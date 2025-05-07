@@ -60,7 +60,9 @@ class AsyncLoopThread:
 
     def __del__(self) -> None:
         self.__loop.call_soon_threadsafe(self.__loop.stop)
-        self.__thread.join()
+#        self.__thread.join()
+# WARNING: we don't join and expect the clients running on this thread to stop themself
+# (using self._running) to finally get rid of this thread to prevent hangs
 
     @property
     def loop(self) -> asyncio.AbstractEventLoop:
@@ -139,7 +141,7 @@ class IteratorReader:
 
 class AsyncComm:
 
-    __slots__ = [ '_asyncLoopThread', '_write_queue', '_host', '_port', '_serial', '_connected_handler', '_disconnected_handler',
+    __slots__ = [ '_asyncLoopThread', '_write_queue', '_running', '_host', '_port', '_serial', '_connected_handler', '_disconnected_handler',
                     '_verify_crc', '_logging' ]
 
     def __init__(self, host:str = '127.0.0.1', port:int = 8080, serial:Optional['SerialSettings'] = None,
@@ -148,6 +150,7 @@ class AsyncComm:
         # internals
         self._asyncLoopThread: Optional[AsyncLoopThread]       = None # the asyncio AsyncLoopThread object
         self._write_queue: 'Optional[asyncio.Queue[bytes]]'    = None # noqa: UP037 # quotes for Python3.8 # the write queue
+        self._running:bool                                     = False              # while True we keep running the thread
 
         # connection
         self._host:str = host
@@ -256,7 +259,7 @@ class AsyncComm:
     # if serial settings are given, host/port are ignore and communication is handled by the given serial port
     async def connect(self, connect_timeout:float=5) -> None:
         writer = None
-        while True:
+        while self._running:
             try:
                 if self._serial is not None:
                     _log.debug('connecting to serial port: %s ...', self._serial['port'])
@@ -311,7 +314,7 @@ class AsyncComm:
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
 
-            await asyncio.sleep(0.7)
+            await asyncio.sleep(0.5)
 
     def send(self, message:bytes) -> None:
         if self.async_loop_thread is not None and self._write_queue is not None:
@@ -324,6 +327,7 @@ class AsyncComm:
         try:
             _log.debug('start sampling')
             if self._asyncLoopThread is None:
+                self._running = True
                 self._asyncLoopThread = AsyncLoopThread()
                 # run sample task in async loop
                 asyncio.run_coroutine_threadsafe(self.connect(connect_timeout), self._asyncLoopThread.loop)
@@ -332,7 +336,7 @@ class AsyncComm:
 
     def stop(self) -> None:
         _log.debug('stop sampling')
-        del self._asyncLoopThread
+        self._running = False
         self._asyncLoopThread = None
         self._write_queue = None
         self.reset_readings()

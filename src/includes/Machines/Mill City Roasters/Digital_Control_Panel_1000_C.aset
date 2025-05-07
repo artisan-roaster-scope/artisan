@@ -1,4 +1,4 @@
-writeSingle([General]
+[General]
 Delay=2000
 roastertype_setup=MCR Digital Control Panel 1000 C
 dropDuplicates=true

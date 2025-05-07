@@ -233,7 +233,7 @@ from artisanlib.util import (appFrozen, uchr, decodeLocal, decodeLocalStrict, en
         application_organization_domain, application_desktop_file_name, getDataDirectory, getAppPath, getResourcePath, debugLogLevelToggle,
         debugLogLevelActive, setDebugLogLevel, createGradient, natsort, setDeviceDebugLogLevel,
         comma2dot, is_proper_temp, weight_units, volume_units, float2float,
-        convertWeight, convertVolume, rgba_colorname2argb_colorname)
+        convertWeight, convertVolume, rgba_colorname2argb_colorname, render_weight)
 
 from artisanlib.qtsingleapplication import QtSingleApplication
 
@@ -886,7 +886,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
         except Exception: # pylint: disable=broad-except
             # not yet monkey patched
             formlayout.fedit_org = formlayout.fedit # type: ignore
-            formlayout.fedit = self.my_fedit
+            formlayout.fedit = self.my_fedit  # pyright:ignore[reportPrivateImportUsage]
 #        # monkey patch _formlayout to work around a MPL3.5.1 issue on Qt6
 #        # (see https://github.com/matplotlib/matplotlib/issues/22471)
 #        if mpl_version in [[3,5,0], [3,5,1]]:
@@ -1487,7 +1487,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     updateScheduleSignal = pyqtSignal()
     disconnectPlusSignal = pyqtSignal()
 
-    __slots__ = [ 'locale_str', 'app', 'superusermode', 'sample_loop_running', 'time_stopped', 'plus_account', 'plus_account_id', 'plus_remember_credentials', 'plus_email', 'plus_language', 'plus_subscription',
+    __slots__ = [ 'locale_str', 'app', 'superusermode', 'sample_loop_running', 'time_stopped', 'plus_account', 'plus_account_id', 'plus_remember_credentials', 'plus_email', 'plus_language', 'plus_subscription', 'percent_decimals',
         'plus_paidUntil', 'plus_rlimit', 'plus_used', 'plus_readonly', 'plus_user_id', 'appearance', 'mpl_fontproperties', 'full_screen_mode_active', 'processingKeyEvent', 'quickEventShortCut',
         'eventaction_running_threads', 'curFile', 'MaxRecentFiles', 'recentFileActs', 'recentSettingActs',
         'recentThemeActs', 'applicationDirectory', 'helpdialog', 'redrawTimer', 'lastLoadedProfile', 'lastLoadedBackground', 'LargeScaleLCDsFlag', 'largeScaleLCDs_dialog',
@@ -1496,7 +1496,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         'weblcds_index_path', 'weblcds_websocket_path',
         'taskWebDisplayGreenActive', 'taskWebDisplayGreenPort', 'taskWebDisplayRoastedActive', 'taskWebDisplayRoastedPort',
         'taskWebDisplayRoastedIndexPath', 'taskWebDisplayRoastedWebSocketPath', 'taskWebDisplayGreen_server', 'taskWebDisplayRoasted_server',
-        'scale_manager', 'scale1_model', 'scale1_id', 'scale2_model', 'scale2_name', 'scale2_id',
+        'scale_manager', 'scale1_model', 'scale1_id', 'container1_idx', 'scale2_model', 'scale2_name', 'scale2_id', 'container2_idx',
         'WebLCDsAlerts', 'EventsDlg_activeTab', 'graphColorDlg_activeTab', 'PID_DlgControl_activeTab', 'CurveDlg_activeTab', 'editGraphDlg_activeTab',
         'backgroundDlg_activeTab', 'DeviceAssignmentDlg_activeTab', 'AlarmDlg_activeTab', 'schedule_activeTab', 'StatisticsDlg_activeTab', 'resetqsettings', 'settingspath', 'wheelpath', 'profilepath',
         'userprofilepath', 'printer', 'main_widget', 'defaultdpi', 'dpi', 'qmc', 'HottopControlActive', 'AsyncSamplingTimer', 'wheeldialog',
@@ -1588,6 +1588,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.plus_rlimit:float = 0 # account amount limit (kg); if 0 then considered as not valid
         self.plus_used:float = 0   # account amount greens roasted within rlimit (kg); if 0 then considered as not valid
         self.plus_readonly:bool = False # True if the plus user has only read rights to the plus account (account might be deactivated, or user might be a read-only user)
+
+        self.percent_decimals:int = 1 # number of decimals to render percentage values like weight loss (set to 0, 1 or 2)
 
         self.appearance:str = ''
         # on Windows we use the Fusion style per default which supports the dark mode
@@ -1689,10 +1691,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.scale1_model:Optional[int] = None
         self.scale1_name:Optional[str] = None  # the display/local name of the device (like "ACAIA162FC")
         self.scale1_id:Optional[str] = None    # the id, eg. the BT address (like "24:71:89:cc:09:05")
+        self.container1_idx:int = -1 # -1: no container set; otherwise index into selected qmc.container_names/qmc.container_weights
         # scale2: just for green
         self.scale2_model:Optional[int] = None
         self.scale2_name:Optional[str] = None  # the display/local name of the device (like "ACAIA162FC")
         self.scale2_id:Optional[str] = None    # the device id, eg. the BT address (like "24:71:89:cc:09:05")
+        self.container2_idx:int = -1 # -1: no container set; otherwise index into selected qmc.container_names/qmc.container_weights
 
         # active tab
         self.EventsDlg_activeTab:int = 0
@@ -4467,6 +4471,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.BTcurve = not self.qmc.BTcurve
             # we reset the cached main event annotation positions as those annotations are now rendered on the other curve
             self.qmc.l_annotations_dict = {}
+            self.qmc.l_event_flags_dict = {}
             # and redraw
             self.qmc.redraw_keep_view(recomputeAllDeltas=False)
 
@@ -4476,6 +4481,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.ETcurve = not self.qmc.ETcurve
             # we reset the cached main event annotation positions as those annotations are now rendered on the other curve
             self.qmc.l_annotations_dict = {}
+            self.qmc.l_event_flags_dict = {}
             self.qmc.redraw_keep_view(recomputeAllDeltas=False)
 
     @pyqtSlot()
@@ -5614,8 +5620,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         # first establish roastersize_setup batchsizes as default batchsize (potentially unit converted)
                         if self.qmc.roastersize_setup > 0:
                             weight_unit = self.qmc.weight[2]
-                            nominal_batch_size = convertWeight(self.qmc.roastersize_setup,1,weight_units.index(self.qmc.weight[2]))
-                            self.qmc.last_batchsize = nominal_batch_size
+                            self.qmc.last_batchsize = convertWeight(self.qmc.roastersize_setup,1,0) # nominal batch size in g
+                            nominal_batch_size = convertWeight(self.qmc.roastersize_setup,1,weight_units.index(weight_unit))
                             self.qmc.weight = (nominal_batch_size,0,weight_unit)
                         # size set, ask for heating
                         resi:Optional[int]
@@ -5699,7 +5705,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         self.sendmessage(QApplication.translate('Message','Action canceled'))
                     else:
                         # setup not canceled, we establish the last_batchsize
-                        self.qmc.weight = (self.qmc.last_batchsize,0,self.qmc.weight[2])
+                        self.qmc.weight = (convertWeight(self.qmc.last_batchsize,0,weight_units.index(self.qmc.weight[2])),0,self.qmc.weight[2])
                     self.establish_etypes()
                 self.qmc.redraw(False,False)
         except Exception as e: # pylint: disable=broad-except
@@ -7577,7 +7583,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     chrg = self.qmc.timex[self.qmc.timeindex[0]]
                 else:
                     chrg = 0
-                if self.qmc.timeindex[6]: # after drop
+                if self.qmc.timeindex[6] and len(self.qmc.timex)>self.qmc.timeindex[6]: # after drop
                     totaltime = self.qmc.timex[self.qmc.timeindex[6]] - chrg
                 else: # before drop
                     totaltime = tx - chrg
@@ -8271,9 +8277,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     if action > 18:
                         action = action + 1 # skip the 19: Aillio PRS
             # after adaption: (see eventaction)
-                value = (self.calcSliderSendValue(n) if v is None else v) # preference for the more precise float value if given over the slider value
-                if action not in {4, 6, 13, 14, 15, 20, 21, 22} or (action in {4,13,20, 22} and v is None): # only for IO, VOUT, S7 and RC Commands we keep the floats always
-                        # and for MODBUS/PWM/Artisan/WebSocket Command if the optional float value v is not given (enabling hi-res ramping event replay)
+                value = (self.calcSliderSendValue(n) if v is None else self.calcEventValue(n,v)) # preference for the more precise float value if given over the slider value
+                if action not in {4, 6, 13, 14, 15, 20, 21, 22}: # only for MODBUS, PWM, Artisan, WebSocket, 6:IO, 14:VOUT, 15:S7 and 16:RC Commands we keep the floats always
                         # NOTE: avoid using 'write({})' in MODBUS commands as {} might be bound to a float and then writing to 2 registers instead of one
                         #       use the more specific 'writeSingle({})' or 'writeWord({})' instead
                     value = int(round(value))
@@ -8306,7 +8311,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.block_quantification_sampling_ticks[n] = self.sampling_ticks_to_block_quantifiction
         self.extraeventsactionslastvalue[n] = self.eventslidervalues[n]
         if self.qmc.flagstart:
-#            value = float2float((self.eventslidervalues[n] + 10.0) / 10.0)
             value = self.qmc.eventsExternal2InternalValue(self.eventslidervalues[n])
             description = str(float2float(self.calcSliderSendValue(n),2)).rstrip('0').rstrip('.') + self.eventsliderunits[n]
             self.qmc.EventRecordAction(extraevent = 1,eventtype=n,eventvalue=value,eventdescription=description)
@@ -9691,9 +9695,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     self.ser.R1.set_fan(int(cmd)/10)
                 elif action == 18 and self.ser.R1 is not None: # Aillio Drum
                     self.ser.R1.set_drum(int(cmd)/10)
-                elif action == 19 and self.ser.R1 is not None:
-                    if cmd_str == 'PRS':
-                        self.ser.R1.prs()
+                elif action == 19 and self.ser.R1 is not None: #Aillio general command
+                    self.ser.R1.send_command(cmd_str)
                 elif action == 20: # Artisan Command
                     if cmd_str:
                         cmds = filter(None, cmd_str.split(';')) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
@@ -9853,14 +9856,46 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                     elif value_int == 2:
                                         self.qmc.replayType = 1
                                         self.qmc.turn_playback_event_ON()
-                                        self.sendmessage(QApplication.translate('Message','playback by BT'))
+                                        self.sendmessage(QApplication.translate('Message','playback by BT').replace('BT', self.BTname))
                                     elif value_int == 3:
                                         self.qmc.replayType = 2
                                         self.qmc.turn_playback_event_ON()
-                                        self.sendmessage(QApplication.translate('Message','playback by ET'))
+                                        self.sendmessage(QApplication.translate('Message','playback by ET').replace('ET', self.ETname))
+                                    elif value_int == 4:
+                                        self.qmc.replayType = 3
+                                        self.qmc.turn_playback_event_ON()
+                                        self.sendmessage(QApplication.translate('Message','playback by time/BT').replace('BT', self.BTname))
+                                    elif value_int == 5:
+                                        self.qmc.replayType = 4
+                                        self.qmc.turn_playback_event_ON()
+                                        self.sendmessage(QApplication.translate('Message','playback by time/ET').replace('ET', self.ETname))
                                     self.updatePlaybackIndicatorSignal.emit()
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
+
+                            # playbackdropmode(<n>) with 0: off, 1: time, 2: BT, 3: ET
+                            elif cs.startswith('playbackdropmode(') and cs.endswith(')'):
+                                try:
+                                    value_int = int(cs[len('playbackdropmode('):-1])
+                                    if value_int == 0:
+                                        self.qmc.replayDropType = 0
+                                        self.qmc.backgroundPlaybackDROP = False
+                                        self.sendmessage(QApplication.translate('Message','playback DROP off'))
+                                    elif value_int == 1:
+                                        self.qmc.replayDropType = 0
+                                        self.qmc.backgroundPlaybackDROP = True
+                                        self.sendmessage(QApplication.translate('Message','playback DROP by time'))
+                                    elif value_int == 2:
+                                        self.qmc.replayDropType = 1
+                                        self.qmc.backgroundPlaybackDROP = True
+                                        self.sendmessage(QApplication.translate('Message','playback DROP by BT'))
+                                    elif value_int == 3:
+                                        self.qmc.replayDropType = 2
+                                        self.qmc.backgroundPlaybackDROP = True
+                                        self.sendmessage(QApplication.translate('Message','playback DROP by ET'))
+                                except Exception as e: # pylint: disable=broad-except
+                                    _log.exception(e)
+
                             # openProperties : open Roast Properties dialog
                             elif cs == 'openProperties':
                                 self.openPropertiesSignal.emit()
@@ -11615,13 +11650,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.alarmAction.setEnabled(False)
             self.autosaveAction.setEnabled(False)
             self.batchAction.setEnabled(False)
-            self.readingsAction.setEnabled(False)
             self.buttonsAction.setChecked(False)
             self.buttonsAction.setEnabled(False)
             self.slidersAction.setChecked(False)
             self.slidersAction.setEnabled(False)
-            self.eventsEditorAction.setChecked(False)
-            self.eventsEditorAction.setEnabled(False)
             self.simulatorAction.setEnabled(False)
 
     def update_minieventline_visibility(self) -> None:
@@ -11831,7 +11863,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                             self.qmc.redraw()
                         # load background when there are no modifiers
                         else:
-                            filename = self.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Load Background'),ext_alt='.alog')
+                            filename = self.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Load Background'),ext='*.alog')
                             if len(filename) != 0:
                                 self.loadBackgroundSignal.emit(filename)
                 elif k == Qt.Key.Key_L: # 76:                       #L (load alarms)
@@ -12500,6 +12532,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 ('densityunits',f'{self.qmc.density[1]}_{self.qmc.density[3]}'),
                 ('density',drop_trailing_zero(f'{self.qmc.density[0]}')),
                 ('moisture',drop_trailing_zero(f'{self.qmc.moisture_greens}')),
+                ('defectsweight',drop_trailing_zero(f'{float2float(self.qmc.roasted_defects_weight,3)}')),
+                ('yield',drop_trailing_zero(f'{float2float(self.qmc.weight[1]-self.qmc.roasted_defects_weight)}')),
+                ('defectsloss',drop_trailing_zero(f"{cp.get('roast_defects_loss',0)}")),
+                ('totalloss',drop_trailing_zero(f"{cp.get('roast_defects_loss',0)+cp.get('weight_loss',0)}")),
                 ('beans_line',beansline),
                 ('beans_10',beansline[:10]),
                 ('beans_15',beansline[:15]),
@@ -12510,7 +12546,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 ('roastedweight',drop_trailing_zero(f'{float2float(float(self.qmc.weight[1]),1)}')),
                 ('roastedvolume',drop_trailing_zero(f'{float2float(float(self.qmc.volume[1]),1)}')),
                 ('roasteddensity',drop_trailing_zero(f'{float2float(float(self.qmc.density_roasted[0]),1)}')),
-                ('roastedmoisture',drop_trailing_zero(f'{float2float(float(self.qmc.moisture_roasted))}')),
+                ('roastedmoisture',drop_trailing_zero(f'{float2float(float(self.qmc.moisture_roasted),1)}')),
                 ('colorwhole',f'{self.qmc.whole_color}'),
                 ('colorground',f'{self.qmc.ground_color}'),
                 ('colorsystem',f'{self.qmc.color_systems[self.qmc.color_system_idx]}'),
@@ -12874,7 +12910,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     #the central OpenFileDialog function that should always be called. Besides triggering the file dialog it
     #reads and sets the actual directory
     # if ext is given, the file selector allows only file with that extension to be selected for open
-    # if ext_alt is given (not None), all files can be selected, but if a file was selected not having the ext_alt the empty string is returned (used in the background profile dialog)
+    # if ext_alt is given (not None), all files can be selected, but if a file was selected not having the ext_alt the empty string is returned (was used in the background profile dialog until v3.1, but why??)
     def ArtisanOpenFileDialog(self, msg:Optional[str] = None, ext:str = '*', ext_alt:Optional[str] = None, path:Optional[str] = None) -> str:
         if msg is None:
             msg = QApplication.translate('Message','Open')
@@ -15486,12 +15522,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     self.qmc.plus_blend_spec_labels = None
             else:
                 self.qmc.plus_blend_spec = None
-                self.qmc.plus_blend_spec_labels = None
+            self.qmc.plus_blend_spec_labels = None
             if 'plus_sync_record_hash' in profile:
                 self.qmc.plus_sync_record_hash = decodeLocal(profile['plus_sync_record_hash'])
             else:
                 self.qmc.plus_sync_record_hash = None
-
             if 'beans' in profile:
                 self.qmc.beans = decodeLocalStrict(profile['beans'])
             else:
@@ -15501,6 +15536,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.qmc.weight = (float(weight[0]),float(weight[1]),decodeLocalStrict(weight[2], 'g'))
             else:
                 self.qmc.weight = (0,0,'g')
+            if 'defects_weight' in profile:
+                defects = profile['defects_weight']
+                self.qmc.roasted_defects_weight = max(0,min(self.qmc.weight[1],float(defects)))
+            else:
+                self.qmc.roasted_defects_weight = 0
             if 'volume' in profile:
                 volume = profile['volume']
                 self.qmc.volume = (float(volume[0]),float(volume[1]),decodeLocalStrict(volume[2], 'l'))
@@ -15962,8 +16002,19 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 # Find the smallest non-zero difference
                 # Exception if there are no non-zero differences
                 try:
-                    resolution = float(numpy.min(numpy.diff(numpy.sort(bt))[numpy.nonzero(numpy.diff(numpy.sort(bt)))]))
+                    # resolution from TP+5 samples to DROP-5 samples (s.b. just increasing trend temps)
+                    tpidx = self.findTP()
+                    rbt = bt[tpidx + 5:self.qmc.timeindex[6] - 5]
+                    resolution_tp = float(numpy.min(numpy.diff(numpy.sort(rbt))[numpy.nonzero(numpy.diff(numpy.sort(rbt)))]))
                 except Exception: # pylint: disable=broad-except
+                    resolution_tp = float('nan')
+                try:
+                    # resolution from CHARGE to DROP (mix of decreasing trend and increasing trend temps)
+                    rbt = bt
+                    resolution = float(numpy.min(numpy.diff(numpy.sort(rbt))[numpy.nonzero(numpy.diff(numpy.sort(rbt)))]))
+                #except Exception: # pylint: disable=broad-except
+                except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
                     resolution = float('nan')
 
                 str_modeChanged = ''
@@ -16019,7 +16070,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     f'Profile quality metrics'
                     f'\n  Title: {self.qmc.title}'
                     f'\n  Meter: {meter}'
-                    f'\n  Resolution: {resolution:.2E} {str_modeChanged}'
+                    f'\n  Resolution: {resolution:.2E}, {resolution_tp:.2E} (TP) {str_modeChanged}'
                     f'\n  Average decimals: {avgDecimal:.2f} {str_modeChanged}'
                     f'\n  Max decimals: {maxDecimal:.2f} {str_modeChanged}'
                     f'\n  Total Samples: {totalSamples}'
@@ -16055,24 +16106,22 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         #Bottom temp@170 - 3min 58sec from drop to bottom temp
                         #Charge temp: 190°C - 25sec from bottom temp to charge
                         output += (
-                            f'\n\n  BBP Metrics'
-                            f'\n  Bottom temp: {bbp_bottom_temp:.2f}{self.qmc.mode} - {bbp_begin_to_bottom_time} from DROP@{self.qmc.temp2[0]:.2f}{self.qmc.mode} to bottom temp'
-                            f'\n  Charge temp: {self.qmc.temp2[self.qmc.timeindex[0]]:.2f} - {bbp_bottom_to_charge_time} from bottom to CHARGE'
+                            f'\n  BBP Bottom temp: {bbp_bottom_temp:.2f}{self.qmc.mode} - {bbp_begin_to_bottom_time} from DROP@{self.qmc.temp2[0]:.2f}{self.qmc.mode} to bottom temp'
+                            f'\n  BBP Charge temp: {self.qmc.temp2[self.qmc.timeindex[0]]:.2f} - {bbp_bottom_to_charge_time} from bottom to CHARGE'
                             f'\n  BBP Low Temp: {bbp_bottom_temp:.2f} {self.qmc.mode}'
                             f'\n  BBP Time Start to Bottom Temp: {bbp_begin_to_bottom_time} at RoR: {bbp_begin_to_bottom_ror:.2f} {self.qmc.mode}/min'
-                            f'\n  BBP RoR Start to Bottom Temp: {bbp_begin_to_bottom_time} at RoR: {bbp_bottom_to_charge_ror:.2f} {self.qmc.mode}/min'
-                            f'\n  BBP Time Bottom Temp to CHARGE: {bbp_bottom_to_charge_time}'
+                            f'\n  BBP Time Bottom Temp to CHARGE: {bbp_bottom_to_charge_time} at RoR: {bbp_bottom_to_charge_ror:.2f} {self.qmc.mode}/min'
                             f'\n  BBP Total Time: {bbp_total_time}'
                             f'\n  '
                         )
                     else:
-                        output += '\n\n  No BBP TP found - Metrics Not Available\n'
+                        output += '\n  BBP: TP not found - Metrics Not Available\n'
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
                     _, _, exc_tb = sys.exc_info()
                     self.qmc.adderror((QApplication.translate('Error Message', 'Error:') + ' profilequality() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             else:
-                output += '\n\n  No BBP - Metrics Not Available\n'
+                output += '\n  BBP: Metrics Not Available\n'
 
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
@@ -16304,23 +16353,26 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             computedProfile['finish_phase_AUC'] = int(round(ts3b,0))
         except Exception: # pylint: disable=broad-except
             pass
-        ######### Weight, Volume, Loss, Gain, Density #########
+        ######### Weight, Volume, Defects, Loss, Gain, Density #########
         try:
             volumein = self.qmc.volume[0]
             volumeout = self.qmc.volume[1]
             weightin = self.qmc.weight[0]
             weightout = self.qmc.weight[1]
             weight_loss = self.weight_loss(weightin,weightout)
+            roast_defects_loss = self.weight_loss(weightout, weightout-self.qmc.roasted_defects_weight)
             volume_gain = self.volume_increase(volumein,volumeout)
             if weight_loss:
-                computedProfile['weight_loss'] = float2float(weight_loss)
+                computedProfile['weight_loss'] = float2float(weight_loss, self.percent_decimals)
+            if roast_defects_loss:
+                computedProfile['roast_defects_loss'] = float2float(roast_defects_loss, self.percent_decimals)
             if volume_gain:
-                computedProfile['volume_gain'] = float2float(volume_gain)
+                computedProfile['volume_gain'] = float2float(volume_gain, self.percent_decimals)
             if self.qmc.moisture_greens and self.qmc.moisture_roasted:
                 moisture_loss = self.qmc.moisture_greens - self.qmc.moisture_roasted
-                computedProfile['moisture_loss'] = float2float(moisture_loss)
+                computedProfile['moisture_loss'] = float2float(moisture_loss, self.percent_decimals)
                 if weight_loss:
-                    computedProfile['organic_loss'] = float2float(weight_loss - moisture_loss)
+                    computedProfile['organic_loss'] = float2float(weight_loss - moisture_loss, self.percent_decimals)
             din = dout = 0.
             # standardize unit of volume and weight to l and g
             if volumein != 0.0:
@@ -16337,6 +16389,17 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 weightout = float2float(convertWeight(weightout,weight_units.index(self.qmc.weight[2]),0),1) # in g
             computedProfile['weightin'] = weightin
             computedProfile['weightout'] = weightout
+
+            roasted_defects_weight = self.qmc.roasted_defects_weight
+            if self.qmc.roasted_defects_weight != 0.0:
+                roasted_defects_weight = float2float(convertWeight(self.qmc.roasted_defects_weight, weight_units.index(self.qmc.weight[2]),0),1) # in g
+            computedProfile['roast_defects_weight'] = roasted_defects_weight
+            if weightin != 0.0:
+                res_weight = (weightin - self.qmc.roasted_defects_weight if weightout == 0 else weightout - self.qmc.roasted_defects_weight)
+                computedProfile['total_yield'] = float2float(convertWeight(res_weight,weight_units.index(self.qmc.weight[2]),0),1) # in g
+                total_loss = self.weight_loss(weightin,res_weight)
+                if total_loss:
+                    computedProfile['total_loss'] = float2float(total_loss, self.percent_decimals)
             if volumein != 0.0 and volumeout != 0.0 and weightin != 0.0 and weightout != 0.0:
                 din = weightin / volumein
                 dout = weightout / volumeout
@@ -16485,6 +16548,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
             profile['beans'] = encodeLocalStrict(self.qmc.beans)
             profile['weight'] = [self.qmc.weight[0],self.qmc.weight[1],encodeLocalStrict(self.qmc.weight[2], 'g')]
+            profile['defects_weight'] = self.qmc.roasted_defects_weight
             profile['volume'] = [self.qmc.volume[0],self.qmc.volume[1],encodeLocalStrict(self.qmc.volume[2], 'l')]
             profile['density'] = [self.qmc.density[0],encodeLocalStrict(self.qmc.density[1], 'g'),self.qmc.density[2],encodeLocalStrict(self.qmc.density[3], 'l')]
             profile['density_roasted'] = [self.qmc.density_roasted[0],encodeLocalStrict(self.qmc.density_roasted[1],'g'),self.qmc.density_roasted[2],encodeLocalStrict(self.qmc.density_roasted[3], 'l')]
@@ -17365,6 +17429,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.plus_language = settings.value('plus_language',self.plus_language)
             self.plus_user_id = settings.value('plus_user_id',self.plus_user_id)
             self.plus_account_id = settings.value('plus_account_id',self.plus_account_id)
+            plus.stock.coffee_label_normal_order = settings.value('standard_bean_labels',plus.stock.coffee_label_normal_order)
             #remember swaplcds and swapdeltalcds
             old_swaplcds = self.qmc.swaplcds
             old_swapdeltalcds = self.qmc.swapdeltalcds
@@ -17499,6 +17564,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.backgroundPlaybackEvents = toBool(settings.value('backgroundPlaybackEvents',self.qmc.backgroundPlaybackEvents))
             self.qmc.backgroundPlaybackDROP = toBool(settings.value('backgroundPlaybackDROP',self.qmc.backgroundPlaybackDROP))
             self.qmc.replayType = toInt(settings.value('replayType',self.qmc.replayType))
+            self.qmc.replayDropType = toInt(settings.value('replayDropType',self.qmc.replayDropType))
             self.qmc.specialeventplaybackaid = [toBool(x) for x in toList(settings.value('specialeventplaybackaid',self.qmc.specialeventplaybackaid))]
             self.qmc.specialeventplayback = [toBool(x) for x in toList(settings.value('specialeventplayback',self.qmc.specialeventplayback))]
             self.qmc.specialeventplaybackramp = [toBool(x) for x in toList(settings.value('specialeventplaybackramp',self.qmc.specialeventplaybackramp))]
@@ -17704,13 +17770,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 #                self.qmc.density[1] = s2a(toString(settings.value("densityweight",self.qmc.density[1])))
 #                self.qmc.density[3] = s2a(toString(settings.value("densityvolume",self.qmc.density[3])))
             self.qmc.volumeCalcUnit = float2float(toFloat(settings.value('volumeCalcUnit',self.qmc.volumeCalcUnit)))
+            self.qmc.roasted_defects_mode = toBool(settings.value('roasted_defects_mode',self.qmc.roasted_defects_mode))
             settings.endGroup()
 #--- END GROUP Units
 
 #--- BEGIN GROUP Tare
             settings.beginGroup('Tare')
             self.qmc.container_names = list(map(str,list(toStringList(settings.value('names',self.qmc.container_names)))))
-            self.qmc.container_weights = [toInt(x) for x in toList(settings.value('weights',self.qmc.container_weights))]
+            self.qmc.container_weights = [toFloat(x) for x in toList(settings.value('weights',self.qmc.container_weights))]
             self.qmc.container_idx = toInt(settings.value('idx',int(self.qmc.container_idx)))
             settings.endGroup()
 #--- END GROUP Tare
@@ -18055,6 +18122,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.deltaBTspan = toInt(settings.value('DeltaSpan',self.qmc.deltaBTspan))
             self.qmc.deltaETspan = toInt(settings.value('DeltaETspan',self.qmc.deltaETspan))
             self.qmc.LCDdecimalplaces = toInt(settings.value('LCDdecimalplaces',self.qmc.LCDdecimalplaces))
+            self.percent_decimals = toInt(settings.value('percent_decimals',self.percent_decimals))
             self.qmc.statisticsmode = toInt(settings.value('statisticsmode',self.qmc.statisticsmode))
             self.qmc.DeltaETlcdflag = toBool(settings.value('DeltaETlcd',self.qmc.DeltaETlcdflag))
             self.qmc.DeltaBTlcdflag = toBool(settings.value('DeltaBTlcd',self.qmc.DeltaBTlcdflag))
@@ -18213,6 +18281,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.gasMix_setup = toInt(settings.value('gasMix_setup',self.qmc.gasMix_setup))
             self.qmc.energyresultunit_setup = toInt(settings.value('energyresultunit_setup',self.qmc.energyresultunit_setup))
 #            self.qmc.energytablecolumnwidths = [toInt(x) for x in toList(settings.value("energytablecolumnwidths",self.qmc.energytablecolumnwidths))]
+            self.qmc.perKgRoastMode = toBool(settings.value('perKgRoastMode',self.qmc.perKgRoastMode))
             settings.endGroup()
             self.qmc.restoreEnergyLoadDefaults()
             self.qmc.restoreEnergyProtocolDefaults()
@@ -18296,8 +18365,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 _log.info('machine: %s (%s, %skg, %s)', self.qmc.machinesetup, self.qmc.roastertype_setup, self.qmc.roastersize_setup, ([''] + self.qmc.sourcenames)[self.qmc.roasterheating_setup])
                 _log.info('device: %s (%s extra devices)', (['Fuji PID']+self.qmc.devices)[self.qmc.device], len(self.qmc.extradevices))
                 _log.info('serial: %s @%s', self.ser.comport, self.ser.baudrate)
-                _log.info('MODBUS %s: %s, %s %s%s%s@%s', ['Serial RTU','Serial ASCII','Serial Binary','TCP','UDP'][self.modbus.type],
-                        self.modbus.host, self.modbus.comport, self.modbus.bytesize, self.modbus.parity, self.modbus.stopbits, self.modbus.baudrate)
+                _log.info('MODBUS %s: %s, %s %s%s%s@%s (%s, %s, %s / %s, %s)', ['Serial RTU','Serial ASCII','Serial Binary','TCP','UDP'][self.modbus.type],
+                        self.modbus.host, self.modbus.comport, self.modbus.bytesize, self.modbus.parity, self.modbus.stopbits, self.modbus.baudrate, self.modbus.timeout, self.modbus.modbus_serial_connect_delay, self.modbus.serial_readRetries, self.modbus.IP_timeout, self.modbus.IP_retries)
                 _log.info('S7: %s', self.s7.host)
                 _log.info('WebSocket: %s', self.ws.host)
             except Exception as e: # pylint: disable=broad-except
@@ -18577,16 +18646,18 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.scale1_model = settings.value('scale1_model',self.scale1_model)
             self.scale1_name = settings.value('scale1_name',self.scale1_name)
             self.scale1_id = settings.value('scale1_id',self.scale1_id)
+            self.container1_idx = toInt(settings.value('container1_idx',int(self.container1_idx)))
             self.scale2_model = settings.value('scale2_model',self.scale2_model)
             self.scale2_name = settings.value('scale2_name',self.scale2_name)
             self.scale2_id = settings.value('scale2_id',self.scale2_id)
+            self.container2_idx = toInt(settings.value('container2_idx',int(self.container2_idx)))
             settings.endGroup()
-#--- END GROUP Tasks
+#--- END GROUP Scales
 
             self.schedule_day_filter =toBool(settings.value('ScheduleDayFilter',self.schedule_day_filter))
             self.schedule_user_filter = toBool(settings.value('ScheduleUserFilter',self.schedule_user_filter))
             self.schedule_machine_filter = toBool(settings.value('ScheduleMachineFilter',self.schedule_machine_filter))
-            self.schedule_visible_filter =toBool(settings.value('ScheduleVisibleFilter',self.schedule_visible_filter))
+            self.schedule_visible_filter = toBool(settings.value('ScheduleVisibleFilter',self.schedule_visible_filter))
             self.scheduled_items_uuids = list(toStringList(settings.value('scheduled_items',self.scheduled_items_uuids)))
             self.scheduleFlag = toBool(settings.value('Schedule',self.scheduleFlag))
             self.scheduler_tasks_visible = toBool(settings.value('SchedulerTasks',self.scheduler_tasks_visible))
@@ -19209,7 +19280,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     if isinstance(m, str):
                         self.qmc.EvalueMarker[0] = m
                     self.qmc.EvalueMarkerSize[0] = max(self.qmc.markersize_min, self.qmc.l_eventtype1dots.get_markersize())
-                    self.qmc.EvalueColor[0] = self.getColor(self.qmc.l_eventtype1dots)
+                    self.qmc.EvalueColor[0] = self.getColor(self.qmc.l_eventtype1dots)[:7] # no alpha for event colors as it is handled separately
                     self.qmc.Evaluelinethickness[0] = max(self.qmc.linewidth_min, self.qmc.l_eventtype1dots.get_linewidth())
                     self.qmc.etypes[0] = str(self.qmc.l_eventtype1dots.get_label())
                 if self.qmc.l_eventtype2dots is not None:
@@ -19217,7 +19288,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     if isinstance(m, str):
                         self.qmc.EvalueMarker[1] = m
                     self.qmc.EvalueMarkerSize[1] = max(self.qmc.markersize_min, self.qmc.l_eventtype2dots.get_markersize())
-                    self.qmc.EvalueColor[1] = self.getColor(self.qmc.l_eventtype2dots)
+                    self.qmc.EvalueColor[1] = self.getColor(self.qmc.l_eventtype2dots)[:7] # no alpha for event colors as it is handled separately
                     self.qmc.Evaluelinethickness[1] = max(self.qmc.linewidth_min, self.qmc.l_eventtype2dots.get_linewidth())
                     self.qmc.etypes[1] = str(self.qmc.l_eventtype2dots.get_label())
                 if self.qmc.l_eventtype3dots is not None:
@@ -19225,7 +19296,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     if isinstance(m, str):
                         self.qmc.EvalueMarker[2] = m
                     self.qmc.EvalueMarkerSize[2] = max(self.qmc.markersize_min, self.qmc.l_eventtype3dots.get_markersize())
-                    self.qmc.EvalueColor[2] = self.getColor(self.qmc.l_eventtype3dots)
+                    self.qmc.EvalueColor[2] = self.getColor(self.qmc.l_eventtype3dots)[:7] # no alpha for event colors as it is handled separately
                     self.qmc.Evaluelinethickness[2] = max(self.qmc.linewidth_min, self.qmc.l_eventtype3dots.get_linewidth())
                     self.qmc.etypes[2] = str(self.qmc.l_eventtype3dots.get_label())
                 if self.qmc.l_eventtype4dots is not None:
@@ -19233,7 +19304,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     if isinstance(m, str):
                         self.qmc.EvalueMarker[3] = m
                     self.qmc.EvalueMarkerSize[3] = max(self.qmc.markersize_min, self.qmc.l_eventtype4dots.get_markersize())
-                    self.qmc.EvalueColor[3] = self.getColor(self.qmc.l_eventtype4dots)
+                    self.qmc.EvalueColor[3] = self.getColor(self.qmc.l_eventtype4dots)[:7] # no alpha for event colors as it is handled separately
                     self.qmc.Evaluelinethickness[3] = max(self.qmc.linewidth_min, self.qmc.l_eventtype4dots.get_linewidth())
                     self.qmc.etypes[3] = str(self.qmc.l_eventtype4dots.get_label())
         except Exception as e: # pylint: disable=broad-except
@@ -19351,6 +19422,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.settingsSetValue(settings, default_settings, 'plus_language', self.plus_language, read_defaults)
                 self.settingsSetValue(settings, default_settings, 'plus_user_id', self.plus_user_id, read_defaults)
                 self.settingsSetValue(settings, default_settings, 'plus_account_id', self.plus_account_id, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'standard_bean_labels', plus.stock.coffee_label_normal_order, read_defaults)
 
             if not read_defaults: # we don't add those to the cache forcing those settings to be saved always
                 #save window geometry if not in fullscreen mode
@@ -19474,6 +19546,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'backgroundPlaybackEvents',self.qmc.backgroundPlaybackEvents, read_defaults)
             self.settingsSetValue(settings, default_settings, 'backgroundPlaybackDROP',self.qmc.backgroundPlaybackDROP, read_defaults)
             self.settingsSetValue(settings, default_settings, 'replayType',self.qmc.replayType, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'replayDropType',self.qmc.replayDropType, read_defaults)
             self.settingsSetValue(settings, default_settings, 'specialeventplaybackaid',self.qmc.specialeventplaybackaid, read_defaults)
             self.settingsSetValue(settings, default_settings, 'specialeventplayback',self.qmc.specialeventplayback, read_defaults)
             self.settingsSetValue(settings, default_settings, 'specialeventplaybackramp',self.qmc.specialeventplaybackramp, read_defaults)
@@ -19853,6 +19926,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'DeltaETspan',self.qmc.deltaETspan, read_defaults)
             self.settingsSetValue(settings, default_settings, 'DeltaSpan',self.qmc.deltaBTspan, read_defaults)
             self.settingsSetValue(settings, default_settings, 'LCDdecimalplaces',self.qmc.LCDdecimalplaces, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'percent_decimals',self.percent_decimals, read_defaults)
             self.settingsSetValue(settings, default_settings, 'statisticsmode',self.qmc.statisticsmode, read_defaults)
             self.settingsSetValue(settings, default_settings, 'swapdeltalcds',self.qmc.swapdeltalcds, read_defaults)
             settings.endGroup()
@@ -19979,6 +20053,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'electricEnergyMix_setup',self.qmc.electricEnergyMix_setup, read_defaults)
             self.settingsSetValue(settings, default_settings, 'gasMix_setup',self.qmc.gasMix_setup, read_defaults)
             self.settingsSetValue(settings, default_settings, 'energyresultunit_setup',self.qmc.energyresultunit_setup, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'perKgRoastMode',self.qmc.perKgRoastMode, read_defaults)
             settings.endGroup()
 #--- END GROUP EnergyUse
 
@@ -20030,6 +20105,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'densityweight',self.qmc.density[1], read_defaults)
             self.settingsSetValue(settings, default_settings, 'densityvolume',self.qmc.density[3], read_defaults)
             self.settingsSetValue(settings, default_settings, 'volumeCalcUnit',self.qmc.volumeCalcUnit, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'roasted_defects_mode',self.qmc.roasted_defects_mode, read_defaults)
             settings.endGroup()
 #--- END GROUP Units
 
@@ -20208,11 +20284,13 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'scale1_model',self.scale1_model, read_defaults)
             self.settingsSetValue(settings, default_settings, 'scale1_name',self.scale1_name, read_defaults)
             self.settingsSetValue(settings, default_settings, 'scale1_id',self.scale1_id, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'container1_idx',self.container1_idx, read_defaults)
             self.settingsSetValue(settings, default_settings, 'scale2_model',self.scale2_model, read_defaults)
             self.settingsSetValue(settings, default_settings, 'scale2_name',self.scale2_name, read_defaults)
             self.settingsSetValue(settings, default_settings, 'scale2_id',self.scale2_id, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'container2_idx',self.container2_idx, read_defaults)
             settings.endGroup()
-#--- END GROUP Tasks
+#--- END GROUP Scales
 
             self.settingsSetValue(settings, default_settings, 'ScheduleDayFilter',self.schedule_day_filter, read_defaults)
             self.settingsSetValue(settings, default_settings, 'ScheduleUserFilter',self.schedule_user_filter, read_defaults)
@@ -20660,6 +20738,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     #  . "weight_in_num" (numeric in g)
     #  . "weight_out_num" (numeric in g)
     #  . "weight_loss_num" (numeric in %)
+    #  . "defects_weight"
+    #  . "defects_loss"
+    #  . "defects_weight_num" (numeric in g)
+    #  . "defects_loss_num" (numeric in %)
     #  . "whole_color"
     #  . "ground_color"
     #  . "color_system"
@@ -20677,9 +20759,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         data_date = data_roastdate.date()
         data_time = data_roastdate.time()
         if data_date is not None:
-            time = data_date.toString('yy-MM-dd') # Qt.DateFormat.SystemLocaleShortDate, Qt.DateFormat.ISODate
+            short_date_format = QLocale().dateFormat(QLocale.FormatType.ShortFormat)
+            time = data_date.toString(short_date_format) # Qt.DateFormat.SystemLocaleShortDate, Qt.DateFormat.ISODate
             if data_time is not None:
-                time += time + data_time.toString('HH:mm') # Qt.DateFormat.SystemLocaleShortDate, Qt.DateFormat.ISODate
+                short_time_format = QLocale().timeFormat(QLocale.FormatType.ShortFormat)
+                time += f' {data_time.toString(short_time_format)}' # Qt.DateFormat.SystemLocaleShortDate, Qt.DateFormat.ISODate
         # weight
         weight_in = ''
         weight_out = ''
@@ -20687,30 +20771,46 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         weight_in_num = 0.
         weight_out_num = 0.
         weight_loss_num = 0.
+        defects_weight = ''
+        defects_loss = ''
+        defects_weight_num = 0.
+        defects_loss_num = 0.
         if 'weight' in data and data['weight'] is not None:
             w = data['weight']
+            d = data.get('defects_weight', 0)
             unit = self.qmc.weight[2]
             wi = convertWeight(w[0],weight_units.index(w[2]),weight_units.index(unit))
             wo = convertWeight(w[1],weight_units.index(w[2]),weight_units.index(unit))
+            wd = convertWeight(d,weight_units.index(w[2]),weight_units.index(unit))
             if unit in {'Kg', 'lb', 'oz'}:
                 weight_in = f'{wi:.3f}'
                 weight_out = f'{wo:.3f}'
+                defects_weight = f'{wd:.3f}'
             else:
                 weight_in = f'{wi:.0f}'
                 weight_out = f'{wo:.0f}'
+                defects_weight = f'{wd:.0f}'
             un = self.qmc.weight[2].lower()
             loss = self.weight_loss(w[0],w[1])
-            weight_loss = f'{loss:.1f}' if 0 < loss < 100 else ''
+            dloss = self.weight_loss(w[1],w[1]-d)
+            weight_loss = str(float2float(loss, self.percent_decimals)) if 0 < loss < 100 else ''
+            defects_loss = str(float2float(dloss, self.percent_decimals)) if 0 < dloss < 100 else ''
             weight_in_num = convertWeight(w[0],weight_units.index(w[2]),weight_units.index('g'))
             weight_out_num = convertWeight(w[1],weight_units.index(w[2]),weight_units.index('g'))
             weight_loss_num = loss
+            defects_weight_num = convertWeight(d,weight_units.index(w[2]),weight_units.index('g'))
+            defects_loss_num = dloss
             if units:
                 if wi > 0:
                     weight_in += un
                 if wo > 0:
                     weight_out += un
+                if wd > 0:
+                    defects_weight += un
                 if 0 < loss < 100:
                     weight_loss += '%'
+                if 0 < dloss < 100:
+                    defects_loss += '%'
 
         res:ProductionDataStr = {
             # id (prefix+nr)
@@ -20730,6 +20830,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             'weight_in_num': weight_in_num,
             'weight_out_num': weight_out_num,
             'weight_loss_num': weight_loss_num,
+            'defects_weight': defects_weight,
+            'defects_loss': defects_loss,
+            'defects_weight_num': defects_weight_num,
+            'defects_loss_num': defects_loss_num,
             'whole_color': data.get('whole_color', 0),
             'ground_color': data.get('ground_color', 0),
             'color_system': data.get('color_system', ''),
@@ -20752,6 +20856,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 <td sorttable_customkey=\"$in_num\">$weightin</td>
 <td sorttable_customkey=\"$out_num\">$weightout</td>
 <td sorttable_customkey=\"$loss_num\">$weightloss</td>
+<td sorttable_customkey=\"$defects_num\">$defects</td>
+<td sorttable_customkey=\"$dfectsloss_num\">$defectsloss</td>
+
 </tr>"""
         ds:ProductionDataStr = self.productionData2string(data,units=False)
         batch_html = ds['id']
@@ -20779,9 +20886,13 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             weightin = ds['weight_in'],
             weightout = ds['weight_out'],
             weightloss = ds['weight_loss'],
+            defects = ds['defects_weight'],
+            defectsloss = ds['defects_loss'],
             in_num = f"{ds['weight_in_num']:.0f}",
             out_num = f"{ds['weight_out_num']:.0f}",
             loss_num = f"{ds['weight_loss_num']:.2f}",
+            defects_num = f"{ds['defects_weight_num']:.0f}",
+            dfectsloss_num = f"{ds['defects_loss_num']:.2f}",
         )
 
     # extracts the following from a give profile dict in a new dict:
@@ -20791,6 +20902,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     #  . "roastdate": QDateTime
     #  . "beans": string
     #  . "weight": [<weight-in>:float,<weight-out>:float,<units>: string] or None
+    #  . defects_weight: float
     @staticmethod
     def profileProductionData(profile:Dict[str, Any]) -> 'ProductionData':
         res:ProductionData = {}
@@ -20877,6 +20989,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             weight = profile['weight']
             if weight is not None:
                 res['weight'] = (weight[0],weight[1],decodeLocalStrict(weight[2], 'g'))
+        if 'defects_weight' in profile:
+            defects_weight = profile['defects_weight']
+            if defects_weight is not None:
+                res['defects_weight'] = defects_weight
         if 'whole_color' in profile:
             res['whole_color'] = profile['whole_color']
         if 'ground_color' in profile:
@@ -20921,24 +21037,29 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 with open(getResourcePath() + 'report-template.htm', encoding='utf-8') as myfile:
                     HTML_REPORT_TEMPLATE=myfile.read()
                 entries = ''
-                total_in = 0.
-                total_out = 0.
+                total_in_sum = 0.
+                total_out_sum = 0.
+                total_defects_sum = 0.
                 unit = self.qmc.weight[2]
                 # collect data
                 for p in profiles:
                     d = self.profileProductionData(p)
                     weight = d.get('weight', (0, 0, weight_units[1]))
+                    defects_weight = d.get('defects_weight', 0)
                     last_unit = (weight[2] if weight is not None else 'kg')
-                    total_in += (convertWeight(weight[0],weight_units.index(last_unit),weight_units.index(unit)) if weight is not None else 0)
-                    total_out += (convertWeight(weight[1],weight_units.index(last_unit),weight_units.index(unit)) if weight is not None else 0)
+                    total_in_sum += (convertWeight(weight[0],weight_units.index(last_unit),weight_units.index(unit)) if weight is not None else 0)
+                    total_out_sum += (convertWeight(weight[1],weight_units.index(last_unit),weight_units.index(unit)) if weight is not None else 0)
+                    total_defects_sum += (convertWeight(defects_weight,weight_units.index(last_unit),weight_units.index(unit)) if defects_weight is not None else 0)
                     entries += self.productionData2htmlentry(d) + '\n'
 
                 html = libstring.Template(HTML_REPORT_TEMPLATE).safe_substitute(
                     title = QApplication.translate('HTML Report Template', 'Roast Batches'),
                     entries = entries,
-                    total_in = (f'{total_in:.2f}' if unit in {'Kg', 'lb', 'oz'} else f'{total_in:.0f}'),
-                    total_out = (f'{total_out:.2f}' if unit in {'Kg', 'lb', 'oz'} else f'{total_out:.0f}'),
-                    total_loss = f'{self.weight_loss(total_in,total_out):.1f}',
+                    total_in = (f'{total_in_sum:.2f}' if unit in {'Kg', 'lb', 'oz'} else f'{total_in_sum:.0f}'),
+                    total_out = (f'{total_out_sum:.2f}' if unit in {'Kg', 'lb', 'oz'} else f'{total_out_sum:.0f}'),
+                    total_loss = float2float(self.weight_loss(total_in_sum,total_out_sum), self.percent_decimals),
+                    total_defects = (f'{total_defects_sum:.2f}' if unit in {'Kg', 'lb', 'oz'} else f'{total_defects_sum:.0f}'),
+                    total_defectsloss = float2float(self.weight_loss(total_out_sum,total_out_sum-total_defects_sum), self.percent_decimals),
                     resources = str(getResourcePath()),
                     batch = QApplication.translate('HTML Report Template', 'Batch'),
                     time = QApplication.translate('HTML Report Template', 'Date'),
@@ -20947,6 +21068,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     weightin = QApplication.translate('HTML Report Template', 'In'),
                     weightout = QApplication.translate('HTML Report Template', 'Out'),
                     loss = QApplication.translate('HTML Report Template', 'Loss'),
+                    defects = QApplication.translate('HTML Report Template', 'Def.'),
+                    defectsloss = QApplication.translate('HTML Report Template', 'Def.L'),
                     sum = QApplication.translate('HTML Report Template', 'SUM'),
                     unit = unit.lower()
                 )
@@ -21062,12 +21185,13 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     # write header
                     with open(filename, 'w',newline='', encoding='utf-8') as outfile:
                         writer= csv.writer(outfile,delimiter='\t')
-                        writer.writerow(['batch','time','profile','beans','in (g)','out (g)','loss (%)','date','time',
+                        writer.writerow(['batch','time','profile','beans','in (g)','out (g)','loss (%)','defects (g)', 'defects loss (%)', 'date','time',
                             f'in ({self.qmc.weight[2].lower()})',f'out ({self.qmc.weight[2].lower()})',
                             'whole color', 'ground color', 'color system', 'machine', 'capacity (kg)', 'beansize min', 'beansize max', 'roasting notes', 'cupping notes'])
                         # write data
 #                        c = 1
                         short_date_format = QLocale().dateFormat(QLocale.FormatType.ShortFormat)
+                        short_time_format = QLocale().timeFormat(QLocale.FormatType.ShortFormat)
                         for p in profiles:
                             try:
                                 d = self.productionData2string(self.profileProductionData(self.deserialize(p)),units=False)
@@ -21079,9 +21203,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                     s2a(d['beans']),
                                     f"{d['weight_in_num']:.0f}",
                                     f"{d['weight_out_num']:.0f}",
-                                    f"{d['weight_loss_num']:.1f}",
+                                    float2float(d['weight_loss_num'], self.percent_decimals),
+                                    f"{d['defects_weight_num']:.0f}",
+                                    float2float(d['defects_loss_num'], self.percent_decimals),
                                     s2a(dt.date().toString(short_date_format)),
-                                    s2a(dt.time().toString(short_date_format)),
+                                    s2a(dt.time().toString(short_time_format)),
                                     s2a(d['weight_in']),
                                     s2a(d['weight_out']),
                                     d['whole_color'],
@@ -21146,11 +21272,15 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         ws['F1'].font = bf
                         ws['G1'] = QApplication.translate('HTML Report Template', 'Loss')
                         ws['G1'].font = bf
+                        ws['H1'] = QApplication.translate('HTML Report Template', 'Defects') + ' (' + str(unit.lower()) + ')'
+                        ws['H1'].font = bf
+                        ws['I1'] = QApplication.translate('HTML Report Template', 'Defects Loss')
+                        ws['I1'].font = bf
 
                         def avgFormat(c:int,r1:str,r2:str) -> str:
                             e1 = f'{r1}{c}'
                             e2 =f'{r2}{c}'
-                            return '=IF(' + e1 + '=0,0,(' + e1 + ' - ' + e2 + ') / ' + e1 + ')'
+                            return f'=IF({e1}=0,0,({e1} - {e2}) / {e1})'
 
                         # write data
                         if unit in {'Kg', 'lb', 'oz'}:
@@ -21168,6 +21298,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                 ws[f'B{c}'].number_format = 'YYYY-MM-DD HH:MM'
                                 ws[f'C{c}'] = d['title']
                                 ws[f'D{c}'] = d['beans']
+
                                 weight = raw_data.get('weight', (0, 0, weight_units[1]))
                                 w_in = (convertWeight(weight[0],weight_units.index(weight[2]),weight_units.index(unit)) if weight is not None else 0)
                                 w_out = (convertWeight(weight[1],weight_units.index(weight[2]),weight_units.index(unit)) if weight is not None else 0)
@@ -21176,7 +21307,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                 ws[f'F{c}'] = w_out # type: ignore[assignment, unused-ignore] # Incompatible types in assignment (expression has type "float", target has type "str")
                                 ws[f'F{c}'].number_format = num_format
                                 ws[f'G{c}'] = avgFormat(c,'E','F')
-                                ws[f'G{c}'].number_format = '0.0%'
+                                ws[f'G{c}'].number_format = ('0.00%' if self.percent_decimals == 2 else '0.0%')
+
+                                w_def = (convertWeight(raw_data.get('defects_weight',0),weight_units.index(weight[2]),weight_units.index(unit)) if weight is not None else 0)
+                                ws[f'H{c}'] = w_def # type: ignore[assignment, unused-ignore] # Incompatible types in assignment (expression has type "float", target has type "str")
+                                ws[f'H{c}'].number_format = num_format
+                                ws[f'I{c}'] = f'=IF(F{c}=0,0,(H{c}) / F{c})'
+                                ws[f'I{c}'].number_format = ('0.00%' if self.percent_decimals == 2 else '0.0%')
+
                             except Exception as e: # pylint: disable=broad-except
                                 _log.exception(e)
                         # write trailer
@@ -21191,7 +21329,15 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                             ws[f'F{c+1}'].number_format = num_format
                             ws[f'G{c+1}'] = avgFormat(c+1,'E','F')
                             ws[f'G{c+1}'].font = bf
-                            ws[f'G{c+1}'].number_format = '0.0%'
+                            ws[f'G{c+1}'].number_format = ('0.00%' if self.percent_decimals == 2 else '0.0%')
+
+                            ws[f'H{c+1}'] = f'=SUM(H2:H{c})'
+                            ws[f'H{c+1}'].font = bf
+                            ws[f'H{c+1}'].number_format = num_format
+                            ws[f'I{c+1}'] = f'=IF(F{c+1}=0,0,(H{c+1}) / F{c+1})'
+                            ws[f'I{c+1}'].font = bf
+                            ws[f'I{c+1}'].number_format = ('0.00%' if self.percent_decimals == 2 else '0.0%')
+
                     wb.save(filename)
                     self.sendmessage(QApplication.translate('Message','Excel Production Report exported to {0}').format(filename))
                 except Exception as e: # pylint: disable=broad-except
@@ -21434,6 +21580,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             ['weightin',            'comp',  'float1',   'false',  'weight',QApplication.translate('HTML Report Template','Weight In')            ],
             ['weightout',           'comp',  'float1',   'false',  'weight',QApplication.translate('HTML Report Template','Weight Out')           ],
             ['weight_loss',         'comp',  'percent',  'false',  '',      QApplication.translate('HTML Report Template','Weight Loss')          ],
+            ['roast_defects_weight','comp',  'float1',   'false',  'weight',QApplication.translate('HTML Report Template','Defects Weight')       ],
+            ['roast_defects_loss',  'comp',  'percent',  'false',  '',      QApplication.translate('HTML Report Template','Defect Loss')          ],
             ['volumein',            'comp',  'float1',   'false',  'volume',QApplication.translate('HTML Report Template','Volume In')            ],
             ['volumeout',           'comp',  'float1',   'false',  'volume',QApplication.translate('HTML Report Template','Volume Out')           ],
             ['volume_gain',         'comp',  'percent',  'false',  '',      QApplication.translate('HTML Report Template','Volume Gain')          ],
@@ -21604,8 +21752,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         import string as libstring
         HTML_REPORT_TEMPLATE = """<tr>
 <td$color_code>$batch</td>
-<td>$time</td>
-<td>$title</td>
+<td>$time<br>$title</td>
 <td sorttable_customkey=\"$in_num\">$weightin</td>
 <td sorttable_customkey=\"$charge_temp_num\">$charge_temp</td>
 <td sorttable_customkey=\"$FCs_time_num\">$FCs_time</td>
@@ -22088,6 +22235,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                             _, _, exc_tb = sys.exc_info()
                             self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' rankingReport() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
+
                     try:
                         # Create a roast phase visualization graph
 
@@ -22242,7 +22390,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         if prev_backgroundpath:
                             self.loadbackground(prev_backgroundpath)
                             self.qmc.background = prev_background
-                        self.qmc.timealign()
+                        if prev_foreground_profile_path or prev_backgroundpath:
+                            self.qmc.timealign()
+                        else:
+                            self.qmc.reset()
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
 
@@ -22451,7 +22602,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                     ws[cr].number_format = '0'
                                 elif typ == 'percent':
                                     ws[cr] = conv_fld/100. # type: ignore[assignment, unused-ignore]
-                                    ws[cr].number_format = '0.0%'
+                                    ws[cr].number_format = ('0.00%' if self.percent_decimals == 2 else '0.0%')
                                 elif typ == 'time':
                                     h,m = divmod(conv_fld,60)
                                     dt = datetime.time(int(h),int(m),0) # note that rounding h and m might lead to failure of .time() as round(59.99) = 60 which is >59 thus not accepted by .time()
@@ -22762,29 +22913,24 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     density = '--'
             except Exception: # pylint: disable=broad-except
                 density = '--'
-            if  self.qmc.weight[0] != 0.0 and self.qmc.weight[1] != 0.0 and 'weight_loss' in cp:
-                weight = self.volume_weight2html(self.qmc.weight[0],self.qmc.weight[1],self.qmc.weight[2],cp['weight_loss'])
-            else:
-                weight = '--'
-            if self.qmc.volume[0] != 0.0 and self.qmc.volume[1] != 0.0 and 'volume_gain' in cp:
-                volume = self.volume_weight2html(self.qmc.volume[0],self.qmc.volume[1],self.qmc.volume[2],cp['volume_gain'])
-            else:
-                volume = '--'
+            weight = self.volume_weight2html(self.qmc.weight[0],self.qmc.weight[1],self.qmc.weight[2],cp.get('weight_loss',None))
+            defects = self.defects2html(self.qmc.roasted_defects_weight,self.qmc.weight[2],cp.get('roast_defects_loss',None))
+            volume = self.volume_weight2html(self.qmc.volume[0],self.qmc.volume[1],self.qmc.volume[2],cp.get('volume_gain',None))
             moisture = ''
             if 'moisture_greens' in cp:
-                moisture = f"{cp['moisture_greens']:.0f}% ({QApplication.translate('Label','greens')})"
+                moisture = f"{float2float(cp['moisture_greens'], self.percent_decimals)}% ({QApplication.translate('Label','greens')})"
                 if 'moisture_roasted' in cp:
                     moisture += '<br>'
             if 'moisture_roasted' in cp:
-                moisture += f"{cp['moisture_roasted']:.0f}% ({QApplication.translate('Label','roasted')})"
+                moisture += f"{float2float(cp['moisture_roasted'],self.percent_decimals)}% ({QApplication.translate('Label','roasted')})"
 
             humidity = ''
             if 'ambient_humidity' in cp:
-                humidity += f"{cp['ambient_humidity']:.0f}%"
+                humidity += f"{cp['ambient_humidity']:.1f}%"
                 if 'ambient_temperature' in cp:
                     humidity += f" at {cp['ambient_temperature']:.0f}{self.qmc.mode}"
             elif 'ambient_temperature' in cp:
-                humidity += f"{cp['ambient_temperature']:.0f}{self.qmc.mode}"
+                humidity += f"{cp['ambient_temperature']:.1f}{self.qmc.mode}"
             if 'ambient_pressure' in cp:
                 if len(humidity) != 0:
                     humidity += ', '
@@ -22864,8 +23010,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 beans=beans_html,
                 weight_label=QApplication.translate('HTML Report Template', 'Weight:'),
                 weight=weight,
-#                degree_label=QApplication.translate("HTML Report Template", "Degree:"),
-#                degree=degree,
+                defects_label=f"{QApplication.translate('Label', 'Defects')}:",
+                defects=defects,
                 volume_label=QApplication.translate('HTML Report Template', 'Volume:'),
                 volume=volume,
                 roaster_label=QApplication.translate('HTML Report Template', 'Roaster:'),
@@ -23016,10 +23162,29 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         score += self.qmc.flavors_total_correction
         return score, all_default
 
-    @staticmethod
-    def volume_weight2html(amount:float, out:float, unit:str, change:float) -> str:
-        if amount:
-            return f'{amount:.1f}{unit}<br>{out}{unit} ({change:.1f}%)'
+    def volume_weight2html(self, amount:float, out:float, unit:str, change:Optional[float]) -> str:
+        if amount>0:
+            if unit == 'g':
+                res = f'{amount:.0f}{unit.lower()}'
+            else:
+                res = f'{amount:.1f}{unit.lower()}'
+            if out>0:
+                if unit == 'g':
+                    res = f'{res}<br>{out:.0f}{unit.lower()}'
+                else:
+                    res = f'{res}<br>{out:.1f}{unit.lower()}'
+            if change is not None and 100 > change > 0:
+                res = f'{res} ({float2float(change, self.percent_decimals)}%)'
+            return res
+        return '--'
+
+    def defects2html(self, amount:float, unit:str, change:Optional[float]) -> str:
+        if amount>0:
+            unit_idx = weight_units.index(unit)
+            res = render_weight(amount,unit_idx,unit_idx)
+            if change is not None:
+                res = f'{res} ({float2float(change, self.percent_decimals)}%)'
+            return res
         return '--'
 
     def phases2html(self, cp:'ComputedProfileInformation') -> Tuple[str,str,str,str]:
@@ -23030,7 +23195,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 #dryphase
                 if 'dryphasetime' in cp:
                     dryphasetime = cp['dryphasetime']
-                    dryphase = f"{stringfromseconds(cp['dryphasetime'])} ({int(round(dryphasetime*100./totaltime))}%)"
+                    dryphase = f"{stringfromseconds(cp['dryphasetime'])} ({float2float(dryphasetime*100./totaltime)}%)"
                     if 'dry_phase_ror' in cp:
                         dryphase += f"<br>{cp['dry_phase_ror']:.1f}{uchr(176)}{self.qmc.mode}/min"
                     if 'dry_phase_delta_temp' in cp:
@@ -23038,7 +23203,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 #midphase
                 if 'midphasetime' in cp:
                     midphasetime = cp['midphasetime']
-                    midphase = f"{stringfromseconds(cp['midphasetime'])} ({int(round(midphasetime*100./totaltime))}%)"
+                    midphase = f"{stringfromseconds(cp['midphasetime'])} ({float2float(midphasetime*100./totaltime)}%)"
                     if 'mid_phase_ror' in cp:
                         midphase += f"<br>{cp['mid_phase_ror']:.1f}{uchr(176)}{self.qmc.mode}/min"
                     if 'mid_phase_delta_temp' in cp:
@@ -23046,7 +23211,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 #finishphase
                 if 'finishphasetime' in cp:
                     finishphasetime = cp['finishphasetime']
-                    finishphase = f"{stringfromseconds(cp['finishphasetime'])} ({int(round(finishphasetime*100./totaltime))}%)"
+                    finishphase = f"{stringfromseconds(cp['finishphasetime'])} ({float2float(finishphasetime*100./totaltime)}%)"
                     if 'finish_phase_ror' in cp:
                         finishphase += f"<br>{cp['finish_phase_ror']:.1f}{uchr(176)}{self.qmc.mode}/min"
                     if 'finish_phase_delta_temp' in cp:
@@ -23054,7 +23219,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 #coolphase
                 if 'coolphasetime' in cp:
                     coolphasetime = cp['coolphasetime']
-                    coolphase = f"{stringfromseconds(cp['coolphasetime'])} ({int(round(coolphasetime*100./totaltime))}%)"
+                    coolphase = f"{stringfromseconds(cp['coolphasetime'])} ({float2float(coolphasetime*100./totaltime)}%)"
         return dryphase, midphase, finishphase, coolphase
 
     def event2html(self,cp:'ComputedProfileInformation', time_key:str, BT_key:Optional[str], prev_time_key:Optional[str]=None) -> str:
@@ -24901,178 +25066,179 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             if self.qmc.reset():
                 tree = ET.ElementTree(file=filename)
                 root = tree.getroot()
-                self.normalize_tags(root) # normalize tags to lower case
-                self.normalize_attr(root) # normalize attributes to lower case
+                if root is not None:
+                    self.normalize_tags(root) # normalize tags to lower case
+                    self.normalize_attr(root) # normalize attributes to lower case
 
-                if root.tag == 'history':
-                    date = root.find('historydate')
-                    time = root.find('historytime')
-                    if date is not None and time is not None:
-                        date_str = date.text
-                        time_str = time.text
-                        if date_str is not None and time_str is not None:
-                            self.qmc.roastdate = QDateTime(QDate.fromString(date_str,'M/d/yyyy'),QTime.fromString(time_str,'h:mm AP'))
+                    if root.tag == 'history':
+                        date = root.find('historydate')
+                        time = root.find('historytime')
+                        if date is not None and time is not None:
+                            date_str = date.text
+                            time_str = time.text
+                            if date_str is not None and time_str is not None:
+                                self.qmc.roastdate = QDateTime(QDate.fromString(date_str,'M/d/yyyy'),QTime.fromString(time_str,'h:mm AP'))
 
-                title = root.find('roasttype')
-                if title is None:
-                    self.qmc.title = str(os.path.basename(filename))
-                else:
-                    self.qmc.title = str(title.text)
-
-                beans = root.find('coffeetype')
-                if beans is not None and beans.text is not None:
-                    self.qmc.beans = str(beans.text)
-
-                roaster = root.find('roaster')
-                if roaster is not None and roaster.text is not None:
-                    self.qmc.roastertype = str(roaster.text)
-
-                chargestr = root.find('charge')
-                if chargestr is None:
-                    chargestr = root.find('chargingcapacity')
-                if chargestr is not None: # contains floating point number; default unit Kg
-                    try:
-                        weight_in_str = chargestr.text
-                        if weight_in_str is not None:
-                            self.qmc.weight = (float(weight_in_str), self.qmc.weight[1], 'Kg')
-                    except Exception: # pylint: disable=broad-except
-                        pass
-
-                dischargestr = root.find('dischargingcapacity')
-                if dischargestr is not None: # contains floating point number; default unit Kg
-                    try:
-                        weight_out_str = dischargestr.text
-                        if weight_out_str is not None:
-                            self.qmc.weight = (self.qmc.weight[0], float(weight_out_str), 'Kg')
-                    except Exception: # pylint: disable=broad-except
-                        pass
-
-                colorstr = root.find('coffeecolor')
-                if colorstr is not None:
-                    c = None
-                    if colorstr.text is not None:
-                        for e in colorstr.text.strip().split():
-                            try:
-                                c = int(e)
-                                break
-                            except Exception: # pylint: disable=broad-except
-                                pass
-                    if c:
-                        self.qmc.ground_color = c
-
-                notes = root.find('notes')
-                if notes is not None and notes.text is not None:
-                    self.qmc.roastingnotes = str(notes.text)
-
-                recipedata = None
-                historydata = None
-                recipedata = tree.find('recipedata')
-                m = None
-                if recipedata is not None:
-                    m = recipedata.get('temp_unit')
-                else:
-                    mt = tree.find('recipedata_temp_unit')
-                    if mt is not None:
-                        m = mt.text
-                if m is None:
-                    historydata = tree.find('historydata')
-                    if historydata is not None:
-                        m = historydata.get('temp_unit')
+                    title = root.find('roasttype')
+                    if title is None:
+                        self.qmc.title = str(os.path.basename(filename))
                     else:
-                        mt = tree.find('historydata_temp_unit')
+                        self.qmc.title = str(title.text)
+
+                    beans = root.find('coffeetype')
+                    if beans is not None and beans.text is not None:
+                        self.qmc.beans = str(beans.text)
+
+                    roaster = root.find('roaster')
+                    if roaster is not None and roaster.text is not None:
+                        self.qmc.roastertype = str(roaster.text)
+
+                    chargestr = root.find('charge')
+                    if chargestr is None:
+                        chargestr = root.find('chargingcapacity')
+                    if chargestr is not None: # contains floating point number; default unit Kg
+                        try:
+                            weight_in_str = chargestr.text
+                            if weight_in_str is not None:
+                                self.qmc.weight = (float(weight_in_str), self.qmc.weight[1], 'Kg')
+                        except Exception: # pylint: disable=broad-except
+                            pass
+
+                    dischargestr = root.find('dischargingcapacity')
+                    if dischargestr is not None: # contains floating point number; default unit Kg
+                        try:
+                            weight_out_str = dischargestr.text
+                            if weight_out_str is not None:
+                                self.qmc.weight = (self.qmc.weight[0], float(weight_out_str), 'Kg')
+                        except Exception: # pylint: disable=broad-except
+                            pass
+
+                    colorstr = root.find('coffeecolor')
+                    if colorstr is not None:
+                        c = None
+                        if colorstr.text is not None:
+                            for e in colorstr.text.strip().split():
+                                try:
+                                    c = int(e)
+                                    break
+                                except Exception: # pylint: disable=broad-except
+                                    pass
+                        if c:
+                            self.qmc.ground_color = c
+
+                    notes = root.find('notes')
+                    if notes is not None and notes.text is not None:
+                        self.qmc.roastingnotes = str(notes.text)
+
+                    recipedata = None
+                    historydata = None
+                    recipedata = tree.find('recipedata')
+                    m = None
+                    if recipedata is not None:
+                        m = recipedata.get('temp_unit')
+                    else:
+                        mt = tree.find('recipedata_temp_unit')
                         if mt is not None:
                             m = mt.text
-                if m is not None:
-                    m = m.lower()
-                    if m == 'c' and self.qmc.mode == 'F':
-                        self.qmc.celsiusMode()
-                    elif m == 'f' and self.qmc.mode == 'C':
-                        self.qmc.fahrenheitMode()
-
-                # add extra device if needed
-                for __ in range(max(0,1 - len(self.qmc.extradevices))):
-                    self.addDevice()
-                if self.qmc.extraname1[0] == 'Extra 1':
-                    self.qmc.extraname1[0] = 'Burner'
-
-                diagrampoints = None
-                if recipedata is not None:
-                    diagrampoints = tree.find('recipedata/diagrampoints')
-                if diagrampoints is None:
-                    diagrampoints = tree.find('diagrampoints')
-                if diagrampoints is None:
-                    diagrampoints = tree.find('historydata')
-                last_timez = 0.
-                if diagrampoints is not None:
-                    for elem in diagrampoints.findall('data'):
-                        time_entry = elem.find('time')
-                        if time_entry is None:
-                            time_entry = elem.find('stime')
-                        if time_entry is None or time_entry.text is None:
-                            last_timez = last_timez + 1
-                            timez = last_timez
+                    if m is None:
+                        historydata = tree.find('historydata')
+                        if historydata is not None:
+                            m = historydata.get('temp_unit')
                         else:
-                            timez = float(stringtoseconds(time_entry.text))
-                            last_timez = timez
-                        self.qmc.timex.append(timez)
-                        self.qmc.temp1.append(-1)
-                        temp_entry = elem.find('temperature')
-                        if temp_entry is None:
-                            temp_entry = elem.find('ntemperature')
-                        if temp_entry is not None:
-                            bt = temp_entry.text
-                            if bt is not None:
-                                bt = bt.replace(',','.')
-                                self.qmc.temp2.append(float(bt))
-                                self.qmc.extratimex[0].append(timez)
-                                burner_entry = elem.find('burnercapacity')
-                                if burner_entry is None:
-                                    burner_entry = elem.find('nburnercapacity')
-                                if burner_entry is not None:
-                                    burner = burner_entry.text
-                                    if burner is not None:
-                                        burner = burner.replace(',','.')
-                                        self.qmc.extratemp1[0].append(float(burner))
-                                        self.qmc.extratemp2[0].append(-1)
+                            mt = tree.find('historydata_temp_unit')
+                            if mt is not None:
+                                m = mt.text
+                    if m is not None:
+                        m = m.lower()
+                        if m == 'c' and self.qmc.mode == 'F':
+                            self.qmc.celsiusMode()
+                        elif m == 'f' and self.qmc.mode == 'C':
+                            self.qmc.fahrenheitMode()
 
-                if len(self.qmc.timex) > 2:
-                    self.qmc.profile_sampling_interval = (self.qmc.timex[-1] - self.qmc.timex[0])/(len(self.qmc.timex) - 1)
-                self.qmc.updateDeltaSamples()
+                    # add extra device if needed
+                    for __ in range(max(0,1 - len(self.qmc.extradevices))):
+                        self.addDevice()
+                    if self.qmc.extraname1[0] == 'Extra 1':
+                        self.qmc.extraname1[0] = 'Burner'
 
-                # set CHARGE and DROP
-                self.qmc.timeindex[0] = 0
-                self.qmc.timeindex[6] = max(0,len(self.qmc.timex) - 1)
+                    diagrampoints = None
+                    if recipedata is not None:
+                        diagrampoints = tree.find('recipedata/diagrampoints')
+                    if diagrampoints is None:
+                        diagrampoints = tree.find('diagrampoints')
+                    if diagrampoints is None:
+                        diagrampoints = tree.find('historydata')
+                    last_timez = 0.
+                    if diagrampoints is not None:
+                        for elem in diagrampoints.findall('data'):
+                            time_entry = elem.find('time')
+                            if time_entry is None:
+                                time_entry = elem.find('stime')
+                            if time_entry is None or time_entry.text is None:
+                                last_timez = last_timez + 1
+                                timez = last_timez
+                            else:
+                                timez = float(stringtoseconds(time_entry.text))
+                                last_timez = timez
+                            self.qmc.timex.append(timez)
+                            self.qmc.temp1.append(-1)
+                            temp_entry = elem.find('temperature')
+                            if temp_entry is None:
+                                temp_entry = elem.find('ntemperature')
+                            if temp_entry is not None:
+                                bt = temp_entry.text
+                                if bt is not None:
+                                    bt = bt.replace(',','.')
+                                    self.qmc.temp2.append(float(bt))
+                                    self.qmc.extratimex[0].append(timez)
+                                    burner_entry = elem.find('burnercapacity')
+                                    if burner_entry is None:
+                                        burner_entry = elem.find('nburnercapacity')
+                                    if burner_entry is not None:
+                                        burner = burner_entry.text
+                                        if burner is not None:
+                                            burner = burner.replace(',','.')
+                                            self.qmc.extratemp1[0].append(float(burner))
+                                            self.qmc.extratemp2[0].append(-1)
 
-                if recipedata is not None:
-                    switchpoints = tree.find('recipedata/switchpoints')
-                else:
-                    switchpoints = tree.find('switchpoints')
-                if switchpoints is not None:
-                    for elem in switchpoints.findall('data'):
-                        time_entry = elem.find('time')
-                        if time_entry is None:
-                            time_entry = elem.find('stime')
-                        if time_entry is not None:
-                            time_str = time_entry.text
-                            if time_str is not None:
-                                time = float(stringtoseconds(time_str))
-                                burner_entry = elem.find('burnercapacity')
-                                if burner_entry is None:
-                                    burner_entry = elem.find('nburnercapacity')
-                                if burner_entry is not None:
-                                    burner = burner_entry.text
-                                    if burner is not None:
-                                        self.qmc.addEvent(
-                                            self.qmc.time2index(time),
-                                            3,
-                                            '',
-                                            self.qmc.str2eventsvalue(burner))
+                    if len(self.qmc.timex) > 2:
+                        self.qmc.profile_sampling_interval = (self.qmc.timex[-1] - self.qmc.timex[0])/(len(self.qmc.timex) - 1)
+                    self.qmc.updateDeltaSamples()
 
-                self.autoAdjustAxis()
+                    # set CHARGE and DROP
+                    self.qmc.timeindex[0] = 0
+                    self.qmc.timeindex[6] = max(0,len(self.qmc.timex) - 1)
 
-                self.sendmessage(QApplication.translate('Message','Probat Pilot data imported successfully'))
-                self.qmc.redraw()
-                self.qmc.fileDirtySignal.emit()
+                    if recipedata is not None:
+                        switchpoints = tree.find('recipedata/switchpoints')
+                    else:
+                        switchpoints = tree.find('switchpoints')
+                    if switchpoints is not None:
+                        for elem in switchpoints.findall('data'):
+                            time_entry = elem.find('time')
+                            if time_entry is None:
+                                time_entry = elem.find('stime')
+                            if time_entry is not None:
+                                time_str = time_entry.text
+                                if time_str is not None:
+                                    time = float(stringtoseconds(time_str))
+                                    burner_entry = elem.find('burnercapacity')
+                                    if burner_entry is None:
+                                        burner_entry = elem.find('nburnercapacity')
+                                    if burner_entry is not None:
+                                        burner = burner_entry.text
+                                        if burner is not None:
+                                            self.qmc.addEvent(
+                                                self.qmc.time2index(time),
+                                                3,
+                                                '',
+                                                self.qmc.str2eventsvalue(burner))
+
+                    self.autoAdjustAxis()
+
+                    self.sendmessage(QApplication.translate('Message','Probat Pilot data imported successfully'))
+                    self.qmc.redraw()
+                    self.qmc.fileDirtySignal.emit()
         except OSError as ex:
             self.qmc.adderror((QApplication.translate('Error Message','IO Error:') + ' importPilot(): {0}').format(str(ex)))
         except ValueError as ex:

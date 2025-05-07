@@ -75,10 +75,13 @@ class Scale:
     def set_disconnected_handler(self, disconnected_handler:Optional[Callable[[], None]]) -> None:
         pass
 
-    def connect(self) -> None:
+    def connect_scale(self) -> None:
         pass
 
-    def disconnect(self) -> None:
+    def disconnect_scale(self) -> None:
+        pass
+
+    def tare_scale(self) -> None:
         pass
 
 
@@ -119,7 +122,7 @@ class ScaleManager:
 
     def set_scale1(self, scale:Optional[Scale]) -> None:
         if self.scale1 is not None:
-            self.scale1.disconnect()
+            self.scale1.disconnect_scale()
         self.scale1 = scale
 
     def get_scale1(self) -> Optional[Scale]:
@@ -127,7 +130,7 @@ class ScaleManager:
 
     def set_scale2(self, scale:Optional[Scale]) -> None:
         if self.scale2 is not None:
-            self.scale2.disconnect()
+            self.scale2.disconnect_scale()
         self.scale2 = scale
 
     def get_scale2(self) -> Optional[Scale]:
@@ -135,8 +138,8 @@ class ScaleManager:
 
     def disconnect_all(self) -> None:
         if self.scale1 is not None:
-            self.scale1.disconnect()
+            self.scale1.disconnect_scale()
             self.scale1 = None
         if self.scale2 is not None:
-            self.scale2.disconnect()
+            self.scale2.disconnect_scale()
             self.scale2 = None

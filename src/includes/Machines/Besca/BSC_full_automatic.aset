@@ -87,7 +87,7 @@ autoDrop=false
 
 [DefaultButtons]
 buttonactions=3, 0, 0, 0, 0, 0, 3, 0
-buttonactionstrings="write(1,1008,2);sleep(10);write(1,1008,5)", , , , , , "write(1,1009,2);sleep(10);write(1,1009,5)", 
+buttonactionstrings="writeSingle(1,1008,2);sleep(10);writeSingle(1,1008,5)", , , , , , "writeSingle(1,1009,2);sleep(10);writeSingle(1,1009,5)", 
 buttonvisibility=true, true, true, true, true, false, true, true
 extrabuttonactions=0, 0, 0
 extrabuttonactionstrings=, , 
@@ -189,7 +189,7 @@ eventslidersflags=1, 1, 1
 eventslidertemp=0, 0, 0, 0
 eventsliderunits=, , , 
 slideractions=2, 2, 0, 2
-slidercommands="write(1,1003,{})", "write(1,1001,{})", , "write(1,3904,{})"
+slidercommands="writeSingle(1,1003,{})", "writeSingle(1,1001,{})", , "writeSingle(1,3904,{})"
 sliderfactors=2.57, 4, 1, 45
 slidermax=100, 100, 100, 100
 slidermin=0, 0, 0, 0

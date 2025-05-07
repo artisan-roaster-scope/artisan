@@ -43,10 +43,10 @@ body:
       description: Shown in the top window bar or in 'Help>> About'.
       options:
         - 
+        - 3.1.4
+        - 3.1.5 Continuous Build
+        - 3.1.2
         - 3.1.0
-        - 3.1.1 Continuous Build
-        - 3.0.2
-        - 3.0.0
         - Other - include in Description
       default: 0
     validations:

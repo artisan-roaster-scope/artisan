@@ -29,7 +29,7 @@ import sys
 import time
 import logging
 from datetime import datetime, timezone
-from enum import Enum
+from enum import Enum, unique
 from artisanlib.util import getResourcePath
 from artisanlib.qtsingleapplication import QtSingleApplication
 import plus.util
@@ -40,6 +40,7 @@ from typing import Final, Optional, List, Union
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
+@unique
 class NotificationType(Enum):
     ARTISAN_SYSTEM = 1 # issued by some internal Artisan activity
     ARTISAN_USER = 2   # issues with notify() Artisan Command

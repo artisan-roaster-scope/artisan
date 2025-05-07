@@ -93,7 +93,10 @@ def toggle(app_window:'ApplicationWindow') -> None:
         ):  # @UndefinedVariable
             sync.sync()
     elif config.connected:
-        if is_synced():
+        if not is_synced() and app_window.qmc.checkSaved(allow_discard=False):
+            # we (manually) turn syncing for the current roast on
+            queue.addRoast()
+        else:
             # a CTR-click (COMMAND on macOS) logs out and
             # discards the credentials
             modifiers = QApplication.keyboardModifiers()
@@ -102,9 +105,6 @@ def toggle(app_window:'ApplicationWindow') -> None:
                 remove_credentials=(modifiers == Qt.KeyboardModifier.ControlModifier),
                 keepON=False,
             )
-        elif app_window.qmc.checkSaved(allow_discard=False):
-            # we (manually) turn syncing for the current roast on
-            queue.addRoast()
     else:
         disconnect(
             remove_credentials=False,

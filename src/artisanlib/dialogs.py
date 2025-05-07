@@ -20,19 +20,20 @@ import logging
 import re
 
 try:
-    from PyQt6.QtCore import Qt, QEvent, QSettings, pyqtSlot, QRegularExpression # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtCore import Qt, QEvent, QSettings, pyqtSlot, pyqtSignal, QRegularExpression # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import (QApplication, QWidget, QDialog, QMessageBox, QDialogButtonBox, QTextEdit,  # @UnusedImport @Reimport  @UnresolvedImport
-                QHBoxLayout, QVBoxLayout, QLabel, QLineEdit, QLayout)  # @UnusedImport @Reimport  @UnresolvedImport
+                QHBoxLayout, QVBoxLayout, QLabel, QLineEdit, QLayout, QTableWidget, QHeaderView, QPushButton)  # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtGui import QKeySequence, QAction, QIntValidator, QTextCharFormat, QTextCursor, QColor  # @UnusedImport @Reimport  @UnresolvedImport
 except ImportError:
-    from PyQt5.QtCore import Qt, QEvent, QSettings, pyqtSlot, QRegularExpression # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import Qt, QEvent, QSettings, pyqtSlot, pyqtSignal, QRegularExpression # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QWidget, QAction, QDialog, QMessageBox, QDialogButtonBox, QTextEdit, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-                QHBoxLayout, QVBoxLayout, QLabel, QLineEdit, QLayout) # @UnusedImport @Reimport  @UnresolvedImport
+                QHBoxLayout, QVBoxLayout, QLabel, QLineEdit, QLayout, QTableWidget, QHeaderView, QPushButton) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QKeySequence, QIntValidator, QTextCharFormat, QTextCursor, QColor # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
-from artisanlib.widgets import MyQComboBox
+from artisanlib.widgets import MyQComboBox, ClickableQLineEdit
+from artisanlib.util import comma2dot, float2float, float2floatWeightVolume, convertWeight, weight_units
 
-from typing import Optional, List, Tuple, TYPE_CHECKING
+from typing import Optional, List, Tuple, cast, Callable, TYPE_CHECKING
 from typing import Final  # Python <=3.7
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
@@ -179,7 +180,7 @@ class HelpDlg(ArtisanDialog):
         # Initialize search state variables
         self.matches: List[QTextCursor] = []
         self.current_match_index = 0
-        self.previous_search_term = ""
+        self.previous_search_term = ''
 
         # Search bar
         self.search_input = QLineEdit()
@@ -187,7 +188,7 @@ class HelpDlg(ArtisanDialog):
 
         # Connect Enter key to search and navigate results
         self.search_input.returnPressed.connect(self.doSearch)
-        
+
         # Show only the ArtisanDialog standard OK button
         self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel))
 
@@ -198,7 +199,7 @@ class HelpDlg(ArtisanDialog):
 
         # Build the dialog layout
         homeLabel = QLabel()
-        homeLabel.setText(f"{QApplication.translate('Label', 'For more details visit')} <a href='https://artisan-scope.org'>artisan-scope.org</a>")
+        homeLabel.setText(f"{QApplication.translate('Label', 'For more details visit')} <a href='https://artisan-scope.org/help/'>artisan-scope.org/help/</a>")
         homeLabel.setOpenExternalLinks(True)
         buttonLayout = QHBoxLayout()
         buttonLayout.addWidget(homeLabel)
@@ -251,13 +252,13 @@ class HelpDlg(ArtisanDialog):
         tc = self.phelp.textCursor()
         tc.clearSelection()
         self.phelp.setTextCursor(tc)
-        
+
         search_term = self.search_input.text().strip()
-        
+
         # Clear highlights and state when search term is empty
-        if search_term == "":
+        if search_term == '':
             self.matches = []
-            self.previous_search_term = ""
+            self.previous_search_term = ''
             return
 
         # Do a fresh search when a new search_term is entered
@@ -265,17 +266,17 @@ class HelpDlg(ArtisanDialog):
             self.previous_search_term = search_term
             self.current_match_index = 0
             self.matches = []
-            
+
             # Create a case-insensitive regular expression.
             regex = QRegularExpression(re.escape(search_term))
             regex.setPatternOptions(QRegularExpression.PatternOption.CaseInsensitiveOption)
-            
+
             # Start at the beginning of the document.
             cursor = self.phelp.textCursor()
             cursor.movePosition(QTextCursor.MoveOperation.Start)
-            
+
             # Collect all matches.
-            for _ in range(500000):  # arbitrarily large limit, better than while True, should always exit via break 
+            for _ in range(500000):  # arbitrarily large limit, better than while True, should always exit via break
                 found = self.phelp.document().find(regex, cursor)  # type: ignore  #self.phelp.document() will never be None
                 if found.isNull():
                     break
@@ -293,10 +294,10 @@ class HelpDlg(ArtisanDialog):
             self.current_match_index = (self.current_match_index + 1) % len(self.matches)
 
         extraSelections = []
-        match_text = "black"
-        current_match_highlight = "#A6FF00" 
-        extra_matches_highlight = "yellow"
-        
+        match_text = 'black'
+        current_match_highlight = '#A6FF00'
+        extra_matches_highlight = 'yellow'
+
         if self.matches:
             # Highlight all matches, the current match in current_match_highlight and all others in extra_matches_highlight
             for i, matchCursor in enumerate(self.matches):
@@ -309,7 +310,7 @@ class HelpDlg(ArtisanDialog):
                 else:
                     fmt.setBackground(QColor(extra_matches_highlight))
                 if self.aw.app.darkmode:
-                    fmt.setForeground(QColor("black"))
+                    fmt.setForeground(QColor('black'))
                 selection.format = fmt
                 extraSelections.append(selection)
             # Move the visible cursor to the current match and clear its active selection
@@ -578,3 +579,172 @@ class ArtisanSliderLCDinputDlg(ArtisanDialog):
     def accept(self) -> None:
         self.value = int(self.valueEdit.text())
         super().accept()
+
+
+##########################################################################
+#####################  VIEW Tare  ########################################
+##########################################################################
+
+
+class tareDlg(ArtisanDialog):
+    tare_updated_signal = pyqtSignal()  # signalled after tare data table got updated
+
+    def __init__(self, parent:ArtisanDialog, aw:'ApplicationWindow', get_scale_weight: Callable[[], Optional[float]]) -> None:
+        super().__init__(parent, aw)
+        self.parent_dialog = parent
+        self.get_scale_weight = get_scale_weight
+        self.setModal(True)
+        self.setWindowTitle(QApplication.translate('Form Caption','Containers'))
+
+        self.taretable = QTableWidget()
+        self.taretable.setTabKeyNavigation(True)
+        self.createTareTable()
+
+        self.taretable.itemSelectionChanged.connect(self.selectionChanged)
+
+        addButton = QPushButton(QApplication.translate('Button','Add'))
+        addButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.delButton = QPushButton(QApplication.translate('Button','Delete'))
+        self.delButton.setDisabled(True)
+        self.delButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+
+        addButton.clicked.connect(self.addTare)
+        self.delButton.clicked.connect(self.delTare)
+
+        okButton = QPushButton(QApplication.translate('Button','OK'))
+        cancelButton = QPushButton(QApplication.translate('Button','Cancel'))
+        cancelButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        okButton.clicked.connect(self.accept)
+        cancelButton.clicked.connect(self.reject)
+        contentbuttonLayout = QHBoxLayout()
+        contentbuttonLayout.addStretch()
+        contentbuttonLayout.addWidget(addButton)
+        contentbuttonLayout.addWidget(self.delButton)
+        contentbuttonLayout.addStretch()
+
+        buttonLayout = QHBoxLayout()
+        buttonLayout.addStretch()
+        buttonLayout.addWidget(cancelButton)
+        buttonLayout.addWidget(okButton)
+        layout = QVBoxLayout()
+        layout.addWidget(self.taretable)
+        layout.addLayout(contentbuttonLayout)
+        layout.addLayout(buttonLayout)
+        self.setLayout(layout)
+        self.setMinimumWidth(230)
+        self.setMinimumHeight(250)
+
+    @pyqtSlot()
+    def selectionChanged(self) -> None:
+        if len(self.taretable.selectedRanges()) > 0:
+            self.delButton.setDisabled(False)
+        else:
+            self.delButton.setDisabled(False)
+
+    @pyqtSlot()
+    def accept(self) -> None:
+        self.saveTareTable()
+        self.tare_updated_signal.emit()
+        self.close()
+        super().accept()
+
+    # weight is always in g
+    def setTableRow(self, row:int, name:str, weight:float) -> None:
+        name_widget = QLineEdit()
+        name_widget.setAlignment(Qt.AlignmentFlag.AlignRight)
+        name_widget.setText(name)
+        weight_widget = ClickableQLineEdit()
+        weight_widget.setAlignment(Qt.AlignmentFlag.AlignRight)
+        # NOTE: we support container weights up to 5kg (11,023lb)
+        if self.aw.qmc.weight[2] == 'g':
+            weight_widget.setText(str(int(round(weight))))
+            weight_widget.setValidator(QIntValidator(0,9999, weight_widget))
+        elif self.aw.qmc.weight[2] == 'Kg':
+            w = convertWeight(weight,0,weight_units.index(self.aw.qmc.weight[2]))
+            weight_widget.setText(f'{float2floatWeightVolume(w):g}')
+            weight_widget.setValidator(self.aw.createCLocaleDoubleValidator(0., 9999999., 4, weight_widget)) # the max limit has to be high enough otherwise the connected signals are not send!
+
+        else:
+            w = convertWeight(weight,0,weight_units.index(self.aw.qmc.weight[2]))
+            weight_widget.setText(f'{float2floatWeightVolume(w):g}')
+            weight_widget.setValidator(self.aw.createCLocaleDoubleValidator(0., 9999999., 4, weight_widget))
+        weight_widget.editingFinished.connect(self.weightEdited)
+        self.taretable.setCellWidget(row, 0, name_widget)
+        self.taretable.setCellWidget(row, 1, weight_widget)
+
+    @pyqtSlot(bool)
+    def addTare(self, _:bool = False) -> None:
+        rows = self.taretable.rowCount()
+        self.taretable.setRowCount(rows + 1)
+        weight = self.get_scale_weight() # read value from scale in 'g' (or None)
+        if weight is None or weight < 0:
+            weight = 0
+        #add widgets to the table
+        self.setTableRow(rows, QApplication.translate('Label', 'container'), weight)
+
+    @pyqtSlot(bool)
+    def delTare(self, _:bool = False) -> None:
+        selected = self.taretable.selectedRanges()
+        if len(selected) > 0:
+            bindex = selected[0].topRow()
+            if bindex >= 0:
+                self.taretable.removeRow(bindex)
+
+    def saveTareTable(self) -> None:
+        tars = self.taretable.rowCount()
+        names:List[str] = []
+        weights:List[float] = []
+        for i in range(tars):
+            nameWidget = cast(QLineEdit, self.taretable.cellWidget(i,0))
+            name = nameWidget.text()
+            weightWidget = cast(QLineEdit, self.taretable.cellWidget(i,1))
+            weight:float = 0
+            try:
+                w = convertWeight(float(comma2dot(weightWidget.text())),weight_units.index(self.aw.qmc.weight[2]),0)
+                weight = float2float(w) # stored in g as floats with one decimals
+            except Exception: # pylint: disable=broad-except
+                pass
+            names.append(name)
+            weights.append(weight)
+        self.aw.qmc.container_names = names
+        self.aw.qmc.container_weights = weights
+
+    @pyqtSlot()
+    def weightEdited(self) -> None:
+        sender = self.sender()
+        if sender and isinstance(sender, QLineEdit):
+            text = sender.text().strip()
+            if text == '':
+                w:Optional[float] = self.get_scale_weight() # read value from scale in 'g'
+                sender.setText(str(w if w is not None and w > 0 else 0))
+            elif self.aw.qmc.weight[2] == 'Kg':
+                # if container weight in kg, but input value > 10, we interpret it as in g
+                w = float(comma2dot(text))
+                if w > 10:
+                    w = convertWeight(w,0,weight_units.index(self.aw.qmc.weight[2]))
+                    sender.setText(f'{float2floatWeightVolume(w):g}')
+
+    def createTareTable(self) -> None:
+        self.taretable.clear()
+        self.taretable.setRowCount(len(self.aw.qmc.container_names))
+        self.taretable.setColumnCount(2)
+        unit:str = self.aw.qmc.weight[2].lower()
+        self.taretable.setHorizontalHeaderLabels([QApplication.translate('Table','Name'),
+                                                         f"{QApplication.translate('Table','Weight')} ({unit})"])
+        self.taretable.setAlternatingRowColors(True)
+        self.taretable.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
+        self.taretable.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
+        self.taretable.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
+        self.taretable.setShowGrid(True)
+        vheader: Optional[QHeaderView] = self.taretable.verticalHeader()
+        if vheader is not None:
+            vheader.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
+        for i, cn in enumerate(self.aw.qmc.container_names):
+            #add widgets to the table
+            self.setTableRow(i, cn, self.aw.qmc.container_weights[i])
+
+        header: Optional[QHeaderView] = self.taretable.horizontalHeader()
+        if header is not None:
+            header.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
+            header.setSectionResizeMode(1, QHeaderView.ResizeMode.Fixed)
+        self.taretable.setColumnWidth(1,80)

@@ -272,7 +272,7 @@ def writepyFile(filename_in:str, filename_out:str) -> None:
     outstr = buildpyCode(filename_in)
 
     # write outstr (py code) to the specified filename
-    with open(filename_out,'w', encoding='utf-8') as file_object:
+    with open(filename_out, 'w', encoding='utf-8', newline='\n') as file_object:
         file_object.write(outstr)
     sleep(0.01)  #allow the previous write to settle, resolves appveyor file read fail
 
@@ -286,7 +286,7 @@ def writehtmlFile(_fname_in:str, filename_out:str, filename_htm:str) -> None:
     htmstr = var.content() + '\n'
 
     # write htmlstr (html) to the specified filename
-    with open(filename_htm,'w', encoding='utf-8') as file_object:
+    with open(filename_htm, 'w', encoding='utf-8', newline='\n') as file_object:
         file_object.write(htmstr)
 
 if __name__ == '__main__':

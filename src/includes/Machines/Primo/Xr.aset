@@ -1,4 +1,4 @@
-writeSingle([General]
+[General]
 roastertype_setup=Primo Xr
 ETcurve=false
 ETlcd=false

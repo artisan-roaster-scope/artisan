@@ -47,7 +47,6 @@ EXCLUDES = [
 #    'PyQt6.QtWebEngineQuick'
 ]
 
-
 a = Analysis(['artisan.py'],
     pathex=[path],
     binaries=BINARIES,

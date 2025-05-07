@@ -17,7 +17,7 @@ Visual scope for coffee roasters
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 
 
-*WARNING: pre-release builds may not work.  Use at your own risk.*
+*WARNING: pre-release (continuous) builds may not work.  Use at your own risk.*
 
 
 Summary
@@ -62,6 +62,8 @@ Version History
 
 | Version | Date  | Comment |
 |---------|------:|---------|
+| [v3.1.4](https://github.com/artisan-roaster-scope/artisan/releases/tag/v3.1.4) | May&nbsp;1,&nbsp;2025 | Fixes backward compatibility with some existing MODBUS configurations broken by v3.1.2 |
+| [v3.1.2](https://github.com/artisan-roaster-scope/artisan/releases/tag/v3.1.2) | Apr&nbsp;30,&nbsp;2025 | Adds roast defects weight, event replay ramping, event dragging, [Aillio Bullet R2](https://artisan-scope.org/machines/aillio/) support, [IMF machine control](https://artisan-scope.org/machines/imf/) setups, extended support for [Giesen machines](https://artisan-scope.org/machines/giesen/), fixes [Loring autoCHARGE/DROP](https://artisan-scope.org/machines/loring/), adds [Carmomaq's Stratto Lab sample roaster](https://artisan-scope.org/machines/carmomaq/), [Phidget motor controllers](https://artisan-scope.org/devices/phidgets/#45-dc-motor-control), support for energy meters, [ROEST CSV import](https://artisan-scope.org/machines/roest/), improved Cropster import, many small fixes and UI improvements |
 | [v3.1.0](https://github.com/artisan-roaster-scope/artisan/releases/tag/v3.1.0) | Nov&nbsp;22,&nbsp;2024 | Adds support for induction heated [Gemma machines by Sweet Coffee Italia](https://artisan-scope.org/machines/sci/), the latest [Santoker machines](https://artisan-scope.org/machines/santoker/) connecting via Bluetooth, [Primo roasting machines](https://artisan-scope.org/machines/primo/), [ColorTrack](https://artisan-scope.org/devices/colortrack/) sensors, [Stronghold](https://stronghold.coffee/) profile import, and [Phidget stepper controllers](https://artisan-scope.org/devices/phidgets/) and more.<br><b>Release Sponsor: [Algrano](https://algrano.com/artisan?utm_source=artisan_blog&utm_medium=referral&utm_campaign=algrano_x_artisan&utm_content=blog)</b><br/> |
 | [v3.0.2](https://github.com/artisan-roaster-scope/artisan/releases/tag/v3.0.2) | Aug&nbsp;20,&nbsp;2024 | Bug fixes |
 | [v3.0.0](https://github.com/artisan-roaster-scope/artisan/releases/tag/v3.0.0) | Aug&nbsp;1,&nbsp;2024 | Adds [roast scheduling](https://doc.artisan.plus/docs/schedule/) support<br><b>Release Sponsor: [artisan.plus](https://artisan.plus/)</b><br/> |

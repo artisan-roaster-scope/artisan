@@ -39,7 +39,7 @@ import logging
 from artisanlib.util import (decodeLocal, encodeLocal, getDirectory, is_int_list, is_float_list, render_weight,
     weight_units, float2float, convertWeight)
 from plus import config, connection, controller, util
-from typing import Final, TypedDict, List, Union, Optional, Tuple, Dict, TextIO
+from typing import Final, TypedDict, List, Union, Optional, Tuple, Dict, TextIO, Set
 from typing_extensions import NotRequired # Python <=3.10
 
 
@@ -51,6 +51,12 @@ stock_semaphore = QSemaphore(
 )  # protects access to the stock_cache file and the stock dict
 
 stock_cache_path = getDirectory(config.stock_cache)
+
+# coffee label format is either
+#   "<origin> <picked>, <label>" (if coffee_label_normal_order=True)
+#   "<label>, <origin> <picked>" (if coffee_label_normal_order=False)
+# NOTE: picked is only added if needed to discriminate to other coffees within this stock
+coffee_label_normal_order:bool = True # defaults to origin first if True
 
 
 # stock data structures
@@ -138,6 +144,7 @@ BlendStructure = Tuple[str, Tuple[Blend, StockItem, float, CoffeeLabelDict, floa
 BlendList = List[Union[str, List[List[Union[str,float]]]]]
 
 stock:Optional[Stock] = None  # holds the dict with the current stock data (coffees, blends,..)
+duplicate_coffee_origin_labels:Set[str] = set() # set of coffee origin+labels which need to be discrimiated by picked year if available
 
 # in kg; only stock larger than stock_epsilon (10g)
 # will be considered, the rest ignored
@@ -147,6 +154,24 @@ stock_epsilon = 0.01
 #
 
 # updates the stock cache
+
+
+# re-calculate duplicate coffee origin labels
+def update_duplicate_coffee_origin_labels() -> None:
+    global duplicate_coffee_origin_labels  # pylint: disable=global-statement
+    duplicate_coffee_origin_labels = set()
+    if stock is not None and 'coffees' in stock:
+        seen = set()
+        for c in stock['coffees']:
+            origin_label = f"{c.get('origin', '')}{c.get('label', '')}"
+            if origin_label in seen:
+                duplicate_coffee_origin_labels.add(origin_label)
+            else:
+                seen.add(origin_label)
+
+def has_duplicate_origin_label(c:Coffee) -> bool:
+    origin_label = f"{c.get('origin', '')}{c.get('label', '')}"
+    return origin_label in duplicate_coffee_origin_labels
 
 
 ####### Stock Update Thread
@@ -207,6 +232,7 @@ class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # Argument to
                         stock = j['result']
                         if stock is not None:
                             stock['retrieved'] = time.time()
+                            update_duplicate_coffee_origin_labels()
                         _log.debug('-> retrieved')
 #                        _log.debug("stock = %s", stock)
                     finally:
@@ -285,6 +311,7 @@ def load() -> None:
         f:TextIO
         with open(stock_cache_path, encoding='utf-8') as f:
             stock = json.load(f)
+            update_duplicate_coffee_origin_labels()
     except Exception as e:  # pylint: disable=broad-except
         _log.info(e)
     finally:
@@ -490,7 +517,6 @@ def getCoffeeId(coffee:Tuple[str, Tuple[Coffee, StockItem]]) -> str:
 def getCoffeesLabels(coffees:List[Tuple[str, Tuple[Coffee, StockItem]]]) -> List[str]:
     return [getCoffeeLabel(c) for c in coffees]
 
-
 def coffee2beans(c:Coffee) -> str:
     origin = ''
     try:
@@ -499,12 +525,7 @@ def coffee2beans(c:Coffee) -> str:
             origin = QApplication.translate('Countries', origin_str)
     except Exception:  # pylint: disable=broad-except
         pass
-    if 'label' in c:
-        label = c['label']
-        if origin:
-            label = f' {label}'
-    else:
-        label = ''
+    label = c.get('label', '')
     processing = ''
     try:
         processing_str = c['processing'].strip() # pyright:ignore[reportTypedDictNotRequiredAccess]
@@ -560,18 +581,32 @@ def coffee2beans(c:Coffee) -> str:
         except Exception:  # pylint: disable=broad-except
             pass
         if picked is not None and not bool(landed):
-            year = f', {picked:d}'
+            year = f'{picked:d}'
         elif landed is not None and not bool(picked):
-            year = f', {landed:d}'
+            year = f'{landed:d}'
         elif picked is not None and landed is not None:
             if picked == landed or landed <= picked:
-                year = f', {picked:d}'
+                year = f'{picked:d}'
             else:
-                year = f', {picked:d}/{landed:d}'
+                year = f'{picked:d}/{landed:d}'
     except Exception:  # pylint: disable=broad-except
         pass
-    return f'{origin}{label}{bean}{year}'
+    if origin == '':
+        if year == '':
+            return f'{label}{bean}'
+        return f'{label}{bean}, {year}'
+    if coffee_label_normal_order:
+        if year == '':
+            return f'{origin} {label}{bean}'
+        return f'{origin} {label}{bean}, {year}'
+    if year == '':
+        return f'{label}{bean}, {origin}'
+    return f'{label}{bean}, {origin} {year}'
 
+#  returns coffee label in the form
+#   "<origin> <picked>, <label>" (if coffee_label_normal_order=True)
+#   "<label>, <origin> <picked>" (if coffee_label_normal_order=False)
+# NOTE: picked is only added if needed to discriminate to other coffees within this stock
 def coffeeLabel(c:Coffee) -> str:
     origin = ''
     try:
@@ -582,23 +617,28 @@ def coffeeLabel(c:Coffee) -> str:
             )
     except Exception:  # pylint: disable=broad-except
         pass
-    if origin != '':
-        try:
-            if 'crop_date' in c:
-                cy = c['crop_date']
-                if (
-                    'picked' in cy
-                    and len(cy['picked']) > 0
-                    and cy['picked'][0] is not None
-                ):
-                    origin += f" {cy['picked'][0]:d}"
-        except Exception as e:  # pylint: disable=broad-except
-            _log.exception(e)
-        origin = f'{origin}, '
-    return f"{origin}{c.get('label', '')}"
+    try:
+        if 'crop_date' in c and has_duplicate_origin_label(c):
+            cy = c['crop_date']
+            if (
+                'picked' in cy
+                and len(cy['picked']) > 0
+                and cy['picked'][0] is not None
+            ):
+                origin += f" {cy['picked'][0]:d}"
+    except Exception as e:  # pylint: disable=broad-except
+        _log.exception(e)
+    if origin == '':
+        return c.get('label', '')
+    if coffee_label_normal_order:
+        return f"{origin}, {c.get('label', '')}"
+    return f"{c.get('label', '')}, {origin}"
 
-# returns a dict with all coffees with stock associated as string of the form  "<origin> <picked>, <label>"
+# returns a dict with all coffees with stock associated as string of the form
+#   "<origin> <picked>, <label>" (if coffee_label_normal_order=True)
+#   "<label>, <origin> <picked>" (if coffee_label_normal_order=False)
 # associated to their hr_id
+# NOTE: picked is only added if needed to discriminate to other coffees within this stock
 def getCoffeeLabels() -> Dict[str, str]:
     try:
         stock_semaphore.acquire(1)
@@ -642,29 +682,7 @@ def getCoffees(weight_unit_idx:int, store:Optional[str]=None) -> List[Tuple[str,
             res = {}
             for c in stock['coffees']:
                 try:
-                    origin = ''
-                    try:
-                        origin_str = c['origin'].strip() # pyright:ignore[reportTypedDictNotRequiredAccess]
-                        if len(origin_str) > 0 and origin_str != 'null':
-                            origin = QApplication.translate(
-                                'Countries', origin_str
-                            )
-                    except Exception:  # pylint: disable=broad-except
-                        pass
-                    if origin != '':
-                        try:
-                            if 'crop_date' in c:
-                                cy = c['crop_date']
-                                if (
-                                    'picked' in cy
-                                    and len(cy['picked']) > 0
-                                    and cy['picked'][0] is not None
-                                ):
-                                    origin += f" {cy['picked'][0]:d}"
-                        except Exception as e:  # pylint: disable=broad-except
-                            _log.exception(e)
-                        origin = f'{origin}, '
-                    label = c.get('label', '')
+                    coffee_label = coffeeLabel(c)
                     default_unit = c.get('default_unit', None)
                     if 'stock' in c:
                         for s in c['stock']:
@@ -682,7 +700,7 @@ def getCoffees(weight_unit_idx:int, store:Optional[str]=None) -> List[Tuple[str,
                                     # is available in several locations
                                     loc = '' if store else f'{location}, '
                                     res[
-                                        f'{origin}{label} [{loc}{renderAmount(amount,default_unit,weight_unit_idx)}]'
+                                        f'{coffee_label} [{loc}{renderAmount(amount,default_unit,weight_unit_idx)}]'
                                     ] = (c, s)
                 except Exception as e:  # pylint: disable=broad-except
                     _log.exception(e)
@@ -1048,7 +1066,7 @@ def getBlends(weight_unit_idx:int, store:Optional[str] = None, customBlend:Optio
 #    _log.debug('getBlends(%s,%s)', weight_unit_idx, store)
     try:
         stock_semaphore.acquire(1)
-        if stock is not None and ('blends' in stock or customBlend is not None):
+        if stock is not None and ('blends' in stock or 'replBlends' in stock or customBlend is not None):
             res = {}
             if store is None:
                 stores = [getStoreId(s) for s in getStores(acquire_lock=False)]

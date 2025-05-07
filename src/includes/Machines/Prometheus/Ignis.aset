@@ -1,4 +1,4 @@
-writeSingle([General]
+[General]
 Delay=2000
 Oversampling=true
 roastertype_setup=Prometheus Ignis

@@ -1,10 +1,12 @@
 [General]
-Delay=500
+Delay=400
 roastertype_setup=Santoker Cube BT PID
 roasterheating_setup=3
 roastersize_setup=0.1
 specialeventplayback=true, true, true, false
 specialeventplaybackramp=false, false, true, false
+dropDuplicates=true
+dropDuplicatesLimit=0.1
 
 [Device]
 id=134
@@ -40,7 +42,7 @@ extratimeout=0.5, 0.5, 0.5, 0.5, 0.5
 
 [ExtraDev]
 devicetablecolumnwidths=230, 80, 80, 80, 80, 40, 40, 45, 47, 56, 57, 59, 61, 49, 49
-extraCurveVisibility1=false, true, false, false, true, true, true, true, true, true
+extraCurveVisibility1=false, false, false, false, true, true, true, true, true, true
 extraCurveVisibility2=false, false, false, false, true, true, true, true, true, true
 extraDelta1=false, false, false, true, false, false, false, false, false, false
 extraDelta2=false, false, false, true, false, false, false, false, false, false
@@ -89,7 +91,7 @@ buttonsize=1
 extraeventbuttoncolor=#808080, #808080, #bfbfbf, #808080, #ad0427, #ad0427, #808080, #45a6cf, #45a6cf, #808080, #808080, #808080, #bfbfbf
 extraeventbuttontextcolor=white, white, white, white, white, white, white, white, white, white, white, white, white
 extraeventsactions=20, 20, 20, 0, 6, 6, 0, 6, 6, 0, 20, 20, 20
-extraeventsactionstrings="PIDon;playbackmode(1);pidmode(0);pidSource(1);button(true);button(2,false);button(11,false);button(12,false)", "PIDon;playbackmode(2);pidmode(0);pidSource(1);button(true);button(1,false);button(11,false);button(12,false)", "playbackmode(0);button(1,false);button(2,false)", , "santoker(fa,{})", "santoker(fa,{})", , "santoker(ca,{})", "santoker(ca,{})", , "PIDon;pidmode(2);pidSource(1);button(true);playbackmode(0);button(12,false);button(1,false);button(2,false)", "PIDon;pidmode(2);pidSource(0);button(true);playbackmode(0);button(11,false);button(1,false);button(2,false)", "pidmode(0);button(11,false);button(12,false)"
+extraeventsactionstrings="PIDon;playbackmode(1);pidmode(0);pidSource(1);button(true);button(2,false);button(11,false);button(12,false)", "PIDon;playbackmode(4);pidmode(0);pidSource(1);button(true);button(1,false);button(11,false);button(12,false)", "playbackmode(0);button(1,false);button(2,false)", , "santoker(fa,{})", "santoker(fa,{})", , "santoker(ca,{})", "santoker(ca,{})", , "PIDon;pidmode(2);pidSource(1);button(true);playbackmode(0);button(12,false);button(1,false);button(2,false)", "PIDon;pidmode(2);pidSource(0);button(true);playbackmode(0);button(11,false);button(1,false);button(2,false)", "pidmode(0);button(11,false);button(12,false)"
 extraeventsbuttonsflags=0, 1, 1
 extraeventsdescriptions=, , , , , , , , , , , , 
 extraeventslabels=⏲ Playback\n\\1, 🌡 Playback\n\\1, Playback\n\\0, , -10%\n\\t, +10%\n\\t, , -10%\n\\t, +10%\n\\t, , Follow\nET, Follow\nBT, Follow\n\\0
@@ -124,11 +126,11 @@ alarmcond=1, 1, 1, 1, 1, 1, 1
 alarmflag=1, 1, 1, 1, 1, 1, 1
 alarmguard=-1, -1, -1, -1, -1, 3, -1
 alarmnegguard=-1, -1, -1, -1, -1, -1, -1
-alarmoffset=1, 1, 1, 1, 1, 90, 1
+alarmoffset=2, 3, 1, 1, 1, 90, 1
 alarmsetlabel=
 alarmsfile=
 alarmsource=-3, -3, -3, -3, -3, -3, -3
-alarmstrings=60, 90, 1 # replay by time and PID ON, 100, 0, 30, 3 # event replay OFF
+alarmstrings=60, 50, 1 # replay by time and PID ON, 100, 0, 30, 3 # event replay OFF
 alarmtemperature=500, 500, 500, 500, 500, 500, 500
 alarmtime=-1, -1, -1, 6, 6, 10, 6
 loadAlarmsFromBackground=false
@@ -144,9 +146,9 @@ invertControl=false
 negativeTargetMax=100
 negativeTargetMin=0
 negativeTargetRangeLimit=false
-pidKd=6
-pidKi=0.13
 pidKp=1.1
+pidKi=0.09
+pidKd=5
 pidNegativeTarget=0
 pidOnCHARGE=true
 pidPositiveTarget=4

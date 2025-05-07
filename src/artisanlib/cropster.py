@@ -834,16 +834,16 @@ def extractProfileCropsterXLS(file:str, aw:'ApplicationWindow') -> 'ProfileData'
                 pass
 
         try:
-            date_tag_value = None
+            date_tag_value:Optional[float] = None
             # try to find the "Date" value
             # 1. test the column name in all known translations
             for tag in date_trans:
-                if tag in general_data:
-                    date_tag_value = general_data[tag].value
+                if tag in general_data and general_data[tag].ctype is xlrd.XL_CELL_DATE:
+                    date_tag_value = float(general_data[tag].value)
                     break
             # 2. take the first value of row1
             if date_tag_value is None:
-                date_tag_value = row1[7].value
+                date_tag_value = float(row1[7].value)
             if date_tag_value is not None:
                 date_tuple = xlrd.xldate_as_tuple(date_tag_value, book.datemode)
                 date = QDateTime(*date_tuple)
@@ -996,8 +996,8 @@ def extractProfileCropsterXLS(file:str, aw:'ApplicationWindow') -> 'ProfileData'
                             res['mode'] = 'F'
                         else:
                             res['mode'] = 'C'
-                        res['timex'] = [t.value for t in time[1:]]
-                        res['temp2'] = [t.value for t in temp[1:]]
+                        res['timex'] = [float(t.value) for t in time[1:]]
+                        res['temp2'] = [float(t.value) for t in temp[1:]]
                         res['temp1'] = [-1]*len(res['timex'])
                         charge_idx = 0
                         try:
@@ -1024,9 +1024,9 @@ def extractProfileCropsterXLS(file:str, aw:'ApplicationWindow') -> 'ProfileData'
                                 res['mode'] = 'F'
                             else:
                                 res['mode'] = 'C'
-                            res['temp1'] = [t.value for t in temp[1:]]
+                            res['temp1'] = [float(t.value) for t in temp[1:]]
                             if len(res['timex']) != len(res['temp1']):
-                                res['timex'] = [t.value for t in time[1:]]
+                                res['timex'] = [float(t.value) for t in time[1:]]
                             if 'temp2' not in res or len(res['temp2']) != len(res['timex']):
                                 res['temp2'] = [-1]*len(res['timex'])
                             charge_idx = 0
@@ -1197,8 +1197,8 @@ def extractProfileCropsterXLS(file:str, aw:'ApplicationWindow') -> 'ProfileData'
                                     if name1 is None:
                                         name1 = 'extra1'
                                     res['extraname1'].append(name1)
-                                res['extratimex'].append([t.value for t in time[1:]])
-                                res['extratemp1'].append([t.value for t in temp[1:]])
+                                res['extratimex'].append([float(t.value) for t in time[1:]])
+                                res['extratemp1'].append([float(t.value) for t in temp[1:]])
                                 res['extramathexpression1'].append('')
                             elif (len(time) -1) == len(res['extratimex'][-1]): # only if time lengths is same as of channel 1
                                 channel = 1
@@ -1219,7 +1219,7 @@ def extractProfileCropsterXLS(file:str, aw:'ApplicationWindow') -> 'ProfileData'
                                     if name2 is None:
                                         name2 = 'extra2'
                                     res['extraname2'].append(name2)
-                                res['extratemp2'].append([t.value for t in temp[1:]])
+                                res['extratemp2'].append([float(t.value) for t in temp[1:]])
                                 res['extramathexpression2'].append('')
             except Exception: # pylint: disable=broad-except
                 pass
@@ -1255,7 +1255,7 @@ def extractProfileCropsterXLS(file:str, aw:'ApplicationWindow') -> 'ProfileData'
                 for r in range(COMMENTS_sh.nrows):
                     if r>0:
                         try:
-                            time = COMMENTS_sh.cell(r, 0).value
+                            time = float(COMMENTS_sh.cell(r, 0).value)
                             comment_type = COMMENTS_sh.cell(r, 2).value.strip()
                             if comment_type not in turning_point_trans: # TP is ignored as it is automatically assigned
                                 comment_value = COMMENTS_sh.cell(r, 3).value

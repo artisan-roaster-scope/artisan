@@ -364,7 +364,7 @@ class Santoker(AsyncComm):
     def start(self, connect_timeout:float=5) -> None:
         if self._connect_using_ble and hasattr(self, '_ble_client') and self._ble_client is not None:
             self._ble_client.setLogging(self._logging)
-            self._ble_client.start(case_sensitive=False)
+            self._ble_client.start(case_sensitive=False, scan_timeout=5, connect_timeout=3)
         else:
             super().start(connect_timeout)
 

@@ -129,12 +129,12 @@ fetch_max_blocks=false
 
 [DefaultButtons]
 buttonactions=3, 0, 0, 0, 0, 0, 3, 3
-buttonactionstrings="write(1,44,1)", , , , , , "write(1,45,1);write(1,26,1);write(1,27,1)", "write(1,21,0)"
+buttonactionstrings="writeSingle(1,44,1)", , , , , , "writeSingle(1,45,1);writeSingle(1,26,1);writeSingle(1,27,1)", "writeSingle(1,21,0)"
 buttonvisibility=true, true, true, false, true, false, true, true
 extrabuttonactions=3, 0, 0
-extrabuttonactionstrings="write(1,28,1)", , 
+extrabuttonactionstrings="writeSingle(1,28,1)", , 
 xextrabuttonactions=0, 3
-xextrabuttonactionstrings=, "write(1,21,1)"
+xextrabuttonactionstrings=, "writeSingle(1,21,1)"
 
 [ExtraEventButtons]
 buttonlistmaxlen=14
@@ -167,7 +167,7 @@ eventslidersflags=0, 1, 1
 eventslidertemp=0, 0, 0, 0
 eventsliderunits="%", "RPM", , "%"
 slideractions=2, 2, 0, 2
-slidercommands="write(1,2,{})", "write(1,8,{})", , "write(1,14,{})"
+slidercommands="writeSingle(1,2,{})", "writeSingle(1,8,{})", , "writeSingle(1,14,{})"
 sliderfactors=1, 1, 1, 1
 slidermax=100, 65, 100, 100
 slidermin=40, 30, 0, 5

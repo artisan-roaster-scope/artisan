@@ -114,7 +114,7 @@ class modbusport:
 
         self.modbus_serial_read_delay       :Final[float] = 0.035 # in seconds
         self.modbus_serial_write_delay      :Final[float] = 0.080 # in seconds
-        self.modbus_serial_connect_delay    :float = 0.0          # in seconds (user configurable delay after serial connect; important for Arduino based slaves that reboot on connect)
+        self.modbus_serial_connect_delay    :float = 0.5          # in seconds (user configurable delay after serial connect; important for Arduino based slaves that reboot on connect)
 
         self.maxCount:Final[int] = 125 # the maximum number of registers that can be fetched in one request according to the MODBUS spec
         self.readRetries:int = 0  # retries
@@ -304,7 +304,6 @@ class modbusport:
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
         self._client = None
-        #del self._asyncLoopThread
         self._asyncLoopThread = None
 
     def clearCommError(self) -> None:
@@ -392,10 +391,10 @@ class modbusport:
                 if self.isConnected():
                     self.updateActiveRegisters()
                     self.clearReadingsCache()
-                    if self.type in {0,1}:
+                    if self.type in {0,1}: # RTU/ASCII
                         # respect the user defined connect delay on serial connections
                         await asyncio.sleep(self.modbus_serial_connect_delay)
-                    else:
+                    else: # all others
                         await asyncio.sleep(.3) # avoid possible hickups on startup
                     self.aw.sendmessage(QApplication.translate('Message', 'Connected via MODBUS'))
                 else:
@@ -502,9 +501,6 @@ class modbusport:
                         count:int = seq[1]-seq[0] + 1
                         if 0 < count <= self.maxCount:
                             res:Optional[ModbusPDU] = None
-#                            if just_send:
-#                                await self.sleepBetweenAsync() # we start with a sleep, as it could be that just a send command happened before the semaphore was caught
-#                            just_send = True
                             tx:float = time.time()
                             while True:
                                 _log.debug('readActive(%d,%d,%d,%d)', slave, code, register, count)
@@ -610,6 +606,7 @@ class modbusport:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
 
+    # DEPRECATED: use writeSingle or writeWord (this one now just calls writeSingle with the value rounded to an integer)
     # write value to register on slave (function 6 for int or function 16 for float)
     # value can be one of string (containing an int or float), an int or a float
     def writeRegister(self, slave:int, register:int, value: Union[int, float, str]) -> None:
@@ -618,13 +615,15 @@ class modbusport:
             return
         if isinstance(value, str):
             if '.' in value:
-                self.writeWord(slave, register, float(value))
+#                self.writeWord(slave, register, float(value))
+                self.writeSingleRegister(slave, register, int(round(float(value))))
             else:
                 self.writeSingleRegister(slave, register, int(value))
         elif isinstance(value, int):
             self.writeSingleRegister(slave,register,value)
         elif isinstance(value, float):
-            self.writeWord(slave,register,value)
+#            self.writeWord(slave,register,value)
+            self.writeSingleRegister(slave,register,int(round(value)))
 
     # function 6 (Write Single Holding Register)
     def writeSingleRegister(self, slave:int, register:int, value:float) -> None:
