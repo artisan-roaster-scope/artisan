@@ -118,6 +118,8 @@ from matplotlib.colors import to_hex, to_rgba
 from artisanlib.phidgets import PhidgetManager
 from Phidget22.VoltageRange import VoltageRange # type: ignore
 
+from artisanlib.interceptor import MqttInterceptor
+
 try:
     # spanning a second multiprocessing instance on macOS falils to import the YAPI interface
     from yoctopuce.yocto_api import YAPI # type: ignore
@@ -125,6 +127,8 @@ except Exception: # pylint: disable=broad-except
     pass
 
 
+# Inisialisasi
+modbus_interceptor = MqttInterceptor()
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
@@ -4993,6 +4997,9 @@ class tgraphcanvas(FigureCanvas):
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
             self.aw.lcd3.display(btstr)
+
+            ## publish data to MQTT
+            modbus_interceptor.publish_to_mqtt(etstr, btstr)
 
             ## Delta LCDs:
             deltaetstr = resLCD
