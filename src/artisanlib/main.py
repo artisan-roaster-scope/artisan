@@ -17578,7 +17578,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.phasesLCDmode = toInt(settings.value('phasesLCDmode',self.qmc.phasesLCDmode))
             if settings.contains('step100temp'):
                 try:
-                    self.qmc.step100temp = int(settings.value('step100temp',self.qmc.step100temp))
+                    self.qmc.step100temp = toInt(settings.value('step100temp',self.qmc.step100temp))
                 except Exception: # pylint: disable=broad-except
                     self.qmc.step100temp = None
             # Important - this must come after the code that restores phasesLCDmode
@@ -18643,13 +18643,37 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 #--- BEGIN GROUP Scales
             # Scales
             settings.beginGroup('Scales')
-            self.scale1_model = settings.value('scale1_model',self.scale1_model)
-            self.scale1_name = settings.value('scale1_name',self.scale1_name)
-            self.scale1_id = settings.value('scale1_id',self.scale1_id)
+            if settings.contains('scale1_model'):
+                try:
+                    self.scale1_model = toInt(settings.value('scale1_model',self.scale1_model))
+                except Exception: # pylint: disable=broad-except
+                    self.scale1_model = None
+            if settings.contains('scale1_name'):
+                try:
+                    self.scale1_name = toString(settings.value('scale1_name',self.scale1_name))
+                except Exception: # pylint: disable=broad-except
+                    self.scale1_name = None
+            if settings.contains('scale1_id'):
+                try:
+                    self.scale1_id = settings.value('scale1_id',self.scale1_id)
+                except Exception: # pylint: disable=broad-except
+                    self.scale1_id = None
             self.container1_idx = toInt(settings.value('container1_idx',int(self.container1_idx)))
-            self.scale2_model = settings.value('scale2_model',self.scale2_model)
-            self.scale2_name = settings.value('scale2_name',self.scale2_name)
-            self.scale2_id = settings.value('scale2_id',self.scale2_id)
+            if settings.contains('scale2_model'):
+                try:
+                    self.scale2_model = toInt(settings.value('scale2_model',self.scale2_model))
+                except Exception: # pylint: disable=broad-except
+                    self.scale2_model = None
+            if settings.contains('scale2_name'):
+                try:
+                    self.scale2_name = toString(settings.value('scale2_name',self.scale2_name))
+                except Exception: # pylint: disable=broad-except
+                    self.scale2_name = None
+            if settings.contains('scale2_id'):
+                try:
+                    self.scale2_id = settings.value('scale2_id',self.scale2_id)
+                except Exception: # pylint: disable=broad-except
+                    self.scale2_id = None
             self.container2_idx = toInt(settings.value('container2_idx',int(self.container2_idx)))
             settings.endGroup()
 #--- END GROUP Scales

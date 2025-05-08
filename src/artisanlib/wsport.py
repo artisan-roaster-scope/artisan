@@ -45,7 +45,7 @@ class wsport:
 
     __slots__ = [ 'aw', '_loop', '_thread', '_write_queue', 'default_host', 'host', 'port', 'path', 'machineID', 'lastReadResult', 'channels', 'readings', 'tx',
                     'channel_requests', 'channel_nodes', 'channel_modes', 'connect_timeout', 'request_timeout', 'compression',
-                    'reconnect_interval', 'ping_interval', 'ping_timeout', 'id_node', 'machine_node',
+                    'reconnect_interval', '_ping_interval', '_ping_timeout', 'id_node', 'machine_node',
                     'command_node', 'data_node', 'pushMessage_node', 'request_data_command', 'charge_message', 'drop_message', 'addEvent_message', 'event_node',
                     'DRY_node', 'FCs_node', 'FCe_node', 'SCs_node', 'SCe_node', 'STARTonCHARGE', 'OFFonDROP', 'open_event', 'pending_events',
                     'ws', 'wst' ]
@@ -79,12 +79,12 @@ class wsport:
         self.channel_modes:List[int] = [0]*self.channels # temp mode is an int here, 0:__,1:C,2:F
 
         # configurable via the UI:
-        self.connect_timeout:float = 4    # in seconds
-        self.request_timeout:float = 0.5  # in seconds
-        self.reconnect_interval:float = 2 # in seconds # not used for now
+        self.connect_timeout:float = 4      # in seconds (websockets default is 10)
+        self.request_timeout:float = 0.5    # in seconds
+        self.reconnect_interval:float = 0.2 # in seconds # not used for now (reconnect delay)
         # not configurable via the UI:
-        self.ping_interval:float = 0      # in seconds; if 0 pings are not send automatically
-        self.ping_timeout:Optional[float] = None    # in seconds
+        self._ping_interval:Optional[float] = 20     # in seconds; None disables keepalive (default is 20)
+        self._ping_timeout:Optional[float] = 20      # in seconds; None disables timeouts (default is 20)
 
         # JSON nodes
         self.id_node:str = 'id'
@@ -256,6 +256,7 @@ class wsport:
             message = await self.producer()
             if message is not None:
                 await websocket.send(message)
+                await asyncio.sleep(0.1)  # yield control to the event loop
 
 
     # if serial settings are given, host/port are ignore and communication is handled by the given serial port
@@ -273,8 +274,11 @@ class wsport:
                     hostport = f'{self.host}:{self.port}'
                 async for websocket in websockets.connect(
                         f'ws://{hostport}/{self.path}',
-                        compression=('deflate' if self.compression else None),
-                        origin=websockets.Origin(f'http://{socket.gethostname()}'),
+                        open_timeout = self.connect_timeout,
+                        ping_interval = self._ping_interval,
+                        ping_timeout = self._ping_timeout,
+                        compression = ('deflate' if self.compression else None),
+                        origin = websockets.Origin(f'http://{socket.gethostname()}'),
                         user_agent_header = f'Artisan/{__version__} websockets'):
                     done: Set[asyncio.Task[Any]] = set()
                     pending: Set[asyncio.Task[Any]] = set()
@@ -288,8 +292,18 @@ class wsport:
                             [consumer_task, producer_task],
                             return_when=asyncio.FIRST_COMPLETED,
                         )
+                        _log.debug('disconnected')
+                        for task in pending:
+                            task.cancel()
+                        for task in done:
+                            exception = task.exception()
+                            if isinstance(exception, Exception):
+                                raise exception
                     except websockets.ConnectionClosed:
+                        _log.debug('ConnectionClosed exception')
                         continue
+                    except Exception as e: # pylint: disable=broad-except
+                        _log.exception(e)
                     finally:
                         for task in pending:
                             task.cancel()
@@ -297,6 +311,9 @@ class wsport:
                             exception = task.exception()
                             if isinstance(exception, Exception):
                                 raise exception
+                    _log.debug('reconnecting')
+                    self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('WebSocket'),True,None)
+                    await asyncio.sleep(0.1)
             except asyncio.TimeoutError:
                 _log.info('connection timeout')
             except Exception as e: # pylint: disable=broad-except

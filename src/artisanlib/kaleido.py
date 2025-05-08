@@ -235,6 +235,7 @@ class KaleidoPort:
         if self._logging:
             _log.info('write: %s',message)
         await websocket.send(message)
+        await asyncio.sleep(0.1)  # yield control to the event loop
 
     async def ws_handle_writes(self, websocket: 'ClientConnection', queue: 'asyncio.Queue[str]') -> None:
         message = await queue.get()
@@ -305,7 +306,14 @@ class KaleidoPort:
                         done, pending = await asyncio.wait([read_handler, write_handler], return_when=asyncio.FIRST_COMPLETED)
 
                         _log.debug('disconnected')
+                        for task in pending:
+                            task.cancel()
+                        for task in done:
+                            exception = task.exception()
+                            if isinstance(exception, Exception):
+                                raise exception
                     except websockets.ConnectionClosed:
+                        _log.debug('reconnecting')
                         continue
                     finally:
                         for task in pending:
