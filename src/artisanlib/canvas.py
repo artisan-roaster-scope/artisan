@@ -3320,7 +3320,7 @@ class tgraphcanvas(FigureCanvas):
                             event_anno = event_annos[event_ind]
                             tempo:Optional[float] = None
                             if foreground:
-                                if self.ETcurve and (not self.BTcurve or not self.showeventsonbt or self.temp1[ind] > self.temp2[ind]):
+                                if self.ETcurve and not (self.BTcurve and self.showeventsonbt) and self.temp1[ind] > self.temp2[ind]:
                                     if self.flagon:
                                         tempo = self.temp1[time_idx]
                                     else:
@@ -3330,7 +3330,7 @@ class tgraphcanvas(FigureCanvas):
                                         tempo = self.temp2[time_idx]
                                     else:
                                         tempo = self.stemp2[time_idx]
-                            elif self.ETcurve and (not self.BTcurve or not self.showeventsonbt or self.temp1B[ind] > self.temp2B[ind]):
+                            elif self.ETcurve and not (self.BTcurve and self.showeventsonbt) and self.temp1B[ind] > self.temp2B[ind]:
                                 tempo = self.temp1B[time_idx]
                             elif self.BTcurve:
                                 tempo = self.temp2B[time_idx]
@@ -3415,8 +3415,7 @@ class tgraphcanvas(FigureCanvas):
                                 event_ind -= self.foreground_evens_before_CAHRGE()
                             if len(event_annos)>event_ind:
                                 event_anno = event_annos[event_ind]
-                                if self.ETcurve and (not self.BTcurve or
-                                            not self.showeventsonbt or self.temp1[time_idx] > self.temp2[time_idx]):
+                                if self.ETcurve and not (self.BTcurve and self.showeventsonbt) and self.temp1[time_idx] > self.temp2[time_idx]:
                                     if self.flagon:
                                         tempo = self.temp1[time_idx]
                                     else:
@@ -3513,8 +3512,7 @@ class tgraphcanvas(FigureCanvas):
                                 event_ind -= self.background_evens_before_CAHRGE()
                             if len(event_annos)>event_ind:
                                 event_anno = event_annos[event_ind]
-                                if self.backgroundETcurve and (not self.backgroundBTcurve or
-                                            not self.showeventsonbt or self.temp1B[time_idx] > self.temp2B[time_idx]):
+                                if self.backgroundETcurve and not (self.backgroundBTcurve and self.showeventsonbt) and self.temp1B[time_idx] > self.temp2B[time_idx]:
                                     tempo = self.temp1B[time_idx]
                                 elif self.BTcurve:
                                     tempo = self.temp2B[time_idx]
@@ -3736,7 +3734,6 @@ class tgraphcanvas(FigureCanvas):
                     len(self.specialeventstype)>self.foreground_event_ind):
             event_type = self.specialeventstype[self.foreground_event_ind]
             ldots, event_annos, specialevent_annos = self.event_type_to_artist(event_type)
-            _log.debug('PRINT specialevent_annos1: %s',specialevent_annos)
             set_x = True
             set_y = True
             if ldots is not None:
@@ -3775,8 +3772,7 @@ class tgraphcanvas(FigureCanvas):
                         if len(event_annos)>event_ind:
                             event_anno = event_annos[event_ind]
                             idx = max(0,min(len(self.timex)-1,self.time2index(xdata[self.foreground_event_pos])))
-                            if self.ETcurve and (not self.BTcurve or
-                                            not self.showeventsonbt or self.temp1[idx] > self.temp2[idx]):
+                            if self.ETcurve and not (self.BTcurve and self.showeventsonbt) and self.temp1[idx] > self.temp2[idx]:
                                 if self.flagon:
                                     tempo = self.temp1[idx]
                                 else:
@@ -3861,8 +3857,7 @@ class tgraphcanvas(FigureCanvas):
                         if len(event_annos)>event_ind:
                             event_anno = event_annos[event_ind]
                             idx = max(0,min(len(self.timeB)-1,self.backgroundtime2index(xdata[self.background_event_pos])))
-                            if self.backgroundETcurve and (not self.backgroundBTcurve or
-                                            not self.showeventsonbt or self.temp1B[idx] > self.temp2B[idx]):
+                            if self.backgroundETcurve and not (self.backgroundBTcurve and self.showeventsonbt) and self.temp1B[idx] > self.temp2B[idx]:
                                 tempo = self.temp1B[idx]
                             elif self.backgroundBTcurve:
                                 tempo = self.temp2B[idx]
@@ -9763,8 +9758,7 @@ class tgraphcanvas(FigureCanvas):
                                         if len(st1) == 0:
                                             st1 = 'E'
                                     # plot events on BT when showeventsonbt is true
-                                    if self.backgroundETcurve and (not self.backgroundBTcurve or
-                                            not self.showeventsonbt or self.temp1B[event_idx] > self.temp2B[event_idx]):
+                                    if self.backgroundETcurve and not (self.backgroundBTcurve and self.showeventsonbt) and self.temp1B[event_idx] > self.temp2B[event_idx]:
                                         temp = self.temp1B[event_idx]
                                     else:
                                         temp = self.temp2B[event_idx]
@@ -10314,7 +10308,7 @@ class tgraphcanvas(FigureCanvas):
                                         #some times ET is not drawn (ET = 0) when using device NONE
                                         if self.ETcurve or self.BTcurve:
                                             # plot events on BT when showeventsonbt is true
-                                            if self.ETcurve and (not self.BTcurve or not self.showeventsonbt or self.temp1[event_idx] >= self.temp2[event_idx]):
+                                            if self.ETcurve and not (self.BTcurve and self.showeventsonbt) and self.temp1[event_idx] >= self.temp2[event_idx]:
                                                 col = self.palette['et']
                                                 if self.flagon:
                                                     temps = self.temp1
@@ -10326,7 +10320,6 @@ class tgraphcanvas(FigureCanvas):
                                                     temps = self.temp2
                                                 else:
                                                     temps = self.stemp2
-        #                                    fcolor=self.EvalueColor[self.specialeventstype[i]]
                                             if platform.system() == 'Windows':
                                                 vert_offset = 5.0
                                             else:
@@ -10699,7 +10692,7 @@ class tgraphcanvas(FigureCanvas):
                                         #some times ET is not drawn (ET = 0) when using device NONE
                                         # plot events on BT when showeventsonbt is true
                                         tempo:Optional[float]
-                                        if self.ETcurve and (not self.BTcurve or not self.showeventsonbt or self.temp1[event_idx] > self.temp2[event_idx]):
+                                        if self.ETcurve and not (self.BTcurve and self.showeventsonbt) and self.temp1[event_idx] > self.temp2[event_idx]:
                                             if self.flagon:
                                                 tempo = self.temp1[event_idx]
                                             else:
@@ -10768,7 +10761,7 @@ class tgraphcanvas(FigureCanvas):
                                                     pass
                                                 # register draggable flag annotation to be re-created after re-positioning on redraw
                                                 self.l_event_flags_dict[i] = anno
-                                                if self.ETcurve and (not self.BTcurve or not self.showeventsonbt or self.temp1[event_idx] > self.temp2[event_idx]):
+                                                if self.ETcurve and not (self.BTcurve and self.showeventsonbt) and self.temp1[event_idx] > self.temp2[event_idx]:
                                                     self.l_eteventannos.append(anno)
                                                 else:
                                                     self.l_bteventannos.append(anno)
@@ -15393,7 +15386,7 @@ class tgraphcanvas(FigureCanvas):
                                 #some times ET is not drawn (ET = 0) when using device NONE
                                 # plot events on BT when showeventsonbt is true
                                 anno = None
-                                if self.ETcurve and (not self.BTcurve or not self.showeventsonbt or self.temp1[index] >= self.temp2[index]):
+                                if self.ETcurve and not (self.BTcurve and self.showeventsonbt) and self.temp1[index] >= self.temp2[index]:
                                     anno = self.ax.annotate(f'{firstletter}{secondletter}',
                                         xy=(self.timex[index],
                                         self.temp1[index]),
@@ -15436,7 +15429,7 @@ class tgraphcanvas(FigureCanvas):
                                 height = 50 if self.mode == 'F' else 20
                                 #some times ET is not drawn (ET = 0) when using device NONE
                                 # plot events on BT when showeventsonbt is true
-                                if self.ETcurve and (not self.BTcurve or not self.showeventsonbt or self.temp1[index] > self.temp2[index]):
+                                if self.ETcurve and not (self.BTcurve and self.showeventsonbt) and self.temp1[index] > self.temp2[index]:
                                     temp = self.temp1[index]
                                 elif self.BTcurve:
                                     temp = self.temp2[index]
@@ -15582,7 +15575,7 @@ class tgraphcanvas(FigureCanvas):
                             height = 50 if self.mode == 'F' else 20
                             #some times ET is not drawn (ET = 0) when using device NONE
                             # plot events on BT when showeventsonbt is true
-                            if self.ETcurve and (not self.BTcurve or not self.showeventsonbt or self.temp1[index] > self.temp2[index]):
+                            if self.ETcurve and not (self.BTcurve and self.showeventsonbt) and self.temp1[index] > self.temp2[index]:
                                 temp = self.temp1[index]
                             else:
                                 temp = self.temp2[index]
@@ -15602,7 +15595,7 @@ class tgraphcanvas(FigureCanvas):
                                 row = {0:self.phases[0]-10,1:self.phases[0]-20,2:self.phases[0]-30,3:self.phases[0]-40}
                             #some times ET is not drawn (ET = 0) when using device NONE
                             # plot events on BT when showeventsonbt is true
-                            if self.ETcurve and (not self.BTcurve or not self.showeventsonbt or self.temp1[index] >= self.temp2[index]):
+                            if self.ETcurve and not (self.BTcurve and self.showeventsonbt) and self.temp1[index] >= self.temp2[index]:
                                 anno = self.ax.annotate(f'{firstletter}{secondletter}', xy=(self.timex[index], self.temp1[index]),xytext=(self.timex[index],row[self.specialeventstype[-1]]),alpha=1.,
                                                  color=self.palette['specialeventtext'],arrowprops={'arrowstyle':'-',
                                                     'color':self.palette['et'],'alpha':0.4,'relpos':(0,0)},fontsize=fontsize,

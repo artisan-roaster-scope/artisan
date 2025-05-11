@@ -40,7 +40,7 @@ ScaleSpecs = List[ScaleSpec]
 # NOTE: this class and all subclasses are not allowed to hold __slots__
 class Scale:
 
-    weight_changed_signal = pyqtSignal(int)   # delivers new weight in g
+    weight_changed_signal = pyqtSignal(float) # delivers new weight in g with decimals for accurate conversion
     battery_changed_signal = pyqtSignal(int)  # delivers new batter level in %
     disconnected_signal = pyqtSignal()        # issued on disconnect
 

@@ -336,8 +336,8 @@ class volumeCalculatorDlg(ArtisanDialog):
     def acaia_battery_changed(self, b:int) -> None:
         self.scale_battery = b
 
-    @pyqtSlot(int)
-    def acaia_weight_changed(self, w:int) -> None:
+    @pyqtSlot(float)
+    def acaia_weight_changed(self, w:float) -> None:
         self.scale_weight = w
         self.update_scale_weight()
 
@@ -1921,8 +1921,8 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.scale_battery = None
         self.updateWeightLCD('----')
 
-    @pyqtSlot(int)
-    def ble_weight_changed(self, w:int) -> None:
+    @pyqtSlot(float)
+    def ble_weight_changed(self, w:float) -> None:
         if w is not None:
             self.scale_weight = w
             self.update_scale_weight()
@@ -1946,7 +1946,8 @@ class editGraphDlg(ArtisanResizeablDialog):
             unit = weight_units.index(self.aw.qmc.weight[2])
             if unit == 0: # g selected
                 # metric
-                v_formatted = f'{v:.0f}' # never show decimals for g
+#                v_formatted = f'{v:.0f}' # never show decimals for g # f'{-0.1:.0f}' => -0
+                v_formatted = str(int(round(v)))
             elif unit == 1: # kg selected
                 # metric (always keep the accuracy to the g
                 v_formatted = f'{v/1000:.3f}'

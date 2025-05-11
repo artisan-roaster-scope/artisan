@@ -54,7 +54,7 @@ protobuf==5.29.3 # v5.30.x drops support for Python 3.8!
 numpy==1.24.3; python_version < '3.9' # last Python 3.8 release
 numpy==2.2.5; python_version >= '3.9'
 scipy==1.10.1; python_version < '3.9' # last Python 3.8 release
-scipy==1.15.2; python_version >= '3.9'
+scipy==1.15.3; python_version >= '3.9'
 wquantiles==0.6
 colorspacious==1.1.2
 openpyxl==3.1.5
@@ -64,7 +64,7 @@ prettytable==3.11.0; python_version < '3.9' # last Python 3.8 release
 prettytable==3.16.0; python_version >= '3.9'
 lxml==5.4.0
 matplotlib==3.7.3; python_version < '3.9' # last Python 3.8 release
-matplotlib==3.10.1; python_version >= '3.9'
+matplotlib==3.10.3; python_version >= '3.9'
 jinja2==3.1.6
 aiohttp==3.10.11; python_version < '3.9' # last Python 3.8 release
 aiohttp==3.11.18; python_version >= '3.9'

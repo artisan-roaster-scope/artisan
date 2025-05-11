@@ -161,8 +161,8 @@ class BLE:
             blacklist:Set[str], # list of client addresses to ignore as they don't offer the required service
             case_sensitive:bool=True,
             disconnected_callback:Optional[Callable[[BleakClient], None]] = None,
-            scan_timeout:float=3,
-            connect_timeout:float=2,
+            scan_timeout:float=4,
+            connect_timeout:float=6,
             address:Optional[str] = None # if given, connect only to the device with this ble address
             ) -> Tuple[Optional[BleakClient], Optional[str]]:
         if hasattr(self, '_asyncLoopThread') and self._asyncLoopThread is None:
@@ -284,7 +284,7 @@ class ClientBLE:
 
 
     # connect and re-connect while self._running to BLE
-    async def _connect(self, case_sensitive:bool=True, scan_timeout:float=3, connect_timeout:float=2, address:Optional[str] = None) -> None:
+    async def _connect(self, case_sensitive:bool=True, scan_timeout:float=3, connect_timeout:float=6, address:Optional[str] = None) -> None:
         blacklist:Set[str] = set()
         while self._running:
             # scan and connect
@@ -394,7 +394,7 @@ class ClientBLE:
             self._keep_alive())
 
 
-    def start(self, case_sensitive:bool=True, scan_timeout:float=3, connect_timeout:float=2, address:Optional[str] = None) -> None:
+    def start(self, case_sensitive:bool=True, scan_timeout:float=4, connect_timeout:float=6, address:Optional[str] = None) -> None:
         _log.debug('start')
         if self._running:
             _log.error('BLE client already running')
@@ -494,6 +494,7 @@ class ClientBLE:
 # scans for named BLE devices providing any of the provided servie_uuids
 # returns a list of triples (name, address, Optional[BLEDevice])
 def scan_ble(timeout: float = 3.0) -> 'List[Tuple[BLEDevice, AdvertisementData]]':
+    _log.debug('scan_ble(%s) started', timeout)
     coro = BleakScanner.discover(
         timeout=timeout,
         return_adv=True)
@@ -502,4 +503,9 @@ def scan_ble(timeout: float = 3.0) -> 'List[Tuple[BLEDevice, AdvertisementData]]
         res = asyncio.run_coroutine_threadsafe(coro, loop).result()
     except RuntimeError:
         res = asyncio.run(coro)
-    return list(res.values())
+    _log.debug('scan_ble ended')
+    if res:
+#        _log.debug('scan_ble results: %s', res.values())
+        return list(res.values())
+    _log.debug('scan_ble returned no results')
+    return []

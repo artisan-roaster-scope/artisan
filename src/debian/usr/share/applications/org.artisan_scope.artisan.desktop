@@ -8,5 +8,6 @@ Exec=artisan %U
 TryExec=artisan
 Icon=artisan
 Terminal=false
+StartupNotify=false
 Categories=Utility;
-MimeType=application/x-artisan-alog;application/x-artisan-alrm;application/x-artisan-apal;application/x-artisan-aset;application/x-artisan-wg;application/x-artisan-athm;
+MimeType=x-scheme-handler/artisan;application/x-artisan-alog;application/x-artisan-alrm;application/x-artisan-apal;application/x-artisan-aset;application/x-artisan-wg;application/x-artisan-athm;

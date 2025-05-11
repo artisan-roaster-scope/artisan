@@ -195,6 +195,7 @@ import matplotlib.backends.qt_editor._formlayout as formlayout
 if TYPE_CHECKING:
     from types import TracebackType
     from artisanlib.atypes import ProfileData, ComputedProfileInformation, RecentRoast, ExtraDeviceSettings, Palette, CurveSimilarity, ProductionData, ProductionDataStr, Wheel # pylint: disable=unused-import
+    from artisanlib.scale import ScaleSpec
     from artisanlib.roast_properties import editGraphDlg # pylint: disable=unused-import
     from artisanlib.comparator import roastCompareDlg # pylint: disable=unused-import
     from artisanlib.wheels import WheelDlg # pylint: disable=unused-import
@@ -1687,6 +1688,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
         # Scales
         self.scale_manager:ScaleManager = ScaleManager()
+        # association of scale ids (eg. BLE addresses) to custom user names for the scales
+        self.custom_scale_ids:List[str] = []   # same length as self.custom_scale_names
+        self.custom_scale_names:List[str] = [] # same length as self.custom_scale_ids
         # scale1: for roasted and green (if no second scale is configured, otherwise just for roasted)
         self.scale1_model:Optional[int] = None
         self.scale1_name:Optional[str] = None  # the display/local name of the device (like "ACAIA162FC")
@@ -4290,6 +4294,38 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.zoomOutShortcut = QShortcut(QKeySequence.StandardKey.ZoomOut, self)
         self.zoomOutShortcut.activated.connect(self.zoomOut)
 
+
+    # returns the custom name associated with the given scale_id if any, or None
+    def get_custom_scale_name(self, scale_id:str) -> Optional[str]:
+        try:
+            return self.custom_scale_names[self.custom_scale_ids.index(scale_id)]
+        except Exception: # pylint: disable=broad-except
+            return None
+
+    # if supplied name is empty a previous custom name entry is removed
+    def set_custom_scale_name(self, scale_id:str, name:str) -> None:
+        if name == '':
+            # given name is the empty string we remove the entry if it exists
+            try:
+                idx = self.custom_scale_ids.index(scale_id)
+                self.custom_scale_ids.pop(idx)
+                self.custom_scale_names.pop(idx)
+            except Exception: # pylint: disable=broad-except
+                pass
+        else:
+            try:
+                # update existing custom name
+                self.custom_scale_names[self.custom_scale_ids.index(scale_id)] = name
+            except ValueError:
+                # add a new custom name entry
+                self.custom_scale_ids.append(scale_id)
+                self.custom_scale_names.append(name)
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
+
+    def getScaleName(self, scale_device:'ScaleSpec') -> str:
+        custom_name = self.get_custom_scale_name(scale_device[1])
+        return custom_name or scale_device[0]
 
     # today is expected to be w.r.t. local timezone
     def scheduledItemsfilter(self, today:datetime.date, item:plus.schedule.ScheduledItem, hidden:bool = False) -> bool:
@@ -18643,6 +18679,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 #--- BEGIN GROUP Scales
             # Scales
             settings.beginGroup('Scales')
+            self.custom_scale_ids = list(toStringList(settings.value('custom_scale_ids',self.custom_scale_ids)))
+            self.custom_scale_names = list(toStringList(settings.value('custom_scale_names',self.custom_scale_names)))
             if settings.contains('scale1_model'):
                 try:
                     self.scale1_model = toInt(settings.value('scale1_model',self.scale1_model))
@@ -20305,6 +20343,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 #--- BEGIN GROUP Scales
             # Scales
             settings.beginGroup('Scales')
+            self.settingsSetValue(settings, default_settings, 'custom_scale_ids',self.custom_scale_ids, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'custom_scale_names',self.custom_scale_names, read_defaults)
             self.settingsSetValue(settings, default_settings, 'scale1_model',self.scale1_model, read_defaults)
             self.settingsSetValue(settings, default_settings, 'scale1_name',self.scale1_name, read_defaults)
             self.settingsSetValue(settings, default_settings, 'scale1_id',self.scale1_id, read_defaults)
