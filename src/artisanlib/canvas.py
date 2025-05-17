@@ -7380,6 +7380,8 @@ class tgraphcanvas(FigureCanvas):
                     #adjust the length of the minor ticks
                     for i in self.ax.xaxis.get_minorticklines():
                         i.set_markersize(4)
+            else:
+                self.ax.set_xticks([])
 
             # we have to update the canvas cache
             if redraw:
@@ -10822,6 +10824,8 @@ class tgraphcanvas(FigureCanvas):
                                 delta_minor_tick_lines:List[Line2D] = self.delta_ax.yaxis.get_minorticklines()
                                 for mtl in delta_minor_tick_lines:
                                     mtl.set_markersize(5)
+                        else:
+                            self.delta_ax.set_yticks([])
 
                     ##### Extra devices-curves
                     for l in self.extratemp1lines + self.extratemp2lines:
