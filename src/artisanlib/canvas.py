@@ -9063,9 +9063,9 @@ class tgraphcanvas(FigureCanvas):
 
     def twoAxisMode(self) -> bool:
         return (self.DeltaETflag or self.DeltaBTflag or
-                    (self.background and self.backgroundprofile is not None and (self.DeltaETBflag or self.DeltaBTBflag) or
+                    (self.background and self.backgroundprofile is not None and (self.DeltaETBflag or self.DeltaBTBflag)) or
                     any(self.aw.extraDelta1[:len(self.extratimex)]) or
-                    any(self.aw.extraDelta2[:len(self.extratimex)])))
+                    any(self.aw.extraDelta2[:len(self.extratimex)]))
 
     @pyqtSlot(bool,bool,bool,bool,bool)
     def redraw_keep_view(self, *args:bool, **kwargs:bool) -> None:
@@ -10798,34 +10798,36 @@ class tgraphcanvas(FigureCanvas):
                             self.drawDeltaET(trans,0,0)
                             self.drawDeltaBT(trans,0,0)
 
-                    if self.delta_ax is not None and two_ax_mode:
-                        self.aw.autoAdjustAxis(timex=False)
-                        self.delta_ax.set_ylim(self.zlimit_min,self.zlimit)
-                        if self.zgrid > 0:
-                            major_locator = ticker.MultipleLocator(self.zgrid)
-                            self.delta_ax.yaxis.set_major_locator(major_locator)
-                            if len(major_locator()) > 20: # accept a maximum of 30 major ticks
-                                min_grid = (self.aw.qmc.zlimit - self.aw.qmc.zlimit_min) / 20
-                                # set grid to closest of min_grid from regular grids [1, 2, 5, 10, 15, 20]
-                                major_locator.set_params(min([1, 2, 5, 10], key=lambda x:abs(x-min_grid)))
-                            delta_major_tick_lines:List[Line2D] = self.delta_ax.get_yticklines()
-                            for ytl in delta_major_tick_lines:
-                                ytl.set_markersize(10)
-                            for label in self.delta_ax.get_yticklabels() :
-                                label.set_fontsize('small')
-                            if not self.LCDdecimalplaces:
-                                self.delta_ax.minorticks_off()
-                            else:
-                                minor_locator = ticker.AutoMinorLocator() # locator parameter n, default: n='auto' => 4 or 5, n=2 => 1
-                                self.delta_ax.yaxis.set_minor_locator(minor_locator)
-                                if len(minor_locator()) > 50:
-                                    # we limit the total number of minor tick locators for performance and esthetic reasons
-                                    self.delta_ax.yaxis.set_minor_locator(ticker.NullLocator())
-                                delta_minor_tick_lines:List[Line2D] = self.delta_ax.yaxis.get_minorticklines()
-                                for mtl in delta_minor_tick_lines:
-                                    mtl.set_markersize(5)
+                    if self.delta_ax is not None:
+                        if two_ax_mode:
+                            self.aw.autoAdjustAxis(timex=False)
+                            self.delta_ax.set_ylim(self.zlimit_min,self.zlimit)
+                            if self.zgrid > 0:
+                                major_locator = ticker.MultipleLocator(self.zgrid)
+                                self.delta_ax.yaxis.set_major_locator(major_locator)
+                                if len(major_locator()) > 20: # accept a maximum of 30 major ticks
+                                    min_grid = (self.aw.qmc.zlimit - self.aw.qmc.zlimit_min) / 20
+                                    # set grid to closest of min_grid from regular grids [1, 2, 5, 10, 15, 20]
+                                    major_locator.set_params(min([1, 2, 5, 10], key=lambda x:abs(x-min_grid)))
+                                delta_major_tick_lines:List[Line2D] = self.delta_ax.get_yticklines()
+                                for ytl in delta_major_tick_lines:
+                                    ytl.set_markersize(10)
+                                for label in self.delta_ax.get_yticklabels() :
+                                    label.set_fontsize('small')
+                                if not self.LCDdecimalplaces:
+                                    self.delta_ax.minorticks_off()
+                                else:
+                                    minor_locator = ticker.AutoMinorLocator() # locator parameter n, default: n='auto' => 4 or 5, n=2 => 1
+                                    self.delta_ax.yaxis.set_minor_locator(minor_locator)
+                                    if len(minor_locator()) > 50:
+                                        # we limit the total number of minor tick locators for performance and esthetic reasons
+                                        self.delta_ax.yaxis.set_minor_locator(ticker.NullLocator())
+                                    delta_minor_tick_lines:List[Line2D] = self.delta_ax.yaxis.get_minorticklines()
+                                    for mtl in delta_minor_tick_lines:
+                                        mtl.set_markersize(5)
                         else:
                             self.delta_ax.set_yticks([])
+
 
                     ##### Extra devices-curves
                     for l in self.extratemp1lines + self.extratemp2lines:
