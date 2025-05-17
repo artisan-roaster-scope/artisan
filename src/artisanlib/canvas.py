@@ -9320,10 +9320,10 @@ class tgraphcanvas(FigureCanvas):
                     if self.ygrid > 0:
                         major_locator = ticker.MultipleLocator(self.ygrid)
                         self.ax.yaxis.set_major_locator(major_locator)
-                        if len(major_locator()) > 20: # accept a maximum of 30 major ticks
-                            min_grid = (self.aw.qmc.ylimit - self.aw.qmc.ylimit_min) / 20
-                            # set grid to closest of min_grid from regular grids [1, 2, 5, 10, 15, 20]
-                            major_locator.set_params(min([1, 2, 5, 10], key=lambda x:abs(x-min_grid)))
+                        if len(major_locator()) > 50: # accept a maximum of 30 major ticks
+                            min_grid = (self.aw.qmc.ylimit - self.aw.qmc.ylimit_min) / 50
+                            # set grid to closest of min_grid from regular grids [1, 2, 5, 10, 20, 50, 100]
+                            major_locator.set_params(min([1, 2, 5, 10, 20, 50, 100], key=lambda x:abs(x-min_grid)))
                         if not self.LCDdecimalplaces:
                             self.ax.minorticks_off()
                         else:
@@ -10799,16 +10799,18 @@ class tgraphcanvas(FigureCanvas):
                             self.drawDeltaBT(trans,0,0)
 
                     if self.delta_ax is not None:
+                        self.delta_ax.set_yticks([])
                         if two_ax_mode:
                             self.aw.autoAdjustAxis(timex=False)
                             self.delta_ax.set_ylim(self.zlimit_min,self.zlimit)
                             if self.zgrid > 0:
                                 major_locator = ticker.MultipleLocator(self.zgrid)
                                 self.delta_ax.yaxis.set_major_locator(major_locator)
-                                if len(major_locator()) > 20: # accept a maximum of 30 major ticks
-                                    min_grid = (self.aw.qmc.zlimit - self.aw.qmc.zlimit_min) / 20
-                                    # set grid to closest of min_grid from regular grids [1, 2, 5, 10, 15, 20]
-                                    major_locator.set_params(min([1, 2, 5, 10], key=lambda x:abs(x-min_grid)))
+                                _log.debug('PRINT len(major_locator()): %s', len(major_locator()))
+                                if len(major_locator()) > 50: # accept a maximum of 20 major ticks
+                                    min_grid = (self.aw.qmc.zlimit - self.aw.qmc.zlimit_min) / 50
+                                    # set grid to closest of min_grid from regular grids [1, 2, 5, 10, 20, 50, 100]
+                                    major_locator.set_params(min([1, 2, 5, 10, 20, 50, 100], key=lambda x:abs(x-min_grid)))
                                 delta_major_tick_lines:List[Line2D] = self.delta_ax.get_yticklines()
                                 for ytl in delta_major_tick_lines:
                                     ytl.set_markersize(10)
@@ -10825,8 +10827,7 @@ class tgraphcanvas(FigureCanvas):
                                     delta_minor_tick_lines:List[Line2D] = self.delta_ax.yaxis.get_minorticklines()
                                     for mtl in delta_minor_tick_lines:
                                         mtl.set_markersize(5)
-                        else:
-                            self.delta_ax.set_yticks([])
+
 
 
                     ##### Extra devices-curves
