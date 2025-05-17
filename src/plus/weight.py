@@ -29,7 +29,9 @@ except ImportError:
     from PyQt5.QtCore import QSemaphore # type: ignore[import-not-found,no-redef]  # @Reimport @UnresolvedImport @UnusedImport
 
 from dataclasses import dataclass
-from typing import Optional, List, Callable, Final
+from typing import Optional, List, Tuple, Callable, Final
+
+from artisanlib.scale import ScaleManager
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -38,7 +40,11 @@ _log: Final[logging.Logger] = logging.getLogger(__name__)
 class WeightItem:
     uuid:str         # the UUID of the ScheduledItem or CompletedItem
     title:str        # the title (schedule item name of a ScheduledItem, or batch number and roast name of a CompletedItem
-    description:str  # the description (the coffee name or blend ingredients of a ScheduleItem or the roast date of a CompletedItem)
+    description:str  # a simple one liner describing the weight item in HTML format
+    descriptions:List[Tuple[float,str]] # the descriptions of the green coffee or blend as non empty list of tuples <ratio>,<description>
+                     # with ratio the component ratio in blends and description the coffee component name.
+                     # A single coffee has just one tuple with ratio set to 1 (also for completed items).
+                     # For roasted blend items this is always just the one element list [(1, '')]
     position:str     # the position string (like "2/5" for 2nd of 5 batches)
     weight:float     # target or suggested weight
     weight_unit_idx:int  # the weight unit, one of (0:'g', 1:'kg', 2:'lb', 3:'oz')
@@ -51,6 +57,20 @@ class GreenWeightItem(WeightItem):
 @dataclass
 class RoastedWeightItem(WeightItem):
     ...
+
+#WebDisplay protocol
+#- id:str (schedule item position / roast batch nr)
+#- title:str
+#- subtitle:str
+#- batchsize:str
+#- weight:str
+#- percent: float => always present
+#- state:int (0:disconnected, 1:connected, 2:weighing, 3:done, 4:canceled)
+#- bucket: int {0,1,2}
+#- blend_percent: str # could be the empty string
+#- total_percent: float => could be dropped
+#- type:int (0:green, 1: roasted, 2:defects)
+
 
 # Consider
 #. if green: target weight (counts down)
@@ -67,132 +87,171 @@ class Display:
 
     def __init__(self) -> None:
         self.active:bool = True
-        self.clear()
+        self.clear_green()
+        self.clear_roasted()
 
-    def clear(self) -> None: # pylint: disable=no-self-use
+    def clear_green(self) -> None: # pylint: disable=no-self-use
+        ...
+
+    def clear_roasted(self) -> None: # pylint: disable=no-self-use
         ...
 
     def show_item(self, item:WeightItem) -> None: # pylint: disable=unused-argument,no-self-use
         ...
 
-
-class PhidgetScaleDisplay(Display):
-#    def __init__(self) -> None:
-#        super().__init__()
-
-    def show_item(self, item:WeightItem) -> None:
-        if self.active:
-            print(item)
-
-class DialogDisplay(Display):
-#    def __init__(self) -> None:
-#        super().__init__()
-
-    def show_item(self, item:WeightItem) -> None:
-        pass
-
-class WebDisplay(Display):
-    __slots__ = [ 'url', 'qr_code' ]
-#    def __init__(self) -> None:
-#        super().__init__()
-
-
-
-class Scale:
-    __slots__ = [ 'display' ]
-
-    def __init__(self) -> None:
-        self.display:Optional[Display] = None
-
-    def get_display(self) -> Optional[Display]:
-        return self.display
-
-
-class PhidgetScale(Scale):
-    def __init__(self) -> None:
-        super().__init__()
-        self.display = Display()
-
-class AcaiaScale(Scale):
+class GreenDisplay(Display):
     ...
+
+class RoastedDisplay(Display):
+    ...
+
+
+
+
+
+#class Scale:
+#    __slots__ = [ 'display' ]
+#
+#    def __init__(self) -> None:
+#        self.display:Optional[Display] = None
+#
+#    def get_display(self) -> Optional[Display]:
+#        return self.display
+#
+#
+#class PhidgetScale(Scale):
+#    def __init__(self) -> None:
+#        super().__init__()
+#        self.display = Display()
+#
+#class AcaiaScale(Scale):
+#    ...
 
 
 
 
 class WeightManager:
 
-    __slots__ = [ 'displays', 'scale', 'next_item', 'current_item', 'itemSemaphore' ]
+    __slots__ = [ 'displays', 'scale_manager', 'next_green_item',  'next_roasted_item',  'current_green_item', 'current_roasted_item',
+                    'greenItemSemaphore', 'roastedItemSemaphore' ]
 
 
-    def __init__(self, displays:List[Display], scale:Optional[Scale] = None) -> None:
+    def __init__(self, displays:List[Display], scale_manager:ScaleManager) -> None:
 
-        # optional selected scale; may contain a display which is controlled by this object
-        self.scale: Optional[Scale] = scale
+        self.scale_manager = scale_manager
 
         # list of displays control, incl. the display of the selected scale if any
         self.displays: List[Display] = displays
-        if self.scale is not None:
-            scale_display = self.scale.get_display()
-            if scale_display is not None:
-                self.displays.append(scale_display)
 
         # holds the next WeightItem waiting to be processed, if any
-        self.next_item:Optional[WeightItem] = None
+        self.next_green_item:Optional[GreenWeightItem] = None
+        self.next_roasted_item:Optional[RoastedWeightItem] = None
 
         # holds the WeightItem currently processed, if any
-        self.current_item:Optional[WeightItem] = None
+        self.current_green_item:Optional[GreenWeightItem] = None
+        self.current_roasted_item:Optional[RoastedWeightItem] = None
 
-        self.itemSemaphore = QSemaphore(1) # semaphore to protect access to next_item and current_item
+        self.greenItemSemaphore = QSemaphore(1) # semaphore to protect access to next_green_item and current_green_item
+        self.roastedItemSemaphore = QSemaphore(1) # semaphore to protect access to next_roasted_item and current_roasted_item
 
 
-    # queues a WeightItem for processing
+    # queues a GreenWeightItem for processing
+    # if item is None, the next green item is cleared
     # Note: the queue has size 1 and a newer incoming item overwrites an older already queued item
-    def set_next(self, item:Optional[WeightItem]) -> None:
+    def set_next_green(self, item:Optional[GreenWeightItem]) -> None:
         if item is None:
-            self.clear_next()
+            self.clear_next_green()
         else:
             # if there is a scale, we add the item to the waiting list to be fetched once a
             # container is recognized on the scale and processing is started
             # older waiting (outdated) weight item just get overwritten
 
-            self.itemSemaphore.acquire(1)
-            self.next_item = item
-            self.itemSemaphore.release(1)
+            self.greenItemSemaphore.acquire(1)
+            self.next_green_item = item
+            self.greenItemSemaphore.release(1)
 
-            if self.scale is None:
-                # if there is no scale, we fetch that item immediately and start "processing"
-                # even if there is already a current one in "processing"
-                self.fetch_next()
+    def clear_next_green(self) -> None:
+        self.greenItemSemaphore.acquire(1)
+        self.next_green_item = None
+        self.greenItemSemaphore.release(1)
+        self.clear_displays(green=True)
+
+    # start processing the next green item if any
+    def fetch_next_green(self) -> None:
+        self.greenItemSemaphore.acquire(1)
+        try:
+            if self.next_green_item is None:
+                self.current_roasted_item = None
+                self.clear_displays(green=True)
+            else:
+                self.current_green_item = self.next_green_item
+                self.next_green_item = None
+                # update displays
+                self.update_displays(self.current_green_item)
+        finally:
+            if self.greenItemSemaphore.available() < 1:
+                self.greenItemSemaphore.release(1)
+
+    def greenTaskCompleted(self) -> None:
+        if self.current_green_item is not None:
+            self.current_green_item.call_back(self.current_green_item.uuid, self.current_green_item.weight)
+
+#--
+
+    # queues a RoastedWeightItem for processing
+    # if item is None, the next roasted item is cleared
+    # Note: the queue has size 1 and a newer incoming item overwrites an older already queued item
+    def set_next_roasted(self, item:Optional[RoastedWeightItem]) -> None:
+        if item is None:
+            self.clear_next_roasted()
+        else:
+            # if there is a scale, we add the item to the waiting list to be fetched once a
+            # container is recognized on the scale and processing is started
+            # older waiting (outdated) weight item just get overwritten
+
+            self.roastedItemSemaphore.acquire(1)
+            self.next_roasted_item = item
+            self.roastedItemSemaphore.release(1)
+
+    def clear_next_roasted(self) -> None:
+        self.roastedItemSemaphore.acquire(1)
+        self.next_roasted_item = None
+        self.roastedItemSemaphore.release(1)
+        self.clear_displays(roasted=True)
+
+    # start processing the next roasted item if any
+    def fetch_next_roasted(self) -> None:
+        self.roastedItemSemaphore.acquire(1)
+        try:
+            if self.next_roasted_item is None:
+                self.current_roasted_item = None
+                self.clear_displays(roasted=True)
+            else:
+                self.current_roasted_item = self.next_roasted_item
+                self.next_roasted_item = None
+                # update displays
+                self.update_displays(self.current_roasted_item)
+        finally:
+            if self.roastedItemSemaphore.available() < 1:
+                self.roastedItemSemaphore.release(1)
+
+    def roastedTaskCompleted(self) -> None:
+        if self.current_roasted_item is not None:
+            self.current_roasted_item.call_back(self.current_roasted_item.uuid, self.current_roasted_item.weight)
+
+#--
 
     def clear_next(self) -> None:
-        self.itemSemaphore.acquire(1)
-        self.next_item = None
-        self.itemSemaphore.release(1)
-        self.clear_displays()
+        self.clear_next_green()
+        self.clear_next_roasted()
+
+    def fetch_next(self) -> None:
+        self.fetch_next_green()
+        self.fetch_next_roasted()
 
     def reset(self) -> None:
         self.clear_next()
-        self.fetch_next()
-
-    # start processing the next item if any
-    def fetch_next(self) -> None:
-        self.itemSemaphore.acquire(1)
-        try:
-            if self.next_item is None:
-                self.current_item = None
-                self.clear_displays()
-            else:
-                self.current_item = self.next_item
-                self.next_item = None
-                # update displays
-                self.update_displays(self.current_item)
-        finally:
-            if self.itemSemaphore.available() < 1:
-                self.itemSemaphore.release(1)
-
-    def taskCompleted(self) -> None:
-        if self.current_item is not None:
-            self.current_item.call_back(self.current_item.uuid, self.current_item.weight)
+        self.fetch_next_green()
 
 
     # render item on all active displays
@@ -202,11 +261,15 @@ class WeightManager:
 
     # update weight to be displayed on all connected displays
     def update_weight(self) -> None:
-        pass # to be implemented
+        pass
 
-    def clear_displays(self) -> None:
+    # if green and roasted are False, all displays are cleared
+    def clear_displays(self, green:bool = False, roasted:bool = False) -> None:
         for display in self.displays:
-            display.clear()
+            if (green and not roasted) or not (green or roasted):
+                display.clear_green()
+            if roasted or not (green or roasted):
+                display.clear_roasted()
 
 # Container information
 #aw.qmc.container_names

@@ -1946,13 +1946,6 @@ class tgraphcanvas(FigureCanvas):
                 linewidth = self.gridthickness,
                 alpha = self.gridalpha)
 
-        #change label colors
-        for label in self.ax.yaxis.get_ticklabels():
-            label.set_color(self.palette['ylabel'])
-
-        for label in self.ax.xaxis.get_ticklabels():
-            label.set_color(self.palette['xlabel'])
-
         self.backgroundETcurve:bool = True
         self.backgroundBTcurve:bool = True
 
@@ -7363,40 +7356,30 @@ class tgraphcanvas(FigureCanvas):
                 mfactor2 =  round(float(2. + abs( int(round(last_reading_time)) / int(round(self.xgrid)) )))
 
                 majorloc = numpy.arange(starttime-(self.xgrid*mfactor1),starttime+(self.xgrid*mfactor2), self.xgrid)
-                if self.xgrid == 60:
-                    minorloc = numpy.arange(starttime-(self.xgrid*mfactor1),starttime+(self.xgrid*mfactor2), 30)
-                else:
-                    minorloc = numpy.arange(starttime-(self.xgrid*mfactor1),starttime+(self.xgrid*mfactor2), 60)
-
                 majorlocator = ticker.FixedLocator(majorloc.tolist())
-                minorlocator = ticker.FixedLocator(minorloc.tolist())
-
                 self.ax.xaxis.set_major_locator(majorlocator)
-                self.ax.xaxis.set_minor_locator(minorlocator)
-
                 formatter = ticker.FuncFormatter(self.formtime)
                 self.ax.xaxis.set_major_formatter(formatter)
-
-
-                #adjust the length of the minor ticks
-                for i in self.ax.xaxis.get_minorticklines() + self.ax.yaxis.get_minorticklines():
-                    i.set_markersize(4)
 
                 #adjust the length of the major ticks
                 for i in self.ax.get_xticklines() + self.ax.get_yticklines():
                     i.set_markersize(6)
                     #i.set_markeredgewidth(2)   #adjust the width
 
-#                # check x labels rotation
-#                if self.xrotation != 0:
-#                    for label in self.ax.xaxis.get_ticklabels():
-#                        label.set_rotation(self.xrotation)
-
-            if not self.LCDdecimalplaces:
-                if self.ax:
+                # minor x-axis tick locator
+                if not self.LCDdecimalplaces:
                     self.ax.minorticks_off()
-                if self.delta_ax is not None:
-                    self.delta_ax.minorticks_off()
+                else:
+                    if self.xgrid == 60:
+                        minorloc = numpy.arange(starttime-(self.xgrid*mfactor1),starttime+(self.xgrid*mfactor2), 30)
+                    else:
+                        minorloc = numpy.arange(starttime-(self.xgrid*mfactor1),starttime+(self.xgrid*mfactor2), 60)
+                    minorlocator = ticker.FixedLocator(minorloc.tolist())
+                    self.ax.xaxis.set_minor_locator(minorlocator)
+
+                    #adjust the length of the minor ticks
+                    for i in self.ax.xaxis.get_minorticklines():
+                        i.set_markersize(4)
 
             # we have to update the canvas cache
             if redraw:
@@ -9123,7 +9106,7 @@ class tgraphcanvas(FigureCanvas):
     #   to keep points and lines drawn without those breaks data should be interpolated via util:fill_gaps (controlled by the "Interpolate Drops" filter)
     @pyqtSlot(bool,bool,bool,bool,bool)
     def redraw(self, recomputeAllDeltas:bool = True, re_smooth_foreground:bool = True, takelock:bool = True, forceRenewAxis:bool = False, re_smooth_background:bool = False) -> None: # pyright: ignore [reportGeneralTypeIssues] # Code is too complex to analyze; reduce complexity by refactoring into subroutines or reducing conditional code paths
-#        _log.info("PRINT redraw(recomputeAllDeltas: %s, re_smooth_foreground: %s, takelock: %s, forceRenewAxis: %s, re_smooth_background: %s)",recomputeAllDeltas, re_smooth_foreground, takelock, forceRenewAxis, re_smooth_background)
+#        _log.debug("PRINT redraw(recomputeAllDeltas: %s, re_smooth_foreground: %s, takelock: %s, forceRenewAxis: %s, re_smooth_background: %s)",recomputeAllDeltas, re_smooth_foreground, takelock, forceRenewAxis, re_smooth_background)
         if self.designerflag:
             self.redrawdesigner(force=True)
         elif self.aw.comparator is not None:
@@ -9149,29 +9132,31 @@ class tgraphcanvas(FigureCanvas):
                     randomness = 12 # 2 (16 default)
                     rcParams['path.sketch'] = (scale, length, randomness)
 
-                    rcParams['axes.linewidth'] = 0.8
-                    rcParams['xtick.major.size'] = 6
-                    rcParams['xtick.major.width'] = 1
-                    rcParams['xtick.minor.width'] = 0.8
-
-                    rcParams['ytick.major.size'] = 4
-                    rcParams['ytick.major.width'] = 1
-                    rcParams['ytick.minor.width'] = 1
+                    # if no axis are set, we need to forceRenewAxis in any case
+                    if self.ax is None or self.delta_ax is None:
+                        forceRenewAxis = True
 
                     xlabel_alpha_color = to_hex(to_rgba(self.palette['xlabel'], 0.47), keep_alpha=True)
                     ylabel_alpha_color = to_hex(to_rgba(self.palette['ylabel'], 0.47), keep_alpha=True)
 
-                    rcParams['xtick.color'] = xlabel_alpha_color
-                    rcParams['ytick.color'] = ylabel_alpha_color
+                    if forceRenewAxis or self.ax is None:
+                        rcParams['axes.linewidth'] = 0.8
+                        rcParams['xtick.major.size'] = 6
+                        rcParams['xtick.major.width'] = 1
+                        rcParams['xtick.minor.width'] = 0.8
 
-                    #rcParams['text.antialiased'] = True
+                        rcParams['ytick.major.size'] = 4
+                        rcParams['ytick.major.width'] = 1
+                        rcParams['ytick.minor.width'] = 1
 
-                    if forceRenewAxis:
+                        rcParams['xtick.color'] = xlabel_alpha_color
+                        rcParams['ytick.color'] = ylabel_alpha_color
+                        #rcParams['text.antialiased'] = True
+
                         self.fig.clf()
 
-                    if self.ax is None or forceRenewAxis:
                         self.ax = self.fig.add_subplot(111,facecolor=self.palette['background'])
-                    if self.delta_ax is None or forceRenewAxis:
+                        self.ax.set_autoscale_on(False)
                         self.delta_ax = self.ax.twinx()
 
                     # instead to remove and regenerate the axis object (we just clear and reuse it)
@@ -9181,16 +9166,11 @@ class tgraphcanvas(FigureCanvas):
                             warnings.simplefilter('ignore')
                             self.ax.clear()
                         self.ax.set_facecolor(self.palette['background'])
-                        self.ax.set_yticks([])
-                        self.ax.set_xticks([])
                         self.ax.set_ylim(self.ylimit_min, self.ylimit)
-                        self.ax.set_autoscale_on(False)
                     if self.delta_ax is not None:
                         with warnings.catch_warnings():
                             warnings.simplefilter('ignore')
                             self.delta_ax.clear()
-                        self.delta_ax.set_yticks([])
-                        self.delta_ax.set_xticks([])
 
                     prop = self.aw.mpl_fontproperties.copy()
                     prop.set_size('small')
@@ -9279,55 +9259,44 @@ class tgraphcanvas(FigureCanvas):
 
                     self.ax.patch.set_visible(True)
 
-                    self.delta_ax.set_ylim(self.zlimit_min,self.zlimit)
-                    if self.zgrid > 0:
-                        self.delta_ax.yaxis.set_major_locator(ticker.MultipleLocator(self.zgrid))
-                        self.delta_ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
-                        for ii in self.delta_ax.get_yticklines():
-                            ii.set_markersize(10)
-                        for iiii in self.delta_ax.yaxis.get_minorticklines():
-                            iiii.set_markersize(5)
-                        for label in self.delta_ax.get_yticklabels() :
-                            label.set_fontsize('small')
-                        if not self.LCDdecimalplaces:
-                            self.delta_ax.minorticks_off()
-                    # translate y-coordinate from delta into temp range to ensure the cursor position display (x,y) coordinate in the temp axis
-                    self.delta_ax.fmt_ydata = self.fmt_data
-                    self.delta_ax.fmt_xdata = self.fmt_timedata
-                    self.delta_ax.yaxis.set_label_position('right')
+                    if self.delta_ax is not None:
+                        # translate y-coordinate from delta into temp range to ensure the cursor position display (x,y) coordinate in the temp axis
+                        self.delta_ax.fmt_ydata = self.fmt_data
+                        self.delta_ax.fmt_xdata = self.fmt_timedata
+                        self.delta_ax.yaxis.set_label_position('right')
 
-                    if two_ax_mode:
-                        #create a second set of axes in the same position as self.ax
-                        self.delta_ax.tick_params(\
-                            axis='y',           # changes apply to the y-axis
-                            which='both',       # both major and minor ticks are affected
-                            left=False,         # ticks along the left edge are off
-                            bottom=False,       # ticks along the bottom edge are off
-                            top=False,          # ticks along the top edge are off
-                            direction='inout',  # tick_dir # this does not work as ticks are not drawn at all in ON mode with this!?
-                            labelright=True,
-                            labelleft=False,
-                            labelbottom=False)   # labels along the bottom edge are off
+                        if two_ax_mode:
+                            #create a second set of axes in the same position as self.ax
+                            self.delta_ax.tick_params(\
+                                axis='y',           # changes apply to the y-axis
+                                which='both',       # both major and minor ticks are affected
+                                left=False,         # ticks along the left edge are off
+                                bottom=False,       # ticks along the bottom edge are off
+                                top=False,          # ticks along the top edge are off
+                                direction='inout',  # tick_dir # this does not work as ticks are not drawn at all in ON mode with this!?
+                                labelright=True,
+                                labelleft=False,
+                                labelbottom=False)   # labels along the bottom edge are off
 
-                        if self.flagstart or self.zgrid == 0:
-                            y_label = self.delta_ax.set_ylabel('')
+                            if self.flagstart or self.zgrid == 0:
+                                y_label = self.delta_ax.set_ylabel('')
+                            else:
+                                y_label = self.delta_ax.set_ylabel(f"{self.mode}{self.aw.arabicReshape('/min')}",
+                                    color = self.palette['ylabel'],
+                                    fontsize='medium',
+                                    fontfamily=prop.get_family()
+                                    )
+                            try:
+                                y_label.set_in_layout(False) # remove y-axis labels from tight_layout calculation
+                            except Exception: # pylint: disable=broad-except # set_in_layout not available in mpl<3.x
+                                pass
                         else:
-                            y_label = self.delta_ax.set_ylabel(f"{self.mode}{self.aw.arabicReshape('/min')}",
-                                color = self.palette['ylabel'],
-                                fontsize='medium',
-                                fontfamily=prop.get_family()
-                                )
-                        try:
-                            y_label.set_in_layout(False) # remove y-axis labels from tight_layout calculation
-                        except Exception: # pylint: disable=broad-except # set_in_layout not available in mpl<3.x
-                            pass
-                    else:
-                        self.delta_ax.patch.set_visible(False)
-                        self.delta_ax.tick_params(\
-                            axis='y',
-                            which='both',
-                            right=False,
-                            labelright=False)
+                            self.delta_ax.patch.set_visible(False)
+                            self.delta_ax.tick_params(\
+                                axis='y',
+                                which='both',
+                                right=False,
+                                labelright=False)
 
                     self.ax.spines['top'].set_color(xlabel_alpha_color)
                     self.ax.spines['bottom'].set_color(xlabel_alpha_color)
@@ -9349,12 +9318,28 @@ class tgraphcanvas(FigureCanvas):
                         self.delta_ax.set_frame_on(False) # hide all splines (as the four lines above)
 
                     if self.ygrid > 0:
-                        self.ax.yaxis.set_major_locator(ticker.MultipleLocator(self.ygrid))
-                        self.ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
+                        major_locator = ticker.MultipleLocator(self.ygrid)
+                        self.ax.yaxis.set_major_locator(major_locator)
+                        if len(major_locator()) > 20: # accept a maximum of 30 major ticks
+                            min_grid = (self.aw.qmc.ylimit - self.aw.qmc.ylimit_min) / 20
+                            # set grid to closest of min_grid from regular grids [1, 2, 5, 10, 15, 20]
+                            major_locator.set_params(min([1, 2, 5, 10], key=lambda x:abs(x-min_grid)))
+                        if not self.LCDdecimalplaces:
+                            self.ax.minorticks_off()
+                        else:
+                            minor_locator = ticker.AutoMinorLocator() # locator parameter n, default: n='auto' => 4 or 5, n=2 => 1
+                            self.ax.yaxis.set_minor_locator(minor_locator)
+                            if len(minor_locator()) > 50:
+                                # we limit the total number of minor tick locators for performance and esthetic reasons
+                                self.ax.yaxis.set_minor_locator(ticker.NullLocator())
+                            for m in self.ax.yaxis.get_minorticklines():
+                                m.set_markersize(5)
                         for j in self.ax.get_yticklines():
                             j.set_markersize(10)
-                        for m in self.ax.yaxis.get_minorticklines():
-                            m.set_markersize(5)
+                        for label in self.ax.get_yticklabels():
+                            label.set_fontsize('small')
+                    else:
+                        self.ax.set_yticks([])
 
                     for ldots in [self.l_eventtype1dots,self.l_eventtype2dots,self.l_eventtype3dots,self.l_eventtype4dots,
                             self.l_backgroundeventtype1dots,self.l_backgroundeventtype2dots,self.l_backgroundeventtype3dots,self.l_backgroundeventtype4dots]:
@@ -9399,10 +9384,8 @@ class tgraphcanvas(FigureCanvas):
                     #update X ticks, labels, and rotating_colors
                     self.xaxistosm(redraw=False)
 
-                    if forceRenewAxis:
-                        for label in self.ax.get_xticklabels() :
-                            label.set_fontsize('small')
-                        for label in self.ax.get_yticklabels() :
+                    if self.xgrid:
+                        for label in self.ax.get_xticklabels():
                             label.set_fontsize('small')
 
                     rcParams['path.sketch'] = (0,0,0)
@@ -10819,18 +10802,28 @@ class tgraphcanvas(FigureCanvas):
                         self.aw.autoAdjustAxis(timex=False)
                         self.delta_ax.set_ylim(self.zlimit_min,self.zlimit)
                         if self.zgrid > 0:
-                            self.delta_ax.yaxis.set_major_locator(ticker.MultipleLocator(self.zgrid))
-                            self.delta_ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
+                            major_locator = ticker.MultipleLocator(self.zgrid)
+                            self.delta_ax.yaxis.set_major_locator(major_locator)
+                            if len(major_locator()) > 20: # accept a maximum of 30 major ticks
+                                min_grid = (self.aw.qmc.zlimit - self.aw.qmc.zlimit_min) / 20
+                                # set grid to closest of min_grid from regular grids [1, 2, 5, 10, 15, 20]
+                                major_locator.set_params(min([1, 2, 5, 10], key=lambda x:abs(x-min_grid)))
                             delta_major_tick_lines:List[Line2D] = self.delta_ax.get_yticklines()
                             for ytl in delta_major_tick_lines:
                                 ytl.set_markersize(10)
-                            delta_minor_tick_lines:List[Line2D] = self.delta_ax.yaxis.get_minorticklines()
-                            for mtl in delta_minor_tick_lines:
-                                mtl.set_markersize(5)
                             for label in self.delta_ax.get_yticklabels() :
                                 label.set_fontsize('small')
                             if not self.LCDdecimalplaces:
                                 self.delta_ax.minorticks_off()
+                            else:
+                                minor_locator = ticker.AutoMinorLocator() # locator parameter n, default: n='auto' => 4 or 5, n=2 => 1
+                                self.delta_ax.yaxis.set_minor_locator(minor_locator)
+                                if len(minor_locator()) > 50:
+                                    # we limit the total number of minor tick locators for performance and esthetic reasons
+                                    self.delta_ax.yaxis.set_minor_locator(ticker.NullLocator())
+                                delta_minor_tick_lines:List[Line2D] = self.delta_ax.yaxis.get_minorticklines()
+                                for mtl in delta_minor_tick_lines:
+                                    mtl.set_markersize(5)
 
                     ##### Extra devices-curves
                     for l in self.extratemp1lines + self.extratemp2lines:
@@ -11222,7 +11215,7 @@ class tgraphcanvas(FigureCanvas):
                     self.fig.canvas.draw_idle()
 
                 # we update the canvas immediately to get the RoR projections drawn again
-                if self.flagstart and  self.timeindex[0] > -1:
+                if self.flagstart and self.timeindex[0] > -1:
                     self.updategraphicsSignal.emit()
 
     def checkOverlap(self, anno:'Annotation') -> bool:

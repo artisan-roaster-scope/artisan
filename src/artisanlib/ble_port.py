@@ -161,7 +161,7 @@ class BLE:
             blacklist:Set[str], # list of client addresses to ignore as they don't offer the required service
             case_sensitive:bool=True,
             disconnected_callback:Optional[Callable[[BleakClient], None]] = None,
-            scan_timeout:float=4,
+            scan_timeout:float=6,
             connect_timeout:float=6,
             address:Optional[str] = None # if given, connect only to the device with this ble address
             ) -> Tuple[Optional[BleakClient], Optional[str]]:
@@ -243,7 +243,7 @@ class ClientBLE:
         self._notifications:Dict[str, Callable[[BleakGATTCharacteristic, bytearray], None]] = {}
         self._writers:Dict[str, List[str]] = {} # associates a service UUID with a list of write characteristics
         self._readers:Dict[str, List[str]] = {} # associates a service UUID with a list of read characteristics
-        self._heartbeat_frequency : float = 0 # heartbeat frequency in seconds; heartbeat ends if not positive and >0
+        self._heartbeat_frequency : float = 0 # heartbeat frequency in seconds; heartbeat ends if not >0
         self._logging = False  # if True device communication is logged
 
 
@@ -284,7 +284,7 @@ class ClientBLE:
 
 
     # connect and re-connect while self._running to BLE
-    async def _connect(self, case_sensitive:bool=True, scan_timeout:float=3, connect_timeout:float=6, address:Optional[str] = None) -> None:
+    async def _connect(self, case_sensitive:bool=True, scan_timeout:float=6, connect_timeout:float=6, address:Optional[str] = None) -> None:
         blacklist:Set[str] = set()
         while self._running:
             # scan and connect
@@ -394,7 +394,7 @@ class ClientBLE:
             self._keep_alive())
 
 
-    def start(self, case_sensitive:bool=True, scan_timeout:float=4, connect_timeout:float=6, address:Optional[str] = None) -> None:
+    def start(self, case_sensitive:bool=True, scan_timeout:float=6, connect_timeout:float=6, address:Optional[str] = None) -> None:
         _log.debug('start')
         if self._running:
             _log.error('BLE client already running')

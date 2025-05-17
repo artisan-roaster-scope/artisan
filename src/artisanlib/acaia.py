@@ -45,14 +45,13 @@ class SCALE_CLASS(IntEnum):
         # split messages between several (mostly 2) payloads
     MODERN = 2 # eg. Lunar, Lunar 2021, Pearl, Pearl 2021, Pearl S
         # report weight in unit indicated by byte 2 of STATUS_A message
-    RELAY = 3  # relaying scales without display eg. Umbra, Cosmo, ..
+    RELAY = 3  # relaying scales without display eg. Umbra, ..
         # report weight always in g; byte 2 of STATUS_A message reports auto off timer
 
 @unique
 class UNIT(IntEnum):
     KG = 1
     G = 2
-    G_FIXED = 4
     OZ = 5
 
 @unique
@@ -60,10 +59,11 @@ class AUTO_OFF_TIMER(IntEnum):
     AUTO_SLEEP_OFF = 1
     AUTO_SLEEP_1MIN = 2
     AUTO_SLEEP_5MIN = 3
-    AUTO_SLEEP_30MIN = 4
-    AUTO_OFF_5MIN = 5
-    AUTO_OFF_10MIN = 6
-    AUTO_OFF_30MIN = 7
+    AUTO_SLEEP_15MIN = 4
+    AUTO_SLEEP_30MIN = 5
+    AUTO_OFF_5MIN = 6
+    AUTO_OFF_10MIN = 7
+    AUTO_OFF_30MIN = 8
 
 @unique
 class KEY_INFO(IntEnum):
@@ -192,7 +192,7 @@ class AcaiaBLE(QObject, ClientBLE): # pyright: ignore [reportGeneralTypeIssues] 
     HEADER1:Final[bytes]      = b'\xef'
     HEADER2:Final[bytes]      = b'\xdd'
 
-    HEARTBEAT_FREQUENCY = 3 # every 3 sec send the heartbeat
+    HEARTBEAT_FREQUENCY = 5 # every 5 sec send the heartbeat
 
 
 # NOTE: __slots__ are incompatible with multiple inheritance mixings in subclasses (as done below in class Acaia with QObject)
@@ -230,7 +230,7 @@ class AcaiaBLE(QObject, ClientBLE): # pyright: ignore [reportGeneralTypeIssues] 
         ###
 
         # configure heartbeat
-        self.set_heartbeat(self.HEARTBEAT_FREQUENCY) # send keep-alive heartbeat all 3-5sec; seems not to be needed any longer after sending ID on newer firmware versions!?
+        self.set_heartbeat(self.HEARTBEAT_FREQUENCY) # send keep-alive heartbeat all 5sec; only for LEGACY scales
 
         # register Acaia Legacy UUIDs
         for legacy_name in (ACAIA_LEGACY_LUNAR_NAME, ACAIA_LEGACY_PEARL_NAME):
@@ -277,12 +277,15 @@ class AcaiaBLE(QObject, ClientBLE): # pyright: ignore [reportGeneralTypeIssues] 
         if connected_service_UUID == ACAIA_LEGACY_SERVICE_UUID:
             _log.debug('connected to Acaia Legacy Scale')
             self.scale_class = SCALE_CLASS.LEGACY
+            self.set_heartbeat(self.HEARTBEAT_FREQUENCY) # enable heartbeat
         elif connected_service_UUID == ACAIA_UMBRA_SERVICE_UUID:
             _log.debug('connected to Acaia Relay Scale')
             self.scale_class = SCALE_CLASS.RELAY
+            self.set_heartbeat(0) # disable heartbeat
         else: #connected_service_UUID == ACAIA_SERVICE_UUID:
             _log.debug('connected to Acaia Scale')
             self.scale_class = SCALE_CLASS.MODERN
+            self.set_heartbeat(0) # disable heartbeat
         if self._connected_handler is not None:
             self._connected_handler()
 
@@ -298,22 +301,13 @@ class AcaiaBLE(QObject, ClientBLE): # pyright: ignore [reportGeneralTypeIssues] 
     def parse_info(self, data:bytes) -> None:
         _log.debug('INFO MSG')
 
-#        if len(data)>1:
-#            print(data[1])
-#        if len(data)>2:
-#            print(data[2])
-
         if len(data)>5:
             self.firmware = (data[3],data[4],data[5])
             _log.debug('firmware: %s.%s.%s', self.firmware[0], self.firmware[1], f'{self.firmware[2]:>03}')
 
-        # passwd_set
-#        if len(data)>6:
-#            print(data[6])
-
     def decode_weight(self, payload:bytes) -> Optional[float]:
         try:
-            #big_endian = (payload[5] & 0x08) == 0x08
+            #big_endian = (payload[5] & 0x08) == 0x08 # bit 3 of byte 5 is set if weight is in big endian
             big_endian = self.scale_class == SCALE_CLASS.RELAY
 
             value:float = 0
@@ -449,7 +443,6 @@ class AcaiaBLE(QObject, ClientBLE): # pyright: ignore [reportGeneralTypeIssues] 
         if len(payload) < EVENT_LEN.KEY:
             return -1
         _log.debug('KEY EVENT')
-        _log.debug('PRINT payload: %s', payload)
 
         if payload[0] == KEY_INFO.TARE:
             _log.debug('tare key')
@@ -505,14 +498,18 @@ class AcaiaBLE(QObject, ClientBLE): # pyright: ignore [reportGeneralTypeIssues] 
     def parse_status(self, payload:bytes) -> None:
         _log.debug('STATUS')
 
-        # battery level (7 bits of second byte) + TIMER_START (1bit)
-        if payload and len(payload) > 0:
+        # byte 0: message len
+
+        # byte 1: battery level (7 bits of second byte) + TIMER_START (1bit)
+        if payload and len(payload) > 1:
             self.battery = int(payload[1] & ~(1 << 7))
             self.battery_changed(self.battery)
             _log.debug('battery: %s%%', self.battery)
-        # unit (7 bits of third byte) + CD_START (1bit)
-        if payload and len(payload) > 1:
+
+        # byte 2:
+        if payload and len(payload) > 2:
             if self.scale_class == SCALE_CLASS.RELAY:
+                # relay scales: auto off setting for
                 auto_off = int(payload[2] & 0xFF)
                 if auto_off == 0:
                     self.auto_off_timer = AUTO_OFF_TIMER.AUTO_SLEEP_OFF
@@ -520,6 +517,9 @@ class AcaiaBLE(QObject, ClientBLE): # pyright: ignore [reportGeneralTypeIssues] 
                 elif auto_off == 1:
                     self.auto_off_timer = AUTO_OFF_TIMER.AUTO_SLEEP_5MIN
                     _log.debug('AUTO OFF TIMER: AutoSleep 5 min')
+                elif auto_off == 2:
+                    self.auto_off_timer = AUTO_OFF_TIMER.AUTO_SLEEP_15MIN
+                    _log.debug('AUTO OFF TIMER: AutoSleep 15 min')
                 elif auto_off == 3:
                     self.auto_off_timer = AUTO_OFF_TIMER.AUTO_SLEEP_30MIN
                     _log.debug('AUTO OFF TIMER: AutoSleep 30 min')
@@ -536,18 +536,74 @@ class AcaiaBLE(QObject, ClientBLE): # pyright: ignore [reportGeneralTypeIssues] 
                     self.auto_off_timer = AUTO_OFF_TIMER.AUTO_SLEEP_1MIN
                     _log.debug('AUTO OFF TIMER: AutoSleep 1 min')
             else:
+                # display scales: weight unit (7 bits of third byte) + CD_START (1bit)
                 self.unit = int(payload[2] & 0x7F)
-                _log.debug('unit: %s', self.unit)
+                _log.debug('unit: %s (%s)', self.unit, ('g' if self.unit == UNIT.G else 'oz'))
 
-        # mode (7 bits of third byte) + tare (1bit)
-        # sleep (4th byte), 0:off, 1:5sec, 2:10sec, 3:20sec, 4:30sec, 5:60sec
-        # key disabled (5th byte), touch key setting 0: off , 1: on
-        # sound (6th byte), beep setting 0 : off 1: on
-        # resolution (7th byte), 0 : default, 1 : high
-        # max weight (8th byte)
+        # byte 3:
+        if payload and len(payload) > 3:
+            if self.scale_class == SCALE_CLASS.RELAY:
+                # relay scales: beep setting (0:off, 1:on)
+                # display scales: beep setting (0:off, 1:on)
+                _log.debug('sound: %s', ('on' if payload[6] else 'off'))
+            else:
+                # display scales: mode (7 bits of third byte) + tare (1bit)
+                mode = int(payload[3] & 0x7F)
+                _log.debug('mode: %s', mode)
+                _log.debug('tare: %s', (payload[3] & 0x80) == 0x80)
+                # Lunar
+                # 2: NodE_1 Weighing Mode
+                # 4: NodE_2 Dual Display Mode
+                # 3: NodE_3 Timer Starts with Flow Mode (drop)
+                # 15: NodE_4 Auto-Tare Timer Starts with Flow Mode (drop/square)
+                # 16: NodE_5 Auto-Tare Auto-Start Timer Mode (triangle/square)
+                # 17: NodE_6 Auto-Tare Mode (square)
+
+        # byte 4:
+        if payload and len(payload) > 4:
+            if self.scale_class == SCALE_CLASS.RELAY:
+                # relay scales: weight unit setting (0:g, 1:oz)
+                self.unit = (UNIT.OZ if payload[4] == 1 else UNIT.G)
+                _log.debug('unit: %s (%s)', self.unit, ('g' if self.unit == UNIT.G else 'oz'))
+            else:
+                sleep_modes = {0:'off', 1:'5sec', 2:'10sec', 3:'20sec', 4:'30sec', 5:'60sec'}
+                _log.debug('sleep: %s%s', payload[4], (f' ({sleep_modes[payload[4]]})' if (payload[4] in sleep_modes) else ''))
+
+        # byte 5:
+        if payload and len(payload) > 5:
+            if self.scale_class == SCALE_CLASS.RELAY:
+                # relay scales: resolution setting
+                _log.debug('resolution: %s', ('0.01g' if payload[5] else '0.1g')) # resolution/readability: 0.1g / 0.01g
+            else:
+                # display scales: key disabled (0: off , 1: on)
+                _log.debug('keys disabled: %s', ('on' if payload[5] else 'off'))
+
+        # byte 6:
+        if payload and len(payload) > 6:
+            if self.scale_class == SCALE_CLASS.RELAY:
+                # relay scales: magic relay sensing (low/normal/high)
+                _log.debug('magic relay sensing: %s', payload[6])
+                # 0: low, 1: normal, 2: high
+            else:
+                # display scales: beep setting (0:off, 1:on)
+                _log.debug('sound: %s', ('on' if payload[6] else 'off'))
+
+        # byte 7:
         if payload and len(payload) > 7:
-            self.max_weight = (payload[7] + 1) * 1000
-            _log.debug('max_weight: %s', self.max_weight)
+            if self.scale_class == SCALE_CLASS.RELAY:
+                # relay scales: magic relay beep
+                _log.debug('magic relay beep: %s', ('on' if payload[7] else 'off'))
+            else:
+                # display scales: resolution (0:default, 1:high)
+                _log.debug('resolution: %s', ('high' if payload[7] else 'default'))
+
+        # byte 8/8/10:
+        if payload and len(payload) > 10 and self.scale_class == SCALE_CLASS.RELAY:
+            # firmware version
+            firmware = (payload[8],payload[9],payload[10])
+            _log.debug('firmware: %s.%s.%s', firmware[0], firmware[1], firmware[2])
+
+        # bytes 11 & 12 reserved
 
 
     def parse_data(self, msg_type:int, data:bytes) -> None:
@@ -562,6 +618,7 @@ class AcaiaBLE(QObject, ClientBLE): # pyright: ignore [reportGeneralTypeIssues] 
         if self.id_sent and not self.fast_notifications_sent:
             # we configure the scale to receive the initial
             # weight notification as fast as possible
+            # Note: this event is needed to have the connected scale start to send weight messages even on relay scales which ignore the settings
             self.fast_notifications()
 
         if not self.id_sent:
@@ -640,7 +697,7 @@ class AcaiaBLE(QObject, ClientBLE): # pyright: ignore [reportGeneralTypeIssues] 
         # self.send_message(MSG.IDENTIFY,b'\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x30\x31\x32\x33\x34')
         self.id_sent = True
 
-    # configure notifications
+    # NOTE: notifications configuration not supported by Umbra and newer scales!
 
     def slow_notifications(self) -> None:
         _log.debug('slow notifications')
@@ -703,9 +760,7 @@ class AcaiaBLE(QObject, ClientBLE): # pyright: ignore [reportGeneralTypeIssues] 
                     cmd = int.from_bytes(await stream.readexactly(1), 'big')
                     if cmd in {CMD.SYSTEM_SA, CMD.INFO_A, CMD.STATUS_A, CMD.EVENT_SA}:
                         dl = await stream.readexactly(1)
-                        data_len:int = min(20, int.from_bytes(dl, 'big'))
-#                        if cmd == CMD.STATUS_A: # all others are of variable length; STATUS_A with maxlen=16!?
-#                            data_len = min(data_len,16)
+                        data_len:int = int.from_bytes(dl, 'big')
                         data = await stream.readexactly(data_len - 1)
                         crc = await stream.readexactly(2)
                         data = dl+data

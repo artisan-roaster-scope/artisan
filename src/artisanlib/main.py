@@ -12791,9 +12791,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.valueEdit.setText('')
                 self.etypeComboBox.setCurrentIndex(0)
                 self.etimeline.setText('')
-                self.qmc.resetlines()
-                if not self.qmc.flagstart:
-                    self.qmc.fig.canvas.draw()
+                if not self.qmc.flagon and self.EventsGroupLayout.isVisible(): # only redraw if the events editor is shown
+                    self.qmc.resetlines()
+                    if not self.qmc.flagstart:
+                        self.qmc.fig.canvas.draw()
                 return
             if currentevent > lenevents:
                 self.eNumberSpinBox.setValue(int(lenevents))
@@ -12810,7 +12811,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.resetlines() #clear old
             if currentevent:
                 self.plotEventSelection(currentevent-1)
-                if not self.qmc.flagstart:
+                if not self.qmc.flagon and self.EventsGroupLayout.isVisible():
                     self.qmc.fig.canvas.draw()
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
@@ -16049,8 +16050,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     rbt = bt
                     resolution = float(numpy.min(numpy.diff(numpy.sort(rbt))[numpy.nonzero(numpy.diff(numpy.sort(rbt)))]))
                 #except Exception: # pylint: disable=broad-except
-                except Exception as e: # pylint: disable=broad-except
-                    _log.exception(e)
+                except Exception: # pylint: disable=broad-except
                     resolution = float('nan')
 
                 str_modeChanged = ''
@@ -19034,16 +19034,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 from artisanlib.weblcds import WebGreen
                 self.taskWebDisplayGreen_server = WebGreen(
                     self.taskWebDisplayGreenPort,
-                    str(getResourcePath()),
-                    ('&nbsp;&nbsp;-.-' if self.qmc.LCDdecimalplaces else '&nbsp;--'),
-                    self.lcdpaletteF['timer'],
-                    self.lcdpaletteB['timer'],
-                    self.lcdpaletteF['bt'],
-                    self.lcdpaletteB['bt'],
-                    self.lcdpaletteF['et'],
-                    self.lcdpaletteB['et'],
-                    self.qmc.ETlcd,
-                    self.qmc.BTlcd)
+                    str(getResourcePath()))
                 res = self.taskWebDisplayGreen_server.startWeb()
                 if res:
                     self.taskWebDisplayGreenActive = True

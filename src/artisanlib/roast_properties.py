@@ -373,7 +373,7 @@ class volumeCalculatorDlg(ArtisanDialog):
         w = self.retrieveWeight()
         if w is not None:
             v = float2floatWeightVolume(w)
-            # updating this widget in a separate thread seems to be important on OS X 10.14 to avoid delayed updates and widget redraw problesm
+            # updating this widget in a separate thread seems to be important on OS X 10.14 to avoid delayed updates and widget redraw problems
             QTimer.singleShot(2,lambda : widget.setText(f'{float2float(v):g}'))
 
     @pyqtSlot(bool)
@@ -2670,7 +2670,6 @@ class editGraphDlg(ArtisanResizeablDialog):
     @pyqtSlot()
     @pyqtSlot('QCloseEvent')
     def closeEvent(self, _:Optional['QCloseEvent'] = None) -> None:
-
         # restore
         self.restoreAllEnergySettings()
 
@@ -2688,6 +2687,11 @@ class editGraphDlg(ArtisanResizeablDialog):
 
         self.aw.qmc.perKgRoastMode = self.org_perKgRoastMode
 
+        events_changed = ((self.aw.qmc.specialevents != self.org_specialevents) or
+            (self.aw.qmc.specialeventstype != self.org_specialeventstype) or
+            (self.aw.qmc.specialeventsStrings != self.org_specialeventsStrings) or
+            (self.aw.qmc.specialeventsvalue != self.org_specialeventsvalue) or
+            (self.aw.qmc.timeindex != self.org_timeindex))
         self.aw.qmc.specialevents = self.org_specialevents
         self.aw.qmc.specialeventstype = self.org_specialeventstype
         self.aw.qmc.specialeventsStrings = self.org_specialeventsStrings
@@ -2705,7 +2709,14 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.aw.qmc.clear_last_picked_event_selection()
         self.aw.eNumberSpinBox.setValue(0)
 
-        self.aw.qmc.redraw_keep_view(recomputeAllDeltas=False)
+        if (not self.aw.qmc.flagon) or events_changed:
+            self.aw.qmc.redrawKeepViewSignal.emit(
+                False, # recomputeAllDeltas (default: True)
+                self.aw.qmc.flagon, # re_smooth_foreground (default: True)
+                True,  # takelock (default: True)
+                False, # forceRenewAxis (default: False)
+                False, # re_smooth_background (default: False)
+            )
 
         self.clean_up()
         super().reject()
@@ -4710,7 +4721,13 @@ class editGraphDlg(ArtisanResizeablDialog):
         if nevents:
             self.aw.clusterEvents()
             self.createEventTable(force=True)
-            self.aw.qmc.redraw(recomputeAllDeltas=False)
+            self.aw.qmc.redrawKeepViewSignal.emit(
+                False, # recomputeAllDeltas (default: True)
+                self.aw.qmc.flagon, # re_smooth_foreground (default: True)
+                True,  # takelock (default: True)
+                False, # forceRenewAxis (default: False)
+                False, # re_smooth_background (default: False)
+            )
             self.aw.qmc.fileDirty()
 
     @pyqtSlot(bool)
@@ -4727,7 +4744,13 @@ class editGraphDlg(ArtisanResizeablDialog):
             if self.aw.qmc.profileDataSemaphore.available() < 1:
                 self.aw.qmc.profileDataSemaphore.release(1)
         self.createEventTable(force=True)
-        self.aw.qmc.redraw(recomputeAllDeltas=False)
+        self.aw.qmc.redrawKeepViewSignal.emit(
+                False, # recomputeAllDeltas (default: True)
+                self.aw.qmc.flagon, # re_smooth_foreground (default: True)
+                True,  # takelock (default: True)
+                False, # forceRenewAxis (default: False)
+                False, # re_smooth_background (default: False)
+            )
         self.aw.qmc.fileDirty()
 
     @pyqtSlot(bool)
@@ -4766,7 +4789,13 @@ class editGraphDlg(ArtisanResizeablDialog):
             event_order_changed = self.aw.orderEvents()
             if event_order_changed:
                 self.createEventTable(force=True)
-                self.aw.qmc.redraw(recomputeAllDeltas=False)
+                self.aw.qmc.redrawKeepViewSignal.emit(
+                    False, # recomputeAllDeltas (default: True)
+                    self.aw.qmc.flagon, # re_smooth_foreground (default: True)
+                    True,  # takelock (default: True)
+                    False, # forceRenewAxis (default: False)
+                    False, # re_smooth_background (default: False)
+                )
 
     @pyqtSlot(bool)
     def addEventTable(self, _:bool = False) -> None:
@@ -4778,7 +4807,13 @@ class editGraphDlg(ArtisanResizeablDialog):
                     str(len(self.aw.qmc.specialevents)),
                     0)
             self.createEventTable(force=True)
-            self.aw.qmc.redraw(recomputeAllDeltas=False)
+            self.aw.qmc.redrawKeepViewSignal.emit(
+                False, # recomputeAllDeltas (default: True)
+                self.aw.qmc.flagon, # re_smooth_foreground (default: True)
+                True,  # takelock (default: True)
+                False, # forceRenewAxis (default: False)
+                False, # re_smooth_background (default: False)
+            )
             message = QApplication.translate('Message','Event #{0} added').format(str(len(self.aw.qmc.specialevents)))
             self.aw.sendmessage(message)
         else:
@@ -4803,7 +4838,13 @@ class editGraphDlg(ArtisanResizeablDialog):
                 message = QApplication.translate('Message',' Event #{0} deleted').format(str(len(self.aw.qmc.specialevents)+1))
             self.aw.qmc.fileDirty()
             self.createEventTable(force=True)
-            self.aw.qmc.redraw(recomputeAllDeltas=False)
+            self.aw.qmc.redrawKeepViewSignal.emit(
+                False, # recomputeAllDeltas (default: True)
+                self.aw.qmc.flagon, # re_smooth_foreground (default: True)
+                True,  # takelock (default: True)
+                False, # forceRenewAxis (default: False)
+                False, # re_smooth_background (default: False)
+            )
             self.aw.sendmessage(message)
         else:
             message = QApplication.translate('Message','No events found')
@@ -5365,6 +5406,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 
     @pyqtSlot()
     def accept(self) -> None:
+        redraw:bool = False # if set to True a redraw happens at the end of this function
         #check for graph
         if len(self.aw.qmc.timex):
             #prevents accidentally deleting a modified profile.
@@ -5373,10 +5415,9 @@ class editGraphDlg(ArtisanResizeablDialog):
             if self.aw.qmc.timeindex[0] != self.org_timeindex[0]:
                 self.aw.qmc.xaxistosm(redraw=False) # we update axis if CHARGE event changed
                 self.aw.qmc.timealign(redraw=False)
-
             self.saveEventTable()
             self.aw.orderEvents()
-            self.aw.qmc.redraw_keep_view(recomputeAllDeltas=False)
+            redraw = True
         # Update Title
         self.aw.qmc.title = ' '.join(self.titleedit.currentText().split())
         self.aw.qmc.title_show_always = self.titleShowAlwaysFlag.isChecked()
@@ -5587,7 +5628,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             try:
                 self.aw.qmc.background = not self.aw.qmc.hideBgafterprofileload
                 self.aw.qmc.timealign(redraw=False)
-                self.aw.qmc.redraw_keep_view()
+                redraw = True
             except Exception: # pylint: disable=broad-except
                 pass
         elif ((not self.aw.qmc.flagon) or
@@ -5596,8 +5637,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             (self.aw.qmc.specialeventsStrings != self.org_specialeventsStrings) or
             (self.aw.qmc.specialeventsvalue != self.org_specialeventsvalue) or
             (self.aw.qmc.timeindex != self.org_timeindex)):
-            # we do a general redraw only if not sampling
-            self.aw.qmc.redraw_keep_view(recomputeAllDeltas=False)
+            redraw = True
         elif (self.org_title != self.aw.qmc.title) or self.org_title_show_always != self.aw.qmc.title_show_always:
             # if title changed we at least update that one
             if self.aw.qmc.flagstart and not self.aw.qmc.title_show_always:
@@ -5625,6 +5665,16 @@ class editGraphDlg(ArtisanResizeablDialog):
                 plus.queue.addRoast()
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
+
+        if redraw:
+            self.aw.qmc.redrawKeepViewSignal.emit(
+                False, # recomputeAllDeltas (default: True)
+                self.aw.qmc.flagon, # re_smooth_foreground (default: True)
+                True,  # takelock (default: True)
+                False, # forceRenewAxis (default: False)
+                False, # re_smooth_background (default: False)
+            )
+
         self.clean_up()
         super().accept()
 

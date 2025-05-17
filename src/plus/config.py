@@ -75,7 +75,9 @@ expired_subscription_max_days: Final[int] = 90
 
 # Cache and queue parameters
 
-stock_cache_expiration: Final[int] = 30  # expiration period in seconds
+# Note: stock_cache_expiration should be larger than schedule_cache_expiration
+stock_cache_expiration: Final[int] = 30   # expiration period in seconds for full stock updates (expensive)
+schedule_cache_expiration: Final[int] = 5 # expiration period in seconds for full stock updates only in case the schedule on the server has changed
 
 queue_start_delay: Final[int] = 5  # startup time of queue in seconds
 # delay between tasks in seconds (cycling interval of the queue)

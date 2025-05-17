@@ -210,43 +210,16 @@ class WebLCDs(WebView):
 
 class WebGreen(WebView):
 
-    __slots__ = [ '_nonesymbol', '_timecolor', '_timebackground', '_btcolor', '_btbackground', '_etcolor', '_etbackground',
-                    '_showetflag', '_showbtflag' ]
+    __slots__ = [  ]
 
     index_path = 'green'
 
-    def __init__(self, port:int, resource_path:str, nonesymbol:str, timecolor:str, timebackground:str, btcolor:str,
-            btbackground:str, etcolor:str, etbackground:str, showetflag:bool, showbtflag:bool) -> None:
+    def __init__(self, port:int, resource_path:str) -> None:
         super().__init__(port, resource_path, WebGreen.index_path, f'{WebGreen.index_path}_ws')
-
-        self._nonesymbol:str = nonesymbol
-        self._timecolor:str = timecolor
-        self._timebackground:str = timebackground
-        self._btcolor:str = btcolor
-        self._btbackground:str = btbackground
-        self._etcolor:str = etcolor
-        self._etbackground:str = etbackground
-        self._showetflag:bool = showetflag
-        self._showbtflag:bool = showbtflag
 
     @aiohttp_jinja2.template(f'{index_path}.tpl')
     async def index(self, _request: 'Request') -> Dict[str,str]:
-        showspace_str = 'inline' if not (self._showbtflag and self._showetflag) else 'none'
-        showbt_str = 'inline' if self._showbtflag else 'none'
-        showet_str = 'inline' if self._showetflag else 'none'
-        return {
-            'port': str(self._port),
-            'nonesymbol': self._nonesymbol,
-            'timecolor': self._timecolor,
-            'timebackground': self._timebackground,
-            'btcolor': self._btcolor,
-            'btbackground': self._btbackground,
-            'etcolor': self._etcolor,
-            'etbackground': self._etbackground,
-            'showbt': showbt_str,
-            'showet': showet_str,
-            'showspace': showspace_str
-        }
+        return {}
 
     def indexPath(self) -> str:
         return self.index_path

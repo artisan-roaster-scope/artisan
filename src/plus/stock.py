@@ -137,6 +137,7 @@ class Stock(TypedDict, total=False):
     replBlends: List[Blend]
     schedule: List[ScheduledItem]
     retrieved: float
+    serverTime: int # server EPOCH of data set sent
 
 ReplacementBlend = Tuple[float, Blend]
 CoffeeLabelDict = Dict[str, str]
@@ -180,46 +181,64 @@ worker:Optional['Worker'] = None
 worker_thread:Optional[QThread] = None
 
 class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
-    startSignal = pyqtSignal()
+    startSignal = pyqtSignal(bool)
     replySignal = pyqtSignal(float, float, str, int, list) # rlimit:float, rused:float, pu:str, notifications:int, machines:List[str]
     updatedSignal = pyqtSignal()  # issued once the stock was updated
     upToDateSignal = pyqtSignal() # issued if the stock was still valid and did NOT get update
 
-    @pyqtSlot()
-    def update_blocking(self) -> None:
-        _log.debug('update_blocking()')
+    # if schedule is True, a stock update is retrieved only if the schedule on the server has changed.
+    # if schedule is False, a full stock update is done if config.stock_cache_expiration is expired or
+    #    config.schedule_cache_expiration is expired and the schedule on the server has changed (schedule updates are received at faster frequency that way).
+    # The request adds the 'lsrt' (last schedule retrieved time) parameter holding the 'serverTime' of
+    # the last stock received to allow the server to decide if the schedule has changed in this second case.
+    @pyqtSlot(bool)
+    def update_blocking(self, schedule:bool) -> None:
+        _log.debug('update_blocking(%s)', schedule)
         if stock is None:
             load()
-        fetch_enabled = False
+
+        fetch_enabled:bool = False
+        # lsrt: set time of last stock retrieved server time if 'serverTime' is available in current stock, else None
+        lsrt:Optional[float] = None
+
         try:
             stock_semaphore.acquire(1)
-            fetch_enabled = config.connected and (
-                stock is None
-                or (
-                    'retrieved' in stock
-                    and (time.time() - stock['retrieved'])
-                    > config.stock_cache_expiration
-                )
-            )
+
+            if config.connected:
+                # seconds_since_last_stock_update is None if no stock with a proper timestamp was ever retrieved
+                seconds_since_last_stock_update:Optional[float] = (None if (stock is None or 'retrieved' not in stock) else time.time() - stock['retrieved'])
+
+                if not schedule and (seconds_since_last_stock_update is None or seconds_since_last_stock_update > config.stock_cache_expiration):
+                        # a regular cache expired stock request (schedule flag is not set) should always return the stock independent of the lack of schedule updates
+                    fetch_enabled = True
+                elif seconds_since_last_stock_update is None or seconds_since_last_stock_update > config.schedule_cache_expiration:
+                    fetch_enabled = True
+                    lsrt = (None if stock is None or 'serverTime' not in stock else stock['serverTime'])
+
         finally:
             if stock_semaphore.available() < 1:
                 stock_semaphore.release(1)
         if fetch_enabled:
-            res = self.fetch()
+            res = self.fetch(lsrt)
             if res:
                 save()
-                self.updatedSignal.emit()
+            self.updatedSignal.emit()
         else:
             _log.debug('-> stock valid')
             self.upToDateSignal.emit()
 
     # requests stock data from server and fills the stock cache
-    def fetch(self) -> bool:
+    # lsrt holds the serverTime of the last stock received if server should only send a stock update if the schedule has been changed since than
+    # if lsrt is None, the server returns the current stock in any case.
+    def fetch(self, lsrt:Optional[float]) -> bool:
         global stock  # pylint: disable=global-statement
         _log.debug('fetch()')
         try:
             # fetch from server (send along the current date to have the server filter the schedule correctly for the local timezone)
-            d = connection.getData(f'{config.stock_url}?today={datetime.datetime.now().astimezone().date()}')
+            request:str = f'{config.stock_url}?today={datetime.datetime.now().astimezone().date()}'
+            if lsrt is not None:
+                request = f'{request}&lsrt={lsrt}'
+            d = connection.getData(request)
             _log.debug('-> %s', d.status_code)
             if d.status_code != 204 and d.headers['content-type'].strip().startswith('application/json'):
                 j = d.json()
@@ -240,7 +259,17 @@ class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # Argument to
                             stock_semaphore.release(1)
                     controller.reconnected()
                     return True
-            _log.error('204: empty response on fetching stock')
+            elif d.status_code == 204:
+                _log.error('204: empty response on fetching stock')
+                if lsrt is not None:
+                    try:
+                        stock_semaphore.acquire(1)
+                        if stock is not None:
+                            stock['retrieved'] = time.time()
+                        _log.debug('-> retrieved time updated')
+                    finally:
+                        if stock_semaphore.available() < 1:
+                            stock_semaphore.release(1)
             return False
         except Exception as e:  # pylint: disable=broad-except
             _log.exception(e)
@@ -264,13 +293,26 @@ def getWorker() -> Optional['Worker']:
         _log.exception(e)
     return None
 
-@pyqtSlot()
+# update stock if config.stock_cache_expiration is expired
 def update() -> None:
     _log.debug('update()')
     try:
         getWorker()
         if worker is not None:
-            worker.startSignal.emit()
+            worker.startSignal.emit(False)
+    except Exception as e:  # pylint: disable=broad-except
+        _log.exception(e)
+
+# update stock if config.schedule_cache_expiration (<config.stock_cache_expiration) and the schedule on the server has changed (by sending the
+# 'lsrt' (last schedule retrieved time) parameter along.
+# Those requests are send more frequently to the server than regular stock.update() requests, but only return results if the schedule changed
+# That way the server has less unnecessary work to do as collecting stock data is rather expensive
+def update_schedule() -> None:
+    _log.debug('update_schedule()')
+    try:
+        getWorker()
+        if worker is not None:
+            worker.startSignal.emit(True)
     except Exception as e:  # pylint: disable=broad-except
         _log.exception(e)
 
@@ -1005,6 +1047,23 @@ def hasBlendReplace(blend:BlendStructure) -> bool:
 
 def getBlendLabels(blends:List[BlendStructure]) -> List[str]:
     return [getBlendLabel(c) for c in blends]
+
+
+
+# weightIn is in kg. Weights are rendered in weight_unit_idx
+# respects replacement beans
+def blend2ratio_beans(blend:BlendStructure, weightIn:float) -> List[Tuple[float,str]]:
+    res:List[Tuple[float,str]] = []
+    try:
+        blends = getBlendBlendDict(blend, weightIn)
+        sorted_ingredients = sorted(
+            blends['ingredients'], key=lambda x: x['ratio'], reverse=True
+        )
+        for i in sorted_ingredients:
+            res.append((i['ratio'], i.get('label', '')))
+    except Exception as e:  # pylint: disable=broad-except
+        _log.exception(e)
+    return res
 
 # weightIn is in kg. Weights are rendered in weight_unit_idx
 def blend2weight_beans(blend:BlendStructure, weight_unit_idx:int, weightIn:float=0) -> List[Tuple[str,str]]:
