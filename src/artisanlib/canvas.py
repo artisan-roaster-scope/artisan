@@ -9080,11 +9080,7 @@ class tgraphcanvas(FigureCanvas):
         if self.delta_ax is not None:
             zlimit_min, zlimit = self.delta_ax.get_ylim()
         # redraw
-
-        start = libtime.time()
         self.redraw(*args, **kwargs)
-        _log.debug('PRINT redraw -> %s',libtime.time() - start)
-
         if self.ax is not None and xlimit_min is not None and xlimit is not None and ylimit_min is not None and ylimit is not None:
             # restore the view
             self.ax.set_xlim(xlimit_min, xlimit)
@@ -12454,7 +12450,7 @@ class tgraphcanvas(FigureCanvas):
                 self.EvalueColor = self.EvalueColor_default.copy()
                 self.EvalueTextColor = self.EvalueTextColor_default.copy()
                 self.aw.sendmessage(QApplication.translate('Message','Colors set to defaults'))
-                self.aw.closeEventSettings()
+#                self.aw.closeEventSettings()
 
         elif color == 2:
             self.aw.sendmessage(QApplication.translate('Message','Colors set to grey'))
@@ -12476,7 +12472,7 @@ class tgraphcanvas(FigureCanvas):
             self.backgroundxtcolor      = self.aw.convertToGreyscale(self.backgroundxtcolor)
             self.backgroundytcolor      = self.aw.convertToGreyscale(self.backgroundytcolor)
             self.aw.setLCDsBW()
-            self.aw.closeEventSettings()
+#            self.aw.closeEventSettings()
 
         elif color == 3:
             from artisanlib.colors import graphColorDlg
@@ -12520,7 +12516,8 @@ class tgraphcanvas(FigureCanvas):
                 self.backgrounddeltabtcolor = str(dialog.bgdeltabtButton.text())
                 self.backgroundxtcolor = str(dialog.bgextraButton.text())
                 self.backgroundytcolor = str(dialog.bgextra2Button.text())
-                self.aw.closeEventSettings()
+#                self.aw.closeEventSettings()
+
 #            #deleteLater() will not work here as the dialog is still bound via the parent
 #            #dialog.deleteLater() # now we explicitly allow the dialog an its widgets to be GCed
 #            # the following will immediately release the memory despite this parent link
