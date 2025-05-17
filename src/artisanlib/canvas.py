@@ -9080,7 +9080,11 @@ class tgraphcanvas(FigureCanvas):
         if self.delta_ax is not None:
             zlimit_min, zlimit = self.delta_ax.get_ylim()
         # redraw
+
+        start = libtime.time()
         self.redraw(*args, **kwargs)
+        _log.debug('PRINT redraw -> %s',libtime.time() - start)
+
         if self.ax is not None and xlimit_min is not None and xlimit is not None and ylimit_min is not None and ylimit is not None:
             # restore the view
             self.ax.set_xlim(xlimit_min, xlimit)
@@ -9140,24 +9144,22 @@ class tgraphcanvas(FigureCanvas):
                     ylabel_alpha_color = to_hex(to_rgba(self.palette['ylabel'], 0.47), keep_alpha=True)
 
                     if forceRenewAxis or self.ax is None:
-                        rcParams['axes.linewidth'] = 0.8
-                        rcParams['xtick.major.size'] = 6
-                        rcParams['xtick.major.width'] = 1
-                        rcParams['xtick.minor.width'] = 0.8
-
-                        rcParams['ytick.major.size'] = 4
-                        rcParams['ytick.major.width'] = 1
-                        rcParams['ytick.minor.width'] = 1
-
-                        rcParams['xtick.color'] = xlabel_alpha_color
-                        rcParams['ytick.color'] = ylabel_alpha_color
                         #rcParams['text.antialiased'] = True
-
                         self.fig.clf()
-
                         self.ax = self.fig.add_subplot(111,facecolor=self.palette['background'])
                         self.ax.set_autoscale_on(False)
                         self.delta_ax = self.ax.twinx()
+
+                    # rcParams need to be set each redraw. Why?
+#                    rcParams['axes.linewidth'] = 0.8
+#                    rcParams['xtick.major.size'] = 6
+#                    rcParams['xtick.major.width'] = 1
+#                    rcParams['xtick.minor.width'] = 0.8
+#                    rcParams['ytick.major.size'] = 4
+#                    rcParams['ytick.major.width'] = 1
+#                    rcParams['ytick.minor.width'] = 1
+                    rcParams['xtick.color'] = xlabel_alpha_color
+                    rcParams['ytick.color'] = ylabel_alpha_color
 
                     # instead to remove and regenerate the axis object (we just clear and reuse it)
 
@@ -11062,6 +11064,7 @@ class tgraphcanvas(FigureCanvas):
 
                     if not self.flagon and self.timeindex[6] and self.AUCshowFlag:
                         self.drawAUC()
+
                     #update label rotating_colors
                     for label in self.ax.xaxis.get_ticklabels():
                         label.set_color(self.palette['xlabel'])
