@@ -10806,7 +10806,6 @@ class tgraphcanvas(FigureCanvas):
                             if self.zgrid > 0:
                                 major_locator = ticker.MultipleLocator(self.zgrid)
                                 self.delta_ax.yaxis.set_major_locator(major_locator)
-                                _log.debug('PRINT len(major_locator()): %s', len(major_locator()))
                                 if len(major_locator()) > 50: # accept a maximum of 20 major ticks
                                     min_grid = (self.aw.qmc.zlimit - self.aw.qmc.zlimit_min) / 50
                                     # set grid to closest of min_grid from regular grids [1, 2, 5, 10, 20, 50, 100]

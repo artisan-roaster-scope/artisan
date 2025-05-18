@@ -1851,7 +1851,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         if self.aw.scale1_name:
             scale_name = (self.aw.getScaleName((self.aw.scale1_name, self.aw.scale1_id)) if self.aw.scale1_id else self.aw.scale1_name)
         else:
-            scale_name = QApplication.translate('Message','scale')
+            scale_name = QApplication.translate('Tab','Scale')
         self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format(scale_name),True,None)
         self.scale1Weight.setEnabled(True)
         self.scale1TareButton.setEnabled(True)
@@ -1861,7 +1861,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         if self.aw.scale1_name:
             scale_name = (self.aw.getScaleName((self.aw.scale1_name, self.aw.scale1_id)) if self.aw.scale1_id else self.aw.scale1_name)
         else:
-            scale_name = QApplication.translate('Message','scale')
+            scale_name = QApplication.translate('Tab','Scale')
         self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format(scale_name),True,None)
         self.scale1Weight.setEnabled(False)
         self.scale1TareButton.setEnabled(False)
@@ -1986,7 +1986,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         if self.aw.scale2_name:
             scale_name = (self.aw.getScaleName((self.aw.scale2_name, self.aw.scale2_id)) if self.aw.scale2_id else self.aw.scale2_name)
         else:
-            scale_name = QApplication.translate('Message','scale')
+            scale_name = QApplication.translate('Tab','Scale')
         self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format(scale_name),True,None)
         self.scale2Weight.setEnabled(True)
         self.scale2TareButton.setEnabled(True)
@@ -1996,7 +1996,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         if self.aw.scale2_name:
             scale_name = (self.aw.getScaleName((self.aw.scale2_name, self.aw.scale2_id)) if self.aw.scale2_id else self.aw.scale2_name)
         else:
-            scale_name = QApplication.translate('Message','scale')
+            scale_name = QApplication.translate('Tab','Scale')
         self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format(scale_name),True,None)
         self.scale2Weight.setEnabled(False)
         self.scale2TareButton.setEnabled(False)

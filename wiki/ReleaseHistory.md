@@ -19,7 +19,7 @@ v3.1.6
 * FIXES
   - fixes an unhandled exception on loading settings related to scales configurations ([Issue #1847](../../../issues/1847))
   - fix regression which broke show-events-on-BT in v3.1.2 and v3.1.4
-  - fixes delayed closing of the Roast Properties dialog on some configurations
+  - fixes delayed closing of the Roast Properties dialog on some configurations ([Issue #1852](../../../issues/1852))
 
 
 ----
