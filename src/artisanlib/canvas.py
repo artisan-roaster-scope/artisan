@@ -10502,7 +10502,6 @@ class tgraphcanvas(FigureCanvas):
                                             try:
                                                 if not self.flagon and self.eventsGraphflag!=4 and self.specialeventannovisibilities[3] != 0:
                                                     E4_annotation = self.parseSpecialeventannotation(self.specialeventannotations[3], i)
-                                                    _log.debug('PRINT E4_annotation: %s',E4_annotation)
                                                     temp = self.E4values[-1]
                                                     anno = self.ax.annotate(E4_annotation, xy=(hoffset + self.timex[int(self.specialevents[i])], voffset + temp),
                                                                 alpha=.9,

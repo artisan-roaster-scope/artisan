@@ -531,7 +531,7 @@ class SerialSettings(TypedDict):
     parity: str
     timeout: float
 
-class BTBreakParams(TypedDict, total=False):
+class BTBreakParams(TypedDict):
     delay: List[List[float]]
     d_drop: List[List[float]]
     d_charge: List[List[float]]

@@ -34,6 +34,7 @@ import copy
 import json
 import time
 import datetime
+import html
 import logging
 
 from artisanlib.util import (decodeLocal, encodeLocal, getDirectory, is_int_list, is_float_list, render_weight,
@@ -1052,7 +1053,8 @@ def getBlendLabels(blends:List[BlendStructure]) -> List[str]:
 
 # weightIn is in kg. Weights are rendered in weight_unit_idx
 # respects replacement beans
-def blend2ratio_beans(blend:BlendStructure, weightIn:float) -> List[Tuple[float,str]]:
+def blend2ratio_beans(blend:BlendStructure, weightIn:float) -> Tuple[Optional[str], List[Tuple[float,str]]]:
+    blend_name:Optional[str] = None
     res:List[Tuple[float,str]] = []
     try:
         blends = getBlendBlendDict(blend, weightIn)
@@ -1060,10 +1062,13 @@ def blend2ratio_beans(blend:BlendStructure, weightIn:float) -> List[Tuple[float,
             blends['ingredients'], key=lambda x: x['ratio'], reverse=True
         )
         for i in sorted_ingredients:
-            res.append((i['ratio'], i.get('label', '')))
+            c = getCoffee(i['coffee'])
+            c_label = (i.get('label', '') if c is None else coffeeLabel(c))
+            res.append((i['ratio'], html.escape(c_label)))
+        blend_name = blends.get('label', None)
     except Exception as e:  # pylint: disable=broad-except
         _log.exception(e)
-    return res
+    return blend_name, res
 
 # weightIn is in kg. Weights are rendered in weight_unit_idx
 def blend2weight_beans(blend:BlendStructure, weight_unit_idx:int, weightIn:float=0) -> List[Tuple[str,str]]:

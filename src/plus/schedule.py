@@ -30,6 +30,7 @@ import html
 import textwrap
 import platform
 import logging
+from json import dumps as json_dumps
 from platform import python_version
 from packaging.version import Version
 from uuid import UUID
@@ -100,6 +101,11 @@ hidden_items_semaphore = QSemaphore(
 hidden_items_cache_path = getDirectory(plus.config.hidden_items_cache)
 
 
+update_schedule_window_semaphore = QSemaphore(
+    1
+)  # prevents processing of updateScheduleWindow while drag-and-drop
+
+
 ## Configuration
 
 # the minimal difference the edited roasted weight in kg of a completed item must have
@@ -154,6 +160,18 @@ tooltip_light_background_style: Final[str] = f'QToolTip {{ background: {light_gr
 tooltip_dull_dark_background_style: Final[str] = f'QToolTip {{ background: {dull_dark_grey}; padding: 5px; opacity: 240; }}'
 
 
+class TaskWebDisplayPayload(TypedDict):
+    id:str                 # scheduleItem pos / roast batch nr | max 6 characters
+    title:str              # task title
+    subtitle:str           # task subtitle (eg. blend component; coffee name)
+    batchsize:str          # rendered batch size | max ~6 characters
+    weight:str             # remaining weight to be added | max 6 characters
+    percent:float          # percent of current green component already added / roasted weight loss
+    state:int              # processing state (0:disconnected, 1:connected, 2:weighing, 3:done, 4:canceled)
+    bucket: int            # number of buckets used from {0, 1, 2}
+    blend_percent: str     # percentage of blend component | max ~6 characters
+    total_percent: float   # total percentage of task completion
+    type:int               # task type (0:green, 1: roasted, 2:defects)
 
 class CompletedItemDict(TypedDict):
     scheduleID:str         # the ID of the ScheduleItem this completed item belongs to
@@ -719,7 +737,6 @@ def is_hidden(item:ScheduledItem) -> bool:
             hidden_items_semaphore.release(1)
     return False
 
-# set all remaining batches as prepared
 def set_hidden(plus_account_id:Optional[str], item:ScheduledItem) -> None:
     modified: bool = False
     try:
@@ -736,7 +753,6 @@ def set_hidden(plus_account_id:Optional[str], item:ScheduledItem) -> None:
         save_hidden(plus_account_id)
 
 
-# set all remaining batches as prepared
 def set_visible(plus_account_id:Optional[str], item:ScheduledItem) -> None:
     modified: bool = False
     try:
@@ -754,7 +770,8 @@ def set_visible(plus_account_id:Optional[str], item:ScheduledItem) -> None:
 
 #--------
 
-def scheduleditem_beans_descriptions(weight_unit_idx:int, item:ScheduledItem) -> List[Tuple[float,str]]:
+# returns blend name or None and list of components (just one if item is about a coffee
+def scheduleditem_beans_descriptions(weight_unit_idx:int, item:ScheduledItem) -> Tuple[Optional[str], List[Tuple[float,str]]]:
     if item.blend is not None:
         blends = plus.stock.getBlends(weight_unit_idx, item.store)
         blend = next((b for b in blends if plus.stock.getBlendId(b) == item.blend and plus.stock.getBlendStockDict(b)['location_hr_id'] == item.store), None)
@@ -763,8 +780,8 @@ def scheduleditem_beans_descriptions(weight_unit_idx:int, item:ScheduledItem) ->
     if item.coffee is not None:
         coffee = plus.stock.getCoffee(item.coffee)
         if coffee is not None:
-            return [(1,html.escape(plus.stock.coffeeLabel(coffee)))]
-    return []
+            return None, [(1,html.escape(plus.stock.coffeeLabel(coffee)))]
+    return None, []
 
 def scheduleditem_beans_description(weight_unit_idx:int, item:ScheduledItem) -> str:
     beans_description:str = ''
@@ -1115,12 +1132,14 @@ class NoDragItem(StandardItem):
             return ''
 
     def select(self) -> None:
-        self.setProperty('Selected', True)
-        self.setStyle(self.style())
+        if self.aw.schedule_window is not None and not self.aw.schedule_window.being_updated:
+            self.setProperty('Selected', True)
+            self.setStyle(self.style())
 
     def deselect(self) -> None:
-        self.setProperty('Selected', False)
-        self.setStyle(self.style())
+        if self.aw.schedule_window is not None and not self.aw.schedule_window.being_updated:
+            self.setProperty('Selected', False)
+            self.setStyle(self.style())
 
 
 
@@ -1157,6 +1176,9 @@ class DragItem(StandardItem):
 
     def set_hidden(self) -> None:
         set_hidden(self.aw.plus_account_id, self.data)
+
+    def set_visible(self) -> None:
+        set_visible(self.aw.plus_account_id, self.data)
 
     def visible_filter_on(self) -> bool:
         return self.aw.schedule_visible_filter
@@ -1282,37 +1304,38 @@ class DragItem(StandardItem):
 
 
     def itemMenu(self) -> None:
-        self.menu = QMenu()
-        if not fully_prepared(self.data):
-            allPreparedAction:QAction = QAction(QApplication.translate('Contextual Menu', 'All batches prepared'),self)
-            allPreparedAction.triggered.connect(self.allPrepared)
-            self.menu.addAction(allPreparedAction)
-        if not fully_unprepared(self.data):
-            nonePreparedAction:QAction = QAction(QApplication.translate('Contextual Menu', 'No batch prepared'),self)
-            nonePreparedAction.triggered.connect(self.nonePrepared)
-            self.menu.addAction(nonePreparedAction)
-        if not self.aw.qmc.flagon and self.aw.curFile is not None and self.aw.qmc.scheduleID is None and self.aw.qmc.roastUUID is not None  and \
-                self.aw.schedule_window is not None and \
-                not self.aw.schedule_window.in_completed(self.aw.qmc.roastUUID) and \
-                self.aw.qmc.roastdate.date().toPyDate() >= self.aw.schedule_window.prev_roast_session_data():
-            # if not sampling and a profile without scheduleID loaded which is not yet registered as completed roast,
-            # and roast date is not before the last roast session
-            # we allow to assign the current profile to the selected schedule item
-            # NOTE: that in contrast to the automatic assignment which does not allow incomplete roasts without a DROP to be registered
-            #   to prevent recorded snippet to confuse the roast session,
-            #   a roast without DROP can still be registered manually
-            addToItemAction:QAction = QAction(QApplication.translate('Contextual Menu', 'Register roast'),self)
-            addToItemAction.triggered.connect(self.addLoadedProfileToSelectedScheduleItem)
-            self.menu.addAction(addToItemAction)
-        if is_hidden(self.data):
-            showaction:QAction = QAction(QApplication.translate('CheckBox', 'Show'),self)
-            showaction.triggered.connect(self.showItem)
-            self.menu.addAction(showaction)
-        else:
-            hideAction:QAction = QAction(QApplication.translate('Contextual Menu', 'Hide'),self)
-            hideAction.triggered.connect(self.hideItem)
-            self.menu.addAction(hideAction)
-        self.menu.popup(QCursor.pos())
+        if self.aw.schedule_window is not None and not self.aw.schedule_window.being_updated:
+            self.menu = QMenu()
+            if not fully_prepared(self.data):
+                allPreparedAction:QAction = QAction(QApplication.translate('Contextual Menu', 'All batches prepared'),self)
+                allPreparedAction.triggered.connect(self.allPrepared)
+                self.menu.addAction(allPreparedAction)
+            if not fully_unprepared(self.data):
+                nonePreparedAction:QAction = QAction(QApplication.translate('Contextual Menu', 'No batch prepared'),self)
+                nonePreparedAction.triggered.connect(self.nonePrepared)
+                self.menu.addAction(nonePreparedAction)
+            if not self.aw.qmc.flagon and self.aw.curFile is not None and self.aw.qmc.scheduleID is None and self.aw.qmc.roastUUID is not None  and \
+                    self.aw.schedule_window is not None and \
+                    not self.aw.schedule_window.in_completed(self.aw.qmc.roastUUID) and \
+                    self.aw.qmc.roastdate.date().toPyDate() >= self.aw.schedule_window.prev_roast_session_data():
+                # if not sampling and a profile without scheduleID loaded which is not yet registered as completed roast,
+                # and roast date is not before the last roast session
+                # we allow to assign the current profile to the selected schedule item
+                # NOTE: that in contrast to the automatic assignment which does not allow incomplete roasts without a DROP to be registered
+                #   to prevent recorded snippet to confuse the roast session,
+                #   a roast without DROP can still be registered manually
+                addToItemAction:QAction = QAction(QApplication.translate('Contextual Menu', 'Register roast'),self)
+                addToItemAction.triggered.connect(self.addLoadedProfileToSelectedScheduleItem)
+                self.menu.addAction(addToItemAction)
+            if is_hidden(self.data):
+                showaction:QAction = QAction(QApplication.translate('CheckBox', 'Show'),self)
+                showaction.triggered.connect(self.showItem)
+                self.menu.addAction(showaction)
+            else:
+                hideAction:QAction = QAction(QApplication.translate('Contextual Menu', 'Hide'),self)
+                hideAction.triggered.connect(self.hideItem)
+                self.menu.addAction(hideAction)
+            self.menu.popup(QCursor.pos())
 
 
     def getLeft(self) -> str:
@@ -1324,27 +1347,41 @@ class DragItem(StandardItem):
 
 
     def getRight(self) -> str:
-#        mark = '\u25C9 ' # BULLSEYE
         mark = '\u25CF '
         return f"{(mark if fully_prepared(self.data) else '')}{render_weight(self.data.weight, 1, self.weight_unit_idx)}"
 
 
     def mouseMoveEvent(self, e:'Optional[QMouseEvent]') -> None:
         super().mouseMoveEvent(e)
-        if e is not None and e.buttons() == Qt.MouseButton.LeftButton:
-            drag = QDrag(self)
-            mime = QMimeData()
-            drag.setMimeData(mime)
+        try:
+            update_schedule_window_semaphore.acquire(1)
+            if e is not None and e.buttons() == Qt.MouseButton.LeftButton and self.aw.schedule_window is not None and not self.aw.schedule_window.being_updated:
+                drag = QDrag(self.aw.schedule_window) # we attach the "stable" schedule_window widget to the drag object
+                self.aw.schedule_window.drag_remaining.drag_source = self # and register the item being dragged under drag_remaining.drag_source
+                if self.visible_filter_on() and self.is_hidden():
+                    self.set_visible()
 
-            self.setGraphicsEffect(None)
-            # Render at x2 pixel ratio to avoid blur on Retina screens.
-            pixmap = QPixmap(self.size().width() * 2, self.size().height() * 2)
-            pixmap.setDevicePixelRatio(2)
-            self.render(pixmap)
-            drag.setPixmap(pixmap)
-            if not is_hidden(self.data):
-                self.setGraphicsEffect(self.makeShadow())
-            drag.exec(Qt.DropAction.MoveAction)
+                mime = QMimeData()
+                drag.setMimeData(mime)
+
+                self.setGraphicsEffect(None)
+                # Render at x2 pixel ratio to avoid blur on Retina screens.
+                pixmap = QPixmap(self.size().width() * 2, self.size().height() * 2)
+                pixmap.setDevicePixelRatio(2)
+                self.render(pixmap)
+                drag.setPixmap(pixmap)
+                if not is_hidden(self.data):
+                    self.setGraphicsEffect(self.makeShadow())
+                drag.exec(Qt.DropAction.MoveAction)
+        except Exception as ex:  # pylint: disable=broad-except
+            _log.exception(ex)
+        finally:
+            if update_schedule_window_semaphore.available() < 1:
+                update_schedule_window_semaphore.release(1)
+            if self.aw.schedule_window is not None:
+                self.aw.schedule_window.drag_remaining.drag_source = None
+                if self.aw.schedule_window.pending_updated:
+                    self.aw.updateScheduleSignal.emit()
 
 
     def select(self, aw:'ApplicationWindow', load_template:bool=True) -> None:
@@ -1443,8 +1480,11 @@ class DragWidget(BaseWidget):
 
     orderChanged = pyqtSignal(list)
 
-    def __init__(self, parent:Optional[QWidget] = None, orientation:Qt.Orientation = Qt.Orientation.Vertical) -> None:
+    def __init__(self, parent:'Optional[ScheduleWindow]' = None, orientation:Qt.Orientation = Qt.Orientation.Vertical) -> None:
         super().__init__(parent, orientation)
+
+        self.schedule_window = parent
+
         self.setAcceptDrops(True)
 
         # Add the drag target indicator. This is invisible by default,
@@ -1452,78 +1492,86 @@ class DragWidget(BaseWidget):
         self._drag_target_indicator = DragTargetIndicator()
         self.blayout.addWidget(self._drag_target_indicator)
         self._drag_target_indicator.hide()
-        self.drag_source:Optional[QObject] = None
+        self.drag_source:Optional[DragItem] = None
+        # NOTE: QDragLeaveEvent has no attribute e.source; therefore we set the self.drag_source explicitly in mouseMoveEvent (could be done also in by dragEnterEvent:e.source())
 
 
     def dragEnterEvent(self, e:'Optional[QDragEnterEvent]') -> None: # pylint: disable=no-self-argument,no-self-use
-        if e is not None:
-            self.drag_source = e.source()
-            e.accept()
-
+        try:
+            if e is not None:
+                if self.drag_source is not None and self.drag_source.is_hidden():
+                    self.drag_source.set_visible()
+                e.accept()
+        except Exception as ex:  # pylint: disable=broad-except
+            _log.exception(ex)
 
     def dragLeaveEvent(self, e:'Optional[QDragLeaveEvent]') -> None:
-        if e is not None:
-            try:
+        try:
+            if e is not None:
                 if self.drag_source is not None:
-                    widget:Optional[QObject] = self.drag_source
-                    if widget is not None and isinstance(widget, DragItem):
-                        # Use drop target location for destination, then remove it.
-                        self._drag_target_indicator.hide()
-                        if not widget.is_hidden():
-                            # we mark the underlying ScheduleItem as hidden
-                            widget.set_hidden()
-                        if not widget.visible_filter_on():
-                            # as hidden items are not filtered out we have to put that item back
-                            index = self.blayout.indexOf(self._drag_target_indicator)
-                            if index is not None:
-                                self.blayout.insertWidget(index, widget) # pyright:ignore[reportArgumentType]
-                                self.orderChanged.emit(self.get_item_data())
-                                widget.show() # pyright:ignore[reportAttributeAccessIssue]
-                                self.blayout.activate()
-
-            except Exception:   # pylint: disable=broad-except
-                # wrapped C/C++ objects might have been deleted due to a complete redraw of the widget via updateScheduleWindow()
-                pass
-            e.accept()
+                    self._drag_target_indicator.hide()
+                    if not self.drag_source.is_hidden():
+                        self.drag_source.set_hidden()
+                    if not self.drag_source.visible_filter_on():
+                        # as hidden items are not filtered out we have to put that item back
+                        index = self.blayout.indexOf(self._drag_target_indicator)
+                        if index is not None:
+                            self.blayout.insertWidget(index, self.drag_source) # pyright:ignore[reportArgumentType]
+                            self.drag_source.show() # pyright:ignore[reportAttributeAccessIssue]
+                            self.blayout.activate()
+#                    self.drag_source = None
+                    e.accept()
+                    # we need to update the schedule window to set a new selection and show the correct hidden state of this item
+                    if self.schedule_window is not None:
+                        self.schedule_window.aw.updateScheduleSignal.emit()
+                else:
+                    e.ignore()
+        except Exception as ex:  # pylint: disable=broad-except
+            _log.exception(ex)
 
 
     def dragMoveEvent(self, e:'Optional[QDragMoveEvent]') -> None:
-        if e is not None:
-            try:
-                # Find the correct location of the drop target, so we can move it there.
-                index = self._find_drop_location(e)
-                if index is not None:
-                    # Inserting moves the item if its alreaady in the layout.
-                    self.blayout.insertWidget(index, self._drag_target_indicator)
-                    # Hide the item being dragged.
-                    source:Optional[QObject] = e.source()
-                    if source is not None and isinstance(source, QWidget):
-                        source.hide() # pyright:ignore[reportAttributeAccessIssue]
-                    # Show the target.
-                    self._drag_target_indicator.show()
-            except Exception:   # pylint: disable=broad-except
-                # wrapped C/C++ objects might have been deleted due to a complete redraw of the widget via updateScheduleWindow()
-                pass
-            e.accept()
+        try: #
+            if e is not None:
+                if self.drag_source is not None:
+                    try:
+                        # Find the correct location of the drop target, so we can move it there.
+                        index = self._find_drop_location(e)
+                        if index is not None:
+                            # Inserting moves the item if its alreaady in the layout.
+                            self.blayout.insertWidget(index, self._drag_target_indicator)
+                            # Hide the item being dragged.
+                            self.drag_source.hide()
+                            # Show the target
+                            self._drag_target_indicator.show()
+                    except Exception:   # pylint: disable=broad-except
+                        # wrapped C/C++ objects might have been deleted due to a complete redraw of the widget via updateScheduleWindow()
+                        pass
+                    e.accept()
+                else:
+                    e.ignore()
+        except Exception as ex:  # pylint: disable=broad-except
+            _log.exception(ex)
 
 
     def dropEvent(self, e:'Optional[QDropEvent]') -> None:
-        if e is not None and e.source() is not None:
-            try:
-                widget:Optional[QObject] = e.source()
-                if widget is not None and isinstance(widget, QWidget):
-                    # Use drop target location for destination, then remove it.
+        # Use drop target location for destination, then remove it.
+        try:
+            if e is not None:
+                if self.drag_source is not None:
                     self._drag_target_indicator.hide()
                     index = self.blayout.indexOf(self._drag_target_indicator)
                     if index is not None:
-                        self.blayout.insertWidget(index, widget) # pyright:ignore[reportArgumentType]
+                        self.blayout.insertWidget(index, self.drag_source) # pyright:ignore[reportArgumentType]
                         self.orderChanged.emit(self.get_item_data())
-                        widget.show() # pyright:ignore[reportAttributeAccessIssue]
+                        self.drag_source.show() # pyright:ignore[reportAttributeAccessIssue]
                         self.blayout.activate()
-            except Exception:   # pylint: disable=broad-except
-                # wrapped C/C++ objects might have been deleted due to a complete redraw of the widget via updateScheduleWindow()
-                pass
-            e.accept()
+                    self.drag_source = None
+                    e.accept()
+                else:
+                    e.ignore()
+        except Exception as ex:  # pylint: disable=broad-except
+            _log.exception(ex)
 
 
     def _find_drop_location(self, e:'QDragMoveEvent') -> int:
@@ -1609,6 +1657,9 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.aw = aw # the Artisan application window
         self.activeTab:int = activeTab
 
+        self.being_updated:bool = False # True while processing self.updateScheduleWindow()
+        self.pending_updated:bool = False # True if a self.updateScheduleWindow() did fail as the update_schedule_window_semaphore was not available
+
         self.scheduled_items:List[ScheduledItem] = []
         self.completed_items:List[CompletedItem] = [] # kept sorted; oldest roasts at begin, youngest appended at the end
 
@@ -1624,7 +1675,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         # or rather use sip.delete(dialog) if the GC via .deleteLater() is prevented by a link to a parent object (parent not None)
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose, True)
 
-        self.drag_remaining = DragWidget(self, orientation=Qt.Orientation.Vertical)
+        self.drag_remaining:DragWidget = DragWidget(self, orientation=Qt.Orientation.Vertical)
         self.drag_remaining.setContentsMargins(0, 0, 0, 0)
 
         self.drag_remaining.orderChanged.connect(self.update_order)
@@ -1948,8 +1999,6 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.completed_stacked_widget.addWidget(self.completed_splitter)
         self.completed_stacked_widget.addWidget(self.completed_message_widget)
 
-#####
-
         self.sync_button = QToolButton()
         self.sync_button.setToolTip(QApplication.translate('Tooltip','Update schedule'))
         if self.aw.app.darkmode:
@@ -2071,7 +2120,6 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
 
         self.setLayout(self.main_layout)
 
-
         # we want minimize and close buttons, but no maximize buttons
         if not platform.system().startswith('Windows'):
             windowFlags = self.windowFlags()
@@ -2104,26 +2152,22 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
 
         self.register_completed_roast.connect(self.register_completed_roast_slot)
 
-
         # a click to the weight in the task display completes it
         self.task_weight.clicked.connect(self.taskCompleted)
 
         self.TabWidget.currentChanged.connect(self.tabSwitched)
 
-        # we set the active tab with a QTimer after the tabbar has been rendered once, as otherwise
-        # some tabs are not rendered at all on Windows using Qt v6.5.1 (https://bugreports.qt.io/projects/QTBUG/issues/QTBUG-114204?filter=allissues)
-        QTimer.singleShot(50, self.setActiveTab)
+#        # we set the active tab with a QTimer after the tabbar has been rendered once, as otherwise
+#        # some tabs are not rendered at all on Windows using Qt v6.5.1 (https://bugreports.qt.io/projects/QTBUG/issues/QTBUG-114204?filter=allissues)
+#        QTimer.singleShot(50, self.setActiveTab)
+        self.setActiveTab()
 
-        if self.activeTab == 0:
-            # no tabswitch will be triggered, thus we need to "manually" set the next weight item
-            self.set_next()
 
         settings = QSettings()
         if settings.contains('ScheduleGeometry'):
             self.restoreGeometry(settings.value('ScheduleGeometry'))
         else:
             self.resize(250,300)
-
 
         settings = QSettings()
         if settings.contains('ScheduleMainSplitter'):
@@ -2222,12 +2266,18 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
     def disconnected_link_handler(self, _link:str) -> None:
         plus.controller.toggle(self.aw)
 
-    def set_next(self) -> None:
-        todo_tab_active:bool = self.TabWidget.currentIndex() == 0
-        if todo_tab_active:
-            self.weight_manager.set_next_green(self.next_not_prepared_item())
-        else:
-            self.weight_manager.set_next_roasted(self.next_not_completed_item())
+    # by default only the next item of the active tab is set, only if update_both is True both next items are reset
+    def set_next(self, update_both:bool = False) -> None:
+        # is called from QTimer potentially at a point of execution the scheduler window might have been already closed and the TabWidget has been collected
+        try:
+            if self and self.TabWidget:
+                todo_tab_active:bool = self.TabWidget.currentIndex() == 0
+                if todo_tab_active or update_both:
+                    self.weight_manager.set_next_green(self.next_not_prepared_item())
+                if not todo_tab_active or update_both:
+                    self.weight_manager.set_next_roasted(self.next_not_completed_item())
+        except Exception:  # pylint: disable=broad-except
+            pass
 
     @pyqtSlot()
     def taskCompleted(self) -> None:
@@ -2471,6 +2521,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         return True
 
     def closeScheduler(self) -> None:
+        self.weight_manager.reset() # reset the WeightManager and clear all connected displays
         self.aw.scheduled_items_uuids = self.get_scheduled_items_ids()
         # remember Dialog geometry
         settings = QSettings()
@@ -2711,7 +2762,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
     @pyqtSlot()
     def remaining_items_selection_changed(self) -> None:
         sender = self.sender()
-        if sender is not None and isinstance(sender, DragItem):
+        if not self.being_updated and sender is not None and isinstance(sender, DragItem):
             self.select_item(sender)
 
     @pyqtSlot()
@@ -2758,15 +2809,18 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
             remaining = item.count - roasted
             if remaining > prepared:
                 weight_unit_idx = weight_units.index(self.aw.qmc.weight[2])
+                blend_name: Optional[str]
+                blend_name, descriptions = scheduleditem_beans_descriptions(weight_unit_idx, item)
                 return GreenWeightItem(
                     uuid = item.id,
                     title = item.title,
+                    blend_name = blend_name,
                     description = scheduleditem_beans_description(weight_unit_idx, item),
-                    descriptions = scheduleditem_beans_descriptions(weight_unit_idx, item),
+                    descriptions = descriptions,
                     position = ('' if item.count == 1 else f'{prepared + roasted + 1}/{item.count}'),
                     weight = item.weight,
                     weight_unit_idx = weight_unit_idx,
-                    call_back = self.set_green_weight
+                    callback = self.set_green_weight
                 )
         return None
 
@@ -2774,15 +2828,23 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         item:Optional[CompletedItem] = next((ci for ci in self.completed_items if not ci.measured), None)
         if item is not None:
             weight_unit_idx = weight_units.index(self.aw.qmc.weight[2])
+            position = ''
+            if item.roastbatchnr > 0:
+                # roasts batch number as position
+                position = f'{item.roastbatchprefix}{item.roastbatchnr}'
+            elif item.count > 1:
+                # if no batchnumber, use the items count if >1 as for green tasks
+                position = f'{item.sequence_id}/{item.count}'
             return RoastedWeightItem(
                     uuid = item.roastUUID.hex,
                     title = f"{(item.prefix + ' ' if item.prefix != '' else '')}{item.title}",
+                    blend_name = item.blend_label,
                     description = completeditem_beans_description(weight_unit_idx, item),
                     descriptions = completeditem_beans_descriptions(item),
-                    position = ('' if item.count == 1 else f'{item.sequence_id}/{item.count}'),
+                    position = position,
                     weight = item.weight_estimate,
                     weight_unit_idx = weight_unit_idx,
-                    call_back = self.set_roasted_weight
+                    callback = self.set_roasted_weight
             )
         return None
 
@@ -3551,60 +3613,76 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
     @pyqtSlot()
     def updateScheduleWindow(self) -> None:
         _log.debug('updateScheduleWindow()')
-        self.update_styles()
-        # load completed roasts cache
-        load_completed(self.aw.plus_account_id)
-        # if the currently loaded profile is among the completed_items, its corresponding entry in that completed list is updated with the information
-        # from the current loaded profile as properties might have been changed via the RoastProperties dialog
-        if self.aw.qmc.roastUUID is not None:
-            completed_item:Optional[CompletedItem] = next((ci for ci in self.completed_items if ci.roastUUID.hex == self.aw.qmc.roastUUID), None)
-            if completed_item is not None:
-                self.updates_completed_from_roast_properties(completed_item)
-        if self.aw.plus_account is None:
-            self.stacked_widget.setCurrentWidget(self.message_widget)
-        else:
-            self.stacked_widget.setCurrentWidget(self.main_splitter)
-            # update scheduled and completed items
-            self.updateScheduledItems()                                 # updates the current schedule items from received stock data
-            load_prepared(self.aw.plus_account_id, self.scheduled_items)# load the prepared items cache and update according to the valid schedule items
-            load_hidden(self.aw.plus_account_id, self.scheduled_items)  # load the hidden items cache and update according to the valid schedule items
-            self.completed_items = self.getCompletedItems()             # updates completed items from cache
-            self.updateFilters()                                        # update filter widget (user and machine)
-
-            # show empty message if there are no scheduled items or the schedule items scrolling widget if there are entries
-            if self.scheduled_items == []:
-                # clear selection and reset scheduleID
-                self.selected_remaining_item = None
-                if self.aw.qmc.timeindex[6] == 0:
-                    # if DROP is not set we clear the ScheduleItem UUID/Date
-                    self.aw.qmc.scheduleID = None
-                    self.aw.qmc.scheduleDate = None
-                # show empty schedule message
-                self.remaining_message.setText(QApplication.translate('Plus', 'Schedule empty!{}Plan your schedule on {}').format('<BR><BR>', f'<a href="{schedulerLink()}">{plus.config.app_name}</a><br>'))
-                self.stacked_remaining_widget.setCurrentWidget(self.remaining_message_widget)
-                self.setAppBadge(0)
-            else:
-                displayed_scheduled_items = self.updateRemainingItems() # redraw To-Do's widget
-                if displayed_scheduled_items > 0:
-                    self.stacked_remaining_widget.setCurrentWidget(self.remaining_scrollarea)
+        # lock resources to prevent race conditions
+        gotlock:bool = update_schedule_window_semaphore.tryAcquire(1)
+        if gotlock:
+            try:
+                self.pending_updated = False # reset pending updates to avoid cycles
+                self.being_updated = True # no user interactions (like right/left click processing)
+                self.drag_remaining.drag_source = None # block ongoing drag-and-drop action from completion and avoid dragging deleted objects if update occurs during a drag
+                self.TabWidget.setEnabled(False) # block tab switches
+                #
+                self.update_styles()
+                # load completed roasts cache
+                load_completed(self.aw.plus_account_id)
+                # if the currently loaded profile is among the completed_items, its corresponding entry in that completed list is updated with the information
+                # from the current loaded profile as properties might have been changed via the RoastProperties dialog
+                if self.aw.qmc.roastUUID is not None:
+                    completed_item:Optional[CompletedItem] = next((ci for ci in self.completed_items if ci.roastUUID.hex == self.aw.qmc.roastUUID), None)
+                    if completed_item is not None:
+                        self.updates_completed_from_roast_properties(completed_item)
+                if self.aw.plus_account is None:
+                    self.stacked_widget.setCurrentWidget(self.message_widget)
                 else:
-                    self.remaining_message.setText(f"{QApplication.translate('Plus', 'Nothing scheduled for you today!{}Deactivate filters to see all items.').format('<BR><BR>')}<br>")
-                    self.stacked_remaining_widget.setCurrentWidget(self.remaining_message_widget)
+                    self.stacked_widget.setCurrentWidget(self.main_splitter)
+                    # update scheduled and completed items
+                    self.updateScheduledItems()                                 # updates the current schedule items from received stock data
+                    load_prepared(self.aw.plus_account_id, self.scheduled_items)# load the prepared items cache and update according to the valid schedule items
+                    load_hidden(self.aw.plus_account_id, self.scheduled_items)  # load the hidden items cache and update according to the valid schedule items
+                    self.completed_items = self.getCompletedItems()             # updates completed items from cache
+                    self.updateFilters()                                        # update filter widget (user and machine)
+
+                    # show empty message if there are no scheduled items or the schedule items scrolling widget if there are entries
+                    if self.scheduled_items == []:
+                        # clear selection and reset scheduleID
+                        self.selected_remaining_item = None
+                        if self.aw.qmc.timeindex[6] == 0:
+                            # if DROP is not set we clear the ScheduleItem UUID/Date
+                            self.aw.qmc.scheduleID = None
+                            self.aw.qmc.scheduleDate = None
+                        # show empty schedule message
+                        self.remaining_message.setText(QApplication.translate('Plus', 'Schedule empty!{}Plan your schedule on {}').format('<BR><BR>', f'<a href="{schedulerLink()}">{plus.config.app_name}</a><br>'))
+                        self.stacked_remaining_widget.setCurrentWidget(self.remaining_message_widget)
+                        self.setAppBadge(0)
+                    else:
+                        displayed_scheduled_items = self.updateRemainingItems() # redraw To-Do's widget
+                        if displayed_scheduled_items > 0:
+                            self.stacked_remaining_widget.setCurrentWidget(self.remaining_scrollarea)
+                        else:
+                            self.remaining_message.setText(f"{QApplication.translate('Plus', 'Nothing scheduled for you today!{}Deactivate filters to see all items.').format('<BR><BR>')}<br>")
+                            self.stacked_remaining_widget.setCurrentWidget(self.remaining_message_widget)
 
 
-            # show empty message if there are no completed items or the completed splitter widget if there are entries
-            if not self.completed_items:
-                self.completed_stacked_widget.setCurrentWidget(self.completed_message_widget)
-            else:
-                self.updateRoastedItems()                               # redraw Completed widget
-                self.completed_stacked_widget.setCurrentWidget(self.completed_splitter)
+                    # show empty message if there are no completed items or the completed splitter widget if there are entries
+                    if not self.completed_items:
+                        self.completed_stacked_widget.setCurrentWidget(self.completed_message_widget)
+                    else:
+                        self.updateRoastedItems()                               # redraw Completed widget
+                        self.completed_stacked_widget.setCurrentWidget(self.completed_splitter)
 
-            # the weight unit might have changed, we update its label
-            self.roasted_weight_suffix.setText(self.aw.qmc.weight[2].lower())
-            self.roasted_yield_suffix.setText(self.aw.qmc.weight[2].lower())
-            self.roasted_defects_suffix.setText(self.aw.qmc.weight[2].lower())
-            # update next weight item
-            self.set_next()
+                    # the weight unit might have changed, we update its label
+                    self.roasted_weight_suffix.setText(self.aw.qmc.weight[2].lower())
+                    self.roasted_yield_suffix.setText(self.aw.qmc.weight[2].lower())
+                    self.roasted_defects_suffix.setText(self.aw.qmc.weight[2].lower())
+                    # update next weight item
+                    self.set_next(update_both=True)
+            finally:
+                if update_schedule_window_semaphore.available() < 1:
+                    update_schedule_window_semaphore.release(1)
+                self.TabWidget.setEnabled(True) # re-enable tab switches
+                self.being_updated = False # reallow user interactions (like right/left click processing)
+        else:
+            self.pending_updated = True # we mark that a an update got blocked to have this run by mouseMoveEvent after the drag-drop terminated and the semaphore got released
 
 
 ########
@@ -3634,35 +3712,115 @@ class WeightItemDisplay(Display):
         self.schedule_window.task_weight.setToolTip(QApplication.translate('Plus', 'nothing to weight'))
 
     def show_item(self, item:'WeightItem') -> None:
-        if isinstance(item, GreenWeightItem):
-            self.schedule_window.task_type.setText(' '.join(QApplication.translate('Label', 'Green').lower()))
-        else:
-            self.schedule_window.task_type.setText(' '.join(QApplication.translate('Label', 'Roasted').lower()))
-        self.schedule_window.task_title.setText(item.title)
-        self.schedule_window.task_position.setText(item.position)
-        self.schedule_window.task_weight.setText(render_weight(item.weight, 1, item.weight_unit_idx))
-        self.schedule_window.task_weight.setToolTip(item.description)
+        todo_tab_active:bool = self.schedule_window.TabWidget.currentIndex() == 0
+        if ((todo_tab_active and isinstance(item, GreenWeightItem)) or
+            not todo_tab_active and isinstance(item, RoastedWeightItem)):
+            if isinstance(item, GreenWeightItem):
+                self.schedule_window.task_type.setText(' '.join(QApplication.translate('Label', 'Green').lower()))
+            else:
+                self.schedule_window.task_type.setText(' '.join(QApplication.translate('Label', 'Roasted').lower()))
+            self.schedule_window.task_title.setText(item.title)
+            self.schedule_window.task_position.setText(item.position)
+            self.schedule_window.task_weight.setText(render_weight(item.weight, 1, item.weight_unit_idx))
+            self.schedule_window.task_weight.setToolTip(item.description)
 
 
 class GreenWebDisplay(GreenDisplay):
     def __init__(self, schedule_window:'ScheduleWindow') -> None:
         self.schedule_window:ScheduleWindow = schedule_window
         super().__init__()
+        self.last_item:Optional[WeightItem] = None
+        self.empty_task:Final[TaskWebDisplayPayload] = {
+                'id': '',
+                'title': '',
+                'subtitle': '',
+                'batchsize': '',
+                'weight': '',
+                'percent': 0,
+                'state': 0,
+                'bucket': 0,
+                'blend_percent': '',
+                'total_percent': 0,
+                'type': 0 # 0:green task; constant
+            }
+        self.rendered_task:TaskWebDisplayPayload = cast(TaskWebDisplayPayload, dict(self.empty_task)) # initialize with a copy of the empty_task
 
-#self.schedule_window.aw.taskWebDisplayGreenPort:bool
-#self.schedule_window.aw.taskWebDisplayGreenActive:int
-#self.schedule_window.aw.taskWebDisplayGreen_server:Optional[WebGreen]
+    def clear_green(self) -> None:
+        self.last_item = None
+        self.rendered_task = cast(TaskWebDisplayPayload, dict(self.empty_task)) # reset with a copy of the empty_task
+        self.update()
 
+    # TODO: display needs to be updated also on WebDisplay start!
+    def show_item(self, item:'WeightItem') -> None:
+        if isinstance(item, GreenWeightItem) and item != self.last_item: # as item is of type WeightItem and this is declared as @dataclass the equality is structural here
+            self.last_item = item
+            self.rendered_task['id'] = item.position
+            self.rendered_task['title'] = item.title
+            self.rendered_task['batchsize'] = render_weight(item.weight, 1, item.weight_unit_idx)
+            if item.descriptions:
+                self.rendered_task['blend_percent'] = (f'{item.descriptions[0][0] * 100:.0f}%' if item.descriptions[0][0] != 1 else '')
+                self.rendered_task['subtitle'] = item.descriptions[0][1]
+            else:
+                self.rendered_task['blend_percent'] = ''
+                self.rendered_task['subtitle'] = ''
+            self.rendered_task['weight'] = ''
+            self.rendered_task['percent'] = 0
+            self.rendered_task['state'] = 0
+            self.rendered_task['bucket'] = 0
+            self.rendered_task['total_percent'] = 0
+            self.update()
+
+    def update(self) -> None:
+        if self.schedule_window.aw.taskWebDisplayGreen_server is not None:
+            msg = json_dumps(self.rendered_task, indent=None, separators=(',', ':'))
+            self.schedule_window.aw.taskWebDisplayGreen_server.send_msg(msg) # Note: send_msg sends respects its _min_send_interval message frequency!
 
 
 class RoastedWebDisplay(RoastedDisplay):
     def __init__(self, schedule_window:'ScheduleWindow') -> None:
         self.schedule_window:ScheduleWindow = schedule_window
         super().__init__()
+        self.last_item:Optional[WeightItem] = None
+        self.empty_task:Final[TaskWebDisplayPayload] = {
+                'id': '',
+                'title': '',
+                'subtitle': '',
+                'batchsize': '',
+                'weight': '',
+                'percent': 0,
+                'state': 0,
+                'bucket': 0,
+                'blend_percent': '',
+                'total_percent': 0,
+                'type': 1 # 1:roasted task; constant
+            }
+        self.rendered_task:TaskWebDisplayPayload = cast(TaskWebDisplayPayload, dict(self.empty_task)) # initialize with a copy of the empty_task
+
+    def clear_roasted(self) -> None:
+        self.last_item = None
+        self.rendered_task = cast(TaskWebDisplayPayload, dict(self.empty_task))  # reset with a copy of the empty_task
+        self.update()
 
     def show_item(self, item:'WeightItem') -> None:
-        pass
+        if isinstance(item, RoastedWeightItem) and item != self.last_item: # as item is of type WeightItem and this is declared as @dataclass the equality is structural here
+            self.last_item = item
+            self.rendered_task['id'] = item.position
+            self.rendered_task['title'] = item.title
+            self.rendered_task['batchsize'] = render_weight(item.weight, 1, item.weight_unit_idx)
+            if item.descriptions:
+                self.rendered_task['blend_percent'] = ''
+                self.rendered_task['subtitle'] = (item.descriptions[0][1] if item.blend_name is None else item.blend_name)
+            else:
+                self.rendered_task['blend_percent'] = ''
+                self.rendered_task['subtitle'] = ''
+            self.rendered_task['weight'] = ''
+            self.rendered_task['percent'] = 0
+            self.rendered_task['state'] = 0
+            self.rendered_task['bucket'] = 0
+            self.rendered_task['total_percent'] = 0
+            self.update()
 
-#self.schedule_window.aw.taskWebDisplayGreenPort:bool
-#self.schedule_window.aw.taskWebDisplayGreenActive:int
-#self.schedule_window.aw.taskWebDisplayGreen_server:Optional[WebRoasted]
+    def update(self) -> None:
+        if self.schedule_window.aw.taskWebDisplayRoasted_server is not None:
+            msg = json_dumps(self.rendered_task, indent=None, separators=(',', ':'))
+            self.schedule_window.aw.taskWebDisplayRoasted_server.send_msg(msg)

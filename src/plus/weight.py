@@ -36,19 +36,20 @@ from artisanlib.scale import ScaleManager
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
-@dataclass
+@dataclass # creates an __eq__ method comparing objects by property values
 class WeightItem:
-    uuid:str         # the UUID of the ScheduledItem or CompletedItem
-    title:str        # the title (schedule item name of a ScheduledItem, or batch number and roast name of a CompletedItem
-    description:str  # a simple one liner describing the weight item in HTML format
+    uuid:str                 # the UUID of the ScheduledItem or CompletedItem
+    title:str                # the title (schedule item name of a ScheduledItem, or batch number and roast name of a CompletedItem
+    blend_name:Optional[str] # None if item is a coffee, else the name of the blend
+    description:str          # a HTML formatted string describing the weight item (used by the Scheduler task display tooltip popup)
     descriptions:List[Tuple[float,str]] # the descriptions of the green coffee or blend as non empty list of tuples <ratio>,<description>
-                     # with ratio the component ratio in blends and description the coffee component name.
-                     # A single coffee has just one tuple with ratio set to 1 (also for completed items).
-                     # For roasted blend items this is always just the one element list [(1, '')]
-    position:str     # the position string (like "2/5" for 2nd of 5 batches)
-    weight:float     # target or suggested weight
-    weight_unit_idx:int  # the weight unit, one of (0:'g', 1:'kg', 2:'lb', 3:'oz')
-    call_back:Callable[[str, float], None] # the function to be called with id:str and weight (in kg) on completion
+                             # with ratio the component ratio in blends and description the coffee component name.
+                             # A single coffee has just one tuple with ratio set to 1 (also for completed items).
+                             # For roasted blend items this is always just the one element list [(1, '')]
+    position:str             # the position string (like "2/5" for 2nd of 5 batches)
+    weight:float             # target or suggested weight
+    weight_unit_idx:int      # the weight unit, one of (0:'g', 1:'kg', 2:'lb', 3:'oz')
+    callback:Callable[[str, float], None] # the function to be called with id:str and weight (in kg) on completion
 
 @dataclass
 class GreenWeightItem(WeightItem):
@@ -87,8 +88,6 @@ class Display:
 
     def __init__(self) -> None:
         self.active:bool = True
-        self.clear_green()
-        self.clear_roasted()
 
     def clear_green(self) -> None: # pylint: disable=no-self-use
         ...
@@ -170,6 +169,11 @@ class WeightManager:
             self.next_green_item = item
             self.greenItemSemaphore.release(1)
 
+            if True: # TODO: if green weighing process is not running
+                # if there is no scale, we fetch that item immediately and start "processing"
+                # even if there is already a current one in "processing"
+                self.fetch_next_green()
+
     def clear_next_green(self) -> None:
         self.greenItemSemaphore.acquire(1)
         self.next_green_item = None
@@ -194,7 +198,7 @@ class WeightManager:
 
     def greenTaskCompleted(self) -> None:
         if self.current_green_item is not None:
-            self.current_green_item.call_back(self.current_green_item.uuid, self.current_green_item.weight)
+            self.current_green_item.callback(self.current_green_item.uuid, self.current_green_item.weight)
 
 #--
 
@@ -212,6 +216,11 @@ class WeightManager:
             self.roastedItemSemaphore.acquire(1)
             self.next_roasted_item = item
             self.roastedItemSemaphore.release(1)
+
+            if True: # TODO: if roasted weighing process is not running
+                # if there is no scale, we fetch that item immediately and start "processing"
+                # even if there is already a current one in "processing"
+                self.fetch_next_roasted()
 
     def clear_next_roasted(self) -> None:
         self.roastedItemSemaphore.acquire(1)
@@ -237,7 +246,7 @@ class WeightManager:
 
     def roastedTaskCompleted(self) -> None:
         if self.current_roasted_item is not None:
-            self.current_roasted_item.call_back(self.current_roasted_item.uuid, self.current_roasted_item.weight)
+            self.current_roasted_item.callback(self.current_roasted_item.uuid, self.current_roasted_item.weight)
 
 #--
 
@@ -251,7 +260,7 @@ class WeightManager:
 
     def reset(self) -> None:
         self.clear_next()
-        self.fetch_next_green()
+        self.fetch_next()
 
 
     # render item on all active displays
@@ -261,7 +270,7 @@ class WeightManager:
 
     # update weight to be displayed on all connected displays
     def update_weight(self) -> None:
-        pass
+        pass # to be implemented
 
     # if green and roasted are False, all displays are cleared
     def clear_displays(self, green:bool = False, roasted:bool = False) -> None:

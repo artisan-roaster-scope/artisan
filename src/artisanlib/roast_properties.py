@@ -3530,7 +3530,29 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.aw.qmc.getMeterReads()
             # Recaclulate the energy metrics
             metrics,self.btu_list = self.aw.qmc.calcEnergyuse(self.weightinedit.text()) # pylint: disable=attribute-defined-outside-init
-            if len(metrics) > 0 and metrics['BTU_batch'] > 0:
+            if ('BTU_batch' in metrics and
+#                    'BTU_batch_per_green_kg' in metrics and
+                    'CO2_batch' in metrics and
+                    'BTU_preheat' in metrics and
+                    'CO2_preheat' in metrics and
+                    'BTU_bbp' in metrics and
+                    'CO2_bbp' in metrics and
+#                    'BTU_cooling' in metrics and
+#                    'CO2_cooling' in metrics and
+                    'BTU_roast' in metrics and
+#                    'BTU_roast_per_green_kg' in metrics and
+                    'CO2_roast' in metrics and
+                    'CO2_batch_per_green_kg' in metrics and
+                    'CO2_roast_per_green_kg' in metrics and
+#                    'BTU_LPG' in metrics and
+#                    'BTU_NG' in metrics and
+#                    'BTU_ELEC' in metrics and
+#                    'BTU_METER1' in metrics and
+#                    'BTU_METER2' in metrics and
+                    'KWH_batch_per_green_kg' in metrics and
+                    'KWH_roast_per_green_kg' in metrics and
+                     metrics['BTU_batch'] > 0):
+
                 energy_unit = self.aw.qmc.energyunits[self.aw.qmc.energyresultunit_setup]
                 #
                 total_energy = scaleFloat2String(self.aw.qmc.convertHeat(metrics['BTU_batch'],'BTU',self.aw.qmc.energyunits[self.aw.qmc.energyresultunit_setup]))

@@ -315,7 +315,7 @@ def extractProfileRoastPathHTML(url:'QUrl', _:'ApplicationWindow') -> Optional['
                     res['extradrawstyles1'].append('default')
                     res['extradrawstyles2'].append('default')
                     ror = data['rorData']
-                    timex = [dateutil.parser.parse(d['Timestamp']).timestamp() - baseTime if 'Tiestamp' in d else 0 for d in ror]
+                    timex = [dateutil.parser.parse(d['Timestamp']).timestamp() - baseTime if 'Timestamp' in d else 0 for d in ror]
                     res['extratimex'].append(timex)
                     res['extratemp1'].append([d.get('StandardValue', -1) for d in ror])
                     res['extratemp2'].append([-1]*len(timex))

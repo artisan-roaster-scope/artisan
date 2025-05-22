@@ -12556,7 +12556,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 ('capacity',drop_trailing_zero(f'{self.qmc.roastersize}')),
                 ('drumspeed',f'{self.qmc.drumspeed}'),
                 ('mode',self.qmc.mode),
-                ('test',setdecimal(cp['finish_phase_delta_temp']) if 'test' in cp else setdecimal(0.0)),
+                ('test',setdecimal(cp['finish_phase_delta_temp']) if 'test' in cp and 'finish_phase_delta_temp' in cp else setdecimal(0.0)),
                 ('weightloss',drop_trailing_zero(f"{cp['weight_loss']}") if 'weight_loss' in cp else '0'),
                 ('volumegain',drop_trailing_zero(f"{cp['volume_gain']}") if 'volume_gain' in cp else '0'),
                 ('densityloss',drop_trailing_zero(density_loss)),
@@ -12653,7 +12653,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 ('btubatchpergreenkg',f"{cp['BTU_batch_per_green_kg']}" if 'BTU_batch_per_green_kg' in cp else '0'),
                 ('bturoastpergreenkg',f"{cp['BTU_roast_per_green_kg']}" if 'BTU_roast_per_green_kg' in cp else '0'),
                 ('effbatch',f"{cp['KWH_batch_per_green_kg']}" if 'KWH_batch_per_green_kg' in cp else '0'),
-                ('effroast',f"{cp['KWH_roast_per_green_kg']}" if 'KEH_roast_per_green_kg' in cp else '0'),
+                ('effroast',f"{cp['KWH_roast_per_green_kg']}" if 'KWH_roast_per_green_kg' in cp else '0'),
                 ]
 
             _ignorecase = re.IGNORECASE  # @UndefinedVariable
@@ -14821,9 +14821,17 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         ws.cell(row=r,column=c,value=fe[0])
                     for el in extraslist:
                         c += 1
-                        ws.cell(row=r,column=c).value = el[0]
+                        try:
+                            # error: Cannot assign to attribute "value" for class "MergedCell" "str" is not assignable to "None"
+                            ws.cell(row=r,column=c).value = el[0] # pyright:ignore[reportAttributeAccessIssue]
+                        except Exception:
+                            pass
                         c += 1
-                        ws.cell(row=r,column=c).value = el[1]
+                        try:
+                            # error: Cannot assign to attribute "value" for class "MergedCell" "str" is not assignable to "None"
+                            ws.cell(row=r,column=c).value = el[1] # pyright:ignore[reportAttributeAccessIssue]
+                        except Exception:
+                            pass
 
                     for i in range(ws.max_column):
                         ws.cell(row=r,column=i+1).font = bf
@@ -16190,7 +16198,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             maxAllowedTime_fromPrevEnd_toStart = 60 #seconds, max gap time between roast recordings
             minBbpTime = 90 #seconds, the minimum amount of time recorded in the current roast before CHARGE
             # is there data from a prev roast?
-            if self.qmc.bbpCache and checkCache:
+            if (self.qmc.bbpCache and checkCache and
+                    'end_roastepoch_msec' in self.qmc.bbpCache and
+                    'drop_to_end' in self.qmc.bbpCache and
+                    'drop_bt' in self.qmc.bbpCache and
+                    'drop_et' in self.qmc.bbpCache and
+                    'end_events' in self.qmc.bbpCache and
+                    'drop_events' in self.qmc.bbpCache and
+                    'drop_to_end' in self.qmc.bbpCache):
                 _log.debug('bbpCache exists')
                 bbpGap = self.qmc.roastepoch - (self.qmc.bbpCache['end_roastepoch_msec']/1000)
                 # did the prev roast end shortly before this roast began?  If not clear bbpCache
@@ -18755,10 +18770,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 QTimer.singleShot(2000, self.startWebLCDsforced)
             # start Task Green Web Display
             if self.taskWebDisplayGreenActive:
-                QTimer.singleShot(2500, self.startWebGreenforced)
+                QTimer.singleShot(2001, self.startWebGreenforced)
             # start Task Roasted Web Display
             if self.taskWebDisplayRoastedActive:
-                QTimer.singleShot(3000, self.startWebRoastedforced)
+                QTimer.singleShot(2002, self.startWebRoastedforced)
 
 
 #--- BEGIN GROUP ExtraEventButtons
@@ -19033,11 +19048,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             if not self.app.artisanviewerMode and (not self.taskWebDisplayGreenActive or force):
                 from artisanlib.weblcds import WebGreen
                 self.taskWebDisplayGreen_server = WebGreen(
+                    f"Artisan – {QApplication.translate('GroupBox', 'Task Green')}",
                     self.taskWebDisplayGreenPort,
                     str(getResourcePath()))
                 res = self.taskWebDisplayGreen_server.startWeb()
                 if res:
                     self.taskWebDisplayGreenActive = True
+                    if self.schedule_window is not None:
+                        self.schedule_window.green_web_display.update()
                     return True
                 self.stopWebGreen()
                 self.taskWebDisplayGreenActive = False
@@ -19075,22 +19093,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             if not self.app.artisanviewerMode and (not self.taskWebDisplayRoastedActive or force):
                 from artisanlib.weblcds import WebRoasted
                 self.taskWebDisplayRoasted_server = WebRoasted(
+                    f"Artisan – {QApplication.translate('GroupBox', 'Task Roasted')}",
                     self.taskWebDisplayRoastedPort,
-                    str(getResourcePath()),
-                    self.taskWebDisplayRoastedIndexPath,
-                    self.taskWebDisplayRoastedWebSocketPath,
-                    ('&nbsp;&nbsp;-.-' if self.qmc.LCDdecimalplaces else '&nbsp;--'),
-                    self.lcdpaletteF['timer'],
-                    self.lcdpaletteB['timer'],
-                    self.lcdpaletteF['bt'],
-                    self.lcdpaletteB['bt'],
-                    self.lcdpaletteF['et'],
-                    self.lcdpaletteB['et'],
-                    self.qmc.ETlcd,
-                    self.qmc.BTlcd)
+                    str(getResourcePath()))
                 res = self.taskWebDisplayRoasted_server.startWeb()
                 if res:
                     self.taskWebDisplayRoastedActive = True
+                    if self.schedule_window is not None:
+                        self.schedule_window.roasted_web_display.update()
                     return True
                 self.stopWebRoasted()
                 self.taskWebDisplayRoastedActive = False
