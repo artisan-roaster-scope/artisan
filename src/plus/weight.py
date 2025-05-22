@@ -169,7 +169,7 @@ class WeightManager:
             self.next_green_item = item
             self.greenItemSemaphore.release(1)
 
-            if True: # TODO: if green weighing process is not running
+            if True: # TODO: if green weighing process is not running  # pylint: disable=fixme,using-constant-test
                 # if there is no scale, we fetch that item immediately and start "processing"
                 # even if there is already a current one in "processing"
                 self.fetch_next_green()
@@ -217,7 +217,7 @@ class WeightManager:
             self.next_roasted_item = item
             self.roastedItemSemaphore.release(1)
 
-            if True: # TODO: if roasted weighing process is not running
+            if True: # TODO: if roasted weighing process is not running  # pylint: disable=fixme,using-constant-test
                 # if there is no scale, we fetch that item immediately and start "processing"
                 # even if there is already a current one in "processing"
                 self.fetch_next_roasted()

@@ -3750,7 +3750,7 @@ class GreenWebDisplay(GreenDisplay):
         self.rendered_task = cast(TaskWebDisplayPayload, dict(self.empty_task)) # reset with a copy of the empty_task
         self.update()
 
-    # TODO: display needs to be updated also on WebDisplay start!
+    # TODO: display needs to be updated also on WebDisplay start! # pylint: disable=fixme
     def show_item(self, item:'WeightItem') -> None:
         if isinstance(item, GreenWeightItem) and item != self.last_item: # as item is of type WeightItem and this is declared as @dataclass the equality is structural here
             self.last_item = item
