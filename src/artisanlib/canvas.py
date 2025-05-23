@@ -5226,9 +5226,6 @@ class tgraphcanvas(FigureCanvas):
                 _log.exception(e)
             self.aw.lcd3.display(btstr)
 
-            ## publish data to MQTT
-            modbus_interceptor.publish_to_mqtt(etstr, btstr)
-
             ## Delta LCDs:
             deltaetstr = resLCD
             deltabtstr = resLCD
@@ -5248,6 +5245,9 @@ class tgraphcanvas(FigureCanvas):
                 _log.exception(e)
             self.aw.lcd4.display(deltaetstr)
             self.aw.lcd5.display(deltabtstr)
+
+            ## publish data to MQTT
+            modbus_interceptor.publish_to_mqtt(etstr, btstr, deltaetstr, deltabtstr)
             try:
                 self.updateLargeDeltaLCDs(deltabt=deltabtstr,deltaet=deltaetstr)
             except Exception as e: # pylint: disable=broad-except

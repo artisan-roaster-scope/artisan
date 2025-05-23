@@ -35,3 +35,5 @@ outbox/
 
 src/mqtt_pub.py
 src/mqtt_sub.py
+src/modbus_scanner.py
+src/modbus_scanner_2.py
