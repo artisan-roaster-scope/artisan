@@ -49,8 +49,7 @@ class SantokerCube_BLE(ClientBLE):
         super().__init__()
 
         # Protocol parser variables
-        self._read_queue : asyncio.Queue[bytes] = asyncio.Queue(maxsize=200)
-        self._input_stream = IteratorReader(AsyncIterable(self._read_queue))
+        self._read_queue : Optional[asyncio.Queue[bytes]] = None
         self._read_msg:Callable[[Union[asyncio.StreamReader, IteratorReader]], Awaitable[None]] = read_msg
 
         # handlers
@@ -62,9 +61,9 @@ class SantokerCube_BLE(ClientBLE):
         self.add_write(self.SANTOKER_CUBE_SERVICE_UUID, self.SANTOKER_CUBE_WRTIE_UUID)
 
     def notify_callback(self, _sender:'BleakGATTCharacteristic', data:bytearray) -> None:
-        if self._logging:
-            _log.debug('notify: %s => %s', self._read_queue.qsize(), data)
-        if hasattr(self, '_async_loop_thread') and self._async_loop_thread is not None:
+        if hasattr(self, '_async_loop_thread') and self._async_loop_thread is not None and self._read_queue is not None:
+            if self._logging:
+                _log.debug('notify: %s => %s', self._read_queue.qsize(), data)
             asyncio.run_coroutine_threadsafe(
                     self._read_queue.put(bytes(data)),
                     self._async_loop_thread.loop)
@@ -77,7 +76,9 @@ class SantokerCube_BLE(ClientBLE):
         if self._disconnected_handler is not None:
             self._disconnected_handler()
 
-    async def reader(self, stream:IteratorReader) -> None:
+    async def reader(self) -> None:
+        self._read_queue = asyncio.Queue(maxsize=200) # queue needs to be started in the current async event loop!
+        stream = IteratorReader(AsyncIterable(self._read_queue))
         while True:
             await self._read_msg(stream)
 
@@ -85,7 +86,7 @@ class SantokerCube_BLE(ClientBLE):
         if hasattr(self, '_async_loop_thread') and self._async_loop_thread is not None:
             # start the reader
             asyncio.run_coroutine_threadsafe(
-                    self.reader(self._input_stream),
+                    self.reader(),
                     self._async_loop_thread.loop)
 
 

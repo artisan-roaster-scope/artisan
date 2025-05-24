@@ -74,10 +74,11 @@ python-bidi==0.6.6; python_version >= '3.9'
 arabic-reshaper==3.0.0
 pillow==10.4.0; python_version < '3.9' # last Python 3.8 release
 pillow>=11.2.1; python_version >= '3.9'
-pydantic==2.11.4; (platform_system=='Windows' and python_version>'3.10') or sys_platform=='darwin' or platform_system=='Linux'
+pydantic==2.11.5; (platform_system=='Windows' and python_version>'3.10') or sys_platform=='darwin' or platform_system=='Linux'
 pydantic==2.7.1; (platform_system=='Windows' and python_version<'3.9')  # last version working with Windows 7/8 pending resolution of pydantic Issue #9920
 babel==2.17.0
 bleak==0.22.3
+python-statemachine==2.5.0
 #
 #
 ######
@@ -95,8 +96,10 @@ yoctopuce==2.1.6320; sys_platform!='darwin' or (sys_platform=='darwin' and platf
 ##
 ## Qt5 on macOS <11 and Windows 7/8 (PyQt5.15.10 is the last version supported on macOS 10.13!)
 PyQt5-sip==12.15.0; (sys_platform=='darwin' and platform_release<'20.0') or (platform_system=='Windows' and python_version<'3.9') # v12.16 requires Python 3.9 or later
-PyQt5==5.15.11; (sys_platform=='darwin' and platform_release<'20.0') or (platform_system=='Windows' and python_version<'3.9')
-PyQtWebEngine==5.15.7; (sys_platform=='darwin' and platform_release<'20.0') or (platform_system=='Windows' and python_version<'3.9')
+PyQt5==5.15.10; (sys_platform=='darwin' and platform_release<'20.0') # PyQt5 5.15.11 only for macOS 11+
+PyQt5==5.15.11; (platform_system=='Windows' and python_version<'3.9')
+PyQtWebEngine==5.15.6; (sys_platform=='darwin' and platform_release<'20.0') # PyQtWebEngine 5.15.7 only for macOS 11+
+PyQtWebEngine==5.15.7; (platform_system=='Windows' and python_version<'3.9')
 # Qt6 on macOS 11+, Windows 10/11 and Linux
 PyQt6==6.9.0; (sys_platform=='darwin' and platform_release>='20.0') or (platform_system=='Windows' and python_version>'3.10') or (platform_system=='Linux' and platform_machine!='aarch64')
 PyQt6-WebEngine==6.9.0; (sys_platform=='darwin' and platform_release>='20.0') or (platform_system=='Windows' and python_version>'3.10') or (platform_system=='Linux' and platform_machine!='aarch64')

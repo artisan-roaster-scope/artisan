@@ -1687,7 +1687,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.taskWebDisplayRoasted_server:Optional[WebRoasted] = None # holds the Roasted Web display instance
 
         # Scales
-        self.scale_manager:ScaleManager = ScaleManager()
+        self.scale_manager:ScaleManager = ScaleManager(self.scale_connected_handler, self.scale_disconnected_handler)
         # association of scale ids (eg. BLE addresses) to custom user names for the scales
         self.custom_scale_ids:List[str] = []   # same length as self.custom_scale_names
         self.custom_scale_names:List[str] = [] # same length as self.custom_scale_ids
@@ -4294,6 +4294,19 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.zoomOutShortcut = QShortcut(QKeySequence.StandardKey.ZoomOut, self)
         self.zoomOutShortcut.activated.connect(self.zoomOut)
 
+    def scale_connected_handler(self, scale_id:str, scale_name:str) -> None:
+        if scale_name:
+            name = (self.getScaleName((scale_name, scale_id)) if scale_id else scale_name)
+        else:
+            name = QApplication.translate('Tab','Scale')
+        self.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format(name),True,None)
+
+    def scale_disconnected_handler(self, scale_id:str, scale_name:str) -> None:
+        if scale_name:
+            name = (self.getScaleName((scale_name, scale_id)) if scale_id else scale_name)
+        else:
+            name = QApplication.translate('Tab','Scale')
+        self.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format(name),True,None)
 
     # returns the custom name associated with the given scale_id if any, or None
     def get_custom_scale_name(self, scale_id:str) -> Optional[str]:
@@ -4452,7 +4465,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             if self.scheduler_auto_open:
                 if item_count > 0 and plus.controller.is_connected():
                     # if plus is connected and there are open schedule items, we open the scheduler window automatically
-                    self.schedule()
+                    self.schedule(True)
                 elif item_count == 0:
                     self.scheduler_auto_open = True # next time new schedule items arrive we again auto open
             # in any case we update the badge
@@ -18729,6 +18742,13 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     self.scale2_id = None
             self.container2_idx = toInt(settings.value('container2_idx',int(self.container2_idx)))
             settings.endGroup()
+
+            # configure the two scales according to the settings just loaded
+            if self.scale1_model is not None and self.scale1_id is not None and self.scale1_name is not None:
+                self.scale_manager.set_scale1_signal.emit(self.scale1_model, self.scale1_id, self.scale1_name)
+            if self.scale2_model is not None and self.scale2_id is not None and self.scale2_name is not None:
+                self.scale_manager.set_scale1_signal.emit(self.scale2_model, self.scale2_id, self.scale2_name)
+
 #--- END GROUP Scales
 
             self.schedule_day_filter =toBool(settings.value('ScheduleDayFilter',self.schedule_day_filter))
@@ -18742,7 +18762,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.scheduler_filters_visible = toBool(settings.value('SchedulerFilter',self.scheduler_filters_visible))
             if self.scheduleFlag:
                 try:
-                    self.schedule()
+                    QTimer.singleShot(700, lambda:self.schedule(True))
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
 
@@ -19056,6 +19076,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     self.taskWebDisplayGreenActive = True
                     if self.schedule_window is not None:
                         self.schedule_window.green_web_display.update()
+                    else:
+                        # send init message
+                        from json import dumps as json_dumps
+                        msg = json_dumps(plus.schedule.GreenWebDisplay.INIT_PAYLOAD, indent=None, separators=(',', ':'))
+                        self.taskWebDisplayGreen_server.send_msg(msg)
                     return True
                 self.stopWebGreen()
                 self.taskWebDisplayGreenActive = False
@@ -19082,7 +19107,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
 
-    ## WebGreen
+    ## WebRoasted
 
     @pyqtSlot()
     def startWebRoastedforced(self) -> None:
@@ -19101,6 +19126,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     self.taskWebDisplayRoastedActive = True
                     if self.schedule_window is not None:
                         self.schedule_window.roasted_web_display.update()
+                    else:
+                        # send init message
+                        from json import dumps as json_dumps
+                        msg = json_dumps(plus.schedule.RoastedWebDisplay.INIT_PAYLOAD, indent=None, separators=(',', ':'))
+                        self.taskWebDisplayRoasted_server.send_msg(msg)
                     return True
                 self.stopWebRoasted()
                 self.taskWebDisplayRoastedActive = False
@@ -20566,6 +20596,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
 
     def stopActivities(self) -> None:
+        # disconnect connected scales
+        self.scale_manager.disconnect_all()
+
         # if BLE was used we need to terminate its singular thread/asyncloop running the bleak scan and connect:
         try:
             if 'artisanlib.ble_port' in sys.modules:
@@ -24591,15 +24624,15 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
     @pyqtSlot()
     @pyqtSlot(bool)
-    def schedule(self, _:bool = False) -> None:
-        if self.schedule_window is None:
+    def schedule(self, b:bool = False) -> None:
+        if b and self.schedule_window is None:
             if  not self.app.artisanviewerMode:  # no scheduler in ArtisanViewer mode
                 self.schedule_window = plus.schedule.ScheduleWindow(self, self, self.schedule_activeTab)
                 if self.schedule_window is not None:
                     self.scheduleFlag = True
                     self.scheduleAction.setChecked(True)
                     self.schedule_window.show()
-        else:
+        elif self.schedule_window is not None:
             self.schedule_window.close()
             self.schedule_window = None
 

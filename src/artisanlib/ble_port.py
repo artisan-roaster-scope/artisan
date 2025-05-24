@@ -20,6 +20,11 @@ import logging
 from bleak import BleakScanner, BleakClient
 from bleak.exc import BleakCharacteristicNotFoundError
 
+try:
+    from PyQt6.QtCore import QObject # @UnusedImport @Reimport  @UnresolvedImport
+except ImportError:
+    from PyQt5.QtCore import QObject # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+
 from artisanlib.async_comm import AsyncLoopThread
 
 from typing import Optional, Callable, Union, Dict, List, Set, Tuple, Awaitable, TYPE_CHECKING
@@ -185,7 +190,7 @@ class BLE:
             _log.error('exception in scan_and_connect: %s', fut.exception())
             return None, None
 
-    def disconnect(self, client:'BleakClient') -> bool:
+    def disconnect_ble(self, client:'BleakClient') -> bool:
         if hasattr(self, '_asyncLoopThread') and self._asyncLoopThread is not None:
             # don't wait for completion not to block caller (note: ble device will not be discovered until fully disconnected)
             asyncio.run_coroutine_threadsafe(client.disconnect(), self._asyncLoopThread.loop)
@@ -221,7 +226,7 @@ ble = BLE() # unique to module
 
 
 
-class ClientBLE:
+class ClientBLE(QObject): # pyright:ignore[reportGeneralTypeIssues] # error: Argument to class must be a base class
 
 # NOTE: __slots__ are incompatible with multiple inheritance mixings in subclasses (e.g. with QObject)
 #    __slots__ = [ '_running', '_async_loop_thread', '_ble_client', '_connected_service_uuid', '_disconnected_event',
@@ -230,6 +235,7 @@ class ClientBLE:
 #                    '_logging'  ]
 
     def __init__(self) -> None:
+        super().__init__()
         # internals
         self._running:bool                                   = False           # if True we keep reconnecting
         self._async_loop_thread: Optional[AsyncLoopThread]   = None            # the asyncio AsyncLoopThread object
@@ -274,7 +280,7 @@ class ClientBLE:
 
     def _disconnect(self) -> None:
         if self._ble_client is not None and self._ble_client.is_connected:
-            ble.disconnect(self._ble_client)
+            ble.disconnect_ble(self._ble_client)
 
     # returns the service UUID connected to or None
     def connected(self) -> Optional[str]:
@@ -394,6 +400,26 @@ class ClientBLE:
             self._keep_alive())
 
 
+    def scan(self, scan_timeout:float = 3.0) -> 'List[Tuple[BLEDevice, AdvertisementData]]':
+        try:
+            if not hasattr(self, '_async_loop_thread') or self._async_loop_thread is None:
+                self._running = True # enable automatic reconnects
+                self._async_loop_thread = AsyncLoopThread()
+                # run scan in async loop
+                coro = BleakScanner.discover(
+                    timeout=scan_timeout,
+                    return_adv=True)
+                res = asyncio.run_coroutine_threadsafe(
+                    coro,
+                    self._async_loop_thread.loop).result()
+                _log.debug('scan_ble ended')
+                if res:
+                    return list(res.values())
+        except Exception as e:  # pylint: disable=broad-except
+            _log.exception(e)
+        return []
+
+
     def start(self, case_sensitive:bool=True, scan_timeout:float=6, connect_timeout:float=6, address:Optional[str] = None) -> None:
         _log.debug('start')
         if self._running:
@@ -487,25 +513,3 @@ class ClientBLE:
         ...
     def heartbeat(self) -> None: # pylint: disable=no-self-use
         ...
-
-
-##
-
-# scans for named BLE devices providing any of the provided servie_uuids
-# returns a list of triples (name, address, Optional[BLEDevice])
-def scan_ble(timeout: float = 3.0) -> 'List[Tuple[BLEDevice, AdvertisementData]]':
-    _log.debug('scan_ble(%s) started', timeout)
-    coro = BleakScanner.discover(
-        timeout=timeout,
-        return_adv=True)
-    try:
-        loop = asyncio.get_running_loop()
-        res = asyncio.run_coroutine_threadsafe(coro, loop).result()
-    except RuntimeError:
-        res = asyncio.run(coro)
-    _log.debug('scan_ble ended')
-    if res:
-#        _log.debug('scan_ble results: %s', res.values())
-        return list(res.values())
-    _log.debug('scan_ble returned no results')
-    return []

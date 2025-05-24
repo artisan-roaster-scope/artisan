@@ -24,13 +24,13 @@ if TYPE_CHECKING:
     from bleak.backends.characteristic import BleakGATTCharacteristic  # pylint: disable=unused-import
 
 try:
-    from PyQt6.QtCore import QObject # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtCore import pyqtSignal, pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
 except ImportError:
-    from PyQt5.QtCore import QObject # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import pyqtSignal, pyqtSlot # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib.ble_port import ClientBLE
 from artisanlib.async_comm import AsyncIterable, IteratorReader
-from artisanlib.scale import Scale
+from artisanlib.scale import Scale, ScaleSpecs
 from artisanlib.util import float2float
 
 
@@ -185,8 +185,12 @@ ACAIA_SCALE_NAMES = [
 
 
 
-class AcaiaBLE(QObject, ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
 
+    weight_changed_signal = pyqtSignal(float) # delivers new weight in g with decimals for accurate conversion
+    battery_changed_signal = pyqtSignal(int)  # delivers new batter level in %
+    connected_signal = pyqtSignal()     # issued on connect
+    disconnected_signal = pyqtSignal()  # issued on disconnect
 
     # Acaia message constants
     HEADER1:Final[bytes]      = b'\xef'
@@ -212,8 +216,7 @@ class AcaiaBLE(QObject, ClientBLE): # pyright: ignore [reportGeneralTypeIssues] 
         self.scale_class:SCALE_CLASS = SCALE_CLASS.MODERN
 
         # Protocol parser variables
-        self._read_queue : asyncio.Queue[bytes] = asyncio.Queue(maxsize=200)
-        self._input_stream = IteratorReader(AsyncIterable(self._read_queue))
+        self._read_queue : Optional[asyncio.Queue[bytes]] = None
 
         self.id_sent:bool = False # ID is sent once after first data is received from scale
         self.fast_notifications_sent:bool = False # after connect we switch fast notification on to receive first reading fast
@@ -250,13 +253,6 @@ class AcaiaBLE(QObject, ClientBLE): # pyright: ignore [reportGeneralTypeIssues] 
         self.add_notify(ACAIA_UMBRA_NOTIFY_UUID, self.notify_callback)
         self.add_write(ACAIA_UMBRA_SERVICE_UUID, ACAIA_UMBRA_WRITE_UUID)
 
-    def set_connected_handler(self, connected_handler:Optional[Callable[[], None]]) -> None:
-        self._connected_handler = connected_handler
-
-    def set_disconnected_handler(self, disconnected_handler:Optional[Callable[[], None]]) -> None:
-        self._disconnected_handler = disconnected_handler
-
-
     # protocol parser
 
 
@@ -288,11 +284,13 @@ class AcaiaBLE(QObject, ClientBLE): # pyright: ignore [reportGeneralTypeIssues] 
             self.set_heartbeat(0) # disable heartbeat
         if self._connected_handler is not None:
             self._connected_handler()
+        self.connected_signal.emit()
 
     def on_disconnect(self) -> None:
         _log.debug('disconnected')
         if self._disconnected_handler is not None:
             self._disconnected_handler()
+        self.disconnected_signal.emit()
 
 
     ##
@@ -357,7 +355,7 @@ class AcaiaBLE(QObject, ClientBLE): # pyright: ignore [reportGeneralTypeIssues] 
             # if value is fresh and reading is stable
             if value_rounded != self.weight: # and stable:
                 self.weight = value_rounded
-                self.weight_changed(self.weight)
+                self.weight_changed_signal.emit(self.weight)
                 _log.debug('new weight: %s', self.weight)
 
     # returns length of consumed data or -1 on error
@@ -373,7 +371,7 @@ class AcaiaBLE(QObject, ClientBLE): # pyright: ignore [reportGeneralTypeIssues] 
         b = payload[0]
         if 0 <= b <= 100:
             self.battery = int(payload[0])
-            self.battery_changed(self.battery)
+            self.battery_changed_signal.emit(self.battery)
             _log.debug('battery: %s', self.battery)
         return EVENT_LEN.BATTERY
 
@@ -503,7 +501,7 @@ class AcaiaBLE(QObject, ClientBLE): # pyright: ignore [reportGeneralTypeIssues] 
         # byte 1: battery level (7 bits of second byte) + TIMER_START (1bit)
         if payload and len(payload) > 1:
             self.battery = int(payload[1] & ~(1 << 7))
-            self.battery_changed(self.battery)
+            self.battery_changed_signal.emit(self.battery)
             _log.debug('battery: %s%%', self.battery)
 
         # byte 2:
@@ -737,7 +735,7 @@ class AcaiaBLE(QObject, ClientBLE): # pyright: ignore [reportGeneralTypeIssues] 
     ###
 
     def notify_callback(self, _sender:'BleakGATTCharacteristic', data:bytearray) -> None:
-        if hasattr(self, '_async_loop_thread') and self._async_loop_thread is not None:
+        if hasattr(self, '_async_loop_thread') and self._async_loop_thread is not None and self._read_queue is not None:
             asyncio.run_coroutine_threadsafe(
                     self._read_queue.put(bytes(data)),
                     self._async_loop_thread.loop)
@@ -752,7 +750,9 @@ class AcaiaBLE(QObject, ClientBLE): # pyright: ignore [reportGeneralTypeIssues] 
     # 6 data:       d[4:10]  = b'\x02\x14\x02<\x14\x00'
     # 2 crc:        d[10:12] = b'\x00W\x18'  # calculated over "data_len+data"
 
-    async def reader(self, stream:IteratorReader) -> None:
+    async def reader(self) -> None:
+        self._read_queue = asyncio.Queue(maxsize=200) # queue needs to be started in the current async event loop!
+        stream = IteratorReader(AsyncIterable(self._read_queue))
         while True:
             try:
                 await stream.readuntil(self.HEADER1)
@@ -769,50 +769,68 @@ class AcaiaBLE(QObject, ClientBLE): # pyright: ignore [reportGeneralTypeIssues] 
                         else:
                             _log.debug('CRC error: %s <- %s',self.crc(data),data)
             except Exception as e:  # pylint: disable=broad-except
-                _log.exception(e)
+                _log.error(e)
 
 
     def on_start(self) -> None:
         if hasattr(self, '_async_loop_thread') and self._async_loop_thread is not None:
             # start the reader
             asyncio.run_coroutine_threadsafe(
-                    self.reader(self._input_stream),
+                    self.reader(),
                     self._async_loop_thread.loop)
 
 
-    def weight_changed(self, new_value:float) -> None:  # pylint: disable=no-self-use
-        del new_value
-
-
-    def battery_changed(self, new_value:int) -> None: # pylint: disable=no-self-use
-        del new_value
-
-
-
-# AcaiaBLE and its super class are not allowed to hold __slots__
-class Acaia(AcaiaBLE, Scale): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+class Acaia(Scale): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
 
     def __init__(self, model:int, ident:Optional[str], name:Optional[str], connected_handler:Optional[Callable[[], None]] = None,
                        disconnected_handler:Optional[Callable[[], None]] = None):
-        Scale.__init__(self, model, ident, name)
-        AcaiaBLE.__init__(self, connected_handler = connected_handler, disconnected_handler=disconnected_handler)
+        super().__init__(model, ident, name)
+        self.acaia = AcaiaBLE(connected_handler = connected_handler, disconnected_handler=disconnected_handler)
+        self.acaia.weight_changed_signal.connect(self.weight_changed)
+        self.acaia.connected_signal.connect(self.on_connect)
+        self.acaia.disconnected_signal.connect(self.on_disconnect)
+
+        self.scale_connected = False
+
+
+    def scan(self) -> None:
+        devices = self.acaia.scan()
+        acaia_devices:ScaleSpecs = []
+        # for Acaia scales we filter by name
+        for d, a in devices:
+            name = (a.local_name or d.name)
+            if name:
+                match = next((f'{product_name} ({name})' for (name_prefix, product_name) in ACAIA_SCALE_NAMES
+                            if name and name.startswith(name_prefix)), None)
+                if match is not None:
+                    acaia_devices.append((match, d.address))
+        self.scanned_signal.emit(acaia_devices)
+
+    def is_connected(self) -> bool:
+        return self.scale_connected
 
     def connect_scale(self) -> None:
-        _log.debug('connect_scale')
-        self.start(address=self.ident)
+        self.acaia.start(address=self.ident)
 
     def disconnect_scale(self) -> None:
-        self.stop()
+        self.acaia.stop()
 
+    @pyqtSlot(float)
     def weight_changed(self, new_value:float) -> None:
         self.weight_changed_signal.emit(new_value)
 
     def battery_changed(self, new_value:int) -> None:
         self.battery_changed_signal.emit(new_value)
 
+    @pyqtSlot()
+    def on_connect(self) -> None:
+        self.scale_connected = True
+        self.connected_signal.emit()
+
+    @pyqtSlot()
     def on_disconnect(self) -> None:
+        self.scale_connected = False
         self.disconnected_signal.emit()
-        AcaiaBLE.on_disconnect(self)
 
     def tare_scale(self) -> None:
-        self.send_tare()
+        self.acaia.send_tare()

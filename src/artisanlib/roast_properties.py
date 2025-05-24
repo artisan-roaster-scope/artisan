@@ -1483,7 +1483,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                     self.acaia.battery_changed_signal.connect(self.ble_battery_changed)
                     self.acaia.disconnected_signal.connect(self.ble_disconnected)
                     # start BLE loop
-                    self.acaia.start()
+                    self.acaia.connect_scale()
 
                     self.updateWeightLCD('----')
                 except Exception as e:  # pylint: disable=broad-except
@@ -2733,7 +2733,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
             try:
-                self.acaia.stop()
+                self.acaia.disconnect_scale()
                 self.updateWeightLCD('')
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)

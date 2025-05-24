@@ -71,7 +71,7 @@ import plus.config
 import plus.sync
 import plus.util
 from plus.util import datetime2epoch, epoch2datetime, schedulerLink, epoch2ISO8601, ISO86012epoch, plusLink
-from plus.weight import Display, GreenDisplay, RoastedDisplay, WeightManager, GreenWeightItem, RoastedWeightItem
+from plus.weight import Display, GreenDisplay, RoastedDisplay, PROCESS_STATE, WeightManager, GreenWeightItem, RoastedWeightItem
 from artisanlib.widgets import ClickableQLabel, ClickableQLineEdit, Splitter
 from artisanlib.dialogs import ArtisanResizeablDialog
 from artisanlib.util import (float2float, convertWeight, weight_units, render_weight, comma2dot, float2floatWeightVolume, getDirectory, getResourcePath)
@@ -167,11 +167,12 @@ class TaskWebDisplayPayload(TypedDict):
     batchsize:str          # rendered batch size | max ~6 characters
     weight:str             # remaining weight to be added | max 6 characters
     percent:float          # percent of current green component already added / roasted weight loss
-    state:int              # processing state (0:disconnected, 1:connected, 2:weighing, 3:done, 4:canceled)
+    state:PROCESS_STATE    # processing state (0:disconnected, 1:connected, 2:weighing, 3:done, 4:canceled)
     bucket: int            # number of buckets used from {0, 1, 2}
     blend_percent: str     # percentage of blend component | max ~6 characters
     total_percent: float   # total percentage of task completion
     type:int               # task type (0:green, 1: roasted, 2:defects)
+
 
 class CompletedItemDict(TypedDict):
     scheduleID:str         # the ID of the ScheduleItem this completed item belongs to
@@ -2517,11 +2518,17 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
 
     @pyqtSlot()
     def close(self) -> bool:
-        self.closeEvent(None)
+        try:
+            # wait until drag-and-drop and updateScheduleWindow operations are done
+            update_schedule_window_semaphore.tryAcquire(1)
+            self.closeEvent(None)
+        finally:
+            if update_schedule_window_semaphore.available() < 1:
+                update_schedule_window_semaphore.release(1)
         return True
 
     def closeScheduler(self) -> None:
-        self.weight_manager.reset() # reset the WeightManager and clear all connected displays
+        self.weight_manager.stop() # reset the WeightManager to clear all connected displays and disconnect from connected scales
         self.aw.scheduled_items_uuids = self.get_scheduled_items_ids()
         # remember Dialog geometry
         settings = QSettings()
@@ -3711,7 +3718,9 @@ class WeightItemDisplay(Display):
         self.schedule_window.task_weight.setText('--')
         self.schedule_window.task_weight.setToolTip(QApplication.translate('Plus', 'nothing to weight'))
 
-    def show_item(self, item:'WeightItem') -> None:
+    def show_item(self, item:'WeightItem', state:PROCESS_STATE = PROCESS_STATE.DISCONNECTED, component:int = 0) -> None:
+        del state
+        del component
         todo_tab_active:bool = self.schedule_window.TabWidget.currentIndex() == 0
         if ((todo_tab_active and isinstance(item, GreenWeightItem)) or
             not todo_tab_active and isinstance(item, RoastedWeightItem)):
@@ -3726,46 +3735,56 @@ class WeightItemDisplay(Display):
 
 
 class GreenWebDisplay(GreenDisplay):
+
+    INIT_PAYLOAD:Final[TaskWebDisplayPayload] = {
+        'id': '',
+        'title': '',
+        'subtitle': '',
+        'batchsize': '',
+        'weight': '',
+        'percent': 0,
+        'state': PROCESS_STATE.DISCONNECTED,
+        'bucket': 0,
+        'blend_percent': '',
+        'total_percent': 0,
+        'type': 0 # 0:green task; constant
+    }
+
     def __init__(self, schedule_window:'ScheduleWindow') -> None:
         self.schedule_window:ScheduleWindow = schedule_window
         super().__init__()
         self.last_item:Optional[WeightItem] = None
-        self.empty_task:Final[TaskWebDisplayPayload] = {
-                'id': '',
-                'title': '',
-                'subtitle': '',
-                'batchsize': '',
-                'weight': '',
-                'percent': 0,
-                'state': 0,
-                'bucket': 0,
-                'blend_percent': '',
-                'total_percent': 0,
-                'type': 0 # 0:green task; constant
-            }
-        self.rendered_task:TaskWebDisplayPayload = cast(TaskWebDisplayPayload, dict(self.empty_task)) # initialize with a copy of the empty_task
+        self.last_process_state:PROCESS_STATE = PROCESS_STATE.DISCONNECTED
+        self.last_component:int = 0
+        self.rendered_task:TaskWebDisplayPayload = cast(TaskWebDisplayPayload, dict(self.INIT_PAYLOAD)) # initialize with a copy of the empty_task
 
     def clear_green(self) -> None:
         self.last_item = None
-        self.rendered_task = cast(TaskWebDisplayPayload, dict(self.empty_task)) # reset with a copy of the empty_task
+        self.last_process_state = PROCESS_STATE.DISCONNECTED
+        self.last_component = 0
+        self.rendered_task = cast(TaskWebDisplayPayload, dict(self.INIT_PAYLOAD)) # reset with a copy of the empty_task
         self.update()
 
-    # TODO: display needs to be updated also on WebDisplay start! # pylint: disable=fixme
-    def show_item(self, item:'WeightItem') -> None:
-        if isinstance(item, GreenWeightItem) and item != self.last_item: # as item is of type WeightItem and this is declared as @dataclass the equality is structural here
+    # component indicates which of the item.descriptions is currently processed
+    def show_item(self, item:'WeightItem', state:PROCESS_STATE = PROCESS_STATE.DISCONNECTED, component:int = 0) -> None:
+        if (isinstance(item, GreenWeightItem) and
+            (item != self.last_item or self.last_process_state != state or self.last_component != component)):
+                # NOTE: as item is of type WeightItem and this is declared as @dataclass the equality is structural here
             self.last_item = item
+            self.last_process_state = state
+            self.last_component = component
             self.rendered_task['id'] = item.position
             self.rendered_task['title'] = item.title
             self.rendered_task['batchsize'] = render_weight(item.weight, 1, item.weight_unit_idx)
             if item.descriptions:
-                self.rendered_task['blend_percent'] = (f'{item.descriptions[0][0] * 100:.0f}%' if item.descriptions[0][0] != 1 else '')
-                self.rendered_task['subtitle'] = item.descriptions[0][1]
+                self.rendered_task['blend_percent'] = (f'{item.descriptions[component][0] * 100:.0f}%' if item.descriptions[component][0] != 1 else '')
+                self.rendered_task['subtitle'] = item.descriptions[component][1]
             else:
                 self.rendered_task['blend_percent'] = ''
                 self.rendered_task['subtitle'] = ''
             self.rendered_task['weight'] = ''
             self.rendered_task['percent'] = 0
-            self.rendered_task['state'] = 0
+            self.rendered_task['state'] = state
             self.rendered_task['bucket'] = 0
             self.rendered_task['total_percent'] = 0
             self.update()
@@ -3777,33 +3796,44 @@ class GreenWebDisplay(GreenDisplay):
 
 
 class RoastedWebDisplay(RoastedDisplay):
+
+    INIT_PAYLOAD:Final[TaskWebDisplayPayload] = {
+        'id': '',
+        'title': '',
+        'subtitle': '',
+        'batchsize': '',
+        'weight': '',
+        'percent': 0,
+        'state': PROCESS_STATE.DISCONNECTED,
+        'bucket': 0,
+        'blend_percent': '',
+        'total_percent': 0,
+        'type': 1 # 1:roasted task; constant
+    }
+
+
     def __init__(self, schedule_window:'ScheduleWindow') -> None:
         self.schedule_window:ScheduleWindow = schedule_window
         super().__init__()
         self.last_item:Optional[WeightItem] = None
-        self.empty_task:Final[TaskWebDisplayPayload] = {
-                'id': '',
-                'title': '',
-                'subtitle': '',
-                'batchsize': '',
-                'weight': '',
-                'percent': 0,
-                'state': 0,
-                'bucket': 0,
-                'blend_percent': '',
-                'total_percent': 0,
-                'type': 1 # 1:roasted task; constant
-            }
-        self.rendered_task:TaskWebDisplayPayload = cast(TaskWebDisplayPayload, dict(self.empty_task)) # initialize with a copy of the empty_task
+        self.last_process_state:PROCESS_STATE = PROCESS_STATE.DISCONNECTED
+        self.last_component:int = 0
+        self.rendered_task:TaskWebDisplayPayload = cast(TaskWebDisplayPayload, dict(self.INIT_PAYLOAD)) # initialize with a copy of the empty_task
 
     def clear_roasted(self) -> None:
         self.last_item = None
-        self.rendered_task = cast(TaskWebDisplayPayload, dict(self.empty_task))  # reset with a copy of the empty_task
+        self.last_process_state = PROCESS_STATE.DISCONNECTED
+        self.last_component = 0
+        self.rendered_task = cast(TaskWebDisplayPayload, dict(self.INIT_PAYLOAD))  # reset with a copy of the empty_task
         self.update()
 
-    def show_item(self, item:'WeightItem') -> None:
-        if isinstance(item, RoastedWeightItem) and item != self.last_item: # as item is of type WeightItem and this is declared as @dataclass the equality is structural here
+    def show_item(self, item:'WeightItem', state:PROCESS_STATE = PROCESS_STATE.DISCONNECTED, component:int = 0) -> None:
+        if (isinstance(item, RoastedWeightItem) and
+                (item != self.last_item or self.last_process_state != state or self.last_component != component)):
+                # as item is of type WeightItem and this is declared as @dataclass the equality is structural here
             self.last_item = item
+            self.last_process_state = state
+            self.last_component = component
             self.rendered_task['id'] = item.position
             self.rendered_task['title'] = item.title
             self.rendered_task['batchsize'] = render_weight(item.weight, 1, item.weight_unit_idx)
@@ -3815,7 +3845,7 @@ class RoastedWebDisplay(RoastedDisplay):
                 self.rendered_task['subtitle'] = ''
             self.rendered_task['weight'] = ''
             self.rendered_task['percent'] = 0
-            self.rendered_task['state'] = 0
+            self.rendered_task['state'] = state
             self.rendered_task['bucket'] = 0
             self.rendered_task['total_percent'] = 0
             self.update()

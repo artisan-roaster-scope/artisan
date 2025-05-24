@@ -24,17 +24,29 @@
 import logging
 
 try:
-    from PyQt6.QtCore import QSemaphore # @Reimport @UnresolvedImport @UnusedImport
+    from PyQt6.QtCore import QObject, QSemaphore, pyqtSlot # @Reimport @UnresolvedImport @UnusedImport
 except ImportError:
-    from PyQt5.QtCore import QSemaphore # type: ignore[import-not-found,no-redef]  # @Reimport @UnresolvedImport @UnusedImport
+    from PyQt5.QtCore import QObject, QSemaphore, pyqtSlot # type: ignore[import-not-found,no-redef]  # @Reimport @UnresolvedImport @UnusedImport
 
 from dataclasses import dataclass
+from enum import IntEnum, unique
+from statemachine import StateMachine, State
 from typing import Optional, List, Tuple, Callable, Final
 
 from artisanlib.scale import ScaleManager
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
+
+
+
+@unique
+class PROCESS_STATE(IntEnum):
+    DISCONNECTED = 0
+    CONNECTED = 1
+    WEIGHING = 2
+    DONE = 3
+    CANCELD = 4
 
 @dataclass # creates an __eq__ method comparing objects by property values
 class WeightItem:
@@ -59,19 +71,6 @@ class GreenWeightItem(WeightItem):
 class RoastedWeightItem(WeightItem):
     ...
 
-#WebDisplay protocol
-#- id:str (schedule item position / roast batch nr)
-#- title:str
-#- subtitle:str
-#- batchsize:str
-#- weight:str
-#- percent: float => always present
-#- state:int (0:disconnected, 1:connected, 2:weighing, 3:done, 4:canceled)
-#- bucket: int {0,1,2}
-#- blend_percent: str # could be the empty string
-#- total_percent: float => could be dropped
-#- type:int (0:green, 1: roasted, 2:defects)
-
 
 # Consider
 #. if green: target weight (counts down)
@@ -95,7 +94,7 @@ class Display:
     def clear_roasted(self) -> None: # pylint: disable=no-self-use
         ...
 
-    def show_item(self, item:WeightItem) -> None: # pylint: disable=unused-argument,no-self-use
+    def show_item(self, item:WeightItem, state:PROCESS_STATE = PROCESS_STATE.DISCONNECTED, component:int = 0) -> None: # pylint: disable=unused-argument,no-self-use
         ...
 
 class GreenDisplay(Display):
@@ -105,53 +104,190 @@ class RoastedDisplay(Display):
     ...
 
 
+#------------
 
 
+class GreenWeighingState(StateMachine):
 
-#class Scale:
-#    __slots__ = [ 'display' ]
-#
-#    def __init__(self) -> None:
-#        self.display:Optional[Display] = None
-#
-#    def get_display(self) -> Optional[Display]:
-#        return self.display
-#
-#
-#class PhidgetScale(Scale):
-#    def __init__(self) -> None:
-#        super().__init__()
-#        self.display = Display()
-#
-#class AcaiaScale(Scale):
-#    ...
+    idle = State(initial=True)  # display_state = 0
+    scale = State()             # scale available, display_state = 1
+    item = State()              # current_item available, display_state = 0
+    ready = State()             # display_state = 1
 
+    current_item = (
+        idle.to(item)
+        | item.to(item)
+        | ready.to(ready)
+        | scale.to(ready)
+    )
 
+    clear_item = (
+        idle.to(idle)
+        | item.to(idle)
+        | ready.to(scale)
+    )
 
+    available = (
+        idle.to(scale)
+        | item.to(ready)
+    )
 
-class WeightManager:
+    unavailable = (
+        scale.to(idle)
+        | ready.to(item)
+    )
 
-    __slots__ = [ 'displays', 'scale_manager', 'next_green_item',  'next_roasted_item',  'current_green_item', 'current_roasted_item',
-                    'greenItemSemaphore', 'roastedItemSemaphore' ]
-
-
-    def __init__(self, displays:List[Display], scale_manager:ScaleManager) -> None:
-
-        self.scale_manager = scale_manager
+    def __init__(self, displays:List[Display]) -> None:
 
         # list of displays control, incl. the display of the selected scale if any
         self.displays: List[Display] = displays
+
+        # holds the WeightItem currently processed, if any
+        self.current_weight_item:Optional[GreenWeightItem] = None
+        self.process_state:PROCESS_STATE = PROCESS_STATE.DISCONNECTED
+        self.component:int = 0 # component (of blend) currently processed (0 <= self.component < len(self.current_weight_item.descriptions))
+
+        super().__init__(allow_event_without_transition=True) # no errors for events which do not lead to transitions
+
+    def after_current_item(self, weight_item:GreenWeightItem) -> None:
+        self.current_weight_item = weight_item
+        self.update_displays()
+
+    def after_clear_item(self) -> None:
+        self.current_weight_item = None
+        self.update_displays()
+
+    def after_available(self) -> None:
+        self.process_state = PROCESS_STATE.CONNECTED
+        self.update_displays()
+
+    def after_unavailable(self) -> None:
+        self.process_state = PROCESS_STATE.DISCONNECTED
+        self.update_displays()
+
+#-
+
+    def taskCompleted(self) -> None:
+        if self.current_weight_item is not None:
+            self.current_weight_item.callback(str(self.current_weight_item.uuid), float(self.current_weight_item.weight))
+
+#-
+
+    # render item on all active displays
+    def update_displays(self) -> None:
+        for display in self.displays:
+            if self.current_weight_item is not None:
+                display.show_item(self.current_weight_item, self.process_state, self.component)
+            else:
+                display.clear_green()
+
+    # update weight to be displayed on all connected displays
+    def update_weight(self) -> None:
+        pass # to be implemented
+
+
+class RoastedWeighingState(StateMachine):
+
+    idle = State(initial=True)  # display_state = 0
+    scale = State()             # scale available, display_state = 1
+    item = State()              # current_item available, display_state = 0
+    ready = State()             # display_state = 1
+
+    current_item = (
+        idle.to(item)
+        | item.to(item)
+        | ready.to(ready)
+        | scale.to(ready)
+    )
+
+    clear_item = (
+        idle.to(idle)
+        | item.to(idle)
+        | ready.to(scale)
+    )
+
+    available = (
+        idle.to(scale)
+        | item.to(ready)
+    )
+
+    unavailable = (
+        scale.to(idle)
+        | ready.to(item)
+    )
+
+    def __init__(self, displays:List[Display]) -> None:
+
+        # list of displays control, incl. the display of the selected scale if any
+        self.displays: List[Display] = displays
+
+        # holds the WeightItem currently processed, if any
+        self.current_weight_item:Optional[RoastedWeightItem] = None
+        self.process_state:PROCESS_STATE = PROCESS_STATE.DISCONNECTED
+        self.component:int = 0 # component (of blend) currently processed (0 <= self.component < len(self.current_weight_item.descriptions))
+
+        super().__init__(allow_event_without_transition=True) # no errors for events which do not lead to transitions
+
+    def after_current_item(self, weight_item:RoastedWeightItem) -> None:
+        self.current_weight_item = weight_item
+        # update displays
+        self.update_displays()
+
+    def after_clear_item(self) -> None:
+        self.current_weight_item = None
+        self.update_displays()
+
+    def after_available(self) -> None:
+        self.process_state = PROCESS_STATE.CONNECTED
+        self.update_displays()
+
+    def after_unavailable(self) -> None:
+        self.process_state = PROCESS_STATE.DISCONNECTED
+        self.update_displays()
+
+#-
+
+    def taskCompleted(self) -> None:
+        if self.current_weight_item is not None:
+            self.current_weight_item.callback(self.current_weight_item.uuid, self.current_weight_item.weight)
+
+#-
+
+    # render item on all active displays
+    def update_displays(self) -> None:
+        for display in self.displays:
+            if self.current_weight_item is not None:
+                display.show_item(self.current_weight_item, self.process_state, self.component)
+            else:
+                display.clear_roasted()
+
+    # update weight to be displayed on all connected displays
+    def update_weight(self) -> None:
+        pass # to be implemented
+
+
+class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error: Argument to class must be a base class
+
+    __slots__ = [ 'displays', 'scale_manager', 'next_green_item',  'next_roasted_item',
+                    'greenItemSemaphore', 'roastedItemSemaphore', 'green_sm' ]
+
+
+    def __init__(self, displays:List[Display], scale_manager:ScaleManager) -> None:
+        super().__init__()
+
+        self.scale_manager = scale_manager
 
         # holds the next WeightItem waiting to be processed, if any
         self.next_green_item:Optional[GreenWeightItem] = None
         self.next_roasted_item:Optional[RoastedWeightItem] = None
 
-        # holds the WeightItem currently processed, if any
-        self.current_green_item:Optional[GreenWeightItem] = None
-        self.current_roasted_item:Optional[RoastedWeightItem] = None
+        self.greenItemSemaphore = QSemaphore(1) # semaphore to protect access to next_green_item
+        self.roastedItemSemaphore = QSemaphore(1) # semaphore to protect access to next_roasted_item
 
-        self.greenItemSemaphore = QSemaphore(1) # semaphore to protect access to next_green_item and current_green_item
-        self.roastedItemSemaphore = QSemaphore(1) # semaphore to protect access to next_roasted_item and current_roasted_item
+        self.sm_green = GreenWeighingState(displays)
+        self.sm_roasted = RoastedWeighingState(displays)
+
+        self.start() # connect to configured scales
 
 
     # queues a GreenWeightItem for processing
@@ -168,37 +304,33 @@ class WeightManager:
             self.greenItemSemaphore.acquire(1)
             self.next_green_item = item
             self.greenItemSemaphore.release(1)
-
-            if True: # TODO: if green weighing process is not running  # pylint: disable=fixme,using-constant-test
-                # if there is no scale, we fetch that item immediately and start "processing"
-                # even if there is already a current one in "processing"
-                self.fetch_next_green()
+            self.fetch_next_green()
 
     def clear_next_green(self) -> None:
         self.greenItemSemaphore.acquire(1)
         self.next_green_item = None
         self.greenItemSemaphore.release(1)
-        self.clear_displays(green=True)
+        self.fetch_next_green()
 
     # start processing the next green item if any
     def fetch_next_green(self) -> None:
-        self.greenItemSemaphore.acquire(1)
-        try:
-            if self.next_green_item is None:
-                self.current_roasted_item = None
-                self.clear_displays(green=True)
-            else:
-                self.current_green_item = self.next_green_item
-                self.next_green_item = None
-                # update displays
-                self.update_displays(self.current_green_item)
-        finally:
-            if self.greenItemSemaphore.available() < 1:
-                self.greenItemSemaphore.release(1)
+        # if there is no scale, we fetch that item immediately and start "processing"
+        # even if there is already a current one in "processing"
+        if self.sm_green.process_state in {PROCESS_STATE.DISCONNECTED, PROCESS_STATE.CONNECTED}:
+            self.greenItemSemaphore.acquire(1)
+            try:
+                if self.next_green_item is None:
+                    self.sm_green.send('clear_item')
+                else:
+                    self.sm_green.current_item(self.next_green_item)
+                    self.next_green_item = None
+            finally:
+                if self.greenItemSemaphore.available() < 1:
+                    self.greenItemSemaphore.release(1)
 
     def greenTaskCompleted(self) -> None:
-        if self.current_green_item is not None:
-            self.current_green_item.callback(self.current_green_item.uuid, self.current_green_item.weight)
+        self.sm_green.taskCompleted()
+
 
 #--
 
@@ -216,37 +348,32 @@ class WeightManager:
             self.roastedItemSemaphore.acquire(1)
             self.next_roasted_item = item
             self.roastedItemSemaphore.release(1)
-
-            if True: # TODO: if roasted weighing process is not running  # pylint: disable=fixme,using-constant-test
-                # if there is no scale, we fetch that item immediately and start "processing"
-                # even if there is already a current one in "processing"
-                self.fetch_next_roasted()
+            self.fetch_next_roasted()
 
     def clear_next_roasted(self) -> None:
         self.roastedItemSemaphore.acquire(1)
         self.next_roasted_item = None
         self.roastedItemSemaphore.release(1)
-        self.clear_displays(roasted=True)
+        self.fetch_next_roasted()
 
     # start processing the next roasted item if any
     def fetch_next_roasted(self) -> None:
-        self.roastedItemSemaphore.acquire(1)
-        try:
-            if self.next_roasted_item is None:
-                self.current_roasted_item = None
-                self.clear_displays(roasted=True)
-            else:
-                self.current_roasted_item = self.next_roasted_item
-                self.next_roasted_item = None
-                # update displays
-                self.update_displays(self.current_roasted_item)
-        finally:
-            if self.roastedItemSemaphore.available() < 1:
-                self.roastedItemSemaphore.release(1)
+        # if there is no scale, we fetch that item immediately and start "processing"
+        # even if there is already a current one in "processing"
+        if self.sm_roasted.process_state in {PROCESS_STATE.DISCONNECTED, PROCESS_STATE.CONNECTED}:
+            self.roastedItemSemaphore.acquire(1)
+            try:
+                if self.next_roasted_item is None:
+                    self.sm_roasted.send('clear_item')
+                else:
+                    self.sm_roasted.current_item(self.next_roasted_item)
+                    self.next_roasted_item = None
+            finally:
+                if self.roastedItemSemaphore.available() < 1:
+                    self.roastedItemSemaphore.release(1)
 
     def roastedTaskCompleted(self) -> None:
-        if self.current_roasted_item is not None:
-            self.current_roasted_item.callback(self.current_roasted_item.uuid, self.current_roasted_item.weight)
+        self.sm_roasted.taskCompleted()
 
 #--
 
@@ -262,23 +389,27 @@ class WeightManager:
         self.clear_next()
         self.fetch_next()
 
+    @pyqtSlot()
+    def scales_available(self) -> None:
+        self.sm_green.send('available')
+        self.sm_roasted.send('available')
 
-    # render item on all active displays
-    def update_displays(self, item:WeightItem) -> None:
-        for display in self.displays:
-            display.show_item(item)
+    @pyqtSlot()
+    def scales_unavailable(self) -> None:
+        self.sm_green.send('unavailable')
+        self.sm_roasted.send('unavailable')
 
-    # update weight to be displayed on all connected displays
-    def update_weight(self) -> None:
-        pass # to be implemented
+    def start(self) -> None:
+        self.scale_manager.available_signal.connect(self.scales_available)
+        self.scale_manager.unavailable_signal.connect(self.scales_unavailable)
+        self.scale_manager.connect_all()
 
-    # if green and roasted are False, all displays are cleared
-    def clear_displays(self, green:bool = False, roasted:bool = False) -> None:
-        for display in self.displays:
-            if (green and not roasted) or not (green or roasted):
-                display.clear_green()
-            if roasted or not (green or roasted):
-                display.clear_roasted()
+    def stop(self) -> None:
+        self.reset()
+        self.scale_manager.disconnect_all()
+        self.scale_manager.available_signal.disconnect()
+        self.scale_manager.unavailable_signal.disconnect()
+
 
 # Container information
 #aw.qmc.container_names
