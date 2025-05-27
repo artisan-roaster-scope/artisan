@@ -122,11 +122,23 @@ class backgroundDlg(ArtisanResizeablDialog):
 
         curvenames = [''] # first entry is the empty one, no extra curve displayed
         for i in range(min(len(self.aw.qmc.extraname1B),len(self.aw.qmc.extraname2B),len(self.aw.qmc.extratimexB))):
-            curvenames.append('B' + str(2*i+3) + ': ' + self.aw.qmc.extraname1B[i].format(
-                self.aw.qmc.Betypesf(0),self.aw.qmc.Betypesf(1),self.aw.qmc.Betypesf(2),self.aw.qmc.Betypesf(3),self.aw.qmc.mode))
-            curvenames.append('B' + str(2*i+4) + ': ' + self.aw.qmc.extraname2B[i].format(
-                self.aw.qmc.Betypesf(0),self.aw.qmc.Betypesf(1),self.aw.qmc.Betypesf(2),self.aw.qmc.Betypesf(3),self.aw.qmc.mode))
+            cn1 = self.aw.qmc.extraname1B[i]
+            try:
+                cn1 = cn1.format(
+                    self.aw.qmc.Betypesf(0),self.aw.qmc.Betypesf(1),self.aw.qmc.Betypesf(2),self.aw.qmc.Betypesf(3),self.aw.qmc.mode)
+            except Exception as e: # pylint: disable=broad-except
+                # substitution might fail if for example a variable {7} is used
+                _log.error(e)
+            curvenames.append(f'B{2*i+3}: {cn1}')
 
+            cn2 = self.aw.qmc.extraname2B[i]
+            try:
+                cn2 = cn2.format(
+                    self.aw.qmc.Betypesf(0),self.aw.qmc.Betypesf(1),self.aw.qmc.Betypesf(2),self.aw.qmc.Betypesf(3),self.aw.qmc.mode)
+            except Exception as e: # pylint: disable=broad-except
+                # substitution might fail if for example a variable {7} is used
+                _log.error(e)
+            curvenames.append(f'B{2*i+4}: {cn2}')
         self.xtcurvelabel = QLabel(QApplication.translate('Label', 'Extra 1'))
         self.xtcurveComboBox = QComboBox()
         self.xtcurveComboBox.setToolTip(QApplication.translate('Tooltip','For loaded backgrounds with extra devices only'))
