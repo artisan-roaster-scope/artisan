@@ -139,5 +139,5 @@ build==1.2.2.post1; platform_system=='Windows'  # required to build pyinstaller 
 pywin32==310; platform_system=='Windows'
 pyinstaller-versionfile==2.1.1; platform_system=='Windows' and python_version < '3.9'
 pyinstaller-versionfile==3.0.1; platform_system=='Windows' and python_version >= '3.9'
-libusb-package==1.0.26.1; platform_system=='Windows'
+libusb-package==1.0.26.3; platform_system=='Windows'
 tzdata==2025.2; platform_system=='Windows' and python_version >= '3.9' # to prevent pyinstaller WARNING: Hidden import "tzdata" not found!
