@@ -10850,7 +10850,10 @@ class tgraphcanvas(FigureCanvas):
                             timexi_lin = None
                         try:
                             if self.aw.extraCurveVisibility1[i]:
-                                if not self.flagon and (re_smooth_foreground or len(self.extrastemp1[i]) != len(self.extratimex[i])):
+                                # Rate of rise variables already have smoothing applied.  We don't smooth equations that use them.
+                                if any(x in self.extramathexpression1[i] for x in ['R1', 'RB1']):
+                                    self.extrastemp1[i] = self.extratemp1[i]
+                                elif not self.flagon and (re_smooth_foreground or len(self.extrastemp1[i]) != len(self.extratimex[i])):
                                     self.extrastemp1[i] = self.smooth_list(self.extratimex[i],
                                         (fill_gaps(self.extratemp1[i]) if self.interpolateDropsflag else self.extratemp1[i]),
                                         window_len=self.curvefilter,
@@ -10895,7 +10898,10 @@ class tgraphcanvas(FigureCanvas):
                             self.adderror((QApplication.translate('Error Message','Exception:') + ' redraw() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
                         try:
                             if self.aw.extraCurveVisibility2[i]:
-                                if not self.flagon and (re_smooth_foreground or len(self.extrastemp2[i]) != len(self.extratimex[i])):
+                                # Rate of rise variables already have smoothing applied.  We don't smooth equations that use them.
+                                if any(x in self.extramathexpression2[i] for x in ['R2', 'RB2']):
+                                    self.extrastemp2[i] = self.extratemp2[i]
+                                elif not self.flagon and (re_smooth_foreground or len(self.extrastemp2[i]) != len(self.extratimex[i])):
                                     self.extrastemp2[i] = self.smooth_list(self.extratimex[i],
                                         (fill_gaps(self.extratemp2[i]) if self.interpolateDropsflag else self.extratemp2[i]),
                                         window_len=self.curvefilter,
