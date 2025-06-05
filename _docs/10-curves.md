@@ -16,14 +16,12 @@ Menu: `Config`>> `Curves`
 
 These are critical settings within Artisan and for most the first two tabs will be where your focus lies.  After you understand Curves, there are advanced roast analysis tools using the Analyze feature which is explained in an Artisan Blog article - [Analyzer](https://artisan-roasterscope.blogspot.com/2019/11/analyzer.html)
 
-First you decide which ROR curves and LCD’s you want to display.  **NOTE you won't see your ROR curves without pushing the CHARGE button during the roast.** 
+First you decide which ROR curves and LCD’s you want to display by checking the boxes on the RoR tab of Config>Curves.  **NOTE you won't see your ROR curves without pushing the CHARGE button during the roast.** 
 
-The order of Delta LCDs can now be swapped too (the BT/ET LCDs can be swapped in the device config menu).The order curves are shown now respects the order of LCDs (from top to bottom). Thus if the DeltaET LCD is shown above the DeltaBT LCD, also the DeltaET curve is drawn above the DeltaBT curve (menu `Config` >> `Curves`, 1st tab `RoR`).    
+
+The order of Delta LCDs can now be swapped (the BT/ET LCDs can be swapped in the device config menu).The order curves are shown now respects the order of LCDs (from top to bottom). Thus if the DeltaET LCD is shown above the DeltaBT LCD, also the DeltaET curve is drawn above the DeltaBT curve (menu `Config` >> `Curves`, 1st tab `RoR`).    
 
 Secondly you move to the filters tab to determine how you want the curves to display.  If you want the curves to be the same during and after the roast your settings will be different than if you want additional post roast filtering/smoothing. **These are critical settings so take your time here.  As you adjust the settings, consider if the results allow you to understand and interpret your results so that you can improve taste in the cup.  For some, to much variation in the curves becomes hard to interpret so they turn up the smoothing.**
-
-![curves filters](/assets/images/gsg/curves-filters.png)
-
 
 *Filtering Raw Data - Input Filter*
 
@@ -37,9 +35,7 @@ Secondly you move to the filters tab to determine how you want the curves to dis
 
 **Swapping BT and ET without switching wires** is easy.  If you want to change the readings from the ET and BT probe to swap them, you do that on the filters tab of Curves dialog, by checking the box `ET<->BT`.
 
-
 IMPORTANT NOTE:  The filters above are applied directly on the incoming data source before the data is recorded under `Roast` >> `Properties`, `Data` tab. Therefore data eliminated by the min-max limit and the drop spikes filter is lost forever. This is in contrast to the other filters that in the remaining sections that work on the internal raw data and their effect is used to improve the visualization.
-
 
 *Filtering During the Roast Of All Curves - Impacting the Delta Curve Rendering During Roast - (Curve Filter)*
 
