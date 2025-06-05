@@ -67,23 +67,22 @@ The best settings depend on the noise produced by your meter, probes and overall
 
 **Delta Span** affects how far back in time Artisan looks when calculating a delta curve. You can enter different values for the ET and BT curves.   The maximum value is 30 seconds.  
 
-Increasing this setting should smooth live-recording delta curves. Increasing this setting will not affect the standard temperature curves (ET/BT/etc.), only deltas. Delta Span is the period in seconds used to calculate basic/core RoR values by dividing the delta-temp/delta-time (so delta-time is the delta-span used for this). A Delta Span smaller than twice the sampling interval has no effect, larger Delta Spans lead to time shifts.
+Increasing this setting smooths live-recording delta curves. Increasing this setting will not affect the standard temperature curves (ET/BT/etc.), only deltas. Delta Span is the period in seconds used to calculate basic/core RoR values by dividing the delta-temp/delta-time. Delta-time in the calculation is set by the Delta Span you choose. A Delta Span smaller than twice the sampling interval has no effect, larger Delta Spans lead to time shifts.
 
-**Smoothing** will impact only the delta curves and is applied after the Smooth Curves setting ONLY FOR THE DELTA CURVES during the roast.  This allows for further refinement of your Delta curve.  You can enter different values for the ET and BT curves.  The maximum value is 40.  
+**Smoothing** values will impact only the delta curves and are applied after the Smooth Curves setting ONLY FOR THE DELTA CURVES during the roast.  This allows for further smoothing of your Delta curves displayed during the roast.  You can enter different values for the ET and BT curves.  The maximum value is 40.  
 
-The value is proportional to the number of basic/core RoR values to be averaged over to compute the final RoR values used for predictions and rendering. This smoothing process produces a shift on the time axis if "Optimal Smoothing Post Roast" is not checked (see below).
+The value is proportional to the number of basic/core RoR values to be averaged to compute the final RoR values used for predictions and rendering. This smoothing process produces a shift on the time axis if "Optimal Smoothing Post Roast" is not checked (see below).
 
 
-**Polyfit computation** – this option computes the Rate-of-Rise signals based on linear polyfits (least squares). This technique results in a smoother Rate-of-Rise curve with larger delta-span values for signals containing high-frequency noise without the introduction of any additional delay.
+**Polyfit computation** computes the Rate-of-Rise signals based on linear polyfits (least squares). This technique results in a smoother Rate-of-Rise curve with larger delta-span values for signals containing high-frequency noise without the introduction of any additional delay.
 
 **Limits** allows you to set temp limits on how high or low your ROR curves can go. This will keep your curves within reasonable ranges. This setting limits the readings calculated by Artisan to the specified range. 
 
 *Filtering After the Roast - An Alternative*
 
-**Optimal Smoothing** turns on a different smoothing algorithm that does not produce a time shift (optimal in that respect), and is applied only post roast.  This option can not be selected unless you select the Polyfit computation.  It needs a complete roast as it looks at data forward as well as backward and forward data is not there during a roast.  If you turn this on, you will have different/shifted renderings of RoR during vs after roasting.  Optimal Smoothing will override your Smooth Curves setting.  
+**Optimal Smoothing Post Roast** turns on a different smoothing algorithm that does not produce a time shift (optimal in that respect), and is applied only post roast.  This option can not be selected unless you select the Polyfit computation.  It needs a complete roast as it looks at data forward as well as backward and forward data is not there during a roast.  If you turn this on, you will have different/shifted renderings of RoR during vs after roasting.  Optimal Smoothing will override your Smooth Curves setting.  
 
-
-IMPORTANT NOTE:  Except for the raw data filters, the filter settings can be changed after recording or even after restart of the app and reload of the file (which stores the raw internal data only) to generate variations of the BT,ET and Delta curve rendering. If you send an Artisan file (.alog) to another user she might get a different rendering on her screen depending on her filter settings, so you may want to send your settings file as well.  
+IMPORTANT NOTE:  Except for the raw data filters described above, the filter settings can be changed after recording or even after an app restart and reload of the file (which stores the raw internal data only) to generate variations of the BT,ET and Delta curve rendering. If you send an Artisan file (.alog) to another user, they might get a different rendering on her screen depending on their filter settings, so you may want to send your settings file as well.  
 
 *UI Tab*
 
