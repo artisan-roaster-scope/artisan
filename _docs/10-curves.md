@@ -62,7 +62,7 @@ The best settings depend on the noise produced by your meter, probes and overall
 
 *Filtering During the Roast – Rate of Rise Filter*
 
-![curves filters](/assets/images/gsg/ror filter 2025.png)
+![curves filters](/assets/images/gsg/ROR filter 2025.png)
 
 **Smoothing** will impact only the delta curves and is applied after the Smooth Curves setting ONLY FOR THE DELTA CURVES during the roast.  This allows for further refinement of your Delta curve.  You can enter different values for the ET and BT curves.  The maximum value is 40.  
 
