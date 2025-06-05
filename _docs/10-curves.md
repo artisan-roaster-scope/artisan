@@ -27,14 +27,15 @@ Secondly you move to the filters tab to determine how you want the curves to dis
 ![curves filters](/assets/images/gsg/curves-filters.png)
 
 
-*Filtering Raw Data*
+*Filtering Raw Data - Input Filter*
 
-**Drop Spikes** will drop huge spikes that are within your set limits. This filter removes all readings that would result in a delta value that is either very high or very low compared to the previous deltas. This filter is able to catch spikes that happen in the standard range temperature values and can therefore not be caught by the min-max filter.
+![curves filters](/assets/images/gsg/input filter 2025.png)
 
-**Limits** will allow you to set temp limits on how high or low your curve can go.  This will keep your curves within reasonable ranges.  This setting limits the readings accepted by Artisan to the specified range. Selecting the standard range of expected temperatures during a roast often already eliminates most of the spikes, because meters experiencing electric noise often return very high or very low readings.
+**Drop Spikes** will drop huge spikes that are within your set limits. This filter removes all readings that would result in a delta value that is either very high or very low compared to the previous deltas. This filter can catch spikes that happen in the standard range temperature values which not be caught by the min-max filter.
+
+**Limits** will allow you to set temp limits on how high or low your curve can go.  This will keep your curves within reasonable ranges.  This setting limits the readings accepted by Artisan to the specified range. Selecting the standard range of expected temperatures during a roast often eliminates most of the spikes, because meters experiencing electric noise often return very high or very low readings.
 
 **Swapping BT and ET without switching wires** is easy.  If you want to change the readings from the ET and BT probe to swap them, you do that on the filters tab of Curves dialog, by checking the box `ET<->BT`.
-
 
 
 IMPORTANT NOTE:  These two filters above are applied directly on the incoming data source before the data is recorded under `Roast` >> `Properties`, `Data` tab. Therefore data eliminated by the min-max limit and the drop spikes filter is lost forever. This is in contrast to the other filters that in the remaining sections that work on the internal raw data and their effect is used to improve the visualization.
