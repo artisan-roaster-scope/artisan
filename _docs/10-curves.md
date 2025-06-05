@@ -18,6 +18,7 @@ These are critical settings within Artisan and for most the first two tabs will 
 
 First you decide which ROR curves and LCD’s you want to display by checking the boxes on the RoR tab of Config>Curves.  **NOTE you won't see your ROR curves without pushing the CHARGE button during the roast.** 
 
+![config curves](/assets/images/gsg/config curves tab.png)
 
 The order of Delta LCDs can now be swapped (the BT/ET LCDs can be swapped in the device config menu).The order curves are shown now respects the order of LCDs (from top to bottom). Thus if the DeltaET LCD is shown above the DeltaBT LCD, also the DeltaET curve is drawn above the DeltaBT curve (menu `Config` >> `Curves`, 1st tab `RoR`).    
 
