@@ -2,7 +2,7 @@
 title: "Curves"
 permalink: /docs/curves/
 excerpt: ""
-last_modified_at: 2025-04-6T15:59:00-04:00
+last_modified_at: 2025-06-4T15:59:00-04:00
 toc: false
 author: Michael Herbert
 author_profile: true
