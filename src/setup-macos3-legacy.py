@@ -103,6 +103,7 @@ DATA_FILES = [
     ('../Resources', [r'includes/alarmclock.ttf']),
     ('../Resources', [r'includes/alarmclock.woff']),
     ('../Resources', [r'includes/artisan.tpl']),
+    ('../Resources', [r'includes/scale_widget.tpl']),
     ('../Resources', [r'includes/bigtext.js']),
     ('../Resources', [r'includes/sorttable.js']),
     ('../Resources', [r'includes/report-template.htm']),

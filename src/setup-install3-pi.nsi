@@ -448,6 +448,7 @@ Section Uninstall
   Delete "$INSTDIR\safari-pinned-tab.svg"
   Delete "$INSTDIR\site.webmanifest"
   Delete "$INSTDIR\artisan.tpl"
+  Delete "$INSTDIR\scale_widget.tpl"
   Delete "$INSTDIR\bigtext.js"
   Delete "$INSTDIR\sorttable.js"
   Delete "$INSTDIR\report-template.htm"

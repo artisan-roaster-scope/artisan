@@ -277,6 +277,7 @@ for fn in [
     r'includes\alarmclock.ttf',
     r'includes\alarmclock.woff',
     r'includes\artisan.tpl',
+    r'includes\scale_widget.tpl',
     r'includes\bigtext.js',
     r'includes\sorttable.js',
     r'includes\report-template.htm',

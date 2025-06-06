@@ -106,6 +106,7 @@ cp includes/mstile-150x150.png dist
 cp includes/safari-pinned-tab.svg dist
 cp includes/site.webmanifest dist
 cp includes/artisan.tpl dist
+cp includes/scale_widget.tpl dist
 cp includes/bigtext.js dist
 cp includes/sorttable.js dist
 cp includes/report-template.htm dist

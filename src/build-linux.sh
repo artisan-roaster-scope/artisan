@@ -93,6 +93,7 @@ cp includes/alarmclock.svg dist
 cp includes/alarmclock.ttf dist
 cp includes/alarmclock.woff dist
 cp includes/artisan.tpl dist
+cp includes/scale_widget.tpl dist
 cp includes/bigtext.js dist
 cp includes/sorttable.js dist
 cp includes/report-template.htm dist

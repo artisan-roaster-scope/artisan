@@ -55,6 +55,7 @@ DATA_FILES:List[Tuple[str,List[str]]] = [
         r'includes/alarmclock.ttf',
         r'includes/alarmclock.woff',
         r'includes/artisan.tpl',
+        r'includes/scale_widget.tpl',
         r'includes/bigtext.js',
         r'includes/jquery-1.11.1.min.js',
         r'includes/android-chrome-192x192.png',
