@@ -30,7 +30,7 @@ On the filters tab, you determine how you want the curves to display.  If you wa
 
 ![curves filters](/assets/images/gsg/input filter 2025.png)
 
-**Interpolate Duplicates** will -- (unpdate coming)
+**Interpolate Duplicates** if duplicate samples are recorded, Artisan will look backwards and remove the duplicates.  For example if you have 3 of the same readings, it will remove the duplicates and interpolate the the balance of the data.  This filter handles instrumentation that can’t keep up with the sample rate and sends duplicate samples.  You probably don’t need this.  
 
 **Drop Spikes** will drop huge spikes that are within your set limits. This filter removes all readings that would result in a delta value that is either very high or very low compared to the previous deltas. This filter can catch spikes that happen in the standard range temperature values which not be caught by the min-max filter.
 
@@ -60,7 +60,7 @@ The best settings depend on the noise produced by your meter, probes and overall
 
 **Show Full** will show portions of the ET / BT curves before the Charge event, and after the Drop event. 
 
-**Interpolate Drops** will -- (unpdate coming)
+**Interpolate Drops** is used the data drops out from the meters, and in this case Artisan will throw away the drops and interpolate the balance of the data.   
 
 
 *Filtering During the Roast – Rate of Rise Filter*
