@@ -42,7 +42,6 @@ from artisanlib.scale import ScaleManager
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 
-
 @unique
 class PROCESS_STATE(IntEnum):
     DISCONNECTED = 0
