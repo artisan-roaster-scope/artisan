@@ -19,6 +19,7 @@ v3.2.0 (June X, 2025)
   - updates Spanish translations (thanks to Juan!)
   - upgrade libusb-package on Windows
   - limits maximum number of major axis ticks and draws minor axis ticks only if productive
+  - deactivates AutoDROP in Hottop 2k+ machine setup ([Issue #1862](../../../issues/1862))
 
 * FIXES
   - fixes an unhandled exception on loading settings related to scales configurations ([Issue #1847](../../../issues/1847))
@@ -26,6 +27,7 @@ v3.2.0 (June X, 2025)
   - fixes delayed closing of the Roast Properties dialog on some configurations ([Issue #1852](../../../issues/1852))
   - hardens event name substitution on background load ([Issue #1863](../../../issues/1863))
   - prevents smoothing extra device curves using rate of rise variables
+  - deactivates processing of event state flag returned from Kaleido machines to trigger Artisan events like CHARGE and DROP ([Issue #1851](../../../issues/1851))
 
 
 
