@@ -303,8 +303,9 @@ class GreenWeighingState(StateMachine):
         self.update_displays(progress=True)
 
     # new_weight is the new total weight of the measured greens without the bucket
-    def after_fill(self, new_weight:int) -> None:
-        if self.current_weight_item is not None and self.current_weight != new_weight:
+    # if force_update is True, the display is update in any case, if not, the display is only update on increasing weights
+    def after_fill(self, new_weight:int, force_update:bool) -> None:
+        if self.current_weight_item is not None:# and self.current_weight != new_weight:
             # if there is another component, we check if we are done with the current one and can step to the next
             target = self.current_weight_item.weight * 1000 # target in g
             component_target_ratio = sum(component[0] for component in self.current_weight_item.descriptions[:self.component+1])
@@ -316,8 +317,10 @@ class GreenWeighingState(StateMachine):
                 prev_component_target_ratio = sum(component[0] for component in self.current_weight_item.descriptions[:self.component])
                 if new_weight < prev_component_target_ratio * target:
                     self.component -= 1
+            increased = self.current_weight <= new_weight
             self.current_weight = new_weight
-            self.update_displays(progress=True)
+            if increased or force_update:
+                self.update_displays(progress=True)
 
 #    def after_reset(self) -> None:
 #        self.current_weight_item = None
@@ -891,7 +894,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error:
                 sm_message = 'bucket_swapped'
                 # we register the already weighted greens
                 self.green_task_container1_registered_weight = weight
-                self.sm_green.fill(weight) # update widget after registered weight of container 1 has been set
+                self.sm_green.send('fill', weight, True) # update widget after registered weight of container 1 has been set
 
             elif self.green_task_container1_registered_weight != 0 and abs(weight - self.green_task_container1_registered_weight) < self.EMPTY_SCALE_RECOGNITION_TOLERANCE:
                 sm_message = 'bucket_removed'
@@ -937,16 +940,8 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error:
 
         # update stable weight
         if scale_nr == 1:
-            if stable_weight < self.scale1_last_stable_weight:
-                # on weight reductions we update the process display as the non-stable weight messages do not update in this case
-                new_weight = stable_weight - self.green_task_scale_tare_weight + self.green_task_container1_registered_weight
-                self.sm_green.fill(max(0, new_weight))
             self.scale1_last_stable_weight = stable_weight
         elif scale_nr == 2:
-            if stable_weight < self.scale1_last_stable_weight:
-                # on weight reductions we update the process display as the non-stable weight messages do not update in this case
-                new_weight = stable_weight - self.green_task_scale_tare_weight + self.green_task_container1_registered_weight
-                self.sm_green.fill(max(0, new_weight))
             self.scale2_last_stable_weight = stable_weight
 
     def release_green_task_scale(self) -> None:
@@ -976,28 +971,32 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error:
 
     @pyqtSlot(int)
     def scale1_stable_weight_changed_slot(self, stable_weight:int) -> None:
-        _log.debug('WM.scale1_stable_weight_changed_slot(%s)',stable_weight)
+        _log.debug('PRINT WM.scale1_stable_weight_changed_slot(%s)',stable_weight)
         self.scale_stable_weight_changed(1, stable_weight)
+        if self.green_task_scale == 1:
+            new_weight = stable_weight - self.green_task_scale_tare_weight + self.green_task_container1_registered_weight
+            self.sm_green.send('fill', max(0, new_weight), True)
 
     @pyqtSlot(int)
     def scale1_weight_changed_slot(self, weight:int) -> None:
         if self.green_task_scale == 1:
             new_weight = weight - self.green_task_scale_tare_weight + self.green_task_container1_registered_weight
-#            if self.sm_green.current_weight < new_weight: # only update progress display on increases to remove flickr on bucket done remove
-            self.sm_green.fill(max(0, new_weight))
+            self.sm_green.send('fill', max(0, new_weight), False) # only update on increasing weights
 
     @pyqtSlot(int)
     def scale2_stable_weight_changed_slot(self, stable_weight:int) -> None:
-        _log.debug('WM.scale2_stable_weight_changed_slot(%s)',stable_weight)
+        _log.debug('PRINT WM.scale2_stable_weight_changed_slot(%s)',stable_weight)
         self.scale_stable_weight_changed(2, stable_weight)
+        if self.green_task_scale == 2:
+            new_weight = stable_weight - self.green_task_scale_tare_weight + self.green_task_container1_registered_weight
+            self.sm_green.send('fill', max(0, new_weight), True)
 
     @pyqtSlot(int)
     def scale2_weight_changed_slot(self, weight:int) -> None:
         _log.debug('WM.scale2_weight_changed_slot(%s)',weight)
         if self.green_task_scale == 2:
             new_weight = weight - self.green_task_scale_tare_weight + self.green_task_container1_registered_weight
-#            if self.sm_green.current_weight < new_weight: # only update progress display on increases to remove flickr on bucket done remove
-            self.sm_green.fill(max(0, new_weight))
+            self.sm_green.send('fill', max(0, new_weight), False) # only update on increasing weights
 
     def start(self) -> None:
         self.scale_manager.available_signal.connect(self.scales_available)

@@ -177,14 +177,12 @@ class ScaleManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error: 
         self.reserve_scale2_signal.connect(self.reserve_scale2_slot, type=Qt.ConnectionType.QueuedConnection) # type: ignore
         self.release_scale2_signal.connect(self.release_scale2_slot, type=Qt.ConnectionType.QueuedConnection) # type: ignore
 
-        self.scale1_last_weight:int = 0    # in g
-        self.scale1_stable_weight:int = 0  # in g
+        self.scale1_last_weight:Optional[int] = None    # in g; cleared by arrival of fresh stable weights
         self.scale1_stable_reading_timer = QTimer()
         self.scale1_stable_reading_timer.setSingleShot(True)
         self.scale1_stable_reading_timer.timeout.connect(self.scale1_stable_reading_timer_slot)
 
-        self.scale2_last_weight:int = 0    # in g
-        self.scale2_stable_weight:int = 0  # in g
+        self.scale2_last_weight:Optional[int] = None    # in g; cleared by arrival of fresh stable weights
         self.scale2_stable_reading_timer = QTimer()
         self.scale2_stable_reading_timer.setSingleShot(True)
         self.scale2_stable_reading_timer.timeout.connect(self.scale2_stable_reading_timer_slot)
@@ -227,8 +225,7 @@ class ScaleManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error: 
             self.reset_scale1()
         self.scale1 = self._get_scale(model, ident, name)
         if self.scale1 is not None:
-            self.scale1_last_weight = 0
-            self.scale1_stable_weight = 0
+            self.scale1_last_weight = None
             #-
             self.scale1.scanned_signal.connect(self.scale1_scanned_slot)
             self.scale1.connected_signal.connect(self.scale1_connected_slot)
@@ -289,22 +286,22 @@ class ScaleManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error: 
     ## try to catch a last non weight change and send as stable state
     @pyqtSlot(float, bool)
     def scale1_weight_changed_slot(self, weight:float, stable:bool) -> None:
-        self.scale1_last_weight = int(round(weight))
+        weight = int(round(weight))
         if stable:
+            self.scale1_last_weight = None # prevent earlier non-stable weights to be send delayed as stable via the timer
             # weights marked as stable by the scale are immediately forwarded as stable weights
-            self.scale1_stable_weight = self.scale1_last_weight
-            self.scale1_stable_weight_changed_signal.emit(self.scale1_last_weight)
+            self.scale1_stable_weight_changed_signal.emit(weight)
         else:
-            # non-stable weights are immediately forwarded as regular weight updates to keep the display fluid
-            self.scale1_weight_changed_signal.emit(self.scale1_last_weight)
-            # and additionally fed into our stable weight timer system to ensure that the "last one" is also emitted as stable weight
+            self.scale1_last_weight = weight
+            # fed into our stable weight timer system to ensure that the "last one" is also emitted as stable weight
             self.scale1_stable_reading_timer.start(STABLE_TIMER_PERIOD) # start/restart stable weight timer
+            # non-stable weights are immediately forwarded as regular weight updates to keep the display fluid
+            self.scale1_weight_changed_signal.emit(weight)
 
     @pyqtSlot()
     def scale1_stable_reading_timer_slot(self) -> None:
-        if abs(self.scale1_stable_weight - self.scale1_last_weight) >= MIN_STABLE_WEIGHT_CHANGE:
-            self.scale1_stable_weight = self.scale1_last_weight
-            self.scale1_stable_weight_changed_signal.emit(self.scale1_stable_weight)
+        if self.scale1_last_weight is not None:
+            self.scale1_stable_weight_changed_signal.emit(self.scale1_last_weight)
 
 
 #- scale 2
@@ -337,8 +334,7 @@ class ScaleManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error: 
             self.reset_scale2()
         self.scale2= self._get_scale(model, ident, name)
         if self.scale2 is not None:
-            self.scale2_last_weight = 0
-            self.scale2_stable_weight = 0
+            self.scale2_last_weight = None
             #-
             self.scale2.scanned_signal.connect(self.scale2_scanned_slot)
             self.scale2.connected_signal.connect(self.scale2_connected_slot)
@@ -398,22 +394,22 @@ class ScaleManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error: 
     ## try to catch a last non weight change and send as stable state
     @pyqtSlot(float, bool)
     def scale2_weight_changed_slot(self, weight:float, stable:bool) -> None:
-        self.scale2_last_weight = int(round(weight))
+        weight = int(round(weight))
         if stable:
+            self.scale2_last_weight = None # prevent earlier non-stable weights to be send delayed as stable via the timer
             # weights marked as stable by the scale are immediately forwarded as stable weights
-            self.scale2_stable_weight = self.scale1_last_weight
-            self.scale2_stable_weight_changed_signal.emit(self.scale2_last_weight)
+            self.scale2_stable_weight_changed_signal.emit(weight)
         else:
-            # non-stable weights are immediately forwarded as regular weight updates to keep the display fluid
-            self.scale2_weight_changed_signal.emit(self.scale2_last_weight)
-            # and additionally fed into our stable weight timer system to ensure that the "last one" is also emitted as stable weight
+            self.scale2_last_weight = weight
+            # fed into our stable weight timer system to ensure that the "last one" is also emitted as stable weight
             self.scale2_stable_reading_timer.start(STABLE_TIMER_PERIOD) # start/restart stable weight timer
+            # non-stable weights are immediately forwarded as regular weight updates to keep the display fluid
+            self.scale2_weight_changed_signal.emit(weight)
 
     @pyqtSlot()
     def scale2_stable_reading_timer_slot(self) -> None:
-        if abs(self.scale2_stable_weight - self.scale2_last_weight) >= MIN_STABLE_WEIGHT_CHANGE:
-            self.scale2_stable_weight = self.scale2_last_weight
-            self.scale2_stable_weight_changed_signal.emit(self.scale2_stable_weight)
+        if self.scale2_last_weight is not None:
+            self.scale2_stable_weight_changed_signal.emit(self.scale1_last_weight)
 
 #--
 
