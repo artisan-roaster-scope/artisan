@@ -161,6 +161,7 @@ class GreenWeighingState(StateMachine):
     clear_item = (
         ready.to(scale)
         | item.to(idle)
+        | idle.to(idle) # ensure that internal display is cleared on scheduler tab switch in any case
     )
 
     available = (
@@ -337,7 +338,7 @@ class GreenWeighingState(StateMachine):
 #        _log.debug("GREEN_SM: Running %s from %s to %s", event.name, event_data.transition.source.id, event_data.transition.target.id)
 
     # weight in kg; if weight is None, the nominal weight from the ScheduleItem/WeightItem is used
-    def taskCompleted(self, weight:Optional[float]) -> None:
+    def taskCompleted(self, weight:Optional[float] = None) -> None:
         if self.current_weight_item is not None:
             if weight is None:
                 weight = self.current_weight_item.weight
@@ -387,6 +388,7 @@ class RoastedWeighingState(StateMachine):
     clear_item = (
         ready.to(scale)
         | item.to(idle)
+        | idle.to(idle) # ensure that internal display is cleared on scheduler tab switch in any case
     )
 
     available = (
@@ -495,9 +497,11 @@ class RoastedWeighingState(StateMachine):
 #        _log.debug("ROASTED_SM: Running %s from %s to %s", event.name, event_data.transition.source.id, event_data.transition.target.id)
 
 
-    # weight in kg; if weight is None, the nominal weight from the ScheduleItem/WeightItem is used
-    def taskCompleted(self, weight:float) -> None:
+    # weight in kg; if weight is None, the estimated weight from the ScheduleItem/WeightItem is used
+    def taskCompleted(self, weight:Optional[float] = None) -> None:
         if self.current_weight_item is not None:
+            if weight is None:
+                weight = self.current_weight_item.weight_estimate
             self.current_weight_item.callback(str(self.current_weight_item.uuid), weight) # register weight in weight_item as prepared
 
 
@@ -535,7 +539,6 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error:
     ROASTED_BUCKET_REMOVALE_TOLERANCE:Final[int] = 10       # +- tolerance to recognize roasted bucket removal
 
     WAIT_BEFORE_CANCEL:Final[int] = 5000  # time in milliseconds to display the CANCEL message before returning to READY
-
 
     def __init__(self, aw:'ApplicationWindow', displays:List[Display], scale_manager:ScaleManager) -> None:
         super().__init__()
@@ -605,6 +608,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error:
         self.fetch_next_green()
 
     # start processing the next green item if any
+    @pyqtSlot()
     def fetch_next_green(self) -> None:
         # if there is no scale, we fetch that item immediately and start "processing"
         # even if there is already a current one in "processing"
@@ -631,6 +635,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error:
     # queues a RoastedWeightItem for processing
     # if item is None, the next roasted item is cleared
     # Note: the queue has size 1 and a newer incoming item overwrites an older already queued item
+    @pyqtSlot()
     def set_next_roasted(self, item:Optional[RoastedWeightItem]) -> None:
         if item is None:
             self.clear_next_roasted()
@@ -664,8 +669,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error:
 
     # called from Scheduler on click of the Scheduler Task Display
     def roastedTaskCompleted(self) -> None:
-        # to be implemented here
-        pass
+        self.sm_roasted.taskCompleted()
 
 #--
 
@@ -740,6 +744,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error:
     #   between WeightManager.MIN_EMPTY_BUCKET_WEIGHT_BATCH_PERECENT and WeightManager.MAX_EMPTY_BUCKET_WEIGHT_BATCH_PERECENT of the batchsize
     #     but not smaller than WeightManager.MIN_EMPTY_BUCKET_WEIGHT and WeightManager.MAX_EMPTY_BUCKET_WEIGHT
     def empty_bucket_placed(self, step:int, batchsize:float) -> bool:
+        _log.debug('PRINT empty_bucket_placed(%s,%s)', step, batchsize)
         # the empty bucket weight must be lighter than the total weight of a filled roasted bucket
         # to avoid overlapping recognition
         # NOTE: a very light roasting task can block the recognition of the placement of empty green buckets
@@ -748,6 +753,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error:
                 self.roasted_task_scale == 0 and                                       # there is no scale yet assigned to the roasted task
                 0 <= self.aw.container2_idx <= len(self.aw.qmc.container_weights) and  # there is a roasted container weight specified
                 step >= self.filled_roasted_bucket_estimated_minimal_weight(self.sm_roasted.current_weight_item.weight, self.aw.qmc.container_weights[self.aw.container2_idx])):
+            _log.debug('PRINT => False; overlaping weight with expected roasted bucket weight')
             return False
 
         # bucket smaller than the total weight of the filled roasted bucket
@@ -768,8 +774,11 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error:
                 min_bucket_weight = min(self.aw.qmc.container_weights)
                 max_bucket_weight = max(self.aw.qmc.container_weights)
 
+            _log.debug('PRINT => %s (limit check)', min_bucket_weight - WeightManager.EMPTY_BUCKET_RECOGNITION_TOLERANCE <= step <= max_bucket_weight + WeightManager.EMPTY_BUCKET_RECOGNITION_TOLERANCE)
+
             return min_bucket_weight - WeightManager.EMPTY_BUCKET_RECOGNITION_TOLERANCE <= step <= max_bucket_weight + WeightManager.EMPTY_BUCKET_RECOGNITION_TOLERANCE
 
+        _log.debug('PRINT => False')
         return False
 
     # tare_weight and current_weight in g
@@ -781,6 +790,8 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error:
     def scale_stable_weight_changed(self, scale_nr:int, stable_weight:int) -> None:
 
         step = stable_weight - (self.scale1_last_stable_weight if scale_nr == 1 else self.scale2_last_stable_weight)
+
+        _log.debug('PRINT scale_stable_weight_changed(%s,%s) => step: %s', scale_nr, stable_weight, step)
 
         if abs(step) <= self.MIN_STABLE_WIGHT_CHANGE:
             return
@@ -972,8 +983,8 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error:
     def scale1_weight_changed_slot(self, weight:int) -> None:
         if self.green_task_scale == 1:
             new_weight = weight - self.green_task_scale_tare_weight + self.green_task_container1_registered_weight
-            if self.sm_green.current_weight < new_weight: # only update progress display on increases to remove flickr on bucket done remove
-                self.sm_green.fill(max(0, new_weight))
+#            if self.sm_green.current_weight < new_weight: # only update progress display on increases to remove flickr on bucket done remove
+            self.sm_green.fill(max(0, new_weight))
 
     @pyqtSlot(int)
     def scale2_stable_weight_changed_slot(self, stable_weight:int) -> None:
@@ -985,8 +996,8 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error:
         _log.debug('WM.scale2_weight_changed_slot(%s)',weight)
         if self.green_task_scale == 2:
             new_weight = weight - self.green_task_scale_tare_weight + self.green_task_container1_registered_weight
-            if self.sm_green.current_weight < new_weight: # only update progress display on increases to remove flickr on bucket done remove
-                self.sm_green.fill(max(0, new_weight))
+#            if self.sm_green.current_weight < new_weight: # only update progress display on increases to remove flickr on bucket done remove
+            self.sm_green.fill(max(0, new_weight))
 
     def start(self) -> None:
         self.scale_manager.available_signal.connect(self.scales_available)

@@ -1381,20 +1381,24 @@ class DragItem(StandardItem):
             self.menu = QMenu()
             fully_prepared_p = fully_prepared(self.data)
             fully_unprepared_p = not fully_prepared_p and fully_unprepared(self.data)
-            if not fully_prepared_p:
-                allPreparedAction:QAction = QAction(QApplication.translate('Contextual Menu', 'All batches prepared'),self)
-                allPreparedAction.triggered.connect(self.allPrepared)
-                self.menu.addAction(allPreparedAction)
-                addPreparedAction:QAction = QAction(QApplication.translate('Contextual Menu', 'One more batch prepared'),self)
-                addPreparedAction.triggered.connect(self.addPrepared)
-                self.menu.addAction(addPreparedAction)
-            if not fully_unprepared_p:
-                removePreparedAction:QAction = QAction(QApplication.translate('Contextual Menu', 'One less batch prepared'),self)
-                removePreparedAction.triggered.connect(self.removePrepared)
-                self.menu.addAction(removePreparedAction)
-                nonePreparedAction:QAction = QAction(QApplication.translate('Contextual Menu', 'No batch prepared'),self)
-                nonePreparedAction.triggered.connect(self.nonePrepared)
-                self.menu.addAction(nonePreparedAction)
+            if (self.aw.schedule_window is not None and
+                self.aw.schedule_window.weight_manager.sm_green.current_weight_item and
+                self.aw.schedule_window.weight_manager.sm_green.current_weight_item.uuid != self.data.id):
+                # this schedule item is not currently under processing by the weight manager
+                if not fully_prepared_p:
+                    allPreparedAction:QAction = QAction(QApplication.translate('Contextual Menu', 'All batches prepared'),self)
+                    allPreparedAction.triggered.connect(self.allPrepared)
+                    self.menu.addAction(allPreparedAction)
+                    addPreparedAction:QAction = QAction(QApplication.translate('Contextual Menu', 'One more batch prepared'),self)
+                    addPreparedAction.triggered.connect(self.addPrepared)
+                    self.menu.addAction(addPreparedAction)
+                if not fully_unprepared_p:
+                    removePreparedAction:QAction = QAction(QApplication.translate('Contextual Menu', 'One less batch prepared'),self)
+                    removePreparedAction.triggered.connect(self.removePrepared)
+                    self.menu.addAction(removePreparedAction)
+                    nonePreparedAction:QAction = QAction(QApplication.translate('Contextual Menu', 'No batch prepared'),self)
+                    nonePreparedAction.triggered.connect(self.nonePrepared)
+                    self.menu.addAction(nonePreparedAction)
             if not self.aw.qmc.flagon and self.aw.curFile is not None and self.aw.qmc.scheduleID is None and self.aw.qmc.roastUUID is not None  and \
                     self.aw.schedule_window is not None and \
                     not self.aw.schedule_window.in_completed(self.aw.qmc.roastUUID) and \
