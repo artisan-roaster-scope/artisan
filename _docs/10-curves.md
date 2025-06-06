@@ -26,6 +26,8 @@ On the filters tab, you determine how you want the curves to display.  If you wa
 
 *Filtering Raw Data - Input Filter*
 
+**IMPORTANT NOTE:  The filters below in this section ONLY are applied directly on the incoming data source before the data is recorded under `Roast` >> `Properties`, `Data` tab. Therefore data eliminated by the min-max limit and the drop spikes filter is lost forever. This is in contrast to the other filters that in the remaining sections that work on the recorded raw data and their effect is used to improve the visualization.**
+
 ![curves filters](/assets/images/gsg/input filter 2025.png)
 
 **Interpolate Duplicates** will -- (unpdate coming)
@@ -36,7 +38,7 @@ On the filters tab, you determine how you want the curves to display.  If you wa
 
 **Swapping BT and ET without switching wires** is easy.  If you want to change the readings from the ET and BT probe to swap them, you do that on the filters tab of Curves dialog, by checking the box `ET<->BT`.
 
-IMPORTANT NOTE:  The filters above are applied directly on the incoming data source before the data is recorded under `Roast` >> `Properties`, `Data` tab. Therefore data eliminated by the min-max limit and the drop spikes filter is lost forever. This is in contrast to the other filters that in the remaining sections that work on the recorded raw data and their effect is used to improve the visualization.
+
 
 *Filtering During the Roast Of All Curves - Impacting the Delta Curve Rendering During Roast - (Curve Filter)*
 
