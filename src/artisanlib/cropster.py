@@ -29,7 +29,7 @@ def extractProfileCropsterXLS(file:str, aw:'ApplicationWindow') -> 'ProfileData'
     def takeClosest(num:float, collection:List[float]) -> float:
         return min(collection, key=lambda x:abs(x-num))
 
-    res:ProfileData = {} # the interpreted data set
+    res:ProfileData = ProfileData() # the interpreted data set
 
     book = xlrd.open_workbook(file)
 

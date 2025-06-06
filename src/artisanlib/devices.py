@@ -16,6 +16,7 @@
 # Marko Luther, 2023
 
 import sys
+import os
 import time as libtime
 import re
 import platform
@@ -29,9 +30,8 @@ if TYPE_CHECKING:
     from artisanlib.scale import ScaleSpecs
 
 from artisanlib.util import (deltaLabelUTF8, setDeviceDebugLogLevel, argb_colorname2rgba_colorname, rgba_colorname2argb_colorname,
-    toInt, weight_units, convertWeight, render_weight)
+    toInt, weight_units, convertWeight, render_weight, getResourcePath)
 from artisanlib.dialogs import ArtisanResizeablDialog, tareDlg
-
 from artisanlib.widgets import MyContentLimitedQComboBox, MyQComboBox, MyQDoubleSpinBox
 from artisanlib.scale import SUPPORTED_SCALES
 
@@ -40,14 +40,14 @@ _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 try:
     from PyQt6.QtCore import (Qt, pyqtSlot, QSettings, QTimer, QRegularExpression, QSignalBlocker) # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtGui import (QStandardItemModel, QStandardItem, QColor, QIntValidator, QRegularExpressionValidator, QPixmap) # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtGui import (QStandardItemModel, QStandardItem, QColor, QIntValidator, QRegularExpressionValidator, QPixmap, QIcon) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit,  # @UnusedImport @Reimport  @UnresolvedImport
                                  QPushButton, QSpinBox, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
                                  QGroupBox, QRadioButton, QButtonGroup, QInputDialog, QToolButton, # @UnusedImport @Reimport  @UnresolvedImport
                                  QTableWidget, QMessageBox, QHeaderView, QTableWidgetItem, QSizePolicy) # @UnusedImport @Reimport  @UnresolvedImport
 except ImportError:
     from PyQt5.QtCore import (Qt, pyqtSlot, QSettings, QTimer, QRegularExpression, QSignalBlocker) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtGui import (QStandardItemModel, QStandardItem, QColor, QIntValidator, QRegularExpressionValidator, QPixmap) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtGui import (QStandardItemModel, QStandardItem, QColor, QIntValidator, QRegularExpressionValidator, QPixmap, QIcon) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
                                  QPushButton, QSpinBox, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
                                  QGroupBox, QRadioButton, QButtonGroup, QInputDialog, QToolButton, # @UnusedImport @Reimport  @UnresolvedImport
@@ -1467,11 +1467,13 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.aw.scale_manager.scale1_connected_signal.connect(self.scale1connected)
             self.aw.scale_manager.scale1_disconnected_signal.connect(self.scale1disconnected)
             self.aw.scale_manager.scale1_weight_changed_signal.connect(self.scale1_weight_changed)
+            self.aw.scale_manager.scale1_stable_weight_changed_signal.connect(self.scale1_weight_changed)
             #-
             self.aw.scale_manager.scale2_scanned_signal.connect(self.scale2_scanned)
             self.aw.scale_manager.scale2_connected_signal.connect(self.scale2connected)
             self.aw.scale_manager.scale2_disconnected_signal.connect(self.scale2disconnected)
             self.aw.scale_manager.scale2_weight_changed_signal.connect(self.scale2_weight_changed)
+            self.aw.scale_manager.scale2_stable_weight_changed_signal.connect(self.scale2_weight_changed)
 
             scale1ModelLabel = QLabel(QApplication.translate('Label','Model'))
             self.scale1ModelComboBox = QComboBox()
@@ -1696,7 +1698,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.containerGreenTareWeight = QLabel('')
             self.containerGreenTareWeight.setToolTip(QApplication.translate('Tooltip','Weight of your green coffee container'))
             self.containerGreenComboBox = QComboBox()
-            self.containerGreenComboBox.setToolTip(QApplication.translate('Tooltip','Identify your green coffee container and its weight'))
+            self.containerGreenComboBox.setToolTip(QApplication.translate('Tooltip','Identify your green coffee container and its weight. If a container is selected only that container is recognized. If no container is selected, all defined containers are recognized.'))
             self.containerGreenComboBox.setMaximumWidth(120)
             self.containerGreenComboBox.setMinimumWidth(120)
             self.updateGreenContainerPopup(adjust_index=False)
@@ -1707,16 +1709,82 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             containerGreenGridLayout = QGridLayout()
             containerGreenGridLayout.addWidget(self.containerGreenComboBox,0,0)
             containerGreenGridLayout.addWidget(self.containerGreenTareWeight,0,1)
+            containerGreenGridLayout.setSpacing(3)
+
+            basedir = os.path.join(getResourcePath(),'Icons')
+            p = os.path.join(basedir, ('bucket_empty_dark.svg' if self.aw.app.darkmode else 'bucket_empty_light.svg')) # bucket_filled
+            self.bucket_button1 = QToolButton()
+            self.bucket_button1.setIcon(QIcon(p))
+            self.bucket_button1.setFixedHeight(20)
+            self.bucket_button1.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            self.bucket_button1.setStyleSheet('QToolButton {border:none;}')
+            self.bucket_button2 = QToolButton()
+            self.bucket_button2.setIcon(QIcon(p))
+            self.bucket_button2.setFixedHeight(20)
+            self.bucket_button2.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            self.bucket_button2.setStyleSheet('QToolButton {border:none;}')
+            self.bucket_button2.setEnabled(False)
+            self.bucket_button3 = QToolButton()
+            self.bucket_button3.setIcon(QIcon(p))
+            self.bucket_button3.setFixedHeight(20)
+            self.bucket_button3.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            self.bucket_button3.setStyleSheet('QToolButton {border:none;}')
+
+            self.single_bucket_mode = QRadioButton()
+            self.single_bucket_mode.setToolTip(QApplication.translate('Tooltip','The one-bucket mode assumes that the entire batch fits into a single bucket'))
+            self.dual_bucket_mode = QRadioButton()
+            self.dual_bucket_mode.setToolTip(QApplication.translate('Tooltip','The two-bucket mode allows splitting a batch into two buckets for easier lifting'))
+            bucket_mode = QButtonGroup(self)
+            bucket_mode.addButton(self.single_bucket_mode)
+            bucket_mode.addButton(self.dual_bucket_mode)
+            if self.aw.two_bucket_mode:
+                self.dual_bucket_mode.setChecked(True)
+                self.bucket_button1.setEnabled(False)
+                self.bucket_button2.setEnabled(True)
+                self.bucket_button3.setEnabled(True)
+            else:
+                self.single_bucket_mode.setChecked(True)
+                self.bucket_button1.setEnabled(True)
+                self.bucket_button2.setEnabled(False)
+                self.bucket_button3.setEnabled(False)
+            self.dual_bucket_mode.toggled.connect(self.bucket_mode_toggled)
+
+            bucketGreenHLayout = QHBoxLayout()
+            bucketGreenHLayout.setSpacing(3)
+            bucketGreenHLayout.addWidget(self.single_bucket_mode)
+            bucketGreenHLayout.addWidget(self.bucket_button1)
+            bucketGreenHLayout.addSpacing(10)
+            bucketGreenHLayout.addWidget(self.dual_bucket_mode)
+            bucketGreenHLayout.addWidget(self.bucket_button2)
+            bucketGreenHLayout.addWidget(self.bucket_button3)
+
+            greenTaskPrecisionLabel = QLabel(QApplication.translate('Label', 'Accuracy'))
+            self.greenTaskPrecision = MyQDoubleSpinBox()
+            self.greenTaskPrecision.setToolTip(QApplication.translate('Tooltip','Target accuracy expressed as a percentage of the batch size. If zero is selected, the check is disabled.'))
+            self.greenTaskPrecision.setDecimals(1)
+            self.greenTaskPrecision.setSingleStep(0.1)
+            self.greenTaskPrecision.setRange(0, 5.)
+            self.greenTaskPrecision.setAlignment(Qt.AlignmentFlag.AlignRight)
+            self.greenTaskPrecision.setMinimumWidth(40)
+            self.greenTaskPrecision.setValue(self.aw.qmc.dropDuplicatesLimit)
+            self.greenTaskPrecision.setSuffix('%')
+            self.greenTaskPrecision.setValue(self.aw.green_task_precision)
 
             containerGreenHLayout = QHBoxLayout()
             containerGreenHLayout.addLayout(containerGreenGridLayout)
             containerGreenHLayout.addStretch()
+            containerGreenHLayout.addWidget(greenTaskPrecisionLabel)
+            containerGreenHLayout.addWidget(self.greenTaskPrecision)
+            containerGreenHLayout.addSpacing(15)
+            containerGreenHLayout.addLayout(bucketGreenHLayout)
+            containerGreenHLayout.setSpacing(5)
+            containerGreenHLayout.setContentsMargins(5,0,5,0) # left, top, right, bottom
 
             # container roasted
             self.containerRoastedTareWeight = QLabel('')
             self.containerRoastedTareWeight.setToolTip(QApplication.translate('Tooltip','Weight of your roasted coffee container'))
             self.containerRoastedComboBox = QComboBox()
-            self.containerRoastedComboBox.setToolTip(QApplication.translate('Tooltip','Identify your roasted coffee container and its weight'))
+            self.containerRoastedComboBox.setToolTip(QApplication.translate('Tooltip','Identify your roasted coffee container and its weight. If no roasted container is selected, the weighing of roasted batches is disabled.'))
             self.containerRoastedComboBox.setMaximumWidth(120)
             self.containerRoastedComboBox.setMinimumWidth(120)
             self.updateRoastedContainerPopup(adjust_index=False)
@@ -1735,6 +1803,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             # Bucket Hobbock, Container, Bin
             containerGreen = QGroupBox(QApplication.translate('GroupBox','Container Green'))
             containerGreen.setLayout(containerGreenHLayout)
+
             containerRoasted = QGroupBox(QApplication.translate('GroupBox','Container Roasted'))
             containerRoasted.setLayout(containerRoastedHLayout)
 
@@ -1857,8 +1926,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.scale1EditButton.setEnabled(False)
         self.update_scale1_weight(None)
 
-    @pyqtSlot(float)
-    def scale1_weight_changed(self, w:float) -> None:
+    @pyqtSlot(int)
+    def scale1_weight_changed(self, w:int) -> None:
         self.update_scale1_weight(w)
 
     # returns formatted weight converted to current weight unit
@@ -1973,8 +2042,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.scale2EditButton.setEnabled(False)
         self.update_scale2_weight(None)
 
-    @pyqtSlot(float)
-    def scale2_weight_changed(self, w:float) -> None:
+    @pyqtSlot(int)
+    def scale2_weight_changed(self, w:int) -> None:
         self.update_scale2_weight(w)
 
     def update_scale2_weight(self, weight:Optional[float]) -> None:
@@ -2039,9 +2108,17 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
     def container_menu_idx(i:int) -> int: # takes a container idx and returns the index of the corresponding menu item
         return i + 3 # skip <edit>, separator and empty index
 
-    # if adjust_index is True (default), the self.aw.container1_idx is updated to still point to the previous entry if possible
     @pyqtSlot()
-    def updateGreenContainerPopup(self, adjust_index:bool=True) -> None:
+    def updateGreenContainerPopupKeepSelectionSlot(self) -> None:
+        self.updateGreenContainerPopup(keep_selection=True)
+
+    @pyqtSlot()
+    def updateGreenContainerPopupUpdateSelectionSlot(self) -> None:
+        self.updateGreenContainerPopup(keep_selection=False)
+
+    # if adjust_index is True (default), the self.aw.container1_idx is updated to still point to the previous entry if possible
+    # if keep_selection, the current selection is not adjusted if ne entries are added. If keep_selection is not set, new entries are selected
+    def updateGreenContainerPopup(self, adjust_index:bool=True, keep_selection:bool=False) -> None:
         prev_item_count = self.containerGreenComboBox.count()
         with QSignalBlocker(self.containerGreenComboBox): # blocking all signals, especially its currentIndexChanged connected to tareChanged which would lead to cycles
             self.containerGreenComboBox.clear()
@@ -2054,7 +2131,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             if view is not None:
                 view.setMinimumWidth(width)
         if adjust_index:
-            if self.containerGreenComboBox.count() > prev_item_count:
+            if not keep_selection and self.containerGreenComboBox.count() > prev_item_count:
                 # if item list is longer (new items added), we select the last item
                 self.aw.container1_idx = self.containerGreenComboBox.count() - 4
             if len(self.aw.qmc.container_weights) > self.aw.container1_idx:
@@ -2068,7 +2145,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         if i == 0:
             self.containerGreenComboBox.setCurrentIndex(self.container_menu_idx(self.aw.container1_idx))
             tareDLG = tareDlg(self,self.aw, self.get_scale1_weight)
-            tareDLG.tare_updated_signal.connect(self.updateGreenContainerPopup)
+            tareDLG.tare_updated_signal.connect(self.updateGreenContainerPopupUpdateSelectionSlot)
+            tareDLG.tare_updated_signal.connect(self.updateRoastedContainerPopupKeepSelectionSlot)
             tareDLG.show()
         else:
             self.aw.container1_idx = i - 3
@@ -2086,9 +2164,17 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         return self.scale1_weight
 
 
-    # if adjust_index is True (default), the self.aw.container2_idx is updated to still point to the previous entry if possible
     @pyqtSlot()
-    def updateRoastedContainerPopup(self, adjust_index:bool=True) -> None:
+    def updateRoastedContainerPopupKeepSelectionSlot(self) -> None:
+        self.updateRoastedContainerPopup(keep_selection=True)
+
+    @pyqtSlot()
+    def updateRoastedContainerPopupUpdateSelectionSlot(self) -> None:
+        self.updateRoastedContainerPopup(keep_selection=False)
+
+    # if adjust_index is True (default), the self.aw.container2_idx is updated to still point to the previous entry if possible
+    # if keep_selection, the current selection is not adjusted if ne entries are added. If keep_selection is not set, new entries are selected
+    def updateRoastedContainerPopup(self, adjust_index:bool=True, keep_selection:bool=False) -> None:
         prev_item_count = self.containerRoastedComboBox.count()
         with QSignalBlocker(self.containerRoastedComboBox): # blocking all signals, especially its currentIndexChanged connected to tareChanged which would lead to cycles
             self.containerRoastedComboBox.clear()
@@ -2101,7 +2187,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             if view is not None:
                 view.setMinimumWidth(width)
         if adjust_index:
-            if self.containerRoastedComboBox.count() > prev_item_count:
+            if not keep_selection and self.containerRoastedComboBox.count() > prev_item_count:
                 # if item list is longer (new items added), we select the last item
                 self.aw.container2_idx = self.containerRoastedComboBox.count() - 4
             if len(self.aw.qmc.container_weights) > self.aw.container2_idx:
@@ -2115,12 +2201,15 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         if i == 0:
             self.containerRoastedComboBox.setCurrentIndex(self.container_menu_idx(self.aw.container2_idx))
             tareDLG = tareDlg(self,self.aw, self.get_scale2_weight)
-            tareDLG.tare_updated_signal.connect(self.updateRoastedContainerPopup)
+            tareDLG.tare_updated_signal.connect(self.updateRoastedContainerPopupUpdateSelectionSlot)
+            tareDLG.tare_updated_signal.connect(self.updateGreenContainerPopupKeepSelectionSlot)
             tareDLG.show()
         else:
             self.aw.container2_idx = i - 3
             # update displayed scale weight
             self.updateRoastedContainerWeight()
+        # we need to update availability, as roasted scale is only available if roasted container weight is set
+        self.aw.scale_manager.update_availability(force=True)
 
     def updateRoastedContainerWeight(self) -> None:
         weight = self.aw.qmc.get_container_weight(self.aw.container2_idx)
@@ -3178,6 +3267,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
             self.aw.ser.externalprogram = self.programedit.text()
             self.aw.ser.externaloutprogram = self.outprogramedit.text()
+
+            self.aw.two_bucket_mode = self.dual_bucket_mode.isChecked()
+            self.aw.green_task_precision = self.greenTaskPrecision.value()
 
             if self.pidButton.isChecked():
                 #type index[0]: 0 = PXG, 1 = PXR, 2 = DTA
@@ -4474,6 +4566,12 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             _log.exception(e)
             _t, _e, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' device accept(): {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
+
+    @pyqtSlot(bool)
+    def bucket_mode_toggled(self, b:bool = False) -> None:
+        self.bucket_button1.setEnabled(not b)
+        self.bucket_button2.setEnabled(b)
+        self.bucket_button3.setEnabled(b)
 
     @pyqtSlot(bool)
     def showExtradevHelp(self, _checked:bool = False) -> None:

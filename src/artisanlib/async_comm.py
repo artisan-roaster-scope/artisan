@@ -182,7 +182,7 @@ class AsyncComm:
     # asyncio loop
 
     @staticmethod
-    async def open_serial_connection(*, loop:Optional[asyncio.AbstractEventLoop] = None,
+    async def open_serial_connection(url:str, *, loop:Optional[asyncio.AbstractEventLoop] = None,
             limit:Optional[int] = None, **kwargs:Union[int,float,str]) -> Tuple[asyncio.StreamReader, asyncio.StreamWriter]:
         """A wrapper for create_serial_connection() returning a (reader,
         writer) pair.
@@ -204,7 +204,7 @@ class AsyncComm:
         reader = asyncio.StreamReader(limit=limit, loop=loop)
         protocol = asyncio.StreamReaderProtocol(reader, loop=loop)
         transport, _ = await create_serial_connection(
-            loop=loop, protocol_factory=lambda: protocol, **kwargs
+            loop, lambda: protocol, url, **kwargs
         )
         writer = asyncio.StreamWriter(transport, protocol, reader, loop)
         return reader, writer

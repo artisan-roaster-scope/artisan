@@ -197,13 +197,13 @@ def main() -> None:
     import time
     from artisanlib.atypes import SerialSettings
     # bench top
-    colortrack_serial:SerialSettings = {
-        'port': '/dev/slave',
-        'baudrate': 9600,
-        'bytesize': 8,
-        'stopbits': 1,
-        'parity': 'N',
-        'timeout': 0.3}
+    colortrack_serial = SerialSettings(
+        port = '/dev/slave',
+        baudrate = 9600,
+        bytesize = 8,
+        stopbits = 1,
+        parity = 'N',
+        timeout = 0.3)
     colorTrack = ColorTrack(serial=colortrack_serial)
     colorTrack.start()
     for _ in range(4):

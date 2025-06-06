@@ -1787,7 +1787,7 @@ class CurvesDlg(ArtisanDialog):
                 # redraw
                 self.aw.qmc.redraw(recomputeAllDeltas=False)
 
-                self.aw.sendmessage(QApplication.translate('Message','New Extra Device: virtual: y1(x) =[%s]; y2(x)=[%s]')%(EQU[0],EQU[1])) # noqa: UP031
+                self.aw.sendmessage(QApplication.translate('Message','New Extra Device: virtual: y1(x) =[{}]; y2(x)=[{}]').format(EQU[0],EQU[1]))
 
         self.aw.calcVirtualdevices()
         self.update_equbuttons()

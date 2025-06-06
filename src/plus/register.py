@@ -191,19 +191,20 @@ def getPath(uuid: str) -> Optional[str]:
 def scanDir(path: Optional[str] = None) -> None:
     _log.debug('scanDir(%s)', path)
     try:
-        assert config.app_window is not None
-        if path is None:
-            # search the last used path
-            currentDictory = Path(
-                config.app_window.getDefaultPath()
-            )  # @UndefinedVariable
-        else:
-            currentDictory = Path(path)
-        for currentFile in currentDictory.glob(f'*.{config.profile_ext}'):
-            d = config.app_window.deserialize(
-                str(currentFile)
-            )  # @UndefinedVariable
-            if d is not None and config.uuid_tag in d:
-                addPath(d[config.uuid_tag], str(currentFile))  # @UndefinedVariable
+        aw = config.app_window
+        if aw is not None:
+            if path is None:
+                # search the last used path
+                currentDictory = Path(
+                    aw.getDefaultPath()
+                )  # @UndefinedVariable
+            else:
+                currentDictory = Path(path)
+            for currentFile in currentDictory.glob(f'*.{config.profile_ext}'):
+                d = aw.deserialize(
+                    str(currentFile)
+                )  # @UndefinedVariable
+                if d is not None and config.uuid_tag in d:
+                    addPath(d[config.uuid_tag], str(currentFile))  # @UndefinedVariable
     except Exception as e:  # pylint: disable=broad-except
         _log.exception(e)

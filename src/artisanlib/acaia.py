@@ -41,12 +41,12 @@ _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 @unique
 class SCALE_CLASS(IntEnum):
-    LEGACY = 1 # eg. Pearl Legacy
+    LEGACY = 1 # eg. Pearl Legacy, Lunar Legacy
         # split messages between several (mostly 2) payloads
-    MODERN = 2 # eg. Lunar, Lunar 2021, Pearl, Pearl 2021, Pearl S
+    MODERN = 2 # eg. Lunar 2021, Pearl, Pearl 2021, Pearl S, Cinco, Pyxis
         # report weight in unit indicated by byte 2 of STATUS_A message
     RELAY = 3  # relaying scales without display eg. Umbra, ..
-        # report weight always in g; byte 2 of STATUS_A message reports auto off timer
+        # report weight always in g (big-endian!); byte 2 of STATUS_A message reports auto off timer; stable bit inverted
 
 @unique
 class UNIT(IntEnum):
@@ -187,7 +187,7 @@ ACAIA_SCALE_NAMES = [
 
 class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
 
-    weight_changed_signal = pyqtSignal(float) # delivers new weight in g with decimals for accurate conversion
+    weight_changed_signal = pyqtSignal(float, bool) # delivers new weight in g with decimals for accurate conversion, and flag indicaating stable readings
     battery_changed_signal = pyqtSignal(int)  # delivers new batter level in %
     connected_signal = pyqtSignal()     # issued on connect
     disconnected_signal = pyqtSignal()  # issued on disconnect
@@ -196,7 +196,7 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
     HEADER1:Final[bytes]      = b'\xef'
     HEADER2:Final[bytes]      = b'\xdd'
 
-    HEARTBEAT_FREQUENCY = 5 # every 5 sec send the heartbeat
+    HEARTBEAT_FREQUENCY = 5 # send the heartbeat every 5 sec
 
 
 # NOTE: __slots__ are incompatible with multiple inheritance mixings in subclasses (as done below in class Acaia with QObject)
@@ -205,12 +205,18 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
 #            '_connected_handler', '_disconnected_handler' ]
 
     def __init__(self, connected_handler:Optional[Callable[[], None]] = None,
-                       disconnected_handler:Optional[Callable[[], None]] = None):
+                       disconnected_handler:Optional[Callable[[], None]] = None,
+                       stable_only:bool=True, # if True only stable weight readings are reported by weight_changed_signal
+                       decimals:int=1): # number of significant decimals (0, 1, ..) of the weight signal
         super().__init__()
 
         # handlers
         self._connected_handler = connected_handler
         self._disconnected_handler = disconnected_handler
+
+        # configuration
+        self.stable_only:bool = stable_only
+        self.decimals:int = decimals
 
         # scale class
         self.scale_class:SCALE_CLASS = SCALE_CLASS.MODERN
@@ -224,6 +230,7 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
 
         # readings
         self.weight:Optional[float] = None
+        self.stable_weight:Optional[float] = None
         self.battery:Optional[int] = None
         self.firmware:Optional[Tuple[int,int,int]] = None # on connect this is set to a triple of integers, (major, minor, patch)-version
         self.unit:int = UNIT.G
@@ -303,7 +310,7 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
             self.firmware = (data[3],data[4],data[5])
             _log.debug('firmware: %s.%s.%s', self.firmware[0], self.firmware[1], f'{self.firmware[2]:>03}')
 
-    def decode_weight(self, payload:bytes) -> Optional[float]:
+    def decode_weight(self, payload:bytes) -> Tuple[Optional[float], bool]:
         try:
             #big_endian = (payload[5] & 0x08) == 0x08 # bit 3 of byte 5 is set if weight is in big endian
             big_endian = self.scale_class == SCALE_CLASS.RELAY
@@ -339,30 +346,39 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
                 elif self.unit == UNIT.OZ:
                     value = value * 28.3495 # scale set to oz displays 4 decimals
 
-            #stable = (payload[5] & 0x01) != 0x01
+            if self.scale_class == SCALE_CLASS.RELAY:
+                stable = (payload[5] & 0x01) == 0x01
+            else:
+                stable = (payload[5] & 0x01) != 0x01
 
             # if 2nd bit of payload[5] is set, the reading is negative
             if (payload[5] & 0x02) == 0x02:
                 value *= -1
-            return value
+            return value, stable
         except Exception:  # pylint: disable=broad-except
-            return None
+            return None, False
 
-    def update_weight(self, value:Optional[float]) -> None:
-        if value is not None:
-            # convert the weight in g delivered with two decimals to an int
-            value_rounded:float = float2float(value, 1)
-            # if value is fresh and reading is stable
-            if value_rounded != self.weight: # and stable:
+    def update_weight(self, value:Optional[float], stable:Optional[bool] = False) -> None:
+        if value is not None and (not self.stable_only or stable):
+            # convert the weight in g delivered with one decimals to an int
+            value_rounded:float = float2float(value, self.decimals)
+            if stable and value_rounded != self.stable_weight:
+                # if value is fresh and reading is stable (if self.stable_only is set)
+                self.stable_weight = value_rounded
+                self.weight = self.weight # we also update the last weight value to prevent it to be send again
+#                _log.debug('PRINT new stable weight: %s', self.stable_weight)
+                self.weight_changed_signal.emit(self.stable_weight, stable)
+            elif not stable and value_rounded != self.weight:
                 self.weight = value_rounded
-                self.weight_changed_signal.emit(self.weight)
-                _log.debug('new weight: %s', self.weight)
+#                _log.debug('PRINT new weight: %s', self.weight)
+                self.weight_changed_signal.emit(self.weight, stable)
 
     # returns length of consumed data or -1 on error
     def parse_weight_event(self, payload:bytes) -> int:
         if len(payload) < EVENT_LEN.WEIGHT:
             return -1
-        self.update_weight(self.decode_weight(payload))
+        weight, stable = self.decode_weight(payload)
+        self.update_weight(weight, stable)
         return EVENT_LEN.WEIGHT
 
     def parse_battery_event(self, payload:bytes) -> int:
@@ -390,7 +406,7 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
     def parse_ack_event(self, payload:bytes) -> int:
         if len(payload) < EVENT_LEN.ACK:
             return -1
-        _log.debug('ACK EVENT')
+#        _log.debug('ACK EVENT')
         consumed_extra = self.parse_extra_weight_time_data(payload[1:])
         return EVENT_LEN.ACK + consumed_extra
 
@@ -410,16 +426,22 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
                 _log.debug('aditional key info 4: %s', payload[1:])
             elif payload[0] == KEY_ADDITIONAL_INFO.WEIGHT:
                 data_payload = payload[1:]
-                weight = (self.decode_weight(data_payload) if len(data_payload) >= EVENT_LEN.WEIGHT else 0)
-                _log.debug('key event weight: %s', weight)
+                if len(data_payload) >= EVENT_LEN.WEIGHT:
+                    weight, stable = self.decode_weight(data_payload)
+                    _log.debug('key event weight: %s (stable: %s)', weight, stable)
+                else:
+                    weight = 0
             elif payload[0] == KEY_ADDITIONAL_INFO.SIX:
                 _log.debug('aditional key info 6: %s', payload[1:])
             elif payload[0] == KEY_ADDITIONAL_INFO.WEIGHT_TIME:
                 time_payload = payload[1:]
                 time = (self.decode_time(time_payload) if len(time_payload) >= EVENT_LEN.TIMER else 0)
                 weight_payload = payload[5:]
-                weight = (self.decode_weight(weight_payload) if len(weight_payload) >= EVENT_LEN.WEIGHT else 0)
-                _log.debug('key event time: %s, weight: %s',time,weight)
+                if len(weight_payload) >= EVENT_LEN.WEIGHT:
+                    weight, stable = self.decode_weight(weight_payload)
+                    _log.debug('key event time: %s, weight: %s (stable: %s)',time,weight,stable)
+                else:
+                    weight = 0
             elif payload[0] == KEY_ADDITIONAL_INFO.BATTERY:
                 data_payload = payload[1:]
                 if len(data_payload) > EVENT_LEN.BATTERY:
@@ -458,7 +480,7 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
         return EVENT_LEN.KEY + consumed_extra
 
     def parse_scale_event(self, payload:bytes) -> int:
-        if payload and len(payload) > 0:
+        if payload and len(payload) > 1:
             event = payload[1]
             payload = payload[2:]
             val = -1
@@ -494,7 +516,7 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
     ##
 
     def parse_status(self, payload:bytes) -> None:
-        _log.debug('STATUS')
+#        _log.debug('STATUS')
 
         # byte 0: message len
 
@@ -502,7 +524,7 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
         if payload and len(payload) > 1:
             self.battery = int(payload[1] & ~(1 << 7))
             self.battery_changed_signal.emit(self.battery)
-            _log.debug('battery: %s%%', self.battery)
+#            _log.debug('battery: %s%%', self.battery)
 
         # byte 2:
         if payload and len(payload) > 2:
@@ -511,117 +533,121 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
                 auto_off = int(payload[2] & 0xFF)
                 if auto_off == 0:
                     self.auto_off_timer = AUTO_OFF_TIMER.AUTO_SLEEP_OFF
-                    _log.debug('AUTO OFF TIMER: Auto Sleep Off')
+#                    _log.debug('AUTO OFF TIMER: Auto Sleep Off')
                 elif auto_off == 1:
                     self.auto_off_timer = AUTO_OFF_TIMER.AUTO_SLEEP_5MIN
-                    _log.debug('AUTO OFF TIMER: AutoSleep 5 min')
+#                    _log.debug('AUTO OFF TIMER: AutoSleep 5 min')
                 elif auto_off == 2:
                     self.auto_off_timer = AUTO_OFF_TIMER.AUTO_SLEEP_15MIN
-                    _log.debug('AUTO OFF TIMER: AutoSleep 15 min')
+#                    _log.debug('AUTO OFF TIMER: AutoSleep 15 min')
                 elif auto_off == 3:
                     self.auto_off_timer = AUTO_OFF_TIMER.AUTO_SLEEP_30MIN
-                    _log.debug('AUTO OFF TIMER: AutoSleep 30 min')
+#                    _log.debug('AUTO OFF TIMER: AutoSleep 30 min')
                 elif auto_off == 4:
                     self.auto_off_timer = AUTO_OFF_TIMER.AUTO_OFF_5MIN
-                    _log.debug('AUTO OFF TIMER: Auto Off 5 min')
+#                    _log.debug('AUTO OFF TIMER: Auto Off 5 min')
                 elif auto_off == 5:
                     self.auto_off_timer = AUTO_OFF_TIMER.AUTO_OFF_10MIN
-                    _log.debug('AUTO OFF TIMER: Auto Off 10 min')
+#                    _log.debug('AUTO OFF TIMER: Auto Off 10 min')
                 elif auto_off == 6:
                     self.auto_off_timer = AUTO_OFF_TIMER.AUTO_OFF_30MIN
-                    _log.debug('AUTO OFF TIMER: Auto Off 30 min')
+#                    _log.debug('AUTO OFF TIMER: Auto Off 30 min')
                 elif auto_off == 7:
                     self.auto_off_timer = AUTO_OFF_TIMER.AUTO_SLEEP_1MIN
-                    _log.debug('AUTO OFF TIMER: AutoSleep 1 min')
+#                    _log.debug('AUTO OFF TIMER: AutoSleep 1 min')
             else:
                 # display scales: weight unit (7 bits of third byte) + CD_START (1bit)
                 self.unit = int(payload[2] & 0x7F)
-                _log.debug('unit: %s (%s)', self.unit, ('g' if self.unit == UNIT.G else 'oz'))
+#                _log.debug('unit: %s (%s)', self.unit, ('g' if self.unit == UNIT.G else 'oz'))
 
-        # byte 3:
-        if payload and len(payload) > 3:
-            if self.scale_class == SCALE_CLASS.RELAY:
-                # relay scales: beep setting (0:off, 1:on)
-                # display scales: beep setting (0:off, 1:on)
-                _log.debug('sound: %s', ('on' if payload[6] else 'off'))
-            else:
-                # display scales: mode (7 bits of third byte) + tare (1bit)
-                mode = int(payload[3] & 0x7F)
-                _log.debug('mode: %s', mode)
-                _log.debug('tare: %s', (payload[3] & 0x80) == 0x80)
-                # Lunar
-                # 2: NodE_1 Weighing Mode
-                # 4: NodE_2 Dual Display Mode
-                # 3: NodE_3 Timer Starts with Flow Mode (drop)
-                # 15: NodE_4 Auto-Tare Timer Starts with Flow Mode (drop/square)
-                # 16: NodE_5 Auto-Tare Auto-Start Timer Mode (triangle/square)
-                # 17: NodE_6 Auto-Tare Mode (square)
+#        # byte 3:
+#        if payload and len(payload) > 3:
+#            if self.scale_class == SCALE_CLASS.RELAY:
+#                # relay scales: beep setting (0:off, 1:on)
+#                # display scales: beep setting (0:off, 1:on)
+#                _log.debug('sound: %s', ('on' if payload[6] else 'off'))
+#            else:
+#                # display scales: mode (7 bits of third byte) + tare (1bit)
+#                mode = int(payload[3] & 0x7F)
+#                _log.debug('mode: %s', mode)
+#                _log.debug('tare: %s', (payload[3] & 0x80) == 0x80)
+#                # Lunar
+#                # 2: NodE_1 Weighing Mode
+#                # 4: NodE_2 Dual Display Mode
+#                # 3: NodE_3 Timer Starts with Flow Mode (drop)
+#                # 15: NodE_4 Auto-Tare Timer Starts with Flow Mode (drop/square)
+#                # 16: NodE_5 Auto-Tare Auto-Start Timer Mode (triangle/square)
+#                # 17: NodE_6 Auto-Tare Mode (square)
 
-        # byte 4:
-        if payload and len(payload) > 4:
-            if self.scale_class == SCALE_CLASS.RELAY:
-                # relay scales: weight unit setting (0:g, 1:oz)
-                self.unit = (UNIT.OZ if payload[4] == 1 else UNIT.G)
-                _log.debug('unit: %s (%s)', self.unit, ('g' if self.unit == UNIT.G else 'oz'))
-            else:
-                sleep_modes = {0:'off', 1:'5sec', 2:'10sec', 3:'20sec', 4:'30sec', 5:'60sec'}
-                _log.debug('sleep: %s%s', payload[4], (f' ({sleep_modes[payload[4]]})' if (payload[4] in sleep_modes) else ''))
+#        # byte 4:
+#        if payload and len(payload) > 4:
+#            if self.scale_class == SCALE_CLASS.RELAY:
+#                # relay scales: weight unit setting (0:g, 1:oz)
+#                self.unit = (UNIT.OZ if payload[4] == 1 else UNIT.G)
+#                _log.debug('unit: %s (%s)', self.unit, ('g' if self.unit == UNIT.G else 'oz'))
+#            else:
+#                sleep_modes = {0:'off', 1:'5sec', 2:'10sec', 3:'20sec', 4:'30sec', 5:'60sec'}
+#                _log.debug('sleep: %s%s', payload[4], (f' ({sleep_modes[payload[4]]})' if (payload[4] in sleep_modes) else ''))
 
-        # byte 5:
-        if payload and len(payload) > 5:
-            if self.scale_class == SCALE_CLASS.RELAY:
-                # relay scales: resolution setting
-                _log.debug('resolution: %s', ('0.01g' if payload[5] else '0.1g')) # resolution/readability: 0.1g / 0.01g
-            else:
-                # display scales: key disabled (0: off , 1: on)
-                _log.debug('keys disabled: %s', ('on' if payload[5] else 'off'))
+#        # byte 5:
+#        if payload and len(payload) > 5:
+#            if self.scale_class == SCALE_CLASS.RELAY:
+#                # relay scales: resolution setting
+#                _log.debug('resolution: %s', ('0.01g' if payload[5] else '0.1g')) # resolution/readability: 0.1g / 0.01g
+#            else:
+#                # display scales: key disabled (0: off , 1: on)
+#                _log.debug('keys disabled: %s', ('on' if payload[5] else 'off'))
 
-        # byte 6:
-        if payload and len(payload) > 6:
-            if self.scale_class == SCALE_CLASS.RELAY:
-                # relay scales: magic relay sensing (low/normal/high)
-                _log.debug('magic relay sensing: %s', payload[6])
-                # 0: low, 1: normal, 2: high
-            else:
-                # display scales: beep setting (0:off, 1:on)
-                _log.debug('sound: %s', ('on' if payload[6] else 'off'))
+#        # byte 6:
+#        if payload and len(payload) > 6:
+#            if self.scale_class == SCALE_CLASS.RELAY:
+#                # relay scales: magic relay sensing (low/normal/high)
+#                _log.debug('magic relay sensing: %s', payload[6])
+#                # 0: low, 1: normal, 2: high
+#            else:
+#                # display scales: beep setting (0:off, 1:on)
+#                _log.debug('sound: %s', ('on' if payload[6] else 'off'))
 
         # byte 7:
-        if payload and len(payload) > 7:
-            if self.scale_class == SCALE_CLASS.RELAY:
-                # relay scales: magic relay beep
-                _log.debug('magic relay beep: %s', ('on' if payload[7] else 'off'))
-            else:
-                # display scales: resolution (0:default, 1:high)
-                _log.debug('resolution: %s', ('high' if payload[7] else 'default'))
+#        if payload and len(payload) > 7:
+#            if self.scale_class == SCALE_CLASS.RELAY:
+#                # relay scales: magic relay beep
+#                _log.debug('magic relay beep: %s', ('on' if payload[7] else 'off'))
+#            else:
+#                # display scales: resolution (0:default, 1:high)
+#                _log.debug('resolution: %s', ('high' if payload[7] else 'default'))
 
-        # byte 8/8/10:
-        if payload and len(payload) > 10 and self.scale_class == SCALE_CLASS.RELAY:
-            # firmware version
-            firmware = (payload[8],payload[9],payload[10])
-            _log.debug('firmware: %s.%s.%s', firmware[0], firmware[1], firmware[2])
+#        # byte 8/8/10:
+#        if payload and len(payload) > 10 and self.scale_class == SCALE_CLASS.RELAY:
+#            # firmware version
+#            firmware = (payload[8],payload[9],payload[10])
+#            _log.debug('firmware: %s.%s.%s', firmware[0], firmware[1], firmware[2])
 
         # bytes 11 & 12 reserved
 
 
     def parse_data(self, msg_type:int, data:bytes) -> None:
-        if msg_type == CMD.INFO_A:
-            self.parse_info(data)
-            self.send_ID() # send also after very INFO_A as handshake confirmation
-        elif msg_type == CMD.STATUS_A:
-            self.parse_status(data)
-        elif msg_type == CMD.EVENT_SA:
-            self.parse_scale_events(data)
-        #
-        if self.id_sent and not self.fast_notifications_sent:
-            # we configure the scale to receive the initial
-            # weight notification as fast as possible
-            # Note: this event is needed to have the connected scale start to send weight messages even on relay scales which ignore the settings
-            self.fast_notifications()
+        try:
+            if msg_type == CMD.INFO_A:
+                self.parse_info(data)
+                self.send_ID() # send also after very INFO_A as handshake confirmation
+            elif msg_type == CMD.STATUS_A:
+                self.parse_status(data)
+            elif msg_type == CMD.EVENT_SA:
+                self.parse_scale_events(data)
+            #
+            if self.id_sent and not self.fast_notifications_sent:
+                # we configure the scale to receive the initial
+                # weight notification as fast as possible
+                # Note: this event is needed to have the connected scale start to send weight messages even on relay scales which ignore the settings
+                self.fast_notifications()
 
-        if not self.id_sent:
-            # send ID only once per connect to initiate the handshake
-            self.send_ID()
+            if not self.id_sent:
+                # send ID only once per connect to initiate the handshake
+                self.send_ID()
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
+            _log.debug('data: %s',data)
 
     ##
 
@@ -658,7 +684,7 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
 
     # keep alive should be send every 3-5sec
     def heartbeat(self) -> None:
-        _log.debug('send heartbeat')
+#        _log.debug('send heartbeat')
         self.send_message(MSG.SYSTEM, b'\x02\x00')
 
     def send_stop(self) -> None: # stop what?
@@ -667,7 +693,11 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
 
     def send_tare(self) -> None:
         _log.debug('send tare')
+        if SCALE_CLASS.RELAY:
+            self.streaming_notifications()
         self.send_message(MSG.TARE,b'\x00')
+        if SCALE_CLASS.RELAY:
+            self.changes_notifications()
 
     def send_get_settings(self) -> None:
         _log.debug('send get settings')
@@ -697,29 +727,45 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
 
     # NOTE: notifications configuration not supported by Umbra and newer scales!
 
-    def slow_notifications(self) -> None:
-        _log.debug('slow notifications')
+    def streaming_notifications(self) -> None:
+        _log.debug('streaming_notifications')
         self.send_event(
             bytes([ # pairs of key/setting
                     0,  # weight id
-                    7,  # 0, 1, 3, 5, 7, 15, 31, 63, 127  # weight argument (speed of notifications in 1/10 sec)
+                    1])) # only SCALE_CLASS.RELAY # 0: only weight changes are reported; 1: streaming weight changes at 1/10
+
+    def changes_notifications(self) -> None:
+        _log.debug('streaming_notifications')
+        self.send_event(
+            bytes([ # pairs of key/setting
+                    0,  # weight id
+                    0])) # only SCALE_CLASS.RELAY # 0: only weight changes are reported; 1: streaming weight changes at 1/10
+
+    def slow_notifications(self) -> None:
+#        _log.debug('slow notifications')
+        self.send_event(
+            bytes([ # pairs of key/setting
+                    0,  # weight id
+                    (0 if SCALE_CLASS.RELAY # 0: only weight changes are reported; 1: streaming weight changes at 1/10
+                     else 3), # 0, 1, 3, 5, 7, 15, 31, 63, 127  # weight argument (speed of notifications in 1/10 sec; 0:  report changes in weight every 1/10)
                         # 5 or 7 seems to be good values for this app in Artisan
 #                    1,   # battery id
 #                    255, #2,  # battery argument (if 0 : fast, 1 : slow)
 #                    2,  # timer id
 #                    255, #5,  # timer argument (number of heartbeats between timer messages)
-#                    3,  # key id (not used)
-#                    255, #4   # setting (not used)
+#                    3,  # key id
+#                    255, #4   # request to receive key events
                 ])
                 )
         self.slow_notifications_sent = True
 
     def fast_notifications(self) -> None:
-        _log.debug('fast notifications')
+#        _log.debug('fast notifications')
         self.send_event(
             bytes([ # pairs of key/setting
                     0,  # weight id
-                    1,  # 0, 1, 3, 5, 7, 15, 31, 63, 127  # weight argument (speed of notifications in 1/10 sec)
+                    (1 if SCALE_CLASS.RELAY # 0: only weight changes are reported; 1: streaming weight changes at 1/10
+                     else 1),  # 0, 1, 3, 5, 7, 15, 31, 63, 127  # weight argument (speed of notifications in 1/10 sec) # larger values => slower updates
                         # 5 or 7 seems to be good values for this app in Artisan
 #                    1,   # battery id
 #                    255, #2,  # battery argument (if 0 : fast, 1 : slow, 2: very slow; not set only once?)
@@ -783,12 +829,15 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
 class Acaia(Scale): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
 
     def __init__(self, model:int, ident:Optional[str], name:Optional[str], connected_handler:Optional[Callable[[], None]] = None,
-                       disconnected_handler:Optional[Callable[[], None]] = None):
+                       disconnected_handler:Optional[Callable[[], None]] = None,
+                       stable_only:bool=False,
+                       decimals:int=1):
         super().__init__(model, ident, name)
-        self.acaia = AcaiaBLE(connected_handler = connected_handler, disconnected_handler=disconnected_handler)
+        self.acaia = AcaiaBLE(connected_handler = connected_handler, disconnected_handler=disconnected_handler, stable_only=stable_only, decimals=decimals)
         self.acaia.weight_changed_signal.connect(self.weight_changed)
         self.acaia.connected_signal.connect(self.on_connect)
         self.acaia.disconnected_signal.connect(self.on_disconnect)
+        self.stable_only = stable_only
 
         self.scale_connected = False
 
@@ -815,9 +864,9 @@ class Acaia(Scale): # pyright: ignore [reportGeneralTypeIssues] # Argument to cl
     def disconnect_scale(self) -> None:
         self.acaia.stop()
 
-    @pyqtSlot(float)
-    def weight_changed(self, new_value:float) -> None:
-        self.weight_changed_signal.emit(new_value)
+    @pyqtSlot(float, bool)
+    def weight_changed(self, new_value:float, stable:bool) -> None:
+        self.weight_changed_signal.emit(new_value, stable)
 
     def battery_changed(self, new_value:int) -> None:
         self.battery_changed_signal.emit(new_value)

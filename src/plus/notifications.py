@@ -31,6 +31,7 @@ except Exception: # pylint: disable=broad-except
 from typing import Final, List, Dict, Any
 
 import json
+import json.decoder
 import logging
 
 from artisanlib.notifications import ntype2NotificationType
@@ -49,13 +50,12 @@ get_notifications_semaphore = QSemaphore(
 def updateNotifications(notifications: int, machines:List[str]) -> None:
     _log.debug('updateNotifications(%s,%s)',notifications,machines)
     try:
-        if config.app_window:
-            aw = config.app_window
-            # we fetch notifications if notifications are enabled within the Artisan settings, there are some unqualified notifications, or
-            # our machine name is in the list of machines indicating that there is a qualified notification for us
-            if aw.notificationsflag and (notifications>0 or aw.qmc.roastertype_setup in machines):
-                # should happen with less delay (0.7s) then the stock.update() (2s) triggered controller.connect() to avoid duplicate fetching on startup
-                QTimer.singleShot(700, retrieveNotifications)
+        aw = config.app_window
+        # we fetch notifications if notifications are enabled within the Artisan settings, there are some unqualified notifications, or
+        # our machine name is in the list of machines indicating that there is a qualified notification for us
+        if aw is not None and aw.notificationsflag and (notifications>0 or aw.qmc.roastertype_setup in machines):
+            # should happen with less delay (0.7s) then the stock.update() (2s) triggered controller.connect() to avoid duplicate fetching on startup
+            QTimer.singleShot(700, retrieveNotifications)
     except Exception as e: # pylint: disable=broad-except
         _log.exception(e)
 
@@ -112,21 +112,20 @@ def retrieveNotifications() -> None:
 # process the received plus notifications and hand them over to the Artisan notification system
 def processNotification(plus_notification:Dict[str,Any], i:int) -> None:
     try:
-        if config.app_window is not None:
-            aw = config.app_window
-            if aw.notificationManager:
-                created = None
-                try:
-                    created = util.ISO86012epoch(plus_notification['added_on'])
-                except Exception as e:  # pylint: disable=broad-except
-                    _log.error(e)
-                aw.notificationManager.sendNotificationMessage(
-                    util.extractInfo(plus_notification, 'title', ''),
-                    util.extractInfo(plus_notification, 'text', ''),
-                    ntype2NotificationType(util.extractInfo(plus_notification, 'ntype', '')),
-                    created = created,
-                    hr_id = util.extractInfo(plus_notification, 'hr_id', None),
-                    link = util.extractInfo(plus_notification, 'link', None),
-                    pos = i)
+        aw = config.app_window
+        if aw is not None and aw.notificationManager:
+            created = None
+            try:
+                created = util.ISO86012epoch(plus_notification['added_on'])
+            except Exception as e:  # pylint: disable=broad-except
+                _log.error(e)
+            aw.notificationManager.sendNotificationMessage(
+                util.extractInfo(plus_notification, 'title', ''),
+                util.extractInfo(plus_notification, 'text', ''),
+                ntype2NotificationType(util.extractInfo(plus_notification, 'ntype', '')),
+                created = created,
+                hr_id = util.extractInfo(plus_notification, 'hr_id', None),
+                link = util.extractInfo(plus_notification, 'link', None),
+                pos = i)
     except Exception as e:  # pylint: disable=broad-except
         _log.exception(e)

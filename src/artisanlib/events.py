@@ -2324,7 +2324,7 @@ class EventsDlg(ArtisanResizeablDialog):
 
     def localSetbuttonsfrom(self, pindex:int) -> int:
         if 0 <= pindex < self.aw.max_palettes:
-            copy = cast('Palette', self.aw.buttonpalette[pindex][:])
+            copy = self.aw.buttonpalette[pindex][:]
             if len(copy):
                 self.extraeventstypes = copy[0][:] # pylint: disable=attribute-defined-outside-init
                 self.extraeventsvalues = copy[1][:] # pylint: disable=attribute-defined-outside-init

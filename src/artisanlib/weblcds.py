@@ -229,6 +229,7 @@ class WebGreen(WebView):
     def __init__(self, title:str, port:int, resource_path:str) -> None:
         super().__init__(port, resource_path, WebGreen.index_path, f'{WebGreen.ws_path}')
         self._title = title
+        self._min_send_interval = 0 # send all updates
 
     @aiohttp_jinja2.template(template_name)
     async def index(self, _request: 'Request') -> Dict[str,str]:
@@ -260,6 +261,7 @@ class WebRoasted(WebView):
     def __init__(self, title:str, port:int, resource_path:str) -> None:
         super().__init__(port, resource_path, WebRoasted.index_path, f'{WebRoasted.ws_path}')
         self._title = title
+        self._min_send_interval = 0 # send all updates
 
     @aiohttp_jinja2.template(template_name)
     async def index(self, _request: 'Request') -> Dict[str,str]:

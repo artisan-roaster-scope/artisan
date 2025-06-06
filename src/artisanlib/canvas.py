@@ -44,7 +44,7 @@ from typing import Final, Optional, List, Set, Dict, Callable, Tuple, Union, Any
 
 if TYPE_CHECKING:
     from artisanlib.comm import serialport # pylint: disable=unused-import
-    from artisanlib.atypes import ProfileData, EnergyMetrics, BTU, AlarmSet # pylint: disable=unused-import
+    from artisanlib.atypes import ProfileData, BTU # pylint: disable=unused-import
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
     from plus.stock import Blend # pylint: disable=unused-import
     from plus.blend import CustomBlend # pylint: disable=unused-import
@@ -66,7 +66,7 @@ from artisanlib import pid
 from artisanlib.time import ArtisanTime
 from artisanlib.filters import LiveMedian
 from artisanlib.dialogs import ArtisanMessageBox
-from artisanlib.atypes import SerialSettings, BTBreakParams, BbpCache
+from artisanlib.atypes import SerialSettings, BTBreakParams, BbpCache, AlarmSet, EnergyMetrics
 
 # import artisan.plus module
 from plus.util import roastLink
@@ -1648,7 +1648,7 @@ class tgraphcanvas(FigureCanvas):
 
         # container scale tare
         self.container_names:List[str] = []
-        self.container_weights:List[float] = [] # all weights in g and as float
+        self.container_weights:List[float] = [] # all weights in g
         self.container_idx:int = -1 # the empty field (as -1 + 2 = 1)
 
         #stores _indexes_ of self.timex to record events.
@@ -2971,6 +2971,7 @@ class tgraphcanvas(FigureCanvas):
 
     def onpick(self, event:'PickEvent') -> None:
         try:
+            event_artist = event.artist
             # reset picked foreground event
             self.foreground_event_ind = None
             self.foreground_event_pos = None
@@ -2982,7 +2983,7 @@ class tgraphcanvas(FigureCanvas):
             self.background_event_pick_position = None
             self.clear_last_background_picked_event_selection()
             # display MET information by clicking on the MET marker
-            if (isinstance(event.artist, Annotation) and self.showmet and event.artist in [self.met_annotate] and
+            if (isinstance(event_artist, Annotation) and self.showmet and event_artist in [self.met_annotate] and
                     self.met_timex_temp1_delta is not None and self.met_timex_temp1_delta[2] is not None):
                 if  self.met_timex_temp1_delta[2] >= 0:
                     met_time_str = str(self.met_timex_temp1_delta[2])
@@ -2994,25 +2995,25 @@ class tgraphcanvas(FigureCanvas):
                 self.aw.sendmessage(f'MET {float2float(self.met_timex_temp1_delta[1],1)}{self.mode} @ {stringfromseconds(self.met_timex_temp1_delta[0])}, {met_time_str} {met_time_msg}')
 
             # the analysis results were clicked
-            elif self.aw.analysisresultsanno is not None and isinstance(event.artist, Annotation) and event.artist in [self.aw.analysisresultsanno]:
+            elif self.aw.analysisresultsanno is not None and isinstance(event_artist, Annotation) and event_artist in [self.aw.analysisresultsanno]:
                 self.analysispickflag = True
 
             # the segment results were clicked
-            elif self.aw.segmentresultsanno is not None and isinstance(event.artist, Annotation) and event.artist in [self.aw.segmentresultsanno]:
+            elif self.aw.segmentresultsanno is not None and isinstance(event_artist, Annotation) and event_artist in [self.aw.segmentresultsanno]:
                 self.segmentpickflag = True
 
             # toggle visibility of graph lines by clicking on the legend
-            elif self.legend is not None and event.artist != self.legend and isinstance(event.artist, (Line2D, Text)) \
-                and event.artist not in [self.l_backgroundeventtype1dots,self.l_backgroundeventtype2dots,self.l_backgroundeventtype3dots,self.l_backgroundeventtype4dots] \
-                and event.artist not in [self.l_eventtype1dots,self.l_eventtype2dots,self.l_eventtype3dots,self.l_eventtype4dots]:
+            elif self.legend is not None and event_artist != self.legend and isinstance(event_artist, (Line2D, Text)) \
+                and event_artist not in [self.l_backgroundeventtype1dots,self.l_backgroundeventtype2dots,self.l_backgroundeventtype3dots,self.l_backgroundeventtype4dots] \
+                and event_artist not in [self.l_eventtype1dots,self.l_eventtype2dots,self.l_eventtype3dots,self.l_eventtype4dots]:
                 idx = None
                 # deltaLabelMathPrefix (legend label)
                 # deltaLabelUTF8 (artist)
-                if isinstance(event.artist, Text):
+                if isinstance(event_artist, Text):
                     artist = None
                     label = None
                     try:
-                        label = event.artist.get_text() # pyright: ignore[reportGeneralTypeIssues]
+                        label = event_artist.get_text()
                         idx = self.labels.index(label)
                     except Exception: # pylint: disable=broad-except
                         pass
@@ -3065,7 +3066,7 @@ class tgraphcanvas(FigureCanvas):
                                 pass
 
             # show event information by clicking on event lines in step, step+ and combo modes
-            elif isinstance(event.artist, Line2D):
+            elif isinstance(event_artist, Line2D):
                 event_type:Optional[int] = None
                 if isinstance(event.ind, int): # type: ignore[attr-defined] # "PickEvent" has no attribute "ind"
                     ind = event.ind # type: ignore[attr-defined] # "PickEvent" has no attribute "ind"
@@ -3074,20 +3075,20 @@ class tgraphcanvas(FigureCanvas):
                         return
                     ind = event.ind[-1] # type: ignore[attr-defined] # "PickEvent" has no attribute "ind"
                 digits = (1 if self.LCDdecimalplaces else 0)
-                if event.artist in [self.l_backgroundeventtype1dots,self.l_backgroundeventtype2dots,self.l_backgroundeventtype3dots,self.l_backgroundeventtype4dots]:
-                    tx = event.artist.get_xdata()[ind]
+                if event_artist in [self.l_backgroundeventtype1dots,self.l_backgroundeventtype2dots,self.l_backgroundeventtype3dots,self.l_backgroundeventtype4dots]:
+                    tx = event_artist.get_xdata()[ind]
                     timex = self.backgroundtime2index(tx)
-                    if event.artist is not None and abs(tx - event.mouseevent.xdata)<3: # allow a slightly different mouse position, but close enough to the point on the line
-                        if event.artist == self.l_backgroundeventtype1dots:
+                    if event_artist is not None and abs(tx - event.mouseevent.xdata)<3: # allow a slightly different mouse position, but close enough to the point on the line
+                        if event_artist == self.l_backgroundeventtype1dots:
                             event_type = 0
-                        elif event.artist == self.l_backgroundeventtype2dots:
+                        elif event_artist == self.l_backgroundeventtype2dots:
                             event_type = 1
-                        elif event.artist == self.l_backgroundeventtype3dots:
+                        elif event_artist == self.l_backgroundeventtype3dots:
                             event_type = 2
-                        elif event.artist == self.l_backgroundeventtype4dots:
+                        elif event_artist == self.l_backgroundeventtype4dots:
                             event_type = 3
                         if event_type is not None:
-                            event_ydata = event.artist.get_ydata()[ind]
+                            event_ydata = event_artist.get_ydata()[ind]
                             event_pos_offset = self.eventpositionbars[0]
                             event_pos_factor = self.eventpositionbars[1] - self.eventpositionbars[0]
                             if self.clampEvents:
@@ -3116,24 +3117,24 @@ class tgraphcanvas(FigureCanvas):
                                         # we support custom event pick-and-drag only for events rendered as step lines, step+ and as combo.
                                         self.background_event_ind = i
                                         self.background_event_pos = ind
-                                        self.background_event_pick_position = (event.artist.get_xdata()[ind],event.artist.get_ydata()[ind])
+                                        self.background_event_pick_position = (event_artist.get_xdata()[ind],event_artist.get_ydata()[ind])
                                         self.background_event_last_picked_ind = i
                                         self.background_event_last_picked_pos = ind
                                     break
-                elif event.artist in [self.l_eventtype1dots,self.l_eventtype2dots,self.l_eventtype3dots,self.l_eventtype4dots]:
-                    tx = event.artist.get_xdata()[ind]
+                elif event_artist in [self.l_eventtype1dots,self.l_eventtype2dots,self.l_eventtype3dots,self.l_eventtype4dots]:
+                    tx = event_artist.get_xdata()[ind]
                     timex = self.time2index(tx)
-                    if event.artist is not None and abs(tx - event.mouseevent.xdata)<3: # allow a slightly different mouse position, but close enough to the point on the line
-                        if event.artist == self.l_eventtype1dots:
+                    if event_artist is not None and abs(tx - event.mouseevent.xdata)<3: # allow a slightly different mouse position, but close enough to the point on the line
+                        if event_artist == self.l_eventtype1dots:
                             event_type = 0
-                        elif event.artist == self.l_eventtype2dots:
+                        elif event_artist == self.l_eventtype2dots:
                             event_type = 1
-                        elif event.artist == self.l_eventtype3dots:
+                        elif event_artist == self.l_eventtype3dots:
                             event_type = 2
-                        elif event.artist == self.l_eventtype4dots:
+                        elif event_artist == self.l_eventtype4dots:
                             event_type = 3
                         if event_type is not None:
-                            event_ydata = event.artist.get_ydata()[ind]
+                            event_ydata = event_artist.get_ydata()[ind]
                             event_pos_offset = self.eventpositionbars[0]
                             event_pos_factor = self.eventpositionbars[1] - self.eventpositionbars[0]
                             if self.clampEvents:
@@ -3161,7 +3162,7 @@ class tgraphcanvas(FigureCanvas):
                                         # we support custom event pick-and-drag only for events rendered as step lines, step+ and as combo.
                                         self.foreground_event_ind = i
                                         self.foreground_event_pos = ind
-                                        self.foreground_event_pick_position = (event.artist.get_xdata()[ind],event.artist.get_ydata()[ind])
+                                        self.foreground_event_pick_position = (event_artist.get_xdata()[ind],event_artist.get_ydata()[ind])
                                         self.foreground_event_last_picked_ind = i
                                         self.foreground_event_last_picked_pos = ind
                                     break
@@ -3737,7 +3738,9 @@ class tgraphcanvas(FigureCanvas):
                         set_y = False
                 xdata = ldots.get_xdata()
                 if set_x:
-                    xdata[self.foreground_event_pos] = int(round(event.xdata))
+                    event_xdata = event.xdata
+                    if event_xdata is not None:
+                        xdata[self.foreground_event_pos] = int(round(event_xdata))
                     ldots.set_xdata(xdata)
                 ydata = ldots.get_ydata()
                 if set_y:
@@ -3821,7 +3824,8 @@ class tgraphcanvas(FigureCanvas):
                     if self.background_event_pos != len(xdata)-1:
                         # there is a point right to ours
                         new_x = min(xdata[self.background_event_pos+1]-1,new_x)
-                    xdata[self.background_event_pos] = int(round(new_x))
+                    if new_x is not None:
+                        xdata[self.background_event_pos] = int(round(new_x))
                     ldots.set_xdata(xdata)
                 ydata = ldots.get_ydata()
                 if set_y:
@@ -4368,7 +4372,7 @@ class tgraphcanvas(FigureCanvas):
     def decay_average(self, tx_in:List[float], temp_in:Sequence[Optional[float]], decay_weights:Optional[List[int]]) -> float:
         if decay_weights is None or len(decay_weights)<2 or len(tx_in) != len(temp_in):
             if len(temp_in)>0 and temp_in[-1] is not None:
-                return temp_in[-1]
+                return temp_in[-1] # ty: ignore[invalid-return-type]
             return -1
         l = min(len(decay_weights),len(temp_in))
         # take trail of length l and remove items where temp[i]=None to fulfil precond. of numpy.interp
@@ -4388,7 +4392,7 @@ class tgraphcanvas(FigureCanvas):
         tx_lin = numpy.flip(numpy.arange(tx_org[-1],tx_org[-1]-l*d,-d), axis=0) # by construction, len(tx_lin)=len(tx_org)=l
         temp_trail_re = numpy.interp(tx_lin, tx_org, temp_trail) # resample data into that linear spaced time
         try:
-            return float(numpy.average(temp_trail_re[-len(decay_weights):],axis=0,weights=decay_weights[-l:]))  # len(decay_weights)>len(temp_trail_re)=l is possible
+            return float(numpy.average(temp_trail_re[-len(decay_weights):],axis=0,weights=decay_weights[-l:])) # ty: ignore[non-subscriptable] # len(decay_weights)>len(temp_trail_re)=l is possible
         except Exception: # pylint: disable=broad-except
             # in case something goes very wrong we at least return the standard average over temp, this should always work as len(tx)=len(temp)
             return float(numpy.average(tx_org, numpy.array(temp_trail)))
@@ -5802,20 +5806,20 @@ class tgraphcanvas(FigureCanvas):
     @staticmethod
     def makeAlarmSet(label:str, flags:List[int], guards:List[int], negguards:List[int], times:List[int], offsets:List[int],
             sources:List[int], conditions:List[int], temperatures:List[float], actions:List[int], beeps:List[int], alarmstrings:List[str]) -> 'AlarmSet':
-        return {
-            'label': label,
-            'flags': flags,
-            'guards': guards,
-            'negguards': negguards,
-            'times': times,
-            'offsets': offsets,
-            'sources': sources,
-            'conditions': conditions,
-            'temperatures': temperatures,
-            'actions': actions,
-            'beeps': beeps,
-            'alarmstrings': alarmstrings
-        }
+        return AlarmSet(
+            label = label,
+            flags = flags,
+            guards = guards,
+            negguards = negguards,
+            times = times,
+            offsets = offsets,
+            sources = sources,
+            conditions = conditions,
+            temperatures = temperatures,
+            actions = actions,
+            beeps = beeps,
+            alarmstrings = alarmstrings
+        )
 
     @staticmethod
     def lists2AlarmSet(l:List[Any]) -> 'AlarmSet':
@@ -6990,7 +6994,7 @@ class tgraphcanvas(FigureCanvas):
                                 if self.specialeventstype[iii] == nint and index >= self.specialevents[iii]:
                                     break  #index found
                             if iii is None:
-                                val = 0 # type: ignore # mypy: Statement is unreachable  [unreachable]
+                                val = 0
                             else:
                                 val = self.eventsInternal2ExternalValue(self.specialeventsvalue[iii])
                         else:
@@ -7402,7 +7406,6 @@ class tgraphcanvas(FigureCanvas):
             starttime = 0
         sign = '' if x >= starttime else '-'
         m,s = divmod(abs(x - starttime), 60.)
-#        return '%s%d:%02d'%(sign,m,s)
         return f'{sign}{m:.0f}:{int(s):02.0f}'
 
     def fmt_data(self, x:float) -> str:
@@ -8057,8 +8060,8 @@ class tgraphcanvas(FigureCanvas):
                 else:
                     result:List[float] = []
                     # ignore -1 readings in averaging and ensure a good ramp
-                    for i, v in enumerate(b):
-                        seq = b[max(0,i-window_len + 1):i+1]
+                    for i, v in enumerate(b): # ty: ignore[invalid-argument-type]
+                        seq = b[max(0,i-window_len + 1):i+1] # ty: ignore[possibly-unbound-implicit-call]
                         w = decay_weights_internal[max(0,window_len-len(seq)):]  # preCond: len(decay_weights_internal)=window_len and len(seq) <= window_len; postCond: len(w)=len(seq)
                         if len(w) == 0:
                             # we don't average if there is are no weights (e.g. if the original seq did only contain -1 values and got empty)
@@ -13055,13 +13058,13 @@ class tgraphcanvas(FigureCanvas):
                 if self.device == 53:
                     # connect HOTTOP
                     from artisanlib.hottop import Hottop
-                    hottop_serial:SerialSettings = {
-                                'port': self.aw.ser.comport,
-                                'baudrate': self.aw.ser.baudrate,
-                                'bytesize': self.aw.ser.bytesize,
-                                'stopbits': self.aw.ser.stopbits,
-                                'parity': self.aw.ser.parity,
-                                'timeout': self.aw.ser.timeout}
+                    hottop_serial = SerialSettings(
+                                port = self.aw.ser.comport,
+                                baudrate = self.aw.ser.baudrate,
+                                bytesize = self.aw.ser.bytesize,
+                                stopbits = self.aw.ser.stopbits,
+                                parity = self.aw.ser.parity,
+                                timeout = self.aw.ser.timeout)
                     self.aw.hottop = Hottop(
                         serial=hottop_serial,
                         connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('Hottop'),True,None),
@@ -13073,13 +13076,13 @@ class tgraphcanvas(FigureCanvas):
                     from artisanlib.santoker import Santoker
                     santoker_serial:Optional[SerialSettings] = None
                     if self.aw.santokerSerial and not self.aw.santokerBLE:
-                        santoker_serial = {
-                                'port': self.aw.ser.comport,
-                                'baudrate': self.aw.ser.baudrate,
-                                'bytesize': self.aw.ser.bytesize,
-                                'stopbits': self.aw.ser.stopbits,
-                                'parity': self.aw.ser.parity,
-                                'timeout': self.aw.ser.timeout}
+                        santoker_serial = SerialSettings(
+                                port = self.aw.ser.comport,
+                                baudrate = self.aw.ser.baudrate,
+                                bytesize = self.aw.ser.bytesize,
+                                stopbits = self.aw.ser.stopbits,
+                                parity = self.aw.ser.parity,
+                                timeout = self.aw.ser.timeout)
                     self.aw.santoker = Santoker(self.aw.santokerHost, self.aw.santokerPort,
                         santoker_serial, self.aw.santokerBLE,
                         connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('Santoker'),True,None),
@@ -13116,20 +13119,20 @@ class tgraphcanvas(FigureCanvas):
                     self.aw.kaleido.setLogging(self.device_logging)
                     kaleido_serial:Optional[SerialSettings] = None
                     if self.aw.kaleidoSerial:
-                        kaleido_serial = {
-                                'port': self.aw.ser.comport,
-                                'baudrate': self.aw.ser.baudrate,
-                                'bytesize': self.aw.ser.bytesize,
-                                'stopbits': self.aw.ser.stopbits,
-                                'parity': self.aw.ser.parity,
-                                'timeout': self.aw.ser.timeout}
+                        kaleido_serial = SerialSettings(
+                                port = self.aw.ser.comport,
+                                baudrate = self.aw.ser.baudrate,
+                                bytesize = self.aw.ser.bytesize,
+                                stopbits = self.aw.ser.stopbits,
+                                parity = self.aw.ser.parity,
+                                timeout = self.aw.ser.timeout)
                     self.aw.kaleido.start(self.mode, self.aw.kaleidoHost, self.aw.kaleidoPort,
                         serial=kaleido_serial,
                         connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('Kaleido'),True,None),
                         disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('Kaleido'),True,None))
                 elif self.device == 142:
                     try:
-                        from artisanlib.ikawa import IKAWA_BLE
+                        from artisanlib.ikawa import IKAWA_BLE # ty: ignore[possibly-unbound-import]
                         self.aw.ikawa = IKAWA_BLE(
                             connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('IKAWA'),True,None),
                             disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('IKAWA'),True,None))
@@ -13642,12 +13645,12 @@ class tgraphcanvas(FigureCanvas):
             self.samplingSemaphore.acquire(1)
 
             if ser.colorTrackBT is not None:
-                ser.colorTrackBT.stop()
+                ser.colorTrackBT.stop() # ty: ignore[possibly-unbound-attribute]
                 libtime.sleep(0.05)
                 ser.colorTrackBT = None
 
             if ser.colorTrackSerial is not None:
-                ser.colorTrackSerial.stop()
+                ser.colorTrackSerial.stop() # ty: ignore[possibly-unbound-attribute]
                 libtime.sleep(0.05)
                 ser.colorTrackSerial = None
 
@@ -13657,41 +13660,44 @@ class tgraphcanvas(FigureCanvas):
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
             # disconnect phidgets
-            if ser.PhidgetTemperatureSensor is not None:
+            ser_PhidgetTemperatureSensor = ser.PhidgetTemperatureSensor
+            if ser_PhidgetTemperatureSensor is not None:
                 try:
-                    if ser.PhidgetTemperatureSensor[0].getAttached():
-                        serial = ser.PhidgetTemperatureSensor[0].getDeviceSerialNumber()
-                        port = ser.PhidgetTemperatureSensor[0].getHubPort()  # returns 0 for USB Phidgets!
-                        deviceType = ser.PhidgetTemperatureSensor[0].getDeviceID()
-                        ser.PhidgetTemperatureSensor[0].close()
+                    if len(ser_PhidgetTemperatureSensor)> 0 and ser_PhidgetTemperatureSensor[0].getAttached():
+                        serial = ser_PhidgetTemperatureSensor[0].getDeviceSerialNumber()
+                        port = ser_PhidgetTemperatureSensor[0].getHubPort()  # returns 0 for USB Phidgets!
+                        deviceType = ser_PhidgetTemperatureSensor[0].getDeviceID()
+                        ser_PhidgetTemperatureSensor[0].close()
                         ser.phidget1048detached(serial,port,deviceType,0) # call detach handler to release from PhidgetManager
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
                 try:
-                    if len(ser.PhidgetTemperatureSensor) > 1 and ser.PhidgetTemperatureSensor[1].getAttached():
-                        serial = ser.PhidgetTemperatureSensor[1].getDeviceSerialNumber()
-                        port = ser.PhidgetTemperatureSensor[1].getHubPort()  # returns 0 for USB Phidgets!
-                        deviceType = ser.PhidgetTemperatureSensor[1].getDeviceID()
-                        ser.PhidgetTemperatureSensor[1].close()
+                    if len(ser_PhidgetTemperatureSensor) > 1 and ser_PhidgetTemperatureSensor[1].getAttached():
+                        serial = ser_PhidgetTemperatureSensor[1].getDeviceSerialNumber()
+                        port = ser_PhidgetTemperatureSensor[1].getHubPort()  # returns 0 for USB Phidgets!
+                        deviceType = ser_PhidgetTemperatureSensor[1].getDeviceID()
+                        ser_PhidgetTemperatureSensor[1].close()
                         ser.phidget1048detached(serial,port,deviceType,1) # call detach handler to release from PhidgetManager
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
                 ser.Phidget1048values = [[],[],[],[]]
                 ser.Phidget1048lastvalues = [-1]*4
                 ser.PhidgetTemperatureSensor = None
-            if ser.PhidgetIRSensor is not None:
+            ser_PhidgetIRSensor = ser.PhidgetIRSensor
+            if ser_PhidgetIRSensor is not None:
                 try:
-                    if ser.PhidgetIRSensor.getAttached():
-                        serial = ser.PhidgetIRSensor.getDeviceSerialNumber()
-                        port = ser.PhidgetIRSensor.getHubPort() # returns 0 for USB Phidgets!
-                        deviceType = ser.PhidgetIRSensor.getDeviceID()
-                        ser.PhidgetIRSensor.close()
+                    if ser_PhidgetIRSensor.getAttached():
+                        serial = ser_PhidgetIRSensor.getDeviceSerialNumber()
+                        port = ser_PhidgetIRSensor.getHubPort() # returns 0 for USB Phidgets!
+                        deviceType = ser_PhidgetIRSensor.getDeviceID()
+                        ser_PhidgetIRSensor.close()
                         ser.phidget1045detached(serial,port,deviceType) # call detach handler to release from PhidgetManager
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
+                ser_PhidgetIRSensorIC = ser.PhidgetIRSensorIC
                 try:
-                    if ser.PhidgetIRSensorIC is not None and ser.PhidgetIRSensorIC.getAttached():
-                        ser.PhidgetIRSensorIC.close()
+                    if ser_PhidgetIRSensorIC is not None and ser_PhidgetIRSensorIC.getAttached():
+                        ser_PhidgetIRSensorIC.close()
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
                 ser.PhidgetIRSensor = None
@@ -13699,46 +13705,48 @@ class tgraphcanvas(FigureCanvas):
                 ser.Phidget1045lastvalue = -1
                 ser.Phidget1045tempIRavg = None
                 ser.PhidgetIRSensorIC = None
-            if ser.PhidgetBridgeSensor is not None:
+            ser_PhidgetBridgeSensor = ser.PhidgetBridgeSensor
+            if ser_PhidgetBridgeSensor is not None:
                 try:
-                    if ser.PhidgetBridgeSensor[0].getAttached():
-                        serial = ser.PhidgetBridgeSensor[0].getDeviceSerialNumber()
-                        port = ser.PhidgetBridgeSensor[0].getHubPort()   # returns 0 for USB Phidgets!
-                        deviceType = ser.PhidgetBridgeSensor[0].getDeviceID()
-                        ser.PhidgetBridgeSensor[0].close()
+                    if len(ser_PhidgetBridgeSensor)>0 and ser_PhidgetBridgeSensor[0].getAttached():
+                        serial = ser_PhidgetBridgeSensor[0].getDeviceSerialNumber()
+                        port = ser_PhidgetBridgeSensor[0].getHubPort()   # returns 0 for USB Phidgets!
+                        deviceType = ser_PhidgetBridgeSensor[0].getDeviceID()
+                        ser_PhidgetBridgeSensor[0].close()
                         ser.phidget1046detached(serial,port,deviceType,0) # call detach handler to release from PhidgetManager
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
                 try:
-                    if len(ser.PhidgetBridgeSensor) > 1 and ser.PhidgetBridgeSensor[1].getAttached():
-                        serial = ser.PhidgetBridgeSensor[1].getDeviceSerialNumber()
-                        port = ser.PhidgetBridgeSensor[1].getHubPort()   # returns 0 for USB Phidgets!
-                        deviceType = ser.PhidgetBridgeSensor[1].getDeviceID()
-                        ser.PhidgetBridgeSensor[1].close()
+                    if len(ser_PhidgetBridgeSensor) > 1 and ser_PhidgetBridgeSensor[1].getAttached():
+                        serial = ser_PhidgetBridgeSensor[1].getDeviceSerialNumber()
+                        port = ser_PhidgetBridgeSensor[1].getHubPort()   # returns 0 for USB Phidgets!
+                        deviceType = ser_PhidgetBridgeSensor[1].getDeviceID()
+                        ser_PhidgetBridgeSensor[1].close()
                         ser.phidget1046detached(serial,port,deviceType,1) # call detach handler to release from PhidgetManager
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
                 ser.Phidget1046values = [[],[],[],[]]
                 ser.Phidget1046lastvalues = [-1]*4
                 ser.PhidgetBridgeSensor = None
-            if ser.PhidgetIO is not None:
+            ser_PhidgetIO = ser.PhidgetIO
+            if ser_PhidgetIO is not None:
                 try:
-                    if ser.PhidgetIO[0].getAttached():
-                        serial = ser.PhidgetIO[0].getDeviceSerialNumber()
-                        port = ser.PhidgetIO[0].getHubPort()   # returns 0 for USB Phidgets!
-                        className = ser.PhidgetIO[0].getChannelClassName()
-                        deviceType = ser.PhidgetIO[0].getDeviceID()
-                        ser.PhidgetIO[0].close()
+                    if len(ser_PhidgetIO) > 0 and ser_PhidgetIO[0].getAttached():
+                        serial = ser_PhidgetIO[0].getDeviceSerialNumber()
+                        port = ser_PhidgetIO[0].getHubPort()   # returns 0 for USB Phidgets!
+                        className = ser_PhidgetIO[0].getChannelClassName()
+                        deviceType = ser_PhidgetIO[0].getDeviceID()
+                        ser_PhidgetIO[0].close()
                         ser.phidget1018detached(serial,port,className,deviceType,0)
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
                 try:
-                    if len(ser.PhidgetIO) > 1 and ser.PhidgetIO[1].getAttached():
-                        serial = ser.PhidgetIO[1].getDeviceSerialNumber()
-                        port = ser.PhidgetIO[1].getHubPort()   # returns 0 for USB Phidgets!
-                        className = ser.PhidgetIO[1].getChannelClassName()
-                        deviceType = ser.PhidgetIO[1].getDeviceID()
-                        ser.PhidgetIO[1].close()
+                    if len(ser_PhidgetIO) > 1 and ser_PhidgetIO[1].getAttached():
+                        serial = ser_PhidgetIO[1].getDeviceSerialNumber()
+                        port = ser_PhidgetIO[1].getHubPort()   # returns 0 for USB Phidgets!
+                        className = ser_PhidgetIO[1].getChannelClassName()
+                        deviceType = ser_PhidgetIO[1].getDeviceID()
+                        ser_PhidgetIO[1].close()
                         ser.phidget1018detached(serial,port,className,deviceType,1)
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
@@ -13752,7 +13760,7 @@ class tgraphcanvas(FigureCanvas):
                     ser.YOCTOchan2 = None
                     ser.YOCTOtempIRavg = None
                     if ser.YOCTOthread is not None:
-                        ser.YOCTOthread.join()
+                        ser.YOCTOthread.join() # ty: ignore[possibly-unbound-attribute]
                         ser.YOCTOthread = None
                     ser.YOCTOvalues = [[],[]]
                     ser.YOCTOlastvalues = [-1]*2
@@ -16285,7 +16293,7 @@ class tgraphcanvas(FigureCanvas):
 
     # Sum up the energy use from a variety of inputs
     def calcEnergyuse(self, beanweightstr:str = '') -> Tuple['EnergyMetrics', List['BTU']]:
-        energymetrics:EnergyMetrics = {}
+        energymetrics = EnergyMetrics()
         btu_list:List[BTU] = []
         try:
             if len(self.timex) == 0:
@@ -16944,7 +16952,7 @@ class tgraphcanvas(FigureCanvas):
                     xb = numpy.array(self.timex)
                     xxb = xb + charge
                     xxa = xa + charge
-                    self.ax.plot(xxb, func(xb, *popt),  color='#000000', linestyle = '-.', linewidth=3)
+                    self.ax.plot(xxb, func(xb, *popt), color='#000000', linestyle = '-.', linewidth=3) # ty: ignore[missing-argument]
                     self.ax.plot(xxa, yn, 'ro')
                     with warnings.catch_warnings():
                         warnings.simplefilter('ignore')
@@ -17779,13 +17787,15 @@ class tgraphcanvas(FigureCanvas):
         if hasattr(event, 'ind'):
             event_ind = event.ind # pyright:ignore
             if event_ind is not None:
-                if isinstance(event_ind, (int)):
+                if isinstance(event_ind, int):
                     self.indexpoint = event_ind
-                else:
+                elif isinstance(event_ind, list):
                     N = len(event_ind)
                     if not N:
                         return
                     self.indexpoint = event_ind[0]
+                else:
+                    return
         else:
             return
 

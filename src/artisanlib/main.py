@@ -194,7 +194,7 @@ import matplotlib.backends.qt_editor._formlayout as formlayout
 
 if TYPE_CHECKING:
     from types import TracebackType
-    from artisanlib.atypes import ProfileData, ComputedProfileInformation, RecentRoast, ExtraDeviceSettings, Palette, CurveSimilarity, ProductionData, ProductionDataStr, Wheel # pylint: disable=unused-import
+    from artisanlib.atypes import ExtraDeviceSettings, Palette # pylint: disable=unused-import
     from artisanlib.scale import ScaleSpec
     from artisanlib.roast_properties import editGraphDlg # pylint: disable=unused-import
     from artisanlib.comparator import roastCompareDlg # pylint: disable=unused-import
@@ -206,7 +206,10 @@ if TYPE_CHECKING:
     from artisanlib.bluedot import BlueDOT # pylint: disable=unused-import
     from artisanlib.mugma import Mugma # pylint: disable=unused-import
     from artisanlib.kaleido import KaleidoPort # pylint: disable=unused-import
-    from artisanlib.ikawa import IKAWA_BLE # pylint: disable=unused-import
+    try:
+        from artisanlib.ikawa import IKAWA_BLE # pylint: disable=unused-import # ty: ignore[possibly-unbound-import]
+    except Exception: # pylint: disable=broad-except
+        pass
     from matplotlib.text import Annotation # pylint: disable=unused-import
     from openpyxl.worksheet.worksheet import Worksheet # pylint: disable=unused-import
     import numpy.typing as npt # pylint: disable=unused-import
@@ -226,6 +229,7 @@ except Exception: # pylint: disable=broad-except
     pass
 
 
+from artisanlib.atypes import (ProfileData, ComputedProfileInformation, RecentRoast, CurveSimilarity, ProductionData, ProductionDataStr, Wheel)
 from artisanlib.util import (appFrozen, uchr, decodeLocal, decodeLocalStrict, encodeLocal, encodeLocalStrict, s2a, fill_gaps,
         deltaLabelPrefix, deltaLabelUTF8, deltaLabelBigPrefix, stringfromseconds, stringtoseconds,
         fromFtoCstrict, fromCtoFstrict, RoRfromFtoCstrict, RoRfromCtoFstrict,
@@ -314,7 +318,7 @@ class Artisan(QtSingleApplication):
             if aw is not None and self.darkmode != bool(colorScheme == Qt.ColorScheme.Dark):
                 self.darkmode = bool(colorScheme == Qt.ColorScheme.Dark)
                 aw.updateCanvasColors()
-                QTimer.singleShot(100, aw.updateScheduleSignal.emit) # only redraw scheduler window # to adjust its colors
+                QTimer.singleShot(500, aw.updateScheduleSignal.emit) # only redraw scheduler window # to adjust the colors of its items (QWidgets are updated automatically)
     except Exception: # pylint: disable=broad-except
         pass
 
@@ -797,7 +801,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
     def __init__(self, plotCanvas:tgraphcanvas, parent:QWidget, white_icons:bool = False) -> None:
 
         # toolitem entries of the form (text, tooltip_text, image_file, callback)
-        self.toolitems: Tuple[Union[Tuple[str, ...], Tuple[None, ...]], ...] = (
+        self.toolitems: List[Union[Tuple[str, ...], Tuple[None, ...]]] = [
                 ('Plus', QApplication.translate('Tooltip', 'Connect to plus service'), 'plus', 'plus'),
                 ('', QApplication.translate('Tooltip', 'Subscription'), 'plus-pro', 'subscription'),
                 (QApplication.translate('Toolbar', 'Home'), QApplication.translate('Tooltip', 'Reset original view'), 'home', 'home'),
@@ -806,7 +810,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
                 (None, None, None, None),
                 (QApplication.translate('Toolbar', 'Pan'), QApplication.translate('Tooltip', 'Pan axes with left mouse, zoom with right'), 'move', 'pan'),
                 (QApplication.translate('Toolbar', 'Zoom'), QApplication.translate('Tooltip', 'Zoom to rectangle'), 'zoom_to_rect', 'zoom'),
-        )
+        ]
 
         self.qmc:tgraphcanvas = plotCanvas
         self.aw = self.qmc.aw
@@ -1251,7 +1255,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
             self._update_cursor(event) # not available in MPL v3.0.3 on Python3.5 for the RPi Stretch builds
         except Exception: # pylint: disable=broad-except
             pass
-        if event is not None and isinstance(event, mplLocationevent) and event.inaxes and event.inaxes.get_navigate():
+        if event is not None and isinstance(event, mplLocationevent) and event.inaxes is not None and event.inaxes.get_navigate(): # ty: ignore[possibly-unbound-attribute]
             self._last_event = event
         else:
             self._last_event = None
@@ -1497,7 +1501,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         'weblcds_index_path', 'weblcds_websocket_path',
         'taskWebDisplayGreenActive', 'taskWebDisplayGreenPort', 'taskWebDisplayRoastedActive', 'taskWebDisplayRoastedPort',
         'taskWebDisplayRoastedIndexPath', 'taskWebDisplayRoastedWebSocketPath', 'taskWebDisplayGreen_server', 'taskWebDisplayRoasted_server',
-        'scale_manager', 'scale1_model', 'scale1_id', 'container1_idx', 'scale2_model', 'scale2_name', 'scale2_id', 'container2_idx',
+        'scale_manager', 'scale1_model', 'scale1_id', 'container1_idx', 'two_bucket_mode', 'green_task_precision', 'scale2_model', 'scale2_name', 'scale2_id', 'container2_idx',
         'WebLCDsAlerts', 'EventsDlg_activeTab', 'graphColorDlg_activeTab', 'PID_DlgControl_activeTab', 'CurveDlg_activeTab', 'editGraphDlg_activeTab',
         'backgroundDlg_activeTab', 'DeviceAssignmentDlg_activeTab', 'AlarmDlg_activeTab', 'schedule_activeTab', 'StatisticsDlg_activeTab', 'resetqsettings', 'settingspath', 'wheelpath', 'profilepath',
         'userprofilepath', 'printer', 'main_widget', 'defaultdpi', 'dpi', 'qmc', 'HottopControlActive', 'AsyncSamplingTimer', 'wheeldialog',
@@ -1696,6 +1700,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.scale1_name:Optional[str] = None  # the display/local name of the device (like "ACAIA162FC")
         self.scale1_id:Optional[str] = None    # the id, eg. the BT address (like "24:71:89:cc:09:05")
         self.container1_idx:int = -1 # -1: no container set; otherwise index into selected qmc.container_names/qmc.container_weights
+        self.two_bucket_mode:bool = False # if True, the TaskManager allows to split green task weight into two buckets
+        self.green_task_precision:float = 1 # precision in percent (range [0.1 - 5%]; if set to 0 all "non-overlapping" weights are accepted)
         # scale2: just for green
         self.scale2_model:Optional[int] = None
         self.scale2_name:Optional[str] = None  # the display/local name of the device (like "ACAIA162FC")
@@ -1872,7 +1878,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.kaleido:Optional[KaleidoPort] = None # holds the Kaleido instance created on connect; reset to None on disconnect
 
         # Ikawa BLE
-        self.ikawa:Optional[IKAWA_BLE] = None
+        self.ikawa:'Optional[IKAWA_BLE]' = None # noqa: UP037
 
         # create a ET control objects
         self.fujipid: FujiPID = FujiPID(self)
@@ -4349,7 +4355,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 (not self.schedule_user_filter or not bool(plus.connection.getNickname()) or item.user is None or item.user == self.plus_user_id) and
                 (self.qmc.roastertype_setup.strip() == '' or not self.schedule_machine_filter or item.machine is None or
                     (self.qmc.roastertype_setup.strip() != '' and item.machine is not None and
-                        item.machine.strip() == self.qmc.roastertype_setup.strip())))
+                        item.machine.strip() == self.qmc.roastertype_setup.strip()))) # ty: ignore[possibly-unbound-attribute]
 
     def updateBadge(self, count:Optional[int] = None) -> None:
         if self.schedule_window is None:
@@ -4879,7 +4885,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     cellWidgetLayout = cellWidget.layout()
                 if cellWidgetLayout is not None and isinstance(widget, QWidget):
                     cw:QWidget = widget
-                    if cellWidgetLayout.indexOf(cw) > -1:
+                    if cellWidgetLayout.indexOf(cw) > -1: # ty: ignore[no-matching-overload]
                         return r
         return None
 
@@ -4897,7 +4903,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     cellWidgetLayout = cellWidget.layout()
                 if cellWidgetLayout is not None and isinstance(widget, QWidget):
                     cw:QWidget = widget
-                    if cellWidgetLayout.indexOf(cw) > -1:
+                    if cellWidgetLayout.indexOf(cw) > -1: # ty: ignore[no-matching-overload]
                         return c
         return None
 
@@ -5187,11 +5193,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             batchnr:int, batchprefix:str, plus_account:Optional[str], plus_store:Optional[str], plus_store_label:Optional[str] ,plus_coffee:Optional[str],
             plus_coffee_label:Optional[str], plus_blend_label:Optional[str], plus_blend_spec:Optional[plus.stock.Blend], plus_blend_spec_labels:Optional[List[str]],
             weightOut:Optional[float], volumeOut:Optional[float], densityRoasted:Optional[float], moistureRoasted:Optional[float], wholeColor:Optional[int], groundColor:Optional[int]) -> 'RecentRoast':
-        d:RecentRoast = {
-            'title': title,
-            'weightIn': weightIn,
-            'weightUnit': weightUnit,
-        }
+        d = RecentRoast(
+            title = title,
+            weightIn = weightIn,
+            weightUnit = weightUnit,
+        )
         d['beans'] = beans
         if weightOut is not None:
             d['weightOut'] = weightOut
@@ -5481,7 +5487,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                             menu_title = str(e[0])
                             menu_title = menu_title.replace('&','&&') # a & in a menu entry is not displayed, but "&&" is displayed as "&"
                             a.setText(menu_title)
-                            submenu.addAction(a)
+                            submenu.addAction(a) # ty: ignore[possibly-unbound-attribute]
                             one_added = True
             else:
                 entry = res[k][0]
@@ -6855,19 +6861,19 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         return max(self.eventslidermin[i]/10., min(self.eventslidermax[i] / 10., r))
 
     def curveSimilarity2(self,exp:int=-1,analysis_starttime:float=0,analysis_endtime:float=0) -> 'CurveSimilarity': # pylint: disable=no-self-use
-        result:CurveSimilarity = {
-            'mse_BT': float('nan'),
-            'mse_deltaBT': float('nan'),
-            'rmse_BT': float('nan'),
-            'rmse_deltaBT': float('nan'),
-            'r2_BT': float('nan'),
-            'r2_deltaBT': float('nan'),
-            'ror_fcs_act': '--',  #prettytable accepts text or number; floats will be converted to str
-            'ror_fcs_delta': '--',  #prettytable accepts text or number; floats will be converted to str
-            'ror_max_delta': float('nan'),
-            'ror_min_delta': float('nan'),
-            'segmentresultstr': ''
-        }
+        result = CurveSimilarity(
+            mse_BT = float('nan'),
+            mse_deltaBT = float('nan'),
+            rmse_BT = float('nan'),
+            rmse_deltaBT = float('nan'),
+            r2_BT = float('nan'),
+            r2_deltaBT = float('nan'),
+            ror_fcs_act = '--',  #prettytable accepts text or number; floats will be converted to str
+            ror_fcs_delta = '--',  #prettytable accepts text or number; floats will be converted to str
+            ror_max_delta = float('nan'),
+            ror_min_delta = float('nan'),
+            segmentresultstr = ''
+        )
         mask = numpy.empty(0)
         fitRoR = '--'  #not a type issue, prettytable accepts text or number
         RoR_FCs_act = '--'  #not a type issue, prettytable accepts text or number
@@ -7137,10 +7143,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
             # build table of general information
             tbl2 = prettytable.PrettyTable()
-            tbl2.field_names = ['A','A1', 'B', 'B1'  ]
-            tbl2.align = 'l'
-            tbl2.align['A1'] = 'r' # type: ignore # Unsupported target for indexed assignment ("str")
-            tbl2.align['B1'] = 'r' # type: ignore # Unsupported target for indexed assignment ("str")
+            tbl2.field_names = [ 'A','A1', 'B', 'B1'  ]
+            tbl2.align['A'] = 'l'
+            tbl2.align['A1'] = 'r'
+            tbl2.align['B'] = 'l'
+            tbl2.align['B1'] = 'r'
             tbl2.float_format = '5.2'
             tbl2.add_row([QApplication.translate('Label','Curve Fit'), fitType, bgAlignLabel, bgAlignType])
             tbl2.add_row([QApplication.translate('Label','Samples Threshold'), self.qmc.segmentsamplesthreshold, QApplication.translate('Label','Delta Threshold'), self.qmc.segmentdeltathreshold])
@@ -9032,7 +9039,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                             self.buttonStates[lastbuttonpressed] = int(newValue)
                                             self.lastIOResult = float(newValue)
                                         else:
-                                            self.sendmessage(QApplication.translate('Message', 'Failed to toggle(%s)' % (cs_a[1]))) # pylint: disable=consider-using-f-string # noqa: UP031
+                                            self.sendmessage(QApplication.translate('Message', 'Failed to toggle ({})').format(cs_a[1]))
                                         #clear style that got set in button press event handler
                                         if self.buttonStates[lastbuttonpressed] == 1:
                                             self.setExtraEventButtonStyleSignal.emit(lastbuttonpressed, 'pressed')
@@ -9260,7 +9267,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
                                 else:
                                     _log.info('IO Command <%s> not recognized', cs)
-                                    self.sendmessage(QApplication.translate('Message','No match for command [%s], continuing' % (cs))) # pylint: disable=consider-using-f-string  # noqa: UP031
+                                    self.sendmessage(QApplication.translate('Message','IO Command {}] unknown').format(cs))
 
                             except Exception as e: # pylint: disable=broad-except
                                 _log.exception(e)
@@ -10534,7 +10541,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                 # ramp(ch,state) # set speed ramping state per channel
                                 try:
                                     n = 2
-                                    cs_split = s[len('ramp('):-1].split(',')
+                                    cs_split = cs[len('ramp('):-1].split(',')
                                     channel_str,state_str = cs_split[0:n]
                                     if len(cs_split)>n:
                                         sn = cs_split[n]
@@ -14079,16 +14086,18 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
     def indent(self, elem:'XMLElement', level:int = 0) -> None:
         i = '\r\n' + level*'  ' # Windows line ending (as Pilot is only available on Windows)
+        elem_tail = elem.tail
+        elem_text = elem.text
         if len(elem):
-            if not elem.text or not elem.text.strip():
+            if not elem_text or not elem_text.strip():
                 elem.text = i + '  '
-            if not elem.tail or not elem.tail.strip():
+            if not elem_tail or not elem_tail.strip():
                 elem.tail = i
             for e in elem:
                 self.indent(e, level+1)
-            if not elem.tail or not elem.tail.strip():
+            if not elem_tail or not elem_tail.strip():
                 elem.tail = i
-        elif level and (not elem.tail or not elem.tail.strip()):
+        elif level and (not elem_tail or not elem_tail.strip()):
             elem.tail = i
 
     def exportPilot(self, filename:str) -> bool:
@@ -14368,7 +14377,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         roastlogger_action_section = ''
         # use io.open instead of open to have encoding support on Python 2
         with open(filename, encoding=enc) as infile:
-            obj:ProfileData = {}
+            obj = ProfileData()
             obj['mode'] = 'C'
             obj['title'] = str(QFileInfo(filename).fileName())
             roastdate_str = encodeLocal(QDate.currentDate().toString())
@@ -16260,7 +16269,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     # and displayed to users e.g. as part of the Report to users and stored along profiles to be used by external programs
     # in case a value cannot be computed the corresponding entry is missing in the resulting dict
     def computedProfileInformation(self) -> 'ComputedProfileInformation':
-        computedProfile:ComputedProfileInformation = {}
+        computedProfile = ComputedProfileInformation()
         TP_time_idx = None
         DRY_time_idx = None
         TP_index = 0
@@ -16570,7 +16579,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     #wrap values in unicode(.) if and only if those are of type string
     def getProfile(self) -> 'ProfileData':
         try:
-            profile:ProfileData = {}
+            profile = ProfileData()
             profile['recording_version'] = self.recording_version
             profile['recording_revision'] = self.recording_revision
             profile['recording_build'] = self.recording_build
@@ -16833,7 +16842,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
             self.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' getProfile(): {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
-            return {}
+            return ProfileData()
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -17420,11 +17429,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                             current_counter = str(self.qmc.batchcounter)
                             files_counter = str(files_batchcounter)
                             if self.qmc.batchcounter < 0:
-                                string = QApplication.translate('Message','Your batch counter is currently turned off. Turn it on and set it to %s from the settings file to be imported?'%(files_counter)) # pylint: disable=consider-using-f-string # noqa: UP031
+                                string = QApplication.translate('Message','Your batch counter is currently turned off. Turn it on and set it to {} from the settings file to be imported?').format(files_counter)
                             elif files_batchcounter < 0:
-                                string = QApplication.translate('Message','Your batch counter is set to %s. Turn it off as in the settings file to be imported?'%(current_counter)) # pylint: disable=consider-using-f-string # noqa: UP031
+                                string = QApplication.translate('Message','Your batch counter is set to {}. Turn it off as in the settings file to be imported?').format(current_counter)
                             else:
-                                string = QApplication.translate('Message','Overwrite your current batch counter %s by %s from the settings file to be imported?'%(current_counter,files_counter)) # noqa: UP031 # pylint: disable=consider-using-f-string
+                                string = QApplication.translate('Message','Overwrite your current batch counter {} by {} from the settings file to be imported?').format(current_counter,files_counter)
                             reply = QMessageBox.question(self, QApplication.translate('Message','Batch Counter'),string,
                                     QMessageBox.StandardButton.Cancel |QMessageBox.StandardButton.No|QMessageBox.StandardButton.Yes)
                             if reply == QMessageBox.StandardButton.Cancel:
@@ -18725,6 +18734,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 except Exception: # pylint: disable=broad-except
                     self.scale1_id = None
             self.container1_idx = toInt(settings.value('container1_idx',int(self.container1_idx)))
+            self.two_bucket_mode = toBool(settings.value('two_bucket_mode',int(self.two_bucket_mode)))
+            self.green_task_precision = toFloat(settings.value('green_task_precision', self.green_task_precision))
             if settings.contains('scale2_model'):
                 try:
                     self.scale2_model = toInt(settings.value('scale2_model',self.scale2_model))
@@ -18747,7 +18758,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             if self.scale1_model is not None and self.scale1_id is not None and self.scale1_name is not None:
                 self.scale_manager.set_scale1_signal.emit(self.scale1_model, self.scale1_id, self.scale1_name)
             if self.scale2_model is not None and self.scale2_id is not None and self.scale2_name is not None:
-                self.scale_manager.set_scale1_signal.emit(self.scale2_model, self.scale2_id, self.scale2_name)
+                self.scale_manager.set_scale2_signal.emit(self.scale2_model, self.scale2_id, self.scale2_name)
 
 #--- END GROUP Scales
 
@@ -20380,6 +20391,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'scale1_name',self.scale1_name, read_defaults)
             self.settingsSetValue(settings, default_settings, 'scale1_id',self.scale1_id, read_defaults)
             self.settingsSetValue(settings, default_settings, 'container1_idx',self.container1_idx, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'two_bucket_mode',self.two_bucket_mode, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'green_task_precision',self.green_task_precision, read_defaults)
             self.settingsSetValue(settings, default_settings, 'scale2_model',self.scale2_model, read_defaults)
             self.settingsSetValue(settings, default_settings, 'scale2_name',self.scale2_name, read_defaults)
             self.settingsSetValue(settings, default_settings, 'scale2_id',self.scale2_id, read_defaults)
@@ -20599,13 +20612,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         # disconnect connected scales
         self.scale_manager.disconnect_all()
 
-        # if BLE was used we need to terminate its singular thread/asyncloop running the bleak scan and connect:
-        try:
-            if 'artisanlib.ble_port' in sys.modules:
-                from artisanlib import ble_port
-                ble_port.ble.close()
-        except Exception: # pylint: disable=broad-except
-            pass
         if self.full_screen_mode_active:
             if not (platform.system() == 'Darwin' and self.qmc.locale_str == 'en'):
                 self.fullscreenAction.setChecked(False)
@@ -20707,7 +20713,20 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 _log.info('MODE: QUIT')
                 flagKeepON = self.qmc.flagKeepON
                 self.qmc.flagKeepON = False # temporarily turn keepOn off
-                self.stopActivities()
+
+
+                self.stopActivities() # also disconnect from connected scales and stops BLE scanning
+                # if BLE was used we need to terminate its singular thread/asyncloop running the bleak scan and connect:
+                # BLE is not stopped in self.stopActivities() as that one is also called on settings load and we need to keep
+                # the same BLE thread/loop running over the whole runtime of the app to avoid ble._scan_and_connect_lock and ble._terminate_scan_event
+                # are running in the wrong thread
+                try:
+                    if 'artisanlib.ble_port' in sys.modules:
+                        from artisanlib import ble_port
+                        ble_port.ble.close()
+                except Exception: # pylint: disable=broad-except
+                    pass
+
                 if unsaved_changes:
                     self.qmc.safesaveflag = False
                     # in case we have unsaved changes and the user decided to discard those, we first reset to have the correct settings (like axis limits) saved
@@ -20910,39 +20929,38 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 if 0 < dloss < 100:
                     defects_loss += '%'
 
-        res:ProductionDataStr = {
+        return ProductionDataStr(
             # id (prefix+nr)
-            'nr': str(data.get('batchnr','')),
-            'id': ((data.get('batchprefix','') + str(data.get('batchnr',''))) if (data.get('batchnr',0) != 0) else ''),
+            nr = str(data.get('batchnr','')),
+            id = ((data.get('batchprefix','') + str(data.get('batchnr',''))) if (data.get('batchnr',0) != 0) else ''),
             # title
-            'title': data.get('title',''),
+            title = data.get('title',''),
             # date and time
-            'datetime': data_roastdate.toPyDateTime(), # not a string but a datetime object
-            'time': time,
+            datetime = data_roastdate.toPyDateTime(), # not a string but a datetime object
+            time = time,
             # beans
-            'beans': data.get('beans',''),
+            beans = data.get('beans',''),
             # weight
-            'weight_in': weight_in,
-            'weight_out': weight_out,
-            'weight_loss': weight_loss,
-            'weight_in_num': weight_in_num,
-            'weight_out_num': weight_out_num,
-            'weight_loss_num': weight_loss_num,
-            'defects_weight': defects_weight,
-            'defects_loss': defects_loss,
-            'defects_weight_num': defects_weight_num,
-            'defects_loss_num': defects_loss_num,
-            'whole_color': data.get('whole_color', 0),
-            'ground_color': data.get('ground_color', 0),
-            'color_system': data.get('color_system', ''),
-            'roastertype': data.get('roastertype', ''),
-            'roastersize': data.get('roastersize', 0),
-            'beansize_min': data.get('beansize_min', 0),
-            'beansize_max': data.get('beansize_max', 0),
-            'roastingnotes': data.get('roastingnotes', ''),
-            'cuppingnotes': data.get('cuppingnotes', '')
-        }
-        return res
+            weight_in = weight_in,
+            weight_out = weight_out,
+            weight_loss = weight_loss,
+            weight_in_num = weight_in_num,
+            weight_out_num = weight_out_num,
+            weight_loss_num = weight_loss_num,
+            defects_weight = defects_weight,
+            defects_loss = defects_loss,
+            defects_weight_num = defects_weight_num,
+            defects_loss_num = defects_loss_num,
+            whole_color = data.get('whole_color', 0),
+            ground_color = data.get('ground_color', 0),
+            color_system = data.get('color_system', ''),
+            roastertype = data.get('roastertype', ''),
+            roastersize = data.get('roastersize', 0),
+            beansize_min = data.get('beansize_min', 0),
+            beansize_max = data.get('beansize_max', 0),
+            roastingnotes = data.get('roastingnotes', ''),
+            cuppingnotes = data.get('cuppingnotes', '')
+        )
 
     def productionData2htmlentry(self, data:'ProductionData') -> str:
         import string as libstring
@@ -21003,7 +21021,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     #  . defects_weight: float
     @staticmethod
     def profileProductionData(profile:Dict[str, Any]) -> 'ProductionData':
-        res:ProductionData = {}
+        res = ProductionData()
         # id ("prefix+nr (sequence)")
         if 'roastbatchprefix' in profile:
             batchprefix_str = decodeLocal(profile['roastbatchprefix'])
@@ -22366,9 +22384,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
                         # no grid or tick marks
                         ax.grid(False)
-                        if ax.axes is not None:
-                            ax.axes.get_xaxis().set_ticks([])
-                            ax.axes.get_yaxis().set_ticks([])
+                        ax_axes = ax.axes
+                        if ax_axes is not None:
+                            ax_axes.get_xaxis().set_ticks([])
+                            ax_axes.get_yaxis().set_ticks([])
 
                         # set graph xy limits
                         ylim = (barheight + barspacer) * (1 + len(profiles))
@@ -23885,6 +23904,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         update_url = '<a href="https://artisan-scope.org">https://artisan-scope.org</a>'
         update_str = QApplication.translate('About', 'There was a problem retrieving the latest version information.  Please check your Internet connection, try again later, or check manually.')
         import json
+        import json.decoder
         try:
             import requests
             r = requests.get('https://api.github.com/repos/artisan-roaster-scope/artisan/releases/latest', timeout=(2,4))
@@ -24380,18 +24400,19 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                             if isinstance(widget, ApplicationWindow):
                                 widget.updateRecentSettingActions()
                         self.sendmessage(QApplication.translate('Message',f'Settings loaded {self.strippedName(filename)}'))
-                    elif not res and remember:
-                        # remove file from the recent file list
-                        settings = QSettings()
-                        files = toStringList(settings.value('recentSettingList'))
-                        try:
-                            removeAll(files,filename)
-                        except ValueError:
-                            pass
-                        settings.setValue('recentSettingList', files)
-                        for widget in QApplication.topLevelWidgets():
-                            if isinstance(widget, ApplicationWindow):
-                                widget.updateRecentSettingActions()
+# we don't remove settings from recent settings if operation was canceled
+#                    elif not res and remember:
+#                        # remove file from the recent file list
+#                        settings = QSettings()
+#                        files = toStringList(settings.value('recentSettingList'))
+#                        try:
+#                            removeAll(files,filename)
+#                        except ValueError:
+#                            pass
+#                        settings.setValue('recentSettingList', files)
+#                        for widget in QApplication.topLevelWidgets():
+#                            if isinstance(widget, ApplicationWindow):
+#                                widget.updateRecentSettingActions()
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
                     # remove file from the recent file list
@@ -25214,8 +25235,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     colorstr = root.find('coffeecolor')
                     if colorstr is not None:
                         c = None
-                        if colorstr.text is not None:
-                            for e in colorstr.text.strip().split():
+                        colorstr_text = colorstr.text
+                        if colorstr_text is not None:
+                            for e in colorstr_text.strip().split():
                                 try:
                                     c = int(e)
                                     break
@@ -25272,12 +25294,13 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                             time_entry = elem.find('time')
                             if time_entry is None:
                                 time_entry = elem.find('stime')
-                            if time_entry is None or time_entry.text is None:
-                                last_timez = last_timez + 1
-                                timez = last_timez
-                            else:
-                                timez = float(stringtoseconds(time_entry.text))
-                                last_timez = timez
+                            last_timez = last_timez + 1
+                            timez = last_timez
+                            if time_entry is not None:
+                                time_entry_text = time_entry.text
+                                if time_entry_text is not None:
+                                    timez = float(stringtoseconds(time_entry_text))
+                                    last_timez = timez
                             self.qmc.timex.append(timez)
                             self.qmc.temp1.append(-1)
                             temp_entry = elem.find('temperature')
@@ -25319,7 +25342,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                             if time_entry is not None:
                                 time_str = time_entry.text
                                 if time_str is not None:
-                                    time = float(stringtoseconds(time_str))
+                                    time_in_seconds = float(stringtoseconds(time_str))
                                     burner_entry = elem.find('burnercapacity')
                                     if burner_entry is None:
                                         burner_entry = elem.find('nburnercapacity')
@@ -25327,7 +25350,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                         burner = burner_entry.text
                                         if burner is not None:
                                             self.qmc.addEvent(
-                                                self.qmc.time2index(time),
+                                                self.qmc.time2index(time_in_seconds),
                                                 3,
                                                 '',
                                                 self.qmc.str2eventsvalue(burner))
@@ -25784,7 +25807,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     #used by WheelGraphDlg()
     #wrap values in unicode(.) if and only if those are of type string
     def getWheelGraph(self) -> 'Wheel':
-        wheel:Wheel = {}
+        wheel = Wheel()
         #two dimension lists
         wheel['wheelnames'] = self.qmc.wheelnames
         wheel['segmentlengths'] = self.qmc.segmentlengths
@@ -26874,7 +26897,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                             self.qmc.extratemp1[x] = [-1.]*len(x_range)
                             self.qmc.extratemp2[x] = [-1.]*len(x_range)
                             self.qmc.extratimex[x] = x_range[:]
-                        self.sendmessage(QApplication.translate('Message','Y1 = [%s] ; Y2 = [%s]'%(EQU[0],EQU[1]))) # noqa: UP031 # pylint: disable=consider-using-f-string
+                        self.sendmessage(f'Y1 = [{EQU[0]}] ; Y2 = [{EQU[1]}]')
 
                     else:
                         self.qmc.timeB = x_range[:]
@@ -26903,7 +26926,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         self.qmc.backgroundprofile_moved_y = 0
                         if doDraw:
                             self.qmc.redraw(recomputeAllDeltas=recomputeAllDeltas)
-                            self.sendmessage(QApplication.translate('Message','B1 = [%s] ; B2 = [%s]'%(EQU[0],EQU[1]))) # noqa: UP031 # pylint: disable=consider-using-f-string
+                            self.sendmessage(f'B1 = [{EQU[0]}] ; B2 = [{EQU[1]}]')
                         else:
                             decay_smoothing_p = not self.qmc.optimalSmoothing
                             self.qmc.smoothETBTBkgnd(recomputeAllDeltas,decay_smoothing_p)

@@ -27,7 +27,7 @@ except ImportError:
 
 from artisanlib.async_comm import AsyncLoopThread
 
-from typing import Optional, Callable, Union, Dict, List, Set, Tuple, Awaitable, TYPE_CHECKING
+from typing import Final, Optional, Callable, Union, Dict, List, Set, Tuple, Awaitable, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from bleak.backends.device import BLEDevice # pylint: disable=unused-import
@@ -42,7 +42,7 @@ _log = logging.getLogger(__name__)
 ## prevents overlapping scan-connects that can lead to crashes
 class BLE:
 
-    _scan_and_connect_lock: asyncio.Lock = asyncio.Lock()
+    _scan_and_connect_lock:asyncio.Lock = asyncio.Lock()
     _terminate_scan_event = asyncio.Event()
     _asyncLoopThread:Optional[AsyncLoopThread] = None
 
@@ -62,10 +62,10 @@ class BLE:
     # returns True also in case the local_name is None, but the given service_uuid is within ad.service_uuids
     @staticmethod
     def name_match(bd:'BLEDevice', ad:'AdvertisementData', device_name:str, case_sensitive:bool, service_uuid:Optional[str]) -> bool:
-        return ((bd.name is not None and (bd.name.startswith(device_name) if
-                    case_sensitive else bd.name.casefold().startswith(device_name.casefold()))) or
-                (ad.local_name is not None and (ad.local_name.startswith(device_name) if
-                    case_sensitive else ad.local_name.casefold().startswith(device_name.casefold()))) or
+        return ((bd.name is not None and (bd.name.startswith(device_name) if                              # ty: ignore[possibly-unbound-attribute]
+                    case_sensitive else bd.name.casefold().startswith(device_name.casefold()))) or        # ty: ignore[possibly-unbound-attribute]
+                (ad.local_name is not None and (ad.local_name.startswith(device_name) if                  # ty: ignore[possibly-unbound-attribute]
+                    case_sensitive else ad.local_name.casefold().startswith(device_name.casefold()))) or  # ty: ignore[possibly-unbound-attribute]
                 (ad.local_name is None and service_uuid is not None and
                     service_uuid.casefold() in (uuid.casefold() for uuid in ad.service_uuids)))
 
@@ -228,6 +228,10 @@ ble = BLE() # unique to module
 
 class ClientBLE(QObject): # pyright:ignore[reportGeneralTypeIssues] # error: Argument to class must be a base class
 
+    SCAN_BETWEEN_SCANS_START:Final[float] = 0.1 # initial sleep between scans in seconds
+    SCAN_BETWEEN_SCANS_INC:Final[float] = 0.1   # increase of sleep time per scan
+    SCAN_BETWEEN_SCANS_MAX:Final[float] = 3     # maximum sleep between scans in seconds
+
 # NOTE: __slots__ are incompatible with multiple inheritance mixings in subclasses (e.g. with QObject)
 #    __slots__ = [ '_running', '_async_loop_thread', '_ble_client', '_connected_service_uuid', '_disconnected_event',
 #                    '_active_notification_uuids',
@@ -243,6 +247,7 @@ class ClientBLE(QObject): # pyright:ignore[reportGeneralTypeIssues] # error: Arg
         self._connected_service_uuid:Optional[str]           = None            # set to the service UUID we are connected to
         self._disconnected_event:asyncio.Event               = asyncio.Event() # event set on disconnect
         self._active_notification_uuids:Set[str]             = set() # uuids of characteristics were notification are active
+        self._sleep_between_scans:float                      = self.SCAN_BETWEEN_SCANS_START
 
         # configuration
         self._device_descriptions:Dict[Optional[str],Optional[Set[str]]] = {}
@@ -332,7 +337,8 @@ class ClientBLE(QObject): # pyright:ignore[reportGeneralTypeIssues] # error: Arg
                 self._disconnected_event.clear()
                 await self._disconnected_event.wait()
                 _log.debug('BLE reconnect')
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(self._sleep_between_scans)
+            self._sleep_between_scans = max(self._sleep_between_scans + self.SCAN_BETWEEN_SCANS_INC, self.SCAN_BETWEEN_SCANS_MAX)
 
     # release the async lock _disconnected_event after disconnect triggered to enable the automatic reconnect
     async def set_event(self) -> None:
@@ -422,6 +428,7 @@ class ClientBLE(QObject): # pyright:ignore[reportGeneralTypeIssues] # error: Arg
 
     def start(self, case_sensitive:bool=True, scan_timeout:float=6, connect_timeout:float=6, address:Optional[str] = None) -> None:
         _log.debug('start')
+        self._sleep_between_scans = self.SCAN_BETWEEN_SCANS_START
         if self._running:
             _log.error('BLE client already running')
         else:

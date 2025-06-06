@@ -55,7 +55,7 @@ class RoastPathData(TypedDict, total=False):
 
 # returns a dict containing all profile information contained in the given RoastPATH document pointed by the given QUrl
 def extractProfileRoastPathHTML(url:'QUrl', _:'ApplicationWindow') -> Optional['ProfileData']:
-    res:ProfileData = {} # the interpreted data set
+    res:ProfileData = ProfileData() # the interpreted data set
     try:
         sess = requests.Session()
         sess.mount('file://', FileAdapter())
@@ -127,7 +127,7 @@ def extractProfileRoastPathHTML(url:'QUrl', _:'ApplicationWindow') -> Optional['
         if title != '' and 'title' not in res:
             res['title'] = title
 
-        data:RoastPathData = {}
+        data:RoastPathData = RoastPathData()
         for elem in ['btData', 'etData', 'atData', 'eventData', 'rorData', 'noteData', 'fuelData', 'fanData', 'drumData']:
             page_content = ''
             try:

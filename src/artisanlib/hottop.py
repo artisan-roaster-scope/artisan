@@ -19,11 +19,9 @@ import time
 import logging
 import asyncio
 
-from typing import Final, Optional, Tuple, Callable, TYPE_CHECKING
+from typing import Final, Optional, Tuple, Callable
 
-if TYPE_CHECKING:
-    from artisanlib.atypes import SerialSettings # pylint: disable=unused-import
-
+from artisanlib.atypes import SerialSettings
 from artisanlib.async_comm import AsyncComm
 
 
@@ -203,13 +201,13 @@ class Hottop(AsyncComm):
                 self._set_cooling_motor = (1 if cooling_motor else 0)
 
 def main() -> None:
-    hottop_serial:SerialSettings = {
-        'port': '/dev/slave',
-        'baudrate': 9600, # 115200
-        'bytesize': 8,
-        'stopbits': 1,
-        'parity': 'N',
-        'timeout': 0.3}
+    hottop_serial = SerialSettings(
+        port = '/dev/slave',
+        baudrate = 9600,
+        bytesize = 8,
+        stopbits = 1,
+        parity = 'N',
+        timeout = 0.3)
     hottop = Hottop(serial=hottop_serial)
     hottop.start()
     for _ in range(4):

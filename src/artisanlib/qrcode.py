@@ -1,6 +1,7 @@
 #
 
 import qrcode # type: ignore
+import qrcode.constants # type: ignore
 from qrcode.main import QRCode # type: ignore
 
 from typing import Dict, Optional, Any

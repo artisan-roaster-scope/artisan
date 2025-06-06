@@ -290,6 +290,7 @@ def getRoast() -> Dict[str, Any]:  #for Python >= 3.9 can replace 'Dict' with th
         _log.debug('getRoast()')
         assert config.app_window is not None
         aw = config.app_window
+        assert aw is not None
         p:ProfileData = aw.getProfile()
 
         d = getTemplate(p)
@@ -418,7 +419,7 @@ def getRoast() -> Dict[str, Any]:  #for Python >= 3.9 can replace 'Dict' with th
         # if profile is already saved, that modification date is send along to
         # the server instead the timestamp
         # of the moment the record is queued
-        if aw.curFile is not None:
+        if aw is not None and aw.curFile is not None:
             mod_date:Optional[float] = util.getModificationDate(aw.curFile)
             if mod_date is not None:
                 d['modified_at'] = util.epoch2ISO8601(mod_date)

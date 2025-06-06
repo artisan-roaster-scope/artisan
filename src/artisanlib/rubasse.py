@@ -23,7 +23,7 @@ _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 # returns a dict containing all profile information contained in the given Rubasse CSV file
 def extractProfileRubasseCSV(file:str, aw:'ApplicationWindow') -> 'ProfileData':
-    res:ProfileData = {} # the interpreted data set
+    res:ProfileData = ProfileData() # the interpreted data set
 
     res['samplinginterval'] = 1.0
     filename:str = os.path.basename(file)

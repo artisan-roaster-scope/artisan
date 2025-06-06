@@ -41,7 +41,7 @@ def url_to_profile(url:str, log_data:bool = False) -> IkawaCmd_pb2.RoastProfile:
 
 def extractProfileIkawaURL(url:QUrl, aw:'ApplicationWindow') -> 'ProfileData':
     ikawa_profile = url_to_profile(url.query(), log_data=aw.qmc.device_logging)
-    res:ProfileData = {} # the interpreted data set
+    res:ProfileData = ProfileData() # the interpreted data set
     res['samplinginterval'] = 1.0
 
     res['roastertype'] = 'IKAWA Sample Roaster'
@@ -156,7 +156,7 @@ def extractProfileIkawaURL(url:QUrl, aw:'ApplicationWindow') -> 'ProfileData':
 
 # returns a dict containing all profile information contained in the given IKAWA CSV file
 def extractProfileIkawaCSV(file:str, aw:'ApplicationWindow') -> 'ProfileData':
-    res:ProfileData = {} # the interpreted data set
+    res:ProfileData = ProfileData() # the interpreted data set
 
     res['samplinginterval'] = 1.0
 

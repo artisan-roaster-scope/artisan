@@ -24,7 +24,7 @@ _log: Final[logging.Logger] = logging.getLogger(__name__)
 # returns a dict containing all profile information contained in the given Stronghold XLSX file
 def extractProfileStrongholdXLSX(file:str, aw:'ApplicationWindow') -> 'ProfileData':
 
-    res:ProfileData = {} # the interpreted data set
+    res:ProfileData = ProfileData() # the interpreted data set
 
     res['roastertype'] = 'Stronghold'
     res['roasterheating'] = 3 # electric

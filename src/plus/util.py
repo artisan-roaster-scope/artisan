@@ -123,17 +123,19 @@ def fromFtoC(Ffloat: Optional[float]) -> Optional[float]:
 
 
 def temp2C(temp: Optional[float],mode:Optional[str] = None) -> Optional[float]:
+    aw = config.app_window
     if (
-        temp is not None and (mode == 'F' or (mode is None and config.app_window is not None and config.app_window.qmc is not None and
-            config.app_window.qmc.mode == 'F'))
+        temp is not None and (mode == 'F' or (mode is None and aw is not None and aw.qmc is not None and
+            aw.qmc.mode == 'F'))
     ):  # @UndefinedVariable
         return fromFtoC(temp)  # @UndefinedVariable
     return temp
 
 def tempDiff2C(temp: Optional[float]) -> Optional[float]:
+    aw = config.app_window
     if (
-        temp is not None and config.app_window is not None and config.app_window.qmc is not None and
-            config.app_window.qmc.mode == 'F'
+        temp is not None and aw is not None and aw.qmc is not None and
+            aw.qmc.mode == 'F'
     ):  # @UndefinedVariable
         if temp in [-1, None] or numpy.isnan(temp):
             return temp
@@ -149,9 +151,10 @@ def RoRfromFtoC(Ffloat: Optional[float]) -> Optional[float]:
 
 
 def RoRtemp2C(temp: Optional[float],mode:Optional[str] = None) -> Optional[float]:
-    assert config.app_window is not None
+    aw = config.app_window
     if (
-        temp is not None and (mode == 'F' or (mode is None and config.app_window.qmc.mode == 'F'
+        aw is not None and
+        temp is not None and (mode == 'F' or (mode is None and aw.qmc.mode == 'F'
     ))):  # @UndefinedVariable
         return RoRfromFtoC(temp)  # @UndefinedVariable
     return temp
@@ -336,12 +339,13 @@ def add2dict(dict_source:'ProfileData', key_source:str, dict_target:Dict[str, An
 
 def getLanguage() -> str:
     try:
+        aw = config.app_window
         if (
-            config.app_window is not None
-            and config.app_window.plus_account is not None
+            aw is not None
+            and aw.plus_account is not None
         ):
-            assert isinstance(config.app_window.plus_language, str)
-            return config.app_window.plus_language
+            assert isinstance(aw.plus_language, str)
+            return aw.plus_language
     except Exception: # pylint: disable=broad-except
         # config.app_window might be still unbound
         pass
@@ -353,13 +357,15 @@ def getLanguage() -> str:
 # if rlimit = -1 or rused = -1 or pu = "", no update information is available and the state is not updated
 @pyqtSlot(float,float,str,int,list)
 def updateLimits(rlimit:float, rused:float, pu:str, notifications:int, machines: List[str]) -> None:  #for Python >= 3.9 can replace 'List' with the generic type hint 'list'
-    if config.app_window:
-        config.app_window.updateLimits(rlimit, rused, pu, notifications, machines)
+    aw = config.app_window
+    if aw is not None:
+        aw.updateLimits(rlimit, rused, pu, notifications, machines)
 
 @pyqtSlot()
 def updateSchedule() -> None:
-    if config.app_window:
-        config.app_window.updateSchedule()
+    aw = config.app_window
+    if aw is not None:
+        aw.updateSchedule()
 
 # takes the JSON response dict and returns the account state as tuple
 # rlimit:float, rused:float, pu:str, notifications:int

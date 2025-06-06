@@ -2123,10 +2123,10 @@ class editGraphDlg(ArtisanResizeablDialog):
                 if self.aw.qmc.plus_custom_blend is not None and self.aw.qmc.plus_custom_blend.name.strip() != '':
                     coffees = plus.stock.getCoffeeLabels()
                     if len(coffees)>2 and self.aw.qmc.plus_custom_blend.isValid(coffees.values()):
-                        custom_blend = {
-                            'hr_id': '',
-                            'label': self.aw.qmc.plus_custom_blend.name.strip(),
-                            'ingredients': [{'ratio': c.ratio, 'coffee': c.coffee} for c in self.aw.qmc.plus_custom_blend.components]}
+                        custom_blend = plus.stock.Blend(
+                            hr_id = '',
+                            label = self.aw.qmc.plus_custom_blend.name.strip(),
+                            ingredients = [{'ratio': c.ratio, 'coffee': c.coffee} for c in self.aw.qmc.plus_custom_blend.components])
                 self.plus_blends = plus.stock.getBlends(self.unitsComboBox.currentIndex(),self.plus_default_store, custom_blend)
                 self.plus_blends_combo.blockSignals(True)
                 self.plus_blends_combo.clear()
@@ -2411,7 +2411,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             # remove labels from ingredients
             ingredients = []
             for i in self.plus_blend_selected_spec['ingredients']:
-                entry:plus.stock.BlendIngredient = {'ratio': i['ratio'], 'coffee': i['coffee']}
+                entry = plus.stock.BlendIngredient(ratio = i['ratio'], coffee = i['coffee'])
                 if 'ratio_num' in i and i['ratio_num'] is not None:
                     entry['ratio_num'] = i['ratio_num']
                 if 'ratio_denom' in i and i['ratio_denom'] is not None:
@@ -5462,9 +5462,10 @@ class editGraphDlg(ArtisanResizeablDialog):
                 self.aw.qmc.plus_blend_label = None
                 self.aw.qmc.plus_blend_spec =  None
                 self.aw.qmc.plus_blend_spec_labels = None
-            # if weight unit changed we update the scheduler window if open
-            if self.aw.schedule_window is not None and self.org_weight[2] != self.aw.qmc.weight[2]:
-                self.aw.updateScheduleSignal.emit()
+#            # if weight unit changed we update the scheduler window if open
+#            if self.aw.schedule_window is not None and self.org_weight[2] != self.aw.qmc.weight[2]:
+            # always update as a completed items properties might have changed
+            self.aw.updateScheduleSignal.emit()
 
         # Update beans
         self.aw.qmc.beans = self.beansedit.toPlainText()
@@ -5691,7 +5692,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         if redraw:
             self.aw.qmc.redrawKeepViewSignal.emit(
                 False, # recomputeAllDeltas (default: True)
-                self.aw.qmc.flagon, # re_smooth_foreground (default: True)
+                True, # re_smooth_foreground (default: True)
                 True,  # takelock (default: True)
                 False, # forceRenewAxis (default: False)
                 False, # re_smooth_background (default: False)
@@ -5846,10 +5847,10 @@ class BlendsComboBox(StockComboBox):
         if self.parentDialog.aw.qmc.plus_custom_blend is not None and self.parentDialog.aw.qmc.plus_custom_blend.name.strip() != '':
             coffees = plus.stock.getCoffeeLabels()
             if len(coffees)>2 and self.parentDialog.aw.qmc.plus_custom_blend.isValid(coffees.values()):
-                custom_blend = {
-                    'hr_id': '',
-                    'label': self.parentDialog.aw.qmc.plus_custom_blend.name.strip(),
-                    'ingredients': [{'ratio': c.ratio, 'coffee': c.coffee} for c in self.parentDialog.aw.qmc.plus_custom_blend.components]}
+                custom_blend = plus.stock.Blend(
+                    hr_id = '',
+                    label = self.parentDialog.aw.qmc.plus_custom_blend.name.strip(),
+                    ingredients = [{'ratio': c.ratio, 'coffee': c.coffee} for c in self.parentDialog.aw.qmc.plus_custom_blend.components])
         plus_blends = plus.stock.getBlends(unit,self.parentDialog.plus_default_store, custom_blend)
         blend_items:List[str] = plus.stock.getBlendLabels(plus_blends)
         return [''] + blend_items

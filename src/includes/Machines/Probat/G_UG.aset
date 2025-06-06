@@ -34,8 +34,8 @@ extradevicecolor2=black, black, black
 extradevices=80, 81, 82
 extramathexpression1=, , 
 extramathexpression2=, , 
-extraname1=IT, Power, GasP
-extraname2=DrumSpeed, Air, DrumP
+extraname1=IT, {3}, {3} mbar
+extraname2={1}, {0}, {1} Pa
 
 [Quantifiers]
 clusterEventsFlag=false

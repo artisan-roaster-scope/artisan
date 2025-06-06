@@ -9,6 +9,7 @@ weight=g
 [events]
 eventsGraphflag=4
 default_etypes_set=1, 0, 0, 1, 0
+autoDrop=false
 
 [ArduinoPID]
 dutyMax=100

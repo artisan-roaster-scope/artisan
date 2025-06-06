@@ -39,8 +39,8 @@ extradevicecolor2=#000000, #45a6cf, #49b360, #49b360
 extradevices=80, 81, 82, 110
 extramathexpression1=, , , 
 extramathexpression2=, , , 
-extraname1=IT, Power, Gas mbar, Cooling
-extraname2=AT, Air, Drum Pa, Drum
+extraname1=IT, {3}, {3} mbar, Cooling
+extraname2=AT, {0}, {1} Pa, {1}
 
 
 [ExtraEventButtons]

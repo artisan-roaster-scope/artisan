@@ -547,13 +547,14 @@ class s7port:
                             raise Exception('result None') # pylint: disable=broad-exception-raised
                     else:
                         break
-                if self.commError: # we clear the previous error and send a message
-                    self.commError = False
-                    self.aw.qmc.adderror(QApplication.translate('Error Message','S7 Communication Resumed'))
-                r = get_real(res,0)
-                if self.aw.seriallogflag:
-                    self.aw.addserial(f'S7 readFloat({area},{dbnumber},{start},{force}) => {r}')
-                return r
+                if res is not None:
+                    if self.commError: # we clear the previous error and send a message
+                        self.commError = False
+                        self.aw.qmc.adderror(QApplication.translate('Error Message','S7 Communication Resumed'))
+                    r = get_real(res,0)
+                    if self.aw.seriallogflag:
+                        self.aw.addserial(f'S7 readFloat({area},{dbnumber},{start},{force}) => {r}')
+                    return r
             self.commError = True
             self.aw.qmc.adderror(QApplication.translate('Error Message','S7 Error: connecting to PLC failed'))
             return None
@@ -638,13 +639,14 @@ class s7port:
                             raise Exception('result None') # pylint: disable=broad-exception-raised
                     else:
                         break
-                if self.commError: # we clear the previous error and send a message
-                    self.commError = False
-                    self.aw.qmc.adderror(QApplication.translate('Error Message','S7 Communication Resumed'))
-                r = get_int(res,0)
-                if self.aw.seriallogflag:
-                    self.aw.addserial(f'S7 readInt({area},{dbnumber},{start},{force}) => {r}')
-                return r
+                if res is not None:
+                    if self.commError: # we clear the previous error and send a message
+                        self.commError = False
+                        self.aw.qmc.adderror(QApplication.translate('Error Message','S7 Communication Resumed'))
+                    r = get_int(res,0)
+                    if self.aw.seriallogflag:
+                        self.aw.addserial(f'S7 readInt({area},{dbnumber},{start},{force}) => {r}')
+                    return r
             self.commError = True
             self.aw.qmc.adderror(QApplication.translate('Error Message','S7 Error: connecting to PLC failed'))
             return None
@@ -729,13 +731,14 @@ class s7port:
                             raise Exception('result None') # pylint: disable=broad-exception-raised
                     else:
                         break
-                if self.commError: # we clear the previous error and send a message
-                    self.commError = False
-                    self.aw.qmc.adderror(QApplication.translate('Error Message','S7 Communication Resumed'))
-                r = get_bool(res,0,index)
-                if self.aw.seriallogflag:
-                    self.aw.addserial(f'S7 readBool({area},{dbnumber},{start},{index},{force}) => {r}')
-                return r
+                if res is not None:
+                    if self.commError: # we clear the previous error and send a message
+                        self.commError = False
+                        self.aw.qmc.adderror(QApplication.translate('Error Message','S7 Communication Resumed'))
+                    r = get_bool(res,0,index)
+                    if self.aw.seriallogflag:
+                        self.aw.addserial(f'S7 readBool({area},{dbnumber},{start},{index},{force}) => {r}')
+                    return r
             self.commError = True
             self.aw.qmc.adderror(QApplication.translate('Error Message','S7 Error: connecting to PLC failed'))
             return None

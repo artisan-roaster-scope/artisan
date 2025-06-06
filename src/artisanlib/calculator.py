@@ -61,9 +61,9 @@ class calculatorDlg(ArtisanDialog):
         self.startEdit.editingFinished.connect(self.calculateRC)
         self.endEdit.editingFinished.connect(self.calculateRC)
         nevents = len(self.aw.qmc.specialevents)
-        events_found = [f'{QApplication.translate("Form Caption", "Event")} #0']
+        events_found = [f"{QApplication.translate('Form Caption', 'Event')} #0"]
         for i in range(nevents):
-            events_found.append(f'{QApplication.translate("Form Caption", "Event")} #{str(i+1)}')
+            events_found.append(f"{QApplication.translate('Form Caption', 'Event')} #{str(i+1)}")
         self.eventAComboBox = QComboBox()
         self.eventAComboBox.addItems(events_found)
         self.eventAComboBox.currentIndexChanged.connect(self.calcEventRC)
@@ -256,7 +256,7 @@ class calculatorDlg(ArtisanDialog):
             deltaseconds = 0 if deltatime == 0 else deltatemperature / deltatime
             deltaminutes = deltaseconds*60.
             string1 = QApplication.translate('Label', 'Best approximation was made from {0} to {1}').format(stringfromseconds(self.aw.qmc.timex[startindex]- start),stringfromseconds(self.aw.qmc.timex[endindex]- start))
-            string2 = QApplication.translate('Label', '<b>{0}</b> {1}/sec, <b>{2}</b> {3}/min').format('%.2f'%(deltaseconds),self.aw.qmc.mode,'%.2f'%(deltaminutes),self.aw.qmc.mode) # pylint: disable=consider-using-f-string # noqa: UP031
+            string2 = QApplication.translate('Label', '<b>{0}</b> {1}/sec, <b>{2}</b> {3}/min').format(f'{deltaseconds:.2f}',self.aw.qmc.mode,f'{deltaminutes:.2f}',self.aw.qmc.mode)
             self.result1.setText(string1)
             self.result2.setText(string2)
         else:

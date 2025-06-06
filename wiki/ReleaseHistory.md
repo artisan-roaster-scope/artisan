@@ -2,24 +2,31 @@ Detailed Release History
 ========================
 
 ----
-v3.1.6
+v3.2.0 (June X, 2025)
 ------------------
 
 * ADDITIONS
-  - adds Acaia Umbra support
-  - adds custom scale names
-  - adds URL open handler for Linux/RPi
+  - adds weighing manager
+  - adds support for Acaia relay scales like the [Umbra](https://acaia.co/products/umbra-lunar)
+  - adds custom local scale names
   - adds button to manual update the roast schedule
+  - adds URL open handler for Linux/RPi
 
 * CHANGES
-  - improves WebSocket performance for slow servers
+  - improves WebSocket performance communicating with slow servers
   - improves full redraw performance
   - increases maximum frequency of schedule updates
+  - updates Spanish translations (thanks to Juan!)
+  - upgrade libusb-package on Windows
+  - limits maximum number of major axis ticks and draws minor axis ticks only if productive
 
 * FIXES
   - fixes an unhandled exception on loading settings related to scales configurations ([Issue #1847](../../../issues/1847))
-  - fix regression which broke show-events-on-BT in v3.1.2 and v3.1.4
+  - fixes regression which broke show-events-on-BT in v3.1.2 and v3.1.4
   - fixes delayed closing of the Roast Properties dialog on some configurations ([Issue #1852](../../../issues/1852))
+  - hardens event name substitution on background load ([Issue #1863](../../../issues/1863))
+  - prevents smoothing extra device curves using rate of rise variables
+
 
 
 ----

@@ -26,7 +26,7 @@ import usb.util # type: ignore[import-untyped]
 import json
 
 if system().startswith('Windows'):
-    import libusb_package # pyright:ignore[reportMissingImports] # pylint: disable=import-error
+    import libusb_package # pyright:ignore[reportMissingImports] # pylint: disable=import-error # ty:ignore[unresolved-import]
 
 
 import logging
@@ -280,7 +280,7 @@ class AillioR2:
                         '/usr/lib/aarch64-linux-gnu/libusb-1.0.so.0']:
                     if os.path.isfile(shared_libusb_path):
                         import usb.backend.libusb1 as libusb10  # type: ignore[import-untyped, unused-ignore]
-                        libusb10._load_library = _load_library  # pylint: disable=protected-access # overwrite the overwrite of the pyinstaller runtime hook pyi_rth_usb.py
+                        libusb10._load_library = _load_library  # pylint: disable=protected-access # ty: ignore[invalid-assignment] # overwrite the overwrite of the pyinstaller runtime hook pyi_rth_usb.py
                         from usb.backend.libusb1 import get_backend  # type: ignore[import-untyped, unused-ignore]
                         backend = get_backend(find_library=lambda _,shared_libusb_path=shared_libusb_path: shared_libusb_path)
                         break

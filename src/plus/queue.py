@@ -37,6 +37,7 @@ import threading
 import time
 import datetime
 import json
+import json.decoder
 import logging
 from typing import Final, Any, List, Dict, Optional, TYPE_CHECKING  #for Python >= 3.9: can remove 'List' and 'Dict' since type hints can use the generic 'list' and 'dict'
 
@@ -81,8 +82,9 @@ class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # Argument to
                 item['data']['roast_id'],
                 util.ISO86012epoch(item['data']['modified_at']),
             )
-            if config.app_window is not None:
-                config.app_window.updatePlusStatusSignal.emit()  # @UndefinedVariable
+            aw = config.app_window
+            if aw is not None:
+                aw.updatePlusStatusSignal.emit()  # @UndefinedVariable
 
     @pyqtSlot()
     def task(self) -> None:
@@ -137,8 +139,9 @@ class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # Argument to
                                     item['url'], item['data'], item['verb']
                                 )
                                 r.raise_for_status()
-                                if config.app_window is not None:
-                                    config.app_window.sendmessage(
+                                aw = config.app_window
+                                if aw is not None:
+                                    aw.sendmessage(
                                         QApplication.translate(
                                             'Plus',
                                             'Roast successfully uploaded to {}'
@@ -296,16 +299,19 @@ def start() -> None:
     if queue is None:
         # we initialize the queue
         import persistqueue
-        queue = persistqueue.SQLiteQueue(
-            queue_path, multithreading=True, auto_commit=False
-        )
-        # we keep items in the queue if not explicit marked as task_done:
-        # auto_commit=False
-
+        if hasattr(persistqueue, 'SQLiteQueue'):
+            try:
+                queue = persistqueue.SQLiteQueue(
+                    queue_path, multithreading=True, auto_commit=False
+                )
+                # we keep items in the queue if not explicit marked as task_done:
+                # auto_commit=False
+            except Exception:  # pylint: disable=broad-except
+                pass
 
     _log.debug('start()')
     if queue is not None:
-        _log.debug('-> qsize: %s', queue.qsize())
+        _log.debug('-> qsize: %s', queue.qsize()) # ty: ignore[possibly-unbound-attribute]
     if worker_thread is None:
         worker = Worker()
         worker_thread = QThread()
@@ -317,7 +323,7 @@ def start() -> None:
         worker.startSignal.emit()
         _log.debug('queue started')
     elif worker is not None:
-        worker.resume()
+        worker.resume() # ty: ignore[possibly-unbound-attribute]
         _log.debug('queue resumed')
 
 
@@ -333,23 +339,27 @@ def stop() -> None:
 # the sync cache but not yet uploaded as they are still in the queue
 def full_roast_in_queue(roast_id: str) -> bool:
     import persistqueue
-    q = persistqueue.SQLiteQueue(
-        queue_path, multithreading=True, auto_commit=False
-    )
-    try:
-        while True:
-            item = q.get(block=False)
-            if 'data' in item:
-                r = item['data']
-                if is_full_roast_record(r) and roast_id == r['roast_id']:
-                    # there is a full roast record already in queue
-                    break
-        del q
-        return True
-    except Exception:  # pylint: disable=broad-except
-        # we reached the end of the queue
+    if hasattr(persistqueue, 'SQLiteQueue'):
+        q = None
+        try:
+            q = persistqueue.SQLiteQueue(
+                queue_path, multithreading=True, auto_commit=False
+            )
+            while True:
+                item = q.get(block=False)
+                if 'data' in item:
+                    r = item['data']
+                    if is_full_roast_record(r) and roast_id == r['roast_id']:
+                        # there is a full roast record already in queue
+                        break
+            del q
+            return True
+        except Exception:  # pylint: disable=broad-except
+            # we reached the end of the queue
+            pass
         del q # noqa: F821
-        return False
+    return False
+
 
 
 ################
@@ -371,9 +381,10 @@ def is_full_roast_record(r: Dict[str, Any]) -> bool:  #for Python >= 3.9 can rep
 def addRoast(roast_record:Optional[Dict[str, Any]] = None) -> None:
     try:
         _log.debug('addRoast()')
-        if config.app_window is None:
+        aw = config.app_window
+        if aw is None:
             _log.info('config.app_window is None')
-        elif config.app_window.plus_readonly:
+        elif aw.plus_readonly:
             _log.info(
                 '-> roast not queued as users'
                  ' account access is readonly'
@@ -402,12 +413,13 @@ def addRoast(roast_record:Optional[Dict[str, Any]] = None) -> None:
             ):  # amount can be 0 but has to be present
                 # put in upload queue
                 _log.debug('-> put in queue')
-                config.app_window.sendmessage(
-                    QApplication.translate(
-                        'Plus',
-                        'Queuing roast for upload to {}'
-                    ).format(config.app_name)
-                )  # @UndefinedVariable
+                if aw is not None:
+                    aw.sendmessage(
+                        QApplication.translate(
+                            'Plus',
+                            'Queuing roast for upload to {}'
+                        ).format(config.app_name)
+                    )  # @UndefinedVariable
                 rr: Dict[str, Any]
                 if roast_record is not None:
                     # on updates only changed attributes w.r.t. the current
@@ -436,9 +448,10 @@ def addRoast(roast_record:Optional[Dict[str, Any]] = None) -> None:
 def sendLockSchedule() -> None:
     try:
         _log.debug('sendLockSchedule()')
-        if config.app_window is None:
+        aw = config.app_window
+        if aw is None:
             _log.info('config.app_window is None')
-        elif config.app_window.plus_readonly:
+        elif aw.plus_readonly:
             _log.info(
                 '-> lockSchedule not queued as users'
                  ' account access is readonly'
@@ -455,6 +468,7 @@ def sendLockSchedule() -> None:
                 # sql queue does not feature a timeout
             )
             _log.debug('-> lockSchedule queued up')
-            config.app_window.qmc.registerLockScheduleSent()
+            if aw is not None:
+                aw.qmc.registerLockScheduleSent()
     except Exception as e:  # pylint: disable=broad-except
         _log.exception(e)
