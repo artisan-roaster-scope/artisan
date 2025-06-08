@@ -1278,6 +1278,17 @@ class editGraphDlg(ArtisanResizeablDialog):
         updateAmbientTemp.setToolTip(QApplication.translate('Tooltip','retreive ambient data from connected devices or calculate from selected profile curve'))
         updateAmbientTemp.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         updateAmbientTemp.clicked.connect(self.updateAmbientTemp)
+        # Humidity Source Selector
+        self.humidityComboBox = QComboBox()
+        self.humidityComboBox.addItems(self.buildHumiditySourceList())
+        self.humidityComboBox.setCurrentIndex(self.aw.qmc.humiditySource)
+        self.humidityComboBox.currentIndexChanged.connect(self.humidityComboBoxIndexChanged)
+        # Pressure Source Selector
+        self.pressureComboBox = QComboBox()
+        self.pressureComboBox.addItems(self.buildPressureSourceList())
+        self.pressureComboBox.setCurrentIndex(self.aw.qmc.pressureSource)
+        self.pressureComboBox.currentIndexChanged.connect(self.pressureComboBoxIndexChanged)
+
         ##### LAYOUTS
         timeLayout = QGridLayout()
         timeLayout.setVerticalSpacing(3)
@@ -1549,9 +1560,12 @@ class editGraphDlg(ArtisanResizeablDialog):
         ambientGrid.setHorizontalSpacing(3)
         ambientGrid.setVerticalSpacing(0)
         ambientGrid.addWidget(ambientlabel,2,0)
-        ambientGrid.addLayout(ambient,2,2,1,5)
+        ambientGrid.addLayout(ambient,4,2,1,5) # add 2 more lines for ambiant humidity and pressure
         ambientGrid.addWidget(updateAmbientTemp,2,10)
         ambientGrid.addWidget(self.ambientComboBox,2,11,Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
+        # add widgets for humidity and pressure
+        ambientGrid.addWidget(self.humidityComboBox,3,11,Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
+        ambientGrid.addWidget(self.pressureComboBox,4,11,Qt.AlignmentFlag.AlignCenter|Qt.AlignmentFlag.AlignVCenter)
         ambientGrid.setColumnMinimumWidth(3, 11)
         ambientGrid.setColumnMinimumWidth(5, 11)
         ambientGrid.setColumnMinimumWidth(8, 11)
@@ -4223,7 +4237,37 @@ class editGraphDlg(ArtisanResizeablDialog):
     def ambientComboBoxIndexChanged(self, i:int) -> None:
         self.aw.qmc.ambientTempSource = i
 
+    # add humidiy combo box support
+    @pyqtSlot(int)
+    def humidityComboBoxIndexChanged(self, i:int) -> None:
+        self.aw.qmc.humiditySource = i
+
+    # add pressure combo box support 
+    @pyqtSlot(int)
+    def pressureComboBoxIndexChanged(self, i:int) -> None:
+        self.aw.qmc.pressureSource = i
+
     def buildAmbientTemperatureSourceList(self) -> List[str]:
+        extra_names = []
+        for i in range(len(self.aw.qmc.extradevices)):
+            extra_names.append(str(i) + 'xT1: ' + self.aw.qmc.extraname1[i])
+            extra_names.append(str(i) + 'xT2: ' + self.aw.qmc.extraname2[i])
+        return ['',
+                QApplication.translate('ComboBox','ET'),
+                QApplication.translate('ComboBox','BT')] + extra_names
+
+    # add humidity source list
+    def buildHumiditySourceList(self) -> List[str]:
+        extra_names = []
+        for i in range(len(self.aw.qmc.extradevices)):
+            extra_names.append(str(i) + 'xT1: ' + self.aw.qmc.extraname1[i])
+            extra_names.append(str(i) + 'xT2: ' + self.aw.qmc.extraname2[i])
+        return ['',
+                QApplication.translate('ComboBox','ET'),
+                QApplication.translate('ComboBox','BT')] + extra_names
+
+    # add pressure source list
+    def buildPressureSourceList(self) -> List[str]:
         extra_names = []
         for i in range(len(self.aw.qmc.extradevices)):
             extra_names.append(str(i) + 'xT1: ' + self.aw.qmc.extraname1[i])
@@ -4234,7 +4278,11 @@ class editGraphDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(bool)
     def updateAmbientTemp(self, _:bool = False) -> None:
+        # ensure that the data from the focused widget gets set
         self.aw.qmc.updateAmbientTemp()
+        self.aw.qmc.updateHumiditySource() # read humidity average
+        self.aw.qmc.updatePressureSource() # read pressure average
+        _log.info('Ambient updated: %s° %s%% %shPa', self.aw.qmc.ambientTemp, self.aw.qmc.ambient_humidity, self.aw.qmc.ambient_pressure)
         self.ambientedit.setText(f'{float2float(self.aw.qmc.ambientTemp):g}')
         self.ambientedit.repaint() # seems to be necessary in some PyQt versions!?
         self.ambient_humidity_edit.setText(f'{float2float(self.aw.qmc.ambient_humidity):g}')
@@ -5471,6 +5519,10 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.aw.qmc.beans = self.beansedit.toPlainText()
         #update ambient temperature source
         self.aw.qmc.ambientTempSource = self.ambientComboBox.currentIndex()
+        #update humidity source
+        self.aw.qmc.humiditySource = self.humidityComboBox.currentIndex()
+        #update pressure source
+        self.aw.qmc.pressureSource = self.pressureComboBox.currentIndex()
         #update weight
         w0:float
         w1:float
