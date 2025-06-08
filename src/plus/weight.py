@@ -214,6 +214,10 @@ class GreenWeighingState(StateMachine):
         | done_weighing2.to(weighing2)
     )
 
+    bucket_put_back_swapped = (
+        empty.to(weighing1)
+    )
+
     task_completed = (
         weighing1.to(done_weighing1)
         | weighing2.to(done_weighing2)
@@ -333,6 +337,11 @@ class GreenWeighingState(StateMachine):
 
     def after_bucket_put_back_done(self) -> None:
         self.process_state = PROCESS_STATE.WEIGHING
+        self.update_displays(progress=True)
+
+    def after_bucket_put_back_swapped(self) -> None:
+        self.process_state = PROCESS_STATE.WEIGHING
+        self.bucket = 0
         self.update_displays(progress=True)
 
     # new_weight is the new total weight of the measured greens without the bucket
@@ -570,8 +579,9 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error:
     EMPTY_SCALE_RECOGNITION_TOLERANCE:Final[int] = 10       # +- tolerance to recognize empty scale in g
     MIN_EMPTY_BUCKET_RECOGNITION_TOLERANCE:Final[int] = 10  # +- minimal tolerance to recognize empty green bucket in g
     EMPTY_BUCKET_RECOGNITION_TOLERANCE_PERCENT:Final[float] = 1     # +- tolerance to recognize empty green bucket in % of bucket weight
-    CANCELED_STEP_RECOGNITION_TOLERANCE:Final[int] = 10     # +- tolerance to recognize a previous 'task_cancel' step to restart via 'bucket_put_back' in g
-    DONE_STEP_RECOGNITION_TOLERANCE:Final[int] = 10         # +- tolerance to recognize a previous 'task_completed' step to restart via 'bucket_put_back_done' in g
+    CANCELED_STEP_RECOGNITION_TOLERANCE:Final[int] = 15     # +- tolerance to recognize a previous 'task_cancel' step to restart via 'bucket_put_back' in g
+    DONE_STEP_RECOGNITION_TOLERANCE:Final[int] = 15         # +- tolerance to recognize a previous 'task_completed' step to restart via 'bucket_put_back_done' in g
+    SWAP_STEP_RECOGNITION_TOLERANCE:Final[int] = 15         # +- tolerance to recognize a previous 'bucket_swapped' step to restart via 'bucket_put_back_swapped' in g
     ROASTED_BUCKET_TOLERANCE:Final[int] = 5                 # +- tolerance to recognize filled roasted container in % w.r.t. the estimated weight
                                                             # (weight loss defaults to 15% if no template is given)
     ROASTED_BUCKET_REMOVALE_TOLERANCE:Final[int] = 10       # +- tolerance to recognize roasted bucket removal
@@ -622,6 +632,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error:
         self.green_task_container1_registered_weight:int = 0  # holds the green fill weight of the first container after container swap
         self.task_canceled_step:int = 0                       # remember step (in g) that did lead to "task_cancel" allowing for a restart via "bucket_put_back" on recognizing the inverse step
         self.task_done_step:int = 0                           # remember step (in g) that did lead to "task_completed" allowing for a restart via "bucket_put_back_done" on recognizing the
+        self.task_swapped_step:int = 0                        # remember step (in g) that did lead to "task_swapped" allowing for a restart via "bucket_put_back_swapped" on recognizing the
         self.task_done_weight:int = 0                         # remember weight (in g) that did lead to "task_completed" allowing to complete this task
         #-
         self.roasted_task_empty_scale_weight:int = 0          # weight of the empty scale
@@ -873,8 +884,16 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error:
                 self.task_done_weight = 0
                 self.sm_green.send('bucket_put_back_done')
 
+            # 3. Cancel Container Swap (from EMPTY TO WEIHING1; bucket_put_back_swapped
+            elif (self.green_task_scale == scale_nr and
+                    self.sm_green.current_state == GreenWeighingState.empty and
+                    self.task_swapped_step < 0 and abs(step + self.task_swapped_step) < self.SWAP_STEP_RECOGNITION_TOLERANCE):
+                # Cancel of the done operation; we restart at the done state
+                self.task_swapped_step = 0
+                self.green_task_container1_registered_weight = 0
+                self.sm_green.send('bucket_put_back_swapped')
 
-            # 3. Place Empty Green Bucket
+            # 4. Place Empty Green Bucket
             elif (self.sm_green.current_weight_item is not None and                            # current green weight item is established
                     (((self.sm_green.current_state in
                         {GreenWeighingState.ready, GreenWeighingState.empty}) and              # green State Machine is in READY or EMPTY state
@@ -916,7 +935,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error:
                     # make state transition (which then triggers the display update)
                     self.sm_green.send('bucket_placed')
 
-            # 4. Place Full Roasted Bucket
+            # 5. Place Full Roasted Bucket
             elif (self.sm_roasted.current_weight_item is not None and                      # current roasted weight item is established
                     self.sm_roasted.current_state == RoastedWeighingState.ready and        # roasted State Machine is in READY state
                     self.roasted_task_scale == 0 and                                       # no scale yet assigned to the roasted task
@@ -964,6 +983,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error:
                 sm_message = 'bucket_swapped'
                 # we register the already weighted greens
                 self.green_task_container1_registered_weight = weight
+                self.task_swapped_step = step
                 self.sm_green.send('fill', weight, True) # update widget after registered weight of container 1 has been set
 
             elif self.green_task_container1_registered_weight != 0 and abs(weight - self.green_task_container1_registered_weight) < self.EMPTY_SCALE_RECOGNITION_TOLERANCE:

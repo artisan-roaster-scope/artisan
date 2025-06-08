@@ -38,7 +38,7 @@ ScaleSpec = Tuple[str,str] # scale name, scale id (eg. ble address)
 ScaleSpecs = List[ScaleSpec]
 
 # STABLE_TIMER_PERIOD should be >1sec if Acaia is reporting also non-stable readings, for stable readings a very short period is fine
-STABLE_TIMER_PERIOD = 500 # period to wait until new weight stabilized before forwarding the new reading via scale_stable_weight_changed signals (> then scale update period!)
+STABLE_TIMER_PERIOD =350 # period to wait until new weight stabilized before forwarding the new reading via scale_stable_weight_changed signals (> then scale update period!)
 MIN_STABLE_WEIGHT_CHANGE = 1 # The weight has to change for at least this amount (in g) to update the last stable weight
 
 

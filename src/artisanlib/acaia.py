@@ -737,7 +737,7 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
                     1])) # only SCALE_CLASS.RELAY # 0: only weight changes are reported; 1: streaming weight changes at 1/10
 
     def changes_notifications(self) -> None:
-        _log.debug('streaming_notifications')
+        _log.debug('changes_notifications')
         self.send_event(
             bytes([ # pairs of key/setting
                     0,  # weight id
