@@ -17768,6 +17768,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.AUCshowFlag = toBool(settings.value('AUCshowFlag',self.qmc.AUCshowFlag))
             self.keyboardmoveflag = toInt(settings.value('keyboardmoveflag',int(self.keyboardmoveflag)))
             self.qmc.ambientTempSource = toInt(settings.value('AmbientTempSource',int(self.qmc.ambientTempSource)))
+            # add humidity and pressure sources
+            self.qmc.humiditySource = toInt(settings.value('AmbiantHumiditySource',int(self.qmc.humiditySource)))
+            self.qmc.pressureSource = toInt(settings.value('AmbiantPressureSource',int(self.qmc.pressureSource)))
             self.setSamplingRate(toInt(settings.value('Delay',int(self.qmc.delay))))
             self.qmc.flagKeepON = toBool(settings.value('KeepON',self.qmc.flagKeepON))
             self.qmc.flagOpenCompleted = toBool(settings.value('flagOpenCompleted',self.qmc.flagOpenCompleted))
@@ -19745,6 +19748,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
             #save ambient temperature source
             self.settingsSetValue(settings, default_settings, 'AmbientTempSource',self.qmc.ambientTempSource, read_defaults)
+            # save humidity source
+            self.settingsSetValue(settings, default_settings, 'AmbientHumiditySource',self.qmc.humiditySource, read_defaults)
+            # save pressure source
+            self.settingsSetValue(settings, default_settings, 'AmbientPressureSource',self.qmc.pressureSource, read_defaults)
             #save delay (sampling interval)
             self.settingsSetValue(settings, default_settings, 'Delay',self.qmc.delay, read_defaults)
             # save keepON flag
