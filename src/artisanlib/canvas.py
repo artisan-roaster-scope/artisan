@@ -1649,7 +1649,7 @@ class tgraphcanvas(FigureCanvas):
         # container scale tare
         self.container_names:List[str] = []
         self.container_weights:List[float] = [] # all weights in g
-        self.container_idx:int = -1 # the empty field (as -1 + 2 = 1)
+        self.container_idx:int = -1 # default points to the empty field in the container menu (as -1 + 2 = 1)
 
         #stores _indexes_ of self.timex to record events.
         # Use as self.timex[self.specialevents[x]] to get the time of an event
@@ -2459,6 +2459,7 @@ class tgraphcanvas(FigureCanvas):
              device_id in self.specialDevices
              )
 
+    # returns None if there is no weight at the given container_idx registered
     def get_container_weight(self, container_idx:int) -> Optional[float]:
         if len(self.container_weights) > container_idx >= 0:
             return self.container_weights[container_idx]

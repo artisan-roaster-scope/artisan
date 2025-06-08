@@ -272,7 +272,7 @@ warn_unreachable = true
 no_implicit_optional = true
 
 
-plugins = ["numpy.typing.mypy_plugin"]
+#plugins = ["numpy.typing.mypy_plugin"] # deprecated in numpy 2.3
 
 [[tool.mypy.overrides]]
 module = ["matplotlib.*", "aiohttp.*", "aiohttp.web.*", "aiohttp_jinja2.*", "libusb_package.*"]
@@ -368,3 +368,24 @@ ignore-words-list = 'Abd,ser,alog,nd,iterm,dout,te,commandi,dout,exitt,currenty,
 #redundant-cast = "ignore"
 #possibly-unbound-attribute = "error"
 #possibly-unbound-import = "error"
+
+[tool.pyrefly]
+project_includes = [
+    "artisanlib/*.py",
+    "plus/*.py",
+]
+project_excludes = [
+    "**/build*",
+    "**/dist*",
+    "**/uic*",
+    "**/misc*",
+]
+python_version = "3.8.0"
+replace_imports_with_any = [
+    "matplotlib.*",
+    "aiohttp.*",
+    "aiohttp.web.*",
+    "aiohttp_jinja2.*",
+    "libusb_package.*",
+    "uic.*",
+]

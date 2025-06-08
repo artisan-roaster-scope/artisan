@@ -173,6 +173,7 @@ class TaskWebDisplayPayload(TypedDict):
     blend_percent:str      # percentage of blend component | max ~6 characters or scheduleItem pos for roasted tasks
     total_percent:float    # total percentage of task completion
     loss:str               # weight loss displayed if type==1 (roasted)
+    timer:int              # timer timeout in seconds; if 0, timer progress is not displayed
     type:int               # task type (0:green, 1: roasted, 2:defects)
 
 
@@ -1383,7 +1384,8 @@ class DragItem(StandardItem):
             fully_unprepared_p = not fully_prepared_p and fully_unprepared(self.data)
             if (self.aw.schedule_window is not None and
                 self.aw.schedule_window.weight_manager.sm_green.current_weight_item and
-                self.aw.schedule_window.weight_manager.sm_green.current_weight_item.uuid != self.data.id):
+                (self.aw.schedule_window.weight_manager.sm_green.current_weight_item.uuid != self.data.id or
+                    self.aw.schedule_window.weight_manager.green_task_scale  == 0)): # no scaled assigned to the green task, thus not processing
                 # this schedule item is not currently under processing by the weight manager
                 if not fully_prepared_p:
                     allPreparedAction:QAction = QAction(QApplication.translate('Contextual Menu', 'All batches prepared'),self)
@@ -3840,6 +3842,7 @@ class GreenWebDisplay(GreenDisplay):
         blend_percent = '',
         total_percent = 0,
         loss = '',
+        timer = 0,
         type = 0 # 0:green task; constant
     )
 
@@ -3885,7 +3888,16 @@ class GreenWebDisplay(GreenDisplay):
             self.rendered_task['state'] = state
             self.rendered_task['bucket'] = 0
             self.rendered_task['total_percent'] = 0
+
+            # set timer tag
+            if state == PROCESS_STATE.CANCELD:
+                self.rendered_task['timer'] = self.cancel_timer_timeout
+            elif state == PROCESS_STATE.DONE:
+                self.rendered_task['timer'] = self.done_timer_timeout
+
             self.update()
+
+            self.rendered_task['timer'] = 0 # clear timer start trigger immediately
 
 
     # current_weight indicates total measured weight over both containers in g (not including the bucket weights)
@@ -3944,6 +3956,7 @@ class RoastedWebDisplay(RoastedDisplay):
             blend_percent = '',
             total_percent = 0,
             loss = '',
+            timer = 0,
             type = 1 # 1:roasted task; constant
     )
 
@@ -3985,7 +3998,17 @@ class RoastedWebDisplay(RoastedDisplay):
             self.rendered_task['state'] = state
             self.rendered_task['bucket'] = 0
             self.rendered_task['total_percent'] = 0
+
+            # set timer tag
+            if state == PROCESS_STATE.CANCELD:
+                self.rendered_task['timer'] = self.cancel_timer_timeout
+            elif state == PROCESS_STATE.DONE:
+                self.rendered_task['timer'] = self.done_timer_timeout
+
             self.update()
+
+            self.rendered_task['timer'] = 0 # clear timer start trigger immediately
+
 
     def show_result(self, state:PROCESS_STATE, current_weight:int) -> None:
         if (self.last_item is not None and (self.last_process_state != state or self.last_current_weight != current_weight)):

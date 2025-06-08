@@ -52,6 +52,16 @@ Receives data in the shape of
     <meta name="mobile-web-app-title" content="{{window_title}}">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;600">
     <title>{{window_title}}</title>
+    <noscript>
+        <style type="text/css">
+            .nojsnoshow {
+                display: none;
+            }
+        </style>
+        <div class="noscriptmsg">
+            This display cannot work without JavaScript turned on, sorry!
+        </div>
+    </noscript>
     <script type="text/javascript" src="fitty_patched.js"></script>
     <script type="text/javascript">
         // @ts-check
@@ -166,6 +176,7 @@ Receives data in the shape of
             elements.scale_rect.style.border = BORDER;
             multiElements.title.forEach(el => el.style.color = TITLECOLOR);
             multiElements.subtitle.forEach(el => el.style.color = TITLECOLOR);
+            multiElements.buckets_images.forEach(el => el.style.display = 'none');
             elements.buckets_grid_part.style.stroke = BUCKETCOLOR;
             elements.dialog_svg.style.display = 'none';
             if (DARKMODE) {
@@ -226,11 +237,6 @@ Receives data in the shape of
                     document.body.removeEventListener("click", processClick);
                 }
 
-                closeTimerDialog();
-                if (parsedData.timer) {
-                    openTimerDialog(parsedData.timer);
-                }
-
                 // display number of buckets
                 for (let i = 0; i < multiElements.buckets_images.length; i++) {
                     const el = multiElements.buckets_images[i];
@@ -238,6 +244,8 @@ Receives data in the shape of
                         el.style.display = i < (parsedData.bucket || 0) ? 'block' : 'none';
                     }
                 }
+
+                elements.timer_progress.style.setProperty('--progress-color', '#2098c7');
 
                 switch (parsedData.state) {
                     case DISCONNECTED:
@@ -286,6 +294,7 @@ Receives data in the shape of
                     case DONE:
                         elements.scale_rect.style.display = 'block';
                         elements.scale_rect.style.backgroundColor = ABLUE;
+                        elements.timer_progress.style.setProperty('--progress-color', 'white');
 
                         if (!parsedData.percent) {
                             elements.scale_icon_done.style.display = 'block';
@@ -300,82 +309,99 @@ Receives data in the shape of
                             elements.bucket_on_scale.style.border = '1.2vmin solid white';
                             elements.percent.style.color = 'white';
                         }
-
+                        closeTimerDialog();
+                        if (parsedData.timer) {
+                            openTimerDialog(parsedData.timer);
+                        }
                         break;
 
                     case CANCELLED:
                         elements.scale_rect.style.display = 'block';
                         elements.scale_rect.style.backgroundColor = ABLUE;
+                        elements.timer_progress.style.setProperty('--progress-color', 'white');
                         elements.scale_icon_done.style.display = 'block';
                         elements.scale_icon_done.style.fill = 'white';
                         elements.bucket_on_scale.style.display = 'none';
                         elements.cancel_svg.style.display = 'block';
+                        closeTimerDialog();
+                        if (parsedData.timer) {
+                            openTimerDialog(parsedData.timer);
+                        }
                         break;
 
                     case WEIGHING:
                         // green
                         if (parsedData.type === 0) {
+                            closeTimerDialog();
+                            if (parsedData.timer) {
+                                openTimerDialog(parsedData.timer);
+                            }
                             elements.percent.classList.remove('big-font-roasted');
                             elements.percent.classList.add('big-font');
-                        // main scale
-                        if (parsedData.percent >= 0) {
-                            // display bucket on scale and %
-                            elements.scale_rect.style.display = 'block';
-                            elements.bucket_on_scale.style.display = 'block';
-                            elements.percent.style.display = 'block';
-                            elements.percent.innerHTML = parsedData.percent.toFixed(0) + '%';
-                            elements.percent.style.color = PERCENTCOLOR;
-                            elements.bucket_on_scale.style.border = BORDER;
-                            elements.bucket_on_scale.style.top = BUCKETPOSITION;
-                            elements.bucket_on_scale.style.left = BUCKETPOSITION;
-                            elements.percent.style.fontSize = '32cqmin';
+                            // main scale
+                            if (parsedData.percent >= 0) {
+                                // display bucket on scale and %
+                                elements.scale_rect.style.display = 'block';
+                                elements.bucket_on_scale.style.display = 'block';
+                                elements.percent.style.display = 'block';
+                                elements.percent.innerHTML = parsedData.percent.toFixed(0) + '%';
+                                elements.percent.style.color = PERCENTCOLOR;
+                                elements.bucket_on_scale.style.border = BORDER;
+                                elements.bucket_on_scale.style.top = BUCKETPOSITION;
+                                elements.bucket_on_scale.style.left = BUCKETPOSITION;
+                                elements.percent.style.fontSize = '32cqmin';
 
-                            if (parsedData.percent <= 99) {
-                                // normal count until 99%
-                                elements.scale_rect.style.background = `linear-gradient(0deg, ${ABLUE} 0 ${parsedData.percent}%, #b5b5b5 ${parsedData.percent}% 100%)`;
-                            } else if (Math.abs(100 - (Math.round(parsedData.percent * 100) / 100)) < TARGET_DEVIATION) {
-                                // special display if [99.99, 100.01]%
-                                elements.scale_rect.style.backgroundColor = ABLUE;
-                                elements.bucket_on_scale.style.color = 'white';
-                                elements.bucket_on_scale.style.backgroundColor = ABLUE;
-                                elements.bucket_on_scale.style.border = '2vmin solid white';
-                                elements.bucket_on_scale.style.top = 'calc(12% - 2vmin)';
-                                elements.bucket_on_scale.style.left = 'calc(12% - 2vmin)';
-                                elements.percent.style.color = 'white';
-                                elements.percent.style.fontSize = '28cqmin';
-                            } else {
-                                // zoom for >99% (and != 100)
-                                elements.scale_rect.style.backgroundColor = ABLUE;
-                                elements.percent.style.display = 'none';
-                                if (parsedData.percent < 100) {
-                                    const zoomsize = (100 * (parsedData.percent - 99)).toFixed(2);
-                                    elements.zoom.style.display = 'block';
-                                    elements.zoom.style.height = `${zoomsize}%`;
-                                    elements.zoom.style.width = elements.zoom.style.height;
-                                } else if (parsedData.percent < 102.5 || !USERED) {
-                                    // overflow
+                                if (parsedData.percent <= 99) {
+                                    // normal count until 99%
+                                    elements.scale_rect.style.background = `linear-gradient(0deg, ${ABLUE} 0 ${parsedData.percent}%, #b5b5b5 ${parsedData.percent}% 100%)`;
+                                    if (parsedData.percent >= 95) {
+                                        elements.timer_progress.style.setProperty('--progress-color', 'white');
+                                    }
+                                } else if (Math.abs(100 - (Math.round(parsedData.percent * 100) / 100)) < TARGET_DEVIATION) {
+                                    // special display if [99.99, 100.01]%
+                                    elements.scale_rect.style.backgroundColor = ABLUE;
+                                    elements.timer_progress.style.setProperty('--progress-color', 'white');
+                                    elements.bucket_on_scale.style.color = 'white';
                                     elements.bucket_on_scale.style.backgroundColor = ABLUE;
-                                    const zoomsize = 76 + (parsedData.percent - 100 + 0.1) * 24;
-                                    elements.scale_for_clipping.style.display = 'block';
-                                    elements.scale_for_clipping.style.background = 'none';
-                                    elements.zoom2.style.display = 'block';
-                                    elements.zoom2.style.height = `${zoomsize.toFixed(2)}%`;
-                                    elements.zoom2.style.width = elements.zoom2.style.height;
-                                    const zoomperc = (100 - zoomsize) / 2;
-                                    // const topleft = `calc(${zoomperc.toFixed(2)}% - 0.25vmin)`;
-                                    elements.zoom2.style.top = `${zoomperc.toFixed(2)}%`;
-                                    elements.zoom2.style.left = elements.zoom2.style.top;
+                                    elements.bucket_on_scale.style.border = '2vmin solid white';
+                                    elements.bucket_on_scale.style.top = 'calc(12% - 2vmin)';
+                                    elements.bucket_on_scale.style.left = 'calc(12% - 2vmin)';
+                                    elements.percent.style.color = 'white';
+                                    elements.percent.style.fontSize = '28cqmin';
                                 } else {
-                                    // overflow max
-                                    elements.bucket_on_scale.style.backgroundColor = ABLUE;
-                                    elements.scale_for_clipping.style.display = 'block';
-                                    elements.scale_for_clipping.style.backgroundColor = ARED;
-                                    elements.zoom2.style.display = 'none';
+                                    // zoom for >99% (and != 100)
+                                    elements.scale_rect.style.backgroundColor = ABLUE;
+                                    elements.timer_progress.style.setProperty('--progress-color', 'white');
+                                    elements.percent.style.display = 'none';
+                                    if (parsedData.percent < 100) {
+                                        const zoomsize = (100 * (parsedData.percent - 99)).toFixed(2);
+                                        elements.zoom.style.display = 'block';
+                                        elements.zoom.style.height = `${zoomsize}%`;
+                                        elements.zoom.style.width = elements.zoom.style.height;
+                                    } else if (parsedData.percent < 102.5 || !USERED) {
+                                        // overflow
+                                        elements.bucket_on_scale.style.backgroundColor = ABLUE;
+                                        const zoomsize = 76 + (parsedData.percent - 100 + 0.1) * 24;
+                                        elements.scale_for_clipping.style.display = 'block';
+                                        elements.scale_for_clipping.style.background = 'none';
+                                        elements.zoom2.style.display = 'block';
+                                        elements.zoom2.style.height = `${zoomsize.toFixed(2)}%`;
+                                        elements.zoom2.style.width = elements.zoom2.style.height;
+                                        const zoomperc = (100 - zoomsize) / 2;
+                                        // const topleft = `calc(${zoomperc.toFixed(2)}% - 0.25vmin)`;
+                                        elements.zoom2.style.top = `${zoomperc.toFixed(2)}%`;
+                                        elements.zoom2.style.left = elements.zoom2.style.top;
+                                    } else {
+                                        // overflow max
+                                        elements.bucket_on_scale.style.backgroundColor = ABLUE;
+                                        elements.scale_for_clipping.style.display = 'block';
+                                        elements.scale_for_clipping.style.backgroundColor = ARED;
+                                        elements.zoom2.style.display = 'none';
+                                    }
                                 }
-                            }
-                        } else {
-                            elements.bucket_on_scale.style.display = 'none';
-                            elements.percent.style.display = 'none';
+                            } else {
+                                elements.bucket_on_scale.style.display = 'none';
+                                elements.percent.style.display = 'none';
                             }
                         } else if (parsedData.type === 1) {
                             elements.percent.innerHTML = parsedData.loss;
@@ -385,6 +411,7 @@ Receives data in the shape of
                             elements.percent.style.display = 'block';
                             elements.scale_rect.style.display = 'block';
                             elements.scale_rect.style.backgroundColor = ABLUE;
+                            elements.timer_progress.style.setProperty('--progress-color', 'white');
                             elements.bucket_on_scale.style.display = 'block';
                             elements.bucket_on_scale.style.backgroundColor = ABLUE;
                             elements.bucket_on_scale.style.border = '3vmin solid white';
@@ -533,9 +560,9 @@ Receives data in the shape of
             dialogs.cancel_dialog.addEventListener("close", () => {
                 showingCancelDialog = undefined;
                 if (allowClick && !showingMessageDialog) {
-                // timeout, otherwise, proessClick will be called with the current click
-                setTimeout(() => {
-                    document.body.addEventListener("click", processClick);
+                    // timeout, otherwise, proessClick will be called with the current click
+                    setTimeout(() => {
+                        document.body.addEventListener("click", processClick);
                         if (websocket === null) {
                             wsConnect();
                         }
@@ -544,8 +571,8 @@ Receives data in the shape of
             });
 
             if (allowClick) {
-            // catch click on whole screen
-            document.body.addEventListener("click", processClick);
+                // catch click on whole screen
+                document.body.addEventListener("click", processClick);
             }
 
             // error / message dialog
@@ -704,6 +731,13 @@ Receives data in the shape of
             height: 100%;
             position: relative;
             font-family: 'Roboto', sans-serif;
+        }
+
+        .noscriptmsg {
+            font-size: 15px;
+            color: #c70c49;
+            text-align: center;
+            margin-top: 20px;
         }
 
         .outer-frame {
@@ -1039,7 +1073,7 @@ Receives data in the shape of
         }
 
         progress {
-            accent-color: #2098c7;
+            accent-color: var(--progress-color, #2098c7);
             -webkit-appearance: none;
             appearance: none;
             border: none;
@@ -1047,13 +1081,16 @@ Receives data in the shape of
             background: none;
             margin-left: auto;
             margin-right: auto;
-            margin-top: 3%;
+            /* margin-top: 3%; */
             width: 90%;
             height: 5%;
+            position: absolute;
+            left: 5%;
+            top: 3%;
         }
 
         progress::-webkit-progress-value {
-            background-color: #2098c7;
+            background-color: var(--progress-color, #2098c7);
             /* border-radius: 30%; */
             /* transition: width 0.4s ease-in; */
         }
@@ -1064,19 +1101,19 @@ Receives data in the shape of
         }
 
         progress::-moz-progress-bar {
-            background-color: #2098c7;
+            background-color: var(--progress-color, #2098c7);
             /* border-radius: 30%; */
             /* transition: width 0.4s ease-in; */
         }
 
         progress {
-            color: #2098c7;
+            color: var(--progress-color, #2098c7);
         }
     </style>
 </head>
 
 <body style="height: 100%; margin: 0;">
-    <dialog closedby="any" id="cancel_dialog" style="border-radius: 10px;">
+    <dialog closedby="any" id="cancel_dialog" style="border-radius: 10px;" class="nojsnoshow">
         <div class="dialog-close-icon" id="dialog_close_icon">&cross;</div>
         <div class="dialog-svg-container">
             <svg id="dialog_cancel_svg" xmlns="http://www.w3.org/2000/svg" height="100%" viewBox="0 0 24 24" width="100%" version="1.1" style="fill: #ff5151; cursor: pointer">
@@ -1084,7 +1121,7 @@ Receives data in the shape of
             </svg>
         </div>
     </dialog>
-    <dialog closedby="any" id="text_dialog" style="border-radius: 10px;">
+    <dialog closedby="any" id="text_dialog" style="border-radius: 10px;" class="nojsnoshow">
         <div class="dialog-text-container" style="cursor: pointer;">
             <div id="dialog_svg" style="fill: #c70c49;">
                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px">
@@ -1094,7 +1131,7 @@ Receives data in the shape of
             <div id="dialog_text">Error</div>
         </div>
     </dialog>
-    <div class="outer-frame" id="outer_frame">
+    <div class="outer-frame nojsnoshow" id="outer_frame">
         <div class="outerdiv" id="outerdiv">
             <div class="maindiv">
                 <div>
@@ -1130,26 +1167,28 @@ Receives data in the shape of
                                 </div>
                             </div>
                             <div class="buckets-grid-part" id="buckets_grid_part">
-                                <svg name="buckets_images" width="100%" height="100%" version="1.0" viewBox="0 0 24 24"
-                                    xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"
-                                    style="margin-top: 15cqmin;">
-                                    <path d="M 10.360146,0.48878671 C 5.8839144,0.59904451 2.2122471,1.1209314 0.94655416,1.8229061 0.74782493,1.9350015 0.57417803,2.0875248 0.51822514,2.2051331 l -0.0463058,0.091881 v 1.0989028 c 0,1.20181 -0.003859,1.1540316 0.1157646,1.2992044 0.18329395,0.2205156 0.75439926,0.4906472 1.43933986,0.6799231 l 0.2141645,0.058804 0.042447,0.233379 c 0.4418349,2.4844758 0.7235287,4.7447606 0.9473403,7.6004376 0.1871528,2.396269 0.3087056,5.365879 0.3087056,7.572873 0,0.600905 0.00772,0.832446 0.025082,0.909627 0.310635,1.255101 5.9522299,2.089385 11.2716138,1.668568 3.00795,-0.237054 5.178536,-0.839797 5.556701,-1.541772 l 0.05595,-0.101069 0.01351,-0.588042 c 0.0077,-0.323423 0.02508,-1.021722 0.03666,-1.552797 0.138918,-6.301234 0.468847,-11.2224063 0.904893,-13.479016 0.08296,-0.4244925 0.121553,-0.5862039 0.144706,-0.6082555 0.01158,-0.011026 0.135059,-0.055129 0.272047,-0.099232 1.030305,-0.3252605 1.514587,-0.5751782 1.66894,-0.8618485 0.03666,-0.071668 0.03859,-0.1029073 0.03859,-1.1962971 0,-1.102578 0,-1.1246296 -0.04052,-1.1981348 C 23.06531,1.4020888 19.611667,0.7331915 14.932847,0.53288983 13.466496,0.47041041 11.747391,0.45387174 10.360146,0.48878671 Z"
-                                        style="stroke-width:0.818999" />
-                                    <path d="m 0.51822514,2.5155887 c 0,0 7.51866326,1.0044227 11.40038886,1.0063705 3.881725,0.00195 11.56924,-1.0192345 11.56924,-1.0192345"
-                                        style="stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter" />
-                                    <path d="m 2.4639743,5.5606455 c 0,0 6.576432,0.8087701 9.9337807,0.8107181 3.357349,0.002 9.09117,-0.7649286 9.09117,-0.7649286"
-                                        style="stroke-width:0.93;stroke-linecap:round;stroke-linejoin:miter" />
-                                </svg>
-                                <svg name="buckets_images" width="100%" height="100%" version="1.0" viewBox="0 0 24 24"
-                                    xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"
-                                    style="margin-top: 15cqmin;">
-                                    <path d="M 10.360146,0.48878671 C 5.8839144,0.59904451 2.2122471,1.1209314 0.94655416,1.8229061 0.74782493,1.9350015 0.57417803,2.0875248 0.51822514,2.2051331 l -0.0463058,0.091881 v 1.0989028 c 0,1.20181 -0.003859,1.1540316 0.1157646,1.2992044 0.18329395,0.2205156 0.75439926,0.4906472 1.43933986,0.6799231 l 0.2141645,0.058804 0.042447,0.233379 c 0.4418349,2.4844758 0.7235287,4.7447606 0.9473403,7.6004376 0.1871528,2.396269 0.3087056,5.365879 0.3087056,7.572873 0,0.600905 0.00772,0.832446 0.025082,0.909627 0.310635,1.255101 5.9522299,2.089385 11.2716138,1.668568 3.00795,-0.237054 5.178536,-0.839797 5.556701,-1.541772 l 0.05595,-0.101069 0.01351,-0.588042 c 0.0077,-0.323423 0.02508,-1.021722 0.03666,-1.552797 0.138918,-6.301234 0.468847,-11.2224063 0.904893,-13.479016 0.08296,-0.4244925 0.121553,-0.5862039 0.144706,-0.6082555 0.01158,-0.011026 0.135059,-0.055129 0.272047,-0.099232 1.030305,-0.3252605 1.514587,-0.5751782 1.66894,-0.8618485 0.03666,-0.071668 0.03859,-0.1029073 0.03859,-1.1962971 0,-1.102578 0,-1.1246296 -0.04052,-1.1981348 C 23.06531,1.4020888 19.611667,0.7331915 14.932847,0.53288983 13.466496,0.47041041 11.747391,0.45387174 10.360146,0.48878671 Z"
-                                        style="stroke-width:0.818999" />
-                                    <path d="m 0.51822514,2.5155887 c 0,0 7.51866326,1.0044227 11.40038886,1.0063705 3.881725,0.00195 11.56924,-1.0192345 11.56924,-1.0192345"
-                                        style="stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter" />
-                                    <path d="m 2.4639743,5.5606455 c 0,0 6.576432,0.8087701 9.9337807,0.8107181 3.357349,0.002 9.09117,-0.7649286 9.09117,-0.7649286"
-                                        style="stroke-width:0.93;stroke-linecap:round;stroke-linejoin:miter" />
-                                </svg>
+                                <div name="buckets_images" style="margin-top: 15cqmin;">
+                                    <svg width="100%" height="100%" version="1.0" viewBox="0 0 24 24"
+                                        xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+                                        <path d="M 10.360146,0.48878671 C 5.8839144,0.59904451 2.2122471,1.1209314 0.94655416,1.8229061 0.74782493,1.9350015 0.57417803,2.0875248 0.51822514,2.2051331 l -0.0463058,0.091881 v 1.0989028 c 0,1.20181 -0.003859,1.1540316 0.1157646,1.2992044 0.18329395,0.2205156 0.75439926,0.4906472 1.43933986,0.6799231 l 0.2141645,0.058804 0.042447,0.233379 c 0.4418349,2.4844758 0.7235287,4.7447606 0.9473403,7.6004376 0.1871528,2.396269 0.3087056,5.365879 0.3087056,7.572873 0,0.600905 0.00772,0.832446 0.025082,0.909627 0.310635,1.255101 5.9522299,2.089385 11.2716138,1.668568 3.00795,-0.237054 5.178536,-0.839797 5.556701,-1.541772 l 0.05595,-0.101069 0.01351,-0.588042 c 0.0077,-0.323423 0.02508,-1.021722 0.03666,-1.552797 0.138918,-6.301234 0.468847,-11.2224063 0.904893,-13.479016 0.08296,-0.4244925 0.121553,-0.5862039 0.144706,-0.6082555 0.01158,-0.011026 0.135059,-0.055129 0.272047,-0.099232 1.030305,-0.3252605 1.514587,-0.5751782 1.66894,-0.8618485 0.03666,-0.071668 0.03859,-0.1029073 0.03859,-1.1962971 0,-1.102578 0,-1.1246296 -0.04052,-1.1981348 C 23.06531,1.4020888 19.611667,0.7331915 14.932847,0.53288983 13.466496,0.47041041 11.747391,0.45387174 10.360146,0.48878671 Z"
+                                            style="stroke-width:0.818999" />
+                                        <path d="m 0.51822514,2.5155887 c 0,0 7.51866326,1.0044227 11.40038886,1.0063705 3.881725,0.00195 11.56924,-1.0192345 11.56924,-1.0192345"
+                                            style="stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter" />
+                                        <path d="m 2.4639743,5.5606455 c 0,0 6.576432,0.8087701 9.9337807,0.8107181 3.357349,0.002 9.09117,-0.7649286 9.09117,-0.7649286"
+                                            style="stroke-width:0.93;stroke-linecap:round;stroke-linejoin:miter" />
+                                    </svg>
+                                </div>
+                                <div name="buckets_images" style="margin-top: 15cqmin;">
+                                    <svg width="100%" height="100%" version="1.0" viewBox="0 0 24 24"
+                                        xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+                                        <path d="M 10.360146,0.48878671 C 5.8839144,0.59904451 2.2122471,1.1209314 0.94655416,1.8229061 0.74782493,1.9350015 0.57417803,2.0875248 0.51822514,2.2051331 l -0.0463058,0.091881 v 1.0989028 c 0,1.20181 -0.003859,1.1540316 0.1157646,1.2992044 0.18329395,0.2205156 0.75439926,0.4906472 1.43933986,0.6799231 l 0.2141645,0.058804 0.042447,0.233379 c 0.4418349,2.4844758 0.7235287,4.7447606 0.9473403,7.6004376 0.1871528,2.396269 0.3087056,5.365879 0.3087056,7.572873 0,0.600905 0.00772,0.832446 0.025082,0.909627 0.310635,1.255101 5.9522299,2.089385 11.2716138,1.668568 3.00795,-0.237054 5.178536,-0.839797 5.556701,-1.541772 l 0.05595,-0.101069 0.01351,-0.588042 c 0.0077,-0.323423 0.02508,-1.021722 0.03666,-1.552797 0.138918,-6.301234 0.468847,-11.2224063 0.904893,-13.479016 0.08296,-0.4244925 0.121553,-0.5862039 0.144706,-0.6082555 0.01158,-0.011026 0.135059,-0.055129 0.272047,-0.099232 1.030305,-0.3252605 1.514587,-0.5751782 1.66894,-0.8618485 0.03666,-0.071668 0.03859,-0.1029073 0.03859,-1.1962971 0,-1.102578 0,-1.1246296 -0.04052,-1.1981348 C 23.06531,1.4020888 19.611667,0.7331915 14.932847,0.53288983 13.466496,0.47041041 11.747391,0.45387174 10.360146,0.48878671 Z"
+                                            style="stroke-width:0.818999" />
+                                        <path d="m 0.51822514,2.5155887 c 0,0 7.51866326,1.0044227 11.40038886,1.0063705 3.881725,0.00195 11.56924,-1.0192345 11.56924,-1.0192345"
+                                            style="stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter" />
+                                        <path d="m 2.4639743,5.5606455 c 0,0 6.576432,0.8087701 9.9337807,0.8107181 3.357349,0.002 9.09117,-0.7649286 9.09117,-0.7649286"
+                                            style="stroke-width:0.93;stroke-linecap:round;stroke-linejoin:miter" />
+                                    </svg>
+                                </div>
                             </div>
                         </div>
                         <div class="scale-icon" id="scale_icon_initial">

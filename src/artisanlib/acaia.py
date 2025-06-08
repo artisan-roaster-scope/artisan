@@ -163,13 +163,14 @@ ACAIA_CINCO_NAME:Final[str] = 'CINCO'    # Acaia Cinco
 ACAIA_PYXIS_NAME:Final[str] = 'PYXIS'    # Acaia Pyxis
 
 
-# Acaia Umbra service and characteristics UUIDs
-ACAIA_UMBRA_SERVICE_UUID:Final[str] = '0000fe40-cc7a-482a-984a-7f2ed5b3e58f'
-ACAIA_UMBRA_NOTIFY_UUID:Final[str] = '0000fe42-8e22-4541-9d4c-21edae82ed19'
-ACAIA_UMBRA_WRITE_UUID:Final[str] = '0000fe41-8e22-4541-9d4c-21edae82ed19' # write without response
+# Acaia Relay service and characteristics UUIDs
+ACAIA_RELAY_SERVICE_UUID:Final[str] = '0000fe40-cc7a-482a-984a-7f2ed5b3e58f'
+ACAIA_RELAY_NOTIFY_UUID:Final[str] = '0000fe42-8e22-4541-9d4c-21edae82ed19'
+ACAIA_RELAY_WRITE_UUID:Final[str] = '0000fe41-8e22-4541-9d4c-21edae82ed19' # write without response
 
-# Acaia Umbra name prefixes
+# Acaia Relay name prefixes
 ACAIA_UMBRA_NAME:Final[str] = 'UMBRA'    # Acaia Umbra
+ACAIA_COSMO_NAME:Final[str] = 'COSMO'    # Acaia Cosmo
 
 
 # Acaia scale device name prefixes and product names
@@ -181,7 +182,8 @@ ACAIA_SCALE_NAMES = [
     (ACAIA_PEARL_NAME, 'Pearl'), # Pearl 2021
     (ACAIA_CINCO_NAME, 'Cinco'),
     (ACAIA_PYXIS_NAME, 'Pyxis'),
-    (ACAIA_UMBRA_NAME, 'Umbra')]
+    (ACAIA_UMBRA_NAME, 'Umbra'),
+    (ACAIA_COSMO_NAME, 'Cosmo')]
 
 
 
@@ -254,11 +256,11 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
         self.add_notify(ACAIA_NOTIFY_UUID, self.notify_callback)
         self.add_write(ACAIA_SERVICE_UUID, ACAIA_WRITE_UUID)
 
-        # register Acaia Umbra UUIDs
-        for acaia_name in [ACAIA_UMBRA_NAME]:
-            self.add_device_description(ACAIA_UMBRA_SERVICE_UUID, acaia_name)
-        self.add_notify(ACAIA_UMBRA_NOTIFY_UUID, self.notify_callback)
-        self.add_write(ACAIA_UMBRA_SERVICE_UUID, ACAIA_UMBRA_WRITE_UUID)
+        # register Acaia Relay UUIDs
+        for acaia_name in (ACAIA_UMBRA_NAME, ACAIA_COSMO_NAME):
+            self.add_device_description(ACAIA_RELAY_SERVICE_UUID, acaia_name)
+        self.add_notify(ACAIA_RELAY_NOTIFY_UUID, self.notify_callback)
+        self.add_write(ACAIA_RELAY_SERVICE_UUID, ACAIA_RELAY_WRITE_UUID)
 
     # protocol parser
 
@@ -281,7 +283,7 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
             _log.debug('connected to Acaia Legacy Scale')
             self.scale_class = SCALE_CLASS.LEGACY
             self.set_heartbeat(self.HEARTBEAT_FREQUENCY) # enable heartbeat
-        elif connected_service_UUID == ACAIA_UMBRA_SERVICE_UUID:
+        elif connected_service_UUID == ACAIA_RELAY_SERVICE_UUID:
             _log.debug('connected to Acaia Relay Scale')
             self.scale_class = SCALE_CLASS.RELAY
             self.set_heartbeat(0) # disable heartbeat

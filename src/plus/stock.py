@@ -473,10 +473,10 @@ def getSchedule(acquire_lock:bool=True) -> List[ScheduledItem]:
             stock_semaphore.acquire(1)
         if stock is not None and 'schedule' in stock:
             return stock['schedule']
-        return []
     finally:
         if acquire_lock and stock_semaphore.available() < 1:
             stock_semaphore.release(1)
+    return []
 
 
 # ==================
@@ -510,10 +510,10 @@ def getStores(acquire_lock:bool=True) -> List[Tuple[str, str]]:
                         ):
                             res[s['location_label']] = s['location_hr_id']
             return sorted(res.items(), key=getStoreLabel)
-        return []
     finally:
         if acquire_lock and stock_semaphore.available() < 1:
             stock_semaphore.release(1)
+    return []
 
 
 # given a list of stores, returns a list of labels to populate the stores popup
@@ -701,11 +701,10 @@ def getCoffeeLabels() -> Dict[str, str]:
                 except Exception as e:  # pylint: disable=broad-except
                     _log.exception(e)
             return res
-        return {}
-
     finally:
         if stock_semaphore.available() < 1:
             stock_semaphore.release(1)
+    return {}
 
 
 def getCoffee(hr_id:str) -> Optional[Coffee]:

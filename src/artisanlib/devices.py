@@ -2161,7 +2161,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.containerGreenTareWeight.setText(render_weight(weight, 0,  weight_units.index(self.aw.qmc.weight[2])))
 
     def get_scale1_weight(self) -> Optional[float]:
-        return self.scale1_weight
+        if self.scale1_weight is not None:
+            return self.scale1_weight
+        return self.scale2_weight
 
 
     @pyqtSlot()
@@ -2219,8 +2221,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.containerRoastedTareWeight.setText(render_weight(weight, 0,  weight_units.index(self.aw.qmc.weight[2])))
 
     def get_scale2_weight(self) -> Optional[float]:
-        return self.scale2_weight
-
+        if self.scale2_weight is not None:
+            return self.scale2_weight
+        return self.scale1_weight
 
     @pyqtSlot(bool)
     def taskWebDisplayGreen(self, b:bool = False) -> None:
