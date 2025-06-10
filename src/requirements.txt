@@ -37,7 +37,7 @@ Phidget22==1.22.20250422
 Unidecode==1.4.0
 qrcode==7.4.2;  python_version < '3.9' # last Python 3.8 release
 qrcode==8.2; python_version >= '3.9'
-requests==2.32.3
+requests==2.32.4
 requests-file==2.1.0
 pyusb==1.2.1;  python_version < '3.9' # last Python 3.8 release
 pyusb==1.3.1;  python_version >= '3.9'
