@@ -43,4 +43,4 @@ jobs:
           pip install -r src/requirements.txt
       - name: Run mypy
         run: |
-          poetry run mypy . 
+          mypy . 
