@@ -41,6 +41,18 @@ jobs:
           pip install --upgrade pip==24.0 # downgrade pip as pip v24.1 fails with pip._vendor.packaging.version.InvalidVersion: Invalid version: '6.5.0-1022-azure' (image name!)
           pip install --upgrade -r src/requirements-dev.txt
           pip install -r src/requirements.txt
-      - name: Run mypy
-        run: |
-          mypy . 
+      - uses: tsuyoshicho/action-mypy@v4
+        with:
+          github_token: ${{ secrets.github_token }}
+          # Change reviewdog reporter if you need [github-pr-check,github-check,github-pr-review].
+          reporter: github-check # github-pr-review # reporter: github-pr-check
+          # Change reporter level if you need.
+          # GitHub Status Check won't become failure with warning.
+          level: info # info, warning, error
+          # Change the current directory to run mypy command.
+          # mypy command reads setup.cfg or other settings file in this path.
+          workdir: src
+
+          reviewdog_flags: -filter-mode=file -fail-on-error
+          filter_mode: nofilter
+          fail_on_error: true
