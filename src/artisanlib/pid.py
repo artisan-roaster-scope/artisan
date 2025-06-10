@@ -19,7 +19,7 @@
 
 import time
 import numpy
-from scipy.signal import iirfilter # type:ignore[import-untyped]
+from scipy.signal import iirfilter # type # ignore[import-untyped]
 import logging
 from typing import Final, List, Optional, Callable
 

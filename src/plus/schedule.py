@@ -310,7 +310,7 @@ class CompletedItem(BaseModel):
         return int(roastdate.timestamp())
 
     @field_serializer('roastUUID', when_used='json')
-    def serialize_roastUUID_to_str(roastUUID: UUID4) -> str: # pyright:ignore[reportGeneralTypeIssues] # pylint: disable=no-self-argument
+    def serialize_roastUUID_to_str(roastUUID: UUID4) -> str: # type:ignore[misc] # pylint: disable=no-self-argument
         return str(roastUUID.hex)
 
 

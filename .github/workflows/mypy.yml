@@ -41,7 +41,6 @@ jobs:
           pip install --upgrade pip==24.0 # downgrade pip as pip v24.1 fails with pip._vendor.packaging.version.InvalidVersion: Invalid version: '6.5.0-1022-azure' (image name!)
           pip install --upgrade -r src/requirements-dev.txt
           pip install -r src/requirements.txt
-          pip install optype==0.9.3
       - uses: tsuyoshicho/action-mypy@v4
         with:
           github_token: ${{ secrets.github_token }}

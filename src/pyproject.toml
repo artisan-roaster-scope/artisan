@@ -242,7 +242,7 @@ enable='''c-extension-no-member,'''
 [tool.mypy]
 files = ["artisanlib/*.py", "plus/*.py"]
 exclude = ['build', 'dist', 'uic', 'misc']
-python_version = "3.8"
+python_version = "3.9"
 
 # Ensure full coverage
 check_untyped_defs = true

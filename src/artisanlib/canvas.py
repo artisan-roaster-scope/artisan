@@ -8567,7 +8567,7 @@ class tgraphcanvas(FigureCanvas):
                                 lin = timex_lin
                             ntemp_lin = numpy.interp(lin, timex, ntemp) # resample data in ntemp to linear spaced time
                             dist = (lin[-1] - lin[0]) / (len(lin) - 1)
-                            from scipy.signal import savgol_filter # type: ignore # @Reimport
+                            from scipy.signal import savgol_filter # type # ignore # @Reimport
                             z1 = savgol_filter(ntemp_lin, dss, 1, deriv=1, delta=dss)
                             z1 = z1 * (60./dist) * dss
                         except Exception: # pylint: disable=broad-except
@@ -16800,7 +16800,7 @@ class tgraphcanvas(FigureCanvas):
     #collects info about the univariate interpolation
     def univariateinfo(self) -> None:
         try:
-            from scipy.interpolate import UnivariateSpline # type: ignore
+            from scipy.interpolate import UnivariateSpline # type # ignore
             #pylint: disable=E0611
             Xpoints,Ypoints = self.findpoints()  #from lowest point to avoid many coefficients
             equ = UnivariateSpline(Xpoints, Ypoints)
@@ -16907,7 +16907,7 @@ class tgraphcanvas(FigureCanvas):
     def lnRegression(self,power:int=0, curvefit_starttime:float=0, curvefit_endtime:float=0, plot:bool=True) -> str:
         res:str = ''
         try:
-            from scipy.optimize import curve_fit # type: ignore
+            from scipy.optimize import curve_fit # type # ignore
             if self.timeindex[0] > -1 and self.timeindex[6] > -1:  #CHARGE and DROP events exist
                 charge = self.timex[self.timeindex[0]]
                 if curvefit_starttime is not None and curvefit_starttime > charge:
@@ -17022,7 +17022,7 @@ class tgraphcanvas(FigureCanvas):
         try:
             if self.ax is not None:
                 #pylint: disable=E1101
-                from scipy import interpolate as inter # type: ignore
+                from scipy import interpolate as inter # type # ignore
                 Xpoints,Ypoints = self.findpoints() #from 0 origin
                 func = inter.interp1d(Xpoints, Ypoints, kind=mode)
                 newY = func(self.timex)

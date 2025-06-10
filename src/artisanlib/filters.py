@@ -210,7 +210,7 @@ if __name__ == '__main__':
     yraw = ys + yerr
 
     # define the filters
-    from scipy.signal import iirfilter, lfilter, sosfilt # type:ignore[import-untyped]
+    from scipy.signal import iirfilter, lfilter, sosfilt # type # ignore[import-untyped]
     #
     # define lowpass filter with 2.5 Hz cutoff frequency of order 4 (note: delay increases with order)
     b, a = iirfilter(4, Wn=2.5, fs=fs, btype='low', ftype='butter')
