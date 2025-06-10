@@ -107,6 +107,7 @@ class BLE:
         return None, None
 
     # pylint: disable=too-many-positional-arguments
+    # on success returns tuple of BleakClient, service UUID as str and device name
     async def _scan_and_connect(self,
                 device_descriptions:Dict[Optional[str],Optional[Set[str]]],
                 blacklist:Set[str], # client addresses to ignore
@@ -114,7 +115,7 @@ class BLE:
                 disconnected_callback:Optional[Callable[[BleakClient], None]],
                 scan_timeout:float, connect_timeout:float,
                 address:Optional[str] = None # if given, connect only to the device with this ble address
-                ) -> Tuple[Optional[BleakClient], Optional[str]]:
+                ) -> Tuple[Optional[BleakClient], Optional[str], Optional[str]]:
         async with self._scan_and_connect_lock:
             # the lock ensures that only one scan/connect operation is running at any time
             # as trying to establish a connection to two devices at the same time
@@ -123,7 +124,7 @@ class BLE:
             service_uuid:Optional[str] = None
             discovered_bd, service_uuid = await self._scan(device_descriptions, blacklist, case_sensitive, scan_timeout, address)
             if discovered_bd is None:
-                return None, None
+                return None, None, None
             client = BleakClient(
                         discovered_bd,
                         disconnected_callback=disconnected_callback,
@@ -134,9 +135,9 @@ class BLE:
                     await client.connect()
             except asyncio.TimeoutError:
                 _log.debug('timeout on connect')
-                return None, None
+                return None, None, None
             _log.debug('BLE client is_connected')
-            return client, service_uuid
+            return client, service_uuid, discovered_bd.name
 
 ##
     def write(self, client:BleakClient, write_uuid:str, message:bytes, response:bool = False) -> None:
@@ -169,7 +170,7 @@ class BLE:
             scan_timeout:float=6,
             connect_timeout:float=6,
             address:Optional[str] = None # if given, connect only to the device with this ble address
-            ) -> Tuple[Optional[BleakClient], Optional[str]]:
+            ) -> Tuple[Optional[BleakClient], Optional[str], Optional[str]]:
         if hasattr(self, '_asyncLoopThread') and self._asyncLoopThread is None:
             self._asyncLoopThread = AsyncLoopThread()
         assert self._asyncLoopThread is not None
@@ -188,7 +189,7 @@ class BLE:
         except Exception: # pylint: disable=broad-except
             #raise fut.exception() from e # type: ignore[misc]
             _log.error('exception in scan_and_connect: %s', fut.exception())
-            return None, None
+            return None, None, None
 
     def disconnect_ble(self, client:'BleakClient') -> bool:
         if hasattr(self, '_asyncLoopThread') and self._asyncLoopThread is not None:
@@ -245,6 +246,7 @@ class ClientBLE(QObject): # pyright:ignore[reportGeneralTypeIssues] # error: Arg
         self._async_loop_thread: Optional[AsyncLoopThread]   = None            # the asyncio AsyncLoopThread object
         self._ble_client:Optional[BleakClient]               = None
         self._connected_service_uuid:Optional[str]           = None            # set to the service UUID we are connected to
+        self._connected_device_name:Optional[str]            = None            # set to the device name we are connected to
         self._disconnected_event:asyncio.Event               = asyncio.Event() # event set on disconnect
         self._active_notification_uuids:Set[str]             = set() # uuids of characteristics were notification are active
         self._sleep_between_scans:float                      = self.SCAN_BETWEEN_SCANS_START
@@ -288,10 +290,10 @@ class ClientBLE(QObject): # pyright:ignore[reportGeneralTypeIssues] # error: Arg
             ble.disconnect_ble(self._ble_client)
 
     # returns the service UUID connected to or None
-    def connected(self) -> Optional[str]:
+    def connected(self) -> Tuple[Optional[str], Optional[str]]:
         if self._ble_client is not None and self._ble_client.is_connected:
-            return self._connected_service_uuid
-        return None
+            return self._connected_service_uuid, self._connected_device_name
+        return None, None
 
 
     # connect and re-connect while self._running to BLE
@@ -302,7 +304,8 @@ class ClientBLE(QObject): # pyright:ignore[reportGeneralTypeIssues] # error: Arg
             # NOTE: re-connecting a bleak client by address on reconnect can lead to instabilities thus we re-scan always
             service_uuid:Optional[str]
             self._connected_service_uuid = None
-            self._ble_client, service_uuid = ble.scan_and_connect(
+            self._connected_device_name = None
+            self._ble_client, service_uuid, device_name = ble.scan_and_connect(
                                     self._device_descriptions,
                                     blacklist,
                                     case_sensitive,
@@ -317,6 +320,7 @@ class ClientBLE(QObject): # pyright:ignore[reportGeneralTypeIssues] # error: Arg
                         if service.uuid.casefold() == service_uuid.casefold():
                             # client offers the service that was requests
                             self._connected_service_uuid = service_uuid
+                            self._connected_device_name = device_name
                             break
                 except Exception as e: # pylint: disable=broad-except
                     _log.error(e)
@@ -327,6 +331,7 @@ class ClientBLE(QObject): # pyright:ignore[reportGeneralTypeIssues] # error: Arg
                     ##blacklist.add(self._ble_client.address) # we don't blacklist as the searched for service might just not yet be discovered
                     self._disconnect()
                     self._ble_client = None
+                    self._connected_device_name = None
                 else:
                     # successfully connected
                     self.on_connect()
@@ -456,6 +461,7 @@ class ClientBLE(QObject): # pyright:ignore[reportGeneralTypeIssues] # error: Arg
             self._async_loop_thread = None
             self._ble_client = None
             self._connected_service_uuid = None
+            self._connected_device_name = None
             _log.debug('BLE client stopped')
             self.on_stop()
         else:

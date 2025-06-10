@@ -1382,10 +1382,10 @@ class DragItem(StandardItem):
             self.menu = QMenu()
             fully_prepared_p = fully_prepared(self.data)
             fully_unprepared_p = not fully_prepared_p and fully_unprepared(self.data)
-            if (self.aw.schedule_window is not None and
-                self.aw.schedule_window.weight_manager.sm_green.current_weight_item and
+            if (self.aw.schedule_window is not None and (self.aw.schedule_window.weight_manager.sm_green.current_weight_item is None or
+                (self.aw.schedule_window.weight_manager.sm_green.current_weight_item and
                 (self.aw.schedule_window.weight_manager.sm_green.current_weight_item.uuid != self.data.id or
-                    self.aw.schedule_window.weight_manager.green_task_scale  == 0)): # no scaled assigned to the green task, thus not processing
+                    self.aw.schedule_window.weight_manager.green_task_scale  == 0)))): # no scaled assigned to the green task, thus not processing
                 # this schedule item is not currently under processing by the weight manager
                 if not fully_prepared_p:
                     allPreparedAction:QAction = QAction(QApplication.translate('Contextual Menu', 'All batches prepared'),self)
@@ -3883,6 +3883,7 @@ class GreenWebDisplay(GreenDisplay):
             else:
                 self.rendered_task['blend_percent'] = ''
                 self.rendered_task['subtitle'] = ''
+            self.last_current_weight = 0
             self.rendered_task['weight'] = ''
             self.rendered_task['percent'] = 0
             self.rendered_task['state'] = state

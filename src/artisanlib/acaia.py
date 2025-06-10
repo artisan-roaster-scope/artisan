@@ -237,6 +237,7 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
         self.firmware:Optional[Tuple[int,int,int]] = None # on connect this is set to a triple of integers, (major, minor, patch)-version
         self.unit:int = UNIT.G
         self.max_weight:int = 0 # always in g
+        self.readability:float = 0 # scale accuracy; minimal weight steps
         self.auto_off_timer:AUTO_OFF_TIMER = AUTO_OFF_TIMER.AUTO_SLEEP_OFF
 
         ###
@@ -271,6 +272,7 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
         self.firmware = None
         self.unit = UNIT.G
         self.max_weight = 0
+        self.readability = 0
 
 
     def on_connect(self) -> None:
@@ -278,19 +280,57 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
         self.id_sent = False
         self.fast_notifications_sent = False
         self.slow_notifications_sent = False
-        connected_service_UUID = self.connected()
+        connected_service_UUID, connected_device_name = self.connected()
         if connected_service_UUID == ACAIA_LEGACY_SERVICE_UUID:
-            _log.debug('connected to Acaia Legacy Scale')
+            _log.debug('connected to Acaia Legacy Scale (%s)', connected_device_name)
             self.scale_class = SCALE_CLASS.LEGACY
             self.set_heartbeat(self.HEARTBEAT_FREQUENCY) # enable heartbeat
+
+            if connected_device_name is not None:
+                # Acaia Pearl/Lunar (Legacy)
+                self.max_weight = 2000
+                self.readability = 0.1
+
         elif connected_service_UUID == ACAIA_RELAY_SERVICE_UUID:
-            _log.debug('connected to Acaia Relay Scale')
+            _log.debug('connected to Acaia Relay Scale (%s)', connected_device_name)
             self.scale_class = SCALE_CLASS.RELAY
             self.set_heartbeat(0) # disable heartbeat
+
+            if connected_device_name is not None:
+                if connected_device_name.startswith('UMBRA'):
+                    # Acaia Umbra
+                    self.max_weight = 1000
+                    self.readability = 0.1
+                elif connected_device_name.startswith('COSMO-100'):
+                    # Acaia Cosmo 100kg
+                    self.max_weight = 100*1000
+                    self.readability = 10
+                elif connected_device_name.startswith('COSMO-10'):
+                    self.max_weight = 10*1000
+                    self.readability = 0.1
+                else:
+                    self.max_weight = 1000
+                    self.readability = 0.1
+
         else: #connected_service_UUID == ACAIA_SERVICE_UUID:
-            _log.debug('connected to Acaia Scale')
+            _log.debug('connected to Acaia Scale (%s)', connected_device_name)
             self.scale_class = SCALE_CLASS.MODERN
             self.set_heartbeat(0) # disable heartbeat
+
+            if connected_device_name is not None:
+                if connected_device_name.startswith(('PYXIS', 'CINCO')):
+                    # Acaia Pearl (2021)
+                    self.max_weight = 500
+                    self.readability = 0.01
+                elif connected_device_name.startswith(('PEARL-', 'LUNAR-')):
+                    # Acaia Pearl (2021)
+                    self.max_weight = 2000
+                    self.readability = 0.1
+                else:
+                    # Acaia Lunar (PEARLS)
+                    self.max_weight = 3000
+                    self.readability = 0.1
+
         if self._connected_handler is not None:
             self._connected_handler()
         self.connected_signal.emit()
@@ -885,3 +925,9 @@ class Acaia(Scale): # pyright: ignore [reportGeneralTypeIssues] # Argument to cl
 
     def tare_scale(self) -> None:
         self.acaia.send_tare()
+
+    def max_weight(self) -> float:
+        return self.acaia.max_weight
+
+    def readability(self) -> float:
+        return self.acaia.readability

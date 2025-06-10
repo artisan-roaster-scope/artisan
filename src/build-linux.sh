@@ -92,8 +92,12 @@ cp includes/alarmclock.eot dist
 cp includes/alarmclock.svg dist
 cp includes/alarmclock.ttf dist
 cp includes/alarmclock.woff dist
+cp includes/roboto-300.woff2 dist
+cp includes/roboto-600.woff2 dist
+cp includes/roboto-regular.woff2 dist
 cp includes/artisan.tpl dist
 cp includes/scale_widget.tpl dist
+cp includes/fitty_patched.js dist
 cp includes/bigtext.js dist
 cp includes/sorttable.js dist
 cp includes/report-template.htm dist

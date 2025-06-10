@@ -750,10 +750,10 @@ def getCoffees(weight_unit_idx:int, store:Optional[str]=None) -> List[Tuple[str,
                 except Exception as e:  # pylint: disable=broad-except
                     _log.exception(e)
             return sorted(res.items(), key=lambda x: x[0])
-        return []
     finally:
         if stock_semaphore.available() < 1:
             stock_semaphore.release(1)
+    return []
 
 
 ## returns the position of coffee hr_id in coffees or

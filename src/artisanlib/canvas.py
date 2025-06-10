@@ -3720,9 +3720,15 @@ class tgraphcanvas(FigureCanvas):
             return
         if event.button != 1:
             return
-        if event.xdata is None:
+        event_xdata = event.xdata
+        if event_xdata in (float('-inf'),float('inf')):
             return
-        if event.ydata is None:
+        if event_xdata is None:
+            return
+        event_ydata = event.ydata
+        if event_ydata in (float('-inf'),float('inf')):
+            return
+        if event_ydata is None:
             return
         tempo:Optional[float] = None
         if  (self.foreground_event_ind is not None and self.foreground_event_pos is not None and self.foreground_event_pick_position is not None and
@@ -3733,19 +3739,17 @@ class tgraphcanvas(FigureCanvas):
             set_y = True
             if ldots is not None:
                 if QApplication.keyboardModifiers() == Qt.KeyboardModifier.ShiftModifier:
-                    if abs(event.xdata - self.foreground_event_pick_position[0]) < abs(event.ydata - self.foreground_event_pick_position[1]):
+                    if abs(event_xdata - self.foreground_event_pick_position[0]) < abs(event_ydata - self.foreground_event_pick_position[1]):
                         set_x = False
                     else:
                         set_y = False
                 xdata = ldots.get_xdata()
                 if set_x:
-                    event_xdata = event.xdata
-                    if event_xdata is not None:
-                        xdata[self.foreground_event_pos] = int(round(event_xdata))
+                    xdata[self.foreground_event_pos] = int(round(event_xdata))
                     ldots.set_xdata(xdata)
                 ydata = ldots.get_ydata()
                 if set_y:
-                    ydata[self.foreground_event_pos] = max(0,event.ydata)
+                    ydata[self.foreground_event_pos] = max(0,event_ydata)
                     if not self.flagon and len(ydata) == self.foreground_event_pos + 2 and (self.timeindex[6]!=0 and self.timex[self.timeindex[6]] >= xdata[-1]):
                         # we also move the last dot up and down with the butlast if automatically added, but only if that last one is not after DROP
                         ydata[-1] = ydata[-2]
@@ -3811,14 +3815,14 @@ class tgraphcanvas(FigureCanvas):
             set_y = True
             if ldots is not None:
                 if QApplication.keyboardModifiers() == Qt.KeyboardModifier.ShiftModifier:
-                    if abs(event.xdata - self.background_event_pick_position[0]) < abs(event.ydata - self.background_event_pick_position[1]):
+                    if abs(event_xdata - self.background_event_pick_position[0]) < abs(event_ydata - self.background_event_pick_position[1]):
                         set_x = False
                     else:
                         set_y = False
                 xdata = ldots.get_xdata()
                 if set_x:
                     # allow to move events only between the previous and the next of that type on the time axis to keep the temporal order
-                    new_x = event.xdata
+                    new_x = event_xdata
                     if self.background_event_pos != 0:
                         # there is a point left to ours
                         new_x = max(xdata[self.background_event_pos-1]+1,new_x)
@@ -3830,7 +3834,7 @@ class tgraphcanvas(FigureCanvas):
                     ldots.set_xdata(xdata)
                 ydata = ldots.get_ydata()
                 if set_y:
-                    ydata[self.background_event_pos] = max(0,event.ydata)
+                    ydata[self.background_event_pos] = max(0,event_ydata)
                     if not self.flagon and len(ydata) == self.background_event_pos + 2 and (self.timeindex[6]!=0 and self.timex[self.timeindex[6]] >= xdata[-1]):
                         # we also move the last dot up and down with the butlast if automatically added, but only if that last one is not after DROP
                         ydata[-1] = ydata[-2]
@@ -3945,17 +3949,18 @@ class tgraphcanvas(FigureCanvas):
                             self.redraw_keep_view(recomputeAllDeltas=True)
                         return
 
-            if event.button == 1 and event.inaxes and self.crossmarker and not self.designerflag and not self.wheelflag and not self.flagon:
-                self.baseX,self.baseY = event.xdata, event.ydata
-                if self.base_horizontalcrossline is None and self.base_verticalcrossline is None:
-                    # Mark starting point of click-and-drag with a marker
-                    self.base_horizontalcrossline, = self.ax.plot(numpy.array(self.baseX), numpy.array(self.baseY), 'r+', markersize=20)
-                    self.base_verticalcrossline, = self.ax.plot(numpy.array(self.baseX), numpy.array(self.baseY), 'wo', markersize = 2)
-            elif event.button == 3 and event.inaxes and not self.designerflag and not self.wheelflag and self.aw.ntb.mode not in ['pan/zoom', 'zoom rect']:# and not self.flagon:
-                # popup not available if pan/zoom or zoom rect is active as it interacts
-                event_xdata = event.xdata
-                event_ydata = event.ydata
-                if event_xdata is not None and event_ydata is not None:
+            event_xdata = event.xdata
+            event_ydata = event.ydata
+            if (event_xdata is not None and event_xdata not in (float('-inf'),float('inf')) and
+                    event_ydata is not None and event_ydata not in (float('-inf'),float('inf'))):
+                if event.button == 1 and event.inaxes and self.crossmarker and not self.designerflag and not self.wheelflag and not self.flagon:
+                    self.baseX,self.baseY = event.xdata, event.ydata
+                    if (self.base_horizontalcrossline is None and self.base_verticalcrossline is None):
+                        # Mark starting point of click-and-drag with a marker
+                        self.base_horizontalcrossline, = self.ax.plot(numpy.array(self.baseX), numpy.array(self.baseY), 'r+', markersize=20)
+                        self.base_verticalcrossline, = self.ax.plot(numpy.array(self.baseX), numpy.array(self.baseY), 'wo', markersize = 2)
+                elif event.button == 3 and event.inaxes and not self.designerflag and not self.wheelflag and self.aw.ntb.mode not in ['pan/zoom', 'zoom rect']:# and not self.flagon:
+                    # popup not available if pan/zoom or zoom rect is active as it interacts
                     timex = self.time2index(event_xdata)
                     if timex > 0:
                         # reset the zoom rectangles
@@ -3998,16 +4003,20 @@ class tgraphcanvas(FigureCanvas):
                                     ac.setText(' ' + k[0])
                                     menu.addAction(ac)
                             # add user EVENT entry
-                            ac = QAction(menu)
-                            ac.setText(' ' + QApplication.translate('Label', 'EVENT'))
-                            event_pos_offset = self.eventpositionbars[0]
-                            event_pos_factor = self.eventpositionbars[1] - self.eventpositionbars[0]
-                            if self.clampEvents:
-                                evalue = int(round(event_ydata))
-                            else:
-                                evalue = int(round((event_ydata - event_pos_offset) / event_pos_factor))
-                            ac.key = (-1,timex,self.eventsExternal2InternalValue(evalue))  # type: ignore # key a custom attribute of QAction which should be defined in a custom subclass
-                            menu.addAction(ac)
+                            try:
+                                ac = QAction(menu)
+                                ac.setText(' ' + QApplication.translate('Label', 'EVENT'))
+                                event_pos_offset = self.eventpositionbars[0]
+                                event_pos_factor = self.eventpositionbars[1] - self.eventpositionbars[0]
+                                if self.clampEvents:
+                                    evalue = int(round(event_ydata))
+                                else:
+                                    evalue = int(round((event_ydata - event_pos_offset) / event_pos_factor))
+                                ac.key = (-1,timex,self.eventsExternal2InternalValue(evalue))  # type: ignore # key a custom attribute of QAction which should be defined in a custom subclass
+                                menu.addAction(ac)
+                            except Exception: # pylint: disable=broad-except
+                                # int(round()) might fail with "cannot convert float infinity to integer"
+                                pass
 
                             # we deactivate all active motion_notify_event_handlers of draggable annotations that might have been connected by this click to
                             # avoid redraw conflicts between Artisan canvas bitblit caching and the matplotlib internal bitblit caches.
@@ -17738,6 +17747,8 @@ class tgraphcanvas(FigureCanvas):
             event_ydata = event.ydata
             if event_xdata is None or event_ydata is None:
                 return
+            if event_xdata in (float('-inf'),float('inf')) or event_ydata in (float('-inf'),float('inf')):
+                return
             self.currentx = event_xdata
             self.currenty = event_ydata
 
@@ -17872,7 +17883,9 @@ class tgraphcanvas(FigureCanvas):
         ydata = event.ydata
 
         try:
-            if ydata is not None and xdata is not None and self.mousepress:                                 #if mouse clicked
+            if xdata is not None and ydata is not None and xdata not in (float('-inf'),float('inf')) and ydata not in (float('-inf'),float('inf')) and self.mousepress:
+
+                #if mouse clicked
 
                 self.timex[self.indexpoint] = xdata
                 if self.workingline == 1:
@@ -18533,7 +18546,7 @@ class tgraphcanvas(FigureCanvas):
         if event.button == 1:
             xdata = event.xdata
             ydata = event.ydata
-            if xdata is not None and ydata is not None:
+            if xdata is not None and xdata not in (float('-inf'),float('inf')) and ydata is not None and ydata not in (float('-inf'),float('inf')):
                 self.wheellocationx = xdata
                 self.wheellocationz = ydata
 
@@ -18822,7 +18835,7 @@ class tgraphcanvas(FigureCanvas):
                 if self.ax is not None and event.inaxes == self.ax:
                     x = event.xdata
                     y = event.ydata
-                    if self.delta_ax is not None and x is not None and y is not None and self.baseX and self.baseY:
+                    if self.delta_ax is not None and x is not None and x not in (float('-inf'),float('inf')) and y is not None and y not in (float('-inf'),float('inf')) and self.baseX and self.baseY:
                         deltaX = stringfromseconds(x - self.baseX)
                         deltaY = str(float2float(y - self.baseY,1))
                         RoR = str(float2float(60 * (y - self.baseY) / (x - self.baseX),1))
@@ -18838,7 +18851,7 @@ class tgraphcanvas(FigureCanvas):
                     elif self.base_messagevisible:
                         self.aw.clearMessageLine()
                         self.base_messagevisible = False
-                    if x is not None and y is not None:
+                    if x is not None and x not in (float('-inf'),float('inf')) and y is not None and y not in (float('-inf'),float('inf')):
                         if self.l_horizontalcrossline is None:
                             self.l_horizontalcrossline = self.ax.axhline(y,color = self.palette['text'], linestyle = '-', linewidth= .5, alpha = 1.0,sketch_params=None,path_effects=[])
                         else:

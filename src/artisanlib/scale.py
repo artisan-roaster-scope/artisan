@@ -104,6 +104,12 @@ class Scale(QObject):  # pyright:ignore[reportGeneralTypeIssues] # error: Argume
     def is_connected(self) -> bool: # pylint: disable=no-self-use
         return False
 
+    def max_weight(self) -> float: # pylint: disable=no-self-use
+        return 0
+
+    def readability(self) -> float: # pylint: disable=no-self-use
+        return 0
+
 
 
 class ScaleManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error: Argument to class must be a base class
@@ -194,6 +200,14 @@ class ScaleManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error: 
             return Acaia(model, ident, name, lambda : self.connected_handler(ident, name), lambda : self.disconnected_handler(ident, name),
                 stable_only=False, decimals=0)
         return None
+
+    # returns readability of the connected scale_nr (0 or 1) if connected and otherwise 0
+    def readability(self, scale_nr:int) -> float:
+        if scale_nr == 1 and self.scale1 is not None:
+            return self.scale1.readability()
+        if scale_nr == 2 and self.scale2 is not None:
+            return self.scale2.readability()
+        return 0
 
 #- scale 1
 

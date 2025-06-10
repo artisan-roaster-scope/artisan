@@ -136,7 +136,8 @@ class RoastedDisplay(Display):
 
 class GreenWeighingState(StateMachine):
 
-    WAIT_BEFORE_END:Final[int] = 3000     # time in milliseconds to display the DONE message before returning to READY
+    CONNECTION_LOSS_TIMEOUT:Final[int] = 60*1000    # 1min; time in milliseconds before disconnect state is terminated by a 'reset'
+    EMPTY_TIMEOUT:Final[int] = 2*60*1000            # 2min; time in milliseconds before EMPTY stated is terminated by a 'reset'
 
     idle = State(initial=True)  # display_state = 0
     scale = State()             # scale available, display_state = 1
@@ -150,17 +151,19 @@ class GreenWeighingState(StateMachine):
     done_weighing1 = State()    # weighing done
     done_weighing2 = State()    # weighing done
 
-#    reset = (
-#        scale.to(idle)
-#        | item.to(idle)
-#        | ready.to(idle)
-#        | weighing1.to(idle)
-#        | empty.to(idle)
-#        | weighing2.to(idle)
-#        | done.to(idle)
-#        | cancel_weighing1.to(idle)
-#        | cancel_weighing2.to(idle)
-#    )
+    reset = (
+        idle.to(idle)
+        | scale.to(scale)
+        | item.to(item)
+        | ready.to(ready)
+        | weighing1.to(ready)
+        | empty.to(ready)
+        | weighing2.to(ready)
+        | cancel_weighing1.to(ready)
+        | cancel_weighing2.to(ready)
+        | done_weighing1.to(ready)
+        | done_weighing2.to(ready)
+    )
 
     current_item = (
         idle.to(item)
@@ -243,6 +246,26 @@ class GreenWeighingState(StateMachine):
         | cancel_weighing2.to(ready)
     )
 
+    connection_lost = (
+        weighing1.to(weighing1)
+        | weighing2.to(weighing2)
+        | cancel_weighing1.to(cancel_weighing1)
+        | cancel_weighing2.to(cancel_weighing2)
+        | done_weighing1.to(done_weighing1)
+        | done_weighing2.to(done_weighing2)
+        | empty.to(empty)
+    )
+
+    connection_restored = (
+        weighing1.to(weighing1)
+        | weighing2.to(weighing2)
+        | cancel_weighing1.to(cancel_weighing1)
+        | cancel_weighing2.to(cancel_weighing2)
+        | done_weighing1.to(done_weighing1)
+        | done_weighing2.to(done_weighing2)
+        | empty.to(empty)
+    )
+
     def __init__(self, displays:List[Display], release_scale:Callable[[],None]) -> None:
 
         # list of displays control, incl. the display of the selected scale if any
@@ -254,9 +277,18 @@ class GreenWeighingState(StateMachine):
         # holds the WeightItem currently processed, if any
         self.current_weight_item:Optional[GreenWeightItem] = None
         self.process_state:PROCESS_STATE = PROCESS_STATE.DISCONNECTED
+        self.process_state_before_connection_loss:PROCESS_STATE = PROCESS_STATE.DISCONNECTED
         self.component:int = 0 # component (of blend) currently processed (0 <= self.component < len(self.current_weight_item.descriptions))
-        self.bucket:int = 0 # from {0,1}
+        self.bucket:int = 0 # from {0,1,2}
         self.current_weight:int = 0 # in g # the current total (potentially over several containers) weight of the filled green coffee (without the weight of any bucket)
+
+        # timers
+        self.connection_loss_reset_timer = QTimer()
+        self.connection_loss_reset_timer.setSingleShot(True)
+        self.connection_loss_reset_timer.timeout.connect(lambda : self.send('reset'))
+        self.empty_state_reset_timer = QTimer()
+        self.empty_state_reset_timer.setSingleShot(True)
+        self.empty_state_reset_timer.timeout.connect(lambda : self.send('reset'))
 
         super().__init__(allow_event_without_transition=True) # no errors for events which do not lead to transitions
 
@@ -264,6 +296,12 @@ class GreenWeighingState(StateMachine):
         if not self.scale_release_blocked:
             self.release_scale()
         self.scale_release_blocked = False
+
+    def on_enter_empty(self) -> None:
+        self.empty_state_reset_timer.start(self.EMPTY_TIMEOUT)
+
+    def on_exit_empty(self) -> None:
+        self.empty_state_reset_timer.stop()
 
     def after_current_item(self, weight_item:GreenWeightItem) -> None:
         self.current_weight_item = weight_item
@@ -344,6 +382,19 @@ class GreenWeighingState(StateMachine):
         self.bucket = 0
         self.update_displays(progress=True)
 
+    def after_connection_lost(self) -> None:
+        self.process_state_before_connection_loss = self.process_state
+        self.process_state = PROCESS_STATE.DISCONNECTED
+        self.update_displays()
+        self.connection_loss_reset_timer.start(self.CONNECTION_LOSS_TIMEOUT)
+
+    def after_connection_restored(self) -> None:
+        self.connection_loss_reset_timer.stop()
+        self.process_state = self.process_state_before_connection_loss
+        self.update_displays()
+        self.update_displays(progress=True)
+
+
     # new_weight is the new total weight of the measured greens without the bucket
     # if force_update is True, the display is update in any case, if not, the display is only update on increasing weights
     def after_fill(self, new_weight:int, force_update:bool) -> None:
@@ -364,13 +415,14 @@ class GreenWeighingState(StateMachine):
             if increased or force_update:
                 self.update_displays(progress=True)
 
-#    def after_reset(self) -> None:
-#        self.current_weight_item = None
-#        self.process_state = PROCESS_STATE.DISCONNECTED
-#        self.component = 0
-#        self.bucket = 0
-#        self.current_weight = 0
-#        self.update_displays()
+    def after_reset(self) -> None:
+        self.release_scale()
+        if self.process_state != PROCESS_STATE.DISCONNECTED:
+            self.process_state = PROCESS_STATE.CONNECTED
+        self.component = 0
+        self.bucket = 0
+        self.current_weight = 0
+        self.update_displays()
 
 # TESTING
 #    from statemachine import Event
@@ -407,21 +459,21 @@ class GreenWeighingState(StateMachine):
 
 class RoastedWeighingState(StateMachine):
 
-    WAIT_BEFORE_END:Final[int] = 3000     # time in milliseconds to display the DONE message before returning to READY
-
     idle = State(initial=True)  # display_state = 0
     scale = State()             # scale available, display_state = 1
     item = State()              # current_item available, display_state = 0
     ready = State()             # display_state = 1
     weighing = State()          # weighing
     done = State()              # weighing done
-    canceled = State()          # canceled task by typing the scale while in done
 
-#    reset = (
-#        scale.to(idle)
-#        | item.to(idle)
-#        | ready.to(idle)
-#    )
+    reset = (
+        idle.to(idle)
+        | scale.to(scale)
+        | item.to(item)
+        | ready.to(ready)
+        | weighing.to(ready)
+        | done.to(ready)
+    )
 
     current_item = (
         idle.to(item)
@@ -456,14 +508,6 @@ class RoastedWeighingState(StateMachine):
 
     task_completed = (
         weighing.to(done)
-    )
-
-    cancel = (
-        done.to(canceled)
-    )
-
-    task_canceled = (
-        canceled.to(ready)
     )
 
     end = (
@@ -504,11 +548,12 @@ class RoastedWeighingState(StateMachine):
         self.process_state = PROCESS_STATE.DISCONNECTED
         self.update_displays()
 
-#    def after_reset(self) -> None:
-#        self.current_weight_item = None
-#        self.process_state = PROCESS_STATE.DISCONNECTED
-#        self.update_displays()
-#
+    def after_reset(self) -> None:
+        self.release_scale()
+        if self.process_state != PROCESS_STATE.DISCONNECTED:
+            self.process_state = PROCESS_STATE.CONNECTED
+        self.update_displays()
+
 
     # weight is yield in g
     def after_bucket_placed(self, weight:int) -> None:
@@ -520,10 +565,9 @@ class RoastedWeighingState(StateMachine):
         self.current_weight = weight
         self.update_displays(result=True)
 
-    def after_task_completed(self, weight:int) -> None:
+    def after_task_completed(self) -> None:
         self.process_state = PROCESS_STATE.DONE
         self.update_displays()
-        QTimer.singleShot(self.WAIT_BEFORE_END, lambda : self.send('end', weight))
 
     # weight in g
     def after_end(self, weight:int) -> None:
@@ -576,7 +620,8 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error:
     MAX_EMPTY_BUCKET_WEIGHT:Final[int] = 4000               # maximum empty bucket weight recognized in g
     MIN_EMPTY_BUCKET_WEIGHT_BATCH_PERECENT:Final[int] = 5   # minimum empty bucket weight percentage of batch size in %
     MAX_EMPTY_BUCKET_WEIGHT_BATCH_PERECENT:Final[int] = 25  # maximum empty bucket weight percentage of batch size in %
-    EMPTY_SCALE_RECOGNITION_TOLERANCE:Final[int] = 10       # +- tolerance to recognize empty scale in g
+    EMPTY_SCALE_RECOGNITION_TOLERANCE_TIGHT:Final[int] = 10 # +- tight tolerance to recognize empty scale in g for scale.readability() < 1g
+    EMPTY_SCALE_RECOGNITION_TOLERANCE_LOOSE:Final[int] = 25 # +- loose tolerance to recognize empty scale in g for scale.readability() >= 1g
     MIN_EMPTY_BUCKET_RECOGNITION_TOLERANCE:Final[int] = 10  # +- minimal tolerance to recognize empty green bucket in g
     EMPTY_BUCKET_RECOGNITION_TOLERANCE_PERCENT:Final[float] = 1     # +- tolerance to recognize empty green bucket in % of bucket weight
     CANCELED_STEP_RECOGNITION_TOLERANCE:Final[int] = 15     # +- tolerance to recognize a previous 'task_cancel' step to restart via 'bucket_put_back' in g
@@ -585,9 +630,11 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error:
     ROASTED_BUCKET_TOLERANCE:Final[int] = 5                 # +- tolerance to recognize filled roasted container in % w.r.t. the estimated weight
                                                             # (weight loss defaults to 15% if no template is given)
     ROASTED_BUCKET_REMOVALE_TOLERANCE:Final[int] = 10       # +- tolerance to recognize roasted bucket removal
+    TAP_CANCEL_THRESHOLD = 100                              # threshold in g the measured weight has to exceed the empty scale weight for a tap-cancel action to be recognized
+    TAP_CANCEL_PERIOD = 500                                 # time in ms after which the weight has to fall back to the empty scale weight for a tap-cancel action to be recognized
 
     WAIT_BEFORE_CANCEL:Final[int] = 5000  # time in milliseconds to display the CANCEL message before returning to READY
-    WAIT_BEFORE_DONE:Final[int] = 5000  # time in milliseconds to display the DONE message before returning to READY
+    WAIT_BEFORE_DONE:Final[int] = 5000    # time in milliseconds to display the DONE message before returning to READY
 
     def __init__(self, aw:'ApplicationWindow', displays:List[Display], scale_manager:ScaleManager) -> None:
         super().__init__()
@@ -622,6 +669,9 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error:
         self.scale1_last_stable_weight:int = 0 # in g
         self.scale2_last_stable_weight:int = 0 # in g
 
+        self.last_nonstable_green_weight:int = 0 # in g
+        self.last_nonstable_roasted_weight:int = 0 # in g
+
         # scale assignment => 0:no scale assigned, 1: scale1 assigned, 2: scale2 assigned
         self.green_task_scale:int = 0
         self.roasted_task_scale:int = 0
@@ -630,6 +680,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error:
         self.green_task_empty_scale_weight:int = 0            # weight of the empty scale
         self.green_task_scale_tare_weight:int = 0             # last stable weight after placing the current empty bucket
         self.green_task_container1_registered_weight:int = 0  # holds the green fill weight of the first container after container swap
+        self.green_task_stable_weight_before_connection_loss = 0 # holds the green weight before the connection to the assigned scale got lost
         self.task_canceled_step:int = 0                       # remember step (in g) that did lead to "task_cancel" allowing for a restart via "bucket_put_back" on recognizing the inverse step
         self.task_done_step:int = 0                           # remember step (in g) that did lead to "task_completed" allowing for a restart via "bucket_put_back_done" on recognizing the
         self.task_swapped_step:int = 0                        # remember step (in g) that did lead to "task_swapped" allowing for a restart via "bucket_put_back_swapped" on recognizing the
@@ -638,6 +689,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error:
         self.roasted_task_empty_scale_weight:int = 0          # weight of the empty scale
         self.roasted_task_scale_tare_weight:int = 0           # last stable weight before placing the full roasted bucket
         self.roasted_task_scale_total_weight:int = 0
+        self.roasted_task_done_weight:int =0                  # remember weight (in g) that did lead to roasted task_completed allowing to complete this task
 
         # Timers
         self.cancel_green_task_timer = QTimer()
@@ -647,6 +699,18 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error:
         self.done_green_task_timer = QTimer()
         self.done_green_task_timer.setSingleShot(True)
         self.done_green_task_timer.timeout.connect(self.done_green_task_slot)
+
+        self.done_roasted_task_timer = QTimer()
+        self.done_roasted_task_timer.setSingleShot(True)
+        self.done_roasted_task_timer.timeout.connect(self.done_roasted_task_slot)
+
+        self.tap_cancel_green_task_timer = QTimer()
+        self.tap_cancel_green_task_timer.setSingleShot(True)
+        self.tap_cancel_green_task_timer.timeout.connect(self.tap_cancel_green_task_slot)
+
+        self.tap_cancel_roasted_task_timer = QTimer()
+        self.tap_cancel_roasted_task_timer.setSingleShot(True)
+        self.tap_cancel_roasted_task_timer.timeout.connect(self.tap_cancel_roasted_task_slot)
 
         self.start() # connect to configured scales
 
@@ -753,8 +817,8 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error:
         if self.roasted_container_weight() is not None:
             # if no roasting container is set, the roasting weihing process is disabled
             self.sm_roasted.send('available')
-        else:
-            self.sm_roasted.send('unavailable')
+#        else:
+#            self.sm_roasted.send('unavailable')
 
     @pyqtSlot()
     def scales_unavailable(self) -> None:
@@ -846,10 +910,12 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error:
 
         return False
 
+    def empty_scale_tolerance(self, scale_nr:int) -> int:
+        return (WeightManager.EMPTY_SCALE_RECOGNITION_TOLERANCE_LOOSE if self.scale_manager.readability(scale_nr) >= 1 else WeightManager.EMPTY_SCALE_RECOGNITION_TOLERANCE_TIGHT)
+
     # tare_weight and current_weight in g
-    @staticmethod
-    def scale_empty(empty_weight:int, current_weight:int) -> bool:
-        return bool(abs(empty_weight - current_weight) <= WeightManager.EMPTY_SCALE_RECOGNITION_TOLERANCE)
+    def scale_empty(self, scale_nr:int, empty_weight:int, current_weight:int) -> bool:
+        return bool(abs(empty_weight - current_weight) <= self.empty_scale_tolerance(scale_nr))
 
     # scale_nr: 1 or 2
     def scale_stable_weight_changed(self, scale_nr:int, stable_weight:int) -> None:
@@ -924,6 +990,8 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error:
                     self.green_task_scale = scale_nr
                     self.green_task_scale_tare_weight = stable_weight # the reading of the scale with the empty bucket placed
                     self.green_task_empty_scale_weight = self.scale1_last_stable_weight
+                    self.scale_manager.scale1_connected_signal.connect(self.scale1_connected_slot)
+                    self.scale_manager.scale1_disconnected_signal.connect(self.scale1_disconnected_slot)
                     self.scale_manager.reserve_scale1_signal.emit()
                     # make state transition (which then triggers the display update)
                     self.sm_green.send('bucket_placed')
@@ -931,6 +999,8 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error:
                     self.green_task_scale = scale_nr
                     self.green_task_scale_tare_weight = stable_weight # the reading of the scale with the empty bucket placed
                     self.green_task_empty_scale_weight = self.scale2_last_stable_weight
+                    self.scale_manager.scale2_connected_signal.connect(self.scale2_connected_slot)
+                    self.scale_manager.scale2_disconnected_signal.connect(self.scale2_disconnected_slot)
                     self.scale_manager.reserve_scale2_signal.emit()
                     # make state transition (which then triggers the display update)
                     self.sm_green.send('bucket_placed')
@@ -950,11 +1020,15 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error:
                     self.roasted_task_scale = scale_nr
                     self.roasted_task_scale_total_weight = stable_weight # the reading of the scale with the full roasted bucket placed
                     self.roasted_task_empty_scale_weight = self.scale1_last_stable_weight
+                    self.scale_manager.scale1_connected_signal.connect(self.scale1_connected_slot)
+                    self.scale_manager.scale1_disconnected_signal.connect(self.scale1_disconnected_slot)
                     self.scale_manager.reserve_scale1_signal.emit()
                 elif scale_nr == 2:
                     self.roasted_task_scale = scale_nr
                     self.roasted_task_scale_total_weight = stable_weight # the reading of the scale with the full roasted bucket placed
                     self.roasted_task_empty_scale_weight = self.scale2_last_stable_weight
+                    self.scale_manager.scale2_connected_signal.connect(self.scale2_connected_slot)
+                    self.scale_manager.scale2_disconnected_signal.connect(self.scale2_disconnected_slot)
                     self.scale_manager.reserve_scale2_signal.emit()
                 self.sm_roasted.send('bucket_placed', int(round(self.roasted_task_scale_total_weight - self.aw.qmc.container_weights[self.aw.container2_idx])))
 
@@ -963,7 +1037,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error:
 
         ## green task
         elif (self.sm_green.current_weight_item is not None and self.green_task_scale == scale_nr and
-                    self.scale_empty(self.green_task_empty_scale_weight, stable_weight)):
+                    self.scale_empty(scale_nr, self.green_task_empty_scale_weight, stable_weight)):
 
             # weight removed completely, scale empty now
 
@@ -986,7 +1060,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error:
                 self.task_swapped_step = step
                 self.sm_green.send('fill', weight, True) # update widget after registered weight of container 1 has been set
 
-            elif self.green_task_container1_registered_weight != 0 and abs(weight - self.green_task_container1_registered_weight) < self.EMPTY_SCALE_RECOGNITION_TOLERANCE:
+            elif self.green_task_container1_registered_weight != 0 and abs(weight - self.green_task_container1_registered_weight) < self.empty_scale_tolerance(scale_nr):
                 sm_message = 'bucket_removed'
 
             elif self.aw.green_task_precision == 0: # precision is deactivated; all weights are accepted (overloading/underloading outside of target range); canceling deactivated
@@ -1015,14 +1089,17 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error:
                 self.sm_green.send(sm_message)
 
         ## roasted task
-        elif (self.sm_roasted.current_weight_item is not None and self.scale_empty(self.roasted_task_empty_scale_weight, stable_weight) and
+        elif (self.sm_roasted.current_weight_item is not None and self.scale_empty(scale_nr, self.roasted_task_empty_scale_weight, stable_weight) and
                 self.roasted_task_scale == scale_nr):
             # weight removed completely, scale empty now
 
             if abs(self.roasted_task_scale_total_weight + step) < self.ROASTED_BUCKET_REMOVALE_TOLERANCE:
                 weight = int(round(self.roasted_task_scale_total_weight - self.aw.qmc.container_weights[self.aw.container2_idx]))
-                self.sm_roasted.send('task_completed', weight)
+                self.sm_roasted.send('task_completed')
+                self.roasted_task_done_weight = weight
+                self.done_roasted_task_timer.start(self.WAIT_BEFORE_DONE)
             else:
+                # this does nothing!
                 # cancel on tap while DONE
                 self.sm_roasted.send('cancel')
 
@@ -1040,21 +1117,68 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error:
         elif scale_nr == 2:
             self.scale2_last_stable_weight = stable_weight
 
+    #-
+
+    def green_task_scale_discconnect(self, last_stable_weight:int) -> None:
+        # remember the current scale1 stable weight to be applied as offset after reconnect
+        self.green_task_stable_weight_before_connection_loss = last_stable_weight
+        self.sm_green.send('connection_lost')
+
+    def green_task_scale_reconnect(self) -> None:
+        self.sm_green.send('connection_restored')
+
+    #-
+
+    @pyqtSlot()
+    def scale1_connected_slot(self) -> None:
+        if self.green_task_scale == 1:
+            self.green_task_scale_reconnect()
+
+    @pyqtSlot()
+    def scale1_disconnected_slot(self) -> None:
+        if self.green_task_scale == 1:
+            self.green_task_scale_discconnect(self.scale1_last_stable_weight)
+
+    @pyqtSlot()
+    def scale2_connected_slot(self) -> None:
+        if self.green_task_scale == 2:
+            self.green_task_scale_reconnect()
+
+    @pyqtSlot()
+    def scale2_disconnected_slot(self) -> None:
+        if self.green_task_scale == 2:
+            self.green_task_scale_discconnect(self.scale2_last_stable_weight)
+
     def release_green_task_scale(self) -> None:
         self.green_task_container1_registered_weight = 0  # clear container1 weight
+        self.task_done_step = 0
+        self.task_done_weight = 0
+        self.done_green_task_timer.stop()
+        self.cancel_green_task_timer.stop()
         if self.green_task_scale == 1:
+            self.scale_manager.scale1_connected_signal.disconnect(self.scale1_connected_slot)
+            self.scale_manager.scale1_disconnected_signal.disconnect(self.scale1_disconnected_slot)
             self.scale_manager.release_scale1_signal.emit()
             self.scale_manager.tare_scale1_signal.emit()
+            self.green_task_stable_weight_before_connection_loss = 0 # reset potential offset from scale disconnect
         elif self.green_task_scale == 2:
+            self.scale_manager.scale2_connected_signal.disconnect(self.scale2_connected_slot)
+            self.scale_manager.scale2_disconnected_signal.disconnect(self.scale2_disconnected_slot)
             self.scale_manager.release_scale2_signal.emit()
             self.scale_manager.tare_scale2_signal.emit()
+            self.green_task_stable_weight_before_connection_loss = 0 # reset potential offset from scale disconnect
         self.green_task_scale = 0
 
     def release_roasted_task_scale(self) -> None:
+        self.roasted_task_done_weight = 0
         if self.roasted_task_scale == 1:
+            self.scale_manager.scale1_connected_signal.disconnect(self.scale1_connected_slot)
+            self.scale_manager.scale1_disconnected_signal.disconnect(self.scale1_disconnected_slot)
             self.scale_manager.release_scale1_signal.emit()
             self.scale_manager.tare_scale1_signal.emit()
         elif self.roasted_task_scale == 2:
+            self.scale_manager.scale2_connected_signal.disconnect(self.scale2_connected_slot)
+            self.scale_manager.scale2_disconnected_signal.disconnect(self.scale2_disconnected_slot)
             self.scale_manager.release_scale2_signal.emit()
             self.scale_manager.tare_scale2_signal.emit()
         self.roasted_task_scale = 0
@@ -1066,41 +1190,87 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error:
             self.task_canceled_step = 0
 
     @pyqtSlot()
+    def tap_cancel_green_task_slot(self) -> None:
+        if (self.green_task_scale != 0 and self.sm_green.current_state in {GreenWeighingState.empty, GreenWeighingState.done_weighing1, GreenWeighingState.done_weighing2} and
+                self.scale_empty(self.green_task_scale, self.green_task_empty_scale_weight, self.last_nonstable_green_weight)):
+            self.done_green_task_timer.stop()
+            self.green_task_empty_scale_weight = 0
+            self.last_nonstable_green_weight = 0
+            self.task_done_step = 0
+            self.task_done_weight = 0
+            self.sm_green.send('reset')
+
+    @pyqtSlot()
+    def tap_cancel_roasted_task_slot(self) -> None:
+        if (self.roasted_task_scale != 0 and self.sm_roasted.current_state == RoastedWeighingState.done and
+                self.scale_empty(self.roasted_task_scale, self.roasted_task_empty_scale_weight, self.last_nonstable_roasted_weight)):
+            self.done_roasted_task_timer.stop()
+            self.roasted_task_empty_scale_weight = 0
+            self.last_nonstable_roasted_weight = 0
+            self.roasted_task_done_weight = 0
+            self.sm_roasted.send('reset')
+
+    @pyqtSlot()
     def done_green_task_slot(self) -> None:
         if self.sm_green.current_state in {GreenWeighingState.done_weighing1, GreenWeighingState.done_weighing2}:
             self.sm_green.send('end', self.task_done_weight)
             self.task_done_step = 0
             self.task_done_weight = 0
 
+    @pyqtSlot()
+    def done_roasted_task_slot(self) -> None:
+        if self.sm_roasted.current_state == RoastedWeighingState.done:
+            self.sm_roasted.send('end', self.roasted_task_done_weight)
+            self.roasted_task_done_weight = 0
+
     @pyqtSlot(int)
     def scale1_stable_weight_changed_slot(self, stable_weight:int) -> None:
 #        _log.debug('PRINT WM.scale1_stable_weight_changed_slot(%s)',stable_weight)
-        self.scale_stable_weight_changed(1, stable_weight)
+        self.scale_stable_weight_changed(1, stable_weight + self.green_task_stable_weight_before_connection_loss)
         if self.green_task_scale == 1:
-            new_weight = stable_weight - self.green_task_scale_tare_weight + self.green_task_container1_registered_weight
+            new_weight = stable_weight - self.green_task_scale_tare_weight + self.green_task_container1_registered_weight + self.green_task_stable_weight_before_connection_loss
             self.sm_green.send('fill', max(0, new_weight), True)
 
     @pyqtSlot(int)
     def scale1_weight_changed_slot(self, weight:int) -> None:
-#        _log.debug('WM.scale1_weight_changed_slot(%s)',weight)
+#        _log.debug('PRINT WM.scale1_weight_changed_slot(%s)',weight)
         if self.green_task_scale == 1:
-            new_weight = weight - self.green_task_scale_tare_weight + self.green_task_container1_registered_weight
-            self.sm_green.send('fill', max(0, new_weight), False) # only update on increasing weights
+            self.last_nonstable_green_weight = weight
+            new_weight = weight - self.green_task_scale_tare_weight + self.green_task_container1_registered_weight + self.green_task_stable_weight_before_connection_loss
+            self.sm_green.send('fill', max(0, new_weight), weight>self.scale1_last_stable_weight) # only update on increasing weights or if larger than thhe last stable weight
+            if (self.sm_green.current_state in { GreenWeighingState.empty, GreenWeighingState.done_weighing1, GreenWeighingState.done_weighing2 } and
+                 weight > self.green_task_empty_scale_weight + WeightManager.TAP_CANCEL_THRESHOLD):
+                self.tap_cancel_green_task_timer.start(WeightManager.TAP_CANCEL_PERIOD)
+        elif self.roasted_task_scale == 1:
+            self.last_nonstable_roasted_weight = weight
+            if (self.sm_roasted.current_state == RoastedWeighingState.done and
+                 weight > self.roasted_task_empty_scale_weight + WeightManager.TAP_CANCEL_THRESHOLD):
+                self.tap_cancel_roasted_task_timer.start(WeightManager.TAP_CANCEL_PERIOD)
+
 
     @pyqtSlot(int)
     def scale2_stable_weight_changed_slot(self, stable_weight:int) -> None:
 #        _log.debug('PRINT WM.scale2_stable_weight_changed_slot(%s)',stable_weight)
-        self.scale_stable_weight_changed(2, stable_weight)
+        self.scale_stable_weight_changed(2, stable_weight + self.green_task_stable_weight_before_connection_loss)
         if self.green_task_scale == 2:
-            new_weight = stable_weight - self.green_task_scale_tare_weight + self.green_task_container1_registered_weight
+            new_weight = stable_weight - self.green_task_scale_tare_weight + self.green_task_container1_registered_weight + self.green_task_stable_weight_before_connection_loss
             self.sm_green.send('fill', max(0, new_weight), True)
 
     @pyqtSlot(int)
     def scale2_weight_changed_slot(self, weight:int) -> None:
 #        _log.debug('WM.scale2_weight_changed_slot(%s)',weight)
         if self.green_task_scale == 2:
-            new_weight = weight - self.green_task_scale_tare_weight + self.green_task_container1_registered_weight
-            self.sm_green.send('fill', max(0, new_weight), False) # only update on increasing weights
+            self.last_nonstable_green_weight = weight
+            new_weight = weight - self.green_task_scale_tare_weight + self.green_task_container1_registered_weight + self.green_task_stable_weight_before_connection_loss
+            self.sm_green.send('fill', max(0, new_weight), weight>self.scale2_last_stable_weight) # only update on increasing weights or if larger than thhe last stable weight
+            if (self.sm_green.current_state in { GreenWeighingState.empty, GreenWeighingState.done_weighing1, GreenWeighingState.done_weighing2 } and
+                 weight > self.green_task_empty_scale_weight + WeightManager.TAP_CANCEL_THRESHOLD):
+                self.tap_cancel_green_task_timer.start(WeightManager.TAP_CANCEL_PERIOD)
+        elif self.roasted_task_scale == 2:
+            self.last_nonstable_roasted_weight = weight
+            if (self.sm_roasted.current_state == RoastedWeighingState.done and
+                 weight > self.roasted_task_empty_scale_weight + WeightManager.TAP_CANCEL_THRESHOLD):
+                self.tap_cancel_roasted_task_timer.start(WeightManager.TAP_CANCEL_PERIOD)
 
     def start(self) -> None:
         self.scale_manager.available_signal.connect(self.scales_available)
@@ -1119,4 +1289,6 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error:
         self.scale_manager.available_signal.disconnect(self.scales_available)
         self.scale_manager.unavailable_signal.disconnect(self.scales_unavailable)
         self.scale_manager.scale1_stable_weight_changed_signal.disconnect(self.scale1_stable_weight_changed_slot)
+        self.scale_manager.scale1_weight_changed_signal.disconnect(self.scale1_weight_changed_slot)
         self.scale_manager.scale2_stable_weight_changed_signal.disconnect(self.scale2_stable_weight_changed_slot)
+        self.scale_manager.scale2_weight_changed_signal.disconnect(self.scale2_weight_changed_slot)

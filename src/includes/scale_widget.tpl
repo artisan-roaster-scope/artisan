@@ -50,7 +50,36 @@ Receives data in the shape of
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-status-bar-style" content="black">
     <meta name="mobile-web-app-title" content="{{window_title}}">
+    
+<!--    
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;600">
+-->
+    
+    <style type='text/css'>
+        /* roboto-300 */
+        @font-face {
+          font-family: 'Roboto';
+          font-style: normal;
+          font-weight: 300;
+          font-stretch: 100%;
+          src: url('roboto-300.woff2') format('woff2');
+        }
+        /* roboto-regular */
+        @font-face {
+          font-family: 'Roboto';
+          font-style: normal;
+          font-weight: 400;
+          src: url('roboto-regular.woff2') format('woff2');
+        }
+        /* roboto-600 */
+        @font-face {
+          font-family: 'Roboto';
+          font-style: normal;
+          font-weight: 600;
+          src: url('roboto-600.woff2') format('woff2');
+        }
+    </style>
+    
     <title>{{window_title}}</title>
     <noscript>
         <style type="text/css">
@@ -304,7 +333,7 @@ Receives data in the shape of
                             elements.bucket_on_scale.style.border = BORDER;
                             elements.percent.style.color = 'black';
                         } else {
-                            elements.bucket_on_scale.style.display = 'block';
+                            elements.bucket_on_scale.style.display = 'flex';
                             elements.bucket_on_scale.style.backgroundColor = ABLUE;
                             elements.bucket_on_scale.style.border = '1.2vmin solid white';
                             elements.percent.style.color = 'white';
@@ -342,7 +371,7 @@ Receives data in the shape of
                             if (parsedData.percent >= 0) {
                                 // display bucket on scale and %
                                 elements.scale_rect.style.display = 'block';
-                                elements.bucket_on_scale.style.display = 'block';
+                                elements.bucket_on_scale.style.display = 'flex';
                                 elements.percent.style.display = 'block';
                                 elements.percent.innerHTML = parsedData.percent.toFixed(0) + '%';
                                 elements.percent.style.color = PERCENTCOLOR;
@@ -354,7 +383,7 @@ Receives data in the shape of
                                 if (parsedData.percent <= 99) {
                                     // normal count until 99%
                                     elements.scale_rect.style.background = `linear-gradient(0deg, ${ABLUE} 0 ${parsedData.percent}%, #b5b5b5 ${parsedData.percent}% 100%)`;
-                                    if (parsedData.percent >= 95) {
+                                    if (parsedData.percent >= 5) {
                                         elements.timer_progress.style.setProperty('--progress-color', 'white');
                                     }
                                 } else if (Math.abs(100 - (Math.round(parsedData.percent * 100) / 100)) < TARGET_DEVIATION) {
@@ -412,7 +441,7 @@ Receives data in the shape of
                             elements.scale_rect.style.display = 'block';
                             elements.scale_rect.style.backgroundColor = ABLUE;
                             elements.timer_progress.style.setProperty('--progress-color', 'white');
-                            elements.bucket_on_scale.style.display = 'block';
+                            elements.bucket_on_scale.style.display = 'flex';
                             elements.bucket_on_scale.style.backgroundColor = ABLUE;
                             elements.bucket_on_scale.style.border = '3vmin solid white';
                             elements.bucket_on_scale.style.top = 'calc(12% - 3vmin)';
@@ -865,12 +894,12 @@ Receives data in the shape of
 
             /* fallbacks for browser that don't understand container size queries */
             bottom: 45px;
-            right: -30%;
+            right: -25%;
             width: 15%;
 
             bottom: 5cqmin;
-            right: -32cqmin;
-            width: 20cqmin;
+            right: -26cqmin;
+            width: 19cqmin;
         }
 
         .bucket-img {
@@ -939,6 +968,9 @@ Receives data in the shape of
             border: 0.5vmin solid #515151;
             border-radius: 100%;
             align-content: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .percent {
@@ -976,7 +1008,7 @@ Receives data in the shape of
         @media (max-aspect-ratio: 1 / 1) {
             .title-separate {
                 display: block;
-                margin: 10px 0;
+                margin: 10px 7px;
             }
 
             .title-top {
@@ -1086,7 +1118,7 @@ Receives data in the shape of
             height: 5%;
             position: absolute;
             left: 5%;
-            top: 3%;
+            bottom: 3%;
         }
 
         progress::-webkit-progress-value {
@@ -1147,7 +1179,6 @@ Receives data in the shape of
                 <div class="scale-and-buckets" id="scale_and_buckets">
                     <div class="scale-div">
                         <div class="scale-rect" id="scale_rect">
-                            <progress id="timer_progress" value="0" max="100"></progress>
                             <div class="scale-for-clipping scale-rect" id="scale_for_clipping">
                                 <span class="zoom2" id="zoom2"></span>
                             </div>
@@ -1190,6 +1221,7 @@ Receives data in the shape of
                                     </svg>
                                 </div>
                             </div>
+                            <progress id="timer_progress" value="0" max="100"></progress>
                         </div>
                         <div class="scale-icon" id="scale_icon_initial">
                             <div style="padding: 10%;">

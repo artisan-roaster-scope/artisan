@@ -246,6 +246,7 @@ python_version = "3.8"
 
 # Ensure full coverage
 check_untyped_defs = true
+#disallow-untyped-defs = true
 disallow_incomplete_defs = true
 disallow_untyped_calls = true
 disallow_untyped_defs = true
