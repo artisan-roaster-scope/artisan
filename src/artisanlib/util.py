@@ -299,7 +299,7 @@ def fill_gaps(ll:Union[Sequence[Union[float, int]], 'npt.NDArray[numpy.floating[
                 s:float = -1
                 for ee in ll[:5]:
                     if ee != -1:
-                        s = ee
+                        s = float(ee)
                         break
                 res.append(s)
                 last_val = s
@@ -327,8 +327,8 @@ def fill_gaps(ll:Union[Sequence[Union[float, int]], 'npt.NDArray[numpy.floating[
                         res.append(last_val)
                 skip = next_idx
             else:
-                res.append(e)
-                last_val = e
+                res.append(float(e))
+                last_val = float(e)
     return res
 
 def replace_duplicates(data:List[float]) -> List[float]:
