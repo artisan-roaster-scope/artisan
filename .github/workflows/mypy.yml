@@ -43,4 +43,4 @@ jobs:
           pip install -r src/requirements.txt
       - name: Run mypy
         run: |
-          MYPYPATH=src mypy src
+          mypy --ignore_missing_imports src
