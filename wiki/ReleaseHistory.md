@@ -11,6 +11,7 @@ v3.2.0 (June X, 2025)
   - adds custom local scale names
   - adds button to manual update the roast schedule
   - adds URL open handler for Linux/RPi
+  - adds possibility to dock sliders to the right side of the main window ([Discussion #1880](../../../discussions/1880))
 
 * CHANGES
   - improves WebSocket performance communicating with slow servers

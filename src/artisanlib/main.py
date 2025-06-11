@@ -106,7 +106,7 @@ try:
                              QLCDNumber, QSpinBox, QComboBox, # @Reimport @UnresolvedImport @UnusedImport
                              QSlider, # @Reimport @UnresolvedImport @UnusedImport
                              QColorDialog, QFrame, QScrollArea, QProgressDialog, # @Reimport @UnresolvedImport @UnusedImport
-                             QStyleFactory, QMenu, QLayout) # @Reimport @UnresolvedImport @UnusedImport
+                             QStyleFactory, QMenu, QLayout, QDockWidget) # @Reimport @UnresolvedImport @UnusedImport
     from PyQt6.QtGui import (QScreen, QPageLayout, QAction, QImageReader, QWindow, # @Reimport @UnresolvedImport @UnusedImport
                                 QKeySequence, QShortcut, # @Reimport @UnresolvedImport @UnusedImport
                                 QPixmap,QColor,QDesktopServices,QIcon, # @Reimport @UnresolvedImport @UnusedImport
@@ -133,7 +133,7 @@ except ImportError:
                              QLCDNumber, QSpinBox, QComboBox, # @Reimport @UnresolvedImport @UnusedImport
                              QSlider, # @Reimport @UnresolvedImport @UnusedImport
                              QColorDialog, QFrame, QScrollArea, QProgressDialog, # @Reimport @UnresolvedImport @UnusedImport
-                             QStyleFactory, QMenu, QLayout, QShortcut) # @Reimport @UnresolvedImport @UnusedImport
+                             QStyleFactory, QMenu, QLayout, QShortcut, QDockWidget) # @Reimport @UnresolvedImport @UnusedImport
     from PyQt5.QtGui import (QScreen, QPageLayout, QImageReader, QWindow,  # type: ignore # @Reimport @UnresolvedImport @UnusedImport
                                 QKeySequence, # @Reimport @UnresolvedImport @UnusedImport
                                 QPixmap,QColor,QDesktopServices,QIcon, # @Reimport @UnresolvedImport @UnusedImport
@@ -1551,7 +1551,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         'DRYlabel', 'DRYlcd', 'DRYlcdFrame', 'DRY2FCslabel', 'DRY2FCsframe', 'FCslabel', 'FCslcd', 'FCslcdFrame', 'AUClabel', 'AUClcd', 'AUClcdFrame',
         'AUCLCD', 'phasesLCDs', 'extrabuttonsLayout', 'extrabuttondialogs', 'slider1', 'slider2', 'slider3', 'slider4', 'sliderLCD1', 'sliderLCD2', 'sliderLCD3',
         'sliderLCD4', 'sliderGrpBox1', 'sliderGrpBox2', 'sliderGrpBox3', 'sliderGrpBox4', 'sliderSV', 'sliderLCDSV', 'sliderGrpBoxSV', 'leftlayout',
-        'sliderFrame', 'lcdFrame', 'midlayout', 'editgraphdialog', 'html_loader', 'QtWebEngineSupport', 'artisanviewerFirstStart',
+        'sliderFrame', 'sliderDock', 'lcdFrame', 'midlayout', 'editgraphdialog', 'html_loader', 'QtWebEngineSupport', 'artisanviewerFirstStart',
         'buttonpalette', 'extraeventbuttontextcolor', 'extraeventsactions', 'extraeventsdescriptions', 'extraeventstypes', 'extraeventsvalues',
         'extraeventsvisibility', 'fileSaveAsAction', 'keyboardButtonStyles', 'language_menu_actions', 'loadThemeAction', 'main_button_min_width_str',
         'minieventleft', 'minieventright', 'nLCDS', 'notificationManager', 'notificationsflag', 'ntb', 'pdf_page_layout', 'pdf_rendering', 'productionPDFAction',
@@ -4167,8 +4167,20 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
         self.sliderFrame:QFrame = QFrame()
         self.sliderFrame.setLayout(self.leftlayout)
-        self.sliderFrame.setVisible(False)
         self.sliderFrame.setContentsMargins(0,0,0,0)
+
+        self.sliderDock:QDockWidget = QDockWidget()
+        self.sliderDock.setObjectName('sliderDock') # object is needed to have saveState() working
+        self.sliderDock.setWindowTitle(QApplication.translate('Tab','Sliders'))
+        self.sliderDock.setWidget(self.sliderFrame)
+        self.sliderFrame.setSizePolicy(QSizePolicy.Policy.Fixed,QSizePolicy.Policy.Ignored)
+        self.sliderDock.setAllowedAreas(Qt.DockWidgetArea.LeftDockWidgetArea|Qt.DockWidgetArea.RightDockWidgetArea)
+        self.sliderDock.setFloating(False)
+        self.sliderDock.setFeatures(QDockWidget.DockWidgetFeature.NoDockWidgetFeatures | QDockWidget.DockWidgetFeature.DockWidgetMovable)# | QDockWidget.DockWidgetFeature.DockWidgetFloatable)
+
+        self.sliderDock.setVisible(False)
+
+        self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, self.sliderDock)
 
         self.lcdFrame:QFrame = QFrame()
         self.lcdFrame.setLayout(LCDlayout)
@@ -4177,7 +4189,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.lcdFrame.setSizePolicy(QSizePolicy.Policy.Maximum,QSizePolicy.Policy.Expanding) # prevent horizontal expansion (graph might not maximize otherwise)
 
         self.midlayout:QHBoxLayout = QHBoxLayout()
-        self.midlayout.addWidget(self.sliderFrame)
+#        self.midlayout.addWidget(self.sliderFrame)
+#        self.midlayout.addWidget(self.sliderDock)
+
         self.midlayout.addLayout(midleftlayout)
         self.midlayout.addWidget(self.lcdFrame)
         self.midlayout.setSpacing(0)
@@ -11300,7 +11314,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.slider3.setVisible(False)
         self.slider4.setVisible(False)
         self.sliderSV.setVisible(False)
-        self.sliderFrame.setVisible(False)
+        self.sliderDock.setVisible(False)
         self.slidersAction.setChecked(False)
         # remember state
         if changeDefault:
@@ -11315,7 +11329,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         focused_widget = QApplication.focusWidget()
         if focused_widget and focused_widget != self.centralWidget():
             focused_widget.clearFocus()
-        self.sliderFrame.setVisible(True)
+        self.sliderDock.setVisible(True)
         self.slider1.setVisible(True)
         self.slider2.setVisible(True)
         self.slider3.setVisible(True)
@@ -11346,7 +11360,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     @pyqtSlot()
     @pyqtSlot(bool)
     def toggleSliders(self,_:bool = False) -> None:
-        if self.sliderFrame.isVisible():
+#        if self.sliderFrame.isVisible():
+        if self.sliderDock.isVisible():
             self.hideSliders()
         else:
             self.showSliders()
@@ -17396,7 +17411,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     # removes window geometry and splitter settings from the given settings
     @staticmethod
     def clearWindowGeometry(settings:QSettings) -> None:
-        for s in ['Geometry', 'BlendGeometry','RoastGeometry','FlavorProperties','CalculatorGeometry','EventsGeometry', 'CompareGeometry',
+        for s in ['MainWindowState', 'Geometry', 'BlendGeometry','RoastGeometry','FlavorProperties','CalculatorGeometry','EventsGeometry', 'CompareGeometry',
                 'BackgroundGeometry','ScheduleGeometry','ScheduleRemainingSplitter', 'ScheduleMainSplitter', 'ScheduleCompletedSplitter', 'LCDGeometry','DeltaLCDGeometry','ExtraLCDGeometry','PhasesLCDGeometry','AlarmsGeometry',
                 'DeviceAssignmentGeometry','PortsGeometry','TransformatorPosition', 'CurvesPosition', 'StatisticsPosition',
                 'AxisPosition','PhasesPosition', 'BatchPosition', 'SamplingPosition', 'autosaveGeometry', 'PIDPosition',
@@ -17410,6 +17425,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         try:
             updateBatchCounter = True
             if filename is not None:
+#                self.stopActivities() # also disconnect from connected scales and stops BLE scanning
+
                 settings = QSettings(filename, QSettings.Format.IniFormat)
 
                 # a proper artisan-settings.aset file needs at least to contain a Mode tag
@@ -18960,6 +18977,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             #restore geometry
             if settings.contains('Geometry'):
                 self.restoreGeometry(settings.value('Geometry'))
+            #restore main window state (like dock widget positions)
+            if settings.contains('MainWindowState'):
+                self.restoreState(settings.value('MainWindowState'))
             if not filename: # only if an external settings file is loaded
                 FigureCanvas.updateGeometry(self.qmc)  #@UndefinedVariable
 
@@ -19533,6 +19553,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 if filename is None or not (self.full_screen_mode_active or self.isFullScreen()):
                     self.settingsSetValue(settings, default_settings, 'Geometry',self.saveGeometry(), read_defaults)
 
+                # Saves the current state of this mainwindow's toolbars and dockwidgets
+                self.settingsSetValue(settings, default_settings, 'MainWindowState',self.saveState(), read_defaults)
 
                 # save screens fingerprint to decide if dialog positions should be remembered on startup
                 if not read_defaults:
@@ -20641,11 +20663,19 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 # disconnect Mugma
                 self.mugma.stop()
                 self.mugma = None
+
         if self.qmc.flagon:
             self.qmc.ToggleMonitor()
+
         if self.WebLCDs:
             self.stopWebLCDs()
             self.WebLCDs = True # to ensure they are started again on restart
+        if self.taskWebDisplayGreenActive:
+            self.stopWebGreen()
+            self.taskWebDisplayGreenActive = True # to ensure they are started again on restart
+        if self.taskWebDisplayRoastedActive:
+            self.stopWebRoasted()
+            self.taskWebDisplayRoastedActive = True # to ensure they are started again on restart
 
         if self.scheduleFlag and self.schedule_window:
             tmp_Schedule = self.scheduleFlag # we keep the state to properly store it in the settings
@@ -23836,7 +23866,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         box = QMessageBox(self)
 
         #create a html QString
-        from scipy import __version__ as SCIPY_VERSION_STR # type: ignore # @UnresolvedImport
+        from scipy import __version__ as SCIPY_VERSION_STR # type #  ignore # @UnresolvedImport
         from pymodbus import __version__ as PYMODBUS_VERSION_STR
         build = ''
         if __build__ != '0':
