@@ -4,7 +4,7 @@ permalink: /docs/curves/
 excerpt: ""
 last_modified_at: 2025-06-4T15:59:00-04:00
 toc: false
-author: Michael Herbert
+author: Michael Herbert and Rick Groszkiewicz
 author_profile: true
 ---
 
@@ -89,3 +89,5 @@ IMPORTANT NOTE:  Except for the raw data filters described above, the filter set
 *UI Tab*
 
 Make sure under the Curves dialog box, you do two things on the UI tab.  Check the box for Decimal Places and investigate the fonts you can use for your graph.  You can also set a [Background Image](https://artisan-scope.org/docs/colors/).  The shortcut COMMAND/CTRL +/- will increase or decrease graph resolution, and the resolution can be reset under the UI tab.  
+
+Many thanks to Rick Groszkiewicz for assisting in rewriting this page in 2025.  
