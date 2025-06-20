@@ -2,11 +2,11 @@ Detailed Release History
 ========================
 
 ----
-v3.2.0 (June X, 2025)
+v3.2.0 (June 23, 2025)
 ------------------
 
 * ADDITIONS
-  - adds weighing manager
+  - adds [batch manager](https://doc.artisan.plus/docs/batch-manager)
   - adds support for Acaia relay scales like the [Umbra](https://acaia.co/products/umbra-lunar)
   - adds custom local scale names
   - adds button to manual update the roast schedule
@@ -18,6 +18,7 @@ v3.2.0 (June X, 2025)
   - improves full redraw performance
   - increases maximum frequency of schedule updates
   - updates Spanish translations (thanks to Juan!)
+  - updates Turkish translations by Kemal of [Shady Coffee Roastery](https://shady.com.tr) as their gift to the Turkish professional and home user coffee roasting community
   - upgrade libusb-package on Windows
   - limits maximum number of major axis ticks and draws minor axis ticks only if productive
   - deactivates AutoDROP in Hottop 2k+ machine setup ([Issue #1862](../../../issues/1862))
@@ -27,7 +28,7 @@ v3.2.0 (June X, 2025)
   - fixes regression which broke show-events-on-BT in v3.1.2 and v3.1.4
   - fixes delayed closing of the Roast Properties dialog on some configurations ([Issue #1852](../../../issues/1852))
   - hardens event name substitution on background load ([Issue #1863](../../../issues/1863))
-  - prevents smoothing extra device curves using rate of rise variables
+  - prevents smoothing extra device curves using rate of rise symbolic variables
   - deactivates processing of event state flag returned from Kaleido machines to trigger Artisan events like CHARGE and DROP ([Issue #1851](../../../issues/1851))
 
 

@@ -3867,6 +3867,7 @@ class GreenWebDisplay(GreenDisplay):
 
     # component indicates which of the item.descriptions is currently processed
     def show_item(self, item:'WeightItem', state:PROCESS_STATE = PROCESS_STATE.DISCONNECTED, component:int = 0) -> None:
+
         if (isinstance(item, GreenWeightItem) and
             (item != self.last_item or self.last_process_state != state or self.last_component != component)):
                 # NOTE: as item is of type WeightItem and this is declared as @dataclass the equality is structural here
@@ -3909,6 +3910,7 @@ class GreenWebDisplay(GreenDisplay):
             self.last_component = component
             self.last_bucket = bucket
             self.last_current_weight = current_weight
+
             #-
             self.rendered_task['state'] = state
             if self.last_item.descriptions and len(self.last_item.descriptions)>component:
@@ -3918,7 +3920,7 @@ class GreenWebDisplay(GreenDisplay):
                 self.rendered_task['blend_percent'] = ''
                 self.rendered_task['subtitle'] = ''
             self.rendered_task['bucket'] = bucket
-            if state == PROCESS_STATE.WEIGHING:
+            if state == PROCESS_STATE.WEIGHING and len(self.last_item.descriptions)>component and len(self.last_item.descriptions[component])>0:
                 target = self.last_item.weight * 1000 # target in g
                 self.rendered_task['total_percent'] = 100 * current_weight / target
                 completed_ratio = sum(completed[0] for completed in self.last_item.descriptions[:component])
@@ -3926,10 +3928,13 @@ class GreenWebDisplay(GreenDisplay):
                 component_target_ratio = completed_ratio + current_component_ratio
                 component_target = component_target_ratio * target
                 # showing what is missing per component
-                self.rendered_task['weight'] = render_weight(component_target - current_weight, 0, weight_units.index(self.schedule_window.aw.qmc.weight[2]))
+                self.rendered_task['weight'] = render_weight(component_target - current_weight, 0, weight_units.index(self.schedule_window.aw.qmc.weight[2]), brief=1)
                 component_target_weight = target * current_component_ratio
                 completed_weight = target * completed_ratio
-                self.rendered_task['percent'] = 100 * (current_weight - completed_weight) / component_target_weight
+                if component_target_weight>0:
+                    self.rendered_task['percent'] = 100 * (current_weight - completed_weight) / component_target_weight
+                else:
+                    self.rendered_task['percent'] = 0
             else:
                 self.rendered_task['weight'] = ''
                 self.rendered_task['percent'] = 0
@@ -3989,7 +3994,7 @@ class RoastedWebDisplay(RoastedDisplay):
             self.rendered_task['id'] = item.position
             self.rendered_task['title'] = item.title
             self.rendered_task['batchsize'] = render_weight(item.weight, 1, item.weight_unit_idx) # from 1:kg to target, user selected, weight unit
-            if len(item.descriptions)>0:
+            if len(item.descriptions)>0 and len(item.descriptions[0])>1:
                 self.rendered_task['subtitle'] = (item.descriptions[0][1] if item.blend_name is None else item.blend_name)
             else:
                 self.rendered_task['subtitle'] = ''
@@ -4019,8 +4024,11 @@ class RoastedWebDisplay(RoastedDisplay):
             self.rendered_task['state'] = state
             if state == PROCESS_STATE.WEIGHING:
                 batchsize = self.last_item.weight * 1000 # target in g
-                total_percent = 100 * current_weight / batchsize
-                self.rendered_task['weight'] = render_weight(current_weight, 0, weight_units.index(self.schedule_window.aw.qmc.weight[2])) # yield
+                if batchsize>0:
+                    total_percent = 100 * current_weight / batchsize
+                else:
+                    total_percent = 0
+                self.rendered_task['weight'] = render_weight(current_weight, 0, weight_units.index(self.schedule_window.aw.qmc.weight[2]), brief=1) # yield
                 self.rendered_task['percent'] = 100.2
                 self.rendered_task['total_percent'] = total_percent
                 self.rendered_task['loss'] = f'-{float2float(100-total_percent, self.schedule_window.aw.percent_decimals)}%' # weight loss percent

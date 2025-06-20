@@ -1807,9 +1807,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             containerRoasted = QGroupBox(QApplication.translate('GroupBox','Container Roasted'))
             containerRoasted.setLayout(containerRoastedHLayout)
 
-            taskGreen = QGroupBox(QApplication.translate('GroupBox', 'Task Green'))
+            taskGreen = QGroupBox(QApplication.translate('GroupBox', 'Task Display Green'))
             taskGreen.setLayout(taskWebDisplayGreenVLayout)
-            taskRoasted = QGroupBox(QApplication.translate('GroupBox', 'Task Roasted'))
+            taskRoasted = QGroupBox(QApplication.translate('GroupBox', 'Task Display Roasted'))
             taskRoasted.setLayout(taskWebDisplayRoastedVLayout)
 
             tab8Layout.addWidget(scale1,0,0)
@@ -1857,7 +1857,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             C8Widget.setLayout(tab8Layout)
         else:
             C8Widget.setLayout(tab8LayoutOFF)
-        self.TabWidget.addTab(C8Widget,QApplication.translate('Tab','Scales'))
+        self.TabWidget.addTab(C8Widget,QApplication.translate('Tab','Batch Manager'))
         self.TabWidget.currentChanged.connect(self.tabSwitched)
         #incorporate layouts
         Mlayout = QVBoxLayout()

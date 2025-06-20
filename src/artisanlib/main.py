@@ -4171,12 +4171,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
         self.sliderDock:QDockWidget = QDockWidget()
         self.sliderDock.setObjectName('sliderDock') # object is needed to have saveState() working
-        self.sliderDock.setWindowTitle(QApplication.translate('Tab','Sliders'))
+#        self.sliderDock.setWindowTitle(QApplication.translate('Tab','Sliders'))
         self.sliderDock.setWidget(self.sliderFrame)
         self.sliderFrame.setSizePolicy(QSizePolicy.Policy.Fixed,QSizePolicy.Policy.Ignored)
         self.sliderDock.setAllowedAreas(Qt.DockWidgetArea.LeftDockWidgetArea|Qt.DockWidgetArea.RightDockWidgetArea)
         self.sliderDock.setFloating(False)
-        self.sliderDock.setFeatures(QDockWidget.DockWidgetFeature.NoDockWidgetFeatures | QDockWidget.DockWidgetFeature.DockWidgetMovable)# | QDockWidget.DockWidgetFeature.DockWidgetFloatable)
+        self.sliderDock.setFeatures(QDockWidget.DockWidgetFeature.NoDockWidgetFeatures | QDockWidget.DockWidgetFeature.DockWidgetMovable | QDockWidget.DockWidgetFeature.DockWidgetFloatable)
 
         self.sliderDock.setVisible(False)
 
@@ -4191,7 +4191,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.midlayout:QHBoxLayout = QHBoxLayout()
 #        self.midlayout.addWidget(self.sliderFrame)
 #        self.midlayout.addWidget(self.sliderDock)
-
         self.midlayout.addLayout(midleftlayout)
         self.midlayout.addWidget(self.lcdFrame)
         self.midlayout.setSpacing(0)
