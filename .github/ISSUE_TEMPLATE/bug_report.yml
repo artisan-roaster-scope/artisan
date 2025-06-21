@@ -12,7 +12,7 @@ body:
         <img src='https://github.com/artisan-roaster-scope/artisan/raw/master/src/artisan.png' align='left' width='100' height='100'>
         ***To help us quickly solve your issue, please attach a sample profile `*.alog` file and your settings `*.aset` file (Help>> Save settings).
         Add screenshots if they help describe the problem.  Rename these files by adding `.txt` to the end of the file name.
-        Add the files to the 'Problem Description' field below.  Do this by drag-and-drop, copy-paste, or clicking the link 
+        Add the files to the 'Problem Description' field below.  Do this by drag-and-drop, copy-paste, or clicking the link
         under the input field.  Screenshots and other images may be added without being renamed.***
         <br clear='left'/>"
       # yamllint enable rule:line-length
@@ -42,20 +42,21 @@ body:
       label: Artisan Version
       description: Shown in the top window bar or in 'Help>> About'.
       options:
-        - 
+        -
+        - 3.2.0
+        - 3.2.1 Continuous Build
         - 3.1.4
-        - 3.1.5 Continuous Build
         - 3.1.2
         - 3.1.0
         - Other - include in Description
       default: 0
     validations:
       required: true
-      
+
 #  - type: input
 #    attributes:
 #      label: Artisan Build Number
-#      description: Go to "Help>> About", the number in brackets (). 
+#      description: Go to "Help>> About", the number in brackets ().
 #      placeholder: "Example: 4b4b3fa"
 #    validations:
 #      required: false

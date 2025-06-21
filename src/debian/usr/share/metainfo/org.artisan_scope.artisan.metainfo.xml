@@ -68,6 +68,41 @@
 
   <releases>
 
+    <release version="3.2.0" date="2025-06-23">
+      <url type="details">https://github.com/artisan-roaster-scope/artisan/releases/tag/v3.2.0</url>
+      <description>
+        <p>ADDITIONS</p>
+        <ul>
+          <li>adds [batch manager](https://doc.artisan.plus/docs/batch-manager)</li>
+          <li>adds support for Acaia relay scales like the Umbra and the Cosmo</li>
+          <li>adds custom local scale names</li>
+          <li>adds button to manual update the roast schedule</li>
+          <li>adds URL open handler for Linux/RPi</li>
+          <li>adds possibility to dock sliders to the right side of the main window (Discussion #1880)</li>
+        </ul>
+        <p>CHANGES</p>
+        <ul>
+          <li>improves WebSocket performance communicating with slow servers</li>
+          <li>improves full redraw performance</li>
+          <li>increases maximum frequency of schedule updates</li>
+          <li>updates Spanish translations (thanks to Juan!)</li>
+          <li>updates Turkish translations by Kemal of Shady Coffee Roastery as their gift to the Turkish professional and home user coffee roasting community</li>
+          <li>upgrade libusb-package on Windows</li>
+          <li>limits maximum number of major axis ticks and draws minor axis ticks only if productive</li>
+          <li>deactivates AutoDROP in Hottop 2k+ machine setup (Issue #1862)</li>
+        </ul>
+        <p>FIXES</p>
+        <ul>
+          <li>fixes an unhandled exception on loading settings related to scales configurations ([ssue #1847)</li>
+          <li>fixes regression which broke show-events-on-BT in v3.1.2 and v3.1.4</li>
+          <li>fixes delayed closing of the Roast Properties dialog on some configurations (Issue #1852)</li>
+          <li>hardens event name substitution on background load (Issue #1863)</li>
+          <li>prevents smoothing extra device curves using rate of rise symbolic variables</li>
+          <li>deactivates processing of event state flag returned from Kaleido machines to trigger Artisan events like CHARGE and DROP (Issue #1851)</li>
+        </ul>
+      </description>
+    </release>
+
     <release version="3.1.4" date="2025-05-01">
       <url type="details">https://github.com/artisan-roaster-scope/artisan/releases/tag/v3.1.4</url>
       <description>

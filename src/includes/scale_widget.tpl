@@ -627,7 +627,7 @@ Receives data in the shape of
             const navigator = (window.top || window).navigator;
             const maxTouchPoints = Number.isFinite(navigator.maxTouchPoints) ? navigator.maxTouchPoints : navigator['msMaxTouchPoints'];
             if (Number.isFinite(maxTouchPoints)) {
-                // Windows 10 system reports that it supports touch, even though it acutally doesn't (ignore msMaxTouchPoints === 256).
+                // Windows 10 system reports that it supports touch, even though it actually doesn't (ignore msMaxTouchPoints === 256).
                 return maxTouchPoints > 0 && maxTouchPoints !== 256;
             }
             return 'ontouchstart' in window;

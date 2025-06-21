@@ -7,7 +7,7 @@ v3.2.0 (June 23, 2025)
 
 * ADDITIONS
   - adds [batch manager](https://doc.artisan.plus/docs/batch-manager)
-  - adds support for Acaia relay scales like the [Umbra](https://acaia.co/products/umbra-lunar)
+  - adds support for Acaia relay scales like the [Umbra](https://acaia.co/products/umbra-lunar) and the [Cosmo](https://buy.artisan.plus/Acaia-Cosmo-Scale)
   - adds custom local scale names
   - adds button to manual update the roast schedule
   - adds URL open handler for Linux/RPi
