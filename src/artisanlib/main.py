@@ -317,7 +317,7 @@ class Artisan(QtSingleApplication):
             aw:Optional[ApplicationWindow] = self.activationWindow()
             if aw is not None and self.darkmode != bool(colorScheme == Qt.ColorScheme.Dark):
                 self.darkmode = bool(colorScheme == Qt.ColorScheme.Dark)
-                aw.updateCanvasColors()
+#                aw.updateCanvasColors()
                 QTimer.singleShot(500, aw.updateScheduleSignal.emit) # only redraw scheduler window # to adjust the colors of its items (QWidgets are updated automatically)
     except Exception: # pylint: disable=broad-except
         pass
@@ -11325,36 +11325,37 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.eventslidersflags[0] = 0
 
     def showSliders(self, changeDefault:bool = True) -> None:
-        focused_widget = QApplication.focusWidget()
-        if focused_widget and focused_widget != self.centralWidget():
-            focused_widget.clearFocus()
-        self.sliderDock.setVisible(True)
-        self.slider1.setVisible(True)
-        self.slider2.setVisible(True)
-        self.slider3.setVisible(True)
-        self.slider4.setVisible(True)
-        self.sliderSV.setVisible(True)
-        if self.keyboardmoveflag == 0:
-            self.setSliderFocusPolicy(Qt.FocusPolicy.StrongFocus)
-        # set slider singleStep
-        self.slider1.setSingleStep(self.eventSliderStepSize(0))
-        self.slider2.setSingleStep(self.eventSliderStepSize(1))
-        self.slider3.setSingleStep(self.eventSliderStepSize(2))
-        self.slider4.setSingleStep(self.eventSliderStepSize(3))
-        # set slider pageStep
-        self.slider1.setPageStep(self.eventSliderPageSize(0))
-        self.slider2.setPageStep(self.eventSliderPageSize(1))
-        self.slider3.setPageStep(self.eventSliderPageSize(2))
-        self.slider4.setPageStep(self.eventSliderPageSize(3))
-        #
-        self.slidersAction.setChecked(True)
-        if changeDefault:
-            if self.qmc.flagstart:
-                self.eventslidersflags[2] = 1
-            elif self.qmc.flagon:
-                self.eventslidersflags[1] = 1
-            else:
-                self.eventslidersflags[0] = 1
+        if any(v != 0 for v in self.eventslidervisibilities) or bool(self.pidcontrol.svSlider):
+            self.sliderDock.setVisible(True)
+            focused_widget = QApplication.focusWidget()
+            if focused_widget and focused_widget != self.centralWidget():
+                focused_widget.clearFocus()
+            self.slider1.setVisible(True)
+            self.slider2.setVisible(True)
+            self.slider3.setVisible(True)
+            self.slider4.setVisible(True)
+            self.sliderSV.setVisible(True)
+            if self.keyboardmoveflag == 0:
+                self.setSliderFocusPolicy(Qt.FocusPolicy.StrongFocus)
+            # set slider singleStep
+            self.slider1.setSingleStep(self.eventSliderStepSize(0))
+            self.slider2.setSingleStep(self.eventSliderStepSize(1))
+            self.slider3.setSingleStep(self.eventSliderStepSize(2))
+            self.slider4.setSingleStep(self.eventSliderStepSize(3))
+            # set slider pageStep
+            self.slider1.setPageStep(self.eventSliderPageSize(0))
+            self.slider2.setPageStep(self.eventSliderPageSize(1))
+            self.slider3.setPageStep(self.eventSliderPageSize(2))
+            self.slider4.setPageStep(self.eventSliderPageSize(3))
+            #
+            self.slidersAction.setChecked(True)
+            if changeDefault:
+                if self.qmc.flagstart:
+                    self.eventslidersflags[2] = 1
+                elif self.qmc.flagon:
+                    self.eventslidersflags[1] = 1
+                else:
+                    self.eventslidersflags[0] = 1
 
     @pyqtSlot()
     @pyqtSlot(bool)
