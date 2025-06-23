@@ -10,15 +10,15 @@ author: Marko Luther
 author_profile: false
 
 gallery:
-  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.1.4/artisan-linux-3.1.4.AppImage
+  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.2.0/artisan-linux-3.2.0.AppImage
     image_path: /assets/images/download-icon-linux-AppImage.png
     alt: "Linux AppImage"
     title: "Linux AppImage"
-  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.1.4/artisan-linux-3.1.4.deb
+  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.2.0/artisan-linux-3.2.0.deb
     image_path: /assets/images/download-icon-linux-deb.png
     alt: "Linux deb"
     title: "Linux deb"
-  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.1.4/artisan-linux-3.1.4.rpm
+  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.2.0/artisan-linux-3.2.0.rpm
     image_path: /assets/images/download-icon-linux-rpm.png
     alt: "Linux rpm"
     title: "Linux rpm"
@@ -33,9 +33,16 @@ release_sponsor:
     alt: "Algrano"
     title: "Algrano"
 
+<!--
+release_sponsor:
+  - url: https://acaia.co
+    image_path: /assets/images/acaia-logo.jpeg
+    alt: "Acaia"
+    title: "Acaia"    
+-->
 ---
 
-[Artisan v3.1.4](https://github.com/artisan-roaster-scope/artisan/releases/tag/v3.1.4)
+[Artisan v3.2.0](https://github.com/artisan-roaster-scope/artisan/releases/tag/v3.2.0)
 {: target="_blank" style="text-align: center; font-weight:bold;"}
 
 {% include gallery id="gallery" %}

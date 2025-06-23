@@ -11,11 +11,11 @@ author_profile: false
 
 
 gallery:
-  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.1.4/artisan-win-x64-3.1.4-setup.exe
+  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.2.0/artisan-win-x64-3.2.0-setup.exe
     image_path: /assets/images/download-icon-windows.png
     alt: "Windows"
     title: "Windows"
-  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.1.4/artisan-mac-3.1.4.dmg
+  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.2.0/artisan-mac-3.2.0.dmg
     image_path: /assets/images/download-icon-macos.png
     alt: "macOS"
     title: "macOS"
@@ -23,25 +23,25 @@ gallery:
     image_path: /assets/images/download-icon-linux.png
     alt: "Linux"
     title: "Linux"
-  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.1.4/artisan-win-x64-legacy-3.1.4-setup.exe
+  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.2.0/artisan-win-x64-legacy-3.2.0-setup.exe
     image_path: /assets/images/download-icon-windows-legacy.png
     alt: "Windows legacy"
     title: "Windows legacy"
-  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.1.4/artisan-mac-legacy-3.1.4.dmg
+  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.2.0/artisan-mac-legacy-3.2.0.dmg
     image_path: /assets/images/download-icon-macos-legacy.png
     alt: "macOS legacy"
     title: "macOS legacy"
-  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.1.4/artisan-linux-3.1.4_PiOS64-bookworm.deb
+  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.2.0/artisan-linux-3.2.0_PiOS64-bookworm.deb
     image_path: /assets/images/download-icon-rpi.png
     alt: "RPi"
     title: "RPi"
 
 
 release_sponsor:
-  - url: https://algrano.com/artisan?utm_source=artisan_blog&utm_medium=referral&utm_campaign=algrano_x_artisan&utm_content=blog
-    image_path: /assets/images/algrano-logo.png
-    alt: "Algrano"
-    title: "Algrano"
+  - url: https://acaia.co
+    image_path: /assets/images/acaia-logo.jpeg
+    alt: "Acaia"
+    title: "Acaia"
 
 ---
 
@@ -51,7 +51,7 @@ release_sponsor:
 
 ![Github Latest Releases](https://img.shields.io/github/downloads/artisan-roaster-scope/artisan/latest/total?logo=github&label=downloads&color=f5f5f5&labelColor=9C9C9C&style=flat){: .align-right}
 
-[Artisan v3.1.4](https://github.com/artisan-roaster-scope/artisan/releases/tag/v3.1.4)
+[Artisan v3.2.0](https://github.com/artisan-roaster-scope/artisan/releases/tag/v3.2.0)
 {: target="_blank" style="text-align: center; font-weight:bold;"}
 
 
