@@ -27,19 +27,13 @@ gallery:
     alt: "Linux Flatpack"
     title: "Linux Flatpack"
 
-release_sponsor:
-  - url: https://algrano.com/
-    image_path: /assets/images/algrano-logo.png
-    alt: "Algrano"
-    title: "Algrano"
 
-<!--
 release_sponsor:
   - url: https://acaia.co
     image_path: /assets/images/acaia-logo.jpeg
     alt: "Acaia"
-    title: "Acaia"    
--->
+    title: "Acaia"
+
 ---
 
 [Artisan v3.2.0](https://github.com/artisan-roaster-scope/artisan/releases/tag/v3.2.0)
