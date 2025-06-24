@@ -1241,6 +1241,10 @@ class tgraphcanvas(FigureCanvas):
         self.title:str = QApplication.translate('Scope Title', 'Roaster Scope')
         self.title_show_always:bool = False
         self.ambientTemp:float = 0.
+        # add humidity and pressure combo box selection
+        self.humiditySource:int = 0 
+        self.pressureSource:int = 0
+
         self.ambientTemp_sampled:float = 0. # keeps the measured ambientTemp over a restart
         self.ambientTempSource:int = 0 # indicates the temperature curve that is used to automatically fill the ambient temperature on DROP
 #                                  # 0 : None; 1 : ET, 2 : BT, 3 : 0xT1, 4 : 0xT2,
@@ -2755,6 +2759,53 @@ class tgraphcanvas(FigureCanvas):
         if res is not None:
             res = float2float(res)
         return res
+
+    #add retrieving humidity from extra values    
+    def updateHumiditySource(self) -> None:
+        res:Optional[float] = None
+        _log.debug('updateHumiditySource()')
+        if self.humiditySource:
+            try:
+                start = 0
+                end = len(self.temp1) - 1
+                if self.timeindex[0] > -1: # CHARGE
+                    start = self.timeindex[0]
+                if self.timeindex[6] > 0: # DROP
+                    end = self.timeindex[6]
+                if (self.humiditySource)%2==0:
+                    res = float(numpy.mean([e for e in self.extratemp2[(self.humiditySource - 3)//2][start:end] if e is not None and e != -1]))
+                else:
+                    res = float(numpy.mean([e for e in self.extratemp1[(self.humiditySource - 3)//2][start:end] if e is not None and e != -1]))
+                _log.debug('updateHumiditySource= %s', res)
+            except Exception as ex: # pylint: disable=broad-except # the array to average over might get empty and mean thus invoking an exception
+                _log.exception(ex)
+        if res is not None and (isinstance(res, (float,int))) and not math.isnan(res):
+            self.ambient_humidity = float2float(float(res))
+            _log.debug('updateHumiditySource exit')
+
+    #add retrieving pressure from extra values    
+    def updatePressureSource(self) -> None:
+        res:Optional[float] = None
+        _log.debug('updatePressureSource()')
+        if self.pressureSource:
+            try:
+                start = 0
+                end = len(self.temp1) - 1
+                if self.timeindex[0] > -1: # CHARGE
+                    start = self.timeindex[0]
+                if self.timeindex[6] > 0: # DROP
+                    end = self.timeindex[6]
+                if (self.pressureSource)%2==0:
+                    res = float(numpy.mean([e for e in self.extratemp2[(self.pressureSource - 3)//2][start:end] if e is not None and e != -1]))
+                else:
+                    res = float(numpy.mean([e for e in self.extratemp1[(self.pressureSource - 3)//2][start:end] if e is not None and e != -1]))
+                _log.debug('updatePressureSource= %s', res)
+            except Exception as ex: # pylint: disable=broad-except # the array to average over might get empty and mean thus invoking an exception
+                _log.exception(ex)
+        if res is not None and (isinstance(res, (float,int))) and not math.isnan(res):
+            self.ambient_pressure = float2float(float(res))
+            _log.debug('updatePressureSource exit')
+
 
     def updateAmbientTempFromPhidgetModulesOrCurve(self) -> None:
         if not self.ambientTempSource:
