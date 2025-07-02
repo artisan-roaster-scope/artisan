@@ -431,6 +431,7 @@ Receives data in the shape of
                             elements.bucket_on_scale.style.top = 'calc(12% - 3vmin)';
                             elements.bucket_on_scale.style.left = 'calc(12% - 3vmin)';
                         }
+                        break;
                     default:
                         break;
                 }
@@ -442,7 +443,7 @@ Receives data in the shape of
                     } else {
                         let perc = (200 - parsedData.total_percent).toFixed(2);
                         if (parsedData.total_percent > 200) {
-                            let perc = '0';
+                            perc = '0';
                         }
                         elements.outer_frame.style.background = `linear-gradient(0deg, ${ABLUE} 0 ${perc}%, ${ARED} ${perc}% 100%)`;
                     }
@@ -459,14 +460,14 @@ Receives data in the shape of
         function processClick() {
             if (parsedData.state === WEIGHING) {
                 openCancelDialog();
-            } else if (ws && ws.readyState === ws.OPEN) {
+            } else if (ws && ws.readyState === WebSocket.OPEN) {
                 ws.send('clicked');
             }
         }
 
         function processDefinitiveClick(returnValue) {
             console.log(`Dialog, click = ${returnValue}`);
-            if (returnValue === 'cancel' && ws.readyState === ws.OPEN) {
+            if (returnValue === 'cancel' && ws.readyState === WebSocket.OPEN) {
                 ws.send('cancelled');
             }
         }
@@ -1035,8 +1036,10 @@ Receives data in the shape of
             overflow: hidden;
             width: 100%;
             height: 100%;
-            margin-left: -0.25vmin;
-            margin-top: -0.25vmin;
+            margin-left: 0;
+            margin-top: 0;
+            border: none;
+            border-radius: 7%;
         }
 
         .zoom {

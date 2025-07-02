@@ -401,6 +401,7 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
             return None, False
 
     def update_weight(self, value:Optional[float], stable:Optional[bool] = False) -> None:
+#        _log.debug('PRINT update_weight(%s,%s)', value, stable)
         if value is not None and (not self.stable_only or stable):
             # convert the weight in g delivered with one decimals to an int
             value_rounded:float = float2float(value, self.decimals)
@@ -738,8 +739,8 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
         if SCALE_CLASS.RELAY:
             self.streaming_notifications()
         self.send_message(MSG.TARE,b'\x00')
-        if SCALE_CLASS.RELAY:
-            self.changes_notifications()
+#        if SCALE_CLASS.RELAY:
+#            self.changes_notifications()
 
     def send_get_settings(self) -> None:
         _log.debug('send get settings')
@@ -788,7 +789,7 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
         self.send_event(
             bytes([ # pairs of key/setting
                     0,  # weight id
-                    (0 if SCALE_CLASS.RELAY # 0: only weight changes are reported; 1: streaming weight changes at 1/10
+                    (1 if SCALE_CLASS.RELAY # 0: only weight changes are reported; 1: streaming weight changes at 1/10
                      else 3), # 0, 1, 3, 5, 7, 15, 31, 63, 127  # weight argument (speed of notifications in 1/10 sec; 0:  report changes in weight every 1/10)
                         # 5 or 7 seems to be good values for this app in Artisan
 #                    1,   # battery id

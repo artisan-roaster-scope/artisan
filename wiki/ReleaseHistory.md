@@ -2,6 +2,21 @@ Detailed Release History
 ========================
 
 ----
+v3.2.1
+------------------
+
+* ADDITIONS
+  - adds drag-drop import of a Cropster XLS profile
+* CHANGES
+  - updated Spanish localizations (thanks to ??)
+  - updates libs (scipy, bleak, lxml, pillow)
+* FIXES
+  - fixes regression which broke the designer such that points could not be moved ([Discussion #1905](../../../discussions/1905))
+  - fixes support for second scale
+  - fixes rendering of special characters like quotes in task displays
+  - fixes regression which broke the import of roast profiles exported from Cropster, Giesen, IKAWA, Loring, Petroncini, RoastLog, RoastPath, ROEST, Rubasse, and Stronghold
+
+----
 v3.2.0 (June 23, 2025)
 ------------------
 

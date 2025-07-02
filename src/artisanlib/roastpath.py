@@ -15,7 +15,6 @@ from typing import Final, TypedDict, Optional, List, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
-    from artisanlib.atypes import ProfileData # pylint: disable=unused-import
     from PyQt6.QtCore import QUrl # pylint: disable=unused-import
 
 try:
@@ -24,6 +23,7 @@ except ImportError:
     from PyQt5.QtCore import QDateTime, Qt # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib.util import encodeLocal
+from artisanlib.atypes import ProfileData
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -54,7 +54,7 @@ class RoastPathData(TypedDict, total=False):
     drumData: List[RoastPathDataItem]
 
 # returns a dict containing all profile information contained in the given RoastPATH document pointed by the given QUrl
-def extractProfileRoastPathHTML(url:'QUrl', _:'ApplicationWindow') -> Optional['ProfileData']:
+def extractProfileRoastPathHTML(url:'QUrl', _:'ApplicationWindow') -> Optional[ProfileData]:
     res:ProfileData = ProfileData() # the interpreted data set
     try:
         sess = requests.Session()

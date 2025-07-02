@@ -1140,7 +1140,9 @@ class tgraphcanvas(FigureCanvas):
 
         self.ax:Optional[Axes]
         self.ax = self.fig.add_subplot(111,facecolor=self.palette['background'])
-        self.delta_ax:Optional[_AxesBase] = self.ax.twinx()
+        self.delta_ax:Optional[_AxesBase] = None
+        if self.ax is not None:
+            self.delta_ax = self.ax.twinx()
 
         #legend location
         self.legendloc:int = 7
@@ -1919,8 +1921,9 @@ class tgraphcanvas(FigureCanvas):
         self.ystep_down:int = 0
         self.ystep_up:int = 0
 
-        self.ax.set_xlim(self.startofx, self.endofx)
-        self.ax.set_ylim(self.ylimit_min,self.ylimit)
+        if self.ax is not None:
+            self.ax.set_xlim(self.startofx, self.endofx)
+            self.ax.set_ylim(self.ylimit_min,self.ylimit)
 
         if self.delta_ax is not None:
             self.delta_ax.set_xlim(self.startofx, self.endofx)
@@ -1928,7 +1931,8 @@ class tgraphcanvas(FigureCanvas):
             self.delta_ax.set_autoscale_on(False)
 
         # disable figure autoscale
-        self.ax.set_autoscale_on(False)
+        if self.ax is not None:
+            self.ax.set_autoscale_on(False)
 
         #set grid + axis labels + title
         grid_axis:Optional[str] = None
@@ -5834,7 +5838,7 @@ class tgraphcanvas(FigureCanvas):
     @staticmethod
     def lists2AlarmSet(l:List[Any]) -> 'AlarmSet':
         if len(l) == tgraphcanvas.ALARMSET_ITEMS:
-            return tgraphcanvas.makeAlarmSet(*l)
+            return tgraphcanvas.makeAlarmSet(*l) # ty:ignore[missing-argument]
         return tgraphcanvas.emptyAlarmSet()
 
     @staticmethod
@@ -8071,7 +8075,7 @@ class tgraphcanvas(FigureCanvas):
                     result:List[float] = []
                     # ignore -1 readings in averaging and ensure a good ramp
                     for i, v in enumerate(b): # ty: ignore[invalid-argument-type]
-                        seq = b[max(0,i-window_len + 1):i+1] # ty: ignore[possibly-unbound-implicit-call]
+                        seq = b[max(0,i-window_len + 1):i+1] # ty: ignore[possibly-unbound-implicit-call, non-subscriptable]
                         w = decay_weights_internal[max(0,window_len-len(seq)):]  # preCond: len(decay_weights_internal)=window_len and len(seq) <= window_len; postCond: len(w)=len(seq)
                         if len(w) == 0:
                             # we don't average if there is are no weights (e.g. if the original seq did only contain -1 values and got empty)
@@ -17801,11 +17805,11 @@ class tgraphcanvas(FigureCanvas):
             if event_ind is not None:
                 if isinstance(event_ind, int):
                     self.indexpoint = event_ind
-                elif isinstance(event_ind, list):
+                elif isinstance(event_ind, (list, numpy.ndarray)):
                     N = len(event_ind)
                     if not N:
                         return
-                    self.indexpoint = event_ind[0]
+                    self.indexpoint = int(event_ind[0])
                 else:
                     return
         else:

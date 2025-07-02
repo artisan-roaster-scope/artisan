@@ -446,6 +446,11 @@ class Artisan(QtSingleApplication):
                 elif file_suffix == 'apal' and aw.app is not None and not aw.app.artisanviewerMode:
                     # load Artisan palettes on double-click on *.apal file
                     aw.loadPalettesSignal.emit(filename)
+                elif file_suffix == 'xls' and aw.app is not None and not aw.app.artisanviewerMode and aw.comparator is None:
+                    # import Cropster XLS profile
+                    from artisanlib.cropster import extractProfileCropsterXLS
+                    aw.importExternal(extractProfileCropsterXLS, QApplication.translate('Message','Import Cropster XLS'),'*.xls',filename)
+
 
         elif platform.system() == 'Windows' and not self.artisanviewerMode:
             msg = url.toString()  #here we don't want a local file, preserve the windows file:///
@@ -4813,11 +4818,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             mimeData = event.mimeData()
             if mimeData is not None:
                 urls = mimeData.urls()
-                if urls and len(urls)>0:
-                    self.app.open_url(urls[0])
+                try:
+                    if urls and len(urls)>0:
+                        self.app.open_url(urls[0])
                     if self.comparator is not None:
                         for url in urls[0:]:
                             self.app.open_url(url)
+                except Exception as e:
+                    _log.exception(e)
 
     def showHelpDialog(self, parent:QWidget, dialog:Optional[HelpDlg], title:str, content:str) -> Optional[HelpDlg]:
         try: # sip not supported on older PyQt versions (RPi!)
@@ -15705,7 +15713,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             if 'roastdate' in profile:
                 try:
                     date = QDate.fromString(decodeLocalStrict(profile['roastdate']))
-                    if not date.isValid():
+                    if not date.isValid(): # ty:ignore[no-matching-overload]
                         date = QDate.currentDate()
                     if 'roasttime' in profile:
                         try:
@@ -15721,12 +15729,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             if 'roastisodate' in profile:
                 try:
                     date = QDate.fromString(decodeLocalStrict(profile['roastisodate']),Qt.DateFormat.ISODate)
-                    if not date.isValid():
+                    if not date.isValid(): # ty:ignore[no-matching-overload]
                         date = QDate.currentDate()
                     if 'roasttime' in profile:
                         try:
                             time = QTime.fromString(decodeLocalStrict(profile['roasttime']))
-                            if not time.isValid():
+                            if not time.isValid(): # ty:ignore[no-matching-overload]
                                 time = QTime().currentTime()
                             self.qmc.roastdate = QDateTime(date,time)
                         except Exception: # pylint: disable=broad-except
@@ -22956,7 +22964,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 except ImportError:
                     from PyQt5.QtCore import QMarginsF # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
                     from PyQt5.QtGui import QPageSize  # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-                if QPrinter().pageLayout().pageSize().id() == QPageSize.PageSizeId.Letter:
+                if QPrinter().pageLayout().pageSize().id() == QPageSize.PageSizeId.Letter: # ty:ignore[no-matching-overload]
                     # Letter
                     ps = QPageSize(QPageSize.PageSizeId.Letter)
                     pu = QPageLayout.Unit.Inch
@@ -25472,9 +25480,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             _, _, exc_tb = sys.exc_info()
             self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' {1} {0}').format(str(ex),message),getattr(exc_tb, 'tb_lineno', '?'))
 
-    def importExternal(self, extractor: Callable[[str, 'ApplicationWindow'], 'ProfileData'], message:str, extension:str) -> None:
+    def importExternal(self, extractor: Callable[[str, 'ApplicationWindow'], 'ProfileData'], message:str, extension:str, filename:Optional[str] = None) -> None:
         try:
-            filename = self.ArtisanOpenFileDialog(msg=message,ext=extension)
+            if filename is None:
+                filename = self.ArtisanOpenFileDialog(msg=message,ext=extension)
             if len(filename) == 0:
                 return
             res = self.qmc.reset(redraw=False,soundOn=False)
@@ -26907,7 +26916,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         else:
                             toff = 0
                     else:
-                        x_range = list(range(int(self.qmc.startofx),int(self.qmc.endofx)))
+                        x_range = list(range(int(self.qmc.startofx),int(self.qmc.endofx))) # ty:ignore[invalid-assignment] # Object of type `list[int]` is not assignable to `list[int | float]`
                         toff = 0
                     #create y range
                     y_range:List[float] = []

@@ -370,6 +370,9 @@ ignore-words-list = 'Abd,ser,alog,nd,iterm,dout,te,commandi,dout,exitt,currenty,
 #possibly-unbound-attribute = "error"
 #possibly-unbound-import = "error"
 
+
+## pyrefly conf
+
 [tool.pyrefly]
 project_includes = [
     "artisanlib/*.py",
@@ -390,3 +393,7 @@ replace_imports_with_any = [
     "libusb_package.*",
     "uic.*",
 ]
+
+[tool.pyrefly.errors]
+missing-attribute = false   # does not understand PyQt connect/disconnect methods
+invalid-inheritance = false # does not understand PyQt inheritance

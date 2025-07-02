@@ -1479,13 +1479,13 @@ class editGraphDlg(ArtisanResizeablDialog):
                         name = 'Acaia',
                         connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('Acaia'),True,None),
                         disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('Acaia'),True,None))
-                    self.acaia.weight_changed_signal.connect(self.ble_weight_changed)
-                    self.acaia.battery_changed_signal.connect(self.ble_battery_changed)
-                    self.acaia.disconnected_signal.connect(self.ble_disconnected)
-                    # start BLE loop
-                    self.acaia.connect_scale()
-
-                    self.updateWeightLCD('----')
+                    if self.acaia is not None:
+                        self.acaia.weight_changed_signal.connect(self.ble_weight_changed)
+                        self.acaia.battery_changed_signal.connect(self.ble_battery_changed)
+                        self.acaia.disconnected_signal.connect(self.ble_disconnected)
+                        # start BLE loop
+                        self.acaia.connect_scale()
+                        self.updateWeightLCD('----')
                 except Exception as e:  # pylint: disable=broad-except
                     _log.exception(e)
             elif self.aw.scale.device in {'KERN NDE','Shore 930'}:

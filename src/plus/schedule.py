@@ -221,8 +221,8 @@ class ScheduledItem(BaseModel):
     title: str
     coffee: Optional[str] = Field(default=None)      # None or coffee hr_id
     blend: Optional[str] = Field(default=None)       # None or blend hr_id
-    store: str = Field(..., alias='location')
-    weight: float = Field(..., alias='amount')       # batch size in kg
+    store: str = Field(..., alias='location')            # pyrefly: ignore
+    weight: float = Field(..., alias='amount')       # batch size in kg # pyrefly: ignore
     loss: float = default_loss                       # default loss based calculated by magic on the server in % (if not given defaults to 15%)
     machine: Optional[str] = Field(default=None)
     user: Optional[str] = Field(default=None)
@@ -231,7 +231,7 @@ class ScheduledItem(BaseModel):
     note: Optional[str] = Field(default=None)
     roasts: Set[UUID4] = Field(default=set())        # note that this generates UUID objects. To get a UUID string without dashes use uuid.hex.
 
-    @field_validator('*', mode='before')
+    @field_validator('*', mode='before') # pyrefly: ignore
     def remove_blank_strings(cls: BaseModel, v: Optional[str]) -> Optional[str]:   # pylint: disable=no-self-argument,no-self-use
         """Removes whitespace characters and return None if empty"""
         if isinstance(v, str):
@@ -476,10 +476,10 @@ def get_all_completed() -> List[CompletedItemDict]:
         return completed_roasts_cache
     except Exception as e:  # pylint: disable=broad-except
         _log.error(e)
-        return []
     finally:
         if completed_roasts_semaphore.available() < 1:
             completed_roasts_semaphore.release(1)
+    return []
 
 
 # add the given CompletedItemDict if it contains a roastUUID which does not occurs yet in the completed_roasts_cache
@@ -834,12 +834,12 @@ def scheduleditem_beans_descriptions(weight_unit_idx:int, item:ScheduledItem) ->
         blends = plus.stock.getBlends(weight_unit_idx, item.store)
         blend = next((b for b in blends if plus.stock.getBlendId(b) == item.blend and plus.stock.getBlendStockDict(b)['location_hr_id'] == item.store), None)
         if blend is not None:
-            return plus.stock.blend2ratio_beans(blend, item.weight)
+            return plus.stock.blend2ratio_beans(blend, item.weight, html_escape=False)
     item_coffee = item.coffee
     if item_coffee is not None:
         coffee = plus.stock.getCoffee(item_coffee)
         if coffee is not None:
-            return None, [(1,html.escape(plus.stock.coffeeLabel(coffee)))]
+            return None, [(1,plus.stock.coffeeLabel(coffee))]
     return None, []
 
 def scheduleditem_beans_description(weight_unit_idx:int, item:ScheduledItem) -> str:
@@ -922,12 +922,12 @@ def locale_format_date_no_year(locale:str, date:datetime.date) -> str:
 
 #--------
 
-class QLabelRight(QLabel): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+class QLabelRight(QLabel): # pyright: ignore [reportGeneralTypeIssues] # pyrefly: ignore # Argument to class must be a base class
     ...
 
 
 ##### https://stackoverflow.com/questions/11446478/pyside-pyqt-truncate-text-in-qlabel-based-on-minimumsize
-class QElidedLabel(QLabel): # pyright: ignore[reportGeneralTypeIssues] # Argument to class must be a base class
+class QElidedLabel(QLabel): # pyright: ignore[reportGeneralTypeIssues] # pyrefly: ignore # Argument to class must be a base class
     """Label with text elision.
 
     QLabel which will elide text too long to fit the widget.  Based on:
@@ -1008,9 +1008,9 @@ class QElidedLabel(QLabel): # pyright: ignore[reportGeneralTypeIssues] # Argumen
 
 
 
-class DragTargetIndicator(QFrame): # pyright: ignore[reportGeneralTypeIssues] # Argument to class must be a base class
+class DragTargetIndicator(QFrame): # pyright: ignore[reportGeneralTypeIssues] # pyrefly: ignore # Argument to class must be a base class
     def __init__(self, parent:Optional[QWidget] = None) -> None:
-        super().__init__(parent)
+        super().__init__(parent) # pyrefly: ignore
         layout = QHBoxLayout()
         layout.addWidget(QLabel())
         layout.setSpacing(0)
@@ -1021,7 +1021,7 @@ class DragTargetIndicator(QFrame): # pyright: ignore[reportGeneralTypeIssues] # 
 
 
 
-class StandardItem(QFrame): # pyright: ignore[reportGeneralTypeIssues] # Argument to class must be a base class
+class StandardItem(QFrame): # pyright: ignore[reportGeneralTypeIssues] # pyrefly: ignore # Argument to class must be a base class
 
     clicked = pyqtSignal()
     selected = pyqtSignal()
@@ -1038,7 +1038,7 @@ class StandardItem(QFrame): # pyright: ignore[reportGeneralTypeIssues] # Argumen
             layout.addSpacing(2)
         self.second_label = QElidedLabel(self.getMiddle())
         layout.addWidget(self.second_label)
-        self.third_label = QLabelRight(self.getRight())
+        self.third_label = QLabelRight(self.getRight()) # pyrefly: ignore
         layout.addWidget(self.third_label)
         layout.setSpacing(5)
         layout.setContentsMargins(5,5,5,5)
@@ -1385,7 +1385,7 @@ class DragItem(StandardItem):
             if (self.aw.schedule_window is not None and (self.aw.schedule_window.weight_manager.sm_green.current_weight_item is None or
                 (self.aw.schedule_window.weight_manager.sm_green.current_weight_item and
                 (self.aw.schedule_window.weight_manager.sm_green.current_weight_item.uuid != self.data.id or
-                    self.aw.schedule_window.weight_manager.green_task_scale  == 0)))): # no scaled assigned to the green task, thus not processing
+                    self.aw.schedule_window.weight_manager.green_task_scale == 0)))): # no scaled assigned to the green task, thus not processing
                 # this schedule item is not currently under processing by the weight manager
                 if not fully_prepared_p:
                     allPreparedAction:QAction = QAction(QApplication.translate('Contextual Menu', 'All batches prepared'),self)
@@ -1496,11 +1496,11 @@ class DragItem(StandardItem):
 
 
 
-class BaseWidget(QWidget): # pyright: ignore[reportGeneralTypeIssues] # Argument to class must be a base class
+class BaseWidget(QWidget): # pyright: ignore[reportGeneralTypeIssues] # pyrefly: ignore # Argument to class must be a base class
     """Widget list
     """
     def __init__(self, parent:Optional[QWidget] = None, orientation:Qt.Orientation = Qt.Orientation.Vertical) -> None:
-        super().__init__(parent)
+        super().__init__(parent) # pyrefly: ignore
         # Store the orientation for drag checks later.
         self.orientation = orientation
         self.blayout:QBoxLayout
@@ -1880,7 +1880,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.roasted_weight.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.roasted_weight.editingFinished.connect(self.roasted_weight_changed)
         self.roasted_weight.receivedFocus.connect(self.roasted_weight_selected)
-        self.roasted_weight_suffix = ClickableQLabel(weight_unit_str)
+        self.roasted_weight_suffix = ClickableQLabel(weight_unit_str)  # pyrefly: ignore
 
         # calculate unit label max_width
         font = self.roasted_weight_suffix.font()
@@ -1901,7 +1901,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.roasted_yield.setValidator(self.aw.createCLocaleDoubleValidator(0., 9999999., 4, self.roasted_yield, ''))
         self.roasted_yield.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.roasted_yield.editingFinished.connect(self.roasted_yield_changed)
-        self.roasted_yield_suffix = ClickableQLabel(weight_unit_str)
+        self.roasted_yield_suffix = ClickableQLabel(weight_unit_str)  # pyrefly: ignore
         self.roasted_yield_suffix.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         self.roasted_yield_suffix.setFixedWidth(weight_suffix_width)
         self.roasted_yield_suffix.setAlignment (Qt.AlignmentFlag.AlignLeft)
@@ -1911,7 +1911,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.roasted_defects.setValidator(self.aw.createCLocaleDoubleValidator(0., 9999999., 4, self.roasted_defects, ''))
         self.roasted_defects.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.roasted_defects.editingFinished.connect(self.defects_weight_changed)
-        self.roasted_defects_suffix = ClickableQLabel(weight_unit_str)
+        self.roasted_defects_suffix = ClickableQLabel(weight_unit_str) # pyrefly: ignore
         self.roasted_defects_suffix.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         self.roasted_defects_suffix.setFixedWidth(weight_suffix_width)
         self.roasted_defects_suffix.setAlignment (Qt.AlignmentFlag.AlignLeft)
@@ -2454,7 +2454,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         else:
             roasted_weight_txt = self.roasted_weight.text().strip()
             roasted_weight = (0 if roasted_weight_txt == '' else float(roasted_weight_txt))
-            roasted_yield = max(0,min(roasted_yield,roasted_weight))
+            roasted_yield = max(0.0,min(roasted_yield,roasted_weight))
             defects = roasted_weight - roasted_yield
         if 0 < roasted_yield < roasted_weight:
             self.roasted_yield.setText(f'{float2floatWeightVolume(roasted_yield):g}')
@@ -2472,11 +2472,11 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
             defects_txt = comma2dot(text)
             defects = float(defects_txt)
         roasted_weight_txt = self.roasted_weight.text().strip()
-        defects = max(0,defects)
+        defects = max(0.0,defects)
         roasted_weight = (0 if roasted_weight_txt == '' else float(roasted_weight_txt))
         if self.aw.qmc.weight[2] == 'Kg' and roasted_weight > 0 and defects > roasted_weight/2:
             defects = convertWeight(defects,0,1)
-        defects = max(0,min(defects,roasted_weight))
+        defects = max(0.0,min(defects,roasted_weight))
         if 0 < defects < roasted_weight:
             roasted_yield = roasted_weight - defects
             self.roasted_yield.setText(f'{float2floatWeightVolume(roasted_yield):g}')
@@ -2703,7 +2703,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
             except Exception:  # pylint: disable=broad-except
                 pass # validation fails for outdated items
         # update the list of schedule items to be displayed
-        self.scheduled_items = current_schedule
+        self.scheduled_items = list(current_schedule)
 
     @staticmethod
     def getCompletedItems() -> List[CompletedItem]:
@@ -3867,6 +3867,8 @@ class GreenWebDisplay(GreenDisplay):
 
     # component indicates which of the item.descriptions is currently processed
     def show_item(self, item:'WeightItem', state:PROCESS_STATE = PROCESS_STATE.DISCONNECTED, component:int = 0) -> None:
+
+        _log.debug('PRINT show_item: %s',item)
 
         if (isinstance(item, GreenWeightItem) and
             (item != self.last_item or self.last_process_state != state or self.last_component != component)):

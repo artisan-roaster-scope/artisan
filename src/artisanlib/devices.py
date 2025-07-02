@@ -1576,6 +1576,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.scale2EditButton.setEnabled(False)
                 else:
                     self.scale2NameComboBox.setEnabled(True)
+                    self.scale2EditButton.setEnabled(True)
             self.scale2ModelComboBox.currentIndexChanged.connect(self.scale2ModelChanged)
             self.scale2NameComboBox.currentIndexChanged.connect(self.scale2NameChanged)
             self.scale2ScanButton.clicked.connect(self.scanScale2)
@@ -2025,7 +2026,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.aw.scale2_id = self.scale2_devices[i][1]
             self.aw.scale_manager.set_scale2_signal.emit(self.aw.scale2_model, self.aw.scale2_id, self.aw.scale2_name)
             self.aw.scale_manager.connect_scale2_signal.emit()
-        # i == -1 if self.scale1NameComboBox is empty!
+        # i == -1 if self.scale2NameComboBox is empty!
         else:
             self.aw.scale_manager.set_scale2_signal.emit(-1, '', '')
 

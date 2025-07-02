@@ -93,7 +93,7 @@ class RoastProfile:
         self.aligned:bool = True # if the profile could not be aligned it is not drawn
         self.active:bool = True # if selected or all are unselected; active profiles are drawn in color, inactive profiles in gray
         self.color:Tuple[float, float, float, float] = color
-        hslf:Tuple[Optional[float], Optional[float], Optional[float], Optional[float]] = QColor.fromRgbF(*color).getHslF()
+        hslf:Tuple[Optional[float], Optional[float], Optional[float], Optional[float]] = QColor.fromRgbF(*color).getHslF() # ty:ignore[missing-argument]
         self.gray:Tuple[float, float, float, float]
         ch:Optional[float] = hslf[0]
         cl:Optional[float] = hslf[2]
@@ -278,7 +278,7 @@ class RoastProfile:
                 roastdate_str:Optional[str] = decodeLocal(profile['roastdate'])
                 if roastdate_str is not None:
                     date = QDate.fromString(roastdate_str)
-                    if not date.isValid():
+                    if not date.isValid(): # ty:ignore[no-matching-overload]
                         date = QDate.currentDate()
                 else:
                     date = QDate.currentDate()
@@ -1460,7 +1460,7 @@ class roastCompareDlg(ArtisanDialog):
 
     def setProfileTableRow(self, i:int) -> None:
         profile = self.profiles[i]
-        c = QColor.fromRgbF(*profile.color)
+        c = QColor.fromRgbF(*profile.color)  # ty:ignore[missing-argument]
         color = QTableWidgetItem()
         color.setBackground(c)
         color.setFlags(Qt.ItemFlag.ItemIsEnabled) # do not change background color on row selection of the color items
@@ -1889,9 +1889,9 @@ class roastCompareDlg(ArtisanDialog):
             w = self.profileTable.item(i,0)
             if w is not None:
                 if p.active:
-                    c = QColor.fromRgbF(*p.color)
+                    c = QColor.fromRgbF(*p.color) # ty:ignore[missing-argument]
                 else:
-                    c = QColor.fromRgbF(*p.gray)
+                    c = QColor.fromRgbF(*p.gray)  # ty:ignore[missing-argument]
                 w.setBackground(c)
         self.aw.qpc.update_phases(self.getPhasesData())
 
@@ -2078,7 +2078,7 @@ class roastCompareDlg(ArtisanDialog):
                 p1:float = dry
                 p3:float = total - fcs if fcs != 0 else 0
                 p2:float = total - p1 - p3 if p1 != 0 and p3 != 0 else 0
-                c:QColor = QColor.fromRgbF(*p.color)
+                c:QColor = QColor.fromRgbF(*p.color) # ty:ignore[missing-argument]
                 data.append((p.label, total, (p1, p2, p3), p.active, p.aligned, c.name()))
         return data
 

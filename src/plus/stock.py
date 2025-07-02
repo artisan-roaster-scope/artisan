@@ -181,7 +181,7 @@ def has_duplicate_origin_label(c:Coffee) -> bool:
 worker:Optional['Worker'] = None
 worker_thread:Optional[QThread] = None
 
-class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # pyrefly: ignore # Argument to class must be a base class
     startSignal = pyqtSignal(bool)
     replySignal = pyqtSignal(float, float, str, int, list) # rlimit:float, rused:float, pu:str, notifications:int, machines:List[str]
     updatedSignal = pyqtSignal()  # issued once the stock was updated
@@ -270,7 +270,7 @@ class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # Argument to
                     try:
                         stock_semaphore.acquire(1)
                         if stock is not None:
-                            stock['retrieved'] = time.time() # ty: ignore[possibly-unbound-implicit-call]
+                            stock['retrieved'] = time.time() # ty: ignore[possibly-unbound-implicit-call, non-subscriptable]
                         _log.debug('-> retrieved time updated')
                     finally:
                         if stock_semaphore.available() < 1:
@@ -799,10 +799,11 @@ def getCoffeeStore(coffeeId:str, storeId:str, acquire_lock:bool = True) -> Tuple
         return None, None
     except Exception:  # pylint: disable=broad-except
         # we end up here if there is no stock available
-        return None, None
+        pass
     finally:
         if acquire_lock and stock_semaphore.available() < 1:
             stock_semaphore.release(1)
+    return None, None
 
 
 # ==================
@@ -1054,7 +1055,7 @@ def getBlendLabels(blends:List[BlendStructure]) -> List[str]:
 
 # weightIn is in kg. Weights are rendered in weight_unit_idx
 # respects replacement beans
-def blend2ratio_beans(blend:BlendStructure, weightIn:float) -> Tuple[Optional[str], List[Tuple[float,str]]]:
+def blend2ratio_beans(blend:BlendStructure, weightIn:float, html_escape:Optional[bool] = True) -> Tuple[Optional[str], List[Tuple[float,str]]]:
     blend_name:Optional[str] = None
     res:List[Tuple[float,str]] = []
     try:
@@ -1065,7 +1066,7 @@ def blend2ratio_beans(blend:BlendStructure, weightIn:float) -> Tuple[Optional[st
         for i in sorted_ingredients:
             c = getCoffee(i['coffee'])
             c_label = (i.get('label', '') if c is None else coffeeLabel(c))
-            res.append((i['ratio'], html.escape(c_label)))
+            res.append((i['ratio'], (html.escape(c_label) if html_escape else c_label)))
         blend_name = blends.get('label', None)
     except Exception as e:  # pylint: disable=broad-except
         _log.exception(e)
@@ -1670,10 +1671,10 @@ def getBlends(weight_unit_idx:int, store:Optional[str] = None, customBlend:Optio
         return []
     except Exception as e:  # pylint: disable=broad-except
         _log.exception(e)
-        return []
     finally:
         if stock_semaphore.available() < 1:
             stock_semaphore.release(1)
+    return []
 
 
 # returns True if blendSpec of the form

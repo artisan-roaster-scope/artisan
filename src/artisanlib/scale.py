@@ -423,7 +423,7 @@ class ScaleManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error: 
     @pyqtSlot()
     def scale2_stable_reading_timer_slot(self) -> None:
         if self.scale2_last_weight is not None:
-            self.scale2_stable_weight_changed_signal.emit(self.scale1_last_weight)
+            self.scale2_stable_weight_changed_signal.emit(self.scale2_last_weight)
 
 #--
 
