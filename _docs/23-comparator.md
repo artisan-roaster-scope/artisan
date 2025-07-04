@@ -2,7 +2,7 @@
 title: "Roast Comparator"
 permalink: /docs/comparator/
 excerpt: ""
-last_modified_at: 2020-04-29T15:59:00-04:00
+last_modified_at: 2025-07-04T15:59:00-04:00
 toc: false
 author: Michael Herbert
 author_profile: true
