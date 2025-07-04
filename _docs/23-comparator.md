@@ -29,6 +29,10 @@ serves to make temporary notes.
 
 The two dropdown boxes on top of the tool window are used choose the curves to be displayed per profile and the dropdown on the next line specifies the event used to align the profiles to each other on the time axis. The order of profiles can be changed via drag-and-drop by grabbing the entries via their row headers.
 
+**Extra Devices**
+Originally only the BT and ET curves were available but now extra devices can be seen on the Comparator as well. 
+![Comparator Extra Devices](/assets/images/gsg/ComparatorExdv.gif)
+
 **Tool Window**
 
 Events are rendered by small round markers on the main temperature curve of a profile (either bean temperature, BT, or environmental temperature, ET). A click on such a mark shows type, time and temperature of that event in the message line. Only one custom event type (e.g., gas or air) can be rendered as plain step line at the bottom of the window.
