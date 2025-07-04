@@ -41,4 +41,5 @@ For a slightly more detailed discussion see the [Artisan Blog post](https://arti
 
 **Phases**
 
-With a small handle at the bottom of the window  you can pull up to open the view of the phases timing and percentages.
+With a small handle at the bottom of the window  you can pull up to open the view of the phases timing and percentages. 
+![Comparator Phases](/assets/images/gsg/Comparatorphases.gif)
