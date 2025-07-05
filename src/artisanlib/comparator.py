@@ -434,9 +434,9 @@ class RoastProfile:
         self.events_timex = []
         if self.stemp1 is not None and self.stemp2 is not None:
             for ti in self.timeindex[:-1]:
-                temp1 = self.stemp1[ti]
-                temp2 = self.stemp2[ti]
-                if ((len(self.events1) == 0 and ti != -1) or ti > 0):
+                temp1:Optional[float] = (self.stemp1[ti] if len(self.stemp1)>ti else None) # pyrefly: ignore
+                temp2:Optional[float] = (self.stemp2[ti] if len(self.stemp2)>ti else None) # pyrefly: ignore
+                if ((len(self.events1) == 0 and ti != -1) or ti > 0): # pyrefly: ignore[bad-argument-type]
                     self.events1.append(temp1)
                     self.events2.append(temp2)
                     self.events_timex.append(self.timex[ti])
@@ -463,12 +463,15 @@ class RoastProfile:
             self.E3 = []
             self.E4 = []
 
-            last_E1, last_E2, last_E3, last_E4 = None, None, None, None
+            last_E1:Optional[float] = None
+            last_E2:Optional[float] = None
+            last_E3:Optional[float] = None
+            last_E4:Optional[float] = None
             for i,e in enumerate(self.specialevents):
                 try:
-                    etime = self.timex[e]
-                    etype = self.specialeventstype[i]
-                    evalue:float = self.aw.qmc.eventsInternal2ExternalValue(self.specialeventsvalue[i]) * value_factor + value_offset
+                    etime:float = self.timex[e]
+                    etype:float = self.specialeventstype[i]  # pyrefly: ignore[bad-specialization]
+                    evalue:float = self.aw.qmc.eventsInternal2ExternalValue(self.specialeventsvalue[i]) * value_factor + value_offset # pyrefly: ignore[bad-specialization]
                     # remember last event value per type before CHARGE
                     if (not self.aw.qmc.compareBBP and self.timeindex[0] != -1 and e < self.timeindex[0]):
                         if etype == 0:
@@ -1810,7 +1813,7 @@ class roastCompareDlg(ArtisanDialog):
     def updateAlignMenu(self, top:Optional[RoastProfile]) -> None:
         if top is not None:
             model = self.alignComboBox.model()
-            assert isinstance(model, QStandardItemModel)
+            assert isinstance(model, QStandardItemModel) # pyrefly: ignore[invalid-argument]
             for i in range(model.rowCount()):
                 item: Optional[QStandardItem] = model.item(i)
                 if item is not None:

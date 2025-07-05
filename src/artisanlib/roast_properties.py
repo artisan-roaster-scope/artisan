@@ -492,7 +492,7 @@ class volumeCalculatorDlg(ArtisanDialog):
 
 class RoastsComboBox(QComboBox): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     def __init__(self, parent:QWidget, aw:'ApplicationWindow', selection:Optional[str] = None) -> None:
-        super().__init__(parent)
+        super().__init__(parent) # pyrefly: ignore[bad-argument-type]
         self.aw:ApplicationWindow = aw
         self.installEventFilter(self)
         self.selection:Optional[str] = selection # just the roast title
@@ -635,6 +635,32 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.template_uuid:Optional[str] = None
         self.template_batchnr:Optional[int] = None
         self.template_batchprefix:Optional[str] = None
+
+        # energy variables (explicitly define constructors)
+        self.curvenames:List[str] = []
+        self.org_gasMix:int = 0
+        self.org_electricEnergyMix:int = 0
+        self.org_betweenbatch_after_preheat:bool = True
+        self.org_coolingenergies:List[float] = [0.0]*4
+        self.org_coolingDuration:int = 0
+        self.org_betweenbatchenergies:List[float] = [0.0]*4
+        self.org_betweenbatchDuration:int = 0
+        self.org_preheatenergies:List[float] = [0.0]*4
+        self.org_preheatDuration:int = 0
+        self.org_metersources:List[int] = [0]*2
+        self.org_meterfuels:List[int] = [2]*2
+        self.org_meterunits:List[int] = [3]*2
+        self.org_meterlabels:List[str] = ['']*2
+        self.org_loadevent_hundpcts:List[int] = [100]*4
+        self.org_loadevent_zeropcts:List[int] = [0]*4
+        self.org_presssure_percents:List[bool] = [False]*4
+        self.org_load_etypes:List[int] = [0]*4
+        self.org_sourcetypes:List[int] = [0]*4
+        self.org_ratingunits:List[int] = [0]*4
+        self.org_loadratings:List[float] = [0.0]*4
+        self.org_loadlabels:List[str] = ['']*4
+        self.btu_list:List[BTU] = []
+        self.energy_ui:Any = None
 
         regextime = QRegularExpression(r'^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$')
         #MARKERS
@@ -863,6 +889,11 @@ class editGraphDlg(ArtisanResizeablDialog):
         batchlabel = ClickableQLabel('<b>' + QApplication.translate('Label', 'Batch') + '</b>')
         batchlabel.right_clicked.connect(self.enableBatchEdit)
         self.batchLayout = QHBoxLayout()
+        # editor
+        self.batchposSpinBox:Optional[QSpinBox] = None
+        self.batchcounterSpinBox:Optional[QSpinBox] = None
+        self.batchprefixedit:Optional[QLineEdit] = None
+        #
         if self.aw.superusermode: # and self.aw.qmc.batchcounter > -1:
             self.defineBatchEditor()
         else:
@@ -930,7 +961,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 
         #defects
         dw = (self.aw.qmc.roasted_defects_weight if (self.aw.qmc.roasted_defects_mode or self.aw.qmc.roasted_defects_weight == 0) else
-            (0 if self.aw.qmc.weight[1] == 0 else min(self.aw.qmc.weight[1], max(0, self.aw.qmc.weight[1] - self.aw.qmc.roasted_defects_weight))))
+            (0 if self.aw.qmc.weight[1] == 0 else min(self.aw.qmc.weight[1], max(0.0, self.aw.qmc.weight[1] - self.aw.qmc.roasted_defects_weight))))
         defectsw = f'{float2floatWeightVolume(dw):g}'
         self.weightoutdefectsedit = QLineEdit()
         self.weightoutdefectsedit.setToolTip(QApplication.translate('Tooltip', 'weight of defects sorted from roasted coffee or weight of roasted coffee after defects have been removed'))
@@ -2901,7 +2932,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.energy_ui = EnergyWidget.Ui_EnergyWidget()
             self.energy_ui.setupUi(self.C5Widget)
 
-            self.btu_list:List[BTU] = []
+            self.btu_list = []
 
             # remember parameters to enable a Cancel action
             self.org_loadlabels = self.aw.qmc.loadlabels.copy()
@@ -3773,7 +3804,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     @pyqtSlot()
     def loadlabels_editingfinished(self) -> None:
         w = self.sender()
-        if w and isinstance(w, QLineEdit) and w.isModified():
+        if w and isinstance(w, QLineEdit) and w.isModified(): # pyrefly: ignore[invalid-argument]
             w.setText(w.text().strip())
             self.updateLoadLabels()
             self.loadsEdited()
@@ -3781,7 +3812,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     @pyqtSlot()
     def loadratings_editingfinished(self) -> None:
         w = self.sender()
-        if w and isinstance(w, QLineEdit) and w.isModified():
+        if w and isinstance(w, QLineEdit) and w.isModified(): # pyrefly: ignore[invalid-argument]
             w.setText(self.validateNumText(w.text()))
             self.updateLoadRatings()
             self.updateEnergyLabels()
@@ -3790,7 +3821,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     @pyqtSlot()
     def ratingunits_currentindexchanged(self) -> None:
         sender = self.sender()
-        if isinstance(sender, QComboBox):
+        if isinstance(sender, QComboBox): # pyrefly: ignore[invalid-argument]
             try:
                 i = [self.energy_ui.ratingunit0,self.energy_ui.ratingunit1,self.energy_ui.ratingunit2,self.energy_ui.ratingunit3].index(sender)
                 self.aw.qmc.ratingunits[i] = sender.currentIndex()
@@ -3803,7 +3834,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     @pyqtSlot()
     def sourcetypes_currentindexchanged(self) -> None:
         sender = self.sender()
-        if isinstance(sender, QComboBox):
+        if isinstance(sender, QComboBox): # pyrefly: ignore[invalid-argument]
             try:
                 i = [self.energy_ui.sourcetype0, self.energy_ui.sourcetype1, self.energy_ui.sourcetype2, self.energy_ui.sourcetype3].index(sender)
                 self.aw.qmc.sourcetypes[i] = sender.currentIndex()
@@ -3815,7 +3846,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     @pyqtSlot()
     def load_etypes_currentindexchanged(self) -> None:
         sender = self.sender()
-        if isinstance(sender, QComboBox):
+        if isinstance(sender, QComboBox): # pyrefly: ignore[invalid-argument]
             try:
                 i = [self.energy_ui.events0, self.energy_ui.events1, self.energy_ui.events2, self.energy_ui.events3].index(sender)
                 self.aw.qmc.load_etypes[i] = sender.currentIndex()
@@ -3829,7 +3860,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     @pyqtSlot(int)
     def pressureCheckBox_statechanged(self, _:int) -> None:
         sender = self.sender()
-        if isinstance(sender, QCheckBox):
+        if isinstance(sender, QCheckBox): # pyrefly: ignore[invalid-argument]
             try:
                 i = [self.energy_ui.pressureCheckBox0, self.energy_ui.pressureCheckBox1, self.energy_ui.pressureCheckBox2, self.energy_ui.pressureCheckBox3].index(sender)
                 self.aw.qmc.presssure_percents[i] = sender.isChecked()
@@ -3889,7 +3920,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     @pyqtSlot()
     def meterlabels_editingfinished(self) -> None:
         w = self.sender()
-        if w and isinstance(w, QLineEdit) and w.isModified():
+        if w and isinstance(w, QLineEdit) and w.isModified(): # pyrefly: ignore[invalid-argument]
             w.setText(w.text().strip())
             self.updateMeterLabels()
             self.loadsEdited()
@@ -3897,7 +3928,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     @pyqtSlot()
     def meterunits_currentindexchanged(self) -> None:
         sender = self.sender()
-        if isinstance(sender, QComboBox):
+        if isinstance(sender, QComboBox):# pyrefly: ignore[invalid-argument]
             try:
                 i = [self.energy_ui.meter1UnitComboBox,self.energy_ui.meter2UnitComboBox].index(sender)
                 self.aw.qmc.meterunits[i] = sender.currentIndex()
@@ -3911,7 +3942,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     @pyqtSlot()
     def meterfuels_currentindexchanged(self) -> None:
         sender = self.sender()
-        if isinstance(sender, QComboBox):
+        if isinstance(sender, QComboBox):# pyrefly: ignore[invalid-argument]
             try:
                 i = [self.energy_ui.meter1FuelComboBox,self.energy_ui.meter2FuelComboBox].index(sender)
                 self.aw.qmc.meterfuels[i] = sender.currentIndex()
@@ -3924,7 +3955,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     @pyqtSlot()
     def metersources_currentindexchanged(self) -> None:
         sender = self.sender()
-        if isinstance(sender, QComboBox):
+        if isinstance(sender, QComboBox): # pyrefly: ignore[invalid-argument]
             try:
                 i = [self.energy_ui.meter1SourceComboBox,self.energy_ui.meter2SourceComboBox].index(sender)
                 self.aw.qmc.metersources[i] = sender.currentIndex()
@@ -4977,9 +5008,9 @@ class editGraphDlg(ArtisanResizeablDialog):
         except Exception: # pylint: disable=broad-except
             pass
         if weight_out > 0:
-            defects = min(weight_out, max(0, defects)) # 0 <= defects <= weight_out
+            defects = min(weight_out, max(0.0, defects)) # 0 <= defects <= weight_out
         else:
-            defects = min(weight_in, max(0, defects)) # 0 <= defects <= weight_in
+            defects = min(weight_in, max(0.0, defects)) # 0 <= defects <= weight_in
         dw_txt = f'{float2floatWeightVolume(defects):g}'
         if self.aw.qmc.roasted_defects_mode or dw_txt != '0':
             self.weightoutdefectsedit.setText(dw_txt)
@@ -5505,7 +5536,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.aw.qmc.roasted_defects_weight = 0
         else:
             # we interpret dw as yield
-            self.aw.qmc.roasted_defects_weight = min(w1, max(0, w1 - dw))
+            self.aw.qmc.roasted_defects_weight = min(w1, max(0.0, w1 - dw))
 
         # max 140kg green; roasted < green:
         if w2 == 'kg':
@@ -5626,9 +5657,12 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.aw.qmc.roastingnotes = self.roastingeditor.toPlainText()
         self.aw.qmc.cuppingnotes = self.cuppingeditor.toPlainText()
         if self.aw.superusermode or self.batcheditmode:
-            self.aw.qmc.roastbatchprefix = self.batchprefixedit.text()
-            self.aw.qmc.roastbatchnr = self.batchcounterSpinBox.value()
-            self.aw.qmc.roastbatchpos = self.batchposSpinBox.value()
+            if self.batchprefixedit is not None:
+                self.aw.qmc.roastbatchprefix = self.batchprefixedit.text()
+            if self.batchcounterSpinBox is not None:
+                self.aw.qmc.roastbatchnr = self.batchcounterSpinBox.value()
+            if self.batchposSpinBox is not None:
+                self.aw.qmc.roastbatchpos = self.batchposSpinBox.value()
 
         self.aw.qmc.perKgRoastMode = self.perKgRoastMode
 
@@ -5833,7 +5867,7 @@ class CoffeesComboBox(StockComboBox):
         super().__init__(parent.unitsComboBox, *args, **kwargs)
         self.parentDialog = parent
 
-    def getItems(self, unit:int) -> List[str]:
+    def getItems(self, unit:int) -> List[str]:  # pyrefly: ignore[bad-override]
         plus_coffees = plus.stock.getCoffees(unit, self.parentDialog.plus_default_store)
         return [''] + plus.stock.getCoffeesLabels(plus_coffees)
 
@@ -5842,7 +5876,7 @@ class BlendsComboBox(StockComboBox):
         super().__init__(parent.unitsComboBox, *args, **kwargs)
         self.parentDialog:editGraphDlg = parent
 
-    def getItems(self, unit:int) -> List[str]:
+    def getItems(self, unit:int) -> List[str]: # pyrefly: ignore[bad-override]
         custom_blend:Optional[plus.stock.Blend] = None
         if self.parentDialog.aw.qmc.plus_custom_blend is not None and self.parentDialog.aw.qmc.plus_custom_blend.name.strip() != '':
             coffees = plus.stock.getCoffeeLabels()

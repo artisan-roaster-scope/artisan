@@ -1532,7 +1532,7 @@ class CurvesDlg(ArtisanDialog):
     @pyqtSlot(bool)
     def expradiobuttonClicked(self, _:bool = False) -> None:
         expradioButton = self.sender()
-        assert isinstance(expradioButton, QRadioButton)
+        assert isinstance(expradioButton, QRadioButton) # pyrefly: ignore[invalid-argument]
         power:int = 3
         if self.expradiobutton1.isChecked():
             power = 2
@@ -1909,7 +1909,7 @@ class CurvesDlg(ArtisanDialog):
     @pyqtSlot(bool)
     def plotequ(self, _b:bool = False) -> None:
         try:
-            self.aw.qmc.plotterstack = [0]*10
+            self.aw.qmc.plotterstack = [0.0]*10
 #            self.aw.qmc.plottermessage = ""
             self.aw.clearMessageLine()
 

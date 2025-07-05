@@ -56,7 +56,7 @@ class AlignDelegate(QStyledItemDelegate): # pyright:ignore[reportGeneralTypeIssu
     def initStyleOption(self, option:Optional['QStyleOptionViewItem'], index:'QModelIndex') -> None:
         super().initStyleOption(option, index)
         if option is not None:
-            option.displayAlignment = Qt.AlignmentFlag.AlignCenter
+            option.displayAlignment = Qt.AlignmentFlag.AlignCenter # pyrefly: ignore[bad-assignment]
 
 class AlarmDlg(ArtisanResizeablDialog):
     def __init__(self, parent:QWidget, aw:'ApplicationWindow', activeTab:int = 0) -> None:
@@ -695,7 +695,7 @@ class AlarmDlg(ArtisanResizeablDialog):
             alarms['alarmtemperatures'] = self.aw.qmc.alarmtemperature
             alarms['alarmactions'] = self.aw.qmc.alarmaction
             alarms['alarmbeep'] = self.aw.qmc.alarmbeep
-            alarms['alarmstrings'] = list(self.aw.qmc.alarmstrings)
+            alarms['alarmstrings'] = list(self.aw.qmc.alarmstrings) # pyrefly: ignore[no-matching-overload]
             from json import dump as json_dump
             with open(filename, 'w', encoding='utf-8') as outfile:
                 json_dump(alarms, outfile, indent=None, separators=(',', ':'), ensure_ascii=False)

@@ -88,7 +88,7 @@ class BLE:
             address:Optional[str]) -> 'Tuple[Optional[BLEDevice], Optional[str]]':
         try:
             async with asyncio.timeout(scan_timeout): # type:ignore[attr-defined]
-                async with BleakScanner() as scanner:
+                async with BleakScanner() as scanner: # pyrefly: ignore[bad-argument-type]
                     self._terminate_scan_event.clear()
                     async for bd, ad in scanner.advertisement_data():
                         if self._terminate_scan_event.is_set():

@@ -157,9 +157,9 @@ class AillioR1:
                         backend = get_backend(find_library=lambda _,shared_libusb_path=shared_libusb_path: shared_libusb_path)
                         break
             self.usbhandle = usb.core.find(idVendor=self.AILLIO_VID,
-                                           idProduct=self.AILLIO_PID, backend=backend)
+                                           idProduct=self.AILLIO_PID, backend=backend) # pyrefly: ignore[bad-assignment]
             if self.usbhandle is None:
-                self.usbhandle = usb.core.find(idVendor=self.AILLIO_VID,
+                self.usbhandle = usb.core.find(idVendor=self.AILLIO_VID, # pyrefly: ignore[bad-assignment]
                                                idProduct=self.AILLIO_PID_REV3, backend=backend)
         else:
             self.usbhandle = libusb_package.find(idVendor=self.AILLIO_VID, # pyright:ignore[reportPossiblyUnboundVariable] # pylint: disable=possibly-used-before-assignment

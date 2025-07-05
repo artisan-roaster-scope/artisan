@@ -151,11 +151,11 @@ def extractProfileRoastLog(url:'QUrl', _:'ApplicationWindow') -> Optional[Profil
                     if len(timex) == len(temp1):
                         res['temp2'] = temp1
                     else:
-                        res['temp2'] = [-1]*len(timex)
+                        res['temp2'] = [-1.0]*len(timex)
                     if len(timex) == len(temp2):
                         res['temp1'] = temp2
                     else:
-                        res['temp1'] = [-1]*len(timex)
+                        res['temp1'] = [-1.0]*len(timex)
                     if len(temp3) == len(timex) or len(temp4) == len(timex):
                         temp3_visibility = True
                         temp4_visibility = True
@@ -165,12 +165,12 @@ def extractProfileRoastLog(url:'QUrl', _:'ApplicationWindow') -> Optional[Profil
                         if len(temp3) == len(timex):
                             res['extratemp1'] = [temp3]
                         else:
-                            res['extratemp1'] = [[-1]*len(timex)]
+                            res['extratemp1'] = [[-1.0]*len(timex)]
                             temp3_visibility = False
                         if len(temp4) == len(timex):
                             res['extratemp2'] = [temp4]
                         else:
-                            res['extratemp2'] = [[-1]*len(timex)]
+                            res['extratemp2'] = [[-1.0]*len(timex)]
                             temp4_visibility = False
                         res['extraname1'] = [temp3_label]
                         res['extraname2'] = [temp4_label]

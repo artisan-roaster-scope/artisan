@@ -2473,7 +2473,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 item0 = layout.itemAt(0)
                 if item0 is not None:
                     checkBox = item0.widget()
-                    if checkBox is not None and isinstance(checkBox, QCheckBox):
+                    if checkBox is not None and isinstance(checkBox, QCheckBox): # pyrefly: ignore[invalid-argument]
                         return checkBox.isChecked() # type:ignore[reportAttributeAccessIssue, unused-ignore] # pyright reports isChecked not known for QWidget
         return False
 

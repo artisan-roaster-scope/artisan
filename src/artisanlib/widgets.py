@@ -49,7 +49,7 @@ def wait_cursor() -> Iterator[None]:
 
 class MyQComboBox(QComboBox): # pylint: disable=too-few-public-methods  # pyright: ignore [reportGeneralTypeIssues]# Argument to class must be a base class
     def __init__(self, parent:Optional['QWidget'] = None, **kwargs:Dict[Any,Any]) -> None:
-        super().__init__(parent, **kwargs)
+        super().__init__(parent, **kwargs) # pyrefly: ignore
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
 
@@ -59,7 +59,7 @@ class MyQComboBox(QComboBox): # pylint: disable=too-few-public-methods  # pyrigh
 
 class MyContentLimitedQComboBox(MyQComboBox): # pylint: disable=too-few-public-methods  # pyright: ignore [reportGeneralTypeIssues]# Argument to class must be a base class
     def __init__(self, parent:Optional['QWidget'] = None, **kwargs:Dict[Any,Any]) -> None:
-        super().__init__(parent, **kwargs)
+        super().__init__(parent, **kwargs) # pyrefly: ignore
         # setting max number visible limit
         self.setMaxVisibleItems(20)
         # ensure Qt style for this widget
@@ -71,7 +71,7 @@ class MyContentLimitedQComboBox(MyQComboBox): # pylint: disable=too-few-public-m
 
 class MyQDoubleSpinBox(QDoubleSpinBox):  # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     def __init__(self, parent:Optional['QWidget'] = None, **kwargs:Dict[str,Any]) -> None:
-        super().__init__(parent, **kwargs)
+        super().__init__(parent, **kwargs) # pyrefly: ignore
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.setLocale(QLocale('C'))
 
@@ -91,7 +91,7 @@ class MyQDoubleSpinBox(QDoubleSpinBox):  # pyright: ignore [reportGeneralTypeIss
 
 class MyQTableWidget(QTableWidget):  # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     def __init__(self, parent:Optional['QWidget'] = None, **kwargs:Dict[Any,Any]) -> None:
-        super().__init__(parent, **kwargs)
+        super().__init__(parent, **kwargs) # pyrefly: ignore
         self.installEventFilter(self)
         self.cursor_navigation:bool = True
 
@@ -128,7 +128,7 @@ class MyTableWidgetItemQLineEdit(QTableWidgetItem): # pylint: disable= too-few-p
     __slots__ = ['sortKey'] # save some memory by using slots
     def __init__(self, sortKey:QLineEdit) -> None:
         #call custom constructor with UserType item type
-        super().__init__('', 1001) #QTableWidgetItem.ItemType.UserType)
+        super().__init__('', 1001) #QTableWidgetItem.ItemType.UserType) # pyrefly: ignore
         self.sortKey = sortKey
 
     #Qt uses a simple < check for sorting items, override this to use the sortKey
@@ -149,7 +149,7 @@ class MyTableWidgetItemQTime(QTableWidgetItem): # pylint: disable= too-few-publi
     __slots__ = ['sortKey'] # save some memory by using slots
     def __init__(self, sortKey:'QTimeEdit') -> None:
         #call custom constructor with UserType item type
-        super().__init__('', 1002) #QTableWidgetItem.ItemType.UserType)
+        super().__init__('', 1002) #QTableWidgetItem.ItemType.UserType) # pyrefly: ignore
         self.sortKey = sortKey
 
     #Qt uses a simple < check for sorting items, override this to use the sortKey
@@ -161,7 +161,7 @@ class MyTableWidgetItemQTime(QTableWidgetItem): # pylint: disable= too-few-publi
 class MyTableWidgetItemNumber(QTableWidgetItem): # pylint: disable= too-few-public-methods  # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     __slots__ = ['sortKey'] # save some memory by using slots
     def __init__(self, text:str, sortKey:float) -> None:
-        super().__init__(text, 1003) #QTableWidgetItem.ItemType.UserType)
+        super().__init__(text, 1003) #QTableWidgetItem.ItemType.UserType) # pyrefly: ignore
         self.sortKey = sortKey
 
     #Qt uses a simple < check for sorting items, override this to use the sortKey
@@ -172,7 +172,7 @@ class MyTableWidgetItemQCheckBox(QTableWidgetItem): # pylint: disable= too-few-p
     __slots__ = ['sortKey'] # save some memory by using slots
     def __init__(self, sortKey:'QCheckBox') -> None:
         #call custom constructor with UserType item type
-        super().__init__('', 1004) #QTableWidgetItem.ItemType.UserType)
+        super().__init__('', 1004) #QTableWidgetItem.ItemType.UserType) # pyrefly: ignore
         self.sortKey = sortKey
 
     #Qt uses a simple < check for sorting items, override this to use the sortKey
@@ -183,7 +183,7 @@ class MyTableWidgetItemQComboBox(QTableWidgetItem): # pylint: disable= too-few-p
     __slots__ = ['sortKey'] # save some memory by using slots
     def __init__(self, sortKey:'QComboBox') -> None:
         #call custom constructor with UserType item type
-        super().__init__('', 1005) # QTableWidgetItem.ItemType.UserType)
+        super().__init__('', 1005) # QTableWidgetItem.ItemType.UserType) # pyrefly: ignore
         self.sortKey = sortKey
 
     #Qt uses a simple < check for sorting items, override this to use the sortKey
@@ -220,7 +220,7 @@ class SliderUnclickable(QSlider): # pyright: ignore [reportGeneralTypeIssues] # 
 # QLabel that automatically resizes its text font
 class MyQLabel(QLabel):  # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     def __init__(self, text: Optional[str] = None, parent: Optional['QWidget'] = None, flags: Qt.WindowType = Qt.WindowType.Widget) -> None:
-        super().__init__(text, parent, flags)
+        super().__init__(text, parent, flags) # pyrefly: ignore
         self.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Ignored,QSizePolicy.Policy.Ignored))
         self.setMinSize(14)
 
@@ -332,7 +332,7 @@ class ClickableTextEdit(QTextEdit): # pylint: disable=too-few-public-methods # p
     receivedFocus = pyqtSignal()
 
     def __init__(self, parent:Optional['QWidget'] = None, **kwargs:Dict[str,Any]) -> None:
-        super().__init__(parent, **kwargs)
+        super().__init__(parent, **kwargs) # pyrefly: ignore
         self._changed = False
         self.setTabChangesFocus(True)
         self.textChanged.connect(self._handle_text_changed)
@@ -370,7 +370,7 @@ class ClickableQLineEdit(QLineEdit): # pylint: disable=too-few-public-methods # 
     receivedFocus = pyqtSignal()
 
     def __init__(self, parent:Optional['QWidget'] = None, **kwargs:Dict[str,Any]) -> None:
-        super().__init__(parent, **kwargs)
+        super().__init__(parent, **kwargs) # pyrefly: ignore
         self._changed = False
         self.textChanged.connect(self._handle_text_changed)
 
@@ -422,7 +422,7 @@ def pushButtonColorStyle(
 
 class EventPushButton(QPushButton): # pylint: disable=too-few-public-methods # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     def __init__(self, text:str, parent:Optional['QWidget'] = None, background_color:str = '#777777') -> None:
-        super().__init__(text, parent)
+        super().__init__(text, parent) # pyrefly: ignore
         self.default_background_color = background_color
         self.default_style = pushButtonColorStyle('*',
             selector='[Selected=false]',

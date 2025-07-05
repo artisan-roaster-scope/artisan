@@ -227,49 +227,49 @@ class profileTransformatorDlg(ArtisanDialog):
     def clearPhasesTargetTimes(self) -> None:
         if self.phases_target_widgets_time is not None and len(self.phases_target_widgets_time)>2:
             for i in range(3):
-                phases_target_widgets_time = self.phases_target_widgets_time[i]
+                phases_target_widgets_time = self.phases_target_widgets_time[i] # pyrefly: ignore[bad-specialization]
                 if phases_target_widgets_time is not None:
                     phases_target_widgets_time.setText('')
 
     def clearPhasesTargetPercent(self) -> None:
         if self.phases_target_widgets_percent is not None and len(self.phases_target_widgets_percent)>2:
             for i in range(3):
-                phases_target_widgets_percent = self.phases_target_widgets_percent[i]
+                phases_target_widgets_percent = self.phases_target_widgets_percent[i] # pyrefly: ignore[bad-specialization]
                 if phases_target_widgets_percent is not None:
                     phases_target_widgets_percent.setText('')
 
     def clearPhasesResults(self) -> None:
         if self.phases_result_widgets is not None and len(self.phases_result_widgets)>2:
             for i in range(3):
-                phases_result_widgets = self.phases_result_widgets[i]
+                phases_result_widgets = self.phases_result_widgets[i] # pyrefly: ignore[bad-specialization]
                 if phases_result_widgets is not None:
                     phases_result_widgets.setText('')
 
     def clearTimeTargets(self) -> None:
         if self.time_target_widgets is not None and len(self.time_target_widgets)>3:
             for i in range(4):
-                time_target_widgets = self.time_target_widgets[i]
+                time_target_widgets = self.time_target_widgets[i] # pyrefly: ignore[bad-specialization]
                 if time_target_widgets is not None:
                     time_target_widgets.setText('')
 
     def clearTimeResults(self) -> None:
         if self.time_result_widgets is not None and len(self.time_result_widgets)>3:
             for i in range(4):
-                time_result_widgets = self.time_result_widgets[i]
+                time_result_widgets = self.time_result_widgets[i] # pyrefly: ignore[bad-specialization]
                 if time_result_widgets is not None:
                     time_result_widgets.setText('')
 
     def clearTempTargets(self) -> None:
         if self.temp_target_widgets is not None and len(self.temp_target_widgets)>4:
             for i in range(5):
-                temp_target_widget:Optional[QLineEdit] = self.temp_target_widgets[i]
+                temp_target_widget:Optional[QLineEdit] = self.temp_target_widgets[i] # pyrefly: ignore[bad-specialization]
                 if temp_target_widget is not None:
                     temp_target_widget.setText('')
 
     def clearTempResults(self) -> None:
         if self.temp_result_widgets is not None and len(self.temp_result_widgets)>4:
             for i in range(5):
-                temp_result_widget:Optional[QTableWidgetItem] = self.temp_result_widgets[i]
+                temp_result_widget:Optional[QTableWidgetItem] = self.temp_result_widgets[i] # pyrefly: ignore[bad-specialization]
                 if temp_result_widget is not None:
                     temp_result_widget.setText('')
         self.temp_formula.setText('')
@@ -449,7 +449,7 @@ class profileTransformatorDlg(ArtisanDialog):
         self.clearTimeTargets()
         if self.phases_target_widgets_time is not None and self.phases_target_widgets_percent is not None:
             sender = self.sender()
-            assert isinstance(sender, QLineEdit)
+            assert isinstance(sender, QLineEdit) # pyrefly: ignore[invalid-argument]
             # clear corresponding time target if percentage target is set, or the otherway around
             if sender.text() != '':
                 try:
@@ -492,7 +492,7 @@ class profileTransformatorDlg(ArtisanDialog):
             result_times = self.calcTimeResults()
             if self.time_result_widgets is not None:
                 for i in range(4):
-                    time_result_widget = self.time_result_widgets[i]
+                    time_result_widget = self.time_result_widgets[i] # pyrefly: ignore[bad-specialization]
                     if time_result_widget is not None:
                         if result_times[i] is None:
                             s = ''
@@ -542,7 +542,7 @@ class profileTransformatorDlg(ArtisanDialog):
         elif self.temp_result_widgets is not None and len(self.temp_result_widgets)>4:
             result_temps,fit = self.calcTempResults()
             for i in range(5):
-                temp_result_widget:Optional[QTableWidgetItem] = self.temp_result_widgets[i]
+                temp_result_widget:Optional[QTableWidgetItem] = self.temp_result_widgets[i]  # pyrefly: ignore[bad-specialization]
                 result_temp = result_temps[i]
                 if temp_result_widget is not None and result_temp is not None:
                     temp_result_widget.setText(str(float2float(result_temp)) + self.aw.qmc.mode)
@@ -710,7 +710,7 @@ class profileTransformatorDlg(ArtisanDialog):
                                 res.append(None)
                         fit_str = self.aw.fit2str(fit_func)
                     else:
-                        res = [None]*5
+                        res = [None]*5 # pyrefly: ignore[bad-assignment]
 #                except numpy.exceptions.RankWarning:
 #                    pass
                 except Exception: # pylint: disable=broad-except
@@ -1046,8 +1046,8 @@ class profileTransformatorDlg(ArtisanDialog):
         self.phases_target_widgets_percent = []
         self.phases_result_widgets = []
 
-        profilePhasesTimes:List[Optional[float]] = [None]*3 # DRYING, MAILARD, FINISHING
-        profilePhasesPercentages:List[Optional[float]] = [None] * 3
+        profilePhasesTimes:List[Optional[float]] = [None]*3 # DRYING, MAILARD, FINISHING # pyrefly: ignore[bad-assignment]
+        profilePhasesPercentages:List[Optional[float]] = [None] * 3 # pyrefly: ignore[bad-assignment]
         #
         # the phases transformation are only enabled if at least DRY, FCs and DROP events are set
         phases_enabled = self.aw.qmc.timeindex[1] and self.aw.qmc.timeindex[2] and self.aw.qmc.timeindex[6]

@@ -481,7 +481,7 @@ def createGradient(rgb:Union[QColor, str], tint_factor:float = 0.1, shade_factor
 def createRGBGradient(rgb:Union[QColor, str], tint_factor:float = 0.3, shade_factor:float = 0.3) -> Tuple[str,str]:
     try:
         rgb_tuple: Tuple[float, float, float]
-        if isinstance(rgb, QColor):
+        if isinstance(rgb, QColor): # pyrefly: ignore[invalid-argument]
             r,g,b,_ = rgb.getRgbF() # type:ignore[unused-ignore]
             if r is not None and g is not None and b is not None:
                 rgb_tuple = (r,g,b)

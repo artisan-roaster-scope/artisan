@@ -632,7 +632,7 @@ class WindowsDlg(ArtisanDialog):
         if self.aw.qmc.backgroundpath and (self.aw.qmc.flagon or len(self.aw.qmc.timex)<2):
             # no foreground profile
             t_min,t_max = self.aw.calcAutoAxisBackground()
-            t_min = min(-30,t_min)
+            t_min = min(-30.0, t_min)
         else:
             t_min,t_max = self.aw.calcAutoAxisForeground()
         if self.aw.qmc.timeindex[0] != -1:

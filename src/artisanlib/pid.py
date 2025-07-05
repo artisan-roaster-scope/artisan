@@ -125,10 +125,12 @@ class PID:
             if self.pidSemaphore.available() < 1:
                 self.pidSemaphore.release(1)
 
-    def isActive(self) -> bool:
+    def isActive(self) -> bool: # pyrefly: ignore[bad-return]
         try:
             self.pidSemaphore.acquire(1)
             return self.active
+        except Exception: # pylint: disable=broad-except
+            return False
         finally:
             if self.pidSemaphore.available() < 1:
                 self.pidSemaphore.release(1)
@@ -174,7 +176,7 @@ class PID:
                 self.Iterm += self.Ki * err * dt
 
                 # clamp Iterm to [outMin,outMax] and avoid integral windup
-                self.Iterm = max(self.outMin,min(self.outMax,self.Iterm))
+                self.Iterm = max(float(self.outMin), min(float(self.outMax), self.Iterm))
 
                 # compute P-Term
                 self.Pterm = self.Kp * err
@@ -200,7 +202,7 @@ class PID:
 
 #                _log.debug('P: %s, I: %s, D: %s => output: %s', self.Pterm, self.Iterm, D, output)
 
-                int_output = int(round(min(self.dutyMax,max(self.dutyMin,output))))
+                int_output = int(round(min(float(self.dutyMax), max(float(self.dutyMin), output))))
                 if self.lastOutput is None or self.iterations_since_duty >= self.force_duty or int_output >= self.lastOutput + self.dutySteps or int_output <= self.lastOutput - self.dutySteps:
                     if self.active:
                         self.control(int_output)
@@ -256,10 +258,12 @@ class PID:
             if self.pidSemaphore.available() < 1:
                 self.pidSemaphore.release(1)
 
-    def getTarget(self) -> float:
+    def getTarget(self) -> float: # pyrefly: ignore[bad-return]
         try:
             self.pidSemaphore.acquire(1)
             return self.target
+        except Exception: # pylint: disable=broad-except
+            return 0.0
         finally:
             if self.pidSemaphore.available() < 1:
                 self.pidSemaphore.release(1)
@@ -319,7 +323,7 @@ class PID:
         try:
             self.pidSemaphore.acquire(1)
             if self.lastOutput is not None:
-                return min(self.dutyMax,max(self.dutyMin,self.lastOutput))
+                return min(float(self.dutyMax), max(float(self.dutyMin), self.lastOutput))
             return None
         finally:
             if self.pidSemaphore.available() < 1:

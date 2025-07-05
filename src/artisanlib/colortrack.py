@@ -136,7 +136,7 @@ class ColorTrackBLE(ClientBLE):
     # maps received byte decimal value to ColorTrack readings in range 0-100
     @staticmethod
     def map_reading(x:int) -> float:
-        return min(100, max(0, 3.402e-8 *x*x + 1.028e-6 * x - 0.0069))
+        return min(100.0, max(0.0, 3.402e-8 *x*x + 1.028e-6 * x - 0.0069))
 
     def register_reading(self, value:float) -> None:
 #        self._received_readings = np.append(self._received_readings, value)

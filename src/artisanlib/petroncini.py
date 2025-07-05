@@ -65,7 +65,7 @@ def extractProfilePetronciniCSV(file:str, aw:'ApplicationWindow') -> ProfileData
         next(data) # skip path
         header = [i.strip() for i in next(data)]
 
-        roast_date = None
+        roast_date:Optional[QDateTime] = None
         power = None # holds last processed heater event value
         power_last = None # holds the heater event value before the last one
         power_event = False # set to True if a heater event exists
@@ -95,7 +95,7 @@ def extractProfilePetronciniCSV(file:str, aw:'ApplicationWindow') -> ProfileData
                 try:
                     date:QDate = QDate(int(item['Year']),int(item['Month']),int(item['Day']))
                     time = QTime(int(item['Hour']),int(item['Minute']),int(item['Second']))
-                    roast_date = QDateTime(date,time)
+                    roast_date = QDateTime(date, time)
                 except Exception:  # pylint: disable=broad-except
                     pass
             #

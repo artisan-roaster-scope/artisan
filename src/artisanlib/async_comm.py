@@ -59,7 +59,7 @@ class AsyncLoopThread:
         self.__thread.start()
 
     def __del__(self) -> None:
-        self.__loop.call_soon_threadsafe(self.__loop.stop)
+        self.__loop.call_soon_threadsafe(self.__loop.stop) # pyrefly: ignore[bad-argument-type]
 #        self.__thread.join()
 # WARNING: we don't join and expect the clients running on this thread to stop themself
 # (using self._running) to finally get rid of this thread to prevent hangs
@@ -258,7 +258,7 @@ class AsyncComm:
 
     # if serial settings are given, host/port are ignore and communication is handled by the given serial port
     async def connect(self, connect_timeout:float=5) -> None:
-        writer = None
+        writer:Optional[asyncio.StreamWriter] = None
         while self._running:
             try:
                 if self._serial is not None:

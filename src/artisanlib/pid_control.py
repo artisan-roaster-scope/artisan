@@ -1157,7 +1157,7 @@ class PIDcontrol:
         self.loadRampSoakFromBackground:bool = False
         self.svLen:Final[int] = 8 # should stay at 8 for compatibility reasons!
         self.svLabel:str = ''
-        self.svValues: List[float]     = [0]*self.svLen      # sv temp as int per 8 channels
+        self.svValues: List[float]     = [0.0]*self.svLen      # sv temp as int per 8 channels
         self.svRamps: List[int]        = [0]*self.svLen      # seconds as int per 8 channels
         self.svSoaks: List[int]        = [0]*self.svLen      # seconds as int per 8 channels
         self.svActions: List[int]      = [-1]*self.svLen     # alarm action as int per 8 channels
@@ -1168,7 +1168,7 @@ class PIDcontrol:
         # extra RS sets:
         self.RSLen:Final[int] = 3 # can be changed to have less or more RSn sets
         self.RS_svLabels: List[str]       = ['']*self.RSLen                  # label of the RS set
-        self.RS_svValues: List[List[float]] = [[0]*self.svLen]*self.RSLen      # sv temp as int per 8 channels
+        self.RS_svValues: List[List[float]] = [[0.0]*self.svLen]*self.RSLen      # sv temp as int per 8 channels
         self.RS_svRamps: List[List[int]]  = [[0]*self.svLen]*self.RSLen      # seconds as int per 8 channels
         self.RS_svSoaks: List[List[int]]  = [[0]*self.svLen]*self.RSLen      # seconds as int per 8 channels
         self.RS_svActions: List[List[int]]= [[-1]*self.svLen]*self.RSLen     # alarm action as int per 8 channels
@@ -1311,7 +1311,7 @@ class PIDcontrol:
     def conv2fahrenheit(self) -> None:
         try:
             self.aw.qmc.rampSoakSemaphore.acquire(1)
-            self.svValue = (0 if self.svValue == 0 else max(0, fromCtoFstrict(self.svValue)))
+            self.svValue = (0 if self.svValue == 0 else max(0.0, fromCtoFstrict(self.svValue)))
             self.svSliderMin = (0 if self.svSliderMin == 0 else max(0, min(999, int(round(fromCtoFstrict(self.svSliderMin))))))
             self.svSliderMax = (0 if self.svSliderMax == 0 else max(0, min(999, int(round(fromCtoFstrict(self.svSliderMax))))))
             # establish ne limits on sliders
@@ -1607,7 +1607,7 @@ class PIDcontrol:
             #  1: BT, 2: ET, 3: as 0xT1, 4: as 0xT2, 5: as 1xT1, ...
 
             if self.aw.qmc.timeindex[6] > 0: # after DROP, the SV configured in the dialog is returned (min/maxed)
-                return max(self.svSliderMin, min(self.svSliderMax, self.svValue))
+                return max(float(self.svSliderMin), min(float(self.svSliderMax), self.svValue))
             if self.aw.qmc.timeindex[0] < 0: # before CHARGE, the CHARGE temp of the background profile is returned
                 if self.aw.qmc.timeindexB[0] < 0:
                     # no CHARGE in background, return manual SV
@@ -1652,14 +1652,14 @@ class PIDcontrol:
 #            self.aw.sendmessage(QApplication.translate("Message","SV set to %s"%sv))
         if self.externalPIDControl() == 1:
             # MODBUS PID and Control ticked
-            sv = max(0,sv)
+            sv = max(0.0, sv)
             if move:
                 self.aw.moveSVslider(sv,setValue=True)
             self.aw.modbus.setTarget(sv)
             self.sv = sv # remember last sv
         elif self.externalPIDControl() == 2:
             # S7 PID and Control ticked
-            sv = max(0,sv)
+            sv = max(0.0, sv)
             if move:
                 self.aw.moveSVslider(sv,setValue=True)
             self.aw.s7.setTarget(sv,self.aw.s7.SVmultiplier)
@@ -1667,7 +1667,7 @@ class PIDcontrol:
         elif self.aw.qmc.device == 19 and self.externalPIDControl():
             # ArduinoTC4 firmware PID
             if self.aw.ser.ArduinoIsInitialized:
-                sv = max(0,float2float(sv,2))
+                sv = max(0.0, float2float(sv,2))
                 if self.sv != sv: # nothing to do (avoid loops via moveslider!)
                     if move:
                         self.aw.moveSVslider(sv,setValue=True) # only move the slider
@@ -1742,7 +1742,7 @@ class PIDcontrol:
             if self.sv is not None:
                 sv = self.sv
             else:
-                sv = min(self.svSliderMax, max(self.svSliderMin, self.svValue))
+                sv = min(float(self.svSliderMax), max(float(self.svSliderMin), self.svValue))
             sv = int(round(sv))
             self.aw.updateSVSliderLCD(sv)
             self.aw.sliderSV.setValue(sv)

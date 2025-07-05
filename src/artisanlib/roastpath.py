@@ -155,7 +155,7 @@ def extractProfileRoastPathHTML(url:'QUrl', _:'ApplicationWindow') -> Optional[P
                 res['temp1'] = res['temp1'][:temp2len] # truncate
                 # now temp1 should be the same length of temp2
             else:
-                res['temp1'] = [-1]*len(res['temp2'])
+                res['temp1'] = [-1.0]*len(res['temp2'])
 
             # Events
             timeindex = [-1,0,0,0,0,0,0,0]
@@ -172,7 +172,7 @@ def extractProfileRoastPathHTML(url:'QUrl', _:'ApplicationWindow') -> Optional[P
                         try:
 #                            tx_idx = res["timex"].index(tx) # does not cope with dropouts as the next line:
                             tx_idx = next(i for i,item in enumerate(res['timex']) if item >= tx)
-                            timeindex[marks[dd['EventName']]] = max(0,tx_idx)
+                            timeindex[marks[dd['EventName']]] = max(0, tx_idx) # pyrefly: ignore[bad-argument-type]
                         except Exception: # pylint: disable=broad-except
                             pass
             res['timeindex'] = timeindex
@@ -285,7 +285,7 @@ def extractProfileRoastPathHTML(url:'QUrl', _:'ApplicationWindow') -> Optional[P
                     timex = [dateutil.parser.parse(d['Timestamp']).timestamp() - baseTime if 'Timestamp' in d else 0 for d in at]
                     res['extratimex'].append(timex)
                     res['extratemp1'].append([d.get('StandardValue', -1) for d in at])
-                    res['extratemp2'].append([-1]*len(timex))
+                    res['extratemp2'].append([-1.0]*len(timex))
 
                 # BT RoR
                 if 'rorData' in data:
@@ -318,7 +318,7 @@ def extractProfileRoastPathHTML(url:'QUrl', _:'ApplicationWindow') -> Optional[P
                     timex = [dateutil.parser.parse(d['Timestamp']).timestamp() - baseTime if 'Timestamp' in d else 0 for d in ror]
                     res['extratimex'].append(timex)
                     res['extratemp1'].append([d.get('StandardValue', -1) for d in ror])
-                    res['extratemp2'].append([-1]*len(timex))
+                    res['extratemp2'].append([-1.0]*len(timex))
 
     except Exception as e: # pylint: disable=broad-except
         _log.exception(e)

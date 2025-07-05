@@ -8,7 +8,7 @@ v3.2.1
 * ADDITIONS
   - adds drag-drop import of a Cropster XLS profile
 * CHANGES
-  - updated Spanish localizations (thanks to ??)
+  - updated Spanish localizations (thanks to Juan Carlos Bonilla)
   - updates libs (scipy, bleak, lxml, pillow)
 * FIXES
   - fixes regression which broke the designer such that points could not be moved ([Discussion #1905](../../../discussions/1905))

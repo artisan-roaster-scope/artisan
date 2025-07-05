@@ -163,7 +163,7 @@ class WebView:
             if self._runner is not None:
                 future = asyncio.run_coroutine_threadsafe(self._runner.cleanup(), self._loop)
                 future.result()
-            self._loop.call_soon_threadsafe(self._loop.stop)
+            self._loop.call_soon_threadsafe(self._loop.stop)  # pyrefly: ignore
             self._loop = None
         # wait for the thread to finish
         if self._thread is not None:

@@ -5,7 +5,7 @@
 import openpyxl
 import logging
 from pathlib import Path
-from typing import Final, Union, List, Dict, Optional, TYPE_CHECKING
+from typing import Final, Union, List, Dict, Tuple, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
@@ -31,7 +31,7 @@ def extractProfileStrongholdXLSX(file:str, aw:'ApplicationWindow') -> ProfileDat
 
     book = openpyxl.load_workbook(file)
     sheet = book.worksheets[0] # first sheet
-    first_row = sheet[1]
+    first_row = sheet[1]  # pyrefly: ignore[bad-argument-type]
     keys:Optional[List[str]] = None # data of columns with empty string as key are ignored
     machine:str = ''
     machine_size:float = 0
@@ -60,7 +60,7 @@ def extractProfileStrongholdXLSX(file:str, aw:'ApplicationWindow') -> ProfileDat
         # "Time" "Internal" "Bean Surface" "Drum Surface" "Hot Air Temp" "RoR" "B.S RoR" "Hot Air" "Halogen" "Drum Heater" "Bean Agitation" "Blower" "Note"
         keys = ['Time', 'ET', 'BT', 'DT', 'IT', '', '', 'Air', 'Halogen', 'DrumHeater', 'DrumSpeed', 'Blower', 'Note']
 
-    if keys is not None:
+    if keys is not None and sheet.max_row is not None:
         # import
         data:Dict[str, List[Union[float,int,str]]] = {}
         # read keys
@@ -68,11 +68,11 @@ def extractProfileStrongholdXLSX(file:str, aw:'ApplicationWindow') -> ProfileDat
             if key != '':
                 data[key] = []
         # extract data
-        for row in range(2, sheet.max_row + 1):
+        for row in range(2, sheet.max_row + 1): # pyrefly: ignore[bad-argument-type]
             for i, key in enumerate(keys):
                 if key != '':
                     if key == 'Time':
-                        data[key].append(stringtoseconds(str(sheet.cell(row, i+1).value)))
+                        data[key].append(stringtoseconds(str(sheet.cell(row, i+1).value))) # pyrefly: ignore[bad-argument-type]
                     else:
                         data[key].append(sheet.cell(row, i+1).value) # type:ignore
 
@@ -96,11 +96,11 @@ def extractProfileStrongholdXLSX(file:str, aw:'ApplicationWindow') -> ProfileDat
             if 'ET' in data and len(data['ET']) == tx_len:
                 res['temp1'] = data['ET'] # type:ignore
             else:
-                res['temp2'] = [-1]*tx_len
+                res['temp2'] = [-1.0]*tx_len
             if 'BT' in data and len(data['BT']) == tx_len:
                 res['temp2'] = data['BT'] # type:ignore
             else:
-                res['temp2'] = [-1]*tx_len
+                res['temp2'] = [-1.0]*tx_len
             res['extradevices'] = [25] # one extra virtual device
             res['extraname1'] = ['IT']
             res['extraname2'] = ['DT']
@@ -108,11 +108,11 @@ def extractProfileStrongholdXLSX(file:str, aw:'ApplicationWindow') -> ProfileDat
             if 'IT' in data and len(data['IT']) == tx_len:
                 res['extratemp1'] = [data['IT']] # type:ignore
             else:
-                res['extratemp1'] = [[-1]*tx_len]
+                res['extratemp1'] = [[-1.0]*tx_len]
             if 'DT' in data and len(data['DT']) == tx_len:
                 res['extratemp2'] = [data['DT']] # type:ignore
             else:
-                res['extratemp2'] = [[-1]*tx_len]
+                res['extratemp2'] = [[-1.0]*tx_len]
             res['extramathexpression1'] = ['']
             res['extramathexpression2'] = ['']
             res['extraNoneTempHint1'] = [False] # apply temperature conversion
@@ -126,15 +126,16 @@ def extractProfileStrongholdXLSX(file:str, aw:'ApplicationWindow') -> ProfileDat
 
             # add events
 
-            events = [] # list of triples (tx_idx, event_nr, value)
+            events:List[Tuple[int, int, float]] = [] # list of triples (tx_idx, event_nr, value)
             try:
                 for event_name, event_nr in [('DrumHeater', 0), ('DrumSpeed', 1), ('Halogen', 2), ('Air', 3), ('Blower', 4)]:
                     if event_name in data and len(data[event_name]) == tx_len:
                         last_value:float = -1
-                        for i,v in enumerate(data[event_name]):
-                            if v != last_value:
-                                events.append((i,event_nr,v*10))
-                            last_value = float(v)
+                        for i, v in enumerate(data[event_name]):
+                            if isinstance(v, (int, float)):
+                                if v != last_value:
+                                    events.append((i, event_nr, v*10.0))
+                                last_value = float(v)
                 events.sort(key = lambda e : e[0])
 
                 res['specialevents'] = [e[0] for e in events]
