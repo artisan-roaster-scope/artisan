@@ -43,7 +43,7 @@ class WebView:
         self._thread:      Optional[Thread]                    = None # the thread running the asyncio loop
         self._app = web.Application(debug=True)
         self._app['websockets'] = weakref.WeakSet()
-        self._app.on_shutdown.append(self.on_shutdown)
+        self._app.on_shutdown.append(self.on_shutdown) # type:ignore[arg-type]
 
         self._last_send:float = time.time() # timestamp of the last message send to the clients
         self._last_message:Optional[str] = None # last message send to connected clients; sent to new clients on connect
