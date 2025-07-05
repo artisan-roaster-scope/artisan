@@ -117,7 +117,7 @@ appnope==0.1.4; sys_platform=='darwin'
 # NOTE: the just released pyobjc v11.0 is not compatible with the current bleak lib
 pyobjc-core==10.3.2; sys_platform=='darwin'  # NOTE: update to 11.0 is currently blocked by bleak which pins to this version
 pyobjc-framework-Cocoa==10.3.2; sys_platform=='darwin'
-pyobjc-framework-CoreBluetooth==10.3.2; sys_platform=='darwin'
+pyobjc-framework-CoreBluetooth==11.1; sys_platform=='darwin'
 pyobjc-framework-libdispatch==10.3.2; sys_platform=='darwin'
 py2app==0.28.8; sys_platform=='darwin'
 #py-cpuinfo==9.0.0; sys_platform=='darwin' # used for proper CPU arch detection running under Rosetta2
