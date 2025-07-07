@@ -22,6 +22,7 @@ v3.2.1
   - fixes regression which broke the import of roast profiles exported from Cropster, Giesen, IKAWA, Loring, Petroncini, RoastLog, RoastPath, ROEST, Rubasse, and Stronghold
   - fixes event buttons bottom row not rendered properly in all cases  
   - fixes number of rendered event buttons rows  
+  - fixes graph bounce and jitter when moving the cursor in the designer
 
 ----
 v3.2.0 (June 23, 2025)

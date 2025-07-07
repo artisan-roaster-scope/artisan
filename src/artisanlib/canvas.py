@@ -17875,7 +17875,7 @@ class tgraphcanvas(FigureCanvas):
             string2 = f" <font color = \"{text_color_rect2[:7]}\" style=\"BACKGROUND-COLOR: {self.palette['rect2'][:7]}\">{margin} {stringfromseconds(midphasetime)} {margin} {midphaseP}% {margin} {midroc} {margin}</font>"
             text_color_rect3 = '#ffffff' if self.aw.QColorBrightness(QColor(self.palette['rect3'])) < 128 else '#000000'
             string3 = f" <font color = \"{text_color_rect3[:7]}\" style=\"BACKGROUND-COLOR: {self.palette['rect3'][:7]}\">{margin} {stringfromseconds(finishphasetime)} {margin} {finishphaseP}% {margin} {finishroc} {margin}</font>"
-            self.aw.sendmessage(f'<PRE>{string1}{string2}{string3}</PRE>',append=False)
+            self.aw.sendmessage(f'{string1}{string2}{string3}',append=False)
 
     #handler for moving point
     def on_motion(self, event:'MouseEvent') -> None:
@@ -17934,6 +17934,7 @@ class tgraphcanvas(FigureCanvas):
 
             orange_hit = False
             blue_hit = False
+            orange_blue_msg_sent = False
             if self.ax is not None and xdata is not None and ydata is not None:                       #outside graph type is None
                 for i,_ in enumerate(self.timex):
                     if abs(xdata - self.timex[i]) < 7.:
@@ -17983,6 +17984,7 @@ class tgraphcanvas(FigureCanvas):
                             elif index == 7:
                                 timez = stringfromseconds(self.timex[self.timeindex[7]] - self.timex[self.timeindex[0]])
                                 self.aw.sendmessage(QApplication.translate('Message', '[ COOL ]') + ' ' + timez, style="background-color:'#6FB5D1';",append=False)
+                            orange_blue_msg_sent = True
                             break
                         axfig = self.ax.get_figure()
                         if self.BTcurve and abs(self.temp2[i] - ydata) < 10:
@@ -18006,6 +18008,7 @@ class tgraphcanvas(FigureCanvas):
                                 self.fig.canvas.flush_events()
                         timez = stringfromseconds(self.timex[i] - self.timex[self.timeindex[0]])
                         self.aw.sendmessage(timez,style="background-color:'lightblue';",append=False)
+                        orange_blue_msg_sent = True
                         break
                 draw_idle = False
                 if not orange_hit and self._designer_orange_mark_shown and self._designer_orange_mark is not None:
@@ -18025,7 +18028,8 @@ class tgraphcanvas(FigureCanvas):
                     self.setCursor(Qt.CursorShape.OpenHandCursor)
                 else:
                     self.setCursor(Qt.CursorShape.PointingHandCursor) # Qt.CursorShape.PointingHandCursor or Qt.CursorShape.ArrowCursor
-                    self.phases_to_messageline()
+                    if not orange_blue_msg_sent:
+                        self.phases_to_messageline()
 
 
         except Exception as e: # pylint: disable=broad-except
