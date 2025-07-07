@@ -101,7 +101,7 @@ class Display:
     def clear_roasted(self) -> None: # pylint: disable=no-self-use
         ...
 
-    def show_item(self, item:WeightItem, state:PROCESS_STATE = PROCESS_STATE.DISCONNECTED, component:int = 0) -> None: # pylint: disable=unused-argument,no-self-use
+    def show_item(self, item:WeightItem, state:PROCESS_STATE = PROCESS_STATE.DISCONNECTED, component:int = 0, final_weight:Optional[int] = None) -> None: # pylint: disable=unused-argument,no-self-use
         ...
 
     # set the displays CANCEL timer timeout in seconds
@@ -339,9 +339,10 @@ class GreenWeighingState(StateMachine):
         self.bucket = 1
         self.update_displays(progress=True)
 
-    def after_task_completed(self) -> None:
+    # final weight in g
+    def after_task_completed(self, weight:int) -> None:
         self.process_state = PROCESS_STATE.DONE
-        self.update_displays()
+        self.update_displays(final_weight = weight)
 
     def before_end(self, weight:int, block_scale_release:bool=False) -> None:
         del weight
@@ -445,13 +446,14 @@ class GreenWeighingState(StateMachine):
 #-
     # render current item and state on all active displays
     # if progress is True, the current weighing progress is displayed
-    def update_displays(self, progress:bool=False) -> None:
+    # final_weight in g if given
+    def update_displays(self, progress:bool=False, final_weight:Optional[int] = None) -> None:
         for display in self.displays:
             if self.current_weight_item is not None:
                 if progress:
                     display.show_progress(self.process_state, self.component, self.bucket, self.current_weight)
                 else:
-                    display.show_item(self.current_weight_item, self.process_state, self.component)
+                    display.show_item(self.current_weight_item, self.process_state, component=self.component, final_weight=final_weight)
             else:
                 display.clear_green()
 
@@ -565,9 +567,10 @@ class RoastedWeighingState(StateMachine):
         self.current_weight = weight
         self.update_displays(result=True)
 
-    def after_task_completed(self) -> None:
+    # final weight in g
+    def after_task_completed(self, weight:int) -> None:
         self.process_state = PROCESS_STATE.DONE
-        self.update_displays()
+        self.update_displays(final_weight = weight)
 
     # weight in g
     def after_end(self, weight:int) -> None:
@@ -597,13 +600,14 @@ class RoastedWeighingState(StateMachine):
 
     # render current item and state on all active displays
     # if result is True, the current weighing result is displayed
-    def update_displays(self, result:bool=False) -> None:
+    # final_weight in g if given
+    def update_displays(self, result:bool=False, final_weight:Optional[int] = None) -> None:
         for display in self.displays:
             if self.current_weight_item is not None:
                 if result:
                     display.show_result(self.process_state, self.current_weight)
                 else:
-                    display.show_item(self.current_weight_item, self.process_state)
+                    display.show_item(self.current_weight_item, self.process_state, final_weight=final_weight)
             else:
                 display.clear_roasted()
 
@@ -620,10 +624,11 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefl
     MAX_EMPTY_BUCKET_WEIGHT:Final[int] = 4000               # maximum empty bucket weight recognized in g
     MIN_EMPTY_BUCKET_WEIGHT_BATCH_PERECENT:Final[int] = 5   # minimum empty bucket weight percentage of batch size in %
     MAX_EMPTY_BUCKET_WEIGHT_BATCH_PERECENT:Final[int] = 25  # maximum empty bucket weight percentage of batch size in %
-    EMPTY_SCALE_RECOGNITION_TOLERANCE_TIGHT:Final[int] = 25 # +- tight tolerance to recognize empty scale in g for scale.readability() < 1g
-    EMPTY_SCALE_RECOGNITION_TOLERANCE_LOOSE:Final[int] = 40 # +- loose tolerance to recognize empty scale in g for scale.readability() >= 1g
     MIN_EMPTY_BUCKET_RECOGNITION_TOLERANCE:Final[int] = 10  # +- minimal tolerance to recognize empty green bucket in g
     EMPTY_BUCKET_RECOGNITION_TOLERANCE_PERCENT:Final[float] = 1     # +- tolerance to recognize empty green bucket in % of bucket weight
+    #-
+    EMPTY_SCALE_RECOGNITION_TOLERANCE_TIGHT:Final[int] = 25 # +- tight tolerance to recognize empty scale in g for scale.readability() < 1g
+    EMPTY_SCALE_RECOGNITION_TOLERANCE_LOOSE:Final[int] = 40 # +- loose tolerance to recognize empty scale in g for scale.readability() >= 1g
     CANCELED_STEP_RECOGNITION_TOLERANCE:Final[int] = 15     # +- tolerance to recognize a previous 'task_cancel' step to restart via 'bucket_put_back' in g
     DONE_STEP_RECOGNITION_TOLERANCE:Final[int] = 15         # +- tolerance to recognize a previous 'task_completed' step to restart via 'bucket_put_back_done' in g
     SWAP_STEP_RECOGNITION_TOLERANCE:Final[int] = 15         # +- tolerance to recognize a previous 'bucket_swapped' step to restart via 'bucket_put_back_swapped' in g
@@ -889,7 +894,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefl
             if 0 <= self.aw.container1_idx < len(self.aw.qmc.container_weights):
                 # if green bucket is set, step should be about the weight of the user defined green bucket
                 selected_container_weight = self.aw.qmc.container_weights[self.aw.container1_idx]
-                return abs(selected_container_weight - step) < max(float(WeightManager.MIN_EMPTY_BUCKET_RECOGNITION_TOLERANCE),
+                return abs(selected_container_weight - step) <= max(float(WeightManager.MIN_EMPTY_BUCKET_RECOGNITION_TOLERANCE),
                     selected_container_weight*WeightManager.EMPTY_BUCKET_RECOGNITION_TOLERANCE_PERCENT/100)
 
             # default min/max limits between 5% and 25% of batchsize in g, with absolute min. of 300g and max. of 4000g
@@ -1044,48 +1049,45 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefl
             weight = ((self.scale1_last_stable_weight if scale_nr == 1 else self.scale2_last_stable_weight)
                 - self.green_task_scale_tare_weight             # remove tare weight
                 + self.green_task_container1_registered_weight) # add already registered green weight filled in container 1
-            sm_message:Optional[str] = None
 
             if (self.aw.two_bucket_mode and weight < batchsize * 1/3) or (not self.aw.two_bucket_mode and weight < batchsize * 0.5):
                 # case 1: bucket was almost empty (less than 1/3, in two-bucket-mode, or less than 50% in one-bucket-mode)
-                sm_message = 'bucket_removed'
+                self.sm_green.send('bucket_removed')
 
             elif self.green_task_container1_registered_weight == 0 and self.aw.two_bucket_mode and batchsize * 1/3 <= weight < batchsize * 2/3:
                 # case 2: bucket filled between 1/3 and 2/3 (only in two-bucket-mode)
                 # buckets not yet swapped
-                sm_message = 'bucket_swapped'
                 # we register the already weighted greens
                 self.green_task_container1_registered_weight = weight
                 self.task_swapped_step = step
                 self.sm_green.send('fill', weight, True) # update widget after registered weight of container 1 has been set
+                self.sm_green.send('bucket_swapped')
 
             elif self.green_task_container1_registered_weight != 0 and abs(weight - self.green_task_container1_registered_weight) < self.empty_scale_tolerance(scale_nr):
-                sm_message = 'bucket_removed'
+                self.sm_green.send('bucket_removed')
 
             elif self.aw.green_task_precision == 0: # precision is deactivated; all weights are accepted (overloading/underloading outside of target range); canceling deactivated
                 # case 3: bucket completely filled (precision deactivated) => done
-                sm_message = 'task_completed'
                 self.task_done_step = step
                 self.task_done_weight = weight
                 self.done_green_task_timer.start(self.WAIT_BEFORE_DONE)
+                self.sm_green.send('task_completed', self.task_done_weight)
 
             elif (self.aw.green_task_precision > 0 and
                     (batchsize - (self.aw.green_task_precision/100 * batchsize)) <= weight <= (batchsize + (self.aw.green_task_precision/100 * batchsize))):
                 # if weight is in target zone (batchsize - green_task_precision% <= weight <= batchsize + green_task_precision%) the task is completed
                 # case 4: bucket completely filled (precision activated) => done
-                sm_message = 'task_completed'
                 self.task_done_step = step
                 self.task_done_weight = weight
                 self.done_green_task_timer.start(self.WAIT_BEFORE_DONE)
+                self.sm_green.send('task_completed', self.task_done_weight)
 
             else:
                 # task canceled
-                sm_message = 'task_canceled'
                 self.task_canceled_step = step
                 self.cancel_green_task_timer.start(self.WAIT_BEFORE_CANCEL)
+                self.sm_green.send('task_canceled')
 
-            if sm_message is not None:
-                self.sm_green.send(sm_message)
 
         ## roasted task
         elif (self.sm_roasted.current_weight_item is not None and self.scale_empty(scale_nr, self.roasted_task_empty_scale_weight, stable_weight) and
@@ -1095,8 +1097,8 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefl
             if abs(self.roasted_task_scale_total_weight + step) < self.ROASTED_BUCKET_REMOVALE_TOLERANCE:
                 weight = int(round(self.roasted_task_scale_total_weight - self.aw.qmc.container_weights[self.aw.container2_idx]
                             - self.roasted_task_empty_scale_weight))             # remove tare weight
-                self.sm_roasted.send('task_completed')
                 self.roasted_task_done_weight = weight
+                self.sm_roasted.send('task_completed', self.roasted_task_done_weight)
                 self.done_roasted_task_timer.start(self.WAIT_BEFORE_DONE)
             else:
                 # this does nothing!
@@ -1192,8 +1194,16 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefl
 
     @pyqtSlot()
     def tap_cancel_green_task_slot(self) -> None:
-        if (self.green_task_scale != 0 and self.sm_green.current_state in {GreenWeighingState.empty, GreenWeighingState.done_weighing1, GreenWeighingState.done_weighing2} and
-                self.scale_empty(self.green_task_scale, self.green_task_empty_scale_weight, self.last_nonstable_green_weight)):
+        selected_container_weight = (self.aw.qmc.container_weights[self.aw.container1_idx] if 0 <= self.aw.container1_idx < len(self.aw.qmc.container_weights) else 0)
+        if (self.green_task_scale != 0 and (self.sm_green.current_state in {
+                    GreenWeighingState.empty, GreenWeighingState.done_weighing1, GreenWeighingState.done_weighing2
+                    } and
+                self.scale_empty(self.green_task_scale, self.green_task_empty_scale_weight, self.last_nonstable_green_weight)
+                or (self.sm_green.current_state in {GreenWeighingState.weighing1, GreenWeighingState.weighing2} and
+                    # if current state is weighing, the reset should be executed if the last stable weight is about the weight of the registered green tare weight
+                    abs(self.green_task_scale_tare_weight - (self.scale1_last_stable_weight if self.green_task_scale == 1 else self.scale2_last_stable_weight)) <=
+                        max(float(WeightManager.MIN_EMPTY_BUCKET_RECOGNITION_TOLERANCE),
+                            selected_container_weight*WeightManager.EMPTY_BUCKET_RECOGNITION_TOLERANCE_PERCENT/100)))):
             self.done_green_task_timer.stop()
             self.green_task_empty_scale_weight = 0
             self.last_nonstable_green_weight = 0
@@ -1239,7 +1249,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefl
             self.last_nonstable_green_weight = weight
             new_weight = weight - self.green_task_scale_tare_weight + self.green_task_container1_registered_weight + self.green_task_stable_weight_before_connection_loss
             self.sm_green.send('fill', max(0, new_weight), weight>self.scale1_last_stable_weight) # only update on increasing weights or if larger than thhe last stable weight
-            if (self.sm_green.current_state in { GreenWeighingState.empty, GreenWeighingState.done_weighing1, GreenWeighingState.done_weighing2 } and
+            if (self.sm_green.current_state in { GreenWeighingState.weighing1, GreenWeighingState.weighing2, GreenWeighingState.empty, GreenWeighingState.done_weighing1, GreenWeighingState.done_weighing2 } and
                  weight > self.green_task_empty_scale_weight + WeightManager.TAP_CANCEL_THRESHOLD):
                 self.tap_cancel_green_task_timer.start(WeightManager.TAP_CANCEL_PERIOD)
         elif self.roasted_task_scale == 1:

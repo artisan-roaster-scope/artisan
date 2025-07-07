@@ -3811,9 +3811,10 @@ class WeightItemDisplay(Display):
         self.schedule_window.task_weight.setText('--')
         self.schedule_window.task_weight.setToolTip(QApplication.translate('Plus', 'nothing to weight'))
 
-    def show_item(self, item:'WeightItem', state:PROCESS_STATE = PROCESS_STATE.DISCONNECTED, component:int = 0) -> None:
+    def show_item(self, item:'WeightItem', state:PROCESS_STATE = PROCESS_STATE.DISCONNECTED, component:int = 0, final_weight:Optional[int] = None) -> None:
         del state
         del component
+        del final_weight
         todo_tab_active:bool = self.schedule_window.TabWidget.currentIndex() == 0
         if ((todo_tab_active and isinstance(item, GreenWeightItem)) or
             not todo_tab_active and isinstance(item, RoastedWeightItem)):
@@ -3866,10 +3867,9 @@ class GreenWebDisplay(GreenDisplay):
         self.update()
 
     # component indicates which of the item.descriptions is currently processed
-    def show_item(self, item:'WeightItem', state:PROCESS_STATE = PROCESS_STATE.DISCONNECTED, component:int = 0) -> None:
-
-        _log.debug('PRINT show_item: %s',item)
-
+    # in state=PROCESS_STATE.done, the final_weight if given states the final weight in g that has been measured and that will be registered for the task
+    def show_item(self, item:'WeightItem', state:PROCESS_STATE = PROCESS_STATE.DISCONNECTED, component:int = 0, final_weight:Optional[int] = None) -> None:
+#        _log.debug("PRINT show_item(%s,%s,%s,%s)",item,state,component,final_weight)
         if (isinstance(item, GreenWeightItem) and
             (item != self.last_item or self.last_process_state != state or self.last_component != component)):
                 # NOTE: as item is of type WeightItem and this is declared as @dataclass the equality is structural here
@@ -3879,7 +3879,8 @@ class GreenWebDisplay(GreenDisplay):
             #-
             self.rendered_task['id'] = item.position
             self.rendered_task['title'] = item.title
-            self.rendered_task['batchsize'] = render_weight(item.weight, 1, item.weight_unit_idx)
+            # weight is rendered with max 7 characters ('10.32kg' is well displayed, '10.321kg' not) thus we set brief=1 for weights >= 10kg
+            self.rendered_task['batchsize'] = render_weight(item.weight, 1, item.weight_unit_idx, brief=(0 if item.weight < 10 else 1)) # item.weight in kg
             if len(item.descriptions)>component:
                 self.rendered_task['blend_percent'] = (f'{item.descriptions[component][0] * 100:.0f}%' if item.descriptions[component][0] != 1 else '')
                 self.rendered_task['subtitle'] = item.descriptions[component][1]
@@ -3898,6 +3899,10 @@ class GreenWebDisplay(GreenDisplay):
                 self.rendered_task['timer'] = self.cancel_timer_timeout
             elif state == PROCESS_STATE.DONE:
                 self.rendered_task['timer'] = self.done_timer_timeout
+                if final_weight is not None:
+                    # or as substring (no limit: brief = 0)
+                    self.rendered_task['weight'] = render_weight(final_weight, 0, weight_units.index(self.schedule_window.aw.qmc.weight[2]),
+                                brief=(0 if final_weight < 10000 else 1))
 
             self.update()
 
@@ -3930,7 +3935,10 @@ class GreenWebDisplay(GreenDisplay):
                 component_target_ratio = completed_ratio + current_component_ratio
                 component_target = component_target_ratio * target
                 # showing what is missing per component
-                self.rendered_task['weight'] = render_weight(component_target - current_weight, 0, weight_units.index(self.schedule_window.aw.qmc.weight[2]), brief=1)
+                # weight is rendered with max 7 characters ('10.32kg' is well displayed, '10.321kg' not) thus we set brief=1 for weights >= 10kg
+                delta_weight = component_target - current_weight
+                self.rendered_task['weight'] = render_weight(delta_weight, 0, weight_units.index(self.schedule_window.aw.qmc.weight[2]),
+                            brief=(0 if delta_weight < 10000 else 1))
                 component_target_weight = target * current_component_ratio
                 completed_weight = target * completed_ratio
                 if component_target_weight>0:
@@ -3984,7 +3992,7 @@ class RoastedWebDisplay(RoastedDisplay):
         self.rendered_task = cast(TaskWebDisplayPayload, dict(self.INIT_PAYLOAD))  # reset with a copy of the empty_task
         self.update()
 
-    def show_item(self, item:'WeightItem', state:PROCESS_STATE = PROCESS_STATE.DISCONNECTED, component:int = 0) -> None:
+    def show_item(self, item:'WeightItem', state:PROCESS_STATE = PROCESS_STATE.DISCONNECTED, component:int = 0, final_weight:Optional[int] = None) -> None:
         del component
         if (isinstance(item, RoastedWeightItem) and
                 (item != self.last_item or self.last_process_state != state)):
@@ -3995,7 +4003,7 @@ class RoastedWebDisplay(RoastedDisplay):
             #-
             self.rendered_task['id'] = item.position
             self.rendered_task['title'] = item.title
-            self.rendered_task['batchsize'] = render_weight(item.weight, 1, item.weight_unit_idx) # from 1:kg to target, user selected, weight unit
+            self.rendered_task['batchsize'] = render_weight(item.weight, 1, item.weight_unit_idx, brief=(0 if item.weight < 10 else 1)) # from 1:kg to target, user selected, weight unit
             if len(item.descriptions)>0 and len(item.descriptions[0])>1:
                 self.rendered_task['subtitle'] = (item.descriptions[0][1] if item.blend_name is None else item.blend_name)
             else:
@@ -4012,12 +4020,17 @@ class RoastedWebDisplay(RoastedDisplay):
                 self.rendered_task['timer'] = self.cancel_timer_timeout
             elif state == PROCESS_STATE.DONE:
                 self.rendered_task['timer'] = self.done_timer_timeout
+                if final_weight is not None:
+                    # or as substring (no limit: brief = 0)
+                    self.rendered_task['weight'] = render_weight(final_weight, 0, weight_units.index(self.schedule_window.aw.qmc.weight[2]),
+                                brief=(0 if final_weight < 10000 else 1))
 
             self.update()
 
             self.rendered_task['timer'] = 0 # clear timer start trigger immediately
 
 
+    # current weight in g
     def show_result(self, state:PROCESS_STATE, current_weight:int) -> None:
         if (self.last_item is not None and (self.last_process_state != state or self.last_current_weight != current_weight)):
             self.last_process_state = state
@@ -4030,7 +4043,7 @@ class RoastedWebDisplay(RoastedDisplay):
                     total_percent = 100 * current_weight / batchsize
                 else:
                     total_percent = 0
-                self.rendered_task['weight'] = render_weight(current_weight, 0, weight_units.index(self.schedule_window.aw.qmc.weight[2]), brief=1) # yield
+                self.rendered_task['weight'] = render_weight(current_weight, 0, weight_units.index(self.schedule_window.aw.qmc.weight[2]), brief=(0 if current_weight < 10000 else 1)) # yield
                 self.rendered_task['percent'] = 100.2
                 self.rendered_task['total_percent'] = total_percent
                 self.rendered_task['loss'] = f'-{float2float(100-total_percent, self.schedule_window.aw.percent_decimals)}%' # weight loss percent

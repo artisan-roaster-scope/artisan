@@ -4885,7 +4885,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     def eventFilter(self, obj:Optional['QObject'], event:Optional[QEvent]) -> bool:
         # pylint: disable=c-extension-no-member
         try:
-            if event is not None and event.type() == QEvent.Type.ApplicationPaletteChange and self.app is not None and sys.platform.startswith('darwin') and QVersionNumber.fromString(qVersion())[0] < QVersionNumber(6,5,0) and darkdetect.isDark() != self.app.darkmode: # pyright:ignore[reportAttributeAccessIssue,reportPossiblyUnboundVariable] # "isDark" is not a known member of module "darkdetect"
+            if event is not None and event.type() == QEvent.Type.ApplicationPaletteChange and self.app is not None and sys.platform.startswith('darwin') and QVersionNumber.fromString(qVersion())[0] < QVersionNumber(6,5,0) and darkdetect.isDark() != self.app.darkmode: # pyrefly: ignore # pyright:ignore[reportAttributeAccessIssue,reportPossiblyUnboundVariable] # "isDark" is not a known member of module "darkdetect"
                     # called if the palette changed (switch between dark and light mode on macOS Legacy builds)
                 self.app.darkmode = not self.app.darkmode
                 self.updateCanvasColors()
@@ -14843,9 +14843,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         ['Time',   self.qmc.roastdate.time().toString()[:-3]              ],
                         ]
                     for f, fe in enumerate(fieldlist):
-                        ws.cell(row=1,column=f+1).value = fe[0]
+                        ws.cell(row=1,column=f+1).value = fe[0] # pyrefly: ignore[bad-assignment]
                         ws.cell(row=1,column=f+1).font = bf
-                        ws.cell(row=2,column=f+1).value = fe[1]
+                        ws.cell(row=2,column=f+1).value = fe[1] # pyrefly: ignore[bad-assignment]
                         ws.cell(row=1,column=f+1).alignment = Alignment(horizontal='center')
                         ws.cell(row=2,column=f+1).alignment = Alignment(horizontal='center')
 
@@ -14869,13 +14869,13 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         c += 1
                         try:
                             # error: Cannot assign to attribute "value" for class "MergedCell" "str" is not assignable to "None"
-                            ws.cell(row=r,column=c).value = el[0] # pyright:ignore[reportAttributeAccessIssue]
+                            ws.cell(row=r,column=c).value = el[0] # pyright:ignore[reportAttributeAccessIssue] # pyrefly: ignore[bad-assignment]
                         except Exception:
                             pass
                         c += 1
                         try:
                             # error: Cannot assign to attribute "value" for class "MergedCell" "str" is not assignable to "None"
-                            ws.cell(row=r,column=c).value = el[1] # pyright:ignore[reportAttributeAccessIssue]
+                            ws.cell(row=r,column=c).value = el[1] # pyright:ignore[reportAttributeAccessIssue] # pyrefly: ignore[bad-assignment]
                         except Exception:
                             pass
 
@@ -21414,13 +21414,13 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         ws['A1'].font = bf
                         ws['B1'] = QApplication.translate('HTML Report Template', 'Time')
                         ws['B1'].font = bf
-                        ws.column_dimensions['B'].width = 18
+                        ws.column_dimensions['B'].width = 18 # pyrefly: ignore[bad-assignment]
                         ws['C1'] = QApplication.translate('HTML Report Template', 'Profile')
                         ws['C1'].font = bf
-                        ws.column_dimensions['C'].width = 25
+                        ws.column_dimensions['C'].width = 25 # pyrefly: ignore[bad-assignment]
                         ws['D1'] = QApplication.translate('HTML Report Template', 'Beans')
                         ws['D1'].font = bf
-                        ws.column_dimensions['D'].width = 25
+                        ws.column_dimensions['D'].width = 25 # pyrefly: ignore[bad-assignment]
                         ws['E1'] = QApplication.translate('HTML Report Template', 'In') + ' (' + str(unit.lower()) + ')'
                         ws['E1'].font = bf
                         ws['F1'] = QApplication.translate('HTML Report Template', 'Out') + ' (' + str(unit.lower()) + ')'
@@ -22676,7 +22676,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     width = len(name + suffix) + 2.
                     if width > widths[i]:
                         widths[i] = width
-                        ws.column_dimensions[get_column_letter(i+1)].width = width
+                        ws.column_dimensions[get_column_letter(i+1)].width = width # pyrefly: ignore[bad-assignment]
 
                 # write data
                 c = 1
@@ -22734,7 +22734,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                         width = float(units)
                                     if width > widths[i]:
                                         widths[i] = width
-                                        ws.column_dimensions[get_column_letter(cnum)].width = width
+                                        ws.column_dimensions[get_column_letter(cnum)].width = width # pyrefly: ignore[bad-assignment]
                                     ws[cr].alignment = Alignment(wrap_text=True)
                                 elif typ == 'int':
                                     ws[cr] = conv_fld  # type: ignore[assignment, unused-ignore]
@@ -22771,7 +22771,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                     width = len(fmt) + 2.
                                     if width > widths[i]:
                                         widths[i] = width
-                                        ws.column_dimensions[get_column_letter(cnum)].width = width
+                                        ws.column_dimensions[get_column_letter(cnum)].width = width # pyrefly: ignore[bad-assignment]
                                 elif typ == 'bool':
                                     ws[cr] = str(conv_fld)
 
