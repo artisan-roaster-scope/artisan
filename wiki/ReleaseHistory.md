@@ -7,14 +7,21 @@ v3.2.1
 
 * ADDITIONS
   - adds drag-drop import of a Cropster XLS profile
+
 * CHANGES
   - updated Spanish localizations (thanks to Juan Carlos Bonilla)
   - updates libs (scipy, bleak, lxml, pillow)
+  - Breaking feature only when hidden buttons are first at the top of the Events Buttons table.  Hidden buttons at the top of the Events Buttons table are no longer counted in the first row's button count, which is limited by the Max Buttons per Row setting.  All other hidden buttons continue to be counted in each row's button count.
+  - Unlimited number of buttons can be created while display is limited to maximum 10 rows with maximum 50 buttons each.
+  - Palette load uses and updates the user selected profile path.
+
 * FIXES
   - fixes regression which broke the designer such that points could not be moved ([Discussion #1905](../../../discussions/1905))
   - fixes support for second scale
   - fixes rendering of special characters like quotes in task displays
   - fixes regression which broke the import of roast profiles exported from Cropster, Giesen, IKAWA, Loring, Petroncini, RoastLog, RoastPath, ROEST, Rubasse, and Stronghold
+  - fixes event buttons bottom row not rendered properly in all cases  
+  - fixes number of rendered event buttons rows  
 
 ----
 v3.2.0 (June 23, 2025)

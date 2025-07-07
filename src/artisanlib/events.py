@@ -1838,7 +1838,7 @@ class EventsDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(bool)
     def restorepaletteeventbuttons(self, _:bool = False) -> None:
-        filename = self.aw.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Load Palettes'),path=self.aw.profilepath)
+        filename = self.aw.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Load Palettes'))
         if filename:
             maxlen = self.aw.loadPalettes(filename,self.aw.buttonpalette)
             if maxlen is not None:
