@@ -705,7 +705,7 @@ class comportDlg(ArtisanResizeablDialog):
         self.modbus_Serial_delayEdit.setValidator(self.aw.createCLocaleDoubleValidator(0,3,1,self.modbus_Serial_delayEdit))
         self.modbus_Serial_delayEdit.setFixedWidth(50)
         self.modbus_Serial_delayEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
-        self.modbus_Serial_delayEdit.setToolTip(QApplication.translate('Tooltip', 'Extra delay in Milliseconds between MODBUS Serial commands'))
+        self.modbus_Serial_delayEdit.setToolTip(QApplication.translate('Tooltip', 'Extra delay after connect in seconds before sending requests (needed by Arduino devices restarting on connect)'))
         modbus_Serial_retries = QLabel(QApplication.translate('Label', 'Retries'))
         self.modbus_Serial_retriesComboBox = QComboBox()
 #        modbus_Serial_retries.setBuddy(self.modbus_Serial_retriesComboBox)

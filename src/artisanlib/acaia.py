@@ -739,8 +739,8 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
         if SCALE_CLASS.RELAY:
             self.streaming_notifications()
         self.send_message(MSG.TARE,b'\x00')
-#        if SCALE_CLASS.RELAY:
-#            self.changes_notifications()
+        if SCALE_CLASS.RELAY:
+            self.changes_notifications()
 
     def send_get_settings(self) -> None:
         _log.debug('send get settings')

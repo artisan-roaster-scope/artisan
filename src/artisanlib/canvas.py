@@ -18815,7 +18815,12 @@ class tgraphcanvas(FigureCanvas):
                 if self.ax is not None:
                     i = self.ax.lines.index(self.base_horizontalcrossline)
                     self.ax.lines[i].remove()
-#                    self.ax.lines.remove(self.l_horizontalcrossline)
+            except Exception: # pylint: disable=broad-except
+                pass
+            try:
+                if self.ax is not None:
+                    i = self.ax.lines.index(self.l_horizontalcrossline)
+                    self.ax.lines[i].remove()
             except Exception: # pylint: disable=broad-except
                 pass
             self.l_horizontalcrossline = None
@@ -18823,7 +18828,12 @@ class tgraphcanvas(FigureCanvas):
                 if self.ax is not None:
                     i = self.ax.lines.index(self.base_verticalcrossline)
                     self.ax.lines[i].remove()
-#                    self.ax.lines.remove(self.l_verticalcrossline)
+            except Exception: # pylint: disable=broad-except
+                pass
+            try:
+                if self.ax is not None:
+                    i = self.ax.lines.index(self.l_verticalcrossline)
+                    self.ax.lines[i].remove()
             except Exception: # pylint: disable=broad-except
                 pass
             self.l_verticalcrossline = None
