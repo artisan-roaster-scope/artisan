@@ -355,7 +355,7 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
     def decode_weight(self, payload:bytes) -> Tuple[Optional[float], bool]:
         try:
             #big_endian = (payload[5] & 0x08) == 0x08 # bit 3 of byte 5 is set if weight is in big endian
-            big_endian = self.scale_class == SCALE_CLASS.RELAY
+            big_endian = False # self.scale_class == SCALE_CLASS.RELAY
 
             value:float = 0
             if big_endian:
@@ -388,10 +388,10 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
                 elif self.unit == UNIT.OZ:
                     value = value * 28.3495 # scale set to oz displays 4 decimals
 
-            if self.scale_class == SCALE_CLASS.RELAY:
-                stable = (payload[5] & 0x01) == 0x01
-            else:
-                stable = (payload[5] & 0x01) != 0x01
+#            if big_endian:
+#                stable = (payload[5] & 0x01) == 0x01
+#            else:
+            stable = (payload[5] & 0x01) != 0x01
 
             # if 2nd bit of payload[5] is set, the reading is negative
             if (payload[5] & 0x02) == 0x02:
@@ -412,6 +412,7 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
 #                _log.debug('PRINT new stable weight: %s', self.stable_weight)
                 self.weight_changed_signal.emit(self.stable_weight, stable)
             elif not stable and value_rounded != self.weight:
+                self.stable_weight = None # non-stable weights invalidate the last stable weight to ensure a sequence of equal stable weights is reported if interleaved with non-stable weights
                 self.weight = value_rounded
 #                _log.debug('PRINT new weight: %s', self.weight)
                 self.weight_changed_signal.emit(self.weight, stable)
@@ -736,11 +737,13 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
 
     def send_tare(self) -> None:
         _log.debug('send tare')
-        if SCALE_CLASS.RELAY:
-            self.streaming_notifications()
+# not needed any longer as in non-streaming mode the tare weight is always send after tare
+#        if SCALE_CLASS.RELAY:
+#            self.streaming_notifications()
         self.send_message(MSG.TARE,b'\x00')
-        if SCALE_CLASS.RELAY:
-            self.changes_notifications()
+# not needed any longer as in non-streaming mode the tare weight is always send after tare
+#        if SCALE_CLASS.RELAY:
+#            self.changes_notifications()
 
     def send_get_settings(self) -> None:
         _log.debug('send get settings')
@@ -789,7 +792,7 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
         self.send_event(
             bytes([ # pairs of key/setting
                     0,  # weight id
-                    (1 if SCALE_CLASS.RELAY # 0: only weight changes are reported; 1: streaming weight changes at 1/10
+                    (0 if SCALE_CLASS.RELAY # 0: only weight changes are reported; 1: streaming weight changes at 1/10
                      else 3), # 0, 1, 3, 5, 7, 15, 31, 63, 127  # weight argument (speed of notifications in 1/10 sec; 0:  report changes in weight every 1/10)
                         # 5 or 7 seems to be good values for this app in Artisan
 #                    1,   # battery id

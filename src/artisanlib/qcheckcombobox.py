@@ -133,7 +133,7 @@ class CheckComboBox(QComboBox): # pyright: ignore [reportGeneralTypeIssues] # Ar
 
             decoration = index.data(Qt.ItemDataRole.DecorationRole)
             if isinstance(decoration, QIcon): # pyrefly: ignore[invalid-argument]
-                menuoption.icon = decoration
+                menuoption.icon = decoration # pyrefly: ignore[bad-assignment]
 
             if self.isSeparator(index):
                 menuoption.menuItemType = QStyleOptionMenuItem.MenuItemType.Separator # pyrefly: ignore[bad-assignment]

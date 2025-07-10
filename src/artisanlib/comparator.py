@@ -2069,12 +2069,15 @@ class roastCompareDlg(ArtisanDialog):
                 return p
         return None
 
-    def getPhasesData(self) -> List[Tuple[str, float, Tuple[float,float,float], bool, bool, str]]:
-        data :List[Tuple[str, float, Tuple[float,float,float], bool, bool, str]]= []
+    def getPhasesData(self) -> List[Tuple[str, float, Tuple[float,float,float], bool, bool, str,
+            Tuple[float,float,float], Tuple[float,float,float]]]:
+        data :List[Tuple[str, float, Tuple[float,float,float], bool, bool, str,
+                Tuple[float,float,float], Tuple[float,float,float]]]= []
         profiles:List[RoastProfile] = self.getProfilesVisualOrder()
         for p in reversed(profiles):
             if p.visible:
-                start:float = p.timex[p.timeindex[0]] if p.timeindex[0] != -1 else p.timex[0]
+                start_idx = p.timeindex[0] if p.timeindex[0] != -1 else 0
+                start:float = p.timex[start_idx]
                 total:float = p.timex[p.timeindex[6]] - start if p.timeindex[6] != 0 else p.timex[-1]
                 dry:float = p.timex[p.timeindex[1]] - start if p.timeindex[1] != 0 else 0
                 fcs:float = p.timex[p.timeindex[2]] - start if p.timeindex[2] != 0 else 0
@@ -2082,7 +2085,24 @@ class roastCompareDlg(ArtisanDialog):
                 p3:float = total - fcs if fcs != 0 else 0
                 p2:float = total - p1 - p3 if p1 != 0 and p3 != 0 else 0
                 c:QColor = QColor.fromRgbF(*p.color) # ty:ignore[missing-argument]
-                data.append((p.label, total, (p1, p2, p3), p.active, p.aligned, c.name()))
+                t1:float = p.temp2[p.timeindex[1]] if p.timeindex[1] != 0 and len(p.temp2) > p.timeindex[1] else -1
+                t2:float = p.temp2[p.timeindex[2]] if p.timeindex[2] != 0 and len(p.temp2) > p.timeindex[2] else -1
+                t3:float = p.temp2[p.timeindex[6]] if p.timeindex[6] != 0 and len(p.temp2) > p.timeindex[6] else (p.temp2[-1] if len(p.temp2)>0 else -1)
+                r1:float = -1
+                r2:float = -1
+                r3:float = -1
+                if p.delta2 is not None:
+                    r:Optional[float] = p.delta2[p.timeindex[1]] if p.timeindex[1] != 0 and len(p.delta2) > p.timeindex[1] else -1
+                    if r is not None:
+                        r1 = float(r)
+                    r = p.delta2[p.timeindex[2]] if p.timeindex[2] != 0 and len(p.delta2) > p.timeindex[2] else -1
+                    if r is not None:
+                        r2 = float(r)
+                    r = p.delta2[p.timeindex[6]] if p.timeindex[6] != 0 and len(p.delta2) > p.timeindex[6] else (p.delta2[-1] if len(p.delta2)>0 else -1)
+                    if r is not None:
+                        r3 = float(r)
+                data.append((p.label, total, (p1, p2, p3), p.active, p.aligned, c.name(),
+                    (t1, t2, t3), (r1, r2, r3)))
         return data
 
     def getProfilesVisualOrder(self) -> List[RoastProfile]:

@@ -12,7 +12,7 @@ types-urllib3>=1.26.25.14
 types-docutils>=0.21.0.20250604
 lxml-stubs>=0.5.1
 mypy==1.16.1
-pyright==1.1.402
+pyright==1.1.403
 ruff>=0.12.1
 pylint==3.3.7
 pre-commit>=4.2.0

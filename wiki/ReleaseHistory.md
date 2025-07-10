@@ -7,6 +7,7 @@ v3.2.1
 
 * ADDITIONS
   - adds drag-drop import of a Cropster XLS profile
+  - adds tooltip to phases widget in Comparator displaying 2nd and 3rd phase bean temperatures (or RoR if ALT/Option key is pressed) limits ([Issue #1906](../../../issues/1906))
 
 * CHANGES
   - updated Spanish localizations (thanks to Juan Carlos Bonilla)
@@ -16,12 +17,12 @@ v3.2.1
   - Palette load uses and updates the user selected profile path.
 
 * FIXES
-  - fixes regression which broke the designer such that points could not be moved ([Discussion #1905](../../../discussions/1905))
+  - fixes regression which broke the designer such that points could not be moved ([Discussion #1905](../../../discussions/1905) and [Issue #1916](../../../issues/1916))
   - fixes support for second scale
   - fixes rendering of special characters like quotes in task displays
   - fixes regression which broke the import of roast profiles exported from Cropster, Giesen, IKAWA, Loring, Petroncini, RoastLog, RoastPath, ROEST, Rubasse, and Stronghold
-  - fixes event buttons bottom row not rendered properly in all cases  
-  - fixes number of rendered event buttons rows  
+  - fixes event buttons bottom row not rendered properly in all cases
+  - fixes number of rendered event buttons rows
   - fixes graph bounce and jitter when moving the cursor in the designer
 
 ----

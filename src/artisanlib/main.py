@@ -1549,8 +1549,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         'mark_last_button_pressed_default', 'mark_last_button_pressed', 'show_extrabutton_tooltips_default', 'show_extrabutton_tooltips',
         'buttonpalette_buttonsize', 'buttonpalette_mark_last_button_pressed', 'buttonpalette_tooltips', 'buttonpalette_slider_alternative_layout', 'eventbuttontablecolumnwidths',
         'lowerbuttondialogLayout', 'lowerbuttondialog', 'lowerbuttondialogLayout', 'e1buttonbarLayout', 'e1buttondialog', 'e2buttonbarLayout', 'e2buttondialog',
-        'e3buttonbarLayout', 'e3buttondialog', 'e4buttonbarLayout', 'e4buttondialog','e5buttonbarLayout', 'e5buttondialog', 'e6buttonbarLayout', 'e6buttondialog', 
-        'e7buttonbarLayout', 'e7buttondialog', 'e8buttonbarLayout', 'e8buttondialog', 'e9buttonbarLayout', 'e9buttondialog', 'e10buttonbarLayout', 'e10buttondialog', 
+        'e3buttonbarLayout', 'e3buttondialog', 'e4buttonbarLayout', 'e4buttondialog','e5buttonbarLayout', 'e5buttondialog', 'e6buttonbarLayout', 'e6buttondialog',
+        'e7buttonbarLayout', 'e7buttondialog', 'e8buttonbarLayout', 'e8buttondialog', 'e9buttonbarLayout', 'e9buttondialog', 'e10buttonbarLayout', 'e10buttondialog',
         'keyboardmove', 'keyboardButtonList', 'keyboardmoveindex',
         'keyboardmoveflag', 'lastkeyboardcmd', 'error_dlg', 'serial_dlg', 'message_dlg', 'ETname', 'BTname', 'level1frame', 'level1layout', 'qpc', 'splitter', 'scroller', 'EventsGroupLayout',
         'LCD2frame', 'LCD3frame', 'LCD4frame', 'LCD5frame', 'LCD6frame', 'LCD7frame', 'TPlabel', 'TPlcd', 'TPlcdFrame', 'TP2DRYlabel', 'TP2DRYframe',
@@ -3965,7 +3965,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         #level 3
         level3layout.addLayout(pidbuttonLayout,0)
 
-        self.qpc: tphasescanvas = tphasescanvas(self.dpi, self)
+        self.qpc:tphasescanvas = tphasescanvas(self.dpi, self)
         self.qpc.mpl_connect('scroll_event', self.scrollingPhases)
 
         self.scroller: QScrollArea = QScrollArea()
@@ -26106,7 +26106,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             if self.extraeventsvisibility[i]:
                 first_visible_idx = i
                 break
-        
+
         for i, eet in enumerate(self.extraeventstypes):
             # next button in this group is hidden
             next_hidden = ((i - first_visible_idx)%self.buttonlistmaxlen < self.buttonlistmaxlen -1 and  # at least one more places in the group
