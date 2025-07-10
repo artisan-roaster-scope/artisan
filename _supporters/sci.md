@@ -34,7 +34,7 @@ sidebar:
 ## Energy Ratings
 
 
-|Model|Source|Size (kg)|Burner (kW)|Motor (kW)|
+|Model|Source|Size (kg)|Heater (kW)|Motor (kW)|
 |:-----|:-----:|:-----:|:-----:|:-----:|
 |||
 | 2IND | Elec | 2 | 2.5 | 0.3
