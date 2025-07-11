@@ -127,14 +127,14 @@ class tphasescanvas(FigureCanvas):
                             ror_end_temp:float = float2float(phases_data['BT_ROR_end_temp'], self.aw.qmc.LCDdecimalplaces)
                             ror_delta_temp:float = phases_data['BT_ROR_end_temp'] - phases_data['BT_ROR_start_temp']
                             ror_delta_temp_str:str = f"{('+' if ror_delta_temp>0 else '')}{float2float(ror_delta_temp, self.aw.qmc.LCDdecimalplaces)}"
-                            text = f"{ror_start_temp}°{self.aw.qmc.mode}/min => {ror_end_temp}°{self.aw.qmc.mode}/min  {ror_delta_temp_str}°{self.aw.qmc.mode}/min"
+                            text = f"{ror_start_temp}°{self.aw.qmc.mode}/min   {ror_delta_temp_str}°{self.aw.qmc.mode}/min   {ror_end_temp}°{self.aw.qmc.mode}/min"
                         elif phases_data['BT_start_temp'] != -1 and phases_data['BT_start_temp'] != -1:
                             # BT temperature
                             start_temp:float = float2float(phases_data['BT_start_temp'], self.aw.qmc.LCDdecimalplaces)
                             end_temp:float = float2float(phases_data['BT_end_temp'], self.aw.qmc.LCDdecimalplaces)
                             delta_temp:float = phases_data['BT_end_temp'] - phases_data['BT_start_temp']
                             delta_temp_str:str = f"{('+' if delta_temp>0 else '')}{float2float(delta_temp, self.aw.qmc.LCDdecimalplaces)}"
-                            text = f"{start_temp}°{self.aw.qmc.mode} => {end_temp}°{self.aw.qmc.mode}  {delta_temp_str}°{self.aw.qmc.mode}"
+                            text = f"{start_temp}°{self.aw.qmc.mode}   {delta_temp_str}°{self.aw.qmc.mode}   {end_temp}°{self.aw.qmc.mode}"
                         if text != '':
                             if self.tooltip_anno is None:
                                 self.tooltip_anno = self.ax.annotate('', xy=(0,0), xytext=(0,0), textcoords='offset points', ha='center', va='center',

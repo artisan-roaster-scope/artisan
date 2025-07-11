@@ -2663,12 +2663,12 @@ class tgraphcanvas(FigureCanvas):
             finally:
                 if self.updateBackgroundSemaphore.available() < 1:
                     self.updateBackgroundSemaphore.release(1)
+                self.block_update = False
 
     def doUpdate(self) -> None:
         if not self.designerflag:
             self.resetlinecountcaches() # ensure that the line counts are up to date
             self.resetlines() # get rid of projection, cross lines and AUC line
-
             try:
                 with warnings.catch_warnings():
                     warnings.simplefilter('ignore')
@@ -2690,8 +2690,6 @@ class tgraphcanvas(FigureCanvas):
                     # we redraw the additional artists like the projection lines, the timeline and the AUC guide line
                     self.update_additional_artists()
                     self.fig.canvas.blit(axfig.bbox)
-
-        self.block_update = False
 
     def device_name_subst(self, device_name:str) -> str:
         try:
@@ -3006,7 +3004,7 @@ class tgraphcanvas(FigureCanvas):
                 self.segmentpickflag = True
 
             # toggle visibility of graph lines by clicking on the legend
-            elif self.legend is not None and event_artist != self.legend and isinstance(event_artist, (Line2D, Text)) \
+            elif not bool(self.aw.comparator) and self.legend is not None and event_artist != self.legend and isinstance(event_artist, (Line2D, Text)) \
                 and event_artist not in [self.l_backgroundeventtype1dots,self.l_backgroundeventtype2dots,self.l_backgroundeventtype3dots,self.l_backgroundeventtype4dots] \
                 and event_artist not in [self.l_eventtype1dots,self.l_eventtype2dots,self.l_eventtype3dots,self.l_eventtype4dots]:
                 idx = None
@@ -3069,7 +3067,7 @@ class tgraphcanvas(FigureCanvas):
                                 pass
 
             # show event information by clicking on event lines in step, step+ and combo modes
-            elif isinstance(event_artist, Line2D):
+            elif not bool(self.aw.comparator) and isinstance(event_artist, Line2D):
                 event_type:Optional[int] = None
                 if isinstance(event.ind, int): # type: ignore[attr-defined] # "PickEvent" has no attribute "ind"
                     ind = event.ind # type: ignore[attr-defined] # "PickEvent" has no attribute "ind"
@@ -3124,7 +3122,7 @@ class tgraphcanvas(FigureCanvas):
                                         self.background_event_last_picked_ind = i
                                         self.background_event_last_picked_pos = ind
                                     break
-                elif event_artist in [self.l_eventtype1dots,self.l_eventtype2dots,self.l_eventtype3dots,self.l_eventtype4dots]:
+                elif not bool(self.aw.comparator) and event_artist in [self.l_eventtype1dots,self.l_eventtype2dots,self.l_eventtype3dots,self.l_eventtype4dots]:
                     tx = event_artist.get_xdata()[ind]
                     timex = self.time2index(tx)
                     if event_artist is not None and abs(tx - event.mouseevent.xdata)<3: # allow a slightly different mouse position, but close enough to the point on the line
@@ -3626,7 +3624,8 @@ class tgraphcanvas(FigureCanvas):
                             cids.append(cid)
             # disconnecting all established motion_notify_event_handlers of DraggableAnnotations
             for cid in cids:
-                self.fig.canvas.mpl_disconnect(cid)
+                if cid != self.onmove_cid: # don't disconnect the general motion notify event used to move the cross lines
+                    self.fig.canvas.mpl_disconnect(cid)
         except Exception: # pylint: disable=broad-except
             pass
 
@@ -3951,6 +3950,7 @@ class tgraphcanvas(FigureCanvas):
                             self.redraw_keep_view(recomputeAllDeltas=True)
                         return
 
+
             event_xdata = event.xdata
             event_ydata = event.ydata
             if (event_xdata is not None and event_xdata not in (float('-inf'),float('inf')) and
@@ -3961,13 +3961,13 @@ class tgraphcanvas(FigureCanvas):
                         # Mark starting point of click-and-drag with a marker
                         self.base_horizontalcrossline, = self.ax.plot(numpy.array(self.baseX), numpy.array(self.baseY), 'r+', markersize=20)
                         self.base_verticalcrossline, = self.ax.plot(numpy.array(self.baseX), numpy.array(self.baseY), 'wo', markersize = 2)
-                elif event.button == 3 and event.inaxes and not self.designerflag and not self.wheelflag and self.aw.ntb.mode not in ['pan/zoom', 'zoom rect']:# and not self.flagon:
+                elif not bool(self.aw.comparator) and event.button == 3 and event.inaxes and not self.designerflag and not self.wheelflag and self.aw.ntb.mode not in ['pan/zoom', 'zoom rect']:# and not self.flagon:
                     # popup not available if pan/zoom or zoom rect is active as it interacts
                     timex = self.time2index(event_xdata)
                     if timex > 0:
                         # reset the zoom rectangles
                         menu = QMenu(self.aw) # if we bind this to self, we inherit the background-color: transparent from self.fig
-    #                    menu.setStyleSheet("QMenu::item {background-color: palette(window); selection-color: palette(window); selection-background-color: darkBlue;}")
+        #                menu.setStyleSheet("QMenu::item {background-color: palette(window); selection-color: palette(window); selection-background-color: darkBlue;}")
                         # populate menu
                         ac = QAction(menu)
                         bt = self.temp2[timex]
@@ -5739,19 +5739,35 @@ class tgraphcanvas(FigureCanvas):
     # ATTENTION: all lines that should be populated need to established in self.ax.lines thus for example delta lines should be established (with empty point lists)
     #   even if they are not drawn before CHARGE to ensure that the linecount corresponds to the fixes lines in self.ax.lines!!
     def resetlines(self) -> None:
-        if self.ax is not None and not bool(self.aw.comparator):
-            #note: delta curves are now in self.delta_ax and have been removed from the count of resetlines()
-            if self.linecount is None:
-                self.linecount = self.lenaxlines()
-            if self.deltalinecount is None:
-                self.deltalinecount = self.lendeltaaxlines()
-            total_linecount = self.linecount+self.deltalinecount
-            # remove lines beyond the max limit of self.linecount)
-            for i in range(len(self.ax.lines)-1,-1,-1):
-                if i >= total_linecount:
-                    self.ax.lines[i].remove()
-                else:
-                    break
+        if self.ax is not None:
+            if bool(self.aw.comparator):
+                if self.l_horizontalcrossline is not None:
+                    try:
+                        i = self.ax.lines.index(self.l_horizontalcrossline)
+                        self.ax.lines[i].remove()
+                        self.l_horizontalcrossline = None
+                    except ValueError:
+                        pass
+                if self.l_verticalcrossline is not None:
+                    try:
+                        i = self.ax.lines.index(self.l_verticalcrossline)
+                        self.ax.lines[i].remove()
+                        self.l_verticalcrossline = None
+                    except ValueError:
+                        pass
+            else:
+                #note: delta curves are now in self.delta_ax and have been removed from the count of resetlines()
+                if self.linecount is None:
+                    self.linecount = self.lenaxlines()
+                if self.deltalinecount is None:
+                    self.deltalinecount = self.lendeltaaxlines()
+                total_linecount = self.linecount+self.deltalinecount
+                # remove lines beyond the max limit of self.linecount)
+                for i in range(len(self.ax.lines)-1,-1,-1):
+                    if i >= total_linecount:
+                        self.ax.lines[i].remove()
+                    else:
+                        break
 
     @pyqtSlot(int)
     def getAlarmSet(self, n:int) -> 'Optional[AlarmSet]':

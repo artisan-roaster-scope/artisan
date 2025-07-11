@@ -1419,6 +1419,7 @@ class roastCompareDlg(ArtisanDialog):
                         pass
                     try:
                         self.legend.set_draggable(state=True,use_blit=True)  #,update='bbox')
+                        self.legend.set_picker(self.aw.draggable_text_box_picker)
                     except Exception: # not available in mpl<3.x # pylint: disable=broad-except
                         self.legend.draggable(state=True) # type: ignore # for mpl 2.x
                     frame = self.legend.get_frame()
