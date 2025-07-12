@@ -6,8 +6,12 @@ v3.2.1
 ------------------
 
 * ADDITIONS
-  - adds drag-drop import of a Cropster XLS profile
   - adds tooltip to phases widget in Comparator displaying 2nd and 3rd phase bean temperatures (or RoR if ALT/Option key is pressed) limits ([Issue #1906](../../../issues/1906))
+  - adds support for [Kraffe](https://artisan-scope.org/machines/kraffe/) shop roasters
+  - adds support for [Berto Essential and Autonics](https://artisan-scope.org/machines/berto/) models
+  - adds support [Cogen roasting machines](https://artisan-scope.org/machines/cogen/) with Siemens PLC (v2)
+  - adds support for [Easyster Smart](https://artisan-scope.org/machines/easyster/), legacy [Proaster](https://artisan-scope.org/machines/proaster/) THCR-01A as well as Easyster/Proaster machines with air pressure sensor
+  - adds drag-drop import of a Cropster XLS profile
 
 * CHANGES
   - updated Spanish localizations (thanks to Juan Carlos Bonilla)

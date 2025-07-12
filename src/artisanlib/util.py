@@ -352,6 +352,7 @@ def replace_duplicates(data:List[float]) -> List[float]:
 # eg. ~/Library/Application Support/artisan-scope/Artisan (macOS)
 #     C:\Users\<USER>\AppData\Local\artisan-scope\Artisan (Windows)
 #     ~/.local/share/artisan-scope/Artisan (Linux)
+#     ~/.var/app/org.artisan_scope.artisan/data/artisan-scope/Artisan/artisan.log (Linux if installed via Flatpack)
 
 # getDataDirectory() returns the Artisan data directory
 # if app is not yet initialized None is returned
