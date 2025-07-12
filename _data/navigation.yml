@@ -104,6 +104,8 @@ machines:
         url: /machines/kapok/
       - title: "Kirsch & Mausser"
         url: /machines/kirsch/
+      - title: "Kraffe"
+        url: /machines/kraffe/
       - title: "Kuban"
         url: /machines/kuban/
       - title: "Lilla"

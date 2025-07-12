@@ -2,7 +2,6 @@
 layout: single
 permalink: /machines/berto/
 title: "Berto"
-excerpt: "One/D/R"
 header:
   overlay_image: /assets/images/berto.jpg
   image: /assets/images/berto.jpg
@@ -12,9 +11,9 @@ sidebar:
 ---
 
 * __Producer:__ [Berto Coffee Roaster](https://berto-online.com/){:target="_blank"}, Indonesia
-* __Machines:__ One and D models with Autonics TX4S PIDs and R models with touch panel
-* __Connection:__ MODBUS RTU via USB (One/D models) or MODBUS TCP via Network (R models)
-* __Features:__ logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves. On the R model the roast is started and stopped also from Artisan.
+* __Machines:__ One and D models with TX4S PIDs and R models with touch panel as well as Autonics and Essential models
+* __Connection:__ MODBUS RTU via USB (One/D/Autonics/Essential models) or MODBUS TCP via Network (R models)
+* __Features:__ logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves. On the R model the roast is started and stopped also from Artisan. The Essential and Autonics models allow for the control of air volume and burner level.
 
 ### Setup One/D Models
 
