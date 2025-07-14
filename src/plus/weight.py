@@ -821,8 +821,8 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefl
         if self.roasted_container_weight() is not None:
             # if no roasting container is set, the roasting weihing process is disabled
             self.sm_roasted.send('available')
-#        else:
-#            self.sm_roasted.send('unavailable')
+        else:
+            self.sm_roasted.send('unavailable')
 
     @pyqtSlot()
     def scales_unavailable(self) -> None:

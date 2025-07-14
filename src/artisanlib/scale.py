@@ -15,6 +15,8 @@
 # AUTHOR
 # Marko Luther, 2025
 
+import math
+import platform
 import time as libtime
 import logging
 from typing import Final, List, Tuple, Optional, Callable
@@ -24,15 +26,17 @@ try:
 except ImportError:
     from PyQt5.QtCore import Qt, QObject, pyqtSignal, pyqtSlot, QTimer # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
+from artisanlib.util import toFloat
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 
 
 #  tuples (model name, connection type) with connection type from {0: BT, 1: WiFi, 2: Serial}
-SUPPORTED_SCALES:Final[List[Tuple[str,int]]] = [
+SUPPORTED_SCALES:Final[List[Tuple[str,int]]] = (
+[
     ('Acaia', 0) # 0
-]
+] if not (platform.system() == 'Windows' and math.floor(toFloat(platform.release())) < 10) else [])
 
 ScaleSpec = Tuple[str,str] # scale name, scale id (eg. ble address)
 ScaleSpecs = List[ScaleSpec]

@@ -9,6 +9,8 @@ v3.2.1
   - adds tooltip to phases widget in Comparator displaying 2nd and 3rd phase bean temperatures (or RoR if ALT/Option key is pressed) limits ([Issue #1906](../../../issues/1906))
   - adds support for [Kraffe](https://artisan-scope.org/machines/kraffe/) shop roasters
   - adds support for [Berto Essential and Autonics](https://artisan-scope.org/machines/berto/) models
+  - adds support for [Nordic](https://artisan-scope.org/machines/nordic/) PLC models including control
+  - adds support for [Prisma](https://artisan-scope.org/machines/prisma/) USB and PLC models including control
   - adds support [Cogen roasting machines](https://artisan-scope.org/machines/cogen/) with Siemens PLC (v2)
   - adds support for [Easyster Smart](https://artisan-scope.org/machines/easyster/), legacy [Proaster](https://artisan-scope.org/machines/proaster/) THCR-01A as well as Easyster/Proaster machines with air pressure sensor
   - adds drag-drop import of a Cropster XLS profile
@@ -16,9 +18,10 @@ v3.2.1
 * CHANGES
   - updated Spanish localizations (thanks to Juan Carlos Bonilla)
   - updates libs (scipy, bleak, lxml, pillow)
-  - Breaking change only when hidden buttons are first at the top of the Events Buttons table: hidden buttons at the top of the Events Buttons table are no longer counted in the first row's button count, which is limited by the Max Buttons per Row setting.  All other hidden buttons continue to be counted in each row's button count.
+  - BREAKING CHANGE, but only when hidden buttons are first at the top of the Events Buttons table: hidden buttons at the top of the Events Buttons table are no longer counted in the first row's button count, which is limited by the Max Buttons per Row setting.  All other hidden buttons continue to be counted in each row's button count.
   - unlimited number of buttons can be created while display is limited to maximum 10 rows with maximum 50 buttons each
   - palette load uses and updates the user selected profile path
+  - increases the maximum number of recent roast entries from 25 to 40
 
 * FIXES
   - fixes regression which broke the designer such that points could not be moved ([Discussion #1905](../../../discussions/1905) and [Issue #1916](../../../issues/1916))

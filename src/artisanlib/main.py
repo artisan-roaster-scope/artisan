@@ -1896,7 +1896,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
         # recent roasts, an ordered list (first-in, first-out) of dictionaries holding partial roast-properties and a link to the background profile if any
         self.recentRoasts:List[RecentRoast] = []
-        self.maxRecentRoasts = 25 # the maximum number of recent roasts held
+        self.maxRecentRoasts = 40 # the maximum number of recent roasts held
 
         #lcd1 = time, lcd2 = met, lcd3 = bt, lcd4 = roc et, lcd5 = roc bt, lcd6 = sv (extra devices lcd same as sv settings)
         self.lcdpaletteB:Dict[str,str] = {
@@ -13149,13 +13149,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.qmc.ToggleRecorder()
                 if filename is not None:
                     self.sendmessage(QApplication.translate('Message','{0} has been saved. New roast has started').format(filename))
-        elif len(self.qmc.timex) > 1:
+        elif len(self.qmc.timex) > 1 or self.qmc.reset():
             self.qmc.ToggleRecorder()
-        else:
-            if self.qmc.flagon:
-                self.qmc.OffMonitor()
-            if self.qmc.reset():
-                self.qmc.ToggleRecorder()
         self.qmc.flagKeepON = tmpKeepON
         return True
 
