@@ -130,6 +130,8 @@ machines:
         url: /machines/phoenix/
       - title: "Primo"
         url: /machines/primo/
+      - title: "Prisma"
+        url: /machines/prisma/
       - title: "Proaster"
         url: /machines/proaster/
       - title: "Prometheus"

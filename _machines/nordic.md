@@ -16,4 +16,4 @@ sidebar:
 * __Connection:__ MODBUS RTU via USB; requires the installation of a [serial driver](/modbus_serial/). The PLC machines use MODBUS TCP via a network connection.
 * __Features:__ 
   - logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves
-  - PLC equipped machines allow to log and control as well the burner, air flow and drum speed
+  - PLC equipped machines allow to log and control the burner, air flow and drum speed
