@@ -13,7 +13,7 @@ categories:
   - webinar
 tags: 
   - artisan
-  - Royal Coffee
+  - royal coffee
 link: https://events.royalcoffee.com/navigating_artisan
 ---
 

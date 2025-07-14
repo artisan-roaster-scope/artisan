@@ -12,7 +12,7 @@ categories:
   - webinar
 tags: 
   - normroast
-  - Probat
+  - probat
 link: https://www.probat.com/events/detail/show/das-norm-roast-protokoll_276/
 ---
 

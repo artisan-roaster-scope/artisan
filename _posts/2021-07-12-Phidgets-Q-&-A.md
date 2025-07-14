@@ -13,7 +13,7 @@ categories:
   - webinar
 tags: 
   - artisan
-  - Phidgets
+  - phidgets
 link: https://www.phidgets.com/education/educators/real-world-examples/
 ---
 

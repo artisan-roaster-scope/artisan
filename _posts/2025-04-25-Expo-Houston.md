@@ -10,7 +10,7 @@ categories:
   - event
 tags: 
   - artisan
-  - Expo
+  - expo
 link: https://www.coffeeexpo.org/
 ---
 

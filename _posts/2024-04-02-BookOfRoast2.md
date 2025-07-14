@@ -12,7 +12,7 @@ categories:
   - publication
 tags:
   - normroast
-  - ROAST Magazine
+  - roast magazine
 link: https://www.roastmagazine.com/bookofroast2
 ---
 

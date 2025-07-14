@@ -11,7 +11,7 @@ last_modified_at: 2022-09-04
 categories:
   - event
   - webinar
-  - Royal Coffee
+  - royal coffee
 tags: 
   - artisan
 link: https://events.royalcoffee.com/getting-the-most-from-artisans-tools

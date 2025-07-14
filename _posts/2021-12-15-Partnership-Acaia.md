@@ -13,7 +13,7 @@ tags:
   - artisan.plus
   - artisan
   - partner
-  - Acaia
+  - acaia
 link: https://eu.acaia.co/pages/collaboration
 ---
 
