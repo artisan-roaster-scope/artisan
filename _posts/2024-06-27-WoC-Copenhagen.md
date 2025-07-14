@@ -11,6 +11,7 @@ categories:
 tags: 
   - artisan
   - artisan.plus
+  - WoC
 link: https://worldofcoffee.org/
 ---
 

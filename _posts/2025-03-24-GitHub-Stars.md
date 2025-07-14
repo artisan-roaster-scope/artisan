@@ -10,6 +10,7 @@ categories:
   - announcement
 tags: 
   - artisan
+  - GitHub
 link: https://github.com/artisan-roaster-scope/artisan
 ---
 

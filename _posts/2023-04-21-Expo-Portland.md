@@ -10,6 +10,7 @@ categories:
   - event
 tags: 
   - artisan
+  - Expo
 link: https://www.coffeeexpo.org/
 ---
 Jason, owner of [Hermeteus](https://www.hermetheus.com/) and producer of [Co-Pilot](https://www.hermetheus.com/roaster-copilot), demonstrated his Artisan-based roaster automation at this Expo.
