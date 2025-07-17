@@ -2,7 +2,7 @@
 layout: single
 permalink: /machines/berto/
 title: "Berto"
-exerpt: ""
+excerpt: ""
 header:
   overlay_image: /assets/images/berto.jpg
   image: /assets/images/berto.jpg
