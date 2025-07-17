@@ -15,7 +15,17 @@ sidebar:
 * __Producer:__ [Toper](http://www.toper.com){:target="_blank"}, Turkey
 * __Machines:__ the "Toper PLC" setup works via a network connection with machines featuring an Omron PLC (Toper TKM-SX) or the Schneider Modicon PLC (Cafemino). The "Toper USB" setup works with some other Toper roasters that feature an USB connector.
 * __Connection:__ MODBUS TCP via network or MODBUS RTU via USB; requires the installation of a [serial driver](/modbus_serial/)
-* __Features:__ logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves
+* __Features:__ 
+- logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves
+- TKM-SX machines with touch display produced 2025 or later allow for control of fan speed, drum speed and burner level as well as to operate the charge/discharge doors, the stirrer and the cooling fan.
+
+<figure>
+<center>
+<a href="{{ site.baseurl }}/assets/images/buttons-toper.png">
+<img src="{{ site.baseurl }}/assets/images/buttons-toper.png" style="width: 80%;"></a>
+    <figcaption>custom event buttons</figcaption>
+</center>
+</figure>
 
 ### Setup
 
