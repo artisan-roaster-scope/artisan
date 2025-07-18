@@ -176,7 +176,7 @@ class nonedevDlg(QDialog): # pylint: disable=too-few-public-methods # pyright: i
     __slots__ = ['etEdit','btEdit','ETbox','okButton','cancelButton'] # save some memory by using slots
 
     def __init__(self, parent:QWidget, aw:'ApplicationWindow') -> None:
-        super().__init__(parent) # pyrefly: ignore[bad-argument-type]
+        super().__init__(parent) # pyrefly: ignore[bad-argument-count]
 
         self.aw = aw
 

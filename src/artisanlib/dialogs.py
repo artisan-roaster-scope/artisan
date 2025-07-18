@@ -48,7 +48,7 @@ class ArtisanDialog(QDialog): # pyright: ignore [reportGeneralTypeIssues] # Argu
     __slots__ = ['aw', 'dialogbuttons']
 
     def __init__(self, parent:Optional[QWidget], aw:'ApplicationWindow') -> None:
-        super().__init__(parent)  # pyrefly: ignore[bad-argument-type]
+        super().__init__(parent)  # pyrefly: ignore[bad-argument-count]
         self.aw = aw # the Artisan application window
 
         # IMPORTANT NOTE: if dialog items have to be access after it has been closed, this Qt.WidgetAttribute.WA_DeleteOnClose attribute
@@ -141,7 +141,7 @@ class ArtisanMessageBox(QMessageBox): # pyright: ignore [reportGeneralTypeIssues
     __slots__ = ['timeout', 'currentTime']
 
     def __init__(self, parent:Optional[QWidget] = None, title:Optional[str] = None, text:Optional[str] = None, timeout:int = 0, modal:bool = True) -> None:
-        super().__init__(parent) # pyrefly: ignore[bad-argument-type]
+        super().__init__(parent) # pyrefly: ignore[bad-argument-count]
         self.setWindowTitle(title)
         self.setText(text)
         self.setModal(modal)

@@ -9,10 +9,11 @@ v3.2.1
   - adds tooltip to phases widget in Comparator displaying 2nd and 3rd phase bean temperatures (or RoR if ALT/Option key is pressed) limits ([Issue #1906](../../../issues/1906))
   - adds support for [Kraffe](https://artisan-scope.org/machines/kraffe/) shop roasters
   - adds support for [Berto Essential and Autonics](https://artisan-scope.org/machines/berto/) models
-  - adds support for [Nordic](https://artisan-scope.org/machines/nordic/) PLC models including control
-  - adds support for [Prisma](https://artisan-scope.org/machines/prisma/) USB and PLC models including control
-  - adds support [Cogen roasting machines](https://artisan-scope.org/machines/cogen/) with Siemens PLC (v2)
+  - adds support for [Nordic](https://artisan-scope.org/machines/nordic/) PLC models supporting burner, airflow, and drum speed control
+  - adds support for [Prisma](https://artisan-scope.org/machines/prisma/) USB and PLC models supporting burner, airflow, and drum speed control
+  - adds support for [Cogen roasting machines](https://artisan-scope.org/machines/cogen/) with Siemens PLC (v2)
   - adds support for [Easyster Smart](https://artisan-scope.org/machines/easyster/), legacy [Proaster](https://artisan-scope.org/machines/proaster/) THCR-01A as well as Easyster/Proaster machines with air pressure sensor
+  - adds support for [Toper roasting machines](https://artisan-scope.org/machines/toper/) with PLC and touch screen produced after 2025 supporting burner, airflow, and drum speed control
   - adds drag-drop import of a Cropster XLS profile
 
 * CHANGES

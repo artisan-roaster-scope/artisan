@@ -492,7 +492,7 @@ class volumeCalculatorDlg(ArtisanDialog):
 
 class RoastsComboBox(QComboBox): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     def __init__(self, parent:QWidget, aw:'ApplicationWindow', selection:Optional[str] = None) -> None:
-        super().__init__(parent) # pyrefly: ignore[bad-argument-type]
+        super().__init__(parent) # pyrefly: ignore[bad-argument-count]
         self.aw:ApplicationWindow = aw
         self.installEventFilter(self)
         self.selection:Optional[str] = selection # just the roast title

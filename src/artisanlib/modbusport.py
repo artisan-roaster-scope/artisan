@@ -104,6 +104,8 @@ class modbusport:
         'readingsCache', 'SVmultiplier', 'PIDmultiplier', 'SVwriteLong', 'SVwriteFloat',
         'wordorderLittle', '_asyncLoopThread', '_client', 'COMsemaphore', 'default_host', 'host', 'port', 'type', 'lastReadResult', 'commError' ]
 
+    MAX_REGISTER_SEGMENT:int = 100 # maximal length of registers fetched at once if fetch_max_blocks is set
+
     def __init__(self, aw:'ApplicationWindow') -> None:
         self.aw = aw
 
@@ -478,6 +480,28 @@ class modbusport:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
 
+    # splits sorted list of registers into list of segments of (first,last) register tuples with maximal length of MAX_REGISTER_SEGMENT
+    # with last-first < MAX_REGISTER_SEGMENT
+    # ex with MAX_REGISTER_SEGMENT = 100:
+    #  client.max_blocks([0, 2, 20, 1040, 1105, 1215]) ==> [(0,20), (1040, 1105), (1215, 1215)]
+    @staticmethod
+    def max_blocks(registers:List[int]) -> List[Tuple[int,int]]:
+        res:List[Tuple[int,int]] = []
+        start_register:Optional[int] = None
+        last_register:Optional[int] = None
+        for register in registers:
+            if start_register is None:
+                start_register = register
+            elif last_register is not None and register > start_register + modbusport.MAX_REGISTER_SEGMENT - 1:
+                res.append((start_register, last_register))
+                start_register = register
+            last_register = register
+
+        # add the last remaining, not yet appended segment
+        if start_register is not None and last_register is not None:
+            res.append((start_register, last_register))
+        return res
+
     async def read_active_registers_async(self) -> None:
         error_disconnect = False # set to True if a serious error requiring a disconnect was detected
         try:
@@ -488,7 +512,9 @@ class modbusport:
                     registers_sorted = sorted(registers)
                     sequences:List[Tuple[int,int]]
                     if self.fetch_max_blocks:
-                        sequences = [(registers_sorted[0],registers_sorted[-1])]
+#                        sequences = [(registers_sorted[0],registers_sorted[-1])]
+                        # we split into sequences with maximal 100 registers
+                        sequences = self.max_blocks(registers_sorted)
                     else:
                         # split in successive sequences
                         gaps = [[s, er] for s, er in zip(registers_sorted, registers_sorted[1:]) if s+1 < er]

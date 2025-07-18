@@ -190,7 +190,7 @@ class CheckComboBox(QComboBox): # pyright: ignore [reportGeneralTypeIssues] # Ar
 
     def __init__(self, parent:Optional[QWidget] = None, placeholderText:str = '', separator:str = ', ',
                  **kwargs:Dict[str,Any]) -> None:
-        super().__init__(parent, **kwargs)  # pyrefly: ignore[bad-argument-type]
+        super().__init__(parent, **kwargs)  # pyrefly: ignore[bad-argument-count]
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
 
         self.__popupIsShown:bool = False

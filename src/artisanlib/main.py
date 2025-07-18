@@ -1419,7 +1419,7 @@ class EventActionThread(QThread): # pylint: disable=too-few-public-methods # pyr
 class MyQDoubleValidator(QDoubleValidator): # pylint: disable=too-few-public-methods  # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
 
     def __init__(self, bottom:float, top:float, decimals:int, lineedit:QLineEdit, empty_default:str = '0') -> None:
-        super().__init__(bottom, top, decimals, lineedit) # pyrefly: ignore[bad-argument-type]
+        super().__init__(bottom, top, decimals, lineedit) # pyrefly: ignore[bad-argument-count]
         self.lineedit = lineedit
         self.empty_default = empty_default
 
@@ -1632,7 +1632,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.recentThemeActs = []
         self.applicationDirectory =  QDir().current().absolutePath()
 
-        super().__init__(parent) # pyrefly: ignore[bad-argument-type]
+        super().__init__(parent) # pyrefly: ignore[bad-argument-count]
         self.helpdialog:Optional[HelpDlg] = None
 
         self.setAcceptDrops(True) # enable drag-and-drop
