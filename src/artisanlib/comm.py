@@ -1827,33 +1827,36 @@ class serialport:
         if self.aw.kaleido is not None:
             t1, t2, _sid = self.aw.kaleido.getBTET()
 # it remains unclear what those machine exactly report and when. In some cases processingn this event flag can lead to unfavorable situations so we do not process them at all
-#            try:
-#                event_flag:int = _sid & 15 # last 4 bits of the sid
-#                if event_flag == 1 and self.aw.qmc.timeindex[0] == -1:
-#                    self.aw.qmc.markChargeSignal.emit(True) # CHARGE
+# now the syncing of those event flags can be user configurable and is by default OFF
+            try:
+                event_flag:int = _sid & 15 # last 4 bits of the sid
+                if len(self.aw.kaleidoEventFlags)>0 and self.aw.kaleidoEventFlags[0] and event_flag == 1 and self.aw.qmc.timeindex[0] == -1:
+                    self.aw.qmc.markChargeSignal.emit(True) # CHARGE
 #                elif event_flag == 2 and self.aw.qmc.TPalarmtimeindex is None:
 #                    self.aw.qmc.markTPSignal.emit() # TP
-#                elif event_flag == 3 and self.aw.qmc.timeindex[1] == 0:
-#                    self.aw.qmc.markDRYSignal.emit(True) # DRY
-#                elif event_flag == 4 and self.aw.qmc.timeindex[2] == 0:
-#                    self.aw.qmc.markFCsSignal.emit(True) # FCs
-#                elif event_flag == 5 and self.aw.qmc.timeindex[3] == 0:
-#                    self.aw.qmc.markFCeSignal.emit(True) # FCe
-#                elif event_flag == 6 and self.aw.qmc.timeindex[4] == 0:
-#                    self.aw.qmc.markSCsSignal.emit(True) # SCs
-#                elif event_flag == 7 and self.aw.qmc.timeindex[5] == 0:
-#                    self.aw.qmc.markSCeSignal.emit(True) # SCe
-#                elif (event_flag == 8 and self.aw.qmc.timeindex[6] == 0 and
-#                    self.aw.qmc.timeindex[0] > -1 and self.aw.qmc.autoDropIdx == 0 and
-#                    (self.aw.qmc.timex[-1] - self.aw.qmc.timex[self.aw.qmc.timeindex[0]]) > 7*60):
-#                    # only after 7min into the roast and if CHARGE is marked
-#                    self.aw.qmc.autoDropIdx = len(self.aw.qmc.timex) - 2
-#                    self.aw.qmc.markDropSignal.emit(True) # DROP
+                elif len(self.aw.kaleidoEventFlags)>1 and self.aw.kaleidoEventFlags[1] and event_flag == 3 and self.aw.qmc.timeindex[1] == 0:
+                    self.aw.qmc.markDRYSignal.emit(True) # DRY
+                elif len(self.aw.kaleidoEventFlags)>2 and self.aw.kaleidoEventFlags[2] and event_flag == 4 and self.aw.qmc.timeindex[2] == 0:
+                    self.aw.qmc.markFCsSignal.emit(True) # FCs
+                elif len(self.aw.kaleidoEventFlags)>3 and self.aw.kaleidoEventFlags[3] and event_flag == 5 and self.aw.qmc.timeindex[3] == 0:
+                    self.aw.qmc.markFCeSignal.emit(True) # FCe
+                elif len(self.aw.kaleidoEventFlags)>4 and self.aw.kaleidoEventFlags[4] and event_flag == 6 and self.aw.qmc.timeindex[4] == 0:
+                    self.aw.qmc.markSCsSignal.emit(True) # SCs
+                elif len(self.aw.kaleidoEventFlags)>5 and self.aw.kaleidoEventFlags[5] and event_flag == 7 and self.aw.qmc.timeindex[5] == 0:
+                    self.aw.qmc.markSCeSignal.emit(True) # SCe
+                elif len(self.aw.kaleidoEventFlags)>6 and self.aw.kaleidoEventFlags[6] and (event_flag == 8 and self.aw.qmc.timeindex[6] == 0 and
+                    self.aw.qmc.timeindex[0] > -1 and self.aw.qmc.autoDropIdx == 0 and
+                    (self.aw.qmc.timex[-1] - self.aw.qmc.timex[self.aw.qmc.timeindex[0]]) > 7*60):
+                    # only after 7min into the roast and if CHARGE is marked
+                    self.aw.qmc.autoDropIdx = len(self.aw.qmc.timex) - 2
+                    self.aw.qmc.markDropSignal.emit(True) # DROP
 #                elif event_flag == 9 and self.aw.qmc.timeindex[7] == 0:
 #                    self.aw.qmc.markCoolSignal.emit(True) # COOL
-#            except Exception as e: # pylint: disable=broad-except
-#                _log.error(e)
+            except Exception as e: # pylint: disable=broad-except
+                _log.error(e)
         return tx,t2,t1 # time, ET (chan2), BT (chan1)
+
+
 
     def Kaleido_SVAT(self) -> Tuple[float,float,float]:
         tx = self.aw.qmc.timeclock.elapsedMilli()

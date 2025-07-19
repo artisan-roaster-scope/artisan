@@ -13,7 +13,7 @@ types-docutils>=0.21.0.20250715
 lxml-stubs>=0.5.1
 mypy==1.17.0
 pyright==1.1.403
-ruff>=0.12.3
+ruff>=0.12.4
 pylint==3.3.7
 pre-commit>=4.2.0
 pytest>=8.4.1

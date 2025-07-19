@@ -1857,6 +1857,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         #    santokerSerial and santokerBLE should never be True at the same time (BLE will have preceedence)
         self.santokerSerial:bool = False # if True connection is via the main serial port
         self.santokerBLE:bool = False # if True connection is via the main serial port
+        self.santokerEventFlags:List[bool] = [False, False, False, False, False, False, False ] # CHARGE, DRY, FCs, FCe, SCs, SCe, DROP
         self.santoker:Optional[Santoker] = None # holds the Santoker instance created on connect; reset to None on disconnect
 
         # Santoker R
@@ -1882,6 +1883,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.kaleidoSerial:bool = False # if True connection is via the main serial port
         self.kaleidoPID:bool = True # if True the external Kaleido PID is operated, otherwise the internal Artisan PID is active
         self.kaleido:Optional[KaleidoPort] = None # holds the Kaleido instance created on connect; reset to None on disconnect
+        self.kaleidoEventFlags:List[bool] = [False, False, False, False, False, False, False ] # CHARGE, DRY, FCs, FCe, SCs, SCe, DROP
 
         # Ikawa BLE
         self.ikawa:'Optional[IKAWA_BLE]' = None # noqa: UP037
@@ -17687,10 +17689,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.santokerPort = toInt(settings.value('santokerPort',self.santokerPort))
             self.santokerSerial = toBool(settings.value('santokerSerial',self.santokerSerial))
             self.santokerBLE = toBool(settings.value('santokerBLE',self.santokerBLE))
+            if settings.contains('santokerEventFlags'):
+                self.santokerEventFlags = [toBool(x) for x in toList(settings.value('santokerEventFlags',self.santokerEventFlags))]
             self.kaleidoHost = toString(settings.value('kaleidoHost',self.kaleidoHost))
             self.kaleidoPort = toInt(settings.value('kaleidoPort',self.kaleidoPort))
             self.kaleidoSerial = toBool(settings.value('kaleidoSerial',self.kaleidoSerial))
             self.kaleidoPID = toBool(settings.value('kaleidoPID',self.kaleidoPID))
+            if settings.contains('kaleidoEventFlags'):
+                self.kaleidoEventFlags = [toBool(x) for x in toList(settings.value('kaleidoEventFlags',self.kaleidoEventFlags))]
             self.mugmaHost = toString(settings.value('mugmaHost',self.mugmaHost))
             self.mugmaPort = toInt(settings.value('mugmaPort',self.mugmaPort))
             self.colorTrack_mean_window_size = toInt(settings.value('ctMean',self.colorTrack_mean_window_size))
@@ -19717,10 +19723,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'santokerPort',self.santokerPort, read_defaults)
             self.settingsSetValue(settings, default_settings, 'santokerSerial',self.santokerSerial, read_defaults)
             self.settingsSetValue(settings, default_settings, 'santokerBLE',self.santokerBLE, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'santokerEventFlags',self.santokerEventFlags, read_defaults)
             self.settingsSetValue(settings, default_settings, 'kaleidoHost',self.kaleidoHost, read_defaults)
             self.settingsSetValue(settings, default_settings, 'kaleidoPort',self.kaleidoPort, read_defaults)
             self.settingsSetValue(settings, default_settings, 'kaleidoSerial',self.kaleidoSerial, read_defaults)
             self.settingsSetValue(settings, default_settings, 'kaleidoPID',self.kaleidoPID, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'kaleidoEventFlags',self.kaleidoEventFlags, read_defaults)
             self.settingsSetValue(settings, default_settings, 'mugmaHost',self.mugmaHost, read_defaults)
             self.settingsSetValue(settings, default_settings, 'mugmaPort',self.mugmaPort, read_defaults)
             self.settingsSetValue(settings, default_settings, 'ctMean',self.colorTrack_mean_window_size, read_defaults)

@@ -13118,11 +13118,11 @@ class tgraphcanvas(FigureCanvas):
                         disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('Santoker'),True,None),
                         # CHARGE handler disactivated to not trigger CHARGE after CHARGE is signalled to the machine by START
                         # NOTE: only after CHARGE the heater
-#                        charge_handler=lambda : (self.markChargeDelaySignal.emit(0) if (self.timeindex[0] == -1) else None),
-                        dry_handler=lambda : (self.markDRYSignal.emit(False) if (self.timeindex[1] == 0) else None),
-                        fcs_handler=lambda : (self.markFCsSignal.emit(False) if (self.timeindex[2] == 0) else None),
-                        scs_handler=lambda : (self.markSCsSignal.emit(False) if (self.timeindex[4] == 0) else None),
-                        drop_handler=lambda : (self.markDropSignal.emit(False) if (self.timeindex[6] == 0) else None))
+                        charge_handler=lambda : (self.markChargeDelaySignal.emit(0) if (len(self.aw.santokerEventFlags)>0 and self.aw.santokerEventFlags[0] and self.timeindex[0] == -1) else None),
+                        dry_handler=lambda : (self.markDRYSignal.emit(False) if (len(self.aw.santokerEventFlags)>1 and self.aw.santokerEventFlags[1] and self.timeindex[1] == 0) else None),
+                        fcs_handler=lambda : (self.markFCsSignal.emit(False) if (len(self.aw.santokerEventFlags)>2 and self.aw.santokerEventFlags[2] and self.timeindex[2] == 0) else None),
+                        scs_handler=lambda : (self.markSCsSignal.emit(False) if (len(self.aw.santokerEventFlags)>4 and self.aw.santokerEventFlags[4] and self.timeindex[4] == 0) else None),
+                        drop_handler=lambda : (self.markDropSignal.emit(False) if (len(self.aw.santokerEventFlags)>6 and self.aw.santokerEventFlags[6] and self.timeindex[6] == 0) else None))
                     self.aw.santoker.setLogging(self.device_logging)
                     self.aw.santoker.start()
                 elif self.device == 171:

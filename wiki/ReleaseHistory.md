@@ -23,6 +23,7 @@ v3.2.1
   - unlimited number of buttons can be created while display is limited to maximum 10 rows with maximum 50 buttons each
   - palette load uses and updates the user selected profile path
   - increases the maximum number of recent roast entries from 25 to 40
+  - makes synchronization of main events with Kaleido and Santoker roasting machines configurable (disabled by default)
 
 * FIXES
   - fixes regression which broke the designer such that points could not be moved ([Discussion #1905](../../../discussions/1905) and [Issue #1916](../../../issues/1916))

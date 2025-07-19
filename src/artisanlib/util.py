@@ -139,6 +139,7 @@ def stringfromseconds(seconds_raw:float, leadingzero:bool = True) -> str:
 
 #Converts a string into a seconds integer. Use for example to interpret times from Roaster Properties Dlg inputs
 #accepted formats: "00:00","-00:00"
+# returns -1 on invalid inputs
 def stringtoseconds(string:str) -> int:
     timeparts = string.split(':')
     if len(timeparts) != 2:
