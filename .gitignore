@@ -24,8 +24,68 @@ artisan_plus.log
 outbox/
 *flycheck_*.py
 
+# Virtual environments
+venv/
+.venv/
+env/
+.env/
+
+# uv
+.uv/
+uv.lock
+
+# Python development
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Testing and coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# Type checking
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pytype/
+
+# Linting
+.ruff_cache/
+
+# Augment AI assistant files
+.augment/
+
+# IDEs and editors
+.vscode/
+.vscode/settings.json.bak
+.vscode/.ropeproject
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
 #Keeps derived files out of the Artisan repository
-#   To remove these files from the repository a commit must first be made 
+#   To remove these files from the repository a commit must first be made
 #   with the these files deleted, then this section should be uncommented.
 #to remove initially make a commit with thee files deleted then uncomment this section
 #src/uic/[!_]*.py
