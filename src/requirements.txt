@@ -50,7 +50,7 @@ websockets==15.0.1; python_version >= '3.9'
 PyYAML==6.0.2
 psutil==7.0.0
 typing-extensions==4.10.0; python_version < '3.8' # required for supporting Final and TypeDict on Python <3.8
-protobuf==5.29.3 # v5.30.x drops support for Python 3.8!
+protobuf==5.29.5 # v5.30.x drops support for Python 3.8!
 numpy==1.24.3; python_version < '3.9' # last Python 3.8 release
 numpy==2.3.1; python_version >= '3.9'
 scipy==1.10.1; python_version < '3.9' # last Python 3.8 release
