@@ -25,3 +25,12 @@ sidebar:
 * __Features:__
   - logging of bean temperature and exhaust temperature
   - PLC equiped machines support additionally the logging of burner power (%), drum pressure (pa), drum speed (Hz), and airflow (%) as well as control of burner power, drum speed and fan speed.
+
+
+<figure>
+<center>
+<a href="{{ site.baseurl }}/assets/images/buttons-joper.png">
+<img src="{{ site.baseurl }}/assets/images/buttons-joper.png" style="width: 80%;"></a>
+    <figcaption>custom event buttons</figcaption>
+</center>
+</figure>

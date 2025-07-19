@@ -19,6 +19,14 @@ sidebar:
   - control of fan, heater and drum speed
   - support for the new [IBTS IR sensor](https://medium.com/@aillio/the-start-of-something-39aa01d08fa9){:target="_blank"} and newer models version 1.5 and 2, and firmware versions, has been added in Artisan v1.6.1
 
+<figure>
+<center>
+<a href="{{ site.baseurl }}/assets/images/buttons-aillio.png">
+<img src="{{ site.baseurl }}/assets/images/buttons-aillio.png" style="width: 80%;"></a>
+    <figcaption>custom event buttons</figcaption>
+</center>
+</figure>
+
 > **Watch out!** 
 > To connect successfully, Artisan running on macOS or Linux does not require any extra device driver to be installed.
 

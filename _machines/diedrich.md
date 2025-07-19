@@ -31,6 +31,14 @@ sidebar:
   - logging & control of burner power (0-100%)
   - logging & control of air fan speed (0-100%)
 
+<figure>
+<center>
+<a href="{{ site.baseurl }}/assets/images/buttons-diedrich-dr.png">
+<img src="{{ site.baseurl }}/assets/images/buttons-diedrich-dr.png" style="width: 80%;"></a>
+    <figcaption>custom event buttons</figcaption>
+</center>
+</figure>
+
 **Watch out!**
 The Diedrich 4 or 6 Sensor Data logging is build around [Phidgets](https://www.phidgets.com/){:target="_blank"}. Ensure you have the latest Phidgets driver v22 for your platform (e.g. [Windows](https://www.phidgets.com/docs/OS_-_Windows){:target="_blank"}, [macOS](https://www.phidgets.com/docs/OS_-_macOS){:target="_blank"} or [Linux](https://www.phidgets.com/docs/OS_-_Linux){:target="_blank"}) installed.
 {: .notice--primary}

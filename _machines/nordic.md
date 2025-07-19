@@ -17,3 +17,11 @@ sidebar:
 * __Features:__ 
   - logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves
   - PLC equipped machines allow to log and control the burner, air flow and drum speed
+
+<figure>
+<center>
+<a href="{{ site.baseurl }}/assets/images/buttons-nordic.png">
+<img src="{{ site.baseurl }}/assets/images/buttons-nordic.png" style="width: 80%;"></a>
+    <figcaption>custom event buttons</figcaption>
+</center>
+</figure>

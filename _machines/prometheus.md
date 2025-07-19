@@ -18,3 +18,11 @@ sidebar:
   - logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves
   - logging and control of gas, drum speed, and airflow
   - control of actors like stirrer and release doors
+
+<figure>
+<center>
+<a href="{{ site.baseurl }}/assets/images/buttons-prometheus.png">
+<img src="{{ site.baseurl }}/assets/images/buttons-prometheus.png" style="width: 80%;"></a>
+    <figcaption>custom event buttons</figcaption>
+</center>
+</figure>

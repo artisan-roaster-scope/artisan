@@ -16,6 +16,14 @@ sidebar:
 * __Connection:__ MODBUS RTU via USB (One/D/Autonics/Essential models) or MODBUS TCP via Network (R models)
 * __Features:__ logging of environmental temperature (ET), bean temperature (BT) and related rate-of-rise curves. On the R model the roast is started and stopped also from Artisan. The Essential and Autonics models allow for the control of air volume and burner level.
 
+<figure>
+<center>
+<a href="{{ site.baseurl }}/assets/images/buttons-berto-autonics-control.png">
+<img src="{{ site.baseurl }}/assets/images/buttons-berto-autonics-control.png" style="width: 80%;"></a>
+    <figcaption>custom event buttons</figcaption>
+</center>
+</figure>
+
 ### Setup One/D Models
 
 The communication via MODBUS RTU requires to install a [serial driver](/modbus_serial/).

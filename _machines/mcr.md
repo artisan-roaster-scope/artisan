@@ -20,6 +20,14 @@ sidebar:
 **Watch out!** Mill City Roasters has never supported the Artisan project like many of the manufacturers here.  For that reason, we are unable to offer support for your specific roaster, especially if it differs from the included one-click machine setups.  Please contact [Mill City Roasters](http://millcityroasters.com/) for support if you encounter setup issues.
 {: .notice--primary}
 
+<figure>
+<center>
+<a href="{{ site.baseurl }}/assets/images/buttons-MCR-digitial.png">
+<img src="{{ site.baseurl }}/assets/images/buttons-MCR-digitial.png" style="width: 80%;"></a>
+    <figcaption>custom event buttons</figcaption>
+</center>
+</figure>
+
 ## Supported Machines
 
 {: .notice--primary}

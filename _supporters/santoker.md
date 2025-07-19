@@ -42,6 +42,13 @@ sidebar:
   - logging of bean temperature (BT), environmental temperature (ET) and in some cases a third temperature
   - logging and control of fan and power for the Q and X Series, the Cube as well as the R Master Series models. The later allows to log the drum speed as well.
 
+<figure>
+<center>
+<a href="{{ site.baseurl }}/assets/images/buttons-santoker-cube.png">
+<img src="{{ site.baseurl }}/assets/images/buttons-santoker-cube.png" style="width: 80%;"></a>
+    <figcaption>custom event buttons</figcaption>
+</center>
+</figure>
   
 <a name="EnergyRatings"></a>
 ## Energy Ratings

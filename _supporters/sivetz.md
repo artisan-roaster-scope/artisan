@@ -20,3 +20,12 @@ sidebar:
   - logging of inlet temperature (IT), exhaust temperature (ET), bean temperature (BT) and related rate-of-rise curves
   - logging of burner level and air power
   - burner control
+
+
+<figure>
+<center>
+<a href="{{ site.baseurl }}/assets/images/buttons-sivetz.png">
+<img src="{{ site.baseurl }}/assets/images/buttons-sivetz.png" style="width: 80%;"></a>
+    <figcaption>custom event buttons</figcaption>
+</center>
+</figure>

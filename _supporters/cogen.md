@@ -17,3 +17,12 @@ sidebar:
 * __Machines:__ Cogen C2, C6, C15, and C30
 * __Connection:__ legacy machines: MODBUS network; v2 machines: Siemens S7
 * __Features:__ logging of bean temperature (BT), environmental temperature (ET), burner power (%), drum speed (%), and airflow (%). Control of burner power, drum speed and airflow. The v2 machines support setting the drum pressure setpoint.
+
+
+<figure>
+<center>
+<a href="{{ site.baseurl }}/assets/images/buttons-cogen-seriesC.png">
+<img src="{{ site.baseurl }}/assets/images/buttons-cogen-seriesC.png" style="width: 80%;"></a>
+    <figcaption>custom event buttons</figcaption>
+</center>
+</figure>
