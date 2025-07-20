@@ -632,7 +632,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefl
     CANCELED_STEP_RECOGNITION_TOLERANCE:Final[int] = 15     # +- tolerance to recognize a previous 'task_cancel' step to restart via 'bucket_put_back' in g
     DONE_STEP_RECOGNITION_TOLERANCE:Final[int] = 15         # +- tolerance to recognize a previous 'task_completed' step to restart via 'bucket_put_back_done' in g
     SWAP_STEP_RECOGNITION_TOLERANCE:Final[int] = 15         # +- tolerance to recognize a previous 'bucket_swapped' step to restart via 'bucket_put_back_swapped' in g
-    ROASTED_BUCKET_TOLERANCE:Final[int] = 5                 # +- tolerance to recognize filled roasted container in % w.r.t. the estimated weight
+    ROASTED_BUCKET_TOLERANCE:Final[int] = 15                # +- tolerance to recognize filled roasted container in % w.r.t. the estimated weight
                                                             # (weight loss defaults to 15% if no template is given)
     ROASTED_BUCKET_REMOVALE_TOLERANCE:Final[int] = 10       # +- tolerance to recognize roasted bucket removal
     TAP_CANCEL_THRESHOLD = 100                              # threshold in g the measured weight has to exceed the empty scale weight for a tap-cancel action to be recognized
@@ -1194,16 +1194,9 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefl
 
     @pyqtSlot()
     def tap_cancel_green_task_slot(self) -> None:
-        selected_container_weight = (self.aw.qmc.container_weights[self.aw.container1_idx] if 0 <= self.aw.container1_idx < len(self.aw.qmc.container_weights) else 0)
         if (self.green_task_scale != 0 and (self.sm_green.current_state in {
-                    GreenWeighingState.empty, GreenWeighingState.done_weighing1, GreenWeighingState.done_weighing2
-                    } and
-                self.scale_empty(self.green_task_scale, self.green_task_empty_scale_weight, self.last_nonstable_green_weight)
-                or (self.sm_green.current_state in {GreenWeighingState.weighing1, GreenWeighingState.weighing2} and
-                    # if current state is weighing, the reset should be executed if the last stable weight is about the weight of the registered green tare weight
-                    abs(self.green_task_scale_tare_weight - (self.scale1_last_stable_weight if self.green_task_scale == 1 else self.scale2_last_stable_weight)) <=
-                        max(float(WeightManager.MIN_EMPTY_BUCKET_RECOGNITION_TOLERANCE),
-                            selected_container_weight*WeightManager.EMPTY_BUCKET_RECOGNITION_TOLERANCE_PERCENT/100)))):
+                    GreenWeighingState.empty, GreenWeighingState.done_weighing1, GreenWeighingState.done_weighing2 }
+                and self.scale_empty(self.green_task_scale, self.green_task_empty_scale_weight, self.last_nonstable_green_weight))):
             self.done_green_task_timer.stop()
             self.green_task_empty_scale_weight = 0
             self.last_nonstable_green_weight = 0
@@ -1249,7 +1242,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefl
             self.last_nonstable_green_weight = weight
             new_weight = weight - self.green_task_scale_tare_weight + self.green_task_container1_registered_weight + self.green_task_stable_weight_before_connection_loss
             self.sm_green.send('fill', max(0, new_weight), weight>self.scale1_last_stable_weight) # only update on increasing weights or if larger than thhe last stable weight
-            if (self.sm_green.current_state in { GreenWeighingState.weighing1, GreenWeighingState.weighing2, GreenWeighingState.empty, GreenWeighingState.done_weighing1, GreenWeighingState.done_weighing2 } and
+            if (self.sm_green.current_state in { GreenWeighingState.empty, GreenWeighingState.done_weighing1, GreenWeighingState.done_weighing2 } and
                  weight > self.green_task_empty_scale_weight + WeightManager.TAP_CANCEL_THRESHOLD):
                 self.tap_cancel_green_task_timer.start(WeightManager.TAP_CANCEL_PERIOD)
         elif self.roasted_task_scale == 1:

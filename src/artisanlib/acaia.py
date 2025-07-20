@@ -311,6 +311,8 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
                 else:
                     self.max_weight = 1000
                     self.readability = 0.1
+                self.fast_notifications()
+                self.fast_notifications_sent = False
 
         else: #connected_service_UUID == ACAIA_SERVICE_UUID:
             _log.debug('connected to Acaia Scale (%s)', connected_device_name)
@@ -401,9 +403,9 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
             return None, False
 
     def update_weight(self, value:Optional[float], stable:Optional[bool] = False) -> None:
-#        _log.debug('PRINT update_weight(%s,%s)', value, stable)
+        _log.debug('PRINT update_weight(%s,%s)', value, stable)
         if value is not None and (not self.stable_only or stable):
-            # convert the weight in g delivered with one decimals to an int
+            # convert the weight in g delivered with one decimal to an int
             value_rounded:float = float2float(value, self.decimals)
             if stable and value_rounded != self.stable_weight:
                 # if value is fresh and reading is stable (if self.stable_only is set)
@@ -674,13 +676,15 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
         try:
             if msg_type == CMD.INFO_A:
                 self.parse_info(data)
-                self.send_ID() # send also after very INFO_A as handshake confirmation
+                self.send_ID() # send after very INFO_A as handshake confirmation
             elif msg_type == CMD.STATUS_A:
                 self.parse_status(data)
             elif msg_type == CMD.EVENT_SA:
                 self.parse_scale_events(data)
             #
-            if self.id_sent and not self.fast_notifications_sent:
+            if self.id_sent and (not self.fast_notifications_sent or not self.slow_notifications_sent):
+                # NOTE: in some cases previously send fast_notifications are ignore so we have to repeat sending them until we received some initial weight data
+                #   (until self.slow_notifications_sent is set)
                 # we configure the scale to receive the initial
                 # weight notification as fast as possible
                 # Note: this event is needed to have the connected scale start to send weight messages even on relay scales which ignore the settings

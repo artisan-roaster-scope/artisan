@@ -5390,7 +5390,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             if self.qmc.plus_blend_spec is not None and 'hr_id' in self.qmc.plus_blend_spec and self.qmc.plus_store is not None:
                 try:
                     weight_unit_idx = weight_units.index(rr['weightUnit'])
-                    blends = plus.stock.getBlends(weight_unit_idx,self.qmc.plus_store)
+                    blends = plus.stock.getStandardBlends(weight_unit_idx,self.qmc.plus_store)
                     blend = next(b for b in blends if \
                         plus.stock.getBlendId(b) == self.qmc.plus_blend_spec['hr_id'] and
                         plus.stock.getBlendStockDict(b)['location_hr_id'] == self.qmc.plus_store)

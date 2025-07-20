@@ -108,9 +108,11 @@ class Scale(QObject):  # pyright:ignore[reportGeneralTypeIssues] # error: Argume
     def is_connected(self) -> bool: # pylint: disable=no-self-use
         return False
 
+    # weight in g
     def max_weight(self) -> float: # pylint: disable=no-self-use
         return 0
 
+    # readability in g
     def readability(self) -> float: # pylint: disable=no-self-use
         return 0
 
@@ -302,6 +304,7 @@ class ScaleManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error: 
         self.scale1_disconnected_signal.emit()
 
     ## try to catch a last non weight change and send as stable state
+    # weight in g
     @pyqtSlot(float, bool)
     def scale1_weight_changed_slot(self, weight:float, stable:bool) -> None:
         weight = int(round(weight))
@@ -410,6 +413,7 @@ class ScaleManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error: 
         self.scale2_disconnected_signal.emit()
 
     ## try to catch a last non weight change and send as stable state
+    # weight in g
     @pyqtSlot(float, bool)
     def scale2_weight_changed_slot(self, weight:float, stable:bool) -> None:
         weight = int(round(weight))

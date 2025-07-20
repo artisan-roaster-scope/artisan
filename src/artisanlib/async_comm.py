@@ -61,7 +61,7 @@ class AsyncLoopThread:
     def __del__(self) -> None:
         self.__loop.call_soon_threadsafe(self.__loop.stop) # pyrefly: ignore[bad-argument-type]
 #        self.__thread.join()
-# WARNING: we don't join and expect the clients running on this thread to stop themself
+# WARNING: we don't join and expect the clients running on this thread to stop them
 # (using self._running) to finally get rid of this thread to prevent hangs
 
     @property
@@ -149,8 +149,8 @@ class AsyncComm:
                 disconnected_handler:Optional[Callable[[], None]] = None) -> None:
         # internals
         self._asyncLoopThread: Optional[AsyncLoopThread]       = None # the asyncio AsyncLoopThread object
-        self._write_queue: 'Optional[asyncio.Queue[bytes]]'    = None # noqa: UP037 # quotes for Python3.8 # the write queue
-        self._running:bool                                     = False              # while True we keep running the thread
+        self._write_queue: 'Optional[asyncio.Queue[bytes]]'    = None # noqa: UP037 # quotes for Python3.8 # the write_queue
+        self._running:bool                                     = False              # while true we keep running the thread
 
         # connection
         self._host:str = host
@@ -256,7 +256,7 @@ class AsyncComm:
             with suppress(asyncio.CancelledError, ConnectionResetError):
                 await writer.drain()
 
-    # if serial settings are given, host/port are ignore and communication is handled by the given serial port
+    # if serial settings are given, the host/port settings are ignored and communication is handled by the given serial port
     async def connect(self, connect_timeout:float=5) -> None:
         writer:Optional[asyncio.StreamWriter] = None
         while self._running:

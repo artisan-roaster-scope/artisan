@@ -831,7 +831,7 @@ def set_visible(plus_account_id:Optional[str], item:ScheduledItem) -> None:
 # returns blend name or None and list of components (just one if item is about a coffee
 def scheduleditem_beans_descriptions(weight_unit_idx:int, item:ScheduledItem) -> Tuple[Optional[str], List[Tuple[float,str]]]:
     if item.blend is not None:
-        blends = plus.stock.getBlends(weight_unit_idx, item.store)
+        blends = plus.stock.getStandardBlends(weight_unit_idx, item.store)
         blend = next((b for b in blends if plus.stock.getBlendId(b) == item.blend and plus.stock.getBlendStockDict(b)['location_hr_id'] == item.store), None)
         if blend is not None:
             return plus.stock.blend2ratio_beans(blend, item.weight, html_escape=False)
@@ -840,6 +840,7 @@ def scheduleditem_beans_descriptions(weight_unit_idx:int, item:ScheduledItem) ->
         coffee = plus.stock.getCoffee(item_coffee)
         if coffee is not None:
             return None, [(1,plus.stock.coffeeLabel(coffee))]
+    _log.error('scheduleditem_beans_descriptions(%s,%s) could not be resolved', weight_unit_idx, item)
     return None, []
 
 def scheduleditem_beans_description(weight_unit_idx:int, item:ScheduledItem) -> str:
@@ -853,7 +854,7 @@ def scheduleditem_beans_description(weight_unit_idx:int, item:ScheduledItem) -> 
                 store_label = f'<br>[{html.escape(store_label)}]'
             beans_description = f'<b>{html.escape(plus.stock.coffeeLabel(coffee))}</b>{store_label}'
     else:
-        blends = plus.stock.getBlends(weight_unit_idx, item.store)
+        blends = plus.stock.getStandardBlends(weight_unit_idx, item.store)
         blend = next((b for b in blends if plus.stock.getBlendId(b) == item.blend and plus.stock.getBlendStockDict(b)['location_hr_id'] == item.store), None)
         if blend is not None:
             blend_lines = ''.join([f'<tr><td>{html.escape(bl[0])}</td><td>{html.escape(bl[1])}</td></tr>'
@@ -2787,7 +2788,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                     except Exception as e:  # pylint: disable=broad-except
                         _log.error(e)
             elif item.blend is not None:
-                blends:List[plus.stock.BlendStructure] = plus.stock.getBlends(weight_unit_idx, item.store)
+                blends:List[plus.stock.BlendStructure] = plus.stock.getStandardBlends(weight_unit_idx, item.store)
                 # NOTE: a blend might not have an hr_id as is the case for all custom blends
                 blend_structure:Optional[plus.stock.BlendStructure] = next((bs for bs in blends if plus.stock.getBlendId(bs) == item.blend), None)
                 if blend_structure is not None:
@@ -3908,9 +3909,9 @@ class GreenWebDisplay(GreenDisplay):
 
             self.rendered_task['timer'] = 0 # clear timer start trigger immediately
 
-
     # current_weight indicates total measured weight over both containers in g (not including the bucket weights)
     def show_progress(self, state:PROCESS_STATE, component:int, bucket:int, current_weight:int) -> None:
+#        _log.debug("PRINT show_progress(%s,%s,%s,%s)",state,component,bucket,current_weight)
         if (self.last_item is not None and (self.last_process_state != state or self.last_component != component or self.last_bucket != bucket or
                 self.last_current_weight != current_weight)):
             self.last_process_state = state
@@ -3927,6 +3928,7 @@ class GreenWebDisplay(GreenDisplay):
                 self.rendered_task['blend_percent'] = ''
                 self.rendered_task['subtitle'] = ''
             self.rendered_task['bucket'] = bucket
+
             if state == PROCESS_STATE.WEIGHING and len(self.last_item.descriptions)>component and len(self.last_item.descriptions[component])>0:
                 target = self.last_item.weight * 1000 # target in g
                 self.rendered_task['total_percent'] = 100 * current_weight / target

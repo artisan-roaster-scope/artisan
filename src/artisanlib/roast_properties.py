@@ -4394,6 +4394,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     @pyqtSlot(int)
     def labelOriginFlagChanged(self, _:int = 0) -> None:
         plus.stock.coffee_label_normal_order = self.label_origin_flag.isChecked()
+        plus.stock.clearStockCaches() # we need to clear the stock caches to receive the updated coffee labels
         self.populatePlusCoffeeBlendCombos()  # update the plus stock popups to display the correct bean label format
 
     @pyqtSlot(int)
