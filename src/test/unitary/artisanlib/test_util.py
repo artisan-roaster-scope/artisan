@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any, Optional, List, Generator
 
 import hypothesis.strategies as st
 import numpy as np
@@ -29,7 +29,6 @@ from artisanlib.util import (
     decodeLocal,
     decodeLocalStrict,
     # Basic utility functions
-    decs2string,
     encodeLocal,
     encodeLocalStrict,
     fill_gaps,
@@ -129,43 +128,43 @@ def test_fromFtoC(temp: Optional[float]) -> None:
 
 
 @pytest.mark.parametrize(
-    "amount,weight_unit_index,target_unit_idx,brief,smart_unit_upgrade,expected",
+    'amount,weight_unit_index,target_unit_idx,brief,smart_unit_upgrade,expected',
     [
         # input g, target g
-        (12.34, 0, 0, 0, True, "12.3g"),
-        (12.34, 0, 0, 1, True, "12g"),
-        (123.4, 0, 0, 0, True, "123g"),  # 0 decimal as >=100 and result unit g
-        (123.4, 0, 0, 1, True, "123g"),  # 0 decimal as >=100 and result unit g
-        (1234.2, 0, 0, 0, True, "1234g"),  # 0 decimal as >=100 and result unit g
+        (12.34, 0, 0, 0, True, '12.3g'),
+        (12.34, 0, 0, 1, True, '12g'),
+        (123.4, 0, 0, 0, True, '123g'),  # 0 decimal as >=100 and result unit g
+        (123.4, 0, 0, 1, True, '123g'),  # 0 decimal as >=100 and result unit g
+        (1234.2, 0, 0, 0, True, '1234g'),  # 0 decimal as >=100 and result unit g
         (
             1234.2,
             0,
             0,
             1,
             True,
-            "1.23kg",
+            '1.23kg',
         ),  # upgraded to kg as brief!=0 and amount>1000, rendered with 2 decimals (1 downgraded from the default 3)
-        (12346, 0, 0, 0, True, "12.346kg"),  # unit upgrade
-        (1600, 0, 0, 0, True, "1.6kg"),  # smart unit upgrade
-        (1600, 0, 0, 0, False, "1600g"),  # no smart unit upgrade (disabled)
-        (1601, 0, 0, 0, True, "1601g"),  # no smart unit upgrade (as not more readable)
-        (1610, 0, 0, 0, True, "1610g"),  # no smart unit upgrade (as not more readable)
-        (1000000, 0, 0, 0, True, "1t"),  # >10kg rendered using result unit t
+        (12346, 0, 0, 0, True, '12.346kg'),  # unit upgrade
+        (1600, 0, 0, 0, True, '1.6kg'),  # smart unit upgrade
+        (1600, 0, 0, 0, False, '1600g'),  # no smart unit upgrade (disabled)
+        (1601, 0, 0, 0, True, '1601g'),  # no smart unit upgrade (as not more readable)
+        (1610, 0, 0, 0, True, '1610g'),  # no smart unit upgrade (as not more readable)
+        (1000000, 0, 0, 0, True, '1t'),  # >10kg rendered using result unit t
         # input kg
-        (0.9123, 1, 0, 0, True, "912g"),  # 0 decimal as >=100 and target unit g
-        (0.9123, 1, 1, 0, True, "912g"),  # target unit kg, but unit downgrade as <1kg
-        (1.9123, 1, 0, 0, True, "1912g"),
-        (1.9123, 1, 1, 0, True, "1.912kg"),
-        (1.9123, 1, 1, 1, True, "1.91kg"),  # brief=1 (one decimal less)
-        (12345.6, 1, 0, 1, True, "12.35t"),  # target unit g; unit upgrade; result unit t
-        (12345.6, 1, 1, 1, True, "12.35t"),  # target unit kg; unit upgrade; result unit t
-        (1600, 1, 1, 0, True, "1.6t"),  # smart unit upgrade
-        (1600, 1, 1, 0, False, "1600kg"),  # no smart unit upgrade (disabled)
-        (1601, 1, 1, 0, True, "1601kg"),  # no smart unit upgrade (as not more readable)
-        (1610, 1, 1, 0, True, "1610kg"),  # no smart unit upgrade (as not more readable)
+        (0.9123, 1, 0, 0, True, '912g'),  # 0 decimal as >=100 and target unit g
+        (0.9123, 1, 1, 0, True, '912g'),  # target unit kg, but unit downgrade as <1kg
+        (1.9123, 1, 0, 0, True, '1912g'),
+        (1.9123, 1, 1, 0, True, '1.912kg'),
+        (1.9123, 1, 1, 1, True, '1.91kg'),  # brief=1 (one decimal less)
+        (12345.6, 1, 0, 1, True, '12.35t'),  # target unit g; unit upgrade; result unit t
+        (12345.6, 1, 1, 1, True, '12.35t'),  # target unit kg; unit upgrade; result unit t
+        (1600, 1, 1, 0, True, '1.6t'),  # smart unit upgrade
+        (1600, 1, 1, 0, False, '1600kg'),  # no smart unit upgrade (disabled)
+        (1601, 1, 1, 0, True, '1601kg'),  # no smart unit upgrade (as not more readable)
+        (1610, 1, 1, 0, True, '1610kg'),  # no smart unit upgrade (as not more readable)
         # input oz
-        (32000, 3, 3, 0, True, "1t"),  # >32000oz rendered as target unit US t
-        (2000, 3, 3, 0, True, "125lb"),  # >1600oz rendered as target unit lbs
+        (32000, 3, 3, 0, True, '1t'),  # >32000oz rendered as target unit US t
+        (2000, 3, 3, 0, True, '125lb'),  # >1600oz rendered as target unit lbs
         # input lb
         (
             0.9123,
@@ -173,7 +172,7 @@ def test_fromFtoC(temp: Optional[float]) -> None:
             2,
             0,
             True,
-            "14.6oz",
+            '14.6oz',
         ),  # 1 decimal as <100 and target unit oz (only with smart unit upgrade)
         (
             0.9123,
@@ -181,12 +180,12 @@ def test_fromFtoC(temp: Optional[float]) -> None:
             2,
             0,
             False,
-            "0.912lb",
+            '0.912lb',
         ),  # 3 decimal as <100 and target unit lb (smart unit upgrade off)
-        (2600, 2, 2, 0, True, "1.3t"),  # smart unit upgrade
-        (2600, 2, 2, 0, False, "2600lb"),  # no smart unit upgrade (disabled)
-        (2601, 2, 2, 0, True, "2601lb"),  # no smart unit upgrade (as not more readable)
-        (2610, 2, 2, 0, True, "2610lb"),  # no smart unit upgrade (as not more readable)
+        (2600, 2, 2, 0, True, '1.3t'),  # smart unit upgrade
+        (2600, 2, 2, 0, False, '2600lb'),  # no smart unit upgrade (disabled)
+        (2601, 2, 2, 0, True, '2601lb'),  # no smart unit upgrade (as not more readable)
+        (2610, 2, 2, 0, True, '2610lb'),  # no smart unit upgrade (as not more readable)
     ],
 )
 def test_render_weight(
@@ -211,25 +210,17 @@ def test_render_weight(
 
 # Basic Utility Functions Tests
 
-
-def test_decs2string() -> None:
-    """Test decs2string function."""
-    assert decs2string([65, 66, 67]) == b"ABC"
-    assert decs2string([]) == b""
-    assert decs2string([0, 255, 128]) == b"\x00\xff\x80"
-
-
 def test_uchr() -> None:
     """Test uchr function."""
-    assert uchr(65) == "A"
-    assert uchr(8364) == "€"  # Euro symbol
-    assert uchr(0) == "\x00"
+    assert uchr(65) == 'A'
+    assert uchr(8364) == '€'  # Euro symbol
+    assert uchr(0) == '\x00'
 
 
 def test_encodeLocal_decodeLocal() -> None:
     """Test encodeLocal and decodeLocal functions."""
     # Test normal strings
-    test_str = "Hello World"
+    test_str = 'Hello World'
     encoded = encodeLocal(test_str)
     assert encoded is not None
     decoded = decodeLocal(encoded)
@@ -240,7 +231,7 @@ def test_encodeLocal_decodeLocal() -> None:
     assert decodeLocal(None) is None
 
     # Test special characters
-    special_str = "CafÃ© Ã±oÃ±o"
+    special_str = 'CafÃ© Ã±oÃ±o'
     encoded_special = encodeLocal(special_str)
     assert encoded_special is not None
     decoded_special = decodeLocal(encoded_special)
@@ -250,16 +241,16 @@ def test_encodeLocal_decodeLocal() -> None:
 def test_encodeLocalStrict_decodeLocalStrict() -> None:
     """Test strict versions of encode/decode functions."""
     # Test normal strings
-    test_str = "Hello World"
+    test_str = 'Hello World'
     encoded = encodeLocalStrict(test_str)
     decoded = decodeLocalStrict(encoded)
     assert decoded == test_str
 
     # Test None with default
-    assert encodeLocalStrict(None) == ""
-    assert encodeLocalStrict(None, "default") == "default"
-    assert decodeLocalStrict(None) == ""
-    assert decodeLocalStrict(None, "default") == "default"
+    assert encodeLocalStrict(None) == ''
+    assert encodeLocalStrict(None, 'default') == 'default'
+    assert decodeLocalStrict(None) == ''
+    assert decodeLocalStrict(None, 'default') == 'default'
 
 
 def test_hex2int() -> None:
@@ -277,48 +268,48 @@ def test_hex2int() -> None:
 
 def test_str2cmd_cmd2str() -> None:
     """Test str2cmd and cmd2str functions."""
-    test_str = "Hello"
+    test_str = 'Hello'
     cmd_bytes = str2cmd(test_str)
     assert isinstance(cmd_bytes, bytes)
-    assert cmd_bytes == b"Hello"
+    assert cmd_bytes == b'Hello'
 
     # Round trip
     result_str = cmd2str(cmd_bytes)
     assert result_str == test_str
 
     # Test with special characters
-    special_str = "Test123!@#"
+    special_str = 'Test123!@#'
     assert cmd2str(str2cmd(special_str)) == special_str
 
 
 def test_s2a() -> None:
     """Test s2a function (string to ASCII)."""
     # Normal ASCII string
-    assert s2a("Hello") == "Hello"
+    assert s2a('Hello') == 'Hello'
 
     # String with non-ASCII characters (should be removed)
-    assert s2a("CafÃ©") == "Caf"
-    assert s2a("Hello ä¸–ç•Œ") == "Hello "
+    assert s2a('CafÃ©') == 'Caf'
+    assert s2a('Hello ä¸–ç•Œ') == 'Hello '
 
     # Empty string
-    assert s2a("") == ""
+    assert s2a('') == ''
 
 
 def test_abbrevString() -> None:
     """Test abbrevString function."""
     # String shorter than limit
-    assert abbrevString("Hello", 10) == "Hello"
+    assert abbrevString('Hello', 10) == 'Hello'
 
     # String equal to limit
-    assert abbrevString("Hello", 5) == "Hello"
+    assert abbrevString('Hello', 5) == 'Hello'
 
     # String longer than limit
-    assert abbrevString("Hello World", 8) == "Hello W..."
-    assert abbrevString("Very long string", 5) == "Very..."
+    assert abbrevString('Hello World', 8) == 'Hello W\u2026'
+    assert abbrevString('Very long string', 5) == 'Very\u2026'
 
     # Edge cases
-    assert abbrevString("A", 1) == "A"
-    assert abbrevString("AB", 1) == "..."
+    assert abbrevString('A', 1) == 'A'
+    assert abbrevString('AB', 1) == '\u2026'
 
 
 # Type Conversion Functions Tests
@@ -328,18 +319,18 @@ def test_toInt() -> None:
     """Test toInt function."""
     # Normal integers
     assert toInt(42) == 42
-    assert toInt("42") == 42
+    assert toInt('42') == 42
     assert toInt(42.7) == 43  # rounds
-    assert toInt("42.7") == 43  # rounds
+    assert toInt('42.7') == 43  # rounds
 
     # Edge cases
     assert toInt(None) == 0
-    assert toInt("") == 0
-    assert toInt("invalid") == 0
+    assert toInt('') == 0
+    assert toInt('invalid') == 0
 
     # Negative numbers
     assert toInt(-42) == -42
-    assert toInt("-42") == -42
+    assert toInt('-42') == -42
     assert toInt(-42.7) == -43  # rounds
 
 
@@ -347,41 +338,41 @@ def test_toFloat() -> None:
     """Test toFloat function."""
     # Normal floats
     assert toFloat(42.5) == 42.5
-    assert toFloat("42.5") == 42.5
+    assert toFloat('42.5') == 42.5
     assert toFloat(42) == 42.0
-    assert toFloat("42") == 42.0
+    assert toFloat('42') == 42.0
 
     # Edge cases
     assert toFloat(None) == 0.0
-    assert toFloat("") == 0.0
-    assert toFloat("invalid") == 0.0
+    assert toFloat('') == 0.0
+    assert toFloat('invalid') == 0.0
 
     # Negative numbers
     assert toFloat(-42.5) == -42.5
-    assert toFloat("-42.5") == -42.5
+    assert toFloat('-42.5') == -42.5
 
 
 def test_toBool() -> None:
     """Test toBool function."""
     # String true values
-    assert toBool("yes") is True
-    assert toBool("YES") is True
-    assert toBool("true") is True
-    assert toBool("TRUE") is True
-    assert toBool("t") is True
-    assert toBool("T") is True
-    assert toBool("1") is True
+    assert toBool('yes') is True
+    assert toBool('YES') is True
+    assert toBool('true') is True
+    assert toBool('TRUE') is True
+    assert toBool('t') is True
+    assert toBool('T') is True
+    assert toBool('1') is True
 
     # String false values
-    assert toBool("no") is False
-    assert toBool("NO") is False
-    assert toBool("false") is False
-    assert toBool("FALSE") is False
-    assert toBool("f") is False
-    assert toBool("F") is False
-    assert toBool("0") is False
-    assert toBool("") is False
-    assert toBool("invalid") is False
+    assert toBool('no') is False
+    assert toBool('NO') is False
+    assert toBool('false') is False
+    assert toBool('FALSE') is False
+    assert toBool('f') is False
+    assert toBool('F') is False
+    assert toBool('0') is False
+    assert toBool('') is False
+    assert toBool('invalid') is False
 
     # Non-string values
     assert toBool(True) is True
@@ -393,11 +384,11 @@ def test_toBool() -> None:
 
 def test_toString() -> None:
     """Test toString function."""
-    assert toString(42) == "42"
-    assert toString(42.5) == "42.5"
-    assert toString("hello") == "hello"
-    assert toString(None) == "None"
-    assert toString([1, 2, 3]) == "[1, 2, 3]"
+    assert toString(42) == '42'
+    assert toString(42.5) == '42.5'
+    assert toString('hello') == 'hello'
+    assert toString(None) == 'None'
+    assert toString([1, 2, 3]) == '[1, 2, 3]'
 
 
 def test_toList() -> None:
@@ -405,16 +396,16 @@ def test_toList() -> None:
     assert toList(None) == []
     assert toList([1, 2, 3]) == [1, 2, 3]
     assert toList((1, 2, 3)) == [1, 2, 3]
-    assert toList("abc") == ["a", "b", "c"]
+    assert toList('abc') == ['a', 'b', 'c']
     assert toList(range(3)) == [0, 1, 2]
 
 
 def test_toStringList() -> None:
     """Test toStringList function."""
-    assert toStringList([1, 2, 3]) == ["1", "2", "3"]
-    assert toStringList(["a", "b", "c"]) == ["a", "b", "c"]
+    assert toStringList([1, 2, 3]) == ['1', '2', '3']
+    assert toStringList(['a', 'b', 'c']) == ['a', 'b', 'c']
     assert toStringList([]) == []
-    assert toStringList([None, 42, "test"]) == ["None", "42", "test"]
+    assert toStringList([None, 42, 'test']) == ['None', '42', 'test']
 
 
 # Temperature Functions Tests
@@ -471,7 +462,7 @@ def test_RoRfromCtoF() -> None:
     # Special values
     assert RoRfromCtoF(None) is None
     assert RoRfromCtoF(-1) == -1
-    assert RoRfromCtoF(float("nan")) is None or np.isnan(RoRfromCtoF(float("nan")))
+    assert RoRfromCtoF(float('nan')) is None or np.isnan(RoRfromCtoF(float('nan')))
 
 
 def test_RoRfromFtoC() -> None:
@@ -483,51 +474,51 @@ def test_RoRfromFtoC() -> None:
     # Special values
     assert RoRfromFtoC(None) is None
     assert RoRfromFtoC(-1) == -1
-    assert RoRfromFtoC(float("nan")) is None or np.isnan(RoRfromFtoC(float("nan")))
+    assert RoRfromFtoC(float('nan')) is None or np.isnan(RoRfromFtoC(float('nan')))
 
 
 def test_convertRoR() -> None:
     """Test convertRoR function."""
     # Same unit
-    assert convertRoR(5.0, "C", "C") == 5.0
-    assert convertRoR(5.0, "F", "F") == 5.0
+    assert convertRoR(5.0, 'C', 'C') == 5.0
+    assert convertRoR(5.0, 'F', 'F') == 5.0
 
     # C to F
-    assert convertRoR(1.0, "C", "F") == 1.8
+    assert convertRoR(1.0, 'C', 'F') == 1.8
 
     # F to C
-    assert pytest.approx(convertRoR(1.8, "F", "C"), 0.01) == 1.0
+    assert pytest.approx(convertRoR(1.8, 'F', 'C'), 0.01) == 1.0
 
     # None handling
-    assert convertRoR(None, "C", "F") is None
+    assert convertRoR(None, 'C', 'F') is None
 
 
 def test_convertRoRstrict() -> None:
     """Test convertRoRstrict function."""
     # Same unit
-    assert convertRoRstrict(5.0, "C", "C") == 5.0
+    assert convertRoRstrict(5.0, 'C', 'C') == 5.0
 
     # C to F
-    assert convertRoRstrict(1.0, "C", "F") == 1.8
+    assert convertRoRstrict(1.0, 'C', 'F') == 1.8
 
     # F to C
-    assert pytest.approx(convertRoRstrict(1.8, "F", "C"), 0.01) == 1.0
+    assert pytest.approx(convertRoRstrict(1.8, 'F', 'C'), 0.01) == 1.0
 
 
 def test_convertTemp() -> None:
     """Test convertTemp function."""
     # Same unit or empty target
-    assert convertTemp(100.0, "C", "C") == 100.0
-    assert convertTemp(100.0, "C", "") == 100.0
-    assert convertTemp(100.0, "", "F") == 100.0
+    assert convertTemp(100.0, 'C', 'C') == 100.0
+    assert convertTemp(100.0, 'C', '') == 100.0
+    assert convertTemp(100.0, '', 'F') == 100.0
 
     # C to F
-    assert convertTemp(0.0, "C", "F") == 32.0
-    assert convertTemp(100.0, "C", "F") == 212.0
+    assert convertTemp(0.0, 'C', 'F') == 32.0
+    assert convertTemp(100.0, 'C', 'F') == 212.0
 
     # F to C
-    assert convertTemp(32.0, "F", "C") == 0.0
-    assert convertTemp(212.0, "F", "C") == 100.0
+    assert convertTemp(32.0, 'F', 'C') == 0.0
+    assert convertTemp(212.0, 'F', 'C') == 100.0
 
 
 def test_is_proper_temp() -> None:
@@ -541,7 +532,7 @@ def test_is_proper_temp() -> None:
     assert is_proper_temp(None) is False
     assert is_proper_temp(-1) is False  # Error value
     assert is_proper_temp(0) is False  # Error value
-    assert is_proper_temp(float("nan")) is False
+    assert is_proper_temp(float('nan')) is False
 
 
 # Time Functions Tests
@@ -550,44 +541,47 @@ def test_is_proper_temp() -> None:
 def test_stringfromseconds() -> None:
     """Test stringfromseconds function."""
     # Normal times
-    assert stringfromseconds(0) == "00:00"
-    assert stringfromseconds(60) == "01:00"
-    assert stringfromseconds(90) == "01:30"
-    assert stringfromseconds(3661) == "61:01"  # Over 60 minutes
+    assert stringfromseconds(0) == '00:00'
+    assert stringfromseconds(60) == '01:00'
+    assert stringfromseconds(90) == '01:30'
+    assert stringfromseconds(3661) == '61:01'  # Over 60 minutes
 
     # With leading zero control
-    assert stringfromseconds(60, leadingzero=True) == "01:00"
-    assert stringfromseconds(60, leadingzero=False) == "1:00"
-    assert stringfromseconds(5, leadingzero=False) == "0:05"
+    assert stringfromseconds(60, leadingzero=True) == '01:00'
+    assert stringfromseconds(60, leadingzero=False) == '1:00'
+    assert stringfromseconds(5, leadingzero=False) == '0:05'
 
     # Negative times (should be handled)
-    assert stringfromseconds(-60) == "-01:00"
+    assert stringfromseconds(-60) == '-01:00'
 
     # Fractional seconds (should round)
-    assert stringfromseconds(60.4) == "01:00"
-    assert stringfromseconds(60.6) == "01:01"
+    assert stringfromseconds(60.4) == '01:00'
+    assert stringfromseconds(60.6) == '01:01'
 
 
 def test_stringtoseconds() -> None:
     """Test stringtoseconds function."""
     # Normal times
-    assert stringtoseconds("00:00") == 0
-    assert stringtoseconds("01:00") == 60
-    assert stringtoseconds("01:30") == 90
-    assert stringtoseconds("10:05") == 605
+    assert stringtoseconds('00:00') == 0
+    assert stringtoseconds('01:00') == 60
+    assert stringtoseconds('01:30') == 90
+    assert stringtoseconds('10:05') == 605
 
     # Negative times
-    assert stringtoseconds("-01:00") == -60
-    assert stringtoseconds("-10:30") == -630
+    assert stringtoseconds('-01:00') == -60
+    assert stringtoseconds('-10:30') == -630
 
     # Invalid formats
-    assert stringtoseconds("invalid") == -1
-    assert stringtoseconds("1:2:3") == -1  # Too many parts
-    assert stringtoseconds("1") == -1  # Too few parts
+    with pytest.raises(ValueError, match='not a properly formatted time string'):
+        stringtoseconds('invalid')
+    with pytest.raises(ValueError, match='not a properly formatted time string'):
+        stringtoseconds('1:2:3')
+    with pytest.raises(ValueError, match='not a properly formatted time string'):
+        stringtoseconds('1')
 
     # Non-numeric parts raise ValueError
-    with pytest.raises(ValueError):
-        stringtoseconds("ab:cd")
+    with pytest.raises(ValueError, match='invalid literal'):
+        stringtoseconds('ab:cd')
 
 
 # String Processing Functions Tests
@@ -596,64 +590,64 @@ def test_stringtoseconds() -> None:
 def test_comma2dot() -> None:
     """Test comma2dot function."""
     # Normal decimal conversion
-    assert comma2dot("1,5") == "1.5"
-    assert comma2dot("12,34") == "12.34"
+    assert comma2dot('1,5') == '1.5'
+    assert comma2dot('12,34') == '12.34'
 
     # Already has dot
-    assert comma2dot("1.5") == "1.5"
+    assert comma2dot('1.5') == '1.5'
 
     # Multiple separators (behavior depends on order)
-    assert comma2dot("1,234.56") == "1234.56"  # comma then dot
-    assert comma2dot("1.234,56") == "1.23456"  # dot then comma
+    assert comma2dot('1,234.56') == '1234.56'  # comma then dot
+    assert comma2dot('1.234,56') == '1.23456'  # dot then comma
 
     # No separators
-    assert comma2dot("123") == "123"
+    assert comma2dot('123') == '123'
 
     # Empty or whitespace
-    assert comma2dot("") == ""
-    assert comma2dot("  ") == ""
+    assert comma2dot('') == ''
+    assert comma2dot('  ') == ''
 
     # Leading/trailing whitespace
-    assert comma2dot("  1,5  ") == "1.5"
+    assert comma2dot('  1,5  ') == '1.5'
 
 
 def test_natsort() -> None:
     """Test natsort function (natural sorting)."""
     # Numbers in strings
-    result = natsort("file10.txt")
+    result = natsort('file10.txt')
     assert 10 in result  # Should extract number
-    assert "file" in result  # Should keep text
-    assert ".txt" in result  # Should keep extension
+    assert 'file' in result  # Should keep text
+    assert '.txt' in result  # Should keep extension
 
     # Mixed content
-    result = natsort("abc123def456")
+    result = natsort('abc123def456')
     assert 123 in result
     assert 456 in result
-    assert "abc" in result
-    assert "def" in result
+    assert 'abc' in result
+    assert 'def' in result
 
 
 def test_scaleFloat2String() -> None:
     """Test scaleFloat2String function."""
     # Zero
-    assert scaleFloat2String(0) == "0"
-    assert scaleFloat2String("0") == "0"
+    assert scaleFloat2String(0) == '0'
+    assert scaleFloat2String('0') == '0'
 
     # Small numbers (< 1)
-    assert scaleFloat2String(0.1) == "0.1"
-    assert scaleFloat2String(0.999) == "0.999"
+    assert scaleFloat2String(0.1) == '0.1'
+    assert scaleFloat2String(0.999) == '0.999'
 
     # Medium numbers (1-9.99)
-    assert scaleFloat2String(1.5) == "1.5"
-    assert scaleFloat2String(9.99) == "9.99"
+    assert scaleFloat2String(1.5) == '1.5'
+    assert scaleFloat2String(9.99) == '9.99'
 
     # Larger numbers (10-999.9)
-    assert scaleFloat2String(10.5) == "10.5"
-    assert scaleFloat2String(999.9) == "999.9"
+    assert scaleFloat2String(10.5) == '10.5'
+    assert scaleFloat2String(999.9) == '999.9'
 
     # Very large numbers (>= 1000)
-    assert scaleFloat2String(1000) == "1000"
-    assert scaleFloat2String(9999) == "9999"
+    assert scaleFloat2String(1000) == '1000'
+    assert scaleFloat2String(9999) == '9999'
 
 
 # Float Processing Functions Tests
@@ -668,7 +662,7 @@ def test_float2float() -> None:
     assert float2float(1.23456, 3) == 1.235  # rounds
 
     # NaN handling (returns 0.0 for NaN)
-    assert float2float(float("nan"), 1) == 0.0
+    assert float2float(float('nan'), 1) == 0.0
 
     # Zero decimals
     assert float2float(1.7, 0) == 2.0  # rounds
@@ -773,28 +767,27 @@ def test_convertVolume() -> None:
 def test_removeAll() -> None:
     """Test removeAll function."""
     # Remove all occurrences (modifies in-place, returns None)
-    test_list = ["a", "b", "c", "b", "d", "b"]
-    result = removeAll(test_list, "b")
-    assert result is None  # Function returns None
-    assert test_list == ["a", "c", "d"]  # List is modified in-place
+    test_list = ['a', 'b', 'c', 'b', 'd', 'b']
+    removeAll(test_list, 'b')
+    assert test_list == ['a', 'c', 'd']  # List is modified in-place
 
-    test_list2 = ["x", "y", "z", "y"]
-    removeAll(test_list2, "y")
-    assert test_list2 == ["x", "z"]
+    test_list2 = ['x', 'y', 'z', 'y']
+    removeAll(test_list2, 'y')
+    assert test_list2 == ['x', 'z']
 
     # Remove non-existent item
-    test_list3 = ["a", "b", "c"]
-    removeAll(test_list3, "z")
-    assert test_list3 == ["a", "b", "c"]  # Unchanged
+    test_list3 = ['a', 'b', 'c']
+    removeAll(test_list3, 'z')
+    assert test_list3 == ['a', 'b', 'c']  # Unchanged
 
     # Empty list
     test_list4: list[str] = []
-    removeAll(test_list4, "x")
+    removeAll(test_list4, 'x')
     assert test_list4 == []
 
     # Remove all items
-    test_list5 = ["x", "x", "x"]
-    removeAll(test_list5, "x")
+    test_list5 = ['x', 'x', 'x']
+    removeAll(test_list5, 'x')
     assert test_list5 == []
 
 
@@ -829,7 +822,7 @@ def test_fill_gaps() -> None:
 def test_replace_duplicates() -> None:
     """Test replace_duplicates function."""
     # Replace consecutive duplicates
-    data = [1, 1, 2, 2, 2, 3]
+    data:List[float] = [1, 1, 2, 2, 2, 3]
     result = replace_duplicates(data)
     # Should replace duplicates with None or interpolated values
     assert len(result) == len(data)
@@ -861,7 +854,7 @@ def test_is_int_list() -> None:
 
     # Invalid lists
     assert is_int_list([1, 2.5, 3]) is False  # Contains float
-    assert is_int_list([1, "2", 3]) is False  # Contains string
+    assert is_int_list([1, '2', 3]) is False  # Contains string
     assert is_int_list([1, None, 3]) is False  # Contains None
 
 
@@ -873,7 +866,7 @@ def test_is_float_list() -> None:
 
     # Invalid lists (ints are NOT considered floats by this function)
     assert is_float_list([1, 2, 3]) is False  # Ints not considered floats
-    assert is_float_list([1.0, "2.5", 3.0]) is False  # Contains string
+    assert is_float_list([1.0, '2.5', 3.0]) is False  # Contains string
     assert is_float_list([1.0, None, 3.0]) is False  # Contains None
 
 
@@ -883,20 +876,20 @@ def test_is_float_list() -> None:
 def test_right_to_left() -> None:
     """Test right_to_left function."""
     # RTL languages
-    assert right_to_left("ar") is True  # Arabic
-    assert right_to_left("he") is True  # Hebrew
-    assert right_to_left("fa") is True  # Farsi/Persian
+    assert right_to_left('ar') is True  # Arabic
+    assert right_to_left('he') is True  # Hebrew
+    assert right_to_left('fa') is True  # Farsi/Persian
 
     # LTR languages
-    assert right_to_left("en") is False  # English
-    assert right_to_left("es") is False  # Spanish
-    assert right_to_left("fr") is False  # French
-    assert right_to_left("de") is False  # German
-    assert right_to_left("zh") is False  # Chinese
+    assert right_to_left('en') is False  # English
+    assert right_to_left('es') is False  # Spanish
+    assert right_to_left('fr') is False  # French
+    assert right_to_left('de') is False  # German
+    assert right_to_left('zh') is False  # Chinese
 
     # Unknown/invalid codes
-    assert right_to_left("xx") is False  # Unknown
-    assert right_to_left("") is False  # Empty
+    assert right_to_left('xx') is False  # Unknown
+    assert right_to_left('') is False  # Empty
 
 
 # Additional Utility Functions Tests
@@ -906,15 +899,15 @@ def test_isOpen() -> None:
     """Test isOpen function (network port checking)."""
     # Test with localhost and common ports
     # Port 80 (HTTP) - might be closed on localhost
-    result = isOpen("127.0.0.1", 80)
+    result = isOpen('127.0.0.1', 80)
     assert isinstance(result, bool)  # Should return boolean
 
     # Invalid host
-    result = isOpen("invalid.host.name", 80)
+    result = isOpen('invalid.host.name', 80)
     assert result is False
 
     # Invalid port
-    result = isOpen("127.0.0.1", 99999)
+    result = isOpen('127.0.0.1', 99999)
     assert result is False
 
 
@@ -964,17 +957,17 @@ def test_getDirectory() -> None:
     """Test getDirectory function."""
     # Test with basic filename (may fail without Qt app)
     try:
-        result = getDirectory("test")
+        result = getDirectory('test')
         assert isinstance(result, str)
         assert len(result) > 0
 
         # Test with extension
-        result = getDirectory("test", ".txt")
+        result = getDirectory('test', '.txt')
         assert isinstance(result, str)
-        assert "test" in result
+        assert 'test' in result
 
         # Test with share parameter
-        result = getDirectory("test", share=True)
+        result = getDirectory('test', share=True)
         assert isinstance(result, str)
     except AttributeError as e:
         # Expected when Qt application is not initialized
@@ -986,20 +979,19 @@ def test_getDirectory() -> None:
             "'NoneType' object has no attribute 'artisanviewerMode'" in error_msg
             or "'NoneType' object has no attribute 'applicationName'" in error_msg
         )
-        pass
 
 
 def test_path2url() -> None:
     """Test path2url function."""
     # Test with simple path
-    result = path2url("/path/to/file.txt")
+    result = path2url('/path/to/file.txt')
     assert isinstance(result, str)
-    assert result.startswith("file://")
+    assert result.startswith('file://')
 
     # Test with spaces in path
-    result = path2url("/path with spaces/file.txt")
+    result = path2url('/path with spaces/file.txt')
     assert isinstance(result, str)
-    assert result.startswith("file://")
+    assert result.startswith('file://')
 
 
 # Color Functions Tests
@@ -1008,78 +1000,78 @@ def test_path2url() -> None:
 def test_argb_colorname2rgba_colorname() -> None:
     """Test argb_colorname2rgba_colorname function."""
     # Normal ARGB color (alpha at beginning)
-    result = argb_colorname2rgba_colorname("#80FF0000")  # Semi-transparent red
-    assert result == "#FF000080"  # Red with alpha at end
+    result = argb_colorname2rgba_colorname('#80FF0000')  # Semi-transparent red
+    assert result == '#FF000080'  # Red with alpha at end
 
     # Regular hex color (no change)
-    result = argb_colorname2rgba_colorname("#FF0000")
-    assert result == "#FF0000"
+    result = argb_colorname2rgba_colorname('#FF0000')
+    assert result == '#FF0000'
 
     # Invalid format (no change)
-    result = argb_colorname2rgba_colorname("invalid")
-    assert result == "invalid"
+    result = argb_colorname2rgba_colorname('invalid')
+    assert result == 'invalid'
 
 
 def test_rgba_colorname2argb_colorname() -> None:
     """Test rgba_colorname2argb_colorname function."""
     # Normal RGBA color (alpha at end)
-    result = rgba_colorname2argb_colorname("#FF000080")  # Red with alpha at end
-    assert result == "#80FF0000"  # Semi-transparent red with alpha at beginning
+    result = rgba_colorname2argb_colorname('#FF000080')  # Red with alpha at end
+    assert result == '#80FF0000'  # Semi-transparent red with alpha at beginning
 
     # Regular hex color (no change)
-    result = rgba_colorname2argb_colorname("#FF0000")
-    assert result == "#FF0000"
+    result = rgba_colorname2argb_colorname('#FF0000')
+    assert result == '#FF0000'
 
     # Invalid format (no change)
-    result = rgba_colorname2argb_colorname("invalid")
-    assert result == "invalid"
+    result = rgba_colorname2argb_colorname('invalid')
+    assert result == 'invalid'
 
 
 def test_toGrey() -> None:
     """Test toGrey function."""
     # Convert red to grey
-    result = toGrey("#FF0000")
+    result = toGrey('#FF0000')
     assert isinstance(result, str)
-    assert result.startswith("#")
+    assert result.startswith('#')
     assert len(result) >= 7
 
     # Convert with alpha
-    result = toGrey("#80FF0000")
+    result = toGrey('#80FF0000')
     assert isinstance(result, str)
-    assert result.startswith("#")
+    assert result.startswith('#')
 
 
 def test_toDim() -> None:
     """Test toDim function."""
     # Dim a bright color
-    result = toDim("#FF0000")
+    result = toDim('#FF0000')
     assert isinstance(result, str)
-    assert result.startswith("#")
+    assert result.startswith('#')
     assert len(result) >= 7
 
     # Dim with alpha
-    result = toDim("#80FF0000")
+    result = toDim('#80FF0000')
     assert isinstance(result, str)
-    assert result.startswith("#")
+    assert result.startswith('#')
 
 
 def test_createGradient() -> None:
     """Test createGradient function."""
     # Create gradient from red
-    result = createGradient("#FF0000")
+    result = createGradient('#FF0000')
     assert isinstance(result, str)
-    assert "QLinearGradient" in result  # Qt gradient format
-    assert "#" in result  # Should contain color codes
+    assert 'QLinearGradient' in result  # Qt gradient format
+    assert '#' in result  # Should contain color codes
 
     # Create gradient with custom factors
-    result = createGradient("#FF0000", tint_factor=0.2, shade_factor=0.2)
+    result = createGradient('#FF0000', tint_factor=0.2, shade_factor=0.2)
     assert isinstance(result, str)
-    assert "QLinearGradient" in result
+    assert 'QLinearGradient' in result
 
     # Create reversed gradient
-    result = createGradient("#FF0000", reverse=True)
+    result = createGradient('#FF0000', reverse=True)
     assert isinstance(result, str)
-    assert "QLinearGradient" in result
+    assert 'QLinearGradient' in result
 
 
 # Logging Functions Tests
@@ -1094,7 +1086,7 @@ def test_getLoggers() -> None:
     assert len(result) >= 0
     # All items should be Logger objects
     for logger in result:
-        assert hasattr(logger, "name")
+        assert hasattr(logger, 'name')
 
 
 def test_debugLogLevelActive() -> None:
@@ -1163,68 +1155,68 @@ def test_stringfromseconds_negative() -> None:
     """Test stringfromseconds with negative values to cover line 138."""
     # Test negative seconds to cover the negative formatting branch
     result = stringfromseconds(-90)  # -1:30
-    assert result == "-01:30"
+    assert result == '-01:30'
 
     result = stringfromseconds(-3661)  # -61:01
-    assert result == "-61:01"
+    assert result == '-61:01'
 
     # Test with leadingzero=False for negative
     result = stringfromseconds(-90, leadingzero=False)
-    assert result == "-1:30"
+    assert result == '-1:30'
 
 
 def test_stringtoseconds_edge_cases() -> None:
     """Test stringtoseconds with edge cases."""
     # Test negative parsing (covers more branches)
-    assert stringtoseconds("-05:30") == -330
-    assert stringtoseconds("-00:01") == -1
+    assert stringtoseconds('-05:30') == -330
+    assert stringtoseconds('-00:01') == -1
 
     # Test edge case with zero
-    assert stringtoseconds("00:00") == 0
-    assert stringtoseconds("-00:00") == 0
+    assert stringtoseconds('00:00') == 0
+    assert stringtoseconds('-00:00') == 0
 
 
 def test_convertTemp_edge_cases() -> None:
     """Test convertTemp with more edge cases."""
     # Test with empty source unit
-    assert convertTemp(100.0, "", "F") == 100.0
+    assert convertTemp(100.0, '', 'F') == 100.0
 
     # Test with both empty
-    assert convertTemp(100.0, "", "") == 100.0
+    assert convertTemp(100.0, '', '') == 100.0
 
     # Test unknown units (actually converts as if C to F)
-    result = convertTemp(100.0, "X", "Y")
+    result = convertTemp(100.0, 'X', 'Y')
     assert pytest.approx(result, 0.1) == 37.8  # Converts as C to F then F to C
 
 
 def test_scaleFloat2String_edge_cases() -> None:
     """Test scaleFloat2String with more edge cases."""
     # Test very small numbers
-    assert scaleFloat2String(0.001) == "0.001"
-    assert scaleFloat2String(0.0001) == "0"  # Very small rounds to 0
+    assert scaleFloat2String(0.001) == '0.001'
+    assert scaleFloat2String(0.0001) == '0'  # Very small rounds to 0
 
     # Test boundary values
-    assert scaleFloat2String(0.999) == "0.999"
-    assert scaleFloat2String(1.0) == "1"
-    assert scaleFloat2String(9.999) == "10"  # Rounds up
-    assert scaleFloat2String(10.0) == "10"
-    assert scaleFloat2String(99.99) == "99.99"
-    assert scaleFloat2String(100.0) == "100"
-    assert scaleFloat2String(999.9) == "999.9"
-    assert scaleFloat2String(1000.0) == "1000"
+    assert scaleFloat2String(0.999) == '0.999'
+    assert scaleFloat2String(1.0) == '1'
+    assert scaleFloat2String(9.999) == '10'  # Rounds up
+    assert scaleFloat2String(10.0) == '10'
+    assert scaleFloat2String(99.99) == '99.99'
+    assert scaleFloat2String(100.0) == '100'
+    assert scaleFloat2String(999.9) == '999.9'
+    assert scaleFloat2String(1000.0) == '1000'
 
 
 def test_comma2dot_edge_cases() -> None:
     """Test comma2dot with more edge cases."""
     # Test complex cases with multiple separators
-    assert comma2dot("1,234,567.89") == "1234567.89"
-    assert comma2dot("1.234.567,89") == "1234.56789"  # Actual behavior
+    assert comma2dot('1,234,567.89') == '1234567.89'
+    assert comma2dot('1.234.567,89') == '1234.56789'  # Actual behavior
 
     # Test with only commas
-    assert comma2dot("1,234,567") == "1234.567"
+    assert comma2dot('1,234,567') == '1234.567'
 
     # Test with only dots
-    assert comma2dot("1.234.567") == "1234.567"
+    assert comma2dot('1.234.567') == '1234.567'
 
 
 def test_fill_gaps_edge_cases() -> None:
@@ -1293,15 +1285,15 @@ def test_render_weight_edge_cases() -> None:
     """Test render_weight with edge cases to improve coverage."""
     # Test very large weights to trigger tonne conversion
     result = render_weight(2000000, 0, 0)  # 2 million grams
-    assert "t" in result  # Should convert to tonnes
+    assert 't' in result  # Should convert to tonnes
 
     # Test edge cases for smart unit upgrade
     result = render_weight(1000, 0, 0, smart_unit_upgrade=True)
-    assert "kg" in result  # Should upgrade to kg
+    assert 'kg' in result  # Should upgrade to kg
 
     # Test brief mode with different values
     result = render_weight(1500, 0, 0, brief=1)
-    assert "kg" in result  # Should upgrade due to brief mode
+    assert 'kg' in result  # Should upgrade due to brief mode
 
     # Test right-to-left language formatting
     result = render_weight(1500, 0, 0, right_to_left_lang=True)
@@ -1311,41 +1303,41 @@ def test_render_weight_edge_cases() -> None:
 def test_toInt_edge_cases() -> None:
     """Test toInt with more edge cases."""
     # Test with very large numbers
-    assert toInt("999999999") == 999999999
+    assert toInt('999999999') == 999999999
 
     # Test with decimal strings
-    assert toInt("42.9") == 43  # Should round
-    assert toInt("42.1") == 42  # Should round down
+    assert toInt('42.9') == 43  # Should round
+    assert toInt('42.1') == 42  # Should round down
 
     # Test with whitespace
-    assert toInt("  42  ") == 42
+    assert toInt('  42  ') == 42
 
     # Test with invalid strings
-    assert toInt("not_a_number") == 0
-    assert toInt("") == 0
+    assert toInt('not_a_number') == 0
+    assert toInt('') == 0
 
 
 def test_toFloat_edge_cases() -> None:
     """Test toFloat with more edge cases."""
     # Test with scientific notation
-    assert toFloat("1e3") == 1000.0
-    assert toFloat("1.5e-2") == 0.015
+    assert toFloat('1e3') == 1000.0
+    assert toFloat('1.5e-2') == 0.015
 
     # Test with whitespace
-    assert toFloat("  42.5  ") == 42.5
+    assert toFloat('  42.5  ') == 42.5
 
     # Test with invalid strings
-    assert toFloat("not_a_number") == 0.0
-    assert toFloat("") == 0.0
+    assert toFloat('not_a_number') == 0.0
+    assert toFloat('') == 0.0
 
 
 def test_toBool_edge_cases() -> None:
     """Test toBool with more edge cases."""
     # Test with mixed case
-    assert toBool("True") is True
-    assert toBool("FALSE") is False
-    assert toBool("Yes") is True
-    assert toBool("NO") is False
+    assert toBool('True') is True
+    assert toBool('FALSE') is False
+    assert toBool('Yes') is True
+    assert toBool('NO') is False
 
     # Test with numbers
     assert toBool(42) is True  # Non-zero number
@@ -1357,40 +1349,40 @@ def test_toBool_edge_cases() -> None:
     assert toBool([]) is False  # Empty list
     assert toBool([1]) is True  # Non-empty list
     assert toBool({}) is False  # Empty dict
-    assert toBool({"a": 1}) is True  # Non-empty dict
+    assert toBool({'a': 1}) is True  # Non-empty dict
 
 
 def test_path2url_edge_cases() -> None:
     """Test path2url with more edge cases."""
     # Test with Windows-style paths
-    result = path2url("C:\\Users\\test\\file.txt")
-    assert result.startswith("file://")
+    result = path2url('C:\\Users\\test\\file.txt')
+    assert result.startswith('file://')
 
     # Test with relative paths
-    result = path2url("./relative/path.txt")
-    assert result.startswith("file://")
+    result = path2url('./relative/path.txt')
+    assert result.startswith('file://')
 
     # Test with special characters
-    result = path2url("/path/with/special chars & symbols.txt")
-    assert result.startswith("file://")
+    result = path2url('/path/with/special chars & symbols.txt')
+    assert result.startswith('file://')
 
 
 def test_natsort_edge_cases() -> None:
     """Test natsort with more edge cases."""
     # Test with no numbers
-    result = natsort("abcdef")
-    assert "abcdef" in result
+    result = natsort('abcdef')
+    assert 'abcdef' in result
     assert all(isinstance(x, str) for x in result)
 
     # Test with only numbers
-    result = natsort("123456")
+    result = natsort('123456')
     assert 123456 in result
 
     # Test with mixed case
-    result = natsort("File123ABC")
-    assert "file" in result  # Should be lowercase
+    result = natsort('File123ABC')
+    assert 'file' in result  # Should be lowercase
     assert 123 in result
-    assert "abc" in result
+    assert 'abc' in result
 
 
 def test_convertTemp_none_handling() -> None:
@@ -1399,7 +1391,7 @@ def test_convertTemp_none_handling() -> None:
     # This is tricky since fromCtoF/fromFtoC handle None, but we need to trigger the None return
 
     # Test with NaN values that might return None
-    result = convertTemp(float("nan"), "C", "F")
+    result = convertTemp(float('nan'), 'C', 'F')
     # Should handle NaN gracefully
     assert isinstance(result, float)
 
@@ -1408,49 +1400,49 @@ def test_toGrey_edge_cases() -> None:
     """Test toGrey with edge cases to cover line 455."""
     # Test with invalid color that might trigger the fallback
     try:
-        result = toGrey("invalid_color")
+        result = toGrey('invalid_color')
         assert isinstance(result, str)
     except Exception:
         # If it fails, that's also acceptable for invalid input
         pass
 
     # Test with edge case colors
-    result = toGrey("#000000")  # Black
+    result = toGrey('#000000')  # Black
     assert isinstance(result, str)
-    assert result.startswith("#")
+    assert result.startswith('#')
 
-    result = toGrey("#FFFFFF")  # White
+    result = toGrey('#FFFFFF')  # White
     assert isinstance(result, str)
-    assert result.startswith("#")
+    assert result.startswith('#')
 
 
 def test_toDim_edge_cases() -> None:
     """Test toDim with edge cases."""
     # Test with invalid color
     try:
-        result = toDim("invalid_color")
+        result = toDim('invalid_color')
         assert isinstance(result, str)
     except Exception:
         # If it fails, that's also acceptable for invalid input
         pass
 
     # Test with edge case colors
-    result = toDim("#000000")  # Black
+    result = toDim('#000000')  # Black
     assert isinstance(result, str)
-    assert result.startswith("#")
+    assert result.startswith('#')
 
 
 def test_createGradient_edge_cases() -> None:
     """Test createGradient with edge cases."""
     # Test with different tint/shade factors
-    result = createGradient("#FF0000", tint_factor=0.1, shade_factor=0.1)
+    result = createGradient('#FF0000', tint_factor=0.1, shade_factor=0.1)
     assert isinstance(result, str)
-    assert "QLinearGradient" in result
+    assert 'QLinearGradient' in result
 
     # Test with extreme factors
-    result = createGradient("#FF0000", tint_factor=0.9, shade_factor=0.9)
+    result = createGradient('#FF0000', tint_factor=0.9, shade_factor=0.9)
     assert isinstance(result, str)
-    assert "QLinearGradient" in result
+    assert 'QLinearGradient' in result
 
 
 def test_float2float_edge_cases() -> None:
@@ -1483,29 +1475,29 @@ def test_render_weight_complex_cases() -> None:
 
     # Test very small weight with kg target (should downgrade to g)
     result = render_weight(0.5, 1, 1)  # 0.5kg target kg
-    assert "g" in result  # Should downgrade to grams
+    assert 'g' in result  # Should downgrade to grams
 
     # Test large oz weight (should upgrade to lb)
     result = render_weight(2000, 3, 3)  # 2000oz target oz
-    assert "lb" in result  # Should upgrade to pounds
+    assert 'lb' in result  # Should upgrade to pounds
 
     # Test very large weight (should upgrade to tonnes)
     result = render_weight(2000000, 0, 0)  # 2M grams
-    assert "t" in result  # Should show tonnes
+    assert 't' in result  # Should show tonnes
 
 
 def test_isOpen_edge_cases() -> None:
     """Test isOpen with more edge cases."""
     # Test with invalid port numbers
-    assert isOpen("127.0.0.1", -1) is False
-    assert isOpen("127.0.0.1", 65536) is False
+    assert isOpen('127.0.0.1', -1) is False
+    assert isOpen('127.0.0.1', 65536) is False
 
     # Test with localhost variations
-    result = isOpen("localhost", 80)
+    result = isOpen('localhost', 80)
     assert isinstance(result, bool)
 
     # Test with IPv6 localhost
-    result = isOpen("::1", 80)
+    result = isOpen('::1', 80)
     assert isinstance(result, bool)
 
 
@@ -1515,39 +1507,44 @@ def test_isOpen_edge_cases() -> None:
 def test_stringtoseconds_should_handle_invalid_format_gracefully() -> None:
     """Test stringtoseconds with various invalid formats."""
     # Test completely invalid formats
-    assert stringtoseconds("") == -1
-    assert stringtoseconds("invalid") == -1
-    assert stringtoseconds("1:2:3:4") == -1  # Too many parts
-    assert stringtoseconds("1") == -1  # Too few parts
-    assert stringtoseconds("::") == -1  # Multiple empty parts
+    with pytest.raises(ValueError, match='not a properly formatted time string'):
+        stringtoseconds('')
+    with pytest.raises(ValueError, match='not a properly formatted time string'):
+        stringtoseconds('invalid')
+    with pytest.raises(ValueError, match='not a properly formatted time string'):
+        stringtoseconds('1:2:3:4')  # Too many parts
+    with pytest.raises(ValueError, match='not a properly formatted time string'):
+        stringtoseconds('1')  # Too few parts
+    with pytest.raises(ValueError, match='not a properly formatted time string'):
+        assert stringtoseconds('::')  # Multiple empty parts
 
     # Test with single empty part (causes IndexError, so we expect exception)
     with pytest.raises(IndexError):
-        stringtoseconds(":")  # Empty parts
+        stringtoseconds(':')  # Empty parts
 
     # Test with non-numeric parts (should raise ValueError)
     with pytest.raises(ValueError):
-        stringtoseconds("ab:cd")
+        stringtoseconds('ab:cd')
     with pytest.raises(ValueError):
-        stringtoseconds("1:ab")
+        stringtoseconds('1:ab')
     with pytest.raises(ValueError):
-        stringtoseconds("ab:1")
+        stringtoseconds('ab:1')
 
 
 def test_abbrevString_should_handle_edge_cases_correctly() -> None:
     """Test abbrevString with precise edge cases."""
     # Test exact boundary conditions
-    assert abbrevString("", 0) == ""
-    assert abbrevString("", 5) == ""
-    assert abbrevString("A", 0) == "..."  # Length 0 should always add ellipsis
-    assert abbrevString("AB", 2) == "AB"  # Exactly at limit
-    assert abbrevString("ABC", 2) == "A..."  # One over limit
+    assert abbrevString('', 0) == ''
+    assert abbrevString('', 5) == ''
+    assert abbrevString('A', 0) == '\u2026'  # Length 0 should always add ellipsis
+    assert abbrevString('AB', 2) == 'AB'  # Exactly at limit
+    assert abbrevString('ABC', 2) == 'A\u2026'  # One over limit
 
     # Test with very long strings
-    long_string = "A" * 1000
+    long_string = 'A' * 1000
     result = abbrevString(long_string, 10)
-    assert result == "A" * 9 + "..."
-    assert len(result) == 12  # 9 chars + 3 dots
+    assert result == 'A' * 9 + '\u2026'
+    assert len(result) == 10  # 9 chars + ellipse char
 
 
 def test_hex2int_should_handle_boundary_values() -> None:
@@ -1572,55 +1569,38 @@ def test_hex2int_should_handle_boundary_values() -> None:
 def test_s2a_should_filter_non_ascii_precisely() -> None:
     """Test s2a function with precise ASCII filtering."""
     # Test with mixed ASCII and non-ASCII
-    assert s2a("Hello123") == "Hello123"  # All ASCII
-    assert s2a("Héllo") == "Hllo"  # Remove accented character
-    assert s2a("Test™") == "Test"  # Remove trademark symbol
-    assert s2a("αβγ") == ""  # All non-ASCII should result in empty string
+    assert s2a('Hello123') == 'Hello123'  # All ASCII
+    assert s2a('Héllo') == 'Hllo'  # Remove accented character
+    assert s2a('Test™') == 'Test'  # Remove trademark symbol
+    assert s2a('αβγ') == ''  # All non-ASCII should result in empty string
 
     # Test with control characters (should be preserved as they are ASCII)
-    assert s2a("Hello\tWorld") == "Hello\tWorld"  # Tab is ASCII
-    assert s2a("Hello\nWorld") == "Hello\nWorld"  # Newline is ASCII
+    assert s2a('Hello\tWorld') == 'Hello\tWorld'  # Tab is ASCII
+    assert s2a('Hello\nWorld') == 'Hello\nWorld'  # Newline is ASCII
 
     # Test with high ASCII values
-    assert s2a("Test\x7f") == "Test\x7f"  # DEL character (127) is ASCII
-
-
-def test_decs2string_should_handle_all_byte_values() -> None:
-    """Test decs2string with comprehensive byte value coverage."""
-    # Test with full byte range
-    assert decs2string([0, 127, 255]) == b"\x00\x7f\xff"
-
-    # Test with ASCII printable characters
-    ascii_values = list(range(32, 127))  # Printable ASCII
-    result = decs2string(ascii_values)
-    assert len(result) == len(ascii_values)
-    assert result == bytes(ascii_values)
-
-    # Test with single values
-    assert decs2string([65]) == b"A"
-    assert decs2string([0]) == b"\x00"
-    assert decs2string([255]) == b"\xff"
+    assert s2a('Test\x7f') == 'Test\x7f'  # DEL character (127) is ASCII
 
 
 def test_encodeLocal_decodeLocal_should_handle_special_characters() -> None:
     """Test encode/decode with comprehensive character coverage."""
     # Test with Unicode characters
-    unicode_str = "Hello 世界 🌍"
+    unicode_str = 'Hello 世界 🌍'
     encoded = encodeLocal(unicode_str)
     assert encoded is not None
     decoded = decodeLocal(encoded)
     assert decoded == unicode_str
 
     # Test with escape sequences
-    escape_str = "Line1\\nLine2\\tTabbed"
+    escape_str = 'Line1\\nLine2\\tTabbed'
     encoded = encodeLocal(escape_str)
     assert encoded is not None
     decoded = decodeLocal(encoded)
     assert decoded == escape_str
 
     # Test with empty string
-    assert encodeLocal("") == ""
-    assert decodeLocal("") == ""
+    assert encodeLocal('') == ''
+    assert decodeLocal('') == ''
 
 
 def test_float2float_should_handle_precision_correctly() -> None:
@@ -1647,22 +1627,22 @@ def test_comma2dot_should_handle_complex_number_formats() -> None:
     """Test comma2dot with various European number formats."""
     # Test German/European format (comma as decimal separator)
     # Note: comma2dot strips trailing zeros
-    assert comma2dot("1,50") == "1.5"  # Trailing zero is stripped
-    assert comma2dot("12,34") == "12.34"
+    assert comma2dot('1,50') == '1.5'  # Trailing zero is stripped
+    assert comma2dot('12,34') == '12.34'
 
     # Test with thousands separators
     assert (
-        comma2dot("1.234,56") == "1.23456"
+        comma2dot('1.234,56') == '1.23456'
     )  # German format - dots removed, last comma becomes decimal
-    assert comma2dot("1,234.56") == "1234.56"  # US format with comma thousands
+    assert comma2dot('1,234.56') == '1234.56'  # US format with comma thousands
 
     # Test edge cases
-    assert comma2dot(",5") == ".5"  # Leading comma
-    assert comma2dot("5,") == "5"  # Trailing comma gets removed
-    assert comma2dot("1,2,3") == "12.3"  # Last comma becomes decimal
+    assert comma2dot(',5') == '.5'  # Leading comma
+    assert comma2dot('5,') == '5'  # Trailing comma gets removed
+    assert comma2dot('1,2,3') == '12.3'  # Last comma becomes decimal
 
     # Test with no separators
-    assert comma2dot("12345") == "12345"
+    assert comma2dot('12345') == '12345'
 
 
 def test_toList_should_handle_various_iterables() -> None:
@@ -1670,11 +1650,11 @@ def test_toList_should_handle_various_iterables() -> None:
     # Test with different iterable types
     result = toList({1, 2, 3})  # Set order varies
     assert sorted(result) == [1, 2, 3]  # Sort to handle order variation
-    assert toList({"a": 1, "b": 2}.keys()) == ["a", "b"]
-    assert toList({"a": 1, "b": 2}.values()) == [1, 2]
+    assert toList({'a': 1, 'b': 2}.keys()) == ['a', 'b']
+    assert toList({'a': 1, 'b': 2}.values()) == [1, 2]
 
     # Test with generator
-    def gen():
+    def gen() -> Generator[int]:
         yield 1
         yield 2
         yield 3
@@ -1708,34 +1688,34 @@ def test_is_proper_temp_should_validate_temperature_values_precisely() -> None:
 
     # Invalid types/values
     assert is_proper_temp(None) is False
-    assert is_proper_temp(float("nan")) is False
+    assert is_proper_temp(float('nan')) is False
     # Note: inf and -inf are actually considered valid by the function
     # as they are not NaN and not in [0, -1]
-    assert is_proper_temp(float("inf")) is True
-    assert is_proper_temp(float("-inf")) is True
+    assert is_proper_temp(float('inf')) is False
+    assert is_proper_temp(float('-inf')) is False
 
 
 @pytest.mark.parametrize(
-    "input_value,expected_output",
+    'input_value,expected_output',
     [
         # Basic conversions
-        (0, "0"),
-        (42, "42"),
-        (-42, "-42"),
-        (42.0, "42.0"),
-        (42.5, "42.5"),
+        (0, '0'),
+        (42, '42'),
+        (-42, '-42'),
+        (42.0, '42.0'),
+        (42.5, '42.5'),
         # Special values
-        (None, "None"),
-        (True, "True"),
-        (False, "False"),
+        (None, 'None'),
+        (True, 'True'),
+        (False, 'False'),
         # Collections
-        ([1, 2, 3], "[1, 2, 3]"),
-        ((1, 2), "(1, 2)"),
-        ({"a": 1}, "{'a': 1}"),
+        ([1, 2, 3], '[1, 2, 3]'),
+        ((1, 2), '(1, 2)'),
+        ({'a': 1}, "{'a': 1}"),
         # Empty values
-        ("", ""),
-        ([], "[]"),
-        ({}, "{}"),
+        ('', ''),
+        ([], '[]'),
+        ({}, '{}'),
     ],
 )
 def test_toString_should_convert_values_correctly(input_value: Any, expected_output: str) -> None:
@@ -1744,7 +1724,7 @@ def test_toString_should_convert_values_correctly(input_value: Any, expected_out
 
 
 @pytest.mark.parametrize(
-    "celsius,expected_fahrenheit",
+    'celsius,expected_fahrenheit',
     [
         (0.0, 32.0),  # Freezing point
         (100.0, 212.0),  # Boiling point
@@ -1763,7 +1743,7 @@ def test_fromCtoFstrict_should_convert_temperatures_accurately(
 
 
 @pytest.mark.parametrize(
-    "fahrenheit,expected_celsius",
+    'fahrenheit,expected_celsius',
     [
         (32.0, 0.0),  # Freezing point
         (212.0, 100.0),  # Boiling point
@@ -1782,7 +1762,7 @@ def test_fromFtoCstrict_should_convert_temperatures_accurately(
 
 
 @pytest.mark.parametrize(
-    "value,decimals,expected",
+    'value,decimals,expected',
     [
         (1.23456, 0, 1.0),
         (1.23456, 1, 1.2),

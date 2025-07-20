@@ -34,6 +34,8 @@ v3.2.1
   - fixes number of rendered event buttons rows
   - fixes graph bounce and jitter when moving the cursor in the designer
   - fixes redraw issue with active crosslines in Comparator
+  - fixes minor quirk in PiOS deb postinstall and perm scripts (Issue #1922)
+
 
 ----
 v3.2.0 (June 23, 2025)

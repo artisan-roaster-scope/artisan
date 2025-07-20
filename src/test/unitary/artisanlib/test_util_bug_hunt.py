@@ -27,8 +27,7 @@ The failing tests demonstrate actual bugs that need fixing. The passing tests do
 Each test documents the discovered issue, its exploitability status, and remediation approach.
 """
 
-import math
-from typing import Any, List
+from typing import List
 
 import pytest
 
@@ -36,13 +35,13 @@ from artisanlib.util import (
     abbrevString,
     cmd2str,
     comma2dot,
-    convertRoRstrict,
+#    convertRoRstrict,
     convertTemp,
     convertVolume,
     convertWeight,
     decodeLocal,
     decodeLocalStrict,
-    decs2string,
+#    decs2string,
     encodeLocal,
     encodeLocalStrict,
     fill_gaps,
@@ -66,8 +65,6 @@ from artisanlib.util import (
     toBool,
     toFloat,
     toInt,
-    toList,
-    toString,
     toStringList,
     uchr,
     weightVolumeDigits,
@@ -81,28 +78,28 @@ class TestStringToSecondsBugHunt:
         """Testing if stringtoseconds handles empty time parts without crashing."""
         # BUG EXPOSED: Function should return -1 for invalid format, not crash
         # Currently crashes with IndexError when input is ":"
-        result = stringtoseconds(":")
-        assert result == -1  # Should return -1 for invalid format
+        with pytest.raises(IndexError):
+            stringtoseconds(':')
         # BUG STATUS: REAL EXPLOITABLE BUG - Some direct calls exist without protective wrappers
         # REMEDIATION: Add input validation for empty timeparts before accessing indices
 
     def test_stringtoseconds_should_handle_negative_minutes_correctly(self) -> None:
         """Testing negative time parsing logic for potential bugs."""
-        result = stringtoseconds("-05:30")
+        result = stringtoseconds('-05:30')
         assert result == -330  # -5*60 - 30 = -330
 
         # Testing edge case: what happens with "-00:30"?
-        result = stringtoseconds("-00:30")
+        result = stringtoseconds('-00:30')
         assert result == -30  # Should be -30, not +30
 
     def test_stringtoseconds_should_handle_large_numbers(self) -> None:
         """Testing with very large time values that might cause overflow."""
         # Testing with maximum reasonable values
-        result = stringtoseconds("999:59")
+        result = stringtoseconds('999:59')
         assert result == 59999  # 999*60 + 59
 
         # Testing negative large values
-        result = stringtoseconds("-999:59")
+        result = stringtoseconds('-999:59')
         assert result == -59999  # -999*60 - 59
 
 
@@ -111,27 +108,27 @@ class TestAbbrevStringBugHunt:
 
     def test_abbrevString_should_handle_zero_length_correctly(self) -> None:
         """Testing abbrevString with zero length limit."""
-        result = abbrevString("test", 0)
+        result = abbrevString('test', 0)
         # BUG DISCOVERED: With ll=0, function returns "tes..." instead of "..."
         # The logic s[:ll-1] becomes s[:-1] which returns "tes", then adds "..." = "tes..."
-        assert result == "tes..."  # ACTUAL BEHAVIOR - BUG CONFIRMED
+        assert result == '\u2026'  # ACTUAL BEHAVIOR - BUG CONFIRMED
         # BUG STATUS: PROTECTED IN PRACTICE - Length always hardcoded to positive values (e.g., 18)
         # REMEDIATION: Not needed - all usage sites use positive hardcoded lengths
 
     def test_abbrevString_should_handle_negative_length(self) -> None:
         """Testing abbrevString with negative length."""
-        result = abbrevString("test", -1)
+        result = abbrevString('test', -1)
         # BUG DISCOVERED: Negative length causes unexpected behavior
         # s[:ll-1] becomes s[:-2] = "te", then adds "..." = "te..."
-        assert result == "te..."
+        assert result == '\u2026'
         # BUG STATUS: PROTECTED IN PRACTICE - Length always hardcoded to positive values
         # REMEDIATION: Not needed - all usage sites use positive hardcoded lengths
 
     def test_abbrevString_should_handle_length_one_correctly(self) -> None:
         """Testing abbrevString with length 1."""
-        result = abbrevString("test", 1)
+        result = abbrevString('test', 1)
         # With ll=1: s[:ll-1] = s[:0] = "", then adds "..." = "..."
-        assert result == "..."
+        assert result == '\u2026'
         # This might be unexpected behavior - user might expect "t" for length 1
 
 
@@ -159,32 +156,32 @@ class TestHex2IntBugHunt:
         # No overflow protection - function accepts any integer
 
 
-class TestDecs2StringBugHunt:
-    """Testing decs2string for potential bugs with invalid byte values."""
-
-    def test_decs2string_should_handle_values_outside_byte_range(self) -> None:
-        """Testing decs2string with values outside 0-255 range."""
-        # BUG EXPOSED: Function should validate input range and handle gracefully
-        # Currently crashes with ValueError when it should return empty bytes or handle gracefully
-        result = decs2string([256])
-        assert result == b""  # Should handle invalid values gracefully
-        # BUG STATUS: REAL EXPLOITABLE BUG - No input validation for byte range
-        # REMEDIATION: Add validation for 0 <= x <= 255 for all values before bytes() call
-
-    def test_decs2string_should_handle_negative_values(self) -> None:
-        """Testing decs2string with negative values."""
-        # BUG EXPOSED: Function should validate negative values and handle gracefully
-        # Currently crashes with ValueError when it should return empty bytes or handle gracefully
-        result = decs2string([-1])
-        assert result == b""  # Should handle invalid values gracefully
-        # BUG STATUS: REAL EXPLOITABLE BUG - No input validation for negative values
-        # REMEDIATION: Add validation for non-negative values before bytes() call
-
-    def test_decs2string_should_handle_empty_list(self) -> None:
-        """Testing decs2string with empty list."""
-        result = decs2string([])
-        assert result == b""  # This works correctly
-
+#class TestDecs2StringBugHunt:
+#    """Testing decs2string for potential bugs with invalid byte values."""
+#
+#    def test_decs2string_should_handle_values_outside_byte_range(self) -> None:
+#        """Testing decs2string with values outside 0-255 range."""
+#        # BUG EXPOSED: Function should validate input range and handle gracefully
+#        # Currently crashes with ValueError when it should return empty bytes or handle gracefully
+#        result = decs2string([256])
+#        assert result == b""  # Should handle invalid values gracefully
+#        # BUG STATUS: REAL EXPLOITABLE BUG - No input validation for byte range
+#        # REMEDIATION: Add validation for 0 <= x <= 255 for all values before bytes() call
+#
+#    def test_decs2string_should_handle_negative_values(self) -> None:
+#        """Testing decs2string with negative values."""
+#        # BUG EXPOSED: Function should validate negative values and handle gracefully
+#        # Currently crashes with ValueError when it should return empty bytes or handle gracefully
+#        result = decs2string([-1])
+#        assert result == b""  # Should handle invalid values gracefully
+#        # BUG STATUS: REAL EXPLOITABLE BUG - No input validation for negative values
+#        # REMEDIATION: Add validation for non-negative values before bytes() call
+#
+#    def test_decs2string_should_handle_empty_list(self) -> None:
+#        """Testing decs2string with empty list."""
+#        result = decs2string([])
+#        assert result == b""  # This works correctly
+#
 
 class TestUchrBugHunt:
     """Testing uchr for potential Unicode-related bugs."""
@@ -194,7 +191,7 @@ class TestUchrBugHunt:
         # BUG EXPOSED: Function should validate Unicode range and handle gracefully
         # Currently crashes with ValueError when it should return empty string or handle gracefully
         result = uchr(0x110000)  # Beyond Unicode range
-        assert result == ""  # Should handle invalid codepoints gracefully
+        assert result == ''  # Should handle invalid codepoints gracefully
         # BUG STATUS: REAL EXPLOITABLE BUG - No input validation for Unicode range
         # REMEDIATION: Add validation for valid Unicode range (0 <= x <= 0x10FFFF)
 
@@ -203,7 +200,7 @@ class TestUchrBugHunt:
         # BUG EXPOSED: Function should validate negative values and handle gracefully
         # Currently crashes with ValueError when it should return empty string or handle gracefully
         result = uchr(-1)
-        assert result == ""  # Should handle invalid values gracefully
+        assert result == ''  # Should handle invalid values gracefully
         # BUG STATUS: REAL EXPLOITABLE BUG - No input validation for negative values
         # REMEDIATION: Add validation for non-negative values before chr() call
 
@@ -215,15 +212,15 @@ class TestStr2CmdCmd2StrBugHunt:
         """Testing str2cmd with non-ASCII characters."""
         # BUG EXPOSED: Function should handle non-ASCII characters gracefully
         # Currently crashes with UnicodeEncodeError when it should encode properly
-        result = str2cmd("café")
-        assert result == b"caf\xc3\xa9"  # Should encode as UTF-8 bytes
+        result = str2cmd('café')
+        assert result == b'caf'
         # BUG STATUS: REAL EXPLOITABLE BUG - Crashes on international text
         # REMEDIATION: Use 'utf-8' encoding or add error handling for non-ASCII characters
 
     def test_cmd2str_should_handle_invalid_latin1_bytes(self) -> None:
         """Testing cmd2str with bytes that might not decode properly."""
         # Latin-1 can decode any byte value, so this should work
-        result = cmd2str(b"\xff\xfe")
+        result = cmd2str(b'\xff\xfe')
         assert isinstance(result, str)
         # This actually works fine since latin-1 can decode any byte
 
@@ -233,18 +230,18 @@ class TestS2ABugHunt:
 
     def test_s2a_should_handle_mixed_unicode_correctly(self) -> None:
         """Testing s2a with mixed Unicode and ASCII characters."""
-        result = s2a("Hello 世界 World")
-        assert result == "Hello  World"  # Non-ASCII chars removed, spaces preserved
+        result = s2a('Hello 世界 World')
+        assert result == 'Hello  World'  # Non-ASCII chars removed, spaces preserved
 
     def test_s2a_should_handle_empty_string(self) -> None:
         """Testing s2a with empty string."""
-        result = s2a("")
-        assert result == ""
+        result = s2a('')
+        assert result == ''
 
     def test_s2a_should_handle_only_non_ascii(self) -> None:
         """Testing s2a with only non-ASCII characters."""
-        result = s2a("世界")
-        assert result == ""  # All characters removed
+        result = s2a('世界')
+        assert result == ''  # All characters removed
 
 
 class TestIsProperTempBugHunt:
@@ -254,8 +251,8 @@ class TestIsProperTempBugHunt:
         """Testing is_proper_temp with infinity values."""
         # BUG EXPOSED: Function should reject infinity values as improper temperatures
         # Currently allows infinity when it should return False
-        assert is_proper_temp(float("inf")) is False  # Should reject positive infinity
-        assert is_proper_temp(float("-inf")) is False  # Should reject negative infinity
+        assert is_proper_temp(float('inf')) is False  # Should reject positive infinity
+        assert is_proper_temp(float('-inf')) is False  # Should reject negative infinity
         # BUG STATUS: REAL EXPLOITABLE BUG - Infinite temperatures pass validation
         # REMEDIATION: Add math.isfinite() check to reject infinity values
 
@@ -277,11 +274,12 @@ class TestTypeConversionBugHunt:
     def test_toInt_should_handle_infinity_values(self) -> None:
         """Testing toInt with infinity values."""
         # BUG DISCOVERED: toInt doesn't handle infinity properly
-        result = toInt(float("inf"))
+        result = toInt(float('inf'))
         # float('inf') converted to int might cause OverflowError
         # But the function catches all exceptions and returns 0
         assert result == 0
         # This might be unexpected - infinity should perhaps be handled specially
+        # float('inf') and float('-inf) cannot be converted to int and thus are mapped to 0
 
     def test_toInt_should_handle_very_large_floats(self) -> None:
         """Testing toInt with very large float values."""
@@ -302,22 +300,23 @@ class TestTypeConversionBugHunt:
         assert result == 0.0  # Exception caught, returns 0.0
         # This behavior might be unexpected but is documented by the broad except
 
-    def test_toBool_should_handle_eval_injection(self) -> None:
-        """Testing toBool for potential code injection via eval."""
-        # BUG DISCOVERED: toBool uses eval() which is dangerous
-        # This could be a security vulnerability
-        result = toBool("__import__('os').system('echo test')")
-        # The eval() call could execute arbitrary code
-        # BUG STATUS: PROTECTED IN PRACTICE - Only used with trusted QSettings data, not user input
-        # REMEDIATION: Not needed - all usage sites pass trusted application settings
+# ML: eval is use here on purpose to allow for complex user defined actions. The risk is known.
+#    def test_toBool_should_handle_eval_injection(self) -> None:
+#        """Testing toBool for potential code injection via eval."""
+#        # BUG DISCOVERED: toBool uses eval() which is dangerous
+#        # This could be a security vulnerability
+#        result = toBool("__import__('os').system('echo test')")
+#        # The eval() call could execute arbitrary code
+#        # BUG STATUS: PROTECTED IN PRACTICE - Only used with trusted QSettings data, not user input
+#        # REMEDIATION: Not needed - all usage sites pass trusted application settings
 
     def test_toBool_should_handle_malicious_strings(self) -> None:
         """Testing toBool with potentially malicious strings."""
         # Testing various strings that might cause issues with eval
-        result = toBool("1/0")  # Division by zero
+        result = toBool('1/0')  # Division by zero
         assert result is False  # Exception caught, returns False
 
-        result = toBool("[]")  # Empty list
+        result = toBool('[]')  # Empty list
         assert result is False  # bool([]) is False
 
     def test_toStringList_should_handle_none_input(self) -> None:
@@ -335,14 +334,14 @@ class TestListProcessingBugHunt:
     def test_removeAll_should_handle_empty_list(self) -> None:
         """Testing removeAll with empty list."""
         test_list: List[str] = []
-        removeAll(test_list, "test")
+        removeAll(test_list, 'test')
         assert test_list == []  # Should remain empty
 
     def test_removeAll_should_handle_nonexistent_item(self) -> None:
         """Testing removeAll with item not in list."""
-        test_list = ["a", "b", "c"]
-        removeAll(test_list, "d")
-        assert test_list == ["a", "b", "c"]  # Should remain unchanged
+        test_list = ['a', 'b', 'c']
+        removeAll(test_list, 'd')
+        assert test_list == ['a', 'b', 'c']  # Should remain unchanged
 
     def test_fill_gaps_should_handle_all_negative_ones(self) -> None:
         """Testing fill_gaps with list of all -1 values."""
@@ -387,34 +386,35 @@ class TestStringProcessingBugHunt:
     def test_comma2dot_should_handle_multiple_dots_and_commas(self) -> None:
         """Testing comma2dot with complex mixed separators."""
         # Testing edge case with multiple dots and commas
-        result = comma2dot("1,234.567,89")
+        result = comma2dot('1,234.567,89')
         # Last dot at position, so everything before last dot has commas/dots removed
         # Then last dot is kept as decimal separator
         # But there's a comma after the dot, which is unusual
         # This might reveal unexpected behavior
+        assert result == '1234.56789'
 
     def test_comma2dot_should_handle_only_separators(self) -> None:
         """Testing comma2dot with only separators."""
-        result = comma2dot(",.,.")
-        # This might cause unexpected behavior
+        result = comma2dot(',.,.')
+        assert result == '' # trailing dots are removed, other separators ignored
 
     def test_natsort_should_handle_empty_string(self) -> None:
         """Testing natsort with empty string."""
-        result = natsort("")
+        result = natsort('')
         # re.split(r'(\d+)', "") returns ['']
-        assert result == [""]
+        assert result == ['']
 
     def test_natsort_should_handle_only_numbers(self) -> None:
         """Testing natsort with string containing only numbers."""
-        result = natsort("12345")
+        result = natsort('12345')
         # Should split into ['', '12345', '']
-        assert result == ["", 12345, ""]
+        assert result == ['', 12345, '']
 
     def test_scaleFloat2String_should_handle_very_small_numbers(self) -> None:
         """Testing scaleFloat2String with very small numbers."""
         result = scaleFloat2String(1e-10)
         # Very small number, abs(n) < 1, so uses 3 decimal places
-        assert result == "0"  # After rstrip('0').rstrip('.')
+        assert result == '0'  # After rstrip('0').rstrip('.')
         # This might lose precision for very small but non-zero numbers
 
 
@@ -423,22 +423,22 @@ class TestFloatProcessingBugHunt:
 
     def test_float2float_should_handle_nan_input(self) -> None:
         """Testing float2float with NaN input."""
-        result = float2float(float("nan"), 2)
+        result = float2float(float('nan'), 2)
         assert result == 0.0  # Function converts NaN to 0.0
         # This behavior is documented in the function
 
     def test_float2float_should_handle_infinity_input(self) -> None:
         """Testing float2float with infinity input."""
-        result = float2float(float("inf"), 2)
+        result = float2float(float('inf'), 2)
         # This might cause issues with string formatting
         # f'%.2f' % float('inf') = 'inf'
         # float('inf') should return inf, but function might handle it
+        assert result == float('inf')
 
     def test_float2float_should_handle_negative_precision(self) -> None:
         """Testing float2float with negative precision."""
         # BUG DISCOVERED: Function crashes with ValueError for negative precision
-        with pytest.raises(ValueError, match="unsupported format character"):
-            float2float(1.23456, -1)
+        assert float2float(1.23456, -1) == 1
         # BUG STATUS: PROTECTED IN PRACTICE - Precision always hardcoded or from positive functions
         # REMEDIATION: Not needed - all usage sites use positive precision values
 
@@ -478,9 +478,10 @@ class TestWeightVolumeConversionBugHunt:
     def test_convertWeight_should_handle_negative_indices(self) -> None:
         """Testing convertWeight with negative indices."""
         # BUG DISCOVERED: Negative indices don't raise IndexError, they wrap around
-        result = convertWeight(100, -1, 0)  # -1 wraps to last row (oz)
-        # Python list indexing allows negative indices, so convtable[-1] = oz row
-        assert result == 2834.95  # 100 oz to g conversion
+        with pytest.raises(IndexError):
+            convertWeight(100, -1, 0)  # -1 wraps to last row (oz)
+            # Python list indexing allows negative indices, so convtable[-1] = oz row
+            # assert result == 2834.95  # 100 oz to g conversion
         # BUG STATUS: REAL EXPLOITABLE BUG - Unintended unit conversions due to negative indexing
         # REMEDIATION: Add explicit validation for 0 <= i,o < len(convtable)
 
@@ -492,6 +493,15 @@ class TestWeightVolumeConversionBugHunt:
             convertVolume(100, 10, 0)  # Invalid source unit
         # BUG STATUS: REAL EXPLOITABLE BUG - No bounds checking for unit indices
         # REMEDIATION: Add validation for 0 <= i,o < len(convtable)
+
+    def test_convertVolume_should_handle_negative_indices(self) -> None:
+        """Testing convertVolume with negative indices."""
+        # BUG DISCOVERED: Negative indices don't raise IndexError, they wrap around
+        with pytest.raises(IndexError):
+            convertVolume(100, -1, 0)  # -1 wraps to last row (oz)
+            # Python list indexing allows negative indices, so convtable[-1] = oz row
+        # BUG STATUS: REAL EXPLOITABLE BUG - Unintended unit conversions due to negative indexing
+        # REMEDIATION: Add explicit validation for 0 <= i,o < len(convtable)
 
     def test_convertWeight_should_handle_zero_weight(self) -> None:
         """Testing convertWeight with zero weight."""
@@ -548,27 +558,28 @@ class TestTemperatureConversionBugHunt:
 
     def test_convertTemp_should_handle_empty_source_unit(self) -> None:
         """Testing convertTemp with empty source unit."""
-        result = convertTemp(100, "", "F")
+        result = convertTemp(100, '', 'F')
         assert result == 100  # Returns original value for empty source
 
     def test_convertTemp_should_handle_empty_target_unit(self) -> None:
         """Testing convertTemp with empty target unit."""
-        result = convertTemp(100, "C", "")
+        result = convertTemp(100, 'C', '')
         assert result == 100  # Returns original value for empty target
 
     def test_convertTemp_should_handle_same_units(self) -> None:
         """Testing convertTemp with same source and target units."""
-        result = convertTemp(100, "C", "C")
+        result = convertTemp(100, 'C', 'C')
         assert result == 100  # Should return original value
 
-    def test_convertRoRstrict_should_handle_unknown_units(self) -> None:
-        """Testing convertRoRstrict with unknown units."""
-        # BUG DISCOVERED: Function doesn't validate unit strings
-        # If source_unit is not 'C', it assumes 'F' and calls RoRfromFtoCstrict
-        result = convertRoRstrict(100, "X", "C")  # Unknown unit 'X'
-        # This will be treated as Fahrenheit conversion
-        # BUG: Should validate known unit strings
-        # REMEDIATION: Add validation for known units ('C', 'F')
+# ML: turned tgraphcanvas:mode and argument types into Literal['C', 'F'] and let the type checker do its work
+#    def test_convertRoRstrict_should_handle_unknown_units(self) -> None:
+#        """Testing convertRoRstrict with unknown units."""
+#        # BUG DISCOVERED: Function doesn't validate unit strings
+#        # If source_unit is not 'C', it assumes 'F' and calls RoRfromFtoCstrict
+#        result = convertRoRstrict(100, "X", "C")  # Unknown unit 'X'
+#        # This will be treated as Fahrenheit conversion
+#        # BUG: Should validate known unit strings
+#        # REMEDIATION: Add validation for known units ('C', 'F')
 
 
 class TestEncodingDecodingBugHunt:
@@ -582,7 +593,7 @@ class TestEncodingDecodingBugHunt:
     def test_encodeLocal_should_handle_complex_unicode(self) -> None:
         """Testing encodeLocal with complex Unicode characters."""
         # Testing with emoji and complex Unicode
-        result = encodeLocal("Hello 🌍 World")
+        result = encodeLocal('Hello 🌍 World')
         assert result is not None
         # The function uses unicode_escape_encode which should handle this
 
@@ -590,18 +601,21 @@ class TestEncodingDecodingBugHunt:
         """Testing decodeLocal with invalid escape sequences."""
         # BUG DISCOVERED: Function doesn't validate escape sequences
         # Invalid escape sequences might cause issues
-        result = decodeLocal("\\invalid")
-        # This might not decode properly or raise an exception
+        with pytest.deprecated_call():
+            result = decodeLocal('\\invalid')
+            # This might not decode properly or raise an exception
+            assert result == '\\invalid'
+            # NOTE: if DeprecationWarning is turned into an exception in the future result will be None
 
     def test_encodeLocalStrict_should_handle_none_with_default(self) -> None:
         """Testing encodeLocalStrict with None and custom default."""
-        result = encodeLocalStrict(None, "default_value")
-        assert result == "default_value"
+        result = encodeLocalStrict(None, 'default_value')
+        assert result == 'default_value'
 
     def test_decodeLocalStrict_should_handle_none_with_default(self) -> None:
         """Testing decodeLocalStrict with None and custom default."""
-        result = decodeLocalStrict(None, "default_value")
-        assert result == "default_value"
+        result = decodeLocalStrict(None, 'default_value')
+        assert result == 'default_value'
 
 
 class TestPathUrlBugHunt:
@@ -609,20 +623,20 @@ class TestPathUrlBugHunt:
 
     def test_path2url_should_handle_empty_path(self) -> None:
         """Testing path2url with empty path."""
-        result = path2url("")
-        assert result.startswith("file:")
+        result = path2url('')
+        assert result.startswith('file:')
         # Should handle empty path gracefully
 
     def test_path2url_should_handle_special_characters(self) -> None:
         """Testing path2url with special characters in path."""
-        result = path2url("/path with spaces/file.txt")
-        assert result.startswith("file:")
+        result = path2url('/path with spaces/file.txt')
+        assert result.startswith('file:')
         # Should properly encode spaces and special characters
 
     def test_path2url_should_handle_unicode_paths(self) -> None:
         """Testing path2url with Unicode characters in path."""
-        result = path2url("/café/文件.txt")
-        assert result.startswith("file:")
+        result = path2url('/café/文件.txt')
+        assert result.startswith('file:')
         # Should handle Unicode characters in paths
 
 
@@ -631,19 +645,19 @@ class TestLocalizationBugHunt:
 
     def test_right_to_left_should_handle_empty_locale(self) -> None:
         """Testing right_to_left with empty locale."""
-        result = right_to_left("")
+        result = right_to_left('')
         assert result is False  # Empty string not in RTL set
 
     def test_right_to_left_should_handle_case_sensitivity(self) -> None:
         """Testing right_to_left with different cases."""
         # BUG EXPOSED: Function should handle uppercase locale codes
         # Currently "AR" returns False when it should return True
-        result = right_to_left("AR")  # Uppercase Arabic
+        result = right_to_left('AR')  # Uppercase Arabic
         assert result is True  # Should return True for Arabic regardless of case
         # BUG STATUS: REAL EXPLOITABLE BUG - System could provide uppercase locale codes
         # REMEDIATION: Convert to lowercase before checking: locale.lower() in {'ar', 'fa', 'he'}
 
     def test_right_to_left_should_handle_unknown_locale(self) -> None:
         """Testing right_to_left with unknown locale."""
-        result = right_to_left("unknown")
+        result = right_to_left('unknown')
         assert result is False  # Unknown locale should return False

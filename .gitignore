@@ -1,28 +1,9 @@
 **/*.pyc
-.svn/
 src/build/
 src/dist*/
-src/artisan.py.bak
-src/artisan.py.org.py
-src/artisan.py.python2.py
-src/artisan.py.zip
-**/*.DS_Store
-src/Artisan.app/
-src/.settings/
-src/translations copy/
-src/Artisan-10.6.app/
-src/.project
 src/.pydevproject
-src/artisan-mac-2.4.5-beta.dmg
-src/artisan-mac-2.4.5.dmg
+src/artisan-mac-*.dmg
 src/artisan-win-*-setup.exe
-.idea/
-.coverage
-.prev_artisanlib_hash.txt
-simple.log
-artisan_plus.log
-outbox/
-*flycheck_*.py
 
 # Virtual environments
 venv/
@@ -47,13 +28,16 @@ pip-delete-this-directory.txt
 .pytest_cache/
 .coverage
 .coverage.*
-htmlcov/
+.htmlcov/
 .tox/
 .nox/
 coverage.xml
 *.cover
 *.py,cover
 .hypothesis/
+
+# Code spelling
+.pyspelling.yml
 
 # Type checking
 .mypy_cache/
@@ -68,6 +52,10 @@ dmypy.json
 .augment/
 
 # IDEs and editors
+.project
+.pydevproject
+.idea/
+.settings/
 .vscode/
 .vscode/settings.json.bak
 .vscode/.ropeproject

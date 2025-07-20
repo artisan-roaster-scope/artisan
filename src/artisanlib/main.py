@@ -17592,7 +17592,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             old_swapdeltalcds = self.qmc.swapdeltalcds
             #restore mode
             old_mode = self.qmc.mode
-            self.qmc.mode = str(settings.value('Mode',self.qmc.mode))
+            self.qmc.mode = ('F' if str(settings.value('Mode',self.qmc.mode)) == 'F' else 'C')
             #convert modes only if needed comparing the new uploaded mode to the old one.
             #otherwise it would incorrectly convert the uploaded phases
             if self.qmc.mode == 'F' and old_mode == 'C':
@@ -18694,7 +18694,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             eventsliderunits = list(map(str,list(toStringList(settings.value('eventsliderunits',self.eventsliderunits)))))
             if len(eventsliderunits) == self.eventsliders:
                 self.eventsliderunits = eventsliderunits
-            self.qmc.mode_tempsliders = str(settings.value('ModeTempSliders',self.qmc.mode_tempsliders)) # pyrefly: ignore[bad-assignment]
+            self.qmc.mode_tempsliders = ('F' if str(settings.value('ModeTempSliders',self.qmc.mode_tempsliders)) == 'F' else 'C') # pyrefly: ignore[bad-assignment]
             settings.endGroup()
             self.qmc.adjustTempSliders() # adjust min/max slider limits of temperature sliders to correspond to the current temp mode
             self.slidersAction.setEnabled(any(self.eventslidervisibilities) or self.pidcontrol.svSlider)

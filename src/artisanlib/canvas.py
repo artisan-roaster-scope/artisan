@@ -40,7 +40,7 @@ from bisect import bisect_right
 import psutil
 from psutil._common import bytes2human # pyright:ignore[reportPrivateImportUsage]
 
-from typing import Final, Optional, List, Set, Dict, Callable, Tuple, Union, Any, Sequence, cast, TYPE_CHECKING  #for Python >= 3.9: can remove 'List' since type hints can now use the generic 'list'
+from typing import Final, Optional, Literal, List, Set, Dict, Callable, Tuple, Union, Any, Sequence, cast, TYPE_CHECKING  #for Python >= 3.9: can remove 'List' since type hints can now use the generic 'list'
 
 if TYPE_CHECKING:
     from artisanlib.comm import serialport # pylint: disable=unused-import
@@ -521,7 +521,7 @@ class tgraphcanvas(FigureCanvas):
         self.flavorchart_total:Optional[Text] = None
 
         #F = Fahrenheit; C = Celsius
-        self.mode:str = 'F'
+        self.mode:Literal['C', 'F'] = 'F'
 
         # default mode on platforms we can detect it like macOS:
         if platform.system() == 'Darwin':
@@ -3650,6 +3650,7 @@ class tgraphcanvas(FigureCanvas):
             etype = self.etypesf(event_type)
             firstletter = self.etypeAbbrev(etype)
         secondletter = self.eventsvaluesShort(evalue_internal)
+        thirdletter:str
         if self.aw.eventslidertemp[event_type]:
             thirdletter = self.mode # postfix
         else:
@@ -10082,6 +10083,7 @@ class tgraphcanvas(FigureCanvas):
                                             Betype = self.Betypesf(self.backgroundEtypes[i])
                                             firstletter = self.etypeAbbrev(Betype)
                                             secondletter = self.eventsvaluesShort(self.backgroundEvalues[i])
+                                            thirdletter:str
                                             if self.aw.eventslidertemp[self.backgroundEtypes[i]]:
                                                 thirdletter = self.mode # postfix
                                             else:
@@ -15408,6 +15410,7 @@ class tgraphcanvas(FigureCanvas):
                             if etype < 4  and (not self.renderEventsDescr or len(self.specialeventsStrings[-1].strip()) == 0):
                                 firstletter = self.etypeAbbrev(self.etypesf(etype))
                                 secondletter = self.eventsvaluesShort(sevalue)
+                                thirdletter:str
                                 if self.aw.eventslidertemp[etype]:
                                     thirdletter = self.mode # postfix
                                 else:

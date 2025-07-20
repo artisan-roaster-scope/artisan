@@ -62,7 +62,7 @@ class WeightItem:
                              # For roasted blend items this is always just the one element list [(1, '')]
     position:str             # the position string (like "2/5" for 2nd of 5 batches)
     weight:float             # batch size (target weight for GreenWeightItem) in kg
-    weight_estimate: float   # expected yield in kg
+    weight_estimate: float   # expected yield in kg (only valid for RoastedWeightItems!)
     weight_unit_idx:int      # the weight unit, one of (0:'g', 1:'kg', 2:'lb', 3:'oz')
     callback:Callable[[str, float], None] # the function to be called with id:str and weight (in kg) on completion
 
@@ -73,15 +73,6 @@ class GreenWeightItem(WeightItem):
 @dataclass
 class RoastedWeightItem(WeightItem):
     ...
-
-
-# Consider
-#. if green: target weight (counts down)
-#. if green: bean or blend name
-#. if green: container recognized (or not) indicating container name
-#. if roasted: batch number + roast name + green weight + weight loss
-#. registered weight (so far)
-
 
 
 class Display:

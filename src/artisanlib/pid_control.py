@@ -34,7 +34,7 @@ from typing import Final, Union, List, Dict, Optional, TYPE_CHECKING
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
 
-from artisanlib.util import decs2string, fromCtoFstrict, fromFtoCstrict, hex2int, str2cmd, stringfromseconds, cmd2str, float2float
+from artisanlib.util import fromCtoFstrict, fromFtoCstrict, hex2int, str2cmd, stringfromseconds, cmd2str, float2float
 
 try:
     from PyQt6.QtCore import pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
@@ -1051,6 +1051,15 @@ class FujiPID:
 
     @staticmethod
     def dec2HexRaw(decimal:int) -> bytes:
+
+        def decs2string(x:List[int]) -> bytes:
+            try:
+                if len(x) > 0:
+                    return bytes(x)
+                return b''
+            except ValueError:
+                return b''
+
         # This method converts a decimal to a raw string appropriate for Fuji serial TX
         # Used to compose serial messages
         Nbytes = []
