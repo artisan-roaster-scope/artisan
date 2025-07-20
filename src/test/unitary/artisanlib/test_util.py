@@ -1654,7 +1654,7 @@ def test_toList_should_handle_various_iterables() -> None:
     assert toList({'a': 1, 'b': 2}.values()) == [1, 2]
 
     # Test with generator
-    def gen() -> Generator[int]:
+    def gen() -> Generator[int, None, None]:
         yield 1
         yield 2
         yield 3
