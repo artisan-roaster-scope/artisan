@@ -50,7 +50,7 @@ xdg-mime uninstall /usr/share/artisan/artisan-wg.xml
 
 case "$1" in
    remove|upgrade)
-   if dpkg-query -W xdg-utils 2>&1 >/dev/null;
+   if dpkg-query -W xdg-utils | awk '{print $2}' 2>&1 >/dev/null;
        then clear_mime;
    fi
    ;;
