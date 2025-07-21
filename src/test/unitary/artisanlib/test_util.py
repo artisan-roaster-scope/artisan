@@ -560,11 +560,11 @@ def test_is_proper_temp() -> None:
     (-125.7, True, '-02:06'),
     (-125.7, False, '-2:06'),
 ])
-def test_stringfromseconds(seconds_raw, leadingzero, expected):
+def test_stringfromseconds1(seconds_raw:float, leadingzero:bool, expected:str) -> None:
     assert stringfromseconds(seconds_raw, leadingzero) == expected
 
 
-def test_stringfromseconds() -> None:
+def test_stringfromseconds2() -> None:
     """Test stringfromseconds function."""
     # Normal times
     assert stringfromseconds(0) == '00:00'
