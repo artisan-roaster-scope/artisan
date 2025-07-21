@@ -35,13 +35,11 @@ from artisanlib.util import (
     abbrevString,
     cmd2str,
     comma2dot,
-#    convertRoRstrict,
     convertTemp,
     convertVolume,
     convertWeight,
     decodeLocal,
     decodeLocalStrict,
-#    decs2string,
     encodeLocal,
     encodeLocalStrict,
     fill_gaps,
@@ -155,33 +153,6 @@ class TestHex2IntBugHunt:
         assert result == 257000  # 1000*256 + 1000
         # No overflow protection - function accepts any integer
 
-
-#class TestDecs2StringBugHunt:
-#    """Testing decs2string for potential bugs with invalid byte values."""
-#
-#    def test_decs2string_should_handle_values_outside_byte_range(self) -> None:
-#        """Testing decs2string with values outside 0-255 range."""
-#        # BUG EXPOSED: Function should validate input range and handle gracefully
-#        # Currently crashes with ValueError when it should return empty bytes or handle gracefully
-#        result = decs2string([256])
-#        assert result == b""  # Should handle invalid values gracefully
-#        # BUG STATUS: REAL EXPLOITABLE BUG - No input validation for byte range
-#        # REMEDIATION: Add validation for 0 <= x <= 255 for all values before bytes() call
-#
-#    def test_decs2string_should_handle_negative_values(self) -> None:
-#        """Testing decs2string with negative values."""
-#        # BUG EXPOSED: Function should validate negative values and handle gracefully
-#        # Currently crashes with ValueError when it should return empty bytes or handle gracefully
-#        result = decs2string([-1])
-#        assert result == b""  # Should handle invalid values gracefully
-#        # BUG STATUS: REAL EXPLOITABLE BUG - No input validation for negative values
-#        # REMEDIATION: Add validation for non-negative values before bytes() call
-#
-#    def test_decs2string_should_handle_empty_list(self) -> None:
-#        """Testing decs2string with empty list."""
-#        result = decs2string([])
-#        assert result == b""  # This works correctly
-#
 
 class TestUchrBugHunt:
     """Testing uchr for potential Unicode-related bugs."""
@@ -299,16 +270,6 @@ class TestTypeConversionBugHunt:
         result = toFloat(3 + 4j)
         assert result == 0.0  # Exception caught, returns 0.0
         # This behavior might be unexpected but is documented by the broad except
-
-# ML: eval is use here on purpose to allow for complex user defined actions. The risk is known.
-#    def test_toBool_should_handle_eval_injection(self) -> None:
-#        """Testing toBool for potential code injection via eval."""
-#        # BUG DISCOVERED: toBool uses eval() which is dangerous
-#        # This could be a security vulnerability
-#        result = toBool("__import__('os').system('echo test')")
-#        # The eval() call could execute arbitrary code
-#        # BUG STATUS: PROTECTED IN PRACTICE - Only used with trusted QSettings data, not user input
-#        # REMEDIATION: Not needed - all usage sites pass trusted application settings
 
     def test_toBool_should_handle_malicious_strings(self) -> None:
         """Testing toBool with potentially malicious strings."""
@@ -570,17 +531,6 @@ class TestTemperatureConversionBugHunt:
         """Testing convertTemp with same source and target units."""
         result = convertTemp(100, 'C', 'C')
         assert result == 100  # Should return original value
-
-# ML: turned tgraphcanvas:mode and argument types into Literal['C', 'F'] and let the type checker do its work
-#    def test_convertRoRstrict_should_handle_unknown_units(self) -> None:
-#        """Testing convertRoRstrict with unknown units."""
-#        # BUG DISCOVERED: Function doesn't validate unit strings
-#        # If source_unit is not 'C', it assumes 'F' and calls RoRfromFtoCstrict
-#        result = convertRoRstrict(100, "X", "C")  # Unknown unit 'X'
-#        # This will be treated as Fahrenheit conversion
-#        # BUG: Should validate known unit strings
-#        # REMEDIATION: Add validation for known units ('C', 'F')
-
 
 class TestEncodingDecodingBugHunt:
     """Testing encoding/decoding functions for potential bugs."""

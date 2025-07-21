@@ -233,16 +233,9 @@ def convertRoRstrict(r:float, source_unit:Literal['C', 'F'], target_unit:Literal
 def convertTemp(t:float, source_unit:str, target_unit:str) -> float:
     if source_unit in ('', target_unit) or target_unit == '':
         return t
-    res : Optional[float]
     if source_unit == 'C':
-        res = fromCtoF(t)
-        if res is None:
-            return t
-        return res
-    res = fromFtoC(t)
-    if res is None:
-        return t
-    return res
+        return fromCtoFstrict(t)
+    return fromFtoCstrict(t)
 
 def path2url(path:str) -> str:
     import urllib.parse as urlparse  # @Reimport
@@ -655,6 +648,7 @@ def float2floatNone(f:Optional[float], n:int=1) -> Optional[float]:
     return float2float(f,n)
 
 # the int n>=0 specifies the number of digits
+# returns 0 if f is not a number
 def float2float(f:float, n:int=1) -> float:
     n = max(n, 0)
     f = float(f)

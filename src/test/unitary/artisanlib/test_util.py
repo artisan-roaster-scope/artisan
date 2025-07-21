@@ -186,6 +186,7 @@ def test_fromFtoC(temp: Optional[float]) -> None:
         (2600, 2, 2, 0, False, '2600lb'),  # no smart unit upgrade (disabled)
         (2601, 2, 2, 0, True, '2601lb'),  # no smart unit upgrade (as not more readable)
         (2610, 2, 2, 0, True, '2610lb'),  # no smart unit upgrade (as not more readable)
+        (20001, 2, 2, 0, True, '10.001t'),
     ],
 )
 def test_render_weight(
@@ -536,6 +537,31 @@ def test_is_proper_temp() -> None:
 
 
 # Time Functions Tests
+
+# stringfromseconds
+
+@pytest.mark.parametrize('seconds_raw, leadingzero, expected', [
+    (0, True, '00:00'),
+    (0, False, '0:00'),
+    (59.4, True, '00:59'),
+    (59.5, True, '01:00'),
+    (61, True, '01:01'),
+    (61, False, '1:01'),
+    (3600, True, '60:00'),
+    (3600, False, '60:00'),
+    (-1, True, '-00:01'),
+    (-1, False, '-0:01'),
+    (-61, True, '-01:01'),
+    (-61, False, '-1:01'),
+    (-3600, True, '-60:00'),
+    (-3600, False, '-60:00'),
+    (125.7, True, '02:06'),
+    (125.7, False, '2:06'),
+    (-125.7, True, '-02:06'),
+    (-125.7, False, '-2:06'),
+])
+def test_stringfromseconds(seconds_raw, leadingzero, expected):
+    assert stringfromseconds(seconds_raw, leadingzero) == expected
 
 
 def test_stringfromseconds() -> None:
@@ -1779,3 +1805,9 @@ def test_float2float_should_round_precisely(value: float, decimals: int, expecte
     """Test float2float rounding behavior with parametrized values."""
     result = float2float(value, decimals)
     assert result == expected
+
+def test_float2float_nan() -> None:
+    result = float2float(float('nan'), 1)
+    assert result == 0
+    result = float2float(float('nan'), 0)
+    assert result == 0
