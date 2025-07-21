@@ -218,6 +218,7 @@ def content() -> str:
     tbl_Commands.add_row(['&#160;','playbackdropmode(<int>)',QApplication.translate('HelpDlg','sets playback DROP mode to 0: off, 1: time, 2: BT, 3: ET')])
     tbl_Commands.add_row(['&#160;','playback(n,<bool>)',QApplication.translate('HelpDlg','toggles playback per event type n from {1,2,3,4}')])
     tbl_Commands.add_row(['&#160;','ramp(n,<bool>)',QApplication.translate('HelpDlg','toggles playback ramping per event type n from {1,2,3,4}')])
+    tbl_Commands.add_row(['&#160;','slider(n,<bool>)',QApplication.translate('HelpDlg','show/hide slider per event type n from {1,2,3,4}')])
     tbl_Commands.add_row(['&#160;','quantifier(n,<bool>)',QApplication.translate('HelpDlg','activate/deactivate quantification per event type n from {1,2,3,4}')])
     tbl_Commands.add_row(['&#160;','setBatchSize(<float>)',QApplication.translate('HelpDlg','set the batch size to the given value. If the value is negative, the batch size is taken from the background profile, if any is loaded')])
     tbl_Commands.add_row(['&#160;','openProperties',QApplication.translate('HelpDlg','opens the Roast Properties dialog')])

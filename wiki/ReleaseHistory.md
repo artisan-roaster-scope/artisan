@@ -14,7 +14,9 @@ v3.2.1
   - adds support for [Cogen roasting machines](https://artisan-scope.org/machines/cogen/) with Siemens PLC (v2)
   - adds support for [Easyster Smart](https://artisan-scope.org/machines/easyster/), legacy [Proaster](https://artisan-scope.org/machines/proaster/) THCR-01A as well as Easyster/Proaster machines with air pressure sensor
   - adds support for [Toper roasting machines](https://artisan-scope.org/machines/toper/) with PLC and touch screen produced after 2025 supporting burner, airflow, and drum speed control
+  - extended setups for [Sweet Coffee Italia Gemma_2IND and Gemma_6-8IND machines](https://artisan-scope.org/machines/sci/)
   - adds drag-drop import of a Cropster XLS profile
+  - adds Artisan Command `slider(<int>, <bool>)` to hide/show sliders
 
 * CHANGES
   - updated Spanish localizations (thanks to Juan Carlos Bonilla)

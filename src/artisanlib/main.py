@@ -10185,6 +10185,25 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                                     self.eventquantifieractive[event_type - 1] = False
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
+                            # slider(<int>, <bool>) with <int> from {1,2,3,4} selecting one of the four event types
+                            elif cs.startswith('slider(') and cs.endswith(')'):
+                                try:
+                                    args = cs[len('slider('):-1].split(',')
+                                    if len(args) == 2:
+                                        event_type = int(args[0])
+                                        if 0 < event_type < 5:
+                                            try:
+                                                state = toBool(eval(args[1])) # pylint: disable=eval-used
+                                                self.eventslidervisibilities[event_type - 1] = int(state)
+                                            except Exception: # pylint: disable=broad-except
+                                                value_str = args[1].strip()
+                                                if value_str.lower() in {'yes', 'true', 't', '1'}:
+                                                    self.eventslidervisibilities[event_type - 1] = True
+                                                else:
+                                                    self.eventslidervisibilities[event_type - 1] = False
+                                            QTimer.singleShot(100, self.updateSlidersProperties) # needs to run in the GUI thread!
+                                except Exception as e: # pylint: disable=broad-except
+                                    _log.exception(e)
                             # setBatchSize(<float>) : if <float> is negative, the batchsize of the background profile is used if any
                             elif cs.startswith('setBatchSize') and cs.endswith(')'): # in seconds
                                 try:
@@ -26369,7 +26388,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.realignbuttons()
                 self.updateSlidersProperties()
                 self.lastbuttonpressed = -1
-                self.sendmessage(QApplication.translate('Message','Palette #%i restored')%pindex) # pylint: disable=consider-using-f-string
+                message = QApplication.translate('Message','Palette #%i restored')%pindex
+                if self.buttonpalette_label != '':
+                    message += f' ({self.buttonpalette_label})'
+                self.sendmessage(message) # pylint: disable=consider-using-f-string
                 return 1  #success
             self.sendmessage(QApplication.translate('Message','Palette #%i empty')%pindex) # pylint: disable=consider-using-f-string
         return 0  #failed
