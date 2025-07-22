@@ -446,10 +446,21 @@ class Artisan(QtSingleApplication):
                 elif file_suffix == 'apal' and aw.app is not None and not aw.app.artisanviewerMode:
                     # load Artisan palettes on double-click on *.apal file
                     aw.loadPalettesSignal.emit(filename)
+                elif file_suffix == 'json' and aw.app is not None and not aw.app.artisanviewerMode and aw.comparator is None:
+                    # import Artisan JSON profile
+                    aw.importJSON(filename)
                 elif file_suffix == 'xls' and aw.app is not None and not aw.app.artisanviewerMode and aw.comparator is None:
                     # import Cropster XLS profile
                     from artisanlib.cropster import extractProfileCropsterXLS
                     aw.importExternal(extractProfileCropsterXLS, QApplication.translate('Message','Import Cropster XLS'),'*.xls',filename)
+                elif file_suffix == 'csv' and aw.app is not None and not aw.app.artisanviewerMode and aw.comparator is None:
+                    # import Giesen CSV profile
+                    from artisanlib.giesen import extractProfileGiesenCSV
+                    aw.importExternal(extractProfileGiesenCSV, QApplication.translate('Message','Import Giesen CSV'),'*.csv',filename)
+                elif file_suffix == 'xlsx' and aw.app is not None and not aw.app.artisanviewerMode and aw.comparator is None:
+                    # import Stronghold XLSX profile
+                    from artisanlib.stronghold import extractProfileStrongholdXLSX
+                    aw.importExternal(extractProfileStrongholdXLSX, QApplication.translate('Message','Import Stronghold XLSX'),'*.xlsx',filename)
 
 
         elif platform.system() == 'Windows' and not self.artisanviewerMode:
@@ -2163,6 +2174,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 importLoringAction.triggered.connect(self.importLoring)
                 self.importMenu.addAction(importLoringAction)
 
+                importPetronciniAction = QAction('Petroncini CSV...', self)
+                importPetronciniAction.triggered.connect(self.importPetroncini)
+                self.importMenu.addAction(importPetronciniAction)
+
                 importROESTAction = QAction('ROEST CSV...', self)
                 importROESTAction.triggered.connect(self.importRoest)
                 self.importMenu.addAction(importROESTAction)
@@ -2170,10 +2185,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 importRubasseAction = QAction('Rubasse CSV...', self)
                 importRubasseAction.triggered.connect(self.importRubasse)
                 self.importMenu.addAction(importRubasseAction)
-
-                importPetronciniAction = QAction('Petroncini CSV...', self)
-                importPetronciniAction.triggered.connect(self.importPetroncini)
-                self.importMenu.addAction(importPetronciniAction)
 
                 importPilotAction = QAction('Probat Pilot...', self)
                 importPilotAction.triggered.connect(self.importPilot)
@@ -2195,6 +2206,39 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 importStrongholdAction.triggered.connect(self.importStronghold)
                 self.importMenu.addAction(importStrongholdAction)
 
+            self.convFromMenu: Optional[QMenu] = self.fileMenu.addMenu(QApplication.translate('Menu', 'Convert From'))
+            if self.convFromMenu is not None:
+                fileConvertFromCropsterAction = QAction(QApplication.translate('Menu', 'Cropster XLS...'), self)
+                fileConvertFromCropsterAction.triggered.connect(self.convertFromCropster)
+                self.convFromMenu.addAction(fileConvertFromCropsterAction)
+
+                fileConvertFromGiesenAction = QAction(QApplication.translate('Menu', 'Giesen CSV...'), self)
+                fileConvertFromGiesenAction.triggered.connect(self.convertFromGiesen)
+                self.convFromMenu.addAction(fileConvertFromGiesenAction)
+
+                fileConvertFromIKAWAAction = QAction(QApplication.translate('Menu', 'IKAWA CSV...'), self)
+                fileConvertFromIKAWAAction.triggered.connect(self.convertFromIKAWA)
+                self.convFromMenu.addAction(fileConvertFromIKAWAAction)
+
+                fileConvertFromLoringAction = QAction(QApplication.translate('Menu', 'Loring CSV...'), self)
+                fileConvertFromLoringAction.triggered.connect(self.convertFromLoring)
+                self.convFromMenu.addAction(fileConvertFromLoringAction)
+
+                fileConvertFromPetronciniAction = QAction(QApplication.translate('Menu', 'Petroncini CSV...'), self)
+                fileConvertFromPetronciniAction.triggered.connect(self.convertFromPetroncini)
+                self.convFromMenu.addAction(fileConvertFromPetronciniAction)
+
+                fileConvertFromROESTAction = QAction(QApplication.translate('Menu', 'ROEST CSV...'), self)
+                fileConvertFromROESTAction.triggered.connect(self.convertFromROEST)
+                self.convFromMenu.addAction(fileConvertFromROESTAction)
+
+                fileConvertFromRubaseAction = QAction(QApplication.translate('Menu', 'Rubase CSV...'), self)
+                fileConvertFromRubaseAction.triggered.connect(self.convertFromRubase)
+                self.convFromMenu.addAction(fileConvertFromRubaseAction)
+
+                fileConvertFromStrongholdAction = QAction(QApplication.translate('Menu', 'Stronghold XLSX...'), self)
+                fileConvertFromStrongholdAction.triggered.connect(self.convertFromStronghold)
+                self.convFromMenu.addAction(fileConvertFromStrongholdAction)
 
             self.fileMenu.addSeparator()
 
@@ -17069,12 +17113,62 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     def fileExportPilot(self, _:bool = False) -> None:
         self.fileExport(QApplication.translate('Message', 'Export Probat Pilot'),'*.xml',self.exportPilot)
 
-    def fileConvert(self, ext:str, dumper:Callable[[str],bool]) -> None:
-        files = self.ArtisanOpenFilesDialog(ext='*.alog')
+#--
+
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def convertFromCropster(self, _:bool = False) -> None:
+        from artisanlib.cropster import extractProfileCropsterXLS
+        self.fileConvertFrom('*.xls', extractProfileCropsterXLS)
+
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def convertFromGiesen(self, _:bool = False) -> None:
+        from artisanlib.giesen import extractProfileGiesenCSV
+        self.fileConvertFrom('*.csv', extractProfileGiesenCSV)
+
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def convertFromIKAWA(self, _:bool = False) -> None:
+        from artisanlib.ikawa import extractProfileIkawaCSV
+        self.fileConvertFrom('*.csv', extractProfileIkawaCSV)
+
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def convertFromLoring(self, _:bool = False) -> None:
+        from artisanlib.loring import extractProfileLoringCSV
+        self.fileConvertFrom('*.csv', extractProfileLoringCSV)
+
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def convertFromPetroncini(self, _:bool = False) -> None:
+        from artisanlib.petroncini import extractProfilePetronciniCSV
+        self.fileConvertFrom('*.csv', extractProfilePetronciniCSV)
+
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def convertFromROEST(self, _:bool = False) -> None:
+        from artisanlib.roest import extractProfileRoestCSV
+        self.fileConvertFrom('*.csv', extractProfileRoestCSV)
+
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def convertFromRubase(self, _:bool = False) -> None:
+        from artisanlib.rubasse import extractProfileRubasseCSV
+        self.fileConvertFrom('*.csv', extractProfileRubasseCSV)
+
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def convertFromStronghold(self, _:bool = False) -> None:
+        from artisanlib.stronghold import extractProfileStrongholdXLSX
+        self.fileConvertFrom('*.xlsx', extractProfileStrongholdXLSX)
+
+
+    def fileConvertFrom(self, ext:str, extractor: Callable[[str, 'ApplicationWindow'], Optional['ProfileData']]) -> None:
+        files = self.ArtisanOpenFilesDialog(ext=ext)
         if files and len(files) > 0:
             loaded_profile = self.curFile
-            cont = self.qmc.reset(soundOn=False)
-            if cont:
+            if self.qmc.reset(soundOn=False):
                 self.saveExtradeviceSettings()
                 outdir = self.ArtisanExistingDirectoryDialog()
                 progress:QProgressDialog = QProgressDialog(QApplication.translate('Message', 'Converting...'), '', 0, len(files), self)
@@ -17089,7 +17183,49 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         progress.setValue(i)
                         QApplication.processEvents()
                         fname = str(QFileInfo(f).fileName())
-                        fconv = str(QDir(outdir).filePath(fname + str(ext)))
+                        fconv = str(QDir(outdir).filePath(f'{fname}.alog'))
+                        if not os.path.exists(fconv):
+                            self.qmc.reset(redraw=False,soundOn=False)
+                            pd = extractor(f, self)
+                            if pd is not None:
+                                self.serialize(fconv, cast(Dict[str,Any], pd))
+                            else:
+                                self.sendmessage(QApplication.translate('Message','Target file {0} exists. {1} not converted.').format(fconv,fname + str(ext)))
+                        else:
+                            self.sendmessage(QApplication.translate('Message','Target file {0} exists. {1} not converted.').format(fconv,fname + str(ext)))
+                    except Exception as e: # pylint: disable=broad-except
+                        _log.exception(e)
+                    i += 1
+                    self.qmc.fileCleanSignal.emit()
+                    self.qmc.reset(soundOn=False)
+                    self.restoreExtradeviceSettings()
+                if loaded_profile:
+                    self.loadFile(loaded_profile,quiet=True)
+                self.qmc.roastpropertiesflag = flag_temp
+                progress.cancel()
+                del progress
+
+
+    def fileConvert(self, ext:str, dumper:Callable[[str],bool]) -> None:
+        files = self.ArtisanOpenFilesDialog(ext='*.alog')
+        if files and len(files) > 0:
+            loaded_profile = self.curFile
+            if self.qmc.reset(soundOn=False):
+                self.saveExtradeviceSettings()
+                outdir = self.ArtisanExistingDirectoryDialog()
+                progress:QProgressDialog = QProgressDialog(QApplication.translate('Message', 'Converting...'), '', 0, len(files), self)
+                progress.setCancelButton(None)
+                progress.setWindowModality(Qt.WindowModality.WindowModal)
+                progress.setAutoClose(True)
+                progress.show()
+                i = 1
+                flag_temp = self.qmc.roastpropertiesflag
+                for f in files:
+                    try:
+                        progress.setValue(i)
+                        QApplication.processEvents()
+                        fname = str(QFileInfo(f).fileName())
+                        fconv = str(QDir(outdir).filePath(f'{fname}{ext}'))
                         if not os.path.exists(fconv):
                             self.qmc.reset(redraw=False,soundOn=False)
                             pd = cast('ProfileData', self.deserialize(f))
@@ -17149,8 +17285,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         files = self.ArtisanOpenFilesDialog(ext='*.alog')
         if files and len(files) > 0:
             loaded_profile = self.curFile
-            cont = self.qmc.reset(soundOn=False)
-            if cont:
+            if self.qmc.reset(soundOn=False):
                 self.saveExtradeviceSettings()
                 fileext = '.png'
                 if filetype == 'JPEG':
