@@ -1,5 +1,6 @@
 **/*.pyc
 .svn/
+src/.eggs/
 src/build/
 src/dist*/
 src/artisan.py.bak

@@ -1288,6 +1288,20 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         colorTrackVBox.setSpacing(5)
         colorTrackVBox.setContentsMargins(0,0,0,0)
 
+        # create lebrew color see C1
+        LebrewRoastSeeNetworkGrid = QGridLayout()
+        LebrewRoastSeeNetworkGrid.setSpacing(20)
+        LebrewRoastSeeNetworkGroupBox = QGroupBox('Lebrew Roast See C1')
+        LebrewRoastSeeNetworkGroupBox.setLayout(LebrewRoastSeeNetworkGrid)
+        LebrewRoastSeeHBox = QHBoxLayout()
+        LebrewRoastSeeHBox.addWidget(LebrewRoastSeeNetworkGroupBox)
+        LebrewRoastSeeHBox.addStretch()
+        LebrewRoastSeeVBox = QVBoxLayout()
+        LebrewRoastSeeVBox.addLayout(LebrewRoastSeeHBox)
+        LebrewRoastSeeVBox.addStretch()
+        LebrewRoastSeeVBox.setSpacing(5)
+        LebrewRoastSeeVBox.setContentsMargins(0,0,0,0)
+ 
         # create pid box
         PIDgrid = QGridLayout()
         PIDgrid.addWidget(label1,0,1)
@@ -1442,6 +1456,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         tab7V2Layout = QVBoxLayout()
         tab7V2Layout.addLayout(mugmaVBox)
         tab7V2Layout.addLayout(colorTrackVBox)
+        tab7V2Layout.addLayout(LebrewRoastSeeVBox)
         tab7V2Layout.addStretch()
         tab7Layout = QHBoxLayout()
         tab7Layout.addLayout(tab7VLayout)
@@ -4201,6 +4216,12 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ##########################
                 elif meter == 'Aillio Bullet R2':
                     self.aw.qmc.device = 176
+                    message = QApplication.translate('Message','Device set to {0}').format(meter)
+                ##########################
+                ####  DEVICE 177 is Lebrew Roast See C1
+                ##########################
+                elif meter == 'Lebrew Roast See C1':
+                    self.aw.qmc.device = 177
                     message = QApplication.translate('Message','Device set to {0}').format(meter)
 
                 # ADD DEVICE:

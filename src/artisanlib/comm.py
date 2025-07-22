@@ -30,6 +30,7 @@ from typing import Final, Optional, List, Tuple, Dict, Callable, Union, Any, TYP
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
     from artisanlib.colortrack import ColorTrack, ColorTrackBLE # pylint: disable=unused-import
+    from artisanlib.lebrewroastsee import LebrewRoastSeeC1 # pylint: disable=unused-import
     import serial # noqa: F401 # pylint: disable=unused-import
     from Phidget22.Phidget import Phidget # type: ignore # pylint: disable=unused-import
     from yoctopuce.yocto_voltageoutput import YVoltageOutput # type: ignore # pylint: disable=unused-import
@@ -253,7 +254,7 @@ class serialport:
         'YOCTOthread','YOCTOvoltageOutputs','YOCTOcurrentOutputs','YOCTOrelays','YOCTOservos','YOCTOpwmOutputs','HH506RAid','MS6514PrevTemp1','MS6514PrevTemp2','DT301PrevTemp','EXTECH755PrevTemp',\
         'controlETpid','readBTpid','useModbusPort','showFujiLCDs','arduinoETChannel','arduinoBTChannel','arduinoATChannel',\
         'ArduinoIsInitialized','ArduinoFILT','HH806Winitflag','R1','devicefunctionlist','externalprogram',\
-        'externaloutprogram','externaloutprogramFlag','PhidgetHUMtemp','PhidgetHUMhum','PhidgetPREpre','TMP1000temp', 'colorTrackSerial', 'colorTrackBT']
+        'externaloutprogram','externaloutprogramFlag','PhidgetHUMtemp','PhidgetHUMhum','PhidgetPREpre','TMP1000temp', 'colorTrackSerial', 'colorTrackBT', 'LebrewRoastSeeC1']
 
     def __init__(self, aw:'ApplicationWindow') -> None:
 
@@ -338,6 +339,7 @@ class serialport:
 
         self.colorTrackSerial:Optional[ColorTrack] = None
         self.colorTrackBT:Optional[ColorTrackBLE] = None
+        self.LebrewRoastSeeC1:Optional[LebrewRoastSeeC1] = None
 
         #stores the _id of the meter HH506RA as a string
         self.HH506RAid:str = 'X'
@@ -550,7 +552,8 @@ class serialport:
                                    self.Santoker_RR,          #173
                                    self.ColorTrackBT,         #174
                                    self.BlueDOT_BTET,         #175
-                                   self.R2_BTIBTS             #176
+                                   self.R2_BTIBTS,            #176
+                                   self.RoastSeeC1BT          #177
                                    ]
         #string with the name of the program for device #27
         self.externalprogram:str = 'test.py'
@@ -1522,6 +1525,23 @@ class serialport:
             return tx, -1, -1
         color_mean, color_median = self.colorTrackBT.getColor()
         return tx, color_median, color_mean # ch1: mean, ch2: median
+
+    def RoastSeeC1BT(self) -> Tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        if self.RoastSeeC1BT is None:
+            try:
+                from artisanlib.lebrewroastsee import LebrewRoastSeeC1
+                self.RoastSeeC1BT = LebrewRoastSeeC1(
+                    self.aw.LebrewColorSeeC1_color_read,
+                    connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('LebrewColorSeeC1'),True,None),
+                    disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('LebrewColorSeeC1'),True,None))
+                if self.RoastSeeC1BT is not None:
+                    self.RoastSeeC1BT.start()
+            except Exception as e: # pylint: disable=broad-except
+                _log.error(e)
+            return tx, -1, -1
+        color_read= self.RoastSeeC1BT.getColor()
+        return tx, color_read, -1 
 
     def ARDUINOTC4(self) -> Tuple[float,float,float]:
         self.aw.qmc.extraArduinoTX = self.aw.qmc.timeclock.elapsedMilli()

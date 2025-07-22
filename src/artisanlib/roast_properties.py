@@ -25,6 +25,7 @@ if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
     from artisanlib.atypes import RecentRoast, BTU
     from artisanlib.acaia import Acaia # noqa: F401 # pylint: disable=unused-import
+    from artisanlib.lebrewroastsee import LebrewColorChecker # pylint: disable=unused-import
     from plus.stock import Blend # noqa: F401  # pylint: disable=unused-import
     from PyQt6.QtWidgets import QLayout, QAbstractItemView, QCompleter # pylint: disable=unused-import
     from PyQt6.QtGui import QClipboard, QCloseEvent, QKeyEvent, QMouseEvent # pylint: disable=unused-import
@@ -553,7 +554,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     scaleWeightUpdated = pyqtSignal(float)
     connectScaleSignal = pyqtSignal()
     readScaleSignal = pyqtSignal()
-
+  
     def __init__(self, parent:QWidget, aw:'ApplicationWindow', activeTab:int = 0) -> None:
         super().__init__(parent, aw)
 
@@ -610,6 +611,10 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.scale_weight:Optional[float] = None # weight received from a connected scale
         self.scale_battery:Optional[int] = None # battery level of the connected scale in %
         self.scale_set:Optional[float] = None # set weight for accumulation in g
+
+        self.colorRead:'Optional[LebrewColorChecker]' = None # BLE interface to the color tracker, if available
+        self.colorRead_value:Optional[float] = None # color reading value from the connected color tracker
+        self.colorRead_signal_connected:bool = False # set to True if the color tracker is disconnected
 
         self.disconnecting = False # this is set to True to terminate the scale connection
         self.volumedialog:Optional[volumeCalculatorDlg] = None # link forward to the the Volume Calculator
@@ -1080,6 +1085,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.colorSystemComboBox.setCurrentIndex(self.aw.qmc.color_system_idx)
         else: # in older versions this could have been a string
             self.aw.qmc.color_system_idx = 0 # type: ignore[unreachable]
+        ground_color_trackinglabel = QLabel('<b>RoastSee C1 used</b>')
         #Greens Temp
         greens_temp_label = QLabel('<b>' + QApplication.translate('Label', 'Beans') + '</b>')
         greens_temp_unit_label = QLabel(self.aw.qmc.mode)
@@ -1473,15 +1479,16 @@ class editGraphDlg(ArtisanResizeablDialog):
 
         propGrid.setColumnStretch(5,10)
 
+        # scale
         if self.aw.scale.device is not None and self.aw.scale.device not in {'', 'None'}:
             propGrid.addWidget(self.tareComboBox,1,6,1,2) # rowSpan=1, columnSpan=3
             propGrid.addLayout(inButtonLayout,1,8)
             propGrid.addLayout(outButtonLayout,1,9)
             propGrid.addLayout(defectsButtonLayout,2,9)
 
-
             if self.aw.scale.device == 'acaia' and not (platform.system() == 'Windows' and math.floor(toFloat(platform.release())) < 10):
-                # BLE is not well supported under Windows versions before Windows 10
+                # BLE is not well supported under Windows versC1
+                # ions before Windows 10
                 try:
                     from artisanlib.acaia import Acaia
                     self.acaia = Acaia(
@@ -1502,6 +1509,21 @@ class editGraphDlg(ArtisanResizeablDialog):
             elif self.aw.scale.device in {'KERN NDE','Shore 930'}:
                 self.connectScaleSignal.connect(self.connectScaleLoop)
                 QTimer.singleShot(2,lambda : self.connectScaleSignal.emit()) # pylint: disable= unnecessary-lambda
+        #try to connect Lebrew RoastSee C1 in addition to Acaia which is catching the BLE connection
+        try:
+            from artisanlib.lebrewroastsee import LebrewColorChecker
+            self.roastsee = LebrewColorChecker(
+                ident = 'F084AA8F-3836-B9AA-2896-BD451B7579AF',
+                connected_handler = lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('Lebrew RoastSee C1'),True,None),
+                disconnected_handler = lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('Lebrew RoastSee C1'),True,None),
+                decimals = 1)
+            self.roastsee.lebrewble.color_changed_signal.connect(self.colorRead_changed)
+            self.roastsee.lebrewble.disconnected_signal.connect(self.colorRead_disconnected)
+            self.roastsee.connect_colorchecker()
+        except Exception as e:
+             _log.exception(e)
+
+        # self.roastsee.disconnected_signal.connect(self.ble_C1_disconnected)
 
         propGrid.setRowMinimumHeight(3,volumeCalcButton.minimumSizeHint().height())
         propGrid.addWidget(volumelabel,3,0,Qt.AlignmentFlag.AlignVCenter)
@@ -1547,8 +1569,10 @@ class editGraphDlg(ArtisanResizeablDialog):
         propGrid.addWidget(self.whole_color_edit,8,1,Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
         propGrid.addWidget(self.ground_color_edit,8,2,Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
         propGrid.addWidget(self.colorSystemComboBox,8,3,1,2) # rowSpan=1, columnSpan=2
+        if self.roastsee is not None:
+            propGrid.addWidget(ground_color_trackinglabel,9,1)
 
-        if self.aw.color.device is not None and self.aw.color.device != '' and self.aw.color.device not in ['None','Tiny Tonino', 'Classic Tonino']:
+        if (self.aw.color.device is not None and self.aw.color.device != '' and self.aw.color.device not in ['None','Tiny Tonino', 'Classic Tonino']):
             propGrid.addWidget(scanWholeButton,8,6)
         if self.aw.color.device not in (None, '', 'None'):
             propGrid.addWidget(scanGroundButton,8,7)
@@ -1928,6 +1952,26 @@ class editGraphDlg(ArtisanResizeablDialog):
                 v_formatted = f'{v:.2f}'
                 unit = self.aw.qmc.weight[2]
         return v_formatted, unit
+
+    def ble_ReadColorC1(self) -> None:
+        if self.roastsee.lebrewble.is_new_color():
+            self.whole_color_edit.setText(str(self.getColor()))
+            
+    def ble_c1_disconnected(self) -> None:
+        self.roastsee.lebrewble.set_color(0)
+
+    @pyqtSlot()
+    def colorRead_disconnected(self) -> None:
+        self.colorRead_value = None
+        self.roastsee.lebrewble.set_color(0)
+
+    @pyqtSlot(float)
+    def colorRead_changed(self, w:float) -> None:
+        if w is not None:
+            self.colorRead_value = w
+            self.whole_color_edit.setText(str(w))
+            self.colorSystemComboBox.setCurrentIndex(5) # set Agtron
+
 
     @pyqtSlot()
     def ble_disconnected(self) -> None:
@@ -2752,6 +2796,11 @@ class editGraphDlg(ArtisanResizeablDialog):
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
             self.acaia = None
+        if self.roastsee.lebrewble.connected():
+            try:
+                self.roastsee.lebrewble.disconnect()
+            except Exception as e:
+                _log.exception(e)
         settings = QSettings()
         #save window geometry
         settings.setValue('RoastGeometry',self.saveGeometry())
@@ -4292,16 +4341,21 @@ class editGraphDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(bool)
     def scanWholeColor(self, _:bool = False) -> None:
-        v = self.aw.color.readColor()
-        if v is not None and v > -1 and 0 <= v <= 250:
+        if self.roastsee.colorchecker_connected :
+            v = self.roastsee.lebrewble.getColor()
+        else:
+            v = self.aw.color.readColor()
+        if isinstance(v, int) and v > -1 and 0 <= v <= 250:
             self.aw.qmc.whole_color = v
             self.whole_color_edit.setText(str(v))
 
     @pyqtSlot(bool)
     def scanGroundColor(self, _:bool = False) -> None:
-        v = self.aw.color.readColor()
-        if v is not None and v > -1:
-            v = max(0,min(250,v))
+        if self.roastsee.colorchecker_connected :
+            v = self.roastsee.lebrewble.getColor()
+        else:
+            v = self.aw.color.readColor()
+        if isinstance(v, int) and v > -1 and 0 <= v <= 250:
             self.aw.qmc.ground_color = v
             self.ground_color_edit.setText(str(v))
 

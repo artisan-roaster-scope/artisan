@@ -914,7 +914,8 @@ class tgraphcanvas(FigureCanvas):
                        '+Santoker DelatBT/DeltaET', #173
                        'ColorTrack BT',             #174
                        'Thermoworks BlueDOT',       #175
-                       'Aillio Bullet R2'           #176
+                       'Aillio Bullet R2',          #176
+                       'Lebrew RoastSee C1'         #177
                        ]
 
         # ADD DEVICE:
@@ -983,7 +984,8 @@ class tgraphcanvas(FigureCanvas):
             171, # Santoker R BT/ET
             174, # ColorTrack BT
             175, # Thermoworks BlueDOT
-            176  # Aillio Bullet R2
+            176, # Aillio Bullet R2
+            177  # Lebrew RoastSee C1
         ]
 
         # ADD DEVICE:
@@ -1057,7 +1059,8 @@ class tgraphcanvas(FigureCanvas):
             166, # +Mugma Heater/Catalyzer
             170, # ColorTrack Serial
             173, # +Santoker BT RoR / ET RoR
-            174  # ColorTrack BT
+            174, # ColorTrack BT
+            177  # Lebrew RoastSee C1
         ]
 
         # ADD DEVICE:
@@ -13705,6 +13708,11 @@ class tgraphcanvas(FigureCanvas):
         try:
             self.samplingSemaphore.acquire(1)
 
+            if ser.LebrewRoastSeeC1 is not None:
+                ser.LebrewRoastSeeC1.stop() # ty: ignore[possibly-unbound-attribute]
+                libtime.sleep(0.05)
+                ser.LebrewRoastSeeC1 = None
+
             if ser.colorTrackBT is not None:
                 ser.colorTrackBT.stop() # ty: ignore[possibly-unbound-attribute]
                 libtime.sleep(0.05)
@@ -13714,7 +13722,7 @@ class tgraphcanvas(FigureCanvas):
                 ser.colorTrackSerial.stop() # ty: ignore[possibly-unbound-attribute]
                 libtime.sleep(0.05)
                 ser.colorTrackSerial = None
-
+                
             # close main serial port
             try:
                 ser.closeport()
