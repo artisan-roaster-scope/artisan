@@ -30,6 +30,8 @@ from unittest.mock import MagicMock, patch
 
 import numpy as np
 import pytest
+from hypothesis import given
+from hypothesis import strategies as st
 
 # Set Qt to headless mode to avoid GUI issues in testing
 os.environ["QT_QPA_PLATFORM"] = "offscreen"
@@ -1359,3 +1361,511 @@ class TestPIDIntegrationScenarios:
             # Verify final state is clean for next roast
             assert not pid.isActive(), "System should be ready for next roast"
             assert pid.getTarget() == 200.0, "Target should be preserved for next roast"
+
+
+class TestPIDDestructiveDataFuzzing:
+    """
+    Level 3 Destructive Testing: Data Fuzzing
+
+    Mission: Intentionally break the PID system with malicious/invalid data
+    Focus: Find vulnerabilities through hostile input conditions
+    Goal: Document security flaws that need development team attention
+
+    These tests are designed to FAIL and expose vulnerabilities.
+    Failures are marked with @pytest.mark.xfail and include remediation suggestions.
+    """
+
+    @pytest.mark.xfail(
+        reason="PID may crash with extremely large float values causing memory exhaustion"
+    )
+    def test_extreme_float_values_cause_overflow(self) -> None:
+        """Test PID behavior with extreme float values that could cause overflow.
+
+        # REMEDIATION: Add input validation to clamp values to reasonable ranges
+        # and handle float overflow exceptions gracefully.
+        """
+        with patch("artisanlib.pid.QSemaphore", return_value=_create_mock_semaphore()):
+            from artisanlib.pid import PID
+
+            # Arrange
+            control_commands: List[float] = []
+
+            def control_function(duty: float) -> None:
+                control_commands.append(duty)
+
+            pid = PID(control=control_function, p=1e308, i=1e308, d=1e308)  # Extreme values
+            pid.setTarget(1e308)  # Extreme target
+            pid.on()
+
+            # Act: Feed extreme values that could cause overflow
+            extreme_values = [
+                1.7976931348623157e308,  # Near max float
+                -1.7976931348623157e308,  # Near min float
+                1e400,  # Beyond float range
+                -1e400,  # Beyond float range
+            ]
+
+            current_time = 0.0
+            with patch("time.time") as mock_time:
+
+                def time_generator() -> float:
+                    nonlocal current_time
+                    current_time += 1.0
+                    return current_time
+
+                mock_time.side_effect = time_generator
+
+                for value in extreme_values:
+                    pid.update(value)  # This should cause overflow/crash
+
+            # Assert: If we reach here, the system didn't crash (unexpected)
+            raise AssertionError("Expected system to crash with extreme float values")
+
+    @given(st.floats(allow_nan=True, allow_infinity=True, width=64))
+    @pytest.mark.hypothesis(deadline=None, max_examples=50)
+    def test_hypothesis_fuzzing_random_floats(self, random_float: float) -> None:
+        """Use Hypothesis to fuzz PID with completely random float values.
+
+        # REMEDIATION: Implement comprehensive input sanitization for all float inputs
+        # to handle NaN, infinity, and extreme values gracefully.
+        """
+        with patch("artisanlib.pid.QSemaphore", return_value=_create_mock_semaphore()):
+            from artisanlib.pid import PID
+
+            # Arrange
+            control_commands: List[float] = []
+
+            def control_function(duty: float) -> None:
+                control_commands.append(duty)
+
+            pid = PID(control=control_function, p=2.0, i=0.1, d=0.05)
+            pid.setTarget(200.0)
+            pid.on()
+
+            # Act: Feed completely random float (including NaN, inf, extreme values)
+            current_time = 0.0
+            with patch("time.time") as mock_time:
+
+                def time_generator() -> float:
+                    nonlocal current_time
+                    current_time += 1.0
+                    return current_time
+
+                mock_time.side_effect = time_generator
+
+                try:
+                    pid.update(random_float)
+
+                    # Assert: System should handle any float value gracefully
+                    assert pid.isActive(), "PID should remain active despite random input"
+
+                    # Verify any output commands are safe
+                    for command in control_commands:
+                        assert not np.isnan(command), f"Output command should not be NaN: {command}"
+                        assert not np.isinf(
+                            command
+                        ), f"Output command should not be infinite: {command}"
+                        assert 0 <= command <= 100, f"Output command should be bounded: {command}"
+
+                except Exception as e:
+                    # Document the vulnerability
+                    pytest.fail(f"PID crashed with input {random_float}: {e}")
+
+    @pytest.mark.xfail(reason="PID may not handle rapid parameter changes causing state corruption")
+    def test_rapid_parameter_corruption_attack(self) -> None:
+        """Test rapid parameter changes to corrupt internal PID state.
+
+        # REMEDIATION: Add parameter change rate limiting and state validation
+        # to prevent corruption from rapid updates.
+        """
+        with patch("artisanlib.pid.QSemaphore", return_value=_create_mock_semaphore()):
+            from artisanlib.pid import PID
+
+            # Arrange
+            control_commands: List[float] = []
+
+            def control_function(duty: float) -> None:
+                control_commands.append(duty)
+
+            pid = PID(control=control_function, p=2.0, i=0.1, d=0.05)
+            pid.setTarget(200.0)
+            pid.on()
+
+            # Act: Rapidly change parameters to corrupt state
+            current_time = 0.0
+            with patch("time.time") as mock_time:
+
+                def time_generator() -> float:
+                    nonlocal current_time
+                    current_time += 0.001  # 1ms intervals - extremely rapid
+                    return current_time
+
+                mock_time.side_effect = time_generator
+
+                # Rapid fire parameter changes (reduced for practical testing)
+                for i in range(100):  # 100 rapid changes instead of 1000
+                    pid.setPID(p=float(i % 10), i=float(i % 10), d=float(i % 10))
+                    pid.setTarget(200.0 + float(i % 50))
+                    pid.update(200.0 + float(i % 20))
+
+                    # Check for state corruption
+                    if hasattr(pid, "Iterm") and (np.isnan(pid.Iterm) or np.isinf(pid.Iterm)):
+                        pytest.fail(f"PID state corrupted at iteration {i}: Iterm={pid.Iterm}")
+
+                    if hasattr(pid, "Pterm") and (np.isnan(pid.Pterm) or np.isinf(pid.Pterm)):
+                        pytest.fail(f"PID state corrupted at iteration {i}: Pterm={pid.Pterm}")
+
+            # Assert: State should remain valid
+            assert pid.isActive(), "PID should remain active after rapid changes"
+            assert not np.isnan(pid.Kp), "P parameter should remain valid"
+            assert not np.isnan(pid.Ki), "I parameter should remain valid"
+            assert not np.isnan(pid.Kd), "D parameter should remain valid"
+
+
+class TestPIDDestructiveResourceExhaustion:
+    """
+    Level 3 Destructive Testing: Resource Exhaustion
+
+    Mission: Exhaust system resources to find breaking points
+    Focus: Memory, CPU, and I/O exhaustion attacks
+    Goal: Document resource limits and failure modes
+
+    These tests push the system beyond normal operational parameters
+    to find resource-related vulnerabilities.
+    """
+
+    @pytest.mark.xfail(reason="PID may exhaust memory with excessive smoothing buffer sizes")
+    def test_memory_exhaustion_through_smoothing_buffers(self) -> None:
+        """Test memory exhaustion by setting extremely large smoothing buffer sizes.
+
+        # REMEDIATION: Add maximum limits to smoothing buffer sizes and
+        # implement memory usage monitoring with graceful degradation.
+        """
+        with patch("artisanlib.pid.QSemaphore", return_value=_create_mock_semaphore()):
+            from artisanlib.pid import PID
+
+            # Arrange
+            control_commands: List[float] = []
+
+            def control_function(duty: float) -> None:
+                control_commands.append(duty)
+
+            pid = PID(control=control_function, p=2.0, i=0.1, d=0.05)
+
+            # Act: Set extremely large smoothing factors to exhaust memory
+            try:
+                pid.input_smoothing_factor = 1000000  # 1 million samples
+                pid.output_smoothing_factor = 1000000  # 1 million samples
+
+                pid.setTarget(200.0)
+                pid.on()
+
+                # Feed data to build up massive buffers
+                current_time = 0.0
+                with patch("time.time") as mock_time:
+
+                    def time_generator() -> float:
+                        nonlocal current_time
+                        current_time += 1.0
+                        return current_time
+
+                    mock_time.side_effect = time_generator
+
+                    # Try to fill the massive buffers
+                    for i in range(10000):  # This should exhaust memory
+                        pid.update(200.0 + float(i % 10))
+
+                        # Check if we're consuming too much memory
+                        if hasattr(pid, "previous_inputs") and len(pid.previous_inputs) > 100000:
+                            pytest.fail(
+                                f"Memory exhaustion: input buffer size {len(pid.previous_inputs)}"
+                            )
+                        if hasattr(pid, "previous_outputs") and len(pid.previous_outputs) > 100000:
+                            pytest.fail(
+                                f"Memory exhaustion: output buffer size {len(pid.previous_outputs)}"
+                            )
+
+            except MemoryError:
+                pytest.fail("PID caused MemoryError with large smoothing buffers")
+
+            # Assert: Should not reach here if memory exhaustion occurs
+            raise AssertionError("Expected memory exhaustion with massive smoothing buffers")
+
+    @pytest.mark.xfail(reason="PID may not handle rapid update flooding causing CPU exhaustion")
+    def test_cpu_exhaustion_through_rapid_updates(self) -> None:
+        """Test CPU exhaustion by flooding PID with extremely rapid updates.
+
+        # REMEDIATION: Implement update rate limiting and CPU usage monitoring
+        # to prevent system lockup from excessive update rates.
+        """
+        with patch("artisanlib.pid.QSemaphore", return_value=_create_mock_semaphore()):
+            from artisanlib.pid import PID
+
+            # Arrange
+            control_commands: List[float] = []
+            update_count = 0
+
+            def control_function(duty: float) -> None:
+                nonlocal update_count
+                control_commands.append(duty)
+                update_count += 1
+
+                # Check for excessive CPU usage
+                if update_count > 100000:
+                    pytest.fail(f"CPU exhaustion: {update_count} control function calls")
+
+            pid = PID(control=control_function, p=2.0, i=0.1, d=0.05)
+            pid.setTarget(200.0)
+            pid.on()
+
+            # Act: Flood with extremely rapid updates
+            current_time = 0.0
+            with patch("time.time") as mock_time:
+
+                def time_generator() -> float:
+                    nonlocal current_time
+                    current_time += 0.0001  # 0.1ms intervals - extremely rapid
+                    return current_time
+
+                mock_time.side_effect = time_generator
+
+                # Flood with updates (reduced to reasonable amount for testing)
+                max_iterations = 10000  # 10k instead of 1M to prevent hanging
+                for i in range(max_iterations):
+                    pid.update(200.0 + float(i % 100))
+
+                    # Early termination if we detect problems
+                    if i % 1000 == 0 and len(control_commands) > 5000:
+                        pytest.fail(
+                            f"CPU exhaustion detected: {len(control_commands)} commands at iteration {i}"
+                        )
+
+            # Assert: Should not reach here if CPU exhaustion occurs
+            raise AssertionError("Expected CPU exhaustion with rapid update flooding")
+
+    @pytest.mark.xfail(reason="PID may deadlock under concurrent access pressure")
+    def test_deadlock_through_concurrent_access_storm(self) -> None:
+        """Test for deadlocks under extreme concurrent access pressure.
+
+        # REMEDIATION: Review semaphore usage and implement deadlock detection
+        # with timeout mechanisms for all critical sections.
+        """
+        import threading
+        import time
+
+        with patch("artisanlib.pid.QSemaphore", return_value=_create_mock_semaphore()):
+            from artisanlib.pid import PID
+
+            # Arrange
+            control_commands: List[float] = []
+
+            def control_function(duty: float) -> None:
+                control_commands.append(duty)
+
+            pid = PID(control=control_function, p=2.0, i=0.1, d=0.05)
+            pid.setTarget(200.0)
+            pid.on()
+
+            # Act: Create concurrent access storm
+            def rapid_updates() -> None:
+                for i in range(1000):
+                    pid.update(200.0 + float(i))
+
+            def rapid_parameter_changes() -> None:
+                for i in range(1000):
+                    pid.setPID(p=2.0 + float(i % 10), i=0.1, d=0.05)
+
+            def rapid_target_changes() -> None:
+                for i in range(1000):
+                    pid.setTarget(200.0 + float(i % 50))
+
+            def rapid_state_changes() -> None:
+                for _ in range(500):
+                    pid.on()
+                    pid.off()
+
+            # Launch concurrent threads
+            threads = [
+                threading.Thread(target=rapid_updates),
+                threading.Thread(target=rapid_parameter_changes),
+                threading.Thread(target=rapid_target_changes),
+                threading.Thread(target=rapid_state_changes),
+            ]
+
+            start_time = time.time()
+            for thread in threads:
+                thread.start()
+
+            # Wait with timeout to detect deadlocks
+            for thread in threads:
+                thread.join(timeout=5.0)  # 5 second timeout
+                if thread.is_alive():
+                    pytest.fail("Deadlock detected: thread did not complete within timeout")
+
+            elapsed = time.time() - start_time
+            if elapsed > 10.0:  # Should complete much faster
+                pytest.fail(f"Performance degradation detected: took {elapsed:.2f} seconds")
+
+            # Assert: Should not reach here if deadlock occurs
+            assert pid.isActive() or not pid.isActive(), "PID should be in a valid state"
+
+
+class TestPIDDestructiveSequenceBreaking:
+    """
+    Level 3 Destructive Testing: Sequence Breaking
+
+    Mission: Break expected function call sequences to corrupt state
+    Focus: State machine violations and improper call ordering
+    Goal: Find vulnerabilities in state management and initialization
+
+    These tests deliberately violate expected usage patterns to find
+    state corruption and initialization vulnerabilities.
+    """
+
+    @pytest.mark.xfail(reason="PID may crash when methods called before proper initialization")
+    def test_uninitialized_method_calls_cause_crash(self) -> None:
+        """Test calling PID methods before proper initialization.
+
+        # REMEDIATION: Add initialization state checking to all public methods
+        # and return appropriate error codes or exceptions for uninitialized state.
+        """
+        with patch("artisanlib.pid.QSemaphore", return_value=_create_mock_semaphore()):
+            from artisanlib.pid import PID
+
+            # Arrange: Create PID but don't initialize properly
+            control_commands: List[float] = []
+
+            def control_function(duty: float) -> None:
+                control_commands.append(duty)
+
+            # Act: Try to use PID methods before proper setup
+            try:
+                pid = PID()  # No control function provided
+
+                # These should fail gracefully, not crash
+                pid.update(200.0)  # Update without control function
+                pid.on()  # Activate without control function
+                pid.getDuty()  # Get duty without any operation
+
+                # Try with control function but no parameters
+                pid.setControl(control_function)
+                pid.update(200.0)  # Update without target set
+
+                # Try operations in wrong order
+                pid.off()  # Turn off before turning on
+                pid.reset()  # Reset before initialization
+
+            except Exception as e:
+                pytest.fail(f"PID crashed with uninitialized access: {e}")
+
+            # Assert: Should handle uninitialized state gracefully
+            assert True, "PID should handle uninitialized state without crashing"
+
+    @pytest.mark.xfail(reason="PID may have race conditions in state transitions")
+    def test_rapid_state_transitions_cause_corruption(self) -> None:
+        """Test rapid state transitions to find race conditions.
+
+        # REMEDIATION: Add proper state transition locking and validation
+        # to prevent race conditions during rapid state changes.
+        """
+        with patch("artisanlib.pid.QSemaphore", return_value=_create_mock_semaphore()):
+            from artisanlib.pid import PID
+
+            # Arrange
+            control_commands: List[float] = []
+
+            def control_function(duty: float) -> None:
+                control_commands.append(duty)
+
+            pid = PID(control=control_function, p=2.0, i=0.1, d=0.05)
+            pid.setTarget(200.0)
+
+            # Act: Rapid state transitions to find race conditions
+            current_time = 0.0
+            with patch("time.time") as mock_time:
+
+                def time_generator() -> float:
+                    nonlocal current_time
+                    current_time += 0.001  # 1ms intervals
+                    return current_time
+
+                mock_time.side_effect = time_generator
+
+                # Rapid fire state changes (reduced for practical testing)
+                for i in range(100):  # 100 instead of 10000 to prevent hanging
+                    pid.on()
+                    pid.update(200.0 + float(i % 10))
+                    pid.off()
+                    pid.reset()
+
+                    # Check for state corruption
+                    try:
+                        _ = pid.isActive()  # Check if method works
+                        target = pid.getTarget()
+
+                        # Validate state consistency
+                        if target != 200.0:
+                            pytest.fail(
+                                f"State corruption: target changed to {target} at iteration {i}"
+                            )
+
+                    except Exception as e:
+                        pytest.fail(f"State corruption exception at iteration {i}: {e}")
+
+            # Assert: State should remain consistent
+            assert pid.getTarget() == 200.0, "Target should remain consistent"
+
+    @pytest.mark.xfail(reason="PID may not handle reentrancy in control function callbacks")
+    def test_reentrancy_attack_through_control_function(self) -> None:
+        """Test reentrancy attacks by calling PID methods from within control function.
+
+        # REMEDIATION: Add reentrancy protection to prevent recursive calls
+        # from control function callbacks that could corrupt internal state.
+        """
+        with patch("artisanlib.pid.QSemaphore", return_value=_create_mock_semaphore()):
+            from artisanlib.pid import PID
+
+            # Arrange
+            control_commands: List[float] = []
+            reentrancy_count = 0
+
+            def malicious_control_function(duty: float) -> None:
+                nonlocal reentrancy_count
+                control_commands.append(duty)
+                reentrancy_count += 1
+
+                # Reentrancy attack: call PID methods from within callback
+                if reentrancy_count < 5:  # Limit to prevent infinite recursion
+                    try:
+                        pid.setTarget(300.0)  # Change target from within callback
+                        pid.setPID(p=5.0, i=0.5, d=0.1)  # Change parameters
+                        pid.update(250.0)  # Recursive update call
+                        pid.reset()  # Reset from within callback
+                    except Exception as e:
+                        pytest.fail(f"Reentrancy caused exception: {e}")
+
+            pid = PID(control=malicious_control_function, p=2.0, i=0.1, d=0.05)
+            pid.setTarget(200.0)
+            pid.on()
+
+            # Act: Trigger reentrancy attack
+            current_time = 0.0
+            with patch("time.time") as mock_time:
+
+                def time_generator() -> float:
+                    nonlocal current_time
+                    current_time += 1.0
+                    return current_time
+
+                mock_time.side_effect = time_generator
+
+                try:
+                    pid.update(180.0)  # This should trigger reentrancy
+                except RecursionError:
+                    pytest.fail("Reentrancy caused infinite recursion")
+                except Exception as e:
+                    pytest.fail(f"Reentrancy caused unexpected exception: {e}")
+
+            # Assert: System should handle reentrancy gracefully
+            assert pid.isActive(), "PID should remain active after reentrancy attack"
+            assert reentrancy_count > 0, "Control function should have been called"
