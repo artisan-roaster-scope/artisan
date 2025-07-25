@@ -644,26 +644,34 @@ class WindowsDlg(ArtisanDialog):
         self.xlimitEdit_min.repaint()
         self.xlimitEdit.repaint()
 
-        endedittime_str = str(self.xlimitEdit.text())
-        if endedittime_str is not None and endedittime_str != '':
-            endeditime = stringtoseconds(endedittime_str)
-            if self.aw.qmc.endofx != endeditime:
-                self.aw.qmc.endofx = endeditime
-                self.aw.qmc.locktimex_end = endeditime
+        try:
+            endedittime_str = str(self.xlimitEdit.text())
+            if endedittime_str is not None and endedittime_str != '':
+                endeditime = stringtoseconds(endedittime_str)
+                if self.aw.qmc.endofx != endeditime:
+                    self.aw.qmc.endofx = endeditime
+                    self.aw.qmc.locktimex_end = endeditime
+                    changed = True
+        except Exception: # pylint: disable=broad-except
+            pass # stringtoseconds raises exception on malformed input
+
+        try:
+            startedittime_str = str(self.xlimitEdit_min.text())
+            if startedittime_str is not None and startedittime_str != '':
+                starteditime = stringtoseconds(startedittime_str)
+                if starteditime >= 0 and self.aw.qmc.timeindex[0] != -1:
+                    self.aw.qmc.startofx = self.aw.qmc.timex[self.aw.qmc.timeindex[0]] + starteditime
+                elif starteditime >= 0 and self.aw.qmc.timeindex[0] == -1:
+                    self.aw.qmc.startofx = starteditime
+                elif starteditime < 0 and self.aw.qmc.timeindex[0] != -1:
+                    self.aw.qmc.startofx = self.aw.qmc.timex[self.aw.qmc.timeindex[0]]-abs(starteditime)
+                else:
+                    self.aw.qmc.startofx = starteditime
+                self.aw.qmc.locktimex_start = starteditime
                 changed = True
-        startedittime_str = str(self.xlimitEdit_min.text())
-        if startedittime_str is not None and startedittime_str != '':
-            starteditime = stringtoseconds(startedittime_str)
-            if starteditime >= 0 and self.aw.qmc.timeindex[0] != -1:
-                self.aw.qmc.startofx = self.aw.qmc.timex[self.aw.qmc.timeindex[0]] + starteditime
-            elif starteditime >= 0 and self.aw.qmc.timeindex[0] == -1:
-                self.aw.qmc.startofx = starteditime
-            elif starteditime < 0 and self.aw.qmc.timeindex[0] != -1:
-                self.aw.qmc.startofx = self.aw.qmc.timex[self.aw.qmc.timeindex[0]]-abs(starteditime)
-            else:
-                self.aw.qmc.startofx = starteditime
-            self.aw.qmc.locktimex_start = starteditime
-            changed = True
+        except Exception: # pylint: disable=broad-except
+            pass # stringtoseconds raises exception on malformed input
+
         if changed:
             self.aw.qmc.redraw(recomputeAllDeltas=False)
 
@@ -833,25 +841,33 @@ class WindowsDlg(ArtisanDialog):
 
         endedittime_str = str(self.xlimitEdit.text())
         if endedittime_str is not None and endedittime_str != '':
-            endeditime = stringtoseconds(endedittime_str)
-            self.aw.qmc.endofx = endeditime
-            self.aw.qmc.locktimex_end = endeditime
+            try:
+                endeditime = stringtoseconds(endedittime_str)
+                self.aw.qmc.endofx = endeditime
+                self.aw.qmc.locktimex_end = endeditime
+            except Exception: # pylint: disable=broad-except
+                self.aw.qmc.endofx = self.aw.qmc.endofx_default
+                self.aw.qmc.locktimex_end = self.aw.qmc.endofx_default
         else:
             self.aw.qmc.endofx = self.aw.qmc.endofx_default
             self.aw.qmc.locktimex_end = self.aw.qmc.endofx_default
 
         startedittime_str = str(self.xlimitEdit_min.text())
         if startedittime_str is not None and startedittime_str != '':
-            starteditime = stringtoseconds(startedittime_str)
-            if starteditime >= 0 and self.aw.qmc.timeindex[0] != -1:
-                self.aw.qmc.startofx = self.aw.qmc.timex[self.aw.qmc.timeindex[0]] + starteditime
-            elif starteditime >= 0 and self.aw.qmc.timeindex[0] == -1:
-                self.aw.qmc.startofx = starteditime
-            elif starteditime < 0 and self.aw.qmc.timeindex[0] != -1:
-                self.aw.qmc.startofx = self.aw.qmc.timex[self.aw.qmc.timeindex[0]]-abs(starteditime)
-            else:
-                self.aw.qmc.startofx = starteditime
-            self.aw.qmc.locktimex_start = starteditime
+            try:
+                starteditime = stringtoseconds(startedittime_str)
+                if starteditime >= 0 and self.aw.qmc.timeindex[0] != -1:
+                    self.aw.qmc.startofx = self.aw.qmc.timex[self.aw.qmc.timeindex[0]] + starteditime
+                elif starteditime >= 0 and self.aw.qmc.timeindex[0] == -1:
+                    self.aw.qmc.startofx = starteditime
+                elif starteditime < 0 and self.aw.qmc.timeindex[0] != -1:
+                    self.aw.qmc.startofx = self.aw.qmc.timex[self.aw.qmc.timeindex[0]]-abs(starteditime)
+                else:
+                    self.aw.qmc.startofx = starteditime
+                self.aw.qmc.locktimex_start = starteditime
+            except Exception: # pylint: disable=broad-except
+                self.aw.qmc.startofx = self.aw.qmc.startofx_default
+                self.aw.qmc.locktimex_start = self.aw.qmc.startofx_default
         else:
             self.aw.qmc.startofx = self.aw.qmc.startofx_default
             self.aw.qmc.locktimex_start = self.aw.qmc.startofx_default
@@ -865,13 +881,19 @@ class WindowsDlg(ArtisanDialog):
         except Exception: # pylint: disable=broad-except
             pass
 
-        resettime = stringtoseconds(str(self.resetEdit.text()))
-        if resettime > 0:
-            self.aw.qmc.resetmaxtime = resettime
+        try:
+            resettime = stringtoseconds(str(self.resetEdit.text()))
+            if resettime > 0:
+                self.aw.qmc.resetmaxtime = resettime
+        except Exception: # pylint: disable=broad-except
+            pass
 
-        chargetime = stringtoseconds(str(self.chargeminEdit.text()))
-        if chargetime <= 0:
-            self.aw.qmc.chargemintime = chargetime
+        try:
+            chargetime = stringtoseconds(str(self.chargeminEdit.text()))
+            if chargetime <= 0:
+                self.aw.qmc.chargemintime = chargetime
+        except Exception: # pylint: disable=broad-except
+            pass
 
         self.aw.qmc.fixmaxtime = not self.fixmaxtimeFlag.isChecked()
         self.aw.qmc.locktimex = self.locktimexFlag.isChecked()

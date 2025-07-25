@@ -7018,7 +7018,7 @@ class tgraphcanvas(FigureCanvas):
                         #find right most occurrence before index of given event type
                         if nint in self.specialeventstype and nint < 4:
                             spevtylen = len(self.specialeventstype)-1
-                            iii = None
+                            iii:Optional[int] = None
                             for iii in range(spevtylen,-1,-1):
                                 if self.specialeventstype[iii] == nint and index >= self.specialevents[iii]:
                                     break  #index found

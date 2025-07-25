@@ -69,12 +69,15 @@ def extractProfileStrongholdXLSX(file:str, aw:'ApplicationWindow') -> ProfileDat
                 data[key] = []
         # extract data
         for row in range(2, sheet.max_row + 1): # pyrefly: ignore[bad-argument-type]
-            for i, key in enumerate(keys):
-                if key != '':
-                    if key == 'Time':
-                        data[key].append(stringtoseconds(str(sheet.cell(row, i+1).value))) # pyrefly: ignore[bad-argument-type]
-                    else:
-                        data[key].append(sheet.cell(row, i+1).value) # type:ignore
+            try:
+                for i, key in enumerate(keys):
+                    if key != '':
+                        if key == 'Time':
+                            data[key].append(stringtoseconds(str(sheet.cell(row, i+1).value))) # pyrefly: ignore[bad-argument-type]
+                        else:
+                            data[key].append(sheet.cell(row, i+1).value) # type:ignore
+            except Exception as e:  # pylint: disable=broad-except
+                _log.error(e)
 
         # convert data
         if 'Time' in data:

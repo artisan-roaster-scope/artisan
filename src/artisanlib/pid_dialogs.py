@@ -3022,7 +3022,10 @@ class PXG4pidDlgControl(PXpidDlgControl):
     @pyqtSlot(bool)
     def writeRSValues(self, _:bool = False) -> None:
         for i in range(16):
-            self.setsegment_i(i)
+            try:
+                self.setsegment_i(i)
+            except Exception: # pylint: disable=broad-exception-caught
+                self.aw.qmc.adderror(QApplication.translate('Message','Error writing PID RS value {0}').format(str(i)))
 
     @pyqtSlot(bool)
     def writeAll(self, _:bool = False) -> None:

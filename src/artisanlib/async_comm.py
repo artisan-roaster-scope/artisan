@@ -6,7 +6,7 @@
 # This program or module is free software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
 # by the Free Software Foundation, either version 2 of the License, or
-# version 3 of the License, or (at your option) any later versison. It is
+# version 3 of the License, or (at your option) any later version. It is
 # provided for educational purposes and is distributed in the hope that
 # it will be useful, but WITHOUT ANY WARRANTY; without even the implied
 # warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
@@ -59,7 +59,8 @@ class AsyncLoopThread:
         self.__thread.start()
 
     def __del__(self) -> None:
-        self.__loop.call_soon_threadsafe(self.__loop.stop) # pyrefly: ignore[bad-argument-type]
+        if not self.__loop.is_closed():
+            self.__loop.call_soon_threadsafe(self.__loop.stop) # pyrefly: ignore[bad-argument-type] # __loop.stop() might raise exception if __loop is closed
 #        self.__thread.join()
 # WARNING: we don't join and expect the clients running on this thread to stop them
 # (using self._running) to finally get rid of this thread to prevent hangs
@@ -149,7 +150,7 @@ class AsyncComm:
                 disconnected_handler:Optional[Callable[[], None]] = None) -> None:
         # internals
         self._asyncLoopThread: Optional[AsyncLoopThread]       = None # the asyncio AsyncLoopThread object
-        self._write_queue: 'Optional[asyncio.Queue[bytes]]'    = None # noqa: UP037 # quotes for Python3.8 # the write_queue
+        self._write_queue:  Optional[asyncio.Queue[bytes]]     = None # noqa: UP037 # quotes for Python3.8 # the write_queue
         self._running:bool                                     = False              # while true we keep running the thread
 
         # connection

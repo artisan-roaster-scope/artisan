@@ -12993,40 +12993,43 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     def miniEventRecord(self, _:bool) -> None:
         lenevents = self.eNumberSpinBox.value()
         if lenevents and  lenevents-1 < len(self.qmc.specialevents):
-            if self.qmc.timeindex[0] > -1:
-                newtime = self.qmc.time2index(self.qmc.timex[self.qmc.timeindex[0]]+ stringtoseconds(str(self.etimeline.text())))
-            else:
-                newtime = self.qmc.time2index(stringtoseconds(str(self.etimeline.text())))
-            self.qmc.setEvent(lenevents-1,
-                newtime,
-                self.etypeComboBox.currentIndex(),
-                self.lineEvent.text(),
-                self.qmc.str2eventsvalue(self.valueEdit.text()))
+            try:
+                if self.qmc.timeindex[0] > -1:
+                    newtime = self.qmc.time2index(self.qmc.timex[self.qmc.timeindex[0]]+ stringtoseconds(str(self.etimeline.text())))
+                else:
+                    newtime = self.qmc.time2index(stringtoseconds(str(self.etimeline.text())))
+                self.qmc.setEvent(lenevents-1,
+                    newtime,
+                    self.etypeComboBox.currentIndex(),
+                    self.lineEvent.text(),
+                    self.qmc.str2eventsvalue(self.valueEdit.text()))
 
-            self.lineEvent.clearFocus()
-            self.eNumberSpinBox.clearFocus()
-            self.etimeline.clearFocus()
+                self.lineEvent.clearFocus()
+                self.eNumberSpinBox.clearFocus()
+                self.etimeline.clearFocus()
 
-            self.orderEvents(force_update=False)
+                self.orderEvents(force_update=False)
 
-            self.qmc.redraw_keep_view(recomputeAllDeltas=False)
+                self.qmc.redraw_keep_view(recomputeAllDeltas=False)
 
-            # redraw minieditor event selection line
-            currentevent = self.eNumberSpinBox.value()
-            if currentevent:
-                self.plotEventSelection(currentevent-1)
+                # redraw minieditor event selection line
+                currentevent = self.eNumberSpinBox.value()
+                if currentevent:
+                    self.plotEventSelection(currentevent-1)
 
-            if not self.qmc.flagstart:
-                self.qmc.fig.canvas.draw()
-                self.qmc.fileDirtySignal.emit()
+                if not self.qmc.flagstart:
+                    self.qmc.fig.canvas.draw()
+                    self.qmc.fileDirtySignal.emit()
 
-            string = ''
-            if len(self.qmc.specialeventsStrings[lenevents-1]) > 5:
-                string += self.qmc.specialeventsStrings[lenevents-1][0:5]
-                string += '...'
+                string = ''
+                if len(self.qmc.specialeventsStrings[lenevents-1]) > 5:
+                    string += self.qmc.specialeventsStrings[lenevents-1][0:5]
+                    string += '...'
 
-            message = QApplication.translate('Message','Event #{0}:  {1} has been updated').format(str(lenevents),string)
-            self.sendmessage(message)
+                message = QApplication.translate('Message','Event #{0}:  {1} has been updated').format(str(lenevents),string)
+                self.sendmessage(message)
+            except Exception:  # pylint: disable=broad-except
+                pass # stringtoseconds might fail on invalid input
 
     @staticmethod
     def strippedName(fullFileName:str) -> str:
@@ -14051,58 +14054,85 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 i = 0
                 for row in data:
                     i = i + 1
-                    items = list(zip(fields, row))
-                    item = {}
-                    for (name, value) in items:
-                        item[name] = value.strip()
-                    #add one measurement
-                    timez = float(stringtoseconds(item['Time1']))
-                    if not last_time or last_time < timez:
-                        self.qmc.timex.append(timez)
-                        self.qmc.temp1.append(float(item['ET']))
-                        self.qmc.temp2.append(float(item['BT']))
-                        for j, ef in enumerate(extra_fields):
-                            if j % 2 == 1:
-                                # odd
-                                self.qmc.extratemp2[int(j/2)].append(float(item[ef]))
-                            else:
-                                # even
-                                self.qmc.extratimex[int(j/2)].append(timez)
-                                self.qmc.extratemp1[int(j/2)].append(float(item[ef]))
-                    last_time = timez
+                    try:
+                        items = list(zip(fields, row))
+                        item = {}
+                        for (name, value) in items:
+                            item[name] = value.strip()
+                        #add one measurement
+                        timez = float(stringtoseconds(item['Time1']))
+                        if not last_time or last_time < timez:
+                            self.qmc.timex.append(timez)
+                            self.qmc.temp1.append(float(item['ET']))
+                            self.qmc.temp2.append(float(item['BT']))
+                            for j, ef in enumerate(extra_fields):
+                                if j % 2 == 1:
+                                    # odd
+                                    self.qmc.extratemp2[int(j/2)].append(float(item[ef]))
+                                else:
+                                    # even
+                                    self.qmc.extratimex[int(j/2)].append(timez)
+                                    self.qmc.extratemp1[int(j/2)].append(float(item[ef]))
+                        last_time = timez
+                    except Exception: # pylint: disable=broad-except
+                        pass # invalid input can make stringtoseconds fail thus this row is ignored
             #set events
             CHARGE_entry = header[2].split('CHARGE:')
             if len(CHARGE_entry)>1:
-                CHARGE = stringtoseconds(CHARGE_entry[1])
+                try:
+                    CHARGE = stringtoseconds(CHARGE_entry[1])
+                except Exception:  # pylint: disable=broad-except
+                    CHARGE = -1
                 if CHARGE >= 0:
                     self.qmc.timeindex[0] = max(-1, self.qmc.time2index(CHARGE))
                 else:
                     self.qmc.timeindex[0] = -1
             else:
                 self.qmc.timeindex[0] = -1
-            DRYe = stringtoseconds(header[4].split('DRYe:')[1])
+            try:
+                DRYe = stringtoseconds(header[4].split('DRYe:')[1])
+            except Exception:  # pylint: disable=broad-except
+                DRYe = 0
             if DRYe > 0:
                 self.qmc.timeindex[1] = max(0, self.qmc.time2index(DRYe))
-            FCs = stringtoseconds(header[5].split('FCs:')[1])
+            try:
+                FCs = stringtoseconds(header[5].split('FCs:')[1])
+            except Exception:  # pylint: disable=broad-except
+                FCs = 0
             if FCs > 0:
                 self.qmc.timeindex[2] = max(0, self.qmc.time2index(FCs))
-            FCe = stringtoseconds(header[6].split('FCe:')[1])
+            try:
+                FCe = stringtoseconds(header[6].split('FCe:')[1])
+            except Exception:  # pylint: disable=broad-except
+                FCe = 0
             if FCe > 0:
                 self.qmc.timeindex[3] = max(0, self.qmc.time2index(FCe))
-            SCs = stringtoseconds(header[7].split('SCs:')[1])
+            try:
+                SCs = stringtoseconds(header[7].split('SCs:')[1])
+            except Exception:  # pylint: disable=broad-except
+                SCs = 0
             if SCs > 0:
                 self.qmc.timeindex[4] = max(0, self.qmc.time2index(SCs))
-            SCe = stringtoseconds(header[8].split('SCe:')[1])
+            try:
+                SCe = stringtoseconds(header[8].split('SCe:')[1])
+            except Exception:  # pylint: disable=broad-except
+                SCe = 0
             if SCe> 0:
                 self.qmc.timeindex[5] = max(0, self.qmc.time2index(SCe))
-            DROP = stringtoseconds(header[9].split('DROP:')[1])
+            try:
+                DROP = stringtoseconds(header[9].split('DROP:')[1])
+            except Exception:  # pylint: disable=broad-except
+                DROP = 0
             if DROP > 0:
                 self.qmc.timeindex[6] = max(0, self.qmc.time2index(DROP))
-            COOL = stringtoseconds(header[10].split('COOL:')[1])
+            try:
+                COOL = stringtoseconds(header[10].split('COOL:')[1])
+            except Exception:  # pylint: disable=broad-except
+                COOL = 0
             if COOL > 0:
                 self.qmc.timeindex[7] = max(0, self.qmc.time2index(COOL))
             self.qmc.endofx = self.qmc.timex[-1]
-            self.sendmessage(QApplication.translate('Message','Artisan CSV file loaded successfully'))
+            self.sendmessage(f"{QApplication.translate('Message','Artisan CSV file loaded successfully')} ({filename})")
             self.qmc.fileDirtySignal.emit()
             self.autoAdjustAxis()
             self.qmc.redraw()
@@ -14217,6 +14247,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 from json import dump as json_dump
                 json_dump(self.getProfile(), outfile, indent=None, separators=(',', ':'), ensure_ascii=False)
                 outfile.write('\n')
+            self.sendmessage(f"{QApplication.translate('Message','Artisan JSON file saved successfully')} ({filename})")
             return True
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
@@ -14457,6 +14488,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.qmc.fileDirtySignal.emit()
                 self.autoAdjustAxis()
                 self.qmc.redraw()
+                self.sendmessage(f"{QApplication.translate('Message','Artisan JSON file loaded successfully')} ({filename})")
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
@@ -14471,6 +14503,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             except Exception: # pylint: disable=broad-except
                 self.importRoastLoggerEnc(filename,'latin1')
             self.qmc.fileDirtySignal.emit()
+            self.sendmessage(f"{QApplication.translate('Message','RoastLogger file loaded successfully')} ({filename})")
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
@@ -14548,28 +14581,31 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 fields = next(data)
                 if len(fields) == 0:
                     break
-                timex.append(float(stringtoseconds(fields[0])))
                 try:
-                    t1 = float(fields[1])
+                    timex.append(float(stringtoseconds(fields[0])))
+                    try:
+                        t1 = float(fields[1])
+                    except Exception: # pylint: disable=broad-except
+                        t1 = -1
+                    temp1.append(t1)
+                    try:
+                        t2 = float(fields[2])
+                    except Exception: # pylint: disable=broad-except
+                        t2 = -1
+                    temp2.append(t2)
+                    event = fields[3]
+                    if event == 'Beans loaded':
+                        timeindex[0] = max(-1,len(timex) - 1)
+                    elif event == 'First crack start':
+                        timeindex[2] = max(0,len(timex) - 1)
+                    elif event == 'First crack end':
+                        timeindex[3] = max(0,len(timex) - 1)
+                    elif event == 'Second crack start':
+                        timeindex[4] = max(0,len(timex) - 1)
+                    elif event == 'Beans ejected':
+                        timeindex[6] = max(0,len(timex) - 1)
                 except Exception: # pylint: disable=broad-except
-                    t1 = -1
-                temp1.append(t1)
-                try:
-                    t2 = float(fields[2])
-                except Exception: # pylint: disable=broad-except
-                    t2 = -1
-                temp2.append(t2)
-                event = fields[3]
-                if event == 'Beans loaded':
-                    timeindex[0] = max(-1,len(timex) - 1)
-                elif event == 'First crack start':
-                    timeindex[2] = max(0,len(timex) - 1)
-                elif event == 'First crack end':
-                    timeindex[3] = max(0,len(timex) - 1)
-                elif event == 'Second crack start':
-                    timeindex[4] = max(0,len(timex) - 1)
-                elif event == 'Beans ejected':
-                    timeindex[6] = max(0,len(timex) - 1)
+                    pass # stringtoseconds might have detected an invalid timestamp thus we skip this row
             obj['timeindex'] = timeindex
             obj['timex'] = timex
             obj['temp1'] = temp2
@@ -14871,6 +14907,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                     extratemps.append('-1')
                             writer.writerow([str(time1),str(time2),str(self.qmc.temp1[i]),str(self.qmc.temp2[i]),str(event)] + extratemps)
                         last_time = time1
+                self.sendmessage(f"{QApplication.translate('Message','Artisan CSV file saved successfully')} ({filename})")
                 return True
             return False
         except Exception as ex: # pylint: disable=broad-except
@@ -25553,11 +25590,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                 time_entry = elem.find('stime')
                             last_timez = last_timez + 1
                             timez = last_timez
-                            if time_entry is not None:
-                                time_entry_text = time_entry.text
-                                if time_entry_text is not None:
-                                    timez = float(stringtoseconds(time_entry_text))
-                                    last_timez = timez
+                            try:
+                                if time_entry is not None:
+                                    time_entry_text = time_entry.text
+                                    if time_entry_text is not None:
+                                        timez = float(stringtoseconds(time_entry_text))
+                                        last_timez = timez
+                            except Exception: # pylint: disable=broad-except
+                                pass # invalid input can make stringtoseconds fail
                             self.qmc.timex.append(timez)
                             self.qmc.temp1.append(-1)
                             temp_entry = elem.find('temperature')
@@ -25599,18 +25639,21 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                             if time_entry is not None:
                                 time_str = time_entry.text
                                 if time_str is not None:
-                                    time_in_seconds = float(stringtoseconds(time_str))
-                                    burner_entry = elem.find('burnercapacity')
-                                    if burner_entry is None:
-                                        burner_entry = elem.find('nburnercapacity')
-                                    if burner_entry is not None:
-                                        burner = burner_entry.text
-                                        if burner is not None:
-                                            self.qmc.addEvent(
-                                                self.qmc.time2index(time_in_seconds),
-                                                3,
-                                                '',
-                                                self.qmc.str2eventsvalue(burner))
+                                    try:
+                                        time_in_seconds = float(stringtoseconds(time_str))
+                                        burner_entry = elem.find('burnercapacity')
+                                        if burner_entry is None:
+                                            burner_entry = elem.find('nburnercapacity')
+                                        if burner_entry is not None:
+                                            burner = burner_entry.text
+                                            if burner is not None:
+                                                self.qmc.addEvent(
+                                                    self.qmc.time2index(time_in_seconds),
+                                                    3,
+                                                    '',
+                                                    self.qmc.str2eventsvalue(burner))
+                                    except Exception: # pylint: disable=broad-except
+                                        pass # invalid input can make stringtoseconds
 
                     self.autoAdjustAxis()
 

@@ -150,6 +150,7 @@ class PID:
             if self.lastError is None or self.lastTime is None:
                 self.lastTime = now
                 self.lastError = err
+                self.lastInput = i
             elif (dt := now - self.lastTime) > 0.2:
                 derr = (err - self.lastError) / dt
 

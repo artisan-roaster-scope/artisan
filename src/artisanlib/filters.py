@@ -63,8 +63,8 @@ class LiveLFilter(LiveFilter):
         """
         self.b = b_
         self.a = a_
-        self._xs:Deque[float] = deque([0.0] * len(b), maxlen=len(b))         # pyrefly: ignore[bad-argument-type]
-        self._ys:Deque[float] = deque([0.0] * (len(a) - 1), maxlen=len(a)-1) # pyrefly: ignore[bad-argument-type]
+        self._xs:Deque[float] = deque([0.0] * len(self.b), maxlen=len(self.b))         # pyrefly: ignore[bad-argument-type]
+        self._ys:Deque[float] = deque([0.0] * (len(self.a) - 1), maxlen=len(self.a)-1) # pyrefly: ignore[bad-argument-type]
 
     def _process(self, x:float) -> float:
         """Filter incoming data with standard difference equations.

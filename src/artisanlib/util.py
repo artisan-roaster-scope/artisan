@@ -581,14 +581,14 @@ def debugLogLevelToggle() -> bool:
     return newDebugLevel
 
 def natsort(s:str) -> List[Union[int,str]]:
-    return [int(t) if t.isdigit() else t.lower() for t in re.split(r'(\d+)', s)]
+    return [int(t) if t.isdigit() else t.casefold() for t in re.split(r'(\d+)', s)]
 
 #convert number to string and auto set the number of decimal places 0, 0.999, 9.99, 999.9, 9999
 def scaleFloat2String(num:Union[float,str]) -> str:
     n = toFloat(num)
     if n == 0:
         return '0'
-    if abs(n) < 1:
+    if abs(n) < 10:
         return f'{n:.3f}'.rstrip('0').rstrip('.')
     if abs(n) >= 1000:
         return f'{n:.0f}'
@@ -604,20 +604,20 @@ def scaleFloat2String(num:Union[float,str]) -> str:
 def comma2dot(s:str) -> str:
     s = s.strip()
     last_dot = s.rfind('.')
-    if last_dot > -1:
+    last_pos = s.rfind(',')
+    if last_dot > -1 and (last_pos == -1 or last_dot > last_pos): # there is no comma after that last dot
         if last_dot + 1 == len(s):
             # this is just a trailing dot, we remove this and all other dots and commas
             return s.replace(',','').replace('.','')
         # we just keep this one and remove all other comma and dots; we also remove trailing zero decimals
         return s[:last_dot].replace(',','').replace('.','') + s[last_dot:].replace(',','').rstrip('0').rstrip('.')
     # there is no dot in the string
-    last_pos = s.rfind(',')
     if last_pos > -1:
         if last_pos + 1 == len(s):
             # this is just a trailing comma, we remove this and all other dots and commas
             return s.replace(',','').replace('.','')
         # we turn the last comma into a dot and remove all others; we also remove trailing zero decimals
-        return s[:last_pos].replace(',','') + '.' + s[last_pos+1:].rstrip('0').rstrip('.')
+        return s[:last_pos].replace(',','').replace('.','') + '.' + s[last_pos+1:].rstrip('0').rstrip('.')
     return s
 
 
@@ -804,7 +804,7 @@ def render_weight(amount:float, weight_unit_index:int, target_unit_idx:int,
 # typing tools
 
 def is_int_list(xs: List[Any]) -> TypeGuard[List[int]]:
-    return all(isinstance(x, int) for x in xs)
+    return all(isinstance(x, int) and not isinstance(x, bool) for x in xs) # bool is a subclass of int!
 
 def is_float_list(xs: List[Any]) -> TypeGuard[List[float]]:
     return all(isinstance(x, float) for x in xs)
@@ -813,42 +813,4 @@ def is_float_list(xs: List[Any]) -> TypeGuard[List[float]]:
 # locale tools
 
 def right_to_left(locale:str) -> bool:
-    return locale.lower() in {'ar', 'fa', 'he'}
-
-#def locale2full_local(locale:str) -> str:
-#    locale_map:Dict[str,str] = {
-#        'ar': 'ar_AA',
-#        'da': 'da_DK',
-#        'de': 'de_DE',
-#        'el': 'el_GR',
-#        'en': 'en_US',
-#        'es': 'es_ES',
-#        'fa': 'fa_IR',
-#        'fi': 'fi_FI',
-#        'fr': 'fr_FR',
-#        'gd': 'gd_GB',
-#        'he': 'he_IL',
-#        'hu': 'hu_HU',
-#        'id': 'id_ID',
-#        'it': 'it_IT',
-#        'ja': 'ja_JP',
-#        'ko': 'ko_KR',
-#        'lv': 'lv_LV',
-#        'nl': 'nl_NL',
-#        'no': 'nn_NO',
-#        'pt': 'pt_PT',
-#        'pt_BR': 'pt_BR',
-#        'pl': 'pl_PL',
-#        'ru': 'ru_RU',
-#        'sk': 'sk_SK',
-#        'sv': 'sv_SE',
-#        'th': 'th_TH',
-#        'tr': 'tr_TR',
-#        'uk': 'uk_UA',
-#        'vi': 'vi_VN',
-#        'zh_CN': 'zh_CN',
-#        'zh_TW': 'zh_TW'
-#    }
-#    if locale in locale_map:
-#        return locale_map[locale]
-#    return locale
+    return locale.casefold() in {'ar', 'fa', 'he'}

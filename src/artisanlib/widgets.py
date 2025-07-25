@@ -135,10 +135,10 @@ class MyTableWidgetItemQLineEdit(QTableWidgetItem): # pylint: disable= too-few-p
     def __lt__(self, other:'MyTableWidgetItemQLineEdit') -> bool: # type: ignore[override]
         a = self.sortKey.text()
         b = other.sortKey.text()
-        if len(a) == 5 and len(b) == 5 and a[2] == ':' and b[2] == ':':
-            # we compare times
-            return stringtoseconds(a) < stringtoseconds(b)
         try:
+            if len(a) == 5 and len(b) == 5 and a[2] == ':' and b[2] == ':':
+                # we compare times (not that stringtoseconds can still throw an exception on malformed input)
+                return stringtoseconds(a) < stringtoseconds(b)
             # if those are numbers
             return int(a) < int(b)
         except Exception: # pylint: disable=broad-except

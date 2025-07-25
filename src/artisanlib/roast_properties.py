@@ -5368,27 +5368,30 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.aw.qmc.timeindex[0] = -1
         elif self.chargeeditcopy != str(self.chargeedit.text()):
             #if there is a CHARGE recorded and the time entered is positive. Use relative time
-            if stringtoseconds(str(self.chargeedit.text())) > 0 and self.aw.qmc.timeindex[0] != -1:
-                startindex = self.aw.qmc.time2index(self.aw.qmc.timex[self.aw.qmc.timeindex[0]] + stringtoseconds(str(self.chargeedit.text())))
-                timeindex_before = self.aw.qmc.timeindex[0]
-                self.aw.qmc.timeindex[0] = max(-1,startindex)
-                self.aw.qmc.startofx += (self.aw.qmc.timex[self.aw.qmc.timeindex[0]] - self.aw.qmc.timex[timeindex_before])
-            #if there is a CHARGE recorded and the time entered is negative. Use relative time
-            elif stringtoseconds(str(self.chargeedit.text())) < 0 and self.aw.qmc.timeindex[0] != -1:
-                relativetime = self.aw.qmc.timex[self.aw.qmc.timeindex[0]]-abs(stringtoseconds(str(self.chargeedit.text())))
-                startindex = self.aw.qmc.time2index(relativetime)
-                timeindex_before = self.aw.qmc.timeindex[0]
-                self.aw.qmc.timeindex[0] = max(-1,startindex)
-                self.aw.qmc.startofx += (self.aw.qmc.timex[self.aw.qmc.timeindex[0]] - self.aw.qmc.timex[timeindex_before])
-            #if there is _no_ CHARGE recorded and the time entered is positive. Use absolute time
-            elif stringtoseconds(str(self.chargeedit.text())) > 0 and self.aw.qmc.timeindex[0] == -1:
-                startindex = self.aw.qmc.time2index(stringtoseconds(str(self.chargeedit.text())))
-                self.aw.qmc.timeindex[0] = max(-1,startindex)
-                self.aw.qmc.startofx += self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
-            #if there is _no_ CHARGE recorded and the time entered is negative. ERROR
-            elif stringtoseconds(str(self.chargeedit.text())) < 0 and self.aw.qmc.timeindex[0] == -1:
-                self.aw.qmc.adderror(QApplication.translate('Error Message', 'Unable to move CHARGE to a value that does not exist'))
-            self.chargeeditcopy = str(self.chargeedit.text())
+            try:
+                if stringtoseconds(str(self.chargeedit.text())) > 0 and self.aw.qmc.timeindex[0] != -1:
+                    startindex = self.aw.qmc.time2index(self.aw.qmc.timex[self.aw.qmc.timeindex[0]] + stringtoseconds(str(self.chargeedit.text())))
+                    timeindex_before = self.aw.qmc.timeindex[0]
+                    self.aw.qmc.timeindex[0] = max(-1,startindex)
+                    self.aw.qmc.startofx += (self.aw.qmc.timex[self.aw.qmc.timeindex[0]] - self.aw.qmc.timex[timeindex_before])
+                #if there is a CHARGE recorded and the time entered is negative. Use relative time
+                elif stringtoseconds(str(self.chargeedit.text())) < 0 and self.aw.qmc.timeindex[0] != -1:
+                    relativetime = self.aw.qmc.timex[self.aw.qmc.timeindex[0]]-abs(stringtoseconds(str(self.chargeedit.text())))
+                    startindex = self.aw.qmc.time2index(relativetime)
+                    timeindex_before = self.aw.qmc.timeindex[0]
+                    self.aw.qmc.timeindex[0] = max(-1,startindex)
+                    self.aw.qmc.startofx += (self.aw.qmc.timex[self.aw.qmc.timeindex[0]] - self.aw.qmc.timex[timeindex_before])
+                #if there is _no_ CHARGE recorded and the time entered is positive. Use absolute time
+                elif stringtoseconds(str(self.chargeedit.text())) > 0 and self.aw.qmc.timeindex[0] == -1:
+                    startindex = self.aw.qmc.time2index(stringtoseconds(str(self.chargeedit.text())))
+                    self.aw.qmc.timeindex[0] = max(-1,startindex)
+                    self.aw.qmc.startofx += self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
+                #if there is _no_ CHARGE recorded and the time entered is negative. ERROR
+                elif stringtoseconds(str(self.chargeedit.text())) < 0 and self.aw.qmc.timeindex[0] == -1:
+                    self.aw.qmc.adderror(QApplication.translate('Error Message', 'Unable to move CHARGE to a value that does not exist'))
+                self.chargeeditcopy = str(self.chargeedit.text())
+            except Exception: # pylint: disable=broad-except
+                pass # invalid input can make stringtoseconds fail
         # check CHARGE (with index self.aw.qmc.timeindex[0])
         start: float
         if self.aw.qmc.timeindex[0] == -1:
@@ -5396,61 +5399,82 @@ class editGraphDlg(ArtisanResizeablDialog):
         else:
             start = self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
         if self.dryeditcopy != str(self.dryedit.text()):
-            s = stringtoseconds(str(self.dryedit.text()))
-            if s <= 0:
-                self.aw.qmc.timeindex[1] = 0
-            else:
-                dryindex = self.aw.qmc.time2index(start + s)
-                self.aw.qmc.timeindex[1] = max(0,dryindex)
-            self.dryeditcopy = str(self.dryedit.text())
+            try:
+                s = stringtoseconds(str(self.dryedit.text()))
+                if s <= 0:
+                    self.aw.qmc.timeindex[1] = 0
+                else:
+                    dryindex = self.aw.qmc.time2index(start + s)
+                    self.aw.qmc.timeindex[1] = max(0,dryindex)
+                self.dryeditcopy = str(self.dryedit.text())
+            except Exception: # pylint: disable=broad-except
+                pass # invalid input can make stringtoseconds fail
         if self.Cstarteditcopy != str(self.Cstartedit.text()):
-            s = stringtoseconds(str(self.Cstartedit.text()))
-            if s <= 0:
-                self.aw.qmc.timeindex[2] = 0
-            else:
-                fcsindex = self.aw.qmc.time2index(start + s)
-                self.aw.qmc.timeindex[2] = max(0,fcsindex)
-            self.Cstarteditcopy = str(self.Cstartedit.text())
+            try:
+                s = stringtoseconds(str(self.Cstartedit.text()))
+                if s <= 0:
+                    self.aw.qmc.timeindex[2] = 0
+                else:
+                    fcsindex = self.aw.qmc.time2index(start + s)
+                    self.aw.qmc.timeindex[2] = max(0,fcsindex)
+                self.Cstarteditcopy = str(self.Cstartedit.text())
+            except Exception: # pylint: disable=broad-except
+                pass # invalid input can make stringtoseconds fail
         if self.Cendeditcopy != str(self.Cendedit.text()):
-            s = stringtoseconds(str(self.Cendedit.text()))
-            if s <= 0:
-                self.aw.qmc.timeindex[3] = 0
-            else:
-                fceindex = self.aw.qmc.time2index(start + s)
-                self.aw.qmc.timeindex[3] = max(0,fceindex)
-            self.Cendeditcopy = str(self.Cendedit.text())
+            try:
+                s = stringtoseconds(str(self.Cendedit.text()))
+                if s <= 0:
+                    self.aw.qmc.timeindex[3] = 0
+                else:
+                    fceindex = self.aw.qmc.time2index(start + s)
+                    self.aw.qmc.timeindex[3] = max(0,fceindex)
+                self.Cendeditcopy = str(self.Cendedit.text())
+            except Exception: # pylint: disable=broad-except
+                pass # invalid input can make stringtoseconds fail
         if self.CCstarteditcopy != str(self.CCstartedit.text()):
-            s = stringtoseconds(str(self.CCstartedit.text()))
-            if s <= 0:
-                self.aw.qmc.timeindex[4] = 0
-            else:
-                scsindex = self.aw.qmc.time2index(start + s)
-                self.aw.qmc.timeindex[4] = max(0,scsindex)
-            self.CCstarteditcopy = str(self.CCstartedit.text())
+            try:
+                s = stringtoseconds(str(self.CCstartedit.text()))
+                if s <= 0:
+                    self.aw.qmc.timeindex[4] = 0
+                else:
+                    scsindex = self.aw.qmc.time2index(start + s)
+                    self.aw.qmc.timeindex[4] = max(0,scsindex)
+                self.CCstarteditcopy = str(self.CCstartedit.text())
+            except Exception: # pylint: disable=broad-except
+                pass # invalid input can make stringtoseconds fail
         if self.CCendeditcopy != str(self.CCendedit.text()):
-            s = stringtoseconds(str(self.CCendedit.text()))
-            if s <= 0:
-                self.aw.qmc.timeindex[5] = 0
-            elif stringtoseconds(str(self.CCendedit.text())) > 0:
-                sceindex = self.aw.qmc.time2index(start + s)
-                self.aw.qmc.timeindex[5] = max(0,sceindex)
-            self.CCendeditcopy = str(self.CCendedit.text())
+            try:
+                s = stringtoseconds(str(self.CCendedit.text()))
+                if s <= 0:
+                    self.aw.qmc.timeindex[5] = 0
+                elif stringtoseconds(str(self.CCendedit.text())) > 0:
+                    sceindex = self.aw.qmc.time2index(start + s)
+                    self.aw.qmc.timeindex[5] = max(0,sceindex)
+                self.CCendeditcopy = str(self.CCendedit.text())
+            except Exception: # pylint: disable=broad-except
+                pass # invalid input can make stringtoseconds fail
         if self.dropeditcopy != str(self.dropedit.text()):
-            s = stringtoseconds(str(self.dropedit.text()))
-            if s <= 0:
-                self.aw.qmc.timeindex[6] = 0
-            else:
-                dropindex = self.aw.qmc.time2index(start + s)
-                self.aw.qmc.timeindex[6] = max(0,dropindex)
-            self.dropeditcopy = str(self.dropedit.text())
+            try:
+                s = stringtoseconds(str(self.dropedit.text()))
+                if s <= 0:
+                    self.aw.qmc.timeindex[6] = 0
+                else:
+                    dropindex = self.aw.qmc.time2index(start + s)
+                    self.aw.qmc.timeindex[6] = max(0,dropindex)
+                self.dropeditcopy = str(self.dropedit.text())
+            except Exception: # pylint: disable=broad-except
+                pass # invalid input can make stringtoseconds fail
         if self.cooleditcopy != str(self.cooledit.text()):
-            s = stringtoseconds(str(self.cooledit.text()))
-            if s <= 0:
-                self.aw.qmc.timeindex[7] = 0
-            else:
-                coolindex = self.aw.qmc.time2index(start + s)
-                self.aw.qmc.timeindex[7] = max(0,coolindex)
-            self.cooleditcopy = str(self.cooledit.text())
+            try:
+                s = stringtoseconds(str(self.cooledit.text()))
+                if s <= 0:
+                    self.aw.qmc.timeindex[7] = 0
+                else:
+                    coolindex = self.aw.qmc.time2index(start + s)
+                    self.aw.qmc.timeindex[7] = max(0,coolindex)
+                self.cooleditcopy = str(self.cooledit.text())
+            except Exception: # pylint: disable=broad-except
+                pass # invalid input can make stringtoseconds fail
         if self.aw.qmc.phasesbuttonflag:
             # adjust phases by DryEnd and FCs events
             if self.aw.qmc.timeindex[1]:

@@ -19,7 +19,8 @@ import time as libtime
 import warnings
 import copy
 import numpy
-from typing import List, Tuple, Callable, Optional, TYPE_CHECKING
+import logging
+from typing import Final, List, Tuple, Callable, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
@@ -42,6 +43,8 @@ except ImportError:
     from PyQt5.QtWidgets import (QApplication, QHeaderView, QAbstractItemView, QWidget, QLabel, QLineEdit, QComboBox, QDialogButtonBox, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
                 QTableWidget, QTableWidgetItem, QGroupBox, QLayout, QHBoxLayout, QVBoxLayout, QFrame) # @UnusedImport @Reimport  @UnresolvedImport
 
+
+_log: Final[logging.Logger] = logging.getLogger(__name__)
 
 class MyQRegularExpressionValidator(QRegularExpressionValidator): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     # we fix partial time input like '12' => '12:00', '12:' => '12:00' and '12:0' => '12:00'
@@ -311,7 +314,10 @@ class profileTransformatorDlg(ArtisanDialog):
                 if w is not None:
                     txt = w.text()
                     if txt is not None and txt != '':
-                        ri = stringtoseconds(txt)
+                        try:
+                            ri = stringtoseconds(txt)
+                        except Exception as e: # pylint: disable=broad-except
+                            _log.error(e) # widget should not allow for malformed time string input on which stringtoseconds raises an exception
                 res_times.append(ri)
         if self.phases_target_widgets_percent is not None:
             for w in self.phases_target_widgets_percent:
@@ -332,7 +338,10 @@ class profileTransformatorDlg(ArtisanDialog):
                 if w is not None:
                     txt = w.text()
                     if txt is not None and txt != '':
-                        r = stringtoseconds(txt)
+                        try:
+                            r = stringtoseconds(txt)
+                        except Exception as e: # pylint: disable=broad-except
+                            _log.error(e) # widget should not allow for malformed time string input on which stringtoseconds raises an exception
                 res.append(r)
         return res
 
@@ -737,8 +746,11 @@ class profileTransformatorDlg(ArtisanDialog):
         drop_phases_target_widget_time = self.phases_target_widgets_time[2]
         drop_phases_target_widget_percent = self.phases_target_widgets_percent[2]
         if drop_phases_target_widget_time is not None and drop_phases_target_widget_time.text() != '':
-            drop = fcs + stringtoseconds(drop_phases_target_widget_time.text())
-            drop_set = True
+            try:
+                drop = fcs + stringtoseconds(drop_phases_target_widget_time.text())
+                drop_set = True
+            except Exception as e: # pylint: disable=broad-except
+                _log.error(e) # widget should not allow for malformed time string input on which stringtoseconds raises an exception
         elif drop_phases_target_widget_percent is not None and drop_phases_target_widget_percent.text() != '':
             drop = fcs + (float(drop_phases_target_widget_percent.text()) * drop / 100)
             drop_set = True
@@ -747,8 +759,11 @@ class profileTransformatorDlg(ArtisanDialog):
         dry_phases_target_widgets_time = self.phases_target_widgets_time[0]
         dry_phases_target_widgets_percent = self.phases_target_widgets_percent[0]
         if dry_phases_target_widgets_time is not None and dry_phases_target_widgets_time.text() != '':
-            dry = stringtoseconds(dry_phases_target_widgets_time.text())
-            dry_set = True
+            try:
+                dry = stringtoseconds(dry_phases_target_widgets_time.text())
+                dry_set = True
+            except Exception as e: # pylint: disable=broad-except
+                _log.error(e) # widget should not allow for malformed time string input on which stringtoseconds raises an exception
         elif dry_phases_target_widgets_percent is not None and dry_phases_target_widgets_percent.text() != '':
             dry = float(dry_phases_target_widgets_percent.text()) * drop / 100
             dry_set = True
@@ -757,8 +772,11 @@ class profileTransformatorDlg(ArtisanDialog):
         fcs_phases_target_widgets_time = self.phases_target_widgets_time[1]
         fcs_phases_target_widgets_percent = self.phases_target_widgets_percent[1]
         if fcs_phases_target_widgets_time is not None and fcs_phases_target_widgets_time.text() != '':
-            fcs = dry + stringtoseconds(fcs_phases_target_widgets_time.text())
-            fcs_set = True
+            try:
+                fcs = dry + stringtoseconds(fcs_phases_target_widgets_time.text())
+                fcs_set = True
+            except Exception as e: # pylint: disable=broad-except
+                _log.error(e) # widget should not allow for malformed time string input on which stringtoseconds raises an exception
         elif fcs_phases_target_widgets_percent is not None and fcs_phases_target_widgets_percent.text() != '':
             fcs = dry + (float(fcs_phases_target_widgets_percent.text()) * drop / 100)
             fcs_set = True
