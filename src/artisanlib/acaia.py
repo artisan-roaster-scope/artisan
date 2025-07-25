@@ -403,7 +403,7 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
             return None, False
 
     def update_weight(self, value:Optional[float], stable:Optional[bool] = False) -> None:
-        _log.debug('PRINT update_weight(%s,%s)', value, stable)
+#        _log.debug('PRINT update_weight(%s,%s)', value, stable)
         if value is not None and (not self.stable_only or stable):
             # convert the weight in g delivered with one decimal to an int
             value_rounded:float = float2float(value, self.decimals)
