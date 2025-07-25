@@ -126,7 +126,7 @@ class TestIteratorReader:
     async def test_init_stores_chunks_and_initializes_backlog(self) -> None:
         """Test that IteratorReader initializes correctly."""
 
-        async def mock_chunks() -> AsyncGenerator[bytes]:
+        async def mock_chunks() -> AsyncGenerator[bytes, None]:
             yield b'test'
 
         reader = IteratorReader(mock_chunks())
@@ -136,7 +136,7 @@ class TestIteratorReader:
     async def test_read_until_end_returns_all_content(self) -> None:
         """Test _read_until_end returns all available content."""
 
-        async def mock_chunks() -> AsyncGenerator[bytes]:
+        async def mock_chunks() -> AsyncGenerator[bytes, None]:
             yield b'chunk1'
             yield b'chunk2'
             yield b'chunk3'
@@ -151,7 +151,7 @@ class TestIteratorReader:
     async def test_read_until_end_includes_backlog(self) -> None:
         """Test _read_until_end includes existing backlog."""
 
-        async def mock_chunks() -> AsyncGenerator[bytes]:
+        async def mock_chunks() -> AsyncGenerator[bytes, None]:
             yield b'new_chunk'
 
         reader = IteratorReader(mock_chunks())
@@ -164,7 +164,7 @@ class TestIteratorReader:
     async def test_read_chunk_returns_exact_size(self) -> None:
         """Test _read_chunk returns exactly the requested size."""
 
-        async def mock_chunks() -> AsyncGenerator[bytes]:
+        async def mock_chunks() -> AsyncGenerator[bytes, None]:
             yield b'1234567890'
 
         reader = IteratorReader(mock_chunks())
@@ -177,7 +177,7 @@ class TestIteratorReader:
     async def test_read_chunk_handles_multiple_chunks(self) -> None:
         """Test _read_chunk can read across multiple chunks."""
 
-        async def mock_chunks() -> AsyncGenerator[bytes]:
+        async def mock_chunks() -> AsyncGenerator[bytes, None]:
             yield b'123'
             yield b'456'
             yield b'789'
@@ -192,7 +192,7 @@ class TestIteratorReader:
     async def test_readexactly_with_positive_size(self) -> None:
         """Test readexactly with positive size calls _read_chunk."""
 
-        async def mock_chunks() -> AsyncGenerator[bytes]:
+        async def mock_chunks() -> AsyncGenerator[bytes, None]:
             yield b'test_data'
 
         reader = IteratorReader(mock_chunks())
@@ -204,7 +204,7 @@ class TestIteratorReader:
     async def test_readexactly_with_minus_one_reads_all(self) -> None:
         """Test readexactly with -1 reads all content."""
 
-        async def mock_chunks() -> AsyncGenerator[bytes]:
+        async def mock_chunks() -> AsyncGenerator[bytes, None]:
             yield b'all_content'
 
         reader = IteratorReader(mock_chunks())
@@ -216,7 +216,7 @@ class TestIteratorReader:
     async def test_readexactly_with_zero_returns_empty(self) -> None:
         """Test readexactly with 0 returns empty bytes."""
 
-        async def mock_chunks() -> AsyncGenerator[bytes]:
+        async def mock_chunks() -> AsyncGenerator[bytes, None]:
             yield b'ignored'
 
         reader = IteratorReader(mock_chunks())
@@ -228,7 +228,7 @@ class TestIteratorReader:
     async def test_readuntil_finds_separator(self) -> None:
         """Test readuntil finds and returns the separator."""
 
-        async def mock_chunks() -> AsyncGenerator[bytes]:
+        async def mock_chunks() -> AsyncGenerator[bytes, None]:
             yield b'a'
             yield b'b'
             yield b'\n'
@@ -243,7 +243,7 @@ class TestIteratorReader:
     async def test_readuntil_with_empty_separator_returns_immediately(self) -> None:
         """Test readuntil with empty separator returns immediately."""
 
-        async def mock_chunks() -> AsyncGenerator[bytes]:
+        async def mock_chunks() -> AsyncGenerator[bytes, None]:
             yield b'test'
 
         reader = IteratorReader(mock_chunks())
@@ -492,7 +492,7 @@ class TestAsyncCommEdgeCases:
     async def test_iterator_reader_with_empty_chunks(self) -> None:
         """Test IteratorReader handles empty chunks gracefully."""
 
-        async def mock_chunks() -> AsyncGenerator[bytes]:
+        async def mock_chunks() -> AsyncGenerator[bytes, None]:
             yield b''
             yield b'data'
             yield b''
