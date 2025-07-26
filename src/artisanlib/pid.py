@@ -31,6 +31,7 @@ try:
 except ImportError:
     from PyQt5.QtCore import QSemaphore # type: ignore # @Reimport @UnresolvedImport @UnusedImport
 
+
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 
@@ -78,6 +79,7 @@ class PID:
         'setpoint_change_threshold',
         'integral_reset_on_setpoint_change',
         'back_calculation_factor',
+        'integral_just_reset',
     ]
 
     def __init__(
@@ -115,7 +117,7 @@ class PID:
         )
         self.target: float = 0.0
         self.active: bool = False  # if active, the control function is called with the PID results
-        self.derivative_on_error = False  # if False => derivative_on_measurement (avoids the Derivative Kick on changing the target)
+        self.derivative_on_error: bool = False  # if False => derivative_on_measurement (avoids the Derivative Kick on changing the target)
         # PID output smoothing
         self.output_smoothing_factor: int = 0  # off if 0
         self.output_decay_weights: Optional[List[float]] = None
@@ -136,7 +138,7 @@ class PID:
 
         # Enhanced derivative kick prevention
         self.lastTarget: float = 0.0  # Track target changes
-        self.derivative_limit: float = 100.0  # Limit derivative contribution
+        self.derivative_limit: float = 80.0  # Limit derivative contribution
         self.measurement_history: List[float] = (
             []
         )  # Track recent measurements for discontinuity detection
@@ -145,11 +147,14 @@ class PID:
         # Enhanced integral windup prevention
         self.integral_windup_prevention: bool = True  # Enable advanced windup prevention
         self.integral_limit_factor: float = 0.8  # Limit integral to 80% of output range
-        self.setpoint_change_threshold: float = 5.0  # Threshold for significant setpoint changes
+        self.setpoint_change_threshold: float = 25.0  # Threshold for significant setpoint changes
         self.integral_reset_on_setpoint_change: bool = (
             True  # Reset integral on large setpoint changes
         )
         self.back_calculation_factor: float = 0.5  # Back-calculation adjustment factor
+        self.integral_just_reset: bool = (
+            False  # Flag to prevent integration immediately after reset
+        )
 
     def _smooth_output(self, output: float) -> float:
         # create or update smoothing decay weights
@@ -244,8 +249,14 @@ class PID:
         if not self.integral_windup_prevention:
             return True
 
+        # Don't integrate immediately after integral was reset due to large setpoint change
+        if self.integral_just_reset:
+            return False
+
         # Don't integrate if output is saturated and error would make it worse
-        return not (output_before_clamp > self.outMax and error > 0) and not (output_before_clamp < self.outMin and error < 0)
+        return not (output_before_clamp > self.outMax and error > 0) and not (
+            output_before_clamp < self.outMin and error < 0
+        )
 
     def _calculate_integral_limits(self) -> Tuple[float, float]:
         """Calculate dynamic integral limits based on output range."""
@@ -276,6 +287,7 @@ class PID:
         if abs(setpoint_change) > self.setpoint_change_threshold:
             # Large setpoint change - reset integral term
             self.Iterm = 0.0
+            self.integral_just_reset = True  # Prevent integration this cycle
         elif abs(setpoint_change) > self.setpoint_change_threshold * 0.5:
             # Moderate setpoint change - reduce integral term
             self.Iterm *= 0.5
@@ -345,7 +357,7 @@ class PID:
                 self.lastTime = now
                 self.lastError = err
                 self.lastInput = i
-            elif (dt := now - self.lastTime) > 0.2:
+            elif (dt := now - self.lastTime) > 0.1:
                 # Update measurement history for discontinuity detection
                 self._update_measurement_history(i)
 
@@ -362,10 +374,6 @@ class PID:
 
                 derr = (err - self.lastError) / dt
 
-                self.lastTime = now
-                self.lastError = err
-                self.lastInput = i
-
                 # compute P-Term first (needed for saturation check)
                 self.Pterm = self.Kp * err
 
@@ -381,6 +389,9 @@ class PID:
                     integral_min, integral_max = self._calculate_integral_limits()
                     self.Iterm = max(integral_min, min(integral_max, self.Iterm))
 
+                # Clear the integral reset flag after processing
+                self.integral_just_reset = False
+
                 # compute D-Term with enhanced derivative kick prevention
                 D: float
                 if self.derivative_on_error:
@@ -391,6 +402,10 @@ class PID:
                 else:
                     # Use enhanced derivative-on-measurement calculation
                     D = self._calculate_derivative_on_measurement(i, dt)
+
+                self.lastTime = now
+                self.lastError = err
+                self.lastInput = i
 
                 if self.derivative_filter_level > 0:
                     D = self.derivative_filter(D)
@@ -436,7 +451,7 @@ class PID:
         self.init()
 
     # re-initalize the PID on restarting it after a temporary off state
-    def init(self, lock:bool = True) -> None:
+    def init(self, lock: bool = True) -> None:
         try:
             if lock:
                 self.pidSemaphore.acquire(1)
@@ -466,6 +481,9 @@ class PID:
             self.lastTarget = self.target
             self.measurement_history = []
             self.setpoint_changed = False
+
+            # Reset integral windup prevention state
+            self.integral_just_reset = False
 
             # Note: Integral windup prevention settings are not reset as they are configuration
         finally:
@@ -585,13 +603,13 @@ class PID:
             if self.pidSemaphore.available() < 1:
                 self.pidSemaphore.release(1)
 
-    def getDerivativeLimit(self) -> float:
+    def getDerivativeLimit(self) -> float: # pyrefly: ignore[bad-return]
         """Get the current derivative limit."""
         try:
             self.pidSemaphore.acquire(1)
             return self.derivative_limit
         except Exception:  # pylint: disable=broad-except
-            return 100.0  # Default value
+            return 80.0  # Default value
         finally:
             if self.pidSemaphore.available() < 1:
                 self.pidSemaphore.release(1)
@@ -605,11 +623,51 @@ class PID:
             if self.pidSemaphore.available() < 1:
                 self.pidSemaphore.release(1)
 
-    def getIntegralWindupPrevention(self) -> bool:
+    def getIntegralWindupPrevention(self) -> bool:  # pyrefly: ignore[bad-return]
         """Get the current integral windup prevention setting."""
         try:
             self.pidSemaphore.acquire(1)
             return self.integral_windup_prevention
+        except Exception:  # pylint: disable=broad-except
+            return True  # Default value
+        finally:
+            if self.pidSemaphore.available() < 1:
+                self.pidSemaphore.release(1)
+
+    def setDerivativeOnError(self, enabled: bool) -> None:
+        """Enable or disable derivative on error (instead of derivative on measurement)"""
+        try:
+            self.pidSemaphore.acquire(1)
+            self.derivative_on_error = enabled
+        finally:
+            if self.pidSemaphore.available() < 1:
+                self.pidSemaphore.release(1)
+
+    def getDerivativeOnError(self) -> bool:  # pyrefly: ignore[bad-return]
+        """Get the current derivative on error setting."""
+        try:
+            self.pidSemaphore.acquire(1)
+            return self.derivative_on_error
+        except Exception:  # pylint: disable=broad-except
+            return True  # Default value
+        finally:
+            if self.pidSemaphore.available() < 1:
+                self.pidSemaphore.release(1)
+
+    def setIntegralResetOnSP(self, enabled: bool) -> None:
+        """Enable or integral reset on SP"""
+        try:
+            self.pidSemaphore.acquire(1)
+            self.integral_reset_on_setpoint_change = enabled
+        finally:
+            if self.pidSemaphore.available() < 1:
+                self.pidSemaphore.release(1)
+
+    def getIntegralResetOnSP(self) -> bool:  # pyrefly: ignore[bad-return]
+        """Get the current integral reset on SP setting."""
+        try:
+            self.pidSemaphore.acquire(1)
+            return self.integral_reset_on_setpoint_change
         except Exception:  # pylint: disable=broad-except
             return True  # Default value
         finally:
@@ -625,7 +683,7 @@ class PID:
             if self.pidSemaphore.available() < 1:
                 self.pidSemaphore.release(1)
 
-    def getIntegralLimitFactor(self) -> float:
+    def getIntegralLimitFactor(self) -> float:  # pyrefly: ignore[bad-return]
         """Get the current integral limit factor."""
         try:
             self.pidSemaphore.acquire(1)
@@ -645,7 +703,7 @@ class PID:
             if self.pidSemaphore.available() < 1:
                 self.pidSemaphore.release(1)
 
-    def getSetpointChangeThreshold(self) -> float:
+    def getSetpointChangeThreshold(self) -> float: # pyrefly: ignore[bad-return]
         """Get the current setpoint change threshold."""
         try:
             self.pidSemaphore.acquire(1)

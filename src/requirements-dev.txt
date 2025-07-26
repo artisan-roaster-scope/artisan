@@ -19,12 +19,12 @@ pre-commit>=4.2.0
 pytest>=8.4.1
 pytest-cov==6.2.1
 pytest-asyncio==1.1.0
+pytest-mock==3.14.1
 #pytest-qt==4.4.0
 #pytest-xvfb==3.0.0
 #PyVirtualDisplay==3.0
 #pytest-bdd==6.1.1
 #pytest-benchmark==4.0.0
-#pytest-mock==3.11.1
 hypothesis>=6.136.4
 coverage>=7.10.0
 coverage-badge==1.1.2

@@ -15,7 +15,7 @@ v3.2.1
   - adds support for [Easyster Smart](https://artisan-scope.org/machines/easyster/), legacy [Proaster](https://artisan-scope.org/machines/proaster/) THCR-01A as well as Easyster/Proaster machines with air pressure sensor
   - adds support for [Toper roasting machines](https://artisan-scope.org/machines/toper/) with PLC and touch screen produced after 2025 supporting burner, airflow, and drum speed control
   - extended setups for [Sweet Coffee Italia Gemma_2IND and Gemma_6-8IND machines](https://artisan-scope.org/machines/sci/)
-  - adds batch-conversion from Cropster XLS, Giesen CSV, IKAWA CSV, Loring CSV, Petroncini CSV, ROEST CSV, Rubase CSV, and Stronghold XLSX profiles to Artisan `.alog` profiles
+  - adds batch conversion from Cropster XLS, Giesen CSV, IKAWA CSV, Loring CSV, Petroncini CSV, ROEST CSV, Rubase CSV, and Stronghold XLSX profiles to Artisan `.alog` profiles
   - adds drag-and-drop import of a Artisan JSON, Cropster XLS, Giesen CSV and Stronghold XLSX profiles
   - adds Artisan Command `slider(<int>, <bool>)` to hide/show sliders
 
@@ -26,7 +26,9 @@ v3.2.1
   - palette load uses and updates the user selected profile path
   - increases the maximum number of recent roast entries from 25 to 40
   - makes synchronization of main events with Kaleido and Santoker roasting machines configurable (disabled by default)
+  - updates internal PID by adding Advanced Integral Windup Prevention, derivative on measurement calculation (DoM), measurement discontinuity detection, derivative limiting and enhanced setpoint change detection to prevent the derivative kicks and spikes
   - updates libs (scipy, bleak, lxml, pillow)
+  - expanse automatic test coverage
 
 * FIXES
   - fixes regression which broke the designer such that points could not be moved ([Discussion #1905](../../../discussions/1905) and [Issue #1916](../../../issues/1916))

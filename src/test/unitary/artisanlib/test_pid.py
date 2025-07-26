@@ -57,7 +57,7 @@ class TestPIDInitialization:
         assert pid.errSum == 0.0
         assert pid.Iterm == 0.0
         assert pid.lastError is None
-        assert pid.lastInput == None
+        assert pid.lastInput is None
         assert pid.lastOutput is None
         assert pid.lastTime is None
         assert pid.lastDerr == 0.0
@@ -379,7 +379,7 @@ class TestPIDControlLoop:
     def test_update_integral_term_calculation(self) -> None:
         """Test integral term calculation."""
         pid = PID(i=0.1)
-        pid.target = 100.0
+        pid.setTarget(100.0)  # Use setTarget instead of direct assignment
 
         # Initialize
         with patch('time.time', return_value=1000.0):
@@ -644,9 +644,9 @@ class TestPIDResetAndInitialization:
         # All state should be reset
         assert pid.errSum == 0.0
         assert pid.lastError == 0.0
-        assert pid.lastInput == None
-        assert pid.lastTime is None
-        assert pid.lastDerr == 0.0  # type: ignore[unreachable]
+        assert pid.lastInput is None
+        assert pid.lastTime is None  # type: ignore[unreachable]
+        assert pid.lastDerr == 0.0
         assert pid.Pterm == 0.0
         assert pid.Iterm == 0.0
         assert pid.lastOutput is None
@@ -987,7 +987,7 @@ class TestPIDDerivativeKickImprovements:
         """Test that derivative limit is properly initialized."""
         pid = PID()
 
-        assert pid.derivative_limit == 100.0
+        assert pid.derivative_limit == 80.0
         assert pid.lastTarget == 0.0
         assert pid.measurement_history == []
         assert pid.setpoint_changed is False
@@ -1012,7 +1012,7 @@ class TestPIDDerivativeKickImprovements:
 
         with patch.object(pid.pidSemaphore, 'acquire', side_effect=Exception('Test exception')):
             result = pid.getDerivativeLimit()
-            assert result == 100.0  # Default value
+            assert result == 80.0  # Default value
 
     def test_measurement_history_tracking(self) -> None:
         """Test that measurement history is properly tracked."""
@@ -1196,7 +1196,7 @@ class TestPIDIntegralWindupImprovements:
 
         assert pid.integral_windup_prevention is True
         assert pid.integral_limit_factor == 0.8
-        assert pid.setpoint_change_threshold == 5.0
+        assert pid.setpoint_change_threshold == 25.0
         assert pid.integral_reset_on_setpoint_change is True
         assert pid.back_calculation_factor == 0.5
 
@@ -1414,6 +1414,10 @@ class TestPIDIntegralWindupImprovements:
 
         # Large setpoint change
         pid.setTarget(80.0, init=False)  # 30 unit change > threshold
+
+        # Need to call update() to trigger setpoint change detection
+        with patch('time.time', return_value=1002.0):
+            pid.update(32.0)
 
         # Integral should be reset due to large setpoint change
         assert pid.Iterm == pytest.approx(0.0, abs=1e-10)

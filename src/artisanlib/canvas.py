@@ -13081,8 +13081,9 @@ class tgraphcanvas(FigureCanvas):
                         self.ambiThread.finished.connect(self.ambiThread.deleteLater)
                         self.ambiThread.start()
 
-            # warm up software PID (write current p-i-d settings,..)
-            self.aw.pidcontrol.confSoftwarePID()
+            # warm up software PID (write current p-i-d settings,..) configured
+            if self.aw.pidcontrol.externalPIDControl() == 0  and self.Controlbuttonflag:
+                self.aw.pidcontrol.confSoftwarePID()
 
             # ADD DEVICE:
             if not bool(self.aw.simulator):
