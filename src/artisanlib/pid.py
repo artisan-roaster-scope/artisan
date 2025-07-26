@@ -110,7 +110,7 @@ class PID:
     def on(self) -> None:
         try:
             self.pidSemaphore.acquire(1)
-#            self.init() # we keep the PID running always, even if inactive, and do not disturb it with an init on switching it active
+#            self.init(lock=False) # we keep the PID running always, even if inactive, and do not disturb it with an init on switching it active
             self.lastOutput = None # this ensures that the next update sends a control output
             self.active = True
         finally:
@@ -206,7 +206,10 @@ class PID:
                 int_output = int(round(min(float(self.dutyMax), max(float(self.dutyMin), output))))
                 if self.lastOutput is None or self.iterations_since_duty >= self.force_duty or int_output >= self.lastOutput + self.dutySteps or int_output <= self.lastOutput - self.dutySteps:
                     if self.active:
-                        self.control(int_output)
+                        try:
+                            self.control(int_output)
+                        except Exception as e:
+                            _log.error(e)
                         self.iterations_since_duty = 0
                     self.lastOutput = output # kept to initialize Iterm on reactivating the PID
                 self.iterations_since_duty += 1
@@ -221,9 +224,10 @@ class PID:
         self.init()
 
     # re-initalize the PID on restarting it after a temporary off state
-    def init(self) -> None:
+    def init(self, lock:bool = True) -> None:
         try:
-            self.pidSemaphore.acquire(1)
+            if lock:
+                self.pidSemaphore.acquire(1)
             # reset the derivative filter on each filter level change (also on PID ON)
             self.derivative_filter = self.derivativeFilter()
             self.errSum = 0.0
@@ -254,7 +258,7 @@ class PID:
             self.pidSemaphore.acquire(1)
             self.target = target
             if init:
-                self.init()
+                self.init(lock=False)
         finally:
             if self.pidSemaphore.available() < 1:
                 self.pidSemaphore.release(1)

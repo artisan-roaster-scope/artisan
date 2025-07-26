@@ -2682,9 +2682,9 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                 # take new item (but merge completed items)
                 if idx_existing_item is not None:
                     # remember existing item
-                    existing_item = current_schedule[idx_existing_item]
+                    existing_item = current_schedule[idx_existing_item] # pyrefly: ignore[index-error]
                     # replace the current item with the updated one from the server
-                    current_schedule[idx_existing_item] = schedule_item
+                    current_schedule[idx_existing_item] = schedule_item # pyrefly: ignore[unsupported-operation]
                     # merge the completed roasts and set them to the newly received item
                     schedule_item.roasts.update(existing_item.roasts)
                     # if all done, remove that item as it is completed
@@ -2805,7 +2805,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                         if 'ratio_denom' in i and i['ratio_denom'] is not None:
                             entry['ratio_denom'] = i['ratio_denom']
                         ingredients.append(entry)
-                    self.aw.qmc.plus_blend_spec['ingredients'] = ingredients
+                    self.aw.qmc.plus_blend_spec['ingredients'] = ingredients # pyrefly: ignore[unsupported-operation]
                     # set beans description
                     blend_lines = plus.stock.blend2beans(blend_structure, weight_unit_idx, self.aw.qmc.weight[0])
                     self.aw.qmc.beans = '\n'.join(blend_lines)

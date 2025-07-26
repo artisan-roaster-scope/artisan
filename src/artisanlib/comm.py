@@ -6718,7 +6718,7 @@ class serialport:
         try:
             run = 1
             counter = 0
-            while run:
+            while run: # pyrefly: ignore[redundant-condition]
 
                 #MaWa
                 #really interesting:

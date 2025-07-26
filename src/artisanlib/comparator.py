@@ -470,8 +470,8 @@ class RoastProfile:
             for i,e in enumerate(self.specialevents):
                 try:
                     etime:float = self.timex[e]
-                    etype:float = self.specialeventstype[i]  # pyrefly: ignore[bad-specialization]
-                    evalue:float = self.aw.qmc.eventsInternal2ExternalValue(self.specialeventsvalue[i]) * value_factor + value_offset # pyrefly: ignore[bad-specialization]
+                    etype:float = self.specialeventstype[i]  # pyrefly: ignore[unsupported-operation]
+                    evalue:float = self.aw.qmc.eventsInternal2ExternalValue(self.specialeventsvalue[i]) * value_factor + value_offset # pyrefly: ignore[unsupported-operation]
                     # remember last event value per type before CHARGE
                     if (not self.aw.qmc.compareBBP and self.timeindex[0] != -1 and e < self.timeindex[0]):
                         if etype == 0:

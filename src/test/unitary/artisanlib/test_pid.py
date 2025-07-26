@@ -166,12 +166,12 @@ class TestPIDParameterSetters:
         assert pid.Ki == 0.0
         assert pid.Kd == 0.0
 
-#    def test_setTarget_updates_target(self) -> None:
-#        """Test that setTarget updates the target value."""
-#        pid = PID()
-#
-#        pid.setTarget(100.0)
-#        assert pid.target == 100.0
+    def test_setTarget_updates_target(self) -> None:
+        """Test that setTarget updates the target value."""
+        pid = PID()
+
+        pid.setTarget(100.0)
+        assert pid.target == 100.0
 
     def test_getTarget_returns_target(self) -> None:
         """Test that getTarget returns the current target."""
@@ -672,15 +672,15 @@ class TestPIDResetAndInitialization:
         # Filter should be reset (new instance)
         assert pid.derivative_filter is not original_filter
 
-#    def test_setTarget_with_init(self) -> None:
-#        """Test setTarget with initialization."""
-#        pid = PID()
-#        pid.Iterm = 50.0  # Set some state
-#
-#        pid.setTarget(200.0, init=True)
-#
-#        assert pid.target == 200.0
-#        assert pid.Iterm == 0.0  # Should be reset
+    def test_setTarget_with_init(self) -> None:
+        """Test setTarget with initialization."""
+        pid = PID()
+        pid.Iterm = 50.0  # Set some state
+
+        pid.setTarget(200.0, init=True)
+
+        assert pid.target == 200.0
+        assert pid.Iterm == 0.0  # Should be reset
 
     def test_setTarget_without_init(self) -> None:
         """Test setTarget without initialization."""
@@ -864,18 +864,18 @@ class TestPIDEdgeCasesAndBoundaryConditions:
 
         # Should handle large smoothing factors
 
-#    def test_concurrent_access_simulation(self) -> None:
-#        """Test simulation of concurrent access to PID methods."""
-#        pid = PID()
-#
-#        # Simulate concurrent calls (though actual threading would be needed for real test)
-#        pid.on()
-#        pid.setPID(1.0, 0.1, 0.01)
-#        pid.setTarget(100.0)
-#        pid.update(50.0)
-#        pid.off()
-#
-#        # Should handle sequential calls without issues
+    def test_concurrent_access_simulation(self) -> None:
+        """Test simulation of concurrent access to PID methods."""
+        pid = PID()
+
+        # Simulate concurrent calls (though actual threading would be needed for real test)
+        pid.on()
+        pid.setPID(1.0, 0.1, 0.01)
+        pid.setTarget(100.0)
+        pid.update(50.0)
+        pid.off()
+
+        # Should handle sequential calls without issues
 
     def test_exception_handling_in_update(self) -> None:
         """Test exception handling in update method."""

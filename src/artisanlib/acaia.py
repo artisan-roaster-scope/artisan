@@ -317,7 +317,11 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
         else: #connected_service_UUID == ACAIA_SERVICE_UUID:
             _log.debug('connected to Acaia Scale (%s)', connected_device_name)
             self.scale_class = SCALE_CLASS.MODERN
-            self.set_heartbeat(0) # disable heartbeat
+            # in principle the heartbeat on those newer scales with newer firmwares is not needed
+            # but it seems to be needed at least on Pearl 2021 as in some cases (1 of 5) the scale stops sending ID events on connect
+            # and thus never gets configured (slow/fast notifications) and thus sends weight messages
+            # to be on the safe side we keep sending the heartbeat for those scales
+            self.set_heartbeat(self.HEARTBEAT_FREQUENCY)
 
             if connected_device_name is not None:
                 if connected_device_name.startswith(('PYXIS', 'CINCO')):
@@ -742,11 +746,11 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
     def send_tare(self) -> None:
         _log.debug('send tare')
 # not needed any longer as in non-streaming mode the tare weight is always send after tare
-#        if SCALE_CLASS.RELAY:
+#        if self.scale_class == SCALE_CLASS.RELAY:
 #            self.streaming_notifications()
         self.send_message(MSG.TARE,b'\x00')
 # not needed any longer as in non-streaming mode the tare weight is always send after tare
-#        if SCALE_CLASS.RELAY:
+#        if self.scale_class == SCALE_CLASS.RELAY:
 #            self.changes_notifications()
 
     def send_get_settings(self) -> None:
@@ -792,11 +796,11 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
                     0])) # only SCALE_CLASS.RELAY # 0: only weight changes are reported; 1: streaming weight changes at 1/10
 
     def slow_notifications(self) -> None:
-#        _log.debug('slow notifications')
+        _log.debug('slow notifications')
         self.send_event(
             bytes([ # pairs of key/setting
                     0,  # weight id
-                    (0 if SCALE_CLASS.RELAY # 0: only weight changes are reported; 1: streaming weight changes at 1/10
+                    (0 if self.scale_class == SCALE_CLASS.RELAY # 0: only weight changes are reported; 1: streaming weight changes at 1/10
                      else 3), # 0, 1, 3, 5, 7, 15, 31, 63, 127  # weight argument (speed of notifications in 1/10 sec; 0:  report changes in weight every 1/10)
                         # 5 or 7 seems to be good values for this app in Artisan
 #                    1,   # battery id
@@ -810,11 +814,11 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
         self.slow_notifications_sent = True
 
     def fast_notifications(self) -> None:
-#        _log.debug('fast notifications')
+        _log.debug('fast notifications')
         self.send_event(
             bytes([ # pairs of key/setting
                     0,  # weight id
-                    (1 if SCALE_CLASS.RELAY # 0: only weight changes are reported; 1: streaming weight changes at 1/10
+                    (1 if self.scale_class == SCALE_CLASS.RELAY # 0: only weight changes are reported; 1: streaming weight changes at 1/10
                      else 1),  # 0, 1, 3, 5, 7, 15, 31, 63, 127  # weight argument (speed of notifications in 1/10 sec) # larger values => slower updates
                         # 5 or 7 seems to be good values for this app in Artisan
 #                    1,   # battery id

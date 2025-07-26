@@ -2539,7 +2539,7 @@ class tgraphcanvas(FigureCanvas):
     def ax_lines_clear(self) -> None:
         if self.ax is not None:
             while len(self.ax.lines) > 0:
-                self.ax.lines[0].remove()
+                self.ax.lines[0].remove() # pyrefly: ignore[index-error]
 
     def ax_combo_text_annotations_clear(self) -> None:
         if self.ax is not None:
@@ -4405,7 +4405,7 @@ class tgraphcanvas(FigureCanvas):
         tx_lin = numpy.flip(numpy.arange(tx_org[-1],tx_org[-1]-l*d,-d), axis=0) # by construction, len(tx_lin)=len(tx_org)=l
         temp_trail_re = numpy.interp(tx_lin, tx_org, temp_trail) # resample data into that linear spaced time
         try:
-            return float(numpy.average(temp_trail_re[-len(decay_weights):],axis=0,weights=decay_weights[-l:])) # ty: ignore[non-subscriptable] # len(decay_weights)>len(temp_trail_re)=l is possible
+            return float(numpy.average(temp_trail_re[-len(decay_weights):],axis=0,weights=decay_weights[-l:])) # pyrefly: ignore[index-error] # ty: ignore[non-subscriptable] # len(decay_weights)>len(temp_trail_re)=l is possible
         except Exception: # pylint: disable=broad-except
             # in case something goes very wrong we at least return the standard average over temp, this should always work as len(tx)=len(temp)
             return float(numpy.average(tx_org, numpy.array(temp_trail)))
@@ -6384,7 +6384,7 @@ class tgraphcanvas(FigureCanvas):
                             # projection extended to the plots current endofx
                             left = now
                             right = max(left, xlim_right + charge) # never have the right point be left of left;)
-                            BTprojection = self.ctemp2[-1] + self.unfiltereddelta2_pure[-1]*(right - left)/60. # pyrefly: ignore[bad-argument-type]
+                            BTprojection = self.ctemp2[-1] + self.unfiltereddelta2_pure[-1]*(right - left)/60. # pyrefly: ignore[unsupported-operation]
                             #plot projection
                             self.BTprojection_tx = [left,right]
                             self.BTprojection_temp = [self.ctemp2[-1], BTprojection] # pyrefly: ignore[bad-assignment]
@@ -6397,7 +6397,7 @@ class tgraphcanvas(FigureCanvas):
                             # projection extended to the plots current endofx
                             left = now
                             right = max(left,xlim_right + charge) # never have the right point be left of left;)
-                            ETprojection = self.ctemp1[-1] + self.unfiltereddelta1_pure[-1]*(right - left)/60. # pyrefly: ignore[bad-argument-type]
+                            ETprojection = self.ctemp1[-1] + self.unfiltereddelta1_pure[-1]*(right - left)/60. # pyrefly: ignore[unsupported-operation]
                             #plot projection
                             self.ETprojection_tx = [left,right]
                             self.ETprojection_temp = [self.ctemp1[-1], ETprojection] # pyrefly: ignore[bad-assignment]
@@ -6431,7 +6431,7 @@ class tgraphcanvas(FigureCanvas):
                             ypoints = [self.ctemp2[-1]]
                             delta_sec = self.unfiltereddelta2_pure[-1]/60
                             for _ in range(len(xpoints)-1):
-                                ypoints.append(ypoints[-1] + delta_sec*delay) # pyrefly: ignore[bad-argument-type]
+                                ypoints.append(ypoints[-1] + delta_sec*delay) # pyrefly: ignore[unsupported-operation]
                                 delta_sec = delta_sec + deltadelta_secsec*delay
                             #plot BT curve
                             self.BTprojection_tx = xpoints.tolist()
@@ -6457,7 +6457,7 @@ class tgraphcanvas(FigureCanvas):
                             ypoints = [self.ctemp1[-1]]
                             delta_sec = self.unfiltereddelta1_pure[-1]/60
                             for _ in range(len(xpoints)-1):
-                                ypoints.append(ypoints[-1] + delta_sec*delay) # pyrefly: ignore[bad-argument-type]
+                                ypoints.append(ypoints[-1] + delta_sec*delay) # pyrefly: ignore[unsupported-operation]
                                 delta_sec = delta_sec + deltadelta_secsec*delay
                             #plot ET curve
                             self.ETprojection_tx = xpoints.tolist()
@@ -6697,7 +6697,7 @@ class tgraphcanvas(FigureCanvas):
             # this evaluates to None before TP and 0 after the event
             try:
                 for v in ['pDRY','pFCs']:
-                    if len(sample_delta2) > 0 and len(sample_delta2)>0 and sample_delta2[-1] and sample_delta2[-1] > 0:  # pyrefly: ignore[bad-argument-type]
+                    if len(sample_delta2) > 0 and len(sample_delta2)>0 and sample_delta2[-1] and sample_delta2[-1] > 0:  # pyrefly: ignore[unsupported-operation]
                         mathdictionary[v] = 0
                         if v == 'pDRY':
                             if self.backgroundprofile is not None and self.timeindexB[1] and not self.autoDRYflag: # with AutoDRY, we always use the set DRY phase temperature as target
@@ -6705,7 +6705,7 @@ class tgraphcanvas(FigureCanvas):
                             else:
                                 drytarget = self.phases[1] # Drying max phases definition
                             if drytarget > sample_temp2[-1]:
-                                mathdictionary[v] = (drytarget - sample_temp2[-1])/(sample_delta2[-1]/60.) # pyrefly: ignore[bad-argument-type]
+                                mathdictionary[v] = (drytarget - sample_temp2[-1])/(sample_delta2[-1]/60.) # pyrefly: ignore[unsupported-operation]
                         elif v == 'pFCs':
                             # display expected time to reach FCs as defined in the background profile or the phases dialog
                             if self.backgroundprofile is not None and self.timeindexB[2]:
@@ -6713,7 +6713,7 @@ class tgraphcanvas(FigureCanvas):
                             else:
                                 fcstarget = self.phases[2] # FCs min phases definition
                             if fcstarget > sample_temp2[-1]:
-                                mathdictionary[v] = (fcstarget - sample_temp2[-1])/(sample_delta2[-1]/60.) # pyrefly: ignore[bad-argument-type]
+                                mathdictionary[v] = (fcstarget - sample_temp2[-1])/(sample_delta2[-1]/60.) # pyrefly: ignore[unsupported-operation]
                     else:
                         # if a prediction is not possible (before TP), we return the error value -1
                         mathdictionary[v] = -1
@@ -6737,7 +6737,7 @@ class tgraphcanvas(FigureCanvas):
                     if idx > -1: # we passed the AUCbegin event
                         mathdictionary['AUCbase'] = sample_temp2[idx]
                     else:
-                        mathdictionary['AUCbase'] = None # Event not set yet, no AUCbase # pyrefly: ignore[bad-argument-type]
+                        mathdictionary['AUCbase'] = None # Event not set yet, no AUCbase # pyrefly: ignore[unsupported-operation]
                 else:
                     mathdictionary['AUCbase'] = self.AUCbase
                 if self.AUCtargetFlag and self.backgroundprofile is not None and self.AUCbackground > 0:
@@ -6957,7 +6957,7 @@ class tgraphcanvas(FigureCanvas):
                                     #no shift
                                     elif mathexpression[i+k+1] == '1':
                                         if k == 0:
-                                            mathdictionary['R1'] = sample_delta1[index] # pyrefly: ignore[bad-argument-type]
+                                            mathdictionary['R1'] = sample_delta1[index] # pyrefly: ignore[unsupported-operation]
                                         else:
                                             #if sampling
                                             if RTsname is not None and RTsname != '':
@@ -6966,7 +6966,7 @@ class tgraphcanvas(FigureCanvas):
                                                 idx = index
                                             # the index is resolved relative to the time of the foreground profile if available
                                             if not sample_timex:
-                                                mathdictionary['RB1'] = self.delta1B[idx] # pyrefly: ignore[bad-argument-type]
+                                                mathdictionary['RB1'] = self.delta1B[idx] # pyrefly: ignore[unsupported-operation]
                                             else:
                                                 if RTsname is not None and RTsname != '':
                                                     if len(sample_timex)>2:
@@ -6981,10 +6981,10 @@ class tgraphcanvas(FigureCanvas):
                                                     res = self.delta1B[idx]
                                                 else:
                                                     res = -1
-                                                mathdictionary['RB1'] = res # pyrefly: ignore[bad-argument-type]
+                                                mathdictionary['RB1'] = res # pyrefly: ignore[unsupported-operation]
                                     elif mathexpression[i+k+1] == '2':
                                         if k == 0:
-                                            mathdictionary['R2'] = sample_delta2[index] # pyrefly: ignore[bad-argument-type]
+                                            mathdictionary['R2'] = sample_delta2[index] # pyrefly: ignore[unsupported-operation]
                                         else:
                                             if RTsname is not None and RTsname != '':
                                                 idx = index + 1
@@ -6992,7 +6992,7 @@ class tgraphcanvas(FigureCanvas):
                                                 idx = index
                                             # the index is resolved relative to the time of the foreground profile if available
                                             if not sample_timex:
-                                                mathdictionary['RB2'] = self.delta2B[idx] # pyrefly: ignore[bad-argument-type]
+                                                mathdictionary['RB2'] = self.delta2B[idx] # pyrefly: ignore[unsupported-operation]
                                             else:
                                                 if RTsname is not None and RTsname != '':
                                                     if len(sample_timex)>2:
@@ -7007,7 +7007,7 @@ class tgraphcanvas(FigureCanvas):
                                                     res = self.delta2B[idx]
                                                 else:
                                                     res = -1
-                                                mathdictionary['RB2'] = res # pyrefly: ignore[bad-argument-type]
+                                                mathdictionary['RB2'] = res # pyrefly: ignore[unsupported-operation]
                         except Exception: # pylint: disable=broad-except
                             # if deltas of backgrounds are not visible the data is not calculated and thus this fails with an exception
                             pass
@@ -8090,7 +8090,7 @@ class tgraphcanvas(FigureCanvas):
                     result:List[float] = []
                     # ignore -1 readings in averaging and ensure a good ramp
                     for i, v in enumerate(b): # ty: ignore[invalid-argument-type] # pyrefly: ignore [bad-argument-type]
-                        seq = b[max(0,i-window_len + 1):i+1] # ty: ignore[possibly-unbound-implicit-call, non-subscriptable]
+                        seq = b[max(0,i-window_len + 1):i+1] # ty: ignore[possibly-unbound-implicit-call, non-subscriptable] # pyrefly: ignore[index-error]
                         w = decay_weights_internal[max(0,window_len-len(seq)):]  # preCond: len(decay_weights_internal)=window_len and len(seq) <= window_len; postCond: len(w)=len(seq)
                         if len(w) == 0:
                             # we don't average if there is are no weights (e.g. if the original seq did only contain -1 values and got empty)
@@ -9238,7 +9238,7 @@ class tgraphcanvas(FigureCanvas):
                                 titleB = self.titleB
                             else:
                                 titleB = f'{self.roastbatchprefixB}{self.roastbatchnrB} {self.titleB}'
-                        elif __release_sponsor_domain__:
+                        elif __release_sponsor_domain__ != '':
                             sponsor = QApplication.translate('About','sponsored by {}').format(__release_sponsor_domain__)
                             titleB = f'\n{sponsor}'
 
@@ -12670,15 +12670,15 @@ class tgraphcanvas(FigureCanvas):
                 #annotate labels
                 self.flavorchart_labels = []
                 for i in range(len(self.flavorlabels)):
-                    if self.flavorchart_angles[i] > 2.*pi or self.flavorchart_angles[i] < 0.: # pyrefly: ignore[bad-specialization]
-                        _,self.flavorchart_angles[i] = divmod(self.flavorchart_angles[i],(2.*pi)) # pyrefly: ignore[bad-specialization]
-                    if self.flavorchart_angles[i] <= (pi/2.) or self.flavorchart_angles[i] >= (1.5*pi): #if < 90 or smaller than 270 degrees # pyrefly: ignore[bad-specialization]
+                    if self.flavorchart_angles[i] > 2.*pi or self.flavorchart_angles[i] < 0.: # pyrefly: ignore[unsupported-operation]
+                        _,self.flavorchart_angles[i] = divmod(self.flavorchart_angles[i],(2.*pi)) # pyrefly: ignore[unsupported-operation]
+                    if self.flavorchart_angles[i] <= (pi/2.) or self.flavorchart_angles[i] >= (1.5*pi): #if < 90 or smaller than 270 degrees # pyrefly: ignore[unsupported-operation]
                         ha = 'left'
                     else:
                         ha = 'right'
-                    anno = self.ax1.annotate(self.flavorChartLabelText(i),xy =(self.flavorchart_angles[i],.9),  # pyrefly: ignore[bad-specialization]
+                    anno = self.ax1.annotate(self.flavorChartLabelText(i),xy =(self.flavorchart_angles[i],.9),  # pyrefly: ignore[unsupported-operation]
                                         fontproperties=fontprop_small,
-                                        xytext=(self.flavorchart_angles[i],1.1),horizontalalignment=ha,verticalalignment='center')  # pyrefly: ignore[bad-specialization]
+                                        xytext=(self.flavorchart_angles[i],1.1),horizontalalignment=ha,verticalalignment='center')  # pyrefly: ignore[unsupported-operation]
                     try:
                         anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
                     except Exception: # pylint: disable=broad-except # mpl before v3.0 do not have this set_in_layout() function
@@ -12735,7 +12735,7 @@ class tgraphcanvas(FigureCanvas):
         self.flavorchart_plotf.append(self.flavors[0])
         #normalize flavor values to 0-1 range
         for i,_ in enumerate(self.flavorchart_plotf):
-            self.flavorchart_plotf[i] /= 10. # pyrefly: ignore[bad-specialization]
+            self.flavorchart_plotf[i] /= 10. # pyrefly: ignore[unsupported-operation]
 
     @staticmethod
     def calcFlavorChartScoreFromFlavors(flavors:List[float], flavors_total_correction:float) -> float:

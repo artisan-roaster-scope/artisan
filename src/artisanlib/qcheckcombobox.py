@@ -169,7 +169,7 @@ class CheckComboBox(QComboBox): # pyright: ignore [reportGeneralTypeIssues] # Ar
                 menuoption.text = str(display)                         # pyrefly: ignore[bad-assignment]
 
             menuoption.fontMetrics = QFontMetrics(menuoption.font)     # pyrefly: ignore[bad-assignment]
-            state = option.state & (QStyle.StateFlag.State_MouseOver | # pyrefly: ignore[internal-error]
+            state = option.state & (QStyle.StateFlag.State_MouseOver | # pyrefly: ignore[unsupported-operation]
                                     QStyle.StateFlag.State_Selected |
                                     QStyle.StateFlag.State_Active)
 

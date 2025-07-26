@@ -230,49 +230,49 @@ class profileTransformatorDlg(ArtisanDialog):
     def clearPhasesTargetTimes(self) -> None:
         if self.phases_target_widgets_time is not None and len(self.phases_target_widgets_time)>2:
             for i in range(3):
-                phases_target_widgets_time = self.phases_target_widgets_time[i] # pyrefly: ignore[bad-specialization]
+                phases_target_widgets_time = self.phases_target_widgets_time[i] # pyrefly: ignore[unsupported-operation]
                 if phases_target_widgets_time is not None:
                     phases_target_widgets_time.setText('')
 
     def clearPhasesTargetPercent(self) -> None:
         if self.phases_target_widgets_percent is not None and len(self.phases_target_widgets_percent)>2:
             for i in range(3):
-                phases_target_widgets_percent = self.phases_target_widgets_percent[i] # pyrefly: ignore[bad-specialization]
+                phases_target_widgets_percent = self.phases_target_widgets_percent[i] # pyrefly: ignore[unsupported-operation]
                 if phases_target_widgets_percent is not None:
                     phases_target_widgets_percent.setText('')
 
     def clearPhasesResults(self) -> None:
         if self.phases_result_widgets is not None and len(self.phases_result_widgets)>2:
             for i in range(3):
-                phases_result_widgets = self.phases_result_widgets[i] # pyrefly: ignore[bad-specialization]
+                phases_result_widgets = self.phases_result_widgets[i] # pyrefly: ignore[unsupported-operation]
                 if phases_result_widgets is not None:
                     phases_result_widgets.setText('')
 
     def clearTimeTargets(self) -> None:
         if self.time_target_widgets is not None and len(self.time_target_widgets)>3:
             for i in range(4):
-                time_target_widgets = self.time_target_widgets[i] # pyrefly: ignore[bad-specialization]
+                time_target_widgets = self.time_target_widgets[i] # pyrefly: ignore[unsupported-operation]
                 if time_target_widgets is not None:
                     time_target_widgets.setText('')
 
     def clearTimeResults(self) -> None:
         if self.time_result_widgets is not None and len(self.time_result_widgets)>3:
             for i in range(4):
-                time_result_widgets = self.time_result_widgets[i] # pyrefly: ignore[bad-specialization]
+                time_result_widgets = self.time_result_widgets[i] # pyrefly: ignore[unsupported-operation]
                 if time_result_widgets is not None:
                     time_result_widgets.setText('')
 
     def clearTempTargets(self) -> None:
         if self.temp_target_widgets is not None and len(self.temp_target_widgets)>4:
             for i in range(5):
-                temp_target_widget:Optional[QLineEdit] = self.temp_target_widgets[i] # pyrefly: ignore[bad-specialization]
+                temp_target_widget:Optional[QLineEdit] = self.temp_target_widgets[i] # pyrefly: ignore[unsupported-operation]
                 if temp_target_widget is not None:
                     temp_target_widget.setText('')
 
     def clearTempResults(self) -> None:
         if self.temp_result_widgets is not None and len(self.temp_result_widgets)>4:
             for i in range(5):
-                temp_result_widget:Optional[QTableWidgetItem] = self.temp_result_widgets[i] # pyrefly: ignore[bad-specialization]
+                temp_result_widget:Optional[QTableWidgetItem] = self.temp_result_widgets[i] # pyrefly: ignore[unsupported-operation]
                 if temp_result_widget is not None:
                     temp_result_widget.setText('')
         self.temp_formula.setText('')
@@ -501,7 +501,7 @@ class profileTransformatorDlg(ArtisanDialog):
             result_times = self.calcTimeResults()
             if self.time_result_widgets is not None:
                 for i in range(4):
-                    time_result_widget = self.time_result_widgets[i] # pyrefly: ignore[bad-specialization]
+                    time_result_widget = self.time_result_widgets[i] # pyrefly: ignore[unsupported-operation]
                     if time_result_widget is not None:
                         if result_times[i] is None:
                             s = ''
@@ -551,7 +551,7 @@ class profileTransformatorDlg(ArtisanDialog):
         elif self.temp_result_widgets is not None and len(self.temp_result_widgets)>4:
             result_temps,fit = self.calcTempResults()
             for i in range(5):
-                temp_result_widget:Optional[QTableWidgetItem] = self.temp_result_widgets[i]  # pyrefly: ignore[bad-specialization]
+                temp_result_widget:Optional[QTableWidgetItem] = self.temp_result_widgets[i]  # pyrefly: ignore[unsupported-operation]
                 result_temp = result_temps[i]
                 if temp_result_widget is not None and result_temp is not None:
                     temp_result_widget.setText(str(float2float(result_temp)) + self.aw.qmc.mode)

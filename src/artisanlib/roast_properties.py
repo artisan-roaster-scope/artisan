@@ -2448,7 +2448,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 if 'ratio_denom' in i and i['ratio_denom'] is not None:
                     entry['ratio_denom'] = i['ratio_denom']
                 ingredients.append(entry)
-            self.plus_blend_selected_spec['ingredients'] = ingredients
+            self.plus_blend_selected_spec['ingredients'] = ingredients # pyrefly: ignore[unsupported-operation]
             self.plus_amount_selected = plus.stock.getBlendMaxAmount(selected_blend)
             self.plus_amount_replace_selected = plus.stock.getBlendReplaceMaxAmount(selected_blend)
             self.fillBlendData(selected_blend,prev_coffee_label,prev_blend_label)

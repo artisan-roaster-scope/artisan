@@ -4817,7 +4817,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 if self.comparator is None and not self.qmc.designerflag and not self.qmc.wheelflag and self.qmc.ax is not None:
                     self.setWindowFilePath(self.curFile)
             # no profile loaded
-            elif __release_sponsor_name__:
+            elif __release_sponsor_name__ != '':
                 self.setWindowTitle(f"{dirtySign}{appTitle} – {__release_sponsor_name__} ({QApplication.translate('About','Release Sponsor')})")
                 self.setWindowFilePath('')
             else:
@@ -7909,10 +7909,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                             DRYlabel = '&darr;' + QApplication.translate('Label', 'DRY')
                         else:
                             DRYlabel = '&raquo;' + QApplication.translate('Label', 'DRY')
-                        if self.qmc.timeindex[0] > -1 and self.qmc.TPalarmtimeindex and len(self.qmc.delta2) > 0 and self.qmc.delta2[-1] is not None and self.qmc.delta2[-1] > 0:  # pyrefly: ignore[bad-argument-type]
+                        if self.qmc.timeindex[0] > -1 and self.qmc.TPalarmtimeindex and len(self.qmc.delta2) > 0 and self.qmc.delta2[-1] is not None and self.qmc.delta2[-1] > 0:  # pyrefly: ignore[unsupported-operation]
                             # display expected time to reach DRY as defined in the background profile or the phases dialog
                             if drytarget > self.qmc.temp2[-1]:
-                                dryexpectedtime = (drytarget - self.qmc.temp2[-1])/(self.qmc.delta2[-1]/60.) # pyrefly: ignore[bad-argument-type]
+                                dryexpectedtime = (drytarget - self.qmc.temp2[-1])/(self.qmc.delta2[-1]/60.) # pyrefly: ignore[unsupported-operation]
                                 if self.qmc.phasesLCDmode == 2:
                                     tstring = stringfromseconds(dryexpectedtime,leadingzero=False)
                                 else:
@@ -7987,7 +7987,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                             DRY2FCsframeTooltip = QApplication.translate('Label','TEMP MODE')
                             TP2DRYframeTooltip = QApplication.translate('Label','TEMP MODE')
                             FCslabel = '&darr;' + QApplication.translate('Label', 'FCs')
-                        if self.qmc.timeindex[0] > -1 and (self.qmc.timeindex[1] or (drytarget <= self.qmc.temp2[-1])) and len(self.qmc.delta2) > 0 and self.qmc.delta2[-1] is not None and self.qmc.delta2[-1] > 0: # pyrefly: ignore[bad-argument-type]
+                        if self.qmc.timeindex[0] > -1 and (self.qmc.timeindex[1] or (drytarget <= self.qmc.temp2[-1])) and len(self.qmc.delta2) > 0 and self.qmc.delta2[-1] is not None and self.qmc.delta2[-1] > 0: # pyrefly: ignore[unsupported-operation]
                             ## after DRY:
                             # display expected time to reach FCs as defined in the background profile or the phases dialog
                             if self.qmc.backgroundprofile is not None and self.qmc.timeindexB[2]:
@@ -7995,7 +7995,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                             else:
                                 fcstarget = self.qmc.phases[2] # FCs min phases definition
                             if fcstarget > self.qmc.temp2[-1]:
-                                fcsexpectedtime = (fcstarget - self.qmc.temp2[-1])/(self.qmc.delta2[-1]/60.) # pyrefly: ignore[bad-argument-type]
+                                fcsexpectedtime = (fcstarget - self.qmc.temp2[-1])/(self.qmc.delta2[-1]/60.) # pyrefly: ignore[unsupported-operation]
                                 if self.qmc.phasesLCDmode == 2:
                                     tstring = stringfromseconds(fcsexpectedtime, leadingzero=False)
                                 else:
@@ -10082,6 +10082,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                             # popup(<m>[,<t>]) with <m> the message and <t> the optional timeout in seconds
                             # message can be a quoted string or just a sequence of characters
                             elif cs.startswith('popup(') and cs.endswith(')'):
+                                values:List[str] = []
                                 try:
                                     # quoted string message
                                     values = cs[len('popup('):-1].split(',')
@@ -23849,7 +23850,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
     # updates AUC guide (expected time to hit target AUC; self.qmc.AUCguideTime) based on current AUC, target, base, and RoR
     def updateAUCguide(self) -> None:
-        if (len(self.qmc.delta2) > 0 and self.qmc.delta2[-1] is not None and self.qmc.delta2[-1] > 0 and # we have a positive BT RoR # pyrefly: ignore[bad-argument-type]
+        if (len(self.qmc.delta2) > 0 and self.qmc.delta2[-1] is not None and self.qmc.delta2[-1] > 0 and # we have a positive BT RoR # pyrefly: ignore[unsupported-operation]
             self.qmc.TPalarmtimeindex is not None and  # we passed TP
             self.qmc.AUCvalue > 0): # there is already some AUC available
 

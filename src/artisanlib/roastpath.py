@@ -172,7 +172,7 @@ def extractProfileRoastPathHTML(url:'QUrl', _:'ApplicationWindow') -> Optional[P
                         try:
 #                            tx_idx = res["timex"].index(tx) # does not cope with dropouts as the next line:
                             tx_idx = next(i for i,item in enumerate(res['timex']) if item >= tx)
-                            timeindex[marks[dd['EventName']]] = max(0, tx_idx) # pyrefly: ignore[bad-argument-type]
+                            timeindex[marks[dd['EventName']]] = max(0, tx_idx) # pyrefly: ignore[index-error]
                         except Exception: # pylint: disable=broad-except
                             pass
             res['timeindex'] = timeindex
