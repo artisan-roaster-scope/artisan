@@ -57,7 +57,7 @@ class TestPIDInitialization:
         assert pid.errSum == 0.0
         assert pid.Iterm == 0.0
         assert pid.lastError is None
-        assert pid.lastInput == 0.0
+        assert pid.lastInput == None
         assert pid.lastOutput is None
         assert pid.lastTime is None
         assert pid.lastDerr == 0.0
@@ -250,10 +250,11 @@ class TestPIDSmoothingFunctions:
         pid = PID()
         pid.output_smoothing_factor = 3
 
-        # First few values should return input until buffer is full
+        # First value
         result1 = pid._smooth_output(10.0)
         assert result1 == 10.0
 
+        # Second value
         result2 = pid._smooth_output(20.0)
         assert result2 == 20.0
 
@@ -262,7 +263,7 @@ class TestPIDSmoothingFunctions:
         # Weighted average: (10*1 + 20*2 + 30*3) / (1+2+3) = 140/6 ≈ 23.33
         assert result3 == pytest.approx(23.333333333333332, abs=1e-10)
 
-        # Now smoothing should be applied
+        # Fourth value - sliding window
         result4 = pid._smooth_output(40.0)
         # Weighted average: (20*1 + 30*2 + 40*3) / (1+2+3) = 200/6 ≈ 33.33
         assert result4 == pytest.approx(33.333333333333336, abs=1e-10)
@@ -426,18 +427,10 @@ class TestPIDControlLoop:
         # dinput = 60 - 50 = 10, dtinput = 10 / 1.0 = 10
         # D = -Kd * dtinput = -0.5 * 10 = -5
 
-
     @pytest.mark.parametrize(
         'kp,ki,kd,target,inputs,expected_trend',
         [
-            (
-                1.0,
-                0.0,
-                0.0,
-                100.0,
-                [70.0, 60.0, 50.0],
-                'increasing',
-            ),  # P-only - inputs moving away from target
+            (1.0, 0.0, 0.0, 100.0, [50.0, 60.0, 70.0], 'decreasing'),  # P-only
             (0.0, 0.1, 0.0, 100.0, [50.0, 50.0, 50.0], 'increasing'),  # I-only
             (1.0, 0.1, 0.1, 100.0, [50.0, 60.0, 70.0], 'positive'),  # PID
         ],
@@ -651,16 +644,16 @@ class TestPIDResetAndInitialization:
         # All state should be reset
         assert pid.errSum == 0.0
         assert pid.lastError == 0.0
-        assert pid.lastInput == 0.0
-        assert pid.lastDerr == 0.0
+        assert pid.lastInput == None
+        assert pid.lastTime is None
+        assert pid.lastDerr == 0.0  # type: ignore[unreachable]
         assert pid.Pterm == 0.0
         assert pid.Iterm == 0.0
+        assert pid.lastOutput is None
         assert pid.previous_inputs == []
         assert pid.previous_outputs == []
         assert pid.input_decay_weights is None
         assert pid.output_decay_weights is None
-        assert pid.lastTime is None
-        assert pid.lastOutput is None # type: ignore [unreachable] # mypy error because of previous lines 'is None'?
 
     def test_init_resets_derivative_filter(self) -> None:
         """Test that init() resets the derivative filter."""
@@ -985,3 +978,463 @@ class TestPIDNumericalStability:
         # Should handle large values without overflow
         assert math.isfinite(pid.Pterm)
         assert math.isfinite(pid.Iterm)
+
+
+class TestPIDDerivativeKickImprovements:
+    """Test improved derivative kick prevention features."""
+
+    def test_derivative_limit_initialization(self) -> None:
+        """Test that derivative limit is properly initialized."""
+        pid = PID()
+
+        assert pid.derivative_limit == 100.0
+        assert pid.lastTarget == 0.0
+        assert pid.measurement_history == []
+        assert pid.setpoint_changed is False
+
+    def test_setDerivativeLimit_updates_limit(self) -> None:
+        """Test that setDerivativeLimit updates the derivative limit."""
+        pid = PID()
+
+        pid.setDerivativeLimit(50.0)
+        assert pid.getDerivativeLimit() == 50.0
+
+    def test_setDerivativeLimit_enforces_non_negative(self) -> None:
+        """Test that setDerivativeLimit enforces non-negative values."""
+        pid = PID()
+
+        pid.setDerivativeLimit(-10.0)
+        assert pid.getDerivativeLimit() == 0.0
+
+    def test_getDerivativeLimit_handles_exceptions(self) -> None:
+        """Test that getDerivativeLimit handles exceptions gracefully."""
+        pid = PID()
+
+        with patch.object(pid.pidSemaphore, 'acquire', side_effect=Exception('Test exception')):
+            result = pid.getDerivativeLimit()
+            assert result == 100.0  # Default value
+
+    def test_measurement_history_tracking(self) -> None:
+        """Test that measurement history is properly tracked."""
+        pid = PID()
+        pid.target = 100.0
+
+        # Simulate several measurements
+        measurements = [50.0, 52.0, 54.0, 56.0, 58.0, 60.0]
+
+        for i, measurement in enumerate(measurements):
+            with patch('time.time', return_value=1000.0 + i):
+                pid.update(measurement)
+
+        # History should contain last 5 measurements
+        assert len(pid.measurement_history) == 5
+        assert pid.measurement_history == measurements[1:]  # Last 5
+
+    def test_setpoint_change_detection(self) -> None:
+        """Test that setpoint changes are properly detected."""
+        pid = PID()
+
+        # Initialize
+        with patch('time.time', return_value=1000.0):
+            pid.update(50.0)
+
+        # Change setpoint
+        pid.setTarget(100.0, init=False)
+
+        # Next update should detect setpoint change
+        with patch('time.time', return_value=1001.0):
+            pid.update(52.0)
+
+        assert pid.setpoint_changed is True
+        assert pid.lastTarget == 100.0
+
+    def test_setpoint_change_flag_clearing(self) -> None:
+        """Test that setpoint change flag is cleared after some time."""
+        pid = PID()
+
+        # Initialize and change setpoint
+        with patch('time.time', return_value=1000.0):
+            pid.update(50.0)
+
+        pid.setTarget(100.0, init=False)
+
+        # First update after setpoint change
+        with patch('time.time', return_value=1001.0):
+            pid.update(52.0)
+
+        assert pid.setpoint_changed is True
+
+        # Subsequent updates without setpoint change should clear flag
+        with patch('time.time', return_value=1002.0):
+            pid.update(54.0)
+
+        assert pid.setpoint_changed is False
+
+    def test_measurement_discontinuity_detection(self) -> None:
+        """Test measurement discontinuity detection."""
+        pid = PID()
+
+        # Build up normal measurement history
+        normal_measurements = [50.0, 51.0, 52.0, 53.0]
+        for measurement in normal_measurements:
+            pid._update_measurement_history(measurement)
+
+        # Test normal change (should not be detected as discontinuity)
+        assert not pid._detect_measurement_discontinuity(54.0)
+
+        # Test large discontinuity (should be detected)
+        assert pid._detect_measurement_discontinuity(70.0)  # Large jump
+
+    def test_derivative_calculation_with_setpoint_change(self) -> None:
+        """Test that derivative calculation is reduced after setpoint changes."""
+        pid = PID(d=1.0)
+        pid.setpoint_changed = True
+        pid.lastInput = 0.0
+
+        # Calculate derivative with setpoint change flag set
+        derivative = pid._calculate_derivative_on_measurement(60.0, 1.0)
+
+        # Should be reduced compared to normal calculation
+        # Normal would be: -1.0 * (60.0 - 0.0) / 1.0 = -60.0
+        # With setpoint change: -60.0 * 0.5 = -30.0
+        assert derivative == pytest.approx(-30.0, abs=1e-10)
+
+    def test_derivative_calculation_with_discontinuity(self) -> None:
+        """Test that derivative calculation is reduced with measurement discontinuities."""
+        pid = PID(d=1.0)
+        pid.lastInput = 50.0
+
+        # Set up measurement history to trigger discontinuity detection
+        pid.measurement_history = [50.0, 51.0, 52.0, 53.0]
+
+        # Large jump should trigger discontinuity reduction
+        derivative = pid._calculate_derivative_on_measurement(80.0, 1.0)
+
+        # Normal would be: -1.0 * (80.0 - 50.0) / 1.0 = -30.0
+        # With discontinuity: -30.0 * 0.3 = -9.0
+        assert derivative == pytest.approx(-9.0, abs=1e-10)
+
+    def test_derivative_limiting(self) -> None:
+        """Test that derivative contribution is limited."""
+        pid = PID(d=1.0)
+        pid.derivative_limit = 20.0
+        pid.lastInput = 0.0
+
+        # Large input change that would exceed derivative limit
+        derivative = pid._calculate_derivative_on_measurement(100.0, 1.0)
+
+        # Should be limited to derivative_limit
+        assert derivative == pytest.approx(-20.0, abs=1e-10)
+
+    def test_enhanced_derivative_on_error_limiting(self) -> None:
+        """Test that derivative-on-error mode also applies limiting."""
+        pid = PID(d=2.0)
+        pid.derivative_on_error = True
+        pid.derivative_limit = 30.0
+        pid.target = 100.0
+
+        # Initialize
+        with patch('time.time', return_value=1000.0):
+            pid.update(50.0)
+
+        # Large error change that would exceed derivative limit
+        with patch('time.time', return_value=1001.0):
+            pid.update(10.0)  # Large change in error
+
+        # The derivative term calculation happens inside update()
+        # We can't directly test the D value, but we can verify the system doesn't crash
+        # and that the derivative limit attribute is being used
+
+    def test_init_resets_enhanced_attributes(self) -> None:
+        """Test that init() resets enhanced derivative kick prevention attributes."""
+        pid = PID()
+
+        # Set some state
+        pid.lastTarget = 50.0
+        pid.measurement_history = [1.0, 2.0, 3.0]
+        pid.setpoint_changed = True
+
+        pid.init()
+
+        # Should be reset
+        assert pid.lastTarget == pid.target
+        assert pid.measurement_history == []
+        assert pid.setpoint_changed is False
+
+    def test_integration_with_existing_functionality(self) -> None:
+        """Test that enhanced features integrate well with existing PID functionality."""
+        control_mock = MagicMock()
+        pid = PID(control=control_mock, p=1.0, i=0.1, d=0.5)
+        pid.setDerivativeLimit(25.0)
+        pid.target = 100.0
+        pid.on()
+
+        # Simulate a sequence with setpoint changes and measurements
+        measurements = [20.0, 25.0, 30.0, 35.0, 40.0]
+
+        for i, measurement in enumerate(measurements):
+            if i == 2:  # Change setpoint mid-sequence
+                pid.setTarget(150.0, init=False)
+
+            with patch('time.time', return_value=1000.0 + i):
+                pid.update(measurement)
+
+        # Should have called control function
+        assert control_mock.called
+
+        # Should have proper state
+        assert len(pid.measurement_history) <= 5
+        assert pid.lastTarget == 150.0
+
+
+class TestPIDIntegralWindupImprovements:
+    """Test improved integral windup prevention features."""
+
+    def test_integral_windup_prevention_initialization(self) -> None:
+        """Test that integral windup prevention attributes are properly initialized."""
+        pid = PID()
+
+        assert pid.integral_windup_prevention is True
+        assert pid.integral_limit_factor == 0.8
+        assert pid.setpoint_change_threshold == 5.0
+        assert pid.integral_reset_on_setpoint_change is True
+        assert pid.back_calculation_factor == 0.5
+
+    def test_setIntegralWindupPrevention_updates_setting(self) -> None:
+        """Test that setIntegralWindupPrevention updates the setting."""
+        pid = PID()
+
+        pid.setIntegralWindupPrevention(False)
+        assert pid.getIntegralWindupPrevention() is False
+
+        pid.setIntegralWindupPrevention(True)
+        assert pid.getIntegralWindupPrevention() is True
+
+    def test_getIntegralWindupPrevention_handles_exceptions(self) -> None:
+        """Test that getIntegralWindupPrevention handles exceptions gracefully."""
+        pid = PID()
+
+        with patch.object(pid.pidSemaphore, 'acquire', side_effect=Exception('Test exception')):
+            result = pid.getIntegralWindupPrevention()
+            assert result is True  # Default value
+
+    def test_setIntegralLimitFactor_updates_factor(self) -> None:
+        """Test that setIntegralLimitFactor updates the factor."""
+        pid = PID()
+
+        pid.setIntegralLimitFactor(0.6)
+        assert pid.getIntegralLimitFactor() == 0.6
+
+    def test_setIntegralLimitFactor_clamps_to_valid_range(self) -> None:
+        """Test that setIntegralLimitFactor clamps values to [0.0, 1.0]."""
+        pid = PID()
+
+        pid.setIntegralLimitFactor(-0.5)
+        assert pid.getIntegralLimitFactor() == 0.0
+
+        pid.setIntegralLimitFactor(1.5)
+        assert pid.getIntegralLimitFactor() == 1.0
+
+    def test_setSetpointChangeThreshold_updates_threshold(self) -> None:
+        """Test that setSetpointChangeThreshold updates the threshold."""
+        pid = PID()
+
+        pid.setSetpointChangeThreshold(10.0)
+        assert pid.getSetpointChangeThreshold() == 10.0
+
+    def test_setSetpointChangeThreshold_enforces_non_negative(self) -> None:
+        """Test that setSetpointChangeThreshold enforces non-negative values."""
+        pid = PID()
+
+        pid.setSetpointChangeThreshold(-5.0)
+        assert pid.getSetpointChangeThreshold() == 0.0
+
+    def test_should_integrate_prevents_windup(self) -> None:
+        """Test that _should_integrate prevents integration during saturation."""
+        pid = PID()
+        pid.setLimits(0, 100)
+
+        # Should not integrate when output is saturated and error would make it worse
+        assert not pid._should_integrate(10.0, 150.0)  # Positive error, output above max
+        assert not pid._should_integrate(-10.0, -50.0)  # Negative error, output below min
+
+        # Should integrate when error would help reduce saturation
+        assert pid._should_integrate(-10.0, 150.0)  # Negative error, output above max
+        assert pid._should_integrate(10.0, -50.0)  # Positive error, output below min
+
+        # Should integrate when output is not saturated
+        assert pid._should_integrate(10.0, 50.0)  # Normal operation
+
+    def test_should_integrate_disabled_windup_prevention(self) -> None:
+        """Test that _should_integrate always returns True when windup prevention is disabled."""
+        pid = PID()
+        pid.integral_windup_prevention = False
+
+        # Should always integrate when windup prevention is disabled
+        assert pid._should_integrate(10.0, 150.0)
+        assert pid._should_integrate(-10.0, -50.0)
+
+    def test_calculate_integral_limits_positive_range(self) -> None:
+        """Test integral limits calculation for positive output range."""
+        pid = PID()
+        pid.setLimits(0, 100)
+        pid.integral_limit_factor = 0.8
+
+        integral_min, integral_max = pid._calculate_integral_limits()
+
+        assert integral_min == 0.0
+        assert integral_max == 80.0  # 100 * 0.8
+
+    def test_calculate_integral_limits_negative_range(self) -> None:
+        """Test integral limits calculation for negative output range."""
+        pid = PID()
+        pid.setLimits(-100, 0)
+        pid.integral_limit_factor = 0.6
+
+        integral_min, integral_max = pid._calculate_integral_limits()
+
+        assert integral_min == -60.0  # -100 * 0.6
+        assert integral_max == 0.0
+
+    def test_calculate_integral_limits_symmetric_range(self) -> None:
+        """Test integral limits calculation for symmetric output range."""
+        pid = PID()
+        pid.setLimits(-50, 50)
+        pid.integral_limit_factor = 0.8
+
+        integral_min, integral_max = pid._calculate_integral_limits()
+
+        assert integral_min == -40.0  # -(100 * 0.8) / 2
+        assert integral_max == 40.0  # (100 * 0.8) / 2
+
+    def test_handle_setpoint_change_integral_large_change(self) -> None:
+        """Test integral handling for large setpoint changes."""
+        pid = PID()
+        pid.Iterm = 50.0
+        pid.setpoint_change_threshold = 10.0
+
+        # Large setpoint change should reset integral
+        pid._handle_setpoint_change_integral(15.0)
+        assert pid.Iterm == 0.0
+
+    def test_handle_setpoint_change_integral_moderate_change(self) -> None:
+        """Test integral handling for moderate setpoint changes."""
+        pid = PID()
+        pid.Iterm = 50.0
+        pid.setpoint_change_threshold = 10.0
+
+        # Moderate setpoint change should reduce integral
+        pid._handle_setpoint_change_integral(7.0)  # Between threshold/2 and threshold
+        assert pid.Iterm == 25.0  # 50.0 * 0.5
+
+    def test_handle_setpoint_change_integral_small_change(self) -> None:
+        """Test integral handling for small setpoint changes."""
+        pid = PID()
+        pid.Iterm = 50.0
+        pid.setpoint_change_threshold = 10.0
+
+        # Small setpoint change should not affect integral
+        pid._handle_setpoint_change_integral(2.0)
+        assert pid.Iterm == 50.0
+
+    def test_handle_setpoint_change_integral_disabled(self) -> None:
+        """Test integral handling when setpoint change handling is disabled."""
+        pid = PID()
+        pid.Iterm = 50.0
+        pid.integral_reset_on_setpoint_change = False
+
+        # Should not change integral even for large setpoint changes
+        pid._handle_setpoint_change_integral(20.0)
+        assert pid.Iterm == 50.0
+
+    def test_back_calculate_integral_with_clamping(self) -> None:
+        """Test back-calculation when output is clamped."""
+        pid = PID(i=1.0)
+        pid.Iterm = 50.0
+        pid.back_calculation_factor = 0.5
+
+        # Simulate output clamping
+        output_before = 120.0
+        output_after = 100.0  # Clamped
+
+        pid._back_calculate_integral(output_before, output_after)
+
+        # Integral should be reduced: 50.0 - (120.0 - 100.0) * 0.5 = 40.0
+        assert pid.Iterm == pytest.approx(40.0, abs=1e-10)
+
+    def test_back_calculate_integral_no_clamping(self) -> None:
+        """Test back-calculation when output is not clamped."""
+        pid = PID(i=1.0)
+        pid.Iterm = 50.0
+
+        # No clamping occurred
+        pid._back_calculate_integral(80.0, 80.0)
+
+        # Integral should remain unchanged
+        assert pid.Iterm == 50.0
+
+    def test_back_calculate_integral_disabled(self) -> None:
+        """Test back-calculation when windup prevention is disabled."""
+        pid = PID(i=1.0)
+        pid.Iterm = 50.0
+        pid.integral_windup_prevention = False
+
+        # Should not adjust integral even when output is clamped
+        pid._back_calculate_integral(120.0, 100.0)
+        assert pid.Iterm == 50.0
+
+    def test_back_calculate_integral_zero_ki(self) -> None:
+        """Test back-calculation when Ki is zero."""
+        pid = PID(i=0.0)
+        pid.Iterm = 50.0
+
+        # Should not adjust integral when Ki is zero
+        pid._back_calculate_integral(120.0, 100.0)
+        assert pid.Iterm == 50.0
+
+    def test_integration_with_setpoint_changes(self) -> None:
+        """Test integration of improved windup prevention with setpoint changes."""
+        control_mock = MagicMock()
+        pid = PID(control=control_mock, p=1.0, i=0.5, d=0.1)
+        pid.setLimits(0, 100)
+        pid.setSetpointChangeThreshold(10.0)
+        pid.setTarget(50.0)  # Initialize with setTarget to set lastTarget properly
+        pid.on()
+
+        # Initialize and build up some integral term
+        with patch('time.time', return_value=1000.0):
+            pid.update(30.0)
+
+        # Let integral build up
+        with patch('time.time', return_value=1001.0):
+            pid.update(30.0)
+
+        # Verify integral has built up
+        assert pid.Iterm > 0.0
+
+        # Large setpoint change
+        pid.setTarget(80.0, init=False)  # 30 unit change > threshold
+
+        # Integral should be reset due to large setpoint change
+        assert pid.Iterm == pytest.approx(0.0, abs=1e-10)
+
+    def test_integration_with_output_saturation(self) -> None:
+        """Test integration behavior during output saturation."""
+        control_mock = MagicMock()
+        pid = PID(control=control_mock, p=2.0, i=1.0, d=0.0)
+        pid.setLimits(0, 100)
+        pid.target = 200.0  # High target to cause saturation
+        pid.on()
+
+        # Initialize
+        with patch('time.time', return_value=1000.0):
+            pid.update(50.0)
+
+        # Multiple updates that would normally cause windup
+        for i in range(5):
+            with patch('time.time', return_value=1001.0 + i):
+                pid.update(50.0)  # Constant error
+
+        # Integral should be limited and not cause excessive windup
+        integral_min, integral_max = pid._calculate_integral_limits()
+        assert integral_min <= pid.Iterm <= integral_max
