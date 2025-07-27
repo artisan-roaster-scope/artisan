@@ -515,7 +515,7 @@ class PID_DlgControl(ArtisanDialog):
             LimitBox.setSpacing(3)
 
             self.SPthresholdSpinBox = QSpinBox()
-            self.SPthresholdSpinBox.setToolTip(QApplication.translate('Tooltip', 'Integral reset on target (SP) changes beyond this limit'))
+            self.SPthresholdSpinBox.setToolTip(QApplication.translate('Tooltip', 'Integral reset on target (SP) changes exceeding the limit'))
             self.SPthresholdSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
             self.SPthresholdSpinBox.setRange(0,100)
             self.SPthresholdSpinBox.setSingleStep(1)

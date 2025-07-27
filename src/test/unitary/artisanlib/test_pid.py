@@ -233,6 +233,57 @@ class TestPIDParameterSetters:
         pid.setDerivativeFilterLevel(2)
         assert pid.derivative_filter_level == 2
 
+    def test_setDerivativeLimit_updates_derivative_limit(self) -> None:
+        """Test that setDerivativeLimit updates derivative limit."""
+        pid = PID()
+
+        pid.setDerivativeLimit(50)
+        assert pid.derivative_limit == 50
+
+    def test_setIntegralWindupPrevention_updates_integral_windup_prevention(self) -> None:
+        """Test that setIntegralWindupPrevention updates integral windup prevention."""
+        pid = PID()
+
+        pid.setIntegralWindupPrevention(False)
+        assert not pid.integral_windup_prevention
+
+        pid.setIntegralWindupPrevention(True)
+        assert pid.integral_windup_prevention
+
+    def test_setDerivativeOnError_updates_derivative_on_error(self) -> None:
+        """Test that setDerivativeOnError updates derivative on error."""
+        pid = PID()
+
+        pid.setDerivativeOnError(False)
+        assert not pid.derivative_on_error
+
+        pid.setDerivativeOnError(True)
+        assert pid.derivative_on_error
+
+    def test_setIntegralResetOnSP_updates_integral_reset_on_setpoint_change(self) -> None:
+        """Test that setIntegralResetOnSP updates integral reset on setpoint change."""
+        pid = PID()
+
+        pid.setIntegralResetOnSP(False)
+        assert not pid.integral_reset_on_setpoint_change
+
+        pid.setIntegralResetOnSP(True)
+        assert pid.integral_reset_on_setpoint_change
+
+    def test_setIntegralLimitFactor_updates_integral_limit_factor(self) -> None:
+        """Test that setIntegralLimitFactor updates integral limit factor."""
+        pid = PID()
+
+        pid.setIntegralLimitFactor(0.3)
+        assert pid.integral_limit_factor == 0.3
+
+    def test_setSetpointChangeThreshold_updates_setpoint_change_threshold(self) -> None:
+        """Test that setSetpointChangeThreshold updates integral limit factor."""
+        pid = PID()
+
+        pid.setSetpointChangeThreshold(55)
+        assert pid.setpoint_change_threshold == 55
+
 
 class TestPIDSmoothingFunctions:
     """Test PID input and output smoothing functionality."""

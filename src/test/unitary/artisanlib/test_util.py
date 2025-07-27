@@ -992,7 +992,7 @@ def test_natsort(s:str, expected:List[Union[int,str]]) -> None:
         (5.123, '5.123'),
         # Larger numbers (10-999.9)
         (9.999, '9.999'),
-        (10.0, '10.0'),
+        (10.0, '10'),
         (10.5, '10.5'),
         (99.9, '99.9'),
         (999.9, '999.9'),
@@ -1015,7 +1015,7 @@ def test_natsort(s:str, expected:List[Union[int,str]]) -> None:
         ('1e-10', '0'), # lose precision for very small but non-zero numbers
     ],
 )
-def event_ydata(input_value: Union[float, int, str], expected_output: str) -> None:
+def test_scaleFloat2String(input_value: Union[float, int, str], expected_output: str) -> None:
     """Test scaleFloat2String function with various input types and values."""
     assert scaleFloat2String(input_value) == expected_output
 

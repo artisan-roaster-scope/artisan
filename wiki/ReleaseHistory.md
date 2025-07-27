@@ -28,7 +28,7 @@ v3.2.1
   - makes synchronization of main events with Kaleido and Santoker roasting machines configurable (disabled by default)
   - updates internal PID by adding Advanced Integral Windup Prevention, derivative on measurement calculation (DoM), measurement discontinuity detection, derivative limiting and enhanced setpoint change detection to prevent the derivative kicks and spikes
   - updates libs (scipy, bleak, lxml, pillow)
-  - expanse automatic test coverage
+  - expands automatic test coverage
 
 * FIXES
   - fixes regression which broke the designer such that points could not be moved ([Discussion #1905](../../../discussions/1905) and [Issue #1916](../../../issues/1916))
