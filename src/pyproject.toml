@@ -355,6 +355,10 @@ testpaths = [
 pythonpath = [
   "."
 ]
+filterwarnings = [
+  "ignore::RuntimeWarning",
+]
+
 
 [tool.codespell]
 skip = '*.ts,./coverage,./build,./dist*,./htmlcov,./*.spec'

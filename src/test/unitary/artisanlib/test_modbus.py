@@ -1019,31 +1019,31 @@ class TestAsyncOperationMocking:
         # Assert - Should return early without doing anything
         # No exception should be raised
 
-#    @patch("asyncio.run_coroutine_threadsafe")
-#    def test_read_active_registers_with_mock_async(
-#        self, mock_run_coroutine: Mock, client: modbusport
-#    ) -> None:
-#        """Test readActiveRegisters with mocked async operations."""
-#        # Arrange
-#        client.optimizer = True
-#        mock_future = Mock()
-#        mock_future.result.return_value = None
-#        mock_run_coroutine.return_value = mock_future
-#
-#        mock_async_thread = Mock()
-#        mock_async_thread.loop = Mock()
-#        client._asyncLoopThread = mock_async_thread
-#
-#        mock_client = Mock()
-#        mock_client.connected = True
-#        client._client = mock_client
-#
-#        with patch("artisanlib.modbusport.modbusport.connect"):
-#            # Act
-#            client.readActiveRegisters()
-#
-#            # Assert
-#            mock_run_coroutine.assert_called_once()
+    @patch('asyncio.run_coroutine_threadsafe')
+    def test_read_active_registers_with_mock_async(
+        self, mock_run_coroutine: Mock, client: modbusport
+    ) -> None:
+        """Test readActiveRegisters with mocked async operations."""
+        # Arrange
+        client.optimizer = True
+        mock_future = Mock()
+        mock_future.result.return_value = None
+        mock_run_coroutine.return_value = mock_future
+
+        mock_async_thread = Mock()
+        mock_async_thread.loop = Mock()
+        client._asyncLoopThread = mock_async_thread
+
+        mock_client = Mock()
+        mock_client.connected = True
+        client._client = mock_client
+
+        with patch('artisanlib.modbusport.modbusport.connect'):
+            # Act
+            client.readActiveRegisters()
+
+            # Assert
+            mock_run_coroutine.assert_called_once()
 
     def test_semaphore_initialization(self, client: modbusport) -> None:
         """Test that COMsemaphore is properly initialized."""

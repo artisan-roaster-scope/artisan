@@ -1325,7 +1325,7 @@ class PID_DlgControl(ArtisanDialog):
             self.aw.pidcontrol.derivative_filter = int(self.derivativeFilterFlag.isChecked())
             self.aw.pidcontrol.pidDoE = self.DoERadioButton.isChecked()
             self.aw.pidcontrol.pidDlimit = int(self.dLimitSpinBox.value())
-            self.aw.pidcontrol.pidIlimitFactor = int(self.iLimitSpinBox.value())
+            self.aw.pidcontrol.pidIlimitFactor = self.iLimitSpinBox.value()
             self.aw.pidcontrol.pidIRoCthreshold = int(self.SPthresholdSpinBox.value())
             self.aw.pidcontrol.pidIWP = self.IWPFlag.isChecked()
             self.aw.pidcontrol.pidIRoC = self.IRoCFlag.isChecked()

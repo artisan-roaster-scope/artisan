@@ -146,7 +146,7 @@ class PID:
 
         # Enhanced integral windup prevention
         self.integral_windup_prevention: bool = True  # Enable advanced windup prevention
-        self.integral_limit_factor: float = 0.8  # Limit integral to 80% of output range
+        self.integral_limit_factor: float = 1.0  # Limit integral to 100% of output range
         self.setpoint_change_threshold: float = 25.0  # Threshold for significant setpoint changes
         self.integral_reset_on_setpoint_change: bool = (
             True  # Reset integral on large setpoint changes
@@ -689,7 +689,7 @@ class PID:
             self.pidSemaphore.acquire(1)
             return self.integral_limit_factor
         except Exception:  # pylint: disable=broad-except
-            return 0.8  # Default value
+            return 1.0  # Default value
         finally:
             if self.pidSemaphore.available() < 1:
                 self.pidSemaphore.release(1)

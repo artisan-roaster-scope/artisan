@@ -12581,14 +12581,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         if self.soundflag:
             QApplication.beep()
 
-#    @staticmethod
-#    def removeDisallowedFilenameChars(filename):
-#        import unicodedata # @UnresolvedImport
-#        cleanedFilename = s2a(unicodedata.normalize('NFKD', filename))
-#        import string as libstring
-#        validFilenameChars = f'-_.() {libstring.ascii_letters}{libstring.digits}'
-#        return ''.join(c for c in decodeLocal(cleanedFilename) if c in validFilenameChars)
-
     @staticmethod
     def removeDisallowedFilenameChars(filename:str) -> str:
         invalidFilenameChars = r'[<>:"/\\|?*]'

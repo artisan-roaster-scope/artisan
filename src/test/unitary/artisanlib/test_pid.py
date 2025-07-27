@@ -1246,7 +1246,7 @@ class TestPIDIntegralWindupImprovements:
         pid = PID()
 
         assert pid.integral_windup_prevention is True
-        assert pid.integral_limit_factor == 0.8
+        assert pid.integral_limit_factor == 1.0
         assert pid.setpoint_change_threshold == 25.0
         assert pid.integral_reset_on_setpoint_change is True
         assert pid.back_calculation_factor == 0.5
@@ -1329,12 +1329,12 @@ class TestPIDIntegralWindupImprovements:
         """Test integral limits calculation for positive output range."""
         pid = PID()
         pid.setLimits(0, 100)
-        pid.integral_limit_factor = 0.8
+        pid.integral_limit_factor = 1.0
 
         integral_min, integral_max = pid._calculate_integral_limits()
 
         assert integral_min == 0.0
-        assert integral_max == 80.0  # 100 * 0.8
+        assert integral_max == 100.0  # 100 * 1.0
 
     def test_calculate_integral_limits_negative_range(self) -> None:
         """Test integral limits calculation for negative output range."""
@@ -1351,12 +1351,12 @@ class TestPIDIntegralWindupImprovements:
         """Test integral limits calculation for symmetric output range."""
         pid = PID()
         pid.setLimits(-50, 50)
-        pid.integral_limit_factor = 0.8
+        pid.integral_limit_factor = 1.0
 
         integral_min, integral_max = pid._calculate_integral_limits()
 
-        assert integral_min == -40.0  # -(100 * 0.8) / 2
-        assert integral_max == 40.0  # (100 * 0.8) / 2
+        assert integral_min == -50.0  # -(100 * 1.0) / 2
+        assert integral_max == 50.0  # (100 * 1.0) / 2
 
     def test_handle_setpoint_change_integral_large_change(self) -> None:
         """Test integral handling for large setpoint changes."""
