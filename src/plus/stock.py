@@ -36,6 +36,7 @@ import time
 import datetime
 import html
 import logging
+import functools
 
 from artisanlib.util import (decodeLocal, encodeLocal, getDirectory, is_int_list, is_float_list, render_weight,
     weight_units, float2float, convertWeight)
@@ -181,7 +182,7 @@ def has_duplicate_origin_label(c:Coffee) -> bool:
 worker:Optional['Worker'] = None
 worker_thread:Optional[QThread] = None
 
-class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # pyrefly: ignore # Argument to class must be a base class
     startSignal = pyqtSignal(bool)
     replySignal = pyqtSignal(float, float, str, int, list) # rlimit:float, rused:float, pu:str, notifications:int, machines:List[str]
     updatedSignal = pyqtSignal()  # issued once the stock was updated
@@ -236,7 +237,7 @@ class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # Argument to
     # lsrt holds the serverTime of the last stock received if server should only send a stock update if the schedule has been changed since than
     # if lsrt is None, the server returns the current stock in any case.
     def fetch(self, lsrt:Optional[float]) -> bool:
-        global stock  # pylint: disable=global-statement
+        global stock  # pylint: disable=global-statement, global-variable-not-assigned # noqa: PLW0602
         _log.debug('fetch()')
         try:
             # fetch from server (send along the current date to have the server filter the schedule correctly for the local timezone)
@@ -251,26 +252,24 @@ class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # Argument to
                     rlimit,rused,pu,notifications,machines = util.extractAccountState(j)
                     self.replySignal.emit(rlimit,rused,pu,notifications,machines)
                 if 'success' in j and j['success'] and 'result' in j and j['result'] is not None:
-                    try:
-                        stock_semaphore.acquire(1)
-                        stock = j['result']
-                        if stock is not None:
-                            stock['retrieved'] = time.time()
-                            update_duplicate_coffee_origin_labels()
-                        _log.debug('-> retrieved')
-#                        _log.debug("stock = %s", stock)
-                    finally:
-                        if stock_semaphore.available() < 1:
-                            stock_semaphore.release(1)
+                    setStock(j['result'])
+                    if stock is not None:
+                        try:
+                            stock_semaphore.acquire(1)
+                            stock['retrieved'] = time.time() # ty: ignore[possibly-unbound-implicit-call, non-subscriptable]
+                        finally:
+                            if stock_semaphore.available() < 1:
+                                stock_semaphore.release(1)
+                    _log.debug('-> retrieved')
+#                    _log.debug("stock = %s", stock)
                     controller.reconnected()
                     return True
             elif d.status_code == 204:
                 _log.error('204: empty response on fetching stock')
-                if lsrt is not None:
+                if lsrt is not None and stock is not None:
                     try:
                         stock_semaphore.acquire(1)
-                        if stock is not None:
-                            stock['retrieved'] = time.time() # ty: ignore[possibly-unbound-implicit-call]
+                        stock['retrieved'] = time.time() # ty: ignore[possibly-unbound-implicit-call, non-subscriptable]
                         _log.debug('-> retrieved time updated')
                     finally:
                         if stock_semaphore.available() < 1:
@@ -280,6 +279,7 @@ class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # Argument to
             _log.exception(e)
             controller.disconnect(remove_credentials=False, stop_queue=False)
             return False
+
 
 def getWorker() -> Optional['Worker']:
     global worker, worker_thread  # pylint: disable=global-statement
@@ -328,6 +328,34 @@ def update_schedule() -> None:
 # NOTE: stock cache data file access is not protected by portalocker for parallel access via a second Artisan instance
 #   as the ArtisanViewer handles is separate cache file
 
+def clearStockCaches() -> None:
+    # clear memoization caches on stock update
+#    _log.debug("PRINT getCoffee.cache_info(): %s", getCoffee.cache_info())
+#    _log.debug("PRINT getStandardBlends.cache_info(): %s", getStandardBlends.cache_info())
+#    _log.debug("PRINT getStores.cache_info(): %s", getStores.cache_info())
+#    _log.debug("PRINT getCoffees.cache_info(): %s", getCoffees.cache_info())
+#    _log.debug("PRINT getCoffeeLabels.cache_info(): %s", getCoffeeLabels.cache_info())
+#    _log.debug("PRINT getCoffeeStore.cache_info(): %s", getCoffeeStore.cache_info())
+    getCoffee.cache_clear()
+    getStandardBlends.cache_clear()
+    getStores.cache_clear()
+    getCoffees.cache_clear()
+    getCoffeeLabels.cache_clear()
+    getCoffeeStore.cache_clear()
+
+# sets stock to new_stock, clears all caches and updates the duplicate coffee origin labels
+def setStock(new_stock:Optional[Stock]) -> None:
+    global stock  # pylint: disable=global-statement
+    try:
+        stock_semaphore.acquire(1)
+        clearStockCaches()
+        stock = new_stock
+        update_duplicate_coffee_origin_labels()
+    finally:
+        if stock_semaphore.available() < 1:
+            stock_semaphore.release(1)
+
+
 # save stock data to local file cache
 def save() -> None:
     _log.debug('save()')
@@ -351,19 +379,13 @@ def init() -> None:
 
 # load stock data from local file cache
 def load() -> None:
-    global stock  # pylint: disable=global-statement
     _log.debug('load()')
     try:
-        stock_semaphore.acquire(1)
         f:TextIO
         with open(stock_cache_path, encoding='utf-8') as f:
-            stock = json.load(f)
-            update_duplicate_coffee_origin_labels()
+            setStock(json.load(f))
     except Exception as e:  # pylint: disable=broad-except
         _log.info(e)
-    finally:
-        if stock_semaphore.available() < 1:
-            stock_semaphore.release(1)
 
 
 ###################
@@ -465,14 +487,27 @@ def renderAmount(amount:float, default_unit:Optional[CoffeeUnit]=None, target_un
 # ==================
 # Schedule
 
-# returns the list of ScheduledItem defined in stock
+# a ScheduleItem is valid if the coffee is in stock
+def validScheduleItem(si:ScheduledItem, acquire_lock:bool) -> bool:
+    aw = config.app_window
+    if aw is not None:
+        if 'coffee' in si and si['coffee'] is not None:
+            return getCoffee(si['coffee']) is not None
+        if 'blend' in si and si['blend'] is not None and 'location' in si:
+            weight_unit_idx = weight_units.index(aw.qmc.weight[2])
+            blends = getStandardBlends(weight_unit_idx, si['location'], acquire_lock)
+            blend = next((b for b in blends if getBlendId(b) == si['blend'] and getBlendStockDict(b)['location_hr_id'] == si['location']), None)
+            return blend is not None
+    return False
+
+# returns the list of (valid) ScheduledItem defined in stock
 def getSchedule(acquire_lock:bool=True) -> List[ScheduledItem]:
     _log.debug('getSchedule()')
     try:
         if acquire_lock:
             stock_semaphore.acquire(1)
         if stock is not None and 'schedule' in stock:
-            return stock['schedule']
+            return [si for si in stock['schedule'] if validScheduleItem(si, not acquire_lock)]
     finally:
         if acquire_lock and stock_semaphore.available() < 1:
             stock_semaphore.release(1)
@@ -493,6 +528,7 @@ def getStoreId(store:Tuple[str, str]) -> str:
 
 
 # returns the list of stores defined in stock
+@functools.lru_cache(maxsize=None)  #for Python >= 3.9 can use @functools.cache
 def getStores(acquire_lock:bool=True) -> List[Tuple[str, str]]:
     _log.debug('getStores()')
     try:
@@ -685,6 +721,7 @@ def coffeeLabel(c:Coffee) -> str:
 #   "<label>, <origin> <picked>" (if coffee_label_normal_order=False)
 # associated to their hr_id
 # NOTE: picked is only added if needed to discriminate to other coffees within this stock
+@functools.lru_cache(maxsize=None)  #for Python >= 3.9 can use @functools.cache
 def getCoffeeLabels() -> Dict[str, str]:
     try:
         stock_semaphore.acquire(1)
@@ -707,6 +744,7 @@ def getCoffeeLabels() -> Dict[str, str]:
     return {}
 
 
+@functools.lru_cache(maxsize=None)  #for Python >= 3.9 can use @functools.cache
 def getCoffee(hr_id:str) -> Optional[Coffee]:
     if stock is not None and 'coffees' in stock:
         return next((x for x in stock['coffees'] if 'hr_id' in x and x['hr_id'] == hr_id), None)
@@ -719,6 +757,7 @@ def getLocationLabel(c:Coffee, location_hr_id:str) -> str:
     return ''
 
 # returns coffees with stock
+@functools.lru_cache(maxsize=None)  #for Python >= 3.9 can use @functools.cache
 def getCoffees(weight_unit_idx:int, store:Optional[str]=None) -> List[Tuple[str, Tuple[Coffee, StockItem]]]:
     _log.debug('getCoffees(%s,%s)', weight_unit_idx, store)
     try:
@@ -785,6 +824,7 @@ def getCoffeeStockPosition(coffeeId:str, stockId:str, coffees:Optional[List[Tupl
 
 
 # returns the coffee and stock dicts of the given coffeeId and storeId or None
+@functools.lru_cache(maxsize=None)  #for Python >= 3.9 can use @functools.cache
 def getCoffeeStore(coffeeId:str, storeId:str, acquire_lock:bool = True) -> Tuple[Optional[Coffee], Optional[StockItem]]:
     try:
         if acquire_lock:
@@ -799,10 +839,11 @@ def getCoffeeStore(coffeeId:str, storeId:str, acquire_lock:bool = True) -> Tuple
         return None, None
     except Exception:  # pylint: disable=broad-except
         # we end up here if there is no stock available
-        return None, None
+        pass
     finally:
         if acquire_lock and stock_semaphore.available() < 1:
             stock_semaphore.release(1)
+    return None, None
 
 
 # ==================
@@ -1054,7 +1095,7 @@ def getBlendLabels(blends:List[BlendStructure]) -> List[str]:
 
 # weightIn is in kg. Weights are rendered in weight_unit_idx
 # respects replacement beans
-def blend2ratio_beans(blend:BlendStructure, weightIn:float) -> Tuple[Optional[str], List[Tuple[float,str]]]:
+def blend2ratio_beans(blend:BlendStructure, weightIn:float, html_escape:Optional[bool] = True) -> Tuple[Optional[str], List[Tuple[float,str]]]:
     blend_name:Optional[str] = None
     res:List[Tuple[float,str]] = []
     try:
@@ -1065,7 +1106,7 @@ def blend2ratio_beans(blend:BlendStructure, weightIn:float) -> Tuple[Optional[st
         for i in sorted_ingredients:
             c = getCoffee(i['coffee'])
             c_label = (i.get('label', '') if c is None else coffeeLabel(c))
-            res.append((i['ratio'], html.escape(c_label)))
+            res.append((i['ratio'], (html.escape(c_label) if html_escape else c_label)))
         blend_name = blends.get('label', None)
     except Exception as e:  # pylint: disable=broad-except
         _log.exception(e)
@@ -1127,10 +1168,16 @@ def blend2beans(blend:BlendStructure, weight_unit_idx:int, weightIn:float=0) -> 
 #          replacementBlends: List[Tuple[float, Blend]]>>
 # Blend is an extra locally defined blend that gets added to the result if it has a non-empty ingredients list
 #    it is a dict of the form { 'hr_id': '', 'label': <some string>, 'ingredients': [ {'ratio':<num>, 'coffee':<hr_id_str>},...] }
-def getBlends(weight_unit_idx:int, store:Optional[str] = None, customBlend:Optional[Blend] = None) -> List[BlendStructure]:
+
+@functools.lru_cache(maxsize=None)  #for Python >= 3.9 can use @functools.cache
+def getStandardBlends(weight_unit_idx:int, store:Optional[str], acquire_lock:bool = True) -> List[BlendStructure]:
+    return getBlends(weight_unit_idx, store, None, acquire_lock)
+
+def getBlends(weight_unit_idx:int, store:Optional[str], customBlend:Optional[Blend], acquire_lock:bool = True) -> List[BlendStructure]:
 #    _log.debug('getBlends(%s,%s)', weight_unit_idx, store)
     try:
-        stock_semaphore.acquire(1)
+        if acquire_lock:
+            stock_semaphore.acquire(1)
         if stock is not None and ('blends' in stock or 'replBlends' in stock or customBlend is not None):
             res = {}
             if store is None:
@@ -1670,10 +1717,10 @@ def getBlends(weight_unit_idx:int, store:Optional[str] = None, customBlend:Optio
         return []
     except Exception as e:  # pylint: disable=broad-except
         _log.exception(e)
-        return []
     finally:
-        if stock_semaphore.available() < 1:
+        if acquire_lock and stock_semaphore.available() < 1:
             stock_semaphore.release(1)
+    return []
 
 
 # returns True if blendSpec of the form

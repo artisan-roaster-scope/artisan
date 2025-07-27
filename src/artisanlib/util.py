@@ -26,7 +26,7 @@ import numpy
 import functools
 from pathlib import Path
 from matplotlib import colors
-from typing import Final, Optional, Tuple, List, Sequence, Union, Any, TYPE_CHECKING
+from typing import Final, Optional, Literal, Tuple, List, Sequence, Union, Any, TYPE_CHECKING
 from typing_extensions import TypeGuard  # Python <=3.10
 
 if TYPE_CHECKING:
@@ -78,47 +78,63 @@ def appFrozen() -> bool:
         _log.exception(e)
     return ib
 
-def decs2string(x:List[int]) -> bytes:
-    if len(x) > 0:
-        return bytes(x)
-    return b''
+# returns empty string for values out of the valid Unicode range
 def uchr(x:int) -> str:
-    return chr(x)
+    try:
+        return chr(x)
+    except ValueError:
+        return ''
+
 def decodeLocal(x:Optional[Any]) -> Optional[str]:
     if x is not None:
-        return codecs.unicode_escape_decode(x)[0]
+        try:
+            return codecs.unicode_escape_decode(x)[0]
+        except Exception: # pylint: disable=broad-except
+            return None
     return None
 def decodeLocalStrict(x:Optional[Any], default:str = '') -> str:
     if x is None:
         return default
-    return codecs.unicode_escape_decode(x)[0]
+    try:
+        return codecs.unicode_escape_decode(x)[0]
+    except Exception: # pylint: disable=broad-except
+        return default
 def encodeLocal(x:Optional[Any]) -> Optional[str]:
     if x is not None:
-        return codecs.unicode_escape_encode(str(x))[0].decode('utf8')
+        try:
+            return codecs.unicode_escape_encode(str(x))[0].decode('utf8')
+        except Exception: # pylint: disable=broad-except
+            return None
     return None
 def encodeLocalStrict(x:Optional[Any], default:str = '') -> str:
     if x is None:
         return default
-    return codecs.unicode_escape_encode(str(x))[0].decode('utf8')
+    try:
+        return codecs.unicode_escape_encode(str(x))[0].decode('utf8')
+    except Exception: # pylint: disable=broad-except
+        return default
 def hex2int(h1:int, h2:Optional[int] = None) -> int:
     if h2 is not None:
         return int(h1*256 + h2)
     return int(h1)
+
+# str2cmd converts string to bytes ignoring all non-ascii characters. Result to be used for low-level device communication.
 def str2cmd(s:str) -> bytes:
-    return bytes(s,'ascii')
+    return s.encode('ascii', errors='ignore')
 def cmd2str(c:bytes) -> str:
     return str(c,'latin1')
 def s2a(s:str) -> str:
-    return s.encode('ascii','ignore').decode('ascii')
+    return str2cmd(s).decode('ascii')
 
 # returns True if x is not None, not NaN and not the error value -1 or 0
 def is_proper_temp(x:Union[None, int, float]) -> bool:
-    return x is not None and not numpy.isnan(x) and isinstance(x, (int, float)) and x not in [0, -1]
+    return x is not None and not numpy.isnan(x) and isinstance(x, (int, float)) and x not in [0, -1, float('-inf'), float('inf')]
 
-# returns the prefix of length ll of s and adds eclipse
+# returns the prefix of length ll-1 of s and adds Unicode ellipsis character
+# the length of the resulting string is max(1, ll, len(s))
 def abbrevString(s:str, ll:int) -> str:
     if len(s) > ll:
-        return f'{s[:ll-1]}...'
+        return f'{s[:max(0,ll-1)]}\u2026'
     return s
 
 # used to convert time from int seconds to string (like in the LCD clock timer). input int, output string xx:xx
@@ -137,12 +153,13 @@ def stringfromseconds(seconds_raw:float, leadingzero:bool = True) -> str:
         return f'-{d:02d}:{m:02d}'
     return f'-{d:d}:{m:02d}'
 
-#Converts a string into a seconds integer. Use for example to interpret times from Roaster Properties Dlg inputs
-#accepted formats: "00:00","-00:00"
+# Converts a string into a seconds integer. Use for example to interpret times from Roaster Properties Dlg inputs
+# accepted formats: "00:00","-00:00"
+# raises ValueError or IndexError on invalid inputs
 def stringtoseconds(string:str) -> int:
     timeparts = string.split(':')
     if len(timeparts) != 2:
-        return -1
+        raise ValueError(f"the string '{string}' is not a properly formatted time string of format xx:xx or -xx:xx")
     if timeparts[0][0] != '-':  #if number is positive
         seconds = int(timeparts[1])
         seconds += int(timeparts[0])*60
@@ -199,14 +216,14 @@ def RoRfromFtoC(FRoR:Optional[float]) -> Optional[float]:
         return FRoR
     return RoRfromFtoCstrict(FRoR)
 
-def convertRoR(r:Optional[float], source_unit:str, target_unit:str) -> Optional[float]:
+def convertRoR(r:Optional[float], source_unit:Literal['C', 'F'], target_unit:Literal['C', 'F']) -> Optional[float]:
     if source_unit == target_unit:
         return r
     if source_unit == 'C':
         return RoRfromCtoF(r)
     return RoRfromFtoC(r)
 
-def convertRoRstrict(r:float, source_unit:str, target_unit:str) -> float:
+def convertRoRstrict(r:float, source_unit:Literal['C', 'F'], target_unit:Literal['C', 'F']) -> float:
     if source_unit == target_unit:
         return r
     if source_unit == 'C':
@@ -216,16 +233,9 @@ def convertRoRstrict(r:float, source_unit:str, target_unit:str) -> float:
 def convertTemp(t:float, source_unit:str, target_unit:str) -> float:
     if source_unit in ('', target_unit) or target_unit == '':
         return t
-    res : Optional[float]
     if source_unit == 'C':
-        res = fromCtoF(t)
-        if res is None:
-            return t
-        return res
-    res = fromFtoC(t)
-    if res is None:
-        return t
-    return res
+        return fromCtoFstrict(t)
+    return fromFtoCstrict(t)
 
 def path2url(path:str) -> str:
     import urllib.parse as urlparse  # @Reimport
@@ -236,6 +246,7 @@ def path2url(path:str) -> str:
 # remaining artifacts from Qt4/5 compatibility layer:
 # note: those conversion functions are sometimes called with string arguments
 # thus a simple int(round(s)) won't work and a int(round(float(s))) needs to be applied
+# float('inf') and float('-inf') cannot be converted to integer and are mapped to 0
 def toInt(x:Optional[Union[int,str,float]]) -> int:
     if x is None:
         return 0
@@ -352,6 +363,7 @@ def replace_duplicates(data:List[float]) -> List[float]:
 # eg. ~/Library/Application Support/artisan-scope/Artisan (macOS)
 #     C:\Users\<USER>\AppData\Local\artisan-scope\Artisan (Windows)
 #     ~/.local/share/artisan-scope/Artisan (Linux)
+#     ~/.var/app/org.artisan_scope.artisan/data/artisan-scope/Artisan/artisan.log (Linux if installed via Flatpack)
 
 # getDataDirectory() returns the Artisan data directory
 # if app is not yet initialized None is returned
@@ -481,7 +493,7 @@ def createGradient(rgb:Union[QColor, str], tint_factor:float = 0.1, shade_factor
 def createRGBGradient(rgb:Union[QColor, str], tint_factor:float = 0.3, shade_factor:float = 0.3) -> Tuple[str,str]:
     try:
         rgb_tuple: Tuple[float, float, float]
-        if isinstance(rgb, QColor):
+        if isinstance(rgb, QColor): # pyrefly: ignore[invalid-argument]
             r,g,b,_ = rgb.getRgbF() # type:ignore[unused-ignore]
             if r is not None and g is not None and b is not None:
                 rgb_tuple = (r,g,b)
@@ -569,14 +581,14 @@ def debugLogLevelToggle() -> bool:
     return newDebugLevel
 
 def natsort(s:str) -> List[Union[int,str]]:
-    return [int(t) if t.isdigit() else t.lower() for t in re.split(r'(\d+)', s)]
+    return [int(t) if t.isdigit() else t.casefold() for t in re.split(r'(\d+)', s)]
 
 #convert number to string and auto set the number of decimal places 0, 0.999, 9.99, 999.9, 9999
 def scaleFloat2String(num:Union[float,str]) -> str:
     n = toFloat(num)
     if n == 0:
         return '0'
-    if abs(n) < 1:
+    if abs(n) < 10:
         return f'{n:.3f}'.rstrip('0').rstrip('.')
     if abs(n) >= 1000:
         return f'{n:.0f}'
@@ -587,24 +599,25 @@ def scaleFloat2String(num:Union[float,str]) -> str:
 
 # for use in widgets that expects a double via a self.createCLocalDoubleValidator that accepts both,
 # one dot and several commas. If there is no dot, the last comma is interpreted as decimal separator and the others removed
-# if there is a dot, the last one is used as a decimal separator and all other comma and dots are removed
+# if there is a dot, the last one is used as a decimal separator and all other comma and dots are removed.
+# Trailing dots are removed as well.
 def comma2dot(s:str) -> str:
     s = s.strip()
     last_dot = s.rfind('.')
-    if last_dot > -1:
+    last_pos = s.rfind(',')
+    if last_dot > -1 and (last_pos == -1 or last_dot > last_pos): # there is no comma after that last dot
         if last_dot + 1 == len(s):
             # this is just a trailing dot, we remove this and all other dots and commas
             return s.replace(',','').replace('.','')
         # we just keep this one and remove all other comma and dots; we also remove trailing zero decimals
         return s[:last_dot].replace(',','').replace('.','') + s[last_dot:].replace(',','').rstrip('0').rstrip('.')
     # there is no dot in the string
-    last_pos = s.rfind(',')
     if last_pos > -1:
         if last_pos + 1 == len(s):
             # this is just a trailing comma, we remove this and all other dots and commas
             return s.replace(',','').replace('.','')
         # we turn the last comma into a dot and remove all others; we also remove trailing zero decimals
-        return s[:last_pos].replace(',','') + '.' + s[last_pos+1:].rstrip('0').rstrip('.')
+        return s[:last_pos].replace(',','').replace('.','') + '.' + s[last_pos+1:].rstrip('0').rstrip('.')
     return s
 
 
@@ -615,6 +628,7 @@ weight_units_lower:Final[Tuple[str,str,str,str]] = ('g','kg','lb','oz') # just f
 volume_units:Final[Tuple[str,str,str,str,str,str]] = ('l','gal','qt','pt','cup','ml')
 
 def weightVolumeDigits(v:float) -> int:
+    v = abs(v)
     if v >= 1000:
         return 1
     if v >= 100:
@@ -633,8 +647,10 @@ def float2floatNone(f:Optional[float], n:int=1) -> Optional[float]:
         return None
     return float2float(f,n)
 
-# the int n specifies the number of digits
+# the int n>=0 specifies the number of digits
+# returns 0 if f is not a number
 def float2float(f:float, n:int=1) -> float:
+    n = max(n, 0)
     f = float(f)
     if n==0:
         if math.isnan(f):
@@ -654,7 +670,9 @@ def convertWeight(v:float, i:int, o:int) -> float:
                     [453.591999,   0.45359237, 1.,             16.],       # lb
                     [28.3495,      0.0283495,  0.0625,         1.]         # oz
                 ]
-    return v*convtable[i][o]
+    if 0 <= i < len(convtable) and 0 <= o < len(convtable):
+        return v*convtable[i][o]
+    raise IndexError(f'index error in convertWeight({v},{i},{o})')
 
 # i/o: 0:l (liter), 1:gal (gallons US), 2:qt, 3:pt, 4:cup, 5:cm^3/ml
 def convertVolume(v:float, i:int, o:int) -> float:
@@ -667,7 +685,9 @@ def convertVolume(v:float, i:int, o:int) -> float:
                     [0.23658823,    0.0625,         0.25,           0.5,            1.,             236.5882365          ],    # cup
                     [0.001,         2.6417205e-4,   1.05668821e-3,  2.11337641e-3,  4.2267528e-3,   1.                   ]     # cm^3
                 ]
-    return v*convtable[i][o]
+    if 0 <= i < len(convtable) and 0 <= o < len(convtable):
+        return v*convtable[i][o]
+    raise IndexError(f'index error in convertVolume({v},{i},{o})')
 
 
 # takes a weight, its weight unit index, and a weight unit target index (decides over metric vs imperial)
@@ -784,7 +804,7 @@ def render_weight(amount:float, weight_unit_index:int, target_unit_idx:int,
 # typing tools
 
 def is_int_list(xs: List[Any]) -> TypeGuard[List[int]]:
-    return all(isinstance(x, int) for x in xs)
+    return all(isinstance(x, int) and not isinstance(x, bool) for x in xs) # bool is a subclass of int!
 
 def is_float_list(xs: List[Any]) -> TypeGuard[List[float]]:
     return all(isinstance(x, float) for x in xs)
@@ -793,42 +813,4 @@ def is_float_list(xs: List[Any]) -> TypeGuard[List[float]]:
 # locale tools
 
 def right_to_left(locale:str) -> bool:
-    return locale in {'ar', 'fa', 'he'}
-
-#def locale2full_local(locale:str) -> str:
-#    locale_map:Dict[str,str] = {
-#        'ar': 'ar_AA',
-#        'da': 'da_DK',
-#        'de': 'de_DE',
-#        'el': 'el_GR',
-#        'en': 'en_US',
-#        'es': 'es_ES',
-#        'fa': 'fa_IR',
-#        'fi': 'fi_FI',
-#        'fr': 'fr_FR',
-#        'gd': 'gd_GB',
-#        'he': 'he_IL',
-#        'hu': 'hu_HU',
-#        'id': 'id_ID',
-#        'it': 'it_IT',
-#        'ja': 'ja_JP',
-#        'ko': 'ko_KR',
-#        'lv': 'lv_LV',
-#        'nl': 'nl_NL',
-#        'no': 'nn_NO',
-#        'pt': 'pt_PT',
-#        'pt_BR': 'pt_BR',
-#        'pl': 'pl_PL',
-#        'ru': 'ru_RU',
-#        'sk': 'sk_SK',
-#        'sv': 'sv_SE',
-#        'th': 'th_TH',
-#        'tr': 'tr_TR',
-#        'uk': 'uk_UA',
-#        'vi': 'vi_VN',
-#        'zh_CN': 'zh_CN',
-#        'zh_TW': 'zh_TW'
-#    }
-#    if locale in locale_map:
-#        return locale_map[locale]
-#    return locale
+    return locale.casefold() in {'ar', 'fa', 'he'}

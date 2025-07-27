@@ -186,7 +186,7 @@ class scanModbusDlg(ArtisanDialog):
                     res = self.aw.modbus.peekSingleRegister(self.slave,int(register),code=3)
                     if res is not None:
                         result += str(register) + '(3),' + str(res) + '<br>'
-                        self.modbusEdit.setHtml(result)
+                        self.modbusEdit.setHtml(result) # pyrefly: ignore[bad-assignment]
             self.aw.modbus.disconnect()
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
@@ -347,7 +347,7 @@ class scanS7Dlg(ArtisanDialog):
                     res = self.aw.s7.peekInt(self.area,self.DBnr,register)
                 if res is not None:
                     result += f'{str(register)}: {str(res)}<br>'
-                    self.S7Edit.setHtml(result)
+                    self.S7Edit.setHtml(result) # pyrefly: ignore[bad-assignment]
                 time.sleep(0.4)
             self.aw.s7.disconnect()
         except Exception as e: # pylint: disable=broad-except
@@ -486,12 +486,12 @@ class comportDlg(ArtisanResizeablDialog):
         modbus_input1divlabel = QLabel(QApplication.translate('Label', 'Divider'))
         modbus_input1modelabel = QLabel(QApplication.translate('Label', 'Mode'))
 
-        self.modbus_inputSlaveEdits:List[Optional[QLineEdit]] = [None]*self.aw.modbus.channels
-        self.modbus_inputRegisterEdits:List[Optional[QLineEdit]] = [None]*self.aw.modbus.channels
-        self.modbus_inputCodes:List[Optional[QComboBox]] = [None]*self.aw.modbus.channels
-        self.modbus_inputDivs:List[Optional[QComboBox]] = [None]*self.aw.modbus.channels
-        self.modbus_inputModes:List[Optional[QComboBox]] = [None]*self.aw.modbus.channels
-        self.modbus_inputDecodes:List[Optional[QComboBox]] = [None]*self.aw.modbus.channels
+        self.modbus_inputSlaveEdits:List[Optional[QLineEdit]] = [None]*self.aw.modbus.channels # pyrefly: ignore[bad-assignment]
+        self.modbus_inputRegisterEdits:List[Optional[QLineEdit]] = [None]*self.aw.modbus.channels # pyrefly: ignore[bad-assignment]
+        self.modbus_inputCodes:List[Optional[QComboBox]] = [None]*self.aw.modbus.channels # pyrefly: ignore[bad-assignment]
+        self.modbus_inputDivs:List[Optional[QComboBox]] = [None]*self.aw.modbus.channels # pyrefly: ignore[bad-assignment]
+        self.modbus_inputModes:List[Optional[QComboBox]] = [None]*self.aw.modbus.channels # pyrefly: ignore[bad-assignment]
+        self.modbus_inputDecodes:List[Optional[QComboBox]] = [None]*self.aw.modbus.channels # pyrefly: ignore[bad-assignment]
 
         for i in range(self.aw.modbus.channels):
             modbus_inputSlaveEdit:QLineEdit = QLineEdit(str(self.aw.modbus.inputSlaves[i]))
@@ -705,7 +705,7 @@ class comportDlg(ArtisanResizeablDialog):
         self.modbus_Serial_delayEdit.setValidator(self.aw.createCLocaleDoubleValidator(0,3,1,self.modbus_Serial_delayEdit))
         self.modbus_Serial_delayEdit.setFixedWidth(50)
         self.modbus_Serial_delayEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
-        self.modbus_Serial_delayEdit.setToolTip(QApplication.translate('Tooltip', 'Extra delay in Milliseconds between MODBUS Serial commands'))
+        self.modbus_Serial_delayEdit.setToolTip(QApplication.translate('Tooltip', 'Extra delay after connect in seconds before sending requests (needed by Arduino devices restarting on connect)'))
         modbus_Serial_retries = QLabel(QApplication.translate('Label', 'Retries'))
         self.modbus_Serial_retriesComboBox = QComboBox()
 #        modbus_Serial_retries.setBuddy(self.modbus_Serial_retriesComboBox)

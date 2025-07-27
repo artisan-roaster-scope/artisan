@@ -88,7 +88,7 @@ class BLE:
             address:Optional[str]) -> 'Tuple[Optional[BLEDevice], Optional[str]]':
         try:
             async with asyncio.timeout(scan_timeout): # type:ignore[attr-defined]
-                async with BleakScanner() as scanner:
+                async with BleakScanner() as scanner: # pyrefly: ignore[bad-context-manager]
                     self._terminate_scan_event.clear()
                     async for bd, ad in scanner.advertisement_data():
                         if self._terminate_scan_event.is_set():
@@ -326,7 +326,7 @@ class ClientBLE(QObject): # pyright:ignore[reportGeneralTypeIssues] # error: Arg
                     _log.error(e)
                 if self._connected_service_uuid is None:
                     # the client does not offer our service thus we put its
-                    # address on the blacklist to be ignore on next discover
+                    # address on the blacklist to be ignored on next discover
                     # and disconnect
                     ##blacklist.add(self._ble_client.address) # we don't blacklist as the searched for service might just not yet be discovered
                     self._disconnect()

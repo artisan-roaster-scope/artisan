@@ -34,7 +34,7 @@ from typing import Final, Union, List, Dict, Optional, TYPE_CHECKING
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
 
-from artisanlib.util import decs2string, fromCtoFstrict, fromFtoCstrict, hex2int, str2cmd, stringfromseconds, cmd2str, float2float
+from artisanlib.util import fromCtoFstrict, fromFtoCstrict, hex2int, str2cmd, stringfromseconds, cmd2str, float2float
 
 try:
     from PyQt6.QtCore import pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
@@ -1051,6 +1051,15 @@ class FujiPID:
 
     @staticmethod
     def dec2HexRaw(decimal:int) -> bytes:
+
+        def decs2string(x:List[int]) -> bytes:
+            try:
+                if len(x) > 0:
+                    return bytes(x)
+                return b''
+            except ValueError:
+                return b''
+
         # This method converts a decimal to a raw string appropriate for Fuji serial TX
         # Used to compose serial messages
         Nbytes = []
@@ -1142,7 +1151,7 @@ class PIDcontrol:
             'dutyMin', 'dutyMax', 'pidKp', 'pidKi', 'pidKd', 'pidSource', 'pidCycle', 'pidPositiveTarget', 'pidNegativeTarget', 'invertControl',
             'sv_smoothing_factor', 'sv_decay_weights', 'previous_svs', 'time_pidON', 'source_reading_pidON', 'current_ramp_segment',  'current_soak_segment', 'ramp_soak_engaged',
             'RS_total_time', 'slider_force_move', 'positiveTargetRangeLimit', 'positiveTargetMin', 'positiveTargetMax', 'negativeTargetRangeLimit',
-            'negativeTargetMin', 'negativeTargetMax', 'derivative_filter']
+            'negativeTargetMin', 'negativeTargetMax', 'derivative_filter', 'pidDoE', 'pidDlimit', 'pidIlimitFactor', 'pidIWP', 'pidIRoC', 'pidIRoCthreshold' ]
 
     def __init__(self, aw:'ApplicationWindow') -> None:
         self.aw:ApplicationWindow = aw
@@ -1157,7 +1166,7 @@ class PIDcontrol:
         self.loadRampSoakFromBackground:bool = False
         self.svLen:Final[int] = 8 # should stay at 8 for compatibility reasons!
         self.svLabel:str = ''
-        self.svValues: List[float]     = [0]*self.svLen      # sv temp as int per 8 channels
+        self.svValues: List[float]     = [0.0]*self.svLen      # sv temp as int per 8 channels
         self.svRamps: List[int]        = [0]*self.svLen      # seconds as int per 8 channels
         self.svSoaks: List[int]        = [0]*self.svLen      # seconds as int per 8 channels
         self.svActions: List[int]      = [-1]*self.svLen     # alarm action as int per 8 channels
@@ -1168,7 +1177,7 @@ class PIDcontrol:
         # extra RS sets:
         self.RSLen:Final[int] = 3 # can be changed to have less or more RSn sets
         self.RS_svLabels: List[str]       = ['']*self.RSLen                  # label of the RS set
-        self.RS_svValues: List[List[float]] = [[0]*self.svLen]*self.RSLen      # sv temp as int per 8 channels
+        self.RS_svValues: List[List[float]] = [[0.0]*self.svLen]*self.RSLen      # sv temp as int per 8 channels
         self.RS_svRamps: List[List[int]]  = [[0]*self.svLen]*self.RSLen      # seconds as int per 8 channels
         self.RS_svSoaks: List[List[int]]  = [[0]*self.svLen]*self.RSLen      # seconds as int per 8 channels
         self.RS_svActions: List[List[int]]= [[-1]*self.svLen]*self.RSLen     # alarm action as int per 8 channels
@@ -1196,7 +1205,15 @@ class PIDcontrol:
         self.pidKp:float = (15.0 if self.aw.qmc.mode == 'C' else 8.3334) # 15.0 in C
         self.pidKi:float = (0.01 if self.aw.qmc.mode == 'C' else 0.00556) # 0.01 in C
         self.pidKd:float = (20.0 if self.aw.qmc.mode == 'C' else 11.1111) # 20.0 in C
-        # Proposional on Measurement mode see: http://brettbeauregard.com/blog/2017/06/introducing-proportional-on-measurement/
+        # Proposional on Measurement (PoM) mode see: http://brettbeauregard.com/blog/2017/06/introducing-proportional-on-measurement/
+        # => PoM removed in v3.1.2
+        ## further pid configurations (only supported by the software pid currently)
+        self.pidDoE:bool = False          # classical Derivative on Error (DoE) if True, otherwise Derivative on Measurement (DoM) to reduce derivative kick
+        self.pidDlimit:float = 80.0       # derivative limit [0-100] (used for both, DoM and DoE)
+        self.pidIlimitFactor:float = 0.8  # integral limit factor
+        self.pidIWP:bool = True           # Advanced Integral Windup Prevention
+        self.pidIRoC:bool = True          # Reset integral on large setpoint changes
+        self.pidIRoCthreshold:float = 30  # SP threshold beyond which the integral will be reset if pidRIoC is set
         # pidSource
         #   either the TC4 input channel from [1,..,4] if self.qmc.device == 19 (Arduino/TC4)
         #   in all other cases (HOTTOP, MODBUS,..), 1 is interpreted as BT and 2 as ET, 3 as 0xT1, 4 as 0xT2, 5 as 1xT1, ...
@@ -1311,7 +1328,7 @@ class PIDcontrol:
     def conv2fahrenheit(self) -> None:
         try:
             self.aw.qmc.rampSoakSemaphore.acquire(1)
-            self.svValue = (0 if self.svValue == 0 else max(0, fromCtoFstrict(self.svValue)))
+            self.svValue = (0 if self.svValue == 0 else max(0.0, fromCtoFstrict(self.svValue)))
             self.svSliderMin = (0 if self.svSliderMin == 0 else max(0, min(999, int(round(fromCtoFstrict(self.svSliderMin))))))
             self.svSliderMax = (0 if self.svSliderMax == 0 else max(0, min(999, int(round(fromCtoFstrict(self.svSliderMax))))))
             # establish ne limits on sliders
@@ -1378,17 +1395,23 @@ class PIDcontrol:
 
     # the internal software PID should be configured on ON, but not be activated yet to warm it up
     def confSoftwarePID(self) -> None:
-        if self.externalPIDControl() not in [1, 2, 4] and not(self.aw.qmc.device == 19 and self.aw.qmc.PIDbuttonflag) and self.aw.qmc.Controlbuttonflag:
-            # software PID
-            self.aw.qmc.pid.setPID(self.pidKp,self.pidKi,self.pidKd)
-            self.aw.qmc.pid.setLimits((-100 if self.pidNegativeTarget else 0),(100 if self.pidPositiveTarget else 0))
-            self.aw.qmc.pid.setDutySteps(self.dutySteps)
-            self.aw.qmc.pid.setDutyMin(self.dutyMin)
-            self.aw.qmc.pid.setDutyMax(self.dutyMax)
-            self.aw.qmc.pid.setControl(self.setEnergy)
-            self.aw.qmc.pid.setDerivativeFilterLevel(self.derivative_filter)
-            if self.svMode == 0:
-                self.setSV(self.aw.sliderSV.value())
+        # software PID
+        self.aw.qmc.pid.setPID(self.pidKp,self.pidKi,self.pidKd)
+        self.aw.qmc.pid.setLimits((-100 if self.pidNegativeTarget else 0),(100 if self.pidPositiveTarget else 0))
+        self.aw.qmc.pid.setDutySteps(self.dutySteps)
+        self.aw.qmc.pid.setDutyMin(self.dutyMin)
+        self.aw.qmc.pid.setDutyMax(self.dutyMax)
+        self.aw.qmc.pid.setControl(self.setEnergy)
+        self.aw.qmc.pid.setDerivativeFilterLevel(self.derivative_filter)
+        if self.svMode == 0:
+            self.setSV(self.aw.sliderSV.value())
+        self.aw.qmc.pid.setDerivativeOnError(self.pidDoE)
+        self.aw.qmc.pid.setDerivativeLimit(self.pidDlimit)
+        self.aw.qmc.pid.setIntegralWindupPrevention(self.pidIWP)
+        self.aw.qmc.pid.setIntegralResetOnSP(self.pidIRoC)
+        self.aw.qmc.pid.setSetpointChangeThreshold(self.pidIRoCthreshold)
+        self.aw.qmc.pid.setIntegralLimitFactor(self.pidIlimitFactor)
+
 
     # if send_command is False, the pidOn command is not forwarded to the external PID (TC4, Kaleido, ..)
     def pidOn(self, send_command:bool = True) -> None:
@@ -1436,15 +1459,7 @@ class PIDcontrol:
         elif self.aw.qmc.Controlbuttonflag:
             # software PID
             if not self.pidActive: # only if not yet active!
-                self.aw.qmc.pid.setPID(self.pidKp,self.pidKi,self.pidKd)
-                self.aw.qmc.pid.setLimits((-100 if self.pidNegativeTarget else 0),(100 if self.pidPositiveTarget else 0))
-                self.aw.qmc.pid.setDutySteps(self.dutySteps)
-                self.aw.qmc.pid.setDutyMin(self.dutyMin)
-                self.aw.qmc.pid.setDutyMax(self.dutyMax)
-                self.aw.qmc.pid.setControl(self.setEnergy)
-                self.aw.qmc.pid.setDerivativeFilterLevel(self.derivative_filter)
-                if self.svMode == 0:
-                    self.setSV(self.aw.sliderSV.value())
+                self.confSoftwarePID()
                 self.pidActive = True
                 self.aw.qmc.pid.on()
                 self.aw.buttonCONTROL.setStyleSheet(self.aw.pushbuttonstyles['PIDactive'])
@@ -1607,7 +1622,7 @@ class PIDcontrol:
             #  1: BT, 2: ET, 3: as 0xT1, 4: as 0xT2, 5: as 1xT1, ...
 
             if self.aw.qmc.timeindex[6] > 0: # after DROP, the SV configured in the dialog is returned (min/maxed)
-                return max(self.svSliderMin, min(self.svSliderMax, self.svValue))
+                return max(float(self.svSliderMin), min(float(self.svSliderMax), self.svValue))
             if self.aw.qmc.timeindex[0] < 0: # before CHARGE, the CHARGE temp of the background profile is returned
                 if self.aw.qmc.timeindexB[0] < 0:
                     # no CHARGE in background, return manual SV
@@ -1652,14 +1667,14 @@ class PIDcontrol:
 #            self.aw.sendmessage(QApplication.translate("Message","SV set to %s"%sv))
         if self.externalPIDControl() == 1:
             # MODBUS PID and Control ticked
-            sv = max(0,sv)
+            sv = max(0.0, sv)
             if move:
                 self.aw.moveSVslider(sv,setValue=True)
             self.aw.modbus.setTarget(sv)
             self.sv = sv # remember last sv
         elif self.externalPIDControl() == 2:
             # S7 PID and Control ticked
-            sv = max(0,sv)
+            sv = max(0.0, sv)
             if move:
                 self.aw.moveSVslider(sv,setValue=True)
             self.aw.s7.setTarget(sv,self.aw.s7.SVmultiplier)
@@ -1667,7 +1682,7 @@ class PIDcontrol:
         elif self.aw.qmc.device == 19 and self.externalPIDControl():
             # ArduinoTC4 firmware PID
             if self.aw.ser.ArduinoIsInitialized:
-                sv = max(0,float2float(sv,2))
+                sv = max(0.0, float2float(sv,2))
                 if self.sv != sv: # nothing to do (avoid loops via moveslider!)
                     if move:
                         self.aw.moveSVslider(sv,setValue=True) # only move the slider
@@ -1742,7 +1757,7 @@ class PIDcontrol:
             if self.sv is not None:
                 sv = self.sv
             else:
-                sv = min(self.svSliderMax, max(self.svSliderMin, self.svValue))
+                sv = min(float(self.svSliderMax), max(float(self.svSliderMin), self.svValue))
             sv = int(round(sv))
             self.aw.updateSVSliderLCD(sv)
             self.aw.sliderSV.setValue(sv)

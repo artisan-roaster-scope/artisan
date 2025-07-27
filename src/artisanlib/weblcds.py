@@ -43,7 +43,7 @@ class WebView:
         self._thread:      Optional[Thread]                    = None # the thread running the asyncio loop
         self._app = web.Application(debug=True)
         self._app['websockets'] = weakref.WeakSet()
-        self._app.on_shutdown.append(self.on_shutdown)
+        self._app.on_shutdown.append(self.on_shutdown) # type:ignore[arg-type, unused-ignore]
 
         self._last_send:float = time.time() # timestamp of the last message send to the clients
         self._last_message:Optional[str] = None # last message send to connected clients; sent to new clients on connect
@@ -163,7 +163,7 @@ class WebView:
             if self._runner is not None:
                 future = asyncio.run_coroutine_threadsafe(self._runner.cleanup(), self._loop)
                 future.result()
-            self._loop.call_soon_threadsafe(self._loop.stop)
+            self._loop.call_soon_threadsafe(self._loop.stop)  # pyrefly: ignore
             self._loop = None
         # wait for the thread to finish
         if self._thread is not None:

@@ -63,8 +63,8 @@ class LiveLFilter(LiveFilter):
         """
         self.b = b_
         self.a = a_
-        self._xs:Deque[float] = deque([0.0] * len(b), maxlen=len(b))
-        self._ys:Deque[float] = deque([0.0] * (len(a) - 1), maxlen=len(a)-1)
+        self._xs:Deque[float] = deque([0.0] * len(self.b), maxlen=len(self.b))         # pyrefly: ignore[bad-argument-type]
+        self._ys:Deque[float] = deque([0.0] * (len(self.a) - 1), maxlen=len(self.a)-1) # pyrefly: ignore[bad-argument-type]
 
     def _process(self, x:float) -> float:
         """Filter incoming data with standard difference equations.
@@ -213,7 +213,7 @@ if __name__ == '__main__':
     from scipy.signal import iirfilter, lfilter, sosfilt # type # ignore[import-untyped]
     #
     # define lowpass filter with 2.5 Hz cutoff frequency of order 4 (note: delay increases with order)
-    b, a = iirfilter(4, Wn=2.5, fs=fs, btype='low', ftype='butter')
+    b, a = iirfilter(4, Wn=2.5, fs=fs, btype='low', ftype='butter') # pyrefly: ignore
     y_scipy_lfilter = lfilter(b, a, yraw)
 
     live_lfilter = LiveLFilter(b, a)

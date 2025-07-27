@@ -19,7 +19,7 @@
 ######
 # the following commented package versions are read by appveyor.yml and downloaded outside of pip.
 #
-# pyinstaller==6.14.1; platform_system='Windows'
+# pyinstaller==6.14.2; platform_system='Windows'
 # libusb==1.0.26;  platform_system='Linux'
 # dotenv==2.8.1;   platform_system='Linux'  # v3.0.0 not compatible with fpm  # gem installed, not pip
 #
@@ -33,7 +33,7 @@ pymodbus==3.6.9; python_version < '3.9' # last Python 3.8 release
 pymodbus==3.9.2; python_version >= '3.9'
 python-snap7==1.3; python_version < '3.10' # last Python 3.9 release
 python-snap7==2.0.2; python_version >= '3.10'
-Phidget22==1.22.20250422
+Phidget22==1.22.20250714
 Unidecode==1.4.0
 qrcode==7.4.2;  python_version < '3.9' # last Python 3.8 release
 qrcode==8.2; python_version >= '3.9'
@@ -52,9 +52,9 @@ psutil==7.0.0
 typing-extensions==4.10.0; python_version < '3.8' # required for supporting Final and TypeDict on Python <3.8
 protobuf==5.29.3 # v5.30.x drops support for Python 3.8!
 numpy==1.24.3; python_version < '3.9' # last Python 3.8 release
-numpy==2.3.1; python_version >= '3.9'
+numpy==2.3.2; python_version >= '3.9'
 scipy==1.10.1; python_version < '3.9' # last Python 3.8 release
-scipy==1.15.3; python_version >= '3.9'
+scipy==1.16.0; python_version >= '3.9'
 wquantiles==0.6
 colorspacious==1.1.2
 openpyxl==3.1.5
@@ -62,22 +62,23 @@ keyring==25.5.0; python_version < '3.9' # last Python 3.8 release
 keyring==25.6.0; python_version >= '3.9'
 prettytable==3.11.0; python_version < '3.9' # last Python 3.8 release
 prettytable==3.16.0; python_version >= '3.9'
-lxml==5.4.0
+lxml==6.0.0
 matplotlib==3.7.3; python_version < '3.9' # last Python 3.8 release
 matplotlib==3.10.3; python_version >= '3.9'
 jinja2==3.1.6
 aiohttp==3.10.11; python_version < '3.9' # last Python 3.8 release
-aiohttp==3.12.12; python_version >= '3.9'
+aiohttp==3.12.14; python_version >= '3.9'
 aiohttp_jinja2==1.6
 python-bidi==0.4.2; python_version < '3.9' # last Python 3.8 release
 python-bidi==0.6.6; python_version >= '3.9'
 arabic-reshaper==3.0.0
 pillow==10.4.0; python_version < '3.9' # last Python 3.8 release
-pillow>=11.2.1; python_version >= '3.9'
+pillow>=11.3.0; python_version >= '3.9'
 pydantic==2.11.7; (platform_system=='Windows' and python_version>'3.10') or sys_platform=='darwin' or platform_system=='Linux'
 pydantic==2.7.1; (platform_system=='Windows' and python_version<'3.9')  # last version working with Windows 7/8 pending resolution of pydantic Issue #9920
 babel==2.17.0
-bleak==0.22.3
+bleak==0.22.3; python_version < '3.9' # last Python 3.8 release
+bleak==1.0.1; python_version >= '3.9'
 python-statemachine==2.5.0
 #
 #
@@ -104,7 +105,7 @@ PyQtWebEngine==5.15.7; (platform_system=='Windows' and python_version<'3.9')
 PyQt6==6.9.1; (sys_platform=='darwin' and platform_release>='20.0') or (platform_system=='Windows' and python_version>'3.10') or (platform_system=='Linux' and platform_machine!='aarch64')
 PyQt6-WebEngine==6.9.0; (sys_platform=='darwin' and platform_release>='20.0') or (platform_system=='Windows' and python_version>'3.10') or (platform_system=='Linux' and platform_machine!='aarch64')
 ###
-pyinstaller==6.14.1; platform_system=='Linux' # on Windows pyinstaller is separately installed (see above)
+pyinstaller==6.14.2; platform_system=='Linux' # on Windows pyinstaller is separately installed (see above)
 ###
 ### Qt build tools not part of PyQt but required by build-derived
 qt5-tools==5.15.2.1.3; (platform_system=='Windows' and python_version<'3.9')
@@ -136,7 +137,7 @@ SecretStorage==3.3.3; platform_system=='Linux'
 ### Windows specific packages
 ###
 build==1.2.2.post1; platform_system=='Windows'  # required to build pyinstaller bootloader
-pywin32==310; platform_system=='Windows'
+pywin32==311; platform_system=='Windows'
 pyinstaller-versionfile==2.1.1; platform_system=='Windows' and python_version < '3.9'
 pyinstaller-versionfile==3.0.1; platform_system=='Windows' and python_version >= '3.9'
 libusb-package==1.0.26.3; platform_system=='Windows'

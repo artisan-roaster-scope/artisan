@@ -15,7 +15,6 @@ from typing import Final, TypedDict, Optional, List, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
-    from artisanlib.atypes import ProfileData # pylint: disable=unused-import
     from PyQt6.QtCore import QUrl # pylint: disable=unused-import
 
 try:
@@ -24,6 +23,7 @@ except ImportError:
     from PyQt5.QtCore import QDateTime, Qt # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib.util import encodeLocal
+from artisanlib.atypes import ProfileData
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -54,7 +54,7 @@ class RoastPathData(TypedDict, total=False):
     drumData: List[RoastPathDataItem]
 
 # returns a dict containing all profile information contained in the given RoastPATH document pointed by the given QUrl
-def extractProfileRoastPathHTML(url:'QUrl', _:'ApplicationWindow') -> Optional['ProfileData']:
+def extractProfileRoastPathHTML(url:'QUrl', _:'ApplicationWindow') -> Optional[ProfileData]:
     res:ProfileData = ProfileData() # the interpreted data set
     try:
         sess = requests.Session()
@@ -155,7 +155,7 @@ def extractProfileRoastPathHTML(url:'QUrl', _:'ApplicationWindow') -> Optional['
                 res['temp1'] = res['temp1'][:temp2len] # truncate
                 # now temp1 should be the same length of temp2
             else:
-                res['temp1'] = [-1]*len(res['temp2'])
+                res['temp1'] = [-1.0]*len(res['temp2'])
 
             # Events
             timeindex = [-1,0,0,0,0,0,0,0]
@@ -172,7 +172,7 @@ def extractProfileRoastPathHTML(url:'QUrl', _:'ApplicationWindow') -> Optional['
                         try:
 #                            tx_idx = res["timex"].index(tx) # does not cope with dropouts as the next line:
                             tx_idx = next(i for i,item in enumerate(res['timex']) if item >= tx)
-                            timeindex[marks[dd['EventName']]] = max(0,tx_idx)
+                            timeindex[marks[dd['EventName']]] = max(0, tx_idx) # pyrefly: ignore[index-error]
                         except Exception: # pylint: disable=broad-except
                             pass
             res['timeindex'] = timeindex
@@ -285,7 +285,7 @@ def extractProfileRoastPathHTML(url:'QUrl', _:'ApplicationWindow') -> Optional['
                     timex = [dateutil.parser.parse(d['Timestamp']).timestamp() - baseTime if 'Timestamp' in d else 0 for d in at]
                     res['extratimex'].append(timex)
                     res['extratemp1'].append([d.get('StandardValue', -1) for d in at])
-                    res['extratemp2'].append([-1]*len(timex))
+                    res['extratemp2'].append([-1.0]*len(timex))
 
                 # BT RoR
                 if 'rorData' in data:
@@ -318,7 +318,7 @@ def extractProfileRoastPathHTML(url:'QUrl', _:'ApplicationWindow') -> Optional['
                     timex = [dateutil.parser.parse(d['Timestamp']).timestamp() - baseTime if 'Timestamp' in d else 0 for d in ror]
                     res['extratimex'].append(timex)
                     res['extratemp1'].append([d.get('StandardValue', -1) for d in ror])
-                    res['extratemp2'].append([-1]*len(timex))
+                    res['extratemp2'].append([-1.0]*len(timex))
 
     except Exception as e: # pylint: disable=broad-except
         _log.exception(e)

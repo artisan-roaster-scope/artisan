@@ -13,7 +13,6 @@ from typing import Final, Optional, List, Dict, Callable, Any, Generator, TYPE_C
 
 
 if TYPE_CHECKING:
-    from artisanlib.atypes import ProfileData # pylint: disable=unused-import
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
 
 try:
@@ -22,6 +21,7 @@ except ImportError:
     from PyQt5.QtCore import QDateTime, Qt, QMutex, QWaitCondition, QUrl  # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib.util import encodeLocal
+from artisanlib.atypes import ProfileData
 
 
 from artisanlib.ble_port import ClientBLE
@@ -39,7 +39,7 @@ def url_to_profile(url:str, log_data:bool = False) -> IkawaCmd_pb2.RoastProfile:
         _log.info('ikawa profile: %s',message_bytes)
     return IkawaCmd_pb2.RoastProfile().FromString(message_bytes) # pylint: disable=no-member
 
-def extractProfileIkawaURL(url:QUrl, aw:'ApplicationWindow') -> 'ProfileData':
+def extractProfileIkawaURL(url:QUrl, aw:'ApplicationWindow') -> ProfileData:
     ikawa_profile = url_to_profile(url.query(), log_data=aw.qmc.device_logging)
     res:ProfileData = ProfileData() # the interpreted data set
     res['samplinginterval'] = 1.0
@@ -155,7 +155,7 @@ def extractProfileIkawaURL(url:QUrl, aw:'ApplicationWindow') -> 'ProfileData':
 
 
 # returns a dict containing all profile information contained in the given IKAWA CSV file
-def extractProfileIkawaCSV(file:str, aw:'ApplicationWindow') -> 'ProfileData':
+def extractProfileIkawaCSV(file:str, aw:'ApplicationWindow') -> ProfileData:
     res:ProfileData = ProfileData() # the interpreted data set
 
     res['samplinginterval'] = 1.0

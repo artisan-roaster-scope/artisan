@@ -9,7 +9,6 @@ from typing import Final, List, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
-    from artisanlib.atypes import ProfileData # pylint: disable=unused-import
 
 try:
     from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
@@ -17,11 +16,12 @@ except ImportError:
     from PyQt5.QtWidgets import QApplication # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib.util import replace_duplicates
+from artisanlib.atypes import ProfileData
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 # returns a dict containing all profile information contained in the given IKAWA CSV file
-def extractProfileGiesenCSV(file:str, aw:'ApplicationWindow') -> 'ProfileData':
+def extractProfileGiesenCSV(file:str, aw:'ApplicationWindow') -> ProfileData:
     res:ProfileData = ProfileData() # the interpreted data set
 
     res['samplinginterval'] = 1.0

@@ -808,7 +808,7 @@ class LargePhasesLCDs(LargeLCDs):
         for i, ll in enumerate(map(self.formatLabel,labels)):
             if ll is not None:
                 self.labels[i] = ll
-        super().updateLabels([' ']*2,[' ']*2,[self.labels[0],self.labels[2]],[self.labels[1],self.labels[3]])
+        super().updateLabels([' ']*2,[' ']*2,[self.labels[0],self.labels[2]],[self.labels[1],self.labels[3]]) # pyrefly: ignore[bad-argument-type]
 
     def updateAUCstyle(self, style:str) -> None:
         self.lcds2[1].setStyleSheet(style)

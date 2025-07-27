@@ -38,7 +38,7 @@ class QRImage(qrcode.image.base.BaseImage): # type: ignore # pyright: "base" is 
     def save(self, stream:Any, kind:Optional[str]=None) -> None:
         pass
 
-    def process(self) -> None:
+    def process(self) -> None: # pyrefly: ignore[bad-override]
         pass
 
     def drawrect_context(self, row: int, col: int, qr: QRCode) -> None: # type:ignore[no-any-unimported,unused-ignore]

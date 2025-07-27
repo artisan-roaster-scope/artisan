@@ -731,7 +731,7 @@ class StatisticsDlg(ArtisanResizeablDialog):
     def insertsummarystat(self, insert:bool = False) -> None:
         try:
             focusWidget = QApplication.focusWidget()
-            if focusWidget is not None and isinstance(focusWidget, QLineEdit):
+            if focusWidget is not None and isinstance(focusWidget, QLineEdit): # pyrefly: ignore[invalid-argument]
                 fw:QLineEdit = focusWidget
                 fw.editingFinished.emit()
         except Exception as e: # pylint: disable=broad-except

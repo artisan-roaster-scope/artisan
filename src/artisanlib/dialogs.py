@@ -48,7 +48,7 @@ class ArtisanDialog(QDialog): # pyright: ignore [reportGeneralTypeIssues] # Argu
     __slots__ = ['aw', 'dialogbuttons']
 
     def __init__(self, parent:Optional[QWidget], aw:'ApplicationWindow') -> None:
-        super().__init__(parent)
+        super().__init__(parent)  # pyrefly: ignore[bad-argument-count]
         self.aw = aw # the Artisan application window
 
         # IMPORTANT NOTE: if dialog items have to be access after it has been closed, this Qt.WidgetAttribute.WA_DeleteOnClose attribute
@@ -141,7 +141,7 @@ class ArtisanMessageBox(QMessageBox): # pyright: ignore [reportGeneralTypeIssues
     __slots__ = ['timeout', 'currentTime']
 
     def __init__(self, parent:Optional[QWidget] = None, title:Optional[str] = None, text:Optional[str] = None, timeout:int = 0, modal:bool = True) -> None:
-        super().__init__(parent)
+        super().__init__(parent) # pyrefly: ignore[bad-argument-count]
         self.setWindowTitle(title)
         self.setText(text)
         self.setModal(modal)
@@ -302,8 +302,8 @@ class HelpDlg(ArtisanDialog):
             # Highlight all matches, the current match in current_match_highlight and all others in extra_matches_highlight
             for i, matchCursor in enumerate(self.matches):
                 selection = QTextEdit.ExtraSelection()
-                selection.cursor = matchCursor
-                fmt = QTextCharFormat()
+                selection.cursor = matchCursor  # pyrefly: ignore[bad-assignment]
+                fmt:QTextCharFormat = QTextCharFormat()
                 fmt.setForeground(QColor(match_text))
                 if i == self.current_match_index:
                     fmt.setBackground(QColor(current_match_highlight))
@@ -311,7 +311,7 @@ class HelpDlg(ArtisanDialog):
                     fmt.setBackground(QColor(extra_matches_highlight))
                 if self.aw.app.darkmode:
                     fmt.setForeground(QColor('black'))
-                selection.format = fmt
+                selection.format = fmt # pyrefly: ignore[bad-assignment]
                 extraSelections.append(selection)
             # Move the visible cursor to the current match and clear its active selection
             self.phelp.setTextCursor(self.matches[self.current_match_index])
@@ -712,7 +712,7 @@ class tareDlg(ArtisanDialog):
     @pyqtSlot()
     def weightEdited(self) -> None:
         sender = self.sender()
-        if sender and isinstance(sender, QLineEdit):
+        if sender and isinstance(sender, QLineEdit): # pyrefly: ignore[invalid-argument]
             text = sender.text().strip()
             if text == '':
                 w:Optional[float] = self.get_scale_weight() # read value from scale in 'g'

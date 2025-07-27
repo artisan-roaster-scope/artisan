@@ -77,7 +77,8 @@ ignore-paths = [ "^uic/.*$",
                  "^build/.*$",
                  "^dist/.*$",
                  "^proto/.*$",
-                 "^test/.*$" ]
+                 "^test/.*$",
+                 "^.pytype/.*$" ]
 
 # Use multiple processes to speed up Pylint. Specifying 0 will auto-detect the
 # number of processors available to use.
@@ -240,7 +241,7 @@ enable='''c-extension-no-member,'''
 ## mypy conf
 
 [tool.mypy]
-files = ["artisanlib/*.py", "plus/*.py"]
+files = ["artisanlib/*.py", "plus/*.py", "test/**/*.py"]
 exclude = ['build', 'dist', 'uic', 'misc']
 python_version = "3.9"
 
@@ -288,6 +289,8 @@ follow_imports = 'skip'
 ## ruff conf
 
 [tool.ruff]
+include = ["artisanlib/*.py", "plus/*.py", "test/**/*.py"]
+
 # Enable pycodestyle (`E`), Pyflakes (`F`), Updates ('UP'), flake8-bugbear (`B`) codes by default.
 # also flake8-2020 (YTT), flake8-commas (COM), flake8-comprehensions (C4),
 # flake8-datetimez (DTZ), flake8-pie (PIE), flake8-raise (RSE), flake8-return (RET),
@@ -318,7 +321,7 @@ target-version = "py38"
 ## pyright conf
 
 [tool.pyright]
-include = ["artisanlib", "plus" ]
+include = ["artisanlib", "plus", "test" ]
 exclude = ["proto"]
 # ignore = ["src/oldstuff"]
 
@@ -352,16 +355,27 @@ testpaths = [
 pythonpath = [
   "."
 ]
+filterwarnings = [
+  "ignore::RuntimeWarning",
+]
+
 
 [tool.codespell]
 skip = '*.ts,./coverage,./build,./dist*,./htmlcov,./*.spec'
 count = ''
 quiet-level = 3
-ignore-words-list = 'Abd,ser,alog,nd,iterm,dout,te,commandi,dout,exitt,currenty,exaust,controle,coment,controle,outweight,everytime,sade,weightIn,weightin'
+ignore-words-list = 'Abd,ser,alog,nd,iterm,dout,te,commandi,dout,exitt,currenty,exaust,controle,coment,controle,outweight,everytime,sade,weightIn,weightin,Caf,caf'
 
 
 
 ## ty conf
+
+[tool.ty.src]
+include = [
+    "artisanlib/*.py",
+    "plus/*.py",
+    "test/**/*.py"
+]
 
 #[tool.ty.rules]
 #invalid-assignment = "ignore"
@@ -370,10 +384,14 @@ ignore-words-list = 'Abd,ser,alog,nd,iterm,dout,te,commandi,dout,exitt,currenty,
 #possibly-unbound-attribute = "error"
 #possibly-unbound-import = "error"
 
+
+## pyrefly conf
+
 [tool.pyrefly]
 project_includes = [
     "artisanlib/*.py",
     "plus/*.py",
+    "test/**/*.py"
 ]
 project_excludes = [
     "**/build*",
@@ -390,3 +408,7 @@ replace_imports_with_any = [
     "libusb_package.*",
     "uic.*",
 ]
+
+[tool.pyrefly.errors]
+missing-attribute = false   # does not understand PyQt connect/disconnect methods
+invalid-inheritance = false # does not understand PyQt inheritance

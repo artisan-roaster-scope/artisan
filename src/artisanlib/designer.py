@@ -376,7 +376,7 @@ class designerconfigDlg(ArtisanDialog):
             except Exception: # pylint: disable=broad-except
                 self.Edit0et.setText(self.Edit0etcopy)
         if self.dryend.isChecked():
-            if self.Edit1.text() != self.Edit1copy and stringtoseconds(str(self.Edit1.text())):
+            if self.Edit1.text() != self.Edit1copy:
                 try:
                     timez = stringtoseconds(str(self.Edit1.text()))+ self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
                     self.aw.qmc.timex[self.aw.qmc.timeindex[1]] = timez
@@ -396,7 +396,7 @@ class designerconfigDlg(ArtisanDialog):
                 except Exception: # pylint: disable=broad-except
                     self.Edit1et.setText(self.Edit1etcopy)
         if self.fcs.isChecked():
-            if self.Edit2.text() != self.Edit2copy and stringtoseconds(str(self.Edit2.text())):
+            if self.Edit2.text() != self.Edit2copy:
                 try:
                     timez = stringtoseconds(str(self.Edit2.text()))+ self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
                     self.aw.qmc.timex[self.aw.qmc.timeindex[2]] = timez
@@ -416,7 +416,7 @@ class designerconfigDlg(ArtisanDialog):
                 except Exception: # pylint: disable=broad-except
                     self.Edit2et.setText(self.Edit2etcopy)
         if self.fce.isChecked():
-            if self.Edit3.text() != self.Edit3copy and stringtoseconds(str(self.Edit3.text())):
+            if self.Edit3.text() != self.Edit3copy:
                 try:
                     timez = stringtoseconds(str(self.Edit3.text()))+ self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
                     self.aw.qmc.timex[self.aw.qmc.timeindex[3]] = timez
@@ -436,7 +436,7 @@ class designerconfigDlg(ArtisanDialog):
                 except Exception: # pylint: disable=broad-except
                     self.Edit3et.setText(self.Edit3etcopy)
         if self.scs.isChecked():
-            if self.Edit4.text() != self.Edit4copy and stringtoseconds(str(self.Edit4.text())):
+            if self.Edit4.text() != self.Edit4copy:
                 try:
                     timez = stringtoseconds(str(self.Edit4.text()))+ self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
                     self.aw.qmc.timex[self.aw.qmc.timeindex[4]] = timez
@@ -456,7 +456,7 @@ class designerconfigDlg(ArtisanDialog):
                 except Exception: # pylint: disable=broad-except
                     self.Edit4et.setText(self.Edit4etcopy)
         if self.sce.isChecked():
-            if self.Edit5.text() != self.Edit5copy and stringtoseconds(str(self.Edit5.text())):
+            if self.Edit5.text() != self.Edit5copy:
                 try:
                     timez = stringtoseconds(str(self.Edit5.text()))+ self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
                     self.aw.qmc.timex[self.aw.qmc.timeindex[5]] = timez
@@ -475,7 +475,7 @@ class designerconfigDlg(ArtisanDialog):
                     self.Edit5etcopy = self.Edit5et.text()
                 except Exception: # pylint: disable=broad-except
                     self.Edit5et.setText(self.Edit5etcopy)
-        if self.Edit6.text() != self.Edit6copy and stringtoseconds(str(self.Edit6.text())):
+        if self.Edit6.text() != self.Edit6copy:
             try:
                 timez = stringtoseconds(str(self.Edit6.text()))+ self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
                 self.aw.qmc.timex[self.aw.qmc.timeindex[6]] = timez
@@ -501,18 +501,21 @@ class designerconfigDlg(ArtisanDialog):
 
     #supporting function for settimes()
     def validatetimeorder(self) -> int:
-        time = []
-        checks = self.readchecks()
-        time.append(stringtoseconds(str(self.Edit0.text())))
-        time.append(stringtoseconds(str(self.Edit1.text())))
-        time.append(stringtoseconds(str(self.Edit2.text())))
-        time.append(stringtoseconds(str(self.Edit3.text())))
-        time.append(stringtoseconds(str(self.Edit4.text())))
-        time.append(stringtoseconds(str(self.Edit5.text())))
-        time.append(stringtoseconds(str(self.Edit6.text())))
-        for i in range(len(time)-1):
-            if time[i+1] <= time[i] and checks[i+1] != 0:
-                return i
+        try:
+            time = []
+            checks = self.readchecks()
+            time.append(stringtoseconds(str(self.Edit0.text())))
+            time.append(stringtoseconds(str(self.Edit1.text())))
+            time.append(stringtoseconds(str(self.Edit2.text())))
+            time.append(stringtoseconds(str(self.Edit3.text())))
+            time.append(stringtoseconds(str(self.Edit4.text())))
+            time.append(stringtoseconds(str(self.Edit5.text())))
+            time.append(stringtoseconds(str(self.Edit6.text())))
+            for i in range(len(time)-1):
+                if time[i+1] <= time[i] and checks[i+1] != 0:
+                    return i
+        except Exception: # pylint: disable=broad-except
+            pass
         return 1000
 
     def validatetime(self) -> int:

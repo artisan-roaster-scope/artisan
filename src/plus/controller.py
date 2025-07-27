@@ -315,7 +315,7 @@ def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
 def disconnect_confirmed() -> bool:
     string = QApplication.translate('Plus', 'Disconnect artisan.plus?')
     aw = config.app_window
-    assert isinstance(aw, QWidget)
+    assert isinstance(aw, QWidget) # pyrefly: ignore
 #    reply = QMessageBox.question(
 #        aw,
 #        QApplication.translate('Plus', 'Disconnect?'),

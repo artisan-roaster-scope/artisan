@@ -64,7 +64,7 @@ class CheckComboBox(QComboBox): # pyright: ignore [reportGeneralTypeIssues] # Ar
 #                style = QApplication.style()
 
             option = QStyleOptionViewItem(option)
-            option.showDecorationSelected = True
+            option.showDecorationSelected = True # pyrefly: ignore[bad-assignment]
 
             # option.state &= ~QStyle.StateFlag.State_HasFocus & ~QStyle.StateFlag.State_MouseOver
             if self.isSeparator(index):
@@ -96,7 +96,7 @@ class CheckComboBox(QComboBox): # pyright: ignore [reportGeneralTypeIssues] # Ar
                 style = option.widget.style()
             if style is not None:
                 style.drawControl(QStyle.ControlElement.CE_MenuItem, menuopt, painter,
-                                  option.widget)
+                                  option.widget) # pyrefly: ignore[bad-argument-type]
 
         def sizeHint(self, option:QStyleOptionViewItem, index:'QModelIndex') -> QSize:
             menuopt = self._getMenuStyleOption(option, index)
@@ -106,21 +106,21 @@ class CheckComboBox(QComboBox): # pyright: ignore [reportGeneralTypeIssues] # Ar
             if style is not None:
                 return style.sizeFromContents(
                     QStyle.ContentsType.CT_MenuItem, menuopt, menuopt.rect.size(),
-                    option.widget)
+                    option.widget)  # pyrefly: ignore[bad-argument-type]
             return QSize()
 
         def _getMenuStyleOption(self, option:QStyleOptionViewItem, index:'QModelIndex') -> 'QStyleOption':
             menuoption = QStyleOptionMenuItem()
             palette = option.palette.resolve(QApplication.palette('QMenu'))
             foreground = index.data(Qt.ItemDataRole.ForegroundRole)
-            if isinstance(foreground, (QBrush, QColor, QPixmap)):
+            if isinstance(foreground, (QBrush, QColor, QPixmap)): # pyrefly: ignore[invalid-argument]
                 foreground = QBrush(foreground)
                 palette.setBrush(QPalette.ColorRole.Text, foreground)
                 palette.setBrush(QPalette.ColorRole.ButtonText, foreground)
                 palette.setBrush(QPalette.ColorRole.WindowText, foreground)
 
             background = index.data(Qt.ItemDataRole.BackgroundRole)
-            if isinstance(background, (QBrush, QColor, QPixmap)):
+            if isinstance(background, (QBrush, QColor, QPixmap)): # pyrefly: ignore[invalid-argument]
                 background = QBrush(background)
                 try:
                     palette.setBrush(QPalette.ColorRole.Base, background)
@@ -132,23 +132,23 @@ class CheckComboBox(QComboBox): # pyright: ignore [reportGeneralTypeIssues] # Ar
             menuoption.palette = palette
 
             decoration = index.data(Qt.ItemDataRole.DecorationRole)
-            if isinstance(decoration, QIcon):
-                menuoption.icon = decoration
+            if isinstance(decoration, QIcon): # pyrefly: ignore[invalid-argument]
+                menuoption.icon = decoration # pyrefly: ignore[bad-assignment]
 
             if self.isSeparator(index):
-                menuoption.menuItemType = QStyleOptionMenuItem.MenuItemType.Separator
+                menuoption.menuItemType = QStyleOptionMenuItem.MenuItemType.Separator # pyrefly: ignore[bad-assignment]
             else:
-                menuoption.menuItemType = QStyleOptionMenuItem.MenuItemType.Normal
+                menuoption.menuItemType = QStyleOptionMenuItem.MenuItemType.Normal # pyrefly: ignore[bad-assignment]
 
             if index.flags() & Qt.ItemFlag.ItemIsUserCheckable:
-                menuoption.checkType = QStyleOptionMenuItem.CheckType.NonExclusive
+                menuoption.checkType = QStyleOptionMenuItem.CheckType.NonExclusive # pyrefly: ignore[bad-assignment]
             else:
-                menuoption.checkType = QStyleOptionMenuItem.CheckType.NotCheckable
+                menuoption.checkType = QStyleOptionMenuItem.CheckType.NotCheckable # pyrefly: ignore[bad-assignment]
 
             check = index.data(Qt.ItemDataRole.CheckStateRole)
             menuoption.checked = check == Qt.CheckState.Checked
 
-            menuoption.font = option.widget.font()
+            menuoption.font = option.widget.font()                    # pyrefly: ignore[bad-assignment]
 #            if option.widget is not None:
 #                menuoption.font = option.widget.font()
 #            else:
@@ -158,18 +158,18 @@ class CheckComboBox(QComboBox): # pyright: ignore [reportGeneralTypeIssues] # Ar
             menuoption.rect = option.rect
             menuoption.menuRect = option.rect
 
-            menuoption.menuHasCheckableItems = True
+            menuoption.menuHasCheckableItems = True # pyrefly: ignore[bad-assignment]
 #            menuoption.tabWidth = 0
             # TODO: self.displayText(QVariant, QLocale) # pylint: disable=fixme
             # TODO: Why is this not a QStyledItemDelegate? # pylint: disable=fixme
             display = index.data(Qt.ItemDataRole.DisplayRole)
             if isinstance(display, str):
-                menuoption.text = display
+                menuoption.text = display                              # pyrefly: ignore[bad-assignment]
             else:
-                menuoption.text = str(display)
+                menuoption.text = str(display)                         # pyrefly: ignore[bad-assignment]
 
-            menuoption.fontMetrics = QFontMetrics(menuoption.font)
-            state = option.state & (QStyle.StateFlag.State_MouseOver |
+            menuoption.fontMetrics = QFontMetrics(menuoption.font)     # pyrefly: ignore[bad-assignment]
+            state = option.state & (QStyle.StateFlag.State_MouseOver | # pyrefly: ignore[unsupported-operation]
                                     QStyle.StateFlag.State_Selected |
                                     QStyle.StateFlag.State_Active)
 
@@ -190,7 +190,7 @@ class CheckComboBox(QComboBox): # pyright: ignore [reportGeneralTypeIssues] # Ar
 
     def __init__(self, parent:Optional[QWidget] = None, placeholderText:str = '', separator:str = ', ',
                  **kwargs:Dict[str,Any]) -> None:
-        super().__init__(parent, **kwargs)
+        super().__init__(parent, **kwargs)  # pyrefly: ignore[bad-argument-count]
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
 
         self.__popupIsShown:bool = False
@@ -309,12 +309,12 @@ class CheckComboBox(QComboBox): # pyright: ignore [reportGeneralTypeIssues] # Ar
         checked = self.checkedIndices()
         if checked:
             items = [self.itemText(i) for i in checked]
-            option.currentText = self.__separator.join(items)
+            option.currentText = self.__separator.join(items) # pyrefly: ignore[bad-assignment]
         else:
-            option.currentText = self.__placeholderText
+            option.currentText = self.__placeholderText # pyrefly: ignore[bad-assignment]
             option.palette.setCurrentColorGroup(QPalette.ColorGroup.Disabled)
 
-        option.currentIcon = QIcon()
+        option.currentIcon = QIcon() # pyrefly: ignore[bad-assignment]
         painter.drawControl(QStyle.ControlElement.CE_ComboBoxLabel, option)
 
     def itemCheckState(self, index:int) -> Qt.CheckState:
@@ -327,7 +327,7 @@ class CheckComboBox(QComboBox): # pyright: ignore [reportGeneralTypeIssues] # Ar
         state : Qt.CheckState
         """
         state = self.itemData(index, role=Qt.ItemDataRole.CheckStateRole)
-        if isinstance(state, (int, Qt.CheckState)):
+        if isinstance(state, (int, Qt.CheckState)): # pyrefly: ignore[invalid-argument]
             return Qt.CheckState(state)
         return Qt.CheckState.Unchecked
 
@@ -406,7 +406,7 @@ def example() -> int:
     cb = CheckComboBox(placeholderText='None')
     model = cb.model()
     if model is not None:
-        assert isinstance(model, QStandardItemModel)
+        assert isinstance(model, QStandardItemModel) # pyrefly: ignore[invalid-argument]
         cb.addItem('First')
         item0 = model.item(0)
         if item0 is not None:

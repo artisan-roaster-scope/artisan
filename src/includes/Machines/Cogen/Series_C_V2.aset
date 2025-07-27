@@ -1,0 +1,105 @@
+[General]
+Delay=1000
+roastertype_setup=Cogen Series C v2
+
+[Device]
+id=79
+
+[ExtraComm]
+extrabaudrate=38400, 38400
+extrabytesize=8, 8
+extracomport=COM1, COM1
+extraparity=E, E
+extrastopbits=1, 1
+extratimeout=0.5, 0.5
+
+[ExtraDev]
+extraCurveVisibility1=false, false, true, true, true, true, true, true, true, true
+extraCurveVisibility2=false, false, true, true, true, true, true, true, true, true
+extraDelta1=false, false, false, false, false, false, false, false, false, false
+extraDelta2=false, false, false, false, false, false, false, false, false, false
+extraFill1=0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+extraFill2=0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+extraLCDvisibility1=false, false, false, false, false, false, false, false, false, false
+extraLCDvisibility2=true, false, false, false, false, false, false, false, false, false
+extradevicecolor1=#9b001d, #3da54d
+extradevicecolor2=#6b006d, #3796c4
+extradevices=80, 81
+extramathexpression1=, 
+extramathexpression2=, 
+extraname1={3}, {1}
+extraname2=Pa, Pa SP
+
+[ExtraEventButtons]
+buttonlistmaxlen=11
+buttonpalette=@Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0), @Variant(\0\0\0\t\0\0\0\0)
+buttonpalette_label=
+buttonpalette_shortcuts=true
+buttonpalettemaxlen=11, 14, 14, 14, 14, 14, 14, 14, 14, 14
+buttonsize=1
+eventbuttontablecolumnwidths=70, 80, 100, 50, 150, 100, 80, 80, 80, 321
+extraeventbuttoncolor=#ad0018, #bd5563, #808080, #00aa44, #65b686, #808080, #0098c9, #70bdd7
+extraeventbuttontextcolor=white, white, white, white, white, white, white, white
+extraeventsactions=4, 4, 0, 4, 4, 0, 4, 4
+extraeventsactionstrings="writeSingle(1,168,{})", "writeSingle(1,168,{})", , "writeWord(1,114,{})", "writeWord(1,114,{})", , "writeWord(1,117,{})", "writeWord(1,117,{})"
+extraeventsbuttonsflags=0, 1, 1
+extraeventsdescriptions=, , , , , , , 
+extraeventslabels=\\t\n+1, \\t\n-1, E, \\t\n+5, \\t\n-5, E, \\t\n+10%, \\t\n-10%
+extraeventstypes=8, 8, 4, 6, 6, 4, 5, 5
+extraeventsvalues=1.1, -1.1, 0, 1.5, -1.5, 0, 2, -2
+extraeventsvisibility=1, 1, 0, 1, 1, 0, 1, 1
+marklastbuttonpressed=true
+showextrabuttontooltips=false
+
+
+[S7]
+PID_OFF_action=
+PID_ON_action=
+PID_SV_register=0
+PID_area=0
+PID_d_register=0
+PID_db_nr=0
+PID_i_register=0
+PID_p_register=0
+PIDmultiplier=0
+SVmultiplier=0
+SVtype=0
+area=6, 6, 6, 6, 6, 6, 0, 0, 0, 0, 0, 0
+db_nr=6, 6, 6, 6, 6, 6, 1, 1, 1, 1, 1, 1
+div=0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+fetch_max_blocks=false
+host=127.0.0.1
+mode=0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+optimizer=true
+port=102
+rack=0
+slot=0
+start=400, 404, 544, 412, 464, 558, 0, 0, 0, 0, 0, 0
+type=1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0
+
+[Quantifiers]
+clusterEventsFlag=false
+eventquantifierSV=0, 0, 0, 0
+eventquantifieraction=0, 0, 0, 0
+quantifieractive=1, 1, 0, 1
+quantifiercoarse=0, 0, 0, 0
+quantifiermax=300, 69, 100, 10
+quantifiermin=0, 0, 0, 1
+quantifiersource=5, 4, 0, 2
+
+[Sliders]
+ModeTempSliders=C
+eventsliderAlternativeLayout=false
+eventsliderBernoulli=0, 0, 0, 0
+eventsliderKeyboardControl=true
+eventslidercoarse=0, 0, 0, 0
+eventslidersflags=0, 1, 1
+eventslidertemp=0, 0, 0, 0
+eventsliderunits=Pa, RPM, , %
+slideractions=12, 12, 0, 12
+slidercommands="setDBfloat(6,558,{})\n", "setDBfloat(6,464,{})\n", , "setDBint(6,544,{})\n"
+sliderfactors=1, 1, 1, 1
+slidermax=300, 69, 100, 10
+slidermin=0, 0, 0, 1
+slideroffsets=0, 0, 0, 0
+slidervisibilities=1, 1, 0, 1

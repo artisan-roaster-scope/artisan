@@ -234,31 +234,34 @@ class calculatorDlg(ArtisanDialog):
             if not self.startEdit.text() or not self.endEdit.text():
                 #empty field
                 return
-            starttime = stringtoseconds(str(self.startEdit.text()))
-            endtime = stringtoseconds(str(self.endEdit.text()))
-            if starttime == -1 or endtime == -1:
-                self.result1.setText(QApplication.translate('Label', 'Time syntax error. Time not valid'))
+            try:
+                starttime = stringtoseconds(str(self.startEdit.text()))
+                endtime = stringtoseconds(str(self.endEdit.text()))
+                if  endtime > self.aw.qmc.timex[-1] or endtime < starttime:
+                    self.aw.sendmessage(QApplication.translate('Label', 'Error: End time smaller than Start time'))
+                    self.result1.setText('')
+                    self.result2.setText('')
+                    return
+                if self.aw.qmc.timeindex[0] != -1:
+                    start = self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
+                else:
+                    start = 0
+                startindex = self.aw.qmc.time2index(starttime + start)
+                endindex = self.aw.qmc.time2index(endtime + start)
+                #delta
+                deltatime = self.aw.qmc.timex[endindex] -  self.aw.qmc.timex[startindex]
+                deltatemperature = self.aw.qmc.temp2[endindex] - self.aw.qmc.temp2[startindex]
+                deltaseconds = 0 if deltatime == 0 else deltatemperature / deltatime
+                deltaminutes = deltaseconds*60.
+                string1 = QApplication.translate('Label', 'Best approximation was made from {0} to {1}').format(stringfromseconds(self.aw.qmc.timex[startindex]- start),stringfromseconds(self.aw.qmc.timex[endindex]- start))
+                string2 = QApplication.translate('Label', '<b>{0}</b> {1}/sec, <b>{2}</b> {3}/min').format(f'{deltaseconds:.2f}',self.aw.qmc.mode,f'{deltaminutes:.2f}',self.aw.qmc.mode)
+                self.result1.setText(string1)
+                self.result2.setText(string2)
+            except Exception: # pylint: disable=broad-except
+                self.aw.sendmessage(QApplication.translate('Label', 'Time syntax error. Time not valid'))
+                self.result1.setText('')
                 self.result2.setText('')
                 return
-            if  endtime > self.aw.qmc.timex[-1] or endtime < starttime:
-                self.result1.setText(QApplication.translate('Label', 'Error: End time smaller than Start time'))
-                self.result2.setText('')
-                return
-            if self.aw.qmc.timeindex[0] != -1:
-                start = self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
-            else:
-                start = 0
-            startindex = self.aw.qmc.time2index(starttime + start)
-            endindex = self.aw.qmc.time2index(endtime + start)
-            #delta
-            deltatime = self.aw.qmc.timex[endindex] -  self.aw.qmc.timex[startindex]
-            deltatemperature = self.aw.qmc.temp2[endindex] - self.aw.qmc.temp2[startindex]
-            deltaseconds = 0 if deltatime == 0 else deltatemperature / deltatime
-            deltaminutes = deltaseconds*60.
-            string1 = QApplication.translate('Label', 'Best approximation was made from {0} to {1}').format(stringfromseconds(self.aw.qmc.timex[startindex]- start),stringfromseconds(self.aw.qmc.timex[endindex]- start))
-            string2 = QApplication.translate('Label', '<b>{0}</b> {1}/sec, <b>{2}</b> {3}/min').format(f'{deltaseconds:.2f}',self.aw.qmc.mode,f'{deltaminutes:.2f}',self.aw.qmc.mode)
-            self.result1.setText(string1)
-            self.result2.setText(string2)
         else:
             self.result1.setText(QApplication.translate('Label', 'No profile found'))
             self.result2.setText('')

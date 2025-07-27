@@ -9,7 +9,6 @@ from typing import Final, Union, List, Set, Sequence, Dict, Optional, TYPE_CHECK
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
-    from artisanlib.atypes import ProfileData # pylint: disable=unused-import
 
 try:
     from PyQt6.QtCore import QDateTime, Qt # @UnusedImport @Reimport  @UnresolvedImport
@@ -19,12 +18,13 @@ except ImportError:
     from PyQt5.QtWidgets import QApplication # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib.util import encodeLocal
+from artisanlib.atypes import ProfileData
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 # returns a dict containing all profile information contained in the given Cropster XLS file
-def extractProfileCropsterXLS(file:str, aw:'ApplicationWindow') -> 'ProfileData':
+def extractProfileCropsterXLS(file:str, aw:'ApplicationWindow') -> ProfileData:
 
     def takeClosest(num:float, collection:List[float]) -> float:
         return min(collection, key=lambda x:abs(x-num))
@@ -998,7 +998,7 @@ def extractProfileCropsterXLS(file:str, aw:'ApplicationWindow') -> 'ProfileData'
                             res['mode'] = 'C'
                         res['timex'] = [float(t.value) for t in time[1:]]
                         res['temp2'] = [float(t.value) for t in temp[1:]]
-                        res['temp1'] = [-1]*len(res['timex'])
+                        res['temp1'] = [-1.0]*len(res['timex'])
                         charge_idx = 0
                         try:
                             charge_idx = res['timex'].index(0)
@@ -1028,7 +1028,7 @@ def extractProfileCropsterXLS(file:str, aw:'ApplicationWindow') -> 'ProfileData'
                             if len(res['timex']) != len(res['temp1']):
                                 res['timex'] = [float(t.value) for t in time[1:]]
                             if 'temp2' not in res or len(res['temp2']) != len(res['timex']):
-                                res['temp2'] = [-1]*len(res['timex'])
+                                res['temp2'] = [-1.0]*len(res['timex'])
                             charge_idx = 0
                             try:
                                 charge_idx = res['timex'].index(0)
@@ -1138,7 +1138,7 @@ def extractProfileCropsterXLS(file:str, aw:'ApplicationWindow') -> 'ProfileData'
                                 res['extraLCDvisibility1'][len(res['extraname1'])] = False
                                 res['extraCurveVisibility1'][len(res['extraname1'])] = False
                             res['extraname1'].append('Extra 1')
-                        res['extratemp1'].append([-1]*len(res['timex']))
+                        res['extratemp1'].append([-1.0]*len(res['timex']))
                         res['extraNoneTempHint1'].append(True)
                         res['extramathexpression1'].append('')
                     else:
@@ -1152,7 +1152,7 @@ def extractProfileCropsterXLS(file:str, aw:'ApplicationWindow') -> 'ProfileData'
                                 res['extraLCDvisibility2'][len(res['extraname2'])] = False
                                 res['extraCurveVisibility2'][len(res['extraname2'])] = False
                             res['extraname2'].append('Extra 2')
-                        res['extratemp2'].append([-1]*len(res['timex']))
+                        res['extratemp2'].append([-1.0]*len(res['timex']))
                         res['extraNoneTempHint2'].append(True)
                         res['extramathexpression2'].append('')
                 else:
@@ -1233,7 +1233,7 @@ def extractProfileCropsterXLS(file:str, aw:'ApplicationWindow') -> 'ProfileData'
                     res['extraLCDvisibility2'][len(res['extraname2'])] = False
                     res['extraCurveVisibility2'][len(res['extraname2'])] = False
                 res['extraname2'].append('Extra 2')
-            res['extratemp2'].append([-1]*len(res['extratemp1'][-1]))
+            res['extratemp2'].append([-1.0]*len(res['extratemp1'][-1]))
             res['extraNoneTempHint2'].append(True)
             res['extramathexpression2'].append('')
 

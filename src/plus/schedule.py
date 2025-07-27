@@ -221,8 +221,8 @@ class ScheduledItem(BaseModel):
     title: str
     coffee: Optional[str] = Field(default=None)      # None or coffee hr_id
     blend: Optional[str] = Field(default=None)       # None or blend hr_id
-    store: str = Field(..., alias='location')
-    weight: float = Field(..., alias='amount')       # batch size in kg
+    store: str = Field(..., alias='location')            # pyrefly: ignore
+    weight: float = Field(..., alias='amount')       # batch size in kg # pyrefly: ignore
     loss: float = default_loss                       # default loss based calculated by magic on the server in % (if not given defaults to 15%)
     machine: Optional[str] = Field(default=None)
     user: Optional[str] = Field(default=None)
@@ -231,7 +231,7 @@ class ScheduledItem(BaseModel):
     note: Optional[str] = Field(default=None)
     roasts: Set[UUID4] = Field(default=set())        # note that this generates UUID objects. To get a UUID string without dashes use uuid.hex.
 
-    @field_validator('*', mode='before')
+    @field_validator('*', mode='before') # pyrefly: ignore
     def remove_blank_strings(cls: BaseModel, v: Optional[str]) -> Optional[str]:   # pylint: disable=no-self-argument,no-self-use
         """Removes whitespace characters and return None if empty"""
         if isinstance(v, str):
@@ -476,10 +476,10 @@ def get_all_completed() -> List[CompletedItemDict]:
         return completed_roasts_cache
     except Exception as e:  # pylint: disable=broad-except
         _log.error(e)
-        return []
     finally:
         if completed_roasts_semaphore.available() < 1:
             completed_roasts_semaphore.release(1)
+    return []
 
 
 # add the given CompletedItemDict if it contains a roastUUID which does not occurs yet in the completed_roasts_cache
@@ -831,15 +831,16 @@ def set_visible(plus_account_id:Optional[str], item:ScheduledItem) -> None:
 # returns blend name or None and list of components (just one if item is about a coffee
 def scheduleditem_beans_descriptions(weight_unit_idx:int, item:ScheduledItem) -> Tuple[Optional[str], List[Tuple[float,str]]]:
     if item.blend is not None:
-        blends = plus.stock.getBlends(weight_unit_idx, item.store)
+        blends = plus.stock.getStandardBlends(weight_unit_idx, item.store)
         blend = next((b for b in blends if plus.stock.getBlendId(b) == item.blend and plus.stock.getBlendStockDict(b)['location_hr_id'] == item.store), None)
         if blend is not None:
-            return plus.stock.blend2ratio_beans(blend, item.weight)
+            return plus.stock.blend2ratio_beans(blend, item.weight, html_escape=False)
     item_coffee = item.coffee
     if item_coffee is not None:
         coffee = plus.stock.getCoffee(item_coffee)
         if coffee is not None:
-            return None, [(1,html.escape(plus.stock.coffeeLabel(coffee)))]
+            return None, [(1,plus.stock.coffeeLabel(coffee))]
+    _log.error('scheduleditem_beans_descriptions(%s,%s) could not be resolved', weight_unit_idx, item)
     return None, []
 
 def scheduleditem_beans_description(weight_unit_idx:int, item:ScheduledItem) -> str:
@@ -853,7 +854,7 @@ def scheduleditem_beans_description(weight_unit_idx:int, item:ScheduledItem) -> 
                 store_label = f'<br>[{html.escape(store_label)}]'
             beans_description = f'<b>{html.escape(plus.stock.coffeeLabel(coffee))}</b>{store_label}'
     else:
-        blends = plus.stock.getBlends(weight_unit_idx, item.store)
+        blends = plus.stock.getStandardBlends(weight_unit_idx, item.store)
         blend = next((b for b in blends if plus.stock.getBlendId(b) == item.blend and plus.stock.getBlendStockDict(b)['location_hr_id'] == item.store), None)
         if blend is not None:
             blend_lines = ''.join([f'<tr><td>{html.escape(bl[0])}</td><td>{html.escape(bl[1])}</td></tr>'
@@ -922,12 +923,12 @@ def locale_format_date_no_year(locale:str, date:datetime.date) -> str:
 
 #--------
 
-class QLabelRight(QLabel): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+class QLabelRight(QLabel): # pyright: ignore [reportGeneralTypeIssues] # pyrefly: ignore # Argument to class must be a base class
     ...
 
 
 ##### https://stackoverflow.com/questions/11446478/pyside-pyqt-truncate-text-in-qlabel-based-on-minimumsize
-class QElidedLabel(QLabel): # pyright: ignore[reportGeneralTypeIssues] # Argument to class must be a base class
+class QElidedLabel(QLabel): # pyright: ignore[reportGeneralTypeIssues] # pyrefly: ignore # Argument to class must be a base class
     """Label with text elision.
 
     QLabel which will elide text too long to fit the widget.  Based on:
@@ -1008,9 +1009,9 @@ class QElidedLabel(QLabel): # pyright: ignore[reportGeneralTypeIssues] # Argumen
 
 
 
-class DragTargetIndicator(QFrame): # pyright: ignore[reportGeneralTypeIssues] # Argument to class must be a base class
+class DragTargetIndicator(QFrame): # pyright: ignore[reportGeneralTypeIssues] # pyrefly: ignore # Argument to class must be a base class
     def __init__(self, parent:Optional[QWidget] = None) -> None:
-        super().__init__(parent)
+        super().__init__(parent) # pyrefly: ignore
         layout = QHBoxLayout()
         layout.addWidget(QLabel())
         layout.setSpacing(0)
@@ -1021,7 +1022,7 @@ class DragTargetIndicator(QFrame): # pyright: ignore[reportGeneralTypeIssues] # 
 
 
 
-class StandardItem(QFrame): # pyright: ignore[reportGeneralTypeIssues] # Argument to class must be a base class
+class StandardItem(QFrame): # pyright: ignore[reportGeneralTypeIssues] # pyrefly: ignore # Argument to class must be a base class
 
     clicked = pyqtSignal()
     selected = pyqtSignal()
@@ -1038,7 +1039,7 @@ class StandardItem(QFrame): # pyright: ignore[reportGeneralTypeIssues] # Argumen
             layout.addSpacing(2)
         self.second_label = QElidedLabel(self.getMiddle())
         layout.addWidget(self.second_label)
-        self.third_label = QLabelRight(self.getRight())
+        self.third_label = QLabelRight(self.getRight()) # pyrefly: ignore
         layout.addWidget(self.third_label)
         layout.setSpacing(5)
         layout.setContentsMargins(5,5,5,5)
@@ -1385,7 +1386,7 @@ class DragItem(StandardItem):
             if (self.aw.schedule_window is not None and (self.aw.schedule_window.weight_manager.sm_green.current_weight_item is None or
                 (self.aw.schedule_window.weight_manager.sm_green.current_weight_item and
                 (self.aw.schedule_window.weight_manager.sm_green.current_weight_item.uuid != self.data.id or
-                    self.aw.schedule_window.weight_manager.green_task_scale  == 0)))): # no scaled assigned to the green task, thus not processing
+                    self.aw.schedule_window.weight_manager.green_task_scale == 0)))): # no scaled assigned to the green task, thus not processing
                 # this schedule item is not currently under processing by the weight manager
                 if not fully_prepared_p:
                     allPreparedAction:QAction = QAction(QApplication.translate('Contextual Menu', 'All batches prepared'),self)
@@ -1496,11 +1497,11 @@ class DragItem(StandardItem):
 
 
 
-class BaseWidget(QWidget): # pyright: ignore[reportGeneralTypeIssues] # Argument to class must be a base class
+class BaseWidget(QWidget): # pyright: ignore[reportGeneralTypeIssues] # pyrefly: ignore # Argument to class must be a base class
     """Widget list
     """
     def __init__(self, parent:Optional[QWidget] = None, orientation:Qt.Orientation = Qt.Orientation.Vertical) -> None:
-        super().__init__(parent)
+        super().__init__(parent) # pyrefly: ignore
         # Store the orientation for drag checks later.
         self.orientation = orientation
         self.blayout:QBoxLayout
@@ -1880,7 +1881,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.roasted_weight.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.roasted_weight.editingFinished.connect(self.roasted_weight_changed)
         self.roasted_weight.receivedFocus.connect(self.roasted_weight_selected)
-        self.roasted_weight_suffix = ClickableQLabel(weight_unit_str)
+        self.roasted_weight_suffix = ClickableQLabel(weight_unit_str)  # pyrefly: ignore
 
         # calculate unit label max_width
         font = self.roasted_weight_suffix.font()
@@ -1901,7 +1902,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.roasted_yield.setValidator(self.aw.createCLocaleDoubleValidator(0., 9999999., 4, self.roasted_yield, ''))
         self.roasted_yield.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.roasted_yield.editingFinished.connect(self.roasted_yield_changed)
-        self.roasted_yield_suffix = ClickableQLabel(weight_unit_str)
+        self.roasted_yield_suffix = ClickableQLabel(weight_unit_str)  # pyrefly: ignore
         self.roasted_yield_suffix.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         self.roasted_yield_suffix.setFixedWidth(weight_suffix_width)
         self.roasted_yield_suffix.setAlignment (Qt.AlignmentFlag.AlignLeft)
@@ -1911,7 +1912,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.roasted_defects.setValidator(self.aw.createCLocaleDoubleValidator(0., 9999999., 4, self.roasted_defects, ''))
         self.roasted_defects.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.roasted_defects.editingFinished.connect(self.defects_weight_changed)
-        self.roasted_defects_suffix = ClickableQLabel(weight_unit_str)
+        self.roasted_defects_suffix = ClickableQLabel(weight_unit_str) # pyrefly: ignore
         self.roasted_defects_suffix.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         self.roasted_defects_suffix.setFixedWidth(weight_suffix_width)
         self.roasted_defects_suffix.setAlignment (Qt.AlignmentFlag.AlignLeft)
@@ -2454,7 +2455,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         else:
             roasted_weight_txt = self.roasted_weight.text().strip()
             roasted_weight = (0 if roasted_weight_txt == '' else float(roasted_weight_txt))
-            roasted_yield = max(0,min(roasted_yield,roasted_weight))
+            roasted_yield = max(0.0,min(roasted_yield,roasted_weight))
             defects = roasted_weight - roasted_yield
         if 0 < roasted_yield < roasted_weight:
             self.roasted_yield.setText(f'{float2floatWeightVolume(roasted_yield):g}')
@@ -2472,11 +2473,11 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
             defects_txt = comma2dot(text)
             defects = float(defects_txt)
         roasted_weight_txt = self.roasted_weight.text().strip()
-        defects = max(0,defects)
+        defects = max(0.0,defects)
         roasted_weight = (0 if roasted_weight_txt == '' else float(roasted_weight_txt))
         if self.aw.qmc.weight[2] == 'Kg' and roasted_weight > 0 and defects > roasted_weight/2:
             defects = convertWeight(defects,0,1)
-        defects = max(0,min(defects,roasted_weight))
+        defects = max(0.0,min(defects,roasted_weight))
         if 0 < defects < roasted_weight:
             roasted_yield = roasted_weight - defects
             self.roasted_yield.setText(f'{float2floatWeightVolume(roasted_yield):g}')
@@ -2681,9 +2682,9 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                 # take new item (but merge completed items)
                 if idx_existing_item is not None:
                     # remember existing item
-                    existing_item = current_schedule[idx_existing_item]
+                    existing_item = current_schedule[idx_existing_item] # pyrefly: ignore[index-error]
                     # replace the current item with the updated one from the server
-                    current_schedule[idx_existing_item] = schedule_item
+                    current_schedule[idx_existing_item] = schedule_item # pyrefly: ignore[unsupported-operation]
                     # merge the completed roasts and set them to the newly received item
                     schedule_item.roasts.update(existing_item.roasts)
                     # if all done, remove that item as it is completed
@@ -2703,7 +2704,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
             except Exception:  # pylint: disable=broad-except
                 pass # validation fails for outdated items
         # update the list of schedule items to be displayed
-        self.scheduled_items = current_schedule
+        self.scheduled_items = list(current_schedule)
 
     @staticmethod
     def getCompletedItems() -> List[CompletedItem]:
@@ -2787,7 +2788,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                     except Exception as e:  # pylint: disable=broad-except
                         _log.error(e)
             elif item.blend is not None:
-                blends:List[plus.stock.BlendStructure] = plus.stock.getBlends(weight_unit_idx, item.store)
+                blends:List[plus.stock.BlendStructure] = plus.stock.getStandardBlends(weight_unit_idx, item.store)
                 # NOTE: a blend might not have an hr_id as is the case for all custom blends
                 blend_structure:Optional[plus.stock.BlendStructure] = next((bs for bs in blends if plus.stock.getBlendId(bs) == item.blend), None)
                 if blend_structure is not None:
@@ -2804,7 +2805,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                         if 'ratio_denom' in i and i['ratio_denom'] is not None:
                             entry['ratio_denom'] = i['ratio_denom']
                         ingredients.append(entry)
-                    self.aw.qmc.plus_blend_spec['ingredients'] = ingredients
+                    self.aw.qmc.plus_blend_spec['ingredients'] = ingredients # pyrefly: ignore[unsupported-operation]
                     # set beans description
                     blend_lines = plus.stock.blend2beans(blend_structure, weight_unit_idx, self.aw.qmc.weight[0])
                     self.aw.qmc.beans = '\n'.join(blend_lines)
@@ -3811,9 +3812,10 @@ class WeightItemDisplay(Display):
         self.schedule_window.task_weight.setText('--')
         self.schedule_window.task_weight.setToolTip(QApplication.translate('Plus', 'nothing to weight'))
 
-    def show_item(self, item:'WeightItem', state:PROCESS_STATE = PROCESS_STATE.DISCONNECTED, component:int = 0) -> None:
+    def show_item(self, item:'WeightItem', state:PROCESS_STATE = PROCESS_STATE.DISCONNECTED, component:int = 0, final_weight:Optional[int] = None) -> None:
         del state
         del component
+        del final_weight
         todo_tab_active:bool = self.schedule_window.TabWidget.currentIndex() == 0
         if ((todo_tab_active and isinstance(item, GreenWeightItem)) or
             not todo_tab_active and isinstance(item, RoastedWeightItem)):
@@ -3866,8 +3868,9 @@ class GreenWebDisplay(GreenDisplay):
         self.update()
 
     # component indicates which of the item.descriptions is currently processed
-    def show_item(self, item:'WeightItem', state:PROCESS_STATE = PROCESS_STATE.DISCONNECTED, component:int = 0) -> None:
-
+    # in state=PROCESS_STATE.done, the final_weight if given states the final weight in g that has been measured and that will be registered for the task
+    def show_item(self, item:'WeightItem', state:PROCESS_STATE = PROCESS_STATE.DISCONNECTED, component:int = 0, final_weight:Optional[int] = None) -> None:
+#        _log.debug("PRINT show_item(%s,%s,%s,%s)",item,state,component,final_weight)
         if (isinstance(item, GreenWeightItem) and
             (item != self.last_item or self.last_process_state != state or self.last_component != component)):
                 # NOTE: as item is of type WeightItem and this is declared as @dataclass the equality is structural here
@@ -3877,7 +3880,8 @@ class GreenWebDisplay(GreenDisplay):
             #-
             self.rendered_task['id'] = item.position
             self.rendered_task['title'] = item.title
-            self.rendered_task['batchsize'] = render_weight(item.weight, 1, item.weight_unit_idx)
+            # weight is rendered with max 7 characters ('10.32kg' is well displayed, '10.321kg' not) thus we set brief=1 for weights >= 10kg
+            self.rendered_task['batchsize'] = render_weight(item.weight, 1, item.weight_unit_idx, brief=(0 if item.weight < 10 else 1)) # item.weight in kg
             if len(item.descriptions)>component:
                 self.rendered_task['blend_percent'] = (f'{item.descriptions[component][0] * 100:.0f}%' if item.descriptions[component][0] != 1 else '')
                 self.rendered_task['subtitle'] = item.descriptions[component][1]
@@ -3896,14 +3900,18 @@ class GreenWebDisplay(GreenDisplay):
                 self.rendered_task['timer'] = self.cancel_timer_timeout
             elif state == PROCESS_STATE.DONE:
                 self.rendered_task['timer'] = self.done_timer_timeout
+                if final_weight is not None:
+                    # or as substring (no limit: brief = 0)
+                    self.rendered_task['weight'] = render_weight(final_weight, 0, weight_units.index(self.schedule_window.aw.qmc.weight[2]),
+                                brief=(0 if final_weight < 10000 else 1))
 
             self.update()
 
             self.rendered_task['timer'] = 0 # clear timer start trigger immediately
 
-
     # current_weight indicates total measured weight over both containers in g (not including the bucket weights)
     def show_progress(self, state:PROCESS_STATE, component:int, bucket:int, current_weight:int) -> None:
+#        _log.debug("PRINT show_progress(%s,%s,%s,%s)",state,component,bucket,current_weight)
         if (self.last_item is not None and (self.last_process_state != state or self.last_component != component or self.last_bucket != bucket or
                 self.last_current_weight != current_weight)):
             self.last_process_state = state
@@ -3920,6 +3928,7 @@ class GreenWebDisplay(GreenDisplay):
                 self.rendered_task['blend_percent'] = ''
                 self.rendered_task['subtitle'] = ''
             self.rendered_task['bucket'] = bucket
+
             if state == PROCESS_STATE.WEIGHING and len(self.last_item.descriptions)>component and len(self.last_item.descriptions[component])>0:
                 target = self.last_item.weight * 1000 # target in g
                 self.rendered_task['total_percent'] = 100 * current_weight / target
@@ -3928,7 +3937,10 @@ class GreenWebDisplay(GreenDisplay):
                 component_target_ratio = completed_ratio + current_component_ratio
                 component_target = component_target_ratio * target
                 # showing what is missing per component
-                self.rendered_task['weight'] = render_weight(component_target - current_weight, 0, weight_units.index(self.schedule_window.aw.qmc.weight[2]), brief=1)
+                # weight is rendered with max 7 characters ('10.32kg' is well displayed, '10.321kg' not) thus we set brief=1 for weights >= 10kg
+                delta_weight = component_target - current_weight
+                self.rendered_task['weight'] = render_weight(delta_weight, 0, weight_units.index(self.schedule_window.aw.qmc.weight[2]),
+                            brief=(0 if delta_weight < 10000 else 1))
                 component_target_weight = target * current_component_ratio
                 completed_weight = target * completed_ratio
                 if component_target_weight>0:
@@ -3982,7 +3994,7 @@ class RoastedWebDisplay(RoastedDisplay):
         self.rendered_task = cast(TaskWebDisplayPayload, dict(self.INIT_PAYLOAD))  # reset with a copy of the empty_task
         self.update()
 
-    def show_item(self, item:'WeightItem', state:PROCESS_STATE = PROCESS_STATE.DISCONNECTED, component:int = 0) -> None:
+    def show_item(self, item:'WeightItem', state:PROCESS_STATE = PROCESS_STATE.DISCONNECTED, component:int = 0, final_weight:Optional[int] = None) -> None:
         del component
         if (isinstance(item, RoastedWeightItem) and
                 (item != self.last_item or self.last_process_state != state)):
@@ -3993,7 +4005,7 @@ class RoastedWebDisplay(RoastedDisplay):
             #-
             self.rendered_task['id'] = item.position
             self.rendered_task['title'] = item.title
-            self.rendered_task['batchsize'] = render_weight(item.weight, 1, item.weight_unit_idx) # from 1:kg to target, user selected, weight unit
+            self.rendered_task['batchsize'] = render_weight(item.weight, 1, item.weight_unit_idx, brief=(0 if item.weight < 10 else 1)) # from 1:kg to target, user selected, weight unit
             if len(item.descriptions)>0 and len(item.descriptions[0])>1:
                 self.rendered_task['subtitle'] = (item.descriptions[0][1] if item.blend_name is None else item.blend_name)
             else:
@@ -4010,12 +4022,17 @@ class RoastedWebDisplay(RoastedDisplay):
                 self.rendered_task['timer'] = self.cancel_timer_timeout
             elif state == PROCESS_STATE.DONE:
                 self.rendered_task['timer'] = self.done_timer_timeout
+                if final_weight is not None:
+                    # or as substring (no limit: brief = 0)
+                    self.rendered_task['weight'] = render_weight(final_weight, 0, weight_units.index(self.schedule_window.aw.qmc.weight[2]),
+                                brief=(0 if final_weight < 10000 else 1))
 
             self.update()
 
             self.rendered_task['timer'] = 0 # clear timer start trigger immediately
 
 
+    # current weight in g
     def show_result(self, state:PROCESS_STATE, current_weight:int) -> None:
         if (self.last_item is not None and (self.last_process_state != state or self.last_current_weight != current_weight)):
             self.last_process_state = state
@@ -4028,7 +4045,7 @@ class RoastedWebDisplay(RoastedDisplay):
                     total_percent = 100 * current_weight / batchsize
                 else:
                     total_percent = 0
-                self.rendered_task['weight'] = render_weight(current_weight, 0, weight_units.index(self.schedule_window.aw.qmc.weight[2]), brief=1) # yield
+                self.rendered_task['weight'] = render_weight(current_weight, 0, weight_units.index(self.schedule_window.aw.qmc.weight[2]), brief=(0 if current_weight < 10000 else 1)) # yield
                 self.rendered_task['percent'] = 100.2
                 self.rendered_task['total_percent'] = total_percent
                 self.rendered_task['loss'] = f'-{float2float(100-total_percent, self.schedule_window.aw.percent_decimals)}%' # weight loss percent

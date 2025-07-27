@@ -287,7 +287,7 @@ class AillioR2:
 
             # Try each known device variant
             for variant in self.DEVICE_VARIANTS:
-                self.usbhandle = usb.core.find(idVendor=variant['vid'],
+                self.usbhandle = usb.core.find(idVendor=variant['vid'], # pyrefly: ignore[bad-assignment]
                                             idProduct=variant['pid'],
                                             backend=backend)
                 if self.usbhandle is not None:
@@ -326,7 +326,7 @@ class AillioR2:
             except Exception as e: # pylint: disable=broad-except
                 self.__dbg(f'Warning: Could not set configuration: {str(e)}')
 
-            cfg:Configuration = self.usbhandle.get_active_configuration()
+            cfg:Configuration = self.usbhandle.get_active_configuration() # pyrefly: ignore[bad-assignment]
             intf:Interface = cfg[(self.AILLIO_INTERFACE,0)]
 
             try:

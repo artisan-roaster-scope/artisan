@@ -332,7 +332,7 @@ class NotificationManager(QObject): # pyright: ignore [reportGeneralTypeIssues]
                     NotificationType.PLUS_ADMIN,
                     NotificationType.PLUS_ADMIN]:
                 icon = self.notificationPlusIcon()
-            self.tray_icon.showMessage(notification.formatedTitle(), notification.message, icon, self.notification_timeout)
+            self.tray_icon.showMessage(notification.formatedTitle(), notification.message, icon, self.notification_timeout) # pyrefly: ignore[no-matching-overload]
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
 

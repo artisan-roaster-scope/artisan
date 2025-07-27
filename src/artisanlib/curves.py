@@ -1532,7 +1532,7 @@ class CurvesDlg(ArtisanDialog):
     @pyqtSlot(bool)
     def expradiobuttonClicked(self, _:bool = False) -> None:
         expradioButton = self.sender()
-        assert isinstance(expradioButton, QRadioButton)
+        assert isinstance(expradioButton, QRadioButton) # pyrefly: ignore[invalid-argument]
         power:int = 3
         if self.expradiobutton1.isChecked():
             power = 2
@@ -1909,7 +1909,7 @@ class CurvesDlg(ArtisanDialog):
     @pyqtSlot(bool)
     def plotequ(self, _b:bool = False) -> None:
         try:
-            self.aw.qmc.plotterstack = [0]*10
+            self.aw.qmc.plotterstack = [0.0]*10
 #            self.aw.qmc.plottermessage = ""
             self.aw.clearMessageLine()
 
@@ -2131,38 +2131,41 @@ class CurvesDlg(ArtisanDialog):
         return events
 
     def doPolyfit(self) -> bool:
-        ll = min(len(self.aw.qmc.timex),len(self.curves[self.c1ComboBox.currentIndex()]),len(self.curves[self.c2ComboBox.currentIndex()]))
-        starttime = stringtoseconds(str(self.startEdit.text()))
-        endtime = stringtoseconds(str(self.endEdit.text()))
-        if starttime == -1 or endtime == -1:
-            self.resultWidget.setText('')
-            self.resultWidget.repaint()
-            return False
-        if  endtime > self.aw.qmc.timex[-1] or endtime < starttime:
-            self.resultWidget.setText('')
-            self.resultWidget.repaint()
-            return False
-        if self.aw.qmc.timeindex[0] != -1:
-            start = self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
-        else:
-            start = 0
-        startindex = self.aw.qmc.time2index(starttime + start)
-        endindex = min(ll,self.aw.qmc.time2index(endtime + start))
-        c1 = self.curves[self.c1ComboBox.currentIndex()]
-        c2 = self.curves[self.c2ComboBox.currentIndex()]
-        z = self.aw.qmc.polyfit(c1,c2,
-               self.polyfitdeg.value(),startindex,endindex,self.deltacurves[self.c2ComboBox.currentIndex()],onDeltaAxis=self.polyfitRoR)
-        res = True
-        if z is not None:
-            for e in z:
-                if numpy.isnan(e):
-                    res = False
-                    break
-        if res and z is not None:
-            s = self.aw.fit2str(z)
-            self.resultWidget.setText(s)
-            self.resultWidget.repaint()
-            return True
+        try:
+            ll = min(len(self.aw.qmc.timex),len(self.curves[self.c1ComboBox.currentIndex()]),len(self.curves[self.c2ComboBox.currentIndex()]))
+            starttime = stringtoseconds(str(self.startEdit.text()))
+            endtime = stringtoseconds(str(self.endEdit.text()))
+            if starttime == -1 or endtime == -1:
+                self.resultWidget.setText('')
+                self.resultWidget.repaint()
+                return False
+            if  endtime > self.aw.qmc.timex[-1] or endtime < starttime:
+                self.resultWidget.setText('')
+                self.resultWidget.repaint()
+                return False
+            if self.aw.qmc.timeindex[0] != -1:
+                start = self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
+            else:
+                start = 0
+            startindex = self.aw.qmc.time2index(starttime + start)
+            endindex = min(ll,self.aw.qmc.time2index(endtime + start))
+            c1 = self.curves[self.c1ComboBox.currentIndex()]
+            c2 = self.curves[self.c2ComboBox.currentIndex()]
+            z = self.aw.qmc.polyfit(c1,c2,
+                   self.polyfitdeg.value(),startindex,endindex,self.deltacurves[self.c2ComboBox.currentIndex()],onDeltaAxis=self.polyfitRoR)
+            res = True
+            if z is not None:
+                for e in z:
+                    if numpy.isnan(e):
+                        res = False
+                        break
+            if res and z is not None:
+                s = self.aw.fit2str(z)
+                self.resultWidget.setText(s)
+                self.resultWidget.repaint()
+                return True
+        except Exception:  # pylint: disable=broad-except
+            pass
         self.resultWidget.setText('')
         self.resultWidget.repaint()
         return False

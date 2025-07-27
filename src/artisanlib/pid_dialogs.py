@@ -27,7 +27,7 @@ if TYPE_CHECKING:
 
 from artisanlib.util import stringfromseconds, stringtoseconds, comma2dot, toInt, toFloat
 from artisanlib.dialogs import ArtisanDialog
-from artisanlib.widgets import MyQComboBox
+from artisanlib.widgets import MyQComboBox, MyQDoubleSpinBox
 
 try:
     from PyQt6.QtCore import Qt, pyqtSlot, QRegularExpression, QSettings, QTimer # @UnusedImport @Reimport  @UnresolvedImport
@@ -35,14 +35,14 @@ try:
     from PyQt6.QtWidgets import (QApplication, QWidget, QLabel, QTableWidget, QPushButton, # @UnusedImport @Reimport  @UnresolvedImport
         QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout, QGroupBox, QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
         QMessageBox, QRadioButton, QSpinBox, QStatusBar, QTabWidget, QDoubleSpinBox, # @UnusedImport @Reimport  @UnresolvedImport
-        QTimeEdit, QLayout, QSizePolicy, QHeaderView) # @UnusedImport @Reimport  @UnresolvedImport
+        QTimeEdit, QLayout, QSizePolicy, QHeaderView, QButtonGroup) # @UnusedImport @Reimport  @UnresolvedImport
 except ImportError:
     from PyQt5.QtCore import Qt, pyqtSlot, QRegularExpression, QSettings, QTimer # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QIntValidator, QRegularExpressionValidator # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QTableWidget, QPushButton, # type:ignore # @UnusedImport @Reimport  @UnresolvedImport
         QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout, QGroupBox, QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
         QMessageBox, QRadioButton, QSpinBox, QStatusBar, QTabWidget, QDoubleSpinBox, # @UnusedImport @Reimport  @UnresolvedImport
-        QTimeEdit, QLayout, QSizePolicy, QHeaderView) # @UnusedImport @Reimport  @UnresolvedImport
+        QTimeEdit, QLayout, QSizePolicy, QHeaderView, QButtonGroup) # @UnusedImport @Reimport  @UnresolvedImport
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -472,12 +472,79 @@ class PID_DlgControl(ArtisanDialog):
             # only for the internal PID we support a derative filter setting
             self.derivativeFilterFlag = QCheckBox(QApplication.translate('Label','Derivative Filter'))
             self.derivativeFilterFlag.setChecked(bool(self.aw.pidcontrol.derivative_filter))
+            self.DoERadioButton = QRadioButton('DoE')
+            self.DoERadioButton.setToolTip(QApplication.translate('Tooltip', 'Derivative on Error'))
+            self.DoMRadioButton = QRadioButton('DoM')
+            self.DoMRadioButton.setToolTip(QApplication.translate('Tooltip', 'Derivative on Measurement (preventing the derivative kick)'))
+            if self.aw.pidcontrol.pidDoE:
+                self.DoERadioButton.setChecked(True)
+            else:
+                self.DoMRadioButton.setChecked(True)
+            DoX = QButtonGroup(self)
+            DoX.addButton(self.DoERadioButton)
+            DoX.addButton(self.DoMRadioButton)
+            dTypeBox = QHBoxLayout()
+            dTypeBox.addWidget(self.DoERadioButton)
+            dTypeBox.addWidget(self.DoMRadioButton)
+            dTypeBox.addStretch()
+
+            iLimitLabel = QLabel(QApplication.translate('Label','ILF'))
+            self.iLimitSpinBox = MyQDoubleSpinBox()
+            self.iLimitSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
+            self.iLimitSpinBox.setRange(0.0,1.0)
+            self.iLimitSpinBox.setSingleStep(.1)
+            self.iLimitSpinBox.setDecimals(1)
+            self.iLimitSpinBox.setValue(self.aw.pidcontrol.pidIlimitFactor)
+            self.iLimitSpinBox.setToolTip(QApplication.translate('Tooltip', 'Integral limit factor'))
+
+            dLimitLabel = QLabel(QApplication.translate('Label','Dlimit'))
+            self.dLimitSpinBox = QSpinBox()
+            self.dLimitSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
+            self.dLimitSpinBox.setRange(0,100)
+            self.dLimitSpinBox.setSingleStep(1)
+            self.dLimitSpinBox.setValue(int(self.aw.pidcontrol.pidDlimit))
+            self.dLimitSpinBox.setToolTip(QApplication.translate('Tooltip', 'Derivative limit'))
+
+            LimitBox = QHBoxLayout()
+            LimitBox.addWidget(iLimitLabel)
+            LimitBox.addWidget(self.iLimitSpinBox)
+            LimitBox.addSpacing(5)
+            LimitBox.addStretch()
+            LimitBox.addWidget(dLimitLabel)
+            LimitBox.addWidget(self.dLimitSpinBox)
+            LimitBox.setSpacing(3)
+
+            self.SPthresholdSpinBox = QSpinBox()
+            self.SPthresholdSpinBox.setToolTip(QApplication.translate('Tooltip', 'Integral reset on target (SP) changes exceeding the limit'))
+            self.SPthresholdSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
+            self.SPthresholdSpinBox.setRange(0,100)
+            self.SPthresholdSpinBox.setSingleStep(1)
+            self.SPthresholdSpinBox.setValue(int(self.aw.pidcontrol.pidIRoCthreshold))
+            self.SPthresholdSpinBox.setEnabled(self.aw.pidcontrol.pidIRoC)
+            self.IWPFlag = QCheckBox(QApplication.translate('Label','IWP'))
+            self.IWPFlag.setToolTip(QApplication.translate('Tooltip', 'Integral Windup Prevention'))
+            self.IWPFlag.setChecked(self.aw.pidcontrol.pidIWP)
+            self.IRoCFlag = QCheckBox(QApplication.translate('Label','IRoC'))
+            self.IRoCFlag.setToolTip(QApplication.translate('Tooltip', 'Integral reset on target (SP) changes exceeding the limit'))
+            self.IRoCFlag.stateChanged.connect(self.IRoCFlag_changedSlot)
+            self.IRoCFlag.setChecked(self.aw.pidcontrol.pidIRoC)
+
+            RIoCBox = QHBoxLayout()
+            RIoCBox.addWidget(self.IRoCFlag)
+            RIoCBox.addWidget(self.SPthresholdSpinBox)
+            RIoCBox.addStretch()
+
             filterGrpBox = QVBoxLayout()
             filterGrpBox.addWidget(self.derivativeFilterFlag)
+            filterGrpBox.addLayout(LimitBox)
+            filterGrpBox.addLayout(dTypeBox)
+            filterGrpBox.addLayout(RIoCBox)
+            filterGrpBox.addWidget(self.IWPFlag)
             filterGrpBox.addStretch()
-            filterGrp = QGroupBox(QApplication.translate('GroupBox','Filter'))
+            filterGrpBox.setSpacing(10)
+            filterGrp = QGroupBox(QApplication.translate('Menu','Config'))
             filterGrp.setLayout(filterGrpBox)
-            filterGrp.setContentsMargins(0,15,0,0)
+#            filterGrp.setContentsMargins(0,0,0,0) # left, top, right, bottom
 
             svBox.addWidget(dutyGrp)
             svBox.addWidget(filterGrp)
@@ -833,11 +900,11 @@ class PID_DlgControl(ArtisanDialog):
         self.setrampsoaks()
         self.setRSs()
 
+        mainLayout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
+
         settings = QSettings()
         if settings.contains('PIDPosition'):
             self.move(settings.value('PIDPosition'))
-
-        mainLayout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
 
         # we set the active tab with a QTimer after the tabbar has been rendered once, as otherwise
         # some tabs are not rendered at all on Windows using Qt v6.5.1 (https://bugreports.qt.io/projects/QTBUG/issues/QTBUG-114204?filter=allissues)
@@ -852,6 +919,10 @@ class PID_DlgControl(ArtisanDialog):
             curveNames.append(self.aw.qmc.device_name_subst(self.aw.qmc.extraname1[i]))
             curveNames.append(self.aw.qmc.device_name_subst(self.aw.qmc.extraname2[i]))
         return curveNames
+
+    @pyqtSlot(int)
+    def IRoCFlag_changedSlot(self, flag:int) -> None:
+        self.SPthresholdSpinBox.setEnabled(bool(flag))
 
     @pyqtSlot()
     def setActiveTab(self) -> None:
@@ -959,7 +1030,7 @@ class PID_DlgControl(ArtisanDialog):
     def setRS(self, _:bool = False) -> None:
         try:
             sender = self.sender()
-            assert isinstance(sender, QPushButton)
+            assert isinstance(sender, QPushButton) # pyrefly: ignore[invalid-argument]
             n = self.RSnButtons.index(sender)
             self.aw.pidcontrol.svLabel = self.getRSnSVLabel(n)
             self.aw.pidcontrol.svValues = self.getRSnSVvalues(n)
@@ -1252,6 +1323,12 @@ class PID_DlgControl(ArtisanDialog):
             self.aw.pidcontrol.dutyMax = max(self.dutyMin.value(),self.dutyMax.value())
             self.aw.pidcontrol.dutySteps = self.pidDutySteps.value()
             self.aw.pidcontrol.derivative_filter = int(self.derivativeFilterFlag.isChecked())
+            self.aw.pidcontrol.pidDoE = self.DoERadioButton.isChecked()
+            self.aw.pidcontrol.pidDlimit = int(self.dLimitSpinBox.value())
+            self.aw.pidcontrol.pidIlimitFactor = self.iLimitSpinBox.value()
+            self.aw.pidcontrol.pidIRoCthreshold = int(self.SPthresholdSpinBox.value())
+            self.aw.pidcontrol.pidIWP = self.IWPFlag.isChecked()
+            self.aw.pidcontrol.pidIRoC = self.IRoCFlag.isChecked()
         self.aw.pidcontrol.svLookahead = self.pidSVLookahead.value()
         #
         self.aw.PID_DlgControl_activeTab = self.tabWidget.currentIndex()
@@ -3022,7 +3099,10 @@ class PXG4pidDlgControl(PXpidDlgControl):
     @pyqtSlot(bool)
     def writeRSValues(self, _:bool = False) -> None:
         for i in range(16):
-            self.setsegment_i(i)
+            try:
+                self.setsegment_i(i)
+            except Exception: # pylint: disable=broad-exception-caught
+                self.aw.qmc.adderror(QApplication.translate('Message','Error writing PID RS value {0}').format(str(i)))
 
     @pyqtSlot(bool)
     def writeAll(self, _:bool = False) -> None:

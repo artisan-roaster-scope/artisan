@@ -93,7 +93,7 @@ class RoastProfile:
         self.aligned:bool = True # if the profile could not be aligned it is not drawn
         self.active:bool = True # if selected or all are unselected; active profiles are drawn in color, inactive profiles in gray
         self.color:Tuple[float, float, float, float] = color
-        hslf:Tuple[Optional[float], Optional[float], Optional[float], Optional[float]] = QColor.fromRgbF(*color).getHslF()
+        hslf:Tuple[Optional[float], Optional[float], Optional[float], Optional[float]] = QColor.fromRgbF(*color).getHslF() # ty:ignore[missing-argument]
         self.gray:Tuple[float, float, float, float]
         ch:Optional[float] = hslf[0]
         cl:Optional[float] = hslf[2]
@@ -278,7 +278,7 @@ class RoastProfile:
                 roastdate_str:Optional[str] = decodeLocal(profile['roastdate'])
                 if roastdate_str is not None:
                     date = QDate.fromString(roastdate_str)
-                    if not date.isValid():
+                    if not date.isValid(): # ty:ignore[no-matching-overload]
                         date = QDate.currentDate()
                 else:
                     date = QDate.currentDate()
@@ -434,9 +434,9 @@ class RoastProfile:
         self.events_timex = []
         if self.stemp1 is not None and self.stemp2 is not None:
             for ti in self.timeindex[:-1]:
-                temp1 = self.stemp1[ti]
-                temp2 = self.stemp2[ti]
-                if ((len(self.events1) == 0 and ti != -1) or ti > 0):
+                temp1:Optional[float] = (self.stemp1[ti] if len(self.stemp1)>ti else None) # pyrefly: ignore
+                temp2:Optional[float] = (self.stemp2[ti] if len(self.stemp2)>ti else None) # pyrefly: ignore
+                if ((len(self.events1) == 0 and ti != -1) or ti > 0): # pyrefly: ignore[bad-argument-type]
                     self.events1.append(temp1)
                     self.events2.append(temp2)
                     self.events_timex.append(self.timex[ti])
@@ -463,12 +463,15 @@ class RoastProfile:
             self.E3 = []
             self.E4 = []
 
-            last_E1, last_E2, last_E3, last_E4 = None, None, None, None
+            last_E1:Optional[float] = None
+            last_E2:Optional[float] = None
+            last_E3:Optional[float] = None
+            last_E4:Optional[float] = None
             for i,e in enumerate(self.specialevents):
                 try:
-                    etime = self.timex[e]
-                    etype = self.specialeventstype[i]
-                    evalue:float = self.aw.qmc.eventsInternal2ExternalValue(self.specialeventsvalue[i]) * value_factor + value_offset
+                    etime:float = self.timex[e]
+                    etype:float = self.specialeventstype[i]  # pyrefly: ignore[unsupported-operation]
+                    evalue:float = self.aw.qmc.eventsInternal2ExternalValue(self.specialeventsvalue[i]) * value_factor + value_offset # pyrefly: ignore[unsupported-operation]
                     # remember last event value per type before CHARGE
                     if (not self.aw.qmc.compareBBP and self.timeindex[0] != -1 and e < self.timeindex[0]):
                         if etype == 0:
@@ -1416,6 +1419,7 @@ class roastCompareDlg(ArtisanDialog):
                         pass
                     try:
                         self.legend.set_draggable(state=True,use_blit=True)  #,update='bbox')
+                        self.legend.set_picker(self.aw.draggable_text_box_picker)
                     except Exception: # not available in mpl<3.x # pylint: disable=broad-except
                         self.legend.draggable(state=True) # type: ignore # for mpl 2.x
                     frame = self.legend.get_frame()
@@ -1460,7 +1464,7 @@ class roastCompareDlg(ArtisanDialog):
 
     def setProfileTableRow(self, i:int) -> None:
         profile = self.profiles[i]
-        c = QColor.fromRgbF(*profile.color)
+        c = QColor.fromRgbF(*profile.color)  # ty:ignore[missing-argument]
         color = QTableWidgetItem()
         color.setBackground(c)
         color.setFlags(Qt.ItemFlag.ItemIsEnabled) # do not change background color on row selection of the color items
@@ -1810,7 +1814,7 @@ class roastCompareDlg(ArtisanDialog):
     def updateAlignMenu(self, top:Optional[RoastProfile]) -> None:
         if top is not None:
             model = self.alignComboBox.model()
-            assert isinstance(model, QStandardItemModel)
+            assert isinstance(model, QStandardItemModel) # pyrefly: ignore[invalid-argument]
             for i in range(model.rowCount()):
                 item: Optional[QStandardItem] = model.item(i)
                 if item is not None:
@@ -1889,9 +1893,9 @@ class roastCompareDlg(ArtisanDialog):
             w = self.profileTable.item(i,0)
             if w is not None:
                 if p.active:
-                    c = QColor.fromRgbF(*p.color)
+                    c = QColor.fromRgbF(*p.color) # ty:ignore[missing-argument]
                 else:
-                    c = QColor.fromRgbF(*p.gray)
+                    c = QColor.fromRgbF(*p.gray)  # ty:ignore[missing-argument]
                 w.setBackground(c)
         self.aw.qpc.update_phases(self.getPhasesData())
 
@@ -2066,20 +2070,40 @@ class roastCompareDlg(ArtisanDialog):
                 return p
         return None
 
-    def getPhasesData(self) -> List[Tuple[str, float, Tuple[float,float,float], bool, bool, str]]:
-        data :List[Tuple[str, float, Tuple[float,float,float], bool, bool, str]]= []
+    def getPhasesData(self) -> List[Tuple[str, float, Tuple[float,float,float], bool, bool, str,
+            Tuple[float,float,float], Tuple[float,float,float]]]:
+        data :List[Tuple[str, float, Tuple[float,float,float], bool, bool, str,
+                Tuple[float,float,float], Tuple[float,float,float]]]= []
         profiles:List[RoastProfile] = self.getProfilesVisualOrder()
         for p in reversed(profiles):
             if p.visible:
-                start:float = p.timex[p.timeindex[0]] if p.timeindex[0] != -1 else p.timex[0]
+                start_idx = p.timeindex[0] if p.timeindex[0] != -1 else 0
+                start:float = p.timex[start_idx]
                 total:float = p.timex[p.timeindex[6]] - start if p.timeindex[6] != 0 else p.timex[-1]
                 dry:float = p.timex[p.timeindex[1]] - start if p.timeindex[1] != 0 else 0
                 fcs:float = p.timex[p.timeindex[2]] - start if p.timeindex[2] != 0 else 0
                 p1:float = dry
                 p3:float = total - fcs if fcs != 0 else 0
                 p2:float = total - p1 - p3 if p1 != 0 and p3 != 0 else 0
-                c:QColor = QColor.fromRgbF(*p.color)
-                data.append((p.label, total, (p1, p2, p3), p.active, p.aligned, c.name()))
+                c:QColor = QColor.fromRgbF(*p.color) # ty:ignore[missing-argument]
+                t1:float = p.temp2[p.timeindex[1]] if p.timeindex[1] != 0 and len(p.temp2) > p.timeindex[1] else -1
+                t2:float = p.temp2[p.timeindex[2]] if p.timeindex[2] != 0 and len(p.temp2) > p.timeindex[2] else -1
+                t3:float = p.temp2[p.timeindex[6]] if p.timeindex[6] != 0 and len(p.temp2) > p.timeindex[6] else (p.temp2[-1] if len(p.temp2)>0 else -1)
+                r1:float = -1
+                r2:float = -1
+                r3:float = -1
+                if p.delta2 is not None:
+                    r:Optional[float] = p.delta2[p.timeindex[1]] if p.timeindex[1] != 0 and len(p.delta2) > p.timeindex[1] else -1
+                    if r is not None:
+                        r1 = float(r)
+                    r = p.delta2[p.timeindex[2]] if p.timeindex[2] != 0 and len(p.delta2) > p.timeindex[2] else -1
+                    if r is not None:
+                        r2 = float(r)
+                    r = p.delta2[p.timeindex[6]] if p.timeindex[6] != 0 and len(p.delta2) > p.timeindex[6] else (p.delta2[-1] if len(p.delta2)>0 else -1)
+                    if r is not None:
+                        r3 = float(r)
+                data.append((p.label, total, (p1, p2, p3), p.active, p.aligned, c.name(),
+                    (t1, t2, t3), (r1, r2, r3)))
         return data
 
     def getProfilesVisualOrder(self) -> List[RoastProfile]:

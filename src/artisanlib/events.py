@@ -100,6 +100,27 @@ class EventsDlg(ArtisanResizeablDialog):
         self.buttonpalette_tooltips:List[bool] =                  [self.aw.show_extrabutton_tooltips_default]*self.aw.max_palettes     # show tooltips flag per pallet
         self.buttonpalette_slider_alternative_layout:List[bool] = [self.aw.eventsliderAlternativeLayout_default]*self.aw.max_palettes  # alternative layout flag per pallet
         self.buttonpalette_label:str = self.aw.buttonpalette_label
+        self.eventsliderAlternativeLayout:bool = self.aw.eventsliderAlternativeLayout_default
+        self.eventsliderAlternativeLayoutstored:bool = self.aw.eventsliderAlternativeLayout_default
+        self.eventsliderKeyboardControlstored:bool = True
+        self.autoDropModestored:int = self.aw.qmc.autoDropMode
+        self.autoChargeModestored:int = self.aw.qmc.autoChargeMode
+        self.autoDropFlagstored:bool = self.aw.qmc.autoDropFlag
+        self.autoChargeFlagstored:bool = self.aw.qmc.autoChargeFlag
+        self.chargeTimerPeriodstored:int = self.aw.qmc.chargeTimerPeriod
+        self.chargeTimerFlagstored:bool = self.aw.qmc.chargeTimerFlag
+        self.etypeComboBoxstored_currentIndex:int = self.aw.etypeComboBox.currentIndex()
+        self.etypesstored:List[str] = self.aw.qmc.etypes[:]
+        self.eventsGraphflagstored:int = self.aw.qmc.eventsGraphflag
+        self.showEtypesstored:List[bool] = self.aw.qmc.showEtypes[:]
+        self.showeventsonbtstored:bool = self.aw.qmc.showeventsonbt
+        self.annotationsflagstored:int = self.aw.qmc.annotationsflag
+        self.eventsshowflagstored:int = self.aw.qmc.eventsshowflag
+        self.eventsbuttonflagstored:int = self.aw.eventsbuttonflag
+        self.markTPFlagstored:bool = self.aw.qmc.markTPflag
+        self.show_extrabutton_tooltips:bool = self.aw.show_extrabutton_tooltips_default
+        self.mark_last_button_pressed:bool = self.aw.mark_last_button_pressed_default
+        self.buttonsize:int = self.aw.buttonsize_default
         # styles
         self.EvalueColor:List[str] = self.aw.qmc.EvalueColor_default.copy()
         self.EvalueMarker:List[str] = ['o','s','h','D']
@@ -1817,7 +1838,7 @@ class EventsDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(bool)
     def restorepaletteeventbuttons(self, _:bool = False) -> None:
-        filename = self.aw.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Load Palettes'),path=self.aw.profilepath)
+        filename = self.aw.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Load Palettes'))
         if filename:
             maxlen = self.aw.loadPalettes(filename,self.aw.buttonpalette)
             if maxlen is not None:
@@ -3060,7 +3081,7 @@ class EventsDlg(ArtisanResizeablDialog):
             return
         try:
             focusWidget = QApplication.focusWidget()
-            if focusWidget is not None and isinstance(focusWidget, QLineEdit):
+            if focusWidget is not None and isinstance(focusWidget, QLineEdit): # pyrefly: ignore[invalid-argument]
                 fw:QLineEdit = focusWidget
                 fw.editingFinished.emit()
         except Exception: # pylint: disable=broad-except
@@ -3317,7 +3338,7 @@ class EventsDlg(ArtisanResizeablDialog):
         self.showEtypesstored = self.aw.qmc.showEtypes[:]
         self.eventsGraphflagstored = self.aw.qmc.eventsGraphflag
         self.etypesstored = self.aw.qmc.etypes
-        self.etypeComboBoxstored = self.aw.etypeComboBox
+        self.etypeComboBoxstored_currentIndex = self.aw.etypeComboBox.currentIndex()
         self.chargeTimerFlagstored = self.aw.qmc.chargeTimerFlag
         self.chargeTimerPeriodstored = self.aw.qmc.chargeTimerPeriod
         self.autoChargeFlagstored = self.aw.qmc.autoChargeFlag
@@ -3391,7 +3412,10 @@ class EventsDlg(ArtisanResizeablDialog):
         self.aw.qmc.showEtypes = self.showEtypesstored[:]
         self.aw.qmc.eventsGraphflag = self.eventsGraphflagstored
         self.aw.qmc.etypes = self.etypesstored
-        self.aw.etypeComboBox = self.etypeComboBoxstored
+        try:
+            self.aw.etypeComboBox.setCurrentIndex(self.etypeComboBoxstored_currentIndex)
+        except Exception: # pylint: disable=broad-except
+            pass
         self.aw.qmc.chargeTimerFlag = self.chargeTimerFlagstored
         self.aw.qmc.chargeTimerPeriod = self.chargeTimerPeriodstored
         self.aw.qmc.autoChargeFlag = self.autoChargeFlagstored

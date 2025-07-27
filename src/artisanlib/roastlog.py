@@ -13,7 +13,6 @@ from typing import Final, List, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
-    from artisanlib.atypes import ProfileData # pylint: disable=unused-import
     from PyQt6.QtCore import QUrl # pylint: disable=unused-import
 
 try:
@@ -23,12 +22,13 @@ except ImportError:
 
 
 from artisanlib.util import encodeLocal, stringtoseconds
+from artisanlib.atypes import ProfileData
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 # returns a dict containing all profile information contained in the given RoastLog document pointed by the given QUrl
-def extractProfileRoastLog(url:'QUrl', _:'ApplicationWindow') -> Optional['ProfileData']:
+def extractProfileRoastLog(url:'QUrl', _:'ApplicationWindow') -> Optional[ProfileData]:
     res:ProfileData = ProfileData() # the interpreted data set
     try:
         s = requests.Session()
@@ -151,11 +151,11 @@ def extractProfileRoastLog(url:'QUrl', _:'ApplicationWindow') -> Optional['Profi
                     if len(timex) == len(temp1):
                         res['temp2'] = temp1
                     else:
-                        res['temp2'] = [-1]*len(timex)
+                        res['temp2'] = [-1.0]*len(timex)
                     if len(timex) == len(temp2):
                         res['temp1'] = temp2
                     else:
-                        res['temp1'] = [-1]*len(timex)
+                        res['temp1'] = [-1.0]*len(timex)
                     if len(temp3) == len(timex) or len(temp4) == len(timex):
                         temp3_visibility = True
                         temp4_visibility = True
@@ -165,12 +165,12 @@ def extractProfileRoastLog(url:'QUrl', _:'ApplicationWindow') -> Optional['Profi
                         if len(temp3) == len(timex):
                             res['extratemp1'] = [temp3]
                         else:
-                            res['extratemp1'] = [[-1]*len(timex)]
+                            res['extratemp1'] = [[-1.0]*len(timex)]
                             temp3_visibility = False
                         if len(temp4) == len(timex):
                             res['extratemp2'] = [temp4]
                         else:
-                            res['extratemp2'] = [[-1]*len(timex)]
+                            res['extratemp2'] = [[-1.0]*len(timex)]
                             temp4_visibility = False
                         res['extraname1'] = [temp3_label]
                         res['extraname2'] = [temp4_label]

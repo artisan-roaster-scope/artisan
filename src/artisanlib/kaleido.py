@@ -430,7 +430,7 @@ class KaleidoPort:
                 connected_handler:Optional[Callable[[], None]] = None,
                 disconnected_handler:Optional[Callable[[], None]] = None) -> None:
 
-        writer = None
+        writer:Optional[asyncio.StreamWriter] = None
         while self._running:
             try:
                 _log.debug('connecting to %s@%s ...',serial['port'],serial['baudrate'])

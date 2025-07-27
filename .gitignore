@@ -3,31 +3,79 @@
 src/.eggs/
 src/build/
 src/dist*/
-src/artisan.py.bak
-src/artisan.py.org.py
-src/artisan.py.python2.py
-src/artisan.py.zip
-**/*.DS_Store
-src/Artisan.app/
-src/.settings/
-src/translations copy/
-src/Artisan-10.6.app/
-src/.project
 src/.pydevproject
-src/artisan-mac-2.4.5-beta.dmg
-src/artisan-mac-2.4.5.dmg
 src/artisan-mac-*.dmg
 src/artisan-win-*-setup.exe
-.idea/
+
+# Virtual environments
+venv/
+.venv/
+env/
+.env/
+
+# uv
+.uv/
+uv.lock
+
+# Python development
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Testing and coverage
+.pytest_cache/
 .coverage
-.prev_artisanlib_hash.txt
-simple.log
-artisan_plus.log
-outbox/
-*flycheck_*.py
+.coverage.*
+.htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# Code spelling
+.pyspelling.yml
+
+# Type checking
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pytype/
+
+# Linting
+.ruff_cache/
+
+# Augment AI assistant files
+.augment/
+
+# IDEs and editors
+.project
+.pydevproject
+.idea/
+.settings/
+.vscode/
+.vscode/settings.json.bak
+.vscode/.ropeproject
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 
 #Keeps derived files out of the Artisan repository
-#   To remove these files from the repository a commit must first be made 
+#   To remove these files from the repository a commit must first be made
 #   with the these files deleted, then this section should be uncommented.
 #to remove initially make a commit with thee files deleted then uncomment this section
 #src/uic/[!_]*.py

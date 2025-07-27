@@ -19,7 +19,8 @@ import time as libtime
 import warnings
 import copy
 import numpy
-from typing import List, Tuple, Callable, Optional, TYPE_CHECKING
+import logging
+from typing import Final, List, Tuple, Callable, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
@@ -42,6 +43,8 @@ except ImportError:
     from PyQt5.QtWidgets import (QApplication, QHeaderView, QAbstractItemView, QWidget, QLabel, QLineEdit, QComboBox, QDialogButtonBox, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
                 QTableWidget, QTableWidgetItem, QGroupBox, QLayout, QHBoxLayout, QVBoxLayout, QFrame) # @UnusedImport @Reimport  @UnresolvedImport
 
+
+_log: Final[logging.Logger] = logging.getLogger(__name__)
 
 class MyQRegularExpressionValidator(QRegularExpressionValidator): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     # we fix partial time input like '12' => '12:00', '12:' => '12:00' and '12:0' => '12:00'
@@ -227,49 +230,49 @@ class profileTransformatorDlg(ArtisanDialog):
     def clearPhasesTargetTimes(self) -> None:
         if self.phases_target_widgets_time is not None and len(self.phases_target_widgets_time)>2:
             for i in range(3):
-                phases_target_widgets_time = self.phases_target_widgets_time[i]
+                phases_target_widgets_time = self.phases_target_widgets_time[i] # pyrefly: ignore[unsupported-operation]
                 if phases_target_widgets_time is not None:
                     phases_target_widgets_time.setText('')
 
     def clearPhasesTargetPercent(self) -> None:
         if self.phases_target_widgets_percent is not None and len(self.phases_target_widgets_percent)>2:
             for i in range(3):
-                phases_target_widgets_percent = self.phases_target_widgets_percent[i]
+                phases_target_widgets_percent = self.phases_target_widgets_percent[i] # pyrefly: ignore[unsupported-operation]
                 if phases_target_widgets_percent is not None:
                     phases_target_widgets_percent.setText('')
 
     def clearPhasesResults(self) -> None:
         if self.phases_result_widgets is not None and len(self.phases_result_widgets)>2:
             for i in range(3):
-                phases_result_widgets = self.phases_result_widgets[i]
+                phases_result_widgets = self.phases_result_widgets[i] # pyrefly: ignore[unsupported-operation]
                 if phases_result_widgets is not None:
                     phases_result_widgets.setText('')
 
     def clearTimeTargets(self) -> None:
         if self.time_target_widgets is not None and len(self.time_target_widgets)>3:
             for i in range(4):
-                time_target_widgets = self.time_target_widgets[i]
+                time_target_widgets = self.time_target_widgets[i] # pyrefly: ignore[unsupported-operation]
                 if time_target_widgets is not None:
                     time_target_widgets.setText('')
 
     def clearTimeResults(self) -> None:
         if self.time_result_widgets is not None and len(self.time_result_widgets)>3:
             for i in range(4):
-                time_result_widgets = self.time_result_widgets[i]
+                time_result_widgets = self.time_result_widgets[i] # pyrefly: ignore[unsupported-operation]
                 if time_result_widgets is not None:
                     time_result_widgets.setText('')
 
     def clearTempTargets(self) -> None:
         if self.temp_target_widgets is not None and len(self.temp_target_widgets)>4:
             for i in range(5):
-                temp_target_widget:Optional[QLineEdit] = self.temp_target_widgets[i]
+                temp_target_widget:Optional[QLineEdit] = self.temp_target_widgets[i] # pyrefly: ignore[unsupported-operation]
                 if temp_target_widget is not None:
                     temp_target_widget.setText('')
 
     def clearTempResults(self) -> None:
         if self.temp_result_widgets is not None and len(self.temp_result_widgets)>4:
             for i in range(5):
-                temp_result_widget:Optional[QTableWidgetItem] = self.temp_result_widgets[i]
+                temp_result_widget:Optional[QTableWidgetItem] = self.temp_result_widgets[i] # pyrefly: ignore[unsupported-operation]
                 if temp_result_widget is not None:
                     temp_result_widget.setText('')
         self.temp_formula.setText('')
@@ -311,7 +314,10 @@ class profileTransformatorDlg(ArtisanDialog):
                 if w is not None:
                     txt = w.text()
                     if txt is not None and txt != '':
-                        ri = stringtoseconds(txt)
+                        try:
+                            ri = stringtoseconds(txt)
+                        except Exception as e: # pylint: disable=broad-except
+                            _log.error(e) # widget should not allow for malformed time string input on which stringtoseconds raises an exception
                 res_times.append(ri)
         if self.phases_target_widgets_percent is not None:
             for w in self.phases_target_widgets_percent:
@@ -332,7 +338,10 @@ class profileTransformatorDlg(ArtisanDialog):
                 if w is not None:
                     txt = w.text()
                     if txt is not None and txt != '':
-                        r = stringtoseconds(txt)
+                        try:
+                            r = stringtoseconds(txt)
+                        except Exception as e: # pylint: disable=broad-except
+                            _log.error(e) # widget should not allow for malformed time string input on which stringtoseconds raises an exception
                 res.append(r)
         return res
 
@@ -449,7 +458,7 @@ class profileTransformatorDlg(ArtisanDialog):
         self.clearTimeTargets()
         if self.phases_target_widgets_time is not None and self.phases_target_widgets_percent is not None:
             sender = self.sender()
-            assert isinstance(sender, QLineEdit)
+            assert isinstance(sender, QLineEdit) # pyrefly: ignore[invalid-argument]
             # clear corresponding time target if percentage target is set, or the otherway around
             if sender.text() != '':
                 try:
@@ -492,7 +501,7 @@ class profileTransformatorDlg(ArtisanDialog):
             result_times = self.calcTimeResults()
             if self.time_result_widgets is not None:
                 for i in range(4):
-                    time_result_widget = self.time_result_widgets[i]
+                    time_result_widget = self.time_result_widgets[i] # pyrefly: ignore[unsupported-operation]
                     if time_result_widget is not None:
                         if result_times[i] is None:
                             s = ''
@@ -542,7 +551,7 @@ class profileTransformatorDlg(ArtisanDialog):
         elif self.temp_result_widgets is not None and len(self.temp_result_widgets)>4:
             result_temps,fit = self.calcTempResults()
             for i in range(5):
-                temp_result_widget:Optional[QTableWidgetItem] = self.temp_result_widgets[i]
+                temp_result_widget:Optional[QTableWidgetItem] = self.temp_result_widgets[i]  # pyrefly: ignore[unsupported-operation]
                 result_temp = result_temps[i]
                 if temp_result_widget is not None and result_temp is not None:
                     temp_result_widget.setText(str(float2float(result_temp)) + self.aw.qmc.mode)
@@ -710,7 +719,7 @@ class profileTransformatorDlg(ArtisanDialog):
                                 res.append(None)
                         fit_str = self.aw.fit2str(fit_func)
                     else:
-                        res = [None]*5
+                        res = [None]*5 # pyrefly: ignore[bad-assignment]
 #                except numpy.exceptions.RankWarning:
 #                    pass
                 except Exception: # pylint: disable=broad-except
@@ -737,8 +746,11 @@ class profileTransformatorDlg(ArtisanDialog):
         drop_phases_target_widget_time = self.phases_target_widgets_time[2]
         drop_phases_target_widget_percent = self.phases_target_widgets_percent[2]
         if drop_phases_target_widget_time is not None and drop_phases_target_widget_time.text() != '':
-            drop = fcs + stringtoseconds(drop_phases_target_widget_time.text())
-            drop_set = True
+            try:
+                drop = fcs + stringtoseconds(drop_phases_target_widget_time.text())
+                drop_set = True
+            except Exception as e: # pylint: disable=broad-except
+                _log.error(e) # widget should not allow for malformed time string input on which stringtoseconds raises an exception
         elif drop_phases_target_widget_percent is not None and drop_phases_target_widget_percent.text() != '':
             drop = fcs + (float(drop_phases_target_widget_percent.text()) * drop / 100)
             drop_set = True
@@ -747,8 +759,11 @@ class profileTransformatorDlg(ArtisanDialog):
         dry_phases_target_widgets_time = self.phases_target_widgets_time[0]
         dry_phases_target_widgets_percent = self.phases_target_widgets_percent[0]
         if dry_phases_target_widgets_time is not None and dry_phases_target_widgets_time.text() != '':
-            dry = stringtoseconds(dry_phases_target_widgets_time.text())
-            dry_set = True
+            try:
+                dry = stringtoseconds(dry_phases_target_widgets_time.text())
+                dry_set = True
+            except Exception as e: # pylint: disable=broad-except
+                _log.error(e) # widget should not allow for malformed time string input on which stringtoseconds raises an exception
         elif dry_phases_target_widgets_percent is not None and dry_phases_target_widgets_percent.text() != '':
             dry = float(dry_phases_target_widgets_percent.text()) * drop / 100
             dry_set = True
@@ -757,8 +772,11 @@ class profileTransformatorDlg(ArtisanDialog):
         fcs_phases_target_widgets_time = self.phases_target_widgets_time[1]
         fcs_phases_target_widgets_percent = self.phases_target_widgets_percent[1]
         if fcs_phases_target_widgets_time is not None and fcs_phases_target_widgets_time.text() != '':
-            fcs = dry + stringtoseconds(fcs_phases_target_widgets_time.text())
-            fcs_set = True
+            try:
+                fcs = dry + stringtoseconds(fcs_phases_target_widgets_time.text())
+                fcs_set = True
+            except Exception as e: # pylint: disable=broad-except
+                _log.error(e) # widget should not allow for malformed time string input on which stringtoseconds raises an exception
         elif fcs_phases_target_widgets_percent is not None and fcs_phases_target_widgets_percent.text() != '':
             fcs = dry + (float(fcs_phases_target_widgets_percent.text()) * drop / 100)
             fcs_set = True
@@ -1046,8 +1064,8 @@ class profileTransformatorDlg(ArtisanDialog):
         self.phases_target_widgets_percent = []
         self.phases_result_widgets = []
 
-        profilePhasesTimes:List[Optional[float]] = [None]*3 # DRYING, MAILARD, FINISHING
-        profilePhasesPercentages:List[Optional[float]] = [None] * 3
+        profilePhasesTimes:List[Optional[float]] = [None]*3 # DRYING, MAILARD, FINISHING # pyrefly: ignore[bad-assignment]
+        profilePhasesPercentages:List[Optional[float]] = [None] * 3 # pyrefly: ignore[bad-assignment]
         #
         # the phases transformation are only enabled if at least DRY, FCs and DROP events are set
         phases_enabled = self.aw.qmc.timeindex[1] and self.aw.qmc.timeindex[2] and self.aw.qmc.timeindex[6]
