@@ -118,7 +118,7 @@ if system() == 'Windows' and hasattr(sys, 'frozen'): # tools/freeze
     except Exception: # pylint: disable=broad-except
         pass
 
-# no longer needed as multiprocessing is     used by Hottop/WebLCDs any longer
+# no longer needed as multiprocessing is used by Hottop/WebLCDs any longer
 #    from multiprocessing import set_executable
 #    executable = os.path.join(os.path.dirname(sys.executable), 'artisan.exe')
 #    set_executable(executable)
