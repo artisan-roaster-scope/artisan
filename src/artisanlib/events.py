@@ -1838,7 +1838,7 @@ class EventsDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(bool)
     def restorepaletteeventbuttons(self, _:bool = False) -> None:
-        filename = self.aw.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Load Palettes'))
+        filename = self.aw.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Load Palettes'), ext='*.apal')
         if filename:
             maxlen = self.aw.loadPalettes(filename,self.aw.buttonpalette)
             if maxlen is not None:
@@ -2727,7 +2727,8 @@ class EventsDlg(ArtisanResizeablDialog):
         if hheader is not None:
             hheader.setStretchLastSection(False)
             self.eventbuttontable.resizeColumnsToContents()
-            hheader.setSectionResizeMode(5, QHeaderView.ResizeMode.Stretch)
+            if platform.system() != 'Windows':  # allow resizing as behavior is different on Windows
+                hheader.setSectionResizeMode(5, QHeaderView.ResizeMode.Stretch)
             hheader.setSectionResizeMode(6, QHeaderView.ResizeMode.Fixed)
             hheader.resizeSection(6, hheader.sectionSize(6) + 15)
             hheader.resizeSection(7, self.aw.standard_button_min_width_px)
@@ -2741,11 +2742,10 @@ class EventsDlg(ArtisanResizeablDialog):
 
         # remember the columnwidth
         for i, _ in enumerate(self.aw.eventbuttontablecolumnwidths):
-            if i not in [5,6,7,8]:
-                try:
-                    self.eventbuttontable.setColumnWidth(i,self.aw.eventbuttontablecolumnwidths[i])
-                except Exception: # pylint: disable=broad-except
-                    pass
+            try:
+                self.eventbuttontable.setColumnWidth(i,self.aw.eventbuttontablecolumnwidths[i])
+            except Exception: # pylint: disable=broad-except
+                pass
 
     @pyqtSlot(bool)
     def copyEventButtonTabletoClipboard(self, _:bool=False) -> None:

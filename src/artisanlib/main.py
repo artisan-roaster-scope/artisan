@@ -26305,30 +26305,32 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
         # hidden buttons at the top of the table are for actions and don't count in the first row
         # find the index of the first visible button
-        first_visible_idx = 0
+        first_counted_idx = 0
         for i, _ in enumerate(self.extraeventstypes):
-            if self.extraeventsvisibility[i]:
-                first_visible_idx = i
+            if self.extraeventsvisibility[i] or (
+                    self.extraeventstypes[i] == 4 and
+                    self.extraeventsactions[i] == 0):
+                first_counted_idx = i
                 break
 
         for i, eet in enumerate(self.extraeventstypes):
             # next button in this group is hidden
-            next_hidden = ((i - first_visible_idx)%self.buttonlistmaxlen < self.buttonlistmaxlen -1 and  # at least one more places in the group
+            next_hidden = ((i - first_counted_idx)%self.buttonlistmaxlen < self.buttonlistmaxlen -1 and  # at least one more places in the group
                     i+1 < len(self.extraeventstypes) and # there is one more button
                     not self.extraeventsvisibility[i+1]) # and the next one is hidden
             # previous button in this group is hidden
-            prev_hidden = ((i - first_visible_idx)%self.buttonlistmaxlen > 0 and # at least one previous place in this group
+            prev_hidden = ((i - first_counted_idx)%self.buttonlistmaxlen > 0 and # at least one previous place in this group
                     i > 0 and # there is more than one button in total
                     not self.extraeventsvisibility[i-1]) # and the previous one is hidden
 
-            if (i - first_visible_idx)%self.buttonlistmaxlen == 0: # left-most button in the row
+            if (i - first_counted_idx)%self.buttonlistmaxlen == 0: # left-most button in the row
                 if i == len(self.extraeventstypes)-1 or next_hidden:
                     # a singleton button in a one element bar
                     self.extraeventbuttonround.append(3)
                 else:
                     # the left-most button in this bar
                     self.extraeventbuttonround.append(1)
-            elif ((i - first_visible_idx)%self.buttonlistmaxlen < self.buttonlistmaxlen-1) and i != len(self.extraeventstypes)-1:
+            elif ((i - first_counted_idx)%self.buttonlistmaxlen < self.buttonlistmaxlen-1) and i != len(self.extraeventstypes)-1:
                 # a button in the middle of this bar
                 if prev_hidden and next_hidden:
                     # we round both sides
@@ -26360,7 +26362,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.buttonlist.append(p)
             self.buttonStates.append(0)
             #add button to row
-            if i < first_visible_idx:
+            if i < first_counted_idx:
                 pass
             elif row1count < self.buttonlistmaxlen:
                 self.e1buttonbarLayout.addWidget(self.buttonlist[i])
