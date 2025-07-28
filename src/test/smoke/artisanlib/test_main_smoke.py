@@ -54,7 +54,7 @@ cross-file contamination.
 from typing import Any, Generator, List
 from unittest.mock import Mock, patch
 
-import numpy # noqa: F401 # explicitly import numpy here to preven dublicate imports after the sys.modules hack below
+import numpy # noqa: F401 # explicitly import numpy here to prevent duplicate imports after the sys.modules hack below
 
 import pytest
 

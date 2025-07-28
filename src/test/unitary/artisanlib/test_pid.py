@@ -62,7 +62,8 @@ modules with Qt dependencies and complex numerical library interactions.
 """
 
 import math
-from typing import Generator, List
+import sys
+from typing import Any, Generator, List
 from unittest.mock import MagicMock, Mock, patch
 
 import pytest
@@ -105,22 +106,86 @@ class MockQSemaphore:
         self.available.return_value = self._count
 
 
-# Set up comprehensive Qt mocking before any artisanlib imports
-mock_modules = {
-    'PyQt6': Mock(),
-    'PyQt6.QtCore': Mock(),
-    'PyQt6.QtWidgets': Mock(),
-    'PyQt6.QtGui': Mock(),
-    'PyQt6.sip': Mock(),
-}
+# ============================================================================
+# ISOLATED MODULE IMPORT WITH PROPER CLEANUP
+# ============================================================================
+# Import modules without contaminating sys.modules for other tests
 
-# Configure Qt mocks with proper classes
-mock_modules['PyQt6.QtCore'].QSemaphore = MockQSemaphore
 
-# Apply mocks and import modules with proper isolation
-with patch.dict('sys.modules', mock_modules, clear=False):
-    # Import the PID module with comprehensive mocking
-    from artisanlib.pid import PID
+# Import PID module with proper Qt mocking that ensures isolation
+def _import_pid_with_mocks() -> Any:
+    """Import PID module with mocks that override any existing Qt modules."""
+    # Store original modules if they exist
+    original_modules = {}
+    qt_module_names = ['PyQt6', 'PyQt6.QtCore', 'PyQt6.QtWidgets', 'PyQt6.QtGui', 'PyQt6.sip']
+
+    for module_name in qt_module_names:
+        if module_name in sys.modules:
+            original_modules[module_name] = sys.modules[module_name]
+
+    try:
+        # Set up comprehensive Qt mocking before any artisanlib imports
+        mock_modules = {
+            'PyQt6': Mock(),
+            'PyQt6.QtCore': Mock(),
+            'PyQt6.QtWidgets': Mock(),
+            'PyQt6.QtGui': Mock(),
+            'PyQt6.sip': Mock(),
+        }
+
+        # Configure Qt mocks with proper classes
+        mock_modules['PyQt6.QtCore'].QSemaphore = MockQSemaphore
+
+        # Force override any existing Qt modules
+        for module_name, mock_module in mock_modules.items():
+            sys.modules[module_name] = mock_module
+
+        # Import the PID module with comprehensive mocking
+        from artisanlib.pid import PID
+
+        return PID
+
+    finally:
+        # Restore original modules to prevent contamination
+        for module_name in qt_module_names:
+            if module_name in original_modules:
+                sys.modules[module_name] = original_modules[module_name]
+            elif module_name in sys.modules:
+                # Remove mock modules we added
+                del sys.modules[module_name]
+
+
+# Import the module
+PID = _import_pid_with_mocks()
+
+
+@pytest.fixture(scope='session', autouse=True)
+def ensure_pid_qt_isolation() -> Generator[None, None, None]:
+    """
+    Ensure Qt modules are properly isolated for PID tests at session level.
+
+    This fixture runs once per test session to ensure that Qt modules
+    are properly mocked for PID tests and don't interfere with other tests.
+    """
+    # Check if Qt modules are already in sys.modules (from other tests)
+    qt_contaminated = any(
+        module_name in sys.modules and not hasattr(sys.modules[module_name], '_mock_name')
+        for module_name in ['PyQt6', 'PyQt6.QtCore', 'PyQt6.QtWidgets', 'PyQt6.QtGui']
+    )
+
+    if qt_contaminated:
+        # If Qt modules are contaminated, we need to re-import PID with proper mocks
+        # Remove the current PID module if it exists
+        if 'artisanlib.pid' in sys.modules:
+            del sys.modules['artisanlib.pid']
+
+        # Re-import with proper mocks
+        global PID
+        PID = _import_pid_with_mocks()
+
+    yield
+
+    # Cleanup is handled by individual test fixtures
 
 
 @pytest.fixture(autouse=True)
@@ -152,7 +217,7 @@ def mock_control() -> Mock:
 
 
 @pytest.fixture
-def pid_instance(mock_control: Mock) -> PID:
+def pid_instance(mock_control: Mock) -> Any:
     """
     Create a fresh PID instance for each test.
 
@@ -172,7 +237,7 @@ def pid_instance(mock_control: Mock) -> PID:
 
 
 @pytest.fixture
-def basic_pid() -> PID:
+def basic_pid() -> Any:
     """
     Create a basic PID instance without control function for testing.
 
@@ -191,7 +256,7 @@ def basic_pid() -> PID:
 class TestPIDInitialization:
     """Test PID controller initialization and basic properties."""
 
-    def test_init_default_parameters(self, basic_pid: PID) -> None:
+    def test_init_default_parameters(self, basic_pid: Any) -> None:
         """Test PID initialization with default parameters."""
         # Arrange - Use the fixture-provided PID instance
         pid = basic_pid
@@ -225,7 +290,7 @@ class TestPIDInitialization:
         # Verify semaphore isolation
         assert isinstance(pid.pidSemaphore, MockQSemaphore)
 
-    def test_init_internal_state(self, basic_pid: PID) -> None:
+    def test_init_internal_state(self, basic_pid: Any) -> None:
         """Test that internal state is properly initialized."""
         # Arrange - Use the fixture-provided PID instance
         pid = basic_pid
@@ -241,7 +306,7 @@ class TestPIDInitialization:
         assert pid.lastDerr == 0.0
         assert not pid.derivative_on_error
 
-    def test_init_smoothing_parameters(self, basic_pid: PID) -> None:
+    def test_init_smoothing_parameters(self, basic_pid: Any) -> None:
         """Test that smoothing parameters are properly initialized."""
         # Arrange - Use the fixture-provided PID instance
         pid = basic_pid
@@ -256,7 +321,7 @@ class TestPIDInitialization:
         assert pid.force_duty == 3
         assert pid.iterations_since_duty == 0
 
-    def test_init_derivative_filter(self, basic_pid: PID) -> None:
+    def test_init_derivative_filter(self, basic_pid: Any) -> None:
         """Test that derivative filter is properly initialized."""
         # Arrange - Use the fixture-provided PID instance
         pid = basic_pid
@@ -267,7 +332,7 @@ class TestPIDInitialization:
         # Should be a LiveSosFilter instance
         assert hasattr(pid.derivative_filter, 'process')
 
-    def test_init_semaphore(self, basic_pid: PID) -> None:
+    def test_init_semaphore(self, basic_pid: Any) -> None:
         """Test that semaphore is properly initialized."""
         # Arrange - Use the fixture-provided PID instance
         pid = basic_pid
@@ -281,7 +346,7 @@ class TestPIDInitialization:
 class TestPIDActivationControl:
     """Test PID activation and deactivation functionality."""
 
-    def test_on_activates_pid(self, basic_pid: PID) -> None:
+    def test_on_activates_pid(self, basic_pid: Any) -> None:
         """Test that on() activates the PID controller."""
         # Arrange - Use the fixture-provided PID instance
         pid = basic_pid
@@ -298,7 +363,7 @@ class TestPIDActivationControl:
         pid.pidSemaphore.acquire.assert_called()
         pid.pidSemaphore.release.assert_called()
 
-    def test_off_deactivates_pid(self, basic_pid: PID) -> None:
+    def test_off_deactivates_pid(self, basic_pid: Any) -> None:
         """Test that off() deactivates the PID controller."""
         # Arrange - Use the fixture-provided PID instance and activate it
         pid = basic_pid
@@ -320,7 +385,7 @@ class TestPIDActivationControl:
         pid.pidSemaphore.acquire.assert_called()
         pid.pidSemaphore.release.assert_called()
 
-    def test_isActive_returns_correct_state(self, basic_pid: PID) -> None:
+    def test_isActive_returns_correct_state(self, basic_pid: Any) -> None:
         """Test that isActive() returns correct activation state."""
         # Arrange - Use the fixture-provided PID instance
         pid = basic_pid
@@ -1457,7 +1522,7 @@ class TestPIDDerivativeKickImprovements:
 class TestPIDIntegralWindupImprovements:
     """Test improved integral windup prevention features."""
 
-    def test_integral_windup_prevention_initialization(self, basic_pid: PID) -> None:
+    def test_integral_windup_prevention_initialization(self, basic_pid: Any) -> None:
         """Test that integral windup prevention attributes are properly initialized."""
         # Arrange - Use the fixture-provided PID instance
         pid = basic_pid
