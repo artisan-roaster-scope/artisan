@@ -9,7 +9,7 @@ types-pyyaml>=6.0.12.20250516
 types-requests>=2.32.4.20250611
 types-setuptools>=80.9.0.20250529
 types-urllib3>=1.26.25.14
-types-docutils>=0.21.0.20250722
+types-docutils>=0.21.0.20250728
 lxml-stubs>=0.5.1
 mypy==1.17.0
 pyright==1.1.403
@@ -25,8 +25,8 @@ pytest-mock==3.14.1
 #PyVirtualDisplay==3.0
 #pytest-bdd==6.1.1
 #pytest-benchmark==4.0.0
-hypothesis>=6.136.4
-coverage>=7.10.0
+hypothesis>=6.136.6
+coverage>=7.10.1
 coverage-badge==1.1.2
 codespell==2.4.1
 # the following 2 packages are not installed along aiohttp on Python3.12 and make mypy complain

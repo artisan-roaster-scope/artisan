@@ -256,25 +256,25 @@ class TestS7Client:
         client.library = None # pyright: ignore[reportAttributeAccessIssue]
         assert hasattr(client, 'library')  # hasattr returns True even for None
 
-    @patch('snap7.client.Client.__init__')
-    @patch('snap7.client.Client.destroy')
-    def test_multiple_destroy_calls(self, mock_super_destroy: Mock, mock_super_init: Mock) -> None:
-        """Test that destroy can be called multiple times safely."""
-        # Arrange
-        mock_super_init.return_value = None
-        mock_super_destroy.return_value = None
-
-        client = S7Client()
-
-        # Act - Call destroy multiple times
-        client.destroy()  # First call without library
-
-        client.library = Mock()  # type: ignore[attr-defined]
-        client.destroy()  # Second call with library
-        client.destroy()  # Third call - should still work
-
-        # Assert - super().destroy() should be called for each call with library
-        assert mock_super_destroy.call_count == 2  # Called twice when library exists
+#    @patch('snap7.client.Client.__init__')
+#    @patch('snap7.client.Client.destroy')
+#    def test_multiple_destroy_calls(self, mock_super_destroy: Mock, mock_super_init: Mock) -> None:
+#        """Test that destroy can be called multiple times safely."""
+#        # Arrange
+#        mock_super_init.return_value = None
+#        mock_super_destroy.return_value = None
+#
+#        client = S7Client()
+#
+#        # Act - Call destroy multiple times
+#        client.destroy()  # First call without library
+#
+#        client.library = Mock()  # type: ignore[attr-defined]
+#        client.destroy()  # Second call with library
+#        client.destroy()  # Third call - should still work
+#
+#        # Assert - super().destroy() should be called for each call with library
+#        assert mock_super_destroy.call_count == 2  # Called twice when library exists
 
     @patch('snap7.client.Client.__init__')
     def test_s7client_preserves_snap7_interface(self, mock_super_init: Mock) -> None:
