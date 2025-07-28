@@ -20,7 +20,7 @@ environment:
   # Set the default Appveyor Python version here. Does not affect windows_legacy. Can be overridden in platform environment.
   PYTHON_V: 3.13
   # Upgrade to specific version (for platforms supporting upgrade). Upgrade skipped if env var is missing or blank.
-  PYUPGRADE_WIN_V: 3.13.3
+  PYUPGRADE_WIN_V: 3.13.5
   #PYUPGRADE_MACOS_V: 3.12.1
 
   matrix:
