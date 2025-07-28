@@ -14,8 +14,8 @@ including numerical stability, initialization behavior, and filter accuracy.
 
 import math
 from typing import Any, List, Tuple
-
 import numpy as np
+
 import pytest
 
 from artisanlib.filters import (

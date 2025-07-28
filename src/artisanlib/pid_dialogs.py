@@ -472,9 +472,9 @@ class PID_DlgControl(ArtisanDialog):
             # only for the internal PID we support a derative filter setting
             self.derivativeFilterFlag = QCheckBox(QApplication.translate('Label','Derivative Filter'))
             self.derivativeFilterFlag.setChecked(bool(self.aw.pidcontrol.derivative_filter))
-            self.DoERadioButton = QRadioButton('DoE')
+            self.DoERadioButton = QRadioButton(QApplication.translate('Label','DoE'))
             self.DoERadioButton.setToolTip(QApplication.translate('Tooltip', 'Derivative on Error'))
-            self.DoMRadioButton = QRadioButton('DoM')
+            self.DoMRadioButton = QRadioButton(QApplication.translate('Label','DoM'))
             self.DoMRadioButton.setToolTip(QApplication.translate('Tooltip', 'Derivative on Measurement (preventing the derivative kick)'))
             if self.aw.pidcontrol.pidDoE:
                 self.DoERadioButton.setChecked(True)
