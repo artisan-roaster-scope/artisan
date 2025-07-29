@@ -113,7 +113,7 @@ def setAccountShelve(account_id: str, fh:IO[str]) -> Optional[int]:
         fh.flush()
         try:
             os.fsync(fh.fileno())
-        except:  # pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-except
             pass
 
 
