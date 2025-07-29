@@ -111,7 +111,10 @@ def setAccountShelve(account_id: str, fh:IO[str]) -> Optional[int]:
             return None
     finally:
         fh.flush()
-        os.fsync(fh.fileno())
+        try:
+            os.fsync(fh.fileno())
+        except:  # pylint: disable=broad-except
+            pass
 
 
 # register the given account_id and assign it a fresh number if not yet
