@@ -367,7 +367,7 @@ def full_roast_in_queue(roast_id: str) -> bool:
 # returns true if the given roast_record r is a full record containing all
 # information (incl. the roast date) and not only an update
 def is_full_roast_record(r: Dict[str, Any]) -> bool:  #for Python >= 3.9 can replace 'Dict' with the generic type hint 'dict'
-    return 'date' in r and r['date'] and 'amount' in r and 'roast_id' in r
+    return bool('date' in r and r['date'] and 'amount' in r and 'roast_id' in r)
 
 
 # called on completed roasts with roast data

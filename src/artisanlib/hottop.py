@@ -202,7 +202,7 @@ class Hottop(AsyncComm):
 
 def main() -> None:
     hottop_serial = SerialSettings(
-        port = '/dev/slave',
+        port = '/dev/port',
         baudrate = 9600,
         bytesize = 8,
         stopbits = 1,

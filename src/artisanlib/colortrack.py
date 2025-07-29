@@ -198,7 +198,7 @@ def main() -> None:
     from artisanlib.atypes import SerialSettings
     # bench top
     colortrack_serial = SerialSettings(
-        port = '/dev/slave',
+        port = '/dev/port',
         baudrate = 9600,
         bytesize = 8,
         stopbits = 1,
