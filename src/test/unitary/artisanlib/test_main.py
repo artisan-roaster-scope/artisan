@@ -204,7 +204,7 @@ def reset_main_state() -> Generator[None, None, None]:
                 or hasattr(module, '_spec_class')
                 or str(type(module)).find('Mock') != -1
             ):
-                qt_is_mocked = True
+                qt_is_mocked = True # noqa: F841
                 break
 
     # Note: We rely on robust patching in individual tests rather than
@@ -421,7 +421,7 @@ class TestLoadFile:
                     main_module.QTextStream = original_qtextstream # type:ignore
                 elif hasattr(main_module, 'QTextStream'):
                     delattr(main_module, 'QTextStream')
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass  # Ignore cleanup errors
 
             # Assert
@@ -489,7 +489,7 @@ class TestLoadFile:
                     main_module.QTextStream = original_qtextstream # type:ignore
                 elif hasattr(main_module, 'QTextStream'):
                     delattr(main_module, 'QTextStream')
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass  # Ignore cleanup errors
 
             # Assert
@@ -617,7 +617,7 @@ class TestLoadFile:
                     main_module.QTextStream = original_qtextstream # type:ignore
                 elif hasattr(main_module, 'QTextStream'):
                     delattr(main_module, 'QTextStream')
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass  # Ignore cleanup errors
 
             # Assert
@@ -836,7 +836,7 @@ class TestLoadFile:
                     main_module.QTextStream = original_qtextstream # type:ignore
                 elif hasattr(main_module, 'QTextStream'):
                     delattr(main_module, 'QTextStream')
-            except:
+            except Exception: # pylint: disable=broad-except
                 pass  # Ignore cleanup errors
 
             # Assert

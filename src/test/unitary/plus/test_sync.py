@@ -70,6 +70,7 @@ class MockQTimer:
 
     def start(self, msec: int = 0) -> None:
         """Mock start method."""
+        del msec
         self.started = True
 
     def stop(self) -> None:
@@ -78,12 +79,13 @@ class MockQTimer:
 
     def setSingleShot(self, single_shot: bool) -> None:
         """Mock setSingleShot method."""
-        pass
+        del single_shot
 
     @staticmethod
     def singleShot(msec: int, receiver: Any) -> None:
         """Mock singleShot static method."""
-        pass
+        del msec
+        del receiver
 
 
 class MockQApplication:
@@ -94,6 +96,9 @@ class MockQApplication:
         context: str, text: str, disambiguation: Optional[str] = None, n: int = -1
     ) -> str:
         """Mock translate method."""
+        del context
+        del disambiguation
+        del n
         return text
 
 
@@ -112,11 +117,12 @@ class MockPortalockerLock:
 
     def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
         """Mock context manager exit."""
-        pass
+        del exc_type
+        del exc_val
+        del exc_tb
 
     def flush(self) -> None:
         """Mock flush method."""
-        pass
 
     def fileno(self) -> int:
         """Mock fileno method."""
@@ -178,7 +184,7 @@ for module_name, mock_module in mock_modules.items():
 # Setup specific Qt mocks
 sys.modules['PyQt6.QtCore'].QSemaphore = MockQSemaphore # type: ignore[attr-defined]
 sys.modules['PyQt6.QtCore'].QTimer = MockQTimer # type: ignore[attr-defined]
-sys.modules['PyQt6.QtCore'].pyqtSlot = Mock(side_effect=lambda *args, **kwargs: lambda f: f) # type: ignore[attr-defined]
+sys.modules['PyQt6.QtCore'].pyqtSlot = Mock(side_effect=lambda *args, **kwargs: lambda f: f) # type: ignore[attr-defined] # noqa: ARG005
 
 # Mock QCoreApplication.instance() to return a mock app
 mock_app = Mock()
@@ -426,7 +432,6 @@ class TestAddSync:
             class MockLockException(Exception):
                 """Mock LockException that properly inherits from BaseException."""
 
-                pass
 
             mock_portalocker.exceptions = Mock()
             mock_portalocker.exceptions.LockException = MockLockException
