@@ -361,6 +361,38 @@ filterwarnings = [
 ]
 
 
+## coverage
+
+[tool.coverage.run]
+omit = [
+    "test/*",
+    "uic/*",
+    "proto/*",
+    "help/*",
+    "dist/*",
+    "build/*",
+    "artisan.py",
+    "conftest.py",
+    "pylupdate6pro.py",
+    "artisan.py ",
+    "setup-*.py",
+    ]
+[tool.coverage.report]
+# Regexes for lines to exclude from consideration
+exclude_also = [
+    # Don't complain if non-runnable code isn't run:
+    "if 0:",
+    "if __name__ == .__main__.:",
+
+    # Don't complaint about PyQt5 compatiblity
+    "except ImportError",
+    "from PyQt5.",
+]
+[tool.coverage.html]
+directory = ".htmlcov"
+
+
+## codespell
 
 [tool.codespell]
 skip = '*.ts,./coverage,./build,./dist*,./htmlcov,./*.spec'

@@ -56,7 +56,7 @@ def eventsExternal2InternalValue(v:int) -> float:
 
 # the values to some keys are to be ignored, like the data which might be set to the import date
 values_to_ignore = [
-    'roastdate', 'roastisodate', 'roasttime', 'roastepoch', 'roastUUID'
+    'roastdate', 'roastisodate', 'roasttime', 'roastepoch', 'roasttzoffset', 'roastUUID'
 ]
 
 # the importers to test
