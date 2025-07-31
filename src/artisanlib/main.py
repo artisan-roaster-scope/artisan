@@ -15599,13 +15599,13 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     self.qmc.extractimex2 = [[]]*len(self.qmc.extratemp2)
                 # d) set other extra curve attribute lists
                 if 'extraname1' in profile:
-                    self.qmc.extraname1 = [decodeLocalStrict(x) for x in profile['extraname1']]
+                    self.qmc.extraname1 = [decodeLocalStrict(x) for x in profile['extraname1'][:self.nLCDS]]
                 if 'extraname2' in profile:
-                    self.qmc.extraname2 = [decodeLocalStrict(x) for x in profile['extraname2']]
+                    self.qmc.extraname2 = [decodeLocalStrict(x) for x in profile['extraname2'][:self.nLCDS]]
                 if 'extramathexpression1' in profile:
-                    self.qmc.extramathexpression1 = [decodeLocalStrict(x) for x in profile['extramathexpression1']]
+                    self.qmc.extramathexpression1 = [decodeLocalStrict(x) for x in profile['extramathexpression1'][:self.nLCDS]]
                 if 'extramathexpression2' in profile:
-                    self.qmc.extramathexpression2 = [decodeLocalStrict(x) for x in profile['extramathexpression2']]
+                    self.qmc.extramathexpression2 = [decodeLocalStrict(x) for x in profile['extramathexpression2'][:self.nLCDS]]
 
                 if updateRender:
                     if 'extradevicecolor1' in profile:
@@ -15982,8 +15982,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             if self.qmc.loadalarmsfromprofile and filename is not None:
                 self.loadAlarmsFromProfile(filename, profile)
 
-            self.qmc.extraNoneTempHint1 = profile.get('extraNoneTempHint1', [])
-            self.qmc.extraNoneTempHint2 = profile.get('extraNoneTempHint2', [])
+            self.qmc.extraNoneTempHint1 = profile.get('extraNoneTempHint1', [])[:self.nLCDS]
+            self.qmc.extraNoneTempHint2 = profile.get('extraNoneTempHint2', [])[:self.nLCDS]
 
             m = str(profile['mode']) if 'mode' in profile else self.qmc.mode
             if 'ambientTemp' in profile:
@@ -16120,31 +16120,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     # we still need to adjust startx as it depends on timeindex[0] to keep x-axis min limit as is
                     # we assume here that the previous reset did initialize timeindex[0] and adjusted startx correctly
                     self.qmc.startofx += self.qmc.timex[self.qmc.timeindex[0]]
-#            elif len(profile) > 0 and ('startend' in profile or 'dryend' in profile or 'cracks' in profile):
-#                ###########      OLD PROFILE FORMAT
-#                if 'startend' in profile:
-#                    startend = [float(fl) for fl in profile['startend']]
-#                else:
-#                    startend = [0.,0.,0.,0.]
-#                if 'dryend' in profile:
-#                    dryend = profile['dryend']
-#                else:
-#                    dryend = [0.,0.]
-#                if 'cracks' in profile:
-#                    varC = [float(fl) for fl in profile['cracks']]
-#                else:
-#                    varC = [0.,0.,0.,0.,0.,0.,0.,0.]
-#                times = []
-#                times.append(startend[0])
-#                times.append(dryend[0])
-#                times.append(varC[0])
-#                times.append(varC[2])
-#                times.append(varC[4])
-#                times.append(varC[6])
-#                times.append(startend[2])
-#                #convert to new profile
-#                self.qmc.timeindexupdate(times)
-#                ###########      END OLD PROFILE FORMAT
             # update phases if phases are set to auto adjusted
             if self.qmc.phasesbuttonflag:
                 # adjust phases by DryEnd and FCs events
@@ -16332,7 +16307,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 output = 'Metrics not available: profile is zero length.'
 
             # Find some BBP data
-            if ( ( self.qmc.timex[self.qmc.timeindex[0]] > 0 ) and ( self.qmc.timex[self.qmc.timeindex[0]] - self.qmc.timex[0] >= 60 ) ):  #greater than 1 minute
+            if ( len(self.qmc.timeindex)>0 and self.qmc.timeindex[0]>-1 and len(self.qmc.timex)>self.qmc.timeindex[0] and
+                    ( self.qmc.timex[self.qmc.timeindex[0]] > 0 ) and ( self.qmc.timex[self.qmc.timeindex[0]] - self.qmc.timex[0] >= 60 ) ):  #greater than 1 minute
                 try:
                     # fake the events
                     bbp_timeindex = [0, 0, self.qmc.timeindex[0], 0, 0, 0, self.qmc.timeindex[0], 0]
@@ -17194,7 +17170,15 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.fileConvertFrom('*.xlsx', extractProfileStrongholdXLSX)
 
 
-    def fileConvertFrom(self, ext:str, extractor: Callable[[str, 'ApplicationWindow'], Optional['ProfileData']]) -> None:
+    # extractor expects the following arguments
+    #   file:str
+    #   etypesdefault:List[str]               # translated to current locale
+    #   alt_etypesdefault:List[str]           # translated to current locale
+    #   artisanflavordefaultlabels:List[str]  # translated to current locale
+    #   eventsExternal2InternalValue: Callable[[int],float]
+    def fileConvertFrom(self,
+            ext:str,
+            extractor: Callable[[str, List[str], List[str], List[str], Callable[[int],float]],Optional['ProfileData']]) -> None:
         files = self.ArtisanOpenFilesDialog(ext=ext)
         if files and len(files) > 0:
             loaded_profile = self.curFile
@@ -17216,7 +17200,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         fconv = str(QDir(outdir).filePath(f'{fname}.alog'))
                         if not os.path.exists(fconv):
                             self.qmc.reset(redraw=False,soundOn=False)
-                            pd = extractor(f, self)
+                            pd = extractor(f,
+                                    self.qmc.etypesdefault,
+                                    self.qmc.alt_etypesdefault,
+                                    self.qmc.artisanflavordefaultlabels,
+                                    self.qmc.eventsExternal2InternalValue)
                             if pd is not None:
                                 self.serialize(fconv, cast(Dict[str,Any], pd))
                             else:
@@ -17522,7 +17510,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' fileImport(): {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @staticmethod
-    def artisanURLextractor(url:QUrl, _aw:'ApplicationWindow') -> Optional['ProfileData']:
+    def artisanURLextractor(url:QUrl,
+            _etypesdefault:List[str],
+            _alt_etypesdefault:List[str],
+            _artisanflavordefaultlabels:List[str],
+            _artisanURLextractor:Callable[[int],float]) -> Optional['ProfileData']:
         try:
             import requests
             r = requests.get(url.toString(),
@@ -25707,7 +25699,15 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.importExternalURL(self.artisanURLextractor, url=url)
 
     # url a QUrl
-    def importExternalURL(self, extractor: Callable[[QUrl, 'ApplicationWindow'], Optional['ProfileData']], message:str='', url:Optional[QUrl] = None) -> None:
+    # extractor expects the following arguments
+    #   url:QUrl
+    #   etypesdefault:List[str]               # translated to current locale
+    #   alt_etypesdefault:List[str]           # translated to current locale
+    #   artisanflavordefaultlabels:List[str]  # translated to current locale
+    #   eventsExternal2InternalValue: Callable[[int],float]
+    def importExternalURL(self,
+            extractor: Callable[[QUrl, List[str], List[str], List[str], Callable[[int],float]], Optional['ProfileData']],
+            message:str='', url:Optional[QUrl] = None) -> None:
         try:
             res:bool = self.qmc.reset(redraw=True,soundOn=False)
             if not res:
@@ -25718,7 +25718,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 if url is None:
                     return
                 try:
-                    obj = extractor(url, self)
+                    obj = extractor(url,
+                                    self.qmc.etypesdefault,
+                                    self.qmc.alt_etypesdefault,
+                                    self.qmc.artisanflavordefaultlabels,
+                                    self.qmc.eventsExternal2InternalValue)
                     res = self.setProfile(None, obj) if obj else False
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
@@ -25746,7 +25750,14 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             _, _, exc_tb = sys.exc_info()
             self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' {1} {0}').format(str(ex),message),getattr(exc_tb, 'tb_lineno', '?'))
 
-    def importExternal(self, extractor: Callable[[str, 'ApplicationWindow'], 'ProfileData'], message:str, extension:str, filename:Optional[str] = None) -> None:
+    # extractor expects the following arguments
+    #   file:str
+    #   etypesdefault:List[str]               # translated to current locale
+    #   alt_etypesdefault:List[str]           # translated to current locale
+    #   artisanflavordefaultlabels:List[str]  # translated to current locale
+    #   eventsExternal2InternalValue: Callable[[int],float]
+    def importExternal(self, extractor:  Callable[[str, List[str], List[str], List[str], Callable[[int],float]],
+            'ProfileData'], message:str, extension:str, filename:Optional[str] = None) -> None:
         try:
             if filename is None:
                 filename = self.ArtisanOpenFileDialog(msg=message,ext=extension)
@@ -25754,7 +25765,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 return
             res = self.qmc.reset(redraw=False,soundOn=False)
             if res:
-                obj:ProfileData = extractor(filename, self)
+                obj:ProfileData = extractor(filename,
+                                        self.qmc.etypesdefault,
+                                        self.qmc.alt_etypesdefault,
+                                        self.qmc.artisanflavordefaultlabels,
+                                        self.qmc.eventsExternal2InternalValue)
                 res = self.setProfile(filename, obj)
 
             if res:
@@ -26305,32 +26320,30 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
         # hidden buttons at the top of the table are for actions and don't count in the first row
         # find the index of the first visible button
-        first_counted_idx = 0
+        first_visible_idx = 0
         for i, _ in enumerate(self.extraeventstypes):
-            if self.extraeventsvisibility[i] or (
-                    self.extraeventstypes[i] == 4 and
-                    self.extraeventsactions[i] == 0):
-                first_counted_idx = i
+            if self.extraeventsvisibility[i]:
+                first_visible_idx = i
                 break
 
         for i, eet in enumerate(self.extraeventstypes):
             # next button in this group is hidden
-            next_hidden = ((i - first_counted_idx)%self.buttonlistmaxlen < self.buttonlistmaxlen -1 and  # at least one more places in the group
+            next_hidden = ((i - first_visible_idx)%self.buttonlistmaxlen < self.buttonlistmaxlen -1 and  # at least one more places in the group
                     i+1 < len(self.extraeventstypes) and # there is one more button
                     not self.extraeventsvisibility[i+1]) # and the next one is hidden
             # previous button in this group is hidden
-            prev_hidden = ((i - first_counted_idx)%self.buttonlistmaxlen > 0 and # at least one previous place in this group
+            prev_hidden = ((i - first_visible_idx)%self.buttonlistmaxlen > 0 and # at least one previous place in this group
                     i > 0 and # there is more than one button in total
                     not self.extraeventsvisibility[i-1]) # and the previous one is hidden
 
-            if (i - first_counted_idx)%self.buttonlistmaxlen == 0: # left-most button in the row
+            if (i - first_visible_idx)%self.buttonlistmaxlen == 0: # left-most button in the row
                 if i == len(self.extraeventstypes)-1 or next_hidden:
                     # a singleton button in a one element bar
                     self.extraeventbuttonround.append(3)
                 else:
                     # the left-most button in this bar
                     self.extraeventbuttonround.append(1)
-            elif ((i - first_counted_idx)%self.buttonlistmaxlen < self.buttonlistmaxlen-1) and i != len(self.extraeventstypes)-1:
+            elif ((i - first_visible_idx)%self.buttonlistmaxlen < self.buttonlistmaxlen-1) and i != len(self.extraeventstypes)-1:
                 # a button in the middle of this bar
                 if prev_hidden and next_hidden:
                     # we round both sides
@@ -26362,7 +26375,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.buttonlist.append(p)
             self.buttonStates.append(0)
             #add button to row
-            if i < first_counted_idx:
+            if i < first_visible_idx:
                 pass
             elif row1count < self.buttonlistmaxlen:
                 self.e1buttonbarLayout.addWidget(self.buttonlist[i])

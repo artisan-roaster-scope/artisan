@@ -8,25 +8,26 @@ import csv
 import re
 import time as libtime
 import logging
-from typing import Final, List, Optional, TYPE_CHECKING
+from typing import Final, List, Optional, Callable
 
-if TYPE_CHECKING:
-    from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
 
 try:
     from PyQt6.QtCore import QDateTime, QDate, QTime, Qt # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
 except ImportError:
     from PyQt5.QtCore import QDateTime, QDate, QTime, Qt # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtWidgets import QApplication # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
-from artisanlib.util import replace_duplicates, encodeLocal
+
+from artisanlib.util import replace_duplicates, encodeLocal, encodeLocalStrict
 from artisanlib.atypes import ProfileData
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 # returns a dict containing all profile information contained in the given Petroncini CSV file
-def extractProfilePetronciniCSV(file:str, aw:'ApplicationWindow') -> ProfileData:
+def extractProfilePetronciniCSV(file:str,
+        etypesdefault:List[str],
+        _alt_etypesdefault:List[str],
+        _artisanflavordefaultlabels:List[str],
+        eventsExternal2InternalValue:Callable[[int],float]) -> ProfileData:
     res:ProfileData = ProfileData()
 
     res['samplinginterval'] = 1.0
@@ -141,8 +142,7 @@ def extractProfilePetronciniCSV(file:str, aw:'ApplicationWindow') -> ProfileData
                             power_last = power
                             power = v
                             power_event = True
-                            v = v/10. + 1
-                            specialeventsvalue.append(v)
+                            specialeventsvalue.append(eventsExternal2InternalValue(int(round(v))))
                             specialevents.append(i)
                             specialeventstype.append(3)
                             specialeventsStrings.append(f'{power:.0f}%')
@@ -152,12 +152,8 @@ def extractProfilePetronciniCSV(file:str, aw:'ApplicationWindow') -> ProfileData
                     _log.exception(e)
 
     res['timex'] = timex
-    if aw.qmc.dropDuplicates:
-        res['temp1'] = replace_duplicates(temp1)
-        res['temp2'] = replace_duplicates(temp2)
-    else:
-        res['temp1'] = temp1
-        res['temp2'] = temp2
+    res['temp1'] = replace_duplicates(temp1)
+    res['temp2'] = replace_duplicates(temp2)
     res['timeindex'] = timeindex
 
     res['extradevices'] = [33]
@@ -168,10 +164,7 @@ def extractProfilePetronciniCSV(file:str, aw:'ApplicationWindow') -> ProfileData
     res['extramathexpression1'] = ['']
 
     res['extraname2'] = ['IT']
-    if aw.qmc.dropDuplicates:
-        res['extratemp2'] = [replace_duplicates(extra1)]
-    else:
-        res['extratemp2'] = [extra1]
+    res['extratemp2'] = [replace_duplicates(extra1)]
     res['extramathexpression2'] = ['']
 
 
@@ -196,10 +189,6 @@ def extractProfilePetronciniCSV(file:str, aw:'ApplicationWindow') -> ProfileData
         res['specialeventsStrings'] = specialeventsStrings
         if power_event:
             # first set etypes to defaults
-            res['etypes'] = [QApplication.translate('ComboBox', 'Air'),
-                             QApplication.translate('ComboBox', 'Drum'),
-                             QApplication.translate('ComboBox', 'Damper'),
-                             QApplication.translate('ComboBox', 'Burner'),
-                             '--']
-    res['title'] = Path(file).stem
+            res['etypes'] = etypesdefault
+    res['title'] = encodeLocalStrict(Path(file).stem)
     return res

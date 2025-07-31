@@ -10,11 +10,10 @@ import re
 import json
 from lxml import html
 import logging
-from typing import Final, TypedDict, Optional, List, TYPE_CHECKING
+from typing import Final, TypedDict, Optional, List, Callable, TYPE_CHECKING
 
 
 if TYPE_CHECKING:
-    from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
     from PyQt6.QtCore import QUrl # pylint: disable=unused-import
 
 try:
@@ -54,7 +53,11 @@ class RoastPathData(TypedDict, total=False):
     drumData: List[RoastPathDataItem]
 
 # returns a dict containing all profile information contained in the given RoastPATH document pointed by the given QUrl
-def extractProfileRoastPathHTML(url:'QUrl', _:'ApplicationWindow') -> Optional[ProfileData]:
+def extractProfileRoastPathHTML(url:'QUrl',
+        _etypesdefault:List[str],
+        _alt_etypesdefault:List[str],
+        _artisanflavordefaultlabels:List[str],
+        eventsExternal2InternalValue:Callable[[int],float]) -> Optional[ProfileData]:
     res:ProfileData = ProfileData() # the interpreted data set
     try:
         sess = requests.Session()
@@ -211,8 +214,7 @@ def extractProfileRoastPathHTML(url:'QUrl', _:'ApplicationWindow') -> Optional[P
                                     specialeventstype.append(4)
                                 try:
                                     vv:float = float(n['Note'])
-                                    vv = vv/10. + 1
-                                    specialeventsvalue.append(vv)
+                                    specialeventsvalue.append(eventsExternal2InternalValue(round(vv)))
                                 except Exception: # pylint: disable=broad-except
                                     specialeventsvalue.append(0)
                                 specialeventsStrings.append(n['Note'])

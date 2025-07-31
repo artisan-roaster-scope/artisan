@@ -2004,10 +2004,16 @@ class roastCompareDlg(ArtisanDialog):
         self.profileTable.setRowCount(len(self.profiles))
         self.setProfileTableRow(len(self.profiles)-1)
 
-    def addProfileFromURL(self, extractor:Callable[[QUrl, 'ApplicationWindow'], Optional['ProfileData']], url:QUrl) -> None:
+    def addProfileFromURL(self,
+            extractor:Callable[[QUrl, List[str], List[str], List[str], Callable[[int],float]], Optional['ProfileData']],
+            url:QUrl) -> None:
         _log.info('addProfileFromURL(%s)', url)
         try:
-            obj:Optional[ProfileData] = extractor(url, self.aw)
+            obj:Optional[ProfileData] = extractor(url,
+                                            self.aw.qmc.etypesdefault,
+                                            self.aw.qmc.alt_etypesdefault,
+                                            self.aw.qmc.artisanflavordefaultlabels,
+                                            self.aw.qmc.eventsExternal2InternalValue)
             if obj:
                 self.addProfile(str(url), obj)
                 self.updateMenus()

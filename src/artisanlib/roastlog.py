@@ -9,10 +9,9 @@ from requests_file import FileAdapter # type: ignore  # @UnresolvedImport
 import re
 from lxml import html
 import logging
-from typing import Final, List, Optional, TYPE_CHECKING
+from typing import Final, List, Optional, Callable, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
     from PyQt6.QtCore import QUrl # pylint: disable=unused-import
 
 try:
@@ -28,7 +27,11 @@ from artisanlib.atypes import ProfileData
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 # returns a dict containing all profile information contained in the given RoastLog document pointed by the given QUrl
-def extractProfileRoastLog(url:'QUrl', _:'ApplicationWindow') -> Optional[ProfileData]:
+def extractProfileRoastLog(url:'QUrl',
+        _etypesdefault:List[str],
+        _alt_etypesdefault:List[str],
+        _artisanflavordefaultlabels:List[str],
+        _eventsExternal2InternalValue:Callable[[int],float]) -> Optional[ProfileData]:
     res:ProfileData = ProfileData() # the interpreted data set
     try:
         s = requests.Session()

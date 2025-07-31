@@ -7,19 +7,20 @@ import os
 import csv
 import re
 import logging
-from typing import Final, Optional, List, Dict, TYPE_CHECKING
+from typing import Final, Optional, List, Dict, Callable
 
-
-if TYPE_CHECKING:
-    from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
-
+from artisanlib.util import encodeLocalStrict
 from artisanlib.atypes import ProfileData
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 
 # returns a dict containing all profile information contained in the given ROEST CSV file
-def extractProfileRoestCSV(file:str, aw:'ApplicationWindow') -> ProfileData:
+def extractProfileRoestCSV(file:str,
+        _etypesdefault:List[str],
+        alt_etypesdefault:List[str],
+        _artisanflavordefaultlabels:List[str],
+        eventsExternal2InternalValue:Callable[[int],float]) -> ProfileData:
     res:ProfileData = ProfileData() # the interpreted data set
 
     res['samplinginterval'] = 1.0
@@ -36,10 +37,10 @@ def extractProfileRoestCSV(file:str, aw:'ApplicationWindow') -> ProfileData:
         if match is not None:
             groups = match.groups()
             if len(groups) == 2:
-                res['title'] = groups[0]
+                res['title'] = encodeLocalStrict(groups[0])
                 res['roastbatchnr'] = int(groups[1])
             else:
-                res['title'] = Path(file).stem
+                res['title'] = encodeLocalStrict(Path(file).stem)
     except Exception as e: # pylint: disable=broad-except
         _log.exception(e)
 
@@ -229,8 +230,7 @@ def extractProfileRoestCSV(file:str, aw:'ApplicationWindow') -> ProfileData:
                             heater_last = None
                         heater_last = heater
                         heater = v
-                        v = v/10. + 1
-                        specialeventsvalue.append(v)
+                        specialeventsvalue.append(eventsExternal2InternalValue(int(round(v))))
                         specialevents.append(i)
                         specialeventstype.append(3)
                         specialeventsStrings.append(f'{heater}' + '%')
@@ -274,6 +274,6 @@ def extractProfileRoestCSV(file:str, aw:'ApplicationWindow') -> ProfileData:
         res['specialeventsvalue'] = specialeventsvalue
         res['specialeventsStrings'] = specialeventsStrings
 
-    res['etypes'] = aw.qmc.alt_etypesdefault
+    res['etypes'] = alt_etypesdefault
 
     return res

@@ -316,7 +316,7 @@ class TestLoadFile:
     def test_load_file_success(self, mock_application_window: Mock) -> None:
         """Test successful loading of a valid profile file."""
         # Arrange
-        test_profile_path = 'test/resources/profile1.alog'
+        test_profile_path = 'test/data/profile1.alog'
         absolute_path = os.path.join(os.getcwd(), 'src', test_profile_path)
 
         # Mock profile data that would be returned by deserialize
@@ -628,7 +628,7 @@ class TestLoadFile:
     def test_load_file_with_actual_profile(self, mock_application_window: Mock) -> None:
         """Test loading the actual profile1.alog file from test resources."""
         # Arrange
-        test_profile_path = Path('test/resources/profile1.alog')
+        test_profile_path = Path('test/data/profile1.alog')
 
         # Skip test if file doesn't exist
         if not test_profile_path.exists():
@@ -850,7 +850,7 @@ class TestImportCSV:
     def test_import_csv_file_exists(self, mock_application_window: Mock) -> None:
         """Test that importCSV function exists and handles file operations."""
         # Arrange
-        test_csv_path = Path('test/resources/profile1.csv')
+        test_csv_path = Path('test/data/profile1.csv')
 
         # Skip test if file doesn't exist
         if not test_csv_path.exists():
@@ -1004,7 +1004,7 @@ class TestImportJSON:
     def test_import_json_success(self, mock_application_window: Mock) -> None:
         """Test successful import of a valid JSON file."""
         # Arrange
-        test_json_path = Path('test/resources/profile1.json')
+        test_json_path = Path('test/data/profile1.json')
 
         # Skip test if file doesn't exist
         if not test_json_path.exists():
@@ -2425,14 +2425,16 @@ class TestArtisanURLextractor:
         # Arrange
         mock_url = Mock(spec=QUrl)
         mock_url.toString.return_value = 'https://example.com/profile.json'
-        mock_aw = Mock()
 
         mock_response = Mock()
         mock_response.json.return_value = {'title': 'Test Profile'}
         mock_get.return_value = mock_response
 
+        def eventsExternal2InternalValue(_n:int) -> float:
+            return 0
+
         # Act
-        result = ApplicationWindow.artisanURLextractor(mock_url, mock_aw)
+        result = ApplicationWindow.artisanURLextractor(mock_url, [], [], [], eventsExternal2InternalValue)
 
         # Assert
         mock_get.assert_called_once()
@@ -2445,12 +2447,13 @@ class TestArtisanURLextractor:
         # Arrange
         mock_url = Mock(spec=QUrl)
         mock_url.toString.return_value = 'https://example.com/profile.json'
-        mock_aw = Mock()
 
         mock_get.side_effect = Exception('Network error')
 
+        def eventsExternal2InternalValue(_n:int) -> float:
+            return 0
         # Act
-        result = ApplicationWindow.artisanURLextractor(mock_url, mock_aw)
+        result = ApplicationWindow.artisanURLextractor(mock_url, [], [], [], eventsExternal2InternalValue)
 
         # Assert
         assert result is None  # Should return None on exception

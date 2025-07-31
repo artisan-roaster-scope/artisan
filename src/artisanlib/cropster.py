@@ -5,26 +5,25 @@
 import time as libtime
 import xlrd # type: ignore
 import logging
-from typing import Final, Union, List, Set, Sequence, Dict, Optional, TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
+from typing import Final, Union, List, Sequence, Dict, Optional, Callable
 
 try:
     from PyQt6.QtCore import QDateTime, Qt # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
 except ImportError:
     from PyQt5.QtCore import QDateTime, Qt # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtWidgets import QApplication # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
-from artisanlib.util import encodeLocal
+from artisanlib.util import encodeLocal, encodeLocalStrict
 from artisanlib.atypes import ProfileData
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 # returns a dict containing all profile information contained in the given Cropster XLS file
-def extractProfileCropsterXLS(file:str, aw:'ApplicationWindow') -> ProfileData:
+def extractProfileCropsterXLS(file:str,
+        etypesdefault:List[str],
+        _alt_etypesdefault:List[str],
+        artisanflavordefaultlabels:List[str],
+        eventsExternal2InternalValue:Callable[[int],float]) -> ProfileData:
 
     def takeClosest(num:float, collection:List[float]) -> float:
         return min(collection, key=lambda x:abs(x-num))
@@ -698,23 +697,23 @@ def extractProfileCropsterXLS(file:str, aw:'ApplicationWindow') -> ProfileData:
         '\u66f2\u7dda - custom', # CN Traditional
     ]
 
-    # just guessing
-    curve_custom_control_trans = [
-        'Curve - custom control', # EN
-        'Curve - customControl', # EN2
-        'Kurve - custom-Steuerung', # DE
-        'Kurve - custom Steuerung', # DE2
-        'Kurve - customControl', # DE3
-        'Curva  customControl', # ES
-        'Courbe customControl', # FR
-        'Curva - customControl', # IT
-        'Curva - customControl', # PT
-        '\u041a\u0440\u0438\u0432\u0430\u044f - customControl', # RU
-        '\ucee4\ube0c - customContrl', # KO
-        '\u30ab\u30fc\u30d6 - customControl', # JP
-        '\u66f2\u7ebf - customControl', # CN Simplified
-        '\u66f2\u7dda - customControl', # CN Traditional
-    ]
+#    # just guessing
+#    curve_custom_control_trans = [
+#        'Curve - custom control', # EN
+#        'Curve - customControl', # EN2
+#        'Kurve - custom-Steuerung', # DE
+#        'Kurve - custom Steuerung', # DE2
+#        'Kurve - customControl', # DE3
+#        'Curva  customControl', # ES
+#        'Courbe customControl', # FR
+#        'Curva - customControl', # IT
+#        'Curva - customControl', # PT
+#        '\u041a\u0440\u0438\u0432\u0430\u044f - customControl', # RU
+#        '\ucee4\ube0c - customContrl', # KO
+#        '\u30ab\u30fc\u30d6 - customControl', # JP
+#        '\u66f2\u7ebf - customControl', # CN Simplified
+#        '\u66f2\u7dda - customControl', # CN Traditional
+#    ]
 
 
 
@@ -829,7 +828,7 @@ def extractProfileCropsterXLS(file:str, aw:'ApplicationWindow') -> ProfileData:
                 if value is None and pos is not None and len(row1)>pos:
                     value = row1[pos].value
                 if value is not None:
-                    res[tag] = encodeLocal(value) # type: ignore # mypy cannot check generic labels accessing the res of type TypedDict
+                    res[tag] = encodeLocalStrict(value) # type: ignore # mypy cannot check generic labels accessing the res of type TypedDict
             except Exception: # pylint: disable=broad-except
                 pass
 
@@ -901,9 +900,9 @@ def extractProfileCropsterXLS(file:str, aw:'ApplicationWindow') -> ProfileData:
                 else:
                     correction = 0
                     valid_score = score
-                res['flavorlabels'] = aw.qmc.flavorlabels
+                res['flavorlabels'] = artisanflavordefaultlabels
                 res['flavors_total_correction'] = correction
-                res['flavors'] = [valid_score/10]*len(aw.qmc.flavorlabels)
+                res['flavors'] = [valid_score/10]*len(artisanflavordefaultlabels)
         except Exception: # pylint: disable=broad-except
             pass
 
@@ -1043,58 +1042,15 @@ def extractProfileCropsterXLS(file:str, aw:'ApplicationWindow') -> ProfileData:
 
     ordered_sheet_names:Sequence[Optional[str]]
 
-    use_existing_extra_curve_names_and_visibility:bool = False # if True the curve names of the current setup are reused as far as possible
-
-    # we resort the channels to better fit the IMF setups
-    if aw.qmc.roastertype_setup.startswith('IMF'):
-        # re-order sheets to realiz the standard IMF config order of extra devices
-        imf_sheets = [
-            curve_burner_temp_trans, curve_set_temperature_control_trans,
-            curve_custom_control_trans, curve_custom_trans,
-            curve_drum_speed_control_trans, curve_drum_speed_trans,
-            curve_airflow_control_trans, curve_airflow_trans]
-        # IMF curves not found will be set to None generating an empty curve
-        idx = 0
-        ordered_sheet_names = []
-        assigned_idx:Set[int] = set()
-        if BT_idx is not None:
-            assigned_idx.add(BT_idx)
-        if ET_idx is not None:
-            assigned_idx.add(ET_idx)
-        for imf_sheet in imf_sheets:
-            # find a sn in sheet_names that matches
-            found:bool = False
-            for i, sn in enumerate(sheet_names):
-                if i not in assigned_idx and sn.strip() in imf_sheet:
-                    assigned_idx.add(i)
-                    ordered_sheet_names.append(sn)
-                    found = True
-                    break
-            if not found:
-                ordered_sheet_names.append(None)
-        # add remaining sheet names
-        for i, sn in enumerate(sheet_names):
-            if i not in assigned_idx:
-                assigned_idx.add(i)
-                ordered_sheet_names.append(sn)
-        use_existing_extra_curve_names_and_visibility = True
-    else:
-        ordered_sheet_names = sheet_names
+    ordered_sheet_names = sheet_names
 
     # sheet names to indexes in the original table order (note the ordered_sheet_names now are in a different order!)
     sheet_idx:Dict[str,int] = {n:i for i,n in enumerate(sheet_names)}
 
-
-    # set extra lcd/curve visibility from current setup as default
-    res['extraLCDvisibility1'] = aw.extraLCDvisibility1
-    res['extraLCDvisibility2'] = aw.extraLCDvisibility2
-    res['extraCurveVisibility1'] = aw.extraCurveVisibility1
-    res['extraCurveVisibility2'] = aw.extraCurveVisibility2
-
     # extra temperature curves (only if ET or BT and its corresponding timex was already parsed successfully)
     if len(res['timex']) > 0:
         channel = 1 # toggle between channel 1 and 2 to be filled with extra temperature curve data
-        for sno in ordered_sheet_names[:(2 * aw.nLCDS)]:  # Artisan supports a maximum of aw.nLCDS=10 extra devices for now (= 2x aw.nLCDS extra curves)
+        for sno in ordered_sheet_names:
             snn:Optional[str] = (None if sno is None else sno.strip())
             if snn is None or snn in extra_temp_curve_trans:
                 temp_curve = True
@@ -1130,28 +1086,13 @@ def extractProfileCropsterXLS(file:str, aw:'ApplicationWindow') -> ProfileData:
                         channel = 2
                         # we add an empty first extra channel if needed
                         res['extradevices'].append(25) # Virtual Device
-                        if use_existing_extra_curve_names_and_visibility and len(aw.qmc.extraname1)>len(res['extraname1']):
-                            res['extraname1'].append(aw.qmc.extraname1[len(res['extraname1'])])
-                        else:
-                            # we turn all empt extra LCDs/curves OFF by default
-                            if len(res['extraLCDvisibility1'])>len(res['extraname1']):
-                                res['extraLCDvisibility1'][len(res['extraname1'])] = False
-                                res['extraCurveVisibility1'][len(res['extraname1'])] = False
-                            res['extraname1'].append('Extra 1')
                         res['extratemp1'].append([-1.0]*len(res['timex']))
                         res['extraNoneTempHint1'].append(True)
                         res['extramathexpression1'].append('')
                     else:
                         channel = 1
-                        # we add an empty second extra channel if needed
-                        if use_existing_extra_curve_names_and_visibility and len(aw.qmc.extraname2)>len(res['extraname2']):
-                            res['extraname2'].append(aw.qmc.extraname2[len(res['extraname2'])])
-                        else:
-                            # we turn all empt extra LCDs/curves OFF by default
-                            if len(res['extraLCDvisibility2'])>len(res['extraname2']):
-                                res['extraLCDvisibility2'][len(res['extraname2'])] = False
-                                res['extraCurveVisibility2'][len(res['extraname2'])] = False
-                            res['extraname2'].append('Extra 2')
+                        # we add an empty second extra channel
+                        res['extraname2'].append('Extra 2')
                         res['extratemp2'].append([-1.0]*len(res['timex']))
                         res['extraNoneTempHint2'].append(True)
                         res['extramathexpression2'].append('')
@@ -1186,17 +1127,12 @@ def extractProfileCropsterXLS(file:str, aw:'ApplicationWindow') -> ProfileData:
                                     # no temp conversion
                                     res['extraNoneTempHint1'].append(True)
                                 res['extradevices'].append(25) # Virtual Device
-                                if use_existing_extra_curve_names_and_visibility and len(aw.qmc.extraname1)>len(res['extraname1']):
-                                    res['extraname1'].append(aw.qmc.extraname1[len(res['extraname1'])])
-                                else:
-                                    # we turn all extra LCDs/curves ON by default
-                                    if len(res['extraLCDvisibility1'])>len(res['extraname1']):
-                                        res['extraLCDvisibility1'][len(res['extraname1'])] = True
-                                        res['extraCurveVisibility1'][len(res['extraname1'])] = True
-                                    name1:Optional[str] = encodeLocal(extra_curve_name)
-                                    if name1 is None:
-                                        name1 = 'extra1'
-                                    res['extraname1'].append(name1)
+
+                                name1:str = 'extra1'
+                                if extra_curve_name is not None:
+                                    name1 = encodeLocalStrict(extra_curve_name)
+                                res['extraname1'].append(name1)
+
                                 res['extratimex'].append([float(t.value) for t in time[1:]])
                                 res['extratemp1'].append([float(t.value) for t in temp[1:]])
                                 res['extramathexpression1'].append('')
@@ -1208,31 +1144,22 @@ def extractProfileCropsterXLS(file:str, aw:'ApplicationWindow') -> ProfileData:
                                 else:
                                     # no temp conversion
                                     res['extraNoneTempHint2'].append(True)
-                                if use_existing_extra_curve_names_and_visibility and len(aw.qmc.extraname2)>len(res['extraname2']):
-                                    res['extraname2'].append(aw.qmc.extraname2[len(res['extraname2'])])
-                                else:
-                                    # we turn all extra LCDs/curves ON by default
-                                    if len(res['extraLCDvisibility2'])>len(res['extraname2']):
-                                        res['extraLCDvisibility2'][len(res['extraname2'])] = True
-                                        res['extraCurveVisibility2'][len(res['extraname2'])] = True
-                                    name2:Optional[str] = encodeLocal(extra_curve_name)
-                                    if name2 is None:
-                                        name2 = 'extra2'
-                                    res['extraname2'].append(name2)
+
+                                name2:str = 'extra2'
+                                if extra_curve_name is not None:
+                                    name2 = encodeLocalStrict(extra_curve_name)
+                                res['extraname2'].append(name2)
+
                                 res['extratemp2'].append([float(t.value) for t in temp[1:]])
                                 res['extramathexpression2'].append('')
             except Exception: # pylint: disable=broad-except
                 pass
+
+
         if 'extratemp1' in res and 'extratemp2' in res and 'extraNoneTempHint2' in res and 'extramathexpression2' in res and 'extraname1' in res and 'extraname2' in res and len(res['extraname1']) != len(res['extraname2']):
-            # we add an empty second extra channel if needed
-            if use_existing_extra_curve_names_and_visibility and len(aw.qmc.extraname2)>len(res['extraname2']):
-                res['extraname2'].append(aw.qmc.extraname2[len(res['extraname2'])])
-            else:
-                # we turn all empty extra LCDs/curves OFF by default
-                if len(res['extraLCDvisibility2'])>len(res['extraname2']):
-                    res['extraLCDvisibility2'][len(res['extraname2'])] = False
-                    res['extraCurveVisibility2'][len(res['extraname2'])] = False
-                res['extraname2'].append('Extra 2')
+
+            res['extraname2'].append('Extra 2')
+
             res['extratemp2'].append([-1.0]*len(res['extratemp1'][-1]))
             res['extraNoneTempHint2'].append(True)
             res['extramathexpression2'].append('')
@@ -1289,8 +1216,7 @@ def extractProfileCropsterXLS(file:str, aw:'ApplicationWindow') -> ProfileData:
                                         specialeventstype.append(4)
                                     try:
                                         v = float(comment_value)
-                                        v = v/10. + 1
-                                        specialeventsvalue.append(v)
+                                        specialeventsvalue.append(eventsExternal2InternalValue(int(round(v))))
                                     except Exception: # pylint: disable=broad-except
                                         specialeventsvalue.append(0)
                                     if not ae and not ge and comment_type not in comment_trans:
@@ -1312,16 +1238,28 @@ def extractProfileCropsterXLS(file:str, aw:'ApplicationWindow') -> ProfileData:
                 res['specialeventsStrings'] = specialeventsStrings
                 if gas_event or airflow_event:
                     # first set etypes to defaults
-                    res['etypes'] = [QApplication.translate('ComboBox', 'Air'),
-                                     QApplication.translate('ComboBox', 'Drum'),
-                                     QApplication.translate('ComboBox', 'Damper'),
-                                     QApplication.translate('ComboBox', 'Burner'),
-                                     '--']
-                    # update
-                    if airflow_event:
-                        res['etypes'][0] = 'Airflow'
-                    if gas_event:
-                        res['etypes'][3] = 'Gas'
+                    res['etypes'] = etypesdefault
         except Exception as e: # pylint: disable=broad-except
-            _log.debug(e)
+            _log.error(e)
+
+    # extra device data can be shorter, make them all equal in length to main device
+    if 'timex' in res and 'extradevices' in res and 'samplinginterval' in res:
+        main_data_len = len(res['timex'])
+        sampling_interval = int(round(res['samplinginterval']))
+        for i,_ in enumerate(res['extradevices']):
+            if 'extratimex' in res and len(res['extratimex'])>i:
+                missing_timex = [float(tx) for tx in range(int(round(res['extratimex'][i][-1]))+sampling_interval,
+                        int(round(res['extratimex'][i][-1])) + (main_data_len - len(res['extratimex'][i]))+sampling_interval,
+                        sampling_interval)]
+                res['extratimex'][i].extend(missing_timex)
+                res['extratimex'][i] = res['extratimex'][i][:main_data_len] # ensure that the list is not too long
+            if 'extratemp1' in res and len(res['extratemp1'])>i:
+                missing_temp1 = [-1]*(main_data_len - len(res['extratemp1'][i]))
+                res['extratemp1'][i].extend(missing_temp1)
+                res['extratemp1'][i] = res['extratemp1'][i][:main_data_len] # ensure that the list is not too long
+            if 'extratemp2' in res and len(res['extratemp2'])>i:
+                missing_temp2 = [-1]*(main_data_len - len(res['extratemp2'][i]))
+                res['extratemp2'][i].extend(missing_temp2)
+                res['extratemp2'][i] = res['extratemp2'][i][:main_data_len] # ensure that the list is not too long
+
     return res

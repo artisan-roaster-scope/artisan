@@ -5,24 +5,20 @@
 import openpyxl
 import logging
 from pathlib import Path
-from typing import Final, Union, List, Dict, Tuple, Optional, TYPE_CHECKING
+from typing import Final, Union, List, Dict, Tuple, Optional, Callable
 
-if TYPE_CHECKING:
-    from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
-
-try:
-    from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
-except ImportError:
-    from PyQt5.QtWidgets import QApplication # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-
-from artisanlib.util import stringtoseconds
+from artisanlib.util import stringtoseconds, encodeLocalStrict
 from artisanlib.atypes import ProfileData
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 # returns a dict containing all profile information contained in the given Stronghold XLSX file
-def extractProfileStrongholdXLSX(file:str, aw:'ApplicationWindow') -> ProfileData:
+def extractProfileStrongholdXLSX(file:str,
+        _etypesdefault:List[str],
+        alt_etypesdefault:List[str],
+        _artisanflavordefaultlabels:List[str],
+        eventsExternal2InternalValue:Callable[[int],float]) -> ProfileData:
 
     res:ProfileData = ProfileData() # the interpreted data set
 
@@ -81,7 +77,7 @@ def extractProfileStrongholdXLSX(file:str, aw:'ApplicationWindow') -> ProfileDat
 
         # convert data
         if 'Time' in data:
-            res['title'] = Path(file).stem
+            res['title'] = encodeLocalStrict(Path(file).stem)
             res['roastertype'] = machine
             res['roastersize'] = machine_size
             res['timex'] = data['Time'] # type:ignore
@@ -143,13 +139,11 @@ def extractProfileStrongholdXLSX(file:str, aw:'ApplicationWindow') -> ProfileDat
 
                 res['specialevents'] = [e[0] for e in events]
                 res['specialeventstype'] = [e[1] for e in events]
-                res['specialeventsvalue'] = [aw.qmc.eventsExternal2InternalValue(int(round(float(e[2])))) for e in events]
+                res['specialeventsvalue'] = [eventsExternal2InternalValue(int(round(float(e[2])))) for e in events]
                 res['specialeventsStrings'] = ['']*len(events)
-                res['etypes'] = [QApplication.translate('ComboBox', 'Drum') + 'H',
-                                 QApplication.translate('ComboBox', 'Drum')+'S',
-                                 'Halogen',
-                                 QApplication.translate('ComboBox', 'Heater'),
-                                 '--']
+                res['etypes'] = alt_etypesdefault
+                res['etypes'][0] = res['etypes'][1] + 'H'
+                res['etypes'][0] = res['etypes'][0] + 'S'
 
             except Exception as e:  # pylint: disable=broad-except
                 _log.exception(e)

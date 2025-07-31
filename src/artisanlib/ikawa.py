@@ -9,18 +9,15 @@ import base64
 import csv
 import re
 import logging
-from typing import Final, Optional, List, Dict, Callable, Any, Generator, TYPE_CHECKING
+from typing import Final, Optional, List, Dict, Callable, Any, Generator
 
-
-if TYPE_CHECKING:
-    from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
 
 try:
     from PyQt6.QtCore import QDateTime, Qt, QMutex, QWaitCondition, QUrl # @UnusedImport @Reimport  @UnresolvedImport
 except ImportError:
     from PyQt5.QtCore import QDateTime, Qt, QMutex, QWaitCondition, QUrl  # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
-from artisanlib.util import encodeLocal
+from artisanlib.util import encodeLocal, encodeLocalStrict
 from artisanlib.atypes import ProfileData
 
 
@@ -31,16 +28,19 @@ from proto import IkawaCmd_pb2 # type:ignore[unused-ignore]
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 
-def url_to_profile(url:str, log_data:bool = False) -> IkawaCmd_pb2.RoastProfile: # pylint: disable=no-member
+def url_to_profile(url:str) -> IkawaCmd_pb2.RoastProfile: # pylint: disable=no-member
     url += '=='
     base64_bytes = url.encode('ascii')
     message_bytes = base64.b64decode(base64_bytes)
-    if log_data:
-        _log.info('ikawa profile: %s',message_bytes)
+#    _log.debug('ikawa profile: %s',message_bytes)
     return IkawaCmd_pb2.RoastProfile().FromString(message_bytes) # pylint: disable=no-member
 
-def extractProfileIkawaURL(url:QUrl, aw:'ApplicationWindow') -> ProfileData:
-    ikawa_profile = url_to_profile(url.query(), log_data=aw.qmc.device_logging)
+def extractProfileIkawaURL(url:QUrl,
+        etypesdefault:List[str],
+        _alt_etypesdefault:List[str],
+        _artisanflavordefaultlabels:List[str],
+        eventsExternal2InternalValue:Callable[[int],float]) -> ProfileData:
+    ikawa_profile = url_to_profile(url.query())
     res:ProfileData = ProfileData() # the interpreted data set
     res['samplinginterval'] = 1.0
 
@@ -79,8 +79,7 @@ def extractProfileIkawaURL(url:QUrl, aw:'ApplicationWindow') -> ProfileData:
                     extra4.append(fan)
                     extra5.append(-1.0)
                     extra6.append(-1.0)
-                    v = fan/10. + 1
-                    specialeventsvalue.append(v)
+                    specialeventsvalue.append(eventsExternal2InternalValue(int(round(fan))))
                     specialevents.append(idx)
                     specialeventstype.append(0)
                     specialeventsStrings.append(f'{int(fan)}' + '%')
@@ -98,8 +97,7 @@ def extractProfileIkawaURL(url:QUrl, aw:'ApplicationWindow') -> ProfileData:
             # we add the fan information
             fan = round(fan_points[0].power / 2.55)
             extra4.append(fan)
-            v = fan/10. + 1
-            specialeventsvalue.append(v)
+            specialeventsvalue.append(eventsExternal2InternalValue(fan))
             specialevents.append(idx)
             specialeventstype.append(0)
             specialeventsStrings.append(f'{int(fan)}' + '%')
@@ -111,8 +109,7 @@ def extractProfileIkawaURL(url:QUrl, aw:'ApplicationWindow') -> ProfileData:
         extra6.append(-1.0)
 
     cooldown_fan = round(ikawa_profile.cooldown_fan.power / 2.55)
-    v = cooldown_fan/10. + 1
-    specialeventsvalue.append(v)
+    specialeventsvalue.append(eventsExternal2InternalValue(cooldown_fan))
     specialevents.append(len(timex)-1)
     specialeventstype.append(0)
     specialeventsStrings.append(f'{int(cooldown_fan)}' + '%')
@@ -150,12 +147,16 @@ def extractProfileIkawaURL(url:QUrl, aw:'ApplicationWindow') -> ProfileData:
         res['specialeventsvalue'] = specialeventsvalue
         res['specialeventsStrings'] = specialeventsStrings
 
-    res['etypes'] = aw.qmc.etypesdefault
+    res['etypes'] = etypesdefault
     return res
 
 
 # returns a dict containing all profile information contained in the given IKAWA CSV file
-def extractProfileIkawaCSV(file:str, aw:'ApplicationWindow') -> ProfileData:
+def extractProfileIkawaCSV(file:str,
+        etypesdefault:List[str],
+        _alt_etypesdefault:List[str],
+        _artisanflavordefaultlabels:List[str],
+        eventsExternal2InternalValue:Callable[[int],float]) -> ProfileData:
     res:ProfileData = ProfileData() # the interpreted data set
 
     res['samplinginterval'] = 1.0
@@ -190,8 +191,6 @@ def extractProfileIkawaCSV(file:str, aw:'ApplicationWindow') -> ProfileData:
         fan_last:Optional[float] = None # holds the fan event value before the last one
         heater:Optional[float] = None # holds last processed heater event value
         heater_last:Optional[float] = None # holds the heater event value before the last one
-#        fan_event:bool = False # set to True if a fan event exists
-#        heater_event:bool = False # set to True if a heater event exists
         specialevents:List[int] = []
         specialeventstype:List[int] = []
         specialeventsvalue:List[float] = []
@@ -282,9 +281,7 @@ def extractProfileIkawaCSV(file:str, aw:'ApplicationWindow') -> ProfileData:
                         else:
                             fan_last = fan
                             fan = v
-#                            fan_event = True
-                            v = v/10. + 1
-                            specialeventsvalue.append(v)
+                            specialeventsvalue.append(eventsExternal2InternalValue(int(round(v))))
                             specialevents.append(i-1)
                             specialeventstype.append(0)
                             specialeventsStrings.append(f'{fan}' + '%')
@@ -313,9 +310,7 @@ def extractProfileIkawaCSV(file:str, aw:'ApplicationWindow') -> ProfileData:
                         else:
                             heater_last = heater
                             heater = v
-#                            heater_event = True
-                            v = v/10. + 1
-                            specialeventsvalue.append(v)
+                            specialeventsvalue.append(eventsExternal2InternalValue(int(round(v))))
                             specialevents.append(i-1)
                             specialeventstype.append(3)
                             specialeventsStrings.append(f'{heater}' + '%')
@@ -357,8 +352,8 @@ def extractProfileIkawaCSV(file:str, aw:'ApplicationWindow') -> ProfileData:
         res['specialeventsvalue'] = specialeventsvalue
         res['specialeventsStrings'] = specialeventsStrings
 
-    res['etypes'] = aw.qmc.etypesdefault
-    res['title'] = Path(file).stem
+    res['etypes'] = etypesdefault
+    res['title'] = encodeLocalStrict(Path(file).stem)
     return res
 
 
