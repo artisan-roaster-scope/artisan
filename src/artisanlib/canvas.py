@@ -8549,10 +8549,10 @@ class tgraphcanvas(FigureCanvas):
     # with window size wsize=1 the RoR is computed over succeeding readings; tx and temp assumed to be of type numpy.array
     def arrayRoR(tx:'npt.NDArray[numpy.double]', temp:'npt.NDArray[numpy.double]', wsize:int) -> 'npt.NDArray[numpy.double]': # with wsize >=1
         # length compensation done downstream, not necessary here!
-        try:
+        with warnings.catch_warnings():
+            # suppress warning if time difference is 0 which leads to a div by zero resulting in a warning and an inf value
+            warnings.simplefilter('ignore')
             return cast('npt.NDArray[numpy.double]', (temp[wsize:] - temp[:-wsize]) / ((tx[wsize:] - tx[:-wsize])/60.))
-        except Exception: # pylint: disable=broad-except
-            return cast('npt.NDArray[numpy.double]', numpy.full((1, tx.size), 0.0, dtype=numpy.double))
 
 
     # returns deltas and linearized timex;  both results can be None
