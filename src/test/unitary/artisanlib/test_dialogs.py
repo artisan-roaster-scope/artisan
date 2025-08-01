@@ -22,7 +22,7 @@ Security Coverage: Levels 1-4 (Basic Stability through Hardware Protection)
 
 import sys
 import time
-from typing import Generator
+from typing import Generator, cast
 from unittest.mock import Mock, patch
 
 import pytest
@@ -49,7 +49,7 @@ from artisanlib.dialogs import (
 
 
 # Test Fixtures
-@pytest.fixture(scope="session")
+@pytest.fixture(scope='session')
 def qapp() -> Generator[QApplication, None, None]:
     """Create QApplication instance for the entire test session."""
     if not QApplication.instance():
@@ -58,7 +58,7 @@ def qapp() -> Generator[QApplication, None, None]:
         yield app
         app.quit()
     else:
-        yield QApplication.instance()
+        yield cast(QApplication, QApplication.instance())
 
 
 @pytest.fixture
@@ -68,8 +68,8 @@ def mock_aw() -> Mock:
 
     # QMC (Quality Management Controller) mock
     mock.qmc = Mock()
-    mock.qmc.weight = ["g", "kg", "g"]  # [in_unit, out_unit, display_unit]
-    mock.qmc.container_names = ["Container 1", "Container 2"]
+    mock.qmc.weight = ['g', 'kg', 'g']  # [in_unit, out_unit, display_unit]
+    mock.qmc.container_names = ['Container 1', 'Container 2']
     mock.qmc.container_weights = [50.0, 75.5]
 
     # App mock for UI properties
@@ -88,7 +88,7 @@ def mock_aw() -> Mock:
 @pytest.fixture
 def mock_qsettings() -> Generator[Mock, None, None]:
     """Mock QSettings to avoid file system operations during testing."""
-    with patch("artisanlib.dialogs.QSettings") as mock_settings:
+    with patch('artisanlib.dialogs.QSettings') as mock_settings:
         settings_instance = Mock()
         settings_instance.contains.return_value = False
         settings_instance.value.return_value = None
@@ -114,10 +114,10 @@ class TestBaseDialogFunctionality:
         ok_button = dialog.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
         cancel_button = dialog.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel)
 
-        assert ok_button is not None, "User should see OK button"
-        assert cancel_button is not None, "User should see Cancel button"
-        assert ok_button.isDefault(), "OK button should be default for Enter key"
-        assert ok_button.autoDefault(), "OK button should respond to Enter"
+        assert ok_button is not None, 'User should see OK button'
+        assert cancel_button is not None, 'User should see Cancel button'
+        assert ok_button.isDefault(), 'OK button should be default for Enter key'
+        assert ok_button.autoDefault(), 'OK button should respond to Enter'
 
         dialog.close()
 
@@ -253,17 +253,17 @@ class TestMessageBoxFunctionality:
         ACT: Display message to user
         ASSERT: User sees correct title and message
         """
-        title = "Test Title"
-        message = "This is a test message for the user"
+        title = 'Test Title'
+        message = 'This is a test message for the user'
 
         msg_box = ArtisanMessageBox(None, title, message, timeout=0, modal=False)
 
         # Note: QMessageBox.windowTitle() may return empty string on some platforms
         # The important thing is that the constructor accepts the title parameter
         # and the message content is displayed correctly
-        assert isinstance(msg_box.windowTitle(), str), "Window title should be a string"
-        assert msg_box.text() == message, "User should see correct message"
-        assert not msg_box.isModal(), "Non-modal box allows user to continue working"
+        assert isinstance(msg_box.windowTitle(), str), 'Window title should be a string'
+        assert msg_box.text() == message, 'User should see correct message'
+        assert not msg_box.isModal(), 'Non-modal box allows user to continue working'
 
         msg_box.close()
 
@@ -275,17 +275,17 @@ class TestMessageBoxFunctionality:
         ACT: Start timer for auto-close
         ASSERT: Message box prepares for automatic closure
         """
-        msg_box = ArtisanMessageBox(None, "Test", "Auto-close test", timeout=1, modal=False)
+        msg_box = ArtisanMessageBox(None, 'Test', 'Auto-close test', timeout=1, modal=False)
 
         # Verify timeout is configured
-        assert msg_box.timeout == 1, "Timeout should be set correctly"
-        assert msg_box.currentTime == 0, "Timer should start at zero"
+        assert msg_box.timeout == 1, 'Timeout should be set correctly'
+        assert msg_box.currentTime == 0, 'Timer should start at zero'
 
         # Simulate show event to start timer
         msg_box.showEvent(None)
 
         # Timer should be ready to count
-        assert msg_box.currentTime == 0, "Timer should be initialized"
+        assert msg_box.currentTime == 0, 'Timer should be initialized'
 
         msg_box.close()
 
@@ -302,15 +302,15 @@ class TestHelpDialogFunctionality:
         ACT: User opens help dialog
         ASSERT: User sees help content and search functionality
         """
-        title = "Help Documentation"
-        content = "<h1>Coffee Roasting Guide</h1><p>This is help content about coffee roasting.</p>"
+        title = 'Help Documentation'
+        content = '<h1>Coffee Roasting Guide</h1><p>This is help content about coffee roasting.</p>'
 
-        dialog = HelpDlg(None, mock_aw, title, content)
+        dialog = HelpDlg(None, mock_aw, title, content) # type: ignore[arg-type]
 
-        assert dialog.windowTitle() == title, "User should see help title"
-        assert not dialog.isModal(), "Help dialog allows user to continue working"
-        assert dialog.search_input is not None, "User should see search box"
-        assert dialog.phelp.toHtml() != "", "User should see help content"
+        assert dialog.windowTitle() == title, 'User should see help title'
+        assert not dialog.isModal(), 'Help dialog allows user to continue working'
+        assert dialog.search_input is not None, 'User should see search box'
+        assert dialog.phelp.toHtml() != '', 'User should see help content'
 
         dialog.close()
 
@@ -322,18 +322,18 @@ class TestHelpDialogFunctionality:
         ACT: User searches for specific term
         ASSERT: Search highlights matching content for user
         """
-        content = "<p>Coffee roasting involves applying heat to coffee beans. The roasting process is crucial.</p>"
-        dialog = HelpDlg(None, mock_aw, "Help", content)
+        content = '<p>Coffee roasting involves applying heat to coffee beans. The roasting process is crucial.</p>'
+        dialog = HelpDlg(None, mock_aw, 'Help', content) # type: ignore[arg-type]
 
         # User types search term
-        dialog.search_input.setText("roasting")
+        dialog.search_input.setText('roasting')
 
         # User presses Enter to search
         dialog.doSearch()
 
         # User should see search results
-        assert len(dialog.matches) > 0, "User should see search matches"
-        assert dialog.current_match_index == 0, "First match should be highlighted"
+        assert len(dialog.matches) > 0, 'User should see search matches'
+        assert dialog.current_match_index == 0, 'First match should be highlighted'
 
         dialog.close()
 
@@ -345,19 +345,19 @@ class TestHelpDialogFunctionality:
         ACT: User clears search box
         ASSERT: All highlights are removed for clean viewing
         """
-        dialog = HelpDlg(None, mock_aw, "Help", "<p>test content</p>")
+        dialog = HelpDlg(None, mock_aw, 'Help', '<p>test content</p>') # type: ignore[arg-type]
 
         # User performs initial search
-        dialog.search_input.setText("test")
+        dialog.search_input.setText('test')
         dialog.doSearch()
 
         # User clears search
-        dialog.search_input.setText("")
+        dialog.search_input.setText('')
         dialog.doSearch()
 
         # User should see clean content without highlights
-        assert len(dialog.matches) == 0, "User should see no highlighted matches"
-        assert dialog.previous_search_term == "", "Search state should be reset"
+        assert len(dialog.matches) == 0, 'User should see no highlighted matches'
+        assert dialog.previous_search_term == '', 'Search state should be reset'
 
         dialog.close()
 
@@ -369,7 +369,7 @@ class TestHelpDialogFunctionality:
         ACT: User presses Ctrl+F (standard search shortcut)
         ASSERT: Search box receives focus for immediate typing
         """
-        dialog = HelpDlg(None, mock_aw, "Help", "<p>content</p>")
+        dialog = HelpDlg(None, mock_aw, 'Help', '<p>content</p>') # type: ignore[arg-type]
 
         # Simulate user pressing Ctrl+F
         ctrl_f_event = QKeyEvent(
@@ -379,7 +379,7 @@ class TestHelpDialogFunctionality:
 
         # Search input should be ready for user input
         # Note: In real usage, this would set focus, but we can't easily test focus in unit tests
-        assert dialog.search_input is not None, "Search input should be available"
+        assert dialog.search_input is not None, 'Search input should be available'
 
         dialog.close()
 
@@ -400,8 +400,8 @@ class TestHelpDialogFunctionality:
         ACT: Search with potentially malicious strings
         ASSERT: Search doesn't crash or expose vulnerabilities
         """
-        content = "<p>Test content for searching</p>" * 100  # Large content
-        dialog = HelpDlg(None, mock_aw, "Help", content)
+        content = '<p>Test content for searching</p>' * 100  # Large content
+        dialog = HelpDlg(None, mock_aw, 'Help', content) # type: ignore[arg-type]
 
         try:
             dialog.search_input.setText(search_term)
@@ -418,7 +418,7 @@ class TestHelpDialogFunctionality:
             dialog.close()
 
     @pytest.mark.xfail(
-        reason="VULNERABILITY: No limit on search matches - memory exhaustion possible"
+        reason='VULNERABILITY: No limit on search matches - memory exhaustion possible'
     )
     def test_search_memory_exhaustion(
         self, qapp: QApplication, mock_aw: Mock, mock_qsettings: Mock  # noqa: ARG002
@@ -431,12 +431,12 @@ class TestHelpDialogFunctionality:
         REMEDIATION: Limit search matches to reasonable number (e.g., 100 matches max)
         """
         # Create massive content that could cause memory issues
-        massive_content = "<p>searchable content " * 10000 + "</p>"
-        dialog = HelpDlg(None, mock_aw, "Help", massive_content)
+        massive_content = '<p>searchable content ' * 10000 + '</p>'
+        dialog = HelpDlg(None, mock_aw, 'Help', massive_content) # type: ignore[arg-type]
 
         try:
             # Search for term that appears many times
-            dialog.search_input.setText("content")
+            dialog.search_input.setText('content')
             dialog.doSearch()
 
             # VULNERABILITY CHECK: Excessive matches could cause memory issues
@@ -447,7 +447,7 @@ class TestHelpDialogFunctionality:
 
         except MemoryError:
             # VULNERABILITY: Search causes memory exhaustion
-            pytest.fail("Search caused memory exhaustion with large content")
+            pytest.fail('Search caused memory exhaustion with large content')
         except Exception as e:
             # VULNERABILITY: Other crashes with large content
             pytest.fail(f"Search failed with large content: {e}")
@@ -464,10 +464,10 @@ class TestHelpDialogFunctionality:
 
         NOTE: This test validates that regex injection protection is working correctly
         """
-        dialog = HelpDlg(None, mock_aw, "Help", "<p>test content without the malicious pattern</p>")
+        dialog = HelpDlg(None, mock_aw, 'Help', '<p>test content without the malicious pattern</p>') # type: ignore[arg-type]
 
         # Test regex special characters that should be escaped
-        malicious_regex = ".*+?^${}()|[]\\"  # Regex metacharacters
+        malicious_regex = '.*+?^${}()|[]\\'  # Regex metacharacters
 
         dialog.search_input.setText(malicious_regex)
 
@@ -477,10 +477,10 @@ class TestHelpDialogFunctionality:
         end_time = time.time()
 
         # Search should be fast (regex is escaped, not interpreted)
-        assert end_time - start_time < 0.1, "Search took too long - possible regex injection"
+        assert end_time - start_time < 0.1, 'Search took too long - possible regex injection'
 
         # Should find no matches because the literal string doesn't exist
-        assert len(dialog.matches) == 0, "Should find no matches for escaped regex pattern"
+        assert len(dialog.matches) == 0, 'Should find no matches for escaped regex pattern'
 
         dialog.close()
 
@@ -497,21 +497,21 @@ class TestInputDialogFunctionality:
         ACT: User enters text and accepts
         ASSERT: User input is captured correctly
         """
-        dialog = ArtisanInputDialog(None, mock_aw, "Enter URL", "Please enter a URL:")
+        dialog = ArtisanInputDialog(None, mock_aw, 'Enter URL', 'Please enter a URL:') # type: ignore[arg-type]
 
         # User types input
-        test_input = "https://example.com"
+        test_input = 'https://example.com'
         dialog.inputLine.setText(test_input)
 
         # User clicks OK
         dialog.accept()
 
         # User's input should be saved
-        assert dialog.url == test_input, "User input should be captured"
+        assert dialog.url == test_input, 'User input should be captured'
 
         dialog.close()
 
-    @patch("artisanlib.dialogs.QApplication.translate")
+    @patch('artisanlib.dialogs.QApplication.translate')
     def test_drag_drop_functionality_helps_user(
         self, mock_translate: Mock, qapp: QApplication, mock_aw: Mock  # noqa: ARG002
     ) -> None:
@@ -520,14 +520,14 @@ class TestInputDialogFunctionality:
         ACT: User drags URL file onto dialog
         ASSERT: URL is automatically filled for user convenience
         """
-        mock_translate.return_value = "test"
-        dialog = ArtisanInputDialog(None, mock_aw, "Enter URL", "URL:")
+        mock_translate.return_value = 'test'
+        dialog = ArtisanInputDialog(None, mock_aw, 'Enter URL', 'URL:') # type: ignore[arg-type]
 
         # Create mock drag event with URL
         mock_mime_data = Mock()
         mock_mime_data.hasUrls.return_value = True
         mock_url = Mock()
-        mock_url.toString.return_value = "https://dragged-url.com"
+        mock_url.toString.return_value = 'https://dragged-url.com'
         mock_mime_data.urls.return_value = [mock_url]
 
         mock_drop_event = Mock()
@@ -538,8 +538,8 @@ class TestInputDialogFunctionality:
 
         # URL should be automatically filled for user
         assert (
-            dialog.inputLine.text() == "https://dragged-url.com"
-        ), "Dropped URL should fill input field"
+            dialog.inputLine.text() == 'https://dragged-url.com'
+        ), 'Dropped URL should fill input field'
 
         dialog.close()
 
@@ -556,7 +556,7 @@ class TestInputDialogFunctionality:
         ACT: Inject potentially malicious strings
         ASSERT: Input is sanitized and doesn't cause issues
         """
-        dialog = ArtisanInputDialog(None, mock_aw, "Test", "Enter data:")
+        dialog = ArtisanInputDialog(None, mock_aw, 'Test', 'Enter data:') # type: ignore[arg-type]
 
         try:
             dialog.inputLine.setText(malicious_input)
@@ -576,7 +576,7 @@ class TestInputDialogFunctionality:
         finally:
             dialog.close()
 
-    @pytest.mark.xfail(reason="VULNERABILITY: No validation of dropped file URLs")
+    @pytest.mark.xfail(reason='VULNERABILITY: No validation of dropped file URLs')
     def test_malicious_file_drop(self, qapp: QApplication, mock_aw: Mock) -> None:  # noqa: ARG002
         """
         ARRANGE: Input dialog with drag-and-drop enabled
@@ -585,16 +585,16 @@ class TestInputDialogFunctionality:
 
         REMEDIATION: Validate and sanitize dropped URLs before setting them
         """
-        with patch("artisanlib.dialogs.QApplication.translate") as mock_translate:
-            mock_translate.return_value = "test"
-            dialog = ArtisanInputDialog(None, mock_aw, "Test", "URL:")
+        with patch('artisanlib.dialogs.QApplication.translate') as mock_translate:
+            mock_translate.return_value = 'test'
+            dialog = ArtisanInputDialog(None, mock_aw, 'Test', 'URL:') # type: ignore[arg-type]
 
             # Create malicious URL drop event
             malicious_urls = [
-                "file:///etc/passwd",  # System file access
+                'file:///etc/passwd',  # System file access
                 "javascript:alert('xss')",  # Script injection
-                "ftp://malicious.com/payload",  # External resource
-                "\\\\malicious-server\\share",  # UNC path injection
+                'ftp://malicious.com/payload',  # External resource
+                '\\\\malicious-server\\share',  # UNC path injection
             ]
 
             for malicious_url in malicious_urls:
@@ -628,13 +628,13 @@ class TestSelectionDialogFunctionality:
         ACT: User opens selection dialog
         ASSERT: User sees all available choices
         """
-        choices = ["Option 1", "Option 2", "Option 3"]
-        dialog = ArtisanComboBoxDialog(None, mock_aw, "Select Option", "Choose:", choices, 1)
+        choices = ['Option 1', 'Option 2', 'Option 3']
+        dialog = ArtisanComboBoxDialog(None, mock_aw, 'Select Option', 'Choose:', choices, 1) # type: ignore[arg-type]
 
         # User should see all choices
-        assert dialog.comboBox.count() == len(choices), "User should see all options"
-        assert dialog.comboBox.currentIndex() == 1, "Default selection should be highlighted"
-        assert dialog.comboBox.currentText() == "Option 2", "User should see default selection"
+        assert dialog.comboBox.count() == len(choices), 'User should see all options'
+        assert dialog.comboBox.currentIndex() == 1, 'Default selection should be highlighted'
+        assert dialog.comboBox.currentText() == 'Option 2', 'User should see default selection'
 
         dialog.close()
 
@@ -646,8 +646,8 @@ class TestSelectionDialogFunctionality:
         ACT: User selects option and confirms
         ASSERT: User's choice is properly recorded
         """
-        choices = ["Coffee", "Tea", "Water"]
-        dialog = ArtisanComboBoxDialog(None, mock_aw, "Select Beverage", "Choose:", choices, 0)
+        choices = ['Coffee', 'Tea', 'Water']
+        dialog = ArtisanComboBoxDialog(None, mock_aw, 'Select Beverage', 'Choose:', choices, 0) # type: ignore[arg-type]
 
         # User selects different option
         dialog.comboBox.setCurrentIndex(2)  # Select "Water"
@@ -661,5 +661,5 @@ class TestSelectionDialogFunctionality:
         dialog.close()
 
 
-if __name__ == "__main__":
-    pytest.main([__file__, "-v"])
+if __name__ == '__main__':
+    pytest.main([__file__, '-v'])
