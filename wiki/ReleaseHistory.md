@@ -29,6 +29,7 @@ v3.2.1
   - updates internal PID by adding Advanced Integral Windup Prevention, derivative on measurement calculation (DoM), measurement discontinuity detection, derivative limiting and enhanced setpoint change detection to prevent the derivative kicks and spikes
   - updates libs (scipy, bleak, lxml, pillow)
   - expands automatic test coverage
+  - graph updates immediately when smoothing value changes
 
 * FIXES
   - fixes regression which broke the designer such that points could not be moved ([Discussion #1905](../../../discussions/1905) and [Issue #1916](../../../issues/1916))

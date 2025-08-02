@@ -6,6 +6,7 @@
 import datetime
 import os
 import sys
+from pathlib import Path
 import tempfile
 from typing import Any, Dict, Generator
 from unittest.mock import Mock, patch
@@ -951,7 +952,7 @@ class TestPlusIcon:
         mock_app_style = Mock()
         mock_app_style.pixelMetric.return_value = 48
 
-        with patch('plus.util.getResourcePath', return_value='/path/to/resources'), patch(
+        with patch('plus.util.getResourcePath', return_value=str(Path('/path/to/resources'))), patch(
             'plus.util.QApplication.style', return_value=mock_app_style
         ), patch('plus.util.QIcon') as mock_qicon, patch('plus.util.QSize') as mock_qsize:
 
@@ -964,7 +965,7 @@ class TestPlusIcon:
             util.setPlusIcon(mock_mbox)
 
             # Assert
-            mock_qicon.assert_called_once_with('/path/to/resources/Icons/plus-notification.svg')
+            mock_qicon.assert_called_once_with(str(Path('/path/to/resources/Icons/plus-notification.svg')))
             mock_qsize.assert_called_once_with(48, 48)
             mock_mbox.setIconPixmap.assert_called_once_with(mock_pixmap)
 
@@ -973,7 +974,7 @@ class TestPlusIcon:
         # Arrange
         mock_mbox = Mock()
 
-        with patch('plus.util.getResourcePath', return_value='/path/to/resources'), patch(
+        with patch('plus.util.getResourcePath', return_value=str(Path('/path/to/resources'))), patch(
             'plus.util.QApplication.style', return_value=None
         ), patch('plus.util.QIcon') as mock_qicon, patch('plus.util.QSize') as mock_qsize:
 
@@ -986,6 +987,6 @@ class TestPlusIcon:
             util.setPlusIcon(mock_mbox)
 
             # Assert
-            mock_qicon.assert_called_once_with('/path/to/resources/Icons/plus-notification.svg')
+            mock_qicon.assert_called_once_with(str(Path('/path/to/resources/Icons/plus-notification.svg')))
             mock_qsize.assert_called_once_with(64, 64)  # Default size
             mock_mbox.setIconPixmap.assert_called_once_with(mock_pixmap)
