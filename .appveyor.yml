@@ -21,7 +21,7 @@ environment:
   PYTHON_V: 3.13
   # Upgrade to specific version (for platforms supporting upgrade). Upgrade skipped if env var is missing or blank.
   PYUPGRADE_WIN_V: 3.13.5
-  #PYUPGRADE_MACOS_V: 3.12.1
+  #PYUPGRADE_MACOS_V: 3.12.1  # when upgrading see the notes in the deploy phase
 
   matrix:
   - job_name: windows_legacy
@@ -247,14 +247,14 @@ for:
     # we upgrade libidn2 and curl to prevent issues caused by the previous python update
     # on running curl for later upload (libunistring.2.dylib not found)
     # this is done here after generating the build to prevent SSL issues
-    - brew upgrade libidn2 # 2.3.4 -> 2.3.4_1
+    # ...at present python is not updated so we can skip this and save the time
+    #- brew upgrade libidn2 # 2.3.4 -> 2.3.4_1
     - ../.ci/upload.sh artisan-*.dmg
 
-#  # uncomment this section for vnc or ssh connection to the build image
+#  # uncomment this section for ssh connection to the build image
 #  on_finish:
-#    - sh: export APPVEYOR_VNC_BLOCK=true
-#    - sh: curl -sflL 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-vnc.sh' | bash -e -
-#    #- sh: curl -sflL 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-ssh.sh' | bash -e -
+#    - sh: export APPVEYOR_SSH_BLOCK=true
+#    - sh: curl -sflL 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-ssh.sh' | bash -e -
 
 
 -
