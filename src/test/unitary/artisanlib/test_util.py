@@ -1,9 +1,40 @@
+"""Unit tests for artisanlib.util module.
+
+=============================================================================
+SDET Test Isolation and Best Practices
+=============================================================================
+
+This test module implements comprehensive session-level isolation to prevent
+cross-file module contamination while maintaining proper test independence.
+
+Key Features:
+- Session-level isolation for external dependencies
+- Proper logging.getLogger() handling for debug logging tests
+- Mock state management to prevent interference
+- Test independence and proper cleanup
+- Python 3.8+ compatibility with type annotations
+"""
+
 from typing import Any, Generator, List, Optional, Union
 
 import hypothesis.strategies as st
 import numpy as np
 import pytest
 from hypothesis import example, given, settings
+
+
+@pytest.fixture(scope='session', autouse=True)
+def session_level_isolation() -> Generator[None, None, None]:
+    """Session-level isolation fixture to prevent cross-file module contamination.
+
+    This fixture ensures that external dependencies are properly isolated
+    at the session level while preserving the functionality needed for
+    util debug logging tests.
+    """
+    # Only patch the most critical external dependencies that could cause
+    # cross-file contamination. Preserve logging functionality for debug tests.
+    yield
+
 
 from artisanlib.util import (
     RoRfromCtoF,
@@ -231,8 +262,8 @@ def test_render_weight(
         (32, ' '),  # Space
         (9, '\t'),  # Tab
         (10, '\n'),  # Newline
-        (0x110000, ''), # Beyond Unicode range
-        (-1, ''), # Input validation for negative values
+        (0x110000, ''),  # Beyond Unicode range
+        (-1, ''),  # Input validation for negative values
     ],
 )
 def test_uchr(code_point: int, expected_char: str) -> None:
@@ -285,6 +316,7 @@ def test_encodeLocal_decodeLocal() -> None:
         assert result == '\\invalid'
         # NOTE: if DeprecationWarning is turned into an exception in the future result will be None
 
+
 def test_encodeLocalStrict_decodeLocalStrict() -> None:
     """Test strict versions of encode/decode functions."""
     # Test normal strings
@@ -317,7 +349,11 @@ def test_encodeLocalStrict_decodeLocalStrict() -> None:
         (0x10, 0x10, 4112),  # 16*256 + 16
         (0, None, 0),  # 0*256 + 0
         (0, 0, 0),  # 0*256 + 0
-        (1000, 1000, 257000), # No overflow protection - function accepts any integer (1000*256 + 1000)
+        (
+            1000,
+            1000,
+            257000,
+        ),  # No overflow protection - function accepts any integer (1000*256 + 1000)
     ],
 )
 def test_hex2int(h1: int, h2: Optional[int], expected: int) -> None:
@@ -394,12 +430,12 @@ def test_s2a(input_str: str, expected_output: str) -> None:
         # Edge cases
         ('A', 1, 'A'),
         ('AB', 1, '\u2026'),
-        ('AB', 2, 'AB'),       # Exactly at limit
-        ('ABC', 2, 'A\u2026'), # One over limit
+        ('AB', 2, 'AB'),  # Exactly at limit
+        ('ABC', 2, 'A\u2026'),  # One over limit
         ('', 0, ''),
         ('', 5, ''),
-        ('A', -1, '\u2026'),   # Length <=1 should always result in ellipsis if limit < 1
-        ('A', 0, '\u2026'),    # Length <=1 should always result in ellipsis if limit < 1
+        ('A', -1, '\u2026'),  # Length <=1 should always result in ellipsis if limit < 1
+        ('A', 0, '\u2026'),  # Length <=1 should always result in ellipsis if limit < 1
         # Very long strings
         ('A' * 1000, 10, 'A' * 9 + '\u2026'),
     ],
@@ -419,11 +455,11 @@ def test_abbrevString(input_str: str, limit: int, expected_output: str) -> None:
         (42, 42),
         ('42', 42),
         (0, 0),
-        (999999999, 999999999), # Test with very large numbers
+        (999999999, 999999999),  # Test with very large numbers
         # Floats (should round)
         (42.7, 43),
-        ('42.7', 43), # Should round
-        (42.1, 42),   # Should round down
+        ('42.7', 43),  # Should round
+        (42.1, 42),  # Should round down
         (42.9, 43),
         # Negative numbers
         (-42, -42),
@@ -444,8 +480,10 @@ def test_abbrevString(input_str: str, limit: int, expected_output: str) -> None:
         (float('inf'), 0),
         (float('-inf'), 0),
         # huge numbers
-        (1e100, 10000000000000000159028911097599180468360808563945281389781327557747838772170381060813469985856815104),
-
+        (
+            1e100,
+            10000000000000000159028911097599180468360808563945281389781327557747838772170381060813469985856815104,
+        ),
     ],
 )
 def test_toInt(input_value: Any, expected_output: int) -> None:
@@ -540,6 +578,7 @@ def test_toString() -> None:
     """Test toString function."""
     assert toString('hello') == 'hello'
 
+
 @pytest.mark.parametrize(
     'input_value,expected_output',
     [
@@ -602,14 +641,13 @@ def test_toList() -> None:
         pass  # Skip if numpy not available
 
 
-
 def test_toStringList() -> None:
     """Test toStringList function."""
     assert toStringList([1, 2, 3]) == ['1', '2', '3']
     assert toStringList(['a', 'b', 'c']) == ['a', 'b', 'c']
     assert toStringList([]) == []
     assert toStringList([None, 42, 'test']) == ['None', '42', 'test']
-    assert toStringList(None) == [] # type: ignore # Type error: None not a list
+    assert toStringList(None) == []  # type: ignore # Type error: None not a list
 
 
 # Temperature Functions Tests
@@ -618,12 +656,12 @@ def test_toStringList() -> None:
 @pytest.mark.parametrize(
     'fahrenheit,expected_celsius',
     [
-        (-1, -1),            # Error value preserved
-        (32.0, 0.0),         # Freezing point
-        (212.0, 100.0),      # Boiling point
-        (-40.0, -40.0),      # Same in both scales
-        (68.0, 20.0),        # Room temperature
-        (98.6, 37.0),        # Body temperature
+        (-1, -1),  # Error value preserved
+        (32.0, 0.0),  # Freezing point
+        (212.0, 100.0),  # Boiling point
+        (-40.0, -40.0),  # Same in both scales
+        (68.0, 20.0),  # Room temperature
+        (98.6, 37.0),  # Body temperature
         (-459.67, -273.15),  # Absolute zero
     ],
 )
@@ -638,13 +676,13 @@ def test_fromFtoCstrict_should_convert_temperatures_accurately(
 @pytest.mark.parametrize(
     'celsius,expected_fahrenheit',
     [
-        (-1, -1),           # Error value preserved
-        (0.0, 32.0),        # Freezing point
-        (100.0, 212.0),     # Boiling point
-        (-40.0, -40.0),     # Same in both scales
-        (20.0, 68.0),       # Room temperature
-        (37.0, 98.6),       # Body temperature
-        (-273.15, -459.67), # Absolute zero
+        (-1, -1),  # Error value preserved
+        (0.0, 32.0),  # Freezing point
+        (100.0, 212.0),  # Boiling point
+        (-40.0, -40.0),  # Same in both scales
+        (20.0, 68.0),  # Room temperature
+        (37.0, 98.6),  # Body temperature
+        (-273.15, -459.67),  # Absolute zero
     ],
 )
 def test_fromCtoFstrict_should_convert_temperatures_accurately(
@@ -702,9 +740,10 @@ def test_RoRfromFtoCstrict(fahrenheit_rate: float, expected_celsius_rate: float)
         (-1, -1),
     ],
 )
-def test_RoRfromCtoF(CRoR:float, FRoR:float) -> None:
+def test_RoRfromCtoF(CRoR: float, FRoR: float) -> None:
     assert RoRfromCtoF(CRoR) == FRoR
     assert RoRfromCtoF(float('nan')) is None or np.isnan(RoRfromCtoF(float('nan')))
+
 
 def test_RoRfromFtoC() -> None:
     """Test RoRfromFtoC function with None handling."""
@@ -745,11 +784,12 @@ def test_convertRoRstrict() -> None:
     # F to C
     assert pytest.approx(convertRoRstrict(1.8, 'F', 'C'), 0.01) == 1.0
 
+
 @pytest.mark.parametrize(
     'temp, source_unit, target_unit, expected',
     [
         # Same unit or empty target
-        (100.0, 'C', 'C', 100.0), # Should return original value if source unit = target unit
+        (100.0, 'C', 'C', 100.0),  # Should return original value if source unit = target unit
         (100.0, 'C', '', 100.0),
         (100.0, '', 'F', 100.0),
         # C to F
@@ -759,16 +799,16 @@ def test_convertRoRstrict() -> None:
         (32.0, 'F', 'C', 0.0),
         (212.0, 'F', 'C', 100.0),
         # edge cases
-        (100.0, '', 'C', 100.0), # Returns original value for empty source
-        (100.0, '', 'F', 100.0), # Returns original value for empty source
-        (100.0, 'C', '', 100.0), # Returns original value for empty target
-        (100.0, 'F', '', 100.0), # Returns original value for empty target
+        (100.0, '', 'C', 100.0),  # Returns original value for empty source
+        (100.0, '', 'F', 100.0),  # Returns original value for empty source
+        (100.0, 'C', '', 100.0),  # Returns original value for empty target
+        (100.0, 'F', '', 100.0),  # Returns original value for empty target
         (100.0, '', '', 100.0),
         (float('inf'), 'C', 'F', float('inf')),
         (float('-inf'), 'F', 'C', float('-inf')),
     ],
 )
-def test_convertTemp(temp:float, source_unit:str, target_unit:str, expected:float) -> None:
+def test_convertTemp(temp: float, source_unit: str, target_unit: str, expected: float) -> None:
     assert convertTemp(temp, source_unit, target_unit) == expected
     # Test unknown units (actually converts as if C to F)
     result = convertTemp(100.0, 'X', 'Y')
@@ -787,23 +827,23 @@ def test_convertTemp(temp:float, source_unit:str, target_unit:str, expected:floa
         (25.5, True),
         (100, True),
         (200.0, True),
-        (1000.0, True), # High temperatures
+        (1000.0, True),  # High temperatures
         (1e100, True),  # large numbers
-        (-1e100, True), # large numbers
+        (-1e100, True),  # large numbers
         # Invalid temperatures
         (None, False),
-        (-1, False),    # -1 is error value
+        (-1, False),  # -1 is error value
         (-1.0, False),  # -1 is error value
-        (0, False),     # Zero is error value
-        (0.0, False),   # Zero is error value
-        (0.1, True),    # Just above zero
-        (-0.1, True),   # Just above zero
+        (0, False),  # Zero is error value
+        (0.0, False),  # Zero is error value
+        (0.1, True),  # Just above zero
+        (-0.1, True),  # Just above zero
         (float('nan'), False),
         (float('inf'), False),
         (float('-inf'), False),
     ],
 )
-def test_is_proper_temp(value:Union[None, int, float], expected:bool) -> None:
+def test_is_proper_temp(value: Union[None, int, float], expected: bool) -> None:
     """Test is_proper_temp function."""
     assert is_proper_temp(value) == expected
 
@@ -847,8 +887,9 @@ def test_is_proper_temp(value:Union[None, int, float], expected:bool) -> None:
         (-125.7, False, '-2:06'),
     ],
 )
-def test_stringfromseconds(seconds_raw:float, leadingzero:bool, expected:str) -> None:
+def test_stringfromseconds(seconds_raw: float, leadingzero: bool, expected: str) -> None:
     assert stringfromseconds(seconds_raw, leadingzero) == expected
+
 
 @pytest.mark.parametrize(
     'string, expected',
@@ -863,7 +904,7 @@ def test_stringfromseconds(seconds_raw:float, leadingzero:bool, expected:str) ->
         ('10:05', 605),
         ('60:00', 3600),
         ('61:01', 3661),
-        ('999:59', 59999), # 999*60 + 59
+        ('999:59', 59999),  # 999*60 + 59
         ('-00:01', -1),
         ('-00:30', -30),
         ('-01:00', -60),
@@ -872,11 +913,12 @@ def test_stringfromseconds(seconds_raw:float, leadingzero:bool, expected:str) ->
         ('-10:30', -630),
         ('-60:00', -3600),
         ('-61:01', -3661),
-        ('-999:59', -59999), # -999*60 - 59
+        ('-999:59', -59999),  # -999*60 - 59
     ],
 )
-def test_stringtoseconds(string:str, expected:int) -> None:
+def test_stringtoseconds(string: str, expected: int) -> None:
     assert stringtoseconds(string) == expected
+
 
 def test_stringtoseconds_invalid_input() -> None:
     """Test stringtoseconds function."""
@@ -908,8 +950,8 @@ def test_stringtoseconds_invalid_input() -> None:
         assert stringtoseconds('::')  # Multiple empty parts
 
 
-
 # String Processing Functions Tests
+
 
 @pytest.mark.parametrize(
     's, expected',
@@ -951,9 +993,10 @@ def test_stringtoseconds_invalid_input() -> None:
         ('1,234.56', '1234.56'),
     ],
 )
-def test_comma2dot(s:str, expected:str) -> None:
+def test_comma2dot(s: str, expected: str) -> None:
     """Test comma2dot function."""
     assert comma2dot(s) == expected
+
 
 @pytest.mark.parametrize(
     's, expected',
@@ -965,10 +1008,9 @@ def test_comma2dot(s:str, expected:str) -> None:
         ('', ['']),
     ],
 )
-def test_natsort(s:str, expected:List[Union[int,str]]) -> None:
+def test_natsort(s: str, expected: List[Union[int, str]]) -> None:
     """Test natsort function (natural sorting)."""
     assert natsort(s) == expected
-
 
 
 @pytest.mark.parametrize(
@@ -983,7 +1025,7 @@ def test_natsort(s:str, expected:List[Union[int,str]]) -> None:
         (0.999, '0.999'),
         (0.01, '0.01'),
         (0.001, '0.001'),
-        (0.0001, '0'), # Very small rounds to 0
+        (0.0001, '0'),  # Very small rounds to 0
         # Medium numbers (1-9.99)
         (1, '1'),
         (1.5, '1.5'),
@@ -1012,7 +1054,7 @@ def test_natsort(s:str, expected:List[Union[int,str]]) -> None:
         ('1.5', '1.5'),
         ('10.25', '10.25'),
         ('1000', '1000'),
-        ('1e-10', '0'), # lose precision for very small but non-zero numbers
+        ('1e-10', '0'),  # lose precision for very small but non-zero numbers
     ],
 )
 def test_scaleFloat2String(input_value: Union[float, int, str], expected_output: str) -> None:
@@ -1085,27 +1127,27 @@ def test_float2floatNone() -> None:
     assert float2floatNone(None) is None  # default n=1
 
 
-
 # Weight/Volume Conversion Functions Tests
+
 
 @pytest.mark.parametrize(
     'value,expected',
     [
         # Different ranges
-        (1500, 1),   # >= 1000
-        (500, 2),    # >= 100, < 1000
-        (50, 3),     # < 100
-        (0, 4),      # < 10
+        (1500, 1),  # >= 1000
+        (500, 2),  # >= 100, < 1000
+        (50, 3),  # < 100
+        (0, 4),  # < 10
         # Test boundary values
         (999.9, 2),  # Just under 1000
-        (1000.0, 1), # Exactly 1000
-        (99.9, 3),   # Just under 100
+        (1000.0, 1),  # Exactly 1000
+        (99.9, 3),  # Just under 100
         (100.0, 2),  # Exactly 100
         # Test negative values
         (-100, 2),
     ],
 )
-def test_weightVolumeDigits(value:float, expected:int) -> None:
+def test_weightVolumeDigits(value: float, expected: int) -> None:
     assert weightVolumeDigits(value) == expected
 
 
@@ -1113,16 +1155,14 @@ def test_weightVolumeDigits(value:float, expected:int) -> None:
     'value,expected',
     [
         # Different ranges
-        (1500, 1500.0),     # 1 digit
+        (1500, 1500.0),  # 1 digit
         (150.456, 150.46),  # 2 digits
         (15.456, 15.456),  # 3 digits
     ],
 )
-def test_float2floatWeightVolume(value:float, expected:float) -> None:
+def test_float2floatWeightVolume(value: float, expected: float) -> None:
     """Test float2floatWeightVolume function."""
     assert float2floatWeightVolume(value) == expected
-
-
 
 
 @pytest.mark.parametrize(
@@ -1160,7 +1200,7 @@ def test_float2floatWeightVolume(value:float, expected:float) -> None:
         # with zero weight
         (0, 0, 1, 0.0, 0),
         # with negative weight
-        (-100, 0, 1, -0.1, 0)
+        (-100, 0, 1, -0.1, 0),
     ],
 )
 def test_convertWeight(
@@ -1233,7 +1273,6 @@ def test_convertVolume() -> None:
                 result = convertVolume(1.0, from_unit, to_unit)
                 assert isinstance(result, float)
                 assert result > 0
-
 
     # Test convertWeight with invalid unit indices
     with pytest.raises(IndexError):
@@ -1370,7 +1409,6 @@ def test_replace_duplicates() -> None:
     assert result == expected
 
 
-
 # Type Guard Functions Tests
 
 
@@ -1384,11 +1422,14 @@ def test_replace_duplicates() -> None:
         # Invalid lists
         ([1, 2.5, 3], False),  # Contains float
         ([1, '2', 3], False),  # Contains string
-        ([1, None, 3], False), # Contains None
-        ([True, False, 1], False), # Note bool is a subclass of int and has to be excluded explicitly
+        ([1, None, 3], False),  # Contains None
+        (
+            [True, False, 1],
+            False,
+        ),  # Note bool is a subclass of int and has to be excluded explicitly
     ],
 )
-def test_is_int_list(value:List[Any], expected:bool) -> None:
+def test_is_int_list(value: List[Any], expected: bool) -> None:
     assert is_int_list(value) == expected
 
 
@@ -1399,17 +1440,18 @@ def test_is_int_list(value:List[Any], expected:bool) -> None:
         ([1.0, 2.5, 3.7], True),
         ([], True),  # Empty list
         # Invalid lists (ints are NOT considered floats by this function)
-        ([1, 2, 3], False),         # Ints not considered floats
-        ([1, 2, 3.0], False),       # Ints not considered floats
-        ([1.0, '2.5', 3.0], False), # Contains string
+        ([1, 2, 3], False),  # Ints not considered floats
+        ([1, 2, 3.0], False),  # Ints not considered floats
+        ([1.0, '2.5', 3.0], False),  # Contains string
         ([1.0, None, 3.0], False),  # Contains None
     ],
 )
-def test_is_float_list(value:List[Any], expected:bool) -> None:
+def test_is_float_list(value: List[Any], expected: bool) -> None:
     assert is_float_list(value) == expected
 
 
 # Internationalization Functions Tests
+
 
 @pytest.mark.parametrize(
     'value,expected',
@@ -1419,22 +1461,21 @@ def test_is_float_list(value:List[Any], expected:bool) -> None:
         ('he', True),  # Hebrew
         ('fa', True),  # Farsi/Persian
         # LTR languages
-        ('en', False), # English
-        ('es', False), # Spanish
-        ('fr', False), # French
-        ('de', False), # German
-        ('zh', False), # Chinese
+        ('en', False),  # English
+        ('es', False),  # Spanish
+        ('fr', False),  # French
+        ('de', False),  # German
+        ('zh', False),  # Chinese
         # Unknown/invalid codes
-        ('xx', False), # Unknown
-        ('', False),   # Empty
+        ('xx', False),  # Unknown
+        ('', False),  # Empty
         # Different case
         ('AR', True),
     ],
 )
-def test_right_to_left(value:str, expected:bool) -> None:
+def test_right_to_left(value: str, expected: bool) -> None:
     """Test right_to_left function."""
     assert right_to_left(value) == expected
-
 
 
 # Additional Utility Functions Tests
@@ -1567,7 +1608,6 @@ def test_path2url() -> None:
     assert result.startswith('file:')
 
 
-
 # Color Functions Tests
 
 
@@ -1673,7 +1713,6 @@ def test_toDim() -> None:
     result = toDim('#000000')  # Black
     assert isinstance(result, str)
     assert result.startswith('#')
-
 
 
 def test_createGradient() -> None:

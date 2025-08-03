@@ -46,7 +46,6 @@ class SCALE_CLASS(IntEnum):
     MODERN = 2 # eg. Lunar 2021, Pearl, Pearl 2021, Pearl S, Cinco, Pyxis
         # report weight in unit indicated by byte 2 of STATUS_A message
     RELAY = 3  # relaying scales without display eg. Umbra, ..
-        # report weight always in g (big-endian!); byte 2 of STATUS_A message reports auto off timer; stable bit inverted
 
 @unique
 class UNIT(IntEnum):

@@ -189,8 +189,8 @@ class wsport:
                         self.aw.addserial('wsport markDROP signal sent')
                 if self.OFFonDROP and self.aw.qmc.flagstart:
                     # turn Recorder off after two sampling periods
-                    delay = self.aw.qmc.delay * 2 # we delay the turning OFF action by 2 sampling periods
-                    await asyncio.sleep(delay)
+#                    delay = (self.aw.qmc.delay * 2)/1000 # we delay the turning OFF action by 2 sampling periods
+#                    await asyncio.sleep(delay)
                     self.aw.qmc.toggleMonitorSignal.emit()
                     if self.aw.seriallogflag:
                         self.aw.addserial('wsport toggleMonitor signal sent')

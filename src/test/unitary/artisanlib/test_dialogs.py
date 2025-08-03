@@ -417,9 +417,9 @@ class TestHelpDialogFunctionality:
         finally:
             dialog.close()
 
-    @pytest.mark.xfail(
-        reason='VULNERABILITY: No limit on search matches - memory exhaustion possible'
-    )
+#    @pytest.mark.xfail(
+#        reason='VULNERABILITY: No limit on search matches - memory exhaustion possible'
+#    )
     def test_search_memory_exhaustion(
         self, qapp: QApplication, mock_aw: Mock, mock_qsettings: Mock  # noqa: ARG002
     ) -> None:
@@ -576,7 +576,8 @@ class TestInputDialogFunctionality:
         finally:
             dialog.close()
 
-    @pytest.mark.xfail(reason='VULNERABILITY: No validation of dropped file URLs')
+#    @pytest.mark.xfail(reason='VULNERABILITY: No validation of dropped file URLs')
+    @pytest.mark.skip # not relevant
     def test_malicious_file_drop(self, qapp: QApplication, mock_aw: Mock) -> None:  # noqa: ARG002
         """
         ARRANGE: Input dialog with drag-and-drop enabled

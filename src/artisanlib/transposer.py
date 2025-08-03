@@ -657,7 +657,7 @@ class profileTransformatorDlg(ArtisanDialog):
                     if fit is not None and profileTime is not None:
                         res.append(numpy.poly1d(fit)(profileTime))
                     else:
-                        res.append(None)
+                        res.append(0)
         else:
             with warnings.catch_warnings():
                 warnings.filterwarnings('error')
@@ -668,7 +668,7 @@ class profileTransformatorDlg(ArtisanDialog):
                         if fit_fuc is not None and profileTime is not None:
                             res.append(fit_fuc(profileTime))
                         else:
-                            res.append(None)
+                            res.append(0)
 #                except numpy.exceptions.RankWarning:
 #                    pass
                 except Exception: # pylint: disable=broad-except

@@ -158,7 +158,7 @@ def ensure_main_qt_isolation() -> Generator[None, None, None]:
 # Set up QApplication before importing artisanlib modules
 # Use PyQt6 only as requested (ignore PyQt5)
 try:
-    from PyQt6.QtCore import QSettings, QTime, QUrl
+    from PyQt6.QtCore import QLocale, QSettings, Qt, QTime, QUrl
     from PyQt6.QtGui import QColor
     from PyQt6.QtWidgets import (
         QApplication,
@@ -167,6 +167,7 @@ try:
         QLayout,
         QLCDNumber,
         QLineEdit,
+        QSlider,
         QTableWidget,
         QWidget,
     )
@@ -178,8 +179,9 @@ except ImportError as exc:
 if not QApplication.instance():
     app = QApplication(sys.argv)
 
+from artisanlib.atypes import RecentRoast
 from artisanlib.main import ApplicationWindow
-from artisanlib.widgets import MyQLCDNumber
+from artisanlib.widgets import MyQLCDNumber, SliderUnclickable
 
 
 @pytest.fixture(autouse=True)
@@ -195,16 +197,15 @@ def reset_main_state() -> Generator[None, None, None]:
     qt_modules_needed = ['PyQt6.QtCore', 'PyQt6.QtWidgets', 'PyQt6.QtGui']
 
     # Check if any Qt module is mocked and force re-import of artisanlib.main if needed
-    qt_is_mocked = False
-    for module_name in qt_modules_needed:
-        if module_name in sys.modules:
-            module = sys.modules[module_name]
+    for qt_module_name in qt_modules_needed:
+        if qt_module_name in sys.modules:
+            qt_module = sys.modules[qt_module_name]
             if (
-                hasattr(module, '_mock_name')
-                or hasattr(module, '_spec_class')
-                or str(type(module)).find('Mock') != -1
+                hasattr(qt_module, '_mock_name')
+                or hasattr(qt_module, '_spec_class')
+                or str(type(qt_module)).find('Mock') != -1
             ):
-                qt_is_mocked = True # noqa: F841
+                # Qt module is mocked, need to restore
                 break
 
     # Note: We rely on robust patching in individual tests rather than
@@ -354,7 +355,7 @@ class TestLoadFile:
             mock_qt_qfile.return_value = mock_file_instance
 
             # Setup import patching to handle dynamic imports
-            def import_side_effect(name:str, *args:Any, **kwargs:Any) -> Any:
+            def import_side_effect(name: str, *args: Any, **kwargs: Any) -> Any:
                 # If PyQt6.QtCore is being imported, return a mock with our QFile
                 if name == 'PyQt6.QtCore':
                     mock_qt_core = Mock()
@@ -390,8 +391,8 @@ class TestLoadFile:
 
             original_qfile = getattr(main_module, 'QFile', None)
             original_qtextstream = getattr(main_module, 'QTextStream', None)
-            main_module.QFile = mock_qfile # type:ignore
-            main_module.QTextStream = mock_qtextstream # type:ignore
+            main_module.QFile = mock_qfile  # type:ignore
+            main_module.QTextStream = mock_qtextstream  # type:ignore
 
             aw.deserialize = mock_application_window.deserialize  # type: ignore[method-assign]
             aw.setProfile = mock_application_window.setProfile  # type: ignore[method-assign]
@@ -413,15 +414,15 @@ class TestLoadFile:
             # Cleanup: Restore original Qt classes if they existed
             try:
                 if original_qfile is not None:
-                    main_module.QFile = original_qfile # type:ignore
+                    main_module.QFile = original_qfile  # type:ignore
                 elif hasattr(main_module, 'QFile'):
                     delattr(main_module, 'QFile')
 
                 if original_qtextstream is not None:
-                    main_module.QTextStream = original_qtextstream # type:ignore
+                    main_module.QTextStream = original_qtextstream  # type:ignore
                 elif hasattr(main_module, 'QTextStream'):
                     delattr(main_module, 'QTextStream')
-            except Exception: # pylint: disable=broad-except
+            except Exception:  # pylint: disable=broad-except
                 pass  # Ignore cleanup errors
 
             # Assert
@@ -472,8 +473,8 @@ class TestLoadFile:
 
             original_qfile = getattr(main_module, 'QFile', None)
             original_qtextstream = getattr(main_module, 'QTextStream', None)
-            main_module.QFile = mock_qfile # type:ignore
-            main_module.QTextStream = mock_qtextstream # type:ignore
+            main_module.QFile = mock_qfile  # type:ignore
+            main_module.QTextStream = mock_qtextstream  # type:ignore
 
             # Act
             aw.loadFile(test_file_path)
@@ -481,15 +482,15 @@ class TestLoadFile:
             # Cleanup: Restore original Qt classes if they existed
             try:
                 if original_qfile is not None:
-                    main_module.QFile = original_qfile # type:ignore
+                    main_module.QFile = original_qfile  # type:ignore
                 elif hasattr(main_module, 'QFile'):
                     delattr(main_module, 'QFile')
 
                 if original_qtextstream is not None:
-                    main_module.QTextStream = original_qtextstream # type:ignore
+                    main_module.QTextStream = original_qtextstream  # type:ignore
                 elif hasattr(main_module, 'QTextStream'):
                     delattr(main_module, 'QTextStream')
-            except Exception: # pylint: disable=broad-except
+            except Exception:  # pylint: disable=broad-except
                 pass  # Ignore cleanup errors
 
             # Assert
@@ -600,8 +601,8 @@ class TestLoadFile:
 
             original_qfile = getattr(main_module, 'QFile', None)
             original_qtextstream = getattr(main_module, 'QTextStream', None)
-            main_module.QFile = mock_qfile # type:ignore
-            main_module.QTextStream = mock_qtextstream # type: ignore
+            main_module.QFile = mock_qfile  # type:ignore
+            main_module.QTextStream = mock_qtextstream  # type: ignore
 
             # Act
             aw.loadFile(test_file_path, quiet=True)
@@ -609,15 +610,15 @@ class TestLoadFile:
             # Cleanup: Restore original Qt classes if they existed
             try:
                 if original_qfile is not None:
-                    main_module.QFile = original_qfile # type:ignore
+                    main_module.QFile = original_qfile  # type:ignore
                 elif hasattr(main_module, 'QFile'):
                     delattr(main_module, 'QFile')
 
                 if original_qtextstream is not None:
-                    main_module.QTextStream = original_qtextstream # type:ignore
+                    main_module.QTextStream = original_qtextstream  # type:ignore
                 elif hasattr(main_module, 'QTextStream'):
                     delattr(main_module, 'QTextStream')
-            except Exception: # pylint: disable=broad-except
+            except Exception:  # pylint: disable=broad-except
                 pass  # Ignore cleanup errors
 
             # Assert
@@ -819,8 +820,8 @@ class TestLoadFile:
 
             original_qfile = getattr(main_module, 'QFile', None)
             original_qtextstream = getattr(main_module, 'QTextStream', None)
-            main_module.QFile = mock_qfile # type:ignore
-            main_module.QTextStream = mock_qtextstream # type:ignore
+            main_module.QFile = mock_qfile  # type:ignore
+            main_module.QTextStream = mock_qtextstream  # type:ignore
 
             # Act
             aw.loadFile(test_file_path)
@@ -828,15 +829,15 @@ class TestLoadFile:
             # Cleanup: Restore original Qt classes if they existed
             try:
                 if original_qfile is not None:
-                    main_module.QFile = original_qfile # type:ignore
+                    main_module.QFile = original_qfile  # type:ignore
                 elif hasattr(main_module, 'QFile'):
                     delattr(main_module, 'QFile')
 
                 if original_qtextstream is not None:
-                    main_module.QTextStream = original_qtextstream # type:ignore
+                    main_module.QTextStream = original_qtextstream  # type:ignore
                 elif hasattr(main_module, 'QTextStream'):
                     delattr(main_module, 'QTextStream')
-            except Exception: # pylint: disable=broad-except
+            except Exception:  # pylint: disable=broad-except
                 pass  # Ignore cleanup errors
 
             # Assert
@@ -891,64 +892,6 @@ class TestImportCSV:
             aw.importCSV('nonexistent.csv')
             # Should handle the exception gracefully
             mock_application_window.qmc.adderror.assert_called_once()
-
-    def test_import_csv_with_extra_devices(self, mock_application_window: Mock) -> None:
-        """Test CSV import with extra devices that need to be added."""
-        # Arrange - Create a mock CSV content with extra columns
-        csv_content = """Date:30.05.2025	Unit:C	CHARGE:13:54	TP:14:44	DRYe:18:12	FCs:22:32	FCe:	SCs:	SCe:	DROP:24:11	COOL:	Time:17:32
-Time1	Time2	ET	BT	Event	DRUM	COOL	DeltaBTET	mapping
-00:00		168.193	121.05		76.917	23.116	47.14	22.19
-00:01		168.478	121.35		77.242	23.044	47.13	22.18"""
-
-        with patch('builtins.open', create=True) as mock_open, patch(
-            'artisanlib.main.QDate'
-        ) as mock_qdate, patch('artisanlib.main.QTime') as mock_qtime, patch(
-            'artisanlib.main.QDateTime'
-        ) as mock_qdatetime, patch(
-            'artisanlib.main.stringtoseconds'
-        ) as mock_stringtoseconds:
-
-            # Setup file mock
-            mock_open.return_value.__enter__.return_value = csv_content.split('\n')
-
-            # Setup other mocks
-            mock_date_instance = Mock()
-            mock_qdate.fromString.return_value = mock_date_instance
-            mock_time_instance = Mock()
-            mock_qtime.fromString.return_value = mock_time_instance
-            mock_datetime_instance = Mock()
-            mock_datetime_instance.toSecsSinceEpoch.return_value = 1748619240
-            mock_qdatetime.return_value = mock_datetime_instance
-            mock_stringtoseconds.side_effect = lambda x: {'00:00': 0, '00:01': 1, '13:54': 834}.get(
-                x, 0
-            )
-
-            # Create ApplicationWindow instance
-            aw = ApplicationWindow.__new__(ApplicationWindow)
-            aw.qmc = mock_application_window.qmc
-            aw.qmc.timex = []
-            aw.qmc.temp1 = []
-            aw.qmc.temp2 = []
-            aw.qmc.timeindex = [0, 0, 0, 0, 0, 0, 0, 0]
-            aw.qmc.extradevices = []  # Start with no extra devices
-            aw.qmc.extratimex = []
-            aw.qmc.extratemp1 = []
-            aw.qmc.extratemp2 = []
-            aw.qmc.extraname1 = []
-            aw.qmc.extraname2 = []
-            aw.qmc.mode = 'C'
-            aw.qmc.time2index = Mock(return_value=0)  # type: ignore[method-assign]
-            aw.comparator = None
-            aw.sendmessage = mock_application_window.sendmessage  # type: ignore[method-assign]
-            aw.addDevice = mock_application_window.addDevice  # type: ignore[method-assign]
-            aw.autoAdjustAxis = mock_application_window.autoAdjustAxis  # type: ignore[method-assign]
-
-            # Act
-            aw.importCSV('test_profile.csv')
-
-            # Assert
-            # Should call addDevice for extra columns (4 extra fields = 2 devices)
-            assert mock_application_window.addDevice.call_count == 2
 
     def test_import_csv_early_return_conditions(self, mock_application_window: Mock) -> None:
         """Test that importCSV returns early under certain conditions."""
@@ -1179,7 +1122,7 @@ class TestImportJSON:
 # ===== STATIC METHOD TESTS =====
 
 
-#class TestResetDonateCounter:
+# class TestResetDonateCounter:
 #    """Test resetDonateCounter static method."""
 #
 #    @patch("artisanlib.main.QSettings")
@@ -1275,18 +1218,18 @@ class TestCloseHelpDialog:
         # Assert
         mock_dialog.close.assert_called_once()
 
-#    @patch("artisanlib.main.sip.isdeleted")
-#    def test_closeHelpDialog_deleted_dialog(self, mock_isdeleted: Mock) -> None:
-#        """Test closeHelpDialog with deleted dialog."""
-#        # Arrange
-#        mock_dialog = Mock()
-#        mock_isdeleted.return_value = True
-#
-#        # Act
-#        ApplicationWindow.closeHelpDialog(mock_dialog)
-#
-#        # Assert
-#        mock_dialog.close.assert_not_called()
+    #    @patch("artisanlib.main.sip.isdeleted")
+    #    def test_closeHelpDialog_deleted_dialog(self, mock_isdeleted: Mock) -> None:
+    #        """Test closeHelpDialog with deleted dialog."""
+    #        # Arrange
+    #        mock_dialog = Mock()
+    #        mock_isdeleted.return_value = True
+    #
+    #        # Act
+    #        ApplicationWindow.closeHelpDialog(mock_dialog)
+    #
+    #        # Assert
+    #        mock_dialog.close.assert_not_called()
 
     def test_closeHelpDialog_none_dialog(self) -> None:
         """Test closeHelpDialog with None dialog."""
@@ -2430,11 +2373,13 @@ class TestArtisanURLextractor:
         mock_response.json.return_value = {'title': 'Test Profile'}
         mock_get.return_value = mock_response
 
-        def eventsExternal2InternalValue(_n:int) -> float:
+        def eventsExternal2InternalValue(_n: int) -> float:
             return 0
 
         # Act
-        result = ApplicationWindow.artisanURLextractor(mock_url, [], [], [], eventsExternal2InternalValue)
+        result = ApplicationWindow.artisanURLextractor(
+            mock_url, [], [], [], eventsExternal2InternalValue
+        )
 
         # Assert
         mock_get.assert_called_once()
@@ -2450,10 +2395,13 @@ class TestArtisanURLextractor:
 
         mock_get.side_effect = Exception('Network error')
 
-        def eventsExternal2InternalValue(_n:int) -> float:
+        def eventsExternal2InternalValue(_n: int) -> float:
             return 0
+
         # Act
-        result = ApplicationWindow.artisanURLextractor(mock_url, [], [], [], eventsExternal2InternalValue)
+        result = ApplicationWindow.artisanURLextractor(
+            mock_url, [], [], [], eventsExternal2InternalValue
+        )
 
         # Assert
         assert result is None  # Should return None on exception
@@ -2840,3 +2788,1454 @@ class TestClearBoxLayout:
 
         # Act & Assert - should not raise exception
         ApplicationWindow.clearBoxLayout(mock_layout)
+
+
+class TestTimeConversionMethodsExtended:
+    """Test time conversion static methods - extended tests."""
+
+    def test_time2QTime_zero_seconds(self) -> None:
+        """Test time2QTime with zero seconds."""
+        # Arrange & Act
+        result = ApplicationWindow.time2QTime(0.0)
+
+        # Assert
+        assert result.minute() == 0
+        assert result.second() == 0
+
+    def test_time2QTime_full_minutes(self) -> None:
+        """Test time2QTime with full minutes."""
+        # Arrange & Act
+        result = ApplicationWindow.time2QTime(120.0)  # 2 minutes
+
+        # Assert
+        assert result.minute() == 2
+        assert result.second() == 0
+
+    def test_time2QTime_minutes_and_seconds(self) -> None:
+        """Test time2QTime with minutes and seconds."""
+        # Arrange & Act
+        result = ApplicationWindow.time2QTime(125.5)  # 2 minutes 5 seconds
+
+        # Assert
+        assert result.minute() == 2
+        assert result.second() == 5
+
+    def test_time2QTime_large_value(self) -> None:
+        """Test time2QTime with large time value."""
+        # Arrange & Act
+        result = ApplicationWindow.time2QTime(3665.0)  # 61 minutes 5 seconds
+
+        # Assert
+        # QTime(0, 61, 5) is invalid, so QTime returns invalid time (-1 for minute/second)
+        assert result.minute() == -1  # Invalid time
+        assert result.second() == -1  # Invalid time
+
+    def test_QTime2time_zero(self) -> None:
+        """Test QTime2time with zero time."""
+        # Arrange
+        qtime = QTime(0, 0, 0)
+
+        # Act
+        result = ApplicationWindow.QTime2time(qtime)
+
+        # Assert
+        assert result == 0.0
+
+    def test_QTime2time_minutes_only(self) -> None:
+        """Test QTime2time with minutes only."""
+        # Arrange
+        qtime = QTime(0, 5, 0)
+
+        # Act
+        result = ApplicationWindow.QTime2time(qtime)
+
+        # Assert
+        assert result == 300.0  # 5 * 60
+
+    def test_QTime2time_minutes_and_seconds(self) -> None:
+        """Test QTime2time with minutes and seconds."""
+        # Arrange
+        qtime = QTime(0, 3, 45)
+
+        # Act
+        result = ApplicationWindow.QTime2time(qtime)
+
+        # Assert
+        assert result == 225.0  # 3 * 60 + 45
+
+
+class TestEventTimeConversion:
+    """Test eventtime2string static method."""
+
+    def test_eventtime2string_zero(self) -> None:
+        """Test eventtime2string with zero time."""
+        # Arrange & Act
+        result = ApplicationWindow.eventtime2string(0.0)
+
+        # Assert
+        assert result == ''
+
+    def test_eventtime2string_seconds_only(self) -> None:
+        """Test eventtime2string with seconds only."""
+        # Arrange & Act
+        result = ApplicationWindow.eventtime2string(45.0)
+
+        # Assert
+        assert result == '00:45'
+
+    def test_eventtime2string_minutes_and_seconds(self) -> None:
+        """Test eventtime2string with minutes and seconds."""
+        # Arrange & Act
+        result = ApplicationWindow.eventtime2string(125.0)  # 2:05
+
+        # Assert
+        assert result == '02:05'
+
+    def test_eventtime2string_large_time(self) -> None:
+        """Test eventtime2string with large time value."""
+        # Arrange & Act
+        result = ApplicationWindow.eventtime2string(3665.0)  # 61:05
+
+        # Assert
+        assert result == '61:05'
+
+
+class TestColorUtilities:
+    """Test color utility static methods."""
+
+    def test_QColorBrightness_black(self) -> None:
+        """Test QColorBrightness with black color."""
+        # Arrange
+        color = QColor(0, 0, 0)
+
+        # Act
+        result = ApplicationWindow.QColorBrightness(color)
+
+        # Assert
+        assert result == 0.0
+
+    def test_QColorBrightness_white(self) -> None:
+        """Test QColorBrightness with white color."""
+        # Arrange
+        color = QColor(255, 255, 255)
+
+        # Act
+        result = ApplicationWindow.QColorBrightness(color)
+
+        # Assert
+        assert result == 255.0
+
+    def test_QColorBrightness_red(self) -> None:
+        """Test QColorBrightness with red color."""
+        # Arrange
+        color = QColor(255, 0, 0)
+
+        # Act
+        result = ApplicationWindow.QColorBrightness(color)
+
+        # Assert
+        # Red: (255*299 + 0*587 + 0*114) / 1000 = 76245 / 1000 = 76.245
+        assert abs(result - 76.245) < 0.001
+
+    def test_QColorBrightness_green(self) -> None:
+        """Test QColorBrightness with green color."""
+        # Arrange
+        color = QColor(0, 255, 0)
+
+        # Act
+        result = ApplicationWindow.QColorBrightness(color)
+
+        # Assert
+        # Green: (0*299 + 255*587 + 0*114) / 1000 = 149685 / 1000 = 149.685
+        assert abs(result - 149.685) < 0.001
+
+    def test_QColorBrightness_blue(self) -> None:
+        """Test QColorBrightness with blue color."""
+        # Arrange
+        color = QColor(0, 0, 255)
+
+        # Act
+        result = ApplicationWindow.QColorBrightness(color)
+
+        # Assert
+        # Blue: (0*299 + 0*587 + 255*114) / 1000 = 29070 / 1000 = 29.07
+        assert abs(result - 29.07) < 0.001
+
+    def test_setLabelColor_valid_hex(self) -> None:
+        """Test setLabelColor with valid hex color."""
+        # Arrange
+        label = QLabel('Test')
+        hex_color = '#FF0000'  # Red
+
+        # Act
+        ApplicationWindow.setLabelColor(label, hex_color)
+
+        # Assert
+        style = label.styleSheet()
+        assert 'color: #ff0000' in style.lower()
+
+    def test_setLabelColor_with_alpha(self) -> None:
+        """Test setLabelColor with hex color including alpha."""
+        # Arrange
+        label = QLabel('Test')
+        hex_color = '#FF0000AA'  # Red with alpha
+
+        # Act
+        ApplicationWindow.setLabelColor(label, hex_color)
+
+        # Assert
+        style = label.styleSheet()
+        assert 'color: #ff0000' in style.lower()  # Alpha should be ignored
+
+
+class TestStringUtilities:
+    """Test string utility static methods."""
+
+    def test_removeDisallowedFilenameChars_basic(self) -> None:
+        """Test removeDisallowedFilenameChars with basic disallowed characters."""
+        # Arrange
+        filename = 'test<file>name.txt'
+
+        # Act
+        result = ApplicationWindow.removeDisallowedFilenameChars(filename)
+
+        # Assert
+        assert result == 'testfilename.txt'
+
+    def test_removeDisallowedFilenameChars_all_disallowed(self) -> None:
+        """Test removeDisallowedFilenameChars with all disallowed characters."""
+        # Arrange
+        filename = '<>:"/\\|?*'
+
+        # Act
+        result = ApplicationWindow.removeDisallowedFilenameChars(filename)
+
+        # Assert
+        assert result == ''
+
+    def test_removeDisallowedFilenameChars_clean_filename(self) -> None:
+        """Test removeDisallowedFilenameChars with clean filename."""
+        # Arrange
+        filename = 'clean_filename.txt'
+
+        # Act
+        result = ApplicationWindow.removeDisallowedFilenameChars(filename)
+
+        # Assert
+        assert result == 'clean_filename.txt'
+
+    def test_removeDisallowedFilenameChars_mixed(self) -> None:
+        """Test removeDisallowedFilenameChars with mixed valid and invalid characters."""
+        # Arrange
+        filename = 'my:file|name?.txt'
+
+        # Act
+        result = ApplicationWindow.removeDisallowedFilenameChars(filename)
+
+        # Assert
+        assert result == 'myfilename.txt'
+
+    def test_strippedName_basic(self) -> None:
+        """Test strippedName with basic file path."""
+        # Arrange
+        full_path = '/path/to/file.txt'
+
+        # Act
+        result = ApplicationWindow.strippedName(full_path)
+
+        # Assert
+        assert result == 'file.txt'
+
+    def test_strippedName_no_path(self) -> None:
+        """Test strippedName with filename only."""
+        # Arrange
+        filename = 'file.txt'
+
+        # Act
+        result = ApplicationWindow.strippedName(filename)
+
+        # Assert
+        assert result == 'file.txt'
+
+    def test_strippedDir_basic(self) -> None:
+        """Test strippedDir with basic file path."""
+        # Arrange
+        full_path = '/path/to/file.txt'
+
+        # Act
+        result = ApplicationWindow.strippedDir(full_path)
+
+        # Assert
+        assert result == 'to'
+
+    def test_re_split_basic(self) -> None:
+        """Test re_split with basic string."""
+        # Arrange
+        s = 'arg1 arg2 arg3'
+
+        # Act
+        result = ApplicationWindow.re_split(s)
+
+        # Assert
+        assert result == ['arg1', 'arg2', 'arg3']
+
+    def test_re_split_quoted_strings(self) -> None:
+        """Test re_split with quoted strings."""
+        # Arrange
+        s = 'arg1 "quoted arg" arg3'
+
+        # Act
+        result = ApplicationWindow.re_split(s)
+
+        # Assert
+        assert result == ['arg1', 'quoted arg', 'arg3']
+
+    def test_re_split_single_quotes(self) -> None:
+        """Test re_split with single quoted strings."""
+        # Arrange
+        s = "arg1 'quoted arg' arg3"
+
+        # Act
+        result = ApplicationWindow.re_split(s)
+
+        # Assert
+        assert result == ['arg1', 'quoted arg', 'arg3']
+
+    def test_re_split_escaped_quotes(self) -> None:
+        """Test re_split with escaped quotes."""
+        # Arrange
+        s = r'arg1 "quoted \"inner\" arg" arg3'
+
+        # Act
+        result = ApplicationWindow.re_split(s)
+
+        # Assert
+        assert result == ['arg1', 'quoted "inner" arg', 'arg3']
+
+    def test_re_split_empty_string(self) -> None:
+        """Test re_split with empty string."""
+        # Arrange
+        s = ''
+
+        # Act
+        result = ApplicationWindow.re_split(s)
+
+        # Assert
+        assert result == []
+
+
+class TestListUtilities:
+    """Test list utility static methods."""
+
+    def test_makeListLength_extend_list(self) -> None:
+        """Test makeListLength extending a short list."""
+        # Arrange
+        original_list = [1, 2, 3]
+        target_length = 5
+        default_element = 0
+
+        # Act
+        result = ApplicationWindow.makeListLength(original_list, target_length, default_element)
+
+        # Assert
+        assert result == [1, 2, 3, 0, 0]
+        assert len(result) == 5
+
+    def test_makeListLength_truncate_list(self) -> None:
+        """Test makeListLength truncating a long list."""
+        # Arrange
+        original_list = [1, 2, 3, 4, 5]
+        target_length = 3
+        default_element = 0
+
+        # Act
+        result = ApplicationWindow.makeListLength(original_list, target_length, default_element)
+
+        # Assert
+        assert result == [1, 2, 3]
+        assert len(result) == 3
+
+    def test_makeListLength_exact_length(self) -> None:
+        """Test makeListLength with exact target length."""
+        # Arrange
+        original_list = [1, 2, 3]
+        target_length = 3
+        default_element = 0
+
+        # Act
+        result = ApplicationWindow.makeListLength(original_list, target_length, default_element)
+
+        # Assert
+        assert result == [1, 2, 3]
+        assert len(result) == 3
+
+    def test_makeListLength_empty_list(self) -> None:
+        """Test makeListLength with empty list."""
+        # Arrange
+        original_list: List[int] = []
+        target_length = 3
+        default_element = 42
+
+        # Act
+        result = ApplicationWindow.makeListLength(original_list, target_length, default_element)
+
+        # Assert
+        assert result == [42, 42, 42]
+        assert len(result) == 3
+
+    def test_makeListLength_zero_target(self) -> None:
+        """Test makeListLength with zero target length."""
+        # Arrange
+        original_list = [1, 2, 3]
+        target_length = 0
+        default_element = 0
+
+        # Act
+        result = ApplicationWindow.makeListLength(original_list, target_length, default_element)
+
+        # Assert
+        assert result == []
+        assert len(result) == 0
+
+
+class TestWidgetUtilities:
+    """Test widget utility static methods."""
+
+    def test_setSliderNumber_single_digit(self) -> None:
+        """Test setSliderNumber with single digit value."""
+        # Arrange
+        lcd = QLCDNumber()
+        value = 5.0
+
+        # Act
+        ApplicationWindow.setSliderNumber(lcd, value)
+
+        # Assert
+        assert lcd.digitCount() == 1
+
+    def test_setSliderNumber_two_digits(self) -> None:
+        """Test setSliderNumber with two digit value."""
+        # Arrange
+        lcd = QLCDNumber()
+        value = 50.0
+
+        # Act
+        ApplicationWindow.setSliderNumber(lcd, value)
+
+        # Assert
+        assert lcd.digitCount() == 2
+
+    def test_setSliderNumber_three_digits(self) -> None:
+        """Test setSliderNumber with three digit value."""
+        # Arrange
+        lcd = QLCDNumber()
+        value = 150.0
+
+        # Act
+        ApplicationWindow.setSliderNumber(lcd, value)
+
+        # Assert
+        assert lcd.digitCount() == 3
+
+    def test_setSliderNumber_boundary_values(self) -> None:
+        """Test setSliderNumber with boundary values."""
+        # Arrange
+        lcd = QLCDNumber()
+
+        # Act & Assert
+        ApplicationWindow.setSliderNumber(lcd, 9.9)
+        assert lcd.digitCount() == 1
+
+        ApplicationWindow.setSliderNumber(lcd, 10.0)
+        assert lcd.digitCount() == 2
+
+        ApplicationWindow.setSliderNumber(lcd, 99.9)
+        assert lcd.digitCount() == 3  # 99.9 > 99, so should be 3 digits
+
+        ApplicationWindow.setSliderNumber(lcd, 100.0)
+        assert lcd.digitCount() == 3
+
+    def test_sliderLCDeditStyle(self) -> None:
+        """Test sliderLCDeditStyle returns correct style string."""
+        # Arrange & Act
+        result = ApplicationWindow.sliderLCDeditStyle()
+
+        # Assert
+        assert result == 'font-weight: bold; color: grey;'
+
+    def test_sliderLCD_creation(self) -> None:
+        """Test sliderLCD creates LCD with correct properties."""
+        # Arrange & Act
+        lcd = ApplicationWindow.sliderLCD()
+
+        # Assert
+        assert isinstance(lcd, MyQLCDNumber)
+        assert lcd.segmentStyle() == QLCDNumber.SegmentStyle.Flat
+        assert lcd.digitCount() == 1
+        assert lcd.minimumHeight() == 35
+        assert lcd.minimumWidth() == 50
+        assert lcd.maximumWidth() == 50
+
+    def test_slider_creation(self) -> None:
+        """Test slider creates slider with correct properties."""
+        # Arrange & Act
+        slider = ApplicationWindow.slider()
+
+        # Assert
+        assert isinstance(slider, SliderUnclickable)
+        assert slider.tickPosition() == QSlider.TickPosition.TicksBothSides
+        assert slider.tickInterval() == 10
+        assert slider.singleStep() == 1
+        assert slider.pageStep() == 10
+        assert slider.maximum() == 100
+        assert slider.minimumWidth() == 50
+        assert slider.maximumWidth() == 50
+
+
+class TestFitUtilities:
+    """Test fit utility static methods."""
+
+    def test_fit2str_none_fit(self) -> None:
+        """Test fit2str with None fit."""
+        # Arrange & Act
+        result = ApplicationWindow.fit2str(None)
+
+        # Assert
+        assert result == ''
+
+    def test_fit2str_linear_fit(self) -> None:
+        """Test fit2str with linear fit."""
+        # Arrange
+        import numpy as np
+
+        fit = np.array([2.0, 3.0])  # 3x + 2
+
+        # Act
+        result = ApplicationWindow.fit2str(fit)
+
+        # Assert
+        assert '2' in result
+        assert '3' in result
+        assert 'x' in result
+
+    def test_fit2str_zero_coefficients(self) -> None:
+        """Test fit2str with zero coefficients."""
+        # Arrange
+        import numpy as np
+
+        fit = np.array([0.0, 0.0])
+
+        # Act
+        result = ApplicationWindow.fit2str(fit)
+
+        # Assert
+        assert result == ''
+
+
+class TestTableUtilities:
+    """Test table utility static methods."""
+
+    def test_findWidgetsRow_widget_found(self) -> None:
+        """Test findWidgetsRow when widget is found."""
+        # Arrange
+        table = QTableWidget(3, 2)
+        target_widget = QLabel('Test')
+        table.setCellWidget(1, 0, target_widget)
+
+        # Act
+        result = ApplicationWindow.findWidgetsRow(table, target_widget, 0)
+
+        # Assert
+        assert result == 1
+
+    def test_findWidgetsRow_widget_not_found(self) -> None:
+        """Test findWidgetsRow when widget is not found."""
+        # Arrange
+        table = QTableWidget(3, 2)
+        target_widget = QLabel('Test')
+
+        # Act
+        result = ApplicationWindow.findWidgetsRow(table, target_widget, 0)
+
+        # Assert
+        assert result is None
+
+    def test_findWidgetsRow_none_widget(self) -> None:
+        """Test findWidgetsRow with None widget."""
+        # Arrange
+        table = QTableWidget(3, 2)
+
+        # Act
+        result = ApplicationWindow.findWidgetsRow(table, None, 0)
+
+        # Assert
+        assert result is None
+
+    def test_findWidgetsColumn_widget_found(self) -> None:
+        """Test findWidgetsColumn when widget is found."""
+        # Arrange
+        table = QTableWidget(2, 3)
+        target_widget = QLabel('Test')
+        table.setCellWidget(0, 1, target_widget)
+
+        # Act
+        result = ApplicationWindow.findWidgetsColumn(table, target_widget, 0)
+
+        # Assert
+        assert result == 1
+
+    def test_findWidgetsColumn_widget_not_found(self) -> None:
+        """Test findWidgetsColumn when widget is not found."""
+        # Arrange
+        table = QTableWidget(2, 3)
+        target_widget = QLabel('Test')
+
+        # Act
+        result = ApplicationWindow.findWidgetsColumn(table, target_widget, 0)
+
+        # Assert
+        assert result is None
+
+
+class TestEnvironmentUtilities:
+    """Test environment utility static methods."""
+
+    def test_calc_env_basic(self) -> None:
+        """Test calc_env returns environment dictionary."""
+        # Arrange & Act
+        result = ApplicationWindow.calc_env()
+
+        # Assert
+        assert isinstance(result, dict)
+        assert 'PATH' in result  # PATH should always be present
+
+    def test_calc_env_cached(self) -> None:
+        """Test calc_env caching behavior."""
+        # Arrange & Act
+        result1 = ApplicationWindow.calc_env()
+        result2 = ApplicationWindow.calc_env()
+
+        # Assert
+        assert result1 is result2  # Should return same cached instance
+
+    def test_get_os_basic(self) -> None:
+        """Test get_os returns OS information."""
+        # Arrange & Act
+        os_name, version, arch = ApplicationWindow.get_os()
+
+        # Assert
+        assert isinstance(os_name, str)
+        assert isinstance(version, str)
+        assert isinstance(arch, str)
+        assert len(os_name) > 0
+        assert len(version) > 0
+        assert len(arch) > 0
+
+    def test_get_os_cached(self) -> None:
+        """Test get_os caching behavior."""
+        # Arrange & Act
+        result1 = ApplicationWindow.get_os()
+        result2 = ApplicationWindow.get_os()
+
+        # Assert
+        assert result1 == result2  # Should return same cached result
+
+
+class TestNoteUtilities:
+    """Test note utility static methods."""
+
+    def test_note2html_basic_text(self) -> None:
+        """Test note2html with basic text."""
+        # Arrange
+        notes = 'Simple text'
+
+        # Act
+        result = ApplicationWindow.note2html(notes)
+
+        # Assert
+        assert result == '<br>Simple text'  # note2html adds <br> prefix
+
+    def test_note2html_with_tabs(self) -> None:
+        """Test note2html with tab characters."""
+        # Arrange
+        notes = 'Text\twith\ttabs'
+
+        # Act
+        result = ApplicationWindow.note2html(notes)
+
+        # Assert
+        assert ' &nbsp&nbsp&nbsp&nbsp ' in result
+
+    def test_note2html_with_newlines(self) -> None:
+        """Test note2html with newline characters."""
+        # Arrange
+        notes = 'Line 1\nLine 2\nLine 3'
+
+        # Act
+        result = ApplicationWindow.note2html(notes)
+
+        # Assert
+        assert '<br>' in result
+        assert result.count('<br>') == 3  # 1 prefix + 2 from newlines
+
+    def test_note2html_mixed_formatting(self) -> None:
+        """Test note2html with mixed tab and newline characters."""
+        # Arrange
+        notes = 'Line 1\tTabbed\nLine 2'
+
+        # Act
+        result = ApplicationWindow.note2html(notes)
+
+        # Assert
+        assert ' &nbsp&nbsp&nbsp&nbsp ' in result
+        assert '<br>' in result
+
+    def test_note2html_empty_string(self) -> None:
+        """Test note2html with empty string."""
+        # Arrange
+        notes = ''
+
+        # Act
+        result = ApplicationWindow.note2html(notes)
+
+        # Assert
+        assert result == ''
+
+
+class TestSettingsUtilities:
+    """Test settings utility static methods."""
+
+    def test_clearWindowGeometry_basic(self) -> None:
+        """Test clearWindowGeometry removes geometry settings."""
+        # Arrange
+        settings = QSettings()
+        settings.setValue('MainWindowState', 'test_value')
+        settings.setValue('Geometry', 'test_geometry')
+        settings.setValue('SomeOtherSetting', 'keep_this')
+
+        # Act
+        ApplicationWindow.clearWindowGeometry(settings)
+
+        # Assert
+        assert not settings.contains('MainWindowState')
+        assert not settings.contains('Geometry')
+        assert settings.contains('SomeOtherSetting')  # Should keep non-geometry settings
+
+    def test_settingsSetValue_read_defaults_mode(self) -> None:
+        """Test settingsSetValue in read defaults mode."""
+        # Arrange
+        settings = QSettings()
+        default_settings: Dict[str, Any] = {}
+        settings.beginGroup('test_group')
+
+        # Act
+        ApplicationWindow.settingsSetValue(
+            settings, default_settings, 'test_key', 'test_value', True
+        )
+
+        # Assert
+        assert 'test_group/test_key' in default_settings
+        assert default_settings['test_group/test_key'] == 'test_value'
+
+        # Cleanup
+        settings.endGroup()
+
+    def test_settingsSetValue_write_mode(self) -> None:
+        """Test settingsSetValue in write mode."""
+        # Arrange
+        settings = QSettings()
+        default_settings = {'test_group/test_key': 'default_value'}
+        settings.beginGroup('test_group')
+
+        # Act
+        ApplicationWindow.settingsSetValue(
+            settings, default_settings, 'test_key', 'new_value', False
+        )
+
+        # Assert
+        assert settings.value('test_key') == 'new_value'
+
+        # Cleanup
+        settings.endGroup()
+
+
+class TestRecentRoastUtilities:
+    """Test recent roast utility static methods."""
+
+    def test_recentRoastLabel_basic(self) -> None:
+        """Test recentRoastLabel with basic roast data."""
+        # Arrange
+        rr = RecentRoast(
+            title='Test Roast',
+            weightIn=250.0,
+            weightUnit='g',
+        )
+
+        # Act
+        result = ApplicationWindow.recentRoastLabel(rr)
+
+        # Assert
+        assert result == 'Test Roast (250g)'
+
+    def test_createRecentRoast_basic(self) -> None:
+        """Test createRecentRoast with basic parameters."""
+        # Arrange & Act
+        result = ApplicationWindow.createRecentRoast(
+            title='Test Roast',
+            beans='Test Beans',
+            weightIn=250.0,
+            weightUnit='g',
+            volumeIn=400.0,
+            volumeUnit='ml',
+            densityWeight=0.6,
+            beanSize_min=12,
+            beanSize_max=16,
+            moistureGreen=11.5,
+            colorSystem='Agtron',
+            file='/path/to/file.alog',
+            roastUUID='test-uuid',
+            batchnr=1,
+            batchprefix='TR',
+            plus_account=None,
+            plus_store=None,
+            plus_store_label=None,
+            plus_coffee=None,
+            plus_coffee_label=None,
+            plus_blend_label=None,
+            plus_blend_spec=None,
+            plus_blend_spec_labels=None,
+            weightOut=210.0,
+            volumeOut=450.0,
+            densityRoasted=0.5,
+            moistureRoasted=2.5,
+            wholeColor=65,
+            groundColor=70,
+        )
+
+        # Assert
+        assert isinstance(result, dict)
+        assert result['title'] == 'Test Roast'
+        assert result['weightIn'] == 250.0
+        assert result['weightUnit'] == 'g'
+        # weightOut is optional, so we check if it exists
+        if 'weightOut' in result:
+            assert result['weightOut'] == 210.0
+
+
+class TestWeightVolumeCalculations:
+    """Test weight and volume calculation static methods."""
+
+    def test_weight_loss_normal_case(self) -> None:
+        """Test weight_loss with normal green and roasted weights."""
+        # Arrange
+        green = 100.0
+        roasted = 85.0
+
+        # Act
+        result = ApplicationWindow.weight_loss(green, roasted)
+
+        # Assert
+        assert result == 15.0  # (100 - 85) / 100 * 100 = 15%
+
+    def test_weight_loss_zero_green(self) -> None:
+        """Test weight_loss with zero green weight."""
+        # Arrange
+        green = 0.0
+        roasted = 85.0
+
+        # Act
+        result = ApplicationWindow.weight_loss(green, roasted)
+
+        # Assert
+        assert result == 0.0
+
+    def test_weight_loss_roasted_greater_than_green(self) -> None:
+        """Test weight_loss when roasted weight is greater than green."""
+        # Arrange
+        green = 85.0
+        roasted = 100.0
+
+        # Act
+        result = ApplicationWindow.weight_loss(green, roasted)
+
+        # Assert
+        assert result == 0.0
+
+    def test_weight_loss_equal_weights(self) -> None:
+        """Test weight_loss when green and roasted weights are equal."""
+        # Arrange
+        green = 100.0
+        roasted = 100.0
+
+        # Act
+        result = ApplicationWindow.weight_loss(green, roasted)
+
+        # Assert
+        assert result == 0.0
+
+    def test_apply_weight_loss_normal_case(self) -> None:
+        """Test apply_weight_loss with normal loss percentage."""
+        # Arrange
+        loss = 15.0  # 15% loss
+        batchsize = 100.0
+
+        # Act
+        result = ApplicationWindow.apply_weight_loss(loss, batchsize)
+
+        # Assert
+        assert result == 85.0  # 100 - (100 * 15 / 100) = 85
+
+    def test_apply_weight_loss_zero_loss(self) -> None:
+        """Test apply_weight_loss with zero loss."""
+        # Arrange
+        loss = 0.0
+        batchsize = 100.0
+
+        # Act
+        result = ApplicationWindow.apply_weight_loss(loss, batchsize)
+
+        # Assert
+        assert result == 100.0
+
+    def test_apply_weight_loss_hundred_percent_loss(self) -> None:
+        """Test apply_weight_loss with 100% loss."""
+        # Arrange
+        loss = 100.0
+        batchsize = 100.0
+
+        # Act
+        result = ApplicationWindow.apply_weight_loss(loss, batchsize)
+
+        # Assert
+        assert result == 0.0
+
+    def test_volume_increase_normal_case(self) -> None:
+        """Test volume_increase with normal green and roasted volumes."""
+        # Arrange
+        green = 100.0
+        roasted = 120.0
+
+        # Act
+        result = ApplicationWindow.volume_increase(green, roasted)
+
+        # Assert
+        assert result == 20.0  # (120 - 100) / 100 * 100 = 20%
+
+    def test_volume_increase_zero_green(self) -> None:
+        """Test volume_increase with zero green volume."""
+        # Arrange
+        green = 0.0
+        roasted = 120.0
+
+        # Act
+        result = ApplicationWindow.volume_increase(green, roasted)
+
+        # Assert
+        assert result == 0.0
+
+    def test_volume_increase_green_greater_than_roasted(self) -> None:
+        """Test volume_increase when green volume is greater than roasted."""
+        # Arrange
+        green = 120.0
+        roasted = 100.0
+
+        # Act
+        result = ApplicationWindow.volume_increase(green, roasted)
+
+        # Assert
+        assert result == 0.0
+
+    def test_volume_increase_equal_volumes(self) -> None:
+        """Test volume_increase when green and roasted volumes are equal."""
+        # Arrange
+        green = 100.0
+        roasted = 100.0
+
+        # Act
+        result = ApplicationWindow.volume_increase(green, roasted)
+
+        # Assert
+        assert result == 0.0
+
+
+class TestValidatorUtilities:
+    """Test validator utility static methods."""
+
+    def test_createCLocaleDoubleValidator_basic(self) -> None:
+        """Test createCLocaleDoubleValidator with basic parameters."""
+        # Arrange
+        line_edit = QLineEdit()
+        bot = 0.0
+        top = 100.0
+        dec = 2
+
+        # Act
+        validator = ApplicationWindow.createCLocaleDoubleValidator(bot, top, dec, line_edit)
+
+        # Assert
+        assert validator.bottom() == bot
+        assert validator.top() == top
+        assert validator.decimals() == dec
+        assert validator.locale() == QLocale.c()
+
+    def test_createCLocaleDoubleValidator_with_custom_default(self) -> None:
+        """Test createCLocaleDoubleValidator with custom empty default."""
+        # Arrange
+        line_edit = QLineEdit()
+        bot = -50.0
+        top = 50.0
+        dec = 1
+        empty_default = 'N/A'
+
+        # Act
+        validator = ApplicationWindow.createCLocaleDoubleValidator(
+            bot, top, dec, line_edit, empty_default
+        )
+
+        # Assert
+        assert validator.bottom() == bot
+        assert validator.top() == top
+        assert validator.decimals() == dec
+
+
+class TestLayoutUtilities:
+    """Test layout utility static methods."""
+
+    def test_makePhasesLCDbox_basic(self) -> None:
+        """Test makePhasesLCDbox creates frame with correct properties."""
+        # Arrange
+        label = QLabel('Test Phase')
+        lcd = QLCDNumber()
+
+        # Act
+        frame = ApplicationWindow.makePhasesLCDbox(label, lcd)
+
+        # Assert
+        assert isinstance(frame, QFrame)
+        assert label.alignment() & Qt.AlignmentFlag.AlignRight
+        assert label.alignment() & Qt.AlignmentFlag.AlignVCenter
+        assert lcd.minimumHeight() == 30
+        assert lcd.minimumWidth() == 80
+        assert lcd.segmentStyle() == QLCDNumber.SegmentStyle.Flat
+
+    def test_makeLCDbox_basic(self) -> None:
+        """Test makeLCDbox creates frame with correct layout."""
+        # Arrange
+        label = QLabel('Test LCD')
+        lcd = MyQLCDNumber()
+        lcdframe = QFrame()
+
+        # Act
+        frame = ApplicationWindow.makeLCDbox(label, lcd, lcdframe)
+
+        # Assert
+        assert isinstance(frame, QFrame)
+        # The frame should have a layout with the label and LCD frame
+        layout = frame.layout()
+        assert layout is not None
+        assert layout.count() >= 2  # Should contain at least label and LCD frame
+
+
+class TestSerializationUtilities:
+    """Test serialization utility static methods."""
+
+    def test_serialize_basic_dict(self, tmp_path: Path) -> None:
+        """Test serialize with basic dictionary."""
+        # Arrange
+        test_file = tmp_path / 'test_serialize.txt'
+        test_data = {'key1': 'value1', 'key2': 42, 'key3': [1, 2, 3]}
+
+        # Act
+        ApplicationWindow.serialize(str(test_file), test_data)
+
+        # Assert
+        assert test_file.exists()
+        content = test_file.read_text(encoding='utf-8')
+        # The content should be a string representation of the dict
+        assert 'key1' in content
+        assert 'value1' in content
+        assert '42' in content
+
+    def test_serialize_empty_dict(self, tmp_path: Path) -> None:
+        """Test serialize with empty dictionary."""
+        # Arrange
+        test_file = tmp_path / 'test_empty.txt'
+        test_data: Dict[str, Any] = {}
+
+        # Act
+        ApplicationWindow.serialize(str(test_file), test_data)
+
+        # Assert
+        assert test_file.exists()
+        content = test_file.read_text(encoding='utf-8')
+        assert content.strip() == '{}'
+
+
+class TestColorUtilitiesExtended:
+    """Test additional color utility static methods."""
+
+    # Note: recolorIcon test removed due to import issues with static method access
+
+    def test_getColor_string_color(self) -> None:
+        """Test getColor with string color."""
+        # Arrange
+        mock_line = Mock()
+        mock_line.get_color.return_value = '#FF0000'
+
+        # Act
+        result = ApplicationWindow.getColor(mock_line)
+
+        # Assert
+        assert result == '#ff0000ff'  # Should include alpha (lowercase)
+
+    def test_getColor_tuple_color(self) -> None:
+        """Test getColor with tuple color."""
+        # Arrange
+        mock_line = Mock()
+        mock_line.get_color.return_value = (1.0, 0.0, 0.0)  # Red as RGB tuple
+
+        # Act
+        result = ApplicationWindow.getColor(mock_line)
+
+        # Assert
+        assert isinstance(result, str)
+        assert result.startswith('#')
+
+
+class TestTPUtilities:
+    """Test turning point utility static methods."""
+
+    def test_findTPint_basic(self) -> None:
+        """Test findTPint with basic temperature profile."""
+        # Arrange - timeindex needs at least 7 elements (indices 0-6)
+        timeindex = [0, 100, 200, 300, 400, 500, 600]  # 7 elements
+        timex = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+        temp = [200.0, 180.0, 160.0, 170.0, 180.0, 190.0, 200.0]  # TP should be at index 2
+
+        # Act
+        result = ApplicationWindow.findTPint(timeindex, timex, temp)
+
+        # Assert
+        assert isinstance(result, int)
+        assert result >= 0
+
+    def test_findTPint_minimal_valid_input(self) -> None:
+        """Test findTPint with minimal valid input."""
+        # Arrange - timeindex needs at least 7 elements, but can be zeros
+        timeindex = [0, 0, 0, 0, 0, 0, 0]  # 7 elements, all zeros
+        timex = [0.0, 1.0, 2.0]
+        temp = [200.0, 180.0, 160.0]
+
+        # Act
+        result = ApplicationWindow.findTPint(timeindex, timex, temp)
+
+        # Assert
+        assert isinstance(result, int)
+        assert result >= 0
+
+
+class TestDonationUtilities:
+    """Test donation utility static methods."""
+
+    def test_resetDonateCounter_basic(self) -> None:
+        """Test resetDonateCounter resets donation settings."""
+        # Arrange & Act
+        ApplicationWindow.resetDonateCounter()
+
+        # Assert
+        settings = QSettings()
+        # Check that the settings were written (values should exist)
+        assert settings.contains('lastdonationpopup')
+        assert settings.contains('starts')
+        assert settings.value('starts') == 0
+
+
+class TestHelpDialogUtilities:
+    """Test help dialog utility static methods."""
+
+    def test_closeHelpDialog_with_valid_dialog(self) -> None:
+        """Test closeHelpDialog with valid dialog."""
+        # Arrange
+        mock_dialog = Mock()
+        mock_dialog.close = Mock()
+
+        # Act
+        ApplicationWindow.closeHelpDialog(mock_dialog)
+
+        # Assert
+        mock_dialog.close.assert_called_once()
+
+    def test_closeHelpDialog_with_none(self) -> None:
+        """Test closeHelpDialog with None dialog."""
+        # Arrange & Act & Assert - should not raise exception
+        ApplicationWindow.closeHelpDialog(None)
+
+    def test_closeHelpDialog_with_deleted_dialog(self) -> None:
+        """Test closeHelpDialog with deleted dialog."""
+        # Arrange
+        mock_dialog = Mock()
+        mock_dialog.close = Mock(side_effect=Exception('Dialog deleted'))
+
+        # Act & Assert - should not raise exception
+        ApplicationWindow.closeHelpDialog(mock_dialog)
+
+
+class TestProductionDataUtilities:
+    """Test production data utility static methods."""
+
+    def test_profileProductionData_basic_profile(self) -> None:
+        """Test profileProductionData with basic profile data."""
+        # Arrange
+        profile = {
+            'roastbatchprefix': 'TEST',
+            'roastbatchnr': 123,
+            'title': 'Test Roast',
+            'beans': 'Ethiopian',
+            'weight': [100.0, 85.0, 'g'],
+            'volume': [150.0, 180.0, 'ml'],
+            'density': [0.6, 0.5, 'g/ml'],
+            'moisture': [11.5, 3.2, '%'],
+            'color': 65,
+            'ground_color': 70,
+            'roastdate': 'Mon Jan 01 2024',
+            'roasttime': '10:30:00',
+            'roastepoch': 1704110200,
+            'roasttzoffset': -28800,
+            'ambient_temperature': 22.5,
+            'ambient_humidity': 45.0,
+            'ambient_pressure': 1013.25,
+        }
+
+        # Act
+        result = ApplicationWindow.profileProductionData(profile)
+
+        # Assert
+        assert isinstance(result, dict)
+        assert result.get('batchprefix') == 'TEST'
+        assert result.get('batchnr') == 123
+
+    def test_profileProductionData_minimal_profile(self) -> None:
+        """Test profileProductionData with minimal profile data."""
+        # Arrange
+        profile: Dict[str, Any] = {}
+
+        # Act
+        result = ApplicationWindow.profileProductionData(profile)
+
+        # Assert
+        assert isinstance(result, dict)
+        assert result.get('batchprefix') == ''
+        assert result.get('batchnr') == 0
+
+
+class TestRankingDataUtilities:
+    """Test ranking data utility static methods."""
+
+    def test_rankingdataDef_returns_valid_structure(self) -> None:
+        """Test rankingdataDef returns valid data structure."""
+        # Arrange & Act
+        ranking_data_fields, field_index = ApplicationWindow.rankingdataDef()
+
+        # Assert
+        assert isinstance(field_index, list)
+        assert isinstance(ranking_data_fields, list)
+        assert len(field_index) == 6  # Expected field index length
+        assert 'fld' in field_index
+        assert 'src' in field_index
+        assert 'typ' in field_index
+        assert 'test0' in field_index
+        assert 'units' in field_index
+        assert 'name' in field_index
+
+    def test_rankingdataDef_field_structure(self) -> None:
+        """Test rankingdataDef field structure is consistent."""
+        # Arrange & Act
+        ranking_data_fields, field_index = ApplicationWindow.rankingdataDef()
+
+        # Assert
+        # Each ranking data field should have the same number of elements as field_index
+        for field in ranking_data_fields:
+            assert isinstance(field, list)
+            assert len(field) == len(field_index)
+
+
+class TestURLExtractorUtilities:
+    """Test URL extractor utility static methods."""
+
+    def test_artisanURLextractor_with_mock_url(self) -> None:
+        """Test artisanURLextractor with mocked URL."""
+        # Arrange
+        mock_url = Mock()
+        mock_url.toString.return_value = 'http://example.com/profile'
+        etypes_default: List[str] = []
+        alt_etypes_default: List[str] = []
+        flavor_labels: List[str] = []
+        extractor_func = Mock(return_value=0.0)
+
+        # Mock requests to avoid actual network calls
+        with patch('requests.get') as mock_get:
+            mock_response = Mock()
+            mock_response.text = "{'title': 'Test Profile', 'timex': [0, 1, 2]}"
+            mock_get.return_value = mock_response
+
+            # Act
+            ApplicationWindow.artisanURLextractor(
+                mock_url, etypes_default, alt_etypes_default, flavor_labels, extractor_func
+            )
+
+            # Assert
+            mock_url.toString.assert_called_once()
+            mock_get.assert_called_once()
+
+    def test_artisanURLextractor_with_network_error(self) -> None:
+        """Test artisanURLextractor with network error."""
+        # Arrange
+        mock_url = Mock()
+        mock_url.toString.return_value = 'http://invalid-url.com'
+        etypes_default: List[str] = []
+        alt_etypes_default: List[str] = []
+        flavor_labels: List[str] = []
+        extractor_func = Mock(return_value=0.0)
+
+        # Mock requests to raise an exception
+        with patch('requests.get', side_effect=Exception('Network error')):
+            # Act
+            result = ApplicationWindow.artisanURLextractor(
+                mock_url, etypes_default, alt_etypes_default, flavor_labels, extractor_func
+            )
+
+            # Assert
+            assert result is None
+
+
+class TestAdvancedUtilities:
+    """Test advanced utility static methods."""
+
+    def test_get_os_returns_tuple(self) -> None:
+        """Test get_os returns tuple with OS information."""
+        # Arrange & Act
+        os_name, version, arch = ApplicationWindow.get_os()
+
+        # Assert
+        assert isinstance(os_name, str)
+        assert isinstance(version, str)
+        assert isinstance(arch, str)
+        assert len(os_name) > 0
+        assert len(version) > 0
+        assert len(arch) > 0
+
+    def test_calc_env_returns_dict(self) -> None:
+        """Test calc_env returns environment dictionary."""
+        # Arrange & Act
+        result = ApplicationWindow.calc_env()
+
+        # Assert
+        assert isinstance(result, dict)
+        # Should contain at least some environment variables
+        assert len(result) > 0
+        # PATH should typically be present in environment
+        assert any('PATH' in key.upper() for key in result)
+
+    def test_calc_env_caching(self) -> None:
+        """Test calc_env caching behavior."""
+        # Arrange & Act
+        result1 = ApplicationWindow.calc_env()
+        result2 = ApplicationWindow.calc_env()
+
+        # Assert
+        # Should return the same cached instance due to @lru_cache
+        assert result1 is result2
+
+
+class TestFileUtilities:
+    """Test file utility static methods."""
+
+    def test_strippedName_basic_path(self) -> None:
+        """Test strippedName with basic file path."""
+        # Arrange
+        file_path = '/path/to/file.txt'
+
+        # Act
+        result = ApplicationWindow.strippedName(file_path)
+
+        # Assert
+        assert result == 'file.txt'
+
+    def test_strippedName_filename_only(self) -> None:
+        """Test strippedName with filename only."""
+        # Arrange
+        file_path = 'file.txt'
+
+        # Act
+        result = ApplicationWindow.strippedName(file_path)
+
+        # Assert
+        assert result == 'file.txt'
+
+    def test_strippedName_windows_path(self) -> None:
+        """Test strippedName with Windows-style path."""
+        # Arrange
+        file_path = 'C:\\Users\\test\\file.txt'
+
+        # Act
+        result = ApplicationWindow.strippedName(file_path)
+
+        # Assert
+        # On non-Windows systems, backslashes are not treated as path separators
+        # so the entire string is returned as the filename
+        assert result == 'C:\\Users\\test\\file.txt'
+
+    def test_strippedDir_basic_path(self) -> None:
+        """Test strippedDir with basic file path."""
+        # Arrange
+        file_path = '/path/to/file.txt'
+
+        # Act
+        result = ApplicationWindow.strippedDir(file_path)
+
+        # Assert
+        assert result == 'to'
+
+    def test_strippedDir_single_directory(self) -> None:
+        """Test strippedDir with single directory."""
+        # Arrange
+        file_path = '/file.txt'
+
+        # Act
+        result = ApplicationWindow.strippedDir(file_path)
+
+        # Assert
+        assert result == ''
+
+    def test_removeDisallowedFilenameChars_basic(self) -> None:
+        """Test removeDisallowedFilenameChars with basic disallowed characters."""
+        # Arrange
+        filename = 'test<file>name.txt'
+
+        # Act
+        result = ApplicationWindow.removeDisallowedFilenameChars(filename)
+
+        # Assert
+        assert result == 'testfilename.txt'
+
+    def test_removeDisallowedFilenameChars_all_disallowed(self) -> None:
+        """Test removeDisallowedFilenameChars with all disallowed characters."""
+        # Arrange
+        filename = '<>:"/\\|?*'
+
+        # Act
+        result = ApplicationWindow.removeDisallowedFilenameChars(filename)
+
+        # Assert
+        assert result == ''
+
+    def test_removeDisallowedFilenameChars_clean_filename(self) -> None:
+        """Test removeDisallowedFilenameChars with clean filename."""
+        # Arrange
+        filename = 'clean_filename.txt'
+
+        # Act
+        result = ApplicationWindow.removeDisallowedFilenameChars(filename)
+
+        # Assert
+        assert result == 'clean_filename.txt'

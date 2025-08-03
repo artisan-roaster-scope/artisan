@@ -276,7 +276,7 @@ class HelpDlg(ArtisanDialog):
             cursor.movePosition(QTextCursor.MoveOperation.Start)
 
             # Collect all matches.
-            for _ in range(500000):  # arbitrarily large limit, better than while True, should always exit via break
+            for _ in range(1000):  # arbitrarily large limit, better than while True, should always exit via break
                 found = self.phelp.document().find(regex, cursor)  # type: ignore  #self.phelp.document() will never be None
                 if found.isNull():
                     break

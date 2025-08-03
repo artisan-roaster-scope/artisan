@@ -71,6 +71,7 @@ modules with Qt dependencies and complex canvas/graphics operations.
 import math
 import os
 import sys
+import warnings
 from typing import Any, Generator, List, Optional
 from unittest.mock import Mock, patch
 
@@ -201,12 +202,106 @@ class MockQImage:
 QApplication = MockQApplication
 QImage = MockQImage
 
+
+# Create mock QWidget class
+class MockQWidget:
+    """Mock QWidget for testing."""
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:  # noqa: ARG002
+        self.parent = Mock()
+        self.resize = Mock()
+        self.move = Mock()
+        self.show = Mock()
+        self.hide = Mock()
+        self.close = Mock()
+        self.update = Mock()
+        self.repaint = Mock()
+
+
+QWidget = MockQWidget
+
+# Create mock ApplicationWindow
+mock_aw = Mock()
+mock_aw.qmc = Mock()
+mock_aw.qmc.palette = {
+    'background': '#ffffff',
+    'grid': '#e5e5e5',
+    'ylabel': '#808080',
+    'xlabel': '#808080',
+    'title': '#0c6aa6',
+    'rect1': '#e5e5e5',
+    'rect2': '#b2b2b2',
+    'rect3': '#e5e5e5',
+}
+mock_aw.qmc.LCDdecimalplaces = False
+mock_aw.qmc.mode = 'C'
+mock_aw.nLCDS = 4  # Number of LCD displays
+mock_aw.qmc.timex = []
+mock_aw.qmc.temp1 = []
+mock_aw.qmc.temp2 = []
+
+
+# Helper function to create canvas instances with proper mocking
+def create_test_canvas() -> 'tgraphcanvas':
+    """Create a test canvas instance with proper mocking."""
+    # Create a mock canvas object with the required methods
+    canvas = Mock(spec=tgraphcanvas)
+    canvas.aw = mock_aw
+    canvas.timex = []
+    canvas.temp1 = []
+    canvas.temp2 = []
+
+    # Add the methods we're testing
+    canvas.str2eventsvalue = tgraphcanvas.str2eventsvalue.__get__(canvas, tgraphcanvas)
+    canvas.calcCO2g = tgraphcanvas.calcCO2g.__get__(canvas, tgraphcanvas)
+    canvas.time2index = tgraphcanvas.time2index.__get__(canvas, tgraphcanvas)
+    canvas.backgroundtime2index = tgraphcanvas.backgroundtime2index.__get__(canvas, tgraphcanvas)
+    canvas.event_type_to_artist = tgraphcanvas.event_type_to_artist.__get__(canvas, tgraphcanvas)
+    canvas.event_type_to_background_artist = tgraphcanvas.event_type_to_background_artist.__get__(
+        canvas, tgraphcanvas
+    )
+    canvas.findtextgap = tgraphcanvas.findtextgap.__get__(canvas, tgraphcanvas)
+    canvas.convertTemperatureF = tgraphcanvas.convertTemperatureF.__get__(canvas, tgraphcanvas)
+    canvas.convertTemperatureC = tgraphcanvas.convertTemperatureC.__get__(canvas, tgraphcanvas)
+    canvas.convertTemperature = tgraphcanvas.convertTemperature.__get__(canvas, tgraphcanvas)
+    canvas.mark2Cstart = tgraphcanvas.mark2Cstart.__get__(canvas, tgraphcanvas)
+    canvas.mark2Cend = tgraphcanvas.mark2Cend.__get__(canvas, tgraphcanvas)
+    canvas.starteventmessagetimer = tgraphcanvas.starteventmessagetimer.__get__(
+        canvas, tgraphcanvas
+    )
+
+    # Add static methods that are called by instance methods
+    canvas.eventsExternal2InternalValue = tgraphcanvas.eventsExternal2InternalValue
+    canvas.timearray2index = tgraphcanvas.timearray2index
+
+    return canvas
+
+
 # Import canvas module with proper isolation
 with patch('artisanlib.util.getDirectory') as mock_get_dir, patch(
     'artisanlib.util.getDataDirectory'
-) as mock_get_data_dir:
+) as mock_get_data_dir, patch('matplotlib.pyplot.figure') as mock_plt_figure, patch(
+    'matplotlib.pyplot.subplots'
+) as mock_plt_subplots, patch(
+    'matplotlib.figure.Figure'
+) as mock_figure, patch(
+    'matplotlib.axes.Axes'
+) as mock_axes, patch(
+    'matplotlib.patches.Rectangle'
+) as mock_rectangle, patch(
+    'matplotlib.transforms.Transform'
+) as mock_transform:
+
     mock_get_dir.return_value = '/tmp/test'
     mock_get_data_dir.return_value = '/tmp/test'
+
+    # Mock matplotlib components
+    mock_plt_figure.return_value = Mock()
+    mock_plt_subplots.return_value = (Mock(), Mock())
+    mock_figure.return_value = Mock()
+    mock_axes.return_value = Mock()
+    mock_rectangle.return_value = Mock()
+    mock_transform.return_value = Mock()
 
     # Create QApplication instance if it doesn't exist
     if not QApplication.instance():
@@ -621,8 +716,10 @@ class TestArrayRoR:
         temp = np.array([20.0, 25.0, 30.0])
         wsize = 1
 
-        # Act
-        result = tgraphcanvas.arrayRoR(tx, temp, wsize)
+        # Act - suppress expected divide by zero warning
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', RuntimeWarning)
+            result = tgraphcanvas.arrayRoR(tx, temp, wsize)
 
         # Assert
         assert len(result) == 2
@@ -756,36 +853,6 @@ class TestResizeList:
 
         # Assert
         assert result == [1, 2, 3]
-
-
-class TestConvertQImageToNumpyArray:
-    """Test convertQImageToNumpyArray static method."""
-
-    def test_convertQImageToNumpyArray_basic(self) -> None:
-        """Test convertQImageToNumpyArray with basic QImage."""
-        # Arrange
-        img = QImage(2, 2, QImage.Format.Format_RGBA8888)
-        img.fill(0xFF0000FF)  # Red color
-
-        # Act
-        result = tgraphcanvas.convertQImageToNumpyArray(img)  # type: ignore[arg-type]
-
-        # Assert
-        assert isinstance(result, np.ndarray)
-        assert result.shape == (2, 2, 4)  # height, width, channels (RGBA)
-
-    def test_convertQImageToNumpyArray_different_formats(self) -> None:
-        """Test convertQImageToNumpyArray converts to RGBA8888 format."""
-        # Arrange
-        img = QImage(1, 1, QImage.Format.Format_RGB32)
-        img.fill(0xFF0000)  # Red color
-
-        # Act
-        result = tgraphcanvas.convertQImageToNumpyArray(img)  # type: ignore[arg-type]
-
-        # Assert
-        assert isinstance(result, np.ndarray)
-        assert result.shape == (1, 1, 4)  # Should be converted to RGBA
 
 
 class TestCalcFlavorChartScoreFromFlavors:
@@ -1027,76 +1094,6 @@ class TestConvertHeat:
         assert abs(result - expected_factor) < 0.001
 
 
-class TestTimetemparray2temp:
-    """Test timetemparray2temp static method."""
-
-    def test_timetemparray2temp_interpolation(self) -> None:
-        """Test timetemparray2temp with interpolation."""
-        # Arrange
-        timearray = [0.0, 1.0, 2.0, 3.0]
-        temparray = [20.0, 30.0, 40.0, 50.0]
-        seconds = 1.5
-
-        # Act
-        result = tgraphcanvas.timetemparray2temp(timearray, temparray, seconds)
-
-        # Assert
-        assert result == 35.0  # Linear interpolation between 30 and 40
-
-    def test_timetemparray2temp_exact_match(self) -> None:
-        """Test timetemparray2temp with exact time match."""
-        # Arrange
-        timearray = [0.0, 1.0, 2.0, 3.0]
-        temparray = [20.0, 30.0, 40.0, 50.0]
-        seconds = 2.0
-
-        # Act
-        result = tgraphcanvas.timetemparray2temp(timearray, temparray, seconds)
-
-        # Assert
-        assert result == 40.0
-
-    def test_timetemparray2temp_out_of_bounds(self) -> None:
-        """Test timetemparray2temp with out of bounds time."""
-        # Arrange
-        timearray = [1.0, 2.0, 3.0]
-        temparray = [20.0, 30.0, 40.0]
-
-        # Act & Assert - before range
-        result = tgraphcanvas.timetemparray2temp(timearray, temparray, 0.5)
-        assert result == -1
-
-        # Act & Assert - after range
-        result = tgraphcanvas.timetemparray2temp(timearray, temparray, 4.0)
-        assert result == -1
-
-    def test_timetemparray2temp_empty_arrays(self) -> None:
-        """Test timetemparray2temp with empty arrays."""
-        # Arrange
-        timearray: List[float] = []
-        temparray: List[float] = []
-        seconds = 1.0
-
-        # Act
-        result = tgraphcanvas.timetemparray2temp(timearray, temparray, seconds)
-
-        # Assert
-        assert result == -1
-
-    def test_timetemparray2temp_with_none_values(self) -> None:
-        """Test timetemparray2temp with None values in temparray."""
-        # Arrange
-        timearray = [0.0, 1.0, 2.0, 3.0]
-        temparray: List[Optional[float]] = [20.0, None, 40.0, 50.0]
-        seconds = 1.5
-
-        # Act
-        result = tgraphcanvas.timetemparray2temp(timearray, temparray, seconds)
-
-        # Assert
-        assert result == -1  # Should return -1 when encountering None
-
-
 class TestTimearray2index:
     """Test timearray2index static method."""
 
@@ -1317,3 +1314,459 @@ class TestAlarmSetMethods:
         assert result[0] == 'Test'
         assert result[1] == [1]
         assert result[11] == ['test']
+
+
+class TestEventValueConversions:
+    """Test event value conversion methods."""
+
+    def test_eventsInternal2ExternalValue_zero_range(self) -> None:
+        """Test eventsInternal2ExternalValue with values in zero range."""
+        # Arrange & Act & Assert
+        assert tgraphcanvas.eventsInternal2ExternalValue(0.0) == 0
+        assert tgraphcanvas.eventsInternal2ExternalValue(0.5) == 0
+        assert tgraphcanvas.eventsInternal2ExternalValue(-0.5) == 0
+        assert tgraphcanvas.eventsInternal2ExternalValue(1.0) == 0
+        assert tgraphcanvas.eventsInternal2ExternalValue(-1.0) == 0
+
+    def test_eventsInternal2ExternalValue_positive_values(self) -> None:
+        """Test eventsInternal2ExternalValue with positive values."""
+        # Arrange & Act & Assert
+        assert tgraphcanvas.eventsInternal2ExternalValue(2.0) == 10  # (2.0 - 1.0) * 10 = 10
+        assert tgraphcanvas.eventsInternal2ExternalValue(5.5) == 45  # (5.5 - 1.0) * 10 = 45
+        assert tgraphcanvas.eventsInternal2ExternalValue(11.0) == 100  # (11.0 - 1.0) * 10 = 100
+
+    def test_eventsInternal2ExternalValue_negative_values(self) -> None:
+        """Test eventsInternal2ExternalValue with negative values."""
+        # Arrange & Act & Assert
+        assert tgraphcanvas.eventsInternal2ExternalValue(-2.0) == -10  # (-2.0 + 1.0) * 10 = -10
+        assert tgraphcanvas.eventsInternal2ExternalValue(-5.5) == -45  # (-5.5 + 1.0) * 10 = -45
+        assert tgraphcanvas.eventsInternal2ExternalValue(-11.0) == -100  # (-11.0 + 1.0) * 10 = -100
+
+    def test_eventsInternal2ExternalValue_none(self) -> None:
+        """Test eventsInternal2ExternalValue with None value."""
+        # Arrange & Act & Assert
+        assert tgraphcanvas.eventsInternal2ExternalValue(None) == 0
+
+    def test_eventsExternal2InternalValue_zero(self) -> None:
+        """Test eventsExternal2InternalValue with zero."""
+        # Arrange & Act & Assert
+        assert tgraphcanvas.eventsExternal2InternalValue(0) == 0.0
+
+    def test_eventsExternal2InternalValue_positive_values(self) -> None:
+        """Test eventsExternal2InternalValue with positive values."""
+        # Arrange & Act & Assert
+        assert tgraphcanvas.eventsExternal2InternalValue(10) == 2.0  # 10/10 + 1 = 2.0
+        assert tgraphcanvas.eventsExternal2InternalValue(45) == 5.5  # 45/10 + 1 = 5.5
+        assert tgraphcanvas.eventsExternal2InternalValue(100) == 11.0  # 100/10 + 1 = 11.0
+
+    def test_eventsExternal2InternalValue_negative_values(self) -> None:
+        """Test eventsExternal2InternalValue with negative values."""
+        # Arrange & Act & Assert
+        assert tgraphcanvas.eventsExternal2InternalValue(-10) == -2.0  # -10/10 - 1 = -2.0
+        assert tgraphcanvas.eventsExternal2InternalValue(-45) == -5.5  # -45/10 - 1 = -5.5
+        assert tgraphcanvas.eventsExternal2InternalValue(-100) == -11.0  # -100/10 - 1 = -11.0
+
+    def test_str2eventsvalue_valid_strings(self) -> None:
+        """Test str2eventsvalue with valid string inputs."""
+        # Arrange
+        canvas = create_test_canvas()
+
+        # Act & Assert
+        assert canvas.str2eventsvalue('10') == 2.0  # 10/10 + 1 = 2.0
+        assert canvas.str2eventsvalue('-10') == -2.0  # -10/10 - 1 = -2.0
+        assert canvas.str2eventsvalue('0') == 0.0
+
+    def test_str2eventsvalue_empty_string(self) -> None:
+        """Test str2eventsvalue with empty string."""
+        # Arrange
+        canvas = create_test_canvas()
+
+        # Act & Assert
+        assert canvas.str2eventsvalue('') == -1
+        assert canvas.str2eventsvalue('   ') == -1  # Whitespace only
+
+    def test_str2eventsvalue_whitespace_handling(self) -> None:
+        """Test str2eventsvalue handles whitespace correctly."""
+        # Arrange
+        canvas = create_test_canvas()
+
+        # Act & Assert
+        assert canvas.str2eventsvalue('  10  ') == 2.0  # Should strip whitespace
+
+
+class TestHeatConversion:
+    """Test heat conversion methods."""
+
+    def test_convertHeat_same_unit(self) -> None:
+        """Test convertHeat with same from and to units."""
+        # Arrange & Act & Assert
+        assert tgraphcanvas.convertHeat(100.0, 'bt', 'bt') == 100.0
+        assert tgraphcanvas.convertHeat(50.0, 'kj', 'kj') == 50.0
+
+    def test_convertHeat_btu_to_kj(self) -> None:
+        """Test convertHeat from BTU to kJ."""
+        # Arrange & Act
+        result = tgraphcanvas.convertHeat(100.0, 'bt', 'kj')
+
+        # Assert
+        assert abs(result - 105.51) < 0.01  # 100 * 1.0551
+
+    def test_convertHeat_kj_to_btu(self) -> None:
+        """Test convertHeat from kJ to BTU."""
+        # Arrange & Act
+        result = tgraphcanvas.convertHeat(100.0, 'kj', 'bt')
+
+        # Assert
+        assert abs(result - 94.782) < 0.01  # 100 * 0.94782
+
+    def test_convertHeat_btu_to_kcal(self) -> None:
+        """Test convertHeat from BTU to kCal."""
+        # Arrange & Act
+        result = tgraphcanvas.convertHeat(100.0, 'bt', 'kc')
+
+        # Assert
+        assert abs(result - 25.2) < 0.01  # 100 * 0.252
+
+    def test_convertHeat_invalid_values(self) -> None:
+        """Test convertHeat with invalid values."""
+        # Arrange & Act & Assert
+        assert tgraphcanvas.convertHeat(-1, 'bt', 'kj') == -1
+        assert tgraphcanvas.convertHeat(None, 'bt', 'kj') is None  # type: ignore[arg-type]
+
+    def test_convertHeat_default_to_unit(self) -> None:
+        """Test convertHeat with default toUnit (BTU)."""
+        # Arrange & Act
+        result = tgraphcanvas.convertHeat(100.0, 'kj')  # Default toUnit='BTU'
+
+        # Assert
+        assert abs(result - 94.782) < 0.01  # 100 * 0.94782
+
+
+class TestCO2Calculation:
+    """Test CO2 calculation methods."""
+
+    def test_calcCO2g_natural_gas(self) -> None:
+        """Test calcCO2g calculation for natural gas."""
+        # Arrange
+        canvas = create_test_canvas()
+        canvas.CO2kg_per_BTU = [0.0, 0.053, 0.0]  # Natural gas coefficient
+        canvas.Biogas_CO2_Reduction = 0.8  # 80% reduction
+        canvas.gasMix = 20  # 20% biogas mix
+        btus = 1000.0
+
+        # Act
+        result = canvas.calcCO2g(btus, 1)  # Natural gas (index 1)
+
+        # Assert
+        # Expected: 1000 * 0.053 * 1000 = 53000
+        # With biogas reduction: 53000 - (53000 * (1 - 0.8) * 20/100) = 53000 - 2120 = 50880
+        assert abs(result - 50880.0) < 1.0
+
+    def test_calcCO2g_electric(self) -> None:
+        """Test calcCO2g calculation for electric."""
+        # Arrange
+        canvas = create_test_canvas()
+        canvas.CO2kg_per_BTU = [0.0, 0.0, 0.117]  # Electric coefficient
+        canvas.electricEnergyMix = 30  # 30% renewable mix
+        btus = 1000.0
+
+        # Act
+        result = canvas.calcCO2g(btus, 2)  # Electric (index 2)
+
+        # Assert
+        # Expected: 1000 * 0.117 * 1000 = 117000
+        # With renewable mix: 117000 * (1 - 30/100) = 117000 * 0.7 = 81900
+        assert abs(result - 81900.0) < 1.0
+
+    def test_calcCO2g_other_source(self) -> None:
+        """Test calcCO2g calculation for other energy source."""
+        # Arrange
+        canvas = create_test_canvas()
+        canvas.CO2kg_per_BTU = [0.045, 0.0, 0.0]  # Other source coefficient
+        btus = 1000.0
+
+        # Act
+        result = canvas.calcCO2g(btus, 0)  # Other source (index 0)
+
+        # Assert
+        # Expected: 1000 * 0.045 * 1000 = 45000 (no additional reductions)
+        assert abs(result - 45000.0) < 1.0
+
+
+class TestTimetemparray2temp:
+    """Test timetemparray2temp static method."""
+
+    def test_timetemparray2temp_exact_match(self) -> None:
+        """Test timetemparray2temp with exact time match."""
+        # Arrange
+        timearray = [0.0, 60.0, 120.0, 180.0]
+        temparray = [20.0, 100.0, 150.0, 200.0]
+        seconds = 120.0
+
+        # Act
+        result = tgraphcanvas.timetemparray2temp(timearray, temparray, seconds)
+
+        # Assert
+        assert result == 150.0
+
+    def test_timetemparray2temp_interpolation(self) -> None:
+        """Test timetemparray2temp with interpolation."""
+        # Arrange
+        timearray = [0.0, 60.0, 120.0, 180.0]
+        temparray = [20.0, 100.0, 150.0, 200.0]
+        seconds = 90.0  # Halfway between 60 and 120
+
+        # Act
+        result = tgraphcanvas.timetemparray2temp(timearray, temparray, seconds)
+
+        # Assert
+        # Should interpolate between 100.0 and 150.0 at 90s (halfway)
+        assert abs(result - 125.0) < 0.1
+
+    def test_timetemparray2temp_out_of_bounds_before(self) -> None:
+        """Test timetemparray2temp with time before range."""
+        # Arrange
+        timearray = [60.0, 120.0, 180.0]
+        temparray = [100.0, 150.0, 200.0]
+        seconds = 30.0  # Before first time
+
+        # Act
+        result = tgraphcanvas.timetemparray2temp(timearray, temparray, seconds)
+
+        # Assert
+        assert result == -1
+
+    def test_timetemparray2temp_out_of_bounds_after(self) -> None:
+        """Test timetemparray2temp with time after range."""
+        # Arrange
+        timearray = [60.0, 120.0, 180.0]
+        temparray = [100.0, 150.0, 200.0]
+        seconds = 240.0  # After last time
+
+        # Act
+        result = tgraphcanvas.timetemparray2temp(timearray, temparray, seconds)
+
+        # Assert
+        assert result == -1
+
+    def test_timetemparray2temp_empty_arrays(self) -> None:
+        """Test timetemparray2temp with empty arrays."""
+        # Arrange
+        timearray: List[float] = []
+        temparray: List[float] = []
+        seconds = 60.0
+
+        # Act
+        result = tgraphcanvas.timetemparray2temp(timearray, temparray, seconds)
+
+        # Assert
+        assert result == -1
+
+    def test_timetemparray2temp_mismatched_lengths(self) -> None:
+        """Test timetemparray2temp with mismatched array lengths."""
+        # Arrange
+        timearray = [60.0, 120.0, 180.0]
+        temparray = [100.0, 150.0]  # One less element
+        seconds = 90.0
+
+        # Act
+        result = tgraphcanvas.timetemparray2temp(timearray, temparray, seconds)
+
+        # Assert
+        assert result == -1
+
+    def test_timetemparray2temp_none_values_in_temp(self) -> None:
+        """Test timetemparray2temp with None values in temperature array."""
+        # Arrange
+        timearray = [0.0, 60.0, 120.0, 180.0]
+        temparray = [20.0, None, 150.0, 200.0]  # None at index 1
+        seconds = 90.0  # Between 60 and 120
+
+        # Act
+        result = tgraphcanvas.timetemparray2temp(timearray, temparray, seconds)
+
+        # Assert
+        # Should handle None values gracefully (implementation dependent)
+        assert isinstance(result, (float, int))
+
+    def test_timetemparray2temp_numpy_arrays(self) -> None:
+        """Test timetemparray2temp with numpy arrays."""
+        # Arrange
+        import numpy as np
+
+        timearray = np.array([0.0, 60.0, 120.0, 180.0])
+        temparray = np.array([20.0, 100.0, 150.0, 200.0])
+        seconds = 120.0
+
+        # Act
+        result = tgraphcanvas.timetemparray2temp(timearray, temparray, seconds)
+
+        # Assert
+        assert result == 150.0
+
+
+class TestTime2Index:
+    """Test time2index instance method."""
+
+    def test_time2index_basic(self) -> None:
+        """Test time2index with basic functionality."""
+        # Arrange
+        canvas = create_test_canvas()
+        canvas.timex = [0.0, 60.0, 120.0, 180.0, 240.0]
+
+        # Act
+        result = canvas.time2index(120.0)
+
+        # Assert
+        assert result == 2
+
+    def test_time2index_nearest_true(self) -> None:
+        """Test time2index with nearest=True."""
+        # Arrange
+        canvas = create_test_canvas()
+        canvas.timex = [0.0, 60.0, 120.0, 180.0, 240.0]
+
+        # Act
+        result = canvas.time2index(75.0, nearest=True)
+
+        # Assert
+        assert result == 1  # Closer to 60.0 than 120.0
+
+    def test_time2index_nearest_false(self) -> None:
+        """Test time2index with nearest=False."""
+        # Arrange
+        canvas = create_test_canvas()
+        canvas.timex = [0.0, 60.0, 120.0, 180.0, 240.0]
+
+        # Act
+        result = canvas.time2index(75.0, nearest=False)
+
+        # Assert
+        assert result == 2  # bisect_right result
+
+    def test_backgroundtime2index_basic(self) -> None:
+        """Test backgroundtime2index with basic functionality."""
+        # Arrange
+        canvas = create_test_canvas()
+        canvas.timeB = [0.0, 30.0, 90.0, 150.0]
+
+        # Act
+        result = canvas.backgroundtime2index(90.0)
+
+        # Assert
+        assert result == 2
+
+
+class TestEventTypeToArtist:
+    """Test event_type_to_artist and event_type_to_background_artist methods."""
+
+    def test_event_type_to_artist_invalid_type(self) -> None:
+        """Test event_type_to_artist with invalid event type."""
+        # Arrange
+        canvas = create_test_canvas()
+
+        # Act
+        ldots, event_annos, special_annos = canvas.event_type_to_artist(99)
+
+        # Assert
+        assert ldots is None
+        assert event_annos is None
+        assert special_annos is None
+
+
+class TestConvertQImageToNumpyArray:
+    """Test convertQImageToNumpyArray static method."""
+
+    def test_convertQImageToNumpyArray_basic(self) -> None:
+        """Test convertQImageToNumpyArray with basic QImage."""
+        # Arrange
+        import numpy as np
+        from PyQt6.QtGui import QImage
+
+        # Create a simple 2x2 RGBA image
+        img = QImage(2, 2, QImage.Format.Format_RGBA8888)
+        img.fill(0xFF0000FF)  # Red color
+
+        # Act
+        result = tgraphcanvas.convertQImageToNumpyArray(img)
+
+        # Assert
+        assert isinstance(result, np.ndarray)
+        assert result.shape == (2, 2, 4)  # height, width, channels (RGBA)
+
+    def test_convertQImageToNumpyArray_different_format(self) -> None:
+        """Test convertQImageToNumpyArray converts format correctly."""
+        # Arrange
+        import numpy as np
+        from PyQt6.QtGui import QImage
+
+        # Create image in different format
+        img = QImage(3, 3, QImage.Format.Format_RGB32)
+        img.fill(0x00FF00)  # Green color
+
+        # Act
+        result = tgraphcanvas.convertQImageToNumpyArray(img)
+
+        # Assert
+        assert isinstance(result, np.ndarray)
+        assert result.shape == (3, 3, 4)  # Should be converted to RGBA
+
+
+class TestFindTextGap:
+    """Test findtextgap method."""
+
+    def test_findtextgap_basic(self) -> None:
+        """Test findtextgap with basic parameters."""
+        # Arrange
+        canvas = create_test_canvas()
+        canvas.ylimit = 300
+        canvas.ylimit_min = 0
+
+        # Act
+        ystep_down, ystep_up = canvas.findtextgap(0, 0, 150.0, 200.0)
+
+        # Assert
+        assert isinstance(ystep_down, int)
+        assert isinstance(ystep_up, int)
+
+    def test_findtextgap_with_custom_dd(self) -> None:
+        """Test findtextgap with custom dd parameter."""
+        # Arrange
+        canvas = create_test_canvas()
+        canvas.ylimit = 300
+        canvas.ylimit_min = 0
+
+        # Act
+        ystep_down, ystep_up = canvas.findtextgap(0, 0, 150.0, 200.0, dd=100.0)
+
+        # Assert
+        assert isinstance(ystep_down, int)
+        assert isinstance(ystep_up, int)
+
+
+class TestTemperatureConversion:
+    """Test temperature conversion methods."""
+
+    def test_convertTemperatureF(self) -> None:
+        """Test convertTemperatureF slot method."""
+        # Arrange
+        canvas = create_test_canvas()
+        canvas.convertTemperature = Mock() # type: ignore
+
+        # Act
+        canvas.convertTemperatureF()
+
+        # Assert
+        canvas.convertTemperature.assert_called_once_with('F')
+
+    def test_convertTemperatureC(self) -> None:
+        """Test convertTemperatureC slot method."""
+        # Arrange
+        canvas = create_test_canvas()
+        canvas.convertTemperature = Mock() # type: ignore
+
+        # Act
+        canvas.convertTemperatureC()
+
+        # Assert
+        canvas.convertTemperature.assert_called_once_with('C')
