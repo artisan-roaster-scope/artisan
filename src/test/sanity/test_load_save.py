@@ -48,6 +48,7 @@ CSV_KEYS = [
 values_to_ignore = [
     'roasttime',    # without seconds in CSV
     'roasttzoffset',
+    'roastepoch',
     'timex',        # times are rounded to seconds
     'extradevices', # not stored in CSV, generated DUMMY (50)
     'extratimex',   # times are rounded to
