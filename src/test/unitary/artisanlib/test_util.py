@@ -15,12 +15,14 @@ Key Features:
 - Python 3.8+ compatibility with type annotations
 """
 
-from typing import Any, Generator, List, Optional, Union
-
+import os
+import pytest
+import tempfile
 import hypothesis.strategies as st
 import numpy as np
-import pytest
 from hypothesis import example, given, settings
+from pathlib import Path
+from typing import Any, Generator, List, Dict, Optional, Union
 
 
 @pytest.fixture(scope='session', autouse=True)
@@ -115,6 +117,10 @@ from artisanlib.util import (
     toStringList,
     uchr,
     weightVolumeDigits,
+    timearray2index,
+    findTPint,
+    eventtime2string,
+    serialize,
 )
 
 # fromCtoF
@@ -1816,3 +1822,198 @@ def test_setFileLogLevel() -> None:
 
         # Set back to original level
         setFileLogLevel(test_logger, original_level)
+
+
+class TestTimearray2index:
+    """Test timearray2index static method."""
+
+    def test_timearray2index_exact_match(self) -> None:
+        """Test timearray2index with exact time match."""
+        # Arrange
+        timearray = [0.0, 1.0, 2.0, 3.0, 4.0]
+        time = 2.0
+
+        # Act
+        result = timearray2index(timearray, time)
+
+        # Assert
+        assert result == 2
+
+    def test_timearray2index_interpolation_nearest(self) -> None:
+        """Test timearray2index with nearest interpolation."""
+        # Arrange
+        timearray = [0.0, 1.0, 2.0, 3.0, 4.0]
+        time = 1.3
+
+        # Act
+        result = timearray2index(timearray, time, nearest=True)
+
+        # Assert
+        assert result == 1  # Closer to 1.0 than 2.0
+
+    def test_timearray2index_no_nearest(self) -> None:
+        """Test timearray2index without nearest (returns bisect_right result)."""
+        # Arrange
+        timearray = [0.0, 1.0, 2.0, 3.0, 4.0]
+        time = 1.8
+
+        # Act
+        result = timearray2index(timearray, time, nearest=False)
+
+        # Assert
+        assert result == 2  # bisect_right returns insertion point
+
+    def test_timearray2index_out_of_bounds(self) -> None:
+        """Test timearray2index with out of bounds time."""
+        # Arrange
+        timearray = [1.0, 2.0, 3.0, 4.0]
+
+        # Act & Assert - before range (bisect_right returns 0, but function returns -1 when i=0)
+        result = timearray2index(timearray, 0.5)
+        assert result == -1
+
+        # Act & Assert - after range
+        result = timearray2index(timearray, 5.0)
+        assert result == len(timearray) - 1  # Returns nearest index (last element)
+
+    def test_timearray2index_empty_array(self) -> None:
+        """Test timearray2index with empty array."""
+        # Arrange
+        timearray: List[float] = []
+        time = 1.0
+
+        # Act
+        result = timearray2index(timearray, time)
+
+        # Assert
+        assert result == -1
+
+
+
+class TestTPUtilities:
+    """Test turning point utility methods."""
+
+
+    def test_findTPint_basic2(self) -> None:
+        """Test findTPint finds turning point index."""
+        # Arrange - timeindex needs at least 8 elements [CHARGE, TP, DRYe, FCs, FCe, SCs, SCe, DROP]
+        timeindex = [0, 0, 0, 0, 0, 0, 0, 0]  # Standard 8-element timeindex
+        timex = [0.0, 1.0, 2.0, 3.0, 4.0]
+        temp = [200.0, 180.0, 160.0, 170.0, 190.0]  # TP at index 2
+
+        # Act
+        result = findTPint(timeindex, timex, temp)
+
+        # Assert
+        assert isinstance(result, int)
+        assert result >= 0  # Should find a valid index
+
+    def test_findTPint_empty_arrays(self) -> None:
+        """Test findTPint with empty arrays."""
+        # Arrange
+        timeindex = [0, 0, 0, 0, 0, 0, 0, 0]  # Standard 8-element timeindex
+        timex: List[float] = []
+        temp: List[float] = []
+
+        # Act
+        result = findTPint(timeindex, timex, temp)
+
+        # Assert
+        assert result == 0  # Should return 0 for empty arrays
+
+    def test_findTPint_no_turning_point(self) -> None:
+        """Test findTPint with monotonic temperature."""
+        # Arrange
+        timeindex = [0, 0, 0, 0, 0, 0, 0, 0]  # Standard 8-element timeindex
+        timex = [0.0, 1.0, 2.0, 3.0]
+        temp = [100.0, 110.0, 120.0, 130.0]  # Monotonic increase
+
+        # Act
+        result = findTPint(timeindex, timex, temp)
+
+        # Assert
+        assert isinstance(result, int)
+        # Should return some index even if no clear TP
+
+
+
+@pytest.mark.parametrize(
+    'seconds,expected_format',
+    [
+        (0.0,  ''),        # 0 to empty str by definition
+        (45.0, '00:45'),
+        (60.0, '01:00'),
+        (125.0, '02:05'),  # 2 minutes 5 seconds (seconds with zero padding)
+        (3600.0, '60:00'), # 1 hour = 60 minutes
+        (3665.0, '61:05')  # 1 hour 1 minute 5 seconds (no separate hour)
+    ],
+)
+def test_eventtime2string_various_times(seconds: float, expected_format: str) -> None:
+    """Test eventtime2string with various time values."""
+    # Act
+    result = eventtime2string(seconds)
+
+    # Assert
+    assert result == expected_format
+
+
+
+
+class TestSerialize:
+    """Test serialize static method."""
+
+
+    def test_serialize_empty_dict(self, tmp_path: Path) -> None:
+        """Test serialize with empty dictionary."""
+        # Arrange
+        test_file = tmp_path / 'test_empty.txt'
+        test_data: Dict[str, Any] = {}
+
+        # Act
+        serialize(str(test_file), test_data)
+
+        # Assert
+        assert test_file.exists()
+        content = test_file.read_text(encoding='utf-8')
+        assert content.strip() == '{}'
+
+    def test_serialize_basic(self) -> None:
+        """Test serialize writes object to file."""
+        # Arrange
+        test_obj = {'key': 'value', 'number': 42}
+
+        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+            temp_filename = temp_file.name
+
+        try:
+            # Act
+            serialize(temp_filename, test_obj)
+
+            # Assert
+            with open(temp_filename, encoding='utf-8') as f:
+                content = f.read()
+                assert 'key' in content
+                assert 'value' in content
+                assert '42' in content
+        finally:
+            os.unlink(temp_filename)
+
+    def test_serialize_complex_object(self) -> None:
+        """Test serialize with complex nested object."""
+        # Arrange
+        test_obj = {'nested': {'inner': 'value'}, 'list': [1, 2, 3], 'boolean': True}
+
+        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+            temp_filename = temp_file.name
+
+        try:
+            # Act
+            serialize(temp_filename, test_obj)
+
+            # Assert
+            with open(temp_filename, encoding='utf-8') as f:
+                content = f.read()
+                assert 'nested' in content
+                assert 'inner' in content
+        finally:
+            os.unlink(temp_filename)

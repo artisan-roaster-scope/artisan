@@ -34,7 +34,7 @@ if TYPE_CHECKING:
     from PyQt6.QtCore import QMimeData # pylint: disable=unused-import
 
 from artisanlib.util import (deltaLabelUTF8, decodeLocal, decodeLocalStrict, stringfromseconds, fromFtoCstrict,
-        fromCtoFstrict, fill_gaps, float2float)
+        fromCtoFstrict, fill_gaps, float2float, deserialize)
 from artisanlib.suppress_errors import suppress_stdout_stderr
 from artisanlib.dialogs import ArtisanDialog
 from artisanlib.widgets import MyQComboBox
@@ -2036,8 +2036,9 @@ class roastCompareDlg(ArtisanDialog):
                 firstChar = stream.read(1)
                 if firstChar == '{':
                     f.close()
-                    obj = cast('ProfileData', self.aw.deserialize(filename))
-                    self.addProfile(filename,obj)
+                    obj = deserialize(filename)
+                    self.aw.plusAddPath(obj, filename)
+                    self.addProfile(filename,cast('ProfileData', obj))
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
 

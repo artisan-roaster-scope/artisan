@@ -5,11 +5,11 @@ repos:
     -   id: check-yaml
     -   id: check-xml
     -   id: end-of-file-fixer
-        exclude: ^(src/uic/|src/translations/|src/includes/)
+        exclude: ^(src/uic/|src/translations/|src/includes/|src/test/data/|src/test/sanity/data/)
     -   id: trailing-whitespace
-        exclude: ^(src/uic/|src/translations/|src/includes/)
+        exclude: ^(src/uic/|src/translations/|src/includes/|src/test/data/|src/test/sanity/data/)
     -   id: double-quote-string-fixer
-        exclude: ^(src/uic/|src/translations/|src/includes/)
+        exclude: ^(src/uic/|src/translations/|src/includes/|src/test/data/|src/test/sanity/data/)
     -   id: check-ast
 -   repo: https://github.com/asottile/pyupgrade
     rev: v3.9.0

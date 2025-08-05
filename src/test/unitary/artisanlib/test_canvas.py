@@ -272,7 +272,6 @@ def create_test_canvas() -> 'tgraphcanvas':
 
     # Add static methods that are called by instance methods
     canvas.eventsExternal2InternalValue = tgraphcanvas.eventsExternal2InternalValue
-    canvas.timearray2index = tgraphcanvas.timearray2index
 
     return canvas
 
@@ -1092,71 +1091,6 @@ class TestConvertHeat:
 
         # Assert
         assert abs(result - expected_factor) < 0.001
-
-
-class TestTimearray2index:
-    """Test timearray2index static method."""
-
-    def test_timearray2index_exact_match(self) -> None:
-        """Test timearray2index with exact time match."""
-        # Arrange
-        timearray = [0.0, 1.0, 2.0, 3.0, 4.0]
-        time = 2.0
-
-        # Act
-        result = tgraphcanvas.timearray2index(timearray, time)
-
-        # Assert
-        assert result == 2
-
-    def test_timearray2index_interpolation_nearest(self) -> None:
-        """Test timearray2index with nearest interpolation."""
-        # Arrange
-        timearray = [0.0, 1.0, 2.0, 3.0, 4.0]
-        time = 1.3
-
-        # Act
-        result = tgraphcanvas.timearray2index(timearray, time, nearest=True)
-
-        # Assert
-        assert result == 1  # Closer to 1.0 than 2.0
-
-    def test_timearray2index_no_nearest(self) -> None:
-        """Test timearray2index without nearest (returns bisect_right result)."""
-        # Arrange
-        timearray = [0.0, 1.0, 2.0, 3.0, 4.0]
-        time = 1.8
-
-        # Act
-        result = tgraphcanvas.timearray2index(timearray, time, nearest=False)
-
-        # Assert
-        assert result == 2  # bisect_right returns insertion point
-
-    def test_timearray2index_out_of_bounds(self) -> None:
-        """Test timearray2index with out of bounds time."""
-        # Arrange
-        timearray = [1.0, 2.0, 3.0, 4.0]
-
-        # Act & Assert - before range (bisect_right returns 0, but function returns -1 when i=0)
-        result = tgraphcanvas.timearray2index(timearray, 0.5)
-        assert result == -1
-
-        # Act & Assert - after range
-        result = tgraphcanvas.timearray2index(timearray, 5.0)
-        assert result == len(timearray) - 1  # Returns nearest index (last element)
-
-    def test_timearray2index_empty_array(self) -> None:
-        """Test timearray2index with empty array."""
-        # Arrange
-        timearray: List[float] = []
-        time = 1.0
-
-        # Act
-        result = tgraphcanvas.timearray2index(timearray, time)
-
-        # Assert
-        assert result == -1
 
 
 class TestWheelTextAngleMethods:

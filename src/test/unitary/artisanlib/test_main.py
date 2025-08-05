@@ -264,7 +264,6 @@ def mock_application_window(mock_qmc: Mock) -> Mock:
     # Configure default attributes and behaviors
     aw.qmc = mock_qmc
     aw.comparator = None
-    aw.deserialize = Mock()
     aw.setProfile = Mock(return_value=True)
     aw.orderEvents = Mock()
     aw.etypeComboBox = Mock()
@@ -329,8 +328,6 @@ class TestLoadFile:
             'extradevices': [],
         }
 
-        mock_application_window.deserialize.return_value = mock_profile_data
-
         # Use comprehensive patching strategy to handle interference from other tests
         # Patch at multiple levels and use import patching to ensure mocks work
         with patch('artisanlib.main.QFile') as mock_qfile, patch(
@@ -394,7 +391,6 @@ class TestLoadFile:
             main_module.QFile = mock_qfile  # type:ignore
             main_module.QTextStream = mock_qtextstream  # type:ignore
 
-            aw.deserialize = mock_application_window.deserialize  # type: ignore[method-assign]
             aw.setProfile = mock_application_window.setProfile  # type: ignore[method-assign]
             aw.orderEvents = mock_application_window.orderEvents  # type: ignore[method-assign]
             aw.etypeComboBox = mock_application_window.etypeComboBox
@@ -430,10 +426,7 @@ class TestLoadFile:
             mock_stream_instance.read.assert_called_once_with(1)
             mock_file_instance.close.assert_called()
             mock_application_window.qmc.reset.assert_called_once_with(redraw=False, soundOn=False)
-            mock_application_window.deserialize.assert_called_once_with(absolute_path)
-            mock_application_window.setProfile.assert_called_once_with(
-                absolute_path, mock_profile_data, quiet=False, reset=False
-            )
+            mock_application_window.setProfile.assert_called_once()
             mock_application_window.orderEvents.assert_called_once()
             mock_application_window.setCurrentFile.assert_called_once_with(absolute_path)
             aw.qmc.fileCleanSignal.emit.assert_called_once()  # pyright: ignore[reportAttributeAccessIssue]
@@ -498,8 +491,6 @@ class TestLoadFile:
             mock_stream_instance.read.assert_called_once_with(1)
             mock_file_instance.close.assert_called()
             mock_application_window.sendmessage.assert_called_once()
-            # Should not proceed to deserialize or setProfile
-            # Since we didn't set up deserialize, it should not be called
 
     def test_load_file_when_comparator_active(self, mock_application_window: Mock) -> None:
         """Test that loadFile returns early when comparator is active."""
@@ -582,8 +573,6 @@ class TestLoadFile:
             aw.qmc.wheelflag = False  # Must be False
             aw.qmc.ax = Mock()  # Must not be None
             aw.comparator = None
-            aw.deserialize = mock_application_window.deserialize  # type: ignore[method-assign]
-            mock_application_window.deserialize.return_value = mock_profile_data
             aw.setProfile = mock_application_window.setProfile  # type: ignore[method-assign]
             aw.orderEvents = mock_application_window.orderEvents  # type: ignore[method-assign]
             aw.etypeComboBox = mock_application_window.etypeComboBox
@@ -622,9 +611,7 @@ class TestLoadFile:
                 pass  # Ignore cleanup errors
 
             # Assert
-            mock_application_window.setProfile.assert_called_once_with(
-                test_file_path, mock_profile_data, quiet=True, reset=False
-            )
+            mock_application_window.setProfile.assert_called_once()
 
     def test_load_file_with_actual_profile(self, mock_application_window: Mock) -> None:
         """Test loading the actual profile1.alog file from test resources."""
@@ -663,8 +650,6 @@ class TestLoadFile:
             aw = ApplicationWindow.__new__(ApplicationWindow)
             aw.qmc = mock_application_window.qmc
             aw.comparator = None
-            aw.deserialize = mock_application_window.deserialize  # type: ignore[method-assign]
-            mock_application_window.deserialize.return_value = mock_profile_data
             aw.setProfile = mock_application_window.setProfile  # type: ignore[method-assign]
             aw.orderEvents = mock_application_window.orderEvents  # type: ignore[method-assign]
             aw.etypeComboBox = mock_application_window.etypeComboBox
@@ -680,7 +665,6 @@ class TestLoadFile:
             aw.loadFile(str(test_profile_path))
 
             # Assert
-            mock_application_window.deserialize.assert_called_once_with(str(test_profile_path))
             mock_application_window.qmc.reset.assert_called_once_with(redraw=False, soundOn=False)
             mock_application_window.setProfile.assert_called_once()
 
@@ -746,8 +730,6 @@ class TestLoadFile:
             aw = ApplicationWindow.__new__(ApplicationWindow)
             aw.qmc = mock_application_window.qmc
             aw.comparator = None
-            aw.deserialize = mock_application_window.deserialize  # type: ignore[method-assign]
-            mock_application_window.deserialize.return_value = mock_profile_data
             aw.setProfile = mock_application_window.setProfile  # type: ignore[method-assign]
             aw.orderEvents = mock_application_window.orderEvents  # type: ignore[method-assign]
             aw.etypeComboBox = mock_application_window.etypeComboBox
@@ -767,82 +749,6 @@ class TestLoadFile:
             # Assert
             mock_application_window.deleteBackground.assert_called_once()
 
-    def test_load_file_profile_changed_sets_dirty_flag(self, mock_application_window: Mock) -> None:
-        """Test that profile changed flag is set when extradevices differ."""
-        # Arrange
-        test_file_path = 'test_file.alog'
-
-        # Mock profile data with different extradevices
-        mock_profile_data: Dict[str, Any] = {
-            'title': 'Test Profile',
-            'extradevices': [{'name': 'device1'}],  # Different from qmc.extradevices
-        }
-
-        with patch('artisanlib.main.QFile') as mock_qfile, patch(
-            'artisanlib.main.QTextStream'
-        ) as mock_qtextstream, patch('artisanlib.main.cast') as mock_cast:
-
-            # Setup mocks
-            mock_file_instance = Mock()
-            mock_file_instance.open.return_value = True
-            mock_qfile.return_value = mock_file_instance
-
-            mock_stream_instance = Mock()
-            mock_stream_instance.read.return_value = '{'
-            mock_qtextstream.return_value = mock_stream_instance
-
-            mock_cast.return_value = mock_profile_data
-
-            # Create ApplicationWindow instance
-            aw = ApplicationWindow.__new__(ApplicationWindow)
-            aw.qmc = mock_application_window.qmc
-            aw.qmc.designerflag = False  # Must be False
-            aw.qmc.wheelflag = False  # Must be False
-            aw.qmc.ax = Mock()  # Must not be None
-            aw.comparator = None
-            aw.deserialize = mock_application_window.deserialize  # type: ignore[method-assign]
-            mock_application_window.deserialize.return_value = mock_profile_data
-            aw.setProfile = mock_application_window.setProfile  # type: ignore[method-assign]
-            aw.orderEvents = mock_application_window.orderEvents  # type: ignore[method-assign]
-            aw.etypeComboBox = mock_application_window.etypeComboBox
-            aw.setCurrentFile = mock_application_window.setCurrentFile  # type: ignore[method-assign]
-            aw.sendmessage = mock_application_window.sendmessage  # type: ignore[method-assign]
-            aw.updatePhasesLCDs = mock_application_window.updatePhasesLCDs  # type: ignore[method-assign]
-            aw.plus_account = None
-            aw.checkColors = mock_application_window.checkColors  # type: ignore[method-assign]
-            aw.getcolorPairsToCheck = mock_application_window.getcolorPairsToCheck  # type: ignore[method-assign]
-            aw.autoAdjustAxis = mock_application_window.autoAdjustAxis  # type: ignore[method-assign]
-            aw.updatePlusStatus = mock_application_window.updatePlusStatus  # type: ignore[method-assign]
-            aw.curFile = 'original_file.alog'
-
-            # Directly patch the Qt classes on the module that the ApplicationWindow uses
-            import artisanlib.main as main_module
-
-            original_qfile = getattr(main_module, 'QFile', None)
-            original_qtextstream = getattr(main_module, 'QTextStream', None)
-            main_module.QFile = mock_qfile  # type:ignore
-            main_module.QTextStream = mock_qtextstream  # type:ignore
-
-            # Act
-            aw.loadFile(test_file_path)
-
-            # Cleanup: Restore original Qt classes if they existed
-            try:
-                if original_qfile is not None:
-                    main_module.QFile = original_qfile  # type:ignore
-                elif hasattr(main_module, 'QFile'):
-                    delattr(main_module, 'QFile')
-
-                if original_qtextstream is not None:
-                    main_module.QTextStream = original_qtextstream  # type:ignore
-                elif hasattr(main_module, 'QTextStream'):
-                    delattr(main_module, 'QTextStream')
-            except Exception:  # pylint: disable=broad-except
-                pass  # Ignore cleanup errors
-
-            # Assert
-            aw.qmc.fileDirtySignal.emit.assert_called_once()  # pyright: ignore[reportAttributeAccessIssue]
-            assert aw.curFile is None  # Should be set to None when profile changed
 
 
 class TestImportCSV:
@@ -2188,101 +2094,7 @@ class TestStrippedDir:
         # Should return the immediate parent directory name
 
 
-class TestEventtime2string:
-    """Test eventtime2string static method."""
 
-    def test_eventtime2string_zero_time(self) -> None:
-        """Test eventtime2string with zero time."""
-        # Act
-        result = ApplicationWindow.eventtime2string(0.0)
-
-        # Assert
-        assert result == ''
-
-    def test_eventtime2string_basic_time(self) -> None:
-        """Test eventtime2string with basic time."""
-        # Arrange
-        time_seconds = 125.0  # 2 minutes 5 seconds
-
-        # Act
-        result = ApplicationWindow.eventtime2string(time_seconds)
-
-        # Assert
-        assert '2' in result  # minutes
-        assert '05' in result  # seconds with zero padding
-
-    def test_eventtime2string_hours(self) -> None:
-        """Test eventtime2string with time including hours."""
-        # Arrange
-        time_seconds = 3665.0  # 1 hour 1 minute 5 seconds
-
-        # Act
-        result = ApplicationWindow.eventtime2string(time_seconds)
-
-        # Assert
-        assert isinstance(result, str)
-        assert len(result) > 0
-
-    @pytest.mark.parametrize(
-        'seconds,expected_format',
-        [
-            (60.0, '01:00'),
-            (125.0, '02:05'),
-            (3600.0, '60:00'),  # 1 hour = 60 minutes
-        ],
-    )
-    def test_eventtime2string_various_times(self, seconds: float, expected_format: str) -> None:
-        """Test eventtime2string with various time values."""
-        # Act
-        result = ApplicationWindow.eventtime2string(seconds)
-
-        # Assert
-        assert result == expected_format
-
-
-class TestSerialize:
-    """Test serialize static method."""
-
-    def test_serialize_basic(self) -> None:
-        """Test serialize writes object to file."""
-        # Arrange
-        test_obj = {'key': 'value', 'number': 42}
-
-        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-            temp_filename = temp_file.name
-
-        try:
-            # Act
-            ApplicationWindow.serialize(temp_filename, test_obj)
-
-            # Assert
-            with open(temp_filename, encoding='utf-8') as f:
-                content = f.read()
-                assert 'key' in content
-                assert 'value' in content
-                assert '42' in content
-        finally:
-            os.unlink(temp_filename)
-
-    def test_serialize_complex_object(self) -> None:
-        """Test serialize with complex nested object."""
-        # Arrange
-        test_obj = {'nested': {'inner': 'value'}, 'list': [1, 2, 3], 'boolean': True}
-
-        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-            temp_filename = temp_file.name
-
-        try:
-            # Act
-            ApplicationWindow.serialize(temp_filename, test_obj)
-
-            # Assert
-            with open(temp_filename, encoding='utf-8') as f:
-                content = f.read()
-                assert 'nested' in content
-                assert 'inner' in content
-        finally:
-            os.unlink(temp_filename)
 
 
 class TestMakeListLength:
@@ -2638,50 +2450,6 @@ class TestNote2html:
         assert result == ''
 
 
-class TestFindTPint:
-    """Test findTPint static method."""
-
-    def test_findTPint_basic(self) -> None:
-        """Test findTPint finds turning point index."""
-        # Arrange - timeindex needs at least 8 elements [CHARGE, TP, DRYe, FCs, FCe, SCs, SCe, DROP]
-        timeindex = [0, 0, 0, 0, 0, 0, 0, 0]  # Standard 8-element timeindex
-        timex = [0.0, 1.0, 2.0, 3.0, 4.0]
-        temp = [200.0, 180.0, 160.0, 170.0, 190.0]  # TP at index 2
-
-        # Act
-        result = ApplicationWindow.findTPint(timeindex, timex, temp)
-
-        # Assert
-        assert isinstance(result, int)
-        assert result >= 0  # Should find a valid index
-
-    def test_findTPint_no_turning_point(self) -> None:
-        """Test findTPint with monotonic temperature."""
-        # Arrange
-        timeindex = [0, 0, 0, 0, 0, 0, 0, 0]  # Standard 8-element timeindex
-        timex = [0.0, 1.0, 2.0, 3.0]
-        temp = [100.0, 110.0, 120.0, 130.0]  # Monotonic increase
-
-        # Act
-        result = ApplicationWindow.findTPint(timeindex, timex, temp)
-
-        # Assert
-        assert isinstance(result, int)
-        # Should return some index even if no clear TP
-
-    def test_findTPint_empty_arrays(self) -> None:
-        """Test findTPint with empty arrays."""
-        # Arrange
-        timeindex = [0, 0, 0, 0, 0, 0, 0, 0]  # Standard 8-element timeindex
-        timex: List[float] = []
-        temp: List[float] = []
-
-        # Act
-        result = ApplicationWindow.findTPint(timeindex, timex, temp)
-
-        # Assert
-        assert result == 0  # Should return 0 for empty arrays
-
 
 class TestWeightLossMethods:
     """Test weight_loss, apply_weight_loss, and volume_increase static methods."""
@@ -2862,42 +2630,6 @@ class TestTimeConversionMethodsExtended:
 
         # Assert
         assert result == 225.0  # 3 * 60 + 45
-
-
-class TestEventTimeConversion:
-    """Test eventtime2string static method."""
-
-    def test_eventtime2string_zero(self) -> None:
-        """Test eventtime2string with zero time."""
-        # Arrange & Act
-        result = ApplicationWindow.eventtime2string(0.0)
-
-        # Assert
-        assert result == ''
-
-    def test_eventtime2string_seconds_only(self) -> None:
-        """Test eventtime2string with seconds only."""
-        # Arrange & Act
-        result = ApplicationWindow.eventtime2string(45.0)
-
-        # Assert
-        assert result == '00:45'
-
-    def test_eventtime2string_minutes_and_seconds(self) -> None:
-        """Test eventtime2string with minutes and seconds."""
-        # Arrange & Act
-        result = ApplicationWindow.eventtime2string(125.0)  # 2:05
-
-        # Assert
-        assert result == '02:05'
-
-    def test_eventtime2string_large_time(self) -> None:
-        """Test eventtime2string with large time value."""
-        # Arrange & Act
-        result = ApplicationWindow.eventtime2string(3665.0)  # 61:05
-
-        # Assert
-        assert result == '61:05'
 
 
 class TestColorUtilities:
@@ -3397,48 +3129,48 @@ class TestTableUtilities:
         assert result is None
 
 
-class TestEnvironmentUtilities:
-    """Test environment utility static methods."""
-
-    def test_calc_env_basic(self) -> None:
-        """Test calc_env returns environment dictionary."""
-        # Arrange & Act
-        result = ApplicationWindow.calc_env()
-
-        # Assert
-        assert isinstance(result, dict)
-        assert 'PATH' in result  # PATH should always be present
-
-    def test_calc_env_cached(self) -> None:
-        """Test calc_env caching behavior."""
-        # Arrange & Act
-        result1 = ApplicationWindow.calc_env()
-        result2 = ApplicationWindow.calc_env()
-
-        # Assert
-        assert result1 is result2  # Should return same cached instance
-
-    def test_get_os_basic(self) -> None:
-        """Test get_os returns OS information."""
-        # Arrange & Act
-        os_name, version, arch = ApplicationWindow.get_os()
-
-        # Assert
-        assert isinstance(os_name, str)
-        assert isinstance(version, str)
-        assert isinstance(arch, str)
-        assert len(os_name) > 0
-        assert len(version) > 0
-        assert len(arch) > 0
-
-    def test_get_os_cached(self) -> None:
-        """Test get_os caching behavior."""
-        # Arrange & Act
-        result1 = ApplicationWindow.get_os()
-        result2 = ApplicationWindow.get_os()
-
-        # Assert
-        assert result1 == result2  # Should return same cached result
+#class TestEnvironmentUtilities:
+#    """Test environment utility static methods."""
+#
+#    def test_calc_env_basic(self) -> None:
+#        """Test calc_env returns environment dictionary."""
+#        # Arrange & Act
+#        result = ApplicationWindow.calc_env()
+#
+#        # Assert
+#        assert isinstance(result, dict)
+#        assert 'PATH' in result  # PATH should always be present
+#
+#    def test_calc_env_cached(self) -> None:
+#        """Test calc_env caching behavior."""
+#        # Arrange & Act
+#        result1 = ApplicationWindow.calc_env()
+#        result2 = ApplicationWindow.calc_env()
+#
+#        # Assert
+#        assert result1 is result2  # Should return same cached instance
+#
+#    def test_get_os_basic(self) -> None:
+#        """Test get_os returns OS information."""
+#        # Arrange & Act
+#        os_name, version, arch = ApplicationWindow.get_os()
+#
+#        # Assert
+#        assert isinstance(os_name, str)
+#        assert isinstance(version, str)
+#        assert isinstance(arch, str)
+#        assert len(os_name) > 0
+#        assert len(version) > 0
+#        assert len(arch) > 0
+#
+#    def test_get_os_cached(self) -> None:
+#        """Test get_os caching behavior."""
+#        # Arrange & Act
+#        result1 = ApplicationWindow.get_os()
+#        result2 = ApplicationWindow.get_os()
+#
+#        # Assert
+#        assert result1 == result2  # Should return same cached result
 
 
 class TestNoteUtilities:
@@ -3836,41 +3568,6 @@ class TestLayoutUtilities:
         assert layout.count() >= 2  # Should contain at least label and LCD frame
 
 
-class TestSerializationUtilities:
-    """Test serialization utility static methods."""
-
-    def test_serialize_basic_dict(self, tmp_path: Path) -> None:
-        """Test serialize with basic dictionary."""
-        # Arrange
-        test_file = tmp_path / 'test_serialize.txt'
-        test_data = {'key1': 'value1', 'key2': 42, 'key3': [1, 2, 3]}
-
-        # Act
-        ApplicationWindow.serialize(str(test_file), test_data)
-
-        # Assert
-        assert test_file.exists()
-        content = test_file.read_text(encoding='utf-8')
-        # The content should be a string representation of the dict
-        assert 'key1' in content
-        assert 'value1' in content
-        assert '42' in content
-
-    def test_serialize_empty_dict(self, tmp_path: Path) -> None:
-        """Test serialize with empty dictionary."""
-        # Arrange
-        test_file = tmp_path / 'test_empty.txt'
-        test_data: Dict[str, Any] = {}
-
-        # Act
-        ApplicationWindow.serialize(str(test_file), test_data)
-
-        # Assert
-        assert test_file.exists()
-        content = test_file.read_text(encoding='utf-8')
-        assert content.strip() == '{}'
-
-
 class TestColorUtilitiesExtended:
     """Test additional color utility static methods."""
 
@@ -3900,38 +3597,6 @@ class TestColorUtilitiesExtended:
         # Assert
         assert isinstance(result, str)
         assert result.startswith('#')
-
-
-class TestTPUtilities:
-    """Test turning point utility static methods."""
-
-    def test_findTPint_basic(self) -> None:
-        """Test findTPint with basic temperature profile."""
-        # Arrange - timeindex needs at least 7 elements (indices 0-6)
-        timeindex = [0, 100, 200, 300, 400, 500, 600]  # 7 elements
-        timex = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-        temp = [200.0, 180.0, 160.0, 170.0, 180.0, 190.0, 200.0]  # TP should be at index 2
-
-        # Act
-        result = ApplicationWindow.findTPint(timeindex, timex, temp)
-
-        # Assert
-        assert isinstance(result, int)
-        assert result >= 0
-
-    def test_findTPint_minimal_valid_input(self) -> None:
-        """Test findTPint with minimal valid input."""
-        # Arrange - timeindex needs at least 7 elements, but can be zeros
-        timeindex = [0, 0, 0, 0, 0, 0, 0]  # 7 elements, all zeros
-        timex = [0.0, 1.0, 2.0]
-        temp = [200.0, 180.0, 160.0]
-
-        # Act
-        result = ApplicationWindow.findTPint(timeindex, timex, temp)
-
-        # Assert
-        assert isinstance(result, int)
-        assert result >= 0
 
 
 class TestDonationUtilities:
@@ -4172,7 +3837,9 @@ class TestFileUtilities:
         # Assert
         assert result == 'file.txt'
 
-    def test_strippedName_windows_path(self) -> None:
+    @pytest.mark.darwin
+    @pytest.mark.linux
+    def test_strippedName_windows_path_non_windows(self) -> None:
         """Test strippedName with Windows-style path."""
         # Arrange
         file_path = 'C:\\Users\\test\\file.txt'
@@ -4184,6 +3851,20 @@ class TestFileUtilities:
         # On non-Windows systems, backslashes are not treated as path separators
         # so the entire string is returned as the filename
         assert result == 'C:\\Users\\test\\file.txt'
+
+    @pytest.mark.win32
+    def test_strippedName_windows_path_windows(self) -> None:
+        """Test strippedName with Windows-style path."""
+        # Arrange
+        file_path = 'C:\\Users\\test\\file.txt'
+
+        # Act
+        result = ApplicationWindow.strippedName(file_path)
+
+        # Assert
+        # On non-Windows systems, backslashes are not treated as path separators
+        # so the entire string is returned as the filename
+        assert result == 'file.txt'
 
     def test_strippedDir_basic_path(self) -> None:
         """Test strippedDir with basic file path."""

@@ -25,7 +25,7 @@ if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
     from PyQt6.QtGui import QCloseEvent # pylint: disable=unused-import
 
-from artisanlib.util import uchr, comma2dot
+from artisanlib.util import uchr, comma2dot, eventtime2string
 from artisanlib.dialogs import ArtisanResizeablDialog, ArtisanDialog
 from artisanlib.widgets import MyQComboBox, MyQDoubleSpinBox
 
@@ -3779,7 +3779,7 @@ class customEventDlg(ArtisanDialog):
             event_time = self.aw.qmc.timex[time_idx]
             if self.aw.qmc.timeindex[0] > -1:
                 event_time -= self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
-            event_time_str = ' @ ' + self.aw.eventtime2string(event_time)
+            event_time_str = ' @ ' + eventtime2string(event_time)
         else:
             event_time_str = ''
         self.setWindowTitle(QApplication.translate('Form Caption','Event') + event_time_str)

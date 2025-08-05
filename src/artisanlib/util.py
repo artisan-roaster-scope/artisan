@@ -21,18 +21,22 @@ import platform
 import sys
 import math
 import os
+import io
 import re
+import ast
 import numpy
 import functools
+from bisect import bisect_right
 from pathlib import Path
 from matplotlib import colors
-from typing import Final, Optional, Literal, Tuple, List, Sequence, Union, Any, TYPE_CHECKING
+from typing import Final, Optional, Literal, Dict, Tuple, List, Set, Sequence, Union, Any, TYPE_CHECKING
 from typing_extensions import TypeGuard  # Python <=3.10
 
 if TYPE_CHECKING:
     from artisanlib.main import Artisan # pylint: disable=unused-import
     import numpy.typing as npt # pylint: disable=unused-import
 
+from artisanlib.atypes import ProfileData
 
 ##
 
@@ -46,10 +50,10 @@ application_desktop_file_name: Final[str] = 'org.artisan_scope.artisan'
 
 
 try:
-    from PyQt6.QtCore import QStandardPaths, QCoreApplication # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtCore import QStandardPaths, QCoreApplication, QTime, QDate, QDateTime # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtGui import QColor  # @UnusedImport @Reimport  @UnresolvedImport
 except ImportError:
-    from PyQt5.QtCore import QStandardPaths, QCoreApplication  # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import QStandardPaths, QCoreApplication, QTime, QDate, QDateTime  # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QColor  # type: ignore  # @UnusedImport @Reimport  @UnresolvedImport
 
 
@@ -814,3 +818,282 @@ def is_float_list(xs: List[Any]) -> TypeGuard[List[float]]:
 
 def right_to_left(locale:str) -> bool:
     return locale.casefold() in {'ar', 'fa', 'he'}
+
+
+# others
+
+# fast variant based on binary search on lists using bisect (using numpy.searchsorted is slower)
+# side-condition: values in self.timex in linear order
+# time: time in seconds
+# nearest: if nearest is True the closest index is returned (slower), otherwise the previous (faster)
+# returns
+#   -1 on empty timex
+#    0 if time smaller than first entry of timex
+#  len(timex)-1 if time larger than last entry of timex (last index)
+def timearray2index(timearray:List[float], time:float, nearest:bool = True) -> int:
+    i = bisect_right(timearray, time)
+    if i:
+        if nearest and i>0 and (i == len(timearray) or abs(time - timearray[i]) > abs(time - timearray[i-1])):
+            return i-1
+        return i
+    return -1
+
+
+def findTPint(timeindex:List[int], timex:List[float], temp:List[float]) -> int:
+    TP:float = 1000
+    idx:int = 0
+    start:int = 0
+    end:int = len(timex)
+    # try to consider only indices until the roast end and not beyond
+    EOR_index = end
+    if timeindex[6]:
+        EOR_index = timeindex[6]
+    if start < EOR_index < end:
+        end = EOR_index
+    # try to consider only indices until FCs and not beyond
+    FCs_index = end
+    if timeindex[2]:
+        FCs_index = timeindex[2]
+    if start < FCs_index < end:
+        end = FCs_index
+    # try to consider only indices from start of roast on and not before
+    SOR_index = start
+    if timeindex[0] != -1:
+        SOR_index = timeindex[0]
+    if start < SOR_index < end:
+        start = SOR_index
+    for i in range(end - 1, start -1, -1):
+        if temp[i] > 0 and temp[i] < TP:
+            TP = temp[i]
+            idx = i
+    return idx
+
+
+def eventtime2string(time:float) -> str:
+    if time == 0.0:
+        return ''
+    di,mo = divmod(time,60)
+    return f'{di:02.0f}:{mo:02.0f}'
+
+
+# serialize/deserialize
+
+
+#Write object to file
+def serialize(filename:str, obj:Dict[str, Any]) -> None:
+    fn = str(filename)
+    with codecs.open(fn, 'w+', encoding='utf-8') as f:
+        f.write(repr(obj))
+
+
+#Read object from file
+def deserialize(filename:str) -> Dict[str, Any]:
+    obj:Dict[str,Any] = {}
+    try:
+        fn = str(filename)
+        if os.path.exists(fn):
+            with codecs.open(fn, 'rb', encoding='utf-8') as f:
+                obj=ast.literal_eval(f.read()) # pylint: disable=eval-used
+    except Exception as ex: # pylint: disable=broad-except
+        _log.exception(ex)
+    return obj
+
+
+def csv_load(csvFile:io.TextIOWrapper) -> 'ProfileData':
+    import csv
+    profile = ProfileData()
+
+    data = csv.reader(csvFile,delimiter='\t')
+    #read file header
+    header = next(data)
+    date = QDate.fromString(header[0].split('Date:')[1],"dd'.'MM'.'yyyy")
+    if len(header) > 11:
+        try:
+            tm = QTime.fromString(header[11].split('Time:')[1])
+            profile['roasttime'] = encodeLocalStrict(tm.toString())
+            roastdate = QDateTime(date,tm)
+        except Exception: # pylint: disable=broad-except
+            roastdate = QDateTime(date, QTime())
+    else:
+        roastdate = QDateTime(date, QTime())
+    profile['roastdate'] = encodeLocalStrict(QDate(date).toString())
+    profile['roastepoch'] = int(roastdate.toSecsSinceEpoch())
+    profile['roasttzoffset'] = 0
+    unit = header[1].split('Unit:')[1]
+    if unit in {'F', 'C'}:
+        profile['mode'] = unit
+    #read column headers
+    fields = next(data)
+    extra_fields = fields[5:] # columns after 'Event'
+
+    timex:List[float] = []
+    temp1:List[float] = []
+    temp2:List[float] = []
+
+    # add extra devices
+    number_extra_devices = min(10, int(len(extra_fields)/2)) # ApplicationWindow.nLCDS = 10
+    extradevices:List[int] = [50]*number_extra_devices # type dummy
+    extratimex:List[List[float]] = [[] for _ in range(number_extra_devices)] # we don't want exact copies of those empty lists as with [[]]*number_extra_devices!
+    extratemp1:List[List[float]] = [[] for _ in range(number_extra_devices)]
+    extratemp2:List[List[float]] = [[] for _ in range(number_extra_devices)]
+    extraname1:List[str] = ['']*number_extra_devices
+    extraname2:List[str] = ['']*number_extra_devices
+    extramathexpression1:List[str] = ['']*number_extra_devices
+    extramathexpression2:List[str] = ['']*number_extra_devices
+
+    # set extra device names # NOTE: eventuelly we want to set/change the names only for devices that were just added in the line above!?
+    for i, ef in enumerate(extra_fields):
+        if i % 2 == 1:
+            # odd
+            extraname2[int(i/2)] = ef
+        else:
+            # even
+            extraname1[int(i/2)] = ef
+
+    #read data
+    last_time:Optional[float] = None
+
+    i = 0
+    for row in data:
+        i = i + 1
+        try:
+            items = list(zip(fields, row))
+            item = {}
+            for (name, value) in items:
+                item[name] = value.strip()
+            #add one measurement
+            timez = float(stringtoseconds(item['Time1']))
+            if not last_time or last_time < timez:
+                timex.append(timez)
+                temp1.append(float(item['ET']))
+                temp2.append(float(item['BT']))
+                for j, ef in enumerate(extra_fields):
+                    if j % 2 == 1:
+                        # odd
+                        extratemp2[int(j/2)].append(float(item[ef]))
+                    else:
+                        # even
+                        extratimex[int(j/2)].append(timez)
+                        extratemp1[int(j/2)].append(float(item[ef]))
+            last_time = timez
+        except Exception: # pylint: disable=broad-except
+            pass # invalid input can make stringtoseconds fail thus this row is ignored
+
+    timeindex:List[int] = [-1,0,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actual index used
+
+    #set events
+    CHARGE_entry = header[2].split('CHARGE:')
+    if len(CHARGE_entry)>1:
+        try:
+            CHARGE = stringtoseconds(CHARGE_entry[1])
+            if CHARGE >= 0:
+                timeindex[0] = max(-1, timearray2index(timex, CHARGE, True))
+        except Exception:  # pylint: disable=broad-except
+            pass
+
+    for i, l in enumerate(['DRYe:', 'FCs:', 'FCe:', 'SCs:', 'SCe:', 'DROP:', 'COOL:']):
+        try:
+            label = stringtoseconds(header[i+4].split(l)[1])
+            if label > 0:
+                timeindex[i+1] = max(0, timearray2index(timex, label, True))
+        except Exception:  # pylint: disable=broad-except
+            pass
+
+    profile['timex'] = timex
+    profile['temp1'] = temp1
+    profile['temp2'] = temp2
+    profile['extradevices'] = extradevices
+    profile['extraname1'] = extraname1
+    profile['extraname2'] = extraname2
+    profile['extratimex'] = extratimex
+    profile['extratemp1'] = extratemp1
+    profile['extratemp2'] = extratemp2
+    profile['extramathexpression1'] = extramathexpression1
+    profile['extramathexpression2'] = extramathexpression2
+    profile['timeindex'] = timeindex
+
+    return profile
+
+
+def exportProfile2CSV(filename:str, profile:'ProfileData') -> bool:
+    if all(key in profile for key in [ 'mode', 'timex', 'timeindex', 'temp1', 'temp2', 'roastdate', 'roasttime', 'extratimex' ]) and len(profile['timex']) > 0: # pyright: ignore[reportTypedDictNotRequiredAccess]
+        import csv
+        timeindex = profile['timeindex'] # pyright: ignore[reportTypedDictNotRequiredAccess]
+        timex = profile['timex'] # pyright: ignore[reportTypedDictNotRequiredAccess]
+        temp1 = profile['temp1'] # pyright: ignore[reportTypedDictNotRequiredAccess]
+        temp2 = profile['temp2'] # pyright: ignore[reportTypedDictNotRequiredAccess]
+        extradevices:int = (len(profile['extratimex']) if 'extratimex' in profile else 0) # pyright: ignore[reportTypedDictNotRequiredAccess]
+        # make timex zero based
+        timex_zero = [tx - timex[0] for tx in timex]
+        CHARGE = timex_zero[timeindex[0]] if timeindex[0] > -1 else -1
+        TP_index = findTPint(timeindex, timex, temp2)
+        TP = timex_zero[TP_index] if TP_index and TP_index < len(timex_zero) else 0.
+        DRYe = timex_zero[timeindex[1]] if timeindex[1] else 0.
+        FCs = timex_zero[timeindex[2]] if timeindex[2] else 0.
+        FCe = timex_zero[timeindex[3]] if timeindex[3] else 0.
+        SCs = timex_zero[timeindex[4]] if timeindex[4] else 0.
+        SCe = timex_zero[timeindex[5]] if timeindex[5] else 0.
+        DROP = timex_zero[timeindex[6]] if timeindex[6] else 0.
+        COOL = timex_zero[timeindex[7]] if timeindex[7] else 0.
+        events:List[Tuple[float,str]] = [
+            (CHARGE,'CHARGE'),
+            (TP,'TP'),
+            (DRYe,'DRY End'),
+            (FCs,'FCs'),
+            (FCe,'FCe'),
+            (SCs,'SCs'),
+            (SCe,'SCe'),
+            (DROP, 'DROP'),
+            (COOL, 'COOL'),
+        ]
+        with open(filename, 'w',newline='',encoding='utf8') as outfile:
+            writer= csv.writer(outfile,delimiter='\t')
+            writer.writerow([
+                'Date:' + QDate.fromString(decodeLocalStrict(profile['roastdate'])).toString("dd'.'MM'.'yyyy"), # pyright: ignore[reportTypedDictNotRequiredAccess]
+                'Unit:' + profile['mode'], # pyright: ignore[reportTypedDictNotRequiredAccess]
+                'CHARGE:' + (eventtime2string(CHARGE) if CHARGE > 0 else ('' if CHARGE < 0 else '00:00')),
+                'TP:' + eventtime2string(TP),
+                'DRYe:' + eventtime2string(DRYe),
+                'FCs:' + eventtime2string(FCs),
+                'FCe:' + eventtime2string(FCe),
+                'SCs:' + eventtime2string(SCs),
+                'SCe:' + eventtime2string(SCe),
+                'DROP:' + eventtime2string(DROP),
+                'COOL:' + eventtime2string(COOL),
+                'Time:' + QTime.fromString(decodeLocalStrict(profile['roasttime'])).toString()[:-3]]) # pyright: ignore[reportTypedDictNotRequiredAccess]
+            headrow:List[str] = (['Time1','Time2','ET','BT','Event'] + functools.reduce(lambda x,y : x + [str(y[0]),str(y[1])], # type:ignore
+                    (list(zip(profile['extraname1'][0:extradevices],profile['extraname2'][0:extradevices])) if 'extraname1' in profile and 'extraname2' in profile else []),
+                    []))
+            writer.writerow(headrow)
+            last_time:Optional[str] = None
+            events_set:Set[str] = set()
+            for i, tx in enumerate(timex_zero):
+                if tx >= CHARGE >= 0:
+                    di,mo = divmod(tx - CHARGE, 60)
+                    time2 = f'{di:02.0f}:{mo:02.0f}'
+                else:
+                    time2 = ''
+                event:str = ''
+                for ev in events:
+                    if ev[1] not in events_set and (ev[0]!=0 or (ev[1]=='CHARGE' and ev[0]!=-1)) and int(round(tx)) == int(round(ev[0])):
+                        event = ev[1]
+                        events_set.add(ev[1])
+                        break
+                di,mo = divmod(tx,60)
+                time1 = f'{di:02.0f}:{mo:02.0f}'
+                if last_time is None or last_time != time1:
+                    extratemps = []
+                    if extradevices>0 and 'extratemp1' in profile and 'extratemp2' in profile:
+                        for j in range(extradevices):
+                            if j < len(profile['extratemp1']) and i < len(profile['extratemp1'][j]):
+                                extratemps.append(str(profile['extratemp1'][j][i]))
+                            else:
+                                extratemps.append('-1')
+                            if j < len(profile['extratemp2']) and i < len(profile['extratemp2'][j]):
+                                extratemps.append(str(profile['extratemp2'][j][i]))
+                            else:
+                                extratemps.append('-1')
+                    writer.writerow([str(time1),str(time2),str(temp1[i]),str(temp2[i]),str(event)] + extratemps)
+                last_time = time1
+        return True
+    return False

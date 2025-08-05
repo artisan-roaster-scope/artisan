@@ -50,7 +50,7 @@ modules that require extensive external dependency mocking while preventing cros
 """
 
 import sys
-from pathlib import Path
+#from pathlib import Path
 from typing import Any, Dict, Generator
 from unittest.mock import Mock, patch
 
@@ -569,135 +569,135 @@ class TestAddPathShelve:
                 register.addPathShelve(sample_uuid, sample_path, mock_lock) # type: ignore[arg-type]
 
 
-class TestScanDir:
-    """Test scanDir function."""
-
-    def test_scan_dir_successful(self, mock_app_window:Mock, sample_profile_data:Dict[str, str]) -> None:
-        """Test scanDir with successful directory scan."""
-        # Arrange
-        mock_files = [
-            Path('/tmp/profiles/roast1.alog'),
-            Path('/tmp/profiles/roast2.alog'),
-            Path('/tmp/profiles/roast3.alog'),
-        ]
-
-        with patch('plus.register.config') as mock_config, patch(
-            'plus.register.Path'
-        ) as mock_path_class, patch('plus.register.addPath') as mock_add_path:
-
-            mock_config.app_window = mock_app_window
-            mock_config.profile_ext = 'alog'
-            mock_config.uuid_tag = 'roastUUID'
-
-            mock_path_instance = Mock()
-            mock_path_instance.glob.return_value = mock_files
-            mock_path_class.return_value = mock_path_instance
-
-            mock_app_window.deserialize.return_value = sample_profile_data
-
-            # Act
-            register.scanDir('/tmp/profiles')
-
-            # Assert
-            mock_path_class.assert_called_once_with('/tmp/profiles')
-            mock_path_instance.glob.assert_called_once_with('*.alog')
-            assert mock_app_window.deserialize.call_count == 3
-            assert mock_add_path.call_count == 3
-
-    def test_scan_dir_default_path(self, mock_app_window:Mock) -> None:
-        """Test scanDir with default path from app window."""
-        # Arrange
-        with patch('plus.register.config') as mock_config, patch(
-            'plus.register.Path'
-        ) as mock_path_class:
-
-            mock_config.app_window = mock_app_window
-            mock_config.profile_ext = 'alog'
-            mock_config.uuid_tag = 'roastUUID'
-
-            mock_path_instance = Mock()
-            mock_path_instance.glob.return_value = []
-            mock_path_class.return_value = mock_path_instance
-
-            # Act
-            register.scanDir()  # No path parameter
-
-            # Assert
-            mock_app_window.getDefaultPath.assert_called_once()
-            mock_path_class.assert_called_once_with('/tmp/profiles')
-
-    def test_scan_dir_no_app_window(self) -> None:
-        """Test scanDir with no app window."""
-        # Arrange
-        with patch('plus.register.config') as mock_config:
-            mock_config.app_window = None
-
-            # Act & Assert - Should not raise exception
-            register.scanDir('/tmp/profiles')
-
-    def test_scan_dir_invalid_profile(self, mock_app_window:Mock) -> None:
-        """Test scanDir with invalid profile file."""
-        # Arrange
-        mock_files = [Path('/tmp/profiles/invalid.alog')]
-
-        with patch('plus.register.config') as mock_config, patch(
-            'plus.register.Path'
-        ) as mock_path_class, patch('plus.register.addPath') as mock_add_path:
-
-            mock_config.app_window = mock_app_window
-            mock_config.profile_ext = 'alog'
-            mock_config.uuid_tag = 'roastUUID'
-
-            mock_path_instance = Mock()
-            mock_path_instance.glob.return_value = mock_files
-            mock_path_class.return_value = mock_path_instance
-
-            mock_app_window.deserialize.return_value = None  # Invalid profile
-
-            # Act
-            register.scanDir('/tmp/profiles')
-
-            # Assert
-            mock_add_path.assert_not_called()
-
-    def test_scan_dir_profile_without_uuid(self, mock_app_window:Mock) -> None:
-        """Test scanDir with profile missing UUID."""
-        # Arrange
-        profile_without_uuid = {'title': 'Test Roast', 'date': '2022-01-01'}
-        mock_files = [Path('/tmp/profiles/no_uuid.alog')]
-
-        with patch('plus.register.config') as mock_config, patch(
-            'plus.register.Path'
-        ) as mock_path_class, patch('plus.register.addPath') as mock_add_path:
-
-            mock_config.app_window = mock_app_window
-            mock_config.profile_ext = 'alog'
-            mock_config.uuid_tag = 'roastUUID'
-
-            mock_path_instance = Mock()
-            mock_path_instance.glob.return_value = mock_files
-            mock_path_class.return_value = mock_path_instance
-
-            mock_app_window.deserialize.return_value = profile_without_uuid
-
-            # Act
-            register.scanDir('/tmp/profiles')
-
-            # Assert
-            mock_add_path.assert_not_called()
-
-    def test_scan_dir_exception_handling(self, mock_app_window:Mock) -> None:
-        """Test scanDir with exception during processing."""
-        # Arrange
-        with patch('plus.register.config') as mock_config, patch(
-            'plus.register.Path'
-        ) as mock_path_class:
-
-            mock_config.app_window = mock_app_window
-            mock_path_class.side_effect = Exception('File system error')
-
-            # Act & Assert - Should not raise exception
-            register.scanDir('/tmp/profiles')
+#class TestScanDir:
+#    """Test scanDir function."""
+#
+#    def test_scan_dir_successful(self, mock_app_window:Mock, sample_profile_data:Dict[str, str]) -> None:
+#        """Test scanDir with successful directory scan."""
+#        # Arrange
+#        mock_files = [
+#            Path('/tmp/profiles/roast1.alog'),
+#            Path('/tmp/profiles/roast2.alog'),
+#            Path('/tmp/profiles/roast3.alog'),
+#        ]
+#
+#        with patch('plus.register.config') as mock_config, patch(
+#            'plus.register.Path'
+#        ) as mock_path_class, patch('plus.register.addPath') as mock_add_path:
+#
+#            mock_config.app_window = mock_app_window
+#            mock_config.profile_ext = 'alog'
+#            mock_config.uuid_tag = 'roastUUID'
+#
+#            mock_path_instance = Mock()
+#            mock_path_instance.glob.return_value = mock_files
+#            mock_path_class.return_value = mock_path_instance
+#
+#            mock_app_window.deserialize.return_value = sample_profile_data
+#
+#            # Act
+#            register.scanDir('/tmp/profiles')
+#
+#            # Assert
+#            mock_path_class.assert_called_once_with('/tmp/profiles')
+#            mock_path_instance.glob.assert_called_once_with('*.alog')
+#            assert mock_app_window.deserialize.call_count == 3
+#            assert mock_add_path.call_count == 3
+#
+#    def test_scan_dir_default_path(self, mock_app_window:Mock) -> None:
+#        """Test scanDir with default path from app window."""
+#        # Arrange
+#        with patch('plus.register.config') as mock_config, patch(
+#            'plus.register.Path'
+#        ) as mock_path_class:
+#
+#            mock_config.app_window = mock_app_window
+#            mock_config.profile_ext = 'alog'
+#            mock_config.uuid_tag = 'roastUUID'
+#
+#            mock_path_instance = Mock()
+#            mock_path_instance.glob.return_value = []
+#            mock_path_class.return_value = mock_path_instance
+#
+#            # Act
+#            register.scanDir()  # No path parameter
+#
+#            # Assert
+#            mock_app_window.getDefaultPath.assert_called_once()
+#            mock_path_class.assert_called_once_with('/tmp/profiles')
+#
+#    def test_scan_dir_no_app_window(self) -> None:
+#        """Test scanDir with no app window."""
+#        # Arrange
+#        with patch('plus.register.config') as mock_config:
+#            mock_config.app_window = None
+#
+#            # Act & Assert - Should not raise exception
+#            register.scanDir('/tmp/profiles')
+#
+#    def test_scan_dir_invalid_profile(self, mock_app_window:Mock) -> None:
+#        """Test scanDir with invalid profile file."""
+#        # Arrange
+#        mock_files = [Path('/tmp/profiles/invalid.alog')]
+#
+#        with patch('plus.register.config') as mock_config, patch(
+#            'plus.register.Path'
+#        ) as mock_path_class, patch('plus.register.addPath') as mock_add_path:
+#
+#            mock_config.app_window = mock_app_window
+#            mock_config.profile_ext = 'alog'
+#            mock_config.uuid_tag = 'roastUUID'
+#
+#            mock_path_instance = Mock()
+#            mock_path_instance.glob.return_value = mock_files
+#            mock_path_class.return_value = mock_path_instance
+#
+#            mock_app_window.deserialize.return_value = None  # Invalid profile
+#
+#            # Act
+#            register.scanDir('/tmp/profiles')
+#
+#            # Assert
+#            mock_add_path.assert_not_called()
+#
+#    def test_scan_dir_profile_without_uuid(self, mock_app_window:Mock) -> None:
+#        """Test scanDir with profile missing UUID."""
+#        # Arrange
+#        profile_without_uuid = {'title': 'Test Roast', 'date': '2022-01-01'}
+#        mock_files = [Path('/tmp/profiles/no_uuid.alog')]
+#
+#        with patch('plus.register.config') as mock_config, patch(
+#            'plus.register.Path'
+#        ) as mock_path_class, patch('plus.register.addPath') as mock_add_path:
+#
+#            mock_config.app_window = mock_app_window
+#            mock_config.profile_ext = 'alog'
+#            mock_config.uuid_tag = 'roastUUID'
+#
+#            mock_path_instance = Mock()
+#            mock_path_instance.glob.return_value = mock_files
+#            mock_path_class.return_value = mock_path_instance
+#
+#            mock_app_window.deserialize.return_value = profile_without_uuid
+#
+#            # Act
+#            register.scanDir('/tmp/profiles')
+#
+#            # Assert
+#            mock_add_path.assert_not_called()
+#
+#    def test_scan_dir_exception_handling(self, mock_app_window:Mock) -> None:
+#        """Test scanDir with exception during processing."""
+#        # Arrange
+#        with patch('plus.register.config') as mock_config, patch(
+#            'plus.register.Path'
+#        ) as mock_path_class:
+#
+#            mock_config.app_window = mock_app_window
+#            mock_path_class.side_effect = Exception('File system error')
+#
+#            # Act & Assert - Should not raise exception
+#            register.scanDir('/tmp/profiles')
 
 
 class TestPathValidation:

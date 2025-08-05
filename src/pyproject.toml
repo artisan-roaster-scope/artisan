@@ -384,7 +384,7 @@ exclude_also = [
     "if 0:",
     "if __name__ == .__main__.:",
 
-    # Don't complaint about PyQt5 compatiblity
+    # Don't complaint about PyQt5 compatibility
     "except ImportError",
     "from PyQt5.",
 ]

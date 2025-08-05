@@ -19,7 +19,7 @@ import asyncio
 import logging
 
 try:
-    from pymodbus.framer.rtu import FramerRTU  # type:ignore[attr-defined,unused-ignore]
+    from pymodbus.framer.rtu import FramerRTU  # type:ignore[attr-defined,import-not-found,unused-ignore]
 except Exception: # pylint: disable=broad-except
     # pymodbus <3.7
     from pymodbus.message.rtu import MessageRTU as FramerRTU # type:ignore[import-not-found, no-redef, unused-ignore]

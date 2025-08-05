@@ -28,7 +28,7 @@ if TYPE_CHECKING:
     from PyQt6.QtWidgets import QStyleOptionViewItem  # pylint: disable=unused-import
     from PyQt6.QtCore import QModelIndex # pylint: disable=unused-import
 
-from artisanlib.util import deltaLabelUTF8, comma2dot, float2float
+from artisanlib.util import deltaLabelUTF8, comma2dot, float2float, deserialize
 from artisanlib.dialogs import ArtisanResizeablDialog
 from artisanlib.widgets import (MyQComboBox, MyTableWidgetItemNumber, MyTableWidgetItemQCheckBox,
                                 MyTableWidgetItemQComboBox, MyTableWidgetItemQLineEdit, MyTableWidgetItemQTime)
@@ -662,8 +662,9 @@ class AlarmDlg(ArtisanResizeablDialog):
                     self.aw.qmc.alarmbeep = [0]*len(self.aw.qmc.alarmflag)
                 self.aw.qmc.alarmstrings = alarms['alarmstrings']
             elif ext == '.alog':
-                obj = cast('ProfileData', self.aw.deserialize(filename))
-                self.aw.loadAlarmsFromProfile(filename, obj)
+                obj = deserialize(filename)
+                self.aw.plusAddPath(obj, filename)
+                self.aw.loadAlarmsFromProfile(filename, cast('ProfileData', obj))
                 self.alarmsfile.setText(self.aw.qmc.alarmsfile)
             self.aw.qmc.alarmstate = [-1]*len(self.aw.qmc.alarmflag)
             aitems = self.buildAlarmSourceList()

@@ -186,25 +186,26 @@ def getPath(uuid: str) -> Optional[str]:
         if register_semaphore.available() < 1:
             register_semaphore.release(1)
 
-
-# scans all .alog files for UUIDs and registers them in the cache
-def scanDir(path: Optional[str] = None) -> None:
-    _log.debug('scanDir(%s)', path)
-    try:
-        aw = config.app_window
-        if aw is not None:
-            if path is None:
-                # search the last used path
-                currentDictory = Path(
-                    aw.getDefaultPath()
-                )  # @UndefinedVariable
-            else:
-                currentDictory = Path(path)
-            for currentFile in currentDictory.glob(f'*.{config.profile_ext}'):
-                d = aw.deserialize(
-                    str(currentFile)
-                )  # @UndefinedVariable
-                if d is not None and config.uuid_tag in d:
-                    addPath(d[config.uuid_tag], str(currentFile))  # @UndefinedVariable
-    except Exception as e:  # pylint: disable=broad-except
-        _log.exception(e)
+# NOT USED YET
+## scans all .alog files for UUIDs and registers them in the cache
+#def scanDir(path: Optional[str] = None) -> None:
+#    _log.debug('scanDir(%s)', path)
+#    try:
+#        aw = config.app_window
+#        if aw is not None:
+#            if path is None:
+#                # search the last used path
+#                currentDictory = Path(
+#                    aw.getDefaultPath()
+#                )  # @UndefinedVariable
+#            else:
+#                currentDictory = Path(path)
+#            for currentFile in currentDictory.glob(f'*.{config.profile_ext}'):
+#                d = aw.deserialize(
+#                    str(currentFile)
+#                )  # @UndefinedVariable
+#                aw.plusAddPath(d, str(currentFile))
+#                if d is not None and config.uuid_tag in d:
+#                    addPath(d[config.uuid_tag], str(currentFile))  # @UndefinedVariable
+#    except Exception as e:  # pylint: disable=broad-except
+#        _log.exception(e)

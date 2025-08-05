@@ -22,6 +22,7 @@ if TYPE_CHECKING:
     from PyQt6.QtWidgets import QWidget # pylint: disable=unused-import
     from PyQt6.QtGui import QCloseEvent # pylint: disable=unused-import
 
+from artisanlib.util import serialize
 from artisanlib.dialogs import ArtisanDialog
 
 
@@ -645,7 +646,7 @@ class WheelDlg(ArtisanDialog):
             filename = self.aw.ArtisanSaveFileDialog(msg=QApplication.translate('Message','Save Wheel graph'),ext='*.wg')
             if filename:
                 #write
-                self.aw.serialize(filename, cast(Dict[str, Any], self.aw.getWheelGraph()))
+                serialize(filename, cast(Dict[str, Any], self.aw.getWheelGraph()))
                 self.aw.sendmessage(QApplication.translate('Message','Wheel Graph saved'))
         except OSError as e:
             self.aw.qmc.adderror((QApplication.translate('Error Message','IO Error:') + ' Wheel graph filesave(): {0}').format(str(e)))

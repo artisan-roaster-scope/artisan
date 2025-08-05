@@ -97,7 +97,7 @@ def convert_from_bcd(value: int) -> int:
 class modbusport:
     """ this class handles the communications with all the modbus devices"""
 
-    __slots__ = [ 'aw', 'legacy_pymodbus', 'modbus_serial_read_delay', 'modbus_serial_connect_delay', 'modbus_serial_write_delay', 'maxCount', 'readRetries', 'default_comport', 'comport', 'baudrate', 'bytesize', 'parity', 'stopbits',
+    __slots__ = [ 'aw', 'legacy_pymodbus', 'legacy_pymodbus_keywords', 'modbus_serial_read_delay', 'modbus_serial_connect_delay', 'modbus_serial_write_delay', 'maxCount', 'readRetries', 'default_comport', 'comport', 'baudrate', 'bytesize', 'parity', 'stopbits',
         'timeout', 'IP_timeout', 'IP_retries', 'serial_readRetries', 'PID_slave_ID', 'PID_SV_register', 'PID_p_register', 'PID_i_register', 'PID_d_register', 'PID_ON_action', 'PID_OFF_action',
         'channels', 'inputSlaves', 'inputRegisters', 'inputFloats', 'inputBCDs', 'inputFloatsAsInt', 'inputBCDsAsInt', 'inputSigned', 'inputCodes', 'inputDivs',
         'inputModes', 'optimizer', 'fetch_max_blocks', 'fail_on_cache_miss', 'disconnect_on_error', 'acceptable_errors', 'activeRegisters',
@@ -109,10 +109,14 @@ class modbusport:
     def __init__(self, aw:'ApplicationWindow') -> None:
         self.aw = aw
 
-        self.legacy_pymodbus:bool = False
+        self.legacy_pymodbus:bool = False           # True for pymodbus < 3.8.2
+        self.legacy_pymodbus_keywords:bool = False  # True for pymodbus < 3.10.0
         if Version(pymodbus.__version__) < Version('3.8.2'):
             # pymodbus before 3.8.2 did not had the option to specify the word order in datatype conversions
             self.legacy_pymodbus = True
+        if Version(pymodbus.__version__) < Version('3.10.0'):
+            # pymodbus before 3.10.0 did use the previous keyword names for read/write methods
+            self.legacy_pymodbus_keywords = True
 
         self.modbus_serial_read_delay       :Final[float] = 0.035 # in seconds
         self.modbus_serial_write_delay      :Final[float] = 0.080 # in seconds
@@ -154,7 +158,7 @@ class modbusport:
         self.inputModes:List[str] = ['C']*self.channels
 
         self.optimizer:bool = True # if set, values of consecutive register addresses are requested in single requests
-        # MODBUS functions associated to dicts associating MODBUS slave ids to registers in use
+        # MODBUS functions associated to dicts associating MODBUS device ids to registers in use
         # for optimized read of full register segments with single requests
         # this dict is re-computed on each connect() by a call to updateActiveRegisters()
         # NOTE: for registers of type float and BCD (32bit = 2x16bit) also the succeeding registers are registered
@@ -204,26 +208,24 @@ class modbusport:
 #
 
     def convert_16bit_uint_to_registers(self, value:int) -> List [int]:
+        if self.legacy_pymodbus:
+            if self.wordorderLittle:
+                return ModbusClientMixin.convert_to_registers(value, ModbusClientMixin.DATATYPE.UINT16)[::-1]
+            return ModbusClientMixin.convert_to_registers(value, ModbusClientMixin.DATATYPE.UINT16)
         return ModbusClientMixin.convert_to_registers(value, ModbusClientMixin.DATATYPE.UINT16, word_order=self.word_order()) # type:ignore[call-arg, unused-ignore]
-
-    #- unused:
-
-#    def convert_16bit_int_to_registers(self, value:int) -> List [int]:
-#        return ModbusClientMixin.convert_to_registers(value, ModbusClientMixin.DATATYPE.INT16, word_order=self.word_order()) # type:ignore[call-arg, unused-ignore]
-#
-#    def convert_32bit_uint_to_registers(self, value:int) -> List [int]:
-#        return ModbusClientMixin.convert_to_registers(value, ModbusClientMixin.DATATYPE.UINT32, word_order=self.word_order()) # type:ignore[call-arg, unused-ignore]
-
-    #-
 
     def convert_32bit_int_to_registers(self, value:int) -> List [int]:
         if self.legacy_pymodbus:
-            return ModbusClientMixin.convert_to_registers(value, ModbusClientMixin.DATATYPE.INT32)[::-1]
+            if self.wordorderLittle:
+                return ModbusClientMixin.convert_to_registers(value, ModbusClientMixin.DATATYPE.INT32)[::-1]
+            return ModbusClientMixin.convert_to_registers(value, ModbusClientMixin.DATATYPE.INT32)
         return ModbusClientMixin.convert_to_registers(value, ModbusClientMixin.DATATYPE.INT32, word_order=self.word_order()) # type:ignore[call-arg, unused-ignore]
 
     def convert_float_to_registers(self, value:float) -> List[int]:
         if self.legacy_pymodbus:
-            return ModbusClientMixin.convert_to_registers(value, ModbusClientMixin.DATATYPE.FLOAT32)[::-1]
+            if self.wordorderLittle:
+                return ModbusClientMixin.convert_to_registers(value, ModbusClientMixin.DATATYPE.FLOAT32)[::-1]
+            return ModbusClientMixin.convert_to_registers(value, ModbusClientMixin.DATATYPE.FLOAT32)
         return ModbusClientMixin.convert_to_registers(value, ModbusClientMixin.DATATYPE.FLOAT32, word_order=self.word_order()) # type:ignore[call-arg, unused-ignore]
 
 
@@ -231,21 +233,39 @@ class modbusport:
 
 
     def convert_16bit_uint_from_registers(self, registers:List[int]) -> int:
-        res = ModbusClientMixin.convert_from_registers(registers, ModbusClientMixin.DATATYPE.UINT16, word_order=self.word_order()) # type:ignore[call-arg, unused-ignore]
+        if self.legacy_pymodbus:
+            if self.wordorderLittle:
+                res = ModbusClientMixin.convert_from_registers(registers[::-1], ModbusClientMixin.DATATYPE.UINT16)
+            else:
+                res = ModbusClientMixin.convert_from_registers(registers, ModbusClientMixin.DATATYPE.UINT16)
+        else:
+            res = ModbusClientMixin.convert_from_registers(registers, ModbusClientMixin.DATATYPE.UINT16, word_order=self.word_order()) # type:ignore[call-arg, unused-ignore]
         if isinstance(res, int):
             return res
         return -1
 
 
     def convert_16bit_int_from_registers(self, registers:List[int]) -> int:
-        res = ModbusClientMixin.convert_from_registers(registers, ModbusClientMixin.DATATYPE.INT16, word_order=self.word_order()) # type:ignore[call-arg, unused-ignore]
+        if self.legacy_pymodbus:
+            if self.wordorderLittle:
+                res = ModbusClientMixin.convert_from_registers(registers[::-1], ModbusClientMixin.DATATYPE.INT16)
+            else:
+                res = ModbusClientMixin.convert_from_registers(registers, ModbusClientMixin.DATATYPE.INT16)
+        else:
+            res = ModbusClientMixin.convert_from_registers(registers, ModbusClientMixin.DATATYPE.INT16, word_order=self.word_order()) # type:ignore[call-arg, unused-ignore]
         if isinstance(res, int):
             return res
         return -1
 
 
     def convert_32bit_uint_from_registers(self, registers:List[int]) -> int:
-        res = ModbusClientMixin.convert_from_registers(registers, ModbusClientMixin.DATATYPE.UINT32, word_order=self.word_order()) # type:ignore[call-arg, unused-ignore]
+        if self.legacy_pymodbus:
+            if self.wordorderLittle:
+                res = ModbusClientMixin.convert_from_registers(registers[::-1], ModbusClientMixin.DATATYPE.UINT32)
+            else:
+                res = ModbusClientMixin.convert_from_registers(registers, ModbusClientMixin.DATATYPE.UINT32)
+        else:
+            res = ModbusClientMixin.convert_from_registers(registers, ModbusClientMixin.DATATYPE.UINT32, word_order=self.word_order()) # type:ignore[call-arg, unused-ignore]
         if isinstance(res, int):
             return res
         return -1
@@ -253,7 +273,10 @@ class modbusport:
 
     def convert_32bit_int_from_registers(self, registers:List[int]) -> int:
         if self.legacy_pymodbus:
-            res = ModbusClientMixin.convert_from_registers(registers[::-1], ModbusClientMixin.DATATYPE.INT32)
+            if self.wordorderLittle:
+                res = ModbusClientMixin.convert_from_registers(registers[::-1], ModbusClientMixin.DATATYPE.INT32)
+            else:
+                res = ModbusClientMixin.convert_from_registers(registers, ModbusClientMixin.DATATYPE.INT32)
         else:
             res = ModbusClientMixin.convert_from_registers(registers, ModbusClientMixin.DATATYPE.INT32, word_order=self.word_order()) # type:ignore[call-arg, unused-ignore]
         if isinstance(res, int):
@@ -263,7 +286,10 @@ class modbusport:
 
     def convert_float_from_registers(self, registers:List[int]) -> float:
         if self.legacy_pymodbus:
-            res = ModbusClientMixin.convert_from_registers(registers[::-1], ModbusClientMixin.DATATYPE.FLOAT32)
+            if self.wordorderLittle:
+                res = ModbusClientMixin.convert_from_registers(registers[::-1], ModbusClientMixin.DATATYPE.FLOAT32)
+            else:
+                res = ModbusClientMixin.convert_from_registers(registers, ModbusClientMixin.DATATYPE.FLOAT32)
         else:
             res = ModbusClientMixin.convert_from_registers(registers, ModbusClientMixin.DATATYPE.FLOAT32, word_order=self.word_order()) # type:ignore[call-arg, unused-ignore]
         if isinstance(res, float):
@@ -408,13 +434,13 @@ class modbusport:
 
 ########## MODBUS optimizer for fetching register data in batches
 
-    # MODBUS code => slave => [registers]
+    # MODBUS code => device id => [registers]
     def updateActiveRegisters(self) -> None:
         _log.debug('updateActiveRegisters()')
         self.activeRegisters = {}
         for c in range(self.channels):
-            slave = self.inputSlaves[c]
-            if slave != 0:
+            device_id = self.inputSlaves[c]
+            if device_id != 0:
                 register = self.inputRegisters[c]
                 code = self.inputCodes[c]
                 if code not in {1,2}: # MODBUS functions 1 and 2 are not optimized
@@ -423,25 +449,25 @@ class modbusport:
                         registers.append(register+1)
                     if code not in self.activeRegisters:
                         self.activeRegisters[code] = {}
-                    if slave in self.activeRegisters[code]:
-                        self.activeRegisters[code][slave].extend(registers)
+                    if device_id in self.activeRegisters[code]:
+                        self.activeRegisters[code][device_id].extend(registers)
                     else:
-                        self.activeRegisters[code][slave] = registers
+                        self.activeRegisters[code][device_id] = registers
         _log.debug('active registers: %s',self.activeRegisters)
 
     def clearReadingsCache(self) -> None:
         _log.debug('clearReadingsCache()')
         self.readingsCache = {}
 
-    def cacheReadings(self, code:int, slave:int, register:int, results:List[int]) -> None:
+    def cacheReadings(self, code:int, device_id:int, register:int, results:List[int]) -> None:
         if code not in self.readingsCache:
             self.readingsCache[code] = {}
-        if slave not in self.readingsCache[code]:
-            self.readingsCache[code][slave] = {}
+        if device_id not in self.readingsCache[code]:
+            self.readingsCache[code][device_id] = {}
         for i,v in enumerate(results):
-            self.readingsCache[code][slave][register+i] = v
+            self.readingsCache[code][device_id][register + i] = v
             if self.aw.seriallogflag:
-                ser_str = f'cache reading : Slave = {slave} || Register = {register+i} || Rx = {v}'
+                ser_str = f'cache reading : Device = {device_id} || Register = {register + i} || Rx = {v}'
                 self.aw.addserial(ser_str)
 
     # first result signals an error
@@ -507,8 +533,8 @@ class modbusport:
         try:
             assert self._client is not None
             self.clearReadingsCache()
-            for code, slaves in self.activeRegisters.items():
-                for slave, registers in slaves.items():
+            for code, device_ids in self.activeRegisters.items():
+                for device_id, registers in device_ids.items():
                     registers_sorted = sorted(registers)
                     sequences:List[Tuple[int,int]]
                     if self.fetch_max_blocks:
@@ -529,15 +555,15 @@ class modbusport:
                             res:Optional[ModbusPDU] = None
                             tx:float = time.time()
                             while True:
-                                _log.debug('readActive(%d,%d,%d,%d)', slave, code, register, count)
+                                _log.debug('readActive(%d,%d,%d,%d)', device_id, code, register, count)
                                 try:
                                     # we cache only MODBUS function 3 and 4 (not 1 and 2!)
                                     if code == 3:
-                                        res = await self._client.read_holding_registers(address=register,count=count,slave=slave)
+                                        res = await self.read_holding_registers(register, count, device_id)
                                     elif code == 4:
-                                        res = await self._client.read_input_registers(address=register,count=count,slave=slave)
+                                        res = await self.read_input_registers(register, count, device_id)
                                 except Exception as e: # pylint: disable=broad-except
-                                    _log.info('readActive(%d,%d,%d,%d)', slave, code, register, count)
+                                    _log.info('readActive(%d,%d,%d,%d)', device_id, code, register, count)
                                     _log.debug(e)
                                     res = None
                                 error, disconnect = self.invalidResult(res,count)
@@ -556,15 +582,15 @@ class modbusport:
                             #note: logged chars should be unicode not binary
                             if self.aw.seriallogflag and res is not None and hasattr(res, 'registers'):
                                 if self.type < 3: # serial MODBUS
-                                    ser_str = f'MODBUS readActiveregisters : {self.formatMS(tx,time.time())}ms => {self.comport},{self.baudrate},{self.bytesize},{self.parity},{self.stopbits},{self.timeout} || Slave = {slave} || Register = {register} || Code = {code} || Rx# = {len(res.registers)}'
+                                    ser_str = f'MODBUS readActiveregisters : {self.formatMS(tx,time.time())}ms => {self.comport},{self.baudrate},{self.bytesize},{self.parity},{self.stopbits},{self.timeout} || Slave = {device_id} || Register = {register} || Code = {code} || Rx# = {len(res.registers)}'
                                 else: # IP MODBUS
-                                    ser_str = f'MODBUS readActiveregisters : {self.formatMS(tx,time.time())}ms => {self.host}:{self.port} || Slave = {slave} || Register = {register} || Code = {code} || Rx# = {len(res.registers)}'
+                                    ser_str = f'MODBUS readActiveregisters : {self.formatMS(tx,time.time())}ms => {self.host}:{self.port} || Slave = {device_id} || Register = {register} || Code = {code} || Rx# = {len(res.registers)}'
                                 _log.debug(ser_str)
                                 self.aw.addserial(ser_str)
 
                             if res is not None and hasattr(res, 'registers'):
                                 self.clearCommError()
-                                self.cacheReadings(code,slave,register,res.registers)
+                                self.cacheReadings(code, device_id, register, res.registers)
 
         except Exception as ex: # pylint: disable=broad-except
             _log.debug(ex)
@@ -579,23 +605,19 @@ class modbusport:
 
 
     # function 15 (Write Multiple Coils)
-    def writeCoils(self, slave:int, register:int, values:List[bool]) -> None:
-        _log.debug('writeCoils(%d,%d,%s)', slave, register, values)
-        if slave == 0:
+    def writeCoils(self, device_id:int, register:int, values:List[bool]) -> None:
+        _log.debug('writeCoils(%d,%d,%s)', device_id, register, values)
+        if device_id == 0:
             return
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
             self.connect()
             if self._asyncLoopThread is not None and self.isConnected():
-                # wrap an Awaitable into a Coroutine
-                async def write_coils_wrapper(client:'ModbusBaseClient', register:int, values:List[bool], slave:int) -> 'ModbusPDU':
-                    return await client.write_coils(register, values, slave=slave)
                 assert self._client is not None
-                asyncio.run_coroutine_threadsafe(write_coils_wrapper(self._client, int(register), list(values), int(slave)), self._asyncLoopThread.loop).result()
-#                time.sleep(.3) # avoid possible hickups on startup
+                asyncio.run_coroutine_threadsafe(self.write_coils_wrapper(self.legacy_pymodbus_keywords, self._client, register, values, device_id), self._asyncLoopThread.loop).result()
         except Exception as ex: # pylint: disable=broad-except
-            _log.info('writeCoils(%d,%d,%s)', slave, register, values)
+            _log.info('writeCoils(%d,%d,%s)', device_id, register, values)
             _log.debug(ex)
             self.disconnectOnError()
             _, _, exc_tb = sys.exc_info()
@@ -606,9 +628,9 @@ class modbusport:
                 self.COMsemaphore.release(1)
 
     # function 5 (Write Single Coil)
-    def writeCoil(self, slave:int ,register:int ,value:bool) -> None:
-        _log.debug('writeCoil(%d,%d,%s)', slave, register, value)
-        if slave == 0:
+    def writeCoil(self, device_id:int, register:int, value:bool) -> None:
+        _log.debug('writeCoil(%d,%d,%s)', device_id, register, value)
+        if device_id == 0:
             return
         try:
             #### lock shared resources #####
@@ -616,13 +638,10 @@ class modbusport:
             self.connect()
             if self._asyncLoopThread is not None and self.isConnected():
                 # wrap an Awaitable into a Coroutine
-                async def write_coil_wrapper(client:'ModbusBaseClient', register:int, value:bool, slave:int) -> 'ModbusPDU':
-                    return await client.write_coil(register, value, slave=slave)
                 assert self._client is not None
-                asyncio.run_coroutine_threadsafe(write_coil_wrapper(self._client, int(register),value,int(slave)), self._asyncLoopThread.loop).result()
-#                time.sleep(.3) # avoid possible hickups on startup
+                asyncio.run_coroutine_threadsafe(self.write_coil_wrapper(self.legacy_pymodbus_keywords, self._client, register, value, device_id), self._asyncLoopThread.loop).result()
         except Exception as ex: # pylint: disable=broad-except
-            _log.info('writeCoil(%d,%d,%s) failed', slave, register, value)
+            _log.info('writeCoil(%d,%d,%s) failed', device_id, register, value)
             _log.debug(ex)
             self.disconnectOnError()
             _, _, exc_tb = sys.exc_info()
@@ -633,28 +652,28 @@ class modbusport:
                 self.COMsemaphore.release(1)
 
     # DEPRECATED: use writeSingle or writeWord (this one now just calls writeSingle with the value rounded to an integer)
-    # write value to register on slave (function 6 for int or function 16 for float)
+    # write value to register on device_id (function 6 for int or function 16 for float)
     # value can be one of string (containing an int or float), an int or a float
-    def writeRegister(self, slave:int, register:int, value: Union[int, float, str]) -> None:
-        _log.debug('writeRegister(%d,%d,%s)', slave, register, value)
-        if slave == 0:
+    def writeRegister(self, device_id:int, register:int, value: Union[int, float, str]) -> None:
+        _log.debug('writeRegister(%d,%d,%s)', device_id, register, value)
+        if device_id == 0:
             return
         if isinstance(value, str):
             if '.' in value:
-#                self.writeWord(slave, register, float(value))
-                self.writeSingleRegister(slave, register, int(round(float(value))))
+#                self.writeWord(device_id, register, float(value))
+                self.writeSingleRegister(device_id, register, int(round(float(value))))
             else:
-                self.writeSingleRegister(slave, register, int(value))
+                self.writeSingleRegister(device_id, register, int(value))
         elif isinstance(value, int):
-            self.writeSingleRegister(slave,register,value)
+            self.writeSingleRegister(device_id, register, value)
         elif isinstance(value, float):
-#            self.writeWord(slave,register,value)
-            self.writeSingleRegister(slave,register,int(round(value)))
+#            self.writeWord(device_id,register,value)
+            self.writeSingleRegister(device_id, register, int(round(value)))
 
     # function 6 (Write Single Holding Register)
-    def writeSingleRegister(self, slave:int, register:int, value:float) -> None:
-        _log.debug('writeSingleRegister(%d,%d,%s)', slave, register, value)
-        if slave == 0:
+    def writeSingleRegister(self, device_id:int, register:int, value:float) -> None:
+        _log.debug('writeSingleRegister(%d,%d,%s)', device_id, register, value)
+        if device_id == 0:
             return
         try:
             #### lock shared resources #####
@@ -662,13 +681,9 @@ class modbusport:
             self.connect()
             if self._asyncLoopThread is not None and self.isConnected():
                 assert self._client is not None
-                # wrap an Awaitable into a Coroutine
-                async def write_register_wrapper(client:'ModbusBaseClient', register:int, value:int, slave:int) -> 'ModbusPDU':
-                    return await client.write_register(register, value, slave=slave)
-                asyncio.run_coroutine_threadsafe(write_register_wrapper(self._client, int(register),int(round(value)),int(slave)), self._asyncLoopThread.loop).result()
-#                time.sleep(.03) # avoid possible hickups on startup
+                asyncio.run_coroutine_threadsafe(self.write_register_wrapper(self.legacy_pymodbus_keywords, self._client, register, int(round(value)), device_id), self._asyncLoopThread.loop).result()
         except Exception as ex: # pylint: disable=broad-except
-            _log.info('writeSingleRegister(%d,%d,%s) failed', slave, register, int(round(value)))
+            _log.info('writeSingleRegister(%d,%d,%s) failed', device_id, register, int(round(value)))
             _log.debug(ex)
             self.disconnectOnError()
             _, _, exc_tb = sys.exc_info()
@@ -681,29 +696,25 @@ class modbusport:
     # function 22 (Mask Write Register)
     # bits to be modified are "masked" with a 0 in the and_mask (not and_mask)
     # new bit values to be written are taken from the or_mask
-    def maskWriteRegister(self, slave:int, register:int, and_mask:int, or_mask:int) -> None:
-        _log.debug('maskWriteRegister(%d,%d,%s,%s)', slave, register, and_mask, or_mask)
-        if slave == 0:
+    def maskWriteRegister(self, device_id:int, register:int, and_mask:int, or_mask:int) -> None:
+        _log.debug('maskWriteRegister(%d,%d,%s,%s)', device_id, register, and_mask, or_mask)
+        if device_id == 0:
             return
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
             self.connect()
             if self._asyncLoopThread is not None and self.isConnected():
-                # wrap an Awaitable into a Coroutine
-                async def mask_write_register_wrapper(client:'ModbusBaseClient', register:int, and_mask:int, or_mask:int, slave:int) -> 'ModbusPDU':
-                    return await client.mask_write_register(address=register, and_mask=and_mask, or_mask=or_mask, slave=slave)
                 assert self._client is not None
-                asyncio.run_coroutine_threadsafe(mask_write_register_wrapper(
+                asyncio.run_coroutine_threadsafe(self.mask_write_register_wrapper(
+                    self.legacy_pymodbus_keywords,
                     self._client,
-                    int(register),
-                    int(and_mask),
-                    int(or_mask),
-                    int(slave)), self._asyncLoopThread.loop).result()
-
-#                time.sleep(.03)
+                    register,
+                    and_mask,
+                    or_mask,
+                    device_id), self._asyncLoopThread.loop).result()
         except Exception as ex: # pylint: disable=broad-except
-            _log.info('maskWriteRegister(%d,%d,%s,%s) failed', slave, register, and_mask, or_mask)
+            _log.info('maskWriteRegister(%d,%d,%s,%s) failed', device_id, register, and_mask, or_mask)
             if debugLogLevelActive():
                 _log.debug(ex)
             self.disconnectOnError()
@@ -717,18 +728,18 @@ class modbusport:
     # a local variant of function 22 (Mask Write Register)
     # the masks are evaluated locally on the given integer value and the result is send via
     # using function 6
-    def localMaskWriteRegister(self, slave:int, register:int, and_mask:int, or_mask:int, value:int) -> None:
-        _log.debug('localMaskWriteRegister(%d,%d,%s,%s,%s)', slave, register, and_mask, or_mask, value)
-        if slave == 0:
+    def localMaskWriteRegister(self, device_id:int, register:int, and_mask:int, or_mask:int, value:int) -> None:
+        _log.debug('localMaskWriteRegister(%d,%d,%s,%s,%s)', device_id, register, and_mask, or_mask, value)
+        if device_id == 0:
             return
         new_val = (int(round(value)) & and_mask) | (or_mask & (and_mask ^ 0xFFFF))
-        self.writeSingleRegister(slave,register,int(new_val))
+        self.writeSingleRegister(device_id, register, int(new_val))
 
     # function 16 (Write Multiple Holding Registers)
     # values is a list of integers or one integer (given floats are rounded to integers
-    def writeRegisters(self, slave:int, register:int, values:Union[List[float], float]) -> None:
-        _log.debug('writeRegisters(%d,%d,%s)', slave, register, values)
-        if slave == 0:
+    def writeRegisters(self, device_id:int, register:int, values:Union[List[float], float]) -> None:
+        _log.debug('writeRegisters(%d,%d,%s)', device_id, register, values)
+        if device_id == 0:
             return
         try:
             #### lock shared resources #####
@@ -738,12 +749,10 @@ class modbusport:
                 assert self._client is not None
                 float_values:List[float] = (values if isinstance(values, list) else [float(values)])
                 int_values:List[int] = [int(round(v)) for v in float_values]
-                # wrap an Awaitable into a Coroutine
-                async def write_registers_wrapper(client:'ModbusBaseClient', register:int, int_values:List[int], slave:int) -> 'ModbusPDU':
-                    return await client.write_registers(register, int_values, slave=slave)
-                asyncio.run_coroutine_threadsafe(write_registers_wrapper(self._client, int(register), int_values, int(slave)), self._asyncLoopThread.loop).result()
+                asyncio.run_coroutine_threadsafe(self.write_registers_wrapper(self.legacy_pymodbus_keywords, self._client, register, int_values, device_id), self._asyncLoopThread.loop).result()
+
         except Exception as ex: # pylint: disable=broad-except
-            _log.info('writeRegisters(%d,%d,%s) failed', slave, register, values)
+            _log.info('writeRegisters(%d,%d,%s) failed', device_id, register, values)
             _log.debug(ex)
             self.disconnectOnError()
             _, _, exc_tb = sys.exc_info()
@@ -756,9 +765,9 @@ class modbusport:
     # function 16 (Write Multiple Holding Registers)
     # value=int or float
     # writes a single precision 32bit float (2-registers)
-    def writeWord(self, slave:int, register:int, value:float) -> None:
-        _log.debug('writeWord(%d,%d,%s)', slave, register, value)
-        if slave == 0:
+    def writeWord(self, device_id:int, register:int, value:float) -> None:
+        _log.debug('writeWord(%d,%d,%s)', device_id, register, value)
+        if device_id == 0:
             return
         try:
             #### lock shared resources #####
@@ -767,13 +776,9 @@ class modbusport:
             if self._asyncLoopThread is not None and self.isConnected():
                 assert self._client is not None
                 payload:List[int] = self.convert_float_to_registers(value)
-                # wrap an Awaitable into a Coroutine
-                async def write_registers_wrapper(client:'ModbusBaseClient', register:int, payload:List[int], slave:int) -> 'ModbusPDU':
-                    return await client.write_registers(register, payload, slave=slave)
-                asyncio.run_coroutine_threadsafe(write_registers_wrapper(self._client, int(register), payload, int(slave)), self._asyncLoopThread.loop).result()
-#                time.sleep(.03)
+                asyncio.run_coroutine_threadsafe(self.write_registers_wrapper(self.legacy_pymodbus_keywords, self._client, register, payload, device_id), self._asyncLoopThread.loop).result()
         except Exception as ex: # pylint: disable=broad-except
-            _log.info('writeWord(%d,%d,%s) failed', slave, register, value)
+            _log.info('writeWord(%d,%d,%s) failed', device_id, register, value)
             _log.exception(ex)
             _log.debug(ex)
             self.disconnectOnError()
@@ -785,9 +790,9 @@ class modbusport:
                 self.COMsemaphore.release(1)
 
     # translates given int value (given floats are rounded to int) into a 16bit BCD and writes it into one register
-    def writeBCD(self, slave:int, register:int, value:float) -> None:
-        _log.debug('writeBCD(%d,%d,%s)', slave, register, value)
-        if slave == 0:
+    def writeBCD(self, device_id:int, register:int, value:float) -> None:
+        _log.debug('writeBCD(%d,%d,%s)', device_id, register, value)
+        if device_id == 0:
             return
         try:
             #### lock shared resources #####
@@ -797,10 +802,9 @@ class modbusport:
                 self.connect()
                 r = convert_to_bcd(int(round(value)))
                 payload: List[int] = self.convert_16bit_uint_to_registers(r)
-                asyncio.run_coroutine_threadsafe(self._client.write_registers(int(register),payload,slave=int(slave)), self._asyncLoopThread.loop).result() # type: ignore [reportGeneralTypeIssues, arg-type, unused-ignore] # Argument of type "list[bytes]" cannot be assigned to parameter "values" of type "List[int] | int" in function "write_registers"; in pymodbus 3.7.4 the error is now "List[bytes]"; expected "List[Union[bytes, int]
-#                time.sleep(.03)
+                asyncio.run_coroutine_threadsafe(self.write_registers_wrapper(self.legacy_pymodbus_keywords, self._client, register, payload, device_id), self._asyncLoopThread.loop).result()
         except Exception as ex: # pylint: disable=broad-except
-            _log.info('writeBCD(%d,%d,%s) failed', slave, register, int(round(value)))
+            _log.info('writeBCD(%d,%d,%s) failed', device_id, register, int(round(value)))
             _log.debug(ex)
             self.disconnectOnError()
             _, _, exc_tb = sys.exc_info()
@@ -813,9 +817,9 @@ class modbusport:
     # function 16 (Write Multiple Holding Registers)
     # value=int or float
     # writes a 32bit integer (2-registers)
-    def writeLong(self, slave:int, register:int, value:float) -> None:
-        _log.debug('writeLong(%d,%d,%s)', slave, register, value)
-        if slave == 0:
+    def writeLong(self, device_id:int, register:int, value:float) -> None:
+        _log.debug('writeLong(%d,%d,%s)', device_id, register, value)
+        if device_id == 0:
             return
         try:
             #### lock shared resources #####
@@ -824,10 +828,9 @@ class modbusport:
             if self._asyncLoopThread is not None and self.isConnected():
                 assert self._client is not None
                 payload:List[int] = self.convert_32bit_int_to_registers(int(round(value)))
-                asyncio.run_coroutine_threadsafe(self._client.write_registers(int(register),payload,slave=int(slave)), self._asyncLoopThread.loop).result() # type: ignore [reportGeneralTypeIssues, arg-type, unused-ignore] # Argument of type "list[bytes]" cannot be assigned to parameter "values" of type "List[int] | int" in function "write_registers"; in pymodbus 3.7.4 the error is now "List[bytes]"; expected "List[Union[bytes, int]
-#                await asyncio.sleep(.03)
+                asyncio.run_coroutine_threadsafe(self.write_registers_wrapper(self.legacy_pymodbus_keywords, self._client, register, payload, device_id), self._asyncLoopThread.loop).result()
         except Exception as ex: # pylint: disable=broad-except
-            _log.info('writeLong(%d,%d,%s) failed', slave, register, int(round(value)))
+            _log.info('writeLong(%d,%d,%s) failed', device_id, register, int(round(value)))
             _log.debug(ex)
             self.disconnectOnError()
             _, _, exc_tb = sys.exc_info()
@@ -839,8 +842,81 @@ class modbusport:
 
 #####
 
+    # mocks of pymodbus read/write functions adjusting for changed method signatures to be removed as soon as support for self.legacy_pymodbus_keywords (Python 3.8) is removed
 
-    async def read_async(self, slave:int, register:int, count:int, code:int) -> 'Tuple[Optional[ModbusPDU], bool]':
+    # function 1
+    async def read_coils(self, register:int, count:int, device_id:int) -> Any:
+        if self._client is None:
+            return None
+        if self.legacy_pymodbus_keywords:
+            return await self._client.read_coils(address=register,count=count,slave=device_id) # type: ignore[call-arg,unused-ignore] # pylint: disable=unexpected-keyword-arg
+        return await self._client.read_coils(register,count=count,device_id=device_id)         # type: ignore[call-arg,unused-ignore] # pylint: disable=unexpected-keyword-arg
+
+    # function 2
+    async def read_discrete_inputs(self, register:int, count:int, device_id:int) -> Any:
+        if self._client is None:
+            return None
+        if self.legacy_pymodbus_keywords:
+            return await self._client.read_discrete_inputs(address=register,count=count,slave=device_id) # type: ignore[call-arg,unused-ignore] # pylint: disable=unexpected-keyword-arg
+        return await self._client.read_discrete_inputs(register,count=count,device_id=device_id)         # type: ignore[call-arg,unused-ignore] # pylint: disable=unexpected-keyword-arg
+
+    # function 3
+    async def read_holding_registers(self, register:int, count:int, device_id:int) -> Any:
+        if self._client is None:
+            return None
+        if self.legacy_pymodbus_keywords:
+            return await self._client.read_holding_registers(address=register,count=count,slave=device_id) # type: ignore[call-arg,unused-ignore] # pylint: disable=unexpected-keyword-arg
+        return await self._client.read_holding_registers(register,count=count,device_id=device_id)         # type: ignore[call-arg,unused-ignore] # pylint: disable=unexpected-keyword-arg
+
+    # function 4
+    async def read_input_registers(self, register:int, count:int, device_id:int) -> Any:
+        if self._client is None:
+            return None
+        if self.legacy_pymodbus_keywords:
+            return await self._client.read_input_registers(address=register,count=count,slave=device_id) # type: ignore[call-arg,unused-ignore] # pylint: disable=unexpected-keyword-arg
+        return await self._client.read_input_registers(register,count=count,device_id=device_id)         # type: ignore[call-arg,unused-ignore] # pylint: disable=unexpected-keyword-arg
+
+#
+
+    # wrap an Awaitable into a Coroutine
+    @staticmethod
+    async def write_coils_wrapper(legacy_pymodbus_keywords:bool, client:'ModbusBaseClient', register:int, values:List[bool], device_id:int) -> 'ModbusPDU':
+        if legacy_pymodbus_keywords:
+            return await client.write_coils(register, values, slave=device_id) # type: ignore[call-arg,unused-ignore] # pylint: disable=unexpected-keyword-arg
+        return await client.write_coils(register, values, device_id=device_id) # type: ignore[call-arg,unused-ignore] # pylint: disable=unexpected-keyword-arg
+
+    # wrap an Awaitable into a Coroutine
+    @staticmethod
+    async def write_coil_wrapper(legacy_pymodbus_keywords:bool, client:'ModbusBaseClient', register:int, value:bool, device_id:int) -> 'ModbusPDU':
+        if legacy_pymodbus_keywords:
+            return await client.write_coil(register, value, slave=device_id) # type: ignore[call-arg,unused-ignore] # pylint: disable=unexpected-keyword-arg
+        return await client.write_coil(register, value, device_id=device_id) # type: ignore[call-arg,unused-ignore] # pylint: disable=unexpected-keyword-arg
+
+    # wrap an Awaitable into a Coroutine
+    @staticmethod
+    async def write_registers_wrapper(legacy_pymodbus_keywords:bool, client:'ModbusBaseClient', register:int, values:List[int], device_id:int) -> 'ModbusPDU':
+        if legacy_pymodbus_keywords:
+            return await client.write_registers(register, values, slave=device_id) # type: ignore[call-arg,unused-ignore] # pylint: disable=unexpected-keyword-arg
+        return await client.write_registers(register, values, device_id=device_id) # type: ignore[call-arg,unused-ignore] # pylint: disable=unexpected-keyword-arg
+
+    # wrap an Awaitable into a Coroutine
+    @staticmethod
+    async def write_register_wrapper(legacy_pymodbus_keywords:bool, client:'ModbusBaseClient', register:int, value:int, device_id:int) -> 'ModbusPDU':
+        if legacy_pymodbus_keywords:
+            return await client.write_register(register, value, slave=device_id) # type: ignore[call-arg,unused-ignore] # pylint: disable=unexpected-keyword-arg
+        return await client.write_register(register, value, device_id=device_id) # type: ignore[call-arg,unused-ignore] # pylint: disable=unexpected-keyword-arg
+
+    # wrap an Awaitable into a Coroutine
+    @staticmethod
+    async def mask_write_register_wrapper(legacy_pymodbus_keywords:bool, client:'ModbusBaseClient', register:int, and_mask:int, or_mask:int, device_id:int) -> 'ModbusPDU':
+        if legacy_pymodbus_keywords:
+            return await client.mask_write_register(address=register, and_mask=and_mask, or_mask=or_mask, slave=device_id) # type: ignore[call-arg,unused-ignore] # pylint: disable=unexpected-keyword-arg
+        return await client.mask_write_register(address=register, and_mask=and_mask, or_mask=or_mask, device_id=device_id) # type: ignore[call-arg,unused-ignore] # pylint: disable=unexpected-keyword-arg
+
+
+#####
+
+    async def read_async(self, device_id:int, register:int, count:int, code:int) -> 'Tuple[Optional[ModbusPDU], bool]':
         retry:int = self.readRetries
         error_disconnect:bool = False # set to True if a serious error requiring a disconnect was detected
         res: Optional[ModbusPDU] = None
@@ -848,13 +924,13 @@ class modbusport:
         while True:
             try:
                 if code==1:
-                    res = await self._client.read_coils(address=int(register),count=count,slave=int(slave))
+                    res = await self.read_coils(register, count, device_id)
                 elif code==2:
-                    res = await self._client.read_discrete_inputs(address=int(register),count=count,slave=int(slave))
+                    res = await self.read_discrete_inputs(register, count, device_id)
                 elif code==4:
-                    res = await self._client.read_input_registers(address=int(register),count=count,slave=int(slave))
+                    res = await self.read_input_registers(register, count, device_id)
                 else: # code==3
-                    res = await self._client.read_holding_registers(address=int(register),count=count,slave=int(slave))
+                    res = await self.read_holding_registers(register, count, device_id)
             except Exception as ex: # pylint: disable=broad-except
                 _log.debug(ex)
                 res = None
@@ -865,22 +941,22 @@ class modbusport:
                     retry = retry - 1
                     _log.debug('retry')
                 else:
-                    raise Exception(f'read_single_registers_async({slave},{register},{code}) failed')  # pylint: disable=broad-exception-raised
+                    raise Exception(f'read_single_registers_async({device_id},{register},{code}) failed')  # pylint: disable=broad-exception-raised
             else:
                 break
         return res, error_disconnect
 
-    # returns register data from optimizer cache or from slave
-    def read_registers(self, slave:int, register:int, count:int, code:int, force:bool=False) -> Tuple[Optional[List[int]],Optional[List[bool]],bool]:
+    # returns register data from optimizer cache or from device_id
+    def read_registers(self, device_id:int, register:int, count:int, code:int, force:bool=False) -> Tuple[Optional[List[int]],Optional[List[bool]],bool]:
         res_registers:Optional[List[int]] = None
         res_bits:Optional[List[bool]] = None
         error_disconnect:bool = False
         if count>0:
             if self.optimizer and not force and code not in {1,2}: # MODBUS function 1 and 2 are never optimized
-                if code in self.readingsCache and slave in self.readingsCache[code] and \
-                        all(r in self.readingsCache[code][slave] for r in range(register,register+count)):
+                if code in self.readingsCache and device_id in self.readingsCache[code] and \
+                        all(r in self.readingsCache[code][device_id] for r in range(register, register + count)):
                     # cache hit
-                    res_registers = [self.readingsCache[code][slave][r] for r in range(register,register+count)]
+                    res_registers = [self.readingsCache[code][device_id][r] for r in range(register, register + count)]
                     _log.debug('return cached registers => %.3f', res_registers)
                 elif self.fail_on_cache_miss:
                     _log.debug('optimizer cache miss')
@@ -891,7 +967,7 @@ class modbusport:
                     self.COMsemaphore.acquire(1)
                     self.connect()
                     if self._asyncLoopThread is not None and self.isConnected():
-                        res_response, res_error_disconnect = asyncio.run_coroutine_threadsafe(self.read_async(slave, register, count, code), self._asyncLoopThread.loop).result()
+                        res_response, res_error_disconnect = asyncio.run_coroutine_threadsafe(self.read_async(device_id, register, count, code), self._asyncLoopThread.loop).result()
                         error_disconnect = res_error_disconnect
                         if res_response is not None:
                             if res_response is not None and hasattr(res_response, 'registers'):
@@ -909,9 +985,9 @@ class modbusport:
 
     # function 3 (Read Multiple Holding Registers) and 4 (Read Input Registers)
     # if force the readings cache is ignored and fresh readings are requested
-    def readFloat(self, slave:int, register:int, code:int=3, force:bool=False) -> Optional[float]:
-        _log.debug('readFloat(%d,%d,%d,%s)', slave, register, code, force)
-        if slave == 0:
+    def readFloat(self, device_id:int, register:int, code:int=3, force:bool=False) -> Optional[float]:
+        _log.debug('readFloat(%d,%d,%d,%s)', device_id, register, code, force)
+        if device_id == 0:
             return None
         tx:float = 0.
         if self.aw.seriallogflag:
@@ -921,7 +997,7 @@ class modbusport:
         try:
             res_registers:Optional[List[int]]
             res_error_disconnect:bool
-            res_registers, _, res_error_disconnect = self.read_registers(slave, register, 2, code, force)
+            res_registers, _, res_error_disconnect = self.read_registers(device_id, register, 2, code, force)
             error_disconnect = res_error_disconnect
             if res_registers is not None:
                 res = self.convert_float_from_registers(res_registers)
@@ -930,7 +1006,7 @@ class modbusport:
 #             await asyncio.sleep(0.020) # we add a small sleep between requests to help out the slow Loring electronic
             return res
         except Exception as ex: # pylint: disable=broad-except
-            _log.info('readFloat(%d,%d,%d,%s) failed', slave, register, code, force)
+            _log.info('readFloat(%d,%d,%d,%s) failed', device_id, register, code, force)
             _log.debug(ex)
             self.disconnectOnError()
             if self.aw.qmc.flagon:
@@ -942,17 +1018,17 @@ class modbusport:
             #note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
                 if self.type < 3: # serial MODBUS
-                    ser_str = f'MODBUS readFloat : {self.formatMS(tx,time.time())}ms => {self.comport},{self.baudrate},{self.bytesize},{self.parity},{self.stopbits},{self.timeout} || Slave = {slave} || Register = {register} || Code = {code} || Rx = {res} || retries = {self.readRetries}'
+                    ser_str = f'MODBUS readFloat : {self.formatMS(tx,time.time())}ms => {self.comport},{self.baudrate},{self.bytesize},{self.parity},{self.stopbits},{self.timeout} || Device = {device_id} || Register = {register} || Code = {code} || Rx = {res} || retries = {self.readRetries}'
                 else: # IP MODBUS
-                    ser_str = f'MODBUS readFloat : {self.formatMS(tx,time.time())}ms => {self.host}:{self.port} || Slave = {slave} || Register = {register} || Code = {code} || Rx = {res} || retries = {self.readRetries}'
+                    ser_str = f'MODBUS readFloat : {self.formatMS(tx,time.time())}ms => {self.host}:{self.port} || Device = {device_id} || Register = {register} || Code = {code} || Rx = {res} || retries = {self.readRetries}'
                 self.aw.addserial(ser_str)
 
 
     # function 3 (Read Multiple Holding Registers) and 4 (Read Input Registers)
     # if force the readings cache is ignored and fresh readings are requested
-    def readBCD(self, slave:int, register:int, code:int=3, force:bool=False) -> Optional[int]:
-        _log.debug('readBCD(%d,%d,%d,%s)', slave, register, code, force)
-        if slave == 0:
+    def readBCD(self, device_id:int, register:int, code:int=3, force:bool=False) -> Optional[int]:
+        _log.debug('readBCD(%d,%d,%d,%s)', device_id, register, code, force)
+        if device_id == 0:
             return None
         tx:float = 0.
         if self.aw.seriallogflag:
@@ -962,7 +1038,7 @@ class modbusport:
         try:
             res_registers:Optional[List[int]]
             res_error_disconnect:bool
-            res_registers, _, res_error_disconnect = self.read_registers(slave, register, 2, code, force)
+            res_registers, _, res_error_disconnect = self.read_registers(device_id, register, 2, code, force)
             error_disconnect = res_error_disconnect
             if res_registers is not None:
                 res = convert_from_bcd(self.convert_32bit_uint_from_registers(res_registers))
@@ -971,7 +1047,7 @@ class modbusport:
 #             await asyncio.sleep(0.020) # we add a small sleep between requests to help out the slow Loring electronic
             return res
         except Exception as ex: # pylint: disable=broad-except
-            _log.info('readBCD(%d,%d,%d,%s) failed', slave, register, code, force)
+            _log.info('readBCD(%d,%d,%d,%s) failed', device_id, register, code, force)
             _log.debug(ex)
             self.disconnectOnError()
             if self.aw.qmc.flagon:
@@ -983,26 +1059,26 @@ class modbusport:
             #note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
                 if self.type < 3: # serial MODBUS
-                    ser_str = f'MODBUS readBCD : {self.formatMS(tx,time.time())}ms => {self.comport},{self.baudrate},{self.bytesize},{self.parity},{self.stopbits},{self.timeout} || Slave = {slave} || Register = {register} || Code = {code} || Rx = {res} || retries = {self.readRetries}'
+                    ser_str = f'MODBUS readBCD : {self.formatMS(tx,time.time())}ms => {self.comport},{self.baudrate},{self.bytesize},{self.parity},{self.stopbits},{self.timeout} || Device = {device_id} || Register = {register} || Code = {code} || Rx = {res} || retries = {self.readRetries}'
                 else: # IP MODBUS
-                    ser_str = f'MODBUS readBCD : {self.formatMS(tx,time.time())}ms => {self.host}:{self.port} || Slave = {slave} || Register = {register} || Code = {code} || Rx = {res} || retries = {self.readRetries}'
+                    ser_str = f'MODBUS readBCD : {self.formatMS(tx,time.time())}ms => {self.host}:{self.port} || Device = {device_id} || Register = {register} || Code = {code} || Rx = {res} || retries = {self.readRetries}'
                 self.aw.addserial(ser_str)
 
 
     # as readSingleRegister, but does not retry nor raise and error and returns a None instead
     # also does not reserve the port via a semaphore! This has to be done by the caller!
-    def peekSingleRegister(self, slave:int, register:int, code:int = 3) -> Optional[int]:
-        _log.debug('peekSingleRegister(%d,%d,%d)', slave, register, code)
-        if slave == 0:
+    def peekSingleRegister(self, device_id:int, register:int, code:int = 3) -> Optional[int]:
+        _log.debug('peekSingleRegister(%d,%d,%d)', device_id, register, code)
+        if device_id == 0:
             return None
         res:Optional[ModbusPDU] = None
         try:
             self.connect()
             if self._asyncLoopThread is not None and self.isConnected():
                 assert self._client is not None
-                res, _ = asyncio.run_coroutine_threadsafe(self.read_async(int(slave), int(register), 1, code), self._asyncLoopThread.loop).result()
+                res, _ = asyncio.run_coroutine_threadsafe(self.read_async(int(device_id), int(register), 1, code), self._asyncLoopThread.loop).result()
         except Exception as ex: # pylint: disable=broad-except
-            _log.info('peekSingleRegister(%d,%d,%d) failed', slave, register, code)
+            _log.info('peekSingleRegister(%d,%d,%d) failed', device_id, register, code)
             _log.debug(ex)
         error, _ = self.invalidResult(res,1)
         if res is not None and not error:
@@ -1027,9 +1103,9 @@ class modbusport:
 
     # function 3 (Read Multiple Holding Registers) and 4 (Read Input Registers)
     # if force the readings cache is ignored and fresh readings are requested
-    def readSingleRegister(self, slave:int, register:int, code:int = 3, force:bool = False, signed:bool = False) -> Optional[int]:
-        _log.debug('readSingleRegister(%d,%d,%d,%s,%s)', slave, register, code, force,signed)
-        if slave == 0:
+    def readSingleRegister(self, device_id:int, register:int, code:int = 3, force:bool = False, signed:bool = False) -> Optional[int]:
+        _log.debug('readSingleRegister(%d,%d,%d,%s,%s)', device_id, register, code, force, signed)
+        if device_id == 0:
             return None
         tx:float = 0.
         if self.aw.seriallogflag:
@@ -1040,7 +1116,7 @@ class modbusport:
             res_bits:Optional[List[bool]]
             res_registers:Optional[List[int]]
             res_error_disconnect:bool
-            res_registers, res_bits, res_error_disconnect = self.read_registers(slave, register, 1, code, force)
+            res_registers, res_bits, res_error_disconnect = self.read_registers(device_id, register, 1, code, force)
             error_disconnect = res_error_disconnect
             if code in {1, 2} and res_bits is not None:
                 res = sum(x[1] << x[0] for x in enumerate(res_bits)) if len(res_bits)>0 else 0
@@ -1057,7 +1133,7 @@ class modbusport:
 #             await asyncio.sleep(0.020) # we add a small sleep between requests to help out the slow Loring electronic
             return res
         except Exception as ex: # pylint: disable=broad-except
-            _log.info('readSingleRegister(%d,%d,%d,%s) failed', slave, register, code, force)
+            _log.info('readSingleRegister(%d,%d,%d,%s) failed', device_id, register, code, force)
             _log.debug(ex)
             self.disconnectOnError()
             if self.aw.qmc.flagon:
@@ -1069,17 +1145,17 @@ class modbusport:
             #note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
                 if self.type < 3: # serial MODBUS
-                    ser_str = f'MODBUS readSingleRegister : {self.formatMS(tx,time.time())}ms => {self.comport},{self.baudrate},{self.bytesize},{self.parity},{self.stopbits},{self.timeout} || Slave = {slave} || Register = {register} || Code = {code} || Rx = {res} || retries = {self.readRetries}'
+                    ser_str = f'MODBUS readSingleRegister : {self.formatMS(tx,time.time())}ms => {self.comport},{self.baudrate},{self.bytesize},{self.parity},{self.stopbits},{self.timeout} || Device = {device_id} || Register = {register} || Code = {code} || Rx = {res} || retries = {self.readRetries}'
                 else: # IP MODBUS
-                    ser_str = f'MODBUS readSingleRegister : {self.formatMS(tx,time.time())}ms => {self.host}:{self.port} || Slave = {slave} || Register = {register} || Code = {code} || Rx = {res} || retries = {self.readRetries}'
+                    ser_str = f'MODBUS readSingleRegister : {self.formatMS(tx,time.time())}ms => {self.host}:{self.port} || Device = {device_id} || Register = {register} || Code = {code} || Rx = {res} || retries = {self.readRetries}'
                 self.aw.addserial(ser_str)
 
 
     # function 3 (Read Multiple Holding Registers) and 4 (Read Input Registers)
     # if force the readings cache is ignored and fresh readings are requested
-    def readInt32(self, slave:int, register:int, code:int = 3,force:bool = False, signed:bool = False) -> Optional[int]:
-        _log.debug('readBCD(%d,%d,%d,%s)', slave, register, code, force)
-        if slave == 0:
+    def readInt32(self, device_id:int, register:int, code:int = 3, force:bool = False, signed:bool = False) -> Optional[int]:
+        _log.debug('readBCD(%d,%d,%d,%s)', device_id, register, code, force)
+        if device_id == 0:
             return None
         tx:float = 0.
         if self.aw.seriallogflag:
@@ -1090,7 +1166,7 @@ class modbusport:
         try:
             res_registers:Optional[List[int]]
             res_error_disconnect:bool
-            res_registers, _, res_error_disconnect = self.read_registers(slave, register, 2, code, force)
+            res_registers, _, res_error_disconnect = self.read_registers(device_id, register, 2, code, force)
             error_disconnect = res_error_disconnect
             if res_registers is not None:
                 if signed:
@@ -1103,7 +1179,7 @@ class modbusport:
 #             await asyncio.sleep(0.020) # we add a small sleep between requests to help out the slow Loring electronic
             return res
         except Exception as ex: # pylint: disable=broad-except
-            _log.info('readInt32(%d,%d,%d,%s) failed', slave, register, code, force)
+            _log.info('readInt32(%d,%d,%d,%s) failed', device_id, register, code, force)
             _log.debug(ex)
             self.disconnectOnError()
             if self.aw.qmc.flagon:
@@ -1115,9 +1191,9 @@ class modbusport:
             #note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
                 if self.type < 3: # serial MODBUS
-                    ser_str = f'MODBUS readInt32 : {self.formatMS(tx,time.time())}ms => {self.comport},{self.baudrate},{self.bytesize},{self.parity},{self.stopbits},{self.timeout} || Slave = {slave} || Register = {register} || Code = {code} || Rx = {res} || retries = {self.readRetries}'
+                    ser_str = f'MODBUS readInt32 : {self.formatMS(tx,time.time())}ms => {self.comport},{self.baudrate},{self.bytesize},{self.parity},{self.stopbits},{self.timeout} || Device = {device_id} || Register = {register} || Code = {code} || Rx = {res} || retries = {self.readRetries}'
                 else: # IP MODBUS
-                    ser_str = f'MODBUS readInt32 : {self.formatMS(tx,time.time())}ms => {self.host}:{self.port} || Slave = {slave} || Register = {register} || Code = {code} || Rx = {res} || retries = {self.readRetries}'
+                    ser_str = f'MODBUS readInt32 : {self.formatMS(tx,time.time())}ms => {self.host}:{self.port} || Device = {device_id} || Register = {register} || Code = {code} || Rx = {res} || retries = {self.readRetries}'
                 self.aw.addserial(ser_str)
 
 
@@ -1126,9 +1202,9 @@ class modbusport:
     # function 3 (Read Multiple Holding Registers) and
     # function 4 (Read Input Registers)
     # if force the readings cache is ignored and fresh readings are requested
-    def readBCDint(self, slave:int, register:int, code:int = 3, force:bool = False) -> Optional[int]:
-        _log.debug('readBCD(%d,%d,%d,%s)', slave, register, code, force)
-        if slave == 0:
+    def readBCDint(self, device_id:int, register:int, code:int = 3, force:bool = False) -> Optional[int]:
+        _log.debug('readBCD(%d,%d,%d,%s)', device_id, register, code, force)
+        if device_id == 0:
             return None
         tx:float = 0.
         if self.aw.seriallogflag:
@@ -1138,7 +1214,7 @@ class modbusport:
         try:
             res_registers:Optional[List[int]]
             res_error_disconnect:bool
-            res_registers, _, res_error_disconnect = self.read_registers(slave, register, 1, code, force)
+            res_registers, _, res_error_disconnect = self.read_registers(device_id, register, 1, code, force)
             error_disconnect = res_error_disconnect
             if res_registers is not None:
                 res = convert_from_bcd(self.convert_16bit_uint_from_registers(res_registers))
@@ -1147,7 +1223,7 @@ class modbusport:
 #             await asyncio.sleep(0.020) # we add a small sleep between requests to help out the slow Loring electronic
             return res
         except Exception as ex: # pylint: disable=broad-except
-            _log.info('readBCDint(%d,%d,%d,%s) failed', slave, register, code, force)
+            _log.info('readBCDint(%d,%d,%d,%s) failed', device_id, register, code, force)
             _log.debug(ex)
             self.disconnectOnError()
             if self.aw.qmc.flagon:
@@ -1159,9 +1235,9 @@ class modbusport:
             #note: logged chars should be unicode not binary
             if self.aw.seriallogflag:
                 if self.type < 3: # serial MODBUS
-                    ser_str = f'MODBUS readBCDint : {self.formatMS(tx,time.time())}ms => {self.comport},{self.baudrate},{self.bytesize},{self.parity},{self.stopbits},{self.timeout} || Slave = {slave} || Register = {register} || Code = {code} || Rx = {res} || retries = {self.readRetries}'
+                    ser_str = f'MODBUS readBCDint : {self.formatMS(tx,time.time())}ms => {self.comport},{self.baudrate},{self.bytesize},{self.parity},{self.stopbits},{self.timeout} || Device = {device_id} || Register = {register} || Code = {code} || Rx = {res} || retries = {self.readRetries}'
                 else: # IP MODBUS
-                    ser_str = f'MODBUS readBCDint : {self.formatMS(tx,time.time())}ms => {self.host}:{self.port} || Slave = {slave} || Register = {register} || Code = {code} || Rx = {res} || retries = {self.readRetries}'
+                    ser_str = f'MODBUS readBCDint : {self.formatMS(tx,time.time())}ms => {self.host}:{self.port} || Device = {device_id} || Register = {register} || Code = {code} || Rx = {res} || retries = {self.readRetries}'
                 self.aw.addserial(ser_str)
 
 

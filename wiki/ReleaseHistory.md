@@ -43,6 +43,7 @@ v3.2.1
   - fixes redraw issue with active crosslines in Comparator
   - fixes minor quirk in PiOS deb postinstall and perm scripts ([Issue #1922](../../../issues/1922))
   - fixes the OFF on DROP option for the WebSocket connection ([Issue #1943](../../../issues/1943))
+  - fixes a regression which broke the MODBUS communication with certain devices in Windows Legacy builds ([Issue #1931](../../../issues/1931))
 
 
 ----
