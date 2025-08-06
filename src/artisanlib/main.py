@@ -18033,7 +18033,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.modbus.IP_timeout = float2float(toFloat(settings.value('IP_timeout',self.modbus.IP_timeout)))
             self.modbus.IP_retries = toInt(settings.value('IP_retries',self.modbus.IP_retries))
             for i in range(self.modbus.channels):
-                self.modbus.inputSlaves[i] = toInt(settings.value(f'input{i+1}slave',self.modbus.inputSlaves[i]))
+                self.modbus.inputDeviceIds[i] = toInt(settings.value(f'input{i + 1}slave', self.modbus.inputDeviceIds[i]))
                 self.modbus.inputRegisters[i] = toInt(settings.value(f'input{i+1}register',self.modbus.inputRegisters[i]))
                 self.modbus.inputFloats[i] = toBool(settings.value(f'input{i+1}float',self.modbus.inputFloats[i]))
                 self.modbus.inputBCDs[i] = toBool(settings.value(f'input{i+1}bcd',self.modbus.inputBCDs[i]))
@@ -19971,7 +19971,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'PID_OFF_action',self.modbus.PID_OFF_action, read_defaults)
             self.settingsSetValue(settings, default_settings, 'PID_ON_action',self.modbus.PID_ON_action, read_defaults)
             for i in range(self.modbus.channels):
-                self.settingsSetValue(settings, default_settings, f'input{i+1}slave',self.modbus.inputSlaves[i], read_defaults)
+                self.settingsSetValue(settings, default_settings, f'input{i+1}slave', self.modbus.inputDeviceIds[i], read_defaults)
                 self.settingsSetValue(settings, default_settings, f'input{i+1}register',self.modbus.inputRegisters[i], read_defaults)
                 self.settingsSetValue(settings, default_settings, f'input{i+1}float',self.modbus.inputFloats[i], read_defaults)
                 self.settingsSetValue(settings, default_settings, f'input{i+1}bcd',self.modbus.inputBCDs[i], read_defaults)
@@ -24122,9 +24122,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 try:
                     inputSlaveEdit = dialog.modbus_inputSlaveEdits[i]
                     if inputSlaveEdit is not None:
-                        self.modbus.inputSlaves[i] = toInt(inputSlaveEdit.text())
+                        self.modbus.inputDeviceIds[i] = toInt(inputSlaveEdit.text())
                 except Exception: # pylint: disable=broad-except
-                    self.modbus.inputSlaves[i] = 0
+                    self.modbus.inputDeviceIds[i] = 0
                 try:
                     inputRegisterEdit = dialog.modbus_inputRegisterEdits[i]
                     if inputRegisterEdit is not None:

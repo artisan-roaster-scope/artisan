@@ -12,6 +12,7 @@ This module tests the BLE and ClientBLE classes functionality including:
 - Service and characteristic management
 """
 
+import warnings
 import asyncio
 from unittest.mock import AsyncMock, Mock, patch
 
@@ -276,10 +277,14 @@ class TestBLE:
         ble_instance._asyncLoopThread = mock_thread
         mock_bleak_client.is_connected = False
 
-        # Act - Should not raise exception
-        ble_instance.write(mock_bleak_client, 'uuid', b'message')
 
-        # Assert - No exception should be raised
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', RuntimeWarning)
+
+            # Act - Should not raise exception
+            ble_instance.write(mock_bleak_client, 'uuid', b'message')
+
+            # Assert - No exception should be raised
 
     def test_read_success(self, ble_instance: BLE, mock_bleak_client: Mock) -> None:
         """Test successful read operation."""
@@ -311,12 +316,15 @@ class TestBLE:
         mock_future.result.side_effect = Exception('Read failed')
         mock_future.exception.return_value = Exception('Read failed')
 
-        with patch('asyncio.run_coroutine_threadsafe', return_value=mock_future):
-            # Act
-            result = ble_instance.read(mock_bleak_client, 'uuid')
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', RuntimeWarning)
 
-            # Assert
-            assert result is None
+            with patch('asyncio.run_coroutine_threadsafe', return_value=mock_future):
+                # Act
+                result = ble_instance.read(mock_bleak_client, 'uuid')
+
+                # Assert
+                assert result is None
 
     def test_read_with_no_async_thread(self, ble_instance: BLE, mock_bleak_client: Mock) -> None:
         """Test read when no async thread exists."""
@@ -351,11 +359,14 @@ class TestBLE:
         # Arrange
         ble_instance._asyncLoopThread = None
 
-        # Act
-        result = ble_instance.disconnect_ble(mock_bleak_client)
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', RuntimeWarning)
 
-        # Assert
-        assert result is False
+            # Act
+            result = ble_instance.disconnect_ble(mock_bleak_client)
+
+            # Assert
+            assert result is False
 
 
 class TestClientBLE:

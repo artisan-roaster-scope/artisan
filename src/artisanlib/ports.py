@@ -494,7 +494,7 @@ class comportDlg(ArtisanResizeablDialog):
         self.modbus_inputDecodes:List[Optional[QComboBox]] = [None]*self.aw.modbus.channels # pyrefly: ignore[bad-assignment]
 
         for i in range(self.aw.modbus.channels):
-            modbus_inputSlaveEdit:QLineEdit = QLineEdit(str(self.aw.modbus.inputSlaves[i]))
+            modbus_inputSlaveEdit:QLineEdit = QLineEdit(str(self.aw.modbus.inputDeviceIds[i]))
             modbus_inputSlaveEdit.setValidator(QIntValidator(0,247,self.modbus_inputSlaveEdits[i]))
             modbus_inputSlaveEdit.setFixedWidth(75)
             modbus_inputSlaveEdit.setAlignment(Qt.AlignmentFlag.AlignRight)

@@ -4,6 +4,7 @@
 # Ensure proper module isolation to prevent cross-file contamination
 
 import sys
+import warnings
 
 # Check if snap7 or other modules are mocked (from other tests) and restore real ones
 external_module_names = ['snap7', 'snap7.client']
@@ -214,11 +215,15 @@ class TestS7Client:
         client._lib = Mock()  # Add required snap7 attributes
         client._s7_client = Mock()
 
-        # Act - Should call super().destroy() since hasattr returns True for None
-        with patch('snap7.client.Client.destroy') as mock_super_destroy:
-            client.destroy()
-            # Assert - super().destroy() should be called since hasattr(client, 'library') is True
-            mock_super_destroy.assert_called_once()
+
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', RuntimeWarning)
+
+            # Act - Should call super().destroy() since hasattr returns True for None
+            with patch('snap7.client.Client.destroy') as mock_super_destroy:
+                client.destroy()
+                # Assert - super().destroy() should be called since hasattr(client, 'library') is True
+                mock_super_destroy.assert_called_once()
 
     @patch('snap7.client.Client.__init__')
     @patch('snap7.client.Client.destroy')
@@ -243,18 +248,22 @@ class TestS7Client:
         # Arrange
         mock_super_init.return_value = None
 
-        client = S7Client()
 
-        # Test case 1: No library attribute
-        assert not hasattr(client, 'library')
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', RuntimeWarning)
 
-        # Test case 2: Library attribute set to Mock
-        client.library = Mock()  # type: ignore[attr-defined]
-        assert hasattr(client, 'library')
+            client = S7Client()
 
-        # Test case 3: Library attribute set to None
-        client.library = None  # pyright: ignore[reportAttributeAccessIssue]
-        assert hasattr(client, 'library')  # hasattr returns True even for None
+            # Test case 1: No library attribute
+            assert not hasattr(client, 'library')
+
+            # Test case 2: Library attribute set to Mock
+            client.library = Mock()  # type: ignore[attr-defined]
+            assert hasattr(client, 'library')
+
+            # Test case 3: Library attribute set to None
+            client.library = None  # pyright: ignore[reportAttributeAccessIssue]
+            assert hasattr(client, 'library')  # hasattr returns True even for None
 
     #    @patch('snap7.client.Client.__init__')
     #    @patch('snap7.client.Client.destroy')
@@ -479,14 +488,18 @@ class TestS7ClientIntegration:
         client.other_attr = 'test_value'  # type: ignore[attr-defined]
         client.another_attr = 42  # type: ignore[attr-defined]
 
-        # Act
-        with patch('snap7.client.Client.destroy'):
-            client.destroy()
 
-        # Assert - Other attributes should remain unchanged
-        assert client.other_attr == 'test_value'  # type: ignore[attr-defined]
-        assert client.another_attr == 42  # type: ignore[attr-defined]
-        assert hasattr(client, 'library')
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', RuntimeWarning)
+
+            # Act
+            with patch('snap7.client.Client.destroy'):
+                client.destroy()
+
+            # Assert - Other attributes should remain unchanged
+            assert client.other_attr == 'test_value'  # type: ignore[attr-defined]
+            assert client.another_attr == 42  # type: ignore[attr-defined]
+            assert hasattr(client, 'library')
 
     @pytest.mark.skip
     @patch('snap7.client.Client.__init__')
@@ -519,34 +532,39 @@ class TestS7ClientIntegration:
     @patch('snap7.client.Client.__init__')
     def test_s7client_hasattr_edge_cases(self, mock_super_init: Mock) -> None:
         """Test hasattr behavior with edge cases."""
-        # Arrange
-        mock_super_init.return_value = None
-        client = S7Client()
 
-        # Test various edge cases
-        test_cases: List[Tuple[Any, bool]] = [
-            (None, True),  # None value
-            (False, True),  # False value
-            (0, True),  # Zero value
-            ('', True),  # Empty string
-            ([], True),  # Empty list
-            ({}, True),  # Empty dict
-        ]
 
-        for value, should_have_attr in test_cases:
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', RuntimeWarning)
+
             # Arrange
-            client.library = value  # type: ignore[attr-defined]
+            mock_super_init.return_value = None
+            client = S7Client()
 
-            # Act & Assert
-            assert hasattr(client, 'library') == should_have_attr
+            # Test various edge cases
+            test_cases: List[Tuple[Any, bool]] = [
+                (None, True),  # None value
+                (False, True),  # False value
+                (0, True),  # Zero value
+                ('', True),  # Empty string
+                ([], True),  # Empty list
+                ({}, True),  # Empty dict
+            ]
 
-#            with patch('snap7.client.Client.destroy') as mock_super_destroy:
-#                client.destroy()
-#                if should_have_attr:
-#                    mock_super_destroy.assert_called_once()
-#                else:
-#                    mock_super_destroy.assert_not_called()
-#                mock_super_destroy.reset_mock()
+            for value, should_have_attr in test_cases:
+                # Arrange
+                client.library = value  # type: ignore[attr-defined]
+
+                # Act & Assert
+                assert hasattr(client, 'library') == should_have_attr
+
+    #            with patch('snap7.client.Client.destroy') as mock_super_destroy:
+    #                client.destroy()
+    #                if should_have_attr:
+    #                    mock_super_destroy.assert_called_once()
+    #                else:
+    #                    mock_super_destroy.assert_not_called()
+    #                mock_super_destroy.reset_mock()
 
 
 class TestS7ClientErrorHandling:

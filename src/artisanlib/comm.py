@@ -2755,14 +2755,14 @@ class serialport:
         res:List[float] = [-1.0]*self.aw.modbus.channels
 
         for i in range(self.aw.modbus.channels):
-            if self.aw.modbus.inputSlaves[i] and not force: # in force mode (second request in oversampling mode) read only first two channels (ET/BT)
+            if self.aw.modbus.inputDeviceIds[i] and not force: # in force mode (second request in oversampling mode) read only first two channels (ET/BT)
                 if not self.aw.modbus.optimizer or force:
                     self.aw.modbus.sleepBetween() # we start with a sleep, as it could be that just a send command happened before the semaphore was caught
                 rf:Optional[float]
                 ri:Optional[int]
                 if self.aw.modbus.inputFloats[i]:
                     rf = self.aw.modbus.readFloat(
-                                self.aw.modbus.inputSlaves[i],
+                                self.aw.modbus.inputDeviceIds[i],
                                 self.aw.modbus.inputRegisters[i],
                                 self.aw.modbus.inputCodes[i],
                                 force)
@@ -2770,7 +2770,7 @@ class serialport:
                         res[i] = rf
                 elif self.aw.modbus.inputFloatsAsInt[i]:
                     ri = self.aw.modbus.readInt32(
-                                self.aw.modbus.inputSlaves[i],
+                                self.aw.modbus.inputDeviceIds[i],
                                 self.aw.modbus.inputRegisters[i],
                                 self.aw.modbus.inputCodes[i],
                                 force,
@@ -2779,7 +2779,7 @@ class serialport:
                         res[i] = ri
                 elif self.aw.modbus.inputBCDs[i]:
                     ri = self.aw.modbus.readBCD(
-                                self.aw.modbus.inputSlaves[i],
+                                self.aw.modbus.inputDeviceIds[i],
                                 self.aw.modbus.inputRegisters[i],
                                 self.aw.modbus.inputCodes[i],
                                 force)
@@ -2787,7 +2787,7 @@ class serialport:
                         res[i] = ri
                 elif self.aw.modbus.inputBCDsAsInt[i]:
                     ri = self.aw.modbus.readBCDint(
-                                self.aw.modbus.inputSlaves[i],
+                                self.aw.modbus.inputDeviceIds[i],
                                 self.aw.modbus.inputRegisters[i],
                                 self.aw.modbus.inputCodes[i],
                                 force)
@@ -2795,7 +2795,7 @@ class serialport:
                         res[i] = ri
                 else:
                     ri = self.aw.modbus.readSingleRegister(
-                                self.aw.modbus.inputSlaves[i],
+                                self.aw.modbus.inputDeviceIds[i],
                                 self.aw.modbus.inputRegisters[i],
                                 self.aw.modbus.inputCodes[i],
                                 force,

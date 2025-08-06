@@ -99,10 +99,10 @@ class modbusport:
 
     __slots__ = [ 'aw', 'legacy_pymodbus', 'legacy_pymodbus_keywords', 'modbus_serial_read_delay', 'modbus_serial_connect_delay', 'modbus_serial_write_delay', 'maxCount', 'readRetries', 'default_comport', 'comport', 'baudrate', 'bytesize', 'parity', 'stopbits',
         'timeout', 'IP_timeout', 'IP_retries', 'serial_readRetries', 'PID_slave_ID', 'PID_SV_register', 'PID_p_register', 'PID_i_register', 'PID_d_register', 'PID_ON_action', 'PID_OFF_action',
-        'channels', 'inputSlaves', 'inputRegisters', 'inputFloats', 'inputBCDs', 'inputFloatsAsInt', 'inputBCDsAsInt', 'inputSigned', 'inputCodes', 'inputDivs',
+        'channels', 'inputDeviceIds', 'inputRegisters', 'inputFloats', 'inputBCDs', 'inputFloatsAsInt', 'inputBCDsAsInt', 'inputSigned', 'inputCodes', 'inputDivs',
         'inputModes', 'optimizer', 'fetch_max_blocks', 'fail_on_cache_miss', 'disconnect_on_error', 'acceptable_errors', 'activeRegisters',
         'readingsCache', 'SVmultiplier', 'PIDmultiplier', 'SVwriteLong', 'SVwriteFloat',
-        'wordorderLittle', '_asyncLoopThread', '_client', 'COMsemaphore', 'default_host', 'host', 'port', 'type', 'lastReadResult', 'commError' ]
+        'wordorderLittle', '_asyncLoopThread', '_client', 'COMsemaphore', 'default_host', 'host', 'port', 'type', 'lastReadResult', 'commError']
 
     MAX_REGISTER_SEGMENT:int = 100 # maximal length of registers fetched at once if fetch_max_blocks is set
 
@@ -144,7 +144,7 @@ class modbusport:
         self.PID_OFF_action:str = ''
 
         self.channels:Final[int] = 10
-        self.inputSlaves:List[int] = [0]*self.channels
+        self.inputDeviceIds:List[int] = [0] * self.channels
         self.inputRegisters:List[int] = [0]*self.channels
         # decoding (default: 16bit uInt)
         self.inputFloats:List[bool] = [False]*self.channels       # 32bit Floats
@@ -439,7 +439,7 @@ class modbusport:
         _log.debug('updateActiveRegisters()')
         self.activeRegisters = {}
         for c in range(self.channels):
-            device_id = self.inputSlaves[c]
+            device_id = self.inputDeviceIds[c]
             if device_id != 0:
                 register = self.inputRegisters[c]
                 code = self.inputCodes[c]

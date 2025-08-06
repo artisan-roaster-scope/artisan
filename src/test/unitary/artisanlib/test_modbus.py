@@ -392,7 +392,7 @@ class TestModbusPortInitialization:
         """Test that channels are properly initialized."""
         # Assert
         assert client.channels == 10
-        assert len(client.inputSlaves) == 10
+        assert len(client.inputDeviceIds) == 10
         assert len(client.inputRegisters) == 10
         assert len(client.inputFloats) == 10
         assert len(client.inputBCDs) == 10
@@ -402,7 +402,7 @@ class TestModbusPortInitialization:
         assert len(client.inputModes) == 10
 
         # Check default values
-        assert all(slave == 0 for slave in client.inputSlaves)
+        assert all(slave == 0 for slave in client.inputDeviceIds)
         assert all(register == 0 for register in client.inputRegisters)
         assert all(not flag for flag in client.inputFloats)
         assert all(not flag for flag in client.inputBCDs)
