@@ -18033,7 +18033,13 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.modbus.IP_timeout = float2float(toFloat(settings.value('IP_timeout',self.modbus.IP_timeout)))
             self.modbus.IP_retries = toInt(settings.value('IP_retries',self.modbus.IP_retries))
             for i in range(self.modbus.channels):
-                self.modbus.inputDeviceIds[i] = toInt(settings.value(f'input{i + 1}slave', self.modbus.inputDeviceIds[i]))
+                if settings.contains(f'input{i + 1}slave'):
+                    # setting 'inputXslave' was changed in Artisan >3.2.0 to 'inputXdeviceId'
+                    # to stay compatible with older settings we still keep this around for a moment:
+                    # we still read from both, but write only to the new
+                    # TODO: remove this in v3.4
+                    self.modbus.inputDeviceIds[i] = toInt(settings.value(f'input{i + 1}slave', self.modbus.inputDeviceIds[i]))
+                self.modbus.inputDeviceIds[i] = toInt(settings.value(f'input{i + 1}deviceId', self.modbus.inputDeviceIds[i]))
                 self.modbus.inputRegisters[i] = toInt(settings.value(f'input{i+1}register',self.modbus.inputRegisters[i]))
                 self.modbus.inputFloats[i] = toBool(settings.value(f'input{i+1}float',self.modbus.inputFloats[i]))
                 self.modbus.inputBCDs[i] = toBool(settings.value(f'input{i+1}bcd',self.modbus.inputBCDs[i]))
@@ -18050,7 +18056,13 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.modbus.SVmultiplier = toInt(settings.value('SVmultiplier',self.modbus.SVmultiplier))
             self.modbus.SVwriteLong = toBool(settings.value('SVwriteLong',self.modbus.SVwriteLong))
             self.modbus.SVwriteFloat = toBool(settings.value('SVwriteFloat',self.modbus.SVwriteFloat))
-            self.modbus.PID_slave_ID = toInt(settings.value('PID_slave_ID',self.modbus.PID_slave_ID))
+            if settings.contains('PID_slave_ID'):
+                # setting 'PID_slave_ID' was changed in Artisan >3.2.0 to 'PID_device_ID'
+                # to stay compatible with older settings we still keep this around for a moment:
+                # we still read from both, but write only to the new
+                # TODO: remove this in v3.4
+                self.modbus.PID_device_ID = toInt(settings.value('PID_slave_ID', self.modbus.PID_device_ID))
+            self.modbus.PID_device_ID = toInt(settings.value('PID_device_ID', self.modbus.PID_device_ID))
             self.modbus.PID_SV_register = toInt(settings.value('PID_SV_register',self.modbus.PID_SV_register))
             self.modbus.PID_p_register = toInt(settings.value('PID_p_register',self.modbus.PID_p_register))
             self.modbus.PID_i_register = toInt(settings.value('PID_i_register',self.modbus.PID_i_register))
@@ -19963,7 +19975,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'serial_readRetries',self.modbus.serial_readRetries, read_defaults)
             self.settingsSetValue(settings, default_settings, 'IP_timeout',self.modbus.IP_timeout, read_defaults)
             self.settingsSetValue(settings, default_settings, 'IP_retries',self.modbus.IP_retries, read_defaults)
-            self.settingsSetValue(settings, default_settings, 'PID_slave_ID',self.modbus.PID_slave_ID, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'PID_device_ID', self.modbus.PID_device_ID, read_defaults)
             self.settingsSetValue(settings, default_settings, 'PID_SV_register',self.modbus.PID_SV_register, read_defaults)
             self.settingsSetValue(settings, default_settings, 'PID_p_register',self.modbus.PID_p_register, read_defaults)
             self.settingsSetValue(settings, default_settings, 'PID_i_register',self.modbus.PID_i_register, read_defaults)
@@ -19971,7 +19983,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'PID_OFF_action',self.modbus.PID_OFF_action, read_defaults)
             self.settingsSetValue(settings, default_settings, 'PID_ON_action',self.modbus.PID_ON_action, read_defaults)
             for i in range(self.modbus.channels):
-                self.settingsSetValue(settings, default_settings, f'input{i+1}slave', self.modbus.inputDeviceIds[i], read_defaults)
+                self.settingsSetValue(settings, default_settings, f'input{i+1}deviceId', self.modbus.inputDeviceIds[i], read_defaults)
                 self.settingsSetValue(settings, default_settings, f'input{i+1}register',self.modbus.inputRegisters[i], read_defaults)
                 self.settingsSetValue(settings, default_settings, f'input{i+1}float',self.modbus.inputFloats[i], read_defaults)
                 self.settingsSetValue(settings, default_settings, f'input{i+1}bcd',self.modbus.inputBCDs[i], read_defaults)
@@ -24108,7 +24120,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 pass
             try:
                 self.modbus.IP_retries = dialog.modbus_IP_retriesComboBox.currentIndex()
-                self.modbus.PID_slave_ID = toInt(str(dialog.modbus_PIDslave_Edit.text()))
+                self.modbus.PID_device_ID = toInt(str(dialog.modbus_PIDdevice_Edit.text()))
                 self.modbus.PID_SV_register = toInt(str(dialog.modbus_SVregister_Edit.text()))
                 self.modbus.PID_p_register = toInt(str(dialog.modbus_Pregister_Edit.text()))
                 self.modbus.PID_i_register = toInt(str(dialog.modbus_Iregister_Edit.text()))
@@ -24120,7 +24132,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
             for i in range(self.modbus.channels):
                 try:
-                    inputSlaveEdit = dialog.modbus_inputSlaveEdits[i]
+                    inputSlaveEdit = dialog.modbus_inputDeviceEdits[i]
                     if inputSlaveEdit is not None:
                         self.modbus.inputDeviceIds[i] = toInt(inputSlaveEdit.text())
                 except Exception: # pylint: disable=broad-except
@@ -26821,7 +26833,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             # build the results table
             import prettytable  # @UnresolvedImport
             tbl = prettytable.PrettyTable()
-            tbl.field_names = [' ',
+            tbl.field_names = [QApplication.translate('Label','Fit', 'Curve Fit Type'), #' ', # Fit Type
                                QApplication.translate('Label','RMSE BT'),
                                QApplication.translate('Label','MSE BT'),
                                QApplication.translate('Label','RoR') +  ' \u0394 ' + QApplication.translate('Label','@FCs'),
@@ -26835,7 +26847,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 tbl.add_row([QApplication.translate('Label','x') + '\u00b3', cfr['dbt_cubic_r'], cfr['dbt_cubic'], cfr['ror_fcs_delta_cubic'], cfr['ror_maxmin_delta_cubic']])
             if 'equ_naturallog' in cfr and 'dbt_naturallog' in cfr and 'ror_fcs_delta_naturallog' in cfr and 'ror_maxmin_delta_naturallog' in cfr:
                 tbl.add_row([QApplication.translate('Label','ln()'), cfr['dbt_naturallog_r'], cfr['dbt_naturallog'], cfr['ror_fcs_delta_naturallog'], cfr['ror_maxmin_delta_naturallog']])
-            resultstr = 'Curve Fit Analysis\n'
+            resultstr = f"{QApplication.translate('Label','Curve Fit Analysis')}\n"
             resultstr += tbl.get_string(sortby=None)
 
             cfr['segmentresultstr'] = res['segmentresultstr']

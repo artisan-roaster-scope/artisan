@@ -89,97 +89,97 @@
         </tr>
         <tr>
             <td>&#160;</td>
-            <td>read(slaveID,register)</td>
-            <td>reads register from slave slaveID using function 3 (Read Multiple Holding Registers). The result is bound to the placeholder `_` and thus can be accessed in later commands.</td>
+            <td>read(deviceID,register)</td>
+            <td>reads register from device deviceID using function 3 (Read Multiple Holding Registers). The result is bound to the placeholder `_` and thus can be accessed in later commands.</td>
             <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
-            <td>readSigned(slaveId,register)</td>
-            <td>reads 1 16bit register from slave slaveID using function 3 (Read Multiple Holding Registers) interpreted as signed integer. The result is bound to the placeholder `_` and thus can be accessed in later commands.</td>
+            <td>readSigned(deviceID,register)</td>
+            <td>reads 1 16bit register from device deviceID using function 3 (Read Multiple Holding Registers) interpreted as signed integer. The result is bound to the placeholder `_` and thus can be accessed in later commands.</td>
             <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
-            <td>readBCD(slaveID,register)</td>
-            <td>reads 1 16bit register from slave slaveID using function 3 (Read Multiple Holding Registers) interpreted as BCD. The result is bound to the placeholder `_` and thus can be accessed in later commands.</td>
+            <td>readBCD(deviceID,register)</td>
+            <td>reads 1 16bit register from device deviceID using function 3 (Read Multiple Holding Registers) interpreted as BCD. The result is bound to the placeholder `_` and thus can be accessed in later commands.</td>
             <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
-            <td>read32(slaveID,register)</td>
-            <td>reads 2 16bit registers from slave slaveID using function 3 (Read Multiple Holding Registers) interpreted as unsigned integer. The result is bound to the placeholder `_` and thus can be accessed in later commands.</td>
+            <td>read32(deviceID,register)</td>
+            <td>reads 2 16bit registers from device deviceID using function 3 (Read Multiple Holding Registers) interpreted as unsigned integer. The result is bound to the placeholder `_` and thus can be accessed in later commands.</td>
             <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
-            <td>read32Signed(slaveID,register)</td>
-            <td>reads 2 16bit registers from slave slaveID using function 3 (Read Multiple Holding Registers) interpreted as signed integer. The result is bound to the placeholder `_` and thus can be accessed in later commands.</td>
+            <td>read32Signed(deviceID,register)</td>
+            <td>reads 2 16bit registers from device deviceID using function 3 (Read Multiple Holding Registers) interpreted as signed integer. The result is bound to the placeholder `_` and thus can be accessed in later commands.</td>
             <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
-            <td>read32BCD(slaveID,register)</td>
-            <td>reads 2 16bit register from slave slaveID using function 3 (Read Multiple Holding Registers) interpreted as BCD. The result is bound to the placeholder `_` and thus can be accessed in later commands.</td>
+            <td>read32BCD(deviceID,register)</td>
+            <td>reads 2 16bit register from device deviceID using function 3 (Read Multiple Holding Registers) interpreted as BCD. The result is bound to the placeholder `_` and thus can be accessed in later commands.</td>
             <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
-            <td>readFloat(slaveID,register)</td>
-            <td>reads 2 16bit registers from slave slaveID using function 3 (Read Multiple Holding Registers) interpreted as float. The result is bound to the placeholder `_` and thus can be accessed in later commands.</td>
+            <td>readFloat(deviceID,register)</td>
+            <td>reads 2 16bit registers from device deviceID using function 3 (Read Multiple Holding Registers) interpreted as float. The result is bound to the placeholder `_` and thus can be accessed in later commands.</td>
             <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
-            <td>write(slaveId,register,value) or write([slaveId,register,value],..,[slaveId,register,value])</td>
-            <td>deprecated: use writeSingle for MODBUS function 6 (int) or writeWord for function 16 (float)</td>
+            <td>write(deviceID,register,value) or write([deviceID,register,value],..,[deviceID,register,value])</td>
+            <td>DEPRECATED: use writeSingle for MODBUS function 6 (int) or writeWord for function 16 (float)</td>
             <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
-            <td>wcoil(slaveId,register,&lt;bool&gt;)</td>
+            <td>wcoil(deviceID,register,&lt;bool&gt;)</td>
             <td>write coil: MODBUS function 5</td>
             <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
-            <td>wcoils(slaveId,register,[&lt;bool&gt;,..,&lt;bool&gt;])</td>
+            <td>wcoils(deviceID,register,[&lt;bool&gt;,..,&lt;bool&gt;])</td>
             <td>write coils: MODBUS function 15</td>
             <td>&#160;</td>
         </tr>
         <tr>
             <td> </td>
-            <td>mwrite(slaveId,register,andMask,orMask) or mwrite(s,r,am,om,v)</td>
-            <td>mask write register: MODBUS function 22 or simulates function 22 with function 6 and the given value v</td>
+            <td>mwrite(deviceID,register,andMask,orMask) or mwrite(deviceID,register,andMask,orMask,value)</td>
+            <td>mask write register: MODBUS function 22 or simulates function 22 with function 6 and the given value value</td>
             <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
-            <td>writem(slaveId,register,value) or writem(slaveId,register,[&lt;int&gt;,..,&lt;int&gt;])</td>
+            <td>writem(deviceID,register,value) or writem(deviceID,register,[&lt;int&gt;,..,&lt;int&gt;])</td>
             <td>write registers: MODBUS function 16</td>
             <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
-            <td>writeBCD(s,r,v) or writeBCD([s,r,v],..,[s,r,v])</td>
-            <td>write 16bit BCD encoded value v to register r of slave s </td>
+            <td>writeBCD(deviceID,register,value) or writeBCD([deviceID,register,value],..,[deviceID,register,value])</td>
+            <td>write 16bit BCD encoded value to register of device with deviceID </td>
             <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
-            <td>writeWord(slaveId,register,value) or writeWord([slaveId,register,value],..,[slaveId,register,value])</td>
+            <td>writeWord(deviceID,register,value) or writeWord([deviceID,register,value],..,[deviceID,register,value])</td>
             <td>write 32bit float to two 16bit int registers: MODBUS function 16</td>
             <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
-            <td>writeLong(slaveId,register,value) or writeLong([slaveId,register,value],..,[slaveId,register,value])</td>
+            <td>writeLong(deviceID,register,value) or writeLong([deviceID,register,value],..,[deviceID,register,value])</td>
             <td>write 32bit integer to two 16bit int registers: MODBUS function 16</td>
             <td>&#160;</td>
         </tr>
         <tr>
             <td>&#160;</td>
-            <td>writeSingle(slaveId,register,value) or writeSingle([slaveId,register,value],..,[slaveId,register,value])</td>
+            <td>writeSingle(deviceID,register,value) or writeSingle([deviceID,register,value],..,[deviceID,register,value])</td>
             <td>write 16bit integer to a single 16bit register: MODBUS function 6 (int)</td>
             <td>&#160;</td>
         </tr>

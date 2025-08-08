@@ -20,8 +20,8 @@ v3.2.1
   - adds Artisan Command `slider(<int>, <bool>)` to hide/show sliders
 
 * CHANGES
-  - updated Spanish localizations (thanks to Juan Carlos Bonilla)
-  - updated Chinese localizations (thanks to Terracotta-6)
+  - updates Spanish localizations (thanks to Juan Carlos Bonilla)
+  - updates Chinese localizations (thanks to Terracotta-6)
   - BREAKING VISUAL CHANGE, but only when consecutive hidden buttons with Type or Action defined are first at the top of the Events Buttons table: The visual button layout may change as hidden buttons with Type or Action defined at the top of the Events Buttons table are no longer counted in the first row's button count, which is limited by the Max Buttons per Row setting.  All other hidden buttons continue to be counted in each row's button count.
   - unlimited number of buttons can be created while display is limited to maximum 10 rows with maximum 50 buttons each
   - palette load uses and updates the user selected profile path
@@ -31,6 +31,7 @@ v3.2.1
   - updates libs (scipy, bleak, lxml, pillow)
   - expands automatic test coverage
   - graph updates immediately when smoothing value changes
+  - eliminates the term 'slave' from the whole project. The term is still used by small compatiblity layer to be remove in one of the next versions.
 
 * FIXES
   - fixes regression which broke the designer such that points could not be moved ([Discussion #1905](../../../discussions/1905) and [Issue #1916](../../../issues/1916))

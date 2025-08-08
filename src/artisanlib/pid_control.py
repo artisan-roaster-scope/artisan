@@ -1253,7 +1253,7 @@ class PIDcontrol:
     #  4: Kaleido
     def externalPIDControl(self) -> int:
         # TC4 with PID firmware or MODBUS and SV register set or S7 and SV area set
-        if self.aw.modbus.PID_slave_ID != 0:
+        if self.aw.modbus.PID_device_ID != 0:
             return 1
         if self.aw.s7.PID_area != 0:
             return 2
@@ -1879,10 +1879,10 @@ class DtaPID:
     def writeDTE(self, value:str, DTAaddress:str) -> None:
         try:
             newsv = hex(int(abs(float(str(value)))))[2:].upper() # can fail on value=''
-            slaveID = self.aw.ser.controlETpid[1]
+            deviceID = self.aw.ser.controlETpid[1]
             if self.aw.ser.controlETpid[0] != 2: # control pid is not a DTA PID
-                slaveID = self.aw.ser.readBTpid[1]
-            command = self.aw.dtapid.message2send(slaveID,6,str(DTAaddress),newsv)
+                deviceID = self.aw.ser.readBTpid[1]
+            command = self.aw.dtapid.message2send(deviceID,6,str(DTAaddress),newsv)
             self.aw.ser.sendDTAcommand(command)
         except Exception:  # pylint: disable=broad-except
             pass

@@ -98,7 +98,7 @@ class modbusport:
     """ this class handles the communications with all the modbus devices"""
 
     __slots__ = [ 'aw', 'legacy_pymodbus', 'legacy_pymodbus_keywords', 'modbus_serial_read_delay', 'modbus_serial_connect_delay', 'modbus_serial_write_delay', 'maxCount', 'readRetries', 'default_comport', 'comport', 'baudrate', 'bytesize', 'parity', 'stopbits',
-        'timeout', 'IP_timeout', 'IP_retries', 'serial_readRetries', 'PID_slave_ID', 'PID_SV_register', 'PID_p_register', 'PID_i_register', 'PID_d_register', 'PID_ON_action', 'PID_OFF_action',
+        'timeout', 'IP_timeout', 'IP_retries', 'serial_readRetries', 'PID_device_ID', 'PID_SV_register', 'PID_p_register', 'PID_i_register', 'PID_d_register', 'PID_ON_action', 'PID_OFF_action',
         'channels', 'inputDeviceIds', 'inputRegisters', 'inputFloats', 'inputBCDs', 'inputFloatsAsInt', 'inputBCDsAsInt', 'inputSigned', 'inputCodes', 'inputDivs',
         'inputModes', 'optimizer', 'fetch_max_blocks', 'fail_on_cache_miss', 'disconnect_on_error', 'acceptable_errors', 'activeRegisters',
         'readingsCache', 'SVmultiplier', 'PIDmultiplier', 'SVwriteLong', 'SVwriteFloat',
@@ -135,7 +135,7 @@ class modbusport:
         self.serial_readRetries:int = 1 # user configurable, defaults to 0
         self.IP_timeout:float = 0.2 # UDP/TCP MODBUS timeout in seconds
         self.IP_retries:int = 1 # UDP/TCP MODBUS retries (max 3)
-        self.PID_slave_ID:int = 0
+        self.PID_device_ID:int = 0
         self.PID_SV_register:int = 0
         self.PID_p_register:int = 0
         self.PID_i_register:int = 0
@@ -1248,27 +1248,27 @@ class modbusport:
 
     def setTarget(self, sv:float) -> None:
         _log.debug('setTarget(%s)', sv)
-        if self.PID_slave_ID:
+        if self.PID_device_ID:
             multiplier = 1.
             if self.SVmultiplier == 1:
                 multiplier = 10.
             elif self.SVmultiplier == 2:
                 multiplier = 100.
             if self.SVwriteFloat:
-                self.writeWord(self.PID_slave_ID,self.PID_SV_register,float(sv*multiplier))
+                self.writeWord(self.PID_device_ID, self.PID_SV_register, float(sv * multiplier))
             elif self.SVwriteLong:
-                self.writeLong(self.PID_slave_ID,self.PID_SV_register,int(round(sv*multiplier)))
+                self.writeLong(self.PID_device_ID, self.PID_SV_register, int(round(sv * multiplier)))
             else:
-                self.writeSingleRegister(self.PID_slave_ID,self.PID_SV_register,int(round(sv*multiplier)))
+                self.writeSingleRegister(self.PID_device_ID, self.PID_SV_register, int(round(sv * multiplier)))
 
     def setPID(self, p:float, i:float, d:float) -> None:
         _log.debug('setPID(%s,%s,%s)', p, i, d)
-        if self.PID_slave_ID and not self.PID_p_register == self.PID_i_register == self.PID_d_register == 0:
+        if self.PID_device_ID and not self.PID_p_register == self.PID_i_register == self.PID_d_register == 0:
             multiplier = 1.
             if self.PIDmultiplier == 1:
                 multiplier = 10.
             elif self.PIDmultiplier == 2:
                 multiplier = 100.
-            self.writeSingleRegister(self.PID_slave_ID,self.PID_p_register,p*multiplier)
-            self.writeSingleRegister(self.PID_slave_ID,self.PID_i_register,i*multiplier)
-            self.writeSingleRegister(self.PID_slave_ID,self.PID_d_register,d*multiplier)
+            self.writeSingleRegister(self.PID_device_ID, self.PID_p_register, p * multiplier)
+            self.writeSingleRegister(self.PID_device_ID, self.PID_i_register, i * multiplier)
+            self.writeSingleRegister(self.PID_device_ID, self.PID_d_register, d * multiplier)

@@ -76,12 +76,12 @@ class scanModbusDlg(ArtisanDialog):
         self.mport_aw:int = self.aw.modbus.port
         self.stop:bool = False # if True stop the processing
         self.setWindowTitle(QApplication.translate('Form Caption','Scan Modbus'))
-        self.slave:int = 1
-        self.slaveLabel:QLabel = QLabel(QApplication.translate('Label', 'Slave'))
-        self.slaveEdit:QLineEdit = QLineEdit(str(self.slave))
-        self.slaveEdit.setValidator(QIntValidator(1,247,self.slaveEdit))
-        self.slaveEdit.setFixedWidth(65)
-        self.slaveEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.deviceID:int = 1
+        self.deviceIDLabel:QLabel = QLabel(QApplication.translate('Label', 'Device'))
+        self.deviceIDEdit:QLineEdit = QLineEdit(str(self.deviceID))
+        self.deviceIDEdit.setValidator(QIntValidator(1, 247, self.deviceIDEdit))
+        self.deviceIDEdit.setFixedWidth(65)
+        self.deviceIDEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.min_register:int = 0
         self.registerLabel:QLabel = QLabel(QApplication.translate('Label', 'Register'))
         self.toLabel:QLabel = QLabel(uchr(8212))
@@ -108,12 +108,12 @@ class scanModbusDlg(ArtisanDialog):
         startButton.setMaximumWidth(150)
         startButton.clicked.connect(self.start_pressed)
         labellayout:QHBoxLayout = QHBoxLayout()
-        labellayout.addWidget(self.slaveLabel)
+        labellayout.addWidget(self.deviceIDLabel)
         labellayout.addStretch()
         labellayout.addWidget(self.registerLabel)
         labellayout.addStretch()
         srlayout:QHBoxLayout = QHBoxLayout()
-        srlayout.addWidget(self.slaveEdit)
+        srlayout.addWidget(self.deviceIDEdit)
         srlayout.addStretch()
         srlayout.addWidget(self.minRegisterEdit)
         srlayout.addWidget(self.toLabel)
@@ -157,8 +157,8 @@ class scanModbusDlg(ArtisanDialog):
             self.aw.modbus.port = self.mport
             self.stop = False
 
-            # update slave and register limits
-            self.slave = int(self.slaveEdit.text())
+            # update device and register limits
+            self.deviceID = int(self.deviceIDEdit.text())
             self.min_register = int(self.minRegisterEdit.text())
             self.max_register = int(self.maxRegisterEdit.text())
 
@@ -176,14 +176,14 @@ class scanModbusDlg(ArtisanDialog):
                 if self.code4:
                     for __ in range(10):
                         self.aw.modbus.sleepBetween()
-                    res = self.aw.modbus.peekSingleRegister(self.slave,int(register),code=4)
+                    res = self.aw.modbus.peekSingleRegister(self.deviceID, int(register), code=4)
                     if res is not None:
                         result += str(register) + '(4),' + str(res) + '<br>'
                         self.modbusEdit.setHtml(result)
                 if self.code3:
                     for __ in range(10):
                         self.aw.modbus.sleepBetween()
-                    res = self.aw.modbus.peekSingleRegister(self.slave,int(register),code=3)
+                    res = self.aw.modbus.peekSingleRegister(self.deviceID, int(register), code=3)
                     if res is not None:
                         result += str(register) + '(3),' + str(res) + '<br>'
                         self.modbusEdit.setHtml(result) # pyrefly: ignore[bad-assignment]
@@ -324,7 +324,7 @@ class scanS7Dlg(ArtisanDialog):
 
             self.stop = False
 
-            # update slave and register limits
+            # update device and register limits
             self.area = int(self.areaCombo.currentIndex())
             self.DBnr = int(self.DBnrEdit.text())
             self.min_register = int(self.minRegisterEdit.text())
@@ -479,14 +479,14 @@ class comportDlg(ArtisanResizeablDialog):
         modbus_divs = ['', '1/10','1/100']
         modbus_decode = ['uInt16', 'uInt32', 'sInt16', 'sInt32', 'BCD16', 'BCD32', 'Float32']
 
-        modbus_input1slavelabel = QLabel(QApplication.translate('Label', 'Slave'))
+        modbus_input1devicelabel = QLabel(QApplication.translate('Label', 'Device'))
         modbus_input1registerlabel = QLabel(QApplication.translate('Label', 'Register'))
         modbus_input1floatlabel = QLabel(QApplication.translate('Label', 'Decode'))
         modbus_input1codelabel = QLabel(QApplication.translate('Label', 'Function'))
         modbus_input1divlabel = QLabel(QApplication.translate('Label', 'Divider'))
         modbus_input1modelabel = QLabel(QApplication.translate('Label', 'Mode'))
 
-        self.modbus_inputSlaveEdits:List[Optional[QLineEdit]] = [None]*self.aw.modbus.channels # pyrefly: ignore[bad-assignment]
+        self.modbus_inputDeviceEdits:List[Optional[QLineEdit]] = [None] * self.aw.modbus.channels # pyrefly: ignore[bad-assignment]
         self.modbus_inputRegisterEdits:List[Optional[QLineEdit]] = [None]*self.aw.modbus.channels # pyrefly: ignore[bad-assignment]
         self.modbus_inputCodes:List[Optional[QComboBox]] = [None]*self.aw.modbus.channels # pyrefly: ignore[bad-assignment]
         self.modbus_inputDivs:List[Optional[QComboBox]] = [None]*self.aw.modbus.channels # pyrefly: ignore[bad-assignment]
@@ -494,11 +494,11 @@ class comportDlg(ArtisanResizeablDialog):
         self.modbus_inputDecodes:List[Optional[QComboBox]] = [None]*self.aw.modbus.channels # pyrefly: ignore[bad-assignment]
 
         for i in range(self.aw.modbus.channels):
-            modbus_inputSlaveEdit:QLineEdit = QLineEdit(str(self.aw.modbus.inputDeviceIds[i]))
-            modbus_inputSlaveEdit.setValidator(QIntValidator(0,247,self.modbus_inputSlaveEdits[i]))
-            modbus_inputSlaveEdit.setFixedWidth(75)
-            modbus_inputSlaveEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
-            self.modbus_inputSlaveEdits[i] = modbus_inputSlaveEdit
+            modbus_inputDeviceEdit:QLineEdit = QLineEdit(str(self.aw.modbus.inputDeviceIds[i]))
+            modbus_inputDeviceEdit.setValidator(QIntValidator(0, 247, self.modbus_inputDeviceEdits[i]))
+            modbus_inputDeviceEdit.setFixedWidth(75)
+            modbus_inputDeviceEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
+            self.modbus_inputDeviceEdits[i] = modbus_inputDeviceEdit
             #
             modbus_inputRegisterEdit:QLineEdit = QLineEdit(str(self.aw.modbus.inputRegisters[i]))
             modbus_inputRegisterEdit.setValidator(QIntValidator(0,65536,self.modbus_inputRegisterEdits[i]))
@@ -581,11 +581,11 @@ class comportDlg(ArtisanResizeablDialog):
         self.modbus_portEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
 
         # modbus external PID conf
-        modbus_PIDslave_label = QLabel(QApplication.translate('Label', 'Slave'))
-        self.modbus_PIDslave_Edit = QLineEdit(str(self.aw.modbus.PID_slave_ID))
-        self.modbus_PIDslave_Edit.setValidator(QIntValidator(0,65536,self.modbus_PIDslave_Edit))
-        self.modbus_PIDslave_Edit.setFixedWidth(50)
-        self.modbus_PIDslave_Edit.setAlignment(Qt.AlignmentFlag.AlignRight)
+        modbus_PIDdevice_label = QLabel(QApplication.translate('Label', 'Device'))
+        self.modbus_PIDdevice_Edit = QLineEdit(str(self.aw.modbus.PID_device_ID))
+        self.modbus_PIDdevice_Edit.setValidator(QIntValidator(0, 65536, self.modbus_PIDdevice_Edit))
+        self.modbus_PIDdevice_Edit.setFixedWidth(50)
+        self.modbus_PIDdevice_Edit.setAlignment(Qt.AlignmentFlag.AlignRight)
         modbus_SVregister_label = QLabel(QApplication.translate('Label', 'SV'))
         self.modbus_SVregister_Edit = QLineEdit(str(self.aw.modbus.PID_SV_register))
         self.modbus_SVregister_Edit.setValidator(QIntValidator(0,65536,self.modbus_SVregister_Edit))
@@ -687,8 +687,8 @@ class comportDlg(ArtisanResizeablDialog):
 
         modbus_pid = QHBoxLayout()
         modbus_pid.addStretch()
-        modbus_pid.addWidget(modbus_PIDslave_label)
-        modbus_pid.addWidget(self.modbus_PIDslave_Edit)
+        modbus_pid.addWidget(modbus_PIDdevice_label)
+        modbus_pid.addWidget(self.modbus_PIDdevice_Edit)
         modbus_pid.addWidget(modbus_pid_registers_box)
         modbus_pid.addWidget(modbus_pid_commands_box)
         modbus_pid.addStretch()
@@ -934,7 +934,7 @@ class comportDlg(ArtisanResizeablDialog):
 
         modbus_input_grid = QGridLayout()
 
-        modbus_input_grid.addWidget(modbus_input1slavelabel,1,0,Qt.AlignmentFlag.AlignRight)
+        modbus_input_grid.addWidget(modbus_input1devicelabel, 1, 0, Qt.AlignmentFlag.AlignRight)
         modbus_input_grid.addWidget(modbus_input1registerlabel,2,0,Qt.AlignmentFlag.AlignRight)
         modbus_input_grid.addWidget(modbus_input1codelabel,3,0,Qt.AlignmentFlag.AlignRight)
         modbus_input_grid.addWidget(modbus_input1divlabel,4,0,Qt.AlignmentFlag.AlignRight)
@@ -942,26 +942,26 @@ class comportDlg(ArtisanResizeablDialog):
         modbus_input_grid.addWidget(modbus_input1floatlabel,6,0,Qt.AlignmentFlag.AlignRight)
 
         for i in range(self.aw.modbus.channels):
-            if (len(self.modbus_inputSlaveEdits)>i and
+            if (len(self.modbus_inputDeviceEdits)>i and
                     len(self.modbus_inputRegisterEdits)>i and
                     len(self.modbus_inputCodes)>i and
                     len(self.modbus_inputDivs)>i and
                     len(self.modbus_inputModes)>i and
                     len(self.modbus_inputDecodes)>i):
                 modbus_input_grid.addWidget(QLabel(QApplication.translate('GroupBox', 'Input') + ' ' + str(i+1)),0,i+1,Qt.AlignmentFlag.AlignCenter)
-                inputSlaveEdit:Optional[QLineEdit] = self.modbus_inputSlaveEdits[i]
+                inputDeviceEdit:Optional[QLineEdit] = self.modbus_inputDeviceEdits[i]
                 inputRegisterEdit:Optional[QLineEdit] = self.modbus_inputRegisterEdits[i]
                 inputCode:Optional[QComboBox] = self.modbus_inputCodes[i]
                 inputDiv:Optional[QComboBox] = self.modbus_inputDivs[i]
                 inputMode:Optional[QComboBox] = self.modbus_inputModes[i]
                 inputDecode:Optional[QComboBox] = self.modbus_inputDecodes[i]
-                if (inputSlaveEdit is not None and
+                if (inputDeviceEdit is not None and
                         inputRegisterEdit is not None and
                         inputCode is not None and
                         inputDiv is not None and
                         inputMode is not None and
                         inputDecode is not None):
-                    modbus_input_grid.addWidget(inputSlaveEdit,1,i+1)
+                    modbus_input_grid.addWidget(inputDeviceEdit, 1, i + 1)
                     modbus_input_grid.addWidget(inputRegisterEdit,2,i+1)
                     modbus_input_grid.addWidget(inputCode,3,i+1)
                     modbus_input_grid.addWidget(inputDiv,4,i+1)

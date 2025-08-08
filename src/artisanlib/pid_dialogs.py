@@ -1372,7 +1372,7 @@ class PXpidDlgControl(ArtisanDialog):
 
     def setpoint(self, PID:str) -> None:
         if PID == 'ET':
-            slaveID = self.aw.ser.controlETpid[1]
+            deviceID = self.aw.ser.controlETpid[1]
             if self.aw.ser.controlETpid[0] == 0:
                 reg_dict = self.aw.fujipid.PXG4
             elif self.aw.ser.controlETpid[0] == 1:
@@ -1380,7 +1380,7 @@ class PXpidDlgControl(ArtisanDialog):
             else:
                 reg_dict = self.aw.fujipid.PXF
         else: # "BT"
-            slaveID = self.aw.ser.readBTpid[1]
+            deviceID = self.aw.ser.readBTpid[1]
             if self.aw.ser.readBTpid[0] == 0:
                 reg_dict = self.aw.fujipid.PXG4
             elif self.aw.ser.readBTpid[0] == 1:
@@ -1394,10 +1394,10 @@ class PXpidDlgControl(ArtisanDialog):
             if self.aw.ser.useModbusPort:
                 reg = self.aw.modbus.address2register(reg_dict['decimalposition'][1],6)
                 if reg:
-                    self.aw.modbus.writeSingleRegister(slaveID,reg,1)
+                    self.aw.modbus.writeSingleRegister(deviceID, reg, 1)
                 r = command
             else:
-                command = self.aw.fujipid.message2send(slaveID,6,reg_dict['decimalposition'][1],1)
+                command = self.aw.fujipid.message2send(deviceID, 6, reg_dict['decimalposition'][1], 1)
                 r = self.aw.ser.sendFUJIcommand(command,8)
             #check response from pid and update message on main window
             if r == command:
@@ -1419,7 +1419,7 @@ class PXpidDlgControl(ArtisanDialog):
 
     def setthermocoupletype(self, PID:str) -> None:
         if PID == 'ET':
-            slaveID = self.aw.ser.controlETpid[1]
+            deviceID = self.aw.ser.controlETpid[1]
             index = self.ETthermocombobox.currentIndex()
             if self.aw.ser.controlETpid[0] == 0:
                 reg_dict = self.aw.fujipid.PXG4
@@ -1431,7 +1431,7 @@ class PXpidDlgControl(ArtisanDialog):
                 reg_dict = self.aw.fujipid.PXF
                 conversiontoindex = self.aw.fujipid.PXFconversiontoindex
         else: # "BT"
-            slaveID = self.aw.ser.readBTpid[1]
+            deviceID = self.aw.ser.readBTpid[1]
             index = self.BTthermocombobox.currentIndex()
             if self.aw.ser.readBTpid[0] == 0:
                 reg_dict = self.aw.fujipid.PXG4
@@ -1449,11 +1449,11 @@ class PXpidDlgControl(ArtisanDialog):
                 value = conversiontoindex[index]
                 reg = self.aw.modbus.address2register(reg_dict['pvinputtype'][1],6)
                 if reg:
-                    self.aw.modbus.writeSingleRegister(slaveID,reg,value)
+                    self.aw.modbus.writeSingleRegister(deviceID, reg, value)
                 r = command
             else:
                 value = conversiontoindex[index]
-                command = self.aw.fujipid.message2send(slaveID,6,reg_dict['pvinputtype'][1],value)
+                command = self.aw.fujipid.message2send(deviceID, 6, reg_dict['pvinputtype'][1], value)
                 r = self.aw.ser.sendFUJIcommand(command,8)
             #check response from pid and update message on main window
             if r == command:
