@@ -167,6 +167,7 @@ class TaskWebDisplayPayload(TypedDict):
     subtitle:str           # task subtitle (eg. blend component; coffee name)
     batchsize:str          # rendered batch size | max ~6 characters
     weight:str             # remaining weight to be added | max 6 characters
+    final_weight:str       # final weight as send to server | max 6 characters
     percent:float          # percent of current green component already added / roasted weight loss
     state:PROCESS_STATE    # processing state (0:disconnected, 1:connected, 2:weighing, 3:done, 4:canceled)
     bucket:int             # number of buckets used from {0, 1, 2}
@@ -3362,6 +3363,8 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                 if sender != self.selected_completed_item:
                     if plus.sync.getSync(sender.data.roastUUID.hex) is None:
                         _log.info('completed roast %s could not be edited as corresponding sync record is missing', sender.data.roastUUID.hex)
+                        # as we cannot edit this entry we mark it as completed by setting the weight_estimate as weight locally, not to block the Batch Manager
+                        self.set_roasted_weight(sender.data.roastUUID.hex, sender.data.weight_estimate)
                     else:
                         # fetch data if roast is participating in the sync record game
                         profile_data: Optional[Dict[str, Any]] = plus.sync.fetchServerUpdate(sender.data.roastUUID.hex, return_data = True)
@@ -3838,6 +3841,7 @@ class GreenWebDisplay(GreenDisplay):
         subtitle = '',
         batchsize = '',
         weight = '',
+        final_weight = '',
         percent = 0,
         state = PROCESS_STATE.DISCONNECTED,
         bucket = 0,
@@ -3890,6 +3894,7 @@ class GreenWebDisplay(GreenDisplay):
                 self.rendered_task['subtitle'] = ''
             self.last_current_weight = 0
             self.rendered_task['weight'] = ''
+            self.rendered_task['final_weight'] = ''
             self.rendered_task['percent'] = 0
             self.rendered_task['state'] = state
             self.rendered_task['bucket'] = 0
@@ -3902,7 +3907,7 @@ class GreenWebDisplay(GreenDisplay):
                 self.rendered_task['timer'] = self.done_timer_timeout
                 if final_weight is not None:
                     # or as substring (no limit: brief = 0)
-                    self.rendered_task['weight'] = render_weight(final_weight, 0, weight_units.index(self.schedule_window.aw.qmc.weight[2]),
+                    self.rendered_task['final_weight'] = render_weight(final_weight, 0, weight_units.index(self.schedule_window.aw.qmc.weight[2]),
                                 brief=(0 if final_weight < 10000 else 1))
 
             self.update()
@@ -3949,6 +3954,7 @@ class GreenWebDisplay(GreenDisplay):
                     self.rendered_task['percent'] = 0
             else:
                 self.rendered_task['weight'] = ''
+                self.rendered_task['final_weight'] = ''
                 self.rendered_task['percent'] = 0
                 self.rendered_task['total_percent'] = 0
             self.update()
@@ -3968,6 +3974,7 @@ class RoastedWebDisplay(RoastedDisplay):
             subtitle = '',
             batchsize = '',
             weight = '',
+            final_weight = '',
             percent = 0,
             state = PROCESS_STATE.DISCONNECTED,
             bucket = 0,
@@ -4012,6 +4019,7 @@ class RoastedWebDisplay(RoastedDisplay):
                 self.rendered_task['subtitle'] = ''
             self.rendered_task['loss'] = ''
             self.rendered_task['weight'] = ''
+            self.rendered_task['final_weight'] = ''
             self.rendered_task['percent'] = 0
             self.rendered_task['state'] = state
             self.rendered_task['bucket'] = 0
@@ -4024,7 +4032,7 @@ class RoastedWebDisplay(RoastedDisplay):
                 self.rendered_task['timer'] = self.done_timer_timeout
                 if final_weight is not None:
                     # or as substring (no limit: brief = 0)
-                    self.rendered_task['weight'] = render_weight(final_weight, 0, weight_units.index(self.schedule_window.aw.qmc.weight[2]),
+                    self.rendered_task['final_weight'] = render_weight(final_weight, 0, weight_units.index(self.schedule_window.aw.qmc.weight[2]),
                                 brief=(0 if final_weight < 10000 else 1))
 
             self.update()
@@ -4045,12 +4053,13 @@ class RoastedWebDisplay(RoastedDisplay):
                     total_percent = 100 * current_weight / batchsize
                 else:
                     total_percent = 0
-                self.rendered_task['weight'] = render_weight(current_weight, 0, weight_units.index(self.schedule_window.aw.qmc.weight[2]), brief=(0 if current_weight < 10000 else 1)) # yield
+                self.rendered_task['final_weight'] = render_weight(current_weight, 0, weight_units.index(self.schedule_window.aw.qmc.weight[2]), brief=(0 if current_weight < 10000 else 1)) # yield
                 self.rendered_task['percent'] = 100.2
                 self.rendered_task['total_percent'] = total_percent
                 self.rendered_task['loss'] = f'-{float2float(100-total_percent, self.schedule_window.aw.percent_decimals)}%' # weight loss percent
             else:
                 self.rendered_task['weight'] = '' # yield
+                self.rendered_task['final_weight'] = ''
                 self.rendered_task['percent'] = 0
                 self.rendered_task['total_percent'] = 0
                 self.rendered_task['loss'] = '' # weight loss percent

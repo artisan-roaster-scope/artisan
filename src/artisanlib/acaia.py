@@ -267,6 +267,7 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
 
     def reset_readings(self) -> None:
         self.weight = None
+        self.stable_weight = None
         self.battery = None
         self.firmware = None
         self.unit = UNIT.G

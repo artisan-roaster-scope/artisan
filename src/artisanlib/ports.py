@@ -38,14 +38,14 @@ try:
     from PyQt6.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
                                  QPushButton, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout,QSizePolicy, # @UnusedImport @Reimport  @UnresolvedImport
                                  QGroupBox, QTableWidget, QTableWidgetItem, QDialog, QTextEdit, QDoubleSpinBox, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QHeaderView, QMessageBox, QScrollArea, QFrame)  # @UnusedImport @Reimport  @UnresolvedImport
+                                 QHeaderView, QScrollArea, QFrame)  # @UnusedImport @Reimport  @UnresolvedImport
 except ImportError:
     from PyQt5.QtCore import (Qt, pyqtSlot, QSettings) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QIntValidator, QStandardItemModel # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
                                  QPushButton, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout,QSizePolicy, # @UnusedImport @Reimport  @UnresolvedImport
                                  QGroupBox, QTableWidget, QTableWidgetItem, QDialog, QTextEdit, QDoubleSpinBox, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QHeaderView, QMessageBox, QScrollArea, QFrame) # @UnusedImport @Reimport  @UnresolvedImport
+                                 QHeaderView, QScrollArea, QFrame) # @UnusedImport @Reimport  @UnresolvedImport
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -772,99 +772,6 @@ class comportDlg(ArtisanResizeablDialog):
         self.modbus_full_block.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.modbus_full_block.setEnabled(bool(self.aw.modbus.optimizer))
 
-        ##########################    TAB 4 WIDGETS   SCALE
-        scale_devicelabel = QLabel(QApplication.translate('Label', 'Device'))
-        self.scale_deviceEdit = QComboBox()
-        self.supported_scales = list(self.aw.scale.devicefunctionlist.keys())
-        self.scale_deviceEdit.addItems(self.supported_scales)
-        try:
-            if self.aw.scale.device is not None:
-                self.scale_deviceEdit.setCurrentIndex(self.supported_scales.index(self.aw.scale.device))
-        except Exception: # pylint: disable=broad-except
-            self.scale_deviceEdit.setCurrentIndex(0)
-        self.scale_deviceEdit.setEditable(False)
-        self.scale_deviceEdit.activated.connect(self.scaleDeviceIndexChanged)
-#        scale_devicelabel.setBuddy(self.scale_deviceEdit)
-        scale_comportlabel = QLabel(QApplication.translate('Label', 'Comm Port'))
-        self.scale_comportEdit = PortComboBox(selection = self.aw.scale.comport)
-        self.scale_comportEdit.activated.connect(self.portComboBoxIndexChanged)
-#        scale_comportlabel.setBuddy(self.scale_comportEdit)
-        scale_baudratelabel = QLabel(QApplication.translate('Label', 'Baud Rate'))
-        self.scale_baudrateComboBox = QComboBox()
-#        scale_baudratelabel.setBuddy(self.scale_baudrateComboBox)
-        self.scale_bauds = ['1200','2400','4800','9600','19200','38400','57600','115200']
-        self.scale_baudrateComboBox.addItems(self.scale_bauds)
-        try:
-            self.scale_baudrateComboBox.setCurrentIndex(self.scale_bauds.index(str(self.aw.scale.baudrate)))
-        except Exception as e: # pylint: disable=broad-except
-            _log.exception(e)
-        scale_bytesizelabel = QLabel(QApplication.translate('Label', 'Byte Size'))
-        self.scale_bytesizeComboBox = QComboBox()
-#        scale_bytesizelabel.setBuddy(self.scale_bytesizeComboBox)
-        self.scale_bytesizes = ['7','8']
-        self.scale_bytesizeComboBox.addItems(self.scale_bytesizes)
-        self.scale_bytesizeComboBox.setCurrentIndex(self.scale_bytesizes.index(str(self.aw.scale.bytesize)))
-        scale_paritylabel = QLabel(QApplication.translate('Label', 'Parity'))
-        self.scale_parityComboBox = QComboBox()
-#        scale_paritylabel.setBuddy(self.scale_parityComboBox)
-        #0 = Odd, E = Even, N = None. NOTE: These strings cannot be translated as they are arguments to the lib pyserial.
-        self.scale_parity = ['O','E','N']
-        self.scale_parityComboBox.addItems(self.scale_parity)
-        self.scale_parityComboBox.setCurrentIndex(self.scale_parity.index(self.aw.scale.parity))
-        scale_stopbitslabel = QLabel(QApplication.translate('Label', 'Stopbits'))
-        self.scale_stopbitsComboBox = QComboBox()
-#        scale_stopbitslabel.setBuddy(self.scale_stopbitsComboBox)
-        self.scale_stopbits = ['1','2']
-        self.scale_stopbitsComboBox.addItems(self.stopbits)
-        self.scale_stopbitsComboBox.setCurrentIndex(self.aw.scale.stopbits - 1)
-        scale_timeoutlabel = QLabel(QApplication.translate('Label', 'Timeout'))
-        self.scale_timeoutEdit = QLineEdit(str(float2float(self.aw.scale.timeout)))
-        self.scale_timeoutEdit.setValidator(self.aw.createCLocaleDoubleValidator(0,5,1,self.scale_timeoutEdit))
-        ##########################    TAB 5 WIDGETS   COLOR
-        color_devicelabel = QLabel(QApplication.translate('Label', 'Device'))
-        self.color_deviceEdit = QComboBox()
-        supported_color_meters = list(self.aw.color.devicefunctionlist.keys())
-        self.color_deviceEdit.addItems(supported_color_meters)
-        try:
-            if self.aw.color.device is not None:
-                self.color_deviceEdit.setCurrentIndex(supported_color_meters.index(self.aw.color.device))
-        except Exception: # pylint: disable=broad-except
-            self.color_deviceEdit.setCurrentIndex(0)
-        self.color_deviceEdit.setEditable(False)
-        self.color_deviceEdit.activated.connect(self.colorDeviceIndexChanged)
-#        color_devicelabel.setBuddy(self.color_deviceEdit)
-        color_comportlabel = QLabel(QApplication.translate('Label', 'Comm Port'))
-        self.color_comportEdit = PortComboBox(selection = self.aw.color.comport)
-        self.color_comportEdit.activated.connect(self.portComboBoxIndexChanged)
-#        color_comportlabel.setBuddy(self.color_comportEdit)
-        color_baudratelabel = QLabel(QApplication.translate('Label', 'Baud Rate'))
-        self.color_baudrateComboBox = QComboBox()
-#        color_baudratelabel.setBuddy(self.color_baudrateComboBox)
-        self.color_bauds = ['1200','2400','4800','9600','19200','38400','57600','115200']
-        self.color_baudrateComboBox.addItems(self.color_bauds)
-        self.color_baudrateComboBox.setCurrentIndex(self.color_bauds.index(str(self.aw.color.baudrate)))
-        color_bytesizelabel = QLabel(QApplication.translate('Label', 'Byte Size'))
-        self.color_bytesizeComboBox = QComboBox()
-#        color_bytesizelabel.setBuddy(self.color_bytesizeComboBox)
-        self.color_bytesizes = ['7','8']
-        self.color_bytesizeComboBox.addItems(self.color_bytesizes)
-        self.color_bytesizeComboBox.setCurrentIndex(self.color_bytesizes.index(str(self.aw.color.bytesize)))
-        color_paritylabel = QLabel(QApplication.translate('Label', 'Parity'))
-        self.color_parityComboBox = QComboBox()
-#        color_paritylabel.setBuddy(self.color_parityComboBox)
-        #0 = Odd, E = Even, N = None. NOTE: These strings cannot be translated as they are arguments to the lib pyserial.
-        self.color_parity = ['O','E','N']
-        self.color_parityComboBox.addItems(self.color_parity)
-        self.color_parityComboBox.setCurrentIndex(self.color_parity.index(self.aw.color.parity))
-        color_stopbitslabel = QLabel(QApplication.translate('Label', 'Stopbits'))
-        self.color_stopbitsComboBox = QComboBox()
-#        color_stopbitslabel.setBuddy(self.color_stopbitsComboBox)
-        self.color_stopbits = ['1','2']
-        self.color_stopbitsComboBox.addItems(self.stopbits)
-        self.color_stopbitsComboBox.setCurrentIndex(self.aw.color.stopbits - 1)
-        color_timeoutlabel = QLabel(QApplication.translate('Label', 'Timeout'))
-        self.color_timeoutEdit = QLineEdit(str(self.aw.color.timeout))
-        self.color_timeoutEdit.setValidator(self.aw.createCLocaleDoubleValidator(0,5,1,self.color_timeoutEdit))
         #### dialog buttons
         # connect the ArtisanDialog standard OK/Cancel buttons
         self.dialogbuttons.accepted.connect(self.accept)
@@ -1304,51 +1211,6 @@ class comportDlg(ArtisanResizeablDialog):
         tab4Layout.setContentsMargins(0,0,0,0)
         tab4Layout.setSpacing(5)
 
-        #LAYOUT TAB 5
-        scale_grid = QGridLayout()
-        scale_grid.addWidget(scale_devicelabel,0,0,Qt.AlignmentFlag.AlignRight)
-        scale_grid.addWidget(self.scale_deviceEdit,0,1)
-        scale_grid.addWidget(scale_comportlabel,1,0,Qt.AlignmentFlag.AlignRight)
-        scale_grid.addWidget(self.scale_comportEdit,1,1)
-        scale_grid.addWidget(scale_baudratelabel,2,0,Qt.AlignmentFlag.AlignRight)
-        scale_grid.addWidget(self.scale_baudrateComboBox,2,1)
-        scale_grid.addWidget(scale_bytesizelabel,3,0,Qt.AlignmentFlag.AlignRight)
-        scale_grid.addWidget(self.scale_bytesizeComboBox,3,1)
-        scale_grid.addWidget(scale_paritylabel,4,0,Qt.AlignmentFlag.AlignRight)
-        scale_grid.addWidget(self.scale_parityComboBox,4,1)
-        scale_grid.addWidget(scale_stopbitslabel,5,0,Qt.AlignmentFlag.AlignRight)
-        scale_grid.addWidget(self.scale_stopbitsComboBox,5,1)
-        scale_grid.addWidget(scale_timeoutlabel,6,0,Qt.AlignmentFlag.AlignRight)
-        scale_grid.addWidget(self.scale_timeoutEdit,6,1)
-        scaleH = QHBoxLayout()
-        scaleH.addLayout(scale_grid)
-        scaleH.addStretch()
-        tab5Layout = QVBoxLayout()
-        tab5Layout.addLayout(scaleH)
-        tab5Layout.addStretch()
-
-        #LAYOUT TAB 6
-        color_grid = QGridLayout()
-        color_grid.addWidget(color_devicelabel,0,0,Qt.AlignmentFlag.AlignRight)
-        color_grid.addWidget(self.color_deviceEdit,0,1)
-        color_grid.addWidget(color_comportlabel,1,0,Qt.AlignmentFlag.AlignRight)
-        color_grid.addWidget(self.color_comportEdit,1,1)
-        color_grid.addWidget(color_baudratelabel,2,0,Qt.AlignmentFlag.AlignRight)
-        color_grid.addWidget(self.color_baudrateComboBox,2,1)
-        color_grid.addWidget(color_bytesizelabel,3,0,Qt.AlignmentFlag.AlignRight)
-        color_grid.addWidget(self.color_bytesizeComboBox,3,1)
-        color_grid.addWidget(color_paritylabel,4,0,Qt.AlignmentFlag.AlignRight)
-        color_grid.addWidget(self.color_parityComboBox,4,1)
-        color_grid.addWidget(color_stopbitslabel,5,0,Qt.AlignmentFlag.AlignRight)
-        color_grid.addWidget(self.color_stopbitsComboBox,5,1)
-        color_grid.addWidget(color_timeoutlabel,6,0,Qt.AlignmentFlag.AlignRight)
-        color_grid.addWidget(self.color_timeoutEdit,6,1)
-        colorH = QHBoxLayout()
-        colorH.addLayout(color_grid)
-        colorH.addStretch()
-        tab6Layout = QVBoxLayout()
-        tab6Layout.addLayout(colorH)
-        tab6Layout.addStretch()
         #
         # host (IP or hostname)
         ws_hostlabel = QLabel(QApplication.translate('Label', 'Host'))
@@ -1652,12 +1514,6 @@ class comportDlg(ArtisanResizeablDialog):
         C4Widget = QWidget()
         C4Widget.setLayout(tab4Layout)
         self.TabWidget.addTab(C4Widget,QApplication.translate('Tab','S7'))
-        C5Widget = QWidget()
-        C5Widget.setLayout(tab5Layout)
-        self.TabWidget.addTab(C5Widget,QApplication.translate('Tab','Scale'))
-        C6Widget = QWidget()
-        C6Widget.setLayout(tab6Layout)
-        self.TabWidget.addTab(C6Widget,QApplication.translate('Tab','Color'))
         C7Widget = QWidget()
         C7Widget.setLayout(tab7Layout)
         self.TabWidget.addTab(C7Widget,QApplication.translate('Tab','WebSocket'))
@@ -1688,16 +1544,6 @@ class comportDlg(ArtisanResizeablDialog):
             self.restoreGeometry(settings.value('PortsGeometry'))
 
     @pyqtSlot(int)
-    def scaleDeviceIndexChanged(self, i:int) -> None:
-        if self.supported_scales[i] in self.aw.scale.bluetooth_devices:
-            permission_status:Optional[bool] = self.aw.app.getBluetoothPermission(request=True)
-            if permission_status is False:
-                message:str = QApplication.translate('Message','Bluetootooth access denied')
-                QMessageBox.warning(None, #self, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
-                    message, message)
-
-
-    @pyqtSlot(int)
     def s7_optimize_toggle(self, i:int) -> None:
         if i:
             self.s7_full_block.setEnabled(True)
@@ -1710,17 +1556,6 @@ class comportDlg(ArtisanResizeablDialog):
             self.modbus_full_block.setEnabled(True)
         else:
             self.modbus_full_block.setEnabled(False)
-
-    @pyqtSlot(int)
-    def colorDeviceIndexChanged(self, i:int) -> None:
-        try:
-            if i==2: # Classic Tonino
-                self.aw.color.baudrate = 115200
-            elif i==1: # Tiny Tonino
-                self.aw.color.baudrate = 57600
-            self.color_baudrateComboBox.setCurrentIndex(self.color_bauds.index(str(self.aw.color.baudrate)))
-        except Exception as e: # pylint: disable=broad-except
-            _log.exception(e)
 
     @pyqtSlot(bool)
     def scanS7(self, _:bool = False) -> None:

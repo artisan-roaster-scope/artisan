@@ -39,7 +39,7 @@ QTDIR = os.environ['QT_PATH']
 
 APP = ['artisan.py']
 
-SUPPORTED_LANGUAGES = ['ar', 'da', 'de','el','en','es','fa','fi','fr','gd', 'he','hu','id','it','ja','ko','lv', 'nl','no','pl','pt_BR','pt','sk', 'sv','th','tr','uk','vi','zh_CN','zh_TW']
+SUPPORTED_LANGUAGES = ['ar', 'cs', 'da', 'de','el','en','es','fa','fi','fr','gd', 'he','hu','id','it','ja','ko','lv', 'nl','no','pl','pt_BR','pt','sk', 'sv','th','tr','uk','vi','zh_CN','zh_TW']
 
 
 DATA_FILES:List[Tuple[str,List[str]]] = [

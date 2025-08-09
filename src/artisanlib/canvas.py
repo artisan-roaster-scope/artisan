@@ -255,7 +255,7 @@ class tgraphcanvas(FigureCanvas):
         'xextrabuttonactions', 'xextrabuttonactionstrings', 'chargeTimerFlag', 'autoChargeFlag', 'autoDropFlag', 'autoChargeMode', 'autoDropMode', 'autoChargeIdx', 'autoDropIdx', 'markTPflag',
         'autoDRYflag', 'autoFCsFlag', 'autoCHARGEenabled', 'autoDRYenabled', 'autoFCsenabled', 'autoDROPenabled', 'autoDryIdx', 'projectionconstant',
         'projectionmode', 'transMappingMode', 'weight', 'volume', 'density', 'density_roasted', 'volumeCalcUnit', 'volumeCalcWeightInStr',
-        'volumeCalcWeightOutStr', 'container_names', 'container_weights', 'container_idx', 'specialevents', 'etypes', 'etypesdefault',
+        'volumeCalcWeightOutStr', 'container_names', 'container_weights', 'specialevents', 'etypes', 'etypesdefault',
         'alt_etypesdefault', 'default_etypes_set', 'specialeventstype',
         'specialeventsStrings', 'specialeventsvalue', 'eventsGraphflag', 'clampEvents', 'renderEventsDescr', 'eventslabelschars', 'eventsshowflag',
         'annotationsflag', 'showeventsonbt', 'showEtypes', 'E1timex', 'E2timex', 'E3timex', 'E4timex', 'E1values', 'E2values', 'E3values', 'E4values',
@@ -1648,7 +1648,6 @@ class tgraphcanvas(FigureCanvas):
         # container scale tare
         self.container_names:List[str] = []
         self.container_weights:List[float] = [] # all weights in g
-        self.container_idx:int = -1 # default points to the empty field in the container menu (as -1 + 2 = 1)
 
         #stores _indexes_ of self.timex to record events.
         # Use as self.timex[self.specialevents[x]] to get the time of an event
@@ -13090,7 +13089,7 @@ class tgraphcanvas(FigureCanvas):
 
             # ADD DEVICE:
             if not bool(self.aw.simulator):
-                if self.device == 53:
+                if self.device == 53 and self.aw.hottop is None: # only start Hottop connection if there is not already one
                     # connect HOTTOP
                     from artisanlib.hottop import Hottop
                     hottop_serial = SerialSettings(

@@ -17,7 +17,6 @@
 
 import os
 import sys
-import re
 import time as libtime
 import numpy
 import math
@@ -49,7 +48,7 @@ if TYPE_CHECKING:
 
 
 
-from artisanlib.util import cmd2str, RoRfromCtoFstrict, fromCtoFstrict, fromFtoCstrict, hex2int, str2cmd, toFloat, float2float
+from artisanlib.util import cmd2str, RoRfromCtoFstrict, fromCtoFstrict, fromFtoCstrict, hex2int, str2cmd
 
 try:
     from PyQt6.QtCore import Qt, QDateTime, QSemaphore, pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
@@ -4276,10 +4275,6 @@ class serialport:
                             do.setIsRemote(False)
                             do.setIsLocal(True)
                         self.aw.ser.PhidgetDigitalOut[serial].append(do)
-# this is not needed here as we add those a bit below on successful attach
-#                    if serial is None:
-#                        # we make this also accessible via its serial number
-#                        self.aw.ser.PhidgetDigitalOut[str(ser)] = self.aw.ser.PhidgetDigitalOut[None]
         try:
             ch = self.aw.ser.PhidgetDigitalOut[serial][channel]
             ch.setOnAttachHandler(self.phidgetOUTattached)
@@ -4412,13 +4407,6 @@ class serialport:
                             do.setIsRemote(False)
                             do.setIsLocal(True)
                         self.aw.ser.PhidgetDigitalOut[serial].append(do)
-# this is not needed here as we add those a bit below on successful attach
-#                    if serial is None:
-#                        # we make this also accessible via its serial number and serial:port number
-#                        for sn in (str(ser) if port is None else [str(ser),f'{str(ser)}:{str(port)}']):
-#                            self.aw.ser.PhidgetDigitalOut[sn] = self.aw.ser.PhidgetDigitalOut[None]
-#                            self.aw.ser.PhidgetDigitalOutLastPWM[sn] = self.aw.ser.PhidgetDigitalOutLastPWM[None]
-#                            self.aw.ser.PhidgetDigitalOutLastToggle[sn] = self.aw.ser.PhidgetDigitalOutLastToggle[None]
 
         try:
             ch = self.aw.ser.PhidgetDigitalOut[serial][channel]
@@ -4704,10 +4692,6 @@ class serialport:
                             vo.setIsRemote(False)
                             vo.setIsLocal(True)
                         self.aw.ser.PhidgetAnalogOut[serial].append(vo)
-# this is not needed here as we add those a bit below on successful attach
-#                    if serial is None:
-#                        # we make this also accessible via its serial number
-#                        self.aw.ser.PhidgetAnalogOut[str(ser)] = self.aw.ser.PhidgetAnalogOut[None]
         try:
             ch = self.aw.ser.PhidgetAnalogOut[serial][channel]
             ch.setOnAttachHandler(self.phidgetOUTattached)
@@ -4847,10 +4831,6 @@ class serialport:
                             dcm.setIsRemote(False)
                             dcm.setIsLocal(True)
                         self.aw.ser.PhidgetDCMotor[serial].append(dcm)
-# this is not needed here as we add those a bit below on successful attach
-#                    if serial is None:
-#                        # we make this also accessible via its serial number
-#                        self.aw.ser.PhidgetDCMotor[str(ser)] = self.aw.ser.PhidgetDCMotor[None]
         try:
             ch = self.aw.ser.PhidgetDCMotor[serial][channel]
             ch.setOnAttachHandler(self.phidgetOUTattached)
@@ -5382,11 +5362,6 @@ class serialport:
                             stepper.setIsRemote(True)
                             stepper.setIsLocal(False)
                         self.aw.ser.PhidgetStepperMotor[serial].append(stepper)
-# this is not needed here as we add those a bit below on successful attach
-#                    if serial is None:
-#                        # we make this also accessible via its serial number
-#                        self.aw.ser.PhidgetStepperMotor[str(ser)] = self.aw.ser.PhidgetStepperMotor[None]
-
         try:
             ch = self.aw.ser.PhidgetStepperMotor[serial][channel]
             ch.setOnAttachHandler(self.phidgetOUTattached)
@@ -5495,10 +5470,6 @@ class serialport:
                             rcservo.setIsRemote(True)
                             rcservo.setIsLocal(False)
                         self.aw.ser.PhidgetRCServo[serial].append(rcservo)
-# this is not needed here as we add those a bit below on successful attach
-#                    if serial is None:
-#                        # we make this also accessible via its serial number
-#                        self.aw.ser.PhidgetRCServo[str(ser)] = self.aw.ser.PhidgetRCServo[None]
         try:
             ch = self.aw.ser.PhidgetRCServo[serial][channel]
             ch.setOnAttachHandler(self.phidgetOUTattached)
@@ -7079,196 +7050,3 @@ class extraserialport:
                 return False
         else:
             return False
-
-class scaleport(extraserialport):
-    """ this class handles the communications with the scale"""
-
-    __slots__ = ['bluetooth_devices']
-
-    def __init__(self, aw:'ApplicationWindow') -> None:
-        super().__init__(aw)
-
-        #default initial settings. They are changed by settingsload() at initiation of program according to the device chosen
-        self.comport:str = '/dev/cu.usbserial-FTFKDA5O'      #NOTE: this string should not be translated.
-        self.baudrate:int = 19200
-        self.bytesize:int = 8
-        self.parity:str = 'N'
-        self.stopbits:int = 1
-        self.timeout:float = 0.2
-        self.devicefunctionlist:Dict[str, Optional[Callable[[],Tuple[float,float,float]]]] = {
-            'None' : None,
-            'KERN NDE' : self.readKERN_NDE,
-            'acaia' : self.readAcaia,
-            #"Shore 930" : self.readShore930,
-        }
-        self.bluetooth_devices:List[str] = ['acaia']
-
-    def closeport(self) -> None:
-        if self.device == 'acaia':
-            # disconnect from acaia scale
-            try:
-                if self.SP is not None and self.SP.is_open:
-                    self.SP.write(str2cmd('BTDS\r\n'))
-            except Exception: # pylint: disable=broad-except
-                pass
-        super().closeport()
-
-    # returns one of weight (g), density (g/l), or moisture (%).  Others return -1.
-    def readWeight(self, scale_weight:Optional[float]=None) -> Tuple[float,float,float]:
-        if scale_weight is not None:
-            return scale_weight,-1,-1
-        if self.device is not None and self.device not in {'None', '', 'acaia'}:
-            device_fct = self.devicefunctionlist[self.device]
-            if device_fct is not None:
-                wei,den,moi = device_fct()
-                if moi is not None and moi > -1:
-                    return -1, -1, float2float(moi)
-                if den is not None and den > -1:
-                    return -1, float2float(den), -1
-                if wei is not None and wei > -1:
-                    return float2float(wei), -1, -1
-            return -1,-1,-1
-        return -1,-1,-1
-
-    def readLine(self) -> str:
-        if self.SP is not None:
-            return str(self.SP.readline().decode('ascii'))
-        return ''
-
-    # replaced by BLE direct implementation
-    @staticmethod
-    def readAcaia() -> Tuple[float,float,float]:
-        return -1, -1, -1
-
-    def readKERN_NDE(self) -> Tuple[float,float,float]:
-        try:
-            if not self.SP:
-                self.connect()
-            if self.SP:
-                if not self.SP.is_open:
-                    self.openport()
-                if self.SP.is_open:
-                    #self.SP.write(str2cmd('s')) # only stable
-                    self.SP.write(str2cmd('w')) # any weight
-                    v = self.SP.readline()
-                    if len(v) == 0:
-                        return -1,-1,-1
-                    sa = v.decode('ascii').split('g')
-                    if len(sa) == 2:
-                        return int(sa[0].replace(' ', '')), -1, -1
-                    # some times the unit is just missing, we assume it is g
-                    sa = v.decode('ascii').split('\r\n')
-                    if len(sa) == 2:
-                        return int(sa[0].replace(' ', '')),-1,-1
-            return -1, -1, -1
-        except Exception:  # pylint: disable=broad-except
-            return -1, -1, -1
-
-    def readShore930(self) -> Tuple[float,float,float]:
-        try:
-            if not self.SP:
-                self.connect()
-            if self.SP:
-                if not self.SP.is_open:
-                    self.openport()
-                if self.SP.is_open:
-                    line1 = self.SP.readline()
-                    weight = re.search(r'Current Weight:',str(line1))
-                    if weight:
-                        w = re.findall(r'([0-9\.]+)',str(line1))
-                        if len(w) == 1:
-                            return toFloat(w[0]),-1,-1
-                        return -1,-1,-1
-
-                    density = re.search(r'Test Weight',str(line1))
-                    if density:
-                        line2 = self.SP.readline()
-                        d = re.findall(r'[0-9\.\-]+',str(line2))
-                        if len(d) == 1:
-                            den = toFloat(d[0]) *12.8718597   # convert from LBS/BTU to g/
-                            return -1,toFloat(den),-1
-                        return -1,-1,-1
-
-                    moisture = re.search(r'Beans',str(line1))
-                    if moisture:
-                        line2 = self.SP.readline()
-                        m = re.findall(r'[0-9\.\-]+',str(line2))
-#                        line3 = self.SP.readline() # unused!
-                        if len(m) == 1:
-                            return -1,-1,toFloat(m[0])
-                        return -1,-1,-1
-            return -1,-1,-1
-        except Exception:  # pylint: disable=broad-except
-            return -1,-1,-1
-
-
-class colorport(extraserialport):
-    """ this class handles the communications with the color meter"""
-
-    __slots__ = []
-
-    def __init__(self, aw:'ApplicationWindow') -> None:
-        super().__init__(aw)
-
-        #default initial settings. They are changed by settingsload() at initiation of program according to the device chosen
-        self.comport:str = '/dev/cu.usbserial-FTFKDA5O'      #NOTE: this string should not be translated.
-        self.baudrate:int = 115200
-        self.bytesize:int = 8
-        self.parity:str = 'N'
-        self.stopbits:int = 1
-        self.timeout:float = 2
-        self.devicefunctionlist:Dict[str,Optional[Callable[[],Tuple[float,float,float]]]] = {
-            'None' : None,
-            'Tiny Tonino' : self.readTonino,
-            'Classic Tonino' : self.readTonino
-        }
-
-    # returns color as int or -1 if something went wrong
-    def readColor(self) -> int:
-        if self.device is not None and self.device not in {'None', ''}:
-            device_fct = self.devicefunctionlist[self.device]
-            if device_fct is not None:
-                return int(round(device_fct()[0]))
-            return -1
-        return -1
-
-    def readline_terminated(self, eol:bytes = b'\r') -> bytes:
-        leneol = len(eol)
-        line = bytearray()
-        if self.SP is not None:
-            while True:
-                c = self.SP.read(1)
-                if c:
-                    line += c
-                    if line[-leneol:] == eol:
-                        break
-                else:
-                    break
-        return bytes(line)
-
-    def readTonino(self, retry:int = 2) -> Tuple[float,float,float]:
-        try:
-            if self.SP is None:
-                self.connect()
-                libtime.sleep(2)
-                if self.SP is not None:
-                    # put Tonino into PC mode on first connect
-                    self.SP.write(str2cmd('\nTONINO\n')) # type: ignore # mypy: Statement is unreachable  [unreachable]
-                    #self.SP.flush()
-                    self.readline_terminated(b'\n')
-            if self.SP is not None:
-                if not self.SP.is_open:
-                    self.openport()
-                if self.SP.is_open:
-                    self.SP.reset_input_buffer()
-                    self.SP.reset_output_buffer()
-                    self.SP.write(str2cmd('\nSCAN\n'))
-                    #self.SP.flush()
-                    v = self.readline_terminated(b'\n').decode('ascii')
-                    if 'SCAN' in v:
-                        return int(v.split(':')[1]),-1,-1 # response should have format "SCAN:128"
-                    if retry > 0:
-                        return self.readTonino(retry-1)
-            return -1,-1,-1
-        except Exception:  # pylint: disable=broad-except
-            return -1,-1,-1

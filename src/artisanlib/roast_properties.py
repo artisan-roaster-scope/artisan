@@ -24,7 +24,6 @@ from typing import Final, Optional, List, Set, Tuple, Dict, Callable, cast, Any,
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
     from artisanlib.atypes import RecentRoast, BTU
-    from artisanlib.acaia import Acaia # noqa: F401 # pylint: disable=unused-import
     from plus.stock import Blend # noqa: F401  # pylint: disable=unused-import
     from PyQt6.QtWidgets import QLayout, QAbstractItemView, QCompleter # pylint: disable=unused-import
     from PyQt6.QtGui import QClipboard, QCloseEvent, QKeyEvent, QMouseEvent # pylint: disable=unused-import
@@ -68,10 +67,6 @@ except ImportError:
                                  QHBoxLayout, QVBoxLayout, QHeaderView, QLabel, QLineEdit, QTextEdit, QListView, # @UnusedImport @Reimport  @UnresolvedImport
                                  QPushButton, QSpinBox, QTableWidget, QTableWidgetItem, QTabWidget, QSizePolicy, # @UnusedImport @Reimport  @UnresolvedImport
                                  QGroupBox, QToolButton, QFrame) # @UnusedImport @Reimport  @UnresolvedImport
-#    try:
-#        from PyQt5 import sip # type: ignore # @Reimport @UnresolvedImport @UnusedImport
-#    except ImportError:
-#        import sip  # type: ignore # @Reimport @UnresolvedImport @UnusedImport
 
 
 ########################################################################################
@@ -89,7 +84,7 @@ class volumeCalculatorDlg(ArtisanDialog):
         self.setModal(True)
         self.setWindowTitle(QApplication.translate('Form Caption','Volume Calculator'))
 
-        if self.aw.scale.device is not None and self.aw.scale.device not in {'', 'None'}:
+        if self.aw.scale_manager.is_scale1_configured():
             self.scale_connected = True
         else:
             self.scale_connected = False
@@ -115,13 +110,11 @@ class volumeCalculatorDlg(ArtisanDialog):
         # Scale Weight
         self.scale_weight = self.parent_dialog.scale_weight
         self.scaleWeight = QLabel() # displays the current reading
-        if self.parent_dialog.acaia is not None:
+        if self.aw.scale_manager.is_scale1_configured():
             self.update_scale_weight()
-            self.parent_dialog.acaia.weight_changed_signal.connect(self.acaia_weight_changed)
-            self.parent_dialog.acaia.battery_changed_signal.connect(self.acaia_battery_changed)
-            self.parent_dialog.acaia.disconnected_signal.connect(self.acaia_disconnected)
-        # Scale Battery
-        self.scale_battery = self.parent_dialog.scale_battery
+            self.aw.scale_manager.scale1_weight_changed_signal.connect(self.scale_weight_changed)
+            self.aw.scale_manager.scale1_stable_weight_changed_signal.connect(self.scale_weight_changed)
+            self.aw.scale_manager.scale1_disconnected_signal.connect(self.scale_disconnected)
 
         # Unit Group
         unitvolumeLabel = QLabel('<b>' + QApplication.translate('Label','Unit') + '</b>')
@@ -322,22 +315,17 @@ class volumeCalculatorDlg(ArtisanDialog):
             self.aw.largeScaleLCDs_dialog.updateWeightUnit('g')
 
     @pyqtSlot()
-    def acaia_disconnected(self) -> None:
+    def scale_disconnected(self) -> None:
         self.scale_weight = None
-        self.scale_battery = None
         self.updateWeightLCD('----')
 
     def updateWeightLCD(self, txt_value:str, txt_unit:str = '') -> None:
-        if self.aw.scale.device is not None and self.aw.scale.device not in {'', 'None'}:
+        if self.aw.scale_manager.is_scale1_configured():
             self.scaleWeight.setText('' if txt_value == '' else txt_value+txt_unit.lower())
             self.aw.qmc.updateLargeScaleLCDs(txt_value)
 
     @pyqtSlot(int)
-    def acaia_battery_changed(self, b:int) -> None:
-        self.scale_battery = b
-
-    @pyqtSlot(float)
-    def acaia_weight_changed(self, w:float) -> None:
+    def scale_weight_changed(self, w:int) -> None:
         self.scale_weight = w
         self.update_scale_weight()
 
@@ -606,9 +594,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.org_perKgRoastMode = self.aw.qmc.perKgRoastMode
         self.perKgRoastMode = self.aw.qmc.perKgRoastMode # if true only the amount during the roast and not the full batch (incl. preheat and BBP) are displayed), toggled by click on the result widget
 
-        self.acaia:'Optional[Acaia]' = None # the BLE interface # noqa: UP037
         self.scale_weight:Optional[float] = None # weight received from a connected scale
-        self.scale_battery:Optional[int] = None # battery level of the connected scale in %
         self.scale_set:Optional[float] = None # set weight for accumulation in g
 
         self.disconnecting = False # this is set to True to terminate the scale connection
@@ -698,7 +684,6 @@ class editGraphDlg(ArtisanResizeablDialog):
             t3 = 0
         self.Cstarteditcopy = stringfromseconds(t3)
         self.Cstartedit = QLineEdit(self.Cstarteditcopy)
-#        self.Cstartedit.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.Cstartedit.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
         self.Cstartedit.setValidator(QRegularExpressionValidator(regextime,self))
         self.Cstartedit.setMaximumWidth(50)
@@ -714,7 +699,6 @@ class editGraphDlg(ArtisanResizeablDialog):
             t4 = 0
         self.Cendeditcopy = stringfromseconds(t4)
         self.Cendedit = QLineEdit(self.Cendeditcopy)
-#        self.Cendedit.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.Cendedit.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
         self.Cendedit.setValidator(QRegularExpressionValidator(regextime,self))
         self.Cendedit.setMaximumWidth(50)
@@ -729,7 +713,6 @@ class editGraphDlg(ArtisanResizeablDialog):
             t5 = 0
         self.CCstarteditcopy = stringfromseconds(t5)
         self.CCstartedit = QLineEdit(self.CCstarteditcopy)
-#        self.CCstartedit.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.CCstartedit.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
         self.CCstartedit.setValidator(QRegularExpressionValidator(regextime,self))
         self.CCstartedit.setMaximumWidth(50)
@@ -759,7 +742,6 @@ class editGraphDlg(ArtisanResizeablDialog):
             t7 = 0
         self.dropeditcopy = stringfromseconds(t7)
         self.dropedit = QLineEdit(self.dropeditcopy)
-#        self.dropedit.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.dropedit.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
         self.dropedit.setValidator(QRegularExpressionValidator(regextime,self))
         self.dropedit.setMaximumWidth(50)
@@ -774,7 +756,6 @@ class editGraphDlg(ArtisanResizeablDialog):
             t8 = 0
         self.cooleditcopy = stringfromseconds(t8)
         self.cooledit = QLineEdit(self.cooleditcopy)
-#        self.cooledit.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.cooledit.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
         self.cooledit.setValidator(QRegularExpressionValidator(regextime,self))
         self.cooledit.setMaximumWidth(50)
@@ -1246,7 +1227,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 #        self.tareComboBox.setMaximumWidth(80)
         self.tareComboBox.setMinimumWidth(80)
         self.updateTarePopup(adjust_index=False)
-        self.tareComboBox.setCurrentIndex(self.aw.qmc.container_idx + 3)
+        self.tareComboBox.setCurrentIndex(self.aw.container1_idx + 3)
         self.tareComboBox.currentIndexChanged.connect(self.tareChanged)
 
         # in button
@@ -1287,18 +1268,6 @@ class editGraphDlg(ArtisanResizeablDialog):
 
         self.updateWeightOutDefectsLabel()
 
-        # scan whole button
-        scanWholeButton = QPushButton(QApplication.translate('Button', 'scan'))
-        scanWholeButton.clicked.connect(self.scanWholeColor)
-        scanWholeButton.setMinimumWidth(80)
-        #the size of Buttons on the Mac is too small with 70,30 and ok with sizeHint/minimumSizeHint
-        scanWholeButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        # scan ground button
-        scanGroundButton = QPushButton(QApplication.translate('Button', 'scan'))
-        scanGroundButton.setMinimumWidth(80)
-        scanGroundButton.clicked.connect(self.scanGroundColor)
-        #the size of Buttons on the Mac is too small with 70,30 and ok with sizeHint/minimumSizeHint
-        scanGroundButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         # Ambient Temperature Source Selector
         self.ambientComboBox = QComboBox()
         self.ambientComboBox.addItems(self.buildAmbientTemperatureSourceList())
@@ -1493,35 +1462,25 @@ class editGraphDlg(ArtisanResizeablDialog):
 
         propGrid.setColumnStretch(5,10)
 
-        if self.aw.scale.device is not None and self.aw.scale.device not in {'', 'None'}:
+        self.scale1_was_connected:bool = False
+
+
+        # we connect to scale1 if configured
+        if self.aw.scale_manager.is_scale1_configured():
+
             propGrid.addWidget(self.tareComboBox,1,6,1,2) # rowSpan=1, columnSpan=3
             propGrid.addLayout(inButtonLayout,1,8)
             propGrid.addLayout(outButtonLayout,1,9)
             propGrid.addLayout(defectsButtonLayout,2,9)
 
+            # remember connection state of scale (only scale1 of scale_manager is supported here!)
+            self.scale1_was_connected = self.aw.scale_manager.is_scale1_connected()
+            self.aw.scale_manager.scale1_weight_changed_signal.connect(self.scale_weight_changed)
+            self.aw.scale_manager.scale1_stable_weight_changed_signal.connect(self.scale_weight_changed)
+            self.aw.scale_manager.scale1_disconnected_signal.connect(self.scale_disconnected)
 
-            if self.aw.scale.device == 'acaia' and not (platform.system() == 'Windows' and math.floor(toFloat(platform.release())) < 10):
-                # BLE is not well supported under Windows versions before Windows 10
-                try:
-                    from artisanlib.acaia import Acaia
-                    self.acaia = Acaia(
-                        model = 1,
-                        ident = None,
-                        name = 'Acaia',
-                        connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('Acaia'),True,None),
-                        disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('Acaia'),True,None))
-                    if self.acaia is not None:
-                        self.acaia.weight_changed_signal.connect(self.ble_weight_changed)
-                        self.acaia.battery_changed_signal.connect(self.ble_battery_changed)
-                        self.acaia.disconnected_signal.connect(self.ble_disconnected)
-                        # start BLE loop
-                        self.acaia.connect_scale()
-                        self.updateWeightLCD('----')
-                except Exception as e:  # pylint: disable=broad-except
-                    _log.exception(e)
-            elif self.aw.scale.device in {'KERN NDE','Shore 930'}:
-                self.connectScaleSignal.connect(self.connectScaleLoop)
-                QTimer.singleShot(2,lambda : self.connectScaleSignal.emit()) # pylint: disable= unnecessary-lambda
+            self.aw.scale_manager.connect_scale1_slot()
+            self.updateWeightLCD('----')
 
         propGrid.setRowMinimumHeight(3,volumeCalcButton.minimumSizeHint().height())
         propGrid.addWidget(volumelabel,3,0,Qt.AlignmentFlag.AlignVCenter)
@@ -1567,11 +1526,6 @@ class editGraphDlg(ArtisanResizeablDialog):
         propGrid.addWidget(self.whole_color_edit,8,1,Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
         propGrid.addWidget(self.ground_color_edit,8,2,Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
         propGrid.addWidget(self.colorSystemComboBox,8,3,1,2) # rowSpan=1, columnSpan=2
-
-        if self.aw.color.device is not None and self.aw.color.device != '' and self.aw.color.device not in ['None','Tiny Tonino', 'Classic Tonino']:
-            propGrid.addWidget(scanWholeButton,8,6)
-        if self.aw.color.device not in (None, '', 'None'):
-            propGrid.addWidget(scanGroundButton,8,7)
 
         propGrid.addWidget(ambientSourceLabel,8,8,1,2,Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignBottom)
 
@@ -1820,7 +1774,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 ##
 
     def updateWeightLCD(self, txt_value:str, txt_unit:str = '', total:Optional[float] = None) -> None:
-        if self.aw.scale.device is not None and self.aw.scale.device not in {'', 'None'}:
+        if self.aw.scale_manager.is_scale1_configured():
             self.scaleWeight.setText(txt_value+txt_unit.lower())
             total_txt, unit = self.updateScaleWeightAccumulated(total)
             self.scaleWeightAccumulated.setText(total_txt + unit.lower())
@@ -1881,44 +1835,6 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.batchLayout.addWidget(self.batchcounterSpinBox)
         self.batchLayout.addWidget(self.batchposSpinBox)
 
-    @pyqtSlot()
-    def readScale(self) -> None:
-        if self.disconnecting:
-            self.aw.scale.closeport()
-            self.scale_weight = None
-            self.scale_battery = None
-        elif self.aw.scale.SP is None or not self.aw.scale.SP.is_open:
-            self.connectScaleSignal.emit()
-        else:
-            w,_,_ = self.aw.scale.readWeight()
-            if w != -1:
-                self.scale_weight = w
-            else:
-                self.scale_weight = None
-            self.update_scale_weight()
-            if self.volumedialog is not None:
-                self.scaleWeightUpdated.emit(w)
-            self.readScaleSignal.emit()
-
-    @pyqtSlot()
-    def readScaleLoop(self) -> None:
-        QTimer.singleShot(1000,self.readScale)
-
-    @pyqtSlot()
-    def connectScaleLoop(self) -> None:
-        QTimer.singleShot(2000,self.connectScale)
-
-    @pyqtSlot()
-    def connectScale(self) -> None:
-        if self.disconnecting:
-            self.aw.scale.closeport()
-        else:
-            res = self.aw.scale.connect(error=False)
-            if res:
-                self.readScaleSignal.connect(self.readScaleLoop)
-                QTimer.singleShot(2,lambda : self.readScaleSignal.emit()) # pylint: disable= unnecessary-lambda
-            else:
-                self.connectScaleSignal.emit()
 
     @pyqtSlot()
     def resetScaleSet(self) -> None:
@@ -1947,21 +1863,15 @@ class editGraphDlg(ArtisanResizeablDialog):
         return v_formatted, unit
 
     @pyqtSlot()
-    def ble_disconnected(self) -> None:
+    def scale_disconnected(self) -> None:
         self.scale_weight = None
-        self.scale_battery = None
         self.updateWeightLCD('----')
 
-    @pyqtSlot(float)
-    def ble_weight_changed(self, w:float) -> None:
+    @pyqtSlot(int)
+    def scale_weight_changed(self, w:int) -> None:
+        _log.debug('PRINT RP:scale_weight_changed(%s)',w)
         if w is not None:
             self.scale_weight = w
-            self.update_scale_weight()
-
-    @pyqtSlot(int)
-    def ble_battery_changed(self, b:int) -> None:
-        if b is not None:
-            self.scale_battery = b
             self.update_scale_weight()
 
     def update_scale_weight(self) -> None:
@@ -1987,7 +1897,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 v = convertWeight(v,0,weight_units.index(self.aw.qmc.weight[2]))
                 v_formatted = f'{v:.2f}'
             self.updateWeightLCD(v_formatted, self.aw.qmc.weight[2].lower(), self.scale_weight - tare)
-        elif self.aw.scale.device is not None and self.aw.scale.device not in {'', 'None'}:
+        elif self.aw.scale_manager.is_scale1_configured():
             self.updateWeightLCD('----')
 
     def updateTemplateLine(self) -> None:
@@ -2756,19 +2666,22 @@ class editGraphDlg(ArtisanResizeablDialog):
     # called on CANCEL and WindowClose from closeEvent(), and on OK from accept()
     def clean_up(self) -> None:
         self.disconnecting = True
-        if self.acaia is not None:
+
+        if self.aw.scale_manager.is_scale1_configured():
+            # disconnect from scale_manager signals
             try:
-                self.acaia.battery_changed_signal.disconnect()
-                self.acaia.weight_changed_signal.disconnect()
-                self.acaia.disconnected_signal.disconnect()
+                self.aw.scale_manager.scale1_weight_changed_signal.disconnect(self.scale_weight_changed)
+                self.aw.scale_manager.scale1_stable_weight_changed_signal.disconnect(self.scale_weight_changed)
+                self.aw.scale_manager.scale1_disconnected_signal.disconnect(self.scale_disconnected)
             except Exception as e: # pylint: disable=broad-except
-                _log.exception(e)
+                _log.error(e)
             try:
-                self.acaia.disconnect_scale()
-                self.updateWeightLCD('')
+                # disconnect scales if they were not connected before
+                if not self.scale1_was_connected:
+                    self.aw.scale_manager.disconnect_scale1_signal.emit()
             except Exception as e: # pylint: disable=broad-except
-                _log.exception(e)
-            self.acaia = None
+                _log.error(e)
+
         settings = QSettings()
         #save window geometry
         settings.setValue('RoastGeometry',self.saveGeometry())
@@ -2792,7 +2705,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             if event.matches(QKeySequence.StandardKey.Copy) and self.TabWidget.currentIndex() == 3: # datatable
                 self.aw.copy_cells_to_clipboard(self.datatable,adjustment=1)
                 self.aw.sendmessage(QApplication.translate('Message','Data table copied to clipboard'))
-            if key == 16777220 and self.aw.scale.device not in (None, '', 'None'): # ENTER key pressed and scale connected
+            if key == 16777220 and self.aw.scale_manager.is_scale1_configured(): # ENTER key pressed and scale connected
                 if self.weightinedit.hasFocus():
                     self.inWeight(True,overwrite=True) # we don't add to current reading but overwrite
                 elif self.weightoutedit.hasFocus():
@@ -2833,12 +2746,13 @@ class editGraphDlg(ArtisanResizeablDialog):
         if adjust_index:
             if self.tareComboBox.count() > prev_item_count:
                 # if item list is longer (new items added), we select the last item
-                self.aw.qmc.container_idx = self.tareComboBox.count() - 4
-            if len(self.aw.qmc.container_weights) > self.aw.qmc.container_idx:
-                self.tareComboBox.setCurrentIndex(self.container_menu_idx(self.aw.qmc.container_idx))
+                self.aw.container1_idx = self.tareComboBox.count() - 4
+            if len(self.aw.qmc.container_weights) > self.aw.container1_idx:
+                self.tareComboBox.setCurrentIndex(self.container_menu_idx(self.aw.container1_idx))
             else:
                 self.tareComboBox.setCurrentIndex(2) # reset to the empty entry
-                self.aw.qmc.container_idx = -1
+                self.aw.container1_idx = -1
+
 
     @pyqtSlot(int)
     def tareChanged(self, i:int) -> None:
@@ -2846,9 +2760,9 @@ class editGraphDlg(ArtisanResizeablDialog):
             tareDLG = tareDlg(self,self.aw, self.get_scale_weight)
             tareDLG.tare_updated_signal.connect(self.updateTarePopup)
             tareDLG.show()
-            self.tareComboBox.setCurrentIndex(self.aw.qmc.container_idx + 3)
+            self.tareComboBox.setCurrentIndex(self.aw.container1_idx + 3)
         else:
-            self.aw.qmc.container_idx = i - 3
+            self.aw.container1_idx = i - 3
             # update displayed scale weight
             self.update_scale_weight()
 
@@ -4274,21 +4188,6 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.pressureedit.repaint() # seems to be necessary in some PyQt versions!?
 
     @pyqtSlot(bool)
-    def scanWholeColor(self, _:bool = False) -> None:
-        v = self.aw.color.readColor()
-        if v is not None and v > -1 and 0 <= v <= 250:
-            self.aw.qmc.whole_color = v
-            self.whole_color_edit.setText(str(v))
-
-    @pyqtSlot(bool)
-    def scanGroundColor(self, _:bool = False) -> None:
-        v = self.aw.color.readColor()
-        if v is not None and v > -1:
-            v = max(0,min(250,v))
-            self.aw.qmc.ground_color = v
-            self.ground_color_edit.setText(str(v))
-
-    @pyqtSlot(bool)
     def volumeCalculatorTimer(self, _:bool = False) -> None:
         QTimer.singleShot(1, self.volumeCalculator)
 
@@ -4345,7 +4244,6 @@ class editGraphDlg(ArtisanResizeablDialog):
                 tare = self.aw.qmc.container_weights[tare_idx]
         except Exception: # pylint: disable=broad-except
             pass
-        #w,d,m = self.aw.scale.readWeight(self.scale_weight) # read value from scale in 'g'
         w = self.scale_weight
         d,m = -1,-1
         if w is not None and w > -1:
@@ -5499,7 +5397,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         # Update Title
         self.aw.qmc.title = ' '.join(self.titleedit.currentText().split())
         self.aw.qmc.title_show_always = self.titleShowAlwaysFlag.isChecked()
-        self.aw.qmc.container_idx = self.tareComboBox.currentIndex() - 3
+        self.aw.container1_idx = self.tareComboBox.currentIndex() - 3
 
 #PLUS
         # Update Plus
@@ -5843,17 +5741,6 @@ class editGraphDlg(ArtisanResizeablDialog):
         if layout is not None:
             layout.setSpacing(5)
         dialog.setFixedHeight(dialog.sizeHint().height())
-#        res = dialog.exec()
-#        #deleteLater() will not work here as the dialog is still bound via the parent
-#        #dialog.deleteLater() # now we explicitly allow the dialog an its widgets to be GCed
-#        # the following will immediately release the memory despite this parent link
-#        QApplication.processEvents() # we ensure events concerning this dialog are processed before deletion
-#        try: # sip not supported on older PyQt versions (RPi!)
-#            sip.delete(dialog)
-#            #print(sip.isdeleted(dialog))
-#        except Exception: # pylint: disable=broad-except
-#            pass
-#        return res
         return dialog.exec()
 
 class StockComboBox(MyQComboBox):

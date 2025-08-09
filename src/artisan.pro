@@ -80,6 +80,7 @@ SOURCES = \
 # the list of translation has to be synced with the script pylupdate6pro (for pylupdate6)
 TRANSLATIONS = \
 	translations/artisan_ar.ts \
+	translations/artisan_cs.ts \
 	translations/artisan_da.ts \
 	translations/artisan_de.ts \
 	translations/artisan_el.ts \

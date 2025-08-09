@@ -18,10 +18,11 @@ v3.2.1
   - adds batch conversion from Cropster XLS, Giesen CSV, IKAWA CSV, Loring CSV, Petroncini CSV, ROEST CSV, Rubase CSV, and Stronghold XLSX profiles to Artisan `.alog` profiles
   - adds drag-and-drop import of a Artisan JSON, Cropster XLS, Giesen CSV and Stronghold XLSX profiles
   - adds Artisan Command `slider(<int>, <bool>)` to hide/show sliders
+  - adds Czech localization
 
 * CHANGES
-  - updates Spanish localizations (thanks to Juan Carlos Bonilla)
-  - updates Chinese localizations (thanks to Terracotta-6)
+  - updates Spanish localization (thanks to Juan Carlos Bonilla)
+  - updates Chinese localization (thanks to Terracotta-6)
   - BREAKING VISUAL CHANGE, but only when consecutive hidden buttons with Type or Action defined are first at the top of the Events Buttons table: The visual button layout may change as hidden buttons with Type or Action defined at the top of the Events Buttons table are no longer counted in the first row's button count, which is limited by the Max Buttons per Row setting.  All other hidden buttons continue to be counted in each row's button count.
   - unlimited number of buttons can be created while display is limited to maximum 10 rows with maximum 50 buttons each
   - palette load uses and updates the user selected profile path
@@ -45,6 +46,7 @@ v3.2.1
   - fixes minor quirk in PiOS deb postinstall and perm scripts ([Issue #1922](../../../issues/1922))
   - fixes the OFF on DROP option for the WebSocket connection ([Issue #1943](../../../issues/1943))
   - fixes a regression which broke the MODBUS communication with certain devices in Windows Legacy builds ([Issue #1931](../../../issues/1931))
+  - don't try to connect to the Hottop while still being connected to the Hottop ([Issue #1950](../../../issues/1950))
 
 
 ----

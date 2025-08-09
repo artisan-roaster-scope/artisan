@@ -582,38 +582,10 @@ class Artisan(QtSingleApplication):
                 _log.exception(e)
         return True
 
-# configure multiprocessing
-#if sys.platform.startswith('darwin'):
-#    try:
-#        # start method can only be set once!
-##        if 'forkserver' in multiprocessing.get_all_start_methods(): # pylint: disable=condition-evals-to-constant,using-constant-test
-##            # signed app with forkserver option fails with a MemoryError
-##            multiprocessing.set_start_method('forkserver') # only available on Python3 on Unix, currently (Python 3.8) not supported by frozen executables generated with pyinstaller
-#        if 'fork' in multiprocessing.get_all_start_methods():
-#            multiprocessing.set_start_method('fork') # default on Python3.7 for macOS (and on Unix also under Python3.8), but considered unsafe,
-#            # not available on Windows, on Python3.8 we have to explicitly set this
-#            # https://bugs.python.org/issue33725
-#            # this is the only option that works (Hottop communication & WebLCDs) in signed macOS apps
-##        if 'spawn' in multiprocessing.get_all_start_methods():
-##            multiprocessing.set_start_method('spawn') # default on Python3.8 for macOS (always default on Windows)
-##            # this breaks on starting WebLCDs in macOS (and linux) builds with py2app, pyinstaller
-##            # https://bugs.python.org/issue32146
-##            # https://github.com/pyinstaller/pyinstaller/issues/4865
-#    except Exception: # pylint: disable=broad-except
-#        pass
-
 app_args = sys.argv
 if sys.platform.startswith('linux'):
     # avoid a GTK bug in Ubuntu Unity
     app_args = app_args + ['-style','Fusion']
-#if platform.system() == 'Windows':
-#    # highDPI support must be set before creating the Application instance
-#    try:
-#        # activate scaling for hiDPI screen support on Windows
-#        QApplication.setAttribute(Qt.ApplicationAttribute.AA_EnableHighDpiScaling)
-#        QApplication.setAttribute(Qt.ApplicationAttribute.AA_UseHighDpiPixmaps)
-#    except Exception as e: # pylint: disable=broad-except
-#        pass
 app = Artisan(app_args)
 
 
@@ -750,13 +722,6 @@ if platform.system().startswith('Windows'):
     # on Windows we use the Fusion style per default which supports the dark mode
     app.setStyle('Fusion')
     app.setWindowIcon(QIcon(os.path.join(getAppPath(),'artisan.png')))
-#    try:
-#        # activate scaling for hiDPI screen support on Windows
-#        app.setAttribute(Qt.ApplicationAttribute.AA_EnableHighDpiScaling)
-#        if hasattr(QStyleFactory, 'AA_UseHighDpiPixmaps'):
-#            app.setAttribute(Qt.ApplicationAttribute.AA_UseHighDpiPixmaps)
-#    except Exception as e: # pylint: disable=broad-except
-#        pass
 
 from artisanlib.s7port import s7port
 from artisanlib.wsport import wsport
@@ -767,7 +732,7 @@ from artisanlib.simulator import Simulator
 from artisanlib.dialogs import HelpDlg, ArtisanInputDialog, ArtisanComboBoxDialog, ArtisanPortsDialog, ArtisanSliderLCDinputDlg
 from artisanlib.large_lcds import (LargeMainLCDs, LargeDeltaLCDs, LargePIDLCDs, LargeExtraLCDs, LargePhasesLCDs, LargeScaleLCDs)
 from artisanlib.logs import (serialLogDlg, errorDlg, messageDlg)
-from artisanlib.comm import serialport, colorport, scaleport
+from artisanlib.comm import serialport
 from artisanlib.pid_dialogs import (PXRpidDlgControl, PXG4pidDlgControl,
     PID_DlgControl, DTApidDlgControl)
 from artisanlib.pid_control import FujiPID, PIDcontrol, DtaPID
@@ -793,19 +758,6 @@ import plus.blend
 import plus.stock
 import plus.schedule
 
-
-
-#######################################################################################
-#####   temporary hack for windows till better solution found about toolbar icon problem with py2exe and svg
-#######################################################################################
-
-
-#def my_get_icon(name:str) -> Optional[QIcon]:
-#    basedir = os.path.join(mpl.rcParams['datapath'], 'images')
-#    p = os.path.join(basedir, name.replace('.svg','.png'))
-#    if os.path.exists(p):
-#        return QIcon(p)
-#    return None
 
 
 
@@ -1130,14 +1082,6 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
                 pm = self.recolorIcon(pm, QColor('#dfdfdf'))
             else:
                 pm = self.recolorIcon(pm,QColor('#424242'))
-#        if hasattr(pm, 'setDevicePixelRatio'):
-#            if mpl_version[0] > 2 and mpl_version[1] > 2:
-#                if mpl_version[1] > 3:
-#                    _setDevicePixelRatio(pm, _devicePixelRatioF(self)) # pylint: disable=protected-access
-#                else:
-#                    _setDevicePixelRatioF(pm, _devicePixelRatioF(self)) # pylint: disable=protected-access
-#            else:
-#                pm.setDevicePixelRatio(self.canvas._dpi_ratio) # pylint: disable=protected-access
         if hasattr(pm, 'setDevicePixelRatio'):
             pm.setDevicePixelRatio(self.devicePixelRatioF() or 1)
 
@@ -1854,10 +1798,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.extraS7tx:float = 0.
         #create an WebSocket port object (main device eg Probat Sample)
         self.ws:wsport = wsport(self)
-        #create scale port object
-        self.scale:scaleport = scaleport(self)
-        #create color port object
-        self.color:colorport = colorport(self)
         #list with extra serial ports (extra devices)
         self.extraser:List[serialport] = []
         #extra comm port settings
@@ -2125,11 +2065,16 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.newRoastMenu: Optional[QMenu] = self.fileMenu.addMenu(QApplication.translate('Menu', 'New'))
 
             self.fileLoadAction = QAction(QApplication.translate('Menu', 'Open...'),self)
+            self.fileLoadAction.setMenuRole(QAction.MenuRole.NoRole)
             self.fileLoadAction.setShortcut(QKeySequence.StandardKey.Open)
             self.fileLoadAction.triggered.connect(self.fileLoad)
             self.fileMenu.addAction(self.fileLoadAction)
 
             self.openRecentMenu = self.fileMenu.addMenu(QApplication.translate('Menu', 'Open Recent'))
+            if self.openRecentMenu is not None:
+                orm_action = self.openRecentMenu.menuAction()
+                if orm_action is not None:
+                    orm_action.setMenuRole(QAction.MenuRole.NoRole)
             if self.openRecentMenu is not None:
                 for i in range(self.MaxRecentFiles):
                     self.openRecentMenu.addAction(self.recentFileActs[i])
@@ -2641,6 +2586,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         # use s.encode("ascii", 'backslashreplace').decode("utf-8") and remove the duplicate \\
         for iso, name in [
                 ('ar', '\u0627\u0644\u0639\u0631\u0628\u064a\u0629'),
+                ('cs', '\u010d\u0065\u0161\u0074\u0069\u006e\u0061'),
                 ('da', 'Dansk'),
                 ('de', 'Deutsch'),
                 ('en', 'English'),
@@ -2654,7 +2600,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 ('id', 'Indonesia'),
                 ('it', 'Italiano'),
                 ('ja', '\u65e5\u672c\u8a9e'),
-                ('ko', '\ud55c\uad6d\uc758'),
+                ('ko', '\ud55c\uad6d\uc5b4'),
                 ('lv', 'Latviete'),
                 ('hu', 'Magyar'),
                 ('nl', 'Nederlands'),
@@ -2928,6 +2874,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.helpMenu.addAction(self.saveAsSettingsAction)
             self.helpMenu.addSeparator()
             self.resetAction = QAction(QApplication.translate('Menu', 'Factory Reset'), self)
+            self.resetAction.setMenuRole(QAction.MenuRole.NoRole)
             self.resetAction.triggered.connect(self.resetApplication)
             self.helpMenu.addAction(self.resetAction)
 
@@ -17919,9 +17866,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.weight = (self.qmc.weight[0],self.qmc.weight[1], (weight_unit if weight_unit in weight_units else weight_units[1]))
             volume_unit:str = s2a(toString(settings.value('volume',self.qmc.volume[2])))
             self.qmc.volume = (self.qmc.volume[0],self.qmc.volume[1], (volume_unit if volume_unit in volume_units else volume_units[0]))
-# density units are now fixed to g/l
-#                self.qmc.density[1] = s2a(toString(settings.value("densityweight",self.qmc.density[1])))
-#                self.qmc.density[3] = s2a(toString(settings.value("densityvolume",self.qmc.density[3])))
             self.qmc.volumeCalcUnit = float2float(toFloat(settings.value('volumeCalcUnit',self.qmc.volumeCalcUnit)))
             self.qmc.roasted_defects_mode = toBool(settings.value('roasted_defects_mode',self.qmc.roasted_defects_mode))
             settings.endGroup()
@@ -17931,7 +17875,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             settings.beginGroup('Tare')
             self.qmc.container_names = list(map(str,list(toStringList(settings.value('names',self.qmc.container_names)))))
             self.qmc.container_weights = [toFloat(x) for x in toList(settings.value('weights',self.qmc.container_weights))]
-            self.qmc.container_idx = toInt(settings.value('idx',int(self.qmc.container_idx)))
             settings.endGroup()
 #--- END GROUP Tare
 
@@ -18075,32 +18018,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.modbus.port = toInt(settings.value('port',self.modbus.port))
             settings.endGroup()
 #--- END GROUP Modbus
-
-#--- BEGIN GROUP Scale
-            #restore scale port
-            settings.beginGroup('Scale')
-            self.scale.device = settings.value('device',self.scale.device)
-            self.scale.comport = s2a(toString(settings.value('comport',self.scale.comport)))
-            self.scale.baudrate = toInt(settings.value('baudrate',int(self.scale.baudrate)))
-            self.scale.bytesize = toInt(settings.value('bytesize',self.scale.bytesize))
-            self.scale.stopbits = toInt(settings.value('stopbits',self.scale.stopbits))
-            self.scale.parity = s2a(toString(settings.value('parity',self.scale.parity)))
-            self.scale.timeout = float2float(toFloat(settings.value('timeout',self.scale.timeout)))
-            settings.endGroup()
-#--- END GROUP Scale
-
-#--- BEGIN GROUP Color
-            #restore color port
-            settings.beginGroup('Color')
-            self.color.device = settings.value('device',self.color.device)
-            self.color.comport = s2a(toString(settings.value('comport',self.color.comport)))
-            self.color.baudrate = toInt(settings.value('baudrate',int(self.color.baudrate)))
-            self.color.bytesize = toInt(settings.value('bytesize',self.color.bytesize))
-            self.color.stopbits = toInt(settings.value('stopbits',self.color.stopbits))
-            self.color.parity = s2a(toString(settings.value('parity',self.color.parity)))
-            self.color.timeout = float2float(toFloat(settings.value('timeout',self.color.timeout)))
-            settings.endGroup()
-#--- END GROUP Color
 
 #--- BEGIN GROUP Alarms
             #restore alarms
@@ -19883,7 +19800,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             settings.beginGroup('Tare')
             self.settingsSetValue(settings, default_settings, 'names',self.qmc.container_names, read_defaults)
             self.settingsSetValue(settings, default_settings, 'weights',self.qmc.container_weights, read_defaults)
-            self.settingsSetValue(settings, default_settings, 'idx',self.qmc.container_idx, read_defaults)
             settings.endGroup()
 #--- END GROUP Tare
 
@@ -20005,32 +19921,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'port',self.modbus.port, read_defaults)
             settings.endGroup()
 #--- END GROUP Modbus
-
-#--- BEGIN GROUP Scale
-            #save scale port
-            settings.beginGroup('Scale')
-            self.settingsSetValue(settings, default_settings, 'device',self.scale.device, read_defaults)
-            self.settingsSetValue(settings, default_settings, 'comport',self.scale.comport, read_defaults)
-            self.settingsSetValue(settings, default_settings, 'baudrate',self.scale.baudrate, read_defaults)
-            self.settingsSetValue(settings, default_settings, 'bytesize',self.scale.bytesize, read_defaults)
-            self.settingsSetValue(settings, default_settings, 'stopbits',self.scale.stopbits, read_defaults)
-            self.settingsSetValue(settings, default_settings, 'parity',self.scale.parity, read_defaults)
-            self.settingsSetValue(settings, default_settings, 'timeout',self.scale.timeout, read_defaults)
-            settings.endGroup()
-#--- END GROUP Scale
-
-#--- BEGIN GROUP Color
-            #save color port
-            settings.beginGroup('Color')
-            self.settingsSetValue(settings, default_settings, 'device',self.color.device, read_defaults)
-            self.settingsSetValue(settings, default_settings, 'comport',self.color.comport, read_defaults)
-            self.settingsSetValue(settings, default_settings, 'baudrate',self.color.baudrate, read_defaults)
-            self.settingsSetValue(settings, default_settings, 'bytesize',self.color.bytesize, read_defaults)
-            self.settingsSetValue(settings, default_settings, 'stopbits',self.color.stopbits, read_defaults)
-            self.settingsSetValue(settings, default_settings, 'parity',self.color.parity, read_defaults)
-            self.settingsSetValue(settings, default_settings, 'timeout',self.color.timeout, read_defaults)
-            settings.endGroup()
-#--- END GROUP Color
 
 #--- BEGIN GROUP ArduinoPID
             #save pid settings (only key and value[0])
@@ -20883,18 +20773,12 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.modbus.disconnect()
         # close s7 port
         self.s7.disconnect()
-        # close scale port
-        try:
-            if self.scale:
-                self.scale.closeport()
-        except Exception as e: # pylint: disable=broad-except
-            _log.exception(e)
-        # close color meter port
-        try:
-            if self.color:
-                self.color.closeport()
-        except Exception as e: # pylint: disable=broad-except
-            _log.exception(e)
+#        # close color meter port
+#        try:
+#            if self.color:
+#                self.color.closeport()
+#        except Exception as e: # pylint: disable=broad-except
+#            _log.exception(e)
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -24293,46 +24177,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
 
-            # set scale port
-            try:
-                self.scale.device = str(dialog.scale_deviceEdit.currentText())                #unicode() changes QString to a python string
-                if self.scale.device in self.scale.bluetooth_devices and not self.app.getBluetoothPermission():
-                    self.scale.device = None
-                    message:str = QApplication.translate('Message','Bluetooth scale cannot be connected while permission for Artisan to access Bluetooth is denied')
-                    QMessageBox.information(self, QApplication.translate('Message','Bluetooth access denied'), message)
-                self.scale.comport = str(dialog.scale_comportEdit.getSelection())
-                self.scale.baudrate = toInt(str(dialog.scale_baudrateComboBox.currentText()))              #int changes QString to int
-                self.scale.bytesize = toInt(str(dialog.scale_bytesizeComboBox.currentText()))
-                self.scale.stopbits = toInt(str(dialog.scale_stopbitsComboBox.currentText()))
-                self.scale.parity = str(dialog.scale_parityComboBox.currentText())
-                self.scale.timeout = float2float(toFloat(comma2dot(str(dialog.scale_timeoutEdit.text()))))
-            except Exception as e: # pylint: disable=broad-except
-                _log.exception(e)
-            # set color port
-            try:
-                self.color.device = str(dialog.color_deviceEdit.currentText())                #unicode() changes QString to a python string
-                self.color.comport = str(dialog.color_comportEdit.getSelection())
-                self.color.baudrate = toInt(str(dialog.color_baudrateComboBox.currentText()))              #int changes QString to int
-                self.color.bytesize = toInt(str(dialog.color_bytesizeComboBox.currentText()))
-                self.color.stopbits = toInt(str(dialog.color_stopbitsComboBox.currentText()))
-                self.color.parity = str(dialog.color_parityComboBox.currentText())
-                self.color.timeout = float2float(toFloat(comma2dot(str(dialog.color_timeoutEdit.text()))))
-            except Exception as e: # pylint: disable=broad-except
-                _log.exception(e)
-
         self.qmc.intChannel.cache_clear() # device type and thus int channels might have been changed
         self.qmc.clearLCDs()
 
-#        # deleteLater() will not work here as the dialog is still bound via the parent
-#        dialog.deleteLater() # now we explicitly allow the dialog an its widgets to be GCed
-#        # the following will immediately release the memory despite this parent link
-#        QApplication.processEvents() # we ensure events concerning this dialog are processed before deletion
-#        try:
-#            sip.delete(dialog)
-#            #print(sip.isdeleted(dialog))
-#        except Exception: # pylint: disable=broad-except
-#            pass
-#        #self.closeEventSettings() # save all app settings
 
     def toggleHottopControl(self) -> None:
         if self.HottopControlActive:
@@ -27384,6 +27231,7 @@ def initialize_locale(my_app:Artisan) -> str:
     # NOTE: on updates, need to update util.py:locale2full_local() as well
     supported_languages:List[str] = [
         'ar',
+        'cs',
         'da',
         'de',
         'el',

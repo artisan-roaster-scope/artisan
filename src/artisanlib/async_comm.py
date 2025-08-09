@@ -15,6 +15,7 @@
 # AUTHOR
 # Marko Luther, 2023
 
+import time
 import logging
 import asyncio
 
@@ -251,6 +252,8 @@ class AsyncComm:
                 while message != b'':
                     await self.write(writer, message)
                     message = await queue.get()
+                # on empty messages we close the connection
+                writer.close()
         except Exception as e: # pylint: disable=broad-except
             _log.error(e)
         finally:
@@ -338,6 +341,8 @@ class AsyncComm:
     def stop(self) -> None:
         _log.debug('stop sampling')
         self._running = False
+        self.send(b'') # we write an empty byte to stop the writer and disconnect
+        time.sleep(0.3) # wait a moment to allow the loop to disconnect
         self._asyncLoopThread = None
         self._write_queue = None
         self.reset_readings()

@@ -417,9 +417,9 @@ class GreenWeighingState(StateMachine):
         self.update_displays()
 
 # TESTING
-#    from statemachine import Event
+#    # from statemachine import Event
 #    @staticmethod
-#    def on_transition(event_data, event: Event) -> None: # type:ignore
+#    def on_transition(event_data, event: 'Event') -> None: # type:ignore
 #        # The `event` parameter can be declared as `str` or `Event`, since `Event` is a subclass of `str`
 #        # Note also that in this example, we're using `on_transition` instead of `on_cycle`, as this
 #        # binds the action to run for every transition instead of a specific event ID.
@@ -571,8 +571,7 @@ class RoastedWeighingState(StateMachine):
 
 # TESTING
 #    @staticmethod
-#    from statemachine import Event
-#    def on_transition(event_data, event: Event) -> None: # type:ignore
+#    def on_transition(event_data, event: 'Event') -> None: # type:ignore
 #        # The `event` parameter can be declared as `str` or `Event`, since `Event` is a subclass of `str`
 #        # Note also that in this example, we're using `on_transition` instead of `on_cycle`, as this
 #        # binds the action to run for every transition instead of a specific event ID.
@@ -852,6 +851,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefl
     # returns True if the roasted coffee weight (filled_container_weight - roasted_bucket_weight) is within estimated_roasted_weight +- self.ROASTED_BUCKET_TOLERANCE (in %)
     @staticmethod
     def filled_roasted_container_placed(filled_container_weight:int, estimated_roasted_weight:float, roasted_bucket_weight:float) -> bool:
+#        _log.debug("PRINT filled_roasted_container_placed(%s,%s,%s)",filled_container_weight,estimated_roasted_weight,roasted_bucket_weight)
         estimated_roasted_weight_g = estimated_roasted_weight*1000
         return abs(estimated_roasted_weight_g - (filled_container_weight - roasted_bucket_weight)) < (estimated_roasted_weight_g * WeightManager.ROASTED_BUCKET_TOLERANCE/100)
 

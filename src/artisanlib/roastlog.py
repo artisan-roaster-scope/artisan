@@ -51,7 +51,7 @@ def extractProfileRoastLog(url:'QUrl',
             tag_elements = tree.xpath(f'//td[contains(@class,"text-rt") and normalize-space(text())="{tag}"]/following::td[1]/text()')
             if isinstance(tag_elements, list) and len(tag_elements)>0:
                 tag_values[tag] = '\n'.join([str(e).strip() for e in tag_elements])
-        # {'Roastable:': '2003000 Diablo FTO BULK', 'Starting mass:': '140.00 lb', 'Ending mass:': '116.80 lb', 'Roasted on:': 'Thu, Jun 6th, 2019 11:11 PM', 'Roasted by:': 'Ryan@caffeladro.com', 'Roaster:': 'Diedrich CR-70'}
+        # {'Roastable:': '2003000 Diablo FTO BULK', 'Starting mass:': '140.00 lb', 'Ending mass:': '116.80 lb', 'Roasted on:': 'Thu, Jun 6th, 2019 11:11 PM', 'Roasted by:': 'infor@coffee.com', 'Roaster:': 'Diedrich CR-70'}
 
         if 'Roasted on:' in tag_values:
             try:

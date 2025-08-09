@@ -217,6 +217,9 @@ class ScaleManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error: 
 
 #- scale 1
 
+    def is_scale1_configured(self) -> bool:
+        return self.scale1 is not None
+
     def is_scale1_connected(self) -> bool:
         return self.scale1 is not None and self.scale1.is_connected()
 
