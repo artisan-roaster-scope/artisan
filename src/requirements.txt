@@ -78,7 +78,7 @@ pydantic==2.11.7; (platform_system=='Windows' and python_version>'3.10') or sys_
 pydantic==2.7.1; (platform_system=='Windows' and python_version<'3.9')  # last version working with Windows 7/8 pending resolution of pydantic Issue #9920
 babel==2.17.0
 bleak==0.22.3; python_version < '3.9' # last Python 3.8 release
-bleak==1.0.1; python_version >= '3.9'
+bleak==1.1.0; python_version >= '3.9'
 python-statemachine==2.5.0
 #
 #
