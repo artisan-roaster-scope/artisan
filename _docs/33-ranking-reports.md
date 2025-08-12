@@ -17,5 +17,6 @@ For comparing your roasts, a great feature is `Report` >> `Ranking`.  Ranking re
 You can save these reports in a web page format, a CSV or an Excel format.  Use your computers normal method for selecting multiple files at once when the dialog box pops open to load a profile.  One use of this data is to automate making roast cards with the data you want to see.  We use Word and they are easy to update, as we keep roast cards with our roasted beans to see what we are drinking.  
 
 This is the web version and it’s hard to screen shot, but you get Load, Charge Temp, FC start time, FC temp, Drop time, Drop Temp, Dry %, Mai%, Dev%, AUC, and Loss.
+You can click on the column title to sort either ascending or descending.  Click once to sort and again to change the order, ascending or descending.
 
 ![Roast Ranking](/assets/images/gsg/Roast Ranking.png)
