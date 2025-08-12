@@ -1,5 +1,5 @@
 ---
-layout: single
+layout: splash
 permalink: /about/
 header:
   overlay_image: /assets/images/teaser-small.jpg
@@ -9,11 +9,6 @@ toc: true
 toc_sticky: true
 toc_label: "On this page"
 toc_icon: "cog"
-gallery_main:
-  - url: https://artisan.plus/
-    image_path: /assets/images/artisan-plus.jpg
-    alt: "artisan.plus"
-    title: "artisan+"
 gallery:
   - url: https://www.phidgets.com/
     image_path: /assets/images/phidgets-logo.jpg
@@ -75,7 +70,126 @@ gallery:
     image_path: /assets/images/algrano-logo.png
     alt: "Algrano"
     title: "Algrano"
+
+feature_row_profiling:
+  - image_path: /assets/images/about-roast-profiling.png
+    alt: "cover image roast profiling"
+    title: "<span style='color: #4C97C3;'>Roast Profiling</span>"
+    excerpt: "
+    - one-click setup for [roasting machines of 80+ brands](/machines), support for [50+ devices](/devices), [configurable sampling rate (0.1–40s)](https://artisan-scope.org/docs/sampling/), unlimited data curves support [probe arrays](https://artisan-roasterscope.blogspot.com/2021/10/probe-arrays.html){:target='_blank'}, extensive import and export (Cropster, Giesen, IKAWA, Stronghold, RoastLog, RoastPath, ..)
+     
+    - [rate-of-rise (RoR)](https://artisan-scope.org/docs/curves/), [area-under-the-curve (AUC)](https://artisan-roasterscope.blogspot.de/2016/11/area-under-curve-auc.html){:target='_blank'}, [development-time-ratio (DTR)](https://artisan-roasterscope.blogspot.com/2020/05/displaying-development-time-ratio-in.html){:target='_blank'}, [phases projections](https://artisan-roasterscope.blogspot.com/2017/02/roast-phases-statistics-and-phases-lcds.html){:target='_blank'}, [virtual devices and symbolic assignments](https://artisan-roasterscope.blogspot.com/2019/11/symbolic-formulas-basics-new-variables.html){:target='_blank'}, [event detection](https://artisan-scope.org/docs/events/), [between-batch protocol support](https://artisan-roasterscope.blogspot.com/2020/12/supporting-between-batch-protocols.html){:target='_blank'}, and color sorting loss calculation
     
+    - zooming, [automatic panning](https://artisan-roasterscope.blogspot.com/2022/03/artisan-v260.html#automaticpanning){:target='_blank'}, and [dynamic reference profile alignment and shifting](https://artisan-roasterscope.blogspot.com/2017/10/profile-templates.html){:target='_blank'}
+    "
+
+
+feature_row_user_interface:
+  - image_path: /assets/images/about-user-interface.png
+    alt: "cover image flexible user interface"
+    title: "<span style='color: #4C97C3;'>Flexible User Interface</span>"
+    excerpt: "
+   [user-defined&nbsp;sliders and buttons with programmable&nbsp;actions](http://artisan-roasterscope.blogspot.de/2013/02/events-buttons-and-palettes.html){:target='_blank'}, [talking&nbsp;alarms](https://artisan-roasterscope.blogspot.com/2017/12/talking-alarms.html){:target='_blank'}, [large&nbsp;Web&nbsp;LCDs](https://artisan-roasterscope.blogspot.com/2016/03/lcds.html), [custom&nbsp;colors](https://artisan-scope.org/docs/colors/), [fonts, and drawing&nbsp;styles](https://artisan-scope.org/docs/curves/), [ready-made&nbsp;themes](https://artisan-scope.org/docs/themes/), [dynamic visibility of curves](https://artisan-scope.org/docs/setup/), [controls](https://artisan-scope.org/docs/controls/), and [readings](https://artisan-scope.org/docs/lcds/), supporting tiny and large&nbsp;screens, localized in 30+&nbsp;languages  
+    
+    "
+
+
+feature_row_roast_control:
+  - image_path: /assets/images/about-roast-control.png
+    alt: "cover image roast control"
+    title: "<span style='color: #4C97C3;'>Roast Control & Automation</span>"
+    excerpt: "
+    
+    - machine control by [custom slider and button actions](http://artisan-roasterscope.blogspot.de/2013/02/events-buttons-and-palettes.html){:target='_blank'}
+
+	- app automation and automated reproduction of roasts via [IF-THEN&nbsp;rules](http://artisan-roasterscope.blogspot.de/2013/03/alarms.html){:target='_blank'}, [ramping replay of reference profile events](https://artisan-roasterscope.blogspot.de/2017/10/profile-templates.html){:target='_blank'} by time and/or temperature which can be dynamically modified by simple dragging, [internal and external PID&nbsp;control](https://artisan-roasterscope.blogspot.de/2016/11/pid-control.html){:target='_blank'} supporting direct profile&nbsp;playback of full roast sessions incl. [automatic&nbsp;save](https://artisan-roasterscope.blogspot.com/2017/10/automatic-save.html){:target='_blank'}
+    
+    "  
+    
+feature_row_profile_design:
+  - image_path: /assets/images/about-profile-design.png
+    alt: "cover image profile design"
+    title: "<span style='color: #4C97C3;'>Profile Design & Analytics</span>"
+    excerpt: "
+    
+[profile&nbsp;designer](https://artisan-roasterscope.blogspot.com/2019/05/using-artisan-designer.html){:target='_blank'}, 
+[profile&nbsp;transposer](https://artisan-roasterscope.blogspot.com/2020/05/profile-transposer.html){:target='_blank'}, 
+[curve&nbsp;comparator](https://artisan-roasterscope.blogspot.com/2020/05/roast-comparator.html){:target='_blank'},
+[ranking&nbsp;reports](https://artisan-scope.org/docs/ranking-reports/){:target='_blank'},
+[roast&nbsp;simulator](https://artisan-roasterscope.blogspot.com/2020/05/roast-simulator.html){:target='_blank'},
+[roast&nbsp;analytics](https://artisan-roasterscope.blogspot.com/2019/11/analyzer.html){:target='_blank'}, 
+[curve&nbsp;delta&nbsp;metrics](https://artisan-roasterscope.blogspot.com/2019/05/how-close.html){:target='_blank'}    
+    
+    "  
+    
+
+feature_row_cupping:
+  - image_path: /assets/images/about-cupping.png
+    alt: "cover image cupping editor"
+    title: "<span style='color: #4C97C3;'>Cupping</span>"
+    excerpt: "
+    
+    cupping notes, [cupping editor](https://artisan-scope.org/docs/cup-profile/){:target='_blank'} and [spider charts](https://artisan-roasterscope.blogspot.com/2017/11/spiders-wheels.html){:target='_blank'}
+    "
+    
+feature_row_energy_tracking:
+  - image_path: /assets/images/about-energy-tracking.png
+    alt: "cover image energy tracking"
+    title: "<span style='color: #4C97C3;'>Energy & CO<sub>2</sub> Tracking</span>"
+    excerpt: "
+    
+    energy and CO2 tracking of roasts from [loads specification](https://artisan-roasterscope.blogspot.com/2021/07/tracking-energy-consumption-co2.html){:target='_blank'} and [energy meter data](https://artisan-roasterscope.blogspot.com/2025/04/using-energy-meter-to-measure-roast.html){:target='_blank'}, reporting of CO2 emissions estimates per unit roasted coffee from the carbon footprint of green coffee production and roasting
+
+	"
+
+
+feature_row_inventory_management:
+  - image_path: /assets/images/about-inventory-management.png
+    alt: "cover image inventory management"
+    title: "<span style='color: #4C97C3;'>Inventory Management</span>"
+    excerpt: "
+    
+- the affordable [**<span style='color: #4C97C3;'>artisan.plus</span>**](https://artisan.plus) extension adds multi-storage, multi-user, multi-machine, mobile-friendly transaction-based inventory management at one fixed price and with friendly 3 month free trial period
+
+- bean data from importers, blend management with magic transitions, EUDR management, stock taking, profile search, [automatic synchronization and seamless integration with **<span style='color: #4C97C3;'>artisan</span>**](https://artisan-roasterscope.blogspot.com/2020/06/working-together-artisan-artisanviewer.html){:target='_blank'} and professional 24h support  
+
+    "
+    url: "https://doc.artisan.plus/docs/"
+    btn_label: "Read More"
+    btn_class: "btn--info btn--small"
+    
+feature_row_production_support:
+  - image_path: /assets/images/about-production-support.png
+    alt: "cover image production support"
+    title: "<span style='color: #4C97C3;'>Production Support</span>"
+    excerpt: "
+    
+[**<span style='color: #4C97C3;'>artisan.plus</span>**](https://artisan.plus) also adds [production&nbsp;planning](https://doc.artisan.plus/docs/schedule/){:target='_blank'} and [roast&nbsp;scheduling](https://doc.artisan.plus/docs/schedule/){:target='_blank'}, [batch&nbsp;management](https://doc.artisan.plus/docs/batch-manager/){:target='_blank'} and [maintenance&nbsp;alerts](https://doc.artisan.plus/docs/reminders/){:target='_blank'}
+
+"    
+    url: "https://doc.artisan.plus/docs/"
+    btn_label: "Read More"
+    btn_class: "btn--info btn--small"
+
+
+feature_row_business_reporting:
+  - image_path: /assets/images/about-reporting.png
+    alt: "cover image reporting"
+    title: "<span style='color: #4C97C3;'>Reporting</span>"
+    excerpt: "
+    
+- basic [roast-, production- and ranking reports](https://artisan-roasterscope.blogspot.de/2016/03/artisan-v099.html){:target='_blank'} in Web, PDF, CSV, and Excel format
+
+- [**<span style='color: #4C97C3;'>artisan.plus</span>**](https://artisan.plus) adds sequential and open roast reports, purchase/sales report, stock, organic and tax business reporting with PDF, CSV and Excel exports
+
+    " 
+    
+    url: "https://doc.artisan.plus/docs/reports/"
+    btn_label: "Read More"
+    btn_class: "btn--info btn--small"
+    
+
+ 
 ---
 
 <!--
@@ -141,78 +255,80 @@ gallery:
     title: "Probat"
 -->
 
-Artisan is an open-source software that helps coffee roasters record, analyze, and control roast profiles. This software can automate the creation of roasting metrics to help make decisions that influence the final coffee flavor.
+> In 2009, Rafael and Marko started **<span style="color: #4C97C3;">artisan</span>**, a simple app for coffee lovers to track their roasts. Fast forward ten years, and **<span style="color: #4C97C3;">artisan</span>** has become the most trusted roasting software for commercial roasters thanks to the launch of **[<span style="color: #4C97C3;">artisan.plus</span>](https://artisan.plus)**, a cloud-based extension adding professional features like inventory management. Today, **<span style="color: #4C97C3;">artisan</span>** has a user base that's ten times bigger than any other roasting software. 
 
-[Donate](/donate/){: .btn .btn--success .btn--large} &ensp;
-[Install Now](https://github.com/artisan-roaster-scope/artisan/releases/latest){: .btn .btn--success .btn--large}{:target="_blank"}
-&ensp; [Quick Start Guide](/docs/quick-start-guide/){: .btn .btn--success .btn--large}
-&ensp; [Tutorials](/docs/videos/){: .btn .btn--success .btn--large}{:target="_blank"}
-&ensp; [Blog](https://artisan-roasterscope.blogspot.com/){: .btn .btn--success .btn--large}{:target="_blank"}
-&ensp; [Shop](https://shop.artisan.plus/){: .btn .btn--success .btn--large}{:target="_blank"}
-
-[All Releases](https://github.com/artisan-roaster-scope/artisan/releases){:target="_blank"} &emsp; [Version History](https://github.com/artisan-roaster-scope/artisan#version_history){:target="_blank"}
+<a name="Platforms"></a>
+**<span style="color: #4C97C3;">Artisan</span>** runs on Windows, macOS, Linux, Raspberry Pi
+{: style="text-align: center;" }
+<br>
 
 
-## Platforms
+{% include feature_row id="feature_row_profiling" type="left" %}
+{% include feature_row id="feature_row_user_interface" type="right" %}
 
-Artisan supports the following 64bit operating systems:
+{% include feature_row id="feature_row_roast_control" type="left" %}
+{% include feature_row id="feature_row_profile_design" type="right" %}
 
-* macOS 12.3 Monterey and higher incl. the latest macOS Sequoia 15 (Intel & AppleSilicon)
-* Windows 10 and 11 (x64)
-* Ubuntu 22.04+ (GCC11), Red Hat 8.4+ (GCC10) on x86 Intel and aarch64 ARM (via [Flatpack](https://flathub.org/apps/org.artisan_scope.artisan))
+{% include feature_row id="feature_row_cupping" type="left" %}
+{% include feature_row id="feature_row_energy_tracking" type="right" %}
 
-There are also legacy builds for Windows 8 (x64) and macOS 10.13 as well as an experimental build for Raspberry Pi OS 12 bookworm 64bit.
+{% include feature_row id="feature_row_inventory_management" type="left" %}
+{% include feature_row id="feature_row_production_support" type="right" %}
 
-## Notable Features
+{% include feature_row id="feature_row_business_reporting" type="left" %}
 
-- we believe in [Open-Source](https://www.youtube.com/watch?v=SpeDK1TPbew){:target="_blank"}, check out [our code](https://github.com/artisan-roaster-scope/artisan){:target="_blank"} and contribute
-- seamless integration into the [artisan.plus](https://artisan.plus){:target="_blank"} inventory management service
-- execution of [artisan.plus roast schedules](https://doc.artisan.plus/docs/schedule/){:target="_blank"}
-- extensive [machine](/machines/) and [device](/devices/) support including control
-- unlimited number of curves
-- rate-of-rise (RoR), [area-under-the-curve (AUC)](https://artisan-roasterscope.blogspot.de/2016/11/area-under-curve-auc.html){:target="_blank"}, [development-time-ratio (DTR)](https://artisan-roasterscope.blogspot.com/2020/05/displaying-development-time-ratio-in.html){:target="_blank"} calculations and projection lines
-- statistics, roast profile evaluation, [Profile Analyzer](https://artisan-roasterscope.blogspot.com/2019/11/analyzer.html){:target="_blank"}, [Roast Comparator](https://artisan-roasterscope.blogspot.com/2020/05/roast-comparator.html){:target="_blank"}, [Profile Transposer](https://artisan-roasterscope.blogspot.com/2020/05/profile-transposer.html){:target="_blank"} and [Roast Simulator](https://artisan-roasterscope.blogspot.com/2020/05/roast-simulator.html){:target="_blank"}
-- [roast-, production- and ranking reports](https://artisan-roasterscope.blogspot.de/2016/03/artisan-v099.html){:target="_blank"}
-- automated reproduction of roasts via [alarm programs](http://artisan-roasterscope.blogspot.de/2013/03/alarms.html){:target="_blank"}, [replay of events](https://artisan-roasterscope.blogspot.de/2017/10/profile-templates.html){:target="_blank"} or [PID control](https://artisan-roasterscope.blogspot.de/2016/11/pid-control.html){:target="_blank"}
-- [batch counter](https://artisan-roasterscope.blogspot.de/2015/07/batch-counter.html){:target="_blank"}
-- [profile designer](https://artisan-roasterscope.blogspot.com/2019/05/using-artisan-designer.html){:target="_blank"}, cupping editor, spider- and wheel graph
-- [user defined buttons and sliders](http://artisan-roasterscope.blogspot.de/2013/02/events-buttons-and-palettes.html){:target="_blank"} with programmable actions
-- many import and export formats like Aillio Roastime, Cropster XLS, Giesen CSV, IKAWA CSV, Probat Pilot, RoastLogger, RoastLog, RoastPath, Stronghold, ..
 
-[Request a Feature](https://github.com/artisan-roaster-scope/artisan/issues){: .btn .btn--success .btn--large}{:target="_blank"}
+
+We believe in [open-source](https://www.youtube.com/watch?v=SpeDK1TPbew){:target="_blank"}. Open-source software powers nearly all the world’s major companies. This software is freely available, and is developed collaboratively, maintained by a broad network that includes everyone from unpaid volunteers to employees at competing tech companies. Check out the **<span style="color: #4C97C3;">artisan</span>** [code](https://github.com/artisan-roaster-scope/artisan){:target="_blank"} and contribute!
+
 
   
 ## Cast
+{: style="text-align: center; color: #4C97C3;" }
 
 __[Marko Luther](/authors/luther/)__ –– maintainer
+{: style="text-align: center;" }
 
 __[Dave Baxter](/authors/baxter/)__ –– design wizard, genius & CI
+{: style="text-align: center;" }
 
 __[Michael Herbert](/authors/herbert/)__ –– documentation & fundraising
+{: style="text-align: center;" }
 
 __[wvengen](/authors/wvengen/)__ –– flatpack installer
+{: style="text-align: center;" }
 
 __Brett Pound__ –– support
+{: style="text-align: center;" }
 
 __Frans Goddijn__ –– support
+{: style="text-align: center;" }
 
 <span style="color:grey">__Rui Paulo__ –– Aillio master & CI</span>
+{: style="text-align: center;" }
 
 <span style="color:grey">__Rafael Cobo__ –– initiator</span>
+{: style="text-align: center;" }
 
-Especially, people that help us to localize the UI of Artisan to more languages and to complete the existing translations are very welcome!
+Especially, people that help us to localize the UI of **<span style="color: #4C97C3;">artisan</span>** to more languages and to complete the existing translations are very welcome to join in!
 
-Contact us via the [Contact Form](https://artisan-roasterscope.blogspot.com/p/contact-me.html){:target="_blank"} on the [Artisan blog](https://artisan-roasterscope.blogspot.com){:target="_blank"}.
+Contact us via the [Contact Form](https://artisan-roasterscope.blogspot.com/p/contact-me.html){:target="_blank"} on the [**<span style="color: #4C97C3;">artisan</span>** blog](https://artisan-roasterscope.blogspot.com/){:target="_blank"}.
+
 
 
 ## Translators
+{: style="color: #4C97C3;" }
 
+>
 Language  | Translators
 ------------- | -------------
-CN  | Leo Huang, Lewis Li
+CN  | Leo Huang, Lewis Li, Terracotta-6
+DE  | MAKOMO
+ES  | Juan Carlos Bonilla
 FA  | Saeed Abdinasab
 FR  | Nico Bigler
 IT  | FraBriz
+KO  | HarioSwitch
 PT-BR | Rodrigo Menezes Ramos
 TR  | Kemal Akdas
 VN  | Trinh Thu
@@ -221,20 +337,22 @@ We are always looking for people that support us here and there.
 
 
 ## Supporters
+{: style="color: #4C97C3;" }
 
-The development of Artisan is supported by a growing number of companies and individuals that recognize its value for their customers and endeavors.
+The development of **<span style="color: #4C97C3;">artisan</span>** is supported by a growing number of companies and individuals that recognize its value for their customers and endeavors. Add yourself to this list by [sending a donation](https://www.paypal.me/MarkoLuther){:target="_blank"}!
 
-Add yourself to this list by [sending a donation](https://www.paypal.me/MarkoLuther){:target="_blank"}!
-
-{% include gallery id="gallery_main" %}
+![image](/assets/images/artisan-plus-logo.svg){: style="width: 5%;"} [<span style="color: #4C97C3;font-weight:bold;">artisan.plus</span>](https://artisan.plus) inventory management
+{: style="text-align: center;" }
 
 {% include gallery id="gallery" %}
 
 
 
-## Enablers
 
-Artisan builds on a large number of excellent open-source software.
+## Enablers
+{: style="color: #4C97C3;" }
+
+**<span style="color: #4C97C3;">artisan</span>** builds on a large base of excellent open-source software.
 
 * [Python](https://www.python.org){:target="_blank"}, [Qt](https://www.qt.io){:target="_blank"}, [PyQt](https://riverbankcomputing.com){:target="_blank"}
 * [numpy/scipy](https://www.scipy.org){:target="_blank"}, [matplotlib](https://matplotlib.org){:target="_blank"}
@@ -244,6 +362,7 @@ Artisan builds on a large number of excellent open-source software.
 ..and many more. Thanks for releasing your work as open-source!
 
 ## License
+{: style="color: #4C97C3;" }
 
-Artisan is developed and distributed under the [GPLv3.0 License](http://www.gnu.org/copyleft/gpl.html). All its documentation (in part available on this site) under the [GFDLv1.3 License](https://www.gnu.org/licenses/fdl-1.3.en.html).
+**<span style="color: #4C97C3;">artisan</span>** is developed and distributed under the [GPLv3.0 License](http://www.gnu.org/copyleft/gpl.html). All its documentation (in part available on this site) under the [GFDLv1.3 License](https://www.gnu.org/licenses/fdl-1.3.en.html).
 

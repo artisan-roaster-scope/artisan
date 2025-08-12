@@ -14,4 +14,6 @@ sidebar:
   nav: "news"
 ---
 
-News and Events
+## <span style='color: #4C97C3;'>News & Events</span>
+
+<BR>

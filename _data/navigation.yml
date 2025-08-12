@@ -1,18 +1,12 @@
 main:
-  - title: "Machines"
-    url: /machines/index
-  - title: "Devices"
-    url: /devices/index
+  - title: "About"
+    url: /about/
   - title: "News"
     url: /news/index
   - title: "Donate"
     url: /donate/
   - title: "Download"
     url: /download/
-  - title: "Discussions"
-    url: /discussions/
-  - title: "About"
-    url: /about/
 
 machines:
   - title: "Machines"

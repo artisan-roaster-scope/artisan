@@ -23,6 +23,9 @@ gallery:
     image_path: /assets/images/download-icon-linux.png
     alt: "Linux"
     title: "Linux"
+    
+
+gallery_legacy:
   - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.2.0/artisan-win-x64-legacy-3.2.0-setup.exe
     image_path: /assets/images/download-icon-windows-legacy.png
     alt: "Windows legacy"
@@ -51,16 +54,25 @@ release_sponsor:
 
 ![Github Latest Releases](https://img.shields.io/github/downloads/artisan-roaster-scope/artisan/latest/total?logo=github&label=downloads&color=f5f5f5&labelColor=9C9C9C&style=flat){: .align-right}
 
-[Artisan v3.2.0](https://github.com/artisan-roaster-scope/artisan/releases/tag/v3.2.0)
-{: target="_blank" style="text-align: center; font-weight:bold;"}
+
+## **artisan v3.2.0**
+{: style="color: #4C97C3; text-align: center; font-weight:bold;" }
+
+free for personal and commercial use
+{: style="text-align: center; font-size: smaller; font-style: oblique;" }
 
 
 {% include gallery id="gallery" %}
 
+![image](/assets/images/artisan-plus-logo.svg){: style="width: 5%;"} [<span style="color: #4C97C3;font-weight:bold;">artisan.plus</span>](https://artisan.plus) inventory management
+{: style="text-align: center;" }
 
+{% include gallery id="gallery_legacy" %}
 
-[Release Sponsor](https://algrano.com/artisan?utm_source=artisan_blog&utm_medium=referral&utm_campaign=algrano_x_artisan&utm_content=blog)
-{: target="_blank" style="text-align: center;"}
+<br>
+
+# **Release Sponsor**
+{: style="color: #4C97C3; text-align: center; font-weight:bold;" }
 
 {% include gallery id="release_sponsor" %}
 

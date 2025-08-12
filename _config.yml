@@ -17,7 +17,7 @@ minimal_mistakes_skin    : "default" # "default" "air", "aqua", "contrast", "dar
 # Site Settings
 future                   : true # show future posts
 locale                   : "en-US"
-title                    : "coffee roasting software"
+title                    : "Leading coffee roasting software"
 title_separator          : "|"
 #subtitle                 : "visual scope" # site tagline that appears below site title in masthead
 name                     : &name "Marko Luther"

@@ -9,21 +9,8 @@ $twitter-color: lightgray;
 @import "minimal-mistakes/skins/{{ site.minimal_mistakes_skin | default: 'default' }}"; // skin
 @import "minimal-mistakes"; // main partials
 
-/* Ripple effect */
-.btn--success:hover {
-  background: #1985ba radial-gradient(circle, transparent 1%, #0c6aa6 1%) center/15000%;
-}
-
-.btn--success:active {
-  background-color: #0c6aa6;
-  background-size: 100%;
-  transition: background 0s;
-  color: #DEDEDE;
-  box-shadow: 2px 3px 1px -2px rgba(0, 0, 0, 0.2), 1px 4px 2px 1px rgba(0, 0, 0, 0.14), 0px 10px 10px 0px rgba(0, 0, 0, 0.12);
-}
-
-.btn--success:visited {
-    background-color: #147bb3;
+.btn--info {
+    background-color: #4C97C3;
     color: #fff;
 }
 
@@ -38,6 +25,33 @@ $twitter-color: lightgray;
   font-weight: 500;
   box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);
 }
+
+.btn--success:visited {
+    background-color: #147bb3;
+    color: #fff;
+}
+
+/* Ripple effect */
+/*
+.btn--success:hover {
+  background-color: #1985ba radial-gradient(circle, transparent 1%, #0c6aa6 1%) center/15000%;
+  color: #fff;
+}
+*/
+
+.btn--success:visited:hover, .btn--success:hover {
+  background-color: #4C94BC;
+  color: #fff;
+}
+
+.btn--success:active {
+  background-color: #0c6aa6;
+  background-size: 100%;
+  transition: background 0s;
+  color: #DEDEDE;
+  box-shadow: 2px 3px 1px -2px rgba(0, 0, 0, 0.2), 1px 4px 2px 1px rgba(0, 0, 0, 0.14), 0px 10px 10px 0px rgba(0, 0, 0, 0.12);
+}
+
 
 .help__toggle {
   margin-left: 1rem;

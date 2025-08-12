@@ -9,6 +9,10 @@ author_profile: true
 gallery:
 
 
+  - url: https://artisan-roasterscope.blogspot.com/2025/04/using-energy-meter-to-measure-roast.html
+    image_path: /assets/images/gsg/post_2025-5_Energy_Meters.jpg
+    alt: "Buttons – Appearance, State, and Action" 
+    title: "2025-4 Energy Meters"
   - url: https://artisan-roasterscope.blogspot.com/2023/06/buttons-appearance-state-and-action.html
     image_path: /assets/images/gsg/post_2023-6_Buttons_–_Appearance,_State,_and_Action.jpg
     alt: "Buttons – Appearance, State, and Action" 
@@ -206,7 +210,7 @@ gallery:
     
 ---
 
-A selection of posts from the [Artisan blog](https://artisan-roasterscope.blogspot.com/){:target="_blank"} covering almost any relevant topic!
+A selection of posts from the [**<span style="color: #4C97C3;">artisan</span>** blog](https://artisan-roasterscope.blogspot.com/){:target="_blank"} covering almost any relevant topic!
 
 {% include gallery id="gallery" %} 
 
