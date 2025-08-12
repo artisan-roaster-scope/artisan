@@ -19,6 +19,11 @@ $twitter-color: lightgray;
     color: #fff;
 }
 
+.btn--info:visited:hover, .btn--info:hover {
+  background-color: #147bb3;
+  color: #fff;
+}
+
 .btn--success {
   background-position: center;
   transition: background 0.8s;
@@ -35,14 +40,6 @@ $twitter-color: lightgray;
     background-color: #147bb3;
     color: #fff;
 }
-
-/* Ripple effect */
-/*
-.btn--success:hover {
-  background-color: #1985ba radial-gradient(circle, transparent 1%, #0c6aa6 1%) center/15000%;
-  color: #fff;
-}
-*/
 
 .btn--success:visited:hover, .btn--success:hover {
   background-color: #4C94BC;
