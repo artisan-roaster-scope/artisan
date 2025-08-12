@@ -255,7 +255,7 @@ feature_row_business_reporting:
     title: "Probat"
 -->
 
-> In 2009, Rafael and Marko started **<span style="color: #4C97C3;">artisan</span>**, a simple app for coffee lovers to track their roasts. Fast forward ten years, and **<span style="color: #4C97C3;">artisan</span>** has become the most trusted roasting software for commercial roasters thanks to the launch of **[<span style="color: #4C97C3;">artisan.plus</span>](https://artisan.plus)**, a cloud-based extension adding professional features like inventory management. Today, **<span style="color: #4C97C3;">artisan</span>** has a user base that's ten times bigger than any other roasting software. 
+> In 2009, the two Computer Scientists Rafael and [Marko](/authors/luther/) started **<span style="color: #4C97C3;">artisan</span>**, a simple app for coffee lovers to track their roasts. Fast forward ten years, and **<span style="color: #4C97C3;">artisan</span>** has become the most trusted roasting software for commercial roasters thanks to the launch of **[<span style="color: #4C97C3;">artisan.plus</span>](https://artisan.plus)**, a cloud-based extension adding professional features like inventory management. Today, **<span style="color: #4C97C3;">artisan</span>** has a user base that's ten times bigger than any other roasting software. 
 
 <a name="Platforms"></a>
 **<span style="color: #4C97C3;">Artisan</span>** runs on Windows, macOS, Linux, Raspberry Pi
