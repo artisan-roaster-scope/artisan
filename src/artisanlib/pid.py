@@ -138,7 +138,7 @@ class PID:
 
         # Enhanced derivative kick prevention
         self.lastTarget: float = 0.0  # Track target changes
-        self.derivative_limit: float = 80.0  # Limit derivative contribution
+        self.derivative_limit: float = 100.0  # Limit derivative contribution
         self.measurement_history: List[float] = (
             []
         )  # Track recent measurements for discontinuity detection

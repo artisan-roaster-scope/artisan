@@ -1319,7 +1319,7 @@ class TestPIDDerivativeKickImprovements:
         """Test that derivative limit is properly initialized."""
         pid = PID()
 
-        assert pid.derivative_limit == 80.0
+        assert pid.derivative_limit == 100.0
         assert pid.lastTarget == 0.0
         assert pid.measurement_history == []
         assert pid.setpoint_changed is False

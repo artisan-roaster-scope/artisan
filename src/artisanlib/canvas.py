@@ -12680,6 +12680,7 @@ class tgraphcanvas(FigureCanvas):
                         ha = 'right'
                     anno = self.ax1.annotate(self.flavorChartLabelText(i),xy =(self.flavorchart_angles[i],.9),  # pyrefly: ignore[unsupported-operation]
                                         fontproperties=fontprop_small,
+                                        color=self.palette['ylabel'],
                                         xytext=(self.flavorchart_angles[i],1.1),horizontalalignment=ha,verticalalignment='center')  # pyrefly: ignore[unsupported-operation]
                     try:
                         anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
@@ -12690,7 +12691,10 @@ class tgraphcanvas(FigureCanvas):
                 # total score
                 score = self.calcFlavorChartScore()
                 txt = f'{score:.2f}'.rstrip('0').rstrip('.')
-                self.flavorchart_total = self.ax1.text(0.,0.,txt,fontsize='x-large',fontproperties=self.aw.mpl_fontproperties,color='#FFFFFF',horizontalalignment='center',bbox={'facecolor':'#212121', 'alpha':0.5, 'pad':10})
+                self.flavorchart_total = self.ax1.text(0.,0.,txt,fontsize='x-large',
+                        fontproperties=self.aw.mpl_fontproperties,color='#FFFFFF',
+                        horizontalalignment='center',
+                        bbox={'facecolor':'#212121', 'alpha':0.5, 'pad':10})
 
                 #add background to plot if found
                 if self.background and self.flavorbackgroundflag:
