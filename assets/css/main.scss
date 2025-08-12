@@ -19,10 +19,17 @@ $twitter-color: lightgray;
     color: #fff;
 }
 
-.btn--info:visited:hover, .btn--info:hover {
+.btn--info:visited:hover {
   background-color: #147bb3;
   color: #fff;
 }
+
+.btn--info:hover {
+  background-color: #147bb3;
+  color: #fff;
+}
+
+
 
 .btn--success {
   background-position: center;
@@ -41,7 +48,13 @@ $twitter-color: lightgray;
     color: #fff;
 }
 
-.btn--success:visited:hover, .btn--success:hover {
+
+.btn--success:visited:hover {
+  background-color: #4C94BC;
+  color: #fff;
+}
+
+.btn--success:hover {
   background-color: #4C94BC;
   color: #fff;
 }
@@ -53,6 +66,7 @@ $twitter-color: lightgray;
   color: #DEDEDE;
   box-shadow: 2px 3px 1px -2px rgba(0, 0, 0, 0.2), 1px 4px 2px 1px rgba(0, 0, 0, 0.14), 0px 10px 10px 0px rgba(0, 0, 0, 0.12);
 }
+
 
 
 .help__toggle {
