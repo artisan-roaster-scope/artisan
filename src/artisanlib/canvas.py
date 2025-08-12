@@ -6767,7 +6767,7 @@ class tgraphcanvas(FigureCanvas):
                 for i in range(mlen):
                     #Start symbolic assignment
                     #Y + one digit
-                    if mathexpression[i] == 'Y' and i+1 < mlen and mathexpression[i+1].isdigit():
+                    if mathexpression[i].upper() == 'Y' and i+1 < mlen and mathexpression[i+1].isdigit():
                         #find Y number for ET,BT,Extras (up to 9)
                         #check for out of range
                         seconddigitstr = ''
@@ -6870,11 +6870,11 @@ class tgraphcanvas(FigureCanvas):
                             except Exception: # pylint: disable=broad-except
                                 mathdictionary['o'] = 0
 
-                    elif mathexpression[i] == 'R':
+                    elif mathexpression[i].upper() == 'R':
                         try:
                             if i+1 < mlen:
                                 k:int
-                                if mathexpression[i+1] == 'B': # RBnn : RoR of Background Profile
+                                if mathexpression[i+1].upper() == 'B': # RBnn : RoR of Background Profile
                                     k = 1
                                     c = 'RB'
                                 else:
@@ -7012,7 +7012,7 @@ class tgraphcanvas(FigureCanvas):
                             pass
 
                     #Add to dict Event1-4 external value
-                    elif mathexpression[i] == 'E' and i+1 < mlen and mathexpression[i+1].isdigit():                          #check for out of range
+                    elif mathexpression[i].upper() == 'E' and i+1 < mlen and mathexpression[i+1].isdigit():                          #check for out of range
                         nint = int(mathexpression[i+1])-1              #Enumber int
                         #find right most occurrence before index of given event type
                         if nint in self.specialeventstype and nint < 4:
@@ -7034,8 +7034,8 @@ class tgraphcanvas(FigureCanvas):
                     # time timeshift of absolute time (not relative to CHARGE)
                     # t : to access the foreground profiles time (sample_timex)
                     # b : to access the background profiles time (self.timeB)
-                    elif mathexpression[i] in {'t', 'b'}:
-                        if mathexpression[i] == 't':
+                    elif mathexpression[i].lower() in {'t', 'b'}:
+                        if mathexpression[i].lower() == 't':
                             timex = sample_timex
                         else:
                             timex = self.abs_timeB
@@ -7078,12 +7078,12 @@ class tgraphcanvas(FigureCanvas):
                             timeshiftexpressionsvalues.append(val)
                             mathexpression = evaltimeexpression.join((mathexpression[:i],mathexpression[end_idx+1:]))
                         #no timeshift
-                        elif mathexpression[i] == 't' and 't' not in mathdictionary:
+                        elif mathexpression[i].lower() == 't' and 't' not in mathdictionary:
                             mathdictionary['t'] = t - t_offset         #add t to the math dictionary
                         # b is only valid with index
 
                     #Add to dict plotter Previous results (cascading) from plotter field windows (1-9)
-                    elif mathexpression[i] == 'P' and i+1 < mlen and mathexpression[i+1].isdigit():                          #check for out of range
+                    elif mathexpression[i].upper() == 'P' and i+1 < mlen and mathexpression[i+1].isdigit():                          #check for out of range
                         nint = int(mathexpression[i+1])              #Ynumber int
                         #check for TIMESHIFT 0-9 (one digit). Example: "Y1[-2]"
                         if i+5 < mlen and mathexpression[i+2] == '[' and mathexpression[i+5] == ']':
@@ -7104,7 +7104,7 @@ class tgraphcanvas(FigureCanvas):
                                 mathdictionary[p_string] = val
 
                     #Background B1 = ETbackground; B2 = BTbackground
-                    elif mathexpression[i] == 'B':
+                    elif mathexpression[i].upper() == 'B':
                         if i+1 < mlen:
                             seconddigitstr = ''
                             if mathexpression[i+1].isdigit():
@@ -7232,7 +7232,7 @@ class tgraphcanvas(FigureCanvas):
                     # Feedback from previous result. Stack = [10,9,8,7,6,5,4,3,2,1]
                     # holds the ten previous formula results (same window) in order.
                     # F1 is the last result. F5 is the past 5th result
-                    elif mathexpression[i] == 'F' and i+1 < mlen and mathexpression[i+1].isdigit():
+                    elif mathexpression[i].upper() == 'F' and i+1 < mlen and mathexpression[i+1].isdigit():
                         nint = int(mathexpression[i+1])
                         val = self.plotterstack[-1*nint]
                         f_string = f'F{mathexpression[i+1]}'
@@ -7241,7 +7241,7 @@ class tgraphcanvas(FigureCanvas):
 
                     # add channel tare values (T1 => ET, T2 => BT, T3 => E1c1, T4 => E1c2, T5 => E2c1,
                     # set by clicking on the corresponding LCD
-                    elif mathexpression[i] == 'T' and i+1 < mlen:                          #check for out of range
+                    elif mathexpression[i].upper() == 'T' and i+1 < mlen:                          #check for out of range
                         nint = -1 #Enumber int
                         if i+2 < mlen and mathexpression[i+2].isdigit():
                             nint = int(f'{mathexpression[i+1]}{mathexpression[i+2]}')-1
