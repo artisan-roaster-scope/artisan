@@ -180,7 +180,7 @@ feature_row_business_reporting:
     
 - basic [roast-, production- and ranking reports](https://artisan-roasterscope.blogspot.de/2016/03/artisan-v099.html){:target='_blank'} in Web, PDF, CSV, and Excel format
 
-- [**<span style='color: #4C97C3;'>artisan.plus</span>**](https://artisan.plus) adds sequential and open roast reports, purchase/sales report, stock, organic and tax business reporting with PDF, CSV and Excel exports
+- [**<span style='color: #4C97C3;'>artisan.plus</span>**](https://artisan.plus) adds sequential and open roast reports, as well as purchase/sales, stock, organic and tax business reporting with PDF, CSV and Excel exports
 
     " 
     
