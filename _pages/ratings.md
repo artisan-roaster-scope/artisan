@@ -9,6 +9,7 @@ toc: false
 ---
 
 # Burner and Motor Ratings
+{: style="color: #4C97C3;" }
 
 
 For selected manufactors ([Aillio](/machines/aillio/#EnergyRatings), [Hottop](/machines/hottop/#EnergyRatings), [Probat](/machines/probat/#EnergyRatings), [Kirsch & Mausser](/machines/kirsch/#EnergyRatings), [Coffed](/machines/coffed/#EnergyRatings), [San Franciscan](/machines/sf/#EnergyRatings), [IP-CC](/machines/iRm/#EnergyRatings)) machine specific ratings are listed on the corresponding pages.

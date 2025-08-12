@@ -15,6 +15,7 @@ If you need support please check the [documentation](#documentation) or ask the 
 
 <a name="Documentation"></a>
 ## Documentation
+{: style="color: #4C97C3;" }
 
 * [Quick-Start Guide](/docs/quick-start-guide/)
 * [Artisan Blog](https://artisan-roasterscope.blogspot.com/){:target="_blank"}
@@ -26,6 +27,7 @@ If you need support please check the [documentation](#documentation) or ask the 
 
 <a name="Community"></a>
 ## Community
+{: style="color: #4C97C3;" }
 
 - [Artisan Discussion Forum](https://github.com/artisan-roaster-scope/artisan/discussions){:target="_blank"} (technical discussions and support; [GitHub registration](https://github.com/join){:target="_blank"} required to post; [Learn how to Subscribe to Discussions](/discussions))
 - [Tutorial videos](https://artisan-scope.org/docs/videos/)
@@ -33,6 +35,7 @@ If you need support please check the [documentation](#documentation) or ask the 
 
 <a name="commercial_support"></a>
 ## Commercial Support
+{: style="color: #4C97C3;" }
 
 Commercial support for **<span style="color: #4C97C3;">artisan</span>** is included with every [PRO subscription](https://buy.artisan.plus/Professional-Roasters) to the cloud-based
 
@@ -43,9 +46,11 @@ Commercial support for **<span style="color: #4C97C3;">artisan</span>** is inclu
 
 <a name="FAQ"></a>
 ## FAQ
+{: style="color: #4C97C3;" }
 
 <a name="FAQ-General"></a>
 ### General
+{: style="color: #4C97C3;" }
 
 <br>
 
@@ -74,6 +79,7 @@ Commercial support for **<span style="color: #4C97C3;">artisan</span>** is inclu
 
 <a name="FAQ-Setup"></a>
 ### Setup
+{: style="color: #4C97C3;" }
 
 <br>
 
@@ -125,6 +131,7 @@ Commercial support for **<span style="color: #4C97C3;">artisan</span>** is inclu
 
 <a name="FAQ-Recording"></a>
 ### Recording
+{: style="color: #4C97C3;" }
 
 <br>
 
@@ -190,6 +197,7 @@ Commercial support for **<span style="color: #4C97C3;">artisan</span>** is inclu
 
 <a name="FAQ-Viewing"></a>
 ### Viewing
+{: style="color: #4C97C3;" }
 
 <br>
 

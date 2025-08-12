@@ -30,6 +30,7 @@ You need to install the corresponding serial driver for the chipset of this conv
 
 
 ## Serial Driver Cheat Sheet
+{: style="color: #4C97C3;" }
 
 .. table to be extended and corrected as we receive new information from you ..
 

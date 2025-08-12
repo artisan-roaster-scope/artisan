@@ -36,6 +36,7 @@ We especially thank our partners for pushing this project forward. Machines of o
 
 
 # Supporters
+{: style="color: #4C97C3;" }
 
 The following manufacturers have supported the Artisan project financially within the past 2 years.
 

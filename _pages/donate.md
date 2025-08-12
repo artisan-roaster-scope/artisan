@@ -23,6 +23,7 @@ Home roasting enthusiasts often donate 10-100.- (in $ or EUR), while small roast
 
 
 ## Legal Notice for donations
+{: style="color: #4C97C3;" }
 
 Any donation that you make to the Artisan project via the above links is voluntary and is not a fee for any services, goods, or advantages. By making a donation to the Artisan project, you acknowledge that we have the right to use the money you donate in any lawful way and for any lawful purpose we see fit and we are not obligated to disclose the way and purpose to any party unless required by applicable law. Although Artisan is free software, to the best of our knowledge the Artisan project does not have any tax exempt status. The Artisan project is neither a registered non-profit corporation nor a registered charity in any country. Your donation may or may not be tax-deductible; please consult your tax advisor in this matter. Your donation is non-refundable.
 

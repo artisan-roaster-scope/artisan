@@ -36,13 +36,20 @@ release_sponsor:
 
 ---
 
-[Artisan v3.2.0](https://github.com/artisan-roaster-scope/artisan/releases/tag/v3.2.0)
-{: target="_blank" style="text-align: center; font-weight:bold;"}
+## **artisan v3.2.0**
+{: style="color: #4C97C3; text-align: center; font-weight:bold;" }
+
+free for personal and commercial use
+{: style="text-align: center; font-size: smaller; font-style: oblique;" }
 
 {% include gallery id="gallery" %}
 
-[Release Sponsor](https://algrano.com/)
-{: target="_blank" style="text-align: center;"}
+![image](/assets/images/artisan-plus-logo.svg){: style="width: 5%;"} [<span style="color: #4C97C3;font-weight:bold;">artisan.plus</span>](https://artisan.plus) inventory management
+{: style="text-align: center;" }
+
+
+# **Release Sponsor**
+{: style="color: #4C97C3; text-align: center; font-weight:bold;" }
 
 {% include gallery id="release_sponsor" %}
 
