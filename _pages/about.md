@@ -149,7 +149,7 @@ feature_row_inventory_management:
     title: "<span style='color: #4C97C3;'>Inventory Management</span>"
     excerpt: "
     
-- the affordable [**<span style='color: #4C97C3;'>artisan.plus</span>**](https://artisan.plus) extension adds multi-storage, multi-user, multi-machine, mobile-friendly transaction-based inventory management at one fixed price and with friendly 3 month free trial period
+- the affordable [**<span style='color: #4C97C3;'>artisan.plus</span>**](https://artisan.plus) cloud extension adds multi-storage, multi-user, multi-machine, mobile-friendly transaction-based inventory management at one fixed price and with friendly 3 month free trial period
 
 - bean data from importers, blend management with magic transitions, EUDR management, stock taking, profile search, [automatic synchronization and seamless integration with **<span style='color: #4C97C3;'>artisan</span>**](https://artisan-roasterscope.blogspot.com/2020/06/working-together-artisan-artisanviewer.html){:target='_blank'} and professional 24h support  
 
