@@ -16,6 +16,10 @@ def content() -> str:
     strlist.append('<b>')
     strlist.append(QApplication.translate('HelpDlg','SYMBOLIC VARIABLES'))
     strlist.append('</b>')
+    tbl_SymbolicVariablestop = prettytable.PrettyTable()
+    tbl_SymbolicVariablestop.header = False
+    tbl_SymbolicVariablestop.add_row([QApplication.translate('HelpDlg','Note: All symbolic variables are case sensitive!')])
+    strlist.append(tbl_SymbolicVariablestop.get_html_string(attributes={'width':'100%','border':'1','padding':'1','border-collapse':'collapse'}))
     tbl_SymbolicVariables = prettytable.PrettyTable()
     tbl_SymbolicVariables.field_names = [QApplication.translate('HelpDlg','Symbol'),QApplication.translate('HelpDlg','Description'),QApplication.translate('HelpDlg','Can  shift?\n(see below)')]
     tbl_SymbolicVariables.add_row(['t',QApplication.translate('HelpDlg','Absolute time (seconds) from begin of recording (not only the time after CHARGE!)'),QApplication.translate('HelpDlg','Yes')])

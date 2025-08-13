@@ -48,6 +48,9 @@ v3.2.1
   - fixes the OFF on DROP option for the WebSocket connection ([Issue #1943](../../../issues/1943))
   - fixes a regression which broke the MODBUS communication with certain devices in Windows Legacy builds ([Issue #1931](../../../issues/1931))
   - don't try to connect to the Hottop while still being connected to the Hottop ([Issue #1950](../../../issues/1950))
+  - fixes dynamic assignment of Yoctopuce PT100 modules
+  - adds note to the symbolic assignment help page that symbolic variables are case-sensitive ([Issue #1514](../../../issues/1514))
+
 
 
 ----

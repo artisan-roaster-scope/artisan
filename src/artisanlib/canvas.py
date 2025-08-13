@@ -13679,6 +13679,7 @@ class tgraphcanvas(FigureCanvas):
 
     # close serial port, Phidgets and Yocto ports
     def disconnectProbesFromSerialDevice(self, ser:'serialport') -> None:
+        _log.debug('disconnectProbesFromSerialDevice')
         try:
             self.samplingSemaphore.acquire(1)
 

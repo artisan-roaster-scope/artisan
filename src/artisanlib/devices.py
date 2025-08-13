@@ -1013,6 +1013,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.yoctoBoxRemoteFlag.stateChanged.connect(self.yoctoBoxRemoteFlagStateChanged)
         yoctoServerIdLabel = QLabel(QApplication.translate('Label','VirtualHub'))
         self.yoctoServerId = QLineEdit(self.aw.qmc.yoctoServerID)
+        self.yoctoServerId.setToolTip(QApplication.translate('Tooltip','Network IP address or name of the remote VirtualHub'))
         self.yoctoServerId.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.yoctoServerId.setMinimumWidth(100)
         self.yoctoServerId.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
