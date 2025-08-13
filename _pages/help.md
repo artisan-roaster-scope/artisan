@@ -29,7 +29,7 @@ If you need support please check the [documentation](#documentation) or ask the 
 ## Community
 {: style="color: #4C97C3;" }
 
-- [Artisan Discussion Forum](https://github.com/artisan-roaster-scope/artisan/discussions){:target="_blank"} (technical discussions and support; [GitHub registration](https://github.com/join){:target="_blank"} required to post; [Learn how to Subscribe to Discussions](/discussions))
+- [Artisan Discussion Forum](https://github.com/artisan-roaster-scope/artisan/discussions){:target="_blank"} for technical discussions and support; [Issue Tracker](https://github.com/artisan-roaster-scope/artisan/issues) for reporting bugs and submitting feature requests ([GitHub registration](https://github.com/join){:target="_blank"} required to post; [Learn how to Subscribe to Discussions](/discussions))
 - [Tutorial videos](https://artisan-scope.org/docs/videos/)
 - [Tutorial documents](https://artisan-scope.org/docs/documents/)
 

@@ -255,7 +255,7 @@ feature_row_business_reporting:
     title: "Probat"
 -->
 
-> In 2009, the two Computer Scientists Rafael and [Marko](/authors/luther/) started **<span style="color: #4C97C3;">artisan</span>**, a simple app for coffee lovers to track their roasts. Fast forward ten years, and **<span style="color: #4C97C3;">artisan</span>** has become the most trusted roasting software for commercial roasters thanks to the launch of **[<span style="color: #4C97C3;">artisan.plus</span>](https://artisan.plus)**, a cloud-based extension adding professional features like inventory management. Today, **<span style="color: #4C97C3;">artisan</span>** has a user base that's ten times bigger than any other roasting software. 
+> In 2009, the two Computer Scientists Rafael and [Marko](/authors/luther/) started **<span style="color: #4C97C3;">artisan</span>**, a simple app for coffee lovers to track their roasts. Fast forward ten years, and **<span style="color: #4C97C3;">artisan</span>** became the most trusted roasting software for commercial roasters thanks to the launch of **[<span style="color: #4C97C3;">artisan.plus</span>](https://artisan.plus)**, a cloud-based extension adding professional features like inventory management. Today, **<span style="color: #4C97C3;">artisan</span>** has a user base that's ten times bigger than any other roasting software. 
 
 <a name="Platforms"></a>
 **<span style="color: #4C97C3;">Artisan</span>** runs on Windows, macOS, Linux, Raspberry Pi
@@ -356,8 +356,11 @@ The development of **<span style="color: #4C97C3;">artisan</span>** is supported
 
 * [Python](https://www.python.org){:target="_blank"}, [Qt](https://www.qt.io){:target="_blank"}, [PyQt](https://riverbankcomputing.com){:target="_blank"}
 * [numpy/scipy](https://www.scipy.org){:target="_blank"}, [matplotlib](https://matplotlib.org){:target="_blank"}
-* [pyserial](https://github.com/pyserial/pyserial){:target="_blank"}, [pyusb](https://github.com/pyusb/pyusb){:target="_blank"}, [pymodbus](https://github.com/riptideio/pymodbus){:target="_blank"}, [python-snap7](https://github.com/gijzelaerr/python-snap7){:target="_blank"}
-* [py2app](https://github.com/ronaldoussoren/py2app){:target="_blank"}, [pyinstaller](https://www.pyinstaller.org){:target="_blank"}
+* [pillow](https://github.com/python-pillow/Pillow){:target="_blank"}, [babel](https://github.com/python-babel/babel){:target="_blank"}, [pyobjc](https://github.com/ronaldoussoren/pyobjc){:target="_blank"}, [pydantic](https://github.com/pydantic/pydantic){:target="_blank"}
+* [pyserial](https://github.com/pyserial/pyserial){:target="_blank"}, [pyusb](https://github.com/pyusb/pyusb){:target="_blank"}, [pymodbus](https://github.com/riptideio/pymodbus){:target="_blank"}, [python-snap7](https://github.com/gijzelaerr/python-snap7){:target="_blank"}, [aiohttp](https://github.com/aio-libs/aiohttp){:target="_blank"}, [bleak](https://github.com/hbldh/bleak){:target="_blank"}
+* [ruff](https://github.com/astral-sh/ruff){:target="_blank"}, [pylint](https://github.com/pylint-dev/pylint){:target="_blank"}, [mypy](https://github.com/python/mypy){:target="_blank"}, [pyright](https://github.com/microsoft/pyright){:target="_blank"}, [ty](https://github.com/astral-sh/ty){:target="_blank"}, [pyrefly](https://github.com/facebook/pyrefly){:target="_blank"}, [pytest](https://github.com/pytest-dev/pytest){:target="_blank"}, 
+[hypothesis](https://github.com/HypothesisWorks/hypothesis){:target="_blank"}, [coverage](https://github.com/nedbat/coveragepy){:target="_blank"}, [codespell](https://github.com/codespell-project/codespell){:target="_blank"}
+* [pip](https://github.com/pypa/pip){:target="_blank"}, [pypip](https://github.com/pypi){:target="_blank"}, [py2app](https://github.com/ronaldoussoren/py2app){:target="_blank"}, [pyinstaller](https://www.pyinstaller.org){:target="_blank"}
 
 ..and many more. Thanks for releasing your work as open-source!
 
