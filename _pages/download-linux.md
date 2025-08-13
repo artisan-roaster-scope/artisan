@@ -47,7 +47,7 @@ Help keep **<span style="color: #4C97C3;">artisan</span>** free for personal and
 
 <br>
 
-![image](/assets/images/artisan-plus-logo.svg){: style="width: 3%;"} [<span style="color: #4C97C3;font-weight:bold;">artisan.plus</span>](https://artisan.plus) inventory management
+![image](/assets/images/artisan-plus-logo.svg){: style="width: 3%;"} [<span style="color: #4C97C3;font-weight:bold;">artisan.plus</span>](https://artisan.plus){:target="_blank"} inventory management
 {: style="text-align: center;" }
 
 {% include gallery id="gallery" %}
