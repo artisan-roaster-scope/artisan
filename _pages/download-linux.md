@@ -39,13 +39,13 @@ release_sponsor:
 ## **artisan v3.2.0**
 {: style="color: #4C97C3; text-align: center; font-weight:bold;" }
 
-free for personal and commercial use
+Help keep **<span style="color: #4C97C3;">artisan</span>** free for personal and commercial use by [sending a donation](/donate)
 {: style="text-align: center; font-size: smaller; font-style: oblique;" }
-
-{% include gallery id="gallery" %}
 
 ![image](/assets/images/artisan-plus-logo.svg){: style="width: 5%;"} [<span style="color: #4C97C3;font-weight:bold;">artisan.plus</span>](https://artisan.plus) inventory management
 {: style="text-align: center;" }
+
+{% include gallery id="gallery" %}
 
 
 # **Release Sponsor**
