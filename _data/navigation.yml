@@ -187,6 +187,8 @@ devices:
   - title: "Devices"
     url: /devices/
     children:
+      - title: "Acaia"
+        url: /devices/acaia/
       - title: "Arduino"
         url: /devices/arduino/
       - title: "ColorTrack"
