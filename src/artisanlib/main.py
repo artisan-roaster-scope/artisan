@@ -7525,7 +7525,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                         mpl.rcParams['font.family'] = ['Arial Unicode MS', 'DejaVu Sans', 'Microsoft YaHei', 'SimHei', 'Noto Sans CJK SC', 'Noto Sans SC', 'sans-serif']
                     elif self.locale_str == 'zh_TW':
 #                        self.set_mpl_fontproperties('C:\\Windows\\Fonts\\mingliu.ttc')
-                        mpl.rcParams['font.family'] = ['Arial Unicode MS', 'DejaVu Sans', 'Microsoft JhengHei', 'MingLiU', 'Noto Sans CJK TC', 'Noto Sans TC' 'sans-serif']
+                        mpl.rcParams['font.family'] = ['Arial Unicode MS', 'DejaVu Sans', 'Microsoft JhengHei', 'MingLiU', 'Noto Sans CJK TC', 'Noto Sans TC', 'sans-serif']
                     elif self.locale_str == 'ko':
 #                        self.set_mpl_fontproperties('C:\\Windows\\Fonts\\batang.ttc')
                         mpl.rcParams['font.family'] = ['Arial Unicode MS', 'DejaVu Sans', 'Malgun Gothic', 'sans-serif']
