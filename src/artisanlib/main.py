@@ -7497,32 +7497,41 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 rcParams['axes.unicode_minus'] = True
                 rcParams['font.size'] = 12.0
                 if platform.system() == 'Darwin':
-                    mpl.rcParams['font.family'] = 'Arial Unicode MS'
+                    if self.locale_str == 'zh_CN':
+                        mpl.rcParams['font.family'] = ['Heiti SC', 'Arial Unicode MS', 'DejaVu Sans', 'sans-serif']
+                    elif self.locale_str == 'zh_TW':
+                        mpl.rcParams['font.family'] = ['Heiti TC', 'Arial Unicode MS', 'DejaVu Sans', 'sans-serif']
+                    else:
+                        mpl.rcParams['font.family'] = ['Arial Unicode MS', 'DejaVu Sans', 'sans-serif']
                     self.mpl_fontproperties = FontProperties()
                 elif platform.system() == 'Linux':
-                    mpl.rcParams['font.family'] = ['DejaVu Sans','DejaVu Sans Mono'] # default; works for Greek
+                    mpl.rcParams['font.family'] = ['DejaVu Sans','DejaVu Sans Mono', 'sans-serif'] # default; works for Greek
                     if self.locale_str == 'ar':
-                        mpl.rcParams['font.family'] = ['DejaVu Sans','DejaVu Sans Mono','Times New Roman']
+                        mpl.rcParams['font.family'] = ['DejaVu Sans','DejaVu Sans Mono','Times New Roman', 'sans-serif']
                     elif self.locale_str == 'ja':
-                        mpl.rcParams['font.family'] = ['TakaoPGothic']
+                        mpl.rcParams['font.family'] = ['TakaoPGothic', 'DejaVu Sans', 'sans-serif']
                     elif self.locale_str in {'zh_CN', 'zh_TW'}:
-                        mpl.rcParams['font.family'] = ['NanumGothic','DejaVu Sans Mono']
+                        mpl.rcParams['font.family'] = ['NanumGothic', 'DejaVu Sans', 'DejaVu Sans Mono', 'sans-serif']
                     self.mpl_fontproperties = FontProperties()
                 else: # Windows:
-                    mpl.rcParams['font.family'] = ['Microsoft Sans Serif', 'Arial'] # works for Greek and Arabic
+                    mpl.rcParams['font.family'] = ['Microsoft Sans Serif', 'DejaVu Sans', 'Arial', 'sans-serif'] # works for Greek and Arabic
                     self.mpl_fontproperties = FontProperties()
-                    # for asian languages on Windows we have to set the parameters directly to *.ttc fonts (mpl supports only *.ttf)
+                    # OUTDATED: for asian languages on Windows we have to set the parameters directly to *.ttc fonts (mpl supports only *.ttf)
                     if self.locale_str == 'ja':
-                        self.set_mpl_fontproperties('C:\\Windows\\Fonts\\MSGOTHIC.ttc')
+#                        self.set_mpl_fontproperties('C:\\Windows\\Fonts\\MSGOTHIC.ttc')
+                        mpl.rcParams['font.family'] = ['Arial Unicode MS', 'DejaVu Sans', 'Meiryo', 'MS Gothic', 'Source Han Sans JP', 'Noto Sans CJK JP', 'Noto Sans JP', 'sans-serif']
                     elif self.locale_str == 'zh_CN':
-                        self.set_mpl_fontproperties('C:\\Windows\\Fonts\\simsun.ttc')
+#                        self.set_mpl_fontproperties('C:\\Windows\\Fonts\\simsun.ttc')
+                        mpl.rcParams['font.family'] = ['Arial Unicode MS', 'DejaVu Sans', 'Microsoft YaHei', 'SimHei', 'Noto Sans CJK SC', 'Noto Sans SC', 'sans-serif']
                     elif self.locale_str == 'zh_TW':
-                        self.set_mpl_fontproperties('C:\\Windows\\Fonts\\mingliu.ttc')
+#                        self.set_mpl_fontproperties('C:\\Windows\\Fonts\\mingliu.ttc')
+                        mpl.rcParams['font.family'] = ['Arial Unicode MS', 'DejaVu Sans', 'Microsoft JhengHei', 'MingLiU', 'Noto Sans CJK TC', 'Noto Sans TC' 'sans-serif']
                     elif self.locale_str == 'ko':
-                        self.set_mpl_fontproperties('C:\\Windows\\Fonts\\batang.ttc')
-#                    elif self.locale_str == "ar":
-#                        mpl.rcParams['font.family'] = "TraditionalArabic"
-#                        self.mpl_fontproperties = FontProperties()
+#                        self.set_mpl_fontproperties('C:\\Windows\\Fonts\\batang.ttc')
+                        mpl.rcParams['font.family'] = ['Arial Unicode MS', 'DejaVu Sans', 'Malgun Gothic', 'sans-serif']
+                    elif self.locale_str == 'ar':
+                        mpl.rcParams['font.family'] = ['DejaVu Sans', 'TraditionalArabic', 'Arial Unicode MS', 'sans-serif']
+                    self.mpl_fontproperties = FontProperties()
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
         elif self.qmc.graphfont == 3: # WenQuanYi Zen Hei

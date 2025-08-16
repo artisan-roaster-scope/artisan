@@ -54,7 +54,7 @@ case "$1" in
    if dpkg-query -W xdg-utils | awk '{print $2}' 2>&1 >/dev/null; then
        set_mime;
    fi
-   if dpkg-query -W udev 2>&1 >/dev/null; then
+   if dpkg-query -W udev | awk '{print $2}' 2>&1 >/dev/null; then
       udevadm control -R
    fi
    ;;
