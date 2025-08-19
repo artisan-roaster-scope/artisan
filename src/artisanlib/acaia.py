@@ -17,6 +17,7 @@
 
 import asyncio
 import logging
+import time as libtime
 from enum import IntEnum, unique
 from typing import Optional, Union, List, Tuple, Final, Callable, TYPE_CHECKING
 
@@ -30,7 +31,7 @@ except ImportError:
 
 from artisanlib.ble_port import ClientBLE
 from artisanlib.async_comm import AsyncIterable, IteratorReader
-from artisanlib.scale import Scale, ScaleSpecs
+from artisanlib.scale import Scale, ScaleSpecs, STATE_ACTION
 from artisanlib.util import float2float
 
 
@@ -38,6 +39,8 @@ _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 
 ####
+
+Color = Tuple[int, int, int] # RGB color with valid values from 0-255
 
 @unique
 class SCALE_CLASS(IntEnum):
@@ -107,6 +110,7 @@ class MSG(IntEnum):
     IDENTIFY = 11
     EVENT = 12
     TIMER = 13
+    LED = 53
 
 # Command IDs
 @unique
@@ -115,6 +119,18 @@ class CMD(IntEnum):
     INFO_A = 7
     STATUS_A = 8
     EVENT_SA = 12
+
+@unique
+class LED_CMD(IntEnum):
+    OFF = 0
+    EFFECT = 1
+    ON = 2
+
+@unique
+class LED_EFFECT(IntEnum):
+    HALO = 1
+    WIPE_OFF = 2
+    BREATHE = 3
 
 # Event types
 @unique
@@ -197,6 +213,19 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
     HEADER1:Final[bytes]      = b'\xef'
     HEADER2:Final[bytes]      = b'\xdd'
 
+    # Colors
+    BLACK:Final[Color] = (0,0,0)
+    WHITE:Final[Color] = (255,255,255)
+    RED:Final[Color] = (255,0,0)
+    GREEN:Final[Color] = (0,255,0)
+    BLUE:Final[Color] = (0,0,255)
+    LIGHT_BLUE:Final[Color] = (0,128,255)
+    MAGENTA:Final[Color] = (255,0,255)
+    CYAN:Final[Color] = (0,255,255) # not used
+    ORANGE:Final[Color] = (255,128,0) # not used
+    BROWN:Final[Color] = (255,60,0)
+
+
     HEARTBEAT_FREQUENCY = 5 # send the heartbeat every 5 sec
 
 
@@ -238,6 +267,7 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
         self.max_weight:int = 0 # always in g
         self.readability:float = 0 # scale accuracy; minimal weight steps
         self.auto_off_timer:AUTO_OFF_TIMER = AUTO_OFF_TIMER.AUTO_SLEEP_OFF
+        self.has_leds:bool = False # scale supports LED commands
 
         ###
 
@@ -281,6 +311,7 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
         self.fast_notifications_sent = False
         self.slow_notifications_sent = False
         connected_service_UUID, connected_device_name = self.connected()
+        self.has_leds = False
         if connected_service_UUID == ACAIA_LEGACY_SERVICE_UUID:
             _log.debug('connected to Acaia Legacy Scale (%s)', connected_device_name)
             self.scale_class = SCALE_CLASS.LEGACY
@@ -305,9 +336,11 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
                     # Acaia Cosmo 100kg
                     self.max_weight = 100*1000
                     self.readability = 10
+                    self.has_leds = True
                 elif connected_device_name.startswith('COSMO-10'):
                     self.max_weight = 10*1000
                     self.readability = 0.1
+                    self.has_leds = True
                 else:
                     self.max_weight = 1000
                     self.readability = 0.1
@@ -723,7 +756,7 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
     def send_message(self, tp:int, payload:bytes) -> None:
         self.send(self.message(tp, payload))
         if self._logging:
-            _log.info('send: %s',payload)
+            _log.debug('send: %s',payload)
 
     def send_event(self, payload:bytes) -> None:
         self.send_message(MSG.EVENT, bytes([len(payload)+1]) + payload)
@@ -745,13 +778,7 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
 
     def send_tare(self) -> None:
         _log.debug('send tare')
-# not needed any longer as in non-streaming mode the tare weight is always send after tare
-#        if self.scale_class == SCALE_CLASS.RELAY:
-#            self.streaming_notifications()
         self.send_message(MSG.TARE,b'\x00')
-# not needed any longer as in non-streaming mode the tare weight is always send after tare
-#        if self.scale_class == SCALE_CLASS.RELAY:
-#            self.changes_notifications()
 
     def send_get_settings(self) -> None:
         _log.debug('send get settings')
@@ -768,6 +795,37 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
     def send_reset_timer(self) -> None:
         _log.debug('send reset time')
         self.send_message(MSG.TIMER,b'\x00\x01')
+
+    def send_led_cmd(self, payload:bytes) -> None:
+        if self.has_leds:
+            if self._logging:
+                _log.debug('send led command: %s', payload)
+            self.send_message(MSG.LED, payload)
+
+    @staticmethod
+    def led_color_payload(cmd:LED_CMD, color:Color, value:int=0) -> bytes:
+        return bytes([
+            cmd,
+            value,
+            max(0,min(255,color[0])),
+            max(0,min(255,color[1])),
+            max(0,min(255,color[2])),
+            0])
+
+    def send_leds_on(self, color:Color) -> None:
+        self.send_led_cmd(self.led_color_payload(LED_CMD.ON, color))
+
+    def send_leds_off(self) -> None:
+        self.send_led_cmd(self.led_color_payload(LED_CMD.OFF, self.BLACK))
+
+    def send_leds_halo(self, color:Color) -> None:
+        self.send_led_cmd(self.led_color_payload(LED_CMD.EFFECT, color, LED_EFFECT.HALO))
+
+    def send_leds_wipe_off(self, color:Color) -> None:
+        self.send_led_cmd(self.led_color_payload(LED_CMD.EFFECT, color, LED_EFFECT.WIPE_OFF))
+
+    def send_leds_breathe(self, color:Color) -> None:
+        self.send_led_cmd(self.led_color_payload(LED_CMD.EFFECT, color, LED_EFFECT.BREATHE))
 
     ###
 
@@ -840,7 +898,7 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
                     self._read_queue.put(bytes(data)),
                     self._async_loop_thread.loop)
             if self._logging:
-                _log.info('received: %s',data)
+                _log.debug('received: %s',data)
 
 
     # EX: d = b'\xef\xdd\x07\x07\x02\x14\x02<\x14\x00W\x18\xef\xdd\x07' (len: 12)
@@ -912,7 +970,8 @@ class Acaia(Scale): # pyright: ignore [reportGeneralTypeIssues] # Argument to cl
     def is_connected(self) -> bool:
         return self.scale_connected
 
-    def connect_scale(self) -> None:
+    def connect_scale(self, device_logging:bool) -> None:
+        self.acaia.setLogging(device_logging)
         self.acaia.start(address=self.ident)
 
     def disconnect_scale(self) -> None:
@@ -943,3 +1002,40 @@ class Acaia(Scale): # pyright: ignore [reportGeneralTypeIssues] # Argument to cl
 
     def readability(self) -> float:
         return self.acaia.readability
+
+    # signal state actions to the user
+    def signal_user(self, action:STATE_ACTION) -> None:
+        if action == STATE_ACTION.DISCONNECTED:
+            self.acaia.send_leds_wipe_off(self.acaia.MAGENTA)
+        elif action == STATE_ACTION.CONNECTED:
+            self.acaia.send_leds_halo(self.acaia.CYAN)
+        elif action == STATE_ACTION.RELEASED:
+            self.acaia.send_leds_breathe(self.acaia.MAGENTA)
+        elif action == STATE_ACTION.ASSIGNED_GREEN:
+            self.acaia.send_leds_breathe(self.acaia.WHITE)
+        elif action == STATE_ACTION.ASSIGNED_ROASTED:
+            self.acaia.send_leds_breathe(self.acaia.BROWN)
+        elif action == STATE_ACTION.ZONE_ENTER:
+            self.acaia.send_leds_on(self.acaia.LIGHT_BLUE)
+        elif action == STATE_ACTION.ZONE_EXIT:
+            self.acaia.send_leds_off()
+        elif action == STATE_ACTION.SWAP_ENTER:
+            self.acaia.send_leds_on(self.acaia.ORANGE)
+        elif action == STATE_ACTION.SWAP_EXIT:
+            self.acaia.send_leds_off()
+        elif action == STATE_ACTION.TARGET_ENTER:
+            self.acaia.send_leds_halo(self.acaia.BLUE)
+            libtime.sleep(0.4)
+            self.acaia.send_leds_on(self.acaia.BLUE)
+        elif action == STATE_ACTION.TARGET_EXIT:
+            self.acaia.send_leds_off()
+        elif action == STATE_ACTION.OK_ENTER:
+            self.acaia.send_leds_on(self.acaia.GREEN)
+        elif action == STATE_ACTION.OK_EXIT:
+            self.acaia.send_leds_wipe_off(self.acaia.GREEN)
+        elif action == STATE_ACTION.CANCEL_ENTER:
+            self.acaia.send_leds_on(self.acaia.RED)
+        elif action in {STATE_ACTION.CANCEL_EXIT, STATE_ACTION.INTERRUPTED}:
+            self.acaia.send_leds_wipe_off(self.acaia.RED)
+        elif action == STATE_ACTION.COMPONENT_CHANGED:
+            self.acaia.send_leds_breathe(self.acaia.ORANGE)

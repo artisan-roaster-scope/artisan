@@ -234,7 +234,7 @@ from artisanlib.util import (appFrozen, uchr, decodeLocal, decodeLocalStrict, en
         fromFtoCstrict, fromCtoFstrict, RoRfromFtoCstrict, RoRfromCtoFstrict,
         convertRoR, convertRoRstrict, convertTemp, path2url, toInt, toString, toList, toFloat,
         toBool, toStringList, removeAll, application_name, application_viewer_name, application_organization_name,
-        application_organization_domain, application_desktop_file_name, getDataDirectory, getAppPath, getResourcePath, debugLogLevelToggle,
+        application_organization_domain, application_desktop_file_name, getDataDirectory, getDocumentsDirectory, getAppPath, getResourcePath, debugLogLevelToggle,
         debugLogLevelActive, setDebugLogLevel, createGradient, natsort, setDeviceDebugLogLevel,
         comma2dot, is_proper_temp, weight_units, volume_units, float2float,
         convertWeight, convertVolume, rgba_colorname2argb_colorname, render_weight, serialize, deserialize, csv_load, exportProfile2CSV, findTPint,
@@ -20619,7 +20619,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
     def stopActivities(self) -> None:
         # disconnect connected scales
-        self.scale_manager.disconnect_all()
+        self.scale_manager.disconnect_all_signal.emit()
 
         if self.full_screen_mode_active:
             if self.fullscreenAction is not None and not (platform.system() == 'Darwin' and self.qmc.locale_str == 'en'):
@@ -20717,7 +20717,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 _log.exception(e)
             self.qmc.stopPhidgetManager()
         try:
-            self.scale_manager.disconnect_all()
+            self.scale_manager.disconnect_all_signal.emit()
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
 
@@ -27380,6 +27380,11 @@ def main() -> None:
     else:
         QApplication.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
 
+    # after app initialization set DocumentsDirectory as default autosave path
+    doc_dir:Optional[str] = getDocumentsDirectory()
+    if doc_dir is not None:
+        appWindow.qmc.autosavepath = doc_dir
+        appWindow.qmc.autosavealsopath = doc_dir
 
     start_time = libtime.process_time() # begin of settings load
     # fill self.defaultSettings with default app QSettings values before loading app settings from system via settingsLoad()

@@ -395,6 +395,35 @@ def _getAppDataDirectory(app:'Artisan') -> Optional[str]:
     except Exception:  # pylint: disable=broad-except
         return None
 
+
+# getDocumentsDirectory() returns the Documents directory of the users account
+# if app is not yet initialized None is returned
+# otherwise the path is computed on first call and then memorized
+# if the computed path does not exists it is created
+# if creation or access of the path fails None is returned and memorized
+def getDocumentsDirectory() -> Optional[str]:
+    app = QCoreApplication.instance()
+    return _getAppDocumentsDirectory(app)
+
+# internal function to return
+@functools.lru_cache(maxsize=None)  #for Python >= 3.9 can use @functools.cache
+def _getAppDocumentsDirectory(app:'Artisan') -> Optional[str]:
+    # temporarily switch app name to Artisan (as it might be ArtisanViewer)
+    appName = app.applicationName()
+    app.setApplicationName(application_name)
+    data_dir = QStandardPaths.standardLocations(
+        QStandardPaths.StandardLocation.DocumentsLocation
+    )[0]
+    app.setApplicationName(appName)
+    try:
+        if not os.path.exists(data_dir):
+            os.makedirs(data_dir)
+        return data_dir
+    except Exception:  # pylint: disable=broad-except
+        return None
+
+
+
 @functools.lru_cache(maxsize=None)  #for Python >= 3.9 can use @functools.cache
 def getAppPath() -> str:
     platf = platform.system()

@@ -41,7 +41,7 @@ class WebView:
 
         self._loop:        Optional[asyncio.AbstractEventLoop] = None # the asyncio loop
         self._thread:      Optional[Thread]                    = None # the thread running the asyncio loop
-        self._app = web.Application(debug=True)
+        self._app = web.Application(debug=True) # ty: ignore
         self._app['websockets'] = weakref.WeakSet()
         self._app.on_shutdown.append(self.on_shutdown) # type:ignore[arg-type, unused-ignore]
 
@@ -54,16 +54,16 @@ class WebView:
         self._index_path:str = index_path
         self._websocket_path:str = websocket_path
 
-        self._runner: Optional[web.AppRunner] = None
+        self._runner: Optional[web.AppRunner] = None # ty: ignore
 
 
         aiohttp_jinja2.setup(self._app,
             loader=jinja2.FileSystemLoader(resource_path))
 
         self._app.add_routes([
-            web.get(f'/{self._index_path}', self.index),
-            web.get(f'/{self._websocket_path}', self.websocket_handler),
-            web.static('/', resource_path, append_version=True)
+            web.get(f'/{self._index_path}', self.index), # ty: ignore
+            web.get(f'/{self._websocket_path}', self.websocket_handler), # ty: ignore
+            web.static('/', resource_path, append_version=True) # ty: ignore
         ])
 
 
@@ -72,7 +72,7 @@ class WebView:
     async def index(self, _request: 'Request') -> Dict[str,str]: # pylint:disable=no-self-use
         return {}
 
-    async def send_msg_to_ws(self, ws:web.WebSocketResponse, message:str) -> None:
+    async def send_msg_to_ws(self, ws:web.WebSocketResponse, message:str) -> None: # ty: ignore
         try:
             await ws.send_str(message)
         except Exception as e: # pylint: disable=broad-except
@@ -103,8 +103,8 @@ class WebView:
                 _log.error(ex)
 
     # route that establishes the websocket between the Artisan app and the clients
-    async def websocket_handler(self, request: 'Request') -> web.WebSocketResponse:
-        ws:web.WebSocketResponse = web.WebSocketResponse()
+    async def websocket_handler(self, request: 'Request') -> web.WebSocketResponse: # ty: ignore
+        ws:web.WebSocketResponse = web.WebSocketResponse()  # ty: ignore
         await ws.prepare(request)
         request.app['websockets'].add(ws)
         try:
@@ -120,15 +120,15 @@ class WebView:
         return ws
 
     @staticmethod
-    async def on_shutdown(app:web.Application) -> None:
+    async def on_shutdown(app:web.Application) -> None:  # ty: ignore
         for ws in set(app['websockets']):
             await ws.close(code=WSCloseCode.GOING_AWAY,
                            message='Server shutdown')
 
     async def startup(self) -> None:
-        self._runner = web.AppRunner(self._app)
+        self._runner = web.AppRunner(self._app)  # ty: ignore
         await self._runner.setup()
-        site = web.TCPSite(self._runner, '0.0.0.0', self._port)
+        site = web.TCPSite(self._runner, '0.0.0.0', self._port)  # ty: ignore
         await asyncio.wait_for(site.start(), 0.7)
 
     @staticmethod

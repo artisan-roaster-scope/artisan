@@ -358,7 +358,7 @@ class TestScale:
     def test_connect_scale_default_implementation(self, scale_instance: Scale) -> None:
         """Test connect_scale default implementation."""
         # Act - Should not raise exception
-        scale_instance.connect_scale()
+        scale_instance.connect_scale(False)
 
         # Assert - No exception should be raised
 
@@ -680,7 +680,7 @@ class TestScaleManager:
         scale_manager_instance.scale1 = mock_scale
 
         # Act
-        scale_manager_instance.connect_scale1_slot()
+        scale_manager_instance.connect_scale1_slot(False)
 
         # Assert
         mock_scale.connect_scale.assert_called_once()
@@ -691,7 +691,7 @@ class TestScaleManager:
         scale_manager_instance.scale1 = None
 
         # Act - Should not raise exception
-        scale_manager_instance.connect_scale1_slot()
+        scale_manager_instance.connect_scale1_slot(False)
 
         # Assert - No exception should be raised
 

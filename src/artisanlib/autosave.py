@@ -163,9 +163,17 @@ class autosaveDlg(ArtisanDialog):
 
     @pyqtSlot()
     def prefixChanged(self) -> None:
-        preview = self.aw.generateFilename(self.prefixEdit.text(),previewmode=2)
+        autosaveprefix:str = self.prefixEdit.text()
+        prefix = ''
+        if autosaveprefix != '':
+            prefix = autosaveprefix
+        elif self.aw.qmc.batchcounter > -1 and self.aw.qmc.roastbatchnr > 0:
+            prefix += self.aw.qmc.batchprefix + str(self.aw.qmc.roastbatchnr)
+        elif self.aw.qmc.batchprefix != '':
+            prefix += self.aw.qmc.batchprefix
+        preview = self.aw.generateFilename(prefix, previewmode=2)
         self.prefixPreview.setText(preview)
-        previewrecording = self.aw.generateFilename(self.prefixEdit.text(),previewmode=1)
+        previewrecording = self.aw.generateFilename(prefix,previewmode=1)
         if previewrecording == preview:
             self.prefixpreviewrecordingLabel.setText('')
             self.prefixPreviewrecording.setText('')

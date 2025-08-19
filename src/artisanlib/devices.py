@@ -1961,7 +1961,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.aw.scale1_name = self.scale1_devices[i][0]
             self.aw.scale1_id = self.scale1_devices[i][1]
             self.aw.scale_manager.set_scale1_signal.emit(self.aw.scale1_model, self.aw.scale1_id, self.aw.scale1_name)
-            self.aw.scale_manager.connect_scale1_signal.emit()
+            self.aw.scale_manager.connect_scale1_signal.emit(self.aw.qmc.device_logging)
         # i == -1 if self.scale1NameComboBox is empty!
         else:
             self.aw.scale_manager.set_scale1_signal.emit(-1, '', '')
@@ -2077,7 +2077,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.aw.scale2_name = self.scale2_devices[i][0]
             self.aw.scale2_id = self.scale2_devices[i][1]
             self.aw.scale_manager.set_scale2_signal.emit(self.aw.scale2_model, self.aw.scale2_id, self.aw.scale2_name)
-            self.aw.scale_manager.connect_scale2_signal.emit()
+            self.aw.scale_manager.connect_scale2_signal.emit(self.aw.qmc.device_logging)
         # i == -1 if self.scale2NameComboBox is empty!
         else:
             self.aw.scale_manager.set_scale2_signal.emit(-1, '', '')

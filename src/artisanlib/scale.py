@@ -19,6 +19,7 @@ import math
 import platform
 import time as libtime
 import logging
+from enum import IntEnum, unique
 from typing import Final, List, Tuple, Optional, Callable
 
 try:
@@ -46,14 +47,40 @@ STABLE_TIMER_PERIOD =350 # period to wait until new weight stabilized before for
 MIN_STABLE_WEIGHT_CHANGE = 1 # The weight has to change for at least this amount (in g) to update the last stable weight
 
 
+
+@unique
+class STATE_ACTION(IntEnum):
+    DISCONNECTED = 0        # scale got disconnected
+    CONNECTED = 1           # scale got connected
+    #
+    RELEASED = 2            # scale got released from task
+    ASSIGNED_GREEN = 3      # scale got assigned to the green weighing task
+    ASSIGNED_ROASTED = 4    # scale got assigned to the roasted weighing task
+    #
+    ZONE_ENTER = 5          # scale weight entered target area with acceptable accuracy
+    ZONE_EXIT = 6           # scale weight left target area with acceptable accuracy
+    SWAP_ENTER = 7          # scale empty for bucket swap
+    SWAP_EXIT = 8           # scale no longer empty after bucket swap
+    TARGET_ENTER = 9        # scale weight entered the 100% target zone
+    TARGET_EXIT = 10        # scale weight left the 100% target zone
+    OK_ENTER = 11           # scale OK confirmation dialog started
+    OK_EXIT = 12            # scale OK confirmation dialog successfully ended with task confirmation
+    CANCEL_ENTER = 13       # scale CANCEL confirmation dialog started
+    CANCEL_EXIT = 14        # scale CANCEL confirmation dialog successfully ended with task cancellation
+    INTERRUPTED = 15        # scale operation interrupted by push-to-cancel guesture
+    COMPONENT_CHANGED = 16  # weight items blend component changed
+
+
+
 # NOTE: this class and all subclasses are not allowed to hold __slots__
 class Scale(QObject):  # pyright:ignore[reportGeneralTypeIssues] # error: Argument to class must be a base class
 
-    scanned_signal = pyqtSignal(list)  # delivers discovered device details
-    weight_changed_signal = pyqtSignal(float, bool) # delivers new weight in g with decimals for accurate conversion and flag indicating stable readings
-    battery_changed_signal = pyqtSignal(int)  # delivers new batter level in %
-    connected_signal = pyqtSignal()     # issued on connect
-    disconnected_signal = pyqtSignal()  # issued on disconnect
+    scanned_signal = pyqtSignal(list)               # delivers discovered device details
+    weight_changed_signal = pyqtSignal(float, bool) # delivers new weight in g with decimals for accurate
+                                                    #   conversion and flag indicating stable readings
+    battery_changed_signal = pyqtSignal(int)        # delivers new battery level in %
+    connected_signal = pyqtSignal()                 # issued on connect
+    disconnected_signal = pyqtSignal()              # issued on disconnect
 
     def __init__(self, model:int, ident:Optional[str] = None, name:Optional[str] = None):
         super().__init__()
@@ -96,7 +123,7 @@ class Scale(QObject):  # pyright:ignore[reportGeneralTypeIssues] # error: Argume
     def scan(self) -> None:
         pass
 
-    def connect_scale(self) -> None:
+    def connect_scale(self, device_logging:bool) -> None:
         pass
 
     def disconnect_scale(self) -> None:
@@ -116,6 +143,8 @@ class Scale(QObject):  # pyright:ignore[reportGeneralTypeIssues] # error: Argume
     def readability(self) -> float: # pylint: disable=no-self-use
         return 0
 
+    def signal_user(self, action:STATE_ACTION) -> None:
+        pass
 
 
 class ScaleManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error: Argument to class must be a base class
@@ -127,9 +156,10 @@ class ScaleManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error: 
     # scales marked assigned (in use) cannot be set nor disconnected
     # note set setting a scale to a new configuration will disconnect from a previously connected scale
     set_scale1_signal = pyqtSignal(int, str, str) # set scale1 to model, ident and name
-    connect_scale1_signal = pyqtSignal()
+    connect_scale1_signal = pyqtSignal(bool) # if argument is True, device logging is activated for scale 1
     disconnect_scale1_signal = pyqtSignal()
     tare_scale1_signal = pyqtSignal()
+    signal_user_scale1_signal = pyqtSignal(int)
     reserve_scale1_signal = pyqtSignal()
     release_scale1_signal = pyqtSignal()
 
@@ -138,11 +168,15 @@ class ScaleManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error: 
     # scales marked assigned (in use) cannot be set nor disconnected
     # note set setting a scale to a new configuration will disconnect from a previously connected scale
     set_scale2_signal = pyqtSignal(int, str, str) # set scale2 to model, ident and name
-    connect_scale2_signal = pyqtSignal()
+    connect_scale2_signal = pyqtSignal(bool) # if argument is True, device logging is activated for scale 1
     disconnect_scale2_signal = pyqtSignal()
     tare_scale2_signal = pyqtSignal()
+    signal_user_scale2_signal = pyqtSignal(int)
     reserve_scale2_signal = pyqtSignal()
     release_scale2_signal = pyqtSignal()
+
+    disconnect_all_signal = pyqtSignal()
+    connect_all_signal = pyqtSignal(bool) # if argument is True, device logging is activated for scales
 
 
     # subscribed by clients:
@@ -178,6 +212,7 @@ class ScaleManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error: 
         self.connect_scale1_signal.connect(self.connect_scale1_slot, type=Qt.ConnectionType.QueuedConnection) # type: ignore
         self.disconnect_scale1_signal.connect(self.disconnect_scale1_slot, type=Qt.ConnectionType.QueuedConnection) # type: ignore
         self.tare_scale1_signal.connect(self.tare_scale1_slot, type=Qt.ConnectionType.QueuedConnection) # type: ignore
+        self.signal_user_scale1_signal.connect(self.signal_user_scale1_slot, type=Qt.ConnectionType.QueuedConnection) # type: ignore
         self.reserve_scale1_signal.connect(self.reserve_scale1_slot, type=Qt.ConnectionType.QueuedConnection) # type: ignore
         self.release_scale1_signal.connect(self.release_scale1_slot, type=Qt.ConnectionType.QueuedConnection) # type: ignore
 
@@ -186,8 +221,12 @@ class ScaleManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error: 
         self.connect_scale2_signal.connect(self.connect_scale2_slot, type=Qt.ConnectionType.QueuedConnection) # type: ignore
         self.disconnect_scale2_signal.connect(self.disconnect_scale2_slot, type=Qt.ConnectionType.QueuedConnection) # type: ignore
         self.tare_scale2_signal.connect(self.tare_scale2_slot, type=Qt.ConnectionType.QueuedConnection) # type: ignore
+        self.signal_user_scale2_signal.connect(self.signal_user_scale2_slot, type=Qt.ConnectionType.QueuedConnection) # type: ignore
         self.reserve_scale2_signal.connect(self.reserve_scale2_slot, type=Qt.ConnectionType.QueuedConnection) # type: ignore
         self.release_scale2_signal.connect(self.release_scale2_slot, type=Qt.ConnectionType.QueuedConnection) # type: ignore
+
+        self.disconnect_all_signal.connect(self.disconnect_all_slot, type=Qt.ConnectionType.QueuedConnection) # type: ignore
+        self.connect_all_signal.connect(self.connect_all_slot, type=Qt.ConnectionType.QueuedConnection) # type: ignore
 
         self.scale1_last_weight:Optional[int] = None    # in g; cleared by arrival of fresh stable weights
         self.scale1_stable_reading_timer = QTimer()
@@ -237,7 +276,7 @@ class ScaleManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error: 
                 self.scale1.disconnected_signal.disconnect(self.update_availability)
             except Exception as e: # pylint: disable=broad-except
                 _log.error(e)
-            self.scale1.disconnect_scale()
+            self.disconnect_scale(self.scale1)
             self.scale1 = None
 
     @pyqtSlot(int,str,str)
@@ -266,20 +305,26 @@ class ScaleManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error: 
             if self.scale1 is not None:
                 self.scale1.scan()
 
-    @pyqtSlot()
-    def connect_scale1_slot(self) -> None:
+    @pyqtSlot(bool)
+    def connect_scale1_slot(self, device_logging:bool) -> None:
         if self.scale1 is not None:
-            self.scale1.connect_scale()
+            self.scale1.connect_scale(device_logging)
 
     @pyqtSlot()
     def disconnect_scale1_slot(self) -> None:
         if self.scale1 is not None and not self.scale1.is_assigned():
-            self.scale1.disconnect_scale()
+            self.disconnect_scale(self.scale1)
+
 
     @pyqtSlot()
     def tare_scale1_slot(self) -> None:
         if self.scale1 is not None:
             self.scale1.tare_scale()
+
+    @pyqtSlot(int)
+    def signal_user_scale1_slot(self, action:STATE_ACTION) -> None:
+        if self.scale1 is not None:
+            self.scale1.signal_user(action)
 
     @pyqtSlot()
     def reserve_scale1_slot(self) -> None:
@@ -301,6 +346,8 @@ class ScaleManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error: 
     @pyqtSlot()
     def scale1_connected_slot(self) -> None:
         self.scale1_connected_signal.emit()
+        if self.scale1 is not None:
+            self.scale1.signal_user(STATE_ACTION.CONNECTED)
 
     @pyqtSlot()
     def scale1_disconnected_slot(self) -> None:
@@ -347,7 +394,7 @@ class ScaleManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error: 
                 self.scale2.disconnected_signal.disconnect(self.update_availability)
             except Exception as e: # pylint: disable=broad-except
                 _log.error(e)
-            self.scale2.disconnect_scale()
+            self.disconnect_scale(self.scale2)
             self.scale2 = None
 
     @pyqtSlot(int,str,str)
@@ -376,19 +423,26 @@ class ScaleManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error: 
                 self.scale2.scan()
 
     @pyqtSlot()
-    def connect_scale2_slot(self) -> None:
+    def connect_scale2_slot(self, device_logging:bool) -> None:
         if self.scale2 is not None:
-            self.scale2.connect_scale()
+            self.scale2.connect_scale(device_logging)
 
     @pyqtSlot()
     def disconnect_scale2_slot(self) -> None:
         if self.scale2 is not None and not self.scale2.is_assigned():
+            self.scale2.signal_user(STATE_ACTION.DISCONNECTED)
+            libtime.sleep(0.2) # wait a moment to have the disconnect signal being sent to the user
             self.scale2.disconnect_scale()
 
     @pyqtSlot()
     def tare_scale2_slot(self) -> None:
         if self.scale2 is not None:
             self.scale2.tare_scale()
+
+    @pyqtSlot(int)
+    def signal_user_scale2_slot(self, action:STATE_ACTION) -> None:
+        if self.scale2 is not None:
+            self.scale2.signal_user(action)
 
     @pyqtSlot()
     def reserve_scale2_slot(self) -> None:
@@ -410,6 +464,8 @@ class ScaleManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error: 
     @pyqtSlot()
     def scale2_connected_slot(self) -> None:
         self.scale2_connected_signal.emit()
+        if self.scale2 is not None:
+            self.scale2.signal_user(STATE_ACTION.CONNECTED)
 
     @pyqtSlot()
     def scale2_disconnected_slot(self) -> None:
@@ -456,13 +512,20 @@ class ScaleManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error: 
     def update_availability_slot(self) -> None:
         self.update_availability()
 
-    def disconnect_all(self) -> None:
-        if self.scale1 is not None:
-            self.scale1.disconnect_scale()
-        if self.scale2 is not None:
-            self.scale2.disconnect_scale()
+    @staticmethod
+    def disconnect_scale(scale:Scale) -> None:
+        scale.signal_user(STATE_ACTION.DISCONNECTED)
+        libtime.sleep(0.2) # wait a moment to have the disconnect signal being sent to the user
+        scale.disconnect_scale()
 
-    def connect_all(self) -> None:
-        self.connect_scale1_slot()
+    @pyqtSlot()
+    def disconnect_all_slot(self) -> None:
+        for scale in (self.scale1, self.scale2):
+            if scale is not None:
+                self.disconnect_scale(scale)
+
+    @pyqtSlot(bool)
+    def connect_all_slot(self, device_logging:bool) -> None:
+        self.connect_scale1_slot(device_logging)
         libtime.sleep(0.1)
-        self.connect_scale2_slot()
+        self.connect_scale2_slot(device_logging)

@@ -446,3 +446,5 @@ replace_imports_with_any = [
 [tool.pyrefly.errors]
 missing-attribute = false   # does not understand PyQt connect/disconnect methods
 invalid-inheritance = false # does not understand PyQt inheritance
+missing-argument = false # pyrefly misinterprets @pyqtSlot() declarations
+bad-argument-type = false # pyrefly misinterprets @pyqtSlot() declarations

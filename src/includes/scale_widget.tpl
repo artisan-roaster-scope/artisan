@@ -183,6 +183,7 @@ Receives data in the shape of
             elements.bucket_on_scale.style.backgroundColor = BACKGROUND;
             elements.bucket_on_scale.style.color = PERCENTCOLOR;
             elements.percent.style.color = PERCENTCOLOR;
+            elements.weight.style.color = PERCENTCOLOR;
             elements.bucket_on_scale.style.border = BORDER;
             elements.bucket_on_scale.style.top = BUCKETPOSITION;
             elements.bucket_on_scale.style.left = BUCKETPOSITION;
@@ -216,6 +217,9 @@ Receives data in the shape of
             elements.zoom2.style.display = 'none';
             elements.scale_for_clipping.style.display = 'none';
             elements.outer_frame.style.background = '#b5b5b5';
+            elements.percent.style.color = 'black';
+            elements.weight.style.color = 'black';
+            elements.percent.style.top = '-10%';
         }
 
         function setTexts() {
@@ -316,11 +320,13 @@ Receives data in the shape of
                             elements.bucket_on_scale.style.display = 'none';
                             elements.bucket_on_scale.style.border = BORDER;
                             elements.percent.style.color = 'black';
+                            elements.weight.style.color = 'black';
                         } else {
                             elements.bucket_on_scale.style.display = 'block';
                             elements.bucket_on_scale.style.backgroundColor = ABLUE;
                             elements.bucket_on_scale.style.border = '1.2vmin solid white';
                             elements.percent.style.color = 'white';
+                            elements.weight.style.color = 'white';
                         }
                         closeTimerDialog();
                         if (parsedData.timer) {
@@ -358,6 +364,7 @@ Receives data in the shape of
                                 elements.percent.style.display = 'block';
                                 elements.percent.innerHTML = parsedData.percent.toFixed(0) + '%';
                                 elements.percent.style.color = PERCENTCOLOR;
+                                elements.weight.style.color = PERCENTCOLOR;
                                 elements.bucket_on_scale.style.border = BORDER;
                                 elements.bucket_on_scale.style.top = BUCKETPOSITION;
                                 elements.bucket_on_scale.style.left = BUCKETPOSITION;
@@ -382,9 +389,11 @@ Receives data in the shape of
                                     elements.bucket_on_scale.style.top = 'calc(12% - 2vmin)';
                                     elements.bucket_on_scale.style.left = 'calc(12% - 2vmin)';
                                     elements.percent.style.color = 'white';
+                                    elements.weight.style.color = 'white';
                                     elements.percent.style.fontSize = '22cqmin';
                                     elements.percent.style.fontWeight = '400';
                                     elements.weight.style.display = 'none';
+                                    elements.percent.style.top = '0';
                                 } else {
                                     // zoom for >99% (and != 100)
                                     elements.scale_rect.style.backgroundColor = ABLUE;
@@ -408,12 +417,16 @@ Receives data in the shape of
                                         const zoomperc = (100 - zoomsize) / 2;
                                         elements.zoom2.style.top = `${zoomperc.toFixed(2)}%`;
                                         elements.zoom2.style.left = elements.zoom2.style.top;
+                                        elements.percent.style.color = 'white';
+                                        elements.weight.style.color = 'white';
                                     } else {
                                         // overflow max
                                         elements.bucket_on_scale.style.backgroundColor = ABLUE;
                                         elements.scale_for_clipping.style.display = 'block';
                                         elements.scale_for_clipping.style.backgroundColor = ARED;
                                         elements.zoom2.style.display = 'none';
+                                        elements.percent.style.color = 'white';
+                                        elements.weight.style.color = 'white';
                                     }
                                 }
                             } else {
@@ -425,6 +438,7 @@ Receives data in the shape of
                             elements.percent.innerHTML = parsedData.loss;
                             elements.percent.classList.replace('big-font', 'big-font-roasted');
                             elements.percent.style.color = 'white';
+                            elements.weight.style.color = 'white';
                             elements.percent.style.display = 'block';
                             elements.scale_rect.style.display = 'block';
                             elements.scale_rect.style.backgroundColor = ABLUE;
@@ -913,7 +927,7 @@ Receives data in the shape of
 
         .big-font-weight {
             /* fallback if container query not supported */
-            font-size: calc(max(min(11vw, 20vh), 12px));
+            font-size: calc(max(min(11vw, 20vh), 11px));
             text-align: center;
             font-weight: 300;
         }
@@ -924,7 +938,7 @@ Receives data in the shape of
             }
 
             .big-font-weight {
-                font-size: 15cqmin;
+                font-size: 12cqmin;
             }
 
             .big-font-roasted {
@@ -947,8 +961,8 @@ Receives data in the shape of
         .percent {
             margin-top: auto;
             margin-bottom: auto;
+            top: -10%;
             position: relative;
-            top: 4%;
             background: none;
             z-index: 4;
         }
@@ -1164,8 +1178,8 @@ Receives data in the shape of
                                 <span class="zoom2" id="zoom2"></span>
                             </div>
                             <span class="bucket-on-scale" id="bucket_on_scale">
-                                <span class="percent big-font" id="percent"></span>
                                 <span class="percent big-font-weight" id="weight"></span>
+                                <span class="percent big-font" id="percent"></span>
                                 <span class="zoom" id="zoom"></span>
                             </span>
                             <div class="scale-icon" id="scale_icon_done">

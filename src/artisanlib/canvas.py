@@ -1491,9 +1491,9 @@ class tgraphcanvas(FigureCanvas):
         self.roastepoch:int = self.roastdate.toSecsSinceEpoch() # in seconds
         self.roastepoch_timeout:Final[int] = 90*60  # in seconds; period after last roast which starts a new roasting session
         self.lastroastepoch:int = self.roastepoch - self.roastepoch_timeout - 1 # the epoch of the last roast in seconds, initialized such that a new roast session can start
-        self.batchcounter:int = -1 # global batch counter; if batchcounter is -1, batchcounter system is inactive
+        self.batchcounter:int = 0  # global batch counter; if batchcounter is -1, batchcounter system is inactive
         self.batchsequence:int = 1 # global counter of position in sequence of batches of one session
-        self.batchprefix:str = ''
+        self.batchprefix:str = 'A'
         self.neverUpdateBatchCounter:bool = False
         # profile batch nr
         self.roastbatchnr:int = 0 # batch number of the roast; if roastbatchnr=0, prefix/counter is hidden/inactiv (initialized to 0 on roast START)
@@ -1902,10 +1902,10 @@ class tgraphcanvas(FigureCanvas):
         self.statisticslower:int = 617
 
         # autosave
-        self.autosaveflag:int = 0
+        self.autosaveflag:int = 1
         self.autosaveprefix:str = ''
-        self.autosavepath:str = ''
-        self.autosavealsopath:str = ''
+        self.autosavepath:str = ''      # default is set on app initialization to users Documents folder (end of main.py)
+        self.autosavealsopath:str = ''  # default is set on app initialization to users Documents folder (end of main.py)
         self.autosaveaddtorecentfilesflag:bool = False
 
         self.autosaveimage:bool = False # if true save an image along alog files

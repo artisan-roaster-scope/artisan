@@ -1,7 +1,7 @@
 #
 # schedule.py
 #
-# Copyright (c) 2024, Paul Holleis, Marko Luther
+# Copyright (c) 2025, Paul Holleis, Marko Luther
 # All rights reserved.
 #
 #
@@ -2889,7 +2889,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         if item is not None:
             add_prepared(self.aw.plus_account_id, item, weight)
             self.updateRemainingItems()
-            self.set_next()
+        self.set_next(True)
 
     # weight in kg
     def set_roasted_weight(self, uuid:str, _weight:float) -> None:
@@ -2902,7 +2902,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                 del completed_item_dict['prefix']
             add_completed(self.aw.plus_account_id, cast(CompletedItemDict, completed_item_dict))
             self.updateRoastedItems()
-            self.set_next()
+        self.set_next(True)
 
     def next_not_prepared_item(self) -> Optional[GreenWeightItem]:
         today:datetime.date = datetime.datetime.now(datetime.timezone.utc).astimezone().date()
@@ -3944,8 +3944,8 @@ class GreenWebDisplay(GreenDisplay):
                 # showing what is missing per component
                 # weight is rendered with max 7 characters ('10.32kg' is well displayed, '10.321kg' not) thus we set brief=1 for weights >= 10kg
                 delta_weight = component_target - current_weight
-                self.rendered_task['weight'] = render_weight(delta_weight, 0, weight_units.index(self.schedule_window.aw.qmc.weight[2]),
-                            brief=(0 if delta_weight < 10000 else 1))
+                self.rendered_task['weight'] = f"{'+' if delta_weight<0 else ''}{render_weight(-delta_weight, 0, weight_units.index(self.schedule_window.aw.qmc.weight[2]),
+                            brief=(0 if delta_weight < 10000 else 1))}"
                 component_target_weight = target * current_component_ratio
                 completed_weight = target * completed_ratio
                 if component_target_weight>0:
