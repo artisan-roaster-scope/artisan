@@ -6752,7 +6752,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                 indexes_to_be_removed.append(i)
                             else:
                                 time_diff = se - self.qmc.specialevents[last_event_idx]
-                                if time_diff < 2*min_span:
+                                if time_diff < 2*min_span: # pyrefly: ignore
                                     indexes_to_be_removed.append(i)
                                     if last_index_not_removed is not None:
                                         self.qmc.specialeventsvalue[last_index_not_removed] = self.qmc.specialeventsvalue[i]
@@ -11063,7 +11063,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     # n=0 : slider1; n=1 : slider2; n=2 : slider3; n=3 : slider4
     # updates corresponding eventslidervalues
     def moveslider(self, n:int, v:float, forceLCDupdate:bool = False) -> None:
-        v = min(max(int(round(v)),self.eventslidermin[n]),self.eventslidermax[n])
+        v = int(min(max(int(round(v)),self.eventslidermin[n]),self.eventslidermax[n]))
         self.eventslidervalues[n] = v
         # first update slider LCDs if needed
         if n == 0 and (forceLCDupdate or self.slider1.value() != v):
@@ -17804,6 +17804,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.qmc.AUCshowFlag = toBool(settings.value('AUCshowFlag',self.qmc.AUCshowFlag))
             self.keyboardmoveflag = toInt(settings.value('keyboardmoveflag',int(self.keyboardmoveflag)))
             self.qmc.ambientTempSource = toInt(settings.value('AmbientTempSource',int(self.qmc.ambientTempSource)))
+            self.qmc.ambientHumiditySource = toInt(settings.value('AmbientHumiditySource',int(self.qmc.ambientHumiditySource)))
+            self.qmc.ambientPressureSource = toInt(settings.value('AmbientPressureSource',int(self.qmc.ambientPressureSource)))
             self.setSamplingRate(toInt(settings.value('Delay',int(self.qmc.delay))))
             self.qmc.flagKeepON = toBool(settings.value('KeepON',self.qmc.flagKeepON))
             self.qmc.flagOpenCompleted = toBool(settings.value('flagOpenCompleted',self.qmc.flagOpenCompleted))
@@ -19775,6 +19777,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
             #save ambient temperature source
             self.settingsSetValue(settings, default_settings, 'AmbientTempSource',self.qmc.ambientTempSource, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'AmbientHumiditySource',self.qmc.ambientHumiditySource, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'AmbientPressureSource',self.qmc.ambientPressureSource, read_defaults)
             #save delay (sampling interval)
             self.settingsSetValue(settings, default_settings, 'Delay',self.qmc.delay, read_defaults)
             # save keepON flag

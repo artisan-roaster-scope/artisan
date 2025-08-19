@@ -2544,7 +2544,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
 
 
     @pyqtSlot('QKeyEvent')
-    def keyPressEvent(self, event: Optional['QKeyEvent']) -> None:
+    def keyPressEvent(self, event: Optional['QKeyEvent']) -> None: # pyrefly: ignore
         if event is not None:
             k = int(event.key())
             if k == 16777235:    # UP

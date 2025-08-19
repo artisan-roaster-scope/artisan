@@ -227,7 +227,7 @@ class tgraphcanvas(FigureCanvas):
         'oncpick_cid', 'ondraw_cid', 'onmove_cid', 'rateofchange1', 'rateofchange2', 'flagon', 'flagstart', 'flagKeepON', 'flagOpenCompleted', 'flagsampling', 'flagsamplingthreadrunning',
         'manuallogETflag', 'zoom_follow', 'alignEvent', 'compareAlignEvent', 'compareEvents', 'compareET', 'compareBT', 'compareDeltaET', 'compareDeltaBT', 'compareMainEvents', 'compareBBP', 'compareRoast', 'compareExtraCurves1', 'compareExtraCurves2',
         'replayType', 'replayDropType', 'replayedBackgroundEvents', 'last_replayed_events', 'beepedBackgroundEvents', 'roastpropertiesflag', 'roastpropertiesAutoOpenFlag', 'roastpropertiesAutoOpenDropFlag',
-        'title', 'title_show_always', 'ambientTemp', 'ambientTempSource', 'ambient_temperature_device', 'ambient_pressure', 'ambient_pressure_device', 'ambient_humidity',
+        'title', 'title_show_always', 'ambientTemp', 'ambientTempSource', 'ambientHumiditySource', 'ambientPressureSource', 'ambient_temperature_device', 'ambient_pressure', 'ambient_pressure_device', 'ambient_humidity',
         'ambient_humidity_device', 'elevation', 'temperaturedevicefunctionlist', 'humiditydevicefunctionlist', 'pressuredevicefunctionlist', 'moisture_greens', 'moisture_roasted',
         'greens_temp', 'beansize', 'beansize_min', 'beansize_max', 'whole_color', 'ground_color', 'color_systems', 'color_system_idx', 'heavyFC_flag', 'lowFC_flag', 'lightCut_flag',
         'darkCut_flag', 'drops_flag', 'oily_flag', 'uneven_flag', 'tipping_flag', 'scorching_flag', 'divots_flag', 'timex',
@@ -1245,6 +1245,10 @@ class tgraphcanvas(FigureCanvas):
         self.ambientTemp_sampled:float = 0. # keeps the measured ambientTemp over a restart
         self.ambientTempSource:int = 0 # indicates the temperature curve that is used to automatically fill the ambient temperature on DROP
 #                                  # 0 : None; 1 : ET, 2 : BT, 3 : 0xT1, 4 : 0xT2,
+        self.ambientHumiditySource:int = 0 # indicates the temperature curve that is used to automatically fill the ambient temperature on DROP
+#                                  # 0 : None; 1 : ET, 2 : BT, 3 : 0xT1, 4 : 0xT2,
+        self.ambientPressureSource:int = 0 # indicates the temperature curve that is used to automatically fill the ambient temperature on DROP
+#                                  # 0 : None; 1 : ET, 2 : BT, 3 : 0xT1, 4 : 0xT2,
         self.ambient_temperature_device:int = 0
         self.ambient_pressure:float = 0.
         self.ambient_pressure_sampled:float = 0. # keeps the measured ambient_pressure over a restart/reset
@@ -1906,7 +1910,7 @@ class tgraphcanvas(FigureCanvas):
         self.autosaveprefix:str = ''
         self.autosavepath:str = ''      # default is set on app initialization to users Documents folder (end of main.py)
         self.autosavealsopath:str = ''  # default is set on app initialization to users Documents folder (end of main.py)
-        self.autosaveaddtorecentfilesflag:bool = False
+        self.autosaveaddtorecentfilesflag:bool = True
 
         self.autosaveimage:bool = False # if true save an image along alog files
 
@@ -2728,9 +2732,9 @@ class tgraphcanvas(FigureCanvas):
     def etypeAbbrev(etype_name:str) -> str:
         return etype_name[:1]
 
-    def ambientTempSourceAvg(self) -> Optional[float]:
+    def ambientSourceAvg(self, curve_source:int) -> Optional[float]:
         res:Optional[float] = None
-        if self.ambientTempSource:
+        if curve_source:
             try:
                 start = 0
                 end = len(self.temp1) - 1
@@ -2738,16 +2742,16 @@ class tgraphcanvas(FigureCanvas):
                     start = self.timeindex[0]
                 if self.timeindex[6] > 0: # DROP
                     end = self.timeindex[6]
-                if self.ambientTempSource == 1: # from ET
+                if curve_source == 1: # from ET
                     res = float(numpy.mean([e for e in self.temp1[start:end] if e is not None and e != -1]))
-                elif self.ambientTempSource == 2: # from BT
+                elif curve_source == 2: # from BT
                     res = float(numpy.mean([e for e in self.temp2[start:end] if e is not None and e != -1]))
-                elif self.ambientTempSource > 2 and ((self.ambientTempSource - 3) < (2*len(self.extradevices))):
+                elif curve_source > 2 and ((curve_source - 3) < (2*len(self.extradevices))):
                     # from an extra device
-                    if (self.ambientTempSource)%2==0:
-                        res = float(numpy.mean([e for e in self.extratemp2[(self.ambientTempSource - 3)//2][start:end] if e is not None and e != -1]))
+                    if (curve_source)%2==0:
+                        res = float(numpy.mean([e for e in self.extratemp2[(curve_source - 3)//2][start:end] if e is not None and e != -1]))
                     else:
-                        res = float(numpy.mean([e for e in self.extratemp1[(self.ambientTempSource - 3)//2][start:end] if e is not None and e != -1]))
+                        res = float(numpy.mean([e for e in self.extratemp1[(curve_source - 3)//2][start:end] if e is not None and e != -1]))
             except Exception as ex: # pylint: disable=broad-except # the array to average over might get empty and mean thus invoking an exception
                 _log.exception(ex)
         if res is not None:
@@ -2800,12 +2804,27 @@ class tgraphcanvas(FigureCanvas):
                             ambient.close()
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
-        res = self.ambientTempSourceAvg()
+        res = self.ambientSourceAvg(self.ambientTempSource)
         if res is not None and (isinstance(res, (float,int))) and not math.isnan(res):
             self.ambientTemp = float2float(float(res))
 
+    def updateAmbientHumidity(self) -> None:
+        res = self.ambientSourceAvg(self.ambientHumiditySource)
+        if res is not None and (isinstance(res, (float,int))) and not math.isnan(res):
+            self.ambient_humidity = float2float(float(res))
+
+    def updateAmbientPressure(self) -> None:
+        res = self.ambientSourceAvg(self.ambientPressureSource)
+        if res is not None and (isinstance(res, (float,int))) and not math.isnan(res):
+            self.ambient_pressure = float2float(float(res))
+
     def updateAmbientTemp(self) -> None:
+        # take ambient temp for Phidget 1048/1101 TC AT channel or from the selected ambient temperature curve
         self.updateAmbientTempFromPhidgetModulesOrCurve()
+        # take the ambient humidity from the selected ambient humidity curve
+        self.updateAmbientHumidity()
+        # take the ambient pressure from the selected ambient pressure curve
+        self.updateAmbientPressure()
         try:
             self.startPhidgetManager()
             self.getAmbientData()
@@ -4085,6 +4104,16 @@ class tgraphcanvas(FigureCanvas):
                 try:
                     # update ambient temperature if a ambient temperature source is configured and no value yet established
                     self.updateAmbientTempFromPhidgetModulesOrCurve()
+                except Exception: # pylint: disable=broad-except
+                    pass
+                try:
+                    # update ambient humidity if a ambient humidity source is configured and no value yet established
+                    self.updateAmbientHumidity()
+                except Exception: # pylint: disable=broad-except
+                    pass
+                try:
+                    # update ambient pressure if a ambient pressure source is configured and no value yet established
+                    self.updateAmbientPressure()
                 except Exception: # pylint: disable=broad-except
                     pass
 #PLUS
@@ -15009,6 +15038,16 @@ class tgraphcanvas(FigureCanvas):
                         try:
                             # update ambient temperature if a ambient temperature source is configured and no value yet established
                             self.updateAmbientTempFromPhidgetModulesOrCurve()
+                        except Exception as e: # pylint: disable=broad-except
+                            _log.exception(e)
+                        try:
+                            # update ambient humidity if a ambient humidity source is configured and no value yet established
+                            self.updateAmbientHumidity()
+                        except Exception as e: # pylint: disable=broad-except
+                            _log.exception(e)
+                        try:
+                            # update ambient pressure if a ambient pressure source is configured and no value yet established
+                            self.updateAmbientPressure()
                         except Exception as e: # pylint: disable=broad-except
                             _log.exception(e)
     #PLUS

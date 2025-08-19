@@ -13,9 +13,6 @@ BTBdeltaColor=#cc0f50
 ETBColor=#0a5c90
 ETBdeltaColor=#0a5c90
 
-[Style]
-graphfont=5
-
 [Units]
 weight=g
 

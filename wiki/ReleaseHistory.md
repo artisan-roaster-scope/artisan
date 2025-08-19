@@ -37,6 +37,7 @@ v3.2.1
   - eliminates the term 'slave' from the whole project. The term is still used by small compatibility layer to be remove in one of the next versions.
   - updates MPL default font selection for Asian and Arabic languages under Windows
   - batch counter and autosave are now active by default after first installation or a factory reset. Autosave is configured to save to the user's account documents folder (platform-specific) by default.
+  - the configuration for taking ambient temperature from a data curve moved from the Roast Properties dialog to the Devices configuration dialog and configurations for taking ambient humidity and ambient pressure from curve data have been added ([Issue #586](../../../issues/586) and [PR #1882](../../../pull/1882))
 
 * FIXES
   - fixes regression which broke the designer such that points could not be moved ([Discussion #1905](../../../discussions/1905) and [Issue #1916](../../../issues/1916))

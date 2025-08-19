@@ -1118,7 +1118,7 @@ class roastCompareDlg(ArtisanDialog):
         self.setFocus(Qt.FocusReason.MouseFocusReason)
 
     @pyqtSlot('QKeyEvent')
-    def keyPressEvent(self, event: Optional['QKeyEvent'] = None) -> None:
+    def keyPressEvent(self, event: Optional['QKeyEvent']) -> None: # pyrefly: ignore
         try:
             if event is not None:
                 k = int(event.key())

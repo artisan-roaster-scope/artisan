@@ -111,7 +111,7 @@ class ArtisanDialog(QDialog): # pyright: ignore [reportGeneralTypeIssues] # Argu
         self.dialogbuttons.rejected.emit()
 
     @pyqtSlot('QCloseEvent')
-    def closeEvent(self,_:Optional['QCloseEvent'] = None) -> None:
+    def closeEvent(self,_:Optional['QCloseEvent']) -> None:
         self.dialogbuttons.rejected.emit()
 
     def keyPressEvent(self, event: Optional['QKeyEvent']) -> None:

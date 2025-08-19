@@ -78,6 +78,10 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.org_scale2_id = self.aw.scale2_id
         self.org_container2_idx = self.aw.container2_idx
 
+        self.org_ambientTempSource = self.aw.qmc.ambientTempSource
+        self.org_ambientHumiditySource = self.aw.qmc.ambientHumiditySource
+        self.org_ambientPressureSource = self.aw.qmc.ambientPressureSource
+
         ################ TAB 1   WIDGETS
         #ETcurve
         self.ETcurve = QCheckBox(QApplication.translate('CheckBox', 'ET'))
@@ -1077,10 +1081,18 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         yoctoVBox.addStretch()
         yoctoVBox.setSpacing(5)
         yoctoVBox.setContentsMargins(0,0,0,0)
+
         # Ambient Widgets and Layouts
+
+        ambientSourceLabel = QLabel(QApplication.translate('Label', 'Ambient Source'))
+
+        # Ambient Temperature Source Selector
+        self.ambientTempComboBox = QComboBox()
+        self.ambientTempComboBox.currentIndexChanged.connect(self.ambientTempComboBoxIndexChanged)
         self.temperatureDeviceCombo = QComboBox()
         self.temperatureDeviceCombo.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.temperatureDeviceCombo.addItems(self.aw.qmc.temperaturedevicefunctionlist)
+        self.temperatureDeviceCombo.currentIndexChanged.connect(self.temperatureDeviceComboBoxIndexChanged)
 
         # HACK: only needed for the macOS UI on Qt 5.12 onwords; without long items get cut in the popup
         #  note the -7 as the width of the popup is too large if given the correct maximum characters
@@ -1090,20 +1102,33 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.temperatureDeviceCombo.setCurrentIndex(self.aw.qmc.ambient_temperature_device)
         except Exception: # pylint: disable=broad-except
             pass
+
+
+        self.ambientHumidityComboBox = QComboBox()
+        self.ambientHumidityComboBox.currentIndexChanged.connect(self.ambientHumidityComboBoxIndexChanged)
         self.humidityDeviceCombo = QComboBox()
         self.humidityDeviceCombo.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.humidityDeviceCombo.addItems(self.aw.qmc.humiditydevicefunctionlist)
+        self.humidityDeviceCombo.currentIndexChanged.connect(self.humidityDeviceComboBoxIndexChanged)
         try:
             self.humidityDeviceCombo.setCurrentIndex(self.aw.qmc.ambient_humidity_device)
         except Exception: # pylint: disable=broad-except
             pass
+
+
+        self.ambientPressureComboBox = QComboBox()
+        self.ambientPressureComboBox.currentIndexChanged.connect(self.ambientPressureComboBoxIndexChanged)
         self.pressureDeviceCombo = QComboBox()
         self.pressureDeviceCombo.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.pressureDeviceCombo.addItems(self.aw.qmc.pressuredevicefunctionlist)
+        self.pressureDeviceCombo.currentIndexChanged.connect(self.pressureDeviceComboBoxIndexChanged)
         try:
             self.pressureDeviceCombo.setCurrentIndex(self.aw.qmc.ambient_pressure_device)
         except Exception: # pylint: disable=broad-except
             pass
+
+        self.updateAmbientSourceComboBoxes()
+
         self.elevationSpinBox = QSpinBox()
         self.elevationSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.elevationSpinBox.setRange(0,3000)
@@ -1115,14 +1140,18 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         pressureDeviceLabel = QLabel(QApplication.translate('Label','Pressure'))
         elevationLabel = QLabel(QApplication.translate('Label','Elevation'))
         ambientGrid = QGridLayout()
-        ambientGrid.addWidget(temperatureDeviceLabel,0,0)
-        ambientGrid.addWidget(self.temperatureDeviceCombo,0,1)
-        ambientGrid.addWidget(humidityDeviceLabel,1,0)
-        ambientGrid.addWidget(self.humidityDeviceCombo,1,1)
-        ambientGrid.addWidget(pressureDeviceLabel,2,0)
-        ambientGrid.addWidget(self.pressureDeviceCombo,2,1)
-        ambientGrid.addWidget(elevationLabel,3,0)
-        ambientGrid.addWidget(self.elevationSpinBox,3,1)
+        ambientGrid.addWidget(ambientSourceLabel,0,2)
+        ambientGrid.addWidget(temperatureDeviceLabel,1,0)
+        ambientGrid.addWidget(self.temperatureDeviceCombo,1,1)
+        ambientGrid.addWidget(self.ambientTempComboBox,1,2)
+        ambientGrid.addWidget(humidityDeviceLabel,2,0)
+        ambientGrid.addWidget(self.humidityDeviceCombo,2,1)
+        ambientGrid.addWidget(self.ambientHumidityComboBox,2,2)
+        ambientGrid.addWidget(pressureDeviceLabel,3,0)
+        ambientGrid.addWidget(self.pressureDeviceCombo,3,1)
+        ambientGrid.addWidget(self.ambientPressureComboBox,3,2)
+        ambientGrid.addWidget(elevationLabel,4,0)
+        ambientGrid.addWidget(self.elevationSpinBox,4,1)
         ambientHBox = QHBoxLayout()
         ambientHBox.addStretch()
         ambientHBox.addLayout(ambientGrid)
@@ -1904,7 +1933,6 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         C7Widget = QWidget()
         C7Widget.setLayout(tab7Layout)
         self.TabWidget.addTab(C7Widget,QApplication.translate('Tab','Networks'))
-        self.TabWidget.currentChanged.connect(self.tabSwitched)
         C8Widget = QWidget()
         if not self.aw.app.artisanviewerMode:
             C8Widget.setLayout(tab8Layout)
@@ -1933,6 +1961,75 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         # some tabs are not rendered at all on Windows using Qt v6.5.1 (https://bugreports.qt.io/projects/QTBUG/issues/QTBUG-114204?filter=allissues)
         QTimer.singleShot(50, self.setActiveTab)
 
+    @pyqtSlot(int)
+    def temperatureDeviceComboBoxIndexChanged(self, i:int) -> None:
+        self.ambientTempComboBox.setEnabled(i == 0)
+
+    @pyqtSlot(int)
+    def ambientTempComboBoxIndexChanged(self, i:int) -> None:
+        self.aw.qmc.ambientTempSource = i
+
+    @pyqtSlot(int)
+    def humidityDeviceComboBoxIndexChanged(self, i:int) -> None:
+        self.ambientHumidityComboBox.setEnabled(i == 0)
+
+    @pyqtSlot(int)
+    def ambientHumidityComboBoxIndexChanged(self, i:int) -> None:
+        self.aw.qmc.ambientHumiditySource = i
+
+    @pyqtSlot(int)
+    def pressureDeviceComboBoxIndexChanged(self, i:int) -> None:
+        self.ambientPressureComboBox.setEnabled(i == 0)
+
+    @pyqtSlot(int)
+    def ambientPressureComboBoxIndexChanged(self, i:int) -> None:
+        self.aw.qmc.ambientPressureSource = i
+
+    def buildAmbientTemperatureSourceList(self) -> List[str]:
+        extra_names = []
+        for i in range(len(self.aw.qmc.extradevices)):
+            try:
+                name1edit = cast(QLineEdit, self.devicetable.cellWidget(i,3))
+                extra_names.append(self.aw.qmc.device_name_subst(name1edit.text()))
+            except Exception: # pylint: disable=broad-except
+                # on __init__ the device table might not yet have been created to read off the edited names
+                extra_names.append(self.aw.qmc.device_name_subst(self.aw.qmc.extraname1[i]))
+            try:
+                name2edit = cast(QLineEdit, self.devicetable.cellWidget(i,4))
+                extra_names.append(self.aw.qmc.device_name_subst(name2edit.text()))
+            except Exception: # pylint: disable=broad-except
+                # on __init__ the device table might not yet have been created to read off the edited names
+                extra_names.append(self.aw.qmc.device_name_subst(self.aw.qmc.extraname2[i]))
+        return ['',
+                self.aw.qmc.device_name_subst(self.aw.ETname),
+                self.aw.qmc.device_name_subst(self.aw.BTname)] + extra_names
+
+    def updateAmbientSourceComboBoxes(self) -> None:
+        ambientSensorSourceList = self.buildAmbientTemperatureSourceList()
+        #-
+        if len(ambientSensorSourceList) <= self.aw.qmc.ambientTempSource:
+            self.aw.qmc.ambientTempSource = 0
+        self.ambientTempComboBox.blockSignals(True)
+        self.ambientTempComboBox.clear()
+        self.ambientTempComboBox.addItems(ambientSensorSourceList)
+        self.ambientTempComboBox.setCurrentIndex(self.aw.qmc.ambientTempSource)
+        self.ambientTempComboBox.blockSignals(False)
+        #-
+        if len(ambientSensorSourceList) <= self.aw.qmc.ambientHumiditySource:
+            self.aw.qmc.ambientHumiditySource = 0
+        self.ambientHumidityComboBox.blockSignals(True)
+        self.ambientHumidityComboBox.clear()
+        self.ambientHumidityComboBox.addItems(ambientSensorSourceList)
+        self.ambientHumidityComboBox.setCurrentIndex(self.aw.qmc.ambientHumiditySource)
+        self.ambientHumidityComboBox.blockSignals(False)
+        #-
+        if len(ambientSensorSourceList) <= self.aw.qmc.ambientPressureSource:
+            self.aw.qmc.ambientPressureSource = 0
+        self.ambientPressureComboBox.blockSignals(True)
+        self.ambientPressureComboBox.clear()
+        self.ambientPressureComboBox.addItems(ambientSensorSourceList)
+        self.ambientPressureComboBox.setCurrentIndex(self.aw.qmc.ambientPressureSource)
+        self.ambientPressureComboBox.blockSignals(False)
 
     @pyqtSlot()
     def changeTaskWebDisplayGreenPort(self) -> None:
@@ -3293,6 +3390,10 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.aw.scale2_name = self.org_scale2_name
         self.aw.scale2_id = self.org_scale2_id
         self.aw.container2_idx = self.org_container2_idx
+
+        self.aw.qmc.ambientTempSource = self.org_ambientTempSource
+        self.aw.qmc.ambientHumiditySource = self.org_ambientHumiditySource
+        self.aw.qmc.ambientPressureSource = self.org_ambientPressureSource
 
         self.reject()
 
@@ -4663,5 +4764,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.aw.closeHelpDialog(self.helpdialog)
 
     @pyqtSlot(int)
-    def tabSwitched(self, _:int) -> None:
+    def tabSwitched(self, idx:int) -> None:
         self.closeHelp()
+        if idx == 5: # Ambient Tab
+            self.updateAmbientSourceComboBoxes()

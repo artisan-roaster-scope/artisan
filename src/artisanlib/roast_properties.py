@@ -1268,12 +1268,6 @@ class editGraphDlg(ArtisanResizeablDialog):
 
         self.updateWeightOutDefectsLabel()
 
-        # Ambient Temperature Source Selector
-        self.ambientComboBox = QComboBox()
-        self.ambientComboBox.addItems(self.buildAmbientTemperatureSourceList())
-        self.ambientComboBox.setCurrentIndex(self.aw.qmc.ambientTempSource)
-        self.ambientComboBox.currentIndexChanged.connect(self.ambientComboBoxIndexChanged)
-        ambientSourceLabel = QLabel(QApplication.translate('Label', 'Ambient Source'))
         updateAmbientTemp = QPushButton(QApplication.translate('Button', 'update'))
         updateAmbientTemp.setToolTip(QApplication.translate('Tooltip','retreive ambient data from connected devices or calculate from selected profile curve'))
         updateAmbientTemp.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -1527,8 +1521,6 @@ class editGraphDlg(ArtisanResizeablDialog):
         propGrid.addWidget(self.ground_color_edit,8,2,Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
         propGrid.addWidget(self.colorSystemComboBox,8,3,1,2) # rowSpan=1, columnSpan=2
 
-        propGrid.addWidget(ambientSourceLabel,8,8,1,2,Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignBottom)
-
         ambientGrid = QGridLayout()
         ambientGrid.setContentsMargins(0,0,0,0)
         ambientGrid.setHorizontalSpacing(3)
@@ -1536,7 +1528,6 @@ class editGraphDlg(ArtisanResizeablDialog):
         ambientGrid.addWidget(ambientlabel,2,0)
         ambientGrid.addLayout(ambient,2,2,1,5)
         ambientGrid.addWidget(updateAmbientTemp,2,10)
-        ambientGrid.addWidget(self.ambientComboBox,2,11,Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
         ambientGrid.setColumnMinimumWidth(3, 11)
         ambientGrid.setColumnMinimumWidth(5, 11)
         ambientGrid.setColumnMinimumWidth(8, 11)
@@ -1869,7 +1860,6 @@ class editGraphDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(int)
     def scale_weight_changed(self, w:int) -> None:
-        _log.debug('PRINT RP:scale_weight_changed(%s)',w)
         if w is not None:
             self.scale_weight = w
             self.update_scale_weight()
@@ -4164,18 +4154,6 @@ class editGraphDlg(ArtisanResizeablDialog):
         if i:
             self.drops.setChecked(False)
 
-    @pyqtSlot(int)
-    def ambientComboBoxIndexChanged(self, i:int) -> None:
-        self.aw.qmc.ambientTempSource = i
-
-    def buildAmbientTemperatureSourceList(self) -> List[str]:
-        extra_names = []
-        for i in range(len(self.aw.qmc.extradevices)):
-            extra_names.append(str(i) + 'xT1: ' + self.aw.qmc.extraname1[i])
-            extra_names.append(str(i) + 'xT2: ' + self.aw.qmc.extraname2[i])
-        return ['',
-                QApplication.translate('ComboBox','ET'),
-                QApplication.translate('ComboBox','BT')] + extra_names
 
     @pyqtSlot(bool)
     def updateAmbientTemp(self, _:bool = False) -> None:
@@ -5423,8 +5401,6 @@ class editGraphDlg(ArtisanResizeablDialog):
 
         # Update beans
         self.aw.qmc.beans = self.beansedit.toPlainText()
-        #update ambient temperature source
-        self.aw.qmc.ambientTempSource = self.ambientComboBox.currentIndex()
         #update weight
         w0:float
         w1:float

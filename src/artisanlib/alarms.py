@@ -725,7 +725,7 @@ class AlarmDlg(ArtisanResizeablDialog):
         self.aw.AlarmDlg_activeTab = self.TabWidget.currentIndex()
         self.accept()
 
-    def closeEvent(self, _:Optional['QCloseEvent'] = None) -> None:
+    def closeEvent(self, _:Optional['QCloseEvent']) -> None: # pyrefly: ignore
         self.closealarms()
 
     def savealarms(self) -> None:
