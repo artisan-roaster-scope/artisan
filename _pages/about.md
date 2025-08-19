@@ -301,7 +301,7 @@ __[wvengen](/authors/wvengen/)__ –– flatpack installer
 __Brett Pound__ –– support
 {: style="text-align: center;" }
 
-__Frans Goddijn__ –– support
+__[Frans Goddijn](https://kostverlorenvaart.blogspot.com/){:target="_blank"}__ –– support
 {: style="text-align: center;" }
 
 <span style="color:grey">__Rui Paulo__ –– Aillio master & CI</span>
