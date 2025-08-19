@@ -279,7 +279,7 @@ feature_row_business_reporting:
 
 
 
-We believe in [open-source](https://www.youtube.com/watch?v=SpeDK1TPbew){:target="_blank"}. Open-source software powers nearly all the world’s major companies. This software is freely available, and is developed collaboratively, maintained by a broad network that includes everyone from unpaid volunteers to employees at competing tech companies. Check out the **<span style="color: #4C97C3;">artisan</span>** [code](https://github.com/artisan-roaster-scope/artisan){:target="_blank"} and contribute!
+We believe in [open-source](https://www.youtube.com/watch?v=SpeDK1TPbew){:target="_blank"}. Open-source software powers nearly all the world’s major companies. This software is freely available, and is developed collaboratively, maintained by a broad network that includes everyone from unpaid volunteers to employees at competing tech companies. Check out the **<span style="color: #4C97C3;">artisan</span>** [code on GitHub](https://github.com/artisan-roaster-scope/artisan){:target="_blank"} and contribute!
 
 
   
