@@ -199,8 +199,8 @@ feature_row_business_reporting:
     title: "Paolo Scimone Coffee Consulting"
   - url: https://cmsale.com/
     image_path: /assets/images/cms-logo.jpg
-    alt: "Coffee Maschines Sale"
-    title: "Coffee Maschines Sale"
+    alt: "Coffee Machines Sale"
+    title: "Coffee Machines Sale"
   - url: http://www.roastmaxroasters.com.au
     image_path: /assets/images/roastmax_logo.jpg
     alt: "Roastmax"

@@ -17,7 +17,7 @@ All Acaia scales are supported by Artisan including just introduced [Artisan Roa
     <figcaption>Cosmo-100 and Cosmo-10</figcaption>
 </figure>
 
-Scale 1 can be used directly in the Roast Properties dialog (menu `Roast >> Properties) for weighing the green and roasted batch. The selected container weight is automatically substracted. Note that the weight of a batch can be measured in parts too. The scale is also accessible in the [Volume Calculator](https://artisan-roasterscope.blogspot.com/2014/11/batch-volume-and-bean-density.html){:target='_blank'}.
+Scale 1 can be used directly in the Roast Properties dialog (menu `Roast >> Properties) for weighing the green and roasted batch. The selected container weight is automatically subtracted. Note that the weight of a batch can be measured in parts too. The scale is also accessible in the [Volume Calculator](https://artisan-roasterscope.blogspot.com/2014/11/batch-volume-and-bean-density.html){:target='_blank'}.
 
 <p style="text-align: center;">
 <a href="https://doc.artisan.plus/docs/batch-manager/" target="_blank">

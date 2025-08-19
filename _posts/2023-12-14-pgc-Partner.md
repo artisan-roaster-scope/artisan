@@ -15,7 +15,7 @@ tags:
 link: https://doc.artisan.plus/partners/
 ---
 
-We welcome our new partner [Prime Green Coffee](https://primegreencoffee.org/) from New Jersey, to our [artisan.plus bean supplier partner program](https://doc.artisan.plus/partners/). [Prime Green Coffee](https://primegreencoffee.org/) offers finest unroasted coffee from suppliers around the world and excells in green coffee for home roasters.
+We welcome our new partner [Prime Green Coffee](https://primegreencoffee.org/) from New Jersey, to our [artisan.plus bean supplier partner program](https://doc.artisan.plus/partners/). [Prime Green Coffee](https://primegreencoffee.org/) offers finest unroasted coffee from suppliers around the world and excels in green coffee for home roasters.
 
 All [Prime Green Coffee](https://primegreencoffee.org/) bean data is now directly available on [artisan.plus](https://artisan.plus) together with exclusive coupon codes.
 

@@ -13,7 +13,7 @@ author_profile: true
 
 This software is open-source and absolutely free, also for commercial use. If you think **<span style="color: #4C97C3;">artisan</span>** is useful to you and your business, contribute financially to its further development. Send any amount via 
 - my [PayPal.Me page](https://www.paypal.me/MarkoLuther){:target="_blank"} or
-- [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/artisan-roaster-scope) (one-time or montly) 
+- [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/artisan-roaster-scope) (one-time or monthly) 
 
 
 Thank you!

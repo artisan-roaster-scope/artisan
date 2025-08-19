@@ -17,5 +17,5 @@ sidebar:
 * __Features:__ logging of bean and environmental temperatures
 
 **Watch out!**
-The datalogging on Titanium maschines is build around [Phidgets](https://www.phidgets.com/){:target="_blank"}. Ensure you have the latest Phidgets driver v22 for your platform (e.g. [Windows](https://www.phidgets.com/docs/OS_-_Windows){:target="_blank"}, [macOS](https://www.phidgets.com/docs/OS_-_macOS){:target="_blank"} or [Linux](https://www.phidgets.com/docs/OS_-_Linux){:target="_blank"}) installed.
+The datalogging on Titanium machines is build around [Phidgets](https://www.phidgets.com/){:target="_blank"}. Ensure you have the latest Phidgets driver v22 for your platform (e.g. [Windows](https://www.phidgets.com/docs/OS_-_Windows){:target="_blank"}, [macOS](https://www.phidgets.com/docs/OS_-_macOS){:target="_blank"} or [Linux](https://www.phidgets.com/docs/OS_-_Linux){:target="_blank"}) installed.
 {: .notice--primary}

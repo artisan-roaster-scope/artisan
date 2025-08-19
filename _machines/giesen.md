@@ -35,7 +35,7 @@ There are also the following 3 generic setups for older firmware version:
 
 There are also variants of those generic Giesen machine setups which includes support for the optional infrared sensor (`IR`) and additional environmental temperature sensor (`Env`).
 
-All of theses generic setups provide some extended custom buttons (press CMD-2 to switch to this extended button set; CMD-1 switches back to the standard button set) to operate the actors installed in some machines, like the stirrer.
+All of these generic setups provide some extended custom buttons (press CMD-2 to switch to this extended button set; CMD-1 switches back to the standard button set) to operate the actors installed in some machines, like the stirrer.
  
  
 <figure>
