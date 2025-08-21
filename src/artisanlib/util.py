@@ -1126,3 +1126,20 @@ def exportProfile2CSV(filename:str, profile:'ProfileData') -> bool:
                 last_time = time1
         return True
     return False
+
+
+# returns total roast time in seconds based on given timeindex and timex structures or None if data is not extractable
+def roast_time(timeindex:List[int], timex:List[float]) -> Optional[float]:
+    if len(timex) == 0 or len(timeindex) < 7:
+        return None
+    starttime = (timex[timeindex[0]] if timeindex[0] != -1 and timeindex[0] < len(timex) else 0)
+    endtime = (timex[timeindex[6]] if timeindex[6] > 0  and timeindex[6] < len(timex) else timex[-1])
+    return endtime - starttime
+
+# return the total roasting time of the given profile in seconds
+def get_total_roast_time_from_profile(profile:ProfileData) -> Optional[float]:
+    if 'timex' in profile and 'timeindex' in profile:
+        timeindex = profile['timeindex']
+        timex = profile['timex']
+        return roast_time(timeindex, timex)
+    return None

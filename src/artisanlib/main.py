@@ -7530,7 +7530,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 #                        self.set_mpl_fontproperties('C:\\Windows\\Fonts\\batang.ttc')
                         mpl.rcParams['font.family'] = ['Arial Unicode MS', 'DejaVu Sans', 'Malgun Gothic', 'sans-serif']
                     elif self.locale_str == 'ar':
-                        mpl.rcParams['font.family'] = ['DejaVu Sans', 'TraditionalArabic', 'Arial Unicode MS', 'sans-serif']
+                        mpl.rcParams['font.family'] = ['Microsoft Sans Serif', 'DejaVu Sans', 'TraditionalArabic', 'Arial Unicode MS', 'sans-serif']
                     self.mpl_fontproperties = FontProperties()
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
@@ -13644,7 +13644,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         if self.loadbackgroundUUID(filename, UUID, force_reload):
             try:
                 self.qmc.background = not self.qmc.hideBgafterprofileload
-                self.autoAdjustAxis()
                 self.qmc.timealign(redraw=False)
                 self.qmc.redraw()
                 if self.qmc.backgroundPlaybackEvents:

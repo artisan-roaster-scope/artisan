@@ -20,6 +20,7 @@ v3.2.1
   - adds Artisan Command `slider(<int>, <bool>)` to hide/show sliders
   - adds Czech localization
   - adds multi-modal state transitions to Batch Manager
+  - adds remaining total roast time estimate to scheduler and lists roast templates in scheduled items
 
 * CHANGES
   - BREAKING VISUAL CHANGE, but only when consecutive hidden buttons with Type or Action defined are first at the top of the Events Buttons table: The visual button layout may change as hidden buttons with Type or Action defined at the top of the Events Buttons table are no longer counted in the first row's button count, which is limited by the Max Buttons per Row setting.  All other hidden buttons continue to be counted in each row's button count.

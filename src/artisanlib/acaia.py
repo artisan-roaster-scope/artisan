@@ -17,7 +17,7 @@
 
 import asyncio
 import logging
-import time as libtime
+#import time as libtime
 from enum import IntEnum, unique
 from typing import Optional, Union, List, Tuple, Final, Callable, TYPE_CHECKING
 
@@ -125,6 +125,7 @@ class LED_CMD(IntEnum):
     OFF = 0
     EFFECT = 1
     ON = 2
+    TOGGLE_DEFAULT_EFFECT = 3 # turn on/off default stable weight effect
 
 @unique
 class LED_EFFECT(IntEnum):
@@ -812,6 +813,12 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
             max(0,min(255,color[2])),
             0])
 
+    def send_default_effects_on(self) -> None:
+        self.send_led_cmd(self.led_color_payload(LED_CMD.TOGGLE_DEFAULT_EFFECT, self.BLACK, 1))
+
+    def send_default_effects_off(self) -> None:
+        self.send_led_cmd(self.led_color_payload(LED_CMD.TOGGLE_DEFAULT_EFFECT, self.BLACK, 0))
+
     def send_leds_on(self, color:Color) -> None:
         self.send_led_cmd(self.led_color_payload(LED_CMD.ON, color))
 
@@ -1005,15 +1012,19 @@ class Acaia(Scale): # pyright: ignore [reportGeneralTypeIssues] # Argument to cl
 
     # signal state actions to the user
     def signal_user(self, action:STATE_ACTION) -> None:
+        _log.debug('PRINT signal_user(%s)',action)
         if action == STATE_ACTION.DISCONNECTED:
             self.acaia.send_leds_wipe_off(self.acaia.MAGENTA)
         elif action == STATE_ACTION.CONNECTED:
             self.acaia.send_leds_halo(self.acaia.CYAN)
         elif action == STATE_ACTION.RELEASED:
             self.acaia.send_leds_breathe(self.acaia.MAGENTA)
+            self.acaia.send_default_effects_on()
         elif action == STATE_ACTION.ASSIGNED_GREEN:
+            self.acaia.send_default_effects_off()
             self.acaia.send_leds_breathe(self.acaia.WHITE)
         elif action == STATE_ACTION.ASSIGNED_ROASTED:
+            self.acaia.send_default_effects_off()
             self.acaia.send_leds_breathe(self.acaia.BROWN)
         elif action == STATE_ACTION.ZONE_ENTER:
             self.acaia.send_leds_on(self.acaia.LIGHT_BLUE)
@@ -1024,8 +1035,8 @@ class Acaia(Scale): # pyright: ignore [reportGeneralTypeIssues] # Argument to cl
         elif action == STATE_ACTION.SWAP_EXIT:
             self.acaia.send_leds_off()
         elif action == STATE_ACTION.TARGET_ENTER:
-            self.acaia.send_leds_halo(self.acaia.BLUE)
-            libtime.sleep(0.4)
+#            self.acaia.send_leds_halo(self.acaia.BLUE)
+#            libtime.sleep(0.6)
             self.acaia.send_leds_on(self.acaia.BLUE)
         elif action == STATE_ACTION.TARGET_EXIT:
             self.acaia.send_leds_off()
@@ -1037,5 +1048,5 @@ class Acaia(Scale): # pyright: ignore [reportGeneralTypeIssues] # Argument to cl
             self.acaia.send_leds_on(self.acaia.RED)
         elif action in {STATE_ACTION.CANCEL_EXIT, STATE_ACTION.INTERRUPTED}:
             self.acaia.send_leds_wipe_off(self.acaia.RED)
-        elif action == STATE_ACTION.COMPONENT_CHANGED:
+        elif action in {STATE_ACTION.COMPONENT_CHANGED, STATE_ACTION.TARE}:
             self.acaia.send_leds_breathe(self.acaia.ORANGE)

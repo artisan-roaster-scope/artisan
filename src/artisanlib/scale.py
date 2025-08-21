@@ -69,6 +69,8 @@ class STATE_ACTION(IntEnum):
     CANCEL_EXIT = 14        # scale CANCEL confirmation dialog successfully ended with task cancellation
     INTERRUPTED = 15        # scale operation interrupted by push-to-cancel guesture
     COMPONENT_CHANGED = 16  # weight items blend component changed
+    #
+    TARE = 17               # tare send from app
 
 
 
@@ -320,6 +322,7 @@ class ScaleManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error: 
     def tare_scale1_slot(self) -> None:
         if self.scale1 is not None:
             self.scale1.tare_scale()
+            self.scale1.signal_user(STATE_ACTION.TARE)
 
     @pyqtSlot(int)
     def signal_user_scale1_slot(self, action:STATE_ACTION) -> None:
@@ -438,6 +441,7 @@ class ScaleManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # error: 
     def tare_scale2_slot(self) -> None:
         if self.scale2 is not None:
             self.scale2.tare_scale()
+            self.scale2.signal_user(STATE_ACTION.TARE)
 
     @pyqtSlot(int)
     def signal_user_scale2_slot(self, action:STATE_ACTION) -> None:

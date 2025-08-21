@@ -26,6 +26,7 @@ import time
 import math
 import datetime
 import json
+import functools
 import html
 import textwrap
 import platform
@@ -48,8 +49,7 @@ except ImportError:
             QGraphicsDropShadowEffect, QPlainTextEdit, QLineEdit, QMenu, QStatusBar, QToolButton)  # @UnusedImport @Reimport  @UnresolvedImport
 
 
-
-from babel.dates import format_date
+from babel.dates import format_date, format_timedelta
 from pydantic import BaseModel, Field, PositiveInt, UUID4, field_validator, model_validator, computed_field, field_serializer
 from typing import Final, Tuple, List, Set, Dict, Optional, Any, TypedDict, cast, TextIO, TYPE_CHECKING
 
@@ -74,7 +74,8 @@ from plus.util import datetime2epoch, epoch2datetime, schedulerLink, epoch2ISO86
 from plus.weight import Display, GreenDisplay, RoastedDisplay, PROCESS_STATE, WeightManager, GreenWeightItem, RoastedWeightItem
 from artisanlib.widgets import ClickableQLabel, ClickableQLineEdit, Splitter
 from artisanlib.dialogs import ArtisanResizeablDialog
-from artisanlib.util import (float2float, convertWeight, weight_units, render_weight, comma2dot, float2floatWeightVolume, getDirectory, getResourcePath)
+from artisanlib.util import (float2float, convertWeight, weight_units, render_weight, comma2dot, float2floatWeightVolume, getDirectory,
+    getResourcePath, deserialize, roast_time, get_total_roast_time_from_profile, stringfromseconds)
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -112,6 +113,7 @@ update_schedule_window_semaphore = QSemaphore(
 # to be able to persist the change, compensating back-and-forth unit conversion errors
 roasted_weight_editing_minimal_diff: Final[float] = 0.07 # 70g
 
+default_roast_time:float = 12*60 # 12min (in seconds)
 default_loss:Final[float] = 15.0 # default roast loss in percent
 loss_min:Final[float] = 5.0 # minimal loss that makes any sense in percent
 loss_max:Final[float] = 25.0 # maximal loss that makes any sense in percent
@@ -202,6 +204,7 @@ class CompletedItemDict(TypedDict):
     roastingnotes: str
     cupping_score: float
     cuppingnotes: str
+    roasttime: int
 
 
 # ordered list of dict with the completed roasts data (latest roast first)
@@ -277,6 +280,7 @@ class CompletedItem(BaseModel):
     roastingnotes: str = Field(default='')
     cupping_score: float
     cuppingnotes: str = Field(default='')
+    roasttime: int = Field(default=0)
 
     @computed_field  # type:ignore[prop-decorator] # Decorators on top of @property are not supported
     @property
@@ -402,6 +406,37 @@ class CompletedItem(BaseModel):
             add_completed(aw.plus_account_id, cast(CompletedItemDict, completed_item_dict))
         return updated
 
+
+
+###################
+# determine templates total roasting time
+
+# returns total roasting time in second of the profile associated with the given uuid
+# as well the profile name (prefixed with batch counter) is available as second result
+@functools.lru_cache(maxsize=100)
+def get_total_roasting_time_and_title(uuid:str) -> Tuple[Optional[float], Optional[str]]:
+    filepath = plus.register.getPath(uuid)
+    if filepath is not None:
+        template:ProfileData = cast('ProfileData', deserialize(filepath))
+        roast_title:Optional[str] = template.get('title', None)
+        if roast_title is not None:
+            batchnr = template.get('roastbatchnr', 0)
+            if batchnr > 0:
+                roast_title = f"{template.get('roastbatchprefix', '')}{batchnr} {roast_title}"
+        return get_total_roast_time_from_profile(template), roast_title
+    return None, None
+
+
+# returns the total roasting time for the given list of roast times in seconds as int, replacing None values by the average roast time of the remaining values
+# (or default_roast_time if all roasting times are unknown/None)
+def total_roasting_time(rtimes:List[Optional[float]]) -> float:
+    roasting_times:List[float] = [x for x in rtimes if x is not None]
+    if len(roasting_times) == 0:
+        return default_roast_time * len(rtimes) # assuming that all roasts have the default roast time
+    known_total = sum(roasting_times)
+    avg_roast_times = known_total / len(roasting_times)
+    # for each unkwnown roast time we add the average of the known roast times
+    return known_total + (len(rtimes) - len(roasting_times)) * avg_roast_times
 
 ###################
 # completed roasts cache
@@ -891,6 +926,18 @@ def remove_suffix(s:str, suffix:str) -> str:
         return s
     return s.removesuffix(suffix) # type:ignore[attr-defined, no-any-return, reportAttributeAccessIssue, unused-ignore] # not known under Python 3.8 which we use for pyright type checking
 
+
+def locale_format_timedelta(locale:str, seconds:float) -> str:
+    sec = int(round(seconds))
+    if sec < 3600:
+        return format_timedelta(sec, locale=locale, format='narrow')
+    res = f"{format_timedelta(sec, locale=locale, format='narrow')}"
+    reminder = sec % 3600
+    if reminder>0:
+        return f"{res} {format_timedelta(reminder, locale=locale, format='narrow')}"
+    return res
+
+
 def locale_format_date_no_year(locale:str, date:datetime.date) -> str:
     try:
         # format nicely using babel
@@ -1143,7 +1190,8 @@ class NoDragItem(StandardItem):
         wrapper =  textwrap.TextWrapper(width=tooltip_line_length, max_lines=tooltip_max_lines, placeholder=tooltip_placeholder)
         title = '<br>'.join(wrapper.wrap(html.escape(self.data.title)))
         accent_color = (white if self.aw.app.darkmode else plus_blue)
-        title_line = f"<p style='white-space:pre'><font color=\"{accent_color}\"><b><big>{title}</big></b></font></p>"
+        roasttime = (f' ({stringfromseconds(self.data.roasttime, leadingzero=False)})' if self.data.roasttime > 0 else '')
+        title_line = f"<p style='white-space:pre'><font color=\"{accent_color}\"><b><big>{title}</big></b></font>{roasttime}</p>"
         beans_description = completeditem_beans_description(self.weight_unit_idx, self.data)
         store_line = (f'</b><br>[{html.escape(self.data.store_label)}]' if (beans_description != '' and self.data.store_label is not None and self.data.store_label != '') else '')
         detailed_description = f"{head_line}{title_line}<p style='white-space:pre'>{beans_description}{store_line}"
@@ -1290,6 +1338,10 @@ class DragItem(StandardItem):
         # adding a note if any
         if self.data.note is not None:
             detailed_description += f'<hr>{html.escape(self.data.note)}'
+        if self.data.template is not None:
+            roasting_time, template_name = get_total_roasting_time_and_title(self.data.template.hex)
+            if roasting_time is not None and template_name is not None:
+                detailed_description += f"<hr>{template_name} ({stringfromseconds(roasting_time, leadingzero=False)})"
         self.setToolTip(detailed_description)
 
         # colors
@@ -2994,11 +3046,19 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         if len(scheduled_items) > 0:
             todays_items = []
             later_items = []
+            todays_items_roasting_times:List[Optional[float]] = [] # roasting times in seconds of todays schedule item templates if any, otherwise None
+            later_items_roasting_times:List[Optional[float]] = []  # roasting times in seconds of next sessions schedule item templates if any, otherwise None
             for si in scheduled_items:
+                roasting_time:Optional[float] = None
+                if si.template is not None:
+                    roasting_time,_ = get_total_roasting_time_and_title(si.template.hex)
                 if si.date == today:
                     todays_items.append(si)
+                    todays_items_roasting_times.extend([roasting_time]*si.count)
                 else:
                     later_items.append(si)
+                    later_items_roasting_times.extend([roasting_time]*si.count)
+
             batches_today, batches_later = (sum(max(0, si.count - len(si.roasts)) for si in items) for items in (todays_items, later_items))
             # total weight in kg
             total_weight_today, total_weight_later = (sum(si.weight * max(0, (si.count - len(si.roasts))) for si in items) for items in (todays_items, later_items))
@@ -3006,12 +3066,14 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
             one_batch_label = QApplication.translate('Message', '1 batch')
             if batches_today > 0:
                 batches_today_label = (one_batch_label if batches_today == 1 else QApplication.translate('Message', '{} batches').format(batches_today))
-                todays_batches = f'{batches_today_label} • {render_weight(total_weight_today, 1, weight_unit_idx)}'
+                todays_total_roasttime_estimate = locale_format_timedelta(self.aw.locale_str, total_roasting_time(todays_items_roasting_times))
+                todays_batches = f'{batches_today_label} • {render_weight(total_weight_today, 1, weight_unit_idx)} • {todays_total_roasttime_estimate}'
             else:
                 todays_batches = ''
             if batches_later > 0:
                 batches_later_label = (one_batch_label if batches_later == 1 else QApplication.translate('Message', '{} batches').format(batches_later))
-                later_batches = f'{batches_later_label} • {render_weight(total_weight_later, 1, weight_unit_idx)}'
+                later_total_roasttime_estimate = locale_format_timedelta(self.aw.locale_str, total_roasting_time(later_items_roasting_times))
+                later_batches = f'{batches_later_label} • {render_weight(total_weight_later, 1, weight_unit_idx)} • {later_total_roasttime_estimate}'
             else:
                 later_batches = ''
             self.TabWidget.setTabToolTip(0, f"<p style='white-space:pre'><b>{todays_batches}</b>{('<br>' if (batches_today > 0 and batches_later > 0) else '')}{later_batches}</p>")
@@ -3069,7 +3131,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         if machine_name != '':
             self.machine_filter.setText(machine_name)
             self.machine_filter.show()
-            self.user_filter.setToolTip(QApplication.translate('Plus','List only items scheduled for the current machine {}').format(machine_name))
+            self.machine_filter.setToolTip(QApplication.translate('Plus','List only items scheduled for the current machine {}').format(machine_name))
         else:
             self.machine_filter.hide()
 
@@ -3238,7 +3300,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
             #        store_label
             #        batchsize
 
-    # updates all roast properties (the changeable as well as the non-changeable from the loaded profiles roast properties to the give CompletedItem
+    # updates all roast properties (the changeable as well as the non-changeable from the loaded profiles roast properties to the given CompletedItem
     # such that changes in the RoastProperties are reflected in the items visualization (even if not yet established to the server)
     def updates_completed_from_roast_properties(self, ci:CompletedItem) -> bool:
         updated:bool = False
@@ -3521,13 +3583,21 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
             weight_unit_idx = weight_units.index(self.aw.qmc.weight[2])
             one_batch_label = QApplication.translate('Message', '1 batch')
             if batches_today > 0:
+                todays_total_roasttime_str = ''
+                todays_total_roasttime = sum(ti.roasttime for ti in todays_items)
+                if todays_total_roasttime>0:
+                    todays_total_roasttime_str = f' • {locale_format_timedelta(self.aw.locale_str, todays_total_roasttime)}'
                 todays_batches_label = (one_batch_label if batches_today == 1 else QApplication.translate('Message', '{} batches').format(batches_today))
-                todays_batches = f'{todays_batches_label} • {render_weight(total_batchsize_today, 1, weight_unit_idx)}'
+                todays_batches = f'{todays_batches_label} • {render_weight(total_batchsize_today, 1, weight_unit_idx)}{todays_total_roasttime_str}'
             else:
                 todays_batches = ''
             if batches_earlier > 0:
+                earlier_total_roasttime_str = ''
+                earlier_total_roasttime = sum(ti.roasttime for ti in earlier_items)
+                if earlier_total_roasttime>0:
+                    earlier_total_roasttime_str = f' • {locale_format_timedelta(self.aw.locale_str, earlier_total_roasttime)}'
                 earlier_batches_label = (one_batch_label if batches_earlier == 1 else QApplication.translate('Message', '{} batches').format(batches_earlier))
-                earlier_batches = f'{earlier_batches_label} • {render_weight(total_batchsize_earlier, 1, weight_unit_idx)}'
+                earlier_batches = f'{earlier_batches_label} • {render_weight(total_batchsize_earlier, 1, weight_unit_idx)}{earlier_total_roasttime_str}'
             else:
                 earlier_batches = ''
             self.TabWidget.setTabToolTip(1, f"<p style='white-space:pre'><b>{todays_batches}</b>{('<br>' if (batches_today > 0 and batches_earlier > 0) else '')}{earlier_batches}</p>")
@@ -3545,15 +3615,6 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
 
     def get_scheduled_items_ids(self) -> List[str]:
         return [si.id for si in self.scheduled_items]
-
-    # returns total roast time in seconds based on given timeindex and timex structures
-    @staticmethod
-    def roast_time(timeindex:List[int], timex:List[float]) -> float:
-        if len(timex) == 0:
-            return 0
-        starttime = (timex[timeindex[0]] if timeindex[0] != -1 and timeindex[0] < len(timex) else 0)
-        endtime = (timex[timeindex[6]] if timeindex[6] > 0  and timeindex[6] < len(timex) else timex[-1])
-        return endtime - starttime
 
     # returns end/drop temperature based on given timeindex and timex structures
     @staticmethod
@@ -3602,9 +3663,10 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                             if abs(background_weight_in - batchsize) < batchsize * similar_roasts_max_batch_size_delta/100:
                                 _log.debug('batchsize delta (in kg): %s < %s',abs(background_weight_in - batchsize), batchsize * similar_roasts_max_batch_size_delta/100)
                                 # batch size the same (delta < 0.5%)
-                                foreground_roast_time = self.roast_time(self.aw.qmc.timeindex, self.aw.qmc.timex)
-                                background_roast_time = self.roast_time(self.aw.qmc.timeindexB, self.aw.qmc.timeB)
-                                if abs(foreground_roast_time - background_roast_time) < similar_roasts_max_roast_time_delta:
+                                foreground_roast_time = roast_time(self.aw.qmc.timeindex, self.aw.qmc.timex)
+                                background_roast_time = roast_time(self.aw.qmc.timeindexB, self.aw.qmc.timeB)
+                                if (foreground_roast_time is not None and background_roast_time is not None and
+                                        abs(foreground_roast_time - background_roast_time) < similar_roasts_max_roast_time_delta):
                                     _log.debug('roast time delta: %s < %s', abs(foreground_roast_time - background_roast_time), similar_roasts_max_roast_time_delta)
                                     # roast time is in the range (delta < 30sec)
                                     foreground_end_temp = self.end_temp(self.aw.qmc.timeindex, self.aw.qmc.temp2)
@@ -3653,6 +3715,8 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                     measured = True
                     weight = convertWeight(self.aw.qmc.weight[1], weight_unit_idx, 1)    # resulting weight converted to kg
 
+                rt:Optional[float] = roast_time(self.aw.qmc.timeindex, self.aw.qmc.timex)
+
                 completed_item:CompletedItemDict = CompletedItemDict(
                     scheduleID = remaining_item.data.id,
                     scheduleDate = remaining_item.data.date.isoformat(),
@@ -3676,7 +3740,8 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                     density = self.aw.qmc.density_roasted[0],
                     roastingnotes = self.aw.qmc.roastingnotes,
                     cupping_score = self.aw.qmc.calcFlavorChartScore(),
-                    cuppingnotes = self.aw.qmc.cuppingnotes
+                    cuppingnotes = self.aw.qmc.cuppingnotes,
+                    roasttime = (0 if rt is None else int(round(rt)))
                 )
                 add_completed(self.aw.plus_account_id, completed_item)
                 # update schedule, removing completed items and selecting the next one
