@@ -862,10 +862,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         dateedit = QLineEdit(date)
         dateedit.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         dateedit.setReadOnly(True)
-        if self.aw.app.darkmode:
-            dateedit.setStyleSheet('background-color: #757575; color : white;')
-        else:
-            dateedit.setStyleSheet('background-color: #eeeeee;')
+        dateedit.setDisabled(True)
         #Batch
         batchlabel = ClickableQLabel('<b>' + QApplication.translate('Label', 'Batch') + '</b>')
         batchlabel.right_clicked.connect(self.enableBatchEdit)
@@ -889,10 +886,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 batch = self.aw.qmc.roastbatchprefix + str(self.aw.qmc.roastbatchnr) + roastpos
             self.batchedit = QLineEdit(batch)
             self.batchedit.setReadOnly(True)
-            if self.aw.app.darkmode:
-                self.batchedit.setStyleSheet('background-color: #757575; color : white;')
-            else:
-                self.batchedit.setStyleSheet('background-color: #eeeeee;')
+            self.batchedit.setDisabled(True)
             self.batchedit.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
         #Beans
