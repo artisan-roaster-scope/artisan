@@ -24448,7 +24448,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         path = QDir()
         path.setPath(self.getDefaultPath())
         fname = path.absoluteFilePath(QApplication.translate('Message','artisan-settings'))
-        fname = fname + '.aset' if not fname.endswith('.aset') else fname
         filename = self.ArtisanSaveFileDialog(msg=QApplication.translate('Message', 'Save Settings'), path=fname, ext='*.aset')
         if filename:
             self.settingspath = filename
