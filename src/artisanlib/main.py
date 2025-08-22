@@ -13148,7 +13148,13 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         if path is None:
             path = self.getDefaultPath()
         with MenuShortCutsDisabled(self.main_menu_actions_with_shortcuts):
-            f = str(QFileDialog.getSaveFileName(self,msg,path,ext)[0])
+            filename, _ = QFileDialog.getSaveFileName(self, msg, path, ext)
+            if filename:
+                # Extract extension from ext parameter (assuming ext is like "*.alog")
+                extension = ext.split('*')[-1].split(')')[0] if '*' in ext else ''
+                if extension and not filename.endswith(extension):
+                    filename = filename + extension
+            f = str(filename)
             self.setDefaultPath(f)
             return f
 
