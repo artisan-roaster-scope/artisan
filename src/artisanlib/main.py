@@ -111,7 +111,7 @@ try:
                                 QPixmap,QColor,QDesktopServices,QIcon, # @Reimport @UnresolvedImport @UnusedImport
                                 QRegularExpressionValidator, QDoubleValidator, QPainter, QCursor) # @Reimport @UnresolvedImport @UnusedImport
     from PyQt6.QtPrintSupport import (QPrinter,QPrintDialog) # @Reimport @UnresolvedImport @UnusedImport
-    from PyQt6.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal, pyqtSlot, QtMsgType, # @Reimport @UnresolvedImport @UnusedImport
+    from PyQt6.QtCore import (QStandardPaths, QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal, pyqtSlot, QtMsgType, # @Reimport @UnresolvedImport @UnusedImport
 #                              QSize, pyqtProperty, # type: ignore # @Reimport @UnresolvedImport @UnusedImport
                               qVersion, QVersionNumber, QTime, QTimer, QFile, QIODevice, QTextStream, QSettings, # @Reimport @UnresolvedImport @UnusedImport
                               QRegularExpression, QDate, QUrl, QUrlQuery, QDir, Qt, QPoint, QEvent, QDateTime, QThread, qInstallMessageHandler) # @Reimport @UnresolvedImport @UnusedImport
@@ -138,7 +138,7 @@ except ImportError:
                                 QPixmap,QColor,QDesktopServices,QIcon, # @Reimport @UnresolvedImport @UnusedImport
                                 QRegularExpressionValidator, QDoubleValidator, QPainter, QCursor) # @Reimport @UnresolvedImport @UnusedImport
     from PyQt5.QtPrintSupport import (QPrinter,QPrintDialog) # type: ignore # @Reimport @UnresolvedImport @UnusedImport
-    from PyQt5.QtCore import (QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal, pyqtSlot, QtMsgType, # type: ignore # @Reimport @UnresolvedImport @UnusedImport
+    from PyQt5.QtCore import (QStandardPaths, QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal, pyqtSlot, QtMsgType, # type: ignore # @Reimport @UnresolvedImport @UnusedImport
                               qVersion, QVersionNumber, QTime, QTimer, QFile, QIODevice, QTextStream, QSettings, # @Reimport @UnresolvedImport @UnusedImport
                               QRegularExpression, QDate, QUrl, QUrlQuery, QDir, Qt, QPoint, QEvent, QDateTime, QThread, qInstallMessageHandler) # @Reimport @UnresolvedImport @UnusedImport
     from PyQt5.QtNetwork import QLocalSocket # type: ignore # @Reimport @UnresolvedImport @UnusedImport
@@ -1706,16 +1706,15 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         # path of last loaded WheelGraph
         self.wheelpath:str = ''
 
-        # self.profilepath is obteined at dirstruct() and points to profiles/year/month file-open/save will point to profilepath
         self.profilepath:str = ''
-        if platform.system() in {'Darwin', 'Linux'}:
-            self.profilepath = QDir().homePath() + '/Documents/'
-        else:
-            self.profilepath = QDir().homePath()
+        documents_directory = getDocumentsDirectory()
+        if documents_directory is not None:
+            self.profilepath = documents_directory
 
         # on the Mac preferences should be stored outside of applications in the users ~/Library/Preferences path
         if platform.system() == 'Darwin':
-            preference_path = QDir().homePath() + '/Library/Preferences//'
+            #preference_path = QDir().homePath() + '/Library/Preferences/'
+            preference_path = QStandardPaths.standardLocations(QStandardPaths.StandardLocation.ConfigLocation)[0]
             preference_dir = QDir()
             preference_dir.setPath(preference_path)
             if not preference_dir.exists():

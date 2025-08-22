@@ -859,15 +859,10 @@ class editGraphDlg(ArtisanResizeablDialog):
         datelabel1 = QLabel('<b>' + QApplication.translate('Label', 'Date') + '</b>')
         date = self.aw.qmc.roastdate.date().toString()
         date += ', ' + self.aw.qmc.roastdate.time().toString()[:-3]
-        dateedit = QLineEdit(date)
-        dateedit.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        dateedit.setReadOnly(True)
-        if self.aw.app.darkmode:
-            dateedit.setStyleSheet('background-color: #757575; color : white;')
-        else:
-            dateedit.setStyleSheet('background-color: #eeeeee;')
+        dateedit = QLabel(date)
         #Batch
         batchlabel = ClickableQLabel('<b>' + QApplication.translate('Label', 'Batch') + '</b>')
+        batchlabel.setToolTip(QApplication.translate('Tooltip','Right-click to edit'))
         batchlabel.right_clicked.connect(self.enableBatchEdit)
         self.batchLayout = QHBoxLayout()
         # editor
@@ -887,13 +882,9 @@ class editGraphDlg(ArtisanResizeablDialog):
                 batch = ''
             else:
                 batch = self.aw.qmc.roastbatchprefix + str(self.aw.qmc.roastbatchnr) + roastpos
-            self.batchedit = QLineEdit(batch)
-            self.batchedit.setReadOnly(True)
-            if self.aw.app.darkmode:
-                self.batchedit.setStyleSheet('background-color: #757575; color : white;')
-            else:
-                self.batchedit.setStyleSheet('background-color: #eeeeee;')
-            self.batchedit.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            self.batchedit = ClickableQLabel(batch)
+            self.batchedit.right_clicked.connect(self.enableBatchEdit)
+            self.batchedit.setToolTip(QApplication.translate('Tooltip','Right-click to edit'))
 
         #Beans
         beanslabel = QLabel('<b>' + QApplication.translate('Label', 'Beans') + '</b>')
@@ -1300,6 +1291,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         datebatch = QHBoxLayout()
         datebatch.addWidget(dateedit)
         datebatch.addSpacing(15)
+        datebatch.addStretch()
         datebatch.addWidget(batchlabel)
         datebatch.addSpacing(7)
         datebatch.addLayout(self.batchLayout)
@@ -1808,6 +1800,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         if not self.aw.superusermode and not self.batcheditmode:
             self.batcheditmode = True
             self.batchLayout.removeWidget(self.batchedit)
+            self.batchedit.setText('')
             self.defineBatchEditor()
 
     def defineBatchEditor(self) -> None:

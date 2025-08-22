@@ -930,11 +930,11 @@ def remove_suffix(s:str, suffix:str) -> str:
 def locale_format_timedelta(locale:str, seconds:float) -> str:
     sec = int(round(seconds))
     if sec < 3600:
-        return format_timedelta(sec, locale=locale, format='narrow')
-    res = f"{format_timedelta(sec, locale=locale, format='narrow')}"
+        return format_timedelta(sec, locale=locale, format='narrow', granularity='minute', threshold=1)
+    res = f"{format_timedelta(sec, locale=locale, format='narrow', granularity='hour', threshold=1)}"
     reminder = sec % 3600
     if reminder>0:
-        return f"{res} {format_timedelta(reminder, locale=locale, format='narrow')}"
+        return f"{res} {format_timedelta(reminder, locale=locale, format='narrow', granularity='minute', threshold=1)}"
     return res
 
 
@@ -4009,8 +4009,7 @@ class GreenWebDisplay(GreenDisplay):
                 # showing what is missing per component
                 # weight is rendered with max 7 characters ('10.32kg' is well displayed, '10.321kg' not) thus we set brief=1 for weights >= 10kg
                 delta_weight = component_target - current_weight
-                self.rendered_task['weight'] = f"{'+' if delta_weight<0 else ''}{render_weight(-delta_weight, 0, weight_units.index(self.schedule_window.aw.qmc.weight[2]),
-                            brief=(0 if delta_weight < 10000 else 1))}"
+                self.rendered_task['weight'] = f"{'+' if delta_weight<0 else ''}{render_weight(-delta_weight, 0, weight_units.index(self.schedule_window.aw.qmc.weight[2]), brief=(0 if delta_weight < 10000 else 1))}"
                 component_target_weight = target * current_component_ratio
                 completed_weight = target * completed_ratio
                 if component_target_weight>0:
