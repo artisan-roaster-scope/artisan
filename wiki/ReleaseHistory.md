@@ -26,8 +26,8 @@ v3.2.1
 * CHANGES
   - BREAKING VISUAL CHANGE, but only when consecutive hidden buttons with Type or Action defined are first at the top of the Events Buttons table: The visual button layout may change as hidden buttons with Type or Action defined at the top of the Events Buttons table are no longer counted in the first row's button count, which is limited by the Max Buttons per Row setting.  All other hidden buttons continue to be counted in each row's button count.
   - updates Spanish localization (thanks to Juan Carlos Bonilla)
-  - updates Chinese localization (thanks to Terracotta-6)
-  - updates Korean localization (thanks to HarioSwitch)
+  - updates Chinese localization (thanks to [Terracotta-6](https://github.com/Terracotta-6))
+  - updates Korean localization (thanks to [HarioSwitch](https://github.com/hakulog))
   - unlimited number of buttons can be created while display is limited to maximum 10 rows with maximum 50 buttons each
   - palette load uses and updates the user selected profile path
   - increases the maximum number of recent roast entries from 25 to 40
@@ -40,6 +40,7 @@ v3.2.1
   - updates MPL default font selection for Asian and Arabic languages under Windows
   - batch counter and autosave are now active by default after first installation or a factory reset. Autosave is configured to save to the user's account documents folder (platform-specific) by default.
   - the configuration for taking ambient temperature from a data curve moved from the Roast Properties dialog to the Devices configuration dialog and configurations for taking ambient humidity and ambient pressure from curve data have been added ([Issue #586](../../../issues/586) and [PR #1882](../../../pull/1882))
+  - ensures that the default file suffixes on file save are applied ([PR #1965](../../../pull/1965)). Thanks [Scott](https://github.com/scottjames)!
 
 * FIXES
   - fixes regression which broke the designer such that points could not be moved ([Discussion #1905](../../../discussions/1905) and [Issue #1916](../../../issues/1916))
