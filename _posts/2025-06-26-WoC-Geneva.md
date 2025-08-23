@@ -22,12 +22,19 @@ The Artisan Scope team has partnered with [Acaia](https://acaia.co/){:target="_b
 
 We presented the first scale exclusively designed for coffee roasters, the [COSMO (10kg and 100kg) from Acaia](https://acaia.co/products/cosmo-landing). It integrates with the revolutionary [Batch Manager](https://doc.artisan.plus/docs/batch-manager/) released with Artisan v3.2.
 
+{% include video id="8dLLYt5F3dU" provider="youtube" %}
 
-<img src="{{ site.baseurl }}/assets/images/posts/2025-06-26-WoC-Geneva_partners.png" width="70%">
-{: .text-center}
+{% include video id="jWI_nr9bjag" provider="youtube" %}
+
+
 
 
 > [World of Coffee](https://worldofcoffee.org/), booth **1253**   
 Jun 26 – 28 2025, Geneva, Switzerland
+
+
+<img src="{{ site.baseurl }}/assets/images/posts/2025-06-26-WoC-Geneva_partners.png" width="70%">
+{: .text-center}
+
 
 ---
