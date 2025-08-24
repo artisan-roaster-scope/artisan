@@ -662,13 +662,15 @@ class serialport:
             #return saved readings from device 0
             return self.aw.qmc.dutycycleTX, self.aw.qmc.dutycycle, self.aw.qmc.currentpidsv
         if not self.aw.pidcontrol.pidActive:
+            self.aw.qmc.updateLargePIDLCDs(sv='', duty='')
             return self.aw.qmc.timeclock.elapsedMilli(),-1,-1
+        lcdformat = ('%.1f' if self.aw.qmc.LCDdecimalplaces else '%.0f')
         if (self.aw.qmc.device == 19 and not self.aw.pidcontrol.externalPIDControl()) or \
-                (self.aw.qmc.device == 53) or \
-                (self.aw.qmc.device == 29 and not self.aw.pidcontrol.externalPIDControl()):
-                # TC4 (19), HOTTOP (53) or MODBUS (29) with Artisan Software PID
+                (self.aw.qmc.device in {29, 79} and not self.aw.pidcontrol.externalPIDControl()):
+                # TC4 (19) or MODBUS/S7 (29/79) with Artisan Software PID
             duty = self.aw.qmc.pid.getDuty()
             duty = (-1.0 if duty is None else min(100.0, max(-100.0, duty)))
+            self.aw.qmc.updateLargePIDLCDs(sv=lcdformat%self.aw.qmc.pid.target, duty=lcdformat%duty)
             return self.aw.qmc.timeclock.elapsedMilli(), duty, self.aw.qmc.pid.target
         sv = self.aw.pidcontrol.sv if self.aw.pidcontrol.sv is not None else -1
         if self.aw.qmc.device == 29: # external MODBUS PID
@@ -676,6 +678,7 @@ class serialport:
         else:
             duty = self.aw.qmc.pid.getDuty()
             duty = (-1.0 if duty is None else min(100.0, max(-100.0, duty)))
+        self.aw.qmc.updateLargePIDLCDs(sv=lcdformat%sv, duty=lcdformat%duty)
         return tx, duty, sv
 
     def DTAtemperature(self) -> Tuple[float,float,float]:

@@ -1012,7 +1012,6 @@ class Acaia(Scale): # pyright: ignore [reportGeneralTypeIssues] # Argument to cl
 
     # signal state actions to the user
     def signal_user(self, action:STATE_ACTION) -> None:
-        _log.debug('PRINT signal_user(%s)',action)
         if action == STATE_ACTION.DISCONNECTED:
             self.acaia.send_leds_wipe_off(self.acaia.MAGENTA)
         elif action == STATE_ACTION.CONNECTED:

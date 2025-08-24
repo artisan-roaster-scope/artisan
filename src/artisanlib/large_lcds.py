@@ -588,10 +588,7 @@ class LargePIDLCDs(LargeLCDs):
         self.updateDecimals()
 
     def updateVisiblitiesPID(self) -> None:
-        if self.aw.ser.showFujiLCDs and self.aw.qmc.device == 0 or self.aw.qmc.device == 26:
-            self.updateVisibilities([True],[True])
-        else:
-            self.updateVisibilities([False],[False])
+        self.updateVisibilities([True],[True])
 
     @pyqtSlot('QCloseEvent')
     def closeEvent(self, _:Optional['QCloseEvent'] = None) -> None:

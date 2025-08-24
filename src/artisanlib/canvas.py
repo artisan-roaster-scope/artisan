@@ -1906,7 +1906,7 @@ class tgraphcanvas(FigureCanvas):
         self.statisticslower:int = 617
 
         # autosave
-        self.autosaveflag:int = 1
+        self.autosaveflag:int = 0
         self.autosaveprefix:str = ''
         self.autosavepath:str = ''      # default is set on app initialization to users Documents folder (end of main.py)
         self.autosavealsopath:str = ''  # default is set on app initialization to users Documents folder (end of main.py)
