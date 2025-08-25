@@ -12431,7 +12431,7 @@ Door wiskundige formules in de plotter te gebruiken, kunnen ook de symbolische v
       <translation type="unfinished">Hoeveelheid</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3953" />
+      <location filename="../plus/schedule.py" line="3956" />
       <location filename="../artisanlib/canvas.py" line="11831" />
       <location filename="../artisanlib/canvas.py" line="11780" />
       <location filename="../artisanlib/canvas.py" line="11775" />
@@ -12441,7 +12441,7 @@ Door wiskundige formules in de plotter te gebruiken, kunnen ook de symbolische v
       <translation>Groen</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3955" />
+      <location filename="../plus/schedule.py" line="3958" />
       <location filename="../plus/schedule.py" line="2105" />
       <location filename="../artisanlib/roast_properties.py" line="899" />
       <location filename="../artisanlib/roast_properties.py" line="285" />
@@ -17383,26 +17383,26 @@ Profiel ontbreekt [CHARGE] of [DROP]</translation>
       <translation>Planner gestopt</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3646" />
-      <location filename="../plus/schedule.py" line="3128" />
+      <location filename="../plus/schedule.py" line="3649" />
+      <location filename="../plus/schedule.py" line="3131" />
       <source>1 batch</source>
       <translation>1 partij</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3661" />
-      <location filename="../plus/schedule.py" line="3652" />
-      <location filename="../plus/schedule.py" line="3136" />
-      <location filename="../plus/schedule.py" line="3130" />
+      <location filename="../plus/schedule.py" line="3664" />
+      <location filename="../plus/schedule.py" line="3655" />
+      <location filename="../plus/schedule.py" line="3139" />
+      <location filename="../plus/schedule.py" line="3133" />
       <source>{} batches</source>
       <translation>{} partijen</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3474" />
+      <location filename="../plus/schedule.py" line="3477" />
       <source>Updating completed roast properties failed</source>
       <translation>Het bijwerken van voltooide braadeigenschappen is mislukt</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3540" />
+      <location filename="../plus/schedule.py" line="3543" />
       <source>Fetching completed roast properties failed</source>
       <translation>Het ophalen van voltooide braadeigenschappen is mislukt</translation>
     </message>
@@ -17624,7 +17624,7 @@ Profiel ontbreekt [CHARGE] of [DROP]</translation>
     <message>
       <location filename="../plus/schedule.py" line="2177" />
       <source>Schedule Updated!</source>
-      <translation type="unfinished" />
+      <translation>Roosterschema bijgewerkt!</translation>
     </message>
     <message>
       <location filename="../plus/schedule.py" line="2272" />
@@ -17632,27 +17632,27 @@ Profiel ontbreekt [CHARGE] of [DROP]</translation>
       <translation>Log in op {} om uw braadschema te ontvangen</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3188" />
+      <location filename="../plus/schedule.py" line="3191" />
       <source>List only items scheduled for the current user {}</source>
       <translation>Alleen items weergeven die gepland zijn voor de huidige gebruiker {}</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3196" />
+      <location filename="../plus/schedule.py" line="3199" />
       <source>List only items scheduled for the current machine {}</source>
       <translation>Alleen items weergeven die voor de huidige machine zijn gepland {}</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3885" />
+      <location filename="../plus/schedule.py" line="3888" />
       <source>Schedule empty!{}Plan your schedule on {}</source>
       <translation>Planning leeg!{}Plan uw planning op {}</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3893" />
+      <location filename="../plus/schedule.py" line="3896" />
       <source>Nothing scheduled for you today!{}Deactivate filters to see all items.</source>
       <translation>Er staat niets voor je gepland vandaag!{}Deactiveer filters om alle items te zien.</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3943" />
+      <location filename="../plus/schedule.py" line="3946" />
       <source>nothing to weight</source>
       <translation>niets te wegen</translation>
     </message>
@@ -17776,7 +17776,7 @@ Profiel ontbreekt [CHARGE] of [DROP]</translation>
   <context>
     <name>Scope Title</name>
     <message>
-      <location filename="../plus/schedule.py" line="2840" />
+      <location filename="../plus/schedule.py" line="2843" />
       <location filename="../artisanlib/canvas.py" line="8849" />
       <location filename="../artisanlib/canvas.py" line="7732" />
       <location filename="../artisanlib/canvas.py" line="1242" />

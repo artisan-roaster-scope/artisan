@@ -12434,7 +12434,7 @@ Matemaattisten kaavojen käyttö plotterissa mahdollistaa myös symbolisten muut
       <translation>Äänenvoimakkuus</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3953" />
+      <location filename="../plus/schedule.py" line="3956" />
       <location filename="../artisanlib/canvas.py" line="11831" />
       <location filename="../artisanlib/canvas.py" line="11780" />
       <location filename="../artisanlib/canvas.py" line="11775" />
@@ -12444,7 +12444,7 @@ Matemaattisten kaavojen käyttö plotterissa mahdollistaa myös symbolisten muut
       <translation>Vihreä</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3955" />
+      <location filename="../plus/schedule.py" line="3958" />
       <location filename="../plus/schedule.py" line="2105" />
       <location filename="../artisanlib/roast_properties.py" line="899" />
       <location filename="../artisanlib/roast_properties.py" line="285" />
@@ -17386,26 +17386,26 @@ Profiilista puuttuu [CHARGE] tai [DROP]</translation>
       <translation>Ajastin pysähtyi</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3646" />
-      <location filename="../plus/schedule.py" line="3128" />
+      <location filename="../plus/schedule.py" line="3649" />
+      <location filename="../plus/schedule.py" line="3131" />
       <source>1 batch</source>
       <translation>1 erä</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3661" />
-      <location filename="../plus/schedule.py" line="3652" />
-      <location filename="../plus/schedule.py" line="3136" />
-      <location filename="../plus/schedule.py" line="3130" />
+      <location filename="../plus/schedule.py" line="3664" />
+      <location filename="../plus/schedule.py" line="3655" />
+      <location filename="../plus/schedule.py" line="3139" />
+      <location filename="../plus/schedule.py" line="3133" />
       <source>{} batches</source>
       <translation>{} erää</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3474" />
+      <location filename="../plus/schedule.py" line="3477" />
       <source>Updating completed roast properties failed</source>
       <translation>Valmiiden paahtoominaisuuksien päivittäminen epäonnistui</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3540" />
+      <location filename="../plus/schedule.py" line="3543" />
       <source>Fetching completed roast properties failed</source>
       <translation>Valmiiden paahtoominaisuuksien nouto epäonnistui</translation>
     </message>
@@ -17627,7 +17627,7 @@ Profiilista puuttuu [CHARGE] tai [DROP]</translation>
     <message>
       <location filename="../plus/schedule.py" line="2177" />
       <source>Schedule Updated!</source>
-      <translation type="unfinished" />
+      <translation>Paistoaikataulu päivitetty!</translation>
     </message>
     <message>
       <location filename="../plus/schedule.py" line="2272" />
@@ -17635,27 +17635,27 @@ Profiilista puuttuu [CHARGE] tai [DROP]</translation>
       <translation>Kirjaudu sisään {} saadaksesi paistamisaikataulusi</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3188" />
+      <location filename="../plus/schedule.py" line="3191" />
       <source>List only items scheduled for the current user {}</source>
       <translation>Listaa vain kohteet, jotka on ajoitettu nykyiselle käyttäjälle {}</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3196" />
+      <location filename="../plus/schedule.py" line="3199" />
       <source>List only items scheduled for the current machine {}</source>
       <translation>Luettele vain nykyiselle koneelle ajoitetut kohteet {}</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3885" />
+      <location filename="../plus/schedule.py" line="3888" />
       <source>Schedule empty!{}Plan your schedule on {}</source>
       <translation>Aikataulu tyhjä!{}Suunnittele aikataulusi {}</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3893" />
+      <location filename="../plus/schedule.py" line="3896" />
       <source>Nothing scheduled for you today!{}Deactivate filters to see all items.</source>
       <translation>Sinulle ei ole suunniteltu tänään mitään!{}Poista suodattimet käytöstä nähdäksesi kaikki kohteet.</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3943" />
+      <location filename="../plus/schedule.py" line="3946" />
       <source>nothing to weight</source>
       <translation>mitään painottavaa</translation>
     </message>
@@ -17779,7 +17779,7 @@ Profiilista puuttuu [CHARGE] tai [DROP]</translation>
   <context>
     <name>Scope Title</name>
     <message>
-      <location filename="../plus/schedule.py" line="2840" />
+      <location filename="../plus/schedule.py" line="2843" />
       <location filename="../artisanlib/canvas.py" line="8849" />
       <location filename="../artisanlib/canvas.py" line="7732" />
       <location filename="../artisanlib/canvas.py" line="1242" />

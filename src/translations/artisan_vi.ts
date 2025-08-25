@@ -12424,7 +12424,7 @@ Việc sử dụng các công thức toán học trong máy vẽ cũng cho phép
       <translation>Thể tích</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3953" />
+      <location filename="../plus/schedule.py" line="3956" />
       <location filename="../artisanlib/canvas.py" line="11831" />
       <location filename="../artisanlib/canvas.py" line="11780" />
       <location filename="../artisanlib/canvas.py" line="11775" />
@@ -12434,7 +12434,7 @@ Việc sử dụng các công thức toán học trong máy vẽ cũng cho phép
       <translation>Hạt thô</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3955" />
+      <location filename="../plus/schedule.py" line="3958" />
       <location filename="../plus/schedule.py" line="2105" />
       <location filename="../artisanlib/roast_properties.py" line="899" />
       <location filename="../artisanlib/roast_properties.py" line="285" />
@@ -17376,26 +17376,26 @@ Hồ sơ thiếu [CHARGE] hoặc [DROP]</translation>
       <translation>Bộ lập lịch đã dừng</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3646" />
-      <location filename="../plus/schedule.py" line="3128" />
+      <location filename="../plus/schedule.py" line="3649" />
+      <location filename="../plus/schedule.py" line="3131" />
       <source>1 batch</source>
       <translation>1 đợt</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3661" />
-      <location filename="../plus/schedule.py" line="3652" />
-      <location filename="../plus/schedule.py" line="3136" />
-      <location filename="../plus/schedule.py" line="3130" />
+      <location filename="../plus/schedule.py" line="3664" />
+      <location filename="../plus/schedule.py" line="3655" />
+      <location filename="../plus/schedule.py" line="3139" />
+      <location filename="../plus/schedule.py" line="3133" />
       <source>{} batches</source>
       <translation>{} đợt</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3474" />
+      <location filename="../plus/schedule.py" line="3477" />
       <source>Updating completed roast properties failed</source>
       <translation>Cập nhật các thuộc tính rang đã hoàn thành không thành công</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3540" />
+      <location filename="../plus/schedule.py" line="3543" />
       <source>Fetching completed roast properties failed</source>
       <translation>Tìm nạp các thuộc tính rang đã hoàn thành không thành công</translation>
     </message>
@@ -17617,7 +17617,7 @@ Hồ sơ thiếu [CHARGE] hoặc [DROP]</translation>
     <message>
       <location filename="../plus/schedule.py" line="2177" />
       <source>Schedule Updated!</source>
-      <translation type="unfinished" />
+      <translation>Lịch rang đã được cập nhật!</translation>
     </message>
     <message>
       <location filename="../plus/schedule.py" line="2272" />
@@ -17625,27 +17625,27 @@ Hồ sơ thiếu [CHARGE] hoặc [DROP]</translation>
       <translation>Đăng nhập vào {} để nhận lịch rang của bạn</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3188" />
+      <location filename="../plus/schedule.py" line="3191" />
       <source>List only items scheduled for the current user {}</source>
       <translation>Chỉ liệt kê các mục được lên lịch cho người dùng hiện tại {}</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3196" />
+      <location filename="../plus/schedule.py" line="3199" />
       <source>List only items scheduled for the current machine {}</source>
       <translation>Chỉ liệt kê các mục được lên lịch cho máy hiện tại {}</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3885" />
+      <location filename="../plus/schedule.py" line="3888" />
       <source>Schedule empty!{}Plan your schedule on {}</source>
       <translation>Lên lịch trống!{}Lên lịch biểu của bạn vào {}</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3893" />
+      <location filename="../plus/schedule.py" line="3896" />
       <source>Nothing scheduled for you today!{}Deactivate filters to see all items.</source>
       <translation>Không có lịch trình nào cho bạn hôm nay!{}Tắt bộ lọc để xem tất cả các mục.</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3943" />
+      <location filename="../plus/schedule.py" line="3946" />
       <source>nothing to weight</source>
       <translation>không có gì để cân</translation>
     </message>
@@ -17769,7 +17769,7 @@ Hồ sơ thiếu [CHARGE] hoặc [DROP]</translation>
   <context>
     <name>Scope Title</name>
     <message>
-      <location filename="../plus/schedule.py" line="2840" />
+      <location filename="../plus/schedule.py" line="2843" />
       <location filename="../artisanlib/canvas.py" line="8849" />
       <location filename="../artisanlib/canvas.py" line="7732" />
       <location filename="../artisanlib/canvas.py" line="1242" />

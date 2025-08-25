@@ -12429,7 +12429,7 @@ Le bhith a’ cleachdadh foirmlean matamataigeach anns a’ chuilbheart cuideach
       <translation>Toirt</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3953" />
+      <location filename="../plus/schedule.py" line="3956" />
       <location filename="../artisanlib/canvas.py" line="11831" />
       <location filename="../artisanlib/canvas.py" line="11780" />
       <location filename="../artisanlib/canvas.py" line="11775" />
@@ -12439,7 +12439,7 @@ Le bhith a’ cleachdadh foirmlean matamataigeach anns a’ chuilbheart cuideach
       <translation>Uaine</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3955" />
+      <location filename="../plus/schedule.py" line="3958" />
       <location filename="../plus/schedule.py" line="2105" />
       <location filename="../artisanlib/roast_properties.py" line="899" />
       <location filename="../artisanlib/roast_properties.py" line="285" />
@@ -17381,26 +17381,26 @@ Pròifil a dhìth [CHARGE] no [DROP]</translation>
       <translation>Sguir an clàr-ama</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3646" />
-      <location filename="../plus/schedule.py" line="3128" />
+      <location filename="../plus/schedule.py" line="3649" />
+      <location filename="../plus/schedule.py" line="3131" />
       <source>1 batch</source>
       <translation>1 baidse</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3661" />
-      <location filename="../plus/schedule.py" line="3652" />
-      <location filename="../plus/schedule.py" line="3136" />
-      <location filename="../plus/schedule.py" line="3130" />
+      <location filename="../plus/schedule.py" line="3664" />
+      <location filename="../plus/schedule.py" line="3655" />
+      <location filename="../plus/schedule.py" line="3139" />
+      <location filename="../plus/schedule.py" line="3133" />
       <source>{} batches</source>
       <translation>{} baidsean</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3474" />
+      <location filename="../plus/schedule.py" line="3477" />
       <source>Updating completed roast properties failed</source>
       <translation>Dh'fhàillig ùrachadh nan togalaichean ròsta crìochnaichte</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3540" />
+      <location filename="../plus/schedule.py" line="3543" />
       <source>Fetching completed roast properties failed</source>
       <translation>Dh'fhàillig le bhith a' faighinn thogalaichean ròsta crìochnaichte</translation>
     </message>
@@ -17622,7 +17622,7 @@ Pròifil a dhìth [CHARGE] no [DROP]</translation>
     <message>
       <location filename="../plus/schedule.py" line="2177" />
       <source>Schedule Updated!</source>
-      <translation type="unfinished" />
+      <translation>Clàr-ama ròstaidh air ùrachadh!</translation>
     </message>
     <message>
       <location filename="../plus/schedule.py" line="2272" />
@@ -17630,27 +17630,27 @@ Pròifil a dhìth [CHARGE] no [DROP]</translation>
       <translation>Log a-steach gu {} gus do chlàr ròsta fhaighinn</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3188" />
+      <location filename="../plus/schedule.py" line="3191" />
       <source>List only items scheduled for the current user {}</source>
       <translation>Liostaich dìreach nithean a tha clàraichte airson a' chleachdaiche làithreach {}</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3196" />
+      <location filename="../plus/schedule.py" line="3199" />
       <source>List only items scheduled for the current machine {}</source>
       <translation>Dèan liosta a-mhàin nithean clàraichte airson an inneil làithreach {}</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3885" />
+      <location filename="../plus/schedule.py" line="3888" />
       <source>Schedule empty!{}Plan your schedule on {}</source>
       <translation>Clàr falamh!{}Plana do chlàr-ama air {}</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3893" />
+      <location filename="../plus/schedule.py" line="3896" />
       <source>Nothing scheduled for you today!{}Deactivate filters to see all items.</source>
       <translation>Chan eil dad clàraichte dhut an-diugh!{}Cuir na criathragan dheth gus a h-uile nì fhaicinn.</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3943" />
+      <location filename="../plus/schedule.py" line="3946" />
       <source>nothing to weight</source>
       <translation>chan eil dad ri cuideam</translation>
     </message>
@@ -17774,7 +17774,7 @@ Pròifil a dhìth [CHARGE] no [DROP]</translation>
   <context>
     <name>Scope Title</name>
     <message>
-      <location filename="../plus/schedule.py" line="2840" />
+      <location filename="../plus/schedule.py" line="2843" />
       <location filename="../artisanlib/canvas.py" line="8849" />
       <location filename="../artisanlib/canvas.py" line="7732" />
       <location filename="../artisanlib/canvas.py" line="1242" />

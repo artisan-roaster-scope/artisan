@@ -12432,7 +12432,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
       <translation type="unfinished">ปริมาตร</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3953" />
+      <location filename="../plus/schedule.py" line="3956" />
       <location filename="../artisanlib/canvas.py" line="11831" />
       <location filename="../artisanlib/canvas.py" line="11780" />
       <location filename="../artisanlib/canvas.py" line="11775" />
@@ -12442,7 +12442,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
       <translation>สีเขียว</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3955" />
+      <location filename="../plus/schedule.py" line="3958" />
       <location filename="../plus/schedule.py" line="2105" />
       <location filename="../artisanlib/roast_properties.py" line="899" />
       <location filename="../artisanlib/roast_properties.py" line="285" />
@@ -17384,26 +17384,26 @@ Profile missing [CHARGE] or [DROP]</source>
       <translation>ตัวกำหนดเวลาหยุดทำงานแล้ว</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3646" />
-      <location filename="../plus/schedule.py" line="3128" />
+      <location filename="../plus/schedule.py" line="3649" />
+      <location filename="../plus/schedule.py" line="3131" />
       <source>1 batch</source>
       <translation>1 ชุด</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3661" />
-      <location filename="../plus/schedule.py" line="3652" />
-      <location filename="../plus/schedule.py" line="3136" />
-      <location filename="../plus/schedule.py" line="3130" />
+      <location filename="../plus/schedule.py" line="3664" />
+      <location filename="../plus/schedule.py" line="3655" />
+      <location filename="../plus/schedule.py" line="3139" />
+      <location filename="../plus/schedule.py" line="3133" />
       <source>{} batches</source>
       <translation>{} ชุด</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3474" />
+      <location filename="../plus/schedule.py" line="3477" />
       <source>Updating completed roast properties failed</source>
       <translation>การอัปเดตคุณสมบัติการย่างที่เสร็จสมบูรณ์ล้มเหลว</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3540" />
+      <location filename="../plus/schedule.py" line="3543" />
       <source>Fetching completed roast properties failed</source>
       <translation>การเรียกคุณสมบัติการย่างที่เสร็จสมบูรณ์ล้มเหลว</translation>
     </message>
@@ -17625,7 +17625,7 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
       <location filename="../plus/schedule.py" line="2177" />
       <source>Schedule Updated!</source>
-      <translation type="unfinished" />
+      <translation>อัปเดตกำหนดการคั่วแล้ว!</translation>
     </message>
     <message>
       <location filename="../plus/schedule.py" line="2272" />
@@ -17633,27 +17633,27 @@ Profile missing [CHARGE] or [DROP]</source>
       <translation>เข้าสู่ระบบ {} เพื่อรับตารางการย่างของคุณ</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3188" />
+      <location filename="../plus/schedule.py" line="3191" />
       <source>List only items scheduled for the current user {}</source>
       <translation>แสดงเฉพาะรายการที่กำหนดไว้สำหรับผู้ใช้ปัจจุบันเท่านั้น {}</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3196" />
+      <location filename="../plus/schedule.py" line="3199" />
       <source>List only items scheduled for the current machine {}</source>
       <translation>แสดงเฉพาะรายการที่กำหนดไว้สำหรับเครื่องปัจจุบันเท่านั้น {}</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3885" />
+      <location filename="../plus/schedule.py" line="3888" />
       <source>Schedule empty!{}Plan your schedule on {}</source>
       <translation>กำหนดการว่างเปล่า!{}วางแผนกำหนดการของคุณในวันที่ {}</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3893" />
+      <location filename="../plus/schedule.py" line="3896" />
       <source>Nothing scheduled for you today!{}Deactivate filters to see all items.</source>
       <translation>วันนี้ไม่มีกำหนดการสำหรับคุณ!{}ปิดใช้งานตัวกรองเพื่อดูรายการทั้งหมด</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3943" />
+      <location filename="../plus/schedule.py" line="3946" />
       <source>nothing to weight</source>
       <translation>ไม่มีอะไรให้น้ำหนัก</translation>
     </message>
@@ -17777,7 +17777,7 @@ Profile missing [CHARGE] or [DROP]</source>
   <context>
     <name>Scope Title</name>
     <message>
-      <location filename="../plus/schedule.py" line="2840" />
+      <location filename="../plus/schedule.py" line="2843" />
       <location filename="../artisanlib/canvas.py" line="8849" />
       <location filename="../artisanlib/canvas.py" line="7732" />
       <location filename="../artisanlib/canvas.py" line="1242" />
