@@ -36,12 +36,13 @@ v3.2.1
   - updates libs (scipy, bleak, lxml, pillow)
   - expands automatic test coverage
   - graph updates immediately when smoothing value changes
-  - eliminates the term 'slave' from the whole project. The term is still used by small compatibility layer to be remove in one of the next versions.
+  - eliminates the term 'slave' from the whole project, but for a small compatibility layer to be remove in one of the next versions
   - updates MPL default font selection for Asian and Arabic languages under Windows
-  - batch counter is now active by default after first installation or a factory reset
+  - the batch counter and autosave mechanisms are now active by default after first installation or a factory reset
   - the configuration for taking ambient temperature from a data curve moved from the Roast Properties dialog to the Devices configuration dialog and configurations for taking ambient humidity and ambient pressure from curve data have been added ([Issue #586](../../../issues/586) and [PR #1882](../../../pull/1882))
   - ensures that the default file suffixes on file save are applied ([PR #1965](../../../pull/1965)). Thanks [Scott](https://github.com/scottjames)!
   - activates large PID LCDs for internal software PID and external TC4/MODBUS/S7 PIDs
+  - the scheduler indicates now significant changes to the current schedule as received from [artisan.aplus](https://artisan.aplus), which have to be acknowledged by the user
 
 * FIXES
   - fixes regression which broke the designer such that points could not be moved ([Discussion #1905](../../../discussions/1905) and [Issue #1916](../../../issues/1916))

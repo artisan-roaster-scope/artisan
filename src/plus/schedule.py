@@ -38,13 +38,13 @@ from uuid import UUID
 try:
     from PyQt6.QtCore import (QRect, Qt, QMimeData, QSettings, pyqtSlot, pyqtSignal, QPoint, QPointF, QLocale, QDate, QDateTime, QSemaphore, QTimer) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtGui import (QDrag, QPixmap, QPainter, QTextLayout, QTextLine, QColor, QFontMetrics, QCursor, QAction, QIcon) # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtWidgets import (QMessageBox, QStackedWidget, QApplication, QWidget, QVBoxLayout, QHBoxLayout, QFrame, QTabWidget,  # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtWidgets import (QDialogButtonBox, QMessageBox, QStackedWidget, QApplication, QWidget, QVBoxLayout, QHBoxLayout, QFrame, QTabWidget,  # @UnusedImport @Reimport  @UnresolvedImport
             QCheckBox, QGroupBox, QScrollArea, QLabel, QSizePolicy,  # @UnusedImport @Reimport  @UnresolvedImport
             QGraphicsDropShadowEffect, QPlainTextEdit, QLineEdit, QMenu, QStatusBar, QToolButton)  # @UnusedImport @Reimport  @UnresolvedImport
 except ImportError:
     from PyQt5.QtCore import (QRect, Qt, QMimeData, QSettings, pyqtSlot, pyqtSignal, QPoint, QPointF, QLocale, QDate, QDateTime, QSemaphore, QTimer) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import (QDrag, QPixmap, QPainter, QTextLayout, QTextLine, QColor, QFontMetrics, QCursor, QIcon) # type: ignore # @UnusedImport @Reimport @UnresolvedImport
-    from PyQt5.QtWidgets import (QMessageBox, QStackedWidget, QApplication, QWidget, QVBoxLayout, QHBoxLayout, QFrame, QTabWidget, # type: ignore # @UnusedImport @Reimport @UnresolvedImport
+    from PyQt5.QtWidgets import (QDialogButtonBox, QMessageBox, QStackedWidget, QApplication, QWidget, QVBoxLayout, QHBoxLayout, QFrame, QTabWidget, # type: ignore # @UnusedImport @Reimport @UnresolvedImport
             QCheckBox, QGroupBox, QScrollArea, QLabel, QSizePolicy, QAction,  # @UnusedImport @Reimport @UnresolvedImport
             QGraphicsDropShadowEffect, QPlainTextEdit, QLineEdit, QMenu, QStatusBar, QToolButton)  # @UnusedImport @Reimport  @UnresolvedImport
 
@@ -2141,10 +2141,6 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.completed_message_widget = QWidget()
         self.completed_message_widget.setLayout(completed_message_layout)
 
-        self.completed_stacked_widget = QStackedWidget()
-        self.completed_stacked_widget.addWidget(self.completed_splitter)
-        self.completed_stacked_widget.addWidget(self.completed_message_widget)
-
         self.sync_button = QToolButton()
         self.sync_button.setToolTip(QApplication.translate('Tooltip','Update schedule'))
         if self.aw.app.darkmode:
@@ -2175,19 +2171,49 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         remaining_splitter_layout.setContentsMargins(0, 0, 0, 0) # left, top, right, bottom
         remaining_splitter_layout.setSpacing(0)
 
-        remaining_splitter_layout_widget = QWidget()
-        remaining_splitter_layout_widget.setLayout(remaining_splitter_layout)
+        self.remaining_splitter_layout_widget = QWidget()
+        self.remaining_splitter_layout_widget.setLayout(remaining_splitter_layout)
 
+        update_conf_message = QLabel(f"<b>{QApplication.translate('Plus', 'Schedule Updated!')}</b>")
+        update_conf_message.setTextFormat(Qt.TextFormat.RichText)
+        update_conf_message.setWordWrap(True)
+
+        update_conf_message_layout = QHBoxLayout()
+        update_conf_message_layout.addStretch()
+        update_conf_message_layout.addWidget(update_conf_message)
+        update_conf_message_layout.addStretch()
+
+        self.update_conf_button = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok)
+        self.update_conf_button.setCenterButtons(True)
+        self.update_conf_button.accepted.connect(self.accept_updated_schedule)
+
+        update_conf_layout = QVBoxLayout()
+        update_conf_layout.addStretch()
+        update_conf_layout.addLayout(update_conf_message_layout)
+        update_conf_layout.addWidget(self.update_conf_button)
+        update_conf_layout.addStretch()
+        update_conf_layout.setContentsMargins(15, 15, 15, 15) # left, top, right, bottom
+
+        self.update_confirmation_widget = QWidget()
+        self.update_confirmation_widget.setLayout(update_conf_layout)
+
+        self.open_stacked_widget = QStackedWidget()
+        self.open_stacked_widget.addWidget(self.remaining_splitter_layout_widget)
+        self.open_stacked_widget.addWidget(self.update_confirmation_widget)
+
+        self.completed_stacked_widget = QStackedWidget()
+        self.completed_stacked_widget.addWidget(self.completed_splitter)
+        self.completed_stacked_widget.addWidget(self.completed_message_widget)
 
 #####
 
         self.TabWidget = QTabWidget()
-        self.TabWidget.addTab(remaining_splitter_layout_widget, QApplication.translate('Tab', 'To-Do'))
+        self.TabWidget.addTab(self.open_stacked_widget, QApplication.translate('Tab', 'To-Do'))
         self.TabWidget.addTab(self.completed_stacked_widget, QApplication.translate('Tab', 'Completed'))
         self.TabWidget.setStyleSheet(tooltip_style)
 
         self.task_type = QLabel()
-        self.task_position = QLabel('2/5')
+        self.task_position = QLabel()
         self.task_weight = ClickableQLabel()
         self.task_title = QElidedLabel(mode = Qt.TextElideMode.ElideRight)
 
@@ -2336,6 +2362,13 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.completed_splitter.splitterMoved.connect(self.completedSplitterMoved)
 
         self.aw.sendmessage(QApplication.translate('Message','Scheduler started'))
+
+    @pyqtSlot()
+    def accept_updated_schedule(self) -> None:
+        self.open_stacked_widget.setCurrentWidget(self.remaining_splitter_layout_widget)
+
+    def show_updated_widget(self) -> None:
+        self.open_stacked_widget.setCurrentWidget(self.update_confirmation_widget)
 
     @staticmethod
     @pyqtSlot(bool)
@@ -2702,6 +2735,35 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.aw.sendmessage(QApplication.translate('Message','Scheduler stopped'))
         self.accept()
 
+    # returns True if the (visible filtered) schedule changed significantly by the updated new_schedule vs the previous old_schedule such that the
+    # user has to be informed
+    def schedule_changed_significantly(self, old_schedule:List[ScheduledItem], new_schedule:List[plus.stock.ScheduledItem]) -> bool:
+        today:datetime.date = datetime.datetime.now(datetime.timezone.utc).astimezone().date()
+        for item in filter(lambda x: self.aw.scheduledItemsfilter(today, x, is_hidden(x)), old_schedule):
+            nitem = next((x for x in new_schedule if x.get('_id', None) == item.id), None)
+            if nitem is not None:
+                try:
+                    new_item = ScheduledItem.model_validate(nitem)
+                    # the item exists in the new schedule
+                    # check if there is a change in any of the significant attributes
+                    if new_item is not None and (new_item.title != item.title or
+                                new_item.date != item.date or
+                                new_item.count != item.count or
+                                new_item.coffee != item.coffee or
+                                new_item.blend != item.blend or
+                                new_item.store != item.store or
+                                new_item.weight != item.weight or
+                                new_item.user != item.user or
+                                new_item.machine != item.machine or
+                                # only if not all roasts in updated schedule item are already "known" by the existing item the count can change
+                                not new_item.roasts.issubset(item.roasts)):
+                            # changes in the SchedulleItem attributes date, nickname, note, template or loss do not trigger a user warning as those are not considered significant
+                        return True
+                except Exception:   # pylint: disable=broad-except
+                    # validation error
+                    return True
+        return False
+
     # updates the current schedule items by joining its roast with those received as part of a stock update from the server
     # adding new items at the end
     def updateScheduledItems(self) -> None:
@@ -2709,7 +2771,10 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         # remove outdated items which remained in the open app from yesterday
         current_schedule:List[ScheduledItem] = [si for si in self.scheduled_items if (si.date - today).days >= 0]
         plus.stock.init()
-        schedule:List[plus.stock.ScheduledItem] = plus.stock.getSchedule()
+        schedule:List[plus.stock.ScheduledItem] = plus.stock.getSchedule() # the new just received schedule
+        get_total_roasting_time_and_title.cache_clear() # clear roasting time/title cache as the templates might have changed or one got removed (not detected by the changed_significantly predicate below
+        if self.schedule_changed_significantly(self.scheduled_items, schedule):
+            self.show_updated_widget()
         _log.debug('schedule: %s',schedule)
         # sort current schedule by order cache (if any)
         if self.aw.scheduled_items_uuids != []:
@@ -2725,7 +2790,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
             self.aw.scheduled_items_uuids = []
             # schedule now only contains items received from the server (in local order)
         else:
-            # remove items from current_schedule that are not in schedule
+            # remove items from current_schedule that are not in (new) schedule
             current_schedule = [si for si in current_schedule if next((s for s in schedule if '_id' in s and s['_id'] == si.id), None) is not None]
         # iterate over new schedule
         for s in schedule:
