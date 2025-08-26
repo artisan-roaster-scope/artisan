@@ -209,10 +209,10 @@ class PID:
             return False
 
         avg_recent_change = sum(recent_changes) / len(recent_changes)
-        current_change = abs(current_input - self.measurement_history[-1])
+        current_change = abs(current_input - self.measurement_history[-2]) # index needs to be -2 as the item at -1 is equal to current_input
 
         # Detect if current change is significantly larger than recent average
-        return current_change > 3.0 * avg_recent_change and current_change > 1.0
+        return current_change > 2.5 * avg_recent_change and current_change > 1.0
 
     def _calculate_derivative_on_measurement(self, current_input: float, dt: float) -> float:
         """Calculate derivative term using derivative-on-measurement with enhanced kick prevention."""
@@ -233,7 +233,7 @@ class PID:
 
         # Reduce derivative action if measurement discontinuity is detected
         if self._detect_measurement_discontinuity(current_input):
-            dtinput *= 0.3  # Reduce derivative action by 70%
+            dtinput *= 0.2  # Reduce derivative action by 80%
 
         return -self.Kd * dtinput
 
@@ -423,7 +423,7 @@ class PID:
                 # Apply back-calculation to adjust integral term if output was clamped
                 self._back_calculate_integral(output_before_clamp, output)
 
-                #                _log.debug('P: %s, I: %s, D: %s => output: %s', self.Pterm, self.Iterm, D, output)
+                # _log.debug('P: %s, I: %s, D: %s => output: %s', self.Pterm, self.Iterm, D, output)
 
                 int_output = int(round(min(float(self.dutyMax), max(float(self.dutyMin), output))))
                 if (

@@ -180,6 +180,26 @@
   <context>
     <name>Button</name>
     <message>
+      <location filename="../artisanlib/dialogs.py" line="614" />
+      <location filename="../artisanlib/dialogs.py" line="94" />
+      <location filename="../artisanlib/comm.py" line="205" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2454" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1583" />
+      <location filename="../artisanlib/pid_dialogs.py" line="708" />
+      <location filename="../plus/login.py" line="100" />
+      <source>OK</source>
+      <translation>Okay</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/dialogs.py" line="615" />
+      <location filename="../artisanlib/dialogs.py" line="95" />
+      <location filename="../artisanlib/comm.py" line="206" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2742" />
+      <location filename="../plus/login.py" line="105" />
+      <source>Cancel</source>
+      <translation>Afbestille</translation>
+    </message>
+    <message>
       <location filename="../artisanlib/colors.py" line="574" />
       <location filename="../artisanlib/designer.py" line="252" />
       <location filename="../artisanlib/phases.py" line="123" />
@@ -299,17 +319,6 @@
       <location filename="../artisanlib/pid_dialogs.py" line="688" />
       <source>Save</source>
       <translation>Gemme</translation>
-    </message>
-    <message>
-      <location filename="../plus/login.py" line="100" />
-      <location filename="../artisanlib/dialogs.py" line="614" />
-      <location filename="../artisanlib/dialogs.py" line="94" />
-      <location filename="../artisanlib/comm.py" line="205" />
-      <location filename="../artisanlib/pid_dialogs.py" line="2454" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1583" />
-      <location filename="../artisanlib/pid_dialogs.py" line="708" />
-      <source>OK</source>
-      <translation>Okay</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="710" />
@@ -522,15 +531,6 @@
       <location filename="../artisanlib/pid_dialogs.py" line="2736" />
       <source>Write PIDs</source>
       <translation>Skriv PID'er</translation>
-    </message>
-    <message>
-      <location filename="../plus/login.py" line="105" />
-      <location filename="../artisanlib/dialogs.py" line="615" />
-      <location filename="../artisanlib/dialogs.py" line="95" />
-      <location filename="../artisanlib/comm.py" line="206" />
-      <location filename="../artisanlib/pid_dialogs.py" line="2742" />
-      <source>Cancel</source>
-      <translation>Afbestille</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="2810" />
@@ -1127,6 +1127,17 @@ ENDE</translation>
   <context>
     <name>CheckBox</name>
     <message>
+      <location filename="../artisanlib/curves.py" line="1029" />
+      <location filename="../artisanlib/curves.py" line="940" />
+      <location filename="../artisanlib/curves.py" line="934" />
+      <location filename="../artisanlib/curves.py" line="927" />
+      <location filename="../artisanlib/curves.py" line="912" />
+      <location filename="../artisanlib/background.py" line="68" />
+      <location filename="../plus/schedule.py" line="1472" />
+      <source>Show</source>
+      <translation>At vise</translation>
+    </message>
+    <message>
       <location filename="../artisanlib/axis.py" line="175" />
       <source>Expand</source>
       <translation>Udvide</translation>
@@ -1356,17 +1367,6 @@ ENDE</translation>
       <location filename="../artisanlib/ports.py" line="1365" />
       <source>OFF on DROP</source>
       <translation>FRA til DROP</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="1472" />
-      <location filename="../artisanlib/curves.py" line="1029" />
-      <location filename="../artisanlib/curves.py" line="940" />
-      <location filename="../artisanlib/curves.py" line="934" />
-      <location filename="../artisanlib/curves.py" line="927" />
-      <location filename="../artisanlib/curves.py" line="912" />
-      <location filename="../artisanlib/background.py" line="68" />
-      <source>Show</source>
-      <translation>At vise</translation>
     </message>
     <message>
       <location filename="../artisanlib/curves.py" line="405" />
@@ -2445,6 +2445,36 @@ ENDE</translation>
   <context>
     <name>Contextual Menu</name>
     <message>
+      <location filename="../plus/schedule.py" line="1445" />
+      <source>All batches prepared</source>
+      <translation>Alle partier forberedt</translation>
+    </message>
+    <message>
+      <location filename="../plus/schedule.py" line="1448" />
+      <source>One more batch prepared</source>
+      <translation>Endnu en portion klargjort</translation>
+    </message>
+    <message>
+      <location filename="../plus/schedule.py" line="1452" />
+      <source>One less batch prepared</source>
+      <translation>Én portion mindre tilberedt</translation>
+    </message>
+    <message>
+      <location filename="../plus/schedule.py" line="1455" />
+      <source>No batch prepared</source>
+      <translation>Ingen batch forberedt</translation>
+    </message>
+    <message>
+      <location filename="../plus/schedule.py" line="1468" />
+      <source>Register roast</source>
+      <translation>Registrer stege</translation>
+    </message>
+    <message>
+      <location filename="../plus/schedule.py" line="1476" />
+      <source>Hide</source>
+      <translation>Skjule</translation>
+    </message>
+    <message>
       <location filename="../artisanlib/canvas.py" line="17813" />
       <source>Add point</source>
       <translation>Tilføj punkt</translation>
@@ -2488,36 +2518,6 @@ ENDE</translation>
       <location filename="../artisanlib/canvas.py" line="18623" />
       <source>Edit</source>
       <translation>Redigere</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="1445" />
-      <source>All batches prepared</source>
-      <translation>Alle partier forberedt</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="1448" />
-      <source>One more batch prepared</source>
-      <translation>Endnu en portion klargjort</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="1452" />
-      <source>One less batch prepared</source>
-      <translation>Én portion mindre tilberedt</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="1455" />
-      <source>No batch prepared</source>
-      <translation>Ingen batch forberedt</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="1468" />
-      <source>Register roast</source>
-      <translation>Registrer stege</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="1476" />
-      <source>Hide</source>
-      <translation>Skjule</translation>
     </message>
   </context>
   <context>
@@ -4500,6 +4500,12 @@ ENDE</translation>
   <context>
     <name>Form Caption</name>
     <message>
+      <location filename="../artisanlib/roast_properties.py" line="1732" />
+      <location filename="../plus/blend.py" line="159" />
+      <source>Custom Blend</source>
+      <translation>Brugerdefineret blanding</translation>
+    </message>
+    <message>
       <location filename="../artisanlib/axis.py" line="77" />
       <source>Axes</source>
       <translation>Akser</translation>
@@ -4656,12 +4662,6 @@ ENDE</translation>
       <location filename="../artisanlib/roast_properties.py" line="556" />
       <source>Roast Properties</source>
       <translation>Stegt egenskaber</translation>
-    </message>
-    <message>
-      <location filename="../plus/blend.py" line="159" />
-      <location filename="../artisanlib/roast_properties.py" line="1732" />
-      <source>Custom Blend</source>
-      <translation>Brugerdefineret blanding</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="4119" />
@@ -11260,6 +11260,105 @@ Brug af matematiske formler i plotteren giver også mulighed for at bruge de sym
   <context>
     <name>Label</name>
     <message>
+      <location filename="../artisanlib/canvas.py" line="11831" />
+      <location filename="../artisanlib/large_lcds.py" line="837" />
+      <location filename="../artisanlib/roast_properties.py" line="900" />
+      <location filename="../artisanlib/roast_properties.py" line="227" />
+      <location filename="../artisanlib/roast_properties.py" line="154" />
+      <location filename="../plus/schedule.py" line="1932" />
+      <location filename="../plus/blend.py" line="186" />
+      <source>Weight</source>
+      <translation>Vægt</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/statistics.py" line="209" />
+      <location filename="../artisanlib/roast_properties.py" line="1087" />
+      <location filename="../artisanlib/roast_properties.py" line="890" />
+      <location filename="../plus/blend.py" line="365" />
+      <source>Beans</source>
+      <translation>Bønner</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/statistics.py" line="238" />
+      <location filename="../artisanlib/roast_properties.py" line="1688" />
+      <location filename="../plus/schedule.py" line="1954" />
+      <source>Yield</source>
+      <translation>Udbytte</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/main.py" line="23162" />
+      <location filename="../artisanlib/roast_properties.py" line="1687" />
+      <location filename="../plus/schedule.py" line="1964" />
+      <source>Defects</source>
+      <translation>Defekter</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/canvas.py" line="11775" />
+      <location filename="../artisanlib/roast_properties.py" line="991" />
+      <location filename="../plus/schedule.py" line="1974" />
+      <source>Density</source>
+      <translation>Massefylde</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/roast_properties.py" line="1062" />
+      <location filename="../artisanlib/events.py" line="459" />
+      <location filename="../plus/schedule.py" line="1984" />
+      <source>Color</source>
+      <translation>Farve</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/canvas.py" line="11780" />
+      <location filename="../artisanlib/roast_properties.py" line="1099" />
+      <location filename="../plus/schedule.py" line="1994" />
+      <source>Moisture</source>
+      <translation>Fugtighed</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/statistics.py" line="220" />
+      <location filename="../artisanlib/roast_properties.py" line="1173" />
+      <location filename="../plus/schedule.py" line="2005" />
+      <location filename="../plus/schedule.py" line="2004" />
+      <source>Roasting Notes</source>
+      <translation>Stegt noter</translation>
+    </message>
+    <message>
+      <location filename="../plus/schedule.py" line="2009" />
+      <source>Score</source>
+      <translation />
+    </message>
+    <message>
+      <location filename="../artisanlib/statistics.py" line="221" />
+      <location filename="../plus/schedule.py" line="2010" />
+      <source>Cupping Score</source>
+      <translation>Cupping-score</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/statistics.py" line="222" />
+      <location filename="../artisanlib/roast_properties.py" line="1178" />
+      <location filename="../plus/schedule.py" line="2017" />
+      <location filename="../plus/schedule.py" line="2016" />
+      <source>Cupping Notes</source>
+      <translation>Cupping-noter</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/roast_properties.py" line="899" />
+      <location filename="../artisanlib/roast_properties.py" line="285" />
+      <location filename="../plus/schedule.py" line="3958" />
+      <location filename="../plus/schedule.py" line="2105" />
+      <source>Roasted</source>
+      <translation>Ristede</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/canvas.py" line="11831" />
+      <location filename="../artisanlib/canvas.py" line="11780" />
+      <location filename="../artisanlib/canvas.py" line="11775" />
+      <location filename="../artisanlib/roast_properties.py" line="898" />
+      <location filename="../artisanlib/roast_properties.py" line="212" />
+      <location filename="../plus/schedule.py" line="3956" />
+      <source>Green</source>
+      <translation>Grøn</translation>
+    </message>
+    <message>
       <location filename="../artisanlib/events.py" line="3715" />
       <location filename="../artisanlib/events.py" line="1015" />
       <location filename="../artisanlib/events.py" line="757" />
@@ -11929,13 +12028,6 @@ Brug af matematiske formler i plotteren giver også mulighed for at bruge de sym
       <translation>Markører</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="1984" />
-      <location filename="../artisanlib/roast_properties.py" line="1062" />
-      <location filename="../artisanlib/events.py" line="459" />
-      <source>Color</source>
-      <translation>Farve</translation>
-    </message>
-    <message>
       <location filename="../artisanlib/events.py" line="461" />
       <source>Text Color</source>
       <translation>Tekstfarve</translation>
@@ -12412,40 +12504,11 @@ Brug af matematiske formler i plotteren giver også mulighed for at bruge de sym
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="1932" />
-      <location filename="../plus/blend.py" line="186" />
-      <location filename="../artisanlib/canvas.py" line="11831" />
-      <location filename="../artisanlib/large_lcds.py" line="837" />
-      <location filename="../artisanlib/roast_properties.py" line="900" />
-      <location filename="../artisanlib/roast_properties.py" line="227" />
-      <location filename="../artisanlib/roast_properties.py" line="154" />
-      <source>Weight</source>
-      <translation>Vægt</translation>
-    </message>
-    <message>
       <location filename="../artisanlib/roast_properties.py" line="960" />
       <location filename="../artisanlib/roast_properties.py" line="242" />
       <location filename="../artisanlib/roast_properties.py" line="169" />
       <source>Volume</source>
       <translation>Bind</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="3956" />
-      <location filename="../artisanlib/canvas.py" line="11831" />
-      <location filename="../artisanlib/canvas.py" line="11780" />
-      <location filename="../artisanlib/canvas.py" line="11775" />
-      <location filename="../artisanlib/roast_properties.py" line="898" />
-      <location filename="../artisanlib/roast_properties.py" line="212" />
-      <source>Green</source>
-      <translation>Grøn</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="3958" />
-      <location filename="../plus/schedule.py" line="2105" />
-      <location filename="../artisanlib/roast_properties.py" line="899" />
-      <location filename="../artisanlib/roast_properties.py" line="285" />
-      <source>Roasted</source>
-      <translation>Ristede</translation>
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="4005" />
@@ -12503,21 +12566,6 @@ Brug af matematiske formler i plotteren giver også mulighed for at bruge de sym
       <translation>Parti</translation>
     </message>
     <message>
-      <location filename="../plus/blend.py" line="365" />
-      <location filename="../artisanlib/statistics.py" line="209" />
-      <location filename="../artisanlib/roast_properties.py" line="1087" />
-      <location filename="../artisanlib/roast_properties.py" line="890" />
-      <source>Beans</source>
-      <translation>Bønner</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="1974" />
-      <location filename="../artisanlib/canvas.py" line="11775" />
-      <location filename="../artisanlib/roast_properties.py" line="991" />
-      <source>Density</source>
-      <translation>Massefylde</translation>
-    </message>
-    <message>
       <location filename="../artisanlib/roast_properties.py" line="1044" />
       <source>Screen</source>
       <translation>Skærm</translation>
@@ -12533,13 +12581,6 @@ Brug af matematiske formler i plotteren giver også mulighed for at bruge de sym
       <translation>Jord</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="1994" />
-      <location filename="../artisanlib/canvas.py" line="11780" />
-      <location filename="../artisanlib/roast_properties.py" line="1099" />
-      <source>Moisture</source>
-      <translation>Fugtighed</translation>
-    </message>
-    <message>
       <location filename="../artisanlib/roast_properties.py" line="1127" />
       <location filename="../artisanlib/roast_properties.py" line="1100" />
       <source>%</source>
@@ -12549,22 +12590,6 @@ Brug af matematiske formler i plotteren giver også mulighed for at bruge de sym
       <location filename="../artisanlib/roast_properties.py" line="1125" />
       <source>Ambient Conditions</source>
       <translation>Omgivelsesbetingelser</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="2005" />
-      <location filename="../plus/schedule.py" line="2004" />
-      <location filename="../artisanlib/statistics.py" line="220" />
-      <location filename="../artisanlib/roast_properties.py" line="1173" />
-      <source>Roasting Notes</source>
-      <translation>Stegt noter</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="2017" />
-      <location filename="../plus/schedule.py" line="2016" />
-      <location filename="../artisanlib/statistics.py" line="222" />
-      <location filename="../artisanlib/roast_properties.py" line="1178" />
-      <source>Cupping Notes</source>
-      <translation>Cupping-noter</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="1342" />
@@ -12580,20 +12605,6 @@ Brug af matematiske formler i plotteren giver også mulighed for at bruge de sym
       <location filename="../artisanlib/roast_properties.py" line="1344" />
       <source>Blend</source>
       <translation>Blanding</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="1964" />
-      <location filename="../artisanlib/main.py" line="23162" />
-      <location filename="../artisanlib/roast_properties.py" line="1687" />
-      <source>Defects</source>
-      <translation>Defekter</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="1954" />
-      <location filename="../artisanlib/statistics.py" line="238" />
-      <location filename="../artisanlib/roast_properties.py" line="1688" />
-      <source>Yield</source>
-      <translation>Udbytte</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="1898" />
@@ -13079,12 +13090,6 @@ LCD-skærme alle</translation>
       <location filename="../artisanlib/statistics.py" line="207" />
       <source>Roaster</source>
       <translation>Rister</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="2010" />
-      <location filename="../artisanlib/statistics.py" line="221" />
-      <source>Cupping Score</source>
-      <translation>Cupping-score</translation>
     </message>
     <message>
       <location filename="../artisanlib/statistics.py" line="235" />
@@ -14000,11 +14005,6 @@ LCD-skærme alle</translation>
       <source>Aspect Ratio</source>
       <translation>Billedformat</translation>
     </message>
-    <message>
-      <location filename="../plus/schedule.py" line="2009" />
-      <source>Score</source>
-      <translation />
-    </message>
   </context>
   <context>
     <name>MAC_APPLICATION_MENU</name>
@@ -14102,6 +14102,12 @@ LCD-skærme alle</translation>
   </context>
   <context>
     <name>Menu</name>
+    <message>
+      <location filename="../artisanlib/main.py" line="2744" />
+      <location filename="../plus/schedule.py" line="2310" />
+      <source>Schedule</source>
+      <translation>Plan</translation>
+    </message>
     <message>
       <location filename="../artisanlib/main.py" line="2053" />
       <location filename="../artisanlib/pid_dialogs.py" line="545" />
@@ -14605,12 +14611,6 @@ LCD-skærme alle</translation>
       <translation>Glidere</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="2310" />
-      <location filename="../artisanlib/main.py" line="2744" />
-      <source>Schedule</source>
-      <translation>Plan</translation>
-    </message>
-    <message>
       <location filename="../artisanlib/main.py" line="2795" />
       <source>Full Screen</source>
       <translation>Fuld skærm</translation>
@@ -14690,6 +14690,62 @@ LCD-skærme alle</translation>
   </context>
   <context>
     <name>Message</name>
+    <message>
+      <location filename="../plus/schedule.py" line="1413" />
+      <source>Register the currently loaded roast profile&lt;br&gt;in the selected entry.&lt;br&gt;This will overwrite some roast properties.</source>
+      <translation>Registrer den aktuelt indlæste stegeprofil&lt;br&gt;i den valgte post.&lt;br&gt;Dette vil overskrive nogle stegeegenskaber.</translation>
+    </message>
+    <message>
+      <location filename="../plus/schedule.py" line="1427" />
+      <location filename="../plus/schedule.py" line="1418" />
+      <source>Register Roast</source>
+      <translation>Registrer Steg</translation>
+    </message>
+    <message>
+      <location filename="../plus/schedule.py" line="2364" />
+      <source>Scheduler started</source>
+      <translation>Planlægger startede</translation>
+    </message>
+    <message>
+      <location filename="../plus/schedule.py" line="2673" />
+      <source>Roasts will not adjust the schedule&lt;br&gt;while the schedule window is closed</source>
+      <translation>Stege vil ikke justere tidsplanen&lt;br&gt;mens tidsplanvinduet er lukket</translation>
+    </message>
+    <message>
+      <location filename="../plus/schedule.py" line="2687" />
+      <location filename="../plus/schedule.py" line="2678" />
+      <source>Close Scheduler</source>
+      <translation>Luk Scheduler</translation>
+    </message>
+    <message>
+      <location filename="../plus/schedule.py" line="2735" />
+      <source>Scheduler stopped</source>
+      <translation>Planlægger stoppet</translation>
+    </message>
+    <message>
+      <location filename="../plus/schedule.py" line="3649" />
+      <location filename="../plus/schedule.py" line="3131" />
+      <source>1 batch</source>
+      <translation>1 portion</translation>
+    </message>
+    <message>
+      <location filename="../plus/schedule.py" line="3664" />
+      <location filename="../plus/schedule.py" line="3655" />
+      <location filename="../plus/schedule.py" line="3139" />
+      <location filename="../plus/schedule.py" line="3133" />
+      <source>{} batches</source>
+      <translation>{} partier</translation>
+    </message>
+    <message>
+      <location filename="../plus/schedule.py" line="3477" />
+      <source>Updating completed roast properties failed</source>
+      <translation>Opdatering af færdige stegeegenskaber mislykkedes</translation>
+    </message>
+    <message>
+      <location filename="../plus/schedule.py" line="3543" />
+      <source>Fetching completed roast properties failed</source>
+      <translation>Hentning af færdige stegeegenskaber mislykkedes</translation>
+    </message>
     <message>
       <location filename="../artisanlib/axis.py" line="910" />
       <source>xlimit = ({2},{3}) ylimit = ({0},{1}) zlimit = ({4},{5})</source>
@@ -17350,62 +17406,6 @@ Profil mangler [CHARGE] eller [DROP]</translation>
       <translation>Baggrundsprofil blev ikke fundet</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="1413" />
-      <source>Register the currently loaded roast profile&lt;br&gt;in the selected entry.&lt;br&gt;This will overwrite some roast properties.</source>
-      <translation>Registrer den aktuelt indlæste stegeprofil&lt;br&gt;i den valgte post.&lt;br&gt;Dette vil overskrive nogle stegeegenskaber.</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="1427" />
-      <location filename="../plus/schedule.py" line="1418" />
-      <source>Register Roast</source>
-      <translation>Registrer Steg</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="2364" />
-      <source>Scheduler started</source>
-      <translation>Planlægger startede</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="2673" />
-      <source>Roasts will not adjust the schedule&lt;br&gt;while the schedule window is closed</source>
-      <translation>Stege vil ikke justere tidsplanen&lt;br&gt;mens tidsplanvinduet er lukket</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="2687" />
-      <location filename="../plus/schedule.py" line="2678" />
-      <source>Close Scheduler</source>
-      <translation>Luk Scheduler</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="2735" />
-      <source>Scheduler stopped</source>
-      <translation>Planlægger stoppet</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="3649" />
-      <location filename="../plus/schedule.py" line="3131" />
-      <source>1 batch</source>
-      <translation>1 portion</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="3664" />
-      <location filename="../plus/schedule.py" line="3655" />
-      <location filename="../plus/schedule.py" line="3139" />
-      <location filename="../plus/schedule.py" line="3133" />
-      <source>{} batches</source>
-      <translation>{} partier</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="3477" />
-      <source>Updating completed roast properties failed</source>
-      <translation>Opdatering af færdige stegeegenskaber mislykkedes</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="3543" />
-      <source>Fetching completed roast properties failed</source>
-      <translation>Hentning af færdige stegeegenskaber mislykkedes</translation>
-    </message>
-    <message>
       <source>Bluetooth scale cannot be connected while permission for Artisan to access Bluetooth is denied</source>
       <translation type="vanished">Bluetooth-vægten kan ikke tilsluttes, mens tilladelse til, at Artisan får adgang til Bluetooth, nægtes</translation>
     </message>
@@ -17416,51 +17416,6 @@ Profil mangler [CHARGE] eller [DROP]</translation>
   </context>
   <context>
     <name>Plus</name>
-    <message>
-      <location filename="../artisanlib/main.py" line="1231" />
-      <source>debug logging ON</source>
-      <translation>fejlretning logning TIL</translation>
-    </message>
-    <message>
-      <location filename="../artisanlib/main.py" line="1232" />
-      <source>debug logging OFF</source>
-      <translation>fejlretning logning FRA</translation>
-    </message>
-    <message>
-      <location filename="../artisanlib/main.py" line="1245" />
-      <source>1 day left</source>
-      <translation>1 dag tilbage</translation>
-    </message>
-    <message>
-      <location filename="../artisanlib/main.py" line="1247" />
-      <source>{} days left</source>
-      <translation>{} dage tilbage</translation>
-    </message>
-    <message>
-      <location filename="../artisanlib/main.py" line="1249" />
-      <source>Paid until</source>
-      <translation>Betalt indtil</translation>
-    </message>
-    <message>
-      <location filename="../artisanlib/main.py" line="1276" />
-      <source>Please visit our {0}shop{1} to extend your subscription</source>
-      <translation>Besøg vores {0} butik {1} for at udvide dit abonnement</translation>
-    </message>
-    <message>
-      <location filename="../artisanlib/main.py" line="1289" />
-      <source>Do you want to extend your subscription?</source>
-      <translation>Vil du forlænge dit abonnement?</translation>
-    </message>
-    <message>
-      <location filename="../artisanlib/main.py" line="1290" />
-      <source>Your subscription ends on</source>
-      <translation>Dit abonnement slutter d</translation>
-    </message>
-    <message>
-      <location filename="../artisanlib/main.py" line="1290" />
-      <source>Your subscription ended on</source>
-      <translation>Dit abonnement sluttede d</translation>
-    </message>
     <message>
       <location filename="../plus/queue.py" line="145" />
       <source>Roast successfully uploaded to {}</source>
@@ -17680,6 +17635,51 @@ Profil mangler [CHARGE] eller [DROP]</translation>
       <source>Remember</source>
       <translation>Husk</translation>
     </message>
+    <message>
+      <location filename="../artisanlib/main.py" line="1231" />
+      <source>debug logging ON</source>
+      <translation>fejlretning logning TIL</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/main.py" line="1232" />
+      <source>debug logging OFF</source>
+      <translation>fejlretning logning FRA</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/main.py" line="1245" />
+      <source>1 day left</source>
+      <translation>1 dag tilbage</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/main.py" line="1247" />
+      <source>{} days left</source>
+      <translation>{} dage tilbage</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/main.py" line="1249" />
+      <source>Paid until</source>
+      <translation>Betalt indtil</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/main.py" line="1276" />
+      <source>Please visit our {0}shop{1} to extend your subscription</source>
+      <translation>Besøg vores {0} butik {1} for at udvide dit abonnement</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/main.py" line="1289" />
+      <source>Do you want to extend your subscription?</source>
+      <translation>Vil du forlænge dit abonnement?</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/main.py" line="1290" />
+      <source>Your subscription ends on</source>
+      <translation>Dit abonnement slutter d</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/main.py" line="1290" />
+      <source>Your subscription ended on</source>
+      <translation>Dit abonnement sluttede d</translation>
+    </message>
   </context>
   <context>
     <name>Radio Button</name>
@@ -17775,7 +17775,6 @@ Profil mangler [CHARGE] eller [DROP]</translation>
   <context>
     <name>Scope Title</name>
     <message>
-      <location filename="../plus/schedule.py" line="2843" />
       <location filename="../artisanlib/canvas.py" line="8849" />
       <location filename="../artisanlib/canvas.py" line="7732" />
       <location filename="../artisanlib/canvas.py" line="1242" />
@@ -17785,6 +17784,7 @@ Profil mangler [CHARGE] eller [DROP]</translation>
       <location filename="../artisanlib/roast_properties.py" line="2485" />
       <location filename="../artisanlib/roast_properties.py" line="2138" />
       <location filename="../artisanlib/roast_properties.py" line="2125" />
+      <location filename="../plus/schedule.py" line="2843" />
       <source>Roaster Scope</source>
       <translation type="unfinished" />
     </message>
@@ -18157,6 +18157,16 @@ Profil mangler [CHARGE] eller [DROP]</translation>
   <context>
     <name>Tab</name>
     <message>
+      <location filename="../plus/schedule.py" line="2211" />
+      <source>To-Do</source>
+      <translation>At gøre</translation>
+    </message>
+    <message>
+      <location filename="../plus/schedule.py" line="2212" />
+      <source>Completed</source>
+      <translation>Afsluttet</translation>
+    </message>
+    <message>
       <location filename="../artisanlib/pid_dialogs.py" line="2976" />
       <location filename="../artisanlib/pid_dialogs.py" line="1823" />
       <location filename="../artisanlib/pid_dialogs.py" line="733" />
@@ -18394,16 +18404,6 @@ Profil mangler [CHARGE] eller [DROP]</translation>
       <location filename="../artisanlib/colors.py" line="564" />
       <source>LCDs</source>
       <translation>LCD-skærme</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="2211" />
-      <source>To-Do</source>
-      <translation>At gøre</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="2212" />
-      <source>Completed</source>
-      <translation>Afsluttet</translation>
     </message>
     <message>
       <source>Color</source>
@@ -19153,6 +19153,11 @@ Profil mangler [CHARGE] eller [DROP]</translation>
   </context>
   <context>
     <name>Tooltip</name>
+    <message>
+      <location filename="../plus/schedule.py" line="2145" />
+      <source>Update schedule</source>
+      <translation>Opdater tidsplan</translation>
+    </message>
     <message>
       <location filename="../artisanlib/axis.py" line="90" />
       <source>100% event values in step mode are aligned with the given y-axis value or the lowest phases limit if left empty</source>
@@ -20733,11 +20738,6 @@ I øjeblikket i TEMP MODE</translation>
       <location filename="../artisanlib/colors.py" line="578" />
       <source>Sets button colors to grey scale and LCD colors to black and white</source>
       <translation>Indstiller knapfarver til gråskala og LCD-farver til sort og hvid</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="2145" />
-      <source>Update schedule</source>
-      <translation>Opdater tidsplan</translation>
     </message>
   </context>
 </TS>

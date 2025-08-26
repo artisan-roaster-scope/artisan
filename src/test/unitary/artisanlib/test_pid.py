@@ -1443,8 +1443,8 @@ class TestPIDDerivativeKickImprovements:
         derivative = pid._calculate_derivative_on_measurement(80.0, 1.0)
 
         # Normal would be: -1.0 * (80.0 - 50.0) / 1.0 = -30.0
-        # With discontinuity: -30.0 * 0.3 = -9.0
-        assert derivative == pytest.approx(-9.0, abs=1e-10)
+        # With discontinuity: -30.0 * 0.2 = -6.0
+        assert derivative == pytest.approx(-6.0, abs=1e-10)
 
     def test_derivative_limiting(self) -> None:
         """Test that derivative contribution is limited."""
