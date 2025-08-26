@@ -13180,7 +13180,7 @@ LCDs All</source>
     <message>
       <location filename="../artisanlib/large_lcds.py" line="842" />
       <source>Total</source>
-      <translation>全部的</translation>
+      <translation type="unfinished">总重量</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="903" />
@@ -14162,7 +14162,7 @@ LCDs All</source>
       <location filename="../artisanlib/main.py" line="2786" />
       <location filename="../artisanlib/large_lcds.py" line="830" />
       <source>Scale LCDs</source>
-      <translation>规模LCD</translation>
+      <translation type="unfinished">电子秤 LCD</translation>
     </message>
     <message>
       <location filename="../artisanlib/main.py" line="2050" />
@@ -19912,7 +19912,7 @@ has to be reduced by 4 times.</source>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="918" />
       <source>weight loss caused by roasting</source>
-      <translation>烘烤导致的体重减轻</translation>
+      <translation type="unfinished">烘培导致的重量减轻</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="926" />
@@ -20068,7 +20068,7 @@ has to be reduced by 4 times.</source>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="1168" />
       <source>weight measured by connected scale</source>
-      <translation>通过连接的秤测量体重</translation>
+      <translation type="unfinished">通过连接的电子秤称重</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="1170" />
@@ -20614,25 +20614,25 @@ Currently in TEMP MODE</source>
       <location filename="../artisanlib/devices.py" line="1627" />
       <location filename="../artisanlib/devices.py" line="1561" />
       <source>Choose the model of your scale</source>
-      <translation>选择您的体重秤型号</translation>
+      <translation type="unfinished">选择您的电子秤型号</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="1632" />
       <location filename="../artisanlib/devices.py" line="1566" />
       <source>Choose your scale</source>
-      <translation>选择您的规模</translation>
+      <translation type="unfinished">选择您的电子秤</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="1635" />
       <location filename="../artisanlib/devices.py" line="1569" />
       <source>Start scanning to discover your scale</source>
-      <translation>开始扫描以发现您的体重秤</translation>
+      <translation type="unfinished">开始扫描以发现您的电子秤</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="1639" />
       <location filename="../artisanlib/devices.py" line="1573" />
       <source>Rename your scale</source>
-      <translation>重命名您的体重秤</translation>
+      <translation type="unfinished">重命名您的电子秤</translation>
     </message>
     <message>
       <location filename="../artisanlib/devices.py" line="1646" />
