@@ -378,7 +378,9 @@ def is_full_roast_record(r: Dict[str, Any]) -> bool:  #for Python >= 3.9 can rep
 #      - date
 #      - amount
 #   an update only the roast_id
-def addRoast(roast_record:Optional[Dict[str, Any]] = None) -> None:
+# if unsynced is set (roast was not yet in sync DB) we always set current time as modified_at stamp, overwriting the last saved dated
+# that might have been set by roast.getRoast()
+def addRoast(roast_record:Optional[Dict[str, Any]] = None, unsynced:bool=False) -> None:
     try:
         _log.debug('addRoast()')
         aw = config.app_window
@@ -399,7 +401,7 @@ def addRoast(roast_record:Optional[Dict[str, Any]] = None) -> None:
             r = roast.getRoast() if roast_record is None else roast_record
             # if modification date is not set yet, we add the current time as
             # modified_at timestamp as float EPOCH with millisecond
-            if 'modified_at' not in r:
+            if unsynced or 'modified_at' not in r:
                 r['modified_at'] = util.epoch2ISO8601(time.time())
             _log.debug('-> roast: %s', r)
             # check if all required data is available before queueing this up

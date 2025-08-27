@@ -95,7 +95,7 @@ def toggle(app_window:'ApplicationWindow') -> None:
     elif config.connected:
         if not is_synced() and app_window.qmc.checkSaved(allow_discard=False):
             # we (manually) turn syncing for the current roast on
-            queue.addRoast()
+            queue.addRoast(unsynced=True)
         else:
             # a CTR-click (COMMAND on macOS) logs out and
             # discards the credentials

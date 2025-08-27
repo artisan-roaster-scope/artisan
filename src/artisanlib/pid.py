@@ -209,7 +209,7 @@ class PID:
             return False
 
         avg_recent_change = sum(recent_changes) / len(recent_changes)
-        current_change = abs(current_input - self.measurement_history[-2]) # index needs to be -2 as the item at -1 is equal to current_input
+        current_change = abs(current_input - self.measurement_history[-1])
 
         # Detect if current change is significantly larger than recent average
         return current_change > 2.5 * avg_recent_change and current_change > 1.0
@@ -358,8 +358,6 @@ class PID:
                 self.lastError = err
                 self.lastInput = i
             elif (dt := now - self.lastTime) > 0.1:
-                # Update measurement history for discontinuity detection
-                self._update_measurement_history(i)
 
                 # Check if setpoint has changed since last update and handle integral
                 setpoint_change = self.target - self.lastTarget
@@ -402,6 +400,9 @@ class PID:
                 else:
                     # Use enhanced derivative-on-measurement calculation
                     D = self._calculate_derivative_on_measurement(i, dt)
+
+                # Update measurement history for discontinuity detection (after calculating D which calls detect discontinuity)
+                self._update_measurement_history(i)
 
                 self.lastTime = now
                 self.lastError = err
