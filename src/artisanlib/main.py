@@ -24342,6 +24342,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         try:
             filename = fn if fn else self.ArtisanOpenFileDialog()
             if filename:
+                # save current settings filename and show as default to save.
+                self.settingspath = filename
+                _log.info("load settings: %s", filename)  # pylint: disable=logging-fstring-interpolation
+                # load settings
                 try:
                     self.stopActivities()
                     saveCurfile = self.curFile
@@ -24446,8 +24450,16 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     def saveSettings(self, _:bool = False) -> None:
         path = QDir()
         path.setPath(self.getDefaultPath())
-        fname = path.absoluteFilePath(QApplication.translate('Message','artisan-settings'))
-        filename = self.ArtisanSaveFileDialog(msg=QApplication.translate('Message', 'Save Settings'), path=fname, ext='*.aset')
+        # get last loaded settings filename, if available
+        fname = path.absoluteFilePath(
+            QApplication.translate("Message", "artisan-settings")
+        )
+        defaultname = self.settingspath if self.settingspath else fname
+        filename = self.ArtisanSaveFileDialog(
+            msg=QApplication.translate("Message", "Save Settings"),
+            path=defaultname,
+            ext="*.aset",
+        )
         if filename:
             self.settingspath = filename
             if self.closeEventSettings(filename):
