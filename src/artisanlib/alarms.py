@@ -850,7 +850,7 @@ class AlarmDlg(ArtisanResizeablDialog):
                                QApplication.translate('ComboBox','SC START'), # qmc.alarmtime 4
                                QApplication.translate('ComboBox','SC END'), # qmc.alarmtime 5
                                QApplication.translate('ComboBox','DROP'), # qmc.alarmtime 6
-                               QApplication.translate('ComboBox','COOL'), # qmc.alarmtime 7
+                               QApplication.translate('ComboBox','COOL END'), # qmc.alarmtime 7
                                QApplication.translate('ComboBox','If Alarm')]) # qmc.alarmtime 10
         timeComboBox.setCurrentIndex(self.aw.qmc.alarmtime2menuidx[self.aw.qmc.alarmtime[i]])
         #5: time after selected event
