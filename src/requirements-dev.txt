@@ -17,7 +17,7 @@ ruff>=0.12.10
 pylint==3.3.8
 pre-commit>=4.3.0
 pytest>=8.4.1
-pytest-cov==6.2.1
+pytest-cov==6.3.0
 pytest-asyncio==1.1.0
 pytest-mock==3.14.1
 pytest-datadir==1.8.0
