@@ -231,7 +231,7 @@ class WebGreen(WebView):
         self._title = title
         self._min_send_interval = 0 # send all updates
 
-    @aiohttp_jinja2.template(template_name)
+    @aiohttp_jinja2.template(template_name) # pyrefly: ignore
     async def index(self, _request: 'Request') -> Dict[str,str]:
         return {
             'window_title': self._title,
@@ -263,7 +263,7 @@ class WebRoasted(WebView):
         self._title = title
         self._min_send_interval = 0 # send all updates
 
-    @aiohttp_jinja2.template(template_name)
+    @aiohttp_jinja2.template(template_name) # pyrefly: ignore
     async def index(self, _request: 'Request') -> Dict[str,str]:
         return {
             'window_title': self._title,

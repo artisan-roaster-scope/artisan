@@ -16,6 +16,7 @@
 # Marko Luther, 2023
 
 from typing import Optional, TYPE_CHECKING
+from babel.units import get_unit_name
 
 from artisanlib.dialogs import ArtisanDialog
 from artisanlib.widgets import MyQDoubleSpinBox
@@ -37,6 +38,7 @@ if TYPE_CHECKING:
 class SamplingDlg(ArtisanDialog):
     def __init__(self, parent:'QWidget', aw:'ApplicationWindow') -> None:
         super().__init__(parent, aw)
+        self.aw = aw
         self.setWindowTitle(QApplication.translate('Message','Sampling'))
         self.setModal(True)
 
@@ -50,11 +52,18 @@ class SamplingDlg(ArtisanDialog):
 
         self.interval = MyQDoubleSpinBox()
         self.interval.setSingleStep(1)
-        self.interval.setValue(self.aw.qmc.delay/1000.)
-        self.interval.setRange(self.aw.qmc.min_delay/1000.,40.)
+        self.interval.setRange(self.aw.qmc.min_delay/1000.,999.99)
+        interval = self.aw.qmc.delay/1000.
+        if self.aw.qmc.xgrid < 3600:
+            unit_name = get_unit_name('duration-second', length='short', locale=self.aw.locale_str)
+            self.interval.setSuffix(f" {unit_name if unit_name is not None else 'sec'}")
+        else:
+            unit_name = get_unit_name('duration-minute', length='short', locale=self.aw.locale_str)
+            self.interval.setSuffix(f" {unit_name if unit_name is not None else 'min'}")
+            interval = interval / 60
+        self.interval.setValue(interval)
         self.interval.setDecimals(2)
         self.interval.setAlignment(Qt.AlignmentFlag.AlignRight)
-        self.interval.setSuffix('s')
 
         intervalLayout = QHBoxLayout()
         intervalLayout.addStretch()
@@ -116,11 +125,13 @@ class SamplingDlg(ArtisanDialog):
     def ok(self) -> None:
         self.aw.qmc.flagKeepON = bool(self.keepOnFlag.isChecked())
         self.aw.qmc.flagOpenCompleted = bool(self.openCompletedFlag.isChecked())
-        self.aw.setSamplingRate(int(self.interval.value()*1000.))
+        interval = self.interval.value()*1000.
+        if self.aw.qmc.xgrid >= 3600:
+            interval = interval * 60
+        self.aw.setSamplingRate(int(interval))
         if self.aw.qmc.delay < self.aw.qmc.default_delay:
             QMessageBox.warning(None, #self.aw, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
                 QApplication.translate('Message', 'Warning', None),
                 QApplication.translate('Message', 'A tight sampling interval might lead to instability on some machines. We suggest a minimum of 1s.'))
         self.storeSettings()
-#        self.aw.closeEventSettings()
         self.accept()

@@ -679,8 +679,8 @@ def coffee2beans(c:Coffee) -> str:
         return f'{label}{bean}, {year}'
     if coffee_label_normal_order:
         if year == '':
-            return f'{origin} {label}{bean}'
-        return f'{origin} {label}{bean}, {year}'
+            return f'{origin}, {label}{bean}'
+        return f'{origin}, {label}{bean}, {year}'
     if year == '':
         return f'{label}{bean}, {origin}'
     return f'{label}{bean}, {origin} {year}'

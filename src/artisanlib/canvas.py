@@ -38,6 +38,7 @@ import textwrap
 import functools
 import psutil
 from psutil._common import bytes2human # pyright:ignore[reportPrivateImportUsage]
+from babel.units import get_unit_name
 
 from typing import Final, Optional, Literal, List, Set, Dict, Callable, Tuple, Union, Any, Sequence, cast, TYPE_CHECKING  #for Python >= 3.9: can remove 'List' since type hints can now use the generic 'list'
 
@@ -54,6 +55,7 @@ if TYPE_CHECKING:
     from matplotlib.legend import Legend # pylint: disable=unused-import
     from matplotlib.backend_bases import PickEvent, MouseEvent, Event # pylint: disable=unused-import
     from matplotlib.font_manager import FontProperties # pylint: disable=unused-import
+    from matplotlib.ticker import Locator # pylint: disable=unused-import
     import numpy.typing as npt # pylint: disable=unused-import
     from PyQt6.QtGui import QResizeEvent # pylint: disable=unused-import
 
@@ -7417,8 +7419,15 @@ class tgraphcanvas(FigureCanvas):
                 mfactor2 =  round(float(2. + abs( int(round(last_reading_time)) / int(round(self.xgrid)) )))
 
                 majorloc = numpy.arange(starttime-(self.xgrid*mfactor1),starttime+(self.xgrid*mfactor2), self.xgrid)
-                majorlocator = ticker.FixedLocator(majorloc.tolist())
-                self.ax.xaxis.set_major_locator(majorlocator)
+                if len(majorloc) > 50:
+                    # we reduce the number of major ticks by a factor of 4
+                    majorloc = majorloc[0:len(majorloc):4]
+                if len(majorloc)>50:
+                    # still too many ticks, we remove them completely
+                    self.ax.yaxis.set_major_locator(ticker.NullLocator())
+                else:
+                    majorlocator = ticker.FixedLocator(majorloc.tolist())
+                    self.ax.xaxis.set_major_locator(majorlocator)
                 formatter = ticker.FuncFormatter(self.formtime)
                 self.ax.xaxis.set_major_formatter(formatter)
 
@@ -7432,10 +7441,18 @@ class tgraphcanvas(FigureCanvas):
                     self.ax.minorticks_off()
                 else:
                     if self.xgrid == 60:
-                        minorloc = numpy.arange(starttime-(self.xgrid*mfactor1),starttime+(self.xgrid*mfactor2), 30)
+                        minorloc = numpy.arange(starttime-(self.xgrid*mfactor1),starttime+(self.xgrid*mfactor2), 30).tolist()
+                    elif self.xgrid >= 3600:
+                        # hours or days selected as step => minor ticks every 15min
+                        minorloc = numpy.arange(starttime-(self.xgrid*mfactor1),starttime+(self.xgrid*mfactor2), 15*60).tolist()
                     else:
-                        minorloc = numpy.arange(starttime-(self.xgrid*mfactor1),starttime+(self.xgrid*mfactor2), 60)
-                    minorlocator = ticker.FixedLocator(minorloc.tolist())
+                        minorloc = numpy.arange(starttime-(self.xgrid*mfactor1),starttime+(self.xgrid*mfactor2), 60).tolist()
+                    minorlocator:Locator
+                    if len(minorloc) > 80:
+                        # we limit the total number of minor tick locators for performance and esthetic reasons
+                        minorlocator = ticker.NullLocator()
+                    else:
+                        minorlocator = ticker.FixedLocator(minorloc)
                     self.ax.xaxis.set_minor_locator(minorlocator)
 
                     #adjust the length of the minor ticks
@@ -7488,33 +7505,27 @@ class tgraphcanvas(FigureCanvas):
         else:
             starttime = 0
 
-        if x >=  starttime:
-            m,s = divmod((x - round(starttime)), 60)  #**NOTE**: divmod() returns here type numpy.float64, which could create problems
-            #print type(m),type(s)                    #it is used in: formatter = ticker.FuncFormatter(self.formtime) in xaxistosm()
-            s = int(round(s))
-            m = int(m)
+        displaytime = x - round(starttime)
 
-            if s >= 59:
-                return f'{m+1:.0f}'
-            if abs(s - 30) < 1:
-                return f'{m:d}.5'
-            if s > 1:
-                return  f'{m:.0f}:{s:02.0f}'
-            return f'{m:.0f}'
+        if self.aw.qmc.xgrid >= 3600:
+            # hours or days as step selected
+            displaytime = displaytime / 60
 
-        m,s = divmod(abs(x - round(starttime)), 60.)
+        sign = ('-' if x <= starttime else '')
+
+        m,s = divmod(abs(displaytime), 60.)
         s = int(round(s))
         m = int(m)
 
         if s >= 59:
-            return f'-{m+1:.0f}'
+            return f'{sign}{m+1:.0f}'
         if abs(s-30) < 1:
-            return f'-{m:d}.5'
+            return f'{sign}{m:d}.5'
         if s > 1:
-            return  f'-{m:.0f}:{s:02.0f}'
+            return  f'{sign}{m}:{s:02.0f}'
         if m == 0:
             return '0'
-        return f'-{m:.0f}'
+        return f'{sign}{m:.0f}'
 
     # returns True if nothing to save, discard or save was selected and False if canceled by the user
     def checkSaved(self,allow_discard:bool = True) -> bool:
@@ -9157,6 +9168,10 @@ class tgraphcanvas(FigureCanvas):
     def default_xlabel_text(self) -> str:
         if self.flagstart or self.xgrid == 0:
             return ''
+        if self.roastersize_setup == 0 and self.roastertype_setup == '':
+            if self.aw.qmc.xgrid < 3600:
+                return get_unit_name('duration-minute', length='short', locale=self.aw.locale_str) or 'min'
+            return get_unit_name('duration-hour', length='short', locale=self.aw.locale_str) or 'h'
         if right_to_left(self.locale_str):
             return f"{(render_weight(self.roastersize_setup, 1, weight_units.index(self.weight[2]), right_to_left_lang=True) if self.roastersize_setup>=0 else '')}  {self.__dijkstra_to_ascii(self.roastertype_setup)}"
         return f"{self.__dijkstra_to_ascii(self.roastertype_setup)} {(render_weight(self.roastersize_setup, 1, weight_units.index(self.weight[2])) if self.roastersize_setup>0 else '')}"
@@ -19071,11 +19086,18 @@ class SampleThread(QThread): # pyright: ignore [reportGeneralTypeIssues] # Argum
         _ = libtime.perf_counter() + delay
         # use the standard sleep until one 5ms before the timeout (Windows <10 might need a limit of 5.5ms)
         if delay > self.accurate_delay_cutoff:
-            half_delay = (delay - self.accurate_delay_cutoff) / 2.0
-            libtime.sleep(half_delay)
-            if not self.aw.qmc.flagon:
-                return # we leave this sleep earlier as sampling was terminated
-            libtime.sleep(half_delay)
+            core_delay = delay - self.accurate_delay_cutoff
+            # split in junks
+            junk_size = 0.5 # 0.5sec
+            if core_delay > junk_size:
+                q, r = divmod(core_delay, junk_size)
+                for _ in range(int(q)):
+                    libtime.sleep(junk_size)
+                    if not self.aw.qmc.flagon:
+                        return
+                libtime.sleep(r)
+            else:
+                libtime.sleep(core_delay)
         # continuous with a busy sleep
         while libtime.perf_counter() < _:
             pass # this raises CPU to 100%
@@ -19104,7 +19126,8 @@ class SampleThread(QThread): # pyright: ignore [reportGeneralTypeIssues] # Argum
                         next_time = libtime.perf_counter() + interval
                     else:
                         #libtime.sleep(max(0, next_time - libtime.time())) # sleep is not very accurate
-                        self.accurate_delay(max(0.0, next_time - libtime.perf_counter())) # more accurate, but keeps the CPU busy
+                        # more accurate, but keeps the CPU more busy:
+                        self.accurate_delay(max(0.0, next_time - libtime.perf_counter()))
 
                     #_log.info(datetime.datetime.now()) # use this to check for drifts
 
@@ -19119,12 +19142,6 @@ class SampleThread(QThread): # pyright: ignore [reportGeneralTypeIssues] # Argum
                 else:
                     self.aw.qmc.flagsampling = False # type: ignore # mypy: Statement is unreachable  [unreachable] # we signal that we are done with sampling
                     # port is disconnected in OFFmonitor by calling disconnectProbes() => disconnectProbesFromSerialDevice()
-#                    try:
-#                        if self.aw.ser.SP.is_open:
-#                            self.aw.ser.closeport()
-##                        QApplication.processEvents()
-#                    except Exception: # pylint: disable=broad-except
-#                        pass
                     self.quit()
                     break  #thread ends
                 if next_time is not None:

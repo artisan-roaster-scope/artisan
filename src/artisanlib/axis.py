@@ -222,7 +222,8 @@ class WindowsDlg(ArtisanDialog):
                       QApplication.translate('ComboBox', '5 minutes'),
                       QApplication.translate('ComboBox', '10 minutes'),
                       QApplication.translate('ComboBox', '30 minutes'),
-                      QApplication.translate('ComboBox', '1 hour')]
+                      QApplication.translate('ComboBox', '1 hour'),
+                      QApplication.translate('ComboBox', '1 day')]
         self.xaxislencombobox.addItems(timelocs)
 
         self.xaxislencombobox.setMinimumContentsLength(6)
@@ -232,7 +233,7 @@ class WindowsDlg(ArtisanDialog):
             self.xaxislencombobox.setMaximumWidth(width)
 #        self.xaxislencombobox.setMaximumWidth(120)
 
-        self.timeconversion = [0,60,120,180,240,300,600,1800,3600]
+        self.timeconversion = [0,60,120,180,240,300,600,1800,3600,86400]
         try:
             self.xaxislencombobox.setCurrentIndex(self.timeconversion.index(self.aw.qmc.xgrid))
         except Exception: # pylint: disable=broad-except

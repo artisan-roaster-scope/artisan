@@ -3662,7 +3662,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         #Create LOWER BUTTONS Widget layout QDialogButtonBox to stack all lower buttons
         self.lowerbuttondialogLayout = QHBoxLayout()
         self.lowerbuttondialogLayout.setSpacing(5)
-        self.lowerbuttondialogLayout.setContentsMargins(0, 0, 0, 10)
+        self.lowerbuttondialogLayout.setContentsMargins(0, 0, 0, 10) # (left, top, right, bottom)
 
         self.lowerbuttondialog: QFrame = QFrame()
         self.lowerbuttondialog.setLayout(self.lowerbuttondialogLayout)
@@ -4049,7 +4049,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         level3layout.setContentsMargins(0,0,0,0)
 
         self.extrabuttonsLayout = QVBoxLayout()
-        self.extrabuttonsLayout.setContentsMargins(0,0,0,10)
+        self.extrabuttonsLayout.setContentsMargins(0,0,0,0)
         self.extrabuttonsLayout.setSpacing(5)
         self.extrabuttonsLayout.addWidget(self.e1buttondialog)
         self.extrabuttonsLayout.addWidget(self.e2buttondialog)
@@ -15523,7 +15523,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     self.qmc.plus_blend_spec_labels = None
             else:
                 self.qmc.plus_blend_spec = None
-            self.qmc.plus_blend_spec_labels = None
+                self.qmc.plus_blend_spec_labels = None
             if 'plus_sync_record_hash' in profile:
                 self.qmc.plus_sync_record_hash = decodeLocal(profile['plus_sync_record_hash'])
             else:
@@ -17440,7 +17440,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     #loads the settings at the start of application. See the oppposite closeEventSettings()
     def settingsLoad(self, filename:Optional[str] = None, theme:bool = False, machine:bool = False, redraw:bool = True) -> bool: # pyright: ignore [reportGeneralTypeIssues] # Code is too complex to analyze; reduce complexity by refactoring into subroutines or reducing
         res = False
-
         try:
             updateBatchCounter = True
             if filename is not None:
@@ -17487,6 +17486,15 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 settings = QSettings()
             if settings.contains('resetqsettings'):
                 self.resetqsettings = toInt(settings.value('resetqsettings',self.resetqsettings))
+            if not self.resetqsettings and filename is None and settings.contains('Mode'):
+                # if not loading from settings file and there are already Artisan settings (not the first start)
+                # we set the old defaults of the autosave/batchcounter changed after v3.2.0 as those were not saved in users settings
+                # to avoid that they are changed to the new defaults
+                self.qmc.autosaveflag = 0
+                self.qmc.autosaveaddtorecentfilesflag = False
+                self.qmc.batchcounter = -1
+                self.qmc.batchprefix = ''
+
             if self.resetqsettings or (filename is None and QApplication.queryKeyboardModifiers() == (Qt.KeyboardModifier.AltModifier | Qt.KeyboardModifier.ShiftModifier)):
                 self.resetqsettings = 0
                 if 'canvas' in self.qmc.palette:
@@ -18315,8 +18323,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.qmc.startofx = toFloat(settings.value('xmin',self.qmc.startofx))
                 self.qmc.endofx = toFloat(settings.value('xmax',self.qmc.endofx))
                 #fixes Windows OS sometimes saving endofx as 0
-                if self.qmc.endofx < 60 or self.qmc.endofx > 1800:
-                    self.qmc.endofx = 60
+                self.qmc.endofx = max(self.qmc.endofx, 60)
             except Exception: # pylint: disable=broad-except
                 pass
             self.qmc.ylimit = min(toInt(settings.value('ymax',self.qmc.ylimit)),self.qmc.ylimit_max)
@@ -20375,11 +20382,13 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'compareExtraCurves2',self.qmc.compareExtraCurves2, read_defaults)
             self.settingsSetValue(settings, default_settings, 'compareBBP',self.qmc.compareBBP, read_defaults)
             self.settingsSetValue(settings, default_settings, 'compareRoast',self.qmc.compareRoast, read_defaults)
-            self.settingsSetValue(settings, default_settings, 'autosaveflag',self.qmc.autosaveflag, read_defaults)
-            self.settingsSetValue(settings, default_settings, 'autosaveaddtorecentfilesflag',self.qmc.autosaveaddtorecentfilesflag, read_defaults)
             self.settingsSetValue(settings, default_settings, 'autosavepdf',self.qmc.autosaveimage, read_defaults)
             self.settingsSetValue(settings, default_settings, 'autosaveimageformat',self.qmc.autosaveimageformat, read_defaults)
             self.settingsSetValue(settings, default_settings, 'autosaveprefix',self.qmc.autosaveprefix, read_defaults)
+            if not read_defaults:
+                # autosave default settings are always stored as its defaults changed from Artisan versions after v3.2.0 to avoid hickups for existing users
+                settings.setValue('autosaveflag',self.qmc.autosaveflag)
+                settings.setValue('autosaveaddtorecentfilesflag',self.qmc.autosaveaddtorecentfilesflag)
 
 #--- BEGIN GROUP WebLCDs
             settings.beginGroup('WebLCDs')
@@ -20522,12 +20531,13 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 
 #--- BEGIN GROUP Batch
             settings.beginGroup('Batch')
-            self.settingsSetValue(settings, default_settings, 'batchcounter',self.qmc.batchcounter, read_defaults)
             self.settingsSetValue(settings, default_settings, 'batchsequence',self.qmc.batchsequence, read_defaults)
-            self.settingsSetValue(settings, default_settings, 'batchprefix',self.qmc.batchprefix, read_defaults)
             if not read_defaults:
                 # store always
-                self.settingsSetValue(settings, default_settings, 'lastroastepoch',self.qmc.lastroastepoch, read_defaults)
+                settings.setValue('lastroastepoch',self.qmc.lastroastepoch)
+                # batchcounter default settings are always stored as its defaults changed from Artisan versions after v3.2.0 to avoid hickups for existing users
+                settings.setValue('batchcounter',self.qmc.batchcounter)
+                settings.setValue('batchprefix',self.qmc.batchprefix)
             self.settingsSetValue(settings, default_settings, 'neverUpdateBatchCounter',self.qmc.neverUpdateBatchCounter, read_defaults)
             settings.endGroup()
 #--- END GROUP Batch

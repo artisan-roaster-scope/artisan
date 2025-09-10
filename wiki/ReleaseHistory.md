@@ -22,6 +22,7 @@ v3.2.1
   - adds Czech localization
   - adds multi-modal state transitions to Batch Manager
   - adds remaining total roast time estimate to scheduler and lists roast templates in scheduled items
+  - adds support for longer recordings as applied in coffee fermentation ([Discussion #1969](../../../discussions/1969)
 
 * CHANGES
   - BREAKING VISUAL CHANGE, but only when consecutive hidden buttons with Type or Action defined are first at the top of the Events Buttons table: The visual button layout may change as hidden buttons with Type or Action defined at the top of the Events Buttons table are no longer counted in the first row's button count, which is limited by the Max Buttons per Row setting.  All other hidden buttons continue to be counted in each row's button count.
@@ -60,6 +61,8 @@ v3.2.1
   - fixes dynamic assignment of Yoctopuce PT100 modules
   - adds note to the symbolic assignment help page that symbolic variables are case-sensitive ([Issue #1514](../../../issues/1514))
   - fixes date/batch widgets color scheme ([Issue #1962](../../../issues/1962))
+  - fixes an issue where the selected default store could reset the selected coffee or blend
+  - fixes typo that caused plus blend ingredient names to not being loaded from alog profiles
 
 
 
