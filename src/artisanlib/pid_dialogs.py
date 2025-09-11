@@ -500,7 +500,7 @@ class PID_DlgControl(ArtisanDialog):
             dLimitLabel = QLabel(QApplication.translate('Label','Dlimit'))
             self.dLimitSpinBox = QSpinBox()
             self.dLimitSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
-            self.dLimitSpinBox.setRange(0,100)
+            self.dLimitSpinBox.setRange(0,999)
             self.dLimitSpinBox.setSingleStep(1)
             self.dLimitSpinBox.setValue(int(self.aw.pidcontrol.pidDlimit))
             self.dLimitSpinBox.setToolTip(QApplication.translate('Tooltip', 'Derivative limit'))

@@ -19,6 +19,7 @@
 
 import logging
 import time
+import functools
 from typing import Callable, Final, List, Optional, Tuple
 
 import numpy
@@ -35,6 +36,28 @@ except ImportError:
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 
+@functools.lru_cache(maxsize=4)
+def _calculate_integral_limits(outMin:int, outMax:int, integral_limit_factor:float) -> Tuple[float, float]:
+    """Calculate dynamic integral limits based on output range."""
+    output_range = outMax - outMin
+    integral_range = output_range * integral_limit_factor
+
+    # Center the integral limits around zero, but adjust if output range is not symmetric
+    if outMin >= 0:
+        # Positive output range
+        integral_min = 0.0
+        integral_max = integral_range
+    elif outMax <= 0:
+        # Negative output range
+        integral_min = -integral_range
+        integral_max = 0.0
+    else:
+        # Symmetric around zero
+        integral_max = integral_range / 2
+        integral_min = -integral_max
+
+    return integral_min, integral_max
+
 # expects a function control that takes a value from [<outMin>,<outMax>] to control the heater as called on each update()
 class PID:
 
@@ -50,8 +73,9 @@ class PID:
         'Ki',
         'Kd',
         'Pterm',
-        'errSum',
         'Iterm',
+        'Dterm',
+        'errSum',
         'lastError',
         'lastInput',
         'lastOutput',
@@ -74,6 +98,8 @@ class PID:
         'derivative_limit',
         'measurement_history',
         'setpoint_changed',
+        'setpoint_changed_significantly',
+        'significant_setup_change_limit',
         'integral_windup_prevention',
         'integral_limit_factor',
         'setpoint_change_threshold',
@@ -104,8 +130,9 @@ class PID:
         self.Kd: float = d
         # Proposional on Measurement mode see: http://brettbeauregard.com/blog/2017/06/introducing-proportional-on-measurement/
         self.Pterm: float = 0.0
-        self.errSum: float = 0.0
         self.Iterm: float = 0.0
+        self.Dterm: float = 0.0
+        self.errSum: float = 0.0
         self.lastError: Optional[float] = None  # used for derivative_on_error mode
         self.lastInput: Optional[float] = None  # used for derivative_on_measurement mode
         self.lastOutput: Optional[float] = (
@@ -143,6 +170,8 @@ class PID:
             []
         )  # Track recent measurements for discontinuity detection
         self.setpoint_changed: bool = False  # Flag for recent setpoint changes
+        self.setpoint_changed_significantly: bool = False # Flag for significant (> significant_setup_change_limit; disabled if significant_setup_change_limit<=0) setpoint changes used to reduce Dterm by 50%
+        self.significant_setup_change_limit:float = 25
 
         # Enhanced integral windup prevention
         self.integral_windup_prevention: bool = True  # Enable advanced windup prevention
@@ -228,12 +257,12 @@ class PID:
             dtinput = self.derivative_limit if dtinput > 0 else -self.derivative_limit
 
         # Reduce derivative action immediately after setpoint changes
-        if self.setpoint_changed:
+        if self.setpoint_changed_significantly:
             dtinput *= 0.5  # Reduce derivative action by 50%
 
         # Reduce derivative action if measurement discontinuity is detected
         if self._detect_measurement_discontinuity(current_input):
-            dtinput *= 0.2  # Reduce derivative action by 80%
+            dtinput *= 0.3  # Reduce derivative action by 70%
 
         return -self.Kd * dtinput
 
@@ -258,26 +287,6 @@ class PID:
             output_before_clamp < self.outMin and error < 0
         )
 
-    def _calculate_integral_limits(self) -> Tuple[float, float]:
-        """Calculate dynamic integral limits based on output range."""
-        output_range = self.outMax - self.outMin
-        integral_range = output_range * self.integral_limit_factor
-
-        # Center the integral limits around zero, but adjust if output range is not symmetric
-        if self.outMin >= 0:
-            # Positive output range
-            integral_min = 0.0
-            integral_max = integral_range
-        elif self.outMax <= 0:
-            # Negative output range
-            integral_min = -integral_range
-            integral_max = 0.0
-        else:
-            # Symmetric around zero
-            integral_max = integral_range / 2
-            integral_min = -integral_max
-
-        return integral_min, integral_max
 
     def _handle_setpoint_change_integral(self, setpoint_change: float) -> None:
         """Handle integral term when setpoint changes significantly."""
@@ -309,7 +318,7 @@ class PID:
                 self.Iterm -= integral_adjustment
 
                 # Ensure integral term stays within reasonable bounds
-                integral_min, integral_max = self._calculate_integral_limits()
+                integral_min, integral_max = _calculate_integral_limits(self.outMin, self.outMax, self.integral_limit_factor)
                 self.Iterm = max(integral_min, min(integral_max, self.Iterm))
 
     ### External API guarded by semaphore
@@ -321,16 +330,14 @@ class PID:
             self.lastOutput = None  # this ensures that the next update sends a control output
             self.active = True
         finally:
-            if self.pidSemaphore.available() < 1:
-                self.pidSemaphore.release(1)
+            self.pidSemaphore.release(1)
 
     def off(self) -> None:
         try:
             self.pidSemaphore.acquire(1)
             self.active = False
         finally:
-            if self.pidSemaphore.available() < 1:
-                self.pidSemaphore.release(1)
+            self.pidSemaphore.release(1)
 
     def isActive(self) -> bool:  # pyrefly: ignore[bad-return]
         try:
@@ -339,12 +346,13 @@ class PID:
         except Exception:  # pylint: disable=broad-except
             return False
         finally:
-            if self.pidSemaphore.available() < 1:
-                self.pidSemaphore.release(1)
+            self.pidSemaphore.release(1)
 
     # update control value (the pid loop is running even if PID is inactive, just the control function is only called if active)
     def update(self, i: Optional[float]) -> None:
         #        _log.debug('update(%s)',i)
+        control_func:Optional[Callable[[float], None]] = None
+        output_value:Optional[float] = None
         try:
             if i == -1 or i is None:
                 # reject error values
@@ -357,18 +365,21 @@ class PID:
                 self.lastTime = now
                 self.lastError = err
                 self.lastInput = i
-            elif (dt := now - self.lastTime) > 0.1:
+            elif (dt := now - self.lastTime) >= 0.1:
 
                 # Check if setpoint has changed since last update and handle integral
                 setpoint_change = self.target - self.lastTarget
                 if abs(setpoint_change) > 0.001:
                     self.setpoint_changed = True
+                    if abs(setpoint_change) > self.significant_setup_change_limit > 0:
+                        self.setpoint_changed_significantly = True
                     # Handle integral term for setpoint changes
                     self._handle_setpoint_change_integral(setpoint_change)
                     self.lastTarget = self.target
                 else:
-                    # Gradually clear the setpoint changed flag
+                    # Gradually clear the setpoint changed flags
                     self.setpoint_changed = False
+                    self.setpoint_changed_significantly = False
 
                 derr = (err - self.lastError) / dt
 
@@ -384,7 +395,7 @@ class PID:
                     self.Iterm += self.Ki * err * dt
 
                     # Apply dynamic integral limits
-                    integral_min, integral_max = self._calculate_integral_limits()
+                    integral_min, integral_max = _calculate_integral_limits(self.outMin, self.outMax, self.integral_limit_factor)
                     self.Iterm = max(integral_min, min(integral_max, self.Iterm))
 
                 # Clear the integral reset flag after processing
@@ -410,7 +421,8 @@ class PID:
 
                 if self.derivative_filter_level > 0:
                     D = self.derivative_filter(D)
-                output: float = self.Pterm + self.Iterm + D
+                self.Dterm = D
+                output: float = self.Pterm + self.Iterm + self.Dterm
 
                 output = self._smooth_output(output)
 
@@ -426,26 +438,29 @@ class PID:
 
                 # _log.debug('P: %s, I: %s, D: %s => output: %s', self.Pterm, self.Iterm, D, output)
 
-                int_output = int(round(min(float(self.dutyMax), max(float(self.dutyMin), output))))
+                final_output = min(float(self.dutyMax), max(float(self.dutyMin), output))
                 if (
                     self.lastOutput is None
                     or self.iterations_since_duty >= self.force_duty
-                    or int_output >= self.lastOutput + self.dutySteps
-                    or int_output <= self.lastOutput - self.dutySteps
+                    or final_output >= self.lastOutput + self.dutySteps
+                    or final_output <= self.lastOutput - self.dutySteps
                 ):
                     if self.active:
-                        try:
-                            self.control(int_output)
-                        except Exception as e:  # pylint: disable=broad-except
-                            _log.error(e)
-                        self.iterations_since_duty = 0
+                        control_func = self.control
+                        output_value = final_output
                     self.lastOutput = output  # kept to initialize Iterm on reactivating the PID
                 self.iterations_since_duty += 1
         except Exception as e:  # pylint: disable=broad-except
             _log.exception(e)
         finally:
-            if self.pidSemaphore.available() < 1:
-                self.pidSemaphore.release(1)
+            self.pidSemaphore.release(1)
+        # send final_output to control function outside of the semaphore to avoid blocking if semaphore is taken within control_function
+        if control_func and output_value is not None:
+            try:
+                control_func(output_value)
+                self.iterations_since_duty = 0
+            except Exception as e:  # pylint: disable=broad-except
+                _log.exception('Control function error: %s', e)
 
     # bring the PID to its initial state (to be called externally)
     def reset(self) -> None:
@@ -482,13 +497,14 @@ class PID:
             self.lastTarget = self.target
             self.measurement_history = []
             self.setpoint_changed = False
+            self.setpoint_changed_significantly = False
 
             # Reset integral windup prevention state
             self.integral_just_reset = False
 
             # Note: Integral windup prevention settings are not reset as they are configuration
         finally:
-            if self.pidSemaphore.available() < 1:
+            if lock:
                 self.pidSemaphore.release(1)
 
     def setTarget(self, target: float, init: bool = True) -> None:
@@ -498,18 +514,14 @@ class PID:
             if init:
                 self.init(lock=False)
         finally:
-            if self.pidSemaphore.available() < 1:
-                self.pidSemaphore.release(1)
+            self.pidSemaphore.release(1)
 
-    def getTarget(self) -> float:  # pyrefly: ignore[bad-return]
+    def getTarget(self) -> float: # pyrefly: ignore[bad-return]
         try:
             self.pidSemaphore.acquire(1)
             return self.target
-        except Exception:  # pylint: disable=broad-except
-            return 0.0
         finally:
-            if self.pidSemaphore.available() < 1:
-                self.pidSemaphore.release(1)
+            self.pidSemaphore.release(1)
 
     def setPID(self, p: float, i: float, d: float) -> None:
         try:
@@ -518,8 +530,7 @@ class PID:
             self.Ki = max(i, 0)
             self.Kd = max(d, 0)
         finally:
-            if self.pidSemaphore.available() < 1:
-                self.pidSemaphore.release(1)
+            self.pidSemaphore.release(1)
 
     def setLimits(self, outMin: int, outMax: int) -> None:
         try:
@@ -527,40 +538,35 @@ class PID:
             self.outMin = outMin
             self.outMax = outMax
         finally:
-            if self.pidSemaphore.available() < 1:
-                self.pidSemaphore.release(1)
+            self.pidSemaphore.release(1)
 
     def setDutySteps(self, steps: int) -> None:
         try:
             self.pidSemaphore.acquire(1)
             self.dutySteps = steps
         finally:
-            if self.pidSemaphore.available() < 1:
-                self.pidSemaphore.release(1)
+            self.pidSemaphore.release(1)
 
     def setDutyMin(self, m: int) -> None:
         try:
             self.pidSemaphore.acquire(1)
             self.dutyMin = m
         finally:
-            if self.pidSemaphore.available() < 1:
-                self.pidSemaphore.release(1)
+            self.pidSemaphore.release(1)
 
     def setDutyMax(self, m: int) -> None:
         try:
             self.pidSemaphore.acquire(1)
             self.dutyMax = m
         finally:
-            if self.pidSemaphore.available() < 1:
-                self.pidSemaphore.release(1)
+            self.pidSemaphore.release(1)
 
     def setControl(self, f: Callable[[float], None]) -> None:
         try:
             self.pidSemaphore.acquire(1)
             self.control = f
         finally:
-            if self.pidSemaphore.available() < 1:
-                self.pidSemaphore.release(1)
+            self.pidSemaphore.release(1)
 
     def getDuty(self) -> Optional[float]:
         try:
@@ -569,8 +575,35 @@ class PID:
                 return min(float(self.dutyMax), max(float(self.dutyMin), self.lastOutput))
             return None
         finally:
-            if self.pidSemaphore.available() < 1:
-                self.pidSemaphore.release(1)
+            self.pidSemaphore.release(1)
+
+    def getPterm(self) -> float: # pyrefly: ignore[bad-return]
+        try:
+            self.pidSemaphore.acquire(1)
+            return self.Pterm
+        finally:
+            self.pidSemaphore.release(1)
+
+    def getIterm(self) -> float: # pyrefly: ignore[bad-return]
+        try:
+            self.pidSemaphore.acquire(1)
+            return self.Iterm
+        finally:
+            self.pidSemaphore.release(1)
+
+    def getDterm(self) -> float: # pyrefly: ignore[bad-return]
+        try:
+            self.pidSemaphore.acquire(1)
+            return self.Dterm
+        finally:
+            self.pidSemaphore.release(1)
+
+    def getError(self) -> float: # pyrefly: ignore[bad-return]
+        try:
+            self.pidSemaphore.acquire(1)
+            return self.lastError or 0
+        finally:
+            self.pidSemaphore.release(1)
 
     @staticmethod
     def derivativeFilter() -> LiveSosFilter:
@@ -592,8 +625,7 @@ class PID:
             # reset the derivative filter on each filter level change (also on PID ON)
             self.derivative_filter = self.derivativeFilter()
         finally:
-            if self.pidSemaphore.available() < 1:
-                self.pidSemaphore.release(1)
+            self.pidSemaphore.release(1)
 
     def setDerivativeLimit(self, limit: float) -> None:
         """Set the maximum allowed derivative contribution to prevent excessive derivative action."""
@@ -601,19 +633,15 @@ class PID:
             self.pidSemaphore.acquire(1)
             self.derivative_limit = max(0.0, limit)  # Ensure non-negative
         finally:
-            if self.pidSemaphore.available() < 1:
-                self.pidSemaphore.release(1)
+            self.pidSemaphore.release(1)
 
     def getDerivativeLimit(self) -> float: # pyrefly: ignore[bad-return]
         """Get the current derivative limit."""
         try:
             self.pidSemaphore.acquire(1)
             return self.derivative_limit
-        except Exception:  # pylint: disable=broad-except
-            return 80.0  # Default value
         finally:
-            if self.pidSemaphore.available() < 1:
-                self.pidSemaphore.release(1)
+            self.pidSemaphore.release(1)
 
     def setIntegralWindupPrevention(self, enabled: bool) -> None:
         """Enable or disable advanced integral windup prevention."""
@@ -621,19 +649,15 @@ class PID:
             self.pidSemaphore.acquire(1)
             self.integral_windup_prevention = enabled
         finally:
-            if self.pidSemaphore.available() < 1:
-                self.pidSemaphore.release(1)
+            self.pidSemaphore.release(1)
 
-    def getIntegralWindupPrevention(self) -> bool:  # pyrefly: ignore[bad-return]
+    def getIntegralWindupPrevention(self) -> bool: # pyrefly: ignore[bad-return]
         """Get the current integral windup prevention setting."""
         try:
             self.pidSemaphore.acquire(1)
             return self.integral_windup_prevention
-        except Exception:  # pylint: disable=broad-except
-            return True  # Default value
         finally:
-            if self.pidSemaphore.available() < 1:
-                self.pidSemaphore.release(1)
+            self.pidSemaphore.release(1)
 
     def setDerivativeOnError(self, enabled: bool) -> None:
         """Enable or disable derivative on error (instead of derivative on measurement)"""
@@ -641,19 +665,15 @@ class PID:
             self.pidSemaphore.acquire(1)
             self.derivative_on_error = enabled
         finally:
-            if self.pidSemaphore.available() < 1:
-                self.pidSemaphore.release(1)
+            self.pidSemaphore.release(1)
 
-    def getDerivativeOnError(self) -> bool:  # pyrefly: ignore[bad-return]
+    def getDerivativeOnError(self) -> bool: # pyrefly: ignore[bad-return]
         """Get the current derivative on error setting."""
         try:
             self.pidSemaphore.acquire(1)
             return self.derivative_on_error
-        except Exception:  # pylint: disable=broad-except
-            return True  # Default value
         finally:
-            if self.pidSemaphore.available() < 1:
-                self.pidSemaphore.release(1)
+            self.pidSemaphore.release(1)
 
     def setIntegralResetOnSP(self, enabled: bool) -> None:
         """Enable or integral reset on SP"""
@@ -661,19 +681,15 @@ class PID:
             self.pidSemaphore.acquire(1)
             self.integral_reset_on_setpoint_change = enabled
         finally:
-            if self.pidSemaphore.available() < 1:
-                self.pidSemaphore.release(1)
+            self.pidSemaphore.release(1)
 
-    def getIntegralResetOnSP(self) -> bool:  # pyrefly: ignore[bad-return]
+    def getIntegralResetOnSP(self) -> bool: # pyrefly: ignore[bad-return]
         """Get the current integral reset on SP setting."""
         try:
             self.pidSemaphore.acquire(1)
             return self.integral_reset_on_setpoint_change
-        except Exception:  # pylint: disable=broad-except
-            return True  # Default value
         finally:
-            if self.pidSemaphore.available() < 1:
-                self.pidSemaphore.release(1)
+            self.pidSemaphore.release(1)
 
     def setIntegralLimitFactor(self, factor: float) -> None:
         """Set the integral limit factor (0.0 to 1.0)."""
@@ -681,19 +697,15 @@ class PID:
             self.pidSemaphore.acquire(1)
             self.integral_limit_factor = max(0.0, min(1.0, factor))
         finally:
-            if self.pidSemaphore.available() < 1:
-                self.pidSemaphore.release(1)
+            self.pidSemaphore.release(1)
 
-    def getIntegralLimitFactor(self) -> float:  # pyrefly: ignore[bad-return]
+    def getIntegralLimitFactor(self) -> float: # pyrefly: ignore[bad-return]
         """Get the current integral limit factor."""
         try:
             self.pidSemaphore.acquire(1)
             return self.integral_limit_factor
-        except Exception:  # pylint: disable=broad-except
-            return 1.0  # Default value
         finally:
-            if self.pidSemaphore.available() < 1:
-                self.pidSemaphore.release(1)
+            self.pidSemaphore.release(1)
 
     def setSetpointChangeThreshold(self, threshold: float) -> None:
         """Set the threshold for significant setpoint changes."""
@@ -701,16 +713,12 @@ class PID:
             self.pidSemaphore.acquire(1)
             self.setpoint_change_threshold = max(0.0, threshold)
         finally:
-            if self.pidSemaphore.available() < 1:
-                self.pidSemaphore.release(1)
+            self.pidSemaphore.release(1)
 
     def getSetpointChangeThreshold(self) -> float: # pyrefly: ignore[bad-return]
         """Get the current setpoint change threshold."""
         try:
             self.pidSemaphore.acquire(1)
             return self.setpoint_change_threshold
-        except Exception:  # pylint: disable=broad-except
-            return 5.0  # Default value
         finally:
-            if self.pidSemaphore.available() < 1:
-                self.pidSemaphore.release(1)
+            self.pidSemaphore.release(1)

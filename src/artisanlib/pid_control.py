@@ -1209,10 +1209,10 @@ class PIDcontrol:
         # => PoM removed in v3.1.2
         ## further pid configurations (only supported by the software pid currently)
         self.pidDoE:bool = False          # classical Derivative on Error (DoE) if True, otherwise Derivative on Measurement (DoM) to reduce derivative kick
-        self.pidDlimit:float = 80.0       # derivative limit [0-100] (used for both, DoM and DoE)
-        self.pidIlimitFactor:float = 0.8  # integral limit factor
-        self.pidIWP:bool = True           # Advanced Integral Windup Prevention
-        self.pidIRoC:bool = True          # Reset integral on large setpoint changes
+        self.pidDlimit:float = 100.0      # derivative limit [0-999] (used for both, DoM and DoE)
+        self.pidIlimitFactor:float = 1    # integral limit factor [0-1]
+        self.pidIWP:bool = False          # Advanced Integral Windup Prevention
+        self.pidIRoC:bool = False         # Reset integral on large setpoint changes
         self.pidIRoCthreshold:float = 30  # SP threshold beyond which the integral will be reset if pidRIoC is set
         # pidSource
         #   either the TC4 input channel from [1,..,4] if self.qmc.device == 19 (Arduino/TC4)

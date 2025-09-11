@@ -124,6 +124,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.controlButtonFlag = QCheckBox(QApplication.translate('Label', 'Control'))
         self.controlButtonFlag.setChecked(self.aw.qmc.Controlbuttonflag)
         self.controlButtonFlag.stateChanged.connect(self.showControlbuttonToggle)
+        self.controlButtonFlag.setToolTip(QApplication.translate('Tooltip', 'Enable PID control'))
 
         self.nonpidButton = QRadioButton(QApplication.translate('Radio Button','Meter'))
         self.pidButton = QRadioButton(QApplication.translate('Radio Button','PID'))
@@ -3688,7 +3689,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ####  DEVICE 21 is +309_34 but +DEVICE cannot be set as main device
                 ##########################
                 ##########################
-                ####  DEVICE 22 is +PID DUTY% but +DEVICE cannot be set as main device
+                ####  DEVICE 22 is +PID DUTY/SV % but +DEVICE cannot be set as main device
                 ##########################
                 elif meter == 'Omega HHM28[6]' and self.aw.qmc.device != 23:
                     self.aw.qmc.device = 23
@@ -4359,6 +4360,12 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 elif meter == 'Aillio Bullet R2':
                     self.aw.qmc.device = 176
                     message = QApplication.translate('Message','Device set to {0}').format(meter)
+                ##########################
+                ####  DEVICE 177 is +PID P/I but +DEVICE cannot be set as main device
+                ##########################
+                ##########################
+                ####  DEVICE 178 is +PID D/Error but +DEVICE cannot be set as main device
+                ##########################
 
                 # ADD DEVICE:
 
@@ -4554,7 +4561,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 1, # 173
                 1, # 174
                 1, # 175
-                1  # 176
+                1, # 176
+                6, # 177
+                6  # 178
                 ]
             #init serial settings of extra devices
             for i, _ in enumerate(self.aw.qmc.extradevices):

@@ -158,6 +158,8 @@ def _import_pid_with_mocks() -> Any:
 # Import the module
 PID = _import_pid_with_mocks()
 
+from artisanlib.pid import _calculate_integral_limits
+
 
 @pytest.fixture(scope='session', autouse=True)
 def ensure_pid_qt_isolation() -> Generator[None, None, None]:
@@ -460,14 +462,6 @@ class TestPIDParameterSetters:
         pid.target = 75.0
 
         assert pid.getTarget() == 75.0
-
-    def test_getTarget_handles_exceptions(self) -> None:
-        """Test that getTarget handles exceptions gracefully."""
-        pid = PID()
-
-        with patch.object(pid.pidSemaphore, 'acquire', side_effect=Exception('Test exception')):
-            result = pid.getTarget()
-            assert result == 0.0
 
     def test_setLimits_updates_output_limits(self) -> None:
         """Test that setLimits updates output limits."""
@@ -1338,14 +1332,6 @@ class TestPIDDerivativeKickImprovements:
         pid.setDerivativeLimit(-10.0)
         assert pid.getDerivativeLimit() == 0.0
 
-    def test_getDerivativeLimit_handles_exceptions(self) -> None:
-        """Test that getDerivativeLimit handles exceptions gracefully."""
-        pid = PID()
-
-        with patch.object(pid.pidSemaphore, 'acquire', side_effect=Exception('Test exception')):
-            result = pid.getDerivativeLimit()
-            assert result == 80.0  # Default value
-
     def test_measurement_history_tracking(self) -> None:
         """Test that measurement history is properly tracked."""
         pid = PID()
@@ -1420,7 +1406,7 @@ class TestPIDDerivativeKickImprovements:
     def test_derivative_calculation_with_setpoint_change(self) -> None:
         """Test that derivative calculation is reduced after setpoint changes."""
         pid = PID(d=1.0)
-        pid.setpoint_changed = True
+        pid.setpoint_changed_significantly = True
         pid.lastInput = 0.0
 
         # Calculate derivative with setpoint change flag set
@@ -1443,8 +1429,8 @@ class TestPIDDerivativeKickImprovements:
         derivative = pid._calculate_derivative_on_measurement(80.0, 1.0)
 
         # Normal would be: -1.0 * (80.0 - 50.0) / 1.0 = -30.0
-        # With discontinuity: -30.0 * 0.2 = -6.0
-        assert derivative == pytest.approx(-6.0, abs=1e-10)
+        # With discontinuity: -30.0 * 0.3 = -9.0
+        assert derivative == pytest.approx(-9.0, abs=1e-10)
 
     def test_derivative_limiting(self) -> None:
         """Test that derivative contribution is limited."""
@@ -1544,14 +1530,6 @@ class TestPIDIntegralWindupImprovements:
         pid.setIntegralWindupPrevention(True)
         assert pid.getIntegralWindupPrevention() is True
 
-    def test_getIntegralWindupPrevention_handles_exceptions(self) -> None:
-        """Test that getIntegralWindupPrevention handles exceptions gracefully."""
-        pid = PID()
-
-        with patch.object(pid.pidSemaphore, 'acquire', side_effect=Exception('Test exception')):
-            result = pid.getIntegralWindupPrevention()
-            assert result is True  # Default value
-
     def test_setIntegralLimitFactor_updates_factor(self) -> None:
         """Test that setIntegralLimitFactor updates the factor."""
         pid = PID()
@@ -1614,7 +1592,7 @@ class TestPIDIntegralWindupImprovements:
         pid.setLimits(0, 100)
         pid.integral_limit_factor = 1.0
 
-        integral_min, integral_max = pid._calculate_integral_limits()
+        integral_min, integral_max = _calculate_integral_limits(0, 100, 1.0)
 
         assert integral_min == 0.0
         assert integral_max == 100.0  # 100 * 1.0
@@ -1625,7 +1603,7 @@ class TestPIDIntegralWindupImprovements:
         pid.setLimits(-100, 0)
         pid.integral_limit_factor = 0.6
 
-        integral_min, integral_max = pid._calculate_integral_limits()
+        integral_min, integral_max = _calculate_integral_limits(-100, 0, 0.6)
 
         assert integral_min == -60.0  # -100 * 0.6
         assert integral_max == 0.0
@@ -1636,7 +1614,7 @@ class TestPIDIntegralWindupImprovements:
         pid.setLimits(-50, 50)
         pid.integral_limit_factor = 1.0
 
-        integral_min, integral_max = pid._calculate_integral_limits()
+        integral_min, integral_max = _calculate_integral_limits(-50, 50, 1.0)
 
         assert integral_min == -50.0  # -(100 * 1.0) / 2
         assert integral_max == 50.0  # (100 * 1.0) / 2
@@ -1771,5 +1749,5 @@ class TestPIDIntegralWindupImprovements:
                 pid.update(50.0)  # Constant error
 
         # Integral should be limited and not cause excessive windup
-        integral_min, integral_max = pid._calculate_integral_limits()
+        integral_min, integral_max = _calculate_integral_limits(0, 100, 1.0)
         assert integral_min <= pid.Iterm <= integral_max

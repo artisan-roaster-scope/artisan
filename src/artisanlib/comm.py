@@ -549,7 +549,9 @@ class serialport:
                                    self.Santoker_RR,          #173
                                    self.ColorTrackBT,         #174
                                    self.BlueDOT_BTET,         #175
-                                   self.R2_BTIBTS             #176
+                                   self.R2_BTIBTS,            #176
+                                   self.pidPtermIterm,        #177
+                                   self.pidDtermError         #178
                                    ]
         #string with the name of the program for device #27
         self.externalprogram:str = 'test.py'
@@ -680,6 +682,14 @@ class serialport:
             duty = (-1.0 if duty is None else min(100.0, max(-100.0, duty)))
         self.aw.qmc.updateLargePIDLCDs(sv=lcdformat%sv, duty=lcdformat%duty)
         return tx, duty, sv
+
+    def pidPtermIterm(self) -> Tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        return tx, self.aw.qmc.pid.getIterm(), self.aw.qmc.pid.getPterm()
+
+    def pidDtermError(self) -> Tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        return tx, self.aw.qmc.pid.getError(), self.aw.qmc.pid.getDterm()
 
     def DTAtemperature(self) -> Tuple[float,float,float]:
         _log.debug('DTAtemperature')

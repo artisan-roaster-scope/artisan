@@ -915,7 +915,9 @@ class tgraphcanvas(FigureCanvas):
                        '+Santoker DelatBT/DeltaET', #173
                        'ColorTrack BT',             #174
                        'Thermoworks BlueDOT',       #175
-                       'Aillio Bullet R2'           #176
+                       'Aillio Bullet R2',          #176
+                       '+PID P/I',                  #177
+                       '+PID D/Error',              #178
                        ]
 
         # ADD DEVICE:
@@ -1058,7 +1060,9 @@ class tgraphcanvas(FigureCanvas):
             166, # +Mugma Heater/Catalyzer
             170, # ColorTrack Serial
             173, # +Santoker BT RoR / ET RoR
-            174  # ColorTrack BT
+            174, # ColorTrack BT
+            177, # +PID P/I
+            178  # +PID D/Error
         ]
 
         # ADD DEVICE:
