@@ -32,6 +32,9 @@ QTDIR = os.environ['QT_PATH'] + r'/'
 
 APP = ['artisan.py']
 
+SUPPORTED_LANGUAGES = ['ar', 'cs', 'da', 'de','el','en','es','fa','fi','fr','gd', 'he','hu','id','it','ja','ko','lv', 'nl','no','pl','pt_BR','pt','sk', 'sv','th','tr','uk','vi','zh_CN','zh_TW']
+
+
 DATA_FILES = [
 # standard QT translation needed to get the Application menu bar and
 # the standard dialog elements translated
@@ -448,6 +451,38 @@ for root, dirs, files in os.walk('.'):
 #                    print('Deleting', os.path.join(r,fl))
                     if not fl.endswith(('.py', '.pyc')):
                         os.remove(os.path.join(r,fl))
+
+
+# remove unused language support from babel
+
+print('*** Removing unused language support from babel ***')
+
+for root, _, files in os.walk(f'./Artisan.app/Contents/Resources/lib/{python_version}/babel/locale-data'):
+    for file in files:
+        if (file.endswith('.dat') and
+            file not in {'root.dat', 'zh.dat', 'zh_Hans_CN.dat', 'zh_Hant_TW.dat'} and
+            (('_' not in file and file.split('.')[0] not in SUPPORTED_LANGUAGES) or
+                ('_' in file and file.split('.')[0] not in SUPPORTED_LANGUAGES))):
+#            print('Deleting', file)
+            os.remove(os.path.join(root,file))
+
+
+print('*** Removing yoctopuce driver libs not for this platforms ***')
+try:
+    subprocess.check_call(f'rm -f ./Artisan.app/Contents/Resources/lib/{python_version}/yoctopuce/cdll/*.so',shell = True)
+    subprocess.check_call(f'rm -f ./Artisan.app/Contents/Resources/lib/{python_version}/yoctopuce/cdll/*.dll',shell = True)
+except Exception: # pylint: disable=broad-except
+    pass
+
+print('*** Removing Phidget driver libs not for this platforms ***')
+try:
+    subprocess.check_call(f'rm -f ./Artisan.app/Contents/Resources/lib/{python_version}/Phidget22/.libs/*.so',shell = True)
+    subprocess.check_call(f'rm -f ./Artisan.app/Contents/Resources/lib/{python_version}/Phidget22/.libs/*.dll',shell = True)
+except Exception: # pylint: disable=broad-except
+    pass
+
+####
+
 
 os.chdir('..')
 subprocess.check_call(r'rm -f artisan-mac-' + VERSION + r'.dmg',shell = True)

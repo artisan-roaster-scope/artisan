@@ -9,62 +9,62 @@
       <translation>Rilis Sponsor</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23876" />
+      <location filename="../artisanlib/main.py" line="23877" />
       <source>About</source>
       <translation>Tentang Artisan</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23894" />
+      <location filename="../artisanlib/main.py" line="23895" />
       <source>Core Developers</source>
       <translation>Pengembang Inti</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23897" />
+      <location filename="../artisanlib/main.py" line="23898" />
       <source>License</source>
       <translation>Lisensi</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23918" />
+      <location filename="../artisanlib/main.py" line="23919" />
       <source>There was a problem retrieving the latest version information.  Please check your Internet connection, try again later, or check manually.</source>
       <translation>Ada masalah saat mengambil informasi versi terbaru. Harap periksa sambungan Internet Anda, coba lagi nanti, atau periksa secara manual.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23932" />
+      <location filename="../artisanlib/main.py" line="23933" />
       <source>A new release is available.</source>
       <translation>Rilis baru tersedia.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23934" />
+      <location filename="../artisanlib/main.py" line="23935" />
       <source>Show Change list</source>
       <translation>Tampilkan daftar Ubah</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23936" />
+      <location filename="../artisanlib/main.py" line="23937" />
       <source>Download Release</source>
       <translation>Download Rilis</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23938" />
+      <location filename="../artisanlib/main.py" line="23939" />
       <source>You are using the latest release.</source>
       <translation>Anda menggunakan rilis terbaru.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23940" />
+      <location filename="../artisanlib/main.py" line="23941" />
       <source>You are using a beta continuous build.</source>
       <translation>Anda menggunakan versi beta berkelanjutan.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23941" />
+      <location filename="../artisanlib/main.py" line="23942" />
       <source>You will see a notice here once a new official release is available.</source>
       <translation>Anda akan melihat pemberitahuan di sini setelah rilis resmi baru tersedia.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23956" />
+      <location filename="../artisanlib/main.py" line="23957" />
       <source>Update status</source>
       <translation>Memperbaharui status</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="9288" />
+      <location filename="../artisanlib/canvas.py" line="9297" />
       <source>sponsored by {}</source>
       <translation>disponsori oleh {}</translation>
     </message>
@@ -72,13 +72,13 @@
   <context>
     <name>AddlInfo</name>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11704" />
+      <location filename="../artisanlib/canvas.py" line="11713" />
       <location filename="../artisanlib/statistics.py" line="205" />
       <source>Roast of the Day</source>
       <translation>Sangraian hari ini</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11781" />
+      <location filename="../artisanlib/canvas.py" line="11790" />
       <location filename="../artisanlib/statistics.py" line="210" />
       <source>Screen Size</source>
       <translation>Ukuran layar</translation>
@@ -94,91 +94,111 @@
       <translation>Kelembaban mentah</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11799" />
+      <location filename="../artisanlib/canvas.py" line="11808" />
       <location filename="../artisanlib/statistics.py" line="213" />
       <source>Batch Size</source>
       <translation>Ukuran Batch</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11807" />
+      <location filename="../artisanlib/canvas.py" line="11816" />
       <location filename="../artisanlib/statistics.py" line="214" />
       <source>Density Roasted</source>
       <translation>Kepadatan Panggang</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11811" />
+      <location filename="../artisanlib/canvas.py" line="11820" />
       <location filename="../artisanlib/statistics.py" line="215" />
       <source>Moisture Roasted</source>
       <translation>Kelembaban matang</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11815" />
+      <location filename="../artisanlib/canvas.py" line="11824" />
       <location filename="../artisanlib/statistics.py" line="216" />
       <source>Ground Color</source>
       <translation>Warna bubuk</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11819" />
+      <location filename="../artisanlib/canvas.py" line="11828" />
       <location filename="../artisanlib/statistics.py" line="217" />
       <source>Energy</source>
       <translation>Energi</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11825" />
+      <location filename="../artisanlib/canvas.py" line="11834" />
       <location filename="../artisanlib/statistics.py" line="218" />
       <source>CO2</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11857" />
+      <location filename="../artisanlib/canvas.py" line="11866" />
       <location filename="../artisanlib/statistics.py" line="224" />
       <source>Weight Roasted</source>
       <translation>Berat Dipanggang</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11861" />
+      <location filename="../artisanlib/canvas.py" line="11870" />
       <location filename="../artisanlib/statistics.py" line="225" />
       <source>Weight Loss</source>
       <translation>Bobot Susut</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11744" />
+      <location filename="../artisanlib/canvas.py" line="11753" />
       <source>From</source>
       <translation>Dari</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11745" />
+      <location filename="../artisanlib/canvas.py" line="11754" />
       <source>Bottom</source>
       <translation>Dasar</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11830" />
+      <location filename="../artisanlib/canvas.py" line="11839" />
       <source>AUC</source>
       <translation type="unfinished">AUC</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11918" />
+      <location filename="../artisanlib/canvas.py" line="11927" />
       <source>Defects Weight</source>
       <translation>Cacat Berat</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11923" />
+      <location filename="../artisanlib/canvas.py" line="11932" />
       <source>Defects Loss</source>
       <translation>Cacat Kerugian</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11928" />
+      <location filename="../artisanlib/canvas.py" line="11937" />
       <source>Yield</source>
       <translation>Menghasilkan</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11934" />
+      <location filename="../artisanlib/canvas.py" line="11943" />
       <source>Total Loss</source>
       <translation>Kerugian Total</translation>
     </message>
   </context>
   <context>
     <name>Button</name>
+    <message>
+      <location filename="../artisanlib/dialogs.py" line="614" />
+      <location filename="../artisanlib/dialogs.py" line="94" />
+      <location filename="../artisanlib/comm.py" line="205" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2454" />
+      <location filename="../artisanlib/pid_dialogs.py" line="1583" />
+      <location filename="../artisanlib/pid_dialogs.py" line="708" />
+      <location filename="../plus/login.py" line="100" />
+      <source>OK</source>
+      <translation>OK</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/dialogs.py" line="615" />
+      <location filename="../artisanlib/dialogs.py" line="95" />
+      <location filename="../artisanlib/comm.py" line="206" />
+      <location filename="../artisanlib/pid_dialogs.py" line="2742" />
+      <location filename="../plus/login.py" line="105" />
+      <source>Cancel</source>
+      <translation>Batal</translation>
+    </message>
     <message>
       <location filename="../artisanlib/colors.py" line="574" />
       <location filename="../artisanlib/designer.py" line="252" />
@@ -299,17 +319,6 @@
       <location filename="../artisanlib/pid_dialogs.py" line="688" />
       <source>Save</source>
       <translation type="unfinished">Simpan</translation>
-    </message>
-    <message>
-      <location filename="../plus/login.py" line="100" />
-      <location filename="../artisanlib/dialogs.py" line="614" />
-      <location filename="../artisanlib/dialogs.py" line="94" />
-      <location filename="../artisanlib/comm.py" line="205" />
-      <location filename="../artisanlib/pid_dialogs.py" line="2454" />
-      <location filename="../artisanlib/pid_dialogs.py" line="1583" />
-      <location filename="../artisanlib/pid_dialogs.py" line="708" />
-      <source>OK</source>
-      <translation>OK</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="710" />
@@ -522,15 +531,6 @@
       <location filename="../artisanlib/pid_dialogs.py" line="2736" />
       <source>Write PIDs</source>
       <translation type="unfinished">Tulis PID</translation>
-    </message>
-    <message>
-      <location filename="../plus/login.py" line="105" />
-      <location filename="../artisanlib/dialogs.py" line="615" />
-      <location filename="../artisanlib/dialogs.py" line="95" />
-      <location filename="../artisanlib/comm.py" line="206" />
-      <location filename="../artisanlib/pid_dialogs.py" line="2742" />
-      <source>Cancel</source>
-      <translation>Batal</translation>
     </message>
     <message>
       <location filename="../artisanlib/pid_dialogs.py" line="2810" />
@@ -802,16 +802,16 @@ Perangkat Ekstra</translation>
       <translation type="unfinished">Teks</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="13409" />
-      <location filename="../artisanlib/canvas.py" line="7716" />
+      <location filename="../artisanlib/canvas.py" line="13426" />
+      <location filename="../artisanlib/canvas.py" line="7717" />
       <location filename="../artisanlib/main.py" line="3280" />
       <source>ON</source>
       <translation>HIDUP</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14128" />
-      <location filename="../artisanlib/canvas.py" line="11743" />
-      <location filename="../artisanlib/canvas.py" line="7721" />
+      <location filename="../artisanlib/canvas.py" line="14145" />
+      <location filename="../artisanlib/canvas.py" line="11752" />
+      <location filename="../artisanlib/canvas.py" line="7722" />
       <location filename="../artisanlib/main.py" line="3294" />
       <source>START</source>
       <translation>MULAI</translation>
@@ -846,13 +846,13 @@ END</source>
       <translation>RESET</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11742" />
+      <location filename="../artisanlib/canvas.py" line="11751" />
       <location filename="../artisanlib/main.py" line="3338" />
       <source>CHARGE</source>
       <translation>ISI</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11743" />
+      <location filename="../artisanlib/canvas.py" line="11752" />
       <location filename="../artisanlib/main.py" line="3343" />
       <source>DROP</source>
       <translation>KELUARKAN</translation>
@@ -930,25 +930,25 @@ END</source>
     </message>
     <message>
       <location filename="../artisanlib/colors.py" line="167" />
-      <location filename="../artisanlib/canvas.py" line="11887" />
+      <location filename="../artisanlib/canvas.py" line="11896" />
       <source>Finishing Phase</source>
       <translation type="unfinished">Fase Akhir</translation>
     </message>
     <message>
       <location filename="../artisanlib/colors.py" line="162" />
-      <location filename="../artisanlib/canvas.py" line="11895" />
+      <location filename="../artisanlib/canvas.py" line="11904" />
       <source>Maillard Phase</source>
       <translation type="unfinished">Fase pematangan</translation>
     </message>
     <message>
       <location filename="../artisanlib/colors.py" line="157" />
-      <location filename="../artisanlib/canvas.py" line="11902" />
+      <location filename="../artisanlib/canvas.py" line="11911" />
       <source>Drying Phase</source>
       <translation type="unfinished">Fase Pengeringan</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14031" />
-      <location filename="../artisanlib/canvas.py" line="13272" />
+      <location filename="../artisanlib/canvas.py" line="14048" />
+      <location filename="../artisanlib/canvas.py" line="13289" />
       <source>OFF</source>
       <translation>MATI</translation>
     </message>
@@ -1122,6 +1122,17 @@ END</source>
   </context>
   <context>
     <name>CheckBox</name>
+    <message>
+      <location filename="../artisanlib/curves.py" line="1029" />
+      <location filename="../artisanlib/curves.py" line="940" />
+      <location filename="../artisanlib/curves.py" line="934" />
+      <location filename="../artisanlib/curves.py" line="927" />
+      <location filename="../artisanlib/curves.py" line="912" />
+      <location filename="../artisanlib/background.py" line="68" />
+      <location filename="../plus/schedule.py" line="1488" />
+      <source>Show</source>
+      <translation type="unfinished">Tampilkan</translation>
+    </message>
     <message>
       <location filename="../artisanlib/axis.py" line="175" />
       <source>Expand</source>
@@ -1354,17 +1365,6 @@ END</source>
       <translation>MATI saat DROP</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="1472" />
-      <location filename="../artisanlib/curves.py" line="1029" />
-      <location filename="../artisanlib/curves.py" line="940" />
-      <location filename="../artisanlib/curves.py" line="934" />
-      <location filename="../artisanlib/curves.py" line="927" />
-      <location filename="../artisanlib/curves.py" line="912" />
-      <location filename="../artisanlib/background.py" line="68" />
-      <source>Show</source>
-      <translation type="unfinished">Tampilkan</translation>
-    </message>
-    <message>
       <location filename="../artisanlib/curves.py" line="405" />
       <location filename="../artisanlib/background.py" line="77" />
       <source>Show Full</source>
@@ -1427,61 +1427,61 @@ END</source>
       <translation type="unfinished">Tampilkan Selalu</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23287" />
+      <location filename="../artisanlib/main.py" line="23288" />
       <location filename="../artisanlib/roast_properties.py" line="1184" />
       <source>Heavy FC</source>
       <translation>FC Berat</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23289" />
+      <location filename="../artisanlib/main.py" line="23290" />
       <location filename="../artisanlib/roast_properties.py" line="1187" />
       <source>Low FC</source>
       <translation>FC Rendah</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23291" />
+      <location filename="../artisanlib/main.py" line="23292" />
       <location filename="../artisanlib/roast_properties.py" line="1190" />
       <source>Light Cut</source>
       <translation>Potong tipis</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23293" />
+      <location filename="../artisanlib/main.py" line="23294" />
       <location filename="../artisanlib/roast_properties.py" line="1193" />
       <source>Dark Cut</source>
       <translation>Potong Hitam</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23295" />
+      <location filename="../artisanlib/main.py" line="23296" />
       <location filename="../artisanlib/roast_properties.py" line="1196" />
       <source>Drops</source>
       <translation>Drop</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23297" />
+      <location filename="../artisanlib/main.py" line="23298" />
       <location filename="../artisanlib/roast_properties.py" line="1199" />
       <source>Oily</source>
       <translation>Berminyak</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23299" />
+      <location filename="../artisanlib/main.py" line="23300" />
       <location filename="../artisanlib/roast_properties.py" line="1202" />
       <source>Uneven</source>
       <translation>Tidak merata</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23301" />
+      <location filename="../artisanlib/main.py" line="23302" />
       <location filename="../artisanlib/roast_properties.py" line="1204" />
       <source>Tipping</source>
       <translation>Pecah</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23303" />
+      <location filename="../artisanlib/main.py" line="23304" />
       <location filename="../artisanlib/roast_properties.py" line="1206" />
       <source>Scorching</source>
       <translation>Gosong</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23305" />
+      <location filename="../artisanlib/main.py" line="23306" />
       <location filename="../artisanlib/roast_properties.py" line="1208" />
       <source>Divots</source>
       <translation>Divot</translation>
@@ -2379,66 +2379,66 @@ END</source>
       <translation>diskrit</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="1670" />
-      <location filename="../artisanlib/canvas.py" line="1663" />
-      <location filename="../artisanlib/canvas.py" line="1435" />
+      <location filename="../artisanlib/canvas.py" line="1671" />
+      <location filename="../artisanlib/canvas.py" line="1664" />
+      <location filename="../artisanlib/canvas.py" line="1436" />
       <source>Air</source>
       <translation>Udara</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="1678" />
-      <location filename="../artisanlib/canvas.py" line="1671" />
-      <location filename="../artisanlib/canvas.py" line="1664" />
-      <location filename="../artisanlib/canvas.py" line="1436" />
-      <source>Drum</source>
-      <translation />
-    </message>
-    <message>
+      <location filename="../artisanlib/canvas.py" line="1679" />
       <location filename="../artisanlib/canvas.py" line="1672" />
       <location filename="../artisanlib/canvas.py" line="1665" />
       <location filename="../artisanlib/canvas.py" line="1437" />
-      <source>Damper</source>
-      <translation>Damper</translation>
+      <source>Drum</source>
+      <translation />
     </message>
     <message>
       <location filename="../artisanlib/canvas.py" line="1673" />
       <location filename="../artisanlib/canvas.py" line="1666" />
       <location filename="../artisanlib/canvas.py" line="1438" />
+      <source>Damper</source>
+      <translation>Damper</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/canvas.py" line="1674" />
+      <location filename="../artisanlib/canvas.py" line="1667" />
+      <location filename="../artisanlib/canvas.py" line="1439" />
       <source>Burner</source>
       <translation>Pembakar</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="1465" />
+      <location filename="../artisanlib/canvas.py" line="1466" />
       <source>Propane Gas (LPG)</source>
       <translation>Gas Propana (LPG)</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="1466" />
+      <location filename="../artisanlib/canvas.py" line="1467" />
       <source>Natural Gas (NG)</source>
       <translation>Gas Alam (NG)</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="1467" />
+      <location filename="../artisanlib/canvas.py" line="1468" />
       <source>Electric</source>
       <translation>Listrik</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="1677" />
+      <location filename="../artisanlib/canvas.py" line="1678" />
       <source>Fan</source>
       <translation>Kipas</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="1679" />
+      <location filename="../artisanlib/canvas.py" line="1680" />
       <source>Cooling</source>
       <translation type="unfinished">Pendinginan</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="1680" />
+      <location filename="../artisanlib/canvas.py" line="1681" />
       <source>Heater</source>
       <translation type="unfinished">Pemanas</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="2291" />
+      <location filename="../artisanlib/canvas.py" line="2292" />
       <source>Elec</source>
       <translation>pilihan</translation>
     </message>
@@ -2446,79 +2446,79 @@ END</source>
   <context>
     <name>Contextual Menu</name>
     <message>
-      <location filename="../artisanlib/canvas.py" line="17828" />
-      <source>Add point</source>
-      <translation>Tambah titik</translation>
-    </message>
-    <message>
-      <location filename="../artisanlib/canvas.py" line="17832" />
-      <source>Remove point</source>
-      <translation>Hapus titik</translation>
-    </message>
-    <message>
-      <location filename="../artisanlib/canvas.py" line="17838" />
-      <source>Load points</source>
-      <translation>Muat titik</translation>
-    </message>
-    <message>
-      <location filename="../artisanlib/canvas.py" line="17842" />
-      <source>Save points</source>
-      <translation>Simpan titik</translation>
-    </message>
-    <message>
-      <location filename="../artisanlib/canvas.py" line="17848" />
-      <source>Reset Designer</source>
-      <translation>Reset Desainer</translation>
-    </message>
-    <message>
-      <location filename="../artisanlib/canvas.py" line="17852" />
-      <source>Config...</source>
-      <translation>Konfig...</translation>
-    </message>
-    <message>
-      <location filename="../artisanlib/canvas.py" line="18628" />
-      <source>Add to Cupping Notes</source>
-      <translation>Tambahkan catatan Cupping</translation>
-    </message>
-    <message>
-      <location filename="../artisanlib/canvas.py" line="18632" />
-      <source>Add to Roasting Notes</source>
-      <translation>Tambahkan ke catatan Roasting</translation>
-    </message>
-    <message>
-      <location filename="../artisanlib/canvas.py" line="18638" />
-      <source>Edit</source>
-      <translation>Sunting</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="1445" />
+      <location filename="../plus/schedule.py" line="1461" />
       <source>All batches prepared</source>
       <translation>Semua batch sudah disiapkan</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="1448" />
+      <location filename="../plus/schedule.py" line="1464" />
       <source>One more batch prepared</source>
       <translation>Satu batch lagi sudah siap</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="1452" />
+      <location filename="../plus/schedule.py" line="1468" />
       <source>One less batch prepared</source>
       <translation>Satu batch lebih sedikit yang sudah disiapkan</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="1455" />
+      <location filename="../plus/schedule.py" line="1471" />
       <source>No batch prepared</source>
       <translation>Tidak ada batch yang disiapkan</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="1468" />
+      <location filename="../plus/schedule.py" line="1484" />
       <source>Register roast</source>
       <translation>Daftar panggang</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="1476" />
+      <location filename="../plus/schedule.py" line="1492" />
       <source>Hide</source>
       <translation>Bersembunyi</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/canvas.py" line="17845" />
+      <source>Add point</source>
+      <translation>Tambah titik</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/canvas.py" line="17849" />
+      <source>Remove point</source>
+      <translation>Hapus titik</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/canvas.py" line="17855" />
+      <source>Load points</source>
+      <translation>Muat titik</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/canvas.py" line="17859" />
+      <source>Save points</source>
+      <translation>Simpan titik</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/canvas.py" line="17865" />
+      <source>Reset Designer</source>
+      <translation>Reset Desainer</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/canvas.py" line="17869" />
+      <source>Config...</source>
+      <translation>Konfig...</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/canvas.py" line="18645" />
+      <source>Add to Cupping Notes</source>
+      <translation>Tambahkan catatan Cupping</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/canvas.py" line="18649" />
+      <source>Add to Roasting Notes</source>
+      <translation>Tambahkan ke catatan Roasting</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/canvas.py" line="18655" />
+      <source>Edit</source>
+      <translation>Sunting</translation>
     </message>
   </context>
   <context>
@@ -3847,18 +3847,18 @@ END</source>
   <context>
     <name>Error Message</name>
     <message>
-      <location filename="../artisanlib/main.py" line="26493" />
-      <location filename="../artisanlib/main.py" line="26455" />
-      <location filename="../artisanlib/main.py" line="26312" />
-      <location filename="../artisanlib/main.py" line="25873" />
-      <location filename="../artisanlib/main.py" line="25803" />
-      <location filename="../artisanlib/main.py" line="25752" />
-      <location filename="../artisanlib/main.py" line="25611" />
-      <location filename="../artisanlib/main.py" line="25480" />
-      <location filename="../artisanlib/main.py" line="25348" />
-      <location filename="../artisanlib/main.py" line="25133" />
-      <location filename="../artisanlib/main.py" line="25053" />
-      <location filename="../artisanlib/main.py" line="23270" />
+      <location filename="../artisanlib/main.py" line="26494" />
+      <location filename="../artisanlib/main.py" line="26456" />
+      <location filename="../artisanlib/main.py" line="26313" />
+      <location filename="../artisanlib/main.py" line="25874" />
+      <location filename="../artisanlib/main.py" line="25804" />
+      <location filename="../artisanlib/main.py" line="25753" />
+      <location filename="../artisanlib/main.py" line="25612" />
+      <location filename="../artisanlib/main.py" line="25481" />
+      <location filename="../artisanlib/main.py" line="25349" />
+      <location filename="../artisanlib/main.py" line="25134" />
+      <location filename="../artisanlib/main.py" line="25054" />
+      <location filename="../artisanlib/main.py" line="23271" />
       <location filename="../artisanlib/main.py" line="22613" />
       <location filename="../artisanlib/main.py" line="21251" />
       <location filename="../artisanlib/main.py" line="16860" />
@@ -3869,80 +3869,80 @@ END</source>
       <translation>Kesalahan IO:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="18814" />
-      <location filename="../artisanlib/canvas.py" line="18373" />
-      <location filename="../artisanlib/canvas.py" line="18269" />
-      <location filename="../artisanlib/canvas.py" line="18227" />
-      <location filename="../artisanlib/canvas.py" line="18122" />
-      <location filename="../artisanlib/canvas.py" line="18104" />
-      <location filename="../artisanlib/canvas.py" line="17399" />
-      <location filename="../artisanlib/canvas.py" line="17376" />
-      <location filename="../artisanlib/canvas.py" line="17127" />
-      <location filename="../artisanlib/canvas.py" line="17103" />
-      <location filename="../artisanlib/canvas.py" line="16918" />
-      <location filename="../artisanlib/canvas.py" line="16751" />
-      <location filename="../artisanlib/canvas.py" line="16694" />
-      <location filename="../artisanlib/canvas.py" line="16664" />
-      <location filename="../artisanlib/canvas.py" line="16358" />
-      <location filename="../artisanlib/canvas.py" line="16323" />
-      <location filename="../artisanlib/canvas.py" line="16034" />
-      <location filename="../artisanlib/canvas.py" line="15735" />
-      <location filename="../artisanlib/canvas.py" line="15636" />
-      <location filename="../artisanlib/canvas.py" line="15402" />
-      <location filename="../artisanlib/canvas.py" line="15224" />
-      <location filename="../artisanlib/canvas.py" line="15089" />
-      <location filename="../artisanlib/canvas.py" line="14910" />
-      <location filename="../artisanlib/canvas.py" line="14794" />
-      <location filename="../artisanlib/canvas.py" line="14684" />
-      <location filename="../artisanlib/canvas.py" line="14578" />
-      <location filename="../artisanlib/canvas.py" line="14465" />
-      <location filename="../artisanlib/canvas.py" line="14381" />
-      <location filename="../artisanlib/canvas.py" line="14321" />
-      <location filename="../artisanlib/canvas.py" line="14143" />
-      <location filename="../artisanlib/canvas.py" line="14080" />
-      <location filename="../artisanlib/canvas.py" line="13515" />
-      <location filename="../artisanlib/canvas.py" line="13472" />
-      <location filename="../artisanlib/canvas.py" line="13306" />
-      <location filename="../artisanlib/canvas.py" line="13228" />
-      <location filename="../artisanlib/canvas.py" line="12172" />
-      <location filename="../artisanlib/canvas.py" line="11936" />
-      <location filename="../artisanlib/canvas.py" line="11690" />
-      <location filename="../artisanlib/canvas.py" line="11646" />
-      <location filename="../artisanlib/canvas.py" line="11601" />
-      <location filename="../artisanlib/canvas.py" line="11346" />
-      <location filename="../artisanlib/canvas.py" line="11285" />
-      <location filename="../artisanlib/canvas.py" line="11026" />
-      <location filename="../artisanlib/canvas.py" line="10978" />
-      <location filename="../artisanlib/canvas.py" line="10608" />
-      <location filename="../artisanlib/canvas.py" line="10565" />
-      <location filename="../artisanlib/canvas.py" line="10522" />
-      <location filename="../artisanlib/canvas.py" line="10478" />
-      <location filename="../artisanlib/canvas.py" line="10020" />
-      <location filename="../artisanlib/canvas.py" line="9981" />
-      <location filename="../artisanlib/canvas.py" line="9942" />
-      <location filename="../artisanlib/canvas.py" line="9903" />
-      <location filename="../artisanlib/canvas.py" line="9136" />
-      <location filename="../artisanlib/canvas.py" line="9084" />
-      <location filename="../artisanlib/canvas.py" line="8737" />
-      <location filename="../artisanlib/canvas.py" line="8561" />
-      <location filename="../artisanlib/canvas.py" line="8080" />
-      <location filename="../artisanlib/canvas.py" line="7958" />
-      <location filename="../artisanlib/canvas.py" line="7622" />
-      <location filename="../artisanlib/canvas.py" line="7376" />
-      <location filename="../artisanlib/canvas.py" line="6569" />
-      <location filename="../artisanlib/canvas.py" line="6399" />
-      <location filename="../artisanlib/canvas.py" line="6099" />
-      <location filename="../artisanlib/canvas.py" line="6081" />
-      <location filename="../artisanlib/canvas.py" line="6058" />
-      <location filename="../artisanlib/canvas.py" line="5706" />
-      <location filename="../artisanlib/canvas.py" line="5596" />
-      <location filename="../artisanlib/canvas.py" line="5582" />
-      <location filename="../artisanlib/canvas.py" line="5201" />
-      <location filename="../artisanlib/canvas.py" line="5188" />
-      <location filename="../artisanlib/canvas.py" line="4408" />
-      <location filename="../artisanlib/canvas.py" line="4053" />
-      <location filename="../artisanlib/canvas.py" line="3630" />
-      <location filename="../artisanlib/canvas.py" line="3192" />
+      <location filename="../artisanlib/canvas.py" line="18831" />
+      <location filename="../artisanlib/canvas.py" line="18390" />
+      <location filename="../artisanlib/canvas.py" line="18286" />
+      <location filename="../artisanlib/canvas.py" line="18244" />
+      <location filename="../artisanlib/canvas.py" line="18139" />
+      <location filename="../artisanlib/canvas.py" line="18121" />
+      <location filename="../artisanlib/canvas.py" line="17416" />
+      <location filename="../artisanlib/canvas.py" line="17393" />
+      <location filename="../artisanlib/canvas.py" line="17144" />
+      <location filename="../artisanlib/canvas.py" line="17120" />
+      <location filename="../artisanlib/canvas.py" line="16935" />
+      <location filename="../artisanlib/canvas.py" line="16768" />
+      <location filename="../artisanlib/canvas.py" line="16711" />
+      <location filename="../artisanlib/canvas.py" line="16681" />
+      <location filename="../artisanlib/canvas.py" line="16375" />
+      <location filename="../artisanlib/canvas.py" line="16340" />
+      <location filename="../artisanlib/canvas.py" line="16051" />
+      <location filename="../artisanlib/canvas.py" line="15752" />
+      <location filename="../artisanlib/canvas.py" line="15653" />
+      <location filename="../artisanlib/canvas.py" line="15419" />
+      <location filename="../artisanlib/canvas.py" line="15241" />
+      <location filename="../artisanlib/canvas.py" line="15106" />
+      <location filename="../artisanlib/canvas.py" line="14927" />
+      <location filename="../artisanlib/canvas.py" line="14811" />
+      <location filename="../artisanlib/canvas.py" line="14701" />
+      <location filename="../artisanlib/canvas.py" line="14595" />
+      <location filename="../artisanlib/canvas.py" line="14482" />
+      <location filename="../artisanlib/canvas.py" line="14398" />
+      <location filename="../artisanlib/canvas.py" line="14338" />
+      <location filename="../artisanlib/canvas.py" line="14160" />
+      <location filename="../artisanlib/canvas.py" line="14097" />
+      <location filename="../artisanlib/canvas.py" line="13532" />
+      <location filename="../artisanlib/canvas.py" line="13489" />
+      <location filename="../artisanlib/canvas.py" line="13323" />
+      <location filename="../artisanlib/canvas.py" line="13245" />
+      <location filename="../artisanlib/canvas.py" line="12181" />
+      <location filename="../artisanlib/canvas.py" line="11945" />
+      <location filename="../artisanlib/canvas.py" line="11699" />
+      <location filename="../artisanlib/canvas.py" line="11655" />
+      <location filename="../artisanlib/canvas.py" line="11610" />
+      <location filename="../artisanlib/canvas.py" line="11355" />
+      <location filename="../artisanlib/canvas.py" line="11294" />
+      <location filename="../artisanlib/canvas.py" line="11035" />
+      <location filename="../artisanlib/canvas.py" line="10987" />
+      <location filename="../artisanlib/canvas.py" line="10617" />
+      <location filename="../artisanlib/canvas.py" line="10574" />
+      <location filename="../artisanlib/canvas.py" line="10531" />
+      <location filename="../artisanlib/canvas.py" line="10487" />
+      <location filename="../artisanlib/canvas.py" line="10029" />
+      <location filename="../artisanlib/canvas.py" line="9990" />
+      <location filename="../artisanlib/canvas.py" line="9951" />
+      <location filename="../artisanlib/canvas.py" line="9912" />
+      <location filename="../artisanlib/canvas.py" line="9137" />
+      <location filename="../artisanlib/canvas.py" line="9085" />
+      <location filename="../artisanlib/canvas.py" line="8738" />
+      <location filename="../artisanlib/canvas.py" line="8562" />
+      <location filename="../artisanlib/canvas.py" line="8081" />
+      <location filename="../artisanlib/canvas.py" line="7959" />
+      <location filename="../artisanlib/canvas.py" line="7623" />
+      <location filename="../artisanlib/canvas.py" line="7377" />
+      <location filename="../artisanlib/canvas.py" line="6570" />
+      <location filename="../artisanlib/canvas.py" line="6400" />
+      <location filename="../artisanlib/canvas.py" line="6100" />
+      <location filename="../artisanlib/canvas.py" line="6082" />
+      <location filename="../artisanlib/canvas.py" line="6059" />
+      <location filename="../artisanlib/canvas.py" line="5707" />
+      <location filename="../artisanlib/canvas.py" line="5597" />
+      <location filename="../artisanlib/canvas.py" line="5583" />
+      <location filename="../artisanlib/canvas.py" line="5202" />
+      <location filename="../artisanlib/canvas.py" line="5189" />
+      <location filename="../artisanlib/canvas.py" line="4409" />
+      <location filename="../artisanlib/canvas.py" line="4054" />
+      <location filename="../artisanlib/canvas.py" line="3631" />
+      <location filename="../artisanlib/canvas.py" line="3193" />
       <location filename="../artisanlib/devices.py" line="4728" />
       <location filename="../artisanlib/devices.py" line="3339" />
       <location filename="../artisanlib/devices.py" line="3239" />
@@ -3953,24 +3953,24 @@ END</source>
       <location filename="../artisanlib/devices.py" line="3038" />
       <location filename="../artisanlib/devices.py" line="3023" />
       <location filename="../artisanlib/devices.py" line="2829" />
-      <location filename="../artisanlib/main.py" line="27031" />
-      <location filename="../artisanlib/main.py" line="26925" />
-      <location filename="../artisanlib/main.py" line="26746" />
-      <location filename="../artisanlib/main.py" line="26732" />
-      <location filename="../artisanlib/main.py" line="26498" />
-      <location filename="../artisanlib/main.py" line="26460" />
-      <location filename="../artisanlib/main.py" line="25883" />
-      <location filename="../artisanlib/main.py" line="25617" />
-      <location filename="../artisanlib/main.py" line="25486" />
-      <location filename="../artisanlib/main.py" line="25439" />
-      <location filename="../artisanlib/main.py" line="25355" />
-      <location filename="../artisanlib/main.py" line="25139" />
-      <location filename="../artisanlib/main.py" line="25059" />
-      <location filename="../artisanlib/main.py" line="24621" />
-      <location filename="../artisanlib/main.py" line="24412" />
-      <location filename="../artisanlib/main.py" line="23952" />
-      <location filename="../artisanlib/main.py" line="23755" />
-      <location filename="../artisanlib/main.py" line="23281" />
+      <location filename="../artisanlib/main.py" line="27032" />
+      <location filename="../artisanlib/main.py" line="26926" />
+      <location filename="../artisanlib/main.py" line="26747" />
+      <location filename="../artisanlib/main.py" line="26733" />
+      <location filename="../artisanlib/main.py" line="26499" />
+      <location filename="../artisanlib/main.py" line="26461" />
+      <location filename="../artisanlib/main.py" line="25884" />
+      <location filename="../artisanlib/main.py" line="25618" />
+      <location filename="../artisanlib/main.py" line="25487" />
+      <location filename="../artisanlib/main.py" line="25440" />
+      <location filename="../artisanlib/main.py" line="25356" />
+      <location filename="../artisanlib/main.py" line="25140" />
+      <location filename="../artisanlib/main.py" line="25060" />
+      <location filename="../artisanlib/main.py" line="24622" />
+      <location filename="../artisanlib/main.py" line="24413" />
+      <location filename="../artisanlib/main.py" line="23953" />
+      <location filename="../artisanlib/main.py" line="23756" />
+      <location filename="../artisanlib/main.py" line="23282" />
       <location filename="../artisanlib/main.py" line="22874" />
       <location filename="../artisanlib/main.py" line="22869" />
       <location filename="../artisanlib/main.py" line="22800" />
@@ -4251,17 +4251,17 @@ END</source>
       <translation>Arduino tidak dapat mengatur filter</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="18808" />
-      <location filename="../artisanlib/canvas.py" line="18367" />
-      <location filename="../artisanlib/canvas.py" line="17122" />
-      <location filename="../artisanlib/canvas.py" line="17098" />
-      <location filename="../artisanlib/canvas.py" line="16912" />
-      <location filename="../artisanlib/main.py" line="25878" />
-      <location filename="../artisanlib/main.py" line="25613" />
-      <location filename="../artisanlib/main.py" line="25482" />
-      <location filename="../artisanlib/main.py" line="25350" />
-      <location filename="../artisanlib/main.py" line="25135" />
-      <location filename="../artisanlib/main.py" line="25055" />
+      <location filename="../artisanlib/canvas.py" line="18825" />
+      <location filename="../artisanlib/canvas.py" line="18384" />
+      <location filename="../artisanlib/canvas.py" line="17139" />
+      <location filename="../artisanlib/canvas.py" line="17115" />
+      <location filename="../artisanlib/canvas.py" line="16929" />
+      <location filename="../artisanlib/main.py" line="25879" />
+      <location filename="../artisanlib/main.py" line="25614" />
+      <location filename="../artisanlib/main.py" line="25483" />
+      <location filename="../artisanlib/main.py" line="25351" />
+      <location filename="../artisanlib/main.py" line="25136" />
+      <location filename="../artisanlib/main.py" line="25056" />
       <location filename="../artisanlib/main.py" line="13995" />
       <location filename="../artisanlib/main.py" line="13385" />
       <location filename="../artisanlib/comm.py" line="6935" />
@@ -4447,59 +4447,65 @@ END</source>
       <translation>Pengecualian (mungkin karena profil kosong):</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="26544" />
+      <location filename="../artisanlib/main.py" line="26545" />
       <source>Analyze: CHARGE event required, none found</source>
       <translation>Analisis: Diperlukan acara CHARGE, tidak ada yang ditemukan</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="26548" />
+      <location filename="../artisanlib/main.py" line="26549" />
       <source>Analyze: DROP event required, none found</source>
       <translation>Analisis: Diperlukan acara DROP, tidak ada yang ditemukan</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="26639" />
+      <location filename="../artisanlib/main.py" line="26640" />
       <source>Analyze: no background profile data available</source>
       <translation>Analisis: tidak ada data profil latar belakang yang tersedia</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="26644" />
+      <location filename="../artisanlib/main.py" line="26645" />
       <source>Analyze: background profile requires CHARGE and DROP events</source>
       <translation>Analisis: profil latar belakang memerlukan peristiwa CHARGE dan DROP</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11937" />
+      <location filename="../artisanlib/canvas.py" line="11946" />
       <source>Unexpected value for n, got</source>
       <translation>Nilai tak terduga untuk n, didapat</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="13065" />
+      <location filename="../artisanlib/canvas.py" line="13082" />
       <source>Exception: phidgetServer couldn't be added. Verify that the Phidget driver is correctly installed!</source>
       <translation>Pengecualian: phidgetServer tidak dapat ditambahkan. Pastikan driver Phidget telah terinstal dengan benar!</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="13073" />
+      <location filename="../artisanlib/canvas.py" line="13090" />
       <source>Exception: PhidgetManager couldn't be started. Verify that the Phidget driver is correctly installed!</source>
       <translation>Pengecualian: PhidgetManager tidak dapat dijalankan. Pastikan driver Phidget sudah terinstal dengan benar!</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="13568" />
-      <location filename="../artisanlib/canvas.py" line="13542" />
+      <location filename="../artisanlib/canvas.py" line="13585" />
+      <location filename="../artisanlib/canvas.py" line="13559" />
       <source>Unstable meter data</source>
       <translation>Data meteran tidak stabil</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="17064" />
+      <location filename="../artisanlib/canvas.py" line="17081" />
       <source>Error in lnRegression:</source>
       <translation>Kesalahan dalam lnRegresi:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="17757" />
+      <location filename="../artisanlib/canvas.py" line="17774" />
       <source>Exception: redrawdesigner() Roast events may be out of order. Resetting Designer.</source>
       <translation>Pengecualian: redrawdesigner() Acara pemanggangan mungkin rusak. Menyetel Ulang Desainer.</translation>
     </message>
   </context>
   <context>
     <name>Form Caption</name>
+    <message>
+      <location filename="../artisanlib/roast_properties.py" line="1741" />
+      <location filename="../plus/blend.py" line="159" />
+      <source>Custom Blend</source>
+      <translation>Campuran Khusus</translation>
+    </message>
     <message>
       <location filename="../artisanlib/axis.py" line="77" />
       <source>Axes</source>
@@ -4657,12 +4663,6 @@ END</source>
       <location filename="../artisanlib/roast_properties.py" line="556" />
       <source>Roast Properties</source>
       <translation>Properti Panggang</translation>
-    </message>
-    <message>
-      <location filename="../plus/blend.py" line="159" />
-      <location filename="../artisanlib/roast_properties.py" line="1741" />
-      <source>Custom Blend</source>
-      <translation>Campuran Khusus</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="4124" />
@@ -4951,15 +4951,15 @@ END</source>
       <translation>Pemutaran</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15966" />
-      <location filename="../artisanlib/canvas.py" line="15904" />
+      <location filename="../artisanlib/canvas.py" line="15983" />
+      <location filename="../artisanlib/canvas.py" line="15921" />
       <location filename="../artisanlib/roast_properties.py" line="2875" />
       <source>Energy</source>
       <translation>Energi</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15967" />
-      <location filename="../artisanlib/canvas.py" line="15905" />
+      <location filename="../artisanlib/canvas.py" line="15984" />
+      <location filename="../artisanlib/canvas.py" line="15922" />
       <location filename="../artisanlib/roast_properties.py" line="2876" />
       <source>CO2</source>
       <translation type="unfinished" />
@@ -5223,14 +5223,14 @@ END</source>
   <context>
     <name>HTML Report Template</name>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11864" />
+      <location filename="../artisanlib/canvas.py" line="11873" />
       <location filename="../artisanlib/main.py" line="21783" />
       <location filename="../artisanlib/statistics.py" line="226" />
       <source>BBP Total Time</source>
       <translation>Total Waktu BBP</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11867" />
+      <location filename="../artisanlib/canvas.py" line="11876" />
       <location filename="../artisanlib/main.py" line="21784" />
       <location filename="../artisanlib/statistics.py" line="227" />
       <source>BBP Bottom Temp</source>
@@ -5247,7 +5247,7 @@ END</source>
       <translation>Ringkasan BBP ringkas</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11909" />
+      <location filename="../artisanlib/canvas.py" line="11918" />
       <location filename="../artisanlib/main.py" line="21681" />
       <location filename="../artisanlib/statistics.py" line="234" />
       <source>Whole Color</source>
@@ -5742,13 +5742,13 @@ END</source>
       <translation>Suhu Sekitar</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23237" />
+      <location filename="../artisanlib/main.py" line="23238" />
       <location filename="../artisanlib/main.py" line="21751" />
       <source>Roasting Notes</source>
       <translation type="unfinished">Catatan Panggang</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23246" />
+      <location filename="../artisanlib/main.py" line="23247" />
       <location filename="../artisanlib/main.py" line="21752" />
       <source>Cupping Notes</source>
       <translation type="unfinished">Catatan Bekam</translation>
@@ -5944,183 +5944,183 @@ END</source>
       <translation>Rata-rata</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23165" />
+      <location filename="../artisanlib/main.py" line="23166" />
       <source>Roasting Report</source>
       <translation>Laporan Pemanggangan</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23166" />
+      <location filename="../artisanlib/main.py" line="23167" />
       <source>Date:</source>
       <translation>Tanggal:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23168" />
+      <location filename="../artisanlib/main.py" line="23169" />
       <source>Beans:</source>
       <translation>Kacang polong:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23170" />
+      <location filename="../artisanlib/main.py" line="23171" />
       <source>Weight:</source>
       <translation>Berat:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23174" />
+      <location filename="../artisanlib/main.py" line="23175" />
       <source>Volume:</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23176" />
+      <location filename="../artisanlib/main.py" line="23177" />
       <source>Roaster:</source>
       <translation>pemanggang:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23178" />
+      <location filename="../artisanlib/main.py" line="23179" />
       <source>Operator:</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23180" />
+      <location filename="../artisanlib/main.py" line="23181" />
       <source>Organization:</source>
       <translation>Organisasi:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11838" />
-      <location filename="../artisanlib/main.py" line="23182" />
+      <location filename="../artisanlib/canvas.py" line="11847" />
+      <location filename="../artisanlib/main.py" line="23183" />
       <source>Cupping:</source>
       <translation>bekam:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23184" />
+      <location filename="../artisanlib/main.py" line="23185" />
       <source>Color:</source>
       <translation>Warna:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23186" />
+      <location filename="../artisanlib/main.py" line="23187" />
       <source>Energy:</source>
       <translation>Energi:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23188" />
+      <location filename="../artisanlib/main.py" line="23189" />
       <source>CO2:</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23190" />
+      <location filename="../artisanlib/main.py" line="23191" />
       <source>CHARGE:</source>
       <translation>MENGENAKAN BIAYA:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23192" />
+      <location filename="../artisanlib/main.py" line="23193" />
       <source>Size:</source>
       <translation>Ukuran:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23195" />
+      <location filename="../artisanlib/main.py" line="23196" />
       <source>Density:</source>
       <translation>Kepadatan:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23197" />
+      <location filename="../artisanlib/main.py" line="23198" />
       <source>Moisture:</source>
       <translation>kelembaban:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23199" />
+      <location filename="../artisanlib/main.py" line="23200" />
       <source>Ambient:</source>
       <translation>Sekelilingnya:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23201" />
+      <location filename="../artisanlib/main.py" line="23202" />
       <source>TP:</source>
       <translation>dll:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23203" />
+      <location filename="../artisanlib/main.py" line="23204" />
       <source>DRY:</source>
       <translation>KERING:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23205" />
+      <location filename="../artisanlib/main.py" line="23206" />
       <source>FCs:</source>
       <translation>FC:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23207" />
+      <location filename="../artisanlib/main.py" line="23208" />
       <source>FCe:</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23209" />
+      <location filename="../artisanlib/main.py" line="23210" />
       <source>SCs:</source>
       <translation>SC:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23211" />
+      <location filename="../artisanlib/main.py" line="23212" />
       <source>SCe:</source>
       <translation>SC:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23213" />
+      <location filename="../artisanlib/main.py" line="23214" />
       <source>DROP:</source>
       <translation>MENJATUHKAN:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23215" />
+      <location filename="../artisanlib/main.py" line="23216" />
       <source>COOL:</source>
       <translation>DINGIN:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23217" />
+      <location filename="../artisanlib/main.py" line="23218" />
       <source>MET:</source>
       <translation>BERTEMU:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23219" />
+      <location filename="../artisanlib/main.py" line="23220" />
       <source>CM:</source>
       <translation>cm:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23221" />
+      <location filename="../artisanlib/main.py" line="23222" />
       <source>Drying:</source>
       <translation>Pengeringan:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23223" />
+      <location filename="../artisanlib/main.py" line="23224" />
       <source>Maillard:</source>
       <translation>surat:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23225" />
+      <location filename="../artisanlib/main.py" line="23226" />
       <source>Finishing:</source>
       <translation>Penyelesaian:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23227" />
+      <location filename="../artisanlib/main.py" line="23228" />
       <source>Cooling:</source>
       <translation>Pendinginan:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23229" />
+      <location filename="../artisanlib/main.py" line="23230" />
       <source>Background:</source>
       <translation>Latar belakang:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23231" />
+      <location filename="../artisanlib/main.py" line="23232" />
       <source>Alarms:</source>
       <translation>Alarm:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23233" />
+      <location filename="../artisanlib/main.py" line="23234" />
       <source>RoR:</source>
       <translation>RoRnya:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23235" />
+      <location filename="../artisanlib/main.py" line="23236" />
       <source>AUC:</source>
       <translation>AUK:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23243" />
+      <location filename="../artisanlib/main.py" line="23244" />
       <source>Events</source>
       <translation type="unfinished">Kejadian</translation>
     </message>
@@ -11262,6 +11262,105 @@ Menggunakan rumus matematika di plotter juga memungkinkan untuk menggunakan vari
   <context>
     <name>Label</name>
     <message>
+      <location filename="../artisanlib/canvas.py" line="11855" />
+      <location filename="../artisanlib/large_lcds.py" line="837" />
+      <location filename="../artisanlib/roast_properties.py" line="900" />
+      <location filename="../artisanlib/roast_properties.py" line="227" />
+      <location filename="../artisanlib/roast_properties.py" line="154" />
+      <location filename="../plus/schedule.py" line="1948" />
+      <location filename="../plus/blend.py" line="186" />
+      <source>Weight</source>
+      <translation type="unfinished">Bobot</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/statistics.py" line="209" />
+      <location filename="../artisanlib/roast_properties.py" line="1087" />
+      <location filename="../artisanlib/roast_properties.py" line="890" />
+      <location filename="../plus/blend.py" line="365" />
+      <source>Beans</source>
+      <translation type="unfinished">Biji</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/statistics.py" line="238" />
+      <location filename="../artisanlib/roast_properties.py" line="1697" />
+      <location filename="../plus/schedule.py" line="1970" />
+      <source>Yield</source>
+      <translation>Menghasilkan</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/main.py" line="23173" />
+      <location filename="../artisanlib/roast_properties.py" line="1696" />
+      <location filename="../plus/schedule.py" line="1980" />
+      <source>Defects</source>
+      <translation type="unfinished">Defect</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/canvas.py" line="11799" />
+      <location filename="../artisanlib/roast_properties.py" line="991" />
+      <location filename="../plus/schedule.py" line="1990" />
+      <source>Density</source>
+      <translation type="unfinished">Densitas</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/roast_properties.py" line="1062" />
+      <location filename="../artisanlib/events.py" line="459" />
+      <location filename="../plus/schedule.py" line="2000" />
+      <source>Color</source>
+      <translation type="unfinished">Warna</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/canvas.py" line="11804" />
+      <location filename="../artisanlib/roast_properties.py" line="1099" />
+      <location filename="../plus/schedule.py" line="2010" />
+      <source>Moisture</source>
+      <translation>Kelembaban</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/statistics.py" line="220" />
+      <location filename="../artisanlib/roast_properties.py" line="1173" />
+      <location filename="../plus/schedule.py" line="2021" />
+      <location filename="../plus/schedule.py" line="2020" />
+      <source>Roasting Notes</source>
+      <translation>Catatan Panggang</translation>
+    </message>
+    <message>
+      <location filename="../plus/schedule.py" line="2025" />
+      <source>Score</source>
+      <translation>Skor</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/statistics.py" line="221" />
+      <location filename="../plus/schedule.py" line="2026" />
+      <source>Cupping Score</source>
+      <translation>Skor Bekam</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/statistics.py" line="222" />
+      <location filename="../artisanlib/roast_properties.py" line="1178" />
+      <location filename="../plus/schedule.py" line="2033" />
+      <location filename="../plus/schedule.py" line="2032" />
+      <source>Cupping Notes</source>
+      <translation>Catatan Bekam</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/roast_properties.py" line="899" />
+      <location filename="../artisanlib/roast_properties.py" line="285" />
+      <location filename="../plus/schedule.py" line="3974" />
+      <location filename="../plus/schedule.py" line="2121" />
+      <source>Roasted</source>
+      <translation type="unfinished">matang</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/canvas.py" line="11855" />
+      <location filename="../artisanlib/canvas.py" line="11804" />
+      <location filename="../artisanlib/canvas.py" line="11799" />
+      <location filename="../artisanlib/roast_properties.py" line="898" />
+      <location filename="../artisanlib/roast_properties.py" line="212" />
+      <location filename="../plus/schedule.py" line="3972" />
+      <source>Green</source>
+      <translation>hijau</translation>
+    </message>
+    <message>
       <location filename="../artisanlib/events.py" line="3715" />
       <location filename="../artisanlib/events.py" line="1015" />
       <location filename="../artisanlib/events.py" line="757" />
@@ -11361,10 +11460,10 @@ Menggunakan rumus matematika di plotter juga memungkinkan untuk menggunakan vari
       <translation>dg</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="17688" />
-      <location filename="../artisanlib/canvas.py" line="17678" />
-      <location filename="../artisanlib/canvas.py" line="9027" />
-      <location filename="../artisanlib/canvas.py" line="8971" />
+      <location filename="../artisanlib/canvas.py" line="17705" />
+      <location filename="../artisanlib/canvas.py" line="17695" />
+      <location filename="../artisanlib/canvas.py" line="9028" />
+      <location filename="../artisanlib/canvas.py" line="8972" />
       <location filename="../artisanlib/main.py" line="18283" />
       <location filename="../artisanlib/main.py" line="6000" />
       <location filename="../artisanlib/main.py" line="5994" />
@@ -11394,10 +11493,10 @@ Menggunakan rumus matematika di plotter juga memungkinkan untuk menggunakan vari
       <translation />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="17685" />
-      <location filename="../artisanlib/canvas.py" line="17674" />
-      <location filename="../artisanlib/canvas.py" line="9000" />
-      <location filename="../artisanlib/canvas.py" line="8949" />
+      <location filename="../artisanlib/canvas.py" line="17702" />
+      <location filename="../artisanlib/canvas.py" line="17691" />
+      <location filename="../artisanlib/canvas.py" line="9001" />
+      <location filename="../artisanlib/canvas.py" line="8950" />
       <location filename="../artisanlib/main.py" line="18276" />
       <location filename="../artisanlib/main.py" line="5997" />
       <location filename="../artisanlib/main.py" line="5991" />
@@ -11435,8 +11534,8 @@ Menggunakan rumus matematika di plotter juga memungkinkan untuk menggunakan vari
       <translation type="unfinished">Luruskan</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="4006" />
-      <location filename="../artisanlib/canvas.py" line="1212" />
+      <location filename="../artisanlib/canvas.py" line="4007" />
+      <location filename="../artisanlib/canvas.py" line="1213" />
       <location filename="../artisanlib/transposer.py" line="1208" />
       <location filename="../artisanlib/devices.py" line="1184" />
       <location filename="../artisanlib/statistics.py" line="104" />
@@ -11467,7 +11566,7 @@ Menggunakan rumus matematika di plotter juga memungkinkan untuk menggunakan vari
       <translation />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="1213" />
+      <location filename="../artisanlib/canvas.py" line="1214" />
       <location filename="../artisanlib/devices.py" line="1185" />
       <location filename="../artisanlib/main.py" line="8023" />
       <location filename="../artisanlib/main.py" line="7909" />
@@ -11482,7 +11581,7 @@ Menggunakan rumus matematika di plotter juga memungkinkan untuk menggunakan vari
       <translation />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="1214" />
+      <location filename="../artisanlib/canvas.py" line="1215" />
       <location filename="../artisanlib/devices.py" line="1186" />
       <location filename="../artisanlib/main.py" line="8024" />
       <location filename="../artisanlib/main.py" line="7987" />
@@ -11500,7 +11599,7 @@ Menggunakan rumus matematika di plotter juga memungkinkan untuk menggunakan vari
       <translation />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="1215" />
+      <location filename="../artisanlib/canvas.py" line="1216" />
       <location filename="../artisanlib/devices.py" line="1187" />
       <location filename="../artisanlib/background.py" line="105" />
       <location filename="../artisanlib/ports.py" line="1422" />
@@ -11509,7 +11608,7 @@ Menggunakan rumus matematika di plotter juga memungkinkan untuk menggunakan vari
       <translation type="unfinished">FCe</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="1216" />
+      <location filename="../artisanlib/canvas.py" line="1217" />
       <location filename="../artisanlib/devices.py" line="1188" />
       <location filename="../artisanlib/background.py" line="106" />
       <location filename="../artisanlib/ports.py" line="1424" />
@@ -11518,7 +11617,7 @@ Menggunakan rumus matematika di plotter juga memungkinkan untuk menggunakan vari
       <translation type="unfinished">SCs</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="1217" />
+      <location filename="../artisanlib/canvas.py" line="1218" />
       <location filename="../artisanlib/devices.py" line="1189" />
       <location filename="../artisanlib/background.py" line="107" />
       <location filename="../artisanlib/ports.py" line="1426" />
@@ -11527,8 +11626,8 @@ Menggunakan rumus matematika di plotter juga memungkinkan untuk menggunakan vari
       <translation type="unfinished">SCe</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="4012" />
-      <location filename="../artisanlib/canvas.py" line="1218" />
+      <location filename="../artisanlib/canvas.py" line="4013" />
+      <location filename="../artisanlib/canvas.py" line="1219" />
       <location filename="../artisanlib/transposer.py" line="1212" />
       <location filename="../artisanlib/transposer.py" line="1141" />
       <location filename="../artisanlib/devices.py" line="1190" />
@@ -11550,9 +11649,9 @@ Menggunakan rumus matematika di plotter juga memungkinkan untuk menggunakan vari
       <translation>/min</translation>
     </message>
     <message>
+      <location filename="../artisanlib/main.py" line="25935" />
       <location filename="../artisanlib/main.py" line="25934" />
       <location filename="../artisanlib/main.py" line="25933" />
-      <location filename="../artisanlib/main.py" line="25932" />
       <location filename="../artisanlib/ports.py" line="1139" />
       <location filename="../artisanlib/ports.py" line="674" />
       <location filename="../artisanlib/events.py" line="1361" />
@@ -11652,8 +11751,8 @@ Menggunakan rumus matematika di plotter juga memungkinkan untuk menggunakan vari
       <translation type="unfinished">Ramp/soak</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="2492" />
-      <location filename="../artisanlib/canvas.py" line="2490" />
+      <location filename="../artisanlib/canvas.py" line="2493" />
+      <location filename="../artisanlib/canvas.py" line="2491" />
       <location filename="../artisanlib/devices.py" line="3335" />
       <location filename="../artisanlib/devices.py" line="3321" />
       <location filename="../artisanlib/main.py" line="6055" />
@@ -11931,13 +12030,6 @@ Menggunakan rumus matematika di plotter juga memungkinkan untuk menggunakan vari
       <translation type="unfinished">Penanda</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="1984" />
-      <location filename="../artisanlib/roast_properties.py" line="1062" />
-      <location filename="../artisanlib/events.py" line="459" />
-      <source>Color</source>
-      <translation type="unfinished">Warna</translation>
-    </message>
-    <message>
       <location filename="../artisanlib/events.py" line="461" />
       <source>Text Color</source>
       <translation type="unfinished">Warna Teks</translation>
@@ -11967,9 +12059,9 @@ Menggunakan rumus matematika di plotter juga memungkinkan untuk menggunakan vari
       <translation type="unfinished">Ukuran</translation>
     </message>
     <message>
+      <location filename="../artisanlib/main.py" line="25959" />
       <location filename="../artisanlib/main.py" line="25958" />
-      <location filename="../artisanlib/main.py" line="25957" />
-      <location filename="../artisanlib/main.py" line="25953" />
+      <location filename="../artisanlib/main.py" line="25954" />
       <location filename="../artisanlib/events.py" line="1407" />
       <location filename="../artisanlib/events.py" line="579" />
       <location filename="../artisanlib/events.py" line="568" />
@@ -11977,8 +12069,8 @@ Menggunakan rumus matematika di plotter juga memungkinkan untuk menggunakan vari
       <translation type="unfinished">MULAI</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15848" />
-      <location filename="../artisanlib/canvas.py" line="15839" />
+      <location filename="../artisanlib/canvas.py" line="15865" />
+      <location filename="../artisanlib/canvas.py" line="15856" />
       <location filename="../artisanlib/events.py" line="613" />
       <source>MET</source>
       <translation>BERTEMU</translation>
@@ -12071,9 +12163,9 @@ Menggunakan rumus matematika di plotter juga memungkinkan untuk menggunakan vari
       <translation type="unfinished">Gugus</translation>
     </message>
     <message>
+      <location filename="../artisanlib/main.py" line="25935" />
       <location filename="../artisanlib/main.py" line="25934" />
-      <location filename="../artisanlib/main.py" line="25933" />
-      <location filename="../artisanlib/main.py" line="25931" />
+      <location filename="../artisanlib/main.py" line="25932" />
       <location filename="../artisanlib/ports.py" line="1136" />
       <location filename="../artisanlib/ports.py" line="671" />
       <location filename="../artisanlib/events.py" line="1376" />
@@ -12338,7 +12430,7 @@ Menggunakan rumus matematika di plotter juga memungkinkan untuk menggunakan vari
       <translation>simpul</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="1219" />
+      <location filename="../artisanlib/canvas.py" line="1220" />
       <location filename="../artisanlib/background.py" line="109" />
       <source>ALL</source>
       <translation>SEMUA</translation>
@@ -12414,17 +12506,6 @@ Menggunakan rumus matematika di plotter juga memungkinkan untuk menggunakan vari
       <translation type="unfinished">g</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="1932" />
-      <location filename="../plus/blend.py" line="186" />
-      <location filename="../artisanlib/canvas.py" line="11846" />
-      <location filename="../artisanlib/large_lcds.py" line="837" />
-      <location filename="../artisanlib/roast_properties.py" line="900" />
-      <location filename="../artisanlib/roast_properties.py" line="227" />
-      <location filename="../artisanlib/roast_properties.py" line="154" />
-      <source>Weight</source>
-      <translation type="unfinished">Bobot</translation>
-    </message>
-    <message>
       <location filename="../artisanlib/roast_properties.py" line="960" />
       <location filename="../artisanlib/roast_properties.py" line="242" />
       <location filename="../artisanlib/roast_properties.py" line="169" />
@@ -12432,25 +12513,7 @@ Menggunakan rumus matematika di plotter juga memungkinkan untuk menggunakan vari
       <translation type="unfinished">Volume</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3956" />
-      <location filename="../artisanlib/canvas.py" line="11846" />
-      <location filename="../artisanlib/canvas.py" line="11795" />
-      <location filename="../artisanlib/canvas.py" line="11790" />
-      <location filename="../artisanlib/roast_properties.py" line="898" />
-      <location filename="../artisanlib/roast_properties.py" line="212" />
-      <source>Green</source>
-      <translation>hijau</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="3958" />
-      <location filename="../plus/schedule.py" line="2105" />
-      <location filename="../artisanlib/roast_properties.py" line="899" />
-      <location filename="../artisanlib/roast_properties.py" line="285" />
-      <source>Roasted</source>
-      <translation type="unfinished">matang</translation>
-    </message>
-    <message>
-      <location filename="../artisanlib/canvas.py" line="4007" />
+      <location filename="../artisanlib/canvas.py" line="4008" />
       <location filename="../artisanlib/transposer.py" line="1209" />
       <location filename="../artisanlib/transposer.py" line="1138" />
       <location filename="../artisanlib/statistics.py" line="106" />
@@ -12459,7 +12522,7 @@ Menggunakan rumus matematika di plotter juga memungkinkan untuk menggunakan vari
       <translation>AKHIR PENGERINGAN</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="4008" />
+      <location filename="../artisanlib/canvas.py" line="4009" />
       <location filename="../artisanlib/transposer.py" line="1210" />
       <location filename="../artisanlib/transposer.py" line="1139" />
       <location filename="../artisanlib/statistics.py" line="107" />
@@ -12468,13 +12531,13 @@ Menggunakan rumus matematika di plotter juga memungkinkan untuk menggunakan vari
       <translation>FC MULAI</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="4009" />
+      <location filename="../artisanlib/canvas.py" line="4010" />
       <location filename="../artisanlib/roast_properties.py" line="693" />
       <source>FC END</source>
       <translation>FC AKHIR</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="4010" />
+      <location filename="../artisanlib/canvas.py" line="4011" />
       <location filename="../artisanlib/transposer.py" line="1211" />
       <location filename="../artisanlib/transposer.py" line="1140" />
       <location filename="../artisanlib/roast_properties.py" line="707" />
@@ -12482,13 +12545,13 @@ Menggunakan rumus matematika di plotter juga memungkinkan untuk menggunakan vari
       <translation>SC MULAI</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="4011" />
+      <location filename="../artisanlib/canvas.py" line="4012" />
       <location filename="../artisanlib/roast_properties.py" line="721" />
       <source>SC END</source>
       <translation>SC AKHIR</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="4013" />
+      <location filename="../artisanlib/canvas.py" line="4014" />
       <location filename="../artisanlib/roast_properties.py" line="750" />
       <source>COOL</source>
       <translation>PENDINGINAN</translation>
@@ -12503,21 +12566,6 @@ Menggunakan rumus matematika di plotter juga memungkinkan untuk menggunakan vari
       <location filename="../artisanlib/roast_properties.py" line="864" />
       <source>Batch</source>
       <translation type="unfinished">Batch</translation>
-    </message>
-    <message>
-      <location filename="../plus/blend.py" line="365" />
-      <location filename="../artisanlib/statistics.py" line="209" />
-      <location filename="../artisanlib/roast_properties.py" line="1087" />
-      <location filename="../artisanlib/roast_properties.py" line="890" />
-      <source>Beans</source>
-      <translation type="unfinished">Biji</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="1974" />
-      <location filename="../artisanlib/canvas.py" line="11790" />
-      <location filename="../artisanlib/roast_properties.py" line="991" />
-      <source>Density</source>
-      <translation type="unfinished">Densitas</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="1044" />
@@ -12535,13 +12583,6 @@ Menggunakan rumus matematika di plotter juga memungkinkan untuk menggunakan vari
       <translation>Tanah</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="1994" />
-      <location filename="../artisanlib/canvas.py" line="11795" />
-      <location filename="../artisanlib/roast_properties.py" line="1099" />
-      <source>Moisture</source>
-      <translation>Kelembaban</translation>
-    </message>
-    <message>
       <location filename="../artisanlib/roast_properties.py" line="1127" />
       <location filename="../artisanlib/roast_properties.py" line="1100" />
       <source>%</source>
@@ -12551,22 +12592,6 @@ Menggunakan rumus matematika di plotter juga memungkinkan untuk menggunakan vari
       <location filename="../artisanlib/roast_properties.py" line="1125" />
       <source>Ambient Conditions</source>
       <translation>Kondisi Sekitar</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="2005" />
-      <location filename="../plus/schedule.py" line="2004" />
-      <location filename="../artisanlib/statistics.py" line="220" />
-      <location filename="../artisanlib/roast_properties.py" line="1173" />
-      <source>Roasting Notes</source>
-      <translation>Catatan Panggang</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="2017" />
-      <location filename="../plus/schedule.py" line="2016" />
-      <location filename="../artisanlib/statistics.py" line="222" />
-      <location filename="../artisanlib/roast_properties.py" line="1178" />
-      <source>Cupping Notes</source>
-      <translation>Catatan Bekam</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="1357" />
@@ -12582,20 +12607,6 @@ Menggunakan rumus matematika di plotter juga memungkinkan untuk menggunakan vari
       <location filename="../artisanlib/roast_properties.py" line="1359" />
       <source>Blend</source>
       <translation>Campur</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="1964" />
-      <location filename="../artisanlib/main.py" line="23172" />
-      <location filename="../artisanlib/roast_properties.py" line="1696" />
-      <source>Defects</source>
-      <translation type="unfinished">Defect</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="1954" />
-      <location filename="../artisanlib/statistics.py" line="238" />
-      <location filename="../artisanlib/roast_properties.py" line="1697" />
-      <source>Yield</source>
-      <translation>Menghasilkan</translation>
     </message>
     <message>
       <location filename="../artisanlib/roast_properties.py" line="1907" />
@@ -12703,7 +12714,7 @@ Menggunakan rumus matematika di plotter juga memungkinkan untuk menggunakan vari
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15972" />
+      <location filename="../artisanlib/canvas.py" line="15989" />
       <location filename="../artisanlib/roast_properties.py" line="3533" />
       <location filename="../artisanlib/roast_properties.py" line="3528" />
       <location filename="../artisanlib/roast_properties.py" line="3504" />
@@ -13057,7 +13068,7 @@ Semua LCD</translation>
       <translation>Tidak tersedia di ArtisanViewer</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="4030" />
+      <location filename="../artisanlib/canvas.py" line="4031" />
       <location filename="../artisanlib/curves.py" line="2130" />
       <source>EVENT</source>
       <translation>KEJADIAN</translation>
@@ -13081,12 +13092,6 @@ Semua LCD</translation>
       <location filename="../artisanlib/statistics.py" line="207" />
       <source>Roaster</source>
       <translation>Pemanggang</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="2010" />
-      <location filename="../artisanlib/statistics.py" line="221" />
-      <source>Cupping Score</source>
-      <translation>Skor Bekam</translation>
     </message>
     <message>
       <location filename="../artisanlib/statistics.py" line="235" />
@@ -13197,14 +13202,14 @@ Semua LCD</translation>
       <translation>Warna tepi (RGBA)</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23084" />
+      <location filename="../artisanlib/main.py" line="23085" />
       <location filename="../artisanlib/main.py" line="1259" />
       <source>roasted</source>
       <translation>matang</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15849" />
-      <location filename="../artisanlib/canvas.py" line="15836" />
+      <location filename="../artisanlib/canvas.py" line="15866" />
+      <location filename="../artisanlib/canvas.py" line="15853" />
       <location filename="../artisanlib/main.py" line="7697" />
       <location filename="../artisanlib/main.py" line="6857" />
       <location filename="../artisanlib/main.py" line="6855" />
@@ -13343,23 +13348,23 @@ Semua LCD</translation>
       <translation />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="17070" />
-      <location filename="../artisanlib/main.py" line="26723" />
+      <location filename="../artisanlib/canvas.py" line="17087" />
+      <location filename="../artisanlib/main.py" line="26724" />
       <location filename="../artisanlib/main.py" line="7226" />
       <source>ln()</source>
       <translation>ln ()</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="26721" />
-      <location filename="../artisanlib/main.py" line="26719" />
+      <location filename="../artisanlib/main.py" line="26722" />
+      <location filename="../artisanlib/main.py" line="26720" />
       <location filename="../artisanlib/main.py" line="7229" />
       <location filename="../artisanlib/main.py" line="7228" />
       <source>x</source>
       <translation type="unfinished">x</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="26717" />
-      <location filename="../artisanlib/main.py" line="26668" />
+      <location filename="../artisanlib/main.py" line="26718" />
+      <location filename="../artisanlib/main.py" line="26669" />
       <location filename="../artisanlib/main.py" line="7230" />
       <source>Bkgnd</source>
       <translation>Kembali ke atas</translation>
@@ -13508,125 +13513,125 @@ Semua LCD</translation>
       <translation>Mengisikan biji</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23064" />
+      <location filename="../artisanlib/main.py" line="23065" />
       <source>/m</source>
       <translation>/M</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="23080" />
+      <location filename="../artisanlib/main.py" line="23081" />
       <source>greens</source>
       <translation>Hijau</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="25949" />
+      <location filename="../artisanlib/main.py" line="25950" />
+      <location filename="../artisanlib/main.py" line="25937" />
       <location filename="../artisanlib/main.py" line="25936" />
-      <location filename="../artisanlib/main.py" line="25935" />
       <source>AUTO</source>
       <translation>OTOMATIS</translation>
     </message>
     <message>
+      <location filename="../artisanlib/main.py" line="25950" />
       <location filename="../artisanlib/main.py" line="25949" />
-      <location filename="../artisanlib/main.py" line="25948" />
-      <location filename="../artisanlib/main.py" line="25936" />
+      <location filename="../artisanlib/main.py" line="25937" />
       <source>MANUAL</source>
       <translation />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="25937" />
+      <location filename="../artisanlib/main.py" line="25938" />
       <source>FLAP</source>
       <translation>TUTUP</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="25951" />
+      <location filename="../artisanlib/main.py" line="25952" />
+      <location filename="../artisanlib/main.py" line="25940" />
       <location filename="../artisanlib/main.py" line="25939" />
-      <location filename="../artisanlib/main.py" line="25938" />
       <source>CLOSE</source>
       <translation>MENUTUP</translation>
     </message>
     <message>
+      <location filename="../artisanlib/main.py" line="25952" />
       <location filename="../artisanlib/main.py" line="25951" />
-      <location filename="../artisanlib/main.py" line="25950" />
-      <location filename="../artisanlib/main.py" line="25939" />
+      <location filename="../artisanlib/main.py" line="25940" />
       <source>OPEN</source>
       <translation>MEMBUKA</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="25940" />
+      <location filename="../artisanlib/main.py" line="25941" />
       <source>CONTROL</source>
       <translation type="unfinished">KONTROL</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="25941" />
+      <location filename="../artisanlib/main.py" line="25942" />
       <source>DISCHARGE</source>
       <translation>MEMULANGKAN</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="25943" />
+      <location filename="../artisanlib/main.py" line="25944" />
       <source>HEATING</source>
       <translation>PEMANASAN</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="25944" />
+      <location filename="../artisanlib/main.py" line="25945" />
       <source>STIRRER</source>
       <translation>PENGADU</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="25945" />
+      <location filename="../artisanlib/main.py" line="25946" />
       <source>FILL</source>
       <translation>MENGISI</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="25947" />
+      <location filename="../artisanlib/main.py" line="25948" />
       <source>COOLING</source>
       <translation>PENDINGINAN</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="25958" />
+      <location filename="../artisanlib/main.py" line="25959" />
+      <location filename="../artisanlib/main.py" line="25954" />
       <location filename="../artisanlib/main.py" line="25953" />
-      <location filename="../artisanlib/main.py" line="25952" />
       <source>STOP</source>
       <translation>BERHENTI</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="25956" />
+      <location filename="../artisanlib/main.py" line="25957" />
       <source>RELEASE</source>
       <translation>MELEPASKAN</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="26710" />
+      <location filename="../artisanlib/main.py" line="26711" />
       <source>Fit</source>
       <comment>Curve Fit Type</comment>
       <translation>Bugar</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="26711" />
+      <location filename="../artisanlib/main.py" line="26712" />
       <source>RMSE BT</source>
       <translation>RMSEBT</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="26712" />
+      <location filename="../artisanlib/main.py" line="26713" />
       <source>MSE BT</source>
       <translation>UMK BT</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15849" />
-      <location filename="../artisanlib/canvas.py" line="15838" />
-      <location filename="../artisanlib/main.py" line="26713" />
+      <location filename="../artisanlib/canvas.py" line="15866" />
+      <location filename="../artisanlib/canvas.py" line="15855" />
+      <location filename="../artisanlib/main.py" line="26714" />
       <source>RoR</source>
       <translation />
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="26713" />
+      <location filename="../artisanlib/main.py" line="26714" />
       <source>@FCs</source>
       <translation>@Fc</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="26714" />
+      <location filename="../artisanlib/main.py" line="26715" />
       <source>Max+/Max- RoR</source>
       <translation>Max + / Max- RoR</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="26724" />
+      <location filename="../artisanlib/main.py" line="26725" />
       <source>Curve Fit Analysis</source>
       <translation>Analisis Kesesuaian Kurva</translation>
     </message>
@@ -13830,155 +13835,155 @@ Semua LCD</translation>
       <translation>Pemetaan</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="2323" />
+      <location filename="../artisanlib/canvas.py" line="2324" />
       <source>Preheat Measured</source>
       <translation>Preheat Terukur</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="2324" />
+      <location filename="../artisanlib/canvas.py" line="2325" />
       <source>Preheat %</source>
       <translation>Panaskan%</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="2325" />
+      <location filename="../artisanlib/canvas.py" line="2326" />
       <source>BBP Measured</source>
       <translation>BBP Terukur</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="2326" />
+      <location filename="../artisanlib/canvas.py" line="2327" />
       <source>BBP %</source>
       <translation>BBP%</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="2327" />
+      <location filename="../artisanlib/canvas.py" line="2328" />
       <source>Cooling Measured</source>
       <translation>Pendinginan Terukur</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="2328" />
+      <location filename="../artisanlib/canvas.py" line="2329" />
       <source>Cooling %</source>
       <translation>Pendinginan%</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="2329" />
+      <location filename="../artisanlib/canvas.py" line="2330" />
       <source>Continuous</source>
       <translation>Kontinu</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="2330" />
+      <location filename="../artisanlib/canvas.py" line="2331" />
       <source>Roast Event</source>
       <translation>Acara Panggang</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="2331" />
+      <location filename="../artisanlib/canvas.py" line="2332" />
       <source>Meter</source>
       <translation type="unfinished">Alat ukur</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="4003" />
-      <location filename="../artisanlib/canvas.py" line="4001" />
+      <location filename="../artisanlib/canvas.py" line="4004" />
+      <location filename="../artisanlib/canvas.py" line="4002" />
       <source>at</source>
       <translation>pada</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="9639" />
+      <location filename="../artisanlib/canvas.py" line="9648" />
       <source>BackgroundXT</source>
       <translation>Latar belakangXT</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="9695" />
+      <location filename="../artisanlib/canvas.py" line="9704" />
       <source>BackgroundYT</source>
       <translation>Latar Belakang YT</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="17653" />
-      <location filename="../artisanlib/canvas.py" line="9729" />
+      <location filename="../artisanlib/canvas.py" line="17670" />
+      <location filename="../artisanlib/canvas.py" line="9738" />
       <source>BackgroundET</source>
       <translation>Latar belakangET</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="17657" />
-      <location filename="../artisanlib/canvas.py" line="9760" />
+      <location filename="../artisanlib/canvas.py" line="17674" />
+      <location filename="../artisanlib/canvas.py" line="9769" />
       <source>BackgroundBT</source>
       <translation>Latar belakangBT</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="9786" />
+      <location filename="../artisanlib/canvas.py" line="9795" />
       <source>BackgroundDeltaET</source>
       <translation>Latar belakang DeltaET</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="9805" />
+      <location filename="../artisanlib/canvas.py" line="9814" />
       <source>BackgroundDeltaBT</source>
       <translation>Latar belakang DeltaBT</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11246" />
+      <location filename="../artisanlib/canvas.py" line="11255" />
       <source>ETprojection</source>
       <translation>Proyeksi ET</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11253" />
+      <location filename="../artisanlib/canvas.py" line="11262" />
       <source>DeltaETprojection</source>
       <translation>Proyeksi DeltaET</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11259" />
+      <location filename="../artisanlib/canvas.py" line="11268" />
       <source>BTprojection</source>
       <translation>Proyeksi BT</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11266" />
+      <location filename="../artisanlib/canvas.py" line="11275" />
       <source>DeltaBTprojection</source>
       <translation>Proyeksi DeltaBT</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11270" />
+      <location filename="../artisanlib/canvas.py" line="11279" />
       <source>TIMEguide</source>
       <translation>Panduan WAKTU</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11275" />
+      <location filename="../artisanlib/canvas.py" line="11284" />
       <source>AUCguide</source>
       <translation>Panduan AUC</translation>
     </message>
     <message>
       <location filename="../artisanlib/cup_profile.py" line="80" />
-      <location filename="../artisanlib/canvas.py" line="12841" />
-      <location filename="../artisanlib/canvas.py" line="12682" />
-      <location filename="../artisanlib/canvas.py" line="11913" />
+      <location filename="../artisanlib/canvas.py" line="12858" />
+      <location filename="../artisanlib/canvas.py" line="12699" />
+      <location filename="../artisanlib/canvas.py" line="11922" />
       <source>Correction</source>
       <translation>Koreksi</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15615" />
+      <location filename="../artisanlib/canvas.py" line="15632" />
       <source>Event #&lt;b&gt;{0} &lt;/b&gt;</source>
       <translation>Kejadian #&lt;b&gt;{0}&lt;/b&gt;</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15851" />
-      <location filename="../artisanlib/canvas.py" line="15842" />
+      <location filename="../artisanlib/canvas.py" line="15868" />
+      <location filename="../artisanlib/canvas.py" line="15859" />
       <source>CM</source>
       <translation>cm</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15853" />
-      <location filename="../artisanlib/canvas.py" line="15844" />
+      <location filename="../artisanlib/canvas.py" line="15870" />
+      <location filename="../artisanlib/canvas.py" line="15861" />
       <source>FC</source>
       <translation>Klub Sepak Bola</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="17624" />
+      <location filename="../artisanlib/canvas.py" line="17641" />
       <source>Designer</source>
       <translation>Desainer</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="18427" />
+      <location filename="../artisanlib/canvas.py" line="18444" />
       <source>BT {0} {1}/min for {2}</source>
       <translation>BT {0} {1}/min dalam {2}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="18440" />
+      <location filename="../artisanlib/canvas.py" line="18457" />
       <source>ET {0} {1}/min for {2}</source>
       <translation>ET {0} {1}/min dalam {2}</translation>
     </message>
@@ -14001,11 +14006,6 @@ Semua LCD</translation>
       <location filename="../artisanlib/cup_profile.py" line="112" />
       <source>Aspect Ratio</source>
       <translation>Rasio Aspek</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="2009" />
-      <source>Score</source>
-      <translation>Skor</translation>
     </message>
   </context>
   <context>
@@ -14104,6 +14104,12 @@ Semua LCD</translation>
   </context>
   <context>
     <name>Menu</name>
+    <message>
+      <location filename="../artisanlib/main.py" line="2744" />
+      <location filename="../plus/schedule.py" line="2326" />
+      <source>Schedule</source>
+      <translation>Rencana</translation>
+    </message>
     <message>
       <location filename="../artisanlib/main.py" line="2053" />
       <location filename="../artisanlib/pid_dialogs.py" line="545" />
@@ -14607,12 +14613,6 @@ Semua LCD</translation>
       <translation>Tombol geser</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="2310" />
-      <location filename="../artisanlib/main.py" line="2744" />
-      <source>Schedule</source>
-      <translation>Rencana</translation>
-    </message>
-    <message>
       <location filename="../artisanlib/main.py" line="2795" />
       <source>Full Screen</source>
       <translation>Tampilan Penuh</translation>
@@ -14693,6 +14693,62 @@ Semua LCD</translation>
   <context>
     <name>Message</name>
     <message>
+      <location filename="../plus/schedule.py" line="1429" />
+      <source>Register the currently loaded roast profile&lt;br&gt;in the selected entry.&lt;br&gt;This will overwrite some roast properties.</source>
+      <translation>Daftarkan profil sangrai yang saat ini dimuat&lt;br&gt;di entri yang dipilih.&lt;br&gt;Ini akan menimpa beberapa properti sangrai.</translation>
+    </message>
+    <message>
+      <location filename="../plus/schedule.py" line="1443" />
+      <location filename="../plus/schedule.py" line="1434" />
+      <source>Register Roast</source>
+      <translation>Daftar Panggang</translation>
+    </message>
+    <message>
+      <location filename="../plus/schedule.py" line="2380" />
+      <source>Scheduler started</source>
+      <translation>Penjadwal dimulai</translation>
+    </message>
+    <message>
+      <location filename="../plus/schedule.py" line="2689" />
+      <source>Roasts will not adjust the schedule&lt;br&gt;while the schedule window is closed</source>
+      <translation>Roasting tidak akan menyesuaikan jadwal&lt;br&gt;saat jendela jadwal ditutup</translation>
+    </message>
+    <message>
+      <location filename="../plus/schedule.py" line="2703" />
+      <location filename="../plus/schedule.py" line="2694" />
+      <source>Close Scheduler</source>
+      <translation>Tutup Penjadwal</translation>
+    </message>
+    <message>
+      <location filename="../plus/schedule.py" line="2751" />
+      <source>Scheduler stopped</source>
+      <translation>Penjadwal berhenti</translation>
+    </message>
+    <message>
+      <location filename="../plus/schedule.py" line="3665" />
+      <location filename="../plus/schedule.py" line="3147" />
+      <source>1 batch</source>
+      <translation>1 kelompok</translation>
+    </message>
+    <message>
+      <location filename="../plus/schedule.py" line="3680" />
+      <location filename="../plus/schedule.py" line="3671" />
+      <location filename="../plus/schedule.py" line="3155" />
+      <location filename="../plus/schedule.py" line="3149" />
+      <source>{} batches</source>
+      <translation>{} kumpulan</translation>
+    </message>
+    <message>
+      <location filename="../plus/schedule.py" line="3493" />
+      <source>Updating completed roast properties failed</source>
+      <translation>Gagal memperbarui properti sangrai yang telah selesai</translation>
+    </message>
+    <message>
+      <location filename="../plus/schedule.py" line="3559" />
+      <source>Fetching completed roast properties failed</source>
+      <translation>Gagal mengambil properti sangrai yang telah selesai</translation>
+    </message>
+    <message>
       <location filename="../artisanlib/axis.py" line="911" />
       <source>xlimit = ({2},{3}) ylimit = ({0},{1}) zlimit = ({4},{5})</source>
       <translation type="unfinished" />
@@ -14708,19 +14764,19 @@ Semua LCD</translation>
       <translation>Grafik Roda disimpan</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="18569" />
+      <location filename="../artisanlib/canvas.py" line="18586" />
       <location filename="../artisanlib/wheels.py" line="656" />
       <source>Open Wheel Graph</source>
       <translation>Grafik Roda Terbuka</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="13233" />
-      <location filename="../artisanlib/canvas.py" line="13219" />
-      <location filename="../artisanlib/canvas.py" line="13213" />
-      <location filename="../artisanlib/canvas.py" line="13193" />
-      <location filename="../artisanlib/canvas.py" line="13185" />
-      <location filename="../artisanlib/canvas.py" line="13170" />
-      <location filename="../artisanlib/canvas.py" line="13152" />
+      <location filename="../artisanlib/canvas.py" line="13250" />
+      <location filename="../artisanlib/canvas.py" line="13236" />
+      <location filename="../artisanlib/canvas.py" line="13230" />
+      <location filename="../artisanlib/canvas.py" line="13210" />
+      <location filename="../artisanlib/canvas.py" line="13202" />
+      <location filename="../artisanlib/canvas.py" line="13187" />
+      <location filename="../artisanlib/canvas.py" line="13169" />
       <location filename="../artisanlib/main.py" line="4435" />
       <location filename="../artisanlib/comm.py" line="1518" />
       <location filename="../artisanlib/wsport.py" line="286" />
@@ -14728,13 +14784,13 @@ Semua LCD</translation>
       <translation>{} terhubung</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="13234" />
-      <location filename="../artisanlib/canvas.py" line="13220" />
-      <location filename="../artisanlib/canvas.py" line="13214" />
-      <location filename="../artisanlib/canvas.py" line="13194" />
-      <location filename="../artisanlib/canvas.py" line="13186" />
-      <location filename="../artisanlib/canvas.py" line="13171" />
-      <location filename="../artisanlib/canvas.py" line="13153" />
+      <location filename="../artisanlib/canvas.py" line="13251" />
+      <location filename="../artisanlib/canvas.py" line="13237" />
+      <location filename="../artisanlib/canvas.py" line="13231" />
+      <location filename="../artisanlib/canvas.py" line="13211" />
+      <location filename="../artisanlib/canvas.py" line="13203" />
+      <location filename="../artisanlib/canvas.py" line="13188" />
+      <location filename="../artisanlib/canvas.py" line="13170" />
       <location filename="../artisanlib/main.py" line="4442" />
       <location filename="../artisanlib/comm.py" line="1519" />
       <location filename="../artisanlib/wsport.py" line="337" />
@@ -15532,7 +15588,7 @@ Ulangi Operasi di akhir: {0}</translation>
       <translation type="unfinished">Contoh</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24245" />
+      <location filename="../artisanlib/main.py" line="24246" />
       <location filename="../artisanlib/main.py" line="14145" />
       <location filename="../artisanlib/sampling.py" line="134" />
       <source>Warning</source>
@@ -15544,13 +15600,13 @@ Ulangi Operasi di akhir: {0}</translation>
       <translation>Interval pengambilan sampel yang ketat dapat menyebabkan ketidakstabilan pada beberapa mesin. Kami menyarankan minimal 1s.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="26956" />
+      <location filename="../artisanlib/main.py" line="26957" />
       <location filename="../artisanlib/curves.py" line="1753" />
       <source>Incompatible variables found in %s</source>
       <translation>Variabel yang tidak cocok ditemukan di %s</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="26958" />
+      <location filename="../artisanlib/main.py" line="26959" />
       <location filename="../artisanlib/curves.py" line="1755" />
       <source>Assignment problem</source>
       <translation>Masalah penugasan</translation>
@@ -15634,19 +15690,19 @@ Ulangi Operasi di akhir: {0}</translation>
       <translation>Profil buka URL: {0}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="25492" />
+      <location filename="../artisanlib/main.py" line="25493" />
       <location filename="../artisanlib/main.py" line="455" />
       <source>Import Cropster XLS</source>
       <translation>Impor Cropster XLS</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="25516" />
+      <location filename="../artisanlib/main.py" line="25517" />
       <location filename="../artisanlib/main.py" line="459" />
       <source>Import Giesen CSV</source>
       <translation>Impor Giesen CSV</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="25498" />
+      <location filename="../artisanlib/main.py" line="25499" />
       <location filename="../artisanlib/main.py" line="463" />
       <source>Import Stronghold XLSX</source>
       <translation>Impor Stronghold XLSX</translation>
@@ -15783,7 +15839,7 @@ Agar tetap gratis dan terkini, dukung kami dengan donasi Anda dan berlangganan a
       <translation>Ketinggian (MASL)</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="7553" />
+      <location filename="../artisanlib/canvas.py" line="7554" />
       <location filename="../artisanlib/main.py" line="5890" />
       <location filename="../artisanlib/main.py" line="5696" />
       <source>Action canceled</source>
@@ -15831,19 +15887,19 @@ Agar tetap gratis dan terkini, dukung kami dengan donasi Anda dan berlangganan a
       <translation>Artisan dikonfigurasi untuk {0}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24560" />
+      <location filename="../artisanlib/main.py" line="24561" />
       <location filename="../artisanlib/main.py" line="5924" />
       <source>Load theme {0}?</source>
       <translation>Muat tema {0}?</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24561" />
+      <location filename="../artisanlib/main.py" line="24562" />
       <location filename="../artisanlib/main.py" line="5925" />
       <source>Adjust Theme Related Settings</source>
       <translation>Sesuaikan Pengaturan Terkait Tema</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24567" />
+      <location filename="../artisanlib/main.py" line="24568" />
       <location filename="../artisanlib/main.py" line="5931" />
       <source>Loaded theme {0}</source>
       <translation>Tema dimuat {0}</translation>
@@ -15854,8 +15910,8 @@ Agar tetap gratis dan terkini, dukung kami dengan donasi Anda dan berlangganan a
       <translation>Mendeteksi pasangan warna yang mungkin sulit dilihat:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="27130" />
-      <location filename="../artisanlib/main.py" line="27087" />
+      <location filename="../artisanlib/main.py" line="27131" />
+      <location filename="../artisanlib/main.py" line="27088" />
       <location filename="../artisanlib/main.py" line="6829" />
       <source>Simulator started @{}x</source>
       <translation>Simulator dimulai @{}x</translation>
@@ -15916,14 +15972,14 @@ Agar tetap gratis dan terkini, dukung kami dengan donasi Anda dan berlangganan a
       <translation>matikan otomatis</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24259" />
+      <location filename="../artisanlib/main.py" line="24260" />
       <location filename="../artisanlib/main.py" line="9988" />
       <location filename="../artisanlib/main.py" line="9966" />
       <source>PID set to OFF</source>
       <translation type="unfinished">PID MATI</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24263" />
+      <location filename="../artisanlib/main.py" line="24264" />
       <location filename="../artisanlib/main.py" line="9985" />
       <location filename="../artisanlib/main.py" line="9975" />
       <source>PID set to ON</source>
@@ -16173,7 +16229,7 @@ Agar tetap gratis dan terkini, dukung kami dengan donasi Anda dan berlangganan a
       <translation>{0} telah disimpan. Panggangan baru telah dimulai</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="27133" />
+      <location filename="../artisanlib/main.py" line="27134" />
       <location filename="../artisanlib/main.py" line="13987" />
       <location filename="../artisanlib/main.py" line="13260" />
       <source>Invalid artisan format</source>
@@ -16254,10 +16310,10 @@ Disarankan untuk menyimpan pengaturan Anda saat ini terlebih dahulu melalui menu
       <translation>Profil disimpan</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24617" />
-      <location filename="../artisanlib/main.py" line="24547" />
-      <location filename="../artisanlib/main.py" line="24479" />
-      <location filename="../artisanlib/main.py" line="24408" />
+      <location filename="../artisanlib/main.py" line="24618" />
+      <location filename="../artisanlib/main.py" line="24548" />
+      <location filename="../artisanlib/main.py" line="24480" />
+      <location filename="../artisanlib/main.py" line="24409" />
       <location filename="../artisanlib/main.py" line="17282" />
       <location filename="../artisanlib/main.py" line="16857" />
       <location filename="../artisanlib/main.py" line="16841" />
@@ -16413,286 +16469,286 @@ Disarankan untuk menyimpan pengaturan Anda saat ini terlebih dahulu melalui menu
       <translation>Laporan Peringkat Excel diekspor ke {0}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24222" />
+      <location filename="../artisanlib/main.py" line="24223" />
       <source>Hottop control turned off</source>
       <translation>Kontrol hottop dimatikan</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24241" />
+      <location filename="../artisanlib/main.py" line="24242" />
       <source>Hottop control turned on</source>
       <translation>Kontrol hottop diaktifkan</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24245" />
+      <location filename="../artisanlib/main.py" line="24246" />
       <source>To control a Hottop you need to activate the super user mode via a right click on the timer LCD first!</source>
       <translation>Untuk mengontrol Hottop Anda perlu mengaktifkan mode pengguna super melalui klik kanan pada LCD pengatur waktu terlebih dahulu!</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24519" />
-      <location filename="../artisanlib/main.py" line="24452" />
+      <location filename="../artisanlib/main.py" line="24520" />
+      <location filename="../artisanlib/main.py" line="24453" />
       <source>Settings not found</source>
       <translation>Setelan tidak ditemukan</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24459" />
+      <location filename="../artisanlib/main.py" line="24460" />
       <source>artisan-settings</source>
       <translation>pengaturan tukang</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24460" />
+      <location filename="../artisanlib/main.py" line="24461" />
       <source>Save Settings</source>
       <translation>Simpan Pengaturan</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24464" />
+      <location filename="../artisanlib/main.py" line="24465" />
       <source>Settings saved</source>
       <translation>Setelan disimpan</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24526" />
+      <location filename="../artisanlib/main.py" line="24527" />
       <source>artisan-theme</source>
       <translation>tema artisan</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24527" />
+      <location filename="../artisanlib/main.py" line="24528" />
       <source>Save Theme</source>
       <translation>Simpan Tema</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24530" />
+      <location filename="../artisanlib/main.py" line="24531" />
       <source>Theme saved</source>
       <translation>Tema disimpan</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24558" />
+      <location filename="../artisanlib/main.py" line="24559" />
       <source>Load Theme</source>
       <translation>Muat Tema</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24584" />
+      <location filename="../artisanlib/main.py" line="24585" />
       <source>Theme loaded</source>
       <translation>Tema dimuat</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24795" />
+      <location filename="../artisanlib/main.py" line="24796" />
       <source>Background profile removed</source>
       <translation>Profil latar belakang dihapus</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24936" />
+      <location filename="../artisanlib/main.py" line="24937" />
       <source>Alarm Config</source>
       <translation>Konfigurasi Alarm</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24937" />
+      <location filename="../artisanlib/main.py" line="24938" />
       <source>Alarms are not available for device None</source>
       <translation>Alarm tidak tersedia untuk perangkat Tidak ada</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24954" />
+      <location filename="../artisanlib/main.py" line="24955" />
       <source>Switching the language needs a restart. Restart now?</source>
       <translation>Mengganti bahasa membutuhkan restart. Restart sekarang?</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="24956" />
+      <location filename="../artisanlib/main.py" line="24957" />
       <source>Restart</source>
       <translation>Mengulang kembali</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="25000" />
+      <location filename="../artisanlib/main.py" line="25001" />
       <source>Import K202 CSV</source>
       <translation>Impor K202 CSV</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="25050" />
+      <location filename="../artisanlib/main.py" line="25051" />
       <source>K202 file loaded successfully</source>
       <translation>File K202 berhasil dimuat</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="25066" />
+      <location filename="../artisanlib/main.py" line="25067" />
       <source>Import K204 CSV</source>
       <translation>Impor K204 CSV</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="25130" />
+      <location filename="../artisanlib/main.py" line="25131" />
       <source>K204 file loaded successfully</source>
       <translation>File K204 berhasil dimuat</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="25160" />
+      <location filename="../artisanlib/main.py" line="25161" />
       <source>Import Probat Recipe</source>
       <translation>Impor Resep Probat</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="25344" />
+      <location filename="../artisanlib/main.py" line="25345" />
       <source>Probat Pilot data imported successfully</source>
       <translation>Data Probat Pilot berhasil diimpor</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="25354" />
+      <location filename="../artisanlib/main.py" line="25355" />
       <source>Import Probat Pilot failed</source>
       <translation>Impor Probat Pilot gagal</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="25476" />
-      <location filename="../artisanlib/main.py" line="25430" />
+      <location filename="../artisanlib/main.py" line="25477" />
+      <location filename="../artisanlib/main.py" line="25431" />
       <source>{0} imported</source>
       <translation>{0} diimpor</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="25433" />
+      <location filename="../artisanlib/main.py" line="25434" />
       <source>an error occurred on importing {0}</source>
       <translation>terjadi kesalahan saat mengimpor {0}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="25504" />
+      <location filename="../artisanlib/main.py" line="25505" />
       <source>Import RoastLog URL</source>
       <translation>Impor URL RoastLog</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="25510" />
+      <location filename="../artisanlib/main.py" line="25511" />
       <source>Import RoastPATH URL</source>
       <translation>Impor URL RoastPATH</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="25522" />
+      <location filename="../artisanlib/main.py" line="25523" />
       <source>Import Petroncini CSV</source>
       <translation>Impor Petroncini CSV</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="25528" />
+      <location filename="../artisanlib/main.py" line="25529" />
       <source>Import IKAWA URL</source>
       <translation>Impor URL IKAWA</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="25534" />
+      <location filename="../artisanlib/main.py" line="25535" />
       <source>Import IKAWA CSV</source>
       <translation>Impor IKAWA CSV</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="25540" />
+      <location filename="../artisanlib/main.py" line="25541" />
       <source>Import Loring CSV</source>
       <translation>Impor Loring CSV</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="25546" />
+      <location filename="../artisanlib/main.py" line="25547" />
       <source>Import ROEST CSV</source>
       <translation>Impor ROEST CSV</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="25552" />
+      <location filename="../artisanlib/main.py" line="25553" />
       <source>Import Rubasse CSV</source>
       <translation>Impor Rubasse CSV</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="25559" />
+      <location filename="../artisanlib/main.py" line="25560" />
       <source>Import HH506RA CSV</source>
       <translation>Impor HH506RA CSV</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="25608" />
+      <location filename="../artisanlib/main.py" line="25609" />
       <source>HH506RA file loaded successfully</source>
       <translation>File HH506RA berhasil dimuat</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="25688" />
+      <location filename="../artisanlib/main.py" line="25689" />
       <source>Save Graph as</source>
       <translation>Simpan Grafik sebagai</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="25749" />
+      <location filename="../artisanlib/main.py" line="25750" />
       <source>{0}  size({1},{2}) saved</source>
       <translation>{0} ukuran({1},{2}) disimpan</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="25760" />
+      <location filename="../artisanlib/main.py" line="25761" />
       <source>Save Graph as PDF</source>
       <translation>Simpan Grafik sebagai PDF</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="25762" />
+      <location filename="../artisanlib/main.py" line="25763" />
       <source>Save Graph as SVG</source>
       <translation>Simpan Grafik sebagai SVG</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="25801" />
+      <location filename="../artisanlib/main.py" line="25802" />
       <source>{0} saved</source>
       <translation>{0} disimpan</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="25862" />
+      <location filename="../artisanlib/main.py" line="25863" />
       <source>Wheel {0} loaded</source>
       <translation>Roda {0} dimuat</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="25865" />
+      <location filename="../artisanlib/main.py" line="25866" />
       <source>Invalid Wheel graph format</source>
       <translation>Format grafik Roda tidak valid</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="26213" />
+      <location filename="../artisanlib/main.py" line="26214" />
       <source>Buttons copied to Palette #</source>
       <translation>Tombol disalin ke Palet #</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="26276" />
+      <location filename="../artisanlib/main.py" line="26277" />
       <source>Palette #%i restored</source>
       <translation>Palet #%i dipulihkan</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="26281" />
+      <location filename="../artisanlib/main.py" line="26282" />
       <source>Palette #%i empty</source>
       <translation>Palet #%i kosong</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="26306" />
+      <location filename="../artisanlib/main.py" line="26307" />
       <source>Save Palettes</source>
       <translation>Simpan Palet</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="26310" />
+      <location filename="../artisanlib/main.py" line="26311" />
       <source>Palettes saved</source>
       <translation>Palet disimpan</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="26447" />
+      <location filename="../artisanlib/main.py" line="26448" />
       <source>Palettes loaded</source>
       <translation>Palet dimuat</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="26450" />
+      <location filename="../artisanlib/main.py" line="26451" />
       <source>Invalid palettes file format</source>
       <translation>Format file palet tidak valid</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="26489" />
+      <location filename="../artisanlib/main.py" line="26490" />
       <source>Alarms loaded</source>
       <translation>Alarm dimuat</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="26563" />
+      <location filename="../artisanlib/main.py" line="26564" />
       <source>Fitting curves...</source>
       <translation>Menyesuaikan kurva...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="26820" />
+      <location filename="../artisanlib/main.py" line="26821" />
       <source>Warning: The start of the analysis interval of interest is earlier than the start of curve fitting.
 Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
       <translation>Peringatan: Awal interval analisis bunga lebih awal dari awal pemasangan kurva.
 Perbaiki ini pada tab Config&gt;Curves&gt;Analyze.</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="26822" />
+      <location filename="../artisanlib/main.py" line="26823" />
       <source>Analysis earlier than Curve fit</source>
       <translation>Analisis lebih awal dari Curve fit</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="27097" />
+      <location filename="../artisanlib/main.py" line="27098" />
       <source>Simulator stopped</source>
       <translation>Simulator berhenti</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="27418" />
+      <location filename="../artisanlib/main.py" line="27419" />
       <source>debug logging ON</source>
       <translation>debug masuk ON</translation>
     </message>
@@ -16885,448 +16941,448 @@ Perbaiki ini pada tab Config&gt;Curves&gt;Analyze.</translation>
       <translation>Perangkat disetel ke {0}, yang setara dengan CENTER 302. Sekarang, pilih port serial</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="2494" />
+      <location filename="../artisanlib/canvas.py" line="2495" />
       <source>set y-coordinate to {}</source>
       <translation>setel koordinat y ke {}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="3010" />
+      <location filename="../artisanlib/canvas.py" line="3011" />
       <source>seconds before FCs</source>
       <translation>detik sebelum FC</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="3013" />
+      <location filename="../artisanlib/canvas.py" line="3014" />
       <source>seconds after FCs</source>
       <translation>detik setelah FC</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="4227" />
+      <location filename="../artisanlib/canvas.py" line="4228" />
       <source>Alarm notice</source>
       <translation>Pemberitahuan alarm</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="5936" />
+      <location filename="../artisanlib/canvas.py" line="5937" />
       <source>Alarm is calling: {0}</source>
       <translation>Alarm memanggil: {0}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="5938" />
+      <location filename="../artisanlib/canvas.py" line="5939" />
       <source>Calling alarm failed on {0}</source>
       <translation>Panggilan alarm gagal pada {0}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="5948" />
+      <location filename="../artisanlib/canvas.py" line="5949" />
       <source>Alarm trigger button error, description '{0}' not a number</source>
       <translation>Kesalahan tombol pemicu alarm, deskripsi '{0}' bukan angka</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="5976" />
+      <location filename="../artisanlib/canvas.py" line="5977" />
       <source>Alarm trigger slider error, description '{0}' not a valid number [0-100]</source>
       <translation>Galat penggeser pemicu alarm, deskripsi '{0}' bukan angka yang valid [0-100]</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="6059" />
+      <location filename="../artisanlib/canvas.py" line="6060" />
       <source>Alarm trigger SV slider error, description '{0}' not a valid number</source>
       <translation>Galat penggeser SV pemicu alarm, deskripsi '{0}' bukan angka yang valid</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="6077" />
+      <location filename="../artisanlib/canvas.py" line="6078" />
       <source>Alarm {0} triggered</source>
       <translation>Alarm {0} terpicu</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="7536" />
+      <location filename="../artisanlib/canvas.py" line="7537" />
       <source>Save profile?</source>
       <translation>Simpan Profil?</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="7545" />
+      <location filename="../artisanlib/canvas.py" line="7546" />
       <source>Profile unsaved</source>
       <translation>Profil belum disimpan</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="7695" />
+      <location filename="../artisanlib/canvas.py" line="7696" />
       <source>Scope has been reset</source>
       <translation>Cakupan telah disetel ulang</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11666" />
+      <location filename="../artisanlib/canvas.py" line="11675" />
       <source>Load Image File</source>
       <translation>Muat File Gambar</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11673" />
+      <location filename="../artisanlib/canvas.py" line="11682" />
       <source>Loaded watermark image {0}</source>
       <translation>Gambar watermark dimuat {0}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="11684" />
+      <location filename="../artisanlib/canvas.py" line="11693" />
       <source>Unable to load watermark image {0}</source>
       <translation>Tidak dapat memuat gambar watermark {0}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12393" />
+      <location filename="../artisanlib/canvas.py" line="12402" />
       <source>Convert profile data to Fahrenheit?</source>
       <translation>Konversikan data profil ke Fahrenheit?</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12506" />
-      <location filename="../artisanlib/canvas.py" line="12454" />
-      <location filename="../artisanlib/canvas.py" line="12444" />
-      <location filename="../artisanlib/canvas.py" line="12394" />
+      <location filename="../artisanlib/canvas.py" line="12515" />
+      <location filename="../artisanlib/canvas.py" line="12463" />
+      <location filename="../artisanlib/canvas.py" line="12453" />
+      <location filename="../artisanlib/canvas.py" line="12403" />
       <source>Convert Profile Temperature</source>
       <translation>Ubah Suhu Profil</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12441" />
+      <location filename="../artisanlib/canvas.py" line="12450" />
       <source>Profile changed to Fahrenheit</source>
       <translation>Profil diubah menjadi Fahrenheit</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12445" />
+      <location filename="../artisanlib/canvas.py" line="12454" />
       <source>Unable to comply. You already are in Fahrenheit</source>
       <translation>Tidak dapat mematuhi. Anda sudah berada di Fahrenheit</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12508" />
-      <location filename="../artisanlib/canvas.py" line="12446" />
+      <location filename="../artisanlib/canvas.py" line="12517" />
+      <location filename="../artisanlib/canvas.py" line="12455" />
       <source>Profile not changed</source>
       <translation>Profil tidak diubah</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12453" />
+      <location filename="../artisanlib/canvas.py" line="12462" />
       <source>Convert profile data to Celsius?</source>
       <translation>Konversikan data profil ke Celsius?</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12503" />
+      <location filename="../artisanlib/canvas.py" line="12512" />
       <source>Profile changed to Celsius</source>
       <translation>Profil berubah menjadi Celcius</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12507" />
+      <location filename="../artisanlib/canvas.py" line="12516" />
       <source>Unable to comply. You already are in Celsius</source>
       <translation>Tidak dapat mematuhi. Anda sudah berada di Celcius</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12515" />
+      <location filename="../artisanlib/canvas.py" line="12524" />
       <source>Convert Profile Scale</source>
       <translation>Konversi Skala Profil</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12516" />
+      <location filename="../artisanlib/canvas.py" line="12525" />
       <source>No profile data found</source>
       <translation>Tidak ada data profil yang ditemukan</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12543" />
-      <location filename="../artisanlib/canvas.py" line="12527" />
+      <location filename="../artisanlib/canvas.py" line="12552" />
+      <location filename="../artisanlib/canvas.py" line="12536" />
       <source>Colors set to defaults</source>
       <translation>Warna diatur ke default</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12531" />
+      <location filename="../artisanlib/canvas.py" line="12540" />
       <source>Colors set to Default Theme</source>
       <translation>Warna diatur ke Tema Default</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12547" />
+      <location filename="../artisanlib/canvas.py" line="12556" />
       <source>Colors set to grey</source>
       <translation>Warna diatur ke abu-abu</translation>
     </message>
     <message>
       <location filename="../artisanlib/cup_profile.py" line="255" />
-      <location filename="../artisanlib/canvas.py" line="12746" />
+      <location filename="../artisanlib/canvas.py" line="12763" />
       <source>Background does not match number of labels</source>
       <translation>Latar belakang tidak cocok dengan jumlah label</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="12967" />
+      <location filename="../artisanlib/canvas.py" line="12984" />
       <source>Phidget service discovery started...</source>
       <translation>Penemuan layanan phidget dimulai...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="13224" />
+      <location filename="../artisanlib/canvas.py" line="13241" />
       <source>scanning for device</source>
       <translation>memindai perangkat</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="13256" />
+      <location filename="../artisanlib/canvas.py" line="13273" />
       <source>Scope monitoring...</source>
       <translation>Pemantauan cakupan...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="13408" />
+      <location filename="../artisanlib/canvas.py" line="13425" />
       <source>Scope stopped</source>
       <translation>Lingkup berhenti</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="13695" />
+      <location filename="../artisanlib/canvas.py" line="13712" />
       <source>Humidity: {}%</source>
       <translation>Kelembaban: {}%</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="13703" />
+      <location filename="../artisanlib/canvas.py" line="13720" />
       <source>Temperature: {}{}</source>
       <translation>Suhu: {}{}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="13709" />
+      <location filename="../artisanlib/canvas.py" line="13726" />
       <source>Pressure: {}hPa</source>
       <translation>Tekanan: {}hPa</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14025" />
+      <location filename="../artisanlib/canvas.py" line="14042" />
       <source>Scope recording...</source>
       <translation>Rekaman cakupan...</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14127" />
+      <location filename="../artisanlib/canvas.py" line="14144" />
       <source>Scope recording stopped</source>
       <translation>Rekaman lingkup berhenti</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14256" />
+      <location filename="../artisanlib/canvas.py" line="14273" />
       <source>Not enough data collected yet. Try again in a few seconds</source>
       <translation>Belum cukup data yang terkumpul. Coba lagi dalam beberapa detik</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14316" />
+      <location filename="../artisanlib/canvas.py" line="14333" />
       <source>CHARGE: Scope is not recording</source>
       <translation>BIAYA: Lingkup tidak merekam</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14341" />
+      <location filename="../artisanlib/canvas.py" line="14358" />
       <source>Roast time starts now 00:00 BT = {0}</source>
       <translation>Waktu pemanggangan dimulai sekarang 00:00 BT = {0}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14375" />
+      <location filename="../artisanlib/canvas.py" line="14392" />
       <source>[TP] recorded at {0} BT = {1}</source>
       <translation>[TP] direkam pada {0} BT = {1}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14460" />
+      <location filename="../artisanlib/canvas.py" line="14477" />
       <source>DRY END: Scope is not recording</source>
       <translation>KERING AKHIR: Cakupan tidak merekam</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14496" />
+      <location filename="../artisanlib/canvas.py" line="14513" />
       <source>[DRY END] recorded at {0} BT = {1}</source>
       <translation>[DRY END] direkam pada {0} BT = {1}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14573" />
+      <location filename="../artisanlib/canvas.py" line="14590" />
       <source>FC START: Scope is not recording</source>
       <translation>FC MULAI: Cakupan tidak merekam</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14611" />
+      <location filename="../artisanlib/canvas.py" line="14628" />
       <source>[FC START] recorded at {0} BT = {1}</source>
       <translation>[FC MULAI] direkam pada {0} BT = {1}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14679" />
+      <location filename="../artisanlib/canvas.py" line="14696" />
       <source>FC END: Scope is not recording</source>
       <translation>FC END: Scope tidak merekam</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14721" />
+      <location filename="../artisanlib/canvas.py" line="14738" />
       <source>[FC END] recorded at {0} BT = {1}</source>
       <translation>[FC END] direkam pada {0} BT = {1}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14789" />
+      <location filename="../artisanlib/canvas.py" line="14806" />
       <source>SC START: Scope is not recording</source>
       <translation>SC MULAI: Lingkup tidak merekam</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14837" />
+      <location filename="../artisanlib/canvas.py" line="14854" />
       <source>[SC START] recorded at {0} BT = {1}</source>
       <translation>[SC MULAI] direkam pada {0} BT = {1}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14905" />
+      <location filename="../artisanlib/canvas.py" line="14922" />
       <source>SC END: Scope is not recording</source>
       <translation>SC END: Cakupan tidak merekam</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14952" />
+      <location filename="../artisanlib/canvas.py" line="14969" />
       <source>[SC END] recorded at {0} BT = {1}</source>
       <translation>[SC END] direkam pada {0} BT = {1}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15084" />
+      <location filename="../artisanlib/canvas.py" line="15101" />
       <source>DROP: Scope is not recording</source>
       <translation>DROP: Lingkup tidak merekam</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15137" />
+      <location filename="../artisanlib/canvas.py" line="15154" />
       <source>Roast ended at {0} BT = {1}</source>
       <translation>Sangrai berakhir pada {0} BT = {1}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15219" />
+      <location filename="../artisanlib/canvas.py" line="15236" />
       <source>COOL: Scope is not recording</source>
       <translation>KEREN: Lingkup tidak merekam</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15268" />
+      <location filename="../artisanlib/canvas.py" line="15285" />
       <source>[COOL END] recorded at {0} BT = {1}</source>
       <translation>[COOL END] direkam pada {0} BT = {1}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15662" />
-      <location filename="../artisanlib/canvas.py" line="15612" />
+      <location filename="../artisanlib/canvas.py" line="15679" />
+      <location filename="../artisanlib/canvas.py" line="15629" />
       <source>Event # {0} recorded at BT = {1}{2} Time = {3}</source>
       <translation>Peristiwa # {0} direkam pada BT = {1}{2} Waktu = {3}</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15632" />
+      <location filename="../artisanlib/canvas.py" line="15649" />
       <source>Timer is OFF</source>
       <translation>Timer MATI</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="16824" />
+      <location filename="../artisanlib/canvas.py" line="16841" />
       <source>Unable to move background</source>
       <translation>Tidak dapat memindahkan latar belakang</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="16881" />
+      <location filename="../artisanlib/canvas.py" line="16898" />
       <source>No finished profile found</source>
       <translation>Tidak ditemukan profil selesai</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="16898" />
+      <location filename="../artisanlib/canvas.py" line="16915" />
       <source>Polynomial coefficients (Horner form):</source>
       <translation>Koefisien polinomial (bentuk Horner):</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="16900" />
+      <location filename="../artisanlib/canvas.py" line="16917" />
       <source>Knots:</source>
       <translation>Simpul:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="16902" />
+      <location filename="../artisanlib/canvas.py" line="16919" />
       <source>Residual:</source>
       <translation>Sisa:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="16904" />
+      <location filename="../artisanlib/canvas.py" line="16921" />
       <source>Roots:</source>
       <translation>Akar:</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="16907" />
+      <location filename="../artisanlib/canvas.py" line="16924" />
       <source>Profile information</source>
       <translation>Informasi Profil</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="17317" />
+      <location filename="../artisanlib/canvas.py" line="17334" />
       <source>Designer Start</source>
       <translation>Desainer Mulai</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="17318" />
+      <location filename="../artisanlib/canvas.py" line="17335" />
       <source>Importing a profile in to Designer will decimate all data except the main [points].
 Continue?</source>
       <translation>Mengimpor profil ke Designer akan memusnahkan semua data kecuali [poin] utama.
 Melanjutkan?</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="17362" />
+      <location filename="../artisanlib/canvas.py" line="17379" />
       <source>Save Points</source>
       <translation>Simpan Poin</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="17372" />
+      <location filename="../artisanlib/canvas.py" line="17389" />
       <source>Points saved</source>
       <translation>Poin disimpan</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="17382" />
+      <location filename="../artisanlib/canvas.py" line="17399" />
       <source>Load Points</source>
       <translation>Titik Beban</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="17395" />
+      <location filename="../artisanlib/canvas.py" line="17412" />
       <source>Points loaded</source>
       <translation>Poin dimuat</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="17465" />
+      <location filename="../artisanlib/canvas.py" line="17482" />
       <source>Designer Init</source>
       <translation>Desainer Init</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="17466" />
+      <location filename="../artisanlib/canvas.py" line="17483" />
       <source>Unable to start designer.
 Profile missing [CHARGE] or [DROP]</source>
       <translation>Tidak dapat memulai desainer.
 Profil tidak ada [CHARGE] atau [DROP]</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="18031" />
+      <location filename="../artisanlib/canvas.py" line="18048" />
       <source>[ CHARGE ]</source>
       <translation>[ MENGENAKAN BIAYA ]</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="18034" />
+      <location filename="../artisanlib/canvas.py" line="18051" />
       <source>[ DRY END ]</source>
       <translation>[AKHIR KERING]</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="18037" />
+      <location filename="../artisanlib/canvas.py" line="18054" />
       <source>[ FC START ]</source>
       <translation>[FC MULAI]</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="18040" />
+      <location filename="../artisanlib/canvas.py" line="18057" />
       <source>[ FC END ]</source>
       <translation>[ FC AKHIR ]</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="18043" />
+      <location filename="../artisanlib/canvas.py" line="18060" />
       <source>[ SC START ]</source>
       <translation>[SC MULAI]</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="18046" />
+      <location filename="../artisanlib/canvas.py" line="18063" />
       <source>[ SC END ]</source>
       <translation>[ SK AKHIR ]</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="18049" />
+      <location filename="../artisanlib/canvas.py" line="18066" />
       <source>[ DROP ]</source>
       <translation>[ MENJATUHKAN ]</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="18052" />
+      <location filename="../artisanlib/canvas.py" line="18069" />
       <source>[ COOL ]</source>
       <translation>[ DINGIN ]</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="18363" />
+      <location filename="../artisanlib/canvas.py" line="18380" />
       <source>New profile created</source>
       <translation>Profil baru dibuat</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="18583" />
+      <location filename="../artisanlib/canvas.py" line="18600" />
       <source> added to cupping notes</source>
       <translation> ditambahkan ke catatan bekam</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="18594" />
+      <location filename="../artisanlib/canvas.py" line="18611" />
       <source> added to roasting notes</source>
       <translation> ditambahkan ke catatan pemanggangan</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="18862" />
+      <location filename="../artisanlib/canvas.py" line="18879" />
       <source>Mouse Cross ON: move mouse around</source>
       <translation>Mouse Cross ON: gerakkan mouse</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="18907" />
+      <location filename="../artisanlib/canvas.py" line="18924" />
       <source>Mouse cross OFF</source>
       <translation>Tikus menyilang MATI</translation>
     </message>
@@ -17352,62 +17408,6 @@ Profil tidak ada [CHARGE] atau [DROP]</translation>
       <translation>Profil latar belakang tidak ditemukan</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="1413" />
-      <source>Register the currently loaded roast profile&lt;br&gt;in the selected entry.&lt;br&gt;This will overwrite some roast properties.</source>
-      <translation>Daftarkan profil sangrai yang saat ini dimuat&lt;br&gt;di entri yang dipilih.&lt;br&gt;Ini akan menimpa beberapa properti sangrai.</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="1427" />
-      <location filename="../plus/schedule.py" line="1418" />
-      <source>Register Roast</source>
-      <translation>Daftar Panggang</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="2364" />
-      <source>Scheduler started</source>
-      <translation>Penjadwal dimulai</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="2673" />
-      <source>Roasts will not adjust the schedule&lt;br&gt;while the schedule window is closed</source>
-      <translation>Roasting tidak akan menyesuaikan jadwal&lt;br&gt;saat jendela jadwal ditutup</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="2687" />
-      <location filename="../plus/schedule.py" line="2678" />
-      <source>Close Scheduler</source>
-      <translation>Tutup Penjadwal</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="2735" />
-      <source>Scheduler stopped</source>
-      <translation>Penjadwal berhenti</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="3649" />
-      <location filename="../plus/schedule.py" line="3131" />
-      <source>1 batch</source>
-      <translation>1 kelompok</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="3664" />
-      <location filename="../plus/schedule.py" line="3655" />
-      <location filename="../plus/schedule.py" line="3139" />
-      <location filename="../plus/schedule.py" line="3133" />
-      <source>{} batches</source>
-      <translation>{} kumpulan</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="3477" />
-      <source>Updating completed roast properties failed</source>
-      <translation>Gagal memperbarui properti sangrai yang telah selesai</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="3543" />
-      <source>Fetching completed roast properties failed</source>
-      <translation>Gagal mengambil properti sangrai yang telah selesai</translation>
-    </message>
-    <message>
       <source>Bluetooth scale cannot be connected while permission for Artisan to access Bluetooth is denied</source>
       <translation type="vanished">Timbangan Bluetooth tidak dapat dihubungkan sementara izin Artisan untuk mengakses Bluetooth ditolak</translation>
     </message>
@@ -17418,51 +17418,6 @@ Profil tidak ada [CHARGE] atau [DROP]</translation>
   </context>
   <context>
     <name>Plus</name>
-    <message>
-      <location filename="../artisanlib/main.py" line="1231" />
-      <source>debug logging ON</source>
-      <translation>debug masuk ON</translation>
-    </message>
-    <message>
-      <location filename="../artisanlib/main.py" line="1232" />
-      <source>debug logging OFF</source>
-      <translation>debug logging OFF</translation>
-    </message>
-    <message>
-      <location filename="../artisanlib/main.py" line="1245" />
-      <source>1 day left</source>
-      <translation>1 hari lagi</translation>
-    </message>
-    <message>
-      <location filename="../artisanlib/main.py" line="1247" />
-      <source>{} days left</source>
-      <translation>{} hari tersisa</translation>
-    </message>
-    <message>
-      <location filename="../artisanlib/main.py" line="1249" />
-      <source>Paid until</source>
-      <translation>Dibayar sampai</translation>
-    </message>
-    <message>
-      <location filename="../artisanlib/main.py" line="1276" />
-      <source>Please visit our {0}shop{1} to extend your subscription</source>
-      <translation>Kunjungi {0} toko {1} kami untuk memperpanjang langganan Anda</translation>
-    </message>
-    <message>
-      <location filename="../artisanlib/main.py" line="1289" />
-      <source>Do you want to extend your subscription?</source>
-      <translation>Apakah Anda ingin memperpanjang langganan Anda?</translation>
-    </message>
-    <message>
-      <location filename="../artisanlib/main.py" line="1290" />
-      <source>Your subscription ends on</source>
-      <translation>Langganan Anda berakhir</translation>
-    </message>
-    <message>
-      <location filename="../artisanlib/main.py" line="1290" />
-      <source>Your subscription ended on</source>
-      <translation>Langganan Anda berakhir pada</translation>
-    </message>
     <message>
       <location filename="../plus/queue.py" line="145" />
       <source>Roast successfully uploaded to {}</source>
@@ -17556,104 +17511,104 @@ Profil tidak ada [CHARGE] atau [DROP]</translation>
       <translation>barel</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="1229" />
+      <location filename="../plus/schedule.py" line="1245" />
       <source>Yesterday</source>
       <translation>Kemarin</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="1842" />
-      <location filename="../plus/schedule.py" line="1304" />
+      <location filename="../plus/schedule.py" line="1858" />
+      <location filename="../plus/schedule.py" line="1320" />
       <source>Today</source>
       <translation>Hari ini</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="1306" />
+      <location filename="../plus/schedule.py" line="1322" />
       <source>Tomorrow</source>
       <translation>Besok</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="1318" />
+      <location filename="../plus/schedule.py" line="1334" />
       <source>by anybody</source>
       <translation>oleh siapa pun</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="1320" />
-      <location filename="../plus/schedule.py" line="1319" />
+      <location filename="../plus/schedule.py" line="1336" />
+      <location filename="../plus/schedule.py" line="1335" />
       <source>by</source>
       <translation>oleh</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="1322" />
+      <location filename="../plus/schedule.py" line="1338" />
       <source>on</source>
       <translation>pada</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="1328" />
+      <location filename="../plus/schedule.py" line="1344" />
       <source>prepared</source>
       <translation>siap</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="1329" />
+      <location filename="../plus/schedule.py" line="1345" />
       <source>({} of {} done{})</source>
       <translation>({} dari {} selesai{})</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="1838" />
+      <location filename="../plus/schedule.py" line="1854" />
       <source>Visible</source>
       <translation>Bisa dilihat</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="1840" />
+      <location filename="../plus/schedule.py" line="1856" />
       <source>List only visible items</source>
       <translation>Daftarkan hanya item yang terlihat</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="1845" />
+      <location filename="../plus/schedule.py" line="1861" />
       <source>List only items scheduled for today</source>
       <translation>Daftarkan hanya item yang dijadwalkan untuk hari ini</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="1858" />
+      <location filename="../plus/schedule.py" line="1874" />
       <source>Filters</source>
       <translation type="unfinished">Saring</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="2134" />
+      <location filename="../plus/schedule.py" line="2150" />
       <source>No completed roasts</source>
       <translation>Tidak ada daging panggang yang sudah selesai</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="2177" />
+      <location filename="../plus/schedule.py" line="2193" />
       <source>Schedule Updated!</source>
       <translation>Jadwal pemanggangan diperbarui!</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="2272" />
+      <location filename="../plus/schedule.py" line="2288" />
       <source>Login to {} to receive your roast schedule</source>
       <translation>Masuk ke {} untuk menerima jadwal pemanggangan Anda</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3191" />
+      <location filename="../plus/schedule.py" line="3207" />
       <source>List only items scheduled for the current user {}</source>
       <translation>Daftar hanya item yang dijadwalkan untuk pengguna saat ini {}</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3199" />
+      <location filename="../plus/schedule.py" line="3215" />
       <source>List only items scheduled for the current machine {}</source>
       <translation>Daftar hanya item yang dijadwalkan untuk mesin saat ini {}</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3888" />
+      <location filename="../plus/schedule.py" line="3904" />
       <source>Schedule empty!{}Plan your schedule on {}</source>
       <translation>Jadwal kosong!{}Rencanakan jadwal Anda pada {}</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3896" />
+      <location filename="../plus/schedule.py" line="3912" />
       <source>Nothing scheduled for you today!{}Deactivate filters to see all items.</source>
       <translation>Tidak ada jadwal untuk Anda hari ini!{}Nonaktifkan filter untuk melihat semua item.</translation>
     </message>
     <message>
-      <location filename="../plus/schedule.py" line="3946" />
+      <location filename="../plus/schedule.py" line="3962" />
       <source>nothing to weight</source>
       <translation>tidak ada yang membebani</translation>
     </message>
@@ -17682,6 +17637,51 @@ Profil tidak ada [CHARGE] atau [DROP]</translation>
       <source>Remember</source>
       <translation>Ingat</translation>
     </message>
+    <message>
+      <location filename="../artisanlib/main.py" line="1231" />
+      <source>debug logging ON</source>
+      <translation>debug masuk ON</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/main.py" line="1232" />
+      <source>debug logging OFF</source>
+      <translation>debug logging OFF</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/main.py" line="1245" />
+      <source>1 day left</source>
+      <translation>1 hari lagi</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/main.py" line="1247" />
+      <source>{} days left</source>
+      <translation>{} hari tersisa</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/main.py" line="1249" />
+      <source>Paid until</source>
+      <translation>Dibayar sampai</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/main.py" line="1276" />
+      <source>Please visit our {0}shop{1} to extend your subscription</source>
+      <translation>Kunjungi {0} toko {1} kami untuk memperpanjang langganan Anda</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/main.py" line="1289" />
+      <source>Do you want to extend your subscription?</source>
+      <translation>Apakah Anda ingin memperpanjang langganan Anda?</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/main.py" line="1290" />
+      <source>Your subscription ends on</source>
+      <translation>Langganan Anda berakhir</translation>
+    </message>
+    <message>
+      <location filename="../artisanlib/main.py" line="1290" />
+      <source>Your subscription ended on</source>
+      <translation>Langganan Anda berakhir pada</translation>
+    </message>
   </context>
   <context>
     <name>Radio Button</name>
@@ -17709,67 +17709,67 @@ Profil tidak ada [CHARGE] atau [DROP]</translation>
   <context>
     <name>Scope Annotation</name>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14284" />
-      <location filename="../artisanlib/canvas.py" line="14216" />
-      <location filename="../artisanlib/canvas.py" line="12063" />
-      <location filename="../artisanlib/canvas.py" line="8358" />
-      <location filename="../artisanlib/canvas.py" line="8353" />
+      <location filename="../artisanlib/canvas.py" line="14301" />
+      <location filename="../artisanlib/canvas.py" line="14233" />
+      <location filename="../artisanlib/canvas.py" line="12072" />
+      <location filename="../artisanlib/canvas.py" line="8359" />
+      <location filename="../artisanlib/canvas.py" line="8354" />
       <source>CHARGE</source>
       <translation>MENGISI</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14366" />
-      <location filename="../artisanlib/canvas.py" line="8382" />
-      <location filename="../artisanlib/canvas.py" line="8370" />
+      <location filename="../artisanlib/canvas.py" line="14383" />
+      <location filename="../artisanlib/canvas.py" line="8383" />
+      <location filename="../artisanlib/canvas.py" line="8371" />
       <source>TP {0}</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14444" />
-      <location filename="../artisanlib/canvas.py" line="14409" />
-      <location filename="../artisanlib/canvas.py" line="8396" />
+      <location filename="../artisanlib/canvas.py" line="14461" />
+      <location filename="../artisanlib/canvas.py" line="14426" />
+      <location filename="../artisanlib/canvas.py" line="8397" />
       <source>DE {0}</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14559" />
-      <location filename="../artisanlib/canvas.py" line="14524" />
-      <location filename="../artisanlib/canvas.py" line="8411" />
+      <location filename="../artisanlib/canvas.py" line="14576" />
+      <location filename="../artisanlib/canvas.py" line="14541" />
+      <location filename="../artisanlib/canvas.py" line="8412" />
       <source>FCs {0}</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14667" />
-      <location filename="../artisanlib/canvas.py" line="14635" />
-      <location filename="../artisanlib/canvas.py" line="8425" />
+      <location filename="../artisanlib/canvas.py" line="14684" />
+      <location filename="../artisanlib/canvas.py" line="14652" />
+      <location filename="../artisanlib/canvas.py" line="8426" />
       <source>FCe {0}</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14777" />
-      <location filename="../artisanlib/canvas.py" line="14746" />
-      <location filename="../artisanlib/canvas.py" line="8447" />
+      <location filename="../artisanlib/canvas.py" line="14794" />
+      <location filename="../artisanlib/canvas.py" line="14763" />
+      <location filename="../artisanlib/canvas.py" line="8448" />
       <source>SCs {0}</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14893" />
-      <location filename="../artisanlib/canvas.py" line="14862" />
-      <location filename="../artisanlib/canvas.py" line="8461" />
+      <location filename="../artisanlib/canvas.py" line="14910" />
+      <location filename="../artisanlib/canvas.py" line="14879" />
+      <location filename="../artisanlib/canvas.py" line="8462" />
       <source>SCe {0}</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15024" />
-      <location filename="../artisanlib/canvas.py" line="14980" />
-      <location filename="../artisanlib/canvas.py" line="12061" />
-      <location filename="../artisanlib/canvas.py" line="8495" />
+      <location filename="../artisanlib/canvas.py" line="15041" />
+      <location filename="../artisanlib/canvas.py" line="14997" />
+      <location filename="../artisanlib/canvas.py" line="12070" />
+      <location filename="../artisanlib/canvas.py" line="8496" />
       <source>DROP {0}</source>
       <translation type="unfinished" />
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="15207" />
-      <location filename="../artisanlib/canvas.py" line="15173" />
+      <location filename="../artisanlib/canvas.py" line="15224" />
+      <location filename="../artisanlib/canvas.py" line="15190" />
       <source>CE {0}</source>
       <translation type="unfinished" />
     </message>
@@ -17777,16 +17777,16 @@ Profil tidak ada [CHARGE] atau [DROP]</translation>
   <context>
     <name>Scope Title</name>
     <message>
-      <location filename="../plus/schedule.py" line="2843" />
-      <location filename="../artisanlib/canvas.py" line="8860" />
-      <location filename="../artisanlib/canvas.py" line="7743" />
-      <location filename="../artisanlib/canvas.py" line="1244" />
+      <location filename="../artisanlib/canvas.py" line="8861" />
+      <location filename="../artisanlib/canvas.py" line="7744" />
+      <location filename="../artisanlib/canvas.py" line="1245" />
       <location filename="../artisanlib/main.py" line="15492" />
       <location filename="../artisanlib/main.py" line="12592" />
       <location filename="../artisanlib/roast_properties.py" line="2520" />
       <location filename="../artisanlib/roast_properties.py" line="2490" />
       <location filename="../artisanlib/roast_properties.py" line="2141" />
       <location filename="../artisanlib/roast_properties.py" line="2128" />
+      <location filename="../plus/schedule.py" line="2859" />
       <source>Roaster Scope</source>
       <translation>Mari ngopi</translation>
     </message>
@@ -18159,6 +18159,16 @@ Profil tidak ada [CHARGE] atau [DROP]</translation>
   <context>
     <name>Tab</name>
     <message>
+      <location filename="../plus/schedule.py" line="2227" />
+      <source>To-Do</source>
+      <translation>Melakukan</translation>
+    </message>
+    <message>
+      <location filename="../plus/schedule.py" line="2228" />
+      <source>Completed</source>
+      <translation>Lengkap</translation>
+    </message>
+    <message>
       <location filename="../artisanlib/pid_dialogs.py" line="2976" />
       <location filename="../artisanlib/pid_dialogs.py" line="1823" />
       <location filename="../artisanlib/pid_dialogs.py" line="733" />
@@ -18396,16 +18406,6 @@ Profil tidak ada [CHARGE] atau [DROP]</translation>
       <location filename="../artisanlib/colors.py" line="564" />
       <source>LCDs</source>
       <translation type="unfinished">LCD</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="2211" />
-      <source>To-Do</source>
-      <translation>Melakukan</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="2212" />
-      <source>Completed</source>
-      <translation>Lengkap</translation>
     </message>
     <message>
       <source>Color</source>
@@ -19155,6 +19155,11 @@ Profil tidak ada [CHARGE] atau [DROP]</translation>
   </context>
   <context>
     <name>Tooltip</name>
+    <message>
+      <location filename="../plus/schedule.py" line="2161" />
+      <source>Update schedule</source>
+      <translation>Jadwal pembaruan</translation>
+    </message>
     <message>
       <location filename="../artisanlib/axis.py" line="90" />
       <source>100% event values in step mode are aligned with the given y-axis value or the lowest phases limit if left empty</source>
@@ -20326,7 +20331,7 @@ Jenis font diatur di Config&gt;&gt; Curves&gt;&gt; tab UI</translation>
       <translation>Gaya garis</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="13407" />
+      <location filename="../artisanlib/canvas.py" line="13424" />
       <location filename="../artisanlib/main.py" line="3282" />
       <source>Start monitoring</source>
       <translation>Mulai pemantauan</translation>
@@ -20526,32 +20531,32 @@ Currently in TEMP MODE</source>
 Saat ini dalam MODE SUHU</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="26172" />
+      <location filename="../artisanlib/main.py" line="26173" />
       <source>&lt;b&gt;Label&lt;/b&gt;= </source>
       <translation>&lt;b&gt;Label&lt;/b&gt;=</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="26173" />
+      <location filename="../artisanlib/main.py" line="26174" />
       <source>&lt;b&gt;Description &lt;/b&gt;= </source>
       <translation>&lt;b&gt;Deskripsi &lt;/b&gt;=</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="26174" />
+      <location filename="../artisanlib/main.py" line="26175" />
       <source>&lt;b&gt;Type &lt;/b&gt;= </source>
       <translation>&lt;b&gt;Ketik &lt;/b&gt;=</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="26176" />
+      <location filename="../artisanlib/main.py" line="26177" />
       <source>&lt;b&gt;Value &lt;/b&gt;= </source>
       <translation>&lt;b&gt;Nilai &lt;/b&gt;=</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="26178" />
+      <location filename="../artisanlib/main.py" line="26179" />
       <source>&lt;b&gt;Documentation &lt;/b&gt;= </source>
       <translation>&lt;b&gt;Dokumentasi &lt;/b&gt;=</translation>
     </message>
     <message>
-      <location filename="../artisanlib/main.py" line="26179" />
+      <location filename="../artisanlib/main.py" line="26180" />
       <source>&lt;b&gt;Button# &lt;/b&gt;= </source>
       <translation>&lt;b&gt;Tombol# &lt;/b&gt;=</translation>
     </message>
@@ -20692,12 +20697,12 @@ Saat ini dalam MODE SUHU</translation>
       <translation>Contoh: 100 + x</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="13273" />
+      <location filename="../artisanlib/canvas.py" line="13290" />
       <source>Stop monitoring</source>
       <translation>Hentikan pemantauan</translation>
     </message>
     <message>
-      <location filename="../artisanlib/canvas.py" line="14032" />
+      <location filename="../artisanlib/canvas.py" line="14049" />
       <source>Stop recording</source>
       <translation>Berhenti merekam</translation>
     </message>
@@ -20735,11 +20740,6 @@ Saat ini dalam MODE SUHU</translation>
       <location filename="../artisanlib/colors.py" line="578" />
       <source>Sets button colors to grey scale and LCD colors to black and white</source>
       <translation>Mengatur warna tombol menjadi skala abu-abu dan warna LCD menjadi hitam putih</translation>
-    </message>
-    <message>
-      <location filename="../plus/schedule.py" line="2145" />
-      <source>Update schedule</source>
-      <translation>Jadwal pembaruan</translation>
     </message>
   </context>
 </TS>

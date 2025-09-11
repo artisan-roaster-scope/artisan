@@ -348,8 +348,10 @@ for qt_dir in [r'PyQt5\Qt5\translations', r'PyQt6\Qt6\translations']:
 logging.info(">>>>> Removing unneeded language support from babel")
 for root, _, files in os.walk(rootdir + r'\babel\locale-data'):
     for file in files:
-        if file.endswith('.dat') and file != 'root.dat' and (('_' not in file and file.split('.')[0] not in SUPPORTED_LANGUAGES) or
-                ('_' in file and file.split('.')[0] not in SUPPORTED_LANGUAGES)):
+        if (file.endswith('.dat') and
+                file not in {'root.dat', 'zh.dat', 'zh_Hans_CN.dat', 'zh_Hant_TW.dat'} and
+                (('_' not in file and file.split('.')[0] not in SUPPORTED_LANGUAGES) or
+                    ('_' in file and file.split('.')[0] not in SUPPORTED_LANGUAGES))):
             file_path = os.path.join(root, file)
             del_file(file_path, True)
             #logging.info(file_path)

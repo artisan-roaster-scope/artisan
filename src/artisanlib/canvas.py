@@ -225,7 +225,7 @@ class tgraphcanvas(FigureCanvas):
         'extratemp2', 'extrastemp1', 'extrastemp2', 'extractimex1', 'extractimex2', 'extractemp1', 'extractemp2', 'extratemp1lines', 'extratemp2lines',
         'extraname1', 'extraname2', 'extramathexpression1', 'extramathexpression2', 'extralinestyles1', 'extralinestyles2', 'extradrawstyles1', 'extradrawstyles2',
         'extralinewidths1', 'extralinewidths2', 'extramarkers1', 'extramarkers2', 'extramarkersizes1', 'extramarkersizes2', 'devicetablecolumnwidths', 'extraNoneTempHint1',
-        'extraNoneTempHint2', 'plotcurves', 'plotcurvecolor', 'overlapList', 'tight_layout_params', 'fig', 'ax', 'delta_ax', 'legendloc', 'legendloc_pos', 'onclick_cid',
+        'extraNoneTempHint2', 'plotcurves', 'plotcurvecolor', 'overlapList', 'tight_layout_params', 'cupping_tight_layout_params', 'fig', 'ax', 'delta_ax', 'legendloc', 'legendloc_pos', 'onclick_cid',
         'oncpick_cid', 'ondraw_cid', 'onmove_cid', 'rateofchange1', 'rateofchange2', 'flagon', 'flagstart', 'flagKeepON', 'flagOpenCompleted', 'flagsampling', 'flagsamplingthreadrunning',
         'manuallogETflag', 'zoom_follow', 'alignEvent', 'compareAlignEvent', 'compareEvents', 'compareET', 'compareBT', 'compareDeltaET', 'compareDeltaBT', 'compareMainEvents', 'compareBBP', 'compareRoast', 'compareExtraCurves1', 'compareExtraCurves2',
         'replayType', 'replayDropType', 'replayedBackgroundEvents', 'last_replayed_events', 'beepedBackgroundEvents', 'roastpropertiesflag', 'roastpropertiesAutoOpenFlag', 'roastpropertiesAutoOpenDropFlag',
@@ -1134,7 +1134,8 @@ class tgraphcanvas(FigureCanvas):
         self.overlapList:List[Tuple[float,float,float,float]] = []
 
         self.tight_layout_params: Final[Dict[str,float]] = {'pad':.3,'h_pad':0.0,'w_pad':0.0} # slightly less space for axis labels
-        self.fig:Figure = Figure(tight_layout=self.tight_layout_params,frameon=True,dpi=dpi)
+        self.cupping_tight_layout_params: Final[Dict[str,float]] = {'pad':1.5,'h_pad':0.0,'w_pad':0.0} # slightly more space for cupping to ensure all labels are visiible
+        self.fig:Figure = Figure(tight_layout=self.tight_layout_params, frameon=True, dpi=dpi)
         # with tight_layout=True, the matplotlib canvas expands to the maximum using figure.autolayout
 
         self.fig.patch.set_facecolor(str(self.palette['canvas']))
@@ -1154,7 +1155,7 @@ class tgraphcanvas(FigureCanvas):
             top=0.93, # the top of the subplots of the figure (default: 0.9)
             bottom=0.1, # the bottom of the subplots of the figure (default: 0.1)
             left=0.067, # the left side of the subplots of the figure (default: 0.125)
-            right=.925) # the right side of the subplots of the figure (default: 0.9
+            right=.925) # the right side of the subplots of the figure (default: 0.9)
         FigureCanvas.__init__(self, self.fig) # type: ignore
 
         self.fig.canvas.set_cursor = lambda _: None # type: ignore # deactivate the busy cursor on slow full redraws
@@ -3643,7 +3644,7 @@ class tgraphcanvas(FigureCanvas):
                             cids.append(cid)
             # disconnecting all established motion_notify_event_handlers of DraggableAnnotations
             for cid in cids:
-                if cid != self.onmove_cid: # don't disconnect the general motion notify event used to move the cross lines
+                if cid != self.onmove_cid and (self.crossmouseid is None or cid != self.crossmouseid): # don't disconnect the general motion notify event used to display the xy-widget or the one to move the cross lines
                     self.fig.canvas.mpl_disconnect(cid)
         except Exception: # pylint: disable=broad-except
             pass
@@ -9170,8 +9171,16 @@ class tgraphcanvas(FigureCanvas):
             return ''
         if self.roastersize_setup == 0 and self.roastertype_setup == '':
             if self.aw.qmc.xgrid < 3600:
-                return get_unit_name('duration-minute', length='short', locale=self.aw.locale_str) or 'min'
-            return get_unit_name('duration-hour', length='short', locale=self.aw.locale_str) or 'h'
+                try:
+                    return get_unit_name('duration-minute', length='short', locale=self.aw.locale_str) or 'min'
+                except Exception as e:  # pylint: disable=broad-except # UnknownLocaleError
+                    _log.error(e)
+                    return get_unit_name('duration-minute', length='short', locale='en') or 'min'
+            try:
+                return get_unit_name('duration-hour', length='short', locale=self.aw.locale_str) or 'h'
+            except Exception as e:  # pylint: disable=broad-except # UnknownLocaleError
+                _log.error(e)
+                return get_unit_name('duration-hour', length='short', locale='en') or 'h'
         if right_to_left(self.locale_str):
             return f"{(render_weight(self.roastersize_setup, 1, weight_units.index(self.weight[2]), right_to_left_lang=True) if self.roastersize_setup>=0 else '')}  {self.__dijkstra_to_ascii(self.roastertype_setup)}"
         return f"{self.__dijkstra_to_ascii(self.roastertype_setup)} {(render_weight(self.roastersize_setup, 1, weight_units.index(self.weight[2])) if self.roastersize_setup>0 else '')}"
@@ -12633,6 +12642,8 @@ class tgraphcanvas(FigureCanvas):
         self.flavorchart_labels = None
         self.flavorchart_total = None
 
+        self.fig.set_layout_engine('tight', **self.tight_layout_params)
+
     #draws a polar star graph to score cupping. It does not delete any profile data.
     def flavorchart(self) -> None:
         try:
@@ -12652,6 +12663,9 @@ class tgraphcanvas(FigureCanvas):
                 except Exception: # pylint: disable=broad-except
                     pass
             self.ax1 = self.fig.add_subplot(111,projection='polar',facecolor='None') #) radar green facecolor='#d5de9c'
+
+            self.fig.set_layout_engine('tight', **self.cupping_tight_layout_params)
+
 
             # fixing yticks with matplotlib.ticker "FixedLocator"
             self.updateFlavorChartData()

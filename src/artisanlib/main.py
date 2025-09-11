@@ -23054,6 +23054,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             if self.app.darkmode:
                 self.qmc.patheffects = org_patheffects
 
+            self.qmc.clearFlavorChart()
             self.qmc.fig.clf() # remove the flavorchart artists
             self.qmc.redraw(recomputeAllDeltas=False)
             met = '--'

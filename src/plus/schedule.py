@@ -930,18 +930,34 @@ def remove_suffix(s:str, suffix:str) -> str:
 def locale_format_timedelta(locale:str, seconds:float) -> str:
     sec = int(round(seconds))
     if sec < 3600:
-        return format_timedelta(sec, locale=locale, format='narrow', granularity='minute', threshold=1)
-    res = f"{format_timedelta(sec, locale=locale, format='narrow', granularity='hour', threshold=1)}"
+        try:
+            return format_timedelta(sec, locale=locale, format='narrow', granularity='minute', threshold=1)
+        except Exception as e:  # pylint: disable=broad-except # UnknownLocaleError
+            _log.error(e)
+            return format_timedelta(sec, locale='en', format='narrow', granularity='minute', threshold=1)
+    try:
+        res = f"{format_timedelta(sec, locale=locale, format='narrow', granularity='hour', threshold=1)}"
+    except Exception as e:  # pylint: disable=broad-except # UnknownLocaleError
+        _log.error(e)
+        res = f"{format_timedelta(sec, locale='en', format='narrow', granularity='hour', threshold=1)}"
     reminder = sec % 3600
     if reminder>0:
-        return f"{res} {format_timedelta(reminder, locale=locale, format='narrow', granularity='minute', threshold=1)}"
+        try:
+            return f"{res} {format_timedelta(reminder, locale=locale, format='narrow', granularity='minute', threshold=1)}"
+        except Exception as e:  # pylint: disable=broad-except # UnknownLocaleError
+            _log.error(e)
+            return f"{res} {format_timedelta(reminder, locale='en', format='narrow', granularity='minute', threshold=1)}"
     return res
 
 
 def locale_format_date_no_year(locale:str, date:datetime.date) -> str:
     try:
         # format nicely using babel
-        date_without_year = format_date(date, format='long', locale=locale).replace(format_date(date, 'Y', locale=locale),'').strip()
+        try:
+            date_without_year = format_date(date, format='long', locale=locale).replace(format_date(date, 'Y', locale=locale),'').strip()
+        except Exception as e:  # pylint: disable=broad-except # UnknownLocaleError
+            _log.error(e)
+            date_without_year = format_date(date, format='long', locale='en').replace(format_date(date, 'Y', locale='en'),'').strip()
         # strip some more characters for certain locales
         if locale.startswith(('en', 'vi')):
             date_without_year = date_without_year.rstrip(',')

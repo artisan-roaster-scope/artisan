@@ -63,7 +63,8 @@ v3.2.1
   - fixes date/batch widgets color scheme ([Issue #1962](../../../issues/1962))
   - fixes an issue where the selected default store could reset the selected coffee or blend
   - fixes typo that caused plus blend ingredient names to not being loaded from alog profiles
-
+  - adds missing unit translations for Chinese and revert to English on missing locale support
+  - adds additional margin to cupping spider graph to prevent clipping in full screen mode
 
 
 ----
