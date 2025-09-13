@@ -151,7 +151,7 @@ feature_row_inventory_management:
     
 - the affordable [**<span style='color: #4C97C3;'>artisan.plus</span>**](https://artisan.plus) cloud extension adds multi-storage, multi-user, multi-machine, mobile-friendly transaction-based inventory management at one fixed price and with friendly 3 month free trial period
 
-- bean data from importers, blend management with magic transitions, EUDR management, stock taking, profile search, [automatic synchronization and seamless integration with **<span style='color: #4C97C3;'>artisan</span>**](https://artisan-roasterscope.blogspot.com/2020/06/working-together-artisan-artisanviewer.html){:target='_blank'} and professional 24h support  
+- [detailed bean data imported directly from our partners](https://doc.artisan.plus/partners/){:target='_blank'} like [Algrano](https://algrano.com/artisan?utm_source=artisan_blog&utm_medium=referral&utm_campaign=algrano_x_artisan&utm_content=blog){:target='_blank'}, [Royal Coffee](https://royalcoffee.com/){:target='_blank'}, [hacea](https://haceacoffee.com/){:target='_blank'}, ..., blend management with [magic transitions](https://doc.artisan.plus/updates/replace-blend-ingredients/){:target='_blank'}, EUDR management, stock taking, profile search, [automatic synchronization and seamless integration with **<span style='color: #4C97C3;'>artisan</span>**](https://artisan-roasterscope.blogspot.com/2020/06/working-together-artisan-artisanviewer.html){:target='_blank'} and professional 24h support  
 
     "
     url: "https://doc.artisan.plus/docs/"
@@ -180,7 +180,7 @@ feature_row_business_reporting:
     
 - basic [roast-, production- and ranking reports](https://artisan-roasterscope.blogspot.de/2016/03/artisan-v099.html){:target='_blank'} in Web, PDF, CSV, and Excel format
 
-- [**<span style='color: #4C97C3;'>artisan.plus</span>**](https://artisan.plus) adds sequential and open roast reports, as well as purchase/sales, stock, organic and tax business reporting with PDF, CSV and Excel exports
+- [**<span style='color: #4C97C3;'>artisan.plus</span>**](https://artisan.plus) adds [sequential and open roast reports](https://doc.artisan.plus/docs/reports/#roast-reports){:target='_blank'}, as well as [purchase/sales](https://doc.artisan.plus/docs/reports/#purchasessales-reports){:target='_blank'}, [stock](https://doc.artisan.plus/docs/reports/#stocks-reports){:target='_blank'}, [organic](https://doc.artisan.plus/updates/organic-reports/){:target='_blank'} and [tax business reporting](https://doc.artisan.plus/updates/tax-reports/){:target='_blank'} with PDF, CSV and Excel exports
 
     " 
     
