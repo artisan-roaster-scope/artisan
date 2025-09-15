@@ -205,6 +205,8 @@ devices:
         url: /devices/phidget-sets/
       - title: "S7"
         url: /devices/s7/
+      - title: "Shelly"
+        url: /devices/shelly/
       - title: "WebSockets"
         url: /devices/websockets/
       - title: "Yoctopuce"
