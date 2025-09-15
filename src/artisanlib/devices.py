@@ -1885,7 +1885,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.greenTaskPrecision.setToolTip(QApplication.translate('Tooltip','Target accuracy expressed as a percentage of the batch size. If zero is selected, the check is disabled.'))
             self.greenTaskPrecision.setDecimals(1)
             self.greenTaskPrecision.setSingleStep(0.1)
-            self.greenTaskPrecision.setRange(0, 5.)
+            self.greenTaskPrecision.setRange(0, 10.)
             self.greenTaskPrecision.setAlignment(Qt.AlignmentFlag.AlignRight)
             self.greenTaskPrecision.setMinimumWidth(40)
             self.greenTaskPrecision.setValue(self.aw.qmc.dropDuplicatesLimit)

@@ -23,7 +23,7 @@ v3.2.1
   - adds Czech localization
   - adds multi-modal state transitions to Batch Manager
   - adds remaining total roast time estimate to scheduler and lists roast templates in scheduled items
-  - adds support for longer recordings as applied in coffee fermentation ([Discussion #1969](../../../discussions/1969)
+  - adds support for longer recordings as applied in coffee fermentation ([Discussion #1969](../../../discussions/1969))
 
 * CHANGES
   - BREAKING VISUAL CHANGE, but only when consecutive hidden buttons with Type or Action defined are first at the top of the Events Buttons table: The visual button layout may change as hidden buttons with Type or Action defined at the top of the Events Buttons table are no longer counted in the first row's button count, which is limited by the Max Buttons per Row setting.  All other hidden buttons continue to be counted in each row's button count.
@@ -48,7 +48,7 @@ v3.2.1
 
 * FIXES
   - fixes regression which broke the designer such that points could not be moved ([Discussion #1905](../../../discussions/1905) and [Issue #1916](../../../issues/1916))
-  - fixes regression which broke the import of roast profiles exported from Cropster, Giesen, IKAWA, Loring, Petroncini, RoastLog, RoastPath, ROEST, Rubasse, and Stronghold([Issue #1958](../../../issues/1958))
+  - fixes regression which broke the import of roast profiles exported from Cropster, Giesen, IKAWA, Loring, Petroncini, RoastLog, RoastPath, ROEST, Rubasse, and Stronghold ([Issue #1958](../../../issues/1958))
   - fixes support for second scale
   - fixes rendering of special characters like quotes in task displays of the Batch Manager
   - fixes event buttons bottom row not rendered properly in all cases

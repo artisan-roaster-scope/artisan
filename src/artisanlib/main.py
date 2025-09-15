@@ -17480,7 +17480,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                                 return False
                             if reply == QMessageBox.StandardButton.No:
                                 updateBatchCounter = False
-                            updateBatchCounter = True
                     settings.endGroup()
 #--- END GROUP Batch
 
@@ -18458,7 +18457,6 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
 #--- END GROUP RoastProperties
 
             self.userprofilepath = toString(settings.value('profilepath',self.userprofilepath))
-            self.settingspath = toString(settings.value('settingspath',self.settingspath))
             self.wheelpath = toString(settings.value('wheelpath',self.wheelpath))
             self.qmc.autosavepath = toString(settings.value('autosavepath',self.qmc.autosavepath))
             self.qmc.autosavealsopath = toString(settings.value('autosavealsopath',self.qmc.autosavealsopath))
@@ -24465,7 +24463,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
     def saveSettings(self, _:bool = False) -> None:
         path = QDir()
         path.setPath(self.getDefaultPath())
-        fname = path.absoluteFilePath(QApplication.translate('Message','artisan-settings'))
+        if self.settingspath:
+            fname = self.settingspath
+        else:
+            fname = path.absoluteFilePath(QApplication.translate('Message','artisan-settings'))
         filename = self.ArtisanSaveFileDialog(msg=QApplication.translate('Message', 'Save Settings'), path=fname, ext='*.aset')
         if filename:
             self.settingspath = filename
