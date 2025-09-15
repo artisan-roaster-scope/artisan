@@ -436,7 +436,8 @@ class EventPushButton(QPushButton): # pylint: disable=too-few-public-methods # p
     def setSelected(self, b:bool) -> None:
         self.setProperty('Selected', b)
         # Update the style
-        self.setStyle(self.style())
+#        self.setStyle(self.style()) # this seems not to work any longer to update selected style of buttons in Qt 6.9.2
+        self.setStyleSheet(self.styleSheet()) # this works in Qt 6.9.2 to update the selected style of buttons
 
 
 class MajorEventPushButton(EventPushButton): # pylint: disable=too-few-public-methods
@@ -493,7 +494,6 @@ class AnimatedMajorEventPushButton(MajorEventPushButton):
         self.selected_animation.setLoopCount(-1)
         self.selected_animation.setEasingCurve(QEasingCurve.Type.OutInCubic)
 
-        self.current_style:str = ''
 
     def setSelected(self, b:bool) -> None:
         super().setSelected(b)
@@ -503,7 +503,6 @@ class AnimatedMajorEventPushButton(MajorEventPushButton):
             self.startAnimation()
 
     def startAnimation(self) -> None:
-        self.current_style = self.styleSheet()
         if self.property('Selected'):
             self.selected_animation.start()
         else:
@@ -513,8 +512,7 @@ class AnimatedMajorEventPushButton(MajorEventPushButton):
     def stopAnimation(self) -> None:
         self.animation.stop()
         self.selected_animation.stop()
-        if self.current_style is not None:
-            self.setStyleSheet(self.current_style)
+        self.setStyleSheet(self.styleSheet())
         self.animating = False
 
     # pylint: disable=no-self-use

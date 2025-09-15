@@ -1482,7 +1482,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         'simulator', 'simulatorpath', 'comparator', 'stack', 'eventsbuttonflag', 'minieventsflags', 'seriallogflag',
         'seriallog', 'ser', 'modbus', 'extraMODBUStemps', 'extraMODBUStx', 's7', 'extraS7tx', 'ws', 'scale', 'color', 'extraser', 'extracomport', 'extrabaudrate',
         'extrabytesize', 'extraparity', 'extrastopbits', 'extratimeout', 'hottop', 'santokerHost', 'santokerPort', 'santokerSerial', 'santokerBLE', 'santoker', 'santokerR', 'fujipid', 'dtapid', 'pidcontrol', 'soundflag', 'recentRoasts', 'maxRecentRoasts',
-        'mugmaHost','mugmaPort', 'mugma', 'mugma_default_host',
+        'mugmaHost','mugmaPort', 'mugma', 'mugma_default_host', 'shelly_3EMPro_host', 'shelly_PlusPlug_host',
         'kaleido_default_host', 'kaleidoHost', 'kaleidoPort', 'kaleidoSerial', 'kaleidoPID', 'kaleido', 'colorTrack_mean_window_size', 'colorTrack_median_window_size', 'ikawa',
         'lcdpaletteB', 'lcdpaletteF', 'extraeventsbuttonsflags', 'extraeventslabels', 'extraeventbuttoncolor', 'extraeventsactionstrings',
         'extraeventbuttonround', 'block_quantification_sampling_ticks', 'sampling_seconds_to_block_quantifiction', 'sampling_ticks_to_block_quantifiction', 'extraeventsactionslastvalue',
@@ -1836,6 +1836,10 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         self.mugmaHost:str = '127.0.0.1'
         self.mugmaPort:int = 1504
         self.mugma:Optional[Mugma] = None # holds the Mugma instance created on connect; reset to None on disconnect
+
+        # Shelly
+        self.shelly_3EMPro_host:str = '127.0.0.1'
+        self.shelly_PlusPlug_host:str = '127.0.0.1'
 
         # ColorTrack
         self.colorTrack_mean_window_size:int = 50    # window size of the mean filter (10-200)
@@ -16143,7 +16147,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                     'end_events' in self.qmc.bbpCache and
                     'drop_events' in self.qmc.bbpCache and
                     'drop_to_end' in self.qmc.bbpCache):
-                _log.debug('bbpCache exists')
+                #_log.debug('bbpCache exists')
                 bbpGap = self.qmc.roastepoch - (self.qmc.bbpCache['end_roastepoch_msec']/1000)
                 # did the prev roast end shortly before this roast began?  If not clear bbpCache
                 if bbpGap < maxAllowedTime_fromPrevEnd_toStart:
@@ -17659,6 +17663,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.kaleidoEventFlags = [toBool(x) for x in toList(settings.value('kaleidoEventFlags',self.kaleidoEventFlags))]
             self.mugmaHost = toString(settings.value('mugmaHost',self.mugmaHost))
             self.mugmaPort = toInt(settings.value('mugmaPort',self.mugmaPort))
+            self.shelly_3EMPro_host = toString(settings.value('shelly_3EMPro_host',self.shelly_3EMPro_host))
+            self.shelly_PlusPlug_host = toString(settings.value('shelly_PlusPlug_host',self.shelly_PlusPlug_host))
             self.colorTrack_mean_window_size = toInt(settings.value('ctMean',self.colorTrack_mean_window_size))
             self.colorTrack_median_window_size = toInt(settings.value('ctMedian',self.colorTrack_median_window_size))
             # activate CONTROL BUTTON
@@ -19679,6 +19685,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             self.settingsSetValue(settings, default_settings, 'kaleidoEventFlags',self.kaleidoEventFlags, read_defaults)
             self.settingsSetValue(settings, default_settings, 'mugmaHost',self.mugmaHost, read_defaults)
             self.settingsSetValue(settings, default_settings, 'mugmaPort',self.mugmaPort, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'shelly_3EMPro_host',self.shelly_3EMPro_host, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'shelly_PlusPlug_host',self.shelly_PlusPlug_host, read_defaults)
             self.settingsSetValue(settings, default_settings, 'ctMean',self.colorTrack_mean_window_size, read_defaults)
             self.settingsSetValue(settings, default_settings, 'ctMedian',self.colorTrack_median_window_size, read_defaults)
             settings.endGroup()

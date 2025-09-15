@@ -922,7 +922,7 @@ class EventsDlg(ArtisanResizeablDialog):
         self.E4_calc.setToolTip(QApplication.translate('Form Caption', 'Slider Calculator'))
 
         # https://www.home-barista.com/home-roasting/coffee-roasting-best-practices-scott-rao-t65601-70.html#p724654
-        bernoulli_tooltip_text = QApplication.translate('Tooltip', "Applies the Bernoulli's gas law to the values computed\nby applying the given factor and offset to the slider value\nassuming that the gas pressureand not the gas flow is controlled.\nTo reduce heat (or gas flow) by 50% the gas pressure\nhas to be reduced by 4 times.")
+        bernoulli_tooltip_text = QApplication.translate('Tooltip', "Applies the Bernoulli's gas law to the values computed\nby applying the given factor and offset to the slider value\nassuming that the gas pressure and not the gas flow is controlled.\nTo reduce heat (or gas flow) by 50% the gas pressure\nhas to be reduced by 4 times.")
         self.E1slider_bernoulli = QCheckBox()
         self.E1slider_bernoulli.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.E1slider_bernoulli.setChecked(bool(self.aw.eventsliderBernoulli[0]))

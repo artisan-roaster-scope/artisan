@@ -918,6 +918,8 @@ class tgraphcanvas(FigureCanvas):
                        'Aillio Bullet R2',          #176
                        '+PID P/I',                  #177
                        '+PID D/Error',              #178
+                       '+Shelly 3EM Pro Energy/Return', #179
+                       '+Shelly Plus Plug Total/Last'   #180
                        ]
 
         # ADD DEVICE:
@@ -986,7 +988,9 @@ class tgraphcanvas(FigureCanvas):
             171, # Santoker R BT/ET
             174, # ColorTrack BT
             175, # Thermoworks BlueDOT
-            176  # Aillio Bullet R2
+            176, # Aillio Bullet R2
+            179, # Shelly 3EM Pro Energy/ReturnS
+            180  # Shelly Plus Plug Total/Last
         ]
 
         # ADD DEVICE:
@@ -1062,7 +1066,9 @@ class tgraphcanvas(FigureCanvas):
             173, # +Santoker BT RoR / ET RoR
             174, # ColorTrack BT
             177, # +PID P/I
-            178  # +PID D/Error
+            178, # +PID D/Error
+            179, # Shelly 3EM Pro Energy/Return
+            180  # Shelly Plus Plug Total/Last
         ]
 
         # ADD DEVICE:
@@ -1076,7 +1082,7 @@ class tgraphcanvas(FigureCanvas):
         ]
 
         # ADD DEVICE:
-        # ids of binary devices certain input filters should not be applied
+        # ids of devices with binary results (0 and 1) certain input filters should not be applied
         self.binaryDevices : Final[List[int]] = [
             69, # Phidget IO Digital 01
             70, # Phidget IO Digital 23
@@ -1504,7 +1510,7 @@ class tgraphcanvas(FigureCanvas):
         self.lastroastepoch:int = self.roastepoch - self.roastepoch_timeout - 1 # the epoch of the last roast in seconds, initialized such that a new roast session can start
         self.batchcounter:int = 0  # global batch counter; if batchcounter is -1, batchcounter system is inactive
         self.batchsequence:int = 1 # global counter of position in sequence of batches of one session
-        self.batchprefix:str = 'A'
+        self.batchprefix:str = ''
         self.neverUpdateBatchCounter:bool = False
         # profile batch nr
         self.roastbatchnr:int = 0 # batch number of the roast; if roastbatchnr=0, prefix/counter is hidden/inactiv (initialized to 0 on roast START)
@@ -14230,7 +14236,8 @@ class tgraphcanvas(FigureCanvas):
                         self.autoChargeIdx = -1 # disable autoCharge to allow manual re-CHARGE
                         # undo wrongly set CHARGE
                         ## deactivate autoCHARGE
-                        ##self.autoCHARGEenabled = False
+                        self.timeindex[0] = -1
+                        removed = True
                         st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation', 'CHARGE'))
                         st1 = self.__dijkstra_to_ascii(st1)
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
@@ -14246,8 +14253,6 @@ class tgraphcanvas(FigureCanvas):
                             self.l_annotations = self.l_annotations[:-2]
                             if 0 in self.l_annotations_dict:
                                 del self.l_annotations_dict[0]
-                            self.timeindex[0] = -1
-                            removed = True
                             self.xaxistosm(redraw=False, set_xlim=not zoomed_in)
                     elif not self.aw.buttonCHARGE.isFlat():
                         if self.device == 18 and self.aw.simulator is None: #manual mode
@@ -14423,6 +14428,8 @@ class tgraphcanvas(FigureCanvas):
                         # undo wrongly set DRY
                         # deactivate autoDRY
                         self.autoDRYenabled = False
+                        self.timeindex[1] = 0
+                        removed = True
                         st = stringfromseconds(self.timex[self.timeindex[1]]-start,False)
                         DE_str = self.aw.arabicReshape(QApplication.translate('Scope Annotation','DE {0}').format(st))
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == DE_str:
@@ -14438,8 +14445,6 @@ class tgraphcanvas(FigureCanvas):
                             self.l_annotations = self.l_annotations[:-2]
                             if 1 in self.l_annotations_dict:
                                 del self.l_annotations_dict[1]
-                            self.timeindex[1] = 0
-                            removed = True
                     elif not self.aw.buttonDRY.isFlat():
                         if self.device != 18 or self.aw.simulator is not None:
                             self.timeindex[1] = max(0,len(self.timex)-1)
@@ -14539,6 +14544,8 @@ class tgraphcanvas(FigureCanvas):
                         # undo wrongly set FCs
                         # deactivate autoFCs
                         self.autoFCsenabled = False
+                        self.timeindex[2] = 0
+                        removed = True
                         st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','FCs {0}').format(stringfromseconds(self.timex[self.timeindex[2]]-start,False)))
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
                             self.ystep_down, self.ystep_up = 0, 0
@@ -14553,8 +14560,6 @@ class tgraphcanvas(FigureCanvas):
                             self.l_annotations = self.l_annotations[:-2]
                             if 2 in self.l_annotations_dict:
                                 del self.l_annotations_dict[2]
-                            self.timeindex[2] = 0
-                            removed = True
                     elif not self.aw.buttonFCs.isFlat():
                         # record 1Cs only if Charge mark has been done
                         if self.device != 18 or self.aw.simulator is not None:
@@ -14650,6 +14655,8 @@ class tgraphcanvas(FigureCanvas):
                         start = 0
                     if self.aw.buttonFCe.isFlat() and self.timeindex[3] > 0:
                         # undo wrongly set FCe
+                        self.timeindex[3] = 0
+                        removed = True
                         st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','FCe {0}').format(stringfromseconds(self.timex[self.timeindex[3]]-start,False)))
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
                             self.ystep_down, self.ystep_up = 0, 0
@@ -14664,8 +14671,6 @@ class tgraphcanvas(FigureCanvas):
                             self.l_annotations = self.l_annotations[:-2]
                             if 3 in self.l_annotations_dict:
                                 del self.l_annotations_dict[3]
-                            self.timeindex[3] = 0
-                            removed = True
                     elif not self.aw.buttonFCe.isFlat():
                         if self.device != 18 or self.aw.simulator is not None:
                             self.timeindex[3] = max(0,len(self.timex)-1)
@@ -14762,6 +14767,8 @@ class tgraphcanvas(FigureCanvas):
                     if self.aw.buttonSCs.isFlat() and self.timeindex[4] > 0:
                         # undo wrongly set FCs
                         st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','SCs {0}').format(stringfromseconds(self.timex[self.timeindex[4]]-start,False)))
+                        self.timeindex[4] = 0
+                        removed = True
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
                             self.ystep_down, self.ystep_up = 0, 0
                             try:
@@ -14775,8 +14782,6 @@ class tgraphcanvas(FigureCanvas):
                             self.l_annotations = self.l_annotations[:-2]
                             if 4 in self.l_annotations_dict:
                                 del self.l_annotations_dict[4]
-                            self.timeindex[4] = 0
-                            removed = True
                     elif not self.aw.buttonSCs.isFlat():
                         if self.device != 18 or self.aw.simulator is not None:
                             self.timeindex[4] = max(0,len(self.timex)-1)
@@ -14877,6 +14882,8 @@ class tgraphcanvas(FigureCanvas):
                         start = 0
                     if self.aw.buttonSCe.isFlat() and self.timeindex[5] > 0:
                         # undo wrongly set FCs
+                        self.timeindex[5] = 0
+                        removed = True
                         st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','SCe {0}').format(stringfromseconds(self.timex[self.timeindex[5]]-start,False)))
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
                             self.ystep_down, self.ystep_up = 0, 0
@@ -14891,8 +14898,6 @@ class tgraphcanvas(FigureCanvas):
                             self.l_annotations = self.l_annotations[:-2]
                             if 5 in self.l_annotations_dict:
                                 del self.l_annotations_dict[5]
-                            self.timeindex[5] = 0
-                            removed = True
                     elif not self.aw.buttonSCe.isFlat():
                         if self.device != 18 or self.aw.simulator is not None:
                             self.timeindex[5] = max(0,len(self.timex)-1)
@@ -14995,6 +15000,10 @@ class tgraphcanvas(FigureCanvas):
                         # undo wrongly set FCs
                         # deactivate autoDROP
                         self.autoDROPenabled = False
+                        self.timeindex[6] = 0
+                        #decrease BatchCounter again
+                        self.decBatchCounter()
+                        removed = True
                         st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','DROP {0}').format(stringfromseconds(self.timex[self.timeindex[6]]-start,False)))
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
                             self.ystep_down, self.ystep_up = 0, 0
@@ -15009,10 +15018,6 @@ class tgraphcanvas(FigureCanvas):
                             self.l_annotations = self.l_annotations[:-2]
                             if 6 in self.l_annotations_dict:
                                 del self.l_annotations_dict[6]
-                            self.timeindex[6] = 0
-                            #decrease BatchCounter again
-                            self.decBatchCounter()
-                            removed = True
                     elif not self.aw.buttonDROP.isFlat():
                         self.incBatchCounter()
                         # generate UUID
@@ -15187,6 +15192,8 @@ class tgraphcanvas(FigureCanvas):
                         start = 0
                     if self.aw.buttonCOOL.isFlat() and self.timeindex[7] > 0:
                         # undo wrongly set COOL
+                        self.timeindex[7] = 0
+                        removed = True
 
                         st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','CE {0}').format(stringfromseconds(self.timex[self.timeindex[7]] - start)))
 
@@ -15203,8 +15210,6 @@ class tgraphcanvas(FigureCanvas):
                             self.l_annotations = self.l_annotations[:-2]
                             if 7 in self.l_annotations_dict:
                                 del self.l_annotations_dict[7]
-                            self.timeindex[7] = 0
-                            removed = True
 
                     elif not self.aw.buttonCOOL.isFlat():
                         if self.device != 18 or self.aw.simulator is not None:

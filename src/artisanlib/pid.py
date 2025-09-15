@@ -171,7 +171,7 @@ class PID:
         )  # Track recent measurements for discontinuity detection
         self.setpoint_changed: bool = False  # Flag for recent setpoint changes
         self.setpoint_changed_significantly: bool = False # Flag for significant (> significant_setup_change_limit; disabled if significant_setup_change_limit<=0) setpoint changes used to reduce Dterm by 50%
-        self.significant_setup_change_limit:float = 25
+        self.significant_setup_change_limit:float = 15
 
         # Enhanced integral windup prevention
         self.integral_windup_prevention: bool = True  # Enable advanced windup prevention

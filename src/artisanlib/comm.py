@@ -24,6 +24,7 @@ import shlex
 import threading
 import platform
 import logging
+import requests
 from typing import Final, Optional, List, Tuple, Dict, Callable, Union, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -551,7 +552,9 @@ class serialport:
                                    self.BlueDOT_BTET,         #175
                                    self.R2_BTIBTS,            #176
                                    self.pidPtermIterm,        #177
-                                   self.pidDtermError         #178
+                                   self.pidDtermError,        #178
+                                   self.Shelly3EMPro_EnergyReturn, #179
+                                   self.ShellyPlusPlug_EnergyTotalLastMinute  #180
                                    ]
         #string with the name of the program for device #27
         self.externalprogram:str = 'test.py'
@@ -690,6 +693,50 @@ class serialport:
     def pidDtermError(self) -> Tuple[float,float,float]:
         tx = self.aw.qmc.timeclock.elapsedMilli()
         return tx, self.aw.qmc.pid.getError(), self.aw.qmc.pid.getDterm()
+
+    def Shelly3EMPro_EnergyReturn(self) -> Tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        energy:float = -1
+        energy_return:float = -1
+        try:
+            shelly_connect_timeout = 0.3
+            shelly_read_timeout = 0.2
+            r = requests.get(f'http://{self.aw.shelly_3EMPro_host}/rpc/EMData.GetStatus?id=0',
+                headers={'Content-Type': 'application/json'},
+                timeout=(shelly_connect_timeout, shelly_read_timeout))
+            r.raise_for_status()
+            res = r.json()
+            if 'total_act' in res:
+                energy = float(res['total_act'])
+            if 'total_act_ret' in res:
+                energy_return = float(res['total_act_ret'])
+        except Exception as e: # pylint: disable=broad-except
+            _log.error(e)
+        return tx, energy_return, energy
+
+    def ShellyPlusPlug_EnergyTotalLastMinute(self) -> Tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        total_energy:float = -1
+        last_minute:float = -1
+        try:
+            shelly_connect_timeout = 0.3
+            shelly_read_timeout = 0.2
+            r = requests.get(f'http://{self.aw.shelly_PlusPlug_host}/rpc/Switch.GetStatus?id=0',
+                headers={'Content-Type': 'application/json'},
+                timeout=(shelly_connect_timeout, shelly_read_timeout))
+            r.raise_for_status()
+            res = r.json()
+            if 'aenergy' in res:
+                energy_res = res['aenergy']
+                if 'total' in energy_res:
+                    total_energy = float(energy_res['total'])
+                if 'by_minute' in energy_res:
+                    by_minute_res = energy_res['by_minute']
+                    if isinstance(by_minute_res, list) and len(by_minute_res)>0:
+                        last_minute = float(by_minute_res[0])
+        except Exception as e: # pylint: disable=broad-except
+            _log.error(e)
+        return tx, last_minute, total_energy
 
     def DTAtemperature(self) -> Tuple[float,float,float]:
         _log.debug('DTAtemperature')

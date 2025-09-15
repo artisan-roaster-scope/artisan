@@ -1253,6 +1253,18 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.mugmaPort.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.mugmaPort.setFixedWidth(150)
 
+        shelly3EMProHostLabel = QLabel(QApplication.translate('Label','Host'))
+        self.shelly3EMProHost = QLineEdit(self.aw.shelly_3EMPro_host)
+        self.shelly3EMProHost.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.shelly3EMProHost.setFixedWidth(150)
+        self.shelly3EMProHost.setValidator(QRegularExpressionValidator(regexhost,self.shelly3EMProHost))
+
+        shellyPlusPlugHostLabel = QLabel(QApplication.translate('Label','Host'))
+        self.shellyPlusPlugHost = QLineEdit(self.aw.shelly_PlusPlug_host)
+        self.shellyPlusPlugHost.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.shellyPlusPlugHost.setFixedWidth(150)
+        self.shellyPlusPlugHost.setValidator(QRegularExpressionValidator(regexhost,self.shellyPlusPlugHost))
+
         colorTrackMeanLabel = QLabel(QApplication.translate('Label','Mean Filter'))
         self.colorTrackMeanSpinBox = QSpinBox()
         self.colorTrackMeanSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
@@ -1337,7 +1349,6 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         kaleidoNetworkGroupBox = QGroupBox('Kaleido')
         kaleidoNetworkGroupBox.setLayout(kaleidoVBox)
 
-
         mugmaNetworkGrid = QGridLayout()
         mugmaNetworkGrid.addWidget(mugmaHostLabel,0,1)
         mugmaNetworkGrid.addWidget(self.mugmaHost,0,2)
@@ -1352,6 +1363,32 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         mugmaVBox = QVBoxLayout()
         mugmaVBox.addLayout(mugmaHBox)
         mugmaVBox.setContentsMargins(0,0,0,0)
+
+        shelly3EMProNetworkGrid = QGridLayout()
+        shelly3EMProNetworkGrid.addWidget(shelly3EMProHostLabel,0,1)
+        shelly3EMProNetworkGrid.addWidget(self.shelly3EMProHost,0,2)
+        shelly3EMProNetworkGrid.setSpacing(20)
+        shelly3EMProNetworkGroupBox = QGroupBox('Shelly 3EM Pro')
+        shelly3EMProNetworkGroupBox.setLayout(shelly3EMProNetworkGrid)
+        shelly3EMProHBox = QHBoxLayout()
+        shelly3EMProHBox.addWidget(shelly3EMProNetworkGroupBox)
+        shelly3EMProHBox.addStretch()
+        shelly3EMProVBox = QVBoxLayout()
+        shelly3EMProVBox.addLayout(shelly3EMProHBox)
+        shelly3EMProVBox.setContentsMargins(0,0,0,0)
+
+        shellyPlusPlugNetworkGrid = QGridLayout()
+        shellyPlusPlugNetworkGrid.addWidget(shellyPlusPlugHostLabel,0,1)
+        shellyPlusPlugNetworkGrid.addWidget(self.shellyPlusPlugHost,0,2)
+        shellyPlusPlugNetworkGrid.setSpacing(20)
+        shellyPlusPlugNetworkGroupBox = QGroupBox('Shelly Plus Plug')
+        shellyPlusPlugNetworkGroupBox.setLayout(shellyPlusPlugNetworkGrid)
+        shellyPlusPlugHBox = QHBoxLayout()
+        shellyPlusPlugHBox.addWidget(shellyPlusPlugNetworkGroupBox)
+        shellyPlusPlugHBox.addStretch()
+        shellyPlusPlugVBox = QVBoxLayout()
+        shellyPlusPlugVBox.addLayout(shellyPlusPlugHBox)
+        shellyPlusPlugVBox.setContentsMargins(0,0,0,0)
 
         colorTrackNetworkGrid = QGridLayout()
         colorTrackNetworkGrid.addWidget(colorTrackMeanLabel,0,1)
@@ -1524,6 +1561,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         tab7V2Layout = QVBoxLayout()
         tab7V2Layout.addLayout(mugmaVBox)
         tab7V2Layout.addLayout(colorTrackVBox)
+        tab7V2Layout.addLayout(shelly3EMProVBox)
+        tab7V2Layout.addLayout(shellyPlusPlugVBox)
         tab7V2Layout.addStretch()
         tab7Layout = QHBoxLayout()
         tab7Layout.addLayout(tab7VLayout)
@@ -4366,6 +4405,12 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ##########################
                 ####  DEVICE 178 is +PID D/Error but +DEVICE cannot be set as main device
                 ##########################
+                ##########################
+                ####  DEVICE 179 is +Shelly 3EM Pro Energy/Return
+                ##########################
+                ##########################
+                ####  DEVICE 180 is +Shelly Plus Plug Total/Last
+                ##########################
 
                 # ADD DEVICE:
 
@@ -4563,7 +4608,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 1, # 175
                 1, # 176
                 6, # 177
-                6  # 178
+                6, # 178
+                1, # 179
+                1  # 180
                 ]
             #init serial settings of extra devices
             for i, _ in enumerate(self.aw.qmc.extradevices):
@@ -4695,6 +4742,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 self.aw.mugmaPort = int(self.mugmaPort.text())
             except Exception: # pylint: disable=broad-except
                 pass
+            self.aw.shelly_3EMPro_host = self.shelly3EMProHost.text().strip()
             self.aw.colorTrack_mean_window_size = self.colorTrackMeanSpinBox.value()
             self.aw.colorTrack_median_window_size = self.colorTrackMedianSpinBox.value()
             for i in range(8):
