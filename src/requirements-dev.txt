@@ -10,7 +10,7 @@ types-requests>=2.32.4.20250913
 types-setuptools>=80.9.0.20250822
 types-urllib3>=1.26.25.14
 types-docutils>=0.22.0.20250914
-types-xlrd-2.0.0.20250914
+types-xlrd>=2.0.0.20250914
 lxml-stubs>=0.5.1
 mypy==1.18.1
 pyright==1.1.405
@@ -20,7 +20,7 @@ pre-commit>=4.3.0
 pytest>=8.4.2
 pytest-cov==7.0.0
 pytest-asyncio==1.2.0
-pytest-mock==3.14.1
+pytest-mock==3.15.0
 pytest-datadir==1.8.0
 #pytest-qt==4.4.0
 #pytest-xvfb==3.0.0
