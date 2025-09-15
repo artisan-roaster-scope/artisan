@@ -3,7 +3,7 @@
 # Cropster XLS Roast Profile importer for Artisan
 
 import time as libtime
-import xlrd # type: ignore
+import xlrd
 import logging
 from typing import Final, Union, List, Sequence, Dict, Optional, Callable
 
@@ -1182,11 +1182,11 @@ def extractProfileCropsterXLS(file:str,
                 for r in range(COMMENTS_sh.nrows):
                     if r>0:
                         try:
-                            time = float(COMMENTS_sh.cell(r, 0).value)
+                            time_epoc = float(COMMENTS_sh.cell(r, 0).value)
                             comment_type = COMMENTS_sh.cell(r, 2).value.strip()
                             if comment_type not in turning_point_trans: # TP is ignored as it is automatically assigned
                                 comment_value = COMMENTS_sh.cell(r, 3).value
-                                c = takeClosest(time,res['timex'])
+                                c = takeClosest(time_epoc,res['timex'])
                                 timex_idx = res['timex'].index(c)
                                 if comment_type in color_change_trans:
                                     res['timeindex'][1] = max(0,timex_idx) # pyright:ignore[reportTypedDictNotRequiredAccess]
