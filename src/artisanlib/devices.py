@@ -4411,7 +4411,12 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ##########################
                 ####  DEVICE 180 is +Shelly Plus Plug Total/Last
                 ##########################
-
+                ##########################
+                ####  DEVICE 181 is +Shelly 3EM Pro Power/S
+                ##########################
+                ##########################
+                ####  DEVICE 182 is +Shelly Plus Plug Power/Temp
+                ##########################
                 # ADD DEVICE:
 
                 # ensure that by selecting a real device, the initial sampling rate is set to 3s
@@ -4610,7 +4615,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 6, # 177
                 6, # 178
                 1, # 179
-                1  # 180
+                1, # 180
+                1, # 181
+                1  # 182
                 ]
             #init serial settings of extra devices
             for i, _ in enumerate(self.aw.qmc.extradevices):

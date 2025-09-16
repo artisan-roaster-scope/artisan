@@ -553,8 +553,10 @@ class serialport:
                                    self.R2_BTIBTS,            #176
                                    self.pidPtermIterm,        #177
                                    self.pidDtermError,        #178
-                                   self.Shelly3EMPro_EnergyReturn, #179
-                                   self.ShellyPlusPlug_EnergyTotalLastMinute  #180
+                                   self.Shelly3EMPro_EnergyReturn,              #179
+                                   self.ShellyPlusPlug_EnergyTotalLastMinute,   #180
+                                   self.Shelly3EMPro_ActivePower_ApparentPower, #181
+                                   self.ShellyPlusPlug_Power_Temperature        #182
                                    ]
         #string with the name of the program for device #27
         self.externalprogram:str = 'test.py'
@@ -714,10 +716,34 @@ class serialport:
             _log.error(e)
         return tx, energy_return, energy
 
+    # Power/S
+    def Shelly3EMPro_ActivePower_ApparentPower(self) -> Tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        active_power:float = -1
+        apparent_power_return:float = -1
+        try:
+            shelly_connect_timeout = 0.3
+            shelly_read_timeout = 0.2
+            r = requests.get(f'http://{self.aw.shelly_3EMPro_host}/rpc/EM.GetStatus?id=0',
+                headers={'Content-Type': 'application/json'},
+                timeout=(shelly_connect_timeout, shelly_read_timeout))
+            r.raise_for_status()
+            res = r.json()
+            if 'total_act_power' in res:
+                active_power = float(res['total_act_power'])
+            if 'total_aprt_power' in res:
+                apparent_power_return = float(res['total_aprt_power'])
+        except Exception as e: # pylint: disable=broad-except
+            _log.error(e)
+        return tx, apparent_power_return, active_power
+
     def ShellyPlusPlug_EnergyTotalLastMinute(self) -> Tuple[float,float,float]:
         tx = self.aw.qmc.timeclock.elapsedMilli()
         total_energy:float = -1
         last_minute:float = -1
+        self.aw.qmc.shellyPlusPlug_TX = tx
+        self.aw.qmc.shellyPlusPlug_Power = -1
+        self.aw.qmc.shellyPlusPlug_Temp = -1
         try:
             shelly_connect_timeout = 0.3
             shelly_read_timeout = 0.2
@@ -734,9 +760,25 @@ class serialport:
                     by_minute_res = energy_res['by_minute']
                     if isinstance(by_minute_res, list) and len(by_minute_res)>0:
                         last_minute = float(by_minute_res[0])
+            try:
+                if 'apower' in res:
+                    self.aw.qmc.shellyPlusPlug_Power = res['apower']
+            except Exception as e: # pylint: disable=broad-except
+                _log.error(e)
+            try:
+                if 'temperature' in res and res['temperature'] and 'tC' in res['temperature']:
+                    self.aw.qmc.shellyPlusPlug_Temp = float(res['temperature']['tC'])
+            except Exception as e: # pylint: disable=broad-except
+                _log.error(e)
+
         except Exception as e: # pylint: disable=broad-except
             _log.error(e)
         return tx, last_minute, total_energy
+
+    # Power/Temp
+    def ShellyPlusPlug_Power_Temperature(self) -> Tuple[float,float,float]:
+        return self.aw.qmc.shellyPlusPlug_TX, self.aw.qmc.shellyPlusPlug_Temp, self.aw.qmc.shellyPlusPlug_Power
+
 
     def DTAtemperature(self) -> Tuple[float,float,float]:
         _log.debug('DTAtemperature')

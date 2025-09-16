@@ -303,6 +303,7 @@ class tgraphcanvas(FigureCanvas):
         'eventactionsemaphore', 'updateBackgroundSemaphore', 'alarmSemaphore', 'rampSoakSemaphore', 'crossmarker', 'crossmouseid', 'onreleaseid',
         'analyzer_connect_id', 'extra309T3', 'extra309T4', 'extra309TX', 'hottop_ET', 'hottop_BT', 'hottop_HEATER', 'hottop_MAIN_FAN', 'hottop_TX',
         'R1_DT', 'R1_BT', 'R1_BT_ROR', 'R1_EXIT_TEMP', 'R1_HEATER', 'R1_FAN', 'R1_DRUM', 'R1_VOLTAGE', 'R1_TX', 'R1_STATE', 'R1_FAN_RPM', 'R1_STATE_STR',
+        'shellyPlusPlug_TX', 'shellyPlusPlug_Power', 'shellyPlusPlug_Temp',
         'extraArduinoTX', 'extraArduinoT1', 'extraArduinoT2', 'extraArduinoT3', 'extraArduinoT4', 'extraArduinoT5', 'extraArduinoT6', 'program_t3', 'program_tx', 'program_t4', 'program_t5', 'program_t6',
         'program_t7', 'program_t8', 'program_t9', 'program_t10', 'dutycycle', 'dutycycleTX', 'currentpidsv', 'linecount', 'deltalinecount',
         'ax_background', 'block_update', 'fmt_data_RoR', 'fmt_data_curve', 'running_LCDs', 'plotterstack', 'plotterequationresults', 'plottermessage', 'alarm_popup_timout',
@@ -919,7 +920,9 @@ class tgraphcanvas(FigureCanvas):
                        '+PID P/I',                  #177
                        '+PID D/Error',              #178
                        '+Shelly 3EM Pro Energy/Return', #179
-                       '+Shelly Plus Plug Total/Last'   #180
+                       '+Shelly Plus Plug Total/Last',  #180
+                       '+Shelly 3EM Pro Power/S',       #181
+                       '+Shelly Plus Plug Power/Temp'   #182
                        ]
 
         # ADD DEVICE:
@@ -989,8 +992,10 @@ class tgraphcanvas(FigureCanvas):
             174, # ColorTrack BT
             175, # Thermoworks BlueDOT
             176, # Aillio Bullet R2
-            179, # Shelly 3EM Pro Energy/ReturnS
-            180  # Shelly Plus Plug Total/Last
+            179, # Shelly 3EM Pro Energy/Return
+            180, # Shelly Plus Plug Total/Last
+            181, # Shelly 3EM Pro Power/S
+            182  # Shelly Plus Plug Power/Temp
         ]
 
         # ADD DEVICE:
@@ -1068,7 +1073,9 @@ class tgraphcanvas(FigureCanvas):
             177, # +PID P/I
             178, # +PID D/Error
             179, # Shelly 3EM Pro Energy/Return
-            180  # Shelly Plus Plug Total/Last
+            180, # Shelly Plus Plug Total/Last
+            181, # 3EM Pro Power/S
+            182  # Plus Plug Power/Temp
         ]
 
         # ADD DEVICE:
@@ -2212,6 +2219,11 @@ class tgraphcanvas(FigureCanvas):
         self.R1_STATE:int = 0
         self.R1_FAN_RPM:float = 0
         self.R1_STATE_STR:str = ''
+
+        # used by device +ShellyPlusPlug_EnergyTotalLastMinute to pass values
+        self.shellyPlusPlug_TX:float = 0.
+        self.shellyPlusPlug_Power:float = -1
+        self.shellyPlusPlug_Temp:float = -1
 
         #used by extra device +ArduinoTC4_XX to pass values
         self.extraArduinoTX:float = 0.  # timestamp of retrieval
@@ -19016,10 +19028,11 @@ class SampleThread(QThread): # pyrefly:ignore[invalid-inheritance] # pyright: ig
 
         self.aw = aw
 
+        # NOTE: this should be smaller than self.min_delay (currently 0.1)
         if str(platform.system()).startswith('Windows'):
-            self.accurate_delay_cutoff = 10e-3
+            self.accurate_delay_cutoff = 0.05 # was 0.01 = 10e-3
         else:
-            self.accurate_delay_cutoff = 5e-3
+            self.accurate_delay_cutoff = 0.025 # was 0.005 = 5e-3
 
     def sample_main_device(self) -> Tuple[float,float,float]:
         #read time, ET (t1) and BT (t2) TEMPERATURE
@@ -19103,6 +19116,7 @@ class SampleThread(QThread): # pyrefly:ignore[invalid-inheritance] # pyright: ig
 
     # libtime.sleep is accurate only up to 0-5ms
     # using a hyprid approach using sleep() and busy-wait based on the time.perf_counter()
+    # PRECONDITION: delay>0
     def accurate_delay(self, delay:float) -> None:
         """Function to provide accurate time delay in seconds
         """
@@ -19114,7 +19128,7 @@ class SampleThread(QThread): # pyrefly:ignore[invalid-inheritance] # pyright: ig
             junk_size = 0.5 # 0.5sec
             if core_delay > junk_size:
                 q, r = divmod(core_delay, junk_size)
-                for _ in range(int(q)):
+                for _x in range(int(q)):
                     libtime.sleep(junk_size)
                     if not self.aw.qmc.flagon:
                         return
@@ -19142,15 +19156,9 @@ class SampleThread(QThread): # pyrefly:ignore[invalid-inheritance] # pyright: ig
             self.aw.lastdigitizedtemp = [None,None,None,None] # last digitized temp value per quantifier
 
             interval = self.aw.qmc.delay/self.aw.qmc.timeclock.getBase()
-            next_time:Optional[float] = None
+            next_time:float = libtime.perf_counter() + interval
             while True:
                 if self.aw.qmc.flagon:
-                    if next_time is None:
-                        next_time = libtime.perf_counter() + interval
-                    else:
-                        #libtime.sleep(max(0, next_time - libtime.time())) # sleep is not very accurate
-                        # more accurate, but keeps the CPU more busy:
-                        self.accurate_delay(max(0.0, next_time - libtime.perf_counter()))
 
                     #_log.info(datetime.datetime.now()) # use this to check for drifts
 
@@ -19162,14 +19170,19 @@ class SampleThread(QThread): # pyrefly:ignore[invalid-inheritance] # pyright: ig
                         finally:
                             self.aw.qmc.flagsampling = False # we signal that we are done with sampling
                     # else: we don't self.quit() and break to end the thread as the simulator (paused) might still be running
+
+                    # skip tasks if we are behind schedule:
+                    # NOTE: libtime.perf_counter() - next_time can get negative if we are too early thus we need a max(0, ) here
+                    next_time += (max(0,libtime.perf_counter() - next_time) // interval) * interval + interval
+                    time_to_sleep = next_time - libtime.perf_counter()
+                    if time_to_sleep>=0:
+                        self.accurate_delay(time_to_sleep)
+
                 else:
                     self.aw.qmc.flagsampling = False # type: ignore # mypy: Statement is unreachable  [unreachable] # we signal that we are done with sampling
                     # port is disconnected in OFFmonitor by calling disconnectProbes() => disconnectProbesFromSerialDevice()
                     self.quit()
                     break  #thread ends
-                if next_time is not None:
-                    # skip tasks if we are behind schedule:
-                    next_time += (libtime.perf_counter() - next_time) // interval * interval + interval
         finally:
             self.terminatingSignal.emit()
             self.aw.qmc.flagsampling = False # we signal that we are done with sampling
@@ -19177,6 +19190,7 @@ class SampleThread(QThread): # pyrefly:ignore[invalid-inheritance] # pyright: ig
             if sys.platform.startswith('darwin'):
                 # disable undefined variable warning:
                 del pool # pylint: disable=E0602
+
 
 
 #########################################################################################################
