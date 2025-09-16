@@ -19171,9 +19171,9 @@ class SampleThread(QThread): # pyrefly:ignore[invalid-inheritance] # pyright: ig
                             self.aw.qmc.flagsampling = False # we signal that we are done with sampling
                     # else: we don't self.quit() and break to end the thread as the simulator (paused) might still be running
 
-                    # skip tasks if we are behind schedule:
+                    # increment the next_time stamp by one interval, but skip tasks if we are behind schedule:
                     # NOTE: libtime.perf_counter() - next_time can get negative if we are too early thus we need a max(0, ) here
-                    next_time += (max(0,libtime.perf_counter() - next_time) // interval) * interval + interval
+                    next_time += max(0, int((libtime.perf_counter() - next_time) // interval)) * interval + interval
                     time_to_sleep = next_time - libtime.perf_counter()
                     if time_to_sleep>=0:
                         self.accurate_delay(time_to_sleep)
