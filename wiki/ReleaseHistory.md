@@ -24,6 +24,7 @@ v3.2.1
   - adds multi-modal state transitions to Batch Manager
   - adds remaining total roast time estimate to scheduler and lists roast templates in scheduled items
   - adds support for longer recordings as applied in coffee fermentation ([Discussion #1969](../../../discussions/1969))
+  - adds support for whole/ground color readings with one decimal ([Issue #1986](../../../issues/1986)
 
 * CHANGES
   - BREAKING VISUAL CHANGE, but only when consecutive hidden buttons with Type or Action defined are first at the top of the Events Buttons table: The visual button layout may change as hidden buttons with Type or Action defined at the top of the Events Buttons table are no longer counted in the first row's button count, which is limited by the Max Buttons per Row setting.  All other hidden buttons continue to be counted in each row's button count.
@@ -45,6 +46,8 @@ v3.2.1
   - ensures that the default file suffixes on file save are applied ([PR #1965](../../../pull/1965)). Thanks [Scott](https://github.com/scottjames)!
   - activates large PID LCDs for internal software PID and external TC4/MODBUS/S7 PIDs
   - the scheduler indicates now significant changes to the current schedule as received from [artisan.aplus](https://artisan.aplus), which have to be acknowledged by the user
+  - changes `COOL` in alarms to `COOL END` for consistency [PR #1976](../../../pull/1976))
+  - remember loaded settings filename as default on save [PR #1975](../../../pull/1975))
 
 * FIXES
   - fixes regression which broke the designer such that points could not be moved ([Discussion #1905](../../../discussions/1905) and [Issue #1916](../../../issues/1916))

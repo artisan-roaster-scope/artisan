@@ -34,7 +34,7 @@ if TYPE_CHECKING:
     from PyQt6.QtCore import QMimeData # pylint: disable=unused-import
 
 from artisanlib.util import (deltaLabelUTF8, decodeLocal, decodeLocalStrict, stringfromseconds, fromFtoCstrict,
-        fromCtoFstrict, fill_gaps, float2float, deserialize)
+        fromCtoFstrict, fill_gaps, float2float, deserialize, float2str)
 from artisanlib.suppress_errors import suppress_stdout_stderr
 from artisanlib.dialogs import ArtisanDialog
 from artisanlib.widgets import MyQComboBox
@@ -346,7 +346,7 @@ class RoastProfile:
                 profile['computed']['weight_loss'] is not None:
             self.metadata['weight_loss'] = f"-{profile['computed']['weight_loss']:g}%"
         if 'ground_color' in profile:
-            self.metadata['ground_color'] = f"#{profile['ground_color']}"
+            self.metadata['ground_color'] = f"#{float2str(profile['ground_color'])}"
         if 'computed' in profile and profile['computed'] is not None and 'AUC' in profile['computed'] and profile['computed']['AUC'] is not None and \
                 profile['computed']['AUC'] != 0:
             self.metadata['AUC'] = f"{profile['computed']['AUC']}C*min"
@@ -938,7 +938,7 @@ class RoastProfile:
             self.l_events4 =  self.drawEvents(self.E4, 3)
 
 
-class CompareTableWidget(QTableWidget): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+class CompareTableWidget(QTableWidget): # pyrefly:ignore[invalid-inheritance] # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     deleteKeyPressed = pyqtSignal()
 
     @pyqtSlot('QKeyEvent')

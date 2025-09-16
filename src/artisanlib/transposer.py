@@ -46,7 +46,7 @@ except ImportError:
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
-class MyQRegularExpressionValidator(QRegularExpressionValidator): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+class MyQRegularExpressionValidator(QRegularExpressionValidator): # pyrefly:ignore[invalid-inheritance] # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     # we fix partial time input like '12' => '12:00', '12:' => '12:00' and '12:0' => '12:00'
 
     @staticmethod

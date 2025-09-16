@@ -52,7 +52,7 @@ except ImportError:
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 
-class AlignDelegate(QStyledItemDelegate): # pyright:ignore[reportGeneralTypeIssues]
+class AlignDelegate(QStyledItemDelegate): # pyrefly:ignore[invalid-inheritance] # pyright:ignore[reportGeneralTypeIssues]
     def initStyleOption(self, option:Optional['QStyleOptionViewItem'], index:'QModelIndex') -> None:
         super().initStyleOption(option, index)
         if option is not None:

@@ -179,8 +179,8 @@ class ProfileData(TypedDict, total=False):
     tipping: bool
     scorching: bool
     divots: bool
-    whole_color: int
-    ground_color: int
+    whole_color: float
+    ground_color: float
     color_system: str
     volumeCalcWeightIn: str
     volumeCalcWeightOut: str
@@ -442,8 +442,8 @@ class ProductionData(TypedDict, total=False):
     beans: str
     weight: Optional[Tuple[float,float,str]]
     defects_weight: float
-    whole_color: int
-    ground_color: int
+    whole_color: float
+    ground_color: float
     color_system: str
     roastertype: str
     roastersize: float
@@ -469,8 +469,8 @@ class ProductionDataStr(TypedDict):
     defects_loss: str
     defects_weight_num: float
     defects_loss_num: float
-    whole_color: int
-    ground_color: int
+    whole_color: float
+    ground_color: float
     color_system: str
     roastertype: str
     roastersize: float
@@ -507,8 +507,8 @@ class RecentRoast(TypedDict, total=False):
     beanSize_max: int
     moistureGreen: float
     moistureRoasted: float
-    wholeColor: int
-    groundColor: int
+    wholeColor: float
+    groundColor: float
     colorSystem: str
     background: Optional[str]
     roastUUID: Optional[str]

@@ -682,7 +682,7 @@ def float2floatNone(f:Optional[float], n:int=1) -> Optional[float]:
 
 # the int n>=0 specifies the number of digits
 # returns 0 if f is not a number
-def float2float(f:float, n:int=1) -> float:
+def float2float(f:Union[float,str], n:int=1) -> float:
     n = max(n, 0)
     f = float(f)
     if n==0:
@@ -693,6 +693,10 @@ def float2float(f:float, n:int=1) -> float:
     if math.isnan(res):
         return 0.0
     return res
+
+# removes trailing zeros like f'{n:g}'
+def float2str(n:float) -> str:
+    return f'{n}'.rstrip('0').rstrip('.')
 
 # i/o: 0:g, 1:Kg, 2:lb (pound), 3:oz (ounce)
 def convertWeight(v:float, i:int, o:int) -> float:

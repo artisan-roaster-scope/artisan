@@ -42,14 +42,14 @@ except ImportError:
     )
 
 
-class CheckComboBox(QComboBox): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+class CheckComboBox(QComboBox): # pyrefly:ignore[invalid-inheritance] # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     """A QComboBox allowing multiple item selection.
     """
 
     flagChanged=pyqtSignal(int,bool)
 
 
-    class ComboItemDelegate(QStyledItemDelegate): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+    class ComboItemDelegate(QStyledItemDelegate): # pyrefly:ignore[invalid-inheritance] # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
         """Helper styled delegate (mostly based on existing private Qt's
         delegate used by the QComboBox). Used to style the popup like a
         list view (e.g windows style).
@@ -78,7 +78,7 @@ class CheckComboBox(QComboBox): # pyright: ignore [reportGeneralTypeIssues] # Ar
             else:
                 super().paint(painter, option, index)
 
-    class ComboMenuDelegate(QAbstractItemDelegate): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+    class ComboMenuDelegate(QAbstractItemDelegate): # pyrefly:ignore[invalid-inheritance] # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
         """Helper styled delegate (mostly based on existing private Qt's
         delegate used by the QComboBox). Used to style the popup like a
         menu. (e.g osx aqua style).

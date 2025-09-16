@@ -27,7 +27,7 @@ pytest-datadir==1.8.0
 #PyVirtualDisplay==3.0
 #pytest-bdd==6.1.1
 #pytest-benchmark==4.0.0
-hypothesis>=6.138.15
+hypothesis>=6.138.17
 coverage>=7.10.6
 coverage-badge==1.1.2
 codespell==2.4.1

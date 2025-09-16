@@ -128,7 +128,7 @@ def sendPlusNotificationSeen(hr_id:str, date:datetime) -> None:
         _log.exception(e)
 
 
-class NotificationManager(QObject): # pyright: ignore [reportGeneralTypeIssues]
+class NotificationManager(QObject): # pyrefly:ignore[invalid-inheritance] # pyright: ignore [reportGeneralTypeIssues]
 
     __slots__ = ( 'notification_timeout', 'notification_queue_max_length', 'notification_queue_max_age',
                 'tray_menu', 'tray_icon', 'notifications_available', 'notifications_enabled', 'notifications_visible',

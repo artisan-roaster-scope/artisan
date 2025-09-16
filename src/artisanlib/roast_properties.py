@@ -41,7 +41,7 @@ import plus.blend
 #from artisanlib.suppress_errors import suppress_stdout_stderr
 from artisanlib.util import (deltaLabelUTF8, stringfromseconds,stringtoseconds, toInt, toFloat, abbrevString,
         scaleFloat2String, comma2dot, weight_units, render_weight, weight_units_lower, volume_units, float2floatWeightVolume, float2float,
-        convertWeight, convertVolume)
+        convertWeight, convertVolume, float2str)
 from artisanlib.dialogs import ArtisanDialog, ArtisanResizeablDialog, tareDlg
 from artisanlib.widgets import MyQComboBox, ClickableQLabel, ClickableTextEdit, MyTableWidgetItemNumber
 
@@ -478,7 +478,7 @@ class volumeCalculatorDlg(ArtisanDialog):
 ########################################################################################
 #####################  RECENT ROAST POPUP  #############################################
 
-class RoastsComboBox(QComboBox): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+class RoastsComboBox(QComboBox): # pyrefly:ignore[invalid-inheritance] # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     def __init__(self, parent:QWidget, aw:'ApplicationWindow', selection:Optional[str] = None) -> None:
         super().__init__(parent) # pyrefly: ignore[bad-argument-count]
         self.aw:ApplicationWindow = aw
@@ -1061,14 +1061,14 @@ class editGraphDlg(ArtisanResizeablDialog):
         #bean color
         color_label = QLabel('<b>' + QApplication.translate('Label', 'Color') + '</b>')
         whole_color_label = QLabel('<b>' + QApplication.translate('Label', 'Whole') + '</b>')
-        self.whole_color_edit = QLineEdit(str(self.aw.qmc.whole_color))
+        self.whole_color_edit = QLineEdit(float2str(self.aw.qmc.whole_color))
         self.whole_color_edit.setToolTip(QApplication.translate('Tooltip', 'color measurement of whole roasted beans'))
         self.whole_color_edit.setValidator(self.aw.createCLocaleDoubleValidator(0., 999., 2, self.whole_color_edit))
         self.whole_color_edit.setMinimumWidth(70)
         self.whole_color_edit.setMaximumWidth(70)
         self.whole_color_edit.setAlignment(Qt.AlignmentFlag.AlignRight)
         ground_color_label = QLabel('<b>' + QApplication.translate('Label', 'Ground') + '</b>')
-        self.ground_color_edit = QLineEdit(str(self.aw.qmc.ground_color))
+        self.ground_color_edit = QLineEdit(float2str(self.aw.qmc.ground_color))
         self.ground_color_edit.setToolTip(QApplication.translate('Tooltip', 'color measurement of ground roasted beans'))
         self.ground_color_edit.setValidator(self.aw.createCLocaleDoubleValidator(0., 999., 2, self.ground_color_edit))
         self.ground_color_edit.setMinimumWidth(70)
@@ -2399,11 +2399,11 @@ class editGraphDlg(ArtisanResizeablDialog):
             else:
                 self.moisture_roasted_edit.setText('0')
             if 'wholeColor' in rr and rr['wholeColor'] is not None:
-                self.whole_color_edit.setText(str(rr['wholeColor']))
+                self.whole_color_edit.setText(float2str(rr['wholeColor']))
             else:
                 self.whole_color_edit.setText('0')
             if 'groundColor' in rr and rr['groundColor'] is not None:
-                self.ground_color_edit.setText(str(rr['groundColor']))
+                self.ground_color_edit.setText(float2str(rr['groundColor']))
             else:
                 self.ground_color_edit.setText('0')
             if 'colorSystem' in rr and rr['colorSystem'] is not None:
@@ -2553,8 +2553,8 @@ class editGraphDlg(ArtisanResizeablDialog):
                     volumeOut = float(comma2dot(str(self.volumeoutedit.text())))
                     densityRoasted = float(comma2dot(str(self.bean_density_out_edit.text())))
                     moistureRoasted = float(comma2dot(self.moisture_roasted_edit.text()))
-                    wholeColor = int(round(float(self.whole_color_edit.text())))
-                    groundColor = int(round(float(self.ground_color_edit.text())))
+                    wholeColor = float2float(self.whole_color_edit.text())
+                    groundColor = float2float(self.ground_color_edit.text())
 
                 rr = self.aw.createRecentRoast(
                     title,
@@ -5502,11 +5502,11 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.aw.qmc.divots_flag = self.divots.isChecked()
         #update color
         try:
-            self.aw.qmc.whole_color = int(round(float(str(self.whole_color_edit.text()))))
+            self.aw.qmc.whole_color = float2float(float(self.whole_color_edit.text()))
         except Exception: # pylint: disable=broad-except
             self.aw.qmc.whole_color = 0
         try:
-            self.aw.qmc.ground_color = int(round(float(str(self.ground_color_edit.text()))))
+            self.aw.qmc.ground_color = float2float(float(self.ground_color_edit.text()))
         except Exception: # pylint: disable=broad-except
             self.aw.qmc.ground_color = 0
         self.aw.qmc.color_system_idx = self.colorSystemComboBox.currentIndex()
@@ -5724,7 +5724,8 @@ class StockComboBox(MyQComboBox):
         self.unitsComboBox:QComboBox = unitsComboBox
 
     # to be overwritten by subclasses
-    def getItems(self, _unit:int) -> List[str]: # pylint: disable=no-self-use
+    def getItems(self, unit:int) -> List[str]: # pylint: disable=no-self-use
+        del unit
         return []
 
     def resetInverted(self) -> None:
@@ -5753,7 +5754,7 @@ class CoffeesComboBox(StockComboBox):
         super().__init__(parent.unitsComboBox, *args, **kwargs)
         self.parentDialog = parent
 
-    def getItems(self, unit:int) -> List[str]:  # pyrefly: ignore[bad-override]
+    def getItems(self, unit:int) -> List[str]:
         plus_coffees = plus.stock.getCoffees(unit, self.parentDialog.plus_default_store)
         return [''] + plus.stock.getCoffeesLabels(plus_coffees)
 
@@ -5762,7 +5763,7 @@ class BlendsComboBox(StockComboBox):
         super().__init__(parent.unitsComboBox, *args, **kwargs)
         self.parentDialog:editGraphDlg = parent
 
-    def getItems(self, unit:int) -> List[str]: # pyrefly: ignore[bad-override]
+    def getItems(self, unit:int) -> List[str]:
         custom_blend:Optional[plus.stock.Blend] = None
         if self.parentDialog.aw.qmc.plus_custom_blend is not None and self.parentDialog.aw.qmc.plus_custom_blend.name.strip() != '':
             coffees = plus.stock.getCoffeeLabels()

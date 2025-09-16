@@ -179,8 +179,8 @@ def getTemplate(bp: 'ProfileData', background:bool=False) -> Dict[str, Any]:  #f
             _log.exception(e)
 
         try:
-            util.addNum2dict(bp, 'whole_color', d, 'whole_color', 0, 255, 0)
-            util.addNum2dict(bp, 'ground_color', d, 'ground_color', 0, 255, 0)
+            util.addNum2dict(bp, 'whole_color', d, 'whole_color', 0, 255, 1)
+            util.addNum2dict(bp, 'ground_color', d, 'ground_color', 0, 255, 1)
             if 'whole_color' in d or 'ground_color' in d:
                 util.addString2dict(bp, 'color_system', d, 'color_system', 25)
         except Exception as e:  # pylint: disable=broad-except

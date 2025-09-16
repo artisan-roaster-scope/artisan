@@ -236,7 +236,7 @@ from artisanlib.util import (appFrozen, uchr, decodeLocal, decodeLocalStrict, en
         toBool, toStringList, removeAll, application_name, application_viewer_name, application_organization_name,
         application_organization_domain, application_desktop_file_name, getDataDirectory, getDocumentsDirectory, getAppPath, getResourcePath, debugLogLevelToggle,
         debugLogLevelActive, setDebugLogLevel, createGradient, natsort, setDeviceDebugLogLevel,
-        comma2dot, is_proper_temp, weight_units, volume_units, float2float,
+        comma2dot, is_proper_temp, weight_units, volume_units, float2float, float2str,
         convertWeight, convertVolume, rgba_colorname2argb_colorname, render_weight, serialize, deserialize, csv_load, exportProfile2CSV, findTPint,
         eventtime2string)
 
@@ -1353,7 +1353,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
 ###     Event Action Thread
 #########################################################################################################
 
-class EventActionThread(QThread): # pylint: disable=too-few-public-methods # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+class EventActionThread(QThread): # pyrefly:ignore[invalid-inheritance] # pylint: disable=too-few-public-methods # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
 
     def __init__(self, aw:'ApplicationWindow', action:int, command:str, eventtype:Optional[int]) -> None:
         super().__init__()
@@ -1371,7 +1371,7 @@ class EventActionThread(QThread): # pylint: disable=too-few-public-methods # pyr
 #########################################################################################################
 
 # applies comma2dot as fixup to automatically turn numbers like "1,2" into valid numbers like "1.0" and the empty entry into "0.0"
-class MyQDoubleValidator(QDoubleValidator): # pylint: disable=too-few-public-methods  # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+class MyQDoubleValidator(QDoubleValidator): # pyrefly:ignore[invalid-inheritance] # pylint: disable=too-few-public-methods  # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
 
     def __init__(self, bottom:float, top:float, decimals:int, lineedit:QLineEdit, empty_default:str = '0') -> None:
         super().__init__(bottom, top, decimals, lineedit) # pyrefly: ignore[bad-argument-count]
@@ -1417,7 +1417,7 @@ class MenuShortCutsDisabled:
 # NOTE: to have pylint to verify proper __slot__ definitions with pylint one has to remove the super class QMainWindow here temporarily
 #   as this class does not has __slot__ definitions and thus __dict__ is contained which suppresses the warnings
 #class ApplicationWindow():
-class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
 
     singleShotPhidgetsPulseOFF = pyqtSignal(int,int,str) # signal to be called from the eventaction thread to realise Phidgets pulse via QTimer in the main thread
     singleShotPhidgetsPulseOFFSerial = pyqtSignal(int,int,str,str)
@@ -5059,6 +5059,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         return 127
 
     # this is important to have . as decimal separator independent of the systems locale
+    # dec: number of decimals
     @staticmethod
     def createCLocaleDoubleValidator(bot:float, top:float, dec:int, w:QLineEdit, empty_default:str = '0') -> MyQDoubleValidator:
         validator = MyQDoubleValidator(bot,top,dec,w,empty_default)
@@ -5326,7 +5327,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             moistureGreen:float, colorSystem:str, file:Optional[str], roastUUID:Optional[str],
             batchnr:int, batchprefix:str, plus_account:Optional[str], plus_store:Optional[str], plus_store_label:Optional[str] ,plus_coffee:Optional[str],
             plus_coffee_label:Optional[str], plus_blend_label:Optional[str], plus_blend_spec:Optional[plus.stock.Blend], plus_blend_spec_labels:Optional[List[str]],
-            weightOut:Optional[float], volumeOut:Optional[float], densityRoasted:Optional[float], moistureRoasted:Optional[float], wholeColor:Optional[int], groundColor:Optional[int]) -> 'RecentRoast':
+            weightOut:Optional[float], volumeOut:Optional[float], densityRoasted:Optional[float], moistureRoasted:Optional[float], wholeColor:Optional[float], groundColor:Optional[float]) -> 'RecentRoast':
         d = RecentRoast(
             title = title,
             weightIn = weightIn,
@@ -12743,8 +12744,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 ('roastedvolume',drop_trailing_zero(f'{float2float(float(self.qmc.volume[1]),1)}')),
                 ('roasteddensity',drop_trailing_zero(f'{float2float(float(self.qmc.density_roasted[0]),1)}')),
                 ('roastedmoisture',drop_trailing_zero(f'{float2float(float(self.qmc.moisture_roasted),1)}')),
-                ('colorwhole',f'{self.qmc.whole_color}'),
-                ('colorground',f'{self.qmc.ground_color}'),
+                ('colorwhole',float2str(self.qmc.whole_color)),
+                ('colorground',float2str(self.qmc.ground_color)),
                 ('colorsystem',f'{self.qmc.color_systems[self.qmc.color_system_idx]}'),
                 ('screenmax',f'{self.qmc.beansize_max}'),
                 ('screenmin',f'{self.qmc.beansize_min}'),
@@ -15615,9 +15616,9 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 self.qmc.divots_flag = profile['divots']
             # color
             if 'whole_color' in profile:
-                self.qmc.whole_color = profile['whole_color']
+                self.qmc.whole_color = float2float(profile['whole_color'])
             if 'ground_color' in profile:
-                self.qmc.ground_color = profile['ground_color']
+                self.qmc.ground_color = float2float(profile['ground_color'])
             if 'color_system' in profile and profile['color_system'] in self.qmc.color_systems:
                 self.qmc.color_system_idx = self.qmc.color_systems.index(profile['color_system'])
             if 'volumeCalcWeightIn' in profile:
@@ -16561,8 +16562,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             profile['tipping'] = self.qmc.tipping_flag
             profile['scorching'] = self.qmc.scorching_flag
             profile['divots'] = self.qmc.divots_flag
-            profile['whole_color'] = self.qmc.whole_color
-            profile['ground_color'] = self.qmc.ground_color
+            profile['whole_color'] = float2float(self.qmc.whole_color)
+            profile['ground_color'] = float2float(self.qmc.ground_color)
             profile['color_system'] = self.qmc.color_systems[self.qmc.color_system_idx]
             profile['volumeCalcWeightIn'] = str(self.qmc.volumeCalcWeightInStr)
             profile['volumeCalcWeightOut'] = str(self.qmc.volumeCalcWeightOutStr)
@@ -21161,7 +21162,7 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
         if 'roastingnotes' in profile:
             res['roastingnotes'] = profile['roastingnotes']
         if 'cuppingnotes' in profile:
-            res['whole_color'] = profile['whole_color']
+            res['cuppingnotes'] = profile['cuppingnotes']
         return res
 
     @pyqtSlot()
@@ -21684,8 +21685,8 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
             ['operator',            'prof',  'text',     'false',  '',      QApplication.translate('HTML Report Template','Operator')             ],
             ['organization',        'prof',  'text',     'false',  '',      QApplication.translate('HTML Report Template','Organization')         ],
             ['drumspeed',           'prof',  'text2int', 'true' ,  '',      QApplication.translate('HTML Report Template','Drum Speed')           ],
-            ['whole_color',         'prof',  'int',      'true' ,  '',      QApplication.translate('HTML Report Template','Whole Color')          ],
-            ['ground_color',        'prof',  'int',      'true' ,  '',      QApplication.translate('HTML Report Template','Ground Color')         ],
+            ['whole_color',         'prof',  'float1',      'true' ,  '',   QApplication.translate('HTML Report Template','Whole Color')          ],
+            ['ground_color',        'prof',  'float1',      'true' ,  '',   QApplication.translate('HTML Report Template','Ground Color')         ],
             ['color_system',        'prof',  'text',     'false',  '',      QApplication.translate('HTML Report Template','Color System')         ],
             ['beansize_min',        'prof',  'text2int', 'true' ,  '',      QApplication.translate('HTML Report Template','Screen Min')           ],
             ['beansize_max',        'prof',  'text2int', 'true' ,  '',      QApplication.translate('HTML Report Template','Screen Max')           ],
@@ -23105,11 +23106,11 @@ class ApplicationWindow(QMainWindow):  # pyright: ignore [reportGeneralTypeIssue
                 humidity = '--'
             if self.qmc.whole_color or self.qmc.ground_color:
                 if self.qmc.whole_color:
-                    wcolor = str(self.qmc.whole_color)
+                    wcolor = float2str(self.qmc.whole_color)
                 else:
                     wcolor = '--'
                 if self.qmc.ground_color:
-                    gcolor = str(self.qmc.ground_color)
+                    gcolor = float2str(self.qmc.ground_color)
                 else:
                     gcolor = '--'
                 color = wcolor + '/' + gcolor

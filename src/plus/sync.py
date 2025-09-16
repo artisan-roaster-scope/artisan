@@ -31,7 +31,7 @@ except Exception: # pylint: disable=broad-except
     from PyQt5.QtWidgets import QApplication # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 from pathlib import Path
-from artisanlib.util import getDirectory, weight_units, convertWeight
+from artisanlib.util import getDirectory, weight_units, convertWeight, float2float
 from plus import config, util, connection, controller, roast, stock
 import os
 import time
@@ -657,14 +657,14 @@ def applyServerUpdates(data:Dict[str, Any]) -> None:
                 dirty = True
             if 'ground_color' in data:
                 if data['ground_color'] != aw.qmc.ground_color:
-                    aw.qmc.ground_color = int(round(float(data['ground_color'])))
+                    aw.qmc.ground_color = float2float(data['ground_color'])
                     dirty = True
             elif aw.qmc.ground_color != 0:
                 aw.qmc.ground_color = 0
                 dirty = True
             if 'whole_color' in data:
                 if data['whole_color'] != aw.qmc.whole_color:
-                    aw.qmc.whole_color = int(round(float(data['whole_color'])))
+                    aw.qmc.whole_color = float2float(data['whole_color'])
                     dirty = True
             elif aw.qmc.whole_color != 0:
                 aw.qmc.whole_color = 0

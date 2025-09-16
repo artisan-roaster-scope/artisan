@@ -75,7 +75,7 @@ def extractProfileCropsterXLS(file:str,
     ]
 
     # list of Artisan tags for integers associated to tuple of (fixed) column nr (or Null) and list of tag translations
-    int_tag_labels_trans = [
+    float_tag_labels_trans = [
         ('whole_color', 26, [
             'Roast value',              # EN
             'Röstwert',                 # DE
@@ -800,7 +800,7 @@ def extractProfileCropsterXLS(file:str,
         except Exception: # pylint: disable=broad-except
             pass
 
-        for (itag,ipos,itrans) in int_tag_labels_trans:
+        for (itag,ipos,itrans) in float_tag_labels_trans:
             value = None
             try:
                 # 1. test the column name in all known translations
@@ -812,7 +812,7 @@ def extractProfileCropsterXLS(file:str,
                 if value is None and ipos is not None and len(row1)>ipos:
                     value = row1[ipos].value
                 if value is not None:
-                    res[itag] = int(round(float(value))) # type: ignore # mypy cannot check generic labels accessing the res of type TypedDict
+                    res[itag] = float(value) # type: ignore # mypy cannot check generic labels accessing the res of type TypedDict
             except Exception: # pylint: disable=broad-except
                 pass
 

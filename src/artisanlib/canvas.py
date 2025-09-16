@@ -61,7 +61,7 @@ if TYPE_CHECKING:
 
 from artisanlib.util import (uchr, fill_gaps, deltaLabelPrefix, deltaLabelUTF8, deltaLabelMathPrefix, stringfromseconds,
         fromFtoC, fromFtoCstrict, fromCtoF, fromCtoFstrict, RoRfromFtoC, RoRfromFtoCstrict, RoRfromCtoF, toInt, toString,
-        toFloat, application_name, getResourcePath, getDirectory, convertWeight, right_to_left,
+        toFloat, application_name, getResourcePath, getDirectory, convertWeight, right_to_left, float2str,
         abbrevString, scaleFloat2String, is_proper_temp, weight_units, render_weight, volume_units, float2float, timearray2index)
 from artisanlib import pid
 from artisanlib.time import ArtisanTime
@@ -134,7 +134,7 @@ _log: Final[logging.Logger] = logging.getLogger(__name__)
 #################### Ambient Data Collection  #########################################
 #######################################################################################
 
-class AmbientWorker(QObject): # pylint: disable=too-few-public-methods # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+class AmbientWorker(QObject): # pyrefly:ignore[invalid-inheritance] # pylint: disable=too-few-public-methods # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     finished = pyqtSignal()
 
     def __init__(self, aw:'ApplicationWindow') -> None:
@@ -1296,8 +1296,8 @@ class tgraphcanvas(FigureCanvas):
         self.beansize_min:int = 0
         self.beansize_max:int = 0
 
-        self.whole_color:int = 0
-        self.ground_color:int = 0
+        self.whole_color:float = 0
+        self.ground_color:float = 0
         self.color_systems: Final[List[str]] = ['','Tonino','ColorTest','Colorette','ColorTrack','Agtron']
         self.color_system_idx:int = 0
 
@@ -7796,8 +7796,8 @@ class tgraphcanvas(FigureCanvas):
                 # roast notes of an existing roast are reset
                 self.roastingnotes = ''
             self.cuppingnotes = ''
-            self.whole_color = 0
-            self.ground_color = 0
+            self.whole_color = 0.
+            self.ground_color = 0.
             self.moisture_roasted = 0.
             self.density_roasted = (0,self.density_roasted[1],1,self.density_roasted[3])
 
@@ -11832,7 +11832,7 @@ class tgraphcanvas(FigureCanvas):
             elif n == 13:  #Ground Color
                 if self.ground_color > 0:
                     stattype_str += (f"{newline}{QApplication.translate('AddlInfo', 'Ground Color')}: #"
-                        f'{self.ground_color} {self.color_systems[self.color_system_idx]}')
+                        f'{float2str(self.ground_color)} {self.color_systems[self.color_system_idx]}')
             elif n == 14:  #Energy
                 if 'BTU_batch' in cp and cp['BTU_batch']:
                     stattype_str += (f"{newline}{QApplication.translate('AddlInfo', 'Energy')}: "
@@ -11926,7 +11926,7 @@ class tgraphcanvas(FigureCanvas):
             elif n == 31:  #Whole Bean Color
                 if self.whole_color > 0:
                     stattype_str += (f"{newline}{QApplication.translate('HTML Report Template','Whole Color')}: #"
-                        f'{self.whole_color} {self.color_systems[self.color_system_idx]}')
+                        f'{float2str(self.whole_color)} {self.color_systems[self.color_system_idx]}')
             elif n == 32:  #Cupper correction
                 if self.aw.qmc.flavors_total_correction != 0:
                     stattype_str += (f"{newline}{QApplication.translate('Label','Correction')} {self.aw.qmc.flavors_total_correction}")
@@ -15884,9 +15884,9 @@ class tgraphcanvas(FigureCanvas):
                     if right_to_left(self.locale_str):
                         msg = ''
                         if self.whole_color and self.ground_color:
-                            msg += f'{self.ground_color}/{self.whole_color}#'
+                            msg += f'{float2str(self.ground_color)}/{float2str(self.whole_color)}#'
                         elif self.ground_color:
-                            msg += f'{self.ground_color}#'
+                            msg += f'{float2str(self.ground_color)}#'
                         if self.volume[0] and self.volume[1]:
                             msg += f'{sep}%{float2float(self.aw.volume_increase(self.volume[0],self.volume[1]), self.aw.percent_decimals)}'
                         if self.weight[0]:
@@ -15918,9 +15918,9 @@ class tgraphcanvas(FigureCanvas):
                         if self.volume[0] and self.volume[1]:
                             msg += f'{sep}{float2float(self.aw.volume_increase(self.volume[0],self.volume[1]), self.aw.percent_decimals)}%'
                         if self.whole_color and self.ground_color:
-                            msg += f'{sep}#{self.whole_color}/{self.ground_color}'
+                            msg += f'{sep}#{float2str(self.whole_color)}/{float2str(self.ground_color)}'
                         elif self.ground_color:
-                            msg += f'{sep}#{self.ground_color}'
+                            msg += f'{sep}#{float2str(self.ground_color)}'
                     self.set_xlabel(msg)
                 elif self.statisticsmode == 2:
                     # total energy/CO2
@@ -19007,7 +19007,7 @@ class tgraphcanvas(FigureCanvas):
 ###     Sample thread
 ########################################################################################
 
-class SampleThread(QThread): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+class SampleThread(QThread): # pyrefly:ignore[invalid-inheritance] # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     sample_processingSignal = pyqtSignal(bool,list,list,list)
     terminatingSignal = pyqtSignal()
 
@@ -19183,7 +19183,7 @@ class SampleThread(QThread): # pyright: ignore [reportGeneralTypeIssues] # Argum
 ###     Artisan thread Server
 #########################################################################################################
 
-class Athreadserver(QWidget): # pylint: disable=too-few-public-methods # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+class Athreadserver(QWidget): # pyrefly:ignore[invalid-inheritance] # pylint: disable=too-few-public-methods # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     terminatingSignal = pyqtSignal()
 
     def __init__(self, aw:'ApplicationWindow') -> None:

@@ -227,7 +227,7 @@ ble = BLE() # unique to module
 
 
 
-class ClientBLE(QObject): # pyright:ignore[reportGeneralTypeIssues] # error: Argument to class must be a base class
+class ClientBLE(QObject): # pyrefly:ignore[invalid-inheritance] # pyright:ignore[reportGeneralTypeIssues] # error: Argument to class must be a base class
 
     SCAN_BETWEEN_SCANS_START:Final[float] = 0.1 # initial sleep between scans in seconds
     SCAN_BETWEEN_SCANS_INC:Final[float] = 0.1   # increase of sleep time per scan

@@ -74,7 +74,7 @@ from plus.util import datetime2epoch, epoch2datetime, schedulerLink, epoch2ISO86
 from plus.weight import Display, GreenDisplay, RoastedDisplay, PROCESS_STATE, WeightManager, GreenWeightItem, RoastedWeightItem
 from artisanlib.widgets import ClickableQLabel, ClickableQLineEdit, Splitter
 from artisanlib.dialogs import ArtisanResizeablDialog
-from artisanlib.util import (float2float, convertWeight, weight_units, render_weight, comma2dot, float2floatWeightVolume, getDirectory,
+from artisanlib.util import (float2float, float2str, convertWeight, weight_units, render_weight, comma2dot, float2floatWeightVolume, getDirectory,
     getResourcePath, deserialize, roast_time, get_total_roast_time_from_profile, stringfromseconds)
 
 
@@ -198,7 +198,7 @@ class CompletedItemDict(TypedDict):
     weight_estimate: float # in kg (estimated roasted weight based on profile template or previous roasts or similar)
     defects_weight: float  # in kg (weight of defects sorted from roasted weight)
     measured: bool         # True if (out-)weight was measured or manually set, False if estimated from server calculated loss or template
-    color: int
+    color: float
     moisture: float        # in %
     density: float         # in g/l
     roastingnotes: str
@@ -274,7 +274,7 @@ class CompletedItem(BaseModel):
     weight_estimate: float # in kg (estimated roasted beans weight based on profile template or previous roasts weight loss)
     defects_weight: float = Field(default=0)  # in kg (weight of defects sorted from roasted weight)
     measured: bool = Field(default=False)     # True if (out-)weight was measured or manually set, False if estimated from server calculated loss or template
-    color: int
+    color: float
     moisture: float # in %
     density: float  # in g/l
     roastingnotes: str = Field(default='')
@@ -369,7 +369,7 @@ class CompletedItem(BaseModel):
                 updated = True
                 self.defects_weight = defects_weight
         if 'ground_color' in profile_data:
-            ground_color = (0 if profile_data['ground_color'] is None else int(float(round(profile_data['ground_color']))))
+            ground_color = (0 if profile_data['ground_color'] is None else float2float(profile_data['ground_color']))
             if ground_color != self.color:
                 updated = True
                 self.color = ground_color
@@ -2591,7 +2591,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
 
     @pyqtSlot()
     def roasted_color_changed(self) -> None:
-        self.roasted_color.setText(str(int(round(float(comma2dot(self.roasted_color.text()))))))
+        self.roasted_color.setText(comma2dot(self.roasted_color.text()))
 
 
     @pyqtSlot()
@@ -3264,7 +3264,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                 self.roasted_yield.setText(converted_yield_str)
             else:
                 self.roasted_yield.setText('')
-            self.roasted_color.setText(str(data.color))
+            self.roasted_color.setText(float2str(data.color))
             self.roasted_density.setText(f'{data.density:g}')
             self.roasted_moisture.setText(f'{data.moisture:g}')
             self.roasted_notes.setPlainText(data.roastingnotes)
@@ -3306,7 +3306,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                     changes['defects_weight'] = convertWeight(float(roasted_defects_value_str), weight_units.index(self.aw.qmc.weight[2]), 1)
         except Exception:  # pylint: disable=broad-except
             pass
-        current_roasted_color = int(round(float(self.roasted_color.text())))
+        current_roasted_color = float2float(self.roasted_color.text())
         if current_roasted_color != data.color:
             if current_roasted_color == 0:
                 changes['ground_color'] = None # remove entry on server as this is the default value

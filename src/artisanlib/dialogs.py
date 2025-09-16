@@ -43,7 +43,7 @@ if TYPE_CHECKING:
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
-class ArtisanDialog(QDialog): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+class ArtisanDialog(QDialog): # pyrefly:ignore[invalid-inheritance] # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
 
     __slots__ = ['aw', 'dialogbuttons']
 
@@ -136,7 +136,7 @@ class ArtisanResizeablDialog(ArtisanDialog):
             self.setWindowFlags(windowFlags)
 
 # if modal=False the message box is not rendered as native dialog on macOS!
-class ArtisanMessageBox(QMessageBox): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+class ArtisanMessageBox(QMessageBox): # pyrefly:ignore[invalid-inheritance] # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
 
     __slots__ = ['timeout', 'currentTime']
 

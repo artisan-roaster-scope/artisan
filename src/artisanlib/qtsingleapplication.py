@@ -26,7 +26,7 @@ except ImportError:
     from PyQt5.QtNetwork import QLocalSocket, QLocalServer # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 
-class QtSingleApplication(QApplication): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+class QtSingleApplication(QApplication): # pyrefly:ignore[invalid-inheritance] # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     messageReceived = pyqtSignal(str)
 
     activateWindowSignal = pyqtSignal()

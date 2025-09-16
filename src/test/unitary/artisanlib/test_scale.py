@@ -642,7 +642,7 @@ class TestScaleManager:
         scale_manager_instance.scale1 = mock_scale
 
         # Act
-        scale_manager_instance.set_scale1_slot(0, 'test-ident', 'Test Scale')
+        scale_manager_instance.set_scale1_slot(0, 'test-ident', 'Test Scale') # pyrefly: ignore
 
         # Assert
         assert scale_manager_instance.scale1 == mock_scale  # Should not change
