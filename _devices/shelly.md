@@ -13,10 +13,10 @@ header:
 
 Artisan reads
 
-- with the extra device of type `Shelly 3EM Pro Energy/Return`
+- with the extra device of type **`Shelly 3EM Pro Energy/Return`**
    - total active energy on all phases (`total_act`), consumed or produced in [Wh]
    - total active returned energy on all phases (`total_act_ret`), fed back into the grid in [Wh]
-- with the extra device of type `Shelly 3EM Pro Power/S`
+- with the extra device of type **`Shelly 3EM Pro Power/S`**
    - sum of the active power on all phases (`total_act_power`) in [W]
    - sum of the apparent power on all phases(`total_aprt_power`) in [VA]
 
@@ -28,10 +28,10 @@ Artisan reads
 
 Artisan reads
 
-- with the extra device of type `Shelly Plus Plug Total/Last`
+- with the extra device of type **`Shelly Plus Plug Total/Last`**
    - total energy consumed (`aenergy.total`) in [Wh]
    - last minutes energy comsumption (`aenergy[0]`) in [mW]
-- with the extra device of type `Shelly Plus Plug Power/Temp`
+- with the extra device of type **`Shelly Plus Plug Power/Temp`**
    - Last measured instantaneous active power (`apower`) in [W]
    - device temperature (`temperature.tC`) in C
 
