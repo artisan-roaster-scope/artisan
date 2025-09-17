@@ -7787,7 +7787,6 @@ class tgraphcanvas(FigureCanvas):
                     if self.last_batchsize <= max_batch_kg*1000:
                         # only initialize with last batch size if smaller than roasters max batchsize or, if not given, maximal 500kg
                         self.weight = (convertWeight(self.last_batchsize,0,weight_units.index(self.weight[2])),0,self.weight[2])
-                self.roasted_defects_weight = 0
                 self.volume = (0,0,self.volume[2])
                 self.density = (0,self.density[1],1,self.density[3])
                 # we reset ambient values to the last sampled readings in this session
@@ -7804,6 +7803,7 @@ class tgraphcanvas(FigureCanvas):
             else:
                 self.weight = (self.weight[0],0,self.weight[2])
                 self.volume = (self.volume[0],0,self.volume[2])
+            self.roasted_defects_weight = 0 # is cleared in any case!
             if len(self.timex) > 20:
                 # roast notes of an existing roast are reset
                 self.roastingnotes = ''

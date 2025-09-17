@@ -15544,7 +15544,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                 self.qmc.weight = (0,0,'g')
             if 'defects_weight' in profile:
                 defects = profile['defects_weight']
-                self.qmc.roasted_defects_weight = max(1.0, min(self.qmc.weight[1],float(defects)))
+                self.qmc.roasted_defects_weight = min(self.qmc.weight[1], max(0.,float(defects)))
             else:
                 self.qmc.roasted_defects_weight = 0
             if 'volume' in profile:
