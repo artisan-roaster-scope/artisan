@@ -16012,7 +16012,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                 blank = numpy.count_nonzero(bt==-1)  # counts missing values
 
                 # Count skipped samples (missing timex)
-                tx_diff = numpy.diff(tx)
+                tx_diff = numpy.diff(tx[1:]) # we skip the first sample as it might have been delayed/skipped by the startup anyhow not to influence the results
                 avg_sample = float(numpy.average(tx_diff))
                 longest_sample = float(numpy.max(tx_diff))
                 shortest_sample = float(numpy.min(tx_diff))

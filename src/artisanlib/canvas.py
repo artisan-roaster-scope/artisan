@@ -19030,9 +19030,9 @@ class SampleThread(QThread): # pyrefly:ignore[invalid-inheritance] # pyright: ig
 
         # NOTE: this should be smaller than self.min_delay (currently 0.1)
         if str(platform.system()).startswith('Windows'):
-            self.accurate_delay_cutoff = 0.05 # was 0.01 = 10e-3
+            self.accurate_delay_cutoff = 3*10e-3 # was 10e-3 = 0.01
         else:
-            self.accurate_delay_cutoff = 0.025 # was 0.005 = 5e-3
+            self.accurate_delay_cutoff = 3*5e-3 # was 5e-3 = 0.005
 
     def sample_main_device(self) -> Tuple[float,float,float]:
         #read time, ET (t1) and BT (t2) TEMPERATURE
@@ -19156,9 +19156,17 @@ class SampleThread(QThread): # pyrefly:ignore[invalid-inheritance] # pyright: ig
             self.aw.lastdigitizedtemp = [None,None,None,None] # last digitized temp value per quantifier
 
             interval = self.aw.qmc.delay/self.aw.qmc.timeclock.getBase()
-            next_time:float = libtime.perf_counter() + interval
+            next_time:Optional[float] = None # we on purpose start with None to have the first reading skipped without being recorded!
             while True:
                 if self.aw.qmc.flagon:
+                    if next_time is None:
+                        next_time = libtime.perf_counter() + interval
+                    else:
+                        time_to_sleep = next_time - libtime.perf_counter()
+                        if time_to_sleep>=0:
+                            #libtime.sleep(time_to_sleep) # sleep is not very accurate
+                            # more accurate, but keeps the CPU busy:
+                            self.accurate_delay(time_to_sleep)
 
                     #_log.info(datetime.datetime.now()) # use this to check for drifts
 
@@ -19170,19 +19178,15 @@ class SampleThread(QThread): # pyrefly:ignore[invalid-inheritance] # pyright: ig
                         finally:
                             self.aw.qmc.flagsampling = False # we signal that we are done with sampling
                     # else: we don't self.quit() and break to end the thread as the simulator (paused) might still be running
-
-                    # increment the next_time stamp by one interval, but skip tasks if we are behind schedule:
-                    # NOTE: libtime.perf_counter() - next_time can get negative if we are too early thus we need a max(0, ) here
-                    next_time += max(0, int((libtime.perf_counter() - next_time) // interval)) * interval + interval
-                    time_to_sleep = next_time - libtime.perf_counter()
-                    if time_to_sleep>=0:
-                        self.accurate_delay(time_to_sleep)
-
                 else:
                     self.aw.qmc.flagsampling = False # type: ignore # mypy: Statement is unreachable  [unreachable] # we signal that we are done with sampling
                     # port is disconnected in OFFmonitor by calling disconnectProbes() => disconnectProbesFromSerialDevice()
                     self.quit()
                     break  #thread ends
+                if next_time is not None:
+                    # increment the next_time stamp by one interval, but skip tasks if we are behind schedule:
+                    # NOTE: libtime.perf_counter() - next_time can get negative if we are too early thus we need a max(0, ) here
+                    next_time += max(0, int((libtime.perf_counter() - next_time) // interval)) * interval + interval
         finally:
             self.terminatingSignal.emit()
             self.aw.qmc.flagsampling = False # we signal that we are done with sampling
