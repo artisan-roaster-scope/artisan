@@ -1169,14 +1169,14 @@ class StandardItem(QFrame): # pyright: ignore[reportGeneralTypeIssues] # pyrefly
     def enterEvent(self, event:'Optional[QEnterEvent]') -> None:
         if event is not None:
             self.setProperty('Hover', True)
-            self.setStyle(self.style())
+            self.setStyleSheet(self.styleSheet())
         super().enterEvent(event)
 
 
     def leaveEvent(self, event:'Optional[QEvent]') -> None:
         if event is not None:
             self.setProperty('Hover', False)
-            self.setStyle(self.style())
+            self.setStyleSheet(self.styleSheet())
         super().leaveEvent(event)
 
 
@@ -1262,12 +1262,12 @@ class NoDragItem(StandardItem):
     def select(self) -> None:
         if self.aw.schedule_window is not None and not self.aw.schedule_window.being_updated:
             self.setProperty('Selected', True)
-            self.setStyle(self.style())
+            self.setStyleSheet(self.styleSheet())
 
     def deselect(self) -> None:
         if self.aw.schedule_window is not None and not self.aw.schedule_window.being_updated:
             self.setProperty('Selected', False)
-            self.setStyle(self.style())
+            self.setStyleSheet(self.styleSheet())
 
 
 
@@ -1548,7 +1548,7 @@ class DragItem(StandardItem):
 
     def select(self, aw:'ApplicationWindow', load_template:bool=True) -> None:
         self.setProperty('Selected', True)
-        self.setStyle(self.style())
+        self.setStyleSheet(self.styleSheet())
         if load_template:
             self.load_template(aw)
 
@@ -1562,7 +1562,7 @@ class DragItem(StandardItem):
 
     def deselect(self) -> None:
         self.setProperty('Selected', False)
-        self.setStyle(self.style())
+        self.setStyleSheet(self.styleSheet())
 
 
 
