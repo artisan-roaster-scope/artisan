@@ -1769,13 +1769,19 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             taskWebDisplayGreenVLayout.addLayout(taskWebDisplayGreenHLayout)
             taskWebDisplayGreenVLayout.addStretch()
 
+
             self.taskWebDisplayRoastedURL = QLabel()
             self.taskWebDisplayRoastedURL.setOpenExternalLinks(True)
             self.taskWebDisplayRoastedFlag = QCheckBox()
             self.taskWebDisplayRoastedFlag.setToolTip(QApplication.translate('Tooltip','Start/stop the roasted coffee weighting task web display'))
-            self.taskWebDisplayRoastedFlag.setChecked(self.aw.taskWebDisplayRoastedActive)
             self.taskWebDisplayRoastedFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            # if green display is ON, roasted display can only be turned ON if roasted container is selected
+            if self.aw.taskWebDisplayGreenActive and self.aw.container2_idx == -1:
+                self.aw.taskWebDisplayRoastedActive = False
+                self.taskWebDisplayRoastedFlag.setEnabled(False)
+            self.taskWebDisplayRoastedFlag.setChecked(self.aw.taskWebDisplayRoastedActive)
             self.taskWebDisplayRoastedFlag.clicked.connect(self.taskWebDisplayRoasted)
+
             self.taskWebDisplayRoastedPortLabel = QLabel(QApplication.translate('Label', 'Port'))
             self.taskWebDisplayRoastedPort = QLineEdit(str(self.aw.taskWebDisplayRoastedPort))
             self.taskWebDisplayRoastedPort.setToolTip(QApplication.translate('Tooltip','IP port of the roasted coffee weighting task web display'))
@@ -1783,7 +1789,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.taskWebDisplayRoastedPort.setValidator(QRegularExpressionValidator(QRegularExpression(r'^[0-9]{1,4}$'),self))
             self.taskWebDisplayRoastedPort.setMaximumWidth(45)
             self.taskWebDisplayRoastedPort.editingFinished.connect(self.changeTaskWebDisplayRoastedPort)
-            self.taskWebDisplayRoastedPort.setDisabled(self.aw.taskWebDisplayRoastedActive)
+
+            self.taskWebDisplayRoastedPort.setDisabled(self.aw.taskWebDisplayRoastedActive or (self.aw.taskWebDisplayGreenActive and self.aw.container2_idx == -1))
             self.taskWebDisplayRoastedQRpic = QLabel() # the QLabel holding the QR code image
             if self.aw.taskWebDisplayRoastedActive:
                 try:
@@ -2307,7 +2314,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.updateGreenContainerPopup(keep_selection=False)
 
     # if adjust_index is True (default), the self.aw.container1_idx is updated to still point to the previous entry if possible
-    # if keep_selection, the current selection is not adjusted if ne entries are added. If keep_selection is not set, new entries are selected
+    # if keep_selection, the current selection is not adjusted if new entries are added. If keep_selection is not set, new entries are selected
     def updateGreenContainerPopup(self, adjust_index:bool=True, keep_selection:bool=False) -> None:
         prev_item_count = self.containerGreenComboBox.count()
         with QSignalBlocker(self.containerGreenComboBox): # blocking all signals, especially its currentIndexChanged connected to tareChanged which would lead to cycles
@@ -2322,8 +2329,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 view.setMinimumWidth(width)
         if adjust_index:
             if not keep_selection and self.containerGreenComboBox.count() > prev_item_count:
-                # if item list is longer (new items added), we select the last item
-                self.aw.container1_idx = self.containerGreenComboBox.count() - 4
+#                # if item list is longer (new items added), we select the last item
+#                self.aw.container1_idx = self.containerGreenComboBox.count() - 4
+                self.aw.container1_idx = -1 # we select the empty entry
             if len(self.aw.qmc.container_weights) > self.aw.container1_idx:
                 self.containerGreenComboBox.setCurrentIndex(self.container_menu_idx(self.aw.container1_idx))
             else:
@@ -2402,6 +2410,11 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.updateRoastedContainerWeight()
         # we need to update availability, as roasted scale is only available if roasted container weight is set
         self.aw.scale_manager.update_availability(force=True)
+        # if green display is ON, roasted display can only be turned ON if roasted container is selected
+        if self.aw.taskWebDisplayGreenActive and self.aw.container2_idx == -1:
+            self.taskWebDisplayRoasted(False)
+        self.taskWebDisplayRoastedFlag.setDisabled(self.aw.taskWebDisplayGreenActive and self.aw.container2_idx == -1)
+        self.taskWebDisplayRoastedPort.setDisabled(self.aw.taskWebDisplayGreenActive and self.aw.container2_idx == -1)
 
     def updateRoastedContainerWeight(self) -> None:
         weight = self.aw.qmc.get_container_weight(self.aw.container2_idx)
@@ -2426,6 +2439,11 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.setTaskGreenURL(self.getTaskURL(self.aw.taskWebDisplayGreenPort, self.aw.taskWebDisplayGreen_server.indexPath())) # this might fail if socket cannot be established
                     self.taskWebDisplayGreenFlag.setChecked(True)
                     self.taskWebDisplayGreenPort.setDisabled(True)
+                    # if green display is turned ON, turn roasted display OFF if no roasted container is selected
+                    if  self.aw.container2_idx == -1:
+                        self.taskWebDisplayRoasted(False)
+                        self.taskWebDisplayRoastedFlag.setEnabled(False)
+                        self.taskWebDisplayRoastedPort.setEnabled(False)
             except Exception as e: # pylint: disable=broad-except
                 self.aw.sendmessage(str(e))
                 res = False
@@ -2437,6 +2455,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.taskWebDisplayGreenPort.setDisabled(False)
             self.taskWebDisplayGreenURL.setText('')
             self.taskWebDisplayGreenQRpic.setPixmap(QPixmap())
+            # if green display is OFF, roasted display can always be turned ON
+            self.taskWebDisplayRoastedFlag.setEnabled(True)
+            self.taskWebDisplayRoastedPort.setDisabled(self.aw.taskWebDisplayRoastedActive)
 
     def setTaskGreenURL(self, url:str) -> None:
         # set URL label
@@ -4409,13 +4430,16 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ####  DEVICE 179 is +Shelly 3EM Pro Energy/Return
                 ##########################
                 ##########################
-                ####  DEVICE 180 is +Shelly Plus Plug Total/Last
+                ####  DEVICE 180 is +Shelly Plug Energy/Last
                 ##########################
                 ##########################
                 ####  DEVICE 181 is +Shelly 3EM Pro Power/S
                 ##########################
                 ##########################
-                ####  DEVICE 182 is +Shelly Plus Plug Power/Temp
+                ####  DEVICE 182 is +Shelly Plug Power/Temp
+                ##########################
+                ##########################
+                ####  DEVICE 183 is +Shelly Plug Voltage/Current
                 ##########################
                 # ADD DEVICE:
 
@@ -4617,7 +4641,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 1, # 179
                 1, # 180
                 1, # 181
-                1  # 182
+                1, # 182
+                1  # 183
                 ]
             #init serial settings of extra devices
             for i, _ in enumerate(self.aw.qmc.extradevices):
@@ -4750,6 +4775,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             except Exception: # pylint: disable=broad-except
                 pass
             self.aw.shelly_3EMPro_host = self.shelly3EMProHost.text().strip()
+            self.aw.shelly_PlusPlug_host = self.shellyPlusPlugHost.text().strip()
             self.aw.colorTrack_mean_window_size = self.colorTrackMeanSpinBox.value()
             self.aw.colorTrack_median_window_size = self.colorTrackMedianSpinBox.value()
             for i in range(8):

@@ -170,7 +170,7 @@ class TaskWebDisplayPayload(TypedDict):
     batchsize:str          # rendered batch size | max ~6 characters
     weight:str             # remaining weight to be added | max 6 characters
     final_weight:str       # final weight as send to server | max 6 characters
-    percent:float          # percent of current green component already added / roasted weight loss
+    percent:float          # percent of current green component already added
     state:PROCESS_STATE    # processing state (0:disconnected, 1:connected, 2:weighing, 3:done, 4:canceled)
     bucket:int             # number of buckets used from {0, 1, 2}
     blend_percent:str      # percentage of blend component | max ~6 characters or scheduleItem pos for roasted tasks
@@ -178,6 +178,7 @@ class TaskWebDisplayPayload(TypedDict):
     loss:str               # weight loss displayed if type==1 (roasted)
     timer:int              # timer timeout in seconds; if 0, timer progress is not displayed
     type:int               # task type (0:green, 1: roasted, 2:defects)
+    accuracy:float         # accuracy deciding when to enter/leave zoom mode (zoom mode off if 0)
 
 
 class CompletedItemDict(TypedDict):
@@ -2710,6 +2711,15 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         else:
             self.closeScheduler()
 
+    def closeWithoutDialog(self) -> None:
+        try:
+            # wait until drag-and-drop and updateScheduleWindow operations are done
+            update_schedule_window_semaphore.tryAcquire(1)
+            self.closeScheduler()
+        finally:
+            if update_schedule_window_semaphore.available() < 1:
+                update_schedule_window_semaphore.release(1)
+
     @pyqtSlot()
     def close(self) -> bool:
         try:
@@ -2722,6 +2732,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         return True
 
     def closeScheduler(self) -> None:
+        _log.debug('Scheduler.closeScheduler')
         self.weight_manager.stop() # reset the WeightManager to clear all connected displays and disconnect from connected scales
         self.aw.scheduled_items_uuids = self.get_scheduled_items_ids()
         # remember Dialog geometry
@@ -3025,16 +3036,35 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.set_next(True)
 
     # weight in kg
-    def set_roasted_weight(self, uuid:str, _weight:float) -> None:
+    def set_roasted_weight(self, uuid:str, weight:float) -> None:
         item:Optional[CompletedItem] = next((ci for ci in self.completed_items if ci.roastUUID.hex == uuid), None)
         if item is not None:
-            item.measured = True
-            # we update the completed_roasts_cache entry
-            completed_item_dict = item.model_dump(mode='json')
-            if 'prefix' in completed_item_dict:
-                del completed_item_dict['prefix']
-            add_completed(self.aw.plus_account_id, cast(CompletedItemDict, completed_item_dict))
-            self.updateRoastedItems()
+            try:
+                changes:Dict[str, Any] = {
+                    'end_weight': weight,
+                    'roast_id': item.roastUUID.hex,
+                    'modified_at': epoch2ISO8601(time.time())}
+                plus.controller.connect(clear_on_failure=False, interactive=False)
+                r = plus.connection.sendData(plus.config.roast_url, changes, 'POST')
+                r.raise_for_status()
+                # update successfully transmitted, we now also add/update the CompletedItem linked to self.selected_completed_item
+                item.update_completed_item(self.aw, changes)
+                item.measured = True
+                # if previous selected roast is loaded we write the changes to its roast properties
+                if item.roastUUID.hex == self.aw.qmc.roastUUID:
+                    self.updates_roast_properties_from_completed(item)
+                # we update the completed_roasts_cache entry
+                completed_item_dict = item.model_dump(mode='json')
+                if 'prefix' in completed_item_dict:
+                    del completed_item_dict['prefix']
+                add_completed(self.aw.plus_account_id, cast(CompletedItemDict, completed_item_dict))
+                self.updateRoastedItems() # updates widgets
+            except Exception as e:  # pylint: disable=broad-except
+                # updating data to server failed
+                _log.error(e)
+                self.aw.sendmessageSignal.emit(QApplication.translate('Message', 'Updating completed roast properties failed'), True, None)
+        else:
+            _log.error('set_roasted_weight(%s,%s) CompletedItem not found', uuid, weight)
         self.set_next(True)
 
     def next_not_prepared_item(self) -> Optional[GreenWeightItem]:
@@ -3995,7 +4025,8 @@ class GreenWebDisplay(GreenDisplay):
         total_percent = 0,
         loss = '',
         timer = 0,
-        type = 0 # 0:green task; constant
+        type = 0, # 0:green task; constant
+        accuracy = 0
     )
 
     def __init__(self, schedule_window:'ScheduleWindow') -> None:
@@ -4039,6 +4070,8 @@ class GreenWebDisplay(GreenDisplay):
                 self.rendered_task['blend_percent'] = ''
                 self.rendered_task['subtitle'] = ''
             self.last_current_weight = 0
+
+            self.rendered_task['accuracy'] = float2float(self.accuracy)
             self.rendered_task['weight'] = ''
             self.rendered_task['final_weight'] = ''
             self.rendered_task['percent'] = 0
@@ -4071,6 +4104,7 @@ class GreenWebDisplay(GreenDisplay):
             self.last_current_weight = current_weight
 
             #-
+            self.rendered_task['accuracy'] = float2float(self.accuracy)
             self.rendered_task['state'] = state
             if self.last_item.descriptions and len(self.last_item.descriptions)>component:
                 self.rendered_task['blend_percent'] = (f'{self.last_item.descriptions[component][0] * 100:.0f}%' if self.last_item.descriptions[component][0] != 1 else '')
@@ -4127,7 +4161,8 @@ class RoastedWebDisplay(RoastedDisplay):
             total_percent = 0,
             loss = '',
             timer = 0,
-            type = 1 # 1:roasted task; constant
+            type = 1, # 1:roasted task; constant
+            accuracy = 0
     )
 
     def __init__(self, schedule_window:'ScheduleWindow') -> None:
@@ -4199,7 +4234,7 @@ class RoastedWebDisplay(RoastedDisplay):
                 else:
                     total_percent = 0
                 self.rendered_task['final_weight'] = render_weight(current_weight, 0, weight_units.index(self.schedule_window.aw.qmc.weight[2]), brief=(0 if current_weight < 10000 else 1)) # yield
-                self.rendered_task['percent'] = 100.2
+                self.rendered_task['percent'] = 100.2 # > 100 to have the border fully blue
                 self.rendered_task['total_percent'] = total_percent
                 self.rendered_task['loss'] = f'-{float2float(100-total_percent, self.schedule_window.aw.percent_decimals)}%' # weight loss percent
             else:

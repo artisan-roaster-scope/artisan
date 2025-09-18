@@ -303,7 +303,7 @@ class tgraphcanvas(FigureCanvas):
         'eventactionsemaphore', 'updateBackgroundSemaphore', 'alarmSemaphore', 'rampSoakSemaphore', 'crossmarker', 'crossmouseid', 'onreleaseid',
         'analyzer_connect_id', 'extra309T3', 'extra309T4', 'extra309TX', 'hottop_ET', 'hottop_BT', 'hottop_HEATER', 'hottop_MAIN_FAN', 'hottop_TX',
         'R1_DT', 'R1_BT', 'R1_BT_ROR', 'R1_EXIT_TEMP', 'R1_HEATER', 'R1_FAN', 'R1_DRUM', 'R1_VOLTAGE', 'R1_TX', 'R1_STATE', 'R1_FAN_RPM', 'R1_STATE_STR',
-        'shellyPlusPlug_TX', 'shellyPlusPlug_Power', 'shellyPlusPlug_Temp',
+        'shellyPlusPlug_TX', 'shellyPlusPlug_Power', 'shellyPlusPlug_Temp', 'shellyPlusPlug_Voltage', 'shellyPlusPlug_Current',
         'extraArduinoTX', 'extraArduinoT1', 'extraArduinoT2', 'extraArduinoT3', 'extraArduinoT4', 'extraArduinoT5', 'extraArduinoT6', 'program_t3', 'program_tx', 'program_t4', 'program_t5', 'program_t6',
         'program_t7', 'program_t8', 'program_t9', 'program_t10', 'dutycycle', 'dutycycleTX', 'currentpidsv', 'linecount', 'deltalinecount',
         'ax_background', 'block_update', 'fmt_data_RoR', 'fmt_data_curve', 'running_LCDs', 'plotterstack', 'plotterequationresults', 'plottermessage', 'alarm_popup_timout',
@@ -920,9 +920,10 @@ class tgraphcanvas(FigureCanvas):
                        '+PID P/I',                  #177
                        '+PID D/Error',              #178
                        '+Shelly 3EM Pro Energy/Return', #179
-                       '+Shelly Plus Plug Total/Last',  #180
+                       '+Shelly Plug Energy/Last',      #180
                        '+Shelly 3EM Pro Power/S',       #181
-                       '+Shelly Plus Plug Power/Temp'   #182
+                       '+Shelly Plug Power/Temp',       #182
+                       '+Shelly Plug Voltage/Current'   #183
                        ]
 
         # ADD DEVICE:
@@ -993,9 +994,10 @@ class tgraphcanvas(FigureCanvas):
             175, # Thermoworks BlueDOT
             176, # Aillio Bullet R2
             179, # Shelly 3EM Pro Energy/Return
-            180, # Shelly Plus Plug Total/Last
+            180, # Shelly Plug Total/Last
             181, # Shelly 3EM Pro Power/S
-            182  # Shelly Plus Plug Power/Temp
+            182, # Shelly Plug Power/Temp
+            183  # Shelly Plug Voltage/Current
         ]
 
         # ADD DEVICE:
@@ -1073,9 +1075,10 @@ class tgraphcanvas(FigureCanvas):
             177, # +PID P/I
             178, # +PID D/Error
             179, # Shelly 3EM Pro Energy/Return
-            180, # Shelly Plus Plug Total/Last
-            181, # 3EM Pro Power/S
-            182  # Plus Plug Power/Temp
+            180, # Shelly Plug Total/Last
+            181, # Shelly 3EM Pro Power/S
+            182, # Shelly Plug Power/Temp
+            183  # Shelly Plug Voltage/Current
         ]
 
         # ADD DEVICE:
@@ -2221,9 +2224,13 @@ class tgraphcanvas(FigureCanvas):
         self.R1_STATE_STR:str = ''
 
         # used by device +ShellyPlusPlug_EnergyTotalLastMinute to pass values
-        self.shellyPlusPlug_TX:float = 0.
+        self.shellyPlusPlug_TX:float = -1
+        self.shellyPlusPlug_Total:float = -1
+        self.shellyPlusPlug_Last:float = -1
         self.shellyPlusPlug_Power:float = -1
         self.shellyPlusPlug_Temp:float = -1
+        self.shellyPlusPlug_Voltage:float = -1
+        self.shellyPlusPlug_Current:float = -1
 
         #used by extra device +ArduinoTC4_XX to pass values
         self.extraArduinoTX:float = 0.  # timestamp of retrieval

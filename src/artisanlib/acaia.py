@@ -17,7 +17,7 @@
 
 import asyncio
 import logging
-#import time as libtime
+import time as libtime
 from enum import IntEnum, unique
 from typing import Optional, Union, List, Tuple, Final, Callable, TYPE_CHECKING
 
@@ -883,8 +883,8 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
         self.send_event(
             bytes([ # pairs of key/setting
                     0,  # weight id
-                    (1 if self.scale_class == SCALE_CLASS.RELAY # 0: only weight changes are reported; 1: streaming weight changes at 1/10
-                     else 1),  # 0, 1, 3, 5, 7, 15, 31, 63, 127  # weight argument (speed of notifications in 1/10 sec) # larger values => slower updates
+                    1,  #i f self.scale_class == SCALE_CLASS.RELAY # 0: only weight changes are reported; 1: streaming weight changes at 1/10
+                        # 0, 1, 3, 5, 7, 15, 31, 63, 127  # weight argument (speed of notifications in 1/10 sec) # larger values => slower updates
                         # 5 or 7 seems to be good values for this app in Artisan
 #                    1,   # battery id
 #                    255, #2,  # battery argument (if 0 : fast, 1 : slow, 2: very slow; not set only once?)
@@ -1026,16 +1026,16 @@ class Acaia(Scale): # pyright: ignore [reportGeneralTypeIssues] # Argument to cl
             self.acaia.send_default_effects_off()
             self.acaia.send_leds_breathe(self.acaia.BROWN)
         elif action == STATE_ACTION.ZONE_ENTER:
+            self.acaia.send_leds_halo(self.acaia.LIGHT_BLUE)
+            libtime.sleep(0.3)
             self.acaia.send_leds_on(self.acaia.LIGHT_BLUE)
         elif action == STATE_ACTION.ZONE_EXIT:
-            self.acaia.send_leds_off()
+            self.acaia.send_leds_wipe_off(self.acaia.LIGHT_BLUE)
         elif action == STATE_ACTION.SWAP_ENTER:
             self.acaia.send_leds_on(self.acaia.ORANGE)
         elif action == STATE_ACTION.SWAP_EXIT:
             self.acaia.send_leds_off()
         elif action == STATE_ACTION.TARGET_ENTER:
-#            self.acaia.send_leds_halo(self.acaia.BLUE)
-#            libtime.sleep(0.6)
             self.acaia.send_leds_on(self.acaia.BLUE)
         elif action == STATE_ACTION.TARGET_EXIT:
             self.acaia.send_leds_off()

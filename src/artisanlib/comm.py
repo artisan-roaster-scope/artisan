@@ -556,7 +556,8 @@ class serialport:
                                    self.Shelly3EMPro_EnergyReturn,              #179
                                    self.ShellyPlusPlug_EnergyTotalLastMinute,   #180
                                    self.Shelly3EMPro_ActivePower_ApparentPower, #181
-                                   self.ShellyPlusPlug_Power_Temperature        #182
+                                   self.ShellyPlusPlug_Power_Temperature,       #182
+                                   self.ShellyPlusPlug_Voltage_Current          #183
                                    ]
         #string with the name of the program for device #27
         self.externalprogram:str = 'test.py'
@@ -701,8 +702,8 @@ class serialport:
         energy:float = -1
         energy_return:float = -1
         try:
-            shelly_connect_timeout = 0.3
-            shelly_read_timeout = 0.2
+            shelly_connect_timeout = 0.5
+            shelly_read_timeout = 0.5
             r = requests.get(f'http://{self.aw.shelly_3EMPro_host}/rpc/EMData.GetStatus?id=0',
                 headers={'Content-Type': 'application/json'},
                 timeout=(shelly_connect_timeout, shelly_read_timeout))
@@ -722,8 +723,8 @@ class serialport:
         active_power:float = -1
         apparent_power_return:float = -1
         try:
-            shelly_connect_timeout = 0.3
-            shelly_read_timeout = 0.2
+            shelly_connect_timeout = 0.5
+            shelly_read_timeout = 0.5
             r = requests.get(f'http://{self.aw.shelly_3EMPro_host}/rpc/EM.GetStatus?id=0',
                 headers={'Content-Type': 'application/json'},
                 timeout=(shelly_connect_timeout, shelly_read_timeout))
@@ -737,29 +738,34 @@ class serialport:
             _log.error(e)
         return tx, apparent_power_return, active_power
 
-    def ShellyPlusPlug_EnergyTotalLastMinute(self) -> Tuple[float,float,float]:
-        tx = self.aw.qmc.timeclock.elapsedMilli()
-        total_energy:float = -1
-        last_minute:float = -1
-        self.aw.qmc.shellyPlusPlug_TX = tx
+    def updateShellyPlusPlug(self) -> None:
+        self.aw.qmc.shellyPlusPlug_TX = -1
+        self.aw.qmc.shellyPlusPlug_Total = -1
+        self.aw.qmc.shellyPlusPlug_Last = -1
         self.aw.qmc.shellyPlusPlug_Power = -1
         self.aw.qmc.shellyPlusPlug_Temp = -1
+        self.aw.qmc.shellyPlusPlug_Voltage = -1
+        self.aw.qmc.shellyPlusPlug_Current = -1
         try:
-            shelly_connect_timeout = 0.3
-            shelly_read_timeout = 0.2
+            shelly_connect_timeout = 0.5
+            shelly_read_timeout = 0.5
             r = requests.get(f'http://{self.aw.shelly_PlusPlug_host}/rpc/Switch.GetStatus?id=0',
                 headers={'Content-Type': 'application/json'},
                 timeout=(shelly_connect_timeout, shelly_read_timeout))
             r.raise_for_status()
             res = r.json()
-            if 'aenergy' in res:
-                energy_res = res['aenergy']
-                if 'total' in energy_res:
-                    total_energy = float(energy_res['total'])
-                if 'by_minute' in energy_res:
-                    by_minute_res = energy_res['by_minute']
-                    if isinstance(by_minute_res, list) and len(by_minute_res)>0:
-                        last_minute = float(by_minute_res[0])
+            self.aw.qmc.shellyPlusPlug_TX = self.aw.qmc.timeclock.elapsedMilli()
+            try:
+                if 'aenergy' in res:
+                    energy_res = res['aenergy']
+                    if 'total' in energy_res:
+                        self.aw.qmc.shellyPlusPlug_Total = float(energy_res['total'])
+                    if 'by_minute' in energy_res:
+                        by_minute_res = energy_res['by_minute']
+                        if isinstance(by_minute_res, list) and len(by_minute_res)>0:
+                            self.aw.qmc.shellyPlusPlug_Last = float(by_minute_res[0])
+            except Exception as e: # pylint: disable=broad-except
+                _log.error(e)
             try:
                 if 'apower' in res:
                     self.aw.qmc.shellyPlusPlug_Power = res['apower']
@@ -770,14 +776,48 @@ class serialport:
                     self.aw.qmc.shellyPlusPlug_Temp = float(res['temperature']['tC'])
             except Exception as e: # pylint: disable=broad-except
                 _log.error(e)
-
+            try:
+                if 'voltage' in res:
+                    self.aw.qmc.shellyPlusPlug_Voltage = res['voltage']
+            except Exception as e: # pylint: disable=broad-except
+                _log.error(e)
+            try:
+                if 'current' in res:
+                    self.aw.qmc.shellyPlusPlug_Current = res['current']
+            except Exception as e: # pylint: disable=broad-except
+                _log.error(e)
         except Exception as e: # pylint: disable=broad-except
             _log.error(e)
-        return tx, last_minute, total_energy
+
+    # Energy/Last
+    def ShellyPlusPlug_EnergyTotalLastMinute(self) -> Tuple[float,float,float]:
+        if -1 in {self.aw.qmc.shellyPlusPlug_Total, self.aw.qmc.shellyPlusPlug_Last}:
+            self.updateShellyPlusPlug()
+        total = self.aw.qmc.shellyPlusPlug_Total
+        last = self.aw.qmc.shellyPlusPlug_Last
+        self.aw.qmc.shellyPlusPlug_Total = -1
+        self.aw.qmc.shellyPlusPlug_Last = -1
+        return self.aw.qmc.shellyPlusPlug_TX, last, total
 
     # Power/Temp
     def ShellyPlusPlug_Power_Temperature(self) -> Tuple[float,float,float]:
-        return self.aw.qmc.shellyPlusPlug_TX, self.aw.qmc.shellyPlusPlug_Temp, self.aw.qmc.shellyPlusPlug_Power
+        if -1 in {self.aw.qmc.shellyPlusPlug_Temp, self.aw.qmc.shellyPlusPlug_Power}:
+            self.updateShellyPlusPlug()
+        power = self.aw.qmc.shellyPlusPlug_Power
+        temp = self.aw.qmc.shellyPlusPlug_Temp
+        self.aw.qmc.shellyPlusPlug_Power = -1
+        self.aw.qmc.shellyPlusPlug_Temp = -1
+        return self.aw.qmc.shellyPlusPlug_TX, temp, power
+
+    # Power/Temp
+    def ShellyPlusPlug_Voltage_Current(self) -> Tuple[float,float,float]:
+        if -1 in {self.aw.qmc.shellyPlusPlug_Voltage, self.aw.qmc.shellyPlusPlug_Current}:
+            self.updateShellyPlusPlug()
+        voltage = self.aw.qmc.shellyPlusPlug_Voltage
+        current = self.aw.qmc.shellyPlusPlug_Current
+        self.aw.qmc.shellyPlusPlug_Voltage = -1
+        self.aw.qmc.shellyPlusPlug_Current = -1
+        return self.aw.qmc.shellyPlusPlug_TX, current, voltage
 
 
     def DTAtemperature(self) -> Tuple[float,float,float]:

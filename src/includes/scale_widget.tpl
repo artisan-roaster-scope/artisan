@@ -20,6 +20,7 @@ Receives data in the shape of
     loss: str (for type 1)
     timer: int (in seconds)
     allow_click: 0 | 1
+    accuracy: float (0: no zoom; 0-10% start of zoom)
 }
 -->
 
@@ -74,6 +75,10 @@ Receives data in the shape of
     <script type="text/javascript">
         // @ts-check
 
+        // if true, will not use a websocket but display some manual inputs
+        const NOWEBSOCKET = false;
+        let final_weight = 0.8;
+
         // if true, will use port 5555, otherwise {{port}}
         const RUNON5555 = false;
 
@@ -88,8 +93,9 @@ Receives data in the shape of
         // if true, scale is red if percent > 102.5 and frame is red if total_percent > 100
         const USERED = false;
 
-        // in %; show "100%" if within 5g for 5kg, 20g for 20kg, ...
-        const TARGET_DEVIATION = 0.1;
+        // in %; show "100%" if within +/- TARGET_DEVIATION; for 0.1, this is 5g for 5kg, 20g for 20kg, ...
+        // 0.5 aligns with the rounded 100% dispolay value
+        const TARGET_DEVIATION = 0.5;
 
 
         /** @type WebSocket | null */
@@ -132,7 +138,7 @@ Receives data in the shape of
          * state: DISCONNECTED | CONNECTED | WEIGHING | DONE | CANCELLED,
          * bucket: 0 | 1 | 2, blend_percent: string, total_percent: number,
          * type: TYPE_GREEN | TYPE_ROASTED | TYPE_DEFECTS, message: string,
-         * timer: number, loss: string, allow_click: 0 | 1 } } */
+         * timer: number, loss: string, allow_click: 0 | 1, accuracy: number } } */
         let parsedData;
 
         /** @type HTMLDialogElement | undefined */
@@ -145,6 +151,7 @@ Receives data in the shape of
         let interval;
 
         let allowClick = false;
+        let accuracy = 10;
 
         function getAllElements() {
             elements.html = document.getElementsByTagName('html')[0];
@@ -176,6 +183,50 @@ Receives data in the shape of
             for (const prop of ['title', 'buckets_images', 'subtitle']) {
                 multiElements[prop] = document.getElementsByName(prop);
             }
+
+            // TODO remove test slider BEGIN
+            if (NOWEBSOCKET) {
+                const finalweight = document.getElementById('testfinalweight');
+                if (finalweight) {
+                    finalweight.addEventListener('input', (e) => {
+                        final_weight = parseFloat(e.target?.['value'] || '0.8');
+                        const perc = parsedData.percent || 85;
+                        const accuracy = parsedData.accuracy ?? 10;
+                        const finalWeightStr = final_weight.toFixed(1) + 'kg';
+                        const remainingWeightStr = (1 - perc / 100) * final_weight > 0.5 ? (-(1 - perc / 100) * final_weight).toFixed(1) + 'kg' : (-(1 - perc / 100) * final_weight * 1000).toFixed(0) + 'g';
+                        const json = { accuracy, type: 0, state: 2, percent: perc, weight: remainingWeightStr, final_weight: finalWeightStr, bucket: 2, id: '2/3', blend_percent: '33%', title: 'Mount "Huehuetenango"', batchsize: '12kg', subtitle: 'Kenia "Mount Huehuetenango" Selection', /* timer: 5 */ };
+                        usedata({ data: JSON.stringify(json) });
+                    });
+                }
+                const slider = document.getElementById('testpercent');
+                if (slider) {
+                    slider.addEventListener('input', (e) => {
+                        const perc = parseFloat(e.target?.['value'] || '1');
+                        parsedData.percent = perc;
+                        const finalWeightStr = final_weight.toFixed(1) + 'kg';
+                        const remainingWeightStr = (1 - perc / 100) * final_weight > 0.5 ? (-(1 - perc / 100) * final_weight).toFixed(1) + 'kg' : (-(1 - perc / 100) * final_weight * 1000).toFixed(0) + 'g';
+                        const json = { accuracy, type: 0, state: 2, percent: perc, weight: remainingWeightStr, final_weight: finalWeightStr, bucket: 2, id: '2/3', blend_percent: '33%', title: 'Mount "Huehuetenango"', batchsize: '12kg', subtitle: 'Kenia "Mount Huehuetenango" Selection', /* timer: 5 */ };
+                        usedata({ data: JSON.stringify(json) });
+                    });
+                }
+                const accuracyInput = document.getElementById('testaccuracy');
+                if (accuracyInput) {
+                    accuracyInput.addEventListener('input', (e) => {
+                        accuracy = parseFloat(e.target?.['value'] ?? '10');
+                        parsedData.accuracy = accuracy;
+                        const finalWeightStr = final_weight.toFixed(1) + 'kg';
+                        const perc = lastdata ? JSON.parse(lastdata.data).percent || 85 : 85;
+                        const remainingWeightStr = (1 - perc / 100) * final_weight > 0.5 ? (-(1 - perc / 100) * final_weight).toFixed(1) + 'kg' : (-(1 - perc / 100) * final_weight * 1000).toFixed(0) + 'g';
+                        const json = { accuracy, type: 0, state: 2, percent: perc, weight: remainingWeightStr, final_weight: finalWeightStr, bucket: 2, id: '2/3', blend_percent: '33%', title: 'Mount "Huehuetenango"', batchsize: '12kg', subtitle: 'Kenia "Mount Huehuetenango" Selection', /* timer: 5 */ };
+                        usedata({ data: JSON.stringify(json) });
+                    });
+                }
+            } else {
+                document.getElementById('testfinalweightspan')?.remove();
+                document.getElementById('testpercentspan')?.remove();
+                document.getElementById('testaccuracyspan')?.remove();
+            }
+            // END
         }
 
         function setInitialStyles() {
@@ -214,6 +265,7 @@ Receives data in the shape of
             elements.scale_rect.style.backgroundColor = 'rgba(0, 0, 0, 0)';
             elements.bucket_on_scale.style.backgroundColor = BACKGROUND;
             elements.zoom.style.display = 'none';
+            elements.zoom.style.position = 'absolute';
             elements.zoom2.style.display = 'none';
             elements.scale_for_clipping.style.display = 'none';
             elements.outer_frame.style.background = '#b5b5b5';
@@ -246,6 +298,8 @@ Receives data in the shape of
             if (parsedData) {
                 resetStyles();
                 setTexts();
+
+                accuracy = parsedData.accuracy ?? 10;
 
                 allowClick = !!parsedData.allow_click;
                 if (allowClick && !showingTimerDialog && !showingCancelDialog && !showingMessageDialog) {
@@ -368,45 +422,67 @@ Receives data in the shape of
                                 elements.bucket_on_scale.style.border = BORDER;
                                 elements.bucket_on_scale.style.top = BUCKETPOSITION;
                                 elements.bucket_on_scale.style.left = BUCKETPOSITION;
+                                elements.percent.style.lineHeight = '30.5cqmin';
                                 elements.percent.style.fontSize = '26cqmin';
                                 elements.percent.style.fontWeight = '400';
                                 elements.weight.style.display = 'block';
-
+                                elements.percent.classList.remove('fade-out');
                                 elements.weight.classList.remove('zoom-weight');
-                                if (parsedData.percent <= 99) {
-                                    // normal count until 99%
+                                elements.zoom.classList.remove('fade-in');
+
+                                if (parsedData.percent < Math.min(100 - accuracy, 100 - TARGET_DEVIATION)) {
+                                    // normal count until (100-accuracy)%
                                     elements.scale_rect.style.background = `linear-gradient(0deg, ${ABLUE} 0 ${parsedData.percent}%, #b5b5b5 ${parsedData.percent}% 100%)`;
                                     if (parsedData.percent >= 5) {
                                         elements.timer_progress.style.setProperty('--progress-color', 'white');
                                     }
                                 } else if (Math.abs(100 - (Math.round(parsedData.percent * 100) / 100)) < TARGET_DEVIATION) {
-                                    // special display if [99.99, 100.01]%
-                                    elements.scale_rect.style.backgroundColor = ABLUE;
+                                    // special display if [99.9, 100.1]% (if TARGET_DEVIATION is 0.1)
+                                    // elements.scale_rect.style.backgroundColor = ABLUE;
                                     elements.timer_progress.style.setProperty('--progress-color', 'white');
                                     elements.bucket_on_scale.style.color = 'white';
                                     elements.bucket_on_scale.style.backgroundColor = ABLUE;
                                     elements.bucket_on_scale.style.border = '2vmin solid white';
-                                    elements.bucket_on_scale.style.top = 'calc(12% - 2vmin)';
-                                    elements.bucket_on_scale.style.left = 'calc(12% - 2vmin)';
+                                    elements.bucket_on_scale.style.top = 'calc(12% - 2.25vmin)';
+                                    elements.bucket_on_scale.style.left = 'calc(12% - 1.75vmin)';
                                     elements.percent.style.color = 'white';
                                     elements.weight.style.color = 'white';
-                                    elements.percent.style.fontSize = '22cqmin';
+                                    elements.percent.style.fontSize = '26cqmin';
                                     elements.percent.style.fontWeight = '400';
                                     elements.weight.style.display = 'none';
                                     elements.percent.style.top = '0';
                                 } else {
-                                    // zoom for >99% (and != 100)
-                                    elements.scale_rect.style.backgroundColor = ABLUE;
+                                    // ZOOM for >(100 - accuracy)% (and != 100)
+
+                                    // if (elements.scale_rect.style.background !== ABLUE) {
+                                    //     let p = parsedData.percent;
+                                    //     const inc = (100 - parsedData.percent) / 10;
+                                    //     const ntrvl = setInterval(() => {
+                                    //         if (p < 100) {
+                                    //             elements.scale_rect.style.background = `linear-gradient(0deg, ${ABLUE} 0 ${p}%, #b5b5b5 ${p}% 100%)`;
+                                    //             p += inc;
+                                    //         } else {
+                                    //             elements.scale_rect.style.background = ABLUE;
+                                    //             clearInterval(ntrvl);
+                                    //         }
+                                    //     }, 25);
+                                    // }
+                                    elements.scale_rect.style.background = ABLUE;
+
                                     elements.timer_progress.style.setProperty('--progress-color', 'white');
-                                    elements.percent.style.display = 'none';
-                                    elements.weight.classList.add('zoom-weight');
+                                    // elements.percent.style.display = 'none';
+                                    // elements.weight.classList.add('zoom-weight');
                                     if (parsedData.percent < 100) {
-                                        const zoomsize = (100 * (parsedData.percent - 99)).toFixed(2);
-                                        elements.zoom.style.display = 'block';
-                                        elements.zoom.style.height = `${zoomsize}%`;
+                                        const zoomsize = 100 * (parsedData.percent - (100 - accuracy)) / accuracy;
+                                        // elements.percent.innerHTML = '&nbsp;';
+                                        elements.percent.classList.add('fade-out');
+                                        elements.zoom.style.height = `${zoomsize.toFixed(2)}%`;
                                         elements.zoom.style.width = elements.zoom.style.height;
+                                        elements.zoom.style.top = (50 - zoomsize / 2).toFixed(2) + '%';
+                                        elements.zoom.style.left = elements.zoom.style.top;
+                                        elements.zoom.style.display = 'block';
                                     } else if (parsedData.percent < 102.5 || !USERED) {
-                                        // overflow
+                                        // overflow (TODO check value according to accuracy)
                                         elements.bucket_on_scale.style.backgroundColor = ABLUE;
                                         const zoomsize = 76 + (parsedData.percent - 100 + 0.1) * 24;
                                         elements.scale_for_clipping.style.display = 'block';
@@ -418,7 +494,6 @@ Receives data in the shape of
                                         elements.zoom2.style.top = `${zoomperc.toFixed(2)}%`;
                                         elements.zoom2.style.left = elements.zoom2.style.top;
                                         elements.percent.style.color = 'white';
-                                        elements.weight.style.color = 'white';
                                     } else {
                                         // overflow max
                                         elements.bucket_on_scale.style.backgroundColor = ABLUE;
@@ -426,7 +501,6 @@ Receives data in the shape of
                                         elements.scale_for_clipping.style.backgroundColor = ARED;
                                         elements.zoom2.style.display = 'none';
                                         elements.percent.style.color = 'white';
-                                        elements.weight.style.color = 'white';
                                     }
                                 }
                             } else {
@@ -435,10 +509,14 @@ Receives data in the shape of
                                 elements.weight.style.display = 'none';
                             }
                         } else if (parsedData.type === 1) {
+                            // roasted
                             elements.percent.innerHTML = parsedData.loss;
                             elements.percent.classList.replace('big-font', 'big-font-roasted');
                             elements.percent.style.color = 'white';
                             elements.weight.style.color = 'white';
+                            if (!parsedData.weight) {
+                                elements.weight.innerHTML = '&nbsp;';
+                            }
                             elements.percent.style.display = 'block';
                             elements.scale_rect.style.display = 'block';
                             elements.scale_rect.style.backgroundColor = ABLUE;
@@ -453,6 +531,9 @@ Receives data in the shape of
                     default:
                         break;
                 }
+
+                document.documentElement.style.setProperty('--last-percent-foreground-color', document.documentElement.style.getPropertyValue('--percent-foreground-color'));
+                document.documentElement.style.setProperty('--percent-foreground-color', elements.percent.style.color);
 
                 if (parsedData.total_percent > 0) {
                     if (parsedData.total_percent <= 100 || !USERED) {
@@ -670,6 +751,19 @@ Receives data in the shape of
                     dialogs.fullscreen_dialog.close();
                 }, CLICK_FOR_FULLSCREEN_DISPLAY_TIME_MS);
             }
+
+            if (NOWEBSOCKET) {
+                const type = 0;
+                const state = 2;
+                const loss = '11.4%';
+                let perc = 85;
+                const final_weight = 0.8;
+                let remainingWeightStr = (1 - perc / 100) * final_weight > 0.5 ? (-(1 - perc / 100) * final_weight).toFixed(1) + 'kg' : (-(1 - perc / 100) * final_weight * 1000).toFixed(0) + 'g';
+                // remainingWeightStr = '';
+                const finalWeightStr = final_weight.toFixed(1) + 'kg';
+                const json = { accuracy, type, state, percent: perc, weight: remainingWeightStr, final_weight: finalWeightStr, bucket: 2, id: '2/3', blend_percent: '33%', title: 'Mount "Huehuetenango"', batchsize: '12kg', subtitle: 'Kenia "Mount Huehuetenango" Selection', loss, /* timer: 5 */ };
+                usedata({ data: JSON.stringify(json) });
+            }
         });
 
         function sleep(ms) {
@@ -734,7 +828,9 @@ Receives data in the shape of
             };
         }
 
-        wsConnect();
+        if (!NOWEBSOCKET) {
+            wsConnect();
+        }
     </script>
 
     <style type='text/css'>
@@ -1128,6 +1224,44 @@ Receives data in the shape of
         progress {
             color: var(--progress-color, #2098c7);
         }
+
+        @keyframes fade-out {
+            0% {
+                opacity: 1;
+                color: var(--last-percent-foreground-color, white);
+            }
+
+            30% {
+                color: var(--last-percent-foreground-color, white);
+            }
+
+            70% {
+                color: #2098c7;
+            }
+
+            100% {
+                color: #2098c7;
+                font-size: 0;
+            }
+        }
+
+        #percent.fade-out {
+            animation: fade-out 0.7s ease-out forwards;
+        }
+
+        /* @keyframes fade-in {
+            0% {
+                opacity: 0;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        #zoom.fade-in {
+            animation: fade-in 0.7s ease-out forwards;
+        } */
     </style>
 </head>
 
@@ -1173,6 +1307,12 @@ Receives data in the shape of
                 </div>
                 <div class="scale-and-buckets" id="scale_and_buckets">
                     <div class="scale-div">
+                        <!-- // TODO remove test slider BEGIN -->
+                        <!-- if NOWEBSOCKET -->
+                        <span id="testfinalweightspan" style="position: absolute; left: 20px; top: calc(50% - 80px); height: 30px;">FinalWeight: <input type="number" id="testfinalweight" step="1" min="0" max="150" value="0.8"></span>
+                        <span id="testaccuracyspan" style="position: absolute; left: 20px; top: calc(50% - 40px); height: 30px;">Accuracy: <input type="number" id="testaccuracy" step="1" min="0" max="10" value="10"></span>
+                        <span id="testpercentspan" style="position: absolute; left: 20px; top: 50%; height: 30px;">Percent: <input type="number" id="testpercent" min="0" step="0.5" value="85" style="width: 80px;"></span>
+                        <!-- // END -->
                         <div class="scale-rect" id="scale_rect">
                             <div class="scale-for-clipping scale-rect" id="scale_for_clipping">
                                 <span class="zoom2" id="zoom2"></span>

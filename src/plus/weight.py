@@ -78,13 +78,14 @@ class RoastedWeightItem(WeightItem):
 class Display:
 
     __slots__ = [ #'active'
-        'cancel_timer_timeout', 'done_timer_timeout'
+        'cancel_timer_timeout', 'done_timer_timeout', 'accuracy'
         ]
 
     def __init__(self) -> None:
 #        self.active:bool = True
-        self.cancel_timer_timeout = 0 # timeout of the cancel state in seconds; if 0, timer is disabled
-        self.done_timer_timeout = 0 # timeout of the cancel state in seconds; if 0, timer is disabled
+        self.cancel_timer_timeout:int = 0 # timeout of the cancel state in seconds; if 0, timer is disabled
+        self.done_timer_timeout:int = 0   # timeout of the cancel state in seconds; if 0, timer is disabled
+        self.accuracy:float = 0.          # accuracy deciding when to enter/leave zoom mode (zoom mode off if 0)
 
     def clear_green(self) -> None: # pylint: disable=no-self-use
         ...
@@ -94,6 +95,9 @@ class Display:
 
     def show_item(self, item:WeightItem, state:PROCESS_STATE = PROCESS_STATE.DISCONNECTED, component:int = 0, final_weight:Optional[int] = None) -> None: # pylint: disable=unused-argument,no-self-use
         ...
+
+    def set_accuracy(self, value:float) -> None:
+        self.accuracy = value
 
     # set the displays CANCEL timer timeout in seconds
     def set_cancel_timer_timeout(self, timeout:int) -> None:
@@ -283,6 +287,10 @@ class GreenWeighingState(StateMachine):
 
         super().__init__(allow_event_without_transition=True) # no errors for events which do not lead to transitions
 
+    def set_accuracy(self, value:float) -> None:
+        for display in self.displays:
+            display.set_accuracy(value)
+
     def on_enter_ready(self) -> None:
         if not self.scale_release_blocked:
             self.release_scale()
@@ -431,6 +439,7 @@ class GreenWeighingState(StateMachine):
         if self.current_weight_item is not None:
             if weight is None:
                 weight = self.current_weight_item.weight
+            _log.debug('BatchManager: green weighing task completed => %s', weight)
             self.current_weight_item.callback(str(self.current_weight_item.uuid), weight) # register weight in weight_item as prepared
 
 
@@ -584,6 +593,7 @@ class RoastedWeighingState(StateMachine):
         if self.current_weight_item is not None:
             if weight is None:
                 weight = self.current_weight_item.weight_estimate
+            _log.debug('BatchManager: roasted weighing task completed => %s', weight)
             self.current_weight_item.callback(str(self.current_weight_item.uuid), weight) # register weight in weight_item as prepared
 
 
@@ -682,7 +692,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefl
         self.task_done_weight:int = 0                         # remember weight (in g) that did lead to "task_completed" allowing to complete this task
         #-
         self.roasted_task_empty_scale_weight:int = 0          # weight of the empty scale (tare weight)
-        self.roasted_task_scale_total_weight:int = 0
+        self.roasted_task_scale_total_weight:int = 0          # the reading of the scale with the full roasted bucket placed minus the tare
         self.roasted_task_done_weight:int =0                  # remember weight (in g) that did lead to roasted task_completed allowing to complete this task
 
         # Timers
@@ -916,6 +926,8 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefl
 
         step = stable_weight - (self.scale1_last_stable_weight if scale_nr == 1 else self.scale2_last_stable_weight)
 
+#        _log.debug("PRINT self.scale1_last_stable_weight: %s",self.scale1_last_stable_weight)
+#        _log.debug("PRINT self.scale2_last_stable_weight: %s",self.scale2_last_stable_weight)
 #        _log.debug('PRINT scale_stable_weight_changed(%s,%s) => step: %s', scale_nr, stable_weight, step)
 
         if abs(step) <= self.MIN_STABLE_WIGHT_CHANGE:
@@ -970,6 +982,8 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefl
                         self.green_task_scale == scale_nr)) and                                # step received on currently assigned scale
                     self.empty_bucket_placed(step, self.sm_green.current_weight_item.weight)): # empty green bucket recognized
 
+                self.sm_green.set_accuracy(self.aw.green_task_precision) # update the GreenStateMachine/Display accuracy
+
                 if self.sm_green.current_state in {GreenWeighingState.cancel_weighing1,GreenWeighingState.cancel_weighing2}:
                     # if task got canceled and cancel timer is still running we stop it here
 #                    self.signal_green_task_scale(STATE_ACTION.CANCEL_EXIT) # not needed as new reservation is immediately following with corresponding signalling
@@ -996,8 +1010,10 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefl
                     if self.green_task_container1_registered_weight > 0:
                         # bucket swapped
                         self.scale_manager.signal_user_scale1_signal.emit(STATE_ACTION.SWAP_EXIT)
+                        _log.debug('BatchManager: bucket placed on scale 1: bucket swapped')
                     else:
                         self.scale_manager.signal_user_scale1_signal.emit(STATE_ACTION.ASSIGNED_GREEN)
+                        _log.debug('BatchManager: bucket placed on scale 1: %s',self.green_task_container1_registered_weight)
                     # make state transition (which then triggers the display update)
                     self.sm_green.send('bucket_placed')
                 elif scale_nr == 2:
@@ -1010,8 +1026,10 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefl
                     if self.green_task_container1_registered_weight > 0:
                         # bucket swapped
                         self.scale_manager.signal_user_scale2_signal.emit(STATE_ACTION.SWAP_EXIT)
+                        _log.debug('BatchManager: bucket placed on scale 2: bucket swapped')
                     else:
                         self.scale_manager.signal_user_scale2_signal.emit(STATE_ACTION.ASSIGNED_GREEN)
+                        _log.debug('BatchManager: bucket placed on scale 2: %s',self.green_task_container1_registered_weight)
                     # make state transition (which then triggers the display update)
                     self.sm_green.send('bucket_placed')
 
@@ -1060,6 +1078,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefl
 
             if (self.aw.two_bucket_mode and weight < batchsize * 1/3) or (not self.aw.two_bucket_mode and weight < batchsize * 0.5):
                 # case 1: bucket was almost empty (less than 1/3, in two-bucket-mode, or less than 50% in one-bucket-mode)
+                _log.debug('BatchManager: green bucket removed @ <50% or 1/3')
                 self.sm_green.send('bucket_removed')
 #                self.fetch_next_green() # a previous fetch_next_green update might have been blocked while processing, update now to the latest
                 self.sm_green.current_weight_item.callback('', 0) # trigger an refresh of the next weight_item, a previous fetch_next_green update might have been blocked while processing
@@ -1075,9 +1094,10 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefl
                 self.signal_green_task_scale(STATE_ACTION.SWAP_ENTER)
 
             elif self.green_task_container1_registered_weight != 0 and abs(weight - self.green_task_container1_registered_weight) < self.empty_scale_tolerance(scale_nr):
+                _log.debug('BatchManager: empty green bucket removed')
                 self.sm_green.send('bucket_removed')
 
-            elif self.aw.green_task_precision == 0: # precision is deactivated; all weights are accepted (overloading/underloading outside of target range); canceling deactivated
+            elif self.aw.green_task_precision <= 0: # precision is deactivated; all weights are accepted (overloading/underloading outside of target range); canceling deactivated
                 # case 3: bucket completely filled (precision deactivated) => done
                 self.task_done_step = step
                 self.task_done_weight = weight
@@ -1097,6 +1117,8 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefl
 
             else:
                 # task canceled
+                _log.debug('BatchManager: green bucket removed while weight %s out of accuracy +-%s. Task canceled.', weight, self.aw.green_task_precision/100 * batchsize)
+                _log.debug('BatchManager: not %s <= %s <= %s', weight, batchsize - (self.aw.green_task_precision/100 * batchsize), batchsize + (self.aw.green_task_precision/100 * batchsize))
                 self.task_canceled_step = step
                 self.cancel_green_task_timer.start(self.WAIT_BEFORE_CANCEL)
                 self.sm_green.send('task_canceled')
@@ -1109,8 +1131,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefl
             # weight removed completely, scale empty now
 
             if abs(self.roasted_task_scale_total_weight + step) < self.ROASTED_BUCKET_REMOVALE_TOLERANCE:
-                weight = int(round(self.roasted_task_scale_total_weight - self.aw.qmc.container_weights[self.aw.container2_idx]
-                            - self.roasted_task_empty_scale_weight))             # remove tare weight
+                weight = int(round(self.roasted_task_scale_total_weight - self.aw.qmc.container_weights[self.aw.container2_idx]))
                 self.roasted_task_done_weight = weight
                 self.sm_roasted.send('task_completed', self.roasted_task_done_weight)
                 self.signal_roasted_task_scale(STATE_ACTION.OK_ENTER)
@@ -1122,13 +1143,10 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefl
                 self.sm_roasted.current_weight_item.callback('', 0) # trigger an refresh of the next weight_item, a previous fetch_next_roasted update might have been blocked while processing, update now to the latest
 
         # independent on the step direction do always update the roasting weight while weighing the roasted container
-        if self.roasted_task_scale == scale_nr and self.sm_roasted.current_state == RoastedWeighingState.weighing:
+        if self.roasted_task_done_weight == 0 and self.roasted_task_scale == scale_nr and self.sm_roasted.current_state == RoastedWeighingState.weighing:
             # while roasting scale is in weighing state, we updated the
             self.roasted_task_scale_total_weight = stable_weight - self.roasted_task_empty_scale_weight
             self.sm_roasted.send('update',int(round(self.roasted_task_scale_total_weight - self.aw.qmc.container_weights[self.aw.container2_idx])))
-
-
-        # if stable_weight gets negative, limit tare to zero?
 
         # update stable weight
         if scale_nr == 1:
@@ -1372,15 +1390,18 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefl
         self.scale_manager.scale2_stable_weight_changed_signal.connect(self.scale2_stable_weight_changed_slot)
         self.scale_manager.scale2_weight_changed_signal.connect(self.scale2_weight_changed_slot)
         self.scale_manager.connect_all_signal.emit(self.aw.qmc.device_logging)
+        _log.debug('BatchManager started')
 
     def stop(self) -> None:
         self.reset()
         self.sm_green.send('reset')
         self.sm_roasted.send('reset')
-        self.scale_manager.disconnect_all_signal.emit()
+#        self.scale_manager.disconnect_all_signal.emit() # closing via signal does not work on app quite for unknown reasons thus we make a direct call
+        self.scale_manager.disconnect_all_slot()
         self.scale_manager.available_signal.disconnect(self.scales_available)
         self.scale_manager.unavailable_signal.disconnect(self.scales_unavailable)
         self.scale_manager.scale1_stable_weight_changed_signal.disconnect(self.scale1_stable_weight_changed_slot)
         self.scale_manager.scale1_weight_changed_signal.disconnect(self.scale1_weight_changed_slot)
         self.scale_manager.scale2_stable_weight_changed_signal.disconnect(self.scale2_stable_weight_changed_slot)
         self.scale_manager.scale2_weight_changed_signal.disconnect(self.scale2_weight_changed_slot)
+        _log.debug('BatchManager stopped')

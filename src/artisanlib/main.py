@@ -1679,7 +1679,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         self.scale1_id:Optional[str] = None    # the id, eg. the BT address (like "24:71:89:cc:09:05")
         self.container1_idx:int = -1 # -1: no container set; otherwise index into selected qmc.container_names/qmc.container_weights
         self.two_bucket_mode:bool = False # if True, the TaskManager allows to split green task weight into two buckets
-        self.green_task_precision:float = 1 # precision in percent (range [0.1 - 5%]; if set to 0 all "non-overlapping" weights are accepted)
+        self.green_task_precision:float = 10 # precision in percent (range [0.1 - 10%]; if set to 0 all "non-overlapping" weights are accepted)
         # scale2: just for green
         self.scale2_model:Optional[int] = None
         self.scale2_name:Optional[str] = None  # the display/local name of the device (like "ACAIA162FC")
@@ -20692,8 +20692,17 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         if self.scheduleFlag and self.schedule_window:
             tmp_Schedule = self.scheduleFlag # we keep the state to properly store it in the settings
             self.scheduler_auto_open = False
-            self.schedule_window.close()
+            self.schedule_window.closeWithoutDialog()
             self.scheduleFlag = tmp_Schedule
+        else:
+            # the scheduler closes the connection to all connected scales, but if that one is not active we might
+            # still be connected to some scales
+            try:
+                #self.scale_manager.disconnect_all_signal.emit()
+                # closing via signal does not work on app quite for unknown reasons thus we make a direct call
+                self.scale_manager.disconnect_all_slot()
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
 
         if self.LargeLCDsFlag and self.largeLCDs_dialog:
             tmp_LargeLCDs = self.LargeLCDsFlag # we keep the state to properly store it in the settings
@@ -20741,10 +20750,6 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
             self.qmc.stopPhidgetManager()
-        try:
-            self.scale_manager.disconnect_all_signal.emit()
-        except Exception as e: # pylint: disable=broad-except
-            _log.exception(e)
 
     # returns True if confirmed, False if canceled by the user
     def closeApp(self) -> bool:

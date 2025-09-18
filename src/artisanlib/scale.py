@@ -334,12 +334,14 @@ class ScaleManager(QObject): # pyrefly:ignore[invalid-inheritance] # pyright:ign
         if self.scale1 is not None:
             self.scale1.set_assigned(True)
             self.update_availability()
+            _log.debug('scale1 reserved')
 
     @pyqtSlot()
     def release_scale1_slot(self) -> None:
         if self.scale1 is not None:
             self.scale1.set_assigned(False)
             self.update_availability()
+            _log.debug('scale1 released')
 
 
     @pyqtSlot(list)
@@ -453,12 +455,14 @@ class ScaleManager(QObject): # pyrefly:ignore[invalid-inheritance] # pyright:ign
         if self.scale2 is not None:
             self.scale2.set_assigned(True)
             self.update_availability()
+            _log.debug('scale2 reserved')
 
     @pyqtSlot()
     def release_scale2_slot(self) -> None:
         if self.scale2 is not None:
             self.scale2.set_assigned(False)
             self.update_availability()
+            _log.debug('scale2 released')
 
 
     @pyqtSlot(list)
@@ -518,12 +522,14 @@ class ScaleManager(QObject): # pyrefly:ignore[invalid-inheritance] # pyright:ign
 
     @staticmethod
     def disconnect_scale(scale:Scale) -> None:
-        scale.signal_user(STATE_ACTION.DISCONNECTED)
-        libtime.sleep(0.2) # wait a moment to have the disconnect signal being sent to the user
-        scale.disconnect_scale()
+        if scale.is_connected():
+            scale.signal_user(STATE_ACTION.DISCONNECTED)
+            libtime.sleep(0.2) # wait a moment to have the disconnect signal being sent to the user
+            scale.disconnect_scale()
 
     @pyqtSlot()
     def disconnect_all_slot(self) -> None:
+        _log.debug('ScaleManager disconnect all')
         for scale in (self.scale1, self.scale2):
             if scale is not None:
                 self.disconnect_scale(scale)
