@@ -427,7 +427,7 @@ class ScaleManager(QObject): # pyrefly:ignore[invalid-inheritance] # pyright:ign
             if self.scale2 is not None:
                 self.scale2.scan()
 
-    @pyqtSlot()
+    @pyqtSlot(bool)
     def connect_scale2_slot(self, device_logging:bool) -> None:
         if self.scale2 is not None:
             self.scale2.connect_scale(device_logging)
