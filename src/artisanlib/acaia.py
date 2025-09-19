@@ -804,14 +804,14 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
             self.send_message(MSG.LED, payload)
 
     @staticmethod
-    def led_color_payload(cmd:LED_CMD, color:Color, value:int=0) -> bytes:
+    def led_color_payload(cmd:LED_CMD, color:Color, value:int=0, param:int=0) -> bytes:
         return bytes([
             cmd,
             value,
             max(0,min(255,color[0])),
             max(0,min(255,color[1])),
             max(0,min(255,color[2])),
-            0])
+            param])
 
     def send_default_effects_on(self) -> None:
         self.send_led_cmd(self.led_color_payload(LED_CMD.TOGGLE_DEFAULT_EFFECT, self.BLACK, 1))
@@ -1014,16 +1014,16 @@ class Acaia(Scale): # pyright: ignore [reportGeneralTypeIssues] # Argument to cl
     def signal_user(self, action:STATE_ACTION) -> None:
         if action == STATE_ACTION.DISCONNECTED:
             self.acaia.send_leds_wipe_off(self.acaia.MAGENTA)
+            self.acaia.send_default_effects_on()
         elif action == STATE_ACTION.CONNECTED:
+            self.acaia.send_default_effects_off()
             self.acaia.send_leds_halo(self.acaia.CYAN)
         elif action == STATE_ACTION.RELEASED:
             self.acaia.send_leds_breathe(self.acaia.MAGENTA)
-            self.acaia.send_default_effects_on()
         elif action == STATE_ACTION.ASSIGNED_GREEN:
             self.acaia.send_default_effects_off()
             self.acaia.send_leds_breathe(self.acaia.WHITE)
         elif action == STATE_ACTION.ASSIGNED_ROASTED:
-            self.acaia.send_default_effects_off()
             self.acaia.send_leds_breathe(self.acaia.BROWN)
         elif action == STATE_ACTION.ZONE_ENTER:
             self.acaia.send_leds_halo(self.acaia.LIGHT_BLUE)

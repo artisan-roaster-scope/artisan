@@ -1615,11 +1615,11 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.scale1Weight = QLabel() # displays the current reading
             self.scale1Weight.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
             self.scale1Weight.setMinimumWidth(60)
-            self.scale1Weight.setEnabled(False)
+            self.scale1Weight.setEnabled(self.scale1_was_connected)
             self.scale1TareButton = QPushButton(QApplication.translate('Button', 'Tare'))
             self.scale1TareButton.setToolTip(QApplication.translate('Tooltip','Tare your scale'))
             self.scale1TareButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-            self.scale1TareButton.setEnabled(False)
+            self.scale1TareButton.setEnabled(self.scale1_was_connected)
             if self.aw.scale1_model is None:
                 self.scale1NameComboBox.setEnabled(False)
                 self.scale1EditButton.setEnabled(False)
@@ -1681,11 +1681,11 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.scale2Weight = QLabel() # displays the current reading
             self.scale2Weight.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
             self.scale2Weight.setMinimumWidth(60)
-            self.scale2Weight.setEnabled(False)
+            self.scale2Weight.setEnabled(self.scale2_was_connected)
             self.scale2TareButton = QPushButton(QApplication.translate('Button', 'Tare'))
             self.scale2TareButton.setToolTip(QApplication.translate('Tooltip','Tare your scale'))
             self.scale2TareButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-            self.scale2TareButton.setEnabled(False)
+            self.scale2TareButton.setEnabled(self.scale2_was_connected)
             if self.aw.scale2_model is None:
                 self.scale2NameComboBox.setEnabled(False)
                 self.scale2EditButton.setEnabled(False)
@@ -2104,8 +2104,10 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         if 0 <= i < len(self.scale1_devices) and self.aw.scale1_model is not None:
             self.aw.scale1_name = self.scale1_devices[i][0]
             self.aw.scale1_id = self.scale1_devices[i][1]
-            self.aw.scale_manager.set_scale1_signal.emit(self.aw.scale1_model, self.aw.scale1_id, self.aw.scale1_name)
-            self.aw.scale_manager.connect_scale1_signal.emit(self.aw.qmc.device_logging)
+            if i != 0 or self.scale1NameComboBox.count() != 1 or not self.aw.scale_manager.is_scale1_connected():
+                # in case i==0 and there is only one entry and we are already connected, we don't disconnect that connection!
+                self.aw.scale_manager.set_scale1_signal.emit(self.aw.scale1_model, self.aw.scale1_id, self.aw.scale1_name)
+                self.aw.scale_manager.connect_scale1_signal.emit(self.aw.qmc.device_logging)
         # i == -1 if self.scale1NameComboBox is empty!
         else:
             self.aw.scale_manager.set_scale1_signal.emit(-1, '', '')
@@ -2220,8 +2222,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         if 0 <= i < len(self.scale2_devices) and self.aw.scale2_model is not None:
             self.aw.scale2_name = self.scale2_devices[i][0]
             self.aw.scale2_id = self.scale2_devices[i][1]
-            self.aw.scale_manager.set_scale2_signal.emit(self.aw.scale2_model, self.aw.scale2_id, self.aw.scale2_name)
-            self.aw.scale_manager.connect_scale2_signal.emit(self.aw.qmc.device_logging)
+            if i != 0 or self.scale2NameComboBox.count() != 1 or not self.aw.scale_manager.is_scale2_connected():
+                self.aw.scale_manager.set_scale2_signal.emit(self.aw.scale2_model, self.aw.scale2_id, self.aw.scale2_name)
+                self.aw.scale_manager.connect_scale2_signal.emit(self.aw.qmc.device_logging)
         # i == -1 if self.scale2NameComboBox is empty!
         else:
             self.aw.scale_manager.set_scale2_signal.emit(-1, '', '')
