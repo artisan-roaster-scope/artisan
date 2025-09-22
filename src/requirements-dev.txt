@@ -20,7 +20,7 @@ pre-commit>=4.3.0
 pytest>=8.4.2
 pytest-cov==7.0.0
 pytest-asyncio==1.2.0
-pytest-mock==3.15.0
+pytest-mock==3.15.1
 pytest-datadir==1.8.0
 #pytest-qt==4.4.0
 #pytest-xvfb==3.0.0
