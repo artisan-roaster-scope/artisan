@@ -80,6 +80,7 @@ class Scale(QObject): # pyrefly:ignore[invalid-inheritance] # pyright:ignore[rep
     scanned_signal = pyqtSignal(list)               # delivers discovered device details
     weight_changed_signal = pyqtSignal(float, bool) # delivers new weight in g with decimals for accurate
                                                     #   conversion and flag indicating stable readings
+    tare_pressed_signal = pyqtSignal()              # issued on tare button pressed
     battery_changed_signal = pyqtSignal(int)        # delivers new battery level in %
     connected_signal = pyqtSignal()                 # issued on connect
     disconnected_signal = pyqtSignal()              # issued on disconnect
@@ -188,12 +189,14 @@ class ScaleManager(QObject): # pyrefly:ignore[invalid-inheritance] # pyright:ign
     scale1_disconnected_signal = pyqtSignal()
     scale1_weight_changed_signal = pyqtSignal(int)         # in g
     scale1_stable_weight_changed_signal = pyqtSignal(int)  # in g
+    scale1_tare_pressed_signal = pyqtSignal()
 
     scale2_scanned_signal = pyqtSignal(list) # ScaleSpecs
     scale2_connected_signal = pyqtSignal()
     scale2_disconnected_signal = pyqtSignal()
     scale2_weight_changed_signal = pyqtSignal(int)         # in g
     scale2_stable_weight_changed_signal = pyqtSignal(int)  # in g
+    scale2_tare_pressed_signal = pyqtSignal()
 
     available_signal = pyqtSignal()    # issued if the first scale freshly connects or an already connected but assigned scale gets released from its assignment
     unavailable_signal = pyqtSignal()  # issued if the last available scale disconnects or gets assigned
@@ -273,6 +276,7 @@ class ScaleManager(QObject): # pyrefly:ignore[invalid-inheritance] # pyright:ign
                 self.scale1.connected_signal.disconnect(self.scale1_connected_slot)
                 self.scale1.disconnected_signal.disconnect(self.scale1_disconnected_slot)
                 self.scale1.weight_changed_signal.disconnect(self.scale1_weight_changed_slot)
+                self.scale1.tare_pressed_signal.disconnect(self.scale1_tare_pressed_slot)
                 #-
                 self.scale1.connected_signal.disconnect(self.update_availability)
                 self.scale1.disconnected_signal.disconnect(self.update_availability)
@@ -295,6 +299,7 @@ class ScaleManager(QObject): # pyrefly:ignore[invalid-inheritance] # pyright:ign
             self.scale1.connected_signal.connect(self.scale1_connected_slot)
             self.scale1.disconnected_signal.connect(self.scale1_disconnected_slot)
             self.scale1.weight_changed_signal.connect(self.scale1_weight_changed_slot)
+            self.scale1.tare_pressed_signal.connect(self.scale1_tare_pressed_slot)
             #-
             self.scale1.connected_signal.connect(self.update_availability)
             self.scale1.disconnected_signal.connect(self.update_availability)
@@ -358,7 +363,7 @@ class ScaleManager(QObject): # pyrefly:ignore[invalid-inheritance] # pyright:ign
     def scale1_disconnected_slot(self) -> None:
         self.scale1_disconnected_signal.emit()
 
-    ## try to catch a last non weight change and send as stable state
+    ## try to catch a last non-stable weight change and send as stable state
     # weight in g
     @pyqtSlot(float, bool)
     def scale1_weight_changed_slot(self, weight:float, stable:bool) -> None:
@@ -366,13 +371,18 @@ class ScaleManager(QObject): # pyrefly:ignore[invalid-inheritance] # pyright:ign
         if stable:
             self.scale1_last_weight = None # prevent earlier non-stable weights to be send delayed as stable via the timer
             # weights marked as stable by the scale are immediately forwarded as stable weights
+#            _log.debug("PRINT stable weight forwarded: %s", weight)
             self.scale1_stable_weight_changed_signal.emit(weight)
         else:
             self.scale1_last_weight = weight
             # fed into our stable weight timer system to ensure that the "last one" is also emitted as stable weight
             self.scale1_stable_reading_timer.start(STABLE_TIMER_PERIOD) # start/restart stable weight timer
             # non-stable weights are immediately forwarded as regular weight updates to keep the display fluid
+#            _log.debug("PRINT non-stable weight forwarded as stable: %s", weight)
             self.scale1_weight_changed_signal.emit(weight)
+
+    def scale1_tare_pressed_slot(self) -> None:
+        self.scale1_tare_pressed_signal.emit()
 
     @pyqtSlot()
     def scale1_stable_reading_timer_slot(self) -> None:
@@ -394,6 +404,7 @@ class ScaleManager(QObject): # pyrefly:ignore[invalid-inheritance] # pyright:ign
                 self.scale2.connected_signal.disconnect(self.scale2_connected_slot)
                 self.scale2.disconnected_signal.disconnect(self.scale2_disconnected_slot)
                 self.scale2.weight_changed_signal.disconnect(self.scale2_weight_changed_slot)
+                self.scale2.tare_pressed_signal.disconnect(self.scale2_tare_pressed_slot)
                 #-
                 self.scale2.connected_signal.disconnect(self.update_availability)
                 self.scale2.disconnected_signal.disconnect(self.update_availability)
@@ -416,6 +427,7 @@ class ScaleManager(QObject): # pyrefly:ignore[invalid-inheritance] # pyright:ign
             self.scale2.connected_signal.connect(self.scale2_connected_slot)
             self.scale2.disconnected_signal.connect(self.scale2_disconnected_slot)
             self.scale2.weight_changed_signal.connect(self.scale2_weight_changed_slot)
+            self.scale2.tare_pressed_signal.connect(self.scale2_tare_pressed_slot)
             #-
             self.scale2.connected_signal.connect(self.update_availability)
             self.scale2.disconnected_signal.connect(self.update_availability)
@@ -479,7 +491,7 @@ class ScaleManager(QObject): # pyrefly:ignore[invalid-inheritance] # pyright:ign
     def scale2_disconnected_slot(self) -> None:
         self.scale2_disconnected_signal.emit()
 
-    ## try to catch a last non weight change and send as stable state
+    ## try to catch a last non-stable weight change and send as stable state
     # weight in g
     @pyqtSlot(float, bool)
     def scale2_weight_changed_slot(self, weight:float, stable:bool) -> None:
@@ -494,6 +506,9 @@ class ScaleManager(QObject): # pyrefly:ignore[invalid-inheritance] # pyright:ign
             self.scale2_stable_reading_timer.start(STABLE_TIMER_PERIOD) # start/restart stable weight timer
             # non-stable weights are immediately forwarded as regular weight updates to keep the display fluid
             self.scale2_weight_changed_signal.emit(weight)
+
+    def scale2_tare_pressed_slot(self) -> None:
+        self.scale2_tare_pressed_signal.emit()
 
     @pyqtSlot()
     def scale2_stable_reading_timer_slot(self) -> None:

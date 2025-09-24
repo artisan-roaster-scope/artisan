@@ -1316,7 +1316,7 @@ class TestPIDDerivativeKickImprovements:
         assert pid.derivative_limit == 100.0
         assert pid.lastTarget == 0.0
         assert pid.measurement_history == []
-        assert pid.setpoint_changed is False
+        assert pid.setpoint_changed_significantly is False
 
     def test_setDerivativeLimit_updates_limit(self) -> None:
         """Test that setDerivativeLimit updates the derivative limit."""
@@ -1363,7 +1363,7 @@ class TestPIDDerivativeKickImprovements:
         with patch('time.time', return_value=1001.0):
             pid.update(52.0)
 
-        assert pid.setpoint_changed is True
+        assert pid.setpoint_changed_significantly is True
         assert pid.lastTarget == 100.0
 
     def test_setpoint_change_flag_clearing(self) -> None:
@@ -1380,13 +1380,13 @@ class TestPIDDerivativeKickImprovements:
         with patch('time.time', return_value=1001.0):
             pid.update(52.0)
 
-        assert pid.setpoint_changed is True
+        assert pid.setpoint_changed_significantly is True
 
         # Subsequent updates without setpoint change should clear flag
         with patch('time.time', return_value=1002.0):
             pid.update(54.0)
 
-        assert pid.setpoint_changed is False
+        assert pid.setpoint_changed_significantly is False
 
     def test_measurement_discontinuity_detection(self) -> None:
         """Test measurement discontinuity detection."""
@@ -1470,14 +1470,14 @@ class TestPIDDerivativeKickImprovements:
         # Set some state
         pid.lastTarget = 50.0
         pid.measurement_history = [1.0, 2.0, 3.0]
-        pid.setpoint_changed = True
+        pid.setpoint_changed_significantly = True
 
         pid.init()
 
         # Should be reset
         assert pid.lastTarget == pid.target
         assert pid.measurement_history == []
-        assert pid.setpoint_changed is False
+        assert pid.setpoint_changed_significantly is False
 
     def test_integration_with_existing_functionality(self) -> None:
         """Test that enhanced features integrate well with existing PID functionality."""
@@ -1565,6 +1565,7 @@ class TestPIDIntegralWindupImprovements:
         """Test that _should_integrate prevents integration during saturation."""
         pid = PID()
         pid.setLimits(0, 100)
+        pid.integral_just_reset = False
 
         # Should not integrate when output is saturated and error would make it worse
         assert not pid._should_integrate(10.0, 150.0)  # Positive error, output above max

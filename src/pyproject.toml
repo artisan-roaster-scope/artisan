@@ -425,7 +425,7 @@ include = [
 project_includes = [
     "artisanlib/*.py",
     "plus/*.py",
-    "test/**/*.py"
+#    "test/**/*.py"
 ]
 project_excludes = [
     "**/build*",

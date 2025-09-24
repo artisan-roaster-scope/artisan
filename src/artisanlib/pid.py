@@ -97,7 +97,6 @@ class PID:
         'lastTarget',
         'derivative_limit',
         'measurement_history',
-        'setpoint_changed',
         'setpoint_changed_significantly',
         'significant_setup_change_limit',
         'integral_windup_prevention',
@@ -169,20 +168,19 @@ class PID:
         self.measurement_history: List[float] = (
             []
         )  # Track recent measurements for discontinuity detection
-        self.setpoint_changed: bool = False  # Flag for recent setpoint changes
         self.setpoint_changed_significantly: bool = False # Flag for significant (> significant_setup_change_limit; disabled if significant_setup_change_limit<=0) setpoint changes used to reduce Dterm by 50%
-        self.significant_setup_change_limit:float = 15
+        self.significant_setup_change_limit:float = 15 # used for D; should be smaller than self.setpoint_change_threshold
 
         # Enhanced integral windup prevention
         self.integral_windup_prevention: bool = True  # Enable advanced windup prevention
         self.integral_limit_factor: float = 1.0  # Limit integral to 100% of output range
-        self.setpoint_change_threshold: float = 25.0  # Threshold for significant setpoint changes
+        self.setpoint_change_threshold: float = 25.0  # Threshold for significant setpoint changes (used for I)
         self.integral_reset_on_setpoint_change: bool = (
             True  # Reset integral on large setpoint changes
         )
         self.back_calculation_factor: float = 0.5  # Back-calculation adjustment factor
         self.integral_just_reset: bool = (
-            False  # Flag to prevent integration immediately after reset
+            True  # Flag to prevent integration immediately after reset
         )
 
     def _smooth_output(self, output: float) -> float:
@@ -251,6 +249,10 @@ class PID:
         # Basic derivative calculation
         dinput = current_input - self.lastInput
         dtinput = dinput / dt
+
+        # apply derative filter before estimating limits in DoM mode
+        if self.derivative_filter_level > 0:
+            dtinput = self.derivative_filter(dtinput)
 
         # Apply derivative limiting to prevent excessive derivative action
         if abs(dtinput) > self.derivative_limit:
@@ -370,15 +372,11 @@ class PID:
                 # Check if setpoint has changed since last update and handle integral
                 setpoint_change = self.target - self.lastTarget
                 if abs(setpoint_change) > 0.001:
-                    self.setpoint_changed = True
-                    if abs(setpoint_change) > self.significant_setup_change_limit > 0:
-                        self.setpoint_changed_significantly = True
-                    # Handle integral term for setpoint changes
+                    self.setpoint_changed_significantly = abs(setpoint_change) > self.significant_setup_change_limit > 0
                     self._handle_setpoint_change_integral(setpoint_change)
                     self.lastTarget = self.target
                 else:
                     # Gradually clear the setpoint changed flags
-                    self.setpoint_changed = False
                     self.setpoint_changed_significantly = False
 
                 derr = (err - self.lastError) / dt
@@ -405,11 +403,14 @@ class PID:
                 D: float
                 if self.derivative_on_error:
                     D = self.Kd * derr
+                    # apply derivative filter for DoE mode
+                    if self.derivative_filter_level > 0:
+                        D = self.derivative_filter(D)
                     # Apply derivative limiting for derivative-on-error mode too
                     if abs(D) > self.derivative_limit:
                         D = self.derivative_limit if D > 0 else -self.derivative_limit
                 else:
-                    # Use enhanced derivative-on-measurement calculation
+                    # Use enhanced derivative-on-measurement calculation (incl. derivative filtering)
                     D = self._calculate_derivative_on_measurement(i, dt)
 
                 # Update measurement history for discontinuity detection (after calculating D which calls detect discontinuity)
@@ -418,9 +419,6 @@ class PID:
                 self.lastTime = now
                 self.lastError = err
                 self.lastInput = i
-
-                if self.derivative_filter_level > 0:
-                    D = self.derivative_filter(D)
                 self.Dterm = D
                 output: float = self.Pterm + self.Iterm + self.Dterm
 
@@ -496,7 +494,6 @@ class PID:
             # Reset enhanced derivative kick prevention attributes
             self.lastTarget = self.target
             self.measurement_history = []
-            self.setpoint_changed = False
             self.setpoint_changed_significantly = False
 
             # Reset integral windup prevention state

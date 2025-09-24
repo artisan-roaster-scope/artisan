@@ -805,7 +805,7 @@ class TestWeightManager:
         # Arrange & Act & Assert
         assert weight.WeightManager.MIN_STABLE_WIGHT_CHANGE == 2
         assert weight.WeightManager.MIN_CUSTOM_EMPTY_BUCKET_WEIGHT == 15
-        assert weight.WeightManager.EMPTY_BUCKET_RECOGNITION_TOLERANCE_PERCENT == 1
+        assert weight.WeightManager.EMPTY_BUCKET_RECOGNITION_TOLERANCE_PERCENT == 5
         assert weight.WeightManager.MIN_EMPTY_BUCKET_RECOGNITION_TOLERANCE == 10
         assert weight.WeightManager.ROASTED_BUCKET_TOLERANCE == 15
         assert weight.WeightManager.TAP_CANCEL_THRESHOLD == 100

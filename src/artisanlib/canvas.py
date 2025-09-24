@@ -15052,6 +15052,8 @@ class tgraphcanvas(FigureCanvas):
                                     return
                             else:
                                 self.timeindex[6] = max(0,len(self.timex)-1)
+                            if self.aw.pidcontrol.pidOffDROP and self.aw.pidcontrol.pidActive: # Arduino/TC4, Hottop, MODBUS
+                                self.aw.pidcontrol.pidOff()
                         else:
                             tx,et,bt = self.aw.ser.NONE()
                             if et != -1 and bt != -1:

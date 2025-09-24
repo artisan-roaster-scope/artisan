@@ -4810,7 +4810,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.aw.sendmessage(message)
             #open serial conf Dialog
             #if device is not None or not external-program (don't need serial settings config)
-            if (self.aw.qmc.device not in self.aw.qmc.nonSerialDevices or (self.aw.qmc.device == 134 and self.aw.santokerSerial) or
+            if (self.aw.qmc.device not in self.aw.qmc.nonSerialDevices or (self.aw.qmc.device == 50) or (self.aw.qmc.device == 134 and self.aw.santokerSerial) or
                 (self.aw.qmc.device == 138 and self.aw.kaleidoSerial)) and self.TabWidget.currentIndex() in {0,1,6}:
                 QTimer.singleShot(700, self.aw.setcommport)
             self.close()

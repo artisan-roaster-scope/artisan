@@ -554,6 +554,10 @@ class PID_DlgControl(ArtisanDialog):
         self.startPIDonCHARGE.setToolTip(QApplication.translate('Tooltip', 'Automatically turn the PID ON on CHARGE'))
         self.startPIDonCHARGE.setChecked(self.aw.pidcontrol.pidOnCHARGE)
 
+        self.stopPIDonDROP = QCheckBox(QApplication.translate('CheckBox', 'Stop PID on DROP'))
+        self.stopPIDonDROP.setToolTip(QApplication.translate('Tooltip', 'Automatically turn the PID OFF on DROP'))
+        self.stopPIDonDROP.setChecked(self.aw.pidcontrol.pidOffDROP)
+
         self.createEvents = QCheckBox(QApplication.translate('CheckBox', 'Create Events'))
         self.createEvents.setChecked(self.aw.pidcontrol.createEvents)
         self.createEvents.setToolTip(QApplication.translate('Tooltip', 'Generated an event mark on each output slider change\ninitiated by the PID'))
@@ -566,6 +570,8 @@ class PID_DlgControl(ArtisanDialog):
 
         flagsLayout = QHBoxLayout()
         flagsLayout.addWidget(self.startPIDonCHARGE)
+        flagsLayout.addSpacing(10)
+        flagsLayout.addWidget(self.stopPIDonDROP)
         flagsLayout.addSpacing(10)
         flagsLayout.addWidget(self.createEvents)
         flagsLayout.addSpacing(10)
@@ -1300,6 +1306,7 @@ class PID_DlgControl(ArtisanDialog):
         self.aw.pidcontrol.setPID(kp,ki,kd,source,cycle)
         #
         self.aw.pidcontrol.pidOnCHARGE = self.startPIDonCHARGE.isChecked()
+        self.aw.pidcontrol.pidOffDROP = self.stopPIDonDROP.isChecked()
 #        self.aw.pidcontrol.RStimeAfterCHARGE = self.radioTimeAfterCHARGE.isChecked()
         self.aw.pidcontrol.loadpidfrombackground = self.loadPIDfromBackground.isChecked()
         self.aw.pidcontrol.createEvents = self.createEvents.isChecked()

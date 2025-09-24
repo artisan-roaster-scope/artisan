@@ -620,15 +620,15 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefl
 
     MIN_STABLE_WIGHT_CHANGE:Final[int] = 2                  # minimum stable weight changes being recognized in g
     MIN_CUSTOM_EMPTY_BUCKET_WEIGHT:Final[int] = 15          # minimum custom empty bucket weight recognized in g
-    MIN_EMPTY_BUCKET_WEIGHT:Final[int] = 300                # minimum empty bucket weight recognized in g
+    MIN_EMPTY_BUCKET_WEIGHT:Final[int] = 200                # minimum empty bucket weight recognized in g
     MAX_EMPTY_BUCKET_WEIGHT:Final[int] = 4000               # maximum empty bucket weight recognized in g
     MIN_EMPTY_BUCKET_WEIGHT_BATCH_PERECENT:Final[int] = 5   # minimum empty bucket weight percentage of batch size in %
     MAX_EMPTY_BUCKET_WEIGHT_BATCH_PERECENT:Final[int] = 25  # maximum empty bucket weight percentage of batch size in %
     MIN_EMPTY_BUCKET_RECOGNITION_TOLERANCE:Final[int] = 10  # +- minimal tolerance to recognize empty green bucket in g
-    EMPTY_BUCKET_RECOGNITION_TOLERANCE_PERCENT:Final[float] = 1     # +- tolerance to recognize empty green bucket in % of bucket weight
+    EMPTY_BUCKET_RECOGNITION_TOLERANCE_PERCENT:Final[float] = 5     # +- tolerance to recognize empty green bucket in % of bucket weight
     #-
     EMPTY_SCALE_RECOGNITION_TOLERANCE_TIGHT:Final[int] = 25 # +- tight tolerance to recognize empty scale in g for scale.readability() < 1g
-    EMPTY_SCALE_RECOGNITION_TOLERANCE_LOOSE:Final[int] = 40 # +- loose tolerance to recognize empty scale in g for scale.readability() >= 1g
+    EMPTY_SCALE_RECOGNITION_TOLERANCE_LOOSE:Final[int] = 60 # +- loose tolerance to recognize empty scale in g for scale.readability() >= 1g
     CANCELED_STEP_RECOGNITION_TOLERANCE:Final[int] = 15     # +- tolerance to recognize a previous 'task_cancel' step to restart via 'bucket_put_back' in g
     DONE_STEP_RECOGNITION_TOLERANCE:Final[int] = 15         # +- tolerance to recognize a previous 'task_completed' step to restart via 'bucket_put_back_done' in g
     SWAP_STEP_RECOGNITION_TOLERANCE:Final[int] = 15         # +- tolerance to recognize a previous 'bucket_swapped' step to restart via 'bucket_put_back_swapped' in g
@@ -868,7 +868,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefl
     # batchsize in kg
     #--
     # empty bucket weight needs in any case to be larger than WeightManager.MIN_CUSTOM_EMPTY_BUCKET_WEIGHT and smaller than roasted total weight of filled roasted bucket
-    # recognition tolerance is at least +-MIN_EMPTY_BUCKET_RECOGNITION_TOLERANCE and otherwise +-EMPTY_BUCKET_RECOGNITION_TOLERANCE percent of the
+    # recognition tolerance is at least +-MIN_EMPTY_BUCKET_RECOGNITION_TOLERANCE and otherwise +-EMPTY_BUCKET_RECOGNITION_TOLERANCE_PERCENT percent of the
     #   selected bucket or (-EMPTY_BUCKET_RECOGNITION_TOLERANCE percent of the min_bucket_weight and EMPTY_BUCKET_RECOGNITION_TOLERANCE of the max_bucket weight)
     # the bucket weight has to be
     #   +-WeightManager.MIN_EMPTY_BUCKET_RECOGNITION_TOLERANCE of the set green bucket weight if available
@@ -1317,6 +1317,16 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefl
             # blend component changed
             self.signal_green_task_scale(STATE_ACTION.COMPONENT_CHANGED)
 
+
+    @pyqtSlot()
+    def scale1_tare_pressed_slot(self) -> None:
+        _log.debug('PRINT ** scale1 tare pressed')
+        if self.green_task_scale == 1:
+            self.sm_green.send('reset')
+        elif self.roasted_task_scale == 1:
+            self.sm_roasted.send('reset')
+
+
     @pyqtSlot(int)
     def scale1_stable_weight_changed_slot(self, stable_weight:int) -> None:
 #        _log.debug('PRINT WM.scale1_stable_weight_changed_slot(%s)',stable_weight)
@@ -1350,6 +1360,17 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefl
             if (self.sm_roasted.current_state == RoastedWeighingState.done and
                  weight > self.roasted_task_empty_scale_weight + WeightManager.TAP_CANCEL_THRESHOLD):
                 self.tap_cancel_roasted_task_timer.start(WeightManager.TAP_CANCEL_PERIOD)
+
+
+
+
+    @pyqtSlot()
+    def scale2_tare_pressed_slot(self) -> None:
+        _log.debug('PRINT ** scale2 tare pressed')
+        if self.green_task_scale == 2:
+            self.sm_green.send('reset')
+        elif self.roasted_task_scale == 2:
+            self.sm_roasted.send('reset')
 
 
     @pyqtSlot(int)
@@ -1387,8 +1408,10 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefl
         self.scale_manager.unavailable_signal.connect(self.scales_unavailable)
         self.scale_manager.scale1_stable_weight_changed_signal.connect(self.scale1_stable_weight_changed_slot)
         self.scale_manager.scale1_weight_changed_signal.connect(self.scale1_weight_changed_slot)
+        self.scale_manager.scale1_tare_pressed_signal.connect(self.scale1_tare_pressed_slot)
         self.scale_manager.scale2_stable_weight_changed_signal.connect(self.scale2_stable_weight_changed_slot)
         self.scale_manager.scale2_weight_changed_signal.connect(self.scale2_weight_changed_slot)
+        self.scale_manager.scale2_tare_pressed_signal.connect(self.scale2_tare_pressed_slot)
         self.scale_manager.connect_all_signal.emit(self.aw.qmc.device_logging)
         _log.debug('BatchManager started')
 
@@ -1402,6 +1425,8 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefl
         self.scale_manager.unavailable_signal.disconnect(self.scales_unavailable)
         self.scale_manager.scale1_stable_weight_changed_signal.disconnect(self.scale1_stable_weight_changed_slot)
         self.scale_manager.scale1_weight_changed_signal.disconnect(self.scale1_weight_changed_slot)
+        self.scale_manager.scale1_tare_pressed_signal.disconnect(self.scale1_tare_pressed_slot)
         self.scale_manager.scale2_stable_weight_changed_signal.disconnect(self.scale2_stable_weight_changed_slot)
         self.scale_manager.scale2_weight_changed_signal.disconnect(self.scale2_weight_changed_slot)
+        self.scale_manager.scale2_tare_pressed_signal.disconnect(self.scale2_tare_pressed_slot)
         _log.debug('BatchManager stopped')

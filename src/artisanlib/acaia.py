@@ -207,6 +207,7 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
 
     weight_changed_signal = pyqtSignal(float, bool) # delivers new weight in g with decimals for accurate conversion, and flag indicaating stable readings
     battery_changed_signal = pyqtSignal(int)  # delivers new batter level in %
+    tare_pressed_signal = pyqtSignal()   # issued on pressing the physical tare button
     connected_signal = pyqtSignal()     # issued on connect
     disconnected_signal = pyqtSignal()  # issued on disconnect
 
@@ -550,6 +551,7 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
 
         if payload[0] == KEY_INFO.TARE:
             _log.debug('tare key')
+            self.tare_pressed_signal.emit()
         elif payload[0] == KEY_INFO.START:
             _log.debug('start timer key')
         elif payload[0] == KEY_INFO.STOP:
@@ -862,20 +864,27 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
 
     def slow_notifications(self) -> None:
         _log.debug('slow notifications')
-        self.send_event(
-            bytes([ # pairs of key/setting
-                    0,  # weight id
-                    (0 if self.scale_class == SCALE_CLASS.RELAY # 0: only weight changes are reported; 1: streaming weight changes at 1/10
-                     else 3), # 0, 1, 3, 5, 7, 15, 31, 63, 127  # weight argument (speed of notifications in 1/10 sec; 0:  report changes in weight every 1/10)
-                        # 5 or 7 seems to be good values for this app in Artisan
-#                    1,   # battery id
-#                    255, #2,  # battery argument (if 0 : fast, 1 : slow)
-#                    2,  # timer id
-#                    255, #5,  # timer argument (number of heartbeats between timer messages)
-#                    3,  # key id
-#                    255, #4   # request to receive key events
-                ])
-                )
+        if self.scale_class == SCALE_CLASS.RELAY:
+            self.send_event(
+                bytes([ # pairs of key/setting
+                        0,  # weight id
+                        0 # 0: only weight changes are reported; 1: streaming weight changes at 1/10
+                          # 0, 1, 3, 5, 7, 15, 31, 63, 127  # weight argument (speed of notifications in 1/10 sec; 0:  report changes in weight every 1/10)
+                          # 5 or 7 seems to be good values for this app in Artisan
+                    ]))
+        else:
+            self.send_event(
+                bytes([ # pairs of key/setting
+                        0,  # weight id
+                        3,  # 0, 1, 3, 5, 7, 15, 31, 63, 127  # weight argument (speed of notifications in 1/10 sec; 0:  report changes in weight every 1/10)
+                            # 5 or 7 seems to be good values for this app in Artisan
+    #                    1,   # battery id
+    #                    255, #2,  # battery argument (if 0 : fast, 1 : slow)
+    #                    2,  # timer id
+    #                    255, #5,  # timer argument (number of heartbeats between timer messages)
+                        3,  # key id
+                        255, #4   # request to receive key events
+                    ]))
         self.slow_notifications_sent = True
 
     def fast_notifications(self) -> None:
@@ -954,6 +963,7 @@ class Acaia(Scale): # pyright: ignore [reportGeneralTypeIssues] # Argument to cl
         super().__init__(model, ident, name)
         self.acaia = AcaiaBLE(connected_handler = connected_handler, disconnected_handler=disconnected_handler, stable_only=stable_only, decimals=decimals)
         self.acaia.weight_changed_signal.connect(self.weight_changed)
+        self.acaia.tare_pressed_signal.connect(self.tare_pressed)
         self.acaia.connected_signal.connect(self.on_connect)
         self.acaia.disconnected_signal.connect(self.on_disconnect)
         self.stable_only = stable_only
@@ -988,6 +998,10 @@ class Acaia(Scale): # pyright: ignore [reportGeneralTypeIssues] # Argument to cl
     def weight_changed(self, new_value:float, stable:bool) -> None:
         self.weight_changed_signal.emit(new_value, stable)
 
+    @pyqtSlot()
+    def tare_pressed(self) -> None:
+        self.tare_pressed_signal.emit()
+
     def battery_changed(self, new_value:int) -> None:
         self.battery_changed_signal.emit(new_value)
 
@@ -1012,6 +1026,7 @@ class Acaia(Scale): # pyright: ignore [reportGeneralTypeIssues] # Argument to cl
 
     # signal state actions to the user
     def signal_user(self, action:STATE_ACTION) -> None:
+#        _log.debug("PRINT signal_user(%s)", action)
         if action == STATE_ACTION.DISCONNECTED:
             self.acaia.send_leds_wipe_off(self.acaia.MAGENTA)
             self.acaia.send_default_effects_on()
@@ -1021,7 +1036,6 @@ class Acaia(Scale): # pyright: ignore [reportGeneralTypeIssues] # Argument to cl
         elif action == STATE_ACTION.RELEASED:
             self.acaia.send_leds_breathe(self.acaia.MAGENTA)
         elif action == STATE_ACTION.ASSIGNED_GREEN:
-            self.acaia.send_default_effects_off()
             self.acaia.send_leds_breathe(self.acaia.WHITE)
         elif action == STATE_ACTION.ASSIGNED_ROASTED:
             self.acaia.send_leds_breathe(self.acaia.BROWN)

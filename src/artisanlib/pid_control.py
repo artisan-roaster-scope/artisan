@@ -1144,7 +1144,7 @@ class FujiPID:
 ###################################################################################
 
 class PIDcontrol:
-    __slots__ = [ 'aw', 'pidActive', 'sv', 'pidOnCHARGE', 'RStimeAfterCHARGE', 'loadpidfrombackground', 'createEvents', 'loadRampSoakFromProfile', 'loadRampSoakFromBackground', 'svLen', 'svLabel',
+    __slots__ = [ 'aw', 'pidActive', 'sv', 'pidOnCHARGE', 'pidOffDROP', 'RStimeAfterCHARGE', 'loadpidfrombackground', 'createEvents', 'loadRampSoakFromProfile', 'loadRampSoakFromBackground', 'svLen', 'svLabel',
             'svValues', 'svSync', 'svRamps', 'svSoaks', 'svActions', 'svBeeps', 'svDescriptions','svTriggeredAlarms',
             'RSLen', 'RS_svLabels', 'RS_svValues', 'RS_svRamps', 'RS_svSoaks',
             'RS_svActions', 'RS_svBeeps', 'RS_svDescriptions', 'svSlider', 'svButtons', 'svMode', 'svLookahead', 'dutySteps', 'svSliderMin', 'svSliderMax', 'svValue',
@@ -1159,6 +1159,7 @@ class PIDcontrol:
         self.sv:Optional[float] = None # the last sv send to the Arduino
         #
         self.pidOnCHARGE:bool = False
+        self.pidOffDROP:bool = False
         self.RStimeAfterCHARGE = False # if True RS time is taken from CHARGE if FALSE it is the time after the PID was last started
         self.loadpidfrombackground = False # if True, p-i-d parameters pidKp, pidKi, pidKd, pidSource, and svLookahead are set from the background profile
         self.createEvents:bool = False

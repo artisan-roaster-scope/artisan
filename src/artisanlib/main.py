@@ -18115,6 +18115,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             #restore TC4/Arduino PID settings
             settings.beginGroup('ArduinoPID')
             self.pidcontrol.pidOnCHARGE = toBool(settings.value('pidOnCHARGE',self.pidcontrol.pidOnCHARGE))
+            self.pidcontrol.pidOffDROP = toBool(settings.value('pidOffDROP',self.pidcontrol.pidOffDROP))
 #            self.pidcontrol.RStimeAfterCHARGE = toBool(settings.value('RStimeAfterCHARGE',self.pidcontrol.RStimeAfterCHARGE))
             self.pidcontrol.loadpidfrombackground = toBool(settings.value('loadpidfrombackground',self.pidcontrol.loadpidfrombackground))
             self.pidcontrol.createEvents = toBool(settings.value('createEvents',self.pidcontrol.createEvents))
@@ -19957,6 +19958,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             #save pid settings (only key and value[0])
             settings.beginGroup('ArduinoPID')
             self.settingsSetValue(settings, default_settings, 'pidOnCHARGE',self.pidcontrol.pidOnCHARGE, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'pidOffDROP',self.pidcontrol.pidOffDROP, read_defaults)
 #            self.settingsSetValue(settings, default_settings, 'RStimeAfterCHARGE',self.pidcontrol.RStimeAfterCHARGE, read_defaults)
             self.settingsSetValue(settings, default_settings, 'loadpidfrombackground',self.pidcontrol.loadpidfrombackground, read_defaults)
             self.settingsSetValue(settings, default_settings, 'createEvents',self.pidcontrol.createEvents, read_defaults)
