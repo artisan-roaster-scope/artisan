@@ -9,31 +9,34 @@ header:
   teaser: assets/images/shelly-logo.jpg
 ---
 
-# Shelly Pro 3EM
+# [Shelly Pro 3EM](https://www.shelly.com/products/shelly-pro-3em-3ct63){:target='_blank'}
 
 Artisan reads
 
 - with the extra device of type **`Shelly 3EM Pro Energy/Return`**
-   - total active energy on all phases (`total_act`), consumed or produced in [Wh]
-   - total active returned energy on all phases (`total_act_ret`), fed back into the grid in [Wh]
+   - total active energy on all phases (`total_act`), consumed or produced [Wh]
+   - total active returned energy on all phases (`total_act_ret`), fed back into the grid [Wh]
 - with the extra device of type **`Shelly 3EM Pro Power/S`**
-   - sum of the active power on all phases (`total_act_power`) in [W]
-   - sum of the apparent power on all phases(`total_aprt_power`) in [VA]
+   - sum of the active power on all phases (`total_act_power`) [W]
+   - sum of the apparent power on all phases(`total_aprt_power`) [VA]
 
  via simple RPC from the host specified in the Devices dialog under `Network >> Shelly Pro 3EM`.
 
 
-# Shelly Plus Plug
+# [Shelly Plus Plug](https://www.shelly.com/products/shelly-plug-s-gen3){:target='_blank'}
 
 
 Artisan reads
 
-- with the extra device of type **`Shelly Plus Plug Total/Last`**
-   - total energy consumed (`aenergy.total`) in [Wh]
-   - last minutes energy comsumption (`aenergy[0]`) in [mW]
-- with the extra device of type **`Shelly Plus Plug Power/Temp`**
-   - Last measured instantaneous active power (`apower`) in [W]
-   - device temperature (`temperature.tC`) in C
+- with the extra device of type **`Shelly Plug Total/Last`**
+   - total energy consumed (`aenergy.total`) [Wh]
+   - last minutes energy comsumption (`aenergy[0]`) [mW]
+- with the extra device of type **`Shelly Plug Power/Temp`**
+   - last measured instantaneous active power (`apower`) [W]
+   - device temperature (`temperature.tC`) [C]
+- with the extra device of type **`Shelly Plug Voltage/Current`**
+   - voltage (`voltage`) [V]
+   - current (`current`) [A]
 
 
 via simple RPC from the host specified in the Devices dialog under `Network >> Shelly Plus Plug`.

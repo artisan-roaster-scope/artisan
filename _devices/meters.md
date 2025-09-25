@@ -17,9 +17,13 @@ Some of these devices come with an internal serial-2-USB interface, while others
 
 Any of these meters require a serial device driver installed that allows the computer to communicate with the serial-2-USB chip implemented by the hardware interface. Most common are
 
-+ [VCP from FTDI](http://www.ftdichip.com/Drivers/VCP.htm)
++ [VCP from FTDI](http://www.ftdichip.com/Drivers/VCP.htm) (preinstalled on Linux/macOS/Windows)
 + [CP210x from Silicon Labs](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers)
 + [PL2303 from Prolific](http://www.prolific.com.tw/US/ShowProduct.aspx?p_id=225&pcid=41)
++ __CH34x__:
+  - Windows: [http://www.wch.cn/download/CH341SER_EXE.html](http://www.wch.cn/download/CH341SER_EXE.html)
+  - macOS: [http://www.wch.cn/downloads/file/178.html](http://www.wch.cn/downloads/file/178.html)
+  - Linux: [http://www.wch.cn/download/CH341SER_LINUX_ZIP.html](http://www.wch.cn/download/CH341SER_LINUX_ZIP.html)
 
 **Watch out!** The FTDI driver is preinstalled on virtually all Linux distributions as well as all OS X versions supported by Artisan. Installing an additional FTDI driver on those operating system might lead to instabilities!
 {: .notice--primary}
@@ -137,6 +141,11 @@ Those 4 channel meters in the list below are all basically identical. Just that 
   - Built in USB to serial converter (9600-8N1)
   - 3 x 1.5V AAA Batteries
   - USB Driver: [CP210x from Silicon Labs](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers)
+* [Tasi TA612C](https://www.tasimeter.com/environmental-tester/contact-thermometer/data-logging-thermoucouple-thermometer.html)
+  - Four K/J-Type
+  - Built in USB to serial converter (9600-8N1)
+  - 3 * 1.5V AA batteries or USB power
+  - USB Driver [CH341 USB](http://www.wch.cn/)
  
 ## Multi Meters
 
