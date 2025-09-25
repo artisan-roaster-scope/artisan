@@ -174,7 +174,7 @@ class WindowsDlg(ArtisanDialog):
         # fixmaxtime flag
         self.fixmaxtimeFlag = QCheckBox(QApplication.translate('CheckBox', 'Expand'))
         self.fixmaxtimeFlag.setChecked(not self.aw.qmc.fixmaxtime)
-        self.fixmaxtimeFlag.setToolTip(QApplication.translate('Tooltip', 'Automatically extend the time axis by 3min on need'))
+        self.fixmaxtimeFlag.setToolTip(QApplication.translate('Tooltip', 'Automatically extend the timeline as needed'))
         # locktimex flag
         self.locktimexFlag = QCheckBox(QApplication.translate('CheckBox', 'Lock'))
         self.locktimexFlag.setChecked(self.aw.qmc.locktimex)

@@ -4444,7 +4444,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ##########################
                 ####  DEVICE 183 is +Shelly Plug Voltage/Current
                 ##########################
-                elif meter == 'TASI TA6712C' and self.aw.qmc.device != 184:
+                elif meter == 'TASI TA612C' and self.aw.qmc.device != 184:
                     self.aw.qmc.device = 184
                     #self.aw.ser.comport = "COM4"
                     self.aw.ser.baudrate = 9600
@@ -4454,7 +4454,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.ser.timeout = 0.7
                     message = QApplication.translate('Message','Device set to {0}, which is equivalent to CENTER 309. Now, choose serial port').format(meter)
                 ##########################
-                ####  DEVICE 184 is +TASI TA6712C 34 but +DEVICE cannot be set as main device
+                ####  DEVICE 184 is +TASI TA612C 34 but +DEVICE cannot be set as main device
                 ##########################
 
                 # ADD DEVICE:

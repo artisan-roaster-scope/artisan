@@ -302,7 +302,7 @@ class tgraphcanvas(FigureCanvas):
         'wheelaspect', 'samplingSemaphore', 'updateGraphicsSemaphore', 'profileDataSemaphore', 'messagesemaphore', 'errorsemaphore', 'serialsemaphore', 'seriallogsemaphore',
         'eventactionsemaphore', 'updateBackgroundSemaphore', 'alarmSemaphore', 'rampSoakSemaphore', 'crossmarker', 'crossmouseid', 'onreleaseid',
         'analyzer_connect_id', 'extra309T3', 'extra309T4', 'extra309TX', 'hottop_ET', 'hottop_BT', 'hottop_HEATER', 'hottop_MAIN_FAN', 'hottop_TX',
-        'extraTASI_TA6712C_TX', 'extraTASI_TA6712C_T4', 'extraTASI_TA6712C_T3',
+        'extraTASI_TA612C_TX', 'extraTASI_TA612C_T3', 'extraTASI_TA612C_T4',
         'R1_DT', 'R1_BT', 'R1_BT_ROR', 'R1_EXIT_TEMP', 'R1_HEATER', 'R1_FAN', 'R1_DRUM', 'R1_VOLTAGE', 'R1_TX', 'R1_STATE', 'R1_FAN_RPM', 'R1_STATE_STR',
         'shellyPlusPlug_TX', 'shellyPlusPlug_Power', 'shellyPlusPlug_Temp', 'shellyPlusPlug_Voltage', 'shellyPlusPlug_Current',
         'extraArduinoTX', 'extraArduinoT1', 'extraArduinoT2', 'extraArduinoT3', 'extraArduinoT4', 'extraArduinoT5', 'extraArduinoT6', 'program_t3', 'program_tx', 'program_t4', 'program_t5', 'program_t6',
@@ -925,8 +925,8 @@ class tgraphcanvas(FigureCanvas):
                        '+Shelly 3EM Pro Power/S',       #181
                        '+Shelly Plug Power/Temp',       #182
                        '+Shelly Plug Voltage/Current',  #183
-                       'TASI TA6712C',              #184
-                       '+TASI TA6712C 34'           #185
+                       'TASI TA612C',               #184
+                       '+TASI TA612C 34'            #185
                        ]
 
         # ADD DEVICE:
@@ -2206,10 +2206,10 @@ class tgraphcanvas(FigureCanvas):
         self.extra309T4:float = -1
         self.extra309TX:float = 0.
 
-        #temporary storage to pass values. Holds extra T3 and T4 values for TASI TA6712C
-        self.extraTASI_TA6712C_T3:float = -1
-        self.extraTASI_TA6712C_T4:float = -1
-        self.extraTASI_TA6712C_TX:float = 0.
+        #temporary storage to pass values. Holds extra T3 and T4 values for TASI TA612C
+        self.extraTASI_TA612C_T3:float = -1
+        self.extraTASI_TA612C_T4:float = -1
+        self.extraTASI_TA612C_TX:float = 0.
 
         #temporary storage to pass values. Holds all values retrieved from a Hottop roaster
         self.hottop_ET:float = -1
@@ -4961,8 +4961,8 @@ class tgraphcanvas(FigureCanvas):
                         #readjust xlimit of plot if needed
                         if  not self.fixmaxtime and not self.locktimex:
                             now = (sample_timex[-1] if self.timeindex[0] == -1 else sample_timex[-1] - sample_timex[self.timeindex[0]])
-                            if now > (self.endofx - 45):            # if difference is smaller than 45 seconds
-                                self.endofx = int(now + 180.)       # increase x limit by 3 minutes
+                            if now > (self.endofx - 45*self.delay/1000):         # if difference is smaller than 45 seconds on 1sec sampling interval
+                                self.endofx = now + 3*60*self.delay/1000    # increase x limit by 3 minutes (180.) if sampling interval is 1sec
                                 self.xaxistosm()
                         if self.ETprojectFlag or self.BTprojectFlag:
                             self.updateProjection()

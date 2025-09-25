@@ -559,8 +559,8 @@ class serialport:
                                    self.Shelly3EMPro_ActivePower_ApparentPower, #181
                                    self.ShellyPlusPlug_Power_Temperature,       #182
                                    self.ShellyPlusPlug_Voltage_Current,         #183
-                                   self.TASI_TA6712C,         #184
-                                   self.TASI_TA6712C_34       #185
+                                   self.TASI_TA612C,          #184
+                                   self.TASI_TA612C_34        #185
                                    ]
         #string with the name of the program for device #27
         self.externalprogram:str = 'test.py'
@@ -1574,14 +1574,14 @@ class serialport:
         t2,t1 = self.CENTER302temperature()
         return tx,t2,t1
 
-    def TASI_TA6712C(self) -> Tuple[float,float,float]:
+    def TASI_TA612C(self) -> Tuple[float,float,float]:
         tx = self.aw.qmc.timeclock.elapsedMilli()
-        t1,t2 = self.TA6712C_temperatures()
+        t1,t2 = self.TA612C_temperatures()
         return tx,t1,t2 # ET, BT
 
-    def TASI_TA6712C_34(self) -> Tuple[float,float,float]:
-        #return saved readings collected at self.TA6712C()
-        return self.aw.qmc.extraTASI_TA6712C_TX,self.aw.qmc.extraTASI_TA6712C_T4,self.aw.qmc.extraTASI_TA6712C_T3
+    def TASI_TA612C_34(self) -> Tuple[float,float,float]:
+        #return saved readings collected at self.TA612C()
+        return self.aw.qmc.extraTASI_TA612C_TX,self.aw.qmc.extraTASI_TA612C_T4,self.aw.qmc.extraTASI_TA612C_T3
 
     def VOLTCRAFTK204(self) -> Tuple[float,float,float]:
         tx = self.aw.qmc.timeclock.elapsedMilli()
@@ -3091,8 +3091,8 @@ class serialport:
                 settings = str(self.comport) + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + str(self.parity) + ',' + str(self.stopbits) + ',' + str(self.timeout)
                 self.aw.addserial('H506: ' + settings + ' || Tx = ' + cmd2str(binascii.hexlify(command)) + ' || Rx = ' + cmd2str(binascii.hexlify(r)))
 
-    # TASI TA6712C
-    def TA6712C_temperatures(self, retry:int = 1) -> Tuple[float, float]: # pyrefly: ignore[bad-return]
+    # TASI TA612C
+    def TA612C_temperatures(self, retry:int = 1) -> Tuple[float, float]: # pyrefly: ignore[bad-return]
         del retry
 
         # Construct the command frame
@@ -3128,13 +3128,13 @@ class serialport:
                     # Convert raw temperature values to Celsius
                     T1,T2,T3,T4 = ((temp / 10.0) for temp in temperatures)  # Divide by 10 to get the correct Celsius value
 
-                    self.aw.qmc.extraTASI_TA6712C_T3 = T3
-                    self.aw.qmc.extraTASI_TA6712C_T4 = T4
+                    self.aw.qmc.extraTASI_TA612C_T3 = T3
+                    self.aw.qmc.extraTASI_TA612C_T4 = T4
 
                     return T1, T2
 
                 nbytes = len(line)
-                error = QApplication.translate('Error Message','TA6712C(): {0} bytes received but 13 needed').format(nbytes)
+                error = QApplication.translate('Error Message','TA612C(): {0} bytes received but 13 needed').format(nbytes)
                 timez = str(QDateTime.currentDateTime().toString('hh:mm:ss.zzz'))    #zzz = milliseconds
                 self.aw.qmc.adderror(timez + ' ' + error)
                 return -1,-1
@@ -3142,7 +3142,7 @@ class serialport:
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' TA6712C() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+            self.aw.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' TA612C() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             self.closeport()
             return -1,-1
         finally:
@@ -3150,7 +3150,7 @@ class serialport:
             if self.aw.seriallogflag:
                 import binascii
                 settings = str(self.comport) + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + str(self.parity) + ',' + str(self.stopbits) + ',' + str(self.timeout)
-                self.aw.addserial('TA6712C: ' + settings + ' || Tx = ' + cmd2str(binascii.hexlify(command_frame)) + ' || Rx = ' + cmd2str(binascii.hexlify(line)))
+                self.aw.addserial('TA612C: ' + settings + ' || Tx = ' + cmd2str(binascii.hexlify(command_frame)) + ' || Rx = ' + cmd2str(binascii.hexlify(line)))
 
     def CENTER302temperature(self,retry:int = 2) -> Tuple[float, float]: # pyrefly: ignore[bad-return]
         import binascii

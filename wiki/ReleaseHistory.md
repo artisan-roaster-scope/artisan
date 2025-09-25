@@ -52,6 +52,7 @@ v3.2.1
   - changes `COOL` in alarms to `COOL END` for consistency [PR #1976](../../../pull/1976))
   - remember loaded settings filename as default on save [PR #1975](../../../pull/1975))
   - BatchManager resets on tare triggered by button press on the Acaia scale
+  - automatic timeline extension now relative to sampling interval
 
 * FIXES
   - fixes regression which broke the designer such that points could not be moved ([Discussion #1905](../../../discussions/1905) and [Issue #1916](../../../issues/1916))
