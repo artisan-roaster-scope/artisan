@@ -401,6 +401,19 @@ class backgroundDlg(ArtisanResizeablDialog):
 
         self.playbackRampLabel = QLabel(QApplication.translate('Label', 'Ramp'))
 
+        rampLookaheadLabel = QLabel(QApplication.translate('Label','Lookahead'))
+
+        # Ramp Lookahead
+        self.rampLookahead = QSpinBox()
+        self.rampLookahead.setToolTip(QApplication.translate('Tooltip', 'On ramping the ramp value is taken with a positive time offset\nspecified by the lookahead'))
+        self.rampLookahead.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.rampLookahead.setRange(0,999)
+        self.rampLookahead.setSingleStep(1)
+        self.rampLookahead.setValue(self.aw.qmc.ramp_lookahead)
+        self.rampLookahead.setSuffix(' s')
+        self.rampLookahead.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.rampLookahead.valueChanged.connect(self.lookahead_changed)
+
         self.backgroundPlaybackRampEvent0 = QCheckBox(self.aw.qmc.etypesf(0))
         self.backgroundPlaybackRampEvent0.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.backgroundPlaybackRampEvent0.setChecked(self.aw.qmc.specialeventplaybackramp[0])
@@ -427,6 +440,10 @@ class backgroundDlg(ArtisanResizeablDialog):
 
         tab4content3 = QHBoxLayout()
         tab4content3.addStretch()
+        tab4content3.addWidget(rampLookaheadLabel)
+        tab4content3.addSpacing(8)
+        tab4content3.addWidget(self.rampLookahead)
+        tab4content3.addSpacing(20)
         tab4content3.addWidget(self.playbackRampLabel)
         tab4content3.addSpacing(10)
         tab4content3.addWidget(self.backgroundPlaybackRampEvent0)
@@ -519,6 +536,10 @@ class backgroundDlg(ArtisanResizeablDialog):
         # we set the active tab with a QTimer after the tabbar has been rendered once, as otherwise
         # some tabs are not rendered at all on Windows using Qt v6.5.1 (https://bugreports.qt.io/projects/QTBUG/issues/QTBUG-114204?filter=allissues)
         QTimer.singleShot(50, self.setActiveTab)
+
+    @pyqtSlot(int)
+    def lookahead_changed(self, i:int) -> None:
+        self.aw.qmc.ramp_lookahead = i
 
     @pyqtSlot(int)
     def tabSwitched(self, i:int) -> None:

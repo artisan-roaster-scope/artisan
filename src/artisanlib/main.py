@@ -17695,6 +17695,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             self.qmc.specialeventplaybackaid = [toBool(x) for x in toList(settings.value('specialeventplaybackaid',self.qmc.specialeventplaybackaid))]
             self.qmc.specialeventplayback = [toBool(x) for x in toList(settings.value('specialeventplayback',self.qmc.specialeventplayback))]
             self.qmc.specialeventplaybackramp = [toBool(x) for x in toList(settings.value('specialeventplaybackramp',self.qmc.specialeventplaybackramp))]
+            self.qmc.ramp_lookahead = toBool(settings.value('ramp_lookahead',self.qmc.ramp_lookahead))
 
             #restore phases
             self.qmc.phases = [toInt(x) for x in toList(settings.value('Phases',self.qmc.phases))]
@@ -19705,6 +19706,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             self.settingsSetValue(settings, default_settings, 'specialeventplaybackaid',self.qmc.specialeventplaybackaid, read_defaults)
             self.settingsSetValue(settings, default_settings, 'specialeventplayback',self.qmc.specialeventplayback, read_defaults)
             self.settingsSetValue(settings, default_settings, 'specialeventplaybackramp',self.qmc.specialeventplaybackramp, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'ramp_lookahead',self.qmc.ramp_lookahead, read_defaults)
             self.settingsSetValue(settings, default_settings, 'Phases',self.qmc.phases, read_defaults)
             #save phasesbuttonflag
             self.settingsSetValue(settings, default_settings, 'phasesbuttonflag',self.qmc.phasesbuttonflag, read_defaults)

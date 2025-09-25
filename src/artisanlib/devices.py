@@ -3765,7 +3765,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     message = QApplication.translate('Message','Device set to {0}. Now, check Serial Port settings').format(meter)
 # +DEVICEs cannot be set as main device
                 ##########################
-                ####  DEVICE 24 is +VOLTCRAFT 204_34 but +DEVICE cannot be set as main device
+                ####  DEVICE 24 is +VOLTCRAFT 204 34 but +DEVICE cannot be set as main device
                 ##########################
                 ##########################
                 ####  DEVICE 25 is +Virtual but +DEVICE cannot be set as main device
@@ -4444,6 +4444,19 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ##########################
                 ####  DEVICE 183 is +Shelly Plug Voltage/Current
                 ##########################
+                elif meter == 'TASI TA6712C' and self.aw.qmc.device != 184:
+                    self.aw.qmc.device = 184
+                    #self.aw.ser.comport = "COM4"
+                    self.aw.ser.baudrate = 9600
+                    self.aw.ser.bytesize = 8
+                    self.aw.ser.parity= 'N'
+                    self.aw.ser.stopbits = 1
+                    self.aw.ser.timeout = 0.7
+                    message = QApplication.translate('Message','Device set to {0}, which is equivalent to CENTER 309. Now, choose serial port').format(meter)
+                ##########################
+                ####  DEVICE 184 is +TASI TA6712C 34 but +DEVICE cannot be set as main device
+                ##########################
+
                 # ADD DEVICE:
 
                 # ensure that by selecting a real device, the initial sampling rate is set to 3s
@@ -4645,7 +4658,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 1, # 180
                 1, # 181
                 1, # 182
-                1  # 183
+                1, # 183
+                3, # 184
+                3  # 185
                 ]
             #init serial settings of extra devices
             for i, _ in enumerate(self.aw.qmc.extradevices):

@@ -302,6 +302,7 @@ class tgraphcanvas(FigureCanvas):
         'wheelaspect', 'samplingSemaphore', 'updateGraphicsSemaphore', 'profileDataSemaphore', 'messagesemaphore', 'errorsemaphore', 'serialsemaphore', 'seriallogsemaphore',
         'eventactionsemaphore', 'updateBackgroundSemaphore', 'alarmSemaphore', 'rampSoakSemaphore', 'crossmarker', 'crossmouseid', 'onreleaseid',
         'analyzer_connect_id', 'extra309T3', 'extra309T4', 'extra309TX', 'hottop_ET', 'hottop_BT', 'hottop_HEATER', 'hottop_MAIN_FAN', 'hottop_TX',
+        'extraTASI_TA6712C_TX', 'extraTASI_TA6712C_T4', 'extraTASI_TA6712C_T3',
         'R1_DT', 'R1_BT', 'R1_BT_ROR', 'R1_EXIT_TEMP', 'R1_HEATER', 'R1_FAN', 'R1_DRUM', 'R1_VOLTAGE', 'R1_TX', 'R1_STATE', 'R1_FAN_RPM', 'R1_STATE_STR',
         'shellyPlusPlug_TX', 'shellyPlusPlug_Power', 'shellyPlusPlug_Temp', 'shellyPlusPlug_Voltage', 'shellyPlusPlug_Current',
         'extraArduinoTX', 'extraArduinoT1', 'extraArduinoT2', 'extraArduinoT3', 'extraArduinoT4', 'extraArduinoT5', 'extraArduinoT6', 'program_t3', 'program_tx', 'program_t4', 'program_t5', 'program_t6',
@@ -325,7 +326,7 @@ class tgraphcanvas(FigureCanvas):
         'custom_event_dlg_default_type', 'custom_event_dlg_default_type', 'foreground_event_ind', 'foreground_event_last_picked_ind',
         'foreground_event_last_picked_pos', 'background_event_ind', 'background_event_pos', 'background_event_pick_position',
         'background_event_last_picked_ind', 'background_event_last_picked_pos',
-        'foreground_event_pos', 'plus_lockSchedule_sent_account', 'plus_lockSchedule_sent_date', 'specialeventplaybackramp',
+        'foreground_event_pos', 'plus_lockSchedule_sent_account', 'plus_lockSchedule_sent_date', 'specialeventplaybackramp', 'ramp_lookahead',
         'CO2kg_per_BTU_default', 'CO2kg_per_BTU', 'Biogas_CO2_Reduction', 'Biogas_CO2_Reduction_default',
         'meterunitnames', 'meterreads_default', 'meterreads', 'meterlabels_setup', 'meterlabels', 'meterunits_setup', 'meterunits',
         'meterfuels_setup', 'meterfuels', 'metersources_setup', 'metersources', 'playbackdrop_min_roasttime', 'TP_max_roasttime'
@@ -923,7 +924,9 @@ class tgraphcanvas(FigureCanvas):
                        '+Shelly Plug Energy/Last',      #180
                        '+Shelly 3EM Pro Power/S',       #181
                        '+Shelly Plug Power/Temp',       #182
-                       '+Shelly Plug Voltage/Current'   #183
+                       '+Shelly Plug Voltage/Current',  #183
+                       'TASI TA6712C',              #184
+                       '+TASI TA6712C 34'           #185
                        ]
 
         # ADD DEVICE:
@@ -1744,6 +1747,7 @@ class tgraphcanvas(FigureCanvas):
         self.specialeventplaybackaid:List[bool] = [True, True, True, True]          # per event type decides if playback aid is active (note that eventtype 4 "--" is not replayed)
         self.specialeventplayback:List[bool] = [True, True, True, True]             # per event type decides if background events are play-backed or not
         self.specialeventplaybackramp:List[bool] = [False, False, False, False]     # per event type decides if playback ramping is applied or not
+        self.ramp_lookahead:int = 0 # lookahead of ramping event replay in seconds
         self.overlappct:int = 100
 
         #curve styles
@@ -2201,6 +2205,11 @@ class tgraphcanvas(FigureCanvas):
         self.extra309T3:float = -1
         self.extra309T4:float = -1
         self.extra309TX:float = 0.
+
+        #temporary storage to pass values. Holds extra T3 and T4 values for TASI TA6712C
+        self.extraTASI_TA6712C_T3:float = -1
+        self.extraTASI_TA6712C_T4:float = -1
+        self.extraTASI_TA6712C_TX:float = 0.
 
         #temporary storage to pass values. Holds all values retrieved from a Hottop roaster
         self.hottop_ET:float = -1
@@ -6405,7 +6414,8 @@ class tgraphcanvas(FigureCanvas):
                                             if last_time <= now <= next_time:
                                                 # we ramp only within the limits
                                                 coefficients = numpy.polyfit([last_time, next_time], [last_event_value, next_event_value], 1)
-                                                ramps[event_type] = numpy.poly1d(coefficients)(now)
+#                                                ramps[event_type] = numpy.poly1d(coefficients)(now)
+                                                ramps[event_type] = numpy.poly1d(coefficients)(now + self.aw.qmc.ramp_lookahead)
 
                 # now move the sliders to the new values (if any)
                 for k,v in slider_events.items():

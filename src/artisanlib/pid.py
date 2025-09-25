@@ -97,6 +97,7 @@ class PID:
         'lastTarget',
         'derivative_limit',
         'measurement_history',
+        'max_len_measurement_history',
         'setpoint_changed_significantly',
         'significant_setup_change_limit',
         'integral_windup_prevention',
@@ -168,6 +169,7 @@ class PID:
         self.measurement_history: List[float] = (
             []
         )  # Track recent measurements for discontinuity detection
+        self.max_len_measurement_history: Final[int] = 5
         self.setpoint_changed_significantly: bool = False # Flag for significant (> significant_setup_change_limit; disabled if significant_setup_change_limit<=0) setpoint changes used to reduce Dterm by 50%
         self.significant_setup_change_limit:float = 15 # used for D; should be smaller than self.setpoint_change_threshold
 
@@ -228,7 +230,7 @@ class PID:
 
         # Calculate recent rate of change
         recent_changes = []
-        for i in range(1, min(len(self.measurement_history), 4)):
+        for i in range(1, min(len(self.measurement_history), (self.max_len_measurement_history - 1))):
             change = abs(self.measurement_history[-i] - self.measurement_history[-i - 1])
             recent_changes.append(change)
 
@@ -272,7 +274,7 @@ class PID:
         """Update measurement history for discontinuity detection."""
         self.measurement_history.append(current_input)
         # Keep only last 5 measurements
-        if len(self.measurement_history) > 5:
+        if len(self.measurement_history) > self.max_len_measurement_history:
             self.measurement_history.pop(0)
 
     def _should_integrate(self, error: float, output_before_clamp: float) -> bool:
@@ -367,7 +369,7 @@ class PID:
                 self.lastTime = now
                 self.lastError = err
                 self.lastInput = i
-            elif (dt := now - self.lastTime) >= 0.1:
+            elif (dt := now - self.lastTime) >= 0.05:
 
                 # Check if setpoint has changed since last update and handle integral
                 setpoint_change = self.target - self.lastTarget
@@ -607,7 +609,7 @@ class PID:
         return LiveSosFilter(
             iirfilter(
                 1,  # order
-                Wn=0.2,  # 0 < Wn < fs/2 (fs=1 -> fs/2=0.5)
+                Wn=0.1,  # 0 < Wn < fs/2 (fs=1 -> fs/2=0.5) # cut-off frequency
                 fs=1,  # sampling rate, Hz
                 btype='low',
                 ftype='butter',
