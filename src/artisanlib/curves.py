@@ -1045,7 +1045,7 @@ class CurvesDlg(ArtisanDialog):
         self.polyfitRoRflag.setChecked(self.polyfitRoR)
         self.polyfitRoRflag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.polyfitRoRflag.stateChanged.connect(self.polyfitRoRflagChanged)
-        regextime = QRegularExpression(r'^[0-5][0-9]:[0-5][0-9]$')
+        regextime = QRegularExpression(r'^-?[0-9]?[0-9]?[0-9][:,h][0-5][0-9]$')
         self.startEdit.setValidator(QRegularExpressionValidator(regextime,self))
         self.startEdit.setText('00:00')
         self.endEdit.setValidator(QRegularExpressionValidator(regextime,self))

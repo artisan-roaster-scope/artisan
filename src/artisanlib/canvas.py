@@ -7519,6 +7519,9 @@ class tgraphcanvas(FigureCanvas):
         else:
             starttime = 0
         sign = '' if x >= starttime else '-'
+        if self.aw.qmc.xgrid >= 3600: # hours/days timeaxis step selected, output in hh:mm
+            m,s = divmod(abs((x - starttime)/60), 60.)
+            return f'{sign}{m:.0f}h{int(s):02.0f}'
         m,s = divmod(abs(x - starttime), 60.)
         return f'{sign}{m:.0f}:{int(s):02.0f}'
 
@@ -15926,7 +15929,7 @@ class tgraphcanvas(FigureCanvas):
                             if self.weight[1]:
                                 msg += f'{sep}%{float2float(self.aw.weight_loss(self.weight[0],self.weight[1]), self.aw.percent_decimals)}-'
                         if totaltime > 0:
-                            msg = f'{msg}{sep}{stringfromseconds(totaltime)}'
+                            msg = f'{msg}{sep}{stringfromseconds(totaltime, leadingzero=False)}{sep}|'
                         if self.beans and self.beans != '':
                             msg = f"{msg}{sep}{abbrevString(self.beans.replace(chr(10),' '),25)}"
                         msg += sep
@@ -15940,7 +15943,7 @@ class tgraphcanvas(FigureCanvas):
                         if self.beans and self.beans != '':
                             msg = f"{msg}{sep}{abbrevString(self.beans.replace(chr(10),' '),25)}"
                         if totaltime > 0:
-                            msg = f'{msg}{sep}{stringfromseconds(totaltime)}'
+                            msg = f'{msg}{sep}|{sep}{stringfromseconds(totaltime, leadingzero=False)}'
                         if self.weight[0]:
                             weight_idx = weight_units.index(self.weight[2])
                             msg += f'{sep}{render_weight(self.weight[0], weight_idx, weight_idx)}'

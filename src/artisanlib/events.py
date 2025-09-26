@@ -770,18 +770,6 @@ class EventsDlg(ArtisanResizeablDialog):
         slidertemptitlelabel.setFont(titlefont)
         sliderunittitlelabel = QLabel(QApplication.translate('Label','Unit'))
         sliderunittitlelabel.setFont(titlefont)
-        self.E1visibility = QCheckBox(self.aw.qmc.etypesf(0))
-        self.E1visibility.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.E1visibility.setChecked(bool(self.aw.eventslidervisibilities[0]))
-        self.E2visibility = QCheckBox(self.aw.qmc.etypesf(1))
-        self.E2visibility.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.E2visibility.setChecked(bool(self.aw.eventslidervisibilities[1]))
-        self.E3visibility = QCheckBox(self.aw.qmc.etypesf(2))
-        self.E3visibility.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.E3visibility.setChecked(bool(self.aw.eventslidervisibilities[2]))
-        self.E4visibility = QCheckBox(self.aw.qmc.etypesf(3))
-        self.E4visibility.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.E4visibility.setChecked(bool(self.aw.eventslidervisibilities[3]))
         self.sliderActionTypes = ['',#QApplication.translate("ComboBox", "None"),
                        QApplication.translate('ComboBox', 'Serial Command'),
                        QApplication.translate('ComboBox', 'Modbus Command'),
@@ -1005,6 +993,26 @@ class EventsDlg(ArtisanResizeablDialog):
         self.sliderAlternativeLayoutFlag = QCheckBox(QApplication.translate('CheckBox','Alternative Layout'))
         self.sliderAlternativeLayoutFlag.setToolTip(QApplication.translate('Tooltip', 'Group Slider 1 with Slider 4 and Slider 2 with Slider 3'))
         self.sliderAlternativeLayoutFlag.setChecked(self.aw.eventsliderAlternativeLayout)
+        self.E1visibility = QCheckBox(self.aw.qmc.etypesf(0))
+        self.E1visibility.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.E1visibility.stateChanged.connect(self.slider1_visibility_changed)
+        self.E1visibility.setChecked(bool(self.aw.eventslidervisibilities[0]))
+        self.E2visibility = QCheckBox(self.aw.qmc.etypesf(1))
+        self.E2visibility.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.E2visibility.stateChanged.connect(self.slider2_visibility_changed)
+        self.E2visibility.setChecked(bool(self.aw.eventslidervisibilities[1]))
+        self.E3visibility = QCheckBox(self.aw.qmc.etypesf(2))
+        self.E3visibility.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.E3visibility.stateChanged.connect(self.slider3_visibility_changed)
+        self.E3visibility.setChecked(bool(self.aw.eventslidervisibilities[2]))
+        self.E4visibility = QCheckBox(self.aw.qmc.etypesf(3))
+        self.E4visibility.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.E4visibility.stateChanged.connect(self.slider4_visibility_changed)
+        self.E4visibility.setChecked(bool(self.aw.eventslidervisibilities[3]))
+        self.slider1_visibility_changed(0)
+        self.slider2_visibility_changed(0)
+        self.slider3_visibility_changed(0)
+        self.slider4_visibility_changed(0)
         ## tab4
         qeventtitlelabel = QLabel(QApplication.translate('Label','Event'))
         qeventtitlelabel.setFont(titlefont)
@@ -1753,6 +1761,81 @@ class EventsDlg(ArtisanResizeablDialog):
         # we set the active tab with a QTimer after the tabbar has been rendered once, as otherwise
         # some tabs are not rendered at all on Windows using Qt v6.5.1 (https://bugreports.qt.io/projects/QTBUG/issues/QTBUG-114204?filter=allissues)
         QTimer.singleShot(50, self.setActiveTab)
+
+    @pyqtSlot(int)
+    def slider1_visibility_changed(self, _:int) -> None:
+        self.slider_visiblity_changed(0)
+    @pyqtSlot(int)
+    def slider2_visibility_changed(self, _:int) -> None:
+        self.slider_visiblity_changed(1)
+    @pyqtSlot(int)
+    def slider3_visibility_changed(self, _:int) -> None:
+        self.slider_visiblity_changed(2)
+    @pyqtSlot(int)
+    def slider4_visibility_changed(self, _:int) -> None:
+        self.slider_visiblity_changed(3)
+
+    def slider_visiblity_changed(self, slider:int) -> None:
+        if slider == 0:
+            for widget in [
+                    self.E1action,
+                    self.E1command,
+                    self.E1_min,
+                    self.E1_max,
+                    self.E1offset,
+                    self.E1factor,
+                    self.E1slider_bernoulli,
+                    self.E1slider_step,
+                    self.E1slider_temp,
+                    self.E1unit,
+                    self.E1_calc
+                    ]:
+                widget.setEnabled(self.E1visibility.isChecked())
+        elif slider == 1:
+            for widget in [
+                    self.E2action,
+                    self.E2command,
+                    self.E2_min,
+                    self.E2_max,
+                    self.E2offset,
+                    self.E2factor,
+                    self.E2slider_bernoulli,
+                    self.E2slider_step,
+                    self.E2slider_temp,
+                    self.E2unit,
+                    self.E2_calc
+                    ]:
+                widget.setEnabled(self.E2visibility.isChecked())
+        elif slider == 2:
+            for widget in [
+                    self.E3action,
+                    self.E3command,
+                    self.E3_min,
+                    self.E3_max,
+                    self.E3offset,
+                    self.E3factor,
+                    self.E3slider_bernoulli,
+                    self.E3slider_step,
+                    self.E3slider_temp,
+                    self.E3unit,
+                    self.E3_calc
+                    ]:
+                widget.setEnabled(self.E3visibility.isChecked())
+        elif slider == 3:
+            for widget in [
+                    self.E4action,
+                    self.E4command,
+                    self.E4_min,
+                    self.E4_max,
+                    self.E4offset,
+                    self.E4factor,
+                    self.E4slider_bernoulli,
+                    self.E4slider_step,
+                    self.E4slider_temp,
+                    self.E4unit,
+                    self.E4_calc
+                    ]:
+                widget.setEnabled(self.E4visibility.isChecked())
 
     @pyqtSlot()
     def quantifier_toggle(self) -> None:

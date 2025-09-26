@@ -97,7 +97,7 @@ class WindowsDlg(ArtisanDialog):
         self.xlimitEdit_min.setMaximumWidth(55)
         self.xlimitEdit_min.setMinimumWidth(55)
         self.xlimitEdit_min.setAlignment(Qt.AlignmentFlag.AlignRight)
-        regextime = QRegularExpression(r'^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$')
+        regextime = QRegularExpression(r'^-?[0-9]?[0-9]?[0-9][:,h][0-5][0-9]$')
         self.xlimitEdit.setValidator(QRegularExpressionValidator(regextime,self))
         self.xlimitEdit_min.setValidator(QRegularExpressionValidator(regextime,self))
         self.ylimitEdit = QLineEdit()
@@ -116,13 +116,13 @@ class WindowsDlg(ArtisanDialog):
         self.zlimitEdit_min.setValidator(QIntValidator(int(self.aw.qmc.zlimit_min_max), int(self.aw.qmc.zlimit_max), self.zlimitEdit_min))
         self.zlimitEdit.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.zlimitEdit_min.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
-        self.xlimitEdit.setText(stringfromseconds(self.aw.qmc.endofx))
+        self.xlimitEdit.setText(stringfromseconds(self.aw.qmc.endofx, leadingzero=False))
 
         self.xlimitEdit.editingFinished.connect(self.xlimitChanged)
         if self.aw.qmc.timeindex[0] != -1:
-            self.xlimitEdit_min.setText(stringfromseconds(self.aw.qmc.startofx - self.aw.qmc.timex[self.aw.qmc.timeindex[0]]))
+            self.xlimitEdit_min.setText(stringfromseconds(self.aw.qmc.startofx - self.aw.qmc.timex[self.aw.qmc.timeindex[0]], leadingzero=False))
         else:
-            self.xlimitEdit_min.setText(stringfromseconds(self.aw.qmc.startofx))
+            self.xlimitEdit_min.setText(stringfromseconds(self.aw.qmc.startofx, leadingzero=False))
         self.xlimitEdit_min.editingFinished.connect(self.xlimitMinChanged)
         self.ylimitEdit.setText(str(self.aw.qmc.ylimit))
         self.ylimitEdit.editingFinished.connect(self.ylimitChanged)
@@ -157,9 +157,8 @@ class WindowsDlg(ArtisanDialog):
         self.resetEdit.setMaximumWidth(50)
         self.resetEdit.setMinimumWidth(50)
         self.resetEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
-        regextime = QRegularExpression(r'^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$')
         self.resetEdit.setValidator(QRegularExpressionValidator(regextime,self))
-        self.resetEdit.setText(stringfromseconds(self.aw.qmc.resetmaxtime))
+        self.resetEdit.setText(stringfromseconds(self.aw.qmc.resetmaxtime, leadingzero=False))
         self.resetEdit.setToolTip(QApplication.translate('Tooltip', 'Time axis max on start of a recording'))
         # CHARGE min
         chargeminlabel = QLabel(QApplication.translate('Label', 'RECORD') + '   ' + QApplication.translate('Label', 'Min'))
@@ -168,7 +167,7 @@ class WindowsDlg(ArtisanDialog):
         self.chargeminEdit.setMinimumWidth(50)
         self.chargeminEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.chargeminEdit.setValidator(QRegularExpressionValidator(regextime,self))
-        self.chargeminEdit.setText(stringfromseconds(self.aw.qmc.chargemintime))
+        self.chargeminEdit.setText(stringfromseconds(self.aw.qmc.chargemintime, leadingzero=False))
         self.chargeminEdit.setToolTip(QApplication.translate('Tooltip', 'Time axis min on start of a recording'))
 
         # fixmaxtime flag
@@ -637,11 +636,11 @@ class WindowsDlg(ArtisanDialog):
         else:
             t_min,t_max = self.aw.calcAutoAxisForeground()
         if self.aw.qmc.timeindex[0] != -1:
-            self.xlimitEdit_min.setText(stringfromseconds(t_min - self.aw.qmc.timex[self.aw.qmc.timeindex[0]]))
-            self.xlimitEdit.setText(stringfromseconds(t_max - self.aw.qmc.timex[self.aw.qmc.timeindex[0]]))
+            self.xlimitEdit_min.setText(stringfromseconds(t_min - self.aw.qmc.timex[self.aw.qmc.timeindex[0]], leadingzero=False))
+            self.xlimitEdit.setText(stringfromseconds(t_max - self.aw.qmc.timex[self.aw.qmc.timeindex[0]], leadingzero=False))
         else:
-            self.xlimitEdit_min.setText(stringfromseconds(t_min))
-            self.xlimitEdit.setText(stringfromseconds(t_max))
+            self.xlimitEdit_min.setText(stringfromseconds(t_min, leadingzero=False))
+            self.xlimitEdit.setText(stringfromseconds(t_max, leadingzero=False))
         self.xlimitEdit_min.repaint()
         self.xlimitEdit.repaint()
 
@@ -969,10 +968,10 @@ class WindowsDlg(ArtisanDialog):
         self.timeGridCheckBox.setChecked(False)
         self.tempGridCheckBox.setChecked(False)
         if len(self.aw.qmc.timex) > 1:
-            self.xlimitEdit.setText(stringfromseconds(self.aw.qmc.timex[-1]))
+            self.xlimitEdit.setText(stringfromseconds(self.aw.qmc.timex[-1], leadingzero=False))
         else:
-            self.xlimitEdit.setText(stringfromseconds(self.aw.qmc.endofx_default))
-        self.xlimitEdit_min.setText(stringfromseconds(self.aw.qmc.startofx_default))
+            self.xlimitEdit.setText(stringfromseconds(self.aw.qmc.endofx_default, leadingzero=False))
+        self.xlimitEdit_min.setText(stringfromseconds(self.aw.qmc.startofx_default, leadingzero=False))
 
         try:
             self.xaxislencombobox.setCurrentIndex(self.timeconversion.index(self.aw.qmc.xgrid_default))

@@ -648,7 +648,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.btu_list:List[BTU] = []
         self.energy_ui:Any = None
 
-        regextime = QRegularExpression(r'^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$')
+        regextime = QRegularExpression(r'^-?[0-9]?[0-9]?[0-9][:,h][0-5][0-9]$')
         #MARKERS
         chargelabel = QLabel('<b>' + QApplication.translate('Label', 'CHARGE') + '</b>')
         chargelabel.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
@@ -2995,7 +2995,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 self.energy_ui.meter2SourceComboBox.setCurrentIndex(self.aw.qmc.metersources[1])
 
             # input validators
-            regextime = QRegularExpression(r'^$|^[0-9]?[0-9]?[0-9]:[0-5][0-9]$') # includes the empty string to trigger editingFinished
+            regextime = QRegularExpression(r'^$|^[0-9]?[0-9]?[0-9]:[0-5][0-9]$') # includes the empty string to trigger editingFinished; does not support hh:mm input!!
             self.energy_ui.preheatDuration.setValidator(QRegularExpressionValidator(regextime,self))
             self.energy_ui.betweenBatchesDuration.setValidator(QRegularExpressionValidator(regextime,self))
             self.energy_ui.coolingDuration.setValidator(QRegularExpressionValidator(regextime,self))
@@ -4364,6 +4364,14 @@ class editGraphDlg(ArtisanResizeablDialog):
 
             #identify by color and add notation
             tableitem = self.datatable.item(i,0)
+
+#            font = QFont()
+#            font.setFamily("courier") # works on macOS
+##            font.setWeight(QFont.Weight.Bold) # works
+##            font.setStyleHint(QFont.StyleHint.TypeWriter) # does not work on macOS
+##            font.setStyleHint(QFont.StyleHint.Monospace) # does not work on macOS
+#            tableitem.setFont(font)
+
             if tableitem is not None:
                 if i == self.aw.qmc.timeindex[0] and i != -1:
                     tableitem.setBackground(QColor('#f07800'))

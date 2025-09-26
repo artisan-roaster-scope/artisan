@@ -55,7 +55,7 @@ class calculatorDlg(ArtisanDialog):
         endlabel = QLabel(QApplication.translate('Label', 'End (00:00)'))
         self.startEdit = QLineEdit()
         self.endEdit = QLineEdit()
-        regextime = QRegularExpression(r'^[0-5][0-9]:[0-5][0-9]$')
+        regextime = QRegularExpression(r'^-?[0-9]?[0-9]?[0-9][:,h][0-5][0-9]$')
         self.startEdit.setValidator(QRegularExpressionValidator(regextime,self))
         self.endEdit.setValidator(QRegularExpressionValidator(regextime,self))
         self.startEdit.editingFinished.connect(self.calculateRC)

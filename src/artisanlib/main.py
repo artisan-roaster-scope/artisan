@@ -3619,7 +3619,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         self.valueEdit.setToolTip(QApplication.translate('Tooltip', 'Value of event'))
         self.valueEdit.setMaximumWidth(50)
 
-        regextime = QRegularExpression(r'^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$')
+        regextime = QRegularExpression(r'^-?[0-9]?[0-9]?[0-9][:,h][0-5][0-9]$')
         self.etimeline: QLineEdit = QLineEdit()
         self.etimeline.setValidator(QRegularExpressionValidator(regextime,self))
         self.etimeline.setMaximumWidth(50)

@@ -413,6 +413,7 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.rampLookahead.setSuffix(' s')
         self.rampLookahead.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.rampLookahead.valueChanged.connect(self.lookahead_changed)
+        self.rampLookahead.setEnabled(self.aw.qmc.backgroundPlaybackEvents)
 
         self.backgroundPlaybackRampEvent0 = QCheckBox(self.aw.qmc.etypesf(0))
         self.backgroundPlaybackRampEvent0.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -614,6 +615,7 @@ class backgroundDlg(ArtisanResizeablDialog):
                 self.backgroundPlaybackEvent1,
                 self.backgroundPlaybackEvent2,
                 self.backgroundPlaybackEvent3,
+                self.rampLookahead
                 ]:
             widget.setEnabled(self.aw.qmc.backgroundPlaybackEvents)
         for i, widget in enumerate([

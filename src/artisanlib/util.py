@@ -143,33 +143,45 @@ def abbrevString(s:str, ll:int) -> str:
 
 # used to convert time from int seconds to string (like in the LCD clock timer). input int, output string xx:xx
 def stringfromseconds(seconds_raw:float, leadingzero:bool = True) -> str:
+    sep = ':'
+    if abs(seconds_raw)>60*60:
+        seconds_raw /= 60
+        sep = 'h'
     # seconds = int(round(seconds_raw)) # note that round(1.5)=round(2.5)=2
     seconds = int(math.floor(seconds_raw + 0.5))
     if seconds >= 0:
         d, m = divmod(seconds, 60)
         if leadingzero:
-            return f'{d:02d}:{m:02d}'
-        return f'{d:d}:{m:02d}'
+            return f'{d:02d}{sep}{m:02d}'
+        return f'{d:d}{sep}{m:02d}'
     #usually the timex[timeindex[0]] is already taken away in seconds before calling stringfromseconds()
     negtime = abs(seconds)
     d, m = divmod(negtime, 60)
     if leadingzero:
-        return f'-{d:02d}:{m:02d}'
-    return f'-{d:d}:{m:02d}'
+        return f'-{d:02d}{sep}{m:02d}'
+    return f'-{d:d}{sep}{m:02d}'
 
 # Converts a string into a seconds integer. Use for example to interpret times from Roaster Properties Dlg inputs
 # accepted formats: "00:00","-00:00"
 # raises ValueError or IndexError on invalid inputs
 def stringtoseconds(string:str) -> int:
-    timeparts = string.split(':')
+    timeparts = string.split(':') # mm:ss
+    hours:bool = False
     if len(timeparts) != 2:
-        raise ValueError(f"the string '{string}' is not a properly formatted time string of format xx:xx or -xx:xx")
+        timeparts = string.split('h') # hh:mm
+        if len(timeparts) != 2:
+            raise ValueError(f"the string '{string}' is not a properly formatted time string of format xx:xx or -xx:xx or xxhxx or -xxhxx")
+        hours = True
     if timeparts[0][0] != '-':  #if number is positive
         seconds = int(timeparts[1])
         seconds += int(timeparts[0])*60
+        if hours:
+            seconds *= 60
         return seconds
     seconds = int(timeparts[0])*60
     seconds -= int(timeparts[1])
+    if hours:
+        seconds *= 60
     return seconds    #return negative number
 
 def fromFtoCstrict(Ffloat:float) -> float:
