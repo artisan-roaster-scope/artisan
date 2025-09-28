@@ -10532,7 +10532,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                                         self.sendmessage(f'Artisan Command: {cs}')
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
-                            # pidLookahead(<n>) adds <n> to the current SV. Note that n can be negative
+                            # pidLookahead(<n>) : PID Lookahead <n> in seconds
                             elif cs.startswith('pidLookahead(') and cs.endswith(')'):
                                 try:
                                     lookahead = toInt(eval(cs[len('pidLookahead('):-1])) # pylint: disable=eval-used
@@ -10542,6 +10542,14 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                                     elif (self.pidcontrol and self.qmc.Controlbuttonflag): # MODBUS hardware PID
                                         self.pidcontrol.svLookahead = lookahead
                                         self.sendmessage(QApplication.translate('Message','PID Lookahead: {0}').format(self.pidcontrol.svLookahead))
+                                except Exception as e: # pylint: disable=broad-except
+                                    _log.exception(e)
+                            # replayLookahead(<n>) : Replay Lookahead <n> in seconds
+                            elif cs.startswith('replayLookahead(') and cs.endswith(')'):
+                                try:
+                                    lookahead = toInt(eval(cs[len('replayLookahead('):-1])) # pylint: disable=eval-used
+                                    self.qmc.ramp_lookahead = lookahead
+                                    self.sendmessage(QApplication.translate('Message','Replay Lookahead: {0}').format(self.qmc.ramp_lookahead))
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
                             # keyboard(<bool>) enable/disable keyboard mode
@@ -12209,7 +12217,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                     else:
                         self.releaseminieditor()
                         self.moveKbutton('enter')
-                elif k == Qt.Key.Key_Backspace: # 16777219:                #BACKSPACE (deletes last picked event)
+                elif k == Qt.Key.Key_Backspace: # 16777219:              #BACKSPACE (deletes last picked event)
                     if self.quickEventShortCut and len(self.quickEventShortCut[1])>0:
                         eventNr = self.quickEventShortCut[0]
                         self.quickEventShortCut = (eventNr, self.quickEventShortCut[1][:-1])
@@ -12286,7 +12294,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                         self.moveKbutton('right')
                     elif self.qmc.background and self.qmc.backgroundKeyboardControlFlag:
                         self.qmc.moveBackgroundSignal.emit('right',self.qmc.backgroundmovespeed)
-                elif k == Qt.Key.Key_Up: # 16777235:               #UP (moves background up)
+                elif k == Qt.Key.Key_Up: # 16777235:              #UP (moves background up)
                     if self.qmc.foreground_event_last_picked_ind is not None and self.qmc.foreground_event_last_picked_pos is not None:
                         # a foreground event is selected; move it up
                         self.qmc.move_custom_event(True, self.qmc.foreground_event_last_picked_ind, self.qmc.foreground_event_last_picked_pos, ystep=1)
@@ -12295,7 +12303,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                         self.qmc.move_custom_event(False, self.qmc.background_event_last_picked_ind, self.qmc.background_event_last_picked_pos, ystep=1)
                     elif self.qmc.background and self.qmc.backgroundKeyboardControlFlag:
                         self.qmc.moveBackgroundSignal.emit('up',self.qmc.backgroundmovespeed)
-                elif k == Qt.Key.Key_Down: # 16777237:               #DOWN (moves background down)
+                elif k == Qt.Key.Key_Down: # 16777237:            #DOWN (moves background down)
                     if self.qmc.foreground_event_last_picked_ind is not None and self.qmc.foreground_event_last_picked_pos is not None:
                         # a foreground event is selected; move it up
                         self.qmc.move_custom_event(True, self.qmc.foreground_event_last_picked_ind, self.qmc.foreground_event_last_picked_pos, ystep=-1)
@@ -17695,7 +17703,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             self.qmc.specialeventplaybackaid = [toBool(x) for x in toList(settings.value('specialeventplaybackaid',self.qmc.specialeventplaybackaid))]
             self.qmc.specialeventplayback = [toBool(x) for x in toList(settings.value('specialeventplayback',self.qmc.specialeventplayback))]
             self.qmc.specialeventplaybackramp = [toBool(x) for x in toList(settings.value('specialeventplaybackramp',self.qmc.specialeventplaybackramp))]
-            self.qmc.ramp_lookahead = toBool(settings.value('ramp_lookahead',self.qmc.ramp_lookahead))
+            self.qmc.ramp_lookahead = toInt(settings.value('ramp_lookahead',self.qmc.ramp_lookahead))
 
             #restore phases
             self.qmc.phases = [toInt(x) for x in toList(settings.value('Phases',self.qmc.phases))]

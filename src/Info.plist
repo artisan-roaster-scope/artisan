@@ -149,6 +149,8 @@
 	<string>Artisan wants to access bluetooth</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>
 	<string>Artisan wants to access bluetooth</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Artisan uses the local network to connect to roasting machines and other supported devices.</string>
 	<key>NSHighResolutionCapable</key>
 	<true/>
 	<key>NSHumanReadableCopyright</key>

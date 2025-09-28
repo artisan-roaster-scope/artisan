@@ -1210,7 +1210,7 @@ class PIDcontrol:
         # => PoM removed in v3.1.2
         ## further pid configurations (only supported by the software pid currently)
         self.pidDoE:bool = False          # classical Derivative on Error (DoE) if True, otherwise Derivative on Measurement (DoM) to reduce derivative kick
-        self.pidDlimit:float = 100.0      # derivative limit [0-999] (used for both, DoM and DoE)
+        self.pidDlimit:float = 500.0      # derivative limit [0-999] (used for both, DoM and DoE)
         self.pidIlimitFactor:float = 1    # integral limit factor [0-1]
         self.pidIWP:bool = False          # Advanced Integral Windup Prevention
         self.pidIRoC:bool = False         # Reset integral on large setpoint changes
@@ -1464,6 +1464,7 @@ class PIDcontrol:
                 self.pidActive = True
                 self.aw.qmc.pid.on()
                 self.aw.buttonCONTROL.setStyleSheet(self.aw.pushbuttonstyles['PIDactive'])
+                self.aw.qmc.pid.setTarget(self.svValue,init=False)
         if self.sv is None and self.svMode == 0: # only in manual SV mode we initialize the SV on PID ON
             self.setSV(self.svValue)
 
