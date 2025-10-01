@@ -11,19 +11,19 @@ author_profile: false
 
 gallery:
   - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.2.0/artisan-linux-3.2.0.AppImage
-    image_path: /assets/images/download-icon-linux-AppImage.png
+    image_path: /assets/images/download-icon-linux-AppImage.svg
     alt: "Linux AppImage"
     title: "Linux AppImage"
   - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.2.0/artisan-linux-3.2.0.deb
-    image_path: /assets/images/download-icon-linux-deb.png
+    image_path: /assets/images/download-icon-linux-deb.svg
     alt: "Linux deb"
     title: "Linux deb"
   - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.2.0/artisan-linux-3.2.0.rpm
-    image_path: /assets/images/download-icon-linux-rpm.png
+    image_path: /assets/images/download-icon-linux-rpm.svg
     alt: "Linux rpm"
     title: "Linux rpm"
   - url: https://flathub.org/apps/org.artisan_scope.artisan
-    image_path: /assets/images/download-icon-linux-Flatpack.png
+    image_path: /assets/images/download-icon-linux-Flatpack.svg
     alt: "Linux Flatpack"
     title: "Linux Flatpack"
 

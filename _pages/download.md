@@ -12,30 +12,30 @@ author_profile: false
 
 gallery:
   - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.2.0/artisan-win-x64-3.2.0-setup.exe
-    image_path: /assets/images/download-icon-windows.png
+    image_path: /assets/images/download-icon-windows.svg
     alt: "Windows"
     title: "Windows"
   - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.2.0/artisan-mac-3.2.0.dmg
-    image_path: /assets/images/download-icon-macos.png
+    image_path: /assets/images/download-icon-macos.svg
     alt: "macOS"
     title: "macOS"
   - url: /download-linux/
-    image_path: /assets/images/download-icon-linux.png
+    image_path: /assets/images/download-icon-linux.svg
     alt: "Linux"
     title: "Linux"
     
 
 gallery_legacy:
   - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.2.0/artisan-win-x64-legacy-3.2.0-setup.exe
-    image_path: /assets/images/download-icon-windows-legacy.png
+    image_path: /assets/images/download-icon-windows-legacy.svg
     alt: "Windows legacy"
     title: "Windows legacy"
   - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.2.0/artisan-mac-legacy-3.2.0.dmg
-    image_path: /assets/images/download-icon-macos-legacy.png
+    image_path: /assets/images/download-icon-macos-legacy.svg
     alt: "macOS legacy"
     title: "macOS legacy"
   - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.2.0/artisan-linux-3.2.0_PiOS64-bookworm.deb
-    image_path: /assets/images/download-icon-rpi.png
+    image_path: /assets/images/download-icon-rpi.svg
     alt: "RPi"
     title: "RPi"
 
@@ -57,8 +57,9 @@ release_sponsor:
 ---
 Help keep **<span style="color: #4C97C3;">artisan</span>** free for personal and commercial use by [sending a donation](/donate) 
 {: style="text-align: center; font-size: smaller; font-style: oblique;" }
-[![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/artisan-roaster-scope)
-{: style="text-align: center;" }
+<p style="text-align: center;"><a aria-label="Donate to keep Artisan free and going" href="https://github.com/sponsors/artisan-roaster-scope"><img src="https://img.shields.io/static/v1?label=Sponsor&amp;message=%E2%9D%A4&amp;logo=GitHub&amp;color=%23fe8e86" alt="GitHub Sponsor Logo" /></a></p>
+
+
 ---
 <br>
 
