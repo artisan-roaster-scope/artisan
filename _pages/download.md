@@ -2,8 +2,8 @@
 layout: single
 permalink: /download/
 header:
-  overlay_image: /assets/images/teaser-small.jpg
-  image: /assets/images/teaser-small.jpg
+  overlay_image: /assets/images/teaser-small.webp
+  image: /assets/images/teaser-small.webp
 title: "Download"
 toc: false
 author: Marko Luther
@@ -40,12 +40,6 @@ gallery_legacy:
     title: "RPi"
 
 
-release_sponsor:
-  - url: https://acaia.co
-    image_path: /assets/images/acaia-logo.jpeg
-    alt: "Acaia"
-    title: "Acaia"
-
 ---
 
 ![Github Latest Releases](https://img.shields.io/github/downloads/artisan-roaster-scope/artisan/latest/total?logo=github&label=downloads&color=f5f5f5&labelColor=9C9C9C&style=flat){: .align-right}
@@ -61,7 +55,6 @@ Help keep **<span style="color: #4C97C3;">artisan</span>** free for personal and
 
 
 ---
-<br>
 
 ![image](/assets/images/artisan-plus-logo.svg){: style="width: 3%;"} [<span style="color: #4C97C3;font-weight:bold;">artisan.plus</span>](https://artisan.plus){:target="_blank"} inventory management
 {: style="text-align: center;" }
@@ -79,7 +72,15 @@ Help keep **<span style="color: #4C97C3;">artisan</span>** free for personal and
 {: style="color: #4C97C3; font-size: larger; text-align: center; font-weight:bold;" }
 ---
 
-{% include gallery id="release_sponsor" %}
+<figure>
+      <a aria-label="Release Sponsor Acaia" target="_blank" href="https://acaia.co" title="Acaia">
+          <img src="/assets/images/acaia-logo.svg" alt="Acaia" 
+           loading="lazy"
+           fetchpriority="low"
+           decoding="async"
+          />
+      </a>
+</figure>
 
 ---
 [Release History](https://github.com/artisan-roaster-scope/artisan/blob/master/wiki/ReleaseHistory.md)
