@@ -4,7 +4,7 @@ permalink: /
 title: "artisan"
 header:
   overlay_color: "#5e616c"
-  overlay_image: /assets/images/teaser.jpg
+  overlay_image: /assets/images/teaser.webp
   show_overlay_title: false
   caption: #'doubleshot'
 excerpt: 'v3.2.0{::nomarkdown}<iframe title="Artisan Version" style="display: inline-block;"  frameborder="0" scrolling="0" width="60px" height="120px"></iframe>{:/nomarkdown}'
@@ -46,18 +46,24 @@ gallery2:
     image_path: /assets/images/testimonial-espinoza.png
     alt: "testimonial espinoza"
 gallery3:
+  - url: /assets/images/testimonial-dan.png
+    image_path: /assets/images/testimonial-dan.png
+    alt: "testimonial dan"
+gallery4:
   - url: /assets/images/testimonial-peritus.png
     image_path: /assets/images/testimonial-peritus.png
     alt: "testimonial peritus"
   - url: /assets/images/testimonial-brian.png
     image_path: /assets/images/testimonial-brian.png
     alt: "testimonial brian"
-gallery4:
-  - url: /assets/images/testimonial-dan.png
-    image_path: /assets/images/testimonial-dan.png
-    alt: "testimonial dan"
 ---
 
+<link
+  rel="preload"
+  href="/assets/images/teaser.webp"
+  as="image"
+  fetchpriority="high"
+/>
 
 {% include feature_row id="intro" type="center" %}
 
@@ -65,23 +71,32 @@ gallery4:
 
 
 <figure class=" ">
-<a target="_blank" href="/assets/images/testimonial-paolo.png"
+<a target="_blank" href="/assets/images/testimonial-paolo.webp">
 <picture>
-  <source srcset="/assets/images/testimonial-paolo.webp" 1300w" type="image/webp">
-  <img src="/assets/images/testimonial-paolo.png" alt="testimonial paolo" loading="lazy" decoding="async">
+<source 
+  media="(max-width: 768px)"
+  srcset="
+   /assets/images/testimonial-paolo-small.webp">
+ <img src="/assets/images/testimonial-paolo.png" 
+  srcset="/assets/images/testimonial-paolo.webp" alt="testimonial paolo" loading="lazy" decoding="async">
 </picture>
 </a>
 </figure>
 
+
 {% include gallery id="gallery2" %}
-{% include gallery id="gallery4" %}
 {% include gallery id="gallery3" %}
+{% include gallery id="gallery4" %}
 
 <figure class=" ">
-<a target="_blank" href="/assets/images/testimonial-stephane.png"
+<a target="_blank" href="/assets/images/testimonial-stephane.webp">
 <picture>
-  <source srcset="/assets/images/testimonial-stephane.webp" 1300w" type="image/webp">
-  <img src="/assets/images/testimonial-stephane.png" alt="testimonial stephane" loading="lazy" decoding="async">
+<source 
+  media="(max-width: 768px)"
+  srcset="
+   /assets/images/testimonial-stephane-small.webp">
+ <img src="/assets/images/testimonial-stephane.png" 
+  srcset="/assets/images/testimonial-stephane.webp" alt="testimonial stephane" loading="lazy" decoding="async">
 </picture>
 </a>
 </figure>
