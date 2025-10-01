@@ -7,7 +7,7 @@ header:
   overlay_image: /assets/images/teaser.jpg
   show_overlay_title: false
   caption: #'doubleshot'
-excerpt: 'v3.2.0{::nomarkdown}<iframe style="display: inline-block;"  frameborder="0" scrolling="0" width="60px" height="120px"></iframe>{:/nomarkdown}'
+excerpt: 'v3.2.0{::nomarkdown}<iframe title="Artisan Version" style="display: inline-block;"  frameborder="0" scrolling="0" width="60px" height="120px"></iframe>{:/nomarkdown}'
 feature_row:
   - image_path: /assets/images/sliders.png
     alt: "Automation"
@@ -38,10 +38,6 @@ intro:
 &ensp; [Shop](https://shop.artisan.plus/){: .btn .btn--success .btn--large}{:target="_blank"}
 <BR>
 <BR>'
-gallery1:
-  - url: /assets/images/testimonial-paolo.png
-    image_path: /assets/images/testimonial-paolo.png
-    alt: "testimonial paolo"
 gallery2:
   - url: /assets/images/testimonial-elvio.png
     image_path: /assets/images/testimonial-elvio.png
@@ -57,10 +53,6 @@ gallery3:
     image_path: /assets/images/testimonial-brian.png
     alt: "testimonial brian"
 gallery4:
-  - url: /assets/images/testimonial-stephane.png
-    image_path: /assets/images/testimonial-stephane.png
-    alt: "testimonial stephane"
-gallery5:
   - url: /assets/images/testimonial-dan.png
     image_path: /assets/images/testimonial-dan.png
     alt: "testimonial dan"
@@ -71,10 +63,25 @@ gallery5:
 
 {% include feature_row %}
 
-{% include gallery id="gallery1" %}
-{% include gallery id="gallery2" %}
-{% include gallery id="gallery5" %}
-{% include gallery id="gallery3" %}
-{% include gallery id="gallery4" %}
 
-<a rel="me" href="https://masto.ai/@artisan"></a>
+<figure class=" ">
+<a target="_blank" href="/assets/images/testimonial-paolo.png"
+<picture>
+  <source srcset="/assets/images/testimonial-paolo.webp" 1300w" type="image/webp">
+  <img src="/assets/images/testimonial-paolo.png" alt="testimonial paolo" loading="lazy" decoding="async">
+</picture>
+</a>
+</figure>
+
+{% include gallery id="gallery2" %}
+{% include gallery id="gallery4" %}
+{% include gallery id="gallery3" %}
+
+<figure class=" ">
+<a target="_blank" href="/assets/images/testimonial-stephane.png"
+<picture>
+  <source srcset="/assets/images/testimonial-stephane.webp" 1300w" type="image/webp">
+  <img src="/assets/images/testimonial-stephane.png" alt="testimonial stephane" loading="lazy" decoding="async">
+</picture>
+</a>
+</figure>
