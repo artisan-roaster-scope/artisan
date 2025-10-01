@@ -42,9 +42,7 @@ gallery_legacy:
 
 ---
 
-![Github Latest Releases](https://img.shields.io/github/downloads/artisan-roaster-scope/artisan/latest/total?logo=github&label=downloads&color=f5f5f5&labelColor=9C9C9C&style=flat){: .align-right}
-
-
+<p><img fetchpriority="high" src="https://img.shields.io/github/downloads/artisan-roaster-scope/artisan/latest/total?logo=github&amp;label=downloads&amp;color=f5f5f5&amp;labelColor=9C9C9C&amp;style=flat" alt="Github Latest Releases" class="align-right" /></p>
 
 **artisan v3.2.0**
 {: style="color: #4C97C3; font-size: larger; text-align: center; font-weight:bold;" }
