@@ -267,40 +267,96 @@ The development of **<span style="color: #4C97C3;">artisan</span>** is supported
           </picture>          
       </a> 
       <a target="_blank" href="http://www.buckeyecoffee.com/" title="Buckeye Coffee">
-          <img src="/assets/images/bc-logo.jpg" alt="Buckeye Coffee" />
+          <picture>
+          <source 
+            media="(max-width: 768px)"
+            srcset="
+             /assets/images/bc-logo-small.webp">
+           <img src="/assets/images/bc-logo.jpg" 
+            srcset="/assets/images/bc-logo.webp" alt="Buckeye Coffee" loading="lazy" decoding="async">
+          </picture>
       </a>
       <a target="_blank" href="https://kaleidostorm.com/" title="Kalaido">
-          <img src="/assets/images/kaleido-logo.jpg" alt="Kaleido" />
+          <picture>
+          <source 
+            media="(max-width: 768px)"
+            srcset="
+             /assets/images/kaleido-logo-small.webp">
+           <img src="/assets/images/kaleido-logo.jpg" 
+            srcset="/assets/images/kaleido-logo.webp" alt="Kaleido" loading="lazy" decoding="async">
+          </picture>
       </a>
       <a target="_blank" href="https://acaia.co/" title="acaia">
           <img src="/assets/images/acaia-logo.svg" alt="acaia" loading="lazy" decoding="async" />
       </a>
       <a target="_blank" href="https://www.sivetz.com/" title="Sivetz">
-          <img src="/assets/images/sivetz-logo.png" alt="Sivetz" />
+          <picture>
+          <source 
+            media="(max-width: 768px)"
+            srcset="
+             /assets/images/sivetz-logo-small.webp">
+           <img src="/assets/images/sivetz-logo.png" 
+            srcset="/assets/images/sivetz-logo.webp" alt="Sivetz" loading="lazy" decoding="async">
+          </picture>
       </a>
       <a target="_blank" href="http://www.buhlergroup.com/" title="Buhler">
-          <img src="/assets/images/buhler-logo.png" alt="Buhler" />
+          <picture>
+          <source 
+            media="(max-width: 768px)"
+            srcset="
+             /assets/images/buhler-logo-small.webp">
+           <img src="/assets/images/buhler-logo.png" 
+            srcset="/assets/images/buhler-logo.webp" alt="Buhler" loading="lazy" decoding="async">
+          </picture>
       </a>
       <a target="_blank" href="https://joper-roasters.com/" title="Joper">
-          <img src="/assets/images/joper-logo.png" alt="Joper" />
+          <picture>
+          <source 
+            media="(max-width: 768px)"
+            srcset="
+             /assets/images/joper-logo-small.webp">
+           <img src="/assets/images/joper-logo.png" 
+            srcset="/assets/images/joper-logo.webp" alt="Joper" loading="lazy" decoding="async">
+          </picture>          
       </a>
       <a target="_blank" href="https://www.irm.coffee/" title="IP-CC iRm">
-          <img src="/assets/images/iRm-logo.jpg" alt="IP-CC iRm" />
+          <picture>
+          <source 
+            media="(max-width: 768px)"
+            srcset="
+             /assets/images/iRm-logo-small.webp">
+           <img src="/assets/images/iRm-logo.png" 
+            srcset="/assets/images/iRm-logo.webp" alt="IP-CC iRm" loading="lazy" decoding="async">
+          </picture>            
       </a>
       <a target="_blank" href="https://finecoffeeroaster.com/" title="Mugma Roasters">
           <img src="/assets/images/mugma-logo.svg" alt="Mugma Roasters" loading="lazy" decoding="async" />
       </a>
       <a target="_blank" href="https://www.beangocube.com/" title="BeanGo">
-          <img src="/assets/images/beango-logo.svg" alt="BeanGo" />
+          <img src="/assets/images/beango-logo.svg" alt="BeanGo" loading="lazy" decoding="async" />
       </a>
       <a target="_blank" href="http://www.santoker.com/" title="Santoker">
           <img src="/assets/images/santoker-logo.svg" alt="Santoker" loading="lazy" decoding="async" />
       </a>
       <a target="_blank" href="https://www.primoroasting.com/" title="Primo">
-          <img src="/assets/images/primo-logo.png" alt="Primo" />
+          <picture>
+          <source 
+            media="(max-width: 768px)"
+            srcset="
+             /assets/images/primo-logo-small.webp">
+           <img src="/assets/images/primo-logo.png" 
+            srcset="/assets/images/primo-logo.webp" alt="Primo" loading="lazy" decoding="async">
+          </picture>  
       </a>
       <a target="_blank" href="https://www.sweetcoffeeitalia.com/" title="Sweet Coffee Italia">
-          <img src="/assets/images/sci-logo.png" alt="Sweet Coffee Italia" />
+          <picture>
+          <source 
+            media="(max-width: 768px)"
+            srcset="
+             /assets/images/sci-logo-small.webp">
+           <img src="/assets/images/sci-logo.png" 
+            srcset="/assets/images/sci-logo.webp" alt="Sweet Coffee Italia" loading="lazy" decoding="async">
+          </picture>           
       </a>
       <a target="_blank" href="https://algrano.com/artisan?utm_source=artisan_blog&amp;utm_medium=referral&amp;utm_campaign=algrano_x_artisan&amp;utm_content=blog" title="Algrano">
           <img src="/assets/images/algrano-logo.svg" alt="Algrano" loading="lazy" decoding="async" />
