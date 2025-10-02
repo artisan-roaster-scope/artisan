@@ -5,8 +5,8 @@ collection: supporters
 classes: wide
 permalink: /machines/
 header:
-  overlay_image: /assets/images/teaser-small.jpg
-  image: /assets/images/teaser-small.jpg
+  overlay_image: /assets/images/teaser-small.webp
+  image: /assets/images/teaser-small.webp
 entries_layout: grid
 sort_by: title
 sidebar:

@@ -2,8 +2,8 @@
 layout: single
 permalink: /donate/
 header:
-  overlay_image: /assets/images/teaser-small.jpg
-  image: /assets/images/teaser-small.jpg
+  overlay_image: /assets/images/teaser-small.webp
+  image: /assets/images/teaser-small.webp
 title: "Donate"
 toc: false
 author: Marko Luther

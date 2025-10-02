@@ -5,7 +5,7 @@ sidebar:
   nav: "docs"
 excerpt: "Artisan Documentation"
 header:
-  overlay_image: /assets/images/teaser-small.jpg
-  image: /assets/images/teaser-small.jpg
+  overlay_image: /assets/images/teaser-small.webp
+  image: /assets/images/teaser-small.webp
 ---
 

@@ -2,258 +2,15 @@
 layout: splash
 permalink: /about/
 header:
-  overlay_image: /assets/images/teaser-small.jpg
-  image: /assets/images/teaser-small.jpg
+  overlay_image: /assets/images/teaser-small.webp
+  image: /assets/images/teaser-small.webp
 title: "About"
 toc: true
 toc_sticky: true
 toc_label: "On this page"
 toc_icon: "cog"
-gallery:
-  - url: https://www.phidgets.com/
-    image_path: /assets/images/phidgets-logo.jpg
-    alt: "Phidgets"
-    title: "Phidgets"
-  - url: https://www.yoctopuce.com/
-    image_path: /assets/images/yoctopuce-logo.png
-    alt: "Yoctopuce"
-    title: "Yoctopuce"
-  - url: http://www.buckeyecoffee.com/
-    image_path: /assets/images/bc-logo.jpg
-    alt: "Buckeye Coffee"
-    title: "Buckeye Coffee"
-  - url: https://kaleidostorm.com/
-    image_path: /assets/images/kaleido-logo.jpg
-    alt: "Kaleido"
-    title: "Kalaido"
-  - url: https://acaia.co/
-    image_path: /assets/images/acaia-logo.jpeg
-    alt: "acaia"
-    title: "acaia"
-  - url: https://www.sivetz.com/
-    image_path: /assets/images/sivetz-logo.png
-    alt: "Sivetz"
-    title: "Sivetz"
-  - url: http://www.buhlergroup.com/
-    image_path: /assets/images/buhler-logo.png
-    alt: "Buhler"
-    title: "Buhler"
-  - url: https://joper-roasters.com/
-    image_path: /assets/images/joper-logo.png
-    alt: "Joper"
-    title: "Joper"
-  - url: https://www.irm.coffee/
-    image_path: /assets/images/iRm-logo.jpg
-    alt: "IP-CC iRm"
-    title: "IP-CC iRm"
-  - url: https://finecoffeeroaster.com/
-    image_path: /assets/images/mugma-logo.png
-    alt: "Mugma Roasters"
-    title: "Mugma Roasters"
-  - url: https://www.beangocube.com/
-    image_path: /assets/images/beango-logo.png
-    alt: "BeanGo"
-    title: "BeanGo"
-  - url: http://www.santoker.com/
-    image_path: /assets/images/santoker-logo.png
-    alt: "Santoker"
-    title: "Santoker"
-  - url: https://www.primoroasting.com/
-    image_path: /assets/images/primo-logo.png
-    alt: "Primo"
-    title: "Primo"
-  - url: https://www.sweetcoffeeitalia.com/
-    image_path: /assets/images/sci-logo.png
-    alt: "Sweet Coffee Italia"
-    title: "Sweet Coffee Italia"
-  - url: https://algrano.com/artisan?utm_source=artisan_blog&utm_medium=referral&utm_campaign=algrano_x_artisan&utm_content=blog
-    image_path: /assets/images/algrano-logo.png
-    alt: "Algrano"
-    title: "Algrano"
-
-feature_row_profiling:
-  - image_path: /assets/images/about-roast-profiling.png
-    alt: "cover image roast profiling"
-    title: "<span style='color: #4C97C3;'>Roast Profiling</span>"
-    excerpt: "
-    - one-click setup for [roasting machines of 80+ brands](/machines), support for [50+ devices](/devices), [configurable sampling rate (0.1s–16.6h)](https://artisan-scope.org/docs/sampling/), unlimited data curves support [probe arrays](https://artisan-roasterscope.blogspot.com/2021/10/probe-arrays.html){:target='_blank'}, extensive import and export (Cropster, Giesen, IKAWA, Stronghold, RoastLog, RoastPath, ..)
-     
-    - [rate-of-rise (RoR)](https://artisan-scope.org/docs/curves/), [area-under-the-curve (AUC)](https://artisan-roasterscope.blogspot.de/2016/11/area-under-curve-auc.html){:target='_blank'}, [development-time-ratio (DTR)](https://artisan-roasterscope.blogspot.com/2020/05/displaying-development-time-ratio-in.html){:target='_blank'}, [phases projections](https://artisan-roasterscope.blogspot.com/2017/02/roast-phases-statistics-and-phases-lcds.html){:target='_blank'}, [virtual devices and symbolic assignments](https://artisan-roasterscope.blogspot.com/2019/11/symbolic-formulas-basics-new-variables.html){:target='_blank'}, [event detection](https://artisan-scope.org/docs/events/), [between-batch protocol support](https://artisan-roasterscope.blogspot.com/2020/12/supporting-between-batch-protocols.html){:target='_blank'}, and color sorting loss calculation
-    
-    - zooming, [automatic panning](https://artisan-roasterscope.blogspot.com/2022/03/artisan-v260.html#automaticpanning){:target='_blank'}, and [dynamic reference profile alignment and shifting](https://artisan-roasterscope.blogspot.com/2017/10/profile-templates.html){:target='_blank'}
-    "
-
-
-feature_row_user_interface:
-  - image_path: /assets/images/about-user-interface.png
-    alt: "cover image flexible user interface"
-    title: "<span style='color: #4C97C3;'>Flexible User Interface</span>"
-    excerpt: "
-   [user-defined&nbsp;sliders and buttons with programmable&nbsp;actions](http://artisan-roasterscope.blogspot.de/2013/02/events-buttons-and-palettes.html){:target='_blank'}, [talking&nbsp;alarms](https://artisan-roasterscope.blogspot.com/2017/12/talking-alarms.html){:target='_blank'}, [large&nbsp;Web&nbsp;LCDs](https://artisan-roasterscope.blogspot.com/2016/03/lcds.html), [custom&nbsp;colors](https://artisan-scope.org/docs/colors/), [fonts, and drawing&nbsp;styles](https://artisan-scope.org/docs/curves/), [ready-made&nbsp;themes](https://artisan-scope.org/docs/themes/), [dynamic visibility of curves](https://artisan-scope.org/docs/setup/), [controls](https://artisan-scope.org/docs/controls/), and [readings](https://artisan-scope.org/docs/lcds/), supporting tiny and large&nbsp;screens, localized in 30+&nbsp;languages  
-    
-    "
-
-
-feature_row_roast_control:
-  - image_path: /assets/images/about-roast-control.png
-    alt: "cover image roast control"
-    title: "<a name='Automation'></a><span style='color: #4C97C3;'>Roast Control & Automation</span>"
-    excerpt: "
-    
-    - machine control by [custom slider and button actions](http://artisan-roasterscope.blogspot.de/2013/02/events-buttons-and-palettes.html){:target='_blank'}
-
-	- app automation and automated reproduction of roasts via [IF-THEN&nbsp;rules](http://artisan-roasterscope.blogspot.de/2013/03/alarms.html){:target='_blank'}, [ramping replay of reference profile events](https://artisan-roasterscope.blogspot.de/2017/10/profile-templates.html){:target='_blank'} by time and/or temperature which can be dynamically modified by simple dragging, [internal and external PID&nbsp;control](https://artisan-roasterscope.blogspot.de/2016/11/pid-control.html){:target='_blank'} supporting direct profile&nbsp;playback of full roast sessions incl. [automatic&nbsp;save](https://artisan-roasterscope.blogspot.com/2017/10/automatic-save.html){:target='_blank'}
-    
-    "  
-    
-feature_row_profile_design:
-  - image_path: /assets/images/about-profile-design.png
-    alt: "cover image profile design"
-    title: "<span style='color: #4C97C3;'>Profile Design & Analytics</span>"
-    excerpt: "
-    
-[profile&nbsp;designer](https://artisan-roasterscope.blogspot.com/2019/05/using-artisan-designer.html){:target='_blank'}, 
-[profile&nbsp;transposer](https://artisan-roasterscope.blogspot.com/2020/05/profile-transposer.html){:target='_blank'}, 
-[curve&nbsp;comparator](https://artisan-roasterscope.blogspot.com/2020/05/roast-comparator.html){:target='_blank'},
-[ranking&nbsp;reports](https://artisan-scope.org/docs/ranking-reports/){:target='_blank'},
-[roast&nbsp;simulator](https://artisan-roasterscope.blogspot.com/2020/05/roast-simulator.html){:target='_blank'},
-[roast&nbsp;analytics](https://artisan-roasterscope.blogspot.com/2019/11/analyzer.html){:target='_blank'}, 
-[curve&nbsp;delta&nbsp;metrics](https://artisan-roasterscope.blogspot.com/2019/05/how-close.html){:target='_blank'}    
-    
-    "  
-    
-
-feature_row_cupping:
-  - image_path: /assets/images/about-cupping.png
-    alt: "cover image cupping editor"
-    title: "<span style='color: #4C97C3;'>Cupping</span>"
-    excerpt: "
-    
-    cupping notes, [cupping editor](https://artisan-scope.org/docs/cup-profile/){:target='_blank'} and [spider charts](https://artisan-roasterscope.blogspot.com/2017/11/spiders-wheels.html){:target='_blank'}
-    "
-    
-feature_row_energy_tracking:
-  - image_path: /assets/images/about-energy-tracking.png
-    alt: "cover image energy tracking"
-    title: "<span style='color: #4C97C3;'>Energy & CO<sub>2</sub> Tracking</span>"
-    excerpt: "
-    
-    energy and CO2 tracking of roasts from [loads specification](https://artisan-roasterscope.blogspot.com/2021/07/tracking-energy-consumption-co2.html){:target='_blank'} and [energy meter data](https://artisan-roasterscope.blogspot.com/2025/04/using-energy-meter-to-measure-roast.html){:target='_blank'}, reporting of CO2 emissions estimates per unit roasted coffee from the carbon footprint of green coffee production and roasting
-
-	"
-
-
-feature_row_inventory_management:
-  - image_path: /assets/images/about-inventory-management.png
-    alt: "cover image inventory management"
-    title: "<a name='InventoryManagement'></a><span style='color: #4C97C3;'>Inventory Management</span>"
-    excerpt: "
-    
-- the affordable [**<span style='color: #4C97C3;'>artisan.plus</span>**](https://artisan.plus) cloud extension adds multi-storage, multi-user, multi-machine, mobile-friendly transaction-based inventory management at one fixed price and with friendly 3 month free trial period
-
-- [detailed bean data imported directly from our partners](https://doc.artisan.plus/partners/){:target='_blank'} like [Algrano](https://algrano.com/artisan?utm_source=artisan_blog&utm_medium=referral&utm_campaign=algrano_x_artisan&utm_content=blog){:target='_blank'}, [Royal Coffee](https://royalcoffee.com/){:target='_blank'}, [hacea](https://haceacoffee.com/){:target='_blank'}, ..., blend management with [magic transitions](https://doc.artisan.plus/updates/replace-blend-ingredients/){:target='_blank'}, EUDR management, stock taking, profile search, [automatic synchronization and seamless integration with **<span style='color: #4C97C3;'>artisan</span>**](https://artisan-roasterscope.blogspot.com/2020/06/working-together-artisan-artisanviewer.html){:target='_blank'} and professional 24h support  
-
-    "
-    url: "https://doc.artisan.plus/docs/"
-    btn_label: "Read More"
-    btn_class: "btn--info btn--small"
-    
-feature_row_production_support:
-  - image_path: /assets/images/about-production-support.png
-    alt: "cover image production support"
-    title: "<span style='color: #4C97C3;'>Production Support</span>"
-    excerpt: "
-    
-[**<span style='color: #4C97C3;'>artisan.plus</span>**](https://artisan.plus) also adds [production&nbsp;planning](https://doc.artisan.plus/docs/schedule/){:target='_blank'} and [roast&nbsp;scheduling](https://doc.artisan.plus/docs/schedule/){:target='_blank'}, [batch&nbsp;management](https://doc.artisan.plus/docs/batch-manager/){:target='_blank'} and [maintenance&nbsp;alerts](https://doc.artisan.plus/docs/reminders/){:target='_blank'}
-
-"    
-    url: "https://doc.artisan.plus/docs/"
-    btn_label: "Read More"
-    btn_class: "btn--info btn--small"
-
-
-feature_row_business_reporting:
-  - image_path: /assets/images/about-reporting.png
-    alt: "cover image reporting"
-    title: "<span style='color: #4C97C3;'>Reporting</span>"
-    excerpt: "
-    
-- basic [roast-, production- and ranking reports](https://artisan-roasterscope.blogspot.de/2016/03/artisan-v099.html){:target='_blank'} in Web, PDF, CSV, and Excel format
-
-- [**<span style='color: #4C97C3;'>artisan.plus</span>**](https://artisan.plus) adds [sequential and open roast reports](https://doc.artisan.plus/docs/reports/#roast-reports){:target='_blank'}, as well as [purchase/sales](https://doc.artisan.plus/docs/reports/#purchasessales-reports){:target='_blank'}, [stock](https://doc.artisan.plus/docs/reports/#stocks-reports){:target='_blank'}, [organic](https://doc.artisan.plus/updates/organic-reports/){:target='_blank'} and [tax business reporting](https://doc.artisan.plus/updates/tax-reports/){:target='_blank'} with PDF, CSV and Excel exports
-
-    " 
-    
-    url: "https://doc.artisan.plus/docs/reports/"
-    btn_label: "Read More"
-    btn_class: "btn--info btn--small"
-    
-
  
 ---
-
-<!--
-  - url: https://www.paoloscimone.com/
-    image_path: /assets/images/paoloscimone-logo.jpg
-    alt: "Paolo Scimone Coffee Consulting"
-    title: "Paolo Scimone Coffee Consulting"
-  - url: https://cmsale.com/
-    image_path: /assets/images/cms-logo.jpg
-    alt: "Coffee Machines Sale"
-    title: "Coffee Machines Sale"
-  - url: http://www.roastmaxroasters.com.au
-    image_path: /assets/images/roastmax_logo.jpg
-    alt: "Roastmax"
-    title: "Roastmax"
-  - url: https://www.bescaroasters.com/
-    image_path: /assets/images/besca-logo.jpg
-    alt: "Besca Roasters"
-    title: "Besca Roasters"
-  - url: https://www.toper.com/
-    image_path: /assets/images/toper-logo.jpg
-    alt: "Toper"
-    title: "Toper"
-  - url: https://coffed.pl/
-    image_path: /assets/images/coffed-logo-light.png
-    alt: "Coffed"
-    title: "Coffed"
-  - url: https://www.ingnapoli.com/
-    image_path: /assets/images/tostabar-logo.png
-    alt: "Tostabar"
-    title: "Tostabar"
-  - url: https://showroomcoffee.com/
-    image_path: /assets/images/showroom-logo.png
-    alt: "Showroom"
-    title: "Showroom"
-  - url: https://www.kapokcoffee.com/
-    image_path: /assets/images/kapok-logo.png
-    alt: "KapoK"
-    title: "KapoK"
-  - url: https://www.sweetmarias.com/
-    image_path: /assets/images/sweet-marias-logo.jpeg
-    alt: "Sweet Maria's"
-    title: "Sweet Maria's"
-  - url: http://www.twinoroasters.com/
-    image_path: /assets/images/twino-logo.png
-    alt: "Twino"
-    title: "Twino"
-  - url: https://www.hottopusa.com/
-    image_path: /assets/images/hottop-logo.png
-    alt: "Hottop"
-    title: "Hottop"
-  - url: http://novustec.co.kr/
-    image_path: /assets/images/novustec-logo.png
-    alt: "Novustec"
-    title: "Novustec"
-  - url: https://typhoon.coffee/
-    image_path: /assets/images/typhoon-logo.png
-    alt: "Typhoon"
-    title: "Typhoon"
-  - url: https://www.probat.com/
-    image_path: /assets/images/probat-logo.jpg
-    alt: "Probat"
-    title: "Probat"
--->
 
 > In 2009, the two Computer Scientists Rafael and [Marko](/authors/luther/) started **<span style="color: #4C97C3;">artisan</span>**, a simple app for coffee lovers to track their roasts. Fast forward ten years, and **<span style="color: #4C97C3;">artisan</span>** became the most trusted roasting software for commercial roasters thanks to the launch of **[<span style="color: #4C97C3;">artisan.plus</span>](https://artisan.plus)**, a cloud-based extension adding professional features like inventory management. Today, **<span style="color: #4C97C3;">artisan</span>** has a user base that's ten times bigger than any other roasting software. 
 
@@ -263,20 +20,171 @@ feature_row_business_reporting:
 <br>
 
 
-{% include feature_row id="feature_row_profiling" type="left" %}
-{% include feature_row id="feature_row_user_interface" type="right" %}
+<div class="feature__wrapper">
+    <div class="feature__item--left">
+      <div class="archive__item">
+          <div class="archive__item-teaser">
+            <picture>
+             <img src="/assets/images/about-roast-profiling.png" 
+              srcset="/assets/images/about-roast-profiling.webp" alt="cover image roast profiling" loading="lazy" decoding="async">
+            </picture>            
+            
+          </div>
+        <div class="archive__item-body">
+            <h2 class="archive__item-title"><span style="color: #4C97C3;">Roast Profiling</span></h2>
+            <div class="archive__item-excerpt">
+              <ul>
+  <li>one-click setup for <a href="/machines">roasting machines of 80+ brands</a>, support for <a href="/devices">50+ devices</a>, <a href="https://artisan-scope.org/docs/sampling/">configurable sampling rate (0.1s–16.6h)</a>, unlimited data curves support <a href="https://artisan-roasterscope.blogspot.com/2021/10/probe-arrays.html" target="_blank">probe arrays</a>, extensive import and export (Cropster, Giesen, IKAWA, Stronghold, RoastLog, RoastPath, ..)</li>
+  <li><a href="https://artisan-scope.org/docs/curves/">rate-of-rise (RoR)</a>, <a href="https://artisan-roasterscope.blogspot.de/2016/11/area-under-curve-auc.html" target="_blank">area-under-the-curve (AUC)</a>, <a href="https://artisan-roasterscope.blogspot.com/2020/05/displaying-development-time-ratio-in.html" target="_blank">development-time-ratio (DTR)</a>, <a href="https://artisan-roasterscope.blogspot.com/2017/02/roast-phases-statistics-and-phases-lcds.html" target="_blank">phases projections</a>, <a href="https://artisan-roasterscope.blogspot.com/2019/11/symbolic-formulas-basics-new-variables.html" target="_blank">virtual devices and symbolic assignments</a>, <a href="https://artisan-scope.org/docs/events/">event detection</a>, <a href="https://artisan-roasterscope.blogspot.com/2020/12/supporting-between-batch-protocols.html" target="_blank">between-batch protocol support</a>, and color sorting loss calculation</li>
+  <li>zooming, <a href="https://artisan-roasterscope.blogspot.com/2022/03/artisan-v260.html#automaticpanning" target="_blank">automatic panning</a>, and <a href="https://artisan-roasterscope.blogspot.com/2017/10/profile-templates.html" target="_blank">dynamic reference profile alignment and shifting</a></li>
+</ul>
+            </div>
+        </div>
+      </div>
+    </div>
+</div>
 
-{% include feature_row id="feature_row_roast_control" type="left" %}
-{% include feature_row id="feature_row_profile_design" type="right" %}
+<div class="feature__wrapper">
+    <div class="feature__item--right">
+      <div class="archive__item">
+          <div class="archive__item-teaser">
+            <img src="/assets/images/about-user-interface.png" alt="cover image flexible user interface" />
+          </div>
+        <div class="archive__item-body">
+            <h2 class="archive__item-title"><span style="color: #4C97C3;">Flexible User Interface</span></h2>
+            <div class="archive__item-excerpt">
+              <p><a href="http://artisan-roasterscope.blogspot.de/2013/02/events-buttons-and-palettes.html" target="_blank">user-defined sliders and buttons with programmable actions</a>, <a href="https://artisan-roasterscope.blogspot.com/2017/12/talking-alarms.html" target="_blank">talking alarms</a>, <a href="https://artisan-roasterscope.blogspot.com/2016/03/lcds.html">large Web LCDs</a>, <a href="https://artisan-scope.org/docs/colors/">custom colors</a>, <a href="https://artisan-scope.org/docs/curves/">fonts, and drawing styles</a>, <a href="https://artisan-scope.org/docs/themes/">ready-made themes</a>, <a href="https://artisan-scope.org/docs/setup/">dynamic visibility of curves</a>, <a href="https://artisan-scope.org/docs/controls/">controls</a>, and <a href="https://artisan-scope.org/docs/lcds/">readings</a>, supporting tiny and large screens, localized in 30+ languages</p>
+            </div>
+        </div>
+      </div>
+    </div>
+</div>
 
-{% include feature_row id="feature_row_cupping" type="left" %}
-{% include feature_row id="feature_row_energy_tracking" type="right" %}
+<div class="feature__wrapper">
+    <div class="feature__item--left">
+      <div class="archive__item">
+          <div class="archive__item-teaser">
+            <img src="/assets/images/about-roast-control.png" alt="cover image roast control" />
+          </div>
+        <div class="archive__item-body">
+            <h2 class="archive__item-title"><a name="Automation"></a><span style="color: #4C97C3;">Roast Control &amp; Automation</span></h2>
+            <div class="archive__item-excerpt">
+<ul>
+  <li>machine control by <a href="http://artisan-roasterscope.blogspot.de/2013/02/events-buttons-and-palettes.html" target="_blank">custom slider and button actions</a></li>
+  <li>app automation and automated reproduction of roasts via <a href="http://artisan-roasterscope.blogspot.de/2013/03/alarms.html" target="_blank">IF-THEN rules</a>, <a href="https://artisan-roasterscope.blogspot.de/2017/10/profile-templates.html" target="_blank">ramping replay of reference profile events</a> by time and/or temperature which can be dynamically modified by simple dragging, <a href="https://artisan-roasterscope.blogspot.de/2016/11/pid-control.html" target="_blank">internal and external PID control</a> supporting direct profile playback of full roast sessions incl. <a href="https://artisan-roasterscope.blogspot.com/2017/10/automatic-save.html" target="_blank">automatic save</a></li>
+</ul>
+            </div>
+        </div>
+      </div>
+    </div>
+</div>
 
-{% include feature_row id="feature_row_inventory_management" type="left" %}
-{% include feature_row id="feature_row_production_support" type="right" %}
+<div class="feature__wrapper">
+    <div class="feature__item--right">
+      <div class="archive__item">
+          <div class="archive__item-teaser">
+            <img src="/assets/images/about-profile-design.png" alt="cover image profile design" />
+          </div>
+        <div class="archive__item-body">
+            <h2 class="archive__item-title"><span style="color: #4C97C3;">Profile Design &amp; Analytics</span></h2>
+            <div class="archive__item-excerpt">
+<p><a href="https://artisan-roasterscope.blogspot.com/2019/05/using-artisan-designer.html" target="_blank">profile designer</a>, <a href="https://artisan-roasterscope.blogspot.com/2020/05/profile-transposer.html" target="_blank">profile transposer</a>, <a href="https://artisan-roasterscope.blogspot.com/2020/05/roast-comparator.html" target="_blank">curve comparator</a>, <a href="https://artisan-scope.org/docs/ranking-reports/" target="_blank">ranking reports</a>, <a href="https://artisan-roasterscope.blogspot.com/2020/05/roast-simulator.html" target="_blank">roast simulator</a>, <a href="https://artisan-roasterscope.blogspot.com/2019/11/analyzer.html" target="_blank">roast analytics</a>, <a href="https://artisan-roasterscope.blogspot.com/2019/05/how-close.html" target="_blank">curve delta metrics</a></p>
+            </div>
+        </div>
+      </div>
+    </div>
+</div>
 
-{% include feature_row id="feature_row_business_reporting" type="left" %}
+<div class="feature__wrapper">
+    <div class="feature__item--left">
+      <div class="archive__item">
+          <div class="archive__item-teaser">
+            <img src="/assets/images/about-cupping.png" alt="cover image cupping editor" />
+          </div>
+        <div class="archive__item-body">
+            <h2 class="archive__item-title"><span style="color: #4C97C3;">Cupping</span></h2>
+            <div class="archive__item-excerpt">
+<p>cupping notes, <a href="https://artisan-scope.org/docs/cup-profile/" target="_blank">cupping editor</a> and <a href="https://artisan-roasterscope.blogspot.com/2017/11/spiders-wheels.html" target="_blank">spider charts</a></p>
+            </div>
+        </div>
+      </div>
+    </div>
+</div>
 
+<div class="feature__wrapper">
+    <div class="feature__item--right">
+      <div class="archive__item">
+          <div class="archive__item-teaser">
+            <img src="/assets/images/about-energy-tracking.png" alt="cover image energy tracking" />
+          </div>
+        <div class="archive__item-body">
+            <h2 class="archive__item-title"><span style="color: #4C97C3;">Energy &amp; CO<sub>2</sub> Tracking</span></h2>
+            <div class="archive__item-excerpt">
+<p>energy and CO2 tracking of roasts from <a href="https://artisan-roasterscope.blogspot.com/2021/07/tracking-energy-consumption-co2.html" target="_blank">loads specification</a> and <a href="https://artisan-roasterscope.blogspot.com/2025/04/using-energy-meter-to-measure-roast.html" target="_blank">energy meter data</a>, reporting of CO2 emissions estimates per unit roasted coffee from the carbon footprint of green coffee production and roasting</p>
+            </div>
+        </div>
+      </div>
+    </div>
+</div>
+
+<div class="feature__wrapper">
+    <div class="feature__item--left">
+      <div class="archive__item">
+          <div class="archive__item-teaser">
+            <img src="/assets/images/about-inventory-management.png" alt="cover image inventory management" />
+          </div>
+        <div class="archive__item-body">
+            <h2 class="archive__item-title"><a name="InventoryManagement"></a><span style="color: #4C97C3;">Inventory Management</span></h2>
+            <div class="archive__item-excerpt">
+<ul>
+  <li>the affordable <a href="https://artisan.plus"><strong><span style="color: #4C97C3;">artisan.plus</span></strong></a> cloud extension adds multi-storage, multi-user, multi-machine, mobile-friendly transaction-based inventory management at one fixed price and with friendly 3 month free trial period</li>
+  <li><a href="https://doc.artisan.plus/partners/" target="_blank">detailed bean data imported directly from our partners</a> like <a href="https://algrano.com/artisan?utm_source=artisan_blog&amp;utm_medium=referral&amp;utm_campaign=algrano_x_artisan&amp;utm_content=blog" target="_blank">Algrano</a>, <a href="https://royalcoffee.com/" target="_blank">Royal Coffee</a>, <a href="https://haceacoffee.com/" target="_blank">hacea</a>, …, blend management with <a href="https://doc.artisan.plus/updates/replace-blend-ingredients/" target="_blank">magic transitions</a>, EUDR management, stock taking, profile search, <a href="https://artisan-roasterscope.blogspot.com/2020/06/working-together-artisan-artisanviewer.html" target="_blank">automatic synchronization and seamless integration with <strong><span style="color: #4C97C3;">artisan</span></strong></a> and professional 24h support</li>
+</ul>
+            </div>
+            <p><a href="https://doc.artisan.plus/docs/" class="btn btn--info btn--small">Read More</a></p>
+        </div>
+      </div>
+    </div>
+  
+
+</div>
+
+<div class="feature__wrapper">
+    <div class="feature__item--right">
+      <div class="archive__item">
+          <div class="archive__item-teaser">
+            <img src="/assets/images/about-production-support.png" alt="cover image production support" />
+          </div>
+        <div class="archive__item-body">
+            <h2 class="archive__item-title"><span style="color: #4C97C3;">Production Support</span></h2>
+            <div class="archive__item-excerpt">
+<p><a href="https://artisan.plus"><strong><span style="color: #4C97C3;">artisan.plus</span></strong></a> also adds <a href="https://doc.artisan.plus/docs/schedule/" target="_blank">production planning</a> and <a href="https://doc.artisan.plus/docs/schedule/" target="_blank">roast scheduling</a>, <a href="https://doc.artisan.plus/docs/batch-manager/" target="_blank">batch management</a> and <a href="https://doc.artisan.plus/docs/reminders/" target="_blank">maintenance alerts</a></p>
+            </div>
+            <p><a href="https://doc.artisan.plus/docs/" class="btn btn--info btn--small">Read More</a></p>
+        </div>
+      </div>
+    </div>
+</div>
+
+<div class="feature__wrapper">
+    <div class="feature__item--left">
+      <div class="archive__item">
+          <div class="archive__item-teaser">
+            <img src="/assets/images/about-reporting.png" alt="cover image reporting" />
+          </div>
+        <div class="archive__item-body">
+            <h2 class="archive__item-title"><span style="color: #4C97C3;">Reporting</span></h2>
+            <div class="archive__item-excerpt">
+<ul>
+  <li>basic <a href="https://artisan-roasterscope.blogspot.de/2016/03/artisan-v099.html" target="_blank">roast-, production- and ranking reports</a> in Web, PDF, CSV, and Excel format</li>
+  <li><a href="https://artisan.plus"><strong><span style="color: #4C97C3;">artisan.plus</span></strong></a> adds <a href="https://doc.artisan.plus/docs/reports/#roast-reports" target="_blank">sequential and open roast reports</a>, as well as <a href="https://doc.artisan.plus/docs/reports/#purchasessales-reports" target="_blank">purchase/sales</a>, <a href="https://doc.artisan.plus/docs/reports/#stocks-reports" target="_blank">stock</a>, <a href="https://doc.artisan.plus/updates/organic-reports/" target="_blank">organic</a> and <a href="https://doc.artisan.plus/updates/tax-reports/" target="_blank">tax business reporting</a> with PDF, CSV and Excel exports</li>
+</ul>
+            </div>
+            <p><a href="https://doc.artisan.plus/docs/reports/" class="btn btn--info btn--small">Read More</a></p>
+        </div>
+      </div>
+    </div>
+</div>
 
 
 We believe in [open-source](https://www.youtube.com/watch?v=SpeDK1TPbew){:target="_blank"}. Open-source software powers nearly all the world’s major companies. This software is freely available, and is developed collaboratively, maintained by a broad network that includes everyone from unpaid volunteers to employees at competing tech companies. Check out the **<span style="color: #4C97C3;">artisan</span>** [code on GitHub](https://github.com/artisan-roaster-scope/artisan){:target="_blank"} and contribute!
@@ -344,9 +252,60 @@ The development of **<span style="color: #4C97C3;">artisan</span>** is supported
 ![image](/assets/images/artisan-plus-logo.svg){: style="width: 5%;"} [<span style="color: #4C97C3;font-weight:bold;">artisan.plus</span>](https://artisan.plus) inventory management
 {: style="text-align: center;" }
 
-{% include gallery id="gallery" %}
-
-
+<figure class="third ">
+      <a target="_blank" href="https://www.phidgets.com/" title="Phidgets">
+          <img src="/assets/images/phidgets-logo.svg" alt="Phidgets" loading="lazy" decoding="async" />
+      </a>
+      <a target="_blank" href="https://www.yoctopuce.com/" title="Yoctopuce">
+          <picture>
+          <source 
+            media="(max-width: 768px)"
+            srcset="
+             /assets/images/yoctopuce-logo-small.webp">
+           <img src="/assets/images/yoctopuce-logo.png" 
+            srcset="/assets/images/yoctopuce-logo.webp" alt="Yoctopuce" loading="lazy" decoding="async">
+          </picture>          
+      </a> 
+      <a target="_blank" href="http://www.buckeyecoffee.com/" title="Buckeye Coffee">
+          <img src="/assets/images/bc-logo.jpg" alt="Buckeye Coffee" />
+      </a>
+      <a target="_blank" href="https://kaleidostorm.com/" title="Kalaido">
+          <img src="/assets/images/kaleido-logo.jpg" alt="Kaleido" />
+      </a>
+      <a target="_blank" href="https://acaia.co/" title="acaia">
+          <img src="/assets/images/acaia-logo.svg" alt="acaia" loading="lazy" decoding="async" />
+      </a>
+      <a target="_blank" href="https://www.sivetz.com/" title="Sivetz">
+          <img src="/assets/images/sivetz-logo.png" alt="Sivetz" />
+      </a>
+      <a target="_blank" href="http://www.buhlergroup.com/" title="Buhler">
+          <img src="/assets/images/buhler-logo.png" alt="Buhler" />
+      </a>
+      <a target="_blank" href="https://joper-roasters.com/" title="Joper">
+          <img src="/assets/images/joper-logo.png" alt="Joper" />
+      </a>
+      <a target="_blank" href="https://www.irm.coffee/" title="IP-CC iRm">
+          <img src="/assets/images/iRm-logo.jpg" alt="IP-CC iRm" />
+      </a>
+      <a target="_blank" href="https://finecoffeeroaster.com/" title="Mugma Roasters">
+          <img src="/assets/images/mugma-logo.svg" alt="Mugma Roasters" loading="lazy" decoding="async" />
+      </a>
+      <a target="_blank" href="https://www.beangocube.com/" title="BeanGo">
+          <img src="/assets/images/beango-logo.svg" alt="BeanGo" />
+      </a>
+      <a target="_blank" href="http://www.santoker.com/" title="Santoker">
+          <img src="/assets/images/santoker-logo.svg" alt="Santoker" loading="lazy" decoding="async" />
+      </a>
+      <a target="_blank" href="https://www.primoroasting.com/" title="Primo">
+          <img src="/assets/images/primo-logo.png" alt="Primo" />
+      </a>
+      <a target="_blank" href="https://www.sweetcoffeeitalia.com/" title="Sweet Coffee Italia">
+          <img src="/assets/images/sci-logo.png" alt="Sweet Coffee Italia" />
+      </a>
+      <a target="_blank" href="https://algrano.com/artisan?utm_source=artisan_blog&amp;utm_medium=referral&amp;utm_campaign=algrano_x_artisan&amp;utm_content=blog" title="Algrano">
+          <img src="/assets/images/algrano-logo.svg" alt="Algrano" loading="lazy" decoding="async" />
+      </a>
+</figure>
 
 
 ## Enablers
