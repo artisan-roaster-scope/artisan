@@ -97,7 +97,7 @@ feature_row_user_interface:
 feature_row_roast_control:
   - image_path: /assets/images/about-roast-control.png
     alt: "cover image roast control"
-    title: "<span style='color: #4C97C3;'>Roast Control & Automation</span>"
+    title: "<a name='Automation'></a><span style='color: #4C97C3;'>Roast Control & Automation</span>"
     excerpt: "
     
     - machine control by [custom slider and button actions](http://artisan-roasterscope.blogspot.de/2013/02/events-buttons-and-palettes.html){:target='_blank'}
@@ -146,7 +146,7 @@ feature_row_energy_tracking:
 feature_row_inventory_management:
   - image_path: /assets/images/about-inventory-management.png
     alt: "cover image inventory management"
-    title: "<span style='color: #4C97C3;'>Inventory Management</span>"
+    title: "<a name='InventoryManagement'></a><span style='color: #4C97C3;'>Inventory Management</span>"
     excerpt: "
     
 - the affordable [**<span style='color: #4C97C3;'>artisan.plus</span>**](https://artisan.plus) cloud extension adds multi-storage, multi-user, multi-machine, mobile-friendly transaction-based inventory management at one fixed price and with friendly 3 month free trial period
