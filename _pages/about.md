@@ -52,6 +52,10 @@ toc_icon: "cog"
       <div class="archive__item">
           <div class="archive__item-teaser">
             <picture>
+            <source 
+              media="(max-width: 768px)"
+              srcset="
+               /assets/images/about-user-interface-small.webp">
              <img src="/assets/images/about-user-interface.png" 
               srcset="/assets/images/about-user-interface.webp" alt="cover image flexible user interface" loading="lazy" decoding="async">
             </picture>
@@ -71,6 +75,10 @@ toc_icon: "cog"
       <div class="archive__item">
           <div class="archive__item-teaser">
             <picture>
+            <source 
+              media="(max-width: 768px)"
+              srcset="
+               /assets/images/about-roast-control-small.webp">
              <img src="/assets/images/about-roast-control.png" 
               srcset="/assets/images/about-roast-control.webp" alt="cover image roast control" loading="lazy" decoding="async">
             </picture>            
@@ -93,6 +101,10 @@ toc_icon: "cog"
       <div class="archive__item">
           <div class="archive__item-teaser">
             <picture>
+            <source 
+              media="(max-width: 768px)"
+              srcset="
+               /assets/images/about-profile-design-small.webp">
              <img src="/assets/images/about-profile-design.png" 
               srcset="/assets/images/about-profile-design.webp" alt="cover image profile design" loading="lazy" decoding="async">
             </picture>
@@ -112,6 +124,10 @@ toc_icon: "cog"
       <div class="archive__item">
           <div class="archive__item-teaser">
             <picture>
+            <source 
+              media="(max-width: 768px)"
+              srcset="
+               /assets/images/about-cupping-small.webp">
              <img src="/assets/images/about-cupping.png" 
               srcset="/assets/images/about-cupping.webp" alt="cover image cupping editor" loading="lazy" decoding="async">
             </picture>
@@ -131,6 +147,10 @@ toc_icon: "cog"
       <div class="archive__item">
           <div class="archive__item-teaser">
             <picture>
+            <source 
+              media="(max-width: 768px)"
+              srcset="
+               /assets/images/about-energy-tracking-small.webp">
              <img src="/assets/images/about-energy-tracking.png" 
               srcset="/assets/images/about-energy-tracking.webp" alt="cover image energy tracking" loading="lazy" decoding="async">
             </picture>
@@ -149,6 +169,10 @@ toc_icon: "cog"
     <div class="feature__item--left">
       <div class="archive__item">
           <div class="archive__item-teaser">
+            <source 
+              media="(max-width: 768px)"
+              srcset="
+               /assets/images/about-inventory-management-small.webp">
             <picture>
              <img src="/assets/images/about-inventory-management.png" 
               srcset="/assets/images/about-inventory-management.webp" alt="cover image inventory management" loading="lazy" decoding="async">
@@ -175,6 +199,10 @@ toc_icon: "cog"
       <div class="archive__item">
           <div class="archive__item-teaser">
             <picture>
+            <source 
+              media="(max-width: 768px)"
+              srcset="
+               /assets/images/about-production-support-small.webp">
              <img src="/assets/images/about-production-support.png" 
               srcset="/assets/images/about-production-support.webp" alt="cover image production support" loading="lazy" decoding="async">
             </picture>
@@ -194,6 +222,10 @@ toc_icon: "cog"
     <div class="feature__item--left">
       <div class="archive__item">
           <div class="archive__item-teaser">
+            <source 
+              media="(max-width: 768px)"
+              srcset="
+               /assets/images/about-reporting-small.webp">
             <picture>
              <img src="/assets/images/about-reporting.png" 
               srcset="/assets/images/about-reporting.webp" alt="cover image reporting" loading="lazy" decoding="async">
