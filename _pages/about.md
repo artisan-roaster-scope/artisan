@@ -26,7 +26,7 @@ toc_icon: "cog"
           <div class="archive__item-teaser">
             <picture>
              <img src="/assets/images/about-roast-profiling.png" 
-              srcset="/assets/images/about-roast-profiling.webp" alt="cover image roast profiling" loading="lazy" decoding="async">
+              srcset="/assets/images/about-roast-profiling.webp 2x, /assets/images/about-roast-profiling-small.webp 1x" alt="cover image roast profiling" loading="lazy" decoding="async">
             </picture>
           </div>
         <div class="archive__item-body">
