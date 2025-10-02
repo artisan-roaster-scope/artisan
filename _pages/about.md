@@ -25,6 +25,10 @@ toc_icon: "cog"
       <div class="archive__item">
           <div class="archive__item-teaser">
             <picture>
+            <source 
+              media="(max-width: 768px)"
+              srcset="
+               /assets/images/about-roast-profiling-small.webp">
              <img src="/assets/images/about-roast-profiling.png" 
               srcset="/assets/images/about-roast-profiling.webp 2x, /assets/images/about-roast-profiling-small.webp 1x" alt="cover image roast profiling" loading="lazy" decoding="async">
             </picture>
