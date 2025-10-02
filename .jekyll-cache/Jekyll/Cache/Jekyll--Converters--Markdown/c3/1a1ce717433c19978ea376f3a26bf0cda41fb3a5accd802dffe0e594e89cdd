@@ -1,7 +1,0 @@
-I"“<ul>
-  <li><strong>Producer:</strong> <a href="http://www.buhlergroup.com/" target="_blank">BÃ¼hler GmbH</a>, Germany</li>
-  <li><strong>Machines:</strong> Roastmaster</li>
-  <li><strong>Connection:</strong> Siemens S7 network</li>
-  <li><strong>Features:</strong> logging of burner temperature, bean temperature, afterburner temperature, drum pressure (pa), drum speed (Hz), and airflow (%)</li>
-</ul>
-:ET

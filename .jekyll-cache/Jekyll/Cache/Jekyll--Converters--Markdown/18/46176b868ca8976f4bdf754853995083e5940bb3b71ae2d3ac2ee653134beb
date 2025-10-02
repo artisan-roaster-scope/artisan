@@ -1,5 +1,0 @@
-I"›
-<p>Artsan v1.3.1 and later need a slightly different MODBUS setup (check menu <code class="language-plaintext highlighter-rouge">Config &gt;&gt; Port</code>, 3rd tab <code class="language-plaintext highlighter-rouge">MODBUS</code>) than earlier versions where the state of the little-endian flag <code class="language-plaintext highlighter-rouge">words</code> was insignificant. Now both little-endian flags, <code class="language-plaintext highlighter-rouge">bytes</code> and <code class="language-plaintext highlighter-rouge">words</code>, should not be ticked as in the screenshot below.</p>
-
-<p><img src="../../assets/images/BC_modbus.png" alt="alt text" /></p>
-:ET

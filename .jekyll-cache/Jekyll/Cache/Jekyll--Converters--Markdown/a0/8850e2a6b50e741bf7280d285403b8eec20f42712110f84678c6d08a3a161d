@@ -1,7 +1,0 @@
-I"º<ul>
-  <li><strong>Distributor:</strong> <a href="https://datgenroasters.com/" target="_blank">DÃ¤tgen Roasters</a>, Germany/Turkey</li>
-  <li><strong>Machines:</strong> DR and DW models</li>
-  <li><strong>Connection:</strong> MODBUS ASCII via USB; requires the installation of a <a href="/modbus_serial/">serial driver</a></li>
-  <li><strong>Features:</strong> logging of bean temperature (BT) and environmental temperature (ET).</li>
-</ul>
-:ET

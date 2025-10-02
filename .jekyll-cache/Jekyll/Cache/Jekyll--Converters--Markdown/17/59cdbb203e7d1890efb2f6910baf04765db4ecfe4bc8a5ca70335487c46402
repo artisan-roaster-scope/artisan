@@ -1,7 +1,0 @@
-I"Ð<ul>
-  <li><strong>Producer:</strong> <a href="https://lanjingmachine.en.alibaba.com/" target="_blank">Zhengzhou Blueking Mechanical Equipment Co. Ltd.</a>, China</li>
-  <li><strong>Machines:</strong> BK Series</li>
-  <li><strong>Connection:</strong> MODBUS RTU via USB; requires the installation of a <a href="/modbus_serial/">serial driver</a></li>
-  <li><strong>Features:</strong> logging of bean temperature (BT) and environmental temperature (ET).</li>
-</ul>
-:ET

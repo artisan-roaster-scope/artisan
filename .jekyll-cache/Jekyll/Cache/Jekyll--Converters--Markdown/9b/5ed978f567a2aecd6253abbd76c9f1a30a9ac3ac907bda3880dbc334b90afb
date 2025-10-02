@@ -1,4 +1,0 @@
-I"µ<p>Artisan can be configured to read from up to 8 channels from a Siemens S7 PLC. Per channel, the S7 area, database, register and data type (integer or float) can be configured</p>
-
-<p>The PID mechanism provided by the Siemens S7 PLC can be connected to the Artisan PID controls similar as in the MODBUS case (see the post on <a href="https://artisan-roasterscope.blogspot.it/2016/11/pid-control.html">PID support</a> for details).</p>
-:ET

@@ -1,7 +1,0 @@
-I"±<ul>
-  <li><strong>Producer:</strong> <a href="https://otesla.vn/" target="_blank">O Tesla</a>, Vietnam</li>
-  <li><strong>Machines:</strong> Machines with Autonics Delta DTA PIDs</li>
-  <li><strong>Connection:</strong> MODBUS RTU via USB; requires the installation of a <a href="/modbus_serial/">serial driver</a></li>
-  <li><strong>Features:</strong> logging of bean temperature (BT) and environmental temperature (ET).</li>
-</ul>
-:ET

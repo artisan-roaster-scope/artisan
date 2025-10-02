@@ -1,7 +1,0 @@
-I"º<ul>
-  <li><strong>Distributor:</strong> <a href="https://opproaster.com/" target="_blank">OPP Roaster</a>, Vietnam</li>
-  <li><strong>Machines:</strong> MR models with Delta DTA4848 PIDs</li>
-  <li><strong>Connection:</strong> MODBUS ASCII via USB; requires the installation of a <a href="/modbus_serial/">serial driver</a></li>
-  <li><strong>Features:</strong> logging of bean temperature (BT) and environmental temperature (ET)</li>
-</ul>
-:ET

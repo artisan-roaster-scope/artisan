@@ -27,8 +27,7 @@ toc_icon: "cog"
             <picture>
              <img src="/assets/images/about-roast-profiling.png" 
               srcset="/assets/images/about-roast-profiling.webp" alt="cover image roast profiling" loading="lazy" decoding="async">
-            </picture>            
-            
+            </picture>
           </div>
         <div class="archive__item-body">
             <h2 class="archive__item-title"><span style="color: #4C97C3;">Roast Profiling</span></h2>
@@ -48,7 +47,10 @@ toc_icon: "cog"
     <div class="feature__item--right">
       <div class="archive__item">
           <div class="archive__item-teaser">
-            <img src="/assets/images/about-user-interface.png" alt="cover image flexible user interface" />
+            <picture>
+             <img src="/assets/images/about-user-interface.png" 
+              srcset="/assets/images/about-user-interface.webp" alt="cover image flexible user interface" loading="lazy" decoding="async">
+            </picture>
           </div>
         <div class="archive__item-body">
             <h2 class="archive__item-title"><span style="color: #4C97C3;">Flexible User Interface</span></h2>
@@ -64,7 +66,10 @@ toc_icon: "cog"
     <div class="feature__item--left">
       <div class="archive__item">
           <div class="archive__item-teaser">
-            <img src="/assets/images/about-roast-control.png" alt="cover image roast control" />
+            <picture>
+             <img src="/assets/images/about-roast-control.png" 
+              srcset="/assets/images/about-roast-control.webp" alt="cover image roast control" loading="lazy" decoding="async">
+            </picture>            
           </div>
         <div class="archive__item-body">
             <h2 class="archive__item-title"><a name="Automation"></a><span style="color: #4C97C3;">Roast Control &amp; Automation</span></h2>
@@ -83,7 +88,10 @@ toc_icon: "cog"
     <div class="feature__item--right">
       <div class="archive__item">
           <div class="archive__item-teaser">
-            <img src="/assets/images/about-profile-design.png" alt="cover image profile design" />
+            <picture>
+             <img src="/assets/images/about-profile-design.png" 
+              srcset="/assets/images/about-profile-design.webp" alt="cover image profile design" loading="lazy" decoding="async">
+            </picture>
           </div>
         <div class="archive__item-body">
             <h2 class="archive__item-title"><span style="color: #4C97C3;">Profile Design &amp; Analytics</span></h2>
@@ -99,7 +107,10 @@ toc_icon: "cog"
     <div class="feature__item--left">
       <div class="archive__item">
           <div class="archive__item-teaser">
-            <img src="/assets/images/about-cupping.png" alt="cover image cupping editor" />
+            <picture>
+             <img src="/assets/images/about-cupping.png" 
+              srcset="/assets/images/about-cupping.webp" alt="cover image cupping editor" loading="lazy" decoding="async">
+            </picture>
           </div>
         <div class="archive__item-body">
             <h2 class="archive__item-title"><span style="color: #4C97C3;">Cupping</span></h2>
@@ -115,7 +126,10 @@ toc_icon: "cog"
     <div class="feature__item--right">
       <div class="archive__item">
           <div class="archive__item-teaser">
-            <img src="/assets/images/about-energy-tracking.png" alt="cover image energy tracking" />
+            <picture>
+             <img src="/assets/images/about-energy-tracking.png" 
+              srcset="/assets/images/about-energy-tracking.webp" alt="cover image energy tracking" loading="lazy" decoding="async">
+            </picture>
           </div>
         <div class="archive__item-body">
             <h2 class="archive__item-title"><span style="color: #4C97C3;">Energy &amp; CO<sub>2</sub> Tracking</span></h2>
@@ -131,7 +145,10 @@ toc_icon: "cog"
     <div class="feature__item--left">
       <div class="archive__item">
           <div class="archive__item-teaser">
-            <img src="/assets/images/about-inventory-management.png" alt="cover image inventory management" />
+            <picture>
+             <img src="/assets/images/about-inventory-management.png" 
+              srcset="/assets/images/about-inventory-management.webp" alt="cover image inventory management" loading="lazy" decoding="async">
+            </picture>
           </div>
         <div class="archive__item-body">
             <h2 class="archive__item-title"><a name="InventoryManagement"></a><span style="color: #4C97C3;">Inventory Management</span></h2>
@@ -153,7 +170,10 @@ toc_icon: "cog"
     <div class="feature__item--right">
       <div class="archive__item">
           <div class="archive__item-teaser">
-            <img src="/assets/images/about-production-support.png" alt="cover image production support" />
+            <picture>
+             <img src="/assets/images/about-production-support.png" 
+              srcset="/assets/images/about-production-support.webp" alt="cover image production support" loading="lazy" decoding="async">
+            </picture>
           </div>
         <div class="archive__item-body">
             <h2 class="archive__item-title"><span style="color: #4C97C3;">Production Support</span></h2>
@@ -170,7 +190,10 @@ toc_icon: "cog"
     <div class="feature__item--left">
       <div class="archive__item">
           <div class="archive__item-teaser">
-            <img src="/assets/images/about-reporting.png" alt="cover image reporting" />
+            <picture>
+             <img src="/assets/images/about-reporting.png" 
+              srcset="/assets/images/about-reporting.webp" alt="cover image reporting" loading="lazy" decoding="async">
+            </picture>
           </div>
         <div class="archive__item-body">
             <h2 class="archive__item-title"><span style="color: #4C97C3;">Reporting</span></h2>

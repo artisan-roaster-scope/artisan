@@ -1,7 +1,0 @@
-I"<ul>
-  <li><strong>Producer:</strong> <a href="https://www.roasterandroaster.com/" target="_blank">R&amp;R  ROASTER AND ROASTER</a>, Turkey</li>
-  <li><strong>Machines:</strong> R Touch (with Fatek PLC) and R Manual (EMKO 3710 PIDs)</li>
-  <li><strong>Connection:</strong> MODBUS RTU via USB; requires the installation of a <a href="/modbus_serial/">serial driver</a></li>
-  <li><strong>Features:</strong> logging of bean temperature (BT) and environmental temperature (ET) and related rate-of-rise curves</li>
-</ul>
-:ET

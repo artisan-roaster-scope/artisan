@@ -1,7 +1,0 @@
-I"n<ul>
-  <li><strong>Producer:</strong> <a href="https://rolltech.qdm.tw/" target="_blank">Rolltech</a>, Taiwan</li>
-  <li><strong>Machines:</strong> EL600</li>
-  <li><strong>Connection:</strong> MODBUS RTU via USB; requires the installation of a <a href="/modbus_serial/">serial driver</a></li>
-  <li><strong>Features:</strong> logging of bean temperature</li>
-</ul>
-:ET

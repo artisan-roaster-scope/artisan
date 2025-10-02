@@ -1,7 +1,0 @@
-I"¢<ul>
-  <li><strong>Producer:</strong> <a href="https://www.garantiroaster.com/" target="_blank">Garanti</a>, Turkey</li>
-  <li><strong>Machines:</strong> GKPX models</li>
-  <li><strong>Connection:</strong> MODBUS RTU via USB; requires the installation of a <a href="/modbus_serial/">serial driver</a></li>
-  <li><strong>Features:</strong> logging of bean temperature (BT) and environmental temperature (ET)</li>
-</ul>
-:ET

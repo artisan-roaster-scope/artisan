@@ -1,7 +1,0 @@
-I"V<ul>
-  <li><strong>Producer:</strong> <a href="http://www.nazarkahve.com.tr/" target="_blank">Nazarkahve</a>, Turkey</li>
-  <li><strong>Machines:</strong> GR Automatic, GR Manual with 3x EMKO PIDs, GR with 2x EMKO PIDs, GR with 2x Delta DTA PIDs as well as some legacy models</li>
-  <li><strong>Connection:</strong> MODBUS ASCII or RTU via USB; requires the installation of a <a href="/modbus_serial/">serial driver</a></li>
-  <li><strong>Features:</strong> logging of bean temperature, inlet temperature and related rate-of-rise curves, as well as the drum temperature on some machines</li>
-</ul>
-:ET
