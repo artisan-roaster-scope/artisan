@@ -169,11 +169,11 @@ toc_icon: "cog"
     <div class="feature__item--left">
       <div class="archive__item">
           <div class="archive__item-teaser">
+            <picture>
             <source 
               media="(max-width: 768px)"
               srcset="
                /assets/images/about-inventory-management-small.webp">
-            <picture>
              <img src="/assets/images/about-inventory-management.png" 
               srcset="/assets/images/about-inventory-management.webp" alt="cover image inventory management" loading="lazy" decoding="async">
             </picture>
@@ -222,11 +222,11 @@ toc_icon: "cog"
     <div class="feature__item--left">
       <div class="archive__item">
           <div class="archive__item-teaser">
+            <picture>
             <source 
               media="(max-width: 768px)"
               srcset="
                /assets/images/about-reporting-small.webp">
-            <picture>
              <img src="/assets/images/about-reporting.png" 
               srcset="/assets/images/about-reporting.webp" alt="cover image reporting" loading="lazy" decoding="async">
             </picture>
