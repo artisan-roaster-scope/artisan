@@ -8,28 +8,6 @@ header:
   show_overlay_title: false
   caption: #'doubleshot'
 excerpt: 'v3.2.0{::nomarkdown}<iframe title="Artisan Version" style="display: inline-block;"  frameborder="0" scrolling="0" width="60px" height="120px"></iframe>{:/nomarkdown}'
-feature_row:
-  - image_path: /assets/images/sliders.png
-    alt: "Automation"
-    title: "<span style='color: #4C97C3;'>Automation</span>"
-    excerpt: "Control and replay your roast using sliders, alarms, and PID"
-    url: "/about"
-    btn_label: "Learn More"
-    btn_class: "btn--info btn--small"
-  - image_path: /assets/images/wheel.png
-    alt: "Support"
-    title: "<span style='color: #4C97C3;'>Support</span>"
-    excerpt: "[200+ Machines](/machines), [50+ Devices](/devices), 30+ Languages, [4 Operating Systems](/about/#platforms)"
-    url: "/about"
-    btn_label: "Learn More"
-    btn_class: "btn--info btn--small"
-  - image_path: /assets/images/plus-square.svg
-    alt: "Inventory Management"
-    title: "<span style='color: #4C97C3;'>Inventory Management</span>"
-    excerpt: "professional production support & business reporting by [<span style='color: #4C97C3; font-weight:bold;'>artisan.plus</span>](https://artisan.plus){:target='_blank'}" 
-    url: "/about"
-    btn_label: "Learn More"
-    btn_class: "btn--info btn--small"
 intro:
   - excerpt: '[<span style="color: #4C97C3;">sign up for <b>artisan.plus</b></span>](https://artisan.plus/en/register) <span style="color: #4C97C3;">
 <BR><BR>[Install Now](/download/){: .btn .btn--success .btn--large} &ensp; [Guide](/docs/quick-start-guide/){: .btn .btn--success .btn--large}
@@ -38,24 +16,6 @@ intro:
 &ensp; [Shop](https://shop.artisan.plus/){: .btn .btn--success .btn--large}{:target="_blank"}
 <BR>
 <BR>'
-gallery2:
-  - url: /assets/images/testimonial-elvio.png
-    image_path: /assets/images/testimonial-elvio.png
-    alt: "testimonial elvio"
-  - url: /assets/images/testimonial-espinoza.png
-    image_path: /assets/images/testimonial-espinoza.png
-    alt: "testimonial espinoza"
-gallery3:
-  - url: /assets/images/testimonial-dan.png
-    image_path: /assets/images/testimonial-dan.png
-    alt: "testimonial dan"
-gallery4:
-  - url: /assets/images/testimonial-peritus.png
-    image_path: /assets/images/testimonial-peritus.png
-    alt: "testimonial peritus"
-  - url: /assets/images/testimonial-brian.png
-    image_path: /assets/images/testimonial-brian.png
-    alt: "testimonial brian"
 ---
 
 <link
@@ -67,7 +27,65 @@ gallery4:
 
 {% include feature_row id="intro" type="center" %}
 
-{% include feature_row %}
+<div class="feature__wrapper">
+    <div class="feature__item">
+      <div class="archive__item">
+          <div class="archive__item-teaser">
+             <picture>
+             <source 
+               media="(max-width: 768px)"
+               srcset="
+                /assets/images/sliders-small.webp">
+              <img src="/assets/images/sliders.png" 
+               srcset="/assets/images/sliders.webp" alt="Automation">
+             </picture> 
+          </div>
+        <div class="archive__item-body">
+            <h2 class="archive__item-title"><span style='color: #4C97C3;'>Automation</span></h2>
+            <div class="archive__item-excerpt">
+              <p>Control and replay your roast using sliders, alarms, and PID</p>
+            </div>
+            <p><a href="/about" class="btn btn--info btn--small">Learn More</a></p>
+        </div>
+      </div>
+    </div>
+    <div class="feature__item">
+      <div class="archive__item">
+          <div class="archive__item-teaser">
+             <picture>
+             <source 
+               media="(max-width: 768px)"
+               srcset="
+                /assets/images/wheel-small.webp">
+              <img src="/assets/images/wheel.png" 
+               srcset="/assets/images/wheel.webp" alt="Support">
+             </picture>   
+          </div>
+        <div class="archive__item-body">
+            <h2 class="archive__item-title"><span style='color: #4C97C3;'>Support</span></h2>
+            <div class="archive__item-excerpt">
+              <p><a href="/machines">200+ Machines</a>, <a href="/devices">50+ Devices</a>, 30+ Languages, <a href="/about/#platforms">4 Operating Systems</a></p>
+            </div>
+            <p><a href="/about" class="btn btn--info btn--small">Learn More</a></p>
+        </div>
+      </div>
+    </div>
+    <div class="feature__item">
+      <div class="archive__item">
+          <div class="archive__item-teaser">
+            <img src="/assets/images/plus-square.svg"
+                 alt="Inventory Management">
+          </div>
+        <div class="archive__item-body">
+            <h2 class="archive__item-title"><span style='color: #4C97C3;'>Inventory Management</span></h2>
+            <div class="archive__item-excerpt">
+              <p>professional production support &amp; business reporting by <a href="https://artisan.plus" target="_blank"><span style="color: #4C97C3; font-weight:bold;">artisan.plus</span></a></p>
+            </div>
+            <p><a href="/about" class="btn btn--info btn--small">Learn More</a></p>
+        </div>
+      </div>
+    </div>
+</div>
 
 
 <figure class=" ">
@@ -82,12 +100,28 @@ gallery4:
 </picture>
 </a>
 </figure>
-
-
-{% include gallery id="gallery2" %}
-{% include gallery id="gallery3" %}
-
-
+<figure class="half ">
+<a target="_blank" href="/assets/images/testimonial-elvio.webp">
+<picture>
+<source 
+  media="(max-width: 768px)"
+  srcset="
+   /assets/images/testimonial-elvio-small.webp">
+ <img src="/assets/images/testimonial-elvio.png" 
+  srcset="/assets/images/testimonial-elvio.webp" alt="testimonial elvio" loading="lazy" decoding="async">
+</picture>
+</a>
+<a target="_blank" href="/assets/images/testimonial-brian.webp">
+<picture>
+<source 
+  media="(max-width: 768px)"
+  srcset="
+   /assets/images/testimonial-dan-small.webp">
+ <img src="/assets/images/testimonial-dan.png" 
+  srcset="/assets/images/testimonial-dan.webp" alt="testimonial dan" loading="lazy" decoding="async">
+</picture>
+</a>
+</figure>
 <figure class="half ">
 <a target="_blank" href="/assets/images/testimonial-peritus.webp">
 <picture>
@@ -99,16 +133,17 @@ gallery4:
   srcset="/assets/images/testimonial-peritus.webp" alt="testimonial peritus" loading="lazy" decoding="async">
 </picture>
 </a>
-
-      <a target="_blank" href="/assets/images/testimonial-brian.png"
-        >
-          <img src="/assets/images/testimonial-brian.png"
-               alt="testimonial brian">
-      </a>
-
+<a target="_blank" href="/assets/images/testimonial-brian.webp">
+<picture>
+<source 
+  media="(max-width: 768px)"
+  srcset="
+   /assets/images/testimonial-brian-small.webp">
+ <img src="/assets/images/testimonial-brian.png" 
+  srcset="/assets/images/testimonial-brian.webp" alt="testimonial brian" loading="lazy" decoding="async">
+</picture>
+</a>
 </figure>
-
-
 <figure class=" ">
 <a target="_blank" href="/assets/images/testimonial-stephane.webp">
 <picture>
