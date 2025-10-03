@@ -22,7 +22,9 @@ sidebar:
 
 Artisan provides a custom machine setup for each Giesen model as well as a [few generic setups](#generic-machine-setups).
 
-
+**Watch out!** 
+Giesen machines manufactored before June 2014, those with Moeller (Eaton) PLCs, are not supported by any Artisan version.
+{: .notice--primary}
 
 
 #### Generic Machine Setups (recommended for machines made before 2/2018)
