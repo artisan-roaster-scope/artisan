@@ -1,8 +1,8 @@
 types-openpyxl>=3.1.5.20250919
 types-Pillow>=10.2.0.20240822
 types-protobuf>=6.32.1.20250918
-types-psutil>=7.0.0.20250822
-types-pyserial>=3.5.0.20250919
+types-psutil>=7.0.0.20251001
+types-pyserial>=3.5.0.20251001
 types-python-dateutil==2.9.0.20250822
 types-pytz>=2025.2.0.20250809
 types-pyyaml>=6.0.12.20250915
@@ -13,8 +13,8 @@ types-docutils>=0.22.2.20250924
 types-xlrd>=2.0.0.20250914
 lxml-stubs>=0.5.1
 mypy==1.18.2
-pyright==1.1.405
-ruff>=0.13.2
+pyright==1.1.406
+ruff>=0.13.3
 pylint==3.3.8
 pre-commit>=4.3.0
 pytest>=8.4.2

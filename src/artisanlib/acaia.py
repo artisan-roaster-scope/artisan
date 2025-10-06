@@ -17,7 +17,6 @@
 
 import asyncio
 import logging
-import time as libtime
 from enum import IntEnum, unique
 from typing import Optional, Union, List, Tuple, Final, Callable, TYPE_CHECKING
 
@@ -827,8 +826,11 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
     def send_leds_off(self) -> None:
         self.send_led_cmd(self.led_color_payload(LED_CMD.OFF, self.BLACK))
 
-    def send_leds_halo(self, color:Color) -> None:
+    def send_leds_halo_off(self, color:Color) -> None:
         self.send_led_cmd(self.led_color_payload(LED_CMD.EFFECT, color, LED_EFFECT.HALO))
+
+    def send_leds_halo_on(self, color:Color) -> None:
+        self.send_led_cmd(self.led_color_payload(LED_CMD.EFFECT, color, LED_EFFECT.HALO, param=1))
 
     def send_leds_wipe_off(self, color:Color) -> None:
         self.send_led_cmd(self.led_color_payload(LED_CMD.EFFECT, color, LED_EFFECT.WIPE_OFF))
@@ -1032,7 +1034,7 @@ class Acaia(Scale): # pyright: ignore [reportGeneralTypeIssues] # Argument to cl
             self.acaia.send_default_effects_on()
         elif action == STATE_ACTION.CONNECTED:
             self.acaia.send_default_effects_off()
-            self.acaia.send_leds_halo(self.acaia.CYAN)
+            self.acaia.send_leds_halo_off(self.acaia.CYAN)
         elif action == STATE_ACTION.RELEASED:
             self.acaia.send_leds_breathe(self.acaia.MAGENTA)
         elif action == STATE_ACTION.ASSIGNED_GREEN:
@@ -1040,9 +1042,7 @@ class Acaia(Scale): # pyright: ignore [reportGeneralTypeIssues] # Argument to cl
         elif action == STATE_ACTION.ASSIGNED_ROASTED:
             self.acaia.send_leds_breathe(self.acaia.BROWN)
         elif action == STATE_ACTION.ZONE_ENTER:
-            self.acaia.send_leds_halo(self.acaia.LIGHT_BLUE)
-            libtime.sleep(0.3)
-            self.acaia.send_leds_on(self.acaia.LIGHT_BLUE)
+            self.acaia.send_leds_halo_on(self.acaia.LIGHT_BLUE)
         elif action == STATE_ACTION.ZONE_EXIT:
             self.acaia.send_leds_wipe_off(self.acaia.LIGHT_BLUE)
         elif action == STATE_ACTION.SWAP_ENTER:

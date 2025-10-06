@@ -144,17 +144,17 @@
 	<key>LSMinimumSystemVersion</key>
 	<string>12.3</string>
 	<key>LSMultipleInstancesProhibited</key>
-	<string>false</string>
+	<false/>
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>Artisan wants to access bluetooth</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>
 	<string>Artisan wants to access bluetooth</string>
-	<key>NSLocalNetworkUsageDescription</key>
-	<string>Artisan uses the local network to connect to roasting machines and other supported devices.</string>
 	<key>NSHighResolutionCapable</key>
 	<true/>
 	<key>NSHumanReadableCopyright</key>
 	<string>GNU General Public License (GPL)</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Artisan uses the local network to connect to roasting machines and other supported devices.</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>

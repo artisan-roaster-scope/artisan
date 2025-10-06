@@ -52,7 +52,7 @@ a = Analysis(['artisan.py'],
     binaries=BINARIES,
     datas=[],
     hookspath=[],
-    runtime_hooks=[],
+    runtime_hooks=['./pyinstaller_hooks/rthooks/pyi_rth_mplconfig.py'], # overwrites default MPL runtime hook which keeps loading font cache from (new) temp directory
     excludes=EXCLUDES,
     hiddenimports=hiddenimports_list,
     win_no_prefer_redirects=False,
@@ -82,7 +82,7 @@ exe = EXE(pyz,
           exclude_binaries=True, # should be True for onedir
           name='artisan',
           debug=False,
-          strip=False,
+          strip=True,
           upx=True,
           console=True)
 
@@ -90,6 +90,6 @@ coll = COLLECT(exe,
                a.binaries,
                a.zipfiles,
                a.datas,
-               strip=False,
+               strip=True,
                upx=True,
                name='artisan')

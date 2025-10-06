@@ -20,7 +20,7 @@ https://artisan-roasterscope.blogspot.de
 
 ## FEATURES
 
-Runs on 64bit x64 Windows 10, macOS 11 Big Sur (legacy builds support Windows 8 x64 and macOS 10.13 High Sierra), Redhat/Debian Linux (incl. 32bit Raspberry Pi) and supports a large number of devices and roasting machines. See <https://artisan-scope.org/devices/index> for supported devices and <https://artisan-scope.org/machines/index> for supported machines.
+Runs on 64bit x64 Windows 10, macOS 12 Monterey (legacy builds support Windows 8 x64 and macOS 10.13 High Sierra), Redhat/Debian Linux (incl. 64bit Raspberry Pi Bookworm) and supports a large number of devices and roasting machines. See <https://artisan-scope.org/devices/index> for supported devices and <https://artisan-scope.org/machines/index> for supported machines.
 
 **Artisan offers**
 - Unlimited number of curves.

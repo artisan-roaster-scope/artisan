@@ -3091,6 +3091,11 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                 )
         return None
 
+    def is_only_not_completed_item(self, uuid:str) -> bool:
+        # latest roast first
+        item:Optional[CompletedItem] = next((ci for ci in self.completed_items if not ci.measured), None)
+        return (item is not None and item.roastUUID.hex == uuid)
+
     def next_not_completed_item(self) -> Optional[RoastedWeightItem]:
 #        # latest roast first
 #        item:Optional[CompletedItem] = next((ci for ci in self.completed_items if not ci.measured), None)

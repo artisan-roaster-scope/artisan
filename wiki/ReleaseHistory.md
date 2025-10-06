@@ -74,6 +74,7 @@ v3.2.1
   - fixes typo that caused plus blend ingredient names to not being loaded from alog profiles
   - adds missing unit translations for Chinese and revert to English on missing locale support
   - adds additional margin to cupping spider graph to prevent clipping in full screen mode
+  - fixes a build issue on Linux ([Issue #2003](../../../issues/2003))
 
 
 ----

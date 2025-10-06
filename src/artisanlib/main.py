@@ -22965,7 +22965,8 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                 self.pdf_rendering = False
 
         @pyqtSlot('QWebEnginePage::RenderProcessTerminationStatus', int)
-        def renderingTerminated(_terminationStatus:'QWebEnginePage.RenderProcessTerminationStatus', _exitCode:int) -> None:
+        def renderingTerminated(terminationStatus:'QWebEnginePage.RenderProcessTerminationStatus',exitCode:int) -> None:
+            _log.debug('renderingTerminated(%s,%s)',terminationStatus,exitCode)
             release()
 
         try:
@@ -27440,6 +27441,8 @@ def main() -> None:
     appWindow.settingsLoad(redraw=False) # redraw is triggered later in the startup process again
     appWindow.restoreExtraDeviceSettingsBackup() # load settings backup if it exists (like on RESET)
     _log.info('loaded %s settings in %.2fs', len(QSettings().allKeys()), libtime.process_time() - start_time)
+
+#    _log.debug("PRINT mpl.get_cachedir(): %s",mpl.get_cachedir())
 
     # inform the user the debug logging is on
     if debugLogLevelActive():

@@ -683,7 +683,8 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefl
 
         # Weighing State.
         self.green_task_empty_scale_weight:int = 0            # weight of the empty scale
-        self.green_task_scale_tare_weight:int = 0             # last stable weight after placing the current empty bucket
+        self.green_task_scale_tare_weight:int = 0             # last stable weight after placing the empty bucket (green)
+        self.roasted_task_scale_tare_weight:int = 0           # last stable weight after placing the empty bucket (roasted)
         self.green_task_container1_registered_weight:int = 0  # holds the green fill weight of the first container after container swap
         self.green_task_stable_weight_before_connection_loss = 0 # holds the green weight before the connection to the assigned scale got lost
         self.task_canceled_step:int = 0                       # remember step (in g) that did lead to "task_cancel" allowing for a restart via "bucket_put_back" on recognizing the inverse step
@@ -875,7 +876,8 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefl
     #   +-WeightManager.MIN_EMPTY_BUCKET_RECOGNITION_TOLERANCE of the defined bucket weights if available (an no green bucket is set)
     #   between WeightManager.MIN_EMPTY_BUCKET_WEIGHT_BATCH_PERECENT and WeightManager.MAX_EMPTY_BUCKET_WEIGHT_BATCH_PERECENT of the batchsize
     #     but not smaller than WeightManager.MIN_EMPTY_BUCKET_WEIGHT and WeightManager.MAX_EMPTY_BUCKET_WEIGHT
-    def empty_bucket_placed(self, step:int, batchsize:float) -> bool:
+    # if green is True we check for an empty bucket to weigh greens otherwise to weigh roasted
+    def empty_bucket_placed(self, step:int, batchsize:float, green:bool=True) -> bool:
         # the empty bucket weight must be lighter than the total weight of a filled roasted bucket
         # to avoid overlapping recognition
         # NOTE: a very light roasting task can block the recognition of the placement of empty green buckets
@@ -891,9 +893,14 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefl
         if step > WeightManager.MIN_CUSTOM_EMPTY_BUCKET_WEIGHT:
             # larger than absolute minimum bucket weight
 
-            if 0 <= self.aw.container1_idx < len(self.aw.qmc.container_weights):
+            if green and 0 <= self.aw.container1_idx < len(self.aw.qmc.container_weights):
                 # if green bucket is set, step should be about the weight of the user defined green bucket
                 selected_container_weight = self.aw.qmc.container_weights[self.aw.container1_idx]
+                return abs(selected_container_weight - step) <= max(float(WeightManager.MIN_EMPTY_BUCKET_RECOGNITION_TOLERANCE),
+                    selected_container_weight*WeightManager.EMPTY_BUCKET_RECOGNITION_TOLERANCE_PERCENT/100)
+            if not green and 0 <= self.aw.container2_idx < len(self.aw.qmc.container_weights):
+                # if roasted bucket is set, step should be about the weight of the user defined roasted bucket
+                selected_container_weight = self.aw.qmc.container_weights[self.aw.container2_idx]
                 return abs(selected_container_weight - step) <= max(float(WeightManager.MIN_EMPTY_BUCKET_RECOGNITION_TOLERANCE),
                     selected_container_weight*WeightManager.EMPTY_BUCKET_RECOGNITION_TOLERANCE_PERCENT/100)
 
@@ -969,7 +976,8 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefl
                 self.signal_green_task_scale(STATE_ACTION.INTERRUPTED)
 
             # 4. Place Empty Green Bucket
-            elif (self.sm_green.current_weight_item is not None and                            # current green weight item is established
+            elif (self.aw.taskWebDisplayGreenActive and                                        # only if Task Display Green is active
+                    self.sm_green.current_weight_item is not None and                          # current green weight item is established
                     (((self.sm_green.current_state in
                         {GreenWeighingState.ready, GreenWeighingState.empty}) and              # green State Machine is in READY or EMPTY state
                         (self.green_task_scale == 0 or
@@ -1033,8 +1041,40 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefl
                     # make state transition (which then triggers the display update)
                     self.sm_green.send('bucket_placed')
 
-            # 5. Place Full Roasted Bucket
-            elif (self.sm_roasted.current_weight_item is not None and                      # current roasted weight item is established
+            # 5. Place Empty Roasted Bucket
+            elif (not self.aw.taskWebDisplayGreenActive and                                # only if Task Display Green is NOT active
+                    self.aw.taskWebDisplayRoastedActive and                                # only if Task Display Roasted is active
+                    self.sm_roasted.current_weight_item is not None and                    # current roasted weight item is established
+                    self.sm_roasted.current_state == RoastedWeighingState.ready and        # roasted State Machine is in READY state (scale available!)
+                    self.roasted_task_scale == 0 and                                       # no scale yet assigned to the roasted task
+                     # the current weight item is the only non-completed one (first and last uncompleted):
+                    self.aw.schedule_window is not None and
+                    self.aw.schedule_window.is_only_not_completed_item(self.sm_roasted.current_weight_item.uuid) and
+                    self.empty_bucket_placed(step, self.sm_roasted.current_weight_item.weight, False)): # empty roasted bucket recognized
+
+                # reserve scale for the roasted task
+                if scale_nr == 1:
+                    self.roasted_task_scale = scale_nr
+                    self.roasted_task_scale_tare_weight = stable_weight  # the reading of the scale with the empty bucket placed
+                    self.roasted_task_empty_scale_weight = self.scale1_last_stable_weight
+                    self.scale_manager.scale1_connected_signal.connect(self.scale1_connected_slot)
+                    self.scale_manager.scale1_disconnected_signal.connect(self.scale1_disconnected_slot)
+                    self.scale_manager.reserve_scale1_signal.emit()
+                    self.scale_manager.signal_user_scale1_signal.emit(STATE_ACTION.ASSIGNED_ROASTED)
+                elif scale_nr == 2:
+                    self.roasted_task_scale = scale_nr
+                    self.roasted_task_scale_tare_weight = stable_weight  # the reading of the scale with the empty bucket placed
+                    self.roasted_task_empty_scale_weight = self.scale2_last_stable_weight
+                    self.scale_manager.scale2_connected_signal.connect(self.scale2_connected_slot)
+                    self.scale_manager.scale2_disconnected_signal.connect(self.scale2_disconnected_slot)
+                    self.scale_manager.reserve_scale2_signal.emit()
+                    self.scale_manager.signal_user_scale2_signal.emit(STATE_ACTION.ASSIGNED_ROASTED)
+                self.sm_roasted.send('empty_bucket_placed')
+
+
+            # 6. Place Full Roasted Bucket
+            elif (self.aw.taskWebDisplayRoastedActive and                                  # only if Task Display Roasted is active
+                    self.sm_roasted.current_weight_item is not None and                    # current roasted weight item is established
                     self.sm_roasted.current_state == RoastedWeighingState.ready and        # roasted State Machine is in READY state
                     self.roasted_task_scale == 0 and                                       # no scale yet assigned to the roasted task
                     0 <= self.aw.container2_idx <= len(self.aw.qmc.container_weights) and  # a roasted container is set

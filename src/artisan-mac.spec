@@ -1,4 +1,4 @@
-# -*- mode: python ; coding: utf-8 -*-
+### -*- mode: python ; coding: utf-8 -*-
 # ABOUT
 # artisan-mac.spec script for Artisan macOS builds using pyinstaller
 #
@@ -13,7 +13,7 @@
 # the GNU General Public License for more details.
 #
 # AUTHOR
-# Dave Baxter, Marko Luther 2023
+# Dave Baxter, Marko Luther 2025
 """
 
 Usage:
@@ -21,6 +21,7 @@ Usage:
 """
 
 import os
+import pathlib
 import subprocess
 import plistlib
 from PyInstaller.utils.hooks import get_package_paths
@@ -37,13 +38,22 @@ VERSION = artisanlib.__version__
 LICENSE = 'GNU General Public License (GPL)'
 
 try:
+    PYTHON_V = os.environ["PYTHON_V"]
+except Exception:
+    PYTHON_V = '3.14'
+python_version = f'python{PYTHON_V}'
+
+try:
     QTDIR = os.environ['QT_PATH'] + r'/'
 except Exception:
     from os.path import expanduser
     HOME = expanduser('~')
-    QTDIR = HOME + r'/Qt5.14.2/5.14.2/clang_64/'
+    QTDIR = HOME + r'/Qt/6.5.3/macos/'
+
+SUPPORTED_LANGUAGES = ['ar', 'cs', 'da', 'de','el','en','es','fa','fi','fr','gd', 'he','hu','id','it','ja','ko','lv', 'nl','no','pl','pt_BR','pt','sk', 'sv','th','tr','uk','vi','zh_CN','zh_TW']
 
 DATA_FILES = [
+        (r'Assets.car', '.'),
         (r'artisanProfile.icns', '.'),
         (r'artisanAlarms.icns', '.'),
         (r'artisanPalettes.icns', '.'),
@@ -59,6 +69,7 @@ DATA_FILES = [
         (r'includes/roboto-regular.woff2', '.'),
         (r'includes/artisan.tpl', '.'),
         (r'includes/scale_widget.tpl', '.'),
+        (r'includes/fitty_patched.js', '.'),
         (r'includes/bigtext.js', '.'),
         (r'includes/fitty_patched.js', '.'),
         (r'includes/jquery-1.11.1.min.js', '.'),
@@ -68,8 +79,13 @@ DATA_FILES = [
         (r'includes/browserconfig.xml', '.'),
         (r'includes/favicon-16x16.png', '.'),
         (r'includes/favicon-32x32.png', '.'),
+        (r'includes/favicon-96x96.png', '.'),
         (r'includes/favicon.ico', '.'),
+        (r'includes/favicon.svg', '.'),
+        (r'includes/mstile-70x70.png', '.'),
+        (r'includes/mstile-144x144.png', '.'),
         (r'includes/mstile-150x150.png', '.'),
+        (r'includes/mstile-310x310.png', '.'),
         (r'includes/safari-pinned-tab.svg', '.'),
         (r'includes/site.webmanifest', '.'),
         (r'includes/sorttable.js', '.'),
@@ -108,9 +124,15 @@ a = Analysis(['artisan.py'],
              binaries=BINARIES,
              datas=DATA_FILES,
              hiddenimports=['babel.numbers'], # should not be needed as it got fixed in pyinstaller 6.11
+             hooksconfig={
+                'matplotlib': {
+                'backends': ['QtAgg', 'svg'] # 'auto',  # auto-detect; the default behavior (QtAgg
+                },
+             },
              hookspath=[],
-             runtime_hooks=[],
-             excludes= [],
+             runtime_hooks=['./pyinstaller_hooks/rthooks/pyi_rth_mplconfig.py'], # overwrites default MPL runtime hook which keeps loading font cache from (new) temp directory
+             additional_hooks_dir=[],
+             excludes= ['tkinter'],
              win_no_prefer_redirects=False,
              win_private_assemblies=False,
              cipher=block_cipher,
@@ -123,26 +145,27 @@ exe = EXE(pyz,
             a.binaries if onefile else [],
             a.zipfiles if onefile else [],
             a.datas if onefile else [],
+            options=[], # runtime python options
             exclude_binaries=not onefile,
             name='Artisan',
             debug=False,
             bootloader_ignore_signals=False,
-            strip=False,
-            upx=False,  # binary compressor: https://github.com/upx/upx
+            strip=True, # not recommended for Windows
+            upx=False,  # binary compressor: https://github.com/upx/upx # brew install upx # UPX is currently used only on Windows
             upx_exclude=[],
             runtime_tmpdir=None,
             console=False,
             disable_windowed_traceback=False,
             argv_emulation=False, # False for GUI apps
-            target_arch='universal2', #'x86_64', #'universal2',
+            target_arch='arm64', #'x86_64', #'universal2',
             codesign_identity='6M3Z6W45L4', #None,
-            entitlements_file='Artisan.entitlements' #None
+            entitlements_file='Artisan.entitlements', #None
             )
 
 try:
     minimumSystemVersion = os.environ['MACOSX_DEPLOYMENT_TARGET']
 except Exception: # pylint: disable=broad-except
-    minimumSystemVersion = '12.0'
+    minimumSystemVersion = '14.0' # numpy/scipy define the minimum
 
 plist = {}
 with open('Info.plist', 'rb') as infile:
@@ -153,10 +176,12 @@ with open('Info.plist', 'rb') as infile:
                     'CFBundleShortVersionString': VERSION,
                     'CFBundleVersion': 'Artisan ' + VERSION,
                     'LSMinimumSystemVersion': minimumSystemVersion,
-                    'LSMultipleInstancesProhibited': 'false',
-                    'LSArchitecturePriority': ['arm64', 'x86_64'],
+                    'LSMultipleInstancesProhibited': False,
+                    'LSArchitecturePriority': ['arm64'],
                     'NSHumanReadableCopyright': LICENSE,
-                    'NSHighResolutionCapable': True
+                    'NSHighResolutionCapable': True,
+#                    'UIDesignRequiresCompatibility': True, # run in compatibility mode, keeping the existing look and metrics of pre v26 macOS releases
+                    'CFBundleIconName': 'artisan-liquid-glass'
                 })
 
 bundle_obj = exe
@@ -167,8 +192,8 @@ if not onefile:
             a.binaries,
             a.zipfiles,
             a.datas,
-            strip=False,
-            upx=False,
+            strip=True, # not recommended for Windows
+            upx=False,  # brew install upx # UPX is currently used only on Windows
             upx_exclude=[],
             name='Test',
         )
@@ -182,13 +207,14 @@ app = BUNDLE(bundle_obj,
 
 #------
 
+subprocess.check_call(r'mv dist/Artisan.app/Contents/Resources/translations dist/Artisan.app/Contents/',shell = True)
 subprocess.check_call(r'rm -rf dist/Test',shell = True)
 subprocess.check_call(r'cp README.txt dist',shell = True)
 subprocess.check_call(r'cp ../LICENSE dist/LICENSE.txt',shell = True)
-subprocess.check_call(r'mkdir dist/Wheels',shell = True)
-subprocess.check_call(r'mkdir dist/Wheels/Cupping',shell = True)
-subprocess.check_call(r'mkdir dist/Wheels/Other',shell = True)
-subprocess.check_call(r'mkdir dist/Wheels/Roasting',shell = True)
+subprocess.check_call(r'mkdir -p dist/Wheels',shell = True)
+subprocess.check_call(r'mkdir -p dist/Wheels/Cupping',shell = True)
+subprocess.check_call(r'mkdir -p dist/Wheels/Other',shell = True)
+subprocess.check_call(r'mkdir -p dist/Wheels/Roasting',shell = True)
 subprocess.check_call(r'cp Wheels/Cupping/* dist/Wheels/Cupping',shell = True)
 subprocess.check_call(r'cp Wheels/Other/* dist/Wheels/Other',shell = True)
 subprocess.check_call(r'cp Wheels/Roasting/* dist/Wheels/Roasting',shell = True)
@@ -200,11 +226,15 @@ except Exception: # pylint: disable=broad-except
 os.chdir('./dist')
 
 # add localization stubs to make macOS translate the systems menu item and native dialogs
-for lang in ['ar', 'cs', 'da', 'de','el','en','es','fa','fi','fr','gd', 'he','hu','id','it','ja','ko','lv', 'nl','no','pl','pt_BR','pt','sk', 'sv','th','tr','uk','vi','zh_CN','zh_TW']:
+for lang in SUPPORTED_LANGUAGES:
     loc_dir = r'Artisan.app/Contents/Resources/' + lang + r'.lproj'
     subprocess.check_call(r'mkdir ' + loc_dir,shell = True)
     subprocess.check_call(r'touch ' + loc_dir + r'/Localizable.string',shell = True)
 
+
+
+#######
+## remove unused and duplicate parts of packages
 
 # for Qt
 print('*** Removing unused Qt frameworks ***')
@@ -218,19 +248,22 @@ Qt_modules = [
     'QtPrintSupport',
     'QtNetwork',
     'QtDBus',
-    'QtBluetooth',
-    'QtConcurrent', # not on PyQt6.2, but PyQt6.4 and PyQt5.x
+#    'QtBluetooth', # replaced by bleak
+#    'QtConcurrent', # not on PyQt6.2, but PyQt6.4 and PyQt5.x
 # needed for QtWebEngine HTML2PDF export:
-    'QtWebEngineWidgets',
     'QtWebEngineCore',
-    'QtWebEngine', # not on PyQt6
+#    'QtWebEngine', # only on PyQt5, does not exists for PyQt6
+    'QtWebEngineWidgets', # required by QtWebEngineCore
+# the following are required by QtWebEngineWidgets and thus by QtWebEngine for the HTML2PDF export
     'QtQuick',
     'QtQuickWidgets',
     'QtQml',
     'QtQmlModels',
+    'QtQmlMeta',
+    'QtQmlWorkerScript',
     'QtWebChannel',
     'QtPositioning',
-    'QtOpenGL' # required by QtWebEngineCore
+    'QtOpenGL'
 ]
 Qt_frameworks = [module + '.framework' for module in Qt_modules]
 
@@ -242,28 +275,32 @@ qt_plugin_dirs = [
     'styles'
 ]
 qt_plugin_files = [
-    'libqsvgicon.dylib',
-    'libqgif.dylib',
-    'libqicns.dylib',
-    'libqico.dylib',
+    'libqsvgicon.dylib', # needed to render MPL toolbar as SVG icons (fallback is PNG; built-in support)
+#    'libqgif.dylib',
+#    'libqicns.dylib',
+#    'libqico.dylib',
     'libqjpeg.dylib',
-    'libqmacjp2.dylib',
+#    'libqmacjp2.dylib',
+#    'libqpdf.dylib',
 	'libqsvg.dylib',
-    'libqtga.dylib',
-    'libqwbmp.dylib',
-    'libqwebp.dylib',
+#    'libqtga.dylib',
+#   'libqtiff.dylib',
+#    'libqwbmp.dylib',
+#    'libqwebp.dylib',
     'libqcocoa.dylib',
     'libcocoaprintersupport.dylib',
     'libqmacstyle.dylib'
 ]
 
-# remove unused Qt frameworks libs (not in Qt_modules_frameworks)
+
+## remove unused Qt frameworks libs (not in Qt_modules_frameworks)
 for subdir, dirs, _files in os.walk('./Artisan.app/Contents/Frameworks/PyQt6/Qt6/lib'):
     for di in dirs:
         if di.startswith('Qt') and di.endswith('.framework') and di not in Qt_frameworks:
             file_path = os.path.join(subdir, di)
             print(f'rm -rf {file_path}')
             subprocess.check_call(f'rm -rf {file_path}',shell = True)
+
 
 ## remove unused plugins
 for root, dirs, _ in os.walk('./Artisan.app/Contents/Frameworks/PyQt6/Qt6/plugins'):
@@ -280,6 +317,64 @@ for root, dirs, _ in os.walk('./Artisan.app/Contents/Frameworks/PyQt6/Qt6/plugin
                         subprocess.check_call(f'rm -rf {file_path}',shell = True)
 
 subprocess.check_call(r'rm -rf ./Artisan.app/Contents/Frameworks/PyQt6/Qt6/qml',shell = True)
+
+
+
+rootdir = f'./Artisan.app/Contents/Resources'
+
+# remove Qt artefacts
+for qt_dir in [
+        'PyQt6/Qt',
+        'PyQt6/bindings',
+        'PyQt6/lupdate',
+        'PyQt6/uic',
+#        'PyQt6/Qt6/translations', # qt translations are kept and loaded from their standard dir
+        'PyQt6/Qt6/qml',
+        'PyQt6/Qt6/qsci',
+#        'PyQt6/Qt6/lib', # comment for the non-Framework variant
+    ]:
+    try:
+        subprocess.check_call(f'rm -rf {rootdir}/{qt_dir}',shell = True)
+    except Exception: # pylint: disable=broad-except
+        pass
+
+qt_trans_prefix_keep = {
+    'qtbase',
+    'qt'
+}
+qt_trans_prefix_delete = {
+    'qt_help'
+}
+
+# remove unused translations of unused Qt modules
+for qt_dir in ['PyQt6/Qt6/translations']:
+    qt = f'{rootdir}/{qt_dir}'
+    for root, _, files in os.walk(qt):
+        for file in files:
+            if (any(file.startswith(f'{x}_') for x in qt_trans_prefix_delete) or
+                    not (any(file.startswith(f'{x}_') for x in qt_trans_prefix_keep) and any(file.endswith(f'_{x}.qm') for x in SUPPORTED_LANGUAGES))):
+                file_path = os.path.join(root, file)
+                subprocess.check_call(f'rm -rf {file_path}',shell = True)
+
+
+print('*** Removing QtWebEngine translations ***')
+
+for qtwebengine_dir in ['PyQt6/Qt6/lib/QtWebEngineCore.framework/Versions/A/Resources/qtwebengine_locales/']:
+    qtwebengine = f'{rootdir}/{qtwebengine_dir}'
+    for root, _, files in os.walk(qtwebengine):
+        for file in files:
+            if not file == 'en-US.pak':
+                file_path = os.path.join(root, file)
+                print(f'rm -rf {file_path}')
+                subprocess.check_call(f'rm {file_path}',shell = True)
+
+print('*** Removing QtWebEngine remote debug lib ***')
+
+try:
+    subprocess.check_call(f'rm -rf {rootdir}/PyQt6/Qt6/lib/QtWebEngineCore.framework/Versions/A/Resources/qtwebengine_devtools_resources.pak',shell = True)
+except Exception: # pylint: disable=broad-except
+    pass
+
 
 print('*** Removing unused files ***')
 for root, dirs, files in os.walk('.'):
@@ -315,10 +410,49 @@ for root, dirs, files in os.walk('.'):
         if 'tests' in di:
             for r,_d,f in os.walk(os.path.join(root,di)):
                 for fl in f:
-#                    print('Deleting', os.path.join(r,fl))
-                    os.remove(os.path.join(r,fl))
+                    print('Deleting', os.path.join(r,fl))
+                    if not fl.endswith(('.py', '.pyc')):
+                        os.remove(os.path.join(r,fl))
 
 
+# remove unused language support from babel
+
+print('*** Removing unused language support from babel ***')
+
+for root, _, files in os.walk(f'./Artisan.app/Contents/Resources/babel/locale-data'):
+    for file in files:
+        if (file.endswith('.dat') and
+            file not in {'root.dat', 'zh.dat', 'zh_Hans_CN.dat', 'zh_Hant_TW.dat'} and
+            (('_' not in file and file.split('.')[0] not in SUPPORTED_LANGUAGES) or
+                ('_' in file and file.split('.')[0] not in SUPPORTED_LANGUAGES))):
+#            print('Deleting', file)
+            os.remove(os.path.join(root,file))
+
+
+print('*** Removing Phidget driver libs not for this platforms ***')
+try:
+    subprocess.check_call(f'rm -f ./Artisan.app/Contents/Frameworks/phidget22.dll',shell = True)
+except Exception: # pylint: disable=broad-except
+    pass
+
+
+print('*** Removing mypy completely ***')
+try:
+    subprocess.check_call(f'rm -rf ./Artisan.app/Contents/Frameworks/mypy',shell = True)
+except Exception: # pylint: disable=broad-except
+    pass
+
+
+print('*** Removing broken symbolic links ***')
+for subdir, _dirs, files in os.walk('.', followlinks=False):
+    for file in files:
+        file_path = pathlib.Path(os.path.join(subdir, file))
+        if file_path.is_symlink() and not file_path.exists():
+            print(f"unlink dangling symlink at {file_path}")
+            subprocess.check_call(f'unlink {file_path}',shell = True)
+
+
+####
 
 
 dist_name = r'artisan-mac-' + VERSION + r'.dmg'
