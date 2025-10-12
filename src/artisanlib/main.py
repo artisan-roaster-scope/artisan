@@ -9340,13 +9340,13 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                                     cs_len = len(cs_a)
                                     if cs_len>2:
                                         b = toBool(cs_a[2])
-                                    ser:Optional[str] = None
-                                    if cs_len == 4:
-                                        ser = cs_a[3]
-                                    if b:
-                                        self.ser.yoctoRELon(int(cs_a[1]),ser)
-                                    else:
-                                        self.ser.yoctoRELoff(int(cs_a[1]),ser)
+                                        ser:Optional[str] = None
+                                        if cs_len == 4:
+                                            ser = cs_a[3]
+                                        if b:
+                                            self.ser.yoctoRELon(int(cs_a[1]),ser)
+                                        else:
+                                            self.ser.yoctoRELoff(int(cs_a[1]),ser)
                                 # on(c[,sn])
                                 elif c.startswith('on'):
                                     cs_a = re.findall(r'[0-9a-zA-Z-.:]+', c)
@@ -9813,6 +9813,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                             elif cs.startswith('button'):
                                 # cmd has format "button(<bool>)" # 0 or 1 or True or False
                                 try:
+                                    args = []
                                     try:
                                         args = eval(cs[len('button'):]) # pylint: disable=eval-used
                                     except Exception: # pylint: disable=broad-except
@@ -10859,6 +10860,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                         elif cs.startswith('button'):
                             # cmd has format "button(<bool>)" # 0 or 1 or True or False
                             try:
+                                args = []
                                 try:
                                     args = eval(cs[len('button'):]) # pylint: disable=eval-used
                                 except Exception: # pylint: disable=broad-except
@@ -12272,7 +12274,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                             self.enableEditMenus()
                             self.showControls()
                         self.releaseminieditor()
-                elif k == Qt.Key.Key_Left: # 16777234:               #LEFT (moves background left / moves button selection left)
+                elif k == Qt.Key.Key_Left: # 16777234:            #LEFT (moves background left / moves button selection left)
                     if self.qmc.foreground_event_last_picked_ind is not None and self.qmc.foreground_event_last_picked_pos is not None:
                         # a foreground event is selected; move it up
                         self.qmc.move_custom_event(True, self.qmc.foreground_event_last_picked_ind, self.qmc.foreground_event_last_picked_pos, xstep=-1)
@@ -12283,7 +12285,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                         self.moveKbutton('left')
                     elif self.qmc.background and self.qmc.backgroundKeyboardControlFlag:
                         self.qmc.moveBackgroundSignal.emit('left',self.qmc.backgroundmovespeed)
-                elif k == Qt.Key.Key_Right: # 16777236:               #RIGHT (moves background right / moves button selection right)
+                elif k == Qt.Key.Key_Right: # 16777236:            #RIGHT (moves background right / moves button selection right)
                     if self.qmc.foreground_event_last_picked_ind is not None and self.qmc.foreground_event_last_picked_pos is not None:
                         # a foreground event is selected; move it up
                         self.qmc.move_custom_event(True, self.qmc.foreground_event_last_picked_ind, self.qmc.foreground_event_last_picked_pos, xstep=1)
@@ -12294,7 +12296,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                         self.moveKbutton('right')
                     elif self.qmc.background and self.qmc.backgroundKeyboardControlFlag:
                         self.qmc.moveBackgroundSignal.emit('right',self.qmc.backgroundmovespeed)
-                elif k == Qt.Key.Key_Up: # 16777235:              #UP (moves background up)
+                elif k == Qt.Key.Key_Up: # 16777235:               #UP (moves background up)
                     if self.qmc.foreground_event_last_picked_ind is not None and self.qmc.foreground_event_last_picked_pos is not None:
                         # a foreground event is selected; move it up
                         self.qmc.move_custom_event(True, self.qmc.foreground_event_last_picked_ind, self.qmc.foreground_event_last_picked_pos, ystep=1)
@@ -12303,7 +12305,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                         self.qmc.move_custom_event(False, self.qmc.background_event_last_picked_ind, self.qmc.background_event_last_picked_pos, ystep=1)
                     elif self.qmc.background and self.qmc.backgroundKeyboardControlFlag:
                         self.qmc.moveBackgroundSignal.emit('up',self.qmc.backgroundmovespeed)
-                elif k == Qt.Key.Key_Down: # 16777237:            #DOWN (moves background down)
+                elif k == Qt.Key.Key_Down: # 16777237:             #DOWN (moves background down)
                     if self.qmc.foreground_event_last_picked_ind is not None and self.qmc.foreground_event_last_picked_pos is not None:
                         # a foreground event is selected; move it up
                         self.qmc.move_custom_event(True, self.qmc.foreground_event_last_picked_ind, self.qmc.foreground_event_last_picked_pos, ystep=-1)
@@ -12312,18 +12314,24 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                         self.qmc.move_custom_event(False, self.qmc.background_event_last_picked_ind, self.qmc.background_event_last_picked_pos, ystep=-1)
                     elif self.qmc.background and self.qmc.backgroundKeyboardControlFlag:
                         self.qmc.moveBackgroundSignal.emit('down',self.qmc.backgroundmovespeed)
-                elif k == Qt.Key.Key_A: # 65:                     #A (automatic save)
+                elif k == Qt.Key.Key_A: # 65:                       #A (automatic save)
                     if not self.app.artisanviewerMode and self.qmc.flagon and not self.qmc.designerflag and self.comparator is None:
                         self.automaticsave()
-                elif k == Qt.Key.Key_D: # 68:                     #D (toggle xy coordinates between temp and RoR scale)
+                elif k == Qt.Key.Key_D: # 68:                       #D (toggle xy coordinates between temp and RoR scale)
                     if not self.qmc.wheelflag:
                         if not self.qmc.fmt_data_ON:
                             self.qmc.fmt_data_ON = True
                         elif not self.qmc.fmt_data_RoR and self.qmc.twoAxisMode():
                             self.qmc.fmt_data_RoR = True
-                        else:
+                        elif not self.qmc.zoom_follow_onET:
+                            # in the "second round" of the D settings we set the Zoom Follow to ET / ET-RoR
+                            self.qmc.zoom_follow_onET = True
                             self.qmc.fmt_data_RoR = False
+                        else:
                             self.qmc.fmt_data_ON = False
+                            self.qmc.fmt_data_RoR = False
+                            self.qmc.zoom_follow_onET = False
+
                         self.ntb.update_message()
                         # force redraw crosslines if active
                         if self.qmc.crossmarker:
@@ -12331,10 +12339,10 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                                 self.ntb.mouse_move(mplLocationevent.lastevent) # type:ignore[attr-defined] # lastevent removed from MPL 3.10
                             except Exception: # pylint: disable=broad-except
                                 pass
-                elif k == Qt.Key.Key_Z: # 90:                     #Z (toggle xy coordinates between 0: cursor, 1: BT, 2: ET, 3: BTB, 4: ETB)
+                elif k == Qt.Key.Key_Z: # 90:                       #Z (toggle xy coordinates between 0: cursor, 1: BT, 2: ET, 3: BTB, 4: ETB)
                     if not self.qmc.designerflag and not self.qmc.wheelflag and self.comparator is None:
                         self.qmc.nextFmtDataCurve()
-                elif k == Qt.Key.Key_U: # 85:                     #U (toggle running LCDs on/off)
+                elif k == Qt.Key.Key_U: # 85:                       #U (toggle running LCDs on/off)
                     if not self.qmc.flagon:
                         if self.qmc.running_LCDs == 0 and self.curFile:
                             self.qmc.running_LCDs = 1
@@ -17453,6 +17461,10 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
     #loads the settings at the start of application. See the oppposite closeEventSettings()
     def settingsLoad(self, filename:Optional[str] = None, theme:bool = False, machine:bool = False, redraw:bool = True) -> bool: # pyright: ignore [reportGeneralTypeIssues] # Code is too complex to analyze; reduce complexity by refactoring into subroutines or reducing
         res = False
+        settings:Optional[QSettings] = None
+        #remember swaplcds and swapdeltalcds
+        old_swaplcds = self.qmc.swaplcds
+        old_swapdeltalcds = self.qmc.swapdeltalcds
         try:
             updateBatchCounter = True
             if filename is not None:
@@ -17559,9 +17571,6 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             self.plus_user_id = settings.value('plus_user_id',self.plus_user_id)
             self.plus_account_id = settings.value('plus_account_id',self.plus_account_id)
             plus.stock.coffee_label_normal_order = settings.value('standard_bean_labels',plus.stock.coffee_label_normal_order)
-            #remember swaplcds and swapdeltalcds
-            old_swaplcds = self.qmc.swaplcds
-            old_swapdeltalcds = self.qmc.swapdeltalcds
             #restore mode
             old_mode = self.qmc.mode
             self.qmc.mode = ('F' if str(settings.value('Mode',self.qmc.mode)) == 'F' else 'C')
@@ -18987,7 +18996,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                 self.qmc.logoloadfile(self.logofilename)
 
             # set window appearances (style)
-            if settings.contains('appearance'):
+            if settings is not None and settings.contains('appearance'):
                 try:
                     # on Windows/Linux we use the Fusion style per default which supports the dark mode
                     if not sys.platform.startswith('darwin') and settings.value('appearance') == '':
@@ -19000,7 +19009,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                     pass # appearance not in list of available once on this platform
 
             # set dpi
-            if filename is not None and settings.contains('dpi'):
+            if filename is not None and settings is not None and settings.contains('dpi'):
                 # if filename is None (ie. setting is not explicitly loaded from file, but from default location on app start),
                 # the dpi is set on creating the FigureCanvas
                 try:
@@ -19008,12 +19017,13 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                         self.setdpi(max(40,toInt(settings.value('dpi',self.dpi))),moveWindow=True)
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
-            #restore geometry
-            if settings.contains('Geometry'):
-                self.restoreGeometry(settings.value('Geometry'))
-            #restore main window state (like dock widget positions)
-            if settings.contains('MainWindowState'):
-                self.restoreState(settings.value('MainWindowState'))
+            if settings is not None:
+                #restore geometry
+                if settings.contains('Geometry'):
+                    self.restoreGeometry(settings.value('Geometry'))
+                #restore main window state (like dock widget positions)
+                if settings.contains('MainWindowState'):
+                    self.restoreState(settings.value('MainWindowState'))
             if not filename: # only if an external settings file is loaded
                 FigureCanvas.updateGeometry(self.qmc)  #@UndefinedVariable
 

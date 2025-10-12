@@ -665,22 +665,9 @@ class TestGreenWeighingState:
 
         # Assert
         mock_displays[0].show_progress.assert_called_once_with(
+            0, sample_green_weight_item,
             weight.PROCESS_STATE.WEIGHING, 0, 0, 0
         )
-
-    def test_green_weighing_state_update_displays_no_item(
-        self, mock_displays:Mock, mock_release_scale:Mock
-    ) -> None:
-        """Test GreenWeighingState update_displays with no current item."""
-        # Arrange
-        with patch('plus.weight.StateMachine.__init__'):
-            state = weight.GreenWeighingState(mock_displays, mock_release_scale)
-
-        # Act
-        state.update_displays()
-
-        # Assert
-        mock_displays[0].clear_green.assert_called_once()
 
 
 class TestRoastedWeighingState:
@@ -745,22 +732,8 @@ class TestRoastedWeighingState:
         # Assert
         # The actual implementation calls show_item without component parameter
         mock_displays[0].show_item.assert_called_once_with(
-            sample_roasted_weight_item, weight.PROCESS_STATE.DONE, final_weight=820
+            1, sample_roasted_weight_item, weight.PROCESS_STATE.DONE, final_weight=820
         )
-
-    def test_roasted_weighing_state_update_displays_no_item(
-        self, mock_displays:Mock, mock_release_scale:Mock
-    ) -> None:
-        """Test RoastedWeighingState update_displays with no current item."""
-        # Arrange
-        with patch('plus.weight.StateMachine.__init__'):
-            state = weight.RoastedWeighingState(mock_displays, mock_release_scale)
-
-        # Act
-        state.update_displays()
-
-        # Assert
-        mock_displays[0].clear_roasted.assert_called_once()
 
 
 class TestWeightManager:

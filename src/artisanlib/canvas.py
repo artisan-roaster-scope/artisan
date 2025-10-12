@@ -227,7 +227,7 @@ class tgraphcanvas(FigureCanvas):
         'extralinewidths1', 'extralinewidths2', 'extramarkers1', 'extramarkers2', 'extramarkersizes1', 'extramarkersizes2', 'devicetablecolumnwidths', 'extraNoneTempHint1',
         'extraNoneTempHint2', 'plotcurves', 'plotcurvecolor', 'overlapList', 'tight_layout_params', 'cupping_tight_layout_params', 'fig', 'ax', 'delta_ax', 'legendloc', 'legendloc_pos', 'onclick_cid',
         'oncpick_cid', 'ondraw_cid', 'onmove_cid', 'rateofchange1', 'rateofchange2', 'flagon', 'flagstart', 'flagKeepON', 'flagOpenCompleted', 'flagsampling', 'flagsamplingthreadrunning',
-        'manuallogETflag', 'zoom_follow', 'alignEvent', 'compareAlignEvent', 'compareEvents', 'compareET', 'compareBT', 'compareDeltaET', 'compareDeltaBT', 'compareMainEvents', 'compareBBP', 'compareRoast', 'compareExtraCurves1', 'compareExtraCurves2',
+        'manuallogETflag', 'zoom_follow', 'zoom_follow_onET', 'alignEvent', 'compareAlignEvent', 'compareEvents', 'compareET', 'compareBT', 'compareDeltaET', 'compareDeltaBT', 'compareMainEvents', 'compareBBP', 'compareRoast', 'compareExtraCurves1', 'compareExtraCurves2',
         'replayType', 'replayDropType', 'replayedBackgroundEvents', 'last_replayed_events', 'beepedBackgroundEvents', 'roastpropertiesflag', 'roastpropertiesAutoOpenFlag', 'roastpropertiesAutoOpenDropFlag',
         'title', 'title_show_always', 'ambientTemp', 'ambientTempSource', 'ambientHumiditySource', 'ambientPressureSource', 'ambient_temperature_device', 'ambient_pressure', 'ambient_pressure_device', 'ambient_humidity',
         'ambient_humidity_device', 'elevation', 'temperaturedevicefunctionlist', 'humiditydevicefunctionlist', 'pressuredevicefunctionlist', 'moisture_greens', 'moisture_roasted',
@@ -325,7 +325,7 @@ class tgraphcanvas(FigureCanvas):
         'fmt_data_ON', 'l_subtitle', 'projectDeltaFlag', 'btbreak_params','bbpCache', 'glow',
         'custom_event_dlg_default_type', 'custom_event_dlg_default_type', 'foreground_event_ind', 'foreground_event_last_picked_ind',
         'foreground_event_last_picked_pos', 'background_event_ind', 'background_event_pos', 'background_event_pick_position',
-        'background_event_last_picked_ind', 'background_event_last_picked_pos',
+        'background_event_last_picked_ind', 'background_event_last_picked_pos', 'event_selected',
         'foreground_event_pos', 'plus_lockSchedule_sent_account', 'plus_lockSchedule_sent_date', 'specialeventplaybackramp', 'ramp_lookahead',
         'CO2kg_per_BTU_default', 'CO2kg_per_BTU', 'Biogas_CO2_Reduction', 'Biogas_CO2_Reduction_default',
         'meterunitnames', 'meterreads_default', 'meterreads', 'meterlabels_setup', 'meterlabels', 'meterunits_setup', 'meterunits',
@@ -1203,6 +1203,8 @@ class tgraphcanvas(FigureCanvas):
         self.background_event_pick_position:Optional[Tuple[float,float]] = None
         self.background_event_last_picked_ind:Optional[int] = None # index of the last picked event marker in self.specialevents to be deleted via backspace or moved by cursor keys
         self.background_event_last_picked_pos:Optional[int] = None # position of the last picked event marker in its 2DLine.xdata() value array to be deleted via backspace or moved by cursor keys
+        #
+        self.event_selected:bool = False # set on pick and unset on move, used in onrelease_after_pick which clears foreground/background_event_last_picked if still set
 
         self.onmove_cid = self.fig.canvas.mpl_connect('motion_notify_event', cast('Callable[[Event],None]', self.onmove))
 
@@ -1230,6 +1232,7 @@ class tgraphcanvas(FigureCanvas):
         self.manuallogETflag = 0
 
         self.zoom_follow:bool = False # if True, Artisan "follows" BT in the center by panning during recording. Activated via a click on the HOME icon
+        self.zoom_follow_onET:bool = False # if True, the Zoom Follow follows ET (or ET RoR if fmt_data_RoR is set) instead of BT (or BT RoR if fmt_data_RoR is set)
 
         self.alignEvent = 0 # 0:CHARGE, 1:DRY, 2:FCs, 3:FCe, 4:SCs, 5:SCe, 6:DROP, 7:ALL
         self.alignnames = [
@@ -3179,6 +3182,7 @@ class tgraphcanvas(FigureCanvas):
                                         self.background_event_pick_position = (event_artist.get_xdata()[ind],event_artist.get_ydata()[ind])
                                         self.background_event_last_picked_ind = i
                                         self.background_event_last_picked_pos = ind
+                                        self.event_selected = True
                                     break
                 elif not bool(self.aw.comparator) and event_artist in [self.l_eventtype1dots,self.l_eventtype2dots,self.l_eventtype3dots,self.l_eventtype4dots]:
                     tx = event_artist.get_xdata()[ind]
@@ -3224,6 +3228,7 @@ class tgraphcanvas(FigureCanvas):
                                         self.foreground_event_pick_position = (event_artist.get_xdata()[ind],event_artist.get_ydata()[ind])
                                         self.foreground_event_last_picked_ind = i
                                         self.foreground_event_last_picked_pos = ind
+                                        self.event_selected = True
                                     break
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
@@ -3619,6 +3624,11 @@ class tgraphcanvas(FigureCanvas):
         self.background_event_ind = None
         self.background_event_pos = None
         self.background_event_pick_position = None
+        if not self.event_selected:
+            # release event selection after a onmove() followed by an onrelease_after_pick()
+            # to give cursor keyboard control back to manual event button mode
+            self.clear_last_picked_event_selection()
+            self.clear_last_background_picked_event_selection()
 
     def onrelease(self, event:'Event') -> None:     # NOTE: onrelease() is connected/disconnected in togglecrosslines()
         event = cast('MouseEvent', event)
@@ -3866,6 +3876,7 @@ class tgraphcanvas(FigureCanvas):
                                 ydata[self.foreground_event_pos])
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
+                self.event_selected = False
                 self.fig.canvas.draw_idle()
         elif (self.background_event_ind is not None and self.background_event_pos is not None and self.background_event_pick_position is not None and
                     len(self.backgroundEtypes)>self.background_event_ind):
@@ -3947,7 +3958,7 @@ class tgraphcanvas(FigureCanvas):
                                 background=True)
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
-
+                self.event_selected = False
                 self.fig.canvas.draw_idle()
 
     def clear_last_picked_event_selection(self) -> None:
@@ -5456,40 +5467,44 @@ class tgraphcanvas(FigureCanvas):
                             self.profileDataSemaphore.release(1)
 
                     if self.flagstart:
-                        if  self.zoom_follow: # self.aw.ntb._active == 'ZOOM'
+                        if self.zoom_follow: # self.aw.ntb._active == 'ZOOM'
                             if not self.fmt_data_RoR:
                                 # center current temp reading on canvas
                                 temp = None
-                                if self.temp2 and len(self.temp2)>0:
+                                if not self.zoom_follow_onET and self.temp2 and len(self.temp2)>0:
                                     temp = self.temp2[-1]
-                                    if temp is not None:
-                                        tx = self.timex[-1]
-                                        # get current limits
-                                        xlim = self.ax.get_xlim()
-                                        xlim_offset = (xlim[1] - xlim[0]) / 2.
-                                        xlim_new = (tx - xlim_offset, tx + xlim_offset)
-                                        ylim = self.ax.get_ylim()
-                                        ylim_offset = (ylim[1] - ylim[0]) / 2.
-                                        ylim_new = (temp - ylim_offset, temp + ylim_offset)
-                                        if ylim != ylim_new or xlim != xlim_new:
-                                            # set new limits to center current temp on canvas
-                                            self.ax.set_xlim(xlim_new)
-                                            self.ax.set_ylim(ylim_new)
-                                            if self.twoAxisMode() and self.delta_ax is not None:
-                                                # keep the RoR axis constant
-                                                zlim = self.delta_ax.get_ylim()
-                                                zlim_offset = (zlim[1] - zlim[0]) / 2.
-                                                tempd = float(self.delta_ax.transData.inverted().transform((0,self.ax.transData.transform((0,temp))[1]))[1])
-                                                zlim_new = (tempd - zlim_offset, tempd + zlim_offset)
-                                                self.delta_ax.set_ylim(zlim_new)
-                                            self.ax_background = None
+                                elif self.zoom_follow_onET and self.temp1 and len(self.temp1)>0:
+                                    temp = self.temp1[-1]
+                                if temp is not None:
+                                    tx = self.timex[-1]
+                                    # get current limits
+                                    xlim = self.ax.get_xlim()
+                                    xlim_offset = (xlim[1] - xlim[0]) / 2.
+                                    xlim_new = (tx - xlim_offset, tx + xlim_offset)
+                                    ylim = self.ax.get_ylim()
+                                    ylim_offset = (ylim[1] - ylim[0]) / 2.
+                                    ylim_new = (temp - ylim_offset, temp + ylim_offset)
+                                    if ylim != ylim_new or xlim != xlim_new:
+                                        # set new limits to center current temp on canvas
+                                        self.ax.set_xlim(xlim_new)
+                                        self.ax.set_ylim(ylim_new)
+                                        if self.twoAxisMode() and self.delta_ax is not None:
+                                            # keep the RoR axis constant
+                                            zlim = self.delta_ax.get_ylim()
+                                            zlim_offset = (zlim[1] - zlim[0]) / 2.
+                                            tempd = float(self.delta_ax.transData.inverted().transform((0,self.ax.transData.transform((0,temp))[1]))[1])
+                                            zlim_new = (tempd - zlim_offset, tempd + zlim_offset)
+                                            self.delta_ax.set_ylim(zlim_new)
+                                        self.ax_background = None
                             else:
                                 # center current RoR reading on canvas
                                 ror = None
                                 two_ax_mode = (self.DeltaETflag or self.DeltaBTflag or (self.background and (self.DeltaETBflag or self.DeltaBTBflag)))
                                 if two_ax_mode and self.delta_ax is not None:
-                                    if self.delta2 and len(self.delta2)>0:
+                                    if not self.zoom_follow_onET and self.delta2 and len(self.delta2)>0:
                                         ror = self.delta2[-1]
+                                    elif self.zoom_follow_onET and self.delta1 and len(self.delta1)>0:
+                                        ror = self.delta1[-1]
                                     if ror is not None:
                                         tx = self.timex[-1]
                                         # get current limits
@@ -9244,6 +9259,7 @@ class tgraphcanvas(FigureCanvas):
             self.aw.comparator.redraw()
             self.aw.qpc.redraw_phases()
         else:
+            titleB = ''
             try:
                 #### lock shared resources   ####
                 if takelock:
@@ -9328,7 +9344,6 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         self.setProfileTitle(self.title)
 
-                    titleB = ''
                     if not ((self.flagstart and not self.title_show_always) or self.title is None or self.title.strip() == ''):
                         if self.backgroundprofile is not None:
                             if self.roastbatchnrB == 0:
@@ -9636,13 +9651,13 @@ class tgraphcanvas(FigureCanvas):
                             idx3 = self.xtcurveidx - 1
                             n3 = idx3 // 2
                             if len(self.stemp1BX) > n3 and len(self.stemp2BX) > n3 and len(self.extratimexB) > n3:
+                                tx:Optional[List[float]] = self.extratimexB[n3]
+                                tx_lin:Optional[List[float]] = None
                                 if re_smooth_background:
                                     # re-smooth the extra background curve
                                     tx = self.extratimexB[n3]
                                     if tx is not None and tx:
                                         tx_lin = numpy.linspace(tx[0],tx[-1],len(tx))
-                                    else:
-                                        tx_lin = None
                                 if self.xtcurveidx % 2:
                                     if len(self.aw.extraDelta1)>n3 and self.aw.extraDelta1[n3] and self.delta_ax is not None:
                                         trans = self.delta_ax.transData
@@ -9692,9 +9707,10 @@ class tgraphcanvas(FigureCanvas):
                             idx4 = self.ytcurveidx - 1
                             n4 = idx4 // 2
                             if len(self.stemp1BX) > n4 and len(self.stemp2BX) > n4 and len(self.extratimexB) > n4:
+                                tx = self.extratimexB[n4]
+                                tx_lin = None
                                 if re_smooth_background:
                                     # re-smooth the extra background curve
-                                    tx = self.extratimexB[n4]
                                     if tx is not None and tx:
                                         tx_lin = numpy.linspace(tx[0],tx[-1],len(tx))
                                     else:
@@ -10350,8 +10366,8 @@ class tgraphcanvas(FigureCanvas):
                     E3_nonempty:bool = False
                     E4_nonempty:bool = False
 
+                    Nevents = len(self.specialevents)
                     if self.eventsshowflag != 0:
-                        Nevents = len(self.specialevents)
                         #three modes of drawing events.
                         # the first mode just places annotations. They are text annotations.
                         # the second mode aligns the events types to a bar height so that they can be visually identified by type. They are text annotations
@@ -17605,17 +17621,19 @@ class tgraphcanvas(FigureCanvas):
             # returns the max ET/BT RoR between CHARGE and DROP
             if setET:
                 try:
-                    func1 = UnivariateSpline(self.timex,self.temp1, k = self.ETsplinedegree)
-                    funcDelta1 = func1.derivative()
-                    delta1_max = max(funcDelta1(self.designer_timez) * 60)
+                    if self.designer_timez is not None:
+                        func1 = UnivariateSpline(self.timex,self.temp1, k = self.ETsplinedegree)
+                        funcDelta1 = func1.derivative()
+                        delta1_max = max(funcDelta1(self.designer_timez) * 60)
                 except Exception: # pylint: disable=broad-except
                     # scipy interpolate might fail for certain k
                     pass
             if setBT:
                 try:
-                    func2 = UnivariateSpline(self.timex,self.temp2, k = self.BTsplinedegree)
-                    funcDelta2 = func2.derivative()
-                    delta2_max = max(funcDelta2(self.designer_timez) * 60)
+                    if self.designer_timez is not None:
+                        func2 = UnivariateSpline(self.timex,self.temp2, k = self.BTsplinedegree)
+                        funcDelta2 = func2.derivative()
+                        delta2_max = max(funcDelta2(self.designer_timez) * 60)
                 except Exception: # pylint: disable=broad-except
                     # scipy interpolate might fail for certain k
                     pass
@@ -17805,11 +17823,20 @@ class tgraphcanvas(FigureCanvas):
             if self.ETsplinedegree >= len(self.timex):  #max 5 or less. Cannot be bigger than points
                 self.ETsplinedegree = len(self.timex)-1
 
+            func1 = None
+            func2 = None
+            btvals = None
+            etvals = None
             try:
-                func2 = UnivariateSpline(self.timex,self.temp2, k = self.BTsplinedegree)
-                btvals = func2(self.designer_timez)
-                func1 = UnivariateSpline(self.timex,self.temp1, k = self.ETsplinedegree)
-                etvals = func1(self.designer_timez)
+                if self.designer_timez is not None:
+                    func2 = UnivariateSpline(self.timex,self.temp2, k = self.BTsplinedegree)
+                    btvals = func2(self.designer_timez)
+                    func1 = UnivariateSpline(self.timex,self.temp1, k = self.ETsplinedegree)
+                    etvals = func1(self.designer_timez)
+                else:
+                    self.adderror(QApplication.translate('Error Message', 'Exception: redrawdesigner() Roast events may be out of order. Resetting Designer.'))
+                    self.reset_designer()
+                    return
             except Exception: # pylint: disable=broad-except
                 self.adderror(QApplication.translate('Error Message', 'Exception: redrawdesigner() Roast events may be out of order. Resetting Designer.'))
                 self.reset_designer()
@@ -17817,23 +17844,23 @@ class tgraphcanvas(FigureCanvas):
 
             #convert all time values to temperature
 
-            if self.DeltaBTflag and self.l_delta2 is not None:
+            if func2 is not None and self.DeltaBTflag and self.l_delta2 is not None and self.designer_timez is not None:
                 funcDelta2 = func2.derivative()
                 deltabtvals = funcDelta2(self.designer_timez) * 60
                 self.l_delta2.set_data(numpy.array(self.designer_timez), deltabtvals)
                 self.ax.draw_artist(self.l_delta2)
 
-            if self.DeltaETflag and self.l_delta1 is not None:
+            if func1 is not None and self.DeltaETflag and self.l_delta1 is not None and self.designer_timez is not None:
                 funcDelta1 = func1.derivative()
                 deltaetvals = funcDelta1(self.designer_timez) * 60
                 self.l_delta1.set_data(numpy.array(self.designer_timez), deltaetvals)
                 self.ax.draw_artist(self.l_delta1)
 
             #add curves
-            if self.ETcurve and self.l_temp1 is not None:
+            if etvals is not None and self.ETcurve and self.l_temp1 is not None:
                 self.l_temp1.set_data(numpy.array(self.designer_timez), etvals)
                 self.ax.draw_artist(self.l_temp1)
-            if self.BTcurve and self.l_temp2 is not None:
+            if btvals is not None and self.BTcurve and self.l_temp2 is not None:
                 self.l_temp2.set_data(numpy.array(self.designer_timez), btvals)
                 self.ax.draw_artist(self.l_temp2)
 

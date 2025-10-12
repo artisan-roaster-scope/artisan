@@ -1662,6 +1662,11 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             scale1Layout.addLayout(scale1HLayout)
             scale1Layout.setContentsMargins(0,0,0,0)
 
+            if self.scale1_was_connected:
+                scale1_last_weight:Optional[int] = self.aw.scale_manager.get_scale1_last_weight()
+                if scale1_last_weight is not None:
+                    self.scale1_weight_changed(scale1_last_weight)
+
             scale2ModelLabel = QLabel(QApplication.translate('Label','Model'))
             self.scale2ModelComboBox = QComboBox()
             self.scale2ModelComboBox.setToolTip(QApplication.translate('Tooltip','Choose the model of your scale'))
@@ -1728,6 +1733,11 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             scale2Layout.addLayout(scale2HLayout)
             scale2Layout.setContentsMargins(0,0,0,0)
 
+            if self.scale2_was_connected:
+                scale2_last_weight:Optional[int] = self.aw.scale_manager.get_scale2_last_weight()
+                if scale2_last_weight is not None:
+                    self.scale2_weight_changed(scale2_last_weight)
+
             self.taskWebDisplayGreenURL = QLabel()
             self.taskWebDisplayGreenURL.setOpenExternalLinks(True)
             self.taskWebDisplayGreenFlag = QCheckBox()
@@ -1775,10 +1785,10 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.taskWebDisplayRoastedFlag = QCheckBox()
             self.taskWebDisplayRoastedFlag.setToolTip(QApplication.translate('Tooltip','Start/stop the roasted coffee weighting task web display'))
             self.taskWebDisplayRoastedFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-            # if green display is ON, roasted display can only be turned ON if roasted container is selected
-            if self.aw.taskWebDisplayGreenActive and self.aw.container2_idx == -1:
-                self.aw.taskWebDisplayRoastedActive = False
-                self.taskWebDisplayRoastedFlag.setEnabled(False)
+#            # if green display is ON, roasted display can only be turned ON if roasted container is selected
+#            if self.aw.taskWebDisplayGreenActive and self.aw.container2_idx == -1:
+#                self.aw.taskWebDisplayRoastedActive = False
+#                self.taskWebDisplayRoastedFlag.setEnabled(False)
             self.taskWebDisplayRoastedFlag.setChecked(self.aw.taskWebDisplayRoastedActive)
             self.taskWebDisplayRoastedFlag.clicked.connect(self.taskWebDisplayRoasted)
 
@@ -1790,7 +1800,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.taskWebDisplayRoastedPort.setMaximumWidth(45)
             self.taskWebDisplayRoastedPort.editingFinished.connect(self.changeTaskWebDisplayRoastedPort)
 
-            self.taskWebDisplayRoastedPort.setDisabled(self.aw.taskWebDisplayRoastedActive or (self.aw.taskWebDisplayGreenActive and self.aw.container2_idx == -1))
+            self.taskWebDisplayRoastedPort.setDisabled(self.aw.taskWebDisplayRoastedActive) # or (self.aw.taskWebDisplayGreenActive and self.aw.container2_idx == -1))
             self.taskWebDisplayRoastedQRpic = QLabel() # the QLabel holding the QR code image
             if self.aw.taskWebDisplayRoastedActive:
                 try:
@@ -2411,13 +2421,13 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.aw.container2_idx = i - 3
             # update displayed scale weight
             self.updateRoastedContainerWeight()
-        # we need to update availability, as roasted scale is only available if roasted container weight is set
-        self.aw.scale_manager.update_availability(force=True)
-        # if green display is ON, roasted display can only be turned ON if roasted container is selected
-        if self.aw.taskWebDisplayGreenActive and self.aw.container2_idx == -1:
-            self.taskWebDisplayRoasted(False)
-        self.taskWebDisplayRoastedFlag.setDisabled(self.aw.taskWebDisplayGreenActive and self.aw.container2_idx == -1)
-        self.taskWebDisplayRoastedPort.setDisabled(self.aw.taskWebDisplayGreenActive and self.aw.container2_idx == -1)
+#        # we need to update availability, as roasted scale is only available if roasted container weight is set
+#        self.aw.scale_manager.update_availability(force=True)
+#        # if green display is ON, roasted display can only be turned ON if roasted container is selected
+#        if self.aw.taskWebDisplayGreenActive and self.aw.container2_idx == -1:
+#            self.taskWebDisplayRoasted(False)
+        self.taskWebDisplayRoastedFlag.setDisabled(self.aw.taskWebDisplayGreenActive)# and self.aw.container2_idx == -1)
+        self.taskWebDisplayRoastedPort.setDisabled(self.aw.taskWebDisplayGreenActive)# and self.aw.container2_idx == -1)
 
     def updateRoastedContainerWeight(self) -> None:
         weight = self.aw.qmc.get_container_weight(self.aw.container2_idx)
@@ -2442,11 +2452,11 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.setTaskGreenURL(self.getTaskURL(self.aw.taskWebDisplayGreenPort, self.aw.taskWebDisplayGreen_server.indexPath())) # this might fail if socket cannot be established
                     self.taskWebDisplayGreenFlag.setChecked(True)
                     self.taskWebDisplayGreenPort.setDisabled(True)
-                    # if green display is turned ON, turn roasted display OFF if no roasted container is selected
-                    if  self.aw.container2_idx == -1:
-                        self.taskWebDisplayRoasted(False)
-                        self.taskWebDisplayRoastedFlag.setEnabled(False)
-                        self.taskWebDisplayRoastedPort.setEnabled(False)
+#                    # if green display is turned ON, turn roasted display OFF if no roasted container is selected
+#                    if  self.aw.container2_idx == -1:
+#                        self.taskWebDisplayRoasted(False)
+#                        self.taskWebDisplayRoastedFlag.setEnabled(False)
+#                        self.taskWebDisplayRoastedPort.setEnabled(False)
             except Exception as e: # pylint: disable=broad-except
                 self.aw.sendmessage(str(e))
                 res = False
@@ -4825,8 +4835,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.aw.sendmessage(message)
             #open serial conf Dialog
             #if device is not None or not external-program (don't need serial settings config)
-            if (self.aw.qmc.device not in self.aw.qmc.nonSerialDevices or (self.aw.qmc.device == 50) or (self.aw.qmc.device == 134 and self.aw.santokerSerial) or
-                (self.aw.qmc.device == 138 and self.aw.kaleidoSerial)) and self.TabWidget.currentIndex() in {0,1,6}:
+            if (self.aw.qmc.device not in self.aw.qmc.nonSerialDevices or (self.aw.qmc.device == 134 and self.aw.santokerSerial) or
+                (self.aw.qmc.device == 138 and self.aw.kaleidoSerial)) and (self.aw.qmc.device != 50) and self.TabWidget.currentIndex() in {0,1,6}:
                 QTimer.singleShot(700, self.aw.setcommport)
             self.close()
             self.accept()

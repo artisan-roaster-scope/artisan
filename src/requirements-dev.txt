@@ -3,19 +3,19 @@ types-Pillow>=10.2.0.20240822
 types-protobuf>=6.32.1.20250918
 types-psutil>=7.0.0.20251001
 types-pyserial>=3.5.0.20251001
-types-python-dateutil==2.9.0.20250822
+types-python-dateutil==2.9.0.20251008
 types-pytz>=2025.2.0.20250809
 types-pyyaml>=6.0.12.20250915
 types-requests>=2.32.4.20250913
 types-setuptools>=80.9.0.20250822
 types-urllib3>=1.26.25.14
-types-docutils>=0.22.2.20250924
+types-docutils>=0.22.2.20251006
 types-xlrd>=2.0.0.20250914
 lxml-stubs>=0.5.1
 mypy==1.18.2
 pyright==1.1.406
-ruff>=0.13.3
-pylint==3.3.8
+ruff>=0.14.0
+pylint==4.0.0
 pre-commit>=4.3.0
 pytest>=8.4.2
 pytest-cov==7.0.0
@@ -27,11 +27,11 @@ pytest-datadir==1.8.0
 #PyVirtualDisplay==3.0
 #pytest-bdd==6.1.1
 #pytest-benchmark==4.0.0
-hypothesis>=6.140.2
+hypothesis>=6.140.3
 coverage>=7.10.7
 coverage-badge==1.1.2
 codespell==2.4.1
 # the following 2 packages are not installed along aiohttp on Python3.12 and make mypy complain
 async_timeout==4.0.3; python_version >= '3.12'
 cycler==0.12.1; python_version >= '3.12'
-scipy-stubs==1.16.2.0
+scipy-stubs==1.16.2.3

@@ -415,8 +415,12 @@ Receives data in the shape of
                                 // display bucket on scale and %
                                 elements.scale_rect.style.display = 'block';
                                 elements.bucket_on_scale.style.display = 'block';
-                                elements.percent.style.display = 'block';
-                                elements.percent.innerHTML = parsedData.percent.toFixed(0) + '%';
+                                elements.percent.style.display = 'block';                                
+                                if (parsedData.weight) {
+                                    elements.percent.innerHTML = parsedData.percent.toFixed(0) + '%';
+                                } else {
+                                    elements.percent.innerHTML = '';
+                                }
                                 elements.percent.style.color = PERCENTCOLOR;
                                 elements.weight.style.color = PERCENTCOLOR;
                                 elements.bucket_on_scale.style.border = BORDER;

@@ -1474,8 +1474,15 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.aw.scale_manager.scale1_stable_weight_changed_signal.connect(self.scale_weight_changed)
             self.aw.scale_manager.scale1_disconnected_signal.connect(self.scale_disconnected)
 
-            self.aw.scale_manager.connect_scale1_signal.emit(self.aw.qmc.device_logging)
-            self.updateWeightLCD('----')
+            if self.scale1_was_connected:
+                scale1_last_weight:Optional[int] = self.aw.scale_manager.get_scale1_last_weight()
+                if scale1_last_weight is None:
+                    self.updateWeightLCD('----')
+                else:
+                    self.scale_weight_changed(scale1_last_weight)
+            else:
+                self.aw.scale_manager.connect_scale1_signal.emit(self.aw.qmc.device_logging)
+                self.updateWeightLCD('----')
 
         propGrid.setRowMinimumHeight(3,volumeCalcButton.minimumSizeHint().height())
         propGrid.addWidget(volumelabel,3,0,Qt.AlignmentFlag.AlignVCenter)

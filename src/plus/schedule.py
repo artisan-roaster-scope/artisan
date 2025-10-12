@@ -210,6 +210,7 @@ class CompletedItemDict(TypedDict):
 
 # ordered list of dict with the completed roasts data (latest roast first)
 completed_roasts_cache:List[CompletedItemDict] = []
+completed_roasts_cache_plus_account_id:Optional[str] = None # the plus_account_id from which completed roast cache was last loaded, None if cache was not yet loaded
 
 # dict associating ScheduledItem IDs to a list of prepared green weights (in kg) interpreted in order. Weights beyond item.count will be ignored.
 # NOTE: adding a roast consumes a prepared item in FIFO order thus the prepared_items_cache represents only still available prepared batches
@@ -470,13 +471,14 @@ def save_completed(plus_account_id:Optional[str]) -> None:
 
 
 # load completed roasts data from local file cache
-def load_completed(plus_account_id:Optional[str]) -> None:
-    global completed_roasts_cache  # pylint: disable=global-statement
+# if force is False (default True), the cache is only loaded if not yet loaded for the given plus_account_id before)
+def load_completed(plus_account_id:Optional[str], force:bool = True) -> None:
+    global completed_roasts_cache, completed_roasts_cache_plus_account_id  # pylint: disable=global-statement
     _log.debug('load_completed(%s)', plus_account_id)
     try:
         completed_roasts_semaphore.acquire(1)
         completed_roasts_cache = []
-        if plus_account_id is not None:
+        if plus_account_id is not None and (force or plus_account_id != completed_roasts_cache_plus_account_id):
             f:TextIO
             with open(completed_roasts_cache_path, encoding='utf-8') as f:
                 completed_roasts_cache_data = json.load(f)
@@ -498,6 +500,7 @@ def load_completed(plus_account_id:Optional[str]) -> None:
                     # we keep all roasts completed today as well as all from the previous roast session
                     completed_roasts_cache = today_completed + previously_completed
                     completed_roasts_cache.sort(key=lambda cr: cr['roastdate'], reverse=True)
+                    completed_roasts_cache_plus_account_id = plus_account_id
     except FileNotFoundError:
         _log.debug('no completed roast cache file found')
     except Exception as e:  # pylint: disable=broad-except
@@ -517,6 +520,19 @@ def get_all_completed() -> List[CompletedItemDict]:
         if completed_roasts_semaphore.available() < 1:
             completed_roasts_semaphore.release(1)
     return []
+
+# UNUSED:
+## returns the CompletedItemDict object for the given roastUUID if any
+#def get_completed(roastUUID:str) -> Optional[CompletedItemDict]:
+#    try:
+#        completed_roasts_semaphore.acquire(1)
+#        return next((d for d in completed_roasts_cache if 'roastUUID' in d and d['roastUUID'] == roastUUID), None)
+#    except Exception as e:  # pylint: disable=broad-except
+#        _log.error(e)
+#    finally:
+#        if completed_roasts_semaphore.available() < 1:
+#            completed_roasts_semaphore.release(1)
+#    return None
 
 
 # add the given CompletedItemDict if it contains a roastUUID which does not occurs yet in the completed_roasts_cache
@@ -542,6 +558,80 @@ def add_completed(plus_account_id:Optional[str], ci:CompletedItemDict) -> None:
         if modified:
             save_completed(plus_account_id)
 
+# updates all roast properties (the changeable as well as the non-changeable from the loaded profiles roast properties to the given CompletedItem
+# such that changes in the RoastProperties are reflected in the items visualization (even if not yet established to the server)
+def updates_completed_from_roast_properties(aw:'ApplicationWindow', ci:CompletedItem) -> bool:
+    updated:bool = False
+    weight_unit_idx = weight_units.index(aw.qmc.weight[2])
+    weight = convertWeight(aw.qmc.weight[1], weight_unit_idx, 1)
+    if ci.weight != weight:
+        ci.weight = weight
+        updated = True
+    if ci.color != aw.qmc.ground_color:
+        ci.color = aw.qmc.ground_color
+        updated = True
+    if ci.moisture != aw.qmc.moisture_roasted:
+        ci.moisture = aw.qmc.moisture_roasted
+        updated = True
+    if ci.density != aw.qmc.density_roasted[0]:
+        ci.density = aw.qmc.density_roasted[0]
+        updated = True
+    if ci.roastingnotes != aw.qmc.roastingnotes:
+        ci.roastingnotes = aw.qmc.roastingnotes
+        updated = True
+    cupping_value = aw.qmc.calcFlavorChartScore()
+    if ci.cupping_score != cupping_value:
+        ci.cupping_score = cupping_value
+        updated = True
+    if ci.cuppingnotes != aw.qmc.cuppingnotes:
+        ci.cuppingnotes = aw.qmc.cuppingnotes
+        updated = True
+    # non_changeable attributes:
+    if ci.roastbatchnr != aw.qmc.roastbatchnr:
+        ci.roastbatchnr = aw.qmc.roastbatchnr
+        updated = True
+    if ci.roastbatchprefix != aw.qmc.roastbatchprefix:
+        ci.roastbatchprefix = aw.qmc.roastbatchprefix
+        updated = True
+    if ci.title != aw.qmc.title:
+        ci.title = aw.qmc.title
+        updated = True
+    if ci.coffee_label != aw.qmc.plus_coffee_label:
+        ci.coffee_label = aw.qmc.plus_coffee_label
+        updated = True
+    if ci.blend_label != aw.qmc.plus_blend_label:
+        ci.blend_label = aw.qmc.plus_blend_label
+        updated = True
+    if ci.store_label != aw.qmc.plus_store_label:
+        ci.store_label = aw.qmc.plus_store_label
+        updated = True
+    # not editable in RoastProperties (only available from the corresponding creating ScheduledItem) thus not modified
+    #batchsize
+
+    if updated:
+        # we update the completed_roasts_cache entry
+        completed_item_dict = ci.model_dump(mode='json')
+        if 'prefix' in completed_item_dict:
+            del completed_item_dict['prefix']
+        add_completed(aw.plus_account_id, cast(CompletedItemDict, completed_item_dict))
+    return updated
+
+# unused:
+#def update_completed_item_from_loaded_profile(aw:'ApplicationWindow') -> None:
+#    if aw.plus_account_id is not None and aw.qmc.roastUUID is not None:
+#        # a plus account is configured
+#        if aw.schedule_window is None:
+#            #  we load the completed items to fill the cache
+#            load_completed(aw.plus_account_id, force=False) # if already loaded, avoid re-loading
+#        # get CompletedItem corresponding to the given roastUUID
+#        completed_item_dict:Optional[CompletedItemDict] = get_completed(aw.qmc.roastUUID)
+#        if completed_item_dict is not None:
+#            completed_item:CompletedItem = CompletedItem.model_validate(completed_item_dict)
+#            # update completed item and persist changes, if any, in the completed item cache
+#            updated = updates_completed_from_roast_properties(aw, completed_item)
+#            if updated and aw.schedule_window is not None:
+#                # update the schedule window
+#                aw.schedule_window.updateScheduleWindow()
 
 
 ###################
@@ -2802,7 +2892,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         get_total_roasting_time_and_title.cache_clear() # clear roasting time/title cache as the templates might have changed or one got removed (not detected by the changed_significantly predicate below
         if self.schedule_changed_significantly(self.scheduled_items, schedule):
             self.show_updated_widget()
-        _log.debug('schedule: %s',schedule)
+#        _log.debug('schedule: %s',schedule)
         # sort current schedule by order cache (if any)
         if self.aw.scheduled_items_uuids != []:
             new_schedule:List[plus.stock.ScheduledItem] = []
@@ -3063,8 +3153,6 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                 # updating data to server failed
                 _log.error(e)
                 self.aw.sendmessageSignal.emit(QApplication.translate('Message', 'Updating completed roast properties failed'), True, None)
-        else:
-            _log.error('set_roasted_weight(%s,%s) CompletedItem not found', uuid, weight)
         self.set_next(True)
 
     def next_not_prepared_item(self) -> Optional[GreenWeightItem]:
@@ -3416,63 +3504,6 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
             #        store_label
             #        batchsize
 
-    # updates all roast properties (the changeable as well as the non-changeable from the loaded profiles roast properties to the given CompletedItem
-    # such that changes in the RoastProperties are reflected in the items visualization (even if not yet established to the server)
-    def updates_completed_from_roast_properties(self, ci:CompletedItem) -> bool:
-        updated:bool = False
-        weight_unit_idx = weight_units.index(self.aw.qmc.weight[2])
-        weight = convertWeight(self.aw.qmc.weight[1], weight_unit_idx, 1)
-        if ci.weight != weight:
-            ci.weight = weight
-            updated = True
-        if ci.color != self.aw.qmc.ground_color:
-            ci.color = self.aw.qmc.ground_color
-            updated = True
-        if ci.moisture != self.aw.qmc.moisture_roasted:
-            ci.moisture = self.aw.qmc.moisture_roasted
-            updated = True
-        if ci.density != self.aw.qmc.density_roasted[0]:
-            ci.density = self.aw.qmc.density_roasted[0]
-            updated = True
-        if ci.roastingnotes != self.aw.qmc.roastingnotes:
-            ci.roastingnotes = self.aw.qmc.roastingnotes
-            updated = True
-        cupping_value = self.aw.qmc.calcFlavorChartScore()
-        if ci.cupping_score != cupping_value:
-            ci.cupping_score = cupping_value
-            updated = True
-        if ci.cuppingnotes != self.aw.qmc.cuppingnotes:
-            ci.cuppingnotes = self.aw.qmc.cuppingnotes
-            updated = True
-        # non_changeable attributes:
-        if ci.roastbatchnr != self.aw.qmc.roastbatchnr:
-            ci.roastbatchnr = self.aw.qmc.roastbatchnr
-            updated = True
-        if ci.roastbatchprefix != self.aw.qmc.roastbatchprefix:
-            ci.roastbatchprefix = self.aw.qmc.roastbatchprefix
-            updated = True
-        if ci.title != self.aw.qmc.title:
-            ci.title = self.aw.qmc.title
-            updated = True
-        if ci.coffee_label != self.aw.qmc.plus_coffee_label:
-            ci.coffee_label = self.aw.qmc.plus_coffee_label
-            updated = True
-        if ci.blend_label != self.aw.qmc.plus_blend_label:
-            ci.blend_label = self.aw.qmc.plus_blend_label
-            updated = True
-        if ci.store_label != self.aw.qmc.plus_store_label:
-            ci.store_label = self.aw.qmc.plus_store_label
-            updated = True
-        # not editable in RoastProperties (only available from the corresponding creating ScheduledItem) thus not modified
-        #batchsize
-
-        if updated:
-            # we update the completed_roasts_cache entry
-            completed_item_dict = ci.model_dump(mode='json')
-            if 'prefix' in completed_item_dict:
-                del completed_item_dict['prefix']
-            add_completed(self.aw.plus_account_id, cast(CompletedItemDict, completed_item_dict))
-        return updated
 
 
     @pyqtSlot()
@@ -3915,7 +3946,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                 if self.aw.qmc.roastUUID is not None:
                     completed_item:Optional[CompletedItem] = next((ci for ci in self.completed_items if ci.roastUUID.hex == self.aw.qmc.roastUUID), None)
                     if completed_item is not None:
-                        self.updates_completed_from_roast_properties(completed_item)
+                        updates_completed_from_roast_properties(self.aw, completed_item)
                 if self.aw.plus_account is None:
                     self.stacked_widget.setCurrentWidget(self.message_widget)
                 else:
@@ -3996,21 +4027,27 @@ class WeightItemDisplay(Display):
         self.schedule_window.task_weight.setText('--')
         self.schedule_window.task_weight.setToolTip(QApplication.translate('Plus', 'nothing to weight'))
 
-    def show_item(self, item:'WeightItem', state:PROCESS_STATE = PROCESS_STATE.DISCONNECTED, component:int = 0, final_weight:Optional[int] = None) -> None:
+    def show_item(self, task_type:int, item:'Optional[WeightItem]', state:PROCESS_STATE = PROCESS_STATE.DISCONNECTED, component:int = 0, final_weight:Optional[int] = None) -> None:
         del state
         del component
         del final_weight
-        todo_tab_active:bool = self.schedule_window.TabWidget.currentIndex() == 0
-        if ((todo_tab_active and isinstance(item, GreenWeightItem)) or
-            not todo_tab_active and isinstance(item, RoastedWeightItem)):
-            if isinstance(item, GreenWeightItem):
-                self.schedule_window.task_type.setText(' '.join(QApplication.translate('Label', 'Green').lower()))
-            else:
-                self.schedule_window.task_type.setText(' '.join(QApplication.translate('Label', 'Roasted').lower()))
-            self.schedule_window.task_title.setText(item.title)
-            self.schedule_window.task_position.setText(item.position)
-            self.schedule_window.task_weight.setText(render_weight(item.weight, 1, item.weight_unit_idx))
-            self.schedule_window.task_weight.setToolTip(item.description)
+        if item is None:
+            if task_type == 0:
+                self.clear_green()
+            elif task_type == 1:
+                self.clear_roasted()
+        else:
+            todo_tab_active:bool = self.schedule_window.TabWidget.currentIndex() == 0
+            if ((todo_tab_active and isinstance(item, GreenWeightItem)) or
+                not todo_tab_active and isinstance(item, RoastedWeightItem)):
+                if isinstance(item, GreenWeightItem):
+                    self.schedule_window.task_type.setText(' '.join(QApplication.translate('Label', 'Green').lower()))
+                else:
+                    self.schedule_window.task_type.setText(' '.join(QApplication.translate('Label', 'Roasted').lower()))
+                self.schedule_window.task_title.setText(item.title)
+                self.schedule_window.task_position.setText(item.position)
+                self.schedule_window.task_weight.setText(render_weight(item.weight, 1, item.weight_unit_idx))
+                self.schedule_window.task_weight.setToolTip(item.description)
 
 
 
@@ -4055,53 +4092,61 @@ class GreenWebDisplay(GreenDisplay):
 
     # component indicates which of the item.descriptions is currently processed
     # in state=PROCESS_STATE.done, the final_weight if given states the final weight in g that has been measured and that will be registered for the task
-    def show_item(self, item:'WeightItem', state:PROCESS_STATE = PROCESS_STATE.DISCONNECTED, component:int = 0, final_weight:Optional[int] = None) -> None:
+    def show_item(self, task_type:int, item:'Optional[WeightItem]', state:PROCESS_STATE = PROCESS_STATE.DISCONNECTED, component:int = 0, final_weight:Optional[int] = None) -> None:
 #        _log.debug("PRINT show_item(%s,%s,%s,%s)",item,state,component,final_weight)
-        if (isinstance(item, GreenWeightItem) and
-            (item != self.last_item or self.last_process_state != state or self.last_component != component)):
-                # NOTE: as item is of type WeightItem and this is declared as @dataclass the equality is structural here
-            self.last_item = item
-            self.last_process_state = state
-            self.last_component = component
-            #-
-            self.rendered_task['id'] = item.position
-            self.rendered_task['title'] = item.title
-            # weight is rendered with max 7 characters ('10.32kg' is well displayed, '10.321kg' not) thus we set brief=1 for weights >= 10kg
-            self.rendered_task['batchsize'] = render_weight(item.weight, 1, item.weight_unit_idx, brief=(0 if item.weight < 10 else 1)) # item.weight in kg
-            if len(item.descriptions)>component:
-                self.rendered_task['blend_percent'] = (f'{item.descriptions[component][0] * 100:.0f}%' if item.descriptions[component][0] != 1 else '')
-                self.rendered_task['subtitle'] = item.descriptions[component][1]
-            else:
-                self.rendered_task['blend_percent'] = ''
-                self.rendered_task['subtitle'] = ''
-            self.last_current_weight = 0
+        if task_type == 0: # ignore non green task types
+            if item is None:
+                self.last_item = None
+                self.last_component = 0
+                self.last_process_state = state
+                self.rendered_task = cast(TaskWebDisplayPayload, dict(self.INIT_PAYLOAD))  # reset with a copy of the empty_task
+                self.rendered_task['state'] = state
+                self.update()
+            elif (isinstance(item, GreenWeightItem) and
+                (item != self.last_item or self.last_process_state != state or self.last_component != component)):
+                    # NOTE: as item is of type WeightItem and this is declared as @dataclass the equality is structural here
+                self.last_item = item
+                self.last_process_state = state
+                self.last_component = component
+                #-
+                self.rendered_task['id'] = item.position
+                self.rendered_task['title'] = item.title
+                # weight is rendered with max 7 characters ('10.32kg' is well displayed, '10.321kg' not) thus we set brief=1 for weights >= 10kg
+                self.rendered_task['batchsize'] = render_weight(item.weight, 1, item.weight_unit_idx, brief=(0 if item.weight < 10 else 1)) # item.weight in kg
+                if len(item.descriptions)>component:
+                    self.rendered_task['blend_percent'] = (f'{item.descriptions[component][0] * 100:.0f}%' if item.descriptions[component][0] != 1 else '')
+                    self.rendered_task['subtitle'] = item.descriptions[component][1]
+                else:
+                    self.rendered_task['blend_percent'] = ''
+                    self.rendered_task['subtitle'] = ''
+                self.last_current_weight = 0
 
-            self.rendered_task['accuracy'] = float2float(self.accuracy)
-            self.rendered_task['weight'] = ''
-            self.rendered_task['final_weight'] = ''
-            self.rendered_task['percent'] = 0
-            self.rendered_task['state'] = state
-            self.rendered_task['bucket'] = 0
-            self.rendered_task['total_percent'] = 0
+                self.rendered_task['accuracy'] = float2float(self.accuracy)
+                self.rendered_task['weight'] = ''
+                self.rendered_task['final_weight'] = ''
+                self.rendered_task['percent'] = 0
+                self.rendered_task['state'] = state
+                self.rendered_task['bucket'] = 0
+                self.rendered_task['total_percent'] = 0
 
-            # set timer tag
-            if state == PROCESS_STATE.CANCELD:
-                self.rendered_task['timer'] = self.cancel_timer_timeout
-            elif state == PROCESS_STATE.DONE:
-                self.rendered_task['timer'] = self.done_timer_timeout
-                if final_weight is not None:
-                    # or as substring (no limit: brief = 0)
-                    self.rendered_task['final_weight'] = render_weight(final_weight, 0, weight_units.index(self.schedule_window.aw.qmc.weight[2]),
-                                brief=(0 if final_weight < 10000 else 1))
+                # set timer tag
+                if state == PROCESS_STATE.CANCELD:
+                    self.rendered_task['timer'] = self.cancel_timer_timeout
+                elif state == PROCESS_STATE.DONE:
+                    self.rendered_task['timer'] = self.done_timer_timeout
+                    if final_weight is not None:
+                        # or as substring (no limit: brief = 0)
+                        self.rendered_task['final_weight'] = render_weight(final_weight, 0, weight_units.index(self.schedule_window.aw.qmc.weight[2]),
+                                    brief=(0 if final_weight < 10000 else 1))
 
-            self.update()
+                self.update()
 
-            self.rendered_task['timer'] = 0 # clear timer start trigger immediately
+                self.rendered_task['timer'] = 0 # clear timer start trigger immediately
 
     # current_weight indicates total measured weight over both containers in g (not including the bucket weights)
-    def show_progress(self, state:PROCESS_STATE, component:int, bucket:int, current_weight:int) -> None:
-#        _log.debug("PRINT show_progress(%s,%s,%s,%s)",state,component,bucket,current_weight)
-        if (self.last_item is not None and (self.last_process_state != state or self.last_component != component or self.last_bucket != bucket or
+    def show_progress(self, task_type:int, item:'Optional[WeightItem]', state:PROCESS_STATE, component:int, bucket:int, current_weight:int) -> None:
+#        _log.debug("PRINT show_progress(%s, %s,%s,%s,%s)",task_type,state,component,bucket,current_weight)
+        if (task_type == 0 and item is not None and isinstance(item, GreenWeightItem) and self.last_item is not None and (self.last_process_state != state or self.last_component != component or self.last_bucket != bucket or
                 self.last_current_weight != current_weight)):
             self.last_process_state = state
             self.last_component = component
@@ -4186,48 +4231,104 @@ class RoastedWebDisplay(RoastedDisplay):
         self.rendered_task = cast(TaskWebDisplayPayload, dict(self.INIT_PAYLOAD))  # reset with a copy of the empty_task
         self.update()
 
-    def show_item(self, item:'WeightItem', state:PROCESS_STATE = PROCESS_STATE.DISCONNECTED, component:int = 0, final_weight:Optional[int] = None) -> None:
+    def show_item(self, task_type:int, item:'Optional[WeightItem]', state:PROCESS_STATE = PROCESS_STATE.DISCONNECTED, component:int = 0, final_weight:Optional[int] = None) -> None:
         del component
-        if (isinstance(item, RoastedWeightItem) and
-                (item != self.last_item or self.last_process_state != state)):
-                # as item is of type WeightItem and this is declared as @dataclass the equality is structural here
-            #-
-            self.last_item = item
-            self.last_process_state = state
-            #-
-            self.rendered_task['id'] = item.position
-            self.rendered_task['title'] = item.title
-            self.rendered_task['batchsize'] = render_weight(item.weight, 1, item.weight_unit_idx, brief=(0 if item.weight < 10 else 1)) # from 1:kg to target, user selected, weight unit
-            if len(item.descriptions)>0 and len(item.descriptions[0])>1:
-                self.rendered_task['subtitle'] = (item.descriptions[0][1] if item.blend_name is None else item.blend_name)
-            else:
-                self.rendered_task['subtitle'] = ''
-            self.rendered_task['loss'] = ''
-            self.rendered_task['weight'] = ''
-            self.rendered_task['final_weight'] = ''
-            self.rendered_task['percent'] = 0
-            self.rendered_task['state'] = state
-            self.rendered_task['bucket'] = 0
-            self.rendered_task['total_percent'] = 0
+        if task_type == 1:
+            if item is None:
+                self.last_item = None
+                self.last_process_state = state
+                self.rendered_task = cast(TaskWebDisplayPayload, dict(self.INIT_PAYLOAD))  # reset with a copy of the empty_task
+                self.rendered_task['state'] = state
+                self.update()
+            elif (isinstance(item, RoastedWeightItem) and
+                        (item != self.last_item or self.last_process_state != state)):
+                        # as item is of type WeightItem and this is declared as @dataclass the equality is structural here
+                #-
+                self.last_item = item
+                self.last_process_state = state
+                #-
+                self.rendered_task['id'] = item.position
+                self.rendered_task['title'] = item.title
+                self.rendered_task['batchsize'] = render_weight(item.weight, 1, item.weight_unit_idx, brief=(0 if item.weight < 10 else 1)) # from 1:kg to target, user selected, weight unit
+                if len(item.descriptions)>0 and len(item.descriptions[0])>1:
+                    self.rendered_task['subtitle'] = (item.descriptions[0][1] if item.blend_name is None else item.blend_name)
+                else:
+                    self.rendered_task['subtitle'] = ''
+                self.rendered_task['loss'] = ''
+                self.rendered_task['weight'] = ''
+                self.rendered_task['final_weight'] = ''
+                self.rendered_task['percent'] = 0
+                self.rendered_task['state'] = state
+                self.rendered_task['bucket'] = 0
+                self.rendered_task['total_percent'] = 0
 
-            # set timer tag
-            if state == PROCESS_STATE.CANCELD:
-                self.rendered_task['timer'] = self.cancel_timer_timeout
-            elif state == PROCESS_STATE.DONE:
-                self.rendered_task['timer'] = self.done_timer_timeout
-                if final_weight is not None:
-                    # or as substring (no limit: brief = 0)
-                    self.rendered_task['final_weight'] = render_weight(final_weight, 0, weight_units.index(self.schedule_window.aw.qmc.weight[2]),
-                                brief=(0 if final_weight < 10000 else 1))
+                # set timer tag
+                if state == PROCESS_STATE.CANCELD:
+                    self.rendered_task['timer'] = self.cancel_timer_timeout
+                elif state == PROCESS_STATE.DONE:
+                    self.rendered_task['timer'] = self.done_timer_timeout
+                    if final_weight is not None:
+                        # or as substring (no limit: brief = 0)
+                        self.rendered_task['final_weight'] = render_weight(final_weight, 0, weight_units.index(self.schedule_window.aw.qmc.weight[2]),
+                                    brief=(0 if final_weight < 10000 else 1))
 
-            self.update()
+                self.update()
+                self.rendered_task['timer'] = 0 # clear timer start trigger immediately
 
-            self.rendered_task['timer'] = 0 # clear timer start trigger immediately
+    # current_weight indicates total measured weight in g (not including the bucket weight)
+    def show_progress(self, task_type:int, item:'Optional[WeightItem]', state:PROCESS_STATE, component:int, bucket:int, current_weight:int) -> None:
+#        _log.debug("PRINT show_progress(%s,%s,%s,%s,%s,%s)",task_type,item,state,component,bucket,current_weight)
+        del component, bucket
+
+        if task_type == 1:
+            if item is None and (self.last_process_state != state or
+                    self.last_current_weight != current_weight): # only possible for roasted tasks, after an empty bucket has placed
+                self.last_process_state = state
+                self.last_current_weight = current_weight
+                self.rendered_task['weight'] = ''
+                self.rendered_task['final_weight'] = ''
+                self.rendered_task['percent'] = 0
+                self.rendered_task['state'] = state
+                self.rendered_task['bucket'] = 0
+                self.rendered_task['blend_percent'] = ''
+                self.rendered_task['total_percent'] = 0 #
+                self.rendered_task['type'] = 0                  # reusing the green weighing for filling roasted
+                self.rendered_task['accuracy'] = float2float(self.accuracy)
+                self.update()
+            elif (isinstance(item, RoastedWeightItem) and self.last_item is not None and (self.last_process_state != state or
+                    self.last_current_weight != current_weight)):
+                self.last_process_state = state
+                self.last_current_weight = current_weight
+
+                #-
+                self.rendered_task['accuracy'] = float2float(self.accuracy)
+                self.rendered_task['state'] = state
+                self.rendered_task['blend_percent'] = ''
+
+                if state == PROCESS_STATE.WEIGHING:
+                    target = self.last_item.weight_estimate * 1000  # target in g
+                    self.rendered_task['type'] = 0                  # reusing the green weighing for filling roasted
+                    self.rendered_task['final_weight'] = render_weight(self.last_item.weight_estimate, 1, self.last_item.weight_unit_idx, brief=(0 if self.last_item.weight_estimate < 10 else 1)) # # render estimated roasted weight as batch size in kg
+                    self.rendered_task['total_percent'] = 100 * current_weight / target
+                    # showing what is missing
+                    # weight is rendered with max 7 characters ('10.32kg' is well displayed, '10.321kg' not) thus we set brief=1 for weights >= 10kg
+                    delta_weight = target - current_weight
+                    self.rendered_task['weight'] = f"{'+' if delta_weight<0 else ''}{render_weight(-delta_weight, 0, weight_units.index(self.schedule_window.aw.qmc.weight[2]), brief=(0 if delta_weight < 10000 else 1))}"
+                    if target>0:
+                        self.rendered_task['percent'] = 100 * current_weight / target
+                    else:
+                        self.rendered_task['percent'] = 0
+                else:
+                    self.rendered_task['weight'] = ''
+                    self.rendered_task['final_weight'] = ''
+                    self.rendered_task['percent'] = 0
+                    self.rendered_task['total_percent'] = 0
+                self.update()
 
 
     # current weight in g
-    def show_result(self, state:PROCESS_STATE, current_weight:int) -> None:
-        if (self.last_item is not None and (self.last_process_state != state or self.last_current_weight != current_weight)):
+    def show_result(self, task_type:int, item:'WeightItem', state:PROCESS_STATE, current_weight:int) -> None:
+        if (task_type == 1 and isinstance(item, RoastedWeightItem) and self.last_item is not None and (self.last_process_state != state or self.last_current_weight != current_weight)):
             self.last_process_state = state
             self.last_current_weight = current_weight
             #-

@@ -222,8 +222,8 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
     BLUE:Final[Color] = (0,0,255)
     LIGHT_BLUE:Final[Color] = (0,128,255)
     MAGENTA:Final[Color] = (255,0,255)
-    CYAN:Final[Color] = (0,255,255) # not used
-    ORANGE:Final[Color] = (255,128,0) # not used
+    CYAN:Final[Color] = (0,255,255)
+    ORANGE:Final[Color] = (255,128,0)
     BROWN:Final[Color] = (255,60,0)
 
 
@@ -1036,9 +1036,9 @@ class Acaia(Scale): # pyright: ignore [reportGeneralTypeIssues] # Argument to cl
             self.acaia.send_default_effects_off()
             self.acaia.send_leds_halo_off(self.acaia.CYAN)
         elif action == STATE_ACTION.RELEASED:
-            self.acaia.send_leds_breathe(self.acaia.MAGENTA)
-        elif action == STATE_ACTION.ASSIGNED_GREEN:
             self.acaia.send_leds_breathe(self.acaia.WHITE)
+        elif action == STATE_ACTION.ASSIGNED_GREEN:
+            self.acaia.send_leds_breathe(self.acaia.GREEN)
         elif action == STATE_ACTION.ASSIGNED_ROASTED:
             self.acaia.send_leds_breathe(self.acaia.BROWN)
         elif action == STATE_ACTION.ZONE_ENTER:

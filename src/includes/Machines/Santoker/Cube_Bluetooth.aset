@@ -12,6 +12,9 @@ santokerSerial=false
 santokerBLE=true
 Controlbuttonflag=true
 
+[Axis]
+resetmaxtime=3600
+
 [events]
 markTP=false
 
