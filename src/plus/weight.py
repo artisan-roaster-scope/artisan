@@ -1298,7 +1298,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefl
 
             if (self.aw.two_bucket_mode and weight < batchsize * 1/3) or (not self.aw.two_bucket_mode and weight < batchsize * 0.5):
                 # case 1: bucket was almost empty (less than 1/3, in two-bucket-mode, or less than 50% in one-bucket-mode)
-                _log.debug(r'BatchManager: green bucket removed at <50\% or 1/3')
+                _log.debug(r'BatchManager: green bucket removed at <50 percent or 1/3')
                 self.sm_green.send('bucket_removed')
                 # trigger an refresh of the next weight_item, a previous fetch_next_green update might have been blocked while processing
                 self.sm_green.current_weight_item.callback('', 0)
@@ -1375,14 +1375,14 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefl
                     self.done_roasted_task_timer.start(self.WAIT_BEFORE_DONE)
                 elif self.sm_roasted.current_state == RoastedWeighingState.filling and weight >= batchsize * 0.5:
                     # 3. roasted bucket filling canceled at a fill weight >= 50% of the batch size, but below the estimated minimal weight
-                    _log.debug(r'BatchManager: roasted bucket removed at >50\% of the batch size, but lower then the estimated minimal weight. Roasted weighing task canceled.')
+                    _log.debug(r'BatchManager: roasted bucket removed at >50 percent of the batch size, but lower then the estimated minimal weight. Roasted weighing task canceled.')
                     self.roasted_task_canceled_step = step
                     self.cancel_roasted_task_timer.start(self.WAIT_BEFORE_CANCEL)
                     self.sm_roasted.send('task_canceled')
                     self.signal_roasted_task_scale(STATE_ACTION.CANCEL_ENTER)
                 elif self.sm_roasted.current_state == RoastedWeighingState.filling and weight < batchsize * 0.5:
                     # 4. roasted bucket filling removed at fill weight < 50% of the batch size
-                    _log.debug(r'BatchManager: roasted bucket removed at <50\% of the batch size')
+                    _log.debug(r'BatchManager: roasted bucket removed at <50 percent of the batch size')
                     self.sm_roasted.send('bucket_removed')
                     # trigger an refresh of the next weight_item, a previous fetch_next_green update might have been blocked while processing
                     self.sm_roasted.current_weight_item.callback('', 0)
