@@ -926,7 +926,8 @@ class tgraphcanvas(FigureCanvas):
                        '+Shelly Plug Power/Temp',       #182
                        '+Shelly Plug Voltage/Current',  #183
                        'TASI TA612C',               #184
-                       '+TASI TA612C 34'            #185
+                       '+TASI TA612C 34',           #185
+                       '+CM ET/BT'                  #186
                        ]
 
         # ADD DEVICE:
@@ -13207,7 +13208,7 @@ class tgraphcanvas(FigureCanvas):
             if self.aw.pidcontrol.externalPIDControl() == 0  and self.Controlbuttonflag:
                 self.aw.pidcontrol.confSoftwarePID()
 
-            # ADD DEVICE:
+            # ADD DEVICE: # start communication/connect
             if not bool(self.aw.simulator):
                 if self.device == 53 and self.aw.hottop is None: # only start Hottop connection if there is not already one
                     # connect HOTTOP
@@ -17299,22 +17300,6 @@ class tgraphcanvas(FigureCanvas):
             # no such extra device curve
             return -1
         return self.timetemparray2temp(self.timeB,temp,seconds + offset)
-
-    def backgroundDBTat(self, seconds:float, relative:bool = False) -> float:
-        if self.timeindexB[0] > -1 and relative:
-            offset = self.timeB[self.timeindexB[0]]
-        else:
-            offset = 0
-        return self.timetemparray2temp(self.timeB,self.delta2B,seconds + offset)
-
-    def backgroundDETat(self, seconds:float, relative:bool = False) -> float:
-        if self.timeindexB[0] > -1 and relative:
-            offset = self.timeB[self.timeindexB[0]]
-        else:
-            offset = 0
-        return self.timetemparray2temp(self.timeB,self.delta1B,seconds + offset)
-
-
 
     #selects closest time INDEX in self.timex from a given input float seconds
     def time2index(self, seconds:float, nearest:bool=True) -> int:

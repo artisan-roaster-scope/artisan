@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # MAINTAINER
-# Marko Luther, 2023
+# Marko Luther, 2025
 
 import time as libtime
 startup_time = libtime.process_time()

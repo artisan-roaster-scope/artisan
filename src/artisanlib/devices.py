@@ -4464,7 +4464,10 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.ser.timeout = 0.7
                     message = QApplication.translate('Message','Device set to {0}, which is equivalent to CENTER 309. Now, choose serial port').format(meter)
                 ##########################
-                ####  DEVICE 184 is +TASI TA612C 34 but +DEVICE cannot be set as main device
+                ####  DEVICE 185 is +TASI TA612C 34 but +DEVICE cannot be set as main device
+                ##########################
+                ##########################
+                ####  DEVICE 186 is +CM ET/BT
                 ##########################
 
                 # ADD DEVICE:
@@ -4670,7 +4673,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 1, # 182
                 1, # 183
                 3, # 184
-                3  # 185
+                3, # 185
+                3  # 186
                 ]
             #init serial settings of extra devices
             for i, _ in enumerate(self.aw.qmc.extradevices):

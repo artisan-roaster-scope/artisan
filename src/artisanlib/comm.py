@@ -254,7 +254,7 @@ class serialport:
         'YOCTOthread','YOCTOvoltageOutputs','YOCTOcurrentOutputs','YOCTOrelays','YOCTOservos','YOCTOpwmOutputs','HH506RAid','MS6514PrevTemp1','MS6514PrevTemp2','DT301PrevTemp','EXTECH755PrevTemp',\
         'controlETpid','readBTpid','useModbusPort','showFujiLCDs','arduinoETChannel','arduinoBTChannel','arduinoATChannel',\
         'ArduinoIsInitialized','ArduinoFILT','HH806Winitflag','R1','devicefunctionlist','externalprogram',\
-        'externaloutprogram','externaloutprogramFlag','PhidgetHUMtemp','PhidgetHUMhum','PhidgetPREpre','TMP1000temp', 'colorTrackSerial', 'colorTrackBT']
+        'externaloutprogram','externaloutprogramFlag','PhidgetHUMtemp','PhidgetHUMhum','PhidgetPREpre','TMP1000temp', 'colorTrackSerial', 'colorTrackBT', 'CM_ET_readings_count', 'CM_BT_readings_count', 'CM_ET_sum_of_squared_differences', 'CM_BT_sum_of_squared_differences' ]
 
     def __init__(self, aw:'ApplicationWindow') -> None:
 
@@ -339,6 +339,11 @@ class serialport:
 
         self.colorTrackSerial:Optional[ColorTrack] = None
         self.colorTrackBT:Optional[ColorTrackBLE] = None
+
+        self.CM_ET_readings_count:int = 0
+        self.CM_BT_readings_count:int = 0
+        self.CM_ET_sum_of_squared_differences:float = 0
+        self.CM_BT_sum_of_squared_differences:float = 0
 
         #stores the _id of the meter HH506RA as a string
         self.HH506RAid:str = 'X'
@@ -560,7 +565,8 @@ class serialport:
                                    self.ShellyPlusPlug_Power_Temperature,       #182
                                    self.ShellyPlusPlug_Voltage_Current,         #183
                                    self.TASI_TA612C,          #184
-                                   self.TASI_TA612C_34        #185
+                                   self.TASI_TA612C_34,       #185
+                                   self.CM_ETBT               #186
                                    ]
         #string with the name of the program for device #27
         self.externalprogram:str = 'test.py'
@@ -1007,6 +1013,42 @@ class serialport:
         t1 = self.aw.slider3.value()
         t2 = self.aw.slider4.value()
         return tx,t2,t1
+
+    def CM_ETBT(self) -> Tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        try:
+            t1 = -1
+            t2 = -1
+            # update counts and sum_of_squared_differences
+            BTlimit = self.aw.qmc.phases[1]
+            BT = (self.aw.qmc.temp2[-1] if len(self.aw.qmc.temp2)>0 else -1)
+            if BT > BTlimit > -1:
+                ET = (self.aw.qmc.temp1[-1] if len(self.aw.qmc.temp1)>0 else -1)
+                nowB = self.aw.qmc.backgroundtime2index(tx)
+                ETB = (self.aw.qmc.temp1B[nowB] if len(self.aw.qmc.temp1B)>nowB>-1 else -1)
+                BTB = (self.aw.qmc.temp2B[nowB] if len(self.aw.qmc.temp2B)>nowB>-1 else -1)
+                if ET > -1 and ETB > -1:
+                    self.CM_ET_readings_count += 1
+                    ET_squared_diff = (ET - ETB)**2
+                    self.CM_ET_sum_of_squared_differences += ET_squared_diff
+                if BTB > -1:
+                    self.CM_BT_readings_count += 1
+                    BT_squared_diff = (BT - BTB)**2
+                    self.CM_BT_sum_of_squared_differences += BT_squared_diff
+            else:
+                self.CM_ET_readings_count = 0
+                self.CM_ET_sum_of_squared_differences = 0
+                self.CM_BT_readings_count = 0
+                self.CM_BT_sum_of_squared_differences = 0
+            # calc results
+            if self.CM_ET_readings_count > 0:
+                t1 = numpy.sqrt(self.CM_ET_sum_of_squared_differences / self.CM_ET_readings_count)
+            if self.CM_BT_readings_count > 0:
+                t2 = numpy.sqrt(self.CM_BT_sum_of_squared_differences / self.CM_BT_readings_count)
+            return tx,t2,t1
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
+        return tx, -1, -1
 
     def virtual(self) -> Tuple[float,float,float]:
         tx = self.aw.qmc.timeclock.elapsedMilli()

@@ -25,7 +25,7 @@ sudo apt-get update -y -q --allow-releaseinfo-change
 sudo apt-get install -y -q ruby-dev build-essential p7zip-full rpm gdb libudev-dev libfuse2
 sudo apt-get install -y -q fakeroot
 
-sudo apt-get install -y -q upx-ucl # tool used to reduce size of pyinstaller builds
+# sudo apt-get install -y -q upx-ucl # tool used to reduce size of pyinstaller builds # seems not to make a binary size difference
 
 # add libs not installed by default on Qt5.15/Qt6 any longer
 sudo apt-get install -y -q libdbus-1-3 libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-xinerama0 libxcb-xfixes0 libxcb-cursor0

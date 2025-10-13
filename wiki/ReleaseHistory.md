@@ -28,6 +28,7 @@ v3.2.1
   - adds support for whole/ground color readings with one decimal ([Issue #1986](../../../issues/1986)
   - adds flag to stop PID on DROP
   - adds lookahead to ramping event replay
+  - adds CM ET/BT device reporting the current Comparison Metrics, CM, (square root of the average sum of squared differences), also known as Casino Mocca values, on how close the ET/BT curves are w.r.t. the loaded background after the DRY END as specified in the phases dialog
 
 * CHANGES
   - BREAKING VISUAL CHANGE, but only when consecutive hidden buttons with Type or Action defined are first at the top of the Events Buttons table: The visual button layout may change as hidden buttons with Type or Action defined at the top of the Events Buttons table are no longer counted in the first row's button count, which is limited by the Max Buttons per Row setting.  All other hidden buttons continue to be counted in each row's button count.
