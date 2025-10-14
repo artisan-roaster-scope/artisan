@@ -1231,11 +1231,11 @@ def getBlends(weight_unit_idx:int, store:Optional[str], customBlend:Optional[Ble
                         coffee_density = {}
                         # associates all coffees incl. replacements with
                         # its screen_min, if known
-                        coffee_screen_min = {}
+                        coffee_screen_min:Dict[str, int] = {}
                         # its screen_max, if known
                         # first we extract and store the initial amount of
                         # all components and replacements of the original blend
-                        coffee_screen_max = (
+                        coffee_screen_max:Dict[str, int] = (
                             {}
                         )  # associates all coffees incl. replacements with
                         for i in blend['ingredients']:

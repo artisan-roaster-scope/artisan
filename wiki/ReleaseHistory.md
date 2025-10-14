@@ -2,7 +2,7 @@ Detailed Release History
 ========================
 
 ----
-v3.2.1
+v3.4.0 (Oct XX, 2025)
 ------------------
 
 * ADDITIONS
@@ -16,7 +16,7 @@ v3.2.1
   - adds support for [Toper roasting machines](https://artisan-scope.org/machines/toper/) with PLC and touch screen produced after 2025 supporting burner, airflow, and drum speed control
   - extended setups for [Sweet Coffee Italia Gemma_2IND and Gemma_6-8IND machines](https://artisan-scope.org/machines/sci/)
   - extended setup for [Joper](https://joper-roasters.com/) PLC-based machines adding buttons to control the burner, cooler and stirrer states (ON/OFF)
-  - adds support for the 4 channel K/J type TC meter [Tasi TA612C](https://www.tasimeter.com/environmental-tester/contact-thermometer/data-logging-thermoucouple-thermometer.html) ([Discussion #1997](../../../discussions/1997))
+  - adds support for the 4 channel K/J type TC meter [Tasi TA612C](https://artisan-scope.org/devices/meters/) ([Discussion #1997](../../../discussions/1997))
   - adds support for [Shelly energy meters](https://artisan-scope.org/devices/shelly/)
   - adds batch conversion from Cropster XLS, Giesen CSV, IKAWA CSV, Loring CSV, Petroncini CSV, ROEST CSV, Rubase CSV, and Stronghold XLSX profiles to Artisan `.alog` profiles
   - adds drag-and-drop import of a Artisan JSON, Cropster XLS, Giesen CSV and Stronghold XLSX profiles

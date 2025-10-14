@@ -427,7 +427,7 @@ Receives data in the shape of
                                 elements.bucket_on_scale.style.top = BUCKETPOSITION;
                                 elements.bucket_on_scale.style.left = BUCKETPOSITION;
                                 elements.percent.style.lineHeight = '30.5cqmin';
-                                elements.percent.style.fontSize = '26cqmin';
+                                elements.percent.style.fontSize = '24cqmin';
                                 elements.percent.style.fontWeight = '400';
                                 elements.weight.style.display = 'block';
                                 elements.percent.classList.remove('fade-out');
@@ -451,7 +451,7 @@ Receives data in the shape of
                                     elements.bucket_on_scale.style.left = 'calc(12% - 1.75vmin)';
                                     elements.percent.style.color = 'white';
                                     elements.weight.style.color = 'white';
-                                    elements.percent.style.fontSize = '26cqmin';
+                                    elements.percent.style.fontSize = '24cqmin';
                                     elements.percent.style.fontWeight = '400';
                                     elements.weight.style.display = 'none';
                                     elements.percent.style.top = '0';
@@ -1020,14 +1020,14 @@ Receives data in the shape of
 
         .big-font {
             /* fallback if container query not supported */
-            font-size: calc(max(min(11vw, 20vh), 23px));
+            font-size: calc(max(min(9vw, 9vh), 23px));
             text-align: center;
             font-weight: 300;
         }
 
         .big-font-weight {
             /* fallback if container query not supported */
-            font-size: calc(max(min(11vw, 20vh), 11px));
+            font-size: calc(max(min(11vw, 11vh), 11px));
             text-align: center;
             font-weight: 300;
         }
