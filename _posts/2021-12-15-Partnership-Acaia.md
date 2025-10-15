@@ -1,8 +1,8 @@
 ---
 header:
-  image: /assets/images/posts/2021-12-15-Partnership-Acaia.png
-  teaser: /assets/images/posts/2021-12-15-Partnership-Acaia-teaser.png
-  og_image: /assets/images/posts/2021-12-15-Partnership-Acaia-teaser.png
+  image: /assets/images/posts/2021-12-15-Partnership-Acaia.webp
+  teaser: /assets/images/posts/2021-12-15-Partnership-Acaia-teaser.webp
+  og_image: /assets/images/posts/2021-12-15-Partnership-Acaia-teaser.webp
 title: "Acaia Integration"
 excerpt: "Partnership with Acaia"
 author_profile: false

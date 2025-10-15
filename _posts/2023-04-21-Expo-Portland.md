@@ -1,8 +1,8 @@
 ---
 header:
-  image: /assets/images/posts/2023-04-21-Expo-Portland.png
-  teaser: /assets/images/posts/2023-04-21-Expo-Portland-teaser.png
-  og_image: /assets/images/posts/2023-04-21-Expo-Portland-teaser.png
+  image: /assets/images/posts/2023-04-21-Expo-Portland.webp
+  teaser: /assets/images/posts/2023-04-21-Expo-Portland-teaser.webp
+  og_image: /assets/images/posts/2023-04-21-Expo-Portland-teaser.webp
 title: "Expo 2023"
 excerpt: "SCA Expo Portland"
 date: 2023-04-21

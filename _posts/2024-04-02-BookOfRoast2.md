@@ -1,8 +1,8 @@
 ---
 header:
-  image: /assets/images/posts/2024-04-02-BookOfRoast2.jpg
-  teaser: /assets/images/posts/2024-04-02-BookOfRoast2-teaser.jpg
-  og_image: /assets/images/posts/2024-04-02-BookOfRoast2-teaser.jpg
+  image: /assets/images/posts/2024-04-02-BookOfRoast2.jpg.webp
+  teaser: /assets/images/posts/2024-04-02-BookOfRoast2-teaser.jpg.webp
+  og_image: /assets/images/posts/2024-04-02-BookOfRoast2-teaser.jpg.webp
 title: "Book of Roast 2"
 excerpt: "@SCA Expo, Chicago"
 author_profile: false

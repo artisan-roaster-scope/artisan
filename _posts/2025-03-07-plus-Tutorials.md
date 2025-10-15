@@ -1,8 +1,8 @@
 ---
 header:
-  image: /assets/images/posts/2025-03-07-plus-Tutorials.png
-  teaser: /assets/images/posts/2025-03-07-plus-Tutorials-teaser.png
-  og_image: /assets/images/posts/2025-03-07-plus-Tutorials-teaser.png
+  image: /assets/images/posts/2025-03-07-plus-Tutorials.webp
+  teaser: /assets/images/posts/2025-03-07-plus-Tutorials-teaser.webp
+  og_image: /assets/images/posts/2025-03-07-plus-Tutorials-teaser.webp
 title: "plus Tutorials"
 excerpt: "artisan.plus Video Tutorials"
 date: 2025-03-07

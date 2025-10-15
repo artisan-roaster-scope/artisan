@@ -1,8 +1,8 @@
 ---
 header:
-  image: /assets/images/posts/2021-12-01-Price-Drop.png
-  teaser: /assets/images/posts/2021-12-01-Price-Drop-teaser.png
-  og_image: /assets/images/posts/2021-12-01-Price-Drop-teaser.png
+  image: /assets/images/posts/2021-12-01-Price-Drop.webp
+  teaser: /assets/images/posts/2021-12-01-Price-Drop-teaser.webp
+  og_image: /assets/images/posts/2021-12-01-Price-Drop-teaser.webp
 title: "50% Price Drop"
 excerpt: "Now only 49.- EUR / year"
 author_profile: false

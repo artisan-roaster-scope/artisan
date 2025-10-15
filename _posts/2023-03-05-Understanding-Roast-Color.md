@@ -1,8 +1,8 @@
 ---
 header:
-  image: /assets/images/posts/2023-03-05-Understanding-Roast-Color.jpg
-  teaser: /assets/images/posts/2023-03-05-Understanding-Roast-Color-teaser.jpg
-  og_image: /assets/images/posts/2023-03-05-Understanding-Roast-Color-teaser.jpg
+  image: /assets/images/posts/2023-03-05-Understanding-Roast-Color.jpg.webp
+  teaser: /assets/images/posts/2023-03-05-Understanding-Roast-Color-teaser.jpg.webp
+  og_image: /assets/images/posts/2023-03-05-Understanding-Roast-Color-teaser.jpg.webp
 title: "Understanding Roast Color"
 excerpt: "Blog Post"
 author_profile: true

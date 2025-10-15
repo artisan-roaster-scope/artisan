@@ -1,8 +1,8 @@
 ---
 header:
-  image: /assets/images/posts/2025-03-24-GitHub-Stars.png
-  teaser: /assets/images/posts/2025-03-24-GitHub-Stars-teaser.png
-  og_image: /assets/images/posts/2025-03-24-GitHub-Stars-teaser.png
+  image: /assets/images/posts/2025-03-24-GitHub-Stars.webp
+  teaser: /assets/images/posts/2025-03-24-GitHub-Stars-teaser.webp
+  og_image: /assets/images/posts/2025-03-24-GitHub-Stars-teaser.webp
 title: "1000 Stars!"
 excerpt: "1k stars reached on GitHub"
 date: 2025-03-24

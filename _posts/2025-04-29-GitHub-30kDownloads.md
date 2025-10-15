@@ -1,8 +1,8 @@
 ---
 header:
-  image: /assets/images/posts/2025-04-29-GitHub-30kDownloads.png
-  teaser: /assets/images/posts/2025-04-29-GitHub-30kDownloads-teaser.png
-  og_image: /assets/images/posts/2025-04-29-GitHub-30kDownloads-teaser.png
+  image: /assets/images/posts/2025-04-29-GitHub-30kDownloads.webp
+  teaser: /assets/images/posts/2025-04-29-GitHub-30kDownloads-teaser.webp
+  og_image: /assets/images/posts/2025-04-29-GitHub-30kDownloads-teaser.webp
 title: "30k Downloads!"
 excerpt: "v3.1 downloaded 30k times"
 date: 2025-04-29

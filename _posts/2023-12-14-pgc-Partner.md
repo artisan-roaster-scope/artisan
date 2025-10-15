@@ -1,8 +1,8 @@
 ---
 header:
-  image: /assets/images/posts/2023-12-14-pgc-Partner.png
-  teaser: /assets/images/posts/2023-12-14-pgc-Partner-teaser.png
-  og_image: /assets/images/posts/2023-12-14-pgc-Partner-teaser.png
+  image: /assets/images/posts/2023-12-14-pgc-Partner.webp
+  teaser: /assets/images/posts/2023-12-14-pgc-Partner-teaser.webp
+  og_image: /assets/images/posts/2023-12-14-pgc-Partner-teaser.webp
 title: "Partnership with Prime Green Coffee"
 excerpt: "New Partner"
 author_profile: false

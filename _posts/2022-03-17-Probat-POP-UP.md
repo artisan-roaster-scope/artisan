@@ -1,8 +1,8 @@
 ---
 header:
-  image: /assets/images/posts/2022-03-17-Probat-POP-UP2.png
-  teaser: /assets/images/posts/2022-03-17-Probat-POP-UP-teaser.png
-  og_image: /assets/images/posts/2022-03-17-Probat-POP-UP-teaser.png
+  image: /assets/images/posts/2022-03-17-Probat-POP-UP2.webp
+  teaser: /assets/images/posts/2022-03-17-Probat-POP-UP-teaser.webp
+  og_image: /assets/images/posts/2022-03-17-Probat-POP-UP-teaser.webp
 title: "Probat POP UP"
 excerpt: "Live on YouTube"
 author: Marko Luther

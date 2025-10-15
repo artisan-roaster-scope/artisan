@@ -1,8 +1,8 @@
 ---
 header:
-  image: /assets/images/posts/2022-03-10-hacea-Partner.png
-  teaser: /assets/images/posts/2022-03-10-hacea-Partner-teaser.png
-  og_image: /assets/images/posts/2022-03-10-hacea-Partner-teaser.png
+  image: /assets/images/posts/2022-03-10-hacea-Partner.webp
+  teaser: /assets/images/posts/2022-03-10-hacea-Partner-teaser.webp
+  og_image: /assets/images/posts/2022-03-10-hacea-Partner-teaser.webp
 title: "Partnership with hacea"
 excerpt: "New Partner"
 author_profile: false

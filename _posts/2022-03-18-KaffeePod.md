@@ -1,8 +1,8 @@
 ---
 header:
-  image: /assets/images/posts/2022-03-18-KaffeePod.png
-  teaser: /assets/images/posts/2022-03-18-KaffeePod-teaser.png
-  og_image: /assets/images/posts/2022-03-18-KaffeePod-teaser.png
+  image: /assets/images/posts/2022-03-18-KaffeePod.webp
+  teaser: /assets/images/posts/2022-03-18-KaffeePod-teaser.webp
+  og_image: /assets/images/posts/2022-03-18-KaffeePod-teaser.webp
 title: "Kaffeepod Artisan"
 excerpt: "Podcast"
 author: Marko Luther

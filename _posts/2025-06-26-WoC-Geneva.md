@@ -1,8 +1,8 @@
 ---
 header:
-  image: /assets/images/posts/2025-06-26-WoC-Geneva2.png
-  teaser: /assets/images/posts/2025-06-26-WoC-Geneva_teaser.png
-  og_image: /assets/images/posts/2025-06-26-WoC-Geneva_teaser.png
+  image: /assets/images/posts/2025-06-26-WoC-Geneva2.webp
+  teaser: /assets/images/posts/2025-06-26-WoC-Geneva_teaser.webp
+  og_image: /assets/images/posts/2025-06-26-WoC-Geneva_teaser.webp
 title: "World of Coffee 2025"
 excerpt: "WoC Geneva, Switzerland"
 date: 2025-06-26

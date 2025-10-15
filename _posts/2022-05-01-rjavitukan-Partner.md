@@ -1,8 +1,8 @@
 ---
 header:
-  image: /assets/images/posts/2022-05-01-rjavitukan-Partner.png
-  teaser: /assets/images/posts/2022-05-01-rjavitukan-Partner-teaser.png
-  og_image: /assets/images/posts/2022-05-01-rjavitukan-Partner-teaser.png
+  image: /assets/images/posts/2022-05-01-rjavitukan-Partner.webp
+  teaser: /assets/images/posts/2022-05-01-rjavitukan-Partner-teaser.webp
+  og_image: /assets/images/posts/2022-05-01-rjavitukan-Partner-teaser.webp
 title: "Partnership with RJAVI TUKAN"
 excerpt: "New Partner"
 author_profile: false

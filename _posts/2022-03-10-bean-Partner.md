@@ -1,8 +1,8 @@
 ---
 header:
-  image: /assets/images/posts/2022-03-10-bean-Partner.png
-  teaser: /assets/images/posts/2022-03-10-bean-Partner-teaser.png
-  og_image: /assets/images/posts/22022-03-10-bean-Partner-teaser.png
+  image: /assets/images/posts/2022-03-10-bean-Partner.wep
+  teaser: /assets/images/posts/2022-03-10-bean-Partner-teaser.webp
+  og_image: /assets/images/posts/22022-03-10-bean-Partner-teaser.webp
 title: "Partnership with Bean Importer"
 excerpt: "New Partner"
 author_profile: false

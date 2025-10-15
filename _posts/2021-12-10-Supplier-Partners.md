@@ -1,8 +1,8 @@
 ---
 header:
-  image: /assets/images/posts/2021-12-10-Supplier-Partners.png
-  teaser: /assets/images/posts/2021-12-10-Supplier-Partners-teaser.png
-  og_image: /assets/images/posts/2021-12-10-Supplier-Partners-teaser.png
+  image: /assets/images/posts/2021-12-10-Supplier-Partners.webp
+  teaser: /assets/images/posts/2021-12-10-Supplier-Partners-teaser.webp
+  og_image: /assets/images/posts/2021-12-10-Supplier-Partners-teaser.webp
 title: "Supplier Partners"
 excerpt: "Coupons & data import"
 author_profile: false

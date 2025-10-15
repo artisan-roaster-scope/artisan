@@ -3,8 +3,8 @@ header:
   video:
     id: mxKqstWoCDE
     provider: youtube
-  teaser: /assets/images/posts/2021-07-12-Phidgets-Q-&-A-teaser.jpg
-  og_image: /assets/images/posts/2021-07-12-Phidgets-Q-&-A-teaser.jpg
+  teaser: /assets/images/posts/2021-07-12-Phidgets-Q-&-A-teaser.jpg.webp
+  og_image: /assets/images/posts/2021-07-12-Phidgets-Q-&-A-teaser.jpg.webp
 title: "Phidgets"
 excerpt: "Q & A"
 author: Marko Luther

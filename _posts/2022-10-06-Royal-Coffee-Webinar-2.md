@@ -1,8 +1,8 @@
 ---
 header:
-  image: /assets/images/posts/2022-10-06-Royal-Coffee-Webinar.png
-  teaser: /assets/images/posts/2022-10-06-Royal-Coffee-Webinar-teaser.png
-  og_image: /assets/images/posts/2022-10-06-Royal-Coffee-Webinar-teaser.png
+  image: /assets/images/posts/2022-10-06-Royal-Coffee-Webinar.webp
+  teaser: /assets/images/posts/2022-10-06-Royal-Coffee-Webinar-teaser.webp
+  og_image: /assets/images/posts/2022-10-06-Royal-Coffee-Webinar-teaser.webp
 title: "Royal Coffee"
 excerpt: "Webinar: Analyzer & Comparator"
 author: Dave Baxter

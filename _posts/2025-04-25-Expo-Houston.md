@@ -1,8 +1,8 @@
 ---
 header:
-  image: /assets/images/posts/2025-04-25-Expo-Houston.png
-  teaser: /assets/images/posts/2025-04-25-Expo-Houston-teaser.png
-  og_image: /assets/images/posts/2025-04-25-Expo-Houston-teaser.png
+  image: /assets/images/posts/2025-04-25-Expo-Houston.webp
+  teaser: /assets/images/posts/2025-04-25-Expo-Houston-teaser.webp
+  og_image: /assets/images/posts/2025-04-25-Expo-Houston-teaser.webp
 title: "Expo 2025"
 excerpt: "SCA Expo Houston"
 date: 2025-04-25

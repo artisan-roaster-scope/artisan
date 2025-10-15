@@ -1,8 +1,8 @@
 ---
 header:
-  image: /assets/images/posts/2022-04-13-Reminders.png
-  teaser: /assets/images/posts/2022-04-13-Reminders-teaser.png
-  og_image: /assets/images/posts/2022-04-13-Reminders-teaser.png
+  image: /assets/images/posts/2022-04-13-Reminders.webp
+  teaser: /assets/images/posts/2022-04-13-Reminders-teaser.webp
+  og_image: /assets/images/posts/2022-04-13-Reminders-teaser.webp
 title: "Reminders"
 excerpt: "New Feature"
 date: 2022-04-13

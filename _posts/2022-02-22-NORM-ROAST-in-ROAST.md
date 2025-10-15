@@ -1,8 +1,8 @@
 ---
 header:
-  image: /assets/images/posts/2022-02-22-NORM-ROAST-in-ROAST.png
-  teaser: /assets/images/posts/2022-02-22-NORM-ROAST-in-ROAST-teaser.png
-  og_image: /assets/images/posts/2022-02-22-NORM-ROAST-in-ROAST-teaser.png
+  image: /assets/images/posts/2022-02-22-NORM-ROAST-in-ROAST.webp
+  teaser: /assets/images/posts/2022-02-22-NORM-ROAST-in-ROAST-teaser.webp
+  og_image: /assets/images/posts/2022-02-22-NORM-ROAST-in-ROAST-teaser.webp
 title: "NORM ROAST"
 excerpt: "Feature in ROAST"
 author_profile: false

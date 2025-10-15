@@ -1,8 +1,8 @@
 ---
 header:
-  image: /assets/images/posts/2024-06-27-WoC-Copenhagen.png
-  teaser: /assets/images/posts/2024-06-27-WoC-Copenhagen-teaser.png
-  og_image: /assets/images/posts/2024-06-27-WoC-Copenhagen-teaser.png
+  image: /assets/images/posts/2024-06-27-WoC-Copenhagen.webp
+  teaser: /assets/images/posts/2024-06-27-WoC-Copenhagen-teaser.webp
+  og_image: /assets/images/posts/2024-06-27-WoC-Copenhagen-teaser.webp
 title: "World of Coffee 2024"
 excerpt: "WoC Copenhagen, Denmark"
 date: 2024-06-27
