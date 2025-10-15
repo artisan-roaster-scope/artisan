@@ -15,7 +15,7 @@ lxml-stubs>=0.5.1
 mypy==1.18.2
 pyright==1.1.406
 ruff>=0.14.0
-pylint==4.0.0
+pylint==4.0.1
 pre-commit>=4.3.0
 pytest>=8.4.2
 pytest-cov==7.0.0
@@ -27,7 +27,7 @@ pytest-datadir==1.8.0
 #PyVirtualDisplay==3.0
 #pytest-bdd==6.1.1
 #pytest-benchmark==4.0.0
-hypothesis>=6.140.3
+hypothesis>=6.141.0
 coverage>=7.10.7
 coverage-badge==1.1.2
 codespell==2.4.1

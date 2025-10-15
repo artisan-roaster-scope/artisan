@@ -4053,7 +4053,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         level3layout.setContentsMargins(0,0,0,0)
 
         self.extrabuttonsLayout = QVBoxLayout()
-        self.extrabuttonsLayout.setContentsMargins(0,0,0,0)
+        self.extrabuttonsLayout.setContentsMargins(0,0,0,7)
         self.extrabuttonsLayout.setSpacing(5)
         self.extrabuttonsLayout.addWidget(self.e1buttondialog)
         self.extrabuttonsLayout.addWidget(self.e2buttondialog)
@@ -11408,19 +11408,20 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                 self.extraeventsbuttonsflags[0] = 0
 
     def showExtraButtons(self, changeDefault:bool = True) -> None:
-        focused_widget = QApplication.focusWidget()
-        if focused_widget and focused_widget != self.centralWidget():
-            focused_widget.clearFocus()
-        self.extrabuttondialogs.setVisible(True)
-        self.buttonsAction.setChecked(True)
-        # remember state
-        if changeDefault:
-            if self.qmc.flagstart:
-                self.extraeventsbuttonsflags[2] = 1
-            elif self.qmc.flagon:
-                self.extraeventsbuttonsflags[1] = 1
-            else:
-                self.extraeventsbuttonsflags[0] = 1
+        if len(self.extraeventstypes)>0:
+            focused_widget = QApplication.focusWidget()
+            if focused_widget and focused_widget != self.centralWidget():
+                focused_widget.clearFocus()
+            self.extrabuttondialogs.setVisible(True)
+            self.buttonsAction.setChecked(True)
+            # remember state
+            if changeDefault:
+                if self.qmc.flagstart:
+                    self.extraeventsbuttonsflags[2] = 1
+                elif self.qmc.flagon:
+                    self.extraeventsbuttonsflags[1] = 1
+                else:
+                    self.extraeventsbuttonsflags[0] = 1
 
     @pyqtSlot()
     @pyqtSlot(bool)
