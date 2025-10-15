@@ -1,8 +1,8 @@
+{% capture overlay_img_path %}{{ page.header.overlay_image | relative_url }}{% endcapture %}
+
 {% if page.header.overlay_image %}
 <link rel="preload" href="{{ overlay_img_path }}" as="image" fetchpriority="high">
 {% endif %}
-
-{% capture overlay_img_path %}{{ page.header.overlay_image | relative_url }}{% endcapture %}
 
 {% if page.header.overlay_filter contains "gradient" %}
   {% capture overlay_filter %}{{ page.header.overlay_filter }}{% endcapture %}
