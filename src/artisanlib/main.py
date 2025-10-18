@@ -9346,7 +9346,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                                             import requests
                                             shelly_connect_timeout = 0.5
                                             shelly_read_timeout = 0.5
-                                            response = requests.get(f'http://{self.shelly_PlusPlug_host}/relay/{n}?turn={'on' if b else 'off'}',
+                                            response = requests.get(f"http://{self.shelly_PlusPlug_host}/relay/{n}?turn={'on' if b else 'off'}",
                                                 headers={'Content-Type': 'application/json'},
                                                 timeout=(shelly_connect_timeout, shelly_read_timeout))
                                             response.raise_for_status()
