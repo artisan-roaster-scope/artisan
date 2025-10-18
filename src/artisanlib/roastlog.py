@@ -5,7 +5,7 @@
 import time as libtime
 import dateutil.parser
 import requests
-from requests_file import FileAdapter # type: ignore  # @UnresolvedImport
+from requests_file import FileAdapter
 import re
 from lxml import html
 import logging
@@ -35,7 +35,7 @@ def extractProfileRoastLog(url:'QUrl',
     res:ProfileData = ProfileData() # the interpreted data set
     try:
         s = requests.Session()
-        s.mount('file://', FileAdapter())
+        s.mount('file://', FileAdapter()) # type: ignore[no-untyped-call]
         page = s.get(url.toString(), timeout=(4, 15), headers={'Accept-Encoding' : 'gzip'})
         tree = html.fromstring(page.content)
 

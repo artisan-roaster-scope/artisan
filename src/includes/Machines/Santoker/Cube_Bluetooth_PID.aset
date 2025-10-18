@@ -1,6 +1,6 @@
 [General]
 Delay=500
-roastertype_setup=Santoker Cube BT PID
+roastertype_setup=Santoker Cube PID
 roasterheating_setup=3
 roastersize_setup=0.1
 specialeventplayback=false, false, true, false
@@ -26,7 +26,8 @@ DeltaETB=false
 
 [events]
 markTP=false
-etypes=, , ET-SV, Burner, 
+default_etypes_set=1, 0, 0, 1, 0
+etypes=, , ET-SV, , 
 clampEvents=true
 autoCharge=false
 

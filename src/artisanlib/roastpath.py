@@ -5,7 +5,7 @@
 import time as libtime
 import dateutil.parser
 import requests
-from requests_file import FileAdapter # type: ignore # @UnresolvedImport
+from requests_file import FileAdapter
 import re
 import json
 from lxml import html
@@ -61,7 +61,7 @@ def extractProfileRoastPathHTML(url:'QUrl',
     res:ProfileData = ProfileData() # the interpreted data set
     try:
         sess = requests.Session()
-        sess.mount('file://', FileAdapter())
+        sess.mount('file://', FileAdapter())  # type: ignore[no-untyped-call]
         page = sess.get(url.toString(), timeout=(4, 15), headers={'Accept-Encoding' : 'gzip'})
         tree = html.fromstring(page.content)
 

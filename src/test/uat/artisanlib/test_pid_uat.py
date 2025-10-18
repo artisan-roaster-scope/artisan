@@ -1630,7 +1630,7 @@ class TestPIDDestructiveDataFuzzing:
 
     @given(st.floats(allow_nan=True, allow_infinity=True, width=64))
     @pytest.mark.hypothesis(deadline=None, max_examples=50)
-    def test_hypothesis_fuzzing_random_floats(self, random_float: float) -> None:
+    def test_hypothesis_fuzzing_random_floats(self, random_float: float) -> None: # type: ignore
         """Use Hypothesis to fuzz PID with completely random float values.
 
         # REMEDIATION: Implement comprehensive input sanitization for all float inputs

@@ -17,6 +17,7 @@ resetmaxtime=360
 
 [events]
 markTP=false
+default_etypes_set=1, 0, 0, 1, 0
 
 [Units]
 weight=g

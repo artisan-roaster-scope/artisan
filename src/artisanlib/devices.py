@@ -2426,8 +2426,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 #        # if green display is ON, roasted display can only be turned ON if roasted container is selected
 #        if self.aw.taskWebDisplayGreenActive and self.aw.container2_idx == -1:
 #            self.taskWebDisplayRoasted(False)
-        self.taskWebDisplayRoastedFlag.setDisabled(self.aw.taskWebDisplayGreenActive)# and self.aw.container2_idx == -1)
-        self.taskWebDisplayRoastedPort.setDisabled(self.aw.taskWebDisplayGreenActive)# and self.aw.container2_idx == -1)
+#        self.taskWebDisplayRoastedFlag.setDisabled(self.aw.taskWebDisplayGreenActive)# and self.aw.container2_idx == -1)
+#        self.taskWebDisplayRoastedPort.setDisabled(self.aw.taskWebDisplayGreenActive)# and self.aw.container2_idx == -1)
 
     def updateRoastedContainerWeight(self) -> None:
         weight = self.aw.qmc.get_container_weight(self.aw.container2_idx)
@@ -2468,9 +2468,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.taskWebDisplayGreenPort.setDisabled(False)
             self.taskWebDisplayGreenURL.setText('')
             self.taskWebDisplayGreenQRpic.setPixmap(QPixmap())
-            # if green display is OFF, roasted display can always be turned ON
-            self.taskWebDisplayRoastedFlag.setEnabled(True)
-            self.taskWebDisplayRoastedPort.setDisabled(self.aw.taskWebDisplayRoastedActive)
+#            # if green display is OFF, roasted display can always be turned ON
+#            self.taskWebDisplayRoastedFlag.setEnabled(True)
+#            self.taskWebDisplayRoastedPort.setDisabled(self.aw.taskWebDisplayRoastedActive)
 
     def setTaskGreenURL(self, url:str) -> None:
         # set URL label

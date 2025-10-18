@@ -9117,6 +9117,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                     ##  sleep(s) : sleep for s seconds, s a float
                     ##  santoker(<target>,<value>) : the byte <target> indicates where <value> of type integer should be written to
                     ##  kaleido(<target>,<value>) : the <target> string indicates where <value> of type string should be written to
+                    ##  shellyrelay(n,b) : switches Shelly plug number <n> ON if b is true or 1, and OFF otherwise
                     #
                     if cmd_str:
                         cmds = filter(None, cmd_str.split(';')) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
@@ -9332,6 +9333,26 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                                                 # or event type is set to -1 and result of event action should be awaited and bound to $ changing event button state # used by toggle buttons
                                                 # send message, await new value and create an event with the new value
                                                 self.kaleidoSendMessageAwaitSignal.emit(target, vs, eventtype, lastbuttonpressed)
+
+                                ##  shellyrelay(n,b) : switches Shelly plug number <n> ON if b is true or 1, and OFF otherwise
+                                elif c.startswith('shellyrelay'):
+                                    cs_a = re.findall(r'[0-9a-zA-Z-.:]+', c)
+                                    cs_len = len(cs_a)
+                                    if cs_len == 3:
+                                        n = toInt(cs_a[1])
+                                        b = toBool(cs_a[2])
+
+                                        try:
+                                            import requests
+                                            shelly_connect_timeout = 0.5
+                                            shelly_read_timeout = 0.5
+                                            response = requests.get(f'http://{self.shelly_PlusPlug_host}/relay/{n}?turn={'on' if b else 'off'}',
+                                                headers={'Content-Type': 'application/json'},
+                                                timeout=(shelly_connect_timeout, shelly_read_timeout))
+                                            response.raise_for_status()
+                                        except Exception as e: # pylint: disable=broad-except
+                                            _log.error(e)
+
 
                                 # Yoctopuce Relay Command Actions
                                 # yset(c,b[,sn])
@@ -12049,7 +12070,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                     if not self.qmc.designerflag and not self.qmc.wheelflag:
                         if self.comparator is not None:
                             self.comparator.modeComboBox.setCurrentIndex((self.comparator.modeComboBox.currentIndex()+1) % 3)
-                        else:
+                        elif self.qmc.autotimex:
                             self.qmc.autotimexMode = (self.qmc.autotimexMode+1) % 3
                             if self.qmc.autotimexMode == 0:
                                 self.sendmessage(QApplication.translate('Message','Auto Axis Graph Mode: Roast'))
@@ -12061,6 +12082,8 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                                 # adjust foreground or if no foreground but background is loaded the background
                                 self.autoAdjustAxis(background=self.qmc.background and (not len(self.qmc.timex) > 3), deltas=False)
                                 self.qmc.redraw()
+                        else:
+                            self.sendmessage(QApplication.translate('Message','Auto Axis Graph Mode is off'))
                 elif self.buttonpalette_shortcuts and control_modifier and k in numberkeys: # palette switch via COMMAND-NUM-Keys
                     self.setbuttonsfrom(numberkeys.index(Qt.Key(k)), only_non_empty=True)
                 elif k == Qt.Key.Key_J: # 74:                       #J (toggle Playback Events)
@@ -17745,6 +17768,8 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             self.qmc.eventsGraphflag = toInt(settings.value('eventsGraphflag',int(self.qmc.eventsGraphflag)))
             if settings.contains('default_etypes_set'):
                 self.qmc.default_etypes_set = [toInt(x) for x in toList(settings.value('default_etypes_set',self.qmc.default_etypes_set))]
+            elif filename is not None: # we reset to the default if loading from a file (like a machine setting)
+                self.qmc.default_etypes_set = [0,0,0,0,0]
             if settings.contains('etypes'):
                 self.qmc.etypes = toStringList(settings.value('etypes',self.qmc.etypes))
                 # etype specified as empty strings are replaced by their defaults to enable translations in partially customized etypes
