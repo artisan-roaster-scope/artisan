@@ -38,5 +38,14 @@ Artisan reads
    - voltage (`voltage`) [V]
    - current (`current`) [A]
 
-
 via simple RPC from the host specified in the Devices dialog under `Network >> Shelly Plus Plug`.
+
+Artisan can also switch the Shelly Plugs ON and OFF via custom event buttons using the `IO Command`
+
+```
+shellyrelay(n,b)
+```
+
+where `n` is the number of the plug (use 0 if the device has just one) and `b` is either 1 or `true` to turn the plug ON, or 0, `false` to turn it OFF.
+
+
