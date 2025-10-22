@@ -7,6 +7,15 @@ toc: false
 author: Michael Herbert
 author_profile: true
 gallery:
+
+  - url: https://youtu.be/iUOO6tkkCbc
+    image_path: /assets/images/gsg/video_two_batches.webp
+    alt: "Roasting Two Batches"
+    title: "2025-10 Roasting Two Batches"
+  - url: https://www.youtube.com/watch?v=4zHP1Hj-1ng
+    image_path: /assets/images/gsg/video_plus_onboarding.webp
+    alt: "Onboarding artisan.plus"
+    title: "2025-3 Onboarding artisan.plus"
   - url: https://www.youtube.com/watch?v=4VFM4jvDLi8
     image_path: /assets/images/gsg/video-captain-beginners-guide.jpg.webp
     alt: "The Captain's Coffee - Artisan Beginner's Guide!"
