@@ -2252,6 +2252,10 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                 fileExportRoastLoggerAction.triggered.connect(self.fileExportRoastLogger)
                 self.exportMenu.addAction(fileExportRoastLoggerAction)
 
+                carmomaqExportAction = QAction('Carmomaq - ProRoaster', self)
+                carmomaqExportAction.triggered.connect(self.fileExportJSON)
+                self.exportMenu.addAction(carmomaqExportAction)
+
             self.convMenu: Optional[QMenu] = self.fileMenu.addMenu(QApplication.translate('Menu', 'Convert To'))
             if self.convMenu is not None:
                 fileConvertFahrenheitAction = QAction(QApplication.translate('Menu', 'Fahrenheit...'), self)
