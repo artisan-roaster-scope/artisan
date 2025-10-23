@@ -15,7 +15,7 @@ sidebar:
 
 * __Producer:__ [COGEN](https://cogen-company.com/){:target="_blank"}, Urkaine
 * __Machines:__ Cogen C2, C6, C15, and C30
-* __Connection:__ legacy machines: MODBUS network; v2 machines: Siemens S7
+* __Connection:__ legacy machines: MODBUS network; v2 machines (produced in 2025 and later): Siemens S7
 * __Features:__ logging of bean temperature (BT), environmental temperature (ET), burner power (%), drum speed (%), and airflow (%). Control of burner power, drum speed and airflow. The v2 machines support setting the drum pressure setpoint.
 
 

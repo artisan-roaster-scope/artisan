@@ -17,7 +17,7 @@ If you need support please check the [documentation](#documentation) or ask the 
 ## Forum
 {: style="color: #4C97C3;" }
 
-Please use the public [Artisan Discussion Forum](https://github.com/artisan-roaster-scope/artisan/discussions){:target="_blank"} for technical discussions and support and the [Issue Tracker](https://github.com/artisan-roaster-scope/artisan/issues) for reporting bugs and submitting feature requests. NOTE: [GitHub registration](https://github.com/join){:target="_blank"} is required to post; [Learn how to Subscribe to Discussions](/discussions)).
+Please use the public [Artisan Discussion Forum](https://github.com/artisan-roaster-scope/artisan/discussions){:target="_blank"} for technical discussions and questions. Use the [Issue Tracker](https://github.com/artisan-roaster-scope/artisan/issues) for reporting bugs and submitting feature requests. NOTE: [GitHub registration](https://github.com/join){:target="_blank"} is required to post; [Learn how to Subscribe to Discussions](/discussions)).
 
 <a name="Documentation"></a>
 ## Documentation
