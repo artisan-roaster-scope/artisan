@@ -71,7 +71,7 @@ aiohttp==3.10.11; python_version < '3.9' # last Python 3.8 release
 aiohttp==3.13.1; python_version >= '3.9'
 aiohttp_jinja2==1.6
 python-bidi==0.4.2; python_version < '3.9' # last Python 3.8 release
-python-bidi==0.6.6; python_version = '3.9' # last Python 3.9 release
+python-bidi==0.6.6; python_version == '3.9' # last Python 3.9 release
 python-bidi==0.6.7; python_version > '3.9' # first Python 3.14 release
 arabic-reshaper==3.0.0
 pillow==10.4.0; python_version < '3.9' # last Python 3.8 release
