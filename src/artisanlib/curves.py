@@ -955,7 +955,7 @@ class CurvesDlg(ArtisanDialog):
 
         self.analyzecombobox = QComboBox()
         self.analyzecomboboxLabel = QLabel(QApplication.translate('Label', 'Start of Analyze interval of interest'))
-        self.analyzecombobox.addItems([QApplication.translate('ComboBox','DRY END'),
+        self.analyzecombobox.addItems([QApplication.translate('Label','DRY END'),
                                        QApplication.translate('ComboBox','120 secs before FCs'),
                                        QApplication.translate('ComboBox','Custom')])
         width = self.analyzecombobox.minimumSizeHint().width()
@@ -987,7 +987,7 @@ class CurvesDlg(ArtisanDialog):
 
         self.curvefitcombobox = QComboBox()
         self.curvefitcomboboxLabel = QLabel(QApplication.translate('Label', 'Start of Curve Fit window'))
-        self.curvefitcombobox.addItems([QApplication.translate('ComboBox','DRY END'),
+        self.curvefitcombobox.addItems([QApplication.translate('Label','DRY END'),
                                        QApplication.translate('ComboBox','120 secs before FCs'),
                                        QApplication.translate('ComboBox','Custom')])
         width = self.curvefitcombobox.minimumSizeHint().width()
@@ -2112,17 +2112,17 @@ class CurvesDlg(ArtisanDialog):
         self.polyfitcurveschanged(0)
 
     def eventlist(self) -> List[Tuple[str,int]]:
-        events = []
+        events:List[Tuple[str,int]] = []
         if self.aw.qmc.timeindex[0] > -1:
-            events.append((QApplication.translate('Table', 'CHARGE'),self.aw.qmc.timeindex[0]))
+            events.append((QApplication.translate('Label', 'CHARGE'),self.aw.qmc.timeindex[0]))
         names = [
-            QApplication.translate('Table', 'DRY END'),
-            QApplication.translate('Table', 'FC START'),
-            QApplication.translate('Table', 'FC END'),
-            QApplication.translate('Table', 'SC START'),
-            QApplication.translate('Table', 'SC END'),
-            QApplication.translate('Table', 'DROP'),
-            QApplication.translate('Table', 'COOL')]
+            QApplication.translate('Label', 'DRY END'),
+            QApplication.translate('Label', 'FC START'),
+            QApplication.translate('Label', 'FC END'),
+            QApplication.translate('Label', 'SC START'),
+            QApplication.translate('Label', 'SC END'),
+            QApplication.translate('Label', 'DROP'),
+            QApplication.translate('ComboBox', 'COOL END')]
         for e, _ in enumerate(names):
             if self.aw.qmc.timeindex[e+1]:
                 events.append((names[e],self.aw.qmc.timeindex[e+1]))

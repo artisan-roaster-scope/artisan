@@ -782,16 +782,16 @@ def extractProfileCropsterXLS(file:str,
         res['samplinginterval'] = 1.0
 
         try:
-            id_tag_value = None
+            id_tag_value:Optional[str] = None
             # try to find the "Id-Tag" value
             # 1. test the column name in all known translations
             for tag in id_tag_trans:
                 if tag in general_data:
-                    id_tag_value = general_data[tag].value
+                    id_tag_value = str(general_data[tag].value)
                     break
             # 2. take the first value of row1
             if id_tag_value is None and len(row1)>0:
-                id_tag_value = row1[0].value
+                id_tag_value = str(row1[0].value)
             if id_tag_value is not None:
                 batch_prefix = id_tag_value.rstrip('0123456789')
                 batch_number = int(id_tag_value[len(batch_prefix):])
@@ -907,16 +907,16 @@ def extractProfileCropsterXLS(file:str,
             pass
 
         try:
-            start_weight_tag_value = None
-            start_weight_unit_tag_value = None
-            end_weight_tag_value = None
-            end_weight_unit_tag_value = None
+            start_weight_unit_tag_value:Optional[str] = None
+            end_weight_unit_tag_value:Optional[str] = None
+            start_weight_tag_value:Optional[float] = None
+            end_weight_tag_value:Optional[float] = None
 
             # try to find the "Start weight" value
             # test the column name in all known translations
             for tag in start_weight_trans:
                 if tag in general_data:
-                    start_weight_tag_value = general_data[tag].value
+                    start_weight_tag_value = float(general_data[tag].value)
                     break
 #            if start_weight_tag_value is None and len(row1)>9:
 #                start_weight_tag_value = row1[9]
@@ -924,7 +924,7 @@ def extractProfileCropsterXLS(file:str,
             # test the column name in all known translations
             for tag in start_weight_unit_trans:
                 if tag in general_data:
-                    start_weight_unit_tag_value = general_data[tag].value
+                    start_weight_unit_tag_value = str(general_data[tag].value)
                     break
 #            if start_weight_unit_tag_value is None and len(row1)>10:
 #                start_weight_unit_tag_value = row1[10]
@@ -932,7 +932,7 @@ def extractProfileCropsterXLS(file:str,
             # test the column name in all known translations
             for tag in end_weight_trans:
                 if tag in general_data:
-                    end_weight_tag_value = general_data[tag].value
+                    end_weight_tag_value = float(general_data[tag].value)
                     break
 #            if end_weight_tag_value is None and len(row1)>11:
 #                end_weight_tag_value = row1[11]
@@ -940,7 +940,7 @@ def extractProfileCropsterXLS(file:str,
             # test the column name in all known translations
             for tag in end_weight_unit_trans:
                 if tag in general_data:
-                    end_weight_unit_tag_value = general_data[tag].value
+                    end_weight_unit_tag_value = str(general_data[tag].value)
                     break
 #            if end_weight_unit_tag_value is None and len(row1)>12:
 #                end_weight_unit_tag_value = row1[12]
@@ -1183,7 +1183,7 @@ def extractProfileCropsterXLS(file:str,
                     if r>0:
                         try:
                             time_epoc = float(COMMENTS_sh.cell(r, 0).value)
-                            comment_type = COMMENTS_sh.cell(r, 2).value.strip()
+                            comment_type = str(COMMENTS_sh.cell(r, 2).value).strip()
                             if comment_type not in turning_point_trans: # TP is ignored as it is automatically assigned
                                 comment_value = COMMENTS_sh.cell(r, 3).value
                                 c = takeClosest(time_epoc,res['timex'])

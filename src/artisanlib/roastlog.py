@@ -35,7 +35,7 @@ def extractProfileRoastLog(url:'QUrl',
     res:ProfileData = ProfileData() # the interpreted data set
     try:
         s = requests.Session()
-        s.mount('file://', FileAdapter()) # type: ignore[no-untyped-call]
+        s.mount('file://', FileAdapter())
         page = s.get(url.toString(), timeout=(4, 15), headers={'Accept-Encoding' : 'gzip'})
         tree = html.fromstring(page.content)
 

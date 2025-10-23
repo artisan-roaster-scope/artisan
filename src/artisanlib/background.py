@@ -1052,28 +1052,28 @@ class backgroundDlg(ArtisanResizeablDialog):
                     if item0 is not None:
                         if i == self.aw.qmc.timeindexB[0] != -1:
                             item0.setBackground(QColor('#f07800'))
-                            text = QApplication.translate('Table', 'CHARGE')
+                            text = QApplication.translate('Label', 'CHARGE')
                         elif i == self.aw.qmc.timeindexB[1]:
                             item0.setBackground(QColor('orange'))
-                            text = QApplication.translate('Table', 'DRY END')
+                            text = QApplication.translate('Label', 'DRY END')
                         elif i == self.aw.qmc.timeindexB[2]:
                             item0.setBackground(QColor('orange'))
-                            text = QApplication.translate('Table', 'FC START')
+                            text = QApplication.translate('Label', 'FC START')
                         elif i == self.aw.qmc.timeindexB[3]:
                             item0.setBackground(QColor('orange'))
-                            text = QApplication.translate('Table', 'FC END')
+                            text = QApplication.translate('Label', 'FC END')
                         elif i == self.aw.qmc.timeindexB[4]:
                             item0.setBackground(QColor('orange'))
-                            text = QApplication.translate('Table', 'SC START')
+                            text = QApplication.translate('Label', 'SC START')
                         elif i == self.aw.qmc.timeindexB[5]:
                             item0.setBackground(QColor('orange'))
-                            text = QApplication.translate('Table', 'SC END')
+                            text = QApplication.translate('Label', 'SC END')
                         elif i == self.aw.qmc.timeindexB[6]:
                             item0.setBackground(QColor('#f07800'))
-                            text = QApplication.translate('Table', 'DROP')
+                            text = QApplication.translate('Label', 'DROP')
                         elif i == self.aw.qmc.timeindexB[7]:
                             item0.setBackground(QColor('orange'))
-                            text = QApplication.translate('Table', 'COOL')
+                            text = QApplication.translate('ComboBox', 'COOL END')
                         elif i in self.aw.qmc.backgroundEvents:
                             item0.setBackground(QColor('yellow'))
                             index = self.aw.qmc.backgroundEvents.index(i)

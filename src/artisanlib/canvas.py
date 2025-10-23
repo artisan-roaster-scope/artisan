@@ -8409,12 +8409,12 @@ class tgraphcanvas(FigureCanvas):
                     if is_proper_temp(y):
                         ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,y,y,d)
                         if startB is not None:
-                            st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation', 'CHARGE'))
+                            st1 = self.aw.arabicReshape(QApplication.translate('Label', 'CHARGE'))
                             st1 = self.__dijkstra_to_ascii(st1)
                             e = 0
                             a = self.backgroundalpha
                         else:
-                            st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation', 'CHARGE'))
+                            st1 = self.aw.arabicReshape(QApplication.translate('Label', 'CHARGE'))
                             st1 = self.__dijkstra_to_ascii(st1)
                             e = 0
                             a = 1.
@@ -11807,8 +11807,8 @@ class tgraphcanvas(FigureCanvas):
         def buildStat(n:int) -> str:
             stattype_str = ''
             degree = '\u00b0'
-            charge = QApplication.translate('Button', 'CHARGE')
-            begin = QApplication.translate('Button', 'DROP') if self.aw.bbp_begin == 'DROP' else QApplication.translate('Button', 'START')
+            charge = QApplication.translate('Label', 'CHARGE')
+            begin = QApplication.translate('Label', 'DROP') if self.aw.bbp_begin == 'DROP' else QApplication.translate('Button', 'START')
             from_s = QApplication.translate('AddlInfo', 'From')
             bottom = QApplication.translate('AddlInfo', 'Bottom')
             if n == 0:  #Blank line
@@ -12128,7 +12128,7 @@ class tgraphcanvas(FigureCanvas):
                 if self.autotimexMode in {0,1}:  #Roast, BBP+Roast
                     event_label = QApplication.translate('Scope Annotation','DROP {0}').replace(' {0}','')
                 else:  #BBP
-                    event_label = QApplication.translate('Scope Annotation','CHARGE')
+                    event_label = QApplication.translate('Label','CHARGE')
 
                 # find right side of the event label
                 _,_,eventtext_end = self.eventtextBounds(time0,patch_upperY,event_label,ls,event_prop,fc)
@@ -14287,7 +14287,7 @@ class tgraphcanvas(FigureCanvas):
                         ## deactivate autoCHARGE
                         self.timeindex[0] = -1
                         removed = True
-                        st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation', 'CHARGE'))
+                        st1 = self.aw.arabicReshape(QApplication.translate('Label', 'CHARGE'))
                         st1 = self.__dijkstra_to_ascii(st1)
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
                             self.ystep_down, self.ystep_up = 0, 0
@@ -14353,7 +14353,7 @@ class tgraphcanvas(FigureCanvas):
                             temp = (self.temp2[self.timeindex[0]] if self.BTcurve else self.temp1[self.timeindex[0]])
                             if is_proper_temp(temp):
                                 d = self.ylimit - self.ylimit_min
-                                st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation', 'CHARGE'))
+                                st1 = self.aw.arabicReshape(QApplication.translate('Label', 'CHARGE'))
                                 st1 = self.__dijkstra_to_ascii(st1)
                                 tx = self.timex[self.timeindex[0]]
                                 self.ystep_down,self.ystep_up = self.findtextgap(0,0,temp,temp,d)
@@ -18097,28 +18097,28 @@ class tgraphcanvas(FigureCanvas):
                             index = self.timeindex.index(i)
                             if index == 0:
                                 timez = stringfromseconds(0)
-                                self.aw.sendmessage(QApplication.translate('Message', '[ CHARGE ]') + ' ' + timez, style="background-color:'#f07800';",append=False)
+                                self.aw.sendmessage(f"[ {QApplication.translate('Label', 'CHARGE')} ] {timez}", style="background-color:'#f07800';",append=False)
                             elif index == 1:
                                 timez = stringfromseconds(self.timex[self.timeindex[1]] - self.timex[self.timeindex[0]])
-                                self.aw.sendmessage(QApplication.translate('Message', '[ DRY END ]') + ' ' + timez, style="background-color:'orange';",append=False)
+                                self.aw.sendmessage(f"[ {QApplication.translate('Label', 'DRY END')} ] {timez}", style="background-color:'orange';",append=False)
                             elif index == 2:
                                 timez = stringfromseconds(self.timex[self.timeindex[2]] - self.timex[self.timeindex[0]])
-                                self.aw.sendmessage(QApplication.translate('Message', '[ FC START ]') + ' ' + timez, style="background-color:'orange';",append=False)
+                                self.aw.sendmessage(f"[ {QApplication.translate('Label', 'FC START')} ] {timez}", style="background-color:'orange';",append=False)
                             elif index == 3:
                                 timez = stringfromseconds(self.timex[self.timeindex[3]] - self.timex[self.timeindex[0]])
-                                self.aw.sendmessage(QApplication.translate('Message', '[ FC END ]') + ' ' + timez, style="background-color:'orange';",append=False)
+                                self.aw.sendmessage(f"[ {QApplication.translate('Label', 'FC END')} ] {timez}", style="background-color:'orange';",append=False)
                             elif index == 4:
                                 timez = stringfromseconds(self.timex[self.timeindex[4]] - self.timex[self.timeindex[0]])
-                                self.aw.sendmessage(QApplication.translate('Message', '[ SC START ]') + ' ' + timez, style="background-color:'orange';",append=False)
+                                self.aw.sendmessage(f"[ {QApplication.translate('Label', 'SC START')} ] {timez}", style="background-color:'orange';",append=False)
                             elif index == 5:
                                 timez = stringfromseconds(self.timex[self.timeindex[5]] - self.timex[self.timeindex[0]])
-                                self.aw.sendmessage(QApplication.translate('Message', '[ SC END ]') + ' ' + timez, style="background-color:'orange';",append=False)
+                                self.aw.sendmessage(f"[ {QApplication.translate('Label', 'SC END')} ] {timez}", style="background-color:'orange';",append=False)
                             elif index == 6:
                                 timez = stringfromseconds(self.timex[self.timeindex[6]] - self.timex[self.timeindex[0]])
-                                self.aw.sendmessage(QApplication.translate('Message', '[ DROP ]') + ' ' + timez, style="background-color:'#f07800';",append=False)
+                                self.aw.sendmessage(f"[ {QApplication.translate('Label', 'DROP')} ] {timez}", style="background-color:'#f07800';",append=False)
                             elif index == 7:
                                 timez = stringfromseconds(self.timex[self.timeindex[7]] - self.timex[self.timeindex[0]])
-                                self.aw.sendmessage(QApplication.translate('Message', '[ COOL ]') + ' ' + timez, style="background-color:'#6FB5D1';",append=False)
+                                self.aw.sendmessage(f"[ {QApplication.translate('ComboBox', 'COOL END')} ] {timez}", style="background-color:'#6FB5D1';",append=False)
                             orange_blue_msg_sent = True
                             break
                         axfig = self.ax.get_figure()

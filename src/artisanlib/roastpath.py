@@ -61,7 +61,7 @@ def extractProfileRoastPathHTML(url:'QUrl',
     res:ProfileData = ProfileData() # the interpreted data set
     try:
         sess = requests.Session()
-        sess.mount('file://', FileAdapter())  # type: ignore[no-untyped-call]
+        sess.mount('file://', FileAdapter())
         page = sess.get(url.toString(), timeout=(4, 15), headers={'Accept-Encoding' : 'gzip'})
         tree = html.fromstring(page.content)
 

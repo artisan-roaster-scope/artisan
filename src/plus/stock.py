@@ -1179,7 +1179,7 @@ def getBlends(weight_unit_idx:int, store:Optional[str], customBlend:Optional[Ble
         if acquire_lock:
             stock_semaphore.acquire(1)
         if stock is not None and ('blends' in stock or 'replBlends' in stock or customBlend is not None):
-            res = {}
+            res:Dict[str,Tuple[Blend, StockItem, float, CoffeeLabelDict, float, List[ReplacementBlend]]] = {}
             if store is None:
                 stores = [getStoreId(s) for s in getStores(acquire_lock=False)]
             else:

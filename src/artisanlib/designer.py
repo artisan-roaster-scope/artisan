@@ -51,15 +51,15 @@ class designerconfigDlg(ArtisanDialog):
         charge = QLabel(QApplication.translate('Label', 'CHARGE'))
         charge.setAlignment(Qt.AlignmentFlag.AlignRight)
         charge.setStyleSheet('background-color: #f07800')
-        self.dryend = QCheckBox(QApplication.translate('CheckBox','DRY END'))
+        self.dryend = QCheckBox(QApplication.translate('Label','DRY END'))
         self.dryend.setStyleSheet('background-color: orange')
-        self.fcs = QCheckBox(QApplication.translate('CheckBox','FC START'))
+        self.fcs = QCheckBox(QApplication.translate('Label','FC START'))
         self.fcs.setStyleSheet('background-color: orange')
-        self.fce = QCheckBox(QApplication.translate('CheckBox','FC END'))
+        self.fce = QCheckBox(QApplication.translate('Label','FC END'))
         self.fce.setStyleSheet('background-color: orange')
-        self.scs = QCheckBox(QApplication.translate('CheckBox','SC START'))
+        self.scs = QCheckBox(QApplication.translate('Label','SC START'))
         self.scs.setStyleSheet('background-color: orange')
-        self.sce = QCheckBox(QApplication.translate('CheckBox','SC END'))
+        self.sce = QCheckBox(QApplication.translate('Label','SC END'))
         self.sce.setStyleSheet('background-color: orange')
         drop = QLabel(QApplication.translate('Label', 'DROP'))
         drop.setAlignment(Qt.AlignmentFlag.AlignRight)
@@ -345,13 +345,13 @@ class designerconfigDlg(ArtisanDialog):
     @pyqtSlot(bool)
     def settimes(self, _:bool = False) -> None:
         #check input
-        strings = [QApplication.translate('Message','CHARGE'),
-                   QApplication.translate('Message','DRY END'),
-                   QApplication.translate('Message','FC START'),
-                   QApplication.translate('Message','FC END'),
-                   QApplication.translate('Message','SC START'),
-                   QApplication.translate('Message','SC END'),
-                   QApplication.translate('Message','DROP')]
+        strings = [QApplication.translate('Label','CHARGE'),
+                   QApplication.translate('Label','DRY END'),
+                   QApplication.translate('Label','FC START'),
+                   QApplication.translate('Label','FC END'),
+                   QApplication.translate('Label','SC START'),
+                   QApplication.translate('Label','SC END'),
+                   QApplication.translate('Label','DROP')]
         timecheck = self.validatetime()
         if timecheck != 1000:
             st = QApplication.translate('Message','Incorrect time format. Please recheck {0} time').format(strings[timecheck])
@@ -631,13 +631,13 @@ class designerconfigDlg(ArtisanDialog):
             elif idi == 5 and self.sce.isChecked():
                 self.sce.setChecked(False)
             #ERROR time from edit boxes is not in ascending order
-            strings = [QApplication.translate('Message','CHARGE'),
-                       QApplication.translate('Message','DRY END'),
-                       QApplication.translate('Message','FC START'),
-                       QApplication.translate('Message','FC END'),
-                       QApplication.translate('Message','SC START'),
-                       QApplication.translate('Message','SC END'),
-                       QApplication.translate('Message','DROP')]
+            strings = [QApplication.translate('Label','CHARGE'),
+                       QApplication.translate('Label','DRY END'),
+                       QApplication.translate('Label','FC START'),
+                       QApplication.translate('Label','FC END'),
+                       QApplication.translate('Label','SC START'),
+                       QApplication.translate('Label','SC END'),
+                       QApplication.translate('Label','DROP')]
             st = QApplication.translate('Message','Times need to be in ascending order. Please recheck {0} time').format(strings[idi])
             QMessageBox.information(self,QApplication.translate('Message','Designer Config'),st)
             return

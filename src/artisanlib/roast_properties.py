@@ -747,7 +747,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.dropedit.setMaximumWidth(50)
         self.dropedit.setMinimumWidth(50)
         droplabel.setBuddy(self.dropedit)
-        coollabel = QLabel('<b>' + QApplication.translate('Label', 'COOL') + '</b>')
+        coollabel = QLabel('<b>' + QApplication.translate('ComboBox', 'COOL END') + '</b>')
         coollabel.setStyleSheet("background-color:'#6666ff';")
         coollabel.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
         if self.aw.qmc.timeindex[7] and self.aw.qmc.timeindex[7] < len(self.aw.qmc.timex):
@@ -4382,28 +4382,28 @@ class editGraphDlg(ArtisanResizeablDialog):
             if tableitem is not None:
                 if i == self.aw.qmc.timeindex[0] and i != -1:
                     tableitem.setBackground(QColor('#f07800'))
-                    text = QApplication.translate('Table', 'CHARGE')
+                    text = QApplication.translate('Label', 'CHARGE')
                 elif i == self.aw.qmc.timeindex[1] and i != 0:
                     tableitem.setBackground(QColor('orange'))
-                    text = QApplication.translate('Table', 'DRY END')
+                    text = QApplication.translate('Label', 'DRY END')
                 elif i == self.aw.qmc.timeindex[2] and i != 0:
                     tableitem.setBackground(QColor('orange'))
-                    text = QApplication.translate('Table', 'FC START')
+                    text = QApplication.translate('Label', 'FC START')
                 elif i == self.aw.qmc.timeindex[3] and i != 0:
                     tableitem.setBackground(QColor('orange'))
-                    text = QApplication.translate('Table', 'FC END')
+                    text = QApplication.translate('Label', 'FC END')
                 elif i == self.aw.qmc.timeindex[4] and i != 0:
                     tableitem.setBackground(QColor('orange'))
-                    text = QApplication.translate('Table', 'SC START')
+                    text = QApplication.translate('Label', 'SC START')
                 elif i == self.aw.qmc.timeindex[5] and i != 0:
                     tableitem.setBackground(QColor('orange'))
-                    text = QApplication.translate('Table', 'SC END')
+                    text = QApplication.translate('Label', 'SC END')
                 elif i == self.aw.qmc.timeindex[6] and i != 0:
                     tableitem.setBackground(QColor('#f07800'))
-                    text = QApplication.translate('Table', 'DROP')
+                    text = QApplication.translate('Label', 'DROP')
                 elif i == self.aw.qmc.timeindex[7] and i != 0:
                     tableitem.setBackground(QColor('orange'))
-                    text = QApplication.translate('Table', 'COOL')
+                    text = QApplication.translate('ComboBox', 'COOL END')
             Rtime.setText(text + ' ' + Rtime.text())
 
             self.datatable.setItem(i,1,ET)

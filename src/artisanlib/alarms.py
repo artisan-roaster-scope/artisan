@@ -842,14 +842,14 @@ class AlarmDlg(ArtisanResizeablDialog):
         timeComboBox.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
         timeComboBox.addItems([QApplication.translate('ComboBox','ON'), # qmc.alarmtime 9
                                QApplication.translate('ComboBox','START'), # qmc.alarmtime -1
-                               QApplication.translate('ComboBox','CHARGE'), # qmc.alarmtime 0
+                               QApplication.translate('Label','CHARGE'), # qmc.alarmtime 0
                                QApplication.translate('ComboBox','TP'), # qmc.alarmtime 8
-                               QApplication.translate('ComboBox','DRY END'), # qmc.alarmtime 1
-                               QApplication.translate('ComboBox','FC START'), # qmc.alarmtime 2
-                               QApplication.translate('ComboBox','FC END'), # qmc.alarmtime 3
-                               QApplication.translate('ComboBox','SC START'), # qmc.alarmtime 4
-                               QApplication.translate('ComboBox','SC END'), # qmc.alarmtime 5
-                               QApplication.translate('ComboBox','DROP'), # qmc.alarmtime 6
+                               QApplication.translate('Label','DRY END'), # qmc.alarmtime 1
+                               QApplication.translate('Label','FC START'), # qmc.alarmtime 2
+                               QApplication.translate('Label','FC END'), # qmc.alarmtime 3
+                               QApplication.translate('Label','SC START'), # qmc.alarmtime 4
+                               QApplication.translate('Label','SC END'), # qmc.alarmtime 5
+                               QApplication.translate('Label','DROP'), # qmc.alarmtime 6
                                QApplication.translate('ComboBox','COOL END'), # qmc.alarmtime 7
                                QApplication.translate('ComboBox','If Alarm')]) # qmc.alarmtime 10
         timeComboBox.setCurrentIndex(self.aw.qmc.alarmtime2menuidx[self.aw.qmc.alarmtime[i]])
@@ -900,15 +900,15 @@ class AlarmDlg(ArtisanResizeablDialog):
                                  QApplication.translate('ComboBox','Slider') + ' ' + self.aw.qmc.etypesf(2),
                                  QApplication.translate('ComboBox','Slider') + ' ' + self.aw.qmc.etypesf(3),
                                  QApplication.translate('ComboBox','START'),
-                                 QApplication.translate('ComboBox','DRY'),
-                                 QApplication.translate('ComboBox','FCs'),
-                                 QApplication.translate('ComboBox','FCe'),
-                                 QApplication.translate('ComboBox','SCs'),
-                                 QApplication.translate('ComboBox','SCe'),
-                                 QApplication.translate('ComboBox','DROP'),
+                                 QApplication.translate('Label','DRY END'),
+                                 QApplication.translate('Label','FC START'),
+                                 QApplication.translate('Label','FC END'),
+                                 QApplication.translate('Label','SC START'),
+                                 QApplication.translate('Label','SC END'),
+                                 QApplication.translate('Label','DROP'),
                                  QApplication.translate('ComboBox','COOL END'),
                                  QApplication.translate('ComboBox','OFF'),
-                                 QApplication.translate('ComboBox','CHARGE'),
+                                 QApplication.translate('Label','CHARGE'),
                                  QApplication.translate('ComboBox','RampSoak ON'),
                                  QApplication.translate('ComboBox','RampSoak OFF'),
                                  QApplication.translate('ComboBox','PID ON'),
