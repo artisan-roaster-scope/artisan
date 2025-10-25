@@ -12,7 +12,7 @@
 # the GNU General Public License for more details.
 #
 # AUTHOR
-# Dave Baxter, Marko Luther 2023
+# Dave Baxter, Marko Luther 2025
 """This is a setup.py script
 
 Usage:
@@ -107,7 +107,7 @@ with open('Info.plist', 'r+b') as fp:
     try:
         plist['LSMinimumSystemVersion'] = os.environ['MACOSX_DEPLOYMENT_TARGET']
     except Exception: # pylint: disable=broad-except
-        plist['LSMinimumSystemVersion'] = '12.3'
+        plist['LSMinimumSystemVersion'] = '13.0'
     plist['LSMultipleInstancesProhibited'] = 'false'
     plist['LSArchitecturePriority'] = ['arm64', 'x86_64']
     plist['NSHumanReadableCopyright'] = LICENSE

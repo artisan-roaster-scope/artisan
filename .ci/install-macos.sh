@@ -13,7 +13,7 @@
 # the GNU General Public License for more details.
 #
 # AUTHOR
-# Dave Baxter, Marko Luther 2023
+# Dave Baxter, Marko Luther 2025
 
 #set -ex # increased logging
 set -e # reduced logging
