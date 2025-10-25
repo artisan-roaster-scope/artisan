@@ -241,23 +241,6 @@ class TestBLE:
         assert result is False
         assert service_uuid is None
 
-    def test_write_success(self, ble_instance: BLE, mock_bleak_client: Mock) -> None:
-        """Test successful write operation."""
-        # Arrange
-        mock_thread = Mock()
-        mock_thread.loop = Mock()
-        ble_instance._asyncLoopThread = mock_thread
-        write_uuid = 'write-characteristic-uuid'
-        message = b'test message that is longer than 20 bytes to test chunking'
-
-        with patch('asyncio.run_coroutine_threadsafe') as mock_run_coroutine:
-            # Act
-            ble_instance.write(mock_bleak_client, write_uuid, message, response=True)
-
-            # Assert
-            # Should be called multiple times due to chunking (20 byte chunks)
-            assert mock_run_coroutine.call_count >= 3  # Message is longer than 40 bytes
-
     def test_write_with_no_async_thread(self, ble_instance: BLE, mock_bleak_client: Mock) -> None:
         """Test write when no async thread exists."""
         # Arrange

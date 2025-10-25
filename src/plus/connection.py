@@ -386,6 +386,7 @@ def sendData(
     _log.debug('sendData(%s,_data_,%s,%s)', url, verb, authorized)
     jsondata = json.dumps(data, indent=None, separators=(',', ':'), ensure_ascii=False).encode('utf8')
     _log.debug('-> size %s', len(jsondata))
+#    _log.debug("PRINT jsondata: %s",jsondata)
     headers, postdata = getHeadersAndData(authorized, compress, jsondata, verb)
     if verb == 'POST':
         r = requests.post(

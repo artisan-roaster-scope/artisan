@@ -20,6 +20,7 @@ v3.4.0 (Oct XX, 2025)
   - adds support for [Shelly energy meters](https://artisan-scope.org/devices/shelly/)
   - adds batch conversion from Cropster XLS, Giesen CSV, IKAWA CSV, Loring CSV, Petroncini CSV, ROEST CSV, Rubase CSV, and Stronghold XLSX profiles to Artisan `.alog` profiles
   - adds drag-and-drop import of a Artisan JSON, Cropster XLS, Giesen CSV and Stronghold XLSX profiles
+  - adds HiBean importer/converter
   - adds Artisan Command `slider(<int>, <bool>)` to hide/show sliders
   - adds Czech localization
   - adds multi-modal state transitions to Batch Manager
@@ -54,6 +55,7 @@ v3.4.0 (Oct XX, 2025)
   - remember loaded settings filename as default on save [PR #1975](../../../pull/1975))
   - BatchManager resets on tare triggered by button press on the Acaia scale
   - automatic timeline extension now relative to sampling interval
+  - Linux builds require now glibc >=2.35
 
 * FIXES
   - fixes regression which broke the designer such that points could not be moved ([Discussion #1905](../../../discussions/1905) and [Issue #1916](../../../issues/1916))
@@ -86,7 +88,7 @@ v3.2.0 (June 23, 2025)
   - adds [batch manager](https://doc.artisan.plus/docs/batch-manager)
   - adds support for Acaia relay scales like the [Umbra](https://acaia.co/products/umbra-lunar) and the [Cosmo](https://buy.artisan.plus/Acaia-Cosmo-Scale)
   - adds custom local scale names
-  - adds button to manual update the roast schedule
+  - adds button to manual synchronize the roast schedule with [artisan.plus](https://artisan.plus)
   - adds URL open handler for Linux/RPi
   - adds possibility to dock sliders to the right side of the main window ([Discussion #1880](../../../discussions/1880))
 

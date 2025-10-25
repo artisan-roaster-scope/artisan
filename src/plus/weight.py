@@ -1206,8 +1206,9 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefl
                     self.sm_green.send('bucket_placed')
 
             # 7. Place Empty Roasted Bucket (only if empty green bucket not recognized)
-            elif (self.aw.taskWebDisplayRoastedActive and                                  # only if Task Display Roasted is active (strictly not necessary,
-                                                                                           #   but this way it allows to deactivate the mechanism
+            elif ((self.aw.taskWebDisplayRoastedActive or (self.aw.schedule_window is not None and self.aw.schedule_window.TabWidget.currentIndex() == 1)) and
+                        # only if Task Display Roasted is active; strictly not necessary,
+                        #   but this way it allows to deactivate the mechanism
                     self.roasted_task_scale == 0 and                                       # no scale yet assigned to the roasted task
                     # either there is no current roasted weight item or there is a single one
                     (self.sm_roasted.current_weight_item is None or

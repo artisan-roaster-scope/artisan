@@ -2121,6 +2121,10 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                 importHH506RAAction.triggered.connect(self.importHH506RA)
                 self.importMenu.addAction(importHH506RAAction)
 
+                importHiBeanAction = QAction('HiBean JSON...', self)
+                importHiBeanAction.triggered.connect(self.importHiBean)
+                self.importMenu.addAction(importHiBeanAction)
+
                 importIkawaURLAction = QAction('IKAWA URL...', self)
                 importIkawaURLAction.triggered.connect(self.importIkawaURL)
                 self.importMenu.addAction(importIkawaURLAction)
@@ -2182,6 +2186,10 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                 fileConvertFromGiesenAction = QAction(QApplication.translate('Menu', 'Giesen CSV...'), self)
                 fileConvertFromGiesenAction.triggered.connect(self.convertFromGiesen)
                 self.convFromMenu.addAction(fileConvertFromGiesenAction)
+
+                fileConvertFromHiBeanAction = QAction(QApplication.translate('Menu', 'HiBean JSON...'), self)
+                fileConvertFromHiBeanAction.triggered.connect(self.convertFromHiBean)
+                self.convFromMenu.addAction(fileConvertFromHiBeanAction)
 
                 fileConvertFromIKAWAAction = QAction(QApplication.translate('Menu', 'IKAWA CSV...'), self)
                 fileConvertFromIKAWAAction.triggered.connect(self.convertFromIKAWA)
@@ -13407,6 +13415,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                 self.updatePlusStatus()
                 if self.plus_account is not None and plus.config.uuid_tag in obj:
                     QTimer.singleShot(100, plus.sync.sync)
+                    QTimer.singleShot(700, lambda: plus.schedule.update_completed_item_from_loaded_profile(self))
 
                 #check colors
                 self.checkColors(self.getcolorPairsToCheck())
@@ -16939,6 +16948,12 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
 
     @pyqtSlot()
     @pyqtSlot(bool)
+    def convertFromHiBean(self, _:bool = False) -> None:
+        from artisanlib.hibean import extractProfileHiBeanJSON
+        self.fileConvertFrom('*.json', extractProfileHiBeanJSON)
+
+    @pyqtSlot()
+    @pyqtSlot(bool)
     def convertFromGiesen(self, _:bool = False) -> None:
         from artisanlib.giesen import extractProfileGiesenCSV
         self.fileConvertFrom('*.csv', extractProfileGiesenCSV)
@@ -17011,9 +17026,9 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                         if not os.path.exists(fconv):
                             self.qmc.reset(redraw=False,soundOn=False)
                             pd = extractor(f,
-                                    self.qmc.etypesdefault,
-                                    self.qmc.alt_etypesdefault,
-                                    self.qmc.artisanflavordefaultlabels,
+                                    self.qmc.etypesdefault[:],
+                                    self.qmc.alt_etypesdefault[:],
+                                    self.qmc.artisanflavordefaultlabels[:],
                                     self.qmc.eventsExternal2InternalValue)
                             if pd is not None:
                                 self.plusAddPath(cast(Dict[str,Any], pd), fconv)
@@ -25472,9 +25487,9 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                     return
                 try:
                     obj = extractor(url,
-                                    self.qmc.etypesdefault,
-                                    self.qmc.alt_etypesdefault,
-                                    self.qmc.artisanflavordefaultlabels,
+                                    self.qmc.etypesdefault[:],
+                                    self.qmc.alt_etypesdefault[:],
+                                    self.qmc.artisanflavordefaultlabels[:],
                                     self.qmc.eventsExternal2InternalValue)
                     res = self.setProfile(None, obj) if obj else False
                 except Exception as e: # pylint: disable=broad-except
@@ -25573,6 +25588,12 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
     def importRoastPATH(self, _:bool = False) -> None:
         from artisanlib.roastpath import extractProfileRoastPathHTML
         self.importExternalURL(extractProfileRoastPathHTML,QApplication.translate('Message','Import RoastPATH URL'))
+
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def importHiBean(self, _:bool = False) -> None:
+        from artisanlib.hibean import extractProfileHiBeanJSON
+        self.importExternal(extractProfileHiBeanJSON,QApplication.translate('Message','Import HiBean JSON'),'*.json')
 
     @pyqtSlot()
     @pyqtSlot(bool)

@@ -62,7 +62,8 @@ if TYPE_CHECKING:
 from artisanlib.util import (uchr, fill_gaps, deltaLabelPrefix, deltaLabelUTF8, deltaLabelMathPrefix, stringfromseconds,
         fromFtoC, fromFtoCstrict, fromCtoF, fromCtoFstrict, RoRfromFtoC, RoRfromFtoCstrict, RoRfromCtoF, toInt, toString,
         toFloat, application_name, getResourcePath, getDirectory, convertWeight, right_to_left, float2str,
-        abbrevString, scaleFloat2String, is_proper_temp, weight_units, render_weight, volume_units, float2float, timearray2index)
+        abbrevString, scaleFloat2String, is_proper_temp, weight_units, render_weight, volume_units, float2float, timearray2index,
+        events_internal_to_external_value, events_external_to_internal_value)
 from artisanlib import pid
 from artisanlib.time import ArtisanTime
 from artisanlib.filters import LiveMedian
@@ -2895,23 +2896,13 @@ class tgraphcanvas(FigureCanvas):
     # -11.0 => -100
     @staticmethod
     def eventsInternal2ExternalValue(v:Optional[float]) -> int:
-        if v is None:
-            return 0
-        if -1.0 <= v <= 1.0:
-            return 0
-        if v < -1.0:
-            return -(int(round(abs(v)*10)) - 10)
-        return int(round(v*10)) - 10
+        return events_internal_to_external_value(v)
 
     # the inverse of eventsInternal2ExternalValue, converting an external to an internal event value
     # v from [-100,100]
     @staticmethod
     def eventsExternal2InternalValue(v:int) -> float:
-        if v == 0:
-            return 0.
-        if v >= 1:
-            return v/10. + 1.
-        return v/10. - 1.
+        return events_external_to_internal_value(v)
 
     # eventsvalues maps the given number v to a string to be displayed to the user as special event value
     # v is expected to be float value of range [0-10]

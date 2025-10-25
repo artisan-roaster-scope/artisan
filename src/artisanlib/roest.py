@@ -265,8 +265,8 @@ def extractProfileRoestCSV(file:str,
     res['extraCurveVisibility2'] = [True, False, False, False, True, True, True, True, True, True]
     res['extraDelta1'] = [False]*10
     res['extraDelta2'] = [False]*10
-    res['extraNoneTempHint1'] = [True, False, False, False, True]
-    res['extraNoneTempHint2'] = [True, True, True, True, True]
+    res['extraNoneTempHint1'] = [False, True, True, True, True]
+    res['extraNoneTempHint2'] = [False, False, False, False, False]
 
     if len(specialevents) > 0:
         res['specialevents'] = specialevents

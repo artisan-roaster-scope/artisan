@@ -1,6 +1,6 @@
 [General]
 Delay=2000
-roastertype_setup=Carmomaq StrwriteSingle(atto Lab
+roastertype_setup=Carmomaq Stratto Lab
 roastersize_setup_default=0.25
 roastersize_setup=0.25
 roasterheating_setup=3

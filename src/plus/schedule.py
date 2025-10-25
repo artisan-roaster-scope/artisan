@@ -521,18 +521,17 @@ def get_all_completed() -> List[CompletedItemDict]:
             completed_roasts_semaphore.release(1)
     return []
 
-# UNUSED:
-## returns the CompletedItemDict object for the given roastUUID if any
-#def get_completed(roastUUID:str) -> Optional[CompletedItemDict]:
-#    try:
-#        completed_roasts_semaphore.acquire(1)
-#        return next((d for d in completed_roasts_cache if 'roastUUID' in d and d['roastUUID'] == roastUUID), None)
-#    except Exception as e:  # pylint: disable=broad-except
-#        _log.error(e)
-#    finally:
-#        if completed_roasts_semaphore.available() < 1:
-#            completed_roasts_semaphore.release(1)
-#    return None
+# returns the CompletedItemDict object for the given roastUUID if any
+def get_completed(roastUUID:str) -> Optional[CompletedItemDict]:
+    try:
+        completed_roasts_semaphore.acquire(1)
+        return next((d for d in completed_roasts_cache if 'roastUUID' in d and d['roastUUID'] == roastUUID), None)
+    except Exception as e:  # pylint: disable=broad-except
+        _log.error(e)
+    finally:
+        if completed_roasts_semaphore.available() < 1:
+            completed_roasts_semaphore.release(1)
+    return None
 
 
 # add the given CompletedItemDict if it contains a roastUUID which does not occurs yet in the completed_roasts_cache
@@ -566,6 +565,7 @@ def updates_completed_from_roast_properties(aw:'ApplicationWindow', ci:Completed
     weight = convertWeight(aw.qmc.weight[1], weight_unit_idx, 1)
     if ci.weight != weight:
         ci.weight = weight
+        ci.measured = bool(weight != 0)
         updated = True
     if ci.color != aw.qmc.ground_color:
         ci.color = aw.qmc.ground_color
@@ -616,22 +616,21 @@ def updates_completed_from_roast_properties(aw:'ApplicationWindow', ci:Completed
         add_completed(aw.plus_account_id, cast(CompletedItemDict, completed_item_dict))
     return updated
 
-# unused:
-#def update_completed_item_from_loaded_profile(aw:'ApplicationWindow') -> None:
-#    if aw.plus_account_id is not None and aw.qmc.roastUUID is not None:
-#        # a plus account is configured
-#        if aw.schedule_window is None:
-#            #  we load the completed items to fill the cache
-#            load_completed(aw.plus_account_id, force=False) # if already loaded, avoid re-loading
-#        # get CompletedItem corresponding to the given roastUUID
-#        completed_item_dict:Optional[CompletedItemDict] = get_completed(aw.qmc.roastUUID)
-#        if completed_item_dict is not None:
-#            completed_item:CompletedItem = CompletedItem.model_validate(completed_item_dict)
-#            # update completed item and persist changes, if any, in the completed item cache
-#            updated = updates_completed_from_roast_properties(aw, completed_item)
-#            if updated and aw.schedule_window is not None:
-#                # update the schedule window
-#                aw.schedule_window.updateScheduleWindow()
+def update_completed_item_from_loaded_profile(aw:'ApplicationWindow') -> None:
+    if aw.plus_account_id is not None and aw.qmc.roastUUID is not None:
+        # a plus account is configured
+        if aw.schedule_window is None:
+            #  we load the completed items to fill the cache
+            load_completed(aw.plus_account_id, force=False) # if already loaded, avoid re-loading
+        # get CompletedItem corresponding to the given roastUUID
+        completed_item_dict:Optional[CompletedItemDict] = get_completed(aw.qmc.roastUUID)
+        if completed_item_dict is not None:
+            completed_item:CompletedItem = CompletedItem.model_validate(completed_item_dict)
+            # update completed item and persist changes, if any, in the completed item cache
+            updated = updates_completed_from_roast_properties(aw, completed_item)
+            if updated and aw.schedule_window is not None:
+                # update the schedule window
+                aw.schedule_window.updateScheduleWindow()
 
 
 ###################
@@ -3185,10 +3184,14 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         return (item is not None and item.roastUUID.hex == uuid)
 
     def next_not_completed_item(self) -> Optional[RoastedWeightItem]:
-#        # latest roast first
-#        item:Optional[CompletedItem] = next((ci for ci in self.completed_items if not ci.measured), None)
+        completed_items = self.completed_items
+        today = datetime.datetime.now(datetime.timezone.utc).astimezone().date()
+        todays_completed_items = [ci for ci in self.completed_items if ci.roastdate.astimezone().date() == today]
+        if len(todays_completed_items) != 0:
+            # in case there are completed items for todays sessions, the WeightManager ignores all items of the previous session
+            completed_items = todays_completed_items
         # oldest roast first
-        item:Optional[CompletedItem] = next((ci for ci in reversed(self.completed_items) if not ci.measured), None)
+        item:Optional[CompletedItem] = next((ci for ci in reversed(completed_items) if not ci.measured), None)
         if item is not None:
             weight_unit_idx = weight_units.index(self.aw.qmc.weight[2])
             position = f'{item.sequence_id}/{item.count}'
@@ -3410,7 +3413,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
             converted_data_weight_str = f'{float2floatWeightVolume(converted_data_weight):g}'
             roasted_weight_text:str = self.roasted_weight.text()
             if roasted_weight_text == '':
-                roasted_weight_text = self.roasted_weight.placeholderText()
+                roasted_weight_text = '0'
             if roasted_weight_text != '':
                 roasted_weight_value_str = comma2dot(roasted_weight_text)
                 if converted_data_weight_str != roasted_weight_value_str:

@@ -921,6 +921,44 @@ def eventtime2string(time:float) -> str:
     return f'{di:02.0f}:{mo:02.0f}'
 
 
+# eventsvalues maps the given internal event value v to an external event int value as displayed to the user as special event value
+# historicaly internal event values ranged from [1-11] and external event values from [0-10]
+#   that range was extended to 0-100 in later Artisan versions
+# v is expected to be float value of range [-11.0,11.0] or None (interpreted as 0)
+# negative values are not used as event values, but as step arguments in extra button definitions
+#   11.0 => 100
+#   10.1 => 91
+#   10.0 => 90
+#   1.1 => 1
+#   1.0 => 0
+#   0.5 => 0
+#     0 => 0
+#  -1.0 => 0
+#  -1.1 => -1
+# -10.0 => -90
+# -10.1 => -91
+# -11.0 => -100
+### NOTE: This one is "LINKED" by a staticmethod for compatibility in canvas.py:tgraphcanvas()
+def events_internal_to_external_value(v:Optional[float]) -> int:
+    if v is None:
+        return 0
+    if -1.0 <= v <= 1.0:
+        return 0
+    if v < -1.0:
+        return -(int(round(abs(v)*10)) - 10)
+    return int(round(v*10)) - 10
+
+# the inverse of events_internal_to_external_value, converting an external to an internal event value
+# v from [-100,100]
+### NOTE: This one is "LINKED" by a staticmethod for compatibility in canvas.py:tgraphcanvas()
+def events_external_to_internal_value(v:int) -> float:
+    if v == 0:
+        return 0.
+    if v >= 1:
+        return v/10. + 1.
+    return v/10. - 1.
+
+
 # serialize/deserialize
 
 
