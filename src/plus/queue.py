@@ -42,7 +42,7 @@ import logging
 from typing import Final, Any, List, Dict, Optional, TYPE_CHECKING  #for Python >= 3.9: can remove 'List' and 'Dict' since type hints can use the generic 'list' and 'dict'
 
 if TYPE_CHECKING:
-    import persistqueue # type:ignore[import-untyped] # pylint: disable=unused-import
+    import persistqueue # pylint: disable=unused-import
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)

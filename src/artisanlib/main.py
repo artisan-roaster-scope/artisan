@@ -11436,6 +11436,9 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             else:
                 self.extraeventsbuttonsflags[0] = 0
 
+    def extraButtonsVisible(self) -> bool:
+        return self.extrabuttondialogs.isVisible()
+
     def showExtraButtons(self, changeDefault:bool = True) -> None:
         if len(self.extraeventstypes)>0:
             focused_widget = QApplication.focusWidget()
@@ -11498,8 +11501,11 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             else:
                 self.eventslidersflags[0] = 0
 
+    def slidersVisible(self) -> bool:
+        return any(v != 0 for v in self.eventslidervisibilities) or bool(self.pidcontrol.svSlider)
+
     def showSliders(self, changeDefault:bool = True) -> None:
-        if any(v != 0 for v in self.eventslidervisibilities) or bool(self.pidcontrol.svSlider):
+        if self.slidersVisible():
             self.sliderDock.setVisible(True)
             focused_widget = QApplication.focusWidget()
             if focused_widget and focused_widget != self.centralWidget():
@@ -11548,18 +11554,24 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         self.level1frame.show()
         self.controlsAction.setChecked(True)
 
+    def controlsVisible(self) -> bool:
+        return self.level1frame.isVisible()
+
     @pyqtSlot()
     @pyqtSlot(bool)
     def toggleControls(self, _:bool = False) -> None:
-        if self.level1frame.isVisible():
+        if self.controlsVisible():
             self.hideControls()
         else:
             self.showControls()
 
+    def lcdsVisible(self) -> bool:
+        return self.lcdFrame.isVisible()
+
     @pyqtSlot()
     @pyqtSlot(bool)
     def toggleReadings(self,_:bool = False) -> None:
-        if self.lcdFrame.isVisible():
+        if self.lcdsVisible():
             self.hideLCDs()
         else:
             self.showLCDs()
@@ -11592,6 +11604,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             self.sliderGrpBox4.setTitle('')
 
     def hideLCDs(self, changeDefault:bool = True) -> None:
+        _log.debug('PRINT hideLCDs')
         self.lcd1.setVisible(False)
         self.lcdFrame.setVisible(False)
         self.readingsAction.setChecked(False)
@@ -24946,13 +24959,10 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
     @pyqtSlot(bool)
     def flavorchart(self, _:bool = False) -> None:
         self.redrawOnResize = False # disable the redraw triggered on resize (eg. by hiding widgets) that replaces the logo icon
-        self.hideControls()
-        self.hideLCDs(False)
-        self.hideSliders(False)
-        self.hideExtraButtons()
         from artisanlib.cup_profile import flavorDlg
         dialog = flavorDlg(self,self)
         dialog.show()
+
 
     @pyqtSlot()
     @pyqtSlot(bool)

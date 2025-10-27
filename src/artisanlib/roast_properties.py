@@ -4734,7 +4734,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 self.createEventTable(force=True)
                 self.aw.qmc.redrawKeepViewSignal.emit(
                     False, # recomputeAllDeltas (default: True)
-                    self.aw.qmc.flagon, # re_smooth_foreground (default: True)
+                    True,  # re_smooth_foreground (default: True)
                     True,  # takelock (default: True)
                     False, # forceRenewAxis (default: False)
                     False, # re_smooth_background (default: False)
