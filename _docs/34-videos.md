@@ -12,6 +12,10 @@ gallery:
     image_path: /assets/images/gsg/video_two_batches.webp
     alt: "Roasting Two Batches"
     title: "2025-10 Roasting Two Batches"
+  - url: https://youtu.be/4hCfyq166Yk
+    image_path: /assets/images/gsg/video_artisan_acaia.webp
+    alt: "Artisan x Acaia Roaster Scale Demo @ WoC 2025"
+    title: "2025-6 Artisan x Acaia Roaster Scale Demo @ WoC 2025"
   - url: https://www.youtube.com/watch?v=4zHP1Hj-1ng
     image_path: /assets/images/gsg/video_plus_onboarding.webp
     alt: "Onboarding artisan.plus"
