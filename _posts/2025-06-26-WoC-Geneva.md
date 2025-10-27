@@ -22,6 +22,8 @@ The Artisan Scope team has partnered with [Acaia](https://acaia.co/){:target="_b
 
 We presented the first scale exclusively designed for coffee roasters, the [COSMO (10kg and 100kg) from Acaia](https://acaia.co/products/cosmo-landing). It integrates with the revolutionary [Batch Manager](https://doc.artisan.plus/docs/batch-manager/) released with Artisan v3.2.
 
+{% include video id="4hCfyq166Yk" provider="youtube" %}
+
 {% include video id="8dLLYt5F3dU" provider="youtube" %}
 
 {% include video id="jWI_nr9bjag" provider="youtube" %}
