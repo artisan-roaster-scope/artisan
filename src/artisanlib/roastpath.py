@@ -170,7 +170,7 @@ def extractProfileRoastPathHTML(url:'QUrl',
                     'Second Crack' : 4,
                     'Drop' : 6}
                 for dd in data['eventData']:
-                    if 'EventName' in dd and dd['EventName'] in marks and 'Timestamp' in dd:
+                    if 'EventName' in dd and dd['EventName'] is not None and dd['EventName'] in marks and 'Timestamp' in dd:
                         tx = dateutil.parser.parse(dd['Timestamp']).timestamp() - baseTime
                         try:
 #                            tx_idx = res["timex"].index(tx) # does not cope with dropouts as the next line:

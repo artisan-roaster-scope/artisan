@@ -4476,7 +4476,7 @@ class tgraphcanvas(FigureCanvas):
         tx_lin = numpy.flip(numpy.arange(tx_org[-1],tx_org[-1]-l*d,-d), axis=0) # by construction, len(tx_lin)=len(tx_org)=l
         temp_trail_re = numpy.interp(tx_lin, tx_org, temp_trail) # resample data into that linear spaced time
         try:
-            return float(numpy.average(temp_trail_re[-len(decay_weights):],axis=0,weights=decay_weights[-l:])) # pyrefly: ignore[index-error] # ty: ignore[non-subscriptable] # len(decay_weights)>len(temp_trail_re)=l is possible
+            return float(numpy.average(temp_trail_re[-len(decay_weights):],axis=0,weights=decay_weights[-l:])) # pyrefly: ignore[bad-index] # ty: ignore[non-subscriptable] # len(decay_weights)>len(temp_trail_re)=l is possible
         except Exception: # pylint: disable=broad-except
             # in case something goes very wrong we at least return the standard average over temp, this should always work as len(tx)=len(temp)
             return float(numpy.average(tx_org, numpy.array(temp_trail)))
@@ -7728,6 +7728,15 @@ class tgraphcanvas(FigureCanvas):
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
         try:
+            if self.designerflag:
+                # reset the users chosen widget visibility for the state
+                self.aw.updateControlsVisibility()
+                self.aw.update_extraeventbuttons_visibility()
+                self.aw.updateExtraButtonsVisibility()
+                self.aw.updateSlidersVisibility() # update visibility of sliders based on the users preference
+                self.aw.update_minieventline_visibility()
+                self.aw.updateReadingsLCDsVisibility() # this one triggers the resize and the recreation of the bitblit canvas
+
             #### lock shared resources #####
             self.profileDataSemaphore.acquire(1)
             #reset time
@@ -7985,7 +7994,6 @@ class tgraphcanvas(FigureCanvas):
 
             if not self.flagon:
                 self.aw.hideDefaultButtons()
-                self.aw.updateExtraButtonsVisibility()
                 self.aw.enableEditMenus()
 
             #reset alarms
@@ -7995,8 +8003,8 @@ class tgraphcanvas(FigureCanvas):
 
             self.aw.pidcontrol.pidActive = False
 
-            self.wheelflag = False
             self.designerflag = False
+            self.wheelflag = False
 
             #check and turn off mouse cross marker
             if self.crossmarker:
@@ -8009,6 +8017,7 @@ class tgraphcanvas(FigureCanvas):
         finally:
             if self.profileDataSemaphore.available() < 1:
                 self.profileDataSemaphore.release(1)
+
         # now clear all measurements and redraw
 
         self.clearMeasurements()
@@ -8179,7 +8188,7 @@ class tgraphcanvas(FigureCanvas):
                     result:List[float] = []
                     # ignore -1 readings in averaging and ensure a good ramp
                     for i, v in enumerate(b): # ty: ignore[invalid-argument-type] # pyrefly: ignore [bad-argument-type]
-                        seq = b[max(0,i-window_len + 1):i+1] # ty: ignore[possibly-unbound-implicit-call, non-subscriptable] # pyrefly: ignore[index-error]
+                        seq = b[max(0,i-window_len + 1):i+1] # ty: ignore[possibly-unbound-implicit-call, non-subscriptable] # pyrefly: ignore[bad-index]
                         w = decay_weights_internal[max(0,window_len-len(seq)):]  # preCond: len(decay_weights_internal)=window_len and len(seq) <= window_len; postCond: len(w)=len(seq)
                         if len(w) == 0:
                             # we don't average if there is are no weights (e.g. if the original seq did only contain -1 values and got empty)
@@ -13337,6 +13346,7 @@ class tgraphcanvas(FigureCanvas):
             self.aw.buttonONOFF.setToolTip(QApplication.translate('Tooltip', 'Stop monitoring'))
             self.aw.buttonSTARTSTOP.setEnabled(True) # ensure that the START button is enabled
             self.aw.disableEditMenus()
+            self.aw.updateControlsVisibility()
             self.aw.update_extraeventbuttons_visibility()
             self.aw.updateExtraButtonsVisibility()
             self.aw.updateSlidersVisibility() # update visibility of sliders based on the users preference
@@ -13473,6 +13483,7 @@ class tgraphcanvas(FigureCanvas):
             self.aw.buttonONOFF.setText(QApplication.translate('Button', 'ON')) # text means click to turn OFF (it is ON)
             # reset time LCD color to the default (might have been changed to red due to long cooling!)
             self.aw.updateReadingsLCDsVisibility()
+            self.aw.updateControlsVisibility()
 
             if not self.aw.HottopControlActive:
                 self.aw.hideExtraButtons(changeDefault=False)
@@ -14112,6 +14123,7 @@ class tgraphcanvas(FigureCanvas):
 
             self.aw.updateSlidersVisibility() # update visibility of sliders based on the users preference
             self.aw.update_minieventline_visibility()
+            self.aw.updateControlsVisibility()
             self.aw.updateReadingsLCDsVisibility() # update visibility of reading LCDs based on the user preference
             if self.phasesLCDflag:
                 self.aw.phasesLCDs.show()

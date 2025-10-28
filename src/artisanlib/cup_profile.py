@@ -54,18 +54,11 @@ class flavorDlg(ArtisanResizeablDialog):
         self.setWindowFlags(flags)
         self.setWindowTitle(QApplication.translate('Form Caption','Cup Profile'))
 
-        self.controls_visible:bool = self.aw.controlsVisible()
-        if self.controls_visible:
-            self.aw.hideControls()
-        self.lcds_visible = self.aw.lcdsVisible()
-        if self.lcds_visible:
-            self.aw.hideLCDs(False)
-        self.sliders_visible = self.aw.slidersVisible()
-        if self.sliders_visible:
-            self.aw.hideSliders(False)
-        self.extra_buttons_visible = self.aw.extraButtonsVisible()
-        if self.extra_buttons_visible:
-            self.aw.hideExtraButtons()
+        self.aw.hideControls(False)
+        self.aw.hideLCDs(False)
+        self.aw.hideSliders(False)
+        self.aw.hide_minieventline(False)
+        self.aw.hideExtraButtons()
 
         settings = QSettings()
         if settings.contains('FlavorProperties'):
@@ -400,14 +393,11 @@ class flavorDlg(ArtisanResizeablDialog):
         self.aw.redrawOnResize = True
         self.aw.qmc.redraw(recomputeAllDeltas=False)
 
-        if self.controls_visible:
-            self.aw.showControls()
-        if self.lcds_visible:
-            self.aw.showLCDs(False)
-        if self.sliders_visible:
-            self.aw.showSliders(False)
-        if self.extra_buttons_visible:
-            self.aw.showExtraButtons()
+        self.aw.updateControlsVisibility()
+        self.aw.updateReadingsLCDsVisibility()
+        self.aw.updateSlidersVisibility()
+        self.aw.update_minieventline_visibility()
+        self.aw.updateExtraButtonsVisibility()
 
         self.accept()
         return True

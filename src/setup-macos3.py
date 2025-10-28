@@ -209,7 +209,7 @@ for lang in SUPPORTED_LANGUAGES:
 #  place it in the brew Cellar
 
 brew_paths = ['/usr/local/Cellar', '/opt/homebrew/Cellar'] # path for Intel and arm brew installations
-libusb_versions = ['1.0.27', '1.0.26' , '1.0.25']
+libusb_versions = ['1.0.29', '1.0.27', '1.0.26' , '1.0.25']
 success = False
 for libusb_cand in [rf'{p}/libusb/{v}/lib/libusb-1.0.0.dylib' for v in libusb_versions for p in brew_paths]:
     print('libusb_cand',libusb_cand)

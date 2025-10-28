@@ -1966,6 +1966,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         self.lastdigitizedtemp:List[Optional[float]] = [None,None,None,None] # last digitized temp value per quantifier
 
         self.readingslcdsflags: List[int] = [0,1,1] # readings LCD visibility per state OFF, ON, START
+        self.controlsflags: List[int] = [1,1,1] # controls visibility per state OFF, ON, START
 
         #SummaryStatistics
         self.summarystatstypes_default:List[int] = [1,2,3,4,5,0,6,7,8,9,10,0,11,12,13,14,15,16,17]
@@ -11546,13 +11547,27 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         else:
             self.showSliders()
 
-    def hideControls(self) -> None:
+    def hideControls(self, changeDefault:bool = True) -> None:
         self.level1frame.hide()
         self.controlsAction.setChecked(False)
+        if changeDefault:
+            if self.qmc.flagstart:
+                self.controlsflags[2] = 0
+            elif self.qmc.flagon:
+                self.controlsflags[1] = 0
+            else:
+                self.controlsflags[0] = 0
 
-    def showControls(self) -> None:
+    def showControls(self, changeDefault:bool = True) -> None:
         self.level1frame.show()
         self.controlsAction.setChecked(True)
+        if changeDefault:
+            if self.qmc.flagstart:
+                self.controlsflags[2] = 1
+            elif self.qmc.flagon:
+                self.controlsflags[1] = 1
+            else:
+                self.controlsflags[0] = 1
 
     def controlsVisible(self) -> bool:
         return self.level1frame.isVisible()
@@ -11567,6 +11582,19 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
 
     def lcdsVisible(self) -> bool:
         return self.lcdFrame.isVisible()
+
+    def updateControlsVisibility(self) -> None:
+        # update visibility (based on the app state)
+        if self.qmc.flagstart:
+            visible = self.controlsflags[2]
+        elif self.qmc.flagon:
+            visible = self.controlsflags[1]
+        else:
+            visible = self.controlsflags[0]
+        if visible:
+            self.showControls(False)
+        else:
+            self.hideControls(False)
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -12313,11 +12341,8 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                                 return
                         #if wheel graph ON
                         elif self.qmc.wheelflag:
-                            self.qmc.wheelflag = False
+                            self.graphwheel()
                             self.wheeleditorAction.setChecked(self.qmc.wheelflag)
-                            self.qmc.exitviewmode()
-                            self.enableEditMenus()
-                            self.showControls()
                         self.releaseminieditor()
                 elif k == Qt.Key.Key_Left: # 16777234:            #LEFT (moves background left / moves button selection left)
                     if self.qmc.foreground_event_last_picked_ind is not None and self.qmc.foreground_event_last_picked_pos is not None:
@@ -17944,6 +17969,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             self.lcd6.setStyleSheet(f"QLCDNumber {{ border-radius:4; color: {rgba_colorname2argb_colorname(self.lcdpaletteF['sv'])}; background: {rgba_colorname2argb_colorname(self.lcdpaletteB['sv'])};}}")
             self.lcd7.setStyleSheet(f"QLCDNumber {{ border-radius:4; color: {rgba_colorname2argb_colorname(self.lcdpaletteF['sv'])}; background: {rgba_colorname2argb_colorname(self.lcdpaletteB['sv'])};}}")
             self.readingslcdsflags = [toInt(x) for x in toList(settings.value('readingslcdsflags',self.readingslcdsflags))]
+            self.controlsflags = [toInt(x) for x in toList(settings.value('controlsflags',self.controlsflags))]
             #restore flavors
             self.qmc.flavorlabels = toStringList(settings.value('Flavors',self.qmc.flavorlabels))
             self.qmc.flavors = [5.]*len(self.qmc.flavorlabels)
@@ -19108,6 +19134,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
 
             self.updateSlidersVisibility() # update visibility of sliders based on the users preference
             self.update_minieventline_visibility()
+            self.updateControlsVisibility()
             self.updateReadingsLCDsVisibility() # update visibility of reading LCD based on the users preference
 
             if filename is None and self.full_screen_mode_active:
@@ -19891,6 +19918,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             self.settingsSetValue(settings, default_settings, 'BackgroundAlpha',self.qmc.backgroundalpha, read_defaults)
             #save readings LCDs status flags
             self.settingsSetValue(settings, default_settings, 'readingslcdsflags',self.readingslcdsflags, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'controlsflags',self.controlsflags, read_defaults)
             #save flavors
             self.settingsSetValue(settings, default_settings, 'Flavors',self.qmc.flavorlabels, read_defaults)
             self.settingsSetValue(settings, default_settings, 'flavorstartangle',self.qmc.flavorstartangle, read_defaults)
@@ -24828,14 +24856,14 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             self.redrawOnResize = True
             self.qmc.exitviewmode()
             self.enableEditMenus()
-            self.showControls()
+            self.updateControlsVisibility()
             self.updateReadingsLCDsVisibility()
             self.updateSlidersVisibility()
             self.update_minieventline_visibility()
             self.updateExtraButtonsVisibility()
         else:
             self.redrawOnResize = False
-            self.hideControls()
+            self.hideControls(False)
             self.hideLCDs(False)
             self.hideSliders(False)
             self.hide_minieventline(False)
@@ -24978,16 +25006,18 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             self.startdesigner()
 
     def startdesigner(self) -> None:
+#        self.showControls(False) # we show controls in designer to keep zoom feature accessible
         self.hideLCDs(False)
         self.hideSliders(False)
         self.hide_minieventline(False)
-        self.hideExtraButtons()
+        self.hideExtraButtons(False)
         self.qmc.designer()
 
     def stopdesigner(self) -> None:
         self.enableEditMenus()
         self.qmc.clear_designer()
         self.qmc.convert_designer()
+#        self.updateControlsVisibility()
         self.updateReadingsLCDsVisibility()
         self.updateSlidersVisibility()
         self.update_minieventline_visibility()

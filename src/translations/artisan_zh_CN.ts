@@ -7200,8 +7200,8 @@ CTRL+ALT 点击加号图标 [Win]</translation>
         <location filename="../help/keyboardshortcuts_help.py" line="75" />
         <source>OPTION click &amp;#39;RESET&amp;#39; Button [Mac]
 ALT click &amp;#39;RESET&amp;#39; Button [Win]</source>
-        <translation>选项点击 &amp;#39;RESET&amp;#39;按钮 [Mac]
-ALT 点击 &amp;#39;RESET&amp;#39;按钮 [赢]</translation>
+        <translation type="unfinished">选项点击 'RESET'按钮 [Mac]
+ALT 点击 'RESET'按钮 [Mac]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="75" />
@@ -7305,8 +7305,8 @@ Keyboard Shortcuts must be turned off (ENTER)</source>
         <location filename="../help/keyboardshortcuts_help.py" line="82" />
         <source>OPTION+UP, OPTION+DOWN [Mac]
 PAGEUP,PAGEDOWN [Win]</source>
-        <translation>选项+向上，选项+向下 [Mac]
-PAGEUP,PAGEDOWN [赢]</translation>
+        <translation type="unfinished">选项+向上，选项+向下 [Mac]
+PAGEUP,PAGEDOWN [Mac]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="82" />
@@ -7316,7 +7316,7 @@ PAGEUP,PAGEDOWN [赢]</translation>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="83" />
         <source>HOME,END</source>
-        <translation>回家，结束</translation>
+        <translation>HOME,END</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="83" />
@@ -7384,8 +7384,8 @@ CTRL工具&gt;&gt;模拟器[Win]</translation>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
         <source>⌘+L [Mac]
 CTRL+L [Win]</source>
-        <translation>⌘+L [苹果机]
-CTRL+L [赢]</translation>
+        <translation type="unfinished">⌘+L [Mac]
+CTRL+L [Mac]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="93" />
@@ -7407,8 +7407,8 @@ CTRL+L [赢]</translation>
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
         <source>OPTION click Stock [Mac]
 ALT click Stock [Win]</source>
-        <translation>选项单击库存 [Mac]
-ALT 点击股票 [获胜]</translation>
+        <translation type="unfinished">选项 点击 Stock  [苹果电脑]
+按住 Alt 键点击Stock [Windows 系统]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
@@ -7425,7 +7425,7 @@ ALT 点击股票 [获胜]</translation>
         <source>OPTION click  &amp;#39;+&amp;#39;  button [Mac]
 ALT click  &amp;#39;+&amp;#39;  button [Win]</source>
         <translation>选项点击 &amp;#39;+&amp;#39;按钮 [Mac]
-ALT 点击 &amp;#39;+&amp;#39;按钮 [赢]</translation>
+ALT 点击 &amp;#39;+&amp;#39;按钮 [Mac]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="89" />
@@ -7436,20 +7436,20 @@ ALT 点击 &amp;#39;+&amp;#39;按钮 [赢]</translation>
         <location filename="../help/keyboardshortcuts_help.py" line="90" />
         <source>OPTION File&gt;&gt; New&gt;&gt; &lt;recent-roast&gt; [Mac]
 ALT File&gt;&gt; New&gt;&gt; &lt;recent-roast&gt; [Win]</source>
-        <translation>选项文件&gt;&gt; 新建&gt;&gt; &lt;recent-roast&gt; [Mac]
-ALT File&gt;&gt; New&gt;&gt; &lt;recent-roast&gt; [Win]</translation>
+        <translation type="unfinished">选项文件&gt;&gt; 新建&gt;&gt; &lt;最近的烘焙&gt; [Mac]
+ALT File&gt;&gt; New&gt;&gt; &lt;最近的烘焙&gt; [Win]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="90" />
         <source>Sets roast properties to &lt;recent-roast&gt; without starting a new roast</source>
-        <translation>将烘焙属性设置为 &lt;recent-roast&gt; 而不开始新的烘焙</translation>
+        <translation type="unfinished">将烘焙属性设置为 &lt;最近的烘焙&gt; 而不开始新的烘焙</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="91" />
         <source>⌘+I [Mac]
 CTRL+I [Win]</source>
-        <translation>⌘+我 [Mac]
-CTRL+I [赢]</translation>
+        <translation>⌘+I [Mac]
+CTRL+I [Mac]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="91" />
@@ -7469,8 +7469,8 @@ CTRL+I [赢]</translation>
         <location filename="../help/keyboardshortcuts_help.py" line="92" />
         <source>⌘+O [Mac]
 CTRL+O [Win]</source>
-        <translation>⌘+O [Mac]
-CTRL+O [赢]</translation>
+        <translation type="unfinished">⌘+O [Mac]
+CTRL+O [Mac]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="92" />
@@ -7481,8 +7481,8 @@ CTRL+O [赢]</translation>
         <location filename="../help/keyboardshortcuts_help.py" line="93" />
         <source>⌘+P [Mac]
 CTRL+P [Win]</source>
-        <translation>⌘+P [Mac]
-CTRL+P [赢]</translation>
+        <translation type="unfinished">⌘+P [Mac]
+CTRL+P [Mac]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="93" />
@@ -7493,7 +7493,7 @@ CTRL+P [赢]</translation>
         <location filename="../help/keyboardshortcuts_help.py" line="95" />
         <location filename="../help/keyboardshortcuts_help.py" line="94" />
         <source>Enter</source>
-        <translation>进入</translation>
+        <translation type="unfinished">Enter</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="94" />
@@ -7523,8 +7523,8 @@ Green Weight  or Roasted Weight field</source>
         <location filename="../help/keyboardshortcuts_help.py" line="96" />
         <source>⌘+C [Mac]
 CTRL+C [Win]</source>
-        <translation>⌘+C [Mac]
-CTRL+C [赢]</translation>
+        <translation type="unfinished">⌘+C [Mac]
+CTRL+C [Mac]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="96" />
@@ -7555,8 +7555,8 @@ CTRL+C [赢]</translation>
         <location filename="../help/keyboardshortcuts_help.py" line="98" />
         <source>OPTION click &amp;#39;Copy Table&amp;#39; Button [Mac]
 ALT click &amp;#39;Copy Table&amp;#39; Button [Win]</source>
-        <translation>选项点击&amp;#39;复制表格&amp;#39;按钮 [Mac]
-ALT 点击&amp;#39;复制表格&amp;#39;按钮 [赢]</translation>
+        <translation type="unfinished">选项点击'复制表格'按钮 [Mac]
+ALT 点击'复制表格'按钮 [Mac]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="98" />
@@ -7572,8 +7572,8 @@ ALT 点击&amp;#39;复制表格&amp;#39;按钮 [赢]</translation>
         <location filename="../help/keyboardshortcuts_help.py" line="99" />
         <source>Click on Home Icon
 While recording only</source>
-        <translation>单击主页图标
-仅录音时</translation>
+        <translation type="unfinished">单击主页图标
+仅录制时</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="99" />
