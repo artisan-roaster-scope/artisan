@@ -79,7 +79,6 @@ load-plugins = [
 ignore-paths = [ "^uic/.*$",
                  "^build/.*$",
                  "^dist/.*$",
-                 "^patches/.*$",
                  "^proto/.*$",
                  "^test/.*$",
                  "^.pytype/.*$" ]
@@ -246,7 +245,7 @@ enable='''c-extension-no-member,'''
 
 [tool.mypy]
 files = ["artisanlib/*.py", "plus/*.py", "test/**/*.py"]
-exclude = ['build', 'dist', 'uic', 'misc', 'patches']
+exclude = ['build', 'dist', 'uic', 'misc']
 python_version = "3.9"
 
 # Ensure full coverage
@@ -312,7 +311,7 @@ line-length = 80
 lint.ignore = ["E501", "E741", "E402", "PLR0912", "PLR0913", "PLR0915", "SIM105", "PLR2044", "PLR2004", "PLW0603", "PLR0911", "COM812", "A005"]
 
 # Exclude a variety of commonly ignored directories.
-exclude = ["dist", "build", "patches", "proto", ".pytype", ".mypy_cache", ".git", ".venv", ".venv_universal", ".venv_arm"]
+exclude = ["dist", "build", "proto", ".pytype", ".mypy_cache", ".git", ".venv", ".venv_universal", ".venv_arm"]
 
 # Assume Python 3.8.
 target-version = "py38"
@@ -326,7 +325,7 @@ target-version = "py38"
 
 [tool.pyright]
 include = ["artisanlib", "plus", "test" ]
-exclude = ["patches", "proto"]
+exclude = ["proto"]
 # ignore = ["src/oldstuff"]
 
 reportMissingImports = true
@@ -371,7 +370,6 @@ filterwarnings = [
 omit = [
     "test/*",
     "uic/*",
-    "patches/*",
     "proto/*",
     "help/*",
     "dist/*",
@@ -400,7 +398,7 @@ directory = ".htmlcov"
 ## codespell
 
 [tool.codespell]
-skip = '*.ts,./coverage,./build,./dist*,./htmlcov,./*.spec,*.svg,./patches'
+skip = '*.ts,./coverage,./build,./dist*,./htmlcov,./*.spec,*.svg'
 count = ''
 quiet-level = 3
 ignore-words-list = 'Abd,ser,alog,nd,iterm,dout,te,commandi,dout,exitt,currenty,exaust,controle,coment,controle,outweight,everytime,sade,weightIn,weightin,Caf,caf'
@@ -437,7 +435,6 @@ project_excludes = [
     "**/dist*",
     "**/uic*",
     "**/misc*",
-    "**/patches*",
 ]
 python_version = "3.8.0"
 replace_imports_with_any = [
