@@ -144,5 +144,6 @@ build==1.3.0; (platform_system=='Windows' and python_version >= '3.9')
 pywin32==311; platform_system=='Windows'
 pyinstaller-versionfile==2.1.1; platform_system=='Windows' and python_version < '3.9'
 pyinstaller-versionfile==3.0.1; platform_system=='Windows' and python_version >= '3.9'
-libusb-package==1.0.26.3; platform_system=='Windows'
+libusb-package==1.0.26.3; platform_system=='Windows' and python_version < '3.14'
+patches\libusb_package-1.0.26.3-cp314-cp314-win_amd64.whl; platform_system=='Windows' and python_version == '3.14' # there is no pypi libusb_package for python_version == 3.14
 tzdata==2025.2; platform_system=='Windows' and python_version >= '3.9' # to prevent pyinstaller WARNING: Hidden import "tzdata" not found!
