@@ -965,7 +965,7 @@ def events_external_to_internal_value(v:int) -> float:
 #Write object to file
 def serialize(filename:str, obj:Dict[str, Any]) -> None:
     fn = str(filename)
-    with codecs.open(fn, 'w+', encoding='utf-8') as f:
+    with open(fn, 'w+', encoding='utf-8') as f:
         f.write(repr(obj))
 
 
@@ -975,7 +975,7 @@ def deserialize(filename:str) -> Dict[str, Any]:
     try:
         fn = str(filename)
         if os.path.exists(fn):
-            with codecs.open(fn, 'rb', encoding='utf-8') as f:
+            with open(fn, encoding='utf-8') as f:
                 obj=ast.literal_eval(f.read()) # pylint: disable=eval-used
     except Exception as ex: # pylint: disable=broad-except
         _log.exception(ex)

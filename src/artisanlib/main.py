@@ -21347,8 +21347,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                         os.remove(filename)
                     except OSError:
                         pass
-                    import codecs
-                    with codecs.open(filename, 'w', encoding='utf-8') as f:
+                    with open(filename, 'w', encoding='utf-8') as f:
                         for ht in html:
                             f.write(ht)
                     if platform.system() == 'Darwin':
@@ -22708,8 +22707,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                             os.remove(filename)
                         except OSError:
                             pass
-                        import codecs # @Reimport
-                        with codecs.open(filename, 'w', encoding='utf-8') as f:
+                        with open(filename, 'w', encoding='utf-8') as f:
                             for ht in html:
                                 f.write(ht)
                         if platform.system() == 'Darwin':
@@ -23370,8 +23368,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                     os.remove(filename)
                 except OSError:
                     pass
-                import codecs # @Reimport
-                with codecs.open(filename, 'w', encoding='utf-8') as f:
+                with open(filename, 'w', encoding='utf-8') as f:
                     for ht in html:
                         f.write(ht)
                 if platform.system() == 'Darwin':

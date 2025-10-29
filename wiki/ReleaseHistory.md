@@ -2,7 +2,7 @@ Detailed Release History
 ========================
 
 ----
-v3.4.0 (Oct XX, 2025)
+v3.4.0 (Oct 31, 2025)
 ------------------
 
 * ADDITIONS

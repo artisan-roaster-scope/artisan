@@ -17427,8 +17427,7 @@ class tgraphcanvas(FigureCanvas):
                 obj['temp1'] = [float2float(float(t1), 8) for t1 in self.temp1] # List[float]
                 obj['temp2'] = [float2float(float(t2), 8) for t2 in self.temp2] # List[float]
                 obj['timeindex'] = self.timeindex # List[int]
-                import codecs # @Reimport
-                with codecs.open(filename, 'w+', encoding='utf-8') as f:
+                with open(filename, 'w+', encoding='utf-8') as f:
                     f.write(repr(obj))
                 self.aw.sendmessage(QApplication.translate('Message','Points saved'))
         except Exception as e: # pylint: disable=broad-except
@@ -17443,8 +17442,7 @@ class tgraphcanvas(FigureCanvas):
             filename = self.aw.ArtisanOpenFileDialog(msg=QApplication.translate('Message', 'Load Points'),ext='*.adsg')
             obj = None
             if os.path.exists(filename):
-                import codecs # @Reimport
-                with codecs.open(filename, 'rb', encoding='utf-8') as f:
+                with open(filename, 'rb', encoding='utf-8') as f:
                     obj=ast.literal_eval(f.read())
             if obj and 'timex' in obj and 'temp1' in obj and 'temp2' in obj:
                 self.timex = obj['timex']
