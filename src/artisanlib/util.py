@@ -253,11 +253,13 @@ def convertTemp(t:float, source_unit:str, target_unit:str) -> float:
         return fromCtoFstrict(t)
     return fromFtoCstrict(t)
 
+# See https://discuss.python.org/t/pathname2url-changes-in-python-3-14-breaking-pip-tests/97091
+# for changes to urllib in Pyton3.14
 def path2url(path:str) -> str:
-    import urllib.parse as urlparse  # @Reimport
-    import urllib.request as urllib  # @Reimport
-    return urlparse.urljoin(
-      'file:', urllib.pathname2url(path))
+    import urllib.parse as urllib_urlparse  # @Reimport
+    import urllib.request as urllib_request  # @Reimport
+    return urllib_urlparse.urljoin(
+      'file://', urllib_request.pathname2url(path))
 
 # remaining artifacts from Qt4/5 compatibility layer:
 # note: those conversion functions are sometimes called with string arguments
