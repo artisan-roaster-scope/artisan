@@ -68,6 +68,89 @@
 
   <releases>
 
+    <release version="3.4.0" date="2025-10-11">
+      <url type="details">https://github.com/artisan-roaster-scope/artisan/releases/tag/v3.4.0</url>
+      <description>
+        <p>ADDITIONS</p>
+        <ul>
+          <li>adds tooltip to phases widget in Comparator displaying 2nd and 3rd phase bean temperatures (or RoR if ALT/Option key is pressed) limits (Issue #1906)</li>
+          <li>adds support for Kraffe](https://artisan-scope.org/machines/kraffe/) shop roasters</li>
+          <li>adds support for [Berto Essential and Autonics](https://artisan-scope.org/machines/berto/) models</li>
+          <li>adds support for [Nordic](https://artisan-scope.org/machines/nordic/) PLC models supporting burner, airflow, and drum speed control</li>
+          <li>adds support for [Prisma](https://artisan-scope.org/machines/prisma/) USB and PLC models supporting burner, airflow, and drum speed control</li>
+          <li>adds support for [Cogen roasting machines](https://artisan-scope.org/machines/cogen/) with Siemens PLC (v2)</li>
+          <li>adds support for [Easyster Smart](https://artisan-scope.org/machines/easyster/), legacy [Proaster](https://artisan-scope.org/machines/proaster/) THCR-01A as well as Easyster/Proaster machines with air pressure sensor</li>
+          <li>adds support for [Toper roasting machines](https://artisan-scope.org/machines/toper/) with PLC and touch screen produced after 2025 supporting burner, airflow, and drum speed control</li>
+          <li>extended setups for [Sweet Coffee Italia Gemma_2IND and Gemma_6-8IND machines](https://artisan-scope.org/machines/sci/)</li>
+          <li>extended setup for [Joper](https://joper-roasters.com/) PLC-based machines adding buttons to control the burner, cooler and stirrer states (ON/OFF)</li>
+          <li>adds support for the 4 channel K/J type TC meter [Tasi TA612C](https://artisan-scope.org/devices/meters/) (Discussion #1997)</li>
+          <li>adds support for [Shelly energy meters](https://artisan-scope.org/devices/shelly/)</li>
+          <li>adds batch conversion from Cropster XLS, Giesen CSV, IKAWA CSV, Loring CSV, Petroncini CSV, ROEST CSV, Rubase CSV, and Stronghold XLSX profiles to Artisan `.alog` profiles</li>
+          <li>adds drag-and-drop import of a Artisan JSON, Cropster XLS, Giesen CSV and Stronghold XLSX profiles</li>
+          <li>adds HiBean importer/converter</li>
+          <li>adds Artisan Command slider(int, bool) to hide/show sliders</li>
+          <li>adds Czech localization</li>
+          <li>adds multi-modal state transitions to Batch Manager</li>
+          <li>adds remaining total roast time estimate to scheduler and lists roast templates in scheduled items</li>
+          <li>adds support for longer recordings as applied in coffee fermentation (Discussion #1969)</li>
+          <li>adds support for whole/ground color readings with one decimal (Issue #1986)</li>
+          <li>adds flag to stop PID on DROP</li>
+          <li>adds lookahead to ramping event replay</li>
+          <li>adds CM ET/BT device reporting the current Comparison Metrics, CM, (square root of the average sum of squared differences), also known as Casino Mocca values, on how close the ET/BT curves are w.r.t. the loaded background after the DRY END as specified in the phases dialog</li>
+        </ul>
+        <p>CHANGES</p>
+        <ul>
+          <li>BREAKING VISUAL CHANGE, but only when consecutive hidden buttons with Type or Action defined are first at the top of the Events Buttons table: The visual button layout may change as hidden buttons with Type or Action defined at the top of the Events Buttons table are no longer counted in the first row's button count, which is limited by the Max Buttons per Row setting.  All other hidden buttons continue to be counted in each row's button count.</li>
+          <li>updates Spanish localization (thanks to Juan Carlos Bonilla)</li>)
+          <li>updates Chinese localization (thanks to Terracotta-6)</li>
+          <li>updates Korean localization (thanks to [HarioSwitch](https://github.com/hakulog))</li>
+          <li>unlimited number of buttons can be created while display is limited to maximum 10 rows with maximum 50 buttons each</li>
+          <li>palette load uses and updates the user selected profile path</li>
+          <li>increases the maximum number of recent roast entries from 25 to 40</li>
+          <li>makes synchronization of main events with Kaleido and Santoker roasting machines configurable (disabled by default)</li>
+          <li>updates internal PID by adding Advanced Integral Windup Prevention, derivative on measurement calculation (DoM), measurement discontinuity detection, derivative limiting and enhanced setpoint change detection to prevent the derivative kicks and spikes</li>
+          <li>updates libs (scipy, bleak, lxml, pillow)</li>
+          <li>expands automatic test coverage</li>
+          <li>graph updates immediately when smoothing value changes</li>
+          <li>eliminates the term 'slave' from the whole project, but for a small compatibility layer to be remove in one of the next versions</li>
+          <li>updates MPL default font selection for Asian and Arabic languages under Windows</li>
+          <li>the batch counter and autosave mechanisms are now active by default after first installation or a factory reset</li>
+          <li>the configuration for taking ambient temperature from a data curve moved from the Roast Properties dialog to the Devices configuration dialog and configurations for taking ambient humidity and ambient pressure from curve data have been added (Issue #586 and PR #1882)</li>
+          <li>ensures that the default file suffixes on file save are applied (PR #1965). Thanks [Scott](https://github.com/scottjames)!</li>
+          <li>activates large PID LCDs for internal software PID and external TC4/MODBUS/S7 PIDs</li>
+          <li>the scheduler indicates now significant changes to the current schedule as received from [artisan.aplus](https://artisan.aplus), which have to be acknowledged by the user</li>
+          <li>changes `COOL` in alarms to `COOL END` for consistency (PR #1976)</li>
+          <li>remember loaded settings filename as default on save ([PR #1975)</li>
+          <li>BatchManager resets on tare triggered by button press on the Acaia scale</li>
+          <li>automatic timeline extension now relative to sampling interval</li>
+          <li>Linux builds require now glibc >=2.39</li>
+        </ul>
+        <p>FIXES</p>
+        <ul>
+          <li>fixes regression which broke the designer such that points could not be moved (Discussion #1905 and Issue #1916)</li>
+          <li>fixes regression which broke the import of roast profiles exported from Cropster, Giesen, IKAWA, Loring, Petroncini, RoastLog, RoastPath, ROEST, Rubasse, and Stronghold (Issue #1958)</li>
+          <li>fixes support for second scale</li>
+          <li>fixes rendering of special characters like quotes in task displays of the Batch Manager</li>
+          <li>fixes event buttons bottom row not rendered properly in all cases</li>
+          <li>fixes number of rendered event buttons rows</li>
+          <li>fixes graph bounce and jitter when moving the cursor in the designer</li>
+          <li>fixes redraw issue with active crosslines in Comparator</li>
+          <li>fixes minor quirk in PiOS deb postinstall and perm scripts (Issue #1922)</li>
+          <li>fixes the OFF on DROP option for the WebSocket connection (Issue #1943)</li>
+          <li>fixes a regression which broke the MODBUS communication with certain devices in Windows Legacy builds (Issue #1931)</li>
+          <li>don't try to connect to the Hottop while still being connected to the Hottop (Issue #1950)</li>
+          <li>fixes dynamic assignment of Yoctopuce PT100 modules</li>
+          <li>adds note to the symbolic assignment help page that symbolic variables are case-sensitive (Issue #1514)</li>
+          <li>fixes date/batch widgets color scheme (Issue #1962)</li>
+          <li>fixes an issue where the selected default store could reset the selected coffee or blend</li>
+          <li>fixes typo that caused plus blend ingredient names to not being loaded from alog profiles</li>
+          <li>adds missing unit translations for Chinese and revert to English on missing locale support</li>
+          <li>adds additional margin to cupping spider graph to prevent clipping in full screen mode</li>
+          <li>fixes a build issue on Linux (Issue #2003)</li>
+        </ul>
+      </description>
+    </release>
+
     <release version="3.2.0" date="2025-06-23">
       <url type="details">https://github.com/artisan-roaster-scope/artisan/releases/tag/v3.2.0</url>
       <description>

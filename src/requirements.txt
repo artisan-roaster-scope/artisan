@@ -56,7 +56,7 @@ protobuf==6.33.0; python_version >= '3.9'
 numpy==1.24.3; python_version < '3.9' # last Python 3.8 release
 numpy==2.3.4; python_version >= '3.9'
 scipy==1.10.1; python_version < '3.9' # last Python 3.8 release
-scipy==1.16.2; python_version >= '3.9'
+scipy==1.16.3; python_version >= '3.9'
 wquantiles==0.6
 colorspacious==1.1.2
 openpyxl==3.1.5
@@ -69,7 +69,7 @@ matplotlib==3.7.3; python_version < '3.9' # last Python 3.8 release
 matplotlib==3.10.7; python_version >= '3.9' # matplotlib 3.10.5 doesn't show HiDPI support
 jinja2==3.1.6
 aiohttp==3.10.11; python_version < '3.9' # last Python 3.8 release
-aiohttp==3.13.1; python_version >= '3.9'
+aiohttp==3.13.2; python_version >= '3.9'
 aiohttp_jinja2==1.6
 python-bidi==0.4.2; python_version < '3.9' # last Python 3.8 release
 python-bidi==0.6.6; python_version == '3.9' # last Python 3.9 release
