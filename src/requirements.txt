@@ -56,7 +56,8 @@ protobuf==6.33.0; python_version >= '3.9'
 numpy==1.24.3; python_version < '3.9' # last Python 3.8 release
 numpy==2.3.4; python_version >= '3.9'
 scipy==1.10.1; python_version < '3.9' # last Python 3.8 release
-scipy==1.16.3; python_version >= '3.9'
+scipy==1.15.3; python_version >= '3.9' and sys_platform=='darwin' and platform_release<'20.0' # last version supporting macOS 10.13
+scipy==1.16.3; python_version >= '3.9' and sys_platform!='darwin' or (sys_platform=='darwin' and platform_release>='20.0')
 wquantiles==0.6
 colorspacious==1.1.2
 openpyxl==3.1.5
