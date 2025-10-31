@@ -9,9 +9,13 @@ author_profile: true
 gallery:
 
 
+  - url: https://artisan-roasterscope.blogspot.com/2025/10/button-layouts-and-hidden-buttons.html
+    image_path: /assets/images/gsg/post_2025-10_Button_Layouts.webp
+    alt: "Button Layouts and Hidden Buttons" 
+    title: "2025-10 Button Layouts and Hidden Buttons"
   - url: https://artisan-roasterscope.blogspot.com/2025/04/using-energy-meter-to-measure-roast.html
     image_path: /assets/images/gsg/post_2025-5_Energy_Meters.jpg.webp
-    alt: "Buttons – Appearance, State, and Action" 
+    alt: "Energy Meters" 
     title: "2025-4 Energy Meters"
   - url: https://artisan-roasterscope.blogspot.com/2023/06/buttons-appearance-state-and-action.html
     image_path: /assets/images/gsg/post_2023-6_Buttons_–_Appearance,_State,_and_Action.jpg.webp

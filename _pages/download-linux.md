@@ -10,15 +10,15 @@ author: Marko Luther
 author_profile: false
 
 gallery:
-  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.2.0/artisan-linux-3.2.0.AppImage
+  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.4.0/artisan-linux-3.4.0.AppImage
     image_path: /assets/images/download-icon-linux-AppImage.svg
     alt: "Linux AppImage"
     title: "Linux AppImage"
-  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.2.0/artisan-linux-3.2.0.deb
+  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.4.0/artisan-linux-3.4.0.deb
     image_path: /assets/images/download-icon-linux-deb.svg
     alt: "Linux deb"
     title: "Linux deb"
-  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.2.0/artisan-linux-3.2.0.rpm
+  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.4.0/artisan-linux-3.4.0.rpm
     image_path: /assets/images/download-icon-linux-rpm.svg
     alt: "Linux rpm"
     title: "Linux rpm"
@@ -34,7 +34,7 @@ gallery:
 
 
 
-**artisan v3.2.0**
+**artisan v3.4.0**
 {: style="color: #4C97C3; font-size: larger; text-align: center; font-weight:bold;" }
 ---
 Help keep **<span style="color: #4C97C3;">artisan</span>** free for personal and commercial use by [sending a donation](/donate) 
@@ -58,8 +58,8 @@ Help keep **<span style="color: #4C97C3;">artisan</span>** free for personal and
 ---
 
 <figure>
-      <a aria-label="Release Sponsor Acaia" target="_blank" href="https://acaia.co" title="Acaia">
-          <img src="/assets/images/acaia-logo.svg" alt="Acaia" 
+      <a aria-label="Release Sponsor artisan.plus" target="_blank" href="https://artisan.plus" title="artisan.plus">
+          <img src="/assets/images/artisan-plus.webp" alt="artisan.plus" 
            loading="lazy"
            fetchpriority="low"
            decoding="async"
