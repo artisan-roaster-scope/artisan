@@ -82,7 +82,7 @@ exe = EXE(pyz,
           exclude_binaries=True, # should be True for onedir
           name='artisan',
           debug=False,
-          strip=True,
+          strip=False,
           upx=True,
           console=True)
 
@@ -90,6 +90,6 @@ coll = COLLECT(exe,
                a.binaries,
                a.zipfiles,
                a.datas,
-               strip=True,
+               strip=False,
                upx=True,
                name='artisan')

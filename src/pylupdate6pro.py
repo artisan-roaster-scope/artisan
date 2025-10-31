@@ -50,6 +50,7 @@ try:
 
     # Build the pylupdate6 command line
     cmdline:List[str] = ['pylupdate6'] # , '--no-obsolete' (add to list of args to remove all obsolete translations)
+    # add '--verbose' to check on errors
     cmdline.extend(unique_top_dirs)
     for t in translations:
         cmdline.extend(['--ts', t])

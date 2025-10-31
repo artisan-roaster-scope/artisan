@@ -36,7 +36,7 @@ mv debian/usr/share/dist debian/usr/share/artisan
 find debian -name .svn -exec rm -rf {} \; > /dev/null 2>&1
 sudo chown -R root:root debian
 sudo chmod -R go-w debian
-rm -f ${NAME}_raspbian-stretch.deb
+rm -f ${NAME}_PiOS64-bookworm.deb
 sudo chmod 755 debian/DEBIAN
 sudo chmod 755 debian/DEBIAN/postinst
 sudo chmod 755 debian/DEBIAN/prerm

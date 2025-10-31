@@ -157,7 +157,7 @@ exe = EXE(pyz,
             console=False,
             disable_windowed_traceback=False,
             argv_emulation=False, # False for GUI apps
-            target_arch='arm64', #'x86_64', #'universal2',
+            target_arch='universal2', # 'arm64', 'x86_64', 'universal2'
             codesign_identity='6M3Z6W45L4', #None,
             entitlements_file='Artisan.entitlements', #None
             )
@@ -165,7 +165,7 @@ exe = EXE(pyz,
 try:
     minimumSystemVersion = os.environ['MACOSX_DEPLOYMENT_TARGET']
 except Exception: # pylint: disable=broad-except
-    minimumSystemVersion = '14.0' # assuming the new-style numpy/scipy libs which define the minimum; Qt 6.10 requires >= 13.0
+    minimumSystemVersion = '13.0' # needs the old-style numpy/scipy libs!! Qt 6.10 requires >= 13.0
 
 plist = {}
 with open('Info.plist', 'rb') as infile:
