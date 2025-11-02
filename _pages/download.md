@@ -34,10 +34,18 @@ gallery_legacy:
     image_path: /assets/images/download-icon-macos-legacy.svg
     alt: "macOS legacy"
     title: "macOS legacy"
+  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.4.0/artisan-mac-arm-3.4.0.dmg
+    image_path: /assets/images/download-icon-macos-arm.svg
+    alt: "macOS ARM"
+    title: "macOS ARM"
   - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.4.0/artisan-linux-3.4.0_PiOS64-bookworm.deb
     image_path: /assets/images/download-icon-rpi.svg
-    alt: "RPi"
-    title: "RPi"
+    alt: "RPi Bookworm"
+    title: "RPi Bookworm"
+  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v3.4.0/artisan-linux-3.4.0_PiOS64-trixie.deb
+    image_path: /assets/images/download-icon-rpi-trixie.svg
+    alt: "RPi Trixie"
+    title: "RPi Trixie"
 
 
 ---
