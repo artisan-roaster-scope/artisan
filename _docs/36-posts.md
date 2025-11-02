@@ -9,6 +9,10 @@ author_profile: true
 gallery:
 
 
+  - url: https://artisan-roasterscope.blogspot.com/2025/11/between-batch-protocol-statistics.html
+    image_path: /assets/images/gsg/post_2025-11_BBP_Statistics.webp
+    alt: "Between Batch Protocol Statistics" 
+    title: "2025-11 Between Batch Protocol Statistics"
   - url: https://artisan-roasterscope.blogspot.com/2025/10/button-layouts-and-hidden-buttons.html
     image_path: /assets/images/gsg/post_2025-10_Button_Layouts.webp
     alt: "Button Layouts and Hidden Buttons" 
