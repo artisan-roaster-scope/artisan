@@ -49,7 +49,7 @@ xlrd==2.0.2
 websockets==13.1;  python_version < '3.9' # last Python 3.8 release
 websockets==15.0.1; python_version >= '3.9'
 PyYAML==6.0.3
-psutil==7.1.2
+psutil==7.1.3
 typing-extensions==4.10.0; python_version < '3.8' # required for supporting Final and TypeDict on Python <3.8
 protobuf==5.29.3; python_version < '3.9' # last Python 3.8 release
 protobuf==6.33.0; python_version >= '3.9'
