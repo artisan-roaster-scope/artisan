@@ -9258,7 +9258,8 @@ class tgraphcanvas(FigureCanvas):
             self.redrawdesigner(force=True)
         elif self.aw.comparator is not None:
             self.aw.comparator.redraw()
-            self.aw.qpc.redraw_phases()
+            if self.aw.qpc is not None:
+                self.aw.qpc.redraw_phases()
         else:
             titleB = ''
             try:

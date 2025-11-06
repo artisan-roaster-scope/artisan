@@ -1629,7 +1629,8 @@ class roastCompareDlg(ArtisanDialog):
             self.autoTimeLimits()
             self.realign()
             self.repaintDlg()
-            self.aw.qpc.update_phases(self.getPhasesData())
+            if self.aw.qpc is not None:
+                self.aw.qpc.update_phases(self.getPhasesData())
         elif i == 2: # title header clicked
             selected = self.profileTable.selectedRanges()
             if selected and len(selected) > 0:
@@ -1645,7 +1646,8 @@ class roastCompareDlg(ArtisanDialog):
         self.realign()
         self.updateZorders()
         self.repaintDlg()
-        self.aw.qpc.update_phases(self.getPhasesData())
+        if self.aw.qpc is not None:
+            self.aw.qpc.update_phases(self.getPhasesData())
 
     @pyqtSlot(int)
     def visibilityChanged(self, state:int) -> None:
@@ -1656,7 +1658,8 @@ class roastCompareDlg(ArtisanDialog):
             self.autoTimeLimits()
             self.realign()
             self.repaintDlg()
-            self.aw.qpc.update_phases(self.getPhasesData())
+            if self.aw.qpc is not None:
+                self.aw.qpc.update_phases(self.getPhasesData())
 
 
     @pyqtSlot(int,bool)
@@ -1712,7 +1715,8 @@ class roastCompareDlg(ArtisanDialog):
             self.aw.qmc.compareAlignEvent = i
             self.realign()
             self.repaintDlg()
-            self.aw.qpc.update_phases(self.getPhasesData())
+            if self.aw.qpc is not None:
+                self.aw.qpc.update_phases(self.getPhasesData())
 
     @pyqtSlot(int)
     def changeEventsidx(self, i:int) -> None:
@@ -1897,7 +1901,8 @@ class roastCompareDlg(ArtisanDialog):
                 else:
                     c = QColor.fromRgbF(*p.gray)  # ty:ignore[missing-argument]
                 w.setBackground(c)
-        self.aw.qpc.update_phases(self.getPhasesData())
+        if self.aw.qpc is not None:
+            self.aw.qpc.update_phases(self.getPhasesData())
 
     # align all profiles to the first one w.r.t. to the event self.aw.qmc.compareAlignEvent
     #   0:CHARGE, 1:TP, 2:DRY, 3:FCs, 4:FCe, 5:SCs, 6:SCe, 7:DROP
@@ -2020,7 +2025,8 @@ class roastCompareDlg(ArtisanDialog):
                 self.realign()
                 self.updateZorders()
                 self.repaintDlg()
-                self.aw.qpc.update_phases(self.getPhasesData())
+                if self.aw.qpc is not None:
+                    self.aw.qpc.update_phases(self.getPhasesData())
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
 
@@ -2050,7 +2056,8 @@ class roastCompareDlg(ArtisanDialog):
             self.realign()
             self.updateZorders()
             self.redrawOnDeltaAxisVisibilityChanged()
-            self.aw.qpc.update_phases(self.getPhasesData())
+            if self.aw.qpc is not None:
+                self.aw.qpc.update_phases(self.getPhasesData())
 
     def deleteProfile(self, i:int) -> None:
         self.profileTable.removeRow(i)
@@ -2067,7 +2074,8 @@ class roastCompareDlg(ArtisanDialog):
             self.realign()
             self.updateZorders()
             self.redrawOnDeltaAxisVisibilityChanged()
-            self.aw.qpc.update_phases(self.getPhasesData())
+            if self.aw.qpc is not None:
+                self.aw.qpc.update_phases(self.getPhasesData())
 
     ### Utility
 
@@ -2170,4 +2178,5 @@ class roastCompareDlg(ArtisanDialog):
             self.aw.ntb.enable_edit_curve_parameters()
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-        self.aw.qpc.update_phases(None)
+        if self.aw.qpc is not None:
+            self.aw.qpc.update_phases(None)

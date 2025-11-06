@@ -150,12 +150,7 @@ class NotificationManager(QObject): # pyrefly:ignore[invalid-inheritance] # pyri
         # notfication_available is true if the operating system supports notifications
         self.notifications_available = self.tray_icon.isSystemTrayAvailable() and self.tray_icon.supportsMessages()
         if self.notifications_available:
-            # the tray icon is displayed only if notifications are supported by the system
-            self.tray_icon.setIcon(self.artisanTrayIcon())
-            self.tray_icon.setToolTip('Artisan Notifications')
-            self.tray_icon.messageClicked.connect(self.messageClicked)
-            #self.tray_icon.show() # if try_icon is not visible, notifications are not delivered
-            self.tray_icon.setContextMenu(self.tray_menu)
+            QTimer.singleShot(600, self.configTrayIcon) # configure using a QTimer not to delay startup
 
         self.notifications_enabled = True # if False, issued notification messages are ignored
         self.notifications_visible = True # if False, the tray_menu icon (and thus notifications) are not shown
@@ -164,6 +159,14 @@ class NotificationManager(QObject): # pyrefly:ignore[invalid-inheritance] # pyri
         self.notification_menu_actions:List[QAction] = []
         # holds the currently displayed notification
         self.active_notification:Optional[Notification] = None
+
+    def configTrayIcon(self) -> None:
+        # the tray icon is displayed only if notifications are supported by the system
+        self.tray_icon.setIcon(self.artisanTrayIcon())
+        self.tray_icon.setToolTip('Artisan Notifications')
+        self.tray_icon.messageClicked.connect(self.messageClicked)
+        #self.tray_icon.show() # if try_icon is not visible, notifications are not delivered
+        self.tray_icon.setContextMenu(self.tray_menu)
 
     @staticmethod
     def artisanTrayIcon() -> QIcon:

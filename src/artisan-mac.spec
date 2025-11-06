@@ -208,6 +208,7 @@ app = BUNDLE(bundle_obj,
 #------
 
 subprocess.check_call(r'mv dist/Artisan.app/Contents/Resources/translations dist/Artisan.app/Contents/',shell = True)
+subprocess.check_call(r'rm -rf dist/Test/_internal/babel/*',shell = True) # unclear: without this line, the next fails
 subprocess.check_call(r'rm -rf dist/Test',shell = True)
 subprocess.check_call(r'cp README.txt dist',shell = True)
 subprocess.check_call(r'cp ../LICENSE dist/LICENSE.txt',shell = True)
@@ -222,6 +223,7 @@ try:
     subprocess.check_call('rm -rf dist/Artisan.app/Contents/Resources/matplotlib/mpl-data/sample_data',shell = True)
 except Exception: # pylint: disable=broad-except
     pass
+
 
 os.chdir('./dist')
 
@@ -422,7 +424,7 @@ print('*** Removing unused language support from babel ***')
 for root, _, files in os.walk(f'./Artisan.app/Contents/Resources/babel/locale-data'):
     for file in files:
         if (file.endswith('.dat') and
-            file not in {'root.dat', 'zh.dat', 'zh_Hans_CN.dat', 'zh_Hant_TW.dat'} and
+            file != 'root.dat' and not (file.startswith('zh') and file.endswith('.dat')) and
             (('_' not in file and file.split('.')[0] not in SUPPORTED_LANGUAGES) or
                 ('_' in file and file.split('.')[0] not in SUPPORTED_LANGUAGES))):
 #            print('Deleting', file)

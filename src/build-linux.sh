@@ -198,14 +198,24 @@ echo Qt QML files removed
 
 for babeltrans in $(find dist/_internal/babel/locale-data -type f -name "*.dat"); do
     babeltrans_filename="${babeltrans##*/}"
+    echo ${babeltrans_filename}
     match=0
+    if [ ${babeltrans_filename} = "root.dat" ]; then
+       echo "match"
+       match=1
+    fi
+    case ${babeltrans_filename} in
+       ("zh"*) match=1
+    esac
     for lang in ${SUPPORTED_LANGUAGES}; do
-        if [ ${babeltrans_filename} = "${lang}.dat" ] || [ ${babeltrans_filename} = "root.dat" ] || [ ${babeltrans_filename} = "zh_Hans_CN.dat" ] || [ ${babeltrans_filename} = "zh_Hant_TW.dat" ] || [ ${babeltrans_filename} = "zh.dat" ] ; then
+        if [ $match = 1 ] ||  [ ${babeltrans_filename} = "${lang}.dat" ] ; then
             match=1
             break
         fi
     done
     if [ $match = 0 ]; then
+        echo "remove"
+        echo ${babeltrans}
         rm -f ${babeltrans}
     fi
 done

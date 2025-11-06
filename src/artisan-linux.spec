@@ -82,7 +82,7 @@ exe = EXE(pyz,
           exclude_binaries=True, # should be True for onedir
           name='artisan',
           debug=False,
-          strip=False,
+          strip=False, # builds fails to start with strip=True with some "address/offset not page-aligned" (scipy/blas)
           upx=True,
           console=True)
 
@@ -90,6 +90,6 @@ coll = COLLECT(exe,
                a.binaries,
                a.zipfiles,
                a.datas,
-               strip=False,
+               strip=False, # builds fails to start with strip=True with some "address/offset not page-aligned" (scipy/blas)
                upx=True,
                name='artisan')
