@@ -349,7 +349,7 @@ logging.info(">>>>> Removing unneeded language support from babel")
 for root, _, files in os.walk(rootdir + r'\babel\locale-data'):
     for file in files:
         if (file.endswith('.dat') and
-                file != 'root.dat' and not (file.startswith('zh') and file.endswith('.dat') and
+                file != 'root.dat' and not (file.startswith('zh') and file.endswith('.dat')) and
                 (('_' not in file and file.split('.')[0] not in SUPPORTED_LANGUAGES) or
                     ('_' in file and file.split('.')[0] not in SUPPORTED_LANGUAGES))):
             file_path = os.path.join(root, file)
