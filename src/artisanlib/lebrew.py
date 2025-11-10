@@ -151,10 +151,9 @@ class Lebrew_RoastSeeNEXT:
         if self._logging:
             _log.debug('register_reading(%s)',data)
         try:
-             values = tuple(float(v) for v in self._payload_pattern.sub('', data.decode('utf-8')).split(','))
-             if len(values) == 7:
+            values = tuple(float(v) for v in self._payload_pattern.sub('', data.decode('utf-8')).split(','))
+            if len(values) == 7:
                 self._agtron, self._crack, self._RoR, self._FoR, self._distance, self._time, self._yellow = values
-
         except UnicodeDecodeError:
             pass
 
