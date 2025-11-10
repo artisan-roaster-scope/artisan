@@ -276,7 +276,7 @@ class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # pyrefly: ig
                             stock_semaphore.release(1)
             return False
         except Exception as e:  # pylint: disable=broad-except
-            _log.exception(e)
+            _log.error(e)
             controller.disconnect(remove_credentials=False, stop_queue=False)
             return False
 

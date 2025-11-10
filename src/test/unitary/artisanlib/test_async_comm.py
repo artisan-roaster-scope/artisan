@@ -237,7 +237,7 @@ class TestIteratorReader:
         reader = IteratorReader(mock_chunks())
         result = await reader.readuntil(b'\n')
 
-        assert result == b'\n'
+        assert result == b'ab\n'
 
     @pytest.mark.asyncio
     async def test_readuntil_with_empty_separator_returns_immediately(self) -> None:

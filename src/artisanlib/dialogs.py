@@ -113,7 +113,6 @@ class ArtisanDialog(QDialog): # pyrefly:ignore[invalid-inheritance] # pyright: i
 
     @pyqtSlot('QCloseEvent')
     def closeEvent(self,_:Optional['QCloseEvent']) -> None:
-        _log.debug('PRINT dialog:closeEvent')
         self.dialogbuttons.rejected.emit()
 
     def keyPressEvent(self, event: Optional['QKeyEvent']) -> None:

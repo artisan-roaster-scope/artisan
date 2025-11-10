@@ -4469,6 +4469,19 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ##########################
                 ####  DEVICE 186 is +CM ET/BT
                 ##########################
+                ##########################
+                ####  DEVICE 187 is +RoastSeeNEXT Agtron/Crack
+                ##########################
+                ###############+##########
+                ####  DEVICE 188 is +RoastSeeNEXT RoR/FOR
+                ##########################
+                ##########################
+                ####  DEVICE 189 is +RoastSeeNEXT Distance/Time
+                ##########################
+                ##########################
+                ####  DEVICE 190 is +RoastSeeNEXT Yellow
+                ##########################
+
 
                 # ADD DEVICE:
 
@@ -4674,7 +4687,11 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 1, # 183
                 3, # 184
                 3, # 185
-                3  # 186
+                3, # 186
+                3, # 187
+                3, # 188
+                3, # 189
+                3  # 190
                 ]
             #init serial settings of extra devices
             for i, _ in enumerate(self.aw.qmc.extradevices):

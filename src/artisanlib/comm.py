@@ -566,7 +566,11 @@ class serialport:
                                    self.ShellyPlusPlug_Voltage_Current,         #183
                                    self.TASI_TA612C,          #184
                                    self.TASI_TA612C_34,       #185
-                                   self.CM_ETBT               #186
+                                   self.CM_ETBT,              #186
+                                   self.RoastSeeNEXT_AGTRON_CRACK,   #187
+                                   self.RoastSeeNEXT_RoR_FoR,        #188
+                                   self.RoastSeeNEXT_Distance_Time,  #189
+                                   self.RoastSeeNEXT_Yello           #190
                                    ]
         #string with the name of the program for device #27
         self.externalprogram:str = 'test.py'
@@ -1049,6 +1053,55 @@ class serialport:
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
         return tx, -1, -1
+
+    def connect_roastsee_NEXT(self) -> None:
+        if self.aw.lebrew_roastseeNEXT is None:
+            from artisanlib.lebrew import Lebrew_RoastSeeNEXT
+            self.aw.lebrew_roastseeNEXT = Lebrew_RoastSeeNEXT(
+                connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('RoastSee NEXT'),True,None),
+                disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('RoastSee NEXT'),True,None))
+            self.aw.lebrew_roastseeNEXT.setLogging(self.aw.qmc.device_logging)
+            if self.aw.lebrew_roastseeNEXT is not None and not self.aw.lebrew_roastseeNEXT.client_started():
+                self.aw.lebrew_roastseeNEXT.start()
+
+    def RoastSeeNEXT_AGTRON_CRACK(self) -> Tuple[float,float,float]:
+        agtron:float = -1
+        crack:float = -1
+        self.connect_roastsee_NEXT()
+        if self.aw.lebrew_roastseeNEXT is not None:
+            agtron = self.aw.lebrew_roastseeNEXT.getAgtron()
+            crack = self.aw.lebrew_roastseeNEXT.getCrack()
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        return tx, crack, agtron
+
+    def RoastSeeNEXT_RoR_FoR(self) -> Tuple[float,float,float]:
+        cror:float = -1
+        cfor:float = -1
+        self.connect_roastsee_NEXT()
+        if self.aw.lebrew_roastseeNEXT is not None:
+            cror = self.aw.lebrew_roastseeNEXT.getRoR()
+            cfor = self.aw.lebrew_roastseeNEXT.getFoR()
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        return tx, cfor, cror
+
+    def RoastSeeNEXT_Distance_Time(self) -> Tuple[float,float,float]:
+        distance:float = -1
+        time:float = -1
+        self.connect_roastsee_NEXT()
+        if self.aw.lebrew_roastseeNEXT is not None:
+            distance = self.aw.lebrew_roastseeNEXT.getDistance()
+            time = self.aw.lebrew_roastseeNEXT.getTime()
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        return tx, time, distance
+
+    def RoastSeeNEXT_Yello(self) -> Tuple[float,float,float]:
+        yellow:float = -1
+        self.connect_roastsee_NEXT()
+        if self.aw.lebrew_roastseeNEXT is not None:
+            yellow = self.aw.lebrew_roastseeNEXT.getYellow()
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        return tx, -1, yellow
+
 
     def virtual(self) -> Tuple[float,float,float]:
         tx = self.aw.qmc.timeclock.elapsedMilli()

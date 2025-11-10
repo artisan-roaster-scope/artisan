@@ -294,7 +294,7 @@ def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
                         True,
                         None,
                     )
-                if (aw.plus_account is not None and queue.queue is None):
+                if aw.plus_account is not None:
                     # connect failed (most likely due to network issues)
                     # we anyhow initialize the queue if not yet done to get roasts queued up
                     try:

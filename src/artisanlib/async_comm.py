@@ -132,14 +132,16 @@ class IteratorReader:
             return await self._read_until_end()
         return b''
 
+    # returns only the data incl. the final separator
     async def readuntil(self, separator:bytes = b'\n') -> bytes:
+        res = b''
         if len(separator) != 0:
             while True:
                 next_char = await self.readexactly(len(separator))
+                res += next_char
                 if next_char == separator:
                     break
-        return separator
-
+        return res
 
 class AsyncComm:
 

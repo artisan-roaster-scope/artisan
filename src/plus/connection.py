@@ -31,6 +31,7 @@ except Exception: # pylint: disable=broad-except
 from artisanlib import __version__
 from typing import Final, Any, Optional, Dict, Tuple  #for Python >= 3.9: can remove 'Dict' since type hints can now use the generic 'dict'
 
+import time
 import uuid
 import datetime
 import gzip
@@ -409,6 +410,7 @@ def sendData(
         _log.debug('-> session token outdated (401)')
         # we re-authentify by renewing the session token and try again
         if authentify():
+            time.sleep(0.3) # a little delay not to stress out the server too much
             headers, postdata = getHeadersAndData(
                 authorized, compress, jsondata, verb
             )  # recreate header with new token

@@ -202,6 +202,7 @@ if TYPE_CHECKING:
     from artisanlib.weblcds import WebLCDs, WebGreen, WebRoasted # pylint: disable=unused-import
     from artisanlib.santoker import Santoker # pylint: disable=unused-import
     from artisanlib.santoker_r import SantokerR # pylint: disable=unused-import
+    from artisanlib.lebrew import Lebrew_RoastSeeNEXT # pylint: disable=unused-import
     from artisanlib.bluedot import BlueDOT # pylint: disable=unused-import
     from artisanlib.mugma import Mugma # pylint: disable=unused-import
     from artisanlib.kaleido import KaleidoPort # pylint: disable=unused-import
@@ -1828,6 +1829,9 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
 
         # Santoker R
         self.santokerR:Optional[SantokerR] = None # holds the Santoker R instance created on connect; reset to None on disconnect
+
+        # Lebrew RoastSee NEXT
+        self.lebrew_roastseeNEXT:Optional[Lebrew_RoastSeeNEXT] = None # holds the Lebrew RoastSeeNEXT instance; reset to None on disconnect
 
         # Thermoworks BlueDOT
         self.thermoworksBlueDOT:Optional[BlueDOT] = None  # holds the BlueDOT instance created on connect; reset to None on disconnect
@@ -11197,7 +11201,8 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
 
     #called from user configured event buttons
     #by default actions are processed in a parallel thread, but components of multiple button actions not to avoid crashes
-    def recordextraevent(self, ee:int, parallel:bool = True, updateButtons:bool = True) -> None:
+    # value, if given, overwrites the button value as defined in the button table
+    def recordextraevent(self, ee:int, parallel:bool = True, updateButtons:bool = True, value:Optional[int] = None) -> None:
         eventtype = self.extraeventstypes[ee]
         if updateButtons and self.mark_last_button_pressed: # not if triggered from mutiplebutton actions:
             try:
@@ -11219,7 +11224,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                     self.qmc.eventactionsemaphore.release(1)
         # reset lastbuttonpressed
         self.lastbuttonpressed = ee
-        cmdvalue = self.qmc.eventsInternal2ExternalValue(self.extraeventsvalues[ee])
+        cmdvalue = (self.qmc.eventsInternal2ExternalValue(self.extraeventsvalues[ee]) if value is None else value)
         if eventtype < 4 or eventtype > 4:  ## if eventtype == 4 we have an button event of type " " that does not add an event; if eventtype == 9 ("-") we have an untyped event
             if eventtype == 9: # an untyped event
                 # we just fire the action
@@ -11235,7 +11240,10 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                 # and record the event
                 if self.qmc.flagstart:
                     # we use event handling to enable the doupdategraphics/doupdatebackground also if running in background thread
-                    self.qmc.eventRecordSignal.emit(ee)
+                    if value is None:
+                        self.qmc.eventRecordSignal.emit(ee)
+                    else:
+                        self.qmc.eventRecordOverwriteValueSignal.emit(ee, value)
             else:
                 #if eventtype < 4: # absolute values
                 etype = eventtype
@@ -11278,7 +11286,10 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                 self.moveslider(etype,new_value)
                 if self.qmc.flagstart and event_record:
                     # we use event handling to enable the doupdategraphics/doupdatebackground also if running in background thread
-                    self.qmc.eventRecordSignal.emit(ee)
+                    if value is None:
+                        self.qmc.eventRecordSignal.emit(ee)
+                    else:
+                        self.qmc.eventRecordOverwriteValueSignal.emit(ee, value)
         else:
             # just issue the eventaction (no cmd substitution here)
             # split on an octothorpe '#' that is not inside parentheses '()'

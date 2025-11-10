@@ -24,11 +24,11 @@
 
 try:
     #pylint: disable = E, W, R, C
-    from PyQt6.QtCore import QCoreApplication, QObject, QThread, pyqtSlot, pyqtSignal # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt6.QtCore import QCoreApplication, QObject, QThread, pyqtSlot, pyqtSignal, QSemaphore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
 except Exception: # pylint: disable=broad-except
     #pylint: disable = E, W, R, C
-    from PyQt5.QtCore import QCoreApplication, QObject, QThread, pyqtSlot, pyqtSignal # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+    from PyQt5.QtCore import QCoreApplication, QObject, QThread, pyqtSlot, pyqtSignal, QSemaphore # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import QApplication # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib.util import getDirectory
@@ -60,6 +60,8 @@ queue:Optional['persistqueue.SQLiteQueue'] = None # type:ignore[no-any-unimporte
 
 worker:Optional['Worker'] = None
 worker_thread:Optional[QThread] = None
+
+queueWorkerSemaphore = QSemaphore(1) # ensure that only one worker thread is running
 
 
 class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # pyrefly: ignore # Argument to class must be a base class
@@ -296,42 +298,51 @@ def start() -> None:
     global queue  # pylint: disable=global-statement
     global worker, worker_thread  # pylint: disable=global-statement
 
-    if queue is None:
-        # we initialize the queue
-        import persistqueue
-        if hasattr(persistqueue, 'SQLiteQueue'):
-            try:
-                queue = persistqueue.SQLiteQueue(
-                    queue_path, multithreading=True, auto_commit=False
-                )
-                # we keep items in the queue if not explicit marked as task_done:
-                # auto_commit=False
-            except Exception:  # pylint: disable=broad-except
-                pass
-
-    _log.debug('start()')
-    if queue is not None:
-        _log.debug('-> qsize: %s', queue.qsize()) # ty: ignore[possibly-unbound-attribute]
-    if worker_thread is None:
-        worker = Worker()
-        worker_thread = QThread()
-        worker_thread.start()
-        worker.moveToThread(worker_thread)
-        worker.startSignal.connect(worker.task)
-        worker.replySignal.connect(util.updateLimits)
-        #app.aboutToQuit.connect(end)
-        worker.startSignal.emit()
-        _log.debug('queue started')
-    elif worker is not None:
-        worker.resume() # ty: ignore[possibly-unbound-attribute]
-        _log.debug('queue resumed')
+    try:
+        queueWorkerSemaphore.acquire(1)
+        if queue is None:
+            # we initialize the queue
+            import persistqueue
+            if hasattr(persistqueue, 'SQLiteQueue'):
+                try:
+                    queue = persistqueue.SQLiteQueue(
+                        queue_path, multithreading=True, auto_commit=False
+                    )
+                    # we keep items in the queue if not explicit marked as task_done:
+                    # auto_commit=False
+                except Exception:  # pylint: disable=broad-except
+                    pass
+        _log.debug('start()')
+        if queue is not None:
+            _log.debug('-> qsize: %s', queue.qsize()) # ty: ignore[possibly-unbound-attribute]
+        if worker_thread is None:
+            worker = Worker()
+            worker_thread = QThread()
+            worker_thread.start()
+            worker.moveToThread(worker_thread)
+            worker.startSignal.connect(worker.task)
+            worker.replySignal.connect(util.updateLimits)
+            #app.aboutToQuit.connect(end)
+            worker.startSignal.emit()
+            _log.debug('queue started')
+        elif worker is not None:
+            worker.resume() # ty: ignore[possibly-unbound-attribute]
+            _log.debug('queue resumed')
+    finally:
+        if queueWorkerSemaphore.available() < 1:
+            queueWorkerSemaphore.release(1)
 
 
 # the queue worker thread cannot really be stopped, but we can pause it
-def stop() -> None:
+def stop() -> None:  # pylint: disable=global-statement
     if worker is not None:
-        worker.pause()
-        _log.debug('queue stopped')
+        try:
+            queueWorkerSemaphore.acquire(1)
+            worker.pause()
+            _log.debug('queue stopped')
+        finally:
+            if queueWorkerSemaphore.available() < 1:
+                queueWorkerSemaphore.release(1)
 
 
 # check if a full roast record (one with date) with roast_id is in the queue
