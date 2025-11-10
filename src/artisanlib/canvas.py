@@ -6000,7 +6000,7 @@ class tgraphcanvas(FigureCanvas):
                             if len(button_spec)>1:
                                 button_overwrite_value = int(button_spec[1].strip())
                             button_number = int(button_spec[0].strip()) - 1 # the event buttons presented to the user are numbered from 1 on
-                        except Exception as e: # pylint: disable=broad-except
+                        except Exception: # pylint: disable=broad-except
                             self.aw.sendmessage(QApplication.translate('Message',"Alarm trigger button error, description '{0}' not a number").format(string))
                         if button_number is not None and -1 < button_number < len(self.aw.buttonlist):
                             self.aw.recordextraevent(button_number,value=button_overwrite_value)
