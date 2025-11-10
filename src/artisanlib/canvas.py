@@ -5993,7 +5993,7 @@ class tgraphcanvas(FigureCanvas):
                     bnrs = text.split(',')
                     for bnr in bnrs:
                         button_number:Optional[int] = None           # the referenced button number
-                        button_overwrite_value:Optional[int] = None  # alue to overwrite the referenced button value
+                        button_overwrite_value:Optional[int] = None  # value to overwrite the referenced button value
                         # a button specification is either just an integer or two integers (button number ref, overwrite event value) separated by a '>' symbol
                         try:
                             button_spec = bnr.strip().split('>')
