@@ -107,7 +107,6 @@ class ArtisanDialog(QDialog): # pyrefly:ignore[invalid-inheritance] # pyright: i
 
     @pyqtSlot()
     def cancelDialog(self) -> None:  # ESC key
-        _log.debug('PRINT dialog:cancelDialog')
 #        self.reject() # this does not call any closeEvent in subclasses!
         self.dialogbuttons.rejected.emit()
 

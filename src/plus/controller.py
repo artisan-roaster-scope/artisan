@@ -408,8 +408,8 @@ def reconnected() -> None:
 # if plus is ON and synced, computes the sync record hash, updates the
 # sync record cache and returns the sync record hash
 # otherwise return None
-# this function is called by filesave() and returns the sync_record hash
-# to be added to the saved file
+# this function is called by filesave(), automaticsave(), scheduler:register_roast()
+# it returns the sync_record hash to be added to the saved file
 def updateSyncRecordHashAndSync() -> Optional[str]:
     try:
         _log.debug('updateSyncRecordHashAndSync()')

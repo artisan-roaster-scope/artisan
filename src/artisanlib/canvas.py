@@ -73,6 +73,7 @@ from artisanlib.atypes import SerialSettings, BTBreakParams, BbpCache, AlarmSet,
 # import artisan.plus module
 from plus.util import roastLink
 from plus.queue import addRoast, sendLockSchedule
+from plus.sync import clearSyncRecordHash
 
 try:
     #pylint: disable-next = E, W, R, C
@@ -7801,6 +7802,8 @@ class tgraphcanvas(FigureCanvas):
             # reset plus sync
             self.plus_sync_record_hash = None
             self.plus_file_last_modified = None
+            # clear also the cached sync record and sync record hash used to detect changes in the loaded profile
+            clearSyncRecordHash()
 
             # initialize recording version to be stored to new profiles recorded
             self.aw.recording_version = str(__version__)
@@ -13813,7 +13816,7 @@ class tgraphcanvas(FigureCanvas):
 
     # close serial port, Phidgets and Yocto ports
     def disconnectProbesFromSerialDevice(self, ser:'serialport') -> None:
-        _log.debug('disconnectProbesFromSerialDevice')
+        _log.debug('disconnectProbesFromSerialDevice(%s)',ser)
         try:
             self.samplingSemaphore.acquire(1)
 
@@ -14173,10 +14176,10 @@ class tgraphcanvas(FigureCanvas):
     def OffRecorder(self, autosave:bool = True, enableButton:bool = True) -> None:
         _log.info('MODE: STOP RECORDING')
         try:
-            # mark DROP if not yet set (and DROP not undone), at least 7min roast time and CHARGE is set and either autoDROP is active or DROP button is hidden
+            # mark DROP if not yet set (and DROP not undone), at least 5min roast time and CHARGE is set and either autoDROP is active or DROP button is hidden
             if self.timeindex[6] == 0 and self.timeindex[0] != -1 and self.autoDROPenabled and (self.autoDropFlag or not self.buttonvisibility[6]):
                 start = self.timex[self.timeindex[0]]
-                if (len(self.timex)>0 and self.timex[-1] - start) > 7*60: # only after 7min into the roast
+                if (len(self.timex)>0 and self.timex[-1] - start) > 5*60: # only after 5min into the roast
                     self.markDrop()
             if self.timeindex[6] == 0 and self.autoDROPenabled:
                 # if DROP is still not set (and was never set before, eg. autoDROP is still enabled), we reset the scheduleID not

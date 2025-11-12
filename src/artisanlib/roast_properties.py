@@ -2113,7 +2113,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             else:
                 self.beansedit.setStyleSheet('QTextEdit { background-color: #e4f3f8; selection-background-color: darkgray;  }')
         else:
-            self.beansedit.setStyleSheet('')
+            self.beansedit.setStyleSheet('QTextEdit { }')
         # for QLineEdit
         if b:
             if self.aw.app.darkmode:
@@ -4801,7 +4801,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             else:
                 w.setStyleSheet("""QLineEdit { color: #CC0F50; }""")
         else:
-            w.setStyleSheet('')
+            w.setStyleSheet('QLineEdit { }')
 
     def checkWeightOut(self) -> None:
         try:
@@ -4941,7 +4941,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             except Exception: # pylint: disable=broad-except
                 pass
         if enough:
-            self.weightinedit.setStyleSheet('')
+            self.weightinedit.setStyleSheet('QLineEdit { }')
         elif self.aw.app.darkmode:
             self.weightinedit.setStyleSheet("""QLineEdit { background-color: #ad0427;  }""")
         elif enough_replacement:
@@ -4951,7 +4951,8 @@ class editGraphDlg(ArtisanResizeablDialog):
 
     @pyqtSlot()
     def weightineditChanged(self) -> None:
-        self.weightinedit.setText(comma2dot(str(self.weightinedit.text())))
+        weight_in = comma2dot(str(self.weightinedit.text()))
+        self.weightinedit.setText(weight_in)
         self.weightinedit.repaint()
         self.percent()
         self.defect_percent()
@@ -4960,7 +4961,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 (self.volumeinedit.text() in {'0',''} and self.weightinedit.text().strip() not in {'0',''})):
             self.calculated_density()
             keep_modified_density = self.modified_density_in_text
-        self.density_in_editing_finished() # recalc volume_in
+        self.recalc_on_density_in_editing_finished(keep_weight_in=True) # recalc volume_in
         if keep_modified_density is not None:
             self.modified_density_in_text = keep_modified_density
         self.recentRoastEnabled()
@@ -4971,6 +4972,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             coffee_idx = self.plus_coffees_combo.currentIndex()
             if coffee_idx > 0:
                 self.coffeeSelectionChanged(coffee_idx)
+        self.weightinedit.setText(weight_in) # need to set it here again as blendSelectionChanged/coffeeSelectionChanged do update a 0
         self.checkWeightOut()
 
     def density_percent(self) -> None:
@@ -5131,8 +5133,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     def pressureedit_editing_finished(self) -> None:
         self.pressureedit.setText(comma2dot(str(self.pressureedit.text())))
 
-    @pyqtSlot()
-    def density_in_editing_finished(self) -> None:
+    def recalc_on_density_in_editing_finished(self, keep_weight_in:bool = False) -> None:
         self.bean_density_in_edit.setText(comma2dot(str(self.bean_density_in_edit.text())))
         self.modified_density_in_text = str(self.bean_density_in_edit.text())
         if self.bean_density_in_edit.text() != '':
@@ -5148,7 +5149,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                         volume_in = convertVolume(volume_in,volume_units.index('l'),self.volumeUnitsComboBox.currentIndex())
                         self.volumeinedit.setText(f'{float2floatWeightVolume(volume_in):g}')
                         self.volume_percent()
-                if self.volumeinedit.text() != '' and self.weightinedit.text().strip() in {'0',''}:
+                if not keep_weight_in and self.volumeinedit.text() != '' and self.weightinedit.text().strip() in {'0',''}:
                     # if density-in and volume-in is given, we re-calc weight-in:
                     volume_in = float(comma2dot(self.volumeinedit.text()))
                     if volume_in != 0:
@@ -5161,6 +5162,10 @@ class editGraphDlg(ArtisanResizeablDialog):
                         self.calculated_organic_loss()
             else:
                 self.volume_percent()
+
+    @pyqtSlot()
+    def density_in_editing_finished(self) -> None:
+        self.recalc_on_density_in_editing_finished()
 
     @pyqtSlot()
     def density_out_editing_finished(self) -> None:

@@ -274,7 +274,7 @@ def setSyncRecordHash(sync_record:Optional[Dict[str, Any]] = None, h:Optional[st
         if sync_record_semaphore.available() < 1:
             sync_record_semaphore.release(1)
 
-
+# cleared on RESET and potentially on sync
 def clearSyncRecordHash() -> None:
     # pylint: disable=global-statement
     global cached_sync_record_hash, cached_sync_record
@@ -935,7 +935,7 @@ def sync() -> None:
                 # missing, offline changes (might) have been applied
                 aw.qmc.fileDirty()  # set file dirty flag
                 clearSyncRecordHash()  # clear sync record hash cash to trigger
-                # an upload of the modified plus sync record on next save
+                # a full upload of the modified plus sync record on next save
             else:
                 setSyncRecordHash(
                     sync_record=computed_sync_record, h=computed_sync_record_hash

@@ -438,7 +438,7 @@ def getRoast() -> Dict[str, Any]:  #for Python >= 3.9 can replace 'Dict' with th
 # values to avoid sending just tags with zeros. Those come in two sets, the first one
 # (sync_record_zero_supressed_attributes_synced) is the regular one which is
 # synced both directions with the server, the second one (sync_record_zero_supressed_attributes_unsynced)
-# are only send to the server (as those are computed values) , but never
+# are only send to the server (as those are computed values), but never
 # received and thus not synced between clients.
 
 sync_record_zero_supressed_attributes_synced: List[str] = [  #for Python >= 3.9 can replace 'List' with the generic type hint 'list'
