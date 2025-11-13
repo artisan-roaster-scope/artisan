@@ -405,7 +405,7 @@ class TestCacheAndQueueParameters:
     def test_queue_task_delay(self) -> None:
         """Test queue task delay setting."""
         # Assert
-        assert config.queue_task_delay == 1.0
+        assert config.queue_task_delay == 2.0
         assert isinstance(config.queue_task_delay, float)
         assert config.queue_task_delay > 0
 

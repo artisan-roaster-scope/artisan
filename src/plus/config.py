@@ -81,7 +81,7 @@ schedule_cache_expiration: Final[int] = 5 # expiration period in seconds for ful
 
 queue_start_delay: Final[int] = 5  # startup time of queue in seconds
 # delay between tasks in seconds (cycling interval of the queue)
-queue_task_delay: Final[float] = 1.0
+queue_task_delay: Final[float] = 2.0
 queue_retries: Final[int] = 2  # number of retries (should be >=0)
 queue_retry_delay: Final[int] = 30  # time between retries in seconds
 queue_discard_after: Final[int] = 3*24*60*60 # period in seconds after 'modified_at'..

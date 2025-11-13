@@ -105,7 +105,6 @@ class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # pyrefly: ig
                 try:
                     if item is None:
                         item = queue.get()
-                    time.sleep(config.queue_task_delay)
                     _log.debug(
                         '-> worker processing item: %s', item
                     )
