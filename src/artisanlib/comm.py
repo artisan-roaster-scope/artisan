@@ -3221,7 +3221,7 @@ class serialport:
                     temperatures = struct.unpack('<HHHH', temperature_data)  # Assuming 4 channels of 16-bit data
 
                     # Convert raw temperature values to Celsius
-                    T1,T2,T3,T4 = ((temp / 10.0) for temp in temperatures)  # Divide by 10 to get the correct Celsius value
+                    T1,T2,T3,T4 = (fromCtoFstrict(temp / 10.0) if self.aw.qmc.mode == 'F' else (temp / 10.0) for temp in temperatures)  # Divide by 10 to get the correct Celsius value
 
                     self.aw.qmc.extraTASI_TA612C_T3 = T3
                     self.aw.qmc.extraTASI_TA612C_T4 = T4
