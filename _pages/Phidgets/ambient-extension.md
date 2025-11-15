@@ -20,6 +20,10 @@ This extension is composed from the following 4 additional parts.
 - 1x [PRE1000 Barometer Phidget VINT Module](https://www.phidgets.com/?tier=3&catid=7&pcid=5&prodid=719){:target="_blank"}
 - 2x [VINT Cable 10cm](https://www.phidgets.com/?tier=3&catid=30&pcid=26&prodid=153){:target="_blank"}
 
+**Watch out!**
+To connect the above two modules to your computer you still need a Phidget VINT HUB with 2 free ports as contained in the [Phidget RTD](https://artisan-scope.org/phidgets/2x-rtd-set/) and [Phidget TC](https://buy.artisan.plus/Phidgets-TC) sensor sets.
+{: .notice--primary}
+
 <figure class="full">
     <a href="/assets/images/Phidgets/VINT-Ambient-Modules-Extension-set-parts.JPG"><img src="/assets/images/Phidgets/VINT-Ambient-Modules-Extension-set-parts.JPG"></a>
     <figcaption>Ambient Modules Extension Set – Parts</figcaption>
