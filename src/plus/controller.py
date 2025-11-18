@@ -21,7 +21,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#pylint: disable = E, W, R, C
 from PyQt6.QtCore import QSemaphore, QTimer, Qt, pyqtSlot
 from PyQt6.QtWidgets import QWidget, QApplication, QMessageBox
 
