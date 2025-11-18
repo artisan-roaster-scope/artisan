@@ -36,6 +36,7 @@ from platform import python_version
 from packaging.version import Version
 from uuid import UUID
 
+#pylint: disable = E, W, R, C
 from PyQt6.QtCore import (Qt, QMimeData, QSettings, pyqtSlot, pyqtSignal, QPoint, QPointF, QLocale, QDate, QDateTime, QSemaphore, QTimer)
 from PyQt6.QtGui import (QDrag, QPixmap, QPainter, QTextLayout, QTextLine, QColor, QFontMetrics, QCursor, QAction, QIcon)
 from PyQt6.QtWidgets import (QDialogButtonBox, QMessageBox, QStackedWidget, QApplication, QWidget, QVBoxLayout, QHBoxLayout, QFrame, QTabWidget,
