@@ -84,7 +84,6 @@ pyobjc-framework-Cocoa==12.0; sys_platform=='darwin'
 pyobjc-framework-CoreBluetooth==12.0; sys_platform=='darwin'
 pyobjc-framework-libdispatch==12.0; sys_platform=='darwin'
 py2app==0.28.8; sys_platform=='darwin'
-darkdetect==0.8.0; sys_platform=='darwin' and platform_release<'20.0' # detect if dark mode is active (only used by macOS legacy builds)
 ###
 ########
 ### Linux specific packages
