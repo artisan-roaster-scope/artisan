@@ -20,7 +20,7 @@ import numpy as np
 from collections import deque
 from bisect import bisect_left, insort
 
-from typing import List, Optional, Deque, Any, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     import numpy.typing as npt # pylint: disable=unused-import
@@ -63,8 +63,8 @@ class LiveLFilter(LiveFilter):
         """
         self.b = b_
         self.a = a_
-        self._xs:Deque[float] = deque([0.0] * len(self.b), maxlen=len(self.b))         # pyrefly: ignore[bad-argument-type]
-        self._ys:Deque[float] = deque([0.0] * (len(self.a) - 1), maxlen=len(self.a)-1) # pyrefly: ignore[bad-argument-type]
+        self._xs:deque[float] = deque([0.0] * len(self.b), maxlen=len(self.b))         # pyrefly: ignore[bad-argument-type]
+        self._ys:deque[float] = deque([0.0] * (len(self.a) - 1), maxlen=len(self.a)-1) # pyrefly: ignore[bad-argument-type]
 
     def _process(self, x:float) -> float:
         """Filter incoming data with standard difference equations.
@@ -124,11 +124,11 @@ class LiveMedian(LiveFilter):
         """
         assert k % 2 == 1, 'Median filter length must be odd.'
         self.k:int = k
-        self.init_list:List[float] = [] # collects first k readings until initialized
+        self.init_list:list[float] = [] # collects first k readings until initialized
         self.total:float = 0 # the sum of the last n<k readings
         self.initialized:bool = False
-        self.q:Optional[Deque[float]] = None
-        self.l:Optional[List[float]] = None
+        self.q:deque[float]|None = None
+        self.l:list[float]|None = None
         self.mididx:int = 0
 
     def init_queue(self) -> None:
@@ -169,10 +169,10 @@ class LiveMean(LiveFilter):
             k: window size
         """
         self.k:int = k
-        self.init_list:List[float] = [] # collects first k readings until initialized
+        self.init_list:list[float] = [] # collects first k readings until initialized
         self.total:float = 0 # the sum of the last n<=k readings
         self.initialized:bool = False
-        self.window:Optional[Deque[float]] = None
+        self.window:deque[float]|None = None
 
     def init_queue(self) -> None:
         self.window = deque(self.init_list)

@@ -21,15 +21,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-try:
-    #pylint: disable = E, W, R, C
-    from PyQt6.QtCore import QSemaphore # @UnusedImport @Reimport  @UnresolvedImport
-except Exception: # pylint: disable=broad-except
-    #pylint: disable = E, W, R, C
-    from PyQt5.QtCore import QSemaphore  # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+#pylint: disable = E, W, R, C
+from PyQt6.QtCore import QSemaphore
 
 from artisanlib import __version__
-from typing import Final, Any, Optional, Dict, Tuple  #for Python >= 3.9: can remove 'Dict' since type hints can now use the generic 'dict'
+from typing import Final, Any
 
 import time
 import uuid
@@ -53,7 +49,7 @@ token_semaphore = QSemaphore(
     1
 )  # protects access to the session token which is manipulated only here
 
-def getToken() -> Optional[str]:
+def getToken() -> str|None:
     try:
         token_semaphore.acquire(1)
         return config.token
@@ -65,7 +61,7 @@ def getToken() -> Optional[str]:
             token_semaphore.release(1)
 
 
-def getNickname() -> Optional[str]:
+def getNickname() -> str|None:
     try:
         token_semaphore.acquire(1)
         return config.nickname
@@ -77,7 +73,7 @@ def getNickname() -> Optional[str]:
             token_semaphore.release(1)
 
 
-def setToken(token: str, nickname: Optional[str] = None) -> None:
+def setToken(token: str, nickname: str|None = None) -> None:
     try:
         token_semaphore.acquire(1)
         config.token = token
@@ -274,7 +270,7 @@ def authentify() -> bool:
                             if paidUntil != '' and (
                                 dateutil.parser.parse(paidUntil).date()
     #                            - datetime.datetime.now().date()  # DTZ005 The use of `datetime.datetime.now()` without `tz` argument is not allowed
-                                - datetime.datetime.now(datetime.timezone.utc).date()
+                                - datetime.datetime.now(datetime.UTC).date() # ty:ignore
                             ).days < (-config.expired_subscription_max_days):
                                 _log.debug(
                                         '-> authentication failed due to'
@@ -335,7 +331,7 @@ def authentify() -> bool:
 
 
 def getHeaders(
-    authorized: bool = True, decompress: bool = True) -> Dict[str, str]:  #for Python >= 3.9 can replace 'Dict' with the generic type hint 'dict'
+    authorized: bool = True, decompress: bool = True) -> dict[str, str]:
     aw = config.app_window
     if aw is not None:
         os, os_version, os_arch = aw.get_os()  # @UndefinedVariable
@@ -362,7 +358,7 @@ def getHeaders(
         return headers
     return {}
 
-def getHeadersAndData(authorized: bool, compress: bool, jsondata: JSON, verb: str) -> Tuple[Dict[str, str],bytes]:
+def getHeadersAndData(authorized: bool, compress: bool, jsondata: JSON, verb: str) -> tuple[dict[str, str],bytes]:
     headers = getHeaders(authorized, decompress=compress)
     headers['Content-Type'] = 'application/json; charset=utf-8'
     if verb == 'POST':
@@ -378,7 +374,7 @@ def getHeadersAndData(authorized: bool, compress: bool, jsondata: JSON, verb: st
 
 def sendData(
     url: str,
-    data: Dict[Any, Any],  #for Python >= 3.9 can replace 'Dict' with the generic type hint 'dict'
+    data: dict[Any, Any],
     verb: str, # POST or PUT
     authorized: bool = True,
     compress: bool = config.compress_posts,
@@ -434,7 +430,7 @@ def sendData(
     return r
 
 
-def getData(url: str, authorized: bool = True, params:Optional[Dict[str,str]]=None) -> Any:
+def getData(url: str, authorized: bool = True, params:dict[str,str]|None = None) -> Any:
     _log.debug('getData(%s,%s,%s)', url, authorized, params)
     headers = getHeaders(authorized)
     params = params or {}

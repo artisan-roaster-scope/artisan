@@ -19,7 +19,6 @@
 import os
 import subprocess
 import sys
-from typing import List, Set  #for Python >= 3.9: can remove 'List' since type hints can now use the generic 'list'
 
 try:
     print('** pylupdate6pro.py is executing')
@@ -35,10 +34,10 @@ try:
     end:int = file_content.find('\n\n', start)  #find will not raise an exception if it runs to the end of the file
     if end == -1:
         end = len(file_content)
-    sources:List[str] = [s.strip().rstrip('\\') for s in file_content[start:end].split('\n')]
+    sources:list[str] = [s.strip().rstrip('\\') for s in file_content[start:end].split('\n')]
     # distill to the unique top directories
     #unique_top_dirs:list = set([os.path.split(source)[0] for source in sources])
-    unique_top_dirs:Set[str] = {os.path.split(source)[0] for source in sources}
+    unique_top_dirs:set[str] = {os.path.split(source)[0] for source in sources}
 
     # grab content from TRANSLATIONS to a blank line
     #print("Looking for translations")
@@ -46,10 +45,10 @@ try:
     end = file_content.find('\n\n', start)  #find will not raise an exception if it runs to the end of the file
     if end == -1:
         end = len(file_content)
-    translations: List[str] = [s.rstrip('\\').strip() for s in file_content[start:end].split('\n')[:-1]]
+    translations: list[str] = [s.rstrip('\\').strip() for s in file_content[start:end].split('\n')[:-1]]
 
     # Build the pylupdate6 command line
-    cmdline:List[str] = ['pylupdate6'] # , '--no-obsolete' (add to list of args to remove all obsolete translations)
+    cmdline:list[str] = ['pylupdate6'] # , '--no-obsolete' (add to list of args to remove all obsolete translations)
     # add '--verbose' to check on errors
     cmdline.extend(unique_top_dirs)
     for t in translations:

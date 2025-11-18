@@ -27,7 +27,8 @@ Key Features:
 
 import sys
 import threading
-from typing import Any, Dict, Generator
+from collections.abc import Generator
+from typing import Any
 from unittest.mock import Mock, patch
 
 import pytest
@@ -42,7 +43,7 @@ def session_level_isolation() -> Generator[None, None, None]:
     comm tests. It handles PyQt6, serial, Phidget, and Yoctopuce mocking.
     """
     # Store original modules if they exist and aren't mocked
-    original_modules: Dict[str, Any] = {}
+    original_modules: dict[str, Any] = {}
     modules_to_check = [
         'PyQt6',
         'PyQt6.QtCore',

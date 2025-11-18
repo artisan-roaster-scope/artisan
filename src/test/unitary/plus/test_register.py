@@ -50,15 +50,15 @@ modules that require extensive external dependency mocking while preventing cros
 """
 
 import sys
-#from pathlib import Path
-from typing import Any, Dict, Generator
+from collections.abc import Generator
+from typing import Any
 from unittest.mock import Mock, patch
 
 import pytest
 
 # Store original modules before any mocking to enable restoration
-original_modules: Dict[str, Any] = {}
-original_functions: Dict[str, Any] = {}
+original_modules: dict[str, Any] = {}
+original_functions: dict[str, Any] = {}
 modules_to_isolate = [
     'PyQt6.QtCore',
     'PyQt6.QtWidgets',
@@ -163,7 +163,7 @@ sys.modules['portalocker.exceptions'].LockException = MockLockException # type: 
 # Mock shelve with proper database behavior
 class MockShelveDB:
     def __init__(self) -> None:
-        self._data: Dict[str, Any] = {}
+        self._data: dict[str, Any] = {}
 
     def __enter__(self) -> 'MockShelveDB':
         return self
@@ -349,7 +349,7 @@ def sample_path() -> str:
 
 
 @pytest.fixture
-def sample_profile_data() -> Dict[str, str]:
+def sample_profile_data() -> dict[str, str]:
     """Create sample profile data with UUID."""
     return {
         'roastUUID': '12345678-1234-5678-9012-123456789abc',
@@ -572,7 +572,7 @@ class TestAddPathShelve:
 #class TestScanDir:
 #    """Test scanDir function."""
 #
-#    def test_scan_dir_successful(self, mock_app_window:Mock, sample_profile_data:Dict[str, str]) -> None:
+#    def test_scan_dir_successful(self, mock_app_window:Mock, sample_profile_data:dict[str, str]) -> None:
 #        """Test scanDir with successful directory scan."""
 #        # Arrange
 #        mock_files = [

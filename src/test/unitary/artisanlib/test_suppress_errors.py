@@ -12,7 +12,7 @@ This module tests the suppress_stdout_stderr context manager functionality inclu
 """
 
 import os
-from typing import Dict, Generator
+from collections.abc import Generator
 from unittest.mock import Mock, call, patch
 
 import pytest
@@ -21,7 +21,7 @@ from artisanlib.suppress_errors import suppress_stdout_stderr
 
 
 @pytest.fixture
-def mock_os_functions() -> Generator[Dict[str, Mock], None, None]:
+def mock_os_functions() -> Generator[dict[str, Mock], None, None]:
     """Create mocks for os module functions."""
     with patch('artisanlib.suppress_errors.os.open') as mock_open, patch(
         'artisanlib.suppress_errors.os.dup'
@@ -39,7 +39,7 @@ def mock_os_functions() -> Generator[Dict[str, Mock], None, None]:
 
 
 @pytest.fixture
-def mock_sys_streams() -> Generator[Dict[str, Mock], None, None]:
+def mock_sys_streams() -> Generator[dict[str, Mock], None, None]:
     """Create mocks for sys.stdout and sys.stderr."""
     with patch('artisanlib.suppress_errors.sys.stdout') as mock_stdout, patch(
         'artisanlib.suppress_errors.sys.stderr'
@@ -54,7 +54,7 @@ def mock_sys_streams() -> Generator[Dict[str, Mock], None, None]:
 class TestSuppressStdoutStderrInitialization:
     """Test suppress_stdout_stderr context manager initialization."""
 
-    def test_successful_initialization(self, mock_os_functions: Dict[str, Mock]) -> None:
+    def test_successful_initialization(self, mock_os_functions: dict[str, Mock]) -> None:
         """Test successful initialization with proper file descriptor setup."""
         # Arrange
         mock_os_functions['open'].side_effect = [10, 11]  # Two null file descriptors
@@ -77,7 +77,7 @@ class TestSuppressStdoutStderrInitialization:
         mock_os_functions['dup'].assert_has_calls([call(1), call(2)])
 
     def test_initialization_with_os_open_exception(
-        self, mock_os_functions: Dict[str, Mock]
+        self, mock_os_functions: dict[str, Mock]
     ) -> None:
         """Test initialization when os.open fails."""
         # Arrange
@@ -94,7 +94,7 @@ class TestSuppressStdoutStderrInitialization:
         mock_os_functions['dup'].assert_not_called()
 
     def test_initialization_with_os_dup_exception_fallback_to_fileno(
-        self, mock_os_functions: Dict[str, Mock], mock_sys_streams: Dict[str, Mock]
+        self, mock_os_functions: dict[str, Mock], mock_sys_streams: dict[str, Mock]
     ) -> None:
         """Test initialization when os.dup fails and falls back to fileno."""
         # Arrange
@@ -112,7 +112,7 @@ class TestSuppressStdoutStderrInitialization:
         assert suppressor.save_fds == []
 
     def test_initialization_with_all_dup_exceptions(
-        self, mock_os_functions: Dict[str, Mock], mock_sys_streams: Dict[str, Mock]
+        self, mock_os_functions: dict[str, Mock], mock_sys_streams: dict[str, Mock]
     ) -> None:
         """Test initialization when all dup operations fail."""
         # Arrange
@@ -132,7 +132,7 @@ class TestSuppressStdoutStderrInitialization:
 class TestSuppressStdoutStderrContextManager:
     """Test suppress_stdout_stderr context manager enter and exit."""
 
-    def test_enter_with_valid_file_descriptors(self, mock_os_functions: Dict[str, Mock]) -> None:
+    def test_enter_with_valid_file_descriptors(self, mock_os_functions: dict[str, Mock]) -> None:
         """Test __enter__ method with valid file descriptors."""
         # Arrange
         mock_os_functions['open'].side_effect = [10, 11]
@@ -165,7 +165,7 @@ class TestSuppressStdoutStderrContextManager:
             # Assert
             mock_dup2.assert_not_called()
 
-    def test_exit_successful_restoration(self, mock_os_functions: Dict[str, Mock]) -> None:
+    def test_exit_successful_restoration(self, mock_os_functions: dict[str, Mock]) -> None:
         """Test __exit__ method with successful restoration."""
         # Arrange
         mock_os_functions['open'].side_effect = [10, 11]
@@ -216,7 +216,7 @@ class TestSuppressStdoutStderrContextManager:
                 [call(10), call(11), call(3), call(4)]  # null_fds  # save_fds
             )
 
-    def test_exit_with_close_exception(self, mock_os_functions: Dict[str, Mock]) -> None:
+    def test_exit_with_close_exception(self, mock_os_functions: dict[str, Mock]) -> None:
         """Test __exit__ method when close operations fail."""
         # Arrange
         mock_os_functions['open'].side_effect = [10, 11]
@@ -258,7 +258,7 @@ class TestSuppressStdoutStderrContextManager:
 class TestSuppressStdoutStderrIntegration:
     """Test suppress_stdout_stderr integration scenarios."""
 
-    def test_context_manager_usage_successful(self, mock_os_functions: Dict[str, Mock]) -> None:
+    def test_context_manager_usage_successful(self, mock_os_functions: dict[str, Mock]) -> None:
         """Test using suppress_stdout_stderr as a context manager successfully."""
         # Arrange
         mock_os_functions['open'].side_effect = [10, 11]
@@ -283,7 +283,7 @@ class TestSuppressStdoutStderrIntegration:
         mock_os_functions['close'].assert_has_calls([call(10), call(11), call(3), call(4)])
 
     def test_context_manager_with_exception_in_block(
-        self, mock_os_functions: Dict[str, Mock]
+        self, mock_os_functions: dict[str, Mock]
     ) -> None:
         """Test context manager when exception occurs in the with block."""
         # Arrange
@@ -314,7 +314,7 @@ class TestSuppressStdoutStderrIntegration:
             mock_dup2.assert_not_called()
             mock_close.assert_not_called()
 
-    def test_multiple_context_manager_instances(self, mock_os_functions: Dict[str, Mock]) -> None:
+    def test_multiple_context_manager_instances(self, mock_os_functions: dict[str, Mock]) -> None:
         """Test multiple instances of the context manager."""
         # Arrange
         mock_os_functions['open'].side_effect = [10, 11, 12, 13]
@@ -333,7 +333,7 @@ class TestSuppressStdoutStderrIntegration:
         assert mock_os_functions['dup'].call_count == 4
         assert mock_os_functions['close'].call_count == 8
 
-    def test_nested_context_managers(self, mock_os_functions: Dict[str, Mock]) -> None:
+    def test_nested_context_managers(self, mock_os_functions: dict[str, Mock]) -> None:
         """Test nested context managers."""
         # Arrange
         mock_os_functions['open'].side_effect = [10, 11, 12, 13]
@@ -352,7 +352,7 @@ class TestSuppressStdoutStderrIntegration:
 class TestSuppressStdoutStderrEdgeCases:
     """Test edge cases and error conditions."""
 
-    def test_partial_initialization_failure(self, mock_os_functions: Dict[str, Mock]) -> None:
+    def test_partial_initialization_failure(self, mock_os_functions: dict[str, Mock]) -> None:
         """Test when only some file descriptors can be opened."""
         # Arrange
         mock_os_functions['open'].side_effect = [10, OSError('Second open fails')]
@@ -364,7 +364,7 @@ class TestSuppressStdoutStderrEdgeCases:
         assert suppressor.null_fds == []
         assert suppressor.save_fds == []
 
-    def test_file_descriptor_values(self, mock_os_functions: Dict[str, Mock]) -> None:
+    def test_file_descriptor_values(self, mock_os_functions: dict[str, Mock]) -> None:
         """Test with various file descriptor values."""
         # Arrange
         mock_os_functions['open'].side_effect = [100, 101]
@@ -377,7 +377,7 @@ class TestSuppressStdoutStderrEdgeCases:
         assert suppressor.null_fds == [100, 101]
         assert suppressor.save_fds == [200, 201]
 
-    def test_exception_parameters_ignored(self, mock_os_functions: Dict[str, Mock]) -> None:
+    def test_exception_parameters_ignored(self, mock_os_functions: dict[str, Mock]) -> None:
         """Test that __exit__ properly ignores exception parameters."""
         # Arrange
         mock_os_functions['open'].side_effect = [10, 11]
@@ -397,7 +397,7 @@ class TestSuppressStdoutStderrRealWorld:
     """Test real-world scenarios and platform-specific behavior."""
 
     def test_windows_compatibility_os_dup_failure(
-        self, mock_os_functions: Dict[str, Mock], mock_sys_streams: Dict[str, Mock]
+        self, mock_os_functions: dict[str, Mock], mock_sys_streams: dict[str, Mock]
     ) -> None:
         """Test Windows compatibility when os.dup fails with WinError 87."""
         # Arrange - Simulate Windows 7 Python 3.7.4 error
@@ -417,7 +417,7 @@ class TestSuppressStdoutStderrRealWorld:
             assert suppressor.null_fds == [10, 11]
             assert suppressor.save_fds == []
 
-    def test_devnull_path_handling(self, mock_os_functions: Dict[str, Mock]) -> None:
+    def test_devnull_path_handling(self, mock_os_functions: dict[str, Mock]) -> None:
         """Test proper handling of os.devnull path."""
         # Arrange
         mock_os_functions['open'].side_effect = [10, 11]
@@ -431,7 +431,7 @@ class TestSuppressStdoutStderrRealWorld:
             [call('/dev/null', os.O_RDWR), call('/dev/null', os.O_RDWR)]
         )
 
-    def test_file_descriptor_cleanup_robustness(self, mock_os_functions: Dict[str, Mock]) -> None:
+    def test_file_descriptor_cleanup_robustness(self, mock_os_functions: dict[str, Mock]) -> None:
         """Test robust file descriptor cleanup even with partial failures."""
         # Arrange
         mock_os_functions['open'].side_effect = [10, 11]
@@ -454,7 +454,7 @@ class TestSuppressStdoutStderrRealWorld:
         # Assert - All close calls should be attempted
         mock_os_functions['close'].assert_has_calls([call(10), call(11), call(3), call(4)])
 
-    def test_stdout_stderr_suppression_behavior(self, mock_os_functions: Dict[str, Mock]) -> None:
+    def test_stdout_stderr_suppression_behavior(self, mock_os_functions: dict[str, Mock]) -> None:
         """Test that stdout and stderr are properly redirected during suppression."""
         # Arrange
         mock_os_functions['open'].side_effect = [10, 11]
@@ -482,7 +482,7 @@ class TestSuppressStdoutStderrRealWorld:
         ]
         mock_os_functions['dup2'].assert_has_calls(expected_calls)
 
-    def test_exception_propagation(self, mock_os_functions: Dict[str, Mock]) -> None:
+    def test_exception_propagation(self, mock_os_functions: dict[str, Mock]) -> None:
         """Test that exceptions from the with block are properly propagated."""
         # Arrange
         mock_os_functions['open'].side_effect = [10, 11]
@@ -495,7 +495,7 @@ class TestSuppressStdoutStderrRealWorld:
         # Verify cleanup occurred despite exception
         mock_os_functions['close'].assert_has_calls([call(10), call(11), call(3), call(4)])
 
-    def test_concurrent_usage_simulation(self, mock_os_functions: Dict[str, Mock]) -> None:
+    def test_concurrent_usage_simulation(self, mock_os_functions: dict[str, Mock]) -> None:
         """Test simulation of concurrent usage with different file descriptors."""
         # Arrange - Simulate different file descriptors for concurrent instances
         mock_os_functions['open'].side_effect = [10, 11, 20, 21, 30, 31]
@@ -517,7 +517,7 @@ class TestSuppressStdoutStderrRealWorld:
         assert suppressor3.save_fds == [7, 8]
 
     def test_resource_cleanup_on_initialization_failure(
-        self, mock_os_functions: Dict[str, Mock]
+        self, mock_os_functions: dict[str, Mock]
     ) -> None:
         """Test that resources are properly cleaned up when initialization fails."""
         # Arrange - First open succeeds, second fails
@@ -533,7 +533,7 @@ class TestSuppressStdoutStderrRealWorld:
         # Verify no cleanup calls since initialization failed
         mock_os_functions['close'].assert_not_called()
 
-    def test_context_manager_protocol_compliance(self, mock_os_functions: Dict[str, Mock]) -> None:
+    def test_context_manager_protocol_compliance(self, mock_os_functions: dict[str, Mock]) -> None:
         """Test that the context manager properly implements the protocol."""
         # Arrange
         mock_os_functions['open'].side_effect = [10, 11]
@@ -551,7 +551,7 @@ class TestSuppressStdoutStderrRealWorld:
         # Test __exit__ returns None (doesn't suppress exceptions)
         suppressor.__exit__(None, None, None)
 
-    def test_file_descriptor_range_handling(self, mock_os_functions: Dict[str, Mock]) -> None:
+    def test_file_descriptor_range_handling(self, mock_os_functions: dict[str, Mock]) -> None:
         """Test handling of various file descriptor ranges."""
         # Arrange - Test with high file descriptor numbers
         mock_os_functions['open'].side_effect = [1000, 1001]
@@ -578,7 +578,7 @@ class TestSuppressStdoutStderrRealWorld:
             ]
         )
 
-    def test_os_module_constants_usage(self, mock_os_functions: Dict[str, Mock]) -> None:
+    def test_os_module_constants_usage(self, mock_os_functions: dict[str, Mock]) -> None:
         """Test proper usage of os module constants."""
         # Arrange
         mock_os_functions['open'].side_effect = [10, 11]
@@ -592,7 +592,7 @@ class TestSuppressStdoutStderrRealWorld:
             [call('/dev/null', os.O_RDWR), call('/dev/null', os.O_RDWR)]
         )
 
-    def test_type_annotations_compliance(self, mock_os_functions: Dict[str, Mock]) -> None:
+    def test_type_annotations_compliance(self, mock_os_functions: dict[str, Mock]) -> None:
         """Test that the implementation complies with type annotations."""
         # Arrange
         mock_os_functions['open'].side_effect = [10, 11]

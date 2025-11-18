@@ -29,93 +29,52 @@
 setuptools==70.3.0 # py2app fails on 71.0.3 and 71.0.4; pyinstaller windows/linux fails on 71.0.0 <= < 71.0.3
 wheel==0.45.1
 pyserial==3.5
-pymodbus==3.6.9; python_version < '3.9' # last Python 3.8 release
-pymodbus==3.11.3; python_version >= '3.9'
-python-snap7==1.3; python_version < '3.10' # last Python 3.9 release
-python-snap7==2.0.2; python_version >= '3.10'
+pymodbus==3.11.3
+python-snap7==2.0.2
 Phidget22==1.23.20251006
 Unidecode==1.4.0
-qrcode==7.4.2; python_version < '3.9' # last Python 3.8 release
-qrcode==8.2; python_version >= '3.9'
-requests==2.32.4; python_version < '3.9' # last Python 3.8 release
-requests==2.32.5; python_version >= '3.9'
+qrcode==8.2
+requests==2.32.5
 requests-file==3.0.1
-pyusb==1.2.1; python_version < '3.9' # last Python 3.8 release
-pyusb==1.3.1; python_version >= '3.9'
+pyusb==1.3.1
 persist-queue==1.1.0
-portalocker==2.10.1;  python_version < '3.9' # last Python 3.8 release
-portalocker==3.2.0; python_version >= '3.9'
+portalocker==3.2.0
 xlrd==2.0.2
-websockets==13.1;  python_version < '3.9' # last Python 3.8 release
-websockets==15.0.1; python_version >= '3.9'
+websockets==15.0.1
 PyYAML==6.0.3
 psutil==7.1.3
-typing-extensions==4.10.0; python_version < '3.8' # required for supporting Final and TypeDict on Python <3.8
-protobuf==5.29.3; python_version < '3.9' # last Python 3.8 release
-protobuf==6.33.0; python_version >= '3.9'
-numpy==1.24.3; python_version < '3.9' # last Python 3.8 release
-numpy==2.3.4; python_version >= '3.9'
-scipy==1.10.1; python_version < '3.9' # last Python 3.8 release
-scipy==1.15.3; python_version >= '3.9' and sys_platform=='darwin' and platform_release<'20.0' # last version supporting macOS 10.13
-scipy==1.16.3; python_version >= '3.9' and sys_platform!='darwin' or (sys_platform=='darwin' and platform_release>='20.0')
+protobuf==6.33.0
+numpy==2.3.4
+scipy==1.16.3
 wquantiles==0.6
 colorspacious==1.1.2
 openpyxl==3.1.5
-keyring==25.5.0; python_version < '3.9' # last Python 3.8 release
-keyring==25.6.0; python_version >= '3.9'
-prettytable==3.11.0; python_version < '3.9' # last Python 3.8 release
-prettytable==3.16.0; python_version >= '3.9'
+keyring==25.7.0
+prettytable==3.17.0
 lxml==6.0.2
-matplotlib==3.7.3; python_version < '3.9' # last Python 3.8 release
-matplotlib==3.10.7; python_version >= '3.9' # matplotlib 3.10.5 doesn't show HiDPI support
+matplotlib==3.10.7
 jinja2==3.1.6
-aiohttp==3.10.11; python_version < '3.9' # last Python 3.8 release
-aiohttp==3.13.2; python_version >= '3.9'
+aiohttp==3.13.2
 aiohttp_jinja2==1.6
-python-bidi==0.4.2; python_version < '3.9' # last Python 3.8 release
-python-bidi==0.6.6; python_version == '3.9' # last Python 3.9 release
-python-bidi==0.6.7; python_version > '3.9' # first Python 3.14 release
+python-bidi==0.6.7
 arabic-reshaper==3.0.0
-pillow==10.4.0; python_version < '3.9' # last Python 3.8 release
-pillow==11.3.0; python_version == '3.10'
-pillow==12.0.0; python_version >= '3.10'
-pydantic==2.12.4; (platform_system=='Windows' and python_version>'3.10') or sys_platform=='darwin' or platform_system=='Linux'
-pydantic==2.7.1; (platform_system=='Windows' and python_version<'3.9')  # last version working with Windows 7/8 pending resolution of pydantic Issue #9920
+pillow==12.0.0
+pydantic==2.12.4
 babel==2.17.0
-bleak==0.22.3; python_version < '3.9' # last Python 3.8 release
-bleak==1.1.1; python_version >= '3.9'
+bleak==1.1.1
 python-statemachine==2.5.0
+yoctopuce==2.1.6320
+PyQt6==6.10.0
+PyQt6-WebEngine==6.10.0
+qt6-tools==6.5.0.1.3
 #
 #
 ######
 # packages that differ per platform
 #
-### yoctopuce 1.10.42060 on macOS 10.13
-yoctopuce==1.10.42060; sys_platform=='darwin' and platform_release<'20.0' # last version supporting macOS 10.13
-yoctopuce==2.1.6320; sys_platform!='darwin' or (sys_platform=='darwin' and platform_release>='20.0')
-# last 1.x yoctopuce lib: 1.10.57762
-# 2.0.59414 is no longer universal2 lacking arm64 support; 2.0.59503 should fix this
-##
-## Qt 5.15.x supports macOS 10.13 (Darwin 17.x) and higher as well as Windows 7/8
-## Qt 6.4.x supports macOS 10.15 (Darwin 19.x) and higher as well as Windows 10/11
-## Qt 6.6.x supports macOS 11 (Darwin 20.x) and higher as well as Windows 10/11
-##
-## Qt5 on macOS <11 and Windows 7/8 (PyQt5.15.10 is the last version supported on macOS 10.13!)
-PyQt5-sip==12.15.0; (sys_platform=='darwin' and platform_release<'20.0') or (platform_system=='Windows' and python_version<'3.9') # last version running on Py3.8; v12.16 and later requires Python 3.9 or later
-PyQt5==5.15.10; (sys_platform=='darwin' and platform_release<'20.0') # PyQt5 5.15.11 only for macOS 11+
-PyQt5==5.15.11; (platform_system=='Windows' and python_version<'3.9')
-PyQtWebEngine==5.15.6; (sys_platform=='darwin' and platform_release<'20.0') # PyQtWebEngine 5.15.7 only for macOS 11+
-PyQtWebEngine==5.15.7; (platform_system=='Windows' and python_version<'3.9')
-# Qt6 on macOS 11+, Windows 10/11 and Linux
-PyQt6==6.10.0; (sys_platform=='darwin' and platform_release>='20.0') or (platform_system=='Windows' and python_version>'3.10') or (platform_system=='Linux' and platform_machine!='aarch64')
-PyQt6-WebEngine==6.10.0; (sys_platform=='darwin' and platform_release>='20.0') or (platform_system=='Windows' and python_version>'3.10') or (platform_system=='Linux' and platform_machine!='aarch64')
 ###
 pyinstaller==6.16.0; platform_system=='Linux' # on Windows pyinstaller is separately installed (see above)
-###
-### Qt build tools not part of PyQt but required by build-derived
-qt5-tools==5.15.2.1.3; (platform_system=='Windows' and python_version<'3.9')
-qt6-tools==6.5.0.1.3; (sys_platform=='darwin' and platform_release>='20.0') or (platform_system=='Windows' and python_version>'3.10') or (platform_system=='Linux' and platform_machine!='aarch64')
-###
+#
 ########
 ### macOS specific packages
 ###
@@ -125,7 +84,6 @@ pyobjc-framework-Cocoa==12.0; sys_platform=='darwin'
 pyobjc-framework-CoreBluetooth==12.0; sys_platform=='darwin'
 pyobjc-framework-libdispatch==12.0; sys_platform=='darwin'
 py2app==0.28.8; sys_platform=='darwin'
-#py-cpuinfo==9.0.0; sys_platform=='darwin' # used for proper CPU arch detection running under Rosetta2
 darkdetect==0.8.0; sys_platform=='darwin' and platform_release<'20.0' # detect if dark mode is active (only used by macOS legacy builds)
 ###
 ########
@@ -140,10 +98,8 @@ SecretStorage==3.4.0; platform_system=='Linux'
 ########
 ### Windows specific packages
 ###
-build==1.2.2.post1; (platform_system=='Windows' and python_version < '3.9')  # required to build pyinstaller bootloader (last version supporting python 3.8
-build==1.3.0; (platform_system=='Windows' and python_version >= '3.9')
+build==1.3.0; platform_system=='Windows'
 pywin32==311; platform_system=='Windows'
-pyinstaller-versionfile==2.1.1; platform_system=='Windows' and python_version < '3.9'
-pyinstaller-versionfile==3.0.1; platform_system=='Windows' and python_version >= '3.9'
+pyinstaller-versionfile==3.0.1; platform_system=='Windows'
 libusb-package==1.0.26.3; platform_system=='Windows'
-tzdata==2025.2; platform_system=='Windows' and python_version >= '3.9' # to prevent pyinstaller WARNING: Hidden import "tzdata" not found!
+tzdata==2025.2; platform_system=='Windows' # to prevent pyinstaller WARNING: Hidden import "tzdata" not found!

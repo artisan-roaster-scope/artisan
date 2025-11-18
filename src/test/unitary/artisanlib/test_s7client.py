@@ -98,7 +98,8 @@ cross-file contamination.
 =============================================================================
 """
 
-from typing import Any, Generator, List, Tuple
+from collections.abc import Generator
+from typing import Any
 from unittest.mock import Mock, patch
 
 import pytest
@@ -431,7 +432,7 @@ class TestS7ClientIntegration:
     #        client = S7Client()
     #
     #        # Test with different attribute types
-    #        test_cases: List[Union[Mock, str, int, List[Any], dict[str, Any], bool]] = [
+    #        test_cases: list[Union[Mock, str, int, list[Any], dict[str, Any], bool]] = [
     #            Mock(),  # Mock object
     #            "library_string",  # String
     #            123,  # Integer
@@ -542,7 +543,7 @@ class TestS7ClientIntegration:
             client = S7Client()
 
             # Test various edge cases
-            test_cases: List[Tuple[Any, bool]] = [
+            test_cases: list[tuple[Any, bool]] = [
                 (None, True),  # None value
                 (False, True),  # False value
                 (0, True),  # Zero value

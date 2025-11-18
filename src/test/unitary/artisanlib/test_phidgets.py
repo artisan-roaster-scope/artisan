@@ -13,7 +13,8 @@ This module tests the PhidgetManager class functionality including:
 - Error handling and exception management
 """
 
-from typing import Any, Dict, Generator
+from collections.abc import Generator
+from typing import Any
 from unittest.mock import Mock, patch
 
 import pytest
@@ -121,7 +122,7 @@ def phidget_manager_instance(
 
 
 @pytest.fixture
-def isolated_phidget_channels() -> Dict[Any, Any]:
+def isolated_phidget_channels() -> dict[Any, Any]:
     """Provide an isolated dictionary for phidget channels for each test."""
     return {}
 
@@ -148,7 +149,7 @@ class TestPhidgetManagerInitialization:
     ) -> None:
         """Test PhidgetManager close method."""
         # Arrange
-        phidget_manager_instance.attachedPhidgetChannels = {'test': True} # pyrefly: ignore
+        phidget_manager_instance.attachedPhidgetChannels = {'test': True} # ty: ignore
 
         # Act
         phidget_manager_instance.close()

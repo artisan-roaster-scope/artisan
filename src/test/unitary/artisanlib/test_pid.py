@@ -63,7 +63,8 @@ modules with Qt dependencies and complex numerical library interactions.
 
 import math
 import sys
-from typing import Any, Generator, List
+from collections.abc import Generator
+from typing import Any
 from unittest.mock import MagicMock, Mock, patch
 
 import pytest
@@ -767,7 +768,7 @@ class TestPIDControlLoop:
         ki: float,
         kd: float,
         target: float,
-        inputs: List[float],
+        inputs: list[float],
         expected_trend: str,
     ) -> None:
         """Test PID control behavior patterns with different parameter combinations."""

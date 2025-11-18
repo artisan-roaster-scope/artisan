@@ -26,16 +26,13 @@ import socket
 
 from contextlib import suppress
 from threading import Thread
-from typing import Final, Optional, Union, Any, Set, Dict, List, TYPE_CHECKING
+from typing import Final, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
     from websockets.asyncio.client import ClientConnection # pylint: disable=unused-import
 
-try:
-    from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
-except ImportError:
-    from PyQt5.QtWidgets import QApplication # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+from PyQt6.QtWidgets import QApplication
 
 from artisanlib import __version__
 
@@ -54,9 +51,9 @@ class wsport:
         self.aw = aw
 
         # internals
-        self._loop:        Optional[asyncio.AbstractEventLoop] = None # the asyncio loop
-        self._thread:      Optional[Thread]                    = None # the thread running the asyncio loop
-        self._write_queue: Optional[asyncio.Queue[str]]        = None # the write queue
+        self._loop:        asyncio.AbstractEventLoop | None = None # the asyncio loop
+        self._thread:      Thread | None                    = None # the thread running the asyncio loop
+        self._write_queue: asyncio.Queue[str] | None        = None # the write queue
 
         # connects to "ws://<host>:<port>/<path>"
         self.default_host:Final[str] = '127.0.0.1'
@@ -66,25 +63,25 @@ class wsport:
         self.machineID:int = 0
         self.compression:bool = True # activatesd/deactivates 'deflate' compression
 
-        self.lastReadResult:Optional[Dict[str,Any]] = None # this is set by eventaction following some custom button/slider Modbus actions with "read" command
+        self.lastReadResult:dict[str,Any] | None = None # this is set by eventaction following some custom button/slider Modbus actions with "read" command
 
         self.channels:Final[int] = 10 # maximal number of WebSocket channels
 
         # WebSocket data
         self.tx:float = 0 # timestamp as epoch of last read
-        self.readings:List[float] = [-1.0]*self.channels
+        self.readings:list[float] = [-1.0]*self.channels
 
-        self.channel_requests:List[str] = ['']*self.channels
-        self.channel_nodes:List[str] = ['']*self.channels
-        self.channel_modes:List[int] = [0]*self.channels # temp mode is an int here, 0:__,1:C,2:F
+        self.channel_requests:list[str] = ['']*self.channels
+        self.channel_nodes:list[str] = ['']*self.channels
+        self.channel_modes:list[int] = [0]*self.channels # temp mode is an int here, 0:__,1:C,2:F
 
         # configurable via the UI:
         self.connect_timeout:float = 4      # in seconds (websockets default is 10)
         self.request_timeout:float = 0.5    # in seconds
         self.reconnect_interval:float = 0.2 # in seconds # not used for now (reconnect delay)
         # not configurable via the UI:
-        self._ping_interval:Optional[float] = 20     # in seconds; None disables keepalive (default is 20)
-        self._ping_timeout:Optional[float] = 20      # in seconds; None disables timeouts (default is 20)
+        self._ping_interval:float|None = 20     # in seconds; None disables keepalive (default is 20)
+        self._ping_timeout:float|None = 20      # in seconds; None disables timeouts (default is 20)
 
         # JSON nodes
         self.id_node:str = 'id'
@@ -112,8 +109,8 @@ class wsport:
         self.STARTonCHARGE:bool = False
         self.OFFonDROP:bool = False
 
-        self.open_event:Optional[asyncio.Event] = None # an event set on connecting
-        self.pending_events:Dict[int, Union[asyncio.Event, Dict[str,Any]]] = {} # message ids associated with pending asyncio.Event object or result
+        self.open_event:asyncio.Event | None = None # an event set on connecting
+        self.pending_events:dict[int, asyncio.Event | dict[str,Any]] = {} # message ids associated with pending asyncio.Event object or result
 
 
     # request event handling
@@ -127,7 +124,7 @@ class wsport:
         del self.pending_events[message_id]
 
     # replace the request event by its result
-    async def setRequestResponse(self, message_id:int, v:Dict[str, Any]) -> None:
+    async def setRequestResponse(self, message_id:int, v:dict[str, Any]) -> None:
         if message_id in self.pending_events:
             pe = self.pending_events[message_id]
             if isinstance(pe, asyncio.Event):
@@ -136,7 +133,7 @@ class wsport:
                 self.pending_events[message_id] = v
 
     # returns the response received for request with id or None
-    def getRequestResponse(self, message_id:int) -> Optional[Dict[str,Any]]:
+    def getRequestResponse(self, message_id:int) -> dict[str,Any] | None:
         if message_id in self.pending_events:
             v = self.pending_events[message_id]
             del self.pending_events[message_id]
@@ -145,7 +142,7 @@ class wsport:
         return None
 
 
-    async def producer(self) -> Optional[str]:
+    async def producer(self) -> str | None:
         if self._write_queue is None:
             return None
         return await self._write_queue.get()
@@ -280,8 +277,8 @@ class wsport:
                         compression = ('deflate' if self.compression else None),
                         origin = websockets.Origin(f'http://{socket.gethostname()}'),
                         user_agent_header = f'Artisan/{__version__} websockets'):
-                    done: Set[asyncio.Task[Any]] = set()
-                    pending: Set[asyncio.Task[Any]] = set()
+                    done: set[asyncio.Task[Any]] = set()
+                    pending: set[asyncio.Task[Any]] = set()
                     try:
                         self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('WebSocket'),True,None)
                         if self._write_queue is None:
@@ -314,7 +311,7 @@ class wsport:
                     _log.debug('reconnecting')
                     self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('WebSocket'),True,None)
                     await asyncio.sleep(0.1)
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 _log.info('connection timeout')
             except Exception as e: # pylint: disable=broad-except
                 _log.error(e)
@@ -366,7 +363,7 @@ class wsport:
 #    # takes a request as dict to be send as JSON
 #    # and returns a dict generated from the JSON response
 #    # or None on exception or if block=False
-    def send(self, request:Dict[str,Any], block:bool = True) -> Optional[Dict[str,Any]]:
+    def send(self, request:dict[str,Any], block:bool = True) -> dict[str,Any] | None:
         try:
             if self._loop is None:
                 self.start()

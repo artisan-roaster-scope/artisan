@@ -4,12 +4,13 @@
 # Ensure proper module isolation to prevent cross-file contamination
 
 import sys
-from typing import Any, Dict, Generator, List, Set, Tuple
+from collections.abc import Generator
+from typing import Any
 from unittest.mock import Mock, patch
 
 # Store original modules before any mocking to enable restoration
-original_modules: Dict[str, Any] = {}
-original_functions: Dict[str, Any] = {}
+original_modules: dict[str, Any] = {}
+original_functions: dict[str, Any] = {}
 modules_to_isolate = ['PyQt6.QtWidgets', 'PyQt5.QtWidgets', 'plus.countries']
 
 # Store original modules if they exist
@@ -274,7 +275,7 @@ class TestCountriesTranslationCalls:
     def test_basic_country_translations(self) -> None:
         """Test basic country name translations."""
         # Arrange
-        expected_countries: List[str] = [
+        expected_countries: list[str] = [
             'Afghanistan',
             'Albania',
             'Algeria',
@@ -302,7 +303,7 @@ class TestCountriesTranslationCalls:
     def test_special_country_names_translation(self) -> None:
         """Test special country names with complex formatting."""
         # Arrange
-        special_countries: List[str] = [
+        special_countries: list[str] = [
             'Bonaire, Sint Eustatius and Saba',
             'Bosnia and Herzegovina',
             'British Indian Ocean Territory',
@@ -336,7 +337,7 @@ class TestCountriesTranslationCalls:
     def test_island_territories_translation(self) -> None:
         """Test island territories and special regions translation."""
         # Arrange
-        island_territories: List[str] = [
+        island_territories: list[str] = [
             'Aland Islands',
             'American Samoa',
             'Anguilla',
@@ -408,7 +409,7 @@ class TestCountriesTranslationCalls:
     def test_african_countries_translation(self) -> None:
         """Test African countries translation."""
         # Arrange
-        african_countries: List[str] = [
+        african_countries: list[str] = [
             'Algeria',
             'Angola',
             'Benin',
@@ -480,7 +481,7 @@ class TestCountriesTranslationCalls:
     def test_asian_countries_translation(self) -> None:
         """Test Asian countries translation."""
         # Arrange
-        asian_countries: List[str] = [
+        asian_countries: list[str] = [
             'Afghanistan',
             'Armenia',
             'Azerbaijan',
@@ -545,7 +546,7 @@ class TestCountriesTranslationCalls:
     def test_european_countries_translation(self) -> None:
         """Test European countries translation."""
         # Arrange
-        european_countries: List[str] = [
+        european_countries: list[str] = [
             'Albania',
             'Andorra',
             'Austria',
@@ -609,7 +610,7 @@ class TestCountriesTranslationCalls:
     def test_american_countries_translation(self) -> None:
         """Test American countries translation."""
         # Arrange
-        american_countries: List[str] = [
+        american_countries: list[str] = [
             'Antigua and Barbuda',
             'Argentina',
             'Bahamas',
@@ -667,7 +668,7 @@ class TestCountriesTranslationCalls:
     def test_oceania_countries_translation(self) -> None:
         """Test Oceania countries translation."""
         # Arrange
-        oceania_countries: List[str] = [
+        oceania_countries: list[str] = [
             'Australia',
             'Fiji',
             'Kiribati',
@@ -706,7 +707,7 @@ class TestCountriesSpecialCases:
     def test_countries_with_abbreviations(self) -> None:
         """Test countries with common abbreviations."""
         # Arrange
-        abbreviations: List[str] = [
+        abbreviations: list[str] = [
             'ANI',  # Andaman and Nicobar Islands
             'UK',  # United Kingdom
             'USA',  # United States of America
@@ -728,7 +729,7 @@ class TestCountriesSpecialCases:
     def test_countries_with_alternative_names(self) -> None:
         """Test countries with alternative name variations."""
         # Arrange
-        alternative_names: List[Tuple[str, str]] = [
+        alternative_names: list[tuple[str, str]] = [
             ('St. Helena', 'Saint Helena'),
             ('St. Lucia', 'Saint Lucia'),
             ('St. Vincent', 'Saint Vincent'),
@@ -756,7 +757,7 @@ class TestCountriesSpecialCases:
     def test_countries_with_special_characters_excluded(self) -> None:
         """Test that countries with accent characters are excluded from translations."""
         # Arrange - These countries are commented out in the source due to accent character issues
-        excluded_countries: List[str] = [
+        excluded_countries: list[str] = [
             'Curaçao',
             'Galápagos',
             'Saint Barthélemy',
@@ -777,7 +778,7 @@ class TestCountriesSpecialCases:
     def test_translation_context_consistency(self) -> None:
         """Test that all translations use the 'Countries' context consistently."""
         # Arrange
-        sample_countries: List[str] = [
+        sample_countries: list[str] = [
             'Afghanistan',
             'Brazil',
             'Canada',
@@ -873,8 +874,8 @@ class TestCountriesSpecialCases:
             ]
 
             # Find duplicates
-            seen: Set[str] = set()
-            duplicates: Set[str] = set()
+            seen: set[str] = set()
+            duplicates: set[str] = set()
             for line in translate_lines:
                 if line in seen:
                     duplicates.add(line)
@@ -893,10 +894,10 @@ class TestCountriesModuleStructure:
         import plus.countries
 
         # Assert - Module should not define any functions or classes
-        module_attrs: List[str] = [attr for attr in dir(plus.countries) if not attr.startswith('_')]
+        module_attrs: list[str] = [attr for attr in dir(plus.countries) if not attr.startswith('_')]
 
         # Filter out imported items (QApplication)
-        defined_attrs: List[str] = []
+        defined_attrs: list[str] = []
         for attr in module_attrs:
             obj: Any = getattr(plus.countries, attr)
             if hasattr(obj, '__module__') and obj.__module__ == 'plus.countries':

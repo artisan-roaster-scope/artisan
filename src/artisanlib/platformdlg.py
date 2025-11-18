@@ -24,10 +24,7 @@ from artisanlib import __revision__
 
 from artisanlib.dialogs import ArtisanDialog
 
-try:
-    from PyQt6.QtWidgets import QApplication, QVBoxLayout, QTextEdit # @UnusedImport @Reimport  @UnresolvedImport
-except ImportError:
-    from PyQt5.QtWidgets import QApplication, QVBoxLayout, QTextEdit # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+from PyQt6.QtWidgets import QApplication, QVBoxLayout, QTextEdit
 
 
 if TYPE_CHECKING:

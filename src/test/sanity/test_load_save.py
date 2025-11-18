@@ -1,6 +1,6 @@
 from pathlib import Path
 from json import load as json_load
-from typing import Tuple, Dict, Union, Optional, List, TypedDict, cast, Any, TYPE_CHECKING
+from typing import TypedDict, cast, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from _pytest.python_api import ApproxScalar
@@ -67,7 +67,7 @@ values_to_ignore = [
 class ApproxBaseReprMixin(ApproxBase):
     def __repr__(self) -> str:
 
-        def recur_repr_helper(obj:Any) -> Union[Dict[Any,Any], Tuple[Any,...], List[Any], ApproxScalar]:
+        def recur_repr_helper(obj:Any) -> dict[Any,Any]|tuple[Any,...]|list[Any]|ApproxScalar:
             if isinstance(obj, dict):
                 return {k : recur_repr_helper(v) for k, v in obj.items()}
             if isinstance(obj, tuple):
@@ -82,7 +82,7 @@ class ApproxBaseReprMixin(ApproxBase):
 class ApproxNestedSequenceLike(ApproxSequenceLike, ApproxBaseReprMixin):
 
     def _yield_comparisons(self, actual:Any) -> Any:
-        mapping: Union[ApproxNestedMapping, ApproxNestedSequenceLike]
+        mapping: ApproxNestedMapping|ApproxNestedSequenceLike
         for k in range(len(self.expected)):
             if isinstance(self.expected[k], dict):
                 mapping = ApproxNestedMapping(self.expected[k], rel=self.rel, abs=self.abs, nan_ok=self.nan_ok)
@@ -101,7 +101,7 @@ class ApproxNestedSequenceLike(ApproxSequenceLike, ApproxBaseReprMixin):
 class ApproxNestedMapping(ApproxMapping, ApproxBaseReprMixin):
 
     def _yield_comparisons(self, actual:Any) -> Any:
-        mapping: Union[ApproxNestedMapping, ApproxNestedSequenceLike]
+        mapping: ApproxNestedMapping|ApproxNestedSequenceLike
         for k in self.expected:
             if isinstance(self.expected[k], dict):
                 mapping = ApproxNestedMapping(self.expected[k], rel=self.rel, abs=self.abs, nan_ok=self.nan_ok)
@@ -116,7 +116,7 @@ class ApproxNestedMapping(ApproxMapping, ApproxBaseReprMixin):
         pass
 
 
-def nested_approx(expected:Any, rel:Optional[float]=None, absv:Optional[float]=None, nan_ok:bool=False) -> ApproxBase:
+def nested_approx(expected:Any, rel:float|None=None, absv:float|None=None, nan_ok:bool=False) -> ApproxBase:
     if isinstance(expected, dict):
         return ApproxNestedMapping(expected, rel, absv, nan_ok)
     if isinstance(expected, (tuple, list)):
@@ -133,8 +133,8 @@ def pytest_generate_tests(metafunc:'Metafunc') -> None:
     data_dir = (this_directory / 'data')
     profiles_dir = (data_dir / 'artisan')
 
-    def get_file_data(ext:str) -> List[FileData]:
-        files_data:List[FileData] = []
+    def get_file_data(ext:str) -> list[FileData]:
+        files_data:list[FileData] = []
         for filename in [f.stem for f in profiles_dir.iterdir() if f.is_file() and f.suffix == ext]:
             # we found the filename again matching the second suffix, add it to the results
             profile_data:FileData = {

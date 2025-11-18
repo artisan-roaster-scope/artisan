@@ -86,10 +86,7 @@ sys.dont_write_bytecode = True  #prevents __pycache__ folder written to help/
 from typing import List, Tuple
 from openpyxl.worksheet.worksheet import Worksheet # pylint: disable=unused-import
 
-try:
-    from PyQt6.QtWidgets import QApplication  # pylint: disable=unused-import
-except ImportError:
-    from PyQt5.QtWidgets import QApplication # type: ignore # noqa: F401  # pylint: disable=unused-import
+from PyQt6.QtWidgets import QApplication
 from openpyxl import load_workbook
 
 
@@ -186,10 +183,7 @@ def buildpyCode(filename_in:str) -> str:
     # wrap the output with python code to allow it to execute
     outstr += '\n' + 'import prettytable'
     outstr += '\n' + 'import re'
-    outstr += '\n' + 'try:'
-    outstr += '\n' + '    from PyQt6.QtWidgets import QApplication # @Reimport @UnresolvedImport @UnusedImport # pylint: disable=import-error'
-    outstr += '\n' + 'except Exception: # pylint: disable=broad-except'
-    outstr += '\n' + '    from PyQt5.QtWidgets import QApplication # type: ignore # @Reimport @UnresolvedImport @UnusedImport'
+    outstr += '\n' + 'from PyQt6.QtWidgets import QApplication'
     outstr += '\n'
     outstr += '\ndef content() -> str:'
     outstr += nlind + 'strlist = []'

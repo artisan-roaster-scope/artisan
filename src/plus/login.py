@@ -21,42 +21,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-try:
-    #pylint: disable = E, W, R, C
-    from PyQt6.QtWidgets import (
-        QApplication, # @UnusedImport @Reimport  @UnresolvedImport
-        QCheckBox, # @UnusedImport @Reimport  @UnresolvedImport
-        QGroupBox, # @UnusedImport @Reimport  @UnresolvedImport
-        QHBoxLayout, # @UnusedImport @Reimport  @UnresolvedImport
-        QVBoxLayout, # @UnusedImport @Reimport  @UnresolvedImport
-        QLabel, # @UnusedImport @Reimport  @UnresolvedImport
-        QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
-        QDialogButtonBox, # @UnusedImport @Reimport  @UnresolvedImport
-        QWidget # @UnusedImport @Reimport  @UnresolvedImport
-    )
-    from PyQt6.QtCore import Qt, pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtGui import QKeySequence, QAction # @UnusedImport @Reimport  @UnresolvedImport
-except Exception: # pylint: disable=broad-except
-    #pylint: disable = E, W, R, C
-    from PyQt5.QtWidgets import ( # type: ignore
-        QApplication, # @UnusedImport @Reimport  @UnresolvedImport
-        QCheckBox, # @UnusedImport @Reimport  @UnresolvedImport
-        QGroupBox, # @UnusedImport @Reimport  @UnresolvedImport
-        QHBoxLayout, # @UnusedImport @Reimport  @UnresolvedImport
-        QVBoxLayout, # @UnusedImport @Reimport  @UnresolvedImport
-        QLabel, # @UnusedImport @Reimport  @UnresolvedImport
-        QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
-        QDialogButtonBox, # @UnusedImport @Reimport  @UnresolvedImport
-        QAction, # @UnusedImport @Reimport  @UnresolvedImport
-        QWidget # @UnusedImport @Reimport  @UnresolvedImport
-    )
-    from PyQt5.QtCore import Qt, pyqtSlot # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtGui import QKeySequence # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+#pylint: disable = E, W, R, C
+from PyQt6.QtWidgets import (QApplication, QCheckBox, QGroupBox, QHBoxLayout,
+    QVBoxLayout, QLabel, QLineEdit, QDialogButtonBox, QWidget)
+from PyQt6.QtCore import Qt, pyqtSlot
+from PyQt6.QtGui import QKeySequence, QAction
 
 import logging
 from artisanlib.dialogs import ArtisanDialog
 from plus import config
-from typing import Final, Optional, Tuple, TYPE_CHECKING
+from typing import Final, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
@@ -72,22 +46,22 @@ class Login(ArtisanDialog):
         self,
         parent:QWidget,
         aw:'ApplicationWindow',
-        email:Optional[str] = None,
-        saved_password:Optional[str] = None,
+        email:str|None = None,
+        saved_password:str|None = None,
         remember_credentials: bool = True,
     ) -> None:
         super().__init__(parent,aw)
 
-        self.login:Optional[str] = None
-        self.passwd:Optional[str] = None
+        self.login:str|None = None
+        self.passwd:str|None = None
         self.remember:bool = remember_credentials
 
         self.linkRegister = QLabel(
-            f'<small><a href="{config.register_url}">{QApplication.translate("Plus", "Register")}</a></small>'
+            f'<small><a href="{config.register_url}">{QApplication.translate('Plus', 'Register')}</a></small>'
         )
         self.linkRegister.setOpenExternalLinks(True)
         self.linkResetPassword = QLabel(
-            f'<small><a href="{config.reset_passwd_url}">{QApplication.translate("Plus", "Reset Password")}</a></small>'
+            f'<small><a href="{config.reset_passwd_url}">{QApplication.translate('Plus', 'Reset Password')}</a></small>'
         )
         self.linkResetPassword.setOpenExternalLinks(True)
 
@@ -230,15 +204,15 @@ class Login(ArtisanDialog):
 def plus_login(
     window: QWidget,
     aw: 'ApplicationWindow',
-    email: Optional[str] = None,
-    saved_password: Optional[str] = None,
+    email: str|None = None,
+    saved_password: str|None = None,
     remember_credentials: bool = True
-) -> Tuple[Optional[str], Optional[str], bool, int]:
+) -> tuple[str|None, str|None, bool, int]:
     _log.debug('plus_login()')
     ld = Login(window, aw, email, saved_password, remember_credentials)
     ld.setWindowTitle('plus')
     ld.setWindowFlags(Qt.WindowType.Sheet)
     ld.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose, True)
     res:int = ld.exec()
-    login_processed:Optional[str] = ld.login.strip() if ld.login is not None else None
+    login_processed:str|None = ld.login.strip() if ld.login is not None else None
     return login_processed, ld.passwd, ld.remember, res

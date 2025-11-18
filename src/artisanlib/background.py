@@ -21,24 +21,17 @@ import logging
 from artisanlib.util import deltaLabelUTF8, deltaLabelPrefix, stringfromseconds
 from artisanlib.dialogs import ArtisanResizeablDialog
 from artisanlib.widgets import (MyTableWidgetItemNumber)
-from typing import Final, Optional, TYPE_CHECKING
+from typing import Final, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
     from PyQt6.QtGui import QCloseEvent, QKeyEvent # pylint: disable=unused-import
 
-try:
-    from PyQt6.QtCore import (Qt, pyqtSlot, QSettings, QTimer) # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtGui import QColor, QKeySequence # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtWidgets import (QApplication, QCheckBox, QGridLayout, QHBoxLayout, QVBoxLayout, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QLabel, QLineEdit,QPushButton, QComboBox, QDialogButtonBox, QHeaderView, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QSpinBox, QTableWidget, QTableWidgetItem, QTabWidget, QWidget, QGroupBox) # @UnusedImport @Reimport  @UnresolvedImport
-except ImportError:
-    from PyQt5.QtCore import (Qt, pyqtSlot, QSettings, QTimer) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtGui import QColor, QKeySequence # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtWidgets import (QApplication, QCheckBox, QGridLayout, QHBoxLayout, QVBoxLayout, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-                                 QLabel, QLineEdit,QPushButton, QComboBox, QDialogButtonBox, QHeaderView, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QSpinBox, QTableWidget, QTableWidgetItem, QTabWidget, QWidget, QGroupBox) # @UnusedImport @Reimport  @UnresolvedImport
+from PyQt6.QtCore import (Qt, pyqtSlot, QSettings, QTimer)
+from PyQt6.QtGui import QColor, QKeySequence
+from PyQt6.QtWidgets import (QApplication, QCheckBox, QGridLayout, QHBoxLayout, QVBoxLayout,
+                             QLabel, QLineEdit,QPushButton, QComboBox, QDialogButtonBox, QHeaderView,
+                             QSpinBox, QTableWidget, QTableWidgetItem, QTabWidget, QWidget, QGroupBox)
 
 
 
@@ -526,7 +519,7 @@ class backgroundDlg(ArtisanResizeablDialog):
         mainLayout.setSpacing(5)
         self.setLayout(mainLayout)
         if platform.system() != 'Windows':
-            ok_button: Optional[QPushButton] = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
+            ok_button: QPushButton|None = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
             if ok_button is not None:
                 ok_button.setFocus()
         else:
@@ -563,13 +556,13 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.aw.autoAdjustAxis()
 
     #keyboard presses. There must not be widgets (pushbuttons, comboboxes, etc) in focus in order to work
-    def keyPressEvent(self, event: Optional['QKeyEvent']) -> None:
-        if event is not None and event.matches(QKeySequence.StandardKey.Copy):
+    def keyPressEvent(self, a0: 'QKeyEvent|None') -> None:
+        if a0 is not None and a0.matches(QKeySequence.StandardKey.Copy):
             if self.TabWidget.currentIndex() == 2: # datatable
                 self.aw.copy_cells_to_clipboard(self.datatable)
                 self.aw.sendmessage(QApplication.translate('Message','Data table copied to clipboard'))
         else:
-            super().keyPressEvent(event)
+            super().keyPressEvent(a0)
 
     @pyqtSlot()
     def accept(self) -> None:
@@ -581,7 +574,8 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.close()
 
     @pyqtSlot('QCloseEvent')
-    def closeEvent(self, _:Optional['QCloseEvent'] = None) -> None:
+    def closeEvent(self, a0:'QCloseEvent|None' = None) -> None:
+        del a0
         settings = QSettings()
         #save window geometry
         settings.setValue('BackgroundGeometry',self.saveGeometry())
@@ -905,7 +899,7 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.eventtable.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         self.eventtable.setSelectionMode(QTableWidget.SelectionMode.ExtendedSelection)
         self.eventtable.setShowGrid(True)
-        vheader: Optional[QHeaderView] = self.eventtable.verticalHeader()
+        vheader: QHeaderView|None = self.eventtable.verticalHeader()
         if vheader is not None:
             vheader.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
         if self.aw.qmc.timeindex[0] != -1:
@@ -946,7 +940,7 @@ class backgroundDlg(ArtisanResizeablDialog):
             self.eventtable.setItem(i,3,description)
             self.eventtable.setItem(i,4,etype)
             self.eventtable.setItem(i,5,evalue)
-        header: Optional[QHeaderView] = self.eventtable.horizontalHeader()
+        header: QHeaderView|None = self.eventtable.horizontalHeader()
         if header is not None:
             #header.setStretchLastSection(True)
             header.setSectionResizeMode(0, QHeaderView.ResizeMode.Fixed)
@@ -1018,7 +1012,7 @@ class backgroundDlg(ArtisanResizeablDialog):
             self.datatable.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
             self.datatable.setSelectionMode(QTableWidget.SelectionMode.ExtendedSelection) # QTableWidget.SelectionMode.SingleSelection, ContiguousSelection, MultiSelection
             self.datatable.setShowGrid(True)
-            vheader: Optional[QHeaderView] = self.datatable.verticalHeader()
+            vheader: QHeaderView|None = self.datatable.verticalHeader()
             if vheader is not None:
                 vheader.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
             for i in range(ndata):
@@ -1048,7 +1042,7 @@ class backgroundDlg(ArtisanResizeablDialog):
 
                 if i:
                     #identify by color and add notation
-                    item0: Optional[QTableWidgetItem] = self.datatable.item(i,0)
+                    item0: QTableWidgetItem|None = self.datatable.item(i,0)
                     if item0 is not None:
                         if i == self.aw.qmc.timeindexB[0] != -1:
                             item0.setBackground(QColor('#f07800'))
@@ -1109,7 +1103,7 @@ class backgroundDlg(ArtisanResizeablDialog):
                     else:
                         self.datatable.setItem(i,5,YT)
 
-            header: Optional[QHeaderView] = self.datatable.horizontalHeader()
+            header: QHeaderView|None = self.datatable.horizontalHeader()
             if header is not None:
                 self.datatable.resizeColumnsToContents()
                 for i in range(1, len(headers)):

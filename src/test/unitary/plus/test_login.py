@@ -4,12 +4,13 @@
 # Ensure proper module isolation to prevent cross-file contamination
 
 import sys
-from typing import Any, Dict, Generator
+from collections.abc import Generator
+from typing import Any
 from unittest.mock import Mock, patch
 
 # Store original modules before any mocking to enable restoration
-original_modules: Dict[str, Any] = {}
-original_functions: Dict[str, Any] = {}
+original_modules: dict[str, Any] = {}
+original_functions: dict[str, Any] = {}
 modules_to_isolate = [
     'PyQt6.QtCore',
     'PyQt6.QtWidgets',
@@ -647,7 +648,7 @@ class TestLoginDialogEventHandlers:
             # Assert
             assert dialog.login == 'user@example.com'
             assert dialog.passwd == 'password123'
-            dialog.accept.assert_called_once()
+            dialog.accept.assert_called_once() # ty:ignore
 
     def test_reject_stores_login(self, mock_parent_widget:Mock, mock_app_window:Mock) -> None:
         """Test reject stores login and calls parent reject."""
@@ -989,7 +990,7 @@ class TestLoginDialogEdgeCases:
             # Assert
             assert dialog.login == ''
             assert dialog.passwd == ''
-            dialog.accept.assert_called_once()
+            dialog.accept.assert_called_once() # ty:ignore
 
     def test_is_input_reasonable_boundary_values(self, mock_parent_widget:Mock, mock_app_window:Mock) -> None:
         """Test isInputReasonable with boundary values."""

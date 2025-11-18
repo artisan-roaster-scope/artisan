@@ -30,7 +30,7 @@ if system().startswith('Windows'):
 
 
 import logging
-from typing import Final, Optional, List, Union, Any, TypedDict, TYPE_CHECKING
+from typing import Final, Any, TypedDict, TYPE_CHECKING
 
 if TYPE_CHECKING:
     try:
@@ -109,9 +109,9 @@ class AillioR2:
         self.worker_thread_run:bool = True
 
         # Communication pipes
-        self.parent_pipe: Optional[Connection] = None
-        self.child_pipe: Optional[Connection] = None
-        self.worker_thread: Optional[threading.Thread] = None
+        self.parent_pipe: Connection|None = None
+        self.child_pipe: Connection|None = None
+        self.worker_thread: threading.Thread|None = None
 
         # Basic configuration
         self.simulated:bool = False
@@ -119,16 +119,16 @@ class AillioR2:
         self.__dbg('init')
 
         # USB handling
-        self.usbhandle:Optional[usb.core.Device] = None # type:ignore[no-any-unimported,unused-ignore]
+        self.usbhandle:usb.core.Device|None = None # type:ignore[no-any-unimported,unused-ignore]
         self.protocol:int = 2
         self.model:str = 'Unknown'
-        self.ep_in:Optional[Endpoint] = None
-        self.ep_out:Optional[Endpoint] = None
+        self.ep_in:Endpoint|None = None
+        self.ep_out:Endpoint|None = None
         self.TIMEOUT = 1000  # USB timeout in milliseconds
         self.FRAME_SIZE = 64  # Standard USB packet size
 
         # Device variants
-        self.DEVICE_VARIANTS:List[DEVICE_VARIANT] = [
+        self.DEVICE_VARIANTS:list[DEVICE_VARIANT] = [
             {'vid': 0x0483, 'pid': 0xa4cd, 'protocol': 2, 'model': 'Aillio Bullet R2'},
         ]
 
@@ -407,7 +407,7 @@ class AillioR2:
                     pass
                 self.usbhandle = None
 
-    def __sendcmd(self, cmd:Union[List[int],bytes]) -> None:
+    def __sendcmd(self, cmd:list[int]|bytes) -> None:
         self.__dbg('sending command: ' + str(cmd))
         if self.usbhandle is None or self.ep_out is None:
             raise OSError('Device not properly initialized')
@@ -663,7 +663,7 @@ class AillioR2:
 #        expected_crc = int.from_bytes(data[-4:], 'little')
 #        return expected_crc == self.calculate_crc32(data)
 
-    def prepare_command(self, cmd:Union[List[int],bytes]) -> bytes:
+    def prepare_command(self, cmd:list[int]|bytes) -> bytes:
         if isinstance(cmd, list):
             cmd = bytes(cmd)
         cmd_with_crc = bytearray(cmd)

@@ -23,15 +23,13 @@
 
 import logging
 
-try:
-    from PyQt6.QtCore import QObject, QTimer, QSemaphore, pyqtSlot # @Reimport @UnresolvedImport @UnusedImport
-except ImportError:
-    from PyQt5.QtCore import QObject, QTimer, QSemaphore, pyqtSlot # type: ignore[import-not-found,no-redef]  # @Reimport @UnresolvedImport @UnusedImport
+from PyQt6.QtCore import QObject, QTimer, QSemaphore, pyqtSlot
 
 from dataclasses import dataclass
 from enum import IntEnum, unique
 from statemachine import StateMachine, State
-from typing import Optional, List, Tuple, Callable, Final, TYPE_CHECKING
+from collections.abc import Callable
+from typing import Final, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
@@ -54,9 +52,9 @@ class PROCESS_STATE(IntEnum):
 class WeightItem:
     uuid:str                 # the UUID of the ScheduledItem or CompletedItem
     title:str                # the title (schedule item name of a ScheduledItem, or batch number and roast name of a CompletedItem
-    blend_name:Optional[str] # None if item is a coffee, else the name of the blend
+    blend_name:str | None    # None if item is a coffee, else the name of the blend
     description:str          # a HTML formatted string describing the weight item (used by the Scheduler task display tooltip popup)
-    descriptions:List[Tuple[float,str]] # the descriptions of the green coffee or blend as non empty list of tuples <ratio>,<description>
+    descriptions:list[tuple[float,str]] # the descriptions of the green coffee or blend as non empty list of tuples <ratio>,<description>
                              # with ratio the component ratio in blends and description the coffee component name.
                              # A single coffee has just one tuple with ratio set to 1 (also for completed items).
                              # For roasted blend items this is always just the one element list [(1, '')]
@@ -106,12 +104,12 @@ class Display:
 
     # show task
     # task_type 0:green, 1:roasted, 2:defect
-    def show_item(self, task_type:int, item:Optional[WeightItem], state:PROCESS_STATE = PROCESS_STATE.DISCONNECTED, component:int = 0, final_weight:Optional[int] = None) -> None: # pylint: disable=unused-argument,no-self-use
+    def show_item(self, task_type:int, item: WeightItem|None, state:PROCESS_STATE = PROCESS_STATE.DISCONNECTED, component:int = 0, final_weight: int|None = None) -> None: # pylint: disable=unused-argument,no-self-use
         ...
 
     # show progress of the green weighing process
     # task_type 0:green, 1:roasted, 2:defect
-    def show_progress(self, task_type:int, item:Optional[WeightItem], state:PROCESS_STATE, component:int, bucket:int, current_weight:int) -> None: # pylint: disable=unused-argument,no-self-use
+    def show_progress(self, task_type:int, item: WeightItem|None, state:PROCESS_STATE, component:int, bucket:int, current_weight:int) -> None: # pylint: disable=unused-argument,no-self-use
         ...
 
     # show progress of the roasted weighing process
@@ -261,16 +259,16 @@ class GreenWeighingState(StateMachine):
         | empty.to(empty)
     )
 
-    def __init__(self, displays:List[Display], release_scale:Callable[[],None]) -> None:
+    def __init__(self, displays:list[Display], release_scale:Callable[[],None]) -> None:
 
         # list of displays control, incl. the display of the selected scale if any
-        self.displays: List[Display] = displays
+        self.displays: list[Display] = displays
         # release scale after weighing is done
         self.release_scale = release_scale
         self.scale_release_blocked = False #  if True, the scale is not released on entering READY (this is set on canceling a CANCEL/DONE timer by placing an empty container)
 
         # holds the WeightItem currently processed, if any
-        self.current_weight_item:Optional[GreenWeightItem] = None
+        self.current_weight_item: GreenWeightItem | None = None
         self.process_state:PROCESS_STATE = PROCESS_STATE.DISCONNECTED
         self.process_state_before_connection_loss:PROCESS_STATE = PROCESS_STATE.DISCONNECTED
         self.component:int = 0 # component (of blend) currently processed (0 <= self.component < len(self.current_weight_item.descriptions))
@@ -435,7 +433,7 @@ class GreenWeighingState(StateMachine):
 #        _log.debug("GREEN_SM: Running %s from %s to %s", event.name, event_data.transition.source.id, event_data.transition.target.id)
 
     # weight in kg; if weight is None, the nominal weight from the ScheduleItem/WeightItem is used
-    def taskCompleted(self, weight:Optional[float] = None) -> None:
+    def taskCompleted(self, weight: float | None = None) -> None:
         if self.current_weight_item is not None:
             if weight is None:
                 weight = self.current_weight_item.weight
@@ -447,7 +445,7 @@ class GreenWeighingState(StateMachine):
     # render current item and state on all active displays
     # if progress is True, the current weighing progress is displayed
     # final_weight in g if given
-    def update_displays(self, progress:bool=False, final_weight:Optional[int] = None) -> None:
+    def update_displays(self, progress:bool=False, final_weight: int | None = None) -> None:
         for display in self.displays:
             if progress and self.current_weight_item is not None:
                 display.show_progress(0, self.current_weight_item, self.process_state, self.component, self.bucket, self.current_weight)
@@ -573,15 +571,15 @@ class RoastedWeighingState(StateMachine):
         | done_filling.to(done_filling)
     )
 
-    def __init__(self, displays:List[Display], release_scale:Callable[[],None]) -> None:
+    def __init__(self, displays:list[Display], release_scale:Callable[[],None]) -> None:
 
         # list of displays control, incl. the display of the selected scale if any
-        self.displays: List[Display] = displays
+        self.displays: list[Display] = displays
         # release scale after weighing is done
         self.release_scale = release_scale
 
         # holds the WeightItem currently processed, if any
-        self.current_weight_item:Optional[RoastedWeightItem] = None
+        self.current_weight_item: RoastedWeightItem | None = None
         self.process_state:PROCESS_STATE = PROCESS_STATE.DISCONNECTED
         self.process_state_before_connection_loss:PROCESS_STATE = PROCESS_STATE.DISCONNECTED
         self.current_weight:int = 0 # in g # the current total weight of the roasted coffee (without the weight of the bucket)
@@ -710,7 +708,7 @@ class RoastedWeighingState(StateMachine):
 
 
     # weight in kg; if weight is None, the estimated weight from the ScheduleItem/WeightItem is used
-    def taskCompleted(self, weight:Optional[float] = None) -> None:
+    def taskCompleted(self, weight: float | None = None) -> None:
         if self.current_weight_item is not None:
             if weight is None:
                 weight = self.current_weight_item.weight_estimate
@@ -722,7 +720,7 @@ class RoastedWeighingState(StateMachine):
     # render current item and state on all active displays
     # if result is True, the current weighing result is displayed
     # final_weight in g if given
-    def update_displays(self, result:bool=False, final_weight:Optional[int] = None,  progress:bool=False) -> None:
+    def update_displays(self, result:bool=False, final_weight: int | None = None,  progress:bool=False) -> None:
         for display in self.displays:
             if result and self.current_weight_item is not None:
                 display.show_result(1, self.current_weight_item, self.process_state, self.current_weight)
@@ -761,7 +759,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefl
     WAIT_BEFORE_CANCEL:Final[int] = 5000  # time in milliseconds to display the CANCEL message before returning to READY
     WAIT_BEFORE_DONE:Final[int] = 5000    # time in milliseconds to display the DONE message before returning to READY
 
-    def __init__(self, aw:'ApplicationWindow', displays:List[Display], scale_manager:ScaleManager) -> None:
+    def __init__(self, aw:'ApplicationWindow', displays:list[Display], scale_manager:ScaleManager) -> None:
         super().__init__()
 
         self.aw = aw # the Artisan application window
@@ -774,8 +772,8 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefl
             display.set_done_timer_timeout(int(round(self.WAIT_BEFORE_DONE/1000)))
 
         # holds the next WeightItem waiting to be processed, if any
-        self.next_green_item:Optional[GreenWeightItem] = None
-        self.next_roasted_item:Optional[RoastedWeightItem] = None
+        self.next_green_item: GreenWeightItem | None = None
+        self.next_roasted_item: RoastedWeightItem | None = None
 
         self.greenItemSemaphore = QSemaphore(1) # semaphore to protect access to next_green_item
         self.roastedItemSemaphore = QSemaphore(1) # semaphore to protect access to next_roasted_item
@@ -852,7 +850,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefl
     # queues a GreenWeightItem for processing
     # if item is None, the next green item is cleared
     # Note: the queue has size 1 and a newer incoming item overwrites an older already queued item
-    def set_next_green(self, item:Optional[GreenWeightItem]) -> None:
+    def set_next_green(self, item: GreenWeightItem | None) -> None:
         if item is None:
             self.clear_next_green()
         else:
@@ -885,7 +883,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefl
 
     # called from Scheduler on click of the Scheduler Task Display or on task completion
     # weight in kg
-    def greenTaskCompleted(self, weight:Optional[float] = None) -> None:
+    def greenTaskCompleted(self, weight: float | None = None) -> None:
         self.sm_green.taskCompleted(weight)
 
 
@@ -895,7 +893,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefl
     # if item is None, the next roasted item is cleared
     # Note: the queue has size 1 and a newer incoming item overwrites an older already queued item
     @pyqtSlot()
-    def set_next_roasted(self, item:Optional[RoastedWeightItem]) -> None:
+    def set_next_roasted(self, item: RoastedWeightItem | None) -> None:
         if item is None:
             self.clear_next_roasted()
         else:
@@ -963,15 +961,15 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefl
         self.sm_roasted.send('unavailable')
 
     # returns roasted container weight in g if one is set
-    def roasted_container_weight(self) -> Optional[int]:
+    def roasted_container_weight(self) -> int | None:
         if 0 <= self.aw.container2_idx < len(self.aw.qmc.container_weights):
             return int(round(self.aw.qmc.container_weights[self.aw.container2_idx])) # in g
         return None
 
     # returns the expected total weight (bucket + roasted coffee) in g of the roasted current_weight_item if any
     # or None if there is no current_weight_item
-    def expected_roasted_weight(self) -> Optional[int]:
-        roasted_container_weight:Optional[int] = self.roasted_container_weight()
+    def expected_roasted_weight(self) -> int | None:
+        roasted_container_weight: int | None = self.roasted_container_weight()
         if self.sm_roasted.current_weight_item is None or roasted_container_weight is None:
             return None
         # current_weight_item.weight holds the weight estimate for the roasted batch in kg
@@ -1010,7 +1008,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefl
     #   between WeightManager.MIN_EMPTY_BUCKET_WEIGHT_BATCH_PERECENT and WeightManager.MAX_EMPTY_BUCKET_WEIGHT_BATCH_PERECENT of the batchsize (if given)
     #     but not smaller than WeightManager.MIN_EMPTY_BUCKET_WEIGHT and WeightManager.MAX_EMPTY_BUCKET_WEIGHT
     # if green is True we check for an empty bucket to weigh greens otherwise to weigh roasted
-    def empty_bucket_placed(self, step:int, batchsize:Optional[float], green:bool=True) -> bool:
+    def empty_bucket_placed(self, step:int, batchsize: float | None, green:bool=True) -> bool:
         # the empty bucket weight must be lighter than the total weight of a filled roasted bucket
         # to avoid overlapping recognition
         # NOTE: a very light roasting task can block the recognition of the placement of empty green buckets
@@ -1588,7 +1586,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefl
         elif self.roasted_task_scale == 2:
             self.scale_manager.signal_user_scale2_signal.emit(action)
 
-    def signal_scale_stable_weight(self, last_weight:int, new_weight:int, last_component:Optional[int] = None) -> None:
+    def signal_scale_stable_weight(self, last_weight:int, new_weight:int, last_component: int | None = None) -> None:
         if  self.sm_green.current_weight_item is not None and last_weight != new_weight:
             batchsize = self.sm_green.current_weight_item.weight * 1000 # batch size in g
             previously_done100percent = round(100 * last_weight / batchsize) == 100
@@ -1611,7 +1609,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefl
             elif previously_done100percent and not done100percent:
                 self.signal_green_task_scale(STATE_ACTION.TARGET_EXIT)
 
-    def signal_scale_weight(self, last_component:Optional[int]) -> None:
+    def signal_scale_weight(self, last_component: int | None) -> None:
         if last_component is not None and last_component != self.sm_green.component:
             # blend component changed
             self.signal_green_task_scale(STATE_ACTION.COMPONENT_CHANGED)

@@ -16,7 +16,7 @@
 # Marko Luther, 2023
 
 
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
@@ -27,12 +27,8 @@ from artisanlib import __version__
 
 from artisanlib.dialogs import ArtisanDialog
 
-try:
-    from PyQt6.QtCore import pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtWidgets import (QApplication, QLabel, QCheckBox, QTextEdit, QVBoxLayout) # @UnusedImport @Reimport  @UnresolvedImport
-except ImportError:
-    from PyQt5.QtCore import pyqtSlot # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtWidgets import (QApplication, QLabel, QCheckBox, QTextEdit, QVBoxLayout) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+from PyQt6.QtCore import pyqtSlot
+from PyQt6.QtWidgets import (QApplication, QLabel, QCheckBox, QTextEdit, QVBoxLayout)
 
 
 ##########################################################################
@@ -76,7 +72,8 @@ class serialLogDlg(ArtisanDialog):
             self.aw.seriallogflag = False
 
     @pyqtSlot('QCloseEvent')
-    def closeEvent(self, _:Optional['QCloseEvent'] = None) -> None:
+    def closeEvent(self, a0:'QCloseEvent|None' = None) -> None:
+        del a0
         self.close()
         self.aw.serial_dlg = None
 
@@ -109,7 +106,8 @@ class errorDlg(ArtisanDialog):
         self.errorEdit.setHtml('version = ' +__version__ +'<br><br>' + htmlerr)
 
     @pyqtSlot('QCloseEvent')
-    def closeEvent(self, _:Optional['QCloseEvent'] = None) -> None:
+    def closeEvent(self, a0:'QCloseEvent|None' = None) -> None:
+        del a0
         self.close()
         self.aw.error_dlg = None
 
@@ -137,6 +135,7 @@ class messageDlg(ArtisanDialog):
         self.messageEdit.setHtml(htmlmessage)
 
     @pyqtSlot('QCloseEvent')
-    def closeEvent(self, _:Optional['QCloseEvent'] = None) -> None:
+    def closeEvent(self, a0:'QCloseEvent|None' = None) -> None:
+        del a0
         self.close()
         self.aw.message_dlg = None

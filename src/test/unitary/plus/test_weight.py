@@ -19,7 +19,8 @@ cross-file module contamination and ensure compatibility with the entire test su
 """
 
 import sys
-from typing import Generator, Dict, Any, List
+from typing import Any
+from collections.abc import Generator
 from unittest.mock import Mock, patch
 
 import pytest
@@ -43,7 +44,7 @@ modules_to_isolate = [
 
 # Store original modules before any mocking
 original_modules = {}
-original_functions:Dict[Any,Any] = {}
+original_functions:dict[Any,Any] = {}
 
 for module_name in modules_to_isolate:
     if module_name in sys.modules:
@@ -371,7 +372,7 @@ def reset_weight_state() -> Generator[None, None, None]:
     # Additional cleanup after each test if needed
 
 
-def comprehensive_qt_patches() -> List[Any]:
+def comprehensive_qt_patches() -> list[Any]:
     """
     Helper function to create comprehensive Qt patches for WeightManager tests.
 
@@ -456,7 +457,7 @@ def mock_display() -> Mock:
 
 
 @pytest.fixture
-def mock_displays(mock_display:Mock) -> List[Mock]:
+def mock_displays(mock_display:Mock) -> list[Mock]:
     """Create a list of mock displays."""
     return [mock_display]
 
@@ -885,7 +886,7 @@ class TestWeightManager:
 
             # Assert
             assert manager.next_green_item == sample_green_weight_item
-            manager.fetch_next_green.assert_called_once()
+            manager.fetch_next_green.assert_called_once() # ty:ignore
 
     def test_clear_next_green(self, mock_displays:Mock) -> None:
         """Test clear_next_green method."""

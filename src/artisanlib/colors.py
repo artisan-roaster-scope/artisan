@@ -19,24 +19,17 @@ import platform
 
 from artisanlib.util import deltaLabelUTF8, rgba_colorname2argb_colorname, argb_colorname2rgba_colorname
 from artisanlib.dialogs import ArtisanDialog
-from typing import Optional, Dict, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
     from PyQt6.QtGui import QCloseEvent # pylint: disable=unused-import
 
-try:
-    from PyQt6.QtCore import Qt, QTimer, pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtGui import QColor, QFont, QPalette # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtWidgets import (QApplication, QWidget, QLabel, QPushButton,  # @UnusedImport @Reimport  @UnresolvedImport
-        QSizePolicy, QHBoxLayout, QVBoxLayout, QDialogButtonBox, QGridLayout, QGroupBox, # @UnusedImport @Reimport  @UnresolvedImport
-        QLayout, QSpinBox, QTabWidget, QMessageBox) # @UnusedImport @Reimport  @UnresolvedImport
-except ImportError:
-    from PyQt5.QtCore import Qt, QTimer, pyqtSlot # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtGui import QColor, QFont, QPalette # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QPushButton, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-        QSizePolicy, QHBoxLayout, QVBoxLayout, QDialogButtonBox, QGridLayout, QGroupBox, # @UnusedImport @Reimport  @UnresolvedImport
-        QLayout, QSpinBox, QTabWidget, QMessageBox) # @UnusedImport @Reimport  @UnresolvedImport
+from PyQt6.QtCore import Qt, QTimer, pyqtSlot
+from PyQt6.QtGui import QColor, QFont, QPalette
+from PyQt6.QtWidgets import (QApplication, QWidget, QLabel, QPushButton,
+    QSizePolicy, QHBoxLayout, QVBoxLayout, QDialogButtonBox, QGridLayout, QGroupBox,
+    QLayout, QSpinBox, QTabWidget, QMessageBox)
 
 
 class graphColorDlg(ArtisanDialog):
@@ -603,7 +596,7 @@ class graphColorDlg(ArtisanDialog):
             layout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize) # don't allow resizing
 
         if platform.system() != 'Windows':
-            ok_button: Optional[QPushButton] = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
+            ok_button: QPushButton|None = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
             if ok_button is not None:
                 ok_button.setFocus()
         else:
@@ -618,7 +611,8 @@ class graphColorDlg(ArtisanDialog):
         self.TabWidget.setCurrentIndex(self.activeTab)
 
     @pyqtSlot('QCloseEvent')
-    def closeEvent(self,_:Optional['QCloseEvent'] = None) -> None:
+    def closeEvent(self, a0:'QCloseEvent|None' = None) -> None:
+        del a0
         self.aw.graphColorDlg_activeTab = self.TabWidget.currentIndex()
 
     @pyqtSlot(bool)
@@ -851,7 +845,7 @@ class graphColorDlg(ArtisanDialog):
             self.aw.qmc.redraw(recomputeAllDeltas=False)
             self.aw.sendmessage(QApplication.translate('Message','Color of {0} set to {1}').format(title,str(color)))
 
-    def setlcdColor(self, palette:Dict[str,str], disj_palette:Dict[str,str], select:str) -> None:
+    def setlcdColor(self, palette:dict[str,str], disj_palette:dict[str,str], select:str) -> None:
         res = self.aw.colordialog(QColor(rgba_colorname2argb_colorname(palette[select])), alphasupport=True)
         if QColor.isValid(res):
             nc = argb_colorname2rgba_colorname(res.name(QColor.NameFormat.HexArgb))

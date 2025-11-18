@@ -7,7 +7,8 @@ import os
 import csv
 import re
 import logging
-from typing import Final, Optional, List, Dict, Callable
+from collections.abc import Callable
+from typing import Final
 
 from artisanlib.util import encodeLocalStrict
 from artisanlib.atypes import ProfileData
@@ -17,9 +18,9 @@ _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 # returns a dict containing all profile information contained in the given ROEST CSV file
 def extractProfileRoestCSV(file:str,
-        _etypesdefault:List[str],
-        alt_etypesdefault:List[str],
-        _artisanflavordefaultlabels:List[str],
+        _etypesdefault:list[str],
+        alt_etypesdefault:list[str],
+        _artisanflavordefaultlabels:list[str],
         eventsExternal2InternalValue:Callable[[int],float]) -> ProfileData:
     res:ProfileData = ProfileData() # the interpreted data set
 
@@ -49,42 +50,42 @@ def extractProfileRoestCSV(file:str,
         #read file header
         header = [h.strip() for h in next(data)]
 
-        fan:Optional[float] = None # holds last processed fan event value
-        fan_last:Optional[float] = None # holds the fan event value before the last one
-        heater:Optional[float] = None # holds last processed heater event value
-        heater_last:Optional[float] = None # holds the heater event value before the last one
-        drum:Optional[float] = None # holds last processed drum speed event value
-        drum_last:Optional[float] = None # holds the drum speed event value before the last one
+        fan:float|None = None # holds last processed fan event value
+        fan_last:float|None = None # holds the fan event value before the last one
+        heater:float|None = None # holds last processed heater event value
+        heater_last:float|None = None # holds the heater event value before the last one
+        drum:float|None = None # holds last processed drum speed event value
+        drum_last:float|None = None # holds the drum speed event value before the last one
 
-        specialevents:List[int] = []
-        specialeventstype:List[int] = []
-        specialeventsvalue:List[float] = []
-        specialeventsStrings:List[str] = []
+        specialevents:list[int] = []
+        specialeventstype:list[int] = []
+        specialeventsvalue:list[float] = []
+        specialeventsStrings:list[str] = []
 
-        timex:List[float] = []
-        temp1:List[float] = []
-        temp2:List[float] = []
+        timex:list[float] = []
+        temp1:list[float] = []
+        temp2:list[float] = []
 
-        extra1:List[float] = []  # Inlet temp (°C)
-        extra2:List[float] = []  # Target (°C)
-        extra3:List[float] = []  # Heater (%)
-        extra4:List[float] = []  # --- Heater PV (not used)
-        extra5:List[float] = []  # RPM (RPM)
-        extra6:List[float] = []  # ---- Drum PV (not used)
-        extra7:List[float] = []  # Fan (%)
-        extra8:List[float] = []  # ---- Fan PV (not used)
-        extra9:List[float] = []  # Drum temp (°C)
-        extra10:List[float] = []  # Exhaust Temp (°C)
+        extra1:list[float] = []  # Inlet temp (°C)
+        extra2:list[float] = []  # Target (°C)
+        extra3:list[float] = []  # Heater (%)
+        extra4:list[float] = []  # --- Heater PV (not used)
+        extra5:list[float] = []  # RPM (RPM)
+        extra6:list[float] = []  # ---- Drum PV (not used)
+        extra7:list[float] = []  # Fan (%)
+        extra8:list[float] = []  # ---- Fan PV (not used)
+        extra9:list[float] = []  # Drum temp (°C)
+        extra10:list[float] = []  # Exhaust Temp (°C)
 
-        v:Optional[float]
+        v:float|None
 
 
-        timeindex:List[int] = [-1,0,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actual index used
+        timeindex:list[int] = [-1,0,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actual index used
         i:int = -1
         for row in data:
             i += 1
-            items = list(zip(header, row))
-            item:Dict[str,str] = {}
+            items = list(zip(header, row, strict=True)) # ty:ignore
+            item:dict[str,str] = {}
             for (name, value) in items:
                 item[name] = value.strip()
             # take i as time in seconds

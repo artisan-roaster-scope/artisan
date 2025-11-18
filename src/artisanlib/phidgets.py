@@ -20,15 +20,12 @@ from Phidget22.DeviceID import DeviceID # type: ignore
 from Phidget22.DeviceClass import DeviceClass # type: ignore
 
 import logging
-from typing import Final, Dict, Tuple, Optional, TYPE_CHECKING
+from typing import Final, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from Phidget22.Phidget import Phidget # type: ignore # pylint: disable=unused-import
 
-try:
-    from PyQt6.QtCore import QSemaphore # @UnusedImport @Reimport  @UnresolvedImport
-except ImportError:
-    from PyQt5.QtCore import QSemaphore # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+from PyQt6.QtCore import QSemaphore
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -45,7 +42,7 @@ class PhidgetManager:
         #    False: occupied and connected to a software channel
         # access to this dict is protected by the managersemaphore and
         # should happen only via the methods addChannel and deleteChannel
-        self.attachedPhidgetChannels:Dict[Phidget, bool] = {} # type:ignore[no-any-unimported,unused-ignore]
+        self.attachedPhidgetChannels:dict[Phidget, bool] = {} # type:ignore[no-any-unimported,unused-ignore]
         self.managersemaphore:QSemaphore = QSemaphore(1)
         self.manager:Manager = Manager() # type:ignore[no-any-unimported,unused-ignore]
 
@@ -139,7 +136,7 @@ class PhidgetManager:
             if self.managersemaphore.available() < 1:
                 self.managersemaphore.release(1)
 
-    def getChannel(self,serial:int, port:Optional[int], channel:int, phidget_class_name:str, device_id:int, remote:bool, remoteOnly:bool) -> Optional['Phidget']: # type:ignore[no-any-unimported,unused-ignore]
+    def getChannel(self,serial:int, port:int|None, channel:int, phidget_class_name:str, device_id:int, remote:bool, remoteOnly:bool) -> 'Phidget|None': # type:ignore[no-any-unimported,unused-ignore]
         try:
             self.managersemaphore.acquire(1)
             # we are looking for HUB ports
@@ -163,12 +160,12 @@ class PhidgetManager:
             if self.managersemaphore.available() < 1:
                 self.managersemaphore.release(1)
 
-    def reserveSerialPort(self, serial:int, port:Optional[int], channel:int, phidget_class_name:str, device_id:int, remote:bool = False, remoteOnly:bool = False) -> None: # type:ignore[no-any-unimported,unused-ignore]
+    def reserveSerialPort(self, serial:int, port:int|None, channel:int, phidget_class_name:str, device_id:int, remote:bool = False, remoteOnly:bool = False) -> None: # type:ignore[no-any-unimported,unused-ignore]
         chnl = self.getChannel(serial, port, channel, phidget_class_name, device_id, remote, remoteOnly)
         if chnl is not None:
             self.reserveChannel(chnl)
 
-    def releaseSerialPort(self, serial:int, port:Optional[int], channel:int, phidget_class_name:str, device_id:int, remote:bool = False, remoteOnly:bool = False) -> None: # type:ignore[no-any-unimported,unused-ignore]
+    def releaseSerialPort(self, serial:int, port:int|None, channel:int, phidget_class_name:str, device_id:int, remote:bool = False, remoteOnly:bool = False) -> None: # type:ignore[no-any-unimported,unused-ignore]
         chnl = self.getChannel(serial, port, channel, phidget_class_name, device_id, remote, remoteOnly)
         if chnl is not None:
             self.releaseChannel(chnl)
@@ -233,11 +230,11 @@ class PhidgetManager:
     def getFirstMatchingPhidget(self,
                 phidget_class_name:str,
                 device_id:int,
-                channel:Optional[int]=None,
+                channel:int|None=None,
                 remote:bool=False,
                 remoteOnly:bool=False,
-                serial:Optional[int]=None,
-                hubport:Optional[int]=None) -> Tuple[Optional[int],Optional[int]]:
+                serial:int|None=None,
+                hubport:int|None=None) -> tuple[int|None,int|None]:
         _log.debug('getFirstMatchingPhidget(%s,%s,%s,%s,%s,%s,%s)',phidget_class_name,device_id,channel,remote,remoteOnly,serial,hubport)
         try:
             self.managersemaphore.acquire(1)

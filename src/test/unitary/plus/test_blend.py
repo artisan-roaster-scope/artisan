@@ -4,12 +4,13 @@
 # Ensure proper module isolation to prevent cross-file contamination
 
 import sys
-from typing import Any, Dict, Generator, List, Set
+from collections.abc import Generator
+from typing import Any
 from unittest.mock import Mock, patch
 
 # Store original modules before any mocking to enable restoration
-original_modules: Dict[str, Any] = {}
-original_functions: Dict[str, Any] = {}
+original_modules: dict[str, Any] = {}
+original_functions: dict[str, Any] = {}
 modules_to_isolate = [
     'PyQt6.QtCore',
     'PyQt6.QtWidgets',
@@ -212,13 +213,13 @@ def sample_component() -> Component:
 
 
 @pytest.fixture
-def sample_components() -> List[Component]:
+def sample_components() -> list[Component]:
     """Create fresh sample components for each test."""
     return [Component('brazil_santos', 0.6), Component('guatemala_antigua', 0.4)]
 
 
 @pytest.fixture
-def sample_blend(sample_components: List[Component]) -> CustomBlend:
+def sample_blend(sample_components: list[Component]) -> CustomBlend:
     """Create a fresh sample blend for each test."""
     return CustomBlend('Test Blend', sample_components)
 
@@ -409,7 +410,7 @@ class TestCustomBlend:
         """Test CustomBlend with empty components list."""
         # Arrange
         blend_name = 'Empty Blend'
-        components: List[Component] = []
+        components: list[Component] = []
 
         # Act
         blend = CustomBlend(blend_name, components)
@@ -479,7 +480,7 @@ class TestCustomBlendValidation:
     def test_is_valid_with_empty_components_invalid(self) -> None:
         """Test isValid with empty components (invalid)."""
         # Arrange
-        components: List[Component] = []
+        components: list[Component] = []
         blend = CustomBlend('Empty Blend', components)
 
         # Act
@@ -537,7 +538,7 @@ class TestCustomBlendValidation:
         # Arrange
         components = [Component('brazil_santos', 0.6), Component('guatemala_antigua', 0.4)]
         blend = CustomBlend('Test Blend', components)
-        available_coffees: Set[str] = set()
+        available_coffees: set[str] = set()
 
         # Act
         result = blend.isValid(available_coffees)

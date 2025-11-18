@@ -13,7 +13,7 @@ maintainers = [
     {name = 'Dave Baxter'}
 ]
 license = {file = 'LICENSE'}
-requires-python = '>=3.8'
+requires-python = '>=3.12'
 keywords = ['roasting', 'roast logging', 'speciality coffee']
 classifiers = [
     'Development Status :: 5 - Production/Stable',
@@ -23,10 +23,6 @@ classifiers = [
     "Operating System :: POSIX :: Linux",
     'Programming Language :: Python',
     'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.8',
-    'Programming Language :: Python :: 3.9',
-    'Programming Language :: Python :: 3.10',
-    'Programming Language :: Python :: 3.11',
     'Programming Language :: Python :: 3.12',
     'Programming Language :: Python :: 3.13',
     'Programming Language :: Python :: 3.14',
@@ -47,7 +43,7 @@ classifiers = [
 
 [tool.black]
 line-length = 100
-target-version = ['py38']
+target-version = ['py313']
 include = '\.pyi?$'
 extend-exclude = '''
 # A regex preceded with ^/ will apply only to files and directories
@@ -88,7 +84,7 @@ ignore-paths = [ "^uic/.*$",
 jobs = "0"
 
 # Minimum supported python version
-py-version = "3.8"
+py-version = "3.12"
 
 # Pickle collected data for later comparisons.
 persistent = "no"
@@ -246,7 +242,7 @@ enable='''c-extension-no-member,'''
 [tool.mypy]
 files = ["artisanlib/*.py", "plus/*.py", "test/**/*.py"]
 exclude = ['build', 'dist', 'uic', 'misc']
-python_version = "3.9"
+python_version = "3.12"
 
 # Ensure full coverage
 check_untyped_defs = true
@@ -313,8 +309,8 @@ lint.ignore = ["E501", "E741", "E402", "PLR0912", "PLR0913", "PLR0915", "SIM105"
 # Exclude a variety of commonly ignored directories.
 exclude = ["dist", "build", "proto", ".pytype", ".mypy_cache", ".git", ".venv", ".venv_universal", ".venv_arm"]
 
-# Assume Python 3.8.
-target-version = "py38"
+# Assume Python 3.12
+target-version = "py312"
 
 [tool.ruff.lint.per-file-ignores]
 "uic/*.py" = ["UP004", "F401", "ARG002"]
@@ -331,7 +327,7 @@ exclude = ["proto"]
 reportMissingImports = true
 reportMissingTypeStubs = false
 
-pythonVersion = "3.8"
+pythonVersion = "3.12"
 pythonPlatform = "All"
 
 #typeCheckingMode = "strict" # "off", "basic", "strict"
@@ -350,7 +346,7 @@ reportInvalidTypeForm = false # since numpy 2.1 more than 150 errors are reporte
 ## pytest conf
 
 [tool.pytest.ini_options]
-minversion = "7.4"
+minversion = "9.0"
 addopts = "-ra -v"
 testpaths = [
     "test",
@@ -436,7 +432,7 @@ project_excludes = [
     "**/uic*",
     "**/misc*",
 ]
-python_version = "3.8.0"
+python_version = "3.12.0"
 replace_imports_with_any = [
     "matplotlib.*",
     "aiohttp.*",

@@ -18,30 +18,21 @@
 import time
 import sys
 import logging
-from typing import Final, List, Dict, Tuple, Optional, Iterator, TYPE_CHECKING, no_type_check
+from collections.abc import Iterator
+from typing import Final, TYPE_CHECKING, no_type_check
 
 if TYPE_CHECKING:
     from snap7.client import Client as S7Client
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
 
-try:
-    # >= v2.0
-    from snap7.type import Area # type:ignore[import-not-found, unused-ignore]
-    from snap7.util.getters import get_bool, get_int, get_real
-    from snap7.util.setters import set_bool, set_int, set_real
-except Exception: # pylint: disable=broad-except
-    # < v2.0
-    from snap7.types import Areas as Area # type:ignore[import-not-found, unused-ignore, no-redef] # noqa: F401 # pylint: disable=unused-import
-    from snap7.util import get_bool, set_bool, get_int, set_int, get_real, set_real
+from snap7.type import Area # type:ignore[import-not-found, unused-ignore]
+from snap7.util.getters import get_bool, get_int, get_real
+from snap7.util.setters import set_bool, set_int, set_real
 
 import artisanlib.util
 
-try:
-    from PyQt6.QtCore import QSemaphore # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
-except ImportError:
-    from PyQt5.QtCore import QSemaphore # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtWidgets import QApplication # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+from PyQt6.QtCore import QSemaphore
+from PyQt6.QtWidgets import QApplication
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -67,13 +58,13 @@ class s7port:
 
         self.lastReadResult:float = 0. # this is set by eventaction following some custom button/slider S/ actions with "read" command
 
-        self.area:List[int] = [0]*self.channels
-        self.db_nr:List[int] = [1]*self.channels
-        self.start:List[int] = [0]*self.channels
-        self.type:List[int] = [0]*self.channels # type 0 => int, type 1 => float, type 2 => intFloat
+        self.area:list[int] = [0]*self.channels
+        self.db_nr:list[int] = [1]*self.channels
+        self.start:list[int] = [0]*self.channels
+        self.type:list[int] = [0]*self.channels # type 0 => int, type 1 => float, type 2 => intFloat
         #  type 3 => Bool(0), type 4 => Bool(1), type 5 => Bool(2), type 6 => Bool(3), type 7 => Bool(4), type 8 => Bool(5), type 9 => Bool(6), type 10 => Bool(7)
-        self.mode:List[int] = [0]*self.channels # temp mode is an int here, 0:__,1:C,2:F (this is different than other places)
-        self.div:List[int] = [0]*self.channels
+        self.mode:list[int] = [0]*self.channels # temp mode is an int here, 0:__,1:C,2:F (this is different than other places)
+        self.div:list[int] = [0]*self.channels
 
         self.optimizer:bool = True # if set, values of consecutive register addresses are requested in single requests
         self.fetch_max_blocks:bool = False # if set, the optimizer fetches only one sequence per area from the minimum to the maximum register ignoring gaps
@@ -86,12 +77,12 @@ class s7port:
         # this dict is re-computed on each connect() by a call to updateActiveRegisters()
         # NOTE: for registers of type float (32bit = 2x16bit) also the succeeding register is registered here
         # S7 area => db_nr => [registers]
-        self.activeRegisters:Dict[int, Dict[int, List[int]]] = {}
+        self.activeRegisters:dict[int, dict[int, list[int]]] = {}
 
         # the readings cache that is filled by requesting sequences of values in blocks
         # readingsCache is a dict associating area to dicts associating db numbers to dicts associating registers to readings
         # S7 area => db_nr => register => value
-        self.readingsCache:Dict[int, Dict[int, Dict[int, int]]] = {}
+        self.readingsCache:dict[int, dict[int, dict[int, int]]] = {}
 
         self.PID_area:int = 0
         self.PID_db_nr:int = 0
@@ -108,13 +99,13 @@ class s7port:
         self.COMsemaphore:QSemaphore = QSemaphore(1)
 
         # we do not use the snap7 enums here to avoid the import for non S7 users
-        self.areas:Optional[List[Area]] = None # type:ignore[reportPossiblyUnboundVariable, unused-ignore, no-any-unimported] # lazy initialized in initArray() on connect
+        self.areas:list[Area]|None = None # type:ignore[reportPossiblyUnboundVariable, unused-ignore, no-any-unimported] # lazy initialized in initArray() on connect
         self.last_request_timestamp:float = time.time()
         self.min_time_between_requests:float = 0.04
 
         self.is_connected:bool = False # local cache of the connection state
 
-        self.plc:Optional[S7Client] = None
+        self.plc:S7Client|None = None
         self.commError:bool = False # True after a communication error was detected and not yet cleared by receiving proper data
 
 ################
@@ -317,15 +308,15 @@ class s7port:
             if self.isConnected():
                 for area, db_numbers in self.activeRegisters.items():
                     for db_nr, registers in db_numbers.items():
-                        sorted_registers:List[int] = sorted(registers)
-                        sequences:List[Tuple[int, int]]
+                        sorted_registers:list[int] = sorted(registers)
+                        sequences:list[tuple[int, int]]
                         if self.fetch_max_blocks:
                             sequences = [(sorted_registers[0],sorted_registers[-1])]
                         else:
                             # split in successive sequences
-                            gaps:List[List[int]] = [[s, e] for s, e in zip(sorted_registers, sorted_registers[1:]) if s+1 < e] # ylint: disable=used-before-assignment
+                            gaps:list[list[int]] = [[s, e] for s, e in zip(sorted_registers, sorted_registers[1:], strict=True) if s+1 < e] # ylint: disable=used-before-assignment
                             edges:Iterator[int] = iter(sorted_registers[:1] + sum(gaps, []) + sorted_registers[-1:])
-                            sequences = list(zip(edges, edges)) # list of pairs of the form (start-register,end-register)
+                            sequences = list(zip(edges, edges, strict=True)) # list of pairs of the form (start-register,end-register) # ty:ignore
                         for seq in sequences:
                             retry = self.readRetries
                             register = seq[0]
@@ -500,11 +491,11 @@ class s7port:
                 self.aw.addserial(f'S7 writeBool({area},{dbnumber},{start},{index},{value})')
 
     # if force the readings cache is ignored and fresh readings are requested
-    def readFloat(self, area:int, dbnumber:int, start:int,force:bool=False) -> Optional[float]:
+    def readFloat(self, area:int, dbnumber:int, start:int,force:bool=False) -> float|None:
         _log.debug('readFloat(%d,%d,%d,%s)',area,dbnumber,start,force)
         if area == 0:
             return None
-        res: Optional[bytearray]
+        res: bytearray|None
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
@@ -574,7 +565,7 @@ class s7port:
 
     # as readFloat, but does not retry nor raise and error and returns a None instead
     # also does not reserve the port via a semaphore nor uses the cache! This has to be done by the caller!
-    def peekFloat(self, area:int, dbnumber:int, start:int) -> Optional[float]:
+    def peekFloat(self, area:int, dbnumber:int, start:int) -> float|None:
         _log.debug('peekFloat(%d,%d,%d)',area,dbnumber,start)
         if area == 0:
             return None
@@ -595,11 +586,11 @@ class s7port:
             return None
 
     # if force the readings cache is ignored and fresh readings are requested
-    def readInt(self, area:int, dbnumber:int, start:int, force:bool=False) -> Optional[int]:
+    def readInt(self, area:int, dbnumber:int, start:int, force:bool=False) -> int|None:
         _log.debug('readInt(%d,%d,%d,%s)',area,dbnumber,start,force)
         if area == 0:
             return None
-        res: Optional[bytearray]
+        res: bytearray|None
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)
@@ -668,7 +659,7 @@ class s7port:
 
     # as readInt, but does not retry nor raise and error and returns a None instead
     # also does not reserve the port via a semaphore nor uses the cache! This has to be done by the caller!
-    def peekInt(self, area:int, dbnumber:int, start:int) -> Optional[int]:
+    def peekInt(self, area:int, dbnumber:int, start:int) -> int|None:
         _log.debug('peakInt(%d,%d,%d)',area,dbnumber,start)
         if area == 0:
             return None
@@ -689,11 +680,11 @@ class s7port:
             return None
 
     # if force the readings cache is ignored and fresh readings are requested
-    def readBool(self, area:int, dbnumber:int, start:int, index:int, force:bool = False) -> Optional[bool]:
+    def readBool(self, area:int, dbnumber:int, start:int, index:int, force:bool = False) -> bool|None:
         _log.debug('readBool(%d,%d,%d,%s)',area,dbnumber,start,force)
         if area == 0:
             return None
-        res: Optional[bytearray]
+        res: bytearray|None
         try:
             #### lock shared resources #####
             self.COMsemaphore.acquire(1)

@@ -18,12 +18,9 @@
 import asyncio
 import logging
 
-try:
-    from pymodbus.framer.rtu import FramerRTU  # type:ignore[attr-defined,import-not-found,unused-ignore]
-except Exception: # pylint: disable=broad-except
-    # pymodbus <3.7
-    from pymodbus.message.rtu import MessageRTU as FramerRTU # type:ignore[import-not-found, no-redef, unused-ignore]
-from typing import Final, Optional, Union, Callable, Awaitable, TYPE_CHECKING
+from pymodbus.framer.rtu import FramerRTU
+from collections.abc import Callable, Awaitable
+from typing import Final, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.atypes import SerialSettings # pylint: disable=unused-import
@@ -43,14 +40,14 @@ class SantokerCube_BLE(ClientBLE):
     SANTOKER_CUBE_WRTIE_UUID:Final[str] = '6e400002-b5a3-f393-e0a9-e50e24dcca9e'
 
     def __init__(self,
-                    read_msg:Callable[[Union[asyncio.StreamReader, IteratorReader]], Awaitable[None]],
-                    connected_handler:Optional[Callable[[], None]] = None,
-                    disconnected_handler:Optional[Callable[[], None]] = None):
+                    read_msg:Callable[[asyncio.StreamReader|IteratorReader], Awaitable[None]],
+                    connected_handler:Callable[[], None]|None = None,
+                    disconnected_handler:Callable[[], None]|None = None):
         super().__init__()
 
         # Protocol parser variables
-        self._read_queue : Optional[asyncio.Queue[bytes]] = None
-        self._read_msg:Callable[[Union[asyncio.StreamReader, IteratorReader]], Awaitable[None]] = read_msg
+        self._read_queue : asyncio.Queue[bytes]|None = None
+        self._read_msg:Callable[[asyncio.StreamReader|IteratorReader], Awaitable[None]] = read_msg
 
         # handlers
         self._connected_handler = connected_handler
@@ -127,15 +124,15 @@ class Santoker(AsyncComm):
                     '_bt_ror', '_et_ror', '_ir',
                     '_power', '_air', '_drum', '_CHARGE', '_DRY', '_FCs', '_SCs', '_DROP', '_connect_using_ble', '_ble_client' ]
 
-    def __init__(self, host:str = '127.0.0.1', port:int = 8080, serial:Optional['SerialSettings'] = None,
+    def __init__(self, host:str = '127.0.0.1', port:int = 8080, serial:'SerialSettings|None' = None,
                 connect_using_ble:bool = False,
-                connected_handler:Optional[Callable[[], None]] = None,
-                disconnected_handler:Optional[Callable[[], None]] = None,
-                charge_handler:Optional[Callable[[], None]] = None,
-                dry_handler:Optional[Callable[[], None]] = None,
-                fcs_handler:Optional[Callable[[], None]] = None,
-                scs_handler:Optional[Callable[[], None]] = None,
-                drop_handler:Optional[Callable[[], None]] = None) -> None:
+                connected_handler:Callable[[], None]|None = None,
+                disconnected_handler:Callable[[], None]|None = None,
+                charge_handler:Callable[[], None]|None = None,
+                dry_handler:Callable[[], None]|None = None,
+                fcs_handler:Callable[[], None]|None = None,
+                scs_handler:Callable[[], None]|None = None,
+                drop_handler:Callable[[], None]|None = None) -> None:
 
         super().__init__(host, port, serial, connected_handler, disconnected_handler)
 
@@ -144,11 +141,11 @@ class Santoker(AsyncComm):
         self._connect_using_ble:bool = connect_using_ble
 
         # handlers
-        self._charge_handler:Optional[Callable[[], None]] = charge_handler
-        self._dry_handler:Optional[Callable[[], None]] = dry_handler
-        self._fcs_handler:Optional[Callable[[], None]] = fcs_handler
-        self._scs_handler:Optional[Callable[[], None]] = scs_handler
-        self._drop_handler:Optional[Callable[[], None]] = drop_handler
+        self._charge_handler:Callable[[], None]|None = charge_handler
+        self._dry_handler:Callable[[], None]|None = dry_handler
+        self._fcs_handler:Callable[[], None]|None = fcs_handler
+        self._scs_handler:Callable[[], None]|None = scs_handler
+        self._drop_handler:Callable[[], None]|None = drop_handler
 
         # current readings
         self._board:float = -1  # board temperature in °C
@@ -168,7 +165,7 @@ class Santoker(AsyncComm):
         self._SCs:bool = False
         self._DROP:bool = False
 
-        self._ble_client:Optional[SantokerCube_BLE] = \
+        self._ble_client:SantokerCube_BLE|None = \
                 (SantokerCube_BLE(self.read_msg, connected_handler, disconnected_handler) if self._connect_using_ble else None)
 
 
@@ -297,7 +294,7 @@ class Santoker(AsyncComm):
     # asyncio read implementation
 
     # https://www.oreilly.com/library/view/using-asyncio-in/9781492075325/ch04.html
-    async def read_msg(self, stream: Union[asyncio.StreamReader, IteratorReader]) -> None:
+    async def read_msg(self, stream: asyncio.StreamReader|IteratorReader) -> None:
         # look for the first header byte
         await stream.readuntil(self.HEADER[0:1])
         # check for the second header byte

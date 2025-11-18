@@ -6,12 +6,13 @@
 import sys
 import tempfile
 from pathlib import Path
-from typing import Any, Dict, Generator
+from collections.abc import Generator
+from typing import Any
 from unittest.mock import Mock, patch
 
 # Store original modules before any mocking to enable restoration
-original_modules: Dict[str, Any] = {}
-original_functions: Dict[str, Any] = {}
+original_modules: dict[str, Any] = {}
+original_functions: dict[str, Any] = {}
 modules_to_isolate = [
     'PyQt6.QtCore',
     'PyQt5.QtCore',
@@ -480,7 +481,7 @@ class TestAccountNumberGeneration:
     def test_account_number_incremental_assignment(self, mock_file_handle: Mock) -> None:
         """Test that account numbers are assigned incrementally."""
         # Arrange
-        mock_db: Dict[str, Any] = {}
+        mock_db: dict[str, Any] = {}
 
         def mock_contains(_: Any, key: str) -> bool:
             return key in mock_db

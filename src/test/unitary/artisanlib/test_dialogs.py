@@ -22,7 +22,8 @@ Security Coverage: Levels 1-4 (Basic Stability through Hardware Protection)
 
 import sys
 import time
-from typing import Generator, cast
+from collections.abc import Generator
+from typing import cast
 from unittest.mock import Mock, patch
 
 import pytest

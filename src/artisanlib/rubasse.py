@@ -5,7 +5,8 @@
 import os
 import csv
 import logging
-from typing import Final, List, Optional, Callable
+from collections.abc import Callable
+from typing import Final
 
 from artisanlib.util import encodeLocalStrict
 from artisanlib.atypes import ProfileData
@@ -16,9 +17,9 @@ _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 # returns a dict containing all profile information contained in the given Rubasse CSV file
 def extractProfileRubasseCSV(file:str,
-        _etypesdefault:List[str],
-        alt_etypesdefault:List[str],
-        _artisanflavordefaultlabels:List[str],
+        _etypesdefault:list[str],
+        alt_etypesdefault:list[str],
+        _artisanflavordefaultlabels:list[str],
         eventsExternal2InternalValue:Callable[[int],float]) -> ProfileData:
     res:ProfileData = ProfileData() # the interpreted data set
 
@@ -35,33 +36,33 @@ def extractProfileRubasseCSV(file:str,
         header_row = next(data)
         header = ['time','BT','Fan','Heater','RoR','Drum','Humidity','ET','Pressure'] + ['DT', 'timeB', 'BTB', 'FanB', 'HeaterB', 'RoRB', 'DrumB', 'HumidityB', 'ETB', 'PressureB', 'DTB']
 
-        fan:Optional[float] = None # holds last processed fan event value
-        fan_last:Optional[float] = None # holds the fan event value before the last one
-        heater:Optional[float] = None # holds last processed heater event value
-        heater_last:Optional[float] = None # holds the heater event value before the last one
+        fan:float|None = None # holds last processed fan event value
+        fan_last:float|None = None # holds the fan event value before the last one
+        heater:float|None = None # holds last processed heater event value
+        heater_last:float|None = None # holds the heater event value before the last one
         fan_event:bool = False # set to True if a fan event exists
         heater_event:bool = False # set to True if a heater event exists
 
-        specialevents:List[int] = []
-        specialeventstype:List[int] = []
-        specialeventsvalue:List[float] = []
-        specialeventsStrings:List[str] = []
-        timex:List[float] = []
-        temp1:List[float] = []
-        temp2:List[float] = []
-        extra1:List[float] = []
-        extra2:List[float] = []
-        extra3:List[float] = []
-        extra4:List[float] = []
-        extra5:List[float] = []
-        extra6:List[float] = []
-        timeindex:List[int] = [-1,0,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actual index used
+        specialevents:list[int] = []
+        specialeventstype:list[int] = []
+        specialeventsvalue:list[float] = []
+        specialeventsStrings:list[str] = []
+        timex:list[float] = []
+        temp1:list[float] = []
+        temp2:list[float] = []
+        extra1:list[float] = []
+        extra2:list[float] = []
+        extra3:list[float] = []
+        extra4:list[float] = []
+        extra5:list[float] = []
+        extra6:list[float] = []
+        timeindex:list[int] = [-1,0,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actual index used
 
 
 
         i = 0
         for row in data:
-            items = list(zip(header, row))
+            items = list(zip(header, row, strict=False)) # ty:ignore
             item = {}
             for (name, value) in items:
                 item[name] = value.strip()

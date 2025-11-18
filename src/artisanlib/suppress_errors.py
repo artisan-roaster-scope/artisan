@@ -2,7 +2,7 @@
 
 import os
 import sys
-from typing import Optional, Type, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 
 if TYPE_CHECKING:
@@ -48,9 +48,9 @@ class suppress_stdout_stderr:
             os.dup2(self.null_fds[1],2)
 
     def __exit__(self,
-        _exc_type: Optional[Type[BaseException]] = None,
-        _exc_val: Optional[BaseException] = None,
-        _exc_tb: Optional['TracebackType'] = None) -> None:
+        _exc_type: type[BaseException]|None = None,
+        _exc_val: BaseException|None = None,
+        _exc_tb: 'TracebackType|None' = None) -> None:
 
         # Re-assign the real stdout/stderr back to (1) and (2)
         try:

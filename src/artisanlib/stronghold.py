@@ -5,7 +5,8 @@
 import openpyxl
 import logging
 from pathlib import Path
-from typing import Final, Union, List, Dict, Tuple, Optional, Callable
+from collections.abc import Callable
+from typing import Final
 
 from artisanlib.util import stringtoseconds, encodeLocalStrict
 from artisanlib.atypes import ProfileData
@@ -15,9 +16,9 @@ _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 # returns a dict containing all profile information contained in the given Stronghold XLSX file
 def extractProfileStrongholdXLSX(file:str,
-        _etypesdefault:List[str],
-        alt_etypesdefault:List[str],
-        _artisanflavordefaultlabels:List[str],
+        _etypesdefault:list[str],
+        alt_etypesdefault:list[str],
+        _artisanflavordefaultlabels:list[str],
         eventsExternal2InternalValue:Callable[[int],float]) -> ProfileData:
 
     res:ProfileData = ProfileData() # the interpreted data set
@@ -28,7 +29,7 @@ def extractProfileStrongholdXLSX(file:str,
     book = openpyxl.load_workbook(file)
     sheet = book.worksheets[0] # first sheet
     first_row = sheet[1]  # pyrefly: ignore[bad-argument-type]
-    keys:Optional[List[str]] = None # data of columns with empty string as key are ignored
+    keys:list[str]|None = None # data of columns with empty string as key are ignored
     machine:str = ''
     machine_size:float = 0
     if len(first_row) == 9: # S7Pro
@@ -58,7 +59,7 @@ def extractProfileStrongholdXLSX(file:str,
 
     if keys is not None and sheet.max_row is not None:
         # import
-        data:Dict[str, List[Union[float,int,str]]] = {}
+        data:dict[str, list[float|int|str]] = {}
         # read keys
         for key in keys:
             if key != '':
@@ -125,7 +126,7 @@ def extractProfileStrongholdXLSX(file:str,
 
             # add events
 
-            events:List[Tuple[int, int, float]] = [] # list of triples (tx_idx, event_nr, value)
+            events:list[tuple[int, int, float]] = [] # list of triples (tx_idx, event_nr, value)
             try:
                 for event_name, event_nr in [('DrumHeater', 0), ('DrumSpeed', 1), ('Halogen', 2), ('Air', 3), ('Blower', 4)]:
                     if event_name in data and len(data[event_name]) == tx_len:

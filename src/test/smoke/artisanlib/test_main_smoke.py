@@ -51,7 +51,8 @@ cross-file contamination.
 =============================================================================
 """
 
-from typing import Any, Generator, List
+from collections.abc import Generator
+from typing import Any
 from unittest.mock import Mock, patch
 
 import numpy # noqa: F401 # explicitly import numpy here to prevent duplicate imports after the sys.modules hack below
@@ -198,7 +199,7 @@ class MockQVersionNumber:
         self.minor = minor
         self.patch = patch_version
 
-    def segments(self) -> List[int]:
+    def segments(self) -> list[int]:
         return [self.major, self.minor, self.patch]
 
     @classmethod
@@ -268,7 +269,7 @@ class MockQStandardPaths:
         TempLocation = 5
 
     @staticmethod
-    def standardLocations(_location_type: Any) -> List[str]:
+    def standardLocations(_location_type: Any) -> list[str]:
         # Return a list of standard paths
         return ['/mock/standard/path']
 

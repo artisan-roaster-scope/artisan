@@ -20,7 +20,7 @@ from artisanlib.util import fromFtoCstrict, fromCtoFstrict, RoRfromFtoCstrict, R
 
 import numpy
 import logging
-from typing import Final, Tuple, Dict, List, Any, Optional, TYPE_CHECKING
+from typing import Final, Any, TYPE_CHECKING
 
 
 if TYPE_CHECKING:
@@ -35,21 +35,21 @@ class Simulator:
         'temp1_array', 'temp2_array', 'timex_array', 'extratemp1_array', 'extratemp2_array', 'extratimex_array']
 
     # mode is the current temperature of Artisan, either "C" or "F"
-    def __init__(self, mode:str, profile:Optional[Dict[str, Any]] = None) -> None:
+    def __init__(self, mode:str, profile:dict[str, Any]|None = None) -> None:
 
-        self.temp1:List[float]
-        self.temp2:List[float]
-        self.timex:List[float]
-        self.extratemp1: List[List[float]]
-        self.extratemp2: List[List[float]]
-        self.extratimex: List[List[float]]
+        self.temp1:list[float]
+        self.temp2:list[float]
+        self.timex:list[float]
+        self.extratemp1: list[list[float]]
+        self.extratemp2: list[list[float]]
+        self.extratimex: list[list[float]]
 
         self.temp1_array:npt.NDArray[numpy.double]
         self.temp2_array:npt.NDArray[numpy.double]
         self.timex_array:npt.NDArray[numpy.double]
-        self.extratemp1_array: List[npt.NDArray[numpy.double]]
-        self.extratemp2_array: List[npt.NDArray[numpy.double]]
-        self.extratimex_array: List[npt.NDArray[numpy.double]]
+        self.extratemp1_array: list[npt.NDArray[numpy.double]]
+        self.extratemp2_array: list[npt.NDArray[numpy.double]]
+        self.extratimex_array: list[npt.NDArray[numpy.double]]
 
         self.profile = profile
         if profile is not None:
@@ -131,7 +131,7 @@ class Simulator:
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
 
-    def read(self, tx:float) -> Tuple[float, float]:
+    def read(self, tx:float) -> tuple[float, float]:
         et:float = -1.0
         bt:float = -1.0
         try:
@@ -145,7 +145,7 @@ class Simulator:
             pass
         return et,bt
 
-    def readextra(self, i:int, tx:float) -> Tuple[float, float]:
+    def readextra(self, i:int, tx:float) -> tuple[float, float]:
         t1:float = -1
         t2:float = -1
         try:

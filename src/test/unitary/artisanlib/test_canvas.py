@@ -72,7 +72,8 @@ import math
 import os
 import sys
 import warnings
-from typing import Any, Generator, List, Optional
+from collections.abc import Generator
+from typing import Any
 from unittest.mock import Mock, patch
 
 import hypothesis.strategies as st
@@ -94,7 +95,7 @@ os.environ['QT_QPA_PLATFORM'] = 'offscreen'
 class MockQApplication:
     """Mock QApplication that behaves like the real one but with controllable behavior."""
 
-    _mock_instance: Optional['MockQApplication'] = None
+    _mock_instance: 'MockQApplication|None' = None
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:  # noqa: ARG002
         self.artisanviewerMode = False
@@ -104,7 +105,7 @@ class MockQApplication:
         self._instance = self
 
     @classmethod
-    def instance(cls) -> Optional['MockQApplication']:
+    def instance(cls) -> 'MockQApplication|None':
         """Return mock instance like real QApplication."""
         return getattr(cls, '_mock_instance', None)
 
@@ -113,7 +114,7 @@ class MockQApplication:
         cls,
         context: str,  # noqa: ARG003
         text: str,
-        disambiguation: Optional[str] = None,  # noqa: ARG003
+        disambiguation: str|None = None,  # noqa: ARG003
         n: int = -1,  # noqa: ARG003
     ) -> str:
         """Mock translate method that returns the text as-is."""
@@ -545,7 +546,7 @@ class TestShiftValueEvalsign:
     def test_shiftValueEvalsign_with_none_values(self) -> None:
         """Test shiftValueEvalsign with None values in readings."""
         # Arrange
-        readings: List[Optional[float]] = [1.0, None, 3.0, 4.0]
+        readings: list[float|None] = [1.0, None, 3.0, 4.0]
         index = 2
         sign = '-'
         shiftval = 1
@@ -860,7 +861,7 @@ class TestCalcFlavorChartScoreFromFlavors:
     def test_calcFlavorChartScoreFromFlavors_empty_list(self) -> None:
         """Test calcFlavorChartScoreFromFlavors with empty flavors list."""
         # Arrange
-        flavors: List[float] = []
+        flavors: list[float] = []
         flavors_total_correction = 0.0
 
         # Act
@@ -964,7 +965,7 @@ class TestCalcMeterRead:
     def test_calc_meter_read_empty_list(self) -> None:
         """Test calc_meter_read with empty list."""
         # Arrange
-        extratemp: List[float] = []
+        extratemp: list[float] = []
 
         # Act
         result = tgraphcanvas.calc_meter_read(extratemp)
@@ -1486,8 +1487,8 @@ class TestTimetemparray2temp:
     def test_timetemparray2temp_empty_arrays(self) -> None:
         """Test timetemparray2temp with empty arrays."""
         # Arrange
-        timearray: List[float] = []
-        temparray: List[float] = []
+        timearray: list[float] = []
+        temparray: list[float] = []
         seconds = 60.0
 
         # Act

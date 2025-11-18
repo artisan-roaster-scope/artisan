@@ -22,10 +22,11 @@ import re
 import platform
 import logging
 from PIL import ImageColor
-from typing import Final, Optional, List, Tuple, cast, TYPE_CHECKING
+from typing import Final, cast, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
+    from artisanlib.dialogs import HelpDlg # noqa: F401 # pylint: disable=unused-import
     from PyQt6.QtWidgets import QAbstractItemView # pylint: disable=unused-import
     from artisanlib.scale import ScaleSpecs
 
@@ -38,20 +39,12 @@ from artisanlib.scale import SUPPORTED_SCALES
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
-try:
-    from PyQt6.QtCore import (Qt, pyqtSlot, QSettings, QTimer, QRegularExpression, QSignalBlocker) # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtGui import (QStandardItemModel, QStandardItem, QColor, QIntValidator, QRegularExpressionValidator, QPixmap, QIcon) # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit,  # @UnusedImport @Reimport  @UnresolvedImport
-                                 QPushButton, QSpinBox, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QGroupBox, QRadioButton, QButtonGroup, QInputDialog, QToolButton, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QTableWidget, QMessageBox, QHeaderView, QTableWidgetItem, QSizePolicy) # @UnusedImport @Reimport  @UnresolvedImport
-except ImportError:
-    from PyQt5.QtCore import (Qt, pyqtSlot, QSettings, QTimer, QRegularExpression, QSignalBlocker) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtGui import (QStandardItemModel, QStandardItem, QColor, QIntValidator, QRegularExpressionValidator, QPixmap, QIcon) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-                                 QPushButton, QSpinBox, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QGroupBox, QRadioButton, QButtonGroup, QInputDialog, QToolButton, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QTableWidget, QMessageBox, QHeaderView, QTableWidgetItem, QSizePolicy) # @UnusedImport @Reimport  @UnresolvedImport
+from PyQt6.QtCore import (Qt, pyqtSlot, QSettings, QTimer, QRegularExpression, QSignalBlocker)
+from PyQt6.QtGui import (QStandardItemModel, QStandardItem, QColor, QIntValidator, QRegularExpressionValidator, QPixmap, QIcon)
+from PyQt6.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit,
+                             QPushButton, QSpinBox, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout,
+                             QGroupBox, QRadioButton, QButtonGroup, QInputDialog, QToolButton,
+                             QTableWidget, QMessageBox, QHeaderView, QTableWidgetItem, QSizePolicy)
 
 
 class DeviceAssignmentDlg(ArtisanResizeablDialog):
@@ -61,7 +54,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.setWindowTitle(QApplication.translate('Form Caption','Device Assignment'))
         self.setModal(True)
 
-        self.helpdialog = None
+        self.helpdialog:HelpDlg|None = None
 
         self.org_phidgetRemoteFlag = self.aw.qmc.phidgetRemoteFlag
         self.org_yoctoRemoteFlag = self.aw.qmc.yoctoRemoteFlag
@@ -143,14 +136,6 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     break
         self.sorted_devices = sorted(dev)
         self.devicetypeComboBox = MyContentLimitedQComboBox()
-
-##        self.devicetypeComboBox.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
-##        self.devicetypeComboBox.view().setTextElideMode(Qt.TextElideMode.ElideNone)
-#        # HACK: only needed for the macintosh UI on Qt 5.12 onwords; without long items get cut in the popup
-#        #  note the -7 as the width of the popup is too large if given the correct maximum characters
-##        self.devicetypeComboBox.setMinimumContentsLength(max(22,len(max(dev, key=len)) - 7)) # expects # characters, but is to wide
-# the following "hack" helped on PyQt5, but seems not to be needed on PyQt6 any longer
-#        self.devicetypeComboBox.setSizePolicy(QSizePolicy.Policy.Expanding,self.devicetypeComboBox.sizePolicy().verticalPolicy())
 
         self.devicetypeComboBox.addItems(self.sorted_devices)
         self.programedit = QLineEdit(self.aw.ser.externalprogram)
@@ -1190,7 +1175,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             QApplication.translate('Label','SCe'),
             QApplication.translate('Label','DROP')
         ]
-        self.santokerEventFlags:List[QCheckBox] = [QCheckBox(l) for l in eventFlagLabels]
+        self.santokerEventFlags:list[QCheckBox] = [QCheckBox(l) for l in eventFlagLabels]
         self.santokerEventFlags[3].setEnabled(False) # not available
         self.santokerEventFlags[5].setEnabled(False) # not available
         for i, cb in enumerate(self.santokerEventFlags):
@@ -1236,7 +1221,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 #        self.kaleidoPIDFlag = QCheckBox()
 #        self.kaleidoPIDFlag.setChecked(self.aw.kaleidoPID)
 
-        self.kaleidoEventFlags:List[QCheckBox] = [QCheckBox(l) for l in eventFlagLabels]
+        self.kaleidoEventFlags:list[QCheckBox] = [QCheckBox(l) for l in eventFlagLabels]
         for i, cb in enumerate(self.kaleidoEventFlags):
             cb.setToolTip(QApplication.translate('Tooltip','Receive {} event from machine').format(cb.text()))
             if len(self.aw.kaleidoEventFlags) > i:
@@ -1577,8 +1562,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         if not self.aw.app.artisanviewerMode:
             self.scale1_devices:ScaleSpecs = [] # discovered scale1 devices
             self.scale2_devices:ScaleSpecs = [] # discovered scale2 devices
-            self.scale1_weight:Optional[float] = None # weight of scale 1 in g
-            self.scale2_weight:Optional[float] = None # weight of scale 2 in g
+            self.scale1_weight:float|None = None # weight of scale 1 in g
+            self.scale2_weight:float|None = None # weight of scale 2 in g
 
             # remember connection state of scales
             self.scale1_was_connected:bool = self.aw.scale_manager.is_scale1_connected()
@@ -1663,7 +1648,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             scale1Layout.setContentsMargins(0,0,0,0)
 
             if self.scale1_was_connected:
-                scale1_last_weight:Optional[int] = self.aw.scale_manager.get_scale1_last_weight()
+                scale1_last_weight:int|None = self.aw.scale_manager.get_scale1_last_weight()
                 if scale1_last_weight is not None:
                     self.scale1_weight_changed(scale1_last_weight)
 
@@ -1734,7 +1719,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             scale2Layout.setContentsMargins(0,0,0,0)
 
             if self.scale2_was_connected:
-                scale2_last_weight:Optional[int] = self.aw.scale_manager.get_scale2_last_weight()
+                scale2_last_weight:int|None = self.aw.scale_manager.get_scale2_last_weight()
                 if scale2_last_weight is not None:
                     self.scale2_weight_changed(scale2_last_weight)
 
@@ -2005,7 +1990,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         Mlayout.setContentsMargins(5,10,5,5)
         self.setLayout(Mlayout)
         if platform.system() != 'Windows':
-            ok_button: Optional[QPushButton] = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
+            ok_button: QPushButton|None = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
             if ok_button is not None:
                 ok_button.setFocus()
         else:
@@ -2042,7 +2027,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
     def ambientPressureComboBoxIndexChanged(self, i:int) -> None:
         self.aw.qmc.ambientPressureSource = i
 
-    def buildAmbientTemperatureSourceList(self) -> List[str]:
+    def buildAmbientTemperatureSourceList(self) -> list[str]:
         extra_names = []
         for i in range(len(self.aw.qmc.extradevices)):
             try:
@@ -2140,7 +2125,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.update_scale1_weight(w)
 
     # returns formatted weight converted to current weight unit
-    def format_scale_weight(self, w:Optional[float]) -> str:
+    def format_scale_weight(self, w:float|None) -> str:
         if w is None:
             return '----'
         unit = weight_units.index(self.aw.qmc.weight[2])
@@ -2155,7 +2140,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         v = convertWeight(w,0,weight_units.index(self.aw.qmc.weight[2]))
         return f'{v:.2f}{self.aw.qmc.weight[2].lower()}'
 
-    def update_scale1_weight(self, weight:Optional[float]) -> None:
+    def update_scale1_weight(self, weight:float|None) -> None:
         self.scale1_weight = weight
         if self.aw.scale1_name is not None and self.aw.scale1_id is not None:
             self.scale1Weight.setText(self.format_scale_weight(self.scale1_weight))
@@ -2256,7 +2241,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
     def scale2_weight_changed(self, w:int) -> None:
         self.update_scale2_weight(w)
 
-    def update_scale2_weight(self, weight:Optional[float]) -> None:
+    def update_scale2_weight(self, weight:float|None) -> None:
         self.scale2_weight = weight
         if self.aw.scale2_name is not None and self.aw.scale2_id is not None:
             self.scale2Weight.setText(self.format_scale_weight(self.scale2_weight))
@@ -2337,7 +2322,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.containerGreenComboBox.addItem('')
             self.containerGreenComboBox.addItems(self.aw.qmc.container_names)
             width = self.containerGreenComboBox.minimumSizeHint().width()
-            view: Optional[QAbstractItemView] = self.containerGreenComboBox.view()
+            view: QAbstractItemView|None = self.containerGreenComboBox.view()
             if view is not None:
                 view.setMinimumWidth(width)
         if adjust_index:
@@ -2371,7 +2356,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         else:
             self.containerGreenTareWeight.setText(render_weight(weight, 0,  weight_units.index(self.aw.qmc.weight[2])))
 
-    def get_scale1_weight(self) -> Optional[float]:
+    def get_scale1_weight(self) -> float|None:
         if self.scale1_weight is not None:
             return self.scale1_weight
         return self.scale2_weight
@@ -2396,7 +2381,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.containerRoastedComboBox.addItem('')
             self.containerRoastedComboBox.addItems(self.aw.qmc.container_names)
             width = self.containerRoastedComboBox.minimumSizeHint().width()
-            view: Optional[QAbstractItemView] = self.containerGreenComboBox.view()
+            view: QAbstractItemView|None = self.containerGreenComboBox.view()
             if view is not None:
                 view.setMinimumWidth(width)
         if adjust_index:
@@ -2436,7 +2421,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         else:
             self.containerRoastedTareWeight.setText(render_weight(weight, 0,  weight_units.index(self.aw.qmc.weight[2])))
 
-    def get_scale2_weight(self) -> Optional[float]:
+    def get_scale2_weight(self) -> float|None:
         if self.scale2_weight is not None:
             return self.scale2_weight
         return self.scale1_weight
@@ -2654,8 +2639,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             _log.exception(e)
 
     @staticmethod
-    def createItems(strs:List[str]) -> List[QStandardItem]:
-        items:List[QStandardItem] = []
+    def createItems(strs:list[str]) -> list[QStandardItem]:
+        items:list[QStandardItem] = []
         for st in strs:
             item = QStandardItem(st)
             items.append(item)
@@ -2678,7 +2663,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.aw.showControlButton()
 
     @staticmethod
-    def centeredCheckBox() -> Tuple[QWidget, QCheckBox]:
+    def centeredCheckBox() -> tuple[QWidget, QCheckBox]:
         widget = QWidget()
         checkBox = QCheckBox()
         checkBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -2689,7 +2674,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         return widget, checkBox
 
     @staticmethod
-    def centeredCheckBox_isChecked(widget:Optional[QWidget]) -> bool:
+    def centeredCheckBox_isChecked(widget:QWidget|None) -> bool:
         if widget is not None:
             layout = widget.layout()
             if layout is not None:
@@ -4289,7 +4274,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 elif meter == 'IKAWA':
                     self.aw.qmc.device = 142
                     message = QApplication.translate('Message','Device set to {0}').format(meter)
-                    permission_status:Optional[bool] = self.aw.app.getBluetoothPermission(request=True)
+                    permission_status:bool|None = self.aw.app.getBluetoothPermission(request=True)
                     if permission_status is False:
                         msg:str = QApplication.translate('Message','Bluetootooth access denied')
                         QMessageBox.warning(None, #self, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
@@ -4495,12 +4480,12 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
     # - add an elif entry above to specify the default serial settings
             #extra devices serial config
             #set of different serial settings modes options
-            ssettings: Final[List[Tuple[int,int,str,int,float]]] = [(9600,8,'O',1,0.5),(19200,8,'E',1,0.5),(2400,7,'E',1,1),(9600,8,'N',1,0.5),
+            ssettings: Final[list[tuple[int,int,str,int,float]]] = [(9600,8,'O',1,0.5),(19200,8,'E',1,0.5),(2400,7,'E',1,1),(9600,8,'N',1,0.5),
                          (19200,8,'N',1,0.5),(2400,8,'N',1,1),(9600,8,'E',1,0.5),(38400,8,'E',1,0.5),(115200,8,'N',1,0.4),(57600,8,'N',1,0.4)]
             #map device index to a setting mode (choose the one that matches the device)
     # ADD DEVICE: to add a device you have to modify several places. Search for the tag "ADD DEVICE:"in the code
     # - add an entry to devsettings below (and potentially to ssettings above)
-            devssettings: Final[List[int]] = [
+            devssettings: Final[list[int]] = [
                 0, # 0
                 1, # 1
                 2, # 2
@@ -4696,7 +4681,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             #init serial settings of extra devices
             for i, _ in enumerate(self.aw.qmc.extradevices):
                 if self.aw.qmc.extradevices[i] < len(devssettings) and devssettings[self.aw.qmc.extradevices[i]] < len(ssettings):
-                    dsettings: Tuple[int,int,str,int,float] = ssettings[devssettings[self.aw.qmc.extradevices[i]]]
+                    dsettings: tuple[int,int,str,int,float] = ssettings[devssettings[self.aw.qmc.extradevices[i]]]
                     if i < len(self.aw.extrabaudrate):
                         self.aw.extrabaudrate[i] = dsettings[0]
                     else:

@@ -15,23 +15,18 @@
 # AUTHOR
 # Marko Luther, 2023
 
-from typing import Optional, cast, TYPE_CHECKING
+from typing import cast, TYPE_CHECKING
 from artisanlib.dialogs import ArtisanDialog
 
-try:
-    from PyQt6.QtCore import Qt, pyqtSlot, QSettings # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtWidgets import (QApplication, QLabel, QPushButton, QDialogButtonBox,  # @UnusedImport @Reimport  @UnresolvedImport
-        QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout, QLineEdit) # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtGui import QStandardItemModel # @UnusedImport @Reimport  @UnresolvedImport
-except ImportError:
-    from PyQt5.QtCore import Qt, pyqtSlot, QSettings # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtWidgets import (QApplication, QLabel, QPushButton, QDialogButtonBox, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-        QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout, QLineEdit) # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtGui import QStandardItemModel # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+from PyQt6.QtCore import Qt, pyqtSlot, QSettings
+from PyQt6.QtWidgets import (QApplication, QLabel, QPushButton, QDialogButtonBox,
+    QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout, QLineEdit)
+from PyQt6.QtGui import QStandardItemModel
 
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
+    from artisanlib.dialogs import HelpDlg # noqa: F401 # pylint: disable=unused-import
     from PyQt6.QtWidgets import QWidget # pylint: disable=unused-import
     from PyQt6.QtGui import QStandardItem, QCloseEvent # pylint: disable=unused-import
 
@@ -45,7 +40,7 @@ class autosaveDlg(ArtisanDialog):
         if settings.contains('autosaveGeometry'):
             self.restoreGeometry(settings.value('autosaveGeometry'))
 
-        self.helpdialog = None
+        self.helpdialog:HelpDlg|None = None
 
         self.prefixEdit = QLineEdit(self.aw.qmc.autosaveprefix)
         self.prefixEdit.setToolTip(QApplication.translate('Tooltip', 'Automatic generated name'))
@@ -80,7 +75,7 @@ class autosaveDlg(ArtisanDialog):
                 # disable "PDF Report" item if QtWebEngine Support is not available
                 model = self.imageTypesComboBox.model()
                 if model is not None:
-                    item: Optional[QStandardItem] = cast(QStandardItemModel, model).item(self.aw.qmc.autoasaveimageformat_types.index('PDF Report'))
+                    item: QStandardItem|None = cast(QStandardItemModel, model).item(self.aw.qmc.autoasaveimageformat_types.index('PDF Report'))
                     if item is not None:
                         item.setEnabled(False)
         except Exception: # pylint: disable=broad-except
@@ -144,7 +139,7 @@ class autosaveDlg(ArtisanDialog):
         mainLayout.addSpacing(10)
         mainLayout.addLayout(buttonLayout)
         self.setLayout(mainLayout)
-        okButton: Optional[QPushButton] = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
+        okButton: QPushButton|None = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
         if okButton is not None:
             okButton.setFocus()
         self.setFixedHeight(self.sizeHint().height())
@@ -211,7 +206,8 @@ class autosaveDlg(ArtisanDialog):
         self.close()
 
     @pyqtSlot('QCloseEvent')
-    def closeEvent(self, _:Optional['QCloseEvent'] = None) -> None:
+    def closeEvent(self, a0:'QCloseEvent|None' = None) -> None:
+        del a0
         self.closeHelp()
         settings = QSettings()
         #save window geometry

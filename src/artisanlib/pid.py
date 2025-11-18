@@ -20,24 +20,22 @@
 import logging
 import time
 import functools
-from typing import Callable, Final, List, Optional, Tuple
+from collections.abc import Callable
+from typing import Final
 
 import numpy
 from scipy.signal import iirfilter  # type # ignore[import-untyped]
 
 from artisanlib.filters import LiveSosFilter
 
-try:
-    from PyQt6.QtCore import QSemaphore # @Reimport @UnresolvedImport @UnusedImport
-except ImportError:
-    from PyQt5.QtCore import QSemaphore # type: ignore # @Reimport @UnresolvedImport @UnusedImport
+from PyQt6.QtCore import QSemaphore
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 
 @functools.lru_cache(maxsize=4)
-def _calculate_integral_limits(outMin:int, outMax:int, integral_limit_factor:float) -> Tuple[float, float]:
+def _calculate_integral_limits(outMin:int, outMax:int, integral_limit_factor:float) -> tuple[float, float]:
     """Calculate dynamic integral limits based on output range."""
     output_range = outMax - outMin
     integral_range = output_range * integral_limit_factor
@@ -133,12 +131,12 @@ class PID:
         self.Iterm: float = 0.0
         self.Dterm: float = 0.0
         self.errSum: float = 0.0
-        self.lastError: Optional[float] = None  # used for derivative_on_error mode
-        self.lastInput: Optional[float] = None  # used for derivative_on_measurement mode
-        self.lastOutput: Optional[float] = (
+        self.lastError: float|None = None  # used for derivative_on_error mode
+        self.lastInput: float|None = None  # used for derivative_on_measurement mode
+        self.lastOutput: float|None = (
             None  # used to reinitialize the Iterm and to apply simple moving average on the derivative part in derivative_on_measurement mode
         )
-        self.lastTime: Optional[float] = None
+        self.lastTime: float|None = None
         self.lastDerr: float = (
             0.0  # used for simple moving average filtering on the derivative part in derivative_on_error mode
         )
@@ -147,12 +145,12 @@ class PID:
         self.derivative_on_error: bool = False  # if False => derivative_on_measurement (avoids the Derivative Kick on changing the target)
         # PID output smoothing
         self.output_smoothing_factor: int = 0  # off if 0
-        self.output_decay_weights: Optional[List[float]] = None
-        self.previous_outputs: List[float] = []
+        self.output_decay_weights: list[float]|None = None
+        self.previous_outputs: list[float] = []
         # PID input smoothing
         self.input_smoothing_factor: int = 0  # off if 0
-        self.input_decay_weights: Optional[List[float]] = None
-        self.previous_inputs: List[float] = []
+        self.input_decay_weights: list[float]|None = None
+        self.previous_inputs: list[float] = []
         self.force_duty: int = (
             3  # at least every n update cycles a new duty value is send, even if its duplicating a previous duty (within the duty step)
         )
@@ -166,7 +164,7 @@ class PID:
         # Enhanced derivative kick prevention
         self.lastTarget: float = 0.0  # Track target changes
         self.derivative_limit: float = 100.0  # Limit derivative contribution
-        self.measurement_history: List[float] = (
+        self.measurement_history: list[float] = (
             []
         )  # Track recent measurements for discontinuity detection
         self.max_len_measurement_history: Final[int] = 5
@@ -191,7 +189,7 @@ class PID:
             self.output_decay_weights is None
             or len(self.output_decay_weights) != self.output_smoothing_factor
         ):  # recompute only on changes
-            self.output_decay_weights = list(numpy.arange(1, self.output_smoothing_factor + 1))
+            self.output_decay_weights = [float(w) for w in numpy.arange(1, self.output_smoothing_factor + 1)]
         # add new value
         self.previous_outputs.append(output)
         # throw away superfluous values
@@ -210,7 +208,7 @@ class PID:
             self.input_decay_weights is None
             or len(self.input_decay_weights) != self.input_smoothing_factor
         ):  # recompute only on changes
-            self.input_decay_weights = list(numpy.arange(1, self.input_smoothing_factor + 1))
+            self.input_decay_weights = [float(w) for w in numpy.arange(1, self.input_smoothing_factor + 1)]
         # add new value
         self.previous_inputs.append(inp)
         # throw away superfluous values
@@ -353,10 +351,10 @@ class PID:
             self.pidSemaphore.release(1)
 
     # update control value (the pid loop is running even if PID is inactive, just the control function is only called if active)
-    def update(self, i: Optional[float]) -> None:
+    def update(self, i: float|None) -> None:
         #        _log.debug('update(%s)',i)
-        control_func:Optional[Callable[[float], None]] = None
-        output_value:Optional[float] = None
+        control_func:Callable[[float], None]|None = None
+        output_value:float|None = None
         try:
             if i == -1 or i is None:
                 # reject error values
@@ -567,7 +565,7 @@ class PID:
         finally:
             self.pidSemaphore.release(1)
 
-    def getDuty(self) -> Optional[float]:
+    def getDuty(self) -> float|None:
         try:
             self.pidSemaphore.acquire(1)
             if self.lastOutput is not None:

@@ -29,7 +29,7 @@ modules that handle complex USB communication and binary protocol processing.
 """
 
 import sys
-from typing import Generator
+from collections.abc import Generator
 from unittest.mock import Mock, patch
 
 import pytest

@@ -23,12 +23,10 @@ from artisanlib.async_comm import AsyncComm
 from artisanlib.ble_port import ClientBLE
 from artisanlib.filters import LiveMean, LiveMedian
 
-try:
-    from PyQt6.QtCore import QRegularExpression # @UnusedImport @Reimport  @UnresolvedImport
-except ImportError:
-    from PyQt5.QtCore import QRegularExpression # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+from PyQt6.QtCore import QRegularExpression
 
-from typing import Final, Optional, Callable, Tuple, TYPE_CHECKING
+from collections.abc import Callable
+from typing import Final, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from PyQt6.QtCore import QRegularExpressionMatch # pylint: disable=unused-import
@@ -43,9 +41,9 @@ class ColorTrack(AsyncComm):
 
     __slots__ = [ '_color_regex', '_weights', '_received_readings' ]
 
-    def __init__(self, host:str = '127.0.0.1', port:int = 8080, serial:Optional['SerialSettings'] = None,
-                connected_handler:Optional[Callable[[], None]] = None,
-                disconnected_handler:Optional[Callable[[], None]] = None) -> None:
+    def __init__(self, host:str = '127.0.0.1', port:int = 8080, serial:'SerialSettings|None' = None,
+                connected_handler:Callable[[], None]|None = None,
+                disconnected_handler:Callable[[], None]|None = None) -> None:
 
         super().__init__(host, port, serial, connected_handler, disconnected_handler)
 
@@ -108,8 +106,8 @@ class ColorTrackBLE(ClientBLE):
 
 
     def __init__(self, mean_window_size:int, median_window_size:int,
-                       connected_handler:Optional[Callable[[], None]] = None,
-                       disconnected_handler:Optional[Callable[[], None]] = None):
+                       connected_handler:Callable[[], None]|None = None,
+                       disconnected_handler:Callable[[], None]|None = None):
         super().__init__()
 
         # handlers
@@ -154,7 +152,7 @@ class ColorTrackBLE(ClientBLE):
 
 
     # second result is the raw average
-    def getColor(self) -> Tuple[float, float]:
+    def getColor(self) -> tuple[float, float]:
 #        read_res = self.read(self.COLORTRACK_READ_NOTIFY_LASER_UUID) # returns 20 bytes (same format as via the notifications)
 #        _log.debug('getLaser: %s',read_res)
 

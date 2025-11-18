@@ -20,12 +20,10 @@ import platform
 import time as libtime
 import logging
 from enum import IntEnum, unique
-from typing import Final, List, Tuple, Optional, Callable
+from collections.abc import Callable
+from typing import Final
 
-try:
-    from PyQt6.QtCore import Qt, QObject, pyqtSignal, pyqtSlot, QTimer # @UnusedImport @Reimport  @UnresolvedImport
-except ImportError:
-    from PyQt5.QtCore import Qt, QObject, pyqtSignal, pyqtSlot, QTimer # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+from PyQt6.QtCore import Qt, QObject, pyqtSignal, pyqtSlot, QTimer
 
 from artisanlib.util import toFloat
 
@@ -34,13 +32,13 @@ _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 
 #  tuples (model name, connection type) with connection type from {0: BT, 1: WiFi, 2: Serial}
-SUPPORTED_SCALES:Final[List[Tuple[str,int]]] = (
+SUPPORTED_SCALES:Final[list[tuple[str,int]]] = (
 [
     ('Acaia', 0) # 0
 ] if not (platform.system() == 'Windows' and math.floor(toFloat(platform.release())) < 10) else [])
 
-ScaleSpec = Tuple[str,str] # scale name, scale id (eg. ble address)
-ScaleSpecs = List[ScaleSpec]
+ScaleSpec = tuple[str,str] # scale name, scale id (eg. ble address)
+ScaleSpecs = list[ScaleSpec]
 
 # STABLE_TIMER_PERIOD should be >1sec if Acaia is reporting also non-stable readings, for stable readings a very short period is fine
 STABLE_TIMER_PERIOD =350 # period to wait until new weight stabilized before forwarding the new reading via scale_stable_weight_changed signals (> then scale update period!)
@@ -85,7 +83,7 @@ class Scale(QObject): # pyrefly:ignore[invalid-inheritance] # pyright:ignore[rep
     connected_signal = pyqtSignal()                 # issued on connect
     disconnected_signal = pyqtSignal()              # issued on disconnect
 
-    def __init__(self, model:int, ident:Optional[str] = None, name:Optional[str] = None):
+    def __init__(self, model:int, ident:str|None = None, name:str|None = None):
         super().__init__()
         self.model = model
         self.ident = ident
@@ -100,16 +98,16 @@ class Scale(QObject): # pyrefly:ignore[invalid-inheritance] # pyright:ignore[rep
     def get_model(self) -> int:
         return self.model
 
-    def set_ident(self, ident:Optional[str]) -> None:
+    def set_ident(self, ident:str|None) -> None:
         self.ident = ident
 
-    def get_ident(self) -> Optional[str]:
+    def get_ident(self) -> str|None:
         return self.ident
 
-    def set_name(self, name:Optional[str]) -> None:
+    def set_name(self, name:str|None) -> None:
         self.name = name
 
-    def get_name(self) -> Optional[str]:
+    def get_name(self) -> str|None:
         return self.name
 
     def set_assigned(self, assigned:bool) -> None:
@@ -208,8 +206,8 @@ class ScaleManager(QObject): # pyrefly:ignore[invalid-inheritance] # pyright:ign
         super().__init__()
         self.connected_handler = connected_handler
         self.disconnected_handler = disconnected_handler
-        self.scale1: Optional[Scale] = None
-        self.scale2: Optional[Scale] = None
+        self.scale1: Scale|None = None
+        self.scale2: Scale|None = None
         self.available:bool = False # true if any of the both scales is connected but not assigned
 
         self.scan_scale1_signal.connect(self.scan_scale1_slot, type=Qt.ConnectionType.QueuedConnection) # type: ignore
@@ -233,21 +231,21 @@ class ScaleManager(QObject): # pyrefly:ignore[invalid-inheritance] # pyright:ign
         self.disconnect_all_signal.connect(self.disconnect_all_slot, type=Qt.ConnectionType.QueuedConnection) # type: ignore
         self.connect_all_signal.connect(self.connect_all_slot, type=Qt.ConnectionType.QueuedConnection) # type: ignore
 
-        self.scale1_last_weight:Optional[int] = None    # in g; cleared by arrival of fresh non-stable weights, holding last weight to-be-come stable_weight
+        self.scale1_last_weight:int|None = None    # in g; cleared by arrival of fresh non-stable weights, holding last weight to-be-come stable_weight
         self.scale1_stable_reading_timer = QTimer()
         self.scale1_stable_reading_timer.setSingleShot(True)
         self.scale1_stable_reading_timer.timeout.connect(self.scale1_stable_reading_timer_slot)
 
-        self.scale1_last_weight_sent:Optional[int] = None # the last weight the scale sent to Artisan
+        self.scale1_last_weight_sent:int|None = None # the last weight the scale sent to Artisan
 
-        self.scale2_last_weight:Optional[int] = None    # in g; cleared by arrival of fresh non-stable weights, holding last weight to-be-come stable_weight
+        self.scale2_last_weight:int|None = None    # in g; cleared by arrival of fresh non-stable weights, holding last weight to-be-come stable_weight
         self.scale2_stable_reading_timer = QTimer()
         self.scale2_stable_reading_timer.setSingleShot(True)
         self.scale2_stable_reading_timer.timeout.connect(self.scale2_stable_reading_timer_slot)
 
-        self.scale2_last_weight_sent:Optional[int] = None # the last weight the scale sent to Artisan
+        self.scale2_last_weight_sent:int|None = None # the last weight the scale sent to Artisan
 
-    def _get_scale(self, model:int, ident:str, name:str) -> Optional[Scale]:
+    def _get_scale(self, model:int, ident:str, name:str) -> Scale|None:
         if model == 0:
             from artisanlib.acaia import Acaia
             return Acaia(model, ident, name, lambda : self.connected_handler(ident, name), lambda : self.disconnected_handler(ident, name),
@@ -392,7 +390,7 @@ class ScaleManager(QObject): # pyrefly:ignore[invalid-inheritance] # pyright:ign
         if self.scale1_last_weight is not None:
             self.scale1_stable_weight_changed_signal.emit(self.scale1_last_weight)
 
-    def get_scale1_last_weight(self) -> Optional[int]:
+    def get_scale1_last_weight(self) -> int|None:
         return self.scale1_last_weight_sent
 
 
@@ -521,7 +519,7 @@ class ScaleManager(QObject): # pyrefly:ignore[invalid-inheritance] # pyright:ign
         if self.scale2_last_weight is not None:
             self.scale2_stable_weight_changed_signal.emit(self.scale2_last_weight)
 
-    def get_scale2_last_weight(self) -> Optional[int]:
+    def get_scale2_last_weight(self) -> int|None:
         return self.scale2_last_weight_sent
 
 #--

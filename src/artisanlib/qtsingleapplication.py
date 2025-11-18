@@ -4,26 +4,20 @@ Source: https://github.com/IARI/alsa_jack_gui
 Author: https://github.com/IARI
 Original Source: http://stackoverflow.com/questions/12712360/qtsingleapplication-for-pyside-or-pyqt
 Original Author: user763305
-Notes: Modified for PyQt5; further modified to remove blocking sockets remaining from died server
-Updated to support QT6
+Notes: modified to remove blocking sockets remaining from died server; Updated to support Qt6
 """
 
 import sys
 import multiprocessing as mp
 
-from typing import Optional, Any, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
 
-try:
-    from PyQt6.QtCore import pyqtSignal, QTextStream, Qt, pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtNetwork import QLocalSocket, QLocalServer # @UnusedImport @Reimport  @UnresolvedImport
-except ImportError:
-    from PyQt5.QtCore import pyqtSignal, QTextStream, Qt, pyqtSlot # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtWidgets import QApplication # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtNetwork import QLocalSocket, QLocalServer # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+from PyQt6.QtCore import pyqtSignal, QTextStream, Qt, pyqtSlot
+from PyQt6.QtWidgets import QApplication
+from PyQt6.QtNetwork import QLocalSocket, QLocalServer
 
 
 class QtSingleApplication(QApplication): # pyrefly:ignore[invalid-inheritance] # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
@@ -47,22 +41,22 @@ class QtSingleApplication(QApplication): # pyrefly:ignore[invalid-inheritance] #
 
         self._id:str = _id
         self._viewer_id:str = _viewer_id
-        self._activationWindow:Optional[ApplicationWindow] = None
+        self._activationWindow:ApplicationWindow|None = None
         self._activateOnMessage:bool = False
 
-        self._inSocket:Optional[QLocalSocket] = None
-        self._outSocket:Optional[QLocalSocket] = None
+        self._inSocket:QLocalSocket|None = None
+        self._outSocket:QLocalSocket|None = None
 
         self._isRunning:bool = False
         self._isRunningViewer:bool = False
 
-        self._server:Optional[QLocalServer] = None
+        self._server:QLocalServer|None = None
 
-        self._inStream:Optional[QTextStream] = None
-        self._outStream:Optional[QTextStream] = None
+        self._inStream:QTextStream|None = None
+        self._outStream:QTextStream|None = None
 
-        self._outSocketViewer: Optional[QLocalSocket] = None
-        self._outStreamViewer:Optional[QTextStream] = None
+        self._outSocketViewer: QLocalSocket|None = None
+        self._outStreamViewer:QTextStream|None = None
 
         # Is there another instance running?
         self._outSocket = QLocalSocket()
@@ -122,7 +116,7 @@ class QtSingleApplication(QApplication): # pyrefly:ignore[invalid-inheritance] #
     def id(self) -> str: # noqa: A003
         return self._id
 
-    def activationWindow(self) -> Optional['ApplicationWindow']:
+    def activationWindow(self) -> 'ApplicationWindow|None':
         return self._activationWindow
 
     def setActivationWindow(self, activationWindow:'ApplicationWindow', activateOnMessage:bool = True) -> None:

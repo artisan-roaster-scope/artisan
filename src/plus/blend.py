@@ -21,47 +21,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-try:
-    #pylint: disable = E, W, R, C
-    from PyQt6.QtWidgets import (
-        QApplication, # @UnusedImport @Reimport  @UnresolvedImport
-        QComboBox, # @UnusedImport @Reimport  @UnresolvedImport
-        QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
-        QDialogButtonBox, # @UnusedImport @Reimport  @UnresolvedImport
-        QToolButton, # @UnusedImport @Reimport  @UnresolvedImport
-        QTableWidget, # @UnusedImport @Reimport  @UnresolvedImport
-        QStyle, # @UnusedImport @Reimport  @UnresolvedImport
-        QHeaderView, # @UnusedImport @Reimport  @UnresolvedImport
-    )
-    from PyQt6.QtCore import Qt, pyqtSlot, QSize, QSettings # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtGui import QKeySequence, QAction, QIcon, QStandardItemModel # @UnusedImport @Reimport  @UnresolvedImport
-#    from PyQt6 import sip # @UnusedImport @Reimport  @UnresolvedImport
-except Exception: # pylint: disable=broad-except
-    #pylint: disable = E, W, R, C
-    from PyQt5.QtWidgets import (  # type: ignore
-        QApplication, # @UnusedImport @Reimport  @UnresolvedImport
-        QComboBox, # @UnusedImport @Reimport  @UnresolvedImport
-        QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
-        QDialogButtonBox, # @UnusedImport @Reimport  @UnresolvedImport
-        QToolButton, # @UnusedImport @Reimport  @UnresolvedImport
-        QTableWidget, # @UnusedImport @Reimport  @UnresolvedImport
-        QStyle, # @UnusedImport @Reimport  @UnresolvedImport
-        QHeaderView, # @UnusedImport @Reimport  @UnresolvedImport
-    )
-    from PyQt5.QtCore import Qt, pyqtSlot, QSize, QSettings # type: ignore  # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtGui import QKeySequence, QIcon, QStandardItemModel # type: ignore  # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtWidgets import QAction # type: ignore  # @UnusedImport @Reimport  @UnresolvedImport
-#    try:
-#        from PyQt5 import sip # type: ignore  # @Reimport @UnresolvedImport @UnusedImport
-#    except Exception: # pylint: disable=broad-except
-#        import sip  # type: ignore # @Reimport @UnresolvedImport @UnusedImport
+#pylint: disable = E, W, R, C
+from PyQt6.QtWidgets import (QApplication, QComboBox, QLineEdit, QDialogButtonBox,
+    QToolButton, QTableWidget, QStyle, QHeaderView)
+from PyQt6.QtCore import Qt, pyqtSlot, QSize, QSettings
+from PyQt6.QtGui import QKeySequence, QAction, QIcon, QStandardItemModel
 
 import logging
 from artisanlib.util import comma2dot, float2floatWeightVolume
 from artisanlib.dialogs import ArtisanDialog
 from artisanlib.widgets import MyQComboBox
 from uic import BlendDialog # OFF type: ignore[attr-defined] # pylint: disable=no-name-in-module
-from typing import Final, Optional, List, Set, Collection, Dict, Tuple, cast, TYPE_CHECKING
+from collections.abc import Collection
+from typing import Final, cast, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
@@ -102,9 +74,9 @@ class Component:
 #######################  CustomBlend  ##################################################
 
 class CustomBlend:
-    def __init__(self, name: str, components: List[Component]) -> None:
+    def __init__(self, name: str, components: list[Component]) -> None:
         self._name:str = name
-        self._components:List[Component] = components
+        self._components:list[Component] = components
 
     @property
     def name(self) -> str:
@@ -115,11 +87,11 @@ class CustomBlend:
         self._name = value
 
     @property
-    def components(self) -> List[Component]:
+    def components(self) -> list[Component]:
         return self._components
 
     @components.setter
-    def components(self, value:List[Component]) -> None:
+    def components(self, value:list[Component]) -> None:
         self._components = value
 
     # a blend is valid if it
@@ -127,7 +99,7 @@ class CustomBlend:
     #  - the component ratios of all ingredients sum up to 1,
     #  - there are no duplicates in the list of component coffees, and,
     #  - all component coffees are contained in the list of available_coffees (list of hr_ids as strings), if given
-    def isValid(self, available_coffees: Optional[Collection[str]] = None) -> bool:
+    def isValid(self, available_coffees: Collection[str]|None = None) -> bool:
         component_coffees = [c.coffee for c in self._components]
         return (
             len(component_coffees)>1 and
@@ -140,15 +112,15 @@ class CustomBlend:
 
 class CustomBlendDialog(ArtisanDialog):
     def __init__(self, parent:'QWidget', aw:'ApplicationWindow', inWeight:float, weightUnit:str,
-            coffees:Dict[str, str], blend:CustomBlend, coffee_hr_ids_with_stock_in_store:Set[str]) -> None:
+            coffees:dict[str, str], blend:CustomBlend, coffee_hr_ids_with_stock_in_store:set[str]) -> None:
         super().__init__(parent, aw)
         self.initialTotalWeight:float = inWeight
         self.inWeight:float = inWeight
         self.weightUnit:str = weightUnit
-        self.coffee_hr_ids_with_stock_in_store:Set[str] = coffee_hr_ids_with_stock_in_store
-        self.coffees:Dict[str, str] = coffees # dict associating coffee names to their hr_id
-        self.coffee_ids:Dict[str, str] = {v: k for k, v in self.coffees.items()} # dict associating coffee hr_ids to their names
-        self.sorted_coffees:List[Tuple[str, str]] = sorted(coffees.items(), key=lambda x: x[0]) # list of coffee name and hr_id tuples sorted by coffee name
+        self.coffee_hr_ids_with_stock_in_store:set[str] = coffee_hr_ids_with_stock_in_store
+        self.coffees:dict[str, str] = coffees # dict associating coffee names to their hr_id
+        self.coffee_ids:dict[str, str] = {v: k for k, v in self.coffees.items()} # dict associating coffee hr_ids to their names
+        self.sorted_coffees:list[tuple[str, str]] = sorted(coffees.items(), key=lambda x: x[0]) # list of coffee name and hr_id tuples sorted by coffee name
         self.blend:CustomBlend = CustomBlend( # we create a new copy not to alter the original one
             blend.name.strip(),
             [Component(c.coffee, c.ratio) for c in blend.components])
@@ -205,17 +177,17 @@ class CustomBlendDialog(ArtisanDialog):
     def cancelDialog(self) -> None: # ESC key
         self.reject()
 
-    def keyPressEvent(self, event: Optional['QKeyEvent']) -> None:
-        if event is not None:
-            key = int(event.key())
+    def keyPressEvent(self, a0: 'QKeyEvent|None') -> None:
+        if a0 is not None:
+            key = int(a0.key())
             #uncomment next line to find the integer value of a key
             #print(key)
             #modifiers = QApplication.keyboardModifiers()
-            modifiers = event.modifiers()
+            modifiers = a0.modifiers()
             if key == 16777216 or (key == 87 and modifiers == Qt.KeyboardModifier.ControlModifier): #ESCAPE or CMD-W
                 self.reject()
             else:
-                super().keyPressEvent(event)
+                super().keyPressEvent(a0)
 
     @pyqtSlot(str)
     def textChanged(self,s:str) -> None:
@@ -324,7 +296,8 @@ class CustomBlendDialog(ArtisanDialog):
         settings.setValue('BlendGeometry',self.saveGeometry())
 
     @pyqtSlot('QCloseEvent')
-    def closeEvent(self, _:Optional['QCloseEvent'] = None) -> None:
+    def closeEvent(self, a0:'QCloseEvent|None' = None) -> None:
+        del a0
         self.reject()
 
     @pyqtSlot()
@@ -445,10 +418,10 @@ class CustomBlendDialog(ArtisanDialog):
 
 
 def openCustomBlendDialog(window:'QWidget', aw:'ApplicationWindow', inWeight:float, weightUnit:str,
-        coffees:Dict[str, str], blend:CustomBlend, coffee_hr_ids_with_stock_in_store:Set[str]) -> Tuple[Optional[CustomBlend], float]:
+        coffees:dict[str, str], blend:CustomBlend, coffee_hr_ids_with_stock_in_store:set[str]) -> tuple[CustomBlend|None, float]:
     dialog = CustomBlendDialog(window, aw, inWeight, weightUnit, coffees, blend, coffee_hr_ids_with_stock_in_store)
     res = dialog.exec()
-    blend_res:Optional[CustomBlend]
+    blend_res:CustomBlend|None
     if res:
         blend_res = dialog.blend
         total_weight = dialog.inWeight

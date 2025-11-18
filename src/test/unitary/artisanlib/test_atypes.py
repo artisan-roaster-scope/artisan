@@ -28,7 +28,8 @@ modules that define complex type structures while preventing cross-file contamin
 =============================================================================
 """
 
-from typing import Any, Dict, Generator, cast
+from collections.abc import Generator
+from typing import Any, cast
 
 import pytest
 
@@ -83,7 +84,7 @@ def reset_atypes_state() -> Generator[None, None, None]:
 
 
 @pytest.fixture
-def sample_computed_profile_info() -> Dict[str, Any]:
+def sample_computed_profile_info() -> dict[str, Any]:
     """Provide a sample ComputedProfileInformation for testing."""
     return {
         'CHARGE_ET': 150.5,
@@ -136,7 +137,7 @@ def sample_computed_profile_info() -> Dict[str, Any]:
 
 
 @pytest.fixture
-def sample_profile_data() -> Dict[str, Any]:
+def sample_profile_data() -> dict[str, Any]:
     """Provide a sample ProfileData for testing."""
     return {
         'version': '2.8.4',
@@ -177,7 +178,7 @@ class TestComputedProfileInformation:
     """Test ComputedProfileInformation TypedDict."""
 
     def test_computed_profile_info_structure(
-        self, sample_computed_profile_info: Dict[str, Any]
+        self, sample_computed_profile_info: dict[str, Any]
     ) -> None:
         """Test ComputedProfileInformation structure and type compatibility."""
         # Arrange & Act
@@ -227,7 +228,7 @@ class TestComputedProfileInformation:
 class TestProfileData:
     """Test ProfileData TypedDict."""
 
-    def test_profile_data_structure(self, sample_profile_data: Dict[str, Any]) -> None:
+    def test_profile_data_structure(self, sample_profile_data: dict[str, Any]) -> None:
         """Test ProfileData structure and type compatibility."""
         # Arrange & Act
         profile_data: atypes.ProfileData = cast(atypes.ProfileData, sample_profile_data)
@@ -259,7 +260,7 @@ class TestProfileData:
         assert len(minimal_profile) == 0
 
     def test_profile_data_with_computed_info(
-        self, sample_profile_data: Dict[str, Any], sample_computed_profile_info: Dict[str, Any]
+        self, sample_profile_data: dict[str, Any], sample_computed_profile_info: dict[str, Any]
     ) -> None:
         """Test ProfileData with computed information."""
         # Arrange

@@ -15,7 +15,7 @@
 # AUTHOR
 # Marko Luther, 2023
 
-from typing import Dict, Optional, cast, Any, TYPE_CHECKING
+from typing import cast, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
@@ -25,19 +25,11 @@ if TYPE_CHECKING:
 from artisanlib.util import serialize
 from artisanlib.dialogs import ArtisanDialog
 
-
-try:
-    from PyQt6.QtCore import Qt, pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtGui import QColor # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtWidgets import (QApplication, QLabel, QTableWidget, QPushButton, # @UnusedImport @Reimport  @UnresolvedImport
-        QComboBox, QHBoxLayout, QVBoxLayout, QTableWidgetItem, QDialogButtonBox, # @UnusedImport @Reimport  @UnresolvedImport
-        QDoubleSpinBox, QGroupBox, QLineEdit, QSpinBox, QHeaderView) # @UnusedImport @Reimport  @UnresolvedImport
-except ImportError:
-    from PyQt5.QtCore import Qt, pyqtSlot # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtGui import QColor # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtWidgets import (QApplication, QLabel, QTableWidget, QPushButton, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-        QComboBox, QHBoxLayout, QVBoxLayout, QTableWidgetItem, QDialogButtonBox, # @UnusedImport @Reimport  @UnresolvedImport
-        QDoubleSpinBox, QGroupBox, QLineEdit, QSpinBox, QHeaderView) # @UnusedImport @Reimport  @UnresolvedImport
+from PyQt6.QtCore import Qt, pyqtSlot
+from PyQt6.QtGui import QColor
+from PyQt6.QtWidgets import (QApplication, QLabel, QTableWidget, QPushButton,
+    QComboBox, QHBoxLayout, QVBoxLayout, QTableWidgetItem, QDialogButtonBox,
+    QDoubleSpinBox, QGroupBox, QLineEdit, QSpinBox, QHeaderView)
 
 
 class WheelDlg(ArtisanDialog):
@@ -58,7 +50,7 @@ class WheelDlg(ArtisanDialog):
         self.setButtonTranslations(self.subdialogbuttons.button(QDialogButtonBox.StandardButton.Close),'Close',QApplication.translate('Button','Close'))
 
         self.subdialogbuttons.rejected.connect(self.closelabels)
-        restoreButton: Optional[QPushButton] = self.subdialogbuttons.button(QDialogButtonBox.StandardButton.RestoreDefaults)
+        restoreButton: QPushButton|None = self.subdialogbuttons.button(QDialogButtonBox.StandardButton.RestoreDefaults)
         if restoreButton is not None:
             restoreButton.clicked.connect(self.resetlabelparents)
 
@@ -107,40 +99,40 @@ class WheelDlg(ArtisanDialog):
         self.colorSpinBox.setValue(int(round(self.aw.qmc.wheelcolorpattern)))
         self.colorSpinBox.setWrapping(True)
         self.colorSpinBox.valueChanged.connect(self.setcolorpattern)
-        addButton: Optional[QPushButton] = QPushButton(QApplication.translate('Button','Add'))
+        addButton: QPushButton|None = QPushButton(QApplication.translate('Button','Add'))
         if addButton is not None:
             addButton.setToolTip(QApplication.translate('Tooltip','Add new wheel'))
             addButton.clicked.connect(self.insertwheel)
-        rotateLeftButton: Optional[QPushButton] = QPushButton('<')
+        rotateLeftButton: QPushButton|None = QPushButton('<')
         if rotateLeftButton is not None:
             rotateLeftButton.setToolTip(QApplication.translate('Tooltip','Rotate graph 1 degree counter clockwise'))
             rotateLeftButton.clicked.connect(self.rotatewheels1)
-        rotateRightButton: Optional[QPushButton] = QPushButton('>')
+        rotateRightButton: QPushButton|None = QPushButton('>')
         if rotateRightButton is not None:
             rotateRightButton.setToolTip(QApplication.translate('Tooltip','Rotate graph 1 degree clockwise'))
             rotateRightButton.clicked.connect(self.rotatewheels0)
 
         self.main_buttons = QDialogButtonBox()
 
-        saveButton: Optional[QPushButton] = QPushButton(QApplication.translate('Button','Save File'))
+        saveButton: QPushButton|None = QPushButton(QApplication.translate('Button','Save File'))
         if saveButton is not None:
             saveButton.clicked.connect(self.fileSave)
             saveButton.setToolTip(QApplication.translate('Tooltip','Save graph to a text file.wg'))
             self.main_buttons.addButton(saveButton,QDialogButtonBox.ButtonRole.ActionRole)
 
-        saveImgButton: Optional[QPushButton] = QPushButton(QApplication.translate('Button','Save Img'))
+        saveImgButton: QPushButton|None = QPushButton(QApplication.translate('Button','Save Img'))
         if saveImgButton is not None:
             saveImgButton.setToolTip(QApplication.translate('Tooltip','Save image using current graph size to a png format'))
             #saveImgButton.clicked.connect(self.aw.resizeImg_0_1) # save as PNG (raster)
             saveImgButton.clicked.connect(self.aw.saveVectorGraph_PDF) # save as PDF (vector)
             self.main_buttons.addButton(saveImgButton,QDialogButtonBox.ButtonRole.ActionRole)
 
-        openButton: Optional[QPushButton] = self.main_buttons.addButton(QDialogButtonBox.StandardButton.Open)
+        openButton: QPushButton|None = self.main_buttons.addButton(QDialogButtonBox.StandardButton.Open)
         if openButton is not None:
             openButton.setToolTip(QApplication.translate('Tooltip','open wheel graph file'))
             openButton.clicked.connect(self.loadWheel)
 
-        viewModeButton: Optional[QPushButton] = self.main_buttons.addButton(QDialogButtonBox.StandardButton.Close)
+        viewModeButton: QPushButton|None = self.main_buttons.addButton(QDialogButtonBox.StandardButton.Close)
         if viewModeButton is not None:
             viewModeButton.setToolTip(QApplication.translate('Tooltip','Sets Wheel graph to view mode'))
             viewModeButton.clicked.connect(self.viewmode)
@@ -220,7 +212,7 @@ class WheelDlg(ArtisanDialog):
             self.labeltable.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
             self.labeltable.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
             self.labeltable.setShowGrid(True)
-            vheader: Optional[QHeaderView] = self.labeltable.verticalHeader()
+            vheader: QHeaderView|None = self.labeltable.verticalHeader()
             if vheader is not None:
                 vheader.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
             #populate table
@@ -438,7 +430,7 @@ class WheelDlg(ArtisanDialog):
         self.datatable.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         self.datatable.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
         self.datatable.setShowGrid(True)
-        vheader: Optional[QHeaderView] = self.datatable.verticalHeader()
+        vheader: QHeaderView|None = self.datatable.verticalHeader()
         if vheader is not None:
             vheader.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
         #populate table
@@ -646,7 +638,7 @@ class WheelDlg(ArtisanDialog):
             filename = self.aw.ArtisanSaveFileDialog(msg=QApplication.translate('Message','Save Wheel graph'),ext='*.wg')
             if filename:
                 #write
-                serialize(filename, cast(Dict[str, Any], self.aw.getWheelGraph()))
+                serialize(filename, cast(dict[str, Any], self.aw.getWheelGraph()))
                 self.aw.sendmessage(QApplication.translate('Message','Wheel Graph saved'))
         except OSError as e:
             self.aw.qmc.adderror((QApplication.translate('Error Message','IO Error:') + ' Wheel graph filesave(): {0}').format(str(e)))
@@ -661,7 +653,8 @@ class WheelDlg(ArtisanDialog):
             self.aw.qmc.drawWheel()
 
     @pyqtSlot('QCloseEvent')
-    def closeEvent(self, _:Optional['QCloseEvent'] = None) -> None:
+    def closeEvent(self, a0:'QCloseEvent|None' = None) -> None:
+        del a0
         self.viewmode(False)
 
     @pyqtSlot(bool)

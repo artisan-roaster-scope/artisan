@@ -18,15 +18,13 @@
 import asyncio
 import logging
 from enum import IntEnum, unique
-from typing import Optional, Union, List, Tuple, Final, Callable, TYPE_CHECKING
+from collections.abc import Callable
+from typing import Final, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from bleak.backends.characteristic import BleakGATTCharacteristic  # pylint: disable=unused-import
 
-try:
-    from PyQt6.QtCore import pyqtSignal, pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
-except ImportError:
-    from PyQt5.QtCore import pyqtSignal, pyqtSlot # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+from PyQt6.QtCore import pyqtSignal, pyqtSlot
 
 from artisanlib.ble_port import ClientBLE
 from artisanlib.async_comm import AsyncIterable, IteratorReader
@@ -39,7 +37,7 @@ _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 ####
 
-Color = Tuple[int, int, int] # RGB color with valid values from 0-255
+Color = tuple[int, int, int] # RGB color with valid values from 0-255
 
 @unique
 class SCALE_CLASS(IntEnum):
@@ -235,8 +233,8 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
 #            'id_sent', 'fast_notifications_sent', 'slow_notifications_sent', 'weight', 'battery', 'firmware', 'unit', 'max_weight'
 #            '_connected_handler', '_disconnected_handler' ]
 
-    def __init__(self, connected_handler:Optional[Callable[[], None]] = None,
-                       disconnected_handler:Optional[Callable[[], None]] = None,
+    def __init__(self, connected_handler:Callable[[], None]|None = None,
+                       disconnected_handler:Callable[[], None]|None = None,
                        stable_only:bool=True, # if True only stable weight readings are reported by weight_changed_signal
                        decimals:int=1): # number of significant decimals (0, 1, ..) of the weight signal
         super().__init__()
@@ -253,17 +251,17 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
         self.scale_class:SCALE_CLASS = SCALE_CLASS.MODERN
 
         # Protocol parser variables
-        self._read_queue : Optional[asyncio.Queue[bytes]] = None
+        self._read_queue : asyncio.Queue[bytes]|None = None
 
         self.id_sent:bool = False # ID is sent once after first data is received from scale
         self.fast_notifications_sent:bool = False # after connect we switch fast notification on to receive first reading fast
         self.slow_notifications_sent:bool = False # after first reading is received we step down to slow readings again
 
         # readings
-        self.weight:Optional[float] = None
-        self.stable_weight:Optional[float] = None
-        self.battery:Optional[int] = None
-        self.firmware:Optional[Tuple[int,int,int]] = None # on connect this is set to a triple of integers, (major, minor, patch)-version
+        self.weight:float|None = None
+        self.stable_weight:float|None = None
+        self.battery:int|None = None
+        self.firmware:tuple[int,int,int]|None = None # on connect this is set to a triple of integers, (major, minor, patch)-version
         self.unit:int = UNIT.G
         self.max_weight:int = 0 # always in g
         self.readability:float = 0 # scale accuracy; minimal weight steps
@@ -392,7 +390,7 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
             self.firmware = (data[3],data[4],data[5])
             _log.debug('firmware: %s.%s.%s', self.firmware[0], self.firmware[1], f'{self.firmware[2]:>03}')
 
-    def decode_weight(self, payload:bytes) -> Tuple[Optional[float], bool]:
+    def decode_weight(self, payload:bytes) -> tuple[float|None, bool]:
         try:
             #big_endian = (payload[5] & 0x08) == 0x08 # bit 3 of byte 5 is set if weight is in big endian
             big_endian = False # self.scale_class == SCALE_CLASS.RELAY
@@ -440,7 +438,7 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
         except Exception:  # pylint: disable=broad-except
             return None, False
 
-    def update_weight(self, value:Optional[float], stable:Optional[bool] = False) -> None:
+    def update_weight(self, value:float|None, stable:bool|None = False) -> None:
 #        _log.debug('PRINT update_weight(%s,%s)', value, stable)
         if value is not None and (not self.stable_only or stable):
             # convert the weight in g delivered with one decimal to an int
@@ -496,8 +494,8 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
 
     def parse_extra_weight_time_data(self, payload:bytes) -> int:
         if len(payload) > EVENT_LEN.KEY:
-            weight:Optional[float] = None
-            time:Optional[float] = None
+            weight:float|None = None
+            time:float|None = None
             if payload[0] == KEY_ADDITIONAL_INFO.ZERO:
                 _log.debug('aditional key info 0: %s', payload[1:])
             elif payload[0] == KEY_ADDITIONAL_INFO.ONE:
@@ -741,7 +739,7 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
 
     # return a bytearray of len 2 containing the even and odd CRCs over the given payload
     @staticmethod
-    def crc(payload:Union[bytes,List[int]]) -> bytes:
+    def crc(payload:bytes|list[int]) -> bytes:
         cksum1 = 0
         cksum2 = 0
         for i, _ in enumerate(payload):
@@ -958,8 +956,8 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
 
 class Acaia(Scale): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
 
-    def __init__(self, model:int, ident:Optional[str], name:Optional[str], connected_handler:Optional[Callable[[], None]] = None,
-                       disconnected_handler:Optional[Callable[[], None]] = None,
+    def __init__(self, model:int, ident:str|None, name:str|None, connected_handler:Callable[[], None]|None = None,
+                       disconnected_handler:Callable[[], None]|None = None,
                        stable_only:bool=False,
                        decimals:int=1):
         super().__init__(model, ident, name)

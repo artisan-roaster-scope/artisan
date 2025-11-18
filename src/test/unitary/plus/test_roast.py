@@ -14,7 +14,7 @@ This module tests the roast management functionality including:
 """
 
 import sys
-from typing import Any, Dict
+from typing import Any
 from unittest.mock import Mock, patch
 
 import pytest
@@ -164,7 +164,7 @@ def mock_app_window() -> Mock:
 
 
 @pytest.fixture
-def sample_profile_data() -> Dict[str, Any]:
+def sample_profile_data() -> dict[str, Any]:
     """Create sample profile data."""
     return {
         'roastbatchnr': 42,
@@ -216,7 +216,7 @@ def sample_profile_data() -> Dict[str, Any]:
 
 
 @pytest.fixture
-def sample_blend_spec_comprehensive() -> Dict[str, Any]:
+def sample_blend_spec_comprehensive() -> dict[str, Any]:
     """Create comprehensive sample blend specification."""
     return {
         'label': 'Test Blend',
@@ -231,7 +231,7 @@ def sample_blend_spec_comprehensive() -> Dict[str, Any]:
 class TestRoastTemplateGeneration:
     """Test roast template generation from profile data."""
 
-    def test_get_template_basic_data(self, sample_profile_data: Dict[str, Any]) -> None:
+    def test_get_template_basic_data(self, sample_profile_data: dict[str, Any]) -> None:
         """Test getTemplate with basic profile data."""
         # Arrange
         with patch('plus.roast.util') as mock_util:
@@ -251,7 +251,7 @@ class TestRoastTemplateGeneration:
             mock_util.addNum2dict.assert_called()
             mock_util.addString2dict.assert_called()
 
-    def test_get_template_background_mode(self, sample_profile_data: Dict[str, Any]) -> None:
+    def test_get_template_background_mode(self, sample_profile_data: dict[str, Any]) -> None:
         """Test getTemplate with background=True."""
         # Arrange
         with patch('plus.roast.util') as mock_util:
@@ -288,7 +288,7 @@ class TestRoastTemplateGeneration:
             assert isinstance(result, dict)
             # Should continue despite exceptions
 
-    def test_get_template_computed_data(self, sample_profile_data: Dict[str, Any]) -> None:
+    def test_get_template_computed_data(self, sample_profile_data: dict[str, Any]) -> None:
         """Test getTemplate processes computed data correctly."""
         # Arrange
         with patch('plus.roast.util') as mock_util:
@@ -335,7 +335,7 @@ class TestBlendSpecTrimming:
     """Test blend specification trimming functionality."""
 
     def test_trim_blend_spec_valid_blend(
-        self, sample_blend_spec_comprehensive: Dict[str, Any]
+        self, sample_blend_spec_comprehensive: dict[str, Any]
     ) -> None:
         """Test trimBlendSpec with valid blend specification."""
         # Act
@@ -349,7 +349,7 @@ class TestBlendSpecTrimming:
         assert 'extra_field' not in result  # Should be removed
 
     def test_trim_blend_spec_ingredient_fields(
-        self, sample_blend_spec_comprehensive: Dict[str, Any]
+        self, sample_blend_spec_comprehensive: dict[str, Any]
     ) -> None:
         """Test trimBlendSpec preserves correct ingredient fields."""
         # Act
@@ -381,7 +381,7 @@ class TestGetRoast:
     """Test getRoast functionality."""
 
     def test_get_roast_basic_functionality(
-        self, mock_app_window: Mock, sample_profile_data: Dict[str, Any]
+        self, mock_app_window: Mock, sample_profile_data: dict[str, Any]
     ) -> None:
         """Test getRoast basic functionality."""
         # Arrange
@@ -406,7 +406,7 @@ class TestGetRoast:
             mock_get_template.assert_called_once_with(sample_profile_data)
 
     def test_get_roast_with_coffee_selection(
-        self, mock_app_window: Mock, sample_profile_data: Dict[str, Any]
+        self, mock_app_window: Mock, sample_profile_data: dict[str, Any]
     ) -> None:
         """Test getRoast with coffee selection."""
         # Arrange
@@ -436,8 +436,8 @@ class TestGetRoast:
     def test_get_roast_with_blend_selection(
         self,
         mock_app_window: Mock,
-        sample_profile_data: Dict[str, Any],
-        sample_blend_spec_comprehensive: Dict[str, Any],
+        sample_profile_data: dict[str, Any],
+        sample_blend_spec_comprehensive: dict[str, Any],
     ) -> None:
         """Test getRoast with blend selection."""
         # Arrange
@@ -468,7 +468,7 @@ class TestGetRoast:
             mock_trim_blend.assert_called_once_with(sample_blend_spec_comprehensive)
 
     def test_get_roast_with_background_profile(
-        self, mock_app_window: Mock, sample_profile_data: Dict[str, Any]
+        self, mock_app_window: Mock, sample_profile_data: dict[str, Any]
     ) -> None:
         """Test getRoast with background profile."""
         # Arrange
@@ -513,7 +513,7 @@ class TestGetRoast:
             assert result == {}
 
     def test_get_roast_location_clearing(
-        self, mock_app_window: Mock, sample_profile_data: Dict[str, Any]
+        self, mock_app_window: Mock, sample_profile_data: dict[str, Any]
     ) -> None:
         """Test getRoast clears location when no coffee or blend selected."""
         # Arrange

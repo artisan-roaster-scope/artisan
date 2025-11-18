@@ -22,7 +22,8 @@ Key Features:
 """
 
 import sys
-from typing import Any, Dict, Generator
+from collections.abc import Generator
+from typing import Any
 from unittest.mock import patch
 
 import pytest
@@ -38,7 +39,7 @@ def session_level_isolation() -> Generator[None, None, None]:
     mocked PyQt6 components globally.
     """
     # Store original PyQt6 modules if they exist and aren't mocked
-    original_modules: Dict[str, Any] = {}
+    original_modules: dict[str, Any] = {}
     qt_modules = ['PyQt6', 'PyQt6.QtCore', 'PyQt6.QtWidgets', 'PyQt6.QtGui']
 
     for module_name in qt_modules:

@@ -20,7 +20,7 @@ import warnings
 import numpy
 import logging
 
-from typing import Final, Dict, Tuple, List, Optional, TypedDict, cast, TYPE_CHECKING
+from typing import Final, TypedDict, cast, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
@@ -33,14 +33,9 @@ from artisanlib.suppress_errors import suppress_stdout_stderr
 from artisanlib.util import toGrey, toDim, stringfromseconds, float2float
 
 
-try:
-    from PyQt6.QtCore import Qt, QSettings # @Reimport @UnresolvedImport @UnusedImport
-    from PyQt6.QtGui import QColor # @Reimport @UnresolvedImport @UnusedImport
-    from PyQt6.QtWidgets import QApplication  # @Reimport @UnresolvedImport @UnusedImport
-except ImportError:
-    from PyQt5.QtCore import Qt, QSettings # type: ignore # @Reimport @UnresolvedImport @UnusedImport
-    from PyQt5.QtGui import QColor # type: ignore # @Reimport @UnresolvedImport @UnusedImport
-    from PyQt5.QtWidgets import QApplication # type: ignore # @Reimport @UnresolvedImport @UnusedImport
+from PyQt6.QtCore import Qt, QSettings
+from PyQt6.QtGui import QColor
+from PyQt6.QtWidgets import QApplication
 
 
 with suppress_stdout_stderr():
@@ -74,20 +69,20 @@ class tphasescanvas(FigureCanvas):
         self.m = 10             # width of batch number field and drop time field
         self.g = 2              # width of the gap between batch number field and drop time field and the actual phase percentage bars
         # set data
-        self.data:Optional[List[Tuple[str, float, Tuple[float,float,float], bool, bool, str, Tuple[float,float,float], Tuple[float,float,float]]]] = None  # the phases data per profile
+        self.data:list[tuple[str, float, tuple[float,float,float], bool, bool, str, tuple[float,float,float], tuple[float,float,float]]]|None = None  # the phases data per profile
         # the canvas
         self.fig = Figure(figsize=(1, 1), frameon=False, dpi=dpi+self.dpi_offset)
         # as alternative to the experimental constrained_layout we could use tight_layout as for them main canvas:
-        self.tight_layout_params: Final[Dict[str, float]] = {'pad':.3,'h_pad':0.0,'w_pad':0.0} # slightly less space for axis labels
+        self.tight_layout_params: Final[dict[str, float]] = {'pad':.3,'h_pad':0.0,'w_pad':0.0} # slightly less space for axis labels
 #        self.fig.set_tight_layout(self.tight_layout_params)
         self.fig.set_layout_engine('tight', **self.tight_layout_params)
         #
-        self.phase_temperatures:Dict[Rectangle, PhasesData]
-        self.tooltip_anno:Optional[Annotation] = None
-        self.tooltip_artist:Optional[Rectangle] = None
+        self.phase_temperatures:dict[Rectangle, PhasesData]
+        self.tooltip_anno:Annotation|None = None
+        self.tooltip_artist:Rectangle|None = None
         #
         super().__init__(self.fig) # type:ignore # Call to untyped function "__init__" in typed context
-        self.ax:Optional[Axes] = None
+        self.ax:Axes|None = None
         self.clear_phases()
         self.fig.canvas.mpl_connect('motion_notify_event', self.hover)
 
@@ -192,12 +187,12 @@ class tphasescanvas(FigureCanvas):
     # active is of type bool indicating the state of the corresponding profile
     # aligned is of type bool indicating that the profile is aligned to the current selected alignment target
     # color is a regular color string like '#00b950'
-    def set_phases(self, data:Optional[List[Tuple[str, float, Tuple[float,float,float], bool, bool, str, Tuple[float,float,float], Tuple[float,float,float]]]]) -> None:
+    def set_phases(self, data:list[tuple[str, float, tuple[float,float,float], bool, bool, str, tuple[float,float,float], tuple[float,float,float]]]|None) -> None:
         self.data = data
 
     # updates the phases graphs data and redraws its canvas
     # side condition: only profile data of visible profiles are contained in data
-    def update_phases(self, data:Optional[List[Tuple[str, float, Tuple[float,float,float], bool, bool, str, Tuple[float,float,float], Tuple[float,float,float]]]]) -> None:
+    def update_phases(self, data:list[tuple[str, float, tuple[float,float,float], bool, bool, str, tuple[float,float,float], tuple[float,float,float]]]|None) -> None:
         self.set_phases(data)
         self.redraw_phases()
 
@@ -245,7 +240,7 @@ class tphasescanvas(FigureCanvas):
                         starts = widths.cumsum() - widths
                         if active:
                             labels = [f"{str(round(percent,digits)).rstrip('0').rstrip('.')}%  {stringfromseconds(tx,leadingzero=False)}" if percent>20 else (f"{str(round(percent,digits)).rstrip('0').rstrip('.')}%" if percent>10 else '')
-                                    for (percent,tx) in zip(phases_percentages, phases_times)]
+                                    for (percent,tx) in zip(phases_percentages, phases_times, strict=True)] # ty:ignore
                         else:
                             labels = ['']*3
                         labels = [label, ''] + labels + ['', stringfromseconds(total_time,leadingzero=False)]
@@ -255,7 +250,7 @@ class tphasescanvas(FigureCanvas):
                         else:
                             patch_colors = [color, background_color, rect1dim, rect2dim, rect3dim, background_color, color]
                         rects = self.ax.barh(i, widths, left=starts, height=self.barheight, color=patch_colors)
-                        prects_patches:List[Rectangle] = rects.patches
+                        prects_patches:list[Rectangle] = rects.patches
                         if len(prects_patches)>4:
                             if len(phases_temps)>1 and len(phases_ror)>1:
                                 self.phase_temperatures[prects_patches[3]] = { # 2nd phase temperatures

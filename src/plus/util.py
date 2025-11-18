@@ -21,16 +21,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-try:
-    #pylint: disable = E, W, R, C
-    from PyQt6.QtCore import QSize, pyqtSlot # @UnusedImport @Reimport @UnresolvedImport
-    from PyQt6.QtGui import QIcon # @UnusedImport @Reimport @UnresolvedImport
-    from PyQt6.QtWidgets import QApplication, QStyle # @UnusedImport @Reimport @UnresolvedImport
-except Exception: # pylint: disable=broad-except
-    #pylint: disable = E, W, R, C
-    from PyQt5.QtCore import QSize, pyqtSlot # type: ignore # @UnusedImport @Reimport @UnresolvedImport
-    from PyQt5.QtGui import QIcon # type: ignore # @UnusedImport @Reimport @UnresolvedImport
-    from PyQt5.QtWidgets import QApplication, QStyle # type: ignore # @Reimport @UnresolvedImport @UnusedImport
+#pylint: disable = E, W, R, C
+from PyQt6.QtCore import QSize, pyqtSlot
+from PyQt6.QtGui import QIcon
+from PyQt6.QtWidgets import QApplication, QStyle
 
 
 from artisanlib.util import decodeLocal, getResourcePath, float2float
@@ -41,7 +35,7 @@ import dateutil.parser
 import logging
 import os
 import numpy
-from typing import Final, Optional, Union, Any, Dict, List, Tuple, TYPE_CHECKING  #for Python >= 3.9: can remove 'List' since type hints can now use the generic 'list'
+from typing import Final, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.atypes import ProfileData, ComputedProfileInformation # pylint: disable=unused-import
@@ -55,7 +49,7 @@ _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 # returns the last modification date as EPOCH (float incl. milliseconds) of
 # the given file if it exists, or None
-def getModificationDate(path:str) -> Optional[float]:
+def getModificationDate(path:str) -> float|None:
     #    return Path(path).stat().st_mtime
     try:
         return os.path.getmtime(Path(path))
@@ -82,7 +76,7 @@ def datetime2epoch(dt:datetime.datetime) -> float:
 
 def epoch2datetime(epoch:float) -> datetime.datetime:
 #    return datetime.datetime.utcfromtimestamp(epoch) # considered dangerous!
-    return datetime.datetime.fromtimestamp(epoch, tz=datetime.timezone.utc)
+    return datetime.datetime.fromtimestamp(epoch, tz=datetime.UTC)  # ty:ignore
 
 
 # given a epoch returns e.g. '2018-10-12T12:55:12.999Z'
@@ -97,7 +91,7 @@ def ISO86012epoch(ts:str) -> float:
 def getGMToffset() -> int:
     try:
         offset = datetime.datetime.now(
-            datetime.timezone.utc).astimezone().utcoffset()
+            datetime.UTC).astimezone().utcoffset() # ty:ignore
         if offset is not None:
             return offset // datetime.timedelta(seconds=1)
     except Exception: # pylint: disable=broad-except
@@ -107,7 +101,7 @@ def getGMToffset() -> int:
 
 # extra simple information from a dict
 # res is assumed to be a dict and the projection result to be a non-empty string or a number
-def extractInfo(res:Dict[str,Any], attr: str, default:Optional[Union[str,int,float,List[str]]]) -> Any:
+def extractInfo(res:dict[str,Any], attr: str, default:None|str|int|float|list[str]) -> Any:
     if attr in res and ((isinstance(res[attr], str) and res[attr] != '') or (isinstance(res[attr],(int, float)))):
         return res[attr]
     return default
@@ -115,14 +109,14 @@ def extractInfo(res:Dict[str,Any], attr: str, default:Optional[Union[str,int,flo
 # Prepare Temperatures for sending
 
 
-def fromFtoC(Ffloat: Optional[float]) -> Optional[float]:
+def fromFtoC(Ffloat: float|None) -> float|None:
     if Ffloat is None or Ffloat == -1 or numpy.isnan(Ffloat):
         return Ffloat
     assert Ffloat is not None
     return (Ffloat - 32.0) * (5.0 / 9.0)
 
 
-def temp2C(temp: Optional[float],mode:Optional[str] = None) -> Optional[float]:
+def temp2C(temp: float|None,mode:str|None = None) -> float|None:
     aw = config.app_window
     if (
         temp is not None and (mode == 'F' or (mode is None and aw is not None and aw.qmc is not None and
@@ -131,7 +125,7 @@ def temp2C(temp: Optional[float],mode:Optional[str] = None) -> Optional[float]:
         return fromFtoC(temp)  # @UndefinedVariable
     return temp
 
-def tempDiff2C(temp: Optional[float]) -> Optional[float]:
+def tempDiff2C(temp: float|None) -> float|None:
     aw = config.app_window
     if (
         temp is not None and aw is not None and aw.qmc is not None and
@@ -143,14 +137,14 @@ def tempDiff2C(temp: Optional[float]) -> Optional[float]:
     return temp
 
 
-def RoRfromFtoC(Ffloat: Optional[float]) -> Optional[float]:
+def RoRfromFtoC(Ffloat: float|None) -> float|None:
     if Ffloat is None or Ffloat == -1 or numpy.isnan(Ffloat):
         return Ffloat
     assert Ffloat is not None
     return Ffloat * (5.0 / 9.0)
 
 
-def RoRtemp2C(temp: Optional[float],mode:Optional[str] = None) -> Optional[float]:
+def RoRtemp2C(temp: float|None, mode:str|None = None) -> float|None:
     aw = config.app_window
     if (
         aw is not None and
@@ -164,7 +158,7 @@ def RoRtemp2C(temp: Optional[float],mode:Optional[str] = None) -> Optional[float
 
 # in addition to float2float restricting to n decimals this one returns
 # integers if possible
-def float2floatMin(fs: Optional[float], n: int = 1) -> Optional[Union[float, int]]:
+def float2floatMin(fs: float|None, n: int = 1) -> None|float|int:
     if fs is None:
         return None
     assert config.app_window is not None
@@ -178,8 +172,8 @@ def float2floatMin(fs: Optional[float], n: int = 1) -> Optional[Union[float, int
 # Prepare numbers for sending
 # for numbers out of range None is returned
 def limitnum(
-    minn: Optional[float], maxn: Optional[float], n: Optional[float]
-) -> Optional[float]:
+    minn: float|None, maxn: float|None, n: float|None
+) -> float|None:
     if (
         n is None
         or (maxn is not None and n > maxn)
@@ -191,7 +185,7 @@ def limitnum(
 
 # Prepare temperature in C to the interval [-50,1000] for sending
 # for numbers out of range None is returned
-def limittemp(temp: Optional[float]) -> Optional[float]:
+def limittemp(temp: float|None) -> float|None:
     if temp is None or numpy.isnan(temp) or temp > 1000 or temp < -50:
         return None
     return temp
@@ -199,7 +193,7 @@ def limittemp(temp: Optional[float]) -> Optional[float]:
 
 # Prepare time in s to the interval [0,3600] for sending
 # for numbers out of range None is returned
-def limittime(tx: Optional[float]) -> Optional[float]:
+def limittime(tx: float|None) -> float|None:
     if tx is None or numpy.isnan(tx) or  tx > 3600 or tx < 0:
         return None
     return tx
@@ -207,7 +201,7 @@ def limittime(tx: Optional[float]) -> Optional[float]:
 
 # Prepare text for sending
 # text longer than maxlen gets truncated and an eclipse added
-def limittext(maxlen: int, s: Optional[str]) -> Optional[str]:
+def limittext(maxlen: int, s: str|None) -> str|None:
     if s is not None:
         if len(s) > maxlen:
             return f'{s[:maxlen]}..'
@@ -218,7 +212,7 @@ def limittext(maxlen: int, s: Optional[str]) -> Optional[str]:
 # Dicts
 
 
-def addString2dict(dict_source:'ProfileData', key_source:str, dict_target:Dict[str, Any], key_target:str, maxlen:int) -> None:
+def addString2dict(dict_source:'ProfileData', key_source:str, dict_target:dict[str, Any], key_target:str, maxlen:int) -> None:
     if key_source in dict_source and dict_source[key_source]: # type:ignore # pyrefly: ignore # TypedDict key must be a string literal; expected one of (
         txt = limittext(maxlen, decodeLocal(dict_source[key_source])) # type:ignore # pyrefly: ignore # TypedDict key must be a string literal; expected one of
         if txt is not None:
@@ -230,12 +224,12 @@ def addString2dict(dict_source:'ProfileData', key_source:str, dict_target:Dict[s
 # numbers beyond the given limit are replaced by None
 # Note: None and 0 values are just dropped and no entry is added
 def addNum2dict(
-    dict_source:Union['ProfileData', 'ComputedProfileInformation'],
+    dict_source:'ProfileData|ComputedProfileInformation',
     key_source:str,
-    dict_target:Dict[str, Any],
+    dict_target:dict[str, Any],
     key_target:str,
-    minn:Optional[float],
-    maxn:Optional[float],
+    minn:float|None,
+    maxn:float|None,
     digits:int,
     factor:float=1.,
 ) -> None:
@@ -255,11 +249,11 @@ def addNum2dict(
 # if min or max is None, the corresponding limit is not enforced, otherwise
 # numbers beyond the given limit are replaced by None
 def addAllNum2dict(
-    dict_source:Union['ProfileData', 'ComputedProfileInformation'],
-    dict_target:Dict[str, Any],
-    key_source_target_pairs:List[Union[str, Tuple[str,str]]],
-    minn:Optional[float],
-    maxn:Optional[float],
+    dict_source:'ProfileData|ComputedProfileInformation',
+    dict_target:dict[str, Any],
+    key_source_target_pairs:list[str|tuple[str,str]],
+    minn:float|None,
+    maxn:float|None,
     digits:int,
     factor:float=1.,
 ) -> None:
@@ -282,7 +276,7 @@ def addAllNum2dict(
         )
 
 
-def addTime2dict(dict_source:Union['ProfileData', 'ComputedProfileInformation'], key_source:str, dict_target:Dict[str, Any], key_target:str) -> None:
+def addTime2dict(dict_source:'ProfileData|ComputedProfileInformation', key_source:str, dict_target:dict[str, Any], key_target:str) -> None:
     if key_source in dict_source and dict_source[key_source]:  # type:ignore # pyrefly: ignore # TypedDict key must be a string literal; expected one of
         tx = limittime(dict_source[key_source])  # type:ignore # pyrefly: ignore # TypedDict key must be a string literal; expected one of
         if tx is not None:
@@ -291,7 +285,7 @@ def addTime2dict(dict_source:Union['ProfileData', 'ComputedProfileInformation'],
 
 # consumes a list of source-target pairs, or just strings used as both source
 # and target key, to be processed with add2dict
-def addAllTime2dict(dict_source:Union['ProfileData', 'ComputedProfileInformation'], dict_target:Dict[str, Any], key_source_target_pairs:List[Union[str,Tuple[str,str]]]) -> None:
+def addAllTime2dict(dict_source:'ProfileData|ComputedProfileInformation', dict_target:dict[str, Any], key_source_target_pairs:list[str|tuple[str,str]]) -> None:
     for p in key_source_target_pairs:
         key_source:str
         key_target:str
@@ -303,13 +297,13 @@ def addAllTime2dict(dict_source:Union['ProfileData', 'ComputedProfileInformation
 
 
 # mode indicates the temperature unit, "C" or "F", of the data if not None
-def addTemp2dict(dict_source:Union['ProfileData', 'ComputedProfileInformation'], key_source:str, dict_target:Dict[str, Any], key_target:str, mode:Optional[str]=None) -> None:
+def addTemp2dict(dict_source:'ProfileData|ComputedProfileInformation', key_source:str, dict_target:dict[str, Any], key_target:str, mode:str|None=None) -> None:
     if key_source in dict_source and dict_source[key_source]:  # type:ignore # pyrefly: ignore # TypedDict key must be a string literal; expected one of
         temp = limittemp(temp2C(dict_source[key_source],mode))  # type:ignore # pyrefly: ignore # TypedDict key must be a string literal; expected one of
         if temp is not None and temp != -1 and not numpy.isnan(temp):
             dict_target[key_target] = float2floatMin(temp)
 
-def addTempDiff2dict(dict_source:Union['ProfileData', 'ComputedProfileInformation'], key_source:str, dict_target:Dict[str, Any], key_target:str) -> None:
+def addTempDiff2dict(dict_source:'ProfileData|ComputedProfileInformation', key_source:str, dict_target:dict[str, Any], key_target:str) -> None:
     if key_source in dict_source and dict_source[key_source]:  # type:ignore # pyrefly: ignore # TypedDict key must be a string literal; expected one of
         temp = limittemp(tempDiff2C(dict_source[key_source]))  # type:ignore # pyrefly: ignore # TypedDict key must be a string literal; expected one of
         if temp is not None and temp != -1 and not numpy.isnan(temp):
@@ -317,7 +311,7 @@ def addTempDiff2dict(dict_source:Union['ProfileData', 'ComputedProfileInformatio
 
 # consumes a list of source-target pairs, or just strings used as both source
 # and target key, to be processed with add2dict
-def addAllTemp2dict(dict_source:Union['ProfileData', 'ComputedProfileInformation'], dict_target:Dict[str, Any], key_source_target_pairs:List[Union[str,Tuple[str,str]]]) -> None:
+def addAllTemp2dict(dict_source:'ProfileData|ComputedProfileInformation', dict_target:dict[str, Any], key_source_target_pairs:list[str|tuple[str,str]]) -> None:
     for p in key_source_target_pairs:
         key_source:str
         key_target:str
@@ -329,7 +323,7 @@ def addAllTemp2dict(dict_source:Union['ProfileData', 'ComputedProfileInformation
 
 
 # mode indicates the temperature unit, "C" or "F", of the data if not None
-def addRoRTemp2dict(dict_source:Union['ProfileData', 'ComputedProfileInformation'], key_source:str, dict_target:Dict[str, Any], key_target:str, mode:Optional[str]=None) -> None:
+def addRoRTemp2dict(dict_source:'ProfileData|ComputedProfileInformation', key_source:str, dict_target:dict[str, Any], key_target:str, mode:str|None=None) -> None:
     if key_source in dict_source and dict_source[key_source]:  # type:ignore # pyrefly: ignore # TypedDict key must be a string literal; expected one of
         temp = limittemp(RoRtemp2C(dict_source[key_source],mode))  # type:ignore # pyrefly: ignore # TypedDict key must be a string literal; expected one of
         if temp is not None:
@@ -338,7 +332,7 @@ def addRoRTemp2dict(dict_source:Union['ProfileData', 'ComputedProfileInformation
 
 # returns extends dict_target by item with key_target holding the
 # dict_source[key_source] value if key_source in dict_source and not empty
-def add2dict(dict_source:'ProfileData', key_source:str, dict_target:Dict[str, Any], key_target:str, if_non_empty:bool = True) -> None:
+def add2dict(dict_source:'ProfileData', key_source:str, dict_target:dict[str, Any], key_target:str, if_non_empty:bool = True) -> None:
     if key_source in dict_source and (not if_non_empty or dict_source[key_source]):  # type:ignore # pyrefly: ignore # TypedDict key must be a string literal; expected one of
         dict_target[key_target] = dict_source[key_source]  # type:ignore # pyrefly: ignore # TypedDict key must be a string literal; expected one of
 
@@ -362,7 +356,7 @@ def getLanguage() -> str:
 
 # if rlimit = -1 or rused = -1 or pu = "", no update information is available and the state is not updated
 @pyqtSlot(float,float,str,int,list)
-def updateLimits(rlimit:float, rused:float, pu:str, notifications:int, machines: List[str]) -> None:  #for Python >= 3.9 can replace 'List' with the generic type hint 'list'
+def updateLimits(rlimit:float, rused:float, pu:str, notifications:int, machines: list[str]) -> None:
     aw = config.app_window
     if aw is not None:
         aw.updateLimits(rlimit, rused, pu, notifications, machines)
@@ -375,12 +369,12 @@ def updateSchedule() -> None:
 
 # takes the JSON response dict and returns the account state as tuple
 # rlimit:float, rused:float, pu:str, notifications:int
-def extractAccountState(response: Dict[str,Any]) -> Tuple[float, float, str, int, List[str]]:
+def extractAccountState(response: dict[str,Any]) -> tuple[float, float, str, int, list[str]]:
     rlimit:float = -1.
     rused:float = -1.
     pu:str = ''
     notifications:int = 0 # unqualified notifications
-    machines:List[str] = [] # list of machine names with matching notifications
+    machines:list[str] = [] # list of machine names with matching notifications
     try:
         if response:
             if 'ol' in response:
@@ -402,7 +396,7 @@ def extractAccountState(response: Dict[str,Any]) -> Tuple[float, float, str, int
     return rlimit, rused, pu, notifications, machines
 
 @pyqtSlot(dict)
-def updateLimitsFromResponse(response: Dict[str,Any]) -> None:
+def updateLimitsFromResponse(response: dict[str,Any]) -> None:
     rlimit,rused,pu,notifications,machines = extractAccountState(response)
     updateLimits(rlimit,rused,pu,notifications,machines)
 
@@ -444,7 +438,7 @@ def schedulerLink() -> str:
 def setPlusIcon(mbox:'QMessageBox') -> None:
     basedir = os.path.join(getResourcePath(),'Icons')
     p = os.path.join(basedir, 'plus-notification.svg')
-    app_style:Optional[QStyle] = QApplication.style()
+    app_style:QStyle|None = QApplication.style()
     if app_style is not None:
         icon_size = app_style.pixelMetric(QStyle.PixelMetric.PM_MessageBoxIconSize)
     else:

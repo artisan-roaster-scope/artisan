@@ -17,7 +17,7 @@ The tests validate:
 
 import sys
 from io import StringIO
-from typing import List, Any
+from typing import Any
 from unittest.mock import patch
 
 import pytest
@@ -233,7 +233,7 @@ class TestHandleCommandsEdgeCases:
             ['artisan', '--VersionHelp'],  # Long options combined
         ],
     )
-    def test_handleCommands_with_malformed_arguments(self, malformed_args: List[str]) -> None:
+    def test_handleCommands_with_malformed_arguments(self, malformed_args: list[str]) -> None:
         """Test behavior with malformed argument combinations."""
         with patch.object(sys, 'argv', malformed_args):
             result = handleCommands()

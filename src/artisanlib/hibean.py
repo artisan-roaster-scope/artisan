@@ -8,12 +8,10 @@ import time as libtime
 import json
 #import re
 import logging
-from typing import Final, Optional, List, Callable
+from collections.abc import Callable
+from typing import Final
 
-try:
-    from PyQt6.QtCore import QDateTime, Qt # @UnusedImport @Reimport  @UnresolvedImport
-except ImportError:
-    from PyQt5.QtCore import QDateTime, Qt # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+from PyQt6.QtCore import QDateTime, Qt
 
 from artisanlib.util import encodeLocal, weight_units, weight_units_lower
 from artisanlib.atypes import ProfileData
@@ -23,9 +21,9 @@ _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 # returns a dict containing all profile information contained in the given HiBean JSON file
 def extractProfileHiBeanJSON(file:str,
-        _etypesdefault:List[str],
-        alt_etypesdefault:List[str],
-        _artisanflavordefaultlabels:List[str],
+        _etypesdefault:list[str],
+        alt_etypesdefault:list[str],
+        _artisanflavordefaultlabels:list[str],
         eventsExternal2InternalValue:Callable[[int],float]) -> ProfileData:
     res:ProfileData = ProfileData() # the interpreted data set
 
@@ -38,13 +36,13 @@ def extractProfileHiBeanJSON(file:str,
         date_time_str = hibean_data.get('dateTime', '') # e.g. "2025-03-29T09:09:29.000", an ISO 8601 DateTime
         if date_time_str:
             date_time:QDateTime = QDateTime.fromString(date_time_str, Qt.DateFormat.ISODate)
-            roastdate:Optional[str] = encodeLocal(date_time.date().toString())
+            roastdate:str|None = encodeLocal(date_time.date().toString())
             if roastdate is not None:
                 res['roastdate'] = roastdate
-            roastisodate:Optional[str] = encodeLocal(date_time.date().toString(Qt.DateFormat.ISODate))
+            roastisodate:str|None = encodeLocal(date_time.date().toString(Qt.DateFormat.ISODate))
             if roastisodate is not None:
                 res['roastisodate'] = roastisodate
-            roasttime:Optional[str] = encodeLocal(date_time.time().toString())
+            roasttime:str|None = encodeLocal(date_time.time().toString())
             if roasttime is not None:
                 res['roasttime'] = roasttime
             res['roastepoch'] = int(date_time.toSecsSinceEpoch())
@@ -79,23 +77,23 @@ def extractProfileHiBeanJSON(file:str,
         device_info = hibean_data.get('deviceInfo', {})
         res['roastertype'] = device_info.get('name','')
 
-        event2timeindex:List[Optional[int]] = [None, 0, None, 1, 2, 3, 4, 5, 6] # maps HiBean event numbers to Artisan timeindex or None if no correspondence
-        timeindex:List[int] = [-1,0,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actual index used
-        timex:List[float] = []
-        temp1:List[float] = []
-        temp2:List[float] = []
+        event2timeindex:list[int|None] = [None, 0, None, 1, 2, 3, 4, 5, 6] # maps HiBean event numbers to Artisan timeindex or None if no correspondence
+        timeindex:list[int] = [-1,0,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actual index used
+        timex:list[float] = []
+        temp1:list[float] = []
+        temp2:list[float] = []
 
-        specialevents:List[int] = []
-        specialeventstype:List[int] = []
-        specialeventsvalue:List[float] = []
-        specialeventsStrings:List[str] = []
+        specialevents:list[int] = []
+        specialeventstype:list[int] = []
+        specialeventsvalue:list[float] = []
+        specialeventsStrings:list[str] = []
 
         data_list = hibean_data.get('dataList', [])
 
-        last_fan:Optional[int] = None
-        last_heat:Optional[int] = None
-        last_drum:Optional[int] = None
-        last_ts:Optional[int] = None
+        last_fan:int|None = None
+        last_heat:int|None = None
+        last_drum:int|None = None
+        last_ts:int|None = None
 
         for idx, data_point in enumerate(data_list):
             timex.append(data_point.get('duration', 0.0))
@@ -103,7 +101,7 @@ def extractProfileHiBeanJSON(file:str,
             temp2.append(data_point.get('bt', 0.0))
             if 'event' in data_point:
                 try:
-                    time_idx:Optional[int] = event2timeindex[int(data_point['event'])]
+                    time_idx:int|None = event2timeindex[int(data_point['event'])]
                     if time_idx is not None:
                         timeindex[time_idx] = idx
                 except Exception:  # pylint: disable=broad-except

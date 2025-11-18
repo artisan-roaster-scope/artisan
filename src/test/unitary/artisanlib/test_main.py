@@ -111,7 +111,8 @@ import builtins
 import os
 import tempfile
 from pathlib import Path
-from typing import Any, Dict, Generator, List, Optional
+from collections.abc import Generator
+from typing import Any
 from unittest.mock import Mock, patch
 
 import numpy as np
@@ -297,7 +298,7 @@ def isolated_temp_file() -> Generator[str, None, None]:
 
 
 @pytest.fixture
-def sample_profile_data() -> Dict[str, Any]:
+def sample_profile_data() -> dict[str, Any]:
     """Provide fresh sample profile data for each test."""
     return {
         'title': 'Test Profile',
@@ -320,7 +321,7 @@ class TestLoadFile:
         absolute_path = os.path.join(os.getcwd(), 'src', test_profile_path)
 
         # Mock profile data that would be returned by deserialize
-        mock_profile_data: Dict[str, Any] = {
+        mock_profile_data: dict[str, Any] = {
             'title': 'Test Profile',
             'timex': [0, 1, 2, 3],
             'temp1': [20, 25, 30, 35],
@@ -549,7 +550,7 @@ class TestLoadFile:
         """Test loadFile with quiet=True parameter."""
         # Arrange
         test_file_path = 'test_file.alog'
-        mock_profile_data: Dict[str, Any] = {'title': 'Test Profile', 'extradevices': []}
+        mock_profile_data: dict[str, Any] = {'title': 'Test Profile', 'extradevices': []}
 
         with patch('artisanlib.main.QFile') as mock_qfile, patch(
             'artisanlib.main.QTextStream'
@@ -709,7 +710,7 @@ class TestLoadFile:
         test_file_path = 'test_file.alog'
         mock_application_window.qmc.clearBgbeforeprofileload = True
 
-        mock_profile_data: Dict[str, Any] = {'title': 'Test Profile', 'extradevices': []}
+        mock_profile_data: dict[str, Any] = {'title': 'Test Profile', 'extradevices': []}
 
         with patch('artisanlib.main.QFile') as mock_qfile, patch(
             'artisanlib.main.QTextStream'
@@ -860,7 +861,7 @@ class TestImportJSON:
             pytest.skip('Test JSON file not found')
 
         # Mock the JSON profile data (based on actual profile1.json structure)
-        mock_profile_data: Dict[str, Any] = {
+        mock_profile_data: dict[str, Any] = {
             'title': 'Guji Shakiso',
             'timex': [0.030917041, 1.03096475, 2.030985333],
             'temp1': [168.193, 168.478, 168.739],
@@ -913,7 +914,7 @@ class TestImportJSON:
         """Test importJSON when setProfile returns False."""
         # Arrange
         test_json_path = 'test_profile.json'
-        mock_profile_data: Dict[str, Any] = {
+        mock_profile_data: dict[str, Any] = {
             'title': 'Test Profile',
             'timex': [0.0, 1.0, 2.0],
             'temp1': [150.0, 160.0, 170.0],
@@ -1228,7 +1229,7 @@ class TestFindWidgetsMethods:
         widget = Mock()
 
         # Mock cellWidget to return our widget at row 1
-        def mock_cellWidget(row: int, col: int) -> Optional[Mock]:
+        def mock_cellWidget(row: int, col: int) -> Mock|None:
             if row == 1 and col == 0:
                 return widget
             return None
@@ -1276,7 +1277,7 @@ class TestFindWidgetsMethods:
         widget = Mock()
 
         # Mock cellWidget to return our widget at column 2
-        def mock_cellWidget(row: int, col: int) -> Optional[Mock]:
+        def mock_cellWidget(row: int, col: int) -> Mock|None:
             if row == 0 and col == 2:
                 return widget
             return None
@@ -2145,7 +2146,7 @@ class TestMakeListLength:
     def test_makeListLength_empty_list(self) -> None:
         """Test makeListLength with empty list."""
         # Arrange
-        original_list: List[int] = []
+        original_list: list[int] = []
         target_length = 3
         default_element = 0
 
@@ -2320,7 +2321,7 @@ class TestSettingsSetValue:
         # Arrange
         mock_settings = Mock(spec=QSettings)
         mock_settings.group.return_value = 'TestGroup'
-        default_settings: Dict[str, Any] = {}
+        default_settings: dict[str, Any] = {}
         name = 'testSetting'
         value = 'testValue'
 
@@ -2336,7 +2337,7 @@ class TestSettingsSetValue:
         # Arrange
         mock_settings = Mock(spec=QSettings)
         mock_settings.group.return_value = 'TestGroup'
-        default_settings: Dict[str, Any] = {}
+        default_settings: dict[str, Any] = {}
         name = 'testSetting'
         value = 'testValue'
 
@@ -2385,7 +2386,7 @@ class TestProfileProductionData:
     def test_profileProductionData_minimal_profile(self) -> None:
         """Test profileProductionData with minimal profile data."""
         # Arrange
-        profile: Dict[str, Any] = {}
+        profile: dict[str, Any] = {}
 
         # Act
         result = ApplicationWindow.profileProductionData(profile)
@@ -2904,7 +2905,7 @@ class TestListUtilities:
     def test_makeListLength_empty_list(self) -> None:
         """Test makeListLength with empty list."""
         # Arrange
-        original_list: List[int] = []
+        original_list: list[int] = []
         target_length = 3
         default_element = 42
 
@@ -3257,7 +3258,7 @@ class TestSettingsUtilities:
         """Test settingsSetValue in read defaults mode."""
         # Arrange
         settings = QSettings()
-        default_settings: Dict[str, Any] = {}
+        default_settings: dict[str, Any] = {}
         settings.beginGroup('test_group')
 
         # Act
@@ -3682,7 +3683,7 @@ class TestProductionDataUtilities:
     def test_profileProductionData_minimal_profile(self) -> None:
         """Test profileProductionData with minimal profile data."""
         # Arrange
-        profile: Dict[str, Any] = {}
+        profile: dict[str, Any] = {}
 
         # Act
         result = ApplicationWindow.profileProductionData(profile)
@@ -3732,9 +3733,9 @@ class TestURLExtractorUtilities:
         # Arrange
         mock_url = Mock()
         mock_url.toString.return_value = 'http://example.com/profile'
-        etypes_default: List[str] = []
-        alt_etypes_default: List[str] = []
-        flavor_labels: List[str] = []
+        etypes_default: list[str] = []
+        alt_etypes_default: list[str] = []
+        flavor_labels: list[str] = []
         extractor_func = Mock(return_value=0.0)
 
         # Mock requests to avoid actual network calls
@@ -3757,9 +3758,9 @@ class TestURLExtractorUtilities:
         # Arrange
         mock_url = Mock()
         mock_url.toString.return_value = 'http://invalid-url.com'
-        etypes_default: List[str] = []
-        alt_etypes_default: List[str] = []
-        flavor_labels: List[str] = []
+        etypes_default: list[str] = []
+        alt_etypes_default: list[str] = []
+        flavor_labels: list[str] = []
         extractor_func = Mock(return_value=0.0)
 
         # Mock requests to raise an exception

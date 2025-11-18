@@ -1,6 +1,7 @@
 from pathlib import Path
 from json import load as json_load
-from typing import Any, TypedDict, Dict, Union, List, Tuple, Callable, Optional, TYPE_CHECKING
+from collections.abc import Callable
+from typing import Any, TypedDict, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from _pytest.python_api import ApproxScalar
@@ -25,8 +26,8 @@ from artisanlib.cropster import extractProfileCropsterXLS
 #######
 # Types
 
-Extractor = Callable[[str, List[str], List[str], List[str], Callable[[int],float]],Optional[ProfileData]]
-ImportSpecs = Tuple[Extractor, str, str]
+Extractor = Callable[[str, list[str], list[str], list[str], Callable[[int],float]], ProfileData|None] # ty:ignore
+ImportSpecs = tuple[Extractor, str, str]
 
 class ImportData(TypedDict):
     extractor:Extractor
@@ -38,9 +39,9 @@ class ImportData(TypedDict):
 #######
 # Mocks
 
-etypesdefault:List[str] = [ 'Air','Drum','Damper', 'Burner', '--']
-alt_etypesdefault:List[str] = ['Fan', 'Drum', 'Cooling', 'Heater', '--']
-artisanflavordefaultlabels:List[str] = ['Acidity','Aftertaste', 'Clean Cup', 'Head', 'Fragrance', 'Sweetness', 'Aroma', 'Balance', 'Body']
+etypesdefault:list[str] = [ 'Air','Drum','Damper', 'Burner', '--']
+alt_etypesdefault:list[str] = ['Fan', 'Drum', 'Cooling', 'Heater', '--']
+artisanflavordefaultlabels:list[str] = ['Acidity','Aftertaste', 'Clean Cup', 'Head', 'Fragrance', 'Sweetness', 'Aroma', 'Balance', 'Body']
 
 def eventsExternal2InternalValue(v:int) -> float:
     if v == 0:
@@ -63,7 +64,7 @@ values_to_ignore = [
 # input files with the specified file extension are expected to be located in a subdirectory of the 'data' directory,
 # named by the second argument, next to this test file together with a variant of the profile exported as Artisan JSON
 # eg. ./data/cropster/<name>.xls and ./data/cropster/<name>.json
-import_specs:List[ImportSpecs] = [
+import_specs:list[ImportSpecs] = [
     (extractProfileCropsterXLS, 'cropster', '.xls'),
     (extractProfileGiesenCSV, 'giesen', '.csv'),
     (extractProfileIkawaCSV, 'ikawa', '.csv'),
@@ -87,7 +88,7 @@ import_specs:List[ImportSpecs] = [
 class ApproxBaseReprMixin(ApproxBase):
     def __repr__(self) -> str:
 
-        def recur_repr_helper(obj:Any) -> Union[Dict[Any,Any], Tuple[Any,...], List[Any], ApproxScalar]:
+        def recur_repr_helper(obj:Any) -> dict[Any,Any]|tuple[Any,...]|list[Any]|ApproxScalar:
             if isinstance(obj, dict):
                 return {k : recur_repr_helper(v) for k, v in obj.items()}
             if isinstance(obj, tuple):
@@ -102,7 +103,7 @@ class ApproxBaseReprMixin(ApproxBase):
 class ApproxNestedSequenceLike(ApproxSequenceLike, ApproxBaseReprMixin):
 
     def _yield_comparisons(self, actual:Any) -> Any:
-        mapping: Union[ApproxNestedMapping, ApproxNestedSequenceLike]
+        mapping: ApproxNestedMapping|ApproxNestedSequenceLike
         for k in range(len(self.expected)):
             if isinstance(self.expected[k], dict):
                 mapping = ApproxNestedMapping(self.expected[k], rel=self.rel, abs=self.abs, nan_ok=self.nan_ok)
@@ -121,7 +122,7 @@ class ApproxNestedSequenceLike(ApproxSequenceLike, ApproxBaseReprMixin):
 class ApproxNestedMapping(ApproxMapping, ApproxBaseReprMixin):
 
     def _yield_comparisons(self, actual:Any) -> Any:
-        mapping: Union[ApproxNestedMapping, ApproxNestedSequenceLike]
+        mapping: ApproxNestedMapping|ApproxNestedSequenceLike
         for k in self.expected:
             if isinstance(self.expected[k], dict):
                 mapping = ApproxNestedMapping(self.expected[k], rel=self.rel, abs=self.abs, nan_ok=self.nan_ok)
@@ -136,7 +137,7 @@ class ApproxNestedMapping(ApproxMapping, ApproxBaseReprMixin):
         pass
 
 
-def nested_approx(expected:Any, rel:Optional[float]=None, absv:Optional[float]=None, nan_ok:bool=False) -> ApproxBase:
+def nested_approx(expected:Any, rel:float|None=None, absv:float|None=None, nan_ok:bool=False) -> ApproxBase:
     if isinstance(expected, dict):
         return ApproxNestedMapping(expected, rel, absv, nan_ok)
     if isinstance(expected, (tuple, list)):
@@ -152,9 +153,9 @@ def pytest_generate_tests(metafunc:'Metafunc') -> None:
     this_directory = Path(__file__).resolve().parent
     data_dir = (this_directory / 'data')
 
-    def get_import_data(extractor:Extractor, dir_name:str, ext:str) -> List[ImportData]:
+    def get_import_data(extractor:Extractor, dir_name:str, ext:str) -> list[ImportData]:
         profiles_dir = (data_dir / dir_name)
-        import_data:List[ImportData] = []
+        import_data:list[ImportData] = []
         for filename in [f.stem for f in profiles_dir.iterdir() if f.is_file() and f.suffix == ext]:
             roest_data:ImportData = {
                 'extractor': extractor,
@@ -165,7 +166,7 @@ def pytest_generate_tests(metafunc:'Metafunc') -> None:
         return import_data
 
     if 'import_data' in metafunc.fixturenames:
-        import_data:List[ImportData] = []
+        import_data:list[ImportData] = []
         for spec in import_specs:
             import_data.extend(get_import_data(*spec))
         metafunc.parametrize('import_data', import_data)
@@ -185,7 +186,7 @@ class TestProfileImport:
         # Skip test if file doesn't exist
         if not test_profile_path.exists():
             pytest.skip('Test profile file not found')
-        csv_obj:Optional[ProfileData] = import_data['extractor'](
+        csv_obj:ProfileData|None = import_data['extractor'](
             str(test_profile_path),
             etypesdefault,
             alt_etypesdefault,

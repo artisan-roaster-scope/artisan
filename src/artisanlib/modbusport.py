@@ -20,30 +20,20 @@ import time
 import asyncio
 import logging
 
-import pymodbus
 from pymodbus.pdu import ExceptionResponse
 from pymodbus.client import AsyncModbusSerialClient, AsyncModbusUdpClient, AsyncModbusTcpClient
 from pymodbus.client.mixin import ModbusClientMixin
-try:
-    from pymodbus.framer import FramerType # type:ignore[attr-defined,unused-ignore]
-except Exception: # pylint: disable=broad-except
-    # FramerType named Framer in pymodbus < 3.7
-    from pymodbus.framer import Framer as FramerType # type:ignore[attr-defined, no-redef, unused-ignore]
+from pymodbus.framer import FramerType # type:ignore[attr-defined,unused-ignore]
 
-from packaging.version import Version
-from typing import Final, Optional, List, Dict, Tuple, Union, Literal, Any, TYPE_CHECKING
+from typing import Final, Literal, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
     from pymodbus.client import ModbusBaseClient # pylint: disable=unused-import
     from pymodbus.pdu.pdu import ModbusPDU # pylint: disable=unused-import
 
-try:
-    from PyQt6.QtCore import QSemaphore # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
-except ImportError:
-    from PyQt5.QtCore import QSemaphore # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtWidgets import QApplication # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+from PyQt6.QtCore import QSemaphore
+from PyQt6.QtWidgets import QApplication
 
 from artisanlib.util import debugLogLevelActive
 from artisanlib.async_comm import AsyncLoopThread
@@ -97,7 +87,7 @@ def convert_from_bcd(value: int) -> int:
 class modbusport:
     """ this class handles the communications with all the modbus devices"""
 
-    __slots__ = [ 'aw', 'legacy_pymodbus', 'legacy_pymodbus_keywords', 'modbus_serial_read_delay', 'modbus_serial_connect_delay', 'modbus_serial_write_delay', 'maxCount', 'readRetries', 'default_comport', 'comport', 'baudrate', 'bytesize', 'parity', 'stopbits',
+    __slots__ = [ 'aw', 'modbus_serial_read_delay', 'modbus_serial_connect_delay', 'modbus_serial_write_delay', 'maxCount', 'readRetries', 'default_comport', 'comport', 'baudrate', 'bytesize', 'parity', 'stopbits',
         'timeout', 'IP_timeout', 'IP_retries', 'serial_readRetries', 'PID_device_ID', 'PID_SV_register', 'PID_p_register', 'PID_i_register', 'PID_d_register', 'PID_ON_action', 'PID_OFF_action',
         'channels', 'inputDeviceIds', 'inputRegisters', 'inputFloats', 'inputBCDs', 'inputFloatsAsInt', 'inputBCDsAsInt', 'inputSigned', 'inputCodes', 'inputDivs',
         'inputModes', 'optimizer', 'fetch_max_blocks', 'fail_on_cache_miss', 'disconnect_on_error', 'acceptable_errors', 'activeRegisters',
@@ -108,15 +98,6 @@ class modbusport:
 
     def __init__(self, aw:'ApplicationWindow') -> None:
         self.aw = aw
-
-        self.legacy_pymodbus:bool = False           # True for pymodbus < 3.8.2
-        self.legacy_pymodbus_keywords:bool = False  # True for pymodbus < 3.10.0
-        if Version(pymodbus.__version__) < Version('3.8.2'):
-            # pymodbus before 3.8.2 did not had the option to specify the word order in datatype conversions
-            self.legacy_pymodbus = True
-        if Version(pymodbus.__version__) < Version('3.10.0'):
-            # pymodbus before 3.10.0 did use the previous keyword names for read/write methods
-            self.legacy_pymodbus_keywords = True
 
         self.modbus_serial_read_delay       :Final[float] = 0.035 # in seconds
         self.modbus_serial_write_delay      :Final[float] = 0.080 # in seconds
@@ -144,18 +125,18 @@ class modbusport:
         self.PID_OFF_action:str = ''
 
         self.channels:Final[int] = 10
-        self.inputDeviceIds:List[int] = [0] * self.channels
-        self.inputRegisters:List[int] = [0]*self.channels
+        self.inputDeviceIds:list[int] = [0] * self.channels
+        self.inputRegisters:list[int] = [0]*self.channels
         # decoding (default: 16bit uInt)
-        self.inputFloats:List[bool] = [False]*self.channels       # 32bit Floats
-        self.inputBCDs:List[bool] = [False]*self.channels         # 32bit uInt BCD decoded
-        self.inputFloatsAsInt:List[bool] = [False]*self.channels  # 32bit uInt/sInt
-        self.inputBCDsAsInt:List[bool] = [False]*self.channels    # 16bit uInt/sInt
-        self.inputSigned:List[bool] = [False]*self.channels       # if True, decode Integers as signed otherwise as unsigned
+        self.inputFloats:list[bool] = [False]*self.channels       # 32bit Floats
+        self.inputBCDs:list[bool] = [False]*self.channels         # 32bit uInt BCD decoded
+        self.inputFloatsAsInt:list[bool] = [False]*self.channels  # 32bit uInt/sInt
+        self.inputBCDsAsInt:list[bool] = [False]*self.channels    # 16bit uInt/sInt
+        self.inputSigned:list[bool] = [False]*self.channels       # if True, decode Integers as signed otherwise as unsigned
         #
-        self.inputCodes:List[int] = [3]*self.channels
-        self.inputDivs:List[int] = [0]*self.channels # 0: none, 1: 1/10, 2:1/100 # :List[Literal[0,1,2]]
-        self.inputModes:List[str] = ['C']*self.channels
+        self.inputCodes:list[int] = [3]*self.channels
+        self.inputDivs:list[int] = [0]*self.channels # 0: none, 1: 1/10, 2:1/100 # :List[Literal[0,1,2]]
+        self.inputModes:list[str] = ['C']*self.channels
 
         self.optimizer:bool = True # if set, values of consecutive register addresses are requested in single requests
         # MODBUS functions associated to dicts associating MODBUS device ids to registers in use
@@ -169,9 +150,9 @@ class modbusport:
         self.disconnect_on_error:bool = True # if True we explicitly disconnect the MODBUS connection on IO errors (was: if on MODBUS serial and restart it on next request)
         self.acceptable_errors = 3 # the number of errors that are acceptable without a disconnect/reconnect. If set to 0 every error triggers a reconnect if disconnect_on_error is True
 
-        self.activeRegisters:Dict[int, Dict[int, List[int]]] = {}
+        self.activeRegisters:dict[int, dict[int, list[int]]] = {}
         # the readings cache that is filled by requesting sequences of values of activeRegisters in blocks
-        self.readingsCache:Dict[int, Dict[int, Dict[int, int]]] = {}
+        self.readingsCache:dict[int, dict[int, dict[int, int]]] = {}
 
         self.SVmultiplier:int = 0  # 0:no, 1:10x, 2:100x # Literal[0,1,2]
         self.SVwriteLong:bool = False # if True (and SVwriteFloat is False)  use self.writeLong() to update the SV, otherwise self.writeRegister() or self.writeWord()
@@ -179,8 +160,8 @@ class modbusport:
         self.PIDmultiplier:int = 0  # 0:no, 1:10x, 2:100x # :Literal[0,1,2]
         self.wordorderLittle:bool = True
 
-        self._asyncLoopThread: Optional[AsyncLoopThread]     = None # the asyncio AsyncLoopThread object
-        self._client: Optional[ModbusBaseClient] = None
+        self._asyncLoopThread: AsyncLoopThread|None = None # the asyncio AsyncLoopThread object
+        self._client: ModbusBaseClient|None = None
 
 
         self.COMsemaphore:QSemaphore = QSemaphore(1)
@@ -194,7 +175,7 @@ class modbusport:
         #    2: Serial Binary
         #    3: TCP
         #    4: UDP
-        self.lastReadResult:Optional[int] = None # this is set by eventaction following some custom button/slider Modbus actions with "read" command
+        self.lastReadResult:int|None = None # this is set by eventaction following some custom button/slider Modbus actions with "read" command
 
         self.commError:int = 0 # number of errors that occurred after the last connect; cleared by receiving proper data
 
@@ -205,93 +186,49 @@ class modbusport:
     def word_order(self) -> Literal['big', 'little']:
         return 'little' if self.wordorderLittle else 'big'
 
-#
-
-    def convert_16bit_uint_to_registers(self, value:int) -> List [int]:
-        if self.legacy_pymodbus:
-            if self.wordorderLittle:
-                return ModbusClientMixin.convert_to_registers(value, ModbusClientMixin.DATATYPE.UINT16)[::-1]
-            return ModbusClientMixin.convert_to_registers(value, ModbusClientMixin.DATATYPE.UINT16)
+    def convert_16bit_uint_to_registers(self, value:int) -> list [int]:
         return ModbusClientMixin.convert_to_registers(value, ModbusClientMixin.DATATYPE.UINT16, word_order=self.word_order()) # type:ignore[call-arg, unused-ignore]
 
-    def convert_32bit_int_to_registers(self, value:int) -> List [int]:
-        if self.legacy_pymodbus:
-            if self.wordorderLittle:
-                return ModbusClientMixin.convert_to_registers(value, ModbusClientMixin.DATATYPE.INT32)[::-1]
-            return ModbusClientMixin.convert_to_registers(value, ModbusClientMixin.DATATYPE.INT32)
+    def convert_32bit_int_to_registers(self, value:int) -> list [int]:
         return ModbusClientMixin.convert_to_registers(value, ModbusClientMixin.DATATYPE.INT32, word_order=self.word_order()) # type:ignore[call-arg, unused-ignore]
 
-    def convert_float_to_registers(self, value:float) -> List[int]:
-        if self.legacy_pymodbus:
-            if self.wordorderLittle:
-                return ModbusClientMixin.convert_to_registers(value, ModbusClientMixin.DATATYPE.FLOAT32)[::-1]
-            return ModbusClientMixin.convert_to_registers(value, ModbusClientMixin.DATATYPE.FLOAT32)
+    def convert_float_to_registers(self, value:float) -> list[int]:
         return ModbusClientMixin.convert_to_registers(value, ModbusClientMixin.DATATYPE.FLOAT32, word_order=self.word_order()) # type:ignore[call-arg, unused-ignore]
 
 
 ##############################
 
 
-    def convert_16bit_uint_from_registers(self, registers:List[int]) -> int:
-        if self.legacy_pymodbus:
-            if self.wordorderLittle:
-                res = ModbusClientMixin.convert_from_registers(registers[::-1], ModbusClientMixin.DATATYPE.UINT16)
-            else:
-                res = ModbusClientMixin.convert_from_registers(registers, ModbusClientMixin.DATATYPE.UINT16)
-        else:
-            res = ModbusClientMixin.convert_from_registers(registers, ModbusClientMixin.DATATYPE.UINT16, word_order=self.word_order()) # type:ignore[call-arg, unused-ignore]
+    def convert_16bit_uint_from_registers(self, registers:list[int]) -> int:
+        res = ModbusClientMixin.convert_from_registers(registers, ModbusClientMixin.DATATYPE.UINT16, word_order=self.word_order()) # type:ignore[call-arg, unused-ignore]
         if isinstance(res, int):
             return res
         return -1
 
 
-    def convert_16bit_int_from_registers(self, registers:List[int]) -> int:
-        if self.legacy_pymodbus:
-            if self.wordorderLittle:
-                res = ModbusClientMixin.convert_from_registers(registers[::-1], ModbusClientMixin.DATATYPE.INT16)
-            else:
-                res = ModbusClientMixin.convert_from_registers(registers, ModbusClientMixin.DATATYPE.INT16)
-        else:
-            res = ModbusClientMixin.convert_from_registers(registers, ModbusClientMixin.DATATYPE.INT16, word_order=self.word_order()) # type:ignore[call-arg, unused-ignore]
+    def convert_16bit_int_from_registers(self, registers:list[int]) -> int:
+        res = ModbusClientMixin.convert_from_registers(registers, ModbusClientMixin.DATATYPE.INT16, word_order=self.word_order()) # type:ignore[call-arg, unused-ignore]
         if isinstance(res, int):
             return res
         return -1
 
 
-    def convert_32bit_uint_from_registers(self, registers:List[int]) -> int:
-        if self.legacy_pymodbus:
-            if self.wordorderLittle:
-                res = ModbusClientMixin.convert_from_registers(registers[::-1], ModbusClientMixin.DATATYPE.UINT32)
-            else:
-                res = ModbusClientMixin.convert_from_registers(registers, ModbusClientMixin.DATATYPE.UINT32)
-        else:
-            res = ModbusClientMixin.convert_from_registers(registers, ModbusClientMixin.DATATYPE.UINT32, word_order=self.word_order()) # type:ignore[call-arg, unused-ignore]
+    def convert_32bit_uint_from_registers(self, registers:list[int]) -> int:
+        res = ModbusClientMixin.convert_from_registers(registers, ModbusClientMixin.DATATYPE.UINT32, word_order=self.word_order()) # type:ignore[call-arg, unused-ignore]
         if isinstance(res, int):
             return res
         return -1
 
 
-    def convert_32bit_int_from_registers(self, registers:List[int]) -> int:
-        if self.legacy_pymodbus:
-            if self.wordorderLittle:
-                res = ModbusClientMixin.convert_from_registers(registers[::-1], ModbusClientMixin.DATATYPE.INT32)
-            else:
-                res = ModbusClientMixin.convert_from_registers(registers, ModbusClientMixin.DATATYPE.INT32)
-        else:
-            res = ModbusClientMixin.convert_from_registers(registers, ModbusClientMixin.DATATYPE.INT32, word_order=self.word_order()) # type:ignore[call-arg, unused-ignore]
+    def convert_32bit_int_from_registers(self, registers:list[int]) -> int:
+        res = ModbusClientMixin.convert_from_registers(registers, ModbusClientMixin.DATATYPE.INT32, word_order=self.word_order()) # type:ignore[call-arg, unused-ignore]
         if isinstance(res, int):
             return res
         return -1
 
 
-    def convert_float_from_registers(self, registers:List[int]) -> float:
-        if self.legacy_pymodbus:
-            if self.wordorderLittle:
-                res = ModbusClientMixin.convert_from_registers(registers[::-1], ModbusClientMixin.DATATYPE.FLOAT32)
-            else:
-                res = ModbusClientMixin.convert_from_registers(registers, ModbusClientMixin.DATATYPE.FLOAT32)
-        else:
-            res = ModbusClientMixin.convert_from_registers(registers, ModbusClientMixin.DATATYPE.FLOAT32, word_order=self.word_order()) # type:ignore[call-arg, unused-ignore]
+    def convert_float_from_registers(self, registers:list[int]) -> float:
+        res = ModbusClientMixin.convert_from_registers(registers, ModbusClientMixin.DATATYPE.FLOAT32, word_order=self.word_order()) # type:ignore[call-arg, unused-ignore]
         if isinstance(res, float):
             return res
         return -1
@@ -313,7 +250,7 @@ class modbusport:
 #            time.sleep(self.modbus_serial_read_delay)
 
     @staticmethod
-    def address2register(addr:Union[float, int], code:int = 3) -> int:
+    def address2register(addr:float|int, code:int = 3) -> int:
         if code in {3, 6}:
             return int(addr) - 40001
         return int(addr) - 30001
@@ -459,7 +396,7 @@ class modbusport:
         _log.debug('clearReadingsCache()')
         self.readingsCache = {}
 
-    def cacheReadings(self, code:int, device_id:int, register:int, results:List[int]) -> None:
+    def cacheReadings(self, code:int, device_id:int, register:int, results:list[int]) -> None:
         if code not in self.readingsCache:
             self.readingsCache[code] = {}
         if device_id not in self.readingsCache[code]:
@@ -473,7 +410,7 @@ class modbusport:
     # first result signals an error
     # second result signals a server error which requires a disconnect/reconnect
     @staticmethod
-    def invalidResult(res:Any, count:int) -> Tuple[bool, bool]:
+    def invalidResult(res:Any, count:int) -> tuple[bool, bool]:
         if res is None:
             _log.info('invalidResult(%d) => None', count)
             return True, False
@@ -511,10 +448,10 @@ class modbusport:
     # ex with MAX_REGISTER_SEGMENT = 100:
     #  client.max_blocks([0, 2, 20, 1040, 1105, 1215]) ==> [(0,20), (1040, 1105), (1215, 1215)]
     @staticmethod
-    def max_blocks(registers:List[int]) -> List[Tuple[int,int]]:
-        res:List[Tuple[int,int]] = []
-        start_register:Optional[int] = None
-        last_register:Optional[int] = None
+    def max_blocks(registers:list[int]) -> list[tuple[int,int]]:
+        res:list[tuple[int,int]] = []
+        start_register:int|None = None
+        last_register:int|None = None
         for register in registers:
             if start_register is None:
                 start_register = register
@@ -536,32 +473,33 @@ class modbusport:
             for code, device_ids in self.activeRegisters.items():
                 for device_id, registers in device_ids.items():
                     registers_sorted = sorted(registers)
-                    sequences:List[Tuple[int,int]]
+                    sequences:list[tuple[int,int]]
                     if self.fetch_max_blocks:
-#                        sequences = [(registers_sorted[0],registers_sorted[-1])]
                         # we split into sequences with maximal 100 registers
                         sequences = self.max_blocks(registers_sorted)
                     else:
                         # split in successive sequences
-                        gaps = [[s, er] for s, er in zip(registers_sorted, registers_sorted[1:]) if s+1 < er]
+                        gaps = [[s, er] for s, er in zip(registers_sorted, registers_sorted[1:], strict=True) if s+1 < er]
                         edges = iter(registers_sorted[:1] + sum(gaps, []) + registers_sorted[-1:])
-                        sequences = list(zip(edges, edges)) # list of pairs of the form (start-register,end-register)
+                        sequences = list(zip(edges, edges, strict=True)) # list of pairs of the form (start-register,end-register) # ty:ignore
 #                    just_send:bool = False
                     for seq in sequences:
                         retry:int = self.readRetries
                         register:int = seq[0]
                         count:int = seq[1]-seq[0] + 1
                         if 0 < count <= self.maxCount:
-                            res:Optional[ModbusPDU] = None
+                            res:ModbusPDU|None = None
                             tx:float = time.time()
                             while True:
                                 _log.debug('readActive(%d,%d,%d,%d)', device_id, code, register, count)
                                 try:
                                     # we cache only MODBUS function 3 and 4 (not 1 and 2!)
                                     if code == 3:
-                                        res = await self.read_holding_registers(register, count, device_id)
+#                                        res = await self.read_holding_registers(register, count, device_id)
+                                        res = await self._client.read_holding_registers(register,count=count,device_id=device_id)
                                     elif code == 4:
-                                        res = await self.read_input_registers(register, count, device_id)
+#                                        res = await self.read_input_registers(register, count, device_id)
+                                        res = await self._client.read_input_registers(register,count=count,device_id=device_id)
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.info('readActive(%d,%d,%d,%d)', device_id, code, register, count)
                                     _log.debug(e)
@@ -582,9 +520,9 @@ class modbusport:
                             #note: logged chars should be unicode not binary
                             if self.aw.seriallogflag and res is not None and hasattr(res, 'registers'):
                                 if self.type < 3: # serial MODBUS
-                                    ser_str = f'MODBUS readActiveregisters : {self.formatMS(tx,time.time())}ms => {self.comport},{self.baudrate},{self.bytesize},{self.parity},{self.stopbits},{self.timeout} || Slave = {device_id} || Register = {register} || Code = {code} || Rx# = {len(res.registers)}'
+                                    ser_str = f'MODBUS readActiveregisters : {self.formatMS(tx,time.time())}ms => {self.comport},{self.baudrate},{self.bytesize},{self.parity},{self.stopbits},{self.timeout} || Device = {device_id} || Register = {register} || Code = {code} || Rx# = {len(res.registers)}'
                                 else: # IP MODBUS
-                                    ser_str = f'MODBUS readActiveregisters : {self.formatMS(tx,time.time())}ms => {self.host}:{self.port} || Slave = {device_id} || Register = {register} || Code = {code} || Rx# = {len(res.registers)}'
+                                    ser_str = f'MODBUS readActiveregisters : {self.formatMS(tx,time.time())}ms => {self.host}:{self.port} || Device = {device_id} || Register = {register} || Code = {code} || Rx# = {len(res.registers)}'
                                 _log.debug(ser_str)
                                 self.aw.addserial(ser_str)
 
@@ -605,7 +543,7 @@ class modbusport:
 
 
     # function 15 (Write Multiple Coils)
-    def writeCoils(self, device_id:int, register:int, values:List[bool]) -> None:
+    def writeCoils(self, device_id:int, register:int, values:list[bool]) -> None:
         _log.debug('writeCoils(%d,%d,%s)', device_id, register, values)
         if device_id == 0:
             return
@@ -615,7 +553,7 @@ class modbusport:
             self.connect()
             if self._asyncLoopThread is not None and self.isConnected():
                 assert self._client is not None
-                asyncio.run_coroutine_threadsafe(self.write_coils_wrapper(self.legacy_pymodbus_keywords, self._client, register, values, device_id), self._asyncLoopThread.loop).result()
+                self._asyncLoopThread.loop.call_soon_threadsafe(asyncio.ensure_future, self._client.write_coils(register, values, device_id=device_id))
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeCoils(%d,%d,%s)', device_id, register, values)
             _log.debug(ex)
@@ -639,7 +577,7 @@ class modbusport:
             if self._asyncLoopThread is not None and self.isConnected():
                 # wrap an Awaitable into a Coroutine
                 assert self._client is not None
-                asyncio.run_coroutine_threadsafe(self.write_coil_wrapper(self.legacy_pymodbus_keywords, self._client, register, value, device_id), self._asyncLoopThread.loop).result()
+                self._asyncLoopThread.loop.call_soon_threadsafe(asyncio.ensure_future, self._client.write_coil(register, value, device_id=device_id))
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeCoil(%d,%d,%s) failed', device_id, register, value)
             _log.debug(ex)
@@ -654,7 +592,7 @@ class modbusport:
     # DEPRECATED: use writeSingle or writeWord (this one now just calls writeSingle with the value rounded to an integer)
     # write value to register on device_id (function 6 for int or function 16 for float)
     # value can be one of string (containing an int or float), an int or a float
-    def writeRegister(self, device_id:int, register:int, value: Union[int, float, str]) -> None:
+    def writeRegister(self, device_id:int, register:int, value: int|float|str) -> None:
         _log.debug('writeRegister(%d,%d,%s)', device_id, register, value)
         if device_id == 0:
             return
@@ -681,7 +619,7 @@ class modbusport:
             self.connect()
             if self._asyncLoopThread is not None and self.isConnected():
                 assert self._client is not None
-                asyncio.run_coroutine_threadsafe(self.write_register_wrapper(self.legacy_pymodbus_keywords, self._client, register, int(round(value)), device_id), self._asyncLoopThread.loop).result()
+                self._asyncLoopThread.loop.call_soon_threadsafe(asyncio.ensure_future, self._client.write_register(register, int(round(value)), device_id=device_id))
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeSingleRegister(%d,%d,%s) failed', device_id, register, int(round(value)))
             _log.debug(ex)
@@ -706,13 +644,12 @@ class modbusport:
             self.connect()
             if self._asyncLoopThread is not None and self.isConnected():
                 assert self._client is not None
-                asyncio.run_coroutine_threadsafe(self.mask_write_register_wrapper(
-                    self.legacy_pymodbus_keywords,
-                    self._client,
-                    register,
-                    and_mask,
-                    or_mask,
-                    device_id), self._asyncLoopThread.loop).result()
+                self._asyncLoopThread.loop.call_soon_threadsafe(asyncio.ensure_future,
+                    self._client.mask_write_register(
+                        address=register,
+                        and_mask=and_mask,
+                        or_mask=or_mask,
+                        device_id=device_id))
         except Exception as ex: # pylint: disable=broad-except
             _log.info('maskWriteRegister(%d,%d,%s,%s) failed', device_id, register, and_mask, or_mask)
             if debugLogLevelActive():
@@ -737,7 +674,7 @@ class modbusport:
 
     # function 16 (Write Multiple Holding Registers)
     # values is a list of integers or one integer (given floats are rounded to integers
-    def writeRegisters(self, device_id:int, register:int, values:Union[List[float], float]) -> None:
+    def writeRegisters(self, device_id:int, register:int, values:list[float]|float) -> None:
         _log.debug('writeRegisters(%d,%d,%s)', device_id, register, values)
         if device_id == 0:
             return
@@ -747,10 +684,9 @@ class modbusport:
             self.connect()
             if self._asyncLoopThread is not None and self.isConnected():
                 assert self._client is not None
-                float_values:List[float] = (values if isinstance(values, list) else [float(values)])
-                int_values:List[int] = [int(round(v)) for v in float_values]
-                asyncio.run_coroutine_threadsafe(self.write_registers_wrapper(self.legacy_pymodbus_keywords, self._client, register, int_values, device_id), self._asyncLoopThread.loop).result()
-
+                float_values:list[float] = (values if isinstance(values, list) else [float(values)])
+                int_values:list[int] = [int(round(v)) for v in float_values]
+                self._asyncLoopThread.loop.call_soon_threadsafe(asyncio.ensure_future, self._client.write_registers(register, int_values, device_id=device_id))
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeRegisters(%d,%d,%s) failed', device_id, register, values)
             _log.debug(ex)
@@ -775,8 +711,8 @@ class modbusport:
             self.connect()
             if self._asyncLoopThread is not None and self.isConnected():
                 assert self._client is not None
-                payload:List[int] = self.convert_float_to_registers(value)
-                asyncio.run_coroutine_threadsafe(self.write_registers_wrapper(self.legacy_pymodbus_keywords, self._client, register, payload, device_id), self._asyncLoopThread.loop).result()
+                payload:list[int] = self.convert_float_to_registers(value)
+                self._asyncLoopThread.loop.call_soon_threadsafe(asyncio.ensure_future, self._client.write_registers(register, payload, device_id=device_id))
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeWord(%d,%d,%s) failed', device_id, register, value)
             _log.exception(ex)
@@ -801,8 +737,8 @@ class modbusport:
                 assert self._client is not None
                 self.connect()
                 r = convert_to_bcd(int(round(value)))
-                payload: List[int] = self.convert_16bit_uint_to_registers(r)
-                asyncio.run_coroutine_threadsafe(self.write_registers_wrapper(self.legacy_pymodbus_keywords, self._client, register, payload, device_id), self._asyncLoopThread.loop).result()
+                payload: list[int] = self.convert_16bit_uint_to_registers(r)
+                self._asyncLoopThread.loop.call_soon_threadsafe(asyncio.ensure_future, self._client.write_registers(register, payload, device_id=device_id))
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeBCD(%d,%d,%s) failed', device_id, register, int(round(value)))
             _log.debug(ex)
@@ -827,8 +763,8 @@ class modbusport:
             self.connect()
             if self._asyncLoopThread is not None and self.isConnected():
                 assert self._client is not None
-                payload:List[int] = self.convert_32bit_int_to_registers(int(round(value)))
-                asyncio.run_coroutine_threadsafe(self.write_registers_wrapper(self.legacy_pymodbus_keywords, self._client, register, payload, device_id), self._asyncLoopThread.loop).result()
+                payload:list[int] = self.convert_32bit_int_to_registers(int(round(value)))
+                self._asyncLoopThread.loop.call_soon_threadsafe(asyncio.ensure_future, self._client.write_registers(register, payload, device_id=device_id))
         except Exception as ex: # pylint: disable=broad-except
             _log.info('writeLong(%d,%d,%s) failed', device_id, register, int(round(value)))
             _log.debug(ex)
@@ -842,95 +778,21 @@ class modbusport:
 
 #####
 
-    # mocks of pymodbus read/write functions adjusting for changed method signatures to be removed as soon as support for self.legacy_pymodbus_keywords (Python 3.8) is removed
-
-    # function 1
-    async def read_coils(self, register:int, count:int, device_id:int) -> Any:
-        if self._client is None:
-            return None
-        if self.legacy_pymodbus_keywords:
-            return await self._client.read_coils(address=register,count=count,slave=device_id) # type: ignore[call-arg,unused-ignore] # pylint: disable=unexpected-keyword-arg
-        return await self._client.read_coils(register,count=count,device_id=device_id)         # type: ignore[call-arg,unused-ignore] # pylint: disable=unexpected-keyword-arg
-
-    # function 2
-    async def read_discrete_inputs(self, register:int, count:int, device_id:int) -> Any:
-        if self._client is None:
-            return None
-        if self.legacy_pymodbus_keywords:
-            return await self._client.read_discrete_inputs(address=register,count=count,slave=device_id) # type: ignore[call-arg,unused-ignore] # pylint: disable=unexpected-keyword-arg
-        return await self._client.read_discrete_inputs(register,count=count,device_id=device_id)         # type: ignore[call-arg,unused-ignore] # pylint: disable=unexpected-keyword-arg
-
-    # function 3
-    async def read_holding_registers(self, register:int, count:int, device_id:int) -> Any:
-        if self._client is None:
-            return None
-        if self.legacy_pymodbus_keywords:
-            return await self._client.read_holding_registers(address=register,count=count,slave=device_id) # type: ignore[call-arg,unused-ignore] # pylint: disable=unexpected-keyword-arg
-        return await self._client.read_holding_registers(register,count=count,device_id=device_id)         # type: ignore[call-arg,unused-ignore] # pylint: disable=unexpected-keyword-arg
-
-    # function 4
-    async def read_input_registers(self, register:int, count:int, device_id:int) -> Any:
-        if self._client is None:
-            return None
-        if self.legacy_pymodbus_keywords:
-            return await self._client.read_input_registers(address=register,count=count,slave=device_id) # type: ignore[call-arg,unused-ignore] # pylint: disable=unexpected-keyword-arg
-        return await self._client.read_input_registers(register,count=count,device_id=device_id)         # type: ignore[call-arg,unused-ignore] # pylint: disable=unexpected-keyword-arg
-
-#
-
-    # wrap an Awaitable into a Coroutine
-    @staticmethod
-    async def write_coils_wrapper(legacy_pymodbus_keywords:bool, client:'ModbusBaseClient', register:int, values:List[bool], device_id:int) -> 'ModbusPDU':
-        if legacy_pymodbus_keywords:
-            return await client.write_coils(register, values, slave=device_id) # type: ignore[call-arg,unused-ignore] # pylint: disable=unexpected-keyword-arg
-        return await client.write_coils(register, values, device_id=device_id) # type: ignore[call-arg,unused-ignore] # pylint: disable=unexpected-keyword-arg
-
-    # wrap an Awaitable into a Coroutine
-    @staticmethod
-    async def write_coil_wrapper(legacy_pymodbus_keywords:bool, client:'ModbusBaseClient', register:int, value:bool, device_id:int) -> 'ModbusPDU':
-        if legacy_pymodbus_keywords:
-            return await client.write_coil(register, value, slave=device_id) # type: ignore[call-arg,unused-ignore] # pylint: disable=unexpected-keyword-arg
-        return await client.write_coil(register, value, device_id=device_id) # type: ignore[call-arg,unused-ignore] # pylint: disable=unexpected-keyword-arg
-
-    # wrap an Awaitable into a Coroutine
-    @staticmethod
-    async def write_registers_wrapper(legacy_pymodbus_keywords:bool, client:'ModbusBaseClient', register:int, values:List[int], device_id:int) -> 'ModbusPDU':
-        if legacy_pymodbus_keywords:
-            return await client.write_registers(register, values, slave=device_id) # type: ignore[call-arg,unused-ignore] # pylint: disable=unexpected-keyword-arg
-        return await client.write_registers(register, values, device_id=device_id) # type: ignore[call-arg,unused-ignore] # pylint: disable=unexpected-keyword-arg
-
-    # wrap an Awaitable into a Coroutine
-    @staticmethod
-    async def write_register_wrapper(legacy_pymodbus_keywords:bool, client:'ModbusBaseClient', register:int, value:int, device_id:int) -> 'ModbusPDU':
-        if legacy_pymodbus_keywords:
-            return await client.write_register(register, value, slave=device_id) # type: ignore[call-arg,unused-ignore] # pylint: disable=unexpected-keyword-arg
-        return await client.write_register(register, value, device_id=device_id) # type: ignore[call-arg,unused-ignore] # pylint: disable=unexpected-keyword-arg
-
-    # wrap an Awaitable into a Coroutine
-    @staticmethod
-    async def mask_write_register_wrapper(legacy_pymodbus_keywords:bool, client:'ModbusBaseClient', register:int, and_mask:int, or_mask:int, device_id:int) -> 'ModbusPDU':
-        if legacy_pymodbus_keywords:
-            return await client.mask_write_register(address=register, and_mask=and_mask, or_mask=or_mask, slave=device_id) # type: ignore[call-arg,unused-ignore] # pylint: disable=unexpected-keyword-arg
-        return await client.mask_write_register(address=register, and_mask=and_mask, or_mask=or_mask, device_id=device_id) # type: ignore[call-arg,unused-ignore] # pylint: disable=unexpected-keyword-arg
-
-
-#####
-
-    async def read_async(self, device_id:int, register:int, count:int, code:int) -> 'Tuple[Optional[ModbusPDU], bool]':
+    async def read_async(self, device_id:int, register:int, count:int, code:int) -> 'tuple[ModbusPDU|None, bool]':
         retry:int = self.readRetries
         error_disconnect:bool = False # set to True if a serious error requiring a disconnect was detected
-        res: Optional[ModbusPDU] = None
+        res: ModbusPDU|None = None
         assert self._client is not None
         while True:
             try:
                 if code==1:
-                    res = await self.read_coils(register, count, device_id)
+                    res = await self._client.read_coils(register,count=count,device_id=device_id)
                 elif code==2:
-                    res = await self.read_discrete_inputs(register, count, device_id)
+                    res = await self._client.read_discrete_inputs(register,count=count,device_id=device_id)
                 elif code==4:
-                    res = await self.read_input_registers(register, count, device_id)
+                    res = await self._client.read_input_registers(register,count=count,device_id=device_id)
                 else: # code==3
-                    res = await self.read_holding_registers(register, count, device_id)
+                    res = await self._client.read_holding_registers(register,count=count,device_id=device_id)
             except Exception as ex: # pylint: disable=broad-except
                 _log.debug(ex)
                 res = None
@@ -947,9 +809,9 @@ class modbusport:
         return res, error_disconnect
 
     # returns register data from optimizer cache or from device_id
-    def read_registers(self, device_id:int, register:int, count:int, code:int, force:bool=False) -> Tuple[Optional[List[int]],Optional[List[bool]],bool]:
-        res_registers:Optional[List[int]] = None
-        res_bits:Optional[List[bool]] = None
+    def read_registers(self, device_id:int, register:int, count:int, code:int, force:bool=False) -> tuple[list[int]|None,list[bool]|None,bool]:
+        res_registers:list[int]|None = None
+        res_bits:list[bool]|None = None
         error_disconnect:bool = False
         if count>0:
             if self.optimizer and not force and code not in {1,2}: # MODBUS function 1 and 2 are never optimized
@@ -985,7 +847,7 @@ class modbusport:
 
     # function 3 (Read Multiple Holding Registers) and 4 (Read Input Registers)
     # if force the readings cache is ignored and fresh readings are requested
-    def readFloat(self, device_id:int, register:int, code:int=3, force:bool=False) -> Optional[float]:
+    def readFloat(self, device_id:int, register:int, code:int=3, force:bool=False) -> float|None:
         _log.debug('readFloat(%d,%d,%d,%s)', device_id, register, code, force)
         if device_id == 0:
             return None
@@ -993,9 +855,9 @@ class modbusport:
         if self.aw.seriallogflag:
             tx = time.time()
         error_disconnect:bool = False # set to True if a serious error requiring a disconnect was detected
-        res:Optional[float] = None
+        res:float|None = None
         try:
-            res_registers:Optional[List[int]]
+            res_registers:list[int]|None
             res_error_disconnect:bool
             res_registers, _, res_error_disconnect = self.read_registers(device_id, register, 2, code, force)
             error_disconnect = res_error_disconnect
@@ -1026,7 +888,7 @@ class modbusport:
 
     # function 3 (Read Multiple Holding Registers) and 4 (Read Input Registers)
     # if force the readings cache is ignored and fresh readings are requested
-    def readBCD(self, device_id:int, register:int, code:int=3, force:bool=False) -> Optional[int]:
+    def readBCD(self, device_id:int, register:int, code:int=3, force:bool=False) -> int|None:
         _log.debug('readBCD(%d,%d,%d,%s)', device_id, register, code, force)
         if device_id == 0:
             return None
@@ -1034,9 +896,9 @@ class modbusport:
         if self.aw.seriallogflag:
             tx = time.time()
         error_disconnect:bool = False # set to True if a serious error requiring a disconnect was detected
-        res:Optional[int] = None
+        res:int|None = None
         try:
-            res_registers:Optional[List[int]]
+            res_registers:list[int]|None
             res_error_disconnect:bool
             res_registers, _, res_error_disconnect = self.read_registers(device_id, register, 2, code, force)
             error_disconnect = res_error_disconnect
@@ -1067,11 +929,11 @@ class modbusport:
 
     # as readSingleRegister, but does not retry nor raise and error and returns a None instead
     # also does not reserve the port via a semaphore! This has to be done by the caller!
-    def peekSingleRegister(self, device_id:int, register:int, code:int = 3) -> Optional[int]:
+    def peekSingleRegister(self, device_id:int, register:int, code:int = 3) -> int|None:
         _log.debug('peekSingleRegister(%d,%d,%d)', device_id, register, code)
         if device_id == 0:
             return None
-        res:Optional[ModbusPDU] = None
+        res:ModbusPDU|None = None
         try:
             self.connect()
             if self._asyncLoopThread is not None and self.isConnected():
@@ -1103,7 +965,7 @@ class modbusport:
 
     # function 3 (Read Multiple Holding Registers) and 4 (Read Input Registers)
     # if force the readings cache is ignored and fresh readings are requested
-    def readSingleRegister(self, device_id:int, register:int, code:int = 3, force:bool = False, signed:bool = False) -> Optional[int]:
+    def readSingleRegister(self, device_id:int, register:int, code:int = 3, force:bool = False, signed:bool = False) -> int|None:
         _log.debug('readSingleRegister(%d,%d,%d,%s,%s)', device_id, register, code, force, signed)
         if device_id == 0:
             return None
@@ -1111,10 +973,10 @@ class modbusport:
         if self.aw.seriallogflag:
             tx = time.time()
         error_disconnect:bool = False # set to True if a serious error requiring a disconnect was detected
-        res:Optional[int] = None
+        res:int|None = None
         try:
-            res_bits:Optional[List[bool]]
-            res_registers:Optional[List[int]]
+            res_bits:list[bool]|None
+            res_registers:list[int]|None
             res_error_disconnect:bool
             res_registers, res_bits, res_error_disconnect = self.read_registers(device_id, register, 1, code, force)
             error_disconnect = res_error_disconnect
@@ -1153,7 +1015,7 @@ class modbusport:
 
     # function 3 (Read Multiple Holding Registers) and 4 (Read Input Registers)
     # if force the readings cache is ignored and fresh readings are requested
-    def readInt32(self, device_id:int, register:int, code:int = 3, force:bool = False, signed:bool = False) -> Optional[int]:
+    def readInt32(self, device_id:int, register:int, code:int = 3, force:bool = False, signed:bool = False) -> int|None:
         _log.debug('readBCD(%d,%d,%d,%s)', device_id, register, code, force)
         if device_id == 0:
             return None
@@ -1161,10 +1023,10 @@ class modbusport:
         if self.aw.seriallogflag:
             tx = time.time()
         error_disconnect:bool = False # set to True if a serious error requiring a disconnect was detected
-        res:Optional[int] = None
+        res:int|None = None
 
         try:
-            res_registers:Optional[List[int]]
+            res_registers:list[int]|None
             res_error_disconnect:bool
             res_registers, _, res_error_disconnect = self.read_registers(device_id, register, 2, code, force)
             error_disconnect = res_error_disconnect
@@ -1202,7 +1064,7 @@ class modbusport:
     # function 3 (Read Multiple Holding Registers) and
     # function 4 (Read Input Registers)
     # if force the readings cache is ignored and fresh readings are requested
-    def readBCDint(self, device_id:int, register:int, code:int = 3, force:bool = False) -> Optional[int]:
+    def readBCDint(self, device_id:int, register:int, code:int = 3, force:bool = False) -> int|None:
         _log.debug('readBCD(%d,%d,%d,%s)', device_id, register, code, force)
         if device_id == 0:
             return None
@@ -1210,9 +1072,9 @@ class modbusport:
         if self.aw.seriallogflag:
             tx = time.time()
         error_disconnect:bool = False # set to True if a serious error requiring a disconnect was detected
-        res:Optional[int] = None
+        res:int|None = None
         try:
-            res_registers:Optional[List[int]]
+            res_registers:list[int]|None
             res_error_disconnect:bool
             res_registers, _, res_error_disconnect = self.read_registers(device_id, register, 1, code, force)
             error_disconnect = res_error_disconnect

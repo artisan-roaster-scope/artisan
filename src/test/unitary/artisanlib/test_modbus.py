@@ -53,7 +53,8 @@ modules with Qt dependencies and complex external library interactions.
 """
 
 import sys
-from typing import Any, Generator, List, Tuple, Union
+from collections.abc import Generator
+from typing import Any
 from unittest.mock import Mock
 
 import numpy  # noqa: F401 # explicitly import numpy here to prevent duplicate imports after the sys.modules hack below
@@ -99,7 +100,7 @@ class MockQStandardPaths:
         AppLocalDataLocation = 0
 
     @staticmethod
-    def standardLocations(location_type: int) -> List[str]:
+    def standardLocations(location_type: int) -> list[str]:
         """Return a list of standard locations."""
         del location_type
         return ['/tmp/artisan_test_data']
@@ -132,7 +133,7 @@ mock_modules['PyQt5.QtWidgets'].QApplication = MockQApplication
 
 
 # Import modbus module with temporary Qt mocking that doesn't contaminate other tests
-def _import_modbus_with_mocks() -> Tuple[Any, Any, Any, Any]: # pyrefly: ignore[bad-return]
+def _import_modbus_with_mocks() -> tuple[Any, Any, Any, Any]: # pyrefly: ignore[bad-return]
     """Import modbus module with temporary mocks that are properly cleaned up."""
     # Store original modules if they exist
     original_modules = {}
@@ -448,7 +449,7 @@ class TestWordOrderAndConversions:
         ],
     )
     def test_convert_float_to_registers(
-        self, client: Any, word_order_little: bool, value: float, expected: List[int]
+        self, client: Any, word_order_little: bool, value: float, expected: list[int]
     ) -> None:
         """Test float to registers conversion with different word orders."""
         # Arrange
@@ -470,7 +471,7 @@ class TestWordOrderAndConversions:
         ],
     )
     def test_convert_float_from_registers(
-        self, client: Any, word_order_little: bool, registers: List[int], expected: float
+        self, client: Any, word_order_little: bool, registers: list[int], expected: float
     ) -> None:
         """Test registers to float conversion with different word orders."""
         # Arrange
@@ -491,7 +492,7 @@ class TestWordOrderAndConversions:
         ],
     )
     def test_convert_16bit_uint_to_registers(
-        self, client: Any, value: int, expected: List[int]
+        self, client: Any, value: int, expected: list[int]
     ) -> None:
         """Test 16-bit unsigned integer to registers conversion."""
         # Act
@@ -514,7 +515,7 @@ class TestWordOrderAndConversions:
         ],
     )
     def test_convert_32bit_int_to_registers(
-        self, client: Any, word_order_little: bool, value: int, expected: List[int]
+        self, client: Any, word_order_little: bool, value: int, expected: list[int]
     ) -> None:
         """Test 32-bit signed integer to registers conversion."""
         # Arrange
@@ -535,7 +536,7 @@ class TestWordOrderAndConversions:
         ],
     )
     def test_convert_16bit_uint_from_registers(
-        self, client: Any, registers: List[int], expected: int
+        self, client: Any, registers: list[int], expected: int
     ) -> None:
         """Test registers to 16-bit unsigned integer conversion."""
         # Act
@@ -553,7 +554,7 @@ class TestWordOrderAndConversions:
         ],
     )
     def test_convert_16bit_int_from_registers(
-        self, client: Any, registers: List[int], expected: int
+        self, client: Any, registers: list[int], expected: int
     ) -> None:
         """Test registers to 16-bit signed integer conversion."""
         # Act
@@ -574,7 +575,7 @@ class TestWordOrderAndConversions:
         ],
     )
     def test_convert_32bit_uint_from_registers(
-        self, client: Any, word_order_little: bool, registers: List[int], expected: int
+        self, client: Any, word_order_little: bool, registers: list[int], expected: int
     ) -> None:
         """Test registers to 32-bit unsigned integer conversion."""
         # Arrange
@@ -600,7 +601,7 @@ class TestWordOrderAndConversions:
         ],
     )
     def test_convert_32bit_int_from_registers(
-        self, client: Any, word_order_little: bool, registers: List[int], expected: int
+        self, client: Any, word_order_little: bool, registers: list[int], expected: int
     ) -> None:
         """Test registers to 32-bit signed integer conversion."""
         # Arrange
@@ -675,7 +676,7 @@ class TestAddressConversion:
         ],
     )
     def test_address2register_conversion(
-        self, addr: Union[int, float], code: int, expected: int
+        self, addr: int|float, code: int, expected: int
     ) -> None:
         """Test address to register conversion for different function codes."""
         # Act
@@ -956,7 +957,7 @@ class TestMaxBlocks:
         ],
     )
     def test_max_blocks_various_inputs(
-        self, client: Any, registers: List[int], expected: List[Tuple[int, int]]
+        self, client: Any, registers: list[int], expected: list[tuple[int, int]]
     ) -> None:
         """Test max_blocks with various register sequences."""
         # Act
@@ -1026,7 +1027,7 @@ class TestSlaveZeroHandling:
         self,
         client: Any,
         method_name: str,
-        args: Tuple[Union[int, bool, float, List[int], List[bool]], ...],
+        args: tuple[int|bool|float|list[int]|list[bool], ...],
     ) -> None:
         """Test that methods return early when slave ID is 0."""
         # Arrange
@@ -1247,44 +1248,6 @@ class TestConnectionTypes:
         """Test that default connection type is Serial RTU."""
         # Assert
         assert client.type == 0  # Serial RTU
-
-
-class TestLegacyPymodbusHandling:
-    """Test handling of legacy pymodbus versions."""
-
-    def test_legacy_pymodbus_detection(self, client: Any) -> None:
-        """Test legacy pymodbus version detection."""
-        # The legacy_pymodbus flag is set during initialization based on pymodbus version
-        # We can't easily mock the version check, but we can test the flag exists
-        assert hasattr(client, 'legacy_pymodbus')
-        assert isinstance(client.legacy_pymodbus, bool)
-
-    def test_legacy_conversion_methods_exist(self, client: Any) -> None:
-        """Test that conversion methods handle legacy pymodbus correctly."""
-        # Arrange - Force legacy mode for testing
-        original_legacy = client.legacy_pymodbus
-        client.legacy_pymodbus = True
-
-        try:
-            # Act & Assert - These should not raise exceptions
-            result_int = client.convert_32bit_int_to_registers(12345)
-            result_float = client.convert_float_to_registers(123.45)
-
-            assert isinstance(result_int, list)
-            assert isinstance(result_float, list)
-            assert len(result_int) == 2
-            assert len(result_float) == 2
-
-            # Test conversion back
-            converted_int = client.convert_32bit_int_from_registers(result_int)
-            converted_float = client.convert_float_from_registers(result_float)
-
-            assert converted_int == 12345
-            assert pytest.approx(converted_float, abs=0.01) == 123.45
-
-        finally:
-            # Restore original state
-            client.legacy_pymodbus = original_legacy
 
 
 class TestAsyncOperationMocking:

@@ -19,10 +19,12 @@ import sys
 import math
 import platform
 import logging
-from typing import Final, Optional, List, Set, Tuple, Dict, Callable, cast, Any, TYPE_CHECKING
+from collections.abc import Callable
+from typing import Final, cast, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
+    from artisanlib.dialogs import HelpDlg # noqa: F401 # pylint: disable=unused-import
     from artisanlib.atypes import RecentRoast, BTU
     from plus.stock import Blend # noqa: F401  # pylint: disable=unused-import
     from PyQt6.QtWidgets import QLayout, QAbstractItemView, QCompleter # pylint: disable=unused-import
@@ -52,21 +54,12 @@ from uic import MeasureDialog # pyright: ignore[attr-defined] # pylint: disable=
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
-try:
-    from PyQt6.QtCore import Qt, pyqtSignal, pyqtSlot, QRegularExpression, QSettings, QTimer, QEvent, QLocale, QSignalBlocker # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtGui import QColor, QIntValidator, QRegularExpressionValidator, QKeySequence, QPalette # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtWidgets import (QApplication, QWidget, QCheckBox, QComboBox, QDialogButtonBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QHBoxLayout, QVBoxLayout, QHeaderView, QLabel, QLineEdit, QTextEdit, QListView,  # @UnusedImport @Reimport  @UnresolvedImport
-                                 QPushButton, QSpinBox, QTableWidget, QTableWidgetItem, QTabWidget, QSizePolicy, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QGroupBox, QToolButton, QFrame) # @UnusedImport @Reimport  @UnresolvedImport
-#    from PyQt6 import sip # @UnusedImport @Reimport  @UnresolvedImport
-except ImportError:
-    from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot, QRegularExpression, QSettings, QTimer, QEvent, QLocale, QSignalBlocker # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtGui import QColor, QIntValidator, QRegularExpressionValidator, QKeySequence, QPalette # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QComboBox, QDialogButtonBox, QGridLayout, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-                                 QHBoxLayout, QVBoxLayout, QHeaderView, QLabel, QLineEdit, QTextEdit, QListView, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QPushButton, QSpinBox, QTableWidget, QTableWidgetItem, QTabWidget, QSizePolicy, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QGroupBox, QToolButton, QFrame) # @UnusedImport @Reimport  @UnresolvedImport
+from PyQt6.QtCore import Qt, pyqtSignal, pyqtSlot, QRegularExpression, QSettings, QTimer, QEvent, QLocale, QSignalBlocker
+from PyQt6.QtGui import QColor, QIntValidator, QRegularExpressionValidator, QKeySequence, QPalette
+from PyQt6.QtWidgets import (QApplication, QWidget, QCheckBox, QComboBox, QDialogButtonBox, QGridLayout,
+                             QHBoxLayout, QVBoxLayout, QHeaderView, QLabel, QLineEdit, QTextEdit, QListView,
+                             QPushButton, QSpinBox, QTableWidget, QTableWidgetItem, QTabWidget, QSizePolicy,
+                             QGroupBox, QToolButton, QFrame)
 
 
 ########################################################################################
@@ -74,7 +67,7 @@ except ImportError:
 ########################################################################################
 
 class volumeCalculatorDlg(ArtisanDialog):
-    def __init__(self, parent:'editGraphDlg', aw:'ApplicationWindow', weightIn:Optional[float], weightOut:Optional[float],
+    def __init__(self, parent:'editGraphDlg', aw:'ApplicationWindow', weightIn:float|None, weightOut:float|None,
             weightunit:int,volumeunit:int,
             inlineedit:QLineEdit,outlineedit:QLineEdit,tare:float) -> None: # weight in and out expected in g (int)
 
@@ -89,16 +82,16 @@ class volumeCalculatorDlg(ArtisanDialog):
         else:
             self.scale_connected = False
 
-        self.weightIn:Optional[float] = weightIn
-        self.weightOut:Optional[float] = weightOut
+        self.weightIn:float|None = weightIn
+        self.weightOut:float|None = weightOut
 
         # the units
         self.weightunit = weightunit
         self.volumeunit = volumeunit
 
         # the results
-        self.inVolume:Optional[float] = None
-        self.outVolume:Optional[float] = None
+        self.inVolume:float|None = None
+        self.outVolume:float|None = None
 
         # the QLineedits of the RoastProperties dialog to be updated
         self.inlineedit = inlineedit
@@ -330,7 +323,7 @@ class volumeCalculatorDlg(ArtisanDialog):
         self.update_scale_weight()
 
     @pyqtSlot(float)
-    def update_scale_weight(self, weight:Optional[float] = None) -> None:
+    def update_scale_weight(self, weight:float|None = None) -> None:
         try:
             if weight is not None:
                 self.scale_weight = weight
@@ -342,9 +335,9 @@ class volumeCalculatorDlg(ArtisanDialog):
             _log.exception(e)
 
     #keyboard presses. There must not be widgets (pushbuttons, comboboxes, etc) in focus in order to work
-    def keyPressEvent(self, event: Optional['QKeyEvent']) -> None:
-        if event is not None:
-            key = int(event.key())
+    def keyPressEvent(self, a0: 'QKeyEvent|None') -> None:
+        if a0 is not None:
+            key = int(a0.key())
             if key == 16777220 and self.scale_connected: # ENTER key pressed
                 v = self.retrieveWeight()
                 if v and v != 0:
@@ -355,7 +348,7 @@ class volumeCalculatorDlg(ArtisanDialog):
                     elif self.coffeeoutweightEdit.hasFocus():
                         self.coffeeoutweightEdit.setText(f'{float2float(v):g}')
             else:
-                super().keyPressEvent(event)
+                super().keyPressEvent(a0)
 
     def widgetWeight(self, widget:QLineEdit) -> None:
         w = self.retrieveWeight()
@@ -378,7 +371,7 @@ class volumeCalculatorDlg(ArtisanDialog):
         QTimer.singleShot(1, self.setWidgetOutWeight)
         QTimer.singleShot(10, self.resetOutVolume)
 
-    def retrieveWeight(self) -> Optional[float]:
+    def retrieveWeight(self) -> float|None:
         v = self.scale_weight
         if v is not None: # value received
             # subtract tare
@@ -454,7 +447,8 @@ class volumeCalculatorDlg(ArtisanDialog):
         self.closeEvent(None)
 
     @pyqtSlot('QCloseEvent')
-    def closeEvent(self,_:Optional['QCloseEvent'] = None) -> None:
+    def closeEvent(self, a0:'QCloseEvent|None' = None) -> None:
+        del a0
         if self.aw.largeScaleLCDs_dialog is not None:
             self.aw.largeScaleLCDs_dialog.updateWeightUnit()
 
@@ -479,16 +473,16 @@ class volumeCalculatorDlg(ArtisanDialog):
 #####################  RECENT ROAST POPUP  #############################################
 
 class RoastsComboBox(QComboBox): # pyrefly:ignore[invalid-inheritance] # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
-    def __init__(self, parent:QWidget, aw:'ApplicationWindow', selection:Optional[str] = None) -> None:
+    def __init__(self, parent:QWidget, aw:'ApplicationWindow', selection:str|None = None) -> None:
         super().__init__(parent) # pyrefly: ignore[bad-argument-count]
         self.aw:ApplicationWindow = aw
         self.installEventFilter(self)
-        self.selection:Optional[str] = selection # just the roast title
-        self.edited:Optional[str] = selection
+        self.selection:str|None = selection # just the roast title
+        self.edited:str|None = selection
         self.updateMenu()
         self.editTextChanged.connect(self.textEdited)
         self.setEditable(True)
-        completer: Optional[QCompleter] = self.completer()
+        completer: QCompleter|None = self.completer()
         if completer is not None:
             completer.setCaseSensitivity(Qt.CaseSensitivity.CaseSensitive)
 #        self.setMouseTracking(False)
@@ -498,7 +492,7 @@ class RoastsComboBox(QComboBox): # pyrefly:ignore[invalid-inheritance] # pyright
         cleaned = ' '.join(txt.split())
         self.edited = cleaned
 
-    def getSelection(self) -> Optional[str]:
+    def getSelection(self) -> str|None:
         return self.edited or self.selection
 
     def setSelection(self, i:int) -> None:
@@ -508,14 +502,15 @@ class RoastsComboBox(QComboBox): # pyrefly:ignore[invalid-inheritance] # pyright
             except Exception: # pylint: disable=broad-except
                 pass
 
-    def eventFilter(self, _obj:Optional['QObject'] = None, event:Optional[QEvent] = None) -> bool:
+    def eventFilter(self, a0:'QObject|None' = None, a1:QEvent|None = None) -> bool:
+        del a0
 # the next prevents correct setSelection on Windows
-#        if event.type() == QEvent.Type.FocusIn:
+#        if a1.type() == QEvent.Type.FocusIn:
 #            self.setSelection(self.currentIndex())
-        if event is not None and event.type() == QEvent.Type.MouseButtonPress:
+        if a1 is not None and a1.type() == QEvent.Type.MouseButtonPress:
             self.updateMenu()
 #            return True # stops processing # popup not drawn if this line is added
-#        return super().eventFilter(obj, event) # this seems to slow down things on Windows and not necessary anyhow
+#        return super().eventFilter(a0, a1) # this seems to slow down things on Windows and not necessary anyhow
         return False # cont processing
 
     # the first entry is always just the current text edit line
@@ -557,7 +552,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 
         # register per tab if all its widgets and data has been initialized
         # initialization of some tabs is delayed for efficiency reasons until they are opened for the first time
-        self.tabInitialized:List[bool] = [False]*6 # 0: Roast, 1: Notes, 2: Events, 3: Data, 4: Energy, 5: Setup
+        self.tabInitialized:list[bool] = [False]*6 # 0: Roast, 1: Notes, 2: Events, 3: Data, 4: Energy, 5: Setup
 
         # we remember user modifications to revert to them on deselecting a plus element
         self.modified_beans:str = self.aw.qmc.beans
@@ -583,22 +578,22 @@ class editGraphDlg(ArtisanResizeablDialog):
 
         self.org_roasted_defects_mode = self.aw.qmc.roasted_defects_mode
 
-        self.setup_ui:Optional[SetupWidget.Ui_SetupWidget] = None # type:ignore[no-any-unimported,unused-ignore]
+        self.setup_ui:SetupWidget.Ui_SetupWidget|None = None # type:ignore[no-any-unimported,unused-ignore]
 
         self.pus_amount_selected = None
 
-        self.helpdialog = None # energy help dialog
+        self.helpdialog:HelpDlg|None = None # energy help dialog
 
         self.batcheditmode = False # a click to the batch label enables the batcheditmode
 
         self.org_perKgRoastMode = self.aw.qmc.perKgRoastMode
         self.perKgRoastMode = self.aw.qmc.perKgRoastMode # if true only the amount during the roast and not the full batch (incl. preheat and BBP) are displayed), toggled by click on the result widget
 
-        self.scale_weight:Optional[float] = None # weight received from a connected scale
-        self.scale_set:Optional[float] = None # set weight for accumulation in g
+        self.scale_weight:float|None = None # weight received from a connected scale
+        self.scale_set:float|None = None # set weight for accumulation in g
 
         self.disconnecting = False # this is set to True to terminate the scale connection
-        self.volumedialog:Optional[volumeCalculatorDlg] = None # link forward to the the Volume Calculator
+        self.volumedialog:volumeCalculatorDlg|None = None # link forward to the the Volume Calculator
 
         # other parameters remembered for Cancel operation
         self.org_specialevents = self.aw.qmc.specialevents[:]
@@ -616,36 +611,36 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.org_roastpropertiesAutoOpenDropFlag = self.aw.qmc.roastpropertiesAutoOpenDropFlag
 
         # propulated by selecting a recent roast from the popup via recentRoastActivated()
-        self.template_file:Optional[str] = None
-        self.template_name:Optional[str] = None
-        self.template_uuid:Optional[str] = None
-        self.template_batchnr:Optional[int] = None
-        self.template_batchprefix:Optional[str] = None
+        self.template_file:str|None = None
+        self.template_name:str|None = None
+        self.template_uuid:str|None = None
+        self.template_batchnr:int|None = None
+        self.template_batchprefix:str|None = None
 
         # energy variables (explicitly define constructors)
-        self.curvenames:List[str] = []
+        self.curvenames:list[str] = []
         self.org_gasMix:int = 0
         self.org_electricEnergyMix:int = 0
         self.org_betweenbatch_after_preheat:bool = True
-        self.org_coolingenergies:List[float] = [0.0]*4
+        self.org_coolingenergies:list[float] = [0.0]*4
         self.org_coolingDuration:int = 0
-        self.org_betweenbatchenergies:List[float] = [0.0]*4
+        self.org_betweenbatchenergies:list[float] = [0.0]*4
         self.org_betweenbatchDuration:int = 0
-        self.org_preheatenergies:List[float] = [0.0]*4
+        self.org_preheatenergies:list[float] = [0.0]*4
         self.org_preheatDuration:int = 0
-        self.org_metersources:List[int] = [0]*2
-        self.org_meterfuels:List[int] = [2]*2
-        self.org_meterunits:List[int] = [3]*2
-        self.org_meterlabels:List[str] = ['']*2
-        self.org_loadevent_hundpcts:List[int] = [100]*4
-        self.org_loadevent_zeropcts:List[int] = [0]*4
-        self.org_presssure_percents:List[bool] = [False]*4
-        self.org_load_etypes:List[int] = [0]*4
-        self.org_sourcetypes:List[int] = [0]*4
-        self.org_ratingunits:List[int] = [0]*4
-        self.org_loadratings:List[float] = [0.0]*4
-        self.org_loadlabels:List[str] = ['']*4
-        self.btu_list:List[BTU] = []
+        self.org_metersources:list[int] = [0]*2
+        self.org_meterfuels:list[int] = [2]*2
+        self.org_meterunits:list[int] = [3]*2
+        self.org_meterlabels:list[str] = ['']*2
+        self.org_loadevent_hundpcts:list[int] = [100]*4
+        self.org_loadevent_zeropcts:list[int] = [0]*4
+        self.org_presssure_percents:list[bool] = [False]*4
+        self.org_load_etypes:list[int] = [0]*4
+        self.org_sourcetypes:list[int] = [0]*4
+        self.org_ratingunits:list[int] = [0]*4
+        self.org_loadratings:list[float] = [0.0]*4
+        self.org_loadlabels:list[str] = ['']*4
+        self.btu_list:list[BTU] = []
         self.energy_ui:Any = None
 
         regextime = QRegularExpression(r'^-?[0-9]?[0-9]?[0-9][:,h][0-5][0-9]$')
@@ -866,9 +861,9 @@ class editGraphDlg(ArtisanResizeablDialog):
         batchlabel.right_clicked.connect(self.enableBatchEdit)
         self.batchLayout = QHBoxLayout()
         # editor
-        self.batchposSpinBox:Optional[QSpinBox] = None
-        self.batchcounterSpinBox:Optional[QSpinBox] = None
-        self.batchprefixedit:Optional[QLineEdit] = None
+        self.batchposSpinBox:QSpinBox|None = None
+        self.batchcounterSpinBox:QSpinBox|None = None
+        self.batchprefixedit:QLineEdit|None = None
         #
         if self.aw.superusermode: # and self.aw.qmc.batchcounter > -1:
             self.defineBatchEditor()
@@ -1313,19 +1308,19 @@ class editGraphDlg(ArtisanResizeablDialog):
 
 #PLUS
         self.user_updated_coffee_or_blend:bool = False # this is set if user changed once either the coffee or blend popup selection. Only after this, changes to the plus coffee/blend selections are persisted on leaving the dialog with OK not to overwrite existing selections if coffees/blends become unvable in the selected store
-        self.plus_store_selected:Optional[str] = None # holds the hr_id of the store of the selected coffee or blend
-        self.plus_store_selected_label:Optional[str] = None # the label of the selected store
-        self.plus_coffee_selected:Optional[str] = None # holds the hr_id of the selected coffee
-        self.plus_coffee_selected_label:Optional[str] = None # the label of the selected coffee
-        self.plus_blend_selected_label:Optional[str] = None # the name of the selected blend
-        self.plus_blend_selected_spec:Optional[Blend] = None # holds the blend dict specification of the selected blend
-        self.plus_blend_selected_spec_labels:Optional[List[str]] = None # the list of coffee labels of the selected blend specification
+        self.plus_store_selected:str|None = None # holds the hr_id of the store of the selected coffee or blend
+        self.plus_store_selected_label:str|None = None # the label of the selected store
+        self.plus_coffee_selected:str|None = None # holds the hr_id of the selected coffee
+        self.plus_coffee_selected_label:str|None = None # the label of the selected coffee
+        self.plus_blend_selected_label:str|None = None # the name of the selected blend
+        self.plus_blend_selected_spec:Blend|None = None # holds the blend dict specification of the selected blend
+        self.plus_blend_selected_spec_labels:list[str]|None = None # the list of coffee labels of the selected blend specification
         if self.aw.plus_account is not None:
             plus.stock.init() # we try to init the stock from the cache before populating the popups
             # variables populated by stock data as rendered in the corresponding popups
-            self.plus_stores:Optional[List[Tuple[str, str]]] = None
-            self.plus_coffees:Optional[List[Tuple[str, Tuple[plus.stock.Coffee, plus.stock.StockItem]]]] = None
-            self.plus_blends:Optional[List[plus.stock.BlendStructure]] = None
+            self.plus_stores:list[tuple[str, str]]|None = None
+            self.plus_coffees:list[tuple[str, tuple[plus.stock.Coffee, plus.stock.StockItem]]]|None = None
+            self.plus_blends:list[plus.stock.BlendStructure]|None = None
             self.plus_default_store = self.aw.qmc.plus_default_store
             # current selected stock/coffee/blend _id
             if self.aw.qmc.plus_store is not None:
@@ -1342,7 +1337,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 # try to generate self.plus_blend_selected_spec_labels from self.plus_blend_selected_spec and current stock
                 # if any coffee is missing from current stock, we keep what we have stored in the alog file
                 if 'ingredients' in self.aw.qmc.plus_blend_spec: # pyrefly: ignore
-                    generated_blend_spec_labels:List[str] = []
+                    generated_blend_spec_labels:list[str] = []
                     for i in self.aw.qmc.plus_blend_spec['ingredients']: # pyrefly: ignore
                         c = plus.stock.getCoffee(i['coffee'])
                         if c is None:
@@ -1352,8 +1347,8 @@ class editGraphDlg(ArtisanResizeablDialog):
                     if generated_blend_spec_labels:
                         self.plus_blend_selected_spec_labels = generated_blend_spec_labels
 
-            self.plus_amount_selected:Optional[float] = None # holds the max amount of the selected coffee/blend if known
-            self.plus_amount_replace_selected:Optional[float] = None # holds the max amount of the selected coffee/blend incl. replacements if known
+            self.plus_amount_selected:float|None = None # holds the max amount of the selected coffee/blend if known
+            self.plus_amount_replace_selected:float|None = None # holds the max amount of the selected coffee/blend incl. replacements if known
             plusCoffeeslabel = QLabel('<b>' + QApplication.translate('Label', 'Stock') + '</b>')
             self.plusStoreslabel = QLabel('<b>' + QApplication.translate('Label', 'Store') + '</b>')
             self.plusBlendslabel = QLabel('<b>' + QApplication.translate('Label', 'Blend') + '</b>')
@@ -1475,7 +1470,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.aw.scale_manager.scale1_disconnected_signal.connect(self.scale_disconnected)
 
             if self.scale1_was_connected:
-                scale1_last_weight:Optional[int] = self.aw.scale_manager.get_scale1_last_weight()
+                scale1_last_weight:int|None = self.aw.scale_manager.get_scale1_last_weight()
                 if scale1_last_weight is None:
                     self.updateWeightLCD('----')
                 else:
@@ -1677,8 +1672,8 @@ class editGraphDlg(ArtisanResizeablDialog):
 
 
 #PLUS
-        self.updateStockSignalConnection:Optional[QMetaObject.Connection] = None
-        self.stockWorker:Optional[plus.stock.Worker] = None
+        self.updateStockSignalConnection:QMetaObject.Connection|None = None
+        self.stockWorker:plus.stock.Worker|None = None
         try:
             if self.aw.plus_account is not None:
                 if plus.controller.is_connected():
@@ -1691,7 +1686,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         except Exception as e:  # pylint: disable=broad-except
             _log.exception(e)
         if platform.system() != 'Windows':
-            ok_button: Optional[QPushButton] = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
+            ok_button: QPushButton|None = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
             if ok_button is not None:
                 ok_button.setFocus()
 
@@ -1724,7 +1719,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.weightoutdefectsedit.setText('')
         self.defect_percent()
 
-    def get_scale_weight(self) -> Optional[float]:
+    def get_scale_weight(self) -> float|None:
         return self.scale_weight
 
     @pyqtSlot()
@@ -1750,7 +1745,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                     plus.blend.Component(coffee_tuples[1][1], 0.5)
                 ])
             # only entries of coffees with stock in the selected store or in all stores if no store is selected) should be enabled in blend component coffee popups
-            coffee_hr_ids_with_stock_in_store:Set[str] = set()
+            coffee_hr_ids_with_stock_in_store:set[str] = set()
             if self.plus_coffees is not None:
                 coffee_hr_ids_with_stock_in_store = {plus.stock.getCoffeeId(c) for c in self.plus_coffees if
                     # if there are multiple stores defined and non is selected, only coffees with stock in all stores are enabled in the blend component coffee popups
@@ -1772,7 +1767,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 
 ##
 
-    def updateWeightLCD(self, txt_value:str, txt_unit:str = '', total:Optional[float] = None) -> None:
+    def updateWeightLCD(self, txt_value:str, txt_unit:str = '', total:float|None = None) -> None:
         if self.aw.scale_manager.is_scale1_configured():
             self.scaleWeight.setText(txt_value+txt_unit.lower())
             total_txt, unit = self.updateScaleWeightAccumulated(total)
@@ -1843,7 +1838,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.aw.qmc.updateLargeScaleLCDs(None, '')
 
     # takes total accumulated weight and renders it as text; returns the empty string if the total weight is not given
-    def updateScaleWeightAccumulated(self,weight:Optional[float]=None) -> Tuple[str,str]:
+    def updateScaleWeightAccumulated(self,weight:float|None = None) -> tuple[str,str]:
         unit:str = ''
         v_formatted:str = ''
         if self.scale_set is not None and weight is not None:
@@ -1927,7 +1922,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 # limit to max 3 component links
                 line = f'{self.plus_blend_selected_label}: '
                 first_component = True
-                for i, ll in sorted(zip(self.plus_blend_selected_spec['ingredients'],self.plus_blend_selected_spec_labels), key=lambda tup:tup[0]['ratio'],reverse = True)[:3]:
+                for i, ll in sorted(zip(self.plus_blend_selected_spec['ingredients'],self.plus_blend_selected_spec_labels, strict=True), key=lambda tup:tup[0]['ratio'],reverse = True)[:3]: # ty:ignore
                     if first_component:
                         first_component = False
                     else:
@@ -1972,7 +1967,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     # storeIndex is the index of the selected store entry in the popup
     @pyqtSlot()
     @pyqtSlot(int)
-    def populatePlusCoffeeBlendCombos(self, storeIndex:Optional[int] = None) -> None:
+    def populatePlusCoffeeBlendCombos(self, storeIndex:int|None = None) -> None:
         if self.aw.plus_account is not None:
             try: # this can crash if dialog got closed while this is processed in a different thread!
                 self.plus_popups_set_enabled(False)
@@ -2052,7 +2047,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 
                 #---- Blends
 
-                custom_blend:Optional[plus.stock.Blend] = None
+                custom_blend:plus.stock.Blend|None = None
                 # if a valid custom_blend with a non-empty name exists, we add it to the blend popups
                 if self.aw.qmc.plus_custom_blend is not None and self.aw.qmc.plus_custom_blend.name.strip() != '':
                     coffees = plus.stock.getCoffeeLabels()
@@ -2060,7 +2055,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                         custom_blend = plus.stock.Blend(
                             hr_id = '',
                             label = self.aw.qmc.plus_custom_blend.name.strip(),
-                            ingredients = [{'ratio': c.ratio, 'coffee': c.coffee} for c in self.aw.qmc.plus_custom_blend.components])
+                            ingredients = [plus.stock.BlendIngredient(ratio = c.ratio, coffee = c.coffee) for c in self.aw.qmc.plus_custom_blend.components])
                 self.plus_blends = plus.stock.getBlends(self.unitsComboBox.currentIndex(),self.plus_default_store, custom_blend)
                 self.plus_blends_combo.blockSignals(True)
                 self.plus_blends_combo.clear()
@@ -2131,7 +2126,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.bean_size_max_edit.setStyleSheet(background_white_style)
             self.moisture_greens_edit.setStyleSheet(background_white_style)
 
-    def updateTitle(self, prev_coffee_label:Optional[str], prev_blend_label:Optional[str]) -> None:
+    def updateTitle(self, prev_coffee_label:str|None, prev_blend_label:str|None) -> None:
         titles_to_be_overwritten = [ '', QApplication.translate('Scope Title', 'Roaster Scope') ]
         if prev_coffee_label is not None:
             titles_to_be_overwritten.append(prev_coffee_label)
@@ -2160,7 +2155,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         for ll in blend_lines:
             self.beansedit.append(ll)
 
-    def fillBlendData(self, blend:plus.stock.BlendStructure, prev_coffee_label:Optional[str], prev_blend_label:Optional[str]) -> None:
+    def fillBlendData(self, blend:plus.stock.BlendStructure, prev_coffee_label:str|None, prev_blend_label:str|None) -> None:
         try:
             self.updateBlendLines(blend)
             keep_modified_moisture = self.modified_moisture_greens_text
@@ -2204,8 +2199,8 @@ class editGraphDlg(ArtisanResizeablDialog):
             _log.exception(e)
 
     # if current title is equal to default title or prev_coffee/blend_label, we set title from selected label
-    def fillCoffeeData(self, coffee:Tuple[str, Tuple[plus.stock.Coffee, plus.stock.StockItem]],
-            prev_coffee_label:Optional[str], prev_blend_label:Optional[str]) -> None:
+    def fillCoffeeData(self, coffee:tuple[str, tuple[plus.stock.Coffee, plus.stock.StockItem]],
+            prev_coffee_label:str|None, prev_blend_label:str|None) -> None:
         try:
             cd = plus.stock.getCoffeeCoffeeDict(coffee)
             self.beansedit.setPlainText(plus.stock.coffee2beans(cd))
@@ -2303,7 +2298,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.checkWeightIn()
         self.updatePlusSelectedLine()
 
-    def getBlendDictCurrentWeight(self, blend:Tuple[str, Tuple[plus.stock.Blend, plus.stock.StockItem, float, Dict[str, str], float, List[Tuple[float, plus.stock.Blend]]]]) -> plus.stock.Blend:
+    def getBlendDictCurrentWeight(self, blend:tuple[str, tuple[plus.stock.Blend, plus.stock.StockItem, float, dict[str, str], float, list[tuple[float, plus.stock.Blend]]]]) -> plus.stock.Blend:
         if self.weightinedit.text() != '':
             weightIn = float(comma2dot(self.weightinedit.text()))
         else:
@@ -2605,7 +2600,8 @@ class editGraphDlg(ArtisanResizeablDialog):
     # called on CANCEL or WINDOW_CLOSE; reverts state and calls clean_up_and_close()
     @pyqtSlot()
     @pyqtSlot('QCloseEvent')
-    def closeEvent(self, _:Optional['QCloseEvent'] = None) -> None:
+    def closeEvent(self, a0:'QCloseEvent|None' = None) -> None:
+        del a0
         # restore
         self.restoreAllEnergySettings()
 
@@ -2691,13 +2687,13 @@ class editGraphDlg(ArtisanResizeablDialog):
         return (1./density) * weight * 1000
 
     #keyboard presses. There must not be widgets (pushbuttons, comboboxes, etc) in focus in order to work
-    def keyPressEvent(self, event: Optional['QKeyEvent']) -> None:
-        if event is not None:
-            key = int(event.key())
+    def keyPressEvent(self, a0: 'QKeyEvent|None') -> None:
+        if a0 is not None:
+            key = int(a0.key())
             #print(key)
-            modifiers = event.modifiers()
+            modifiers = a0.modifiers()
             control_modifier = modifiers == Qt.KeyboardModifier.ControlModifier # command/apple k on macOS, CONTROL on Windows
-            if event.matches(QKeySequence.StandardKey.Copy) and self.TabWidget.currentIndex() == 3: # datatable
+            if a0.matches(QKeySequence.StandardKey.Copy) and self.TabWidget.currentIndex() == 3: # datatable
                 self.aw.copy_cells_to_clipboard(self.datatable,adjustment=1)
                 self.aw.sendmessage(QApplication.translate('Message','Data table copied to clipboard'))
             if key == 16777220 and self.aw.scale_manager.is_scale1_configured(): # ENTER key pressed and scale connected
@@ -2718,7 +2714,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             elif key == 80 and control_modifier and self.TabWidget.currentIndex() == 0: #ctrl P on Roast tab => send scale weight to in-weight field
                 self.resetScaleSet()
             else:
-                super().keyPressEvent(event)
+                super().keyPressEvent(a0)
 
     @staticmethod
     def container_menu_idx(i:int) -> int: # takes a container idx and returns the index of the corresponding menu item
@@ -2735,7 +2731,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.tareComboBox.addItem('')
             self.tareComboBox.addItems(self.aw.qmc.container_names)
             width = self.tareComboBox.minimumSizeHint().width()
-            view: Optional[QAbstractItemView] = self.tareComboBox.view()
+            view: QAbstractItemView|None = self.tareComboBox.view()
             if view is not None:
                 view.setMinimumWidth(width)
         if adjust_index:
@@ -2869,7 +2865,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             ### reset UI text labels and tooltips for proper translation
             # hack to access the Qt automatic translation of the Help button
             db_help = QDialogButtonBox(QDialogButtonBox.StandardButton.Help)
-            help_button: Optional[QPushButton] = db_help.button(QDialogButtonBox.StandardButton.Help)
+            help_button: QPushButton|None = db_help.button(QDialogButtonBox.StandardButton.Help)
             help_text_translated:str = 'Help'
             if help_button is not None:
                 help_text_translated = help_button.text()
@@ -2912,7 +2908,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.energy_ui.loadsSetDefaultsButton.setText(QApplication.translate('Button','Save Defaults'))
             # hack to access the Qt automatic translation of the RestoreDefaults button
             db = QDialogButtonBox(QDialogButtonBox.StandardButton.RestoreDefaults)
-            defaults_button: Optional[QPushButton] = db.button(QDialogButtonBox.StandardButton.RestoreDefaults)
+            defaults_button: QPushButton|None = db.button(QDialogButtonBox.StandardButton.RestoreDefaults)
             defaults_button_text_translated:str = 'Restore Defaults'
             if defaults_button is not None:
                 defaults_button_text_translated = defaults_button.text()
@@ -4090,7 +4086,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.setup_ui.SetDefaults.setText(QApplication.translate('Button', 'Save Defaults'))
             # hack to access the Qt automatic translation of the RestoreDefaults button
             db = QDialogButtonBox(QDialogButtonBox.StandardButton.RestoreDefaults)
-            defaults_button: Optional[QPushButton] = db.button(QDialogButtonBox.StandardButton.RestoreDefaults)
+            defaults_button: QPushButton|None = db.button(QDialogButtonBox.StandardButton.RestoreDefaults)
             if defaults_button is not None:
                 defaults_button_text_translated = defaults_button.text()
                 self.setup_ui.Defaults.setText(defaults_button_text_translated)
@@ -4175,8 +4171,8 @@ class editGraphDlg(ArtisanResizeablDialog):
         QTimer.singleShot(1, self.volumeCalculator)
 
     def volumeCalculator(self) -> None:
-        weightin:Optional[float] = None
-        weightout:Optional[float] = None
+        weightin:float|None = None
+        weightout:float|None = None
         try:
             weightin = float(comma2dot(self.weightinedit.text()))
         except Exception: # pylint: disable=broad-except
@@ -4219,7 +4215,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     def defectsWeight(self, _:bool = False, overwrite:bool = False) -> None:
         QTimer.singleShot(1,lambda : self.setWeight(self.weightoutdefectsedit,None,None,overwrite))
 
-    def setWeight(self, weight_edit:QLineEdit, density_edit:Optional[QLineEdit], moisture_edit:Optional[QLineEdit], overwrite:bool = False) -> None:
+    def setWeight(self, weight_edit:QLineEdit, density_edit:QLineEdit|None, moisture_edit:QLineEdit|None, overwrite:bool = False) -> None:
         tare:float = 0
         try:
             tare_idx = self.tareComboBox.currentIndex() - 3
@@ -4311,7 +4307,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.datatable.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         self.datatable.setSelectionMode(QTableWidget.SelectionMode.ExtendedSelection) # QTableWidget.SelectionMode.SingleSelection, ContiguousSelection, MultiSelection
         self.datatable.setShowGrid(True)
-        vheader: Optional[QHeaderView] = self.datatable.verticalHeader()
+        vheader: QHeaderView|None = self.datatable.verticalHeader()
         if vheader is not None:
             vheader.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
 
@@ -4363,7 +4359,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                     self.aw.qmc.etypeAbbrev(self.aw.qmc.etypesf(self.aw.qmc.specialeventstype[index])),
                     self.aw.qmc.eventsvalues(self.aw.qmc.specialeventsvalue[index]))
             self.datatable.setItem(i,0,Rtime)
-            tableitem: Optional[QTableWidgetItem]
+            tableitem: QTableWidgetItem|None
             if i in self.aw.qmc.specialevents:
                 tableitem = self.datatable.item(i,0)
                 if tableitem is not None:
@@ -4430,7 +4426,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                     self.datatable.setItem(i,j,extra_qtw2)
                     j = j + 1
 
-        header: Optional[QHeaderView] = self.datatable.horizontalHeader()
+        header: QHeaderView|None = self.datatable.horizontalHeader()
         if header is not None:
             self.datatable.resizeColumnsToContents()
             for i in range(1,len(columns)):
@@ -4466,7 +4462,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 
                 self.eventtable.setShowGrid(True)
 
-                vheader: Optional[QHeaderView] = self.eventtable.verticalHeader()
+                vheader: QHeaderView|None = self.eventtable.verticalHeader()
                 if vheader is not None:
                     vheader.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
                 regextime = QRegularExpression(r'^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$')
@@ -4521,7 +4517,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                     self.eventtable.setCellWidget(i,4,typeComboBox)
                     self.eventtable.setCellWidget(i,5,valueEdit)
                     valueEdit.setValidator(QIntValidator(0,self.aw.eventsMaxValue,self.eventtable.cellWidget(i,5)))
-                header: Optional[QHeaderView] = self.eventtable.horizontalHeader()
+                header: QHeaderView|None = self.eventtable.horizontalHeader()
                 if header is not None:
                     #header.setStretchLastSection(True)
                     header.setSectionResizeMode(0, QHeaderView.ResizeMode.Fixed)
@@ -4631,12 +4627,12 @@ class editGraphDlg(ArtisanResizeablDialog):
                 clipboard += typeComboBox.currentText() + '\t'
                 clipboard += valueEdit.text() + '\n'
         # copy to the system clipboard
-        sys_clip: Optional[QClipboard] = QApplication.clipboard()
+        sys_clip: QClipboard|None = QApplication.clipboard()
         if sys_clip is not None:
             sys_clip.setText(clipboard)
         self.aw.sendmessage(QApplication.translate('Message','Event table copied to clipboard'))
 
-    def createAlarmEventRows(self, rows:List[int]) -> None:
+    def createAlarmEventRows(self, rows:list[int]) -> None:
         for r in rows:
             TP = self.aw.findTP()
             if TP:
@@ -4701,7 +4697,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         if len(self.aw.qmc.specialevents):
             # check for selection
             selected = self.eventtable.selectedRanges()
-            rows: List[int]
+            rows: list[int]
             if selected and len(selected) > 0:
                 rows = []
                 for s in selected:
@@ -4956,7 +4952,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.weightinedit.repaint()
         self.percent()
         self.defect_percent()
-        keep_modified_density:Optional[str] = self.modified_density_in_text
+        keep_modified_density:str|None = self.modified_density_in_text
         if ((self.bean_density_in_edit.text() in {'0',''} and self.volumeinedit.text() not in {'0',''} and self.weightinedit.text().strip() not in {'0',''}) or
                 (self.volumeinedit.text() in {'0',''} and self.weightinedit.text().strip() not in {'0',''})):
             self.calculated_density()
@@ -5052,7 +5048,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.checkVolumeOut()
 
     # calculates density in g/l from weightin/weightout and volumein/volumeout
-    def calc_density(self) -> Tuple[float,float]:
+    def calc_density(self) -> tuple[float,float]:
         din = dout = 0.0
         try:
             if self.volumeinedit.text() != '' and self.weightinedit.text() != '':
@@ -5090,7 +5086,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.calculated_organic_loss()
         self.checkDensityOut()
 
-    def calc_organic_loss(self) -> Tuple[float,float]:
+    def calc_organic_loss(self) -> tuple[float,float]:
         wloss = 0. # weight (moisture + organic)
         mloss = 0. # moisture
         try:
@@ -5653,7 +5649,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         super().accept()
 
     def getMeasuredvalues(self, title:str, func_updatefields:Callable[[],None],
-            fields:List[QLineEdit], loadEnergy:List[float], func_updateduration:Callable[[],None],
+            fields:list[QLineEdit], loadEnergy:list[float], func_updateduration:Callable[[],None],
             durationfield:QLineEdit, duration:float) -> None:
         loadLabels = ['']*4
         loadUnits = ['']*4
@@ -5713,9 +5709,9 @@ class editGraphDlg(ArtisanResizeablDialog):
                 self.energy_ui.coolingenergies3]
         self.getMeasuredvalues(title, self.updateCoolingEnergies, fields, loadEnergy, self.updateCoolingDuration, self.energy_ui.coolingDuration, duration)
 
-    def openEnergyMeasuringDialog(self, title:str, loadLabels:List[str], loadValues:List[str], loadUnits:List[str], protocolDuration:str) -> int:
+    def openEnergyMeasuringDialog(self, title:str, loadLabels:list[str], loadValues:list[str], loadUnits:list[str], protocolDuration:str) -> int:
         dialog = EnergyMeasuringDialog(self, self.aw)
-        layout: Optional[QLayout]  = dialog.layout()
+        layout: QLayout|None  = dialog.layout()
         # set data
         dialog.ui.groupBox.setTitle(title)
         dialog.ui.loadAlabel.setText(loadLabels[0])
@@ -5744,14 +5740,14 @@ class StockComboBox(MyQComboBox):
         self.unitsComboBox:QComboBox = unitsComboBox
 
     # to be overwritten by subclasses
-    def getItems(self, unit:int) -> List[str]: # pylint: disable=no-self-use
+    def getItems(self, unit:int) -> list[str]: # pylint: disable=no-self-use
         del unit
         return []
 
     def resetInverted(self) -> None:
         self.inverted = False
 
-    def mousePressEvent(self, event:'Optional[QMouseEvent]') -> None:
+    def mousePressEvent(self, e:'QMouseEvent|None') -> None:
         if self.unitsComboBox is not None and QApplication.keyboardModifiers() == Qt.KeyboardModifier.AltModifier or self.inverted:
             # with ALT (Win) / OPTION (macOS) pressed we rewrite the popup menu indicating weights in imperial units if metric units were selected and vice versa
             default_unit:int = self.unitsComboBox.currentIndex()
@@ -5767,14 +5763,14 @@ class StockComboBox(MyQComboBox):
                 if len(items) > i:
                     self.setItemText(i, items[i])
             self.inverted = not self.inverted
-        super().mousePressEvent(event)
+        super().mousePressEvent(e)
 
 class CoffeesComboBox(StockComboBox):
     def __init__(self, parent:editGraphDlg, *args:Any, **kwargs:Any) -> None:
         super().__init__(parent.unitsComboBox, *args, **kwargs)
         self.parentDialog = parent
 
-    def getItems(self, unit:int) -> List[str]:
+    def getItems(self, unit:int) -> list[str]:
         plus_coffees = plus.stock.getCoffees(unit, self.parentDialog.plus_default_store)
         return [''] + plus.stock.getCoffeesLabels(plus_coffees)
 
@@ -5783,17 +5779,17 @@ class BlendsComboBox(StockComboBox):
         super().__init__(parent.unitsComboBox, *args, **kwargs)
         self.parentDialog:editGraphDlg = parent
 
-    def getItems(self, unit:int) -> List[str]:
-        custom_blend:Optional[plus.stock.Blend] = None
+    def getItems(self, unit:int) -> list[str]:
+        custom_blend:plus.stock.Blend|None = None
         if self.parentDialog.aw.qmc.plus_custom_blend is not None and self.parentDialog.aw.qmc.plus_custom_blend.name.strip() != '':
             coffees = plus.stock.getCoffeeLabels()
             if len(coffees)>2 and self.parentDialog.aw.qmc.plus_custom_blend.isValid(coffees.values()):
                 custom_blend = plus.stock.Blend(
                     hr_id = '',
                     label = self.parentDialog.aw.qmc.plus_custom_blend.name.strip(),
-                    ingredients = [{'ratio': c.ratio, 'coffee': c.coffee} for c in self.parentDialog.aw.qmc.plus_custom_blend.components])
+                    ingredients = [plus.stock.BlendIngredient(ratio = c.ratio, coffee= c.coffee) for c in self.parentDialog.aw.qmc.plus_custom_blend.components])
         plus_blends = plus.stock.getBlends(unit,self.parentDialog.plus_default_store, custom_blend)
-        blend_items:List[str] = plus.stock.getBlendLabels(plus_blends)
+        blend_items:list[str] = plus.stock.getBlendLabels(plus_blends)
         return [''] + blend_items
 
 

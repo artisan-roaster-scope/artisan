@@ -29,7 +29,7 @@ modules that handle complex async communication and sensor data processing.
 """
 
 import sys
-from typing import Generator
+from collections.abc import Generator
 from unittest.mock import patch
 
 import pytest
@@ -228,7 +228,7 @@ class TestSantokerImplementationDetails:
         # Test that communication methods are defined
         assert 'def register_reading(self, target:bytes, data:bytes) -> None:' in source_content
         assert (
-            'async def read_msg(self, stream: Union[asyncio.StreamReader, IteratorReader]) -> None:'
+            'async def read_msg(self, stream: asyncio.StreamReader|IteratorReader) -> None:'
             in source_content
         )
         assert 'def create_msg(self, target:bytes, value: int) -> bytes:' in source_content

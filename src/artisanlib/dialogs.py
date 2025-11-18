@@ -19,27 +19,20 @@ import platform
 import logging
 import re
 
-try:
-    from PyQt6.QtCore import Qt, QEvent, QSettings, pyqtSlot, pyqtSignal, QRegularExpression # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtWidgets import (QApplication, QWidget, QDialog, QMessageBox, QDialogButtonBox, QTextEdit,  # @UnusedImport @Reimport  @UnresolvedImport
-                QHBoxLayout, QVBoxLayout, QLabel, QLineEdit, QLayout, QTableWidget, QHeaderView, QPushButton)  # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtGui import QKeySequence, QAction, QIntValidator, QTextCharFormat, QTextCursor, QColor  # @UnusedImport @Reimport  @UnresolvedImport
-except ImportError:
-    from PyQt5.QtCore import Qt, QEvent, QSettings, pyqtSlot, pyqtSignal, QRegularExpression # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtWidgets import (QApplication, QWidget, QAction, QDialog, QMessageBox, QDialogButtonBox, QTextEdit, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-                QHBoxLayout, QVBoxLayout, QLabel, QLineEdit, QLayout, QTableWidget, QHeaderView, QPushButton) # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtGui import QKeySequence, QIntValidator, QTextCharFormat, QTextCursor, QColor # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+from PyQt6.QtCore import Qt, QEvent, QSettings, pyqtSlot, pyqtSignal, QRegularExpression
+from PyQt6.QtWidgets import (QApplication, QWidget, QDialog, QMessageBox, QDialogButtonBox, QTextEdit,
+            QHBoxLayout, QVBoxLayout, QLabel, QLineEdit, QLayout, QTableWidget, QHeaderView, QPushButton)
+from PyQt6.QtGui import QKeySequence, QAction, QIntValidator, QTextCharFormat, QTextCursor, QColor
 
 from artisanlib.widgets import MyQComboBox, ClickableQLineEdit
 from artisanlib.util import comma2dot, float2float, float2floatWeightVolume, convertWeight, weight_units
 
-from typing import Optional, List, Tuple, cast, Callable, TYPE_CHECKING
-from typing import Final  # Python <=3.7
+from collections.abc import Callable
+from typing import Final, cast, TYPE_CHECKING
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
-    from PyQt6.QtWidgets import QPushButton # pylint: disable=unused-import
-    from PyQt6.QtGui import QCloseEvent, QDragEnterEvent, QDropEvent, QKeyEvent, QShowEvent, QTextCursor  # pylint: disable=unused-import
-    from PyQt6.QtCore import QTimerEvent, QEvent, QObject # pylint: disable=unused-import
+    from PyQt6.QtGui import QCloseEvent, QDragEnterEvent, QDropEvent, QKeyEvent, QShowEvent  # pylint: disable=unused-import
+    from PyQt6.QtCore import QTimerEvent, QObject # pylint: disable=unused-import
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
@@ -47,7 +40,7 @@ class ArtisanDialog(QDialog): # pyrefly:ignore[invalid-inheritance] # pyright: i
 
     __slots__ = ['aw', 'dialogbuttons']
 
-    def __init__(self, parent:Optional[QWidget], aw:'ApplicationWindow') -> None:
+    def __init__(self, parent:QWidget|None, aw:'ApplicationWindow') -> None:
         super().__init__(parent)  # pyrefly: ignore[bad-argument-count]
         self.aw = aw # the Artisan application window
 
@@ -70,12 +63,12 @@ class ArtisanDialog(QDialog): # pyrefly:ignore[invalid-inheritance] # pyright: i
 
         # configure standard dialog buttons
         self.dialogbuttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel,Qt.Orientation.Horizontal)
-        okButton: Optional[QPushButton] = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
+        okButton: QPushButton|None = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
         if okButton is not None:
             okButton.setDefault(True)
             okButton.setAutoDefault(True)
             okButton.setFocusPolicy(Qt.FocusPolicy.StrongFocus) # to add to tab focus switch
-        cancelButton: Optional[QPushButton] = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel)
+        cancelButton: QPushButton|None = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel)
         if cancelButton is not None:
             cancelButton.setDefault(False)
             cancelButton.setAutoDefault(False)
@@ -96,7 +89,7 @@ class ArtisanDialog(QDialog): # pyrefly:ignore[invalid-inheritance] # pyright: i
             self.setButtonTranslations(btn,txt,trans)
 
     @staticmethod
-    def setButtonTranslations(btn: Optional['QPushButton'], txt:str, trans:str) -> None:
+    def setButtonTranslations(btn: 'QPushButton|None', txt:str, trans:str) -> None:
         if btn is not None:
             current_trans = btn.text()
             if txt == current_trans:
@@ -111,23 +104,24 @@ class ArtisanDialog(QDialog): # pyrefly:ignore[invalid-inheritance] # pyright: i
         self.dialogbuttons.rejected.emit()
 
     @pyqtSlot('QCloseEvent')
-    def closeEvent(self,_:Optional['QCloseEvent']) -> None:
+    def closeEvent(self, a0:'QCloseEvent|None') -> None:
+        del a0
         self.dialogbuttons.rejected.emit()
 
-    def keyPressEvent(self, event: Optional['QKeyEvent']) -> None:
-        if event is not None:
-            key = int(event.key())
+    def keyPressEvent(self, a0: 'QKeyEvent|None') -> None:
+        if a0 is not None:
+            key = int(a0.key())
             #uncomment next line to find the integer value of a key
             #print(key)
             #modifiers = QApplication.keyboardModifiers()
-            modifiers = event.modifiers()
+            modifiers = a0.modifiers()
             if key == 16777216 or (key == 87 and modifiers == Qt.KeyboardModifier.ControlModifier): #ESCAPE or CMD-W
                 self.close()
             else:
-                super().keyPressEvent(event)
+                super().keyPressEvent(a0)
 
 class ArtisanResizeablDialog(ArtisanDialog):
-    def __init__(self, parent:Optional[QWidget], aw:'ApplicationWindow') -> None:
+    def __init__(self, parent:QWidget|None, aw:'ApplicationWindow') -> None:
         super().__init__(parent, aw)
         if str(platform.system()) == 'Windows':
             windowFlags = self.windowFlags()
@@ -140,7 +134,7 @@ class ArtisanMessageBox(QMessageBox): # pyrefly:ignore[invalid-inheritance] # py
 
     __slots__ = ['timeout', 'currentTime']
 
-    def __init__(self, parent:Optional[QWidget] = None, title:Optional[str] = None, text:Optional[str] = None, timeout:int = 0, modal:bool = True) -> None:
+    def __init__(self, parent:QWidget|None = None, title:str|None = None, text:str|None = None, timeout:int = 0, modal:bool = True) -> None:
         super().__init__(parent) # pyrefly: ignore[bad-argument-count]
         self.setWindowTitle(title)
         self.setText(text)
@@ -152,12 +146,14 @@ class ArtisanMessageBox(QMessageBox): # pyrefly:ignore[invalid-inheritance] # py
         self.timeout = timeout # configured timeout, defaults to 0 (no timeout)
         self.currentTime = 0 # counts seconds after timer start
 
-    def showEvent(self, _:Optional['QShowEvent']) -> None:
+    def showEvent(self, a0:'QShowEvent|None') -> None:
+        del a0
         self.currentTime = 0
         if (self.timeout and self.timeout != 0):
             self.startTimer(1000)
 
-    def timerEvent(self, _:Optional['QTimerEvent']) -> None:
+    def timerEvent(self, a0:'QTimerEvent|None') -> None:
+        del a0
         self.currentTime = self.currentTime + 1
         if self.currentTime >= self.timeout:
             self.done(0)
@@ -178,7 +174,7 @@ class HelpDlg(ArtisanDialog):
         self.phelp.setReadOnly(True)
 
         # Initialize search state variables
-        self.matches: List[QTextCursor] = []
+        self.matches: list[QTextCursor] = []
         self.current_match_index = 0
         self.previous_search_term = ''
 
@@ -212,14 +208,14 @@ class HelpDlg(ArtisanDialog):
         hLayout.addLayout(buttonLayout)
         self.setLayout(hLayout)
 
-    def keyPressEvent(self, event: Optional['QKeyEvent']) -> None:
-        if event is not None:
-            key = event.key()
+    def keyPressEvent(self, a0: 'QKeyEvent|None') -> None:
+        if a0 is not None:
+            key = a0.key()
             # uncomment next lines to find the integer value and name of a key
             #key_name = QKeySequence(key).toString(QKeySequence.SequenceFormat.PortableText)
             #_log.info(f'{key=}, {key_name=}')
 
-            modifiers = event.modifiers()
+            modifiers = a0.modifiers()
             # Ctrl+F puts focus in the search box
             if key == Qt.Key.Key_F and modifiers == Qt.KeyboardModifier.ControlModifier:
                 self.search_input.setFocus()
@@ -233,10 +229,11 @@ class HelpDlg(ArtisanDialog):
                 if focused_widget is okButton or focused_widget is self.phelp:
                     self.handleClose()
             else:
-                super().keyPressEvent(event)
+                super().keyPressEvent(a0)
 
     @pyqtSlot('QCloseEvent')
-    def closeEvent(self, _: Optional['QCloseEvent'] = None) -> None:
+    def closeEvent(self, a0: 'QCloseEvent|None' = None) -> None:
+        del a0
         self.handleClose()
 
     @pyqtSlot()
@@ -355,7 +352,7 @@ class ArtisanInputDialog(ArtisanDialog):
         # connect the ArtisanDialog standard OK/Cancel buttons
         self.dialogbuttons.rejected.connect(self.reject)
         self.dialogbuttons.accepted.connect(self.accept)
-        okButton: Optional[QPushButton] = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
+        okButton: QPushButton|None = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
         if okButton is not None:
             okButton.setFocus()
 
@@ -364,19 +361,18 @@ class ArtisanInputDialog(ArtisanDialog):
         self.url = self.inputLine.text()
         super().accept()
 
-    @staticmethod
-    def dragEnterEvent(event:Optional['QDragEnterEvent']) -> None:
-        if event is not None:
-            mimeData = event.mimeData()
+    def dragEnterEvent(self, a0:'QDragEnterEvent|None') -> None:  # pylint: disable=no-self-use # overloaded method
+        if a0 is not None:
+            mimeData = a0.mimeData()
             if mimeData is not None:
                 if mimeData.hasUrls():
-                    event.accept()
+                    a0.accept()
                 else:
-                    event.ignore()
+                    a0.ignore()
 
-    def dropEvent(self, event:Optional['QDropEvent']) -> None:
-        if event is not None:
-            mimeData = event.mimeData()
+    def dropEvent(self, a0:'QDropEvent|None') -> None:
+        if a0 is not None:
+            mimeData = a0.mimeData()
             if mimeData is not None and mimeData.hasUrls():
                 urls = mimeData.urls()
                 if urls and len(urls)>0:
@@ -387,10 +383,10 @@ class ArtisanComboBoxDialog(ArtisanDialog):
 
     __slots__ = [ 'idx', 'comboBox' ]
 
-    def __init__(self, parent:QWidget, aw:'ApplicationWindow', title:str = '', label:str='', choices:Optional[List[str]] = None, default:int = -1) -> None:
+    def __init__(self, parent:QWidget, aw:'ApplicationWindow', title:str = '', label:str='', choices:list[str]|None = None, default:int = -1) -> None:
         super().__init__(parent, aw)
 
-        self.idx:Optional[int] = None
+        self.idx:int|None = None
 
         self.setWindowTitle(title)
         self.setModal(True)
@@ -407,7 +403,7 @@ class ArtisanComboBoxDialog(ArtisanDialog):
         # connect the ArtisanDialog standard OK/Cancel buttons
         self.dialogbuttons.rejected.connect(self.reject)
         self.dialogbuttons.accepted.connect(self.accept)
-        okButton: Optional[QPushButton] = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
+        okButton: QPushButton|None = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
         if okButton is not None:
             okButton.setFocus()
 
@@ -422,18 +418,18 @@ class PortComboBox(MyQComboBox):  # pyright: ignore [reportGeneralTypeIssues] # 
     __slots__ = ['selection', 'select_device_name', 'ports','edited'] # save some memory by using slots
 
     # the given select_device_name is preferred (if a corresponding port is found) over the given selection port name
-    def __init__(self, parent:Optional[QWidget] = None, selection:Optional[str] = None, select_device_name:Optional[str] = None) -> None:
+    def __init__(self, parent:QWidget|None = None, selection:str|None = None, select_device_name:str|None = None) -> None:
         super().__init__(parent)
         self.installEventFilter(self)
-        self.selection:Optional[str] = selection # just the port name (first element of one of the triples in self.ports)
-        self.select_device_name:Optional[str] = select_device_name # device name (second element of one of the triples in self.ports)
+        self.selection:str|None = selection # just the port name (first element of one of the triples in self.ports)
+        self.select_device_name:str|None = select_device_name # device name (second element of one of the triples in self.ports)
 
         self.setEditable(True)
 
         # a list of triples as returned by serial.tools.list_ports
-        self.ports:List[Tuple[str, Optional[str], str]] = []  # list of tuples (port, desc, hwid)
+        self.ports:list[tuple[str, str|None, str]] = []  # list of tuples (port, desc, hwid)
         self.updateMenu()
-        self.edited:Optional[str] = None
+        self.edited:str|None = None
         if self.selection is not None:
             self.setCurrentText(self.selection)
         self.currentIndexChanged.connect(self.setSelection)
@@ -451,7 +447,7 @@ class PortComboBox(MyQComboBox):  # pyright: ignore [reportGeneralTypeIssues] # 
     def textEdited(self, txt:str) -> None:
         self.edited = txt
 
-    def getSelection(self) -> Optional[str]:
+    def getSelection(self) -> str|None:
         return self.edited or self.selection
 
     @pyqtSlot(int)
@@ -463,13 +459,13 @@ class PortComboBox(MyQComboBox):  # pyright: ignore [reportGeneralTypeIssues] # 
             except Exception: # pylint: disable=broad-except
                 pass
 
-    def eventFilter(self, obj:Optional['QObject'], event:Optional['QEvent']) -> bool:
+    def eventFilter(self, a0:'QObject|None', a1:'QEvent|None') -> bool:
 # the next prevents correct setSelection on Windows
-#        if event.type() == QEvent.Type.FocusIn:
+#        if a1.type() == QEvent.Type.FocusIn:
 #            self.setSelection(self.currentIndex())
-        if event is not None and event.type() == QEvent.Type.MouseButtonPress:
+        if a1 is not None and a1.type() == QEvent.Type.MouseButtonPress:
             self.updateMenu()
-        return super().eventFilter(obj, event)
+        return super().eventFilter(a0, a1)
 
     def updateMenu(self) -> None:
         self.blockSignals(True)
@@ -504,12 +500,12 @@ class ArtisanPortsDialog(ArtisanDialog):
 
     __slots__ = [ 'idx', 'comboBox' ]
 
-    def __init__(self, parent:QWidget, aw:'ApplicationWindow', title:Optional[str] = None,
-            label:Optional[str] = None,
-            selection:Optional[str] = None,
-            select_device_name:Optional[str] = None) -> None:
+    def __init__(self, parent:QWidget, aw:'ApplicationWindow', title:str|None = None,
+            label:str|None = None,
+            selection:str|None = None,
+            select_device_name:str|None = None) -> None:
         super().__init__(parent, aw)
-        self.idx:Optional[int] = None
+        self.idx:int|None = None
         self.comboBox = PortComboBox(parent, selection, select_device_name)
 
         self.setWindowTitle(QApplication.translate('Message', 'Port Configuration') if title is None else title)
@@ -523,11 +519,11 @@ class ArtisanPortsDialog(ArtisanDialog):
         # connect the ArtisanDialog standard OK/Cancel buttons
         self.dialogbuttons.rejected.connect(self.reject)
         self.dialogbuttons.accepted.connect(self.accept)
-        okButton: Optional[QPushButton] = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
+        okButton: QPushButton|None = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
         if okButton is not None:
             okButton.setFocus()
 
-    def getSelection(self) -> Optional[str]:
+    def getSelection(self) -> str|None:
         return self.comboBox.getSelection()
 
     @pyqtSlot()
@@ -537,9 +533,9 @@ class ArtisanPortsDialog(ArtisanDialog):
 
 class ArtisanSliderLCDinputDlg(ArtisanDialog):
 
-    def __init__(self, parent:QWidget, aw:'ApplicationWindow', value:int, value_min:int, value_max:int, title:Optional[str] = None) -> None:
+    def __init__(self, parent:QWidget, aw:'ApplicationWindow', value:int, value_min:int, value_max:int, title:str|None = None) -> None:
         super().__init__(parent, aw)
-        self.value:Optional[int] = None
+        self.value:int|None = None
         if title is None:
             title = ''
         self.setWindowTitle(title)
@@ -589,7 +585,7 @@ class ArtisanSliderLCDinputDlg(ArtisanDialog):
 class tareDlg(ArtisanDialog):
     tare_updated_signal = pyqtSignal()  # signalled after tare data table got updated
 
-    def __init__(self, parent:ArtisanDialog, aw:'ApplicationWindow', get_scale_weight: Callable[[], Optional[float]]) -> None:
+    def __init__(self, parent:ArtisanDialog, aw:'ApplicationWindow', get_scale_weight: Callable[[], float|None]) -> None:
         super().__init__(parent, aw)
         self.parent_dialog = parent
         self.get_scale_weight = get_scale_weight
@@ -692,8 +688,8 @@ class tareDlg(ArtisanDialog):
 
     def saveTareTable(self) -> None:
         tars = self.taretable.rowCount()
-        names:List[str] = []
-        weights:List[float] = []
+        names:list[str] = []
+        weights:list[float] = []
         for i in range(tars):
             nameWidget = cast(QLineEdit, self.taretable.cellWidget(i,0))
             name = nameWidget.text()
@@ -715,7 +711,7 @@ class tareDlg(ArtisanDialog):
         if sender and isinstance(sender, QLineEdit): # pyrefly: ignore[invalid-argument]
             text = sender.text().strip()
             if text == '':
-                w:Optional[float] = self.get_scale_weight() # read value from scale in 'g'
+                w:float|None = self.get_scale_weight() # read value from scale in 'g'
                 sender.setText(str(w if w is not None and w > 0 else 0))
             elif self.aw.qmc.weight[2] == 'Kg':
                 # if container weight in kg, but input value > 10, we interpret it as in g
@@ -736,14 +732,14 @@ class tareDlg(ArtisanDialog):
         self.taretable.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         self.taretable.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
         self.taretable.setShowGrid(True)
-        vheader: Optional[QHeaderView] = self.taretable.verticalHeader()
+        vheader: QHeaderView|None = self.taretable.verticalHeader()
         if vheader is not None:
             vheader.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
         for i, cn in enumerate(self.aw.qmc.container_names):
             #add widgets to the table
             self.setTableRow(i, cn, self.aw.qmc.container_weights[i])
 
-        header: Optional[QHeaderView] = self.taretable.horizontalHeader()
+        header: QHeaderView|None = self.taretable.horizontalHeader()
         if header is not None:
             header.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
             header.setSectionResizeMode(1, QHeaderView.ResizeMode.Fixed)

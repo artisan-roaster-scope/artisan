@@ -26,7 +26,7 @@ from plus import config, util, stock
 import hashlib
 import logging
 
-from typing import Final, Any, Optional, Dict, List, Tuple, Union, TYPE_CHECKING  #for Python >= 3.9: can remove 'List', 'Dict' and 'Tuple' since type hints can use the generic 'list', 'dict' and 'tuple'
+from typing import Final, Any, TYPE_CHECKING
 
 
 if TYPE_CHECKING:
@@ -37,9 +37,9 @@ _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 # given a profile dictionary extract key parameters to populate a Roast element
 # background=True if the bp is holding a background profile (ambientTemp, AUCbase not converted to current temp mode)
-def getTemplate(bp: 'ProfileData', background:bool=False) -> Dict[str, Any]:  #for Python >= 3.9 can replace 'Dict' with the generic type hint 'dict'
+def getTemplate(bp: 'ProfileData', background:bool=False) -> dict[str, Any]:
     _log.debug('getTemplate()')
-    d: Dict[str, Any] = {}
+    d: dict[str, Any] = {}
     try:
         try:
             util.addNum2dict(
@@ -258,13 +258,13 @@ def getTemplate(bp: 'ProfileData', background:bool=False) -> Dict[str, Any]:  #f
 
 
 # remove all data but for what is to be synced with the server
-def trimBlendSpec(blend_spec:stock.Blend) -> Optional[stock.Blend]:
+def trimBlendSpec(blend_spec:stock.Blend) -> stock.Blend|None:
     try:
         res:stock.Blend = {} # type: ignore # missing required fields (added later)
         if 'label' in blend_spec and blend_spec['label']:
             res['label'] = blend_spec['label']
             if 'ingredients' in blend_spec and blend_spec['ingredients']:
-                res_ingredients:List[stock.BlendIngredient] = []
+                res_ingredients:list[stock.BlendIngredient] = []
                 for ingredient in blend_spec['ingredients']:
                     res_ingredient:stock.BlendIngredient = {} # type: ignore # missing required fields (added later)
                     for tag in ['coffee', 'ratio', 'ratio_num', 'ratio_denom']:
@@ -284,7 +284,7 @@ def trimBlendSpec(blend_spec:stock.Blend) -> Optional[stock.Blend]:
 
 
 # the resulting dictionary returned by getRoast() does not contain null values like 0 or '' as those are suppressed
-def getRoast() -> Dict[str, Any]:  #for Python >= 3.9 can replace 'Dict' with the generic type hint 'dict'
+def getRoast() -> dict[str, Any]:
     d = {}
     try:
         _log.debug('getRoast()')
@@ -403,7 +403,7 @@ def getRoast() -> Dict[str, Any]:  #for Python >= 3.9 can replace 'Dict' with th
         try:
             if 'flavors' in p:
                 correction:float = p.get('flavors_total_correction', 0)
-                cupping_value:Optional[Union[float, int]] = aw.qmc.calcFlavorChartScoreFromFlavors(p['flavors'], correction)
+                cupping_value:float|int|None = aw.qmc.calcFlavorChartScoreFromFlavors(p['flavors'], correction)
                 cupping_value = util.float2floatMin(cupping_value, 2)
                 if cupping_value != 50:
                     # a cupping_value of 50 is dropped as this is the default
@@ -420,7 +420,7 @@ def getRoast() -> Dict[str, Any]:  #for Python >= 3.9 can replace 'Dict' with th
         # the server instead the timestamp
         # of the moment the record is queued
         if aw is not None and aw.curFile is not None:
-            mod_date:Optional[float] = util.getModificationDate(aw.curFile)
+            mod_date:float|None = util.getModificationDate(aw.curFile)
             if mod_date is not None:
                 d['modified_at'] = util.epoch2ISO8601(mod_date)
 
@@ -441,7 +441,7 @@ def getRoast() -> Dict[str, Any]:  #for Python >= 3.9 can replace 'Dict' with th
 # are only send to the server (as those are computed values), but never
 # received and thus not synced between clients.
 
-sync_record_zero_supressed_attributes_synced: List[str] = [  #for Python >= 3.9 can replace 'List' with the generic type hint 'list'
+sync_record_zero_supressed_attributes_synced: list[str] = [
     'density_roasted',
     'batch_number',
     'batch_pos',
@@ -453,7 +453,7 @@ sync_record_zero_supressed_attributes_synced: List[str] = [  #for Python >= 3.9 
 # the following attributes are send on changes from Artisan to the server, but the server never sends those back
 # in response on aroast requests. Thus synchornization of those is one-way only and those are not synced between
 # two Artisan clients.
-sync_record_zero_supressed_attributes_unsynced: List[str] = [  #for Python >= 3.9 can replace 'List' with the generic type hint 'list'
+sync_record_zero_supressed_attributes_unsynced: list[str] = [
     # ambient information can edited in Artisan.
     # It cannot be edited in the WebApp, but it is displayed as part of a roast chart on artisan.plus
     #
@@ -483,17 +483,17 @@ sync_record_zero_supressed_attributes_unsynced: List[str] = [  #for Python >= 3.
     'CO2_batch',
 ]
 
-sync_record_zero_supressed_attributes: List[str] = sync_record_zero_supressed_attributes_synced + sync_record_zero_supressed_attributes_unsynced
+sync_record_zero_supressed_attributes: list[str] = sync_record_zero_supressed_attributes_synced + sync_record_zero_supressed_attributes_unsynced
 
 # the following data items are suppressed from the roast record if they have a value of 50
 # to avoid sending just tags with this default value:
-sync_record_fifty_supressed_attributes: List[str] = [  #for Python >= 3.9 can replace 'List' with the generic type hint 'list'
+sync_record_fifty_supressed_attributes: list[str] = [
     'cupping_score',
 ]
 
 # the following data items are suppressed from the roast record if they hold the empty string
 # to avoid sending just tags with empty strings:
-sync_record_empty_string_supressed_attributes: List[str] = [  #for Python >= 3.9 can replace 'List' with the generic type hint 'list'
+sync_record_empty_string_supressed_attributes: list[str] = [
     'label',
     'batch_prefix',
     'color_system',
@@ -503,7 +503,7 @@ sync_record_empty_string_supressed_attributes: List[str] = [  #for Python >= 3.9
 ]
 
 # those will always be send by Artisan also if None or 0:
-sync_record_non_supressed_attributes: List[str] = [  #for Python >= 3.9 can replace 'List' with the generic type hint 'list'
+sync_record_non_supressed_attributes: list[str] = [
     'roast_id',
     'location',       # default None
     'coffee',         # default None
@@ -515,7 +515,7 @@ sync_record_non_supressed_attributes: List[str] = [  #for Python >= 3.9 can repl
 ]
 
 # all roast record attributes that participate in the sync process
-sync_record_attributes: List[str] = (  #for Python >= 3.9 can replace 'List' with the generic type hint 'list'
+sync_record_attributes: list[str] = (
     sync_record_non_supressed_attributes
     + sync_record_zero_supressed_attributes
     + sync_record_fifty_supressed_attributes
@@ -526,10 +526,10 @@ sync_record_attributes: List[str] = (  #for Python >= 3.9 can replace 'List' wit
 # returns the current plus record and a hash over the plus record
 # if applied, r is assumed to contain the complete roast data as returned
 # by roast.getRoast() # NOTE: this dict has zero values like 0 or '' suppressed
-def getSyncRecord(r: Optional[Dict[str, Any]] = None) -> Tuple[Dict[str, Any], str]:  #for Python >= 3.9 can replace 'Dict' and 'Tuple' with the generic type hints 'dict' and 'tuple'
+def getSyncRecord(r: dict[str, Any]|None = None) -> tuple[dict[str, Any], str]:
     _log.debug('getSyncRecord(%s)', r)
     m = hashlib.sha256()
-    d: Dict[str, Any] = {}
+    d: dict[str, Any] = {}
     try:
         if r is None:
             r = getRoast()

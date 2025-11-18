@@ -21,12 +21,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-try:
-    #pylint: disable = E, W, R, C
-    from PyQt6.QtCore import QSemaphore # @UnusedImport @Reimport  @UnresolvedImport
-except Exception: # pylint: disable=broad-except
-    #pylint: disable = E, W, R, C
-    from PyQt5.QtCore import QSemaphore # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+#pylint: disable = E, W, R, C
+from PyQt6.QtCore import QSemaphore
 
 from pathlib import Path
 from artisanlib.util import getDirectory
@@ -34,7 +30,7 @@ from plus import config
 import os
 import logging
 
-from typing import Final, Optional, IO
+from typing import Final, IO
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -123,7 +119,7 @@ def addPath(uuid: str, path: str) -> None:
 
 
 # returns None if given UUID is not registered, otherwise the registered path
-def getPath(uuid: str) -> Optional[str]:
+def getPath(uuid: str) -> str|None:
     _log.debug('getPath(%s)', uuid)
     import portalocker
     import shelve

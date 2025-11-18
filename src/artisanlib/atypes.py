@@ -18,13 +18,9 @@
 
 import datetime
 
-try:
-    from PyQt6.QtCore import QDateTime # @UnusedImport @Reimport  @UnresolvedImport
-except ImportError:
-    from PyQt5.QtCore import QDateTime  # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+from PyQt6.QtCore import QDateTime
 
-from typing import TypedDict, Optional,  Tuple, List, Union, TYPE_CHECKING
-from typing_extensions import Required # Python <3.11
+from typing import TypedDict, Required, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from plus.stock import BlendList, Blend
@@ -141,10 +137,10 @@ class ProfileData(TypedDict, total=False):
     artisan_os_arch: str
     mode: str
     viewerMode: bool
-    timeindex: List[int]
-    flavors: List[float]
+    timeindex: list[int]
+    flavors: list[float]
     flavors_total_correction: float
-    flavorlabels: List[str]
+    flavorlabels: list[str]
     flavorstartangle: float
     flavoraspect: float
     title: str
@@ -155,12 +151,12 @@ class ProfileData(TypedDict, total=False):
     plus_coffee_label: str
     plus_blend_label: str
     plus_blend_spec: 'BlendList'
-    plus_blend_spec_labels: List[str]
+    plus_blend_spec_labels: list[str]
     beans: str
-    weight: List[Union[float,str]] # NOTE: internally weight is a typed tuple
-    volume: List[Union[float,str]] # NOTE: internally volume is a typed tuple
-    density: List[Union[float,str]] # NOTE: internally density is a typed tuple
-    density_roasted: List[Union[float,str]] # NOTE: internally density_roasted is a typed tuple
+    weight: list[float|str] # NOTE: internally weight is a typed tuple
+    volume: list[float|str] # NOTE: internally volume is a typed tuple
+    density: list[float|str] # NOTE: internally density is a typed tuple
+    density_roasted: list[float|str] # NOTE: internally density_roasted is a typed tuple
     defects_weight:float
     roastertype: str
     roastersize: float
@@ -198,19 +194,19 @@ class ProfileData(TypedDict, total=False):
     beansize:str # legacy; float in str mapped to beansize_max
     beansize_min:str # int saved as str to external profiles (internal variable of type int)
     beansize_max:str # int saved as str to external profiles (internal variable of type int)
-    specialevents: List[int]
-    specialeventstype: List[int]
-    specialeventsvalue: List[float]
-    specialeventsStrings: List[str]
-    default_etypes: List[bool]
-    default_etypes_set: List[int]
-    etypes: List[str]
+    specialevents: list[int]
+    specialeventstype: list[int]
+    specialeventsvalue: list[float]
+    specialeventsStrings: list[str]
+    default_etypes: list[bool]
+    default_etypes_set: list[int]
+    etypes: list[str]
     cuppingnotes: str
     roastingnotes: str
-    timex: List[float]
-    temp1: List[float]
-    temp2: List[float]
-    phases: List[int]
+    timex: list[float]
+    temp1: list[float]
+    temp2: list[float]
+    phases: list[int]
     zmax: int
     zmin: int
     ymax: int
@@ -223,164 +219,164 @@ class ProfileData(TypedDict, total=False):
     moisture_greens: float
     greens_temp: float
     moisture_roasted: float
-    extradevices: List[int]
-    extraname1: List[str]
-    extraname2: List[str]
-    extratimex: List[List[float]]
-    extratemp1: List[List[float]]
-    extratemp2: List[List[float]]
-    extramathexpression1: List[str]
-    extramathexpression2: List[str]
-    extradevicecolor1: List[str]
-    extradevicecolor2: List[str]
-    extraLCDvisibility1: List[bool]
-    extraLCDvisibility2: List[bool]
-    extraCurveVisibility1: List[bool]
-    extraCurveVisibility2: List[bool]
-    extraDelta1: List[bool]
-    extraDelta2: List[bool]
-    extraFill1: List[int]
-    extraFill2: List[int]
-    extramarkersizes1: List[float]
-    extramarkersizes2: List[float]
-    extramarkers1: List[str]
-    extramarkers2: List[str]
-    extralinewidths1:List[float]
-    extralinewidths2:List[float]
-    extralinestyles1:List[str]
-    extralinestyles2:List[str]
-    extradrawstyles1:List[str]
-    extradrawstyles2:List[str]
+    extradevices: list[int]
+    extraname1: list[str]
+    extraname2: list[str]
+    extratimex: list[list[float]]
+    extratemp1: list[list[float]]
+    extratemp2: list[list[float]]
+    extramathexpression1: list[str]
+    extramathexpression2: list[str]
+    extradevicecolor1: list[str]
+    extradevicecolor2: list[str]
+    extraLCDvisibility1: list[bool]
+    extraLCDvisibility2: list[bool]
+    extraCurveVisibility1: list[bool]
+    extraCurveVisibility2: list[bool]
+    extraDelta1: list[bool]
+    extraDelta2: list[bool]
+    extraFill1: list[int]
+    extraFill2: list[int]
+    extramarkersizes1: list[float]
+    extramarkersizes2: list[float]
+    extramarkers1: list[str]
+    extramarkers2: list[str]
+    extralinewidths1: list[float]
+    extralinewidths2: list[float]
+    extralinestyles1: list[str]
+    extralinestyles2: list[str]
+    extradrawstyles1: list[str]
+    extradrawstyles2: list[str]
     externalprogram: str
     externaloutprogram: str
-    extraNoneTempHint1: List[bool]
-    extraNoneTempHint2: List[bool]
-    alarmsetlabel:str
-    alarmflag: List[int]
-    alarmguard: List[int]
-    alarmnegguard: List[int]
-    alarmtime: List[int]
-    alarmoffset: List[int]
-    alarmcond: List[int]
-    alarmsource: List[int]
-    alarmtemperature: List[float]
-    alarmaction: List[int]
-    alarmbeep: List[int]
-    alarmstrings: List[str]
+    extraNoneTempHint1: list[bool]
+    extraNoneTempHint2: list[bool]
+    alarmsetlabel: str
+    alarmflag: list[int]
+    alarmguard: list[int]
+    alarmnegguard: list[int]
+    alarmtime: list[int]
+    alarmoffset: list[int]
+    alarmcond: list[int]
+    alarmsource: list[int]
+    alarmtemperature: list[float]
+    alarmaction: list[int]
+    alarmbeep: list[int]
+    alarmstrings: list[str]
     backgroundpath: str
     backgroundUUID: str
     samplinginterval: float
     svLabel: str
-    svValues: List[float]
-    svRamps: List[int]
-    svSoaks: List[int]
-    svActions: List[int]
-    svBeeps: List[bool]
-    svDescriptions: List[str]
+    svValues: list[float]
+    svRamps: list[int]
+    svSoaks: list[int]
+    svActions: list[int]
+    svBeeps: list[bool]
+    svDescriptions: list[str]
     pidKp: float
     pidKi: float
     pidKd: float
     pidSource: int
     pOnE: bool
     svLookahead: int
-    devices: List[str]
+    devices: list[str]
     elevation: int
     computed: ComputedProfileInformation
-    anno_positions: List[List[float]]
-    flag_positions: List[List[float]]
-    legendloc_pos: List[float]
-    loadlabels: List[str]
-    loadratings: List[float]
-    ratingunits: List[int]
-    sourcetypes: List[int]
-    load_etypes: List[int]
-    presssure_percents: List[bool]
-    loadevent_zeropcts: List[int]
-    loadevent_hundpcts: List[int]
-    meterlabels: List[str]
-    meterunits: List[int]
-    metersources: List[int]
-    meterfuels: List[int]
-    co2kg_per_btu: List[float]
+    anno_positions: list[list[float]]
+    flag_positions: list[list[float]]
+    legendloc_pos: list[float]
+    loadlabels: list[str]
+    loadratings: list[float]
+    ratingunits: list[int]
+    sourcetypes: list[int]
+    load_etypes: list[int]
+    presssure_percents: list[bool]
+    loadevent_zeropcts: list[int]
+    loadevent_hundpcts: list[int]
+    meterlabels: list[str]
+    meterunits: list[int]
+    metersources: list[int]
+    meterfuels: list[int]
+    co2kg_per_btu: list[float]
     biogas_co2_reduction: float
     preheatDuration: int
-    preheatenergies:List[float]
+    preheatenergies: list[float]
     betweenbatchDuration: int
-    betweenbatchenergies: List[float]
+    betweenbatchenergies: list[float]
     coolingDuration: int
-    coolingenergies: List[float]
+    coolingenergies: list[float]
     betweenbatch_after_preheat: bool
     electricEnergyMix: int
     gasMix: int
-    meterreads: List[List[float]]
+    meterreads: list[list[float]]
     plus_sync_record_hash: str
     bbp_begin: str
     bbp_time_added_from_prev: float
     bbp_endroast_epoch_msec: int
-    bbp_endevents: List[List[Optional[float]]]
-    bbp_dropevents: List[List[Optional[float]]]
+    bbp_endevents: list[list[float|None]]
+    bbp_dropevents: list[list[float|None]]
     bbp_dropbt: float
     bbp_dropet: float
     bbp_drop_to_end: float
 
 class ExtraDeviceSettings(TypedDict):
-    extradevices           : List[int]
-    extradevicecolor1      : List[str]
-    extradevicecolor2      : List[str]
-    extraname1             : List[str]
-    extraname2             : List[str]
-    extramathexpression1   : List[str]
-    extramathexpression2   : List[str]
-    extraLCDvisibility1    : List[bool]
-    extraLCDvisibility2    : List[bool]
-    extraCurveVisibility1  : List[bool]
-    extraCurveVisibility2  : List[bool]
-    extraDelta1            : List[bool]
-    extraDelta2            : List[bool]
-    extraFill1             : List[int]
-    extraFill2             : List[int]
-    extralinestyles1       : List[str]
-    extralinestyles2       : List[str]
-    extradrawstyles1       : List[str]
-    extradrawstyles2       : List[str]
-    extralinewidths1       : List[float]
-    extralinewidths2       : List[float]
-    extramarkers1          : List[str]
-    extramarkers2          : List[str]
-    extramarkersizes1      : List[float]
-    extramarkersizes2      : List[float]
-    default_etypes_set     : List[int]
-    etypes                 : List[str]
+    extradevices           : list[int]
+    extradevicecolor1      : list[str]
+    extradevicecolor2      : list[str]
+    extraname1             : list[str]
+    extraname2             : list[str]
+    extramathexpression1   : list[str]
+    extramathexpression2   : list[str]
+    extraLCDvisibility1    : list[bool]
+    extraLCDvisibility2    : list[bool]
+    extraCurveVisibility1  : list[bool]
+    extraCurveVisibility2  : list[bool]
+    extraDelta1            : list[bool]
+    extraDelta2            : list[bool]
+    extraFill1             : list[int]
+    extraFill2             : list[int]
+    extralinestyles1       : list[str]
+    extralinestyles2       : list[str]
+    extradrawstyles1       : list[str]
+    extradrawstyles2       : list[str]
+    extralinewidths1       : list[float]
+    extralinewidths2       : list[float]
+    extramarkers1          : list[str]
+    extramarkers2          : list[str]
+    extramarkersizes1      : list[float]
+    extramarkersizes2      : list[float]
+    default_etypes_set     : list[int]
+    etypes                 : list[str]
 
-Palette = Tuple[
-    List[int],    # 0: event button types
-    List[float],  # 1: event button values (same length as event button types)
-    List[int],    # 2: event button actions (same length as event button actions)
-    List[int],    # 3: event button visibility (same length as event button actions)
-    List[str],    # 4: event button action strings (same length as event button actions)
-    List[str],    # 5: event button labels (same length as event button actions)
-    List[str],    # 6: event button descriptions (same length as event button actions)
-    List[str],    # 7: event button colors (same length as event button actions)
-    List[str],    # 8: event button text colors (same length as event button actions)
-    List[int],    # 9: slider visibilities; len=self.eventsliders
-    List[int],    # 10: slider actions; len=self.eventsliders
-    List[str],    # 11: slider commands; len=self.eventsliders
-    List[float],  # 12: slider offsets; len=self.eventsliders
-    List[float],  # 13: slider factors; len=self.eventsliders
-    List[int],    # 14: quantifier active; len=self.eventsliders
-    List[int],    # 15: quantifier sources; len=self.eventsliders
-    List[int],    # 16: quantifier min; len=self.eventsliders
-    List[int],    # 17: quantifier max; len=self.eventsliders
-    List[int],    # 18: quanfifier coarse; len=self.eventsliders
-    List[int],    # 19: slider min; len=self.eventsliders
-    List[int],    # 20: slider max; len=self.eventsliders
-    List[int],    # 21: slider coarse; len=self.eventsliders
-    List[int],    # 22: slider temp flags; len=self.eventsliders
-    List[str],    # 23: slider units; len=self.eventsliders
-    List[int],    # 24: slider bernoulli flags; len=self.eventsliders
+Palette = tuple[
+    list[int],    # 0: event button types
+    list[float],  # 1: event button values (same length as event button types)
+    list[int],    # 2: event button actions (same length as event button actions)
+    list[int],    # 3: event button visibility (same length as event button actions)
+    list[str],    # 4: event button action strings (same length as event button actions)
+    list[str],    # 5: event button labels (same length as event button actions)
+    list[str],    # 6: event button descriptions (same length as event button actions)
+    list[str],    # 7: event button colors (same length as event button actions)
+    list[str],    # 8: event button text colors (same length as event button actions)
+    list[int],    # 9: slider visibilities; len=self.eventsliders
+    list[int],    # 10: slider actions; len=self.eventsliders
+    list[str],    # 11: slider commands; len=self.eventsliders
+    list[float],  # 12: slider offsets; len=self.eventsliders
+    list[float],  # 13: slider factors; len=self.eventsliders
+    list[int],    # 14: quantifier active; len=self.eventsliders
+    list[int],    # 15: quantifier sources; len=self.eventsliders
+    list[int],    # 16: quantifier min; len=self.eventsliders
+    list[int],    # 17: quantifier max; len=self.eventsliders
+    list[int],    # 18: quanfifier coarse; len=self.eventsliders
+    list[int],    # 19: slider min; len=self.eventsliders
+    list[int],    # 20: slider max; len=self.eventsliders
+    list[int],    # 21: slider coarse; len=self.eventsliders
+    list[int],    # 22: slider temp flags; len=self.eventsliders
+    list[str],    # 23: slider units; len=self.eventsliders
+    list[int],    # 24: slider bernoulli flags; len=self.eventsliders
     str,          # 25: label
-    List[int],    # 26: quantifier action flags; len=self.eventsliders
-    List[int]    # 27: quantifier SV flags; len=self.eventsliders
+    list[int],    # 26: quantifier action flags; len=self.eventsliders
+    list[int]    # 27: quantifier SV flags; len=self.eventsliders
     ]
 
 class BTU(TypedDict):
@@ -417,15 +413,15 @@ class EnergyMetrics(TypedDict, total=False):
     KWH_roast_per_green_kg  : float
 
 class Wheel(TypedDict, total=False):
-    wheelnames: List[List[str]]
-    segmentlengths: List[List[float]]
-    segmentsalpha: List[List[float]]
-    wradii: List[float]
-    startangle: List[float]
-    projection: List[int]
-    wheeltextsize: List[int]
-    wheelcolor: List[List[str]]
-    wheelparent: List[List[int]]
+    wheelnames: list[list[str]]
+    segmentlengths: list[list[float]]
+    segmentsalpha: list[list[float]]
+    wradii: list[float]
+    startangle: list[float]
+    projection: list[int]
+    wheeltextsize: list[int]
+    wheelcolor: list[list[str]]
+    wheelparent: list[list[int]]
     wheeledge: float
     wheellinewidth: float
     wheellinecolor: str
@@ -438,9 +434,9 @@ class ProductionData(TypedDict, total=False):
     roastUUID: str
     plus_coffee: str
     title: str
-    roastdate: Optional[QDateTime]
+    roastdate: QDateTime|None
     beans: str
-    weight: Optional[Tuple[float,float,str]]
+    weight: tuple[float,float,str]|None
     defects_weight: float
     whole_color: float
     ground_color: float
@@ -510,18 +506,18 @@ class RecentRoast(TypedDict, total=False):
     wholeColor: float
     groundColor: float
     colorSystem: str
-    background: Optional[str]
-    roastUUID: Optional[str]
+    background: str|None
+    roastUUID: str|None
     batchnr: int
     batchprefix: str
-    plus_account: Optional[str]
-    plus_store: Optional[str]
-    plus_store_label:Optional[str]
-    plus_coffee:Optional[str]
-    plus_coffee_label:Optional[str]
-    plus_blend_label:Optional[str]
-    plus_blend_spec:Optional['Blend']
-    plus_blend_spec_labels: Optional[List[str]]
+    plus_account: str|None
+    plus_store: str|None
+    plus_store_label:str|None
+    plus_coffee:str|None
+    plus_coffee_label:str|None
+    plus_blend_label:str|None
+    plus_blend_spec:'Blend|None'
+    plus_blend_spec_labels: list[str]|None
 
 class SerialSettings(TypedDict):
     port: str
@@ -532,12 +528,12 @@ class SerialSettings(TypedDict):
     timeout: float
 
 class BTBreakParams(TypedDict):
-    delay: List[List[float]]
-    d_drop: List[List[float]]
-    d_charge: List[List[float]]
-    offset_charge: List[List[float]]
-    offset_drop: List[List[float]]
-    dpre_dpost_diff: List[List[float]]
+    delay: list[list[float]]
+    d_drop: list[list[float]]
+    d_charge: list[list[float]]
+    offset_charge: list[list[float]]
+    offset_drop: list[list[float]]
+    dpre_dpost_diff: list[list[float]]
     tight: int
     loose: int
     f: float
@@ -546,23 +542,23 @@ class BTBreakParams(TypedDict):
 
 class AlarmSet(TypedDict):
     label: str
-    flags: List[int]
-    guards: List[int]
-    negguards: List[int]
-    times: List[int]
-    offsets: List[int]
-    sources: List[int]
-    conditions: List[int]
-    temperatures: List[float]
-    actions: List[int]
-    beeps: List[int]
-    alarmstrings: List[str]
+    flags: list[int]
+    guards: list[int]
+    negguards: list[int]
+    times: list[int]
+    offsets: list[int]
+    sources: list[int]
+    conditions: list[int]
+    temperatures: list[float]
+    actions: list[int]
+    beeps: list[int]
+    alarmstrings: list[str]
 
 class BbpCache(TypedDict, total=False):
     mode: str
     drop_bt: float
     drop_et: float
     end_roastepoch_msec: int
-    end_events: List[List[Optional[float]]]
-    drop_events: List[List[Optional[float]]]
+    end_events: list[list[float|None]]
+    drop_events: list[list[float|None]]
     drop_to_end: float

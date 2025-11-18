@@ -21,7 +21,8 @@ import sys
 import tempfile
 import time
 from pathlib import Path
-from typing import Generator, Dict, Any, Optional
+from collections.abc import Generator
+from typing import Any
 from unittest.mock import Mock, patch
 
 import pytest
@@ -279,7 +280,7 @@ def mock_config() -> Generator[Mock, None, None]:
 
 
 @pytest.fixture
-def sample_coffee() -> Dict[str, Any]:
+def sample_coffee() -> dict[str, Any]:
     """Create a sample coffee data structure."""
     return {
         'hr_id': 'coffee123',
@@ -299,7 +300,7 @@ def sample_coffee() -> Dict[str, Any]:
 
 
 @pytest.fixture
-def sample_blend() -> Dict[str, Any]:
+def sample_blend() -> dict[str, Any]:
     """Create a sample blend data structure."""
     return {
         'hr_id': 'blend456',
@@ -313,7 +314,7 @@ def sample_blend() -> Dict[str, Any]:
 
 
 @pytest.fixture
-def sample_stock_data(sample_coffee:Dict[str, Any], sample_blend:Dict[str, Any]) -> Dict[str, Any]:
+def sample_stock_data(sample_coffee:dict[str, Any], sample_blend:dict[str, Any]) -> dict[str, Any]:
     """Create sample stock data."""
     return {
         'coffees': [sample_coffee],
@@ -362,7 +363,7 @@ class TestStockDataStructures:
         assert stock_item['location_label'] == 'Test Store'
         assert stock_item['amount'] == 5.5
 
-    def test_coffee_structure(self, sample_coffee:Dict[str,Any]) -> None:
+    def test_coffee_structure(self, sample_coffee:dict[str,Any]) -> None:
         """Test Coffee structure."""
         # Act & Assert - Should be valid Coffee
         assert sample_coffee['hr_id'] == 'coffee123'
@@ -382,7 +383,7 @@ class TestStockDataStructures:
         assert ingredient['ratio_num'] == 3
         assert ingredient['ratio_denom'] == 5
 
-    def test_blend_structure(self, sample_blend:Dict[str,Any]) -> None:
+    def test_blend_structure(self, sample_blend:dict[str,Any]) -> None:
         """Test Blend structure."""
         # Act & Assert - Should be valid Blend
         assert sample_blend['hr_id'] == 'blend456'
@@ -390,7 +391,7 @@ class TestStockDataStructures:
         assert len(sample_blend['ingredients']) == 2
         assert len(sample_blend['stock']) == 1
 
-    def test_stock_structure(self, sample_stock_data:Dict[str,Any]) -> None:
+    def test_stock_structure(self, sample_stock_data:dict[str,Any]) -> None:
         """Test Stock structure."""
         # Act & Assert - Should be valid Stock
         assert 'coffees' in sample_stock_data
@@ -405,7 +406,7 @@ class TestStockCacheOperations:
     """Test stock cache file operations."""
 
     def test_save_stock_to_cache(
-        self, mock_stock_semaphore:Mock, sample_stock_data:Dict[str,Any], temp_stock_cache:str
+        self, mock_stock_semaphore:Mock, sample_stock_data:dict[str,Any], temp_stock_cache:str
     ) -> None:
         """Test saving stock data to cache file."""
         # Arrange
@@ -444,7 +445,7 @@ class TestStockCacheOperations:
             # File should not be created or should be empty
             assert not Path(temp_stock_cache).exists() or Path(temp_stock_cache).stat().st_size == 0
 
-    def test_load_stock_from_cache(self, sample_stock_data:Dict[str,Any], temp_stock_cache:str) -> None:
+    def test_load_stock_from_cache(self, sample_stock_data:dict[str,Any], temp_stock_cache:str) -> None:
         """Test loading stock data from cache file."""
         # Arrange
         with open(temp_stock_cache, 'w', encoding='utf-8') as f:
@@ -503,7 +504,7 @@ class TestStockCacheOperations:
 class TestStockManagement:
     """Test stock management operations."""
 
-    def test_set_stock_updates_global_stock(self, mock_stock_semaphore:Mock, sample_stock_data:Optional[stock.Stock]) -> None:
+    def test_set_stock_updates_global_stock(self, mock_stock_semaphore:Mock, sample_stock_data:stock.Stock|None) -> None:
         """Test setStock updates global stock variable."""
         # Arrange
         with patch('plus.stock.clearStockCaches') as mock_clear_caches, patch(
@@ -673,7 +674,7 @@ class TestWorkerUpdateBlocking:
             # Assert - Should call load when stock is None
             mock_load.assert_called_once()
 
-    def test_update_blocking_cache_expired(self, sample_stock_data:Dict[str,Any]) -> None:
+    def test_update_blocking_cache_expired(self, sample_stock_data:dict[str,Any]) -> None:
         """Test update_blocking when cache is expired."""
         # Arrange
         worker = stock.Worker()
@@ -696,7 +697,7 @@ class TestWorkerUpdateBlocking:
             mock_semaphore.acquire.assert_called_once_with(1)
             mock_semaphore.release.assert_called_once_with(1)
 
-    def test_update_blocking_cache_valid(self, sample_stock_data:Dict[str,Any]) -> None:
+    def test_update_blocking_cache_valid(self, sample_stock_data:dict[str,Any]) -> None:
         """Test update_blocking executes without errors when cache is valid."""
         # Arrange
         worker = stock.Worker()
@@ -720,7 +721,7 @@ class TestWorkerUpdateBlocking:
             except Exception as e:
                 pytest.fail(f"update_blocking raised an exception: {e}")
 
-    def test_update_blocking_schedule_mode(self, sample_stock_data:Dict[str,Any]) -> None:
+    def test_update_blocking_schedule_mode(self, sample_stock_data:dict[str,Any]) -> None:
         """Test update_blocking in schedule mode."""
         # Arrange
         worker = stock.Worker()
@@ -827,7 +828,7 @@ class TestWorkerUpdateBlocking:
 class TestCoffeeOperations:
     """Test coffee-related operations."""
 
-    def test_get_coffee_labels(self, mock_stock_semaphore:Mock, sample_stock_data:Dict[str,Any]) -> None:
+    def test_get_coffee_labels(self, mock_stock_semaphore:Mock, sample_stock_data:dict[str,Any]) -> None:
         """Test getCoffeeLabels function."""
         # Arrange
         with patch('plus.stock.stock', sample_stock_data), patch(
@@ -859,7 +860,7 @@ class TestCoffeeOperations:
             mock_stock_semaphore.acquire.assert_called_once_with(1)
             mock_stock_semaphore.release.assert_called_once_with(1)
 
-    def test_get_coffee_by_hr_id(self, sample_stock_data:Dict[str,Any]) -> None:
+    def test_get_coffee_by_hr_id(self, sample_stock_data:dict[str,Any]) -> None:
         """Test getCoffee function."""
         # Arrange
         with patch('plus.stock.stock', sample_stock_data):
@@ -874,7 +875,7 @@ class TestCoffeeOperations:
             assert 'label' in result
             assert result['label'] == 'Test Coffee'
 
-    def test_get_coffee_not_found(self, sample_stock_data:Dict[str,Any]) -> None:
+    def test_get_coffee_not_found(self, sample_stock_data:dict[str,Any]) -> None:
         """Test getCoffee with non-existent hr_id."""
         # Arrange
         with patch('plus.stock.stock', sample_stock_data):
@@ -901,7 +902,7 @@ class TestCoffeeOperations:
         # Assert
         assert result == ''
 
-    def test_get_coffees_with_stock(self, mock_stock_semaphore:Mock, sample_stock_data:Dict[str,Any]) -> None:
+    def test_get_coffees_with_stock(self, mock_stock_semaphore:Mock, sample_stock_data:dict[str,Any]) -> None:
         """Test getCoffees function."""
         # Arrange
         with patch('plus.stock.stock', sample_stock_data), patch(
@@ -916,7 +917,7 @@ class TestCoffeeOperations:
             mock_stock_semaphore.release.assert_called_once_with(1)
             assert len(result) > 0
 
-    def test_get_coffees_filtered_by_store(self, mock_stock_semaphore:Mock, sample_stock_data:Dict[str,Any]) -> None:
+    def test_get_coffees_filtered_by_store(self, mock_stock_semaphore:Mock, sample_stock_data:dict[str,Any]) -> None:
         """Test getCoffees filtered by specific store."""
         del mock_stock_semaphore
         # Arrange
@@ -931,7 +932,7 @@ class TestCoffeeOperations:
             assert len(result) > 0
             # Should only include items from store1
 
-    def test_get_coffee_store(self, mock_stock_semaphore:Mock, sample_stock_data:Dict[str,Any]) -> None:
+    def test_get_coffee_store(self, mock_stock_semaphore:Mock, sample_stock_data:dict[str,Any]) -> None:
         """Test getCoffeeStore function."""
         # Arrange
         with patch('plus.stock.stock', sample_stock_data):
@@ -949,7 +950,7 @@ class TestCoffeeOperations:
             assert 'location_hr_id' in stock_item
             assert stock_item['location_hr_id'] == 'store1'
 
-    def test_get_coffee_store_not_found(self, mock_stock_semaphore:Mock, sample_stock_data:Dict[str,Any]) -> None:
+    def test_get_coffee_store_not_found(self, mock_stock_semaphore:Mock, sample_stock_data:dict[str,Any]) -> None:
         """Test getCoffeeStore with non-existent coffee or store."""
         del mock_stock_semaphore
         # Arrange
@@ -966,7 +967,7 @@ class TestCoffeeOperations:
 class TestStoreOperations:
     """Test store-related operations."""
 
-    def test_get_stores(self, mock_stock_semaphore:Mock, sample_stock_data:Dict[str,Any]) -> None:
+    def test_get_stores(self, mock_stock_semaphore:Mock, sample_stock_data:dict[str,Any]) -> None:
         """Test getStores function."""
         # Arrange
         with patch('plus.stock.stock', sample_stock_data), patch(
@@ -999,7 +1000,7 @@ class TestStoreOperations:
             mock_stock_semaphore.acquire.assert_called_once_with(1)
             mock_stock_semaphore.release.assert_called_once_with(1)
 
-    def test_get_stores_no_acquire_lock(self, sample_stock_data:Dict[str,Any]) -> None:
+    def test_get_stores_no_acquire_lock(self, sample_stock_data:dict[str,Any]) -> None:
         """Test getStores without acquiring lock."""
         # Arrange
         with patch('plus.stock.stock', sample_stock_data), patch(
@@ -1027,7 +1028,7 @@ class TestStoreOperations:
 class TestBlendOperations:
     """Test blend-related operations."""
 
-    def test_get_blends(self, mock_stock_semaphore:Mock, sample_stock_data:Dict[str,Any]) -> None:
+    def test_get_blends(self, mock_stock_semaphore:Mock, sample_stock_data:dict[str,Any]) -> None:
         """Test getBlends function."""
         # Arrange
         with patch('plus.stock.stock', sample_stock_data), patch(
@@ -1042,7 +1043,7 @@ class TestBlendOperations:
             mock_stock_semaphore.release.assert_called_once_with(1)
             assert len(result) >= 0  # May be empty if no blends match criteria
 
-    def test_get_blends_filtered_by_store(self, mock_stock_semaphore:Mock, sample_stock_data:Dict[str,Any]) -> None:
+    def test_get_blends_filtered_by_store(self, mock_stock_semaphore:Mock, sample_stock_data:dict[str,Any]) -> None:
         """Test getBlends filtered by specific store."""
         del mock_stock_semaphore
         # Arrange
@@ -1068,7 +1069,7 @@ class TestBlendOperations:
             # Assert
             assert result == []
 
-    def test_get_blend_by_hr_id(self, sample_stock_data:Dict[str,Any], mock_stock_semaphore:Mock) -> None:
+    def test_get_blend_by_hr_id(self, sample_stock_data:dict[str,Any], mock_stock_semaphore:Mock) -> None:
         """Test finding blend by hr_id through getBlends function."""
         # Arrange
         with patch('plus.stock.stock', sample_stock_data), patch(
@@ -1084,7 +1085,7 @@ class TestBlendOperations:
             mock_stock_semaphore.acquire.assert_called_once_with(1)
             mock_stock_semaphore.release.assert_called_once_with(1)
 
-    def test_get_blend_not_found(self, sample_stock_data:Dict[str,Any], mock_stock_semaphore:Mock) -> None:
+    def test_get_blend_not_found(self, sample_stock_data:dict[str,Any], mock_stock_semaphore:Mock) -> None:
         """Test getBlends with empty stock returns empty list."""
         del sample_stock_data
         # Arrange
@@ -1153,7 +1154,7 @@ class TestBlendOperations:
 class TestStockFiltering:
     """Test stock filtering and epsilon operations."""
 
-    def test_stock_epsilon_filtering(self, sample_stock_data:Dict[str,Any], mock_stock_semaphore:Mock) -> None:
+    def test_stock_epsilon_filtering(self, sample_stock_data:dict[str,Any], mock_stock_semaphore:Mock) -> None:
         """Test that stock items below epsilon are filtered out."""
         # Arrange
         small_stock_data = sample_stock_data.copy()
@@ -1172,7 +1173,7 @@ class TestStockFiltering:
             mock_stock_semaphore.acquire.assert_called_once_with(1)
             mock_stock_semaphore.release.assert_called_once_with(1)
 
-    def test_stock_above_epsilon_included(self, sample_stock_data:Dict[str,Any], mock_stock_semaphore:Mock) -> None:
+    def test_stock_above_epsilon_included(self, sample_stock_data:dict[str,Any], mock_stock_semaphore:Mock) -> None:
         """Test that stock items above epsilon are included."""
         # Arrange
         with patch('plus.stock.stock', sample_stock_data), patch(
@@ -1249,7 +1250,7 @@ class TestCoffeeLabelGeneration:
             # Assert
             assert '2023' in result  # Should include picked year
 
-    def test_update_duplicate_coffee_origin_labels(self, sample_stock_data:Dict[str,Any]) -> None:
+    def test_update_duplicate_coffee_origin_labels(self, sample_stock_data:dict[str,Any]) -> None:
         """Test update_duplicate_coffee_origin_labels function."""
         # Arrange
         # Add another coffee with same origin+label but different picked year

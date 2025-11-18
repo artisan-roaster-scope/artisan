@@ -9,13 +9,11 @@ import base64
 import csv
 import re
 import logging
-from typing import Final, Optional, List, Dict, Callable, Any, Generator
+from collections.abc import Callable, Generator
+from typing import Final, Any
 
 
-try:
-    from PyQt6.QtCore import QDateTime, Qt, QMutex, QWaitCondition, QUrl # @UnusedImport @Reimport  @UnresolvedImport
-except ImportError:
-    from PyQt5.QtCore import QDateTime, Qt, QMutex, QWaitCondition, QUrl  # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+from PyQt6.QtCore import QDateTime, Qt, QMutex, QWaitCondition, QUrl
 
 from artisanlib.util import encodeLocal, encodeLocalStrict
 from artisanlib.atypes import ProfileData
@@ -36,9 +34,9 @@ def url_to_profile(url:str) -> IkawaCmd_pb2.RoastProfile: # pylint: disable=no-m
     return IkawaCmd_pb2.RoastProfile().FromString(message_bytes) # pylint: disable=no-member
 
 def extractProfileIkawaURL(url:QUrl,
-        etypesdefault:List[str],
-        _alt_etypesdefault:List[str],
-        _artisanflavordefaultlabels:List[str],
+        etypesdefault:list[str],
+        _alt_etypesdefault:list[str],
+        _artisanflavordefaultlabels:list[str],
         eventsExternal2InternalValue:Callable[[int],float]) -> ProfileData:
     ikawa_profile = url_to_profile(url.query())
     res:ProfileData = ProfileData() # the interpreted data set
@@ -47,23 +45,23 @@ def extractProfileIkawaURL(url:QUrl,
     res['roastertype'] = 'IKAWA Sample Roaster'
     res['roasterheating'] = 3 # electric
 
-    specialevents:List[int] = []
-    specialeventstype:List[int] = []
-    specialeventsvalue:List[float] = []
-    specialeventsStrings:List[str] = []
+    specialevents:list[int] = []
+    specialeventstype:list[int] = []
+    specialeventsvalue:list[float] = []
+    specialeventsStrings:list[str] = []
 
-    timex:List[float] = []
-    temp1:List[float] = []
-    temp2:List[float] = []
-    extra1:List[float] = []
-    extra2:List[float] = []
-    extra3:List[float] = []
-    extra4:List[float] = []
-    extra5:List[float] = []
-    extra6:List[float] = []
-    timeindex:List[int] = [-1,0,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actual index used
+    timex:list[float] = []
+    temp1:list[float] = []
+    temp2:list[float] = []
+    extra1:list[float] = []
+    extra2:list[float] = []
+    extra3:list[float] = []
+    extra4:list[float] = []
+    extra5:list[float] = []
+    extra6:list[float] = []
+    timeindex:list[int] = [-1,0,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actual index used
 
-    fan_points:List[Any] = list(ikawa_profile.fan_points)
+    fan_points:list[Any] = list(ikawa_profile.fan_points)
     for idx, p in enumerate(ikawa_profile.temp_points):
         if idx != 0:
             # add additional fan_point before this temp point
@@ -153,9 +151,9 @@ def extractProfileIkawaURL(url:QUrl,
 
 # returns a dict containing all profile information contained in the given IKAWA CSV file
 def extractProfileIkawaCSV(file:str,
-        etypesdefault:List[str],
-        _alt_etypesdefault:List[str],
-        _artisanflavordefaultlabels:List[str],
+        etypesdefault:list[str],
+        _alt_etypesdefault:list[str],
+        _artisanflavordefaultlabels:list[str],
         eventsExternal2InternalValue:Callable[[int],float]) -> ProfileData:
     res:ProfileData = ProfileData() # the interpreted data set
 
@@ -168,13 +166,13 @@ def extractProfileIkawaCSV(file:str,
         if p.match(filename):
             s = filename[6:-4] # the extracted date time string
             date = QDateTime.fromString(s,'yyyy-MM-dd HHmmss')
-            roastdate:Optional[str] = encodeLocal(date.date().toString())
+            roastdate:str|None = encodeLocal(date.date().toString())
             if roastdate is not None:
                 res['roastdate'] = roastdate
-            roastisodate:Optional[str] = encodeLocal(date.date().toString(Qt.DateFormat.ISODate))
+            roastisodate:str|None = encodeLocal(date.date().toString(Qt.DateFormat.ISODate))
             if roastisodate is not None:
                 res['roastisodate'] = roastisodate
-            roasttime:Optional[str] = encodeLocal(date.time().toString())
+            roasttime:str|None = encodeLocal(date.time().toString())
             if roasttime is not None:
                 res['roasttime'] = roasttime
             res['roastepoch'] = int(date.toSecsSinceEpoch())
@@ -187,31 +185,31 @@ def extractProfileIkawaCSV(file:str,
         #read file header
         header = [h.strip() for h in next(data)]
 
-        fan:Optional[float] = None # holds last processed fan event value
-        fan_last:Optional[float] = None # holds the fan event value before the last one
-        heater:Optional[float] = None # holds last processed heater event value
-        heater_last:Optional[float] = None # holds the heater event value before the last one
-        specialevents:List[int] = []
-        specialeventstype:List[int] = []
-        specialeventsvalue:List[float] = []
-        specialeventsStrings:List[str] = []
-        timex:List[float] = []
-        temp1:List[float] = []
-        temp2:List[float] = []
-        extra1:List[float] = []
-        extra2:List[float] = []
-        extra3:List[float] = []
-        extra4:List[float] = []
-        extra5:List[float] = []
-        extra6:List[float] = []
-        timeindex:List[int] = [-1,0,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actual index used
+        fan:float|None = None # holds last processed fan event value
+        fan_last:float|None = None # holds the fan event value before the last one
+        heater:float|None = None # holds last processed heater event value
+        heater_last:float|None = None # holds the heater event value before the last one
+        specialevents:list[int] = []
+        specialeventstype:list[int] = []
+        specialeventsvalue:list[float] = []
+        specialeventsStrings:list[str] = []
+        timex:list[float] = []
+        temp1:list[float] = []
+        temp2:list[float] = []
+        extra1:list[float] = []
+        extra2:list[float] = []
+        extra3:list[float] = []
+        extra4:list[float] = []
+        extra5:list[float] = []
+        extra6:list[float] = []
+        timeindex:list[int] = [-1,0,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actual index used
         i:int = 0
-        v:Optional[float]
-        last_item:Optional[Dict[str,str]] = None
+        v:float|None
+        last_item:dict[str,str]|None = None
         for row in data:
             i = i + 1
-            items = list(zip(header, row))
-            item:Dict[str,str] = {}
+            items = list(zip(header, row, strict=False)) # ty:ignore
+            item:dict[str,str] = {}
             for (name, value) in items:
                 item[name] = value.strip()
             last_item = item
@@ -381,8 +379,8 @@ try: # BLE not available on some platforms
         IKAWA_WRITE_UUID:    Final[str] = '851A4582-19C1-4E6C-AB37-E7A03766BA16'
 
         def __init__(self,
-                    connected_handler:Optional[Callable[[], None]] = None,
-                    disconnected_handler:Optional[Callable[[], None]] = None) -> None:
+                    connected_handler:Callable[[], None]|None = None,
+                    disconnected_handler:Callable[[], None]|None = None) -> None:
             super().__init__()
 
             # register IKAWA UUIDs
@@ -391,8 +389,8 @@ try: # BLE not available on some platforms
             self.add_write(self.IKAWA_SERVICE_UUID, self.IKAWA_WRITE_UUID)
 
             # handlers
-            self.connected_handler:Optional[Callable[[], None]] = connected_handler
-            self.disconnected_handler:Optional[Callable[[], None]] = disconnected_handler
+            self.connected_handler:Callable[[], None]|None = connected_handler
+            self.disconnected_handler:Callable[[], None]|None = disconnected_handler
 
             self.receiveMutex:QMutex = QMutex()
             self.dataReceived:QWaitCondition = QWaitCondition()
@@ -427,7 +425,7 @@ try: # BLE not available on some platforms
             # 10: detecting
             # 11: development
 
-            self.seq:Generator[int, None, None] = self.seqNum() # message sequence number generator
+            self.seq:Generator[int] = self.seqNum() # message sequence number generator
             self.frame_char:Final[int]          = 126 # b'\x7e'
             self.escape_char:Final[int]         = 125 # b'\x7d'
             self.escape_offset:Final[int]       = 32
@@ -435,10 +433,10 @@ try: # BLE not available on some platforms
             self.escape_char_escaped:Final[int] = self.escape_char - self.escape_offset # 93 = b'\x5d'
 
             # either empty, or contains a partial payload incl. the beginning frame_char or contains the full payload incl. the beginning and ending frame_char
-            self.rcv_buffer:Optional[bytes] = None
+            self.rcv_buffer:bytes|None = None
 
         @staticmethod
-        def seqNum() -> Generator[int, None, None]:
+        def seqNum() -> Generator[int]:
             num = 1
             while True:
                 yield num

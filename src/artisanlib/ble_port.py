@@ -20,14 +20,12 @@ import logging
 from bleak import BleakScanner, BleakClient
 from bleak.exc import BleakCharacteristicNotFoundError
 
-try:
-    from PyQt6.QtCore import QObject # @UnusedImport @Reimport  @UnresolvedImport
-except ImportError:
-    from PyQt5.QtCore import QObject # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+from PyQt6.QtCore import QObject
 
 from artisanlib.async_comm import AsyncLoopThread
 
-from typing import Final, Optional, Callable, Union, Dict, List, Set, Tuple, Awaitable, TYPE_CHECKING
+from collections.abc import Callable, Awaitable
+from typing import Final, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from bleak.backends.device import BLEDevice # pylint: disable=unused-import
@@ -44,7 +42,7 @@ class BLE:
 
     _scan_and_connect_lock:asyncio.Lock = asyncio.Lock()
     _terminate_scan_event = asyncio.Event()
-    _asyncLoopThread:Optional[AsyncLoopThread] = None
+    _asyncLoopThread:AsyncLoopThread|None = None
 
     def __del__(self) -> None:
         self.close()
@@ -61,18 +59,18 @@ class BLE:
     # returns True if the given device name matches with the devices name or the local_name of the advertisement
     # returns True also in case the local_name is None, but the given service_uuid is within ad.service_uuids
     @staticmethod
-    def name_match(bd:'BLEDevice', ad:'AdvertisementData', device_name:str, case_sensitive:bool, service_uuid:Optional[str]) -> bool:
-        return ((bd.name is not None and (bd.name.startswith(device_name) if                              # ty: ignore[possibly-unbound-attribute]
-                    case_sensitive else bd.name.casefold().startswith(device_name.casefold()))) or        # ty: ignore[possibly-unbound-attribute]
-                (ad.local_name is not None and (ad.local_name.startswith(device_name) if                  # ty: ignore[possibly-unbound-attribute]
-                    case_sensitive else ad.local_name.casefold().startswith(device_name.casefold()))) or  # ty: ignore[possibly-unbound-attribute]
+    def name_match(bd:'BLEDevice', ad:'AdvertisementData', device_name:str, case_sensitive:bool, service_uuid:str|None) -> bool:
+        return ((bd.name is not None and (bd.name.startswith(device_name) if
+                    case_sensitive else bd.name.casefold().startswith(device_name.casefold()))) or
+                (ad.local_name is not None and (ad.local_name.startswith(device_name) if
+                    case_sensitive else ad.local_name.casefold().startswith(device_name.casefold()))) or
                 (ad.local_name is None and service_uuid is not None and
                     service_uuid.casefold() in (uuid.casefold() for uuid in ad.service_uuids)))
 
     # matches the discovered BLEDevice and AdvertisementData
     # returns True on success and False otherwise, as well as the service_uuid str of the matching device_description
     def description_match(self, bd:'BLEDevice', ad:'AdvertisementData',
-            device_descriptions:Dict[Optional[str],Optional[Set[str]]], case_sensitive:bool) -> Tuple[bool, Optional[str]]:
+            device_descriptions:dict[str|None,set[str]|None], case_sensitive:bool) -> tuple[bool, str|None]:
         for service_uuid, device_names in device_descriptions.items():
             if device_names is None or any(self.name_match(bd,ad,device_name,case_sensitive, service_uuid) for device_name in device_names):
                 return True, service_uuid
@@ -81,13 +79,13 @@ class BLE:
 
     # returns discovered_bd and service_uuid on success, or None
     async def _scan(self,
-            device_descriptions:Dict[Optional[str],Optional[Set[str]]],
-            blacklist:Set[str],
+            device_descriptions:dict[str|None,set[str]|None],
+            blacklist:set[str],
             case_sensitive:bool,
             scan_timeout:float,
-            address:Optional[str]) -> 'Tuple[Optional[BLEDevice], Optional[str]]':
+            address:str|None) -> 'tuple[BLEDevice|None, str|None]':
         try:
-            async with asyncio.timeout(scan_timeout): # type:ignore[attr-defined]
+            async with asyncio.timeout(scan_timeout):
                 async with BleakScanner() as scanner: # pyrefly: ignore[bad-context-manager] # ty: ignore[invalid-context-manager]
                     self._terminate_scan_event.clear()
                     async for bd, ad in scanner.advertisement_data():
@@ -96,32 +94,32 @@ class BLE:
 #                        _log.debug("device %s, (%s): %s", bd.name, ad.local_name, ad.service_uuids)
                         if bd.address not in blacklist and (address is None or bd.address == address):
                             res:bool
-                            res_service_uuid:Optional[str]
+                            res_service_uuid:str|None
                             res, res_service_uuid = self.description_match(bd,ad,device_descriptions,case_sensitive)
                             if res:
                                 _log.debug('BLE device match')
                                 # we return the first discovered device that matches the given device descriptions
                                 return bd, res_service_uuid
-        except asyncio.TimeoutError:
+        except TimeoutError:
             _log.debug('timeout on BLE scanning')
         return None, None
 
     # pylint: disable=too-many-positional-arguments
     # on success returns tuple of BleakClient, service UUID as str and device name
     async def _scan_and_connect(self,
-                device_descriptions:Dict[Optional[str],Optional[Set[str]]],
-                blacklist:Set[str], # client addresses to ignore
+                device_descriptions:dict[str|None,set[str]|None],
+                blacklist:set[str], # client addresses to ignore
                 case_sensitive:bool,
-                disconnected_callback:Optional[Callable[[BleakClient], None]],
+                disconnected_callback:Callable[[BleakClient], None]|None,
                 scan_timeout:float, connect_timeout:float,
-                address:Optional[str] = None # if given, connect only to the device with this ble address
-                ) -> Tuple[Optional[BleakClient], Optional[str], Optional[str]]:
+                address:str|None = None # if given, connect only to the device with this ble address
+                ) -> tuple[BleakClient|None, str|None, str|None]:
         async with self._scan_and_connect_lock:
             # the lock ensures that only one scan/connect operation is running at any time
             # as trying to establish a connection to two devices at the same time
             # can cause errors
-            discovered_bd:Optional[BLEDevice] = None
-            service_uuid:Optional[str] = None
+            discovered_bd:BLEDevice|None = None
+            service_uuid:str|None = None
             discovered_bd, service_uuid = await self._scan(device_descriptions, blacklist, case_sensitive, scan_timeout, address)
             if discovered_bd is None:
                 return None, None, None
@@ -131,9 +129,9 @@ class BLE:
                         service=([service_uuid] if service_uuid is not None else None),
                         timeout=connect_timeout)
             try:
-                async with asyncio.timeout(connect_timeout): # type:ignore[attr-defined]
+                async with asyncio.timeout(connect_timeout):
                     await client.connect()
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 _log.debug('timeout on connect')
                 return None, None, None
             _log.debug('BLE client is_connected')
@@ -154,7 +152,7 @@ class BLE:
             try:
                 # Add a 5 second timeout to avoid a complete crash in the event of hardware failure.
                 fut.result(timeout=5.0)
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 _log.error('BLE timeout')
                 fut.cancel()
                 raise
@@ -163,7 +161,7 @@ class BLE:
                 raise
 
 
-    def read(self, client:BleakClient, read_uuid:str) -> Optional[bytes]:
+    def read(self, client:BleakClient, read_uuid:str) -> bytes|None:
         if hasattr(self, '_asyncLoopThread') and self._asyncLoopThread is not None and client.is_connected:
             fut = asyncio.run_coroutine_threadsafe(
                     client.read_gatt_char(read_uuid),
@@ -176,14 +174,14 @@ class BLE:
         return None
 
     def scan_and_connect(self,
-            device_descriptions: Dict[Optional[str],Optional[Set[str]]],
-            blacklist:Set[str], # list of client addresses to ignore as they don't offer the required service
+            device_descriptions: dict[str|None, set[str]|None],
+            blacklist:set[str], # list of client addresses to ignore as they don't offer the required service
             case_sensitive:bool=True,
-            disconnected_callback:Optional[Callable[[BleakClient], None]] = None,
+            disconnected_callback:Callable[[BleakClient], None]|None = None,
             scan_timeout:float=6,
             connect_timeout:float=6,
-            address:Optional[str] = None # if given, connect only to the device with this ble address
-            ) -> Tuple[Optional[BleakClient], Optional[str], Optional[str]]:
+            address:str|None = None # if given, connect only to the device with this ble address
+            ) -> tuple[BleakClient|None, str|None, str|None]:
         if hasattr(self, '_asyncLoopThread') and self._asyncLoopThread is None:
             self._asyncLoopThread = AsyncLoopThread()
         assert self._asyncLoopThread is not None
@@ -210,7 +208,7 @@ class BLE:
             asyncio.run_coroutine_threadsafe(client.disconnect(), self._asyncLoopThread.loop)
         return False
 
-    def start_notify(self, client:BleakClient, uuid:str, callback: 'Callable[[BleakGATTCharacteristic, bytearray], Union[None, Awaitable[None]]]') -> None:
+    def start_notify(self, client:BleakClient, uuid:str, callback: 'Callable[[BleakGATTCharacteristic, bytearray], Awaitable[None]|None]') -> None:
         if hasattr(self, '_asyncLoopThread') and self._asyncLoopThread is not None and client.is_connected:
             fut = asyncio.run_coroutine_threadsafe(
                     client.start_notify(uuid, callback),
@@ -256,19 +254,19 @@ class ClientBLE(QObject): # pyrefly:ignore[invalid-inheritance] # pyright:ignore
         super().__init__()
         # internals
         self._running:bool                                   = False           # if True we keep reconnecting
-        self._async_loop_thread: Optional[AsyncLoopThread]   = None            # the asyncio AsyncLoopThread object
-        self._ble_client:Optional[BleakClient]               = None
-        self._connected_service_uuid:Optional[str]           = None            # set to the service UUID we are connected to
-        self._connected_device_name:Optional[str]            = None            # set to the device name we are connected to
+        self._async_loop_thread: AsyncLoopThread|None        = None            # the asyncio AsyncLoopThread object
+        self._ble_client:BleakClient|None                    = None
+        self._connected_service_uuid:str|None                = None            # set to the service UUID we are connected to
+        self._connected_device_name:str|None                 = None            # set to the device name we are connected to
         self._disconnected_event:asyncio.Event               = asyncio.Event() # event set on disconnect
-        self._active_notification_uuids:Set[str]             = set() # uuids of characteristics were notification are active
+        self._active_notification_uuids:set[str]             = set() # uuids of characteristics were notification are active
         self._sleep_between_scans:float                      = self.SCAN_BETWEEN_SCANS_START
 
         # configuration
-        self._device_descriptions:Dict[Optional[str],Optional[Set[str]]] = {}
-        self._notifications:Dict[str, Callable[[BleakGATTCharacteristic, bytearray], None]] = {}
-        self._writers:Dict[str, List[str]] = {} # associates a service UUID with a list of write characteristics
-        self._readers:Dict[str, List[str]] = {} # associates a service UUID with a list of read characteristics
+        self._device_descriptions:dict[str|None, set[str]|None] = {}
+        self._notifications:dict[str, Callable[[BleakGATTCharacteristic, bytearray], None]] = {}
+        self._writers:dict[str, list[str]] = {} # associates a service UUID with a list of write characteristics
+        self._readers:dict[str, list[str]] = {} # associates a service UUID with a list of read characteristics
         self._heartbeat_frequency : float = 0 # heartbeat frequency in seconds; heartbeat ends if not >0
         self._logging = False  # if True device communication is logged
 
@@ -303,19 +301,19 @@ class ClientBLE(QObject): # pyrefly:ignore[invalid-inheritance] # pyright:ignore
             ble.disconnect_ble(self._ble_client)
 
     # returns the service UUID connected to or None
-    def connected(self) -> Tuple[Optional[str], Optional[str]]:
+    def connected(self) -> tuple[str|None, str|None]:
         if self._ble_client is not None and self._ble_client.is_connected:
             return self._connected_service_uuid, self._connected_device_name
         return None, None
 
 
     # connect and re-connect while self._running to BLE
-    async def _connect(self, case_sensitive:bool=True, scan_timeout:float=6, connect_timeout:float=6, address:Optional[str] = None) -> None:
-        blacklist:Set[str] = set()
+    async def _connect(self, case_sensitive:bool=True, scan_timeout:float=6, connect_timeout:float=6, address:str|None = None) -> None:
+        blacklist:set[str] = set()
         while self._running:
             # scan and connect
             # NOTE: re-connecting a bleak client by address on reconnect can lead to instabilities thus we re-scan always
-            service_uuid:Optional[str]
+            service_uuid:str|None
             self._connected_service_uuid = None
             self._connected_device_name = None
             self._ble_client, service_uuid, device_name = ble.scan_and_connect(
@@ -372,12 +370,12 @@ class ClientBLE(QObject): # pyrefly:ignore[invalid-inheritance] # pyright:ignore
         if hasattr(self, '_async_loop_thread') and self._async_loop_thread is not None:
             asyncio.run_coroutine_threadsafe(self.set_event(), self._async_loop_thread.loop)
 
-    def send(self, message:bytes, response:bool = False, write_characteristic:Optional[str] = None) -> None:
+    def send(self, message:bytes, response:bool = False, write_characteristic:str|None = None) -> None:
         if self._ble_client is not None and self._connected_service_uuid is not None and self._connected_service_uuid in self._writers:
             if self._logging:
                 _log.debug('send to %s: %s', self._writers[self._connected_service_uuid], message)
             write_chars = self._writers[self._connected_service_uuid]
-            wc:Optional[str] = None
+            wc:str|None = None
             if write_characteristic is None:
                 # if there is no explicit write_characteristic specified thus we write to the only registered as writer
                 if len(write_chars) == 1:
@@ -392,12 +390,12 @@ class ClientBLE(QObject): # pyrefly:ignore[invalid-inheritance] # pyright:ignore
             else:
                 ble.write(self._ble_client, wc, message, response)
 
-    def read(self, read_characteristic:Optional[str] = None) -> Optional[bytes]:
+    def read(self, read_characteristic:str|None = None) -> bytes|None:
         if self._ble_client is not None and self._connected_service_uuid is not None and self._connected_service_uuid in self._readers:
             if self._logging:
                 _log.debug('receive from %s', self._readers[self._connected_service_uuid])
             read_chars = self._readers[self._connected_service_uuid]
-            rc:Optional[str] = None
+            rc:str|None = None
             if read_characteristic is None:
                 # if there is no explicit read_characteristic specified thus we read from the only registered as reader
                 if len(read_chars) == 1:
@@ -418,13 +416,13 @@ class ClientBLE(QObject): # pyrefly:ignore[invalid-inheritance] # pyright:ignore
             await asyncio.sleep(self._heartbeat_frequency)
             self.heartbeat()
 
-    async def _connect_and_keep_alive(self,case_sensitive:bool,scan_timeout:float, connect_timeout:float, address:Optional[str] = None) -> None:
+    async def _connect_and_keep_alive(self,case_sensitive:bool,scan_timeout:float, connect_timeout:float, address:str|None = None) -> None:
         await asyncio.gather(
             self._connect(case_sensitive,scan_timeout,connect_timeout, address),
             self._keep_alive())
 
 
-    def scan(self, scan_timeout:float = 3.0) -> 'List[Tuple[BLEDevice, AdvertisementData]]':
+    def scan(self, scan_timeout:float = 3.0) -> 'list[tuple[BLEDevice, AdvertisementData]]':
         try:
             if not hasattr(self, '_async_loop_thread') or self._async_loop_thread is None:
                 self._running = True # enable automatic reconnects
@@ -444,7 +442,7 @@ class ClientBLE(QObject): # pyrefly:ignore[invalid-inheritance] # pyright:ignore
         return []
 
 
-    def start(self, case_sensitive:bool=True, scan_timeout:float=6, connect_timeout:float=6, address:Optional[str] = None) -> None:
+    def start(self, case_sensitive:bool=True, scan_timeout:float=6, connect_timeout:float=6, address:str|None = None) -> None:
         _log.debug('start')
         self._sleep_between_scans = self.SCAN_BETWEEN_SCANS_START
         if self._running:
@@ -499,7 +497,7 @@ class ClientBLE(QObject): # pyrefly:ignore[invalid-inheritance] # pyright:ignore
     # the specified service UUID is supported. The empty service UUID (None) matches with any discovered client of the associated names.
     # If both, serviceUUID and device name are not given (both set to None), any service matches.
     # The initial device description as generated on init_device_description() does not match anything.
-    def add_device_description(self, service_uuid:Optional[str] = None, device_name:Optional[str] = None) -> None:
+    def add_device_description(self, service_uuid:str|None = None, device_name:str|None = None) -> None:
         if service_uuid is None and device_name is None:
             self._device_descriptions = {}
         elif device_name is None:

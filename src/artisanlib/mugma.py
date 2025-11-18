@@ -17,7 +17,8 @@
 
 import asyncio
 import logging
-from typing import Final, Optional, Callable
+from collections.abc import Callable
+from typing import Final
 
 from artisanlib.async_comm import AsyncComm
 
@@ -28,8 +29,8 @@ class Mugma(AsyncComm):
     __slots__ = [ 'device_logging', '_bt', '_et', '_heater', '_fan', '_catalyzer', '_sv' ]
 
     def __init__(self, host:str = '127.0.0.1', port:int = 1504, device_logging:bool = False,
-                connected_handler:Optional[Callable[[], None]] = None,
-                disconnected_handler:Optional[Callable[[], None]] = None) -> None:
+                connected_handler:Callable[[], None]|None = None,
+                disconnected_handler:Callable[[], None]|None = None) -> None:
 
         self.device_logging = device_logging
 

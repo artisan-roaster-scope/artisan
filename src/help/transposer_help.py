@@ -3,10 +3,7 @@
 # then execute artisan/doc/help_dialogs/Script/xlsx_to_artisan_help.py
 import prettytable
 import re
-try:
-    from PyQt6.QtWidgets import QApplication # @Reimport @UnresolvedImport @UnusedImport # pylint: disable=import-error
-except Exception: # pylint: disable=broad-except
-    from PyQt5.QtWidgets import QApplication # type: ignore # @Reimport @UnresolvedImport @UnusedImport
+from PyQt6.QtWidgets import QApplication
 
 def content() -> str:
     strlist = []

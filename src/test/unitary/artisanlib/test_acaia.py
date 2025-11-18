@@ -30,7 +30,8 @@ modules that handle complex BLE communication and hardware interfaces.
 """
 
 from unittest.mock import patch
-from typing import Generator, Tuple, List, Callable, TYPE_CHECKING
+from collections.abc import Callable, Generator
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from bleak.backends.characteristic import BleakGATTCharacteristic  # pylint: disable=unused-import
@@ -405,7 +406,7 @@ class TestAcaiaProtocolFunctions:
                 assert single_result[0] == 0xFF  # Even position
                 assert single_result[1] == 0x00  # No odd position
 
-                # Test with list input (the method accepts Union[bytes, List[int]])
+                # Test with list input (the method accepts Union[bytes, list[int]])
                 list_payload = [0x07, 0x02, 0x14, 0x02]
                 list_result = AcaiaBLE.crc(list_payload)
                 assert list_result == result  # Should match bytes input
@@ -563,7 +564,7 @@ class TestAcaiaBLEWeightDecoding:
                 def set_heartbeat(self, frequency: int) -> None:
                     pass
 
-                def connected(self) -> Tuple[None, None]:
+                def connected(self) -> tuple[None, None]:
                     return (None, None)
 
                 def send(self, data: bytes) -> None:
@@ -652,7 +653,7 @@ class TestAcaiaBLEMessageConstruction:
                 def set_heartbeat(self, frequency: int) -> None:
                     pass
 
-                def connected(self) -> Tuple[None, None]:
+                def connected(self) -> tuple[None, None]:
                     return (None, None)
 
                 def send(self, data: bytes) -> None:
@@ -740,7 +741,7 @@ class TestAcaiaBLEEventParsing:
                 def set_heartbeat(self, frequency: int) -> None:
                     pass
 
-                def connected(self) -> Tuple[None, None]:
+                def connected(self) -> tuple[None, None]:
                     return (None, None)
 
                 def send(self, data: bytes) -> None:
@@ -820,7 +821,7 @@ class TestAcaiaBLEEventParsing:
                 def set_heartbeat(self, frequency: int) -> None:
                     pass
 
-                def connected(self) -> Tuple[None, None]:
+                def connected(self) -> tuple[None, None]:
                     return (None, None)
 
                 def send(self, data: bytes) -> None:
@@ -893,7 +894,7 @@ class TestAcaiaBLEScaleClassBehavior:
                 def set_heartbeat(self, frequency: int) -> None:
                     pass
 
-                def connected(self) -> Tuple[None, None]:
+                def connected(self) -> tuple[None, None]:
                     return (None, None)
 
                 def send(self, data: bytes) -> None:
@@ -955,7 +956,7 @@ class TestAcaiaBLEScaleClassBehavior:
                 def set_heartbeat(self, frequency: int) -> None:
                     pass
 
-                def connected(self) -> Tuple[None, None]:
+                def connected(self) -> tuple[None, None]:
                     return (None, None)
 
                 def send(self, data: bytes) -> None:
@@ -1032,7 +1033,7 @@ class TestAcaiaWrapperClass:
                 def set_heartbeat(self, frequency: int) -> None:
                     pass
 
-                def connected(self) -> Tuple[None, None]:
+                def connected(self) -> tuple[None, None]:
                     return (None, None)
 
                 def send(self, data: bytes) -> None:
@@ -1136,7 +1137,7 @@ class TestAcaiaWrapperClass:
                 def stop(self) -> None:
                     pass
 
-                def scan(self) -> 'List[Tuple[BLEDevice, AdvertisementData]]':
+                def scan(self) -> 'list[tuple[BLEDevice, AdvertisementData]]':
                     return []
 
                 def send_tare(self) -> None:
@@ -1145,7 +1146,7 @@ class TestAcaiaWrapperClass:
                 def set_heartbeat(self, frequency: int) -> None:
                     pass
 
-                def connected(self) -> Tuple[None, None]:
+                def connected(self) -> tuple[None, None]:
                     return (None, None)
 
                 def send(self, data: bytes) -> None:

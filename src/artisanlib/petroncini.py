@@ -8,13 +8,11 @@ import csv
 import re
 import time as libtime
 import logging
-from typing import Final, List, Optional, Callable
+from collections.abc import Callable
+from typing import Final
 
 
-try:
-    from PyQt6.QtCore import QDateTime, QDate, QTime, Qt # @UnusedImport @Reimport  @UnresolvedImport
-except ImportError:
-    from PyQt5.QtCore import QDateTime, QDate, QTime, Qt # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+from PyQt6.QtCore import QDateTime, QDate, QTime, Qt
 
 
 from artisanlib.util import replace_duplicates, encodeLocal, encodeLocalStrict
@@ -24,9 +22,9 @@ _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 # returns a dict containing all profile information contained in the given Petroncini CSV file
 def extractProfilePetronciniCSV(file:str,
-        etypesdefault:List[str],
-        _alt_etypesdefault:List[str],
-        _artisanflavordefaultlabels:List[str],
+        etypesdefault:list[str],
+        _alt_etypesdefault:list[str],
+        _artisanflavordefaultlabels:list[str],
         eventsExternal2InternalValue:Callable[[int],float]) -> ProfileData:
     res:ProfileData = ProfileData()
 
@@ -34,9 +32,9 @@ def extractProfilePetronciniCSV(file:str,
 
     res['roastertype'] = 'Petroncini'
 
-    roastdate:Optional[str]
-    roastisodate:Optional[str]
-    roasttime:Optional[str]
+    roastdate:str|None
+    roastisodate:str|None
+    roasttime:str|None
 
     # set profile date from the file name if it has the format "yyyy_mm_dd_hh_mm_ss.csv"
     try:
@@ -66,26 +64,26 @@ def extractProfilePetronciniCSV(file:str,
         next(data) # skip path
         header = [i.strip() for i in next(data)]
 
-        roast_date:Optional[QDateTime] = None
+        roast_date:QDateTime|None = None
         power = None # holds last processed heater event value
         power_last = None # holds the heater event value before the last one
         power_event = False # set to True if a heater event exists
-        specialevents:List[int] = []
-        specialeventstype:List[int] = []
-        specialeventsvalue:List[float] = []
-        specialeventsStrings:List[str] = []
-        timex:List[float] = []
-        temp1:List[float] = [] # outlet temperature as ET
-        temp2:List[float] = [] # bean temperature
-        extra1:List[float] = [] # inlet temperature
-        extra2:List[float] = [] # burner percentage
-        timeindex:List[int] = [-1,0,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actual index used
+        specialevents:list[int] = []
+        specialeventstype:list[int] = []
+        specialeventsvalue:list[float] = []
+        specialeventsStrings:list[str] = []
+        timex:list[float] = []
+        temp1:list[float] = [] # outlet temperature as ET
+        temp2:list[float] = [] # bean temperature
+        extra1:list[float] = [] # inlet temperature
+        extra2:list[float] = [] # burner percentage
+        timeindex:list[int] = [-1,0,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actual index used
         i = 0
         for row in data:
             if row == []:
                 continue
             i = i + 1
-            items = list(zip(header, row))
+            items = list(zip(header, row, strict=True)) # ty:ignore
             item = {}
             for (name, value) in items:
                 item[name] = value.strip()

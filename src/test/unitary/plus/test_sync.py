@@ -19,13 +19,14 @@ cross-file module contamination and ensure proper mock state management.
 """
 
 import sys
-from typing import Any, Dict, Generator, Optional
+from collections.abc import Generator
+from typing import Any
 from unittest.mock import Mock, patch
 
 import pytest
 
 # Store original modules for restoration
-_original_modules: Dict[str, Any] = {}
+_original_modules: dict[str, Any] = {}
 
 # Store original import function before any mocking occurs
 import builtins
@@ -61,7 +62,7 @@ class MockQSemaphore:
 class MockQTimer:
     """Enhanced mock for QTimer with proper method signatures."""
 
-    def __init__(self, parent: Optional[Any] = None) -> None:
+    def __init__(self, parent: Any = None) -> None:
         """Initialize mock timer."""
         self.parent = parent
         self.timeout = Mock()
@@ -93,7 +94,7 @@ class MockQApplication:
 
     @staticmethod
     def translate(
-        context: str, text: str, disambiguation: Optional[str] = None, n: int = -1
+        context: str, text: str, disambiguation: str|None = None, n: int = -1
     ) -> str:
         """Mock translate method."""
         del context

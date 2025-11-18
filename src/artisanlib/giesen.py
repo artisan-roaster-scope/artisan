@@ -5,7 +5,8 @@
 from pathlib import Path
 import csv
 import logging
-from typing import Final, List, Callable
+from collections.abc import Callable
+from typing import Final
 
 from artisanlib.util import replace_duplicates, encodeLocalStrict
 from artisanlib.atypes import ProfileData
@@ -14,9 +15,9 @@ _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 # returns a dict containing all profile information contained in the given IKAWA CSV file
 def extractProfileGiesenCSV(file:str,
-        etypesdefault:List[str],
-        _alt_etypesdefault:List[str],
-        _artisanflavordefaultlabels:List[str],
+        etypesdefault:list[str],
+        _alt_etypesdefault:list[str],
+        _artisanflavordefaultlabels:list[str],
         eventsExternal2InternalValue:Callable[[int],float]) -> ProfileData:
     res:ProfileData = ProfileData() # the interpreted data set
 
@@ -33,22 +34,22 @@ def extractProfileGiesenCSV(file:str,
         power_last = None # holds the heater event value before the last one
         speed_event = False # set to True if a drum event exists
         power_event = False # set to True if a heater event exists
-        specialevents:List[int] = []
-        specialeventstype:List[int] = []
-        specialeventsvalue:List[float] = []
-        specialeventsStrings:List[str] = []
-        timex:List[float] = []
-        temp1:List[float] = []
-        temp2:List[float] = []
-        extra1:List[float] = [] # ror
-        extra2:List[float] = [] # power
-        extra3:List[float] = [] # speed
-        extra4:List[float] = [] # pressure
-        timeindex:List[int] = [-1,0,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actual index used
+        specialevents:list[int] = []
+        specialeventstype:list[int] = []
+        specialeventsvalue:list[float] = []
+        specialeventsStrings:list[str] = []
+        timex:list[float] = []
+        temp1:list[float] = []
+        temp2:list[float] = []
+        extra1:list[float] = [] # ror
+        extra2:list[float] = [] # power
+        extra3:list[float] = [] # speed
+        extra4:list[float] = [] # pressure
+        timeindex:list[int] = [-1,0,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actual index used
         i:int = 0
         for row in data:
             i = i + 1
-            items = list(zip(header, row))
+            items = list(zip(header, row, strict=True)) # ty:ignore
             item = {}
             for (name, value) in items:
                 item[name] = value.strip()

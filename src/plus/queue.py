@@ -22,14 +22,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-try:
-    #pylint: disable = E, W, R, C
-    from PyQt6.QtCore import QCoreApplication, QObject, QThread, pyqtSlot, pyqtSignal, QSemaphore # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
-except Exception: # pylint: disable=broad-except
-    #pylint: disable = E, W, R, C
-    from PyQt5.QtCore import QCoreApplication, QObject, QThread, pyqtSlot, pyqtSignal, QSemaphore # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtWidgets import QApplication # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+#pylint: disable = E, W, R, C
+from PyQt6.QtCore import QCoreApplication, QObject, QThread, pyqtSlot, pyqtSignal, QSemaphore
+from PyQt6.QtWidgets import QApplication
 
 from artisanlib.util import getDirectory
 from plus import config, util, roast, connection, sync, controller
@@ -39,7 +34,7 @@ import datetime
 import json
 import json.decoder
 import logging
-from typing import Final, Any, List, Dict, Optional, TYPE_CHECKING  #for Python >= 3.9: can remove 'List' and 'Dict' since type hints can use the generic 'list' and 'dict'
+from typing import Final, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     import persistqueue # pylint: disable=unused-import
@@ -51,22 +46,22 @@ queue_path = getDirectory(config.outbox_cache, share=False)
 
 app = QCoreApplication.instance()
 
-queue:Optional['persistqueue.SQLiteQueue'] = None # type:ignore[no-any-unimported,unused-ignore] # holdes the persistqueue.SQLiteQueue, initialized by start()
+queue:'persistqueue.SQLiteQueue|None' = None # type:ignore[no-any-unimported,unused-ignore] # holdes the persistqueue.SQLiteQueue, initialized by start()
 
 # queue entries are dictionaries with entries
 #   url   : the URL to send the request to
 #   data  : the data dictionary that will be send in the body as JSON
 #   verb  : the HTTP verb to be used (POST or PUT)
 
-worker:Optional['Worker'] = None
-worker_thread:Optional[QThread] = None
+worker:'Worker|None' = None
+worker_thread:QThread|None = None
 
 queueWorkerSemaphore = QSemaphore(1) # ensure that only one worker thread is running
 
 
 class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # pyrefly: ignore # Argument to class must be a base class
     startSignal = pyqtSignal()
-    replySignal = pyqtSignal(float, float, str, int, list) # rlimit:float, rused:float, pu:str, notifications:int, machines:List[str]
+    replySignal = pyqtSignal(float, float, str, int, list) # rlimit:float, rused:float, pu:str, notifications:int, machines:list[str]
 
     __slots__ = [ '_paused', '_state' ]
 
@@ -76,7 +71,7 @@ class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # pyrefly: ig
         self._state:threading.Condition = threading.Condition()
 
     @staticmethod
-    def addSyncItem(item:Dict[str, Any]) -> None:
+    def addSyncItem(item:dict[str, Any]) -> None:
         # successfully transmitted, we add/update the roasts UUID sync-cache
         if 'roast_id' in item['data'] and 'modified_at' in item['data']:
             # we update the plus status icon
@@ -281,7 +276,7 @@ class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # pyrefly: ig
             self._paused = True  # make self block and wait
 
 # will be evaluated in GUI thread
-def processReply(rlimit:float, rused:float, pu:str, notifications:int, machines:List[str]) -> None:
+def processReply(rlimit:float, rused:float, pu:str, notifications:int, machines:list[str]) -> None:
     try:
 #        _log.debug('thread id', threading.get_ident())
         _log.debug('processReply(%s,%s,%s,%s,%s', rlimit, rused, pu, notifications, machines)
@@ -313,7 +308,7 @@ def start() -> None:
                     pass
         _log.debug('start()')
         if queue is not None:
-            _log.debug('-> qsize: %s', queue.qsize()) # ty: ignore[possibly-unbound-attribute]
+            _log.debug('-> qsize: %s', queue.qsize())
         if worker_thread is None:
             worker = Worker()
             worker_thread = QThread()
@@ -325,7 +320,7 @@ def start() -> None:
             worker.startSignal.emit()
             _log.debug('queue started')
         elif worker is not None:
-            worker.resume() # ty: ignore[possibly-unbound-attribute]
+            worker.resume()
             _log.debug('queue resumed')
     finally:
         if queueWorkerSemaphore.available() < 1:
@@ -376,21 +371,21 @@ def full_roast_in_queue(roast_id: str) -> bool:
 
 # returns true if the given roast_record r is a full record containing all
 # information (incl. the roast date) and not only an update
-def is_full_roast_record(r: Dict[str, Any]) -> bool:  #for Python >= 3.9 can replace 'Dict' with the generic type hint 'dict'
+def is_full_roast_record(r:dict[str, Any]) -> bool:
     return bool('date' in r and r['date'] and 'amount' in r and 'roast_id' in r)
 
 # holds the last queued roast item
-last_queued_roast_item:Optional[Dict[str, Any]] = None
+last_queued_roast_item:dict[str, Any]|None = None
 
 
 # adds given item to the outgoing queue to be send to the server, but ignores items that contain no additional information over the item just queued before (last_queued_roast).
 # NOTE: it can happen that the new item to be queued (queued on SAVE/AUTOSAVE) is just an update of a previous queued roast but not yet send roast (queued on DROP) and thus the
 #   mechanism (via sync.py cached_sync_record_hash/cached_sync_record) to just send updates does not yet applies.
-def queue_roast_item(roast_item:Dict[str, Any]) -> bool:
+def queue_roast_item(roast_item:dict[str, Any]) -> bool:
     global last_queued_roast_item  # pylint: disable=global-statement
 
     # is roast1 a subset of roast2 modulo the attribute 'modified_at'?
-    def roast_subset_of(roast1:Dict[str, Any], roast2:Dict[str, Any]) -> bool:
+    def roast_subset_of(roast1:dict[str, Any], roast2:dict[str, Any]) -> bool:
         return all(item in roast2.items() for item in roast1.items() if item[0] != 'modified_at')
 
     queued:bool = False
@@ -419,7 +414,7 @@ def queue_roast_item(roast_item:Dict[str, Any]) -> bool:
 #   an update only the roast_id
 # if unsynced is set (roast was not yet in sync DB) we always set current time as modified_at, overwriting the last saved dated
 # that might have been set by roast.getRoast()
-def addRoast(roast_record:Optional[Dict[str, Any]] = None, unsynced:bool=False) -> None:
+def addRoast(roast_record:dict[str, Any]|None = None, unsynced:bool=False) -> None:
     try:
         _log.debug('addRoast(%s, %s)', roast_record, unsynced)
         aw = config.app_window
@@ -436,7 +431,7 @@ def addRoast(roast_record:Optional[Dict[str, Any]] = None, unsynced:bool=False) 
                  ' is not running'
             )
         else:
-            r: Dict[str, Any]
+            r: dict[str, Any]
             r = roast.getRoast() if roast_record is None else roast_record
             # if modification date is not set yet, we add the current time as
             # modified_at timestamp as float EPOCH with millisecond
@@ -461,7 +456,7 @@ def addRoast(roast_record:Optional[Dict[str, Any]] = None, unsynced:bool=False) 
                             'Queuing roast for upload to {}'
                         ).format(config.app_name)
                     )  # @UndefinedVariable
-                rr: Dict[str, Any]
+                rr: dict[str, Any]
                 if roast_record is not None:
                     # on updates only changed attributes w.r.t. the current
                     # cached sync record are uploaded

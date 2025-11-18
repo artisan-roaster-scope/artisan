@@ -9,15 +9,13 @@ from requests_file import FileAdapter
 import re
 from lxml import html
 import logging
-from typing import Final, List, Optional, Callable, TYPE_CHECKING
+from collections.abc import Callable
+from typing import Final, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from PyQt6.QtCore import QUrl # pylint: disable=unused-import
 
-try:
-    from PyQt6.QtCore import QDateTime, Qt # @UnusedImport @Reimport  @UnresolvedImport
-except ImportError:
-    from PyQt5.QtCore import QDateTime, Qt # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+from PyQt6.QtCore import QDateTime, Qt
 
 
 from artisanlib.util import encodeLocal, stringtoseconds
@@ -28,10 +26,10 @@ _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 # returns a dict containing all profile information contained in the given RoastLog document pointed by the given QUrl
 def extractProfileRoastLog(url:'QUrl',
-        _etypesdefault:List[str],
-        _alt_etypesdefault:List[str],
-        _artisanflavordefaultlabels:List[str],
-        _eventsExternal2InternalValue:Callable[[int],float]) -> Optional[ProfileData]:
+        _etypesdefault:list[str],
+        _alt_etypesdefault:list[str],
+        _artisanflavordefaultlabels:list[str],
+        _eventsExternal2InternalValue:Callable[[int],float]) -> ProfileData|None:
     res:ProfileData = ProfileData() # the interpreted data set
     try:
         s = requests.Session()
@@ -58,13 +56,13 @@ def extractProfileRoastLog(url:'QUrl',
                 dt = dateutil.parser.parse(tag_values['Roasted on:'])
                 dateQt = QDateTime.fromSecsSinceEpoch(int(round(dt.timestamp())))
                 if dateQt.isValid():
-                    roastdate:Optional[str] = encodeLocal(dateQt.date().toString())
+                    roastdate:str|None = encodeLocal(dateQt.date().toString())
                     if roastdate is not None:
                         res['roastdate'] = roastdate
-                    roastisodate:Optional[str] = encodeLocal(dateQt.date().toString(Qt.DateFormat.ISODate))
+                    roastisodate:str|None = encodeLocal(dateQt.date().toString(Qt.DateFormat.ISODate))
                     if roastisodate is not None:
                         res['roastisodate'] = roastisodate
-                    roasttime:Optional[str] = encodeLocal(dateQt.time().toString())
+                    roasttime:str|None = encodeLocal(dateQt.time().toString())
                     if roasttime is not None:
                         res['roasttime'] = roasttime
                     res['roastepoch'] = int(dateQt.toSecsSinceEpoch())
@@ -119,11 +117,11 @@ def extractProfileRoastLog(url:'QUrl',
                 response = requests.get(url_str, timeout=(4, 15), headers=headers)
                 data_json = response.json()
 
-                timeindex:List[int] = [-1,0,0,0,0,0,0,0]
-                specialevents:List[int] = []
-                specialeventstype:List[int] = []
-                specialeventsvalue:List[float] = []
-                specialeventsStrings:List[str] = []
+                timeindex:list[int] = [-1,0,0,0,0,0,0,0]
+                specialevents:list[int] = []
+                specialeventstype:list[int] = []
+                specialeventsvalue:list[float] = []
+                specialeventsStrings:list[str] = []
                 timex = []
                 temp1,temp2,temp3,temp4 = [],[],[],[]
 

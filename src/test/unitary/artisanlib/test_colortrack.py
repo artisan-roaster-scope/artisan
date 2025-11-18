@@ -29,7 +29,7 @@ modules that handle complex measurement processing and statistical filtering.
 """
 
 import sys
-from typing import Generator
+from collections.abc import Generator
 from unittest.mock import Mock, patch
 
 import pytest
@@ -201,7 +201,7 @@ class TestColorTrackImplementationDetails:
         assert 'async def read_msg(self, stream: asyncio.StreamReader) -> None:' in source_content
 
         # Test that ColorTrackBLE methods are defined in the source
-        assert 'def getColor(self) -> Tuple[float, float]:' in source_content
+        assert 'def getColor(self) -> tuple[float, float]:' in source_content
         assert 'def register_reading(self, value:float) -> None:' in source_content
         assert 'def register_readings(self, payload:bytearray) -> None:' in source_content
         assert 'def notify_laser_callback(self,' in source_content

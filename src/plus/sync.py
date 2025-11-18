@@ -21,14 +21,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-try:
-    #pylint: disable = E, W, R, C
-    from PyQt6.QtCore import QSemaphore, QTimer, pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
-except Exception: # pylint: disable=broad-except
-    #pylint: disable = E, W, R, C
-    from PyQt5.QtCore import QSemaphore, QTimer, pyqtSlot # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtWidgets import QApplication # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+#pylint: disable = E, W, R, C
+from PyQt6.QtCore import QSemaphore, QTimer, pyqtSlot
+from PyQt6.QtWidgets import QApplication
 
 from pathlib import Path
 from artisanlib.util import getDirectory, weight_units, convertWeight, float2float
@@ -38,7 +33,7 @@ import time
 import logging
 import json
 import json.decoder
-from typing import Final, Optional, Dict, Any, List, IO
+from typing import Final, Any, IO
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -139,7 +134,7 @@ def addSync(uuid:str, modified_at:float) -> None:
 
 # returns None if given uuid is not registered for syncing, otherwise the
 # last modified_at timestamp in EPOC milliseconds
-def getSync(uuid:str) -> Optional[float]:
+def getSync(uuid:str) -> float|None:
     import portalocker
     import shelve
     fh:IO[str]
@@ -247,8 +242,8 @@ def delSync(uuid:str) -> None:
 sync_record_semaphore = QSemaphore(
     1
 )  # protecting access to the cached_plus_sync_record_hash
-cached_sync_record_hash:Optional[str] = None  # hash over the sync record
-cached_sync_record:Optional[Dict[str,Any]] = None  # the actual sync record the hash is computed over
+cached_sync_record_hash:str|None = None  # hash over the sync record
+cached_sync_record:dict[str,Any]|None = None  # the actual sync record the hash is computed over
 # to be able to compute the differences
 # to the current sync record and send only those in updates
 
@@ -257,7 +252,7 @@ cached_sync_record:Optional[Dict[str,Any]] = None  # the actual sync record the 
 # the sync record
 # if provided, roast_record is assumed to be a full roast record as provided by
 # roast.getRoast() and h its hash, otherwise the roast record is taken from the current data (not suppressing any default zero values like 0, '', 50)
-def setSyncRecordHash(sync_record:Optional[Dict[str, Any]] = None, h:Optional[str] = None) -> None:
+def setSyncRecordHash(sync_record:dict[str, Any]|None = None, h:str|None = None) -> None:
     # pylint: disable=global-statement
     global cached_sync_record_hash, cached_sync_record
     try:
@@ -294,7 +289,7 @@ def clearSyncRecordHash() -> None:
 # current roast data) equals the cached_sync_record_hash
 # if provided, roast_record is assumed to be a full roast record
 # as provided by roast.getRoast()
-def syncRecordUpdated(roast_record:Optional[Dict[str, Any]] = None) -> bool:
+def syncRecordUpdated(roast_record:dict[str, Any]|None = None) -> bool:
     try:
         _log.debug('syncRecordUpdated(%s)', roast_record)
         sync_record_semaphore.acquire(1)
@@ -311,7 +306,7 @@ def syncRecordUpdated(roast_record:Optional[Dict[str, Any]] = None) -> bool:
 
 
 # replaces zero values like 0 and '' by None for attributes enabled for suppression to save data space on server
-def surpress_zero_values(roast_record:Dict[str, Any]) -> Dict[str, Any]:
+def surpress_zero_values(roast_record:dict[str, Any]) -> dict[str, Any]:
     for key in roast.sync_record_zero_supressed_attributes:
         if key in roast_record and roast_record[key] == 0:
             roast_record[key] = None
@@ -328,7 +323,7 @@ def surpress_zero_values(roast_record:Dict[str, Any]) -> Dict[str, Any]:
 # the attributes holding the same values as in the current cached_sync_record removed
 # the result is the roast_record with all unchanged attributes, which do not
 # need to synced on updates, removed
-def diffCachedSyncRecord(roast_record:Dict[str, Any]) -> Dict[str, Any]:
+def diffCachedSyncRecord(roast_record:dict[str, Any]) -> dict[str, Any]:
     try:
         _log.debug('diffCachedSyncRecord()')
         sync_record_semaphore.acquire(1)
@@ -405,10 +400,10 @@ def diffCachedSyncRecord(roast_record:Dict[str, Any]) -> Dict[str, Any]:
 applied_server_updates_modified_at_semaphore = QSemaphore(
     1
 )  # protecting access to the applied_server_updates_modified_at
-applied_server_updates_modified_at:Optional[float] = None
+applied_server_updates_modified_at:float|None = None
 
 
-def setApplidedServerUpdatesModifiedAt(modified_at:Optional[float]) -> None:
+def setApplidedServerUpdatesModifiedAt(modified_at:float|None) -> None:
     # pylint: disable=global-statement
     global applied_server_updates_modified_at
     try:
@@ -422,7 +417,7 @@ def setApplidedServerUpdatesModifiedAt(modified_at:Optional[float]) -> None:
             applied_server_updates_modified_at_semaphore.release(1)
 
 
-def getApplidedServerUpdatesModifiedAt() -> Optional[float]:
+def getApplidedServerUpdatesModifiedAt() -> float|None:
     # pylint: disable=global-statement
     try:
         _log.debug('getApplidedServerUpdatesModifiedAt()')
@@ -439,7 +434,7 @@ def getApplidedServerUpdatesModifiedAt() -> Optional[float]:
 # the values of "syncable" properties in data are applied to the apps
 # variables directly
 # NOTE: server returns always all values of the SyncRecord, but suppresses NULL values
-def applyServerUpdates(data:Dict[str, Any]) -> None:
+def applyServerUpdates(data:dict[str, Any]) -> None:
     dirty = False
     title_changed = False
     aw = config.app_window
@@ -576,7 +571,7 @@ def applyServerUpdates(data:Dict[str, Any]) -> None:
                     and data['blend']['ingredients']
                 ):
                     try:
-                        ingredients:List[stock.BlendIngredient] = []
+                        ingredients:list[stock.BlendIngredient] = []
                         for i in data['blend']['ingredients']:
                             entry = stock.BlendIngredient(
                                 ratio = i['ratio'],
@@ -749,7 +744,7 @@ def applyServerUpdates(data:Dict[str, Any]) -> None:
 # internal function fetching the update from server and then unblock the
 # Properties Dialog and update the plus icon
 # if return_data is set, the received data is not applied via applyServerUpdates, but returned instead
-def fetchServerUpdate(uuid: str, file:Optional[str]=None, return_data:bool = False) -> Optional[Dict[str, Any]]:
+def fetchServerUpdate(uuid: str, file:str|None = None, return_data:bool = False) -> dict[str, Any]|None:
     aw = config.app_window
     import requests
     import requests.exceptions
@@ -833,7 +828,7 @@ def fetchServerUpdate(uuid: str, file:Optional[str]=None, return_data:bool = Fal
     #            _log.info("PRINT data received: %s",data)
                 util.updateLimitsFromResponse(data) # update account limits
                 if 'result' in data:
-                    r:Dict[str, Any] = data['result']
+                    r:dict[str, Any] = data['result']
                     _log.debug('-> fetch: %s', r)
 
                     if getSync(uuid) is None and 'modified_at' in r:
@@ -902,7 +897,7 @@ def fetchServerUpdate(uuid: str, file:Optional[str]=None, return_data:bool = Fal
 # it but there is already a record on the platform"
 
 # this function might be called from a thread (eg. via QTimer)
-def getUpdate(uuid: Optional[str], file:Optional[str]=None) -> None:
+def getUpdate(uuid: str|None, file: str|None = None) -> None:
     _log.debug('getUpdate(%s,%s)', uuid, file)
     if uuid is not None and config.app_window is not None:
         aw = config.app_window

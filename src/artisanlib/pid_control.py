@@ -29,20 +29,15 @@
 import time as libtime
 import numpy
 import logging
-from typing import Final, Union, List, Dict, Optional, TYPE_CHECKING
+from typing import Final, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
 
 from artisanlib.util import fromCtoFstrict, fromFtoCstrict, hex2int, str2cmd, stringfromseconds, cmd2str, float2float
 
-try:
-    from PyQt6.QtCore import pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtWidgets import QApplication # @UnusedImport @Reimport  @UnresolvedImport
-except ImportError:
-    from PyQt5.QtCore import pyqtSlot # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtWidgets import QApplication # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-
+from PyQt6.QtCore import pyqtSlot
+from PyQt6.QtWidgets import QApplication
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
@@ -54,7 +49,7 @@ class FujiPID:
         self.followBackground = False
         self.lookahead = 0 # the lookahead in seconds
         self.rampsoak = False # True if RS is active
-        self.sv:Optional[float] = None # the last sv send to the Fuji PID
+        self.sv:float|None = None # the last sv send to the Fuji PID
 
         ## FUJI PXG input types
         ##0 (JPT 100'3f)
@@ -158,7 +153,7 @@ class FujiPID:
 
         #refer to Fuji PID instruction manual for more information about the parameters and channels
         #dictionary "KEY": [VALUE,MEMORY_ADDRESS]
-        self.PXG4:Dict[str, List[Union[float, int]]] = {
+        self.PXG4:dict[str, list[float|int]] = {
                   ############ CH1  Selects controller modes
                   # manual mode 0 = OFF(auto), 1 = ON(manual)
                   'manual': [0,41121],
@@ -238,7 +233,7 @@ class FujiPID:
                   }
 
         # "KEY": [VALUE,MEMORY_ADDRESS]
-        self.PXR:Dict[str, List[Union[float, int]]] = {'autotuning':[0,41005],
+        self.PXR:dict[str, list[float|int]] = {'autotuning':[0,41005],
                     'segment1sv':[100.0,41057],'segment1ramp':[3,41065],'segment1soak':[0,41066], #PXR uses only HH:MM time format but stored as minutes in artisan
                     'segment2sv':[100.0,41058],'segment2ramp':[3,41067],'segment2soak':[0,41068],
                     'segment3sv':[100.0,41059],'segment3ramp':[3,41069],'segment3soak':[0,41070],
@@ -275,7 +270,7 @@ class FujiPID:
                     'segment?':[0,31009],
                     'mv1':[0,31004]   #duty cycle rx -300 to 10300  = -3.00% to 103.00%
                     }
-        self.PXF:Dict[str, List[Union[float, int]]] = dict(self.PXG4)
+        self.PXF:dict[str, list[float|int]] = dict(self.PXG4)
         # initialize the PXF register numbers from the PXG and an offset of 1000
         for k in self.PXF: # pylint: disable=consider-iterating-dictionary,consider-using-dict-items
             if len(self.PXF[k]) > 1:
@@ -374,7 +369,7 @@ class FujiPID:
                 self.aw.qmc.adderror(message)
 
     # updates and returns the current ramp soak mode
-    def getCurrentRampSoakMode(self) -> Union[float, int, None]:
+    def getCurrentRampSoakMode(self) -> float|int|None:
         register: int
         if self.aw.ser.controlETpid[0] == 0: # PXG
             register = int(self.aw.fujipid.PXG4['rampsoakmode'][1])
@@ -384,7 +379,7 @@ class FujiPID:
             register = int(self.aw.fujipid.PXF['rampsoakmode'][1])
         else:
             return None
-        currentmode: Union[float, int, None]
+        currentmode: float|int|None
         if self.aw.ser.useModbusPort:
             reg = self.aw.modbus.address2register(register,3)
             currentmode = self.aw.modbus.readSingleRegister(self.aw.ser.controlETpid[1],reg,3)
@@ -470,7 +465,7 @@ class FujiPID:
             self.aw.sendmessage(message)
             self.aw.qmc.adderror(message)
 
-    def calcSV(self, tx:float) -> Optional[float]:
+    def calcSV(self, tx:float) -> float|None:
         # tx is the timestamp recorded, NOT the time displayed to the user after CHARGE
         if self.aw.qmc.background:
             # Follow Background mode
@@ -489,7 +484,7 @@ class FujiPID:
     #This function reads read-only memory (with 3xxxx memory we need function=4)
     #both PXR3 and PXG4 use the same memory location 31001 (3xxxx = read only)
     # pidType: 0=PXG, 1=PXR, 2=None, 3=DTA, 4=PXF (here we support only 0, 1 and 4 for now)
-    def gettemperature(self, pidType:int, stationNo:int) -> Optional[int]:
+    def gettemperature(self, pidType:int, stationNo:int) -> int|None:
         reg: int
         if pidType == 0:
             reg = int(self.PXG4['pv?'][1])
@@ -512,7 +507,7 @@ class FujiPID:
     def readcurrentsv(self) -> float:
         val:float = -0.1
         if self.aw.ser.useModbusPort:
-            reg:Optional[int] = None
+            reg:int|None = None
             #if control pid is fuji PXG4
             if self.aw.ser.controlETpid[0] == 0:
                 reg = int(self.aw.modbus.address2register(self.PXG4['sv?'][1],4))
@@ -584,7 +579,7 @@ class FujiPID:
                 return v/100.
         return -1
 
-    def getrampsoakmode(self) -> Union[int, float, None]:
+    def getrampsoakmode(self) -> int|float|None:
         register: int
         if self.aw.ser.controlETpid[0] == 0: #Fuji PXG
             register = int(self.PXG4['rampsoakpattern'][1])
@@ -594,7 +589,7 @@ class FujiPID:
             register = int(self.PXF['rampsoakpattern'][1])
         else:
             return 0
-        currentmode: Union[int, float, None]
+        currentmode: int|float|None
         if self.aw.ser.useModbusPort:
             reg = self.aw.modbus.address2register(register,3)
             currentmode = self.aw.modbus.readSingleRegister(self.aw.ser.controlETpid[1],reg,3)
@@ -643,7 +638,7 @@ class FujiPID:
     #A ramp soak pattern defines a whole profile. They have a minimum of 4 segments.
     # returns True on success, False otherwise
     def setrampsoak(self, flag:int) -> bool:
-        register:Optional[int] = None
+        register:int|None = None
         if self.aw.ser.controlETpid[0] == 0: #Fuji PXG
             register = int(self.PXG4['rampsoak'][1])
         elif self.aw.ser.controlETpid[0] == 1: #Fuji PXR
@@ -717,7 +712,7 @@ class FujiPID:
         self.aw.qmc.adderror(mssg)
         return False
 
-    def getONOFFstandby(self) -> Optional[int]:
+    def getONOFFstandby(self) -> int|None:
         if self.aw.ser.controlETpid[0] == 0:
             return int(self.aw.fujipid.PXG4['runstandby'][0])
         if self.aw.ser.controlETpid[0] == 1:
@@ -1052,7 +1047,7 @@ class FujiPID:
     @staticmethod
     def dec2HexRaw(decimal:int) -> bytes:
 
-        def decs2string(x:List[int]) -> bytes:
+        def decs2string(x:list[int]) -> bytes:
             try:
                 if len(x) > 0:
                     return bytes(x)
@@ -1071,7 +1066,7 @@ class FujiPID:
             Nbytes.append(0)
         return decs2string(Nbytes)
 
-    def message2send(self, stationNo:int, FunctionCode:int, memory:Union[int,float], Nword:int) -> bytes:
+    def message2send(self, stationNo:int, FunctionCode:int, memory:int|float, Nword:int) -> bytes:
         memory = int(memory)
         # This method takes the arguments to compose a Fuji serial command and returns the complete raw string with crc16 included
         # memory must be given as the Resistor Number Engineering unit (example of memory = 41057 )
@@ -1156,7 +1151,7 @@ class PIDcontrol:
     def __init__(self, aw:'ApplicationWindow') -> None:
         self.aw:ApplicationWindow = aw
         self.pidActive:bool = False
-        self.sv:Optional[float] = None # the last sv send to the Arduino
+        self.sv:float|None = None # the last sv send to the Arduino
         #
         self.pidOnCHARGE:bool = False
         self.pidOffDROP:bool = False
@@ -1167,23 +1162,23 @@ class PIDcontrol:
         self.loadRampSoakFromBackground:bool = False
         self.svLen:Final[int] = 8 # should stay at 8 for compatibility reasons!
         self.svLabel:str = ''
-        self.svValues: List[float]     = [0.0]*self.svLen      # sv temp as int per 8 channels
-        self.svRamps: List[int]        = [0]*self.svLen      # seconds as int per 8 channels
-        self.svSoaks: List[int]        = [0]*self.svLen      # seconds as int per 8 channels
-        self.svActions: List[int]      = [-1]*self.svLen     # alarm action as int per 8 channels
-        self.svBeeps: List[bool]       = [False]*self.svLen  # alarm beep as bool per 8 channels
-        self.svDescriptions: List[str] = ['']*self.svLen     # alarm descriptions as string per 8 channels
+        self.svValues: list[float]     = [0.0]*self.svLen      # sv temp as int per 8 channels
+        self.svRamps: list[int]        = [0]*self.svLen      # seconds as int per 8 channels
+        self.svSoaks: list[int]        = [0]*self.svLen      # seconds as int per 8 channels
+        self.svActions: list[int]      = [-1]*self.svLen     # alarm action as int per 8 channels
+        self.svBeeps: list[bool]       = [False]*self.svLen  # alarm beep as bool per 8 channels
+        self.svDescriptions: list[str] = ['']*self.svLen     # alarm descriptions as string per 8 channels
         #
         self.svTriggeredAlarms = [False]*self.svLen # set to true once the corresponding alarm was triggered
         # extra RS sets:
         self.RSLen:Final[int] = 3 # can be changed to have less or more RSn sets
-        self.RS_svLabels: List[str]       = ['']*self.RSLen                  # label of the RS set
-        self.RS_svValues: List[List[float]] = [[0.0]*self.svLen]*self.RSLen      # sv temp as int per 8 channels
-        self.RS_svRamps: List[List[int]]  = [[0]*self.svLen]*self.RSLen      # seconds as int per 8 channels
-        self.RS_svSoaks: List[List[int]]  = [[0]*self.svLen]*self.RSLen      # seconds as int per 8 channels
-        self.RS_svActions: List[List[int]]= [[-1]*self.svLen]*self.RSLen     # alarm action as int per 8 channels
-        self.RS_svBeeps: List[List[bool]] = [[False]*self.svLen]*self.RSLen  # alarm beep as bool per 8 channels
-        self.RS_svDescriptions: List[List[str]] = [['']*self.svLen]*self.RSLen     # alarm descriptions as string per 8 channels
+        self.RS_svLabels: list[str]       = ['']*self.RSLen                  # label of the RS set
+        self.RS_svValues: list[list[float]] = [[0.0]*self.svLen]*self.RSLen      # sv temp as int per 8 channels
+        self.RS_svRamps: list[list[int]]  = [[0]*self.svLen]*self.RSLen      # seconds as int per 8 channels
+        self.RS_svSoaks: list[list[int]]  = [[0]*self.svLen]*self.RSLen      # seconds as int per 8 channels
+        self.RS_svActions: list[list[int]]= [[-1]*self.svLen]*self.RSLen     # alarm action as int per 8 channels
+        self.RS_svBeeps: list[list[bool]] = [[False]*self.svLen]*self.RSLen  # alarm beep as bool per 8 channels
+        self.RS_svDescriptions: list[list[str]] = [['']*self.svLen]*self.RSLen     # alarm descriptions as string per 8 channels
         #
         self.svSlider:bool = False
         self.svButtons:bool = False
@@ -1228,8 +1223,8 @@ class PIDcontrol:
         self.invertControl:bool = False
         # PID sv smoothing
         self.sv_smoothing_factor:int = 0 # off if 0
-        self.sv_decay_weights:Optional[List[float]] = None
-        self.previous_svs:List[float] = []
+        self.sv_decay_weights:list[float]|None = None
+        self.previous_svs:list[float] = []
         # time @ PID ON
         self.time_pidON:float = 0 # in monitoring mode, ramp-soak times are interpreted w.r.t. the time after the PID was turned on and not the time after CHARGE as during recording
         self.source_reading_pidON:float = 0 # the reading of the selected source on PID ON (to be used as start point for the first RAMP/SOAK pattern)
@@ -1241,7 +1236,7 @@ class PIDcontrol:
         self.slider_force_move:bool = True # if True move the slider independent of the slider position to fire slider action!
 
     @staticmethod
-    def RStotalTime(ramps:List[int], soaks:List[int]) -> int:
+    def RStotalTime(ramps:list[int], soaks:list[int]) -> int:
         return sum(ramps) + sum(soaks)
 
     # returns 1 (True) if an external PID controller is in use (MODBUS or TC4 PID firmware)
@@ -1531,7 +1526,7 @@ class PIDcontrol:
 
     # returns SV (or None) wrt. to the ramp-soak table and the given time t
     # (used only internally)
-    def svRampSoak(self, t:float) -> Optional[float]:
+    def svRampSoak(self, t:float) -> float|None:
         try:
             self.aw.qmc.rampSoakSemaphore.acquire(1)
             if self.ramp_soak_engaged == 0:
@@ -1585,7 +1580,7 @@ class PIDcontrol:
         if self.sv_smoothing_factor:
             # create or update smoothing decay weights
             if self.sv_decay_weights is None or len(self.sv_decay_weights) != self.sv_smoothing_factor: # recompute only on changes
-                self.sv_decay_weights = list(numpy.arange(1,self.sv_smoothing_factor+1))
+                self.sv_decay_weights = [float(w) for w in numpy.arange(1,self.sv_smoothing_factor+1)]
             # add new value
             self.previous_svs.append(sv)
             # throw away superfluous values
@@ -1596,7 +1591,7 @@ class PIDcontrol:
         return sv # no smoothing yet
 
     # returns None if in manual mode or no other sv (via ramp/soak or follow mode) defined
-    def calcSV(self, tx:float) -> Optional[float]:
+    def calcSV(self, tx:float) -> float|None:
         # tx is the timestamp recorded, NOT the time displayed to the user after CHARGE
         if self.svMode == 1:
             # Ramp/Soak mode
@@ -1733,7 +1728,7 @@ class PIDcontrol:
                 self.aw.qmc.rampSoakSemaphore.release(1)
 
     # returns the first RS patterrn idx with label or None
-    def findRSset(self, label:str) -> Optional[int]:
+    def findRSset(self, label:str) -> int|None:
         try:
             self.aw.qmc.rampSoakSemaphore.acquire(1)
             return self.RS_svLabels.index(label)
@@ -1789,7 +1784,7 @@ class PIDcontrol:
             self.aw.buttonSVm5.setVisible(False)
 
     # just store the p-i-d configuration
-    def setPID(self, kp:float, ki:float, kd:float, source:Optional[int] = None, cycle:Optional[int] = None) -> None:
+    def setPID(self, kp:float, ki:float, kd:float, source:int|None = None, cycle:int|None = None) -> None:
         self.pidKp = kp
         self.pidKi = ki
         self.pidKd = kd
@@ -1799,7 +1794,7 @@ class PIDcontrol:
             self.pidCycle = cycle
 
     # send conf to connected PID
-    def confPID(self, kp:float, ki:float, kd:float, source:Optional[int] = None, cycle:Optional[int] = None) -> None:
+    def confPID(self, kp:float, ki:float, kd:float, source:int|None = None, cycle:int|None = None) -> None:
         if self.externalPIDControl() == 1: # MODBUS (external) Control active
             self.aw.modbus.setPID(kp,ki,kd)
             self.pidKp = kp
@@ -1857,7 +1852,7 @@ class DtaPID:
 
         #refer to Delta instruction manual for more information
         #dictionary "KEY": [VALUE,ASCII_MEMORY_ADDRESS]  note: address contains hex alpha characters
-        self.dtamem:Dict[str,List[Union[int,float,str]]]={
+        self.dtamem:dict[str, list[int|float|str]]={
                   'pv': [0,'4700'],             # process value (temperature reading)
                   'sv': [100.0,'4701'],         # set point
                   'p': [5,'4708'],              # p value 0-9999
@@ -1889,7 +1884,7 @@ class DtaPID:
         except Exception:  # pylint: disable=broad-except
             pass
 
-    def message2send(self, unitID:int, FUNCTION:int, ADDRESS:str, NDATA:Union[int,str]) -> str:
+    def message2send(self, unitID:int, FUNCTION:int, ADDRESS:str, NDATA:int|str) -> str:
         #compose command
         string_unitID = str(unitID).zfill(2)
         string_FUNCTION = str(FUNCTION).zfill(2)

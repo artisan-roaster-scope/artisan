@@ -31,7 +31,7 @@ modules that handle complex web scraping and JSON data extraction operations.
 """
 
 import sys
-from typing import Generator
+from collections.abc import Generator
 from unittest.mock import Mock, patch
 
 import pytest
@@ -206,21 +206,21 @@ class TestRoastPathImplementationDetails:
         assert 'class RoastPathDataItem(TypedDict, total=False):' in source_content
         assert 'Timestamp: str' in source_content
         assert 'StandardValue: float' in source_content
-        assert 'EventName: Optional[str]' in source_content
+        assert 'EventName: str|None' in source_content
         assert 'Note: float' in source_content
         assert 'NoteTypeId: int' in source_content
 
         # Test that RoastPathData TypedDict is defined
         assert 'class RoastPathData(TypedDict, total=False):' in source_content
-        assert 'btData: List[RoastPathDataItem]' in source_content
-        assert 'etData: List[RoastPathDataItem]' in source_content
-        assert 'atData: List[RoastPathDataItem]' in source_content
-        assert 'eventData: List[RoastPathDataItem]' in source_content
-        assert 'rorData: List[RoastPathDataItem]' in source_content
-        assert 'noteData: List[RoastPathDataItem]' in source_content
-        assert 'fuelData: List[RoastPathDataItem]' in source_content
-        assert 'fanData: List[RoastPathDataItem]' in source_content
-        assert 'drumData: List[RoastPathDataItem]' in source_content
+        assert 'btData: list[RoastPathDataItem]' in source_content
+        assert 'etData: list[RoastPathDataItem]' in source_content
+        assert 'atData: list[RoastPathDataItem]' in source_content
+        assert 'eventData: list[RoastPathDataItem]' in source_content
+        assert 'rorData: list[RoastPathDataItem]' in source_content
+        assert 'noteData: list[RoastPathDataItem]' in source_content
+        assert 'fuelData: list[RoastPathDataItem]' in source_content
+        assert 'fanData: list[RoastPathDataItem]' in source_content
+        assert 'drumData: list[RoastPathDataItem]' in source_content
 
 #    def test_roastpath_data_processing_from_source_inspection(self) -> None:
 #        """Test RoastPath data processing by inspecting the actual source code."""

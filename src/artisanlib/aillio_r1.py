@@ -35,22 +35,13 @@ if system().startswith('Windows'):
 #from lxml import html # unused
 
 import logging
-from typing import Final, Optional, List, Any, TYPE_CHECKING
+from typing import Final, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     try:
         from multiprocessing.connection import PipeConnection as Connection # type: ignore[unused-ignore,attr-defined,assignment] # pylint: disable=unused-import
     except ImportError:
         from multiprocessing.connection import Connection # type: ignore[unused-ignore,attr-defined,assignment] # pylint: disable=unused-import
-#    from artisanlib.atypes import ProfileData # pylint: disable=unused-import
-#    from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
-
-#try:
-#    from PyQt6.QtCore import QDateTime, Qt # @UnusedImport @Reimport  @UnresolvedImport
-#except ImportError:
-#    from PyQt5.QtCore import QDateTime, Qt # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-
-#from artisanlib.util import weight_units
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -92,7 +83,7 @@ class AillioR1:
         self.simulated = False
         self.AILLIO_DEBUG = debug
         self.__dbg('init')
-        self.usbhandle:Optional[usb.core.Device] = None # type:ignore[no-any-unimported,unused-ignore]
+        self.usbhandle:usb.core.Device|None = None # type:ignore[no-any-unimported,unused-ignore]
         self.bt:float = 0
         self.dt:float = 0
         self.heater:float = 0
@@ -103,13 +94,13 @@ class AillioR1:
         self.exitt:float = 0
         self.state_str:str = ''
         self.r1state:int = 0
-        self.worker_thread:Optional[threading.Thread] = None
+        self.worker_thread:threading.Thread|None = None
         self.worker_thread_run = True
         self.roast_number:int = -1
         self.fan_rpm:float = 0
 
-        self.parent_pipe:Optional[Connection] = None # type:ignore[no-any-unimported,unused-ignore]
-        self.child_pipe:Optional[Connection] = None # type:ignore[no-any-unimported,unused-ignore]
+        self.parent_pipe:Connection|None = None # type:ignore[no-any-unimported,unused-ignore]
+        self.child_pipe:Connection|None = None # type:ignore[no-any-unimported,unused-ignore]
         self.irt:float = 0
         self.pcbt:float = 0
         self.coil_fan:int = 0
@@ -443,7 +434,7 @@ class AillioR1:
         self.__dbg('state: ' + self.state_str)
         self.__dbg('second coil fan: ' + str(self.coil_fan2))
 
-    def __sendcmd(self, cmd:List[int]) -> None:
+    def __sendcmd(self, cmd:list[int]) -> None:
         self.__dbg('sending command: ' + str(cmd))
         if self.usbhandle is not None:
             self.usbhandle.write(self.AILLIO_ENDPOINT_WR, cmd)
@@ -470,13 +461,13 @@ class AillioR1:
 #                except Exception: # pylint: disable=broad-except
 #                    dateQt = QDateTime.fromMSecsSinceEpoch (data['dateTime'])
 #                if dateQt.isValid():
-#                    roastdate:Optional[str] = encodeLocal(dateQt.date().toString())
+#                    roastdate:str|None = encodeLocal(dateQt.date().toString())
 #                    if roastdate is not None:
 #                        res['roastdate'] = roastdate
-#                    roastisodate:Optional[str] = encodeLocal(dateQt.date().toString(Qt.DateFormat.ISODate))
+#                    roastisodate:str|None = encodeLocal(dateQt.date().toString(Qt.DateFormat.ISODate))
 #                    if roastisodate is not None:
 #                        res['roastisodate'] = roastisodate
-#                    roasttime:Optional[str] = encodeLocal(dateQt.time().toString())
+#                    roasttime:str|None = encodeLocal(dateQt.time().toString())
 #                    if roasttime is not None:
 #                        res['roasttime'] = roasttime
 #                    res['roastepoch'] = int(dateQt.toSecsSinceEpoch())
@@ -589,7 +580,7 @@ class AillioR1:
 #            eventtypes = ['blowerSetting','drumSpeedSetting','--','inductionPowerSetting']
 #            for j, eventname in enumerate(eventtypes):
 #                if eventname != '--' and eventname in data:
-#                    last:Optional[float] = None
+#                    last:float|None = None
 #                    ip = data[eventname]
 #                    for i, _ in enumerate(ip):
 #                        v = ip[i]+1
@@ -674,7 +665,7 @@ class AillioR1:
 #        _log.exception(e)
 #        return {}
 
-#def extractProfileRoastWorld(url:'QUrl', aw:'ApplicationWindow') -> Optional['ProfileData']:
+#def extractProfileRoastWorld(url:'QUrl', aw:'ApplicationWindow') -> 'ProfileData|None':
 #    s = requests.Session()
 #    s.mount('file://', FileAdapter())
 #    page = s.get(url.toString(), timeout=(4, 15), headers={'Accept-Encoding' : 'gzip'})

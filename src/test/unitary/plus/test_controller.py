@@ -4,12 +4,13 @@
 # Ensure proper module isolation to prevent cross-file contamination
 
 import sys
-from typing import Any, Dict, Tuple, Generator
+from collections.abc import Generator
+from typing import Any
 from unittest.mock import Mock, patch
 
 # Store original modules before any mocking to enable restoration
-original_modules: Dict[str, Any] = {}
-original_functions: Dict[str, Any] = {}
+original_modules: dict[str, Any] = {}
+original_functions: dict[str, Any] = {}
 modules_to_isolate = [
     'PyQt6.QtCore',
     'PyQt6.QtWidgets',
@@ -316,7 +317,7 @@ def mock_app_window() -> Mock:
 
 
 @pytest.fixture
-def mock_login_response() -> Tuple[str,str,bool,bool]:
+def mock_login_response() -> tuple[str,str,bool,bool]:
     """Create a mock login response."""
     return ('test@example.com', 'password123', True, True)
 

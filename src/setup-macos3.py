@@ -28,8 +28,6 @@ import plistlib
 
 import artisanlib
 
-from typing import List, Tuple
-
 
 # current version of artisan
 VERSION = artisanlib.__version__
@@ -42,7 +40,7 @@ APP = ['artisan.py']
 SUPPORTED_LANGUAGES = ['ar', 'cs', 'da', 'de','el','en','es','fa','fi','fr','gd', 'he','hu','id','it','ja','ko','lv', 'nl','no','pl','pt_BR','pt','sk', 'sv','th','tr','uk','vi','zh_CN','zh_TW']
 
 
-DATA_FILES:List[Tuple[str,List[str]]] = [
+DATA_FILES:list[tuple[str,list[str]]] = [
     ('../Resources', [
         r'artisanProfile.icns',
         r'artisanAlarms.icns',
@@ -169,15 +167,10 @@ subprocess.check_call(r'cp Wheels/Other/* dist/Wheels/Other',shell = True)
 subprocess.check_call(r'cp Wheels/Roasting/* dist/Wheels/Roasting',shell = True)
 os.chdir('./dist')
 
-#try:
-#    PYTHONPATH = os.environ['PYTHONPATH'] + r'/'
-#except Exception: # pylint: disable=broad-except
-#    PYTHONPATH = r'/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/'
-#
 
 try:
     PYTHON_V = os.environ['PYTHON_V']
-except Exception:
+except Exception: # pylint: disable=broad-except
     PYTHON_V = '3.12'
 python_version = f'python{PYTHON_V}'
 

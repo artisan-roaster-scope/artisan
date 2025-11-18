@@ -17,26 +17,19 @@
 
 import sys
 import platform
-from typing import Optional, List, Any, cast, TYPE_CHECKING, Final
+from typing import Any, cast, TYPE_CHECKING, Final
 from artisanlib.dialogs import ArtisanResizeablDialog
 from artisanlib.util import deltaLabelUTF8
 from artisanlib.widgets import MyContentLimitedQComboBox, MyQTableWidget
 import logging
 
-try:
-    from PyQt6.QtCore import Qt, pyqtSlot, QSettings, QTimer # @Reimport  @UnresolvedImport
-    from PyQt6.QtWidgets import (QApplication, QLabel, QDialogButtonBox, QGridLayout, # @Reimport  @UnresolvedImport
-        QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGroupBox, # @Reimport  @UnresolvedImport
-        QSpinBox, QWidget, QTabWidget, QTableWidget, QPushButton, QHeaderView, QLineEdit) # @XUnusedImport @Reimport  @UnresolvedImport
-except ImportError:
-    from PyQt5.QtCore import Qt, pyqtSlot, QSettings, QTimer # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtWidgets import (QApplication, QLabel, QDialogButtonBox, QGridLayout, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-        QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGroupBox, # @UnusedImport @Reimport  @UnresolvedImport
-        QSpinBox, QWidget, QTabWidget, QTableWidget, QPushButton, QHeaderView, QLineEdit) # @UnusedImport @Reimport  @UnresolvedImport
+from PyQt6.QtCore import Qt, pyqtSlot, QSettings, QTimer
+from PyQt6.QtWidgets import (QApplication, QLabel, QDialogButtonBox, QGridLayout,
+    QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGroupBox,
+    QSpinBox, QWidget, QTabWidget, QTableWidget, QPushButton, QHeaderView, QLineEdit)
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
-    from PyQt6.QtWidgets import QPushButton, QWidget # pylint: disable=unused-import
     from PyQt6.QtGui import QCloseEvent # pylint: disable=unused-import
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -187,10 +180,10 @@ class StatisticsDlg(ArtisanResizeablDialog):
         vgroupLayout.addWidget(AUCgroupLayout)
 
         ### TAB 2 - Config Summary Stats
-        self.summarystatstypes:List[int] = []
+        self.summarystatstypes:list[int] = []
         self.buttonlistmaxlen:int = self.aw.buttonlistmaxlen
         # Statistic entries are made here and in buildStat() in canvas.py
-        self.summarystats_types:List[str] = [
+        self.summarystats_types:list[str] = [
                 # Presentation of these stats is done with corresponding entries in canvas:statsSummary():buildStat()
                 # Add new stats at the end of the list.
                 # The string used to identify a statistic may be changed without causing compatibility issues
@@ -240,11 +233,11 @@ class StatisticsDlg(ArtisanResizeablDialog):
                 ]
 
         # function to remove from a list any elements matching string_to_remove
-        def remove_matching_strings(input_list:List[str], string_to_remove:str) -> List[str]:
+        def remove_matching_strings(input_list:list[str], string_to_remove:str) -> list[str]:
             return [s for s in input_list if string_to_remove not in s ]
 
         # remove entries designated as 'Unused' from the sorted list of statistic types
-        self.summarystats_types_sorted:List[str] = sorted(remove_matching_strings(self.summarystats_types,'Unused'))
+        self.summarystats_types_sorted:list[str] = sorted(remove_matching_strings(self.summarystats_types,'Unused'))
 
 #        helpDialogButton = QDialogButtonBox()
 
@@ -281,26 +274,26 @@ class StatisticsDlg(ArtisanResizeablDialog):
         self.summarystatstable = MyQTableWidget() #QTableWidget()
         self.summarystatstable.setTabKeyNavigation(True)
         self.summarystatstable.itemSelectionChanged.connect(self.selectionChanged)
-        vheader: Optional[QHeaderView] = self.summarystatstable.verticalHeader()
+        vheader: QHeaderView|None = self.summarystatstable.verticalHeader()
         if vheader is not None:
             vheader.sectionMoved.connect(self.sectionMoved)
         self.copysummarystatsTableButton = QPushButton(QApplication.translate('Button', 'Copy Table'))
         self.copysummarystatsTableButton.setToolTip(QApplication.translate('Tooltip','Copy table to clipboard, OPTION or ALT click for tabular text'))
         self.copysummarystatsTableButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.copysummarystatsTableButton.clicked.connect(self.copyEventButtonTabletoClipboard)
-        addButton: Optional[QPushButton] = QPushButton(QApplication.translate('Button','Add'))
+        addButton: QPushButton|None = QPushButton(QApplication.translate('Button','Add'))
         if addButton is not None:
             addButton.setToolTip(QApplication.translate('Tooltip','Add new Statistic'))
             #addButton.setMaximumWidth(100)
             addButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             addButton.clicked.connect(self.addsummarystatSlot)
-        delButton: Optional[QPushButton] = QPushButton(QApplication.translate('Button','Delete'))
+        delButton: QPushButton|None = QPushButton(QApplication.translate('Button','Delete'))
         if delButton is not None:
             delButton.setToolTip(QApplication.translate('Tooltip','Delete the selected Statistic'))
             #delButton.setMaximumWidth(100)
             delButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             delButton.clicked.connect(self.deletesummarystat)
-        self.insertButton: Optional[QPushButton] = QPushButton(QApplication.translate('Button','Insert'))
+        self.insertButton: QPushButton|None = QPushButton(QApplication.translate('Button','Insert'))
         if self.insertButton is not None:
             self.insertButton.setToolTip(QApplication.translate('Tooltip','Insert below the selected Statistic'))
             self.insertButton.clicked.connect(self.insertsummarystatSlot)
@@ -318,7 +311,7 @@ class StatisticsDlg(ArtisanResizeablDialog):
             self.defaultButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             self.defaultButton.clicked.connect(self.restoreDefaults)
 #        helpDialogButton = QDialogButtonBox()
-#        helpButtonD: Optional[QPushButton] = helpDialogButton.addButton(QDialogButtonBox.StandardButton.Help)
+#        helpButtonD: QPushButton|None = helpDialogButton.addButton(QDialogButtonBox.StandardButton.Help)
 #        if helpButtonD is not None:
 #            helpButtonD.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 #            helpButtonD.setToolTip(QApplication.translate('Tooltip','Show help'))
@@ -383,7 +376,7 @@ class StatisticsDlg(ArtisanResizeablDialog):
         self.setLayout(mainLayout)
 
         if platform.system() != 'Windows':
-            ok_button: Optional[QPushButton] = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
+            ok_button: QPushButton|None = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
             if ok_button is not None:
                 ok_button.setFocus()
         else:
@@ -498,11 +491,11 @@ class StatisticsDlg(ArtisanResizeablDialog):
         self.TabWidget.setCurrentIndex(self.activeTab)
 
     @staticmethod
-    def swapItems(l:List[Any], source:int, target:int) -> None:
+    def swapItems(l:list[Any], source:int, target:int) -> None:
         l[target],l[source] = l[source],l[target]
 
     @staticmethod
-    def moveItem(l:List[Any], source:int, target:int) -> None:
+    def moveItem(l:list[Any], source:int, target:int) -> None:
         l.insert(target, l.pop(source))
 
     @pyqtSlot(int,int,int)
@@ -517,8 +510,8 @@ class StatisticsDlg(ArtisanResizeablDialog):
         if QApplication.queryKeyboardModifiers() == Qt.KeyboardModifier.AltModifier:
             # if ALT/OPTION key is hold, the items are swap
             swap = True
-        l:List[Any]
-        event_data:List[List[Any]] = [self.summarystatstypes]
+        l:list[Any]
+        event_data:list[list[Any]] = [self.summarystatstypes]
         for l in event_data:
             if swap:
                 self.swapItems(l, logicalIndex, newVisualIndex)
@@ -787,7 +780,8 @@ class StatisticsDlg(ArtisanResizeablDialog):
 
 
     @pyqtSlot('QCloseEvent')
-    def closeEvent(self,_:Optional['QCloseEvent'] = None) -> None:
+    def closeEvent(self, a0:'QCloseEvent|None' = None) -> None:
+        del a0
 #        self.closeHelp()
         settings = QSettings()
         #save window geometry

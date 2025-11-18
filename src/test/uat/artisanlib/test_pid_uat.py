@@ -83,7 +83,7 @@ UAT modules with Qt dependencies and complex numerical library interactions.
 
 import os
 import time
-from typing import Generator, List, Optional
+from collections.abc import Generator
 from unittest.mock import Mock, patch
 
 import numpy as np
@@ -136,7 +136,7 @@ class MockQSemaphore:
 class MockLiveSosFilter:
     """Mock LiveSosFilter that provides realistic filtering behavior."""
 
-    def __init__(self, sos_: Optional[np.ndarray] = None) -> None:
+    def __init__(self, sos_: np.ndarray|None = None) -> None:
         """Initialize with optional SOS parameter to match real LiveSosFilter."""
         self.sos = sos_ if sos_ is not None else np.array([[1.0, 0.0, 0.0, 1.0, 0.0, 0.0]])
         self.process = Mock()
@@ -289,7 +289,7 @@ class TestPIDUserAcceptance:
         5. Deactivates PID when done
         """
         # Arrange: Setup PID controller like a user would with proper isolation
-        control_commands: List[float] = []
+        control_commands: list[float] = []
 
         def control_function(duty: float) -> None:
             control_commands.append(duty)
@@ -350,7 +350,7 @@ class TestPIDUserAcceptance:
         - PID responds to temperature variations
         """
         # Arrange - Use isolated PID class with proper mocking
-        control_commands: List[float] = []
+        control_commands: list[float] = []
 
         def control_function(duty: float) -> None:
             control_commands.append(duty)
@@ -388,7 +388,7 @@ class TestPIDUserAcceptance:
             from artisanlib.pid import PID
 
             # Arrange
-            control_commands: List[float] = []
+            control_commands: list[float] = []
 
             def control_function(duty: float) -> None:
                 control_commands.append(duty)
@@ -427,7 +427,7 @@ class TestPIDUserAcceptance:
             from artisanlib.pid import PID
 
             # Arrange
-            control_commands: List[float] = []
+            control_commands: list[float] = []
 
             def control_function(duty: float) -> None:
                 control_commands.append(duty)
@@ -466,7 +466,7 @@ class TestPIDUserAcceptance:
             from artisanlib.pid import PID
 
             # Arrange
-            control_commands: List[float] = []
+            control_commands: list[float] = []
 
             def control_function(duty: float) -> None:
                 control_commands.append(duty)
@@ -505,7 +505,7 @@ class TestPIDUserAcceptance:
             from artisanlib.pid import PID
 
             # Arrange
-            control_commands: List[float] = []
+            control_commands: list[float] = []
 
             def control_function(duty: float) -> None:
                 control_commands.append(duty)
@@ -561,7 +561,7 @@ class TestPIDTechnicalRobustness:
             from artisanlib.pid import PID
 
             # Arrange
-            control_commands: List[float] = []
+            control_commands: list[float] = []
 
             def control_function(duty: float) -> None:
                 control_commands.append(duty)
@@ -571,7 +571,7 @@ class TestPIDTechnicalRobustness:
             pid.on()
 
             # Act: Feed malicious/invalid inputs
-            malicious_inputs: List[Optional[float]] = [
+            malicious_inputs: list[float|None] = [
                 -1,  # Error value (should be rejected)
                 None,  # Null value (should be rejected)
                 float('inf'),  # Infinity (should be handled)
@@ -598,7 +598,7 @@ class TestPIDTechnicalRobustness:
             from artisanlib.pid import PID
 
             # Arrange
-            control_commands: List[float] = []
+            control_commands: list[float] = []
 
             def control_function(duty: float) -> None:
                 control_commands.append(duty)
@@ -639,7 +639,7 @@ class TestPIDTechnicalRobustness:
             from artisanlib.pid import PID
 
             # Arrange
-            control_commands: List[float] = []
+            control_commands: list[float] = []
 
             def control_function(duty: float) -> None:
                 control_commands.append(duty)
@@ -671,7 +671,7 @@ class TestPIDTechnicalRobustness:
             from artisanlib.pid import PID
 
             # Arrange
-            control_commands: List[float] = []
+            control_commands: list[float] = []
 
             def control_function(duty: float) -> None:
                 control_commands.append(duty)
@@ -715,8 +715,8 @@ class TestPIDAlgorithmDetails:
             from artisanlib.pid import PID
 
             # Arrange
-            control_commands_error: List[float] = []
-            control_commands_measurement: List[float] = []
+            control_commands_error: list[float] = []
+            control_commands_measurement: list[float] = []
 
             def control_function_error(duty: float) -> None:
                 control_commands_error.append(duty)
@@ -765,7 +765,7 @@ class TestPIDAlgorithmDetails:
             from artisanlib.pid import PID
 
             # Arrange
-            control_commands: List[float] = []
+            control_commands: list[float] = []
 
             def control_function(duty: float) -> None:
                 control_commands.append(duty)
@@ -801,7 +801,7 @@ class TestPIDAlgorithmDetails:
             from artisanlib.pid import PID
 
             # Arrange
-            control_commands: List[float] = []
+            control_commands: list[float] = []
 
             def control_function(duty: float) -> None:
                 control_commands.append(duty)
@@ -844,7 +844,7 @@ class TestPIDAlgorithmDetails:
             from artisanlib.pid import PID
 
             # Arrange
-            control_commands: List[float] = []
+            control_commands: list[float] = []
 
             def control_function(duty: float) -> None:
                 control_commands.append(duty)
@@ -877,8 +877,8 @@ class TestPIDAlgorithmDetails:
             from artisanlib.pid import PID
 
             # Arrange: Setup for complete roasting session
-            control_commands: List[float] = []
-            session_log: List[str] = []
+            control_commands: list[float] = []
+            session_log: list[str] = []
 
             def control_function(duty: float) -> None:
                 control_commands.append(duty)
@@ -945,7 +945,7 @@ class TestPIDAlgorithmDetails:
             from artisanlib.pid import PID
 
             # Arrange
-            control_commands: List[float] = []
+            control_commands: list[float] = []
 
             def control_function(duty: float) -> None:
                 control_commands.append(duty)
@@ -991,7 +991,7 @@ class TestPIDAlgorithmDetails:
             from artisanlib.pid import PID
 
             # Arrange
-            control_commands: List[float] = []
+            control_commands: list[float] = []
 
             def control_function(duty: float) -> None:
                 control_commands.append(duty)
@@ -1047,7 +1047,7 @@ class TestPIDAlgorithmDetails:
             from artisanlib.pid import PID
 
             # Arrange
-            control_commands: List[float] = []
+            control_commands: list[float] = []
             error_count = 0
 
             def control_function_with_errors(duty: float) -> None:
@@ -1094,7 +1094,7 @@ class TestPIDAlgorithmDetails:
             from artisanlib.pid import PID
 
             # Arrange
-            control_commands: List[float] = []
+            control_commands: list[float] = []
 
             def control_function(duty: float) -> None:
                 control_commands.append(duty)
@@ -1136,7 +1136,7 @@ class TestPIDAlgorithmDetails:
             from artisanlib.pid import PID
 
             # Arrange
-            control_commands: List[float] = []
+            control_commands: list[float] = []
 
             def control_function(duty: float) -> None:
                 control_commands.append(duty)
@@ -1170,7 +1170,7 @@ class TestPIDAlgorithmDetails:
             from artisanlib.pid import PID
 
             # Arrange
-            control_commands: List[float] = []
+            control_commands: list[float] = []
 
             def control_function(duty: float) -> None:
                 control_commands.append(duty)
@@ -1211,7 +1211,7 @@ class TestPIDAlgorithmDetails:
             from artisanlib.pid import PID
 
             # Arrange
-            control_commands: List[float] = []
+            control_commands: list[float] = []
 
             def control_function(duty: float) -> None:
                 control_commands.append(duty)
@@ -1274,7 +1274,7 @@ class TestPIDIntegrationScenarios:
             from artisanlib.pid import PID
 
             # Arrange
-            control_commands: List[float] = []
+            control_commands: list[float] = []
 
             def control_function(duty: float) -> None:
                 control_commands.append(duty)
@@ -1316,8 +1316,8 @@ class TestPIDIntegrationScenarios:
             from artisanlib.pid import PID
 
             # Arrange
-            control_commands_1: List[float] = []
-            control_commands_2: List[float] = []
+            control_commands_1: list[float] = []
+            control_commands_2: list[float] = []
 
             def control_function_1(duty: float) -> None:
                 control_commands_1.append(duty)
@@ -1370,7 +1370,7 @@ class TestPIDIntegrationScenarios:
             from artisanlib.pid import PID
 
             # Arrange
-            control_commands: List[float] = []
+            control_commands: list[float] = []
 
             def control_function(duty: float) -> None:
                 control_commands.append(duty)
@@ -1446,7 +1446,7 @@ class TestPIDIntegrationScenarios:
             from artisanlib.pid import PID
 
             # Arrange
-            control_commands: List[float] = []
+            control_commands: list[float] = []
 
             def control_function(duty: float) -> None:
                 control_commands.append(duty)
@@ -1505,8 +1505,8 @@ class TestPIDIntegrationScenarios:
             from artisanlib.pid import PID
 
             # Arrange
-            control_commands: List[float] = []
-            user_actions: List[str] = []
+            control_commands: list[float] = []
+            user_actions: list[str] = []
 
             def control_function(duty: float) -> None:
                 control_commands.append(duty)
@@ -1528,7 +1528,7 @@ class TestPIDIntegrationScenarios:
 
             # Phase 3: Normal operation with sensor errors
             user_actions.append('Roasting with occasional sensor errors')
-            temps_with_errors: List[Optional[float]] = [180.0, 185.0, -1, 190.0, None, 195.0, 200.0]
+            temps_with_errors: list[float|None] = [180.0, 185.0, -1, 190.0, None, 195.0, 200.0]
 
             current_time = 0.0
             with patch('time.time') as mock_time:
@@ -1595,7 +1595,7 @@ class TestPIDDestructiveDataFuzzing:
     #            from artisanlib.pid import PID
     #
     #            # Arrange
-    #            control_commands: List[float] = []
+    #            control_commands: list[float] = []
     #
     #            def control_function(duty: float) -> None:
     #                control_commands.append(duty)
@@ -1630,7 +1630,7 @@ class TestPIDDestructiveDataFuzzing:
 
     @given(st.floats(allow_nan=True, allow_infinity=True, width=64))
     @pytest.mark.hypothesis(deadline=None, max_examples=50)
-    def test_hypothesis_fuzzing_random_floats(self, random_float: float) -> None: # type: ignore
+    def test_hypothesis_fuzzing_random_floats(self, random_float: float) -> None:
         """Use Hypothesis to fuzz PID with completely random float values.
 
         # REMEDIATION: Implement comprehensive input sanitization for all float inputs
@@ -1640,7 +1640,7 @@ class TestPIDDestructiveDataFuzzing:
             from artisanlib.pid import PID
 
             # Arrange
-            control_commands: List[float] = []
+            control_commands: list[float] = []
 
             def control_function(duty: float) -> None:
                 control_commands.append(duty)
@@ -1690,7 +1690,7 @@ class TestPIDDestructiveDataFuzzing:
 #            from artisanlib.pid import PID
 #
 #            # Arrange
-#            control_commands: List[float] = []
+#            control_commands: list[float] = []
 #
 #            def control_function(duty: float) -> None:
 #                control_commands.append(duty)
@@ -1753,7 +1753,7 @@ class TestPIDDestructiveDataFuzzing:
 #            from artisanlib.pid import PID
 #
 #            # Arrange
-#            control_commands: List[float] = []
+#            control_commands: list[float] = []
 #
 #            def control_function(duty: float) -> None:
 #                control_commands.append(duty)
@@ -1810,7 +1810,7 @@ class TestPIDDestructiveDataFuzzing:
 #            from artisanlib.pid import PID
 #
 #            # Arrange
-#            control_commands: List[float] = []
+#            control_commands: list[float] = []
 #            update_count = 0
 #
 #            def control_function(duty: float) -> None:
@@ -1865,7 +1865,7 @@ class TestPIDDestructiveDataFuzzing:
 #            from artisanlib.pid import PID
 #
 #            # Arrange
-#            control_commands: List[float] = []
+#            control_commands: list[float] = []
 #
 #            def control_function(duty: float) -> None:
 #                control_commands.append(duty)
@@ -1942,7 +1942,7 @@ class TestPIDDestructiveSequenceBreaking:
 #            from artisanlib.pid import PID
 #
 #            # Arrange: Create PID but don't initialize properly
-#            control_commands: List[float] = []
+#            control_commands: list[float] = []
 #
 #            def control_function(duty: float) -> None:
 #                control_commands.append(duty)
@@ -1981,7 +1981,7 @@ class TestPIDDestructiveSequenceBreaking:
 #            from artisanlib.pid import PID
 #
 #            # Arrange
-#            control_commands: List[float] = []
+#            control_commands: list[float] = []
 #
 #            def control_function(duty: float) -> None:
 #                control_commands.append(duty)
@@ -2035,7 +2035,7 @@ class TestPIDDestructiveSequenceBreaking:
 #            from artisanlib.pid import PID
 #
 #            # Arrange
-#            control_commands: List[float] = []
+#            control_commands: list[float] = []
 #            reentrancy_count = 0
 #
 #            def malicious_control_function(duty: float) -> None:

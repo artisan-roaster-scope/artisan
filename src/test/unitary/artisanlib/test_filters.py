@@ -13,7 +13,7 @@ including numerical stability, initialization behavior, and filter accuracy.
 """
 
 import math
-from typing import Any, List, Tuple
+from typing import Any
 import numpy as np
 
 import pytest
@@ -184,7 +184,7 @@ class TestLiveLFilter:
         ],
     )
     def test_process_various_filter_types(
-        self, b_coeffs: List[float], a_coeffs: List[float]
+        self, b_coeffs: list[float], a_coeffs: list[float]
     ) -> None:
         """Test processing with various filter coefficient combinations."""
         b = np.array(b_coeffs)
@@ -312,7 +312,7 @@ class TestLiveSosFilter:
             [1e-10, 1e10, -1e10],
         ],
     )
-    def test_process_sequence_stability(self, input_sequence: List[float]) -> None:
+    def test_process_sequence_stability(self, input_sequence: list[float]) -> None:
         """Test that filter remains stable with various input sequences."""
         sos = np.array([[0.5, 0.0, 0.0, 1.0, 0.0, 0.0]])  # Gain of 0.5
 
@@ -428,7 +428,7 @@ class TestLiveMedian:
         ],
     )
     def test_process_various_sequences(
-        self, window_size: int, input_sequence: List[int], expected_medians: List[int]
+        self, window_size: int, input_sequence: list[int], expected_medians: list[int]
     ) -> None:
         """Test processing with various input sequences."""
         filter_instance = LiveMedian(window_size)
@@ -441,7 +441,7 @@ class TestLiveMedian:
         # Check the medians after initialization (starts from index window_size)
         actual_medians = results[window_size:]
         assert len(actual_medians) == len(expected_medians)
-        for actual, expected in zip(actual_medians, expected_medians):
+        for actual, expected in zip(actual_medians, expected_medians, strict=True): # ty:ignore
             assert actual == pytest.approx(float(expected), abs=1e-10)
 
     def test_process_with_nan_input(self) -> None:
@@ -581,7 +581,7 @@ class TestLiveMean:
         ],
     )
     def test_process_various_sequences(
-        self, window_size: int, input_sequence: List[int], expected_final_mean: float
+        self, window_size: int, input_sequence: list[int], expected_final_mean: float
     ) -> None:
         """Test processing with various input sequences."""
         filter_instance = LiveMean(window_size)
@@ -679,7 +679,7 @@ class TestFiltersIntegration:
         ],
     )
     def test_filters_numerical_stability(
-        self, filter_class: Any, init_args: Tuple[Any, ...]
+        self, filter_class: Any, init_args: tuple[Any, ...]
     ) -> None:
         """Test numerical stability with extreme input values."""
         filter_instance = filter_class(*init_args)

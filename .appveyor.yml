@@ -60,68 +60,68 @@ stack:
 
 for:
 -
-  matrix:
-    only:
-      - job_name: windows_legacy
-    fast_finish: false
-
-  environment:
-    PYTHON_PATH: "C:/Python38-x64"
-    QT_PATH: "C:/qt/5.15/msvc2019_64"
-    PYUIC: "pyuic5.exe"
-    PYQT: "5"
-    BUILD_PYINSTALLER: "True"
-    ARTISAN_LEGACY: "True"
-    VC_REDIST: "https://aka.ms/vs/16/release/vc_redist.x64.exe"  #redistributable for VS 2015-2019
-    VCVARSALL: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Auxiliary/Build/vcvarsall.bat"
-
-  install:
-    - cmd: echo Windows Legacy Install
-
-    # generate the path to PyQt translations files
-    - ps: $env:QT_TRANSL = "$env:PYTHON_PATH/Lib/site-packages/PyQt5/Qt5/translations"
-
-    # pull library versions from requirments file
-    - ps: $env:PYINSTALLER_VER = Select-String -Path ./src/requirements.txt "pyinstaller==([\d\.]*).*platform_system='Windows'" -List | ForEach-Object {$_.Matches.Groups[1].Value}
-    - ps: Write-Host "PYINSTALLER_VER= $env:PYINSTALLER_VER"
-
-    # update path env var
-    - cmd: set PATH=%PYTHON_PATH%;%PYTHON_PATH%\Scripts;%PATH%
-
-    # run the install script
-    - cmd: .ci\install-win.bat
-
-  build_script:
-    - cmd: echo Windows Legacy Build
-    - cmd: cd src
-
-    #update the copyright year used by pyinstaller to set exe properties for Windows
-    - ps: $YEAR=(Get-Date).year
-    - ps: gc version-metadata.yml | %{ $_ -replace "yyyy", "$YEAR" } | out-file newfile -encoding ascii
-    - ps: move -force newfile version-metadata.yml
-
-    # update the __revision__ field with the left seven of the GIT commit hash
-    - ps: $GIT_VERSION=git rev-parse --verify --short HEAD
-    - ps: gc artisanlib/__init__.py | %{ $_ -replace "__revision__ = '.*'", "__revision__ = '$GIT_VERSION'" } | out-file newfile -encoding ascii
-    - ps: move -force newfile artisanlib/__init__.py
-
-    # run the build script
-    - cmd: build-win3-pi.bat
-
-#  test_script:
-#    - cmd: python -m unittest discover
-
-  artifacts:
-#    - path: 'generated-win-legacy.zip'
-    - path: 'src\%artifact_prefix%-win*setup.exe'
-
-  deploy_script:
-    - cmd: bash ../.ci/upload.sh artisan-win*setup.exe
-
-#  # uncomment this section for remote desktop connection to build image
-#  on_finish:
-#    - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
-
+#  matrix:
+#    only:
+#      - job_name: windows_legacy
+#    fast_finish: false
+#
+#  environment:
+#    PYTHON_PATH: "C:/Python38-x64"
+#    QT_PATH: "C:/qt/5.15/msvc2019_64"
+#    PYUIC: "pyuic5.exe"
+#    PYQT: "5"
+#    BUILD_PYINSTALLER: "True"
+#    ARTISAN_LEGACY: "True"
+#    VC_REDIST: "https://aka.ms/vs/16/release/vc_redist.x64.exe"  #redistributable for VS 2015-2019
+#    VCVARSALL: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Auxiliary/Build/vcvarsall.bat"
+#
+#  install:
+#    - cmd: echo Windows Legacy Install
+#
+#    # generate the path to PyQt translations files
+#    - ps: $env:QT_TRANSL = "$env:PYTHON_PATH/Lib/site-packages/PyQt5/Qt5/translations"
+#
+#    # pull library versions from requirments file
+#    - ps: $env:PYINSTALLER_VER = Select-String -Path ./src/requirements.txt "pyinstaller==([\d\.]*).*platform_system='Windows'" -List | ForEach-Object {$_.Matches.Groups[1].Value}
+#    - ps: Write-Host "PYINSTALLER_VER= $env:PYINSTALLER_VER"
+#
+#    # update path env var
+#    - cmd: set PATH=%PYTHON_PATH%;%PYTHON_PATH%\Scripts;%PATH%
+#
+#    # run the install script
+#    - cmd: .ci\install-win.bat
+#
+#  build_script:
+#    - cmd: echo Windows Legacy Build
+#    - cmd: cd src
+#
+#    #update the copyright year used by pyinstaller to set exe properties for Windows
+#    - ps: $YEAR=(Get-Date).year
+#    - ps: gc version-metadata.yml | %{ $_ -replace "yyyy", "$YEAR" } | out-file newfile -encoding ascii
+#    - ps: move -force newfile version-metadata.yml
+#
+#    # update the __revision__ field with the left seven of the GIT commit hash
+#    - ps: $GIT_VERSION=git rev-parse --verify --short HEAD
+#    - ps: gc artisanlib/__init__.py | %{ $_ -replace "__revision__ = '.*'", "__revision__ = '$GIT_VERSION'" } | out-file newfile -encoding ascii
+#    - ps: move -force newfile artisanlib/__init__.py
+#
+#    # run the build script
+#    - cmd: build-win3-pi.bat
+#
+##  test_script:
+##    - cmd: python -m unittest discover
+#
+#  artifacts:
+##    - path: 'generated-win-legacy.zip'
+#    - path: 'src\%artifact_prefix%-win*setup.exe'
+#
+#  deploy_script:
+#    - cmd: bash ../.ci/upload.sh artisan-win*setup.exe
+#
+##  # uncomment this section for remote desktop connection to build image
+##  on_finish:
+##    - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+#
 
 -
   matrix:

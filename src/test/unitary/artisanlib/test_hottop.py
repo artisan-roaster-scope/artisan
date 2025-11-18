@@ -29,7 +29,7 @@ modules that handle complex serial communication and hardware interfaces.
 =============================================================================
 """
 
-from typing import Generator
+from collections.abc import Generator
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest

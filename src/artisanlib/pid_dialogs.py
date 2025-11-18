@@ -18,7 +18,7 @@
 import sys
 import time as libtime
 import logging
-from typing import Final, Optional, Dict, List, Union, cast, TYPE_CHECKING
+from typing import Final, cast, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
@@ -29,20 +29,12 @@ from artisanlib.util import stringfromseconds, stringtoseconds, comma2dot, toInt
 from artisanlib.dialogs import ArtisanDialog
 from artisanlib.widgets import MyQComboBox, MyQDoubleSpinBox
 
-try:
-    from PyQt6.QtCore import Qt, pyqtSlot, QRegularExpression, QSettings, QTimer # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtGui import QIntValidator, QRegularExpressionValidator # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtWidgets import (QApplication, QWidget, QLabel, QTableWidget, QPushButton, # @UnusedImport @Reimport  @UnresolvedImport
-        QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout, QGroupBox, QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
-        QMessageBox, QRadioButton, QSpinBox, QStatusBar, QTabWidget, QDoubleSpinBox, # @UnusedImport @Reimport  @UnresolvedImport
-        QTimeEdit, QLayout, QSizePolicy, QHeaderView, QButtonGroup) # @UnusedImport @Reimport  @UnresolvedImport
-except ImportError:
-    from PyQt5.QtCore import Qt, pyqtSlot, QRegularExpression, QSettings, QTimer # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtGui import QIntValidator, QRegularExpressionValidator # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QTableWidget, QPushButton, # type:ignore # @UnusedImport @Reimport  @UnresolvedImport
-        QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout, QGroupBox, QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
-        QMessageBox, QRadioButton, QSpinBox, QStatusBar, QTabWidget, QDoubleSpinBox, # @UnusedImport @Reimport  @UnresolvedImport
-        QTimeEdit, QLayout, QSizePolicy, QHeaderView, QButtonGroup) # @UnusedImport @Reimport  @UnresolvedImport
+from PyQt6.QtCore import Qt, pyqtSlot, QRegularExpression, QSettings, QTimer
+from PyQt6.QtGui import QIntValidator, QRegularExpressionValidator
+from PyQt6.QtWidgets import (QApplication, QWidget, QLabel, QTableWidget, QPushButton,
+    QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout, QGroupBox, QLineEdit,
+    QMessageBox, QRadioButton, QSpinBox, QStatusBar, QTabWidget, QDoubleSpinBox,
+    QTimeEdit, QLayout, QSizePolicy, QHeaderView, QButtonGroup)
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -744,13 +736,13 @@ class PID_DlgControl(ArtisanDialog):
         ############################
 
         # RSn tabs
-        self.RSnTab_LabelWidgets:List[QLineEdit] = []
-        self.RSnTab_SVWidgets:List[List[QSpinBox]] = []
-        self.RSnTab_RampWidgets:List[List[QTimeEdit]] = []
-        self.RSnTab_SoakWidgets:List[List[QTimeEdit]] = []
-        self.RSnTab_ActionWidgets:List[List[MyQComboBox]] = []
-        self.RSnTab_BeepWidgets:List[List[QWidget]] = []
-        self.RSnTab_DescriptionWidgets:List[List[QLineEdit]] = []
+        self.RSnTab_LabelWidgets:list[QLineEdit] = []
+        self.RSnTab_SVWidgets:list[list[QSpinBox]] = []
+        self.RSnTab_RampWidgets:list[list[QTimeEdit]] = []
+        self.RSnTab_SoakWidgets:list[list[QTimeEdit]] = []
+        self.RSnTab_ActionWidgets:list[list[MyQComboBox]] = []
+        self.RSnTab_BeepWidgets:list[list[QWidget]] = []
+        self.RSnTab_DescriptionWidgets:list[list[QLineEdit]] = []
 
         self.RSnButtons = []
 
@@ -766,12 +758,12 @@ class PID_DlgControl(ArtisanDialog):
             RSnGrid.addWidget(QLabel(QApplication.translate('Table','Action')),0,4)
             RSnGrid.addWidget(QLabel(QApplication.translate('Table','Beep')),0,5)
             RSnGrid.addWidget(QLabel(QApplication.translate('Table','Description')),0,6)
-            SVWidgets:List[QSpinBox] = []
-            RampWidgets:List[QTimeEdit] = []
-            SoakWidgets:List[QTimeEdit] = []
-            ActionWidgets:List[MyQComboBox] = []
-            BeepWidgets:List[QWidget] = []
-            DescriptionWidgets:List[QLineEdit] = []
+            SVWidgets:list[QSpinBox] = []
+            RampWidgets:list[QTimeEdit] = []
+            SoakWidgets:list[QTimeEdit] = []
+            ActionWidgets:list[MyQComboBox] = []
+            BeepWidgets:list[QWidget] = []
+            DescriptionWidgets:list[QLineEdit] = []
             labelLabel = QLabel(QApplication.translate('Label', 'Label'))
             labelEdit = QLineEdit()
             for i in range(self.aw.pidcontrol.svLen):
@@ -917,7 +909,7 @@ class PID_DlgControl(ArtisanDialog):
         QTimer.singleShot(10, self.setActiveTab)
 
     # NOTE: ET/BT inverted as pidSource=1 => BT and pidSource=2 => ET !!
-    def getCurveNames(self) -> List[str]:
+    def getCurveNames(self) -> list[str]:
         curveNames = []
         curveNames.append(self.aw.qmc.device_name_subst(self.aw.ETname))
         curveNames.append(self.aw.qmc.device_name_subst(self.aw.BTname))
@@ -1053,16 +1045,16 @@ class PID_DlgControl(ArtisanDialog):
 
     def getRSnSVLabel(self, n:int) -> str:
         return self.RSnTab_LabelWidgets[n].text()
-    def getRSnSVvalues(self, n:int) -> List[float]:
+    def getRSnSVvalues(self, n:int) -> list[float]:
         return [w.value() for w in self.RSnTab_SVWidgets[n]]
-    def getRSnSVramps(self, n:int) -> List[int]:
+    def getRSnSVramps(self, n:int) -> list[int]:
         return [int(round(self.aw.QTime2time(w.time()))) for w in self.RSnTab_RampWidgets[n]]
-    def getRSnSVsoaks(self, n:int) -> List[int]:
+    def getRSnSVsoaks(self, n:int) -> list[int]:
         return [int(round(self.aw.QTime2time(w.time()))) for w in self.RSnTab_SoakWidgets[n]]
-    def getRSnSVactions(self, n:int) -> List[int]:
+    def getRSnSVactions(self, n:int) -> list[int]:
         return [int(w.currentIndex()) - 1 for w in self.RSnTab_ActionWidgets[n]]
-    def getRSnSVbeeps(self, n:int) -> List[bool]:
-        res:List[bool] = []
+    def getRSnSVbeeps(self, n:int) -> list[bool]:
+        res:list[bool] = []
         for w in self.RSnTab_BeepWidgets[n]:
             b:bool = False
             l = w.layout()
@@ -1074,7 +1066,7 @@ class PID_DlgControl(ArtisanDialog):
                         b = cast(QCheckBox, wid).isChecked()
             res.append(b)
         return res
-    def getRSnSVdescriptions(self, n:int) -> List[str]:
+    def getRSnSVdescriptions(self, n:int) -> list[str]:
         return [w.text() for w in self.RSnTab_DescriptionWidgets[n]]
 
     def setRSnSVLabel(self, n:int) -> None:
@@ -1093,7 +1085,7 @@ class PID_DlgControl(ArtisanDialog):
             self.RSnTab_ActionWidgets[n][i].setCurrentIndex(self.aw.pidcontrol.RS_svActions[n][i] + 1)
     def setRSnSVbeeps(self, n:int) -> None:
         for i in range(self.aw.pidcontrol.svLen):
-            beep:Optional[QCheckBox] = None
+            beep:QCheckBox|None = None
             l = self.RSnTab_BeepWidgets[n][i].layout()
             if l is not None:
                 item = l.itemAt(1)
@@ -1141,7 +1133,7 @@ class PID_DlgControl(ArtisanDialog):
     def exportrampsoaksJSON(self, filename:str) -> bool:
         try:
             self.saverampsoaks()
-            rampsoaks:Dict[str,Union[str,List[float],List[int],List[bool],List[str]]] = {}
+            rampsoaks:dict[str,str|list[float]|list[int]|list[bool]|list[str]] = {}
             rampsoaks['svLabel'] = self.aw.pidcontrol.svLabel
             rampsoaks['svValues'] = self.aw.pidcontrol.svValues
             rampsoaks['svRamps'] = self.aw.pidcontrol.svRamps
@@ -1242,8 +1234,8 @@ class PID_DlgControl(ArtisanDialog):
         kp = self.pidKp.value() # 5.00
         ki = self.pidKi.value() # 0.15
         kd = self.pidKd.value() # 0.00
-        source:Optional[int] = None
-        cycle:Optional[int] = None
+        source:int|None = None
+        cycle:int|None = None
         if self.aw.pidcontrol.externalPIDControl() in {0, 3, 4}: # only Internal PID and TC4/Kaleido
             pidSourceIdx = self.pidSource.currentIndex()
             if pidSourceIdx == 0:
@@ -1270,8 +1262,8 @@ class PID_DlgControl(ArtisanDialog):
         kp = self.pidKp.value() # 5.00
         ki = self.pidKi.value() # 0.15
         kd = self.pidKd.value() # 0.00
-        source:Optional[int] = None
-        cycle:Optional[int] = None
+        source:int|None = None
+        cycle:int|None = None
         pid_controller = self.aw.pidcontrol.externalPIDControl()
         if pid_controller in {0, 3, 4}:
             pidSourceIdx = self.pidSource.currentIndex()
@@ -1347,7 +1339,8 @@ class PID_DlgControl(ArtisanDialog):
         return True
 
     @pyqtSlot('QCloseEvent')
-    def closeEvent(self,_:Optional['QCloseEvent'] = None) -> None:
+    def closeEvent(self, a0:'QCloseEvent|None' = None) -> None:
+        del a0
         #save window position (only; not size!)
         settings = QSettings()
         settings.setValue('PIDPosition',self.frameGeometry().topLeft())
@@ -2300,7 +2293,7 @@ class PXRpidDlgControl(PXpidDlgControl):
         self.segmenttable.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         self.segmenttable.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
         self.segmenttable.setShowGrid(True)
-        vheader: Optional[QHeaderView] = self.segmenttable.verticalHeader()
+        vheader: QHeaderView|None = self.segmenttable.verticalHeader()
         if vheader is not None:
             vheader.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
         regextime = QRegularExpression(r'^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$')
@@ -3141,7 +3134,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
                 pidvalues[dkey] = self.aw.fujipid.PXG4[dkey][0]
             pids['pidvalues'] = pidvalues
             # store ramp-soak segments
-            segments:Dict[str,Union[float,int]] = {}
+            segments:dict[str,float|int] = {}
             for i in range(16):
                 svkey = 'segment' + str(i+1) + 'sv'
                 rampkey = 'segment' + str(i+1) + 'ramp'
@@ -3881,7 +3874,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
             reg_dict = self.aw.fujipid.PXF
         for i in reversed(list(range(1,8))):
             svkey = 'sv' + str(i)
-            sv:Optional[float]
+            sv:float|None
             if self.aw.ser.useModbusPort:
                 reg = self.aw.modbus.address2register(reg_dict[svkey][1],3)
                 svr = self.aw.modbus.readSingleRegister(self.aw.ser.controlETpid[1],reg,3)
@@ -4317,7 +4310,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
         self.segmenttable.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         self.segmenttable.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
         self.segmenttable.setShowGrid(True)
-        vheader: Optional[QHeaderView] = self.segmenttable.verticalHeader()
+        vheader: QHeaderView|None = self.segmenttable.verticalHeader()
         if vheader is not None:
             vheader.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
         regextime = QRegularExpression(r'^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$')

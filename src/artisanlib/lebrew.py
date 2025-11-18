@@ -18,7 +18,8 @@
 import re
 import asyncio
 import logging
-from typing import Final, Optional, Union, Callable, Awaitable, TYPE_CHECKING
+from collections.abc import Callable, Awaitable
+from typing import Final, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from bleak.backends.characteristic import BleakGATTCharacteristic  # pylint: disable=unused-import
@@ -35,14 +36,14 @@ class Lebrew_RoastSeeNEXT_BLE(ClientBLE):
     LEBREW_RoastSeeNEXT_NOTIFY_UUID:Final[str] = '0000bb01-0000-1000-8000-00805f9b34fb' # 'bb01'
 
     def __init__(self,
-                    read_msg:Callable[[Union[asyncio.StreamReader, IteratorReader]], Awaitable[None]],
-                    connected_handler:Optional[Callable[[], None]] = None,
-                    disconnected_handler:Optional[Callable[[], None]] = None):
+                    read_msg:Callable[[asyncio.StreamReader|IteratorReader], Awaitable[None]],
+                    connected_handler:Callable[[], None]|None = None,
+                    disconnected_handler:Callable[[], None]|None = None):
         super().__init__()
 
         # Protocol parser variables
-        self._read_queue : Optional[asyncio.Queue[bytes]] = None
-        self._read_msg:Callable[[Union[asyncio.StreamReader, IteratorReader]], Awaitable[None]] = read_msg
+        self._read_queue : asyncio.Queue[bytes]|None = None
+        self._read_msg:Callable[[asyncio.StreamReader|IteratorReader], Awaitable[None]] = read_msg
 
         # handlers
         self._connected_handler = connected_handler
@@ -89,10 +90,10 @@ class Lebrew_RoastSeeNEXT:
     __slots__ = [ '_ble_client', '_ble_client_started', '_payload_pattern', '_agtron', '_crack', '_RoR', '_FoR', '_distance', '_time', '_yellow', '_logging' ]
 
     def __init__(self,
-                    connected_handler:Optional[Callable[[], None]] = None,
-                    disconnected_handler:Optional[Callable[[], None]] = None) -> None:
+                    connected_handler:Callable[[], None]|None = None,
+                    disconnected_handler:Callable[[], None]|None = None) -> None:
 
-        self._ble_client:Optional[Lebrew_RoastSeeNEXT_BLE] = \
+        self._ble_client:Lebrew_RoastSeeNEXT_BLE|None = \
                 Lebrew_RoastSeeNEXT_BLE(self.read_msg, connected_handler, disconnected_handler)
         self._ble_client_started:bool = False
         self._payload_pattern:re.Pattern[str] = re.compile(r'[^0-9,.]')
@@ -160,10 +161,10 @@ class Lebrew_RoastSeeNEXT:
     # asyncio read implementation
 
     # https://www.oreilly.com/library/view/using-asyncio-in/9781492075325/ch04.html
-    async def read_msg(self, stream: Union[asyncio.StreamReader, IteratorReader]) -> None:
+    async def read_msg(self, stream: asyncio.StreamReader|IteratorReader) -> None:
         data = await stream.readuntil(self.SEPARATOR)
         # register readings
-        self.register_reading(data[:-1]) # self.SEPARATOR is included in readuntil result and need to be removed
+        self.register_reading(data[:-len(self.SEPARATOR)]) # self.SEPARATOR is included in readuntil result and need to be removed
 
     def start(self, connect_timeout:float=3) -> None:
         if self._ble_client is not None and not self._ble_client_started:

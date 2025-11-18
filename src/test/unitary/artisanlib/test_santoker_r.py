@@ -27,7 +27,7 @@ modules that handle BLE communication and sensor data processing algorithms.
 """
 
 import sys
-from typing import Generator
+from collections.abc import Generator
 from unittest.mock import patch
 
 import pytest

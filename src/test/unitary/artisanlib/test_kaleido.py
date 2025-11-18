@@ -29,7 +29,7 @@ modules that handle complex async communication and state management.
 """
 
 import sys
-from typing import Generator
+from collections.abc import Generator
 from unittest.mock import patch
 
 import pytest
@@ -225,21 +225,21 @@ class TestKaleidoImplementationDetails:
 
         # Test that KaleidoPort methods are defined in the source
         assert 'def setLogging(self, b:bool) -> None:' in source_content
-        assert 'def getBTET(self) -> Tuple[float,float, int]:' in source_content
-        assert 'def getSVAT(self) -> Tuple[float,float]:' in source_content
-        assert 'def getDrumAH(self) -> Tuple[float,float]:' in source_content
-        assert 'def getHeaterFan(self) -> Tuple[float,float]:' in source_content
+        assert 'def getBTET(self) -> tuple[float,float, int]:' in source_content
+        assert 'def getSVAT(self) -> tuple[float,float]:' in source_content
+        assert 'def getDrumAH(self) -> tuple[float,float]:' in source_content
+        assert 'def getHeaterFan(self) -> tuple[float,float]:' in source_content
         assert 'def resetReadings(self) -> None:' in source_content
         assert 'def pidON(self) -> None:' in source_content
         assert 'def pidOFF(self) -> None:' in source_content
         assert 'def setSV(self, sv:float) -> None:' in source_content
-        assert 'def get_state(self, var:str) -> Optional[Union[str,int,float]]:' in source_content
+        assert 'def get_state(self, var:str) -> str|int|float|None:' in source_content
         assert (
-            'def send_msg(self, target:str, value:Optional[str] = None, timeout:Optional[float] = None) -> None:'
+            'def send_msg(self, target:str, value:str|None = None, timeout:float|None = None) -> None:'
             in source_content
         )
         assert (
-            'def send_request(self, target:str, value:Optional[str] = None, var:Optional[str] = None,'
+            'def send_request(self, target:str, value:str|None = None, var:str|None = None,'
             in source_content
         )
         assert (

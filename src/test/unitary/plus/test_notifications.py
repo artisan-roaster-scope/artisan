@@ -5,12 +5,13 @@
 
 import json
 import sys
-from typing import Any, Dict, Generator
+from collections.abc import Generator
+from typing import Any
 from unittest.mock import Mock, patch
 
 # Store original modules before any mocking to enable restoration
-original_modules: Dict[str, Any] = {}
-original_functions: Dict[str, Any] = {}
+original_modules: dict[str, Any] = {}
+original_functions: dict[str, Any] = {}
 modules_to_isolate = [
     'PyQt6.QtCore',
     'PyQt5.QtCore',
@@ -318,7 +319,7 @@ def mock_http_response() -> Mock:
 
 
 @pytest.fixture
-def sample_notification_data() -> Dict[str, Any]:
+def sample_notification_data() -> dict[str, Any]:
     """Create sample notification data."""
     return {
         'success': True,
@@ -452,7 +453,7 @@ class TestRetrieveNotifications:
     """Test retrieveNotifications function."""
 
     def test_retrieve_notifications_successful(
-        self, mock_app_window:Mock, mock_http_response:Mock, sample_notification_data:Dict[str,Any], mock_qsemaphore:Mock
+        self, mock_app_window:Mock, mock_http_response:Mock, sample_notification_data:dict[str,Any], mock_qsemaphore:Mock
     ) -> None:
         """Test retrieveNotifications with successful response."""
         # Arrange

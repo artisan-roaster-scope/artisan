@@ -21,20 +21,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-try:
-    #pylint: disable = E, W, R, C
-    from PyQt6.QtCore import QSemaphore, QTimer, Qt, pyqtSlot # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt6.QtWidgets import QWidget, QApplication, QMessageBox # @UnusedImport @Reimport  @UnresolvedImport
-except Exception: # pylint: disable=broad-except
-    #pylint: disable = E, W, R, C
-    from PyQt5.QtCore import QSemaphore, QTimer, Qt, pyqtSlot # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-    from PyQt5.QtWidgets import QWidget, QApplication, QMessageBox # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-
+#pylint: disable = E, W, R, C
+from PyQt6.QtCore import QSemaphore, QTimer, Qt, pyqtSlot
+from PyQt6.QtWidgets import QWidget, QApplication, QMessageBox
 
 import platform
 import threading
 import logging
-from typing import Final, Optional, TYPE_CHECKING
+from typing import Final, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
@@ -410,7 +404,7 @@ def reconnected() -> None:
 # otherwise return None
 # this function is called by filesave(), automaticsave(), scheduler:register_roast()
 # it returns the sync_record hash to be added to the saved file
-def updateSyncRecordHashAndSync() -> Optional[str]:
+def updateSyncRecordHashAndSync() -> str|None:
     try:
         _log.debug('updateSyncRecordHashAndSync()')
         if is_on():

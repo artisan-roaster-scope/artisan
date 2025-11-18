@@ -5,12 +5,10 @@
 import time as libtime
 import xlrd
 import logging
-from typing import Final, Union, List, Sequence, Dict, Optional, Callable
+from collections.abc import Callable, Sequence
+from typing import Final
 
-try:
-    from PyQt6.QtCore import QDateTime, Qt # @UnusedImport @Reimport  @UnresolvedImport
-except ImportError:
-    from PyQt5.QtCore import QDateTime, Qt # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
+from PyQt6.QtCore import QDateTime, Qt
 
 from artisanlib.util import encodeLocal, encodeLocalStrict
 from artisanlib.atypes import ProfileData
@@ -20,21 +18,21 @@ _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 # returns a dict containing all profile information contained in the given Cropster XLS file
 def extractProfileCropsterXLS(file:str,
-        etypesdefault:List[str],
-        _alt_etypesdefault:List[str],
-        artisanflavordefaultlabels:List[str],
+        etypesdefault:list[str],
+        _alt_etypesdefault:list[str],
+        artisanflavordefaultlabels:list[str],
         eventsExternal2InternalValue:Callable[[int],float]) -> ProfileData:
 
-    def takeClosest(num:float, collection:List[float]) -> float:
+    def takeClosest(num:float, collection:list[float]) -> float:
         return min(collection, key=lambda x:abs(x-num))
 
     res:ProfileData = ProfileData() # the interpreted data set
 
     book = xlrd.open_workbook(file)
 
-    sheet_names:List[str] = book.sheet_names()
+    sheet_names:list[str] = book.sheet_names()
 
-    id_tag_trans:List[str] = [
+    id_tag_trans:list[str] = [
         'Id-Tag',  # EN
         'ID-Tag',  # DE
         'Etiqueta de identificaci\u00f3n', # ES
@@ -47,7 +45,7 @@ def extractProfileCropsterXLS(file:str,
         'ID\uff0d\u6807\u7b7e', # CN simplified
         '\u7de8\u865f\u0020\u002d\u0020\u6a19\u7c64'] # CN traditional
 
-    date_trans:List[str] = [
+    date_trans:list[str] = [
         'Date',  # EN
         'Datum', # DE
         'Fecha', # ES
@@ -777,12 +775,12 @@ def extractProfileCropsterXLS(file:str,
     general_sh = book.sheet_by_index(0)
     if general_sh.nrows >= 1:
         row1 = general_sh.row(1)
-        general_data = dict(zip([x.value for x in general_sh.row(0)],row1))
+        general_data = dict(zip([x.value for x in general_sh.row(0)], row1, strict=True)) # ty:ignore
 
         res['samplinginterval'] = 1.0
 
         try:
-            id_tag_value:Optional[str] = None
+            id_tag_value:str|None = None
             # try to find the "Id-Tag" value
             # 1. test the column name in all known translations
             for tag in id_tag_trans:
@@ -833,7 +831,7 @@ def extractProfileCropsterXLS(file:str,
                 pass
 
         try:
-            date_tag_value:Optional[float] = None
+            date_tag_value:float|None = None
             # try to find the "Date" value
             # 1. test the column name in all known translations
             for tag in date_trans:
@@ -847,13 +845,13 @@ def extractProfileCropsterXLS(file:str,
                 date_tuple = xlrd.xldate_as_tuple(date_tag_value, book.datemode)
                 date = QDateTime(*date_tuple)
                 if date.isValid():
-                    roastdate:Optional[str] = encodeLocal(date.date().toString())
+                    roastdate:str|None = encodeLocal(date.date().toString())
                     if roastdate is not None:
                         res['roastdate'] = roastdate
-                    roastisodate:Optional[str] = encodeLocal(date.date().toString(Qt.DateFormat.ISODate))
+                    roastisodate:str|None = encodeLocal(date.date().toString(Qt.DateFormat.ISODate))
                     if roastisodate is not None:
                         res['roastisodate'] = roastisodate
-                    roasttime:Optional[str] = encodeLocal(date.time().toString())
+                    roasttime:str|None = encodeLocal(date.time().toString())
                     if roasttime is not None:
                         res['roasttime'] = roasttime
                     res['roastepoch'] = int(date.toSecsSinceEpoch())
@@ -907,10 +905,10 @@ def extractProfileCropsterXLS(file:str,
             pass
 
         try:
-            start_weight_unit_tag_value:Optional[str] = None
-            end_weight_unit_tag_value:Optional[str] = None
-            start_weight_tag_value:Optional[float] = None
-            end_weight_tag_value:Optional[float] = None
+            start_weight_unit_tag_value:str|None = None
+            end_weight_unit_tag_value:str|None = None
+            start_weight_tag_value:float|None = None
+            end_weight_tag_value:float|None = None
 
             # try to find the "Start weight" value
             # test the column name in all known translations
@@ -948,7 +946,7 @@ def extractProfileCropsterXLS(file:str,
             if start_weight_tag_value is not None and end_weight_tag_value is not None:
                 cropster_weight_units = ['G','KG','LBS','OZ']
                 artisan_weight_units = ['g','Kg','lb','oz']
-                weight:List[Union[float,str]] = [0,0,artisan_weight_units[0]]
+                weight:list[float|str] = [0,0,artisan_weight_units[0]]
                 try:
                     if end_weight_unit_tag_value is not None:
                         idx = cropster_weight_units.index(end_weight_unit_tag_value)
@@ -1040,18 +1038,18 @@ def extractProfileCropsterXLS(file:str,
     except Exception: # pylint: disable=broad-except
         pass
 
-    ordered_sheet_names:Sequence[Optional[str]]
+    ordered_sheet_names:Sequence[str|None]
 
     ordered_sheet_names = sheet_names
 
     # sheet names to indexes in the original table order (note the ordered_sheet_names now are in a different order!)
-    sheet_idx:Dict[str,int] = {n:i for i,n in enumerate(sheet_names)}
+    sheet_idx:dict[str,int] = {n:i for i,n in enumerate(sheet_names)}
 
     # extra temperature curves (only if ET or BT and its corresponding timex was already parsed successfully)
     if len(res['timex']) > 0:
         channel = 1 # toggle between channel 1 and 2 to be filled with extra temperature curve data
         for sno in ordered_sheet_names:
-            snn:Optional[str] = (None if sno is None else sno.strip())
+            snn:str|None = (None if sno is None else sno.strip())
             if snn is None or snn in extra_temp_curve_trans:
                 temp_curve = True
             elif snn in extra_nontemp_curve_trans:
@@ -1174,10 +1172,10 @@ def extractProfileCropsterXLS(file:str,
             COMMENTS_sh = book.sheet_by_index(COMMENTS_idx)
             gas_event = False # set to True if a Gas event exists
             airflow_event = False # set to True if an Airflow event exists
-            specialevents:List[int] = []
-            specialeventstype:List[int] = []
-            specialeventsvalue:List[float] = []
-            specialeventsStrings:List[str] = []
+            specialevents:list[int] = []
+            specialeventstype:list[int] = []
+            specialeventsvalue:list[float] = []
+            specialeventsStrings:list[str] = []
             if COMMENTS_sh.ncols >= 4:
                 for r in range(COMMENTS_sh.nrows):
                     if r>0:
@@ -1220,12 +1218,12 @@ def extractProfileCropsterXLS(file:str,
                                     except Exception: # pylint: disable=broad-except
                                         specialeventsvalue.append(0)
                                     if not ae and not ge and comment_type not in comment_trans:
-                                        event_type_str:Optional[str] = encodeLocal(comment_type)
+                                        event_type_str:str|None = encodeLocal(comment_type)
                                         if event_type_str is None:
                                             event_type_str = 'event'
                                         specialeventsStrings.append(event_type_str)
                                     else:
-                                        event_value_str:Optional[str] = encodeLocal(comment_value)
+                                        event_value_str:str|None = encodeLocal(comment_value)
                                         if event_value_str is None:
                                             event_value_str = 'event'
                                         specialeventsStrings.append(event_value_str)
