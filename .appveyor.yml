@@ -59,7 +59,7 @@ stack:
   python ${PYTHON_V}
 
 for:
--
+#-
 #  matrix:
 #    only:
 #      - job_name: windows_legacy
