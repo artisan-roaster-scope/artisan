@@ -292,6 +292,7 @@ class tgraphcanvas(FigureCanvas):
         'eventactionsemaphore', 'updateBackgroundSemaphore', 'alarmSemaphore', 'rampSoakSemaphore', 'crossmarker', 'crossmouseid', 'onreleaseid',
         'analyzer_connect_id', 'extra309T3', 'extra309T4', 'extra309TX', 'hottop_ET', 'hottop_BT', 'hottop_HEATER', 'hottop_MAIN_FAN', 'hottop_TX',
         'extraTASI_TA612C_TX', 'extraTASI_TA612C_T3', 'extraTASI_TA612C_T4',
+        'extraEVOLV_DNA_TX', 'extraEVOLV_DNA_T3', 'extraEVOLV_DNA_T4','extraEVOLV_DNA_T5', 'extraEVOLV_DNA_T6', 'extraEVOLV_DNA_T7', 'extraEVOLV_DNA_T8',
         'R1_DT', 'R1_BT', 'R1_BT_ROR', 'R1_EXIT_TEMP', 'R1_HEATER', 'R1_FAN', 'R1_DRUM', 'R1_VOLTAGE', 'R1_TX', 'R1_STATE', 'R1_FAN_RPM', 'R1_STATE_STR',
         'shellyPlusPlug_TX', 'shellyPlusPlug_Power', 'shellyPlusPlug_Temp', 'shellyPlusPlug_Voltage', 'shellyPlusPlug_Current',
         'extraArduinoTX', 'extraArduinoT1', 'extraArduinoT2', 'extraArduinoT3', 'extraArduinoT4', 'extraArduinoT5', 'extraArduinoT6', 'program_t3', 'program_tx', 'program_t4', 'program_t5', 'program_t6',
@@ -920,7 +921,11 @@ class tgraphcanvas(FigureCanvas):
                        '+RoastSeeNEXT Agtron/Crack',    #187
                        '+RoastSeeNEXT RoR/FoR',         #188
                        '+RoastSeeNEXT Distance/Time',   #189
-                       '+RoastSeeNEXT Yellow'           #190
+                       '+RoastSeeNEXT Yellow',          #190
+                       'Evolv DNA',                     #191
+                       '+Evolv DNA 34',                 #192
+                       '+Evolv DNA 56',                 #193
+                       '+Evolv DNA 78'                  #194
                        ]
 
         # ADD DEVICE:
@@ -2207,6 +2212,15 @@ class tgraphcanvas(FigureCanvas):
         self.extraTASI_TA612C_T4:float = -1
         self.extraTASI_TA612C_TX:float = 0.
 
+        #temporary storage to pass values. Holds extra T3 and T4 values for EVOLV DNA
+        self.extraEVOLV_DNA_T3:float = -1
+        self.extraEVOLV_DNA_T4:float = -1
+        self.extraEVOLV_DNA_T5:float = -1
+        self.extraEVOLV_DNA_T6:float = -1
+        self.extraEVOLV_DNA_T7:float = -1
+        self.extraEVOLV_DNA_T8:float = -1
+        self.extraEVOLV_DNA_TX:float = 0.        
+        
         #temporary storage to pass values. Holds all values retrieved from a Hottop roaster
         self.hottop_ET:float = -1
         self.hottop_BT:float = -1

@@ -561,7 +561,11 @@ class serialport:
                                    self.RoastSeeNEXT_AGTRON_CRACK,   #187
                                    self.RoastSeeNEXT_RoR_FoR,        #188
                                    self.RoastSeeNEXT_Distance_Time,  #189
-                                   self.RoastSeeNEXT_Yello           #190
+                                   self.RoastSeeNEXT_Yello,          #190
+                                   self.EVOLV_DNA,            #191
+                                   self.EVOLV_DNA_34,         #192
+                                   self.EVOLV_DNA_56,         #193
+                                   self.EVOLV_DNA_78          #194
                                    ]
         #string with the name of the program for device #27
         self.externalprogram:str = 'test.py'
@@ -1668,6 +1672,20 @@ class serialport:
     def TASI_TA612C_34(self) -> tuple[float,float,float]:
         #return saved readings collected at self.TA612C()
         return self.aw.qmc.extraTASI_TA612C_TX,self.aw.qmc.extraTASI_TA612C_T4,self.aw.qmc.extraTASI_TA612C_T3
+
+    def EVOLV_DNA(self) -> tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        ohms,temp = self.EvolvDNA_data()
+        return tx,ohms,temp # ET, BT
+    
+    def EVOLV_DNA_34(self) -> tuple[float,float,float]:
+        return self.aw.qmc.extraEVOLV_DNA_TX,self.aw.qmc.extraEVOLV_DNA_T4,self.aw.qmc.extraEVOLV_DNA_T3
+
+    def EVOLV_DNA_56(self) -> tuple[float,float,float]:
+        return self.aw.qmc.extraEVOLV_DNA_TX,self.aw.qmc.extraEVOLV_DNA_T6,self.aw.qmc.extraEVOLV_DNA_T5
+    
+    def EVOLV_DNA_78(self) -> tuple[float,float,float]:
+        return self.aw.qmc.extraEVOLV_DNA_TX,self.aw.qmc.extraEVOLV_DNA_T8,self.aw.qmc.extraEVOLV_DNA_T7
 
     def VOLTCRAFTK204(self) -> tuple[float,float,float]:
         tx = self.aw.qmc.timeclock.elapsedMilli()
@@ -3238,6 +3256,77 @@ class serialport:
                 settings = str(self.comport) + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + str(self.parity) + ',' + str(self.stopbits) + ',' + str(self.timeout)
                 self.aw.addserial('TA612C: ' + settings + ' || Tx = ' + cmd2str(binascii.hexlify(command_frame)) + ' || Rx = ' + cmd2str(binascii.hexlify(line)))
 
+    def EvolvDNA_data(self, retry:int = 1) -> tuple[float, float]: # pyrefly: ignore[bad-return]
+        del retry
+
+        def read_line():
+            """Read one line and extract only the numeric value."""
+            line = self.SP.readline().decode(errors="ignore").strip()
+            # extract the first number, including decimal
+            import re
+            match = re.search(r'[-+]?\d*\.?\d+', line)
+            if match:
+                return float(match.group())
+            return 0
+        
+        command_liveres = "R=GET LIVE"
+        command_temperature = "T=GET"
+        command_tension = "V=GET"
+        command_current = "I=GET"
+        command_power = "P=GET" # lets ask the mod instead of using volts * amps 
+        command_coldres = "R=GET"
+        command_roomtemp = "T=GET ROOM"
+        command_boardtemp = "T=GET BOARD"
+        command_frame = (
+                        f"{command_liveres}\r"
+                        f"{command_temperature}\r"
+                        f"{command_tension}\r"
+                        f"{command_current}\r"
+                        f"{command_power}\r"
+                        f"{command_coldres}\r"
+                        f"{command_roomtemp}\r"
+                        f"{command_boardtemp}\r"
+                        ).encode()
+                               
+        try:
+            if not self.SP.is_open:
+                self.openport()
+            if self.SP.is_open:
+                self.SP.reset_input_buffer()
+                self.SP.reset_output_buffer()
+                self.SP.write(command_frame)
+                self.SP.flush()
+                libtime.sleep(.1)
+                ohms = read_line() * 1000 # milliohms
+                temp = read_line()
+                volts = read_line()
+                amps = read_line()
+                power = read_line()
+                coldres = read_line() * 1000 # milliohms
+                roomtemp = read_line()
+                boardtemp = read_line()
+
+                self.aw.qmc.extraEVOLV_DNA_T3 = volts
+                self.aw.qmc.extraEVOLV_DNA_T4 = amps
+                self.aw.qmc.extraEVOLV_DNA_T5 = power 
+                self.aw.qmc.extraEVOLV_DNA_T6 = coldres
+                self.aw.qmc.extraEVOLV_DNA_T7 = roomtemp 
+                self.aw.qmc.extraEVOLV_DNA_T8 = boardtemp
+
+                return ohms,temp
+            return -1,-1
+        except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
+            _, _, exc_tb = sys.exc_info()
+            self.aw.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' EvolvDNA() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+            self.closeport()
+            return -1,-1
+        finally:
+            #note: logged chars should be unicode not binary
+            if self.aw.seriallogflag:
+                settings = str(self.comport) + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + str(self.parity) + ',' + str(self.stopbits) + ',' + str(self.timeout)
+                self.aw.addserial('EvolvDNA: ' + settings + ' || Tx = ' + cmd2str(f"{command_frame}".encode()) + ' || Rx = ' + cmd2str(f"{ohms},{temp},{volts},{amps},{power},{coldres},{roomtemp},{boardtemp}".encode()))
+                
     def CENTER302temperature(self,retry:int = 2) -> tuple[float, float]: # pyrefly: ignore[bad-return]
         import binascii
         command = str2cmd('\x41')
