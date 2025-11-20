@@ -17927,9 +17927,9 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                 if 'bt' in self.qmc.palette:
                     self.setLabelColor(self.label3,self.qmc.palette['bt'], self.qmc.BTcurve)
                 if 'deltaet' in self.qmc.palette:
-                    self.setLabelColor(self.label4,self.qmc.palette['deltaet'], self.qmc.DeltaETcurve)
+                    self.setLabelColor(self.label4,self.qmc.palette['deltaet'], self.qmc.DeltaETflag)
                 if 'deltabt' in self.qmc.palette:
-                    self.setLabelColor(self.label5,self.qmc.palette['deltabt'], self.qmc.DeltaBTcurve)
+                    self.setLabelColor(self.label5,self.qmc.palette['deltabt'], self.qmc.DeltaBTflag)
                 if 'canvas' in self.qmc.palette:
                     if len(self.qmc.palette['canvas']) == 0:  #revert the canvas element to default if it is blank in the settings.
                         self.qmc.palette['canvas'] = '#f8f8f8'
