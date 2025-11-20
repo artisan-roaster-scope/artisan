@@ -944,13 +944,13 @@ class graphColorDlg(ArtisanDialog):
             var.setStyleSheet('QPushButton { background: ' + rgba_colorname2argb_colorname(self.aw.qmc.palette[color]) + '; color: ' + tc + ';' + self.commonstyle + '}')
             self.aw.qmc.redraw(recomputeAllDeltas=False)
             if title == 'ET':
-                self.aw.setLabelColor(self.aw.label2, self.aw.qmc.palette[color])
+                self.aw.setLabelColor(self.aw.label2, self.aw.qmc.palette[color], self.aw.qmc.ETcurve)
             elif title == 'BT':
-                self.aw.setLabelColor(self.aw.label3, self.aw.qmc.palette[color])
+                self.aw.setLabelColor(self.aw.label3, self.aw.qmc.palette[color], self.aw.qmc.BTcurve)
             elif title == 'DeltaET':
-                self.aw.setLabelColor(self.aw.label4, self.aw.qmc.palette[color])
+                self.aw.setLabelColor(self.aw.label4, self.aw.qmc.palette[color], self.aw.qmc.DeltaETcurve)
             elif title == 'DeltaBT':
-                self.aw.setLabelColor(self.aw.label5, self.aw.qmc.palette[color])
+                self.aw.setLabelColor(self.aw.label5, self.aw.qmc.palette[color], self.aw.qmc.DeltaBTcurve)
             self.aw.sendmessage(QApplication.translate('Message','Color of {0} set to {1}').format(title,str(self.aw.qmc.palette[color])))
 
     @pyqtSlot(int)

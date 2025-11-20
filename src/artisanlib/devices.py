@@ -3373,7 +3373,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     colorname = argb_colorname2rgba_colorname(colorf.name(QColor.NameFormat.HexArgb))
                     self.aw.qmc.extradevicecolor1[i] = colorname
                     # set LCD label color
-                    self.aw.setLabelColor(self.aw.extraLCDlabel1[i],colorname)
+                    self.aw.setLabelColor(self.aw.extraLCDlabel1[i], colorname, self.aw.extraCurveVisibility1[i])
                     color1Button = cast(QPushButton, self.devicetable.cellWidget(i,1))
                     color1Button.setStyleSheet(f"border: none; outline: none; background-color: rgba{ImageColor.getcolor(self.aw.qmc.extradevicecolor1[i], 'RGBA')}; color: { self.aw.labelBorW(self.aw.qmc.extradevicecolor1[i])}")
                     color1Button.setText(colorname)
@@ -3387,7 +3387,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     colorname = argb_colorname2rgba_colorname(colorf.name(QColor.NameFormat.HexArgb))
                     self.aw.qmc.extradevicecolor2[i] = colorname
                     # set LCD label color
-                    self.aw.setLabelColor(self.aw.extraLCDlabel2[i],colorname)
+                    self.aw.setLabelColor(self.aw.extraLCDlabel2[i],colorname, self.aw.extraCurveVisibility2[i])
                     color2Button = cast(QPushButton, self.devicetable.cellWidget(i,2))
                     color2Button.setStyleSheet(f"border: none; outline: none; background-color: rgba{ImageColor.getcolor(self.aw.qmc.extradevicecolor2[i], 'RGBA')}; color: {self.aw.labelBorW(self.aw.qmc.extradevicecolor2[i])}")
                     color2Button.setText(colorname)

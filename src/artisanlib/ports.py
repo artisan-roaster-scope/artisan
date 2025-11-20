@@ -1519,7 +1519,7 @@ class comportDlg(ArtisanResizeablDialog):
         elif devid == 79: # switch to S7 tab if S7 device was selected as main device
             self.TabWidget.setCurrentIndex(3)
         elif devid == 111:  # switch to WebSocket tab if WebSocket device was selected as main device
-            self.TabWidget.setCurrentIndex(6)
+            self.TabWidget.setCurrentIndex(4)
         #incorporate layouts
         Mlayout = QVBoxLayout()
         Mlayout.addWidget(self.TabWidget)

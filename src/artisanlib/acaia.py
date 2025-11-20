@@ -175,7 +175,6 @@ ACAIA_LUNAR_NAME:Final[str] = 'LUNAR-'   # Acaia Lunar (2021)
 ACAIA_CINCO_NAME:Final[str] = 'CINCO'    # Acaia Cinco
 ACAIA_PYXIS_NAME:Final[str] = 'PYXIS'    # Acaia Pyxis
 
-
 # Acaia Relay service and characteristics UUIDs
 ACAIA_RELAY_SERVICE_UUID:Final[str] = '0000fe40-cc7a-482a-984a-7f2ed5b3e58f'
 ACAIA_RELAY_NOTIFY_UUID:Final[str] = '0000fe42-8e22-4541-9d4c-21edae82ed19'
@@ -185,9 +184,13 @@ ACAIA_RELAY_WRITE_UUID:Final[str] = '0000fe41-8e22-4541-9d4c-21edae82ed19' # wri
 ACAIA_UMBRA_NAME:Final[str] = 'UMBRA'    # Acaia Umbra
 ACAIA_COSMO_NAME:Final[str] = 'COSMO'    # Acaia Cosmo
 
+# Acaia Pyxis Black 2025 name prefix
+ACAIA_PYXIS_BLACK_NAME:Final[str] = 'ACAIAS-P' # Acaia Pyxis Black 2025
+
 
 # Acaia scale device name prefixes and product names
 ACAIA_SCALE_NAMES = [
+    (ACAIA_PYXIS_BLACK_NAME, 'Pyxis'), # Pyxis 2025
     (ACAIA_LEGACY_LUNAR_NAME, 'Lunar'), # original Lunar
     (ACAIA_LUNAR_NAME, 'Lunar'), # Lunar 2021 and later
     (ACAIA_LEGACY_PEARL_NAME, 'Pearl'), # original Pearl
@@ -273,11 +276,6 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
         # configure heartbeat
         self.set_heartbeat(self.HEARTBEAT_FREQUENCY) # send keep-alive heartbeat all 5sec; only for LEGACY scales
 
-        # register Acaia Legacy UUIDs
-        for legacy_name in (ACAIA_LEGACY_LUNAR_NAME, ACAIA_LEGACY_PEARL_NAME):
-            self.add_device_description(ACAIA_LEGACY_SERVICE_UUID, legacy_name)
-        self.add_notify(ACAIA_LEGACY_NOTIFY_UUID, self.notify_callback)
-        self.add_write(ACAIA_LEGACY_SERVICE_UUID, ACAIA_LEGACY_WRITE_UUID)
 
         # register Acaia Current UUIDs
         for acaia_name in (ACAIA_PEARL_NAME, ACAIA_PEARLS_NAME, ACAIA_LUNAR_NAME, ACAIA_PYXIS_NAME, ACAIA_CINCO_NAME):
@@ -286,10 +284,17 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
         self.add_write(ACAIA_SERVICE_UUID, ACAIA_WRITE_UUID)
 
         # register Acaia Relay UUIDs
-        for acaia_name in (ACAIA_UMBRA_NAME, ACAIA_COSMO_NAME):
+        for acaia_name in (ACAIA_UMBRA_NAME, ACAIA_COSMO_NAME, ACAIA_PYXIS_BLACK_NAME):
             self.add_device_description(ACAIA_RELAY_SERVICE_UUID, acaia_name)
         self.add_notify(ACAIA_RELAY_NOTIFY_UUID, self.notify_callback)
         self.add_write(ACAIA_RELAY_SERVICE_UUID, ACAIA_RELAY_WRITE_UUID)
+
+        # register Acaia Legacy UUIDs (need to be added after the relay scales for the name overlap between ACAIA_LEGACY_LUNAR_NAME and ACAIA_PYXIS_BLACK_NAME)
+        for legacy_name in (ACAIA_LEGACY_LUNAR_NAME, ACAIA_LEGACY_PEARL_NAME):
+            self.add_device_description(ACAIA_LEGACY_SERVICE_UUID, legacy_name)
+        self.add_notify(ACAIA_LEGACY_NOTIFY_UUID, self.notify_callback)
+        self.add_write(ACAIA_LEGACY_SERVICE_UUID, ACAIA_LEGACY_WRITE_UUID)
+
 
     # protocol parser
 
@@ -340,6 +345,10 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
                     self.max_weight = 10*1000
                     self.readability = 0.1
                     self.has_leds = True
+                elif connected_device_name.startswith('ACAIAS-P'):
+                    self.max_weight = 500
+                    self.readability = 0.001
+                    self.has_leds = False
                 else:
                     self.max_weight = 1000
                     self.readability = 0.1
@@ -393,7 +402,7 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
     def decode_weight(self, payload:bytes) -> tuple[float|None, bool]:
         try:
             #big_endian = (payload[5] & 0x08) == 0x08 # bit 3 of byte 5 is set if weight is in big endian
-            big_endian = False # self.scale_class == SCALE_CLASS.RELAY
+            big_endian = False
 
             value:float = 0
             if big_endian:

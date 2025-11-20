@@ -22,7 +22,7 @@ from artisanlib import __build__
 from artisanlib import __release_sponsor_domain__
 from artisanlib import __release_sponsor_url__
 
-import gc
+#import gc
 import time as libtime
 import os
 import sys  # @UnusedImport
@@ -117,6 +117,31 @@ _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 
 type Interp1dKind = Literal['linear', 'nearest', 'nearest-up', 'zero', 'slinear', 'quadratic', 'cubic', 'previous', 'next']
+
+
+##### BEGIN Profiling: use @profile annotations and check results using '# snakeviz *.profile'
+#import io
+#import cProfile
+#import pstats
+#from functools import wraps
+#from typing import TypeVar
+#RT = TypeVar('RT')  # return type
+#def profile(func:Callable[..., RT]) -> Callable[..., RT]:
+#    @wraps(func)
+#    def wrapper(*args:Any, **kwargs:Any) -> RT:
+#        datafn = func.__name__ + ".profile" # Name the data file sensibly
+#        pr = cProfile.Profile()
+#        pr.enable()
+#        retval = func(*args, **kwargs)
+#        pr.disable()
+#        s = io.StringIO()
+#        sortby = pstats.SortKey.CUMULATIVE  # 'cumulative'
+#        ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
+#        ps.dump_stats(f'/Users/luther/{datafn}')
+#        return retval
+#    return wrapper
+##### END Profiling
+
 
 #######################################################################################
 #################### Ambient Data Collection  #########################################
@@ -7565,28 +7590,27 @@ class tgraphcanvas(FigureCanvas):
             return str(float2float(res))
         return str(int(round(res)))
 
+
     #used by xaxistosm(). Provides also negative time
     def formtime(self, x:float, _pos:int|None) -> str:
         starttime:float
-        if bool(self.aw.comparator):
-            starttime = 0
-        elif self.timeindex[0] != -1 and self.timeindex[0] < len(self.timex):
+        if not bool(self.aw.comparator) and (self.timeindex[0] != -1 and self.timeindex[0] < len(self.timex)):
             starttime = self.timex[self.timeindex[0]]
         else:
             starttime = 0
-
         displaytime = x - round(starttime)
-
         if self.aw.qmc.xgrid >= 3600:
             # hours or days as step selected
             displaytime = displaytime / 60
+        return self.formtime_formatter(displaytime, x)
 
-        sign = ('-' if x <= starttime else '')
-
+    @staticmethod
+#    @functools.lru_cache(maxsize=500)
+    def formtime_formatter(displaytime:float, x:float) -> str:
+        sign = ('-' if x <= displaytime else '')
         m,s = divmod(abs(displaytime), 60.)
         s = int(round(s))
         m = int(m)
-
         if s >= 59:
             return f'{sign}{m+1:.0f}'
         if abs(s-30) < 1:
@@ -7596,6 +7620,7 @@ class tgraphcanvas(FigureCanvas):
         if m == 0:
             return '0'
         return f'{sign}{m:.0f}'
+
 
     # returns True if nothing to save, discard or save was selected and False if canceled by the user
     def checkSaved(self,allow_discard:bool = True) -> bool:
@@ -8078,11 +8103,11 @@ class tgraphcanvas(FigureCanvas):
             self.aw.autoAdjustAxis(background=not keepProperties) # if reset() triggered by ON, we ignore background on adjusting the axis and adjust according to RESET min/max
             self.redraw(True,re_smooth_foreground=False)
 
-        try:
-            gc.collect()
-            _log.debug('gc_stats: %s', gc.get_stats())
-        except Exception: # pylint: disable=broad-except
-            pass
+#        try:
+#            gc.collect()
+#            _log.debug('gc_stats: %s', gc.get_stats())
+#        except Exception: # pylint: disable=broad-except
+#            pass
         # write memory stats to the log
         try:
             vm = psutil.virtual_memory()
@@ -8778,11 +8803,11 @@ class tgraphcanvas(FigureCanvas):
             roast_start_idx = CHARGEidx if CHARGEidx > -1 else 0
             roast_end_idx = DROPidx if DROPidx > 0 else lt
             if deltaBTsamples is None:
-                dsBT = max(1, self.deltaBTsamples) # now as in sample_processing()
+                dsBT = max(1, self.deltaBTsamples) # as in sample_processing()
             else:
                 dsBT = deltaBTsamples
             if deltaETsamples is None:
-                dsET = max(1, self.deltaETsamples) # now as in sample_processing()
+                dsET = max(1, self.deltaETsamples) # as in sample_processing()
             else:
                 dsET = deltaETsamples
             if timex_lin is not None:

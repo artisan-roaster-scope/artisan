@@ -352,8 +352,9 @@ def fill_gaps(ll:'Sequence[float|int]|npt.NDArray[numpy.floating[Any]]', interpo
                         res.append(last_val)
                 skip = next_idx
             else:
-                res.append(float(e))
-                last_val = float(e)
+                fe = float(e)
+                res.append(fe)
+                last_val = fe
     return res
 
 def replace_duplicates(data:list[float]) -> list[float]:

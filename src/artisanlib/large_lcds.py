@@ -630,22 +630,18 @@ class LargeExtraLCDs(LargeLCDs):
         try:
             sender = self.sender()
             assert isinstance(sender, ClickableLCDFrame)
-            i = self.lcds1frames.index(sender)
-            self.aw.extraCurveVisibility1[i] = not self.aw.extraCurveVisibility1[i]
+            self.aw.toggleExtraCurve1number(self.lcds1frames.index(sender))
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-        self.aw.qmc.redraw_keep_view(recomputeAllDeltas=False)
 
     @pyqtSlot()
     def toggleExtraCurve2(self) -> None:
         try:
             sender = self.sender()
             assert isinstance(sender, ClickableLCDFrame)
-            i = self.lcds2frames.index(sender)
-            self.aw.extraCurveVisibility2[i] = not self.aw.extraCurveVisibility2[i]
+            self.aw.toggleExtraCurve2number(self.lcds2frames.index(sender))
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-        self.aw.qmc.redraw_keep_view(recomputeAllDeltas=False)
 
     def makeLCDs(self) -> None:
         self.lcds1 = []

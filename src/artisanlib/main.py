@@ -65,11 +65,15 @@ from functools import reduce as freduce
 
 
 
-#### Profiling: use @profile annotations
+##### BEGIN Profiling: use @profile annotations and check results using '# snakeviz *.profile'
 #import cProfile
 #import pstats
-#def profile(func):
-#    def wrapper(*args, **kwargs):
+#from functools import wraps
+#from typing import TypeVar
+#RT = TypeVar('RT')  # return type
+#def profile(func:Callable[..., RT]) -> Callable[..., RT]:
+#    @wraps(func)
+#    def wrapper(*args:Any, **kwargs:Any) -> RT:
 #        datafn = func.__name__ + ".profile" # Name the data file sensibly
 #        pr = cProfile.Profile()
 #        pr.enable()
@@ -78,11 +82,10 @@ from functools import reduce as freduce
 #        s = io.StringIO()
 #        sortby = pstats.SortKey.CUMULATIVE  # 'cumulative'
 #        ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
-#        ps.print_stats()
-#        with open(datafn, 'w') as perf_file:
-#            perf_file.write(s.getvalue())
+#        ps.dump_stats(f'/Users/luther/{datafn}')
 #        return retval
 #    return wrapper
+##### END Profiling
 
 
 
@@ -211,7 +214,7 @@ from artisanlib.util import (appFrozen, uchr, decodeLocal, decodeLocalStrict, en
         debugLogLevelActive, setDebugLogLevel, createGradient, natsort, setDeviceDebugLogLevel,
         comma2dot, is_proper_temp, weight_units, volume_units, float2float, float2str,
         convertWeight, convertVolume, rgba_colorname2argb_colorname, render_weight, serialize, deserialize, csv_load, exportProfile2CSV, findTPint,
-        eventtime2string)
+        eventtime2string, toDim)
 
 from artisanlib.qtsingleapplication import QtSingleApplication
 
@@ -3480,22 +3483,22 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         self.label2:QLabel = QLabel()
         self.label2.setAlignment(Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignRight)
         self.label2.setText(f"<big><b>{QApplication.translate('Label', 'ET')}</b></big>")
-        self.setLabelColor(self.label2,self.qmc.palette['et'])
+        self.setLabelColor(self.label2,self.qmc.palette['et'], self.qmc.ETcurve)
         #BT
         self.label3:QLabel = QLabel()
         self.label3.setAlignment(Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignRight)
         self.label3.setText(f"<big><b>{QApplication.translate('Label', 'BT')}</b></big>")
-        self.setLabelColor(self.label3,self.qmc.palette['bt'])
+        self.setLabelColor(self.label3,self.qmc.palette['bt'], self.qmc.BTcurve)
         #DELTA MET
         self.label4:QLabel = QLabel()
         self.label4.setAlignment(Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignRight)
         self.label4.setText(f"{deltaLabelBigPrefix}{QApplication.translate('Label', 'ET')}</b></big>")
-        self.setLabelColor(self.label4,self.qmc.palette['deltaet'])
+        self.setLabelColor(self.label4,self.qmc.palette['deltaet'], self.qmc.DeltaETflag)
         # DELTA BT
         self.label5:QLabel = QLabel()
         self.label5.setAlignment(Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignRight)
         self.label5.setText(f"{deltaLabelBigPrefix}{QApplication.translate('Label', 'BT')}</b></big>")
-        self.setLabelColor(self.label5,self.qmc.palette['deltabt'])
+        self.setLabelColor(self.label5,self.qmc.palette['deltabt'], self.qmc.DeltaBTflag)
         # pid sv
         self.label6:QLabel = QLabel()
         self.label6.setAlignment(Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignRight)
@@ -4635,6 +4638,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             self.qmc.l_event_flags_dict = {}
             # and redraw
             self.qmc.redraw_keep_view(recomputeAllDeltas=False)
+        self.setLabelColor(self.label3,self.qmc.palette['bt'], self.qmc.BTcurve)
 
     def toggleETCurve(self) -> None:
         if len(self.qmc.temp1) > 5:
@@ -4644,6 +4648,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             self.qmc.l_annotations_dict = {}
             self.qmc.l_event_flags_dict = {}
             self.qmc.redraw_keep_view(recomputeAllDeltas=False)
+        self.setLabelColor(self.label2,self.qmc.palette['et'], self.qmc.ETcurve)
 
     @pyqtSlot()
     def toggleDeltaETlcdCurve(self) -> None:
@@ -4666,6 +4671,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             self.qmc.DeltaETflag = not self.qmc.DeltaETflag
             twoAxis_after = self.qmc.twoAxisMode()
             self.qmc.redraw_keep_view(recomputeAllDeltas=False, forceRenewAxis=twoAxis_before != twoAxis_after)
+        self.setLabelColor(self.label4,self.qmc.palette['deltaet'], self.qmc.DeltaETflag)
 
     def toggleDeltaBTCurve(self) -> None:
         if len(self.qmc.delta2) > 5:
@@ -4674,32 +4680,39 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             self.qmc.DeltaBTflag = not self.qmc.DeltaBTflag
             twoAxis_after = self.qmc.twoAxisMode()
             self.qmc.redraw_keep_view(recomputeAllDeltas=False, forceRenewAxis=twoAxis_before != twoAxis_after)
+        self.setLabelColor(self.label5,self.qmc.palette['deltabt'], self.qmc.DeltaBTflag)
+
+    def toggleExtraCurve1number(self, i:int) -> None:
+        if len(self.qmc.extratemp1[i])>5:
+            # only if some data is given to have a visible clue
+            self.extraCurveVisibility1[i] = not self.extraCurveVisibility1[i]
+        self.qmc.redraw_keep_view(recomputeAllDeltas=False)
+        self.setLabelColor(self.extraLCDlabel1[i], self.qmc.extradevicecolor1[i], self.extraCurveVisibility1[i])
+
+    def toggleExtraCurve2number(self, i:int) -> None:
+        if len(self.qmc.extratemp2[i])>5:
+            # only if some data is given to have a visible clue
+            self.extraCurveVisibility2[i] = not self.extraCurveVisibility2[i]
+        self.qmc.redraw_keep_view(recomputeAllDeltas=False)
+        self.setLabelColor(self.extraLCDlabel2[i], self.qmc.extradevicecolor2[i], self.extraCurveVisibility2[i])
 
     @pyqtSlot()
     def toggleExtraCurve1(self) -> None:
         try:
             sender = self.sender()
             assert isinstance(sender, ClickableLCDFrame)
-            i = self.extraLCDframe1.index(sender)
-            if len(self.qmc.extratemp1[i])>5:
-                # only if some data is given to have a visible clue
-                self.extraCurveVisibility1[i] = not self.extraCurveVisibility1[i]
+            self.toggleExtraCurve1number(self.extraLCDframe1.index(sender))
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-        self.qmc.redraw_keep_view(recomputeAllDeltas=False)
 
     @pyqtSlot()
     def toggleExtraCurve2(self) -> None:
         try:
             sender = self.sender()
             assert isinstance(sender, ClickableLCDFrame)
-            i = self.extraLCDframe2.index(sender)
-            if len(self.qmc.extratemp2[i])>5:
-                # only if some data is given to have a visible clue
-                self.extraCurveVisibility2[i] = not self.extraCurveVisibility2[i]
+            self.toggleExtraCurve2number(self.extraLCDframe2.index(sender))
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
-        self.qmc.redraw_keep_view(recomputeAllDeltas=False)
 
     def addLanguage(self, locale:str, menu_entry:str) -> None:
         languageAction = QAction(menu_entry, self)
@@ -6161,13 +6174,13 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         self.lcdpaletteF['slowcoolingtimer'] = '#ffffff'
         self.setTimerColor('timer')
         self.lcd2.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {rgba_colorname2argb_colorname(self.lcdpaletteF['et'])}; background-color: {rgba_colorname2argb_colorname(self.lcdpaletteB['et'])};}}")
-        self.setLabelColor(self.label2,self.qmc.palette['et'])
+        self.setLabelColor(self.label2,self.qmc.palette['et'], self.qmc.ETcurve)
         self.lcd3.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {rgba_colorname2argb_colorname(self.lcdpaletteF['bt'])}; background-color: {rgba_colorname2argb_colorname(self.lcdpaletteB['bt'])};}}")
-        self.setLabelColor(self.label3,self.qmc.palette['bt'])
+        self.setLabelColor(self.label3,self.qmc.palette['bt'], self.qmc.BTcurve)
         self.lcd4.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {rgba_colorname2argb_colorname(self.lcdpaletteF['deltaet'])}; background-color: {rgba_colorname2argb_colorname(self.lcdpaletteB['deltaet'])};}}")
-        self.setLabelColor(self.label4,self.qmc.palette['deltaet'])
+        self.setLabelColor(self.label4,self.qmc.palette['deltaet'],self.qmc.DeltaETflag)
         self.lcd5.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {rgba_colorname2argb_colorname(self.lcdpaletteF['deltabt'])}; background-color: {rgba_colorname2argb_colorname(self.lcdpaletteB['deltabt'])};}}")
-        self.setLabelColor(self.label5,self.qmc.palette['deltabt'])
+        self.setLabelColor(self.label5,self.qmc.palette['deltabt'],self.qmc.DeltaBTflag)
         self.lcd6.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {rgba_colorname2argb_colorname(self.lcdpaletteF['sv'])}; background-color: {rgba_colorname2argb_colorname(self.lcdpaletteB['sv'])};}}")
         # label always black?
         self.lcd7.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {rgba_colorname2argb_colorname(self.lcdpaletteF['sv'])}; background-color: {rgba_colorname2argb_colorname(self.lcdpaletteB['sv'])};}}")
@@ -7469,6 +7482,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             self.sliderSV.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.sliderSV.clearFocus()
 
+
     def setFonts(self, redraw:bool = True) -> None:
         # try to select the right font for matplotlib according to the given locale and platform
         if self.qmc.graphfont == 0:
@@ -8540,8 +8554,8 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
 
     # c is a hex color string in MPL format (cf. util:argb_colorname2rgba_colorname)
     @staticmethod
-    def setLabelColor(label:QLabel, c:str) -> None:
-        color = QColor(c[:7]) # we ignore the alpha information
+    def setLabelColor(label:QLabel, c:str, enabled:bool = True) -> None:
+        color = QColor(c[:7] if enabled else toDim(c[:7])) # we ignore the alpha information
         label.setStyleSheet(f'QLabel {{ color: {color.name()}; }}')
 
     #adds to serial log
@@ -11660,13 +11674,13 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                 if i < len(self.qmc.extraname1):
                     l1 = '<b>' + self.qmc.device_name_subst(self.qmc.extraname1[i]) + '</b>'
                     self.extraLCDlabel1[i].setText(l1)
-                    self.setLabelColor(self.extraLCDlabel1[i],self.qmc.extradevicecolor1[i])
+                    self.setLabelColor(self.extraLCDlabel1[i],self.qmc.extradevicecolor1[i], self.extraCurveVisibility1[i])
                 self.extraLCD1[i].setStyleSheet(f"QLCDNumber {{ border-radius:4; color: {rgba_colorname2argb_colorname(self.lcdpaletteF['sv'])}; background-color: {rgba_colorname2argb_colorname(self.lcdpaletteB['sv'])};}}")
                 self.extraLCDframe2[i].setVisible(bool(self.extraLCDvisibility2[i]))
                 if i < len(self.qmc.extraname2):
                     l2 = '<b>' + self.qmc.device_name_subst(self.qmc.extraname2[i]) + '</b>'
                     self.extraLCDlabel2[i].setText(l2)
-                    self.setLabelColor(self.extraLCDlabel2[i],self.qmc.extradevicecolor2[i])
+                    self.setLabelColor(self.extraLCDlabel2[i],self.qmc.extradevicecolor2[i], self.extraCurveVisibility2[i])
                 self.extraLCD2[i].setStyleSheet(f"QLCDNumber {{ border-radius:4; color: {rgba_colorname2argb_colorname(self.lcdpaletteF['sv'])}; background-color: {rgba_colorname2argb_colorname(self.lcdpaletteB['sv'])};}}")
         #hide the rest (just in case)
         for i in range(ndev,self.nLCDS):
@@ -17909,13 +17923,13 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                 if 'messages' in self.qmc.palette:
                     self.setLabelColor(self.messagelabel,self.qmc.palette['messages'])
                 if 'et' in self.qmc.palette:
-                    self.setLabelColor(self.label2,self.qmc.palette['et'])
+                    self.setLabelColor(self.label2,self.qmc.palette['et'], self.qmc.ETcurve)
                 if 'bt' in self.qmc.palette:
-                    self.setLabelColor(self.label3,self.qmc.palette['bt'])
+                    self.setLabelColor(self.label3,self.qmc.palette['bt'], self.qmc.BTcurve)
                 if 'deltaet' in self.qmc.palette:
-                    self.setLabelColor(self.label4,self.qmc.palette['deltaet'])
+                    self.setLabelColor(self.label4,self.qmc.palette['deltaet'], self.qmc.DeltaETcurve)
                 if 'deltabt' in self.qmc.palette:
-                    self.setLabelColor(self.label5,self.qmc.palette['deltabt'])
+                    self.setLabelColor(self.label5,self.qmc.palette['deltabt'], self.qmc.DeltaBTcurve)
                 if 'canvas' in self.qmc.palette:
                     if len(self.qmc.palette['canvas']) == 0:  #revert the canvas element to default if it is blank in the settings.
                         self.qmc.palette['canvas'] = '#f8f8f8'
@@ -19479,7 +19493,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                         self.qmc.extramarkers1[i] = m
                     self.qmc.extramarkersizes1[i] = max(self.qmc.markersize_min, l1.get_markersize())
                     self.qmc.extradevicecolor1[i] = self.getColor(l1)
-                    self.setLabelColor(self.extraLCDlabel1[i],self.qmc.extradevicecolor1[i])
+                    self.setLabelColor(self.extraLCDlabel1[i],self.qmc.extradevicecolor1[i], self.extraCurveVisibility1[i])
                     self.qmc.extraname1[i] = str(l1.get_label())
                     x1 = x1 + 1
                 if len(self.extraCurveVisibility2)> i and self.extraCurveVisibility2[i] and len(self.qmc.extratemp2lines) > x2:
@@ -19497,7 +19511,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                         self.qmc.extramarkers2[i] = m
                     self.qmc.extramarkersizes2[i] = max(self.qmc.markersize_min, l2.get_markersize())
                     self.qmc.extradevicecolor2[i] = self.getColor(l2)
-                    self.setLabelColor(self.extraLCDlabel2[i],self.qmc.extradevicecolor2[i])
+                    self.setLabelColor(self.extraLCDlabel2[i],self.qmc.extradevicecolor2[i], self.extraCurveVisibility2[i])
                     self.qmc.extraname2[i] = str(l2.get_label())
                     x2 = x2 + 1
             if self.qmc.eventsGraphflag in {2, 3, 4}:

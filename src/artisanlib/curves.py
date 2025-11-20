@@ -2312,10 +2312,13 @@ class CurvesDlg(ArtisanDialog):
 
     @pyqtSlot(int)
     def changeDeltaET(self, _:int = 0) -> None:
+        twoAxis_before = self.aw.qmc.twoAxisMode()
         self.aw.qmc.DeltaETflag = not self.aw.qmc.DeltaETflag
+        twoAxis_after = self.aw.qmc.twoAxisMode()
         if self.aw.qmc.crossmarker:
             self.aw.qmc.togglecrosslines() # turn crossmarks off to adjust for new coordinate system
-        self.aw.qmc.redraw_keep_view(recomputeAllDeltas=True)
+        self.aw.qmc.redraw_keep_view(recomputeAllDeltas=True, forceRenewAxis=twoAxis_before != twoAxis_after)
+        self.aw.setLabelColor(self.aw.label4,self.aw.qmc.palette['deltaet'], self.aw.qmc.DeltaETflag)
 
     @pyqtSlot(int)
     def changeDeltaBTspan(self, i:int) -> None:
@@ -2354,6 +2357,7 @@ class CurvesDlg(ArtisanDialog):
         if self.aw.qmc.crossmarker:
             self.aw.qmc.togglecrosslines() # turn crossmarks off to adjust for new coordinate system
         self.aw.qmc.redraw_keep_view(recomputeAllDeltas=True, forceRenewAxis=twoAxis_before != twoAxis_after)
+        self.aw.setLabelColor(self.aw.label5,self.aw.qmc.palette['deltabt'], self.aw.qmc.DeltaBTflag)
 
     @pyqtSlot(int)
     def changeDeltaETlcd(self, _:int = 0) -> None:

@@ -8,6 +8,8 @@ v3.4.1
 * ADDITIONS
   - adds support of the Lebrew RoastSee NEXT real-time Agtron and crack analyzer
   - adds possibility to overwrite the event button value on alarm action `Event Button`
+  - adds support for [Acaia Pyxis Black (2025)](https://eu.acaia.co/products/pyxis-black)
+  - adds visual clue to curve LCDs indicating hidden curves
 
 
 ----
