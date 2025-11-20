@@ -1661,9 +1661,9 @@ class serialport:
         return tx,t2,t1
 
     def TASI_TA612C(self) -> tuple[float,float,float]:
-        tx = self.aw.qmc.timeclock.elapsedMilli()
+        self.aw.qmc.extraTASI_TA612C_TX = self.aw.qmc.timeclock.elapsedMilli()
         t1,t2 = self.TA612C_temperatures()
-        return tx,t1,t2 # ET, BT
+        return self.aw.qmc.extraTASI_TA612C_TX,t1,t2 # ET, BT
 
     def TASI_TA612C_34(self) -> tuple[float,float,float]:
         #return saved readings collected at self.TA612C()
