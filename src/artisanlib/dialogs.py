@@ -22,12 +22,12 @@ import re
 try:
     from PyQt6.QtCore import Qt, QEvent, QSettings, pyqtSlot, pyqtSignal, QRegularExpression # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import (QApplication, QWidget, QDialog, QMessageBox, QDialogButtonBox, QTextEdit,  # @UnusedImport @Reimport  @UnresolvedImport
-                QHBoxLayout, QVBoxLayout, QLabel, QLineEdit, QLayout, QTableWidget, QHeaderView, QPushButton)  # @UnusedImport @Reimport  @UnresolvedImport
+                QHBoxLayout, QVBoxLayout, QLabel, QLineEdit, QLayout, QTableWidget, QHeaderView, QPushButton, QSpinBox)  # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtGui import QKeySequence, QAction, QIntValidator, QTextCharFormat, QTextCursor, QColor  # @UnusedImport @Reimport  @UnresolvedImport
 except ImportError:
     from PyQt5.QtCore import Qt, QEvent, QSettings, pyqtSlot, pyqtSignal, QRegularExpression # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QWidget, QAction, QDialog, QMessageBox, QDialogButtonBox, QTextEdit, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-                QHBoxLayout, QVBoxLayout, QLabel, QLineEdit, QLayout, QTableWidget, QHeaderView, QPushButton) # @UnusedImport @Reimport  @UnresolvedImport
+                QHBoxLayout, QVBoxLayout, QLabel, QLineEdit, QLayout, QTableWidget, QHeaderView, QPushButton, QSpinBox) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QKeySequence, QIntValidator, QTextCharFormat, QTextCursor, QColor # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib.widgets import MyQComboBox, ClickableQLineEdit
@@ -749,3 +749,58 @@ class tareDlg(ArtisanDialog):
             header.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
             header.setSectionResizeMode(1, QHeaderView.ResizeMode.Fixed)
         self.taretable.setColumnWidth(1,80)
+
+class DesignerSplineNodesDlg(ArtisanDialog):
+    """Dialog for selecting number of spline nodes when fitting a profile to designer."""
+
+    __slots__ = ['nodes_spinbox', 'num_nodes']
+
+    def __init__(self, parent:Optional[QWidget], aw:'ApplicationWindow', default_nodes:int = 10) -> None:
+        super().__init__(parent, aw)
+        self.setWindowTitle(QApplication.translate('Dialog','Designer Spline Fit'))
+        self.setModal(True)
+        self.num_nodes = default_nodes
+
+        # Create the spinbox for selecting number of nodes
+        label = QLabel(QApplication.translate('Label','Number of spline nodes:'))
+        self.nodes_spinbox = QSpinBox()
+        self.nodes_spinbox.setMinimum(3)
+        self.nodes_spinbox.setMaximum(100)
+        self.nodes_spinbox.setValue(default_nodes)
+        self.nodes_spinbox.setSingleStep(1)
+        self.nodes_spinbox.setToolTip(QApplication.translate('Tooltip','Number of control points for spline fitting'))
+
+        # Info label
+        info_label = QLabel(QApplication.translate('Label',
+            'The profile will be fitted with a spline using the specified number of nodes.\n'
+            'More nodes = better fit but harder to edit.\n'
+            'Fewer nodes = simpler curve but may lose detail.'))
+        info_label.setWordWrap(True)
+
+        # Layout
+        input_layout = QHBoxLayout()
+        input_layout.addWidget(label)
+        input_layout.addWidget(self.nodes_spinbox)
+        input_layout.addStretch()
+
+        mainLayout = QVBoxLayout()
+        mainLayout.addWidget(info_label)
+        mainLayout.addLayout(input_layout)
+        mainLayout.addWidget(self.dialogbuttons)
+
+        self.setLayout(mainLayout)
+        mainLayout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
+
+        # Connect signals
+        self.dialogbuttons.accepted.connect(self.accept_dialog)
+        self.dialogbuttons.rejected.connect(self.reject)
+
+    @pyqtSlot()
+    def accept_dialog(self) -> None:
+        """Store the selected number of nodes and accept the dialog."""
+        self.num_nodes = self.nodes_spinbox.value()
+        self.accept()
+
+    def get_num_nodes(self) -> int:
+        """Return the selected number of nodes."""
+        return self.num_nodes
