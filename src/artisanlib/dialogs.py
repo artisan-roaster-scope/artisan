@@ -22,12 +22,12 @@ import re
 try:
     from PyQt6.QtCore import Qt, QEvent, QSettings, pyqtSlot, pyqtSignal, QRegularExpression # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import (QApplication, QWidget, QDialog, QMessageBox, QDialogButtonBox, QTextEdit,  # @UnusedImport @Reimport  @UnresolvedImport
-                QHBoxLayout, QVBoxLayout, QLabel, QLineEdit, QLayout, QTableWidget, QHeaderView, QPushButton, QSpinBox)  # @UnusedImport @Reimport  @UnresolvedImport
+                QHBoxLayout, QVBoxLayout, QLabel, QLineEdit, QLayout, QTableWidget, QHeaderView, QPushButton, QSpinBox, QCheckBox)  # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtGui import QKeySequence, QAction, QIntValidator, QTextCharFormat, QTextCursor, QColor  # @UnusedImport @Reimport  @UnresolvedImport
 except ImportError:
     from PyQt5.QtCore import Qt, QEvent, QSettings, pyqtSlot, pyqtSignal, QRegularExpression # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QWidget, QAction, QDialog, QMessageBox, QDialogButtonBox, QTextEdit, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-                QHBoxLayout, QVBoxLayout, QLabel, QLineEdit, QLayout, QTableWidget, QHeaderView, QPushButton, QSpinBox) # @UnusedImport @Reimport  @UnresolvedImport
+                QHBoxLayout, QVBoxLayout, QLabel, QLineEdit, QLayout, QTableWidget, QHeaderView, QPushButton, QSpinBox, QCheckBox) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import QKeySequence, QIntValidator, QTextCharFormat, QTextCursor, QColor # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
 
 from artisanlib.widgets import MyQComboBox, ClickableQLineEdit
@@ -753,7 +753,7 @@ class tareDlg(ArtisanDialog):
 class DesignerSplineNodesDlg(ArtisanDialog):
     """Dialog for selecting number of spline nodes when fitting a profile to designer."""
 
-    __slots__ = ['nodes_spinbox', 'num_nodes']
+    __slots__ = ['nodes_spinbox', 'num_nodes', 'legacy_checkbox', 'nodes_label']
 
     def __init__(self, parent:Optional[QWidget], aw:'ApplicationWindow', default_nodes:int = 10) -> None:
         super().__init__(parent, aw)
@@ -761,8 +761,20 @@ class DesignerSplineNodesDlg(ArtisanDialog):
         self.setModal(True)
         self.num_nodes = default_nodes
 
+        # Info label
+        info_label = QLabel(QApplication.translate('Label',
+            'Choose how to convert the profile to Designer mode:'))
+        info_label.setWordWrap(True)
+
+        # Legacy mode checkbox
+        self.legacy_checkbox = QCheckBox(QApplication.translate('CheckBox','Use legacy mode (landmarks only)'))
+        self.legacy_checkbox.setToolTip(QApplication.translate('Tooltip',
+            'Legacy mode extracts only key points (CHARGE, DRY, FC, SC, DROP).\n'
+            'Unchecked: Fits a smooth spline to preserve curve shape.'))
+        self.legacy_checkbox.stateChanged.connect(self.on_legacy_changed)
+
         # Create the spinbox for selecting number of nodes
-        label = QLabel(QApplication.translate('Label','Number of spline nodes:'))
+        self.nodes_label = QLabel(QApplication.translate('Label','Number of spline nodes:'))
         self.nodes_spinbox = QSpinBox()
         self.nodes_spinbox.setMinimum(3)
         self.nodes_spinbox.setMaximum(100)
@@ -770,22 +782,24 @@ class DesignerSplineNodesDlg(ArtisanDialog):
         self.nodes_spinbox.setSingleStep(1)
         self.nodes_spinbox.setToolTip(QApplication.translate('Tooltip','Number of control points for spline fitting'))
 
-        # Info label
-        info_label = QLabel(QApplication.translate('Label',
-            'The profile will be fitted with a spline using the specified number of nodes.\n'
+        # Spline info label
+        spline_info_label = QLabel(QApplication.translate('Label',
             'More nodes = better fit but harder to edit.\n'
             'Fewer nodes = simpler curve but may lose detail.'))
-        info_label.setWordWrap(True)
+        spline_info_label.setWordWrap(True)
 
-        # Layout
+        # Layout for spline nodes input
         input_layout = QHBoxLayout()
-        input_layout.addWidget(label)
+        input_layout.addWidget(self.nodes_label)
         input_layout.addWidget(self.nodes_spinbox)
         input_layout.addStretch()
 
         mainLayout = QVBoxLayout()
         mainLayout.addWidget(info_label)
+        mainLayout.addWidget(self.legacy_checkbox)
+        mainLayout.addSpacing(10)
         mainLayout.addLayout(input_layout)
+        mainLayout.addWidget(spline_info_label)
         mainLayout.addWidget(self.dialogbuttons)
 
         self.setLayout(mainLayout)
@@ -795,12 +809,22 @@ class DesignerSplineNodesDlg(ArtisanDialog):
         self.dialogbuttons.accepted.connect(self.accept_dialog)
         self.dialogbuttons.rejected.connect(self.reject)
 
+    @pyqtSlot(int)
+    def on_legacy_changed(self, state: int) -> None:
+        """Enable/disable spinbox based on legacy checkbox state."""
+        is_legacy = state == Qt.CheckState.Checked.value
+        self.nodes_spinbox.setEnabled(not is_legacy)
+        self.nodes_label.setEnabled(not is_legacy)
+
     @pyqtSlot()
     def accept_dialog(self) -> None:
         """Store the selected number of nodes and accept the dialog."""
-        self.num_nodes = self.nodes_spinbox.value()
+        if self.legacy_checkbox.isChecked():
+            self.num_nodes = 0  # 0 indicates legacy mode
+        else:
+            self.num_nodes = self.nodes_spinbox.value()
         self.accept()
 
     def get_num_nodes(self) -> int:
-        """Return the selected number of nodes."""
+        """Return the selected number of nodes (0 = legacy mode)."""
         return self.num_nodes
