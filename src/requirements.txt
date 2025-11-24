@@ -61,7 +61,7 @@ arabic-reshaper==3.0.0
 pillow==12.0.0
 pydantic==2.12.4
 babel==2.17.0
-bleak==1.1.1
+bleak==2.0.0
 python-statemachine==2.5.0
 yoctopuce==2.1.6320
 PyQt6==6.10.0
