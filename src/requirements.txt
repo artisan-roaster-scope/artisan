@@ -89,7 +89,7 @@ py2app==0.28.8; sys_platform=='darwin'
 ### Linux specific packages
 ###
 distro==1.9.0; platform_system=='Linux'
-SecretStorage==3.4.0; platform_system=='Linux'
+SecretStorage==3.5.0; platform_system=='Linux'
 ### NOTES:
 ### keyring on Linux needs the GnomeKeyring package installed for plus to remember the passwords
 ### via # sudo apt install gnome-keyring
