@@ -32,6 +32,6 @@ coverage>=7.11.3
 coverage-badge==1.1.2
 codespell==2.4.1
 # the following 2 packages are not installed along aiohttp on Python3.12 and make mypy complain
-async_timeout==4.0.3; python_version >= '3.12'
+async_timeout==5.0.1; python_version >= '3.12'
 cycler==0.12.1; python_version >= '3.12'
 scipy-stubs==1.16.3.0
