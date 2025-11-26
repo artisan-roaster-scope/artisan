@@ -19,7 +19,7 @@ import platform
 from artisanlib.dialogs import ArtisanResizeablDialog
 from artisanlib.widgets import MyQDoubleSpinBox
 
-from typing import Any, cast, TYPE_CHECKING
+from typing import override, Any, cast, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
@@ -368,10 +368,12 @@ class flavorDlg(ArtisanResizeablDialog):
             self.aw.qmc.flavorchart()
 
     @pyqtSlot('QCloseEvent')
+    @override
     def closeEvent(self, a0:'QCloseEvent|None' = None) -> None:
         del a0
         self.close()
 
+    @override
     def close(self) -> bool:
         settings = QSettings()
         #save window geometry

@@ -13,7 +13,7 @@ including numerical stability, initialization behavior, and filter accuracy.
 """
 
 import math
-from typing import Any
+from typing import override, Any
 import numpy as np
 
 import pytest
@@ -37,6 +37,7 @@ class TestLiveFilterBase:
             def __init__(self) -> None:
                 self.process_called = False
 
+            @override
             def _process(self, x: float) -> float:
                 self.process_called = True
                 return x * 2
@@ -51,6 +52,7 @@ class TestLiveFilterBase:
         """Test that process() calls _process for valid input."""
 
         class MockFilter(LiveFilter):
+            @override
             def _process(self, x: float) -> float:
                 return x * 2
 
@@ -63,6 +65,7 @@ class TestLiveFilterBase:
         """Test that __call__ delegates to process method."""
 
         class MockFilter(LiveFilter):
+            @override
             def _process(self, x: float) -> float:
                 return x + 1
 
@@ -94,6 +97,7 @@ class TestLiveFilterBase:
         """Test that process handles various special float values."""
 
         class MockFilter(LiveFilter):
+            @override
             def _process(self, x: float) -> float:
                 return x
 

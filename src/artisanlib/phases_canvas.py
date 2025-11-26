@@ -43,7 +43,6 @@ with suppress_stdout_stderr():
 
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas  # @Reimport
-from matplotlib.font_manager import FontProperties
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
@@ -71,7 +70,7 @@ class tphasescanvas(FigureCanvas):
         # set data
         self.data:list[tuple[str, float, tuple[float,float,float], bool, bool, str, tuple[float,float,float], tuple[float,float,float]]]|None = None  # the phases data per profile
         # the canvas
-        self.fig = Figure(figsize=(1, 1), frameon=False, dpi=dpi+self.dpi_offset)
+        self.fig:Figure = Figure(figsize=(1, 1), frameon=False, dpi=dpi+self.dpi_offset)
         # as alternative to the experimental constrained_layout we could use tight_layout as for them main canvas:
         self.tight_layout_params: Final[dict[str, float]] = {'pad':.3,'h_pad':0.0,'w_pad':0.0} # slightly less space for axis labels
 #        self.fig.set_tight_layout(self.tight_layout_params)
@@ -81,7 +80,7 @@ class tphasescanvas(FigureCanvas):
         self.tooltip_anno:Annotation|None = None
         self.tooltip_artist:Rectangle|None = None
         #
-        super().__init__(self.fig) # type:ignore # Call to untyped function "__init__" in typed context
+        super().__init__(self.fig) # type:ignore[no-untyped-call] # Call to untyped function "__init__" in typed context
         self.ax:Axes|None = None
         self.clear_phases()
         self.fig.canvas.mpl_connect('motion_notify_event', self.hover)
@@ -158,15 +157,14 @@ class tphasescanvas(FigureCanvas):
         self.tooltip_anno = None
         if self.ax is None:
             self.ax = self.fig.add_subplot(111, frameon=False)
-        if self.ax is not None:
-            self.ax.clear()
-            self.ax.axis('off')
-            self.ax.grid(False)
-            self.ax.set_xlim(0,100 + 2*self.m + 2*self.g)
+        self.ax.clear()
+        self.ax.axis('off')
+        self.ax.grid(False)
+        self.ax.set_xlim(0,100 + 2*self.m + 2*self.g)
 
     # a similar function is define in aw:ApplicationWindow
     def setdpi(self, dpi:int, moveWindow:bool = True) -> None:
-        if self.aw is not None and self.fig and dpi >= 40:
+        if dpi >= 40:
             try:
                 self.fig.set_dpi((dpi + self.dpi_offset) * self.aw.devicePixelRatio())
                 if moveWindow:
@@ -209,10 +207,7 @@ class tphasescanvas(FigureCanvas):
             # maximum total roast time of all given profiles
             max_total_time = max(p[1] for p in self.data)
             # set font
-            if self.aw:
-                prop = self.aw.mpl_fontproperties
-            else:
-                prop = FontProperties().copy()
+            prop = self.aw.mpl_fontproperties
             prop.set_family(mpl.rcParams['font.family'])
             prop.set_size('medium')
 
@@ -252,13 +247,13 @@ class tphasescanvas(FigureCanvas):
                         rects = self.ax.barh(i, widths, left=starts, height=self.barheight, color=patch_colors)
                         prects_patches:list[Rectangle] = rects.patches
                         if len(prects_patches)>4:
-                            if len(phases_temps)>1 and len(phases_ror)>1:
+                            if len(phases_ror)>1:
                                 self.phase_temperatures[prects_patches[3]] = { # 2nd phase temperatures
                                         'BT_start_temp': phases_temps[0],
                                         'BT_end_temp': phases_temps[1],
                                         'BT_ROR_start_temp': phases_ror[0],
                                         'BT_ROR_end_temp': phases_ror[1]}
-                            if len(phases_temps)>1 and len(phases_ror)>2:
+                            if len(phases_ror)>2:
                                 self.phase_temperatures[prects_patches[4]] = { # 3rd phase temperatures
                                         'BT_start_temp': phases_temps[1],
                                         'BT_end_temp': phases_temps[2],
@@ -306,7 +301,7 @@ class tphasescanvas(FigureCanvas):
                         patch_colors = [color, background_color, background_color, rect3dim, background_color, color]
                     rects = self.ax.barh(i, widths, left=starts, height=self.barheight, color=patch_colors)
                     prects_patches = rects.patches
-                    if len(prects_patches)>3 and len(phases_temps)>1 and len(phases_ror)>2:
+                    if len(prects_patches)>3 and len(phases_ror)>2:
                         self.phase_temperatures[prects_patches[3]] = { # 3rd phase temperatures
                                     'BT_start_temp': phases_temps[1],
                                     'BT_end_temp': phases_temps[2],
@@ -350,8 +345,7 @@ class tphasescanvas(FigureCanvas):
         else:
             # if no profiles are given we set the canvas height to 0
             QSettings().setValue('MainSplitter',self.aw.splitter.saveState())
-            if self.ax is not None:
-                self.ax.set_ylim((0, 0))
+            self.ax.set_ylim((0, 0))
             #self.fig.set_size_inches(0,0, forward=True) # this one crashes numpy on Windows and seems not needed
             self.aw.scroller.setMaximumHeight(0)
             self.aw.scroller.setVisible(False)

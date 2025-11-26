@@ -15,7 +15,7 @@
 # AUTHOR
 # Marko Luther, 2023
 
-from typing import cast, Literal, TYPE_CHECKING
+from typing import override, cast, Literal, TYPE_CHECKING
 
 from artisanlib.util import stringfromseconds, stringtoseconds
 from artisanlib.dialogs import ArtisanDialog
@@ -494,7 +494,7 @@ class designerconfigDlg(ArtisanDialog):
     #supporting function for settimes()
     def validatetimeorder(self) -> int:
         try:
-            time = []
+            time:list[int] = []
             checks = self.readchecks()
             time.append(stringtoseconds(str(self.Edit0.text())))
             time.append(stringtoseconds(str(self.Edit1.text())))
@@ -549,6 +549,7 @@ class designerconfigDlg(ArtisanDialog):
 #        self.aw.qmc.convert_designer()
 
     @pyqtSlot()
+    @override
     def accept(self) -> None:
         #save window position (only; not size!)
         settings = QSettings()

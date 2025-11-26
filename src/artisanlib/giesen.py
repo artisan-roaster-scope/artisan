@@ -50,7 +50,7 @@ def extractProfileGiesenCSV(file:str,
         for row in data:
             i = i + 1
             items = list(zip(header, row, strict=True)) # ty:ignore
-            item = {}
+            item:dict[str,str] = {}
             for (name, value) in items:
                 item[name] = value.strip()
             # take i as time in seconds

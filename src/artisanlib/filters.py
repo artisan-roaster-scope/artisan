@@ -20,7 +20,7 @@ import numpy as np
 from collections import deque
 from bisect import bisect_left, insort
 
-from typing import Any, TYPE_CHECKING
+from typing import override, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     import numpy.typing as npt # pylint: disable=unused-import
@@ -66,6 +66,7 @@ class LiveLFilter(LiveFilter):
         self._xs:deque[float] = deque([0.0] * len(self.b), maxlen=len(self.b))         # pyrefly: ignore[bad-argument-type]
         self._ys:deque[float] = deque([0.0] * (len(self.a) - 1), maxlen=len(self.a)-1) # pyrefly: ignore[bad-argument-type]
 
+    @override
     def _process(self, x:float) -> float:
         """Filter incoming data with standard difference equations.
         """
@@ -98,6 +99,7 @@ class LiveSosFilter(LiveFilter):
         self.n_sections = self.sos.shape[0]
         self.state = np.zeros((self.n_sections, 2))
 
+    @override
     def _process(self, x:float) -> float:
         """Filter incoming data with cascaded second-order sections.
         """
@@ -133,14 +135,14 @@ class LiveMedian(LiveFilter):
 
     def init_queue(self) -> None:
         self.q = deque(self.init_list)
-        if self.q is not None:
-            self.l = list(self.q)
-            self.l.sort()
-            self.mididx = (len(self.q) - 1) // 2
-            self.initialized = True
-            del self.init_list
-            del self.total
+        self.l = list(self.q)
+        self.l.sort()
+        self.mididx = (len(self.q) - 1) // 2
+        self.initialized = True
+        del self.init_list
+        del self.total
 
+    @override
     def _process(self, x:float) -> float:
         """Filter incoming data with median low-pass filter.
         """
@@ -176,10 +178,10 @@ class LiveMean(LiveFilter):
 
     def init_queue(self) -> None:
         self.window = deque(self.init_list)
-        if self.window is not None:
-            self.initialized = True
-            del self.init_list
+        self.initialized = True
+        del self.init_list
 
+    @override
     def _process(self, x:float) -> float:
         """Filter incoming data with mean low-pass filter.
         """

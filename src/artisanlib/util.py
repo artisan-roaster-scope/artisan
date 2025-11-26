@@ -29,7 +29,8 @@ import functools
 from bisect import bisect_right
 from pathlib import Path
 from matplotlib import colors
-from typing import Final, Literal, Any, TypeGuard, TYPE_CHECKING # ty:ignore
+from collections.abc import Iterator
+from typing import Final, Literal, Any, TypeGuard, cast, TYPE_CHECKING # ty:ignore
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -128,7 +129,7 @@ def s2a(s:str) -> str:
 
 # returns True if x is not None, not NaN and not the error value -1 or 0
 def is_proper_temp(x:None|int|float) -> bool:
-    return x is not None and not numpy.isnan(x) and isinstance(x, (int, float)) and x not in [0, -1, float('-inf'), float('inf')]
+    return x is not None and not numpy.isnan(x) and x not in [0, -1, float('-inf'), float('inf')]
 
 # returns the prefix of length ll-1 of s and adds Unicode ellipsis character
 # the length of the resulting string is max(1, ll, len(s))
@@ -138,6 +139,7 @@ def abbrevString(s:str, ll:int) -> str:
     return s
 
 # used to convert time from int seconds to string (like in the LCD clock timer). input int, output string xx:xx
+@functools.lru_cache(maxsize=100)
 def stringfromseconds(seconds_raw:float, leadingzero:bool = True) -> str:
     sep = ':'
     if abs(seconds_raw)>60*60:
@@ -186,7 +188,7 @@ def fromFtoCstrict(Ffloat:float) -> float:
     return (Ffloat-32.0)*(5.0/9.0)
 
 def fromFtoC(Ffloat:float|None) -> float|None:
-    if Ffloat is None or Ffloat == -1 or (Ffloat is not None and numpy.isnan(Ffloat)):
+    if Ffloat is None or Ffloat == -1 or numpy.isnan(Ffloat):
         return Ffloat
     return fromFtoCstrict(Ffloat)
 
@@ -204,7 +206,7 @@ def fromCtoF(Cfloat:float|None) -> float|None:
     >>> fromCtoF(32)
     89.6
     """
-    if Cfloat is None or Cfloat == -1 or (Cfloat is not None and numpy.isnan(Cfloat)):
+    if Cfloat is None or Cfloat == -1 or numpy.isnan(Cfloat):
         return Cfloat
     return fromCtoFstrict(Cfloat)
 
@@ -214,7 +216,7 @@ def RoRfromCtoFstrict(CRoR:float) -> float:
     return CRoR*9.0/5.0
 
 def RoRfromCtoF(CRoR:float|None) -> float|None:
-    if CRoR is None or CRoR == -1 or (CRoR is not None and numpy.isnan(CRoR)):
+    if CRoR is None or CRoR == -1 or numpy.isnan(CRoR):
         return CRoR
     return RoRfromCtoFstrict(CRoR)
 
@@ -224,7 +226,7 @@ def RoRfromFtoCstrict(FRoR:float) -> float:
     return FRoR*(5.0/9.0)
 
 def RoRfromFtoC(FRoR:float|None) -> float|None:
-    if FRoR is None or FRoR == -1 or (FRoR is not None and numpy.isnan(FRoR)):
+    if FRoR is None or FRoR == -1 or numpy.isnan(FRoR):
         return FRoR
     return RoRfromFtoCstrict(FRoR)
 
@@ -340,7 +342,7 @@ def fill_gaps(ll:'Sequence[float|int]|npt.NDArray[numpy.floating[Any]]', interpo
                     # no further valid values, we append the tail
                     res.extend(ll[i:])
                     return res
-                if interpolate_max is not None and interpolate_max < (next_idx - i):
+                if interpolate_max < (next_idx - i):
                     # gap too big
                     res.extend(ll[i:next_idx])
                 else:
@@ -471,7 +473,7 @@ def getDirectory(filename: str, ext: str|None = None, share: bool = False) -> st
     fn = filename
     if not share:
         app = QCoreApplication.instance()
-        if app.artisanviewerMode: # type: ignore
+        if app.artisanviewerMode: # type: ignore[union-attr]
             fn = filename + '_viewer'
     dd = getDataDirectory()
     fp = Path(('' if dd is None else dd), fn)
@@ -489,18 +491,21 @@ def getDirectory(filename: str, ext: str|None = None, share: bool = False) -> st
 # standard/MPL hex color strings append alpha information to the end, while QColor assumes the alpha information in color name strings at the begin
 
 # converts QColor ARGB names to a standard/MPL hex color strings with alpha values at the end
+@functools.lru_cache(maxsize=50)
 def argb_colorname2rgba_colorname(c:str) -> str:
     if len(c) == 9 and c[0] == '#':
         return f'#{c[3:9]}{c[1:3]}'
     return c
 
 # converts standard/MPL hex color strings to QColor ARGB names with alpha at the begin
+@functools.lru_cache(maxsize=50)
 def rgba_colorname2argb_colorname(c:str) -> str:
     if len(c) == 9 and c[0] == '#':
         return f'#{c[7:9]}{c[1:7]}'
     return c
 
 # takes a hex color string and returns the same color as hex string with staturation set to 0 and incr. lightness
+@functools.lru_cache(maxsize=50)
 def toGrey(color:str) -> str:
     h, _s, l, a = QColor(rgba_colorname2argb_colorname(color)).getHslF()
     if h is not None and l is not None and a is not None:
@@ -512,6 +517,7 @@ def toGrey(color:str) -> str:
     return gray.name(QColor.NameFormat.HexRgb)
 
 # takes a hex color string and returns the same color as hex string with reduced staturation and incr. lightness
+@functools.lru_cache(maxsize=50)
 def toDim(color:str) -> str:
     h, s, l, a = QColor(rgba_colorname2argb_colorname(color)).getHslF()
     if h is not None and s is not None and l is not None and a is not None:
@@ -711,7 +717,7 @@ def float2str(n:float) -> str:
 # i/o: 0:g, 1:Kg, 2:lb (pound), 3:oz (ounce)
 def convertWeight(v:float, i:int, o:int) -> float:
     #                g,            kg,         lb,             oz,
-    convtable = [
+    convtable:list[list[float]] = [
                     [1.,           0.001,      0.00220462262,  0.035274],  # g
                     [1000,         1.,         2.205,          35.274],    # Kg
                     [453.591999,   0.45359237, 1.,             16.],       # lb
@@ -724,7 +730,7 @@ def convertWeight(v:float, i:int, o:int) -> float:
 # i/o: 0:l (liter), 1:gal (gallons US), 2:qt, 3:pt, 4:cup, 5:cm^3/ml
 def convertVolume(v:float, i:int, o:int) -> float:
                     #liter          gal             qt              pt              cup             ml/cm^3
-    convtable = [
+    convtable:list[list[float]] = [
                     [1.,            0.26417205,     1.05668821,     2.11337643,     4.22675284,     1000.                ],    # liter
                     [3.78541181,    1.,             4.,             8.,             16,             3785.4117884         ],    # gallon
                     [0.94635294,    0.25,           1.,             2.,             4.,             946.352946           ],    # quart
@@ -747,6 +753,7 @@ def convertVolume(v:float, i:int, o:int) -> float:
 # if brief is set to 0 (default 0), 3 decimals are returned for lb/kg and 2 for oz/g, if brief > 0 the number of decimals is reduced by that value and
 # the rendering might loose precision
 # with smart_unit_upgrade (default True), a weight like 1600g is rendered more readable as 1.6kg (but leaves 1610g and 1601g as is)
+@functools.lru_cache(maxsize=100)
 def render_weight(amount:float, weight_unit_index:int, target_unit_idx:int,
         right_to_left_lang:bool = False, brief:int=0, smart_unit_upgrade:bool=True) -> str:
     w = convertWeight(
@@ -911,8 +918,9 @@ def findTPint(timeindex:list[int], timex:list[float], temp:list[float]) -> int:
             idx = i
     return idx
 
-
+@functools.lru_cache(maxsize=30)
 def eventtime2string(time:float) -> str:
+    _log.debug('PRINT eventtime2string(%s)',time)
     if time == 0.0:
         return ''
     di,mo = divmod(time,60)
@@ -1039,7 +1047,7 @@ def csv_load(csvFile:io.TextIOWrapper) -> 'ProfileData':
         i = i + 1
         try:
             items = list(zip(fields, row, strict=True)) # ty:ignore
-            item = {}
+            item:dict[str,str] = {}
             for (name, value) in items:
                 item[name] = value.strip()
             #add one measurement
@@ -1142,9 +1150,9 @@ def exportProfile2CSV(filename:str, profile:'ProfileData') -> bool:
                 'DROP:' + eventtime2string(DROP),
                 'COOL:' + eventtime2string(COOL),
                 'Time:' + QTime.fromString(decodeLocalStrict(profile['roasttime'])).toString()[:-3]]) # pyright: ignore[reportTypedDictNotRequiredAccess]
-            headrow:list[str] = (['Time1','Time2','ET','BT','Event'] + functools.reduce(lambda x,y : x + [str(y[0]),str(y[1])], # type:ignore
+            headrow:list[str] = (['Time1','Time2','ET','BT','Event'] + functools.reduce(lambda x,y : x + [str(y[0]),str(y[1])],
                     (list(zip(profile['extraname1'][0:extradevices],profile['extraname2'][0:extradevices], strict=True)) if 'extraname1' in profile and 'extraname2' in profile else []), # ty:ignore
-                    []))
+                    cast(list[str], [])))
             writer.writerow(headrow)
             last_time:str|None = None
             events_set:set[str] = set()
@@ -1195,3 +1203,37 @@ def get_total_roast_time_from_profile(profile:ProfileData) -> float|None:
         timex = profile['timex']
         return roast_time(timeindex, timex)
     return None
+
+
+### register calculations for S7/MODBUS
+
+# splits (sorted) list of registers into list of segments of (first,last) register tuples with maximal length of MAX_REGISTER_SEGMENT
+# with last-first < max_register_segment
+# ex with max_register_segment = 100:
+#  max_blocks([0, 2, 20, 1040, 1105, 1215]) ==> [(0,20), (1040, 1105), (1215, 1215)]
+def max_blocks(registers:list[int], max_register_segment:int = 100) -> list[tuple[int,int]]:
+    registers_sorted = sorted(registers)
+    res:list[tuple[int,int]] = []
+    start_register:int|None = None
+    last_register:int|None = None
+    for register in registers_sorted:
+        if start_register is None:
+            start_register = register
+        elif last_register is not None and register > start_register + max_register_segment - 1:
+            res.append((start_register, last_register))
+            start_register = register
+        last_register = register
+    # add the last remaining, not yet appended segment
+    if start_register is not None and last_register is not None:
+        res.append((start_register, last_register))
+    return res
+
+# calculates connected blocks of minimal length from a (unsorted) list of registers as list of pairs of the form (start-register,end-register)
+def min_blocks(registers:list[int]) -> list[tuple[int,int]]:
+    registers_sorted:list[int] = sorted(registers) # eg. [12392, 12393, 12394, 12462, 12463, 12465]
+    # split in successive sequences (eg. gaps = [[12394, 12462], [12463, 12465]])
+    gaps:list[list[int]] = [[s, er] for s, er in zip(registers_sorted, registers_sorted[1:], strict=False) if s+1 < er]
+    # edges iter returns in sequence [12392, 12394, 12462, 12463, 12465, 12465]
+    edges:Iterator[int] = iter(registers_sorted[:1] + sum(gaps, cast(list[int], [])) + registers_sorted[-1:])
+    # sequences: eg. [(12392, 12394), (12462, 12463), (12465, 12465)]
+    return list(zip(edges, edges, strict=True)) # ty:ignore

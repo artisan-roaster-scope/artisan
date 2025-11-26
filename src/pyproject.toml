@@ -246,12 +246,12 @@ python_version = "3.12"
 
 # Ensure full coverage
 check_untyped_defs = true
-#disallow-untyped-defs = true
 disallow_incomplete_defs = true
 disallow_untyped_calls = true
 disallow_untyped_defs = true
 disallow_untyped_decorators = true
-disallow_any_unimported = false # raises about 100 errors with numpy >= 2.1
+disallow_any_unimported = true
+
 
 # Restrict dynamic typing
 disallow_any_generics = true
@@ -267,13 +267,12 @@ warn_redundant_casts = true
 warn_unused_configs = true
 warn_unused_ignores = true
 warn_unreachable = true
-#show_error_codes = true
+show_error_codes = true
+
+enable_error_code = "possibly-undefined,truthy-bool,redundant-expr,unused-awaitable, explicit-override, ignore-without-code"
 
 # Explicit is better than implicit
 no_implicit_optional = true
-
-
-#plugins = ["numpy.typing.mypy_plugin"] # deprecated in numpy 2.3
 
 [[tool.mypy.overrides]]
 module = ["matplotlib.*", "aiohttp.*", "aiohttp.web.*", "aiohttp_jinja2.*", "libusb_package.*"]
@@ -288,7 +287,7 @@ follow_imports = 'skip'
 ## ruff conf
 
 [tool.ruff]
-include = ["artisanlib/*.py", "plus/*.py", "test/**/*.py"]
+include = ["artisanlib/*.py", "plus/*.py", "test/*.py", "test/**/*.py"]
 
 # Enable pycodestyle (`E`), Pyflakes (`F`), Updates ('UP'), flake8-bugbear (`B`) codes by default.
 # also flake8-2020 (YTT), flake8-commas (COM), flake8-comprehensions (C4),
@@ -320,7 +319,7 @@ target-version = "py312"
 ## pyright conf
 
 [tool.pyright]
-include = ["artisanlib", "plus", "test" ]
+include = ["artisanlib", "plus" ] #, "test" ]
 exclude = ["proto"]
 # ignore = ["src/oldstuff"]
 
@@ -333,14 +332,15 @@ pythonPlatform = "All"
 #typeCheckingMode = "strict" # "off", "basic", "strict"
 
 # strict disabled checks # "error", "warning", false, true
-#reportUnboundVariable = "error"
-#reportUnknownParameterType = false
-#reportMissingParameterType = false
-#reportUnknownMemberType = false
-#reportUnknownArgumentType = false
-#reportGeneralTypeIssues = false
-useLibraryCodeForTypes = false
-reportInvalidTypeForm = false # since numpy 2.1 more than 150 errors are reported
+reportUnboundVariable = true # "error"
+reportMissingParameterType = true
+reportUnknownParameterType = true
+#reportUnknownMemberType = false # PyQt signal/slot issues
+reportUnknownArgumentType = true
+reportGeneralTypeIssues = true
+useLibraryCodeForTypes = true
+reportInvalidTypeForm = true
+reportUnnecessaryComparison = true
 
 
 ## pytest conf

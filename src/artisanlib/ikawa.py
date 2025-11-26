@@ -10,15 +10,13 @@ import csv
 import re
 import logging
 from collections.abc import Callable, Generator
-from typing import Final, Any
+from typing import override, Final, Any
 
 
 from PyQt6.QtCore import QDateTime, Qt, QMutex, QWaitCondition, QUrl
 
 from artisanlib.util import encodeLocal, encodeLocalStrict
 from artisanlib.atypes import ProfileData
-
-
 from artisanlib.ble_port import ClientBLE
 from proto import IkawaCmd_pb2 # type:ignore[unused-ignore]
 
@@ -589,11 +587,13 @@ try: # BLE not available on some platforms
                 except Exception as e:  # pylint: disable=broad-except
                     _log.error(e)
 
+        @override
         def on_connect(self) -> None:
             self.connected_state = True
             if self.connected_handler is not None:
                 self.connected_handler()
 
+        @override
         def on_disconnect(self) -> None:
             self.connected_state = False
             if self.disconnected_handler is not None:

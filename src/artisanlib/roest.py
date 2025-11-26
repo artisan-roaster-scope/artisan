@@ -165,7 +165,7 @@ def extractProfileRoestCSV(file:str,
             if 'Fan (%)' in item:
                 try:
                     v = float(item['Fan (%)'])
-                    if v is not None and v != fan:
+                    if v != fan:
                         # fan value changed
                         if v == fan_last:
                             # just a fluctuation, we remove the last added fan value again
@@ -192,7 +192,7 @@ def extractProfileRoestCSV(file:str,
             if 'RPM (RPM)' in item:
                 try:
                     v = float(item['RPM (RPM)'])
-                    if v is not None and v != drum:
+                    if v != drum:
                         # drum value changed
                         if v == drum_last:
                             # just a fluctuation, we remove the last added drum value again
@@ -218,7 +218,7 @@ def extractProfileRoestCSV(file:str,
             if 'Power (%)' in item:
                 try:
                     v = float(item['Power (%)'])
-                    if v is not None and v != heater:
+                    if v != heater:
                         # heater value changed
                         if v == heater_last:
                             # just a fluctuation, we remove the last added heater value again

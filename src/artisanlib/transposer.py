@@ -21,7 +21,7 @@ import copy
 import numpy
 import logging
 from collections.abc import Callable
-from typing import Final, TYPE_CHECKING
+from typing import override, Final, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
@@ -45,6 +45,7 @@ _log: Final[logging.Logger] = logging.getLogger(__name__)
 class MyQRegularExpressionValidator(QRegularExpressionValidator): # pyrefly:ignore[invalid-inheritance] # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     # we fix partial time input like '12' => '12:00', '12:' => '12:00' and '12:0' => '12:00'
 
+    @override
     def fixup(self, a0:str|None) -> str: # pylint: disable=no-self-use # overwritten method needs to have compatible signature
         if a0 is not None:
             if ':' not in a0:
@@ -308,19 +309,18 @@ class profileTransformatorDlg(ArtisanDialog):
             for w in self.phases_target_widgets_time:
                 ri:int|None = None
                 if w is not None:
-                    txt = w.text()
-                    if txt is not None and txt != '':
-                        try:
-                            ri = stringtoseconds(txt)
-                        except Exception as e: # pylint: disable=broad-except
-                            _log.error(e) # widget should not allow for malformed time string input on which stringtoseconds raises an exception
+                    try:
+                        txt = w.text()
+                        ri = stringtoseconds(txt)
+                    except Exception as e: # pylint: disable=broad-except
+                        _log.error(e) # widget should not allow for malformed time string input on which stringtoseconds raises an exception
                 res_times.append(ri)
         if self.phases_target_widgets_percent is not None:
             for w in self.phases_target_widgets_percent:
                 rf:float|None = None
                 if w is not None:
                     txt = w.text()
-                    if txt is not None and txt != '':
+                    if txt != '':
                         rf = float(txt)
                 res_phases.append(rf)
         return res_times, res_phases
@@ -333,7 +333,7 @@ class profileTransformatorDlg(ArtisanDialog):
                 r = None
                 if w is not None:
                     txt = w.text()
-                    if txt is not None and txt != '':
+                    if txt != '':
                         try:
                             r = stringtoseconds(txt)
                         except Exception as e: # pylint: disable=broad-except
@@ -349,7 +349,7 @@ class profileTransformatorDlg(ArtisanDialog):
                 r = None
                 if w is not None:
                     txt = w.text()
-                    if txt is not None and txt != '':
+                    if txt != '':
                         r = float(txt)
                 res.append(r)
         return res
@@ -499,43 +499,35 @@ class profileTransformatorDlg(ArtisanDialog):
                 for i in range(4):
                     time_result_widget = self.time_result_widgets[i] # pyrefly: ignore[unsupported-operation]
                     if time_result_widget is not None:
-                        if result_times[i] is None:
-                            s = ''
-                        else:
-                            s = stringfromseconds(result_times[i],leadingzero=False)
+                        s = stringfromseconds(result_times[i],leadingzero=False)
                         time_result_widget.setText(s)
             # set new phases results
             if self.phases_result_widgets is not None:
                 result_times = self.calcTimeResults()
-                if all(result_times[r] is not None for r in [0,1,3]):
-                    # DRYING
-                    drying_period = result_times[0]
-                    drying_percentage = 100 * drying_period / result_times[3]
-                    drying_str = \
-                            f'{stringfromseconds(drying_period,leadingzero=False)}    {float2float(drying_percentage)}%'
-                    phases_result_widgets = self.phases_result_widgets[0]
-                    if phases_result_widgets is not None:
-                        phases_result_widgets.setText(drying_str)
-                    # MAILARD
-                    mailard_period = result_times[1] - result_times[0]
-                    mailard_percentage = 100 * mailard_period / result_times[3]
-                    mailard_str = \
-                            f'{stringfromseconds(mailard_period,leadingzero=False)}    {float2float(mailard_percentage)}%'
-                    phases_result_widgets= self.phases_result_widgets[1]
-                    if phases_result_widgets is not None:
-                        phases_result_widgets.setText(mailard_str)
-                    # FINISHING
-                    finishing_period = result_times[3] - result_times[1]
-                    finishing_percentage = 100 * finishing_period / result_times[3]
-                    finishing_str = \
-                            f'{stringfromseconds(finishing_period,leadingzero=False)}    {float2float(finishing_percentage)}%'
-                    phases_result_widgets = self.phases_result_widgets[2]
-                    if phases_result_widgets is not None:
-                        phases_result_widgets.setText(finishing_str)
-                else:
-                    for w in self.phases_result_widgets:
-                        if w is not None:
-                            w.setText('')
+                # DRYING
+                drying_period = result_times[0]
+                drying_percentage = 100 * drying_period / result_times[3]
+                drying_str = \
+                        f'{stringfromseconds(drying_period,leadingzero=False)}    {float2float(drying_percentage)}%'
+                phases_result_widgets = self.phases_result_widgets[0]
+                if phases_result_widgets is not None:
+                    phases_result_widgets.setText(drying_str)
+                # MAILARD
+                mailard_period = result_times[1] - result_times[0]
+                mailard_percentage = 100 * mailard_period / result_times[3]
+                mailard_str = \
+                        f'{stringfromseconds(mailard_period,leadingzero=False)}    {float2float(mailard_percentage)}%'
+                phases_result_widgets= self.phases_result_widgets[1]
+                if phases_result_widgets is not None:
+                    phases_result_widgets.setText(mailard_str)
+                # FINISHING
+                finishing_period = result_times[3] - result_times[1]
+                finishing_percentage = 100 * finishing_period / result_times[3]
+                finishing_str = \
+                        f'{stringfromseconds(finishing_period,leadingzero=False)}    {float2float(finishing_percentage)}%'
+                phases_result_widgets = self.phases_result_widgets[2]
+                if phases_result_widgets is not None:
+                    phases_result_widgets.setText(finishing_str)
 
     @pyqtSlot()
     def updateTempResults(self) -> None:
@@ -632,6 +624,7 @@ class profileTransformatorDlg(ArtisanDialog):
         self.aw.closeHelpDialog(self.helpdialog)
 
     @pyqtSlot('QCloseEvent')
+    @override
     def closeEvent(self, a0:'QCloseEvent|None' = None) -> None:
         del a0
         self.restoreState()
@@ -996,7 +989,7 @@ class profileTransformatorDlg(ArtisanDialog):
 
                 tp = self.org_temp2[i]
                 fitj = fits[j]
-                if tp is None or tp == -1 or fitj is None:
+                if tp == -1 or fitj is None:
                     self.aw.qmc.temp2.append(tp)
                 else:
                     fit = numpy.poly1d(fitj) # fit to be applied
@@ -1009,8 +1002,7 @@ class profileTransformatorDlg(ArtisanDialog):
                 p = self.calcTempPolyfit()
                 if p is not None:
                     fit = numpy.poly1d(p)
-                    if fit is not None:
-                        self.aw.qmc.temp2 = [(-1 if (temp is None) or (temp == -1) else fit(temp)) for temp in self.org_temp2]
+                    self.aw.qmc.temp2 = [(-1 if temp == -1 else fit(temp)) for temp in self.org_temp2]
 #            except numpy.exceptions.RankWarning:
 #                pass
             except Exception: # pylint: disable=broad-except

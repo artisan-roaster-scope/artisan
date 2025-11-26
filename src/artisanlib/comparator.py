@@ -22,7 +22,7 @@ from matplotlib import ticker, transforms
 from matplotlib import rcParams
 import logging
 from collections.abc import Callable, Sequence
-from typing import Final, TypedDict, Literal, cast, TYPE_CHECKING
+from typing import override, Final, TypedDict, Literal, cast, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
@@ -97,10 +97,10 @@ class RoastProfile:
         else:
             g0 = QColor.fromHslF(0.5,0,0.5,0.5) # saturation set to 0
         self.gray = (
-                (0 if g0.redF() is None else g0.redF()),
-                (0 if g0.greenF() is None else g0.greenF()),
-                (0 if g0.blueF() is None else g0.blueF()),
-                (0 if g0.alphaF() is None else g0.alphaF()))
+                g0.redF(),
+                g0.greenF(),
+                g0.blueF(),
+                g0.alphaF())
         self.label:str = ''
         self.title:str = ''
         #
@@ -189,10 +189,7 @@ class RoastProfile:
                 xname2 = profile['extraname2'][:l]
                 delta1 = profile['extraDelta1'][:l]
                 delta2 = profile['extraDelta2'][:l]
-                if (isinstance(xtimex, list) and isinstance(xtemp1, list) and isinstance(xtemp2, list) and
-                        isinstance(xname1, list) and isinstance(xname2, list) and
-                        isinstance(delta1, list) and isinstance(delta2, list) and
-                        len(xtimex) == len(xtemp1) == len(xtemp2) == len(xname1) == len(xname2) == len(delta1) == len(delta2) == l):
+                if len(xtimex) == len(xtemp1) == len(xtemp2) == len(xname1) == len(xname2) == len(delta1) == len(delta2) == l:
                     # ensure that all extra timex and temp lists are of the same length as self.timex
                     for i, timex in enumerate(xtimex):
                         if len(timex) == len(self.timex):
@@ -336,12 +333,11 @@ class RoastProfile:
             self.metadata['ambient_humidity'] = f"{float2float(profile['ambient_humidity']):g}%"
         if 'ambient_pressure' in profile:
             self.metadata['ambient_pressure'] = f"{float2float(profile['ambient_pressure']):g}hPa"
-        if 'computed' in profile and profile['computed'] is not None and 'weight_loss' in profile['computed'] and \
-                profile['computed']['weight_loss'] is not None:
+        if 'computed' in profile and 'weight_loss' in profile['computed']:
             self.metadata['weight_loss'] = f"-{profile['computed']['weight_loss']:g}%"
         if 'ground_color' in profile:
             self.metadata['ground_color'] = f"#{float2str(profile['ground_color'])}"
-        if 'computed' in profile and profile['computed'] is not None and 'AUC' in profile['computed'] and profile['computed']['AUC'] is not None and \
+        if 'computed' in profile and 'AUC' in profile['computed'] and \
                 profile['computed']['AUC'] != 0:
             self.metadata['AUC'] = f"{profile['computed']['AUC']}C*min"
         if 'roastingnotes' in profile:
@@ -353,7 +349,7 @@ class RoastProfile:
             if cupping_notes is not None:
                 self.metadata['cuppingnotes'] = cupping_notes
         # TP time in time since DROP
-        if 'computed' in profile and profile['computed'] is not None and 'TP_time' in profile['computed']:
+        if 'computed' in profile and 'TP_time' in profile['computed']:
             self.TP = profile['computed']['TP_time']
         else:
             self.TP = 0
@@ -366,7 +362,7 @@ class RoastProfile:
     def recompute(self) -> None:
         decay_smoothing_p = not self.aw.qmc.optimalSmoothing
         # we resample the temperatures to regular interval timestamps
-        if self.timex is not None and self.timex and len(self.timex)>1:
+        if len(self.timex)>1:
             timex_lin = numpy.linspace(self.timex[0],self.timex[-1],len(self.timex))
         else:
             timex_lin = None
@@ -376,7 +372,7 @@ class RoastProfile:
         self.extrastemp1 = []
         self.extrastemp2 = []
         for i, timex in enumerate(self.extratimex):
-            if timex is not None and timex and len(timex)>1:
+            if len(timex)>1:
                 timex_lin = numpy.linspace(timex[0],timex[-1],len(timex))
             else:
                 timex_lin = None
@@ -399,10 +395,8 @@ class RoastProfile:
         # calculate start/end index
         self.startTimeIdx = (self.timeindex[0] if self.timeindex[0] != -1 else 0)
         self.endTimeIdx = (self.timeindex[6] if self.timeindex[6] != 0 else len(self.timex)-1)
-        if self.stemp1 is not None:
-            self.stemp1 = [None if (not self.aw.qmc.compareBBP and i < self.startTimeIdx) or (not self.aw.qmc.compareRoast and i>self.startTimeIdx) or i > self.endTimeIdx else t for i,t in enumerate(self.stemp1)]
-        if self.stemp2 is not None:
-            self.stemp2 = [None if (not self.aw.qmc.compareBBP and i < self.startTimeIdx) or (not self.aw.qmc.compareRoast and i>self.startTimeIdx) or i > self.endTimeIdx else t for i,t in enumerate(self.stemp2)]
+        self.stemp1 = [None if (not self.aw.qmc.compareBBP and i < self.startTimeIdx) or (not self.aw.qmc.compareRoast and i>self.startTimeIdx) or i > self.endTimeIdx else t for i,t in enumerate(self.stemp1)]
+        self.stemp2 = [None if (not self.aw.qmc.compareBBP and i < self.startTimeIdx) or (not self.aw.qmc.compareRoast and i>self.startTimeIdx) or i > self.endTimeIdx else t for i,t in enumerate(self.stemp2)]
         for i, _ in enumerate(self.extratimex):
             extrastemp1_i = self.extrastemp1[i]
             extrastemp2_i = self.extrastemp2[i]
@@ -426,7 +420,7 @@ class RoastProfile:
         self.events1 = []
         self.events2 = []
         self.events_timex = []
-        if self.stemp1 is not None and self.stemp2 is not None:
+        if self.stemp1 is not None and self.stemp2 is not None: # type:ignore[redundant-expr]
             for ti in self.timeindex[:-1]:
                 temp1:float|None = (self.stemp1[ti] if len(self.stemp1)>ti else None) # pyrefly: ignore
                 temp2:float|None = (self.stemp2[ti] if len(self.stemp2)>ti else None) # pyrefly: ignore
@@ -675,16 +669,16 @@ class RoastProfile:
         for ll in [self.l_temp1,self.l_temp2]:
             if ll is not None:
                 ll.set_transform(tempTransZero) # we reset the transformation to avoid a double shift along the timeaxis
-                ll.set_xdata(numpy.array([x-offset if x is not None else None for x in self.timex]))
+                ll.set_xdata(numpy.array([x-offset for x in self.timex]))
 
         # shifting the extra curves
         for i, (ll1, ll2) in enumerate(zip(self.l_extratemp1, self.l_extratemp2, strict=True)): # ty:ignore
             if ll1 is not None:
                 ll1.set_transform(deltaTransZero if self.extraDelta1[i] else tempTransZero) # we reset the transformation to avoid a double shift along the timeaxis
-                ll1.set_xdata(numpy.array([x-offset if x is not None else None for x in self.extratimex[i]]))
+                ll1.set_xdata(numpy.array([x-offset for x in self.extratimex[i]]))
             if ll2 is not None:
                 ll2.set_transform(deltaTransZero if self.extraDelta2[i] else tempTransZero) # we reset the transformation to avoid a double shift along the timeaxis
-                ll2.set_xdata(numpy.array([x-offset if x is not None else None for x in self.extratimex[i]]))
+                ll2.set_xdata(numpy.array([x-offset for x in self.extratimex[i]]))
 
         # shifting the delta curves does not work for some curves that hold many points resulting some at the end being not displayed
         # thus we update the xdata explicitly below
@@ -695,7 +689,7 @@ class RoastProfile:
         for ll in [self.l_delta1,self.l_delta2]:
             if ll is not None:
                 ll.set_transform(deltaTransZero) # we reset the transformation to avoid a double shift along the timeaxis
-                ll.set_xdata(numpy.array([x-offset if x is not None else None for x in self.timex]))
+                ll.set_xdata(numpy.array([x-offset for x in self.timex]))
 
 #        # update RoR clippings
 #        self.l_delta1_clipping.set_transform(self.getDeltaTrans())
@@ -809,7 +803,7 @@ class RoastProfile:
                 self.l_extratemp2[i] = l_temp2
 
     def drawBT(self) -> None:
-        if self.aw.qmc.ax is not None and self.timex is not None and self.stemp2 is not None:
+        if self.aw.qmc.ax is not None and self.stemp2 is not None:
             alpha = (self.alpha[0] if self.active else self.alpha[1]*self.alpha_dim_factor)
             self.l_temp2, = self.aw.qmc.ax.plot(self.timex,numpy.array(self.stemp2),transform=self.getTempTrans(),markersize=self.aw.qmc.BTmarkersize,marker=self.aw.qmc.BTmarker,visible=(self.visible and self.aligned),
                 sketch_params=None,
@@ -822,7 +816,7 @@ class RoastProfile:
                 label=f'{self.label} {self.aw.arabicReshape(self.aw.BTname)}')
 
     def drawET(self) -> None:
-        if self.aw.qmc.ax is not None and self.timex is not None and self.stemp1 is not None:
+        if self.aw.qmc.ax is not None and self.stemp1 is not None:
             alpha = (self.alpha[1] if self.active else self.alpha[1]*self.alpha_dim_factor)
             self.l_temp1, = self.aw.qmc.ax.plot(self.timex,numpy.array(self.stemp1),transform=self.getTempTrans(),markersize=self.aw.qmc.ETmarkersize,marker=self.aw.qmc.ETmarker,visible=(self.visible and self.aligned),
                 sketch_params=None,
@@ -835,7 +829,7 @@ class RoastProfile:
                 label=f'{self.label} {self.aw.arabicReshape(self.aw.ETname)}')
 
     def drawDeltaBT(self) -> None:
-        if self.aw.qmc.ax is not None and self.timex is not None and self.delta2 is not None:
+        if self.aw.qmc.ax is not None and self.delta2 is not None:
             alpha = (self.alpha[2] if self.active else self.alpha[1]*self.alpha_dim_factor)
             # we clip the RoR such that values below 0 are not displayed
 #            self.l_delta2_clipping = patches.Rectangle((0,0),self.timex[self.endTimeIdx],self.max_DeltaBT, transform=self.getDeltaTrans())
@@ -851,7 +845,7 @@ class RoastProfile:
                 label=f"{self.label} {self.aw.arabicReshape(deltaLabelUTF8 + QApplication.translate('Label', 'BT'))}")
 
     def drawDeltaET(self) -> None:
-        if self.aw.qmc.ax is not None and self.timex is not None and self.delta1 is not None:
+        if self.aw.qmc.ax is not None and self.delta1 is not None:
             alpha = (self.alpha[3] if self.active else self.alpha[3]*self.alpha_dim_factor)
             # we clip the RoR such that values below 0 are not displayed
 #            self.l_delta1_clipping = patches.Rectangle((0,0),self.timex[self.endTimeIdx],self.max_DeltaET, transform=self.getDeltaTrans())
@@ -880,7 +874,7 @@ class RoastProfile:
                 picker=True,
                 pickradius=5,
                 label=f"{self.label} {self.aw.arabicReshape(QApplication.translate('Label', 'Events'))}")
-            if self.aw.qmc.graphstyle == 1 and self.l_mainEvents1 is not None:
+            if self.aw.qmc.graphstyle == 1:
                 self.l_mainEvents1.set_sketch_params(1,700,12)
 
     def drawMainEvents2(self) -> None:
@@ -897,7 +891,7 @@ class RoastProfile:
                 picker=True,
                 pickradius=5,
                 label=f"{self.label} {self.aw.arabicReshape(QApplication.translate('Label', 'Events'))}")
-            if self.aw.qmc.graphstyle == 1 and self.l_mainEvents2 is not None:
+            if self.aw.qmc.graphstyle == 1:
                 self.l_mainEvents2.set_sketch_params(4,800,20)
 
     # draw event lines n in [0,..,3]
@@ -916,26 +910,23 @@ class RoastProfile:
         return None
 
     def drawEvents1(self) -> None:
-        if self.E1 is not None:
-            self.l_events1 = self.drawEvents(self.E1, 0)
+        self.l_events1 = self.drawEvents(self.E1, 0)
 
     def drawEvents2(self) -> None:
-        if self.E2 is not None:
-            self.l_events2 =  self.drawEvents(self.E2, 1)
+        self.l_events2 =  self.drawEvents(self.E2, 1)
 
     def drawEvents3(self) -> None:
-        if self.E3 is not None:
-            self.l_events3 =  self.drawEvents(self.E3, 2)
+        self.l_events3 =  self.drawEvents(self.E3, 2)
 
     def drawEvents4(self) -> None:
-        if self.E4 is not None:
-            self.l_events4 =  self.drawEvents(self.E4, 3)
+        self.l_events4 =  self.drawEvents(self.E4, 3)
 
 
 class CompareTableWidget(QTableWidget): # pyrefly:ignore[invalid-inheritance] # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
     deleteKeyPressed = pyqtSignal()
 
     @pyqtSlot('QKeyEvent')
+    @override
     def keyPressEvent(self, e: 'QKeyEvent|None' = None) -> None:
         if e is not None and e.key() in [Qt.Key.Key_Delete,Qt.Key.Key_Backspace]:
             self.deleteKeyPressed.emit()
@@ -1015,7 +1006,7 @@ class roastCompareDlg(ArtisanDialog):
         self.modeComboBox.currentIndexChanged.connect(self.changeModeidx)
         #
         alignLabel = QLabel(QApplication.translate('Label','Align'))
-        self.alignnames = [
+        self.alignnames:list[str] = [
             QApplication.translate('Label','CHARGE'),
             QApplication.translate('Label','TP'),
             QApplication.translate('Label','DRY'),
@@ -1112,6 +1103,7 @@ class roastCompareDlg(ArtisanDialog):
         self.setFocus(Qt.FocusReason.MouseFocusReason)
 
     @pyqtSlot('QKeyEvent')
+    @override
     def keyPressEvent(self, a0: 'QKeyEvent|None') -> None:
         try:
             if a0 is not None:
@@ -1124,6 +1116,7 @@ class roastCompareDlg(ArtisanDialog):
             pass
 
     @pyqtSlot('QDragEnterEvent')
+    @override
     def dragEnterEvent(self, a0: 'QDragEnterEvent|None') -> None: # pylint: disable=no-self-use # overloaded method
         if a0 is not None:
             mimeData:QMimeData|None = a0.mimeData()
@@ -1133,6 +1126,7 @@ class roastCompareDlg(ArtisanDialog):
                 a0.ignore()
 
     @pyqtSlot('QDropEvent')
+    @override
     def dropEvent(self, a0: 'QDropEvent|None' = None) -> None:
         if a0 is not None:
             mimeData:QMimeData|None = a0.mimeData()
@@ -1182,15 +1176,20 @@ class roastCompareDlg(ArtisanDialog):
                     for op in self.profiles):
                 return
 
-            ind = event.ind[0] # type: ignore[attr-defined] # "PickEvent" has no attribute "ind"
+            ind:int = event.ind[0] # type: ignore[attr-defined] # "PickEvent" has no attribute "ind"
             time = p.timex[p.timeindex[ind]]
             if p.timeindex[0] != -1:
                 time -= p.timex[p.timeindex[0]]
-            temp = float2float(p.temp2[p.timeindex[ind]])
-            name_idx = ind + 1 if ind > 0 else ind
-            event_name = self.alignnames[name_idx]
-            event_name = self.aw.arabicReshape(event_name)
-            self.aw.sendmessage(f'{p.label}: {event_name} @ {stringfromseconds(time,leadingzero=False)}, {temp}{self.aw.qmc.mode}')
+            if len(p.timeindex) > ind:
+                tx:int = p.timeindex[ind]
+                if len(p.temp2) > tx:
+                    flt:float = p.temp2[tx]
+                    temp = float2float(flt)
+                    name_idx:int = ind + 1 if ind > 0 else ind
+                    if len(self.alignnames) > name_idx:
+                        event_name:str = self.alignnames[name_idx]
+                        event_name = self.aw.arabicReshape(event_name)
+                        self.aw.sendmessage(f'{p.label}: {event_name} @ {stringfromseconds(time,leadingzero=False)}, {temp}{self.aw.qmc.mode}') # pyright:ignore[reportUnknownArgumentType]
 
     # if zgrid is != 0 and either ET or BT delta is selected or any of the visible extra curves is rendered on the delta axis we show the delta (second) y-axis
     def deltaAxisVisible(self) -> bool:
@@ -1383,8 +1382,8 @@ class roastCompareDlg(ArtisanDialog):
                 else:
                     loc = self.legendloc_pos
             else:
-                loc = self.legend._loc # type: ignore # "Legend" has no attribute "_loc" # pylint: disable=protected-access
-            handles = []
+                loc = self.legend._loc # type: ignore[attr-defined] # "Legend" has no attribute "_loc" # pylint: disable=protected-access
+            handles:list[Line2D] = []
             labels = []
             for p in self.profiles:
                 if p.visible and p.aligned:
@@ -1401,20 +1400,14 @@ class roastCompareDlg(ArtisanDialog):
                 prop = self.aw.mpl_fontproperties.copy()
                 prop.set_size('x-small')
                 if self.aw.qmc.ax is not None:
-                    self.legend = self.aw.qmc.ax.legend(handles,labels,loc=loc,
+                    self.legend = self.aw.qmc.ax.legend(handles, labels, loc=loc, # pyright:ignore[reportUnknownArgumentType]
                         #ncol=ncol,
                         fancybox=True,prop=prop,shadow=False,frameon=True)
 
                 if self.legend is not None:
-                    try:
-                        self.legend.set_in_layout(False) # remove legend from tight_layout calculation
-                    except Exception: # set_in_layout not available in mpl<3.x # pylint: disable=broad-except
-                        pass
-                    try:
-                        self.legend.set_draggable(state=True,use_blit=True)  #,update='bbox')
-                        self.legend.set_picker(self.aw.draggable_text_box_picker)
-                    except Exception: # not available in mpl<3.x # pylint: disable=broad-except
-                        self.legend.draggable(state=True) # type: ignore # for mpl 2.x
+                    self.legend.set_in_layout(False) # remove legend from tight_layout calculation
+                    self.legend.set_draggable(state=True,use_blit=True)  #,update='bbox')
+                    self.legend.set_picker(self.aw.draggable_text_box_picker)
                     frame = self.legend.get_frame()
                     frame.set_facecolor(self.aw.qmc.palette['legendbg'])
                     frame.set_alpha(self.aw.qmc.alpha['legendbg'])
@@ -1473,7 +1466,7 @@ class roastCompareDlg(ArtisanDialog):
         self.profileTable.setCellWidget(i,1,flagWidget)
         title_item = QTableWidgetItem(profile.title)
         tooltip = self.renderToolTip(profile)
-        if tooltip is not None and tooltip != '':
+        if tooltip != '':
             title_item.setToolTip(tooltip)
         self.profileTable.setItem(i,2,title_item)
         header = QTableWidgetItem(profile.label)
@@ -1481,69 +1474,68 @@ class roastCompareDlg(ArtisanDialog):
 
     def renderToolTip(self, profile:RoastProfile) -> str:
         tooltip:str = ''
-        if profile.metadata is not None:
-            try:
-                if 'roastdate' in profile.metadata:
-                    tooltip = profile.metadata['roastdate'].date().toString()
-                    tooltip += ', ' + profile.metadata['roastdate'].time().toString()[:-3]
-                if 'roastoftheday' in profile.metadata:
-                    if tooltip != '':
-                        tooltip += '\n'
-                    tooltip += profile.metadata['roastoftheday']
+        try:
+            if 'roastdate' in profile.metadata:
+                tooltip = profile.metadata['roastdate'].date().toString()
+                tooltip += ', ' + profile.metadata['roastdate'].time().toString()[:-3]
+            if 'roastoftheday' in profile.metadata:
+                if tooltip != '':
+                    tooltip += '\n'
+                tooltip += profile.metadata['roastoftheday']
+            if 'weight' in profile.metadata:
+                if tooltip != '':
+                    tooltip += '\n'
+                tooltip += profile.metadata['weight']
+            if 'beans' in profile.metadata:
                 if 'weight' in profile.metadata:
-                    if tooltip != '':
-                        tooltip += '\n'
-                    tooltip += profile.metadata['weight']
-                if 'beans' in profile.metadata:
-                    if 'weight' in profile.metadata:
-                        tooltip += ' '
-                    elif tooltip != '':
-                        tooltip += '\n'
-                    tooltip += profile.metadata['beans'].strip()
-                    if 'moisture_greens' in profile.metadata:
-                        tooltip += f" ({float2float(profile.metadata['moisture_greens'],self.aw.percent_decimals):g}%)"
+                    tooltip += ' '
+                elif tooltip != '':
+                    tooltip += '\n'
+                tooltip += profile.metadata['beans'].strip()
+                if 'moisture_greens' in profile.metadata:
+                    tooltip += f" ({float2float(profile.metadata['moisture_greens'],self.aw.percent_decimals):g}%)"
+            if 'ambientTemp' in profile.metadata:
+                if tooltip != '':
+                    tooltip += '\n'
+                tooltip += profile.metadata['ambientTemp']
+            if 'ambient_humidity' in profile.metadata:
                 if 'ambientTemp' in profile.metadata:
-                    if tooltip != '':
-                        tooltip += '\n'
-                    tooltip += profile.metadata['ambientTemp']
-                if 'ambient_humidity' in profile.metadata:
-                    if 'ambientTemp' in profile.metadata:
-                        tooltip += ', '
-                    elif tooltip != '':
-                        tooltip += '\n'
-                    tooltip += profile.metadata['ambient_humidity']
-                if 'ambient_pressure' in profile.metadata:
-                    if 'ambientTemp' in profile.metadata or 'ambient_humidity' in profile.metadata:
-                        tooltip += ', '
-                    elif tooltip != '':
-                        tooltip += '\n'
-                    tooltip += profile.metadata['ambient_pressure']
+                    tooltip += ', '
+                elif tooltip != '':
+                    tooltip += '\n'
+                tooltip += profile.metadata['ambient_humidity']
+            if 'ambient_pressure' in profile.metadata:
+                if 'ambientTemp' in profile.metadata or 'ambient_humidity' in profile.metadata:
+                    tooltip += ', '
+                elif tooltip != '':
+                    tooltip += '\n'
+                tooltip += profile.metadata['ambient_pressure']
+            if 'weight_loss' in profile.metadata:
+                if tooltip != '':
+                    tooltip += '\n'
+                tooltip += profile.metadata['weight_loss']
+            if 'ground_color' in profile.metadata:
                 if 'weight_loss' in profile.metadata:
-                    if tooltip != '':
-                        tooltip += '\n'
-                    tooltip += profile.metadata['weight_loss']
-                if 'ground_color' in profile.metadata:
-                    if 'weight_loss' in profile.metadata:
-                        tooltip += ', '
-                    elif tooltip != '':
-                        tooltip += '\n'
-                    tooltip += profile.metadata['ground_color']
-                if 'AUC' in profile.metadata:
-                    if 'weight_loss' in profile.metadata or 'ground_color' in profile.metadata:
-                        tooltip += ', '
-                    elif tooltip != '':
-                        tooltip += '\n'
-                    tooltip += profile.metadata['AUC']
-                if 'roastingnotes' in profile.metadata:
-                    if tooltip != '':
-                        tooltip += '\n'
-                    tooltip += profile.metadata['roastingnotes'].strip()
-                if 'cuppingnotes' in profile.metadata:
-                    if tooltip != '':
-                        tooltip += '\n'
-                    tooltip += profile.metadata['cuppingnotes'].strip()
-            except Exception as e: # pylint: disable=broad-except
-                _log.exception(e)
+                    tooltip += ', '
+                elif tooltip != '':
+                    tooltip += '\n'
+                tooltip += profile.metadata['ground_color']
+            if 'AUC' in profile.metadata:
+                if 'weight_loss' in profile.metadata or 'ground_color' in profile.metadata:
+                    tooltip += ', '
+                elif tooltip != '':
+                    tooltip += '\n'
+                tooltip += profile.metadata['AUC']
+            if 'roastingnotes' in profile.metadata:
+                if tooltip != '':
+                    tooltip += '\n'
+                tooltip += profile.metadata['roastingnotes'].strip()
+            if 'cuppingnotes' in profile.metadata:
+                if tooltip != '':
+                    tooltip += '\n'
+                tooltip += profile.metadata['cuppingnotes'].strip()
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
         return tooltip.strip()
 
     def createProfileTable(self) -> None:
@@ -2141,6 +2133,7 @@ class roastCompareDlg(ArtisanDialog):
                 self.aw.qmc.xaxistosm(min_time=min_timex, max_time=max_timex)
 
     @pyqtSlot('QCloseEvent')
+    @override
     def closeEvent(self, a0:'QCloseEvent|None' = None) -> None:
         del a0
         #disconnect pick handler

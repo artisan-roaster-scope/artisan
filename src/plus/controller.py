@@ -77,7 +77,7 @@ def start(app_window:'ApplicationWindow') -> None:
 def toggle(app_window:'ApplicationWindow') -> None:
     _log.debug('toggle()')
     config.app_window = app_window
-    if app_window is not None and app_window.plus_account is None:  # @UndefinedVariable
+    if app_window.plus_account is None:  # @UndefinedVariable
         connect()
         if (
             is_connected()
@@ -134,7 +134,7 @@ def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
                     account = aw.plus_email
                     if isinstance(
                         # pylint: disable=protected-access
-                        threading.current_thread(), threading._MainThread # type: ignore
+                        threading.current_thread(), threading._MainThread # type: ignore[attr-defined]
                     ):  # this is dangerous and should only be done while
                         # running in the main GUI thread as a consequence are
                         # GUI actions which might crash in other threads
@@ -256,12 +256,9 @@ def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
                         message = QApplication.translate(
                             'Plus', 'Authentication failed'
                         )
-                        if (
-                            aw.plus_account is not None
-                        ):  # @UndefinedVariable
-                            message = (
-                                f'{aw.plus_account} {message}'
-                            )  # @UndefinedVariable
+                        message = (
+                            f'{aw.plus_account} {message}'
+                        )  # @UndefinedVariable
                         aw.sendmessageSignal.emit(
                             message, True, None
                         )  # @UndefinedVariable

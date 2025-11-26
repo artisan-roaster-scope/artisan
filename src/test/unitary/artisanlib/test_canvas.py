@@ -1686,7 +1686,7 @@ class TestTemperatureConversion:
         """Test convertTemperatureF slot method."""
         # Arrange
         canvas = create_test_canvas()
-        canvas.convertTemperature = Mock() # type: ignore
+        canvas.convertTemperature = Mock() # type: ignore[method-assign]
 
         # Act
         canvas.convertTemperatureF()
@@ -1698,7 +1698,7 @@ class TestTemperatureConversion:
         """Test convertTemperatureC slot method."""
         # Arrange
         canvas = create_test_canvas()
-        canvas.convertTemperature = Mock() # type: ignore
+        canvas.convertTemperature = Mock() # type: ignore[method-assign]
 
         # Act
         canvas.convertTemperatureC()

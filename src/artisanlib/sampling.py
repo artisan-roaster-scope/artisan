@@ -15,7 +15,7 @@
 # AUTHOR
 # Marko Luther, 2023
 
-from typing import TYPE_CHECKING
+from typing import override, TYPE_CHECKING
 from babel.units import get_unit_name
 
 from artisanlib.dialogs import ArtisanDialog
@@ -100,12 +100,14 @@ class SamplingDlg(ArtisanDialog):
 
     #window close box
     @pyqtSlot('QCloseEvent')
+    @override
     def closeEvent(self, a0:'QCloseEvent|None' = None) -> None:
         del a0
         self.close()
 
     #cancel button
     @pyqtSlot()
+    @override
     def close(self) -> bool:
         self.storeSettings()
         self.reject()

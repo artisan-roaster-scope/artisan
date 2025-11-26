@@ -11,7 +11,7 @@ import json
 from lxml import html
 import logging
 from collections.abc import Callable
-from typing import Final, TypedDict, TYPE_CHECKING
+from typing import Final, TypedDict, cast, TYPE_CHECKING
 
 
 if TYPE_CHECKING:
@@ -137,7 +137,7 @@ def extractProfileRoastPathHTML(url:'QUrl',
                 page_content = page.content.decode('latin-1')
             d = re.findall(fr"var {elem} = JSON\.parse\('(.+?)'\);", page_content, re.S)  # @UndefinedVariable
             if d:
-                data[elem] = json.loads(d[0]) # type: ignore # generic strings accessors cannot be handled by mypy
+                data[elem] = json.loads(d[0]) # type: ignore[literal-required] # generic strings accessors cannot be handled by mypy
 
         if 'btData' in data and len(data['btData']) > 0 and 'Timestamp' in data['btData'][0]:
             # BT
@@ -179,17 +179,16 @@ def extractProfileRoastPathHTML(url:'QUrl',
             res['timeindex'] = timeindex
 
             # Notes
-            noteData = None
+            noteData:list[RoastPathDataItem] = []
             for tag in ['noteData','fuelData','fanData','drumData']:
                 if tag in data:
-                    if noteData is None:
-                        noteData = data[tag] # type: ignore # mypy cannot check generic tags on TypedDicts
-                    noteData = noteData + data[tag] # type: ignore # mypy cannot check generic tags on TypedDicts
-            if noteData is not None:
-                specialevents = []
-                specialeventstype = []
-                specialeventsvalue = []
-                specialeventsStrings = []
+                    noteData.append(cast(RoastPathDataItem, data[tag])) # type:ignore[literal-required]
+            if len(noteData)>0:
+                specialevents:list[int] = []
+                specialeventstype:list[int] = []
+                specialeventsvalue:list[float] = []
+                specialeventsStrings:list[str] = []
+                n:RoastPathDataItem
                 for n in noteData:
                     if 'Timestamp' in n and 'NoteTypeId' in n and 'Note' in n:
                         c = dateutil.parser.parse(n['Timestamp']).timestamp() - baseTime
@@ -211,11 +210,13 @@ def extractProfileRoastPathHTML(url:'QUrl',
                                 else: # n == 3: # Notes
                                     specialeventstype.append(4)
                                 try:
-                                    vv:float = float(n['Note'])
-                                    specialeventsvalue.append(eventsExternal2InternalValue(round(vv)))
+                                    if 'Note' in n:
+                                        vv:float = float(n['Note'])
+                                        specialeventsvalue.append(eventsExternal2InternalValue(round(vv)))
                                 except Exception: # pylint: disable=broad-except
                                     specialeventsvalue.append(0)
-                                specialeventsStrings.append(n['Note'])
+                                if 'Note' in n:
+                                    specialeventsStrings.append(str(n['Note']))
                         except Exception as e: # pylint: disable=broad-except
                             _log.exception(e)
                 if len(specialevents) > 0:

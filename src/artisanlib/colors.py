@@ -19,7 +19,7 @@ import platform
 
 from artisanlib.util import deltaLabelUTF8, rgba_colorname2argb_colorname, argb_colorname2rgba_colorname
 from artisanlib.dialogs import ArtisanDialog
-from typing import TYPE_CHECKING
+from typing import override, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
@@ -611,6 +611,7 @@ class graphColorDlg(ArtisanDialog):
         self.TabWidget.setCurrentIndex(self.activeTab)
 
     @pyqtSlot('QCloseEvent')
+    @override
     def closeEvent(self, a0:'QCloseEvent|None' = None) -> None:
         del a0
         self.aw.graphColorDlg_activeTab = self.TabWidget.currentIndex()

@@ -118,7 +118,7 @@ def fromFtoC(Ffloat: float|None) -> float|None:
 def temp2C(temp: float|None,mode:str|None = None) -> float|None:
     aw = config.app_window
     if (
-        temp is not None and (mode == 'F' or (mode is None and aw is not None and aw.qmc is not None and
+        temp is not None and (mode == 'F' or (mode is None and aw is not None and
             aw.qmc.mode == 'F'))
     ):  # @UndefinedVariable
         return fromFtoC(temp)  # @UndefinedVariable
@@ -127,7 +127,7 @@ def temp2C(temp: float|None,mode:str|None = None) -> float|None:
 def tempDiff2C(temp: float|None) -> float|None:
     aw = config.app_window
     if (
-        temp is not None and aw is not None and aw.qmc is not None and
+        temp is not None and aw is not None and
             aw.qmc.mode == 'F'
     ):  # @UndefinedVariable
         if temp in [-1, None] or numpy.isnan(temp):
@@ -212,8 +212,8 @@ def limittext(maxlen: int, s: str|None) -> str|None:
 
 
 def addString2dict(dict_source:'ProfileData', key_source:str, dict_target:dict[str, Any], key_target:str, maxlen:int) -> None:
-    if key_source in dict_source and dict_source[key_source]: # type:ignore # pyrefly: ignore # TypedDict key must be a string literal; expected one of (
-        txt = limittext(maxlen, decodeLocal(dict_source[key_source])) # type:ignore # pyrefly: ignore # TypedDict key must be a string literal; expected one of
+    if key_source in dict_source and dict_source[key_source]: # type:ignore[literal-required] # pyrefly: ignore # TypedDict key must be a string literal; expected one of (
+        txt = limittext(maxlen, decodeLocal(dict_source[key_source])) # type:ignore[literal-required] # pyrefly: ignore # TypedDict key must be a string literal; expected one of
         if txt is not None:
             dict_target[key_target] = txt
 
@@ -232,11 +232,11 @@ def addNum2dict(
     digits:int,
     factor:float=1.,
 ) -> None:
-    if key_source in dict_source and dict_source[key_source]: # type: ignore # TypedDict key must be a string literal; expected one of
-        n = dict_source[key_source]  # type:ignore # TypedDict key must be a string literal; expected one of
-        if n is not None and factor is not None and isinstance(n, (float, int)):
+    if key_source in dict_source and dict_source[key_source]: # type: ignore[literal-required] # TypedDict key must be a string literal; expected one of
+        n = dict_source[key_source]  # type:ignore[literal-required] # TypedDict key must be a string literal; expected one of
+        if n is not None and isinstance(n, (float, int)):
             n = n * factor
-        n = limitnum(minn, maxn, n)  # may return None
+        n = limitnum(minn, maxn, n)  # may return None # pyright:ignore[reportUnknownArgumentType]
         n = float2floatMin(n, digits)
         if n:
             dict_target[key_target] = n
@@ -276,8 +276,8 @@ def addAllNum2dict(
 
 
 def addTime2dict(dict_source:'ProfileData|ComputedProfileInformation', key_source:str, dict_target:dict[str, Any], key_target:str) -> None:
-    if key_source in dict_source and dict_source[key_source]:  # type:ignore # pyrefly: ignore # TypedDict key must be a string literal; expected one of
-        tx = limittime(dict_source[key_source])  # type:ignore # pyrefly: ignore # TypedDict key must be a string literal; expected one of
+    if key_source in dict_source and dict_source[key_source]:  # type:ignore[literal-required] # pyrefly: ignore # ty:ignore[invalid-key] # TypedDict key must be a string literal; expected one of
+        tx = limittime(dict_source[key_source])  # type:ignore[literal-required] # pyrefly: ignore # TypedDict key must be a string literal; expected one of
         if tx is not None:
             dict_target[key_target] = float2floatMin(tx)
 
@@ -297,14 +297,14 @@ def addAllTime2dict(dict_source:'ProfileData|ComputedProfileInformation', dict_t
 
 # mode indicates the temperature unit, "C" or "F", of the data if not None
 def addTemp2dict(dict_source:'ProfileData|ComputedProfileInformation', key_source:str, dict_target:dict[str, Any], key_target:str, mode:str|None=None) -> None:
-    if key_source in dict_source and dict_source[key_source]:  # type:ignore # pyrefly: ignore # TypedDict key must be a string literal; expected one of
-        temp = limittemp(temp2C(dict_source[key_source],mode))  # type:ignore # pyrefly: ignore # TypedDict key must be a string literal; expected one of
+    if key_source in dict_source and dict_source[key_source]:  # type:ignore[literal-required] # pyrefly: ignore # TypedDict key must be a string literal; expected one of
+        temp = limittemp(temp2C(dict_source[key_source],mode))  # type:ignore[literal-required] # pyrefly: ignore # TypedDict key must be a string literal; expected one of
         if temp is not None and temp != -1 and not numpy.isnan(temp):
             dict_target[key_target] = float2floatMin(temp)
 
 def addTempDiff2dict(dict_source:'ProfileData|ComputedProfileInformation', key_source:str, dict_target:dict[str, Any], key_target:str) -> None:
-    if key_source in dict_source and dict_source[key_source]:  # type:ignore # pyrefly: ignore # TypedDict key must be a string literal; expected one of
-        temp = limittemp(tempDiff2C(dict_source[key_source]))  # type:ignore # pyrefly: ignore # TypedDict key must be a string literal; expected one of
+    if key_source in dict_source and dict_source[key_source]:  # type:ignore[literal-required] # ty:ignore[invalid-key] # pyrefly: ignore # TypedDict key must be a string literal; expected one of
+        temp = limittemp(tempDiff2C(dict_source[key_source]))  # type:ignore[literal-required] # pyrefly: ignore # TypedDict key must be a string literal; expected one of
         if temp is not None and temp != -1 and not numpy.isnan(temp):
             dict_target[key_target] = float2floatMin(temp)
 
@@ -323,8 +323,8 @@ def addAllTemp2dict(dict_source:'ProfileData|ComputedProfileInformation', dict_t
 
 # mode indicates the temperature unit, "C" or "F", of the data if not None
 def addRoRTemp2dict(dict_source:'ProfileData|ComputedProfileInformation', key_source:str, dict_target:dict[str, Any], key_target:str, mode:str|None=None) -> None:
-    if key_source in dict_source and dict_source[key_source]:  # type:ignore # pyrefly: ignore # TypedDict key must be a string literal; expected one of
-        temp = limittemp(RoRtemp2C(dict_source[key_source],mode))  # type:ignore # pyrefly: ignore # TypedDict key must be a string literal; expected one of
+    if key_source in dict_source and dict_source[key_source]:  # type:ignore[literal-required] # pyrefly: ignore # TypedDict key must be a string literal; expected one of
+        temp = limittemp(RoRtemp2C(dict_source[key_source],mode))  # type:ignore[literal-required] # pyrefly: ignore # TypedDict key must be a string literal; expected one of
         if temp is not None:
             dict_target[key_target] = float2floatMin(temp)
 
@@ -332,8 +332,8 @@ def addRoRTemp2dict(dict_source:'ProfileData|ComputedProfileInformation', key_so
 # returns extends dict_target by item with key_target holding the
 # dict_source[key_source] value if key_source in dict_source and not empty
 def add2dict(dict_source:'ProfileData', key_source:str, dict_target:dict[str, Any], key_target:str, if_non_empty:bool = True) -> None:
-    if key_source in dict_source and (not if_non_empty or dict_source[key_source]):  # type:ignore # pyrefly: ignore # TypedDict key must be a string literal; expected one of
-        dict_target[key_target] = dict_source[key_source]  # type:ignore # pyrefly: ignore # TypedDict key must be a string literal; expected one of
+    if key_source in dict_source and (not if_non_empty or dict_source[key_source]):  # type:ignore[literal-required] # pyrefly: ignore # TypedDict key must be a string literal; expected one of
+        dict_target[key_target] = dict_source[key_source]  # type:ignore[literal-required] # pyrefly: ignore] # TypedDict key must be a string literal; expected one of
 
 
 def getLanguage() -> str:

@@ -270,7 +270,9 @@ class NotificationManager(QObject): # pyrefly:ignore[invalid-inheritance] # pyri
         self.notifications_queue = []
 
     def isNotificationInQueue(self, hr_id:str|None) -> bool:
-        return not id and any(n.id == hr_id for n in self.getNotificationItems()) # type: ignore
+        if hr_id is None:
+            return False
+        return any(n.id == hr_id for n in self.getNotificationItems())
 
     def cleanNotificationQueue(self) -> None:
         try:

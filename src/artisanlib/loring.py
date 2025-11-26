@@ -59,7 +59,7 @@ def extractProfileLoringCSV(file:str,
         i = 0
         for row in data:
             items = list(zip(header, row, strict=True)) # ty:ignore
-            item = {}
+            item:dict[str,str] = {}
             for (name, value) in items:
                 item[name] = value.strip()
 

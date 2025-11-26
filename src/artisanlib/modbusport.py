@@ -35,7 +35,7 @@ if TYPE_CHECKING:
 from PyQt6.QtCore import QSemaphore
 from PyQt6.QtWidgets import QApplication
 
-from artisanlib.util import debugLogLevelActive
+from artisanlib.util import debugLogLevelActive, max_blocks, min_blocks
 from artisanlib.async_comm import AsyncLoopThread
 
 
@@ -90,7 +90,7 @@ class modbusport:
     __slots__ = [ 'aw', 'modbus_serial_read_delay', 'modbus_serial_connect_delay', 'modbus_serial_write_delay', 'maxCount', 'readRetries', 'default_comport', 'comport', 'baudrate', 'bytesize', 'parity', 'stopbits',
         'timeout', 'IP_timeout', 'IP_retries', 'serial_readRetries', 'PID_device_ID', 'PID_SV_register', 'PID_p_register', 'PID_i_register', 'PID_d_register', 'PID_ON_action', 'PID_OFF_action',
         'channels', 'inputDeviceIds', 'inputRegisters', 'inputFloats', 'inputBCDs', 'inputFloatsAsInt', 'inputBCDsAsInt', 'inputSigned', 'inputCodes', 'inputDivs',
-        'inputModes', 'optimizer', 'fetch_max_blocks', 'fail_on_cache_miss', 'disconnect_on_error', 'acceptable_errors', 'activeRegisters',
+        'inputModes', 'optimizer', 'fetch_max_blocks', 'fail_on_cache_miss', 'disconnect_on_error', 'acceptable_errors', 'activeRegisterSequences',
         'readingsCache', 'SVmultiplier', 'PIDmultiplier', 'SVwriteLong', 'SVwriteFloat',
         'wordorderLittle', '_asyncLoopThread', '_client', 'COMsemaphore', 'default_host', 'host', 'port', 'type', 'lastReadResult', 'commError']
 
@@ -101,7 +101,7 @@ class modbusport:
 
         self.modbus_serial_read_delay       :Final[float] = 0.035 # in seconds
         self.modbus_serial_write_delay      :Final[float] = 0.080 # in seconds
-        self.modbus_serial_connect_delay    :float = 0.5          # in seconds (user configurable delay after serial connect; important for Arduino based slaves that reboot on connect)
+        self.modbus_serial_connect_delay    :float = 0.5          # in seconds (user configurable delay after serial connect; important for Arduino based devices that reboot on connect)
 
         self.maxCount:Final[int] = 125 # the maximum number of registers that can be fetched in one request according to the MODBUS spec
         self.readRetries:int = 0  # retries
@@ -114,7 +114,7 @@ class modbusport:
         self.stopbits:int = 1
         self.timeout:float = 0.4 # serial MODBUS timeout
         self.serial_readRetries:int = 1 # user configurable, defaults to 0
-        self.IP_timeout:float = 0.2 # UDP/TCP MODBUS timeout in seconds
+        self.IP_timeout:float = 0.3 # UDP/TCP MODBUS timeout in seconds
         self.IP_retries:int = 1 # UDP/TCP MODBUS retries (max 3)
         self.PID_device_ID:int = 0
         self.PID_SV_register:int = 0
@@ -150,7 +150,7 @@ class modbusport:
         self.disconnect_on_error:bool = True # if True we explicitly disconnect the MODBUS connection on IO errors (was: if on MODBUS serial and restart it on next request)
         self.acceptable_errors = 3 # the number of errors that are acceptable without a disconnect/reconnect. If set to 0 every error triggers a reconnect if disconnect_on_error is True
 
-        self.activeRegisters:dict[int, dict[int, list[int]]] = {}
+        self.activeRegisterSequences:dict[int, dict[int, list[tuple[int,int]]]] = {} # associates to each code and device_id a list of start-end-register tuples to be fetched
         # the readings cache that is filled by requesting sequences of values of activeRegisters in blocks
         self.readingsCache:dict[int, dict[int, dict[int, int]]] = {}
 
@@ -353,6 +353,7 @@ class modbusport:
                 _log.debug('connect(): connecting')
                 if self._client is not None:
                     await self._client.connect()
+                self.updateActiveRegisters()
                 if self.isConnected():
                     self.updateActiveRegisters()
                     self.clearReadingsCache()
@@ -374,7 +375,7 @@ class modbusport:
     # MODBUS code => device id => [registers]
     def updateActiveRegisters(self) -> None:
         _log.debug('updateActiveRegisters()')
-        self.activeRegisters = {}
+        activeRegisters:dict[int, dict[int, list[int]]] = {}
         for c in range(self.channels):
             device_id = self.inputDeviceIds[c]
             if device_id != 0:
@@ -384,13 +385,20 @@ class modbusport:
                     registers = [register]
                     if self.inputFloats[c] or self.inputBCDs[c] or self.inputFloatsAsInt[c]:
                         registers.append(register+1)
-                    if code not in self.activeRegisters:
-                        self.activeRegisters[code] = {}
-                    if device_id in self.activeRegisters[code]:
-                        self.activeRegisters[code][device_id].extend(registers)
+                    if code not in activeRegisters:
+                        activeRegisters[code] = {}
+                    if device_id in activeRegisters[code]:
+                        activeRegisters[code][device_id].extend(registers)
                     else:
-                        self.activeRegisters[code][device_id] = registers
-        _log.debug('active registers: %s',self.activeRegisters)
+                        activeRegisters[code][device_id] = registers
+        # now take the activeRegisters and compute the sequences to fetch
+        self.activeRegisterSequences = {}
+        for code, device_ids in activeRegisters.items():
+            for device_id, registers in device_ids.items():
+                if code not in self.activeRegisterSequences:
+                    self.activeRegisterSequences[code] = {}
+                self.activeRegisterSequences[code][device_id] = self.register_sequences(registers)
+
 
     def clearReadingsCache(self) -> None:
         _log.debug('clearReadingsCache()')
@@ -443,46 +451,19 @@ class modbusport:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
 
-    # splits sorted list of registers into list of segments of (first,last) register tuples with maximal length of MAX_REGISTER_SEGMENT
-    # with last-first < MAX_REGISTER_SEGMENT
-    # ex with MAX_REGISTER_SEGMENT = 100:
-    #  client.max_blocks([0, 2, 20, 1040, 1105, 1215]) ==> [(0,20), (1040, 1105), (1215, 1215)]
-    @staticmethod
-    def max_blocks(registers:list[int]) -> list[tuple[int,int]]:
-        res:list[tuple[int,int]] = []
-        start_register:int|None = None
-        last_register:int|None = None
-        for register in registers:
-            if start_register is None:
-                start_register = register
-            elif last_register is not None and register > start_register + modbusport.MAX_REGISTER_SEGMENT - 1:
-                res.append((start_register, last_register))
-                start_register = register
-            last_register = register
+    # calculates the blocks of sequences to be fetches as list of pairs of the form (start-register,end-register)
+    # respecting self.fetch_max_blocks and MAX_REGISTER_SEGMENT
+    def register_sequences(self, registers:list[int]) -> list[tuple[int,int]]:
+        return (max_blocks(registers, max_register_segment=modbusport.MAX_REGISTER_SEGMENT) if self.fetch_max_blocks else min_blocks(registers))
 
-        # add the last remaining, not yet appended segment
-        if start_register is not None and last_register is not None:
-            res.append((start_register, last_register))
-        return res
 
     async def read_active_registers_async(self) -> None:
         error_disconnect = False # set to True if a serious error requiring a disconnect was detected
         try:
             assert self._client is not None
             self.clearReadingsCache()
-            for code, device_ids in self.activeRegisters.items():
-                for device_id, registers in device_ids.items():
-                    registers_sorted = sorted(registers)
-                    sequences:list[tuple[int,int]]
-                    if self.fetch_max_blocks:
-                        # we split into sequences with maximal 100 registers
-                        sequences = self.max_blocks(registers_sorted)
-                    else:
-                        # split in successive sequences
-                        gaps = [[s, er] for s, er in zip(registers_sorted, registers_sorted[1:], strict=True) if s+1 < er]
-                        edges = iter(registers_sorted[:1] + sum(gaps, []) + registers_sorted[-1:])
-                        sequences = list(zip(edges, edges, strict=True)) # list of pairs of the form (start-register,end-register) # ty:ignore
-#                    just_send:bool = False
+            for code, device_ids in self.activeRegisterSequences.items():
+                for device_id, sequences in device_ids.items():
                     for seq in sequences:
                         retry:int = self.readRetries
                         register:int = seq[0]
@@ -495,10 +476,8 @@ class modbusport:
                                 try:
                                     # we cache only MODBUS function 3 and 4 (not 1 and 2!)
                                     if code == 3:
-#                                        res = await self.read_holding_registers(register, count, device_id)
                                         res = await self._client.read_holding_registers(register,count=count,device_id=device_id)
                                     elif code == 4:
-#                                        res = await self.read_input_registers(register, count, device_id)
                                         res = await self._client.read_input_registers(register,count=count,device_id=device_id)
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.info('readActive(%d,%d,%d,%d)', device_id, code, register, count)
@@ -832,7 +811,7 @@ class modbusport:
                         res_response, res_error_disconnect = asyncio.run_coroutine_threadsafe(self.read_async(device_id, register, count, code), self._asyncLoopThread.loop).result()
                         error_disconnect = res_error_disconnect
                         if res_response is not None:
-                            if res_response is not None and hasattr(res_response, 'registers'):
+                            if hasattr(res_response, 'registers'):
                                 res_registers = res_response.registers
                             if code in {1, 2} and hasattr(res_response, 'bits'):
                                 res_bits = res_response.bits

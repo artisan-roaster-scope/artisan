@@ -45,11 +45,7 @@ import dateutil.parser
 import copy as copyd
 import arabic_reshaper # type:ignore[import-untyped]
 from pathlib import Path
-try:
-    from bidi import get_display # type:ignore[import-untyped] # newer rust based implementation of the above Python implementation
-except Exception: # pylint: disable=broad-except
-    # for Python <3.9 we need to import the pure Python implementation
-    from bidi.algorithm import get_display # type:ignore # pure Python implementation
+from bidi import get_display # type:ignore[import-untyped] # newer rust based implementation of the above Python implementation
 
 # links CTR-C signals to the system default (ignore)
 import signal
@@ -59,7 +55,7 @@ import zlib
 import logging.config
 from yaml import safe_load as yaml_load
 from collections.abc import Callable
-from typing import Final, cast, Any, TYPE_CHECKING
+from typing import Final, cast, Any, override, Literal, TYPE_CHECKING
 
 from functools import reduce as freduce
 
@@ -190,16 +186,17 @@ if TYPE_CHECKING:
     import numpy.typing as npt # pylint: disable=unused-import
     from PyQt6.QtWidgets import QTableWidgetItem, QTableWidget, QScrollBar # pylint: disable=unused-import
     from PyQt6.QtGui import QStyleHints, QClipboard, QKeyEvent, QMouseEvent, QDropEvent, QDragEnterEvent, QCloseEvent, QResizeEvent, QValidator # pylint: disable=unused-import
-    from PyQt6.QtCore import QObject, QPermission, QMessageLogContext  # noqa: F401 # pylint: disable=unused-import
+    from PyQt6.QtCore import QFile, QObject, QPermission, QMessageLogContext  # noqa: F401 # pylint: disable=unused-import,reimported # QFile is reimported for mypy!?
     from PyQt6.QtWebEngineCore import QWebEnginePage  # noqa: F401 # pylint: disable=unused-import
     from matplotlib.backend_bases import Event as MplEvent, MouseEvent # pylint: disable=unused-import
     from matplotlib.artist import Artist # pylint: disable=unused-import
+    from matplotlib.lines import Line2D # pylint: disable=unused-import
     from xml.etree.ElementTree import Element as XMLElement
 
 # fix socket.inet_pton on Windows (used by pymodbus TCP/UDP)
 try:
     if str(platform.system()).startswith('Windows'):
-        import win_inet_pton # type: ignore # @UnresolvedImport @UnusedImport # pylint: disable=import-error,unused-import # noqa: F401
+        import win_inet_pton # type: ignore[import-not-found] # @UnresolvedImport @UnusedImport # pylint: disable=import-error,unused-import # noqa: F401
 except Exception: # pylint: disable=broad-except
     pass
 
@@ -222,18 +219,15 @@ from artisanlib.qtsingleapplication import QtSingleApplication
 
 try:
     # spanning a second multiprocessing instance (Hottop server) on macOS falils to import the YAPI interface
-    from yoctopuce.yocto_api import YAPI # type: ignore
+    from yoctopuce.yocto_api import YAPI # type: ignore[import-untyped]
 except ImportError:
     pass
 
 # platform dependent imports:
 if sys.platform.startswith('darwin'):
     # control app napping on OS X >= 10.9
-    import appnope # type: ignore # @UnresolvedImport # type: ignore # pylint: disable=import-error
+    import appnope # type: ignore[import-untyped] # @UnresolvedImport # type: ignore # pylint: disable=import-error
     appnope.nope()
-    if QVersionNumber.fromString(qVersion())[0] < QVersionNumber(6,5,0):
-        # import darkdetect module to detect if macOS dark mode is active or not if Qt < 6.5.0, otherwise we related to QTs ColorScheme() mechanism
-        import darkdetect # type: ignore # type: ignore # @UnresolvedImport # pylint: disable=import-error
 
 
 #######################################################################################
@@ -257,8 +251,8 @@ class Artisan(QtSingleApplication):
         super().__init__(appGuid, viewerAppGuid, args)
 
         # with Qt.ConnectionType.QueuedConnection the signal is queued even if called from the same thread
-        self.sendmessage2ArtisanInstanceSignal.connect(self._sendMessage2ArtisanInstanceSlot, type=Qt.ConnectionType.QueuedConnection) # type: ignore
-        self.sendmessage2ArtisanViewerSignal.connect(self._sendMessage2ArtisanViewerSlot, type=Qt.ConnectionType.QueuedConnection) # type: ignore
+        self.sendmessage2ArtisanInstanceSignal.connect(self._sendMessage2ArtisanInstanceSlot, type=Qt.ConnectionType.QueuedConnection) # type: ignore[call-arg]
+        self.sendmessage2ArtisanViewerSignal.connect(self._sendMessage2ArtisanViewerSlot, type=Qt.ConnectionType.QueuedConnection) # type: ignore[call-arg]
 
         self.sentToBackground:float|None = None # set to timestamp on putting app to background without any open dialog
         self.plus_sync_cache_expiration = 1*40 # how long a plus sync is valid in seconds
@@ -271,18 +265,12 @@ class Artisan(QtSingleApplication):
 
         self.darkmode:bool = False # holds current darkmode state
         self.style_hints:QStyleHints|None = None # holds the styleHints instance on Qt 6.5 and higher
-        if QVersionNumber.fromString(qVersion())[0] < QVersionNumber(6,5,0):
-            if sys.platform.startswith('darwin'):
-                # remember darkmode using darkdetect on macOS Legacy with older Qt versions
-                self.darkmode = darkdetect.isDark() # pyright: ignore # "isDark" is not a known member of module "darkdetect" # pylint: disable=c-extension-no-member
-            # otherwise we do not have any mean to detect the systems palette
-        else:
-            # we use the Qt 6.5 ColorScheme mechanism to detect dark mode
-            self.style_hints = self.styleHints()
-            if self.style_hints is not None:
-                self.darkmode = self.style_hints.colorScheme() == Qt.ColorScheme.Dark
-                if hasattr(self, 'colorSchemeChanged'):
-                    self.style_hints.colorSchemeChanged.connect(self.colorSchemeChanged)
+        # we use the Qt >=6.5 ColorScheme mechanism to detect dark mode
+        self.style_hints = self.styleHints()
+        if self.style_hints is not None:
+            self.darkmode = self.style_hints.colorScheme() == Qt.ColorScheme.Dark
+            if hasattr(self, 'colorSchemeChanged'):
+                self.style_hints.colorSchemeChanged.connect(self.colorSchemeChanged)
 
         self.messageReceived.connect(self.receiveMessage)
 #        self.focusChanged.connect(self.appRaised)
@@ -385,7 +373,7 @@ class Artisan(QtSingleApplication):
                     query = QUrlQuery(url.query())
                     if query.hasQueryItem('url'):
                         import requests
-                        query_url = QUrl(requests.utils.unquote(query.queryItemValue('url'))) # type: ignore # Module has no attribute "unquote"
+                        query_url = QUrl(requests.utils.unquote(query.queryItemValue('url'))) # type: ignore[attr-defined] # Module has no attribute "unquote"
                         if aw.comparator is not None:
                             aw.comparatorAddProfileURLSignal.emit(query_url)
                         else:
@@ -417,24 +405,24 @@ class Artisan(QtSingleApplication):
                         aw.loadBackgroundSignal.emit(filename)
                     else:
                         aw.loadFileSignal.emit(filename)
-                elif file_suffix == 'alrm' and aw.app is not None and not aw.app.artisanviewerMode:
+                elif file_suffix == 'alrm' and not aw.app.artisanviewerMode:
                     # load Artisan alarms on double-click on *.alrm file
                     aw.loadAlarmsSignal.emit(filename)
-                elif file_suffix == 'apal' and aw.app is not None and not aw.app.artisanviewerMode:
+                elif file_suffix == 'apal' and not aw.app.artisanviewerMode:
                     # load Artisan palettes on double-click on *.apal file
                     aw.loadPalettesSignal.emit(filename)
-                elif file_suffix == 'json' and aw.app is not None and not aw.app.artisanviewerMode and aw.comparator is None:
+                elif file_suffix == 'json' and not aw.app.artisanviewerMode and aw.comparator is None:
                     # import Artisan JSON profile
                     aw.importJSON(filename)
-                elif file_suffix == 'xls' and aw.app is not None and not aw.app.artisanviewerMode and aw.comparator is None:
+                elif file_suffix == 'xls' and not aw.app.artisanviewerMode and aw.comparator is None:
                     # import Cropster XLS profile
                     from artisanlib.cropster import extractProfileCropsterXLS
                     aw.importExternal(extractProfileCropsterXLS, QApplication.translate('Message','Import Cropster XLS'),'*.xls',filename)
-                elif file_suffix == 'csv' and aw.app is not None and not aw.app.artisanviewerMode and aw.comparator is None:
+                elif file_suffix == 'csv' and not aw.app.artisanviewerMode and aw.comparator is None:
                     # import Giesen CSV profile
                     from artisanlib.giesen import extractProfileGiesenCSV
                     aw.importExternal(extractProfileGiesenCSV, QApplication.translate('Message','Import Giesen CSV'),'*.csv',filename)
-                elif file_suffix == 'xlsx' and aw.app is not None and not aw.app.artisanviewerMode and aw.comparator is None:
+                elif file_suffix == 'xlsx' and not aw.app.artisanviewerMode and aw.comparator is None:
                     # import Stronghold XLSX profile
                     from artisanlib.stronghold import extractProfileStrongholdXLSX
                     aw.importExternal(extractProfileStrongholdXLSX, QApplication.translate('Message','Import Stronghold XLSX'),'*.xlsx',filename)
@@ -504,12 +492,13 @@ class Artisan(QtSingleApplication):
             self._outStream = None
         return False
 
+    @override
     def event(self, a0:QEvent|None) -> bool:
         if a0 is not None and a0.type() == QEvent.Type.FileOpen:
             try:
                 aw:ApplicationWindow|None = self.activationWindow()
                 if aw is not None:
-                    url = a0.url() # type: ignore # "QEvent" has no attribute "url"
+                    url:QUrl = cast(QUrl, a0.url()) # type: ignore[attr-defined] # "QEvent" has no attribute "url"
                     # files cannot be opend while
                     # - sampling
                     # - in Designer mode
@@ -523,14 +512,14 @@ class Artisan(QtSingleApplication):
                     if can_open_mode:
                         self.open_url(url)
                     else:
-                        message = url.toString()
+                        message:str = url.toString()
                         # we send open file in the other instance if running
                         if self.artisanviewerMode:
                             # this is the Viewer, but we cannot open the file, send an open request to the main app if it is running
-                            self.sendMessage2ArtisanInstance(message,self._id)
+                            self.sendMessage2ArtisanInstance(message, self._id)
                         else:
                             # try to open the file in Viewer if it is running
-                            self.sendMessage2ArtisanInstance(message,self._viewer_id)
+                            self.sendMessage2ArtisanInstance(message, self._viewer_id)
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
             return True
@@ -651,6 +640,7 @@ class DuplicateFilter(logging.Filter):
         super().__init__()
         self._message_lockup: dict[int,int] = {}
 
+    @override
     def filter(self, record:logging.LogRecord) -> bool:
         try:
             if logging.getLogger(record.name).isEnabledFor(logging.DEBUG): # don't filter anything in DEBUG mode
@@ -786,7 +776,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
 
 # add green flag menu on matplotlib v2.0 and later
         self.edit_curve_parameters_action = None
-        if len(self.actions()) > 0:
+        if len(self.actions()) > 0: # pyright:ignore[reportUnknownArgumentType]
             # insert the "Green Flag" menu item before the last one (which is the x/y coordinate display)
             self.edit_curve_parameters_action = QAction(self._icon('qt4_editor_options.png'),QApplication.translate('Toolbar', 'Lines'), self) # pyrefly: ignore[bad-assignment]
             self.edit_curve_parameters_action.triggered.connect(self.my_edit_parameters)
@@ -795,46 +785,44 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
 
         # adjust for dark or light canvas and set hover/selection style
         for a in self.actions():
-            if self.aw is not None:
-                if self.qmc.palette['canvas'] is None or self.qmc.palette['canvas'] == 'None':
-                    canvas_color = QColor('#ECECEC')
-                else:
-                    canvas_color = QColor(self.qmc.palette['canvas'])
-                if canvas_color.name() == '#000000': # on black we start with (1,1,1) for lighter
-                    canvas_color = QColor('#222222')
+            if self.qmc.palette['canvas'] == 'None':
+                canvas_color = QColor('#ECECEC')
+            else:
+                canvas_color = QColor(self.qmc.palette['canvas'])
+            if canvas_color.name() == '#000000': # on black we start with (1,1,1) for lighter
+                canvas_color = QColor('#222222')
 
-                if self.white_icons:
-                    selected_canvas_color = canvas_color.lighter(250)
-                    border_color = '#ffffff'
-                else:
-                    selected_canvas_color = canvas_color.darker(120)
-                    border_color = '#000000'
-                self.widgetForAction(a).setStyleSheet(' \
-                        QToolButton:checked {border:1px solid transparent; margin: 1px; padding: 2px; background-color:' + selected_canvas_color.name() + ';border-radius: 3px;} \
-                        QToolButton:hover {border:1px solid ' + border_color + '; margin: 2px; padding: 2px; background-color:transparent;border-radius: 3px;} \
-                        QToolButton:checked:hover {border:1px solid ' + border_color + '; margin: 2px; padding: 2px; background-color:' + selected_canvas_color.name() + ';border-radius: 3px;} \
-                        QToolButton {border:1px solid transparent; margin: 2px; padding: 2px; background-color: transparent;border-radius: 3px;}')
+            if self.white_icons:
+                selected_canvas_color = canvas_color.lighter(250)
+                border_color = '#ffffff'
+            else:
+                selected_canvas_color = canvas_color.darker(120)
+                border_color = '#000000'
+            self.widgetForAction(a).setStyleSheet(' \
+                    QToolButton:checked {border:1px solid transparent; margin: 1px; padding: 2px; background-color:' + selected_canvas_color.name() + ';border-radius: 3px;} \
+                    QToolButton:hover {border:1px solid ' + border_color + '; margin: 2px; padding: 2px; background-color:transparent;border-radius: 3px;} \
+                    QToolButton:checked:hover {border:1px solid ' + border_color + '; margin: 2px; padding: 2px; background-color:' + selected_canvas_color.name() + ';border-radius: 3px;} \
+                    QToolButton {border:1px solid transparent; margin: 2px; padding: 2px; background-color: transparent;border-radius: 3px;}')
 
-        if self.aw is not None:
-            self.aw.updatePlusStatus(self)
+        self.aw.updatePlusStatus(self)
 
-        self.update_view_org = self._update_view # type: ignore # Cannot determine type of "_update_view"
+        self.update_view_org = self._update_view # type: ignore[has-type] # Cannot determine type of "_update_view"
         self._update_view = self.update_view_new # pyright: ignore # Cannot assign to a method  [method-assign]
 
         self.release_pan_org = self.release_pan
-        self.release_pan = self.release_pan_new # type: ignore # Cannot assign to a method  [method-assign]
+        self.release_pan = self.release_pan_new # type: ignore[method-assign] # Cannot assign to a method  [method-assign]
         self.release_zoom_org = self.release_zoom
-        self.release_zoom = self.release_zoom_new # type: ignore # Cannot assign to a method  [method-assign]
+        self.release_zoom = self.release_zoom_new # type: ignore[method-assign] # Cannot assign to a method  [method-assign]
 
 #        # monkey patch matplotlib figureoptions that links to svg icon by default (crashes Windows Qt4 builds!)
 #        if not svgsupport:
 #            figureoptions.get_icon = my_get_icon
         # monkey patch _formlayout
         try:
-            formlayout.fedit_org # type: ignore #@UndefinedVariable # noqa: B018
+            formlayout.fedit_org # type: ignore[attr-defined] #@UndefinedVariable # noqa: B018
         except Exception: # pylint: disable=broad-except
             # not yet monkey patched
-            formlayout.fedit_org = formlayout.fedit # type: ignore
+            formlayout.fedit_org = formlayout.fedit # type: ignore[attr-defined]
             formlayout.fedit = self.my_fedit  # pyright:ignore[reportPrivateImportUsage] # ty:ignore[invalid-assignment]
 #        # monkey patch _formlayout to work around a MPL3.5.1 issue on Qt6
 #        # (see https://github.com/matplotlib/matplotlib/issues/22471)
@@ -865,12 +853,12 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
                 linedict[label] = line
 
             # filter out all temporary lines with names starting with an underscore character
-            if (isinstance(data, list) and len(data)>1 and isinstance(data[1],tuple) and len(data[1]) == 3 and
+            if (isinstance(data, list) and len(data)>1 and isinstance(data[1],tuple) and len(data[1]) == 3 and # pyright:ignore[reportUnknownArgumentType]
                     isinstance(data[1][0], list)):
-                data[1] = ([elem for elem in data[1][0] if not (isinstance(elem,list) and len(elem)>1 and elem[1].startswith('_'))],
+                data[1] = ([elem for elem in data[1][0] if not (isinstance(elem,list) and len(elem)>1 and elem[1].startswith('_'))], # pyright:ignore[reportUnknownArgumentType]
                             data[1][1], data[1][2])
 
-            if len(data) > 1:
+            if len(data) > 1: # pyright:ignore[reportUnknownArgumentType]
                 # just take the Curve Styles and drop the Axis settings
                 data = data[1][0]
                 # add translations
@@ -889,25 +877,25 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
                 }
                 try:
                     for l in data:
-                        if isinstance(l, (list, tuple)) and len(l)>0:
+                        if isinstance(l, (list, tuple)) and len(l)>0: # pyright:ignore[reportUnknownArgumentType]
                             translated_tpls:list[list[Any]|tuple[Any,...]] = [] # translated tuples l[0]
                             for tpl in l[0]:
-                                if isinstance(tpl, list) and len(tpl) > 0:
+                                if isinstance(tpl, list) and len(tpl) > 0: # pyright:ignore[reportUnknownArgumentType]
                                     if tpl[0] in trans:
                                         tpl[0] = trans[tpl[0]]
-                                    translated_tpls.append(tpl)
-                                elif isinstance(tpl, tuple) and len(tpl) > 0:
+                                    translated_tpls.append(tpl) # pyright:ignore[reportUnknownArgumentType]
+                                elif isinstance(tpl, tuple) and len(tpl) > 0: # pyright:ignore[reportUnknownArgumentType]
                                     if tpl[0] in trans:
-                                        tpl_list = list(tpl)
+                                        tpl_list = list(tpl) # pyright:ignore[reportUnknownArgumentType]
                                         tpl_list[0] = trans[tpl[0]]
-                                        translated_tpls.append(tuple(tpl_list))
-                                    elif len(tpl)>1 and tpl[0] is None and tpl[1] is not None and tpl[1] in trans:
-                                        tpl_list = list(tpl)
+                                        translated_tpls.append(tuple(tpl_list)) # pyright:ignore[reportUnknownArgumentType]
+                                    elif len(tpl)>1 and tpl[0] is None and tpl[1] is not None and tpl[1] in trans: # pyright:ignore[reportUnknownArgumentType]
+                                        tpl_list = list(tpl) # pyright:ignore[reportUnknownArgumentType]
                                         tpl_list[1] = trans[tpl[1]]
-                                        translated_tpls.append(tuple(tpl_list))
+                                        translated_tpls.append(tuple(tpl_list))# pyright:ignore[reportUnknownArgumentType]
                                     else:
-                                        translated_tpls.append(tpl)
-                            l[0] = translated_tpls # type: ignore # Unsupported target for indexed assignment ("List[Any]|tuple[Any,...]")
+                                        translated_tpls.append(tpl) # pyright:ignore[reportUnknownArgumentType]
+                            l[0] = translated_tpls # type: ignore[index] # Unsupported target for indexed assignment ("List[Any]|tuple[Any,...]")
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
                 def my_apply(data:dict[Any,Any]) -> None:
@@ -932,13 +920,13 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
                                     line.set_markeredgecolor(markeredgecolor)
                         # Redraw
                         figure.canvas.draw()
-                        if axes is not None and not (axes.get_xlim() == orig_xlim and axes.get_ylim() == orig_ylim):
+                        if not (axes.get_xlim() == orig_xlim and axes.get_ylim() == orig_ylim):
                             tb = figure.canvas.toolbar
                             if tb is not None:
                                 tb.push_current()
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
-                dialog = formlayout.FormDialog(data, QApplication.translate('Toolbar', 'Lines'), comment, icon, parent, my_apply) # type: ignore
+                dialog = formlayout.FormDialog(data, QApplication.translate('Toolbar', 'Lines'), comment, icon, parent, my_apply) # type: ignore[no-untyped-call]
                 dialog.exec()
 
 #######################################################################################
@@ -991,7 +979,8 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
             res.append(ylim[1]-ylim[0])
         return res
 
-    def press_pan(self, event:'MplEvent') -> None:
+    @override
+    def press_pan(self, event:'MplEvent') -> None: # pyrefly:ignore[bad-override]
         try:
             if self.qmc.ai is not None:
                 # we remember the axis ranges before the pan-zoom to detect if it was zoomed
@@ -1000,7 +989,8 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
             _log.error(e)
         super().press_pan(event)
 
-    def forward(self, *args:Any) -> None:
+    @override
+    def forward(self, *args:Any) -> None: # pyrefly:ignore[bad-override]
         try:
             if self.qmc.ai is not None:
                 self.qmc.ai.set_visible(False)  # whenever forward is pressed the image will be hidden
@@ -1008,7 +998,8 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
             _log.error(e)
         super().forward(*args)
 
-    def back(self, *args:Any) -> None:
+    @override
+    def back(self, *args:Any) -> None: # pyrefly:ignore[bad-override]
         try:
             if self.qmc.ai is not None and self._nav_stack._pos == 1: # pylint: disable=protected-access
                 self.qmc.ai.set_visible(True)
@@ -1016,7 +1007,8 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
             _log.error(e)
         super().back(*args)
 
-    def home(self, *args:Any) -> None:
+    @override
+    def home(self, *args:Any) -> None: # pyrefly:ignore[bad-override]
         """Restore the original view"""
         # show the background image again that was hidden on zoom-in
         try:
@@ -1038,8 +1030,9 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
         if self.qmc.zoom_follow:
             self.push_current()
 
-    def _icon(self, name:str) -> QIcon:
-        if self.aw is not None and name.startswith('plus'):
+    @override
+    def _icon(self, name:str) -> QIcon: # pyrefly:ignore[bad-override]
+        if name.startswith('plus'):
             basedir = os.path.join(getResourcePath(),'Icons')
         else:
             basedir = os.path.join(mpl.get_data_path(), 'images')
@@ -1060,7 +1053,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
             else:
                 pm = self.recolorIcon(pm, QColor('#424242'))
         if hasattr(pm, 'setDevicePixelRatio'):
-            pm.setDevicePixelRatio(self.devicePixelRatioF() or 1)
+            pm.setDevicePixelRatio(self.devicePixelRatioF() or 1) # pyright:ignore[reportUnknownArgumentType]
 
         return QIcon(pm)
 
@@ -1082,10 +1075,10 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
         backgroundtimeindex = None # caches the background timex index computed at x cursor position
         # update xy cursor position widget
         if self._last_event is None:
-            self.set_message(f'<PRE>{self.mode}</PRE>') # type:ignore
+            self.set_message(f'<PRE>{self.mode}</PRE>') # type:ignore[no-untyped-call]
         else:
             if not self.qmc.fmt_data_ON:
-                self.set_message(f'<PRE>{self.mode}</PRE>') # type:ignore
+                self.set_message(f'<PRE>{self.mode}</PRE>') # type:ignore[no-untyped-call]
             else:
                 try:
                     channel = ''
@@ -1138,22 +1131,22 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
                             if inaxes is not None and self._last_event.ydata is not None:
                                 ys = float(inaxes.format_ydata(self._last_event.ydata))
                 except Exception: # pylint: disable=broad-except
-                    self.set_message(f'<PRE>{self.mode}</PRE>') # type:ignore
+                    self.set_message(f'<PRE>{self.mode}</PRE>') # type:ignore[no-untyped-call]
                 else:
                     min_temp_digits = 5 if self.qmc.LCDdecimalplaces else 3
                     if self.qmc.fmt_data_RoR:
                         min_temp_digits -= 1
                     if self.mode:
-                        self.set_message(f"<PRE>{self.mode}  {xs: >5}\n{channel} {'' if ys is None else ys: >{min_temp_digits}}\u00B0{self.qmc.mode}{'/min' if self.qmc.fmt_data_RoR else ''}</PRE>") # type:ignore
+                        self.set_message(f"<PRE>{self.mode}  {xs: >5}\n{channel} {'' if ys is None else ys: >{min_temp_digits}}\u00B0{self.qmc.mode}{'/min' if self.qmc.fmt_data_RoR else ''}</PRE>") # type:ignore[no-untyped-call]
                     else:
-                        self.set_message(f"<PRE>{xs: >5}\n{channel} {'' if ys is None else ys: >{min_temp_digits}}\u00B0{self.qmc.mode}{'/min' if self.qmc.fmt_data_RoR else ''}</PRE>") # type:ignore
+                        self.set_message(f"<PRE>{xs: >5}\n{channel} {'' if ys is None else ys: >{min_temp_digits}}\u00B0{self.qmc.mode}{'/min' if self.qmc.fmt_data_RoR else ''}</PRE>") # type:ignore[no-untyped-call]
             # update running LCDs
             if not self.qmc.flagon and self.aw.comparator is None and self._last_event.xdata is not None:
                 if self.qmc.running_LCDs == 1: # show foreground profile readings at cursor position in LCDs
                     if timeindex is None:
                         timeindex = self.qmc.time2index(float(self._last_event.xdata), nearest=False) # pyrefly: ignore[bad-argument-type]
-                    time:float|None = self._last_event.xdata  # pyrefly: ignore
-                    if time is not None:
+                    time:float|None = self._last_event.xdata
+                    if time is not None: # pyright:ignore[reportUnnecessaryComparison]
                         if self.qmc.timeindex[0] != -1 and self.qmc.timeindex[0] < len(self.qmc.timex):
                             time -= self.qmc.timex[self.qmc.timeindex[0]]
                         self.qmc.updateLCDs(
@@ -1170,23 +1163,23 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
                         if backgroundtimeindex is None:
                             backgroundtimeindex = self.qmc.backgroundtime2index(float(self._last_event.xdata), nearest=False) # pyrefly: ignore[bad-argument-type]
                         time = float(self._last_event.xdata) # pyrefly: ignore[bad-argument-type]
-                        if time is not None:
-                            if self.qmc.timeindexB[0] != -1 and self.qmc.timeindexB[0] < len(self.qmc.timeB):
-                                time -= self.qmc.timeB[self.qmc.timeindexB[0]]
-                            self.qmc.updateLCDs(
-                                time,
-                                self.qmc.temp1B,
-                                self.qmc.temp2B,
-                                self.qmc.delta1B,
-                                self.qmc.delta2B,
-                                self.qmc.temp1BX,
-                                self.qmc.temp2BX,
-                                idx=(None if backgroundtimeindex < 0 else backgroundtimeindex))
+                        if self.qmc.timeindexB[0] != -1 and self.qmc.timeindexB[0] < len(self.qmc.timeB):
+                            time -= self.qmc.timeB[self.qmc.timeindexB[0]]
+                        self.qmc.updateLCDs(
+                            time,
+                            self.qmc.temp1B,
+                            self.qmc.temp2B,
+                            self.qmc.delta1B,
+                            self.qmc.delta2B,
+                            self.qmc.temp1BX,
+                            self.qmc.temp2BX,
+                            idx=(None if backgroundtimeindex < 0 else backgroundtimeindex))
                     except Exception as e:  # pylint: disable=broad-except
                         _log.exception(e)
 
     # overwritten from MPL v3.2.2 to get rid of that extra data printed
-    def mouse_move(self, event:'MplEvent|None') -> None:
+    @override
+    def mouse_move(self, event:'MplEvent|None') -> None: # pyrefly: ignore[bad-override]
         try:
             self._update_cursor(event) # not available in MPL v3.0.3 on Python3.5 for the RPi Stretch builds
         except Exception: # pylint: disable=broad-except
@@ -1292,17 +1285,11 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
                     # temporary set the axis to get proper menu items (same code as in redraw)
                     self.qmc.set_xlabel(self.aw.arabicReshape(QApplication.translate('Label', 'Time')))
                     y_label = self.qmc.ax.set_ylabel(self.qmc.mode)
-                    try:
-                        y_label.set_in_layout(False) # remove x-axis labels from tight_layout calculation
-                    except Exception: # pylint: disable=broad-except # set_in_layout not available in mpl<3.x
-                        pass
+                    y_label.set_in_layout(False) # remove x-axis labels from tight_layout calculation
                     two_ax_mode = self.qmc.twoAxisMode() and not self.qmc.designerflag
                     if two_ax_mode and self.qmc.delta_ax is not None:
                         y_label = self.qmc.delta_ax.set_ylabel(self.qmc.mode + '/min')
-                        try:
-                            y_label.set_in_layout(False) # remove x-axis labels from tight_layout calculation
-                        except Exception: # pylint: disable=broad-except # set_in_layout not available in mpl<3.x
-                            pass
+                        y_label.set_in_layout(False) # remove x-axis labels from tight_layout calculation
 
                 axes = allaxes[0]
 
@@ -1310,7 +1297,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
 
                     with warnings.catch_warnings():
                         warnings.filterwarnings('ignore') # , category=numpy.VisibleDeprecationWarning)
-                        figureoptions.figure_edit(axes) # type:ignore
+                        figureoptions.figure_edit(axes) # type:ignore[no-untyped-call]
 #                        for line in steps_post_lines:
 #                            line.set_drawstyle("steps-post")
 
@@ -1339,6 +1326,7 @@ class EventActionThread(QThread): # pyrefly:ignore[invalid-inheritance] # pylint
         self.command:str = command
         self.eventtype:int|None = eventtype
 
+    @override
     def run(self) -> None:
         # as eventaction_internal is not running in the GUI thread we avoid doing graphic updates and run them instead after thread termination within
         # the GUI thread
@@ -1355,6 +1343,7 @@ class MyQDoubleValidator(QDoubleValidator): # pyrefly:ignore[invalid-inheritance
         self.lineedit = lineedit
         self.empty_default = empty_default
 
+    @override
     def validate(self, a0:str|None, a1:int) -> 'tuple[QValidator.State, str, int]':
         del a0
         return super().validate(self.lineedit.text(), a1)
@@ -1362,6 +1351,7 @@ class MyQDoubleValidator(QDoubleValidator): # pyrefly:ignore[invalid-inheritance
     def set_empty_default(self, empty_default:str) -> None:
         self.empty_default = empty_default
 
+    @override
     def fixup(self, input: str|None) -> Any: # pylint: disable=redefined-builtin # noqa: A002  # -> str/None, but also str|None is not accepted!?
         try:
             if input is not None:
@@ -1453,15 +1443,16 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         'weblcds_index_path', 'weblcds_websocket_path',
         'taskWebDisplayGreenActive', 'taskWebDisplayGreenPort', 'taskWebDisplayRoastedActive', 'taskWebDisplayRoastedPort',
         'taskWebDisplayRoastedIndexPath', 'taskWebDisplayRoastedWebSocketPath', 'taskWebDisplayGreen_server', 'taskWebDisplayRoasted_server',
-        'scale_manager', 'scale1_model', 'scale1_id', 'container1_idx', 'two_bucket_mode', 'green_task_precision', 'scale2_model', 'scale2_name', 'scale2_id', 'container2_idx',
+        'custom_scale_ids', 'custom_scale_names',
+        'scale_manager', 'scale1_model', 'scale1_name', 'scale1_id', 'container1_idx', 'two_bucket_mode', 'green_task_precision', 'scale2_model', 'scale2_name', 'scale2_id', 'container2_idx',
         'WebLCDsAlerts', 'EventsDlg_activeTab', 'graphColorDlg_activeTab', 'PID_DlgControl_activeTab', 'CurveDlg_activeTab', 'editGraphDlg_activeTab',
         'backgroundDlg_activeTab', 'DeviceAssignmentDlg_activeTab', 'AlarmDlg_activeTab', 'schedule_activeTab', 'StatisticsDlg_activeTab', 'resetqsettings', 'settingspath', 'wheelpath', 'profilepath',
         'userprofilepath', 'printer', 'main_widget', 'defaultdpi', 'dpi', 'qmc', 'HottopControlActive', 'AsyncSamplingTimer', 'wheeldialog',
         'simulator', 'simulatorpath', 'comparator', 'stack', 'eventsbuttonflag', 'minieventsflags', 'seriallogflag',
         'seriallog', 'ser', 'modbus', 'extraMODBUStemps', 'extraMODBUStx', 's7', 'extraS7tx', 'ws', 'scale', 'color', 'extraser', 'extracomport', 'extrabaudrate',
-        'extrabytesize', 'extraparity', 'extrastopbits', 'extratimeout', 'hottop', 'santokerHost', 'santokerPort', 'santokerSerial', 'santokerBLE', 'santoker', 'santokerR', 'fujipid', 'dtapid', 'pidcontrol', 'soundflag', 'recentRoasts', 'maxRecentRoasts',
+        'extrabytesize', 'extraparity', 'extrastopbits', 'extratimeout', 'hottop', 'santokerHost', 'santokerPort', 'santokerSerial', 'santokerBLE', 'santokerEventFlags', 'santoker', 'santokerR', 'lebrew_roastseeNEXT', 'thermoworksBlueDOT', 'fujipid', 'dtapid', 'pidcontrol', 'soundflag', 'recentRoasts', 'maxRecentRoasts',
         'mugmaHost','mugmaPort', 'mugma', 'mugma_default_host', 'shelly_3EMPro_host', 'shelly_PlusPlug_host',
-        'kaleido_default_host', 'kaleidoHost', 'kaleidoPort', 'kaleidoSerial', 'kaleidoPID', 'kaleido', 'colorTrack_mean_window_size', 'colorTrack_median_window_size', 'ikawa',
+        'kaleido_default_host', 'kaleidoHost', 'kaleidoPort', 'kaleidoSerial', 'kaleidoPID', 'kaleido', 'kaleidoEventFlags', 'colorTrack_mean_window_size', 'colorTrack_median_window_size', 'ikawa',
         'lcdpaletteB', 'lcdpaletteF', 'extraeventsbuttonsflags', 'extraeventslabels', 'extraeventbuttoncolor', 'extraeventsactionstrings',
         'extraeventbuttonround', 'block_quantification_sampling_ticks', 'sampling_seconds_to_block_quantifiction', 'sampling_ticks_to_block_quantifiction', 'extraeventsactionslastvalue',
         'org_extradevicesettings', 'eventslidervalues', 'eventslidervisibilities', 'eventsliderKeyboardControl', 'eventsliderAlternativeLayout_default',
@@ -1470,9 +1461,9 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         'eventslidertemp', 'eventsliderunits', 'eventslidermoved', 'SVslidermoved', 'eventquantifieractive', 'eventquantifiersource', 'eventquantifierSV',
         'eventquantifiermin', 'eventquantifiermax', 'eventquantifiercoarse', 'eventquantifieraction', 'clusterEventsFlag', 'eventquantifierlinspaces',
         'eventquantifierthresholdfine', 'eventquantifierthresholdcoarse', 'eventquantifierthresholdmed', 'lastdigitizedvalue', 'lastdigitizedtemp',
-        'readingslcdsflags', 'logoimgalpha', 'logoimgflag', 'logofilename', 'redrawOnResize', 'searchtextartisansettings', 'fileMenu', 'editMenu',
+        'readingslcdsflags', 'controlsflags', 'logoimgalpha', 'logoimgflag', 'logofilename', 'redrawOnResize', 'searchtextartisansettings', 'fileMenu', 'editMenu',
         'RoastMenu', 'ConfMenu', 'ToolkitMenu', 'viewMenu', 'helpMenu', 'newRoastMenu', 'fileLoadAction', 'openRecentMenu', 'importMenu',
-        'fileSaveAction', 'fileSaveCopyAsAction', 'exportMenu', 'convMenu', 'saveGraphMenu', 'reportMenu', 'htmlAction', 'productionMenu',
+        'fileSaveAction', 'fileSaveCopyAsAction', 'exportMenu', 'convMenu', 'convFromMenu', 'saveGraphMenu', 'reportMenu', 'htmlAction', 'productionMenu',
         'productionWebAction', 'productionCsvAction', 'productionExcelAction', 'rankingMenu', 'rankingWebAction', 'rankingCsvAction', 'rankingExcelAction',
         'saveStatisticsMenu', 'printAction', 'quitAction', 'cutAction', 'copyAction', 'pasteAction', 'editGraphAction', 'backgroundAction',
         'flavorAction', 'switchAction', 'switchETBTAction', 'machineMenu', 'deviceAction', 'commportAction', 'calibrateDelayAction', 'curvesAction',
@@ -1577,9 +1568,9 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         #############################  Define variables that need to exist before calling settingsload()
         self.curFile:str|None = None
         self.MaxRecentFiles = 20
-        self.recentFileActs = []
-        self.recentSettingActs = []
-        self.recentThemeActs = []
+        self.recentFileActs:list[QAction] = []
+        self.recentSettingActs:list[QAction] = []
+        self.recentThemeActs:list[QAction] = []
         self.applicationDirectory =  QDir().current().absolutePath()
 
         super().__init__(parent) # pyrefly: ignore[bad-argument-count]
@@ -2152,8 +2143,9 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                 self.importMenu.addAction(importRoastLogAction)
 
                 importRoastPathAction = QAction('RoastPATH URL...',self)
-                importRoastPathAction.triggered.connect(self.importRoastPATH)
+#                importRoastPathAction.triggered.connect(self.importRoastPATH)
                 self.importMenu.addAction(importRoastPathAction)
+                importRoastPathAction.setEnabled(False)
 
                 importStrongholdAction = QAction('Stronghold XLSX...', self)
                 importStrongholdAction.triggered.connect(self.importStronghold)
@@ -2512,7 +2504,6 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
 
             self.alarmAction:QAction = QAction(QApplication.translate('Menu', 'Alarms...'), self)
             self.alarmAction.triggered.connect(self.alarmconfig)
-            self.alarmActionShortCut = QKeySequence()
             self.alarmAction.setShortcut('Ctrl+A')
 #            self.alarmAction.setShortcutContext(Qt.ShortcutContext.WidgetShortcut)
 #            self.alarmAction.setShortcutContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
@@ -2572,8 +2563,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                 self.temperatureConfMenu.addAction(self.CelsiusAction)
 
             self.languageMenu: QMenu|None
-            if self.ConfMenu is not None:
-                self.languageMenu = self.ConfMenu.addMenu(QApplication.translate('Menu', 'Language'))
+            self.languageMenu = self.ConfMenu.addMenu(QApplication.translate('Menu', 'Language'))
 
         # language_menu_actions holds a dict associating iso2 locale strings to language menu actions
         self.language_menu_actions:dict[str, QAction] = {}
@@ -2789,13 +2779,12 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
 
             if not (platform.system() == 'Darwin' and self.qmc.locale_str == 'en'): # macOS automatically adds the fullscreen action to View menu
                 self.fullscreenAction = QAction(QApplication.translate('Menu', 'Full Screen'), self)
-                if self.fullscreenAction is not None:
-                    self.fullscreenAction.triggered.connect(self.toggleFullscreen)
-                    self.fullscreenAction.setCheckable(True)
-                    self.fullscreenAction.setChecked(False)
-                    self.fullscreenAction.setShortcut('Ctrl+F')
-                    self.fullscreenAction.setMenuRole(QAction.MenuRole.NoRole)
-                    self.viewMenu.addAction(self.fullscreenAction)
+                self.fullscreenAction.triggered.connect(self.toggleFullscreen)
+                self.fullscreenAction.setCheckable(True)
+                self.fullscreenAction.setChecked(False)
+                self.fullscreenAction.setShortcut('Ctrl+F')
+                self.fullscreenAction.setMenuRole(QAction.MenuRole.NoRole)
+                self.viewMenu.addAction(self.fullscreenAction)
 
         # HELP menu
         if self.helpMenu is not None:
@@ -4361,24 +4350,24 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         self.santokerSendMessageSignal.connect(self.santokerSendMessage)
         self.kaleidoSendMessageSignal.connect(self.kaleidoSendMessage)
         self.kaleidoSendMessageAwaitSignal.connect(self.kaleidoSendMessageAwait)
-        self.addEventSignal.connect(self.addEventSlot, type=Qt.ConnectionType.QueuedConnection) # type: ignore
-        self.addRawEventSignal.connect(self.addRawEventSlot, type=Qt.ConnectionType.QueuedConnection) # type: ignore
+        self.addEventSignal.connect(self.addEventSlot, type=Qt.ConnectionType.QueuedConnection) # type: ignore[call-arg]
+        self.addRawEventSignal.connect(self.addRawEventSlot, type=Qt.ConnectionType.QueuedConnection) # type: ignore[call-arg]
            # by default the connection type is AutoConnection (If the emitter & receiver are in the same thread, a DirectConnection is used. Otherwise, a QueuedConnection is used.)
            # if the signal is send/receveid in the same thread a direct connection equals to a direct function call, the event is NOT put on the event loop and this not potentially processed delays
            # explicitly specifying QueuedConnection puts the message on the event loop and delays the processing potentially also if running in the same thread as the sender
         self.updateMessageLogSignal.connect(self.updateMessageLog)
         self.updateSerialLogSignal.connect(self.updateSerialLog)
         self.updateErrorLogSignal.connect(self.updateErrorLog)
-        self.establishQuantifiedEventSignal.connect(self.establishQuantifiedEventSlot, type=Qt.ConnectionType.QueuedConnection)  # type: ignore
+        self.establishQuantifiedEventSignal.connect(self.establishQuantifiedEventSlot, type=Qt.ConnectionType.QueuedConnection)  # type: ignore[call-arg]
         self.updateExtraEventButtonsVisibilitySignal.connect(self.update_extraeventbuttons_visibility)
         self.realignButtonsSignal.connect(self.realignbuttons)
-        self.loadAlarmsSignal.connect(self.loadAlarms, type=Qt.ConnectionType.QueuedConnection)  # type: ignore
-        self.loadFileSignal.connect(self.loadFileSlot, type=Qt.ConnectionType.QueuedConnection)  # type: ignore
-        self.loadPalettesSignal.connect(self.loadPalettesSlot, type=Qt.ConnectionType.QueuedConnection)  # type: ignore
-        self.importArtisanURLSignal.connect(self.importArtisanURLSlot, type=Qt.ConnectionType.QueuedConnection)  # type: ignore
-        self.comparatorAddProfileURLSignal.connect(self.comparatorAddProfileURLSlot, type=Qt.ConnectionType.QueuedConnection)  # type: ignore
-        self.comparatorAddProfileSignal.connect(self.comparatorAddProfileSlot, type=Qt.ConnectionType.QueuedConnection)  # type: ignore
-        self.updateScheduleSignal.connect(self.updateSchedule, type=Qt.ConnectionType.QueuedConnection)  # type: ignore
+        self.loadAlarmsSignal.connect(self.loadAlarms, type=Qt.ConnectionType.QueuedConnection)  # type: ignore[call-arg]
+        self.loadFileSignal.connect(self.loadFileSlot, type=Qt.ConnectionType.QueuedConnection)  # type: ignore[call-arg]
+        self.loadPalettesSignal.connect(self.loadPalettesSlot, type=Qt.ConnectionType.QueuedConnection)  # type: ignore[call-arg]
+        self.importArtisanURLSignal.connect(self.importArtisanURLSlot, type=Qt.ConnectionType.QueuedConnection)  # type: ignore[call-arg]
+        self.comparatorAddProfileURLSignal.connect(self.comparatorAddProfileURLSlot, type=Qt.ConnectionType.QueuedConnection)  # type: ignore[call-arg]
+        self.comparatorAddProfileSignal.connect(self.comparatorAddProfileSlot, type=Qt.ConnectionType.QueuedConnection)  # type: ignore[call-arg]
+        self.updateScheduleSignal.connect(self.updateSchedule, type=Qt.ConnectionType.QueuedConnection)  # type: ignore[call-arg]
 
         self.notificationManager:NotificationManager|None = None
         if not self.app.artisanviewerMode:
@@ -4463,7 +4452,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                 (not self.schedule_day_filter or item.date == today) and
                 (not self.schedule_user_filter or not bool(plus.connection.getNickname()) or item.user is None or item.user == self.plus_user_id) and
                 (self.qmc.roastertype_setup.strip() == '' or not self.schedule_machine_filter or item.machine is None or
-                    (self.qmc.roastertype_setup.strip() != '' and item.machine is not None and
+                    (self.qmc.roastertype_setup.strip() != '' and
                         item.machine.strip() == self.qmc.roastertype_setup.strip())))
 
     def updateBadge(self, count:int|None = None) -> None:
@@ -4529,6 +4518,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         except Exception:  # pylint: disable=broad-except
             pass
 
+    @override
     def mousePressEvent(self, a0:'QMouseEvent|None') -> None:
         super().mousePressEvent(a0)
         if a0 is not None and a0.button() == Qt.MouseButton.LeftButton:
@@ -4815,7 +4805,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                 if self.comparator is None and not self.qmc.designerflag and not self.qmc.wheelflag and self.qmc.ax is not None:
                     self.setWindowFilePath(self.curFile)
             # no profile loaded
-            elif __release_sponsor_name__ != '':
+            elif __release_sponsor_name__ != '': # pyright:ignore[reportUnnecessaryComparison]
                 self.setWindowTitle(f"{dirtySign}{appTitle} – {__release_sponsor_name__} ({QApplication.translate('About','Release Sponsor')})")
                 self.setWindowFilePath('')
             else:
@@ -4904,6 +4894,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
     def QTime2time(t: QTime) -> float:
         return t.minute() * 60 + t.second()
 
+    @override
     def dragEnterEvent(self, a0:'QDragEnterEvent|None') -> None:
         # pylint: disable=no-self-use # class method
         if a0 is not None:
@@ -4913,6 +4904,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             else:
                 a0.ignore()
 
+    @override
     def dropEvent(self, a0:'QDropEvent|None') -> None:
         # pylint: disable=no-self-use # class method
         if a0 is not None:
@@ -4981,17 +4973,6 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
         return s
-
-    def eventFilter(self, a0:'QObject|None', a1:QEvent|None) -> bool:
-        # pylint: disable=c-extension-no-member
-        try:
-            if a1 is not None and a1.type() == QEvent.Type.ApplicationPaletteChange and self.app is not None and sys.platform.startswith('darwin') and QVersionNumber.fromString(qVersion())[0] < QVersionNumber(6,5,0) and darkdetect.isDark() != self.app.darkmode: # pyrefly: ignore # pyright:ignore[reportAttributeAccessIssue,reportPossiblyUnboundVariable] # "isDark" is not a known member of module "darkdetect"
-                    # called if the palette changed (switch between dark and light mode on macOS Legacy builds)
-                self.app.darkmode = not self.app.darkmode
-                self.updateCanvasColors()
-        except Exception: # pylint: disable=broad-except
-            pass
-        return super().eventFilter(a0, a1)
 
     # search the given QTable table for a row with the given widget as cellWidget or item in column col or as a sub-widget contained in the layout of a widget in place
     # returns the row number if the widget was found or None
@@ -5186,11 +5167,11 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                     subscription_icon += '.svg'
                 else:
                     subscription_icon += '.png'
-            if ntb is not None and len(ntb.actions()) > 0:
+            if len(ntb.actions()) > 0: # pyright:ignore[reportUnknownArgumentType]
                 a = ntb.actions()[0] # the plus action is the first one
                 a.setIcon(ntb._icon(plus_icon)) # pylint: disable=protected-access
                 a.setToolTip(tooltip)
-                if len(ntb.actions()) > 1:
+                if len(ntb.actions()) > 1: # pyright:ignore[reportUnknownArgumentType]
                     a = ntb.actions()[1] # the plus subscription action is the second one
                     if subscription_icon is None:
                         a.setEnabled(False)
@@ -5261,7 +5242,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                         fields.append(hdr)
                 tbl.field_names = fields
                 for r in range(nrows):
-                    tblrows = []
+                    tblrows:list[str] = []
                     if adjustment & 2 and r == 0:
                         tblrows.append(' ')
                     for c in range(ncols):
@@ -5343,8 +5324,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             d['wholeColor'] = wholeColor
         if groundColor is not None:
             d['groundColor'] = groundColor
-        if colorSystem is not None:
-            d['colorSystem'] = colorSystem
+        d['colorSystem'] = colorSystem
         d['background'] = file
         d['roastUUID'] = roastUUID
         d['batchnr'] = batchnr
@@ -5361,52 +5341,50 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
 
     # recentRoast activated via NEW
     def setRecentRoast(self, rr:'RecentRoast') -> None:
-        if 'title' in rr and rr['title'] is not None:
-            self.qmc.title = rr['title']
-            if not self.qmc.flagstart or self.qmc.title_show_always:
-                self.qmc.setProfileTitle(self.qmc.title,updatebackground=True)
-        if 'weightIn' in rr and 'weightUnit' in rr and rr['weightIn'] is not None and rr['weightUnit'] is not None:
-            self.qmc.weight = (rr['weightIn'],self.qmc.weight[1],rr['weightUnit'])
-        if 'weightOut' in rr and 'weightUnit' in rr and rr['weightOut'] is not None and rr['weightUnit'] is not None:
+        self.qmc.title = rr['title']
+        if not self.qmc.flagstart or self.qmc.title_show_always:
+            self.qmc.setProfileTitle(self.qmc.title,updatebackground=True)
+        self.qmc.weight = (rr['weightIn'],self.qmc.weight[1],rr['weightUnit'])
+        if 'weightOut' in rr:
             self.qmc.weight = (self.qmc.weight[0],rr['weightOut'],rr['weightUnit'])
         else:
             self.qmc.weight = (self.qmc.weight[0],0,self.qmc.weight[2])
-        if 'volumeIn' in rr and 'volumeUnit' in rr and rr['volumeIn'] is not None and rr['volumeUnit'] is not None:
+        if 'volumeIn' in rr and 'volumeUnit' in rr:
             self.qmc.volume = (rr['volumeIn'],self.qmc.volume[1],rr['volumeUnit'])
-        if 'volumeOut' in rr and 'volumeUnit' in rr and rr['volumeOut'] is not None and rr['volumeUnit'] is not None:
+        if 'volumeOut' in rr and 'volumeUnit' in rr :
             self.qmc.volume = (self.qmc.volume[0],rr['volumeOut'],rr['volumeUnit'])
         else:
             self.qmc.volume = (self.qmc.volume[0], 0, self.qmc.volume[2])
-        if 'densityWeight' in rr and rr['densityWeight'] is not None:
+        if 'densityWeight' in rr:
             self.qmc.density = (rr['densityWeight'],self.qmc.density[1],self.qmc.density[2],self.qmc.density[3])
-        if 'densityRoasted' in rr and rr['densityRoasted'] is not None:
+        if 'densityRoasted' in rr:
             self.qmc.density_roasted = (rr['densityRoasted'],self.qmc.density_roasted[1],self.qmc.density_roasted[2],self.qmc.density_roasted[3])
         else:
             self.qmc.density_roasted = (0,self.qmc.density_roasted[1],self.qmc.density_roasted[2],self.qmc.density_roasted[3])
-        if 'beans' in rr and rr['beans'] is not None:
+        if 'beans' in rr:
             self.qmc.beans = rr['beans']
-        if 'beanSize_min' in rr and rr['beanSize_min'] is not None:
+        if 'beanSize_min' in rr:
             self.qmc.beansize_min = int(rr['beanSize_min'])
-        if 'beanSize_max' in rr and rr['beanSize_max'] is not None:
+        if 'beanSize_max' in rr:
             self.qmc.beansize_max = int(rr['beanSize_max'])
-        if 'moistureGreen' in rr and rr['moistureGreen'] is not None:
+        if 'moistureGreen' in rr:
             self.qmc.moisture_greens = rr['moistureGreen']
-        if 'moistureRoasted' in rr and rr['moistureRoasted'] is not None:
+        if 'moistureRoasted' in rr:
             self.qmc.moisture_roasted = rr['moistureRoasted']
         else:
             self.qmc.moisture_roasted = 0
-        if 'wholeColor' in rr and rr['wholeColor'] is not None:
+        if 'wholeColor' in rr:
             self.qmc.whole_color = rr['wholeColor']
         else:
             self.qmc.whole_color = 0
-        if 'groundColor' in rr and rr['groundColor'] is not None:
+        if 'groundColor' in rr:
             self.qmc.ground_color = rr['groundColor']
         else:
             self.qmc.ground_color = 0
-        if 'colorSystem' in rr and rr['colorSystem'] is not None:
+        if 'colorSystem' in rr:
             if rr['colorSystem'] in self.qmc.color_systems:
                 self.qmc.color_system_idx = self.qmc.color_systems.index(rr['colorSystem'])
-            elif isinstance(rr['colorSystem'], int) and rr['colorSystem'] < len(self.qmc.color_systems): # type: ignore
+            elif isinstance(rr['colorSystem'], int) and rr['colorSystem'] < len(self.qmc.color_systems): # type: ignore[unreachable]
                 # to stay compatible with older versions were rr['colorSystem'] was an index instead of the name of a system
                 self.qmc.color_system_idx = rr['colorSystem'] # type: ignore[unreachable]
 
@@ -5440,26 +5418,21 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                     w = convertWeight(self.qmc.weight[0],weight_unit_idx,weight_units.index('Kg')) # w is weightIn converted to kg
                     bd:plus.stock.Blend = plus.stock.getBlendBlendDict(blend,w)
                     self.qmc.plus_blend_label = bd['label']
-                    if self.qmc.plus_blend_spec is not None:
-                        self.qmc.plus_blend_spec_labels = [i.get('label', '') for i in self.qmc.plus_blend_spec['ingredients']]
-                        self.qmc.beans = '\n'.join(plus.stock.blend2beans(blend,weight_unit_idx,self.qmc.weight[0]))
-                        if 'moisture' in bd and bd['moisture'] is not None:
-                            self.qmc.moisture_greens = bd['moisture']
-                        else:
-                            self.qmc.moisture_greens = 0
-                        if 'density' in bd and bd['density'] is not None:
-                            density = bd['density']
-                        else:
-                            density = 0
-                        self.qmc.density = (density, self.qmc.density[1],self.qmc.density[2],self.qmc.density[3])
-                        if 'screen_min' in bd and bd['screen_min'] is not None:
-                            self.qmc.beansize_min = bd['screen_min']
-                        else:
-                            self.qmc.beansize_min = 0
-                        if 'screen_max' in bd and bd['screen_max'] is not None:
-                            self.qmc.beansize_max = bd['screen_max']
-                        else:
-                            self.qmc.beansize_max = 0
+                    self.qmc.plus_blend_spec_labels = [i.get('label', '') for i in self.qmc.plus_blend_spec['ingredients']]
+                    self.qmc.beans = '\n'.join(plus.stock.blend2beans(blend,weight_unit_idx,self.qmc.weight[0]))
+                    if 'moisture' in bd:
+                        self.qmc.moisture_greens = bd['moisture']
+                    else:
+                        self.qmc.moisture_greens = 0
+                    self.qmc.density = (bd.get('density', 0), self.qmc.density[1],self.qmc.density[2],self.qmc.density[3])
+                    if 'screen_min' in bd:
+                        self.qmc.beansize_min = bd['screen_min']
+                    else:
+                        self.qmc.beansize_min = 0
+                    if 'screen_max' in bd:
+                        self.qmc.beansize_max = bd['screen_max']
+                    else:
+                        self.qmc.beansize_max = 0
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
         self.sendmessage(QApplication.translate('Message',f"Recent roast properties '{self.recentRoastLabel(rr)}' set"))
@@ -5469,7 +5442,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         # check for duplications
         entry_with_same_title = None
         for i, rr in enumerate(self.recentRoasts):
-            if 'title' in rr and 'weightIn' in rr and 'weightUnit' in rr and rr['title'] == title and rr['weightIn'] == weightIn and rr['weightUnit'] == weightUnit:
+            if rr['title'] == title and rr['weightIn'] == weightIn and rr['weightUnit'] == weightUnit:
                 entry_with_same_title = i
                 break
         if entry_with_same_title is not None:
@@ -6068,27 +6041,26 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
     def colorDifference(self, color1:str|None, color2:str|None) -> float:
         cDiff = 100
         try:
-            from colorspacious import deltaE # type: ignore
+            from colorspacious import deltaE # type: ignore[import-untyped]
             if color1 is None or color1 == 'None':
                 color1 = '#f0f0f0'
             if color2 is None or color2 == 'None':
                 color2 = '#f0f0f0'
             if color1.lower() == 'transparent':
-                if self.qmc.palette['canvas'] is None or self.qmc.palette['canvas'] == 'None':
+                if self.qmc.palette['canvas'] == 'None':
                     color1 = '#f0f0f0'
                 else:
                     color1 = self.qmc.palette['canvas']
             if color2.lower() == 'transparent':
-                if self.qmc.palette['canvas'] is None or self.qmc.palette['canvas'] == 'None':
+                if self.qmc.palette['canvas'] == 'None':
                     color2 = '#f0f0f0'
                 else:
                     color2 = self.qmc.palette['canvas']
-            if color1 is not None and color2 is not None:
-                c1 = QColor(color1[:7]).name()
-                c2 = QColor(color2[:7]).name()
-                c1_rgb = tuple(int(c1[i:i+2], 16) for i in (1, 3 ,5))
-                c2_rgb = tuple(int(c2[i:i+2], 16) for i in (1, 3 ,5))
-                cDiff = deltaE(c1_rgb, c2_rgb, input_space='sRGB255', uniform_space='CIELab')
+            c1 = QColor(color1[:7]).name()
+            c2 = QColor(color2[:7]).name()
+            c1_rgb = tuple(int(c1[i:i+2], 16) for i in (1, 3 ,5))
+            c2_rgb = tuple(int(c2[i:i+2], 16) for i in (1, 3 ,5))
+            cDiff = deltaE(c1_rgb, c2_rgb, input_space='sRGB255', uniform_space='CIELab')
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
             _, _, exc_tb = sys.exc_info()
@@ -6130,17 +6102,17 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         alpha = ''
         try:
             from colorspacious import cspace_convert
-            if c is None or c == 'None':
+            if c == 'None':
                 return 'None'
-            if isinstance(c,str) and c.lower() == 'transparent':
+            if c.lower() == 'transparent':
                 return 'transparent'
             cq = str(QColor(c[:7]).name())
             alpha = c[7:9]
-            c_rgb = tuple(int(cq[i:i+2], 16) for i in (1, 3 ,5))
-            nc_greyscale_JCh = cspace_convert(c_rgb, 'sRGB255', 'JCh')
+            c_rgb:tuple[int,int,int] = cast(tuple[int,int,int], tuple(int(cq[i:i+2], 16) for i in (1, 3, 5)))
+            nc_greyscale_JCh:numpy.ndarray[tuple[Literal[1]],numpy.dtype[numpy.double]] = cspace_convert(c_rgb, 'sRGB255', 'JCh')
             nc_greyscale_JCh[..., 1] = 0
-            nc_greyscale_sRGB = cspace_convert(nc_greyscale_JCh, 'JCh', 'sRGB255')
-            nc_greyscale_sRGB = numpy.clip(nc_greyscale_sRGB, 0, 255)
+            nc_greyscale_sRGB:numpy.ndarray[tuple[Literal[1]],numpy.dtype[numpy.double]] = cspace_convert(nc_greyscale_JCh, 'JCh', 'sRGB255')
+            nc_greyscale_sRGB = numpy.clip(nc_greyscale_sRGB, 0, 255) # pyright:ignore[reportUnknownArgumentType]
             nc_greyscale = f'#{int(nc_greyscale_sRGB[0]):2x}{int(nc_greyscale_sRGB[1]):2x}{int(nc_greyscale_sRGB[2]):2x}'
             nc = str(QColor(nc_greyscale).name())
         except Exception as e: # pylint: disable=broad-except
@@ -6223,7 +6195,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
 
     def updateCanvasColors(self, checkColors:bool=True) -> None:
         canvas_color = self.qmc.palette['canvas']
-        if canvas_color is not None and canvas_color != 'None' and not QColor.isValidColor(canvas_color):
+        if canvas_color != 'None' and not QColor.isValidColor(canvas_color):
             # we re-initialize broken canvas color
             canvas_color = self.qmc.palette['canvas'] = '#F8F8F8'
         try:
@@ -6282,9 +6254,9 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             self.level1layout.removeWidget(self.ntb) # remove current bar
 
             if self.ntb.mode == MPL_Mode.PAN:
-                self.ntb.pan() # type:ignore # PAN is active, we deactivate it before changing the ToolBar
+                self.ntb.pan() # type:ignore[no-untyped-call] # PAN is active, we deactivate it before changing the ToolBar
             if self.ntb.mode == MPL_Mode.ZOOM:
-                self.ntb.zoom() # type:ignore # ZOOM is active, we deactivate it before changing the ToolBar
+                self.ntb.zoom() # type:ignore[no-untyped-call] # ZOOM is active, we deactivate it before changing the ToolBar
             self.removeToolBar(self.ntb)
 #            self.ntb.hide() # seems not to be necessary anymore with the removeToolBar() above
             self.ntb.destroy()
@@ -6323,7 +6295,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                                     + '}' )
 
         if self.comparator is None:
-            if self.qmc.background and not (self.qmc.title is None or self.qmc.title == ''):
+            if self.qmc.background and self.qmc.title != '':
                 if self.qmc.roastbatchnrB == 0:
                     titleB = self.qmc.titleB
                 else:
@@ -6377,7 +6349,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                             d = self.digitize(t,linespace,self.eventquantifiercoarse[i],i)
                             ld = self.lastdigitizedvalue[i] # in internal format so 8 representing 70%
                             lt = self.lastdigitizedtemp[i] # last digitized raw value corresponding to ld
-                            if (d is not None and (ld is None or ld != d) and
+                            if ((ld is None or ld != d) and
                                 (ld is None or lt is None or linespacethreshold < abs(t - lt))): # and only if significantly different than previous to avoid fluktuation
                                 # test if t is increasing or decreasing
                                 v = d * 10.
@@ -6579,7 +6551,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         if timeindex[6] > 0:
             end = timeindex[6]
         try:
-            visible_readings = []
+            visible_readings:list[float|None] = []
             if d1flag and self.qmc.autodeltaxET:
                 visible_readings.extend(d1[start:end])
             if d2flag and self.qmc.autodeltaxBT:
@@ -6657,7 +6629,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             self.qmc.specialevents = [max(0,i) for i in self.qmc.specialevents]
 
             nevents = len(self.qmc.specialevents)
-            packed_events = []
+            packed_events:list[tuple[int,int,str,float]] = []
             # pack
             for i in range(nevents):
                 packed_events.append(
@@ -6672,7 +6644,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             packed_events_sorted = sorted(packed_events, key=lambda tup: tup[0])
 
             # check if order changed
-            same_order = [(e[0] if len(e)>0 else 0) for e in packed_events] == [(e[0] if len(e)>0 else 0) for e in packed_events_sorted]
+            same_order = [e[0] for e in packed_events] == [e[0] for e in packed_events_sorted]
 
             if force_update or not same_order:
                 # in case the order did not change and we are not forced to update, everything can stay the same,
@@ -7040,13 +7012,13 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                 # Replace None values in the Delta curves with the closest numeric value on the right
                 def replNone(a:'npt.NDArray[numpy.double]', nv:'npt.NDArray[numpy.int64]') -> 'npt.NDArray[numpy.double]':
                     for i, nvi in enumerate(nv):
-                        if i == len(nv) -1 or a[nvi + 1] is None:
+                        if i == len(nv) -1 or a[nvi + 1] is None: # pyright:ignore[reportUnnecessaryComparison]
                             a[nvi] = 0
                         else:
                             a[nvi] = a[nvi + 1]
                     return a
-                nv = numpy.atleast_1d(numpy.asarray(np_dbt is None)).nonzero()[0] # fixes "Calling nonzero on 0d arrays is not allowed" numpy error of previous two lines
-                nvb = numpy.atleast_1d(numpy.asarray(np_dbtb is None)).nonzero()[0] # fixes "Calling nonzero on 0d arrays is not allowed" numpy error of previous two lines
+                nv = numpy.atleast_1d(numpy.asarray(np_dbt is None)).nonzero()[0] # pyright:ignore[reportUnnecessaryComparison] # fixes "Calling nonzero on 0d arrays is not allowed" numpy error of previous two lines
+                nvb = numpy.atleast_1d(numpy.asarray(np_dbtb is None)).nonzero()[0] # pyright:ignore[reportUnnecessaryComparison] # fixes "Calling nonzero on 0d arrays is not allowed" numpy error of previous two lines
 
                 np_dbt = replNone(np_dbt,nv)
                 np_dbtb = replNone(np_dbtb,nvb)
@@ -7195,7 +7167,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
 
 
                 # interval of interest metrics
-                ioi_start = eventtime2string(self.qmc.timex[timeindexs_seg[0]] - self.qmc.timex[self.qmc.timeindex[0]])
+                ioi_start = eventtime2string(self.qmc.timex[int(timeindexs_seg[0])] - self.qmc.timex[self.qmc.timeindex[0]])
                 ioi_seconds = analysis_endtime - analysis_starttime
                 ioi_duration = eventtime2string(ioi_seconds)
                 ioi_abs_deltas = numpy.absolute(deltas_all)
@@ -7245,7 +7217,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                                QApplication.translate('Label','ABC/secs')  ]
             tbl.float_format = '5.2'
             for i in range(len(mask)):
-                thistime = eventtime2string(self.qmc.timex[timeindexs_seg[i]] - self.qmc.timex[self.qmc.timeindex[0]])
+                thistime = eventtime2string(self.qmc.timex[int(timeindexs_seg[i])] - self.qmc.timex[self.qmc.timeindex[0]])
                 duration = eventtime2string(deltatimes_seg[i])
                 swing = maxdeltas_seg[i] - maxdeltas_seg[i - 1] if i > 0 else ''
                 abcprime = segment_abc_deltas[i] / deltatimes_seg[i]
@@ -7314,13 +7286,13 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
 #                _log.debug(f"curveSimilarity: {self.qmc.background_profile_sampling_interval=}")  #pylint: disable=logging-fstring-interpolation
 
                 # create arrays using smoothed data if available
-                if self.qmc.stemp1 is not None and len(self.qmc.stemp1) == len(self.qmc.temp1):
+                if len(self.qmc.stemp1) == len(self.qmc.temp1):
                     # take smoothed data if available
                     np_et = numpy.array(self.qmc.stemp1)
                 else:
                     np_et = numpy.array(self.qmc.temp1)
                     _log.debug('curveSimilarity: using non-smoothed ET')
-                if self.qmc.stemp2 is not None and len(self.qmc.stemp2) == len(self.qmc.temp2):
+                if len(self.qmc.stemp2) == len(self.qmc.temp2):
                     # take smoothed data if available
                     np_bt = numpy.array(self.qmc.stemp2)
                 else:
@@ -7619,8 +7591,8 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
     def arabicReshape(self, s:str, a:str|None = None) -> str:
         if self.locale_str in {'ar', 'fa'}:
             if a:
-                return str(get_display(arabic_reshaper.reshape(s.format(a))))
-            return str(get_display(arabic_reshaper.reshape(s)))
+                return str(get_display(arabic_reshaper.reshape(s.format(a)))) # pyright:ignore[reportUnknownArgumentType]
+            return str(get_display(arabic_reshaper.reshape(s))) # pyright:ignore[reportUnknownArgumentType]
         if self.locale_str == 'he':
             if a:
                 return str(get_display(s.format(a)))
@@ -8075,8 +8047,8 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                     # update large phases LCDs
                     try:
                         if self.largePhasesLCDs_dialog is not None:
-                            values1 = [TP, FCs] # TP and FCs phase LCDs
-                            values2 = [DRY, None] # DRY phase and AUC LCDs
+                            values1:list[str|None] = [TP, FCs] # TP and FCs phase LCDs
+                            values2:list[str|None] = [DRY, None] # DRY phase and AUC LCDs
                             self.largePhasesLCDs_dialog.updateValues(values1,values2)
                             self.largePhasesLCDs_dialog.updatePhasesLabels([TPlabel,DRYlabel,FCslabel,None])
                     except Exception as e: # pylint: disable=broad-except
@@ -8578,6 +8550,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                 if self.qmc.seriallogsemaphore.available() < 1:
                     self.qmc.seriallogsemaphore.release(1)
 
+    @override
     def resizeEvent(self, a0:'QResizeEvent|None') -> None:
         if not self.qmc.flagon and self.qmc.statssummary and len(self.qmc.timex) > 3:
             self.redrawTimer.start(500) # (re-) start the redraw time to be fired in half a second
@@ -9883,7 +9856,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                             else:
                                 # command not recognized
                                 _log.info('S7 Command <%s> not recognized', cs)
-                elif action == 16 and self.ser is not None and self.ser.R1 is not None: # Aillio Heater
+                elif action == 16 and self.ser.R1 is not None: # Aillio Heater
                     self.ser.R1.set_heater(int(cmd)/10)
                 elif action == 17 and self.ser.R1 is not None: # Aillio Fan
                     self.ser.R1.set_fan(int(cmd)/10)
@@ -10547,10 +10520,10 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                             elif cs.startswith('pidLookahead(') and cs.endswith(')'):
                                 try:
                                     lookahead = toInt(eval(cs[len('pidLookahead('):-1])) # pylint: disable=eval-used
-                                    if self.qmc.device == 0 and self.fujipid and self.qmc.Controlbuttonflag: # FUJI PID
+                                    if self.qmc.device == 0 and self.qmc.Controlbuttonflag: # FUJI PID
                                         self.fujipid.lookahead = lookahead
                                         self.sendmessage(QApplication.translate('Message','PID Lookahead: {0}').format(self.fujipid.lookahead))
-                                    elif (self.pidcontrol and self.qmc.Controlbuttonflag): # MODBUS hardware PID
+                                    elif self.qmc.Controlbuttonflag: # MODBUS hardware PID
                                         self.pidcontrol.svLookahead = lookahead
                                         self.sendmessage(QApplication.translate('Message','PID Lookahead: {0}').format(self.pidcontrol.svLookahead))
                                 except Exception as e: # pylint: disable=broad-except
@@ -11039,7 +11012,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                         startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW # type:ignore[unused-ignore,attr-defined]
                     except AttributeError:
                         try:
-                            startupinfo.dwFlags |= subprocess._subprocess.STARTF_USESHOWWINDOW # type: ignore # @UndefinedVariable # pylint: disable=maybe-no-member # pylint: disable=protected-access
+                            startupinfo.dwFlags |= subprocess._subprocess.STARTF_USESHOWWINDOW # type: ignore[attr-defined] # @UndefinedVariable # pylint: disable=maybe-no-member # pylint: disable=protected-access
                         except AttributeError:
                             pass
                     prg_file = str(qd.absolutePath())
@@ -11349,7 +11322,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
     # this should only be called from within the main GUI thread (and never from the sampling thread!)
     @pyqtSlot(str,bool,str)
     def sendmessage(self, message:str, append:bool = True, style:str|None = None) -> None:
-        if isinstance(threading.current_thread(), threading._MainThread): # type: ignore # pylint: disable=protected-access
+        if isinstance(threading.current_thread(), threading._MainThread): # type: ignore[attr-defined] # pylint: disable=protected-access
             # we are running in the main thread thus we can call sendmessage_internal via a QTimer to avoid redraw issues
             QTimer.singleShot(2,lambda : self.sendmessage_internal(message,append,style))
         else:
@@ -11785,8 +11758,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         self.saveAsSettingsAction.setEnabled(True)
         self.resetAction.setEnabled(True)
         self.switchAction.setEnabled(True)
-        if self.machineMenu is not None:
-            self.machineMenu.setEnabled(True)
+        self.machineMenu.setEnabled(True)
         self.editGraphAction.setEnabled(True)
         self.backgroundAction.setEnabled(True)
         self.switchETBTAction.setEnabled(True)
@@ -11795,8 +11767,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         self.StatisticsAction.setEnabled(True)
         self.WindowconfigAction.setEnabled(True)
         self.colorsAction.setEnabled(True)
-        if self.themeMenu is not None:
-            self.themeMenu.setEnabled(True)
+        self.themeMenu.setEnabled(True)
         self.controlsAction.setEnabled(True)
         self.readingsAction.setEnabled(True)
         self.eventsEditorAction.setEnabled(True)
@@ -11869,8 +11840,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             self.StatisticsAction.setEnabled(False)
             self.WindowconfigAction.setEnabled(False)
             self.colorsAction.setEnabled(False)
-        if self.themeMenu is not None:
-            self.themeMenu.setEnabled(False)
+        self.themeMenu.setEnabled(False)
         if self.temperatureConfMenu is not None:
             self.temperatureConfMenu.setEnabled(False)
         if self.languageMenu is not None:
@@ -11917,8 +11887,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                 self.newRoastMenu.setEnabled(False)
             self.calibrateDelayAction.setEnabled(False)
             self.saveAsSettingsAction.setEnabled(False)
-            if self.machineMenu is not None:
-                self.machineMenu.setEnabled(False)
+            self.machineMenu.setEnabled(False)
             self.alarmAction.setEnabled(False)
             self.autosaveAction.setEnabled(False)
             self.batchAction.setEnabled(False)
@@ -11989,7 +11958,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             if self.qmc.designerflag:
                 self.qmc.redrawdesigner(force=True)
             else:
-                self.autoAdjustAxis(background=self.qmc.background and (not len(self.qmc.timex) > 3), deltas=False)
+                self.autoAdjustAxis(background=(not len(self.qmc.timex) > 3), deltas=False)
                 self.qmc.redraw_keep_view(recomputeAllDeltas=False)
 
     @pyqtSlot()
@@ -12002,9 +11971,8 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             else:
                 self.qmc.l_subtitle.set_color(self.qmc.palette['title_hidden'])
             self.qmc.ax.draw_artist(self.qmc.l_subtitle)
-            if self.qmc.ax.figure is not None:
-                self.qmc.ax.figure.canvas.blit()
-                self.qmc.ax.figure.canvas.flush_events()
+            self.qmc.ax.figure.canvas.blit()
+            self.qmc.ax.figure.canvas.flush_events()
             self.qmc.ax_background = None
 
     def togglePlaybackEvents(self) -> None:
@@ -12074,6 +12042,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
 
     #keyboard presses. There must not be widgets (pushbuttons, comboboxes, etc) in focus in order to work
     @pyqtSlot('QKeyEvent')
+    @override
     def keyPressEvent(self, a0: 'QKeyEvent|None') -> None: # pyright: ignore [reportGeneralTypeIssues] # Code is too complex to analyze; reduce complexity by refactoring into subroutines or reducing conditional code paths
         if not self.processingKeyEvent and a0 is not None:
             try:
@@ -12151,7 +12120,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                             _log.exception(e)
                 elif k == Qt.Key.Key_P: # 80:                       #P
                     # switch PID mode
-                    if self.qmc.device == 0 and self.fujipid and self.qmc.Controlbuttonflag: # FUJI PID
+                    if self.qmc.device == 0 and self.qmc.Controlbuttonflag: # FUJI PID
                         # toggle mode: manual => RS => background
                         if not self.fujipid.rampsoak and not self.fujipid.followBackground: # => RS
                             self.fujipid.setrampsoak(1)
@@ -12167,7 +12136,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                             self.fujipid.setrampsoak(0)
                             self.fujipid.followBackground = False
                             self.sendmessage(QApplication.translate('Message','PID Mode: Manual'))
-                    elif (self.pidcontrol and self.qmc.Controlbuttonflag): # MODBUS hardware/software PID
+                    elif self.qmc.Controlbuttonflag: # MODBUS hardware/software PID
                         self.pidcontrol.svMode = (self.pidcontrol.svMode+1) %3
                         # 0: manual, 1: Ramp/Soak, 2: Follow (background profile)
                         if self.pidcontrol.svMode == 0:
@@ -12188,10 +12157,10 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                         # a background event is selected; move it up
                         self.qmc.move_custom_event(False, self.qmc.background_event_last_picked_ind, self.qmc.background_event_last_picked_pos, ystep=-1)
                     elif not(control_modifier or control_shift_modifier):
-                        if self.qmc.device == 0 and self.fujipid and self.qmc.Controlbuttonflag: # FUJI PID
+                        if self.qmc.device == 0 and self.qmc.Controlbuttonflag: # FUJI PID
                             self.fujipid.lookahead = max(0,self.fujipid.lookahead-1)
                             self.sendmessage(QApplication.translate('Message','PID Lookahead: {0}').format(self.fujipid.lookahead))
-                        elif (self.pidcontrol and self.qmc.Controlbuttonflag): # MODBUS hardware PID
+                        elif self.qmc.Controlbuttonflag: # MODBUS hardware PID
                             self.pidcontrol.svLookahead = max(0,self.pidcontrol.svLookahead-1)
                             self.sendmessage(QApplication.translate('Message','PID Lookahead: {0}').format(self.pidcontrol.svLookahead))
                 elif k_txt == '+': #k == Qt.Key.Key_Plus: k == 43:         #+ (increase dpi, zoom in / increase PID lookahead)
@@ -12206,10 +12175,10 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                         # a background event is selected; move it up
                         self.qmc.move_custom_event(False, self.qmc.background_event_last_picked_ind, self.qmc.background_event_last_picked_pos, ystep=1)
                     elif not(control_modifier or control_shift_modifier):
-                        if self.qmc.device == 0 and self.fujipid and self.qmc.Controlbuttonflag: # FUJI PID
+                        if self.qmc.device == 0 and self.qmc.Controlbuttonflag: # FUJI PID
                             self.fujipid.lookahead = self.fujipid.lookahead+1
                             self.sendmessage(QApplication.translate('Message','PID Lookahead: {0}').format(self.fujipid.lookahead))
-                        elif (self.pidcontrol and self.qmc.Controlbuttonflag): # MODBUS hardware PID
+                        elif self.qmc.Controlbuttonflag: # MODBUS hardware PID
                             self.pidcontrol.svLookahead = self.pidcontrol.svLookahead+1
                             self.sendmessage(QApplication.translate('Message','PID Lookahead: {0}').format(self.pidcontrol.svLookahead))
                 elif k == Qt.Key.Key_Space: # 32:                       #SPACE (selects active button)
@@ -13004,9 +12973,9 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
     def plotEventSelection(self, event_nr:int) -> None:
         if self.qmc.ax is not None and len(self.qmc.specialevents)>event_nr:
             etimeindex = self.qmc.specialevents[event_nr]
-            x = [self.qmc.timex[etimeindex],self.qmc.timex[etimeindex],self.qmc.timex[etimeindex],self.qmc.timex[etimeindex]]
-            y = [(self.qmc.ylimit_min-100),self.qmc.temp2[etimeindex],self.qmc.temp1[etimeindex],(self.qmc.ylimit+100)]
-            self.qmc.ax.plot(x,y,marker ='o',markersize=12,color ='yellow',linestyle='-',linewidth = 7,alpha=.4)
+            x:list[float] = [self.qmc.timex[etimeindex],self.qmc.timex[etimeindex],self.qmc.timex[etimeindex],self.qmc.timex[etimeindex]]
+            y:list[float] = [float(self.qmc.ylimit_min-100),self.qmc.temp2[etimeindex],self.qmc.temp1[etimeindex],float(self.qmc.ylimit+100)]
+            self.qmc.ax.plot(x, y, marker ='o', markersize=12, color ='yellow', linestyle='-', linewidth = 7, alpha=.4)
 
     #moves events in minieditor
     @pyqtSlot(int)
@@ -13324,8 +13293,9 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         if self.comparator is not None or self.qmc.designerflag or self.qmc.wheelflag or self.qmc.ax is None:
             # only load a profile if not in Comparator/Designer/WheelChart/FlavorChart mode
             return
-        f = QFile(filename)
+        f:QFile|None = None
         try:
+            f = QFile(filename)
             if self.qmc.clearBgbeforeprofileload:
                 self.deleteBackground()
             if not f.open(QFile.OpenModeFlag.ReadOnly):
@@ -13466,7 +13436,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             _, _, exc_tb = sys.exc_info()
             self.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' loadFile() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         finally:
-            if f:
+            if f is not None:
                 f.close()
 
     def loadAlarmsFromProfile(self, filename:str, profile:'ProfileData') -> None:
@@ -13583,7 +13553,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         else:
             self.qmc.Biogas_CO2_Reduction = self.qmc.Biogas_CO2_Reduction_default
         # for compatibility with profiles created with d76a41d or earlier
-        if (self.qmc.meterreads[0] is not None and len(self.qmc.meterreads[0]) == 3):
+        if len(self.qmc.meterreads[0]) == 3:
             self.qmc.CO2kg_per_BTU = [6.288e-05,5.291e-05,2.964e-04]
             self.qmc.Biogas_CO2_Reduction = 0.7562
         if 'preheatDuration' in profile:
@@ -13642,8 +13612,8 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                 return False
 
             # be sure there is an equation to process (already checked in devices.py, repeated here in case this is called from elsewhere)
-            nonempty_ETfunction = self.qmc.ETfunction is not None and self.qmc.ETfunction.strip() != ''
-            nonempty_BTfunction = self.qmc.BTfunction is not None and self.qmc.BTfunction.strip() != ''
+            nonempty_ETfunction = self.qmc.ETfunction.strip() != ''
+            nonempty_BTfunction = self.qmc.BTfunction.strip() != ''
             if (nonempty_ETfunction or nonempty_BTfunction):
                 # set dirty
                 self.qmc.fileDirtySignal.emit()
@@ -13688,8 +13658,8 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                         y_range1:list[float] = []
                         y_range2:list[float] = []
 
-                    nonempty_mathexpression1 = bool(self.qmc.extramathexpression1[j] is not None and len(self.qmc.extramathexpression1[j].strip()))
-                    nonempty_mathexpression2 = bool(self.qmc.extramathexpression2[j] is not None and len(self.qmc.extramathexpression2[j].strip()))
+                    nonempty_mathexpression1 = bool(len(self.qmc.extramathexpression1[j].strip()))
+                    nonempty_mathexpression2 = bool(len(self.qmc.extramathexpression2[j].strip()))
 
                     if nonempty_mathexpression1 or nonempty_mathexpression2:
                         self.qmc.extratimex[j] = self.qmc.timex[:]
@@ -13770,7 +13740,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
 
     @pyqtSlot(str)
     def loadbackgroundRedraw(self, filename:str) -> None:
-        if filename is None or len(filename) == 0:
+        if len(filename) == 0:
             return
         try:
             filename = os.path.expanduser(filename) # expand users home directory abbreviation
@@ -13828,8 +13798,9 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
     # Loads background profile
     # NOTE: this does NOT set the self.qmc.background flag to make the loaded background visible.
     def loadbackground(self, filename:str) -> None:
-        f = QFile(filename)
+        f:QFile|None = None
         try:
+            f = QFile(filename)
             if not f.open(QIODevice.OpenModeFlag.ReadOnly):
                 raise OSError(f.errorString())
             stream = QTextStream(f)
@@ -13922,10 +13893,9 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                         t2x[e] = fill_gaps(t2x[e])
 
                 # we resample the temperatures to regular interval timestamps
+                tb_lin:numpy.ndarray[tuple[Literal[1]],numpy.dtype[numpy.double]]|None = None
                 if tb is not None and tb:
-                    tb_lin = numpy.linspace(tb[0],tb[-1],len(tb))
-                else:
-                    tb_lin = None
+                    tb_lin = cast(numpy.ndarray[tuple[Literal[1]]], numpy.linspace(tb[0],tb[-1],len(tb)))
                 decay_smoothing_p = not self.qmc.optimalSmoothing
                 b1 = self.qmc.smooth_list(tb,t1,window_len=self.qmc.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tb_lin)
                 b2 = self.qmc.smooth_list(tb,t2,window_len=self.qmc.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tb_lin)
@@ -13942,10 +13912,9 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
 # we smooth also that 3rd and 4th background courve only on redraw with the actual smoothing parameters
                     if (self.qmc.xtcurveidx > 0 and n3 == i) or (self.qmc.ytcurveidx > 0 and n4 == i): # this is the 3rd or 4th background curve to be drawn, we smooth it
                         tx=timex[i]
+                        tx_lin:numpy.ndarray[tuple[Literal[1]],numpy.dtype[numpy.double]]|None = None
                         if tx is not None and tx:
-                            tx_lin = numpy.linspace(tx[0],tx[-1],len(tx))
-                        else:
-                            tx_lin = None
+                            tx_lin = cast(numpy.ndarray[tuple[Literal[1]],numpy.dtype[numpy.double]], numpy.linspace(tx[0],tx[-1],len(tx)))
                         if (self.qmc.xtcurveidx > 0 and n3 == i and self.qmc.xtcurveidx % 2) or (self.qmc.ytcurveidx > 0 and n4 == i and self.qmc.ytcurveidx % 2):
                             b1x.append(self.qmc.smooth_list(tx,t1x[i],window_len=self.qmc.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin))
                             b2x.append(numpy.array(t2x[i]))
@@ -14009,17 +13978,15 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                         # adjust phases by DryEnd and FCs events from background profile
                         if self.qmc.timeindexB[1] and len(self.qmc.timeindexB) > 1 and len(self.qmc.temp2B) > self.qmc.timeindexB[1]:
                             val = self.qmc.temp2B[self.qmc.timeindexB[1]]
-                            if val is not None:
-                                self.qmc.phases[1] = int(round(val))
+                            self.qmc.phases[1] = int(round(val))
                         if self.qmc.timeindexB[2] and len(self.qmc.timeindexB) > 2 and len(self.qmc.temp2B) > self.qmc.timeindexB[2]:
                             val = self.qmc.temp2B[self.qmc.timeindexB[2]]
-                            if val is not None:
-                                self.qmc.phases[2] = int(round(val))
+                            self.qmc.phases[2] = int(round(val))
                 elif 'startend' in profile:
                     startendB = profile['startend']
                     varCB = profile['cracks']
                     dryendB = profile.get('dryend', [0, 0])
-                    times = []
+                    times:list[float] = []
                     times.append(startendB[0])
                     times.append(dryendB[0])
                     times.append(varCB[0])
@@ -14079,7 +14046,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             self.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' loadbackground() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             return
         finally:
-            if f:
+            if f is not None:
                 f.close()
 
 
@@ -14512,7 +14479,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         roastlogger_action_section = ''
         # use io.open instead of open to have encoding support on Python 2
         with open(filename, encoding=enc) as infile:
-            obj = ProfileData()
+            obj:ProfileData = ProfileData()
             obj['mode'] = 'C'
             obj['title'] = str(QFileInfo(filename).fileName())
             roastdate_str = encodeLocal(QDate.currentDate().toString())
@@ -14531,10 +14498,10 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                     break
                 if l == '':
                     break
-            timeindex = [-1,0,0,0,0,0,0,0]
-            timex = []
-            temp1 = []
-            temp2 = []
+            timeindex:list[int] = [-1,0,0,0,0,0,0,0]
+            timex:list[float] = []
+            temp1:list[float] = []
+            temp2:list[float] = []
             data = csv.reader(infile,delimiter=',')
             #read file header
             next(data) # we do not use the labels
@@ -14914,8 +14881,8 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                             time2 = '' #@UnusedVariable #@UnusedVariable # pylint: disable=unused-variable # noqa: F841
                         event:str = ''     #@UnusedVariable #@UnusedVariable # pylint: disable=unused-variable # noqa: F841
                         for ev in events:
-                            if not ev[2] and int(round(tx)) == int(round(ev[0])): # type: ignore
-                                event = ev[1] # type: ignore # #@UnusedVariable #@UnusedVariable # pylint: disable=unused-variable # noqa: F841
+                            if not ev[2] and int(round(tx)) == int(round(ev[0])): # type: ignore[arg-type]
+                                event = ev[1] # type: ignore[assignment] # #@UnusedVariable #@UnusedVariable # pylint: disable=unused-variable # noqa: F841
                                 ev[2] = True
                                 break
                         if i in self.qmc.specialevents:
@@ -14932,7 +14899,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                         di,mo = divmod(tx,60)
                         time1 = f'{di:02.0f}:{mo:02.0f}'
                         if last_time is None or last_time != time1:
-                            extratemps = []
+                            extratemps:list[float] = []
                             for j in range(len(self.qmc.extradevices)):
                                 if j < len(self.qmc.extratemp1) and i < len(self.qmc.extratemp1[j]):
                                     extratemps.append(self.qmc.extratemp1[j][i])
@@ -14950,7 +14917,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                                     pass
 
                             for j, etemp in enumerate(extratemps):
-                                ws.cell(row=r+i, column=7+j).value = etemp
+                                ws.cell(row=r+i, column=7+j).value = etemp # pyrefly:ignore[bad-assignment] # pyright:ignore[reportAttributeAccessIssue]
 
                         last_time = time1
 
@@ -16097,7 +16064,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                 skipped_sample_time = 1.5*avg_sample
                 skipped = numpy.count_nonzero(tx_diff > skipped_sample_time)
                 bins = [0, 1*profile_sampling_interval, 1.5*profile_sampling_interval, 4*profile_sampling_interval, 9999]
-                hist = numpy.histogram(tx_diff,bins=bins)
+                hist = numpy.histogram(tx_diff,bins=bins) # pyright:ignore[reportUnknownArgumentType]
                 std_sample = numpy.std(tx_diff)
 
                 # Aperiodic sample ratio
@@ -16779,12 +16746,12 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             # add positions of main event annotations and custom event flags
             profile['anno_positions'] = self.qmc.getAnnoPositions()
             profile['flag_positions'] = self.qmc.getFlagPositions()
-            if self.qmc.legend is not None and not isinstance(self.qmc.legend._loc, int): # type: ignore # "Legend" has no attribute "_loc" # pylint: disable=protected-access
+            if self.qmc.legend is not None and not isinstance(self.qmc.legend._loc, int): # type: ignore[attr-defined] # "Legend" has no attribute "_loc" # pylint: disable=protected-access
                 # if a legend is currently drawn and has a custom position we save its position in data coordinates
                 try:
                     if self.qmc.ax is not None:
                         axis_to_data = self.qmc.ax.transAxes + self.qmc.ax.transData.inverted()
-                        profile['legendloc_pos'] = axis_to_data.transform(self.qmc.legend._loc).tolist() # type: ignore # "Legend" has no attribute "_loc" # pylint: disable=protected-access
+                        profile['legendloc_pos'] = axis_to_data.transform(self.qmc.legend._loc).tolist() # type: ignore[attr-defined] # "Legend" has no attribute "_loc" # pylint: disable=protected-access
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
 
@@ -17189,10 +17156,10 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                             image = self.qmc.grab()
                             if filetype in {'JPEG', 'PNG'}:
                                 # transparences are not supported by those file types and are rendered in black by default.
-                                white_img = QPixmap(image.size())
+                                white_img = QPixmap(image.size()) # pyright:ignore[reportUnknownArgumentType]
                                 white_img.fill() # fills by default with Qt.GlobalColor.white
                                 painter = QPainter(white_img)
-                                painter.drawPixmap(0,0,image.width(),image.height(),image)
+                                painter.drawPixmap(0,0,image.width(),image.height(),image) # pyright:ignore[reportUnknownArgumentType]
                                 image = white_img
                                 painter.end()
                                 del painter
@@ -18098,7 +18065,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                     # setting 'inputXslave' was changed in Artisan >3.2.0 to 'inputXdeviceId'
                     # to stay compatible with older settings we still keep this around for a moment:
                     # we still read from both, but write only to the new
-                    # TODO: remove this in v3.4
+                    # TODO: remove this in v4.0
                     self.modbus.inputDeviceIds[i] = toInt(settings.value(f'input{i + 1}slave', self.modbus.inputDeviceIds[i]))
                 self.modbus.inputDeviceIds[i] = toInt(settings.value(f'input{i + 1}deviceId', self.modbus.inputDeviceIds[i]))
                 self.modbus.inputRegisters[i] = toInt(settings.value(f'input{i+1}register',self.modbus.inputRegisters[i]))
@@ -18121,7 +18088,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                 # setting 'PID_slave_ID' was changed in Artisan >3.2.0 to 'PID_device_ID'
                 # to stay compatible with older settings we still keep this around for a moment:
                 # we still read from both, but write only to the new
-                # TODO: remove this in v3.4
+                # TODO: remove this in v4.0
                 self.modbus.PID_device_ID = toInt(settings.value('PID_slave_ID', self.modbus.PID_device_ID))
             self.modbus.PID_device_ID = toInt(settings.value('PID_device_ID', self.modbus.PID_device_ID))
             self.modbus.PID_SV_register = toInt(settings.value('PID_SV_register',self.modbus.PID_SV_register))
@@ -19011,7 +18978,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             self.qmc.showmet = toBool(settings.value('showmet',self.qmc.showmet))
             if settings.contains('statssummary'):
                 self.qmc.statssummary = toBool(settings.value('statssummary'))
-            if self.qmc.statssummary is not None and self.qmc.statssummary and self.saveStatisticsMenu is not None:
+            if self.qmc.statssummary and self.saveStatisticsMenu is not None:
                 self.saveStatisticsMenu.setEnabled(True)
             elif self.saveStatisticsMenu is not None:
                 self.saveStatisticsMenu.setEnabled(False)
@@ -19554,6 +19521,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
 
     #Saves the settings when closing application. See the oppposite settingsLoad()
     @pyqtSlot('QCloseEvent')
+    @override
     def closeEvent(self, a0:'QCloseEvent|None' = None) -> None:
         res = self.closeApp()
         if a0 is not None:
@@ -20927,54 +20895,53 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             return
         if self.printer is None:
             self.printer = QPrinter(QPrinter.PrinterMode.HighResolution) # (QPrinter.PrinterMode.PrinterResolution)
-        if self.printer is not None:
-            self.printer.setCreator(application_name)
-#            self.printer.setResolution(300)
-            form = QPrintDialog(self.printer, self)
-            if form.exec():
-                # painter coordinates
-                painter = QPainter(self.printer)
-                rect = painter.viewport()
-                # image coordinates
-                size = image.size()
-                rect_size = rect.size()
-                graph_height = size.height()
-                rect_size.setHeight(int(round(rect_size.height()*self.devicePixelRatio())))
-                rect_size.setWidth(int(round(rect_size.width()*self.devicePixelRatio())))
-                size.scale(rect_size, Qt.AspectRatioMode.KeepAspectRatio)
-                painter.setViewport(rect.x(), rect.y(), size.width(), size.height()) # sets device coordinate system
-                image_rect = image.rect()
-    #            image_rect.setHeight(int(round(image_rect.height()/self.devicePixelRatio())))
-    #            image_rect.setWidth(int(round(image_rect.width()/self.devicePixelRatio())))
-                painter.setWindow(image_rect) #scale to fit page # sets logical coordinate system
-                if isinstance(image, QPixmap): # pyrefly: ignore[invalid-argument]
-                    painter.drawPixmap(0, 0, image)
-                else:
-                    painter.drawImage(0, 0, image)
-                if self.comparator is not None and self.qpc is not None and len(self.splitter.sizes())>1 and self.splitter.sizes()[1]>0:
-                    phases_image = self.qpc.grab().toImage() # a QImage on macOS
-                    if not phases_image.isNull():
-                        if self.printer.pageLayout().orientation() == QPageLayout.Orientation.Landscape:
-                            self.printer.newPage()
-                            offset = 0
-                        else:
-                            offset = int(round(graph_height/self.devicePixelRatio())) # put the phases graph below the profile graph
-                        size = phases_image.size()
-                        rect_size = rect.size()
-                        rect_size.setHeight(int(round(rect_size.height()*self.devicePixelRatio())))
-                        rect_size.setWidth(int(round(rect_size.width()*self.devicePixelRatio())))
-                        size.scale(rect_size, Qt.AspectRatioMode.KeepAspectRatio)
-                        painter.setViewport(rect.x(), rect.y(), size.width(), size.height()) # sets device coordinate system
-                        image_rect = phases_image.rect()
-            #            image_rect.setHeight(int(round(image_rect.height()/self.devicePixelRatio())))
-            #            image_rect.setWidth(int(round(image_rect.width()/self.devicePixelRatio())))
-                        painter.setWindow(image_rect) #scale to fit page # sets logical coordinate system
-                        if isinstance(phases_image, QPixmap): # pyrefly: ignore[invalid-argument]
-                            painter.drawPixmap(0, 0, phases_image)
-                        else:
-                            painter.drawImage(0, offset, phases_image)
-                painter.end()
-                del painter
+        self.printer.setCreator(application_name)
+#        self.printer.setResolution(300)
+        form = QPrintDialog(self.printer, self)
+        if form.exec():
+            # painter coordinates
+            painter = QPainter(self.printer)
+            rect = painter.viewport()
+            # image coordinates
+            size = image.size()
+            rect_size = rect.size()
+            graph_height = size.height()
+            rect_size.setHeight(int(round(rect_size.height()*self.devicePixelRatio())))
+            rect_size.setWidth(int(round(rect_size.width()*self.devicePixelRatio())))
+            size.scale(rect_size, Qt.AspectRatioMode.KeepAspectRatio)
+            painter.setViewport(rect.x(), rect.y(), size.width(), size.height()) # pyright:ignore[reportUnknownArgumentType] # sets device coordinate system
+            image_rect = image.rect()
+#            image_rect.setHeight(int(round(image_rect.height()/self.devicePixelRatio())))
+#            image_rect.setWidth(int(round(image_rect.width()/self.devicePixelRatio())))
+            painter.setWindow(image_rect) # pyright:ignore[reportUnknownArgumentType] #scale to fit page # sets logical coordinate system
+            if isinstance(image, QPixmap): # pyrefly: ignore[invalid-argument]
+                painter.drawPixmap(0, 0, image)
+            else:
+                painter.drawImage(0, 0, image) # pyright:ignore[reportUnknownArgumentType]
+            if self.comparator is not None and self.qpc is not None and len(self.splitter.sizes())>1 and self.splitter.sizes()[1]>0:
+                phases_image = self.qpc.grab().toImage() # a QImage on macOS
+                if not phases_image.isNull():
+                    if self.printer.pageLayout().orientation() == QPageLayout.Orientation.Landscape:
+                        self.printer.newPage()
+                        offset = 0
+                    else:
+                        offset = int(round(graph_height/self.devicePixelRatio())) # pyright:ignore[reportUnknownArgumentType] # put the phases graph below the profile graph
+                    size = phases_image.size()
+                    rect_size = rect.size()
+                    rect_size.setHeight(int(round(rect_size.height()*self.devicePixelRatio())))
+                    rect_size.setWidth(int(round(rect_size.width()*self.devicePixelRatio())))
+                    size.scale(rect_size, Qt.AspectRatioMode.KeepAspectRatio)
+                    painter.setViewport(rect.x(), rect.y(), size.width(), size.height())   # pyright:ignore[reportUnknownArgumentType] # sets device coordinate system
+                    image_rect = phases_image.rect()
+        #            image_rect.setHeight(int(round(image_rect.height()/self.devicePixelRatio())))
+        #            image_rect.setWidth(int(round(image_rect.width()/self.devicePixelRatio())))
+                    painter.setWindow(image_rect) #scale to fit page # sets logical coordinate system  # pyright:ignore[reportUnknownArgumentType]
+                    if isinstance(phases_image, QPixmap): # pyrefly: ignore[invalid-argument]
+                        painter.drawPixmap(0, 0, phases_image)
+                    else:
+                        painter.drawImage(0, offset, phases_image) # pyright:ignore[reportUnknownArgumentType]
+            painter.end()
+            del painter
 
     # takes a production data generated by profileProductionData(profile) and extracts the following as keyed (mostly) string values in a dict:
     #  . "id"
@@ -21011,12 +20978,10 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             data_roastdate = data['roastdate']
         data_date = data_roastdate.date()
         data_time = data_roastdate.time()
-        if data_date is not None:
-            short_date_format = QLocale().dateFormat(QLocale.FormatType.ShortFormat)
-            time = data_date.toString(short_date_format) # Qt.DateFormat.SystemLocaleShortDate, Qt.DateFormat.ISODate
-            if data_time is not None:
-                short_time_format = QLocale().timeFormat(QLocale.FormatType.ShortFormat)
-                time += f' {data_time.toString(short_time_format)}' # Qt.DateFormat.SystemLocaleShortDate, Qt.DateFormat.ISODate
+        short_date_format = QLocale().dateFormat(QLocale.FormatType.ShortFormat)
+        time = data_date.toString(short_date_format) # Qt.DateFormat.SystemLocaleShortDate, Qt.DateFormat.ISODate
+        short_time_format = QLocale().timeFormat(QLocale.FormatType.ShortFormat)
+        time += f' {data_time.toString(short_time_format)}' # Qt.DateFormat.SystemLocaleShortDate, Qt.DateFormat.ISODate
         # weight
         weight_in = ''
         weight_out = ''
@@ -21118,14 +21083,14 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         title_html = ds['title']
         beans_html = ds['beans']
         try:
-            if 'roastUUID' in data and data['roastUUID'] is not None and data['roastUUID'] != '':
+            if 'roastUUID' in data and data['roastUUID'] != '':
                 roast_uuid = data['roastUUID']
 #                if plus.register.getPath(roast_uuid):
 #                    title_html = f'<a href="artisan://roast/{roast_uuid}">{title_html}</a>'
                 title_html = f'<a href="artisan://roast/{roast_uuid}">{title_html}</a>'
                 if bool(plus.sync.getSync(roast_uuid)):
                     time_html = f"<a href='{plus.util.roastLink(roast_uuid)}' target='_blank'>{time_html}</a>"
-                if 'plus_coffee' in data and data['plus_coffee'] is not None and data['plus_coffee'] != '':
+                if 'plus_coffee' in data and data['plus_coffee'] != '':
                     beans_html = f"<a href=\"{plus.util.coffeeLink(data['plus_coffee'])}\" target=\"_blank\">{beans_html}</a>"
         except Exception: # pylint: disable=broad-except
             pass
@@ -21289,7 +21254,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                 # let's sort by isodate
                 profiles = sorted(profiles,
                     key=lambda p: (QDateTime(QDate.fromString(p['roastisodate'], Qt.DateFormat.ISODate),QTime.fromString(p['roasttime'])).toMSecsSinceEpoch()
-                         if p is not None and 'roastisodate' in p and 'roasttime' in p else 0))
+                         if 'roastisodate' in p and 'roasttime' in p else 0))
                 with open(getResourcePath() + 'report-template.htm', encoding='utf-8') as myfile:
                     HTML_REPORT_TEMPLATE=myfile.read()
                 entries = ''
@@ -21305,7 +21270,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                     last_unit = (weight[2] if weight is not None else 'kg')
                     total_in_sum += (convertWeight(weight[0],weight_units.index(last_unit),weight_units.index(unit)) if weight is not None else 0)
                     total_out_sum += (convertWeight(weight[1],weight_units.index(last_unit),weight_units.index(unit)) if weight is not None else 0)
-                    total_defects_sum += (convertWeight(defects_weight,weight_units.index(last_unit),weight_units.index(unit)) if defects_weight is not None else 0)
+                    total_defects_sum += (convertWeight(defects_weight,weight_units.index(last_unit),weight_units.index(unit)) if defects_weight == 0 else 0)
                     entries += self.productionData2htmlentry(d) + '\n'
 
                 html = libstring.Template(HTML_REPORT_TEMPLATE).safe_substitute(
@@ -21898,7 +21863,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             dsd = {}
         if rd is None:
             rd = {}
-        res = []
+        res:list[str] = []
         weight_unit = self.qmc.weight[2]
         volume_unit = self.qmc.volume[2]
         temperature_unit = self.qmc.mode
@@ -21937,7 +21902,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                     elif src == 'rank' and fld in rd:
                         res_fld = rd[fld]
                     elif src == 'prod' and pd is not None and fld in pd:
-                        res_fld = pd[fld] # type: ignore # TypedDict key must be a string literal; expected one of ("id", "nr", "title", "datetime", "time", ...)
+                        res_fld = pd[fld] # type: ignore[literal-required] # TypedDict key must be a string literal; expected one of ("id", "nr", "title", "datetime", "time", ...)
                     elif src == 'eval':
                         res_fld = eval(fld) # pylint: disable=eval-used
                         if res_fld in {'None', None}:
@@ -21948,6 +21913,8 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                         continue
 
                     res_fldf:float = toFloat(res_fld)
+
+                    conv_fld:float
 
                     if (test0 == 'true' and res_fldf > 0) or test0 == 'false':
                         if units == 'temp':
@@ -21986,7 +21953,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                             assert isinstance(res_fld, datetime.datetime)
                             res.append(f'{QDateTime(res_fld).toPyDateTime()}')
                         elif typ == 'bool':
-                            res.append(str(res_fld))
+                            res.append(str(res_fld)) # pyright:ignore[reportUnknownArgumentType]
                         else:
                             res.append('')
                     else:
@@ -22035,7 +22002,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         time_html = pd.get('time','')
         title_html = pd.get('title','')
         try:
-            if 'roastUUID' in production_data and production_data['roastUUID'] is not None:
+            if 'roastUUID' in production_data:
                 roast_uuid = production_data['roastUUID']
 #                if plus.register.getPath(roast_uuid):
 #                    title_html = '<a href="artisan://roast/{0}">{1}</a>'.format(roast_uuid,title_html)
@@ -22050,7 +22017,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             batch = batch_html,
             time = time_html,
             title = title_html,
-            in_num = (weight_fmt.format(pd['weight_in_num']) if 'weight_in_num' in pd else ''),
+            in_num = weight_fmt.format(pd['weight_in_num']),
             weightin = pd.get('weight_in',''),
             charge_temp_num = rd['charge_temp_num'],
             charge_temp = rd['charge_temp'],
@@ -22070,7 +22037,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             DEV_percent = rd['DEV_percent'],
             AUC_num = rd['AUC_num'],
             AUC = rd['AUC'],
-            loss_num = (f"{pd['weight_loss_num']:.2f}" if 'weight_loss_num' in pd else ''),
+            loss_num = f"{pd['weight_loss_num']:.2f}",
             weightloss = pd.get('weight_loss',''),
             color_num = rd['color_num'],
             color = rd['color'],
@@ -22167,16 +22134,16 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                     co2s_count = 0
                     co2kgs = 0.
                     co2kgs_count = 0
-                    handles = []
-                    labels = []
-                    timex_list = []
+                    handles:list[Line2D] = []
+                    labels:list[str] = []
+                    timex_list:list[list[float]] = []
                     stemp_list = []
                     cl_list = []
                     max_profiles = 20
-                    color=iter(colormaps['tab20'](numpy.linspace(0,1,max_profiles)))  # @UndefinedVariable # pylint: disable=maybe-no-member
+                    color = iter(colormaps['tab20'](numpy.linspace(0,1,max_profiles)))  # @UndefinedVariable # pylint: disable=maybe-no-member
                     # collect data
-#                    c = 1
-                    min_start_time = max_end_time = 0
+                    min_start_time:float = 0
+                    max_end_time:float = 0
                     first_profile:bool = True
                     first_profile_event_time = 0
                     max_drop_time = 0
@@ -22296,13 +22263,13 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                                 entries += self.rankingData2htmlentry(pd,rd, cl) + '\n'
 
                                 temp = [convertTemp(t,rd['temp_unit'],self.qmc.mode) for t in rd['temp']]
-                                timex = rd['timex']
+                                timex:list[float] = rd['timex']
                                 stemp = self.qmc.smooth_list(timex,
                                     (fill_gaps(temp) if self.qmc.interpolateDropsflag else temp),
                                     window_len=self.qmc.curvefilter,
                                     decay_smoothing=not self.qmc.optimalSmoothing)
                                 charge = max(0,rd['charge_idx']) # start of visible data
-                                drop = rd['drop_idx'] # end of visible data
+                                drop:int = rd['drop_idx'] # end of visible data
                                 stemp = numpy.concatenate((
                                     numpy.full(charge, numpy.nan, dtype=numpy.double),
                                     stemp[charge:drop],
@@ -22331,7 +22298,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                                 if len(timex) > charge:
                                     min_start_time = min(min_start_time,timex[charge])
                                 if len(timex) > drop:
-                                    max_end_time = max(max_end_time,timex[drop])
+                                    max_end_time = max(max_end_time, timex[drop])
                                 # cut-out only CHARGE to DROP
 
                                 labels.append(label)
@@ -22375,10 +22342,10 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                             timex = txl
                             stemp = stemp_list[i]
                             cl = cl_list[i]
-                            l_temp, = self.qmc.ax.plot(timex,stemp,markersize=self.qmc.BTmarkersize,marker=self.qmc.BTmarker,
+                            l_temp, = self.qmc.ax.plot(timex,stemp,markersize=self.qmc.BTmarkersize,marker=self.qmc.BTmarker, # pyright:ignore[reportUnknownArgumentType]
         #                        sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.qmc.BTlinewidth+self.qmc.patheffects,foreground=path_effects_color)],
                                 sketch_params=None,path_effects=[],
-                                linewidth=self.qmc.BTlinewidth,linestyle=self.qmc.BTlinestyle,drawstyle=self.qmc.BTdrawstyle,color=cl,label=label)
+                                linewidth=self.qmc.BTlinewidth, linestyle=self.qmc.BTlinestyle, drawstyle=self.qmc.BTdrawstyle, color=cl, label=label) # pyright:ignore[reportUnknownArgumentType]
                             handles.append(l_temp)
 
                     tmpdir = str(QDir.tempPath() + '/')
@@ -22458,7 +22425,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                                 ncol = int(math.ceil(len(handles)/2.))
                             else:
                                 ncol = int(math.ceil(len(handles)))
-                            self.qmc.ax.legend(handles,labels,loc=self.qmc.legendloc,ncol=ncol,fancybox=True,prop=prop,shadow=False)
+                            self.qmc.ax.legend(handles, labels, loc=self.qmc.legendloc, ncol=ncol, fancybox=True, prop=prop, shadow=False)
 
                             # Remove and update the logo image
                             try:
@@ -22792,7 +22759,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                         cnum = col_
                         for i, rdf in enumerate(ranking_data_fields):
                             cnum += 1
-                            cr = f'{get_column_letter(cnum)}{c}'
+                            cr:str = f'{get_column_letter(cnum)}{c}'
 
                             name = rdf[field_index.index('name')]
                             fld:str = rdf[field_index.index('fld')]
@@ -22818,21 +22785,23 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                             else:
                                 continue
 
+                            conv_fld:float
+
                             if (test0 == 'true' and float2float(toFloat(res_fld)) > 0) or test0 == 'false':
                                 if units == 'temp':
-                                    conv_fld = convertTemp(res_fld,dsd['mode'],temperature_unit)
+                                    conv_fld = convertTemp(res_fld,dsd['mode'],temperature_unit) # pyright:ignore[reportUnknownArgumentType]
                                 elif units == 'ror':
-                                    conv_fld = convertRoRstrict(res_fld,dsd['mode'],temperature_unit)
+                                    conv_fld = convertRoRstrict(res_fld,dsd['mode'],temperature_unit) # pyright:ignore[reportUnknownArgumentType]
                                 elif units == 'volume':
-                                    conv_fld = convertVolume(res_fld,0,volume_units.index(volume_unit))
+                                    conv_fld = convertVolume(res_fld,0,volume_units.index(volume_unit))  # pyright:ignore[reportUnknownArgumentType]
                                 elif units == 'weight':
-                                    conv_fld = convertWeight(res_fld,0,weight_units.index(weight_unit))
+                                    conv_fld = convertWeight(res_fld,0,weight_units.index(weight_unit))  # pyright:ignore[reportUnknownArgumentType]
                                 else:
                                     conv_fld = res_fld
 
                                 if typ == 'text':
                                     ws[cr] = conv_fld # type: ignore[assignment, unused-ignore]
-                                    width = len(str(conv_fld)) + 2.
+                                    width = len(str(conv_fld)) + 2. # pyright:ignore[reportUnknownArgumentType]
                                     if re.match(r'[0-9]+',units) and width > float(units):
                                         width = float(units)
                                     if width > widths[i]:
@@ -22863,12 +22832,12 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                                     ws[cr] = conv_fld/100. # type: ignore[assignment, unused-ignore]
                                     ws[cr].number_format = ('0.00%' if self.percent_decimals == 2 else '0.0%')
                                 elif typ == 'time':
-                                    h,m = divmod(conv_fld, 60.0)
+                                    h,m = divmod(conv_fld, 60.0) # pyright:ignore[reportUnknownArgumentType]
                                     dt = datetime.time(int(h),int(m),0) # note that rounding h and m might lead to failure of .time() as round(59.99) = 60 which is >59 thus not accepted by .time()
                                     ws[cr] = dt # type: ignore[assignment, unused-ignore] # Incompatible types in assignment (expression has type "time", target has type "str")
                                     ws[cr].number_format = 'H:MM'
                                 elif typ == 'date':
-                                    ws[cr] = QDateTime(conv_fld).toPyDateTime() # type: ignore # Incompatible types in assignment (expression has type "datetime", target has type "str")
+                                    ws[cr] = QDateTime(conv_fld).toPyDateTime() # type: ignore[call-overload] # Incompatible types in assignment (expression has type "datetime", target has type "str")
                                     fmt = 'YYYY-MM-DD HH:MM'
                                     ws[cr].number_format = fmt
                                     width = len(fmt) + 2.
@@ -22876,7 +22845,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                                         widths[i] = width
                                         ws.column_dimensions[get_column_letter(cnum)].width = width # pyrefly: ignore[bad-assignment]
                                 elif typ == 'bool':
-                                    ws[cr] = str(conv_fld)
+                                    ws[cr] = str(conv_fld) # pyright:ignore[reportUnknownArgumentType]
 
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
@@ -23008,7 +22977,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         def release() -> None:
             if batch_process and self.html_loader is not None:
                 try:
-                    self.html_loader.page().pdfPrintingFinished.disconnect() # type: ignore # "Callable[[str, bool], None]" has no attribute "disconnect"
+                    self.html_loader.page().pdfPrintingFinished.disconnect() # type: ignore[union-attr] # "Callable[[str, bool], None]" has no attribute "disconnect"
                 except Exception: # pylint: disable=broad-except
                     pass
                 try:
@@ -23099,7 +23068,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             rcParams['path.effects'] = []
             with open(getResourcePath() + 'roast-template.htm', encoding='utf-8') as myfile:
                 HTML_REPORT_TEMPLATE=myfile.read()
-            beans_html = str(htmllib.escape(self.qmc.beans))
+            beans_html:str = str(htmllib.escape(self.qmc.beans))
             if len(beans_html) > 43:
                 beans_html = beans_html[:41] + '&hellip;'
 
@@ -23222,7 +23191,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                 cm_tuple = f"{cp['det']:.1f}/{cp['dbt']:.1f}{uchr(176)}{self.qmc.mode}"
             else:
                 cm_tuple = '--'
-            if self.qmc.titleB is None or self.qmc.titleB == '':
+            if self.qmc.titleB == '':
                 background_html = '--'
             else:
                 if self.qmc.roastbatchnrB == 0:
@@ -23249,9 +23218,9 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                     datetime_html = f'<a href="{plus.util.roastLink(self.qmc.roastUUID)}" target="_blank">{datetime_html}</a>'
 #            if self.qmc.background and self.qmc.titleB is not None and self.qmc.titleB != "" and self.qmc.backgroundUUID is not None and plus.register.getPath(self.qmc.backgroundUUID):
 #                background_html = '<a href="artisan://roast/' + self.qmc.backgroundUUID + '">' + background_html + "</a>"
-            if self.qmc.background and self.qmc.titleB is not None and self.qmc.titleB != '' and self.qmc.backgroundUUID is not None:
+            if self.qmc.background and self.qmc.titleB != '' and self.qmc.backgroundUUID is not None:
                 background_html = '<a href="artisan://roast/' + self.qmc.backgroundUUID + '">' + background_html + '</a>'
-            if beans_html is not None and beans_html != '' and self.qmc.plus_coffee is not None:
+            if beans_html != '' and self.qmc.plus_coffee is not None:
                 beans_html = f'<a href="{plus.util.coffeeLink(self.qmc.plus_coffee)}" target="_blank">{beans_html}</a>'
                 # note that blends are hard to link back as it requires to link component by component
             cupping_score, cupping_all_default = self.cuppingSum(self.qmc.flavors)
@@ -23379,7 +23348,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
 
     # returns a string with all the activated roast attributes
     def roastattributes(self) -> str:
-        res = []
+        res:list[str] = []
         if self.qmc.heavyFC_flag:
             res.append(QApplication.translate('CheckBox','Heavy FC'))
         if self.qmc.lowFC_flag:
@@ -23496,9 +23465,9 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                 start = 0
             # sort events by time/index
             sevents = sorted(zip(self.qmc.specialevents, range(len(self.qmc.specialevents)), strict=True)) # ty:ignore
-            seventsString = []
-            seventsType = []
-            seventsValue = []
+            seventsString:list[str] = []
+            seventsType:list[int] = []
+            seventsValue:list[float] = []
             for sev in sevents:
                 sorted_pos = sev[1]
                 seventsString.append(self.qmc.specialeventsStrings[sorted_pos])
@@ -23726,10 +23695,10 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             return timeindex[2]
         return -1
 
-    def thisAUC(self, idx:int,timex:list[float],temp:list[float],mode:str) -> float:
+    def thisAUC(self, idx:int,timex:list[float], temp:list[float], mode:str) -> float:
         if self.qmc.AUCbaseFlag:
             # we take the base temperature from the BT at st
-            if len(temp)>idx and temp[idx] is not None and temp[idx]!=-1:
+            if len(temp)>idx and temp[idx]!=-1:
                 tbase = temp[idx]
             else:
                 # no proper base temperature available, return AUC=0
@@ -23761,7 +23730,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
     #  temp2: if temp2 is given, then the area between temp1 and temp2 is calculated, assuming temp1>temp2, and the base is ignored
     # result is in C*seconds
     def calcAUC(self, base:float, timex:list[float], temp:list[float], i:int = -1, temp2:list[float]|None = None) -> float:
-        if len(timex) > 1 and len(temp) > 1 and (i == -1 or (0 < i < min(len(timex),len(temp)))) and temp[i] is not None and temp[i] != -1 and temp[i-1] is not None and temp[i-1] != -1:
+        if len(timex) > 1 and len(temp) > 1 and (i == -1 or (0 < i < min(len(timex),len(temp)))) and temp[i] != -1 and temp[i-1] != -1:
             # at least two readings available
             dt = timex[i] - timex[i-1]
             t1 = convertTemp(temp[i],self.qmc.mode,'C')
@@ -23894,26 +23863,20 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
     def viewErrorLog(self, _:bool = False) -> None:
         if self.error_dlg is None:
             self.error_dlg = errorDlg(self,self)
-            if self.error_dlg is not None:
-                self.error_dlg.setModal(False)
-                self.error_dlg.show()
-        if self.error_dlg is not None:
-            self.error_dlg.raise_()
-            self.error_dlg.activateWindow()
-#            QApplication.processEvents()
+            self.error_dlg.setModal(False)
+            self.error_dlg.show()
+        self.error_dlg.raise_()
+        self.error_dlg.activateWindow()
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def viewSerialLog(self, _:bool = False) -> None:
         if self.serial_dlg is None:
             self.serial_dlg = serialLogDlg(self,self)
-            if self.serial_dlg is not None:
-                self.serial_dlg.setModal(False)
-                self.serial_dlg.show()
-        if self.serial_dlg is not None:
-            self.serial_dlg.raise_()
-            self.serial_dlg.activateWindow()
-#            QApplication.processEvents()
+            self.serial_dlg.setModal(False)
+            self.serial_dlg.show()
+        self.serial_dlg.raise_()
+        self.serial_dlg.activateWindow()
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -23923,44 +23886,40 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         platformDLG.setModal(False)
         platformDLG.show()
         platformDLG.activateWindow()
-#        QApplication.processEvents()
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def viewMessageLog(self, _:bool = False) -> None:
         if self.message_dlg is None:
             self.message_dlg = messageDlg(self, self)
-            if self.message_dlg is not None:
-                self.message_dlg.setModal(False)
-                self.message_dlg.show()
-        if self.message_dlg is not None:
-            self.message_dlg.raise_()
-            self.message_dlg.activateWindow()
-#            QApplication.processEvents()
+            self.message_dlg.setModal(False)
+            self.message_dlg.show()
+        self.message_dlg.raise_()
+        self.message_dlg.activateWindow()
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def helpAbout(self, _:bool = False) -> None:
         # pylint: disable=consider-using-f-string
-        coredevelopers = '<br>Rafael Cobo, Marko Luther &amp; Dave Baxter'
+        coredevelopers:str = '<br>Rafael Cobo, Marko Luther &amp; Dave Baxter'
         box = QMessageBox(self)
 
         #create a html QString
         from scipy import __version__ as SCIPY_VERSION_STR # type #  ignore # @UnresolvedImport
         from pymodbus import __version__ as PYMODBUS_VERSION_STR
-        build = ''
-        if __build__ != '0':
+        build:str = ''
+        if __build__ != '0': # pyright:ignore[reportUnnecessaryComparison]
             build = ' build ' + __build__
-        name = (application_viewer_name if self.app.artisanviewerMode else application_name)
-        otherlibs = ''
+        name:str = (application_viewer_name if self.app.artisanviewerMode else application_name)
+        otherlibs:str = ''
         try:
-            from Phidget22.Phidget import Phidget as PhidgetDriver # type: ignore
+            from Phidget22.Phidget import Phidget as PhidgetDriver # type: ignore[import-untyped]
             phidgetlibversion = PhidgetDriver.getLibraryVersion()
             otherlibs += ', ' + phidgetlibversion
         except Exception as e: # pylint: disable=broad-except
             _log.debug(e)
         try:
-            from Phidget22 import __version__ as phidget_lib_version # type: ignore # @UnresolvedImport
+            from Phidget22 import __version__ as phidget_lib_version # type: ignore[import-untyped] # @UnresolvedImport
             otherlibs += f' ({phidget_lib_version})'
         except Exception: # pylint: disable=broad-except
             pass
@@ -23980,10 +23939,10 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                 <p><b>{12}</b><br><small>{13}</small></p>
                 """.format( # noqa: UP030
                 name,
-                str(__version__),
+                __version__,
                 (f' ({str(__revision__)})' if str(__revision__) != '' else ''),
                 platform.python_version(),
-                qVersion(),
+                qVersion,
                 PYQT_VERSION_STR,
                 mpl.__version__,
                 numpy.__version__,
@@ -23994,7 +23953,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                 QApplication.translate('About', 'License'),
                 '<a href="http://www.gnu.org/copyleft/gpl.html">GNU Public Licence (GPLv3.0)</a>',
                 build,
-                otherlibs,
+                otherlibs, # pyright:ignore[reportUnknownArgumentType]
                 '<a href="https://artisan-scope.org">https://artisan-scope.org</a>'))
 
     @pyqtSlot()
@@ -24137,9 +24096,9 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
 
             for i in range(self.modbus.channels):
                 try:
-                    inputSlaveEdit = dialog.modbus_inputDeviceEdits[i]
-                    if inputSlaveEdit is not None:
-                        self.modbus.inputDeviceIds[i] = toInt(inputSlaveEdit.text())
+                    inputDeviceEdit = dialog.modbus_inputDeviceEdits[i]
+                    if inputDeviceEdit is not None:
+                        self.modbus.inputDeviceIds[i] = toInt(inputDeviceEdit.text())
                 except Exception: # pylint: disable=broad-except
                     self.modbus.inputDeviceIds[i] = 0
                 try:
@@ -24724,10 +24683,9 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         if b and self.schedule_window is None:
             if  not self.app.artisanviewerMode:  # no scheduler in ArtisanViewer mode
                 self.schedule_window = plus.schedule.ScheduleWindow(self, self, self.schedule_activeTab)
-                if self.schedule_window is not None:
-                    self.scheduleFlag = True
-                    self.scheduleAction.setChecked(True)
-                    self.schedule_window.show()
+                self.scheduleFlag = True
+                self.scheduleAction.setChecked(True)
+                self.schedule_window.show()
         elif self.schedule_window is not None:
             self.schedule_window.close()
             self.schedule_window = None
@@ -24737,11 +24695,10 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
     def largeLCDs(self, _:bool = False) -> None:
         if self.largeLCDs_dialog is None:
             self.largeLCDs_dialog = LargeMainLCDs(self,self)
-            if self.largeLCDs_dialog is not None:
-                self.largeLCDs_dialog.setModal(False)
-                self.LargeLCDsFlag = True
-                self.lcdsAction.setChecked(True)
-                self.largeLCDs_dialog.show()
+            self.largeLCDs_dialog.setModal(False)
+            self.LargeLCDsFlag = True
+            self.lcdsAction.setChecked(True)
+            self.largeLCDs_dialog.show()
         else:
             self.largeLCDs_dialog.close()
             self.largeLCDs_dialog = None
@@ -24751,11 +24708,10 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
     def largeDeltaLCDs(self, _:bool = False) -> None:
         if self.largeDeltaLCDs_dialog is None:
             self.largeDeltaLCDs_dialog = LargeDeltaLCDs(self,self)
-            if self.largeDeltaLCDs_dialog is not None:
-                self.largeDeltaLCDs_dialog.setModal(False)
-                self.LargeDeltaLCDsFlag = True
-                self.deltalcdsAction.setChecked(True)
-                self.largeDeltaLCDs_dialog.show()
+            self.largeDeltaLCDs_dialog.setModal(False)
+            self.LargeDeltaLCDsFlag = True
+            self.deltalcdsAction.setChecked(True)
+            self.largeDeltaLCDs_dialog.show()
         else:
             self.largeDeltaLCDs_dialog.close()
             self.largeDeltaLCDs_dialog = None
@@ -24765,11 +24721,10 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
     def largePIDLCDs(self, _:bool = False) -> None:
         if self.largePIDLCDs_dialog is None:
             self.largePIDLCDs_dialog = LargePIDLCDs(self,self)
-            if self.largePIDLCDs_dialog is not None:
-                self.largePIDLCDs_dialog.setModal(False)
-                self.LargePIDLCDsFlag = True
-                self.pidlcdsAction.setChecked(True)
-                self.largePIDLCDs_dialog.show()
+            self.largePIDLCDs_dialog.setModal(False)
+            self.LargePIDLCDsFlag = True
+            self.pidlcdsAction.setChecked(True)
+            self.largePIDLCDs_dialog.show()
         else:
             self.largePIDLCDs_dialog.close()
             self.largePIDLCDs_dialog = None
@@ -24779,11 +24734,10 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
     def largeScaleLCDs(self, _:bool = False) -> None:
         if self.largeScaleLCDs_dialog is None:
             self.largeScaleLCDs_dialog = LargeScaleLCDs(self,self)
-            if self.largeScaleLCDs_dialog is not None:
-                self.largeScaleLCDs_dialog.setModal(False)
-                self.LargeScaleLCDsFlag = True
-                self.scalelcdsAction.setChecked(True)
-                self.largeScaleLCDs_dialog.show()
+            self.largeScaleLCDs_dialog.setModal(False)
+            self.LargeScaleLCDsFlag = True
+            self.scalelcdsAction.setChecked(True)
+            self.largeScaleLCDs_dialog.show()
         else:
             self.largeScaleLCDs_dialog.close()
             self.largeScaleLCDs_dialog = None
@@ -24793,11 +24747,10 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
     def largeExtraLCDs(self, _:bool = False) -> None:
         if self.largeExtraLCDs_dialog is None:
             self.largeExtraLCDs_dialog = LargeExtraLCDs(self,self)
-            if self.largeExtraLCDs_dialog is not None:
-                self.largeExtraLCDs_dialog.setModal(False)
-                self.LargeExtraLCDsFlag = True
-                self.extralcdsAction.setChecked(True)
-                self.largeExtraLCDs_dialog.show()
+            self.largeExtraLCDs_dialog.setModal(False)
+            self.LargeExtraLCDsFlag = True
+            self.extralcdsAction.setChecked(True)
+            self.largeExtraLCDs_dialog.show()
         else:
             self.largeExtraLCDs_dialog.close()
             self.largeExtraLCDs_dialog = None
@@ -24807,12 +24760,11 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
     def largePhasesLCDs(self, _:bool = False) -> None:
         if self.largePhasesLCDs_dialog is None:
             self.largePhasesLCDs_dialog = LargePhasesLCDs(self,self)
-            if self.largePhasesLCDs_dialog is not None:
-                self.largePhasesLCDs_dialog.setModal(False)
-                self.LargePhasesLCDsFlag = True
-                self.phaseslcdsAction.setChecked(True)
-                self.updatePhasesLCDs()
-                self.largePhasesLCDs_dialog.show()
+            self.largePhasesLCDs_dialog.setModal(False)
+            self.LargePhasesLCDsFlag = True
+            self.phaseslcdsAction.setChecked(True)
+            self.updatePhasesLCDs()
+            self.largePhasesLCDs_dialog.show()
         else:
             self.largePhasesLCDs_dialog.close()
             self.largePhasesLCDs_dialog = None
@@ -25599,11 +25551,11 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         from artisanlib.roastlog import extractProfileRoastLog
         self.importExternalURL(extractProfileRoastLog,QApplication.translate('Message','Import RoastLog URL'))
 
-    @pyqtSlot()
-    @pyqtSlot(bool)
-    def importRoastPATH(self, _:bool = False) -> None:
-        from artisanlib.roastpath import extractProfileRoastPathHTML
-        self.importExternalURL(extractProfileRoastPathHTML,QApplication.translate('Message','Import RoastPATH URL'))
+#    @pyqtSlot()
+#    @pyqtSlot(bool)
+#    def importRoastPATH(self, _:bool = False) -> None:
+#        from artisanlib.roastpath import extractProfileRoastPathHTML
+#        self.importExternalURL(extractProfileRoastPathHTML,QApplication.translate('Message','Import RoastPATH URL'))
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -25682,8 +25634,8 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                     unit:str|None = None
                     #read data
                     for row in data:
-                        items = list(zip(fields, row, strict=True)) # ty:ignore
-                        item = {}
+                        items:list[tuple[str,str]] = list(zip(fields, row, strict=True)) # ty:ignore
+                        item:dict[str,str] = {}
                         for (name, value) in items:
                             item[name] = value.strip()
                         #set temperature mode
@@ -25786,7 +25738,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             fileext = '.png'
             if filetype == 'JPEG':
                 fileext = '.jpg'
-            if fname == '' or fname is None:
+            if fname == '':
                 filename = self.ArtisanSaveFileDialog(msg=QApplication.translate('Message','Save Graph as') + ' ' + filetype,ext='*'+fileext)
             else:
                 filename = fname
@@ -25831,7 +25783,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                 self.qmc.fig.savefig(filename,
                         dpi=fig_dpi,
                         backend='agg',
-                        transparent=(self.qmc.palette['canvas'] is None or self.qmc.palette['canvas']=='None'),
+                        transparent=self.qmc.palette['canvas']=='None',
                         #bbox_inches='tight',
                         #backend='pgf', # slow and fails on # characters in TeX backend
                         facecolor=str(self.qmc.palette['canvas']),
@@ -25857,7 +25809,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
 
     def saveVectorGraph(self,extension:str = '*.pdf',fname:str = '') -> None:
         try:
-            if fname == '' or fname is None:
+            if fname == '':
                 if extension == '*.pdf':
                     filename = self.ArtisanSaveFileDialog(msg=QApplication.translate('Message','Save Graph as PDF'),ext=extension)
                 else:
@@ -25891,7 +25843,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                         metadata['Source'] = Path(self.curFile).name
 
                 self.qmc.fig.savefig(filename,
-                        transparent=(self.qmc.palette['canvas'] is None or self.qmc.palette['canvas']=='None'),
+                        transparent=self.qmc.palette['canvas']=='None',
                         #bbox_inches='tight',
                         #backend='pgf', # slow and fails on # characters in TeX backend
                         facecolor=str(self.qmc.palette['canvas']),
@@ -25936,7 +25888,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         return wheel
 
     def loadWheel(self, filename:str) -> None:
-        f = None
+        f:QFile|None = None
         try:
             f = QFile(filename)
             if not f.open(QIODevice.OpenModeFlag.ReadOnly):
@@ -25985,7 +25937,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' loadWheel() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             return
         finally:
-            if f:
+            if f is not None:
                 f.close()
 
     def standardButtonsVisibility(self) -> None:
@@ -26398,7 +26350,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         return tree
 
     def backuppaletteeventbuttons(self, pal:list['Palette'], maxlen:list[int]) -> None:
-        palette = {}
+        palette:dict[str,str|list[int]] = {}
         #convert labels to unicode
         for i, pa in enumerate(pal):
             k = str(i)
@@ -26408,7 +26360,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             filename = self.ArtisanSaveFileDialog(msg=QApplication.translate('Message','Save Palettes'),ext='*.apal')
             if filename:
                 #write
-                serialize(filename,palette)
+                serialize(filename, palette)
                 self.sendmessage(QApplication.translate('Message','Palettes saved'))
         except OSError as ex:
             self.qmc.adderror((QApplication.translate('Error Message','IO Error:') + ' backuppaletteeventbuttons(): {0}').format(str(ex)))
@@ -26638,7 +26590,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         analysis_endtime=0.
         resultstr=''
         # curve fit results
-        cfr = {} #use dict to allow more flexible expansion
+        cfr:dict[str,str] = {} #use dict to allow more flexible expansion
 
         # exp == 0 -> ln(), 1 -> unused, 2 -> quadratic, 3 -> cubic, 4 -> bkgnd, -1 -> all of 0,2,and 3
         #check for any roast data
@@ -26763,7 +26715,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                     return x
                 return '--' if numpy.isnan(x) else f'{x:.2f}'
 
-            res = {}
+            res:dict[str,str] = {}
 
             # background
             if exp == 4:
@@ -26892,7 +26844,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             _log.exception(ex)
             return False, {}
 
-    def analysisShowResults(self, cfr:dict[str,Any], resultstr:str, curvefit_starttime:float = 0,
+    def analysisShowResults(self, cfr:dict[str,str], resultstr:str, curvefit_starttime:float = 0,
             curvefit_endtime:float = 0, analysis_starttime:float = 0, analysis_endtime:float = 0) -> None:
         if self.qmc.ax is None:
             return
@@ -26974,12 +26926,9 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                         _log.error(e)
 
                 if self.segmentresultsanno is not None:
-                    try:
-                        self.segmentresultsanno.set_in_layout(False) # remove from tight_layout calculation
-                        self.segmentresultsanno.draggable(use_blit=True)
-                        self.segmentresultsanno.set_picker(self.draggable_text_box_picker)
-                    except Exception: # pylint: disable=broad-except # set_in_layout not available in mpl<3.x
-                        pass
+                    self.segmentresultsanno.set_in_layout(False) # remove from tight_layout calculation
+                    self.segmentresultsanno.draggable(use_blit=True)
+                    self.segmentresultsanno.set_picker(self.draggable_text_box_picker)
 
             # create the analysis results annotation box
             a = self.qmc.alpha['statsanalysisbkgnd']
@@ -27012,12 +26961,9 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                     _log.error(ex)
 
             if self.analysisresultsanno is not None:
-                try:
-                    self.analysisresultsanno.set_in_layout(False) # remove from tight_layout calculation
-                    self.analysisresultsanno.draggable(use_blit=True)
-                    self.analysisresultsanno.set_picker(self.draggable_text_box_picker)
-                except Exception: # pylint: disable=broad-except # set_in_layout not available in mpl<3.x
-                    pass
+                self.analysisresultsanno.set_in_layout(False) # remove from tight_layout calculation
+                self.analysisresultsanno.draggable(use_blit=True)
+                self.analysisresultsanno.set_picker(self.draggable_text_box_picker)
             self.qmc.analyzer_connect_id = self.qmc.fig.canvas.mpl_connect('button_release_event', self.qmc.onrelease)
             self.qmc.fig.canvas.draw()
 
@@ -27149,7 +27095,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             background = (self.qmc.backgroundpath if self.qmc.background else None)
             self.establish_phasescanvas()
             if self.qmc.reset():
-                filenames = []
+                filenames:list[str] = []
                 if foreground is not None and foreground.strip() != '':
                     filenames.append(foreground)
                 if background is not None and background.strip() != '':
@@ -27165,9 +27111,8 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                         _log.exception(e)
                     from artisanlib.comparator import roastCompareDlg
                     self.comparator = roastCompareDlg(self,self,foreground,background)
-                    if self.comparator is not None:
-                        self.comparator.addProfiles(filenames)
-                        self.comparator.show()
+                    self.comparator.addProfiles(filenames)
+                    self.comparator.show()
             self.roastCompareAction.setChecked(bool(self.comparator))
 
     @pyqtSlot()
@@ -27282,7 +27227,7 @@ def excepthook(excType:type, excValue:BaseException, tracebackobj:'TracebackType
         for k, value in frame.f_locals.items():
             variables += f'\t{k:>20}'
             try:
-                s = str(value)
+                s = str(value) # pyright:ignore[reportUnknownArgumentType]
             except Exception: # pylint: disable=broad-except
                 s = '<???>'
             variables += f'{s}\n'
@@ -27323,8 +27268,8 @@ sys.excepthook = excepthook
 # the following avoids the "No document could be created" dialog and the Console message
 # "The Artisan Profile type doesn't map to any NSDocumentClass." on startup (since pyobjc-core 3.1.1)
 if sys.platform.startswith('darwin'):
-    from Cocoa import NSDocument # type: ignore # @UnresolvedImport # pylint: disable=import-error,no-name-in-module
-    class Document(NSDocument): # type: ignore # pylint: disable= too-few-public-methods
+    from Cocoa import NSDocument # type: ignore[import-untyped] # @UnresolvedImport # pylint: disable=import-error,no-name-in-module
+    class Document(NSDocument): # type: ignore[misc,no-any-unimported] # pylint: disable= too-few-public-methods
 #        def windowNibName(self):
 #            return None #"Document"
         def makeWindowControllers(self) -> None:
@@ -27345,6 +27290,7 @@ def qt_message_handler(mode:QtMsgType, context:'QMessageLogContext', message:str
         context.line, context.function, context.file, mode_str, message)
 
 def initialize_locale(my_app:Artisan) -> str:
+    locale:str
     if QSettings().contains('resetqsettings') and not toInt(QSettings().value('resetqsettings')):
         locale = toString(QSettings().value('locale'))
         if locale in {'en_US', 'None'}:
@@ -27394,21 +27340,21 @@ def initialize_locale(my_app:Artisan) -> str:
         'zh_TW',
     ]
 
-    if len(locale) == 0:
+    if locale == '':
         if platform.system() == 'Darwin':
             from Cocoa import NSUserDefaults # type:ignore[import-not-found,unused-ignore]  # @UnresolvedImport # pylint: disable=import-error,no-name-in-module
             defs = NSUserDefaults.standardUserDefaults()
-            langs = defs.objectForKey_('AppleLanguages')
-            if langs.objectAtIndex_(0)[:7] == 'zh_Hans':
+            langs = defs.objectForKey_('AppleLanguages') # pyright:ignore[reportUnknownArgumentType]
+            if langs.objectAtIndex_(0)[:7] == 'zh_Hans': # pyright:ignore[reportUnknownArgumentType]
                 locale = 'zh_CN'
-            elif langs.objectAtIndex_(0)[:7] == 'zh_Hant':
+            elif langs.objectAtIndex_(0)[:7] == 'zh_Hant': # pyright:ignore[reportUnknownArgumentType]
                 locale = 'zh_TW'
-            elif len(langs.objectAtIndex_(0))>4 and langs.objectAtIndex_(0)[:3] in {'zh_', 'pt_'}:
-                locale = langs.objectAtIndex_(0)[:5]
+            elif len(langs.objectAtIndex_(0))>4 and langs.objectAtIndex_(0)[:3] in {'zh_', 'pt_'}: # pyright:ignore[reportUnknownArgumentType]
+                locale = str(langs.objectAtIndex_(0)[:5]) # pyright:ignore[reportUnknownArgumentType]
             else:
-                locale = langs.objectAtIndex_(0)[:2]
+                locale = str(langs.objectAtIndex_(0)[:2]) # pyright:ignore[reportUnknownArgumentType]
         else:
-            lname = QLocale.system().name()
+            lname:str = str(QLocale.system().name())
             if lname[:7] == 'zh_Hans':
                 locale = 'zh_CN'
             elif lname[:7] == 'zh_Hant':
@@ -27422,15 +27368,12 @@ def initialize_locale(my_app:Artisan) -> str:
         if locale in supported_languages:
             QSettings().setValue('locale', locale)
 
-    if locale is None or len(locale) == 0 or locale == 'None':
+    if locale in {'', 'None'}:
         locale = 'en'
 
     #load Qt default translations from QLibrary
     try:
-        try:
-            qt_trans_path = QLibraryInfo.path(QLibraryInfo.LibraryPath.TranslationsPath)
-        except Exception: # pylint: disable=broad-except
-            qt_trans_path = QLibraryInfo.location(QLibraryInfo.TranslationsPath) # type: ignore
+        qt_trans_path:str = QLibraryInfo.path(QLibraryInfo.LibraryPath.TranslationsPath)
 
         trans_paths:list[str] = []
         # add the translations path for binary installations
@@ -27446,9 +27389,10 @@ def initialize_locale(my_app:Artisan) -> str:
             # each QTranslator can only hold one file
             qtTranslator:QTranslator = QTranslator(my_app)
             qt_qm_file:str = f'{qt_trans_module}_{locale}'
-            for trans_path in [qt_trans_path] + trans_paths: # start with the default PyQt/Qt translations location
+            trans_path_list:list[str] = [qt_trans_path] + trans_paths
+            for trans_path in trans_path_list: # start with the default PyQt/Qt translations location
                 if qtTranslator.load(qt_qm_file, trans_path):
-                    _log.info('loading qt translations %s from %s', qt_qm_file, trans_path)
+                    _log.info('loading qt translations %s from %s', str(qt_qm_file), str(trans_path))
                     break
             my_app.installTranslator(qtTranslator)
 

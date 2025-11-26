@@ -24,7 +24,7 @@ import aiohttp_jinja2
 from contextlib import suppress
 from aiohttp import web, WSCloseCode, WSMsgType
 from threading import Thread
-from typing import Final, TYPE_CHECKING
+from typing import override, Final, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from aiohttp.web import Request  # pylint: disable=unused-import
@@ -191,6 +191,7 @@ class WebLCDs(WebView):
         self._showbtflag:bool = showbtflag
 
     @aiohttp_jinja2.template('artisan.tpl')
+    @override
     async def index(self, _request: 'Request') -> dict[str,str]:
         showspace_str = 'inline' if not (self._showbtflag and self._showetflag) else 'none'
         showbt_str = 'inline' if self._showbtflag else 'none'
@@ -209,10 +210,12 @@ class WebLCDs(WebView):
             'showspace': showspace_str
         }
 
+    @override
     def startWeb(self) -> bool:
         _log.info('start WebLCDs on port %s', self._port)
         return super().startWeb()
 
+    @override
     def stopWeb(self) -> None:
         _log.info('stop WebLCDs')
         super().stopWeb()
@@ -232,6 +235,7 @@ class WebGreen(WebView):
         self._min_send_interval = 0 # send all updates
 
     @aiohttp_jinja2.template(template_name) # pyrefly: ignore
+    @override
     async def index(self, _request: 'Request') -> dict[str,str]:
         return {
             'window_title': self._title,
@@ -241,10 +245,12 @@ class WebGreen(WebView):
     def indexPath(self) -> str:
         return self.index_path
 
+    @override
     def startWeb(self) -> bool:
         _log.info('start WebGreen on port %s', self._port)
         return super().startWeb()
 
+    @override
     def stopWeb(self) -> None:
         _log.info('stop WebGreen')
         super().stopWeb()
@@ -264,6 +270,7 @@ class WebRoasted(WebView):
         self._min_send_interval = 0 # send all updates
 
     @aiohttp_jinja2.template(template_name) # pyrefly: ignore
+    @override
     async def index(self, _request: 'Request') -> dict[str,str]:
         return {
             'window_title': self._title,
@@ -273,10 +280,12 @@ class WebRoasted(WebView):
     def indexPath(self) -> str:
         return self.index_path
 
+    @override
     def startWeb(self) -> bool:
         _log.info('start WebRoasted on port %s', self._port)
         return super().startWeb()
 
+    @override
     def stopWeb(self) -> None:
         _log.info('stop WebRoasted')
         super().stopWeb()

@@ -74,8 +74,8 @@ class Simulator:
         else:
             self.extraDelta1 = [False]*len(self.extratimex)
             self.extraDelta2 = [False]*len(self.extratimex)
-        self.extraNoneTempHint1 = (profile.get('extraNoneTempHint1', []) if profile is not None else [])
-        self.extraNoneTempHint2 = (profile.get('extraNoneTempHint2', []) if profile is not None else [])
+        self.extraNoneTempHint1:list[bool] = (profile.get('extraNoneTempHint1', []) if profile is not None else [])
+        self.extraNoneTempHint2:list[bool] = (profile.get('extraNoneTempHint2', []) if profile is not None else [])
 
         # convert temperature unit if needed
         m = profile['mode'] if profile is not None and 'mode' in profile else mode

@@ -18,7 +18,6 @@
 import time
 import sys
 import logging
-from collections.abc import Iterator
 from typing import Final, TYPE_CHECKING, no_type_check
 
 if TYPE_CHECKING:
@@ -29,7 +28,7 @@ from snap7.type import Area # type:ignore[import-not-found, unused-ignore]
 from snap7.util.getters import get_bool, get_int, get_real
 from snap7.util.setters import set_bool, set_int, set_real
 
-import artisanlib.util
+from artisanlib.util import isOpen, max_blocks, min_blocks
 
 from PyQt6.QtCore import QSemaphore
 from PyQt6.QtWidgets import QApplication
@@ -41,9 +40,11 @@ _log: Final[logging.Logger] = logging.getLogger(__name__)
 class s7port:
 
     __slots__ = [ 'aw', 'readRetries', 'channels', 'default_host', 'host', 'port', 'rack', 'slot', 'lastReadResult', 'area', 'db_nr', 'start', 'type', 'mode',
-        'div', 'optimizer', 'fetch_max_blocks', 'fail_on_cache_miss', 'activeRegisters', 'readingsCache', 'PID_area', 'PID_db_nr', 'PID_SV_register', 'PID_p_register',
+        'div', 'optimizer', 'fetch_max_blocks', 'fail_on_cache_miss', 'activeRegisterSequences', 'readingsCache', 'PID_area', 'PID_db_nr', 'PID_SV_register', 'PID_p_register',
         'PID_i_register', 'PID_d_register', 'PID_ON_action', 'PID_OFF_action', 'PIDmultiplier', 'SVtype', 'SVmultiplier', 'COMsemaphore',
         'areas', 'last_request_timestamp', 'min_time_between_requests', 'is_connected', 'plc', 'commError' ]
+
+    MAX_REGISTER_SEGMENT:int = 100 # maximal length of registers fetched at once if fetch_max_blocks is set
 
     def __init__(self, aw:'ApplicationWindow') -> None:
         self.aw = aw
@@ -76,8 +77,8 @@ class s7port:
         # for optimized read of full register segments with single requests
         # this dict is re-computed on each connect() by a call to updateActiveRegisters()
         # NOTE: for registers of type float (32bit = 2x16bit) also the succeeding register is registered here
-        # S7 area => db_nr => [registers]
-        self.activeRegisters:dict[int, dict[int, list[int]]] = {}
+        # S7 area => db_nr => [(start_register,end_register),..,(start_register,end_register)]
+        self.activeRegisterSequences:dict[int, dict[int, list[tuple[int,int]]]] = {} # associates to each S7 area and db_nr a list of start-end-register tuples to be fetched
 
         # the readings cache that is filled by requesting sequences of values in blocks
         # readingsCache is a dict associating area to dicts associating db numbers to dicts associating registers to readings
@@ -215,7 +216,7 @@ class s7port:
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
             time.sleep(0.2)
-            if artisanlib.util.isOpen(self.host,self.port):
+            if isOpen(self.host,self.port):
                 try:
                     assert self.plc is not None
                     self.plc.connect(self.host,self.rack,self.slot,self.port)
@@ -261,7 +262,7 @@ class s7port:
     # S7 area => db_nr => [registers]
     def updateActiveRegisters(self) -> None:
         _log.debug('updateActiveRegisters()')
-        self.activeRegisters = {}
+        activeRegisters:dict[int, dict[int, list[int]]] = {}
         for c in range(self.channels):
             area = self.area[c]-1
             if area != -1:
@@ -274,12 +275,28 @@ class s7port:
                     registers.append(register+3)
                 elif self.type[c] == 0: # INT
                     registers.append(register+1)
-                if area not in self.activeRegisters:
-                    self.activeRegisters[area] = {}
-                if db_nr in self.activeRegisters[area]:
-                    self.activeRegisters[area][db_nr].extend(registers)
+                if area not in activeRegisters:
+                    activeRegisters[area] = {}
+                if db_nr in activeRegisters[area]:
+                    activeRegisters[area][db_nr].extend(registers)
                 else:
-                    self.activeRegisters[area][db_nr] = registers
+                    activeRegisters[area][db_nr] = registers
+        # now take the activeRegisters and compute the sequences to fetch
+        self.activeRegisterSequences = {}
+        for area, db_numbers in activeRegisters.items():
+            for db_nr, registers in db_numbers.items():
+                sequences:list[tuple[int, int]] = (max_blocks(registers, max_register_segment=s7port.MAX_REGISTER_SEGMENT) if self.fetch_max_blocks else min_blocks(registers))
+#                sorted_registers:list[int] = sorted(registers)
+#                if self.fetch_max_blocks:
+#                    sequences = [(sorted_registers[0],sorted_registers[-1])]
+#                else:
+#                    # split in successive sequences
+#                    gaps:list[list[int]] = [[s, e] for s, e in zip(sorted_registers, sorted_registers[1:], strict=False) if s+1 < e]
+#                    edges:Iterator[int] = iter(sorted_registers[:1] + sum(gaps, []) + sorted_registers[-1:])
+#                    sequences = list(zip(edges, edges, strict=True)) # list of pairs of the form (start-register,end-register) # ty:ignore
+                if area not in self.activeRegisterSequences:
+                    self.activeRegisterSequences[area] = {}
+                self.activeRegisterSequences[area][db_nr] = sequences
 
     def clearReadingsCache(self) -> None:
         _log.debug('clearReadingsCache()')
@@ -306,17 +323,8 @@ class s7port:
             self.clearReadingsCache()
             self.connect()
             if self.isConnected():
-                for area, db_numbers in self.activeRegisters.items():
-                    for db_nr, registers in db_numbers.items():
-                        sorted_registers:list[int] = sorted(registers)
-                        sequences:list[tuple[int, int]]
-                        if self.fetch_max_blocks:
-                            sequences = [(sorted_registers[0],sorted_registers[-1])]
-                        else:
-                            # split in successive sequences
-                            gaps:list[list[int]] = [[s, e] for s, e in zip(sorted_registers, sorted_registers[1:], strict=True) if s+1 < e] # ylint: disable=used-before-assignment
-                            edges:Iterator[int] = iter(sorted_registers[:1] + sum(gaps, []) + sorted_registers[-1:])
-                            sequences = list(zip(edges, edges, strict=True)) # list of pairs of the form (start-register,end-register) # ty:ignore
+                for area, db_numbers in self.activeRegisterSequences.items():
+                    for db_nr, sequences in db_numbers.items():
                         for seq in sequences:
                             retry = self.readRetries
                             register = seq[0]
@@ -340,11 +348,10 @@ class s7port:
                                         raise Exception(f'read_area({area},{db_nr},{register},{count})') # pylint: disable=broad-exception-raised
                                 else:
                                     break
-                            if res is not None:
-                                if self.commError: # we clear the previous error and send a message
-                                    self.commError = False
-                                    self.aw.qmc.adderror(QApplication.translate('Error Message','S7 Communication Resumed'))
-                                self.cacheReadings(area,db_nr,register,res)
+                            if self.commError: # we clear the previous error and send a message
+                                self.commError = False
+                                self.aw.qmc.adderror(QApplication.translate('Error Message','S7 Communication Resumed'))
+                            self.cacheReadings(area,db_nr,register,res)
 
                             #note: logged chars should be unicode not binary
                             if self.aw.seriallogflag:
@@ -538,14 +545,13 @@ class s7port:
                             raise Exception('result None') # pylint: disable=broad-exception-raised
                     else:
                         break
-                if res is not None:
-                    if self.commError: # we clear the previous error and send a message
-                        self.commError = False
-                        self.aw.qmc.adderror(QApplication.translate('Error Message','S7 Communication Resumed'))
-                    r = get_real(res,0)
-                    if self.aw.seriallogflag:
-                        self.aw.addserial(f'S7 readFloat({area},{dbnumber},{start},{force}) => {r}')
-                    return r
+                if self.commError: # we clear the previous error and send a message
+                    self.commError = False
+                    self.aw.qmc.adderror(QApplication.translate('Error Message','S7 Communication Resumed'))
+                r = get_real(res,0)
+                if self.aw.seriallogflag:
+                    self.aw.addserial(f'S7 readFloat({area},{dbnumber},{start},{force}) => {r}')
+                return r
             self.commError = True
             self.aw.qmc.adderror(QApplication.translate('Error Message','S7 Error: connecting to PLC failed'))
             return None
@@ -630,14 +636,13 @@ class s7port:
                             raise Exception('result None') # pylint: disable=broad-exception-raised
                     else:
                         break
-                if res is not None:
-                    if self.commError: # we clear the previous error and send a message
-                        self.commError = False
-                        self.aw.qmc.adderror(QApplication.translate('Error Message','S7 Communication Resumed'))
-                    r = get_int(res,0)
-                    if self.aw.seriallogflag:
-                        self.aw.addserial(f'S7 readInt({area},{dbnumber},{start},{force}) => {r}')
-                    return r
+                if self.commError: # we clear the previous error and send a message
+                    self.commError = False
+                    self.aw.qmc.adderror(QApplication.translate('Error Message','S7 Communication Resumed'))
+                r = get_int(res,0)
+                if self.aw.seriallogflag:
+                    self.aw.addserial(f'S7 readInt({area},{dbnumber},{start},{force}) => {r}')
+                return r
             self.commError = True
             self.aw.qmc.adderror(QApplication.translate('Error Message','S7 Error: connecting to PLC failed'))
             return None
@@ -722,14 +727,13 @@ class s7port:
                             raise Exception('result None') # pylint: disable=broad-exception-raised
                     else:
                         break
-                if res is not None:
-                    if self.commError: # we clear the previous error and send a message
-                        self.commError = False
-                        self.aw.qmc.adderror(QApplication.translate('Error Message','S7 Communication Resumed'))
-                    r = get_bool(res,0,index)
-                    if self.aw.seriallogflag:
-                        self.aw.addserial(f'S7 readBool({area},{dbnumber},{start},{index},{force}) => {r}')
-                    return r
+                if self.commError: # we clear the previous error and send a message
+                    self.commError = False
+                    self.aw.qmc.adderror(QApplication.translate('Error Message','S7 Communication Resumed'))
+                r = get_bool(res,0,index)
+                if self.aw.seriallogflag:
+                    self.aw.addserial(f'S7 readBool({area},{dbnumber},{start},{index},{force}) => {r}')
+                return r
             self.commError = True
             self.aw.qmc.adderror(QApplication.translate('Error Message','S7 Error: connecting to PLC failed'))
             return None

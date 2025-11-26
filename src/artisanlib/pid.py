@@ -227,7 +227,7 @@ class PID:
             return False
 
         # Calculate recent rate of change
-        recent_changes = []
+        recent_changes:list[float] = []
         for i in range(1, min(len(self.measurement_history), (self.max_len_measurement_history - 1))):
             change = abs(self.measurement_history[-i] - self.measurement_history[-i - 1])
             recent_changes.append(change)

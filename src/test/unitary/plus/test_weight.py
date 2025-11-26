@@ -305,7 +305,7 @@ with patch('enum.IntEnum', MockIntEnum), patch('enum.unique', mock_unique):
     from plus import weight
 
 # Patch the PROCESS_STATE enum in the weight module
-weight.PROCESS_STATE = MockProcessState # type: ignore
+weight.PROCESS_STATE = MockProcessState   # type:ignore[assignment, misc]
 
 # ============================================================================
 # SESSION-LEVEL ISOLATION FIXTURES

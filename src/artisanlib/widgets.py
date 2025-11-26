@@ -17,7 +17,8 @@
 
 from contextlib import contextmanager
 from collections.abc import Iterator
-from typing import Any, TYPE_CHECKING
+from typing import override, Any, TYPE_CHECKING
+
 from artisanlib.util import stringtoseconds, createGradient
 
 if TYPE_CHECKING:
@@ -27,7 +28,7 @@ if TYPE_CHECKING:
 
 from PyQt6.QtCore import (Qt, pyqtSignal, pyqtSlot, QLine, QEvent,
     QByteArray, QPropertyAnimation, QEasingCurve, QLocale)
-from PyQt6.QtCore import pyqtProperty # type:ignore
+from PyQt6.QtCore import pyqtProperty # type:ignore[attr-defined]
 from PyQt6.QtWidgets import (QApplication, QSplitter, QSplitterHandle, QLabel, QComboBox, QLineEdit, QTextEdit, QDoubleSpinBox, QPushButton,
     QTableWidget, QTableWidgetItem, QSizePolicy, QLCDNumber, QGroupBox, QFrame, QSlider, QStyle, QStyleOptionSlider)
 from PyQt6.QtGui import QPen, QPainter, QFontMetrics, QColor, QCursor, QEnterEvent, QPaintEvent
@@ -47,6 +48,7 @@ class MyQComboBox(QComboBox): # pyrefly:ignore[invalid-inheritance] # pylint: di
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
 
+    @override
     def wheelEvent(self, e:'QWheelEvent|None') -> None:
         if self.hasFocus():
             super().wheelEvent(e)
@@ -69,6 +71,7 @@ class MyQDoubleSpinBox(QDoubleSpinBox): # pyrefly:ignore[invalid-inheritance] # 
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.setLocale(QLocale('C'))
 
+    @override
     def wheelEvent(self, e:'QWheelEvent|None') -> None:
         if self.hasFocus():
             super().wheelEvent(e)
@@ -78,6 +81,7 @@ class MyQDoubleSpinBox(QDoubleSpinBox): # pyrefly:ignore[invalid-inheritance] # 
     # which had the effect that a double click an DoubleSpinBox arrow in the Cup Profile dialog
     # leads to a non-terminating sequence of setvalue() calls until the end of the spinner is reached.
     # Note: a triple click still has this effect
+    @override
     def mouseDoubleClickEvent(self, a0:'QMouseEvent|None') -> None:
         super().mouseReleaseEvent(a0)
         super().mouseDoubleClickEvent(a0)
@@ -90,12 +94,14 @@ class MyQTableWidget(QTableWidget): # pyrefly:ignore[invalid-inheritance] # pyri
         self.cursor_navigation:bool = True
 
     #keyboard presses. There must not be widgets (pushbuttons, comboboxes, etc) in focus in order to work
+    @override
     def keyPressEvent(self, e: 'QKeyEvent|None') -> None:
         if e is not None and e.key() == Qt.Key.Key_Tab and self.cursor_navigation:
             self.cursor_navigation = False
             self.setCurrentCell(max(-1,self.currentRow()-1), 0)
         super().keyPressEvent(e)
 
+    @override
     def eventFilter(self, object:'QObject|None', event:'QEvent|None') -> bool: # pylint: disable=redefined-builtin # noqa: A002 # Function argument `object` is shadowing a Python builtin
         # pylint: disable=c-extension-no-member
         try:
@@ -126,6 +132,7 @@ class MyTableWidgetItemQLineEdit(QTableWidgetItem): # pyrefly:ignore[invalid-inh
         self.sortKey = sortKey
 
     #Qt uses a simple < check for sorting items, override this to use the sortKey
+    @override
     def __lt__(self, other:'MyTableWidgetItemQLineEdit') -> bool: # type: ignore[override]
         a = self.sortKey.text()
         b = other.sortKey.text()
@@ -147,6 +154,7 @@ class MyTableWidgetItemQTime(QTableWidgetItem): # pyrefly:ignore[invalid-inherit
         self.sortKey = sortKey
 
     #Qt uses a simple < check for sorting items, override this to use the sortKey
+    @override
     def __lt__(self, other:'MyTableWidgetItemQTime') -> bool: # type: ignore[override]
         a = self.sortKey.time().minute() * 60 + self.sortKey.time().second()
         b = other.sortKey.time().minute() * 60 + other.sortKey.time().second()
@@ -159,6 +167,7 @@ class MyTableWidgetItemNumber(QTableWidgetItem): # pyrefly:ignore[invalid-inheri
         self.sortKey = sortKey
 
     #Qt uses a simple < check for sorting items, override this to use the sortKey
+    @override
     def __lt__(self, other:'MyTableWidgetItemNumber') -> bool: # type: ignore[override]
         return self.sortKey < other.sortKey
 
@@ -170,7 +179,8 @@ class MyTableWidgetItemQCheckBox(QTableWidgetItem): # pyrefly:ignore[invalid-inh
         self.sortKey = sortKey
 
     #Qt uses a simple < check for sorting items, override this to use the sortKey
-    def __lt__(self, other:'MyTableWidgetItemQCheckBox') -> bool: # type: ignore[override]
+    @override
+    def __lt__(self, other:'MyTableWidgetItemQCheckBox') -> bool:  # type: ignore[override]
         return self.sortKey.isChecked() < other.sortKey.isChecked()
 
 class MyTableWidgetItemQComboBox(QTableWidgetItem): # pyrefly:ignore[invalid-inheritance] # pylint: disable= too-few-public-methods  # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
@@ -181,6 +191,7 @@ class MyTableWidgetItemQComboBox(QTableWidgetItem): # pyrefly:ignore[invalid-inh
         self.sortKey = sortKey
 
     #Qt uses a simple < check for sorting items, override this to use the sortKey
+    @override
     def __lt__(self, other:'MyTableWidgetItemQComboBox') -> bool: # type: ignore[override]
         return str(self.sortKey.currentText()) < str(other.sortKey.currentText())
 
@@ -190,6 +201,7 @@ class SliderUnclickable(QSlider): # pyrefly:ignore[invalid-inheritance] # pyrigh
     focus_in = pyqtSignal()
     focus_out = pyqtSignal()
 
+    @override
     def mousePressEvent(self, ev:'QMouseEvent|None') -> None:
         opt = QStyleOptionSlider()
         self.initStyleOption(opt)
@@ -200,11 +212,13 @@ class SliderUnclickable(QSlider): # pyrefly:ignore[invalid-inheritance] # pyrigh
             if pressedControl is not QStyle.SubControl.SC_None:
                 super().mousePressEvent(ev)
 
+    @override
     def focusInEvent(self, a0:'QFocusEvent|None') -> None:
         super().focusInEvent(a0)
         if a0 is not None:
             self.focus_in.emit()
 
+    @override
     def focusOutEvent(self, a0:'QFocusEvent|None') -> None:
         super().focusOutEvent(a0)
         if a0 is not None:
@@ -224,6 +238,7 @@ class MyQLabel(QLabel): # pyrefly:ignore[invalid-inheritance] # pyright: ignore 
         br = QFontMetrics(f).boundingRect(self.text())
         self.setMinimumSize(br.width(), br.height())
 
+    @override
     def resizeEvent(self, a0:'QResizeEvent|None') -> None:
         super().resizeEvent(a0)
         if a0 is not None:
@@ -261,6 +276,7 @@ class ClickableQLabel(QLabel): # pyrefly:ignore[invalid-inheritance] # pylint: d
     left_clicked = pyqtSignal()
     right_clicked = pyqtSignal()
 
+    @override
     def mousePressEvent(self, ev:'QMouseEvent|None') -> None:
         super().mousePressEvent(ev)
         if ev is not None:
@@ -275,6 +291,7 @@ class ClickableQGroupBox(QGroupBox): # pyrefly:ignore[invalid-inheritance] # pyl
     left_clicked = pyqtSignal()
     right_clicked = pyqtSignal()
 
+    @override
     def mousePressEvent(self, event:'QMouseEvent|None') -> None:
         super().mousePressEvent(event)
         if event is not None:
@@ -290,6 +307,7 @@ class MyQLCDNumber(QLCDNumber): # pyrefly:ignore[invalid-inheritance] # pylint: 
     right_clicked = pyqtSignal()
     double_clicked = pyqtSignal()
 
+    @override
     def mousePressEvent(self, a0:'QMouseEvent|None') -> None:
         super().mousePressEvent(a0)
         if a0 is not None:
@@ -299,6 +317,7 @@ class MyQLCDNumber(QLCDNumber): # pyrefly:ignore[invalid-inheritance] # pylint: 
             elif a0.button() == Qt.MouseButton.RightButton:
                 self.right_clicked.emit()
 
+    @override
     def mouseDoubleClickEvent(self, a0:'QMouseEvent|None') -> None:
         super().mousePressEvent(a0)
         if a0 is not None:
@@ -309,6 +328,7 @@ class ClickableLCDFrame(QFrame): # pyrefly:ignore[invalid-inheritance] # pylint:
     left_clicked = pyqtSignal()
     right_clicked = pyqtSignal()
 
+    @override
     def mousePressEvent(self, a0:'QMouseEvent|None') -> None:
         super().mousePressEvent(a0)
         if a0 is not None:
@@ -331,16 +351,19 @@ class ClickableTextEdit(QTextEdit): # pyrefly:ignore[invalid-inheritance] # pyli
         self.setTabChangesFocus(True)
         self.textChanged.connect(self._handle_text_changed)
 
+    @override
     def mousePressEvent(self, e:'QMouseEvent|None') -> None:
         super().mousePressEvent(e)
         if e is not None and e.modifiers() == Qt.KeyboardModifier.ControlModifier:
             self.clicked.emit()
 
+    @override
     def focusInEvent(self, e:'QFocusEvent|None') -> None:
         super().focusInEvent(e)
         if e is not None:
             self.receivedFocus.emit()
 
+    @override
     def focusOutEvent(self, e:'QFocusEvent|None') -> None:
         if e is not None and self._changed:
             self.editingFinished.emit()
@@ -368,16 +391,19 @@ class ClickableQLineEdit(QLineEdit): # pyrefly:ignore[invalid-inheritance] # pyl
         self._changed = False
         self.textChanged.connect(self._handle_text_changed)
 
+    @override
     def mousePressEvent(self, a0:'QMouseEvent|None') -> None:
         super().mousePressEvent(a0)
         if a0 is not None and a0.modifiers() == Qt.KeyboardModifier.ControlModifier:
             self.clicked.emit()
 
+    @override
     def focusInEvent(self, a0:'QFocusEvent|None') -> None:
         super().focusInEvent(a0)
         if a0 is not None:
             self.receivedFocus.emit()
 
+    @override
     def focusOutEvent(self, a0:'QFocusEvent|None') -> None:
         if a0 is not None and self._changed:
             self.editingFinished.emit()
@@ -489,6 +515,7 @@ class AnimatedMajorEventPushButton(MajorEventPushButton):
         self.selected_animation.setEasingCurve(QEasingCurve.Type.OutInCubic)
 
 
+    @override
     def setSelected(self, b:bool) -> None:
         super().setSelected(b)
         if self.animating:
@@ -540,6 +567,7 @@ class SplitterHandle(QSplitterHandle): # pyrefly:ignore[invalid-inheritance] # p
         self.pen_color_hover_darkmode = QColor(190, 190, 190)
         self.pen_color = self.pen_color_normal
 
+    @override
     def enterEvent(self, event:QEnterEvent|None) -> None:
         if event is not None:
             app:QCoreApplication|None = QApplication.instance()
@@ -549,11 +577,13 @@ class SplitterHandle(QSplitterHandle): # pyrefly:ignore[invalid-inheritance] # p
                 self.pen_color = self.pen_color_hover_lightmode
             self.repaint()
 
+    @override
     def leaveEvent(self, a0:QEvent|None) -> None:
         if a0 is not None:
             self.pen_color = self.pen_color_normal
             self.repaint()
 
+    @override
     def paintEvent(self, a0:QPaintEvent|None) -> None:
         super().paintEvent(a0)
         painter = QPainter(self)
@@ -582,5 +612,6 @@ class Splitter(QSplitter):  # pyrefly:ignore[invalid-inheritance] # pyright: ign
         super().__init__(*args, *kwargs)
         self.setHandleWidth(10)
 
+    @override
     def createHandle(self) -> QSplitterHandle:
         return SplitterHandle(self.orientation(), self)

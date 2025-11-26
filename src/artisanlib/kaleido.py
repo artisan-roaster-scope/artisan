@@ -162,7 +162,7 @@ class KaleidoPort:
     # returns the current state of the given var or None (for sid/TU/SC/CL) and -1 (otherwise) if the state is unknown
     def get_state(self, var:str) -> str|int|float|None:
         if var in self._state:
-            return self._state[var] # type: ignore # TypedDict key must be a string literal
+            return self._state[var] # type: ignore[literal-required, no-any-return] # TypedDict key must be a string literal
         if var in {'sid', 'TU', 'SC', 'CL', 'SN'}:
             return None
         if self.intVar(var):
@@ -178,15 +178,15 @@ class KaleidoPort:
     # if single_res is True we assume the state is set from a single var/value pair response and thus we clear the var prefixed by _single_await_var_prefix
     async def set_state(self, var:str, value:str, single_res:bool) -> None:
         if self.intVar(var):
-            self._state[var] = int(round(float(value))) # type: ignore # TypedDict key must be a string literal
+            self._state[var] = int(round(float(value))) # type: ignore[literal-required] # TypedDict key must be a string literal
         elif self.strVar(var):
-            self._state[var] = value # type: ignore # TypedDict key must be a string literal
+            self._state[var] = value # type: ignore[literal-required] # TypedDict key must be a string literal
         else:
             try:
-                self._state[var] = float(value) # type: ignore # TypedDict key must be a string literal
+                self._state[var] = float(value) # type: ignore[literal-required] # TypedDict key must be a string literal
             except Exception: # pylint: disable=broad-except
                 # if conversion to a float failed (maybe an unknown tag), we still keep the reading as original string
-                self._state[var] = value # type: ignore # TypedDict key must be a string literal
+                self._state[var] = value # type: ignore[literal-required] # TypedDict key must be a string literal
         clear_var = var
         if single_res:
             # value received by a response with a single var/value pair thus we clear the prefixed variable
@@ -446,7 +446,7 @@ class KaleidoPort:
                 # Wait for 2 seconds, then raise TimeoutError
                 reader, writer = await asyncio.wait_for(connect, timeout=self._open_timeout)
 
-                if reader is not None and writer is not None:
+                if writer is not None: # pyright:ignore[reportUnnecessaryComparison] # reader is never None!
                     self._write_queue = asyncio.Queue()
                     await asyncio.wait_for(self.serial_initialize(reader, writer, mode), timeout=self._init_timeout)
 
@@ -481,7 +481,7 @@ class KaleidoPort:
                             self._write_queue.task_done()
                     except Exception as e: # pylint: disable=broad-except
                         _log.error(e)
-                if writer is not None and writer.transport is not None:
+                if writer is not None:
                     try:
                         writer.transport.close()
                     except Exception as e: # pylint: disable=broad-except

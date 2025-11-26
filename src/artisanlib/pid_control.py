@@ -280,7 +280,7 @@ class FujiPID:
 
     #writes new values for p - i - d
     def setpidPXG(self, k:int, newPvalue:float, newIvalue:float, newDvalue:float) -> None:
-        if k is not None and k > 0:
+        if k > 0:
             #send command to the right sv
             pkey = 'p' + str(k)
             ikey = 'i' + str(k)
@@ -325,7 +325,7 @@ class FujiPID:
 
     #writes new values for p - i - d
     def setpidPXF(self, k:int, newPvalue:float, newIvalue:float, newDvalue:float) -> None:
-        if k is not None and k > 0:
+        if k > 0:
             #send command to the right sv
             pkey = 'p' + str(k)
             ikey = 'i' + str(k)
@@ -532,8 +532,7 @@ class FujiPID:
             elif self.aw.ser.controlETpid[0] == 4:
                 command = self.message2send(self.aw.ser.controlETpid[1],4,int(self.PXF['sv?'][1]),1)
             res = self.readoneword(command)
-            if res is not None:
-                val = res/10.
+            val = res/10.
         if val != -0.1:
             return val
         return -1
@@ -889,7 +888,7 @@ class FujiPID:
     #example of command string with four segments (minimum for Fuji PIDs)
     # SETRS::270.0::3::0::SETRS::300.0::3::0::SETRS::350.0::3::0::SETRS::400.0::3::0
     def replaysetrs(self, CommandString:str) -> None:
-        segments =CommandString.split('SETRS')
+        segments = CommandString.split('SETRS')
         if len(segments[0]) == 0:
             segments = segments[1:]          #remove first empty [""] list [[""],[etc]]
         if len(segments[-1]) == 0:
@@ -903,7 +902,7 @@ class FujiPID:
                 #create a string with 4 segments ("SETRS" already removed)
                 string = '::' + lasttemp + '::0::0'   #add zero ramp time and zero soak time
                 segments.append(string)
-        rs = []
+        rs:list[list[str]] = []
         changeflag = 0
         for i in range(n):
             rs.append(segments[i].split('::'))
@@ -1057,7 +1056,7 @@ class FujiPID:
 
         # This method converts a decimal to a raw string appropriate for Fuji serial TX
         # Used to compose serial messages
-        Nbytes = []
+        Nbytes:list[int] = []
         while decimal:
             decimal, rem = divmod(decimal, 256)
             Nbytes.append(rem)
@@ -1599,7 +1598,7 @@ class PIDcontrol:
             time = tx
             if not self.aw.qmc.flagstart or not self.RStimeAfterCHARGE:
                 time = time - self.time_pidON
-            elif self.RStimeAfterCHARGE and self.aw.qmc.timeindex[0] > -1:
+            elif self.aw.qmc.timeindex[0] > -1:
                 # after CHARGE
                 time = time - self.aw.qmc.timex[self.aw.qmc.timeindex[0]]
             return self.svRampSoak(time)

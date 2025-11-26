@@ -19,7 +19,7 @@ import os
 import sys
 import platform
 import logging
-from typing import Final, cast, TYPE_CHECKING
+from typing import override, Final, cast, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
@@ -47,6 +47,7 @@ _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 
 class AlignDelegate(QStyledItemDelegate): # pyrefly:ignore[invalid-inheritance] # pyright:ignore[reportGeneralTypeIssues]
+    @override
     def initStyleOption(self, option:'QStyleOptionViewItem|None', index:'QModelIndex') -> None:
         super().initStyleOption(option, index)
         if option is not None:
@@ -719,6 +720,7 @@ class AlarmDlg(ArtisanResizeablDialog):
         self.aw.AlarmDlg_activeTab = self.TabWidget.currentIndex()
         self.accept()
 
+    @override
     def closeEvent(self, a0:'QCloseEvent|None') -> None: # pyrefly: ignore
         del a0
         self.closealarms()
@@ -782,8 +784,9 @@ class AlarmDlg(ArtisanResizeablDialog):
                 if beepLayout is not None:
                     item0 = beepLayout.itemAt(0)
                     if item0 is not None:
-                        beep = cast(QCheckBox, item0.widget())
-                        if beep and beep is not None:
+                        beep = item0.widget()
+                        if beep is not None:
+                            beep = cast(QCheckBox, beep)
                             self.aw.qmc.alarmbeep[i] = int(beep.isChecked())
                 description = cast(QLineEdit, self.alarmtable.cellWidget(i,11))
                 self.aw.qmc.alarmstrings[i] = description.text()
@@ -1061,7 +1064,7 @@ class AlarmDlg(ArtisanResizeablDialog):
                     fields.append(item.text())
             tbl.field_names = fields
             for r in range(nrows):
-                rows = []
+                rows:list[str] = []
                 item0 = self.alarmtable.item(r,0)
                 if item0 is not None:
                     rows.append(item0.text())
@@ -1088,8 +1091,9 @@ class AlarmDlg(ArtisanResizeablDialog):
                 if beepLayout is not None:
                     item1 = beepLayout.itemAt(0)
                     if item1 is not None:
-                        beepCheckBox = cast(QCheckBox, item1.widget())
-                        if beepCheckBox and beepCheckBox is not None:
+                        beepCheckBox = item1.widget()
+                        if beepCheckBox is not None:
+                            beepCheckBox = cast(QCheckBox, beepCheckBox)
                             rows.append(str(beepCheckBox.isChecked()))
                 descriptionedit = cast(QLineEdit, self.alarmtable.cellWidget(r,11))
                 rows.append(descriptionedit.text())
@@ -1130,8 +1134,9 @@ class AlarmDlg(ArtisanResizeablDialog):
                 if beepLayout is not None:
                     item1 = beepLayout.itemAt(0)
                     if item1 is not None:
-                        beepCheckBox = cast(QCheckBox, item1.widget())
-                        if beepCheckBox and beepCheckBox is not None:
+                        beepCheckBox = item1.widget()
+                        if beepCheckBox is not None:
+                            beepCheckBox = cast(QCheckBox, beepCheckBox)
                             clipboard += str(beepCheckBox.isChecked()) + '\t'
                         else:
                             clipboard += ' ' + '\t'

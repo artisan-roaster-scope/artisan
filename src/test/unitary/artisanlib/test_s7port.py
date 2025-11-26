@@ -107,7 +107,7 @@ class TestS7PortInitialization:
         assert port.optimizer is True
         assert port.fetch_max_blocks is False
         assert port.fail_on_cache_miss is True
-        assert not port.activeRegisters
+        assert not port.activeRegisterSequences
         assert not port.readingsCache
         assert port.is_connected is False
         assert port.plc is None
@@ -135,7 +135,7 @@ class TestS7PortInitialization:
             'optimizer',
             'fetch_max_blocks',
             'fail_on_cache_miss',
-            'activeRegisters',
+            'activeRegisterSequences',
             'readingsCache',
             'PID_area',
             'PID_db_nr',
@@ -448,9 +448,9 @@ class TestS7PortCaching:
         s7port_instance.updateActiveRegisters()
 
         # Assert
-        assert 0 in s7port_instance.activeRegisters  # area-1 = 0
-        assert 5 in s7port_instance.activeRegisters[0]
-        assert s7port_instance.activeRegisters[0][5] == [10, 11]  # INT uses 2 registers
+        assert 0 in s7port_instance.activeRegisterSequences  # area-1 = 0
+        assert 5 in s7port_instance.activeRegisterSequences[0]
+        assert s7port_instance.activeRegisterSequences[0][5] == [(10, 11)]  # INT uses 2 registers
 
     def test_update_active_registers_float_type(self, s7port_instance: s7port) -> None:
         """Test updating active registers for FLOAT type."""
@@ -464,9 +464,9 @@ class TestS7PortCaching:
         s7port_instance.updateActiveRegisters()
 
         # Assert
-        assert 0 in s7port_instance.activeRegisters
-        assert 5 in s7port_instance.activeRegisters[0]
-        assert s7port_instance.activeRegisters[0][5] == [10, 11, 12, 13]  # FLOAT uses 4 registers
+        assert 0 in s7port_instance.activeRegisterSequences
+        assert 5 in s7port_instance.activeRegisterSequences[0]
+        assert s7port_instance.activeRegisterSequences[0][5] == [(10, 13)]  # FLOAT uses 4 registers
 
     def test_update_active_registers_bool_type(self, s7port_instance: s7port) -> None:
         """Test updating active registers for BOOL type."""
@@ -480,9 +480,9 @@ class TestS7PortCaching:
         s7port_instance.updateActiveRegisters()
 
         # Assert
-        assert 0 in s7port_instance.activeRegisters
-        assert 5 in s7port_instance.activeRegisters[0]
-        assert s7port_instance.activeRegisters[0][5] == [10]  # BOOL uses 1 register
+        assert 0 in s7port_instance.activeRegisterSequences
+        assert 5 in s7port_instance.activeRegisterSequences[0]
+        assert s7port_instance.activeRegisterSequences[0][5] == [(10, 10)]  # BOOL uses 1 register
 
     def test_update_active_registers_multiple_channels(self, s7port_instance: s7port) -> None:
         """Test updating active registers for multiple channels."""
@@ -496,11 +496,11 @@ class TestS7PortCaching:
         s7port_instance.updateActiveRegisters()
 
         # Assert
-        assert 0 in s7port_instance.activeRegisters
-        assert 5 in s7port_instance.activeRegisters[0]
+        assert 0 in s7port_instance.activeRegisterSequences
+        assert 5 in s7port_instance.activeRegisterSequences[0]
         # Should combine registers from both channels
-        expected_registers = [10, 11, 12, 13]  # From both channels
-        assert sorted(s7port_instance.activeRegisters[0][5]) == expected_registers
+        expected_registers = [(10, 13)]  # From both channels
+        assert sorted(s7port_instance.activeRegisterSequences[0][5]) == expected_registers
 
 
 class TestS7PortReadOperations:

@@ -121,6 +121,8 @@ from artisanlib.util import (
     findTPint,
     eventtime2string,
     serialize,
+    max_blocks,
+    min_blocks,
 )
 
 # fromCtoF
@@ -653,7 +655,7 @@ def test_toStringList() -> None:
     assert toStringList(['a', 'b', 'c']) == ['a', 'b', 'c']
     assert toStringList([]) == []
     assert toStringList([None, 42, 'test']) == ['None', '42', 'test']
-    assert toStringList(None) == []  # type: ignore # Type error: None not a list
+    assert toStringList(None) == []  # type: ignore[arg-type] # Type error: None not a list
 
 
 # Temperature Functions Tests
@@ -2018,3 +2020,48 @@ class TestSerialize:
                 assert 'inner' in content
         finally:
             os.unlink(temp_filename)
+
+
+@pytest.mark.parametrize(
+    'registers,max_register_segment,expected',
+    [
+        ([0, 2, 20, 1040, 1105, 1215], 100, [(0,20), (1040, 1105), (1215, 1215)]),
+        ([0, 10], 100, [(0, 10)]),
+        ([0, 99], 100, [(0, 99)]),
+        ([0, 100], 100, [(0, 0), (100, 100)]),  # Split at MAX_REGISTER_SEGMENT
+        ([1, 5, 112, 120], 100, [(1, 5), (112, 120)]),
+        ([0, 2, 20, 1040, 1105, 1215], 100, [(0, 20), (1040, 1105), (1215, 1215)]),
+        (
+            [0, 99, 100, 199, 200, 299, 300, 320, 350],
+            100,
+            [(0, 99), (100, 199), (200, 299), (300, 350)],
+        ),
+        ([], 100, []),  # Empty list
+        ([42], 100, [(42, 42)]),    # Single register
+        ([100, 50, 200, 75], 100, [(50, 100), (200, 200)]), # unsorted input
+        ([0, 1, 1000, 1001, 2000], 100, [(0, 1), (1000, 1001), (2000, 2000)]), # large gaps
+        (list(range(250)), 100, [(0, 99), (100, 199), (200, 249)]), # 250 consecutive registers
+    ],
+)
+def test_max_blocks(registers: list[int], max_register_segment: int, expected:list[tuple[int,int]]) -> None:
+    """Test max_blocks with various lists of registers."""
+    # Act
+    result = max_blocks(registers, max_register_segment=max_register_segment)
+
+    # Assert
+    assert result == expected
+
+
+@pytest.mark.parametrize(
+    'registers,expected',
+    [
+        ([12392, 12393, 12394, 12462, 12463, 12465], [(12392, 12394), (12462, 12463), (12465, 12465)])
+    ],
+)
+def test_min_blocks(registers: list[int], expected:list[tuple[int,int]]) -> None:
+    """Test muin_blocks with various lists of registers."""
+    # Act
+    result = min_blocks(registers)
+
+    # Assert
+    assert result == expected

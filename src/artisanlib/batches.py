@@ -17,7 +17,7 @@
 
 from artisanlib.dialogs import ArtisanDialog
 
-from typing import TYPE_CHECKING
+from typing import override, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
@@ -131,6 +131,7 @@ class batchDlg(ArtisanDialog):
         self.close()
 
     @pyqtSlot()
+    @override
     def close(self) -> bool:
         #save window position (only; not size!)
         settings = QSettings()

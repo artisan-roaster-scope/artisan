@@ -300,7 +300,7 @@ def mock_app_window() -> Mock:
     # Configure default attributes and behaviors
     mock_aw.plus_account = 'test@example.com'
     mock_aw.qmc = Mock()
-    mock_aw.qmc.operator = None
+    mock_aw.qmc.operator = 'OperatorName'
     mock_aw.get_os = Mock(return_value=('macOS', '13.0', 'x86_64'))
     mock_aw.updateLimitsSignal = Mock()
     mock_aw.updateLimitsSignal.emit = Mock()

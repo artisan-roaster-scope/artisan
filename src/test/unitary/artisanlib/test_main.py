@@ -389,8 +389,8 @@ class TestLoadFile:
 
             original_qfile = getattr(main_module, 'QFile', None)
             original_qtextstream = getattr(main_module, 'QTextStream', None)
-            main_module.QFile = mock_qfile  # type:ignore
-            main_module.QTextStream = mock_qtextstream  # type:ignore
+            main_module.QFile = mock_qfile    # type:ignore[misc]
+            main_module.QTextStream = mock_qtextstream  # type:ignore[misc]
 
             aw.setProfile = mock_application_window.setProfile  # type: ignore[method-assign]
             aw.orderEvents = mock_application_window.orderEvents  # type: ignore[method-assign]
@@ -411,12 +411,12 @@ class TestLoadFile:
             # Cleanup: Restore original Qt classes if they existed
             try:
                 if original_qfile is not None:
-                    main_module.QFile = original_qfile  # type:ignore
+                    main_module.QFile = original_qfile  # type:ignore[misc]
                 elif hasattr(main_module, 'QFile'):
                     delattr(main_module, 'QFile')
 
                 if original_qtextstream is not None:
-                    main_module.QTextStream = original_qtextstream  # type:ignore
+                    main_module.QTextStream = original_qtextstream  # type:ignore[misc]
                 elif hasattr(main_module, 'QTextStream'):
                     delattr(main_module, 'QTextStream')
             except Exception:  # pylint: disable=broad-except
@@ -467,8 +467,8 @@ class TestLoadFile:
 
             original_qfile = getattr(main_module, 'QFile', None)
             original_qtextstream = getattr(main_module, 'QTextStream', None)
-            main_module.QFile = mock_qfile  # type:ignore
-            main_module.QTextStream = mock_qtextstream  # type:ignore
+            main_module.QFile = mock_qfile  # type:ignore[misc]
+            main_module.QTextStream = mock_qtextstream  # type:ignore[misc]
 
             # Act
             aw.loadFile(test_file_path)
@@ -476,12 +476,12 @@ class TestLoadFile:
             # Cleanup: Restore original Qt classes if they existed
             try:
                 if original_qfile is not None:
-                    main_module.QFile = original_qfile  # type:ignore
+                    main_module.QFile = original_qfile  # type:ignore[misc]
                 elif hasattr(main_module, 'QFile'):
                     delattr(main_module, 'QFile')
 
                 if original_qtextstream is not None:
-                    main_module.QTextStream = original_qtextstream  # type:ignore
+                    main_module.QTextStream = original_qtextstream  # type:ignore[misc]
                 elif hasattr(main_module, 'QTextStream'):
                     delattr(main_module, 'QTextStream')
             except Exception:  # pylint: disable=broad-except
@@ -591,8 +591,8 @@ class TestLoadFile:
 
             original_qfile = getattr(main_module, 'QFile', None)
             original_qtextstream = getattr(main_module, 'QTextStream', None)
-            main_module.QFile = mock_qfile  # type:ignore
-            main_module.QTextStream = mock_qtextstream  # type: ignore
+            main_module.QFile = mock_qfile  # type:ignore[misc]
+            main_module.QTextStream = mock_qtextstream  # type: ignore[misc]
 
             # Act
             aw.loadFile(test_file_path, quiet=True)
@@ -600,12 +600,12 @@ class TestLoadFile:
             # Cleanup: Restore original Qt classes if they existed
             try:
                 if original_qfile is not None:
-                    main_module.QFile = original_qfile  # type:ignore
+                    main_module.QFile = original_qfile  # type:ignore[misc]
                 elif hasattr(main_module, 'QFile'):
                     delattr(main_module, 'QFile')
 
                 if original_qtextstream is not None:
-                    main_module.QTextStream = original_qtextstream  # type:ignore
+                    main_module.QTextStream = original_qtextstream  # type:ignore[misc]
                 elif hasattr(main_module, 'QTextStream'):
                     delattr(main_module, 'QTextStream')
             except Exception:  # pylint: disable=broad-except

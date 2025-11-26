@@ -15,7 +15,7 @@
 # AUTHOR
 # Marko Luther, 2023
 
-from typing import cast, TYPE_CHECKING
+from typing import override, cast, TYPE_CHECKING
 from artisanlib.dialogs import ArtisanDialog
 
 from PyQt6.QtCore import Qt, pyqtSlot, QSettings
@@ -206,6 +206,7 @@ class autosaveDlg(ArtisanDialog):
         self.close()
 
     @pyqtSlot('QCloseEvent')
+    @override
     def closeEvent(self, a0:'QCloseEvent|None' = None) -> None:
         del a0
         self.closeHelp()

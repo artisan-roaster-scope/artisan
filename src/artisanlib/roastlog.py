@@ -44,7 +44,7 @@ def extractProfileRoastLog(url:'QUrl',
             if isinstance(title0,str):
                 title = title0.strip()
 
-        tag_values = {}
+        tag_values:dict[str,str] = {}
         for tag in ['Roastable:', 'Starting mass:', 'Ending mass:', 'Roasted on:', 'Roasted by:', 'Roaster:', 'Roast level:', 'Roast Notes:']:
             tag_elements = tree.xpath(f'//td[contains(@class,"text-rt") and normalize-space(text())="{tag}"]/following::td[1]/text()')
             if isinstance(tag_elements, list) and len(tag_elements)>0:

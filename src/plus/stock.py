@@ -392,8 +392,6 @@ def blend2list(blend_dict:Blend|None) -> BlendList|None:
     try:
         if (
             blend_dict is not None
-            and 'label' in blend_dict
-            and 'ingredients' in blend_dict
             and len(blend_dict['ingredients']) > 0
         ):
             blend_label = encodeLocal(blend_dict['label'])
@@ -528,15 +526,11 @@ def getStores(acquire_lock:bool=True) -> list[tuple[str, str]]:
         if acquire_lock:
             stock_semaphore.acquire(1)
         if stock is not None and 'coffees' in stock:
-            res = {}
+            res:dict[str, str] = {}
             for c in stock['coffees']:
                 if 'stock' in c:
                     for s in c['stock']:
-                        if (
-                            'amount' in s
-                            and s['amount'] is not None
-                            and s['amount'] > stock_epsilon
-                        ):
+                        if s['amount'] > stock_epsilon:
                             res[s['location_label']] = s['location_hr_id']
             return sorted(res.items(), key=getStoreLabel)
     finally:
@@ -547,14 +541,14 @@ def getStores(acquire_lock:bool=True) -> list[tuple[str, str]]:
 
 # given a list of stores, returns a list of labels to populate the stores popup
 def getStoreLabels(stores:list[tuple[str, str]]) -> list[str]:
-    return [getStoreLabel(s) for s in stores if getStoreId(s) is not None]
+    return [getStoreLabel(s) for s in stores]
 
 
 # returns the position of store id in stores or None if store not in the stores
 def getStorePosition(storeId:str, stores:list[tuple[str, str]]) -> int|None:
     try:
         return [
-            getStoreId(s) for s in stores if getStoreId(s) is not None
+            getStoreId(s) for s in stores
         ].index(storeId)
     except Exception:  # pylint: disable=broad-except
         return None
@@ -623,15 +617,11 @@ def coffee2beans(c:Coffee) -> str:
         pass
     varietals = ''
     try:
-        if (
-            'varietals' in c
-            and c['varietals'] is not None
-            and len(c['varietals']) > 0
-        ):
+        if 'variatals' in c and len(c['varietals']) > 0:
             vs = [
                 v.strip()
                 for v in c['varietals']
-                if v is not None and v not in {'null', ''}
+                if v not in {'null', ''}
             ]
             if processing == '':
                 varietals = f" {', '.join(vs)}"
@@ -698,7 +688,6 @@ def coffeeLabel(c:Coffee) -> str:
             if (
                 'picked' in cy
                 and len(cy['picked']) > 0
-                and cy['picked'][0] is not None
             ):
                 origin += f" {cy['picked'][0]:d}"
     except Exception as e:  # pylint: disable=broad-except
@@ -756,17 +745,14 @@ def getCoffees(weight_unit_idx:int, store:str|None = None) -> list[tuple[str, tu
     try:
         stock_semaphore.acquire(1)
         if stock is not None and 'coffees' in stock:
-            res = {}
+            res:dict[str, tuple[Coffee, StockItem]] = {}
             for c in stock['coffees']:
                 try:
                     coffee_label = coffeeLabel(c)
                     default_unit = c.get('default_unit', None)
                     if 'stock' in c:
                         for s in c['stock']:
-                            if (store is None or (
-                                'location_hr_id' in s
-                                and s['location_hr_id'] == store
-                            )) and 'location_label' in s:
+                            if store is None or s['location_hr_id'] == store:
                                 location = s['location_label']
                                 amount = s['amount']
                                 if (
@@ -802,9 +788,7 @@ def getCoffees(weight_unit_idx:int, store:str|None = None) -> list[tuple[str, tu
 
 # returns the position in coffees which matches the given coffeeId and
 # stockId and None if no match is found
-def getCoffeeStockPosition(coffeeId:str, stockId:str, coffees:list[tuple[str, tuple[Coffee, StockItem]]]|None) -> int|None:
-    if coffees is None:
-        return None
+def getCoffeeStockPosition(coffeeId:str, stockId:str, coffees:list[tuple[str, tuple[Coffee, StockItem]]]) -> int|None:
     res = [
         i
         for i, c in enumerate(coffees)
@@ -910,16 +894,16 @@ def getBlendBlendDict(blend:BlendStructure, weight:float|None = None) -> Blend:
         ]
     if weight > 0:
         components:dict[str, float] = {}  # associates coffees to the amounts used in the blend
-        components_labels = {}  # associates components to their labels
-        components_moisture = {}
+        components_labels:dict[str, str] = {}  # associates components to their labels
+        components_moisture:dict[str, float] = {}
         # associates components to their moisture,
         # if the moisture is known
-        components_density = {}
+        components_density:dict[str, int] = {}
         # associates components to their density, if the density is known
-        components_screen_min = (
+        components_screen_min:dict[str, int] = (
             {}
         )  # associates components to their screen_min, if known
-        components_screen_max = (
+        components_screen_max:dict[str, int] = (
             {}
         )  # associates components to their screen_max, if known
         amount_spent:float = 0
@@ -927,20 +911,21 @@ def getBlendBlendDict(blend:BlendStructure, weight:float|None = None) -> Blend:
             remaining_amount = min(weight - amount_spent, max_amount)
             # we consume the remaining_amount per component
             # according to their blend ratio
-            for i in blend_dict['ingredients']:
-                c:str = i['coffee']
+            bdi:BlendIngredient
+            for bdi in blend_dict['ingredients']:
+                c:str = bdi['coffee']
                 c_amount = components.get(c, 0)
-                components[c] = i['ratio'] * remaining_amount + c_amount
-                if 'label' in i and i['label'] is not None:
-                    components_labels[c] = i['label']
-                if 'moisture' in i and i['moisture'] is not None:
-                    components_moisture[c] = i['moisture']
-                if 'density' in i and i['density'] is not None:
-                    components_density[c] = i['density']
-                if 'screen_min' in i and i['screen_min'] is not None:
-                    components_screen_min[c] = i['screen_min']
-                if 'screen_max' in i and i['screen_max'] is not None:
-                    components_screen_max[c] = i['screen_max']
+                components[c] = bdi['ratio'] * remaining_amount + c_amount
+                if 'label' in bdi:
+                    components_labels[c] = bdi['label']
+                if 'moisture' in bdi:
+                    components_moisture[c] = bdi['moisture']
+                if 'density' in bdi:
+                    components_density[c] = bdi['density']
+                if 'screen_min' in bdi:
+                    components_screen_min[c] = bdi['screen_min']
+                if 'screen_max' in bdi:
+                    components_screen_max[c] = bdi['screen_max']
             if weight - amount_spent <= max_amount:
                 amount_spent = amount_spent + remaining_amount
                 break
@@ -949,22 +934,22 @@ def getBlendBlendDict(blend:BlendStructure, weight:float|None = None) -> Blend:
         # all replacements, the last replacement blend is "extended"
         missing_amount = weight - amount_spent
         if missing_amount > 0:
-            for i in max_amounts_blend_dicts[-1][1][
+            for j in max_amounts_blend_dicts[-1][1][
                 'ingredients'
             ]:  # we "fill" according to the last replacement blend
-                c = i['coffee']
+                c = j['coffee']
                 c_amount = components.get(c, 0)
-                components[c] = i['ratio'] * missing_amount + c_amount
-                if 'label' in i and i['label'] is not None:
-                    components_labels[c] = i['label']
-                if 'moisture' in i and i['moisture'] is not None:
-                    components_moisture[c] = i['moisture']
-                if 'density' in i and i['density'] is not None:
-                    components_density[c] = i['density']
-                if 'screen_min' in i and i['screen_min'] is not None:
-                    components_screen_min[c] = i['screen_min']
-                if 'screen_max' in i and i['screen_max'] is not None:
-                    components_screen_max[c] = i['screen_max']
+                components[c] = j['ratio'] * missing_amount + c_amount
+                if 'label' in j:
+                    components_labels[c] = j['label']
+                if 'moisture' in j:
+                    components_moisture[c] = j['moisture']
+                if 'density' in j:
+                    components_density[c] = j['density']
+                if 'screen_min' in j:
+                    components_screen_min[c] = j['screen_min']
+                if 'screen_max' in j:
+                    components_screen_max[c] = j['screen_max']
 
         # we replace the ingredients with a recomputed set based on
         # the usage per blend replacement as accumulated in
@@ -974,6 +959,8 @@ def getBlendBlendDict(blend:BlendStructure, weight:float|None = None) -> Blend:
         densities:list[float|None] = []
         screen_mins:list[int|None] = []
         screen_maxs:list[int|None] = []
+        # c:str (defined on line 916)
+        a:float
         for c, a in components.items():
             ratio = a / weight
             ingredient = BlendIngredient(
@@ -1179,12 +1166,12 @@ def getBlends(weight_unit_idx:int, store:str|None, customBlend:Blend|None, acqui
                 stores = [store]
             for s in stores:
                 location_label = ''
-                store_blends = []
+                store_blends:list[Blend] = []
                 if customBlend is not None:
                     store_blends.append(customBlend)
-                if 'blends' in stock and stock['blends'] is not None:
+                if 'blends' in stock:
                     store_blends.extend(stock['blends'])
-                if 'replBlends' in stock and stock['replBlends'] is not None:
+                if 'replBlends' in stock:
                     store_blends.extend(stock['replBlends'])
                 for blend in store_blends:
                     res_sd:StockItem|None = None
@@ -1206,7 +1193,7 @@ def getBlends(weight_unit_idx:int, store:str|None, customBlend:Blend|None, acqui
                     # according to their ratio. Thus a replacement blend may
                     # have less ingredients than the original blend
                     # blends without ingredients (like the default Custom Blend) are ignored
-                    if 'ingredients' in blend and len(blend['ingredients'])>0:
+                    if len(blend['ingredients'])>0:
                         # associates all coffees incl. replacements with
                         # their long labels (coffeeLabels), if known
                         # associates all coffees incl. replacements with
@@ -1242,70 +1229,63 @@ def getBlends(weight_unit_idx:int, store:str|None, customBlend:Blend|None, acqui
                             if sd is None or cd is None:
                                 coffee_stock[coffee] = 0
                             else:
-                                if (
-                                    location_label == ''
-                                    and 'location_label' in sd
-                                    and sd['location_label'] is not None
-                                ):
-                                    location_label = sd[
-                                        'location_label'
-                                    ].strip()
+                                if location_label == '':
+                                    location_label = sd['location_label'].strip()
                                 res_sd = sd
                                 coffee_stock[coffee] = sd['amount']
                                 coffee_data[coffee] = (cd, sd)
                                 coffeeLabels[coffee] = coffee2beans(cd)
-                                if cd is not None:
-                                    if 'label' in cd:
-                                        i['label'] = cd['label']
-                                        # add label of coffee to ingredient,
-                                        # used in the Roast Properties dialog
-                                        # for links to the coffees
-                                        try:
-                                            if cd['crop_date']['picked'][0] is not None: # pyright:ignore[reportTypedDictNotRequiredAccess]
-                                                i['label'] = f"{cd['crop_date']['picked'][0]} {i['label']}" # pyright:ignore[reportTypedDictNotRequiredAccess]
-                                            # pylint: disable=broad-except
-                                        except Exception:
-                                            pass
+                                if 'label' in cd:
+                                    i['label'] = cd['label']
+                                    # add label of coffee to ingredient,
+                                    # used in the Roast Properties dialog
+                                    # for links to the coffees
                                     try:
-                                        m = float(cd['moisture']) # pyright:ignore[reportTypedDictNotRequiredAccess]
-                                        if m > 0:
-                                            coffee_moisture[coffee] = m
-                                            i['moisture'] = m
+                                        if 'crop_date' in cd and 'picked' in cd['crop_date'] and len(cd['crop_date']['picked']) > 0:
+                                            i['label'] = f"{cd['crop_date']['picked'][0]} {i['label']}"
                                         # pylint: disable=broad-except
                                     except Exception:
                                         pass
-                                    try:
-                                        d = int(cd['density']) # pyright:ignore[reportTypedDictNotRequiredAccess]
-                                        if d > 0:
-                                            coffee_density[coffee] = d
-                                            i['density'] = d
-                                        # pylint: disable=broad-except
-                                    except Exception:
-                                        pass
-                                    try:
-                                        screen_size_min = int(
-                                            cd['screen_size']['min'] # pyright:ignore[reportTypedDictNotRequiredAccess]
-                                        )
-                                        if screen_size_min > 0:
-                                            coffee_screen_min[
-                                                coffee
-                                            ] = screen_size_min
-                                            i['screen_min'] = screen_size_min
-                                        # pylint: disable=broad-except
-                                    except Exception:
-                                        pass
-                                    try:
-                                        screen_size_max = int(
-                                            cd['screen_size']['max'] # pyright:ignore[reportTypedDictNotRequiredAccess]
-                                        )
-                                        if screen_size_max > 0:
-                                            coffee_screen_max[
-                                                coffee
-                                            ] = screen_size_max
-                                            i['screen_max'] = screen_size_max
-                                        # pylint: disable=broad-except
-                                    except Exception:
-                                        pass
+                                try:
+                                    m = float(cd['moisture']) # pyright:ignore[reportTypedDictNotRequiredAccess]
+                                    if m > 0:
+                                        coffee_moisture[coffee] = m
+                                        i['moisture'] = m
+                                    # pylint: disable=broad-except
+                                except Exception:
+                                    pass
+                                try:
+                                    d = int(cd['density']) # pyright:ignore[reportTypedDictNotRequiredAccess]
+                                    if d > 0:
+                                        coffee_density[coffee] = d
+                                        i['density'] = d
+                                    # pylint: disable=broad-except
+                                except Exception:
+                                    pass
+                                try:
+                                    screen_size_min = int(
+                                        cd['screen_size']['min'] # pyright:ignore[reportTypedDictNotRequiredAccess]
+                                    )
+                                    if screen_size_min > 0:
+                                        coffee_screen_min[
+                                            coffee
+                                        ] = screen_size_min
+                                        i['screen_min'] = screen_size_min
+                                    # pylint: disable=broad-except
+                                except Exception:
+                                    pass
+                                try:
+                                    screen_size_max = int(
+                                        cd['screen_size']['max'] # pyright:ignore[reportTypedDictNotRequiredAccess]
+                                    )
+                                    if screen_size_max > 0:
+                                        coffee_screen_max[
+                                            coffee
+                                        ] = screen_size_max
+                                        i['screen_max'] = screen_size_max
+                                    # pylint: disable=broad-except
+                                except Exception:
+                                    pass
                             # add data for replacements if any
                             if 'replace_coffee' in i:
                                 replaceCoffee = i['replace_coffee']
@@ -1321,63 +1301,63 @@ def getBlends(weight_unit_idx:int, store:str|None, customBlend:Blend|None, acqui
                                     coffee_stock[replaceCoffee] = sd['amount']
                                     coffee_data[replaceCoffee] = (cd, sd)
                                     coffeeLabels[replaceCoffee] = coffee2beans(cd)
-                                    if cd is not None:
-                                        if 'label' in cd:
-                                            i['replaceLabel'] = cd['label']
-                                            # add label of coffee to ingredient
-                                            # used in the Roast Properties
-                                            # dialog for links to the coffees
-                                            try:
-                                                if cd['crop_date']['picked'][0] is not None:  # pyright:ignore[reportTypedDictNotRequiredAccess]
-                                                    i[
-                                                        'replaceLabel'
-                                                    ] = f"{cd['crop_date']['picked'][0]} {i['replaceLabel']}"  # pyright:ignore[reportTypedDictNotRequiredAccess]
-                                                # pylint: disable=broad-except
-                                            except Exception:
-                                                pass
+                                    if 'label' in cd:
+                                        i['replaceLabel'] = cd['label']
+                                        # add label of coffee to ingredient
+                                        # used in the Roast Properties
+                                        # dialog for links to the coffees
                                         try:
-                                            m = float(cd['moisture']) # pyright:ignore[reportTypedDictNotRequiredAccess]
-                                            if m > 0:
-                                                coffee_moisture[
-                                                    replaceCoffee
-                                                ] = m
+                                            if 'crop_date' in cd and 'picked' in cd['crop_date'] and len(cd['crop_date'])>0:
+                                                i[
+                                                    'replaceLabel'
+                                                ] = f"{cd['crop_date']['picked'][0]} {i['replaceLabel']}"  # pyright:ignore[reportTypedDictNotRequiredAccess]
                                             # pylint: disable=broad-except
                                         except Exception:
                                             pass
-                                        try:
-                                            d = int(cd['density']) # pyright:ignore[reportTypedDictNotRequiredAccess]
-                                            if d > 0:
-                                                coffee_density[
-                                                    replaceCoffee
-                                                ] = d
-                                            # pylint: disable=broad-except
-                                        except Exception:
-                                            pass
-                                        try:
-                                            screen_size_min = int(
-                                                cd['screen_size']['min'] # pyright:ignore[reportTypedDictNotRequiredAccess]
-                                            )
-                                            if screen_size_min > 0:
-                                                coffee_screen_min[
-                                                    replaceCoffee
-                                                ] = screen_size_min
-                                            # pylint: disable=broad-except
-                                        except Exception:
-                                            pass
-                                        try:
-                                            screen_size_max = int(
-                                                cd['screen_size']['max'] # pyright:ignore[reportTypedDictNotRequiredAccess]
-                                            )
-                                            if screen_size_max > 0:
-                                                coffee_screen_max[
-                                                    replaceCoffee
-                                                ] = screen_size_max
-                                            # pylint: disable=broad-except
-                                        except Exception:
-                                            pass
+                                    try:
+                                        m = float(cd['moisture']) # pyright:ignore[reportTypedDictNotRequiredAccess]
+                                        if m > 0:
+                                            coffee_moisture[
+                                                replaceCoffee
+                                            ] = m
+                                        # pylint: disable=broad-except
+                                    except Exception:
+                                        pass
+                                    try:
+                                        d = int(cd['density']) # pyright:ignore[reportTypedDictNotRequiredAccess]
+                                        if d > 0:
+                                            coffee_density[
+                                                replaceCoffee
+                                            ] = d
+                                        # pylint: disable=broad-except
+                                    except Exception:
+                                        pass
+                                    try:
+                                        screen_size_min = int(
+                                            cd['screen_size']['min'] # pyright:ignore[reportTypedDictNotRequiredAccess]
+                                        )
+                                        if screen_size_min > 0:
+                                            coffee_screen_min[
+                                                replaceCoffee
+                                            ] = screen_size_min
+                                        # pylint: disable=broad-except
+                                    except Exception:
+                                        pass
+                                    try:
+                                        screen_size_max = int(
+                                            cd['screen_size']['max'] # pyright:ignore[reportTypedDictNotRequiredAccess]
+                                        )
+                                        if screen_size_max > 0:
+                                            coffee_screen_max[
+                                                replaceCoffee
+                                            ] = screen_size_max
+                                        # pylint: disable=broad-except
+                                    except Exception:
+                                        pass
                         # next we iterate again over the ingredients and
                         # replace coffees by their replacements if needed
-                        ingredients = copy.deepcopy(blend['ingredients'])
+                        ingredients:list[BlendIngredient] = copy.deepcopy(blend['ingredients'])
+                        reach:float = 0
                         while True:
                             # we first compute the minimum reach
                             # over all components
@@ -1388,18 +1368,21 @@ def getBlends(weight_unit_idx:int, store:str|None, customBlend:Blend|None, acqui
                             # if the minimum reach over all ingredients is
                             # larger than 0 we add an entry to the result list
                             # replacementBlends
-                            if reach_per_ingredients is not None and len(reach_per_ingredients) > 0:
+                            if len(reach_per_ingredients) > 0:
                                 reach = min(reach_per_ingredients)
                             else:
                                 break
                             # we also add the initial blend and blends with
                             # empty reach to replacementBlends and filter
                             # those out later
-                            new_blend = Blend(
+                            new_blend = (Blend(
                                 label = blend['label'],
                                 hr_id = blend['hr_id'],
-                                ingredients = ingredients)
-                            moistures = [
+                                ingredients = ingredients) if 'hr_id' in blend else
+                                    Blend(
+                                        label = blend['label'],
+                                        ingredients = ingredients))
+                            moistures:list[float|None] = [
                                 (
                                     coffee_moisture[i['coffee']] * i['ratio']
                                     if i['coffee'] in coffee_moisture
@@ -1407,7 +1390,7 @@ def getBlends(weight_unit_idx:int, store:str|None, customBlend:Blend|None, acqui
                                 )
                                 for i in ingredients
                             ]
-                            densities = [
+                            densities:list[float|None] = [
                                 (
                                     coffee_density[i['coffee']] * i['ratio']
                                     if i['coffee'] in coffee_density

@@ -22,7 +22,7 @@ import re
 import platform
 import logging
 from PIL import ImageColor
-from typing import Final, cast, TYPE_CHECKING
+from typing import override, Final, cast, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
@@ -234,7 +234,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.showControlButton.setChecked(self.aw.qmc.PIDbuttonflag)
         self.showControlButton.stateChanged.connect(self.PIDfirmwareToggle)
         FILTLabel =QLabel(QApplication.translate('Label', 'Filter'))
-        self.FILTspinBoxes = []
+        self.FILTspinBoxes:list[QSpinBox] = []
         for i in range(4):
             spinBox = QSpinBox()
             spinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
@@ -2188,7 +2188,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             if current_name is None:
                 current_name = self.aw.scale1_name
             new_name, state = QInputDialog.getText(self, 'Scale Name', 'Set scale name', QLineEdit.EchoMode.Normal, text=current_name)
-            if state and new_name is not None:
+            if state:
                 self.aw.set_custom_scale_name(self.aw.scale1_id, new_name.strip())
                 # we need to update both popups
                 self.updateScale1devices(self.scale1_devices, keep_selection=True)
@@ -2289,7 +2289,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             if current_name is None:
                 current_name = self.aw.scale2_name
             new_name, state = QInputDialog.getText(self, 'Scale Name', 'Set scale name', QLineEdit.EchoMode.Normal, text=current_name)
-            if state and new_name is not None:
+            if state:
                 self.aw.set_custom_scale_name(self.aw.scale2_id, new_name.strip())
                 # we need to update both popups
                 self.updateScale1devices(self.scale1_devices, keep_selection=True)
@@ -2688,7 +2688,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
     def createDeviceTable(self) -> None:
         try:
             columns = 15
-            if self.devicetable is not None and self.devicetable.columnCount() == columns:
+            if self.devicetable.columnCount() == columns:
                 # rows have been already established
                 # save the current columnWidth to reset them after table creation
                 self.aw.qmc.devicetablecolumnwidths = [self.devicetable.columnWidth(c) for c in range(self.devicetable.columnCount())]
@@ -2904,7 +2904,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     fields.append(re_strip.sub('',item.text()))
             tbl.field_names = fields
             for r in range(nrows):
-                rows = []
+                rows:list[str] = []
                 # device type
                 typeComboBox = cast(MyQComboBox, self.devicetable.cellWidget(r,0))
                 rows.append(typeComboBox.currentText())
@@ -3210,25 +3210,13 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                         self.aw.qmc.extradevices[i] = self.aw.qmc.devices.index('+' + str(typecombobox.currentText())) + 1
                     except Exception: # pylint: disable=broad-except
                         self.aw.qmc.extradevices[i] = 0
-                if name1edit:
-                    self.aw.qmc.extraname1[i] = name1edit.text()
-                else:
-                    self.aw.qmc.extraname1[i] = ''
-                if name2edit:
-                    self.aw.qmc.extraname2[i] = name2edit.text()
-                else:
-                    self.aw.qmc.extraname2[i] = ''
+                self.aw.qmc.extraname1[i] = name1edit.text()
+                self.aw.qmc.extraname2[i] = name2edit.text()
 
                 self.aw.extraLCDlabel1[i].setText('<b>' + self.aw.qmc.device_name_subst(self.aw.qmc.extraname1[i]) + '</b>')
                 self.aw.extraLCDlabel2[i].setText('<b>' + self.aw.qmc.device_name_subst(self.aw.qmc.extraname2[i]) + '</b>')
-                if mexpr2edit:
-                    self.aw.qmc.extramathexpression1[i] = mexpr1edit.text()
-                else:
-                    self.aw.qmc.extramathexpression1[i] = ''
-                if mexpr2edit:
-                    self.aw.qmc.extramathexpression2[i] = mexpr2edit.text()
-                else:
-                    self.aw.qmc.extramathexpression2[i] = ''
+                self.aw.qmc.extramathexpression1[i] = mexpr1edit.text()
+                self.aw.qmc.extramathexpression2[i] = mexpr2edit.text()
             #update legend with new curves
             if redraw:
                 self.aw.qmc.redraw(recomputeAllDeltas=False)
@@ -3254,8 +3242,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
     def updateETBTinprofile(self, _:bool) -> None:
         try:
             # be sure there is an equation to process
-            nonempty_ETfunction = bool(self.ETfunctionedit.text() is not None and len(self.ETfunctionedit.text().strip()))
-            nonempty_BTfunction = bool(self.BTfunctionedit.text() is not None and len(self.BTfunctionedit.text().strip()))
+            nonempty_ETfunction = bool(len(self.ETfunctionedit.text().strip()))
+            nonempty_BTfunction = bool(len(self.BTfunctionedit.text().strip()))
             if (nonempty_ETfunction or nonempty_BTfunction):
 
                 # confirm the action
@@ -3398,6 +3386,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.aw.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' setextracolor(): {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     # close is called from OK and CANCEL
+    @override
     def close(self) -> bool:
         self.closeHelp()
         settings = QSettings()

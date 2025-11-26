@@ -448,13 +448,12 @@ def addRoast(roast_record:dict[str, Any]|None = None, unsynced:bool=False) -> No
             ):  # amount can be 0 but has to be present
                 # put in upload queue
                 _log.debug('-> put in queue')
-                if aw is not None:
-                    aw.sendmessage(
-                        QApplication.translate(
-                            'Plus',
-                            'Queuing roast for upload to {}'
-                        ).format(config.app_name)
-                    )  # @UndefinedVariable
+                aw.sendmessage(
+                    QApplication.translate(
+                        'Plus',
+                        'Queuing roast for upload to {}'
+                    ).format(config.app_name)
+                )  # @UndefinedVariable
                 rr: dict[str, Any]
                 if roast_record is not None:
                     # on updates only changed attributes w.r.t. the current
@@ -500,7 +499,6 @@ def sendLockSchedule() -> None:
                 # sql queue does not feature a timeout
             )
             _log.debug('-> lockSchedule queued up')
-            if aw is not None:
-                aw.qmc.registerLockScheduleSent()
+            aw.qmc.registerLockScheduleSent()
     except Exception as e:  # pylint: disable=broad-except
         _log.exception(e)

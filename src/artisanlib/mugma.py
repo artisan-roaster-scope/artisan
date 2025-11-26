@@ -18,7 +18,7 @@
 import asyncio
 import logging
 from collections.abc import Callable
-from typing import Final
+from typing import override, Final
 
 from artisanlib.async_comm import AsyncComm
 
@@ -72,6 +72,7 @@ class Mugma(AsyncComm):
     # asyncio read implementation
 
     # https://www.oreilly.com/library/view/using-asyncio-in/9781492075325/ch04.html
+    @override
     async def read_msg(self, stream: asyncio.StreamReader) -> None:
         # read line
         try:

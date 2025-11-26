@@ -16,7 +16,7 @@
 # Marko Luther, 2023
 
 import platform
-from typing import TYPE_CHECKING
+from typing import override, TYPE_CHECKING
 
 
 from artisanlib.util import deltaLabelUTF8, stringfromseconds, stringtoseconds
@@ -508,7 +508,7 @@ class WindowsDlg(ArtisanDialog):
     def xlimitChanged(self) -> None:
         try:
             endedittime_str = str(self.xlimitEdit.text())
-            if endedittime_str is not None and endedittime_str != '':
+            if endedittime_str != '':
                 endeditime = stringtoseconds(endedittime_str)
                 if self.aw.qmc.endofx != endeditime:
                     self.autotimexFlag.setChecked(False)
@@ -523,7 +523,7 @@ class WindowsDlg(ArtisanDialog):
     def xlimitMinChanged(self) -> None:
         try:
             startedittime_str = str(self.xlimitEdit_min.text())
-            if startedittime_str is not None and startedittime_str != '':
+            if startedittime_str != '':
                 starteditime = stringtoseconds(startedittime_str)
                 if starteditime >= 0 and self.aw.qmc.timeindex[0] != -1:
                     self.aw.qmc.startofx = self.aw.qmc.timex[self.aw.qmc.timeindex[0]] + starteditime
@@ -596,14 +596,15 @@ class WindowsDlg(ArtisanDialog):
 
     @pyqtSlot(int)
     def autoDeltaxFlagChanged(self, _:int) -> None:
-        self.aw.qmc.autodeltaxET = self.autodeltaxETFlag.isChecked()
-        self.aw.qmc.autodeltaxBT = self.autodeltaxBTFlag.isChecked()
-        if not self.aw.qmc.flagon and (self.autodeltaxETFlag or self.autodeltaxBTFlag):
-            if self.aw.comparator is not None:
-                self.aw.comparator.redraw()
-                self.zlimitEdit.setText(str(self.aw.qmc.zlimit))
-            else:
-                self.autoDeltaAxis()
+        if not self.aw.qmc.flagon:
+            self.aw.qmc.autodeltaxET = self.autodeltaxETFlag.isChecked()
+            self.aw.qmc.autodeltaxBT = self.autodeltaxBTFlag.isChecked()
+            if (self.aw.qmc.autodeltaxET or self.aw.qmc.autodeltaxBT):
+                if self.aw.comparator is not None:
+                    self.aw.comparator.redraw()
+                    self.zlimitEdit.setText(str(self.aw.qmc.zlimit))
+                else:
+                    self.autoDeltaAxis()
 
     @pyqtSlot(int)
     def autoTimexFlagChanged(self, n:int) -> None:
@@ -639,7 +640,7 @@ class WindowsDlg(ArtisanDialog):
 
         try:
             endedittime_str = str(self.xlimitEdit.text())
-            if endedittime_str is not None and endedittime_str != '':
+            if endedittime_str != '':
                 endeditime = stringtoseconds(endedittime_str)
                 if self.aw.qmc.endofx != endeditime:
                     self.aw.qmc.endofx = endeditime
@@ -650,7 +651,7 @@ class WindowsDlg(ArtisanDialog):
 
         try:
             startedittime_str = str(self.xlimitEdit_min.text())
-            if startedittime_str is not None and startedittime_str != '':
+            if startedittime_str != '':
                 starteditime = stringtoseconds(startedittime_str)
                 if starteditime >= 0 and self.aw.qmc.timeindex[0] != -1:
                     self.aw.qmc.startofx = self.aw.qmc.timex[self.aw.qmc.timeindex[0]] + starteditime
@@ -833,7 +834,7 @@ class WindowsDlg(ArtisanDialog):
 
 
         endedittime_str = str(self.xlimitEdit.text())
-        if endedittime_str is not None and endedittime_str != '':
+        if endedittime_str != '':
             try:
                 endeditime = stringtoseconds(endedittime_str)
                 self.aw.qmc.endofx = endeditime
@@ -846,7 +847,7 @@ class WindowsDlg(ArtisanDialog):
             self.aw.qmc.locktimex_end = self.aw.qmc.endofx_default
 
         startedittime_str = str(self.xlimitEdit_min.text())
-        if startedittime_str is not None and startedittime_str != '':
+        if startedittime_str != '':
             try:
                 starteditime = stringtoseconds(startedittime_str)
                 if starteditime >= 0 and self.aw.qmc.timeindex[0] != -1:
@@ -938,6 +939,7 @@ class WindowsDlg(ArtisanDialog):
         self.close()
 
     @pyqtSlot('QCloseEvent')
+    @override
     def closeEvent(self, a0:'QCloseEvent|None' = None) -> None:
         del a0
         #save window position (only; not size!)

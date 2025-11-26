@@ -158,7 +158,6 @@ def getTemplate(bp: 'ProfileData', background:bool=False) -> dict[str, Any]:
         try:
             if (
                 'roastersize' in bp
-                and bp['roastersize'] is not None
                 and bp['roastersize'] != 0
             ):
                 util.addNum2dict(
@@ -169,7 +168,6 @@ def getTemplate(bp: 'ProfileData', background:bool=False) -> dict[str, Any]:
         try:
             if (
                 'roasterheating' in bp
-                and bp['roasterheating'] is not None
                 and bp['roasterheating'] != 0
             ):
                 util.addNum2dict(
@@ -260,17 +258,17 @@ def getTemplate(bp: 'ProfileData', background:bool=False) -> dict[str, Any]:
 # remove all data but for what is to be synced with the server
 def trimBlendSpec(blend_spec:stock.Blend) -> stock.Blend|None:
     try:
-        res:stock.Blend = {} # type: ignore # missing required fields (added later)
-        if 'label' in blend_spec and blend_spec['label']:
+        res:stock.Blend = {} # type: ignore[typeddict-item] # missing required fields (added later)
+        if blend_spec['label']:
             res['label'] = blend_spec['label']
-            if 'ingredients' in blend_spec and blend_spec['ingredients']:
+            if blend_spec['ingredients']:
                 res_ingredients:list[stock.BlendIngredient] = []
                 for ingredient in blend_spec['ingredients']:
-                    res_ingredient:stock.BlendIngredient = {} # type: ignore # missing required fields (added later)
+                    res_ingredient:stock.BlendIngredient = {} # type: ignore[typeddict-item] # missing required fields (added later)
                     for tag in ['coffee', 'ratio', 'ratio_num', 'ratio_denom']:
                         if tag in ingredient:
-                            res_ingredient[tag] = ingredient[tag] # type: ignore # field vars like 'tag' are not supported by mypy for TypedDicts
-                    if res_ingredient and 'coffee' in res_ingredient and res_ingredient['coffee'] and 'ratio' in res_ingredient and res_ingredient['ratio'] > 0:
+                            res_ingredient[tag] = ingredient[tag] # type: ignore[literal-required] # field vars like 'tag' are not supported by mypy for TypedDicts
+                    if res_ingredient['coffee'] and res_ingredient['ratio'] > 0:
                         res_ingredients.append(res_ingredient)
                     else:
                         return None
@@ -419,7 +417,7 @@ def getRoast() -> dict[str, Any]:
         # if profile is already saved, that modification date is send along to
         # the server instead the timestamp
         # of the moment the record is queued
-        if aw is not None and aw.curFile is not None:
+        if aw.curFile is not None:
             mod_date:float|None = util.getModificationDate(aw.curFile)
             if mod_date is not None:
                 d['modified_at'] = util.epoch2ISO8601(mod_date)

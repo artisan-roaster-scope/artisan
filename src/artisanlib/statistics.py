@@ -17,7 +17,7 @@
 
 import sys
 import platform
-from typing import Any, cast, TYPE_CHECKING, Final
+from typing import override, Any, cast, TYPE_CHECKING, Final
 from artisanlib.dialogs import ArtisanResizeablDialog
 from artisanlib.util import deltaLabelUTF8
 from artisanlib.widgets import MyContentLimitedQComboBox, MyQTableWidget
@@ -281,35 +281,30 @@ class StatisticsDlg(ArtisanResizeablDialog):
         self.copysummarystatsTableButton.setToolTip(QApplication.translate('Tooltip','Copy table to clipboard, OPTION or ALT click for tabular text'))
         self.copysummarystatsTableButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.copysummarystatsTableButton.clicked.connect(self.copyEventButtonTabletoClipboard)
-        addButton: QPushButton|None = QPushButton(QApplication.translate('Button','Add'))
-        if addButton is not None:
-            addButton.setToolTip(QApplication.translate('Tooltip','Add new Statistic'))
-            #addButton.setMaximumWidth(100)
-            addButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-            addButton.clicked.connect(self.addsummarystatSlot)
-        delButton: QPushButton|None = QPushButton(QApplication.translate('Button','Delete'))
-        if delButton is not None:
-            delButton.setToolTip(QApplication.translate('Tooltip','Delete the selected Statistic'))
-            #delButton.setMaximumWidth(100)
-            delButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-            delButton.clicked.connect(self.deletesummarystat)
+        addButton: QPushButton = QPushButton(QApplication.translate('Button','Add'))
+        addButton.setToolTip(QApplication.translate('Tooltip','Add new Statistic'))
+        #addButton.setMaximumWidth(100)
+        addButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        addButton.clicked.connect(self.addsummarystatSlot)
+        delButton: QPushButton = QPushButton(QApplication.translate('Button','Delete'))
+        delButton.setToolTip(QApplication.translate('Tooltip','Delete the selected Statistic'))
+        #delButton.setMaximumWidth(100)
+        delButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        delButton.clicked.connect(self.deletesummarystat)
         self.insertButton: QPushButton|None = QPushButton(QApplication.translate('Button','Insert'))
-        if self.insertButton is not None:
-            self.insertButton.setToolTip(QApplication.translate('Tooltip','Insert below the selected Statistic'))
-            self.insertButton.clicked.connect(self.insertsummarystatSlot)
-            self.insertButton.setMinimumWidth(80)
-            self.insertButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-            self.insertButton.setEnabled(False)
+        self.insertButton.setToolTip(QApplication.translate('Tooltip','Insert below the selected Statistic'))
+        self.insertButton.clicked.connect(self.insertsummarystatSlot)
+        self.insertButton.setMinimumWidth(80)
+        self.insertButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.insertButton.setEnabled(False)
         self.copyTableButton = QPushButton(QApplication.translate('Button', 'Copy Table'))
-        if self.copyTableButton is not None:
-            self.copyTableButton.setToolTip(QApplication.translate('Tooltip','Copy table to clipboard, OPTION or ALT click for tabular text'))
-            self.copyTableButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-            self.copyTableButton.clicked.connect(self.copyEventButtonTabletoClipboard)
+        self.copyTableButton.setToolTip(QApplication.translate('Tooltip','Copy table to clipboard, OPTION or ALT click for tabular text'))
+        self.copyTableButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.copyTableButton.clicked.connect(self.copyEventButtonTabletoClipboard)
         self.defaultButton = QPushButton(QApplication.translate('Button', 'Defaults'))
-        if self.defaultButton is not None:
-            self.defaultButton.setToolTip(QApplication.translate('Tooltip','Set Statistics Summary to default settings'))
-            self.defaultButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-            self.defaultButton.clicked.connect(self.restoreDefaults)
+        self.defaultButton.setToolTip(QApplication.translate('Tooltip','Set Statistics Summary to default settings'))
+        self.defaultButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.defaultButton.clicked.connect(self.restoreDefaults)
 #        helpDialogButton = QDialogButtonBox()
 #        helpButtonD: QPushButton|None = helpDialogButton.addButton(QDialogButtonBox.StandardButton.Help)
 #        if helpButtonD is not None:
@@ -466,6 +461,7 @@ class StatisticsDlg(ArtisanResizeablDialog):
         self.aw.qmc.redraw(recomputeAllDeltas=False)
 
     @pyqtSlot()
+    @override
     def accept(self) -> None:
         self.aw.qmc.AUCtarget = self.targetedit.value()
         self.aw.qmc.AUCtargetFlag = self.targetFlag.isChecked()
@@ -633,7 +629,7 @@ class StatisticsDlg(ArtisanResizeablDialog):
                     fields.append(item.text())
             tbl.field_names = fields
             for r in range(nrows):
-                rows = []
+                rows:list[str] = []
                 rows.append(str(r+1))
                 # type
                 typeComboBox = cast(MyContentLimitedQComboBox, self.summarystatstable.cellWidget(r,0))
@@ -780,6 +776,7 @@ class StatisticsDlg(ArtisanResizeablDialog):
 
 
     @pyqtSlot('QCloseEvent')
+    @override
     def closeEvent(self, a0:'QCloseEvent|None' = None) -> None:
         del a0
 #        self.closeHelp()

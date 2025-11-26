@@ -13,7 +13,7 @@ once.
 # adjusted to PyQt6 by Marko Luther 2021
 
 import sys
-from typing import Any, TYPE_CHECKING
+from typing import override, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from PyQt6.QtGui import QPainter, QWheelEvent, QMouseEvent, QPaintEvent, QKeyEvent # pylint: disable=unused-import
@@ -44,6 +44,7 @@ class CheckComboBox(QComboBox): # pyrefly:ignore[invalid-inheritance] # pyright:
         def isSeparator(self, index:'QModelIndex') -> bool: # pylint: disable=no-self-use
             return str(index.data(Qt.ItemDataRole.AccessibleDescriptionRole)) == 'separator'
 
+        @override
         def paint(self, painter:'QPainter|None', option:QStyleOptionViewItem, index:'QModelIndex') -> None:
 #            if option.widget is not None:
 #                style = option.widget.style()
@@ -76,20 +77,20 @@ class CheckComboBox(QComboBox): # pyrefly:ignore[invalid-inheritance] # pyright:
         def isSeparator(self, index:'QModelIndex') -> bool: # pylint: disable=no-self-use
             return str(index.data(Qt.ItemDataRole.AccessibleDescriptionRole)) == 'separator'
 
+        @override
         def paint(self, painter:'QPainter|None', option:QStyleOptionViewItem, index:'QModelIndex') -> None:
             menuopt = self._getMenuStyleOption(option, index)
             style:QStyle|None = QApplication.style()
-            if option.widget is not None:
-                style = option.widget.style()
+            style = option.widget.style()
             if style is not None:
                 style.drawControl(QStyle.ControlElement.CE_MenuItem, menuopt, painter,
                                   option.widget) # pyrefly: ignore[bad-argument-type]
 
+        @override
         def sizeHint(self, option:QStyleOptionViewItem, index:'QModelIndex') -> QSize:
             menuopt = self._getMenuStyleOption(option, index)
             style:QStyle|None = QApplication.style()
-            if option.widget is not None:
-                style = option.widget.style()
+            style = option.widget.style()
             if style is not None:
                 return style.sizeFromContents(
                     QStyle.ContentsType.CT_MenuItem, menuopt, menuopt.rect.size(),
@@ -113,7 +114,7 @@ class CheckComboBox(QComboBox): # pyrefly:ignore[invalid-inheritance] # pyright:
                     palette.setBrush(QPalette.ColorRole.Base, background)
                 except Exception:  # pylint: disable=broad-except
                     # old obsolete style:
-                    palette.setBrush(QPalette.ColorRole.Background, background) # type: ignore
+                    palette.setBrush(QPalette.ColorRole.Background, background) # type: ignore[attr-defined]
 
 
             menuoption.palette = palette
@@ -189,6 +190,7 @@ class CheckComboBox(QComboBox): # pyrefly:ignore[invalid-inheritance] # pyright:
 
         self.__updateItemDelegate()
 
+    @override
     def mousePressEvent(self, e:'QMouseEvent|None') -> None:
         """Reimplemented."""
         self.__popupIsShown = False
@@ -198,12 +200,14 @@ class CheckComboBox(QComboBox): # pyrefly:ignore[invalid-inheritance] # pyright:
             self.__blockMouseReleaseTimer.start(
                 QApplication.doubleClickInterval())
 
+    @override
     def changeEvent(self, e:QEvent|None) -> None:
         """Reimplemented."""
         if e is not None and e.type() == QEvent.Type.StyleChange:
             self.__updateItemDelegate()
         super().changeEvent(e)
 
+    @override
     def showPopup(self) -> None:
         """Reimplemented."""
         super().showPopup()
@@ -215,6 +219,7 @@ class CheckComboBox(QComboBox): # pyrefly:ignore[invalid-inheritance] # pyright:
                 vp.installEventFilter(self)
                 self.__popupIsShown = True
 
+    @override
     def hidePopup(self) -> None:
         """Reimplemented."""
         view = self.view()
@@ -228,6 +233,7 @@ class CheckComboBox(QComboBox): # pyrefly:ignore[invalid-inheritance] # pyright:
             super().hidePopup()
             view.clearFocus()
 
+    @override
     def eventFilter(self, a0:'QObject|None' = None, a1:QEvent|None = None) -> bool:
         """Reimplemented."""
         view = self.view()
@@ -236,7 +242,7 @@ class CheckComboBox(QComboBox): # pyrefly:ignore[invalid-inheritance] # pyright:
             if self.__popupIsShown and \
                     a1.type() == QEvent.Type.MouseMove and \
                     view.isVisible() and self.__initialMousePos is not None:
-                diff = a0.mapToGlobal(a1.position()) - self.__initialMousePos # type: ignore # mypy: Statement is unreachable
+                diff = a0.mapToGlobal(a1.position()) - self.__initialMousePos # type: ignore[attr-defined, union-attr] # mypy: Statement is unreachable
                 if diff.manhattanLength() > 9 and \
                         self.__blockMouseReleaseTimer.isActive():
                     self.__blockMouseReleaseTimer.stop()
@@ -286,6 +292,7 @@ class CheckComboBox(QComboBox): # pyrefly:ignore[invalid-inheritance] # pyright:
 
         return super().eventFilter(a0, a1)
 
+    @override
     def paintEvent(self, e:'QPaintEvent|None') -> None:
         """Reimplemented."""
         del e
@@ -337,6 +344,7 @@ class CheckComboBox(QComboBox): # pyrefly:ignore[invalid-inheritance] # pyright:
         return [i for i in range(self.count())
                 if self.itemCheckState(i) == Qt.CheckState.Checked]
 
+    @override
     def setPlaceholderText(self, placeholderText:str|None) -> None:
         """Set the placeholder text.
         This text is displayed on the checkbox when there are no checked
@@ -349,6 +357,7 @@ class CheckComboBox(QComboBox): # pyrefly:ignore[invalid-inheritance] # pyright:
             self.__placeholderText = placeholderText
             self.update()
 
+    @override
     def placeholderText(self) -> str:
         """Return the placeholder text.
         Returns
@@ -357,11 +366,13 @@ class CheckComboBox(QComboBox): # pyrefly:ignore[invalid-inheritance] # pyright:
         """
         return self.__placeholderText
 
+    @override
     def wheelEvent(self, e:'QWheelEvent|None') -> None: # pylint: disable=no-self-use
         """Reimplemented."""
         if e is not None:
             e.ignore()
 
+    @override
     def keyPressEvent(self, e:'QKeyEvent|None') -> None:
         """Reimplemented."""
         # Override the default QComboBox behavior

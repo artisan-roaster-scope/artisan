@@ -63,7 +63,7 @@ def extractProfileRubasseCSV(file:str,
         i = 0
         for row in data:
             items = list(zip(header, row, strict=False)) # ty:ignore
-            item = {}
+            item:dict[str,str] = {}
             for (name, value) in items:
                 item[name] = value.strip()
 
@@ -153,7 +153,7 @@ def extractProfileRubasseCSV(file:str,
                     _log.exception(e)
             if 'Heater' in item:
                 try:
-                    vh = item['Heater']
+                    vh:str = item['Heater']
                     if vh != '':
                         v = float(vh)
                         if heater is None or v != heater:

@@ -137,7 +137,7 @@ stopbits=1
 timeout=0.5
 type=3
 optimizer=true
-fetch_max_blocks=false
+fetch_max_blocks=true
 
 [Quantifiers]
 clusterEventsFlag=true

@@ -326,7 +326,7 @@ def diffCachedSyncRecord(roast_record:dict[str, Any]) -> dict[str, Any]:
     try:
         _log.debug('diffCachedSyncRecord()')
         sync_record_semaphore.acquire(1)
-        if cached_sync_record is None or roast_record is None:
+        if cached_sync_record is None:
             return roast_record
         res = dict(roast_record)  # make a copy of the given roast_record
         keys_with_equal_values = []
@@ -900,13 +900,13 @@ def getUpdate(uuid: str|None, file: str|None = None) -> None:
     _log.debug('getUpdate(%s,%s)', uuid, file)
     if uuid is not None and config.app_window is not None:
         aw = config.app_window
-        if aw is not None and aw.editgraphdialog is None and controller.is_connected():
+        if aw.editgraphdialog is None and controller.is_connected():
             try:
                 # block opening the Roast Properties dialog
                 # while syncing from the server
                 aw.editgraphdialog = False
                 aw.updatePlusStatusSignal.emit()  # show syncing icon
-                QTimer.singleShot(2, lambda: (fetchServerUpdate(uuid, file) if isinstance(uuid, str) else None))
+                QTimer.singleShot(2, lambda: fetchServerUpdate(uuid, file))
             except Exception as e:  # pylint: disable=broad-except
                 _log.exception(e)
 

@@ -15,7 +15,7 @@
 # AUTHOR
 # Marko Luther, 2023
 
-from typing import cast, Any, TYPE_CHECKING
+from typing import override, cast, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
@@ -99,33 +99,28 @@ class WheelDlg(ArtisanDialog):
         self.colorSpinBox.setValue(int(round(self.aw.qmc.wheelcolorpattern)))
         self.colorSpinBox.setWrapping(True)
         self.colorSpinBox.valueChanged.connect(self.setcolorpattern)
-        addButton: QPushButton|None = QPushButton(QApplication.translate('Button','Add'))
-        if addButton is not None:
-            addButton.setToolTip(QApplication.translate('Tooltip','Add new wheel'))
-            addButton.clicked.connect(self.insertwheel)
-        rotateLeftButton: QPushButton|None = QPushButton('<')
-        if rotateLeftButton is not None:
-            rotateLeftButton.setToolTip(QApplication.translate('Tooltip','Rotate graph 1 degree counter clockwise'))
-            rotateLeftButton.clicked.connect(self.rotatewheels1)
-        rotateRightButton: QPushButton|None = QPushButton('>')
-        if rotateRightButton is not None:
-            rotateRightButton.setToolTip(QApplication.translate('Tooltip','Rotate graph 1 degree clockwise'))
-            rotateRightButton.clicked.connect(self.rotatewheels0)
+        addButton: QPushButton = QPushButton(QApplication.translate('Button','Add'))
+        addButton.setToolTip(QApplication.translate('Tooltip','Add new wheel'))
+        addButton.clicked.connect(self.insertwheel)
+        rotateLeftButton: QPushButton = QPushButton('<')
+        rotateLeftButton.setToolTip(QApplication.translate('Tooltip','Rotate graph 1 degree counter clockwise'))
+        rotateLeftButton.clicked.connect(self.rotatewheels1)
+        rotateRightButton: QPushButton = QPushButton('>')
+        rotateRightButton.setToolTip(QApplication.translate('Tooltip','Rotate graph 1 degree clockwise'))
+        rotateRightButton.clicked.connect(self.rotatewheels0)
 
         self.main_buttons = QDialogButtonBox()
 
-        saveButton: QPushButton|None = QPushButton(QApplication.translate('Button','Save File'))
-        if saveButton is not None:
-            saveButton.clicked.connect(self.fileSave)
-            saveButton.setToolTip(QApplication.translate('Tooltip','Save graph to a text file.wg'))
-            self.main_buttons.addButton(saveButton,QDialogButtonBox.ButtonRole.ActionRole)
+        saveButton: QPushButton = QPushButton(QApplication.translate('Button','Save File'))
+        saveButton.clicked.connect(self.fileSave)
+        saveButton.setToolTip(QApplication.translate('Tooltip','Save graph to a text file.wg'))
+        self.main_buttons.addButton(saveButton,QDialogButtonBox.ButtonRole.ActionRole)
 
-        saveImgButton: QPushButton|None = QPushButton(QApplication.translate('Button','Save Img'))
-        if saveImgButton is not None:
-            saveImgButton.setToolTip(QApplication.translate('Tooltip','Save image using current graph size to a png format'))
-            #saveImgButton.clicked.connect(self.aw.resizeImg_0_1) # save as PNG (raster)
-            saveImgButton.clicked.connect(self.aw.saveVectorGraph_PDF) # save as PDF (vector)
-            self.main_buttons.addButton(saveImgButton,QDialogButtonBox.ButtonRole.ActionRole)
+        saveImgButton: QPushButton = QPushButton(QApplication.translate('Button','Save Img'))
+        saveImgButton.setToolTip(QApplication.translate('Tooltip','Save image using current graph size to a png format'))
+        #saveImgButton.clicked.connect(self.aw.resizeImg_0_1) # save as PNG (raster)
+        saveImgButton.clicked.connect(self.aw.saveVectorGraph_PDF) # save as PDF (vector)
+        self.main_buttons.addButton(saveImgButton,QDialogButtonBox.ButtonRole.ActionRole)
 
         openButton: QPushButton|None = self.main_buttons.addButton(QDialogButtonBox.StandardButton.Open)
         if openButton is not None:
@@ -178,6 +173,7 @@ class WheelDlg(ArtisanDialog):
         mainlayout.addLayout(buttonlayout)
         self.setLayout(mainlayout)
 
+    @override
     def close(self) -> bool:
         self.accept()
         return True
@@ -589,7 +585,11 @@ class WheelDlg(ArtisanDialog):
             nwheels = len(self.aw.qmc.wheelnames[-1])
         else:                                       #if no wheels
             nwheels = 3
-        wn,sl,sa,wlp,co = [],[],[],[],[]
+        wn:list[str] = []
+        sl:list[float] = []
+        sa:list[float] = []
+        wlp:list[int] = []
+        co:list[str] = []
         for i in range(nwheels+1):
             wn.append(f'W{len(self.aw.qmc.wheelnames)+1} {i+1}')
             sl.append(100./(nwheels+1))
@@ -653,6 +653,7 @@ class WheelDlg(ArtisanDialog):
             self.aw.qmc.drawWheel()
 
     @pyqtSlot('QCloseEvent')
+    @override
     def closeEvent(self, a0:'QCloseEvent|None' = None) -> None:
         del a0
         self.viewmode(False)

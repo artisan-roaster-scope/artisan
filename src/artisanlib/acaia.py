@@ -19,7 +19,7 @@ import asyncio
 import logging
 from enum import IntEnum, unique
 from collections.abc import Callable
-from typing import Final, TYPE_CHECKING
+from typing import override, Final, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from bleak.backends.characteristic import BleakGATTCharacteristic  # pylint: disable=unused-import
@@ -309,6 +309,7 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
         self.readability = 0
 
 
+    @override
     def on_connect(self) -> None:
         self.reset_readings()
         self.id_sent = False
@@ -382,6 +383,7 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
             self._connected_handler()
         self.connected_signal.emit()
 
+    @override
     def on_disconnect(self) -> None:
         _log.debug('disconnected')
         if self._disconnected_handler is not None:
@@ -777,6 +779,7 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
     ###
 
     # keep alive should be send every 3-5sec
+    @override
     def heartbeat(self) -> None:
 #        _log.debug('send heartbeat')
         self.send_message(MSG.SYSTEM, b'\x02\x00')
@@ -955,6 +958,7 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
                 _log.error(e)
 
 
+    @override
     def on_start(self) -> None:
         if hasattr(self, '_async_loop_thread') and self._async_loop_thread is not None:
             # start the reader
@@ -980,6 +984,7 @@ class Acaia(Scale): # pyright: ignore [reportGeneralTypeIssues] # Argument to cl
         self.scale_connected = False
 
 
+    @override
     def scan(self) -> None:
         devices = self.acaia.scan()
         acaia_devices:ScaleSpecs = []
@@ -993,13 +998,16 @@ class Acaia(Scale): # pyright: ignore [reportGeneralTypeIssues] # Argument to cl
                     acaia_devices.append((match, d.address))
         self.scanned_signal.emit(acaia_devices)
 
+    @override
     def is_connected(self) -> bool:
         return self.scale_connected
 
+    @override
     def connect_scale(self, device_logging:bool) -> None:
         self.acaia.setLogging(device_logging)
         self.acaia.start(address=self.ident)
 
+    @override
     def disconnect_scale(self) -> None:
         self.acaia.stop()
 
@@ -1024,16 +1032,20 @@ class Acaia(Scale): # pyright: ignore [reportGeneralTypeIssues] # Argument to cl
         self.scale_connected = False
         self.disconnected_signal.emit()
 
+    @override
     def tare_scale(self) -> None:
         self.acaia.send_tare()
 
+    @override
     def max_weight(self) -> float:
         return self.acaia.max_weight
 
+    @override
     def readability(self) -> float:
         return self.acaia.readability
 
     # signal state actions to the user
+    @override
     def signal_user(self, action:STATE_ACTION) -> None:
 #        _log.debug("PRINT signal_user(%s)", action)
         if action == STATE_ACTION.DISCONNECTED:

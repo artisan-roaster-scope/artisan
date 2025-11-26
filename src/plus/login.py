@@ -29,7 +29,7 @@ from PyQt6.QtGui import QKeySequence, QAction
 import logging
 from artisanlib.dialogs import ArtisanDialog
 from plus import config
-from typing import Final, TYPE_CHECKING
+from typing import override, Final, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
@@ -160,6 +160,7 @@ class Login(ArtisanDialog):
                 self.ok_button.setEnabled(True)
 
     @pyqtSlot()
+    @override
     def reject(self) -> None:
         self.login = self.textName.text()
         super().reject()

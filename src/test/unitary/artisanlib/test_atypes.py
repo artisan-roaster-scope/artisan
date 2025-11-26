@@ -635,4 +635,4 @@ class TestAlarmSet:
             'beeps',
             'alarmstrings',
         ]
-        assert all(len(alarm_set[field]) == alarm_count for field in list_fields) # type: ignore
+        assert all(len(alarm_set[field]) == alarm_count for field in list_fields) # type: ignore[literal-required]

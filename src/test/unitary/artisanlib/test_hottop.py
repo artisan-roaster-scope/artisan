@@ -123,7 +123,7 @@ class TestHottopInitialization:
         from artisanlib.atypes import SerialSettings
         from artisanlib.hottop import Hottop
 
-        serial_settings = SerialSettings() # type: ignore
+        serial_settings = SerialSettings() # type: ignore[typeddict-item]
 
         # Act
         hottop = Hottop(serial=serial_settings)

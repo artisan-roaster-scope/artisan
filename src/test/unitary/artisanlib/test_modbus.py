@@ -380,7 +380,7 @@ class TestModbusPortInitialization:
         assert client.parity == 'N'
         assert client.stopbits == 1
         assert client.timeout == 0.4
-        assert client.IP_timeout == 0.2
+        assert client.IP_timeout == 0.3
         assert client.default_host == '127.0.0.1'
         assert client.host == '127.0.0.1'
         assert client.port == 502
@@ -937,61 +937,6 @@ class TestCacheManagement:
         assert client.readingsCache[3][1][101] == 456
 
 
-class TestMaxBlocks:
-    """Test max_blocks optimization functionality."""
-
-    @pytest.mark.parametrize(
-        'registers,expected',
-        [
-            ([0, 10], [(0, 10)]),
-            ([0, 99], [(0, 99)]),
-            ([0, 100], [(0, 0), (100, 100)]),  # Split at MAX_REGISTER_SEGMENT
-            ([1, 5, 112, 120], [(1, 5), (112, 120)]),
-            ([0, 2, 20, 1040, 1105, 1215], [(0, 20), (1040, 1105), (1215, 1215)]),
-            (
-                [0, 99, 100, 199, 200, 299, 300, 320, 350],
-                [(0, 99), (100, 199), (200, 299), (300, 350)],
-            ),
-            ([], []),  # Empty list
-            ([42], [(42, 42)]),  # Single register
-        ],
-    )
-    def test_max_blocks_various_inputs(
-        self, client: Any, registers: list[int], expected: list[tuple[int, int]]
-    ) -> None:
-        """Test max_blocks with various register sequences."""
-        # Act
-        result = client.max_blocks(registers)
-
-        # Assert
-        assert result == expected
-
-    def test_max_blocks_large_gap(self, client: Any) -> None:
-        """Test max_blocks with large gaps between registers."""
-        # Arrange
-        registers = [0, 1, 1000, 1001, 2000]
-
-        # Act
-        result = client.max_blocks(registers)
-
-        # Assert
-        expected = [(0, 1), (1000, 1001), (2000, 2000)]
-        assert result == expected
-
-    def test_max_blocks_exceeds_segment_size(self, client: Any) -> None:
-        """Test max_blocks when range exceeds MAX_REGISTER_SEGMENT."""
-        # Arrange
-        registers = list(range(250))  # 250 consecutive registers
-
-        # Act
-        result = client.max_blocks(registers)
-
-        # Assert
-        # Should be split into chunks of MAX_REGISTER_SEGMENT (100)
-        expected = [(0, 99), (100, 199), (200, 249)]
-        assert result == expected
-
-
 class TestUpdateActiveRegisters:
     """Test active registers management for optimization."""
 
@@ -1001,7 +946,7 @@ class TestUpdateActiveRegisters:
         client.updateActiveRegisters()
 
         # Assert - activeRegisters should be a dict
-        assert isinstance(client.activeRegisters, dict)
+        assert isinstance(client.activeRegisterSequences, dict)
 
 
 class TestSlaveZeroHandling:
@@ -1186,39 +1131,6 @@ class TestEdgeCasesAndBoundaryConditions:
         assert expected_ip_timeout == 0.2
 
 
-class TestDeprecatedWriteRegister:
-    """Test the deprecated writeRegister method."""
-
-    def test_write_register_value_parsing(self) -> None:
-        """Test writeRegister value parsing logic."""
-        # Test string float parsing
-        test_str_float = '123.45'
-        assert isinstance(test_str_float, str) and '.' in test_str_float
-        assert int(round(float(test_str_float))) == 123
-
-        # Test string int parsing
-        test_str_int = '456'
-        assert isinstance(test_str_int, str) and '.' not in test_str_int
-        assert int(test_str_int) == 456
-
-        # Test int value
-        assert isinstance(789, int)
-
-        # Test float value rounding
-        assert int(round(123.67)) == 124
-
-    def test_write_register_slave_zero_ignored(self, client: Any) -> None:
-        """Test writeRegister ignores slave ID 0."""
-        # This should not raise an exception and should return early
-        try:
-            client.writeRegister(0, 100, 123)
-            # If we get here, the method returned early as expected
-            assert True
-        except Exception as exc:
-            # Should not raise any exception
-            raise AssertionError('writeRegister should handle slave 0 gracefully') from exc
-
-
 class TestConnectionTypes:
     """Test different connection type configurations."""
 
@@ -1316,19 +1228,6 @@ class TestErrorScenarios:
         # This will give a mathematical result, not a proper BCD conversion
         assert isinstance(result, int)
 
-    def test_max_blocks_with_unsorted_input(self, client: Any) -> None:
-        """Test max_blocks with unsorted register list."""
-        # Arrange
-        unsorted_registers = [100, 50, 200, 75]
-
-        # Act
-        result = client.max_blocks(unsorted_registers)
-
-        # Assert
-        # The method processes registers in order without sorting
-        # It creates segments based on the order given
-        expected = [(100, 50), (200, 75)]
-        assert result == expected
 
     def test_conversion_methods_with_empty_registers(self, client: Any) -> None:
         """Test conversion methods with empty register lists."""

@@ -505,7 +505,7 @@ class ClientBLE(QObject): # pyrefly:ignore[invalid-inheritance] # pyright:ignore
         elif service_uuid not in self._device_descriptions:
             self._device_descriptions[service_uuid] = { device_name }
         elif self._device_descriptions[service_uuid] is not None:
-            self._device_descriptions[service_uuid].add(device_name) # type:ignore
+            self._device_descriptions[service_uuid].add(device_name) # type:ignore[union-attr]
 
     def add_notify(self, notify_uuid:str, callback:'Callable[[BleakGATTCharacteristic, bytearray], None]') -> None:
         self._notifications[notify_uuid] = callback

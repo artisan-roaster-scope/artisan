@@ -19,20 +19,21 @@ import asyncio
 import logging
 import numpy as np
 
-from artisanlib.async_comm import AsyncComm
-from artisanlib.ble_port import ClientBLE
-from artisanlib.filters import LiveMean, LiveMedian
-
 from PyQt6.QtCore import QRegularExpression
 
 from collections.abc import Callable
-from typing import Final, TYPE_CHECKING
+from typing import override, Final, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from PyQt6.QtCore import QRegularExpressionMatch # pylint: disable=unused-import
     from artisanlib.atypes import SerialSettings # pylint: disable=unused-import
     import numpy.typing as npt # pylint: disable=unused-import
     from bleak.backends.characteristic import BleakGATTCharacteristic  # pylint: disable=unused-import
+
+
+from artisanlib.async_comm import AsyncComm
+from artisanlib.ble_port import ClientBLE
+from artisanlib.filters import LiveMean, LiveMedian
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
@@ -81,6 +82,7 @@ class ColorTrack(AsyncComm):
     # asyncio read implementation
 
     # https://www.oreilly.com/library/view/using-asyncio-in/9781492075325/ch04.html
+    @override
     async def read_msg(self, stream: asyncio.StreamReader) -> None:
         line = await stream.readline()
         if self._logging:
@@ -180,11 +182,13 @@ class ColorTrackBLE(ClientBLE):
 #    def notify_temp_hum_callback(_sender:'BleakGATTCharacteristic', payload:bytearray) -> None:
 #        _log.info('temp/hum: %s', payload)
 
+    @override
     def on_connect(self) -> None: # pylint: disable=no-self-use
 #        self._received_readings = np.array([])
         if self._connected_handler is not None:
             self._connected_handler()
 
+    @override
     def on_disconnect(self) -> None: # pylint: disable=no-self-use
         if self._disconnected_handler is not None:
             self._disconnected_handler()

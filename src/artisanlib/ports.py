@@ -19,7 +19,7 @@ import sys
 import time
 import platform
 import logging
-from typing import Final, cast, TYPE_CHECKING
+from typing import override, Final, cast, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
@@ -128,6 +128,7 @@ class scanModbusDlg(ArtisanDialog):
         layout.addLayout(hlayout)
         self.setLayout(layout)
 
+    @override
     def keyPressEvent(self, a0: 'QKeyEvent|None') -> None:
         if a0 is not None:
             key = int(a0.key())
@@ -211,6 +212,7 @@ class scanModbusDlg(ArtisanDialog):
             self.code4 = False
 
     @pyqtSlot('QCloseEvent')
+    @override
     def closeEvent(self, a0:'QCloseEvent|None' = None) -> None:
         del a0
         self.stop = True
@@ -299,6 +301,7 @@ class scanS7Dlg(ArtisanDialog):
         layout.addLayout(hlayout)
         self.setLayout(layout)
 
+    @override
     def keyPressEvent(self, a0: 'QKeyEvent|None') -> None:
         if a0 is not None:
             key = int(a0.key())
@@ -373,6 +376,7 @@ class scanS7Dlg(ArtisanDialog):
             self.checkbox3.setChecked(not self.typeFloat)
 
     @pyqtSlot('QCloseEvent')
+    @override
     def closeEvent(self, a0:'QCloseEvent|None' = None) -> None:
         del a0
         self.stop = True
@@ -961,12 +965,12 @@ class comportDlg(ArtisanResizeablDialog):
         s7_modeLabel = QLabel(QApplication.translate('Label', 'Mode'))
         s7_divLabel = QLabel(QApplication.translate('Label', 'Factor'))
 
-        self.s7_areaCombos = []
-        self.s7_dbEdits = []
-        self.s7_startEdits = []
-        self.s7_typeCombos = []
-        self.s7_modeCombos = []
-        self.s7_divCombos = []
+        self.s7_areaCombos:list[QComboBox] = []
+        self.s7_dbEdits:list[QLineEdit] = []
+        self.s7_startEdits:list[QLineEdit] = []
+        self.s7_typeCombos:list[QComboBox] = []
+        self.s7_modeCombos:list[QComboBox] = []
+        self.s7_divCombos:list[QComboBox] = []
 
         s7_areas = [' ','PE','PA','MK','CT','TM','DB']
         s7_types = ['Int', 'Float', 'IntFloat','Bool(0)', 'Bool(1)', 'Bool(2)', 'Bool(3)', 'Bool(4)', 'Bool(5)', 'Bool(6)', 'Bool(7)']
@@ -1430,9 +1434,9 @@ class comportDlg(ArtisanResizeablDialog):
         ws_line3.addWidget(ws_events_box)
 
 
-        self.ws_requestEdits = []
-        self.ws_nodeEdits = []
-        self.ws_modeCombos = []
+        self.ws_requestEdits:list[QLineEdit] = []
+        self.ws_nodeEdits:list[QLineEdit] = []
+        self.ws_modeCombos:list[QComboBox] = []
 
         ws_grid = QGridLayout()
 
@@ -1716,6 +1720,7 @@ class comportDlg(ArtisanResizeablDialog):
         self.closeHelp()
 
     @pyqtSlot('QCloseEvent')
+    @override
     def closeEvent(self, a0:'QCloseEvent|None' = None) -> None:
         del a0
         self.closeHelp()
@@ -1724,6 +1729,7 @@ class comportDlg(ArtisanResizeablDialog):
         settings.setValue('PortsGeometry',self.saveGeometry())
 
     @pyqtSlot()
+    @override
     def accept(self) -> None:
         #validate serial parameter against input errors
         class comportError(Exception):

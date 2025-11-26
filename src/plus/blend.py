@@ -32,7 +32,7 @@ from artisanlib.dialogs import ArtisanDialog
 from artisanlib.widgets import MyQComboBox
 from uic import BlendDialog # OFF type: ignore[attr-defined] # pylint: disable=no-name-in-module
 from collections.abc import Collection
-from typing import Final, cast, TYPE_CHECKING
+from typing import override, Final, cast, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
@@ -173,9 +173,11 @@ class CustomBlendDialog(ArtisanDialog):
             self.restoreGeometry(settings.value('BlendGeometry'))
 
     @pyqtSlot()
+    @override
     def cancelDialog(self) -> None: # ESC key
         self.reject()
 
+    @override
     def keyPressEvent(self, a0: 'QKeyEvent|None') -> None:
         if a0 is not None:
             key = int(a0.key())
@@ -295,21 +297,25 @@ class CustomBlendDialog(ArtisanDialog):
         settings.setValue('BlendGeometry',self.saveGeometry())
 
     @pyqtSlot('QCloseEvent')
+    @override
     def closeEvent(self, a0:'QCloseEvent|None' = None) -> None:
         del a0
         self.reject()
 
     @pyqtSlot()
+    @override
     def accept(self) -> None:
         self.saveSettings()
         super().accept()
 
     @pyqtSlot()
+    @override
     def reject(self) -> None:
         self.saveSettings()
         super().reject()
 
     @pyqtSlot()
+    @override
     def close(self) -> bool:
         self.closeEvent(None)
         return True
@@ -381,12 +387,11 @@ class CustomBlendDialog(ArtisanDialog):
 
                 # disable items without stock in current selected store
                 model = cast(QStandardItemModel, beansComboBox.model())
-                if model is not None:
-                    for r, (_,hr_id) in enumerate(coffees_tuples):
-                        if hr_id not in self.coffee_hr_ids_with_stock_in_store:
-                            item = model.item(r)
-                            if item is not None:
-                                item.setEnabled(False)
+                for r, (_,hr_id) in enumerate(coffees_tuples):
+                    if hr_id not in self.coffee_hr_ids_with_stock_in_store:
+                        item = model.item(r)
+                        if item is not None:
+                            item.setEnabled(False)
 
                 beansComboBox.setCurrentIndex(coffees.index(self.coffee_ids[c.coffee]))
                 self.ui.tableWidget.setCellWidget(i,2,beansComboBox)

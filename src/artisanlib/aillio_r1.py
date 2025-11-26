@@ -16,15 +16,17 @@
 # Rui Paulo, 2023
 
 import time
+import array
 import random
+import threading
 from struct import unpack
 from multiprocessing import Pipe
-import threading
 from platform import system
+from collections.abc import Generator
+
 import usb.core # type: ignore[import-untyped]
 import usb.util # type: ignore[import-untyped]
 
-import array
 
 if system().startswith('Windows'):
     import libusb_package # pyright:ignore[reportMissingImports] # pylint: disable=import-error # ty:ignore[unresolved-import]
@@ -83,7 +85,7 @@ class AillioR1:
         self.simulated = False
         self.AILLIO_DEBUG = debug
         self.__dbg('init')
-        self.usbhandle:usb.core.Device|None = None # type:ignore[no-any-unimported,unused-ignore]
+        self.usbhandle:Generator[usb.core.Device, Any, None]|usb.core.Device|None = None # type:ignore[no-any-unimported,unused-ignore]
         self.bt:float = 0
         self.dt:float = 0
         self.heater:float = 0
@@ -160,6 +162,8 @@ class AillioR1:
                                                      idProduct=self.AILLIO_PID_REV3)
         if self.usbhandle is None:
             raise OSError('not found or no permission')
+        if isinstance(self.usbhandle, Generator):
+            raise OSError('Generator not supported')
         self.__dbg('device found!')
         if not system().startswith('Windows') and self.usbhandle.is_kernel_driver_active(self.AILLIO_INTERFACE):
             try:
@@ -171,7 +175,7 @@ class AillioR1:
 #                raise OSError('unable to detach kernel driver') from e
         try:
             config = self.usbhandle.get_active_configuration()
-            if config is not None and config.bConfigurationValue != self.AILLIO_CONFIGURATION:
+            if config is not None and config.bConfigurationValue != self.AILLIO_CONFIGURATION: # pyright:ignore[reportAttributeAccessIssue]
                 self.usbhandle.set_configuration(configuration=self.AILLIO_CONFIGURATION)
         except Exception as e:  # pylint: disable=broad-except
             self.usbhandle = None
@@ -195,8 +199,7 @@ class AillioR1:
         self.parent_pipe, self.child_pipe = Pipe()
         self.worker_thread = threading.Thread(target=self.__updatestate,
                                               args=(self.child_pipe,))
-        if self.worker_thread is not None:
-            self.worker_thread.start()
+        self.worker_thread.start()
 
     def _close_port(self) -> None:
         if self.simulated:
@@ -410,10 +413,10 @@ class AillioR1:
             self.__dbg('IR temperature: ' + str(self.pcbt))
             self.__dbg('voltage: ' + str(self.voltage))
             self.__dbg('coil fan: ' + str(self.coil_fan))
-            self.__dbg('fan: ' + str(self.fan))
-            self.__dbg('heater: ' + str(self.heater))
-            self.__dbg('drum speed: ' + str(self.drum))
-            self.__dbg('time: ' + str(self.minutes) + ':' + str(self.seconds))
+            self.__dbg(f'fan: {self.fan}')
+            self.__dbg(f'heater: {self.heater}')
+            self.__dbg(f'drum speed: {self.drum}')
+            self.__dbg('time: {self.minutes}:{self.seconds}')
 
         state = state[64:]         # type:ignore[reportIndexIssue, unused-ignore]
         self.coil_fan2 = round(unpack('i', state[32:36])[0], 1) # type:ignore[reportIndexIssue, unused-ignore]
@@ -436,12 +439,12 @@ class AillioR1:
 
     def __sendcmd(self, cmd:list[int]) -> None:
         self.__dbg('sending command: ' + str(cmd))
-        if self.usbhandle is not None:
-            self.usbhandle.write(self.AILLIO_ENDPOINT_WR, cmd)
+        if self.usbhandle is not None and not isinstance(self.usbhandle, Generator):
+            self.usbhandle.write(self.AILLIO_ENDPOINT_WR, cmd) # ty: ignore[possibly-missing-attribute]
 
     def __readreply(self, length:int) -> Any:
-        if self.usbhandle is not None:
-            return self.usbhandle.read(self.AILLIO_ENDPOINT_RD, length)
+        if self.usbhandle is not None and not isinstance(self.usbhandle, Generator):
+            return self.usbhandle.read(self.AILLIO_ENDPOINT_RD, length) # ty: ignore[possibly-missing-attribute]
         raise OSError('not found or no permission')
 
 #def extractProfileBulletDict(data:Dict, aw:'ApplicationWindow') -> 'ProfileData':

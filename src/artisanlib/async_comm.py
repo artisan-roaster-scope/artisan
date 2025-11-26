@@ -282,7 +282,7 @@ class AsyncComm:
                     connect = asyncio.open_connection(self._host, self._port)
                 # Wait for 2 seconds, then raise TimeoutError
                 reader, writer = await asyncio.wait_for(connect, timeout=connect_timeout)
-                if reader is not None and writer is not None:
+                if writer is not None: # pyright:ignore[reportUnnecessaryComparison] # reader is of type asyncio.streams.StreamReader and thus never None
                     _log.debug('connected')
                     if self._connected_handler is not None:
                         try:

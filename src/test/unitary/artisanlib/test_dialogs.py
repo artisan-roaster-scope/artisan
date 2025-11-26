@@ -30,15 +30,9 @@ import pytest
 from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
 
-# PyQt6/PyQt5 compatibility imports
-try:
-    from PyQt6.QtCore import Qt
-    from PyQt6.QtGui import QKeyEvent
-    from PyQt6.QtWidgets import QApplication, QDialogButtonBox
-except ImportError:
-    from PyQt5.QtCore import Qt  # type: ignore
-    from PyQt5.QtGui import QKeyEvent  # type: ignore
-    from PyQt5.QtWidgets import QApplication, QDialogButtonBox  # type: ignore
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QKeyEvent
+from PyQt6.QtWidgets import QApplication, QDialogButtonBox
 
 from artisanlib.dialogs import (
     ArtisanComboBoxDialog,
@@ -51,7 +45,7 @@ from artisanlib.dialogs import (
 
 # Test Fixtures
 @pytest.fixture(scope='session')
-def qapp() -> Generator[QApplication, None, None]:
+def qapp() -> Generator[QApplication, None, None]: # pyright:ignore[reportUnknownParameterType]
     """Create QApplication instance for the entire test session."""
     if not QApplication.instance():
         app = QApplication(sys.argv)
@@ -102,7 +96,7 @@ class TestBaseDialogFunctionality:
 
     # Level 2 UAT Tests
     def test_dialog_creation_provides_standard_buttons(
-        self, qapp: QApplication, mock_aw: Mock  # noqa: ARG002
+        self, mock_aw: Mock  # noqa: ARG002
     ) -> None:
         """
         ARRANGE: Create base dialog
@@ -123,7 +117,7 @@ class TestBaseDialogFunctionality:
         dialog.close()
 
     def test_escape_key_closes_dialog(
-        self, qapp: QApplication, mock_aw: Mock  # noqa: ARG002
+        self, mock_aw: Mock  # noqa: ARG002
     ) -> None:
         """
         ARRANGE: Open dialog
@@ -145,7 +139,7 @@ class TestBaseDialogFunctionality:
         dialog.close()
 
     def test_ctrl_w_shortcut_closes_dialog(
-        self, qapp: QApplication, mock_aw: Mock  # noqa: ARG002
+        self, mock_aw: Mock  # noqa: ARG002
     ) -> None:
         """
         ARRANGE: Open dialog
@@ -167,7 +161,7 @@ class TestBaseDialogFunctionality:
 
     # Level 3 Destructive Tests
     def test_dialog_with_corrupted_application_window(
-        self, qapp: QApplication  # noqa: ARG002
+        self  # noqa: ARG002
     ) -> None:
         """
         ARRANGE: Corrupted ApplicationWindow mock
@@ -192,7 +186,7 @@ class TestBaseDialogFunctionality:
         max_examples=50, deadline=1000, suppress_health_check=[HealthCheck.function_scoped_fixture]
     )
     def test_key_event_fuzzing(
-        self, qapp: QApplication, mock_aw: Mock, key_code: int  # noqa: ARG002
+        self, mock_aw: Mock, key_code: int  # noqa: ARG002
     ) -> None:
         """
         ARRANGE: Dialog ready for input
@@ -215,7 +209,7 @@ class TestBaseDialogFunctionality:
             dialog.close()
 
     def test_rapid_dialog_creation_destruction(
-        self, qapp: QApplication, mock_aw: Mock  # noqa: ARG002
+        self, mock_aw: Mock  # noqa: ARG002
     ) -> None:
         """
         ARRANGE: System ready for dialog operations
@@ -248,7 +242,7 @@ class TestMessageBoxFunctionality:
     """Test ArtisanMessageBox timeout functionality and user feedback."""
 
     # Level 2 UAT Tests
-    def test_message_box_displays_user_content(self, qapp: QApplication) -> None:  # noqa: ARG002
+    def test_message_box_displays_user_content(self) -> None:  # noqa: ARG002
         """
         ARRANGE: Create message box with user content
         ACT: Display message to user
@@ -269,7 +263,7 @@ class TestMessageBoxFunctionality:
         msg_box.close()
 
     def test_timeout_functionality_provides_auto_close(
-        self, qapp: QApplication  # noqa: ARG002
+        self  # noqa: ARG002
     ) -> None:
         """
         ARRANGE: Create message box with timeout
@@ -296,7 +290,7 @@ class TestHelpDialogFunctionality:
 
     # Level 2 UAT Tests
     def test_help_dialog_displays_content_to_user(
-        self, qapp: QApplication, mock_aw: Mock, mock_qsettings: Mock  # noqa: ARG002
+        self, mock_aw: Mock, mock_qsettings: Mock  # noqa: ARG002
     ) -> None:
         """
         ARRANGE: Create help dialog with content
@@ -316,7 +310,7 @@ class TestHelpDialogFunctionality:
         dialog.close()
 
     def test_search_functionality_finds_user_content(
-        self, qapp: QApplication, mock_aw: Mock, mock_qsettings: Mock  # noqa: ARG002
+        self, mock_aw: Mock, mock_qsettings: Mock  # noqa: ARG002
     ) -> None:
         """
         ARRANGE: Help dialog with searchable content
@@ -339,7 +333,7 @@ class TestHelpDialogFunctionality:
         dialog.close()
 
     def test_empty_search_clears_highlights_for_user(
-        self, qapp: QApplication, mock_aw: Mock, mock_qsettings: Mock  # noqa: ARG002
+        self, mock_aw: Mock, mock_qsettings: Mock  # noqa: ARG002
     ) -> None:
         """
         ARRANGE: Help dialog with previous search results
@@ -363,7 +357,7 @@ class TestHelpDialogFunctionality:
         dialog.close()
 
     def test_ctrl_f_focuses_search_for_user(
-        self, qapp: QApplication, mock_aw: Mock, mock_qsettings: Mock  # noqa: ARG002
+        self, mock_aw: Mock, mock_qsettings: Mock  # noqa: ARG002
     ) -> None:
         """
         ARRANGE: Help dialog is open
@@ -391,7 +385,6 @@ class TestHelpDialogFunctionality:
     )
     def test_search_with_malicious_input(
         self,
-        qapp: QApplication,  # noqa: ARG002
         mock_aw: Mock,
         mock_qsettings: Mock,  # noqa: ARG002
         search_term: str,
@@ -422,7 +415,7 @@ class TestHelpDialogFunctionality:
 #        reason='VULNERABILITY: No limit on search matches - memory exhaustion possible'
 #    )
     def test_search_memory_exhaustion(
-        self, qapp: QApplication, mock_aw: Mock, mock_qsettings: Mock  # noqa: ARG002
+        self, mock_aw: Mock, mock_qsettings: Mock  # noqa: ARG002
     ) -> None:
         """
         ARRANGE: Help dialog with massive content
@@ -456,7 +449,7 @@ class TestHelpDialogFunctionality:
             dialog.close()
 
     def test_regex_injection_protection(
-        self, qapp: QApplication, mock_aw: Mock, mock_qsettings: Mock  # noqa: ARG002
+        self, mock_aw: Mock, mock_qsettings: Mock  # noqa: ARG002
     ) -> None:
         """
         ARRANGE: Help dialog ready for search
@@ -491,7 +484,7 @@ class TestInputDialogFunctionality:
 
     # Level 2 UAT Tests
     def test_input_dialog_accepts_user_text(
-        self, qapp: QApplication, mock_aw: Mock  # noqa: ARG002
+        self, mock_aw: Mock  # noqa: ARG002
     ) -> None:
         """
         ARRANGE: Create input dialog
@@ -514,7 +507,7 @@ class TestInputDialogFunctionality:
 
     @patch('artisanlib.dialogs.QApplication.translate')
     def test_drag_drop_functionality_helps_user(
-        self, mock_translate: Mock, qapp: QApplication, mock_aw: Mock  # noqa: ARG002
+        self, mock_translate: Mock, mock_aw: Mock  # noqa: ARG002
     ) -> None:
         """
         ARRANGE: Input dialog ready for drag-and-drop
@@ -550,7 +543,7 @@ class TestInputDialogFunctionality:
         max_examples=30, deadline=1000, suppress_health_check=[HealthCheck.function_scoped_fixture]
     )
     def test_input_injection_attacks(
-        self, qapp: QApplication, mock_aw: Mock, malicious_input: str  # noqa: ARG002
+        self, mock_aw: Mock, malicious_input: str  # noqa: ARG002
     ) -> None:
         """
         ARRANGE: Input dialog ready for user input
@@ -579,7 +572,7 @@ class TestInputDialogFunctionality:
 
 #    @pytest.mark.xfail(reason='VULNERABILITY: No validation of dropped file URLs')
     @pytest.mark.skip # not relevant
-    def test_malicious_file_drop(self, qapp: QApplication, mock_aw: Mock) -> None:  # noqa: ARG002
+    def test_malicious_file_drop(self, mock_aw: Mock) -> None:  # noqa: ARG002
         """
         ARRANGE: Input dialog with drag-and-drop enabled
         ACT: Drop malicious file URLs
@@ -623,7 +616,7 @@ class TestSelectionDialogFunctionality:
 
     # Level 2 UAT Tests
     def test_combo_box_dialog_presents_choices_to_user(
-        self, qapp: QApplication, mock_aw: Mock  # noqa: ARG002
+        self, mock_aw: Mock  # noqa: ARG002
     ) -> None:
         """
         ARRANGE: Create combo box dialog with choices
@@ -641,7 +634,7 @@ class TestSelectionDialogFunctionality:
         dialog.close()
 
     def test_user_selection_is_captured(
-        self, qapp: QApplication, mock_aw: Mock  # noqa: ARG002
+        self, mock_aw: Mock  # noqa: ARG002
     ) -> None:
         """
         ARRANGE: Combo box dialog with multiple options

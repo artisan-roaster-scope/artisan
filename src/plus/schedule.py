@@ -45,7 +45,7 @@ from PyQt6.QtWidgets import (QDialogButtonBox, QMessageBox, QStackedWidget, QApp
 
 from babel.dates import format_date, format_timedelta
 from pydantic import BaseModel, Field, PositiveInt, UUID4, field_validator, model_validator, computed_field, field_serializer
-from typing import Final, Any, TypedDict, cast, TextIO, TYPE_CHECKING
+from typing import override, Final, Any, TypedDict, cast, TextIO, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.atypes import ProfileData # noqa: F401 # pylint: disable=unused-import
@@ -478,8 +478,8 @@ def load_completed(plus_account_id:str|None, force:bool = True) -> None:
                 completed_roasts_cache_data = json.load(f)
                 if plus_account_id in completed_roasts_cache_data:
                     completed_roasts = completed_roasts_cache_data[plus_account_id]
-                    today_completed = []
-                    previously_completed = []
+                    today_completed:list[CompletedItemDict] = []
+                    previously_completed:list[CompletedItemDict] = []
                     today = datetime.datetime.now(datetime.UTC) # ty:ignore
                     for ci in completed_roasts:
                         if 'roastdate' in ci:
@@ -490,7 +490,7 @@ def load_completed(plus_account_id:str|None, force:bool = True) -> None:
                     if len(previously_completed)>0:
                         previous_session_epoch:float = previously_completed[0].get('roastdate', datetime2epoch(today))
                         previous_session_date = epoch2datetime(previous_session_epoch).astimezone().date()
-                        previously_completed = [pc for pc in previously_completed if 'roastdate' in pc and epoch2datetime(pc['roastdate']).astimezone().date() == previous_session_date]
+                        previously_completed = [pc for pc in previously_completed if epoch2datetime(pc['roastdate']).astimezone().date() == previous_session_date]
                     # we keep all roasts completed today as well as all from the previous roast session
                     completed_roasts_cache = today_completed + previously_completed
                     completed_roasts_cache.sort(key=lambda cr: cr['roastdate'], reverse=True)
@@ -519,7 +519,7 @@ def get_all_completed() -> list[CompletedItemDict]:
 def get_completed(roastUUID:str) -> CompletedItemDict|None:
     try:
         completed_roasts_semaphore.acquire(1)
-        return next((d for d in completed_roasts_cache if 'roastUUID' in d and d['roastUUID'] == roastUUID), None)
+        return next((d for d in completed_roasts_cache if d['roastUUID'] == roastUUID), None)
     except Exception as e:  # pylint: disable=broad-except
         _log.error(e)
     finally:
@@ -536,7 +536,7 @@ def add_completed(plus_account_id:str|None, ci:CompletedItemDict) -> None:
         try:
             completed_roasts_semaphore.acquire(1)
             # test if there is already a completed roasts with that UUID
-            idx = next((i for i,d in enumerate(completed_roasts_cache) if 'roastUUID' in d and d['roastUUID'] == ci['roastUUID']), None)
+            idx = next((i for i,d in enumerate(completed_roasts_cache) if d['roastUUID'] == ci['roastUUID']), None)
             if idx is None:
                 # add ci to front
                 completed_roasts_cache.insert(0, ci)
@@ -1116,16 +1116,19 @@ class QElidedLabel(QLabel): # pyright: ignore[reportGeneralTypeIssues] # pyrefly
         self.setText(text)
 
 
+    @override
     def setText(self, a0:str|None) -> None:
         if a0 is not None:
             self._contents = a0
             self.update()
 
 
+    @override
     def text(self) -> str:
         return self._contents
 
 
+    @override
     def paintEvent(self, a0:'QPaintEvent|None') -> None:
         super().paintEvent(a0)
 
@@ -1235,6 +1238,7 @@ class StandardItem(QFrame): # pyright: ignore[reportGeneralTypeIssues] # pyrefly
         pass
 
 
+    @override
     def mousePressEvent(self, a0:'QMouseEvent|None') -> None:
         if a0 is not None:
             modifiers = QApplication.keyboardModifiers()
@@ -1242,6 +1246,7 @@ class StandardItem(QFrame): # pyright: ignore[reportGeneralTypeIssues] # pyrefly
                 self.clicked.emit()
         super().mousePressEvent(a0)
 
+    @override
     def mouseReleaseEvent(self, a0:'QMouseEvent|None') -> None:
         if a0 is not None:
             modifiers = QApplication.keyboardModifiers()
@@ -1250,6 +1255,7 @@ class StandardItem(QFrame): # pyright: ignore[reportGeneralTypeIssues] # pyrefly
         super().mouseReleaseEvent(a0)
 
 
+    @override
     def enterEvent(self, event:'QEnterEvent|None') -> None:
         if event is not None:
             self.setProperty('Hover', True)
@@ -1257,6 +1263,7 @@ class StandardItem(QFrame): # pyright: ignore[reportGeneralTypeIssues] # pyrefly
         super().enterEvent(event)
 
 
+    @override
     def leaveEvent(self, a0:'QEvent|None') -> None:
         if a0 is not None:
             self.setProperty('Hover', False)
@@ -1307,12 +1314,15 @@ class NoDragItem(StandardItem):
             'QElidedLabel { font-weight: normal; }')
 
 
+    @override
     def getLeft(self) -> str:
         return f'{self.data.prefix}'
 
+    @override
     def getMiddle(self) -> str:
         return f'{self.data.title}'
 
+    @override
     def getRight(self) -> str:
         try:
             # the datetimes now and roastdate are in UTC, we need to compare the dates w.r.t. the local timezone thus we have to convert both via astimezone()
@@ -1536,10 +1546,9 @@ class DragItem(StandardItem):
             self.menu = QMenu()
             fully_prepared_p = fully_prepared(self.data)
             fully_unprepared_p = not fully_prepared_p and fully_unprepared(self.data)
-            if (self.aw.schedule_window is not None and (self.aw.schedule_window.weight_manager.sm_green.current_weight_item is None or
-                (self.aw.schedule_window.weight_manager.sm_green.current_weight_item and
+            if (self.aw.schedule_window.weight_manager.sm_green.current_weight_item is None or
                 (self.aw.schedule_window.weight_manager.sm_green.current_weight_item.uuid != self.data.id or
-                    self.aw.schedule_window.weight_manager.green_task_scale == 0)))): # no scaled assigned to the green task, thus not processing
+                    self.aw.schedule_window.weight_manager.green_task_scale == 0)): # no scaled assigned to the green task, thus not processing
                 # this schedule item is not currently under processing by the weight manager
                 if not fully_prepared_p:
                     allPreparedAction:QAction = QAction(QApplication.translate('Contextual Menu', 'All batches prepared'),self)
@@ -1556,7 +1565,6 @@ class DragItem(StandardItem):
                     nonePreparedAction.triggered.connect(self.nonePrepared)
                     self.menu.addAction(nonePreparedAction)
             if not self.aw.qmc.flagon and self.aw.curFile is not None and self.aw.qmc.scheduleID is None and self.aw.qmc.roastUUID is not None  and \
-                    self.aw.schedule_window is not None and \
                     not self.aw.schedule_window.in_completed(self.aw.qmc.roastUUID) and \
                     self.aw.qmc.roastdate.date().toPyDate() >= self.aw.schedule_window.prev_roast_session_data():
                 # if not sampling and a profile without scheduleID loaded which is not yet registered as completed roast,
@@ -1579,14 +1587,17 @@ class DragItem(StandardItem):
             self.menu.popup(QCursor.pos())
 
 
+    @override
     def getLeft(self) -> str:
         return f'{max(0,self.data.count - len(self.data.roasts))}x'
 
 
+    @override
     def getMiddle(self) -> str:
         return self.data.title
 
 
+    @override
     def getRight(self) -> str:
         mark = ''
         prepared = prepared_state(self.data)
@@ -1597,6 +1608,7 @@ class DragItem(StandardItem):
         return f"{mark}{render_weight(self.data.weight, 1, self.weight_unit_idx)}"
 
 
+    @override
     def mouseMoveEvent(self, a0:'QMouseEvent|None') -> None:
         super().mouseMoveEvent(a0)
         try:
@@ -1742,6 +1754,7 @@ class DragWidget(BaseWidget):
         # NOTE: QDragLeaveEvent has no attribute e.source; therefore we set the self.drag_source explicitly in mouseMoveEvent (could be done also in by dragEnterEvent:e.source())
 
 
+    @override
     def dragEnterEvent(self, a0:'QDragEnterEvent|None') -> None: # pylint: disable=no-self-argument,no-self-use
         try:
             if a0 is not None:
@@ -1751,6 +1764,7 @@ class DragWidget(BaseWidget):
         except Exception as ex:  # pylint: disable=broad-except
             _log.exception(ex)
 
+    @override
     def dragLeaveEvent(self, a0:'QDragLeaveEvent|None') -> None:
         try:
             if a0 is not None:
@@ -1761,7 +1775,7 @@ class DragWidget(BaseWidget):
                     if not self.drag_source.visible_filter_on():
                         # as hidden items are not filtered out we have to put that item back
                         index = self.blayout.indexOf(self._drag_target_indicator)
-                        if index is not None:
+                        if index >= 0:
                             self.blayout.insertWidget(index, self.drag_source) # pyright:ignore[reportArgumentType]
                             self.drag_source.show() # pyright:ignore[reportAttributeAccessIssue]
                             self.blayout.activate()
@@ -1776,6 +1790,7 @@ class DragWidget(BaseWidget):
             _log.exception(ex)
 
 
+    @override
     def dragMoveEvent(self, a0:'QDragMoveEvent|None') -> None:
         try: #
             if a0 is not None:
@@ -1783,13 +1798,12 @@ class DragWidget(BaseWidget):
                     try:
                         # Find the correct location of the drop target, so we can move it there.
                         index = self._find_drop_location(a0)
-                        if index is not None:
-                            # Inserting moves the item if its alreaady in the layout.
-                            self.blayout.insertWidget(index, self._drag_target_indicator)
-                            # Hide the item being dragged.
-                            self.drag_source.hide()
-                            # Show the target
-                            self._drag_target_indicator.show()
+                        # Inserting moves the item if its alreaady in the layout.
+                        self.blayout.insertWidget(index, self._drag_target_indicator)
+                        # Hide the item being dragged.
+                        self.drag_source.hide()
+                        # Show the target
+                        self._drag_target_indicator.show()
                     except Exception:   # pylint: disable=broad-except
                         # wrapped C/C++ objects might have been deleted due to a complete redraw of the widget via updateScheduleWindow()
                         pass
@@ -1800,6 +1814,7 @@ class DragWidget(BaseWidget):
             _log.exception(ex)
 
 
+    @override
     def dropEvent(self, a0:'QDropEvent|None') -> None:
         # Use drop target location for destination, then remove it.
         try:
@@ -1807,7 +1822,7 @@ class DragWidget(BaseWidget):
                 if self.drag_source is not None:
                     self._drag_target_indicator.hide()
                     index = self.blayout.indexOf(self._drag_target_indicator)
-                    if index is not None:
+                    if index >= 0:
                         self.blayout.insertWidget(index, self.drag_source) # pyright:ignore[reportArgumentType]
                         self.orderChanged.emit(self.get_item_data())
                         self.drag_source.show() # pyright:ignore[reportAttributeAccessIssue]
@@ -1853,6 +1868,7 @@ class DragWidget(BaseWidget):
         return n
 
 
+    @override
     def clearItems(self) -> None:
         while self.blayout.count():
             child = self.blayout.takeAt(0)
@@ -1867,6 +1883,7 @@ class DragWidget(BaseWidget):
         self.blayout.addWidget(item)
 
 
+    @override
     def itemAt(self, i:int) -> DragItem|None:
         item:QLayoutItem|None = self.blayout.itemAt(i)
         if item is not None:
@@ -2549,7 +2566,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
     def set_next(self, update_both:bool = False) -> None:
         # is potentially called from QTimer at a point of execution the scheduler window might have been already closed and the TabWidget has been collected
         try:
-            if self and self.TabWidget:
+            if self.TabWidget:
                 todo_tab_active:bool = self.TabWidget.currentIndex() == 0
                 if todo_tab_active or update_both:
                     self.weight_manager.set_next_green(self.next_not_prepared_item())
@@ -2729,6 +2746,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
 
 
     @pyqtSlot('QKeyEvent')
+    @override
     def keyPressEvent(self, a0: 'QKeyEvent|None') -> None:
         if a0 is not None:
             k = int(a0.key())
@@ -2767,6 +2785,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
 
 
     @pyqtSlot('QCloseEvent')
+    @override
     def closeEvent(self, a0:'QCloseEvent|None' = None) -> None: # type:ignore[reportIncompatibleMethodOverride, unused-ignore]
         if self.aw.scheduler_auto_open and len(self.scheduled_items) > 0 and self.aw.plus_account is not None:
             self.aw.scheduler_auto_open = False
@@ -2804,6 +2823,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                 update_schedule_window_semaphore.release(1)
 
     @pyqtSlot()
+    @override
     def close(self) -> bool:
         try:
             # wait until drag-and-drop and updateScheduleWindow operations are done
@@ -2856,7 +2876,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                     new_item = ScheduledItem.model_validate(nitem)
                     # the item exists in the new schedule
                     # check if there is a change in any of the significant attributes
-                    if new_item is not None and (new_item.title != item.title or
+                    if (new_item.title != item.title or
                                 new_item.date != item.date or
                                 new_item.count != item.count or
                                 new_item.coffee != item.coffee or
@@ -2988,26 +3008,26 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                     self.aw.qmc.beans = plus.stock.coffee2beans(coffee)
                     # set coffee attributes from stock (moisture, density, screen size):
                     try:
-                        coffees:list[tuple[str, tuple[plus.stock.Coffee, plus.stock.StockItem]]]|None = plus.stock.getCoffees(weight_unit_idx, item.store)
+                        coffees:list[tuple[str, tuple[plus.stock.Coffee, plus.stock.StockItem]]] = plus.stock.getCoffees(weight_unit_idx, item.store)
                         idx:int|None = plus.stock.getCoffeeStockPosition(item_coffee, item.store, coffees)
-                        if coffees is not None and idx is not None:
+                        if idx is not None:
                             cd = plus.stock.getCoffeeCoffeeDict(coffees[idx])
-                            if 'moisture' in cd and cd['moisture'] is not None:
+                            if 'moisture' in cd:
                                 self.aw.qmc.moisture_greens = cd['moisture']
                             else:
                                 self.aw.qmc.moisture_greens = 0
-                            if 'density' in cd and cd['density'] is not None:
+                            if 'density' in cd:
                                 self.aw.qmc.density = (cd['density'],'g',1.,'l')
                             else:
                                 self.aw.qmc.density = (0,'g',1.,'l')
                             screen_size_min:int = 0
                             screen_size_max:int = 0
                             try:
-                                if 'screen_size' in cd and cd['screen_size'] is not None:
+                                if 'screen_size' in cd:
                                     screen = cd['screen_size']
-                                    if 'min' in screen and screen['min'] is not None:
+                                    if 'min' in screen:
                                         screen_size_min = int(screen['min'])
-                                    if 'max' in screen and screen['max'] is not None:
+                                    if 'max' in screen:
                                         screen_size_max = int(screen['max'])
                             except Exception:  # pylint: disable=broad-except
                                 pass
@@ -3028,9 +3048,9 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                     ingredients = []
                     for i in self.aw.qmc.plus_blend_spec['ingredients']:
                         entry = plus.stock.BlendIngredient(ratio = i['ratio'], coffee = i['coffee'])
-                        if 'ratio_num' in i and i['ratio_num'] is not None:
+                        if 'ratio_num' in i:
                             entry['ratio_num'] = i['ratio_num']
-                        if 'ratio_denom' in i and i['ratio_denom'] is not None:
+                        if 'ratio_denom' in i:
                             entry['ratio_denom'] = i['ratio_denom']
                         ingredients.append(entry)
                     self.aw.qmc.plus_blend_spec['ingredients'] = ingredients # pyrefly: ignore[unsupported-operation]
@@ -3038,19 +3058,19 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                     blend_lines = plus.stock.blend2beans(blend_structure, weight_unit_idx, self.aw.qmc.weight[0])
                     self.aw.qmc.beans = '\n'.join(blend_lines)
                     # set blend attributes from stock (moisture, density, screen size):
-                    if 'moisture' in blend and blend['moisture'] is not None:
+                    if 'moisture' in blend:
                         self.aw.qmc.moisture_greens = blend['moisture']
                     else:
                         self.aw.qmc.moisture_greens = 0
-                    if 'density' in blend and blend['density'] is not None:
+                    if 'density' in blend:
                         self.aw.qmc.density = (blend['density'],'g',1.,'l')
                     else:
                         self.aw.qmc.density = (0,'g',1.,'l')
-                    if 'screen_min' in blend and blend['screen_min'] is not None:
+                    if 'screen_min' in blend:
                         self.aw.qmc.beansize_min = blend['screen_min']
                     else:
                         self.aw.qmc.beansize_min = 0
-                    if 'screen_max' in blend and blend['screen_max'] is not None:
+                    if 'screen_max' in blend:
                         self.aw.qmc.beansize_max = blend['screen_max']
                     else:
                         self.aw.qmc.beansize_max = 0
@@ -3245,8 +3265,8 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         # updates the tabs tooltip
         scheduled_items:list[ScheduledItem] = self.drag_remaining.get_item_data()
         if len(scheduled_items) > 0:
-            todays_items = []
-            later_items = []
+            todays_items:list[ScheduledItem] = []
+            later_items:list[ScheduledItem] = []
             todays_items_roasting_times:list[float|None] = [] # roasting times in seconds of todays schedule item templates if any, otherwise None
             later_items_roasting_times:list[float|None] = []  # roasting times in seconds of next sessions schedule item templates if any, otherwise None
             for si in scheduled_items:
@@ -3296,7 +3316,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
     def setAppBadge(number:int) -> None:
         try:
             app = QApplication.instance()
-            app.setBadgeNumber(max(0, number)) # type: ignore # "QCoreApplication" has no attribute "setBadgeNumber"
+            app.setBadgeNumber(max(0, number)) # type: ignore[union-attr] # "QCoreApplication" has no attribute "setBadgeNumber"
         except Exception: # pylint: disable=broad-except
             pass # setBadgeNumber only supported by Qt 6.5 and newer
 
@@ -3714,8 +3734,8 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         today:datetime.date = now.astimezone().date() # today in local timezone
         completed_items:list[CompletedItem] = self.completed_items
         if len(completed_items) > 0:
-            todays_items = []
-            earlier_items = []
+            todays_items:list[CompletedItem] = []
+            earlier_items:list[CompletedItem] = []
             for ci in completed_items:
                 if ci.roastdate.astimezone().date() == today:
                     todays_items.append(ci)
@@ -4007,11 +4027,13 @@ class WeightItemDisplay(Display):
         self.schedule_window:ScheduleWindow = schedule_window
         super().__init__()
 
+    @override
     def clear_green(self) -> None:
         todo_tab_active:bool = self.schedule_window.TabWidget.currentIndex() == 0
         if todo_tab_active:
             self.clear()
 
+    @override
     def clear_roasted(self) -> None:
         completed_tab_active:bool = self.schedule_window.TabWidget.currentIndex() == 1
         if completed_tab_active:
@@ -4024,6 +4046,7 @@ class WeightItemDisplay(Display):
         self.schedule_window.task_weight.setText('--')
         self.schedule_window.task_weight.setToolTip(QApplication.translate('Plus', 'nothing to weight'))
 
+    @override
     def show_item(self, task_type:int, item:'WeightItem|None', state:PROCESS_STATE = PROCESS_STATE.DISCONNECTED, component:int = 0, final_weight:int|None = None) -> None:
         del state
         del component
@@ -4080,6 +4103,7 @@ class GreenWebDisplay(GreenDisplay):
         #-
         self.rendered_task:TaskWebDisplayPayload = cast(TaskWebDisplayPayload, dict(self.INIT_PAYLOAD)) # initialize with a copy of the empty_task
 
+    @override
     def clear_green(self) -> None:
         self.last_item = None
         self.last_process_state = PROCESS_STATE.DISCONNECTED
@@ -4089,6 +4113,7 @@ class GreenWebDisplay(GreenDisplay):
 
     # component indicates which of the item.descriptions is currently processed
     # in state=PROCESS_STATE.done, the final_weight if given states the final weight in g that has been measured and that will be registered for the task
+    @override
     def show_item(self, task_type:int, item:'WeightItem|None', state:PROCESS_STATE = PROCESS_STATE.DISCONNECTED, component:int = 0, final_weight:int|None = None) -> None:
 #        _log.debug("PRINT show_item(%s,%s,%s,%s)",item,state,component,final_weight)
         if task_type == 0: # ignore non green task types
@@ -4141,6 +4166,7 @@ class GreenWebDisplay(GreenDisplay):
                 self.rendered_task['timer'] = 0 # clear timer start trigger immediately
 
     # current_weight indicates total measured weight over both containers in g (not including the bucket weights)
+    @override
     def show_progress(self, task_type:int, item:'WeightItem|None', state:PROCESS_STATE, component:int, bucket:int, current_weight:int) -> None:
 #        _log.debug("PRINT show_progress(%s, %s,%s,%s,%s)",task_type,state,component,bucket,current_weight)
         if (task_type == 0 and item is not None and isinstance(item, GreenWeightItem) and self.last_item is not None and (self.last_process_state != state or self.last_component != component or self.last_bucket != bucket or
@@ -4222,12 +4248,14 @@ class RoastedWebDisplay(RoastedDisplay):
         #-
         self.rendered_task:TaskWebDisplayPayload = cast(TaskWebDisplayPayload, dict(self.INIT_PAYLOAD)) # initialize with a copy of the empty_task
 
+    @override
     def clear_roasted(self) -> None:
         self.last_item = None
         self.last_process_state = PROCESS_STATE.DISCONNECTED
         self.rendered_task = cast(TaskWebDisplayPayload, dict(self.INIT_PAYLOAD))  # reset with a copy of the empty_task
         self.update()
 
+    @override
     def show_item(self, task_type:int, item:'WeightItem|None', state:PROCESS_STATE = PROCESS_STATE.DISCONNECTED, component:int = 0, final_weight:int|None = None) -> None:
         del component
         if task_type == 1:
@@ -4273,6 +4301,7 @@ class RoastedWebDisplay(RoastedDisplay):
                 self.rendered_task['timer'] = 0 # clear timer start trigger immediately
 
     # current_weight indicates total measured weight in g (not including the bucket weight)
+    @override
     def show_progress(self, task_type:int, item:'WeightItem|None', state:PROCESS_STATE, component:int, bucket:int, current_weight:int) -> None:
 #        _log.debug("PRINT show_progress(%s,%s,%s,%s,%s,%s)",task_type,item,state,component,bucket,current_weight)
         del component, bucket
@@ -4324,6 +4353,7 @@ class RoastedWebDisplay(RoastedDisplay):
 
 
     # current weight in g
+    @override
     def show_result(self, task_type:int, item:'WeightItem', state:PROCESS_STATE, current_weight:int) -> None:
         if (task_type == 1 and isinstance(item, RoastedWeightItem) and self.last_item is not None and (self.last_process_state != state or self.last_current_weight != current_weight)):
             self.last_process_state = state

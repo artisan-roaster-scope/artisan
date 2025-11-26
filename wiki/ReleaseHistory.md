@@ -11,6 +11,8 @@ v3.4.1
   - adds support for [Acaia Pyxis Black (2025)](https://eu.acaia.co/products/pyxis-black)
   - adds visual clue to curve LCDs indicating hidden curves
 
+* CHANGES
+  - removed the term `slave` from the project but for 2 lines (to be removed in later versions) to keep compatibility with older settings
 
 ----
 v3.4.0 (Oct 31, 2025)

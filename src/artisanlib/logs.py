@@ -16,7 +16,7 @@
 # Marko Luther, 2023
 
 
-from typing import TYPE_CHECKING
+from typing import override, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
@@ -72,6 +72,7 @@ class serialLogDlg(ArtisanDialog):
             self.aw.seriallogflag = False
 
     @pyqtSlot('QCloseEvent')
+    @override
     def closeEvent(self, a0:'QCloseEvent|None' = None) -> None:
         del a0
         self.close()
@@ -106,6 +107,7 @@ class errorDlg(ArtisanDialog):
         self.errorEdit.setHtml('version = ' +__version__ +'<br><br>' + htmlerr)
 
     @pyqtSlot('QCloseEvent')
+    @override
     def closeEvent(self, a0:'QCloseEvent|None' = None) -> None:
         del a0
         self.close()
@@ -135,6 +137,7 @@ class messageDlg(ArtisanDialog):
         self.messageEdit.setHtml(htmlmessage)
 
     @pyqtSlot('QCloseEvent')
+    @override
     def closeEvent(self, a0:'QCloseEvent|None' = None) -> None:
         del a0
         self.close()

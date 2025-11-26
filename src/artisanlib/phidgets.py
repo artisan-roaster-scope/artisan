@@ -15,15 +15,15 @@
 # AUTHOR
 # Marko Luther, 2023
 
-from Phidget22.Devices.Manager import Manager # type: ignore
-from Phidget22.DeviceID import DeviceID # type: ignore
-from Phidget22.DeviceClass import DeviceClass # type: ignore
+from Phidget22.Devices.Manager import Manager # type: ignore[import-untyped]
+from Phidget22.DeviceID import DeviceID # type: ignore[import-untyped]
+from Phidget22.DeviceClass import DeviceClass # type: ignore[import-untyped]
 
 import logging
 from typing import Final, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from Phidget22.Phidget import Phidget # type: ignore # pylint: disable=unused-import
+    from Phidget22.Phidget import Phidget # type: ignore[import-untyped] # pylint: disable=unused-import
 
 from PyQt6.QtCore import QSemaphore
 
@@ -175,7 +175,7 @@ class PhidgetManager:
         _log.debug('reserveChannel: %s', channel)
         try:
             self.managersemaphore.acquire(1)
-            if channel is not None and channel in self.attachedPhidgetChannels:
+            if channel in self.attachedPhidgetChannels:
                 self.attachedPhidgetChannels[channel] = False  # reserve channel
                 if channel.getIsHubPortDevice():
                     hub = channel.getHub()
@@ -200,7 +200,7 @@ class PhidgetManager:
         _log.debug('releaseChannel: %s', channel)
         try:
             self.managersemaphore.acquire(1)
-            if channel is not None and channel in self.attachedPhidgetChannels:
+            if channel in self.attachedPhidgetChannels:
                 self.attachedPhidgetChannels[channel] = True # channel again available for attach
                 if channel.getIsHubPortDevice():
                     hub = channel.getHub()

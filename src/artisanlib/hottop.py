@@ -20,7 +20,7 @@ import logging
 import asyncio
 
 from collections.abc import Callable
-from typing import Final
+from typing import override, Final
 
 from artisanlib.atypes import SerialSettings
 from artisanlib.async_comm import AsyncComm
@@ -74,13 +74,14 @@ class Hottop(AsyncComm):
 
     def valid_message(self, message:bytearray) -> bool:
         return (len(message) == 36 and
-            self.HEADER[0:2] == message[0:2] and
+            self.HEADER[0:2] == bytes(message[0:2]) and
             (not self._verify_crc or int(message[35]) == sum(int(c) for c in message[:35]) & 0xFF))
 
 
     # asyncio read implementation
 
     # https://www.oreilly.com/library/view/using-asyncio-in/9781492075325/ch04.html
+    @override
     async def read_msg(self, stream: asyncio.StreamReader) -> None:
         # look for the first header byte
         message = bytearray()
@@ -119,6 +120,7 @@ class Hottop(AsyncComm):
         elif self._logging:
             _log.info('invalid message received: %s', message)
 
+    @override
     def reset_readings(self) -> None:
         self._bt = -1
         self._et = -1

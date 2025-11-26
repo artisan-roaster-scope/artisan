@@ -18,7 +18,7 @@
 import sys
 import time as libtime
 import logging
-from typing import Final, cast, TYPE_CHECKING
+from typing import override, Final, cast, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
@@ -592,12 +592,12 @@ class PID_DlgControl(ArtisanDialog):
         tab2Layout.addSpacing(15)
         tab2Layout.addLayout(tab2InnerLayout)
         rsGrid = QGridLayout()
-        self.SVWidgets = []
-        self.RampWidgets = []
-        self.SoakWidgets = []
-        self.ActionWidgets = []
-        self.BeepWidgets = []
-        self.DescriptionWidgets = []
+        self.SVWidgets:list[QSpinBox] = []
+        self.RampWidgets:list[QTimeEdit] = []
+        self.SoakWidgets:list[QTimeEdit] = []
+        self.ActionWidgets:list[MyQComboBox] = []
+        self.BeepWidgets:list[QWidget] = []
+        self.DescriptionWidgets:list[QLineEdit] = []
         rsGrid.addWidget(QLabel(QApplication.translate('Table','SV')),0,1)
         rsGrid.addWidget(QLabel(QApplication.translate('Table','Ramp')),0,2)
         rsGrid.addWidget(QLabel(QApplication.translate('Table','Soak')),0,3)
@@ -1258,6 +1258,7 @@ class PID_DlgControl(ArtisanDialog):
         if self.aw.pidcontrol.externalPIDControl() == 0: # only the internal PID allows for duty control
             self.aw.pidcontrol.setDutySteps(self.pidDutySteps.value())
 
+    @override
     def close(self) -> bool:
         kp = self.pidKp.value() # 5.00
         ki = self.pidKi.value() # 0.15
@@ -1339,6 +1340,7 @@ class PID_DlgControl(ArtisanDialog):
         return True
 
     @pyqtSlot('QCloseEvent')
+    @override
     def closeEvent(self, a0:'QCloseEvent|None' = None) -> None:
         del a0
         #save window position (only; not size!)
@@ -4244,6 +4246,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
                 self.status.showMessage(QApplication.translate('StatusBar','UNABLE to set Autotune',None),5000)
 
     @pyqtSlot(bool)
+    @override
     def accept(self, _:bool = False) -> None:
         # store set values
         self.aw.fujipid.PXG4['sv1'][0] = toFloat(comma2dot(self.sv1edit.text()))

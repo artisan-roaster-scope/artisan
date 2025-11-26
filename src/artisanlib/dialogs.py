@@ -28,7 +28,7 @@ from artisanlib.widgets import MyQComboBox, ClickableQLineEdit
 from artisanlib.util import comma2dot, float2float, float2floatWeightVolume, convertWeight, weight_units
 
 from collections.abc import Callable
-from typing import Final, cast, TYPE_CHECKING
+from typing import override, Final, cast, TYPE_CHECKING
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
     from PyQt6.QtGui import QCloseEvent, QDragEnterEvent, QDropEvent, QKeyEvent, QShowEvent  # pylint: disable=unused-import
@@ -104,10 +104,12 @@ class ArtisanDialog(QDialog): # pyrefly:ignore[invalid-inheritance] # pyright: i
         self.dialogbuttons.rejected.emit()
 
     @pyqtSlot('QCloseEvent')
+    @override
     def closeEvent(self, a0:'QCloseEvent|None') -> None:
         del a0
         self.dialogbuttons.rejected.emit()
 
+    @override
     def keyPressEvent(self, a0: 'QKeyEvent|None') -> None:
         if a0 is not None:
             key = int(a0.key())
@@ -146,12 +148,14 @@ class ArtisanMessageBox(QMessageBox): # pyrefly:ignore[invalid-inheritance] # py
         self.timeout = timeout # configured timeout, defaults to 0 (no timeout)
         self.currentTime = 0 # counts seconds after timer start
 
+    @override
     def showEvent(self, a0:'QShowEvent|None') -> None:
         del a0
         self.currentTime = 0
         if (self.timeout and self.timeout != 0):
             self.startTimer(1000)
 
+    @override
     def timerEvent(self, a0:'QTimerEvent|None') -> None:
         del a0
         self.currentTime = self.currentTime + 1
@@ -208,6 +212,7 @@ class HelpDlg(ArtisanDialog):
         hLayout.addLayout(buttonLayout)
         self.setLayout(hLayout)
 
+    @override
     def keyPressEvent(self, a0: 'QKeyEvent|None') -> None:
         if a0 is not None:
             key = a0.key()
@@ -232,6 +237,7 @@ class HelpDlg(ArtisanDialog):
                 super().keyPressEvent(a0)
 
     @pyqtSlot('QCloseEvent')
+    @override
     def closeEvent(self, a0: 'QCloseEvent|None' = None) -> None:
         del a0
         self.handleClose()
@@ -274,7 +280,7 @@ class HelpDlg(ArtisanDialog):
 
             # Collect all matches.
             for _ in range(1000):  # arbitrarily large limit, better than while True, should always exit via break
-                found = self.phelp.document().find(regex, cursor)  # type: ignore  #self.phelp.document() will never be None
+                found = self.phelp.document().find(regex, cursor)  # type: ignore[union-attr]  #self.phelp.document() will never be None
                 if found.isNull():
                     break
                 self.matches.append(found)
@@ -357,10 +363,12 @@ class ArtisanInputDialog(ArtisanDialog):
             okButton.setFocus()
 
     @pyqtSlot()
+    @override
     def accept(self) -> None:
         self.url = self.inputLine.text()
         super().accept()
 
+    @override
     def dragEnterEvent(self, a0:'QDragEnterEvent|None') -> None:  # pylint: disable=no-self-use # overloaded method
         if a0 is not None:
             mimeData = a0.mimeData()
@@ -370,6 +378,7 @@ class ArtisanInputDialog(ArtisanDialog):
                 else:
                     a0.ignore()
 
+    @override
     def dropEvent(self, a0:'QDropEvent|None') -> None:
         if a0 is not None:
             mimeData = a0.mimeData()
@@ -408,6 +417,7 @@ class ArtisanComboBoxDialog(ArtisanDialog):
             okButton.setFocus()
 
     @pyqtSlot()
+    @override
     def accept(self) -> None:
         self.idx = self.comboBox.currentIndex()
         QDialog.accept(self)
@@ -459,6 +469,7 @@ class PortComboBox(MyQComboBox):  # pyright: ignore [reportGeneralTypeIssues] # 
             except Exception: # pylint: disable=broad-except
                 pass
 
+    @override
     def eventFilter(self, a0:'QObject|None', a1:'QEvent|None') -> bool:
 # the next prevents correct setSelection on Windows
 #        if a1.type() == QEvent.Type.FocusIn:
@@ -527,6 +538,7 @@ class ArtisanPortsDialog(ArtisanDialog):
         return self.comboBox.getSelection()
 
     @pyqtSlot()
+    @override
     def accept(self) -> None:
         self.idx = self.comboBox.currentIndex()
         QDialog.accept(self)
@@ -572,6 +584,7 @@ class ArtisanSliderLCDinputDlg(ArtisanDialog):
         self.setLayout(mainLayout)
 
     @pyqtSlot()
+    @override
     def accept(self) -> None:
         self.value = int(self.valueEdit.text())
         super().accept()
@@ -638,6 +651,7 @@ class tareDlg(ArtisanDialog):
             self.delButton.setDisabled(False)
 
     @pyqtSlot()
+    @override
     def accept(self) -> None:
         self.saveTareTable()
         self.tare_updated_signal.emit()

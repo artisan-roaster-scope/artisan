@@ -21,7 +21,7 @@ import logging
 from artisanlib.util import deltaLabelUTF8, deltaLabelPrefix, stringfromseconds
 from artisanlib.dialogs import ArtisanResizeablDialog
 from artisanlib.widgets import (MyTableWidgetItemNumber)
-from typing import Final, TYPE_CHECKING
+from typing import override, Final, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
@@ -556,6 +556,7 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.aw.autoAdjustAxis()
 
     #keyboard presses. There must not be widgets (pushbuttons, comboboxes, etc) in focus in order to work
+    @override
     def keyPressEvent(self, a0: 'QKeyEvent|None') -> None:
         if a0 is not None and a0.matches(QKeySequence.StandardKey.Copy):
             if self.TabWidget.currentIndex() == 2: # datatable
@@ -565,6 +566,7 @@ class backgroundDlg(ArtisanResizeablDialog):
             super().keyPressEvent(a0)
 
     @pyqtSlot()
+    @override
     def accept(self) -> None:
         self.aw.qmc.backgroundmovespeed = self.speedSpinBox.value()
         self.aw.qmc.backgroundKeyboardControlFlag = bool(self.keyboardControlflag.isChecked())
@@ -574,6 +576,7 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.close()
 
     @pyqtSlot('QCloseEvent')
+    @override
     def closeEvent(self, a0:'QCloseEvent|None' = None) -> None:
         del a0
         settings = QSettings()
@@ -1084,7 +1087,7 @@ class backgroundDlg(ArtisanResizeablDialog):
                 self.datatable.setItem(i,3,deltaET)
                 self.datatable.setItem(i,4,deltaBT)
 
-                if xtcurve and n3 is not None and len(self.aw.qmc.temp1BX[n3]) > i: # an XT column is available, fill it with data
+                if xtcurve and len(self.aw.qmc.temp1BX[n3]) > i: # an XT column is available, fill it with data
                     if self.aw.qmc.xtcurveidx % 2:
                         XT = QTableWidgetItem(f'{self.aw.qmc.temp1BX[n3][i]:.0f}')
                     else:
@@ -1092,7 +1095,7 @@ class backgroundDlg(ArtisanResizeablDialog):
                     XT.setTextAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
                     self.datatable.setItem(i,5,XT)
 
-                if ytcurve and n4 is not None and len(self.aw.qmc.temp1BX[n4]) > i: # an YT column is available, fill it with data
+                if ytcurve and len(self.aw.qmc.temp1BX[n4]) > i: # an YT column is available, fill it with data
                     if self.aw.qmc.ytcurveidx % 2:
                         YT = QTableWidgetItem(f'{self.aw.qmc.temp1BX[n4][i]:.0f}')
                     else:

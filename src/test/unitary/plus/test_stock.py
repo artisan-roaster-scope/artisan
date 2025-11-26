@@ -1112,10 +1112,10 @@ class TestBlendOperations:
         with patch('plus.stock.coffee_label_normal_order', True):
 
             # Act - Test getBlendLabel (returns ID)
-            label_result = stock.getBlendLabel(mock_blend_structure)   # type: ignore
+            label_result = stock.getBlendLabel(mock_blend_structure)  # type:ignore[arg-type]
 
             # Act - Test getBlendName (returns actual label)
-            name_result = stock.getBlendName(mock_blend_structure)   # type: ignore
+            name_result = stock.getBlendName(mock_blend_structure)    # type:ignore[arg-type]
 
             # Assert
             assert label_result == 'blend456'  # getBlendLabel returns the ID
@@ -1139,7 +1139,7 @@ class TestBlendOperations:
             result = stock.blend2beans(
                 ( # ty: ignore
                     'blend456',
-                    sample_stock_data['blends'][0], # type: ignore
+                    sample_stock_data['blends'][0],  # type:ignore[arg-type]
                     {'location_hr_id': 'store1', 'amount': 1.2},
                 ),
                 0,

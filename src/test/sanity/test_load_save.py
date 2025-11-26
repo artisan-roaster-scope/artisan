@@ -1,6 +1,6 @@
 from pathlib import Path
 from json import load as json_load
-from typing import TypedDict, cast, Any, TYPE_CHECKING
+from typing import override, TypedDict, cast, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from _pytest.python_api import ApproxScalar
@@ -65,6 +65,8 @@ values_to_ignore = [
 # by https://stackoverflow.com/users/8380999/iker
 
 class ApproxBaseReprMixin(ApproxBase):
+
+    @override
     def __repr__(self) -> str:
 
         def recur_repr_helper(obj:Any) -> dict[Any,Any]|tuple[Any,...]|list[Any]|ApproxScalar:
@@ -81,6 +83,7 @@ class ApproxBaseReprMixin(ApproxBase):
 
 class ApproxNestedSequenceLike(ApproxSequenceLike, ApproxBaseReprMixin):
 
+    @override
     def _yield_comparisons(self, actual:Any) -> Any:
         mapping: ApproxNestedMapping|ApproxNestedSequenceLike
         for k in range(len(self.expected)):
@@ -93,6 +96,7 @@ class ApproxNestedSequenceLike(ApproxSequenceLike, ApproxBaseReprMixin):
             else:
                 yield actual[k], self.expected[k]
 
+    @override
     def _check_type(self) -> None:
         pass
 
@@ -100,6 +104,7 @@ class ApproxNestedSequenceLike(ApproxSequenceLike, ApproxBaseReprMixin):
 
 class ApproxNestedMapping(ApproxMapping, ApproxBaseReprMixin):
 
+    @override
     def _yield_comparisons(self, actual:Any) -> Any:
         mapping: ApproxNestedMapping|ApproxNestedSequenceLike
         for k in self.expected:
@@ -112,6 +117,7 @@ class ApproxNestedMapping(ApproxMapping, ApproxBaseReprMixin):
             else:
                 yield actual[k], self.expected[k]
 
+    @override
     def _check_type(self) -> None:
         pass
 

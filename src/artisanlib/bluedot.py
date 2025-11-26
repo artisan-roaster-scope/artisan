@@ -18,7 +18,7 @@
 
 import logging
 from collections.abc import Callable
-from typing import Final, TYPE_CHECKING
+from typing import override, Final, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from bleak.backends.characteristic import BleakGATTCharacteristic  # pylint: disable=unused-import
@@ -60,6 +60,7 @@ class BlueDOT(ClientBLE):
             self.BlueDOT_NAME)
         self.add_notify(self.BlueDOT_NOTIFY_UUID, self.notify_callback)
 
+    @override
     def setLogging(self, b:bool) -> None:
         self._logging = b
 
@@ -68,10 +69,12 @@ class BlueDOT(ClientBLE):
         self._ET = -1
 
 
+    @override
     def on_connect(self) -> None:
         if self.connected_handler is not None:
             self.connected_handler()
 
+    @override
     def on_disconnect(self) -> None:
         self.reset_readings()
         if self.disconnected_handler is not None:

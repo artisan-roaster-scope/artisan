@@ -79,8 +79,7 @@ def setToken(token: str, nickname: str|None = None) -> None:
         config.nickname = nickname
         aw = config.app_window
         if (aw is not None
-            and (aw.qmc.operator is None
-                or aw.qmc.operator == '')
+            and aw.qmc.operator == ''
             and nickname is not None
             and nickname != ''
         ):  # @UndefinedVariable
@@ -340,7 +339,7 @@ def getHeaders(
         }
         try:
             locale = aw.locale_str
-            if locale is not None and locale != '':
+            if locale != '':
                 assert isinstance(locale, str)
                 locale = locale.lower().replace('_', '-')
                 headers['Accept-Language'] = locale

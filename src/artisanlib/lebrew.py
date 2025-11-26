@@ -19,7 +19,7 @@ import re
 import asyncio
 import logging
 from collections.abc import Callable, Awaitable
-from typing import Final, TYPE_CHECKING
+from typing import override, Final, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from bleak.backends.characteristic import BleakGATTCharacteristic  # pylint: disable=unused-import
@@ -60,10 +60,12 @@ class Lebrew_RoastSeeNEXT_BLE(ClientBLE):
                     self._read_queue.put(bytes(data)),
                     self._async_loop_thread.loop)
 
+    @override
     def on_connect(self) -> None: # pylint: disable=no-self-use
         if self._connected_handler is not None:
             self._connected_handler()
 
+    @override
     def on_disconnect(self) -> None: # pylint: disable=no-self-use
         if self._disconnected_handler is not None:
             self._disconnected_handler()
@@ -74,6 +76,7 @@ class Lebrew_RoastSeeNEXT_BLE(ClientBLE):
         while True:
             await self._read_msg(stream)
 
+    @override
     def on_start(self) -> None:
         if hasattr(self, '_async_loop_thread') and self._async_loop_thread is not None:
             # start the reader

@@ -20,7 +20,7 @@ import logging
 
 from pymodbus.framer.rtu import FramerRTU
 from collections.abc import Callable, Awaitable
-from typing import Final, TYPE_CHECKING
+from typing import override, Final, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.atypes import SerialSettings # pylint: disable=unused-import
@@ -65,10 +65,12 @@ class SantokerCube_BLE(ClientBLE):
                     self._read_queue.put(bytes(data)),
                     self._async_loop_thread.loop)
 
+    @override
     def on_connect(self) -> None: # pylint: disable=no-self-use
         if self._connected_handler is not None:
             self._connected_handler()
 
+    @override
     def on_disconnect(self) -> None: # pylint: disable=no-self-use
         if self._disconnected_handler is not None:
             self._disconnected_handler()
@@ -79,6 +81,7 @@ class SantokerCube_BLE(ClientBLE):
         while True:
             await self._read_msg(stream)
 
+    @override
     def on_start(self) -> None:
         if hasattr(self, '_async_loop_thread') and self._async_loop_thread is not None:
             # start the reader
@@ -294,6 +297,7 @@ class Santoker(AsyncComm):
     # asyncio read implementation
 
     # https://www.oreilly.com/library/view/using-asyncio-in/9781492075325/ch04.html
+    @override
     async def read_msg(self, stream: asyncio.StreamReader|IteratorReader) -> None:
         # look for the first header byte
         await stream.readuntil(self.HEADER[0:1])
@@ -359,6 +363,7 @@ class Santoker(AsyncComm):
             self.send(self.create_msg(target, value))
 
 
+    @override
     def start(self, connect_timeout:float=5) -> None:
         if self._connect_using_ble and hasattr(self, '_ble_client') and self._ble_client is not None:
             self._ble_client.setLogging(self._logging)
@@ -366,6 +371,7 @@ class Santoker(AsyncComm):
         else:
             super().start(connect_timeout)
 
+    @override
     def stop(self) -> None:
         if self._connect_using_ble and hasattr(self, '_ble_client') and self._ble_client is not None:
             self._ble_client.stop()

@@ -15,7 +15,7 @@
 # AUTHOR
 # Marko Luther, 2023
 
-from typing import TYPE_CHECKING
+from typing import override, TYPE_CHECKING
 
 from artisanlib.util import fromCtoF, fromFtoC, stringfromseconds, stringtoseconds, comma2dot, weight_units, convertWeight, convertVolume
 from artisanlib.dialogs import ArtisanDialog
@@ -325,6 +325,7 @@ class calculatorDlg(ArtisanDialog):
         self.yieldEdit.setText(f'{cyield:.1f}')
 
     @pyqtSlot('QCloseEvent')
+    @override
     def closeEvent(self, a0:'QCloseEvent|None' = None) -> None:
         del a0
         settings = QSettings()
