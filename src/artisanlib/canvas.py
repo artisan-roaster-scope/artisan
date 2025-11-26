@@ -17255,6 +17255,64 @@ class tgraphcanvas(FigureCanvas):
                 self.errorsemaphore.release(1)
 
     ####################  PROFILE DESIGNER   ###################################################################################
+
+    # Fit a spline with N nodes to existing profile data
+    def fit_spline_to_profile(self, num_nodes: int) -> tuple[list[float], list[float], list[float]]:
+        """Fit a spline with the specified number of nodes to the current profile data.
+
+        Args:
+            num_nodes: Number of control points/nodes for the fitted spline
+
+        Returns:
+            Tuple of (times, temps1, temps2) lists containing the fitted control points
+        """
+        from scipy.interpolate import splrep, splev
+
+        if not self.timex or not self.temp1 or not self.temp2:
+            return [], [], []
+
+        # Get the time range from CHARGE to DROP
+        start_idx = self.timeindex[0]  # CHARGE
+        end_idx = self.timeindex[6]    # DROP
+
+        if start_idx == -1 or end_idx == 0:
+            # Fall back to full range if no CHARGE/DROP
+            start_idx = 0
+            end_idx = len(self.timex) - 1
+
+        # Extract the data segment
+        time_data = numpy.array(self.timex[start_idx:end_idx+1])
+        temp1_data = numpy.array(self.temp1[start_idx:end_idx+1])
+        temp2_data = numpy.array(self.temp2[start_idx:end_idx+1])
+
+        # Fit smoothing splines to the data
+        # Use s parameter for smoothing (0 = interpolation, higher = more smoothing)
+        # We use some smoothing to avoid overfitting to noise
+        try:
+            # Determine smoothing factor based on data length
+            s_factor = len(time_data) * 0.5
+
+            # Fit splines for both ET and BT
+            tck_et = splrep(time_data, temp1_data, s=s_factor, k=min(3, num_nodes-1))
+            tck_bt = splrep(time_data, temp2_data, s=s_factor, k=min(3, num_nodes-1))
+
+            # Generate N evenly spaced time points across the range
+            fitted_times = numpy.linspace(time_data[0], time_data[-1], num_nodes).tolist()
+
+            # Evaluate the fitted splines at these points
+            fitted_temp1 = splev(fitted_times, tck_et).tolist() # pyright:ignore[reportUnknownArgumentType]
+            fitted_temp2 = splev(fitted_times, tck_bt).tolist() # pyright:ignore[reportUnknownArgumentType]
+
+            return fitted_times, fitted_temp1, fitted_temp2
+
+        except Exception as e: # pylint: disable=broad-except
+            _log.error('Spline fitting failed: %s',e)
+            # Fall back to simple uniform sampling if spline fitting fails
+            indices = numpy.linspace(0, len(time_data)-1, num_nodes, dtype=int)
+            return ([float(time_data[i]) for i in indices],
+                    [float(temp1_data[i]) for i in indices],
+                    [float(temp2_data[i]) for i in indices])
+
     #launches designer
     def designer(self) -> None:
         #disconnect mouse cross if ON
@@ -17265,11 +17323,12 @@ class tgraphcanvas(FigureCanvas):
             self.aw.deleteBackground()
 
         if self.timex:
-            reply = QMessageBox.question(self.aw, QApplication.translate('Message','Designer Start'),
-                                         QApplication.translate('Message','Importing a profile in to Designer will decimate all data except the main [points].\nContinue?'),
-                                         QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
-            if reply == QMessageBox.StandardButton.Yes:
-                res = self.initfromprofile()
+            # Show dialog to select number of spline nodes
+            from artisanlib.dialogs import DesignerSplineNodesDlg
+            dialog = DesignerSplineNodesDlg(self.aw, self.aw, default_nodes=10)
+            if dialog.exec():
+                num_nodes = dialog.get_num_nodes()
+                res = self.initfromprofile(num_nodes=num_nodes)
                 if res:
                     self.ax_lines_clear()
                     self.ax_annotations_clear() # remove background profiles annotations (has to be done before reset!)
@@ -17281,7 +17340,7 @@ class tgraphcanvas(FigureCanvas):
                     self.redraw()
                 else:
                     self.aw.designerAction.setChecked(False)
-            elif reply == QMessageBox.StandardButton.Cancel:
+            else:
                 self.aw.designerAction.setChecked(False)
         else:
             #if no profile found
@@ -17409,7 +17468,15 @@ class tgraphcanvas(FigureCanvas):
         self.redrawdesigner(force=True)
 
     #loads main points from a profile so that they can be edited
-    def initfromprofile(self) -> bool:
+    def initfromprofile(self, num_nodes: int = 0) -> bool:
+        """Initialize designer from existing profile by fitting a spline.
+
+        Args:
+            num_nodes: Number of spline nodes to fit. If 0, uses landmark-based method (old behavior).
+
+        Returns:
+            True if successful, False otherwise.
+        """
         if self.timeindex[0] == -1 or self.timeindex[6] == 0:
             QMessageBox.information(self.aw, QApplication.translate('Message','Designer Init'),
                                     QApplication.translate('Message','Unable to start designer.\nProfile missing [CHARGE] or [DROP]'))
@@ -17426,52 +17493,84 @@ class tgraphcanvas(FigureCanvas):
             self.eventtimecopy.append(self.timex[spe]-self.timex[self.timeindex[0]])
         self.etypescopy = self.etypes[:]
 
-        #find lowest point from profile to be converted
-        lpindex = self.aw.findTP()
-        if lpindex != -1 and lpindex not in self.timeindex:
-            lptime = self.timex[lpindex]
-            lptemp2 = self.temp2[lpindex]
-            # we only consider TP if its BT is at least 20 degrees lower than the CHARGE temperature
-            if self.temp2[self.timeindex[0]] < (lptemp2 + 20):
+        # Save landmark times before any modifications
+        timeindexhold = [self.timex[idx] if 0 <= idx < len(self.timex) else 0 for idx in self.timeindex]
+
+        if num_nodes > 0:
+            # NEW METHOD: Fit spline with specified number of nodes
+            # Fit the spline to the existing profile data
+            fitted_times, fitted_temp1, fitted_temp2 = self.fit_spline_to_profile(num_nodes)
+
+            if not fitted_times:
+                # Fitting failed, fall back to old method
+                num_nodes = 0
+            else:
+                # we remember time axis limits to reconstruct after reset
+                startofx = self.startofx
+                endofx = self.endofx
+
+                res = self.reset()  #erase screen
+                if not res:
+                    return False
+
+                # reconstruct timeaxis limits
+                self.startofx = startofx
+                self.endofx = endofx
+
+                # Use the fitted spline points
+                self.timex = fitted_times[:]
+                self.temp1 = fitted_temp1[:]
+                self.temp2 = fitted_temp2[:]
+
+                # Update timeindex to match landmark positions in the fitted data
+                self.timeindexupdate(timeindexhold)
+
+        if num_nodes == 0:
+            # OLD METHOD: Extract only landmark points (backwards compatibility)
+            #find lowest point from profile to be converted
+            lpindex = self.aw.findTP()
+            if lpindex != -1 and lpindex not in self.timeindex:
+                lptime = self.timex[lpindex]
+                lptemp2 = self.temp2[lpindex]
+                # we only consider TP if its BT is at least 20 degrees lower than the CHARGE temperature
+                if self.temp2[self.timeindex[0]] < (lptemp2 + 20):
+                    lpindex = -1
+            else:
                 lpindex = -1
-        else:
-            lpindex = -1
-            lptime = -1
-            lptemp2 = -1
+                lptime = -1
+                lptemp2 = -1
 
-        timeindexhold:list[float] = [self.timex[self.timeindex[0]],0,0,0,0,0,0,0]
-        timez,t1,t2 = [self.timex[self.timeindex[0]]],[self.temp1[self.timeindex[0]]],[self.temp2[self.timeindex[0]]]    #first CHARGE point
-        for i in range(1,len(self.timeindex)):
-            if self.timeindex[i]:                           # fill up empty lists with main points (FCs, etc). match from timeindex
-                timez.append(self.timex[self.timeindex[i]])  #add time
-                t1.append(self.temp1[self.timeindex[i]])    #add temp1
-                t2.append(self.temp2[self.timeindex[i]])    #add temp2
-                timeindexhold[i] =  self.timex[self.timeindex[i]]
+            timez,t1,t2 = [self.timex[self.timeindex[0]]],[self.temp1[self.timeindex[0]]],[self.temp2[self.timeindex[0]]]    #first CHARGE point
+            for i in range(1,len(self.timeindex)):
+                if self.timeindex[i]:                           # fill up empty lists with main points (FCs, etc). match from timeindex
+                    timez.append(self.timex[self.timeindex[i]])  #add time
+                    t1.append(self.temp1[self.timeindex[i]])    #add temp1
+                    t2.append(self.temp2[self.timeindex[i]])    #add temp2
 
-        # we remember time axis limits to reconstruct after reset (which might alter them such that they do not fit to the profile data any longer!)
-        startofx = self.startofx
-        endofx = self.endofx
+            # we remember time axis limits to reconstruct after reset (which might alter them such that they do not fit to the profile data any longer!)
+            startofx = self.startofx
+            endofx = self.endofx
 
-        res = self.reset()  #erase screen
-        if not res:
-            return False
+            res = self.reset()  #erase screen
+            if not res:
+                return False
 
-        # reconstruct timeaxis limits
-        self.startofx = startofx
-        self.endofx = endofx
+            # reconstruct timeaxis limits
+            self.startofx = startofx
+            self.endofx = endofx
 
-        self.timex,self.temp1,self.temp2 = timez[:],t1[:],t2[:]  #copy lists back after reset() with the main points
+            self.timex,self.temp1,self.temp2 = timez[:],t1[:],t2[:]  #copy lists back after reset() with the main points
 
-        self.timeindexupdate(timeindexhold) #create new timeindex[]
+            self.timeindexupdate(timeindexhold) #create new timeindex[]
 
-        #add lowest point as extra point
-        if lpindex != -1:
-            self.currentx = lptime
-            self.currenty = lptemp2
-            self.addpoint(manual=False)
-            # reset cursor coordinates
-            self.currentx = 0
-            self.currenty = 0
+            #add lowest point as extra point
+            if lpindex != -1:
+                self.currentx = lptime
+                self.currenty = lptemp2
+                self.addpoint(manual=False)
+                # reset cursor coordinates
+                self.currentx = 0
+                self.currenty = 0
 
         self.timealign(redraw=False)
 
