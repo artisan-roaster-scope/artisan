@@ -44,7 +44,7 @@ websockets==15.0.1
 PyYAML==6.0.3
 psutil==7.1.3
 protobuf==6.33.1
-numpy==2.3.4
+numpy==2.3.5
 scipy==1.16.3
 wquantiles==0.6
 colorspacious==1.1.2
@@ -79,17 +79,17 @@ pyinstaller==6.17.0; platform_system=='Linux' # on Windows pyinstaller is separa
 ### macOS specific packages
 ###
 appnope==0.1.4; sys_platform=='darwin'
-pyobjc-core==12.0; sys_platform=='darwin'
-pyobjc-framework-Cocoa==12.0; sys_platform=='darwin'
-pyobjc-framework-CoreBluetooth==12.0; sys_platform=='darwin'
-pyobjc-framework-libdispatch==12.0; sys_platform=='darwin'
+pyobjc-core==12.1; sys_platform=='darwin'
+pyobjc-framework-Cocoa==12.1; sys_platform=='darwin'
+pyobjc-framework-CoreBluetooth==12.1; sys_platform=='darwin'
+pyobjc-framework-libdispatch==12.1; sys_platform=='darwin'
 py2app==0.28.8; sys_platform=='darwin'
 ###
 ########
 ### Linux specific packages
 ###
 distro==1.9.0; platform_system=='Linux'
-SecretStorage==3.4.0; platform_system=='Linux'
+SecretStorage==3.5.0; platform_system=='Linux'
 ### NOTES:
 ### keyring on Linux needs the GnomeKeyring package installed for plus to remember the passwords
 ### via # sudo apt install gnome-keyring
