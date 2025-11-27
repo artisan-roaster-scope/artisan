@@ -47,8 +47,8 @@ jobs:
 #      env:
 #        REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        pylint --disable=C,R,E0401,E0611 --extension-pkg-allow-list=PyQt6 --load-plugins=pylint.extensions.no_self_use, pylint.extensions.private_import src/plus
-        pylint --disable=C,R,E0401,E0611 --extension-pkg-allow-list=PyQt6 --load-plugins=pylint.extensions.no_self_use, pylint.extensions.private_import src/artisanlib
+        pylint --disable=C,R,E0401,E0611 --extension-pkg-allow-list=PyQt6 --load-plugins=pylint.extensions.no_self_use,pylint.extensions.private_import src/plus
+        pylint --disable=C,R,E0401,E0611 --extension-pkg-allow-list=PyQt6 --load-plugins=pylint.extensions.no_self_use,pylint.extensions.private_import src/artisanlib
 #    - name: Set up reviewdog
 #      run: |
 #        mkdir -p "$HOME/bin"

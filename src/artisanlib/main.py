@@ -144,7 +144,7 @@ with suppress_stdout_stderr():
 #except Exception: # pylint: disable=broad-except
 #    mpl_version = [7,7,7] # a trunk version
 
-from matplotlib.backend_bases import _Mode as MPL_Mode  # pylint: disable=import-private-name # @UnresolvedImport
+from matplotlib.backend_bases import _Mode as MPL_Mode  # pylint: disable=import-private-name,unknown-option-value # @UnresolvedImport
 
 svgsupport = next((x for x in QImageReader.supportedImageFormats() if x == b'svg'),None)
 
