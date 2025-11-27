@@ -73,17 +73,17 @@ qt6-tools==6.5.0.1.3
 # packages that differ per platform
 #
 ###
-pyinstaller==6.17.0; platform_system=='Linux' or platform_system=='darwin' # on Windows pyinstaller is separately installed (see above)
+pyinstaller==6.17.0; platform_system=='Linux' or sys_platform=='darwin' # on Windows pyinstaller is separately installed (see above)
 #
 ########
 ### macOS specific packages
 ###
-appnope==0.1.4; platform_system=='darwin'
-pyobjc-core==12.1; platform_system=='darwin'
-pyobjc-framework-Cocoa==12.1; platform_system=='darwin'
-pyobjc-framework-CoreBluetooth==12.1; platform_system=='darwin'
-pyobjc-framework-libdispatch==12.1; platform_system=='darwin'
-#py2app==0.28.8; platform_system=='darwin'
+appnope==0.1.4; sys_platform=='darwin'
+pyobjc-core==12.1; sys_platform=='darwin'
+pyobjc-framework-Cocoa==12.1; sys_platform=='darwin'
+pyobjc-framework-CoreBluetooth==12.1; sys_platform=='darwin'
+pyobjc-framework-libdispatch==12.1; sys_platform=='darwin'
+#py2app==0.28.8; sys_platform=='darwin'
 ###
 ########
 ### Linux specific packages
