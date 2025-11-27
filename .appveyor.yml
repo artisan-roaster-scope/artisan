@@ -20,7 +20,7 @@ environment:
   # Set the default Appveyor Python version here. Does not affect windows_legacy. Can be overridden in platform environment.
   PYTHON_V: 3.13
   # Upgrade to specific version (for platforms supporting upgrade). Upgrade skipped if env var is missing or blank.
-  #PYUPGRADE_WIN_V: 3.13.9
+  PYUPGRADE_WIN_V: 3.14.0
   #PYUPGRADE_MACOS_V: 3.12.1  # when upgrading see the notes in the deploy phase
 
   matrix:
@@ -163,8 +163,16 @@ for:
     # update path env var
     - cmd: set PATH=%PYTHON_PATH%;%PYTHON_PATH%\Scripts;%PATH%
 
+    # patch for libusb_package until a Python 3.14 version is available on pypi.org
+    - cmd: echo *** PATCH install version of libusb_package modified for Python 3.14
+    - cmd: pip install .ci\patches\libusb_package-1.0.26.3-py314-none-win_amd64.whl
+        
     # run the install script
     - cmd: .ci/install-win.bat
+        
+    # patch for pylupdate6 until this is fixed on pypi.org
+    - cmd: echo *** PATCH pylupdate6 for Python 3.14
+    - cmd: copy /Y .ci\patches\python_source.py C:\Python314-x64\Lib\site-packages\PyQt6\lupdate\python_source.py
 
   build_script:
     - cmd: echo Windows Build
