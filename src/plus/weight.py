@@ -733,8 +733,8 @@ class RoastedWeighingState(StateMachine):
 
 class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefly: ignore [invalid-inheritance] # error: Argument to class must be a base class
 
-    __slots__ = [ 'displays', 'scale_manager', 'next_green_item',  'next_roasted_item',
-                    'greenItemSemaphore', 'roastedItemSemaphore', 'green_sm' ]
+    __slots__ = [ 'scale_manager', 'next_green_item',  'next_roasted_item',
+                    'greenItemSemaphore', 'roastedItemSemaphore', 'sm_green' ]
 
     MIN_STABLE_WIGHT_CHANGE:Final[int] = 2                  # minimum stable weight changes being recognized in g
     MIN_CUSTOM_EMPTY_BUCKET_WEIGHT:Final[int] = 15          # minimum custom empty bucket weight recognized in g

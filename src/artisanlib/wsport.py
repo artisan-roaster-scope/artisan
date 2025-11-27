@@ -44,8 +44,7 @@ class wsport:
                     'channel_requests', 'channel_nodes', 'channel_modes', 'connect_timeout', 'request_timeout', 'compression',
                     'reconnect_interval', '_ping_interval', '_ping_timeout', 'id_node', 'machine_node',
                     'command_node', 'data_node', 'pushMessage_node', 'request_data_command', 'charge_message', 'drop_message', 'addEvent_message', 'event_node',
-                    'DRY_node', 'FCs_node', 'FCe_node', 'SCs_node', 'SCe_node', 'STARTonCHARGE', 'OFFonDROP', 'open_event', 'pending_events',
-                    'ws', 'wst' ]
+                    'DRY_node', 'FCs_node', 'FCe_node', 'SCs_node', 'SCe_node', 'STARTonCHARGE', 'OFFonDROP', 'open_event', 'pending_events' ]
 
     def __init__(self, aw:'ApplicationWindow') -> None:
         self.aw = aw

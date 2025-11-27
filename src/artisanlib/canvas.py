@@ -94,7 +94,7 @@ from matplotlib import rcParams, patches, transforms, ticker
 import matplotlib.patheffects as PathEffects
 from matplotlib.patches import Polygon, Rectangle
 from matplotlib.transforms import Bbox, Transform
-from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas  # @Reimport
+from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.projections.polar import PolarAxes
 from matplotlib.text import Annotation, Text
 from matplotlib.lines import Line2D
@@ -1195,7 +1195,7 @@ class tgraphcanvas(FigureCanvas):
             bottom=0.1, # the bottom of the subplots of the figure (default: 0.1)
             left=0.067, # the left side of the subplots of the figure (default: 0.125)
             right=.925) # the right side of the subplots of the figure (default: 0.9)
-        FigureCanvas.__init__(self, self.fig) # type: ignore[no-untyped-call]
+        super().__init__(self.fig) # type: ignore[no-untyped-call]
 
         self.fig.canvas.set_cursor = lambda _: None # type: ignore[assignment, method-assign] # deactivate the busy cursor on slow full redraws
 
@@ -2250,13 +2250,13 @@ class tgraphcanvas(FigureCanvas):
         self.R1_STATE_STR:str = ''
 
         # used by device +ShellyPlusPlug_EnergyTotalLastMinute to pass values
-        self.shellyPlusPlug_TX:float = -1
-        self.shellyPlusPlug_Total:float = -1
-        self.shellyPlusPlug_Last:float = -1
-        self.shellyPlusPlug_Power:float = -1
-        self.shellyPlusPlug_Temp:float = -1
-        self.shellyPlusPlug_Voltage:float = -1
-        self.shellyPlusPlug_Current:float = -1
+        self.shellyPlusPlug_TX:float = -1.
+        self.shellyPlusPlug_Total:float = -1.
+        self.shellyPlusPlug_Last:float = -1.
+        self.shellyPlusPlug_Power:float = -1.
+        self.shellyPlusPlug_Temp:float = -1.
+        self.shellyPlusPlug_Voltage:float = -1.
+        self.shellyPlusPlug_Current:float = -1.
 
         #used by extra device +ArduinoTC4_XX to pass values
         self.extraArduinoTX:float = 0.  # timestamp of retrieval
@@ -3351,8 +3351,8 @@ class tgraphcanvas(FigureCanvas):
                         event_ydata = int(round(new_value * event_pos_factor + event_pos_offset))
                     ydata[pos] = event_ydata
                     if (not self.flagon and len(cast(list[float], ydata)) == pos + 2 and (
-                        self.timeindex[6]!=0 and self.timex[self.timeindex[6]] >= xdata[-1] if foreground
-                            else self.timeindexB[6]!=0 and self.timeB[self.timeindexB[6]] >= xdata[-1])):
+                        self.timeindex[6]!=0 and self.timex[self.timeindex[6]] >= cast(float, xdata[-1]) if foreground
+                            else self.timeindexB[6]!=0 and self.timeB[self.timeindexB[6]] >= cast(float, xdata[-1]))):
                         # we also move the last dot up and down with the butlast
                         ydata[-1] = ydata[-2]
                     ldots.set_ydata(cast(list[float], ydata))
@@ -3849,7 +3849,7 @@ class tgraphcanvas(FigureCanvas):
                         ldots.set_xdata(cast(list[float], xdata))
                     if set_y and isinstance(ydata, list):
                         ydata[self.foreground_event_pos] = max(0,event_ydata)
-                        if not self.flagon and len(cast(list[float], ydata)) == self.foreground_event_pos + 2 and (self.timeindex[6]!=0 and self.timex[self.timeindex[6]] >= xdata[-1]):
+                        if not self.flagon and len(cast(list[float], ydata)) == self.foreground_event_pos + 2 and (self.timeindex[6]!=0 and self.timex[self.timeindex[6]] >= cast(float, xdata[-1])):
                             # we also move the last dot up and down with the butlast if automatically added, but only if that last one is not after DROP
                             ydata[-1] = ydata[-2]
                         ldots.set_ydata(cast(list[float], ydata))
@@ -3935,7 +3935,7 @@ class tgraphcanvas(FigureCanvas):
                         ldots.set_xdata(cast(list[float], xdata))
                     if set_y:
                         ydata[self.background_event_pos] = max(0,event_ydata)
-                        if not self.flagon and len(cast(list[float], ydata)) == self.background_event_pos + 2 and (self.timeindex[6]!=0 and self.timex[self.timeindex[6]] >= xdata[-1]):
+                        if not self.flagon and len(cast(list[float], ydata)) == self.background_event_pos + 2 and (self.timeindex[6]!=0 and self.timex[self.timeindex[6]] >= cast(float, xdata[-1])):
                             # we also move the last dot up and down with the butlast if automatically added, but only if that last one is not after DROP
                             ydata[-1] = ydata[-2]
                         ldots.set_ydata(cast(list[float], ydata))
@@ -12043,7 +12043,7 @@ class tgraphcanvas(FigureCanvas):
 
             # size borders and margins
             borderX = 0.007 * (self.ax.get_xlim()[1] - self.ax.get_xlim()[0])  # space around outside of patch rect (in seconds)
-            borderY = max( 11, 0.015 * (self.ax.get_ylim()[1] - self.ax.get_ylim()[0]) ) # space around outside of patch rect (in degrees)
+            borderY = max(11., 0.015 * (self.ax.get_ylim()[1] - self.ax.get_ylim()[0]) ) # space around outside of patch rect (in degrees)
             marginX = 4.0          # text to edge of patch rect (in seconds)
             marginX_factor = 0.05  #scaling factor to size relative to stats_textbox_width
             marginY = 4.0          # text to edge of patch rect (in degrees)

@@ -952,8 +952,8 @@ class CompareTableWidget(QTableWidget): # pyrefly:ignore[invalid-inheritance] # 
 class roastCompareDlg(ArtisanDialog):
 
     __slots__ = [ 'foreground', 'background', 'maxentries', 'basecolors', 'profiles', 'label_number', 'l_align', 'legend', 'legendloc_pos', 'addButton',
-        'deleteButton', 'alignnames', 'alignComboBox', 'etypes', 'eventsComboBox', 'cb', 'model', 'button_7_org_state_hidden', 'button_1_org_state_hidden',
-        'button_2_org_state_hidden', 'button_10_org_state_hidden', 'pick_handler_id', 'modeComboBox', 'buttonCONTROL_org_state_hidden', 'buttonONOFF_org_state_hidden',
+        'deleteButton', 'alignnames', 'alignComboBox', 'eventsComboBox', 'cb', 'model',
+        'pick_handler_id', 'modeComboBox', 'buttonCONTROL_org_state_hidden', 'buttonONOFF_org_state_hidden',
         'buttonRESET_org_state_hidden', 'buttonSTARTSTOP_org_state_hidden', 'profileTable', 'delta_axis_visible' ]
 
     def __init__(self, parent:QWidget, aw:'ApplicationWindow', foreground:str|None = None, background:str|None = None) -> None:

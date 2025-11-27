@@ -745,13 +745,13 @@ class serialport:
         return tx, apparent_power_return, active_power
 
     def updateShellyPlusPlug(self) -> None:
-        self.aw.qmc.shellyPlusPlug_TX = -1
-        self.aw.qmc.shellyPlusPlug_Total = -1
-        self.aw.qmc.shellyPlusPlug_Last = -1
-        self.aw.qmc.shellyPlusPlug_Power = -1
-        self.aw.qmc.shellyPlusPlug_Temp = -1
-        self.aw.qmc.shellyPlusPlug_Voltage = -1
-        self.aw.qmc.shellyPlusPlug_Current = -1
+        self.aw.qmc.shellyPlusPlug_TX = -1.
+        self.aw.qmc.shellyPlusPlug_Total = -1.
+        self.aw.qmc.shellyPlusPlug_Last = -1.
+        self.aw.qmc.shellyPlusPlug_Power = -1.
+        self.aw.qmc.shellyPlusPlug_Temp = -1.
+        self.aw.qmc.shellyPlusPlug_Voltage = -1.
+        self.aw.qmc.shellyPlusPlug_Current = -1.
         try:
             shelly_connect_timeout = 0.5
             shelly_read_timeout = 0.5

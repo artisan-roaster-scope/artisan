@@ -35,6 +35,8 @@ class CheckComboBox(QComboBox): # pyrefly:ignore[invalid-inheritance] # pyright:
 
     flagChanged=pyqtSignal(int,bool)
 
+    __slots__ = [ '__popupIsShown', '__blockMouseReleaseTimer', '__initialMousePos', '__separator', '__placeholderText' ]
+
 
     class ComboItemDelegate(QStyledItemDelegate): # pyrefly:ignore[invalid-inheritance] # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
         """Helper styled delegate (mostly based on existing private Qt's
@@ -71,8 +73,6 @@ class CheckComboBox(QComboBox): # pyrefly:ignore[invalid-inheritance] # pyright:
         delegate used by the QComboBox). Used to style the popup like a
         menu. (e.g osx aqua style).
         """
-
-        __slots__ = [ '__popupIsShown', '__blockMouseReleaseTimer', '__initialMousePos', '__separator', '__placeholderText' ]
 
         def isSeparator(self, index:'QModelIndex') -> bool: # pylint: disable=no-self-use
             return str(index.data(Qt.ItemDataRole.AccessibleDescriptionRole)) == 'separator'

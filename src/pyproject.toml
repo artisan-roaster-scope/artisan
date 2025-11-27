@@ -65,7 +65,7 @@ load-plugins = [
     'pylint.extensions.eq_without_hash',
     'pylint.extensions.for_any_all',
     'pylint.extensions.overlapping_exceptions',
-#    'pylint.extensions.private_import',
+    'pylint.extensions.private_import',
     'pylint.extensions.set_membership',
     'pylint.extensions.typing',
 #    'pylint.extensions.redefined_variable_type', # NOT YET
@@ -87,7 +87,7 @@ jobs = "0"
 py-version = "3.12"
 
 # Pickle collected data for later comparisons.
-persistent = "no"
+persistent = "yes"
 
 # A comma-separated list of package or module names from where C extensions may
 # be loaded. Extensions are loading into the active Python interpreter and may
@@ -275,7 +275,7 @@ enable_error_code = "possibly-undefined,truthy-bool,redundant-expr,unused-awaita
 no_implicit_optional = true
 
 [[tool.mypy.overrides]]
-module = ["matplotlib.*", "aiohttp.*", "aiohttp.web.*", "aiohttp_jinja2.*", "libusb_package.*"]
+module = ["libusb_package.*"]
 ignore_missing_imports = true
 
 
@@ -341,6 +341,7 @@ reportGeneralTypeIssues = true
 useLibraryCodeForTypes = true
 reportInvalidTypeForm = true
 reportUnnecessaryComparison = true
+reportUninitializedInstanceVariable = true
 
 
 ## pytest conf
@@ -434,10 +435,6 @@ project_excludes = [
 ]
 python_version = "3.12.0"
 replace_imports_with_any = [
-    "matplotlib.*",
-    "aiohttp.*",
-    "aiohttp.web.*",
-    "aiohttp_jinja2.*",
     "libusb_package.*",
     "uic.*",
 ]

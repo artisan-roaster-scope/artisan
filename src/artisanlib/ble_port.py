@@ -18,7 +18,8 @@
 import asyncio
 import logging
 from bleak import BleakScanner, BleakClient
-from bleak.exc import BleakCharacteristicNotFoundError
+from bleak.exc import BleakCharacteristicNotFoundError, BleakBluetoothNotAvailableError
+
 
 from PyQt6.QtCore import QObject
 
@@ -197,6 +198,9 @@ class BLE:
                 self._asyncLoopThread.loop)
         try:
             return fut.result()
+        except BleakBluetoothNotAvailableError:
+            _log.error('Bluetooth is not supported, turned off or permission is denied')
+            return None, None, None
         except Exception: # pylint: disable=broad-except
             #raise fut.exception() from e # type: ignore[misc]
             _log.error('exception in scan_and_connect: %s', fut.exception())
@@ -437,6 +441,8 @@ class ClientBLE(QObject): # pyrefly:ignore[invalid-inheritance] # pyright:ignore
                 _log.debug('scan_ble ended')
                 if res:
                     return list(res.values())
+        except BleakBluetoothNotAvailableError:
+            _log.error('Bluetooth is not supported, turned off or permission is denied')
         except Exception as e:  # pylint: disable=broad-except
             _log.exception(e)
         return []

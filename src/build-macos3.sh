@@ -38,9 +38,13 @@ rm -f ${PYTHONPATH}/site-packages/fontTools/misc/bezierTools.c # 1.9MB
 # distribution
 rm -rf build dist
 sleep .3 # sometimes it takes a little for dist to get really empty
-echo "************* p2app **************"
-python3 setup-macos3.py py2app 2>&1 | egrep -v '^(creating|copying file|byte-compiling|locate|ADD INFO|changefunc)'
-if [ ${PIPESTATUS[0]} -ne 0 ]; then echo "Failed in py2app"; exit 1; else (echo "** Finished py2app"); fi
+
+#echo "************* py2app **************"
+#python3 setup-macos3.py py2app 2>&1 | egrep -v '^(creating|copying file|byte-compiling|locate|ADD INFO|changefunc)'
+#if [ ${PIPESTATUS[0]} -ne 0 ]; then echo "Failed in py2app"; exit 1; else (echo "** Finished py2app"); fi
+
+echo "************* pyinstaller **************"
+pyinstaller -y --log-level=INFO artisan-mac.spec
 
 # Check that the packaged files are above an expected size
 version=$(python3 -c "import artisanlib; print(artisanlib.__version__)")
