@@ -158,8 +158,8 @@ exe = EXE(pyz,
             disable_windowed_traceback=False,
             argv_emulation=False, # False for GUI apps
             target_arch='arm64', #'x86_64', #'universal2',
-            codesign_identity='6M3Z6W45L4', #None,
-            entitlements_file='Artisan.entitlements', #None
+            codesign_identity=None,
+            entitlements_file=None
             )
 
 try:
