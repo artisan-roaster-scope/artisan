@@ -54,7 +54,7 @@ if TYPE_CHECKING:
     from matplotlib.axes._base import _AxesBase # pyright:ignore[reportPrivateImportUsage] # pylint: disable=unused-import
     from matplotlib.image import AxesImage # pylint: disable=unused-import
     from matplotlib.legend import Legend # pylint: disable=unused-import
-    from matplotlib.backend_bases import PickEvent, MouseEvent, Event # pylint: disable=unused-import
+    from matplotlib.backend_bases import Event # pylint: disable=unused-import
     from matplotlib.font_manager import FontProperties # pylint: disable=unused-import
     from matplotlib.ticker import Locator # pylint: disable=unused-import
     import numpy.typing as npt # pylint: disable=unused-import
@@ -94,6 +94,7 @@ from matplotlib import rcParams, patches, transforms, ticker
 import matplotlib.patheffects as PathEffects
 from matplotlib.patches import Polygon, Rectangle
 from matplotlib.transforms import Bbox, Transform
+from matplotlib.backend_bases import PickEvent, MouseEvent
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.projections.polar import PolarAxes
 from matplotlib.text import Annotation, Text
@@ -374,7 +375,7 @@ class tgraphcanvas(FigureCanvas):
 
 
         # standard math functions allowed in symbolic formulas
-        self.mathdictionary_base:dict[str,Any] = {
+        self.mathdictionary_base:dict[str,float|Callable[[Any], float]|Callable[[Any, Any], float]] = {
             'min':min,'max':max,'sin':math.sin,'cos':math.cos,'tan':math.tan,
             'pow':math.pow,'exp':math.exp,'pi':math.pi,'e':math.e,
             'abs':abs,'acos':math.acos,'asin':math.asin,'atan':math.atan,
@@ -1197,14 +1198,14 @@ class tgraphcanvas(FigureCanvas):
             right=.925) # the right side of the subplots of the figure (default: 0.9)
         super().__init__(self.fig) # type: ignore[no-untyped-call]
 
-        self.fig.canvas.set_cursor = lambda _: None # type: ignore[assignment, method-assign] # deactivate the busy cursor on slow full redraws
+        #self.fig.canvas.set_cursor = lambda _: None # type: ignore[assignment, method-assign] # deactivate the busy cursor on slow full redraws
 
         # important to make the Qt canvas transparent (note that this changes stylesheets of children like popups too!):
         if isinstance(self.fig.canvas, QWidget): # pyrefly: ignore[invalid-argument]
             cast(QWidget, self.fig.canvas).setStyleSheet('background-color:transparent;') # default is white
 
-        self.onclick_cid:int = self.fig.canvas.mpl_connect('button_press_event', cast('Callable[[Event],None]',self.onclick))
-        self.oncpick_cid:int = self.fig.canvas.mpl_connect('pick_event', cast('Callable[[Event],None]', self.onpick)) # incompatible type "Callable[[PickEvent], None]"; expected "Callable[[Event], Any] # type: ignore[arg-type]
+        self.onclick_cid:int = self.fig.canvas.mpl_connect('button_press_event', self.onclick)
+        self.oncpick_cid:int = self.fig.canvas.mpl_connect('pick_event', self.onpick)
         self.ondraw_cid:int = self.fig.canvas.mpl_connect('draw_event', self._draw_event)
 
         self.custom_event_dlg_default_type:int = 4 # the default type remembered by the customEventDlg on adding events via a right click on the graph
@@ -1222,7 +1223,7 @@ class tgraphcanvas(FigureCanvas):
         #
         self.event_selected:bool = False # set on pick and unset on move, used in onrelease_after_pick which clears foreground/background_event_last_picked if still set
 
-        self.onmove_cid:int = self.fig.canvas.mpl_connect('motion_notify_event', cast('Callable[[Event],None]', self.onmove))
+        self.onmove_cid:int = self.fig.canvas.mpl_connect('motion_notify_event', self.onmove)
 
         self.fig.canvas.mpl_connect('button_release_event', self.onrelease_after_pick)
 
@@ -1530,7 +1531,7 @@ class tgraphcanvas(FigureCanvas):
         #
         self.last_batchsize:float = 0 # in g; remember the last batchsize used to be applied as default for the next batch
         #
-        self.machinesetup_energy_ratings:dict[int, dict[float, dict[str,list[Any]]]]|None = None # read from predefined machine setups and used if available to set energy defaults
+        self.machinesetup_energy_ratings:dict[int, dict[float, dict[str,list[str]]]]|None = None # read from predefined machine setups and used if available to set energy defaults
         #
         self.machinesetup:str = ''
         self.roastingnotes:str = ''
@@ -2096,7 +2097,7 @@ class tgraphcanvas(FigureCanvas):
         self.reproducedesigner:int = 0      #flag to add events to help reproduce (replay) the profile: 0 = none; 1 = sv; 2 = ramp
         self.designertemp1init:list[float] = []
         self.designertemp2init:list[float] = []
-        self.ax_background_designer:Any|None = None # canvas background in designer mode for bitblitting # pylint: disable=c-extension-no-member
+        self.ax_background_designer:str|None = None # canvas background in designer mode for bitblitting # pylint: disable=c-extension-no-member
         self.designer_timez:list[float]|None = None
         self.time_step_size:Final[int] = 2 # only every 2sec a point to increase speed of redrawing
         # designer artist line caches
@@ -3036,191 +3037,187 @@ class tgraphcanvas(FigureCanvas):
         self.eventmessagetimer.setSingleShot(True)
         self.eventmessagetimer.start(time)
 
-    def onpick(self, event:'PickEvent') -> None:
-        try:
-            event_artist = event.artist
-            # reset picked foreground event
-            self.foreground_event_ind = None
-            self.foreground_event_pos = None
-            self.foreground_event_pick_position = None
-            self.clear_last_picked_event_selection()
-            # reset picked background event
-            self.background_event_ind = None
-            self.background_event_pos = None
-            self.background_event_pick_position = None
-            self.clear_last_background_picked_event_selection()
-            # display MET information by clicking on the MET marker
-            if (isinstance(event_artist, Annotation) and self.showmet and event_artist in [self.met_annotate] and
-                    self.met_timex_temp1_delta is not None and self.met_timex_temp1_delta[2] is not None):
-                if  self.met_timex_temp1_delta[2] >= 0:
-                    met_time_str = str(self.met_timex_temp1_delta[2])
-                    met_time_msg = QApplication.translate('Message','seconds before FCs')
-                else:
-                    met_time_str = str(-1*self.met_timex_temp1_delta[2])
-                    met_time_msg = QApplication.translate('Message','seconds after FCs')
+    def onpick(self, event:'Event') -> None:
+        if isinstance(event, PickEvent):
+            try:
+                event_artist = event.artist
+                # reset picked foreground event
+                self.foreground_event_ind = None
+                self.foreground_event_pos = None
+                self.foreground_event_pick_position = None
+                self.clear_last_picked_event_selection()
+                # reset picked background event
+                self.background_event_ind = None
+                self.background_event_pos = None
+                self.background_event_pick_position = None
+                self.clear_last_background_picked_event_selection()
+                # display MET information by clicking on the MET marker
+                if (isinstance(event_artist, Annotation) and self.showmet and event_artist in [self.met_annotate] and
+                        self.met_timex_temp1_delta is not None and self.met_timex_temp1_delta[2] is not None):
+                    if  self.met_timex_temp1_delta[2] >= 0:
+                        met_time_str = str(self.met_timex_temp1_delta[2])
+                        met_time_msg = QApplication.translate('Message','seconds before FCs')
+                    else:
+                        met_time_str = str(-1*self.met_timex_temp1_delta[2])
+                        met_time_msg = QApplication.translate('Message','seconds after FCs')
 
-                self.aw.sendmessage(f'MET {float2float(self.met_timex_temp1_delta[1],1)}{self.mode} @ {stringfromseconds(self.met_timex_temp1_delta[0])}, {met_time_str} {met_time_msg}')
+                    self.aw.sendmessage(f'MET {float2float(self.met_timex_temp1_delta[1],1)}{self.mode} @ {stringfromseconds(self.met_timex_temp1_delta[0])}, {met_time_str} {met_time_msg}')
 
-            # the analysis results were clicked
-            elif self.aw.analysisresultsanno is not None and isinstance(event_artist, Annotation) and event_artist in [self.aw.analysisresultsanno]:
-                self.analysispickflag = True
+                # the analysis results were clicked
+                elif self.aw.analysisresultsanno is not None and isinstance(event_artist, Annotation) and event_artist in [self.aw.analysisresultsanno]:
+                    self.analysispickflag = True
 
-            # the segment results were clicked
-            elif self.aw.segmentresultsanno is not None and isinstance(event_artist, Annotation) and event_artist in [self.aw.segmentresultsanno]:
-                self.segmentpickflag = True
+                # the segment results were clicked
+                elif self.aw.segmentresultsanno is not None and isinstance(event_artist, Annotation) and event_artist in [self.aw.segmentresultsanno]:
+                    self.segmentpickflag = True
 
-            # toggle visibility of graph lines by clicking on the legend
-            elif not bool(self.aw.comparator) and self.legend is not None and event_artist != self.legend and isinstance(event_artist, (Line2D, Text)) \
-                and event_artist not in [self.l_backgroundeventtype1dots,self.l_backgroundeventtype2dots,self.l_backgroundeventtype3dots,self.l_backgroundeventtype4dots] \
-                and event_artist not in [self.l_eventtype1dots,self.l_eventtype2dots,self.l_eventtype3dots,self.l_eventtype4dots]:
-                idx = None
-                # deltaLabelMathPrefix (legend label)
-                # deltaLabelUTF8 (artist)
-                if isinstance(event_artist, Text):
-                    artist = None
-                    label = None
-                    try:
-                        label = event_artist.get_text()
-                        idx = self.labels.index(label)
-                    except Exception: # pylint: disable=broad-except
-                        pass
-                    if label is not None and idx is not None:
-                        if label == self.aw.ETname:
-                            label = 'ET'  #allows for a match below to the label in legend_lines
-                            try:
-                                for a in self.l_eteventannos:
-                                    a.set_visible(not a.get_visible())
-                                if self.met_annotate is not None:
-                                    self.met_annotate.set_visible(not self.met_annotate.get_visible())
-                            except Exception: # pylint: disable=broad-except
-                                pass
-                        elif label == self.aw.BTname:
-                            label = 'BT'  #allows for a match below to the label in legend_lines
-                            try:
-                                for a in self.l_bteventannos:
-                                    a.set_visible(not a.get_visible())
-                            except Exception: # pylint: disable=broad-except
-                                pass
+                # toggle visibility of graph lines by clicking on the legend
+                elif not bool(self.aw.comparator) and self.legend is not None and event_artist != self.legend and isinstance(event_artist, (Line2D, Text)) \
+                    and event_artist not in [self.l_backgroundeventtype1dots,self.l_backgroundeventtype2dots,self.l_backgroundeventtype3dots,self.l_backgroundeventtype4dots] \
+                    and event_artist not in [self.l_eventtype1dots,self.l_eventtype2dots,self.l_eventtype3dots,self.l_eventtype4dots]:
+                    idx = None
+                    # deltaLabelMathPrefix (legend label)
+                    # deltaLabelUTF8 (artist)
+                    if isinstance(event_artist, Text):
+                        artist = None
+                        label = None
                         try:
-                            # toggle also the visibility of the legend handle
-                            clean_label = label.replace(deltaLabelMathPrefix,deltaLabelUTF8)
-                            artist = next((x for x in self.legend_lines if x.get_label() == clean_label), None)
-                            if artist:
-                                artist.set_visible(not artist.get_visible())
+                            label = event_artist.get_text()
+                            idx = self.labels.index(label)
                         except Exception: # pylint: disable=broad-except
                             pass
-                    # toggle the visibility of the corresponding line
-                    if idx is not None and artist:
-                        artist = self.handles[idx]
-                        artist.set_visible(not artist.get_visible())
-                        if self.eventsGraphflag in {2, 3, 4} and label is not None:
-                            # if events are rendered in Combo style we need to hide also the corresponding annotations:
+                        if label is not None and idx is not None:
+                            if label == self.aw.ETname:
+                                label = 'ET'  #allows for a match below to the label in legend_lines
+                                try:
+                                    for a in self.l_eteventannos:
+                                        a.set_visible(not a.get_visible())
+                                    if self.met_annotate is not None:
+                                        self.met_annotate.set_visible(not self.met_annotate.get_visible())
+                                except Exception: # pylint: disable=broad-except
+                                    pass
+                            elif label == self.aw.BTname:
+                                label = 'BT'  #allows for a match below to the label in legend_lines
+                                try:
+                                    for a in self.l_bteventannos:
+                                        a.set_visible(not a.get_visible())
+                                except Exception: # pylint: disable=broad-except
+                                    pass
                             try:
-                                i = [self.aw.arabicReshape(et) for et in self.etypes[:4]].index(label)
-                                if i == 0:
-                                    for a in self.l_eventtype1annos:
-                                        a.set_visible(not a.get_visible())
-                                elif i == 1:
-                                    for a in self.l_eventtype2annos:
-                                        a.set_visible(not a.get_visible())
-                                elif i == 2:
-                                    for a in self.l_eventtype3annos:
-                                        a.set_visible(not a.get_visible())
-                                elif i == 3:
-                                    for a in self.l_eventtype4annos:
-                                        a.set_visible(not a.get_visible())
+                                # toggle also the visibility of the legend handle
+                                clean_label = label.replace(deltaLabelMathPrefix,deltaLabelUTF8)
+                                artist = next((x for x in self.legend_lines if x.get_label() == clean_label), None)
+                                if artist:
+                                    artist.set_visible(not artist.get_visible())
                             except Exception: # pylint: disable=broad-except
                                 pass
+                        # toggle the visibility of the corresponding line
+                        if idx is not None and artist:
+                            artist = self.handles[idx]
+                            artist.set_visible(not artist.get_visible())
+                            if self.eventsGraphflag in {2, 3, 4} and label is not None:
+                                # if events are rendered in Combo style we need to hide also the corresponding annotations:
+                                try:
+                                    i = [self.aw.arabicReshape(et) for et in self.etypes[:4]].index(label)
+                                    if i == 0:
+                                        for a in self.l_eventtype1annos:
+                                            a.set_visible(not a.get_visible())
+                                    elif i == 1:
+                                        for a in self.l_eventtype2annos:
+                                            a.set_visible(not a.get_visible())
+                                    elif i == 2:
+                                        for a in self.l_eventtype3annos:
+                                            a.set_visible(not a.get_visible())
+                                    elif i == 3:
+                                        for a in self.l_eventtype4annos:
+                                            a.set_visible(not a.get_visible())
+                                except Exception: # pylint: disable=broad-except
+                                    pass
 
-            # show event information by clicking on event lines in step, step+ and combo modes
-            elif not bool(self.aw.comparator) and isinstance(event_artist, Line2D):
-                event_type:int|None = None
-                if isinstance(event.ind, int): # type: ignore[attr-defined] # "PickEvent" has no attribute "ind"
-                    ind = event.ind # type: ignore[attr-defined] # "PickEvent" has no attribute "ind"
-                else:
-                    if event.ind is None or len(event.ind) < 1 or not isinstance(event.ind[0], (int, numpy.integer)): # type: ignore[attr-defined] # "PickEvent" has no attribute "ind"
-                        return
-                    ind = event.ind[-1] # type: ignore[attr-defined] # "PickEvent" has no attribute "ind"
-                digits = (1 if self.LCDdecimalplaces else 0)
-                if event_artist in [self.l_backgroundeventtype1dots,self.l_backgroundeventtype2dots,self.l_backgroundeventtype3dots,self.l_backgroundeventtype4dots]:
-                    xdata_seq = event_artist.get_xdata()
-                    event_mouseevent_xdata:float|None = event.mouseevent.xdata
-                    if isinstance(xdata_seq, Sequence) and event_mouseevent_xdata is not None:
-                        xvalue = xdata_seq[ind]
-                        if isinstance(xvalue, float):
-                            tx:float = xvalue
-                            timex = self.backgroundtime2index(tx)
-                            if abs(tx - event_mouseevent_xdata)<3: # allow a slightly different mouse position, but close enough to the point on the line
-                                if event_artist == self.l_backgroundeventtype1dots:
-                                    event_type = 0
-                                elif event_artist == self.l_backgroundeventtype2dots:
-                                    event_type = 1
-                                elif event_artist == self.l_backgroundeventtype3dots:
-                                    event_type = 2
-                                elif event_artist == self.l_backgroundeventtype4dots:
-                                    event_type = 3
-                                if event_type is not None:
-                                    ydata_seq = event_artist.get_ydata()
-                                    if isinstance(ydata_seq, Sequence):
-                                        yvalue = ydata_seq[ind]
-                                        if isinstance(yvalue, float):
-                                            event_ydata = yvalue
-                                            event_pos_offset = self.eventpositionbars[0]
-                                            event_pos_factor = self.eventpositionbars[1] - self.eventpositionbars[0]
-                                            if self.clampEvents:
-                                                evalue = max(0,int(round(event_ydata)))
-                                            else:
-                                                evalue = max(0,int(round((event_ydata - event_pos_offset) / event_pos_factor)))
-                                            evalue_internal = self.eventsExternal2InternalValue(evalue)
-                                            for i, bge in enumerate(self.backgroundEvents):
-                                                if (event_type == self.backgroundEtypes[i] and
-                                                        evalue_internal == self.backgroundEvalues[i] and # same event value
-                                                        abs(timex-bge) <= 1):
-                                                    if self.timeindex[0] != -1:
-                                                        start = self.timex[self.timeindex[0]]
-                                                    else:
-                                                        start = 0
-                                                    if len(self.backgroundeventmessage) != 0:
-                                                        self.backgroundeventmessage += ' | '
-                                                    else:
-                                                        self.backgroundeventmessage += 'Background: '
-                                                    self.backgroundeventmessage = f'{self.backgroundeventmessage}{self.Betypesf(self.backgroundEtypes[i])} = {self.eventsvalues(self.backgroundEvalues[i])}'
-                                                    if self.renderEventsDescr and self.backgroundEStrings[i] and self.backgroundEStrings[i]!='':
-                                                        self.backgroundeventmessage = f'{self.backgroundeventmessage} ({self.backgroundEStrings[i].strip()[:self.eventslabelschars]})'
-                                                    self.backgroundeventmessage = f'{self.backgroundeventmessage} @ {(stringfromseconds(self.timeB[bge] - start))} {float2float(self.temp2B[bge],digits)}{self.mode}'
-                                                    self.starteventmessagetimer()
-                                                    if self.eventsGraphflag in {2,3,4}:
-                                                        # we support custom event pick-and-drag only for events rendered as step lines, step+ and as combo.
-                                                        self.background_event_ind = i
-                                                        self.background_event_pos = ind
-                                                        self.background_event_pick_position = (tx, event_ydata)
-                                                        self.background_event_last_picked_ind = i
-                                                        self.background_event_last_picked_pos = ind
-                                                        self.event_selected = True
-                                                    break
-                elif not bool(self.aw.comparator) and event_artist in [self.l_eventtype1dots,self.l_eventtype2dots,self.l_eventtype3dots,self.l_eventtype4dots]:
-                    xdata_seq = event_artist.get_xdata()
-                    event_mouseevent_xdata = event.mouseevent.xdata
-                    if isinstance(xdata_seq, Sequence) and event_mouseevent_xdata is not None:
-                        yvalue = xdata_seq[ind]
-                        if isinstance(yvalue, float):
-                            tx = yvalue
-                            timex = self.time2index(tx)
-                            if abs(tx - event_mouseevent_xdata)<3: # allow a slightly different mouse position, but close enough to the point on the line
-                                if event_artist == self.l_eventtype1dots:
-                                    event_type = 0
-                                elif event_artist == self.l_eventtype2dots:
-                                    event_type = 1
-                                elif event_artist == self.l_eventtype3dots:
-                                    event_type = 2
-                                elif event_artist == self.l_eventtype4dots:
-                                    event_type = 3
-                                if event_type is not None:
-                                    ydata_seq = event_artist.get_ydata()
-                                    if isinstance(ydata_seq, Sequence):
-                                        y_value = ydata_seq[ind]
-                                        if isinstance(y_value, float):
-                                            event_ydata = y_value
+                # show event information by clicking on event lines in step, step+ and combo modes
+                elif not bool(self.aw.comparator) and isinstance(event_artist, Line2D):
+                    event_type:int|None = None
+                    if hasattr(event, 'ind'):
+                        if isinstance(event.ind, int): # pyright:ignore[reportAttributeAccessIssue] # "PickEvent" has no attribute "ind"
+                            ind = event.ind # pyright:ignore[reportAttributeAccessIssue] # "PickEvent" has no attribute "ind"
+                        else:
+                            if event.ind is None or (isinstance(event.ind, (numpy.ndarray, list)) and len(event.ind) < 1) or not isinstance(event.ind[0], (int, numpy.integer)): # pyright:ignore[reportAttributeAccessIssue,reportUnknownArgumentType] # "PickEvent" has no attribute "ind"
+                                return
+                            ind = event.ind[-1] # pyright:ignore[reportAttributeAccessIssue] # "PickEvent" has no attribute "ind"
+                        digits = (1 if self.LCDdecimalplaces else 0)
+                        if event_artist in [self.l_backgroundeventtype1dots,self.l_backgroundeventtype2dots,self.l_backgroundeventtype3dots,self.l_backgroundeventtype4dots]:
+                            xdata_seq = event_artist.get_xdata()
+                            event_mouseevent_xdata:float|None = event.mouseevent.xdata
+                            if isinstance(xdata_seq, (numpy.ndarray, Sequence)) and event_mouseevent_xdata is not None:
+                                xvalue = xdata_seq[ind]
+                                if isinstance(xvalue, float):
+                                    tx:float = xvalue
+                                    timex = self.backgroundtime2index(tx)
+                                    if abs(tx - event_mouseevent_xdata)<3: # allow a slightly different mouse position, but close enough to the point on the line
+                                        if event_artist == self.l_backgroundeventtype1dots:
+                                            event_type = 0
+                                        elif event_artist == self.l_backgroundeventtype2dots:
+                                            event_type = 1
+                                        elif event_artist == self.l_backgroundeventtype3dots:
+                                            event_type = 2
+                                        elif event_artist == self.l_backgroundeventtype4dots:
+                                            event_type = 3
+                                        if event_type is not None:
+                                            ydata_seq = event_artist.get_ydata()
+                                            if isinstance(ydata_seq, (numpy.ndarray, Sequence)) and len(ydata_seq)>ind: # pyright:ignore[reportUnknownArgumentType]
+                                                event_ydata = float(ydata_seq[ind]) # pyright:ignore[reportArgumentType]
+                                                event_pos_offset = self.eventpositionbars[0]
+                                                event_pos_factor = self.eventpositionbars[1] - self.eventpositionbars[0]
+                                                if self.clampEvents:
+                                                    evalue = max(0,int(round(event_ydata)))
+                                                else:
+                                                    evalue = max(0,int(round((event_ydata - event_pos_offset) / event_pos_factor)))
+                                                evalue_internal = self.eventsExternal2InternalValue(evalue)
+                                                for i, bge in enumerate(self.backgroundEvents):
+                                                    if (event_type == self.backgroundEtypes[i] and
+                                                            evalue_internal == self.backgroundEvalues[i] and # same event value
+                                                            abs(timex-bge) <= 1):
+                                                        if self.timeindex[0] != -1:
+                                                            start = self.timex[self.timeindex[0]]
+                                                        else:
+                                                            start = 0
+                                                        if len(self.backgroundeventmessage) != 0:
+                                                            self.backgroundeventmessage += ' | '
+                                                        else:
+                                                            self.backgroundeventmessage += 'Background: '
+                                                        self.backgroundeventmessage = f'{self.backgroundeventmessage}{self.Betypesf(self.backgroundEtypes[i])} = {self.eventsvalues(self.backgroundEvalues[i])}'
+                                                        if self.renderEventsDescr and self.backgroundEStrings[i] and self.backgroundEStrings[i]!='':
+                                                            self.backgroundeventmessage = f'{self.backgroundeventmessage} ({self.backgroundEStrings[i].strip()[:self.eventslabelschars]})'
+                                                        self.backgroundeventmessage = f'{self.backgroundeventmessage} @ {(stringfromseconds(self.timeB[bge] - start))} {float2float(self.temp2B[bge],digits)}{self.mode}'
+                                                        self.starteventmessagetimer()
+                                                        if self.eventsGraphflag in {2,3,4}:
+                                                            # we support custom event pick-and-drag only for events rendered as step lines, step+ and as combo.
+                                                            self.background_event_ind = i
+                                                            self.background_event_pos = ind
+                                                            self.background_event_pick_position = (tx, event_ydata)
+                                                            self.background_event_last_picked_ind = i
+                                                            self.background_event_last_picked_pos = ind
+                                                            self.event_selected = True
+                                                        break
+                        elif not bool(self.aw.comparator) and event_artist in [self.l_eventtype1dots,self.l_eventtype2dots,self.l_eventtype3dots,self.l_eventtype4dots]:
+                            xdata_seq = event_artist.get_xdata()
+                            event_mouseevent_xdata = event.mouseevent.xdata
+                            if isinstance(xdata_seq, (numpy.ndarray, Sequence)) and event_mouseevent_xdata is not None and len(xdata_seq)>ind: # pyright:ignore[reportUnknownArgumentType]
+                                tx = float(xdata_seq[ind]) # pyright:ignore[reportArgumentType]
+                                timex = self.time2index(tx)
+                                if abs(tx - event_mouseevent_xdata)<3: # allow a slightly different mouse position, but close enough to the point on the line
+                                    if event_artist == self.l_eventtype1dots:
+                                        event_type = 0
+                                    elif event_artist == self.l_eventtype2dots:
+                                        event_type = 1
+                                    elif event_artist == self.l_eventtype3dots:
+                                        event_type = 2
+                                    elif event_artist == self.l_eventtype4dots:
+                                        event_type = 3
+                                    if event_type is not None:
+                                        ydata_seq = event_artist.get_ydata()
+                                        if isinstance(ydata_seq, (numpy.ndarray, Sequence)) and len(ydata_seq)>ind: # pyright:ignore[reportUnknownArgumentType]
+                                            event_ydata = float(ydata_seq[ind]) # pyright:ignore[reportArgumentType]
                                             event_pos_offset = self.eventpositionbars[0]
                                             event_pos_factor = self.eventpositionbars[1] - self.eventpositionbars[0]
                                             if self.clampEvents:
@@ -3253,10 +3250,10 @@ class tgraphcanvas(FigureCanvas):
                                                         self.foreground_event_last_picked_pos = ind
                                                         self.event_selected = True
                                                     break
-        except Exception as e: # pylint: disable=broad-except
-            _log.exception(e)
-            _, _, exc_tb = sys.exc_info()
-            self.adderror((QApplication.translate('Error Message','Exception:') + ' onpick() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
+                _, _, exc_tb = sys.exc_info()
+                self.adderror((QApplication.translate('Error Message','Exception:') + ' onpick() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     # returns event line artist, if any, and, if events are displayed as Combo also the list event annotations or in Step+ mode also the flag annos
     # an optional third result lists the specialeventannotations if any
@@ -3342,7 +3339,7 @@ class tgraphcanvas(FigureCanvas):
             if ldots is not None:
                 xdata = ldots.get_xdata()
                 ydata = ldots.get_ydata()
-                if isinstance(xdata, list) and isinstance(ydata, list):
+                if isinstance(xdata, (numpy.ndarray, list)) and isinstance(ydata, (numpy.ndarray, list)):
                     if self.clampEvents:
                         event_ydata = new_value
                     else:
@@ -3462,7 +3459,7 @@ class tgraphcanvas(FigureCanvas):
                 if ldots is not None:
                     # update the xdata
                     xdata = ldots.get_xdata()
-                    if isinstance(xdata, list):
+                    if isinstance(xdata, (numpy.ndarray, list)):
                         time_idx = max(0,min(len(self.timex)-1,self.time2index(cast(float, xdata[self.foreground_event_pos]))))
                         self.specialevents[self.foreground_event_ind] = time_idx
                         # update also the Artist to the final time
@@ -3470,7 +3467,7 @@ class tgraphcanvas(FigureCanvas):
                         ldots.set_xdata(cast(list[float], xdata))
                         # update the ydata
                         ydata = ldots.get_ydata()
-                        if isinstance(ydata, list):
+                        if isinstance(ydata, (numpy.ndarray, list)):
                             event_ydata:float = cast(float, ydata[self.foreground_event_pos])
                             event_pos_offset = self.eventpositionbars[0]
                             event_pos_factor = self.eventpositionbars[1] - self.eventpositionbars[0]
@@ -3557,7 +3554,7 @@ class tgraphcanvas(FigureCanvas):
                 if ldots is not None:
                     # update the xdata
                     xdata = ldots.get_xdata()
-                    if isinstance(xdata, list):
+                    if isinstance(xdata, (numpy.ndarray, list)):
                         time_idx = max(0,min(len(self.timeB)-1,self.backgroundtime2index(cast(float, xdata[self.background_event_pos]))))
                         self.backgroundEvents[self.background_event_ind] = time_idx
                         # update also the Artist to the final time
@@ -3565,7 +3562,7 @@ class tgraphcanvas(FigureCanvas):
                         ldots.set_xdata(cast(list[float], xdata))
                         # update the ydata
                         ydata = ldots.get_ydata()
-                        if isinstance(ydata, list):
+                        if isinstance(ydata, (numpy.ndarray, list)):
                             event_ydata = cast(float, ydata[self.background_event_pos])
                             event_pos_offset = self.eventpositionbars[0]
                             event_pos_factor = self.eventpositionbars[1] - self.eventpositionbars[0]
@@ -3807,188 +3804,189 @@ class tgraphcanvas(FigureCanvas):
             count += 1
         return count
 
-    def onmove(self, event:'MouseEvent') -> None:
-        if all(x is None for x in [self.foreground_event_ind, self.foreground_event_pos, self.foreground_event_pick_position,
-            self.background_event_ind, self.background_event_pos, self.background_event_pick_position]):
-            return
-        if self.foreground_event_ind is not None:
-            self.clear_last_picked_event_selection() # clear the last picked event index, if any, remembered for the delete event by backspace action
-        if event.inaxes is None:
-            return
-        if event.button != 1:
-            return
-        event_xdata = event.xdata
-        if event_xdata in (float('-inf'),float('inf')):
-            return
-        if event_xdata is None:
-            return
-        event_ydata = event.ydata
-        if event_ydata in (float('-inf'),float('inf')):
-            return
-        if event_ydata is None:
-            return
-        tempo:float|None = None
-        if  (self.foreground_event_ind is not None and self.foreground_event_pos is not None and self.foreground_event_pick_position is not None and
-                    len(self.specialeventstype)>self.foreground_event_ind):
-            event_type = self.specialeventstype[self.foreground_event_ind]
-            specialevent_annos:list[Annotation]|None
-            ldots, event_annos, specialevent_annos = self.event_type_to_artist(event_type)
-            set_x = True
-            set_y = True
-            if ldots is not None:
-                if QApplication.keyboardModifiers() == Qt.KeyboardModifier.ShiftModifier:
-                    if abs(event_xdata - self.foreground_event_pick_position[0]) < abs(event_ydata - self.foreground_event_pick_position[1]):
-                        set_x = False
-                    else:
-                        set_y = False
-                xdata = ldots.get_xdata()
-                ydata = ldots.get_ydata()
-                if isinstance(xdata, list) and isinstance(ydata, list):
-                    if set_x:
-                        xdata[self.foreground_event_pos] = int(round(event_xdata))
-                        ldots.set_xdata(cast(list[float], xdata))
-                    if set_y and isinstance(ydata, list):
-                        ydata[self.foreground_event_pos] = max(0,event_ydata)
-                        if not self.flagon and len(cast(list[float], ydata)) == self.foreground_event_pos + 2 and (self.timeindex[6]!=0 and self.timex[self.timeindex[6]] >= cast(float, xdata[-1])):
-                            # we also move the last dot up and down with the butlast if automatically added, but only if that last one is not after DROP
-                            ydata[-1] = ydata[-2]
-                        ldots.set_ydata(cast(list[float], ydata))
-                    if event_annos is not None:
-                        if self.foregroundShowFullflag:
-                            corrected_foreground_event_pos = self.foreground_event_pos
-                        else: # extra one is added to line at the end, but without anno
-                            corrected_foreground_event_pos = self.foreground_event_pos - max(0, len(cast(list[float], xdata)) - len(event_annos) - 1) # before first anno there can be others line elements
-                        if self.eventsGraphflag == 4 and len(event_annos)>corrected_foreground_event_pos:
-                            event_anno = event_annos[corrected_foreground_event_pos]
-                            self.updateEventAnno(
-                                event_type,
-                                event_anno,
-                                cast(float, xdata[self.foreground_event_pos]),
-                                cast(float, ydata[self.foreground_event_pos]))
-                        elif self.eventsGraphflag == 3 and (self.ETcurve or self.BTcurve):
-                            event_ind = self.foreground_event_ind
-                            if not self.foregroundShowFullflag:
-                                event_ind -= self.foreground_evens_before_CAHRGE()
-                            if len(event_annos)>event_ind:
-                                event_anno = event_annos[event_ind]
-                                idx = max(0,min(len(self.timex)-1,self.time2index(cast(float, xdata[self.foreground_event_pos]))))
-                                if self.ETcurve and not (self.BTcurve and self.showeventsonbt) and self.temp1[idx] > self.temp2[idx]:
-                                    if self.flagon:
-                                        tempo = self.temp1[idx]
-                                    else:
-                                        tempo = self.stemp1[idx]
-                                elif self.BTcurve:
-                                    if self.flagon:
-                                        tempo = self.temp2[idx]
-                                    else:
-                                        tempo = self.stemp2[idx]
-                                if tempo is not None:
-                                    self.updateFlagAnno(
-                                        event_type,
-                                        event_anno,
-                                        cast(float, xdata[self.foreground_event_pos]),
-                                        cast(float, ydata[self.foreground_event_pos]),
-                                        tempo)
-                    try:
-                        if specialevent_annos is not None and self.eventsGraphflag in {2, 3}:
+    def onmove(self, event:'Event') -> None:
+        if isinstance(event, MouseEvent):
+            if all(x is None for x in [self.foreground_event_ind, self.foreground_event_pos, self.foreground_event_pick_position,
+                self.background_event_ind, self.background_event_pos, self.background_event_pick_position]):
+                return
+            if self.foreground_event_ind is not None:
+                self.clear_last_picked_event_selection() # clear the last picked event index, if any, remembered for the delete event by backspace action
+            if event.inaxes is None:
+                return
+            if event.button != 1:
+                return
+            event_xdata = event.xdata
+            if event_xdata in (float('-inf'),float('inf')):
+                return
+            if event_xdata is None:
+                return
+            event_ydata = event.ydata
+            if event_ydata in (float('-inf'),float('inf')):
+                return
+            if event_ydata is None:
+                return
+            tempo:float|None = None
+            if  (self.foreground_event_ind is not None and self.foreground_event_pos is not None and self.foreground_event_pick_position is not None and
+                        len(self.specialeventstype)>self.foreground_event_ind):
+                event_type = self.specialeventstype[self.foreground_event_ind]
+                specialevent_annos:list[Annotation]|None
+                ldots, event_annos, specialevent_annos = self.event_type_to_artist(event_type)
+                set_x = True
+                set_y = True
+                if ldots is not None:
+                    if QApplication.keyboardModifiers() == Qt.KeyboardModifier.ShiftModifier:
+                        if abs(event_xdata - self.foreground_event_pick_position[0]) < abs(event_ydata - self.foreground_event_pick_position[1]):
+                            set_x = False
+                        else:
+                            set_y = False
+                    xdata = ldots.get_xdata()
+                    ydata = ldots.get_ydata()
+                    if isinstance(xdata, (numpy.ndarray, list)) and isinstance(ydata, (numpy.ndarray, list)):
+                        if set_x:
+                            xdata[self.foreground_event_pos] = int(round(event_xdata))
+                            ldots.set_xdata(cast(list[float], xdata))
+                        if set_y and isinstance(ydata, (numpy.ndarray, list)):
+                            ydata[self.foreground_event_pos] = max(0,event_ydata)
+                            if not self.flagon and len(cast(list[float], ydata)) == self.foreground_event_pos + 2 and (self.timeindex[6]!=0 and self.timex[self.timeindex[6]] >= cast(float, xdata[-1])):
+                                # we also move the last dot up and down with the butlast if automatically added, but only if that last one is not after DROP
+                                ydata[-1] = ydata[-2]
+                            ldots.set_ydata(cast(list[float], ydata))
+                        if event_annos is not None:
                             if self.foregroundShowFullflag:
                                 corrected_foreground_event_pos = self.foreground_event_pos
                             else: # extra one is added to line at the end, but without anno
-                                corrected_foreground_event_pos = self.foreground_event_pos - max(0, len(cast(list[float], xdata)) - len(specialevent_annos) - 1) # before first anno there can be others line elements
-                            if len(specialevent_annos)>corrected_foreground_event_pos:
-                                event_anno = specialevent_annos[corrected_foreground_event_pos]
-                                self.updateSpecialEventAnno(
-                                    self.foreground_event_ind,
+                                corrected_foreground_event_pos = self.foreground_event_pos - max(0, len(cast(list[float], xdata)) - len(event_annos) - 1) # before first anno there can be others line elements
+                            if self.eventsGraphflag == 4 and len(event_annos)>corrected_foreground_event_pos:
+                                event_anno = event_annos[corrected_foreground_event_pos]
+                                self.updateEventAnno(
                                     event_type,
                                     event_anno,
                                     cast(float, xdata[self.foreground_event_pos]),
                                     cast(float, ydata[self.foreground_event_pos]))
-                    except Exception as e: # pylint: disable=broad-except
-                        _log.exception(e)
-                    self.event_selected = False
-                    self.fig.canvas.draw_idle()
-        elif (self.background_event_ind is not None and self.background_event_pos is not None and self.background_event_pick_position is not None and
-                    len(self.backgroundEtypes)>self.background_event_ind):
-            event_type = self.backgroundEtypes[self.background_event_ind]
-            ldots, event_annos, specialevent_annos = self.event_type_to_background_artist(event_type)
-            set_x = True
-            set_y = True
-            if ldots is not None:
-                if QApplication.keyboardModifiers() == Qt.KeyboardModifier.ShiftModifier:
-                    if abs(event_xdata - self.background_event_pick_position[0]) < abs(event_ydata - self.background_event_pick_position[1]):
-                        set_x = False
-                    else:
-                        set_y = False
-                xdata = ldots.get_xdata()
-                ydata = ldots.get_ydata()
-                if isinstance(xdata, list) and isinstance(ydata, list):
-                    if set_x:
-                        # allow to move events only between the previous and the next of that type on the time axis to keep the temporal order
-                        new_x = event_xdata
-                        if self.background_event_pos != 0:
-                            # there is a point left to ours
-                            new_x = max(cast(float, xdata[self.background_event_pos-1])+1,new_x)
-                        if self.background_event_pos != len(cast(list[float], xdata))-1:
-                            # there is a point right to ours
-                            new_x = min(cast(float, xdata[self.background_event_pos+1])-1,new_x)
-                        xdata[self.background_event_pos] = int(round(new_x))
-                        ldots.set_xdata(cast(list[float], xdata))
-                    if set_y:
-                        ydata[self.background_event_pos] = max(0,event_ydata)
-                        if not self.flagon and len(cast(list[float], ydata)) == self.background_event_pos + 2 and (self.timeindex[6]!=0 and self.timex[self.timeindex[6]] >= cast(float, xdata[-1])):
-                            # we also move the last dot up and down with the butlast if automatically added, but only if that last one is not after DROP
-                            ydata[-1] = ydata[-2]
-                        ldots.set_ydata(cast(list[float], ydata))
-                    if event_annos is not None:
-                        if self.backgroundShowFullflag:
-                            corrected_background_event_pos = self.background_event_pos
-                        else: # extra one is added to line at the end, but without anno
-                            corrected_background_event_pos = self.background_event_pos - max(0, len(cast(list[float], xdata)) - len(event_annos) - 1) # before first anno there can be others line elements
-                        if self.eventsGraphflag == 4 and len(event_annos)>corrected_background_event_pos:
-                            event_anno = event_annos[corrected_background_event_pos]
-                            self.updateEventAnno(
-                                event_type,
-                                event_anno,
-                                cast(float, xdata[self.background_event_pos]),
-                                cast(float, ydata[self.background_event_pos]),
-                                background=True)
-                        elif self.eventsGraphflag == 3 and (self.backgroundETcurve or self.backgroundBTcurve):
-                            event_ind = self.background_event_ind
-                            if not self.backgroundShowFullflag:
-                                event_ind -= self.background_evens_before_CAHRGE()
-                            if len(event_annos)>event_ind:
-                                event_anno = event_annos[event_ind]
-                                idx = max(0,min(len(self.timeB)-1,self.backgroundtime2index(cast(float, xdata[self.background_event_pos]))))
-                                if self.backgroundETcurve and not (self.backgroundBTcurve and self.showeventsonbt) and self.temp1B[idx] > self.temp2B[idx]:
-                                    tempo = self.temp1B[idx]
-                                elif self.backgroundBTcurve:
-                                    tempo = self.temp2B[idx]
-                                if tempo is not None:
-                                    self.updateFlagAnno(
+                            elif self.eventsGraphflag == 3 and (self.ETcurve or self.BTcurve):
+                                event_ind = self.foreground_event_ind
+                                if not self.foregroundShowFullflag:
+                                    event_ind -= self.foreground_evens_before_CAHRGE()
+                                if len(event_annos)>event_ind:
+                                    event_anno = event_annos[event_ind]
+                                    idx = max(0,min(len(self.timex)-1,self.time2index(cast(float, xdata[self.foreground_event_pos]))))
+                                    if self.ETcurve and not (self.BTcurve and self.showeventsonbt) and self.temp1[idx] > self.temp2[idx]:
+                                        if self.flagon:
+                                            tempo = self.temp1[idx]
+                                        else:
+                                            tempo = self.stemp1[idx]
+                                    elif self.BTcurve:
+                                        if self.flagon:
+                                            tempo = self.temp2[idx]
+                                        else:
+                                            tempo = self.stemp2[idx]
+                                    if tempo is not None:
+                                        self.updateFlagAnno(
+                                            event_type,
+                                            event_anno,
+                                            cast(float, xdata[self.foreground_event_pos]),
+                                            cast(float, ydata[self.foreground_event_pos]),
+                                            tempo)
+                        try:
+                            if specialevent_annos is not None and self.eventsGraphflag in {2, 3}:
+                                if self.foregroundShowFullflag:
+                                    corrected_foreground_event_pos = self.foreground_event_pos
+                                else: # extra one is added to line at the end, but without anno
+                                    corrected_foreground_event_pos = self.foreground_event_pos - max(0, len(cast(list[float], xdata)) - len(specialevent_annos) - 1) # before first anno there can be others line elements
+                                if len(specialevent_annos)>corrected_foreground_event_pos:
+                                    event_anno = specialevent_annos[corrected_foreground_event_pos]
+                                    self.updateSpecialEventAnno(
+                                        self.foreground_event_ind,
                                         event_type,
                                         event_anno,
-                                        cast(float, xdata[self.background_event_pos]),
-                                        cast(float, ydata[self.background_event_pos]),
-                                        tempo)
-                    try:
-                        if specialevent_annos is not None and self.eventsGraphflag in {2, 3}:
+                                        cast(float, xdata[self.foreground_event_pos]),
+                                        cast(float, ydata[self.foreground_event_pos]))
+                        except Exception as e: # pylint: disable=broad-except
+                            _log.exception(e)
+                        self.event_selected = False
+                        self.fig.canvas.draw_idle()
+            elif (self.background_event_ind is not None and self.background_event_pos is not None and self.background_event_pick_position is not None and
+                        len(self.backgroundEtypes)>self.background_event_ind):
+                event_type = self.backgroundEtypes[self.background_event_ind]
+                ldots, event_annos, specialevent_annos = self.event_type_to_background_artist(event_type)
+                set_x = True
+                set_y = True
+                if ldots is not None:
+                    if QApplication.keyboardModifiers() == Qt.KeyboardModifier.ShiftModifier:
+                        if abs(event_xdata - self.background_event_pick_position[0]) < abs(event_ydata - self.background_event_pick_position[1]):
+                            set_x = False
+                        else:
+                            set_y = False
+                    xdata = ldots.get_xdata()
+                    ydata = ldots.get_ydata()
+                    if isinstance(xdata, (numpy.ndarray, list)) and isinstance(ydata, (numpy.ndarray, list)):
+                        if set_x:
+                            # allow to move events only between the previous and the next of that type on the time axis to keep the temporal order
+                            new_x = event_xdata
+                            if self.background_event_pos != 0:
+                                # there is a point left to ours
+                                new_x = max(cast(float, xdata[self.background_event_pos-1])+1,new_x)
+                            if self.background_event_pos != len(cast(list[float], xdata))-1:
+                                # there is a point right to ours
+                                new_x = min(cast(float, xdata[self.background_event_pos+1])-1,new_x)
+                            xdata[self.background_event_pos] = int(round(new_x))
+                            ldots.set_xdata(cast(list[float], xdata))
+                        if set_y:
+                            ydata[self.background_event_pos] = max(0,event_ydata)
+                            if not self.flagon and len(cast(list[float], ydata)) == self.background_event_pos + 2 and (self.timeindex[6]!=0 and self.timex[self.timeindex[6]] >= cast(float, xdata[-1])):
+                                # we also move the last dot up and down with the butlast if automatically added, but only if that last one is not after DROP
+                                ydata[-1] = ydata[-2]
+                            ldots.set_ydata(cast(list[float], ydata))
+                        if event_annos is not None:
                             if self.backgroundShowFullflag:
                                 corrected_background_event_pos = self.background_event_pos
                             else: # extra one is added to line at the end, but without anno
-                                corrected_background_event_pos = self.background_event_pos - max(0, len(cast(list[float], xdata)) - len(specialevent_annos) - 1) # before first anno there can be others line elements
-                            if len(specialevent_annos)>corrected_background_event_pos:
-                                event_anno = specialevent_annos[corrected_background_event_pos]
-                                self.updateSpecialEventAnno(
-                                    self.background_event_ind,
+                                corrected_background_event_pos = self.background_event_pos - max(0, len(cast(list[float], xdata)) - len(event_annos) - 1) # before first anno there can be others line elements
+                            if self.eventsGraphflag == 4 and len(event_annos)>corrected_background_event_pos:
+                                event_anno = event_annos[corrected_background_event_pos]
+                                self.updateEventAnno(
                                     event_type,
                                     event_anno,
                                     cast(float, xdata[self.background_event_pos]),
                                     cast(float, ydata[self.background_event_pos]),
                                     background=True)
-                    except Exception as e: # pylint: disable=broad-except
-                        _log.exception(e)
-                    self.event_selected = False
-                    self.fig.canvas.draw_idle()
+                            elif self.eventsGraphflag == 3 and (self.backgroundETcurve or self.backgroundBTcurve):
+                                event_ind = self.background_event_ind
+                                if not self.backgroundShowFullflag:
+                                    event_ind -= self.background_evens_before_CAHRGE()
+                                if len(event_annos)>event_ind:
+                                    event_anno = event_annos[event_ind]
+                                    idx = max(0,min(len(self.timeB)-1,self.backgroundtime2index(cast(float, xdata[self.background_event_pos]))))
+                                    if self.backgroundETcurve and not (self.backgroundBTcurve and self.showeventsonbt) and self.temp1B[idx] > self.temp2B[idx]:
+                                        tempo = self.temp1B[idx]
+                                    elif self.backgroundBTcurve:
+                                        tempo = self.temp2B[idx]
+                                    if tempo is not None:
+                                        self.updateFlagAnno(
+                                            event_type,
+                                            event_anno,
+                                            cast(float, xdata[self.background_event_pos]),
+                                            cast(float, ydata[self.background_event_pos]),
+                                            tempo)
+                        try:
+                            if specialevent_annos is not None and self.eventsGraphflag in {2, 3}:
+                                if self.backgroundShowFullflag:
+                                    corrected_background_event_pos = self.background_event_pos
+                                else: # extra one is added to line at the end, but without anno
+                                    corrected_background_event_pos = self.background_event_pos - max(0, len(cast(list[float], xdata)) - len(specialevent_annos) - 1) # before first anno there can be others line elements
+                                if len(specialevent_annos)>corrected_background_event_pos:
+                                    event_anno = specialevent_annos[corrected_background_event_pos]
+                                    self.updateSpecialEventAnno(
+                                        self.background_event_ind,
+                                        event_type,
+                                        event_anno,
+                                        cast(float, xdata[self.background_event_pos]),
+                                        cast(float, ydata[self.background_event_pos]),
+                                        background=True)
+                        except Exception as e: # pylint: disable=broad-except
+                            _log.exception(e)
+                        self.event_selected = False
+                        self.fig.canvas.draw_idle()
 
     def clear_last_picked_event_selection(self) -> None:
         if self.foreground_event_last_picked_ind is not None or self.foreground_event_last_picked_pos is not None:
@@ -4001,135 +3999,137 @@ class tgraphcanvas(FigureCanvas):
             self.background_event_last_picked_ind = None # clear the last picked event index remembered for the delete event by backspace action
             self.background_event_last_picked_pos = None
 
-    def onclick(self, event:'MouseEvent') -> None:
-        if self.foreground_event_last_picked_ind is not None and self.foreground_event_last_picked_ind != self.foreground_event_ind:
-            self.clear_last_picked_event_selection()
-        if self.background_event_last_picked_ind is not None and self.background_event_last_picked_ind != self.background_event_ind:
-            self.clear_last_background_picked_event_selection()
-        self.aw.setFocus() # we set the focus to the ApplicationWindow on clicking the MPL canvas to (re-)gain focus while the event minieditor is open
-        try:
-            if self.ax is None:
-                return
-            if not self.designerflag and not self.wheelflag and event.inaxes is None and not self.flagstart and not self.flagon and event.button == 3:
-                self.statisticsmode = (self.statisticsmode + 1)%4
-                self.writecharacteristics()
-                self.fig.canvas.draw_idle()
-                return
-
-#PLUS
-            if not self.designerflag and not self.wheelflag and event.inaxes is None and not self.flagstart and not self.flagon and event.button == 1 and event.dblclick and \
-                    event.x < event.y and self.roastUUID is not None:
-                QDesktopServices.openUrl(QUrl(roastLink(self.roastUUID), QUrl.ParsingMode.TolerantMode))
-                return
-
-            if event.dblclick and event.button == 1 and not self.designerflag and not self.wheelflag and event.inaxes:
-                if self.ax.get_autoscaley_on():
-                    self.ax.autoscale(enable=False, axis='y', tight=False)
-                    self.redraw(recomputeAllDeltas=False)
-                else:
-                    self.ax.autoscale(enable=True, axis='y', tight=False)
-                    self.fig.canvas.draw_idle()
-
-            if not self.wheelflag and event.inaxes is None and event.button == 1 and event.dblclick and event.x > event.y:
-                fig = self.ax.get_figure()
-                if fig is None:
+    def onclick(self, event:'Event') -> None:
+        if isinstance(event, MouseEvent):
+            if self.foreground_event_last_picked_ind is not None and self.foreground_event_last_picked_ind != self.foreground_event_ind:
+                self.clear_last_picked_event_selection()
+            if self.background_event_last_picked_ind is not None and self.background_event_last_picked_ind != self.background_event_ind:
+                self.clear_last_background_picked_event_selection()
+            self.aw.setFocus() # we set the focus to the ApplicationWindow on clicking the MPL canvas to (re-)gain focus while the event minieditor is open
+            try:
+                if self.ax is None:
                     return
-                s = fig.get_size_inches()*fig.dpi # type:ignore[union-attr] # MPL 3.10.0 reports `Item "SubFigure" of "Union[Figure, SubFigure]" has no attribute "get_size_inches"`
-                if event.x > s[0]*2/3 and event.y > s[1]*2/3:
-                    if not self.flagstart and not self.flagon and self.backgroundprofile is None and __release_sponsor_domain__ and __release_sponsor_url__:
-                        QDesktopServices.openUrl(QUrl(__release_sponsor_url__, QUrl.ParsingMode.TolerantMode))
-                        return
-                    if self.backgroundprofile is not None:
-                        # toggle background if right top corner above canvas where the subtitle is clicked
-                        self.background = not self.background
-                        self.aw.autoAdjustAxis(background=self.background and (not len(self.timex) > 3))
-                        if self.statssummary and self.autotimex:
-                            self.redraw(recomputeAllDeltas=True)
-                        else:
-                            self.redraw_keep_view(recomputeAllDeltas=True)
-                        return
+                if not self.designerflag and not self.wheelflag and event.inaxes is None and not self.flagstart and not self.flagon and event.button == 3:
+                    self.statisticsmode = (self.statisticsmode + 1)%4
+                    self.writecharacteristics()
+                    self.fig.canvas.draw_idle()
+                    return
 
+    #PLUS
+                if not self.designerflag and not self.wheelflag and event.inaxes is None and not self.flagstart and not self.flagon and event.button == 1 and event.dblclick and \
+                        event.x < event.y and self.roastUUID is not None:
+                    QDesktopServices.openUrl(QUrl(roastLink(self.roastUUID), QUrl.ParsingMode.TolerantMode))
+                    return
 
-            event_xdata = event.xdata
-            event_ydata = event.ydata
-            if (event_xdata is not None and event_xdata not in (float('-inf'),float('inf')) and
-                    event_ydata is not None and event_ydata not in (float('-inf'),float('inf'))):
-                if event.button == 1 and event.inaxes and self.crossmarker and not self.designerflag and not self.wheelflag and not self.flagon:
-                    self.baseX,self.baseY = event.xdata, event.ydata
-                    if (self.base_horizontalcrossline is None and self.base_verticalcrossline is None):
-                        # Mark starting point of click-and-drag with a marker
-                        self.base_horizontalcrossline, = self.ax.plot(numpy.array(self.baseX), numpy.array(self.baseY), 'r+', markersize=20)
-                        self.base_verticalcrossline, = self.ax.plot(numpy.array(self.baseX), numpy.array(self.baseY), 'wo', markersize = 2)
-                elif not bool(self.aw.comparator) and event.button == 3 and event.inaxes and not self.designerflag and not self.wheelflag and self.aw.ntb.mode not in ['pan/zoom', 'zoom rect']:# and not self.flagon:
-                    # popup not available if pan/zoom or zoom rect is active as it interacts
-                    timex = self.time2index(event_xdata)
-                    if timex > 0:
-                        # reset the zoom rectangles
-                        menu = QMenu(self.aw) # if we bind this to self, we inherit the background-color: transparent from self.fig
-        #                menu.setStyleSheet("QMenu::item {background-color: palette(window); selection-color: palette(window); selection-background-color: darkBlue;}")
-                        # populate menu
-                        ac = QAction(menu)
-                        bt = self.temp2[timex]
-                        if not self.BTcurve and self.ETcurve:
-                            # we allow click to ET if BT is hidden and ET is shown
-                            bt = self.temp1[timex]
-                        #btdelta = 50 if self.mode == 'C' else 70
-                        if bt != -1: # and abs(bt-event_ydata) < btdelta:
-                            # we suppress the popup if not clicked close enough to the BT curve
-                            if self.timeindex[0] > -1:
-                                ac.setText(f"{QApplication.translate('Label', 'at')} {stringfromseconds(event_xdata - self.timex[self.timeindex[0]])}")
-                            else:
-                                ac.setText(f"{QApplication.translate('Label', 'at')} {stringfromseconds(event_xdata)}")
-                            ac.setEnabled(False)
-                            menu.addAction(ac)
-                            for k in [(QApplication.translate('Label','CHARGE'),0),
-                                      (QApplication.translate('Label','DRY END'),1),
-                                      (QApplication.translate('Label','FC START'),2),
-                                      (QApplication.translate('Label','FC END'),3),
-                                      (QApplication.translate('Label','SC START'),4),
-                                      (QApplication.translate('Label','SC END'),5),
-                                      (QApplication.translate('Label','DROP'),6),
-                                      (QApplication.translate('Label','COOL'),7)]:
-                                idx_before = idx_after = 0
-                                for i in range(k[1]):
-                                    if self.timeindex[i] and self.timeindex[i] != -1:
-                                        idx_before = self.timeindex[i]
-                                for i in range(6,k[1],-1) :
-                                    if self.timeindex[i] and self.timeindex[i] != -1:
-                                        idx_after = self.timeindex[i]
-                                if (((not idx_before) or timex > idx_before) and ((not idx_after) or timex < idx_after) and
-                                    (not self.flagstart or (k[1] == 0) or (k[1] != 0 and self.timeindex[k[1]] != 0))): # only add menu item during recording if already a value is set (via a button); but for CHARGE
-                                    ac = QAction(menu)
-                                    ac.key = (k[1],timex) # type: ignore[attr-defined] # key a custom attribute of QAction which should be defined in a custom subclass
-                                    ac.setText(' ' + k[0])
-                                    menu.addAction(ac)
-                            # add user EVENT entry
-                            try:
-                                ac = QAction(menu)
-                                ac.setText(' ' + QApplication.translate('Label', 'EVENT'))
-                                event_pos_offset = self.eventpositionbars[0]
-                                event_pos_factor = self.eventpositionbars[1] - self.eventpositionbars[0]
-                                if self.clampEvents:
-                                    evalue = int(round(event_ydata))
+                if event.dblclick and event.button == 1 and not self.designerflag and not self.wheelflag and event.inaxes:
+                    if self.ax.get_autoscaley_on():
+                        self.ax.autoscale(enable=False, axis='y', tight=False)
+                        self.redraw(recomputeAllDeltas=False)
+                    else:
+                        self.ax.autoscale(enable=True, axis='y', tight=False)
+                        self.fig.canvas.draw_idle()
+
+                if not self.wheelflag and event.inaxes is None and event.button == 1 and event.dblclick and event.x > event.y:
+                    fig = self.ax.get_figure()
+                    if fig is None:
+                        return
+                    if isinstance(fig, Figure):
+                        s = fig.get_size_inches()*fig.dpi
+                        if event.x > s[0]*2/3 and event.y > s[1]*2/3:
+                            if not self.flagstart and not self.flagon and self.backgroundprofile is None and __release_sponsor_domain__ and __release_sponsor_url__:
+                                QDesktopServices.openUrl(QUrl(__release_sponsor_url__, QUrl.ParsingMode.TolerantMode))
+                                return
+                            if self.backgroundprofile is not None:
+                                # toggle background if right top corner above canvas where the subtitle is clicked
+                                self.background = not self.background
+                                self.aw.autoAdjustAxis(background=self.background and (not len(self.timex) > 3))
+                                if self.statssummary and self.autotimex:
+                                    self.redraw(recomputeAllDeltas=True)
                                 else:
-                                    evalue = int(round((event_ydata - event_pos_offset) / event_pos_factor))
-                                ac.key = (-1,timex,self.eventsExternal2InternalValue(evalue))  # type: ignore[attr-defined] # key a custom attribute of QAction which should be defined in a custom subclass
+                                    self.redraw_keep_view(recomputeAllDeltas=True)
+                                return
+
+
+                event_xdata = event.xdata
+                event_ydata = event.ydata
+                if (event_xdata is not None and event_xdata not in (float('-inf'),float('inf')) and
+                        event_ydata is not None and event_ydata not in (float('-inf'),float('inf'))):
+                    if event.button == 1 and event.inaxes and self.crossmarker and not self.designerflag and not self.wheelflag and not self.flagon:
+                        self.baseX,self.baseY = event.xdata, event.ydata
+                        if (self.base_horizontalcrossline is None and self.base_verticalcrossline is None):
+                            # Mark starting point of click-and-drag with a marker
+                            self.base_horizontalcrossline, = self.ax.plot(numpy.array(self.baseX), numpy.array(self.baseY), 'r+', markersize=20)
+                            self.base_verticalcrossline, = self.ax.plot(numpy.array(self.baseX), numpy.array(self.baseY), 'wo', markersize = 2)
+                    elif not bool(self.aw.comparator) and event.button == 3 and event.inaxes and not self.designerflag and not self.wheelflag and self.aw.ntb.mode not in ['pan/zoom', 'zoom rect']:# and not self.flagon:
+                        # popup not available if pan/zoom or zoom rect is active as it interacts
+                        timex = self.time2index(event_xdata)
+                        if timex > 0:
+                            # reset the zoom rectangles
+                            menu = QMenu(self.aw) # if we bind this to self, we inherit the background-color: transparent from self.fig
+            #                menu.setStyleSheet("QMenu::item {background-color: palette(window); selection-color: palette(window); selection-background-color: darkBlue;}")
+                            # populate menu
+                            ac = QAction(menu)
+                            bt = self.temp2[timex]
+                            if not self.BTcurve and self.ETcurve:
+                                # we allow click to ET if BT is hidden and ET is shown
+                                bt = self.temp1[timex]
+                            #btdelta = 50 if self.mode == 'C' else 70
+                            if bt != -1: # and abs(bt-event_ydata) < btdelta:
+                                # we suppress the popup if not clicked close enough to the BT curve
+                                if self.timeindex[0] > -1:
+                                    ac.setText(f"{QApplication.translate('Label', 'at')} {stringfromseconds(event_xdata - self.timex[self.timeindex[0]])}")
+                                else:
+                                    ac.setText(f"{QApplication.translate('Label', 'at')} {stringfromseconds(event_xdata)}")
+                                ac.setEnabled(False)
                                 menu.addAction(ac)
-                            except Exception: # pylint: disable=broad-except
-                                # int(round()) might fail with "cannot convert float infinity to integer"
-                                pass
+                                for k in [(QApplication.translate('Label','CHARGE'),0),
+                                          (QApplication.translate('Label','DRY END'),1),
+                                          (QApplication.translate('Label','FC START'),2),
+                                          (QApplication.translate('Label','FC END'),3),
+                                          (QApplication.translate('Label','SC START'),4),
+                                          (QApplication.translate('Label','SC END'),5),
+                                          (QApplication.translate('Label','DROP'),6),
+                                          (QApplication.translate('Label','COOL'),7)]:
+                                    idx_before = idx_after = 0
+                                    for i in range(k[1]):
+                                        if self.timeindex[i] and self.timeindex[i] != -1:
+                                            idx_before = self.timeindex[i]
+                                    for i in range(6,k[1],-1) :
+                                        if self.timeindex[i] and self.timeindex[i] != -1:
+                                            idx_after = self.timeindex[i]
+                                    if (((not idx_before) or timex > idx_before) and ((not idx_after) or timex < idx_after) and
+                                        (not self.flagstart or (k[1] == 0) or (k[1] != 0 and self.timeindex[k[1]] != 0))): # only add menu item during recording if already a value is set (via a button); but for CHARGE
+                                        ac = QAction(menu)
+                                        ac.key = (k[1],timex) # type: ignore[attr-defined] # key a custom attribute of QAction which should be defined in a custom subclass
+                                        ac.setText(' ' + k[0])
+                                        menu.addAction(ac)
+                                # add user EVENT entry
+                                try:
+                                    ac = QAction(menu)
+                                    ac.setText(' ' + QApplication.translate('Label', 'EVENT'))
+                                    event_pos_offset = self.eventpositionbars[0]
+                                    event_pos_factor = self.eventpositionbars[1] - self.eventpositionbars[0]
+                                    if self.clampEvents:
+                                        evalue = int(round(event_ydata))
+                                    else:
+                                        evalue = int(round((event_ydata - event_pos_offset) / event_pos_factor))
+                                    ac.key = (-1,timex,self.eventsExternal2InternalValue(evalue))  # type: ignore[attr-defined] # key a custom attribute of QAction which should be defined in a custom subclass
+                                    menu.addAction(ac)
+                                except Exception: # pylint: disable=broad-except
+                                    # int(round()) might fail with "cannot convert float infinity to integer"
+                                    pass
 
-                            # we deactivate all active motion_notify_event_handlers of draggable annotations that might have been connected by this click to
-                            # avoid redraw conflicts between Artisan canvas bitblit caching and the matplotlib internal bitblit caches.
-                            self.disconnect_draggableannotations_motion_notifiers()
+                                # we deactivate all active motion_notify_event_handlers of draggable annotations that might have been connected by this click to
+                                # avoid redraw conflicts between Artisan canvas bitblit caching and the matplotlib internal bitblit caches.
+                                self.disconnect_draggableannotations_motion_notifiers()
 
-                            # show menu
-                            menu.triggered.connect(self.event_popup_action)
-                            menu.popup(QCursor.pos())
-        except Exception as e: # pylint: disable=broad-except
-            _log.exception(e)
-            _, _, exc_tb = sys.exc_info()
-            self.adderror((QApplication.translate('Error Message','Exception:') + ' onclick() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
+                                # show menu
+                                menu.triggered.connect(self.event_popup_action)
+                                menu.popup(QCursor.pos())
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
+                _, _, exc_tb = sys.exc_info()
+                self.adderror((QApplication.translate('Error Message','Exception:') + ' onclick() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot('QAction*')
     def event_popup_action(self, action:QAction) -> None:
@@ -6720,7 +6720,7 @@ class tgraphcanvas(FigureCanvas):
     def eval_math_expression(self,mathexpression:str, t:float, equeditnumber:int|None = None,
                 RTsname:str|None = None, RTsval:float|None = None, t_offset:float = 0.) -> float:
         if len(mathexpression):
-            mathdictionary:dict[str,Any] = {}
+            mathdictionary:dict[str,None|float|Callable[[Any], float|None]|Callable[[Any, Any], float|None]] = {}
             mathdictionary.update(self.mathdictionary_base) # extend by the standard math symbolic formulas
 
             if self.flagstart or not self.flagon:
@@ -17391,7 +17391,7 @@ class tgraphcanvas(FigureCanvas):
             filename = self.aw.ArtisanOpenFileDialog(msg=QApplication.translate('Message', 'Load Points'),ext='*.adsg')
             obj = None
             if os.path.exists(filename):
-                with open(filename, 'r', encoding='utf-8') as f:
+                with open(filename, encoding='utf-8') as f:
                     obj=ast.literal_eval(f.read())
             if obj and 'timex' in obj and 'temp1' in obj and 'temp2' in obj:
                 self.timex = obj['timex']
@@ -17947,7 +17947,7 @@ class tgraphcanvas(FigureCanvas):
         if isinstance(line, Line2D):
             #identify which line is being edited
             ydata = line.get_ydata()
-            if isinstance(ydata, Sequence) and len(ydata)>1 and ydata[1] == self.temp1[1]:
+            if isinstance(ydata, (numpy.ndarray, Sequence)) and len(ydata)>1 and ydata[1] == self.temp1[1]: # pyright:ignore[reportUnknownArgumentType]
                 self.workingline = 1
             else:
                 self.workingline = 2

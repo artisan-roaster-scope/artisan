@@ -409,6 +409,9 @@ class PID:
                     # Apply derivative limiting for derivative-on-error mode too
                     if abs(D) > self.derivative_limit:
                         D = self.derivative_limit if D > 0 else -self.derivative_limit
+                    # Reduce derivative action immediately after setpoint changes
+                    if self.setpoint_changed_significantly:
+                        D *= 0.5  # Reduce derivative action by 50%
                 else:
                     # Use enhanced derivative-on-measurement calculation (incl. derivative filtering)
                     D = self._calculate_derivative_on_measurement(i, dt)
@@ -606,9 +609,9 @@ class PID:
     def derivativeFilter() -> LiveSosFilter:
         return LiveSosFilter(
             iirfilter(
-                1,  # order
+                2,       # order
                 Wn=0.1,  # 0 < Wn < fs/2 (fs=1 -> fs/2=0.5) # cut-off frequency
-                fs=1,  # sampling rate, Hz
+                fs=1,    # sampling rate, Hz
                 btype='low',
                 ftype='butter',
                 output='sos',

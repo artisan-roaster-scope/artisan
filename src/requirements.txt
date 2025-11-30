@@ -29,7 +29,7 @@
 setuptools==70.3.0 # py2app fails on 71.0.3 and 71.0.4; pyinstaller windows/linux fails on 71.0.0 <= < 71.0.3
 wheel==0.45.1
 pyserial==3.5
-pymodbus==3.11.3
+pymodbus==3.11.4
 python-snap7==2.0.2
 Phidget22==1.23.20251006
 Unidecode==1.4.0
@@ -83,7 +83,7 @@ pyobjc-core==12.1; sys_platform=='darwin'
 pyobjc-framework-Cocoa==12.1; sys_platform=='darwin'
 pyobjc-framework-CoreBluetooth==12.1; sys_platform=='darwin'
 pyobjc-framework-libdispatch==12.1; sys_platform=='darwin'
-#py2app==0.28.8; sys_platform=='darwin'
+#py2app==0.28.9; sys_platform=='darwin'
 ###
 ########
 ### Linux specific packages

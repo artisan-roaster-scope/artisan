@@ -19624,7 +19624,11 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         try:
             if filename is None:
                 self.settingsSetValue(settings, default_settings, 'fullscreen', self.full_screen_mode_active or self.isFullScreen(), read_defaults)
-                self.settingsSetValue(settings, default_settings, 'plus_account', self.plus_account, read_defaults)
+                if not read_defaults:
+                    if self.plus_account is None:
+                        settings.remove('plus_account')
+                    else:
+                        settings.setValue('plus_account', self.plus_account)
                 self.settingsSetValue(settings, default_settings, 'plus_remember_credentials', self.plus_remember_credentials, read_defaults)
                 self.settingsSetValue(settings, default_settings, 'plus_email', self.plus_email, read_defaults)
                 self.settingsSetValue(settings, default_settings, 'plus_language', self.plus_language, read_defaults)
@@ -27459,7 +27463,6 @@ def main() -> None:
     appWindow.settingsLoad(redraw=False) # redraw is triggered later in the startup process again
     appWindow.restoreExtraDeviceSettingsBackup() # load settings backup if it exists (like on RESET)
     _log.info('loaded %s settings in %.2fs', len(QSettings().allKeys()), libtime.process_time() - start_time)
-
 #    _log.debug("PRINT mpl.get_cachedir(): %s",mpl.get_cachedir())
 
     # inform the user the debug logging is on
