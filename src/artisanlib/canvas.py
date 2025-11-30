@@ -17391,7 +17391,7 @@ class tgraphcanvas(FigureCanvas):
             filename = self.aw.ArtisanOpenFileDialog(msg=QApplication.translate('Message', 'Load Points'),ext='*.adsg')
             obj = None
             if os.path.exists(filename):
-                with open(filename, 'rb', encoding='utf-8') as f:
+                with open(filename, 'r', encoding='utf-8') as f:
                     obj=ast.literal_eval(f.read())
             if obj and 'timex' in obj and 'temp1' in obj and 'temp2' in obj:
                 self.timex = obj['timex']
