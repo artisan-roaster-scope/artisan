@@ -18,14 +18,12 @@
 # Include "skip ci" in the commit message to prevent this build process from running
 environment:
   # Set the default Appveyor Python version here. Does not affect windows_legacy. Can be overridden in platform environment.
-  PYTHON_V: 3.13
+  PYTHON_V: 3.14
   # Upgrade to specific version (for platforms supporting upgrade). Upgrade skipped if env var is missing or blank.
-  PYUPGRADE_WIN_V: 3.14.0
+  #PYUPGRADE_WIN_VER: 3.14.0
   #PYUPGRADE_MACOS_V: 3.12.1  # when upgrading see the notes in the deploy phase
 
   matrix:
-#  - job_name: windows_legacy
-#    appveyor_build_worker_image: Visual Studio 2019
   - job_name: windows
     appveyor_build_worker_image: Visual Studio 2022
   - job_name: macos
@@ -59,70 +57,6 @@ stack:
   python ${PYTHON_V}
 
 for:
-#-
-#  matrix:
-#    only:
-#      - job_name: windows_legacy
-#    fast_finish: false
-#
-#  environment:
-#    PYTHON_PATH: "C:/Python38-x64"
-#    QT_PATH: "C:/qt/5.15/msvc2019_64"
-#    PYUIC: "pyuic5.exe"
-#    PYQT: "5"
-#    BUILD_PYINSTALLER: "True"
-#    ARTISAN_LEGACY: "True"
-#    VC_REDIST: "https://aka.ms/vs/16/release/vc_redist.x64.exe"  #redistributable for VS 2015-2019
-#    VCVARSALL: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Auxiliary/Build/vcvarsall.bat"
-#
-#  install:
-#    - cmd: echo Windows Legacy Install
-#
-#    # generate the path to PyQt translations files
-#    - ps: $env:QT_TRANSL = "$env:PYTHON_PATH/Lib/site-packages/PyQt5/Qt5/translations"
-#
-#    # pull library versions from requirments file
-#    - ps: $env:PYINSTALLER_VER = Select-String -Path ./src/requirements.txt "pyinstaller==([\d\.]*).*platform_system='Windows'" -List | ForEach-Object {$_.Matches.Groups[1].Value}
-#    - ps: Write-Host "PYINSTALLER_VER= $env:PYINSTALLER_VER"
-#
-#    # update path env var
-#    - cmd: set PATH=%PYTHON_PATH%;%PYTHON_PATH%\Scripts;%PATH%
-#
-#    # run the install script
-#    - cmd: .ci\install-win.bat
-#
-#  build_script:
-#    - cmd: echo Windows Legacy Build
-#    - cmd: cd src
-#
-#    #update the copyright year used by pyinstaller to set exe properties for Windows
-#    - ps: $YEAR=(Get-Date).year
-#    - ps: gc version-metadata.yml | %{ $_ -replace "yyyy", "$YEAR" } | out-file newfile -encoding ascii
-#    - ps: move -force newfile version-metadata.yml
-#
-#    # update the __revision__ field with the left seven of the GIT commit hash
-#    - ps: $GIT_VERSION=git rev-parse --verify --short HEAD
-#    - ps: gc artisanlib/__init__.py | %{ $_ -replace "__revision__ = '.*'", "__revision__ = '$GIT_VERSION'" } | out-file newfile -encoding ascii
-#    - ps: move -force newfile artisanlib/__init__.py
-#
-#    # run the build script
-#    - cmd: build-win3-pi.bat
-#
-##  test_script:
-##    - cmd: python -m unittest discover
-#
-#  artifacts:
-##    - path: 'generated-win-legacy.zip'
-#    - path: 'src\%artifact_prefix%-win*setup.exe'
-#
-#  deploy_script:
-#    - cmd: bash ../.ci/upload.sh artisan-win*setup.exe
-#
-##  # uncomment this section for remote desktop connection to build image
-##  on_finish:
-##    - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
-#
-
 -
   matrix:
     only:
@@ -133,7 +67,7 @@ for:
     QT_PATH: "C:/qt/6.5.1/msvc2019_64"  #there is no msvc2022_64 under /qt*
     PYQT: "6"
     PYUIC: "pyuic6.exe"
-    BUILD_PYINSTALLER: "True"
+    BUILD_PYINSTALLER: "False"
     ARTISAN_LEGACY: "False"
     VC_REDIST: "https://aka.ms/vs/17/release/vc_redist.x64.exe"  #redistributable for VS 2015-2022
     VCVARSALL: "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Auxiliary/Build/vcvarsall.bat"
@@ -141,38 +75,45 @@ for:
   install:
     - cmd: echo Windows Install
 
-    # Update the Python version when PYUPGRADE_WIN_V is set.  The upgrade happens in install-win.bat
+    # Update the Python version when PYUPGRADE_WIN_VER is set.  The upgrade happens in upgrade-py-win.bat
     # Note that the paths set below may not exist yet.
     - ps: |
-        if (Test-Path env:PYUPGRADE_WIN_V) {
+        if (Test-Path env:PYUPGRADE_WIN_VER) {
             $env:PREV_PYTHON_V = $env:PYTHON_V
-            $env:PYTHON_V = ($env:PYUPGRADE_WIN_V -split '\.')[0..1] -join '.'
+            $env:PREV_PYTHON_PATH = "C:/Python$($env:PYTHON_V -replace '\.','')-x64"
+            $env:PYTHON_V = ($env:PYUPGRADE_WIN_VER -split '\.')[0..1] -join '.'
         }
 
-    # derive the python path from the version number
+    # derive the path to python.exe from the version number
     - ps: $env:PYTHON_PATH = "C:/Python$($env:PYTHON_V -replace '\.','')-x64"
     - ps: Write-Host $env:PYTHON_PATH
 
-    # generate the path to PyQt translations files
-    - ps: $env:QT_TRANSL = "$env:PYTHON_PATH/Lib/site-packages/PyQt6/Qt6/translations"
-
-    # pull library versions from requirments file
-    - ps: $env:PYINSTALLER_VER = Select-String -Path ./src/requirements.txt "pyinstaller==([\d\.]*).*platform_system='Windows'" -List | ForEach-Object {$_.Matches.Groups[1].Value}
-    - ps: Write-Host "PYINSTALLER_VER= $env:PYINSTALLER_VER"
+    # upgrade the python version installed if necessary
+    - cmd: .ci/upgrade-py-win.bat
 
     # update path env var
     - cmd: set PATH=%PYTHON_PATH%;%PYTHON_PATH%\Scripts;%PATH%
 
+    # expose the python version
+    - cmd: python -V
+
+    # generate the path to PyQt translations files
+    - ps: $env:QT_TRANSL = "$env:PYTHON_PATH/Lib/site-packages/PyQt6/Qt6/translations"
+
+    # pull library versions from requirements file
+    - ps: $env:PYINSTALLER_VER = Select-String -Path ./src/requirements.txt "pyinstaller==([\d\.]*).*platform_system='Windows'" -List | ForEach-Object {$_.Matches.Groups[1].Value}
+    - ps: Write-Host "PYINSTALLER_VER= $env:PYINSTALLER_VER"
+
     # patch for libusb_package until a Python 3.14 version is available on pypi.org
-    - cmd: echo *** PATCH install version of libusb_package modified for Python 3.14
-    - cmd: pip install .ci\patches\libusb_package-1.0.26.3-py314-none-win_amd64.whl
-        
+    - cmd: if "%PYTHON_V%"=="3.14" (echo *** PATCH install version of libusb_package modified for Python 3.14)
+    - cmd: if "%PYTHON_V%"=="3.14" (pip install .ci\patches\libusb_package-1.0.26.3-py314-none-win_amd64.whl)
+
     # run the install script
     - cmd: .ci/install-win.bat
-        
+
     # patch for pylupdate6 until this is fixed on pypi.org
-    - cmd: echo *** PATCH pylupdate6 for Python 3.14
-    - cmd: copy /Y .ci\patches\python_source.py C:\Python314-x64\Lib\site-packages\PyQt6\lupdate\python_source.py
+    - cmd: if "%PYTHON_V%"=="3.14" (echo *** PATCH pylupdate6 for Python 3.14)
+    - cmd: if "%PYTHON_V%"=="3.14" (copy /Y .ci\patches\python_source.py C:\Python314-x64\Lib\site-packages\PyQt6\lupdate\python_source.py)
 
   build_script:
     - cmd: echo Windows Build
