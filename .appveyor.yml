@@ -18,9 +18,9 @@
 # Include "skip ci" in the commit message to prevent this build process from running
 environment:
   # Set the default Appveyor Python version here. Does not affect windows_legacy. Can be overridden in platform environment.
-  PYTHON_V: 3.14
+  PYTHON_V: 3.13
   # Upgrade to specific version (for platforms supporting upgrade). Upgrade skipped if env var is missing or blank.
-  #PYUPGRADE_WIN_VER: 3.14.0
+  PYUPGRADE_WIN_VER: 3.14.0
   #PYUPGRADE_MACOS_V: 3.12.1  # when upgrading see the notes in the deploy phase
 
   matrix:
