@@ -457,43 +457,6 @@ class TestPIDUserAcceptance:
             assert pid.Kd == 0.01, 'Derivative gain should be updated'
             assert len(control_commands) > 0, 'PID should respond to parameter changes'
 
-    def test_pid_smoothing_features_for_stable_control(self) -> None:
-        """Test PID input and output smoothing features for stable control.
-
-        This validates that smoothing reduces noise in temperature readings and control outputs.
-        """
-        with patch('artisanlib.pid.QSemaphore', return_value=_create_mock_semaphore()):
-            from artisanlib.pid import PID
-
-            # Arrange
-            control_commands: list[float] = []
-
-            def control_function(duty: float) -> None:
-                control_commands.append(duty)
-
-            pid = PID(control=control_function, p=2.0, i=0.1, d=0.1)
-
-            # Enable smoothing features
-            pid.input_smoothing_factor = 3  # Smooth input over 3 readings
-            pid.output_smoothing_factor = 3  # Smooth output over 3 readings
-
-            pid.setTarget(200.0)
-            pid.on()
-
-            # Act: Feed noisy temperature readings
-            noisy_temps = [195.0, 205.0, 198.0, 202.0, 199.0, 201.0]
-
-            with patch('time.time', side_effect=[i * 0.5 for i in range(len(noisy_temps))]):
-                for temp in noisy_temps:
-                    pid.update(temp)
-
-            # Assert: Verify smoothing is working
-            assert len(control_commands) > 0, 'PID should issue smoothed control commands'
-
-            # Verify smoothing arrays are populated
-            assert len(pid.previous_inputs) <= 3, 'Input smoothing buffer should be limited'
-            assert len(pid.previous_outputs) <= 3, 'Output smoothing buffer should be limited'
-
     def test_pid_derivative_filtering_for_noise_reduction(self) -> None:
         """Test PID derivative filtering to reduce noise in derivative term.
 
@@ -726,13 +689,15 @@ class TestPIDAlgorithmDetails:
 
             # Test derivative-on-error mode
             pid_error = PID(control=control_function_error, p=1.0, i=0.1, d=0.5)
-            pid_error.derivative_on_error = True
+            pid_error.beta = 1.0
+            pid_error.gamma = 1.0 # DoE
             pid_error.setTarget(200.0)
             pid_error.on()
 
             # Test derivative-on-measurement mode
             pid_measurement = PID(control=control_function_measurement, p=1.0, i=0.1, d=0.5)
-            pid_measurement.derivative_on_error = False  # Default
+            pid_error.beta = 1.0
+            pid_error.gamma = 1.0 # DoM
             pid_measurement.setTarget(200.0)
             pid_measurement.on()
 
@@ -1418,156 +1383,6 @@ class TestPIDIntegrationScenarios:
             assert pid.Kd == 0.06, 'Final D parameter should be applied'
             assert pid.getTarget() == 210.0, 'Final target should be applied'
 
-    @pytest.mark.parametrize(
-        'smoothing_input,smoothing_output,derivative_filter,expected_stability',
-        [
-            (0, 0, 0, True),  # No smoothing
-            (3, 0, 0, True),  # Input smoothing only
-            (0, 3, 0, True),  # Output smoothing only
-            (0, 0, 1, True),  # Derivative filter only
-            (3, 3, 1, True),  # All smoothing enabled
-            (10, 10, 1, True),  # Heavy smoothing
-        ],
-    )
-    def test_smoothing_configurations_for_noise_reduction(
-        self,
-        smoothing_input: int,
-        smoothing_output: int,
-        derivative_filter: int,
-        expected_stability: bool,
-    ) -> None:
-        """Test various smoothing configurations for noise reduction in harsh environments.
-
-        This validates that different smoothing settings work correctly for users.
-        """
-        with patch('artisanlib.pid.QSemaphore', return_value=_create_mock_semaphore()), patch(
-            'artisanlib.pid.LiveSosFilter', return_value=_create_mock_live_sos_filter()
-        ):
-            from artisanlib.pid import PID
-
-            # Arrange
-            control_commands: list[float] = []
-
-            def control_function(duty: float) -> None:
-                control_commands.append(duty)
-
-            pid = PID(control=control_function, p=2.0, i=0.1, d=0.1)
-
-            # Configure smoothing
-            pid.input_smoothing_factor = smoothing_input
-            pid.output_smoothing_factor = smoothing_output
-            pid.setDerivativeFilterLevel(derivative_filter)
-
-            pid.setTarget(200.0)
-            pid.on()
-
-            # Act: Feed noisy temperature data
-            noisy_temps = [195.0, 205.0, 192.0, 208.0, 198.0, 202.0, 196.0, 204.0]
-
-            current_time = 0.0
-            with patch('time.time') as mock_time:
-
-                def time_generator() -> float:
-                    nonlocal current_time
-                    current_time += 0.4  # 400ms intervals
-                    return current_time
-
-                mock_time.side_effect = time_generator
-
-                for temp in noisy_temps:
-                    pid.update(temp)
-
-            # Assert: Smoothing should improve stability
-            if expected_stability:
-                assert len(control_commands) >= 1, 'PID should issue commands with smoothing'
-
-                # Verify smoothing buffers are managed correctly
-                if smoothing_input > 0:
-                    assert (
-                        len(pid.previous_inputs) <= smoothing_input
-                    ), 'Input buffer should be limited'
-                if smoothing_output > 0:
-                    assert (
-                        len(pid.previous_outputs) <= smoothing_output
-                    ), 'Output buffer should be limited'
-
-                # Verify all commands are stable
-                for command in control_commands:
-                    assert 0 <= command <= 100, f"Smoothed command {command} should be stable"
-                    assert not np.isnan(command), 'Smoothed commands should not be NaN'
-
-    def test_complete_user_workflow_with_error_conditions(self) -> None:
-        """Test complete user workflow including error recovery scenarios.
-
-        This is the ultimate UAT combining normal operation with error handling.
-        """
-        with patch('artisanlib.pid.QSemaphore', return_value=_create_mock_semaphore()):
-            from artisanlib.pid import PID
-
-            # Arrange
-            control_commands: list[float] = []
-            user_actions: list[str] = []
-
-            def control_function(duty: float) -> None:
-                control_commands.append(duty)
-
-            pid = PID(control=control_function, p=2.0, i=0.1, d=0.05)
-
-            # Act: Complete workflow with error conditions
-
-            # Phase 1: Initial setup
-            user_actions.append('User configures PID parameters')
-            pid.setPID(p=2.0, i=0.1, d=0.05)
-            pid.setLimits(outMin=10, outMax=90)
-            pid.setTarget(200.0)
-
-            # Phase 2: Start roasting
-            user_actions.append('User starts PID control')
-            pid.on()
-            assert pid.isActive(), 'PID should be active after user starts it'
-
-            # Phase 3: Normal operation with sensor errors
-            user_actions.append('Roasting with occasional sensor errors')
-            temps_with_errors: list[float|None] = [180.0, 185.0, -1, 190.0, None, 195.0, 200.0]
-
-            current_time = 0.0
-            with patch('time.time') as mock_time:
-
-                def time_generator() -> float:
-                    nonlocal current_time
-                    current_time += 30.0  # 30 second intervals
-                    return current_time
-
-                mock_time.side_effect = time_generator
-
-                for temp in temps_with_errors:
-                    pid.update(temp)
-
-            # Phase 4: User adjusts parameters mid-roast
-            user_actions.append('User adjusts PID parameters during roast')
-            pid.setPID(p=2.5, i=0.12, d=0.06)
-
-            with patch('time.time', return_value=300.0):
-                pid.update(205.0)
-
-            # Phase 5: User completes roast
-            user_actions.append('User completes roast and stops PID')
-            pid.off()
-            assert not pid.isActive(), 'PID should be inactive after user stops it'
-
-            # Assert: Complete workflow validation
-            assert len(control_commands) > 0, 'User should receive control outputs during roast'
-            assert len(user_actions) == 5, 'All user workflow phases should be completed'
-
-            # Verify user received safe control commands throughout
-            for command in control_commands:
-                assert (
-                    10 <= command <= 90
-                ), f"All commands should respect user-configured limits: {command}"
-
-            # Verify final state is clean for next roast
-            assert not pid.isActive(), 'System should be ready for next roast'
-            assert pid.getTarget() == 200.0, 'Target should be preserved for next roast'
 
 
 class TestPIDDestructiveDataFuzzing:
@@ -1582,51 +1397,6 @@ class TestPIDDestructiveDataFuzzing:
     Failures are marked with @pytest.mark.xfail and include remediation suggestions.
     """
 
-    #    @pytest.mark.xfail(
-    #        reason="PID may crash with extremely large float values causing memory exhaustion"
-    #    )
-    #    def test_extreme_float_values_cause_overflow(self) -> None:
-    #        """Test PID behavior with extreme float values that could cause overflow.
-    #
-    #        # REMEDIATION: Add input validation to clamp values to reasonable ranges
-    #        # and handle float overflow exceptions gracefully.
-    #        """
-    #        with patch("artisanlib.pid.QSemaphore", return_value=_create_mock_semaphore()):
-    #            from artisanlib.pid import PID
-    #
-    #            # Arrange
-    #            control_commands: list[float] = []
-    #
-    #            def control_function(duty: float) -> None:
-    #                control_commands.append(duty)
-    #
-    #            pid = PID(control=control_function, p=1e308, i=1e308, d=1e308)  # Extreme values
-    #            pid.setTarget(1e308)  # Extreme target
-    #            pid.on()
-    #
-    #            # Act: Feed extreme values that could cause overflow
-    #            extreme_values = [
-    #                1.7976931348623157e308,  # Near max float
-    #                -1.7976931348623157e308,  # Near min float
-    #                1e400,  # Beyond float range
-    #                -1e400,  # Beyond float range
-    #            ]
-    #
-    #            current_time = 0.0
-    #            with patch("time.time") as mock_time:
-    #
-    #                def time_generator() -> float:
-    #                    nonlocal current_time
-    #                    current_time += 1.0
-    #                    return current_time
-    #
-    #                mock_time.side_effect = time_generator
-    #
-    #                for value in extreme_values:
-    #                    pid.update(value)  # This should cause overflow/crash
-    #
-    #            # Assert: If we reach here, the system didn't crash (unexpected)
-    #            raise AssertionError("Expected system to crash with extreme float values")
 
     @given(st.floats(allow_nan=True, allow_infinity=True, width=64))
     @pytest.mark.hypothesis(deadline=None, max_examples=50)

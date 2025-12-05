@@ -7,10 +7,12 @@ v3.4.1
 
 * ADDITIONS
   - adds support of the Lebrew RoastSee NEXT real-time Agtron and crack analyzer
-  - adds possibility to overwrite the event button value on alarm action `Event Button`
+  - adds possibility to overwrite the event button value on alarm action `Event Button` by the number given after the button number and the `>` sign, like in `1>3,3>2,4 # activate button 1 with value 3, button 3 with value 2 and button 4`
   - adds support for [Acaia Pyxis Black (2025)](https://eu.acaia.co/products/pyxis-black)
   - adds visual clue to curve LCDs indicating hidden curves
   - adds Designer spline fitting ([PR #2050](../../../pull/2050) contributed by [Thomas](https://github.com/phreeza))
+  - adds 2DOF PID incl. classical DoE, PoE, DoM, and PoM PID variants, integral limit adjustment to parameter beta, bumpless transfer, duty and derivative IIR SOS filter adjusting to sampling interval, and SV FIR filter for background follow mode
+  - adds Artisan Command `pidWeights` to set 2DOFPID parameters beta and gamma
 
 * CHANGES
   - removed the term `slave` from the project but for 2 lines (to be removed in later versions) to keep compatibility with older settings

@@ -276,8 +276,9 @@ class ProfileData(TypedDict, total=False):
     pidKp: float
     pidKi: float
     pidKd: float
+    pidPsetpointWeight: float
+    pidDsetpointWeight: float
     pidSource: int
-    pOnE: bool
     svLookahead: int
     devices: list[str]
     elevation: int

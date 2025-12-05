@@ -122,6 +122,7 @@ def content() -> str:
     tbl_Commands.add_row(['&#160;','PIDtoggle',QApplication.translate('HelpDlg','toggles the PID state'),'&#160;'])
     tbl_Commands.add_row(['&#160;','pidmode(<int>)',QApplication.translate('HelpDlg','sets PID mode to 0: manual, 1: RS, 2: background follow'),'&#160;'])
     tbl_Commands.add_row(['&#160;','p-i-d(<p>,<i>,<d>)',QApplication.translate('HelpDlg','sets the p-i-d parameters of the PID'),'&#160;'])
+    tbl_Commands.add_row(['&#160;','pidWeights(<beta>,<gamma>)',QApplication.translate('HelpDlg','sets the beta and gamma parameters of the PID'),'&#160;'])
     tbl_Commands.add_row(['&#160;','adjustSV(<float>)',QApplication.translate('HelpDlg','increases or decreases the current target SV value by <float>'),'&#160;'])
     tbl_Commands.add_row(['&#160;','pidSV(<float>)',QApplication.translate('HelpDlg','sets the PID target set value SV'),'&#160;'])
     tbl_Commands.add_row(['&#160;','pidSVC(<float>)',QApplication.translate('HelpDlg','sets the PID target set value SV given in C'),'&#160;'])

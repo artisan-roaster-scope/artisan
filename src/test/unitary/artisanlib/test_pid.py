@@ -306,8 +306,8 @@ class TestPIDInitialization:
         assert pid.lastInput is None
         assert pid.lastOutput is None
         assert pid.lastTime is None
-        assert pid.lastDerr == 0.0
-        assert not pid.derivative_on_error
+        assert pid.beta == 1.
+        assert pid.gamma == 1.
 
     def test_init_smoothing_parameters(self, basic_pid: Any) -> None:
         """Test that smoothing parameters are properly initialized."""
@@ -315,12 +315,6 @@ class TestPIDInitialization:
         pid = basic_pid
 
         # Act & Assert - Verify smoothing parameter initialization
-        assert pid.output_smoothing_factor == 0
-        assert pid.output_decay_weights is None
-        assert pid.previous_outputs == []
-        assert pid.input_smoothing_factor == 0
-        assert pid.input_decay_weights is None
-        assert pid.previous_inputs == []
         assert pid.force_duty == 3
         assert pid.iterations_since_duty == 0
 
@@ -526,16 +520,6 @@ class TestPIDParameterSetters:
         pid.setIntegralWindupPrevention(True)
         assert pid.integral_windup_prevention
 
-    def test_setDerivativeOnError_updates_derivative_on_error(self) -> None:
-        """Test that setDerivativeOnError updates derivative on error."""
-        pid = PID()
-
-        pid.setDerivativeOnError(False)
-        assert not pid.derivative_on_error
-
-        pid.setDerivativeOnError(True)
-        assert pid.derivative_on_error
-
     def test_setIntegralResetOnSP_updates_integral_reset_on_setpoint_change(self) -> None:
         """Test that setIntegralResetOnSP updates integral reset on setpoint change."""
         pid = PID()
@@ -567,7 +551,6 @@ class TestPIDSmoothingFunctions:
     def test_smooth_output_no_smoothing(self) -> None:
         """Test output smoothing when smoothing factor is 0."""
         pid = PID()
-        pid.output_smoothing_factor = 0
 
         result = pid._smooth_output(10.0)
         assert result == 10.0
@@ -575,87 +558,36 @@ class TestPIDSmoothingFunctions:
     def test_smooth_output_with_smoothing(self) -> None:
         """Test output smoothing with smoothing factor > 0."""
         pid = PID()
-        pid.output_smoothing_factor = 3
+        pid.output_filter_level = 1
 
         # First value
         result1 = pid._smooth_output(10.0)
-        assert result1 == 10.0
+        assert float(result1) == pytest.approx(2.4523, abs=1e-3)
 
         # Second value
         result2 = pid._smooth_output(20.0)
-        assert result2 == 20.0
+        assert float(result2) == pytest.approx(8.6066, abs=1e-3)
 
         # Third value - now we have 3 values, so smoothing is applied
         result3 = pid._smooth_output(30.0)
         # Weighted average: (10*1 + 20*2 + 30*3) / (1+2+3) = 140/6 ≈ 23.33
-        assert result3 == pytest.approx(23.333333333333332, abs=1e-10)
+        assert result3 == pytest.approx(16.64717, abs=1e-3)
 
         # Fourth value - sliding window
         result4 = pid._smooth_output(40.0)
         # Weighted average: (20*1 + 30*2 + 40*3) / (1+2+3) = 200/6 ≈ 33.33
-        assert result4 == pytest.approx(33.333333333333336, abs=1e-10)
+        assert result4 == pytest.approx(25.6487, abs=1e-3)
 
-    def test_smooth_input_no_smoothing(self) -> None:
-        """Test input smoothing when smoothing factor is 0."""
-        pid = PID()
-        pid.input_smoothing_factor = 0
-
-        result = pid._smooth_input(15.0)
-        assert result == 15.0
-
-    def test_smooth_input_with_smoothing(self) -> None:
-        """Test input smoothing with smoothing factor > 0."""
-        pid = PID()
-        pid.input_smoothing_factor = 2
-
-        result1 = pid._smooth_input(10.0)
-        assert result1 == 10.0
-
-        result2 = pid._smooth_input(20.0)
-        # Weighted average: (10*1 + 20*2) / (1+2) = 50/3 ≈ 16.67
-        assert result2 == pytest.approx(16.666666666666668, abs=1e-10)
-
-    def test_smooth_output_buffer_management(self) -> None:
-        """Test that output smoothing buffer is properly managed."""
-        pid = PID()
-        pid.output_smoothing_factor = 2
-
-        # Fill buffer beyond capacity
-        pid._smooth_output(10.0)
-        pid._smooth_output(20.0)
-        pid._smooth_output(30.0)
-
-        # Buffer should only contain last 2 values
-        assert len(pid.previous_outputs) == 2
-        assert pid.previous_outputs == [20.0, 30.0]
-
-    def test_smooth_input_buffer_management(self) -> None:
-        """Test that input smoothing buffer is properly managed."""
-        pid = PID()
-        pid.input_smoothing_factor = 2
-
-        # Fill buffer beyond capacity
-        pid._smooth_input(5.0)
-        pid._smooth_input(15.0)
-        pid._smooth_input(25.0)
-
-        # Buffer should only contain last 2 values
-        assert len(pid.previous_inputs) == 2
-        assert pid.previous_inputs == [15.0, 25.0]
 
     def test_smoothing_weight_recalculation(self) -> None:
         """Test that smoothing weights are recalculated when factor changes."""
         pid = PID()
 
         # Set initial smoothing factor
-        pid.output_smoothing_factor = 2
         pid._smooth_output(10.0)
-        assert pid.output_decay_weights == [1.0, 2.0]
 
         # Change smoothing factor
-        pid.output_smoothing_factor = 3
         pid._smooth_output(20.0)
-        assert pid.output_decay_weights == [1.0, 2.0, 3.0]
 
 
 class TestPIDControlLoop:
@@ -722,7 +654,8 @@ class TestPIDControlLoop:
     def test_update_derivative_on_error_calculation(self) -> None:
         """Test derivative term calculation in derivative-on-error mode."""
         pid = PID(d=0.5)
-        pid.derivative_on_error = True
+        pid.beta = 1.  # PoE
+        pid.gamma = 1. # DoE
         pid.target = 100.0
 
         # Initialize
@@ -740,7 +673,8 @@ class TestPIDControlLoop:
     def test_update_derivative_on_measurement_calculation(self) -> None:
         """Test derivative term calculation in derivative-on-measurement mode."""
         pid = PID(d=0.5)
-        pid.derivative_on_error = False  # Default
+        pid.beta = 1.  # PoE
+        pid.gamma = 1. # DoE
         pid.target = 100.0
 
         # Initialize
@@ -959,12 +893,9 @@ class TestPIDResetAndInitialization:
         pid.lastError = 10.0
         pid.lastInput = 25.0
         pid.lastTime = 1000.0
-        pid.lastDerr = 5.0
         pid.Pterm = 30.0
         pid.Iterm = 40.0
         pid.lastOutput = 50.0
-        pid.previous_inputs = [1.0, 2.0, 3.0]
-        pid.previous_outputs = [4.0, 5.0, 6.0]
 
         pid.init()
 
@@ -973,14 +904,9 @@ class TestPIDResetAndInitialization:
         assert pid.lastError == 0.0
         assert pid.lastInput is None
         assert pid.lastTime is None
-        assert pid.lastDerr == 0.0
         assert pid.Pterm == 0.0
         assert pid.Iterm == 0.0
         assert pid.lastOutput is None
-        assert pid.previous_inputs == []
-        assert pid.previous_outputs == []
-        assert pid.input_decay_weights is None
-        assert pid.output_decay_weights is None
 
     def test_init_resets_derivative_filter(self) -> None:
         """Test that init() resets the derivative filter."""
@@ -1173,12 +1099,10 @@ class TestPIDEdgeCasesAndBoundaryConditions:
         pid = PID()
 
         # Test with smoothing factor of 1
-        pid.output_smoothing_factor = 1
         result = pid._smooth_output(10.0)
         assert result == 10.0
 
         # Test with very large smoothing factor
-        pid.output_smoothing_factor = 1000
         for i in range(10):
             pid._smooth_output(float(i))
 
@@ -1217,7 +1141,7 @@ class TestPIDDerivativeFilter:
 
     def test_derivativeFilter_returns_filter(self) -> None:
         """Test that derivativeFilter returns a LiveSosFilter."""
-        filter_instance = PID.derivativeFilter()
+        filter_instance = PID.derivativeFilter(1)
 
         assert hasattr(filter_instance, 'process')
         # Should be able to process values
@@ -1409,9 +1333,10 @@ class TestPIDDerivativeKickImprovements:
         pid = PID(d=1.0)
         pid.setpoint_changed_significantly = True
         pid.lastInput = 0.0
+        pid.gamma = 1.
 
         # Calculate derivative with setpoint change flag set
-        derivative = pid._calculate_derivative_on_measurement(60.0, 1.0)
+        derivative = pid._calculate_derivative(60.0, 1.0)
 
         # Should be reduced compared to normal calculation
         # Normal would be: -1.0 * (60.0 - 0.0) / 1.0 = -60.0
@@ -1422,12 +1347,13 @@ class TestPIDDerivativeKickImprovements:
         """Test that derivative calculation is reduced with measurement discontinuities."""
         pid = PID(d=1.0)
         pid.lastInput = 50.0
+        pid.gamma = 0.
 
         # Set up measurement history to trigger discontinuity detection
         pid.measurement_history = [50.0, 51.0, 52.0, 53.0]
 
         # Large jump should trigger discontinuity reduction
-        derivative = pid._calculate_derivative_on_measurement(80.0, 1.0)
+        derivative = pid._calculate_derivative(80.0, 1.0)
 
         # Normal would be: -1.0 * (80.0 - 50.0) / 1.0 = -30.0
         # With discontinuity: -30.0 * 0.3 = -9.0
@@ -1438,9 +1364,10 @@ class TestPIDDerivativeKickImprovements:
         pid = PID(d=1.0)
         pid.derivative_limit = 20.0
         pid.lastInput = 0.0
+        pid.gamma = 0.
 
         # Large input change that would exceed derivative limit
-        derivative = pid._calculate_derivative_on_measurement(100.0, 1.0)
+        derivative = pid._calculate_derivative(100.0, 1.0)
 
         # Should be limited to derivative_limit
         assert derivative == pytest.approx(-20.0, abs=1e-10)
@@ -1448,7 +1375,8 @@ class TestPIDDerivativeKickImprovements:
     def test_enhanced_derivative_on_error_limiting(self) -> None:
         """Test that derivative-on-error mode also applies limiting."""
         pid = PID(d=2.0)
-        pid.derivative_on_error = True
+        pid.beta = 1.
+        pid.gamma = 1.
         pid.derivative_limit = 30.0
         pid.target = 100.0
 
@@ -1518,7 +1446,7 @@ class TestPIDIntegralWindupImprovements:
         assert pid.integral_windup_prevention is True
         assert pid.integral_limit_factor == 1.0  # Default value from PID class
         assert pid.setpoint_change_threshold == 25.0
-        assert pid.integral_reset_on_setpoint_change is True
+        assert pid.integral_reset_on_setpoint_change is False
         assert pid.back_calculation_factor == 0.5
 
     def test_setIntegralWindupPrevention_updates_setting(self) -> None:
@@ -1626,6 +1554,7 @@ class TestPIDIntegralWindupImprovements:
         pid = PID()
         pid.Iterm = 50.0
         pid.setpoint_change_threshold = 10.0
+        pid.integral_reset_on_setpoint_change = True
 
         # Large setpoint change should reset integral
         pid._handle_setpoint_change_integral(15.0)
@@ -1636,6 +1565,7 @@ class TestPIDIntegralWindupImprovements:
         pid = PID()
         pid.Iterm = 50.0
         pid.setpoint_change_threshold = 10.0
+        pid.integral_reset_on_setpoint_change = True
 
         # Moderate setpoint change should reduce integral
         pid._handle_setpoint_change_integral(7.0)  # Between threshold/2 and threshold

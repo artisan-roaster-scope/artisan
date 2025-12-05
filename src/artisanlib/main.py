@@ -1720,7 +1720,6 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
 
         self.qmc:tgraphcanvas = tgraphcanvas(self.main_widget, self.dpi, locale, self)
         self.qmc.setMinimumHeight(150)
-
         #self.qmc.setAttribute(Qt.WidgetAttribute.WA_NoSystemBackground)
 
         # PID control for Arduino, Hottop and generic MODBUS devices
@@ -4686,6 +4685,13 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         self.qmc.redraw_keep_view(recomputeAllDeltas=False)
         self.setLabelColor(self.extraLCDlabel2[i], self.qmc.extradevicecolor2[i], self.extraCurveVisibility2[i])
 
+    def updateLabelColors(self) -> None:
+        # set label colors according to curve visibility (after settings load)
+        self.setLabelColor(self.label2,self.qmc.palette['et'], self.qmc.ETcurve)
+        self.setLabelColor(self.label3,self.qmc.palette['bt'], self.qmc.BTcurve)
+        self.setLabelColor(self.label4,self.qmc.palette['deltaet'], self.qmc.DeltaETflag)
+        self.setLabelColor(self.label5,self.qmc.palette['deltabt'], self.qmc.DeltaBTflag)
+
     @pyqtSlot()
     def toggleExtraCurve1(self) -> None:
         try:
@@ -6709,21 +6715,21 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                     last_event_idx = None # index of last event analyzed
                     last_index_not_removed:int|None = None
                     # group those with minimally 2x min_span time delta by keeping the first with the value of the last
-                    for i, se in enumerate(self.qmc.specialevents):
-                        if self.qmc.specialeventstype[i] == tp and last_event_idx is not None:
-                            if self.qmc.specialeventsvalue[last_event_idx] == self.qmc.specialeventsvalue[i]:
+                    for j, se in enumerate(self.qmc.specialevents): # pyrefly:ignore
+                        if self.qmc.specialeventstype[j] == tp and last_event_idx is not None:
+                            if self.qmc.specialeventsvalue[last_event_idx] == self.qmc.specialeventsvalue[j]:
                                 # if the value of the event is the same as the previous, we remove it
-                                indexes_to_be_removed.append(i)
+                                indexes_to_be_removed.append(j)
                             else:
                                 time_diff = se - self.qmc.specialevents[last_event_idx]
                                 if time_diff < 2*min_span: # pyrefly: ignore
-                                    indexes_to_be_removed.append(i)
+                                    indexes_to_be_removed.append(j)
                                     if last_index_not_removed is not None:
-                                        self.qmc.specialeventsvalue[last_index_not_removed] = self.qmc.specialeventsvalue[i]
+                                        self.qmc.specialeventsvalue[last_index_not_removed] = self.qmc.specialeventsvalue[j]
                                 else:
-                                    last_index_not_removed = i
-                        if self.qmc.specialeventstype[i] == tp:
-                            last_event_idx = i # pyrefly: ignore[bad-assignment]
+                                    last_index_not_removed = j
+                        if self.qmc.specialeventstype[j] == tp:
+                            last_event_idx = j
                     # remove marked events
                     self.qmc.deleteEvents(indexes_to_be_removed)
         finally:
@@ -9501,7 +9507,6 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                                         self.fujipid.setpidPXF(N,kp,ki,kd)
                             else:
                                 self.pidcontrol.confPID(kp,ki,kd)
-                                #self.pidcontrol.setPID(kp,ki,kd) # we don't set the new values in the dialog
                 elif action == 12: # Fuji Command (currently only "write(<unitId>,<register>,<value>)" is supported
                     if cmd_str:
                         cmds = filter(None, cmd_str.split(';')) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
@@ -10387,16 +10392,29 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                                             self.sendmessage(f'Artisan Command: {cs}')
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
+                            # pidWeights(<beta>,<gamma>) with <beta>, <gamma> numbers
+                            elif cs.startswith('pidWeights(') and cs.endswith(')'):
+                                args = cs[len('pidWeights('):-1].split(',')
+                                if len(args) == 2:
+                                    beta:float|None = None
+                                    gamma:float|None = None
+                                    try:
+                                        beta = float(args[0])
+                                    except Exception: # pylint: disable=broad-except
+                                        pass
+                                    try:
+                                        gamma = float(args[1])
+                                    except Exception: # pylint: disable=broad-except
+                                        pass
+                                    self.pidcontrol.confPIDweights(beta,gamma)
                             # pidSVC(<n>) with <n> a number in C to be used as PID SV (if temperature mode is F, n will be first converted to F
                             elif cs.startswith('pidSVC(') and cs.endswith(')'):
                                 try:
                                     sv = max(0.0, convertTemp(float(eval(cs[len('pidSVC('):-1])), 'C', self.qmc.mode)) # we don't send SV < 0 # pylint: disable=eval-used
                                     if self.qmc.device == 0 and sv != self.fujipid.sv:
                                         self.fujipid.setsv(sv,silent=True)
-#                                        self.sendmessage(f'Artisan Command: pidSVC({float2float(sv)})') # too many messages if used in ramping event reply
                                     elif sv != self.pidcontrol.sv:
                                         self.pidcontrol.setSV(sv,init=False)
-#                                        self.sendmessage(f'Artisan Command: pidSVC({float2float(sv)})') # too many messages if used in ramping event reply
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
                             # pidSV(<n>) with <n> a number to be used as PID SV
@@ -10405,10 +10423,8 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                                     sv = max(0.0, float(eval(cs[len('pidSV('):-1]))) # we don't send SV < 0 # pylint: disable=eval-used
                                     if self.qmc.device == 0 and sv != self.fujipid.sv:
                                         self.fujipid.setsv(sv,silent=True)
-#                                        self.sendmessage(f'Artisan Command: pidSV({float2float(sv)})') # too many messages if used in ramping event reply
                                     elif sv != self.pidcontrol.sv:
                                         self.pidcontrol.setSV(sv,init=False)
-#                                        self.sendmessage(f'Artisan Command: pidSV({float2float(sv)})') # too many messages if used in ramping event reply
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
                             # pidRS(<n>) with <n> a number to be used to select the PID RS pattern (1-based for the internal software PID)
@@ -16732,7 +16748,8 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             profile['svDescriptions'] = self.pidcontrol.svDescriptions
             profile['pidKp'] = self.pidcontrol.pidKp
             profile['pidKi'] = self.pidcontrol.pidKi
-            profile['pidKd'] = self.pidcontrol.pidKd
+            profile['pidPsetpointWeight'] = self.pidcontrol.pidPsetpointWeight
+            profile['pidDsetpointWeight'] = self.pidcontrol.pidDsetpointWeight
             profile['pidSource'] = self.pidcontrol.pidSource
             profile['svLookahead'] = self.pidcontrol.svLookahead
             try:
@@ -18202,11 +18219,16 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             self.pidcontrol.negativeTargetMin = toInt(settings.value('negativeTargetMin',self.pidcontrol.negativeTargetMin))
             self.pidcontrol.negativeTargetMax = toInt(settings.value('negativeTargetMax',self.pidcontrol.negativeTargetMax))
             self.pidcontrol.derivative_filter = toInt(settings.value('derivative_filter',self.pidcontrol.derivative_filter))
+            self.pidcontrol.duty_filter = toInt(settings.value('duty_filter',self.pidcontrol.duty_filter))
+            self.pidcontrol.sv_filter = toInt(settings.value('sv_filter',self.pidcontrol.sv_filter))
             self.pidcontrol.activateSVSlider(self.pidcontrol.svSlider)
             self.pidcontrol.pidKp = toFloat(settings.value('pidKp',self.pidcontrol.pidKp))
             self.pidcontrol.pidKi = toFloat(settings.value('pidKi',self.pidcontrol.pidKi))
             self.pidcontrol.pidKd = toFloat(settings.value('pidKd',self.pidcontrol.pidKd))
-            self.pidcontrol.pidDoE = toBool(settings.value('pidDoE',self.pidcontrol.pidDoE))
+            self.pidcontrol.pidPsetpointWeight = toFloat(settings.value('pidPsetpointWeight',self.pidcontrol.pidPsetpointWeight))
+            if settings.contains('pidDoE'):
+                self.pidcontrol.pidDsetpointWeight = (1 if toBool(settings.value('pidDoE', True)) else 0)
+            self.pidcontrol.pidDsetpointWeight = toFloat(settings.value('pidDsetpointWeight',self.pidcontrol.pidDsetpointWeight))
             self.pidcontrol.pidDlimit = toFloat(settings.value('pidDlimit',self.pidcontrol.pidDlimit))
             self.pidcontrol.pidIlimitFactor = toFloat(settings.value('pidIlimitFactor',self.pidcontrol.pidIlimitFactor))
             self.pidcontrol.pidIWP = toBool(settings.value('pidIWP',self.pidcontrol.pidIWP))
@@ -18309,6 +18331,8 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             self.qmc.ETlcd = toBool(settings.value('ETlcd',self.qmc.ETlcd))
             self.qmc.BTlcd = toBool(settings.value('BTlcd',self.qmc.BTlcd))
             self.qmc.swaplcds = toBool(settings.value('swaplcds',self.qmc.swaplcds))
+
+            self.updateLabelColors()
 
 #--- BEGIN GROUP DefaultButtons
             settings.beginGroup('DefaultButtons')
@@ -20055,10 +20079,14 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             self.settingsSetValue(settings, default_settings, 'negativeTargetMin',self.pidcontrol.negativeTargetMin, read_defaults)
             self.settingsSetValue(settings, default_settings, 'negativeTargetMax',self.pidcontrol.negativeTargetMax, read_defaults)
             self.settingsSetValue(settings, default_settings, 'derivative_filter',self.pidcontrol.derivative_filter, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'duty_filter',self.pidcontrol.duty_filter, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'sv_filter',self.pidcontrol.sv_filter, read_defaults)
             self.settingsSetValue(settings, default_settings, 'pidKp',self.pidcontrol.pidKp, read_defaults)
             self.settingsSetValue(settings, default_settings, 'pidKi',self.pidcontrol.pidKi, read_defaults)
             self.settingsSetValue(settings, default_settings, 'pidKd',self.pidcontrol.pidKd, read_defaults)
-            self.settingsSetValue(settings, default_settings, 'pidDoE',self.pidcontrol.pidDoE, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'pidKd',self.pidcontrol.pidKd, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'pidPsetpointWeight',self.pidcontrol.pidPsetpointWeight, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'pidDsetpointWeight',self.pidcontrol.pidDsetpointWeight, read_defaults)
             self.settingsSetValue(settings, default_settings, 'pidDlimit',self.pidcontrol.pidDlimit, read_defaults)
             self.settingsSetValue(settings, default_settings, 'pidIlimitFactor',self.pidcontrol.pidIlimitFactor, read_defaults)
             self.settingsSetValue(settings, default_settings, 'pidIWP',self.pidcontrol.pidIWP, read_defaults)

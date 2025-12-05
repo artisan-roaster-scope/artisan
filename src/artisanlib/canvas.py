@@ -67,7 +67,7 @@ from artisanlib.util import (uchr, fill_gaps, deltaLabelPrefix, deltaLabelUTF8, 
         events_internal_to_external_value, events_external_to_internal_value)
 from artisanlib import pid
 from artisanlib.time import ArtisanTime
-from artisanlib.filters import LiveMedian
+#from artisanlib.filters import LiveMedian
 from artisanlib.dialogs import ArtisanMessageBox
 from artisanlib.atypes import SerialSettings, BTBreakParams, BbpCache, AlarmSet, EnergyMetrics
 
@@ -309,8 +309,9 @@ class tgraphcanvas(FigureCanvas):
         'filterDropOut_replaceRoR_period', 'filterDropOut_spikeRoR_period', 'filterDropOut_tmin_C_default', 'filterDropOut_tmax_C_default',
         'filterDropOut_tmin_F_default', 'filterDropOut_tmax_F_default', 'filterDropOut_spikeRoR_dRoR_limit_C_default', 'filterDropOut_spikeRoR_dRoR_limit_F_default',
         'filterDropOuts', 'filterDropOut_tmin', 'filterDropOut_tmax', 'filterDropOut_spikeRoR_dRoR_limit', 'minmaxLimits', 'median_filter_factor_RoR',
-        'dropSpikes', 'dropDuplicates', 'dropDuplicatesLimit', 'median_filter_factor', 'liveMedianETRoRfilter', 'liveMedianBTRoRfilter',
-        'liveMedianETfilter', 'liveMedianBTfilter', 'interpolatemax', 'swapETBT', 'wheelflag', 'wheelnames', 'segmentlengths', 'segmentsalpha',
+        'dropSpikes', 'dropDuplicates', 'dropDuplicatesLimit', 'median_filter_factor',
+#        'liveMedianETRoRfilter', 'liveMedianBTRoRfilter', 'liveMedianETfilter', 'liveMedianBTfilter',
+        'interpolatemax', 'swapETBT', 'wheelflag', 'wheelnames', 'segmentlengths', 'segmentsalpha',
         'wheellabelparent', 'wheelcolor', 'wradii', 'startangle', 'projection', 'wheeltextsize', 'wheelcolorpattern', 'wheeledge',
         'wheellinewidth', 'wheellinecolor', 'wheeltextcolor', 'wheelconnections', 'wheelx', 'wheelz', 'wheellocationx', 'wheellocationz',
         'wheelaspect', 'samplingSemaphore', 'updateGraphicsSemaphore', 'profileDataSemaphore', 'messagesemaphore', 'errorsemaphore', 'serialsemaphore', 'seriallogsemaphore',
@@ -2146,10 +2147,10 @@ class tgraphcanvas(FigureCanvas):
         # self.median_filter_factor: factor used for MedianFilter on both, temperature and RoR curves
         self.median_filter_factor:Final[int] = 5 # k=3 is conservative seems not to catch all spikes in all cases; k=5 and k=7 seems to be ok; 13 might be the maximum; k must be odd!
         self.median_filter_factor_RoR:Final[int] = 3
-        self.liveMedianETfilter:LiveMedian = LiveMedian(self.median_filter_factor)
-        self.liveMedianBTfilter:LiveMedian = LiveMedian(self.median_filter_factor)
-        self.liveMedianETRoRfilter:LiveMedian = LiveMedian(self.median_filter_factor_RoR)
-        self.liveMedianBTRoRfilter:LiveMedian = LiveMedian(self.median_filter_factor_RoR)
+#        self.liveMedianETfilter:LiveMedian = LiveMedian(self.median_filter_factor)
+#        self.liveMedianBTfilter:LiveMedian = LiveMedian(self.median_filter_factor)
+#        self.liveMedianETRoRfilter:LiveMedian = LiveMedian(self.median_filter_factor_RoR)
+#        self.liveMedianBTRoRfilter:LiveMedian = LiveMedian(self.median_filter_factor_RoR)
 
         self.interpolatemax:Final[int] = 3 # maximal number of dropped readings (-1) that will be interpolated
 
@@ -4832,10 +4833,11 @@ class tgraphcanvas(FigureCanvas):
                     # as now the software PID is also update while the PID is off (if configured).
                     if (self.Controlbuttonflag and \
                             not self.aw.pidcontrol.externalPIDControl()): # any device and + Artisan Software PID lib
+                        process_value:float = 0
                         if self.aw.pidcontrol.pidSource in {0, 1}:
-                            self.pid.update(st2) # smoothed BT
+                            process_value = st2 # smoothed BT
                         elif self.aw.pidcontrol.pidSource == 2:
-                            self.pid.update(st1) # smoothed ET
+                            process_value = st1 # smoothed ET
                         else:
                             # pidsource = 3 => extra device 1, channel 1 => sample_extratemp1[0]
                             # pidsource = 4 => extra device 1, channel 2 => sample_extratemp2[0]
@@ -4843,9 +4845,10 @@ class tgraphcanvas(FigureCanvas):
                             #...
                             ps = self.aw.pidcontrol.pidSource - 3
                             if ps % 2 == 0 and len(sample_extratemp1)>(ps // 2) and len(sample_extratemp1[ps // 2])>0:
-                                self.pid.update(sample_extratemp1[ps // 2][-1])
+                                process_value = sample_extratemp1[ps // 2][-1]
                             elif len(sample_extratemp1)>(ps // 2) and len(sample_extratemp2[ps // 2])>0:
-                                self.pid.update(sample_extratemp2[ps // 2][-1])
+                                process_value = sample_extratemp2[ps // 2][-1]
+                        self.pid.update(process_value, active=self.aw.pidcontrol.pidActive)
 
                     rateofchange1plot:float|None
                     rateofchange2plot:float|None
@@ -13146,6 +13149,7 @@ class tgraphcanvas(FigureCanvas):
             # warm up software PID (write current p-i-d settings,..) configured
             if self.aw.pidcontrol.externalPIDControl() == 0  and self.Controlbuttonflag:
                 self.aw.pidcontrol.confSoftwarePID()
+                self.aw.pidcontrol.setSV(self.aw.sliderSV.value())
 
             # ADD DEVICE: # start communication/connect
             if not bool(self.aw.simulator):
