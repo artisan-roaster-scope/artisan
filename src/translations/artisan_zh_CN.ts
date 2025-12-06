@@ -11851,12 +11851,12 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="489" />
         <source>β</source>
-        <translation>偏向按误差比例( PoE）</translation>
+        <translation />
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="499" />
         <source>γ</source>
-        <translation>偏向误差导数(DoE）</translation>
+        <translation />
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="510" />
