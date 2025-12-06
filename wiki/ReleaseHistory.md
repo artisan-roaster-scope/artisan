@@ -13,6 +13,7 @@ v3.4.1
   - adds Designer spline fitting ([PR #2050](../../../pull/2050) contributed by [Thomas](https://github.com/phreeza))
   - adds 2DOF PID incl. classical DoE, PoE, DoM, and PoM PID variants, integral limit adjustment to parameter beta, bumpless transfer, duty and derivative IIR SOS filter adjusting to sampling interval, and SV FIR filter for background follow mode
   - adds Artisan Command `pidWeights` to set 2DOFPID parameters beta and gamma
+  - adds support for Yoccto Meteo as well as Phidget TMP1000, HUM1000 and PRE1000 as extra devices
 
 * CHANGES
   - removed the term `slave` from the project but for 2 lines (to be removed in later versions) to keep compatibility with older settings

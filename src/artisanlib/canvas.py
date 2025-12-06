@@ -946,11 +946,16 @@ class tgraphcanvas(FigureCanvas):
                        '+RoastSeeNEXT Agtron/Crack',    #187
                        '+RoastSeeNEXT RoR/FoR',         #188
                        '+RoastSeeNEXT Distance/Time',   #189
-                       '+RoastSeeNEXT Yellow'           #190
+                       '+RoastSeeNEXT Yellow',          #190
+                       '+Phidget TMP1000',           #191
+                       '+Phidget HUM1000 Hum/Temp',  #192
+                       '+Phidget PRE1000',           #193
+                       '+Yocto Meteo Hum/Temp',      #194
+                       '+Yocto Meteo Pressure'       #195
                        ]
 
         # ADD DEVICE:
-        # ids of (main) Phidget devices (without a + in front of their name string)
+        # ids of (main) Phidget devices (without a + in front of their name string) as well as Phidget TMP100, HUM100 or PRE1000
         self.phidgetDevices : Final[list[int]] = [
             34, # Phidget 1048
             37, # Phidget 1046
@@ -984,6 +989,9 @@ class tgraphcanvas(FigureCanvas):
             154, # Phidget DAQ1300 01
             156, # Phidget DAQ1301 01
             168, # Phidget TMP1202
+            191, # +Phidget TMP1000
+            192, # +Phidget HUM1000 Hum/Temp
+            193, # +Phidget PRE1000
         ]
 
         # ADD DEVICE:
@@ -1016,6 +1024,8 @@ class tgraphcanvas(FigureCanvas):
             174, # ColorTrack BT
             175, # Thermoworks BlueDOT
             176, # Aillio Bullet R2
+            194, # +Yocto Meteo Hum/Temp
+            195  # +Yocto Meteo Pressure
         ]
 
         # ADD DEVICE:
@@ -1100,7 +1110,12 @@ class tgraphcanvas(FigureCanvas):
             187, # +RoastSeeNEXT Agtron/Crack
             188, # +RoastSeeNEXT RoR/FOR
             189, # +RoastSeeNEXT Distance/Time
-            190  # +RoastSeeNEXT Yellow
+            190, # +RoastSeeNEXT Yellow
+            191, # +Phidget TMP1000
+            192, # +Phidget HUM1000 Hum/Temp
+            193, # +Phidget PRE1000
+            194, # +Yocto Meteo Hum/Temp
+            195  # +Yocto Meteo Pressure
         ]
 
         # ADD DEVICE:

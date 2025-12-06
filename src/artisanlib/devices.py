@@ -4455,6 +4455,21 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ##########################
                 ####  DEVICE 190 is +RoastSeeNEXT Yellow
                 ##########################
+                ##########################
+                ####  DEVICE 191 is +Phidget TMP1000
+                ##########################
+                ##########################
+                ####  DEVICE 192 is +Phidget HUM1000 Hum/Temp
+                ##########################
+                ##########################
+                ####  DEVICE 193 is +Phidget PRE1000
+                ##########################
+                ##########################
+                ####  DEVICE 194 is +Yocto Meteo Hum/Temp
+                ##########################
+                ##########################
+                ####  DEVICE 195 is +Yocto Meteo Pressure
+                ##########################
 
 
                 # ADD DEVICE:
@@ -4665,7 +4680,12 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 3, # 187
                 3, # 188
                 3, # 189
-                3  # 190
+                3, # 190
+                3, # 191
+                3, # 192
+                3, # 193
+                3, # 194
+                3  # 195
                 ]
             #init serial settings of extra devices
             for i, _ in enumerate(self.aw.qmc.extradevices):

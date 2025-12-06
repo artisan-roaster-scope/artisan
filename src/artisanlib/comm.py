@@ -563,7 +563,12 @@ class serialport:
                                    self.RoastSeeNEXT_AGTRON_CRACK,   #187
                                    self.RoastSeeNEXT_RoR_FoR,        #188
                                    self.RoastSeeNEXT_Distance_Time,  #189
-                                   self.RoastSeeNEXT_Yello           #190
+                                   self.RoastSeeNEXT_Yello,          #190
+                                   self.Phidget_TMP1000,             #191
+                                   self.Phidget_HUM1000_HumTemp,     #192
+                                   self.Phidget_PRE1000,             #193
+                                   self.Yocto_Meteo_HumTemp,         #194
+                                   self.Yocto_Meteo_Pressure         #195
                                    ]
         #string with the name of the program for device #27
         self.externalprogram:str = 'test.py'
@@ -1136,6 +1141,47 @@ class serialport:
         return tx,0,0
 #        x,y = self.aw.qmc.test()
 #        return tx,x,y
+
+    def Yocto_Meteo_HumTemp(self) -> tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        hum:float|None = self.YoctoMeteoHUM()
+        temp:float|None = self.YoctoMeteoTEMP()
+        return tx,(-1 if temp is None else (fromCtoFstrict(temp) if self.aw.qmc.mode == 'F' else temp)),(1 if hum is None else hum)
+
+    def Yocto_Meteo_Pressure(self) -> tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        press:float|None = self.YoctoMeteoPRESS()
+        pressure:float = -1
+        temp:float = 23. # assume room temperature
+        if press is not None:
+            if self.aw.qmc.ambientTemp != 0:
+                temp = (fromFtoCstrict(self.aw.qmc.ambientTemp) if self.aw.qmc.mode == 'F' else self.aw.qmc.ambientTemp)
+            pressure = self.aw.qmc.barometricPressure(pressure, temp, self.aw.qmc.elevation)
+        return tx,pressure,pressure
+
+    def Phidget_TMP1000(self) -> tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        temp:float|None = self.PhidgetHUM1000temperature()
+        temperature:float = (-1 if temp is None else (fromCtoFstrict(temp) if self.aw.qmc.mode == 'F' else temp))
+        return tx,temperature,temperature
+
+    def Phidget_HUM1000_HumTemp(self) -> tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        hum:float|None = self.PhidgetHUM1000humidity()
+        temp:float|None = self.PhidgetHUM1000temperature()
+        return tx,(-1 if temp is None else (fromCtoFstrict(temp) if self.aw.qmc.mode == 'F' else temp)),(1 if hum is None else hum)
+
+    def Phidget_PRE1000(self) -> tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        pre:float|None = self.PhidgetPRE1000pressure()
+        pressure:float = -1.
+        temp:float = 23. # assume room temperature
+        if pre is not None:
+            pressure = pre * 10. # convert to hPa/mbar
+            if self.aw.qmc.ambientTemp != 0:
+                temp = (fromFtoCstrict(self.aw.qmc.ambientTemp) if self.aw.qmc.mode == 'F' else self.aw.qmc.ambientTemp)
+            pressure = self.aw.qmc.barometricPressure(pressure, temp, self.aw.qmc.elevation)
+        return tx,temp,pressure
 
     def PHIDGET1045(self) -> tuple[float,float,float]:
         tx = self.aw.qmc.timeclock.elapsedMilli()
@@ -2384,7 +2430,7 @@ class serialport:
                 self.aw.ser.TMP1000temp = None
             return None
 
-    # connects to a Phidgets HUM1000 temp channel, returns current temperature value and stays connected
+    # connects to a Phidgets HUM1000 temp channel, returns current temperature value in C and stays connected
     # NOTE: disconnected devices still physically attached can introduce signals that are not filtered by the HUB and thus
     # can disturb and even crash the HUB. Thus we keep the device channel attached as long as possible
     def PhidgetHUM1000temperature(self) -> float|None:
