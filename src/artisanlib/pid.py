@@ -282,11 +282,7 @@ class PID:
                 self.Iterm -= integral_adjustment
 
                 # Ensure integral term stays within reasonable bounds
-                integral_min, integral_max = _calculate_integral_limits(self.outMin, self.outMax, self.integral_limit_factor)
-                # adjust Iterm max for beta != 0 in which case the Iterm needs to compensate for potentially negative P (beta <0)
-                # see https://github.com/CapnBry/HeaterMeter/issues/42#issuecomment-412280142
-                integral_max += self.Kp * (1 - self.beta) * self.target
-                self.Iterm = max(integral_min, min(integral_max, self.Iterm))
+                self.Iterm = self.applyIntegralLimits(self.Iterm)
 
     ### External API guarded by semaphore
 
@@ -315,14 +311,22 @@ class PID:
         finally:
             self.pidSemaphore.release(1)
 
+    def applyIntegralLimits(self, iterm:float) -> float:
+        integral_min, integral_max = _calculate_integral_limits(self.outMin, self.outMax, self.integral_limit_factor)
+        # adjust Iterm max for beta != 0 in which case the Iterm needs to compensate for potentially negative P (beta <0)
+        # see https://github.com/CapnBry/HeaterMeter/issues/42#issuecomment-412280142
+        integral_max += self.Kp * (1 - self.beta) * self.target
+        return max(integral_min, min(integral_max, iterm))
+
+
     # update control value (the pid loop is running even if PID is inactive, just the control function is only called if active)
     # to enable a bumpless transfer between ON and OFF, the target value (SP) is set to the process value (PV), here i, if OFF (active == False)
-    def update(self, i: float|None, active:bool = True) -> None:
+    def update(self, i: float|None) -> None:
         _log.debug('update(%s)',i)
         control_func:Callable[[float], None]|None = None
         output_value:float|None = None
         try:
-            if i is not None and not active:
+            if i is not None and not self.isActive():
                 # bumpless transfer
                 self.target = i
             if i == -1 or i is None:
@@ -359,10 +363,7 @@ class PID:
                     self.Iterm += self.Ki * err * dt
 
                     # Apply dynamic integral limits
-                    integral_min, integral_max = _calculate_integral_limits(self.outMin, self.outMax, self.integral_limit_factor)
-                    # adjust Iterm max for beta != 0 in which case the Iterm needs to compensate for potentially negative P (beta <0)
-                    integral_max += self.Kp * (1 - self.beta) * self.target
-                    self.Iterm = max(integral_min, min(integral_max, self.Iterm))
+                    self.Iterm = self.applyIntegralLimits(self.Iterm)
 
                 # Clear the integral reset flag after processing
                 self.integral_just_reset = False

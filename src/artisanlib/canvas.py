@@ -4848,7 +4848,7 @@ class tgraphcanvas(FigureCanvas):
                                 process_value = sample_extratemp1[ps // 2][-1]
                             elif len(sample_extratemp1)>(ps // 2) and len(sample_extratemp2[ps // 2])>0:
                                 process_value = sample_extratemp2[ps // 2][-1]
-                        self.pid.update(process_value, active=self.aw.pidcontrol.pidActive)
+                        self.pid.update(process_value)
 
                     rateofchange1plot:float|None
                     rateofchange2plot:float|None

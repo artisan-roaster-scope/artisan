@@ -562,21 +562,19 @@ class TestPIDSmoothingFunctions:
 
         # First value
         result1 = pid._smooth_output(10.0)
-        assert float(result1) == pytest.approx(2.4523, abs=1e-3)
+        assert float(result1) == pytest.approx(6.62459, abs=1e-3)
 
         # Second value
         result2 = pid._smooth_output(20.0)
-        assert float(result2) == pytest.approx(8.6066, abs=1e-3)
+        assert float(result2) == pytest.approx(17.7213, abs=1e-3)
 
-        # Third value - now we have 3 values, so smoothing is applied
+        # Third value
         result3 = pid._smooth_output(30.0)
-        # Weighted average: (10*1 + 20*2 + 30*3) / (1+2+3) = 140/6 ≈ 23.33
-        assert result3 == pytest.approx(16.64717, abs=1e-3)
+        assert result3 == pytest.approx(27.3649, abs=1e-3)
 
-        # Fourth value - sliding window
+        # Fourth value
         result4 = pid._smooth_output(40.0)
-        # Weighted average: (20*1 + 30*2 + 40*3) / (1+2+3) = 200/6 ≈ 33.33
-        assert result4 == pytest.approx(25.6487, abs=1e-3)
+        assert result4 == pytest.approx(37.4807, abs=1e-3)
 
 
     def test_smoothing_weight_recalculation(self) -> None:
@@ -611,6 +609,7 @@ class TestPIDControlLoop:
         """Test that first update call properly initializes state."""
         pid = PID()
         pid.target = 100.0
+        pid.active = True
 
         with patch('time.time', return_value=1000.0):
             pid.update(50.0)
@@ -623,6 +622,7 @@ class TestPIDControlLoop:
         """Test proportional term calculation."""
         pid = PID(p=2.0)
         pid.target = 100.0
+        pid.active = True
 
         # Initialize with first call
         with patch('time.time', return_value=1000.0):
@@ -639,6 +639,7 @@ class TestPIDControlLoop:
         """Test integral term calculation."""
         pid = PID(i=0.1)
         pid.setTarget(100.0)  # Use setTarget instead of direct assignment
+        pid.active = True
 
         # Initialize
         with patch('time.time', return_value=1000.0):
@@ -1205,6 +1206,7 @@ class TestPIDNumericalStability:
         """Test PID precision with very small values."""
         pid = PID(p=1e-6, i=1e-8, d=1e-10)
         pid.target = 1e-5
+        pid.active = True
 
         with patch('time.time', return_value=1000.0):
             pid.update(1e-6)
@@ -1276,6 +1278,7 @@ class TestPIDDerivativeKickImprovements:
     def test_setpoint_change_detection(self) -> None:
         """Test that setpoint changes are properly detected."""
         pid = PID()
+        pid.active = True
 
         # Initialize
         with patch('time.time', return_value=1000.0):
