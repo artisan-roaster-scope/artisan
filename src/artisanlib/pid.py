@@ -564,25 +564,24 @@ class PID:
             self.pidSemaphore.release(1)
 
     @staticmethod
-    def irrFilter(sampling_rate:float) -> LiveSosFilter:
+    def irrFilter(sampling_rate:float, wn:float) -> LiveSosFilter:
         """infinite impulse response filter"""
         # Note: IIR filter can be computed faster but can suffer from artefacts and FIR filters should be preferred. However, IIR filter specification
         # can be easier adjusted to varying samplings rates
         return LiveSosFilter(
             iirfilter(
                 1,         # order (higher-order, sharper cut-off, but incr. delay)
-#                Wn=0.013,  # 0 < Wn < fs/2 (fs=1 -> fs/2=0.5) # cut-off frequency
-                Wn=0.1,  # 0 < Wn < fs/2 (fs=1 -> fs/2=0.5) # cut-off frequency
+                Wn=max(0., min(wn, sampling_rate/2 - 0.001)),  # 0 < Wn < fs/2 (fs=1 -> fs/2=0.5) # cut-off frequency
                 fs=sampling_rate,    # sampling rate, Hz
                 btype='low',
                 ftype='butter',
                 output='sos'))
     @staticmethod
     def derivativeFilter(sampling_rate:float) -> LiveSosFilter:
-        return PID.irrFilter(sampling_rate)
+        return PID.irrFilter(sampling_rate, 0.1)
     @staticmethod
     def outputFilter(sampling_rate:float) -> LiveSosFilter:
-        return PID.irrFilter(sampling_rate)
+        return PID.irrFilter(sampling_rate, 0.35)
 
     def setOutputFilterLevel(self, v:int, reset:bool = True) -> None:
         try:

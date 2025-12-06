@@ -444,6 +444,7 @@ class PID_DlgControl(ArtisanDialog):
 
             # only for the internal PID we support a duty filter setting
             self.dutyFilterFlag = QCheckBox(QApplication.translate('Label','Duty Filter'))
+            self.dutyFilterFlag.setToolTip(QApplication.translate('Tooltip', 'Smooth the final output signal and suppress abrupt changes in the P/I term'))
             self.dutyFilterFlag.setChecked(bool(self.aw.pidcontrol.duty_filter))
 
             dutyFilterBox = QHBoxLayout()
