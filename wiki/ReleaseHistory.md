@@ -17,6 +17,7 @@ v3.4.1
 
 * CHANGES
   - removed the term `slave` from the project but for 2 lines (to be removed in later versions) to keep compatibility with older settings
+  - improved ramping event tracking with lookahead avoiding non-linearities
 
 ----
 v3.4.0 (Oct 31, 2025)

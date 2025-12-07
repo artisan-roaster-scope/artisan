@@ -6385,14 +6385,15 @@ class tgraphcanvas(FigureCanvas):
                                 # temperatures which are assumed to increase
                                 end_reached[event_type] = True
 
-                                if (event_type not in slider_events and               # only if there is no slider event of the corresponding type
+                                if (#event_type not in slider_events and  # only if there is no slider event of the corresponding type
+                                        # UPDATE: we also ramp if we are @ the event to avoid SV discontinuities if lookahead is active, otherwise non-linearities could occur
                                         self.specialeventplayback[event_type] and     # only replay event types activated for replay
                                         (str(self.etypesf(event_type) == str(self.Betypesf(event_type)))) and
                                         self.specialeventplaybackramp[event_type]):   # only calculate ramp for ramping events
 
                                     ## calculate ramping
 
-                                    # we pick the left event of the ramp the last event of type event_type either of the foreground or the background, whichever ever is closer
+                                    # we pick as left event of the ramp the last event of type event_type either of the foreground or the background, whichever ever is closer
                                     # NOTE: this last event was not necessarily replayed before and might have been manually entered instead
 
                                     last_registered_background_event_idx:int|None = None
@@ -6415,7 +6416,7 @@ class tgraphcanvas(FigureCanvas):
 
                                     last_event_idx:int|None = last_registered_background_event_idx
                                     last_event_time:float|None = last_registered_background_event_time
-                                    last_event_value:float|None = None
+                                    last_event_value:int|None = None
                                     last_event_temp1:float|None = None
                                     last_event_temp2:float|None = None
                                     last_event_temp:float|None = None
@@ -6448,12 +6449,14 @@ class tgraphcanvas(FigureCanvas):
                                         if (last_event_temp2 is not None and (self.replayType == 1 or (self.replayType == 3 and value_decreasing)) and len(self.temp2)>1 and self.temp2[-1] != -1 and
                                                 self.temp2[-2] != -1 and self.temp2[-1] >= self.temp2[-2] and
                                                 len(self.temp2B) > bge):
+                                            # if replayType is by BT or (replayType is by time/BT and value is decreasing)
                                             last_event_temp = last_event_temp2
                                             next_event_temp = self.temp2B[bge]
                                             current_temp = self.temp2[-1]
                                         elif (last_event_temp1 is not None and (self.replayType == 2 or (self.replayType == 4 and value_decreasing)) and len(self.temp1)>1 and self.temp1[-1] != -1 and
                                                 self.temp1[-2] != -1 and self.temp1[-1] >= self.temp1[-2] and
                                                 len(self.temp1B) > bge):
+                                            # if replayType is by ET or (replayType is by time/ET and value is decreasing)
                                             last_event_temp = last_event_temp1
                                             next_event_temp = self.temp1B[bge]
                                             current_temp = self.temp1[-1]
@@ -6461,6 +6464,7 @@ class tgraphcanvas(FigureCanvas):
                                         # compute ramp value if possible
                                         if ((self.replayType in {1,2} or (self.replayType in {3,4} and value_decreasing)) and last_event_temp is not None and next_event_temp is not None and
                                                 current_temp is not None):
+                                            # if replayType is BT or ET or (time/BT and value is decreasing) or (time/ET and value is decreasing)
                                             # if background event target temperature did increase (or decrease) as the foreground, we ramp by temperature
                                             if min(last_event_temp, next_event_temp) <= current_temp <= max(last_event_temp, next_event_temp) and last_event_value is not None:
                                                 # we ramp only within the limits
@@ -6477,10 +6481,35 @@ class tgraphcanvas(FigureCanvas):
                                             # we ramp by (absolute) time (ignoring relative shift by CHARGE)
                                             last_time = last_event_time
                                             next_time = self.timeB[bge]
+
                                             if last_time <= now <= next_time and last_event_value is not None:
                                                 # we ramp only within the limits
-                                                coefficients = numpy.polyfit([last_time, next_time], [last_event_value, next_event_value], 1)
-                                                ramps[event_type] = numpy.poly1d(coefficients)(now + self.aw.qmc.ramp_lookahead)
+                                                next_after_next_registered_background_event_idx:None|int = None
+                                                if (now + self.aw.qmc.ramp_lookahead) >= next_time:
+                                                    # with lookahead we are leaving the current ramp, lets check if there is a next one
+                                                    try:
+                                                        # next event is at i (@next_time), but we are looking for the one after that
+                                                        next_background_event_types = self.backgroundEtypes[i+1:] # check only events after NOW (events after the current checked index bge)
+                                                        next_after_next_registered_background_event_idx = i + 1 + next_background_event_types.index(event_type) # index of next background event if any; except otherwise
+                                                    except ValueError: # index access fails if there is no such event/index
+                                                        pass
+                                                if next_after_next_registered_background_event_idx is None:
+                                                    # incl. the lookahead we are still within the current ramp or there is no next ramp
+                                                    coefficients = numpy.polyfit([last_time, next_time], [last_event_value, next_event_value], 1)
+                                                    ramps[event_type] = numpy.poly1d(coefficients)(now + self.aw.qmc.ramp_lookahead)
+                                                else:
+                                                    try:
+                                                        next_after_next_idx:int = self.backgroundEvents[next_after_next_registered_background_event_idx]
+                                                        if self.timeindexB[6]==0 or next_after_next_idx < self.timeindexB[6]:
+                                                            # we don't ramp to events after DROP
+                                                            next_after_next_time:float = self.timeB[next_after_next_idx]
+                                                            next_after_next_event_value:int = self.eventsInternal2ExternalValue(self.backgroundEvalues[next_after_next_registered_background_event_idx])
+                                                            # we take the next ramp after the current one
+                                                            coefficients = numpy.polyfit([next_time, next_after_next_time], [next_event_value, next_after_next_event_value], 1)
+                                                            ramps[event_type] = numpy.poly1d(coefficients)(now + self.aw.qmc.ramp_lookahead)
+                                                    except IndexError:
+                                                        pass
+
 
                 # now move the sliders to the new values (if any)
                 for k,v in slider_events.items():
@@ -8186,12 +8215,9 @@ class tgraphcanvas(FigureCanvas):
                             return y
                     elif len(res) != len(y):
                         return y
-                    else:
-                        return res
-                else:
-                    return y
-            else:
+                    return res
                 return y
+            return y
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
