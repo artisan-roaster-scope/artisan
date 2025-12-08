@@ -35,4 +35,4 @@ codespell==2.4.1
 # the following 2 packages are not installed along aiohttp on Python3.12 and make mypy complain
 async_timeout==5.0.1
 cycler==0.12.1
-scipy-stubs==1.16.3.2
+scipy-stubs==1.16.3.3
