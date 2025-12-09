@@ -272,6 +272,7 @@ class ScaleManager(QObject): # pyrefly:ignore[invalid-inheritance] # pyright:ign
         if self.scale1 is not None:
             if self.scale1.is_assigned():
                 return
+            self.disconnect_scale(self.scale1)
             try:
                 self.scale1.scanned_signal.disconnect(self.scale1_scanned_slot)
                 self.scale1.connected_signal.disconnect(self.scale1_connected_slot)
@@ -283,7 +284,6 @@ class ScaleManager(QObject): # pyrefly:ignore[invalid-inheritance] # pyright:ign
                 self.scale1.disconnected_signal.disconnect(self.update_availability)
             except Exception as e: # pylint: disable=broad-except
                 _log.error(e)
-            self.disconnect_scale(self.scale1)
             self.scale1 = None
 
     @pyqtSlot(int,str,str)
@@ -403,6 +403,7 @@ class ScaleManager(QObject): # pyrefly:ignore[invalid-inheritance] # pyright:ign
         if self.scale2 is not None:
             if self.scale2.is_assigned():
                 return
+            self.disconnect_scale(self.scale2)
             try:
                 self.scale2.scanned_signal.disconnect(self.scale2_scanned_slot)
                 self.scale2.connected_signal.disconnect(self.scale2_connected_slot)
@@ -414,7 +415,6 @@ class ScaleManager(QObject): # pyrefly:ignore[invalid-inheritance] # pyright:ign
                 self.scale2.disconnected_signal.disconnect(self.update_availability)
             except Exception as e: # pylint: disable=broad-except
                 _log.error(e)
-            self.disconnect_scale(self.scale2)
             self.scale2 = None
 
     @pyqtSlot(int,str,str)

@@ -946,14 +946,8 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefl
 
     @pyqtSlot()
     def scales_available(self) -> None:
-        if self.aw.taskWebDisplayGreenActive:
-            self.sm_green.send('available')
-        else:
-            self.sm_green.send('unavailable')
-        if self.aw.taskWebDisplayRoastedActive:
-            self.sm_roasted.send('available')
-        else:
-            self.sm_roasted.send('unavailable')
+        self.sm_green.send('available')
+        self.sm_roasted.send('available')
 
     @pyqtSlot()
     def scales_unavailable(self) -> None:

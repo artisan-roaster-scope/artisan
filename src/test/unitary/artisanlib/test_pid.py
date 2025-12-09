@@ -1604,7 +1604,7 @@ class TestPIDIntegralWindupImprovements:
         output_before = 120.0
         output_after = 100.0  # Clamped
 
-        pid._back_calculate_integral(output_before, output_after)
+        pid._back_calculate_integral(0, output_before, output_after)
 
         # Integral should be reduced: 50.0 - (120.0 - 100.0) * 0.5 = 40.0
         assert pid.Iterm == pytest.approx(40.0, abs=1e-10)
@@ -1615,7 +1615,7 @@ class TestPIDIntegralWindupImprovements:
         pid.Iterm = 50.0
 
         # No clamping occurred
-        pid._back_calculate_integral(80.0, 80.0)
+        pid._back_calculate_integral(0, 80.0, 80.0)
 
         # Integral should remain unchanged
         assert pid.Iterm == 50.0
@@ -1627,7 +1627,7 @@ class TestPIDIntegralWindupImprovements:
         pid.integral_windup_prevention = False
 
         # Should not adjust integral even when output is clamped
-        pid._back_calculate_integral(120.0, 100.0)
+        pid._back_calculate_integral(0, 120.0, 100.0)
         assert pid.Iterm == 50.0
 
     def test_back_calculate_integral_zero_ki(self) -> None:
@@ -1636,7 +1636,7 @@ class TestPIDIntegralWindupImprovements:
         pid.Iterm = 50.0
 
         # Should not adjust integral when Ki is zero
-        pid._back_calculate_integral(120.0, 100.0)
+        pid._back_calculate_integral(0, 120.0, 100.0)
         assert pid.Iterm == 50.0
 
     def test_integration_with_setpoint_changes(self) -> None:

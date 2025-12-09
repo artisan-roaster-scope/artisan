@@ -705,7 +705,7 @@ class tgraphcanvas(FigureCanvas):
         self.YOCTO_dataRatesStrings: Final[list[str]] = ['32ms','64ms','128ms','256ms','512ms','768ms','1s','1s*']
         self.YOCTO_dataRatesValues: Final[list[int]] = [32,64,128,256,512,768,1000,1024] # the 1024 mode returns every sec an average over the period, while 1000 returns every second the last sample
 
-        self.phidget1018valueFactor = 1000 # we map the 0-5V voltage returned by the Phidgets22 API to mV (0-5000)
+        self.phidget1018valueFactor:Final[float] = 1000. # we map the 0-5V voltage returned by the Phidgets22 API to mV (0-5000)
         self.phidget1018_async:list[bool] = [False]*8
         self.phidget1018_ratio:list[bool] = [False]*8 # if True VoltageRatio instead of VoltageInput is returned
         self.phidget1018_dataRates:list[int] = [256]*8 # in ms; (Phidgets default 256ms, min is 8ms, 16ms if wireless is active), max 1000ms
@@ -13369,6 +13369,7 @@ class tgraphcanvas(FigureCanvas):
     def OffMonitorCloseDown(self) -> None:
         _log.debug('MODE: OffMonitorCloseDown')
         try:
+
             self.threadserver.terminatingSignal.disconnect(self.OffMonitorCloseDown)
 
             # reset WebLCDs
@@ -13474,6 +13475,7 @@ class tgraphcanvas(FigureCanvas):
 
             if not self.aw.HottopControlActive:
                 self.aw.hideExtraButtons(changeDefault=False)
+
             self.aw.updateSlidersVisibility() # update visibility of sliders based on the users preference
             self.aw.update_minieventline_visibility()
             self.aw.updateExtraButtonsVisibility()

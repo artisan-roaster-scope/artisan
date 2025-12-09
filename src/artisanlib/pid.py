@@ -20,8 +20,13 @@
 import logging
 import time
 import functools
+import numpy
 from collections.abc import Callable
-from typing import Final
+from typing import Final, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import numpy.typing as npt # pylint: disable=unused-import
+
 
 from scipy.signal import iirfilter  # type # ignore[import-untyped]
 
@@ -54,6 +59,16 @@ def _calculate_integral_limits(outMin:int, outMax:int, integral_limit_factor:flo
         integral_min = -integral_max
 
     return integral_min, integral_max
+
+
+@functools.lru_cache(maxsize=3)
+def _getParameterLinearFit(x1:float, x2:float, y1:float, y2:float) -> 'npt.NDArray[numpy.floating]':
+    return numpy.polyfit([x1,x2], [y1,y2], 1)
+
+@functools.lru_cache(maxsize=3)
+def _getParameterQuadraticFit(x1:float, x2:float, x3:float, y1:float, y2:float, y3:float) -> 'npt.NDArray[numpy.floating]':
+    return numpy.polyfit([x1,x2,x3], [y1,y2,y3], 2)
+
 
 # expects a function control that takes a value from [<outMin>,<outMax>] to control the heater as called on each update()
 class PID:
@@ -99,7 +114,19 @@ class PID:
         'integral_reset_on_setpoint_change',
         'back_calculation_factor',
         'integral_just_reset',
-        'sampling_rate'
+        'sampling_rate',
+        'gain_scheduling',
+        'gain_scheduling_on_SV',
+        'gain_scheduling_quadratic',
+        'Kp1',
+        'Ki1',
+        'Kd1',
+        'Kp2',
+        'Ki2',
+        'Kd2',
+        'Schedule0',
+        'Schedule1',
+        'Schedule2'
     ]
 
     def __init__(
@@ -122,16 +149,34 @@ class PID:
         self.dutyMin: int = 0
         self.dutyMax: int = 100
         self.control: Callable[[float], None] = control
+        # first (regular) set of k-p-i parameters corresponding to self.Schedule0
         self.Kp: float = p
         self.Ki: float = i
         self.Kd: float = d
         self.beta: float = beta   # should be larger than 0, defaults to 1 (PoE)
         self.gamma: float = gamma # should be larger than 0, defaults to 1 (DoE)
         self.sampling_rate = sampling_rate
-        # Proposional on Measurement mode see: http://brettbeauregard.com/blog/2017/06/introducing-proportional-on-measurement/
+        # Gain Scheduling
+        self.gain_scheduling:bool = False # if True, gain scheduling is active, otherwise self.kp, self.ki, and self.kd parameters are used
+        self.gain_scheduling_on_SV:bool = True #  by default the observed gain scheduling variable is SV otherwise PV
+        self.gain_scheduling_quadratic:bool = False # by default linear approximation between the first and second set of p-i-d parameters is used
+        # second set of k-p-i parameters corresponding to self.Schedule1
+        self.Kp1: float = p
+        self.Ki1: float = i
+        self.Kd1: float = d
+        # third set of k-p-i parameters corresponding to self.Schedule2
+        self.Kp2: float = p
+        self.Ki2: float = i
+        self.Kd2: float = d
+        # schedule values corresponding to the first, second, and if gain_scheduling_quadratic is active, the third gain schedule value (referring to PV or SV, depending on gain_scheduling_on_SV)
+        self.Schedule0: float = 0
+        self.Schedule1: float = 0
+        self.Schedule2: float = 0
+        #
         self.Pterm: float = 0.0
         self.Iterm: float = 0.0
         self.Dterm: float = 0.0
+        #
         self.errSum: float = 0.0
         self.lastError: float|None = None
         self.lastInput: float|None = None  # used for derivative_on_measurement mode
@@ -228,7 +273,7 @@ class PID:
         if self._detect_measurement_discontinuity(current_input):
             derror *= 0.3  # Reduce derivative action by 70%
 
-        return self.Kd * derror
+        return self.getKd(current_input) * derror
 
     def _update_measurement_history(self, current_input: float) -> None:
         """Update measurement history for discontinuity detection."""
@@ -266,7 +311,7 @@ class PID:
             self.Iterm *= 0.5
 
     def _back_calculate_integral(
-        self, output_before_clamp: float, output_after_clamp: float
+        self, PV:float, output_before_clamp: float, output_after_clamp: float
     ) -> None:
         """Adjust integral term using back-calculation when output is clamped."""
         if not self.integral_windup_prevention:
@@ -277,12 +322,12 @@ class PID:
             excess = output_before_clamp - output_after_clamp
 
             # Reduce integral term to compensate for the clamping
-            if self.Ki != 0:
+            if self.getKi(PV) != 0:
                 integral_adjustment = excess * self.back_calculation_factor
                 self.Iterm -= integral_adjustment
 
                 # Ensure integral term stays within reasonable bounds
-                self.Iterm = self.applyIntegralLimits(self.Iterm)
+                self.Iterm = self.applyIntegralLimits(PV, self.Iterm)
 
     ### External API guarded by semaphore
 
@@ -311,18 +356,48 @@ class PID:
         finally:
             self.pidSemaphore.release(1)
 
-    def applyIntegralLimits(self, iterm:float) -> float:
+    def applyIntegralLimits(self, PV:float, iterm:float) -> float:
         integral_min, integral_max = _calculate_integral_limits(self.outMin, self.outMax, self.integral_limit_factor)
         # adjust Iterm max for beta != 0 in which case the Iterm needs to compensate for potentially negative P (beta <0)
         # see https://github.com/CapnBry/HeaterMeter/issues/42#issuecomment-412280142
-        integral_max += self.Kp * (1 - self.beta) * self.target
+        integral_max += self.getKp(PV) * (1 - self.beta) * self.target
         return max(integral_min, min(integral_max, iterm))
 
+
+    # Gain Scheduling
+
+    def getParameter(self, PV:float, y1:float, y2:float, y3:float) -> float:
+        if self.gain_scheduling:
+            coefficients:npt.NDArray[numpy.floating] | None = None
+            try:
+                if self.gain_scheduling_quadratic:
+                    coefficients = _getParameterQuadraticFit(self.Schedule0,self.Schedule1,self.Schedule2,y1,y2,y3)
+                else:
+                    coefficients = _getParameterLinearFit(self.Schedule0,self.Schedule1,y1,y2)
+            except Exception:  # pylint: disable=broad-except
+                pass
+            if coefficients is not None:
+                mapped_parameter:float = float(numpy.poly1d(coefficients)(self.target if self.gain_scheduling_on_SV else PV))
+                # parameter is limited to the interval [y1, y2] on the linear and [y1,y3] on the quadratic scheduling scheme
+                max_param = (max(y1,y2,y3) if self.gain_scheduling_quadratic else max(y1,y2))
+                min_param = (min(y1,y2,y3) if self.gain_scheduling_quadratic else min(y1,y2))
+                return max(min_param, min(max_param, mapped_parameter))
+        return y1
+
+    def getKp(self, PV:float) -> float:
+        return self.getParameter(PV, self.Kp, self.Kp1, self.Kp2)
+    def getKi(self, PV:float) -> float:
+        return self.getParameter(PV, self.Ki, self.Ki1, self.Ki2)
+    def getKd(self, PV:float) -> float:
+        return self.getParameter(PV, self.Kd, self.Kd1, self.Kd2)
+
+
+    # PID LOOP
 
     # update control value (the pid loop is running even if PID is inactive, just the control function is only called if active)
     # to enable a bumpless transfer between ON and OFF, the target value (SP) is set to the process value (PV), here i, if OFF (active == False)
     def update(self, i: float|None) -> None:
-        _log.debug('update(%s)',i)
+#        _log.debug('update(%s)',i)
         control_func:Callable[[float], None]|None = None
         output_value:float|None = None
         try:
@@ -352,7 +427,7 @@ class PID:
                     self.setpoint_changed_significantly = False
 
                 # compute P-Term first (needed for saturation check)
-                self.Pterm = self.Kp * (self.beta * self.target - i)
+                self.Pterm = self.getKp(i) * (self.beta * self.target - i)
 
                 # Enhanced integral calculation with windup prevention
                 # Calculate output before integration to check for saturation
@@ -360,10 +435,10 @@ class PID:
 
                 # Only integrate if it won't worsen saturation
                 if self._should_integrate(err, output_before_integration):
-                    self.Iterm += self.Ki * err * dt
+                    self.Iterm += self.getKi(i) * err * dt
 
                     # Apply dynamic integral limits
-                    self.Iterm = self.applyIntegralLimits(self.Iterm)
+                    self.Iterm = self.applyIntegralLimits(i, self.Iterm)
 
                 # Clear the integral reset flag after processing
                 self.integral_just_reset = False
@@ -388,7 +463,7 @@ class PID:
                     output = self.outMin
 
                 # Apply back-calculation to adjust integral term if output was clamped
-                self._back_calculate_integral(output_before_clamp, output)
+                self._back_calculate_integral(i, output_before_clamp, output)
 
                 # _log.debug('P: %s, I: %s, D: %s => output: %s', self.Pterm, self.Iterm, D, output)
 
@@ -474,6 +549,8 @@ class PID:
     def setPID(self, p: float, i: float, d: float) -> None:
         try:
             self.pidSemaphore.acquire(1)
+            _getParameterLinearFit.cache_clear()
+            _getParameterQuadraticFit.cache_clear()
             self.Kp = max(p, 0)
             self.Ki = max(i, 0)
             self.Kd = max(d, 0)
@@ -690,5 +767,50 @@ class PID:
             self.pidSemaphore.acquire(1)
             if sampling_rate > 0:
                 self.sampling_rate = sampling_rate
+        finally:
+            self.pidSemaphore.release(1)
+
+    #
+
+    def setGainScheduleState(self, state: bool) -> None:
+        """Activates or deactivates Gain Scheduling."""
+        try:
+            self.pidSemaphore.acquire(1)
+            self.gain_scheduling = state
+        finally:
+            self.pidSemaphore.release(1)
+
+    def setGainScheduleOnSV(self, state: bool) -> None:
+        """Activates or deactivates Gain Scheduling."""
+        try:
+            self.pidSemaphore.acquire(1)
+            self.gain_scheduling_on_SV = state
+        finally:
+            self.pidSemaphore.release(1)
+
+    def setGainSCheduleQuadratic(self, state: bool) -> None:
+        """Activates or deactivates Gain Scheduling."""
+        try:
+            self.pidSemaphore.acquire(1)
+            self.gain_scheduling_quadratic = state
+        finally:
+            self.pidSemaphore.release(1)
+
+    def setGainSchedule(self, kp1:float, ki1:float, kd1:float, kp2:float, ki2:float, kd2:float,
+            schedule0:float, schedule1:float, schedule2:float) -> None:
+        """Activates or deactivates Gain Scheduling."""
+        try:
+            self.pidSemaphore.acquire(1)
+            _getParameterLinearFit.cache_clear()
+            _getParameterQuadraticFit.cache_clear()
+            self.Kp1 = kp1
+            self.Ki1 = ki1
+            self.Kd1 = kd1
+            self.Kp2 = kp2
+            self.Ki2 = ki2
+            self.Kd2 = kd2
+            self.Schedule0 = schedule0
+            self.Schedule1 = schedule1
+            self.Schedule2 = schedule2
         finally:
             self.pidSemaphore.release(1)

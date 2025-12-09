@@ -291,7 +291,7 @@ class StatisticsDlg(ArtisanResizeablDialog):
         #delButton.setMaximumWidth(100)
         delButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         delButton.clicked.connect(self.deletesummarystat)
-        self.insertButton: QPushButton|None = QPushButton(QApplication.translate('Button','Insert'))
+        self.insertButton: QPushButton = QPushButton(QApplication.translate('Button','Insert'))
         self.insertButton.setToolTip(QApplication.translate('Tooltip','Insert below the selected Statistic'))
         self.insertButton.clicked.connect(self.insertsummarystatSlot)
         self.insertButton.setMinimumWidth(80)
@@ -521,11 +521,10 @@ class StatisticsDlg(ArtisanResizeablDialog):
     @pyqtSlot()
     def selectionChanged(self) -> None:
         selected = self.summarystatstable.selectedRanges()
-        if self.insertButton is not None:
-            if selected and len(selected) > 0:
-                self.insertButton.setEnabled(True)
-            else:
-                self.insertButton.setEnabled(False)
+        if selected and len(selected) > 0:
+            self.insertButton.setEnabled(True)
+        else:
+            self.insertButton.setEnabled(False)
         vheader = self.summarystatstable.verticalHeader()
         if self.summarystatstable.cursor_navigation and vheader is not None:
             QTimer.singleShot(0, vheader.setFocus)

@@ -4603,13 +4603,16 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
              self.qmc.DeltaETflag,
              self.extraCurveVisibility1,
              self.extraCurveVisibility2) = self.qmc.curveVisibilityCache
+            self.updateLabelColors()
 
     @pyqtSlot()
     def toggleBTlcdCurve(self) -> None:
+        _log.debug('PRINT toggleBTlcdCurve')
         if self.qmc.swaplcds:
             self.toggleETCurve()
         else:
             self.toggleBTCurve()
+        _log.debug('PRINT self.qmc.BTcurve: %s',self.qmc.BTcurve)
 
     @pyqtSlot()
     def toggleETlcdCurve(self) -> None:
@@ -11680,6 +11683,8 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         self.LCD4frame.setVisible(self.qmc.DeltaBTlcdflag if self.qmc.swapdeltalcds else self.qmc.DeltaETlcdflag)
         self.LCD5frame.setVisible(self.qmc.DeltaETlcdflag if self.qmc.swapdeltalcds else self.qmc.DeltaBTlcdflag)
         #
+        self.updateLabelColors()
+        #
         if self.largeLCDs_dialog is not None:
             self.largeLCDs_dialog.updateVisiblitiesETBT()
         if self.largeDeltaLCDs_dialog is not None:
@@ -13509,6 +13514,47 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                 self.pidcontrol.pidKi = float(profile['pidKi'])
             if 'pidKd' in profile:
                 self.pidcontrol.pidKd = float(profile['pidKd'])
+            #
+            if 'pidKp1' in profile:
+                self.pidcontrol.pidKp1 = float(profile['pidKp1'])
+            else:
+                self.pidcontrol.pidKp1 = self.pidcontrol.pidKp
+            if 'pidKi1' in profile:
+                self.pidcontrol.pidKi1 = float(profile['pidKi1'])
+            else:
+                self.pidcontrol.pidKi1 = self.pidcontrol.pidKi
+            if 'pidKd1' in profile:
+                self.pidcontrol.pidKd1 = float(profile['pidKd1'])
+            else:
+                self.pidcontrol.pidKd1 = self.pidcontrol.pidKd
+            #
+            if 'pidKp2' in profile:
+                self.pidcontrol.pidKp2 = float(profile['pidKp2'])
+            else:
+                self.pidcontrol.pidKp2 = self.pidcontrol.pidKp
+            if 'pidKi2' in profile:
+                self.pidcontrol.pidKi2 = float(profile['pidKi2'])
+            else:
+                self.pidcontrol.pidKi2 = self.pidcontrol.pidKi
+            if 'pidKd2' in profile:
+                self.pidcontrol.pidKd2 = float(profile['pidKd2'])
+            else:
+                self.pidcontrol.pidKd2 = self.pidcontrol.pidKd
+            #
+            if 'pidSchedule0' in profile:
+                self.pidcontrol.pidSchedule0 = float(profile['pidSchedule0'])
+            if 'pidSchedule1' in profile:
+                self.pidcontrol.pidSchedule1 = float(profile['pidSchedule1'])
+            if 'pidSchedule2' in profile:
+                self.pidcontrol.pidSchedule2 = float(profile['pidSchedule2'])
+            #
+            if 'gain_scheduling' in profile:
+                self.pidcontrol.pidGainScheduling = bool(profile['gain_scheduling'])
+            if 'gain_scheduling_on_SV' in profile:
+                self.pidcontrol.pidGainSchedulingSV = bool(profile['gain_scheduling_on_SV'])
+            if 'gain_scheduling_quadratic' in profile:
+                self.pidcontrol.pidGainSchedulingQuadratic = bool(profile['gain_scheduling_quadratic'])
+            #
             if 'pidSource' in profile:
                 self.pidcontrol.pidSource = int(profile['pidSource'])
             if 'svLookahead' in profile:
@@ -16752,6 +16798,19 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             profile['pidDsetpointWeight'] = self.pidcontrol.pidDsetpointWeight
             profile['pidSource'] = self.pidcontrol.pidSource
             profile['svLookahead'] = self.pidcontrol.svLookahead
+            profile['ramp_lookahead'] = self.qmc.ramp_lookahead
+            profile['pidKp1'] = self.pidcontrol.pidKp1
+            profile['pidKi1'] = self.pidcontrol.pidKi1
+            profile['pidKd1'] = self.pidcontrol.pidKd1
+            profile['pidKp2'] = self.pidcontrol.pidKp2
+            profile['pidKi2'] = self.pidcontrol.pidKi2
+            profile['pidKd2'] = self.pidcontrol.pidKd2
+            profile['pidSchedule0'] = self.pidcontrol.pidSchedule0
+            profile['pidSchedule1'] = self.pidcontrol.pidSchedule1
+            profile['pidSchedule2'] = self.pidcontrol.pidSchedule2
+            profile['gain_scheduling'] = self.pidcontrol.pidGainScheduling
+            profile['gain_scheduling_on_SV'] = self.pidcontrol.pidGainSchedulingSV
+            profile['gain_scheduling_quadratic'] = self.pidcontrol.pidGainSchedulingQuadratic
             try:
                 ds = list(self.qmc.extradevices)
                 ds.insert(0,self.qmc.device)
@@ -18222,9 +18281,34 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             self.pidcontrol.duty_filter = toInt(settings.value('duty_filter',self.pidcontrol.duty_filter))
             self.pidcontrol.sv_filter = toInt(settings.value('sv_filter',self.pidcontrol.sv_filter))
             self.pidcontrol.activateSVSlider(self.pidcontrol.svSlider)
+            #-
             self.pidcontrol.pidKp = toFloat(settings.value('pidKp',self.pidcontrol.pidKp))
             self.pidcontrol.pidKi = toFloat(settings.value('pidKi',self.pidcontrol.pidKi))
             self.pidcontrol.pidKd = toFloat(settings.value('pidKd',self.pidcontrol.pidKd))
+            # for compatibility with older settings initialize the Gain Scheduler parameters with the original set of p-i-d parameters
+            self.pidcontrol.pidKp1 = self.pidcontrol.pidKp
+            self.pidcontrol.pidKi1 = self.pidcontrol.pidKi
+            self.pidcontrol.pidKd1 = self.pidcontrol.pidKd
+            self.pidcontrol.pidKp2 = self.pidcontrol.pidKp
+            self.pidcontrol.pidKi2 = self.pidcontrol.pidKi
+            self.pidcontrol.pidKd2 = self.pidcontrol.pidKd
+            #-
+            self.pidcontrol.pidKp1 = toFloat(settings.value('pidKp1',self.pidcontrol.pidKp1))
+            self.pidcontrol.pidKi1 = toFloat(settings.value('pidKi1',self.pidcontrol.pidKi1))
+            self.pidcontrol.pidKd1 = toFloat(settings.value('pidKd1',self.pidcontrol.pidKd1))
+            #-
+            self.pidcontrol.pidKp2 = toFloat(settings.value('pidKp2',self.pidcontrol.pidKp2))
+            self.pidcontrol.pidKi2 = toFloat(settings.value('pidKi2',self.pidcontrol.pidKi2))
+            self.pidcontrol.pidKd2 = toFloat(settings.value('pidKd2',self.pidcontrol.pidKd2))
+            #-
+            self.pidcontrol.pidSchedule0 = toFloat(settings.value('pidSchedule0',self.pidcontrol.pidSchedule0))
+            self.pidcontrol.pidSchedule1 = toFloat(settings.value('pidSchedule1',self.pidcontrol.pidSchedule1))
+            self.pidcontrol.pidSchedule2 = toFloat(settings.value('pidSchedule2',self.pidcontrol.pidSchedule2))
+            #-
+            self.pidcontrol.pidGainScheduling = toBool(settings.value('pidGainScheduling',self.pidcontrol.pidGainScheduling))
+            self.pidcontrol.pidGainSchedulingSV = toBool(settings.value('pidGainSchedulingSV',self.pidcontrol.pidGainSchedulingSV))
+            self.pidcontrol.pidGainSchedulingQuadratic = toBool(settings.value('pidGainSchedulingQuadratic',self.pidcontrol.pidGainSchedulingQuadratic))
+            #-
             self.pidcontrol.pidPsetpointWeight = toFloat(settings.value('pidPsetpointWeight',self.pidcontrol.pidPsetpointWeight))
             if settings.contains('pidDoE'):
                 self.pidcontrol.pidDsetpointWeight = (1 if toBool(settings.value('pidDoE', True)) else 0)
@@ -18324,6 +18408,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             self.qmc.swapdeltalcds = toBool(settings.value('swapdeltalcds',self.qmc.swapdeltalcds))
             settings.endGroup()
 #--- END GROUP RoC
+
 
             self.qmc.curvefilter = toInt(settings.value('curvefilter',self.qmc.curvefilter))
             self.qmc.ETcurve = toBool(settings.value('ETcurve',self.qmc.ETcurve))
@@ -20081,10 +20166,27 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             self.settingsSetValue(settings, default_settings, 'derivative_filter',self.pidcontrol.derivative_filter, read_defaults)
             self.settingsSetValue(settings, default_settings, 'duty_filter',self.pidcontrol.duty_filter, read_defaults)
             self.settingsSetValue(settings, default_settings, 'sv_filter',self.pidcontrol.sv_filter, read_defaults)
+            #-
             self.settingsSetValue(settings, default_settings, 'pidKp',self.pidcontrol.pidKp, read_defaults)
             self.settingsSetValue(settings, default_settings, 'pidKi',self.pidcontrol.pidKi, read_defaults)
             self.settingsSetValue(settings, default_settings, 'pidKd',self.pidcontrol.pidKd, read_defaults)
-            self.settingsSetValue(settings, default_settings, 'pidKd',self.pidcontrol.pidKd, read_defaults)
+            #-
+            self.settingsSetValue(settings, default_settings, 'pidKp1',self.pidcontrol.pidKp1, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'pidKi1',self.pidcontrol.pidKi1, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'pidKd1',self.pidcontrol.pidKd1, read_defaults)
+            #-
+            self.settingsSetValue(settings, default_settings, 'pidKp2',self.pidcontrol.pidKp2, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'pidKi2',self.pidcontrol.pidKi2, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'pidKd2',self.pidcontrol.pidKd2, read_defaults)
+            #-
+            self.settingsSetValue(settings, default_settings, 'pidSchedule0',self.pidcontrol.pidSchedule0, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'pidSchedule1',self.pidcontrol.pidSchedule1, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'pidSchedule2',self.pidcontrol.pidSchedule2, read_defaults)
+            #-
+            self.settingsSetValue(settings, default_settings, 'pidGainScheduling',self.pidcontrol.pidGainScheduling, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'pidGainSchedulingSV',self.pidcontrol.pidGainSchedulingSV, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'pidGainSchedulingQuadratic',self.pidcontrol.pidGainSchedulingQuadratic, read_defaults)
+            #-
             self.settingsSetValue(settings, default_settings, 'pidPsetpointWeight',self.pidcontrol.pidPsetpointWeight, read_defaults)
             self.settingsSetValue(settings, default_settings, 'pidDsetpointWeight',self.pidcontrol.pidDsetpointWeight, read_defaults)
             self.settingsSetValue(settings, default_settings, 'pidDlimit',self.pidcontrol.pidDlimit, read_defaults)

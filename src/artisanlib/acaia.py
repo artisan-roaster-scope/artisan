@@ -1010,6 +1010,7 @@ class Acaia(Scale): # pyright: ignore [reportGeneralTypeIssues] # Argument to cl
     @override
     def disconnect_scale(self) -> None:
         self.acaia.stop()
+        self.on_disconnect() # not called automatically by disconnecting via acaia.stop(), only called automatically if the scale itself disconnects
 
     @pyqtSlot(float, bool)
     def weight_changed(self, new_value:float, stable:bool) -> None:

@@ -280,6 +280,19 @@ class ProfileData(TypedDict, total=False):
     pidDsetpointWeight: float
     pidSource: int
     svLookahead: int
+    ramp_lookahead: int
+    pidKp1: float
+    pidKi1: float
+    pidKd1: float
+    pidKp2: float
+    pidKi2: float
+    pidKd2: float
+    pidSchedule0: float
+    pidSchedule1: float
+    pidSchedule2: float
+    gain_scheduling: bool
+    gain_scheduling_on_SV: bool
+    gain_scheduling_quadratic: bool
     devices: list[str]
     elevation: int
     computed: ComputedProfileInformation

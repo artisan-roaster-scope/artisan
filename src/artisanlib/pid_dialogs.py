@@ -34,7 +34,7 @@ from PyQt6.QtGui import QIntValidator, QRegularExpressionValidator
 from PyQt6.QtWidgets import (QApplication, QWidget, QLabel, QTableWidget, QPushButton,
     QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout, QGroupBox, QLineEdit,
     QMessageBox, QRadioButton, QSpinBox, QStatusBar, QTabWidget, QDoubleSpinBox,
-    QTimeEdit, QLayout, QSizePolicy, QHeaderView, QButtonGroup)
+    QTimeEdit, QLayout, QSizePolicy, QHeaderView, QButtonGroup, QFrame)
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -64,36 +64,164 @@ class PID_DlgControl(ArtisanDialog):
         # PID tab
         tab1Layout = QVBoxLayout()
         pidGrp = QGroupBox(QApplication.translate('GroupBox','p-i-d'))
+
+        self.pidScheduleModeLabel = QLabel()
+        self.pidSchedule0 = QSpinBox()
+        self.pidSchedule0.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.pidSchedule0.setRange(0,999)
+        self.pidSchedule0.setSingleStep(10)
+        self.pidSchedule0.setValue(int(round(self.aw.pidcontrol.pidSchedule0)))
+        self.pidSchedule1 = QSpinBox()
+        self.pidSchedule1.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.pidSchedule1.setRange(0,999)
+        self.pidSchedule1.setSingleStep(10)
+        self.pidSchedule1.setValue(int(round(self.aw.pidcontrol.pidSchedule1)))
+        self.pidSchedule2 = QSpinBox()
+        self.pidSchedule2.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.pidSchedule2.setRange(0,999)
+        self.pidSchedule2.setSingleStep(10)
+        self.pidSchedule2.setValue(int(round(self.aw.pidcontrol.pidSchedule2)))
+
+        pidKpLabel = QLabel('kp')
+
         self.pidKp = QDoubleSpinBox()
         self.pidKp.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.pidKp.setRange(.0,9999.)
         self.pidKp.setSingleStep(.1)
         self.pidKp.setDecimals(3)
         self.pidKp.setValue(self.aw.pidcontrol.pidKp)
-        pidKpLabel = QLabel('kp')
+
+        self.pidKp1 = QDoubleSpinBox()
+        self.pidKp1.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.pidKp1.setRange(.0,9999.)
+        self.pidKp1.setSingleStep(.1)
+        self.pidKp1.setDecimals(3)
+        self.pidKp1.setValue(self.aw.pidcontrol.pidKp1)
+
+        self.pidKp2 = QDoubleSpinBox()
+        self.pidKp2.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.pidKp2.setRange(.0,9999.)
+        self.pidKp2.setSingleStep(.1)
+        self.pidKp2.setDecimals(3)
+        self.pidKp2.setValue(self.aw.pidcontrol.pidKp2)
+
+
+        pidKiLabel = QLabel('ki')
+
         self.pidKi = QDoubleSpinBox()
         self.pidKi.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.pidKi.setRange(.0,9999.)
         self.pidKi.setSingleStep(.1)
         self.pidKi.setDecimals(3)
         self.pidKi.setValue(self.aw.pidcontrol.pidKi)
-        pidKiLabel = QLabel('ki')
+
+        self.pidKi1 = QDoubleSpinBox()
+        self.pidKi1.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.pidKi1.setRange(.0,9999.)
+        self.pidKi1.setSingleStep(.1)
+        self.pidKi1.setDecimals(3)
+        self.pidKi1.setValue(self.aw.pidcontrol.pidKi1)
+
+        self.pidKi2 = QDoubleSpinBox()
+        self.pidKi2.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.pidKi2.setRange(.0,9999.)
+        self.pidKi2.setSingleStep(.1)
+        self.pidKi2.setDecimals(3)
+        self.pidKi2.setValue(self.aw.pidcontrol.pidKi2)
+
+
+        pidKdLabel = QLabel('kd')
+
         self.pidKd = QDoubleSpinBox()
         self.pidKd.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.pidKd.setRange(.0,9999.)
         self.pidKd.setSingleStep(.1)
         self.pidKd.setDecimals(3)
         self.pidKd.setValue(self.aw.pidcontrol.pidKd)
-        pidKdLabel = QLabel('kd')
+
+        self.pidKd1 = QDoubleSpinBox()
+        self.pidKd1.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.pidKd1.setRange(.0,9999.)
+        self.pidKd1.setSingleStep(.1)
+        self.pidKd1.setDecimals(3)
+        self.pidKd1.setValue(self.aw.pidcontrol.pidKd1)
+
+        self.pidKd2 = QDoubleSpinBox()
+        self.pidKd2.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.pidKd2.setRange(.0,9999.)
+        self.pidKd2.setSingleStep(.1)
+        self.pidKd2.setDecimals(3)
+        self.pidKd2.setValue(self.aw.pidcontrol.pidKd2)
+
+        schedule_hline = QFrame()
+        schedule_hline.setLineWidth(2)
+        schedule_hline.setMidLineWidth(1)
+        schedule_hline.setFrameShape(QFrame.Shape.HLine)
+        schedule_hline.setFrameShadow(QFrame.Shadow.Raised)
+
+        self.pidSchedulingFlag = QCheckBox(QApplication.translate('Label','Scheduling'))
+        self.pidSchedulingFlag.setToolTip(QApplication.translate('Tooltip', 'Activates p-i-d gain scheduling'))
+        self.pidSchedulingFlag.setChecked(self.aw.pidcontrol.pidGainScheduling)
+        self.pidSchedulingPV = QRadioButton(QApplication.translate('Label','PV'))
+        self.pidSchedulingPV.setToolTip(QApplication.translate('Tooltip', 'Gain scheduling by process value input temperature'))
+        self.pidSchedulingPV.setChecked(not self.aw.pidcontrol.pidGainSchedulingSV)
+        self.pidSchedulingSV = QRadioButton(QApplication.translate('Label','SV'))
+        self.pidSchedulingSV.setToolTip(QApplication.translate('Tooltip', 'Gain scheduling by set value target temperature'))
+        self.pidSchedulingLinear = QRadioButton('x')
+        self.pidSchedulingLinear.setToolTip(QApplication.translate('Tooltip', 'Scheduling based on linear mapping of two points'))
+        self.pidSchedulingLinear.toggled.connect(self.scheduling_method_changed)
+        self.pidSchedulingQuadratic = QRadioButton('x\xb2')
+        self.pidSchedulingQuadratic.setToolTip(QApplication.translate('Tooltip', 'Scheduling based on quadratic mapping of three points'))
+
+        self.pidSchedulingFlag.stateChanged.connect(self.scheduling_state_changed)
+        self.pidSchedulingPV.toggled.connect(self.scheduling_input_changed)
+        self.pidSchedulingSV.setChecked(self.aw.pidcontrol.pidGainSchedulingSV)
+        self.pidSchedulingLinear.setChecked(not self.aw.pidcontrol.pidGainSchedulingQuadratic)
+        self.pidSchedulingQuadratic.setChecked(self.aw.pidcontrol.pidGainSchedulingQuadratic)
+
+        pidScheudlingSource = QButtonGroup(self)
+        pidScheudlingSource.addButton(self.pidSchedulingPV)
+        pidScheudlingSource.addButton(self.pidSchedulingSV)
+
+        pidScheudlingMapping = QButtonGroup(self)
+        pidScheudlingMapping.addButton(self.pidSchedulingLinear)
+        pidScheudlingMapping.addButton(self.pidSchedulingQuadratic)
+
+        pidSchedulingLayout = QHBoxLayout()
+        pidSchedulingLayout.addStretch()
+        pidSchedulingLayout.addWidget(self.pidSchedulingFlag)
+        pidSchedulingLayout.addSpacing(10)
+        pidSchedulingLayout.addWidget(self.pidSchedulingPV)
+        pidSchedulingLayout.addWidget(self.pidSchedulingSV)
+        pidSchedulingLayout.addSpacing(10)
+        pidSchedulingLayout.addWidget(self.pidSchedulingLinear)
+        pidSchedulingLayout.addWidget(self.pidSchedulingQuadratic)
+        pidSchedulingLayout.addStretch()
+
 
         pidGrid = QGridLayout()
-        pidGrid.addWidget(pidKpLabel,0,0)
-        pidGrid.addWidget(self.pidKp,0,1)
-        pidGrid.addWidget(pidKiLabel,1,0)
-        pidGrid.addWidget(self.pidKi,1,1)
-        pidGrid.addWidget(pidKdLabel,2,0)
-        pidGrid.addWidget(self.pidKd,2,1)
         pidGrid.setSpacing(5)
+        if pid_controller == 0:
+            pidGrid.addWidget(self.pidScheduleModeLabel,0,0, alignment=Qt.AlignmentFlag.AlignRight)
+            pidGrid.addWidget(self.pidSchedule0,0,1)
+            pidGrid.addWidget(self.pidSchedule1,0,2)
+            pidGrid.addWidget(self.pidSchedule2,0,3)
+            pidGrid.addWidget(schedule_hline,1,1,1,3)
+            pidGrid.addWidget(self.pidKp1,2,2)
+            pidGrid.addWidget(self.pidKp2,2,3)
+            pidGrid.addWidget(self.pidKi1,3,2)
+            pidGrid.addWidget(self.pidKi2,3,3)
+            pidGrid.addWidget(self.pidKd1,4,2)
+            pidGrid.addWidget(self.pidKd2,4,3)
+        pidGrid.addWidget(pidKpLabel,2,0, alignment=Qt.AlignmentFlag.AlignRight)
+        pidGrid.addWidget(self.pidKp,2,1)
+        pidGrid.addWidget(pidKiLabel,3,0, alignment=Qt.AlignmentFlag.AlignRight)
+        pidGrid.addWidget(self.pidKi,3,1)
+        pidGrid.addWidget(pidKdLabel,4,0, alignment=Qt.AlignmentFlag.AlignRight)
+        pidGrid.addWidget(self.pidKd,4,1)
+
+        self.updateSchedulingInput()
+        self.updateSchedulingWidgetsEnableStatus()
 
 
         self.pidCycle = QSpinBox()
@@ -179,6 +307,8 @@ class PID_DlgControl(ArtisanDialog):
             pidVBox.setAlignment(pidSetBox,Qt.AlignmentFlag.AlignRight)
 
         if pid_controller != 4:
+            if pid_controller == 0:
+                pidGridVBox.addLayout(pidSchedulingLayout)
             pidGridVBox.addLayout(pidGrid)
         pidGridVBox.addStretch()
         pidGridBox = QHBoxLayout()
@@ -363,10 +493,16 @@ class PID_DlgControl(ArtisanDialog):
             self.pidSVSliderMin.setSuffix(' F')
             self.pidSVSliderMax.setSuffix(' F')
             self.pidSV.setSuffix(' F')
+            self.pidSchedule0.setSuffix(' F')
+            self.pidSchedule1.setSuffix(' F')
+            self.pidSchedule2.setSuffix(' F')
         elif self.aw.qmc.mode == 'C':
             self.pidSVSliderMin.setSuffix(' C')
             self.pidSVSliderMax.setSuffix(' C')
             self.pidSV.setSuffix(' C')
+            self.pidSchedule0.setSuffix(' C')
+            self.pidSchedule1.setSuffix(' C')
+            self.pidSchedule2.setSuffix(' C')
 
         modeBox = QHBoxLayout()
         modeBox.addWidget(pidSVModeLabel)
@@ -637,6 +773,8 @@ class PID_DlgControl(ArtisanDialog):
         self.loadPIDfromBackground = QCheckBox(QApplication.translate('CheckBox', 'Load p-i-d from background'))
         self.loadPIDfromBackground.setToolTip(QApplication.translate('Tooltip', 'Load kp, ki, kd, PID Input, P on Error/Input and Lookahead settings from background profile'))
         self.loadPIDfromBackground.setChecked(self.aw.pidcontrol.loadpidfrombackground)
+        if pid_controller == 4:
+            self.loadPIDfromBackground.setEnabled(False)
 
         flagsLayout = QHBoxLayout()
         flagsLayout.addWidget(self.startPIDonCHARGE)
@@ -646,6 +784,7 @@ class PID_DlgControl(ArtisanDialog):
         flagsLayout.addWidget(self.createEvents)
         flagsLayout.addSpacing(10)
         flagsLayout.addWidget(self.loadPIDfromBackground)
+        flagsLayout.addSpacing(10) # to avoid cutting the last flag label (layout bug!)
         flagsLayout.addStretch()
 
         tab1Layout.addLayout(pidBox)
@@ -977,15 +1116,53 @@ class PID_DlgControl(ArtisanDialog):
         self.setrampsoaks()
         self.setRSs()
 
-        mainLayout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
-
         settings = QSettings()
         if settings.contains('PIDPosition'):
             self.move(settings.value('PIDPosition'))
 
+        mainLayout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
+
         # we set the active tab with a QTimer after the tabbar has been rendered once, as otherwise
         # some tabs are not rendered at all on Windows using Qt v6.5.1 (https://bugreports.qt.io/projects/QTBUG/issues/QTBUG-114204?filter=allissues)
         QTimer.singleShot(10, self.setActiveTab)
+
+    @pyqtSlot(int)
+    def scheduling_state_changed(self, _:int) -> None:
+        self.updateSchedulingWidgetsEnableStatus()
+
+    @pyqtSlot(bool)
+    def scheduling_input_changed(self, _:bool = False) -> None:
+        self.updateSchedulingInput()
+
+    @pyqtSlot(bool)
+    def scheduling_method_changed(self, _:bool = False) -> None:
+        self.updateSchedulingWidgetsEnableStatus()
+
+    def updateSchedulingInput(self) -> None:
+        if self.pidSchedulingPV.isChecked():
+            self.pidScheduleModeLabel.setText('PV')
+        else:
+            self.pidScheduleModeLabel.setText('SV')
+
+
+    def updateSchedulingWidgetsEnableStatus(self) -> None:
+        scheduling_enabled:bool = self.pidSchedulingFlag.isChecked()
+        scheduling_quadratic:bool = self.pidSchedulingQuadratic.isChecked()
+        self.pidScheduleModeLabel.setEnabled(scheduling_enabled)
+        self.pidSchedulingPV.setEnabled(scheduling_enabled)
+        self.pidSchedulingSV.setEnabled(scheduling_enabled)
+        self.pidSchedulingLinear.setEnabled(scheduling_enabled)
+        self.pidSchedulingQuadratic.setEnabled(scheduling_enabled)
+        self.pidSchedule0.setEnabled(scheduling_enabled)
+        self.pidSchedule1.setEnabled(scheduling_enabled)
+        self.pidSchedule2.setEnabled(scheduling_enabled and scheduling_quadratic)
+        self.pidKp1.setEnabled(scheduling_enabled)
+        self.pidKp2.setEnabled(scheduling_enabled and scheduling_quadratic)
+        self.pidKi1.setEnabled(scheduling_enabled)
+        self.pidKi2.setEnabled(scheduling_enabled and scheduling_quadratic)
+        self.pidKd1.setEnabled(scheduling_enabled)
+        self.pidKd2.setEnabled(scheduling_enabled and scheduling_quadratic)
+
 
     def updatePTermSPweightSpinBox(self) -> None:
         self.pTermSPweightSpinBox.blockSignals(True)
@@ -1436,6 +1613,7 @@ class PID_DlgControl(ArtisanDialog):
         self.aw.pidcontrol.svButtons = self.pidSVbuttonsFlag.isChecked()
         self.aw.pidcontrol.activateONOFFeasySV(self.aw.pidcontrol.svButtons)
         self.aw.pidcontrol.svMode = self.pidMode.currentIndex()
+        #-
         if self.aw.pidcontrol.externalPIDControl() == 0:
             self.aw.pidcontrol.positiveTargetMin = min(self.positiveTargetMin.value(),self.positiveTargetMax.value())
             self.aw.pidcontrol.positiveTargetMax = max(self.positiveTargetMin.value(),self.positiveTargetMax.value())
@@ -1453,6 +1631,20 @@ class PID_DlgControl(ArtisanDialog):
             self.aw.pidcontrol.pidIRoCthreshold = int(self.SPthresholdSpinBox.value())
             self.aw.pidcontrol.pidIWP = self.IWPFlag.isChecked()
             self.aw.pidcontrol.pidIRoC = self.IRoCFlag.isChecked()
+            #- Gain Scheduling
+            self.aw.pidcontrol.pidGainScheduling = self.pidSchedulingFlag.isChecked()
+            self.aw.pidcontrol.pidGainSchedulingSV = self.pidSchedulingSV.isChecked()
+            self.aw.pidcontrol.pidGainSchedulingQuadratic = self.pidSchedulingQuadratic.isChecked()
+            self.aw.pidcontrol.pidKp1 = self.pidKp1.value()
+            self.aw.pidcontrol.pidKp2 = self.pidKp2.value()
+            self.aw.pidcontrol.pidKi1 = self.pidKi1.value()
+            self.aw.pidcontrol.pidKi2 = self.pidKi2.value()
+            self.aw.pidcontrol.pidKd1 = self.pidKd1.value()
+            self.aw.pidcontrol.pidKd2 = self.pidKd2.value()
+            self.aw.pidcontrol.pidSchedule0 = self.pidSchedule0.value()
+            self.aw.pidcontrol.pidSchedule1 = self.pidSchedule1.value()
+            self.aw.pidcontrol.pidSchedule2 = self.pidSchedule2.value()
+
         self.aw.pidcontrol.svLookahead = self.pidSVLookahead.value()
         kp = self.pidKp.value() # 5.00
         ki = self.pidKi.value() # 0.15

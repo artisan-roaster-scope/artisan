@@ -1025,16 +1025,16 @@ class serialport:
             # update counts and sum_of_squared_differences
             BTlimit = self.aw.qmc.phases[1]
             BT = (self.aw.qmc.temp2[-1] if len(self.aw.qmc.temp2)>0 else -1)
-            if BT > BTlimit > -1 and self.aw.qmc.timeindex[6] == 0: # BT above DRY END as specified in Phased dialog and before DROP is registered
+            if BTlimit < BT and self.aw.qmc.timeindex[6] == 0: # BT above DRY END as specified in Phased dialog and before DROP is registered
                 ET = (self.aw.qmc.temp1[-1] if len(self.aw.qmc.temp1)>0 else -1)
-                nowB = self.aw.qmc.backgroundtime2index(tx)
+                nowB = self.aw.qmc.backgroundtime2index(tx) # points to the last entry if tx > all elements in btimex
                 ETB = (self.aw.qmc.temp1B[nowB] if len(self.aw.qmc.temp1B)>nowB>-1 else -1)
                 BTB = (self.aw.qmc.temp2B[nowB] if len(self.aw.qmc.temp2B)>nowB>-1 else -1)
                 if ET > -1 and ETB > -1:
                     self.CM_ET_readings_count += 1
                     ET_squared_diff = (ET - ETB)**2
                     self.CM_ET_sum_of_squared_differences += ET_squared_diff
-                if BTB > -1:
+                if BT > -1 and BTB > -1:
                     self.CM_BT_readings_count += 1
                     BT_squared_diff = (BT - BTB)**2
                     self.CM_BT_sum_of_squared_differences += BT_squared_diff

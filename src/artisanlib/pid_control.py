@@ -1146,7 +1146,9 @@ class PIDcontrol:
             'pidPsetpointWeightMax', 'pidDsetpointWeightMax', 'sv_filter',
             'sv_smoothing_factor_default', 'sv_smoothing_factor', 'sv_decay_weights', 'previous_svs', 'time_pidON', 'source_reading_pidON', 'current_ramp_segment',  'current_soak_segment', 'ramp_soak_engaged',
             'RS_total_time', 'slider_force_move', 'positiveTargetRangeLimit', 'positiveTargetMin', 'positiveTargetMax', 'negativeTargetRangeLimit',
-            'negativeTargetMin', 'negativeTargetMax', 'derivative_filter', 'duty_filter', 'pidDlimit', 'pidIlimitFactor', 'pidIWP', 'pidIRoC', 'pidIRoCthreshold' ]
+            'negativeTargetMin', 'negativeTargetMax', 'derivative_filter', 'duty_filter', 'pidDlimit', 'pidIlimitFactor', 'pidIWP', 'pidIRoC', 'pidIRoCthreshold',
+            'pidKp1', 'pidKd1', 'pidKi1', 'pidKp2', 'pidKi2', 'pidKd2', 'pidGainScheduling', 'pidGainSchedulingSV', 'pidGainSchedulingQuadratic',
+            'pidSchedule0', 'pidSchedule1', 'pidSchedule2' ]
 
     def __init__(self, aw:'ApplicationWindow') -> None:
         self.aw:ApplicationWindow = aw
@@ -1211,6 +1213,23 @@ class PIDcontrol:
         self.pidKp:float = (15.0 if self.aw.qmc.mode == 'C' else 8.3334) # 15.0 in C
         self.pidKi:float = (0.01 if self.aw.qmc.mode == 'C' else 0.00556) # 0.01 in C
         self.pidKd:float = (20.0 if self.aw.qmc.mode == 'C' else 11.1111) # 20.0 in C
+        #-
+        self.pidKp1:float = (15.0 if self.aw.qmc.mode == 'C' else 8.3334) # 15.0 in C
+        self.pidKi1:float = (0.01 if self.aw.qmc.mode == 'C' else 0.00556) # 0.01 in C
+        self.pidKd1:float = (20.0 if self.aw.qmc.mode == 'C' else 11.1111) # 20.0 in C
+        #-
+        self.pidKp2:float = (15.0 if self.aw.qmc.mode == 'C' else 8.3334) # 15.0 in C
+        self.pidKi2:float = (0.01 if self.aw.qmc.mode == 'C' else 0.00556) # 0.01 in C
+        self.pidKd2:float = (20.0 if self.aw.qmc.mode == 'C' else 11.1111) # 20.0 in C
+        #-
+        self.pidSchedule0:float = 0
+        self.pidSchedule1:float = 0
+        self.pidSchedule2:float = 0
+        #-
+        self.pidGainScheduling:bool = False
+        self.pidGainSchedulingSV:bool = True # variable observed by Gain Scheduling defaults to SV; setting this to False observes PV
+        self.pidGainSchedulingQuadratic:bool = False # Gain Scheduling defaults to linear mapping between p-i-d set 0 and 1; if True p-i-d set 2 is involved too with a quadratic mapping
+        #-
         self.pidPsetpointWeight:float = 1. # [0, pidPsetpointWeightMax] defaults to 1: PoE (0: PoM)
         self.pidPsetpointWeightMax:Final[float] = 2.
         self.pidDsetpointWeight:float = 1. # [0, pidDsetpointWeightMax] defaults to 1: DoE (0: DoM)
@@ -1221,7 +1240,7 @@ class PIDcontrol:
 #        self.pidDoE:bool = False          # classical Derivative on Error (DoE) if True, otherwise Derivative on Measurement (DoM) to reduce derivative kick
         self.pidDlimit:float = 500.0      # derivative limit [0-999] (used for both, DoM and DoE)
         self.pidIlimitFactor:float = 1    # integral limit factor [0-1]
-        self.pidIWP:bool = False          # Advanced Integral Windup Prevention
+        self.pidIWP:bool = True           # Advanced Integral Windup Prevention
         self.pidIRoC:bool = False         # Reset integral on large setpoint changes
         self.pidIRoCthreshold:float = 30  # SP threshold beyond which the integral will be reset if pidRIoC is set
         # pidSource
@@ -1318,6 +1337,19 @@ class PIDcontrol:
             self.pidKp = self.pidKp * (9/5.)
             self.pidKi = self.pidKi * (9/5.)
             self.pidKd = self.pidKd * (9/5.)
+            #
+            self.pidKp1 = self.pidKp1 * (9/5.)
+            self.pidKi1 = self.pidKi1 * (9/5.)
+            self.pidKd1 = self.pidKd1 * (9/5.)
+            #
+            self.pidKp2 = self.pidKp2 * (9/5.)
+            self.pidKi2 = self.pidKi2 * (9/5.)
+            self.pidKd2 = self.pidKd2 * (9/5.)
+            #
+            self.pidSchedule0 = max(0, min(999, int(round(fromFtoCstrict(self.pidSchedule0)))))
+            self.pidSchedule1 = max(0, min(999, int(round(fromFtoCstrict(self.pidSchedule1)))))
+            self.pidSchedule2 = max(0, min(999, int(round(fromFtoCstrict(self.pidSchedule2)))))
+            #
             for i in range(len(self.svValues)): # pylint: disable=consider-using-enumerate
                 if self.svValues[i] != 0:
                     self.svValues[i] = fromFtoCstrict(self.svValues[i])
@@ -1344,6 +1376,19 @@ class PIDcontrol:
             self.pidKp = self.pidKp / (9/5.)
             self.pidKi = self.pidKi / (9/5.)
             self.pidKd = self.pidKd / (9/5.)
+            #
+            self.pidKp1 = self.pidKp1 / (9/5.)
+            self.pidKi1 = self.pidKi1 / (9/5.)
+            self.pidKd1 = self.pidKd1 / (9/5.)
+            #
+            self.pidKp2 = self.pidKp2 / (9/5.)
+            self.pidKi2 = self.pidKi2 / (9/5.)
+            self.pidKd2 = self.pidKd2 / (9/5.)
+            #
+            self.pidSchedule0 = max(0, min(999, int(round(fromCtoFstrict(self.pidSchedule0)))))
+            self.pidSchedule1 = max(0, min(999, int(round(fromCtoFstrict(self.pidSchedule1)))))
+            self.pidSchedule2 = max(0, min(999, int(round(fromCtoFstrict(self.pidSchedule2)))))
+            #
             for i in range(len(self.svValues)): # pylint: disable=consider-using-enumerate
                 if self.svValues[i] != 0:
                     self.svValues[i] = fromCtoFstrict(self.svValues[i])
@@ -1418,6 +1463,11 @@ class PIDcontrol:
         self.aw.qmc.pid.setIntegralResetOnSP(self.pidIRoC)
         self.aw.qmc.pid.setSetpointChangeThreshold(self.pidIRoCthreshold)
         self.aw.qmc.pid.setIntegralLimitFactor(self.pidIlimitFactor)
+        self.aw.qmc.pid.setGainScheduleState(self.pidGainScheduling)
+        self.aw.qmc.pid.setGainScheduleOnSV(self.pidGainSchedulingSV)
+        self.aw.qmc.pid.setGainSCheduleQuadratic(self.pidGainSchedulingQuadratic)
+        self.aw.qmc.pid.setGainSchedule(self.pidKp1,self.pidKi1,self.pidKd1,self.pidKp2,self.pidKi2,self.pidKd2,
+            self.pidSchedule0,self.pidSchedule1,self.pidSchedule2)
 
 
     # if send_command is False, the pidOn command is not forwarded to the external PID (TC4, Kaleido, ..)

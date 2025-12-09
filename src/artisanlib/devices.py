@@ -4742,6 +4742,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.qmc.swaplcds = swap
                     self.aw.largeLCDs_dialog.reLayout()
             self.aw.qmc.swaplcds = swap
+            self.aw.updateLCDproperties()
 
             # close all ports to force a reopen
             self.aw.qmc.disconnectProbes()
