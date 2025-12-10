@@ -58,7 +58,7 @@ def setAccountShelve(account_id: str, fh:IO[str]) -> int|None:
         db:shelve.Shelf[int]
         with shelve.open(account_cache_path) as db:
             if account_id in db:
-                return db[account_id]
+                return int(db[account_id])
             new_nr = len(db)
             db[account_id] = new_nr
             try:
@@ -90,7 +90,7 @@ def setAccountShelve(account_id: str, fh:IO[str]) -> int|None:
             # try again to access/create the shelve file
             with shelve.open(account_cache_path) as db:
                 if account_id in db:
-                    return db[account_id]
+                    return int(db[account_id])
                 new_nr = len(db)
                 db[account_id] = new_nr
                 try:

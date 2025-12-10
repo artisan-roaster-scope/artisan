@@ -691,7 +691,7 @@ class AlarmDlg(ArtisanResizeablDialog):
             alarms['alarmtemperatures'] = self.aw.qmc.alarmtemperature
             alarms['alarmactions'] = self.aw.qmc.alarmaction
             alarms['alarmbeep'] = self.aw.qmc.alarmbeep
-            alarms['alarmstrings'] = list(self.aw.qmc.alarmstrings) # pyrefly: ignore[no-matching-overload]
+            alarms['alarmstrings'] = self.aw.qmc.alarmstrings
             from json import dump as json_dump
             with open(filename, 'w', encoding='utf-8') as outfile:
                 json_dump(alarms, outfile, indent=None, separators=(',', ':'), ensure_ascii=False)
@@ -1013,7 +1013,7 @@ class AlarmDlg(ArtisanResizeablDialog):
             #populate table
             for i in range(nalarms):
                 self.setalarmtablerow(i)
-            fixed_columns:Final[list[int]] = [0,1,5,7,10]
+            fixed_columns:list[int] = [0,1,5,7,10]
             header = self.alarmtable.horizontalHeader()
             if header is not None:
                 header.setStretchLastSection(True)

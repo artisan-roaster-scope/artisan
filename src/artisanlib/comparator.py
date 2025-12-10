@@ -1662,7 +1662,7 @@ class roastCompareDlg(ArtisanDialog):
         elif i == 5:
             self.aw.qmc.compareMainEvents = b
         else:
-            offset:Final[int] = 7
+            offset:int = 7
             j:int = i - offset
             d,m = divmod(j,2)
             if m == 0:
@@ -1783,7 +1783,7 @@ class roastCompareDlg(ArtisanDialog):
         ]
         extra1_visibilitites:list[bool] = []
         extra2_visibilitites:list[bool] = []
-        offset:Final[int] = 7
+        offset:int = 7
         for i in range(self.aw.nLCDS):
             extra1_visibilitites.append(self.cb.itemCheckState(offset + i*2) == Qt.CheckState.Checked)
             extra2_visibilitites.append(self.cb.itemCheckState(offset + i*2 + 1) == Qt.CheckState.Checked)

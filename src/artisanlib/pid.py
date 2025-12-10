@@ -31,6 +31,7 @@ if TYPE_CHECKING:
 from scipy.signal import iirfilter  # type # ignore[import-untyped]
 
 from artisanlib.filters import LiveSosFilter
+from artisanlib.suppress_errors import suppress_stdout_stderr
 
 from PyQt6.QtCore import QSemaphore
 
@@ -370,15 +371,16 @@ class PID:
         if self.gain_scheduling:
             coefficients:npt.NDArray[numpy.floating] | None = None
             try:
-                if self.gain_scheduling_quadratic:
-                    coefficients = _getParameterQuadraticFit(self.Schedule0,self.Schedule1,self.Schedule2,y1,y2,y3)
-                else:
-                    coefficients = _getParameterLinearFit(self.Schedule0,self.Schedule1,y1,y2)
+                with suppress_stdout_stderr():
+                    if self.gain_scheduling_quadratic:
+                        coefficients = _getParameterQuadraticFit(self.Schedule0,self.Schedule1,self.Schedule2,y1,y2,y3)
+                    else:
+                        coefficients = _getParameterLinearFit(self.Schedule0,self.Schedule1,y1,y2)
             except Exception:  # pylint: disable=broad-except
                 pass
             if coefficients is not None:
                 mapped_parameter:float = float(numpy.poly1d(coefficients)(self.target if self.gain_scheduling_on_SV else PV))
-                # parameter is limited to the interval [y1, y2] on the linear and [y1,y3] on the quadratic scheduling scheme
+                # parameter is limited to the min/max of the values [y1, y2] on the linear and [y1,y2,y3] on the quadratic scheduling scheme
                 max_param = (max(y1,y2,y3) if self.gain_scheduling_quadratic else max(y1,y2))
                 min_param = (min(y1,y2,y3) if self.gain_scheduling_quadratic else min(y1,y2))
                 return max(min_param, min(max_param, mapped_parameter))

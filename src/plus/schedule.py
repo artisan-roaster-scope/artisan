@@ -1537,7 +1537,7 @@ class DragItem(StandardItem):
                             QApplication.translate('Message','Register Roast'),string,
                             QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Ok, QMessageBox.StandardButton.Cancel)
 
-        if reply == QMessageBox.StandardButton.Ok :
+        if reply == int(QMessageBox.StandardButton.Ok):
             self.registerRoast.emit()
 
 
@@ -2805,8 +2805,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                 reply = QMessageBox.warning(None, #self, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
                                 QApplication.translate('Message','Close Scheduler'),string,
                                 QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Close, QMessageBox.StandardButton.Cancel)
-
-            if reply == QMessageBox.StandardButton.Close :
+            if reply == int(QMessageBox.StandardButton.Close):
                 self.closeScheduler()
             elif a0 is not None:
                 a0.ignore()
