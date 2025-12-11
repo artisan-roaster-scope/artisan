@@ -1306,7 +1306,7 @@ class PIDcontrol:
                 heat = int(round(float(raw_heat)))
                 heat = self.aw.applySliderStepSize(slidernr, heat) # quantify by slider step size
                 self.aw.addRawEventSignal.emit(heat,raw_heat,slidernr,self.createEvents,True,self.slider_force_move)
-                self.aw.qmc.slider_force_move = False
+                self.slider_force_move = False
             if self.pidNegativeTarget:
                 slidernr = self.pidNegativeTarget - 1
                 # we need to map the duty [0%,-100%] to the [slidermin,slidermax] range

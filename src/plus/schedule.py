@@ -3042,17 +3042,17 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                     blend:plus.stock.Blend = plus.stock.getBlendBlendDict(blend_structure, schedule_item_weight)
                     self.aw.qmc.plus_blend_label = blend['label']
                     self.aw.qmc.plus_blend_spec = cast(plus.stock.Blend, dict(blend)) # make a copy of the blend dict
-                    self.aw.qmc.plus_blend_spec_labels = [i.get('label','') for i in self.aw.qmc.plus_blend_spec['ingredients']]
+                    self.aw.qmc.plus_blend_spec_labels = [i.get('label','') for i in self.aw.qmc.plus_blend_spec['ingredients']] # ty:ignore[non-subscriptable]
                     # remove labels from ingredients
                     ingredients = []
-                    for i in self.aw.qmc.plus_blend_spec['ingredients']:
+                    for i in self.aw.qmc.plus_blend_spec['ingredients']: # ty:ignore[non-subscriptable]
                         entry = plus.stock.BlendIngredient(ratio = i['ratio'], coffee = i['coffee'])
                         if 'ratio_num' in i:
                             entry['ratio_num'] = i['ratio_num']
                         if 'ratio_denom' in i:
                             entry['ratio_denom'] = i['ratio_denom']
                         ingredients.append(entry)
-                    self.aw.qmc.plus_blend_spec['ingredients'] = ingredients # pyrefly: ignore[unsupported-operation]
+                    self.aw.qmc.plus_blend_spec['ingredients'] = ingredients # ty:ignore[possibly-missing-implicit-call] # pyrefly: ignore[unsupported-operation]
                     # set beans description
                     blend_lines = plus.stock.blend2beans(blend_structure, weight_unit_idx, self.aw.qmc.weight[0])
                     self.aw.qmc.beans = '\n'.join(blend_lines)

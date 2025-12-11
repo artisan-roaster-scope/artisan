@@ -213,7 +213,7 @@ class phasesGraphDlg(ArtisanDialog):
     @pyqtSlot(int)
     def lcdmodeComboBox_dryChanged(self, _:int) -> None:
         self.aw.qmc.phasesLCDmode_l[0] = self.lcdmodeComboBox_dry.currentIndex()
-        self.aw.qmc.phasesLCD = self.aw.qmc.phasesLCDmode_l[0]
+        self.aw.qmc.phasesLCDmode = self.aw.qmc.phasesLCDmode_l[0]
 
     @pyqtSlot(int)
     def lcdmodeComboBox_midChanged(self, _:int) -> None:

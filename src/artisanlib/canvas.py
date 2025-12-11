@@ -164,11 +164,44 @@ class AmbientWorker(QObject): # pyrefly:ignore[invalid-inheritance] # pylint: di
         finally:
             self.finished.emit()
 
+class MplCanvas(FigureCanvas):
+
+
+    def __init__(self, parent:QWidget, dpi:int, tight_layout_params:dict[str,float], aw:'ApplicationWindow') -> None:
+        self.aw = aw
+
+        self.fig:Figure = Figure(tight_layout=tight_layout_params, frameon=True, dpi=dpi)
+        # with tight_layout=True, the matplotlib canvas expands to the maximum using figure.autolayout
+        super().__init__(self.fig) # type: ignore[no-untyped-call]
+        self.setParent(parent)
+
+        self.lazyredraw_on_resize_timer:QTimer =  QTimer()
+        self.lazyredraw_on_resize_timer.timeout.connect(self.lazyredraw_on_resize)
+        self.lazyredraw_on_resize_timer.setSingleShot(True)
+
+    @pyqtSlot()
+    def lazyredraw_on_resize(self) -> None:
+        self.lazyredraw(recomputeAllDeltas=False)
+
+    @override
+    def resizeEvent(self, event:'QResizeEvent') -> None: # pyrefly:ignore[bad-override]
+        super().resizeEvent(event) # type:ignore[no-untyped-call]
+        # we only trigger a redraw on resize if a watermark is displayed to fix its aspect ratio
+        if self.aw.redrawOnResize and self.aw.logofilename != '':
+            dw = event.size().width() - event.oldSize().width()   # width change
+            dh = event.size().height() - event.oldSize().height() # height change
+#            t = libtime.time()
+#            # ensure that we redraw during resize only once per second
+#            if self.resizeredrawing + 0.5 < t and ((dw != 0) or (dh != 0)):
+#                self.resizeredrawing = t
+#                QTimer.singleShot(1, lazyredraw_on_resize)
+            if ((dw != 0) or (dh != 0)):
+                self.lazyredraw_on_resize_timer.start(10)
+
 
 # NOTE: to have pylint to verify proper __slot__ definitions using pylint one has to remove the super class FigureCanvas here temporarily
 #   as this does not has __slot__ definitions and thus __dict__ is contained which suppresses the warnings
-#class tgraphcanvas():
-class tgraphcanvas(FigureCanvas):
+class tgraphcanvas(QObject):
     updategraphicsSignal = pyqtSignal()
     updateLargeLCDsTimeSignal = pyqtSignal(str)
     updateLargeLCDsReadingsSignal = pyqtSignal(str,str)
@@ -216,7 +249,7 @@ class tgraphcanvas(FigureCanvas):
     ALARMSET_COUNT: Final[int] = 10 # number of alarm sets
     ALARMSET_ITEMS: Final[int] = 12 # number of elements per alarm set
 
-    __slots__ = [ 'aw', 'alignnames', 'locale_str', 'alpha', 'palette', 'palette1', 'EvalueColor_default', 'EvalueTextColor_default', 'artisanflavordefaultlabels', 'customflavorlabels',
+    __slots__ = [ 'aw', 'canvas', 'alignnames', 'locale_str', 'alpha', 'palette', 'palette1', 'EvalueColor_default', 'EvalueTextColor_default', 'artisanflavordefaultlabels', 'customflavorlabels',
         'SCAAflavordefaultlabels', 'SCAflavordefaultlabels', 'CQIflavordefaultlabels', 'SweetMariasflavordefaultlabels', 'Cflavordefaultlabels', 'Eflavordefaultlabels', 'coffeegeekflavordefaultlabels',
         'Intelligentsiaflavordefaultlabels', 'IstitutoInternazionaleAssaggiatoriCaffe', 'WorldCoffeeRoastingChampionship', 'ax1', 'ax2', 'ambiWorker', 'ambiThread', 'afterTP',
         'decay_weights', 'temp_decay_weights', 'flavorlabels', 'flavors', 'flavors_total_correction', 'flavorstartangle', 'flavoraspect', 'flavorchart_plotf', 'flavorchart_angles', 'flavorchart_plot',
@@ -238,11 +271,11 @@ class tgraphcanvas(FigureCanvas):
         'devices', 'phidgetDevices', 'nonSerialDevices', 'nonTempDevices', 'specialDevices', 'binaryDevices', 'extradevices', 'extratimex', 'extradevicecolor1', 'extradevicecolor2', 'extratemp1',
         'extratemp2', 'extrastemp1', 'extrastemp2', 'extractimex1', 'extractimex2', 'extractemp1', 'extractemp2', 'extratemp1lines', 'extratemp2lines',
         'extraname1', 'extraname2', 'extramathexpression1', 'extramathexpression2', 'extralinestyles1', 'extralinestyles2', 'extradrawstyles1', 'extradrawstyles2',
-        'extralinewidths1', 'extralinewidths2', 'extramarkers1', 'extramarkers2', 'extramarkersizes1', 'extramarkersizes2', 'devicetablecolumnwidths', 'extraNoneTempHint1',
+        'extralinewidths1', 'extralinewidths2', 'extramarkers1', 'extramarkers2', 'extramarkersizes1', 'extramarkersizes2', 'devicetablecolumnwidths', 'energytablecolumnwidths', 'extraNoneTempHint1',
         'extraNoneTempHint2', 'plotcurves', 'plotcurvecolor', 'overlapList', 'tight_layout_params', 'cupping_tight_layout_params', 'fig', 'ax', 'delta_ax', 'legendloc', 'legendloc_pos', 'onclick_cid',
         'oncpick_cid', 'ondraw_cid', 'onmove_cid', 'rateofchange1', 'rateofchange2', 'flagon', 'flagstart', 'flagKeepON', 'flagOpenCompleted', 'flagsampling', 'flagsamplingthreadrunning',
         'manuallogETflag', 'zoom_follow', 'zoom_follow_onET', 'alignEvent', 'compareAlignEvent', 'compareEvents', 'compareET', 'compareBT', 'compareDeltaET', 'compareDeltaBT', 'compareMainEvents', 'compareBBP', 'compareRoast', 'compareExtraCurves1', 'compareExtraCurves2',
-        'replayType', 'replayDropType', 'replayedBackgroundEvents', 'last_replayed_events', 'beepedBackgroundEvents', 'roastpropertiesflag', 'roastpropertiesAutoOpenFlag', 'roastpropertiesAutoOpenDropFlag',
+        'replayType', 'replayDropType', 'replayedBackgroundEvents', 'beepedBackgroundEvents', 'roastpropertiesflag', 'roastpropertiesAutoOpenFlag', 'roastpropertiesAutoOpenDropFlag',
         'title', 'title_show_always', 'ambientTemp', 'ambientTempSource', 'ambientHumiditySource', 'ambientPressureSource', 'ambient_temperature_device', 'ambient_pressure', 'ambient_pressure_device', 'ambient_humidity',
         'ambient_humidity_device', 'elevation', 'temperaturedevicefunctionlist', 'humiditydevicefunctionlist', 'pressuredevicefunctionlist', 'moisture_greens', 'moisture_roasted',
         'greens_temp', 'beansize', 'beansize_min', 'beansize_max', 'whole_color', 'ground_color', 'color_systems', 'color_system_idx', 'heavyFC_flag', 'lowFC_flag', 'lightCut_flag',
@@ -269,7 +302,7 @@ class tgraphcanvas(FigureCanvas):
         'deltaETsamples', 'deltaBTsamples', 'profile_sampling_interval', 'background_profile_sampling_interval', 'profile_meter', 'optimalSmoothing', 'polyfitRoRcalc',
         'patheffects', 'graphstyle', 'graphfont', 'buttonvisibility', 'buttonactions', 'buttonactionstrings', 'extrabuttonactions', 'extrabuttonactionstrings',
         'xextrabuttonactions', 'xextrabuttonactionstrings', 'chargeTimerFlag', 'autoChargeFlag', 'autoDropFlag', 'autoChargeMode', 'autoDropMode', 'autoChargeIdx', 'autoDropIdx', 'markTPflag',
-        'autoDRYflag', 'autoFCsFlag', 'autoCHARGEenabled', 'autoDRYenabled', 'autoFCsenabled', 'autoDROPenabled', 'autoDryIdx', 'projectionconstant',
+        'autoDRYflag', 'autoFCsFlag', 'autoCHARGEenabled', 'autoDRYenabled', 'autoFCsenabled', 'autoDROPenabled', 'projectionconstant',
         'projectionmode', 'transMappingMode', 'weight', 'roasted_defects_weight', 'volume', 'density', 'roasted_defects_mode', 'density_roasted', 'volumeCalcUnit', 'volumeCalcWeightInStr',
         'volumeCalcWeightOutStr', 'container_names', 'container_weights', 'specialevents', 'etypes', 'etypesdefault',
         'alt_etypesdefault', 'default_etypes_set', 'specialeventstype',
@@ -291,7 +324,7 @@ class tgraphcanvas(FigureCanvas):
         'ygrid_C_default', 'zlimit_C_default', 'zlimit_min_C_default', 'zgrid_C_default', 'temp_grid', 'time_grid', 'zlimit_max', 'zlimit_min_max',
         'ylimit_max', 'ylimit_min_max', 'ylimit', 'ylimit_min', 'zlimit', 'zlimit_min', 'RoRlimitFlag', 'RoRlimit', 'RoRlimitm', 'maxRoRlimit',
         'endofx', 'startofx', 'resetmaxtime', 'chargemintime', 'fixmaxtime', 'locktimex', 'autotimex', 'autotimexMode', 'autodeltaxET', 'autodeltaxBT', 'locktimex_start',
-        'locktimex_end', 'xgrid', 'ygrid', 'zgrid', 'gridstyles', 'gridlinestyle', 'gridthickness', 'gridalpha', 'xrotation',
+        'locktimex_end', 'xgrid', 'ygrid', 'zgrid', 'gridstyles', 'gridlinestyle', 'gridthickness', 'gridalpha',
         'statisticsheight', 'statisticsupper', 'statisticslower', 'autosaveflag', 'autosaveprefix', 'autosavepath', 'autosavealsopath',
         'autosaveaddtorecentfilesflag', 'autosaveimage', 'autosaveimageformat', 'autoasaveimageformat_types', 'ystep_down', 'ystep_up', 'backgroundETcurve', 'backgroundBTcurve',
         'l_temp1', 'l_temp2', 'l_delta1', 'l_delta2', 'l_back1', 'l_back2', 'l_back3', 'l_back4', 'l_delta1B', 'l_delta2B', 'l_BTprojection', 'l_DeltaETprojection', 'l_DeltaBTprojection',
@@ -317,7 +350,7 @@ class tgraphcanvas(FigureCanvas):
         'wheelaspect', 'samplingSemaphore', 'updateGraphicsSemaphore', 'profileDataSemaphore', 'messagesemaphore', 'errorsemaphore', 'serialsemaphore', 'seriallogsemaphore',
         'eventactionsemaphore', 'updateBackgroundSemaphore', 'alarmSemaphore', 'rampSoakSemaphore', 'crossmarker', 'crossmouseid', 'onreleaseid',
         'analyzer_connect_id', 'extra309T3', 'extra309T4', 'extra309TX', 'hottop_ET', 'hottop_BT', 'hottop_HEATER', 'hottop_MAIN_FAN', 'hottop_TX',
-        'extraTASI_TA612C_TX', 'extraTASI_TA612C_T3', 'extraTASI_TA612C_T4',
+        'extraTASI_TA612C_TX', 'extraTASI_TA612C_T3', 'extraTASI_TA612C_T4', 'extraPL125T4T3', 'extraPL125T4T4', 'extraPL125T4TX',
         'R1_DT', 'R1_BT', 'R1_DT_ROR', 'R1_BT_ROR', 'R1_EXIT_TEMP', 'R1_HEATER', 'R1_FAN', 'R1_DRUM', 'R1_VOLTAGE', 'R1_TX', 'R1_STATE', 'R1_FAN_RPM', 'R1_STATE_STR',
         'shellyPlusPlug_TX', 'shellyPlusPlug_Total', 'shellyPlusPlug_Last', 'shellyPlusPlug_Power', 'shellyPlusPlug_Temp', 'shellyPlusPlug_Voltage', 'shellyPlusPlug_Current',
         'extraArduinoTX', 'extraArduinoT1', 'extraArduinoT2', 'extraArduinoT3', 'extraArduinoT4', 'extraArduinoT5', 'extraArduinoT6', 'program_t3', 'program_tx', 'program_t4', 'program_t5', 'program_t6',
@@ -335,7 +368,7 @@ class tgraphcanvas(FigureCanvas):
         'eventmessagetimer', 'resizeredrawing', 'logoimg', 'analysisresultsloc_default', 'analysisresultsloc', 'analysispickflag', 'analysisresultsstr',
         'analysisstartchoice', 'analysisoffset', 'curvefitstartchoice', 'curvefitoffset', 'segmentresultsloc_default', 'segmentresultsloc',
         'segmentpickflag', 'segmentdeltathreshold', 'segmentsamplesthreshold', 'stats_summary_rect', 'title_text', 'title_artist', 'title_width',
-        'background_title_width', 'xlabel_text', 'xlabel_artist', 'xlabel_width', 'lazyredraw_on_resize_timer', 'mathdictionary_base',
+        'background_title_width', 'xlabel_text', 'xlabel_artist', 'xlabel_width', 'mathdictionary_base',
         'ambient_pressure_sampled', 'ambient_humidity_sampled', 'ambientTemp_sampled', 'backgroundmovespeed', 'chargeTimerPeriod', 'flavors_default_value',
         'fmt_data_ON', 'l_subtitle', 'projectDeltaFlag', 'btbreak_params','bbpCache', 'glow',
         'custom_event_dlg_default_type', 'custom_event_dlg_default_type', 'foreground_event_ind', 'foreground_event_pick_position', 'foreground_event_last_picked_ind',
@@ -350,7 +383,13 @@ class tgraphcanvas(FigureCanvas):
 
     def __init__(self, parent:QWidget, dpi:int, locale:str, aw:'ApplicationWindow') -> None:
 
+        super().__init__(parent)
+
+        self.tight_layout_params: Final[dict[str,float]] = {'pad':.3,'h_pad':0.0,'w_pad':0.0} # slightly less space for axis labels
+        self.cupping_tight_layout_params: Final[dict[str,float]] = {'pad':1.5,'h_pad':0.0,'w_pad':0.0} # slightly more space for cupping to ensure all labels are visiible
+
         self.aw = aw
+        self.canvas = MplCanvas(parent, dpi, self.tight_layout_params, aw)
 
         #default palette of colors
         self.locale_str:str = locale
@@ -581,8 +620,8 @@ class tgraphcanvas(FigureCanvas):
 
         #show phases LCDs during roasts
         self.phasesLCDflag:bool = True
-        self.phasesLCDmode = 1 # one of 0: time, 1: percentage, 2: temp mode
-        self.phasesLCDmode_l = [1,1,1]
+        self.phasesLCDmode:int = 1 # one of 0: time, 1: percentage, 2: temp mode
+        self.phasesLCDmode_l:list[int] = [1,1,1] # stores last phases LCD mode per app state (OFF/ON/RECORDING)
         self.phasesLCDmode_all:list[bool] = [False,False,True]
 
 
@@ -1177,6 +1216,7 @@ class tgraphcanvas(FigureCanvas):
         self.extramarkersizes2:list[float] = []                     # list of extra curve marker size
 
         self.devicetablecolumnwidths:list[int] = []
+        self.energytablecolumnwidths:list[int] = []
 
         # the following two list are generated on ON from the extradevices types and might be longer or smaller than len(self.extradevices)
         # if no entry is available, a temperature curve that needs C<->F translation is assumed
@@ -1190,10 +1230,8 @@ class tgraphcanvas(FigureCanvas):
 
         self.overlapList:list[tuple[float,float,float,float]] = []
 
-        self.tight_layout_params: Final[dict[str,float]] = {'pad':.3,'h_pad':0.0,'w_pad':0.0} # slightly less space for axis labels
-        self.cupping_tight_layout_params: Final[dict[str,float]] = {'pad':1.5,'h_pad':0.0,'w_pad':0.0} # slightly more space for cupping to ensure all labels are visiible
-        self.fig:Figure = Figure(tight_layout=self.tight_layout_params, frameon=True, dpi=dpi)
         # with tight_layout=True, the matplotlib canvas expands to the maximum using figure.autolayout
+        self.fig:Figure = self.canvas.fig
 
         self.fig.patch.set_facecolor(str(self.palette['canvas']))
 
@@ -1212,7 +1250,6 @@ class tgraphcanvas(FigureCanvas):
             bottom=0.1, # the bottom of the subplots of the figure (default: 0.1)
             left=0.067, # the left side of the subplots of the figure (default: 0.125)
             right=.925) # the right side of the subplots of the figure (default: 0.9)
-        super().__init__(self.fig) # type: ignore[no-untyped-call]
 
         #self.fig.canvas.set_cursor = lambda _: None # type: ignore[assignment, method-assign] # deactivate the busy cursor on slow full redraws
 
@@ -1244,11 +1281,11 @@ class tgraphcanvas(FigureCanvas):
         self.fig.canvas.mpl_connect('button_release_event', self.onrelease_after_pick)
 
         # set the parent widget
-        self.setParent(parent)
+#        self.setParent(parent)
         # we define the widget as
-        FigureCanvas.setSizePolicy(self,QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Expanding)  #@UndefinedVariable
+        FigureCanvas.setSizePolicy(self.canvas, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)  #@UndefinedVariable
         # notify the system of updated policy
-        FigureCanvas.updateGeometry(self)  #@UndefinedVariable
+        FigureCanvas.updateGeometry(self.canvas)  #@UndefinedVariable
 
         # the rate of change of temperature
         self.rateofchange1:float = 0.0
@@ -1961,7 +1998,6 @@ class tgraphcanvas(FigureCanvas):
         self.gridlinestyle:int = 0
         self.gridthickness:float = 1
         self.gridalpha:float = .2
-#        self.xrotation:float = 0
 
         #height of statistics bar
         self.statisticsheight:int = 650
@@ -2239,6 +2275,11 @@ class tgraphcanvas(FigureCanvas):
         self.extra309T4:float = -1
         self.extra309TX:float = 0.
 
+        #temporary storage to pass values. Holds extra T3 and T4 values for center 309
+        self.extraPL125T4T3:float = -1
+        self.extraPL125T4T4:float = -1
+        self.extraPL125T4TX:float = 0.
+
         #temporary storage to pass values. Holds extra T3 and T4 values for TASI TA612C
         self.extraTASI_TA612C_T3:float = -1
         self.extraTASI_TA612C_T4:float = -1
@@ -2478,10 +2519,6 @@ class tgraphcanvas(FigureCanvas):
         self.xlabel_artist:Text|None = None
         self.xlabel_width:float|None = None
 
-        self.lazyredraw_on_resize_timer:QTimer =  QTimer()
-        self.lazyredraw_on_resize_timer.timeout.connect(self.lazyredraw_on_resize)
-        self.lazyredraw_on_resize_timer.setSingleShot(True)
-
         self.updategraphicsSignal.connect(self.updategraphics, type=Qt.ConnectionType.QueuedConnection) # type: ignore[call-arg]
         self.updateLargeLCDsSignal.connect(self.updateLargeLCDs)
         self.updateLargeLCDsReadingsSignal.connect(self.updateLargeLCDsReadings)
@@ -2699,25 +2736,6 @@ class tgraphcanvas(FigureCanvas):
         self.safesaveflag = False
         self.aw.updateWindowTitle()
 
-    @pyqtSlot()
-    def lazyredraw_on_resize(self) -> None:
-        self.lazyredraw(recomputeAllDeltas=False)
-
-    @override
-    def resizeEvent(self, event:'QResizeEvent') -> None: # pyrefly:ignore[bad-override]
-        super().resizeEvent(event) # type:ignore[no-untyped-call]
-        # we only trigger a redraw on resize if a watermark is displayed to fix its aspect ratio
-        if self.aw.redrawOnResize and self.aw.logofilename != '':
-            dw = event.size().width() - event.oldSize().width()   # width change
-            dh = event.size().height() - event.oldSize().height() # height change
-#            t = libtime.time()
-#            # ensure that we redraw during resize only once per second
-#            if self.resizeredrawing + 0.5 < t and ((dw != 0) or (dh != 0)):
-#                self.resizeredrawing = t
-#                QTimer.singleShot(1, lazyredraw_on_resize)
-            if ((dw != 0) or (dh != 0)):
-                self.lazyredraw_on_resize_timer.start(10)
-
 
     # update the self.deltaBTspan and deltaETspan from the given sampling interval, self.deltaETsamples and self.deltaBTsamples
     # interval is expected in seconds (either from the profile on load or from the sampling interval set for recording)
@@ -2764,7 +2782,7 @@ class tgraphcanvas(FigureCanvas):
             if self.ax is not None:
                 axfig = self.ax.get_figure()
                 if axfig is not None and hasattr(self.fig.canvas,'copy_from_bbox'):
-                    self.ax_background = self.fig.canvas.copy_from_bbox(axfig.bbox) # pyright: ignore[reportAttributeAccessIssue]
+                    self.ax_background = self.fig.canvas.copy_from_bbox(axfig.bbox) # ty:ignore[call-non-callable] # pyright: ignore[reportAttributeAccessIssue]
                     # we redraw the additional artists like the projection lines, the timeline and the AUC guide line
                     self.update_additional_artists()
                     self.fig.canvas.blit(axfig.bbox)
@@ -5560,7 +5578,7 @@ class tgraphcanvas(FigureCanvas):
                                         xlim_new = (tx - xlim_offset, tx + xlim_offset)
                                         ylim = self.ax.get_ylim()
                                         ylim_offset = (ylim[1] - ylim[0]) / 2.
-                                        rord = (self.ax.transData.inverted().transform((0,self.delta_ax.transData.transform((0,ror))[1]))[1])
+                                        rord = float(self.ax.transData.inverted().transform((0,self.delta_ax.transData.transform((0,ror))[1]))[1])
                                         ylim_new = (rord - ylim_offset, rord + ylim_offset)
                                         if ylim != ylim_new or xlim != xlim_new:
                                             # set new limits to center current temp on canvas
@@ -6265,7 +6283,7 @@ class tgraphcanvas(FigureCanvas):
                 end_reached:list[bool] = [not flag for flag in self.specialeventplayback] # those event types not activated for event replay are considered done already
 
                 # the next variables is used to realize ramping event replay
-                ramps:list[int|None] = [None,None,None,None]  # holds the time or temp ramp value to be applied per event type, calculated from last_replayed_events and the succeeding event
+                ramps:list[int|None] = [None,None,None,None]  # holds the time or temp ramp value to be applied per event type, calculated from last replayed event and the succeeding event
 
                 slider_events:dict[int,int] = {} # keep event type value pairs to move sliders (but only once per slider and per interval!)
                 next_byTemp_checked:list[bool] = [False,False,False,False] # we take care to reply events by temperature in order; if the next event cannot be triggered by-temp we prevent to trigger the but next as is likely to trigger as we assume always increasing temperatures; but not the next in the row!
@@ -6543,27 +6561,27 @@ class tgraphcanvas(FigureCanvas):
                 if self.projectionmode == 0 or (self.projectionmode == 1 and (self.timex[-1]-charge)<=60*5): # linear temperature projection mode based on current RoR
                     #calculate the temperature endpoint at endofx according to the latest rate of change
                     if self.l_BTprojection is not None:
-                        if self.BTcurve and len(self.unfiltereddelta2_pure) > 0 and len(self.ctemp2) > 0 and self.ctemp2[-1] is not None and self.ctemp2[-1] != -1 and not math.isnan(self.ctemp2[-1]):
+                        if self.BTcurve and len(self.unfiltereddelta2_pure) > 0 and len(self.ctemp2) > 0 and self.ctemp2[-1] is not None and self.ctemp2[-1] != -1 and not math.isnan(self.ctemp2[-1]): # ty:ignore[invalid-argument-type]
                             # projection extended to the plots current endofx
                             left = now
                             right = max(left, xlim_right + charge) # never have the right point be left of left;)
-                            BTprojection = self.ctemp2[-1] + self.unfiltereddelta2_pure[-1]*(right - left)/60. # pyrefly: ignore[unsupported-operation]
+                            BTprojection = self.ctemp2[-1] + self.unfiltereddelta2_pure[-1]*(right - left)/60. # ty:ignore[unsupported-operator] # pyrefly: ignore[unsupported-operation]
                             #plot projection
                             self.BTprojection_tx = [left,right]
-                            self.BTprojection_temp = [self.ctemp2[-1], BTprojection] # pyrefly: ignore[bad-assignment]
+                            self.BTprojection_temp = [self.ctemp2[-1], BTprojection] # ty:ignore[invalid-assignment] # pyrefly: ignore[bad-assignment]
                         else:
                             self.BTprojection_tx = []
                             self.BTprojection_temp = []
                         self.l_BTprojection.set_data(self.BTprojection_tx, self.BTprojection_temp)
                     if self.l_ETprojection is not None:
-                        if self.ETcurve and len(self.unfiltereddelta1_pure) > 0 and len(self.ctemp1) > 0 and self.ctemp1[-1] is not None and self.ctemp1[-1] != -1 and not math.isnan(self.ctemp1[-1]):
+                        if self.ETcurve and len(self.unfiltereddelta1_pure) > 0 and len(self.ctemp1) > 0 and self.ctemp1[-1] is not None and self.ctemp1[-1] != -1 and not math.isnan(self.ctemp1[-1]): # ty:ignore[invalid-argument-type]
                             # projection extended to the plots current endofx
                             left = now
                             right = max(left,xlim_right + charge) # never have the right point be left of left;)
-                            ETprojection = self.ctemp1[-1] + self.unfiltereddelta1_pure[-1]*(right - left)/60. # pyrefly: ignore[unsupported-operation]
+                            ETprojection = self.ctemp1[-1] + self.unfiltereddelta1_pure[-1]*(right - left)/60. # ty:ignore[unsupported-operator] # pyrefly: ignore[unsupported-operation]
                             #plot projection
                             self.ETprojection_tx = [left,right]
-                            self.ETprojection_temp = [self.ctemp1[-1], ETprojection] # pyrefly: ignore[bad-assignment]
+                            self.ETprojection_temp = [self.ctemp1[-1], ETprojection] # ty:ignore[invalid-assignment] # pyrefly: ignore[bad-assignment]
                         else:
                             self.ETprojection_tx = []
                             self.ETprojection_temp = []
@@ -6579,7 +6597,7 @@ class tgraphcanvas(FigureCanvas):
 
                     # NOTE: we use the unfiltered deltas here to make this work also with a delta symbolic formula like x/2 to render RoR in C/30sec
                     if self.l_BTprojection is not None:
-                        if (len(self.ctemp2) > 0 and self.ctemp2[-1] is not None and self.ctemp2[-1] != -1 and not math.isnan(self.ctemp2[-1]) and
+                        if (len(self.ctemp2) > 0 and self.ctemp2[-1] is not None and self.ctemp2[-1] != -1 and not math.isnan(self.ctemp2[-1]) and # ty:ignore[invalid-argument-type]
                                 len(self.unfiltereddelta2_pure)>delta_interval_BT and
                                 self.unfiltereddelta2_pure[-1] and
                                 self.unfiltereddelta2_pure[-1]>0 and
@@ -6594,18 +6612,18 @@ class tgraphcanvas(FigureCanvas):
                             ypoints = [self.ctemp2[-1]]
                             delta_sec = self.unfiltereddelta2_pure[-1]/60
                             for _ in range(len(xpoints)-1):
-                                ypoints.append(ypoints[-1] + delta_sec*delay) # pyrefly: ignore[unsupported-operation]
+                                ypoints.append(ypoints[-1] + delta_sec*delay) # ty:ignore[unsupported-operator] # pyrefly: ignore[unsupported-operation]
                                 delta_sec = delta_sec + deltadelta_secsec*delay
                             #plot BT curve
                             self.BTprojection_tx = xpoints.tolist()
-                            self.BTprojection_temp = ypoints # pyrefly: ignore[bad-assignment]
+                            self.BTprojection_temp = ypoints # ty:ignore[invalid-assignment] # pyrefly: ignore[bad-assignment]
                         else:
                             self.BTprojection_tx = []
                             self.BTprojection_temp = []
                         self.l_BTprojection.set_data(self.BTprojection_tx, self.BTprojection_temp)
 
                     if self.l_ETprojection is not None:
-                        if (len(self.ctemp1) > 0 and self.ctemp1[-1] is not None and self.ctemp1[-1] != -1 and not math.isnan(self.ctemp1[-1]) and
+                        if (len(self.ctemp1) > 0 and self.ctemp1[-1] is not None and self.ctemp1[-1] != -1 and not math.isnan(self.ctemp1[-1]) and # ty:ignore[invalid-argument-type]
                                 len(self.unfiltereddelta1_pure)>delta_interval_BT and
                                 self.unfiltereddelta1_pure[-1] and
                                 self.unfiltereddelta1_pure[-1]>0 and
@@ -6620,11 +6638,11 @@ class tgraphcanvas(FigureCanvas):
                             ypoints = [self.ctemp1[-1]]
                             delta_sec = self.unfiltereddelta1_pure[-1]/60
                             for _ in range(len(xpoints)-1):
-                                ypoints.append(ypoints[-1] + delta_sec*delay) # pyrefly: ignore[unsupported-operation]
+                                ypoints.append(ypoints[-1] + delta_sec*delay) # ty:ignore[unsupported-operator] # pyrefly: ignore[unsupported-operation]
                                 delta_sec = delta_sec + deltadelta_secsec*delay
                             #plot ET curve
                             self.ETprojection_tx = xpoints.tolist()
-                            self.ETprojection_temp = ypoints # pyrefly: ignore[bad-assignment]
+                            self.ETprojection_temp = ypoints # ty:ignore[invalid-assignment] # pyrefly: ignore[bad-assignment]
                         else:
                             self.ETprojection_tx = []
                             self.ETprojection_temp = []
@@ -6861,7 +6879,7 @@ class tgraphcanvas(FigureCanvas):
             # this evaluates to None before TP and 0 after the event
             try:
                 for v in ['pDRY','pFCs']:
-                    if len(sample_delta2) > 0 and len(sample_delta2)>0 and sample_delta2[-1] and sample_delta2[-1] > 0:  # pyrefly: ignore[unsupported-operation]
+                    if len(sample_delta2) > 0 and len(sample_delta2)>0 and sample_delta2[-1] and sample_delta2[-1] > 0:  # ty:ignore[unsupported-operator] # pyrefly: ignore[unsupported-operation]
                         mathdictionary[v] = 0
                         if v == 'pDRY':
                             if self.backgroundprofile is not None and self.timeindexB[1] and not self.autoDRYflag: # with AutoDRY, we always use the set DRY phase temperature as target
@@ -6869,7 +6887,7 @@ class tgraphcanvas(FigureCanvas):
                             else:
                                 drytarget = self.phases[1] # Drying max phases definition
                             if drytarget > sample_temp2[-1]:
-                                mathdictionary[v] = (drytarget - sample_temp2[-1])/(sample_delta2[-1]/60.) # pyrefly: ignore[unsupported-operation]
+                                mathdictionary[v] = (drytarget - sample_temp2[-1])/(sample_delta2[-1]/60.) # ty:ignore[unsupported-operator] # pyrefly: ignore[unsupported-operation]
                         elif v == 'pFCs':
                             # display expected time to reach FCs as defined in the background profile or the phases dialog
                             if self.backgroundprofile is not None and self.timeindexB[2]:
@@ -6877,7 +6895,7 @@ class tgraphcanvas(FigureCanvas):
                             else:
                                 fcstarget = self.phases[2] # FCs min phases definition
                             if fcstarget > sample_temp2[-1]:
-                                mathdictionary[v] = (fcstarget - sample_temp2[-1])/(sample_delta2[-1]/60.) # pyrefly: ignore[unsupported-operation]
+                                mathdictionary[v] = (fcstarget - sample_temp2[-1])/(sample_delta2[-1]/60.) # ty:ignore[unsupported-operator] # pyrefly: ignore[unsupported-operation]
                     else:
                         # if a prediction is not possible (before TP), we return the error value -1
                         mathdictionary[v] = -1
@@ -6901,7 +6919,7 @@ class tgraphcanvas(FigureCanvas):
                     if idx > -1: # we passed the AUCbegin event
                         mathdictionary['AUCbase'] = sample_temp2[idx]
                     else:
-                        mathdictionary['AUCbase'] = None # Event not set yet, no AUCbase # pyrefly: ignore[unsupported-operation]
+                        mathdictionary['AUCbase'] = None # Event not set yet, no AUCbase # ty:ignore[unsupported-operator] # pyrefly: ignore[unsupported-operation]
                 else:
                     mathdictionary['AUCbase'] = self.AUCbase
                 if self.AUCtargetFlag and self.backgroundprofile is not None and self.AUCbackground > 0:
@@ -7121,7 +7139,7 @@ class tgraphcanvas(FigureCanvas):
                                     #no shift
                                     elif mathexpression[i+k+1] == '1':
                                         if k == 0:
-                                            mathdictionary['R1'] = sample_delta1[index] # pyrefly: ignore[unsupported-operation]
+                                            mathdictionary['R1'] = sample_delta1[index] # ty:ignore[unsupported-operator] # pyrefly: ignore[unsupported-operation]
                                         else:
                                             #if sampling
                                             if RTsname is not None and RTsname != '':
@@ -7130,7 +7148,7 @@ class tgraphcanvas(FigureCanvas):
                                                 idx = index
                                             # the index is resolved relative to the time of the foreground profile if available
                                             if not sample_timex:
-                                                mathdictionary['RB1'] = self.delta1B[idx] # pyrefly: ignore[unsupported-operation]
+                                                mathdictionary['RB1'] = self.delta1B[idx] # ty:ignore[unsupported-operator] # pyrefly: ignore[unsupported-operation]
                                             else:
                                                 if RTsname is not None and RTsname != '':
                                                     if len(sample_timex)>2:
@@ -7145,10 +7163,10 @@ class tgraphcanvas(FigureCanvas):
                                                     res = self.delta1B[idx]
                                                 else:
                                                     res = -1
-                                                mathdictionary['RB1'] = res # pyrefly: ignore[unsupported-operation]
+                                                mathdictionary['RB1'] = res # ty:ignore[unsupported-operator] # pyrefly: ignore[unsupported-operation]
                                     elif mathexpression[i+k+1] == '2':
                                         if k == 0:
-                                            mathdictionary['R2'] = sample_delta2[index] # pyrefly: ignore[unsupported-operation]
+                                            mathdictionary['R2'] = sample_delta2[index] # ty:ignore[unsupported-operator] # pyrefly: ignore[unsupported-operation]
                                         else:
                                             if RTsname is not None and RTsname != '':
                                                 idx = index + 1
@@ -7156,7 +7174,7 @@ class tgraphcanvas(FigureCanvas):
                                                 idx = index
                                             # the index is resolved relative to the time of the foreground profile if available
                                             if not sample_timex:
-                                                mathdictionary['RB2'] = self.delta2B[idx] # pyrefly: ignore[unsupported-operation]
+                                                mathdictionary['RB2'] = self.delta2B[idx] # ty:ignore[unsupported-operator] # pyrefly: ignore[unsupported-operation]
                                             else:
                                                 if RTsname is not None and RTsname != '':
                                                     if len(sample_timex)>2:
@@ -7171,7 +7189,7 @@ class tgraphcanvas(FigureCanvas):
                                                     res = self.delta2B[idx]
                                                 else:
                                                     res = -1
-                                                mathdictionary['RB2'] = res # pyrefly: ignore[unsupported-operation]
+                                                mathdictionary['RB2'] = res # ty:ignore[unsupported-operator] # pyrefly: ignore[unsupported-operation]
                         except Exception: # pylint: disable=broad-except
                             # if deltas of backgrounds are not visible the data is not calculated and thus this fails with an exception
                             pass
@@ -8028,7 +8046,7 @@ class tgraphcanvas(FigureCanvas):
 #                self.designertemp1init = [500,500,500,500,500,500,500]
 #                self.designertemp2init = [380,300,390,395,410,412,420]
             self.disconnect_designer()  #sets designer flag false
-            self.setCursor(Qt.CursorShape.ArrowCursor)
+            self.canvas.setCursor(Qt.CursorShape.ArrowCursor)
 
             # disconnect analyzer signal
             if self.analyzer_connect_id is not None:
@@ -12776,7 +12794,7 @@ class tgraphcanvas(FigureCanvas):
                 #annotate labels
                 self.flavorchart_labels = []
                 for i in range(len(self.flavorlabels)):
-                    if self.flavorchart_angles[i] > 2.*pi or self.flavorchart_angles[i] < 0.: # pyrefly: ignore[unsupported-operation]
+                    if self.flavorchart_angles[i] > 2.*pi or self.flavorchart_angles[i] < 0.: # ty:ignore[unsupported-operator] # pyrefly: ignore[unsupported-operation]
                         _,self.flavorchart_angles[i] = divmod(self.flavorchart_angles[i],(2.*pi)) # pyrefly: ignore[unsupported-operation]
                     if self.flavorchart_angles[i] <= (pi/2.) or self.flavorchart_angles[i] >= (1.5*pi): #if < 90 or smaller than 270 degrees # pyrefly: ignore[unsupported-operation]
                         ha = 'left'
@@ -12785,7 +12803,7 @@ class tgraphcanvas(FigureCanvas):
                     anno = self.ax1.annotate(self.flavorChartLabelText(i),xy =(self.flavorchart_angles[i],.9),  # pyrefly: ignore[unsupported-operation]
                                         fontproperties=fontprop_small,
                                         color=self.palette['ylabel'],
-                                        xytext=(self.flavorchart_angles[i],1.1),horizontalalignment=ha,verticalalignment='center')  # pyrefly: ignore[unsupported-operation]
+                                        xytext=(self.flavorchart_angles[i],1.1),horizontalalignment=ha,verticalalignment='center')  # ty:ignore[unsupported-operator] # pyrefly: ignore[unsupported-operation]
                     anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
                     self.flavorchart_labels.append(anno)
 
@@ -12842,7 +12860,7 @@ class tgraphcanvas(FigureCanvas):
         self.flavorchart_plotf.append(self.flavors[0])
         #normalize flavor values to 0-1 range
         for i,_ in enumerate(self.flavorchart_plotf):
-            self.flavorchart_plotf[i] /= 10. # pyrefly: ignore[unsupported-operation]
+            self.flavorchart_plotf[i] /= 10. # ty:ignore[unsupported-operator] # pyrefly: ignore[unsupported-operation]
 
     @staticmethod
     def calcFlavorChartScoreFromFlavors(flavors:list[float], flavors_total_correction:float) -> float:
@@ -12934,9 +12952,9 @@ class tgraphcanvas(FigureCanvas):
                 self.samplingAction()
             self.StopAsyncSamplingAction()
             self.aw.AsyncSamplingTimer = QTimer()
-            self.aw.AsyncSamplingTimer.timeout.connect(self.AsyncSamplingActionTrigger)
-            self.aw.AsyncSamplingTimer.setSingleShot(True)
-            self.aw.AsyncSamplingTimer.start(int(round(self.extra_event_sampling_delay)))
+            self.aw.AsyncSamplingTimer.timeout.connect(self.AsyncSamplingActionTrigger) # ty:ignore[possibly-missing-attribute]
+            self.aw.AsyncSamplingTimer.setSingleShot(True) # ty:ignore[possibly-missing-attribute]
+            self.aw.AsyncSamplingTimer.start(int(round(self.extra_event_sampling_delay))) # ty:ignore[possibly-missing-attribute]
 
     @pyqtSlot()
     def StartAsyncSamplingAction(self) -> None:
@@ -13208,8 +13226,8 @@ class tgraphcanvas(FigureCanvas):
                         serial=hottop_serial,
                         connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('Hottop'),True,None),
                         disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('Hottop'),True,None))
-                    self.aw.hottop.setLogging(self.device_logging)
-                    self.aw.hottop.start()
+                    self.aw.hottop.setLogging(self.device_logging) # ty:ignore[possibly-missing-attribute]
+                    self.aw.hottop.start() # ty:ignore[possibly-missing-attribute]
                 elif self.device == 134:
                     # connect Santoker
                     from artisanlib.santoker import Santoker
@@ -13233,29 +13251,29 @@ class tgraphcanvas(FigureCanvas):
                         fcs_handler=lambda : (self.markFCsSignal.emit(False) if (len(self.aw.santokerEventFlags)>2 and self.aw.santokerEventFlags[2] and self.timeindex[2] == 0) else None),
                         scs_handler=lambda : (self.markSCsSignal.emit(False) if (len(self.aw.santokerEventFlags)>4 and self.aw.santokerEventFlags[4] and self.timeindex[4] == 0) else None),
                         drop_handler=lambda : (self.markDropSignal.emit(False) if (len(self.aw.santokerEventFlags)>6 and self.aw.santokerEventFlags[6] and self.timeindex[6] == 0) else None))
-                    self.aw.santoker.setLogging(self.device_logging)
-                    self.aw.santoker.start()
+                    self.aw.santoker.setLogging(self.device_logging) # ty:ignore[possibly-missing-attribute]
+                    self.aw.santoker.start() # ty:ignore[possibly-missing-attribute]
                 elif self.device == 171:
                     # connect Santoker R
                     from artisanlib.santoker_r import SantokerR
                     self.aw.santokerR = SantokerR(
                         connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('Santoker R'),True,None),
                         disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('Santoker R'),True,None))
-                    self.aw.santokerR.setLogging(self.device_logging)
-                    self.aw.santokerR.start(case_sensitive=False)
+                    self.aw.santokerR.setLogging(self.device_logging) # ty:ignore[possibly-missing-attribute]
+                    self.aw.santokerR.start(case_sensitive=False) # ty:ignore[possibly-missing-attribute]
                 elif self.device == 175:
                     # connect Thermoworks BlueDOT
                     from artisanlib.bluedot import BlueDOT
                     self.aw.thermoworksBlueDOT = BlueDOT(
                         connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('Thermoworks BlueDOT'),True,None),
                         disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('Thermoworks BlueDOT'),True,None))
-                    self.aw.thermoworksBlueDOT.setLogging(self.device_logging)
-                    self.aw.thermoworksBlueDOT.start(case_sensitive=False)
+                    self.aw.thermoworksBlueDOT.setLogging(self.device_logging) # ty:ignore[possibly-missing-attribute]
+                    self.aw.thermoworksBlueDOT.start(case_sensitive=False) # ty:ignore[possibly-missing-attribute]
                 elif self.device == 138:
                     # connect Kaleido
                     from artisanlib.kaleido import KaleidoPort
                     self.aw.kaleido = KaleidoPort()
-                    self.aw.kaleido.setLogging(self.device_logging)
+                    self.aw.kaleido.setLogging(self.device_logging) # ty:ignore[possibly-missing-attribute]
                     kaleido_serial:SerialSettings|None = None
                     if self.aw.kaleidoSerial:
                         kaleido_serial = SerialSettings(
@@ -13265,7 +13283,7 @@ class tgraphcanvas(FigureCanvas):
                                 stopbits = self.aw.ser.stopbits,
                                 parity = self.aw.ser.parity,
                                 timeout = self.aw.ser.timeout)
-                    self.aw.kaleido.start(self.mode, self.aw.kaleidoHost, self.aw.kaleidoPort,
+                    self.aw.kaleido.start(self.mode, self.aw.kaleidoHost, self.aw.kaleidoPort, # ty:ignore[possibly-missing-attribute]
                         serial=kaleido_serial,
                         connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('Kaleido'),True,None),
                         disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('Kaleido'),True,None))
@@ -13275,8 +13293,8 @@ class tgraphcanvas(FigureCanvas):
                         self.aw.ikawa = IKAWA_BLE(
                             connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('IKAWA'),True,None),
                             disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('IKAWA'),True,None))
-                        self.aw.ikawa.setLogging(self.device_logging)
-                        self.aw.ikawa.start_sampling()
+                        self.aw.ikawa.setLogging(self.device_logging) # ty:ignore[possibly-missing-attribute]
+                        self.aw.ikawa.start_sampling() # ty:ignore[possibly-missing-attribute]
                         self.aw.sendmessageSignal.emit(QApplication.translate('Message', 'scanning for device'),True,None)
                     except Exception as ex:  # pylint: disable=broad-except
                         _log.error(ex)
@@ -13288,8 +13306,8 @@ class tgraphcanvas(FigureCanvas):
                     self.aw.mugma = Mugma(self.aw.mugmaHost, self.aw.mugmaPort, self.device_logging,
                         connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('Mugma'),True,None),
                         disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('Mugma'),True,None))
-                    self.aw.mugma.setLogging(self.device_logging)
-                    self.aw.mugma.start()
+                    self.aw.mugma.setLogging(self.device_logging) # ty:ignore[possibly-missing-attribute]
+                    self.aw.mugma.start() # ty:ignore[possibly-missing-attribute]
 
 
             self.aw.initializedMonitoringExtraDeviceStructures()
@@ -17541,7 +17559,7 @@ class tgraphcanvas(FigureCanvas):
         self.etypescopy = self.etypes[:]
 
         # Save landmark times before any modifications
-        timeindexhold = [self.timex[idx] if 0 <= idx < len(self.timex) else 0 for idx in self.timeindex]
+        timeindexhold:list[float] = [self.timex[idx] if 0 <= idx < len(self.timex) else 0 for idx in self.timeindex]
 
         if num_nodes > 0:
             # NEW METHOD: Fit spline with specified number of nodes
@@ -17798,11 +17816,11 @@ class tgraphcanvas(FigureCanvas):
                 # initialize bitblit background
                 axfig = self.ax.get_figure()
                 if axfig is not None and hasattr(self.fig.canvas,'copy_from_bbox'):
-                    self.ax_background_designer = self.fig.canvas.copy_from_bbox(axfig.bbox)  # pyright: ignore[reportAttributeAccessIssue]
+                    self.ax_background_designer = self.fig.canvas.copy_from_bbox(axfig.bbox)  # ty:ignore[call-non-callable]  # pyright: ignore[reportAttributeAccessIssue]
 
             # restore background
             if hasattr(self.fig.canvas,'restore_region'):
-                self.fig.canvas.restore_region(self.ax_background_designer) # pyright: ignore[reportAttributeAccessIssue]
+                self.fig.canvas.restore_region(self.ax_background_designer) # ty:ignore[call-non-callable] # pyright: ignore[reportAttributeAccessIssue]
 
 
             #create statistics bar
@@ -17910,13 +17928,13 @@ class tgraphcanvas(FigureCanvas):
             if event.inaxes != self.ax or event.button != 3:
                 return #select right click only
 
-            self.releaseMouse()
+            self.canvas.releaseMouse()
             self.mousepress = False
             # reset the zoom rectangles
             self.aw.ntb.release_pan(event)
             self.aw.ntb.release_zoom(event)
             # set cursor
-            self.setCursor(Qt.CursorShape.PointingHandCursor)
+            self.canvas.setCursor(Qt.CursorShape.PointingHandCursor)
 
             event_xdata = event.xdata
             event_ydata = event.ydata
@@ -17969,7 +17987,7 @@ class tgraphcanvas(FigureCanvas):
             self.currenty = 0
             return
 
-        self.setCursor(Qt.CursorShape.ClosedHandCursor)
+        self.canvas.setCursor(Qt.CursorShape.ClosedHandCursor)
 
         if hasattr(event, 'ind'):
             event_ind = event.ind # pyright:ignore
@@ -18002,7 +18020,7 @@ class tgraphcanvas(FigureCanvas):
     #handles when releasing mouse
     def on_release(self,_:'Event') -> None:
         self.mousepress = False
-        self.setCursor(Qt.CursorShape.OpenHandCursor)
+        self.canvas.setCursor(Qt.CursorShape.OpenHandCursor)
         self.redrawdesigner(force=True)
 
     def phases_to_messageline(self) -> None:
@@ -18198,9 +18216,9 @@ class tgraphcanvas(FigureCanvas):
                     self.redrawdesigner(force=True)
 
                 if orange_hit or blue_hit:
-                    self.setCursor(Qt.CursorShape.OpenHandCursor)
+                    self.canvas.setCursor(Qt.CursorShape.OpenHandCursor)
                 else:
-                    self.setCursor(Qt.CursorShape.PointingHandCursor) # Qt.CursorShape.PointingHandCursor or Qt.CursorShape.ArrowCursor
+                    self.canvas.setCursor(Qt.CursorShape.PointingHandCursor) # Qt.CursorShape.PointingHandCursor or Qt.CursorShape.ArrowCursor
                     if not orange_blue_msg_sent:
                         self.phases_to_messageline()
 
@@ -18485,7 +18503,7 @@ class tgraphcanvas(FigureCanvas):
         if not self.designerflag:
             self.designerflag = True
             self.aw.designerAction.setChecked(True)
-            self.setCursor(Qt.CursorShape.PointingHandCursor)
+            self.canvas.setCursor(Qt.CursorShape.PointingHandCursor)
             self.mousepress = False
             #create mouse events. Note: keeping the ids inside a list helps protect against extrange python behaviour.
             self.designerconnections = [None,None,None,None]
@@ -18503,7 +18521,7 @@ class tgraphcanvas(FigureCanvas):
         for dc in self.designerconnections:
             if dc is not None:
                 self.fig.canvas.mpl_disconnect(dc)
-        self.setCursor(Qt.CursorShape.ArrowCursor)
+        self.canvas.setCursor(Qt.CursorShape.ArrowCursor)
         warnings.simplefilter('default', UserWarning)
 
     #launches designer config Window
@@ -18766,14 +18784,14 @@ class tgraphcanvas(FigureCanvas):
 
     def connectWheel(self) -> None:
         self.wheelflag = True
-        self.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.canvas.setCursor(Qt.CursorShape.PointingHandCursor)
         self.wheelconnections[0] = self.fig.canvas.mpl_connect('pick_event', cast('Callable[[Event],None]', self.wheel_pick))
         self.wheelconnections[1] = self.fig.canvas.mpl_connect('button_press_event', cast('Callable[[Event],None]', self.wheel_menu))           #right click menu context
         self.wheelconnections[2] = self.fig.canvas.mpl_connect('button_release_event', cast('Callable[[Event],None]', self.wheel_release))
 
     def disconnectWheel(self) -> None:
         self.wheelflag = False
-        self.setCursor(Qt.CursorShape.ArrowCursor)
+        self.canvas.setCursor(Qt.CursorShape.ArrowCursor)
         self.fig.canvas.mpl_disconnect(self.wheelconnections[0])
         self.fig.canvas.mpl_disconnect(self.wheelconnections[1])
         self.fig.canvas.mpl_disconnect(self.wheelconnections[2])

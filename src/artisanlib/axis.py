@@ -719,14 +719,6 @@ class WindowsDlg(ArtisanDialog):
         if changed:
             self.aw.qmc.redraw(recomputeAllDeltas=False)
 
-#    def changexrotation(self):
-#        self.aw.qmc.xrotation = self.xrotationSpinBox.value()
-#        self.xrotationSpinBox.setDisabled(True)
-#        self.aw.qmc.xaxistosm(redraw=False)
-#        self.aw.qmc.redraw(recomputeAllDeltas=False)
-#        self.xrotationSpinBox.setDisabled(False)
-#        self.xrotationSpinBox.setFocus()
-
     @pyqtSlot(int)
     def changegridalpha(self, _:int) -> None:
         self.aw.qmc.gridalpha = self.gridalphaSpinBox.value()/10.

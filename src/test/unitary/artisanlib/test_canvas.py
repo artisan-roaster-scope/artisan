@@ -1677,31 +1677,3 @@ class TestFindTextGap:
         # Assert
         assert isinstance(ystep_down, int)
         assert isinstance(ystep_up, int)
-
-
-class TestTemperatureConversion:
-    """Test temperature conversion methods."""
-
-    def test_convertTemperatureF(self) -> None:
-        """Test convertTemperatureF slot method."""
-        # Arrange
-        canvas = create_test_canvas()
-        canvas.convertTemperature = Mock() # type: ignore[method-assign]
-
-        # Act
-        canvas.convertTemperatureF()
-
-        # Assert
-        canvas.convertTemperature.assert_called_once_with('F')
-
-    def test_convertTemperatureC(self) -> None:
-        """Test convertTemperatureC slot method."""
-        # Arrange
-        canvas = create_test_canvas()
-        canvas.convertTemperature = Mock() # type: ignore[method-assign]
-
-        # Act
-        canvas.convertTemperatureC()
-
-        # Assert
-        canvas.convertTemperature.assert_called_once_with('C')

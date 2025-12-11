@@ -1017,7 +1017,6 @@ class serialport:
         return tx,t2,t1
 
     def CM_ETBT(self) -> tuple[float,float,float]:
-        _log.debug('PRINT CM_ETBT')
         tx = self.aw.qmc.timeclock.elapsedMilli()
         try:
             t1 = -1

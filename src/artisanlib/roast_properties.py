@@ -1752,12 +1752,13 @@ class editGraphDlg(ArtisanResizeablDialog):
                     # if there are multiple stores defined and non is selected, only coffees with stock in all stores are enabled in the blend component coffee popups
                     self.plus_stores is None or len(self.plus_stores) < 2 or self.plus_stores_combo.currentIndex() != 0 or len(plus.stock.getCoffeeCoffeeStocks(c)) == len(self.plus_stores)}
 
+            total_weight:float
             res, total_weight = plus.blend.openCustomBlendDialog(self, self.aw, inWeight, self.aw.qmc.weight[2],
                     coffees, blend, coffee_hr_ids_with_stock_in_store)
-            if res: # not canceled
+            if res is not None: # not canceled
                 self.aw.qmc.plus_custom_blend = res
                 self.populatePlusCoffeeBlendCombos() # we update the blend menu to reflect the current custom blend
-                if self.aw.qmc.plus_custom_blend.name.strip() == '' and self.plus_blend_selected_spec is not None and 'hr_id' in self.plus_blend_selected_spec and self.plus_blend_selected_spec['hr_id'] == '':
+                if self.aw.qmc.plus_custom_blend.name.strip() == '' and self.plus_blend_selected_spec is not None and 'hr_id' in self.plus_blend_selected_spec and self.plus_blend_selected_spec['hr_id'] == '': # ty:ignore[possibly-missing-attribute]
                     # if the custom blend entry was selected before, which is now removed, we select the empty first entry
                     self.plus_blends_combo.setCurrentIndex(0)
                     self.blendSelectionChanged(0)
@@ -3444,7 +3445,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.aw.qmc.presssure_percents = self.org_presssure_percents.copy()
             self.aw.qmc.loadevent_zeropcts = self.org_loadevent_zeropcts.copy()
             self.aw.qmc.loadevent_hundpcts = self.org_loadevent_hundpcts.copy()
-            self.aw.qmc.meterlables = self.org_meterlabels.copy()
+            self.aw.qmc.meterlabels = self.org_meterlabels.copy()
             self.aw.qmc.meterunits = self.org_meterunits.copy()
             self.aw.qmc.meterfuels = self.org_meterfuels.copy()
             self.aw.qmc.metersources = self.org_metersources.copy()
@@ -3452,7 +3453,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.aw.qmc.preheatenergies = self.org_preheatenergies.copy()
             self.aw.qmc.betweenbatchDuration = self.org_betweenbatchDuration
             self.aw.qmc.betweenbatchenergies = self.org_betweenbatchenergies.copy()
-            self.aw.qmc.coolinghDuration = self.org_coolingDuration
+            self.aw.qmc.coolingDuration = self.org_coolingDuration
             self.aw.qmc.coolingenergies = self.org_coolingenergies.copy()
             self.aw.qmc.betweenbatch_after_preheat = self.org_betweenbatch_after_preheat
             self.aw.qmc.electricEnergyMix = self.org_electricEnergyMix

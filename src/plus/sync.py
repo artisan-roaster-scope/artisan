@@ -145,7 +145,7 @@ def getSync(uuid:str) -> float|None:
             try:
                 with shelve.open(getSyncPath()) as db:
                     try:
-                        ts = db[uuid]
+                        ts:float = float(db[uuid])
                         _log.debug(' -> sync:getSync = %s', ts)
                         return ts
                     except Exception:  # pylint: disable=broad-except

@@ -11,13 +11,13 @@ v3.4.1
   - adds support for [Acaia Pyxis Black (2025)](https://eu.acaia.co/products/pyxis-black)
   - adds visual clue to curve LCDs indicating hidden curves
   - adds Designer spline fitting ([PR #2050](../../../pull/2050) contributed by [Thomas](https://github.com/phreeza))
-  - adds 2DOF PID incl. classical DoE, PoE, DoM, and PoM PID variants, integral limit adjustment to parameter beta, bumpless transfer, duty and derivative IIR SOS filter respecting sampling interval, Gain Scheduling and SV FIR filter for background follow mode
+  - adds 2DOF PID incl. classical DoE, PoE, DoM, and PoM PID variants, interpolated gain scheduling, bumpless transfer, duty and derivative IIR SOS filter respecting sampling interval, and SV FIR filter for background follow mode
   - adds Artisan Command `pidWeights` to set 2DOFPID parameters beta and gamma
   - adds support for Yoccto Meteo as well as Phidget TMP1000, HUM1000 and PRE1000 as extra devices
 
 * CHANGES
   - removed the term `slave` from the project but for 2 lines (to be removed in later versions) to keep compatibility with older settings
-  - improved ramping event tracking with lookahead avoiding non-linearities
+  - improved ramping event tracking with lookahead, avoiding non-linearities
 
 ----
 v3.4.0 (Oct 31, 2025)

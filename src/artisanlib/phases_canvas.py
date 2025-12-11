@@ -33,7 +33,7 @@ from artisanlib.suppress_errors import suppress_stdout_stderr
 from artisanlib.util import toGrey, toDim, stringfromseconds, float2float
 
 
-from PyQt6.QtCore import Qt, QSettings
+from PyQt6.QtCore import Qt, QSettings, QObject
 from PyQt6.QtGui import QColor
 from PyQt6.QtWidgets import QApplication
 
@@ -54,36 +54,41 @@ class PhasesData(TypedDict):
     BT_ROR_start_temp : float
     BT_ROR_end_temp   : float
 
+class MplPhasesCanvas(FigureCanvas):
+    def __init__(self, tight_layout_params:dict[str,float], dpi:int) -> None:
+        self.fig:Figure = Figure(tight_layout=tight_layout_params, frameon=True, dpi=dpi)
+        # with tight_layout=True, the matplotlib canvas expands to the maximum using figure.autolayout
+        super().__init__(self.fig) # type: ignore[no-untyped-call]
 
-class tphasescanvas(FigureCanvas):
+class tphasescanvas(QObject):
 
-    __slots__ = [ 'aw', 'dpi_offset', 'barheight', 'm', 'g', 'data', 'fig', 'ax' , 'tight_layout_params',
+    __slots__ = [ 'canvas', 'aw', 'dpi_offset', 'barheight', 'm', 'g', 'data', 'ax' , 'tight_layout_params',
             'phase_temperatures',  'tooltip_anno', 'tooltip_artist' ]
 
     def __init__(self, dpi:int, aw:'ApplicationWindow') -> None:
+        super().__init__()
         self.aw = aw
-        self.dpi_offset = -30 # set the dpi to 30% less than the user selected dpi
+        self.dpi_offset:Final[int] = -30 # set the dpi to 30% less than the user selected dpi
         # values that define the bars and spacing
-        self.barheight =  0.88  # height of each bar within the norm row height of 1
-        self.m = 10             # width of batch number field and drop time field
-        self.g = 2              # width of the gap between batch number field and drop time field and the actual phase percentage bars
+        self.barheight:float =  0.88  # height of each bar within the norm row height of 1
+        self.m:float = 10.0                   # width of batch number field and drop time field
+        self.g:float = 2.0                    # width of the gap between batch number field and drop time field and the actual phase percentage bars
         # set data
         self.data:list[tuple[str, float, tuple[float,float,float], bool, bool, str, tuple[float,float,float], tuple[float,float,float]]]|None = None  # the phases data per profile
         # the canvas
-        self.fig:Figure = Figure(figsize=(1, 1), frameon=False, dpi=dpi+self.dpi_offset)
+#        self.fig:Figure = Figure(figsize=(1, 1), frameon=False, dpi=dpi+self.dpi_offset)
         # as alternative to the experimental constrained_layout we could use tight_layout as for them main canvas:
         self.tight_layout_params: Final[dict[str, float]] = {'pad':.3,'h_pad':0.0,'w_pad':0.0} # slightly less space for axis labels
-#        self.fig.set_tight_layout(self.tight_layout_params)
-        self.fig.set_layout_engine('tight', **self.tight_layout_params)
+        self.canvas:MplPhasesCanvas = MplPhasesCanvas(self.tight_layout_params, dpi+self.dpi_offset)
+        self.canvas.fig.set_layout_engine('tight', **self.tight_layout_params)
         #
         self.phase_temperatures:dict[Rectangle, PhasesData]
         self.tooltip_anno:Annotation|None = None
         self.tooltip_artist:Rectangle|None = None
         #
-        super().__init__(self.fig) # type:ignore[no-untyped-call] # Call to untyped function "__init__" in typed context
         self.ax:Axes|None = None
         self.clear_phases()
-        self.fig.canvas.mpl_connect('motion_notify_event', self.hover)
+        self.canvas.fig.canvas.mpl_connect('motion_notify_event', self.hover)
 
     def update_anno(self, artist:'Rectangle', text:str) -> None:
         if self.tooltip_anno is not None:
@@ -104,7 +109,7 @@ class tphasescanvas(FigureCanvas):
 
     def hover(self, event:'Event') -> None:
         event = cast('MouseEvent', event)
-        an_artist_is_hovered = False
+        an_artist_is_hovered:bool = False
         if self.ax is not None and event.inaxes == self.ax:
             for artist in self.phase_temperatures:
                 contains, _ = artist.contains(event)
@@ -140,23 +145,23 @@ class tphasescanvas(FigureCanvas):
                                         )
                             self.update_anno(artist, text)
                             self.tooltip_anno.set_visible(True)
-                            self.fig.canvas.draw_idle()
+                            self.canvas.fig.canvas.draw_idle()
                         elif self.tooltip_anno is not None:
                             # nothing to show
                             self.tooltip_anno.set_visible(False)
-                            self.fig.canvas.draw_idle()
+                            self.canvas.fig.canvas.draw_idle()
                     break
         if not an_artist_is_hovered and self.tooltip_anno is not None and self.tooltip_anno.get_visible():
             # one wants to hide the annotation only if no artist in the graph is hovered
             self.tooltip_anno.set_visible(False)
             self.tooltip_artist = None
-            self.fig.canvas.draw_idle()
+            self.canvas.fig.canvas.draw_idle()
 
     def clear_phases(self) -> None:
         self.phase_temperatures = {}
         self.tooltip_anno = None
         if self.ax is None:
-            self.ax = self.fig.add_subplot(111, frameon=False)
+            self.ax = self.canvas.fig.add_subplot(111, frameon=False)
         self.ax.clear()
         self.ax.axis('off')
         self.ax.grid(False)
@@ -166,14 +171,14 @@ class tphasescanvas(FigureCanvas):
     def setdpi(self, dpi:int, moveWindow:bool = True) -> None:
         if dpi >= 40:
             try:
-                self.fig.set_dpi((dpi + self.dpi_offset) * self.aw.devicePixelRatio())
+                self.canvas.fig.set_dpi((dpi + self.dpi_offset) * self.aw.devicePixelRatio())
                 if moveWindow:
                     with warnings.catch_warnings():
                         warnings.simplefilter('ignore')
-                        self.fig.canvas.draw()
-#                        self.fig.canvas.update()
+                        self.canvas.fig.canvas.draw()
+#                        self.canvas.fig.canvas.update()
                     FigureCanvas.updateGeometry(self)  #@UndefinedVariable
-                self.aw.scroller.setMaximumHeight(self.sizeHint().height()) # type:ignore[no-untyped-call] # Call to untyped function "sizeHint" in typed context  [no-untyped-call]
+                self.aw.scroller.setMaximumHeight(self.canvas.sizeHint().height()) # type:ignore[no-untyped-call] # Call to untyped function "sizeHint" in typed context  [no-untyped-call]
             except Exception as e:  # pylint: disable=broad-except
                 _log.exception(e)
 
@@ -203,7 +208,7 @@ class tphasescanvas(FigureCanvas):
             self.aw.scroller.setVisible(True)
             # set canvas background color
             background_color = self.aw.qmc.palette['background']
-            self.setStyleSheet(f'background-color: {background_color[:7]}')
+            self.canvas.setStyleSheet(f'background-color: {background_color[:7]}')
             # maximum total roast time of all given profiles
             max_total_time = max(p[1] for p in self.data)
             # set font
@@ -248,13 +253,13 @@ class tphasescanvas(FigureCanvas):
                         prects_patches:list[Rectangle] = rects.patches
                         if len(prects_patches)>4:
                             if len(phases_ror)>1:
-                                self.phase_temperatures[prects_patches[3]] = { # 2nd phase temperatures
+                                self.phase_temperatures[prects_patches[3]] = { # ty:ignore[invalid-assignment] # 2nd phase temperatures
                                         'BT_start_temp': phases_temps[0],
                                         'BT_end_temp': phases_temps[1],
                                         'BT_ROR_start_temp': phases_ror[0],
                                         'BT_ROR_end_temp': phases_ror[1]}
                             if len(phases_ror)>2:
-                                self.phase_temperatures[prects_patches[4]] = { # 3rd phase temperatures
+                                self.phase_temperatures[prects_patches[4]] = { # ty:ignore[invalid-assignment] # 3rd phase temperatures
                                         'BT_start_temp': phases_temps[1],
                                         'BT_end_temp': phases_temps[2],
                                         'BT_ROR_start_temp': phases_ror[1],
@@ -302,7 +307,7 @@ class tphasescanvas(FigureCanvas):
                     rects = self.ax.barh(i, widths, left=starts, height=self.barheight, color=patch_colors)
                     prects_patches = rects.patches
                     if len(prects_patches)>3 and len(phases_ror)>2:
-                        self.phase_temperatures[prects_patches[3]] = { # 3rd phase temperatures
+                        self.phase_temperatures[prects_patches[3]] = { # ty:ignore[invalid-assignment] # 3rd phase temperatures
                                     'BT_start_temp': phases_temps[1],
                                     'BT_end_temp': phases_temps[2],
                                     'BT_ROR_start_temp': phases_ror[1],
@@ -326,8 +331,8 @@ class tphasescanvas(FigureCanvas):
                     i += 1
 
             # set the graph axis limits
-            x,_ = self.fig.get_size_inches()
-            self.fig.set_size_inches(x, (i-1)*0.35 + 0.445, forward=True)
+            x,_ = self.canvas.fig.get_size_inches()
+            self.canvas.fig.set_size_inches(x, (i-1)*0.35 + 0.445, forward=True)
             self.ax.set_ylim((-0.5, i-0.5)) # 0 to number of entries but shifted by one half to get rid of borders
 
 #            # add legend
@@ -340,12 +345,12 @@ class tphasescanvas(FigureCanvas):
 #            self.ax.legend(ncol=len(phases_names),handles=handles, bbox_to_anchor=(0,-0.01,1,0),
 #                  loc='upper center', fontsize='small', shadow=False, frameon=False, fancybox=False, labelcolor=legend_labelcolor)
 
-            self.fig.canvas.draw_idle()
-            self.aw.scroller.setMaximumHeight(self.sizeHint().height()) # type:ignore[no-untyped-call] # Call to untyped function "sizeHint" in typed context  [no-untyped-call]
+            self.canvas.fig.canvas.draw_idle()
+            self.aw.scroller.setMaximumHeight(self.canvas.sizeHint().height()) # type:ignore[no-untyped-call] # Call to untyped function "sizeHint" in typed context  [no-untyped-call]
         else:
             # if no profiles are given we set the canvas height to 0
             QSettings().setValue('MainSplitter',self.aw.splitter.saveState())
             self.ax.set_ylim((0, 0))
-            #self.fig.set_size_inches(0,0, forward=True) # this one crashes numpy on Windows and seems not needed
+            #self.canvas.fig.set_size_inches(0,0, forward=True) # this one crashes numpy on Windows and seems not needed
             self.aw.scroller.setMaximumHeight(0)
             self.aw.scroller.setVisible(False)
