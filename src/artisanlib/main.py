@@ -301,8 +301,8 @@ class Artisan(QtSingleApplication):
                               aw.plus_account is not None and aw.qmc.roastUUID is not None and aw.curFile is not None):
                             plus.sync.getUpdate(aw.qmc.roastUUID, aw.curFile) # sync the loaded profile data if any
 
-                        if aw.schedule_window is not None and aw.plus_account is not None:
-                            # only if scheduler is active and plus connected we update the stock on app raise which triggers a scheduler redraw implicitly
+                        if aw.schedule_window is not None and aw.plus_account is not None and not aw.qmc.flagstart:
+                            # only if not recording, scheduler is active and plus connected we update the stock on app raise which triggers a scheduler redraw implicitly
                             # NOTE the scheduler redraw is also happening if stock was not updated due to the update request time limit
                             plus.stock.update() # stock update (frequency limited by plus/config.py:stock_cache_expiration)
 
@@ -7281,11 +7281,13 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
 
         return result
 
-    # computes the similarity between BT and backgroundBT as well as ET and backgroundET
+    # computes the similarity between BT and backgroundBT as well as ET and backgroundET on raw readings
     # known as CM (idea by Hungary roasting company Casino Mocca)
-    # computes from profile DRY END as set in Phases dialog through DROP
+    # computes from profile DRY END temperature as set in Phases dialog through DROP
     # returns None in case no similarity can be computed
     # refactored to use numpy arrays.
+    # NOTE: the results can differ if foreground and background curves are swapped as the DRY END of the foreground profiles determines the number of readings
+    # to be compared which might differ from that of the background profile
     def curveSimilarity(self) -> tuple[float|None, float|None]: # pylint: disable=no-self-use
         try:
             # if background profile is loaded and both profiles have a DROP event set
@@ -7294,19 +7296,8 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
 #                _log.debug(f"curveSimilarity: {self.qmc.profile_sampling_interval=}")  #pylint: disable=logging-fstring-interpolation
 #                _log.debug(f"curveSimilarity: {self.qmc.background_profile_sampling_interval=}")  #pylint: disable=logging-fstring-interpolation
 
-                # create arrays using smoothed data if available
-                if len(self.qmc.stemp1) == len(self.qmc.temp1):
-                    # take smoothed data if available
-                    np_et = numpy.array(self.qmc.stemp1)
-                else:
-                    np_et = numpy.array(self.qmc.temp1)
-                    _log.debug('curveSimilarity: using non-smoothed ET')
-                if len(self.qmc.stemp2) == len(self.qmc.temp2):
-                    # take smoothed data if available
-                    np_bt = numpy.array(self.qmc.stemp2)
-                else:
-                    np_bt = numpy.array(self.qmc.temp2)
-                    _log.debug('curveSimilarity: using non-smoothed BT')
+                np_et = numpy.array(self.qmc.temp1)
+                np_bt = numpy.array(self.qmc.temp2)
 
                 # CM is based on the Phases Dry not marked Dry
                 # Find the DRY point
@@ -7314,7 +7305,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                 rev_np_bt = np_bt[::-1]
                 # Find TP or if there is not one then find the minimum temp before DROP
                 # Note - CHARGE is not considered
-                len_bt = len(self.qmc.stemp2)
+                len_bt = len(self.qmc.temp2)
                 rev_drop_idx:int = len_bt - self.qmc.timeindex[6]
                 BTlimit = self.qmc.phases[1]
                 if len(rev_np_bt[rev_drop_idx:]) == 0:
@@ -7344,25 +7335,38 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                 # these are not the smoothed background temps, which is how the old CM was done
                 np_etb = numpy.array(self.qmc.temp1B)
                 np_btb = numpy.array(self.qmc.temp2B)
-                np_timeB = numpy.array(self.qmc.timeB) + dropTimeDelta
+                np_timeB = numpy.array(self.qmc.timeB) + dropTimeDelta # shift background times such that they are aligned with foreground profile @ DROP
 
-                # hack to work like OLD method where any temp before timeB[0] is -1
-                np_etb = numpy.insert(np_etb,0,-1)
-                np_btb = numpy.insert(np_btb,0,-1)
-                np_timeB = numpy.insert(np_timeB,0,np_timeB[0]-0.1)
+                # we masked the -1 error values
+                np_etb_masked = numpy.ma.masked_equal(np_etb, -1) # type:ignore[no-untyped-call]
+                np_btb_masked = numpy.ma.masked_equal(np_btb, -1) # type:ignore[no-untyped-call]
+                np_timeB_etb_masked = numpy.ma.masked_array(np_timeB, np_etb_masked.mask) # type:ignore[no-untyped-call] # pylint:disable=no-member
+                np_timeB_btb_masked = numpy.ma.masked_array(np_timeB, np_btb_masked.mask) # type:ignore[no-untyped-call] # pylint:disable=no-member
+                # ignore the masked error values on computing the interpolation and fill (especially on the left) with -1 values
+                interp_np_etb = numpy.interp(np_timex,np_timeB_etb_masked.compressed(),np_etb_masked.compressed(),left=-1,right=-1) # pyright:ignore[reportUnknownArgumentType]  # pylint:disable=no-member
+                interp_np_btb = numpy.interp(np_timex,np_timeB_btb_masked.compressed(),np_btb_masked.compressed(),left=-1,right=-1) # pyright:ignore[reportUnknownArgumentType]  # pylint:disable=no-member
 
-                interp_np_etb = numpy.interp(np_timex,np_timeB,np_etb)
-                interp_np_btb = numpy.interp(np_timex,np_timeB,np_btb)
+                # at his point the background arrays interp_np_etb/interp_np_btb have the same length then their foreground counter parts np_et/np_bt
+                # however, all those errors may contain -1 error values and inf/nan readings. Let's mask them to be ignored in the computation.
 
-                det = numpy.sqrt(numpy.mean(numpy.square(np_et - interp_np_etb)))
-                dbt = numpy.sqrt(numpy.mean(numpy.square(np_bt - interp_np_btb)))
+                # mask the -1 padding resulting from interpolating the background data as well as the inf/nan readings
+                interp_np_etb_masked = numpy.ma.masked_equal(numpy.ma.masked_invalid(interp_np_etb), -1) # type:ignore[no-untyped-call] # mask -1, inf, nan to be ignored
+                interp_np_btb_masked = numpy.ma.masked_equal(numpy.ma.masked_invalid(interp_np_btb), -1) # type:ignore[no-untyped-call] # mask -1, inf, nan to be ignored
 
-                if numpy.isnan(det):
-                    det = None
-                if numpy.isnan(dbt):
-                    dbt = None
+                # mask the -1 error values as well as the inf/nan readings
+                np_et_masked = numpy.ma.masked_equal(numpy.ma.masked_invalid(np_et), -1) # type:ignore[no-untyped-call] # mask -1, inf, nan to be ignored
+                np_bt_masked = numpy.ma.masked_equal(numpy.ma.masked_invalid(np_bt), -1) # type:ignore[no-untyped-call] # mask -1, inf, nan to be ignored
 
-                return det,dbt
+                # all readings that are masked in the one or the other array are ignored and do not contribute in the following
+                RMSE_et = numpy.sqrt(numpy.mean(numpy.square(np_et_masked - interp_np_etb_masked))) # pyright:ignore[reportUnknownArgumentType]
+                RMSE_bt = numpy.sqrt(numpy.mean(numpy.square(np_bt_masked - interp_np_btb_masked))) # pyright:ignore[reportUnknownArgumentType]
+
+                if numpy.isnan(RMSE_et):
+                    RMSE_et = None
+                if numpy.isnan(RMSE_bt):
+                    RMSE_bt = None
+
+                return RMSE_et,RMSE_bt
 
             # no DROP event registered
             return None, None

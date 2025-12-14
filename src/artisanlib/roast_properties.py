@@ -1677,13 +1677,11 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.stockWorker:plus.stock.Worker|None = None
         try:
             if self.aw.plus_account is not None:
-                if plus.controller.is_connected():
-                    self.stockWorker= plus.stock.getWorker()
-                    if self.stockWorker is not None:
-                        self.updateStockSignalConnection = self.stockWorker.updatedSignal.connect(self.populatePlusCoffeeBlendCombos)
-                        QTimer.singleShot(10, plus.stock.update)
-                else: # we are in ON mode, but not connected, we connect which triggers a stock update if successful
-                    plus.controller.connect(interactive=False)
+                self.stockWorker= plus.stock.getWorker()
+                if self.stockWorker is not None:
+                    self.updateStockSignalConnection = self.stockWorker.updatedSignal.connect(self.populatePlusCoffeeBlendCombos)
+                    QTimer.singleShot(10, plus.stock.update)
+
         except Exception as e:  # pylint: disable=broad-except
             _log.exception(e)
         if platform.system() != 'Windows':

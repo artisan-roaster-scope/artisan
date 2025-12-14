@@ -443,3 +443,8 @@ replace_imports_with_any = [
 missing-attribute = false   # does not understand PyQt connect/disconnect methods
 missing-argument = false # pyrefly misinterprets @pyqtSlot() declarations
 bad-argument-type = false # pyrefly misinterprets @pyqtSlot() declarations
+
+
+[tool.zuban]
+files = ["artisanlib/*.py", "plus/*.py"]
+exclude = ['build', 'dist', 'uic', 'misc']

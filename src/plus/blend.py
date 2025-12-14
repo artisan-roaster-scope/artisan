@@ -126,7 +126,7 @@ class CustomBlendDialog(ArtisanDialog):
 
         # configure UI
         self.ui = BlendDialog.Ui_customBlendDialog()
-        self.ui.setupUi(self) # OFF type:ignore[no-untyped-call]
+        self.ui.setupUi(self) # type:ignore[no-untyped-call,unused-ignore]
         self.setWindowTitle(QApplication.translate('Form Caption','Custom Blend'))
         self.ui.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel|QDialogButtonBox.StandardButton.Apply)
         # hack to assign the Apply button the AcceptRole without losing default system translations

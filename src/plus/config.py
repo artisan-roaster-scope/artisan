@@ -59,7 +59,8 @@ notifications_url: Final[str] = api_base_url + '/notifications'
 #verify_ssl: Final[bool] = False
 verify_ssl: Final[bool] = True
 connect_timeout: Final[int] = 6  # in seconds
-read_timeout: Final[int] = 6  # in seconds
+read_timeout: Final[int] = 12  # in seconds
+read_timeout_max: Final[int] = 30  # in seconds
 min_passwd_len: Final[int] = 4
 min_login_len: Final[int] = 6
 compress_posts: Final[bool] = True
@@ -76,7 +77,7 @@ expired_subscription_max_days: Final[int] = 90
 # Cache and queue parameters
 
 # Note: stock_cache_expiration should be larger than schedule_cache_expiration
-stock_cache_expiration: Final[int] = 30   # expiration period in seconds for full stock updates (expensive)
+stock_cache_expiration: Final[int] = 35   # expiration period in seconds for full stock updates (expensive)
 schedule_cache_expiration: Final[int] = 5 # expiration period in seconds for full stock updates only in case the schedule on the server has changed
 
 queue_start_delay: Final[int] = 5  # startup time of queue in seconds

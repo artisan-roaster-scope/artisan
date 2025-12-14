@@ -30,6 +30,7 @@ from plus import config, util, roast, connection, sync, controller
 import threading
 import time
 import datetime
+import requests.models
 import json
 import json.decoder
 import logging
@@ -118,12 +119,12 @@ class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # pyrefly: ig
                         _log.debug(
                             '-> remaining iterations: %s', iters
                         )
-                        r:Any = None
+                        r:requests.models.Response|None = None
                         try:
                             # we upload only full roast records, or partial updates
                             # in case they are under sync
                             # (registered in the sync cache)
-                            if is_full_roast_record(item['data']) or (    # pyrefly: ignore
+                            if is_full_roast_record(item['data']) or (     # pyrefly: ignore
                                 'roast_id' in item['data']                 # pyrefly: ignore
                                 and sync.getSync(item['data']['roast_id']) # pyrefly: ignore
                             ):

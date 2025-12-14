@@ -77,6 +77,9 @@ def start(app_window:'ApplicationWindow') -> None:
 def toggle(app_window:'ApplicationWindow') -> None:
     _log.debug('toggle()')
     config.app_window = app_window
+
+    modifiers = QApplication.keyboardModifiers()
+
     if app_window.plus_account is None:  # @UndefinedVariable
         connect()
         if (
@@ -98,6 +101,11 @@ def toggle(app_window:'ApplicationWindow') -> None:
                 remove_credentials=(modifiers == Qt.KeyboardModifier.ControlModifier),
                 keepON=False,
             )
+    elif is_on() and modifiers != Qt.KeyboardModifier.ControlModifier:
+        # active but not connected (dark grey plus icon)
+        # if modifier is pressed we disconnect, otherwise we try to reconnect
+        # we lost connection, let's try to reconnect
+        connect(clear_on_failure=False, interactive=False) # ensure we are connected (reconnect if needed)
     else:
         disconnect(
             remove_credentials=False,
@@ -362,9 +370,14 @@ def disconnect(
                     )
                 else:
                     aw.sendmessageSignal.emit(
+                        (
+                        QApplication.translate(
+                            'Plus', 'artisan.plus connection lost. Reconnecting automatically...'
+                        )
+                        if keepON else
                         QApplication.translate(
                             'Plus', 'artisan.plus disconnected'
-                        ),
+                        )),
                         True,
                         None,
                     )
@@ -393,6 +406,12 @@ def reconnected() -> None:
             aw.updatePlusStatusSignal.emit()  # @UndefinedVariable
         if is_connected():
             queue.start()  # restart the outbox queue
+            if aw is not None:
+                aw.sendmessageSignal.emit(
+                    QApplication.translate(
+                        'Plus', 'artisan.plus reconnected'),
+                    True,
+                    None)
 
 
 # if plus is ON and synced, computes the sync record hash, updates the

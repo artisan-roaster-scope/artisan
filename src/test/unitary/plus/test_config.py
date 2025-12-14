@@ -331,7 +331,7 @@ class TestConnectionConfigurations:
     def test_read_timeout_setting(self) -> None:
         """Test read timeout setting."""
         # Assert
-        assert config.read_timeout == 6
+        assert config.read_timeout == 12
         assert isinstance(config.read_timeout, int)
         assert config.read_timeout > 0
 
@@ -380,7 +380,7 @@ class TestCacheAndQueueParameters:
     def test_stock_cache_expiration(self) -> None:
         """Test stock cache expiration setting."""
         # Assert
-        assert config.stock_cache_expiration == 30
+        assert config.stock_cache_expiration == 35
         assert isinstance(config.stock_cache_expiration, int)
         assert config.stock_cache_expiration > 0
 

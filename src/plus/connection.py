@@ -35,6 +35,7 @@ import json.decoder
 import logging
 import dateutil.parser
 import requests
+import requests.models
 import requests.exceptions
 
 from plus import config, account, util
@@ -47,6 +48,22 @@ JSON = Any
 token_semaphore = QSemaphore(
     1
 )  # protects access to the session token which is manipulated only here
+
+# request timeout
+
+request_read_timeout_step:Final[int] = 2 # step size to decrease request_read_timeout on success in seconds
+request_read_timeout:int = config.read_timeout # dynamic read_timeout, updated on successful communication and timeouts
+
+def getReadTimeout() -> int:
+    return request_read_timeout
+def updateReadTimeoutOnSuccess() -> None:
+    global request_read_timeout # pylint:disable=global-statement
+    request_read_timeout = max(config.read_timeout, request_read_timeout - request_read_timeout_step)
+def updateReadTimeoutOnTimeout() -> None:
+    global request_read_timeout # pylint:disable=global-statement
+    request_read_timeout = config.read_timeout_max
+
+#
 
 def getToken() -> str|None:
     try:
@@ -376,95 +393,111 @@ def sendData(
     verb: str, # POST or PUT
     authorized: bool = True,
     compress: bool = config.compress_posts,
-) -> Any:
+) -> requests.models.Response:
     # don't log POST data as it might contain credentials!
     _log.debug('sendData(%s,_data_,%s,%s)', url, verb, authorized)
     jsondata = json.dumps(data, indent=None, separators=(',', ':'), ensure_ascii=False).encode('utf8')
     _log.debug('-> size %s', len(jsondata))
 #    _log.debug("PRINT jsondata: %s",jsondata)
     headers, postdata = getHeadersAndData(authorized, compress, jsondata, verb)
-    if verb == 'POST':
-        r = requests.post(
-            url,
-            headers=headers,
-            data=postdata,
-            verify=config.verify_ssl,
-            timeout=(config.connect_timeout, config.read_timeout),
-        )
-    else:
-        r = requests.put(
-            url,
-            headers=headers,
-            data=postdata,
-            verify=config.verify_ssl,
-            timeout=(config.connect_timeout, config.read_timeout),
-        )
-    _log.debug('-> status %s, time %s', r.status_code, r.elapsed.total_seconds())
-    if authorized and r.status_code == 401:  # authorisation failed
-        _log.debug('-> session token outdated (401)')
-        # we re-authentify by renewing the session token and try again
-        if authentify():
-            time.sleep(0.3) # a little delay not to stress out the server too much
-            headers, postdata = getHeadersAndData(
-                authorized, compress, jsondata, verb
-            )  # recreate header with new token
-            if verb == 'POST':
-                r = requests.post(
-                    url,
-                    headers=headers,
-                    data=postdata,
-                    verify=config.verify_ssl,
-                    timeout=(config.connect_timeout, config.read_timeout),
-                )
-            else:
-                r = requests.put(
-                    url,
-                    headers=headers,
-                    data=postdata,
-                    verify=config.verify_ssl,
-                    timeout=(config.connect_timeout, config.read_timeout),
-                )
-            _log.debug('-> status %s, time %s', r.status_code, r.elapsed.total_seconds())
-    return r
+
+    try:
+        if verb == 'POST':
+            r = requests.post(
+                url,
+                headers=headers,
+                data=postdata,
+                verify=config.verify_ssl,
+                timeout=(config.connect_timeout, getReadTimeout()),
+            )
+        else:
+            r = requests.put(
+                url,
+                headers=headers,
+                data=postdata,
+                verify=config.verify_ssl,
+                timeout=(config.connect_timeout, getReadTimeout()),
+            )
+        updateReadTimeoutOnSuccess()
+        _log.debug('-> status %s, time %s', r.status_code, r.elapsed.total_seconds())
+        if authorized and r.status_code == 401:  # authorisation failed
+            _log.debug('-> session token outdated (401)')
+            # we re-authentify by renewing the session token and try again
+            if authentify():
+                time.sleep(0.3) # a little delay not to stress out the server too much
+                headers, postdata = getHeadersAndData(
+                    authorized, compress, jsondata, verb
+                )  # recreate header with new token
+                if verb == 'POST':
+                    r = requests.post(
+                        url,
+                        headers=headers,
+                        data=postdata,
+                        verify=config.verify_ssl,
+                        timeout=(config.connect_timeout, getReadTimeout()),
+                    )
+                else:
+                    r = requests.put(
+                        url,
+                        headers=headers,
+                        data=postdata,
+                        verify=config.verify_ssl,
+                        timeout=(config.connect_timeout, getReadTimeout()),
+                    )
+                updateReadTimeoutOnSuccess()
+                _log.debug('on retry: -> status %s, time %s', r.status_code, r.elapsed.total_seconds())
+        return r
+    except requests.exceptions.Timeout as e:
+        _log.error(e)
+        updateReadTimeoutOnTimeout()
+        raise e
 
 
-def getData(url: str, authorized: bool = True, params:dict[str,str]|None = None) -> Any:
+def getData(url: str, authorized: bool = True, params:dict[str,str]|None = None) -> requests.models.Response|None:
     _log.debug('getData(%s,%s,%s)', url, authorized, params)
     headers = getHeaders(authorized)
     params = params or {}
     #    _log.debug("-> request headers %s",headers)
-    r = requests.get(
-        url,
-        headers=headers,
-        verify=config.verify_ssl,
-        params=params,
-        timeout=(config.connect_timeout, config.read_timeout),
-    )
-    _log.debug('-> status %s', r.status_code)
-    # _log.debug("-> headers %s",r.headers)
-    _log.debug('-> time %s', r.elapsed.total_seconds())
-    if authorized and r.status_code == 401:  # authorisation failed
-        _log.debug(
-            '-> session token outdated (404) - re-authentify'
-        )
-        # we re-authentify by renewing the session token and try again
-        authentify()
-        headers = getHeaders(authorized)  # recreate header with new token
-        r = requests.get(
+    try:
+        r:requests.models.Response = requests.get(
             url,
             headers=headers,
             verify=config.verify_ssl,
             params=params,
-            timeout=(config.connect_timeout, config.read_timeout),
+            timeout=(config.connect_timeout, getReadTimeout()),
         )
+        updateReadTimeoutOnSuccess()
         _log.debug('-> status %s', r.status_code)
-        #        _log.debug("-> headers %s",r.headers)
-        _log.debug(
-            '-> time %s', r.elapsed.total_seconds()
-        )
-    try:
-        _log.debug('-> size %s', len(r.content))
-#        _log.debug("-> data %s",r.json())
-    except Exception:  # pylint: disable=broad-except
-        pass
-    return r
+        # _log.debug("-> headers %s",r.headers)
+        _log.debug('-> time %s', r.elapsed.total_seconds())
+        if authorized and r.status_code == 401:  # authorisation failed
+            _log.debug(
+                '-> session token outdated (404) - re-authentify'
+            )
+            # we re-authentify by renewing the session token and try again
+            if authentify():
+                time.sleep(0.3) # a little delay not to stress out the server too much
+                headers = getHeaders(authorized)  # recreate header with new token
+                r = requests.get(
+                    url,
+                    headers=headers,
+                    verify=config.verify_ssl,
+                    params=params,
+                    timeout=(config.connect_timeout, getReadTimeout()),
+                )
+                updateReadTimeoutOnSuccess()
+                _log.debug('-> status %s', r.status_code)
+                #        _log.debug("-> headers %s",r.headers)
+                _log.debug(
+                    'on retry: -> time %s', r.elapsed.total_seconds()
+                )
+        try:
+            _log.debug('-> size %s', len(r.content))
+    #        _log.debug("-> data %s",r.json())
+        except Exception:  # pylint: disable=broad-except
+            pass
+        return r
+    except requests.exceptions.Timeout as e:
+        _log.error(e)
+        updateReadTimeoutOnTimeout()
+        return None

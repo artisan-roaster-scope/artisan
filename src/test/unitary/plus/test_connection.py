@@ -748,7 +748,7 @@ class TestSendData:
             mock_post.assert_called_once()
             call_args = mock_post.call_args
             assert call_args[1]['verify'] is True
-            assert call_args[1]['timeout'] == (6, 6)
+            assert call_args[1]['timeout'] == (6, 12)
 
     def test_send_data_put_success(self, mock_response: Mock) -> None:
         """Test sendData with successful PUT request."""

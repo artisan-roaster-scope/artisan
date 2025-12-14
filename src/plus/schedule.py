@@ -3142,25 +3142,28 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         item:CompletedItem|None = next((ci for ci in self.completed_items if ci.roastUUID.hex == uuid), None)
         if item is not None:
             try:
-                changes:dict[str, Any] = {
-                    'end_weight': weight,
-                    'roast_id': item.roastUUID.hex,
-                    'modified_at': epoch2ISO8601(time.time())}
-                plus.controller.connect(clear_on_failure=False, interactive=False)
-                r = plus.connection.sendData(plus.config.roast_url, changes, 'POST')
-                r.raise_for_status()
-                # update successfully transmitted, we now also add/update the CompletedItem linked to self.selected_completed_item
-                item.update_completed_item(self.aw, changes)
-                item.measured = True
-                # if previous selected roast is loaded we write the changes to its roast properties
-                if item.roastUUID.hex == self.aw.qmc.roastUUID:
-                    self.updates_roast_properties_from_completed(item)
-                # we update the completed_roasts_cache entry
-                completed_item_dict = item.model_dump(mode='json')
-                if 'prefix' in completed_item_dict:
-                    del completed_item_dict['prefix']
-                add_completed(self.aw.plus_account_id, cast(CompletedItemDict, completed_item_dict))
-                self.updateRoastedItems() # updates widgets
+                if not plus.config.connected and self.aw.plus_account is not None:
+                    # we lost connection, let's try to reconnect
+                    plus.controller.connect(clear_on_failure=False, interactive=False) # ensure we are connected (reconnect if needed)
+                if plus.config.connected:
+                    changes:dict[str, Any] = {
+                        'end_weight': weight,
+                        'roast_id': item.roastUUID.hex,
+                        'modified_at': epoch2ISO8601(time.time())}
+                    r = plus.connection.sendData(plus.config.roast_url, changes, 'POST')
+                    r.raise_for_status()
+                    # update successfully transmitted, we now also add/update the CompletedItem linked to self.selected_completed_item
+                    item.update_completed_item(self.aw, changes)
+                    item.measured = True
+                    # if previous selected roast is loaded we write the changes to its roast properties
+                    if item.roastUUID.hex == self.aw.qmc.roastUUID:
+                        self.updates_roast_properties_from_completed(item)
+                    # we update the completed_roasts_cache entry
+                    completed_item_dict = item.model_dump(mode='json')
+                    if 'prefix' in completed_item_dict:
+                        del completed_item_dict['prefix']
+                    add_completed(self.aw.plus_account_id, cast(CompletedItemDict, completed_item_dict))
+                    self.updateRoastedItems() # updates widgets
             except Exception as e:  # pylint: disable=broad-except
                 # updating data to server failed
                 _log.error(e)

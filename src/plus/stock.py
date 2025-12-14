@@ -29,6 +29,8 @@ import json
 import time
 import datetime
 import html
+import requests
+import requests.models
 import logging
 import functools
 
@@ -40,6 +42,10 @@ from typing import Final, TypedDict, TextIO, NotRequired # ty:ignore
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
+
+fetch_semaphore = QSemaphore(
+    1
+)  # to avoid stacking of startSignals from update()/update_schedule() while fetch() is already communicating
 
 stock_semaphore = QSemaphore(
     1
@@ -199,11 +205,8 @@ class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # pyrefly: ig
         try:
             stock_semaphore.acquire(1)
             aw = config.app_window
-            if not config.connected and aw is not None and aw.plus_account is not None:
-                # we lost connection, let's try to reconnect
-                controller.connect(clear_on_failure=False, interactive=False) # ensure we are connected (reconnect if needed)
 
-            if config.connected:
+            if config.connected or (aw is not None and aw.plus_account is not None): # we lost connect, but we try to reconnect by sending our request
                 # seconds_since_last_stock_update is None if no stock with a proper timestamp was ever retrieved
                 seconds_since_last_stock_update:float|None = (None if (stock is None or 'retrieved' not in stock) else time.time() - stock['retrieved'])
 
@@ -226,52 +229,61 @@ class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # pyrefly: ig
             _log.debug('-> stock valid')
             self.upToDateSignal.emit()
 
+
     # requests stock data from server and fills the stock cache
     # lsrt holds the serverTime of the last stock received if server should only send a stock update if the schedule has been changed since than
     # if lsrt is None, the server returns the current stock in any case.
     def fetch(self, lsrt:float|None) -> bool:
         global stock  # pylint: disable=global-statement, global-variable-not-assigned # noqa: PLW0602
         _log.debug('fetch()')
+        d:requests.models.Response|None = None
         try:
+            fetch_semaphore.acquire(1)
             # fetch from server (send along the current date to have the server filter the schedule correctly for the local timezone)
             request:str = f'{config.stock_url}?today={datetime.datetime.now().astimezone().date()}'
             if lsrt is not None:
                 request = f'{request}&lsrt={lsrt}'
             d = connection.getData(request)
-            _log.debug('-> %s', d.status_code)
-            if d.status_code != 204 and d.headers['content-type'].strip().startswith('application/json'):
-                j = d.json()
-                if j:
-                    rlimit,rused,pu,notifications,machines = util.extractAccountState(j)
-                    self.replySignal.emit(rlimit,rused,pu,notifications,machines)
-                if 'success' in j and j['success'] and 'result' in j and j['result'] is not None:
-                    setStock(j['result'])
-                    if stock is not None:
+            if d is not None:
+                _log.debug('-> %s', d.status_code)
+                if d.status_code != 204 and d.headers['content-type'].strip().startswith('application/json'):
+                    j = d.json()
+                    if j:
+                        rlimit,rused,pu,notifications,machines = util.extractAccountState(j)
+                        self.replySignal.emit(rlimit,rused,pu,notifications,machines)
+                    if 'success' in j and j['success'] and 'result' in j and j['result'] is not None:
+                        setStock(j['result'])
+                        if stock is not None:
+                            try:
+                                stock_semaphore.acquire(1)
+                                stock['retrieved'] = time.time() # ty: ignore[non-subscriptable]
+                            finally:
+                                if stock_semaphore.available() < 1:
+                                    stock_semaphore.release(1)
+                        _log.debug('-> retrieved')
+#                        _log.debug("stock = %s", stock)
+                        controller.reconnected() # update the connection status
+                        return True
+                elif d.status_code == 204:
+                    _log.error('204: empty response on fetching stock')
+                    if lsrt is not None and stock is not None:
                         try:
                             stock_semaphore.acquire(1)
                             stock['retrieved'] = time.time() # ty: ignore[non-subscriptable]
+                            _log.debug('-> retrieved time updated')
                         finally:
                             if stock_semaphore.available() < 1:
                                 stock_semaphore.release(1)
-                    _log.debug('-> retrieved')
-#                    _log.debug("stock = %s", stock)
-                    controller.reconnected()
-                    return True
-            elif d.status_code == 204:
-                _log.error('204: empty response on fetching stock')
-                if lsrt is not None and stock is not None:
-                    try:
-                        stock_semaphore.acquire(1)
-                        stock['retrieved'] = time.time() # ty: ignore[non-subscriptable]
-                        _log.debug('-> retrieved time updated')
-                    finally:
-                        if stock_semaphore.available() < 1:
-                            stock_semaphore.release(1)
-            return False
+                    controller.reconnected() # update the connection status
+                return False
         except Exception as e:  # pylint: disable=broad-except
             _log.error(e)
+        finally:
+            if fetch_semaphore.available() < 1:
+                fetch_semaphore.release(1)
+        if d is None: # communication errors like timeouts
             controller.disconnect(remove_credentials=False, stop_queue=False)
-            return False
+        return False
 
 
 def getWorker() -> 'Worker|None':
@@ -291,15 +303,25 @@ def getWorker() -> 'Worker|None':
         _log.exception(e)
     return None
 
+
+# NOTE ON update() and update_schedule(): as both send signals to the work and the worker is communicating synchronously with the server,
+#   hanging requests block the event loop which keeps those startSignal requests stacking up and being processed once the hanging communication completed
+#   to prevent this stacking a fetch_semaphore which is hold during fetch() and if this is not available, the update()/update_scheudule() calls are discarded
+
 # update stock if config.stock_cache_expiration is expired
 def update() -> None:
     _log.debug('update()')
-    try:
-        getWorker()
-        if worker is not None:
-            worker.startSignal.emit(False)
-    except Exception as e:  # pylint: disable=broad-except
-        _log.exception(e)
+    gotlock = fetch_semaphore.tryAcquire(1)
+    if gotlock:
+        try:
+            getWorker()
+            if worker is not None:
+                worker.startSignal.emit(False)
+        except Exception as e:  # pylint: disable=broad-except
+            _log.exception(e)
+        finally:
+            if fetch_semaphore.available() < 1:
+                fetch_semaphore.release(1)
 
 # update stock if config.schedule_cache_expiration (<config.stock_cache_expiration) and the schedule on the server has changed (by sending the
 # 'lsrt' (last schedule retrieved time) parameter along.
@@ -307,12 +329,17 @@ def update() -> None:
 # That way the server has less unnecessary work to do as collecting stock data is rather expensive
 def update_schedule() -> None:
     _log.debug('update_schedule()')
-    try:
-        getWorker()
-        if worker is not None:
-            worker.startSignal.emit(True)
-    except Exception as e:  # pylint: disable=broad-except
-        _log.exception(e)
+    gotlock = fetch_semaphore.tryAcquire(1)
+    if gotlock:
+        try:
+            getWorker()
+            if worker is not None:
+                worker.startSignal.emit(True)
+        except Exception as e:  # pylint: disable=broad-except
+            _log.exception(e)
+        finally:
+            if fetch_semaphore.available() < 1:
+                fetch_semaphore.release(1)
 
 
 ###################
@@ -689,7 +716,9 @@ def coffeeLabel(c:Coffee) -> str:
                 'picked' in cy
                 and len(cy['picked']) > 0
             ):
-                origin += f" {cy['picked'][0]:d}"
+                if origin != '':
+                    origin += ' '
+                origin += f"{cy['picked'][0]:d}"
     except Exception as e:  # pylint: disable=broad-except
         _log.exception(e)
     if origin == '':
