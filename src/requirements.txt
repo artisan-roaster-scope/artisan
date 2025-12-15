@@ -101,4 +101,4 @@ build==1.3.0; platform_system=='Windows'
 pywin32==311; platform_system=='Windows'
 pyinstaller-versionfile==3.0.1; platform_system=='Windows'
 #libusb-package==1.0.26.3; platform_system=='Windows'  # temp removed for Py 3.14, monkey patched into .appveyor.yml until a Py3.14 wheel is available on pypi
-tzdata==2025.2; platform_system=='Windows' # to prevent pyinstaller WARNING: Hidden import "tzdata" not found!
+tzdata==2025.3; platform_system=='Windows' # to prevent pyinstaller WARNING: Hidden import "tzdata" not found!
