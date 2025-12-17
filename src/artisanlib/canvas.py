@@ -14486,9 +14486,8 @@ class tgraphcanvas(QObject):
                         self.autoDRYenabled = False
                         self.timeindex[1] = 0
                         removed = True
-                        st = stringfromseconds(self.timex[self.timeindex[1]]-start,False)
-                        DE_str = self.aw.arabicReshape(QApplication.translate('Scope Annotation','DE {0}').format(st))
-                        if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == DE_str:
+                        st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','DE {0}').format(0)).rstrip('0')
+                        if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text().startswith(st1):
                             self.ystep_down, self.ystep_up = 0, 0
                             try:
                                 self.l_annotations[-1].remove()
@@ -14602,8 +14601,8 @@ class tgraphcanvas(QObject):
                         self.autoFCsenabled = False
                         self.timeindex[2] = 0
                         removed = True
-                        st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','FCs {0}').format(stringfromseconds(self.timex[self.timeindex[2]]-start,False)))
-                        if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
+                        st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','FCs {0}').format(0)).rstrip('0')
+                        if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text().startswith(st1):
                             self.ystep_down, self.ystep_up = 0, 0
                             try:
                                 self.l_annotations[-1].remove()
@@ -14710,11 +14709,12 @@ class tgraphcanvas(QObject):
                     else:
                         start = 0
                     if self.aw.buttonFCe.isFlat() and self.timeindex[3] > 0:
+                        _log.debug('PRINT FCe UNDO')
                         # undo wrongly set FCe
                         self.timeindex[3] = 0
                         removed = True
-                        st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','FCe {0}').format(stringfromseconds(self.timex[self.timeindex[3]]-start,False)))
-                        if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
+                        st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','FCe {0}').format(0)).rstrip('0')
+                        if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text().startswith(st1):
                             self.ystep_down, self.ystep_up = 0, 0
                             try:
                                 self.l_annotations[-1].remove()
@@ -14750,6 +14750,7 @@ class tgraphcanvas(QObject):
                                 else:
                                     self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,temp,temp,d)
                                 time_temp_annos = self.annotate(temp,st1,self.timex[self.timeindex[3]],temp,self.ystep_up,self.ystep_down,draggable_anno_key=3)
+                                _log.debug('PRINT time_temp_annos: %s',time_temp_annos)
                                 if time_temp_annos is not None:
                                     self.l_annotations += time_temp_annos
                                 if self.alignEvent not in {3, 7}: # in this case the updateBackground is triggered by the redraw of timealign below
@@ -14821,11 +14822,11 @@ class tgraphcanvas(QObject):
                     else:
                         start = 0
                     if self.aw.buttonSCs.isFlat() and self.timeindex[4] > 0:
-                        # undo wrongly set FCs
-                        st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','SCs {0}').format(stringfromseconds(self.timex[self.timeindex[4]]-start,False)))
+                        # undo wrongly set SCs
                         self.timeindex[4] = 0
                         removed = True
-                        if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
+                        st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','SCs {0}').format(0)).rstrip('0')
+                        if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text().startswith(st1):
                             self.ystep_down, self.ystep_up = 0, 0
                             try:
                                 self.l_annotations[-1].remove()
@@ -14937,10 +14938,10 @@ class tgraphcanvas(QObject):
                     else:
                         start = 0
                     if self.aw.buttonSCe.isFlat() and self.timeindex[5] > 0:
-                        # undo wrongly set FCs
+                        # undo wrongly set SCe
                         self.timeindex[5] = 0
                         removed = True
-                        st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','SCe {0}').format(stringfromseconds(self.timex[self.timeindex[5]]-start,False)))
+                        st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','SCe {0}').format(0)).rstrip('0')
                         if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
                             self.ystep_down, self.ystep_up = 0, 0
                             try:
@@ -15060,8 +15061,8 @@ class tgraphcanvas(QObject):
                         #decrease BatchCounter again
                         self.decBatchCounter()
                         removed = True
-                        st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','DROP {0}').format(stringfromseconds(self.timex[self.timeindex[6]]-start,False)))
-                        if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
+                        st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','DROP {0}').format(0)).rstrip('0')
+                        if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text().startswith(st1):
                             self.ystep_down, self.ystep_up = 0, 0
                             try:
                                 self.l_annotations[-1].remove()
@@ -15252,10 +15253,8 @@ class tgraphcanvas(QObject):
                         # undo wrongly set COOL
                         self.timeindex[7] = 0
                         removed = True
-
-                        st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','CE {0}').format(stringfromseconds(self.timex[self.timeindex[7]] - start)))
-
-                        if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
+                        st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','CE {0}').format(0)).rstrip('0')
+                        if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text().startswith(st1):
                             self.ystep_down, self.ystep_up = 0, 0
                             try:
                                 self.l_annotations[-1].remove()

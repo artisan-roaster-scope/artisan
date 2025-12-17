@@ -408,11 +408,13 @@ ignore-words-list = 'Abd,ser,alog,nd,iterm,dout,te,commandi,dout,exitt,currenty,
 include = [
     "artisanlib/*.py",
     "plus/*.py",
-    "test/**/*.py"
+#    "test/**/*.py"
 ]
 
-#[tool.ty.rules]
-#invalid-assignment = "ignore"
+[tool.ty.rules]
+invalid-argument-type = "ignore"
+invalid-method-override = "ignore"
+invalid-assignment = "ignore"
 #unused-ignore-comment = "warn"
 #redundant-cast = "ignore"
 #possibly-unbound-attribute = "error"

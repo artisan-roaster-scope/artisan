@@ -44,6 +44,7 @@ import functools
 import dateutil.parser
 import copy as copyd
 import arabic_reshaper # type:ignore[import-untyped]
+from enum import IntEnum
 from pathlib import Path
 from bidi import get_display # type:ignore[import-untyped] # newer rust based implementation of the above Python implementation
 
@@ -110,7 +111,7 @@ from PyQt6.QtWidgets import (QApplication, QWidget, QMessageBox, QLabel, QMainWi
                          QLCDNumber, QSpinBox, QComboBox,
                          QSlider,
                          QColorDialog, QFrame, QScrollArea, QProgressDialog,
-                         QStyleFactory, QMenu, QLayout, QDockWidget)
+                         QStyleFactory, QMenuBar, QMenu, QLayout, QDockWidget)
 from PyQt6.QtGui import (QScreen, QPageLayout, QAction, QImageReader, QWindow,
                             QKeySequence, QShortcut,
                             QPixmap,QColor,QDesktopServices,QIcon,
@@ -1381,6 +1382,10 @@ class MenuShortCutsDisabled:
 #################### MAIN APPLICATION WINDOW ###########################################
 ########################################################################################
 
+class UI_MODE(IntEnum):
+    EXPERT = 1
+    DEFAULT = 2
+    PRODUCTION = 3
 
 # NOTE: to have pylint to verify proper __slot__ definitions with pylint one has to remove the super class QMainWindow here temporarily
 #   as this class does not has __slot__ definitions and thus __dict__ is contained which suppresses the warnings
@@ -1507,7 +1512,9 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         'bbp_begin_to_bottom_ror', 'bbp_bottom_to_charge_ror', 'bbp_time_added_from_prev', 'bbp_begin', 'bbp_endroast_epoch_msec', 'bbp_endevents',
         'bbp_dropevents', 'bbp_dropbt', 'bbp_dropet', 'bbp_drop_to_end', 'schedule_day_filter', 'schedule_user_filter', 'schedule_machine_filter',
         'schedule_visible_filter', 'scheduler_tasks_visible', 'scheduler_completed_details_visible', 'scheduler_filters_visible', 'scheduler_auto_open',
-        'main_menu_actions_with_shortcuts' ]
+        'main_menu_actions_with_shortcuts', 'ui_mode', 'UIModeMenu',  'productionModeAction', 'defaultModeAction', 'expertModeAction', 'calculatorAction',
+        'helpAboutAction', 'checkUpdateAction', 'errorAction', 'messageAction', 'serialAction', 'platformAction', 'aboutQtAction',
+        'helpDocumentationAction', 'KshortCAction' ]
 
     nLCDS: Final[int] = 10 # maximum number of LCDs and extra devices (2x10 => 20 in total!)
 
@@ -1520,6 +1527,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         self.locale_str:str = locale
         self.app:Artisan = app
         self.superusermode:bool = False
+        self.ui_mode:UI_MODE = UI_MODE.DEFAULT
 
         self.sample_loop_running:bool = True
         self.time_stopped:float = 0
@@ -2013,7 +2021,6 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         _mac_about = QApplication.translate('MAC_APPLICATION_MENU', 'About {0}')
 
         # the & adds a short cut automatically
-        menuBar = self.menuBar()
         self.fileMenu: QMenu|None = None
         self.editMenu: QMenu|None = None
         self.RoastMenu: QMenu|None = None
@@ -2022,547 +2029,536 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         self.viewMenu: QMenu|None = None
         self.helpMenu: QMenu|None = None
 
-        if menuBar is not None:
-            self.fileMenu = menuBar.addMenu('&' + QApplication.translate('Menu', 'File'))
-            self.editMenu = menuBar.addMenu('&' + QApplication.translate('Menu', 'Edit'))
-            self.RoastMenu = menuBar.addMenu('&' + QApplication.translate('Menu', 'Roast'))
-            self.ConfMenu = menuBar.addMenu('&' + QApplication.translate('Menu', 'Config'))
-            self.ToolkitMenu = menuBar.addMenu('&' + QApplication.translate('Menu', 'Tools'))
-            self.viewMenu = menuBar.addMenu('&' + QApplication.translate('Menu', 'View'))
-            self.helpMenu = menuBar.addMenu('&' + QApplication.translate('Menu', 'Help'))
+#        if menuBar is not None:
+#            self.fileMenu = menuBar.addMenu('&' + QApplication.translate('Menu', 'File'))
+#            self.editMenu = menuBar.addMenu('&' + QApplication.translate('Menu', 'Edit'))
+#            self.RoastMenu = menuBar.addMenu('&' + QApplication.translate('Menu', 'Roast'))
+#            self.ConfMenu = menuBar.addMenu('&' + QApplication.translate('Menu', 'Config'))
+#            self.ToolkitMenu = menuBar.addMenu('&' + QApplication.translate('Menu', 'Tools'))
+#            self.viewMenu = menuBar.addMenu('&' + QApplication.translate('Menu', 'View'))
+#            self.helpMenu = menuBar.addMenu('&' + QApplication.translate('Menu', 'Help'))
 
         # initialize the variables holding QActions with shortcuts
         self.fullscreenAction:QAction|None = None
         self.newRoastAction:QAction|None = None
 
         #FILE menu
-        if self.fileMenu is not None:
-            self.newRoastMenu: QMenu|None = self.fileMenu.addMenu(QApplication.translate('Menu', 'New'))
-
-            self.fileLoadAction = QAction(QApplication.translate('Menu', 'Open...'),self)
-            self.fileLoadAction.setMenuRole(QAction.MenuRole.NoRole)
-            self.fileLoadAction.setShortcut(QKeySequence.StandardKey.Open)
-            self.fileLoadAction.triggered.connect(self.fileLoad)
-            self.fileMenu.addAction(self.fileLoadAction)
-
-            self.openRecentMenu = self.fileMenu.addMenu(QApplication.translate('Menu', 'Open Recent'))
-            if self.openRecentMenu is not None:
-                orm_action = self.openRecentMenu.menuAction()
-                if orm_action is not None:
-                    orm_action.setMenuRole(QAction.MenuRole.NoRole)
-            if self.openRecentMenu is not None:
-                for i in range(self.MaxRecentFiles):
-                    self.openRecentMenu.addAction(self.recentFileActs[i])
-                self.updateRecentFileActions()
-
-            self.importMenu: QMenu|None = self.fileMenu.addMenu(QApplication.translate('Menu', 'Import'))
-            if self.importMenu is not None:
-                urlImportAction = QAction('Artisan URL...', self)
-                urlImportAction.triggered.connect(self.urlImport)
-                self.importMenu.addAction(urlImportAction)
-
-                fileImportCSVAction = QAction('Artisan CSV...', self)
-                fileImportCSVAction.triggered.connect(self.fileImportCSV)
-                self.importMenu.addAction(fileImportCSVAction)
-
-                fileImportJSONAction = QAction('Artisan JSON...', self)
-                fileImportJSONAction.triggered.connect(self.fileImportJSON)
-                self.importMenu.addAction(fileImportJSONAction)
-
-                self.importMenu.addSeparator()
-
-                importBulletAction = QAction('Aillio RoasTime...', self)
-#                importBulletAction.triggered.connect(self.importBullet)
-                self.importMenu.addAction(importBulletAction)
-                importBulletAction.setEnabled(False)
-
-                importBulletAction = QAction('Aillio Roast.World URL...', self)
-#                importBulletAction.triggered.connect(self.importBulletURL)
-                self.importMenu.addAction(importBulletAction)
-                importBulletAction.setEnabled(False)
-
-                importCropsterAction = QAction('Cropster XLS...', self)
-                importCropsterAction.triggered.connect(self.importCropster)
-                self.importMenu.addAction(importCropsterAction)
-
-                importGiesenAction = QAction('Giesen CSV...', self)
-                importGiesenAction.triggered.connect(self.importGiesen)
-                self.importMenu.addAction(importGiesenAction)
-
-                importHH506RAAction = QAction('HH506RA...', self)
-                importHH506RAAction.triggered.connect(self.importHH506RA)
-                self.importMenu.addAction(importHH506RAAction)
-
-                importHiBeanAction = QAction('HiBean JSON...', self)
-                importHiBeanAction.triggered.connect(self.importHiBean)
-                self.importMenu.addAction(importHiBeanAction)
-
-                importIkawaURLAction = QAction('IKAWA URL...', self)
-                importIkawaURLAction.triggered.connect(self.importIkawaURL)
-                self.importMenu.addAction(importIkawaURLAction)
-
-                importIkawaAction = QAction('IKAWA CSV...', self)
-                importIkawaAction.triggered.connect(self.importIkawa)
-                self.importMenu.addAction(importIkawaAction)
-
-                importK202Action = QAction('K202...', self)
-                importK202Action.triggered.connect(self.importK202)
-                self.importMenu.addAction(importK202Action)
-
-                importK204Action = QAction('K204...', self)
-                importK204Action.triggered.connect(self.importK204)
-                self.importMenu.addAction(importK204Action)
-
-                importLoringAction = QAction('Loring CSV...', self)
-                importLoringAction.triggered.connect(self.importLoring)
-                self.importMenu.addAction(importLoringAction)
-
-                importPetronciniAction = QAction('Petroncini CSV...', self)
-                importPetronciniAction.triggered.connect(self.importPetroncini)
-                self.importMenu.addAction(importPetronciniAction)
-
-                importROESTAction = QAction('ROEST CSV...', self)
-                importROESTAction.triggered.connect(self.importRoest)
-                self.importMenu.addAction(importROESTAction)
-
-                importRubasseAction = QAction('Rubasse CSV...', self)
-                importRubasseAction.triggered.connect(self.importRubasse)
-                self.importMenu.addAction(importRubasseAction)
-
-                importPilotAction = QAction('Probat Pilot...', self)
-                importPilotAction.triggered.connect(self.importPilot)
-                self.importMenu.addAction(importPilotAction)
-
-                fileImportRoastLoggerAction = QAction('RoastLogger...', self)
-                fileImportRoastLoggerAction.triggered.connect(self.fileImportRoastLogger)
-                self.importMenu.addAction(fileImportRoastLoggerAction)
-
-                importRoastLogAction = QAction('RoastLog URL...',self)
-                importRoastLogAction.triggered.connect(self.importRoastLog)
-                self.importMenu.addAction(importRoastLogAction)
+        self.newRoastMenu:QMenu = QMenu(QApplication.translate('Menu', 'New'))
+
+        self.fileLoadAction = QAction(QApplication.translate('Menu', 'Open...'),self)
+        self.fileLoadAction.setMenuRole(QAction.MenuRole.NoRole)
+        self.fileLoadAction.setShortcut(QKeySequence.StandardKey.Open)
+        self.fileLoadAction.triggered.connect(self.fileLoad)
+##        self.fileMenu.addAction(self.fileLoadAction)
+
+        self.openRecentMenu = QMenu(QApplication.translate('Menu', 'Open Recent'))
+        orm_action = self.openRecentMenu.menuAction()
+        if orm_action is not None:
+            orm_action.setMenuRole(QAction.MenuRole.NoRole)
+        for i in range(self.MaxRecentFiles):
+            self.openRecentMenu.addAction(self.recentFileActs[i])
+        self.updateRecentFileActions()
+
+        self.importMenu:QMenu = QMenu(QApplication.translate('Menu', 'Import'))
+        urlImportAction = QAction('Artisan URL...', self)
+        urlImportAction.triggered.connect(self.urlImport)
+        self.importMenu.addAction(urlImportAction)
+
+        fileImportCSVAction = QAction('Artisan CSV...', self)
+        fileImportCSVAction.triggered.connect(self.fileImportCSV)
+        self.importMenu.addAction(fileImportCSVAction)
+
+        fileImportJSONAction = QAction('Artisan JSON...', self)
+        fileImportJSONAction.triggered.connect(self.fileImportJSON)
+        self.importMenu.addAction(fileImportJSONAction)
+
+        self.importMenu.addSeparator()
+
+        importBulletAction = QAction('Aillio RoasTime...', self)
+        #importBulletAction.triggered.connect(self.importBullet)
+        self.importMenu.addAction(importBulletAction)
+        importBulletAction.setEnabled(False)
+
+        importBulletAction = QAction('Aillio Roast.World URL...', self)
+        #importBulletAction.triggered.connect(self.importBulletURL)
+        self.importMenu.addAction(importBulletAction)
+        importBulletAction.setEnabled(False)
+
+        importCropsterAction = QAction('Cropster XLS...', self)
+        importCropsterAction.triggered.connect(self.importCropster)
+        self.importMenu.addAction(importCropsterAction)
+
+        importGiesenAction = QAction('Giesen CSV...', self)
+        importGiesenAction.triggered.connect(self.importGiesen)
+        self.importMenu.addAction(importGiesenAction)
+
+        importHH506RAAction = QAction('HH506RA...', self)
+        importHH506RAAction.triggered.connect(self.importHH506RA)
+        self.importMenu.addAction(importHH506RAAction)
+
+        importHiBeanAction = QAction('HiBean JSON...', self)
+        importHiBeanAction.triggered.connect(self.importHiBean)
+        self.importMenu.addAction(importHiBeanAction)
+
+        importIkawaURLAction = QAction('IKAWA URL...', self)
+        importIkawaURLAction.triggered.connect(self.importIkawaURL)
+        self.importMenu.addAction(importIkawaURLAction)
+
+        importIkawaAction = QAction('IKAWA CSV...', self)
+        importIkawaAction.triggered.connect(self.importIkawa)
+        self.importMenu.addAction(importIkawaAction)
+
+        importK202Action = QAction('K202...', self)
+        importK202Action.triggered.connect(self.importK202)
+        self.importMenu.addAction(importK202Action)
+
+        importK204Action = QAction('K204...', self)
+        importK204Action.triggered.connect(self.importK204)
+        self.importMenu.addAction(importK204Action)
+
+        importLoringAction = QAction('Loring CSV...', self)
+        importLoringAction.triggered.connect(self.importLoring)
+        self.importMenu.addAction(importLoringAction)
+
+        importPetronciniAction = QAction('Petroncini CSV...', self)
+        importPetronciniAction.triggered.connect(self.importPetroncini)
+        self.importMenu.addAction(importPetronciniAction)
+
+        importROESTAction = QAction('ROEST CSV...', self)
+        importROESTAction.triggered.connect(self.importRoest)
+        self.importMenu.addAction(importROESTAction)
+
+        importRubasseAction = QAction('Rubasse CSV...', self)
+        importRubasseAction.triggered.connect(self.importRubasse)
+        self.importMenu.addAction(importRubasseAction)
+
+        importPilotAction = QAction('Probat Pilot...', self)
+        importPilotAction.triggered.connect(self.importPilot)
+        self.importMenu.addAction(importPilotAction)
+
+        fileImportRoastLoggerAction = QAction('RoastLogger...', self)
+        fileImportRoastLoggerAction.triggered.connect(self.fileImportRoastLogger)
+        self.importMenu.addAction(fileImportRoastLoggerAction)
+
+        importRoastLogAction = QAction('RoastLog URL...',self)
+        importRoastLogAction.triggered.connect(self.importRoastLog)
+        self.importMenu.addAction(importRoastLogAction)
+
+        importRoastPathAction = QAction('RoastPATH URL...',self)
+        #importRoastPathAction.triggered.connect(self.importRoastPATH)
+        self.importMenu.addAction(importRoastPathAction)
+        importRoastPathAction.setEnabled(False)
 
-                importRoastPathAction = QAction('RoastPATH URL...',self)
-#                importRoastPathAction.triggered.connect(self.importRoastPATH)
-                self.importMenu.addAction(importRoastPathAction)
-                importRoastPathAction.setEnabled(False)
+        importStrongholdAction = QAction('Stronghold XLSX...', self)
+        importStrongholdAction.triggered.connect(self.importStronghold)
+        self.importMenu.addAction(importStrongholdAction)
 
-                importStrongholdAction = QAction('Stronghold XLSX...', self)
-                importStrongholdAction.triggered.connect(self.importStronghold)
-                self.importMenu.addAction(importStrongholdAction)
+        self.convFromMenu:QMenu = QMenu(QApplication.translate('Menu', 'Convert From'))
+        fileConvertFromCropsterAction = QAction(QApplication.translate('Menu', 'Cropster XLS...'), self)
+        fileConvertFromCropsterAction.triggered.connect(self.convertFromCropster)
+        self.convFromMenu.addAction(fileConvertFromCropsterAction)
 
-            self.convFromMenu: QMenu|None = self.fileMenu.addMenu(QApplication.translate('Menu', 'Convert From'))
-            if self.convFromMenu is not None:
-                fileConvertFromCropsterAction = QAction(QApplication.translate('Menu', 'Cropster XLS...'), self)
-                fileConvertFromCropsterAction.triggered.connect(self.convertFromCropster)
-                self.convFromMenu.addAction(fileConvertFromCropsterAction)
+        fileConvertFromGiesenAction = QAction(QApplication.translate('Menu', 'Giesen CSV...'), self)
+        fileConvertFromGiesenAction.triggered.connect(self.convertFromGiesen)
+        self.convFromMenu.addAction(fileConvertFromGiesenAction)
 
-                fileConvertFromGiesenAction = QAction(QApplication.translate('Menu', 'Giesen CSV...'), self)
-                fileConvertFromGiesenAction.triggered.connect(self.convertFromGiesen)
-                self.convFromMenu.addAction(fileConvertFromGiesenAction)
+        fileConvertFromHiBeanAction = QAction(QApplication.translate('Menu', 'HiBean JSON...'), self)
+        fileConvertFromHiBeanAction.triggered.connect(self.convertFromHiBean)
+        self.convFromMenu.addAction(fileConvertFromHiBeanAction)
 
-                fileConvertFromHiBeanAction = QAction(QApplication.translate('Menu', 'HiBean JSON...'), self)
-                fileConvertFromHiBeanAction.triggered.connect(self.convertFromHiBean)
-                self.convFromMenu.addAction(fileConvertFromHiBeanAction)
+        fileConvertFromIKAWAAction = QAction(QApplication.translate('Menu', 'IKAWA CSV...'), self)
+        fileConvertFromIKAWAAction.triggered.connect(self.convertFromIKAWA)
+        self.convFromMenu.addAction(fileConvertFromIKAWAAction)
 
-                fileConvertFromIKAWAAction = QAction(QApplication.translate('Menu', 'IKAWA CSV...'), self)
-                fileConvertFromIKAWAAction.triggered.connect(self.convertFromIKAWA)
-                self.convFromMenu.addAction(fileConvertFromIKAWAAction)
+        fileConvertFromLoringAction = QAction(QApplication.translate('Menu', 'Loring CSV...'), self)
+        fileConvertFromLoringAction.triggered.connect(self.convertFromLoring)
+        self.convFromMenu.addAction(fileConvertFromLoringAction)
 
-                fileConvertFromLoringAction = QAction(QApplication.translate('Menu', 'Loring CSV...'), self)
-                fileConvertFromLoringAction.triggered.connect(self.convertFromLoring)
-                self.convFromMenu.addAction(fileConvertFromLoringAction)
+        fileConvertFromPetronciniAction = QAction(QApplication.translate('Menu', 'Petroncini CSV...'), self)
+        fileConvertFromPetronciniAction.triggered.connect(self.convertFromPetroncini)
+        self.convFromMenu.addAction(fileConvertFromPetronciniAction)
 
-                fileConvertFromPetronciniAction = QAction(QApplication.translate('Menu', 'Petroncini CSV...'), self)
-                fileConvertFromPetronciniAction.triggered.connect(self.convertFromPetroncini)
-                self.convFromMenu.addAction(fileConvertFromPetronciniAction)
+        fileConvertFromROESTAction = QAction(QApplication.translate('Menu', 'ROEST CSV...'), self)
+        fileConvertFromROESTAction.triggered.connect(self.convertFromROEST)
+        self.convFromMenu.addAction(fileConvertFromROESTAction)
 
-                fileConvertFromROESTAction = QAction(QApplication.translate('Menu', 'ROEST CSV...'), self)
-                fileConvertFromROESTAction.triggered.connect(self.convertFromROEST)
-                self.convFromMenu.addAction(fileConvertFromROESTAction)
+        fileConvertFromRubaseAction = QAction(QApplication.translate('Menu', 'Rubase CSV...'), self)
+        fileConvertFromRubaseAction.triggered.connect(self.convertFromRubase)
+        self.convFromMenu.addAction(fileConvertFromRubaseAction)
 
-                fileConvertFromRubaseAction = QAction(QApplication.translate('Menu', 'Rubase CSV...'), self)
-                fileConvertFromRubaseAction.triggered.connect(self.convertFromRubase)
-                self.convFromMenu.addAction(fileConvertFromRubaseAction)
+        fileConvertFromStrongholdAction = QAction(QApplication.translate('Menu', 'Stronghold XLSX...'), self)
+        fileConvertFromStrongholdAction.triggered.connect(self.convertFromStronghold)
+        self.convFromMenu.addAction(fileConvertFromStrongholdAction)
 
-                fileConvertFromStrongholdAction = QAction(QApplication.translate('Menu', 'Stronghold XLSX...'), self)
-                fileConvertFromStrongholdAction.triggered.connect(self.convertFromStronghold)
-                self.convFromMenu.addAction(fileConvertFromStrongholdAction)
+##        self.fileMenu.addSeparator()
 
-            self.fileMenu.addSeparator()
+        self.fileSaveAction = QAction(QApplication.translate('Menu', 'Save'), self)
+        self.fileSaveAction.setShortcut(QKeySequence.StandardKey.Save)
+        self.fileSaveAction.triggered.connect(self.fileSave_current_action)
+##        self.fileMenu.addAction(self.fileSaveAction)
 
-            self.fileSaveAction = QAction(QApplication.translate('Menu', 'Save'), self)
-            self.fileSaveAction.setShortcut(QKeySequence.StandardKey.Save)
-            self.fileSaveAction.triggered.connect(self.fileSave_current_action)
-            self.fileMenu.addAction(self.fileSaveAction)
+        self.fileSaveAsAction = QAction(QApplication.translate('Menu', 'Save As...'), self)
+        self.fileSaveAsAction.setShortcut(QKeySequence.StandardKey.SaveAs)
+        self.fileSaveAsAction.triggered.connect(self.fileSave_new_action)
+##        self.fileMenu.addAction(self.fileSaveAsAction)
 
-            self.fileSaveAsAction = QAction(QApplication.translate('Menu', 'Save As...'), self)
-            self.fileSaveAsAction.setShortcut(QKeySequence.StandardKey.SaveAs)
-            self.fileSaveAsAction.triggered.connect(self.fileSave_new_action)
-            self.fileMenu.addAction(self.fileSaveAsAction)
+        # same as SaveAs, just that the saved file gets a new roastUUID assigned
+        self.fileSaveCopyAsAction = QAction(QApplication.translate('Menu', 'Save a Copy As...'), self)
+        self.fileSaveCopyAsAction.triggered.connect(self.fileSave_copy_action)
+##        self.fileMenu.addAction(self.fileSaveCopyAsAction)
 
-            # same as SaveAs, just that the saved file gets a new roastUUID assigned
-            self.fileSaveCopyAsAction = QAction(QApplication.translate('Menu', 'Save a Copy As...'), self)
-            self.fileSaveCopyAsAction.triggered.connect(self.fileSave_copy_action)
-            self.fileMenu.addAction(self.fileSaveCopyAsAction)
+##        self.fileMenu.addSeparator()
 
-            self.fileMenu.addSeparator()
+        self.exportMenu:QMenu = QMenu(QApplication.translate('Menu', 'Export'))
+        fileExportCSVAction = QAction(QApplication.translate('Menu', 'Artisan CSV...'), self)
+        fileExportCSVAction.triggered.connect(self.fileExportCSV)
+        self.exportMenu.addAction(fileExportCSVAction)
 
-            self.exportMenu = self.fileMenu.addMenu(QApplication.translate('Menu', 'Export'))
-            if self.exportMenu is not None:
-                fileExportCSVAction = QAction(QApplication.translate('Menu', 'Artisan CSV...'), self)
-                fileExportCSVAction.triggered.connect(self.fileExportCSV)
-                self.exportMenu.addAction(fileExportCSVAction)
+        fileExportJSONAction = QAction(QApplication.translate('Menu', 'Artisan JSON...'), self)
+        fileExportJSONAction.triggered.connect(self.fileExportJSON)
+        self.exportMenu.addAction(fileExportJSONAction)
 
-                fileExportJSONAction = QAction(QApplication.translate('Menu', 'Artisan JSON...'), self)
-                fileExportJSONAction.triggered.connect(self.fileExportJSON)
-                self.exportMenu.addAction(fileExportJSONAction)
+        self.exportMenu.addSeparator()
 
-                self.exportMenu.addSeparator()
+        fileExportExcelAction = QAction(QApplication.translate('Menu', 'Excel...'), self)
+        fileExportExcelAction.triggered.connect(self.fileExportExcel)
+        self.exportMenu.addAction(fileExportExcelAction)
 
-                fileExportExcelAction = QAction(QApplication.translate('Menu', 'Excel...'), self)
-                fileExportExcelAction.triggered.connect(self.fileExportExcel)
-                self.exportMenu.addAction(fileExportExcelAction)
+        self.exportMenu.addSeparator()
 
-                self.exportMenu.addSeparator()
+        fileExportPilotAction = QAction(QApplication.translate('Menu', 'Probat Pilot...'), self)
+        fileExportPilotAction.triggered.connect(self.fileExportPilot)
+        self.exportMenu.addAction(fileExportPilotAction)
 
-                fileExportPilotAction = QAction(QApplication.translate('Menu', 'Probat Pilot...'), self)
-                fileExportPilotAction.triggered.connect(self.fileExportPilot)
-                self.exportMenu.addAction(fileExportPilotAction)
+        fileExportRoastLoggerAction = QAction(QApplication.translate('Menu', 'RoastLogger...'), self)
+        fileExportRoastLoggerAction.triggered.connect(self.fileExportRoastLogger)
+        self.exportMenu.addAction(fileExportRoastLoggerAction)
 
-                fileExportRoastLoggerAction = QAction(QApplication.translate('Menu', 'RoastLogger...'), self)
-                fileExportRoastLoggerAction.triggered.connect(self.fileExportRoastLogger)
-                self.exportMenu.addAction(fileExportRoastLoggerAction)
+        self.convMenu:QMenu = QMenu(QApplication.translate('Menu', 'Convert To'))
+        fileConvertFahrenheitAction = QAction(QApplication.translate('Menu', 'Fahrenheit...'), self)
+        fileConvertFahrenheitAction.triggered.connect(self.fileConvertToFahrenheit)
+        self.convMenu.addAction(fileConvertFahrenheitAction)
 
-            self.convMenu: QMenu|None = self.fileMenu.addMenu(QApplication.translate('Menu', 'Convert To'))
-            if self.convMenu is not None:
-                fileConvertFahrenheitAction = QAction(QApplication.translate('Menu', 'Fahrenheit...'), self)
-                fileConvertFahrenheitAction.triggered.connect(self.fileConvertToFahrenheit)
-                self.convMenu.addAction(fileConvertFahrenheitAction)
+        fileConvertCelsiusAction = QAction(QApplication.translate('Menu', 'Celsius...'), self)
+        fileConvertCelsiusAction.triggered.connect(self.fileConvertToCelsius)
+        self.convMenu.addAction(fileConvertCelsiusAction)
 
-                fileConvertCelsiusAction = QAction(QApplication.translate('Menu', 'Celsius...'), self)
-                fileConvertCelsiusAction.triggered.connect(self.fileConvertToCelsius)
-                self.convMenu.addAction(fileConvertCelsiusAction)
+        self.convMenu.addSeparator()
 
-                self.convMenu.addSeparator()
+        fileConvertExcelAction = QAction(QApplication.translate('Menu', 'Excel...'), self)
+        fileConvertExcelAction.triggered.connect(self.fileConvertExcel)
+        self.convMenu.addAction(fileConvertExcelAction)
 
-                fileConvertExcelAction = QAction(QApplication.translate('Menu', 'Excel...'), self)
-                fileConvertExcelAction.triggered.connect(self.fileConvertExcel)
-                self.convMenu.addAction(fileConvertExcelAction)
+        self.convMenu.addSeparator()
 
-                self.convMenu.addSeparator()
+        fileConvertCSVAction = QAction(QApplication.translate('Menu', 'Artisan CSV...'), self)
+        fileConvertCSVAction.triggered.connect(self.fileConvertCSV)
+        self.convMenu.addAction(fileConvertCSVAction)
 
-                fileConvertCSVAction = QAction(QApplication.translate('Menu', 'Artisan CSV...'), self)
-                fileConvertCSVAction.triggered.connect(self.fileConvertCSV)
-                self.convMenu.addAction(fileConvertCSVAction)
+        fileConvertJSONAction = QAction(QApplication.translate('Menu', 'Artisan JSON...'), self)
+        fileConvertJSONAction.triggered.connect(self.fileConvertJSON)
+        self.convMenu.addAction(fileConvertJSONAction)
 
-                fileConvertJSONAction = QAction(QApplication.translate('Menu', 'Artisan JSON...'), self)
-                fileConvertJSONAction.triggered.connect(self.fileConvertJSON)
-                self.convMenu.addAction(fileConvertJSONAction)
+        self.convMenu.addSeparator()
 
-                self.convMenu.addSeparator()
+        fileConvertProbatAction = QAction(QApplication.translate('Menu', 'Probat Pilot...'), self)
+        fileConvertProbatAction.triggered.connect(self.fileConvertPilot)
+        self.convMenu.addAction(fileConvertProbatAction)
 
-                fileConvertProbatAction = QAction(QApplication.translate('Menu', 'Probat Pilot...'), self)
-                fileConvertProbatAction.triggered.connect(self.fileConvertPilot)
-                self.convMenu.addAction(fileConvertProbatAction)
-
-                fileConvertRoastLoggerAction = QAction(QApplication.translate('Menu', 'RoastLogger...'), self)
-                fileConvertRoastLoggerAction.triggered.connect(self.fileConvertRoastLogger)
-                self.convMenu.addAction(fileConvertRoastLoggerAction)
-
-                self.convMenu.addSeparator()
-
-                fileConvertPNGAction = QAction(QApplication.translate('Menu', 'PNG...'), self)
-                fileConvertPNGAction.triggered.connect(self.fileConvertPNG)
-                self.convMenu.addAction(fileConvertPNGAction)
-
-                fileConvertJPEGAction = QAction(QApplication.translate('Menu', 'JPEG...'), self)
-                fileConvertJPEGAction.triggered.connect(self.fileConvertJPEG)
-                self.convMenu.addAction(fileConvertJPEGAction)
-
-                fileConvertSVGAction = QAction(QApplication.translate('Menu', 'SVG...'), self)
-                fileConvertSVGAction.triggered.connect(self.fileConvertSVG)
-                self.convMenu.addAction(fileConvertSVGAction)
-
-                fileConvertPDFAction = QAction(QApplication.translate('Menu', 'PDF...'), self)
-                fileConvertPDFAction.triggered.connect(self.fileConvertPDF)
-                self.convMenu.addAction(fileConvertPDFAction)
-
-                fileConvertReportPDFAction = QAction(QApplication.translate('Menu', 'Roast Report PDF...'), self)
-                fileConvertReportPDFAction.triggered.connect(self.fileConvertReportPDF)
-                self.convMenu.addAction(fileConvertReportPDFAction)
-                if not self.QtWebEngineSupport:
-                    fileConvertReportPDFAction.setEnabled(False)
-
-            self.fileMenu.addSeparator()
-
-            self.saveGraphMenu: QMenu|None = self.fileMenu.addMenu(QApplication.translate('Menu', 'Save Graph'))
-            if self.saveGraphMenu is not None:
-                PDFAction = QAction('PDF...', self)
-                PDFAction.triggered.connect(self.saveVectorGraph_PDF)
-                self.saveGraphMenu.addAction(PDFAction)
-
-                SVGAction = QAction('SVG...',self)
-                SVGAction.triggered.connect(self.saveVectorGraph_SVG)
-                self.saveGraphMenu.addAction(SVGAction)
-
-                fullsizeAction = QAction(QApplication.translate('Menu', 'PNG...'), self)
-                fullsizeAction.triggered.connect(self.resizeImg_0_1)
-                self.saveGraphMenu.addAction(fullsizeAction)
-
-                JPEGAction = QAction('JPEG...',self)
-                JPEGAction.triggered.connect(self.resizeImg_0_1_JPEG)
-                self.saveGraphMenu.addAction(JPEGAction)
-
-                self.saveGraphMenu.addSeparator()
-
-                HomeBaristaAction = QAction('Home-Barista.com (1200x?)...', self)
-                HomeBaristaAction.triggered.connect(self.resizeImg_1200_1)
-                self.saveGraphMenu.addAction(HomeBaristaAction)
-
-                KaffeeNetzAction = QAction('Kaffee-Netz.de (800x?)...', self)
-                KaffeeNetzAction.triggered.connect(self.resizeImg_800_1)
-                self.saveGraphMenu.addAction(KaffeeNetzAction)
-
-                RiktigtKaffeAction = QAction('RiktigtKaffe.se (620x?)...', self)
-                RiktigtKaffeAction.triggered.connect(self.resizeImg_620_1)
-                self.saveGraphMenu.addAction(RiktigtKaffeAction)
-
-                PlanetCafeAction = QAction('PlanetCafe.fr (600x?)...', self)
-                PlanetCafeAction.triggered.connect(self.resizeImg_600_1)
-                self.saveGraphMenu.addAction(PlanetCafeAction)
-
-                CoffeeGeekAction = QAction('CoffeeGeek.com (500x?)...', self)
-                CoffeeGeekAction.triggered.connect(self.resizeImg_500_1)
-                self.saveGraphMenu.addAction(CoffeeGeekAction)
-
-                self.saveGraphMenu.addSeparator()
-
-                facebookSizeAction = QAction('Facebook (1200x628)...',self)
-                facebookSizeAction.triggered.connect(self.resizeImgSize_1200_628)
-                self.saveGraphMenu.addAction(facebookSizeAction)
-
-                instagramSizeAction = QAction('Instagram (1080x608)...', self)
-                instagramSizeAction.triggered.connect(self.resizeImgSize_1080_608)
-                self.saveGraphMenu.addAction(instagramSizeAction)
-
-            self.reportMenu: QMenu|None = self.fileMenu.addMenu(QApplication.translate('Menu', 'Report'))
-            if self.reportMenu is not None:
-
-                self.roastReportMenu: QMenu|None = self.reportMenu.addMenu(QApplication.translate('Menu', 'Roast'))
-                if self.roastReportMenu is not None:
-                    self.roastReportPDFAction = QAction(QApplication.translate('Menu', 'PDF...'), self)
-                    self.roastReportPDFAction.triggered.connect(self.pdfReport)
-                    self.roastReportMenu.addAction(self.roastReportPDFAction)
-                    if not self.QtWebEngineSupport:
-                        self.roastReportPDFAction.setEnabled(False)
-
-                    self.htmlAction = QAction(QApplication.translate('Menu', 'Web...'), self)
-                    self.htmlAction.triggered.connect(self.htmlReport)
-                    self.htmlAction.setShortcut('Ctrl+R')
-                    self.roastReportMenu.addAction(self.htmlAction)
-
-                self.productionMenu: QMenu|None = self.reportMenu.addMenu(QApplication.translate('Menu', 'Batches'))
-                if self.productionMenu is not None:
-                    self.productionPDFAction = QAction(QApplication.translate('Menu', 'PDF...'), self)
-                    self.productionPDFAction.triggered.connect(self.productionPDFReport)
-                    self.productionMenu.addAction(self.productionPDFAction)
-                    if not self.QtWebEngineSupport:
-                        self.productionPDFAction.setEnabled(False)
-                    self.productionWebAction = QAction(QApplication.translate('Menu', 'Web...'), self)
-                    self.productionWebAction.triggered.connect(self.productionHTMLReport)
-                    self.productionMenu.addAction(self.productionWebAction)
-                    self.productionCsvAction = QAction(QApplication.translate('Menu', 'CSV...'), self)
-                    self.productionCsvAction.triggered.connect(self.productionCSVReport)
-                    self.productionMenu.addAction(self.productionCsvAction)
-                    self.productionExcelAction = QAction(QApplication.translate('Menu', 'Excel...'), self)
-                    self.productionExcelAction.triggered.connect(self.productionExcelReport)
-                    self.productionMenu.addAction(self.productionExcelAction)
-
-                self.rankingMenu: QMenu|None = self.reportMenu.addMenu(QApplication.translate('Menu', 'Ranking'))
-                if self.rankingMenu is not None:
-                    self.rankingPDFAction = QAction(QApplication.translate('Menu', 'PDF...'), self)
-                    self.rankingPDFAction.triggered.connect(self.rankingPDFReport)
-                    self.rankingMenu.addAction(self.rankingPDFAction)
-                    if not self.QtWebEngineSupport:
-                        self.rankingPDFAction.setEnabled(False)
-                    self.rankingWebAction = QAction(QApplication.translate('Menu', 'Web...'), self)
-                    self.rankingWebAction.triggered.connect(self.rankingHTMLReport)
-                    self.rankingMenu.addAction(self.rankingWebAction)
-                    self.rankingCsvAction = QAction(QApplication.translate('Menu', 'CSV...'), self)
-                    self.rankingCsvAction.triggered.connect(self.rankingCSVReport)
-                    self.rankingMenu.addAction(self.rankingCsvAction)
-                    self.rankingExcelAction = QAction(QApplication.translate('Menu', 'Excel...'), self)
-                    self.rankingExcelAction.triggered.connect(self.rankingExcelReport)
-                    self.rankingMenu.addAction(self.rankingExcelAction)
-
-            self.saveStatisticsMenu: QMenu|None = self.fileMenu.addMenu(QApplication.translate('Message', 'Save Statistics'))
-            if self.saveStatisticsMenu is not None:
-                savestatisticsIMGAction = QAction(f"{QApplication.translate('Menu', 'PDF...')}", self)
-                savestatisticsIMGAction.triggered.connect(self.saveStatistics_IMG)
-                self.saveStatisticsMenu.addAction(savestatisticsIMGAction)
-                savestatisticsTXTAction = QAction(f"{QApplication.translate('Button', 'Text')}...",self)
-                savestatisticsTXTAction.triggered.connect(self.saveStatistics_TXT)
-                self.saveStatisticsMenu.addAction(savestatisticsTXTAction)
-
-            self.fileMenu.addSeparator()
-
-            self.printAction:QAction = QAction(QApplication.translate('Menu', 'Print...'), self)
-            self.printAction.setShortcut(QKeySequence.StandardKey.Print)
-            self.printAction.triggered.connect(self.filePrint)
-            self.fileMenu.addAction(self.printAction)
-
-            self.quitAction:QAction
-            if platform.system() == 'Darwin':
-                self.quitAction = QAction('Quit', self) # automatically translated by Qt Translators
-            else:
-                self.quitAction = QAction(QApplication.translate('MAC_APPLICATION_MENU', 'Quit {0}').format(application_name), self)
-            self.quitAction.setMenuRole(QAction.MenuRole.QuitRole)
-            self.quitAction.setShortcut(QKeySequence.StandardKey.Quit)
-            self.quitAction.triggered.connect(self.fileQuit)
-            self.fileMenu.addAction(self.quitAction)
+        fileConvertRoastLoggerAction = QAction(QApplication.translate('Menu', 'RoastLogger...'), self)
+        fileConvertRoastLoggerAction.triggered.connect(self.fileConvertRoastLogger)
+        self.convMenu.addAction(fileConvertRoastLoggerAction)
+
+        self.convMenu.addSeparator()
+
+        fileConvertPNGAction = QAction(QApplication.translate('Menu', 'PNG...'), self)
+        fileConvertPNGAction.triggered.connect(self.fileConvertPNG)
+        self.convMenu.addAction(fileConvertPNGAction)
+
+        fileConvertJPEGAction = QAction(QApplication.translate('Menu', 'JPEG...'), self)
+        fileConvertJPEGAction.triggered.connect(self.fileConvertJPEG)
+        self.convMenu.addAction(fileConvertJPEGAction)
+
+        fileConvertSVGAction = QAction(QApplication.translate('Menu', 'SVG...'), self)
+        fileConvertSVGAction.triggered.connect(self.fileConvertSVG)
+        self.convMenu.addAction(fileConvertSVGAction)
+
+        fileConvertPDFAction = QAction(QApplication.translate('Menu', 'PDF...'), self)
+        fileConvertPDFAction.triggered.connect(self.fileConvertPDF)
+        self.convMenu.addAction(fileConvertPDFAction)
+
+        fileConvertReportPDFAction = QAction(QApplication.translate('Menu', 'Roast Report PDF...'), self)
+        fileConvertReportPDFAction.triggered.connect(self.fileConvertReportPDF)
+        self.convMenu.addAction(fileConvertReportPDFAction)
+        if not self.QtWebEngineSupport:
+            fileConvertReportPDFAction.setEnabled(False)
+
+##        self.fileMenu.addSeparator()
+
+        self.saveGraphMenu:QMenu = QMenu(QApplication.translate('Menu', 'Save Graph'))
+        PDFAction = QAction('PDF...', self)
+        PDFAction.triggered.connect(self.saveVectorGraph_PDF)
+        self.saveGraphMenu.addAction(PDFAction)
+
+        SVGAction = QAction('SVG...',self)
+        SVGAction.triggered.connect(self.saveVectorGraph_SVG)
+        self.saveGraphMenu.addAction(SVGAction)
+
+        fullsizeAction = QAction(QApplication.translate('Menu', 'PNG...'), self)
+        fullsizeAction.triggered.connect(self.resizeImg_0_1)
+        self.saveGraphMenu.addAction(fullsizeAction)
+
+        JPEGAction = QAction('JPEG...',self)
+        JPEGAction.triggered.connect(self.resizeImg_0_1_JPEG)
+        self.saveGraphMenu.addAction(JPEGAction)
+
+        self.saveGraphMenu.addSeparator()
+
+        HomeBaristaAction = QAction('Home-Barista.com (1200x?)...', self)
+        HomeBaristaAction.triggered.connect(self.resizeImg_1200_1)
+        self.saveGraphMenu.addAction(HomeBaristaAction)
+
+        KaffeeNetzAction = QAction('Kaffee-Netz.de (800x?)...', self)
+        KaffeeNetzAction.triggered.connect(self.resizeImg_800_1)
+        self.saveGraphMenu.addAction(KaffeeNetzAction)
+
+        RiktigtKaffeAction = QAction('RiktigtKaffe.se (620x?)...', self)
+        RiktigtKaffeAction.triggered.connect(self.resizeImg_620_1)
+        self.saveGraphMenu.addAction(RiktigtKaffeAction)
+
+        PlanetCafeAction = QAction('PlanetCafe.fr (600x?)...', self)
+        PlanetCafeAction.triggered.connect(self.resizeImg_600_1)
+        self.saveGraphMenu.addAction(PlanetCafeAction)
+
+        CoffeeGeekAction = QAction('CoffeeGeek.com (500x?)...', self)
+        CoffeeGeekAction.triggered.connect(self.resizeImg_500_1)
+        self.saveGraphMenu.addAction(CoffeeGeekAction)
+
+        self.saveGraphMenu.addSeparator()
+
+        facebookSizeAction = QAction('Facebook (1200x628)...',self)
+        facebookSizeAction.triggered.connect(self.resizeImgSize_1200_628)
+        self.saveGraphMenu.addAction(facebookSizeAction)
+
+        instagramSizeAction = QAction('Instagram (1080x608)...', self)
+        instagramSizeAction.triggered.connect(self.resizeImgSize_1080_608)
+        self.saveGraphMenu.addAction(instagramSizeAction)
+
+        self.reportMenu:QMenu = QMenu(QApplication.translate('Menu', 'Report'))
+        self.roastReportMenu: QMenu = QMenu(QApplication.translate('Menu', 'Roast'))
+        self.reportMenu.addMenu(self.roastReportMenu)
+        self.roastReportPDFAction = QAction(QApplication.translate('Menu', 'PDF...'), self)
+        self.roastReportPDFAction.triggered.connect(self.pdfReport)
+        self.roastReportMenu.addAction(self.roastReportPDFAction)
+        if not self.QtWebEngineSupport:
+            self.roastReportPDFAction.setEnabled(False)
+
+        self.htmlAction = QAction(QApplication.translate('Menu', 'Web...'), self)
+        self.htmlAction.triggered.connect(self.htmlReport)
+        self.htmlAction.setShortcut('Ctrl+R')
+        self.roastReportMenu.addAction(self.htmlAction)
+
+        self.productionMenu:QMenu = QMenu(QApplication.translate('Menu', 'Batches'))
+        self.reportMenu.addMenu(self.productionMenu)
+        self.productionPDFAction = QAction(QApplication.translate('Menu', 'PDF...'), self)
+        self.productionPDFAction.triggered.connect(self.productionPDFReport)
+        self.productionMenu.addAction(self.productionPDFAction)
+        if not self.QtWebEngineSupport:
+            self.productionPDFAction.setEnabled(False)
+        self.productionWebAction = QAction(QApplication.translate('Menu', 'Web...'), self)
+        self.productionWebAction.triggered.connect(self.productionHTMLReport)
+        self.productionMenu.addAction(self.productionWebAction)
+        self.productionCsvAction = QAction(QApplication.translate('Menu', 'CSV...'), self)
+        self.productionCsvAction.triggered.connect(self.productionCSVReport)
+        self.productionMenu.addAction(self.productionCsvAction)
+        self.productionExcelAction = QAction(QApplication.translate('Menu', 'Excel...'), self)
+        self.productionExcelAction.triggered.connect(self.productionExcelReport)
+        self.productionMenu.addAction(self.productionExcelAction)
+
+        self.rankingMenu:QMenu = QMenu(QApplication.translate('Menu', 'Ranking'))
+        self.reportMenu.addMenu(self.rankingMenu)
+        self.rankingPDFAction = QAction(QApplication.translate('Menu', 'PDF...'), self)
+        self.rankingPDFAction.triggered.connect(self.rankingPDFReport)
+        self.rankingMenu.addAction(self.rankingPDFAction)
+        if not self.QtWebEngineSupport:
+            self.rankingPDFAction.setEnabled(False)
+        self.rankingWebAction = QAction(QApplication.translate('Menu', 'Web...'), self)
+        self.rankingWebAction.triggered.connect(self.rankingHTMLReport)
+        self.rankingMenu.addAction(self.rankingWebAction)
+        self.rankingCsvAction = QAction(QApplication.translate('Menu', 'CSV...'), self)
+        self.rankingCsvAction.triggered.connect(self.rankingCSVReport)
+        self.rankingMenu.addAction(self.rankingCsvAction)
+        self.rankingExcelAction = QAction(QApplication.translate('Menu', 'Excel...'), self)
+        self.rankingExcelAction.triggered.connect(self.rankingExcelReport)
+        self.rankingMenu.addAction(self.rankingExcelAction)
+
+        self.saveStatisticsMenu: QMenu = QMenu(QApplication.translate('Message', 'Save Statistics'))
+        savestatisticsIMGAction = QAction(f"{QApplication.translate('Menu', 'PDF...')}", self)
+        savestatisticsIMGAction.triggered.connect(self.saveStatistics_IMG)
+        self.saveStatisticsMenu.addAction(savestatisticsIMGAction)
+        savestatisticsTXTAction = QAction(f"{QApplication.translate('Button', 'Text')}...",self)
+        savestatisticsTXTAction.triggered.connect(self.saveStatistics_TXT)
+        self.saveStatisticsMenu.addAction(savestatisticsTXTAction)
+
+##        self.fileMenu.addSeparator()
+
+        self.printAction:QAction = QAction(QApplication.translate('Menu', 'Print...'), self)
+        self.printAction.setShortcut(QKeySequence.StandardKey.Print)
+        self.printAction.triggered.connect(self.filePrint)
+##        self.fileMenu.addAction(self.printAction)
+
+        self.quitAction:QAction
+        if platform.system() == 'Darwin':
+            self.quitAction = QAction('Quit', self) # automatically translated by Qt Translators
+        else:
+            self.quitAction = QAction(QApplication.translate('MAC_APPLICATION_MENU', 'Quit {0}').format(application_name), self)
+        self.quitAction.setMenuRole(QAction.MenuRole.QuitRole)
+        self.quitAction.setShortcut(QKeySequence.StandardKey.Quit)
+        self.quitAction.triggered.connect(self.fileQuit)
+#        self.fileMenu.addAction(self.quitAction)
 
         # EDIT menu
-        if self.editMenu is not None:
-            self.cutAction:QAction = QAction(QApplication.translate('Menu', 'Cut'), self)
-            self.cutAction.setShortcut(QKeySequence.StandardKey.Cut)
-            self.editMenu.addAction(self.cutAction)
-            self.cutAction.triggered.connect(self.on_actionCut_triggered)
-            self.copyAction:QAction = QAction(QApplication.translate('Menu', 'Copy'), self)
-            self.copyAction.setShortcut(QKeySequence.StandardKey.Copy)
-            self.editMenu.addAction(self.copyAction)
-            self.copyAction.triggered.connect(self.on_actionCopy_triggered)
-            self.pasteAction:QAction = QAction(QApplication.translate('Menu', 'Paste'), self)
-            self.pasteAction.setShortcut(QKeySequence.StandardKey.Paste)
-            self.editMenu.addAction(self.pasteAction)
-            self.pasteAction.triggered.connect(self.on_actionPaste_triggered)
+        self.cutAction:QAction = QAction(QApplication.translate('Menu', 'Cut'), self)
+        self.cutAction.setShortcut(QKeySequence.StandardKey.Cut)
+        self.cutAction.triggered.connect(self.on_actionCut_triggered)
+##        self.editMenu.addAction(self.cutAction)
+        self.copyAction:QAction = QAction(QApplication.translate('Menu', 'Copy'), self)
+        self.copyAction.setShortcut(QKeySequence.StandardKey.Copy)
+        self.copyAction.triggered.connect(self.on_actionCopy_triggered)
+##        self.editMenu.addAction(self.copyAction)
+        self.pasteAction:QAction = QAction(QApplication.translate('Menu', 'Paste'), self)
+        self.pasteAction.setShortcut(QKeySequence.StandardKey.Paste)
+        self.pasteAction.triggered.connect(self.on_actionPaste_triggered)
+##        self.editMenu.addAction(self.pasteAction)
 
         # ROAST menu
-        if self.RoastMenu is not None:
-            self.editGraphAction:QAction = QAction(QApplication.translate('Menu', 'Properties...'), self)
-            self.editGraphAction.setMenuRole(QAction.MenuRole.NoRole) # without this, this item is not shown in he
-            self.editGraphAction.triggered.connect(self.editgraph)
-            self.RoastMenu.addAction(self.editGraphAction)
-            self.editGraphAction.setShortcut('Ctrl+T')
+        self.editGraphAction:QAction = QAction(QApplication.translate('Menu', 'Properties...'), self)
+        self.editGraphAction.setMenuRole(QAction.MenuRole.NoRole) # without this, this item is not shown in he
+        self.editGraphAction.triggered.connect(self.editgraph)
+        self.editGraphAction.setShortcut('Ctrl+T')
+##        self.RoastMenu.addAction(self.editGraphAction)
 
-            self.backgroundAction:QAction = QAction(QApplication.translate('Menu', 'Background...'), self)
-            self.backgroundAction.triggered.connect(self.background)
-            self.RoastMenu.addAction(self.backgroundAction)
-            self.backgroundAction.setShortcut('Ctrl+B')
+        self.backgroundAction:QAction = QAction(QApplication.translate('Menu', 'Background...'), self)
+        self.backgroundAction.triggered.connect(self.background)
+        self.backgroundAction.setShortcut('Ctrl+B')
+##        self.RoastMenu.addAction(self.backgroundAction)
 
-            self.flavorAction:QAction = QAction(QApplication.translate('Menu', 'Cup Profile...'), self)
-            self.flavorAction.triggered.connect(self.flavorchart)
-            self.RoastMenu.addAction(self.flavorAction)
+        self.flavorAction:QAction = QAction(QApplication.translate('Menu', 'Cup Profile...'), self)
+        self.flavorAction.triggered.connect(self.flavorchart)
+##        self.RoastMenu.addAction(self.flavorAction)
 
-            self.RoastMenu.addSeparator()
+##        self.RoastMenu.addSeparator()
 
-            self.switchAction:QAction = QAction(QApplication.translate('Menu', 'Switch Profiles'), self)
-            self.switchAction.setShortcut(QKeySequence.StandardKey.Close)
-            self.switchAction.triggered.connect(self.switch)
-            self.RoastMenu.addAction(self.switchAction)
+        self.switchAction:QAction = QAction(QApplication.translate('Menu', 'Switch Profiles'), self)
+        self.switchAction.setShortcut(QKeySequence.StandardKey.Close)
+        self.switchAction.triggered.connect(self.switch)
+##        self.RoastMenu.addAction(self.switchAction)
 
-            self.switchETBTAction:QAction = QAction(QApplication.translate('Menu', 'Switch ET<->BT'), self)
-            self.switchETBTAction.triggered.connect(self.switchETBT)
-            self.RoastMenu.addAction(self.switchETBTAction)
+        self.switchETBTAction:QAction = QAction(QApplication.translate('Menu', 'Switch ET<->BT'), self)
+        self.switchETBTAction.triggered.connect(self.switchETBT)
+##        self.RoastMenu.addAction(self.switchETBTAction)
+
 
         # CONFIGURATION menu
-        if self.ConfMenu is not None:
-            self.machineMenu:QMenu = QMenu(QApplication.translate('Menu', 'Machine'))
-            # populated in populateMachineMenu/populateListMenu if not empty
-            # using a QTimer to speed up startup a bit
-            QTimer.singleShot(500,self.populateMachineMenu)
-            self.ConfMenu.addMenu(self.machineMenu)
 
-            self.deviceAction:QAction = QAction(QApplication.translate('Menu', 'Device...'), self)
-            self.deviceAction.triggered.connect(self.deviceassigment)
-            self.ConfMenu.addAction(self.deviceAction)
-            self.deviceAction.setShortcut('Ctrl+D')
+        self.machineMenu:QMenu = QMenu(QApplication.translate('Menu', 'Machine'))
+        # populated in populateMachineMenu/populateListMenu if not empty
+        # using a QTimer to speed up startup a bit
+        QTimer.singleShot(500,self.populateMachineMenu)
+#        self.ConfMenu.addMenu(self.machineMenu)
 
-            self.commportAction:QAction = QAction(QApplication.translate('Menu', 'Port...'), self)
-            self.commportAction.triggered.connect(self.setcommport)
-            self.ConfMenu.addAction(self.commportAction)
+        self.deviceAction:QAction = QAction(QApplication.translate('Menu', 'Device...'), self)
+        self.deviceAction.triggered.connect(self.deviceassigment)
+        self.deviceAction.setShortcut('Ctrl+D')
+#        self.ConfMenu.addAction(self.deviceAction)
 
-            self.ConfMenu.addSeparator()
+        self.commportAction:QAction = QAction(QApplication.translate('Menu', 'Port...'), self)
+        self.commportAction.triggered.connect(self.setcommport)
+#        self.ConfMenu.addAction(self.commportAction)
 
-            self.calibrateDelayAction:QAction = QAction(QApplication.translate('Menu', 'Sampling...'), self)
-            self.calibrateDelayAction.triggered.connect(self.calibratedelay)
-            self.ConfMenu.addAction(self.calibrateDelayAction)
+#        self.ConfMenu.addSeparator()
 
-            self.ConfMenu.addSeparator()
+        self.calibrateDelayAction:QAction = QAction(QApplication.translate('Menu', 'Sampling...'), self)
+        self.calibrateDelayAction.triggered.connect(self.calibratedelay)
+#        self.ConfMenu.addAction(self.calibrateDelayAction)
 
-            self.curvesAction:QAction = QAction(QApplication.translate('Menu', 'Curves...'), self)
-            self.curvesAction.triggered.connect(self.setCurves)
-            self.curvesAction.setShortcut('Ctrl+U')
-            self.ConfMenu.addAction(self.curvesAction)
+#        self.ConfMenu.addSeparator()
 
-            self.ConfMenu.addSeparator()
+        self.curvesAction:QAction = QAction(QApplication.translate('Menu', 'Curves...'), self)
+        self.curvesAction.triggered.connect(self.setCurves)
+        self.curvesAction.setShortcut('Ctrl+U')
+#        self.ConfMenu.addAction(self.curvesAction)
 
-            self.eventsAction:QAction = QAction(QApplication.translate('Menu', 'Events...'), self)
-            self.eventsAction.triggered.connect(self.eventsconf)
-            self.ConfMenu.addAction(self.eventsAction)
-            self.eventsAction.setShortcut('Ctrl+E')
+#        self.ConfMenu.addSeparator()
 
-            self.alarmAction:QAction = QAction(QApplication.translate('Menu', 'Alarms...'), self)
-            self.alarmAction.triggered.connect(self.alarmconfig)
-            self.alarmAction.setShortcut('Ctrl+A')
-#            self.alarmAction.setShortcutContext(Qt.ShortcutContext.WidgetShortcut)
-#            self.alarmAction.setShortcutContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
-#            self.alarmAction.setShortcutContext(Qt.ShortcutContext.WindowShortcut)
-            self.alarmAction.setShortcutContext(Qt.ShortcutContext.ApplicationShortcut)
-            self.ConfMenu.addAction(self.alarmAction)
+        self.eventsAction:QAction = QAction(QApplication.translate('Menu', 'Events...'), self)
+        self.eventsAction.triggered.connect(self.eventsconf)
+        self.eventsAction.setShortcut('Ctrl+E')
+#        self.ConfMenu.addAction(self.eventsAction)
 
-            self.ConfMenu.addSeparator()
+        self.alarmAction:QAction = QAction(QApplication.translate('Menu', 'Alarms...'), self)
+        self.alarmAction.triggered.connect(self.alarmconfig)
+        self.alarmAction.setShortcut('Ctrl+A')
+        #self.alarmAction.setShortcutContext(Qt.ShortcutContext.WidgetShortcut)
+        #self.alarmAction.setShortcutContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
+        #self.alarmAction.setShortcutContext(Qt.ShortcutContext.WindowShortcut)
+        self.alarmAction.setShortcutContext(Qt.ShortcutContext.ApplicationShortcut)
+#        self.ConfMenu.addAction(self.alarmAction)
 
-            self.phasesGraphAction:QAction = QAction(QApplication.translate('Menu', 'Phases...'), self)
-            self.phasesGraphAction.triggered.connect(self.editphases)
-            self.ConfMenu.addAction(self.phasesGraphAction)
+#        self.ConfMenu.addSeparator()
 
-            self.StatisticsAction:QAction = QAction(QApplication.translate('Menu', 'Statistics...'), self)
-            self.StatisticsAction.triggered.connect(self.showstatistics)
-            self.ConfMenu.addAction(self.StatisticsAction)
+        self.phasesGraphAction:QAction = QAction(QApplication.translate('Menu', 'Phases...'), self)
+        self.phasesGraphAction.triggered.connect(self.editphases)
+#        self.ConfMenu.addAction(self.phasesGraphAction)
 
-            self.WindowconfigAction:QAction = QAction(QApplication.translate('Menu', 'Axes...'), self)
-            self.WindowconfigAction.triggered.connect(self.Windowconfig)
-            self.WindowconfigAction.setShortcut('Ctrl+Shift+A')
-            self.ConfMenu.addAction(self.WindowconfigAction)
+        self.StatisticsAction:QAction = QAction(QApplication.translate('Menu', 'Statistics...'), self)
+        self.StatisticsAction.triggered.connect(self.showstatistics)
+#        self.ConfMenu.addAction(self.StatisticsAction)
 
-            self.ConfMenu.addSeparator()
+        self.WindowconfigAction:QAction = QAction(QApplication.translate('Menu', 'Axes...'), self)
+        self.WindowconfigAction.triggered.connect(self.Windowconfig)
+        self.WindowconfigAction.setShortcut('Ctrl+Shift+A')
+#        self.ConfMenu.addAction(self.WindowconfigAction)
 
-            self.colorsAction:QAction = QAction(QApplication.translate('Menu', 'Colors...'), self)
-            self.colorsAction.triggered.connect(self.qmc.changeGColor3)
-            self.ConfMenu.addAction(self.colorsAction)
+#        self.ConfMenu.addSeparator()
 
-            self.themeMenu:QMenu = QMenu(QApplication.translate('Menu', 'Themes'))
-            self.loadThemeAction:QAction|None = None
-            self.saveAsThemeAction:QAction|None = None
-            self.populateThemeMenu()
-            self.ConfMenu.addMenu(self.themeMenu)
-            self.updateRecentThemeActions()
+        self.colorsAction:QAction = QAction(QApplication.translate('Menu', 'Colors...'), self)
+        self.colorsAction.triggered.connect(self.qmc.changeGColor3)
+#        self.ConfMenu.addAction(self.colorsAction)
 
-            self.ConfMenu.addSeparator()
+        self.themeMenu:QMenu = QMenu(QApplication.translate('Menu', 'Themes'))
+        self.loadThemeAction:QAction|None = None
+        self.saveAsThemeAction:QAction|None = None
+        self.populateThemeMenu()
+        self.updateRecentThemeActions()
+#        self.ConfMenu.addMenu(self.themeMenu)
 
-            self.autosaveAction:QAction = QAction(QApplication.translate('Menu', 'Autosave...'), self)
-            self.autosaveAction.triggered.connect(self.autosaveconf)
-            self.ConfMenu.addAction(self.autosaveAction)
+#        self.ConfMenu.addSeparator()
 
-            self.batchAction:QAction = QAction(QApplication.translate('Menu', 'Batch...'), self)
-            self.batchAction.triggered.connect(self.batchconf)
-            self.ConfMenu.addAction(self.batchAction)
+        self.autosaveAction:QAction = QAction(QApplication.translate('Menu', 'Autosave...'), self)
+        self.autosaveAction.triggered.connect(self.autosaveconf)
+#        self.ConfMenu.addAction(self.autosaveAction)
 
-            self.ConfMenu.addSeparator()
+        self.batchAction:QAction = QAction(QApplication.translate('Menu', 'Batch...'), self)
+        self.batchAction.triggered.connect(self.batchconf)
+#        self.ConfMenu.addAction(self.batchAction)
 
-            self.temperatureConfMenu: QMenu|None = self.ConfMenu.addMenu(QApplication.translate('Menu', 'Temperature'))
-            self.FahrenheitAction: QAction
-            self.CelsiusAction: QAction
-            if self.temperatureConfMenu is not None:
-                self.FahrenheitAction = QAction(QApplication.translate('Menu', 'Fahrenheit Mode'), self)
-                self.FahrenheitAction.triggered.connect(self.qmc.fahrenheitModeRedraw)
-                self.temperatureConfMenu.addAction(self.FahrenheitAction)
-                self.CelsiusAction = QAction(QApplication.translate('Menu', 'Celsius Mode'), self)
-                self.CelsiusAction.triggered.connect(self.qmc.celsiusModeRedraw)
-                self.temperatureConfMenu.addAction(self.CelsiusAction)
+#        self.ConfMenu.addSeparator()
 
-            self.languageMenu: QMenu|None
-            self.languageMenu = self.ConfMenu.addMenu(QApplication.translate('Menu', 'Language'))
+        self.temperatureConfMenu:QMenu = QMenu(QApplication.translate('Menu', 'Temperature'))
+#        self.ConfMenu.addMenu(self.temperatureConfMenu)
+
+        self.FahrenheitAction: QAction
+        self.CelsiusAction: QAction
+        self.FahrenheitAction = QAction(QApplication.translate('Menu', 'Fahrenheit Mode'), self)
+        self.FahrenheitAction.triggered.connect(self.qmc.fahrenheitModeRedraw)
+        self.temperatureConfMenu.addAction(self.FahrenheitAction)
+        self.CelsiusAction = QAction(QApplication.translate('Menu', 'Celsius Mode'), self)
+        self.CelsiusAction.triggered.connect(self.qmc.celsiusModeRedraw)
+        self.temperatureConfMenu.addAction(self.CelsiusAction)
+
+        self.languageMenu:QMenu = QMenu(QApplication.translate('Menu', 'Language'))
+#        self.ConfMenu.addMenu(self.languageMenu)
 
         # language_menu_actions holds a dict associating iso2 locale strings to language menu actions
         self.language_menu_actions:dict[str, QAction] = {}
@@ -2603,299 +2599,316 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                 ('zh_TW', '\u7e41\u9ad4\u4e2d\u6587')]:
             self.addLanguage(iso, name)
 
+#        self.ConfMenu.addSeparator()
+
+        self.UIModeMenu:QMenu = QMenu(QApplication.translate('Menu', 'Mode'))
+#        self.ConfMenu.addMenu(self.UIModeMenu)
+        self.productionModeAction:QAction = QAction(QApplication.translate('Menu', 'Production'), self)
+        self.productionModeAction.triggered.connect(self.setProductionMode)
+        self.productionModeAction.setCheckable(True)
+        self.productionModeAction.setChecked(False)
+        self.UIModeMenu.addAction(self.productionModeAction)
+        #
+        self.defaultModeAction:QAction = QAction(QApplication.translate('Menu', 'Default'), self)
+        self.defaultModeAction.triggered.connect(self.setDefaultMode)
+        self.defaultModeAction.setCheckable(True)
+        self.defaultModeAction.setChecked(True)
+        self.UIModeMenu.addAction(self.defaultModeAction)
+        #
+        self.expertModeAction:QAction = QAction(QApplication.translate('Menu', 'Expert'), self)
+        self.expertModeAction.triggered.connect(self.setExpertMode)
+        self.expertModeAction.setCheckable(True)
+        self.expertModeAction.setChecked(False)
+        self.UIModeMenu.addAction(self.expertModeAction)
+
 
         # TOOLKIT menu
 
-        if self.ToolkitMenu is not None:
-            self.analyzeMenu: QMenu|None = self.ToolkitMenu.addMenu(QApplication.translate('Menu', 'Analyzer'))
-            if self.analyzeMenu is not None:
-                self.fitIdealautoAction = QAction(QApplication.translate('Menu','Auto All'),self)
-                self.fitIdealautoAction.triggered.connect(self.analysisfitCurvesALL)
-                self.fitIdealautoAction.setShortcut('Ctrl+K')
-                self.analyzeMenu.addAction(self.fitIdealautoAction)
-                self.analyzeMenu.addSeparator()
-                self.fitIdealx2Action = QAction(QApplication.translate('Menu','Fit BT to') + ' x\xb2',self)
-                self.fitIdealx2Action.triggered.connect(self.analysisfitCurvesX2)
-                self.analyzeMenu.addAction(self.fitIdealx2Action)
-                self.fitIdealx3Action = QAction(QApplication.translate('Menu','Fit BT to') + ' x\xb3',self)
-                self.fitIdealx3Action.triggered.connect(self.analysisfitCurvesX3)
-                self.analyzeMenu.addAction(self.fitIdealx3Action)
-                self.fitIdealx0Action = QAction(QApplication.translate('Menu','Fit BT to') + ' ln()',self)
-                self.fitIdealx0Action.triggered.connect(self.analysisfitCurvesLN)
-                self.analyzeMenu.addAction(self.fitIdealx0Action)
-                self.analyzeMenu.addSeparator()
-                self.fitBkgndAction = QAction(QApplication.translate('Menu','Fit BT to Bkgnd'),self)
-                self.fitBkgndAction.triggered.connect(self.analysisfitCurvesBkgnd)
-                self.analyzeMenu.addAction(self.fitBkgndAction)
-                self.analyzeMenu.addSeparator()
-                self.clearresultsAction = QAction(QApplication.translate('Menu','Clear results'),self)
-                self.clearresultsAction.triggered.connect(self.clearResults)
-                self.clearresultsAction.setShortcut('Ctrl+Alt+K') # COMMAND+OPTION on macOS
-                self.analyzeMenu.addAction(self.clearresultsAction)
+        self.analyzeMenu: QMenu = QMenu(QApplication.translate('Menu', 'Analyzer'))
+        self.fitIdealautoAction = QAction(QApplication.translate('Menu','Auto All'),self)
+        self.fitIdealautoAction.triggered.connect(self.analysisfitCurvesALL)
+        self.fitIdealautoAction.setShortcut('Ctrl+K')
+        self.analyzeMenu.addAction(self.fitIdealautoAction)
+        self.analyzeMenu.addSeparator()
+        self.fitIdealx2Action = QAction(QApplication.translate('Menu','Fit BT to') + ' x\xb2',self)
+        self.fitIdealx2Action.triggered.connect(self.analysisfitCurvesX2)
+        self.analyzeMenu.addAction(self.fitIdealx2Action)
+        self.fitIdealx3Action = QAction(QApplication.translate('Menu','Fit BT to') + ' x\xb3',self)
+        self.fitIdealx3Action.triggered.connect(self.analysisfitCurvesX3)
+        self.analyzeMenu.addAction(self.fitIdealx3Action)
+        self.fitIdealx0Action = QAction(QApplication.translate('Menu','Fit BT to') + ' ln()',self)
+        self.fitIdealx0Action.triggered.connect(self.analysisfitCurvesLN)
+        self.analyzeMenu.addAction(self.fitIdealx0Action)
+        self.analyzeMenu.addSeparator()
+        self.fitBkgndAction = QAction(QApplication.translate('Menu','Fit BT to Bkgnd'),self)
+        self.fitBkgndAction.triggered.connect(self.analysisfitCurvesBkgnd)
+        self.analyzeMenu.addAction(self.fitBkgndAction)
+        self.analyzeMenu.addSeparator()
+        self.clearresultsAction = QAction(QApplication.translate('Menu','Clear results'),self)
+        self.clearresultsAction.triggered.connect(self.clearResults)
+        self.clearresultsAction.setShortcut('Ctrl+Alt+K') # COMMAND+OPTION on macOS
+        self.analyzeMenu.addAction(self.clearresultsAction)
 
-            self.roastCompareAction: QAction = QAction(QApplication.translate('Menu', 'Comparator'), self)
-            self.roastCompareAction.triggered.connect(self.roastCompare)
-            self.roastCompareAction.setCheckable(True)
-            self.roastCompareAction.setChecked(bool(self.comparator))
-            self.ToolkitMenu.addAction(self.roastCompareAction)
+        self.roastCompareAction: QAction = QAction(QApplication.translate('Menu', 'Comparator'), self)
+        self.roastCompareAction.triggered.connect(self.roastCompare)
+        self.roastCompareAction.setCheckable(True)
+        self.roastCompareAction.setChecked(bool(self.comparator))
+##        self.ToolkitMenu.addAction(self.roastCompareAction)
 
-            self.designerAction: QAction = QAction(QApplication.translate('Menu', 'Designer') , self)
-            self.designerAction.triggered.connect(self.designerTriggered)
-            self.designerAction.setCheckable(True)
-            self.designerAction.setChecked(self.qmc.designerflag)
-            self.ToolkitMenu.addAction(self.designerAction)
+        self.designerAction: QAction = QAction(QApplication.translate('Menu', 'Designer') , self)
+        self.designerAction.triggered.connect(self.designerTriggered)
+        self.designerAction.setCheckable(True)
+        self.designerAction.setChecked(self.qmc.designerflag)
+##        self.ToolkitMenu.addAction(self.designerAction)
 
-            self.simulatorAction: QAction = QAction(QApplication.translate('Menu', 'Simulator') , self)
-            self.simulatorAction.triggered.connect(self.simulate)
-            self.simulatorAction.setCheckable(True)
-            self.simulatorAction.setChecked(bool(self.simulator))
-            self.ToolkitMenu.addAction(self.simulatorAction)
+        self.simulatorAction: QAction = QAction(QApplication.translate('Menu', 'Simulator') , self)
+        self.simulatorAction.triggered.connect(self.simulate)
+        self.simulatorAction.setCheckable(True)
+        self.simulatorAction.setChecked(bool(self.simulator))
+##        self.ToolkitMenu.addAction(self.simulatorAction)
 
-            self.wheeleditorAction: QAction = QAction(QApplication.translate('Menu', 'Wheel Graph'), self)
-            self.wheeleditorAction.triggered.connect(self.graphwheel)
-            self.wheeleditorAction.setCheckable(True)
-            self.wheeleditorAction.setChecked(self.qmc.wheelflag)
-            self.ToolkitMenu.addAction(self.wheeleditorAction)
+        self.wheeleditorAction: QAction = QAction(QApplication.translate('Menu', 'Wheel Graph'), self)
+        self.wheeleditorAction.triggered.connect(self.graphwheel)
+        self.wheeleditorAction.setCheckable(True)
+        self.wheeleditorAction.setChecked(self.qmc.wheelflag)
+##        self.ToolkitMenu.addAction(self.wheeleditorAction)
 
-            self.ToolkitMenu.addSeparator()
+##        self.ToolkitMenu.addSeparator()
 
-            self.transformAction: QAction = QAction(QApplication.translate('Menu', 'Transposer'), self)
-            self.transformAction.triggered.connect(self.transform)
-            self.ToolkitMenu.addAction(self.transformAction)
+        self.transformAction: QAction = QAction(QApplication.translate('Menu', 'Transposer'), self)
+        self.transformAction.triggered.connect(self.transform)
+##        self.ToolkitMenu.addAction(self.transformAction)
 
-            self.temperatureMenu: QMenu|None = self.ToolkitMenu.addMenu(QApplication.translate('Menu', 'Convert Profile Temperature'))
 
-            self.ConvertToFahrenheitAction: QAction
-            self.ConvertToCelsiusAction: QAction
-            if self.temperatureMenu is not None:
-                self.ConvertToFahrenheitAction = QAction(QApplication.translate('Menu', 'Convert to Fahrenheit'), self)
-                self.ConvertToFahrenheitAction.triggered.connect(self.qmc.convertTemperatureF)
-                self.temperatureMenu.addAction(self.ConvertToFahrenheitAction)
+        self.temperatureMenu:QMenu = QMenu(QApplication.translate('Menu', 'Convert Profile Temperature'))
+        self.ConvertToFahrenheitAction = QAction(QApplication.translate('Menu', 'Convert to Fahrenheit'), self)
+        self.ConvertToFahrenheitAction.triggered.connect(self.qmc.convertTemperatureF)
+        self.temperatureMenu.addAction(self.ConvertToFahrenheitAction)
+        self.ConvertToCelsiusAction = QAction(QApplication.translate('Menu', 'Convert to Celsius'), self)
+        self.ConvertToCelsiusAction.triggered.connect(self.qmc.convertTemperatureC)
+        self.temperatureMenu.addAction(self.ConvertToCelsiusAction)
 
-                self.ConvertToCelsiusAction = QAction(QApplication.translate('Menu', 'Convert to Celsius'), self)
-                self.ConvertToCelsiusAction.triggered.connect(self.qmc.convertTemperatureC)
-                self.temperatureMenu.addAction(self.ConvertToCelsiusAction)
+        if self.qmc.mode == 'F':
+            self.FahrenheitAction.setDisabled(True)
+            self.ConvertToFahrenheitAction.setDisabled(True)
+        else:
+            self.CelsiusAction.setDisabled(True)
+            self.ConvertToCelsiusAction.setDisabled(True)
 
-                if self.qmc.mode == 'F':
-                    self.FahrenheitAction.setDisabled(True)
-                    self.ConvertToFahrenheitAction.setDisabled(True)
-                else:
-                    self.CelsiusAction.setDisabled(True)
-                    self.ConvertToCelsiusAction.setDisabled(True)
+#        self.ToolkitMenu.addSeparator()
 
-            self.ToolkitMenu.addSeparator()
-
-            calculatorAction = QAction(QApplication.translate('Menu', 'Calculator'), self)
-            calculatorAction.triggered.connect(self.calculator)
-            self.ToolkitMenu.addAction(calculatorAction)
+        self.calculatorAction = QAction(QApplication.translate('Menu', 'Calculator'), self)
+        self.calculatorAction.triggered.connect(self.calculator)
+#        self.ToolkitMenu.addAction(self.calculatorAction)
 
         # VIEW menu
 
-        if self.viewMenu is not None:
-            self.controlsAction = QAction(QApplication.translate('Menu', 'Controls'), self)
-            self.controlsAction.setShortcut('C')
-            self.controlsAction.triggered.connect(self.toggleControls)
-            self.controlsAction.setCheckable(True)
-            self.controlsAction.setChecked(True)
-            self.viewMenu.addAction(self.controlsAction)
+        self.controlsAction = QAction(QApplication.translate('Menu', 'Controls'), self)
+        self.controlsAction.setShortcut('C')
+        self.controlsAction.triggered.connect(self.toggleControls)
+        self.controlsAction.setCheckable(True)
+        self.controlsAction.setChecked(True)
+#        self.viewMenu.addAction(self.controlsAction)
 
-            self.readingsAction = QAction(QApplication.translate('Menu', 'Readings'), self)
-            self.readingsAction.setShortcut('X')
-            self.readingsAction.triggered.connect(self.toggleReadings)
-            self.readingsAction.setCheckable(True)
-            self.readingsAction.setChecked(False)
-            self.viewMenu.addAction(self.readingsAction)
+        self.readingsAction = QAction(QApplication.translate('Menu', 'Readings'), self)
+        self.readingsAction.setShortcut('X')
+        self.readingsAction.triggered.connect(self.toggleReadings)
+        self.readingsAction.setCheckable(True)
+        self.readingsAction.setChecked(False)
+#        self.viewMenu.addAction(self.readingsAction)
 
-            self.eventsEditorAction = QAction(QApplication.translate('Menu', 'Events Editor'), self)
-            self.eventsEditorAction.triggered.connect(self.toggle_minieventline)
-            self.eventsEditorAction.setCheckable(True)
-            self.eventsEditorAction.setChecked(False)
-            self.viewMenu.addAction(self.eventsEditorAction)
+        self.eventsEditorAction = QAction(QApplication.translate('Menu', 'Events Editor'), self)
+        self.eventsEditorAction.triggered.connect(self.toggle_minieventline)
+        self.eventsEditorAction.setCheckable(True)
+        self.eventsEditorAction.setChecked(False)
+#        self.viewMenu.addAction(self.eventsEditorAction)
 
-            self.buttonsAction = QAction(QApplication.translate('Menu', 'Buttons'), self)
-            self.buttonsAction.setShortcut('B')
-            self.buttonsAction.triggered.connect(self.toggleExtraButtons)
-            self.buttonsAction.setCheckable(True)
-            self.buttonsAction.setChecked(False)
-            self.viewMenu.addAction(self.buttonsAction)
+        self.buttonsAction = QAction(QApplication.translate('Menu', 'Buttons'), self)
+        self.buttonsAction.setShortcut('B')
+        self.buttonsAction.triggered.connect(self.toggleExtraButtons)
+        self.buttonsAction.setCheckable(True)
+        self.buttonsAction.setChecked(False)
+#        self.viewMenu.addAction(self.buttonsAction)
 
-            self.slidersAction: QAction = QAction(QApplication.translate('Menu', 'Sliders'), self)
-            self.slidersAction.setShortcut('S')
-            self.slidersAction.triggered.connect(self.toggleSliders)
-            self.slidersAction.setCheckable(True)
-            self.slidersAction.setChecked(False)
-            self.viewMenu.addAction(self.slidersAction)
+        self.slidersAction: QAction = QAction(QApplication.translate('Menu', 'Sliders'), self)
+        self.slidersAction.setShortcut('S')
+        self.slidersAction.triggered.connect(self.toggleSliders)
+        self.slidersAction.setCheckable(True)
+        self.slidersAction.setChecked(False)
+#        self.viewMenu.addAction(self.slidersAction)
 
-            self.scheduleAction: QAction = QAction(QApplication.translate('Menu', 'Schedule'), self)
-            self.scheduleAction.triggered.connect(self.schedule)
-            self.scheduleAction.setCheckable(True)
-            self.scheduleAction.setChecked(False)
-            self.viewMenu.addSeparator()
-            self.viewMenu.addAction(self.scheduleAction)
-            if self.app.artisanviewerMode:
-                self.scheduleAction.setEnabled(False) # no scheduler in ArtisanViewer mode
+        self.scheduleAction: QAction = QAction(QApplication.translate('Menu', 'Schedule'), self)
+        self.scheduleAction.triggered.connect(self.schedule)
+        self.scheduleAction.setCheckable(True)
+        self.scheduleAction.setChecked(False)
+#        self.viewMenu.addSeparator()
+#        self.viewMenu.addAction(self.scheduleAction)
+        if self.app.artisanviewerMode:
+            self.scheduleAction.setEnabled(False) # no scheduler in ArtisanViewer mode
 
-            self.viewMenu.addSeparator()
+#        self.viewMenu.addSeparator()
 
-            self.lcdsAction: QAction = QAction(QApplication.translate('Menu', 'Main LCDs'), self)
-            self.lcdsAction.triggered.connect(self.largeLCDs)
-            self.lcdsAction.setCheckable(True)
-            self.lcdsAction.setChecked(False)
-            self.lcdsAction.setShortcut('Ctrl+L')
-            self.viewMenu.addAction(self.lcdsAction)
+        self.lcdsAction: QAction = QAction(QApplication.translate('Menu', 'Main LCDs'), self)
+        self.lcdsAction.setShortcut('Ctrl+L')
+        self.lcdsAction.triggered.connect(self.largeLCDs)
+        self.lcdsAction.setCheckable(True)
+        self.lcdsAction.setChecked(False)
+#        self.viewMenu.addAction(self.lcdsAction)
 
-            self.deltalcdsAction: QAction = QAction(QApplication.translate('Menu', 'Delta LCDs'), self)
-            self.deltalcdsAction.triggered.connect(self.largeDeltaLCDs)
-            self.deltalcdsAction.setCheckable(True)
-            self.deltalcdsAction.setChecked(False)
-            self.viewMenu.addAction(self.deltalcdsAction)
+        self.deltalcdsAction: QAction = QAction(QApplication.translate('Menu', 'Delta LCDs'), self)
+        self.deltalcdsAction.triggered.connect(self.largeDeltaLCDs)
+        self.deltalcdsAction.setCheckable(True)
+        self.deltalcdsAction.setChecked(False)
+#        self.viewMenu.addAction(self.deltalcdsAction)
 
-            self.pidlcdsAction: QAction = QAction(QApplication.translate('Menu', 'PID LCDs'), self)
-            self.pidlcdsAction.triggered.connect(self.largePIDLCDs)
-            self.pidlcdsAction.setCheckable(True)
-            self.pidlcdsAction.setChecked(False)
-            self.viewMenu.addAction(self.pidlcdsAction)
+        self.pidlcdsAction: QAction = QAction(QApplication.translate('Menu', 'PID LCDs'), self)
+        self.pidlcdsAction.triggered.connect(self.largePIDLCDs)
+        self.pidlcdsAction.setCheckable(True)
+        self.pidlcdsAction.setChecked(False)
+#        self.viewMenu.addAction(self.pidlcdsAction)
 
-            self.extralcdsAction: QAction = QAction(QApplication.translate('Menu', 'Extra LCDs'), self)
-            self.extralcdsAction.triggered.connect(self.largeExtraLCDs)
-            self.extralcdsAction.setCheckable(True)
-            self.extralcdsAction.setChecked(False)
-            self.viewMenu.addAction(self.extralcdsAction)
+        self.extralcdsAction: QAction = QAction(QApplication.translate('Menu', 'Extra LCDs'), self)
+        self.extralcdsAction.triggered.connect(self.largeExtraLCDs)
+        self.extralcdsAction.setCheckable(True)
+        self.extralcdsAction.setChecked(False)
+#        self.viewMenu.addAction(self.extralcdsAction)
 
-            self.phaseslcdsAction: QAction = QAction(QApplication.translate('Menu', 'Phases LCDs'), self)
-            self.phaseslcdsAction.triggered.connect(self.largePhasesLCDs)
-            self.phaseslcdsAction.setCheckable(True)
-            self.phaseslcdsAction.setChecked(False)
-            self.viewMenu.addAction(self.phaseslcdsAction)
+        self.phaseslcdsAction: QAction = QAction(QApplication.translate('Menu', 'Phases LCDs'), self)
+        self.phaseslcdsAction.triggered.connect(self.largePhasesLCDs)
+        self.phaseslcdsAction.setCheckable(True)
+        self.phaseslcdsAction.setChecked(False)
+#        self.viewMenu.addAction(self.phaseslcdsAction)
 
-            self.scalelcdsAction: QAction = QAction(QApplication.translate('Menu', 'Scale LCDs'), self)
-            self.scalelcdsAction.triggered.connect(self.largeScaleLCDs)
-            self.scalelcdsAction.setCheckable(True)
-            self.scalelcdsAction.setChecked(False)
-            self.viewMenu.addAction(self.scalelcdsAction)
+        self.scalelcdsAction: QAction = QAction(QApplication.translate('Menu', 'Scale LCDs'), self)
+        self.scalelcdsAction.triggered.connect(self.largeScaleLCDs)
+        self.scalelcdsAction.setCheckable(True)
+        self.scalelcdsAction.setChecked(False)
+#        self.viewMenu.addAction(self.scalelcdsAction)
 
-            self.viewMenu.addSeparator()
+#        self.viewMenu.addSeparator()
 
-            if not (platform.system() == 'Darwin' and self.qmc.locale_str == 'en'): # macOS automatically adds the fullscreen action to View menu
-                self.fullscreenAction = QAction(QApplication.translate('Menu', 'Full Screen'), self)
-                self.fullscreenAction.triggered.connect(self.toggleFullscreen)
-                self.fullscreenAction.setCheckable(True)
-                self.fullscreenAction.setChecked(False)
-                self.fullscreenAction.setShortcut('Ctrl+F')
-                self.fullscreenAction.setMenuRole(QAction.MenuRole.NoRole)
-                self.viewMenu.addAction(self.fullscreenAction)
+#        if not (platform.system() == 'Darwin' and self.qmc.locale_str == 'en'): # macOS automatically adds the fullscreen action to View menu
+        self.fullscreenAction = QAction(QApplication.translate('Menu', 'Full Screen'), self)
+        self.fullscreenAction.triggered.connect(self.toggleFullscreen)
+        self.fullscreenAction.setCheckable(True)
+        self.fullscreenAction.setChecked(False)
+        self.fullscreenAction.setShortcut('Ctrl+F')
+        self.fullscreenAction.setMenuRole(QAction.MenuRole.NoRole)
+#            self.viewMenu.addAction(self.fullscreenAction)
+
 
         # HELP menu
-        if self.helpMenu is not None:
-            if self.app.artisanviewerMode:
-                helpAboutAction = QAction(QApplication.translate('MAC_APPLICATION_MENU', 'About {0}').format(application_viewer_name), self)
-            else:
-                helpAboutAction = QAction(QApplication.translate('MAC_APPLICATION_MENU', 'About {0}').format(application_name), self)
-            helpAboutAction.setMenuRole(QAction.MenuRole.AboutRole)
-            helpAboutAction.triggered.connect(self.helpAbout)
-            self.helpMenu.addAction(helpAboutAction)
 
-            aboutQtAction = QAction(QApplication.translate('Menu', 'About Qt'), self)
-            aboutQtAction.setMenuRole(QAction.MenuRole.AboutQtRole)
-            aboutQtAction.triggered.connect(self.showAboutQt)
-            self.helpMenu.addAction(aboutQtAction)
+        if self.app.artisanviewerMode:
+            self.helpAboutAction = QAction(QApplication.translate('MAC_APPLICATION_MENU', 'About {0}').format(application_viewer_name), self)
+        else:
+            self.helpAboutAction = QAction(QApplication.translate('MAC_APPLICATION_MENU', 'About {0}').format(application_name), self)
+        self.helpAboutAction.setMenuRole(QAction.MenuRole.AboutRole)
+        self.helpAboutAction.triggered.connect(self.helpAbout)
+#        self.helpMenu.addAction(self.helpAboutAction)
 
-            helpDocumentationAction = QAction(QApplication.translate('Menu', 'Documentation'), self)
-            helpDocumentationAction.triggered.connect(self.helpHelp)
-            helpDocumentationAction.setShortcut(QKeySequence.StandardKey.HelpContents)
-            self.helpMenu.addAction(helpDocumentationAction)
+        self.aboutQtAction = QAction(QApplication.translate('Menu', 'About Qt'), self)
+        self.aboutQtAction.setMenuRole(QAction.MenuRole.AboutQtRole)
+        self.aboutQtAction.triggered.connect(self.showAboutQt)
+#        self.helpMenu.addAction(self.aboutQtAction)
 
-            KshortCAction = QAction(QApplication.translate('Menu', 'Keyboard Shortcuts'), self)
-            KshortCAction.triggered.connect(self.viewKshortcuts)
-            self.helpMenu.addAction(KshortCAction)
+        self.helpDocumentationAction = QAction(QApplication.translate('Menu', 'Documentation'), self)
+        self.helpDocumentationAction.triggered.connect(self.helpHelp)
+        self.helpDocumentationAction.setShortcut(QKeySequence.StandardKey.HelpContents)
+#        self.helpMenu.addAction(self.helpDocumentationAction)
 
-            self.helpMenu.addSeparator()
+        self.KshortCAction = QAction(QApplication.translate('Menu', 'Keyboard Shortcuts'), self)
+        self.KshortCAction.triggered.connect(self.viewKshortcuts)
+#        self.helpMenu.addAction(self.KshortCAction)
 
-            checkUpdateAction = QAction(QApplication.translate('Menu', 'Check for Updates'), self)
-            checkUpdateAction.setMenuRole(QAction.MenuRole.NoRole)
-            checkUpdateAction.triggered.connect(self.checkUpdate)
-            self.helpMenu.addAction(checkUpdateAction)
+#        self.helpMenu.addSeparator()
 
-            self.helpMenu.addSeparator()
+        self.checkUpdateAction = QAction(QApplication.translate('Menu', 'Check for Updates'), self)
+        self.checkUpdateAction.setMenuRole(QAction.MenuRole.NoRole)
+        self.checkUpdateAction.triggered.connect(self.checkUpdate)
+#        self.helpMenu.addAction(self.checkUpdateAction)
 
-            errorAction = QAction(QApplication.translate('Menu', 'Errors'), self)
-            errorAction.triggered.connect(self.viewErrorLog)
-            self.helpMenu.addAction(errorAction)
+#        self.helpMenu.addSeparator()
 
-            messageAction = QAction(QApplication.translate('Menu', 'Messages'), self)
-            messageAction.triggered.connect(self.viewMessageLog)
-            self.helpMenu.addAction(messageAction)
+        self.errorAction = QAction(QApplication.translate('Menu', 'Errors'), self)
+        self.errorAction.triggered.connect(self.viewErrorLog)
+#        self.helpMenu.addAction(self.errorAction)
 
-            serialAction = QAction(QApplication.translate('Menu', 'Serial'), self)
-            serialAction.triggered.connect(self.viewSerialLog)
-            serialAction.setMenuRole(QAction.MenuRole.NoRole)
-            self.helpMenu.addAction(serialAction)
+        self.messageAction = QAction(QApplication.translate('Menu', 'Messages'), self)
+        self.messageAction.triggered.connect(self.viewMessageLog)
+#        self.helpMenu.addAction(self.messageAction)
 
-            platformAction = QAction(QApplication.translate('Menu', 'Platform'), self)
-            platformAction.triggered.connect(self.viewplatform)
-            self.helpMenu.addAction(platformAction)
+        self.serialAction = QAction(QApplication.translate('Menu', 'Serial'), self)
+        self.serialAction.triggered.connect(self.viewSerialLog)
+        self.serialAction.setMenuRole(QAction.MenuRole.NoRole)
+#        self.helpMenu.addAction(self.serialAction)
+
+        self.platformAction = QAction(QApplication.translate('Menu', 'Platform'), self)
+        self.platformAction.triggered.connect(self.viewplatform)
+#        self.helpMenu.addAction(self.platformAction)
 
 
-            # SETTINGS submenu
-            self.helpMenu.addSeparator()
+        # SETTINGS submenu
+#        self.helpMenu.addSeparator()
 
-            self.loadSettingsAction = QAction(QApplication.translate('Menu', 'Load Settings...'), self)
-            self.loadSettingsAction.triggered.connect(self.loadSettings_triggered)
-            self.loadSettingsAction.setMenuRole(QAction.MenuRole.NoRole) # avoid specific handling of settings menu
-            self.helpMenu.addAction(self.loadSettingsAction)
+        self.loadSettingsAction = QAction(QApplication.translate('Menu', 'Load Settings...'), self)
+        self.loadSettingsAction.triggered.connect(self.loadSettings_triggered)
+        self.loadSettingsAction.setMenuRole(QAction.MenuRole.NoRole) # avoid specific handling of settings menu
+#        self.helpMenu.addAction(self.loadSettingsAction)
 
-            self.openRecentSettingMenu: QMenu|None = self.helpMenu.addMenu(QApplication.translate('Menu', 'Load Recent Settings'))
-            if self.openRecentSettingMenu is not None:
-                for i in range(self.MaxRecentFiles):
-                    self.openRecentSettingMenu.addAction(self.recentSettingActs[i])
-                self.updateRecentSettingActions()
+        self.openRecentSettingMenu:QMenu = QMenu(QApplication.translate('Menu', 'Load Recent Settings'))
+        for i in range(self.MaxRecentFiles):
+            self.openRecentSettingMenu.addAction(self.recentSettingActs[i])
+        self.updateRecentSettingActions()
 
-            self.saveAsSettingsAction = QAction(QApplication.translate('Menu', 'Save Settings...'), self)
-            self.saveAsSettingsAction.triggered.connect(self.saveSettings)
-            self.saveAsSettingsAction.setMenuRole(QAction.MenuRole.NoRole)  # avoid specific handling of settings menu
+        self.saveAsSettingsAction = QAction(QApplication.translate('Menu', 'Save Settings...'), self)
+        self.saveAsSettingsAction.triggered.connect(self.saveSettings)
+        self.saveAsSettingsAction.setMenuRole(QAction.MenuRole.NoRole)  # avoid specific handling of settings menu
+#        self.helpMenu.addAction(self.saveAsSettingsAction)
 
-            self.helpMenu.addAction(self.saveAsSettingsAction)
-            self.helpMenu.addSeparator()
-            self.resetAction = QAction(QApplication.translate('Menu', 'Factory Reset'), self)
-            self.resetAction.setMenuRole(QAction.MenuRole.NoRole)
-            self.resetAction.triggered.connect(self.resetApplication)
-            self.helpMenu.addAction(self.resetAction)
+#        self.helpMenu.addSeparator()
 
-        self.displayonlymenus()
+        self.resetAction = QAction(QApplication.translate('Menu', 'Factory Reset'), self)
+        self.resetAction.setMenuRole(QAction.MenuRole.NoRole)
+        self.resetAction.triggered.connect(self.resetApplication)
+#        self.helpMenu.addAction(self.resetAction)
 
+
+        self.displayonlymenus() # enable/disable menu items as needed
 
         self.main_menu_actions_with_shortcuts:list[QAction|None] = [
+            # file menu
+            self.newRoastAction,
             self.fileLoadAction,
             self.fileSaveAction,
             self.fileSaveAsAction,
-            self.fileSaveCopyAsAction,
             self.htmlAction,
             self.printAction,
             self.quitAction,
-            #
+            # edit menu
             self.cutAction,
             self.copyAction,
             self.pasteAction,
-            #
+            # roast menu
             self.editGraphAction,
             self.backgroundAction,
             self.switchAction,
+            # config menu
             self.deviceAction,
             self.curvesAction,
             self.eventsAction,
             self.alarmAction,
             self.WindowconfigAction,
-            #
+            # tools menu
             self.fitIdealautoAction,
             self.clearresultsAction,
-            #
+            # view menu
             self.controlsAction,
             self.readingsAction,
             self.buttonsAction,
             self.slidersAction,
             self.lcdsAction,
             self.fullscreenAction,
-            self.newRoastAction,
         ]
 
 
@@ -4389,6 +4402,218 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         self.zoomOutShortcut = QShortcut(QKeySequence.StandardKey.ZoomOut, self)
         self.zoomOutShortcut.activated.connect(self.zoomOut)
 
+    #
+
+    def create_file_menu(self, ui_mode:UI_MODE) -> QMenu:
+        file_menu = QMenu(f"&{QApplication.translate('Menu', 'File')}")
+        file_menu.addMenu(self.newRoastMenu)
+        file_menu.addAction(self.fileLoadAction)       # Open
+        file_menu.addMenu(self.openRecentMenu)         # Open recent
+        if ui_mode in {UI_MODE.EXPERT, UI_MODE.DEFAULT}:
+            file_menu.addMenu(self.importMenu)         # Import
+            file_menu.addMenu(self.convFromMenu)       # Convert from
+        file_menu.addSeparator()                       # ---
+        file_menu.addAction(self.fileSaveAction)       # Save
+        file_menu.addAction(self.fileSaveAsAction)     # SaveAs
+        if ui_mode is UI_MODE.EXPERT:
+            file_menu.addAction(self.fileSaveCopyAsAction) # SaveAs Copy
+        file_menu.addSeparator()
+        if ui_mode in {UI_MODE.EXPERT, UI_MODE.DEFAULT}:
+            file_menu.addMenu(self.exportMenu)         # Export
+            file_menu.addMenu(self.convMenu)           # Convert to
+        file_menu.addSeparator()                       # ---
+        if ui_mode in {UI_MODE.EXPERT, UI_MODE.DEFAULT}:
+            file_menu.addMenu(self.saveGraphMenu)      # Save Graph
+            file_menu.addMenu(self.reportMenu)         # Report
+            if ui_mode is UI_MODE.EXPERT:    # Save Statistics
+                file_menu.addMenu(self.saveStatisticsMenu)
+        file_menu.addSeparator()                       # ---
+        file_menu.addAction(self.printAction)          # Print
+        file_menu.addAction(self.quitAction)           # Quit
+        return file_menu
+
+    def create_edit_menu(self, ui_mode:UI_MODE) -> QMenu:
+        del ui_mode
+        edit_menu = QMenu(f"&{QApplication.translate('Menu', 'Edit')}")
+        edit_menu.addAction(self.cutAction)
+        edit_menu.addAction(self.copyAction)
+        edit_menu.addAction(self.pasteAction)
+        return edit_menu
+
+    def create_roast_menu(self, ui_mode:UI_MODE) -> QMenu:
+        roast_menu = QMenu(f"&{QApplication.translate('Menu', 'Roast')}")
+        roast_menu.addAction(self.editGraphAction)
+        roast_menu.addAction(self.backgroundAction)
+        roast_menu.addAction(self.flavorAction)
+        if ui_mode in {UI_MODE.EXPERT, UI_MODE.DEFAULT}:
+            roast_menu.addSeparator()
+            roast_menu.addAction(self.switchAction)
+            if ui_mode is UI_MODE.EXPERT:
+                roast_menu.addAction(self.switchETBTAction)
+        return roast_menu
+
+    def create_config_menu(self, ui_mode:UI_MODE) -> QMenu:
+        config_menu = QMenu(f"&{QApplication.translate('Menu', 'Config')}")
+        if ui_mode in {UI_MODE.EXPERT, UI_MODE.DEFAULT}:
+            config_menu.addMenu(self.machineMenu)
+        if ui_mode is UI_MODE.EXPERT:
+            config_menu.addAction(self.deviceAction)
+            config_menu.addAction(self.commportAction)
+            config_menu.addSeparator()
+            config_menu.addAction(self.calibrateDelayAction)
+            config_menu.addSeparator()
+            config_menu.addAction(self.curvesAction)
+        if ui_mode in {UI_MODE.EXPERT, UI_MODE.DEFAULT}:
+            config_menu.addSeparator()
+            config_menu.addAction(self.eventsAction)
+            config_menu.addAction(self.alarmAction)
+            config_menu.addSeparator()
+            config_menu.addAction(self.phasesGraphAction)
+            config_menu.addAction(self.StatisticsAction)
+        config_menu.addAction(self.WindowconfigAction)
+        config_menu.addSeparator()
+        if ui_mode is UI_MODE.EXPERT:
+            config_menu.addAction(self.colorsAction)
+        if ui_mode in {UI_MODE.EXPERT, UI_MODE.DEFAULT}:
+            config_menu.addMenu(self.themeMenu)
+            config_menu.addSeparator()
+            config_menu.addAction(self.autosaveAction)
+            config_menu.addAction(self.batchAction)
+            config_menu.addSeparator()
+            config_menu.addMenu(self.temperatureConfMenu)
+        config_menu.addMenu(self.languageMenu)
+        # the UI mode selector should always be present
+        config_menu.addSeparator()
+        config_menu.addMenu(self.UIModeMenu)
+        return config_menu
+
+    def create_tools_menu(self, ui_mode:UI_MODE) -> QMenu:
+        tools_menu = QMenu(f"&{QApplication.translate('Menu', 'Tools')}")
+        if ui_mode is not UI_MODE.PRODUCTION:
+            if ui_mode is UI_MODE.EXPERT:
+                tools_menu.addMenu(self.analyzeMenu)
+            tools_menu.addAction(self.roastCompareAction)
+            tools_menu.addAction(self.designerAction)
+            if ui_mode is UI_MODE.EXPERT:
+                tools_menu.addAction(self.simulatorAction)
+                tools_menu.addAction(self.wheeleditorAction)
+            tools_menu.addSeparator()
+            if ui_mode is UI_MODE.EXPERT:
+                tools_menu.addAction(self.transformAction)
+            tools_menu.addMenu(self.temperatureMenu)
+            tools_menu.addSeparator()
+            tools_menu.addAction(self.calculatorAction)
+        return tools_menu
+
+    def create_view_menu(self, ui_mode:UI_MODE) -> QMenu:
+        del ui_mode
+        view_menu = QMenu(f"&{QApplication.translate('Menu', 'View')}")
+        view_menu.addAction(self.controlsAction)
+        view_menu.addAction(self.readingsAction)
+        view_menu.addAction(self.eventsEditorAction)
+        view_menu.addAction(self.buttonsAction)
+        view_menu.addAction(self.slidersAction)
+        view_menu.addSeparator()
+        view_menu.addAction(self.scheduleAction)
+        if self.app.artisanviewerMode:
+            self.scheduleAction.setEnabled(False) # no scheduler in ArtisanViewer mode
+        view_menu.addSeparator()
+        view_menu.addAction(self.lcdsAction)
+        view_menu.addAction(self.deltalcdsAction)
+        view_menu.addAction(self.pidlcdsAction)
+        view_menu.addAction(self.extralcdsAction)
+        view_menu.addAction(self.phaseslcdsAction)
+        view_menu.addAction(self.scalelcdsAction)
+        view_menu.addSeparator()
+        if not (platform.system() == 'Darwin' and self.qmc.locale_str == 'en'): # macOS automatically adds the fullscreen action to View menu
+#            self.fullscreenAction = QAction(QApplication.translate('Menu', 'Full Screen'), self)
+#            self.fullscreenAction.triggered.connect(self.toggleFullscreen)
+#            self.fullscreenAction.setCheckable(True)
+#            self.fullscreenAction.setChecked(False)
+#            self.fullscreenAction.setShortcut('Ctrl+F')
+#            self.fullscreenAction.setMenuRole(QAction.MenuRole.NoRole)
+            view_menu.addAction(self.fullscreenAction)
+        return view_menu
+
+
+    def create_help_menu(self, ui_mode:UI_MODE) -> QMenu:
+        help_menu = QMenu(f"&{QApplication.translate('Menu', 'Help')}")
+        help_menu.addAction(self.helpAboutAction)
+        help_menu.addAction(self.aboutQtAction)
+        help_menu.addAction(self.helpDocumentationAction)
+        help_menu.addAction(self.KshortCAction)
+        if ui_mode in {UI_MODE.EXPERT, UI_MODE.DEFAULT}:
+            help_menu.addSeparator()
+            help_menu.addAction(self.checkUpdateAction)
+        if ui_mode is UI_MODE.EXPERT:
+            help_menu.addSeparator()
+            help_menu.addAction(self.errorAction)
+            help_menu.addAction(self.messageAction)
+            help_menu.addAction(self.serialAction)
+            help_menu.addAction(self.platformAction)
+        if ui_mode in {UI_MODE.EXPERT, UI_MODE.DEFAULT}:
+            help_menu.addSeparator()
+            help_menu.addAction(self.loadSettingsAction)
+            help_menu.addMenu(self.openRecentSettingMenu)
+            help_menu.addAction(self.saveAsSettingsAction)
+            help_menu.addSeparator()
+            help_menu.addAction(self.resetAction)
+        return help_menu
+
+    #
+
+    def set_menu(self, ui_mode:UI_MODE) -> None:
+        menuBar:QMenuBar|None = self.menuBar()
+        if menuBar is not None:
+#            menuBar.clear()
+            # File menu
+            self.fileMenu = self.create_file_menu(ui_mode)
+            menuBar.addMenu(self.fileMenu)
+            # Edit menu
+            self.editMenu = self.create_edit_menu(ui_mode)
+            menuBar.addMenu(self.editMenu)
+            # Roast menu
+            self.RoastMenu = self.create_roast_menu(ui_mode)
+            menuBar.addMenu(self.RoastMenu)
+            # Config menu
+            self.ConfMenu = self.create_config_menu(ui_mode)
+            menuBar.addMenu(self.ConfMenu)
+            # Tools menu
+            self.ToolkitMenu = self.create_tools_menu(ui_mode)
+            menuBar.addMenu(self.ToolkitMenu)
+            # View menu
+            self.viewMenu = self.create_view_menu(ui_mode)
+            menuBar.addMenu(self.viewMenu)
+            # Help menu
+            self.helpMenu = self.create_help_menu(ui_mode)
+            menuBar.addMenu(self.helpMenu)
+
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def setProductionMode(self, _:bool = False) -> None:
+        if self.ui_mode is not UI_MODE.PRODUCTION:
+            self.set_ui_mode(UI_MODE.PRODUCTION)
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def setDefaultMode(self, _:bool = False) -> None:
+        if self.ui_mode is not UI_MODE.DEFAULT:
+            self.set_ui_mode(UI_MODE.DEFAULT)
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def setExpertMode(self, _:bool = False) -> None:
+        if self.ui_mode is not UI_MODE.EXPERT:
+            self.set_ui_mode(UI_MODE.EXPERT)
+
+    # configures apps UI for different usage scenario by adjusting menus, dialogs, and shortcuts
+    def set_ui_mode(self, ui_mode:UI_MODE) -> None:
+        self.ui_mode = ui_mode
+        self.productionModeAction.setChecked(ui_mode is UI_MODE.PRODUCTION)
+        self.defaultModeAction.setChecked(ui_mode is UI_MODE.DEFAULT)
+        self.expertModeAction.setChecked(ui_mode is UI_MODE.EXPERT)
+        self.set_menu(ui_mode)
+
+    #
+
     def establish_phasescanvas(self) -> None:
         if self.qpc is None:
             from artisanlib.phases_canvas import tphasescanvas # pylint: disable=reimported
@@ -4718,8 +4943,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         languageAction.setCheckable(True)
         languageAction.triggered.connect(self.change_local_action)
         self.language_menu_actions[locale] = languageAction
-        if self.languageMenu is not None:
-            self.languageMenu.addAction(languageAction)
+        self.languageMenu.addAction(languageAction)
         if self.locale_str == locale:
             languageAction.setChecked(True)
 
@@ -5501,24 +5725,23 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
 
 
     def updateNewMenuRecentRoasts(self) -> None:
-        if self.newRoastMenu is not None:
-            self.newRoastMenu.clear()
-            # add NEW menu item
-            self.newRoastAction = QAction(QApplication.translate('Menu', 'New'), self)
-            self.newRoastAction.setShortcut(QKeySequence.StandardKey.New)
-            self.newRoastAction.triggered.connect(self.newRoast)  # pyright: ignore [reportGeneralTypeIssues] # error: Argument of type "(_: bool = False) -> bool" cannot be assigned to parameter "slot" of type "PYQT_SLOT" in function "connect"
-            self.newRoastMenu.addAction(self.newRoastAction)
-            # add recent roasts items
-            if len(self.recentRoasts) > 0:
-                self.newRoastMenu.addSeparator()
-                for rr in self.recentRoasts:
-    #                act = QAction(self, visible=True,
-    #                                triggered=self.newRecentRoast)
-                    act = QAction(self)
-                    act.triggered.connect(self.newRecentRoast)
-                    act.setData(rr)
-                    act.setText(self.recentRoastLabel(rr))
-                    self.newRoastMenu.addAction(act)
+        self.newRoastMenu.clear()
+        # add NEW menu item
+        self.newRoastAction = QAction(QApplication.translate('Menu', 'New'), self)
+        self.newRoastAction.setShortcut(QKeySequence.StandardKey.New)
+        self.newRoastAction.triggered.connect(self.newRoast)  # pyright: ignore [reportGeneralTypeIssues] # error: Argument of type "(_: bool = False) -> bool" cannot be assigned to parameter "slot" of type "PYQT_SLOT" in function "connect"
+        self.newRoastMenu.addAction(self.newRoastAction)
+        # add recent roasts items
+        if len(self.recentRoasts) > 0:
+            self.newRoastMenu.addSeparator()
+            for rr in self.recentRoasts:
+    #            act = QAction(self, visible=True,
+    #                            triggered=self.newRecentRoast)
+                act = QAction(self)
+                act.triggered.connect(self.newRecentRoast)
+                act.setData(rr)
+                act.setText(self.recentRoastLabel(rr))
+                self.newRoastMenu.addAction(act)
 
     def recentRoastsMenuList(self) -> list[str]:
         return [self.recentRoastLabel(rr) for rr in self.recentRoasts]
@@ -11713,73 +11936,53 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
 
     def disableLoadImportConvertMenus(self) -> None:
         self.fileLoadAction.setEnabled(False) # open
-        if self.openRecentMenu is not None:
-            self.openRecentMenu.setEnabled(False) # open recent
-        if self.importMenu is not None:
-            self.importMenu.setEnabled(False) # import
-        if self.convMenu is not None:
-            self.convMenu.setEnabled(False) # convert
+        self.openRecentMenu.setEnabled(False) # open recent
+        self.importMenu.setEnabled(False) # import
+        self.convMenu.setEnabled(False) # convert
 
     def enableLoadImportConvertMenus(self) -> None:
         self.fileLoadAction.setEnabled(True) # open
-        if self.openRecentMenu is not None:
-            self.openRecentMenu.setEnabled(True) # open recent
-        if self.importMenu is not None:
-            self.importMenu.setEnabled(True) # import
-        if self.convMenu is not None:
-            self.convMenu.setEnabled(True) # convert
+        self.openRecentMenu.setEnabled(True) # open recent
+        self.importMenu.setEnabled(True) # import
+        self.convMenu.setEnabled(True) # convert
 
     def enableEditMenus(self) -> None:
-        if self.newRoastMenu is not None:
-            self.newRoastMenu.setEnabled(True)
+        self.newRoastMenu.setEnabled(True)
         self.fileLoadAction.setEnabled(True) # open
-        if self.openRecentMenu is not None:
-            self.openRecentMenu.setEnabled(True) # open recent
-        if self.importMenu is not None:
-            self.importMenu.setEnabled(True) # import
+        self.openRecentMenu.setEnabled(True) # open recent
+        self.importMenu.setEnabled(True) # import
         self.fileSaveAction.setEnabled(True)
         self.fileSaveAsAction.setEnabled(True)
         self.fileSaveCopyAsAction.setEnabled(True)
-        if self.exportMenu is not None:
-            self.exportMenu.setEnabled(True)
-        if self.convMenu is not None:
-            self.convMenu.setEnabled(True)
-        if self.saveGraphMenu is not None:
-            self.saveGraphMenu.setEnabled(True)
+        self.exportMenu.setEnabled(True)
+        self.convMenu.setEnabled(True)
+        self.saveGraphMenu.setEnabled(True)
         self.htmlAction.setEnabled(True)
         if self.QtWebEngineSupport:
             self.roastReportPDFAction.setEnabled(True)
-        if self.reportMenu is not None:
-            self.reportMenu.setEnabled(True)
-        if self.productionMenu is not None:
-            self.productionMenu.setEnabled(True)
-        if self.rankingMenu is not None:
-            self.rankingMenu.setEnabled(True)
+        self.reportMenu.setEnabled(True)
+        self.productionMenu.setEnabled(True)
+        self.rankingMenu.setEnabled(True)
         self.printAction.setEnabled(True)
         self.editGraphAction.setEnabled(True)
         self.backgroundAction.setEnabled(True)
         self.switchAction.setEnabled(True)
         self.switchETBTAction.setEnabled(True)
         self.flavorAction.setEnabled(True)
-        if self.temperatureMenu is not None:
-            self.temperatureMenu.setEnabled(True)
-        if self.temperatureConfMenu is not None:
-            self.temperatureConfMenu.setEnabled(True)
-        if self.languageMenu is not None:
-            self.languageMenu.setEnabled(True)
+        self.temperatureMenu.setEnabled(True)
+        self.temperatureConfMenu.setEnabled(True)
+        self.languageMenu.setEnabled(True)
         self.deviceAction.setEnabled(True)
         self.commportAction.setEnabled(True)
         self.curvesAction.setEnabled(True)
-        if self.analyzeMenu is not None:
-            self.analyzeMenu.setEnabled(True)
+        self.analyzeMenu.setEnabled(True)
         self.roastCompareAction.setEnabled(True)
         self.designerAction.setEnabled(True)
         self.simulatorAction.setEnabled(True)
         self.wheeleditorAction.setEnabled(True)
         self.transformAction.setEnabled(True)
         self.loadSettingsAction.setEnabled(True)
-        if self.openRecentSettingMenu is not None:
-            self.openRecentSettingMenu.setEnabled(True)
+        self.openRecentSettingMenu.setEnabled(True)
         self.saveAsSettingsAction.setEnabled(True)
         self.resetAction.setEnabled(True)
         self.switchAction.setEnabled(True)
@@ -11799,49 +12002,39 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         self.buttonsAction.setEnabled(True)
         self.slidersAction.setEnabled(True)
 
-        if self.qmc.statssummary and self.saveStatisticsMenu is not None:
+        if self.qmc.statssummary:
             self.saveStatisticsMenu.setEnabled(True)
         self.displayonlymenus()
 
     def disableEditMenus(self, designer:bool = False, wheel:bool = False, compare:bool = False, sampling:bool = False) -> None:
         # FILE menu
-        if self.newRoastMenu is not None:
-            if designer or wheel or compare:
-                self.newRoastMenu.setEnabled(False)
-            else:
-                self.newRoastMenu.setEnabled(True)
+        if designer or wheel or compare:
+            self.newRoastMenu.setEnabled(False)
+        else:
+            self.newRoastMenu.setEnabled(True)
         if compare:
             self.fileLoadAction.setEnabled(True) # open
-            if self.openRecentMenu is not None:
-                self.openRecentMenu.setEnabled(True) # open recent
+            self.openRecentMenu.setEnabled(True) # open recent
         else:
             self.fileLoadAction.setEnabled(False) # open
-            if self.openRecentMenu is not None:
-                self.openRecentMenu.setEnabled(False) # open recent
-        if self.importMenu is not None:
-            self.importMenu.setEnabled(False) # import
+            self.openRecentMenu.setEnabled(False) # open recent
+        self.importMenu.setEnabled(False) # import
         if not sampling:
             self.fileSaveAction.setEnabled(False)
             self.fileSaveAsAction.setEnabled(False)
             self.fileSaveCopyAsAction.setEnabled(False)
-            if self.exportMenu is not None:
-                self.exportMenu.setEnabled(False)
-        if self.convMenu is not None:
-            self.convMenu.setEnabled(False)
-        if self.saveGraphMenu is not None and not wheel and not compare and not sampling:
+            self.exportMenu.setEnabled(False)
+        self.convMenu.setEnabled(False)
+        if not wheel and not compare and not sampling:
             self.saveGraphMenu.setEnabled(False)
         self.htmlAction.setEnabled(False)
         self.roastReportPDFAction.setEnabled(False)
-        if self.reportMenu is not None:
-            self.reportMenu.setEnabled(False)
-        if self.productionMenu is not None:
-            self.productionMenu.setEnabled(False)
-        if self.rankingMenu is not None:
-            self.rankingMenu.setEnabled(False)
+        self.reportMenu.setEnabled(False)
+        self.productionMenu.setEnabled(False)
+        self.rankingMenu.setEnabled(False)
         if not compare and not sampling:
             self.printAction.setEnabled(False)
-        if self.saveStatisticsMenu is not None:
-            self.saveStatisticsMenu.setEnabled(False)
+        self.saveStatisticsMenu.setEnabled(False)
         # EDIT menu
         # ROAST menu
         if compare or wheel:
@@ -11866,13 +12059,10 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             self.WindowconfigAction.setEnabled(False)
             self.colorsAction.setEnabled(False)
         self.themeMenu.setEnabled(False)
-        if self.temperatureConfMenu is not None:
-            self.temperatureConfMenu.setEnabled(False)
-        if self.languageMenu is not None:
-            self.languageMenu.setEnabled(False)
+        self.temperatureConfMenu.setEnabled(False)
+        self.languageMenu.setEnabled(False)
         # TOOLS menu
-        if self.analyzeMenu is not None:
-            self.analyzeMenu.setEnabled(False)
+        self.analyzeMenu.setEnabled(False)
         if not compare:
             self.roastCompareAction.setEnabled(False)
         else:
@@ -11887,8 +12077,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         else:
             self.wheeleditorAction.setEnabled(True)
         self.transformAction.setEnabled(False)
-        if self.temperatureMenu is not None:
-            self.temperatureMenu.setEnabled(False)
+        self.temperatureMenu.setEnabled(False)
         # VIEW menu
         if wheel:
             self.controlsAction.setEnabled(False)
@@ -11899,8 +12088,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             self.slidersAction.setEnabled(False)
         # HELP menu
         self.loadSettingsAction.setEnabled(False)
-        if self.openRecentSettingMenu is not None:
-            self.openRecentSettingMenu.setEnabled(False)
+        self.openRecentSettingMenu.setEnabled(False)
         self.saveAsSettingsAction.setEnabled(False)
         self.resetAction.setEnabled(False)
         #
@@ -11908,8 +12096,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
 
     def displayonlymenus(self) -> None:
         if self.app.artisanviewerMode:
-            if self.newRoastMenu is not None:
-                self.newRoastMenu.setEnabled(False)
+            self.newRoastMenu.setEnabled(False)
             self.calibrateDelayAction.setEnabled(False)
             self.saveAsSettingsAction.setEnabled(False)
             self.machineMenu.setEnabled(False)
@@ -17633,6 +17820,8 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                 self.qmc.autosaveaddtorecentfilesflag = False
                 self.qmc.batchcounter = -1
                 self.qmc.batchprefix = ''
+                # similarly we default to UI_MODE.EXPERT for existing users while for new users the default is UI_MODE.DEFAULT
+                self.ui_mode = UI_MODE.EXPERT
 
             if self.resetqsettings or (filename is None and QApplication.queryKeyboardModifiers() == (Qt.KeyboardModifier.AltModifier | Qt.KeyboardModifier.ShiftModifier)):
                 self.resetqsettings = 0
@@ -17956,6 +18145,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             self.qmc.AUCLCDmode = toInt(settings.value('AUCLCDmode',self.qmc.AUCLCDmode))
             self.qmc.AUCshowFlag = toBool(settings.value('AUCshowFlag',self.qmc.AUCshowFlag))
             self.keyboardmoveflag = toInt(settings.value('keyboardmoveflag',int(self.keyboardmoveflag)))
+            self.ui_mode = UI_MODE(toInt(settings.value('UI_mode',int(self.ui_mode))))
             self.qmc.ambientTempSource = toInt(settings.value('AmbientTempSource',int(self.qmc.ambientTempSource)))
             self.qmc.ambientHumiditySource = toInt(settings.value('AmbientHumiditySource',int(self.qmc.ambientHumiditySource)))
             self.qmc.ambientPressureSource = toInt(settings.value('AmbientPressureSource',int(self.qmc.ambientPressureSource)))
@@ -19971,6 +20161,8 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             settings.endGroup()
 #--- END GROUP events
 
+            #save UI Mode
+            self.settingsSetValue(settings, default_settings, 'UI_mode',self.ui_mode, read_defaults)
             #save ambient temperature source
             self.settingsSetValue(settings, default_settings, 'AmbientTempSource',self.qmc.ambientTempSource, read_defaults)
             self.settingsSetValue(settings, default_settings, 'AmbientHumiditySource',self.qmc.ambientHumiditySource, read_defaults)
@@ -27598,6 +27790,8 @@ def main() -> None:
     appWindow.restoreExtraDeviceSettingsBackup() # load settings backup if it exists (like on RESET)
     _log.info('loaded %s settings in %.2fs', len(QSettings().allKeys()), libtime.process_time() - start_time)
 #    _log.debug("PRINT mpl.get_cachedir(): %s",mpl.get_cachedir())
+
+    appWindow.set_ui_mode(appWindow.ui_mode)
 
     # inform the user the debug logging is on
     if debugLogLevelActive():

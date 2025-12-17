@@ -3052,7 +3052,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                         if 'ratio_denom' in i:
                             entry['ratio_denom'] = i['ratio_denom']
                         ingredients.append(entry)
-                    self.aw.qmc.plus_blend_spec['ingredients'] = ingredients # ty:ignore[possibly-missing-implicit-call] # pyrefly: ignore[unsupported-operation]
+                    self.aw.qmc.plus_blend_spec['ingredients'] = ingredients # ty:ignore[possibly-missing-implicit-call] # pyrefly: ignore[unsupported-operation] # ty:ignore[invalid-assignment]
                     # set beans description
                     blend_lines = plus.stock.blend2beans(blend_structure, weight_unit_idx, self.aw.qmc.weight[0])
                     self.aw.qmc.beans = '\n'.join(blend_lines)
