@@ -35,11 +35,10 @@ import logging
 from typing import Final, Any, TypedDict, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from multiprocessing.connection import Connection # pylint: disable=unused-import
-#    try:
-#        from multiprocessing.connection import Connection # type: ignore[unused-ignore,attr-defined,assignment] # pylint: disable=unused-import
-#    except ImportError:
-#        from multiprocessing.connection import PipeConnection as Connection # type: ignore[unused-ignore,attr-defined,assignment] # pylint: disable=unused-import
+    try:
+        from multiprocessing.connection import PipeConnection as Connection # type: ignore[unused-ignore,attr-defined,assignment] # pylint: disable=unused-import
+    except ImportError:
+        from multiprocessing.connection import Connection # type: ignore[unused-ignore,attr-defined,assignment] # pylint: disable=unused-import
     from usb.core import Configuration, Interface, Endpoint
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
