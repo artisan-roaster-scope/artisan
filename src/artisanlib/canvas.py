@@ -2434,15 +2434,18 @@ class tgraphcanvas(QObject):
 
         # Others
         self.energyresultunit_setup:int = 0                        # index in list self.powerunits
-        self.kind_list: Final[list[str]] = [QApplication.translate('Label','Preheat Measured'),
-                          QApplication.translate('Label','Preheat %'),
-                          QApplication.translate('Label','BBP Measured'),
-                          QApplication.translate('Label','BBP %'),
-                          QApplication.translate('Label','Cooling Measured'),
-                          QApplication.translate('Label','Cooling %'),
-                          QApplication.translate('Label','Continuous'),
-                          QApplication.translate('Label','Roast Event'),
-                          QApplication.translate('Label','Meter')]
+        self.kind_list: Final[list[str]] = [                       # label displayed in Kind column of the Energy Details table
+                        QApplication.translate('Label','Preheat Measured'),      # 0
+                        QApplication.translate('Label','Preheat %'),             # 1
+                        QApplication.translate('Label','BBP Measured'),          # 2
+                        QApplication.translate('Label','BBP %'),                 # 3
+                        QApplication.translate('Label','Cooling Measured'),      # 4
+                        QApplication.translate('Label','Cooling %'),             # 5
+                        QApplication.translate('Label','Continuous'),            # 6
+                        QApplication.translate('Label','Roast Event'),           # 7
+                        QApplication.translate('Label','Meter'),                 # 8
+                        QApplication.translate('Label','PID Duty %')             # 9
+                        ]
         self.perKgRoastMode:bool = False # if true only the amount during the roast and not the full batch (incl. preheat and BBP) are displayed), toggled by click on the result widget
 
         ## working variables (stored in .alog profiles):
@@ -16437,6 +16440,7 @@ class tgraphcanvas(QObject):
             def formatLoadLabel(i:int) -> str:
                 if len(self.loadlabels[i]) > 0:
                     return  self.loadlabels[i]
+                # if label is empty generate alphabetic label (A,B,C D)
                 return chr(ord('A')+i)
 
             # get the valid green weight
@@ -16446,7 +16450,7 @@ class tgraphcanvas(QObject):
                 w = self.weight[0]
             bean_weight = convertWeight(w, weight_units.index(self.weight[2]),1) # to kg
 
-            eTypes = [''] + self.etypes[:][:4]
+            eTypes = [''] + self.etypes[:4]
 
             # init the prev_loadtime to drop if it exists or to the end of profile time
             if self.timeindex[6] > 0:
@@ -16455,24 +16459,33 @@ class tgraphcanvas(QObject):
                 prev_loadtime = [self.timex[-1]]*4
                 #self.aw.sendmessage(QApplication.translate("Message","Profile has no DROP event"),append=False)
 
+            # setup for PID DUTY %
+            PID_DUTY_DEVICE_INDEX = 22  # '+PID SV/DUTY %' hardcoded value
+            pid_duty_extradevice_index = -1
+            pid_duty_label = ''
+            if PID_DUTY_DEVICE_INDEX in self.extradevices:
+                pid_duty_extradevice_index = self.extradevices.index(PID_DUTY_DEVICE_INDEX)
+                pid_duty_label = self.extraname2[pid_duty_extradevice_index]
+
+            # loop through each load and calculate the energy from each contributor
             for i in range(4):
-                # iterate specialevents in reverse from DROP to the first event
+                # calculate specialevents, iterate in reverse from DROP to the first event
                 for j in range(len(self.specialevents) - 1, -1, -1):
-                    if self.load_etypes[i] != 0 and self.specialeventstype[j] == self.load_etypes[i]-1:
+                    if self.load_etypes[i] in {1,2,3,4} and self.specialeventstype[j] == self.load_etypes[i]-1:
                         # skip if loadrating is zero
                         if self.loadratings[i] == 0:
-                            break
+                            break #j loop
                         loadtime = self.timex[self.specialevents[j]]
                         # exclude heat before charge event
                         if self.timeindex[0] > -1 and loadtime <= self.timex[self.timeindex[0]]:
                             if prev_loadtime[i] <= self.timex[self.timeindex[0]]:
-                                break
+                                break #j loop
                             loadtime = self.timex[self.timeindex[0]]
                         duration = prev_loadtime[i] - loadtime
 
                         # exclude heat after drop event
                         if duration < 0:
-                            continue
+                            continue #j loop
                         prev_loadtime[i] = loadtime
                         # scale the burner setting for 0-100%
                         val = (self.specialeventsvalue[j] - 1) * 10
@@ -16492,10 +16505,64 @@ class tgraphcanvas(QObject):
                             kind = 7  #Roast Event
                             sortorder = (2000 * (i + 1)) + j
                             CO2g = self.calcCO2g(BTUs, self.sourcetypes[i])
-                            btu_list.append({'load_pct':load_pct,'duration':duration,'BTUs':BTUs,'CO2g':CO2g,'LoadLabel':loadlabel,'Kind':kind,'SourceType':self.sourcetypes[i],'SortOrder':sortorder})
-                ### end of loop: for j in range(len(self.specialevents) - 1, -1, -1)
+                            btu_list.append({
+                                'load_pct':load_pct,
+                                'duration':duration,
+                                'BTUs':BTUs,
+                                'CO2g':CO2g,
+                                'LoadLabel':loadlabel,
+                                'Kind':kind,
+                                'SourceType':self.sourcetypes[i],
+                                'SortOrder':sortorder
+                            })
 
-                # calculate Continuous event type
+                # calculate PID DUTY % energy when there is a 'PID DUTY %' extradevice, Load Rating, and CHARGE/DROP
+                if (self.load_etypes[i] == 6 and pid_duty_extradevice_index > -1 and self.loadratings[i] > 0 and
+                    self.timeindex[0] > -1 and self.timeindex[6] > 0):
+
+                    accumulated_btus: float = 0
+                    accumulated_factors: float = 0
+                    # loop over the values from CHARGE to DROP and accumulate energy
+                    for j in range(self.timeindex[0],self.timeindex[6]):  #
+                        duration = self.extratimex[pid_duty_extradevice_index][j+1] - self.extratimex[pid_duty_extradevice_index][j]
+
+                        # don't accumulate the value when the PID is OFF, i.e. when extratemp2 == -1 and rekject values not in 0-100
+                        if not 0 < self.extratemp2[pid_duty_extradevice_index][j] <= 100:
+                            break  #j loop
+
+                        # get the PID DUTY % value
+                        load_pct = self.extratemp2[pid_duty_extradevice_index][j]
+
+                        # scale when Pressure % is ticked
+                        if self.presssure_percents[i] and self.sourcetypes[i] in {0, 1}:   # gas loads only
+                            # convert pressure to heat
+                            factor = math.sqrt(load_pct / 100)
+                        else:
+                            factor = load_pct / 100
+
+                        # accumulate
+                        accumulated_btus += self.loadratings[i] * factor * (duration / 3600) * self.convertHeat(1,self.powerunits[self.ratingunits[i]],'BTU')
+                        accumulated_factors += factor
+
+                    if accumulated_btus > 0:
+                        loadlabel = f'{formatLoadLabel(i)}-{pid_duty_label}'
+                        kind = 9  #PID DUTY %
+                        sortorder = 200 + i
+                        CO2g = self.calcCO2g(accumulated_btus, self.sourcetypes[i])
+                        roast_time = self.extratimex[pid_duty_extradevice_index][self.timeindex[6]] - self.extratimex[pid_duty_extradevice_index][self.timeindex[0]]
+                        avg_power_pct = accumulated_factors * 100 / (self.timeindex[6] - self.timeindex[0]) if (self.timeindex[6] - self.timeindex[0]) > 0 else 0
+                        btu_list.append({
+                            'load_pct':avg_power_pct,
+                            'duration':roast_time,
+                            'BTUs':accumulated_btus,
+                            'CO2g':CO2g,
+                            'LoadLabel':loadlabel,
+                            'Kind':kind,
+                            'SourceType':self.sourcetypes[i],
+                            'SortOrder':sortorder
+                        })
+
+                # calculate Continuous loads
                 if self.load_etypes[i] == 0:
                     if self.timeindex[0] > -1 and self.timeindex[6] > 0:
                         duration = self.timex[self.timeindex[6]] - self.timex[self.timeindex[0]]
@@ -16509,14 +16576,24 @@ class tgraphcanvas(QObject):
                     else:
                         factor = load_pct / 100
 
-                    loadlabel = formatLoadLabel(i)
-                    kind = 6  #Roast Continuous
-                    fueltype = self.sourcetypes[i]
-                    sortorder = 2000 - i
                     BTUs = self.loadratings[i] * factor * (duration / 3600) * self.convertHeat(1,self.powerunits[self.ratingunits[i]],'BTU')
-                    CO2g = self.calcCO2g(BTUs, self.sourcetypes[i])
+                    
                     if BTUs > 0:
-                        btu_list.append({'load_pct':load_pct,'duration':duration,'BTUs':BTUs,'CO2g':CO2g,'LoadLabel':loadlabel,'Kind':kind,'SourceType':self.sourcetypes[i],'SortOrder':sortorder})
+                        loadlabel = formatLoadLabel(i)
+                        kind = 6  #Roast Continuous
+                        fueltype = self.sourcetypes[i]
+                        sortorder = 2000 - i
+                        CO2g = self.calcCO2g(BTUs, self.sourcetypes[i])
+                        btu_list.append({
+                            'load_pct':load_pct,
+                            'duration':duration,
+                            'BTUs':BTUs,
+                            'CO2g':CO2g,
+                            'LoadLabel':loadlabel,
+                            'Kind':kind,
+                            'SourceType':self.sourcetypes[i],
+                            'SortOrder':sortorder
+                        })
 
                 # calculate preheat
                 if self.preheatenergies[i] != 0 and self.roastbatchpos == 1:
@@ -16538,11 +16615,20 @@ class tgraphcanvas(QObject):
                         BTUs = self.preheatenergies[i] * self.convertHeat(1,self.powerunits[self.ratingunits[i]],'BTU')
                         kind = 0  #Preheat Measured
 
-                    loadlabel = formatLoadLabel(i)
-                    sortorder = 100 + i
-                    CO2g = self.calcCO2g(BTUs, self.sourcetypes[i])
                     if BTUs > 0:
-                        btu_list.append({'load_pct':load_pct,'duration':duration,'BTUs':BTUs,'CO2g':CO2g,'LoadLabel':loadlabel,'Kind':kind,'SourceType':self.sourcetypes[i],'SortOrder':sortorder})
+                        loadlabel = formatLoadLabel(i)
+                        sortorder = 100 + i
+                        CO2g = self.calcCO2g(BTUs, self.sourcetypes[i])
+                        btu_list.append({
+                            'load_pct':load_pct,
+                            'duration':duration,
+                            'BTUs':BTUs,
+                            'CO2g':CO2g,
+                            'LoadLabel':loadlabel,
+                            'Kind':kind,
+                            'SourceType':self.sourcetypes[i],
+                            'SortOrder':sortorder
+                        })
 
                 # calculate betweenbatch
                 if self.betweenbatchenergies[i] != 0 and (self.roastbatchpos > 1 or self.betweenbatch_after_preheat or self.roastbatchpos==0):
@@ -16564,11 +16650,20 @@ class tgraphcanvas(QObject):
                         BTUs = self.betweenbatchenergies[i] * self.convertHeat(1,self.powerunits[self.ratingunits[i]],'BTU')
                         kind = 2  #BBP Measured
 
-                    loadlabel = formatLoadLabel(i)
-                    sortorder = 400 + i
-                    CO2g = self.calcCO2g(BTUs, self.sourcetypes[i])
                     if BTUs > 0:
-                        btu_list.append({'load_pct':load_pct,'duration':duration,'BTUs':BTUs,'CO2g':CO2g,'LoadLabel':loadlabel,'Kind':kind,'SourceType':self.sourcetypes[i],'SortOrder':sortorder})
+                        loadlabel = formatLoadLabel(i)
+                        sortorder = 400 + i
+                        CO2g = self.calcCO2g(BTUs, self.sourcetypes[i])
+                        btu_list.append({
+                            'load_pct':load_pct,
+                            'duration':duration,
+                            'BTUs':BTUs,
+                            'CO2g':CO2g,
+                            'LoadLabel':loadlabel,
+                            'Kind':kind,
+                            'SourceType':self.sourcetypes[i],
+                            'SortOrder':sortorder
+                        })
 
                 # calculate cooling
                 if self.coolingenergies[i] != 0 and self.roastbatchpos == 1:
@@ -16589,11 +16684,21 @@ class tgraphcanvas(QObject):
                         duration = 0
                         BTUs = self.coolingenergies[i] * self.convertHeat(1,self.powerunits[self.ratingunits[i]],'BTU')
                         kind = 4  #Cooling Measured
-                    loadlabel = formatLoadLabel(i)
-                    sortorder = 800 + i
-                    CO2g = self.calcCO2g(BTUs, self.sourcetypes[i])
+
                     if BTUs > 0:
-                        btu_list.append({'load_pct':load_pct,'duration':duration,'BTUs':BTUs,'CO2g':CO2g,'LoadLabel':loadlabel,'Kind':kind,'SourceType':self.sourcetypes[i],'SortOrder':sortorder})
+                        loadlabel = formatLoadLabel(i)
+                        sortorder = 800 + i
+                        CO2g = self.calcCO2g(BTUs, self.sourcetypes[i])
+                        btu_list.append({
+                            'load_pct':load_pct,
+                            'duration':duration,
+                            'BTUs':BTUs,
+                            'CO2g':CO2g,
+                            'LoadLabel':loadlabel,
+                            'Kind':kind,
+                            'SourceType':self.sourcetypes[i],
+                            'SortOrder':sortorder
+                        })
             #### end of loop: for i in range(0,4)
 
             # Meter reads
@@ -16610,7 +16715,16 @@ class tgraphcanvas(QObject):
                     fueltype = self.meterfuels[j]
                     CO2g = self.calcCO2g(BTUs, fueltype)
                     kind = 8 # Meter
-                    btu_list.append({'load_pct':0,'duration':0,'BTUs':BTUs,'CO2g':CO2g,'LoadLabel':loadlabel,'Kind':kind,'SourceType':fueltype,'SortOrder':sortorder})
+                    btu_list.append({
+                        'load_pct':0,
+                        'duration':0,
+                        'BTUs':BTUs,
+                        'CO2g':CO2g,
+                        'LoadLabel':loadlabel,
+                        'Kind':kind,
+                        'SourceType':fueltype,
+                        'SortOrder':sortorder
+                    })
                     # Get the BBP and Roastreads
                     btu_meter_bbp += self.meterreads[j][1] # Charge
                     btu_meter_roast += self.meterreads[j][7] - self.meterreads[j][1] # Drop minus Charge
