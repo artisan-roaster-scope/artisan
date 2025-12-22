@@ -920,7 +920,6 @@ def findTPint(timeindex:list[int], timex:list[float], temp:list[float]) -> int:
 
 @functools.lru_cache(maxsize=30)
 def eventtime2string(time:float) -> str:
-    _log.debug('PRINT eventtime2string(%s)',time)
     if time == 0.0:
         return ''
     di,mo = divmod(time,60)

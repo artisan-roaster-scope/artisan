@@ -16,6 +16,7 @@
 # Marko Luther, 2023
 
 import platform
+from artisanlib.main import UI_MODE
 from artisanlib.dialogs import ArtisanResizeablDialog
 from artisanlib.widgets import MyQDoubleSpinBox
 
@@ -128,11 +129,12 @@ class flavorDlg(ArtisanResizeablDialog):
         aspectLayout.addWidget(aspectlabel)
         aspectLayout.addWidget(self.aspectSpinBox)
         blayout1 = QHBoxLayout()
-        blayout1.addWidget(addButton)
-        blayout1.addSpacing(5)
-        blayout1.addWidget(delButton)
+        if self.aw.ui_mode is UI_MODE.EXPERT:
+            blayout1.addWidget(addButton)
+            blayout1.addSpacing(5)
+            blayout1.addWidget(delButton)
+            blayout1.addSpacing(10)
         blayout1.addStretch()
-        blayout1.addSpacing(10)
         blayout1.addWidget(correctionLabel)
         blayout1.addWidget(self.correctionSpinBox)
         extralayout = QVBoxLayout()
@@ -160,7 +162,8 @@ class flavorDlg(ArtisanResizeablDialog):
         mainLayout.addLayout(flavorLayout)
         mainLayout.addLayout(blayout1)
         mainLayout.addWidget(extraGroupLayout)
-#        mainLayout.addLayout(blayout)
+        if self.aw.ui_mode is UI_MODE.PRODUCTION:
+            extraGroupLayout.hide()
         mainLayout.addLayout(mainButtonsLayout)
         mainLayout.setContentsMargins(7,5,7,5) # left, top, right, bottom
         mainLayout.setSpacing(3)

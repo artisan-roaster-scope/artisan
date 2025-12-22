@@ -18,6 +18,7 @@
 import platform
 import logging
 
+from artisanlib.main import UI_MODE
 from artisanlib.util import deltaLabelUTF8, deltaLabelPrefix, stringfromseconds
 from artisanlib.dialogs import ArtisanResizeablDialog
 from artisanlib.widgets import (MyTableWidgetItemNumber)
@@ -291,23 +292,27 @@ class backgroundDlg(ArtisanResizeablDialog):
         checkslayout1.addWidget(self.backgroundFullflag)
         checkslayout1.addStretch()
         layoutBoxedH = QHBoxLayout()
-        layoutBoxedH.addStretch()
+        if self.aw.ui_mode is not UI_MODE.PRODUCTION:
+            layoutBoxedH.addStretch()
         layoutBoxedH.addStretch()
         layoutBoxedH.addLayout(movelayout)
         layoutBoxedH.addStretch()
-        layoutBoxedH.addWidget(self.keyboardControlflag)
+        if self.aw.ui_mode is not UI_MODE.PRODUCTION:
+            layoutBoxedH.addWidget(self.keyboardControlflag)
         layoutBoxed = QVBoxLayout()
         layoutBoxed.addStretch()
-        layoutBoxed.addLayout(checkslayout1)
-        layoutBoxed.addStretch()
+        if self.aw.ui_mode is not UI_MODE.PRODUCTION:
+            layoutBoxed.addLayout(checkslayout1)
+            layoutBoxed.addStretch()
         layoutBoxed.addLayout(layoutBoxedH)
         layoutBoxed.addStretch()
         alignButtonBoxed = QHBoxLayout()
-        alignButtonBoxed.addWidget(self.xtcurvelabel)
-        alignButtonBoxed.addWidget(self.xtcurveComboBox)
-        alignButtonBoxed.addSpacing(10)
-        alignButtonBoxed.addWidget(self.ytcurvelabel)
-        alignButtonBoxed.addWidget(self.ytcurveComboBox)
+        if len(self.aw.qmc.extratimexB)>0 and self.aw.ui_mode is not UI_MODE.PRODUCTION:
+            alignButtonBoxed.addWidget(self.xtcurvelabel)
+            alignButtonBoxed.addWidget(self.xtcurveComboBox)
+            alignButtonBoxed.addSpacing(10)
+            alignButtonBoxed.addWidget(self.ytcurvelabel)
+            alignButtonBoxed.addWidget(self.ytcurveComboBox)
         alignButtonBoxed.addStretch()
         alignButtonBoxed.addWidget(alignButton)
         alignButtonBoxed.addWidget(self.alignComboBox)
@@ -478,7 +483,8 @@ class backgroundDlg(ArtisanResizeablDialog):
 #        tab1layout.addStretch()
         tab1layout.addLayout(alignButtonBoxed)
         tab1layout.addWidget(playbackGroupLayout)
-        tab1layout.addLayout(optcontent)
+        if self.aw.ui_mode is UI_MODE.EXPERT:
+            tab1layout.addLayout(optcontent)
         tab1layout.setContentsMargins(5, 0, 5, 0) # left, top, right, bottom
         tab1layout.setSpacing(5)
         eventbuttonLayout = QHBoxLayout()
@@ -502,10 +508,12 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.TabWidget.addTab(C1Widget,QApplication.translate('Tab','Config'))
         C2Widget = QWidget()
         C2Widget.setLayout(tab2layout)
-        self.TabWidget.addTab(C2Widget,QApplication.translate('Tab','Events'))
+        if self.aw.ui_mode is not UI_MODE.PRODUCTION:
+            self.TabWidget.addTab(C2Widget,QApplication.translate('Tab','Events'))
         C3Widget = QWidget()
         C3Widget.setLayout(tab3layout)
-        self.TabWidget.addTab(C3Widget,QApplication.translate('Tab','Data'))
+        if self.aw.ui_mode is UI_MODE.EXPERT:
+            self.TabWidget.addTab(C3Widget,QApplication.translate('Tab','Data'))
         buttonLayout = QHBoxLayout()
         buttonLayout.addWidget(loadButton)
         buttonLayout.addWidget(delButton)

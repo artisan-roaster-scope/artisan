@@ -31,6 +31,7 @@ if TYPE_CHECKING:
     from PyQt6.QtGui import QClipboard, QCloseEvent, QKeyEvent, QMouseEvent # pylint: disable=unused-import
     from PyQt6.QtCore import QObject, QMetaObject # pylint: disable=unused-import
 
+from artisanlib.main import UI_MODE
 
 # import artisan.plus modules
 import plus.config  # @UnusedImport
@@ -1299,9 +1300,9 @@ class editGraphDlg(ArtisanResizeablDialog):
         titleLine.addWidget(self.titleedit)
         titleLine.addWidget(self.addRecentButton)
         titleLine.addWidget(self.delRecentButton)
-        titleLine.addSpacing(2)
-        titleLine.addWidget(self.titleShowAlwaysFlag)
-
+        if self.aw.ui_mode is UI_MODE.EXPERT:
+            titleLine.addSpacing(2)
+            titleLine.addWidget(self.titleShowAlwaysFlag)
         self.template_line = QLabel('P249 Guatemala')
         template_font = self.template_line.font()
         template_font.setPointSize(template_font.pointSize() -1)
@@ -1406,7 +1407,8 @@ class editGraphDlg(ArtisanResizeablDialog):
             selectedLineLayout = QHBoxLayout()
             selectedLineLayout.addWidget(self.plus_selected_line)
             selectedLineLayout.addStretch()
-            selectedLineLayout.addWidget(self.label_origin_flag)
+            if self.aw.ui_mode is UI_MODE.EXPERT:
+                selectedLineLayout.addWidget(self.label_origin_flag)
             textLayout.addLayout(selectedLineLayout,4,1)
             textLayout.addWidget(plusCoffeeslabel,5,0)
             textLayout.addLayout(plusLine,5,1)
@@ -1531,7 +1533,8 @@ class editGraphDlg(ArtisanResizeablDialog):
         ambientGrid.setVerticalSpacing(0)
         ambientGrid.addWidget(ambientlabel,2,0)
         ambientGrid.addLayout(ambient,2,2,1,5)
-        ambientGrid.addWidget(updateAmbientTemp,2,10)
+        if self.aw.ui_mode in {UI_MODE.DEFAULT, UI_MODE.EXPERT}:
+            ambientGrid.addWidget(updateAmbientTemp,2,10)
         ambientGrid.setColumnMinimumWidth(3, 11)
         ambientGrid.setColumnMinimumWidth(5, 11)
         ambientGrid.setColumnMinimumWidth(8, 11)
@@ -1556,13 +1559,14 @@ class editGraphDlg(ArtisanResizeablDialog):
         anotationLayout.addWidget(cuppinglabel)
         anotationLayout.addWidget(self.cuppingeditor)
         okLayout = QHBoxLayout()
-        okLayout.addWidget(self.roastproperties)
-        okLayout.addStretch()
-        okLayout.addSpacing(3)
-        okLayout.addWidget(self.roastpropertiesAutoOpen)
-        okLayout.addStretch()
-        okLayout.addSpacing(3)
-        okLayout.addWidget(self.roastpropertiesAutoOpenDROP)
+        if self.aw.ui_mode is UI_MODE.EXPERT:
+            okLayout.addWidget(self.roastproperties)
+            okLayout.addStretch()
+            okLayout.addSpacing(3)
+            okLayout.addWidget(self.roastpropertiesAutoOpen)
+            okLayout.addStretch()
+            okLayout.addSpacing(3)
+            okLayout.addWidget(self.roastpropertiesAutoOpenDROP)
         okLayout.addStretch()
         okLayout.addWidget(self.dialogbuttons)
         okLayout.setSpacing(10)
@@ -1575,9 +1579,11 @@ class editGraphDlg(ArtisanResizeablDialog):
         mainLayout.setContentsMargins(3, 3, 3, 3)
         eventbuttonLayout = QHBoxLayout()
         eventbuttonLayout.addWidget(self.copyeventTableButton)
-        eventbuttonLayout.addWidget(self.createalarmTableButton)
+        if self.aw.ui_mode is not UI_MODE.EXPERT:
+            eventbuttonLayout.addWidget(self.createalarmTableButton)
         eventbuttonLayout.addStretch()
-        eventbuttonLayout.addWidget(self.clusterEventsButton)
+        if self.aw.ui_mode is not UI_MODE.EXPERT:
+            eventbuttonLayout.addWidget(self.clusterEventsButton)
         eventbuttonLayout.addWidget(self.ordereventTableButton)
         eventbuttonLayout.addStretch()
         eventbuttonLayout.addWidget(self.clearEventsButton)
@@ -1634,14 +1640,18 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.TabWidget.addTab(C2Widget,QApplication.translate('Tab', 'Notes'))
         C3Widget = QWidget()
         C3Widget.setLayout(tab3Layout)
-        self.TabWidget.addTab(C3Widget,QApplication.translate('Tab', 'Events'))
+        if self.aw.ui_mode is not UI_MODE.PRODUCTION:
+            self.TabWidget.addTab(C3Widget,QApplication.translate('Tab', 'Events'))
         C4Widget = QWidget()
         C4Widget.setLayout(tab4Layout)
-        self.TabWidget.addTab(C4Widget,QApplication.translate('Tab', 'Data'))
+        if self.aw.ui_mode is UI_MODE.EXPERT:
+            self.TabWidget.addTab(C4Widget,QApplication.translate('Tab', 'Data'))
         self.C5Widget = QWidget()
-        self.TabWidget.addTab(self.C5Widget,QApplication.translate('Tab', 'Energy'))
+        if self.aw.ui_mode is UI_MODE.EXPERT:
+            self.TabWidget.addTab(self.C5Widget,QApplication.translate('Tab', 'Energy'))
         self.C6Widget = QWidget()
-        self.TabWidget.addTab(self.C6Widget,QApplication.translate('Tab', 'Setup'))
+        if self.aw.ui_mode is UI_MODE.EXPERT:
+            self.TabWidget.addTab(self.C6Widget,QApplication.translate('Tab', 'Setup'))
         #
         self.TabWidget.currentChanged.connect(self.tabSwitched)
         #incorporate layouts

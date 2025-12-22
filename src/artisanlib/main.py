@@ -774,15 +774,10 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
 ##        f.setBold(True)
         self.locLabel.setFont(f)
 
+# WORK:
 
 # add green flag menu on matplotlib v2.0 and later
         self.edit_curve_parameters_action = None
-        if len(self.actions()) > 0: # pyright:ignore[reportUnknownArgumentType]
-            # insert the "Green Flag" menu item before the last one (which is the x/y coordinate display)
-            self.edit_curve_parameters_action = QAction(self._icon('qt4_editor_options.png'),QApplication.translate('Toolbar', 'Lines'), self) # pyrefly: ignore[bad-assignment]
-            self.edit_curve_parameters_action.triggered.connect(self.my_edit_parameters)
-            self.edit_curve_parameters_action.setToolTip(QApplication.translate('Tooltip', 'Line styles'))
-            self.insertAction(self.actions()[-1], self.edit_curve_parameters_action)
 
         # adjust for dark or light canvas and set hover/selection style
         for a in self.actions():
@@ -834,6 +829,21 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
 #######################################################################################
 #####   temporary hack for windows till better solution found about toolbar icon problem with py2exe and svg
 #######################################################################################
+
+    def add_toolbar_lines_configuration(self) -> None:
+        if len(self.actions()) > 0 and self.edit_curve_parameters_action is None: # pyright:ignore[reportUnknownArgumentType]
+            # insert the "Green Flag" menu item before the last one (which is the x/y coordinate display)
+            self.edit_curve_parameters_action = QAction(self._icon('qt4_editor_options.png'),QApplication.translate('Toolbar', 'Lines'), self) # pyrefly: ignore[bad-assignment]
+            self.edit_curve_parameters_action.triggered.connect(self.my_edit_parameters)
+            self.edit_curve_parameters_action.setToolTip(QApplication.translate('Tooltip', 'Line styles'))
+            self.insertAction(self.actions()[-1], self.edit_curve_parameters_action)
+
+    def remove_toolbar_lines_configuration(self) -> None:
+        if len(self.actions()) > 0 and self.edit_curve_parameters_action is not None: # pyright:ignore[reportUnknownArgumentType]
+            self.removeAction(self.edit_curve_parameters_action)
+            self.edit_curve_parameters_action = None
+
+
 
     def my_fedit(self, data:Any, title:str='', comment:str='', icon:QIcon|None = None,
             parent:QWidget|None = None, apply:Callable[..., None]|None = None) -> None:
@@ -1981,25 +1991,16 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
 
         # populate recent file menu
         for _ in range(self.MaxRecentFiles):
-#            self.recentFileActs.append(
-#                    QAction(self, visible=False,
-#                            triggered=self.openRecentFile))
             action = QAction(self)
             action.triggered.connect(self.openRecentFile)
             self.recentFileActs.append(action)
         # populate recent settings menu
         for _ in range(self.MaxRecentFiles):
-#            self.recentSettingActs.append(
-#                    QAction(self, visible=False,
-#                            triggered=self.openRecentSetting))
             action = QAction(self)
             action.triggered.connect(self.openRecentSetting)
             self.recentSettingActs.append(action)
         # populate recent themes menu
         for _ in range(self.MaxRecentFiles):
-#            self.recentThemeActs.append(
-#                    QAction(self, visible=False,
-#                            triggered=self.openRecentTheme))
             action = QAction(self)
             action.triggered.connect(self.openRecentTheme)
             self.recentThemeActs.append(action)
@@ -2020,7 +2021,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         _mac_quit = QApplication.translate('MAC_APPLICATION_MENU', 'Quit {0}')
         _mac_about = QApplication.translate('MAC_APPLICATION_MENU', 'About {0}')
 
-        # the & adds a short cut automatically
+        # the & to menu titles adds a short cut automatically
         self.fileMenu: QMenu|None = None
         self.editMenu: QMenu|None = None
         self.RoastMenu: QMenu|None = None
@@ -2028,15 +2029,6 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         self.ToolkitMenu: QMenu|None = None
         self.viewMenu: QMenu|None = None
         self.helpMenu: QMenu|None = None
-
-#        if menuBar is not None:
-#            self.fileMenu = menuBar.addMenu('&' + QApplication.translate('Menu', 'File'))
-#            self.editMenu = menuBar.addMenu('&' + QApplication.translate('Menu', 'Edit'))
-#            self.RoastMenu = menuBar.addMenu('&' + QApplication.translate('Menu', 'Roast'))
-#            self.ConfMenu = menuBar.addMenu('&' + QApplication.translate('Menu', 'Config'))
-#            self.ToolkitMenu = menuBar.addMenu('&' + QApplication.translate('Menu', 'Tools'))
-#            self.viewMenu = menuBar.addMenu('&' + QApplication.translate('Menu', 'View'))
-#            self.helpMenu = menuBar.addMenu('&' + QApplication.translate('Menu', 'Help'))
 
         # initialize the variables holding QActions with shortcuts
         self.fullscreenAction:QAction|None = None
@@ -2049,7 +2041,6 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         self.fileLoadAction.setMenuRole(QAction.MenuRole.NoRole)
         self.fileLoadAction.setShortcut(QKeySequence.StandardKey.Open)
         self.fileLoadAction.triggered.connect(self.fileLoad)
-##        self.fileMenu.addAction(self.fileLoadAction)
 
         self.openRecentMenu = QMenu(QApplication.translate('Menu', 'Open Recent'))
         orm_action = self.openRecentMenu.menuAction()
@@ -2190,24 +2181,17 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         fileConvertFromStrongholdAction.triggered.connect(self.convertFromStronghold)
         self.convFromMenu.addAction(fileConvertFromStrongholdAction)
 
-##        self.fileMenu.addSeparator()
-
         self.fileSaveAction = QAction(QApplication.translate('Menu', 'Save'), self)
         self.fileSaveAction.setShortcut(QKeySequence.StandardKey.Save)
         self.fileSaveAction.triggered.connect(self.fileSave_current_action)
-##        self.fileMenu.addAction(self.fileSaveAction)
 
         self.fileSaveAsAction = QAction(QApplication.translate('Menu', 'Save As...'), self)
         self.fileSaveAsAction.setShortcut(QKeySequence.StandardKey.SaveAs)
         self.fileSaveAsAction.triggered.connect(self.fileSave_new_action)
-##        self.fileMenu.addAction(self.fileSaveAsAction)
 
         # same as SaveAs, just that the saved file gets a new roastUUID assigned
         self.fileSaveCopyAsAction = QAction(QApplication.translate('Menu', 'Save a Copy As...'), self)
         self.fileSaveCopyAsAction.triggered.connect(self.fileSave_copy_action)
-##        self.fileMenu.addAction(self.fileSaveCopyAsAction)
-
-##        self.fileMenu.addSeparator()
 
         self.exportMenu:QMenu = QMenu(QApplication.translate('Menu', 'Export'))
         fileExportCSVAction = QAction(QApplication.translate('Menu', 'Artisan CSV...'), self)
@@ -2292,8 +2276,6 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         self.convMenu.addAction(fileConvertReportPDFAction)
         if not self.QtWebEngineSupport:
             fileConvertReportPDFAction.setEnabled(False)
-
-##        self.fileMenu.addSeparator()
 
         self.saveGraphMenu:QMenu = QMenu(QApplication.translate('Menu', 'Save Graph'))
         PDFAction = QAction('PDF...', self)
@@ -2400,12 +2382,9 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         savestatisticsTXTAction.triggered.connect(self.saveStatistics_TXT)
         self.saveStatisticsMenu.addAction(savestatisticsTXTAction)
 
-##        self.fileMenu.addSeparator()
-
         self.printAction:QAction = QAction(QApplication.translate('Menu', 'Print...'), self)
         self.printAction.setShortcut(QKeySequence.StandardKey.Print)
         self.printAction.triggered.connect(self.filePrint)
-##        self.fileMenu.addAction(self.printAction)
 
         self.quitAction:QAction
         if platform.system() == 'Darwin':
@@ -2415,48 +2394,37 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         self.quitAction.setMenuRole(QAction.MenuRole.QuitRole)
         self.quitAction.setShortcut(QKeySequence.StandardKey.Quit)
         self.quitAction.triggered.connect(self.fileQuit)
-#        self.fileMenu.addAction(self.quitAction)
 
         # EDIT menu
         self.cutAction:QAction = QAction(QApplication.translate('Menu', 'Cut'), self)
         self.cutAction.setShortcut(QKeySequence.StandardKey.Cut)
         self.cutAction.triggered.connect(self.on_actionCut_triggered)
-##        self.editMenu.addAction(self.cutAction)
         self.copyAction:QAction = QAction(QApplication.translate('Menu', 'Copy'), self)
         self.copyAction.setShortcut(QKeySequence.StandardKey.Copy)
         self.copyAction.triggered.connect(self.on_actionCopy_triggered)
-##        self.editMenu.addAction(self.copyAction)
         self.pasteAction:QAction = QAction(QApplication.translate('Menu', 'Paste'), self)
         self.pasteAction.setShortcut(QKeySequence.StandardKey.Paste)
         self.pasteAction.triggered.connect(self.on_actionPaste_triggered)
-##        self.editMenu.addAction(self.pasteAction)
 
         # ROAST menu
         self.editGraphAction:QAction = QAction(QApplication.translate('Menu', 'Properties...'), self)
         self.editGraphAction.setMenuRole(QAction.MenuRole.NoRole) # without this, this item is not shown in he
         self.editGraphAction.triggered.connect(self.editgraph)
         self.editGraphAction.setShortcut('Ctrl+T')
-##        self.RoastMenu.addAction(self.editGraphAction)
 
         self.backgroundAction:QAction = QAction(QApplication.translate('Menu', 'Background...'), self)
         self.backgroundAction.triggered.connect(self.background)
         self.backgroundAction.setShortcut('Ctrl+B')
-##        self.RoastMenu.addAction(self.backgroundAction)
 
         self.flavorAction:QAction = QAction(QApplication.translate('Menu', 'Cup Profile...'), self)
         self.flavorAction.triggered.connect(self.flavorchart)
-##        self.RoastMenu.addAction(self.flavorAction)
-
-##        self.RoastMenu.addSeparator()
 
         self.switchAction:QAction = QAction(QApplication.translate('Menu', 'Switch Profiles'), self)
         self.switchAction.setShortcut(QKeySequence.StandardKey.Close)
         self.switchAction.triggered.connect(self.switch)
-##        self.RoastMenu.addAction(self.switchAction)
 
         self.switchETBTAction:QAction = QAction(QApplication.translate('Menu', 'Switch ET<->BT'), self)
         self.switchETBTAction.triggered.connect(self.switchETBT)
-##        self.RoastMenu.addAction(self.switchETBTAction)
 
 
         # CONFIGURATION menu
@@ -2465,36 +2433,24 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         # populated in populateMachineMenu/populateListMenu if not empty
         # using a QTimer to speed up startup a bit
         QTimer.singleShot(500,self.populateMachineMenu)
-#        self.ConfMenu.addMenu(self.machineMenu)
 
         self.deviceAction:QAction = QAction(QApplication.translate('Menu', 'Device...'), self)
         self.deviceAction.triggered.connect(self.deviceassigment)
         self.deviceAction.setShortcut('Ctrl+D')
-#        self.ConfMenu.addAction(self.deviceAction)
 
         self.commportAction:QAction = QAction(QApplication.translate('Menu', 'Port...'), self)
         self.commportAction.triggered.connect(self.setcommport)
-#        self.ConfMenu.addAction(self.commportAction)
-
-#        self.ConfMenu.addSeparator()
 
         self.calibrateDelayAction:QAction = QAction(QApplication.translate('Menu', 'Sampling...'), self)
         self.calibrateDelayAction.triggered.connect(self.calibratedelay)
-#        self.ConfMenu.addAction(self.calibrateDelayAction)
-
-#        self.ConfMenu.addSeparator()
 
         self.curvesAction:QAction = QAction(QApplication.translate('Menu', 'Curves...'), self)
         self.curvesAction.triggered.connect(self.setCurves)
         self.curvesAction.setShortcut('Ctrl+U')
-#        self.ConfMenu.addAction(self.curvesAction)
-
-#        self.ConfMenu.addSeparator()
 
         self.eventsAction:QAction = QAction(QApplication.translate('Menu', 'Events...'), self)
         self.eventsAction.triggered.connect(self.eventsconf)
         self.eventsAction.setShortcut('Ctrl+E')
-#        self.ConfMenu.addAction(self.eventsAction)
 
         self.alarmAction:QAction = QAction(QApplication.translate('Menu', 'Alarms...'), self)
         self.alarmAction.triggered.connect(self.alarmconfig)
@@ -2503,50 +2459,33 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         #self.alarmAction.setShortcutContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         #self.alarmAction.setShortcutContext(Qt.ShortcutContext.WindowShortcut)
         self.alarmAction.setShortcutContext(Qt.ShortcutContext.ApplicationShortcut)
-#        self.ConfMenu.addAction(self.alarmAction)
-
-#        self.ConfMenu.addSeparator()
 
         self.phasesGraphAction:QAction = QAction(QApplication.translate('Menu', 'Phases...'), self)
         self.phasesGraphAction.triggered.connect(self.editphases)
-#        self.ConfMenu.addAction(self.phasesGraphAction)
 
         self.StatisticsAction:QAction = QAction(QApplication.translate('Menu', 'Statistics...'), self)
         self.StatisticsAction.triggered.connect(self.showstatistics)
-#        self.ConfMenu.addAction(self.StatisticsAction)
 
         self.WindowconfigAction:QAction = QAction(QApplication.translate('Menu', 'Axes...'), self)
         self.WindowconfigAction.triggered.connect(self.Windowconfig)
         self.WindowconfigAction.setShortcut('Ctrl+Shift+A')
-#        self.ConfMenu.addAction(self.WindowconfigAction)
-
-#        self.ConfMenu.addSeparator()
 
         self.colorsAction:QAction = QAction(QApplication.translate('Menu', 'Colors...'), self)
         self.colorsAction.triggered.connect(self.qmc.changeGColor3)
-#        self.ConfMenu.addAction(self.colorsAction)
 
         self.themeMenu:QMenu = QMenu(QApplication.translate('Menu', 'Themes'))
         self.loadThemeAction:QAction|None = None
         self.saveAsThemeAction:QAction|None = None
         self.populateThemeMenu()
         self.updateRecentThemeActions()
-#        self.ConfMenu.addMenu(self.themeMenu)
-
-#        self.ConfMenu.addSeparator()
 
         self.autosaveAction:QAction = QAction(QApplication.translate('Menu', 'Autosave...'), self)
         self.autosaveAction.triggered.connect(self.autosaveconf)
-#        self.ConfMenu.addAction(self.autosaveAction)
 
         self.batchAction:QAction = QAction(QApplication.translate('Menu', 'Batch...'), self)
         self.batchAction.triggered.connect(self.batchconf)
-#        self.ConfMenu.addAction(self.batchAction)
-
-#        self.ConfMenu.addSeparator()
 
         self.temperatureConfMenu:QMenu = QMenu(QApplication.translate('Menu', 'Temperature'))
-#        self.ConfMenu.addMenu(self.temperatureConfMenu)
 
         self.FahrenheitAction: QAction
         self.CelsiusAction: QAction
@@ -2558,7 +2497,6 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         self.temperatureConfMenu.addAction(self.CelsiusAction)
 
         self.languageMenu:QMenu = QMenu(QApplication.translate('Menu', 'Language'))
-#        self.ConfMenu.addMenu(self.languageMenu)
 
         # language_menu_actions holds a dict associating iso2 locale strings to language menu actions
         self.language_menu_actions:dict[str, QAction] = {}
@@ -2599,10 +2537,8 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                 ('zh_TW', '\u7e41\u9ad4\u4e2d\u6587')]:
             self.addLanguage(iso, name)
 
-#        self.ConfMenu.addSeparator()
 
         self.UIModeMenu:QMenu = QMenu(QApplication.translate('Menu', 'Mode'))
-#        self.ConfMenu.addMenu(self.UIModeMenu)
         self.productionModeAction:QAction = QAction(QApplication.translate('Menu', 'Production'), self)
         self.productionModeAction.triggered.connect(self.setProductionMode)
         self.productionModeAction.setCheckable(True)
@@ -2653,32 +2589,24 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         self.roastCompareAction.triggered.connect(self.roastCompare)
         self.roastCompareAction.setCheckable(True)
         self.roastCompareAction.setChecked(bool(self.comparator))
-##        self.ToolkitMenu.addAction(self.roastCompareAction)
 
         self.designerAction: QAction = QAction(QApplication.translate('Menu', 'Designer') , self)
         self.designerAction.triggered.connect(self.designerTriggered)
         self.designerAction.setCheckable(True)
         self.designerAction.setChecked(self.qmc.designerflag)
-##        self.ToolkitMenu.addAction(self.designerAction)
 
         self.simulatorAction: QAction = QAction(QApplication.translate('Menu', 'Simulator') , self)
         self.simulatorAction.triggered.connect(self.simulate)
         self.simulatorAction.setCheckable(True)
         self.simulatorAction.setChecked(bool(self.simulator))
-##        self.ToolkitMenu.addAction(self.simulatorAction)
 
         self.wheeleditorAction: QAction = QAction(QApplication.translate('Menu', 'Wheel Graph'), self)
         self.wheeleditorAction.triggered.connect(self.graphwheel)
         self.wheeleditorAction.setCheckable(True)
         self.wheeleditorAction.setChecked(self.qmc.wheelflag)
-##        self.ToolkitMenu.addAction(self.wheeleditorAction)
-
-##        self.ToolkitMenu.addSeparator()
 
         self.transformAction: QAction = QAction(QApplication.translate('Menu', 'Transposer'), self)
         self.transformAction.triggered.connect(self.transform)
-##        self.ToolkitMenu.addAction(self.transformAction)
-
 
         self.temperatureMenu:QMenu = QMenu(QApplication.translate('Menu', 'Convert Profile Temperature'))
         self.ConvertToFahrenheitAction = QAction(QApplication.translate('Menu', 'Convert to Fahrenheit'), self)
@@ -2695,11 +2623,8 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             self.CelsiusAction.setDisabled(True)
             self.ConvertToCelsiusAction.setDisabled(True)
 
-#        self.ToolkitMenu.addSeparator()
-
         self.calculatorAction = QAction(QApplication.translate('Menu', 'Calculator'), self)
         self.calculatorAction.triggered.connect(self.calculator)
-#        self.ToolkitMenu.addAction(self.calculatorAction)
 
         # VIEW menu
 
@@ -2708,93 +2633,74 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         self.controlsAction.triggered.connect(self.toggleControls)
         self.controlsAction.setCheckable(True)
         self.controlsAction.setChecked(True)
-#        self.viewMenu.addAction(self.controlsAction)
 
         self.readingsAction = QAction(QApplication.translate('Menu', 'Readings'), self)
         self.readingsAction.setShortcut('X')
         self.readingsAction.triggered.connect(self.toggleReadings)
         self.readingsAction.setCheckable(True)
         self.readingsAction.setChecked(False)
-#        self.viewMenu.addAction(self.readingsAction)
 
         self.eventsEditorAction = QAction(QApplication.translate('Menu', 'Events Editor'), self)
         self.eventsEditorAction.triggered.connect(self.toggle_minieventline)
         self.eventsEditorAction.setCheckable(True)
         self.eventsEditorAction.setChecked(False)
-#        self.viewMenu.addAction(self.eventsEditorAction)
 
         self.buttonsAction = QAction(QApplication.translate('Menu', 'Buttons'), self)
         self.buttonsAction.setShortcut('B')
         self.buttonsAction.triggered.connect(self.toggleExtraButtons)
         self.buttonsAction.setCheckable(True)
         self.buttonsAction.setChecked(False)
-#        self.viewMenu.addAction(self.buttonsAction)
 
         self.slidersAction: QAction = QAction(QApplication.translate('Menu', 'Sliders'), self)
         self.slidersAction.setShortcut('S')
         self.slidersAction.triggered.connect(self.toggleSliders)
         self.slidersAction.setCheckable(True)
         self.slidersAction.setChecked(False)
-#        self.viewMenu.addAction(self.slidersAction)
 
         self.scheduleAction: QAction = QAction(QApplication.translate('Menu', 'Schedule'), self)
         self.scheduleAction.triggered.connect(self.schedule)
         self.scheduleAction.setCheckable(True)
         self.scheduleAction.setChecked(False)
-#        self.viewMenu.addSeparator()
-#        self.viewMenu.addAction(self.scheduleAction)
         if self.app.artisanviewerMode:
             self.scheduleAction.setEnabled(False) # no scheduler in ArtisanViewer mode
-
-#        self.viewMenu.addSeparator()
 
         self.lcdsAction: QAction = QAction(QApplication.translate('Menu', 'Main LCDs'), self)
         self.lcdsAction.setShortcut('Ctrl+L')
         self.lcdsAction.triggered.connect(self.largeLCDs)
         self.lcdsAction.setCheckable(True)
         self.lcdsAction.setChecked(False)
-#        self.viewMenu.addAction(self.lcdsAction)
 
         self.deltalcdsAction: QAction = QAction(QApplication.translate('Menu', 'Delta LCDs'), self)
         self.deltalcdsAction.triggered.connect(self.largeDeltaLCDs)
         self.deltalcdsAction.setCheckable(True)
         self.deltalcdsAction.setChecked(False)
-#        self.viewMenu.addAction(self.deltalcdsAction)
 
         self.pidlcdsAction: QAction = QAction(QApplication.translate('Menu', 'PID LCDs'), self)
         self.pidlcdsAction.triggered.connect(self.largePIDLCDs)
         self.pidlcdsAction.setCheckable(True)
         self.pidlcdsAction.setChecked(False)
-#        self.viewMenu.addAction(self.pidlcdsAction)
 
         self.extralcdsAction: QAction = QAction(QApplication.translate('Menu', 'Extra LCDs'), self)
         self.extralcdsAction.triggered.connect(self.largeExtraLCDs)
         self.extralcdsAction.setCheckable(True)
         self.extralcdsAction.setChecked(False)
-#        self.viewMenu.addAction(self.extralcdsAction)
 
         self.phaseslcdsAction: QAction = QAction(QApplication.translate('Menu', 'Phases LCDs'), self)
         self.phaseslcdsAction.triggered.connect(self.largePhasesLCDs)
         self.phaseslcdsAction.setCheckable(True)
         self.phaseslcdsAction.setChecked(False)
-#        self.viewMenu.addAction(self.phaseslcdsAction)
 
         self.scalelcdsAction: QAction = QAction(QApplication.translate('Menu', 'Scale LCDs'), self)
         self.scalelcdsAction.triggered.connect(self.largeScaleLCDs)
         self.scalelcdsAction.setCheckable(True)
         self.scalelcdsAction.setChecked(False)
-#        self.viewMenu.addAction(self.scalelcdsAction)
 
-#        self.viewMenu.addSeparator()
-
-#        if not (platform.system() == 'Darwin' and self.qmc.locale_str == 'en'): # macOS automatically adds the fullscreen action to View menu
         self.fullscreenAction = QAction(QApplication.translate('Menu', 'Full Screen'), self)
         self.fullscreenAction.triggered.connect(self.toggleFullscreen)
         self.fullscreenAction.setCheckable(True)
         self.fullscreenAction.setChecked(False)
         self.fullscreenAction.setShortcut('Ctrl+F')
         self.fullscreenAction.setMenuRole(QAction.MenuRole.NoRole)
-#            self.viewMenu.addAction(self.fullscreenAction)
 
 
         # HELP menu
@@ -2805,56 +2711,41 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             self.helpAboutAction = QAction(QApplication.translate('MAC_APPLICATION_MENU', 'About {0}').format(application_name), self)
         self.helpAboutAction.setMenuRole(QAction.MenuRole.AboutRole)
         self.helpAboutAction.triggered.connect(self.helpAbout)
-#        self.helpMenu.addAction(self.helpAboutAction)
 
         self.aboutQtAction = QAction(QApplication.translate('Menu', 'About Qt'), self)
         self.aboutQtAction.setMenuRole(QAction.MenuRole.AboutQtRole)
         self.aboutQtAction.triggered.connect(self.showAboutQt)
-#        self.helpMenu.addAction(self.aboutQtAction)
 
         self.helpDocumentationAction = QAction(QApplication.translate('Menu', 'Documentation'), self)
         self.helpDocumentationAction.triggered.connect(self.helpHelp)
         self.helpDocumentationAction.setShortcut(QKeySequence.StandardKey.HelpContents)
-#        self.helpMenu.addAction(self.helpDocumentationAction)
 
         self.KshortCAction = QAction(QApplication.translate('Menu', 'Keyboard Shortcuts'), self)
         self.KshortCAction.triggered.connect(self.viewKshortcuts)
-#        self.helpMenu.addAction(self.KshortCAction)
-
-#        self.helpMenu.addSeparator()
 
         self.checkUpdateAction = QAction(QApplication.translate('Menu', 'Check for Updates'), self)
         self.checkUpdateAction.setMenuRole(QAction.MenuRole.NoRole)
         self.checkUpdateAction.triggered.connect(self.checkUpdate)
-#        self.helpMenu.addAction(self.checkUpdateAction)
-
-#        self.helpMenu.addSeparator()
 
         self.errorAction = QAction(QApplication.translate('Menu', 'Errors'), self)
         self.errorAction.triggered.connect(self.viewErrorLog)
-#        self.helpMenu.addAction(self.errorAction)
 
         self.messageAction = QAction(QApplication.translate('Menu', 'Messages'), self)
         self.messageAction.triggered.connect(self.viewMessageLog)
-#        self.helpMenu.addAction(self.messageAction)
 
         self.serialAction = QAction(QApplication.translate('Menu', 'Serial'), self)
         self.serialAction.triggered.connect(self.viewSerialLog)
         self.serialAction.setMenuRole(QAction.MenuRole.NoRole)
-#        self.helpMenu.addAction(self.serialAction)
 
         self.platformAction = QAction(QApplication.translate('Menu', 'Platform'), self)
         self.platformAction.triggered.connect(self.viewplatform)
-#        self.helpMenu.addAction(self.platformAction)
 
 
         # SETTINGS submenu
-#        self.helpMenu.addSeparator()
 
         self.loadSettingsAction = QAction(QApplication.translate('Menu', 'Load Settings...'), self)
         self.loadSettingsAction.triggered.connect(self.loadSettings_triggered)
         self.loadSettingsAction.setMenuRole(QAction.MenuRole.NoRole) # avoid specific handling of settings menu
-#        self.helpMenu.addAction(self.loadSettingsAction)
 
         self.openRecentSettingMenu:QMenu = QMenu(QApplication.translate('Menu', 'Load Recent Settings'))
         for i in range(self.MaxRecentFiles):
@@ -2864,14 +2755,10 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         self.saveAsSettingsAction = QAction(QApplication.translate('Menu', 'Save Settings...'), self)
         self.saveAsSettingsAction.triggered.connect(self.saveSettings)
         self.saveAsSettingsAction.setMenuRole(QAction.MenuRole.NoRole)  # avoid specific handling of settings menu
-#        self.helpMenu.addAction(self.saveAsSettingsAction)
-
-#        self.helpMenu.addSeparator()
 
         self.resetAction = QAction(QApplication.translate('Menu', 'Factory Reset'), self)
         self.resetAction.setMenuRole(QAction.MenuRole.NoRole)
         self.resetAction.triggered.connect(self.resetApplication)
-#        self.helpMenu.addAction(self.resetAction)
 
 
         self.displayonlymenus() # enable/disable menu items as needed
@@ -4470,7 +4357,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             config_menu.addSeparator()
             config_menu.addAction(self.phasesGraphAction)
             config_menu.addAction(self.StatisticsAction)
-        config_menu.addAction(self.WindowconfigAction)
+            config_menu.addAction(self.WindowconfigAction)
         config_menu.addSeparator()
         if ui_mode is UI_MODE.EXPERT:
             config_menu.addAction(self.colorsAction)
@@ -4511,19 +4398,25 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         view_menu.addAction(self.controlsAction)
         view_menu.addAction(self.readingsAction)
         view_menu.addAction(self.eventsEditorAction)
-        view_menu.addAction(self.buttonsAction)
-        view_menu.addAction(self.slidersAction)
+        if self.ui_mode is not UI_MODE.PRODUCTION or len(self.extraeventslabels) > 0:
+            view_menu.addAction(self.buttonsAction)
+        if self.ui_mode is not UI_MODE.PRODUCTION or self.slidersVisible():
+            view_menu.addAction(self.slidersAction)
         view_menu.addSeparator()
         view_menu.addAction(self.scheduleAction)
         if self.app.artisanviewerMode:
             self.scheduleAction.setEnabled(False) # no scheduler in ArtisanViewer mode
         view_menu.addSeparator()
         view_menu.addAction(self.lcdsAction)
-        view_menu.addAction(self.deltalcdsAction)
-        view_menu.addAction(self.pidlcdsAction)
-        view_menu.addAction(self.extralcdsAction)
+        if self.ui_mode is not UI_MODE.PRODUCTION or self.qmc.DeltaETflag or self.qmc.DeltaBTflag or self.qmc.DeltaETlcdflag or self.qmc.DeltaBTlcdflag:
+            view_menu.addAction(self.deltalcdsAction)
+        if self.ui_mode is not UI_MODE.PRODUCTION or self.qmc.Controlbuttonflag:
+            view_menu.addAction(self.pidlcdsAction)
+        if self.ui_mode is not UI_MODE.PRODUCTION or len(self.qmc.extradevices)>0:
+            view_menu.addAction(self.extralcdsAction)
         view_menu.addAction(self.phaseslcdsAction)
-        view_menu.addAction(self.scalelcdsAction)
+        if self.ui_mode is not UI_MODE.PRODUCTION or self.scale1_model is not None:
+            view_menu.addAction(self.scalelcdsAction)
         view_menu.addSeparator()
         if not (platform.system() == 'Darwin' and self.qmc.locale_str == 'en'): # macOS automatically adds the fullscreen action to View menu
 #            self.fullscreenAction = QAction(QApplication.translate('Menu', 'Full Screen'), self)
@@ -4588,6 +4481,13 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             self.helpMenu = self.create_help_menu(ui_mode)
             menuBar.addMenu(self.helpMenu)
 
+    def set_toolbar(self, ui_mode:UI_MODE) -> None:
+        if ui_mode is UI_MODE.EXPERT:
+            self.ntb.add_toolbar_lines_configuration()
+        else:
+            self.ntb.remove_toolbar_lines_configuration()
+
+
     @pyqtSlot()
     @pyqtSlot(bool)
     def setProductionMode(self, _:bool = False) -> None:
@@ -4610,7 +4510,10 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         self.productionModeAction.setChecked(ui_mode is UI_MODE.PRODUCTION)
         self.defaultModeAction.setChecked(ui_mode is UI_MODE.DEFAULT)
         self.expertModeAction.setChecked(ui_mode is UI_MODE.EXPERT)
+        # configure menus
         self.set_menu(ui_mode)
+        # configure toolbar
+        self.set_toolbar(ui_mode)
 
     #
 
@@ -4832,12 +4735,10 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
 
     @pyqtSlot()
     def toggleBTlcdCurve(self) -> None:
-        _log.debug('PRINT toggleBTlcdCurve')
         if self.qmc.swaplcds:
             self.toggleETCurve()
         else:
             self.toggleBTCurve()
-        _log.debug('PRINT self.qmc.BTcurve: %s',self.qmc.BTcurve)
 
     @pyqtSlot()
     def toggleETlcdCurve(self) -> None:
@@ -11709,7 +11610,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                 self.eventslidersflags[0] = 0
 
     def slidersVisible(self) -> bool:
-        return any(v != 0 for v in self.eventslidervisibilities) or bool(self.pidcontrol.svSlider)
+        return not self.app.artisanviewerMode and (any(v != 0 for v in self.eventslidervisibilities) or bool(self.pidcontrol.svSlider))
 
     def showSliders(self, changeDefault:bool = True) -> None:
         if self.slidersVisible():
@@ -11747,7 +11648,6 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
     @pyqtSlot()
     @pyqtSlot(bool)
     def toggleSliders(self,_:bool = False) -> None:
-#        if self.sliderFrame.isVisible():
         if self.sliderDock.isVisible():
             self.hideSliders()
         else:
@@ -11999,8 +11899,14 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         self.controlsAction.setEnabled(True)
         self.readingsAction.setEnabled(True)
         self.eventsEditorAction.setEnabled(True)
-        self.buttonsAction.setEnabled(True)
-        self.slidersAction.setEnabled(True)
+        self.buttonsAction.setEnabled(len(self.extraeventslabels) > 0)
+        if not self.buttonsAction.isEnabled():
+            # hide buttons widget and reset the flag
+            self.hideExtraButtons()
+        self.slidersAction.setEnabled(self.slidersVisible())
+        if not self.slidersAction.isEnabled():
+            # hide slider widget and reset the flag
+            self.hideSliders()
 
         if self.qmc.statssummary:
             self.saveStatisticsMenu.setEnabled(True)
@@ -12085,7 +11991,9 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             self.readingsAction.setEnabled(False)
             self.eventsEditorAction.setEnabled(False)
             self.buttonsAction.setEnabled(False)
+            self.hideExtraButtons()
             self.slidersAction.setEnabled(False)
+            self.hideSliders()
         # HELP menu
         self.loadSettingsAction.setEnabled(False)
         self.openRecentSettingMenu.setEnabled(False)
@@ -12105,7 +12013,9 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             self.batchAction.setEnabled(False)
             self.buttonsAction.setChecked(False)
             self.buttonsAction.setEnabled(False)
+            self.hideExtraButtons()
             self.slidersAction.setChecked(False)
+            self.hideSliders()
             self.slidersAction.setEnabled(False)
             self.simulatorAction.setEnabled(False)
 
@@ -13625,6 +13535,8 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
 
                 #check colors
                 self.checkColors(self.getcolorPairsToCheck())
+                #update menus
+                self.set_ui_mode(self.ui_mode)
 
         except OSError as ex:
             _, _, exc_tb = sys.exc_info()
@@ -17825,6 +17737,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
 
             if self.resetqsettings or (filename is None and QApplication.queryKeyboardModifiers() == (Qt.KeyboardModifier.AltModifier | Qt.KeyboardModifier.ShiftModifier)):
                 self.resetqsettings = 0
+#                settings.clear() # this allows to get rid of old Artisan settings via "Save Settings >> Factory Reset >> Load Settings"
                 if 'canvas' in self.qmc.palette:
                     self.updateCanvasColors(checkColors=False)
                 # remove window geometry and splitter settings
@@ -19010,9 +18923,6 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             self.qmc.mode_tempsliders = ('F' if str(settings.value('ModeTempSliders',self.qmc.mode_tempsliders)) == 'F' else 'C') # pyrefly: ignore[bad-assignment]
             settings.endGroup()
             self.qmc.adjustTempSliders() # adjust min/max slider limits of temperature sliders to correspond to the current temp mode
-            self.slidersAction.setEnabled(any(self.eventslidervisibilities) or self.pidcontrol.svSlider)
-            if self.app.artisanviewerMode:
-                self.slidersAction.setEnabled(False)
 #--- END GROUP Sliders
 
 #--- BEGIN GROUP Quantifiers
@@ -19917,6 +19827,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             return self.saveAllSettings(QSettings(filename, QSettings.Format.IniFormat), None, filename)
         # we hand over the defaultSettings to have only those settings saved that are different from their defaults
         return self.saveAllSettings(QSettings(), self.defaultSettings)
+
 
     # if settings are None, the default_settings dict is filled with current values (the default values if called directly after start)
     # if settings are given all values are filled if default_settings are not given or different to the corresponding value in default_settings
@@ -26543,9 +26454,13 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             self.e10buttonbarLayout.insertStretch(0)
             self.e10buttonbarLayout.insertStretch(self.e10buttonbarLayout.count())
         self.settooltip()
-        self.buttonsAction.setEnabled(bool(len(self.extraeventslabels) > 0))
         if self.app.artisanviewerMode:
             self.buttonsAction.setEnabled(False)
+        else:
+            self.buttonsAction.setEnabled(bool(len(self.extraeventslabels) > 0))
+        if not self.buttonsAction.isEnabled():
+            # hide buttons widget and reset the flag
+            self.hideExtraButtons()
         self.update_extraeventbuttons_visibility()
 
     #assigns tooltips to extra event buttons

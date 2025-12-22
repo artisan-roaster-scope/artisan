@@ -8157,6 +8157,8 @@ class tgraphcanvas(QObject):
 
         self.aw.updatePlusStatus()
 
+        self.aw.set_ui_mode(self.aw.ui_mode)
+
         ### REDRAW  ##
         if redraw:
             self.aw.autoAdjustAxis(background=not keepProperties) # if reset() triggered by ON, we ignore background on adjusting the axis and adjust according to RESET min/max
@@ -14709,7 +14711,6 @@ class tgraphcanvas(QObject):
                     else:
                         start = 0
                     if self.aw.buttonFCe.isFlat() and self.timeindex[3] > 0:
-                        _log.debug('PRINT FCe UNDO')
                         # undo wrongly set FCe
                         self.timeindex[3] = 0
                         removed = True
@@ -14750,7 +14751,6 @@ class tgraphcanvas(QObject):
                                 else:
                                     self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,temp,temp,d)
                                 time_temp_annos = self.annotate(temp,st1,self.timex[self.timeindex[3]],temp,self.ystep_up,self.ystep_down,draggable_anno_key=3)
-                                _log.debug('PRINT time_temp_annos: %s',time_temp_annos)
                                 if time_temp_annos is not None:
                                     self.l_annotations += time_temp_annos
                                 if self.alignEvent not in {3, 7}: # in this case the updateBackground is triggered by the redraw of timealign below
@@ -14942,7 +14942,7 @@ class tgraphcanvas(QObject):
                         self.timeindex[5] = 0
                         removed = True
                         st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','SCe {0}').format(0)).rstrip('0')
-                        if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text() == st1:
+                        if len(self.l_annotations) > 1 and self.l_annotations[-1].get_text().startswith(st1):
                             self.ystep_down, self.ystep_up = 0, 0
                             try:
                                 self.l_annotations[-1].remove()
@@ -17144,7 +17144,6 @@ class tgraphcanvas(QObject):
                 #pylint: disable=E1101
                 from scipy import interpolate as inter # type # ignore
                 Xpoints,Ypoints = self.findpoints() #from 0 origin
-                _log.debug('PRINT ** Xpoints ** %s',Xpoints)
                 func = inter.interp1d(Xpoints, Ypoints, kind=mode)
                 newY = func(self.timex)
                 self.ax.plot(self.timex, newY, color='#000000', linestyle = '-.', linewidth=3)

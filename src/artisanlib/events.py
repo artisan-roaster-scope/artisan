@@ -2499,7 +2499,7 @@ class EventsDlg(ArtisanResizeablDialog):
                 if len(copy)>25:
                     self.aw.buttonpalette_label = copy[25]
                 else:
-                    self.aw.buttonpalette_label = self.aw.buttonpalette_default_label
+                    self.aw.buttonpalette_label = self.aw.buttonpalette_default_label # type:ignore[unreachable, unused-ignore]
                 if len(copy)>26 and len(copy[26]) == 4:
                     self.aw.eventquantifieraction = copy[26][:]
                 else:
@@ -3814,7 +3814,7 @@ class SliderCalculator(ArtisanDialog):
         self.sliderMin = sliderMin
         self.sliderMax = sliderMax
         self.ui = SliderCalculatorDialog.Ui_SliderCalculator()
-        self.ui.setupUi(self)
+        self.ui.setupUi(self) # type:ignore[no-untyped-call, unused-ignore]
         self.setWindowTitle(QApplication.translate('Form Caption','Slider Calculator'))
         self.ui.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel|QDialogButtonBox.StandardButton.Apply)
         # hack to assign the Apply button the AcceptRole without losing default system translations
