@@ -4458,7 +4458,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
     def set_menu(self, ui_mode:UI_MODE) -> None:
         menuBar:QMenuBar|None = self.menuBar()
         if menuBar is not None:
-#            menuBar.clear()
+            menuBar.clear()
             # File menu
             self.fileMenu = self.create_file_menu(ui_mode)
             menuBar.addMenu(self.fileMenu)

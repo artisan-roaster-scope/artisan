@@ -2977,6 +2977,15 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.energy_ui.events1.addItems(etypes)
             self.energy_ui.events2.addItems(etypes)
             self.energy_ui.events3.addItems(etypes)
+            # if an extra device of type "PID SV/Duty %" (#22) is defined, add an entry with its name after a separator
+            try:
+                extra_dev_PID_duty_idx = self.aw.qmc.extradevices.index(22)
+                extra_dev_PID_duty_name = self.aw.qmc.extraname2[extra_dev_PID_duty_idx]
+                for combo in [self.energy_ui.events0, self.energy_ui.events1, self.energy_ui.events2, self.energy_ui.events3]:
+                    combo.insertSeparator(5)
+                    combo .addItem(extra_dev_PID_duty_name)
+            except Exception: # pylint: disable=broad-except
+                pass
             #
             self.energy_ui.ratingunit0.addItems(self.aw.qmc.powerunits)
             self.energy_ui.ratingunit1.addItems(self.aw.qmc.powerunits)
@@ -3221,10 +3230,30 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.energy_ui.sourcetype2.setCurrentIndex(self.aw.qmc.sourcetypes[2])
         self.energy_ui.sourcetype3.setCurrentIndex(self.aw.qmc.sourcetypes[3])
         # event
-        self.energy_ui.events0.setCurrentIndex(self.aw.qmc.load_etypes[0])
-        self.energy_ui.events1.setCurrentIndex(self.aw.qmc.load_etypes[1])
-        self.energy_ui.events2.setCurrentIndex(self.aw.qmc.load_etypes[2])
-        self.energy_ui.events3.setCurrentIndex(self.aw.qmc.load_etypes[3])
+        try: # number of events items popup depend dynamically on extra device setup w.r.t. PID Duty and thus the index might be out of range here
+            self.energy_ui.events0.setCurrentIndex(self.aw.qmc.load_etypes[0])
+        except Exception: # pylint: disable=broad-except
+            self.energy_ui.events0.setCurrentIndex(0)
+            self.energy_ui.zeropcts0.setEnabled(False)
+            self.energy_ui.hundredpct0.setEnabled(True)
+        try: # number of events items popup depend dynamically on extra device setup w.r.t. PID Duty and thus the index might be out of range here
+            self.energy_ui.events1.setCurrentIndex(self.aw.qmc.load_etypes[1])
+        except Exception: # pylint: disable=broad-except
+            self.energy_ui.events1.setCurrentIndex(0)
+            self.energy_ui.zeropcts1.setEnabled(False)
+            self.energy_ui.hundredpct1.setEnabled(True)
+        try: # number of events items popup depend dynamically on extra device setup w.r.t. PID Duty and thus the index might be out of range here
+            self.energy_ui.events2.setCurrentIndex(self.aw.qmc.load_etypes[2])
+        except Exception: # pylint: disable=broad-except
+            self.energy_ui.events2.setCurrentIndex(0)
+            self.energy_ui.zeropcts2.setEnabled(False)
+            self.energy_ui.hundredpct2.setEnabled(True)
+        try: # number of events items popup depend dynamically on extra device setup w.r.t. PID Duty and thus the index might be out of range here
+            self.energy_ui.events3.setCurrentIndex(self.aw.qmc.load_etypes[3])
+        except Exception: # pylint: disable=broad-except
+            self.energy_ui.events3.setCurrentIndex(0)
+            self.energy_ui.zeropcts3.setEnabled(False)
+            self.energy_ui.hundredpct3.setEnabled(True)
         # pressure percent
         self.energy_ui.pressureCheckBox0.setChecked(self.aw.qmc.presssure_percents[0])
         self.energy_ui.pressureCheckBox1.setChecked(self.aw.qmc.presssure_percents[1])
@@ -3292,26 +3321,26 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.updateMetricsLabel()
 
     def updateLoadUnits(self, updateMetrics:bool = True) -> None:
-        self.aw.qmc.ratingunits[0] = self.energy_ui.ratingunit0.currentIndex()
-        self.aw.qmc.ratingunits[1] = self.energy_ui.ratingunit1.currentIndex()
-        self.aw.qmc.ratingunits[2] = self.energy_ui.ratingunit2.currentIndex()
-        self.aw.qmc.ratingunits[3] = self.energy_ui.ratingunit3.currentIndex()
+        self.aw.qmc.ratingunits[0] = max(0, self.energy_ui.ratingunit0.currentIndex()) # could be -1 if never set!
+        self.aw.qmc.ratingunits[1] = max(0, self.energy_ui.ratingunit1.currentIndex())
+        self.aw.qmc.ratingunits[2] = max(0, self.energy_ui.ratingunit2.currentIndex())
+        self.aw.qmc.ratingunits[3] = max(0, self.energy_ui.ratingunit3.currentIndex())
         if updateMetrics:
             self.updateMetricsLabel()
 
     def updateSourceTypes(self, updateMetrics:bool = True) -> None:
-        self.aw.qmc.sourcetypes[0] = self.energy_ui.sourcetype0.currentIndex()
-        self.aw.qmc.sourcetypes[1] = self.energy_ui.sourcetype1.currentIndex()
-        self.aw.qmc.sourcetypes[2] = self.energy_ui.sourcetype2.currentIndex()
-        self.aw.qmc.sourcetypes[3] = self.energy_ui.sourcetype3.currentIndex()
+        self.aw.qmc.sourcetypes[0] = max(0, self.energy_ui.sourcetype0.currentIndex()) # could be -1 if never set!
+        self.aw.qmc.sourcetypes[1] = max(0, self.energy_ui.sourcetype1.currentIndex())
+        self.aw.qmc.sourcetypes[2] = max(0, self.energy_ui.sourcetype2.currentIndex())
+        self.aw.qmc.sourcetypes[3] = max(0, self.energy_ui.sourcetype3.currentIndex())
         if updateMetrics:
             self.updateMetricsLabel()
 
     def updateLoadEvents(self, updateMetrics:bool = True) -> None:
-        self.aw.qmc.load_etypes[0] = self.energy_ui.events0.currentIndex()
-        self.aw.qmc.load_etypes[1] = self.energy_ui.events1.currentIndex()
-        self.aw.qmc.load_etypes[2] = self.energy_ui.events2.currentIndex()
-        self.aw.qmc.load_etypes[3] = self.energy_ui.events3.currentIndex()
+        self.aw.qmc.load_etypes[0] = max(0, self.energy_ui.events0.currentIndex()) # could be -1 if never set!
+        self.aw.qmc.load_etypes[1] = max(0, self.energy_ui.events1.currentIndex())
+        self.aw.qmc.load_etypes[2] = max(0, self.energy_ui.events2.currentIndex())
+        self.aw.qmc.load_etypes[3] = max(0, self.energy_ui.events3.currentIndex())
         if updateMetrics:
             self.updateMetricsLabel()
 
@@ -3331,20 +3360,20 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.updateEnergyLabels()
 
     def updateMeterUnits(self, updateMetrics:bool = True) -> None:
-        self.aw.qmc.meterunits[0] = self.energy_ui.meter1UnitComboBox.currentIndex()
-        self.aw.qmc.meterunits[1] = self.energy_ui.meter2UnitComboBox.currentIndex()
+        self.aw.qmc.meterunits[0] = max(0, self.energy_ui.meter1UnitComboBox.currentIndex()) # could be -1 if never set
+        self.aw.qmc.meterunits[1] = max(0, self.energy_ui.meter2UnitComboBox.currentIndex())
         if updateMetrics:
             self.updateMetricsLabel()
 
     def updateMeterFuels(self, updateMetrics:bool = True) -> None:
-        self.aw.qmc.meterfuels[0] = self.energy_ui.meter1FuelComboBox.currentIndex()
-        self.aw.qmc.meterfuels[1] = self.energy_ui.meter2FuelComboBox.currentIndex()
+        self.aw.qmc.meterfuels[0] = max(0, self.energy_ui.meter1FuelComboBox.currentIndex()) # could be -1 if never set
+        self.aw.qmc.meterfuels[1] = max(0, self.energy_ui.meter2FuelComboBox.currentIndex())
         if updateMetrics:
             self.updateMetricsLabel()
 
     def updateMeterSources(self, updateMetrics:bool = True) -> None:
-        self.aw.qmc.metersources[0] = self.energy_ui.meter1SourceComboBox.currentIndex()
-        self.aw.qmc.metersources[1] = self.energy_ui.meter2SourceComboBox.currentIndex()
+        self.aw.qmc.metersources[0] = max(0, self.energy_ui.meter1SourceComboBox.currentIndex()) # could be -1 if never set
+        self.aw.qmc.metersources[1] = max(0, self.energy_ui.meter2SourceComboBox.currentIndex())
         if updateMetrics:
             self.updateMetricsLabel()
 
@@ -3417,7 +3446,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     # fills the energy config data from the current energy tab widget values
     def updateEnergyConfig(self) -> None:
         if self.tabInitialized[4]:
-            self.aw.qmc.energyresultunit_setup = self.energy_ui.resultunitComboBox.currentIndex()
+            self.aw.qmc.energyresultunit_setup = max(0, self.energy_ui.resultunitComboBox.currentIndex()) # could be -1 if never set
             ## Details tab
             ## Loads tab
             # label
@@ -3592,19 +3621,25 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.energy_ui.loadDLabel.setText(self.formatLoadLabel('D',self.aw.qmc.loadlabels[3]))
 
     def updateEnergyUnitLabels(self) -> None:
-        self.energy_ui.loadAUnitLabel.setText(self.formatLoadUnitLabel(self.energy_ui.ratingunit0.currentIndex()))
-        self.energy_ui.loadBUnitLabel.setText(self.formatLoadUnitLabel(self.energy_ui.ratingunit1.currentIndex()))
-        self.energy_ui.loadCUnitLabel.setText(self.formatLoadUnitLabel(self.energy_ui.ratingunit2.currentIndex()))
-        self.energy_ui.loadDUnitLabel.setText(self.formatLoadUnitLabel(self.energy_ui.ratingunit3.currentIndex()))
+        self.energy_ui.loadAUnitLabel.setText(self.formatLoadUnitLabel(max(0, self.energy_ui.ratingunit0.currentIndex()))) # curentIndex() returns -1 if never set
+        self.energy_ui.loadBUnitLabel.setText(self.formatLoadUnitLabel(max(0, self.energy_ui.ratingunit1.currentIndex())))
+        self.energy_ui.loadCUnitLabel.setText(self.formatLoadUnitLabel(max(0, self.energy_ui.ratingunit2.currentIndex())))
+        self.energy_ui.loadDUnitLabel.setText(self.formatLoadUnitLabel(max(0, self.energy_ui.ratingunit3.currentIndex())))
 
     def updateEnableZHpct(self) -> None:
-        for ew,zw in [
-            (self.energy_ui.events0,self.energy_ui.zeropcts0),
-            (self.energy_ui.events1,self.energy_ui.zeropcts1),
-            (self.energy_ui.events2,self.energy_ui.zeropcts2),
-            (self.energy_ui.events3,self.energy_ui.zeropcts3),
+        for ew,zw,hw,pcb in [
+            (self.energy_ui.events0,self.energy_ui.zeropcts0,self.energy_ui.hundredpct0,self.energy_ui.pressureCheckBox0),
+            (self.energy_ui.events1,self.energy_ui.zeropcts1,self.energy_ui.hundredpct1,self.energy_ui.pressureCheckBox1),
+            (self.energy_ui.events2,self.energy_ui.zeropcts2,self.energy_ui.hundredpct2,self.energy_ui.pressureCheckBox2),
+            (self.energy_ui.events3,self.energy_ui.zeropcts3,self.energy_ui.hundredpct3,self.energy_ui.pressureCheckBox3),
             ]:
-            zw.setEnabled(ew.currentIndex() != 0)
+            idx = ew.currentIndex()
+            if idx < 0 or idx >= ew.count(): # no entry selected on idx=-1
+                # index out of range
+                idx = 0
+            zw.setEnabled(idx in {1,2,3,4})
+            hw.setEnabled(idx in {-1, 0,1,2,3,4})
+            pcb.setEnabled(idx < 5)
         self.updateMetricsLabel()
 
     ##
@@ -3736,7 +3771,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         if isinstance(sender, QComboBox): # pyrefly: ignore[invalid-argument]
             try:
                 i = [self.energy_ui.ratingunit0,self.energy_ui.ratingunit1,self.energy_ui.ratingunit2,self.energy_ui.ratingunit3].index(sender)
-                self.aw.qmc.ratingunits[i] = sender.currentIndex()
+                self.aw.qmc.ratingunits[i] = max(0, sender.currentIndex())
                 self.updateMetricsLabel()
                 self.updateEnergyUnitLabels()
                 self.loadsEdited()
@@ -3749,7 +3784,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         if isinstance(sender, QComboBox): # pyrefly: ignore[invalid-argument]
             try:
                 i = [self.energy_ui.sourcetype0, self.energy_ui.sourcetype1, self.energy_ui.sourcetype2, self.energy_ui.sourcetype3].index(sender)
-                self.aw.qmc.sourcetypes[i] = sender.currentIndex()
+                self.aw.qmc.sourcetypes[i] = max(0, sender.currentIndex())
                 self.updateMetricsLabel()
                 self.loadsEdited()
             except Exception: # pylint: disable=broad-except
@@ -3761,9 +3796,13 @@ class editGraphDlg(ArtisanResizeablDialog):
         if isinstance(sender, QComboBox): # pyrefly: ignore[invalid-argument]
             try:
                 i = [self.energy_ui.events0, self.energy_ui.events1, self.energy_ui.events2, self.energy_ui.events3].index(sender)
-                self.aw.qmc.load_etypes[i] = sender.currentIndex()
+                self.aw.qmc.load_etypes[i] = max(0, sender.currentIndex())
                 zw = [self.energy_ui.zeropcts0, self.energy_ui.zeropcts1, self.energy_ui.zeropcts2, self.energy_ui.zeropcts3][i]
-                zw.setEnabled(sender.currentIndex() != 0)
+                zw.setEnabled(sender.currentIndex() in {1,2,3,4})
+                hw = [self.energy_ui.hundredpct0, self.energy_ui.hundredpct1, self.energy_ui.hundredpct2, self.energy_ui.hundredpct3][i]
+                hw.setEnabled(sender.currentIndex() in {-1, 0,1,2,3,4})
+                pcb = [self.energy_ui.pressureCheckBox0, self.energy_ui.pressureCheckBox1, self.energy_ui.pressureCheckBox2, self.energy_ui.pressureCheckBox3][i]
+                pcb.setEnabled(sender.currentIndex() < 5)
                 self.updateMetricsLabel()
                 self.loadsEdited()
             except Exception: # pylint: disable=broad-except
@@ -3843,7 +3882,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         if isinstance(sender, QComboBox):# pyrefly: ignore[invalid-argument]
             try:
                 i = [self.energy_ui.meter1UnitComboBox,self.energy_ui.meter2UnitComboBox].index(sender)
-                self.aw.qmc.meterunits[i] = sender.currentIndex()
+                self.aw.qmc.meterunits[i] = max(0, sender.currentIndex())
                 self.updateMetricsLabel()
                 self.updateMeterLabels()
                 self.updateMeterUnits()
@@ -3857,7 +3896,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         if isinstance(sender, QComboBox):# pyrefly: ignore[invalid-argument]
             try:
                 i = [self.energy_ui.meter1FuelComboBox,self.energy_ui.meter2FuelComboBox].index(sender)
-                self.aw.qmc.meterfuels[i] = sender.currentIndex()
+                self.aw.qmc.meterfuels[i] = max(0, sender.currentIndex())
                 self.updateMetricsLabel()
                 self.updateMeterFuels()
                 self.loadsEdited()
@@ -3870,7 +3909,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         if isinstance(sender, QComboBox): # pyrefly: ignore[invalid-argument]
             try:
                 i = [self.energy_ui.meter1SourceComboBox,self.energy_ui.meter2SourceComboBox].index(sender)
-                self.aw.qmc.metersources[i] = sender.currentIndex()
+                self.aw.qmc.metersources[i] = max(0, sender.currentIndex())
                 self.updateMetricsLabel()
                 self.updateMeterSources()
                 self.loadsEdited()
@@ -3965,7 +4004,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 
     @pyqtSlot()
     def energyresultunitComboBox_indexchanged(self) -> None:
-        self.aw.qmc.energyresultunit_setup = self.energy_ui.resultunitComboBox.currentIndex()
+        self.aw.qmc.energyresultunit_setup = max(0, self.energy_ui.resultunitComboBox.currentIndex())
         self.updateMetricsLabel()
         if self.energy_ui.tabWidget.currentIndex() == 0:  # Detail (datatable) tab
             self.createEnergyDataTable()
@@ -5665,7 +5704,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         loadValues = ['0']*4
         for i in range(4):
             loadLabels[i] = self.formatLoadLabel(chr(ord('A')+i),self.aw.qmc.loadlabels[i])
-            if self.aw.qmc.load_etypes[i] > 0 and loadEnergy[i] >- 1:
+            if self.aw.qmc.load_etypes[i] > 0 and loadEnergy[i] > -1:
                 loadValues[i] = scaleFloat2String(loadEnergy[i])
                 loadUnits[i] = self.aw.qmc.energyunits[self.aw.qmc.ratingunits[i]]
             else:

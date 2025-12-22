@@ -2412,7 +2412,7 @@ class tgraphcanvas(QObject):
         self.loadratings_setup:list[float] = [0.0]*4               # in ratingunits
         self.ratingunits_setup:list[int] = [0]*4                   # index in list self.powerunits
         self.sourcetypes_setup:list[int] = [0]*4                   # index in list self.sourcenames
-        self.load_etypes_setup:list[int] = [0]*4                   # index of the etype that is the gas/burner setting
+        self.load_etypes_setup:list[int] = [0]*4                   # index of the etype that is the gas/burner setting (if idx > 4, the PID Duty extra dev is selected as source)
         self.presssure_percents_setup:list[bool] = [False]*4       # event value in pressure percent
         self.loadevent_zeropcts_setup:list[int] = [0]*4            # event value corresponding to 0 percent
         self.loadevent_hundpcts_setup:list[int] = [100]*4          # event value corresponding to 100 percent
@@ -2451,7 +2451,7 @@ class tgraphcanvas(QObject):
         self.loadratings = self.loadratings_setup[:]             # in ratingunits
         self.ratingunits = self.ratingunits_setup[:]             # index in list self.heatunits
         self.sourcetypes = self.sourcetypes_setup[:]             # index in list self.sourcetypes
-        self.load_etypes = self.load_etypes_setup[:]             # index of the etype that is the gas/burner setting
+        self.load_etypes = self.load_etypes_setup[:]             # index of the etype that is the gas/burner setting (if idx > 4, the PID Duty extra dev is selected as source)
         self.presssure_percents = self.presssure_percents_setup[:]  # event value in pressure percent
         self.loadevent_zeropcts = self.loadevent_zeropcts_setup[:]  # event value corresponding to 0 percent
         self.loadevent_hundpcts = self.loadevent_hundpcts_setup[:]  # event value corresponding to 100 percent
