@@ -4408,8 +4408,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             self.scheduleAction.setEnabled(False) # no scheduler in ArtisanViewer mode
         view_menu.addSeparator()
         view_menu.addAction(self.lcdsAction)
-        if self.ui_mode is not UI_MODE.PRODUCTION or self.qmc.DeltaETflag or self.qmc.DeltaBTflag or self.qmc.DeltaETlcdflag or self.qmc.DeltaBTlcdflag:
-            view_menu.addAction(self.deltalcdsAction)
+        view_menu.addAction(self.deltalcdsAction)
         if self.ui_mode is not UI_MODE.PRODUCTION or self.qmc.Controlbuttonflag:
             view_menu.addAction(self.pidlcdsAction)
         if self.ui_mode is not UI_MODE.PRODUCTION or len(self.qmc.extradevices)>0:
