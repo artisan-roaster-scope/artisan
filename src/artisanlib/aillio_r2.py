@@ -111,8 +111,8 @@ class AillioR2:
         self.worker_thread_run:bool = True
 
         # Communication pipes
-        self.parent_pipe: Connection|None = None # type:ignore[no-any-unimported]
-        self.child_pipe: Connection|None = None # type:ignore[no-any-unimported]
+        self.parent_pipe: Connection|None = None # type:ignore[no-any-unimported, unused-ignore]
+        self.child_pipe: Connection|None = None # type:ignore[no-any-unimported, unused-ignore]
         self.worker_thread: threading.Thread|None = None
 
         # Basic configuration
@@ -443,7 +443,7 @@ class AillioR2:
             print(f"{i:04x}: {hex_values:<48} {ascii_values}")
 
 
-    def __updatestate(self, p:'Connection') -> None: # type:ignore[no-any-unimported]
+    def __updatestate(self, p:'Connection') -> None: # type:ignore[no-any-unimported, unused-ignore]
         """Worker thread main loop for updating roaster state data"""
         while self.worker_thread_run:
             try:
