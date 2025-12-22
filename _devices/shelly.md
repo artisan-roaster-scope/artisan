@@ -31,7 +31,7 @@ Artisan reads
 
 - with the extra device of type **`Shelly Plug Energy/Last`**
    - total energy consumed (`aenergy.total`) [Wh]
-   - last minutes energy consumption (`aenergy[0]`) [mW]
+   - last minutes energy consumption (`aenergy[0]`) [mWh]
 - with the extra device of type **`Shelly Plug Power/Temp`**
    - last measured instantaneous active power (`apower`) [W]
    - device temperature (`temperature.tC`) [C]
