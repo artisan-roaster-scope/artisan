@@ -1,6 +1,6 @@
 Marko Luther:
   name     : "Dr. Marko Luther"
-  avatar   : "/assets/images/MarkoLuther.jpg"
+  avatar   : "/assets/images/MarkoLuther.webp"
   bio      : "maintainer"
   location : "Germany"
   links:
@@ -19,7 +19,7 @@ Marko Luther:
 
 Michael Herbert:
   name     : "Michael Herbert"
-  avatar   : "/assets/images/MichaelHerbert.jpeg"
+  avatar   : "/assets/images/MichaelHerbert.webp"
   bio      : "documentation"
   location : "AZ, USA"
   links:
@@ -36,7 +36,7 @@ Michael Herbert:
 
 Dave Baxter:
   name     : "Dave Baxter"
-  avatar   : "/assets/images/DaveBaxter.png"
+  avatar   : "/assets/images/DaveBaxter.webp"
   bio      : "genius"
   location : "SF, USA"
   links:
@@ -47,7 +47,7 @@ Dave Baxter:
 
 wvengen:
   name     : "wvengen"
-  avatar   : "/assets/images/wvengen.jpeg"
+  avatar   : "/assets/images/wvengen.webp"
   bio      : "build master"
   location : "Norway"
   links:
