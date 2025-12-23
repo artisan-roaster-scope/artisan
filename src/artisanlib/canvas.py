@@ -4553,7 +4553,7 @@ class tgraphcanvas(QObject):
             return float(numpy.average(temp_trail_re[-len(decay_weights):],axis=0,weights=decay_weights[-l:])) # pyrefly: ignore[bad-index] # ty: ignore[non-subscriptable] # len(decay_weights)>len(temp_trail_re)=l is possible
         except Exception: # pylint: disable=broad-except
             # in case something goes very wrong we at least return the standard average over temp, this should always work as len(tx)=len(temp)
-            return float(numpy.average(tx_org, numpy.array(temp_trail)))
+            return float(numpy.average(numpy.array(temp_trail)))
 
     # returns true after BT passed the TP
     def checkTPalarmtime(self) -> bool:
@@ -8203,7 +8203,7 @@ class tgraphcanvas(QObject):
             y[:j,i] = x[0]
             y[:-j,-(i+1)] = x[j:]
             y[-j:,-(i+1)] = x[-1]
-        return cast('npt.NDArray[numpy.double]', numpy.median(y, axis=1))
+        return numpy.median(y, axis=1)
 #        return numpy.nanmedian(y, axis=1) # produces artefacts
 
     # smoothes a list (or numpy.array) of values 'y' at taken at times indicated by the numbers in list 'x'
@@ -8304,7 +8304,7 @@ class tgraphcanvas(QObject):
                             # we don't average if there is are no weights (e.g. if the original seq did only contain -1 values and got empty)
                             result.append(v)
                         else:
-                            result.append(numpy.average(seq,axis=0,weights=w)) # works only if len(seq) = len(w)
+                            result.append(float(numpy.average(seq,axis=0,weights=w))) # works only if len(seq) = len(w)
                     res = numpy.array(result)
                     # postCond: len(res) = len(b)
             else:
@@ -8317,7 +8317,7 @@ class tgraphcanvas(QObject):
         # 4. sample back
         if re_sample and back_sample:
             res = numpy.interp(a, a_mod, res) # pyright:ignore[reportUnknownArgumentType] # re-sampled back to original timestamps
-        return numpy.array(res)
+        return numpy.array(res).astype(numpy.double)
 
     # takes lists a (time array) and b (temperature array) containing invalid segments of -1/None values and returns a list with all segments of valid values smoothed
     # a: list of timestamps
@@ -8328,7 +8328,7 @@ class tgraphcanvas(QObject):
     # delta: True if b is a RoR signal
     # NOTE: result can contain NaN items on places where the input array contains the error element -1
     # result is a numpy array or the b as numpy array with drop out readings -1 replaced by NaN
-    def smooth_list(self, aa:'npt.NDArray[numpy.double]|Sequence[float]', b:'npt.NDArray[numpy.double]|Sequence[float]', window_len:int = 7, window:str = 'hanning',
+    def smooth_list(self, aa:'npt.NDArray[numpy.double]|npt.NDArray[numpy.floating]|Sequence[float]', b:'npt.NDArray[numpy.double]|npt.NDArray[numpy.floating]|Sequence[float]', window_len:int = 7, window:str = 'hanning',
             decay_weights:list[int]|None = None, decay_smoothing:bool = False, fromIndex:int = -1, toIndex:int = 0,
             re_sample:bool = True, back_sample:bool = True, a_lin:'npt.NDArray[numpy.double]|None' = None, delta:bool=False) -> 'npt.NDArray[numpy.double]':
         if len(aa) > 1 and len(aa) == len(b) and (self.filterDropOuts or window_len>2):
@@ -8342,7 +8342,7 @@ class tgraphcanvas(QObject):
                 toIndex = len(aa)
             a = numpy.array(aa[fromIndex:toIndex], dtype=numpy.double)
             # we mask the error value -1 and Numpy  in the temperature array
-            mb:numpy.ndarray[tuple[Literal[1]],numpy.dtype[numpy.float64]] = cast(numpy.ndarray[tuple[Literal[1]],numpy.dtype[numpy.float64]], numpy.ma.masked_equal(numpy.ma.masked_equal(b[fromIndex:toIndex], -1), None)) # type:ignore[no-untyped-call]
+            mb:numpy.ndarray[tuple[Literal[1]],numpy.dtype[numpy.float64]] = cast(numpy.ndarray[tuple[Literal[1]],numpy.dtype[numpy.float64]], numpy.ma.masked_equal(b[fromIndex:toIndex], -1))
             # split in masked and
             unmasked_slices = [(x,False) for x in numpy.ma.clump_unmasked(mb)] # type:ignore[no-untyped-call] # the valid readings
             masked_slices = [(x,True) for x in numpy.ma.clump_masked(mb)]  # type:ignore[no-untyped-call] # the dropped values
@@ -8740,12 +8740,12 @@ class tgraphcanvas(QObject):
 
     @staticmethod
     # with window size wsize=1 the RoR is computed over succeeding readings; tx and temp assumed to be of type numpy.array
-    def arrayRoR(tx:'npt.NDArray[numpy.double]', temp:'npt.NDArray[numpy.double]', wsize:int) -> 'npt.NDArray[numpy.double]': # with wsize >=1
+    def arrayRoR(tx:'npt.NDArray[numpy.double]', temp:'npt.NDArray[numpy.double]', wsize:int) -> 'npt.NDArray[numpy.floating]': # with wsize >=1
         # length compensation done downstream, not necessary here!
         with warnings.catch_warnings():
             # suppress warning if time difference is 0 which leads to a div by zero resulting in a warning and an inf value
             warnings.simplefilter('ignore')
-            return cast('npt.NDArray[numpy.double]', (temp[wsize:] - temp[:-wsize]) / ((tx[wsize:] - tx[:-wsize])/60.))
+            return (temp[wsize:] - temp[:-wsize]) / ((tx[wsize:] - tx[:-wsize])/60.)
 
 
     # returns deltas and linearized timex;  both results can be None
@@ -9079,7 +9079,7 @@ class tgraphcanvas(QObject):
             except Exception: # pylint: disable=broad-except
                 pass
             # don't draw -1:
-            temp = numpy.ma.masked_where(temp == -1, temp) # type:ignore[no-untyped-call]
+            temp = numpy.ma.masked_where(temp == -1, temp)
             self.l_temp1, = self.ax.plot(
                 self.timex,
                 temp, # pyright:ignore[reportUnknownArgumentType]
@@ -9101,7 +9101,7 @@ class tgraphcanvas(QObject):
             except Exception: # pylint: disable=broad-except
                 pass
             # don't draw -1:
-            temp = numpy.ma.masked_where(temp == -1, temp) # type:ignore[no-untyped-call]
+            temp = numpy.ma.masked_where(temp == -1, temp)
             self.l_temp2, = self.ax.plot(
                 self.timex,
                 temp, # pyright:ignore[reportUnknownArgumentType]
@@ -9778,7 +9778,7 @@ class tgraphcanvas(QObject):
                                 except Exception: # pylint: disable=broad-except
                                     pass
                                 # don't draw -1:
-                                stemp3B = numpy.ma.masked_where(stemp3B == -1, stemp3B) # type:ignore[no-untyped-call]
+                                stemp3B = numpy.ma.masked_where(stemp3B == -1, stemp3B)
                                 self.l_back3, = self.ax.plot(self.extratimexB[n3], stemp3B, markersize=self.XTbackmarkersize,marker=self.XTbackmarker,
                                                             sketch_params=None,path_effects=[],transform=trans,
                                                             linewidth=self.XTbacklinewidth,linestyle=self.XTbacklinestyle,drawstyle=self.XTbackdrawstyle,color=self.backgroundxtcolor,
@@ -9835,7 +9835,7 @@ class tgraphcanvas(QObject):
                                 except Exception: # pylint: disable=broad-except
                                     pass
                                 # don't draw -1:
-                                stemp4B = numpy.ma.masked_where(stemp4B == -1, stemp4B) # type:ignore[no-untyped-call]
+                                stemp4B = numpy.ma.masked_where(stemp4B == -1, stemp4B)
                                 self.l_back4, = self.ax.plot(self.extratimexB[n4], stemp4B, markersize=self.YTbackmarkersize,marker=self.YTbackmarker,
                                                             sketch_params=None,path_effects=[],transform=trans,
                                                             linewidth=self.YTbacklinewidth,linestyle=self.YTbacklinestyle,drawstyle=self.YTbackdrawstyle,color=self.backgroundytcolor,
@@ -9869,7 +9869,7 @@ class tgraphcanvas(QObject):
                         except Exception: # pylint: disable=broad-except
                             pass
                         # don't draw -1:
-                        temp_etb = numpy.ma.masked_where(temp_etb == -1, temp_etb) # type:ignore[no-untyped-call]
+                        temp_etb = numpy.ma.masked_where(temp_etb == -1, temp_etb)
                         self.l_back1, = self.ax.plot(self.timeB,temp_etb,markersize=self.ETbackmarkersize,marker=self.ETbackmarker,
                                                     sketch_params=None,path_effects=[],
                                                     linewidth=self.ETbacklinewidth,linestyle=self.ETbacklinestyle,drawstyle=self.ETbackdrawstyle,color=self.backgroundmetcolor,
@@ -9900,7 +9900,7 @@ class tgraphcanvas(QObject):
                         except Exception: # pylint: disable=broad-except
                             pass
                         # don't draw -1:
-                        temp_btb = numpy.ma.masked_where(temp_btb == -1, temp_btb) # type:ignore[no-untyped-call]
+                        temp_btb = numpy.ma.masked_where(temp_btb == -1, temp_btb)
                         self.l_back2, = self.ax.plot(self.timeB, temp_btb,markersize=self.BTbackmarkersize,marker=self.BTbackmarker,
                                                     linewidth=self.BTbacklinewidth,linestyle=self.BTbacklinestyle,drawstyle=self.BTbackdrawstyle,color=self.backgroundbtcolor,
                                                     sketch_params=None,path_effects=[],
@@ -16577,7 +16577,7 @@ class tgraphcanvas(QObject):
                         factor = load_pct / 100
 
                     BTUs = self.loadratings[i] * factor * (duration / 3600) * self.convertHeat(1,self.powerunits[self.ratingunits[i]],'BTU')
-                    
+
                     if BTUs > 0:
                         loadlabel = formatLoadLabel(i)
                         kind = 6  #Roast Continuous

@@ -2641,6 +2641,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         self.readingsAction.setChecked(False)
 
         self.eventsEditorAction = QAction(QApplication.translate('Menu', 'Events Editor'), self)
+        self.readingsAction.setShortcut('Y')
         self.eventsEditorAction.triggered.connect(self.toggle_minieventline)
         self.eventsEditorAction.setCheckable(True)
         self.eventsEditorAction.setChecked(False)
@@ -7295,7 +7296,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                         tra = numpy.trapezoid(segment_abs_deltas, x=segment_times)
                     except Exception:  # pylint: disable=broad-except
                         tra = numpy.trapz(segment_abs_deltas, x=segment_times) # type:ignore [attr-defined, unused-ignore]
-                    segment_abc_deltas = numpy.append(segment_abc_deltas, tra)
+                    segment_abc_deltas = numpy.append(segment_abc_deltas, tra) # pyright:ignore[reportUnknownArgumentType]
 
 
                 # interval of interest metrics
@@ -7308,7 +7309,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                     tra = numpy.trapezoid(ioi_abs_deltas, x=times_all)
                 except Exception:  # pylint: disable=broad-except
                     tra = numpy.trapz(ioi_abs_deltas, x=times_all) # type:ignore [attr-defined, unused-ignore]
-                ioi_abc_deltas = float(numpy.sum(tra))
+                ioi_abc_deltas = float(numpy.sum(tra)) # pyright:ignore[reportUnknownArgumentType]
                 ioi_abcprime = ioi_abc_deltas / ioi_seconds
 
                 # fit RoR in C/min/min
@@ -7461,10 +7462,10 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                 np_timeB = numpy.array(self.qmc.timeB) + dropTimeDelta # shift background times such that they are aligned with foreground profile @ DROP
 
                 # we masked the -1 error values
-                np_etb_masked = numpy.ma.masked_equal(np_etb, -1) # type:ignore[no-untyped-call]
-                np_btb_masked = numpy.ma.masked_equal(np_btb, -1) # type:ignore[no-untyped-call]
-                np_timeB_etb_masked = numpy.ma.masked_array(np_timeB, np_etb_masked.mask) # type:ignore[no-untyped-call] # pylint:disable=no-member
-                np_timeB_btb_masked = numpy.ma.masked_array(np_timeB, np_btb_masked.mask) # type:ignore[no-untyped-call] # pylint:disable=no-member
+                np_etb_masked = numpy.ma.masked_equal(np_etb, -1)
+                np_btb_masked = numpy.ma.masked_equal(np_btb, -1)
+                np_timeB_etb_masked = numpy.ma.masked_array(np_timeB, np_etb_masked.mask) # pylint:disable=no-member
+                np_timeB_btb_masked = numpy.ma.masked_array(np_timeB, np_btb_masked.mask) # pylint:disable=no-member
                 # ignore the masked error values on computing the interpolation and fill (especially on the left) with -1 values
                 interp_np_etb = numpy.interp(np_timex,np_timeB_etb_masked.compressed(),np_etb_masked.compressed(),left=-1,right=-1) # pyright:ignore[reportUnknownArgumentType]  # pylint:disable=no-member
                 interp_np_btb = numpy.interp(np_timex,np_timeB_btb_masked.compressed(),np_btb_masked.compressed(),left=-1,right=-1) # pyright:ignore[reportUnknownArgumentType]  # pylint:disable=no-member
@@ -7473,12 +7474,12 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                 # however, all those errors may contain -1 error values and inf/nan readings. Let's mask them to be ignored in the computation.
 
                 # mask the -1 padding resulting from interpolating the background data as well as the inf/nan readings
-                interp_np_etb_masked = numpy.ma.masked_equal(numpy.ma.masked_invalid(interp_np_etb), -1) # type:ignore[no-untyped-call] # mask -1, inf, nan to be ignored
-                interp_np_btb_masked = numpy.ma.masked_equal(numpy.ma.masked_invalid(interp_np_btb), -1) # type:ignore[no-untyped-call] # mask -1, inf, nan to be ignored
+                interp_np_etb_masked = numpy.ma.masked_equal(numpy.ma.masked_invalid(interp_np_etb), -1) # mask -1, inf, nan to be ignored
+                interp_np_btb_masked = numpy.ma.masked_equal(numpy.ma.masked_invalid(interp_np_btb), -1) # mask -1, inf, nan to be ignored
 
                 # mask the -1 error values as well as the inf/nan readings
-                np_et_masked = numpy.ma.masked_equal(numpy.ma.masked_invalid(np_et), -1) # type:ignore[no-untyped-call] # mask -1, inf, nan to be ignored
-                np_bt_masked = numpy.ma.masked_equal(numpy.ma.masked_invalid(np_bt), -1) # type:ignore[no-untyped-call] # mask -1, inf, nan to be ignored
+                np_et_masked = numpy.ma.masked_equal(numpy.ma.masked_invalid(np_et), -1) # mask -1, inf, nan to be ignored
+                np_bt_masked = numpy.ma.masked_equal(numpy.ma.masked_invalid(np_bt), -1) # mask -1, inf, nan to be ignored
 
                 # all readings that are masked in the one or the other array are ignored and do not contribute in the following
                 RMSE_et = numpy.sqrt(numpy.mean(numpy.square(np_et_masked - interp_np_etb_masked))) # pyright:ignore[reportUnknownArgumentType]
@@ -12488,7 +12489,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                 elif k == Qt.Key.Key_Z: # 90:                       #Z (toggle xy coordinates between 0: cursor, 1: BT, 2: ET, 3: BTB, 4: ETB)
                     if not self.qmc.designerflag and not self.qmc.wheelflag and self.comparator is None:
                         self.qmc.nextFmtDataCurve()
-                elif k == Qt.Key.Key_U: # 85:                       #U (toggle running LCDs on/off)
+                elif k == Qt.Key.Key_U and self.ui_mode is not UI_MODE.PRODUCTION: # 85:  #U (toggle running LCDs on/off)
                     if not self.qmc.flagon:
                         if self.qmc.running_LCDs == 0 and self.curFile:
                             self.qmc.running_LCDs = 1
@@ -12523,7 +12524,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                 elif k == Qt.Key.Key_S: # 83:                          #S (toggle sliders)
                     if not self.app.artisanviewerMode and not self.qmc.designerflag and not self.qmc.wheelflag:
                         self.toggleSliders()
-                elif k == Qt.Key.Key_T: # 84 and not self.qmc.flagon:  #T (toggle mouse cross)
+                elif k == Qt.Key.Key_T: # 84 and not self.qmc.flagon and self.ui_mode is not UI_MODE.PRODUCTION:  #T (toggle mouse cross)
                     self.qmc.togglecrosslines()
                 elif k == Qt.Key.Key_Q: # 81:                          #Q (quick entry of custom event 1)
                     if not self.qmc.designerflag and self.comparator is None:
@@ -12572,9 +12573,9 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                             self.quickEventShortCut = (eventNr,eventValueStr)
                             self.outputQuickEventShortCutState()
                 # note Qt/PyQt maps the ';' and ',' keys reversed from the ASCII mapping
-                elif k_txt == ';' and not self.qmc.flagon: #k == Qt.Key.Key_Semicolon: k == 58    # ";" (application screenshots only if not sampling)
+                elif k_txt == ';' and not self.qmc.flagon and self.ui_mode is not UI_MODE.PRODUCTION: #k == Qt.Key.Key_Semicolon : k == 58    # ";" (application screenshots only if not sampling)
                     self.applicationscreenshot()
-                elif k_txt == ':' and not self.qmc.flagon:  #k == Qt.Key.Key_Colon:    k == 59    # ":" (desktop screenshots only if not sampling)
+                elif k_txt == ':' and not self.qmc.flagon and self.ui_mode is not UI_MODE.PRODUCTION:  #k == Qt.Key.Key_Colon:    k == 59    # ":" (desktop screenshots only if not sampling)
                     self.desktopscreenshot()
                 else:
                     QWidget.keyPressEvent(self, a0)
@@ -24543,7 +24544,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         #FUJI/DELTA pid
         if self.qmc.device in {0, 26}:
             modifiers = QApplication.keyboardModifiers()
-            if modifiers == Qt.KeyboardModifier.ControlModifier and self.qmc.device == 0:
+            if (self.ui_mode is UI_MODE.PRODUCTION or modifiers == Qt.KeyboardModifier.ControlModifier) and self.qmc.device == 0:
                 # a right-click on the Control button will toggle PID Standby on and off
                 standby = self.fujipid.getONOFFstandby()
                 if standby == 0:
@@ -24581,7 +24582,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         # all other devices
         else:
             modifiers = QApplication.keyboardModifiers()
-            if modifiers == Qt.KeyboardModifier.ControlModifier:
+            if self.ui_mode is UI_MODE.PRODUCTION or modifiers == Qt.KeyboardModifier.ControlModifier:
                 self.pidcontrol.togglePID()
             else:
                 dialog = PID_DlgControl(self,self,self.PID_DlgControl_activeTab)

@@ -480,9 +480,9 @@ class backgroundDlg(ArtisanResizeablDialog):
         optcontent.addWidget(self.hideBgafterprofileload)
         tab1layout = QVBoxLayout()
         tab1layout.addLayout(layoutBoxed)
-#        tab1layout.addStretch()
         tab1layout.addLayout(alignButtonBoxed)
-        tab1layout.addWidget(playbackGroupLayout)
+        if self.aw.ui_mode is not UI_MODE.PRODUCTION:
+            tab1layout.addWidget(playbackGroupLayout)
         if self.aw.ui_mode is UI_MODE.EXPERT:
             tab1layout.addLayout(optcontent)
         tab1layout.setContentsMargins(5, 0, 5, 0) # left, top, right, bottom
