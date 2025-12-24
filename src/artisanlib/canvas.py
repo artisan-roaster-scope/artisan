@@ -2418,8 +2418,8 @@ class tgraphcanvas(QObject):
         self.loadevent_hundpcts_setup:list[int] = [100]*4          # event value corresponding to 100 percent
         # Meters
         self.meterlabels_setup:list[str] = ['']*2                  # meter labels
-        self.meterunits_setup:list[int] = [3]*2                    # index in list meterunitnames, default to Elec
-        self.meterfuels_setup:list[int] = [2]*2                    # index in list sourcetypes, default to kWh
+        self.meterunits_setup:list[int] = [3]*2                    # index in list sourcetypes, default to kWh
+        self.meterfuels_setup:list[int] = [2]*2                    # index in list meterunitnames, default to Elec
         self.metersources_setup:list[int] = [0]*2                  # index in locally generated list curvenames
         # Protocol
         self.preheatDuration_setup:int = 0                         # length of preheat in seconds
@@ -2443,8 +2443,12 @@ class tgraphcanvas(QObject):
                         QApplication.translate('Label','Cooling %'),             # 5
                         QApplication.translate('Label','Continuous'),            # 6
                         QApplication.translate('Label','Roast Event'),           # 7
-                        QApplication.translate('Label','Meter'),                 # 8
-                        QApplication.translate('Label','PID Duty %')             # 9
+                        QApplication.translate('Label','Meter Batch'),           # 8
+                        QApplication.translate('Label','PID Duty %'),            # 9
+                        QApplication.translate('Label','Meter Preheat'),         #10
+                        QApplication.translate('Label','Meter BBP'),             #11
+                        QApplication.translate('Label','Meter Roast'),           #12
+                        QApplication.translate('Label','Meter Cooling')          #13
                         ]
         self.perKgRoastMode:bool = False # if true only the amount during the roast and not the full batch (incl. preheat and BBP) are displayed), toggled by click on the result widget
 
@@ -16699,37 +16703,65 @@ class tgraphcanvas(QObject):
                             'SourceType':self.sourcetypes[i],
                             'SortOrder':sortorder
                         })
-            #### end of loop: for i in range(0,4)
+            #### end of loop through each load
 
             # Meter reads
-            btu_meter_bbp:float = 0
-            btu_meter_roast:float = 0
-            co2_meter_bbp:float = 0
-            co2_meter_roast:float = 0
+            # iterate over the 2 meters
             for j in range(2):
-                # Get the batch, roast and bbp meter reads
+                # Process the meter reads previously conditioned by conditionMeterData()
                 if self.meterreads[j][0] > 0:
-                    BTUs = self.meterreads[j][0]
-                    loadlabel = self.meterlabels[j]
-                    sortorder = j  # meter reads at the top of the details table
                     fueltype = self.meterfuels[j]
-                    CO2g = self.calcCO2g(BTUs, fueltype)
-                    kind = 8 # Meter
+                    loadlabel = self.meterlabels[j]
+                    sortorder = (j * 10) + 1  # meter reads at the top of the details table
+                    # Get the meter reads
+                    btu_meter_bbp = self.meterreads[j][1] # Charge
+                    btu_meter_roast = self.meterreads[j][7] - self.meterreads[j][1] # Drop minus Charge
+                    btu_meter_cooling = self.meterreads[j][0] - self.meterreads[j][7] # Batch minus Drop
+                    btu_meter_batch = self.meterreads[j][0]  # ON to OFF
+                    co2g_meter_bbp = self.calcCO2g(btu_meter_bbp, fueltype)
+                    co2g_meter_roast = self.calcCO2g(btu_meter_roast, fueltype)
+                    co2g_meter_cooling = self.calcCO2g(btu_meter_cooling, fueltype)
+                    co2g_meter_batch = self.calcCO2g(btu_meter_batch, fueltype)  # noqa F841  # pylint: disable=unused-variable
+                    # note durations here are based on self.timex[self.timeindex[]] and not on the corresponding extratimex.
+                    duration_meter_bbp = self.timex[self.timeindex[0]] - self.timex[0]
+                    duration_meter_roast = self.timex[self.timeindex[6]] - self.timex[self.timeindex[0]]
+                    duration_meter_cooling = self.timex[-1] - self.timex[self.timeindex[6]]
+                    duration_meter_batch = self.timex[self.timeindex[-1]] - self.timex[0]  # noqa F841  # pylint: disable=unused-variable
+                    # display order in the Energy Details follows the order here
+                    kind = 11 # Meter BBP
                     btu_list.append({
                         'load_pct':0,
-                        'duration':0,
-                        'BTUs':BTUs,
-                        'CO2g':CO2g,
+                        'duration':duration_meter_bbp,
+                        'BTUs':btu_meter_bbp,
+                        'CO2g':co2g_meter_bbp,
                         'LoadLabel':loadlabel,
                         'Kind':kind,
                         'SourceType':fueltype,
                         'SortOrder':sortorder
                     })
-                    # Get the BBP and Roastreads
-                    btu_meter_bbp += self.meterreads[j][1] # Charge
-                    btu_meter_roast += self.meterreads[j][7] - self.meterreads[j][1] # Drop minus Charge
-                    co2_meter_bbp += self.calcCO2g(btu_meter_bbp, fueltype)
-                    co2_meter_roast += self.calcCO2g(btu_meter_roast, fueltype)
+                    kind = 12 # Meter Roast
+                    btu_list.append({
+                        'load_pct':0,
+                        'duration':duration_meter_roast,
+                        'BTUs':btu_meter_roast,
+                        'CO2g':co2g_meter_roast,
+                        'LoadLabel':loadlabel,
+                        'Kind':kind,
+                        'SourceType':fueltype,
+                        'SortOrder':sortorder
+                    })
+                    kind = 13 # Meter Cooling
+                    btu_list.append({
+                        'load_pct':0,
+                        'duration':duration_meter_cooling,
+                        #'BTUs':BTUs,
+                        'BTUs':btu_meter_cooling,
+                        'CO2g':co2g_meter_cooling,
+                        'LoadLabel':loadlabel,
+                        'Kind':kind,
+                        'SourceType':fueltype,
+                        'SortOrder':sortorder
+                    })
 
             # sort the entries in btu list per the sort order defined for each entry
             btu_list.sort(key=lambda k : k['SortOrder'] )
@@ -16741,21 +16773,17 @@ class tgraphcanvas(QObject):
             for item in btu_list:
                 btu_batch += item['BTUs']
                 btu_preheat += item['BTUs'] if item['Kind'] in {0, 1} else 0
-                btu_bbp += item['BTUs'] if item['Kind'] in {2, 3} else 0
-                btu_cooling += item['BTUs'] if item['Kind'] in {4, 5} else 0
-                btu_roast += item['BTUs'] if item['Kind'] in {6, 7} else 0
+                btu_bbp += item['BTUs'] if item['Kind'] in {2, 3, 11} else 0
+                btu_cooling += item['BTUs'] if item['Kind'] in {4, 5, 13} else 0
+                btu_roast += item['BTUs'] if item['Kind'] in {6, 7, 12} else 0
                 co2_batch += item['CO2g']
                 co2_preheat += item['CO2g'] if item['Kind'] in {0, 1} else 0
-                co2_bbp += item['CO2g'] if item['Kind'] in {2, 3} else 0
-                co2_cooling += item['CO2g'] if item['Kind'] in {4, 5} else 0
-                co2_roast += item['CO2g'] if item['Kind'] in {6, 7} else 0
+                co2_bbp += item['CO2g'] if item['Kind'] in {2, 3, 11} else 0
+                co2_cooling += item['CO2g'] if item['Kind'] in {4, 5, 13} else 0
+                co2_roast += item['CO2g'] if item['Kind'] in {6, 7, 12} else 0
                 btu_lpg += item['BTUs'] if item['SourceType'] == 0 else 0
                 btu_ng += item['BTUs'] if item['SourceType'] == 1 else 0
                 btu_elec += item['BTUs'] if item['SourceType'] == 2 else 0
-            btu_bbp += btu_meter_bbp
-            btu_roast += btu_meter_roast
-            co2_bbp += co2_meter_bbp
-            co2_roast += co2_meter_roast
             btu_batch = float2float(btu_batch,3)
             btu_preheat = float2float(btu_preheat,3)
             btu_bbp = float2float(btu_bbp,3)
