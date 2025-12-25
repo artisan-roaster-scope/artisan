@@ -14034,32 +14034,32 @@ Fewer nodes: simpler curve but may lose detail</source>
     <message>
         <location filename="../artisanlib/canvas.py" line="2446" />
         <source>Meter Batch</source>
-        <translation type="unfinished" />
+        <translation>計量批次</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2447" />
         <source>PID Duty %</source>
-        <translation type="unfinished" />
+        <translation>PID佔空比%</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2448" />
         <source>Meter Preheat</source>
-        <translation type="unfinished" />
+        <translation>儀表預熱</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2449" />
         <source>Meter BBP</source>
-        <translation type="unfinished" />
+        <translation>血糖儀</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2450" />
         <source>Meter Roast</source>
-        <translation type="unfinished" />
+        <translation>烘焙程度</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2451" />
         <source>Meter Cooling</source>
-        <translation type="unfinished" />
+        <translation>儀表冷卻</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="4123" />
@@ -14689,7 +14689,7 @@ Fewer nodes: simpler curve but may lose detail</source>
     <message>
         <location filename="../artisanlib/main.py" line="2542" />
         <source>Production</source>
-        <translation type="unfinished" />
+        <translation>生產</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="2548" />
@@ -14699,7 +14699,7 @@ Fewer nodes: simpler curve but may lose detail</source>
     <message>
         <location filename="../artisanlib/main.py" line="2554" />
         <source>Expert</source>
-        <translation type="unfinished" />
+        <translation>專家</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="2563" />
@@ -20342,42 +20342,42 @@ specified by the lookahead</source>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2926" />
         <source>Load label for reference. If left blank the row label, 'A', 'B', 'C' or 'D' will be used in its place.</source>
-        <translation type="unfinished" />
+        <translation>加載標籤以供參考。如果留空，則將使用行標籤「A」、「B」、「C」或「D」取代。</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2928" />
         <source>Power rating of the load</source>
-        <translation type="unfinished" />
+        <translation>負載的額定功率</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2930" />
         <source>Unit of the load matching the power rating</source>
-        <translation type="unfinished" />
+        <translation>與額定功率相符的負載單元</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2932" />
         <source>Energy source of the load</source>
-        <translation type="unfinished" />
+        <translation>負載的能量來源</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2934" />
         <source>Data source for the load. Either a recorded event type or the internal PID duty signal.</source>
-        <translation type="unfinished" />
+        <translation>負載資料來源。可以是記錄的事件類型，也可以是內部PID佔空比訊號。</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2936" />
         <source>Ticked if readings are taken from a pressure gauge. Unticked for electric roasters and regular burner power output.</source>
-        <translation type="unfinished" />
+        <translation>如果讀數來自壓力表，則勾選此項。對於電烤爐和普通燃燒器功率輸出，則取消勾選。</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2938" />
         <source>Electric Energy Mix approximates the percentage of electricity that comes from renewable sources</source>
-        <translation type="unfinished" />
+        <translation>電力能源結構近似反映了來自再生能源的電力百分比。</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2940" />
         <source>Gas Energy Mix approximates the percentage of gas that comes from renewable sources</source>
-        <translation type="unfinished" />
+        <translation>天然氣能源結構估算了來自再生能源的天然氣百分比。</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="4132" />

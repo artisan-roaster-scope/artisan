@@ -14029,32 +14029,32 @@ Daha az düğüm: daha basit eğri ancak ayrıntı kaybı olabilir</translation>
     <message>
         <location filename="../artisanlib/canvas.py" line="2446" />
         <source>Meter Batch</source>
-        <translation type="unfinished" />
+        <translation>Sayaç Partisi</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2447" />
         <source>PID Duty %</source>
-        <translation type="unfinished" />
+        <translation>PID Görevi %</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2448" />
         <source>Meter Preheat</source>
-        <translation type="unfinished" />
+        <translation>Sayaç Ön Isıtma</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2449" />
         <source>Meter BBP</source>
-        <translation type="unfinished" />
+        <translation>Metre BBP</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2450" />
         <source>Meter Roast</source>
-        <translation type="unfinished" />
+        <translation>Sayaç Kavurması</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2451" />
         <source>Meter Cooling</source>
-        <translation type="unfinished" />
+        <translation>Sayaç Soğutma</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="4123" />
@@ -14684,7 +14684,7 @@ Daha az düğüm: daha basit eğri ancak ayrıntı kaybı olabilir</translation>
     <message>
         <location filename="../artisanlib/main.py" line="2542" />
         <source>Production</source>
-        <translation type="unfinished" />
+        <translation>Üretme</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="2548" />
@@ -14694,7 +14694,7 @@ Daha az düğüm: daha basit eğri ancak ayrıntı kaybı olabilir</translation>
     <message>
         <location filename="../artisanlib/main.py" line="2554" />
         <source>Expert</source>
-        <translation type="unfinished" />
+        <translation>Uzman</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="2563" />
@@ -20332,42 +20332,42 @@ specified by the lookahead</source>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2926" />
         <source>Load label for reference. If left blank the row label, 'A', 'B', 'C' or 'D' will be used in its place.</source>
-        <translation type="unfinished" />
+        <translation>Referans için etiket yükleyin. Boş bırakılırsa, yerine 'A', 'B', 'C' veya 'D' satır etiketi kullanılacaktır.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2928" />
         <source>Power rating of the load</source>
-        <translation type="unfinished" />
+        <translation>Yükün güç değeri</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2930" />
         <source>Unit of the load matching the power rating</source>
-        <translation type="unfinished" />
+        <translation>Yükün güç değerine karşılık gelen birimi</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2932" />
         <source>Energy source of the load</source>
-        <translation type="unfinished" />
+        <translation>Yükün enerji kaynağı</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2934" />
         <source>Data source for the load. Either a recorded event type or the internal PID duty signal.</source>
-        <translation type="unfinished" />
+        <translation>Yük için veri kaynağı. Kaydedilmiş bir olay türü veya dahili PID görev sinyali olabilir.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2936" />
         <source>Ticked if readings are taken from a pressure gauge. Unticked for electric roasters and regular burner power output.</source>
-        <translation type="unfinished" />
+        <translation>Basınç göstergesinden ölçüm alınıyorsa işaretlenir. Elektrikli kavurma makineleri ve normal brülör güç çıkışı için işaretlenmez.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2938" />
         <source>Electric Energy Mix approximates the percentage of electricity that comes from renewable sources</source>
-        <translation type="unfinished" />
+        <translation>Elektrik Enerjisi Karışımı, yenilenebilir kaynaklardan gelen elektriğin yüzdesini yaklaşık olarak ifade eder.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2940" />
         <source>Gas Energy Mix approximates the percentage of gas that comes from renewable sources</source>
-        <translation type="unfinished" />
+        <translation>Gaz Enerji Karışımı, yenilenebilir kaynaklardan gelen gazın yüzdesini yaklaşık olarak gösterir.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="4132" />

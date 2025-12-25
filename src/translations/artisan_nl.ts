@@ -3818,7 +3818,7 @@ EIND</translation>
     <message>
         <location filename="../artisanlib/dialogs.py" line="769" />
         <source>Designer Spline Fit</source>
-        <translation type="unfinished" />
+        <translation>Ontwerper Spline Fit</translation>
     </message>
 </context><context>
     <name>Error Message</name>
@@ -14017,17 +14017,17 @@ Minder knooppunten: eenvoudigere curve, maar mogelijk verlies aan detail</transl
     <message>
         <location filename="../artisanlib/canvas.py" line="2446" />
         <source>Meter Batch</source>
-        <translation type="unfinished" />
+        <translation>Meterbatch</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2447" />
         <source>PID Duty %</source>
-        <translation type="unfinished" />
+        <translation>PID-gebruiksduur %</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2448" />
         <source>Meter Preheat</source>
-        <translation type="unfinished" />
+        <translation>Meter voorverwarmen</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2449" />
@@ -14042,7 +14042,7 @@ Minder knooppunten: eenvoudigere curve, maar mogelijk verlies aan detail</transl
     <message>
         <location filename="../artisanlib/canvas.py" line="2451" />
         <source>Meter Cooling</source>
-        <translation type="unfinished" />
+        <translation>Meterkoeling</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="4123" />
@@ -14668,7 +14668,7 @@ Minder knooppunten: eenvoudigere curve, maar mogelijk verlies aan detail</transl
     <message>
         <location filename="../artisanlib/main.py" line="2542" />
         <source>Production</source>
-        <translation type="unfinished" />
+        <translation>Productie</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="2548" />
@@ -14678,7 +14678,7 @@ Minder knooppunten: eenvoudigere curve, maar mogelijk verlies aan detail</transl
     <message>
         <location filename="../artisanlib/main.py" line="2554" />
         <source>Expert</source>
-        <translation type="unfinished" />
+        <translation>Deskundige</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="2563" />
@@ -20322,42 +20322,42 @@ gespecificeerd door de lookahead</translation>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2926" />
         <source>Load label for reference. If left blank the row label, 'A', 'B', 'C' or 'D' will be used in its place.</source>
-        <translation type="unfinished" />
+        <translation>Laad het label ter referentie. Indien dit veld leeg wordt gelaten, wordt het rijlabel 'A', 'B', 'C' of 'D' gebruikt.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2928" />
         <source>Power rating of the load</source>
-        <translation type="unfinished" />
+        <translation>Vermogen van de belasting</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2930" />
         <source>Unit of the load matching the power rating</source>
-        <translation type="unfinished" />
+        <translation>Eenheid van de belasting die overeenkomt met het vermogen</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2932" />
         <source>Energy source of the load</source>
-        <translation type="unfinished" />
+        <translation>Energiebron van de belasting</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2934" />
         <source>Data source for the load. Either a recorded event type or the internal PID duty signal.</source>
-        <translation type="unfinished" />
+        <translation>Gegevensbron voor de belasting. Ofwel een geregistreerd gebeurtenistype, ofwel het interne PID-duty-signaal.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2936" />
         <source>Ticked if readings are taken from a pressure gauge. Unticked for electric roasters and regular burner power output.</source>
-        <translation type="unfinished" />
+        <translation>Aangevinkt indien de metingen worden gedaan met een drukmeter. Niet aangevinkt voor elektrische branders en branders met een normaal vermogen.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2938" />
         <source>Electric Energy Mix approximates the percentage of electricity that comes from renewable sources</source>
-        <translation type="unfinished" />
+        <translation>De elektriciteitsmix geeft een indicatie van het percentage elektriciteit dat afkomstig is van hernieuwbare bronnen.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2940" />
         <source>Gas Energy Mix approximates the percentage of gas that comes from renewable sources</source>
-        <translation type="unfinished" />
+        <translation>De gasenergiemix benadert het percentage gas dat afkomstig is van hernieuwbare bronnen.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="4132" />

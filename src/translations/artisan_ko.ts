@@ -14938,32 +14938,32 @@ Fewer nodes: simpler curve but may lose detail</source>
     <message>
         <location filename="../artisanlib/canvas.py" line="2446" />
         <source>Meter Batch</source>
-        <translation type="unfinished" />
+        <translation>미터 배치</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2447" />
         <source>PID Duty %</source>
-        <translation type="unfinished" />
+        <translation>PID 듀티 %</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2448" />
         <source>Meter Preheat</source>
-        <translation type="unfinished" />
+        <translation>미터 예열</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2449" />
         <source>Meter BBP</source>
-        <translation type="unfinished" />
+        <translation>미터 BBP</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2450" />
         <source>Meter Roast</source>
-        <translation type="unfinished" />
+        <translation>미터 로스트</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2451" />
         <source>Meter Cooling</source>
-        <translation type="unfinished" />
+        <translation>계량기 냉각</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="4123" />
@@ -15896,7 +15896,7 @@ Fewer nodes: simpler curve but may lose detail</source>
     <message>
         <location filename="../artisanlib/main.py" line="2542" />
         <source>Production</source>
-        <translation type="unfinished" />
+        <translation>생산</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="2548" />
@@ -15906,7 +15906,7 @@ Fewer nodes: simpler curve but may lose detail</source>
     <message>
         <location filename="../artisanlib/main.py" line="2554" />
         <source>Expert</source>
-        <translation type="unfinished" />
+        <translation>전문가</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="2563" />
@@ -21899,42 +21899,42 @@ specified by the lookahead</source>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2926" />
         <source>Load label for reference. If left blank the row label, 'A', 'B', 'C' or 'D' will be used in its place.</source>
-        <translation type="unfinished" />
+        <translation>참조용 적재물 레이블입니다. 비워두면 행 레이블인 'A', 'B', 'C' 또는 'D'가 대신 사용됩니다.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2928" />
         <source>Power rating of the load</source>
-        <translation type="unfinished" />
+        <translation>부하의 정격 전력</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2930" />
         <source>Unit of the load matching the power rating</source>
-        <translation type="unfinished" />
+        <translation>정격 전력에 맞는 부하 장치</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2932" />
         <source>Energy source of the load</source>
-        <translation type="unfinished" />
+        <translation>부하의 에너지원</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2934" />
         <source>Data source for the load. Either a recorded event type or the internal PID duty signal.</source>
-        <translation type="unfinished" />
+        <translation>부하에 대한 데이터 소스입니다. 기록된 이벤트 유형 또는 내부 PID 듀티 신호 중 하나입니다.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2936" />
         <source>Ticked if readings are taken from a pressure gauge. Unticked for electric roasters and regular burner power output.</source>
-        <translation type="unfinished" />
+        <translation>압력계를 사용하여 측정하는 경우 체크 표시를 합니다. 전기 로스터 및 일반 버너 출력의 경우 체크 표시를 해제합니다.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2938" />
         <source>Electric Energy Mix approximates the percentage of electricity that comes from renewable sources</source>
-        <translation type="unfinished" />
+        <translation>전력 에너지 구성은 재생 에너지원에서 생산되는 전력의 비율을 대략적으로 나타냅니다.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2940" />
         <source>Gas Energy Mix approximates the percentage of gas that comes from renewable sources</source>
-        <translation type="unfinished" />
+        <translation>가스 에너지 혼합 비율은 재생 가능 에너지원에서 생산되는 가스의 비율을 대략적으로 나타낸 것입니다.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="4132" />

@@ -14022,22 +14022,22 @@ Fewer nodes: simpler curve but may lose detail</source>
     <message>
         <location filename="../artisanlib/canvas.py" line="2446" />
         <source>Meter Batch</source>
-        <translation type="unfinished" />
+        <translation>Партия счетчиков</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2447" />
         <source>PID Duty %</source>
-        <translation type="unfinished" />
+        <translation>Процентная ставка ПИД-регулятора</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2448" />
         <source>Meter Preheat</source>
-        <translation type="unfinished" />
+        <translation>Предварительный подогрев счетчика</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2449" />
         <source>Meter BBP</source>
-        <translation type="unfinished" />
+        <translation>Счетчик BBP</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2450" />
@@ -14047,7 +14047,7 @@ Fewer nodes: simpler curve but may lose detail</source>
     <message>
         <location filename="../artisanlib/canvas.py" line="2451" />
         <source>Meter Cooling</source>
-        <translation type="unfinished" />
+        <translation>Охлаждение счетчика</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="4123" />
@@ -14677,7 +14677,7 @@ Fewer nodes: simpler curve but may lose detail</source>
     <message>
         <location filename="../artisanlib/main.py" line="2542" />
         <source>Production</source>
-        <translation type="unfinished" />
+        <translation>Производство</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="2548" />
@@ -14687,7 +14687,7 @@ Fewer nodes: simpler curve but may lose detail</source>
     <message>
         <location filename="../artisanlib/main.py" line="2554" />
         <source>Expert</source>
-        <translation type="unfinished" />
+        <translation>Эксперт</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="2563" />
@@ -20331,42 +20331,42 @@ specified by the lookahead</source>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2926" />
         <source>Load label for reference. If left blank the row label, 'A', 'B', 'C' or 'D' will be used in its place.</source>
-        <translation type="unfinished" />
+        <translation>Загрузите метку для справки. Если оставить поле пустым, вместо нее будет использоваться метка строки «A», «B», «C» или «D».</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2928" />
         <source>Power rating of the load</source>
-        <translation type="unfinished" />
+        <translation>Номинальная мощность нагрузки</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2930" />
         <source>Unit of the load matching the power rating</source>
-        <translation type="unfinished" />
+        <translation>Нагрузочный блок, соответствующий номинальной мощности.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2932" />
         <source>Energy source of the load</source>
-        <translation type="unfinished" />
+        <translation>Источник энергии нагрузки</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2934" />
         <source>Data source for the load. Either a recorded event type or the internal PID duty signal.</source>
-        <translation type="unfinished" />
+        <translation>Источник данных для нагрузки. Либо зарегистрированный тип события, либо внутренний сигнал ПИД-регулятора.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2936" />
         <source>Ticked if readings are taken from a pressure gauge. Unticked for electric roasters and regular burner power output.</source>
-        <translation type="unfinished" />
+        <translation>Отмечается галочкой, если показания снимаются с манометра. Снимается галочкой для электрических ростеров и при обычной мощности горелки.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2938" />
         <source>Electric Energy Mix approximates the percentage of electricity that comes from renewable sources</source>
-        <translation type="unfinished" />
+        <translation>Показатель «Энергетический баланс электроэнергии» приблизительно отражает процент электроэнергии, получаемой из возобновляемых источников.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2940" />
         <source>Gas Energy Mix approximates the percentage of gas that comes from renewable sources</source>
-        <translation type="unfinished" />
+        <translation>Показатель «Газовый энергетический баланс» приблизительно отражает процент газа, поступающего из возобновляемых источников.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="4132" />

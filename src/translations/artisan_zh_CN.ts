@@ -46,7 +46,7 @@
     <message>
         <location filename="../artisanlib/main.py" line="24234" />
         <source>You are using the latest release.</source>
-        <translation>你正在使用持续改进中的Beta版本。</translation>
+        <translation>您正在使用最新版本。</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="24236" />
@@ -66,7 +66,7 @@
     <message>
         <location filename="../artisanlib/canvas.py" line="9446" />
         <source>sponsored by {}</source>
-        <translation>由...赞助 {}</translation>
+        <translation>由{}赞助</translation>
     </message>
 </context><context>
     <name>AddlInfo</name>
@@ -188,7 +188,7 @@
         <location filename="../artisanlib/wheels.py" line="49" />
         <location filename="../artisanlib/axis.py" line="316" />
         <source>Restore Defaults</source>
-        <translation>修复默认</translation>
+        <translation type="unfinished">恢复默认</translation>
     </message>
     <message>
         <location filename="../artisanlib/designer.py" line="239" />
@@ -938,7 +938,7 @@ END</source>
         <location filename="../artisanlib/colors.py" line="155" />
         <location filename="../artisanlib/canvas.py" line="11985" />
         <source>Maillard Phase</source>
-        <translation>梅纳反应阶段</translation>
+        <translation>美拉德反应阶段</translation>
     </message>
     <message>
         <location filename="../artisanlib/colors.py" line="150" />
@@ -1233,7 +1233,7 @@ END</source>
         <location filename="../artisanlib/events.py" line="289" />
         <source>Show on {}</source>
         <comment>Show on BT</comment>
-        <translation>显示于 {}</translation>
+        <translation>显示在 {}</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="296" />
@@ -1249,7 +1249,7 @@ END</source>
         <location filename="../artisanlib/events.py" line="553" />
         <source>{} Timer</source>
         <comment>CHARGE Timer</comment>
-        <translation>{} 计时器</translation>
+        <translation>{}计时器</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="610" />
@@ -1548,7 +1548,7 @@ END</source>
     <message>
         <location filename="../artisanlib/curves.py" line="1260" />
         <source>Decimal Places</source>
-        <translation>十进制标记</translation>
+        <translation type="unfinished">小数位数</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="1297" />
@@ -1558,7 +1558,7 @@ END</source>
     <message>
         <location filename="../artisanlib/curves.py" line="1357" />
         <source>Hide Image During Roast</source>
-        <translation>烘培时隐藏图像</translation>
+        <translation>烘焙时隐藏图像</translation>
     </message>
     <message>
         <location filename="../artisanlib/statistics.py" line="59" />
@@ -1629,7 +1629,7 @@ END</source>
     <message>
         <location filename="../artisanlib/devices.py" line="190" />
         <source>PID Duty/Power LCDs</source>
-        <translation>PID占空比/功率 LCDs</translation>
+        <translation>PID占空比/功率 LCD</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="193" />
@@ -1729,13 +1729,13 @@ END</source>
         <location filename="../artisanlib/comparator.py" line="993" />
         <location filename="../artisanlib/axis.py" line="193" />
         <source>Roast</source>
-        <translation>烘培</translation>
+        <translation>烘焙</translation>
     </message>
     <message>
         <location filename="../artisanlib/comparator.py" line="994" />
         <location filename="../artisanlib/axis.py" line="194" />
         <source>BBP+Roast</source>
-        <translation>BBP+烘培</translation>
+        <translation>BBP+烘焙</translation>
     </message>
     <message>
         <location filename="../artisanlib/comparator.py" line="995" />
@@ -2351,7 +2351,7 @@ END</source>
     <message>
         <location filename="../artisanlib/canvas.py" line="1774" />
         <source>Fan</source>
-        <translation>扇子</translation>
+        <translation type="unfinished">风机</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="1776" />
@@ -2490,7 +2490,7 @@ END</source>
     <message>
         <location filename="../plus/schedule.py" line="1576" />
         <source>Register roast</source>
-        <translation>注册烘bei</translation>
+        <translation type="unfinished">注册烘焙</translation>
     </message>
     <message>
         <location filename="../plus/schedule.py" line="1584" />
@@ -3077,7 +3077,7 @@ END</source>
     <message>
         <location filename="../plus/countries.py" line="141" />
         <source>Jamaica</source>
-        <translation>的牙买加</translation>
+        <translation>牙买加</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="142" />
@@ -3387,7 +3387,7 @@ END</source>
     <message>
         <location filename="../plus/countries.py" line="205" />
         <source>Palau</source>
-        <translation>u琉</translation>
+        <translation>帕劳</translation>
     </message>
     <message>
         <location filename="../plus/countries.py" line="206" />
@@ -5107,7 +5107,7 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="19447" />
         <source>Task Roasted</source>
-        <translation>烘培任务</translation>
+        <translation>烘焙任务</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="101" />
@@ -5407,7 +5407,7 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="21982" />
         <source>Roaster</source>
-        <translation>烘培机</translation>
+        <translation>烘焙机</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="21983" />
@@ -5417,7 +5417,7 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="21984" />
         <source>Operator</source>
-        <translation>烘培师</translation>
+        <translation>烘焙师</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="21985" />
@@ -5919,7 +5919,7 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="22869" />
         <source>Roast Ranking</source>
-        <translation>烘培排名</translation>
+        <translation>烘焙排名</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="22954" />
@@ -5964,7 +5964,7 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="23485" />
         <source>Operator:</source>
-        <translation>烘培师:</translation>
+        <translation>烘焙师:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="23487" />
@@ -7064,7 +7064,7 @@ CTRL+F [Win]</source>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="60" />
         <source>Open the roast in artisan.plus</source>
-        <translation>在 artisan.plus 中打开烘培</translation>
+        <translation>在 artisan.plus 中打开烘焙</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="60" />
@@ -7144,7 +7144,7 @@ CTRL+F [Win]</source>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="66" />
         <source>Sync the roast with artisan.plus</source>
-        <translation>将烘培与 artisan.plus 同步</translation>
+        <translation>将烘焙与 artisan.plus 同步</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="67" />
@@ -7512,7 +7512,7 @@ CTRL+P [Win]</translation>
         <source>Roast Properties Roast Tab
 Volume Calculator Unit, Green Unit  Weight or Roasted Unit Weight field</source>
         <translation>烘焙属性 烘焙选项卡
-体积计算器单位、生豆单位重量或烘培单位重量字段</translation>
+体积计算器单位、生豆单位重量或烘焙单位重量字段</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="91" />
@@ -7524,7 +7524,7 @@ Volume Calculator Unit, Green Unit  Weight or Roasted Unit Weight field</source>
         <source>Roast Properties Roast tab
 Green Weight  or Roasted Weight field</source>
         <translation>烘焙属性 烘焙选项卡
-生豆重量或烘培重量字段</translation>
+生豆重量或烘焙重量字段</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="92" />
@@ -7695,7 +7695,7 @@ Hold Shift+Alt [Win]</source>
         <location filename="../help/keyboardshortcuts_help.py" line="113" />
         <location filename="../help/keyboardshortcuts_help.py" line="112" />
         <source>Roast</source>
-        <translation>烘培</translation>
+        <translation>烘焙</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="112" />
@@ -7804,7 +7804,7 @@ Pressing the "Apply" button applies the current computed mapping to the loaded p
     <message>
         <location filename="../help/transposer_help.py" line="21" />
         <source>EXAMPLE 1: ADJUST TOTAL ROAST TIME</source>
-        <translation>示例 1：调整总烘培时间</translation>
+        <translation>示例 1：调整总烘焙时间</translation>
     </message>
     <message>
         <location filename="../help/transposer_help.py" line="25" />
@@ -7827,7 +7827,7 @@ Load the profile and start the Transposer under Tools. Enter our target roast ti
 Load the profile recorded on the smaller machine and open the Transposer. Select the linear mapping and put the DRY and FC START target temperatures as observed on your larger machine into the into the corresponding fields under BT. Underneath the table you see the calculated symbolic formula that can be copy-pasted into the BT symbolic formula under Config &gt;&gt; Devices to adjust the computed mapping automatically while roasting on your smaller machine to see the temperature reading as you expect them on the larger machine.</source>
         <translation>假设大型机器上的 DRY 和 FC START 事件发生在与小型机器不同的温度下，则将较小机器上的温度读数转移到较大机器上。
 
-加载在较小机器上记录的配置文件并打开 Transposer。选择线性映射并将在大型机器上观察到的 DRY 和 FC START 目标温度放入 BT 下的相应字段中。在表格下方，您会看到计算出的符号公式，可以将其复制粘贴到 Config &gt;&gt; Devices 下的 BT 符号公式中，以便在较小的机器上烘培时自动调整计算的映射，以在较大的机器上查看您所期望的温度读数.</translation>
+加载在较小机器上记录的配置文件并打开 Transposer。选择线性映射并将在大型机器上观察到的 DRY 和 FC START 目标温度放入 BT 下的相应字段中。在表格下方，您会看到计算出的符号公式，可以将其复制粘贴到 Config &gt;&gt; Devices 下的 BT 符号公式中，以便在较小的机器上烘焙时自动调整计算的映射，以在较大的机器上查看您所期望的温度读数.</translation>
     </message>
     <message>
         <location filename="../help/eventsliders_help.py" line="14" />
@@ -9840,7 +9840,7 @@ Follow the steps below to set the energy inputs for the roast machine and afterb
 
 请注意，预热和烘焙机冷却能源值适用于烘焙过程的第一次烘焙。批次之间的能源应用于除第一次之外的每一次烘焙。勾选“预热后批次间”框，将批次间值应用于第一次烘焙。
 
-按照以下步骤设置烘培机和加力燃烧器的能源输入。</translation>
+按照以下步骤设置烘焙机和加力燃烧器的能源输入。</translation>
     </message>
     <message>
         <location filename="../help/energy_help.py" line="18" />
@@ -9895,7 +9895,7 @@ Follow the steps below to set the energy inputs for the roast machine and afterb
     <message>
         <location filename="../help/energy_help.py" line="40" />
         <source>Burner entries require knowing the power rating of the burner.  Roasting machine manufacturer&amp;#39;s typically provide this information.  If this information can not be found for your machine this table provides approximate values based on roaster capacities.  https://artisan-scope.org/ratings/</source>
-        <translation>燃烧器条目需要知道燃烧器的额定功率。烘培机制造商通常会提供此信息。如果无法为您的机器找到此信息，此表提供基于烘焙机容量的近似值。 https://artisan-scope.org/ratings/</translation>
+        <translation>燃烧器条目需要知道燃烧器的额定功率。烘焙机制造商通常会提供此信息。如果无法为您的机器找到此信息，此表提供基于烘焙机容量的近似值。 https://artisan-scope.org/ratings/</translation>
     </message>
     <message>
         <location filename="../help/energy_help.py" line="40" />
@@ -10062,7 +10062,7 @@ When blank the load is assumed to be at a constant setting, which is the percent
         <location filename="../help/energy_help.py" line="78" />
         <location filename="../help/energy_help.py" line="59" />
         <source>Restore Defaults</source>
-        <translation>修复默认</translation>
+        <translation type="unfinished">恢复默认</translation>
     </message>
     <message>
         <location filename="../help/energy_help.py" line="78" />
@@ -10088,7 +10088,7 @@ When blank the load is assumed to be at a constant setting, which is the percent
     <message>
         <location filename="../help/energy_help.py" line="66" />
         <source>To use the Artisan energy measurement feature you will need to record one or more profiles that include the protocol of interest.  For example, to measure the Pre-Heating energy, START recording when the roaster is turned on.  Let Artisan record the entire pre-heating procedure.  At the end of the pre-heating you can either STOP recording the profile or go forward with the roast.  The CHARGE event will mark the end of pre-heating when Artisan measures the pre-heat energy.  Similarly a Between Batches protocol can be recorded with START followed by a normal roast.  A Cooling protocol would be captured by not turning the Artisan recording OFF until the roaster is fully cooled.</source>
-        <translation>要使用 Artisan 能源测量功能，您需要记录一个或多个包含感兴趣协议的配置文件。例如，要测量预热能源，请在打开烘焙机时开始记录。让 Artisan 记录整个预热过程。在预热结束时，您可以停止记录配置文件或继续烘培。当 Artisan 测量预热能源时，CHARGE 事件将标志着预热结束。类似地，可以使用 START 记录“批次之间”协议，然后进行正常烘培。通过在烘培机完全冷却之前不关闭 Artisan 记录来捕获冷却协议。</translation>
+        <translation>要使用 Artisan 能源测量功能，您需要记录一个或多个包含感兴趣协议的配置文件。例如，要测量预热能源，请在打开烘焙机时开始记录。让 Artisan 记录整个预热过程。在预热结束时，您可以停止记录配置文件或继续烘焙。当 Artisan 测量预热能源时，CHARGE 事件将标志着预热结束。类似地，可以使用 START 记录“批次之间”协议，然后进行正常烘焙。通过在烘焙机完全冷却之前不关闭 Artisan 记录来捕获冷却协议。</translation>
     </message>
     <message>
         <location filename="../help/energy_help.py" line="66" />
@@ -10175,7 +10175,7 @@ Pre-Heating energy is applied only to the first batch of a roasting session.</so
     <message>
         <location filename="../help/energy_help.py" line="76" />
         <source>This box should be ticked when a Between Batches protocol run is done after the Pre-heating and before the roast.</source>
-        <translation>当在预热之后和烘培之前完成批次间规程运行时，应勾选此框。</translation>
+        <translation>当在预热之后和烘焙之前完成批次间规程运行时，应勾选此框。</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="14" />
@@ -10280,7 +10280,7 @@ A &amp;#39;在录音时：&amp;#39;如果在范围采样时文件名不同，也
     <message>
         <location filename="../help/autosave_help.py" line="34" />
         <source>The current batch position, or "Roast of the Day"</source>
-        <translation>当前批次位置,或'烘培日期'</translation>
+        <translation>当前批次位置,或'烘焙日期'</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="35" />
@@ -10299,7 +10299,7 @@ A &amp;#39;在录音时：&amp;#39;如果在范围采样时文件名不同，也
         <source>Replace “nn” with 10, 15, 20, 25, or 30 to show the first “nn” characters of the Beans field.
 From Roast&gt;Properties&gt;Beans</source>
         <translation>将“nn”替换为 10、15、20、25 或 30 以显示 Beans 字段的第一个“nn”字符。
-从烘培&gt;属性&gt;豆子</translation>
+从烘焙&gt;属性&gt;豆子</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="38" />
@@ -10309,27 +10309,27 @@ From Roast&gt;Properties&gt;Beans</source>
     <message>
         <location filename="../help/autosave_help.py" line="39" />
         <source>Roast date in format yy-MM-dd</source>
-        <translation>烘培日期格式为 yy-MM-dd</translation>
+        <translation>烘焙日期格式为 yy-MM-dd</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="40" />
         <source>Roast date in format yyyy-MM-dd</source>
-        <translation>烘培日期格式为 yyyy-MM-dd</translation>
+        <translation>烘焙日期格式为 yyyy-MM-dd</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="41" />
         <source>Roast time in format hhmm</source>
-        <translation>烘培时间格式为 hhmm</translation>
+        <translation>烘焙时间格式为 hhmm</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="42" />
         <source>Roast date and time in format yy-MM-dd_hhmm</source>
-        <translation>烘培日期和时间格式为 yy-MM-dd_hhmm</translation>
+        <translation>烘焙日期和时间格式为 yy-MM-dd_hhmm</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="43" />
         <source>Roast date and time in format yyyy-MM-dd_hhmm</source>
-        <translation>烘培日期和时间格式为 yyyy-MM-dd_hhmm</translation>
+        <translation>烘焙日期和时间格式为 yyyy-MM-dd_hhmm</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="44" />
@@ -10344,7 +10344,7 @@ From Roast&gt;Properties&gt;Beans</source>
     <message>
         <location filename="../help/autosave_help.py" line="46" />
         <source>Roast month in format MMM (localized)</source>
-        <translation>MMM 格式的烘培月（本地化）</translation>
+        <translation>MMM 格式的烘焙月（本地化）</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="47" />
@@ -10359,7 +10359,7 @@ From Roast&gt;Properties&gt;Beans</source>
     <message>
         <location filename="../help/autosave_help.py" line="49" />
         <source>Roast day in format dd</source>
-        <translation>dd 格式的烘培日</translation>
+        <translation>dd 格式的烘焙日</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="50" />
@@ -10369,17 +10369,17 @@ From Roast&gt;Properties&gt;Beans</source>
     <message>
         <location filename="../help/autosave_help.py" line="51" />
         <source>Roast minute in format mm</source>
-        <translation>烘培分钟格式 mm</translation>
+        <translation>烘焙分钟格式 mm</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="52" />
         <source>Current date and time with seconds in format yy-MM-dd_hhmmss.  Not the same as roast time. </source>
-        <translation>当前日期和时间，格式为 yy-MM-dd_hhmmss。不一样的烘培时间。</translation>
+        <translation>当前日期和时间，格式为 yy-MM-dd_hhmmss。不一样的烘焙时间。</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="53" />
         <source>From Roast&gt;Properties&gt;Operator</source>
-        <translation>来自 烘培&gt;属性&gt;烘培师</translation>
+        <translation>来自 烘焙&gt;属性&gt;烘焙师</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="54" />
@@ -11153,8 +11153,7 @@ The prediction value is the calculated time in seconds to reach the DRY or FCs t
     <message>
         <location filename="../help/symbolic_help.py" line="159" />
         <source>Return the absolute value of x.</source>
-        <translatorcomment>返回 x 的绝对值。</translatorcomment>
-        <translation />
+        <translation type="unfinished">返回 x 的绝对值。</translation>
     </message>
     <message>
         <location filename="../help/symbolic_help.py" line="160" />
@@ -12859,7 +12858,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
         <location filename="../artisanlib/roast_properties.py" line="3554" />
         <location filename="../artisanlib/roast_properties.py" line="3549" />
         <source>Roast</source>
-        <translation>烘培</translation>
+        <translation>烘焙</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="3592" />
@@ -12880,7 +12879,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
     <message>
         <location filename="../artisanlib/roast_properties.py" line="4134" />
         <source>Operator</source>
-        <translation>烘培师</translation>
+        <translation>烘焙师</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="4135" />
@@ -13230,7 +13229,7 @@ LCDs All</source>
     <message>
         <location filename="../artisanlib/statistics.py" line="200" />
         <source>Roaster</source>
-        <translation>烘培机</translation>
+        <translation>烘焙机</translation>
     </message>
     <message>
         <location filename="../plus/schedule.py" line="2127" />
@@ -14466,7 +14465,7 @@ Fewer nodes: simpler curve but may lose detail</source>
         <location filename="../artisanlib/main.py" line="2252" />
         <location filename="../artisanlib/main.py" line="2217" />
         <source>RoastLogger...</source>
-        <translation>烘培记录...</translation>
+        <translation>烘焙记录...</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="2221" />
@@ -14527,7 +14526,7 @@ Fewer nodes: simpler curve but may lose detail</source>
         <location filename="../artisanlib/main.py" line="4331" />
         <location filename="../artisanlib/main.py" line="2330" />
         <source>Roast</source>
-        <translation>烘培</translation>
+        <translation>烘焙</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="2367" />
@@ -14575,7 +14574,7 @@ Fewer nodes: simpler curve but may lose detail</source>
     <message>
         <location filename="../artisanlib/main.py" line="2410" />
         <source>Properties...</source>
-        <translation>烘培属性...</translation>
+        <translation>烘焙属性...</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="2415" />
@@ -14777,7 +14776,7 @@ Fewer nodes: simpler curve but may lose detail</source>
     <message>
         <location filename="../artisanlib/main.py" line="2626" />
         <source>Calculator</source>
-        <translation>烘培计算器</translation>
+        <translation>烘焙计算器</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="2631" />
@@ -14808,7 +14807,7 @@ Fewer nodes: simpler curve but may lose detail</source>
         <location filename="../plus/schedule.py" line="2427" />
         <location filename="../artisanlib/main.py" line="2661" />
         <source>Schedule</source>
-        <translation>烘培计划</translation>
+        <translation>烘焙计划</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="2699" />
@@ -16363,7 +16362,7 @@ To keep it free and current please support us with your donation and subscribe t
     <message>
         <location filename="../artisanlib/main.py" line="13388" />
         <source>{0} has been saved. New roast has started</source>
-        <translation>{0}已被保存.新的烘培已经开始</translation>
+        <translation>{0}已被保存.新的烘焙已经开始</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="27425" />
@@ -16481,7 +16480,7 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
     <message>
         <location filename="../artisanlib/main.py" line="17108" />
         <source>Export RoastLogger</source>
-        <translation>导出烘培记录</translation>
+        <translation>导出烘焙记录</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="17113" />
@@ -16532,7 +16531,7 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
     <message>
         <location filename="../artisanlib/main.py" line="17561" />
         <source>Import RoastLogger</source>
-        <translation>导入烘培记录</translation>
+        <translation>导入烘焙记录</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="17705" />
@@ -17292,7 +17291,7 @@ Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
     <message>
         <location filename="../artisanlib/canvas.py" line="14429" />
         <source>Roast time starts now 00:00 BT = {0}</source>
-        <translation>烘培计时现在开始 00:00 BT = {0}</translation>
+        <translation>烘焙计时现在开始 00:00 BT = {0}</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="14463" />
@@ -17357,7 +17356,7 @@ Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
     <message>
         <location filename="../artisanlib/canvas.py" line="15226" />
         <source>Roast ended at {0} BT = {1}</source>
-        <translation>烘培结束于 {0} BT = {1}</translation>
+        <translation>烘焙结束于 {0} BT = {1}</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="15306" />
@@ -17459,7 +17458,7 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
         <location filename="../artisanlib/canvas.py" line="18859" />
         <source> added to roasting notes</source>
-        <translation>已添加到烘培记录</translation>
+        <translation>已添加到烘焙记录</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="19125" />
@@ -17501,7 +17500,7 @@ Profile missing [CHARGE] or [DROP]</source>
         <location filename="../plus/schedule.py" line="1537" />
         <location filename="../plus/schedule.py" line="1528" />
         <source>Register Roast</source>
-        <translation>注册烘培</translation>
+        <translation>注册烘焙</translation>
     </message>
     <message>
         <location filename="../plus/schedule.py" line="2481" />
@@ -18487,7 +18486,7 @@ Continue?</source>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1638" />
         <source>Roast</source>
-        <translation>烘培</translation>
+        <translation>烘焙</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1641" />
@@ -19665,12 +19664,12 @@ This range can be clamped by setting tighter minimum and maximum  limits.</sourc
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="660" />
         <source>Derivative on Error</source>
-        <translation>误差导数</translation>
+        <translation type="unfinished">误差导数（DoE）</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="662" />
         <source>Derivative on Measurement (preventing the derivative kick)</source>
-        <translation>测量导数（防止导数冲击）</translation>
+        <translation type="unfinished">测量导数（DoM）</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="701" />
@@ -19863,7 +19862,7 @@ initiated by the PID</source>
     <message>
         <location filename="../artisanlib/events.py" line="611" />
         <source>During roast display a vertical line at the current time</source>
-        <translation>烘培期间显示当前时间的垂直线</translation>
+        <translation>烘焙期间显示当前时间的垂直线</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="647" />
@@ -20006,7 +20005,7 @@ has to be reduced by 4 times.</source>
         <location filename="../artisanlib/events.py" line="1286" />
         <location filename="../artisanlib/events.py" line="1277" />
         <source>Display the button during roast</source>
-        <translation>烘培期间显示按钮</translation>
+        <translation>烘焙期间显示按钮</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="1403" />
@@ -20150,7 +20149,7 @@ specified by the lookahead</source>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="917" />
         <source>weight loss caused by roasting</source>
-        <translation>烘培导致的重量减轻</translation>
+        <translation>烘焙导致的重量减轻</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="925" />
@@ -20190,7 +20189,7 @@ specified by the lookahead</source>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="975" />
         <source>volume increase caused by roasting</source>
-        <translation>烘培后失重率</translation>
+        <translation>烘焙后失重率</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="982" />
@@ -20220,7 +20219,7 @@ specified by the lookahead</source>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1014" />
         <source>loss of organic matters caused by roasting</source>
-        <translation>烘培造成的有机物质损失</translation>
+        <translation>烘焙造成的有机物质损失</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1021" />
@@ -20346,42 +20345,42 @@ specified by the lookahead</source>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2926" />
         <source>Load label for reference. If left blank the row label, 'A', 'B', 'C' or 'D' will be used in its place.</source>
-        <translation type="unfinished" />
+        <translation type="unfinished">加载标签作为参考。如果留空，将使用行标签 “A”“B”“C” 或 “D” 来替代。</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2928" />
         <source>Power rating of the load</source>
-        <translation type="unfinished" />
+        <translation type="unfinished">负载的额定功率</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2930" />
         <source>Unit of the load matching the power rating</source>
-        <translation type="unfinished" />
+        <translation type="unfinished">负载单位与额定功率匹配</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2932" />
         <source>Energy source of the load</source>
-        <translation type="unfinished" />
+        <translation type="unfinished">负载的能源来源</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2934" />
         <source>Data source for the load. Either a recorded event type or the internal PID duty signal.</source>
-        <translation type="unfinished" />
+        <translation type="unfinished">负载的数据源。可以是记录的事件类型或内部PID占空比。</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2936" />
         <source>Ticked if readings are taken from a pressure gauge. Unticked for electric roasters and regular burner power output.</source>
-        <translation type="unfinished" />
+        <translation type="unfinished">如果读数来自压力表，则勾选此项。对于电动烘焙机则不勾选。</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2938" />
         <source>Electric Energy Mix approximates the percentage of electricity that comes from renewable sources</source>
-        <translation type="unfinished" />
+        <translation type="unfinished">电能结构近似表示来自可再生能源的电力比例</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2940" />
         <source>Gas Energy Mix approximates the percentage of gas that comes from renewable sources</source>
-        <translation type="unfinished" />
+        <translation type="unfinished">天然气能源结构大致反映了可再生能源在天然气中的占比</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="4132" />
@@ -20523,7 +20522,7 @@ Note: Erases all existing background curves.</source>
     <message>
         <location filename="../artisanlib/statistics.py" line="140" />
         <source>Show AUC LCD during roast</source>
-        <translation>烘培期间显示 AUC LCD</translation>
+        <translation>烘焙期间显示 AUC LCD</translation>
     </message>
     <message>
         <location filename="../artisanlib/statistics.py" line="144" />

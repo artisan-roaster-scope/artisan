@@ -14001,7 +14001,7 @@ Weniger Punkte: Einfachere Kurve, aber möglicherweise Detailverlust</translatio
     <message>
         <location filename="../artisanlib/canvas.py" line="2446" />
         <source>Meter Batch</source>
-        <translation type="unfinished" />
+        <translation>Zählercharge</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2447" />
@@ -14011,22 +14011,22 @@ Weniger Punkte: Einfachere Kurve, aber möglicherweise Detailverlust</translatio
     <message>
         <location filename="../artisanlib/canvas.py" line="2448" />
         <source>Meter Preheat</source>
-        <translation type="unfinished" />
+        <translation>Vorwärmung des Messgeräts</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2449" />
         <source>Meter BBP</source>
-        <translation type="unfinished" />
+        <translation>Zähler BBP</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2450" />
         <source>Meter Roast</source>
-        <translation type="unfinished" />
+        <translation>Zählerröstung</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2451" />
         <source>Meter Cooling</source>
-        <translation type="unfinished" />
+        <translation>Zählerkühlung</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="4123" />

@@ -14008,32 +14008,32 @@ Fewer nodes: simpler curve but may lose detail</source>
     <message>
         <location filename="../artisanlib/canvas.py" line="2446" />
         <source>Meter Batch</source>
-        <translation type="unfinished" />
+        <translation>Παρτίδα μετρητή</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2447" />
         <source>PID Duty %</source>
-        <translation type="unfinished" />
+        <translation>Δασμός PID %</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2448" />
         <source>Meter Preheat</source>
-        <translation type="unfinished" />
+        <translation>Προθέρμανση μετρητή</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2449" />
         <source>Meter BBP</source>
-        <translation type="unfinished" />
+        <translation>Μετρητής BBP</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2450" />
         <source>Meter Roast</source>
-        <translation type="unfinished" />
+        <translation>Μετρητής ψητό</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2451" />
         <source>Meter Cooling</source>
-        <translation type="unfinished" />
+        <translation>Ψύξη μετρητή</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="4123" />
@@ -14663,7 +14663,7 @@ Fewer nodes: simpler curve but may lose detail</source>
     <message>
         <location filename="../artisanlib/main.py" line="2542" />
         <source>Production</source>
-        <translation type="unfinished" />
+        <translation>Παραγωγή</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="2548" />
@@ -14673,7 +14673,7 @@ Fewer nodes: simpler curve but may lose detail</source>
     <message>
         <location filename="../artisanlib/main.py" line="2554" />
         <source>Expert</source>
-        <translation type="unfinished" />
+        <translation>Εμπειρογνώμονας</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="2563" />
@@ -20317,42 +20317,42 @@ specified by the lookahead</source>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2926" />
         <source>Load label for reference. If left blank the row label, 'A', 'B', 'C' or 'D' will be used in its place.</source>
-        <translation type="unfinished" />
+        <translation>Φόρτωση ετικέτας για αναφορά. Εάν αφεθεί κενή, θα χρησιμοποιηθεί στη θέση της η ετικέτα γραμμής, 'A', 'B', 'C' ή 'D'.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2928" />
         <source>Power rating of the load</source>
-        <translation type="unfinished" />
+        <translation>Ονομαστική ισχύς του φορτίου</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2930" />
         <source>Unit of the load matching the power rating</source>
-        <translation type="unfinished" />
+        <translation>Μονάδα φορτίου που ταιριάζει με την ονομαστική ισχύ</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2932" />
         <source>Energy source of the load</source>
-        <translation type="unfinished" />
+        <translation>Πηγή ενέργειας του φορτίου</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2934" />
         <source>Data source for the load. Either a recorded event type or the internal PID duty signal.</source>
-        <translation type="unfinished" />
+        <translation>Πηγή δεδομένων για το φορτίο. Είτε ένας τύπος καταγεγραμμένου συμβάντος είτε το εσωτερικό σήμα λειτουργίας PID.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2936" />
         <source>Ticked if readings are taken from a pressure gauge. Unticked for electric roasters and regular burner power output.</source>
-        <translation type="unfinished" />
+        <translation>Σημειώνεται εάν οι μετρήσεις λαμβάνονται από μανόμετρο. Δεν είναι επιλεγμένο για ηλεκτρικές ψηστιέρες και κανονική ισχύ εξόδου καυστήρα.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2938" />
         <source>Electric Energy Mix approximates the percentage of electricity that comes from renewable sources</source>
-        <translation type="unfinished" />
+        <translation>Το Μείγμα Ηλεκτρικής Ενέργειας προσεγγίζει το ποσοστό της ηλεκτρικής ενέργειας που προέρχεται από ανανεώσιμες πηγές.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2940" />
         <source>Gas Energy Mix approximates the percentage of gas that comes from renewable sources</source>
-        <translation type="unfinished" />
+        <translation>Το Ενεργειακό Μείγμα Φυσικού Αερίου (Gas Energy Mix) προσεγγίζει το ποσοστό του φυσικού αερίου που προέρχεται από ανανεώσιμες πηγές.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="4132" />

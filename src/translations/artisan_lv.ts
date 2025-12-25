@@ -14003,32 +14003,32 @@ Mazāk mezglu: vienkāršāka līkne, bet var zust detaļas</translation>
     <message>
         <location filename="../artisanlib/canvas.py" line="2446" />
         <source>Meter Batch</source>
-        <translation type="unfinished" />
+        <translation>Metru partija</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2447" />
         <source>PID Duty %</source>
-        <translation type="unfinished" />
+        <translation>PID noslodze %</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2448" />
         <source>Meter Preheat</source>
-        <translation type="unfinished" />
+        <translation>Skaitītāja uzsildīšana</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2449" />
         <source>Meter BBP</source>
-        <translation type="unfinished" />
+        <translation>BBP mērītājs</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2450" />
         <source>Meter Roast</source>
-        <translation type="unfinished" />
+        <translation>Metra cepetis</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2451" />
         <source>Meter Cooling</source>
-        <translation type="unfinished" />
+        <translation>Skaitītāja dzesēšana</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="4123" />
@@ -14658,7 +14658,7 @@ Mazāk mezglu: vienkāršāka līkne, bet var zust detaļas</translation>
     <message>
         <location filename="../artisanlib/main.py" line="2542" />
         <source>Production</source>
-        <translation type="unfinished" />
+        <translation>Ražošana</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="2548" />
@@ -14668,7 +14668,7 @@ Mazāk mezglu: vienkāršāka līkne, bet var zust detaļas</translation>
     <message>
         <location filename="../artisanlib/main.py" line="2554" />
         <source>Expert</source>
-        <translation type="unfinished" />
+        <translation>Eksperts</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="2563" />
@@ -20295,42 +20295,42 @@ specified by the lookahead</source>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2926" />
         <source>Load label for reference. If left blank the row label, 'A', 'B', 'C' or 'D' will be used in its place.</source>
-        <translation type="unfinished" />
+        <translation>Ielādēt etiķeti atsaucei. Ja atstāj tukšu, tās vietā tiks izmantota rindas etiķete “A”, “B”, “C” vai “D”.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2928" />
         <source>Power rating of the load</source>
-        <translation type="unfinished" />
+        <translation>Slodzes jaudas vērtējums</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2930" />
         <source>Unit of the load matching the power rating</source>
-        <translation type="unfinished" />
+        <translation>Slodzes mērvienība, kas atbilst jaudas vērtējumam</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2932" />
         <source>Energy source of the load</source>
-        <translation type="unfinished" />
+        <translation>Slodzes enerģijas avots</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2934" />
         <source>Data source for the load. Either a recorded event type or the internal PID duty signal.</source>
-        <translation type="unfinished" />
+        <translation>Slodzes datu avots. Vai nu reģistrēta notikuma tips, vai iekšējais PID darba signāls.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2936" />
         <source>Ticked if readings are taken from a pressure gauge. Unticked for electric roasters and regular burner power output.</source>
-        <translation type="unfinished" />
+        <translation>Atzīmēts, ja rādījumi tiek ņemti no spiediena mērītāja. Neatzīmēts elektriskajām plītīm un parastajām degļu jaudām.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2938" />
         <source>Electric Energy Mix approximates the percentage of electricity that comes from renewable sources</source>
-        <translation type="unfinished" />
+        <translation>Elektroenerģijas sajaukums aptuveni parāda, cik procentu elektroenerģijas tiek iegūta no atjaunojamiem avotiem</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2940" />
         <source>Gas Energy Mix approximates the percentage of gas that comes from renewable sources</source>
-        <translation type="unfinished" />
+        <translation>Gāzes enerģijas maisījums aptuveni parāda, cik procentu gāzes tiek iegūta no atjaunojamiem avotiem.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="4132" />

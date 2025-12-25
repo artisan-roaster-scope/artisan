@@ -14019,32 +14019,32 @@ Nas lugha de nodan: lùb nas sìmplidh ach dh’ fhaodadh e mion-fhiosrachadh a 
     <message>
         <location filename="../artisanlib/canvas.py" line="2446" />
         <source>Meter Batch</source>
-        <translation type="unfinished" />
+        <translation>Baidse Meatair</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2447" />
         <source>PID Duty %</source>
-        <translation type="unfinished" />
+        <translation>Dleastanas PID %</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2448" />
         <source>Meter Preheat</source>
-        <translation type="unfinished" />
+        <translation>Ro-theasachadh a' Mheatair</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2449" />
         <source>Meter BBP</source>
-        <translation type="unfinished" />
+        <translation>Meatair BBP</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2450" />
         <source>Meter Roast</source>
-        <translation type="unfinished" />
+        <translation>Ròstadh Meatair</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2451" />
         <source>Meter Cooling</source>
-        <translation type="unfinished" />
+        <translation>Fuarachadh Meatair</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="4123" />
@@ -14674,7 +14674,7 @@ Nas lugha de nodan: lùb nas sìmplidh ach dh’ fhaodadh e mion-fhiosrachadh a 
     <message>
         <location filename="../artisanlib/main.py" line="2542" />
         <source>Production</source>
-        <translation type="unfinished" />
+        <translation>Riochdachadh</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="2548" />
@@ -14684,7 +14684,7 @@ Nas lugha de nodan: lùb nas sìmplidh ach dh’ fhaodadh e mion-fhiosrachadh a 
     <message>
         <location filename="../artisanlib/main.py" line="2554" />
         <source>Expert</source>
-        <translation type="unfinished" />
+        <translation>Eòlaiche</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="2563" />
@@ -20326,42 +20326,42 @@ specified by the lookahead</source>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2926" />
         <source>Load label for reference. If left blank the row label, 'A', 'B', 'C' or 'D' will be used in its place.</source>
-        <translation type="unfinished" />
+        <translation>Luchdaich leubail airson fiosrachaidh. Ma dh’fhàgar bàn e, thèid leubail na sreath, ‘A’, ‘B’, ‘C’ no ‘D’ a chleachdadh na àite.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2928" />
         <source>Power rating of the load</source>
-        <translation type="unfinished" />
+        <translation>Rangachadh cumhachd an luchd</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2930" />
         <source>Unit of the load matching the power rating</source>
-        <translation type="unfinished" />
+        <translation>Aonad an luchd a tha a’ freagairt ris an rangachadh cumhachd</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2932" />
         <source>Energy source of the load</source>
-        <translation type="unfinished" />
+        <translation>Stòr lùtha an luchd</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2934" />
         <source>Data source for the load. Either a recorded event type or the internal PID duty signal.</source>
-        <translation type="unfinished" />
+        <translation>Stòr dàta airson an luchd. Seòrsa tachartais clàraichte no comharra dleastanais PID a-staigh.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2936" />
         <source>Ticked if readings are taken from a pressure gauge. Unticked for electric roasters and regular burner power output.</source>
-        <translation type="unfinished" />
+        <translation>Le comharra ma thèid na leughaidhean a thoirt bho thomhasair cuideim. Gun chomharra airson ròstairean dealain agus toradh cumhachd losgaidh àbhaisteach.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2938" />
         <source>Electric Energy Mix approximates the percentage of electricity that comes from renewable sources</source>
-        <translation type="unfinished" />
+        <translation>Tha Measgachadh Lùtha Dealain a’ tuairmseachadh na ceudad de dhealan a thig bho thùsan ath-nuadhachail</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2940" />
         <source>Gas Energy Mix approximates the percentage of gas that comes from renewable sources</source>
-        <translation type="unfinished" />
+        <translation>Tha Measgachadh Lùtha Gasa a’ dèanamh tuairmse air a’ cheudad de ghas a thig bho thùsan ath-nuadhachail</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="4132" />

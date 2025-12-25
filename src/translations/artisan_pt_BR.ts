@@ -14027,32 +14027,32 @@ Menos nós: curva mais simples, mas pode haver perda de detalhes.</translation>
     <message>
         <location filename="../artisanlib/canvas.py" line="2446" />
         <source>Meter Batch</source>
-        <translation type="unfinished" />
+        <translation>Medidor de lote</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2447" />
         <source>PID Duty %</source>
-        <translation type="unfinished" />
+        <translation>Percentual de ciclo de trabalho PID</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2448" />
         <source>Meter Preheat</source>
-        <translation type="unfinished" />
+        <translation>Pré-aquecimento do medidor</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2449" />
         <source>Meter BBP</source>
-        <translation type="unfinished" />
+        <translation>Medidor BBP</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2450" />
         <source>Meter Roast</source>
-        <translation type="unfinished" />
+        <translation>Assado no medidor</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2451" />
         <source>Meter Cooling</source>
-        <translation type="unfinished" />
+        <translation>Resfriamento do medidor</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="4123" />
@@ -14682,7 +14682,7 @@ Menos nós: curva mais simples, mas pode haver perda de detalhes.</translation>
     <message>
         <location filename="../artisanlib/main.py" line="2542" />
         <source>Production</source>
-        <translation type="unfinished" />
+        <translation>Produção</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="2548" />
@@ -14692,7 +14692,7 @@ Menos nós: curva mais simples, mas pode haver perda de detalhes.</translation>
     <message>
         <location filename="../artisanlib/main.py" line="2554" />
         <source>Expert</source>
-        <translation type="unfinished" />
+        <translation>Especialista</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="2563" />
@@ -20336,42 +20336,42 @@ especificado pelo lookahead</translation>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2926" />
         <source>Load label for reference. If left blank the row label, 'A', 'B', 'C' or 'D' will be used in its place.</source>
-        <translation type="unfinished" />
+        <translation>Carregar etiqueta para referência. Se deixada em branco, a etiqueta da linha, 'A', 'B', 'C' ou 'D', será usada em seu lugar.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2928" />
         <source>Power rating of the load</source>
-        <translation type="unfinished" />
+        <translation>Potência nominal da carga</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2930" />
         <source>Unit of the load matching the power rating</source>
-        <translation type="unfinished" />
+        <translation>Unidade de carga correspondente à potência nominal.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2932" />
         <source>Energy source of the load</source>
-        <translation type="unfinished" />
+        <translation>Fonte de energia da carga</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2934" />
         <source>Data source for the load. Either a recorded event type or the internal PID duty signal.</source>
-        <translation type="unfinished" />
+        <translation>Fonte de dados para a carga. Pode ser um tipo de evento registrado ou o sinal de ciclo de trabalho PID interno.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2936" />
         <source>Ticked if readings are taken from a pressure gauge. Unticked for electric roasters and regular burner power output.</source>
-        <translation type="unfinished" />
+        <translation>Marcado se as leituras forem feitas a partir de um manômetro. Desmarcado para torrefadores elétricos e queimadores convencionais.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2938" />
         <source>Electric Energy Mix approximates the percentage of electricity that comes from renewable sources</source>
-        <translation type="unfinished" />
+        <translation>A matriz energética elétrica representa aproximadamente a porcentagem de eletricidade proveniente de fontes renováveis.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2940" />
         <source>Gas Energy Mix approximates the percentage of gas that comes from renewable sources</source>
-        <translation type="unfinished" />
+        <translation>A matriz energética do gás representa aproximadamente a porcentagem de gás proveniente de fontes renováveis.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="4132" />

@@ -13979,22 +13979,22 @@ Méně uzlů: jednodušší křivka, ale může dojít ke ztrátě detailů</tra
     <message>
         <location filename="../artisanlib/canvas.py" line="2446" />
         <source>Meter Batch</source>
-        <translation type="unfinished" />
+        <translation>Dávka měřidla</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2447" />
         <source>PID Duty %</source>
-        <translation type="unfinished" />
+        <translation>% spotřeby PID</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2448" />
         <source>Meter Preheat</source>
-        <translation type="unfinished" />
+        <translation>Předehřívání měřiče</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2449" />
         <source>Meter BBP</source>
-        <translation type="unfinished" />
+        <translation>Měřič BBP</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2450" />
@@ -14004,7 +14004,7 @@ Méně uzlů: jednodušší křivka, ale může dojít ke ztrátě detailů</tra
     <message>
         <location filename="../artisanlib/canvas.py" line="2451" />
         <source>Meter Cooling</source>
-        <translation type="unfinished" />
+        <translation>Chlazení měřiče</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="4123" />
@@ -14635,7 +14635,7 @@ Méně uzlů: jednodušší křivka, ale může dojít ke ztrátě detailů</tra
     <message>
         <location filename="../artisanlib/main.py" line="2542" />
         <source>Production</source>
-        <translation type="unfinished" />
+        <translation>Výroba</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="2548" />
@@ -20255,42 +20255,42 @@ specified by the lookahead</source>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2926" />
         <source>Load label for reference. If left blank the row label, 'A', 'B', 'C' or 'D' will be used in its place.</source>
-        <translation type="unfinished" />
+        <translation>Načíst popisek pro referenci. Pokud pole ponecháte prázdné, bude místo něj použit popisek řádku „A“, „B“, „C“ nebo „D“.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2928" />
         <source>Power rating of the load</source>
-        <translation type="unfinished" />
+        <translation>Jmenovitý výkon zátěže</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2930" />
         <source>Unit of the load matching the power rating</source>
-        <translation type="unfinished" />
+        <translation>Jednotka zátěže odpovídající jmenovitému výkonu</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2932" />
         <source>Energy source of the load</source>
-        <translation type="unfinished" />
+        <translation>Zdroj energie zátěže</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2934" />
         <source>Data source for the load. Either a recorded event type or the internal PID duty signal.</source>
-        <translation type="unfinished" />
+        <translation>Zdroj dat pro zátěž. Buď zaznamenaný typ události, nebo interní signál PID regulace.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2936" />
         <source>Ticked if readings are taken from a pressure gauge. Unticked for electric roasters and regular burner power output.</source>
-        <translation type="unfinished" />
+        <translation>Zaškrtnuto, pokud jsou údaje odečítány z tlakoměru. Nezaškrtnuto u elektrických pekáčů a běžného výkonu hořáku.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2938" />
         <source>Electric Energy Mix approximates the percentage of electricity that comes from renewable sources</source>
-        <translation type="unfinished" />
+        <translation>Energetický mix se přibližuje k procentu elektřiny pocházející z obnovitelných zdrojů.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2940" />
         <source>Gas Energy Mix approximates the percentage of gas that comes from renewable sources</source>
-        <translation type="unfinished" />
+        <translation>Energetický mix plynu odhaduje procento plynu pocházejícího z obnovitelných zdrojů.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="4132" />

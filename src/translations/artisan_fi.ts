@@ -14020,32 +14020,32 @@ Vähemmän solmuja: yksinkertaisempi käyrä, mutta yksityiskohtia voi kadota</t
     <message>
         <location filename="../artisanlib/canvas.py" line="2446" />
         <source>Meter Batch</source>
-        <translation type="unfinished" />
+        <translation>Mittarierä</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2447" />
         <source>PID Duty %</source>
-        <translation type="unfinished" />
+        <translation>PID-käyttö %</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2448" />
         <source>Meter Preheat</source>
-        <translation type="unfinished" />
+        <translation>Mittarin esilämmitys</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2449" />
         <source>Meter BBP</source>
-        <translation type="unfinished" />
+        <translation>Mittari BBP</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2450" />
         <source>Meter Roast</source>
-        <translation type="unfinished" />
+        <translation>Metrin paahto</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2451" />
         <source>Meter Cooling</source>
-        <translation type="unfinished" />
+        <translation>Mittarin jäähdytys</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="4123" />
@@ -14675,7 +14675,7 @@ Vähemmän solmuja: yksinkertaisempi käyrä, mutta yksityiskohtia voi kadota</t
     <message>
         <location filename="../artisanlib/main.py" line="2542" />
         <source>Production</source>
-        <translation type="unfinished" />
+        <translation>Tuotanto</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="2548" />
@@ -14685,7 +14685,7 @@ Vähemmän solmuja: yksinkertaisempi käyrä, mutta yksityiskohtia voi kadota</t
     <message>
         <location filename="../artisanlib/main.py" line="2554" />
         <source>Expert</source>
-        <translation type="unfinished" />
+        <translation>Asiantuntija</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="2563" />
@@ -20316,42 +20316,42 @@ specified by the lookahead</source>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2926" />
         <source>Load label for reference. If left blank the row label, 'A', 'B', 'C' or 'D' will be used in its place.</source>
-        <translation type="unfinished" />
+        <translation>Lataa otsikko viitteeksi. Jos tämä jätetään tyhjäksi, sen tilalla käytetään rivin otsikkoa 'A', 'B', 'C' tai 'D'.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2928" />
         <source>Power rating of the load</source>
-        <translation type="unfinished" />
+        <translation>Kuorman teholuokitus</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2930" />
         <source>Unit of the load matching the power rating</source>
-        <translation type="unfinished" />
+        <translation>Teholuokitusta vastaavan kuorman yksikkö</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2932" />
         <source>Energy source of the load</source>
-        <translation type="unfinished" />
+        <translation>Kuorman energialähde</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2934" />
         <source>Data source for the load. Either a recorded event type or the internal PID duty signal.</source>
-        <translation type="unfinished" />
+        <translation>Kuorman tietolähde. Joko tallennetun tapahtuman tyyppi tai sisäinen PID-käyttösignaali.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2936" />
         <source>Ticked if readings are taken from a pressure gauge. Unticked for electric roasters and regular burner power output.</source>
-        <translation type="unfinished" />
+        <translation>Rastitettu, jos lukemat otetaan painemittarista. Ei rastitettu sähköpaistoille ja tavallisille polttimille.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2938" />
         <source>Electric Energy Mix approximates the percentage of electricity that comes from renewable sources</source>
-        <translation type="unfinished" />
+        <translation>Sähköenergian sekoitus arvioi uusiutuvista lähteistä peräisin olevan sähkön prosenttiosuuden</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2940" />
         <source>Gas Energy Mix approximates the percentage of gas that comes from renewable sources</source>
-        <translation type="unfinished" />
+        <translation>Kaasun energiajakauma arvioi uusiutuvista lähteistä peräisin olevan kaasun prosenttiosuuden</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="4132" />

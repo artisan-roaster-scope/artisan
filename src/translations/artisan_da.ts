@@ -14000,22 +14000,22 @@ Færre noder: enklere kurve, men kan miste detaljer</translation>
     <message>
         <location filename="../artisanlib/canvas.py" line="2446" />
         <source>Meter Batch</source>
-        <translation type="unfinished" />
+        <translation>Målerbatch</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2447" />
         <source>PID Duty %</source>
-        <translation type="unfinished" />
+        <translation>PID-driftsprocent</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2448" />
         <source>Meter Preheat</source>
-        <translation type="unfinished" />
+        <translation>Målerforvarmning</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2449" />
         <source>Meter BBP</source>
-        <translation type="unfinished" />
+        <translation>Måler BBP</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2450" />
@@ -14025,7 +14025,7 @@ Færre noder: enklere kurve, men kan miste detaljer</translation>
     <message>
         <location filename="../artisanlib/canvas.py" line="2451" />
         <source>Meter Cooling</source>
-        <translation type="unfinished" />
+        <translation>Målerkøling</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="4123" />
@@ -14655,7 +14655,7 @@ Færre noder: enklere kurve, men kan miste detaljer</translation>
     <message>
         <location filename="../artisanlib/main.py" line="2542" />
         <source>Production</source>
-        <translation type="unfinished" />
+        <translation>Produktion</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="2548" />
@@ -14665,7 +14665,7 @@ Færre noder: enklere kurve, men kan miste detaljer</translation>
     <message>
         <location filename="../artisanlib/main.py" line="2554" />
         <source>Expert</source>
-        <translation type="unfinished" />
+        <translation>Ekspert</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="2563" />
@@ -20289,42 +20289,42 @@ specified by the lookahead</source>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2926" />
         <source>Load label for reference. If left blank the row label, 'A', 'B', 'C' or 'D' will be used in its place.</source>
-        <translation type="unfinished" />
+        <translation>Indlæs etiket til reference. Hvis det står tomt, bruges rækkeetiketten 'A', 'B', 'C' eller 'D' i stedet.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2928" />
         <source>Power rating of the load</source>
-        <translation type="unfinished" />
+        <translation>Belastningens nominelle effekt</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2930" />
         <source>Unit of the load matching the power rating</source>
-        <translation type="unfinished" />
+        <translation>Enhed for den belastning, der matcher den nominelle effekt</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2932" />
         <source>Energy source of the load</source>
-        <translation type="unfinished" />
+        <translation>Energikilden til lasten</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2934" />
         <source>Data source for the load. Either a recorded event type or the internal PID duty signal.</source>
-        <translation type="unfinished" />
+        <translation>Datakilde for belastningen. Enten en registreret hændelsestype eller det interne PID-driftssignal.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2936" />
         <source>Ticked if readings are taken from a pressure gauge. Unticked for electric roasters and regular burner power output.</source>
-        <translation type="unfinished" />
+        <translation>Markeret, hvis aflæsningerne tages fra en trykmåler. Ikke markeret for elektriske risteovne og normal brændereffekt.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2938" />
         <source>Electric Energy Mix approximates the percentage of electricity that comes from renewable sources</source>
-        <translation type="unfinished" />
+        <translation>Elektrisk energimiks er en omtrentlig andel af elektricitet, der kommer fra vedvarende energikilder</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2940" />
         <source>Gas Energy Mix approximates the percentage of gas that comes from renewable sources</source>
-        <translation type="unfinished" />
+        <translation>Gasenergimikset er en omtrentlig andel af gas, der kommer fra vedvarende energikilder</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="4132" />

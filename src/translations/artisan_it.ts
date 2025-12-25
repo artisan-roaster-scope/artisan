@@ -3824,7 +3824,7 @@ END</source>
     <message>
         <location filename="../artisanlib/dialogs.py" line="769" />
         <source>Designer Spline Fit</source>
-        <translation type="unfinished" />
+        <translation />
     </message>
 </context><context>
     <name>Error Message</name>
@@ -11754,12 +11754,12 @@ L'utilizzo di formule matematiche nel plotter permette anche di utilizzare le va
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="625" />
         <source>β</source>
-        <translation type="unfinished" />
+        <translation />
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="635" />
         <source>γ</source>
-        <translation type="unfinished" />
+        <translation />
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="646" />
@@ -11769,12 +11769,12 @@ L'utilizzo di formule matematiche nel plotter permette anche di utilizzare le va
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="654" />
         <source>PoE</source>
-        <translation type="unfinished" />
+        <translation />
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="656" />
         <source>PoM</source>
-        <translation type="unfinished" />
+        <translation />
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="659" />
@@ -14024,32 +14024,32 @@ Meno nodi: curva più semplice ma potrebbe perdere dettagli</translation>
     <message>
         <location filename="../artisanlib/canvas.py" line="2446" />
         <source>Meter Batch</source>
-        <translation type="unfinished" />
+        <translation>Lotto di misuratori</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2447" />
         <source>PID Duty %</source>
-        <translation type="unfinished" />
+        <translation>% di dazio PID</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2448" />
         <source>Meter Preheat</source>
-        <translation type="unfinished" />
+        <translation>Preriscaldamento del misuratore</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2449" />
         <source>Meter BBP</source>
-        <translation type="unfinished" />
+        <translation>Misuratore BBP</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2450" />
         <source>Meter Roast</source>
-        <translation type="unfinished" />
+        <translation>Tostatura del misuratore</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="2451" />
         <source>Meter Cooling</source>
-        <translation type="unfinished" />
+        <translation>Raffreddamento del contatore</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="4123" />
@@ -14674,22 +14674,22 @@ Meno nodi: curva più semplice ma potrebbe perdere dettagli</translation>
     <message>
         <location filename="../artisanlib/main.py" line="2541" />
         <source>Mode</source>
-        <translation type="unfinished">Modalità</translation>
+        <translation>Modalità</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="2542" />
         <source>Production</source>
-        <translation type="unfinished" />
+        <translation>Produzione</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="2548" />
         <source>Default</source>
-        <translation type="unfinished">Predefinito</translation>
+        <translation>Predefinito</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="2554" />
         <source>Expert</source>
-        <translation type="unfinished" />
+        <translation>Esperto</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="2563" />
@@ -20331,42 +20331,42 @@ specificato dal lookahead</translation>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2926" />
         <source>Load label for reference. If left blank the row label, 'A', 'B', 'C' or 'D' will be used in its place.</source>
-        <translation type="unfinished" />
+        <translation>Caricare l'etichetta come riferimento. Se lasciato vuoto, al suo posto verrà utilizzata l'etichetta di riga "A", "B", "C" o "D".</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2928" />
         <source>Power rating of the load</source>
-        <translation type="unfinished" />
+        <translation>Potenza nominale del carico</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2930" />
         <source>Unit of the load matching the power rating</source>
-        <translation type="unfinished" />
+        <translation>Unità di carico corrispondente alla potenza nominale</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2932" />
         <source>Energy source of the load</source>
-        <translation type="unfinished" />
+        <translation>Fonte di energia del carico</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2934" />
         <source>Data source for the load. Either a recorded event type or the internal PID duty signal.</source>
-        <translation type="unfinished" />
+        <translation>Fonte dei dati per il carico. Un tipo di evento registrato o il segnale di servizio PID interno.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2936" />
         <source>Ticked if readings are taken from a pressure gauge. Unticked for electric roasters and regular burner power output.</source>
-        <translation type="unfinished" />
+        <translation>Selezionato se le letture vengono rilevate da un manometro. Non selezionato per i forni elettrici e i bruciatori con potenza standard.</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2938" />
         <source>Electric Energy Mix approximates the percentage of electricity that comes from renewable sources</source>
-        <translation type="unfinished" />
+        <translation>Il mix energetico elettrico approssima la percentuale di elettricità proveniente da fonti rinnovabili</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2940" />
         <source>Gas Energy Mix approximates the percentage of gas that comes from renewable sources</source>
-        <translation type="unfinished" />
+        <translation>Il mix energetico del gas approssima la percentuale di gas proveniente da fonti rinnovabili</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="4132" />
