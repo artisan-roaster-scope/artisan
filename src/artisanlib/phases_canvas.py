@@ -24,10 +24,10 @@ from typing import Final, TypedDict, cast, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
-    from matplotlib.axes import Axes # pylint: disable=unused-import
-    from matplotlib.patches import Rectangle # pylint: disable=unused-import
-    from matplotlib.text import Annotation # pylint: disable=unused-import
-    from matplotlib.backend_bases import Event, MouseEvent # pylint: disable=unused-import
+    from matplotlib.axes import Axes # type:ignore[untyped-import,unused-ignore] # pylint: disable=unused-import
+    from matplotlib.patches import Rectangle # type:ignore[untyped-import,unused-ignore] # pylint: disable=unused-import
+    from matplotlib.text import Annotation # type:ignore[untyped-import,unused-ignore] # pylint: disable=unused-import
+    from matplotlib.backend_bases import Event, MouseEvent # type:ignore[untyped-import,unused-ignore] # pylint: disable=unused-import
 
 from artisanlib.suppress_errors import suppress_stdout_stderr
 from artisanlib.util import toGrey, toDim, stringfromseconds, float2float
@@ -39,10 +39,10 @@ from PyQt6.QtWidgets import QApplication
 
 
 with suppress_stdout_stderr():
-    import matplotlib as mpl
+    import matplotlib as mpl # type:ignore[untyped-import,unused-ignore]
 
-from matplotlib.figure import Figure
-from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas  # @Reimport
+from matplotlib.figure import Figure # type:ignore[untyped-import,unused-ignore]
+from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas # type:ignore[untyped-import,unused-ignore] # @Reimport
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 

@@ -136,30 +136,30 @@ from PyQt6 import sip
 from artisanlib.suppress_errors import suppress_stdout_stderr
 
 with suppress_stdout_stderr():
-    import matplotlib as mpl
-    from matplotlib import colormaps
-    import matplotlib.colors as mcolors
+    import matplotlib as mpl # type:ignore[untyped-import,unused-ignore]
+    from matplotlib import colormaps # type:ignore[untyped-import,unused-ignore]
+    import matplotlib.colors as mcolors # type:ignore[untyped-import,unused-ignore]
 
 #try:
 #    mpl_version = [int(i) for i in mpl.__version__.split('.')]
 #except Exception: # pylint: disable=broad-except
 #    mpl_version = [7,7,7] # a trunk version
 
-from matplotlib.backend_bases import _Mode as MPL_Mode  # pylint: disable=import-private-name,unknown-option-value # @UnresolvedImport
+from matplotlib.backend_bases import _Mode as MPL_Mode # type:ignore[untyped-import,unused-ignore] # pylint: disable=import-private-name,unknown-option-value # @UnresolvedImport
 
 svgsupport = next((x for x in QImageReader.supportedImageFormats() if x == b'svg'),None)
 
-from matplotlib.figure import Figure
-from matplotlib import rcParams, ticker
-from matplotlib.font_manager import FontProperties, fontManager
-from matplotlib.transforms import Bbox
+from matplotlib.figure import Figure # type:ignore[untyped-import,unused-ignore]
+from matplotlib import rcParams, ticker # type:ignore[untyped-import,unused-ignore]
+from matplotlib.font_manager import FontProperties, fontManager # type:ignore[untyped-import,unused-ignore]
+from matplotlib.transforms import Bbox # type:ignore[untyped-import,unused-ignore]
 
-from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas  # @Reimport
-from matplotlib.backends.backend_qt import NavigationToolbar2QT as NavigationToolbar  # @Reimport
-from matplotlib.backend_bases import LocationEvent as mplLocationevent
+from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas # type:ignore[untyped-import,unused-ignore] # @Reimport
+from matplotlib.backends.backend_qt import NavigationToolbar2QT as NavigationToolbar # type:ignore[untyped-import,unused-ignore] # @Reimport
+from matplotlib.backend_bases import LocationEvent as mplLocationevent # type:ignore[untyped-import,unused-ignore]
 
-from matplotlib.backends.qt_editor import figureoptions
-import matplotlib.backends.qt_editor._formlayout as formlayout
+from matplotlib.backends.qt_editor import figureoptions # type:ignore[untyped-import,unused-ignore]
+import matplotlib.backends.qt_editor._formlayout as formlayout # type:ignore[untyped-import,unused-ignore]
 
 
 if TYPE_CHECKING:
@@ -182,16 +182,16 @@ if TYPE_CHECKING:
         from artisanlib.ikawa import IKAWA_BLE # pylint: disable=unused-import # ty:ignore [possibly-missing-import]
     except Exception: # pylint: disable=broad-except
         pass
-    from matplotlib.text import Annotation # pylint: disable=unused-import
+    from matplotlib.text import Annotation # type:ignore[untyped-import,unused-ignore] # pylint: disable=unused-import
     from openpyxl.worksheet.worksheet import Worksheet # pylint: disable=unused-import
     import numpy.typing as npt # pylint: disable=unused-import
     from PyQt6.QtWidgets import QTableWidgetItem, QTableWidget, QScrollBar # pylint: disable=unused-import
     from PyQt6.QtGui import QStyleHints, QClipboard, QKeyEvent, QMouseEvent, QDropEvent, QDragEnterEvent, QCloseEvent, QResizeEvent, QValidator # pylint: disable=unused-import
     from PyQt6.QtCore import QFile, QObject, QPermission, QMessageLogContext  # noqa: F401 # pylint: disable=unused-import,reimported # QFile is reimported for mypy!?
     from PyQt6.QtWebEngineCore import QWebEnginePage  # noqa: F401 # pylint: disable=unused-import
-    from matplotlib.backend_bases import Event as MplEvent, MouseEvent # pylint: disable=unused-import
-    from matplotlib.artist import Artist # pylint: disable=unused-import
-    from matplotlib.lines import Line2D # pylint: disable=unused-import
+    from matplotlib.backend_bases import Event as MplEvent, MouseEvent # type:ignore[untyped-import,unused-ignore] # pylint: disable=unused-import
+    from matplotlib.artist import Artist # type:ignore[untyped-import,unused-ignore] # pylint: disable=unused-import
+    from matplotlib.lines import Line2D # type:ignore[untyped-import,unused-ignore] # pylint: disable=unused-import
     from xml.etree.ElementTree import Element as XMLElement
 
 # fix socket.inet_pton on Windows (used by pymodbus TCP/UDP)
@@ -2761,9 +2761,6 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         self.resetAction.setMenuRole(QAction.MenuRole.NoRole)
         self.resetAction.triggered.connect(self.resetApplication)
 
-
-        self.displayonlymenus() # enable/disable menu items as needed
-
         self.main_menu_actions_with_shortcuts:list[QAction|None] = [
             # file menu
             self.newRoastAction,
@@ -4178,6 +4175,8 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         mainlayout.addLayout(self.midlayout)
         mainlayout.setContentsMargins(0,0,0,0)
         mainlayout.setSpacing(0)
+
+        self.displayonlymenus() # enable/disable menu items as needed
 
         if self.qmc.mode == 'C':
             self.qmc.mode = 'F'

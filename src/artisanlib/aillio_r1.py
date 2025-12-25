@@ -162,7 +162,7 @@ class AillioR1:
                                                      idProduct=self.AILLIO_PID_REV3)
         if self.usbhandle is None:
             raise OSError('not found or no permission')
-        if isinstance(self.usbhandle, Generator): # pyrefly:ignore[invalid-argument]
+        if isinstance(self.usbhandle, Generator): # pyrefly:ignore[invalid-argument,unsafe-overlap]
             raise OSError('Generator not supported')
         self.__dbg('device found!')
         if not system().startswith('Windows') and self.usbhandle.is_kernel_driver_active(self.AILLIO_INTERFACE):
@@ -439,11 +439,11 @@ class AillioR1:
 
     def __sendcmd(self, cmd:list[int]) -> None:
         self.__dbg('sending command: ' + str(cmd))
-        if self.usbhandle is not None and not isinstance(self.usbhandle, Generator): # pyrefly:ignore[invalid-argument]
+        if self.usbhandle is not None and not isinstance(self.usbhandle, Generator): # pyrefly:ignore[invalid-argument,unsafe-overlap]
             self.usbhandle.write(self.AILLIO_ENDPOINT_WR, cmd) # ty: ignore[possibly-missing-attribute]
 
     def __readreply(self, length:int) -> Any:
-        if self.usbhandle is not None and not isinstance(self.usbhandle, Generator): # pyrefly:ignore[invalid-argument]
+        if self.usbhandle is not None and not isinstance(self.usbhandle, Generator): # pyrefly:ignore[invalid-argument,unsafe-overlap]
             return self.usbhandle.read(self.AILLIO_ENDPOINT_RD, length) # ty: ignore[possibly-missing-attribute]
         raise OSError('not found or no permission')
 

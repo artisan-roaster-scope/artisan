@@ -28,7 +28,7 @@ import numpy
 import functools
 from bisect import bisect_right
 from pathlib import Path
-from matplotlib import colors
+from matplotlib import colors # type:ignore[untyped-import,unused-ignore]
 from collections.abc import Iterator
 from typing import Final, Literal, Any, TypeGuard, cast, TYPE_CHECKING # ty:ignore
 
@@ -719,7 +719,7 @@ def convertWeight(v:float, i:int, o:int) -> float:
     #                g,            kg,         lb,             oz,
     convtable:list[list[float]] = [
                     [1.,           0.001,      0.00220462262,  0.035274],  # g
-                    [1000,         1.,         2.20462,        35.274],    # Kg
+                    [1000,         1.,         2.20462262185,  35.274],    # Kg
                     [453.591999,   0.45359237, 1.,             16.],       # lb
                     [28.3495,      0.0283495,  0.0625,         1.]         # oz
                 ]

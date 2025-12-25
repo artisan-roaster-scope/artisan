@@ -49,14 +49,14 @@ if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
     from plus.stock import Blend # pylint: disable=unused-import
     from plus.blend import CustomBlend # pylint: disable=unused-import
-    from matplotlib.collections import PolyCollection # pylint: disable=unused-import
-    from matplotlib.axes import Axes # pylint: disable=unused-import
-    from matplotlib.axes._base import _AxesBase # pyright:ignore[reportPrivateImportUsage] # pylint: disable=unused-import
-    from matplotlib.image import AxesImage # pylint: disable=unused-import
-    from matplotlib.legend import Legend # pylint: disable=unused-import
-    from matplotlib.backend_bases import Event # pylint: disable=unused-import
-    from matplotlib.font_manager import FontProperties # pylint: disable=unused-import
-    from matplotlib.ticker import Locator # pylint: disable=unused-import
+    from matplotlib.collections import PolyCollection # type:ignore[untyped-import,unused-ignore] # pylint: disable=unused-import
+    from matplotlib.axes import Axes # type:ignore[untyped-import,unused-ignore]# pylint: disable=unused-import
+    from matplotlib.axes._base import _AxesBase # type:ignore[untyped-import,unused-ignore]# pyright:ignore[reportPrivateImportUsage] # pylint: disable=unused-import
+    from matplotlib.image import AxesImage # type:ignore[untyped-import,unused-ignore]# pylint: disable=unused-import
+    from matplotlib.legend import Legend # type:ignore[untyped-import,unused-ignore]# pylint: disable=unused-import
+    from matplotlib.backend_bases import Event # type:ignore[untyped-import,unused-ignore]# pylint: disable=unused-import
+    from matplotlib.font_manager import FontProperties # type:ignore[untyped-import,unused-ignore]# pylint: disable=unused-import
+    from matplotlib.ticker import Locator # type:ignore[untyped-import,unused-ignore]# pylint: disable=unused-import
     import numpy.typing as npt # pylint: disable=unused-import
     from PyQt6.QtGui import QResizeEvent # pylint: disable=unused-import
 
@@ -89,18 +89,18 @@ from PyQt6.QtCore import (QLocale, pyqtSignal, pyqtSlot,
 from PyQt6 import sip
 
 
-from matplotlib.figure import Figure
-from matplotlib import rcParams, patches, transforms, ticker
-import matplotlib.patheffects as PathEffects
-from matplotlib.patches import Polygon, Rectangle
-from matplotlib.transforms import Bbox, Transform
-from matplotlib.backend_bases import PickEvent, MouseEvent
-from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.projections.polar import PolarAxes
-from matplotlib.text import Annotation, Text
-from matplotlib.lines import Line2D
-from matplotlib.offsetbox import DraggableAnnotation
-from matplotlib.colors import to_hex, to_rgba
+from matplotlib.figure import Figure # type:ignore[untyped-import,unused-ignore]
+from matplotlib import rcParams, patches, transforms, ticker # type:ignore[untyped-import,unused-ignore]
+import matplotlib.patheffects as PathEffects # type:ignore[untyped-import,unused-ignore]
+from matplotlib.patches import Polygon, Rectangle # type:ignore[untyped-import,unused-ignore]
+from matplotlib.transforms import Bbox, Transform # type:ignore[untyped-import,unused-ignore]
+from matplotlib.backend_bases import PickEvent, MouseEvent # type:ignore[untyped-import,unused-ignore]
+from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas # type:ignore[untyped-import,unused-ignore]
+from matplotlib.projections.polar import PolarAxes # type:ignore[untyped-import,unused-ignore]
+from matplotlib.text import Annotation, Text # type:ignore[untyped-import,unused-ignore]
+from matplotlib.lines import Line2D # type:ignore[untyped-import,unused-ignore]
+from matplotlib.offsetbox import DraggableAnnotation # type:ignore[untyped-import,unused-ignore]
+from matplotlib.colors import to_hex, to_rgba # type:ignore[untyped-import,unused-ignore]
 
 from artisanlib.phidgets import PhidgetManager
 from Phidget22.VoltageRange import VoltageRange # type: ignore[import-untyped]

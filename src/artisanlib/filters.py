@@ -249,7 +249,7 @@ if __name__ == '__main__':
 
 
     # plot the data
-    import matplotlib.pyplot as plt
+    import matplotlib.pyplot as plt # type:ignore[untyped-import,unused-ignore]
     plt.figure(figsize=(6.4, 2.4))
     plt.plot(ts, yraw, label='Noisy signal')
 #    plt.plot(ts, y_scipy_lfilter, lw=1, label="SciPy lfilter")

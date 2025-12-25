@@ -36,4 +36,4 @@ codespell==2.4.1
 async_timeout==5.0.1
 cycler==0.12.1
 scipy-stubs==1.16.3.3
-#numpy-typing-compat
+#matplotlib-stubs==0.3.11

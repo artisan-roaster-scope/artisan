@@ -18,8 +18,8 @@
 import sys
 import platform
 import numpy
-from matplotlib import ticker, transforms
-from matplotlib import rcParams
+from matplotlib import ticker, transforms # type:ignore[untyped-import,unused-ignore]
+from matplotlib import rcParams # type:ignore[untyped-import,unused-ignore]
 import logging
 from collections.abc import Callable, Sequence
 from typing import override, Final, TypedDict, Literal, cast, TYPE_CHECKING
@@ -27,9 +27,9 @@ from typing import override, Final, TypedDict, Literal, cast, TYPE_CHECKING
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
     from artisanlib.atypes import ProfileData # pylint: disable=unused-import
-    from matplotlib.lines import Line2D # pylint: disable=unused-import
-    from matplotlib.backend_bases import PickEvent # pylint: disable=unused-import
-    from matplotlib.legend import Legend # pylint: disable=unused-import
+    from matplotlib.lines import Line2D # type:ignore[untyped-import,unused-ignore]# pylint: disable=unused-import
+    from matplotlib.backend_bases import PickEvent # type:ignore[untyped-import,unused-ignore] # pylint: disable=unused-import
+    from matplotlib.legend import Legend # type:ignore[untyped-import,unused-ignore] # pylint: disable=unused-import
     from PyQt6.QtWidgets import QLayoutItem, QLayout, QScrollBar # pylint: disable=unused-import
     from PyQt6.QtGui import QStandardItem, QKeyEvent, QDropEvent, QDragEnterEvent, QCloseEvent # pylint: disable=unused-import
     from PyQt6.QtCore import QMimeData # pylint: disable=unused-import
