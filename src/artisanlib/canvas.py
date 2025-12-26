@@ -1574,6 +1574,12 @@ class tgraphcanvas(FigureCanvas):
         self.ETprojectFlag:bool = True
         self.BTprojectFlag:bool = True
         self.projectDeltaFlag:bool = False
+        self.raoizerFlag:bool = False  # Raoizer first crack projection
+        self.raoizer_est_fc_temp:int = 205  # Estimated first crack temperature in °C
+        self.raoizer_target_seconds_to_fc:int = 420  # Target seconds to first crack
+        self.raoizer_target_ror_to_fc:float = 0.0  # Target RoR (°C/min) for first crack, 0 = legacy mode
+        self.raoizer_time_weight:float = 1.0  # Weight (α) for time deviation in optimization
+        self.raoizer_ror_weight:float = 1.0  # Weight (β) for RoR deviation in optimization
         self.ETcurve:bool = True
         self.BTcurve:bool = True
         self.ETlcd:bool = True
@@ -2008,6 +2014,7 @@ class tgraphcanvas(FigureCanvas):
         self.l_ETprojection:Optional[Line2D] = None
         self.l_DeltaBTprojection:Optional[Line2D] = None
         self.l_DeltaETprojection:Optional[Line2D] = None
+        self.l_RaoizerProjection:Optional[Line2D] = None  # Raoizer first crack projection
 
         self.l_AUCguide:Optional[Line2D] = None
 
@@ -4390,6 +4397,9 @@ class tgraphcanvas(FigureCanvas):
                     self.ax.draw_artist(self.l_BTprojection)
                 if self.projectDeltaFlag and self.l_DeltaBTprojection is not None and self.DeltaBTflag:
                     self.ax.draw_artist(self.l_DeltaBTprojection)
+            # Draw Raoizer projection
+            if self.l_RaoizerProjection is not None and self.raoizerFlag:
+                self.ax.draw_artist(self.l_RaoizerProjection)
             if self.l_AUCguide is not None and self.AUCguideFlag and self.AUCguideTime > 0 and self.AUCguideTime < self.endofx:
                 self.ax.draw_artist(self.l_AUCguide)
 
@@ -6603,6 +6613,149 @@ class tgraphcanvas(FigureCanvas):
                             self.DeltaETprojection_tx = []
                             self.DeltaETprojection_temp = []
                         self.l_DeltaETprojection.set_data(self.DeltaETprojection_tx, self.DeltaETprojection_temp)
+
+                    # Raoizer projection
+                    if self.l_RaoizerProjection is not None:
+                        if (self.raoizerFlag and
+                            self.timeindex[0] != -1 and  # CHARGE occurred
+                            self.timeindex[5] == 0 and   # First crack not marked
+                            self.timeindex[6] == 0 and   # DROP not marked
+                            len(self.timex) > 0 and
+                            len(self.ctemp2) > 0 and
+                            len(self.delta2) > 0):
+
+                            current_time = self.timex[-1]
+                            current_temp = self.ctemp2[-1]
+                            current_delta_bt = self.delta2[-1]
+                            charge_time = self.timex[self.timeindex[0]]
+                            elapsed_since_charge = current_time - charge_time
+
+                            # Check remaining conditions
+                            if (elapsed_since_charge >= 180 and  # At least 3 minutes
+                                current_temp < self.raoizer_est_fc_temp and
+                                elapsed_since_charge < self.raoizer_target_seconds_to_fc):
+
+                                # Calculate projection based on whether target RoR is specified
+                                target_time = charge_time + self.raoizer_target_seconds_to_fc
+                                time_remaining = target_time - current_time
+
+                                if time_remaining > 0:  # Prevent division by zero
+                                    temp_delta_needed = self.raoizer_est_fc_temp - current_temp
+
+                                    # Check if dual-target mode (target RoR specified) or legacy mode
+                                    if self.raoizer_target_ror_to_fc > 0:
+                                        # Dual-target projection with weighted optimization
+                                        #
+                                        # FEASIBLE CURVE CALCULATION (T054-T055):
+                                        # The feasible curve represents all possible (time, RoR) combinations
+                                        # that will reach first crack temperature from current state.
+                                        # Formula: RoR(t) = 2*(T_fc - T_now)/(t - t_now) - RoR_now
+                                        #
+                                        # WEIGHTED EUCLIDEAN DISTANCE (T054):
+                                        # We minimize: distance² = α*(t - t_target)² + β*(RoR(t) - RoR_target)²
+                                        # Where:
+                                        #   α (alpha) = time weight (user-configurable, default 1.0)
+                                        #   β (beta) = RoR weight (user-configurable, default 1.0)
+                                        #   t = candidate time on feasible curve
+                                        #   RoR(t) = RoR at time t on feasible curve
+                                        #   t_target = user's target time to first crack
+                                        #   RoR_target = user's target RoR at first crack
+                                        #
+                                        # Higher weight values prioritize minimizing that dimension's error
+
+                                        # Convert target RoR from °C/min to °C/sec for internal consistency
+                                        target_ror_per_sec = self.raoizer_target_ror_to_fc / 60.0
+                                        current_ror_per_sec = current_delta_bt / 60.0 if current_delta_bt > 0 else 0.001
+
+                                        # Find optimal time on feasible curve using weighted distance
+                                        # This minimizes: alpha*(t - t_target)^2 + beta*(RoR(t) - RoR_target)^2
+                                        # Where alpha and beta are user-configurable weights
+
+                                        # Get weight values (default to 1.0 if not set)
+                                        alpha = self.raoizer_time_weight if hasattr(self, 'raoizer_time_weight') else 1.0
+                                        beta = self.raoizer_ror_weight if hasattr(self, 'raoizer_ror_weight') else 1.0
+
+                                        # Simplified approach: sample the feasible curve and find minimum weighted distance
+                                        min_distance_sq = float('inf')
+                                        optimal_time = target_time
+                                        optimal_ror = target_ror_per_sec
+
+                                        # Sample time range from now to slightly beyond target
+                                        time_samples = 50
+                                        time_min = current_time + 30  # At least 30 seconds ahead
+                                        time_max = max(target_time * 1.2, current_time + 600)  # Up to 10 min or 120% of target
+
+                                        for i in range(time_samples):
+                                            t = time_min + (time_max - time_min) * i / (time_samples - 1)
+                                            dt = t - current_time
+                                            if dt > 0:
+                                                # Feasible RoR at this time (in °C/sec)
+                                                ror_feasible = (2 * temp_delta_needed / dt) - current_ror_per_sec
+
+                                                # Weighted distance from target
+                                                # Scale RoR by 60 to convert °C/sec to °C/min for weighting
+                                                time_diff = (t - target_time)
+                                                ror_diff = (ror_feasible - target_ror_per_sec) * 60  # Convert to °C/min
+                                                distance_sq = alpha * (time_diff**2) + beta * (ror_diff**2)
+
+                                                if distance_sq < min_distance_sq:
+                                                    min_distance_sq = distance_sq
+                                                    optimal_time = t
+                                                    optimal_ror = ror_feasible
+
+                                        # Convert optimal RoR back to °C/min for display (delta BT)
+                                        target_delta_bt = optimal_ror * 60.0
+                                        target_time = optimal_time
+
+                                        # Validate and clamp optimized values (T046, T049)
+                                        # Check for unrealistic RoR (> 100°C/min or < 0)
+                                        if target_delta_bt < 0 or target_delta_bt > 100 * 60:  # RoR in °C/sec, convert limit
+                                            # Clamp to reasonable bounds
+                                            target_delta_bt = max(0, min(target_delta_bt, 100 * 60))
+
+                                        # Ensure target time is not before current time
+                                        if target_time < current_time:
+                                            target_time = current_time + 30  # At least 30 seconds ahead
+                                    else:
+                                        # Legacy linear projection (target RoR = 0)
+                                        target_delta_bt = (2 * temp_delta_needed / time_remaining) - current_delta_bt
+
+                                        # Validate legacy projection output as well
+                                        if target_delta_bt < 0 or target_delta_bt > 100 * 60:
+                                            target_delta_bt = max(0, min(target_delta_bt, 100 * 60))
+
+                                    # Final validation check: ensure values are reasonable before displaying
+                                    # If optimization failed or produced invalid results, clear projection
+                                    if (target_time <= current_time or
+                                        target_delta_bt < 0 or
+                                        target_delta_bt > 100 * 60 or
+                                        not isinstance(target_delta_bt, (int, float)) or
+                                        not isinstance(target_time, (int, float))):
+                                        # Optimization failed or produced invalid results (T048)
+                                        self.RaoizerProjection_tx = []
+                                        self.RaoizerProjection_temp = []
+                                    else:
+                                        # Update line data with validated values
+                                        self.RaoizerProjection_tx = [current_time, target_time]
+                                        self.RaoizerProjection_temp = [current_delta_bt, target_delta_bt]
+                                else:
+                                    # Time remaining is zero or negative, clear projection
+                                    self.RaoizerProjection_tx = []
+                                    self.RaoizerProjection_temp = []
+                            else:
+                                # Conditions not met, clear projection
+                                self.RaoizerProjection_tx = []
+                                self.RaoizerProjection_temp = []
+                        else:
+                            # Feature disabled or roast not in valid state
+                            self.RaoizerProjection_tx = []
+                            self.RaoizerProjection_temp = []
+
+                        # Update line object
+                        self.l_RaoizerProjection.set_data(
+                            self.RaoizerProjection_tx,
+                            self.RaoizerProjection_temp
+                        )
             else:
                 self.BTprojection_tx = []
                 self.BTprojection_temp = []
@@ -6612,6 +6765,8 @@ class tgraphcanvas(FigureCanvas):
                 self.DeltaBTprojection_temp = []
                 self.DeltaETprojection_tx = []
                 self.DeltaETprojection_temp = []
+                self.RaoizerProjection_tx = []
+                self.RaoizerProjection_temp = []
                 if self.l_BTprojection is not None:
                     self.l_BTprojection.set_data([],[])
                 if self.l_ETprojection is not None:
@@ -6620,6 +6775,8 @@ class tgraphcanvas(FigureCanvas):
                     self.l_DeltaBTprojection.set_data([],[])
                 if self.l_DeltaETprojection is not None:
                     self.l_DeltaETprojection.set_data([],[])
+                if self.l_RaoizerProjection is not None:
+                    self.l_RaoizerProjection.set_data([],[])
 
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
@@ -6633,6 +6790,8 @@ class tgraphcanvas(FigureCanvas):
                 self.l_DeltaBTprojection.set_data([],[])
             if self.l_DeltaETprojection is not None:
                 self.l_DeltaETprojection.set_data([],[])
+            if self.l_RaoizerProjection is not None:
+                self.l_RaoizerProjection.set_data([],[])
 
     # takes array with readings, the current index, the sign of the shift as character and the shift value
     # returns val, evalsign
@@ -11347,6 +11506,23 @@ class tgraphcanvas(FigureCanvas):
                                                     transform=trans,
                                                     label=self.aw.arabicReshape(QApplication.translate('Label', 'DeltaBTprojection')),
                                                     linestyle = '-.', linewidth= 8, alpha = .3,sketch_params=None,path_effects=[])
+                # Raoizer projection line
+                if self.delta_ax is not None:
+                    self.RaoizerProjection_tx: List[float] = []
+                    self.RaoizerProjection_temp: List[float] = []
+                    trans = self.delta_ax.transData
+                    self.l_RaoizerProjection, = self.ax.plot(
+                        self.RaoizerProjection_tx,
+                        self.RaoizerProjection_temp,
+                        color=self.palette['deltabt'],
+                        linestyle='-.',
+                        linewidth=8,
+                        alpha=.3,
+                        transform=trans,
+                        label=self.aw.arabicReshape('Raoizer'),
+                        sketch_params=None,
+                        path_effects=[]
+                    )
                 if (self.device == 18 and self.aw.simulator is None) or self.showtimeguide: # not NONE device
                     self.l_timeline = self.ax.axvline(self.timeclock.elapsedMilli(),color = self.palette['timeguide'],
                                             label=self.aw.arabicReshape(QApplication.translate('Label', 'TIMEguide')),

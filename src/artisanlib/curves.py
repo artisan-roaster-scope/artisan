@@ -39,14 +39,14 @@ try:
     from PyQt6.QtCore import (Qt, pyqtSlot, QSettings, QRegularExpression, QTimer) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtGui import (QColor, QIntValidator, QRegularExpressionValidator, QPixmap) # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt6.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # @UnusedImport @Reimport  @UnresolvedImport
-                                 QPushButton, QSpinBox, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
+                                 QPushButton, QSpinBox, QDoubleSpinBox, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
                                  QGroupBox, QLayout, QMessageBox, QRadioButton, QStyleFactory, QHeaderView, # @UnusedImport @Reimport  @UnresolvedImport
                                  QTableWidget, QTableWidgetItem, QFrame, QButtonGroup) # @UnusedImport @Reimport  @UnresolvedImport
 except ImportError:
     from PyQt5.QtCore import (Qt, pyqtSlot, QSettings, QRegularExpression, QTimer) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtGui import (QColor, QIntValidator, QRegularExpressionValidator, QPixmap) # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
     from PyQt5.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, # type: ignore # @UnusedImport @Reimport  @UnresolvedImport
-                                 QPushButton, QSpinBox, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
+                                 QPushButton, QSpinBox, QDoubleSpinBox, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout, # @UnusedImport @Reimport  @UnresolvedImport
                                  QGroupBox, QLayout, QMessageBox, QRadioButton, QStyleFactory, QHeaderView, # @UnusedImport @Reimport  @UnresolvedImport
                                  QTableWidget, QTableWidgetItem, QFrame, QButtonGroup) # @UnusedImport @Reimport  @UnresolvedImport
 
@@ -334,6 +334,12 @@ class CurvesDlg(ArtisanDialog):
         self.org_foregroundShowFullflag = self.aw.qmc.foregroundShowFullflag
         self.org_LCDdecimalplaces = self.aw.qmc.LCDdecimalplaces
         self.org_percent_decimals = self.aw.percent_decimals
+        self.org_raoizerFlag = self.aw.qmc.raoizerFlag
+        self.org_raoizer_est_fc_temp = self.aw.qmc.raoizer_est_fc_temp
+        self.org_raoizer_target_seconds_to_fc = self.aw.qmc.raoizer_target_seconds_to_fc
+        self.org_raoizer_target_ror_to_fc = self.aw.qmc.raoizer_target_ror_to_fc
+        self.org_raoizer_time_weight = self.aw.qmc.raoizer_time_weight
+        self.org_raoizer_ror_weight = self.aw.qmc.raoizer_ror_weight
 
         #delta ET
         self.DeltaET = QCheckBox()
@@ -463,6 +469,11 @@ class CurvesDlg(ArtisanDialog):
         self.ETprojectCheck.stateChanged.connect(self.changeETProjection) #toggle
         self.BTprojectCheck.stateChanged.connect(self.changeBTProjection) #toggle
         self.projectDeltaCheck.stateChanged.connect(self.changeDeltaProjection) #toggle
+
+        # Raoizer projection widgets
+        self.raoizerEnabledCheck: QCheckBox
+        self.raoizerEstFCTempSpinBox: QSpinBox
+        self.raoizerTargetSecondsSpinBox: QSpinBox
 
         deltaSpanLabel = QLabel(QApplication.translate('Label', 'Delta Span'))
         self.spanitems = range(31)
@@ -1432,6 +1443,93 @@ class CurvesDlg(ArtisanDialog):
         tab5Layout.setContentsMargins(5,5,5,0)
         C5Widget.setContentsMargins(0,0,0,0)
         self.TabWidget.addTab(C5Widget,QApplication.translate('Tab','UI'))
+
+        # Raoizer tab
+        raoizerLayout = QVBoxLayout()
+        raoizerLayout.setContentsMargins(5, 5, 5, 5)
+
+        # Enable checkbox
+        self.raoizerEnabledCheck = QCheckBox(
+            QApplication.translate('CheckBox', 'Enable Raoizer Projection'))
+        self.raoizerEnabledCheck.setChecked(self.aw.qmc.raoizerFlag)
+        self.raoizerEnabledCheck.stateChanged.connect(self.changeRaoizerEnabled)
+        raoizerLayout.addWidget(self.raoizerEnabledCheck)
+
+        # Temperature spinbox with label
+        tempLabel = QLabel(QApplication.translate('Label', 'Estimated First Crack Temperature'))
+        raoizerLayout.addWidget(tempLabel)
+
+        self.raoizerEstFCTempSpinBox = QSpinBox()
+        self.raoizerEstFCTempSpinBox.setRange(150, 250)
+        self.raoizerEstFCTempSpinBox.setValue(self.aw.qmc.raoizer_est_fc_temp)
+        self.raoizerEstFCTempSpinBox.setSuffix(' °C')
+        self.raoizerEstFCTempSpinBox.valueChanged.connect(self.changeRaoizerEstFCTemp)
+        raoizerLayout.addWidget(self.raoizerEstFCTempSpinBox)
+
+        # Time spinbox with label
+        timeLabel = QLabel(QApplication.translate('Label', 'Target Seconds to First Crack'))
+        raoizerLayout.addWidget(timeLabel)
+
+        self.raoizerTargetSecondsSpinBox = QSpinBox()
+        self.raoizerTargetSecondsSpinBox.setRange(180, 900)
+        self.raoizerTargetSecondsSpinBox.setValue(self.aw.qmc.raoizer_target_seconds_to_fc)
+        self.raoizerTargetSecondsSpinBox.setSuffix(' sec')
+        self.raoizerTargetSecondsSpinBox.valueChanged.connect(self.changeRaoizerTargetTime)
+        raoizerLayout.addWidget(self.raoizerTargetSecondsSpinBox)
+
+        # RoR spinbox with label
+        rorLabel = QLabel(QApplication.translate('Label', 'Target RoR at First Crack (0 = legacy mode)'))
+        raoizerLayout.addWidget(rorLabel)
+
+        self.raoizerTargetRoRSpinBox = QDoubleSpinBox()
+        self.raoizerTargetRoRSpinBox.setRange(0.0, 50.0)
+        self.raoizerTargetRoRSpinBox.setDecimals(1)
+        self.raoizerTargetRoRSpinBox.setValue(self.aw.qmc.raoizer_target_ror_to_fc)
+        self.raoizerTargetRoRSpinBox.setSuffix(' °C/min')
+        self.raoizerTargetRoRSpinBox.valueChanged.connect(self.changeRaoizerTargetRoR)
+        raoizerLayout.addWidget(self.raoizerTargetRoRSpinBox)
+
+        # Optimization weights section
+        weightsLabel = QLabel(QApplication.translate('Label', 'Optimization Weights'))
+        raoizerLayout.addWidget(weightsLabel)
+
+        # Time weight spinbox
+        timeWeightLabel = QLabel(QApplication.translate('Label', 'Time Weight (α)'))
+        raoizerLayout.addWidget(timeWeightLabel)
+
+        self.raoizerTimeWeightSpinBox = QDoubleSpinBox()
+        self.raoizerTimeWeightSpinBox.setRange(0.1, 10.0)
+        self.raoizerTimeWeightSpinBox.setDecimals(1)
+        self.raoizerTimeWeightSpinBox.setValue(self.aw.qmc.raoizer_time_weight)
+        self.raoizerTimeWeightSpinBox.valueChanged.connect(self.changeRaoizerTimeWeight)
+        raoizerLayout.addWidget(self.raoizerTimeWeightSpinBox)
+
+        # RoR weight spinbox
+        rorWeightLabel = QLabel(QApplication.translate('Label', 'RoR Weight (β)'))
+        raoizerLayout.addWidget(rorWeightLabel)
+
+        self.raoizerRoRWeightSpinBox = QDoubleSpinBox()
+        self.raoizerRoRWeightSpinBox.setRange(0.1, 10.0)
+        self.raoizerRoRWeightSpinBox.setDecimals(1)
+        self.raoizerRoRWeightSpinBox.setValue(self.aw.qmc.raoizer_ror_weight)
+        self.raoizerRoRWeightSpinBox.valueChanged.connect(self.changeRaoizerRoRWeight)
+        raoizerLayout.addWidget(self.raoizerRoRWeightSpinBox)
+
+        # Set initial state of weight controls (only enabled if dual-target mode is active)
+        weights_enabled = self.aw.qmc.raoizer_target_ror_to_fc > 0
+        self.raoizerTimeWeightSpinBox.setEnabled(weights_enabled)
+        self.raoizerRoRWeightSpinBox.setEnabled(weights_enabled)
+
+        raoizerLayout.addStretch()
+
+        # Container widget
+        RaoizerWidget = QWidget()
+        RaoizerWidget.setLayout(raoizerLayout)
+        RaoizerWidget.setContentsMargins(0, 0, 0, 0)
+
+        # Add tab to widget
+        self.TabWidget.addTab(RaoizerWidget, QApplication.translate('Tab', 'Raoizer'))
+
         buttonsLayout = QHBoxLayout()
         buttonsLayout.addStretch()
         buttonsLayout.addWidget(self.dialogbuttons)
@@ -2512,6 +2610,45 @@ class CurvesDlg(ArtisanDialog):
     @pyqtSlot(int)
     def changeDeltaProjection(self, _:int = 0) -> None:
         self.aw.qmc.projectDeltaFlag = not self.aw.qmc.projectDeltaFlag
+
+    @pyqtSlot(int)
+    def changeRaoizerEnabled(self, _:int = 0) -> None:
+        self.aw.qmc.raoizerFlag = not self.aw.qmc.raoizerFlag
+        if not self.aw.qmc.raoizerFlag:
+            self.aw.qmc.resetlines()
+
+    @pyqtSlot(int)
+    def changeRaoizerEstFCTemp(self, value:int) -> None:
+        self.aw.qmc.raoizer_est_fc_temp = value
+
+    @pyqtSlot(int)
+    def changeRaoizerTargetTime(self, value:int) -> None:
+        self.aw.qmc.raoizer_target_seconds_to_fc = value
+        if not self.aw.qmc.projectDeltaFlag:
+            #erase old projections
+            self.aw.qmc.resetlines()
+
+    @pyqtSlot(float)
+    def changeRaoizerTargetRoR(self, value:float) -> None:
+        self.aw.qmc.raoizer_target_ror_to_fc = value
+        # Enable/disable weight controls based on whether dual-target mode is active
+        weights_enabled = value > 0
+        self.raoizerTimeWeightSpinBox.setEnabled(weights_enabled)
+        self.raoizerRoRWeightSpinBox.setEnabled(weights_enabled)
+        if not self.aw.qmc.projectDeltaFlag:
+            #erase old projections
+            self.aw.qmc.resetlines()
+
+    @pyqtSlot(float)
+    def changeRaoizerTimeWeight(self, value:float) -> None:
+        self.aw.qmc.raoizer_time_weight = value
+        if not self.aw.qmc.projectDeltaFlag:
+            #erase old projections
+            self.aw.qmc.resetlines()
+
+    @pyqtSlot(float)
+    def changeRaoizerRoRWeight(self, value:float) -> None:
+        self.aw.qmc.raoizer_ror_weight = value
         if not self.aw.qmc.projectDeltaFlag:
             #erase old projections
             self.aw.qmc.resetlines()
@@ -2584,6 +2721,12 @@ class CurvesDlg(ArtisanDialog):
         self.aw.qmc.foregroundShowFullflag = self.org_foregroundShowFullflag
         self.aw.qmc.LCDdecimalplaces = self.org_LCDdecimalplaces
         self.aw.percent_decimals = self.org_percent_decimals
+        self.aw.qmc.raoizerFlag = self.org_raoizerFlag
+        self.aw.qmc.raoizer_est_fc_temp = self.org_raoizer_est_fc_temp
+        self.aw.qmc.raoizer_target_seconds_to_fc = self.org_raoizer_target_seconds_to_fc
+        self.aw.qmc.raoizer_target_ror_to_fc = self.org_raoizer_target_ror_to_fc
+        self.aw.qmc.raoizer_time_weight = self.org_raoizer_time_weight
+        self.aw.qmc.raoizer_ror_weight = self.org_raoizer_ror_weight
 
         self.aw.setFonts(False)
         self.aw.qmc.resetlinecountcaches()
