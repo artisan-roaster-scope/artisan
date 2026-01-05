@@ -3157,7 +3157,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             item2.setText(self.aw.qmc.energyunits[self.aw.qmc.energyresultunit_setup])
 
         for i in range(ndata):
-            if self.btu_list[i]['Kind'] in {0, 2, 8, 10, 11, 12, 13}:  #Preheat Measured, BBP Measured, Meter Batch/Preheat/BBP/Roast/Cooling
+            if self.btu_list[i]['Kind'] in {0, 2, 4, 8, 10, 11, 12, 13}:  #Preheat Measured, BBP Measured, Cooling Measured, Meter Batch/Preheat/BBP/Roast/Cooling
                 load_widget = MyTableWidgetItemNumber('',self.btu_list[i]['load_pct'])
             elif self.btu_list[i]['Kind'] in {9}:  # PID DUTY %, indicate the power % displayed is the average
                 load_widget = MyTableWidgetItemNumber(f"{self.btu_list[i]['load_pct']:.1f}% x\u0304",self.btu_list[i]['load_pct'])
@@ -3165,7 +3165,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 load_widget = MyTableWidgetItemNumber(f"{self.btu_list[i]['load_pct']:.1f}%",self.btu_list[i]['load_pct'])
             load_widget.setTextAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
 
-            if self.btu_list[i]['Kind'] in {0, 2}:  #Preheat Measured, BBP Measured
+            if self.btu_list[i]['Kind'] in {0, 2, 4, 10}:  #Preheat Measured, BBP Measured, Cooling Measured, Meter Preheat
                 duration_mmss_widget = MyTableWidgetItemNumber('',0)
             else:
                 duration_mmss_widget = MyTableWidgetItemNumber(stringfromseconds(self.btu_list[i]['duration']),self.btu_list[i]['duration'])

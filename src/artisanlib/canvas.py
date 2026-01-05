@@ -2400,10 +2400,10 @@ class tgraphcanvas(QObject):
         self.CO2kg_per_BTU:list[float] = self.CO2kg_per_BTU_default.copy()
         self.Biogas_CO2_Reduction:float = self.Biogas_CO2_Reduction_default
 
-        self.energyunits: Final[list[str]] = ['BTU', 'kJ', 'kCal', 'kWh', 'hph']
-        self.powerunits: Final[list[str]] = ['BTU/h', 'kJ/h', 'kCal/h', 'kW', 'hp']
+        self.energyunits: Final[list[str]] = ['BTU', 'kJ', 'kCal', 'kWh', 'hph','Wh']
+        self.powerunits: Final[list[str]] = ['BTU/h', 'kJ/h', 'kCal/h', 'kW', 'hp','W']
         self.sourcenames: Final[list[str]] = ['LPG', 'NG', QApplication.translate('ComboBox','Elec')]
-        self.meterunitnames: Final[list[str]] = ['BTU', 'kJ', 'kCal', 'kWh', 'thm']
+        self.meterunitnames: Final[list[str]] = ['BTU', 'kJ', 'kCal', 'kWh', 'thm', 'Wh']
         self.meterreads_default: list[list[float]] = [[0.]*9,[0.]*9] # scaled to btu, [0]:ON to OFF, [1:8] ON to extratemp[timeindex[0:7]]
         self.meterreads = self.meterreads_default.copy()
         ## setup defaults (stored in app):
@@ -2441,14 +2441,26 @@ class tgraphcanvas(QObject):
                         QApplication.translate('Label','BBP %'),                 # 3
                         QApplication.translate('Label','Cooling Measured'),      # 4
                         QApplication.translate('Label','Cooling %'),             # 5
-                        QApplication.translate('Label','Continuous'),            # 6
+                        QApplication.translate('Label','Continuous Roast'),      # 6
                         QApplication.translate('Label','Roast Event'),           # 7
                         QApplication.translate('Label','Meter Batch'),           # 8
                         QApplication.translate('Label','PID Duty %'),            # 9
                         QApplication.translate('Label','Meter Preheat'),         #10
                         QApplication.translate('Label','Meter BBP'),             #11
                         QApplication.translate('Label','Meter Roast'),           #12
-                        QApplication.translate('Label','Meter Cooling')          #13
+                        QApplication.translate('Label','Meter Cooling'),         #13
+                        QApplication.translate('Label','PID Duty % BBP'),        #14
+                        QApplication.translate('Label','PID Duty % Roast'),      #15
+                        QApplication.translate('Label','PID Duty % Cooling'),    #16
+                        QApplication.translate('Label','Preheat Event'),         #17
+                        QApplication.translate('Label','BBP Event'),             #18
+                        QApplication.translate('Label','Cooling Event'),         #19
+                        QApplication.translate('Label','PID Duty % Preheat'),    #20
+                        QApplication.translate('Label','Continuous Batch'),      #21
+                        QApplication.translate('Label','Continuous Preheat'),    #22
+                        QApplication.translate('Label','Continuous BBP'),        #23
+                        QApplication.translate('Label','Continuous Cooling'),    #24
+                        QApplication.translate('Label','Event Batch'),           #25
                         ]
         self.perKgRoastMode:bool = False # if true only the amount during the roast and not the full batch (incl. preheat and BBP) are displayed), toggled by click on the result widget
 
@@ -13715,7 +13727,6 @@ class tgraphcanvas(QObject):
                         # if no timeindex then leave at initialized -1 value
                         if self.timeindex[event] > 0:
                             event_meterread[event] = self.timeindex[event]
-
                     self.meterreads[i] = [
                         float2float(
                             self.convertHeat(
@@ -13729,7 +13740,7 @@ class tgraphcanvas(QObject):
                         float2float(
                             self.convertHeat(
                                 self.calc_meter_read(meterarray, self.timeindex[j], rolloveridx),
-                                self.powerunits[self.meterunits[i]],
+                                self.meterunitnames[self.meterunits[i]],
                                 'BTU'
                             ),
                             5
@@ -16408,14 +16419,21 @@ class tgraphcanvas(QObject):
     def convertHeat(value:float, fromUnit:str, toUnit:str='BTU') -> float:
         if value in [-1,None]:
             return value
-        conversion = { #        BTU                kJ                kCal                kWh                hph               thm
-                       'bt': {'bt':1.,          'kj':1.0551E+00,  'kc':2.5200E-01,  'kw':2.9307E-04,  'hp':3.9301E-04, 'th':1.0000E-05 }, # = 1 btu
-                       'kj': {'bt':9.4782E-01,  'kj':1.,          'kc':2.3885E-01,  'kw':2.7778E-04,  'hp':3.7251E-04, 'th':9.4782E-06 }, # = 1 kj
-                       'kc': {'bt':3.9683E+00,  'kj':4.1868E+00,  'kc':1.,          'kw':1.1630E-03,  'hp':1.5596E-03, 'th':3.9683E-05 }, # = 1 kcal
-                       'kw': {'bt':3.4121E+03,  'kj':3.6000E+03,  'kc':8.5985E+02,  'kw':1.,          'hp':1.3410E+00, 'th':3.4121E-02 }, # = 1 kwh
-                       'hp': {'bt':2.5444E+03,  'kj':2.6845E+03,  'kc':6.4119E+02,  'kw':7.4570E-01,  'hp':1.        , 'th':2.5444E-02 }, # = 1 hph
-                       'th': {'bt':1.0000E+05,  'kj':1.0551E+05,  'kc':2.5200E+04,  'kw':2.9307E+01,  'hp':3.9301E+01, 'th':1.         }} # = 1 thm
-
+        # all units are truncated to the first two characters, this doesn't work for W (wattts) so add an 'h' to fudge it
+        if fromUnit in {'w','W'}:
+            fromUnit = 'wh'
+        if toUnit in {'w','W'}:
+            toUnit = 'wh'
+        conversion = {
+            #          BTU               kJ                kCal              kWh               hph              thm             Wh
+            'bt': {'bt':1.,          'kj':1.0551E+00,  'kc':2.5200E-01,  'kw':2.9307E-04,  'hp':3.9301E-04, 'th':1.0000E-05, 'wh':2.9307E-01}, # = 1 btu
+            'kj': {'bt':9.4782E-01,  'kj':1.,          'kc':2.3885E-01,  'kw':2.7778E-04,  'hp':3.7251E-04, 'th':9.4782E-06, 'wh':2.7778E-01}, # = 1 kj
+            'kc': {'bt':3.9683E+00,  'kj':4.1868E+00,  'kc':1.,          'kw':1.1630E-03,  'hp':1.5596E-03, 'th':3.9683E-05, 'wh':1.1630E-00}, # = 1 kcal
+            'kw': {'bt':3.4121E+03,  'kj':3.6000E+03,  'kc':8.5985E+02,  'kw':1.,          'hp':1.3410E+00, 'th':3.4121E-02, 'wh':1.0000E+03}, # = 1 kwh
+            'hp': {'bt':2.5444E+03,  'kj':2.6845E+03,  'kc':6.4119E+02,  'kw':7.4570E-01,  'hp':1.        , 'th':2.5444E-02, 'wh':7.4570E+02}, # = 1 hph
+            'th': {'bt':1.0000E+05,  'kj':1.0551E+05,  'kc':2.5200E+04,  'kw':2.9307E+01,  'hp':3.9301E+01, 'th':1.        , 'wh':2.9307E+04}, # = 1 thm
+            'wh': {'bt':3.4121E+00,  'kj':3.6000E+00,  'kc':8.5985E-01,  'kw':1.0000E-03,  'hp':1.3410E-03, 'th':3.4121E-05, 'wh':1.        }, # = 1 Wh
+        }
         try:
             return value * conversion[fromUnit.lower()[0:2]][toUnit.lower()[0:2]]
         except Exception as ex: # pylint: disable=broad-except
@@ -16432,20 +16450,106 @@ class tgraphcanvas(QObject):
         return co2g
 
     # Sum up the energy use from a variety of inputs
+    #   If there is no CHARGE or DROP all Loads and meters will feed into PreHeating.  Protocols are unchanged.
+    #   Protocols Pre-Heating and Cooling protocols apply only to the first batch
     def calcEnergyuse(self, beanweightstr:str = '') -> tuple['EnergyMetrics', list['BTU']]:
         energymetrics = EnergyMetrics()
         btu_list:list[BTU] = []
         try:
+            # return immediately if there is no time to the profile
             if len(self.timex) == 0:
                 #self.aw.sendmessage(QApplication.translate("Message","No profile data"),append=False)
                 return energymetrics, btu_list
 
-            # helping function
+            # Local function, generate alphabetic label (A,B,C D) if loadlabel is empty, otherwise return the loadlabel as is
             def formatLoadLabel(i:int) -> str:
                 if len(self.loadlabels[i]) > 0:
                     return  self.loadlabels[i]
-                # if label is empty generate alphabetic label (A,B,C D)
                 return chr(ord('A')+i)
+
+            # Local function to record energies of events
+            def record_event_energies(_kind: int, _duration: float) -> None:
+                # scale the burner setting for 0-100%
+                val = (self.specialeventsvalue[j] - 1) * 10
+                emin = toInt(self.loadevent_zeropcts[i])
+                emax = toInt(self.loadevent_hundpcts[i])
+                scaled = (val - emin) / (emax - emin)  #emax > emin enforced by energy.py
+                load_pct = min(1.0, max(0.0, scaled)) * 100
+                if self.presssure_percents[i] and self.sourcetypes[i] in {0, 1}:   # gas loads only
+                    # convert pressure to heat
+                    factor = math.sqrt(load_pct / 100)
+                else:
+                    factor = load_pct / 100
+                BTUs = self.loadratings[i] * factor * (duration / 3600) * self.convertHeat(1,self.powerunits[self.ratingunits[i]],'BTU')
+                if BTUs > 0:
+                    loadlabel = f'{formatLoadLabel(i)}-{eTypes[self.load_etypes[i]]}'
+                    sortorder = (2000 * (i + 1)) + j
+                    CO2g = self.calcCO2g(BTUs, self.sourcetypes[i])
+                    btu_list.append({
+                        'load_pct':load_pct,
+                        'duration':_duration,
+                        'BTUs':BTUs,
+                        'CO2g':CO2g,
+                        'LoadLabel':loadlabel,
+                        'Kind':_kind,
+                        'SourceType':self.sourcetypes[i],
+                        'SortOrder':sortorder
+                    })
+
+            # Local function to record energies of continuous loads
+            def record_continuous_energies(_i: int, _kind: int, _duration: float) -> None:
+                load_pct = self.loadevent_hundpcts[_i]  #needed only for the btu_list and outmsg
+                if self.presssure_percents[_i] and self.sourcetypes[_i] in {0, 1}:   # gas loads only
+                    # convert pressure to heat
+                    factor = math.sqrt(load_pct / 100)
+                else:
+                    factor = load_pct / 100
+
+                BTUs = self.loadratings[_i] * factor * (duration / 3600) * self.convertHeat(1,self.powerunits[self.ratingunits[_i]],'BTU')
+                if BTUs > 0:
+                    loadlabel = formatLoadLabel(_i)
+                    kind = _kind
+                    sortorder = 2000 - _i
+                    CO2g = self.calcCO2g(BTUs, self.sourcetypes[_i])
+                    btu_list.append({
+                        'load_pct':load_pct,
+                        'duration':duration,
+                        'BTUs':BTUs,
+                        'CO2g':CO2g,
+                        'LoadLabel':loadlabel,
+                        'Kind':kind,
+                        'SourceType':self.sourcetypes[_i],
+                        'SortOrder':sortorder
+                    })
+
+
+            # Local function to accumulate and return the DUTY % BTUs
+            def accumulate_DUTY(_i:int, extra_timex_idx_start: int, extra_timex_idx_end: int, _pid_duty_extradevice_index: int) -> tuple[float, float]:
+                accumulated_btus: float = 0
+                accumulated_factors: float = 0
+                # loop over the values from CHARGE to DROP and accumulate energy
+                for j in range(extra_timex_idx_start, extra_timex_idx_end):
+                    duration = self.extratimex[_pid_duty_extradevice_index][j+1] - self.extratimex[_pid_duty_extradevice_index][j]
+
+                    # get the PID DUTY % value
+                    load_pct = self.extratemp2[_pid_duty_extradevice_index][j]
+
+                    # scale when Pressure % is ticked
+                    if self.presssure_percents[_i] and self.sourcetypes[_i] in {0, 1}:   # gas loads only
+                        # convert pressure to heat
+                        factor = math.sqrt(load_pct / 100)
+                    else:
+                        factor = load_pct / 100
+
+                    # don't accumulate the value when the PID is OFF, i.e. when extratemp2 == -1 and reject values not in 0-100
+                    if not 0 <= self.extratemp2[_pid_duty_extradevice_index][j] <= 100:
+                        factor = 0
+
+                    # accumulate
+                    accumulated_btus += self.loadratings[_i] * factor * (duration / 3600) * self.convertHeat(1,self.powerunits[self.ratingunits[_i]],'BTU')
+                    accumulated_factors += factor
+
+                return accumulated_btus, accumulated_factors
 
             # get the valid green weight
             if beanweightstr != '':
@@ -16456,20 +16560,17 @@ class tgraphcanvas(QObject):
 
             eTypes = [''] + self.etypes[:4]
 
-            # init the prev_loadtime to drop if it exists or to the end of profile time
-            if self.timeindex[6] > 0:
-                prev_loadtime = [self.timex[self.timeindex[6]]]*4
-            else:
-                prev_loadtime = [self.timex[-1]]*4
-                #self.aw.sendmessage(QApplication.translate("Message","Profile has no DROP event"),append=False)
+            # init the prev_loadtime to the end of profile time
+            prev_loadtime = [self.timex[-1]]*4
 
-            # setup for PID DUTY %
+            # init for PID DUTY % calculations
             PID_DUTY_DEVICE_INDEX = 22  # '+PID SV/DUTY %' hardcoded value
             pid_duty_extradevice_index = -1
             pid_duty_label = ''
             if PID_DUTY_DEVICE_INDEX in self.extradevices:
                 pid_duty_extradevice_index = self.extradevices.index(PID_DUTY_DEVICE_INDEX)
                 pid_duty_label = self.extraname2[pid_duty_extradevice_index]
+
 
             # loop through each load and calculate the energy from each contributor
             for i in range(4):
@@ -16480,39 +16581,109 @@ class tgraphcanvas(QObject):
                         if self.loadratings[i] == 0:
                             break #j loop
                         loadtime = self.timex[self.specialevents[j]]
-                        # exclude heat before charge event
-                        if self.timeindex[0] > -1 and loadtime <= self.timex[self.timeindex[0]]:
-                            if prev_loadtime[i] <= self.timex[self.timeindex[0]]:
-                                break #j loop
-                            loadtime = self.timex[self.timeindex[0]]
-                        duration = prev_loadtime[i] - loadtime
 
-                        # exclude heat after drop event
-                        if duration < 0:
-                            continue #j loop
-                        prev_loadtime[i] = loadtime
-                        # scale the burner setting for 0-100%
-                        val = (self.specialeventsvalue[j] - 1) * 10
-                        emin = toInt(self.loadevent_zeropcts[i])
-                        emax = toInt(self.loadevent_hundpcts[i])
-                        scaled = (val - emin) / (emax - emin)  #emax > emin enforced by energy.py
-                        load_pct = min(1.0, max(0.0, scaled)) * 100
-                        if self.presssure_percents[i] and self.sourcetypes[i] in {0, 1}:   # gas loads only
-                            # convert pressure to heat
-                            factor = math.sqrt(load_pct / 100)
-                        else:
-                            factor = load_pct / 100
+                        # there is no CHARGE or no DROP, events accumulate to Preheat
+                        if self.timeindex[0] == -1 or self.timeindex[6] == 0:
+                            kind = 17 # Event PreheatS
+                            duration = prev_loadtime[i] - loadtime
+                            record_event_energies(kind, duration)
+                            prev_loadtime[i] = loadtime
+                            continue  #j loop
 
-                        BTUs = self.loadratings[i] * factor * (duration / 3600) * self.convertHeat(1,self.powerunits[self.ratingunits[i]],'BTU')
-                        if BTUs > 0:
-                            loadlabel = f'{formatLoadLabel(i)}-{eTypes[self.load_etypes[i]]}'
-                            kind = 7  #Roast Event
-                            sortorder = (2000 * (i + 1)) + j
-                            CO2g = self.calcCO2g(BTUs, self.sourcetypes[i])
+                        # from here on we know there is a CHARGE and a DROP event
+
+                        # calculate the portion after DROP
+                        # Event begins and terminates after DROP
+                        if loadtime > self.timex[self.timeindex[6]]:
+                            kind = 19  #Event Cooling
+                            duration = prev_loadtime[i] - loadtime
+                            record_event_energies(kind, duration)
+                            prev_loadtime[i] = loadtime
+                            continue  #j loop
+
+                        # Event begins before DROP, terminates after DROP
+                        if loadtime <= self.timex[self.timeindex[6]] and prev_loadtime[i] > self.timex[self.timeindex[6]]:
+                            # Event begins after CHARGE
+                            if loadtime >= self.timex[self.timeindex[0]]:
+                                # Two portions to register
+                                # Before DROP
+                                kind = 7  #Event Roast
+                                duration = self.timex[self.timeindex[6]] - loadtime
+                                record_event_energies(kind, duration)
+                                # After DROP
+                                kind = 19  #Event Cooling
+                                duration = prev_loadtime[i] - self.timex[self.timeindex[6]]
+                                record_event_energies(kind, duration)
+                                prev_loadtime[i] = loadtime
+                                continue  #j loop
+                            # Event begins before CHARGE
+                            if loadtime < self.timex[self.timeindex[0]]:
+                                # Three portions to register
+                                # Before CHARGE
+                                kind = 18  #Event BBP
+                                duration = self.timex[self.timeindex[0]] - loadtime
+                                record_event_energies(kind, duration)
+                                # After CHARGE and Before DROP
+                                kind = 7  #Event Roast
+                                duration = self.timex[self.timeindex[6]] - self.timex[self.timeindex[0]]
+                                record_event_energies(kind, duration)
+                                # After DROP
+                                kind = 19  #Event Cooling
+                                duration = prev_loadtime[i] - self.timex[self.timeindex[6]]
+                                record_event_energies(kind, duration)
+                                prev_loadtime[i] = loadtime
+                                continue  #j loop
+
+                        # Event begins and terminates after CHARGE and before DROP
+                        if (self.timex[self.timeindex[0]] <= loadtime < self.timex[self.timeindex[6]] and
+                            self.timex[self.timeindex[0]] <= prev_loadtime[i] < self.timex[self.timeindex[6]]):
+                            kind = 7  #Event Roast
+                            duration = prev_loadtime[i] - loadtime
+                            record_event_energies(kind, duration)
+                            prev_loadtime[i] = loadtime
+                            continue  #j loop
+
+                        # Event begins before CHARGE and terminates after CHARGE and before DROP
+                        if (loadtime < self.timex[self.timeindex[0]] and
+                            self.timex[self.timeindex[0]] <= prev_loadtime[i] < self.timex[self.timeindex[6]]):
+                            # Two portions to register
+                            # Before CHARGE
+                            kind = 18  #Event BBP
+                            duration = self.timex[self.timeindex[0]] - loadtime
+                            record_event_energies(kind, duration)
+                            # Between CHARGE and DROP
+                            # After CHARGE and Before DROP
+                            kind = 7  #Event Roast
+                            duration = prev_loadtime[i] - self.timex[self.timeindex[0]]
+                            record_event_energies(kind, duration)
+                            prev_loadtime[i] = loadtime
+                            continue  #j loop
+
+                        # Event begins and terminates before CHARGE
+                        if (loadtime < self.timex[self.timeindex[0]] and
+                            prev_loadtime[i] < self.timex[self.timeindex[0]]):
+                            kind = 18  #Event BBP
+                            duration = prev_loadtime[i] - loadtime
+                            record_event_energies(kind, duration)
+                            prev_loadtime[i] = loadtime
+                            continue  #j loop
+
+                # calculate PID DUTY % energy when there is a 'PID DUTY %' extradevice, Load Rating
+                if self.load_etypes[i] == 6 and pid_duty_extradevice_index > -1 and self.loadratings[i] > 0:
+                    # no CHARGE or DROP, accumulate PID DUTY % to Preheat
+                    if self.timeindex[0] == -1 or self.timeindex[6] == 0:
+                        accumulated_btus, accumulated_factors = accumulate_DUTY(i, 0, len(self.extratimex[pid_duty_extradevice_index]) -1, pid_duty_extradevice_index)
+                        if accumulated_btus > 0:
+                            loadlabel = f'{formatLoadLabel(i)}-{pid_duty_label}'
+                            kind = 20  #PID Duty % Preheat
+                            sortorder = 200 + i
+                            CO2g = self.calcCO2g(accumulated_btus, self.sourcetypes[i])
+                            roast_time = self.extratimex[pid_duty_extradevice_index][-1] - self.extratimex[pid_duty_extradevice_index][0]
+                            avg_power_pct = accumulated_factors * 100 / (self.timeindex[0]) if (self.timeindex[0]) > 0 else 0
                             btu_list.append({
-                                'load_pct':load_pct,
-                                'duration':duration,
-                                'BTUs':BTUs,
+                                'load_pct':avg_power_pct,
+                                'duration':roast_time,
+                                'BTUs':accumulated_btus,
                                 'CO2g':CO2g,
                                 'LoadLabel':loadlabel,
                                 'Kind':kind,
@@ -16520,84 +16691,90 @@ class tgraphcanvas(QObject):
                                 'SortOrder':sortorder
                             })
 
-                # calculate PID DUTY % energy when there is a 'PID DUTY %' extradevice, Load Rating, and CHARGE/DROP
-                if (self.load_etypes[i] == 6 and pid_duty_extradevice_index > -1 and self.loadratings[i] > 0 and
-                    self.timeindex[0] > -1 and self.timeindex[6] > 0):
+                    # there is both a CHARGE and DROP
+                    else:
+                        # PID DUTY % BBP (includes Preheat)
+                        accumulated_btus, accumulated_factors = accumulate_DUTY(i, 0, self.timeindex[0], pid_duty_extradevice_index)
+                        if accumulated_btus > 0:
+                            loadlabel = f'{formatLoadLabel(i)}-{pid_duty_label}'
+                            kind = 14  #PID DUTY % BBP
+                            sortorder = 200 + i
+                            CO2g = self.calcCO2g(accumulated_btus, self.sourcetypes[i])
+                            roast_time = self.extratimex[pid_duty_extradevice_index][self.timeindex[0]] - self.extratimex[pid_duty_extradevice_index][0]
+                            avg_power_pct = accumulated_factors * 100 / (self.timeindex[0]) if (self.timeindex[0]) > 0 else 0
+                            btu_list.append({
+                                'load_pct':avg_power_pct,
+                                'duration':roast_time,
+                                'BTUs':accumulated_btus,
+                                'CO2g':CO2g,
+                                'LoadLabel':loadlabel,
+                                'Kind':kind,
+                                'SourceType':self.sourcetypes[i],
+                                'SortOrder':sortorder
+                            })
 
-                    accumulated_btus: float = 0
-                    accumulated_factors: float = 0
-                    # loop over the values from CHARGE to DROP and accumulate energy
-                    for j in range(self.timeindex[0],self.timeindex[6]):  #
-                        duration = self.extratimex[pid_duty_extradevice_index][j+1] - self.extratimex[pid_duty_extradevice_index][j]
+                        # PID DUTY % Roast
+                        accumulated_btus, accumulated_factors = accumulate_DUTY(i, self.timeindex[0],self.timeindex[6], pid_duty_extradevice_index)
 
-                        # don't accumulate the value when the PID is OFF, i.e. when extratemp2 == -1 and rekject values not in 0-100
-                        if not 0 < self.extratemp2[pid_duty_extradevice_index][j] <= 100:
-                            break  #j loop
+                        if accumulated_btus > 0:
+                            loadlabel = f'{formatLoadLabel(i)}-{pid_duty_label}'
+                            kind = 15  #PID DUTY % Roast
+                            sortorder = 200 + i
+                            CO2g = self.calcCO2g(accumulated_btus, self.sourcetypes[i])
+                            roast_time = self.extratimex[pid_duty_extradevice_index][self.timeindex[6]] - self.extratimex[pid_duty_extradevice_index][self.timeindex[0]]
+                            avg_power_pct = accumulated_factors * 100 / (self.timeindex[6] - self.timeindex[0]) if (self.timeindex[6] - self.timeindex[0]) > 0 else 0
+                            btu_list.append({
+                                'load_pct':avg_power_pct,
+                                'duration':roast_time,
+                                'BTUs':accumulated_btus,
+                                'CO2g':CO2g,
+                                'LoadLabel':loadlabel,
+                                'Kind':kind,
+                                'SourceType':self.sourcetypes[i],
+                                'SortOrder':sortorder
+                            })
 
-                        # get the PID DUTY % value
-                        load_pct = self.extratemp2[pid_duty_extradevice_index][j]
-
-                        # scale when Pressure % is ticked
-                        if self.presssure_percents[i] and self.sourcetypes[i] in {0, 1}:   # gas loads only
-                            # convert pressure to heat
-                            factor = math.sqrt(load_pct / 100)
-                        else:
-                            factor = load_pct / 100
-
-                        # accumulate
-                        accumulated_btus += self.loadratings[i] * factor * (duration / 3600) * self.convertHeat(1,self.powerunits[self.ratingunits[i]],'BTU')
-                        accumulated_factors += factor
-
-                    if accumulated_btus > 0:
-                        loadlabel = f'{formatLoadLabel(i)}-{pid_duty_label}'
-                        kind = 9  #PID DUTY %
-                        sortorder = 200 + i
-                        CO2g = self.calcCO2g(accumulated_btus, self.sourcetypes[i])
-                        roast_time = self.extratimex[pid_duty_extradevice_index][self.timeindex[6]] - self.extratimex[pid_duty_extradevice_index][self.timeindex[0]]
-                        avg_power_pct = accumulated_factors * 100 / (self.timeindex[6] - self.timeindex[0]) if (self.timeindex[6] - self.timeindex[0]) > 0 else 0
-                        btu_list.append({
-                            'load_pct':avg_power_pct,
-                            'duration':roast_time,
-                            'BTUs':accumulated_btus,
-                            'CO2g':CO2g,
-                            'LoadLabel':loadlabel,
-                            'Kind':kind,
-                            'SourceType':self.sourcetypes[i],
-                            'SortOrder':sortorder
-                        })
+                        # PID DUTY % Cooling
+                        accumulated_btus, accumulated_factors = accumulate_DUTY(i, self.timeindex[6], len(self.extratimex[pid_duty_extradevice_index]) -1, pid_duty_extradevice_index)
+                        if accumulated_btus > 0:
+                            loadlabel = f'{formatLoadLabel(i)}-{pid_duty_label}'
+                            kind = 16  #PID DUTY % Cooling (Includes DROP to OFF)
+                            sortorder = 200 + i
+                            CO2g = self.calcCO2g(accumulated_btus, self.sourcetypes[i])
+                            roast_time = self.extratimex[pid_duty_extradevice_index][-1] - self.extratimex[pid_duty_extradevice_index][self.timeindex[6]]
+                            avg_power_pct = accumulated_factors * 100 / (len(self.extratimex[i]) - self.timeindex[6]) if (len(self.extratimex[i]) - self.timeindex[6]) > 0 else 0
+                            btu_list.append({
+                                'load_pct':avg_power_pct,
+                                'duration':roast_time,
+                                'BTUs':accumulated_btus,
+                                'CO2g':CO2g,
+                                'LoadLabel':loadlabel,
+                                'Kind':kind,
+                                'SourceType':self.sourcetypes[i],
+                                'SortOrder':sortorder
+                            })
 
                 # calculate Continuous loads
                 if self.load_etypes[i] == 0:
-                    if self.timeindex[0] > -1 and self.timeindex[6] > 0:
+                    # no CHARGE or DROP accumulate Continuous to Preheat
+                    if self.timeindex[0] == -1 or self.timeindex[6] == 0:
+                        duration = self.timex[-1] - self.timex[0]
+                        kind = 22  # Continuous Preheat
+                        record_continuous_energies(i, kind, duration)
+                    # there is both a CHARGE and DROP
+                    else:
+                        # BBP portion
+                        duration = self.timex[self.timeindex[0]] - self.timex[0]
+                        kind = 23  # Continuous BBP
+                        record_continuous_energies(i, kind, duration)
+                        # Roast portion
                         duration = self.timex[self.timeindex[6]] - self.timex[self.timeindex[0]]
-                    else:
-                        duration = 0
-                        #self.aw.sendmessage(QApplication.translate("Message","Missing CHARGE or DROP event"),append=False)
-                    load_pct = toInt(self.loadevent_hundpcts[i])  #needed only for the btu_list and outmsg
-                    if self.presssure_percents[i] and self.sourcetypes[i] in {0, 1}:   # gas loads only
-                        # convert pressure to heat
-                        factor = math.sqrt(load_pct / 100)
-                    else:
-                        factor = load_pct / 100
-
-                    BTUs = self.loadratings[i] * factor * (duration / 3600) * self.convertHeat(1,self.powerunits[self.ratingunits[i]],'BTU')
-
-                    if BTUs > 0:
-                        loadlabel = formatLoadLabel(i)
-                        kind = 6  #Roast Continuous
-                        fueltype = self.sourcetypes[i]
-                        sortorder = 2000 - i
-                        CO2g = self.calcCO2g(BTUs, self.sourcetypes[i])
-                        btu_list.append({
-                            'load_pct':load_pct,
-                            'duration':duration,
-                            'BTUs':BTUs,
-                            'CO2g':CO2g,
-                            'LoadLabel':loadlabel,
-                            'Kind':kind,
-                            'SourceType':self.sourcetypes[i],
-                            'SortOrder':sortorder
-                        })
+                        kind = 6  # Continuous Roast
+                        record_continuous_energies(i, kind, duration)
+                        # Cooling portion
+                        duration = self.timex[-1] - self.timex[self.timeindex[6]]
+                        kind = 24  # Continuous Cooling
+                        record_continuous_energies(i, kind, duration)
 
                 # calculate preheat
                 if self.preheatenergies[i] != 0 and self.roastbatchpos == 1:
@@ -16634,8 +16811,10 @@ class tgraphcanvas(QObject):
                             'SortOrder':sortorder
                         })
 
-                # calculate betweenbatch
-                if self.betweenbatchenergies[i] != 0 and (self.roastbatchpos > 1 or self.betweenbatch_after_preheat or self.roastbatchpos==0):
+                # calculate betweenbatch, only when there is both CHARGE and DROP
+                if (self.betweenbatchenergies[i] != 0 and
+                    (self.roastbatchpos > 1 or self.betweenbatch_after_preheat or self.roastbatchpos==0) and
+                    self.timeindex[0] > -1 and self.timeindex[6] > 0):
                     if self.betweenbatchenergies[i] < 0 < self.betweenbatchDuration:
                         # percent load multiplied by duration
                         load_pct = abs(self.betweenbatchenergies[i] * 1000./10)
@@ -16669,8 +16848,9 @@ class tgraphcanvas(QObject):
                             'SortOrder':sortorder
                         })
 
-                # calculate cooling
-                if self.coolingenergies[i] != 0 and self.roastbatchpos == 1:
+                # calculate cooling, only when there is both CHARGE and DROP
+                if (self.coolingenergies[i] != 0 and self.roastbatchpos == 1 and
+                    self.timeindex[0] > -1 and self.timeindex[6] > 0):
                     if self.coolingenergies[i] < 0 < self.coolingDuration:
                         # percent load multiplied by duration
                         load_pct = abs(self.coolingenergies[i] * 1000./10)
@@ -16721,13 +16901,30 @@ class tgraphcanvas(QObject):
                     co2g_meter_bbp = self.calcCO2g(btu_meter_bbp, fueltype)
                     co2g_meter_roast = self.calcCO2g(btu_meter_roast, fueltype)
                     co2g_meter_cooling = self.calcCO2g(btu_meter_cooling, fueltype)
-                    co2g_meter_batch = self.calcCO2g(btu_meter_batch, fueltype)  # noqa F841  # pylint: disable=unused-variable
-                    # note durations here are based on self.timex[self.timeindex[]] and not on the corresponding extratimex.
+                    co2g_meter_batch = self.calcCO2g(btu_meter_batch, fueltype)
+                    # note durations here are based on self.timex[] and not on the corresponding self.extratimex.
                     duration_meter_bbp = self.timex[self.timeindex[0]] - self.timex[0]
                     duration_meter_roast = self.timex[self.timeindex[6]] - self.timex[self.timeindex[0]]
                     duration_meter_cooling = self.timex[-1] - self.timex[self.timeindex[6]]
-                    duration_meter_batch = self.timex[self.timeindex[-1]] - self.timex[0]  # noqa F841  # pylint: disable=unused-variable
-                    # display order in the Energy Details follows the order here
+                    duration_meter_batch = self.timex[-1] - self.timex[0]
+
+                    # there is no CHARGE or no DROP, events accumulate to Preheat
+                    if self.timeindex[0] == -1 or  self.timeindex[6] == 0:
+                        kind = 10 # Meter Preheat
+                        btu_list.append({
+                            'load_pct':0,
+                            'duration':duration_meter_batch,
+                            'BTUs':btu_meter_batch,
+                            'CO2g':co2g_meter_batch,
+                            'LoadLabel':loadlabel,
+                            'Kind':kind,
+                            'SourceType':fueltype,
+                            'SortOrder':sortorder
+                        })
+                        continue #j loop
+
+                    # there is a CHARGE and a DROP event
+                    # BBP
                     kind = 11 # Meter BBP
                     btu_list.append({
                         'load_pct':0,
@@ -16739,6 +16936,7 @@ class tgraphcanvas(QObject):
                         'SourceType':fueltype,
                         'SortOrder':sortorder
                     })
+                    # Roast
                     kind = 12 # Meter Roast
                     btu_list.append({
                         'load_pct':0,
@@ -16750,6 +16948,7 @@ class tgraphcanvas(QObject):
                         'SourceType':fueltype,
                         'SortOrder':sortorder
                     })
+                    # Cooling
                     kind = 13 # Meter Cooling
                     btu_list.append({
                         'load_pct':0,
@@ -16770,17 +16969,18 @@ class tgraphcanvas(QObject):
             btu_batch = btu_preheat = btu_bbp = btu_cooling = btu_roast = 0.
             co2_batch = co2_preheat = co2_bbp = co2_cooling = co2_roast = 0.
             btu_elec = btu_lpg = btu_ng = 0.
+
             for item in btu_list:
                 btu_batch += item['BTUs']
-                btu_preheat += item['BTUs'] if item['Kind'] in {0, 1} else 0
-                btu_bbp += item['BTUs'] if item['Kind'] in {2, 3, 11} else 0
-                btu_cooling += item['BTUs'] if item['Kind'] in {4, 5, 13} else 0
-                btu_roast += item['BTUs'] if item['Kind'] in {6, 7, 12} else 0
+                btu_preheat += item['BTUs'] if item['Kind'] in {0, 1, 10, 17, 20, 22} else 0
+                btu_bbp += item['BTUs'] if item['Kind'] in {2, 3, 11, 14, 18, 23} else 0
+                btu_cooling += item['BTUs'] if item['Kind'] in {4, 5, 13, 16, 19, 24} else 0
+                btu_roast += item['BTUs'] if item['Kind'] in {6, 7, 12, 15} else 0
                 co2_batch += item['CO2g']
-                co2_preheat += item['CO2g'] if item['Kind'] in {0, 1} else 0
-                co2_bbp += item['CO2g'] if item['Kind'] in {2, 3, 11} else 0
-                co2_cooling += item['CO2g'] if item['Kind'] in {4, 5, 13} else 0
-                co2_roast += item['CO2g'] if item['Kind'] in {6, 7, 12} else 0
+                co2_preheat += item['CO2g'] if item['Kind'] in {0, 1, 10, 17, 20, 22} else 0
+                co2_bbp += item['CO2g'] if item['Kind'] in {2, 3, 11, 14, 18, 23} else 0
+                co2_cooling += item['CO2g'] if item['Kind'] in {4, 5, 13, 16, 19, 24} else 0
+                co2_roast += item['CO2g'] if item['Kind'] in {6, 7, 12, 15} else 0
                 btu_lpg += item['BTUs'] if item['SourceType'] == 0 else 0
                 btu_ng += item['BTUs'] if item['SourceType'] == 1 else 0
                 btu_elec += item['BTUs'] if item['SourceType'] == 2 else 0
@@ -16789,6 +16989,7 @@ class tgraphcanvas(QObject):
             btu_bbp = float2float(btu_bbp,3)
             btu_cooling = float2float(btu_cooling,3)
             btu_roast = float2float(btu_roast,3)
+
             co2_batch = float2float(co2_batch,3)
             co2_preheat = float2float(co2_preheat,3)
             co2_bbp = float2float(co2_bbp,3)
