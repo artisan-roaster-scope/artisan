@@ -426,7 +426,7 @@ class ClientBLE(QObject): # pyrefly:ignore[invalid-inheritance] # pyright:ignore
             self._keep_alive())
 
 
-    def scan(self, scan_timeout:float = 3.0) -> 'list[tuple[BLEDevice, AdvertisementData]]':
+    def scan(self, scan_timeout:float = 5.0) -> 'list[tuple[BLEDevice, AdvertisementData]]':
         try:
             if not hasattr(self, '_async_loop_thread') or self._async_loop_thread is None:
                 self._running = True # enable automatic reconnects

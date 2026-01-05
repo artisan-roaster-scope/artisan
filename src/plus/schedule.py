@@ -3042,10 +3042,10 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                     blend:plus.stock.Blend = plus.stock.getBlendBlendDict(blend_structure, schedule_item_weight)
                     self.aw.qmc.plus_blend_label = blend['label']
                     self.aw.qmc.plus_blend_spec = cast(plus.stock.Blend, dict(blend)) # make a copy of the blend dict
-                    self.aw.qmc.plus_blend_spec_labels = [i.get('label','') for i in self.aw.qmc.plus_blend_spec['ingredients']] # ty:ignore[non-subscriptable]
+                    self.aw.qmc.plus_blend_spec_labels = [i.get('label','') for i in self.aw.qmc.plus_blend_spec['ingredients']] # ty:ignore[not-subscriptable]
                     # remove labels from ingredients
                     ingredients = []
-                    for i in self.aw.qmc.plus_blend_spec['ingredients']: # ty:ignore[non-subscriptable]
+                    for i in self.aw.qmc.plus_blend_spec['ingredients']: # ty:ignore[not-subscriptable]
                         entry = plus.stock.BlendIngredient(ratio = i['ratio'], coffee = i['coffee'])
                         if 'ratio_num' in i:
                             entry['ratio_num'] = i['ratio_num']

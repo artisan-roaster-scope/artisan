@@ -542,8 +542,12 @@ class editGraphDlg(ArtisanResizeablDialog):
     connectScaleSignal = pyqtSignal()
     readScaleSignal = pyqtSignal()
 
-    def __init__(self, parent:QWidget, aw:'ApplicationWindow', activeTab:int = 0) -> None:
+    # if start_recording_on_exit is set, on leaving the dialog with OK, the recording is started in case plus is connected and beans have been set
+    # and the flags "Open on CHARGE" andn "Open on DROP" are not set
+    def __init__(self, parent:QWidget, aw:'ApplicationWindow', activeTab:int = 0, start_recording_on_exit:bool = False) -> None:
         super().__init__(parent, aw)
+
+        self.start_recording_on_exit = start_recording_on_exit
 
         self.ETname = self.aw.qmc.device_name_subst(self.aw.ETname)
         self.BTname = self.aw.qmc.device_name_subst(self.aw.BTname)
@@ -765,9 +769,11 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.roastproperties.setChecked(bool(self.aw.qmc.roastpropertiesflag))
         self.roastproperties.stateChanged.connect(self.roastpropertiesChanged)
         self.roastpropertiesAutoOpen = QCheckBox(QApplication.translate('CheckBox','Open on CHARGE'))
+        self.roastpropertiesAutoOpen.setToolTip(QApplication.translate('Tooltip','Open roast properties dialog on CHARGE'))
         self.roastpropertiesAutoOpen.setChecked(bool(self.aw.qmc.roastpropertiesAutoOpenFlag))
         self.roastpropertiesAutoOpen.stateChanged.connect(self.roastpropertiesAutoOpenChanged)
         self.roastpropertiesAutoOpenDROP = QCheckBox(QApplication.translate('CheckBox','Open on DROP'))
+        self.roastpropertiesAutoOpen.setToolTip(QApplication.translate('Tooltip','Open roast properties dialog on DROP'))
         self.roastpropertiesAutoOpenDROP.setChecked(bool(self.aw.qmc.roastpropertiesAutoOpenDropFlag))
         self.roastpropertiesAutoOpenDROP.stateChanged.connect(self.roastpropertiesAutoOpenDROPChanged)
         # EVENTS
@@ -854,6 +860,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 'QComboBox {padding-left: 2px; padding-right: 2px; padding-top: 1px; font-weight: bold;' + color + backgroundcolor + '} QComboBox QAbstractItemView {font-weight: normal;}')
         self.titleedit.setView(QListView())
         self.titleShowAlwaysFlag = QCheckBox(QApplication.translate('CheckBox','Show Always'))
+        self.titleShowAlwaysFlag.setToolTip(QApplication.translate('Tooltip','Display the roast title while roasting'))
         self.titleShowAlwaysFlag.setChecked(self.aw.qmc.title_show_always)
         #Date
         datelabel1 = QLabel('<b>' + QApplication.translate('Label', 'Date') + '</b>')
@@ -901,6 +908,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         inw = f'{float2floatWeightVolume(self.aw.qmc.weight[0]):g}'
         outw = f'{float2floatWeightVolume(self.aw.qmc.weight[1]):g}'
         self.weightinedit = QLineEdit(inw)
+        self.weightinedit.setStyleSheet('QLineEdit { font-weight: bold; }')
         self.weightinedit.setToolTip(QApplication.translate('Tooltip', 'batch size'))
         self.weightinedit.setValidator(self.aw.createCLocaleDoubleValidator(0., 9999999., 4, self.weightinedit))  # the max limit has to be high enough otherwise the connected signals are not send!
         self.weightinedit.setMinimumWidth(70)
@@ -1352,15 +1360,22 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.plus_amount_selected:float|None = None # holds the max amount of the selected coffee/blend if known
             self.plus_amount_replace_selected:float|None = None # holds the max amount of the selected coffee/blend incl. replacements if known
             plusCoffeeslabel = QLabel('<b>' + QApplication.translate('Label', 'Stock') + '</b>')
+            plusCoffeeslabel.setToolTip(QApplication.translate('Tooltip','Select beans from your inventory'))
             self.plusStoreslabel = QLabel('<b>' + QApplication.translate('Label', 'Store') + '</b>')
+            self.plusStoreslabel.setToolTip(QApplication.translate('Tooltip','Select a storage location'))
             self.plusBlendslabel = QLabel('<b>' + QApplication.translate('Label', 'Blend') + '</b>')
+            self.plusBlendslabel.setToolTip(QApplication.translate('Tooltip','Select a blend from your inventory'))
             self.plus_stores_combo = MyQComboBox(self)
+            self.plus_stores_combo.setToolTip(QApplication.translate('Tooltip','Select a storage location'))
             self.plus_coffees_combo = CoffeesComboBox(self)
+            self.plus_coffees_combo.setToolTip(QApplication.translate('Tooltip','Select beans from your inventory'))
             self.plus_blends_combo = BlendsComboBox(self)
+            self.plus_blends_combo.setToolTip(QApplication.translate('Tooltip','Select a blend from your inventory'))
             self.plus_stores_combo.currentIndexChanged.connect(self.storeSelectionChanged)
             self.plus_coffees_combo.currentIndexChanged.connect(self.coffeeSelectionChanged)
             self.plus_blends_combo.currentIndexChanged.connect(self.blendSelectionChanged)
             self.plus_custom_blend_button = QToolButton()
+            self.plus_custom_blend_button.setToolTip(QApplication.translate('Tooltip','Define a custom blend'))
             self.plus_custom_blend_button.setText('...')
             self.plus_custom_blend_button.clicked.connect(self.customBlendButton_triggered)
             self.plus_selected_line = QLabel()
@@ -1580,10 +1595,10 @@ class editGraphDlg(ArtisanResizeablDialog):
         mainLayout.setContentsMargins(3, 3, 3, 3)
         eventbuttonLayout = QHBoxLayout()
         eventbuttonLayout.addWidget(self.copyeventTableButton)
-        if self.aw.ui_mode is not UI_MODE.EXPERT:
+        if self.aw.ui_mode is UI_MODE.EXPERT:
             eventbuttonLayout.addWidget(self.createalarmTableButton)
         eventbuttonLayout.addStretch()
-        if self.aw.ui_mode is not UI_MODE.EXPERT:
+        if self.aw.ui_mode is UI_MODE.EXPERT:
             eventbuttonLayout.addWidget(self.clusterEventsButton)
         eventbuttonLayout.addWidget(self.ordereventTableButton)
         eventbuttonLayout.addStretch()
@@ -4996,13 +5011,13 @@ class editGraphDlg(ArtisanResizeablDialog):
             except Exception: # pylint: disable=broad-except
                 pass
         if enough:
-            self.weightinedit.setStyleSheet('QLineEdit { }')
+            self.weightinedit.setStyleSheet('QLineEdit { font-weight: bold; }')
         elif self.aw.app.darkmode:
-            self.weightinedit.setStyleSheet("""QLineEdit { background-color: #ad0427;  }""")
+            self.weightinedit.setStyleSheet("""QLineEdit { font-weight: bold; background-color: #ad0427;  }""")
         elif enough_replacement:
-            self.weightinedit.setStyleSheet("""QLineEdit { color: #0A5C90; }""")
+            self.weightinedit.setStyleSheet("""QLineEdit { font-weight: bold; color: #0A5C90; }""")
         else:
-            self.weightinedit.setStyleSheet("""QLineEdit { color: #CC0F50; }""")
+            self.weightinedit.setStyleSheet("""QLineEdit { font-weight: bold; color: #CC0F50; }""")
 
     @pyqtSlot()
     def weightineditChanged(self) -> None:
@@ -5705,6 +5720,16 @@ class editGraphDlg(ArtisanResizeablDialog):
             )
 
         self.clean_up()
+
+        if (self.start_recording_on_exit and
+                not self.aw.qmc.flagstart and                        # not yet recording
+                self.aw.plus_account is not None and                 # plus connected
+                not self.aw.qmc.roastpropertiesAutoOpenFlag and      # no "Open on CHARGE"
+                not self.aw.qmc.roastpropertiesAutoOpenDropFlag and  # no "Open on DROP"
+                not (self.aw.qmc.plus_coffee is None and self.aw.qmc.plus_blend_spec is None)): # beans are set
+            # we trigger the START of the recording on leaving this dialog
+            self.aw.qmc.toggleRecorderSignal.emit()
+
         super().accept()
 
     def getMeasuredvalues(self, title:str, func_updatefields:Callable[[],None],

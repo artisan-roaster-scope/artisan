@@ -16,6 +16,7 @@
 # Marko Luther, 2023
 
 from artisanlib.dialogs import ArtisanDialog
+from artisanlib.main import UI_MODE
 
 from typing import override, TYPE_CHECKING
 
@@ -88,8 +89,9 @@ class batchDlg(ArtisanDialog):
         batchlayout.addWidget(counterlabel,2,0)
         batchlayout.addWidget(self.counterSpinBox,2,1)
         batchlayout.addWidget(descrLabel,3,0,1,3)
-        batchlayout.addWidget(self.neverOverwriteCheckbox,4,0,Qt.AlignmentFlag.AlignRight)
-        batchlayout.addWidget(neverOverwriteCounterlabel,4,1)
+        if self.aw.ui_mode is UI_MODE.EXPERT:
+            batchlayout.addWidget(self.neverOverwriteCheckbox,4,0,Qt.AlignmentFlag.AlignRight)
+            batchlayout.addWidget(neverOverwriteCounterlabel,4,1)
 
         mainLayout = QVBoxLayout()
         mainLayout.addLayout(batchlayout)

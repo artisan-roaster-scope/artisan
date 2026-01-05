@@ -256,7 +256,7 @@ class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # pyrefly: ig
                         if stock is not None:
                             try:
                                 stock_semaphore.acquire(1)
-                                stock['retrieved'] = time.time() # ty: ignore[non-subscriptable]
+                                stock['retrieved'] = time.time()
                             finally:
                                 if stock_semaphore.available() < 1:
                                     stock_semaphore.release(1)
@@ -269,7 +269,7 @@ class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # pyrefly: ig
                     if lsrt is not None and stock is not None:
                         try:
                             stock_semaphore.acquire(1)
-                            stock['retrieved'] = time.time() # ty: ignore[non-subscriptable]
+                            stock['retrieved'] = time.time()
                             _log.debug('-> retrieved time updated')
                         finally:
                             if stock_semaphore.available() < 1:

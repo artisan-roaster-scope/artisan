@@ -4075,7 +4075,7 @@ class tgraphcanvas(QObject):
                     return
 
                 if event.dblclick and event.button == 1 and not self.designerflag and not self.wheelflag and event.inaxes:
-                    if self.ax.get_autoscaley_on():
+                    if self.ax.get_autoscaley_on(): # pyrefly:ignore[not-callable]
                         self.ax.autoscale(enable=False, axis='y', tight=False)
                         self.redraw(recomputeAllDeltas=False)
                     else:
@@ -4566,7 +4566,7 @@ class tgraphcanvas(QObject):
         tx_lin = numpy.flip(numpy.arange(tx_org[-1],tx_org[-1]-l*d,-d), axis=0) # by construction, len(tx_lin)=len(tx_org)=l
         temp_trail_re = numpy.interp(tx_lin, tx_org, temp_trail) # resample data into that linear spaced time
         try:
-            return float(numpy.average(temp_trail_re[-len(decay_weights):],axis=0,weights=decay_weights[-l:])) # pyrefly: ignore[bad-index] # ty: ignore[non-subscriptable] # len(decay_weights)>len(temp_trail_re)=l is possible
+            return float(numpy.average(temp_trail_re[-len(decay_weights):],axis=0,weights=decay_weights[-l:])) # pyrefly: ignore[bad-index] # ty: ignore[not-subscriptable] # len(decay_weights)>len(temp_trail_re)=l is possible
         except Exception: # pylint: disable=broad-except
             # in case something goes very wrong we at least return the standard average over temp, this should always work as len(tx)=len(temp)
             return float(numpy.average(numpy.array(temp_trail)))
@@ -7134,16 +7134,19 @@ class tgraphcanvas(QObject):
                                         try:
                                             absolute_index = eval(body,{'__builtins__':None},mathdictionary)  # pylint: disable=eval-used
                                             if absolute_index > -1:
+                                                valn:float|None = -1
                                                 if nint == 1: #DeltaET
                                                     if k == 0:
-                                                        val = sample_delta1[absolute_index] # pyrefly: ignore[bad-assignment]
+                                                        valn = sample_delta1[absolute_index]
                                                     else:
-                                                        val = self.delta1B[absolute_index] # pyrefly: ignore[bad-assignment]
+                                                        valn = self.delta1B[absolute_index]
                                                 # nint == 2: #DeltaBT
                                                 elif k == 0:
-                                                    val = sample_delta2[absolute_index] # pyrefly: ignore[bad-assignment]
+                                                    valn = sample_delta2[absolute_index]
                                                 else:
-                                                    val = self.delta2B[absolute_index] # pyrefly: ignore[bad-assignment]
+                                                    valn = self.delta2B[absolute_index]
+                                                if valn is not None:
+                                                    val = valn
                                         except Exception: # pylint: disable=broad-except
                                             pass
                                         #add expression and values found
@@ -7603,7 +7606,7 @@ class tgraphcanvas(QObject):
                 self.ax.xaxis.set_major_formatter(formatter)
 
                 #adjust the length of the major ticks
-                for i in self.ax.get_xticklines() + self.ax.get_yticklines():
+                for i in self.ax.get_xticklines() + self.ax.get_yticklines(): # pyrefly:ignore[not-callable]
                     i.set_markersize(6)
                     #i.set_markeredgewidth(2)   #adjust the width
 
@@ -8314,7 +8317,7 @@ class tgraphcanvas(QObject):
                     result:list[float] = []
                     # ignore -1 readings in averaging and ensure a good ramp
                     for i, v in enumerate(b): # ty: ignore[invalid-argument-type] # pyrefly: ignore [bad-argument-type]
-                        seq = b[max(0,i-window_len + 1):i+1] # ty: ignore[non-subscriptable] # pyrefly: ignore[bad-index]
+                        seq = b[max(0,i-window_len + 1):i+1] # ty: ignore[not-subscriptable] # pyrefly: ignore[bad-index]
                         w = decay_weights_internal[max(0,window_len-len(seq)):]  # preCond: len(decay_weights_internal)=window_len and len(seq) <= window_len; postCond: len(w)=len(seq)
                         if len(w) == 0:
                             # we don't average if there is are no weights (e.g. if the original seq did only contain -1 values and got empty)
@@ -9496,8 +9499,8 @@ class tgraphcanvas(QObject):
                         labelbottom=True)   # labels along the bottom edge are on
 
                     # format temperature as int, not float in the cursor position coordinate indicator
-                    self.ax.fmt_ydata = self.fmt_data
-                    self.ax.fmt_xdata = self.fmt_timedata
+                    self.ax.fmt_ydata = self.fmt_data # pyrefly:ignore[bad-assignment] # not assignable to attribute `fmt_ydata` with type `Formatter | None`
+                    self.ax.fmt_xdata = self.fmt_timedata  # pyrefly:ignore[bad-assignment] # not assignable to attribute `fmt_ydata` with type `Formatter | None`
 
                     if self.delta_ax is not None:
                         self.ax.set_zorder(self.delta_ax.get_zorder()+1) # put ax in front of delta_ax (which remains empty!)
@@ -9576,12 +9579,12 @@ class tgraphcanvas(QObject):
                                 self.ax.yaxis.set_minor_locator(ticker.NullLocator())
                             for m in self.ax.yaxis.get_minorticklines():
                                 m.set_markersize(5)
-                        for j in self.ax.get_yticklines():
+                        for j in self.ax.get_yticklines(): # pyrefly:ignore[not-callable]
                             j.set_markersize(10)
-                        for label in self.ax.get_yticklabels():
+                        for label in self.ax.get_yticklabels(): # pyrefly:ignore[not-callable]
                             label.set_fontsize('small')
                     else:
-                        self.ax.set_yticks([])
+                        self.ax.set_yticks([]) # pyrefly:ignore[not-callable]
 
                     for ldots in [self.l_eventtype1dots,self.l_eventtype2dots,self.l_eventtype3dots,self.l_eventtype4dots,
                             self.l_backgroundeventtype1dots,self.l_backgroundeventtype2dots,self.l_backgroundeventtype3dots,self.l_backgroundeventtype4dots]:
@@ -9627,7 +9630,7 @@ class tgraphcanvas(QObject):
                     self.xaxistosm(redraw=False)
 
                     if self.xgrid:
-                        for label in self.ax.get_xticklabels():
+                        for label in self.ax.get_xticklabels(): # pyrefly:ignore[not-callable]
                             label.set_fontsize('small')
 
                     rcParams['path.sketch'] = (0,0,0)
@@ -11000,7 +11003,7 @@ class tgraphcanvas(QObject):
                             self.drawDeltaBT(trans,0,0)
 
                     if self.delta_ax is not None:
-                        self.delta_ax.set_yticks([])
+                        self.delta_ax.set_yticks([]) # pyrefly:ignore[not-callable]
                         if two_ax_mode:
                             self.aw.autoAdjustAxis(timex=False)
                             self.delta_ax.set_ylim(self.zlimit_min,self.zlimit)
@@ -11011,10 +11014,10 @@ class tgraphcanvas(QObject):
                                     min_grid = (self.aw.qmc.zlimit - self.aw.qmc.zlimit_min) / 50
                                     # set grid to closest of min_grid from regular grids [1, 2, 5, 10, 20, 50, 100]
                                     major_locator.set_params(min([1, 2, 5, 10, 20, 50, 100], key=lambda x:abs(x-min_grid)))
-                                delta_major_tick_lines:list[Line2D] = self.delta_ax.get_yticklines()
+                                delta_major_tick_lines:list[Line2D] = self.delta_ax.get_yticklines() # pyrefly:ignore[not-callable]
                                 for ytl in delta_major_tick_lines:
                                     ytl.set_markersize(10)
-                                for label in self.delta_ax.get_yticklabels() :
+                                for label in self.delta_ax.get_yticklabels(): # pyrefly:ignore[not-callable]
                                     label.set_fontsize('small')
                                 if not self.LCDdecimalplaces:
                                     self.delta_ax.minorticks_off()
@@ -12762,7 +12765,7 @@ class tgraphcanvas(QObject):
             self.updateFlavorChartData()
             if self.flavorchart_angles is not None:
                 try:
-                    ticks_loc = [float(tick) for tick in self.ax1.get_yticks()]
+                    ticks_loc = [float(tick) for tick in self.ax1.get_yticks()] # pyrefly:ignore[not-callable]
                     self.ax1.yaxis.set_major_locator(ticker.FixedLocator(ticks_loc))
                 except Exception: # pylint: disable=broad-except
                     pass
@@ -12805,12 +12808,12 @@ class tgraphcanvas(QObject):
                 fontprop_small.set_size('x-small')
 
                 #rename yaxis
-                locs = self.ax1.get_yticks()
+                locs = self.ax1.get_yticks()  # pyrefly:ignore[not-callable]
                 labels:list[str] = []
                 for loc in locs:
                     stringlabel = str(int(round(loc*10)))
                     labels.append(stringlabel)
-                self.ax1.set_yticklabels(labels, color=self.palette['xlabel'],fontproperties=fontprop_small)
+                self.ax1.set_yticklabels(labels, color=self.palette['xlabel'],fontproperties=fontprop_small)  # pyrefly:ignore[not-callable]
 
                 #annotate labels
                 self.flavorchart_labels = []
@@ -13588,7 +13591,6 @@ class tgraphcanvas(QObject):
                 ge = self.aw.buttonSTARTSTOP.graphicsEffect()
                 if ge is not None:
                     ge.setEnabled(False)
-                self.aw.buttonSTARTSTOP.setEnabled(False)
 
                 self.aw.buttonCONTROL.setEnabled(False)
                 ge = self.aw.buttonCONTROL.graphicsEffect()
@@ -14126,7 +14128,6 @@ class tgraphcanvas(QObject):
             ge:QGraphicsEffect|None = self.aw.buttonSTARTSTOP.graphicsEffect()
             if ge is not None:
                 ge.setEnabled(False)
-#            self.aw.buttonSTARTSTOP.setGraphicsEffect(None) # not type correct as setGraphicsEffect expects a QGraphicsEffect
             self.aw.buttonONOFF.setText(QApplication.translate('Button', 'OFF')) # text means click to turn OFF (it is ON)
             self.aw.buttonONOFF.setToolTip(QApplication.translate('Tooltip', 'Stop recording'))
             self.aw.buttonONOFF.setEnabled(True) # ensure that the OFF button is enabled
@@ -14256,6 +14257,15 @@ class tgraphcanvas(QObject):
         if not self.flagstart:
             if not self.checkSaved():
                 return
+
+            # ensure that beans are specified if plus is connected
+            if (self.aw.plus_account is not None and              # plus connected
+                    not self.roastpropertiesAutoOpenFlag and      # no "Open on CHARGE"
+                    not self.roastpropertiesAutoOpenDropFlag and  # no "Open on DROP"
+                    (self.plus_coffee is None and self.plus_blend_spec is None)): # beans are not set
+                self.aw.open_roast_properties_dialog(start_recording_on_exit=True)
+                return
+
             self.aw.soundpopSignal.emit()
             if self.flagon and len(self.timex) == 1:
                 # we are already in monitoring mode, we just clear this first measurement and go
@@ -18046,11 +18056,11 @@ class tgraphcanvas(QObject):
                         if self.zgrid > 0:
                             self.delta_ax.yaxis.set_major_locator(ticker.MultipleLocator(self.zgrid))
                             self.delta_ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
-                            for i in self.delta_ax.get_yticklines():
+                            for i in self.delta_ax.get_yticklines():  # pyrefly:ignore[not-callable]
                                 i.set_markersize(10)
                             for i in self.delta_ax.yaxis.get_minorticklines():
                                 i.set_markersize(5)
-                            for label in self.delta_ax.get_yticklabels() :
+                            for label in self.delta_ax.get_yticklabels():  # pyrefly:ignore[not-callable]
                                 label.set_fontsize('small')
                             if not self.LCDdecimalplaces:
                                 self.delta_ax.minorticks_off()
@@ -19157,7 +19167,7 @@ class tgraphcanvas(QObject):
 
             # fixing yticks with matplotlib.ticker "FixedLocator"
             try:
-                ticks_loc = [float(tick) for tick in self.ax2.get_yticks()]
+                ticks_loc = [float(tick) for tick in self.ax2.get_yticks()]  # pyrefly:ignore[not-callable]
                 self.ax2.yaxis.set_major_locator(ticker.FixedLocator(ticks_loc))
             except Exception: # pylint: disable=broad-except
                 pass
@@ -19172,9 +19182,9 @@ class tgraphcanvas(QObject):
                 #tick.label1On = False
                 tick.label1.set_visible(False)
             #delete yaxis
-            locs = self.ax2.get_yticks()
+            locs = self.ax2.get_yticks()  # pyrefly:ignore[not-callable]
             labels = ['']*len(locs)
-            self.ax2.set_yticklabels(labels)
+            self.ax2.set_yticklabels(labels) # pyrefly:ignore[not-callable]
 
             names = self.wheelnames[:]
             Wradii:list[float] = self.wradii[:]

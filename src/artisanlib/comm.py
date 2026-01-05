@@ -750,7 +750,7 @@ class serialport:
         return tx, apparent_power_return, active_power
 
     def updateShellyPlusPlug(self) -> None:
-        self.aw.qmc.shellyPlusPlug_TX = -1.
+        self.aw.qmc.shellyPlusPlug_TX = self.aw.qmc.timeclock.elapsedMilli()
         self.aw.qmc.shellyPlusPlug_Total = -1.
         self.aw.qmc.shellyPlusPlug_Last = -1.
         self.aw.qmc.shellyPlusPlug_Power = -1.
@@ -765,7 +765,6 @@ class serialport:
                 timeout=(shelly_connect_timeout, shelly_read_timeout))
             r.raise_for_status()
             res:dict[str,Any] = r.json()
-            self.aw.qmc.shellyPlusPlug_TX = self.aw.qmc.timeclock.elapsedMilli()
             try:
                 if 'aenergy' in res:
                     energy_res = res['aenergy']

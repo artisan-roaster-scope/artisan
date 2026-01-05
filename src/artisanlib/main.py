@@ -2294,37 +2294,37 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         JPEGAction.triggered.connect(self.resizeImg_0_1_JPEG)
         self.saveGraphMenu.addAction(JPEGAction)
 
-        self.saveGraphMenu.addSeparator()
-
-        HomeBaristaAction = QAction('Home-Barista.com (1200x?)...', self)
-        HomeBaristaAction.triggered.connect(self.resizeImg_1200_1)
-        self.saveGraphMenu.addAction(HomeBaristaAction)
-
-        KaffeeNetzAction = QAction('Kaffee-Netz.de (800x?)...', self)
-        KaffeeNetzAction.triggered.connect(self.resizeImg_800_1)
-        self.saveGraphMenu.addAction(KaffeeNetzAction)
-
-        RiktigtKaffeAction = QAction('RiktigtKaffe.se (620x?)...', self)
-        RiktigtKaffeAction.triggered.connect(self.resizeImg_620_1)
-        self.saveGraphMenu.addAction(RiktigtKaffeAction)
-
-        PlanetCafeAction = QAction('PlanetCafe.fr (600x?)...', self)
-        PlanetCafeAction.triggered.connect(self.resizeImg_600_1)
-        self.saveGraphMenu.addAction(PlanetCafeAction)
-
-        CoffeeGeekAction = QAction('CoffeeGeek.com (500x?)...', self)
-        CoffeeGeekAction.triggered.connect(self.resizeImg_500_1)
-        self.saveGraphMenu.addAction(CoffeeGeekAction)
-
-        self.saveGraphMenu.addSeparator()
-
-        facebookSizeAction = QAction('Facebook (1200x628)...',self)
-        facebookSizeAction.triggered.connect(self.resizeImgSize_1200_628)
-        self.saveGraphMenu.addAction(facebookSizeAction)
-
-        instagramSizeAction = QAction('Instagram (1080x608)...', self)
-        instagramSizeAction.triggered.connect(self.resizeImgSize_1080_608)
-        self.saveGraphMenu.addAction(instagramSizeAction)
+#        self.saveGraphMenu.addSeparator()
+#
+#        HomeBaristaAction = QAction('Home-Barista.com (1200x?)...', self)
+#        HomeBaristaAction.triggered.connect(self.resizeImg_1200_1)
+#        self.saveGraphMenu.addAction(HomeBaristaAction)
+#
+#        KaffeeNetzAction = QAction('Kaffee-Netz.de (800x?)...', self)
+#        KaffeeNetzAction.triggered.connect(self.resizeImg_800_1)
+#        self.saveGraphMenu.addAction(KaffeeNetzAction)
+#
+#        RiktigtKaffeAction = QAction('RiktigtKaffe.se (620x?)...', self)
+#        RiktigtKaffeAction.triggered.connect(self.resizeImg_620_1)
+#        self.saveGraphMenu.addAction(RiktigtKaffeAction)
+#
+#        PlanetCafeAction = QAction('PlanetCafe.fr (600x?)...', self)
+#        PlanetCafeAction.triggered.connect(self.resizeImg_600_1)
+#        self.saveGraphMenu.addAction(PlanetCafeAction)
+#
+#        CoffeeGeekAction = QAction('CoffeeGeek.com (500x?)...', self)
+#        CoffeeGeekAction.triggered.connect(self.resizeImg_500_1)
+#        self.saveGraphMenu.addAction(CoffeeGeekAction)
+#
+#        self.saveGraphMenu.addSeparator()
+#
+#        facebookSizeAction = QAction('Facebook (1200x628)...',self)
+#        facebookSizeAction.triggered.connect(self.resizeImgSize_1200_628)
+#        self.saveGraphMenu.addAction(facebookSizeAction)
+#
+#        instagramSizeAction = QAction('Instagram (1080x608)...', self)
+#        instagramSizeAction.triggered.connect(self.resizeImgSize_1080_608)
+#        self.saveGraphMenu.addAction(instagramSizeAction)
 
         self.reportMenu:QMenu = QMenu(QApplication.translate('Menu', 'Report'))
         self.roastReportMenu: QMenu = QMenu(QApplication.translate('Menu', 'Roast'))
@@ -4356,7 +4356,8 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             config_menu.addAction(self.alarmAction)
             config_menu.addSeparator()
             config_menu.addAction(self.phasesGraphAction)
-            config_menu.addAction(self.StatisticsAction)
+            if ui_mode is UI_MODE.EXPERT:
+                config_menu.addAction(self.StatisticsAction)
             config_menu.addAction(self.WindowconfigAction)
         config_menu.addSeparator()
         if ui_mode is UI_MODE.EXPERT:
@@ -4734,15 +4735,27 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
 
     @pyqtSlot()
     def toggleBTlcdCurve(self) -> None:
+        modifiers = QApplication.keyboardModifiers()
         if self.qmc.swaplcds:
-            self.toggleETCurve()
+            if modifiers == Qt.KeyboardModifier.AltModifier:
+                self.toggleETBackgroundCurve()
+            else:
+                self.toggleETCurve()
+        elif modifiers == Qt.KeyboardModifier.AltModifier:
+            self.toggleBTBackgroundCurve()
         else:
             self.toggleBTCurve()
 
     @pyqtSlot()
     def toggleETlcdCurve(self) -> None:
+        modifiers = QApplication.keyboardModifiers()
         if self.qmc.swaplcds:
-            self.toggleBTCurve()
+            if modifiers == Qt.KeyboardModifier.AltModifier:
+                self.toggleBTBackgroundCurve()
+            else:
+                self.toggleBTCurve()
+        elif modifiers == Qt.KeyboardModifier.AltModifier:
+            self.toggleETBackgroundCurve()
         else:
             self.toggleETCurve()
 
@@ -4767,19 +4780,57 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             self.qmc.redraw_keep_view(recomputeAllDeltas=False)
         self.setLabelColor(self.label2,self.qmc.palette['et'], self.qmc.ETcurve)
 
+    def toggleETBackgroundCurve(self) -> None:
+        if self.qmc.backgroundprofile is not None and self.qmc.background:
+            self.qmc.backgroundETcurve = not self.qmc.backgroundETcurve
+            self.qmc.l_annotations_dict = {}
+            self.qmc.redraw_keep_view(recomputeAllDeltas=False)
+
+    def toggleBTBackgroundCurve(self) -> None:
+        if self.qmc.backgroundprofile is not None and self.qmc.background:
+            self.qmc.backgroundBTcurve = not self.qmc.backgroundBTcurve
+            self.qmc.l_annotations_dict = {}
+            self.qmc.redraw_keep_view(recomputeAllDeltas=False)
+
     @pyqtSlot()
     def toggleDeltaETlcdCurve(self) -> None:
+        modifiers = QApplication.keyboardModifiers()
         if self.qmc.swapdeltalcds:
-            self.toggleDeltaBTCurve()
+            if modifiers == Qt.KeyboardModifier.AltModifier:
+                self.toggleBackgroundDeltaBTCurve()
+            else:
+                self.toggleDeltaBTCurve()
+        elif modifiers == Qt.KeyboardModifier.AltModifier:
+            self.toggleBackgroundDeltaETCurve()
         else:
             self.toggleDeltaETCurve()
 
     @pyqtSlot()
     def toggleDeltaBTlcdCurve(self) -> None:
+        modifiers = QApplication.keyboardModifiers()
         if self.qmc.swapdeltalcds:
-            self.toggleDeltaETCurve()
+            if modifiers == Qt.KeyboardModifier.AltModifier:
+                self.toggleBackgroundDeltaETCurve()
+            else:
+                self.toggleDeltaETCurve()
+        elif modifiers == Qt.KeyboardModifier.AltModifier:
+            self.toggleBackgroundDeltaBTCurve()
         else:
             self.toggleDeltaBTCurve()
+
+    def toggleBackgroundDeltaETCurve(self) -> None:
+        if self.qmc.backgroundprofile is not None and self.qmc.background:
+            twoAxis_before = self.qmc.twoAxisMode()
+            self.qmc.DeltaETBflag = not self.qmc.DeltaETBflag
+            twoAxis_after = self.qmc.twoAxisMode()
+            self.qmc.redraw_keep_view(recomputeAllDeltas=False, forceRenewAxis=twoAxis_before != twoAxis_after)
+
+    def toggleBackgroundDeltaBTCurve(self) -> None:
+        if self.qmc.backgroundprofile is not None and self.qmc.background:
+            twoAxis_before = self.qmc.twoAxisMode()
+            self.qmc.DeltaBTBflag = not self.qmc.DeltaBTBflag
+            twoAxis_after = self.qmc.twoAxisMode()
+            self.qmc.redraw_keep_view(recomputeAllDeltas=False, forceRenewAxis=twoAxis_before != twoAxis_after)
 
     def toggleDeltaETCurve(self) -> None:
         if len(self.qmc.delta1) > 5:
@@ -5287,7 +5338,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                                     subscription_icon = 'plus-pro-low'
                 else:
                     plus_icon = 'plus-on'
-                    tooltip = QApplication.translate('Tooltip', 'Disconnect artisan.plus')
+                    tooltip = QApplication.translate('Tooltip', 'Connect artisan.plus')
             else:
                 plus_icon = 'plus-off'
                 tooltip = QApplication.translate('Tooltip', 'Connect artisan.plus')
@@ -8705,7 +8756,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                         self.qmc.fig.canvas.draw()
 #                        self.qmc.fig.canvas.update()
                     self.qmc.canvas.adjustSize()
-                    FigureCanvas.updateGeometry(self.qmc)  #@UndefinedVariable
+                    FigureCanvas.updateGeometry(self.qmc.canvas)
                     QApplication.processEvents()
                     if self.qmc.statssummary:
                         self.qmc.redraw(recomputeAllDeltas=False)
@@ -17011,7 +17062,10 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
             if not filename:
                 path = QDir()
                 path.setPath(self.getDefaultPath())
-                if self.qmc.batchcounter > -1 and self.qmc.roastbatchnr > 0 and self.qmc.autosaveprefix == '':
+                if self.qmc.roastbatchnr > 0 and self.qmc.roastbatchprefix != '' and self.qmc.autosaveprefix == '':
+                    # we are saving a file which already has batch prefix and counter assigned, we keep that as default prefix
+                    prefix = self.qmc.roastbatchprefix + str(self.qmc.roastbatchnr)
+                elif self.qmc.batchcounter > -1 and self.qmc.roastbatchnr > 0 and self.qmc.autosaveprefix == '':
                     prefix = self.qmc.batchprefix + str(self.qmc.roastbatchnr)
                 elif self.qmc.roastbatchprefix != '' and self.qmc.autosaveprefix == '':
                     prefix = self.qmc.roastbatchprefix
@@ -20072,7 +20126,8 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
 #--- END GROUP events
 
             #save UI Mode
-            self.settingsSetValue(settings, default_settings, 'UI_mode',self.ui_mode, read_defaults)
+            if not read_defaults:
+                settings.setValue('UI_mode',int(self.ui_mode)) # 'UI_mode' is always stored to ease the transition (old settings default to Expert, new to Default)
             #save ambient temperature source
             self.settingsSetValue(settings, default_settings, 'AmbientTempSource',self.qmc.ambientTempSource, read_defaults)
             self.settingsSetValue(settings, default_settings, 'AmbientHumiditySource',self.qmc.ambientHumiditySource, read_defaults)
@@ -25194,9 +25249,12 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
     @pyqtSlot()
     @pyqtSlot(bool)
     def editgraph(self, _:bool = False) -> None:
+        self.open_roast_properties_dialog()
+
+    def open_roast_properties_dialog(self, start_recording_on_exit:bool=False) -> None:
         if self.editgraphdialog is not False and self.editgraphdialog is None: # Roast Properties dialog is not blocked!
             from artisanlib.roast_properties import editGraphDlg
-            self.editgraphdialog = editGraphDlg(self,self,self.editGraphDlg_activeTab)
+            self.editgraphdialog = editGraphDlg(self,self,self.editGraphDlg_activeTab,start_recording_on_exit)
             self.editgraphdialog.show()
 
     @pyqtSlot()

@@ -42,7 +42,7 @@ from artisanlib.widgets import MyQComboBox
 from artisanlib.qcheckcombobox import CheckComboBox
 
 with suppress_stdout_stderr():
-    from matplotlib import colormaps
+    from matplotlib import colormaps # pyrefly:ignore[missing-module-attribute]
 
 from PyQt6.QtCore import (Qt, pyqtSignal, pyqtSlot, QSettings, QFile, QTextStream, QUrl,
     QFileInfo, QDate, QTime, QDateTime)
@@ -1211,11 +1211,11 @@ class roastCompareDlg(ArtisanDialog):
             if self.delta_axis_visible and self.aw.qmc.zgrid>0:
                 self.aw.qmc.delta_ax.yaxis.set_major_locator(ticker.MultipleLocator(self.aw.qmc.zgrid))
                 self.aw.qmc.delta_ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
-                for i in self.aw.qmc.delta_ax.get_yticklines():
+                for i in self.aw.qmc.delta_ax.get_yticklines():  # pyrefly:ignore[not-callable]
                     i.set_markersize(10)
                 for i in self.aw.qmc.delta_ax.yaxis.get_minorticklines():
                     i.set_markersize(5)
-                for label in self.aw.qmc.delta_ax.get_yticklabels() :
+                for label in self.aw.qmc.delta_ax.get_yticklabels():  # pyrefly:ignore[not-callable]
                     label.set_fontproperties(prop)
             else:
                 self.aw.qmc.delta_ax.yaxis.set_major_locator(ticker.NullLocator())
@@ -1291,14 +1291,14 @@ class roastCompareDlg(ArtisanDialog):
             direction=tick_dir,
             labelbottom=True)   # labels along the bottom edge are on
 
-        for label in self.aw.qmc.ax.get_xticklabels() :
+        for label in self.aw.qmc.ax.get_xticklabels():  # pyrefly:ignore[not-callable]
             label.set_fontproperties(prop)
-        for label in self.aw.qmc.ax.get_yticklabels() :
+        for label in self.aw.qmc.ax.get_yticklabels():  # pyrefly:ignore[not-callable]
             label.set_fontproperties(prop)
 
         # format temperature as int, not float in the cursor position coordinate indicator
-        self.aw.qmc.ax.fmt_ydata = self.aw.qmc.fmt_data
-        self.aw.qmc.ax.fmt_xdata = self.aw.qmc.fmt_timedata
+        self.aw.qmc.ax.fmt_ydata = self.aw.qmc.fmt_data # pyrefly:ignore[bad-assignment] # not assignable to attribute `fmt_ydata` with type `Formatter | None`
+        self.aw.qmc.ax.fmt_xdata = self.aw.qmc.fmt_timedata # pyrefly:ignore[bad-assignment] # not assignable to attribute `fmt_ydata` with type `Formatter | None`
 
         self.aw.qmc.ax.set_zorder(self.aw.qmc.delta_ax.get_zorder()+1) # put ax in front of delta_ax (which remains empty!)
         #create a second set of axes in the same position as self.ax
@@ -1325,19 +1325,19 @@ class roastCompareDlg(ArtisanDialog):
         if self.delta_axis_visible and self.aw.qmc.zgrid>0:
             self.aw.qmc.delta_ax.yaxis.set_major_locator(ticker.MultipleLocator(self.aw.qmc.zgrid))
             self.aw.qmc.delta_ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
-            for i in self.aw.qmc.delta_ax.get_yticklines():
+            for i in self.aw.qmc.delta_ax.get_yticklines():  # pyrefly:ignore[not-callable]
                 i.set_markersize(10)
             for i in self.aw.qmc.delta_ax.yaxis.get_minorticklines():
                 i.set_markersize(5)
-            for label in self.aw.qmc.delta_ax.get_yticklabels() :
+            for label in self.aw.qmc.delta_ax.get_yticklabels():  # pyrefly:ignore[not-callable]
                 label.set_fontproperties(prop)
         else:
             self.aw.qmc.delta_ax.yaxis.set_major_locator(ticker.NullLocator())
             self.aw.qmc.delta_ax.yaxis.set_minor_locator(ticker.NullLocator())
 
         # translate y-coordinate from delta into temp range to ensure the cursor position display (x,y) coordinate in the temp axis
-        self.aw.qmc.delta_ax.fmt_ydata = self.aw.qmc.fmt_data
-        self.aw.qmc.delta_ax.fmt_xdata = self.aw.qmc.fmt_timedata
+        self.aw.qmc.delta_ax.fmt_ydata = self.aw.qmc.fmt_data # pyrefly:ignore[bad-assignment] # not assignable to attribute `fmt_ydata` with type `Formatter | None`
+        self.aw.qmc.delta_ax.fmt_xdata = self.aw.qmc.fmt_timedata # pyrefly:ignore[bad-assignment] # not assignable to attribute `fmt_ydata` with type `Formatter | None`
 
         self.aw.qmc.ax.spines['top'].set_color('0.40')
         self.aw.qmc.ax.spines['bottom'].set_color('0.40')
@@ -1347,7 +1347,7 @@ class roastCompareDlg(ArtisanDialog):
         if self.aw.qmc.ygrid > 0:
             self.aw.qmc.ax.yaxis.set_major_locator(ticker.MultipleLocator(self.aw.qmc.ygrid))
             self.aw.qmc.ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
-            for i in self.aw.qmc.ax.get_yticklines():
+            for i in self.aw.qmc.ax.get_yticklines(): # pyrefly:ignore[not-callable]
                 i.set_markersize(10)
             for i in self.aw.qmc.ax.yaxis.get_minorticklines():
                 i.set_markersize(5)

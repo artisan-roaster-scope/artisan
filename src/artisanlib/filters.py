@@ -261,8 +261,8 @@ if __name__ == '__main__':
     plt.plot(ts, y_live_avg9filt, lw=1, label='LiveAvg9Filter')
     plt.plot(ts, y_live_med5sosfilt, lw=1, label='LiveMed5SosFilter')
 
-    plt.legend(loc='lower center', bbox_to_anchor=[0.5, 1], ncol=3,
-               fontsize='smaller')
+    plt.legend(loc='lower center', bbox_to_anchor=[0.5, 1], ncol=3, # pyrefly:ignore[unexpected-keyword]
+               fontsize='smaller') # pyrefly:ignore[unexpected-keyword]
     plt.xlabel('Time / s')
     plt.ylabel('Amplitude')
     plt.tight_layout()

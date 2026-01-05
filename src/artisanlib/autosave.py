@@ -109,6 +109,7 @@ class autosaveDlg(ArtisanDialog):
         autochecklabelplus = QHBoxLayout()
         autochecklabelplus.addWidget(autochecklabel)
         autochecklabelplus.addWidget(self.addtorecentfiles)
+        autochecklabelplus.addSpacing(15)
         autochecklabelplus.addWidget(addtorecentfileslabel)
         autochecklabelplus.addStretch()
 

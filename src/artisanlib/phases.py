@@ -17,6 +17,7 @@
 
 from typing import TYPE_CHECKING
 from artisanlib.dialogs import ArtisanDialog
+from artisanlib.main import UI_MODE
 
 from PyQt6.QtCore import Qt, pyqtSlot, QSettings
 from PyQt6.QtWidgets import (QApplication, QLabel, QDialogButtonBox, QGridLayout,
@@ -163,6 +164,7 @@ class phasesGraphDlg(ArtisanDialog):
         self.lcdmodeComboBox_fin.setEnabled(not bool(self.aw.qmc.phasesLCDmode_all[2]))
 
         self.lcdmodeFlag_all_fin = QCheckBox()
+        self.lcdmodeFlag_all_fin.setToolTip(QApplication.translate('Tooltip','Display all information (time, percentage and temperature) of the last phase across all 3 phases LCDs in parallel'))
         self.lcdmodeFlag_all_fin.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.lcdmodeFlag_all_fin.setChecked(self.aw.qmc.phasesLCDmode_all[2])
         self.lcdmodeFlag_all_fin.stateChanged.connect(self.lcdmodeFlagFinChanged)
@@ -189,7 +191,8 @@ class phasesGraphDlg(ArtisanDialog):
         buttonsLayout.addWidget(self.dialogbuttons)
         mainLayout = QVBoxLayout()
         mainLayout.addLayout(boxedPhaseLayout)
-        mainLayout.addLayout(boxedPhaseFlagLayout)
+        if self.aw.ui_mode is UI_MODE.EXPERT:
+            mainLayout.addLayout(boxedPhaseFlagLayout)
         mainLayout.addStretch()
         mainLayout.addSpacing(10)
         mainLayout.addLayout(buttonsLayout)

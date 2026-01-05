@@ -6,14 +6,17 @@ v3.4.1
 ------------------
 
 * ADDITIONS
+  - adds UI modes (production, default, expert)
   - adds support of the Lebrew RoastSee NEXT real-time Agtron and crack analyzer
+  - adds support for Yoccto Meteo as well as Phidget TMP1000, HUM1000 and PRE1000 as extra devices
   - adds possibility to overwrite the event button value on alarm action `Event Button` by the number given after the button number and the `>` sign, like in `1>3,3>2,4 # activate button 1 with value 3, button 3 with value 2 and button 4`
   - adds support for [Acaia Pyxis Black (2025)](https://eu.acaia.co/products/pyxis-black)
   - adds visual clue to curve LCDs indicating hidden curves
+  - adds OPTION click on ET/BT or DeltaET/DeltaBT LCDs to hide/show the corresponding background curves
   - adds Designer spline fitting ([PR #2050](../../../pull/2050) contributed by [Thomas](https://github.com/phreeza))
-  - adds 2DOF PID incl. classical DoE, PoE, DoM, and PoM PID variants, interpolated gain scheduling, bumpless transfer, duty and derivative IIR SOS filter respecting sampling interval, and SV FIR filter for background follow mode
+  - adds 2DOF PID implementation including classical DoE, PoE, DoM, and PoM PID variants, interpolated gain scheduling, bumpless transfer, duty and derivative IIR SOS filter respecting sampling interval, and SV FIR filter for background follow mode
   - adds Artisan Command `pidWeights` to set 2DOFPID parameters beta and gamma
-  - adds support for Yoccto Meteo as well as Phidget TMP1000, HUM1000 and PRE1000 as extra devices
+  - adds calculation of energy data from PID Duty %
 
 * CHANGES
   - removed the term `slave` from the project but for 2 lines (to be removed in later versions) to keep compatibility with older settings
