@@ -22,25 +22,25 @@ def extractProfileKaleidoCSV(file: str,
         eventsExternal2InternalValue: Callable[[int], float]) -> ProfileData:
     res: ProfileData = ProfileData()  # the interpreted data set
 
-    # 初始化数据列表
-    timex = []  # 时间轴
-    temp1 = []  # ET (环境温度)
-    temp2 = []  # BT (豆温)
-    temp3 = []  # RoR (升温率)
+    # Initialize data list
+    timex = []  # Timeline
+    temp1 = []  # ET
+    temp2 = []  # BT
+    temp3 = []  # RoR
 
-    specialevents = []        # 特殊事件时间点
-    specialeventstype = []    # 事件类型 (0=Fan, 1=Drum, 2=Damper, 3=Burner)
-    specialeventsvalue = []   # 事件数值
-    specialeventsStrings = [] # 事件描述
+    specialevents = []        # Special event time points
+    specialeventstype = []    # Event Type (0=Fan, 1=Drum, 2=Damper, 3=Burner)
+    specialeventsvalue = []   # Event value
+    specialeventsStrings = [] # Event Description
 
-    timeindex = [-1, 0, 0, 0, 0, 0, 0, 0]  # 时间索引: [CHARGE, DRY END, FC START, FC END, SC START, SC END, DROP, COOL]
+    timeindex = [-1, 0, 0, 0, 0, 0, 0, 0]  # Time Index: [CHARGE, DRY END, FC START, FC END, SC START, SC END, DROP, COOL]
                                             # CHARGE index init set to -1 as 0 could be an actual index used
 
-    # 解析 Kaleido CSV 文件（Kaleido文件是文本格式，包含多个部分）
+    # Analysis Kaleido CSV File（Kaleido The file is in text format and contains multiple sections.）
     with open(file, encoding='utf-8') as f:
         content = f.read()
 
-    # 分割文件内容到不同部分
+    # Split file content into different sections
     sections = {}
     current_section = None
     lines = content.split('\n')
@@ -49,25 +49,25 @@ def extractProfileKaleidoCSV(file: str,
     while i < len(lines):
         line = lines[i].strip()
 
-        # 检查是否是 section 标记，如 [{DATA}], [{EVENT}], [{CookDate}] 等
+        # Check if it is a section tag, such as [{DATA}], [{EVENT}], [{CookDate}] ...
         if line.startswith('[{') and line.endswith('}]'):
-            current_section = line[2:-2]  # 去掉 [{ 和 }]
+            current_section = line[2:-2]  # Remove [{ and }]
             sections[current_section] = []
             i += 1
             continue
 
-        # 如果当前在某个 section 内，收集内容
+        # If currently in a certain section Inside, collecting content
         if current_section and line:
             sections[current_section].append(line)
 
         i += 1
 
-    # 解析基本信息
-    # 解析烘焙日期和时间
+    # Analyze basic information
+    # Analyzing the baking date and time
     if 'CookDate' in sections and sections['CookDate']:
         cook_date = sections['CookDate'][0].strip() if sections['CookDate'] else ''
         if cook_date:
-            # 格式: 25-05-18 19:32:48
+            # Format: 25-05-18 19:32:48
             try:
                 date_part, time_part = cook_date.split(' ')
                 year = f"20{date_part[:2]}"
@@ -79,18 +79,18 @@ def extractProfileKaleidoCSV(file: str,
             except:
                 _log.warning('Could not parse CookDate: %s', cook_date)
 
-    # 解析评论/标题
+    # Analyze comments/titles
     if 'Comment' in sections and sections['Comment']:
         comment = sections['Comment'][0].strip() if sections['Comment'] else ''
         if comment:
             res['title'] = comment
 
-    # 解析预热温度
+    # Analyzing preheating temperature
     if 'PreTemp' in sections and sections['PreTemp']:
         pre_temp = sections['PreTemp'][0].strip() if sections['PreTemp'] else ''
         if pre_temp:
             try:
-                res['drumtemp'] = float(pre_temp)  # 使用预热温度作为初始鼓温
+                res['drumtemp'] = float(pre_temp)  # Use the preheating temperature as the initial drum temperature
             except ValueError:
                 pass
 
@@ -115,37 +115,37 @@ def extractProfileKaleidoCSV(file: str,
             # hpm_list = [] # HPM (Manual/Auto mode) -> Mode (not displayed in Roast Properties Data)
             # ps_list = []  # PS (Status) -> Status (not displayed in Roast Properties Data)
 
-            for idx, line in enumerate(data_lines[1:]):  # 跳过标题行
+            for idx, line in enumerate(data_lines[1:]):  # Skip the header row
                 line = line.strip()
                 if line:
                     parts = line.split(',')
-                    if len(parts) >= 11:  # 确保有足够的列
+                    if len(parts) >= 11:  # Ensure there are enough columns
                         try:
                             # 解析数据列: Index,Time,BT,ET,RoR,SV,HPM,HP,SM,RL,PS
                             # Index = parts[0] (跳过)
-                            time_ms = int(parts[1])      # 时间（毫秒）
-                            bt = float(parts[2])         # BT (豆温)
-                            et = float(parts[3])         # ET (环境温度)
-                            ror = float(parts[4])        # RoR (升温率)
-                            sv = float(parts[5])         # 设定值
+                            time_ms = int(parts[1])      # Time (milliseconds)
+                            bt = float(parts[2])         # BT
+                            et = float(parts[3])         # ET
+                            ror = float(parts[4])        # RoR
+                            sv = float(parts[5])         # Set value
 
-                            hpm_str = parts[6].strip()   # HPM (手动/自动模式 - M=手动火力, A=依据SV值PID火力控制)
-                            hp_str = parts[7].strip()    # HP (火力)
-                            sm_str = parts[8].strip()    # SM (风门设置/Air)
-                            rl_str = parts[9].strip()    # RL (转速)
-                            ps_str = parts[10].strip()   # PS (状态 - O或F)
+                            hpm_str = parts[6].strip()   # HPM (Manual/Auto Mode - M=Manual Heating, A=PID Heating Control based on SV value)
+                            hp_str = parts[7].strip()    # HP (Burner)
+                            sm_str = parts[8].strip()    # SM (Air damper setting)
+                            rl_str = parts[9].strip()    # RL (RPM)
+                            ps_str = parts[10].strip()   # PS (Burner Status - O OR C)
 
-                            # 转换时间（毫秒转秒）
+                            # Conversion time (milliseconds to seconds)
                             time_sec = time_ms / 1000.0
 
-                            # 转换各参数值
-                            hpm = hpm_str if hpm_str else 'M'  # 默认为手动模式
+                            # Convert each parameter value
+                            hpm = hpm_str if hpm_str else 'M'  # Default to manual mode
                             hp = float(hp_str) if hp_str and hp_str not in ['0', ''] else 0.0
                             sm = float(sm_str) if sm_str and sm_str not in ['0', ''] else 0.0
                             rl = float(rl_str) if rl_str and rl_str not in ['0', ''] else 0.0
-                            ps = ps_str if ps_str else 'O'  # 默认为火力打开状态
+                            ps = ps_str if ps_str else 'O'  # Default to firepower on.
 
-                            # 添加到数据列表
+                            # Add to the data list
                             timex.append(time_sec)
                             temp1.append(et)
                             temp2.append(bt)
