@@ -17,6 +17,7 @@ v3.4.1
   - adds 2DOF PID implementation including classical DoE, PoE, DoM, and PoM PID variants, interpolated gain scheduling, bumpless transfer, duty and derivative IIR SOS filter respecting sampling interval, and SV FIR filter for background follow mode
   - adds Artisan Command `pidWeights` to set 2DOFPID parameters beta and gamma
   - adds calculation of energy data from PID Duty %
+  - adds relative percent event types ([Issue #2086](../../../issues/2086))
 
 * CHANGES
   - removed the term `slave` from the project but for 2 lines (to be removed in later versions) to keep compatibility with older settings

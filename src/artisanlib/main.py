@@ -1885,12 +1885,14 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         #
         self.extraeventslabels: list[str] = []
         self.extraeventsdescriptions: list[str] = []
-        self.extraeventstypes: list[int] = []
         self.extraeventsvalues: list[float] = [] # internal eventvalues (see canvas.py:self.qmc.eventsExternal2InternalValue()/eventsInternal2ExternalValue()
-        # extraeventtypes:
+        self.extraeventstypes: list[int] = []
+        # extraeventstypes:
         #  0-3: custom event types (absolute value assignments)
-        #  4: no event type assigned
+        #  4: no event type assigned (does not add any event)
         #  5-8: custom event types (relative value assignments; +/- steps)
+        #  9: -- (untyped event)
+        #  10-13: custom event types (relative percent value assignments; +/- % steps)
         self.extraeventbuttoncolor:list[str] = []
         self.extraeventbuttontextcolor:list[str] = []
         self.extraeventsactionstrings:list[str] = []
@@ -11385,7 +11387,11 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                 #if eventtype < 4: # absolute values
                 etype = eventtype
                 new_value = cmdvalue
-                if eventtype > 4: # relative values for +/- actions
+                if eventtype > 9: # relative % values for % +/- actions
+                    etype = eventtype-10 # the real event type has a offset of 10 in this case
+                    p = self.extraeventsactionslastvalue[etype]
+                    new_value = cmdvalue if p is None else p + int(round(p*cmdvalue/100))
+                elif eventtype > 4: # relative values for +/- actions
                     etype = eventtype-5 # the real event type has a offset of 5 in this case
                     p = self.extraeventsactionslastvalue[etype]
                     new_value = cmdvalue if p is None else p + cmdvalue
@@ -26270,11 +26276,16 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         tempvalueF = (value if self.qmc.mode == 'F' else int(round(fromFtoCstrict(value))))
         tempvalueC = (value if self.qmc.mode == 'C' else int(round(fromCtoFstrict(value))))
         sign = ''
-        if 4 < et < 9 and value > 0:
+        percent = ''
+        if et != 9 and 4 < et < 14 and value > 0:
             sign = '+'
+        if 9 < et < 14:
+            percent = '%'
+        if et > 8:
+            et = et - 10
         if et > 4:
             et = et - 5
-        if et < 4:
+        if et < 4 and eventtype != 9:
             res = res.replace('\\t',self.qmc.etypes[et])
         state:int = 0
         if len(self.buttonStates) > buttonNr > -1:
@@ -26309,7 +26320,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                 ('\\s', QApplication.translate('Label','START')),
                 ('\\S', (QApplication.translate('Label','STOP') if state else QApplication.translate('Label','START'))),
                 ('\\T', f'{tempvalueC}{self.qmc.mode}'),
-                ('\\V', f'{sign}{value}'),
+                ('\\V', f'{sign}{value}{percent}'),
                 ('\\w', self.qmc.etypes[1])
                 ]:
             res = res.replace(var,subst)

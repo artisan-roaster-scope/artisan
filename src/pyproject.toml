@@ -12,15 +12,15 @@ maintainers = [
     {name = 'Marko Luther'},
     {name = 'Dave Baxter'}
 ]
-license = {file = 'LICENSE'}
+license = 'GPL-3.0'
+license-files = ['LICENSE']
 requires-python = '>=3.12'
 keywords = ['roasting', 'roast logging', 'speciality coffee']
 classifiers = [
     'Development Status :: 5 - Production/Stable',
-    'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
-    "Operating System :: Windows",
-    "Operating System :: MacOS",
-    "Operating System :: POSIX :: Linux",
+    'Operating System :: Windows',
+    'Operating System :: MacOS',
+    'Operating System :: POSIX :: Linux',
     'Programming Language :: Python',
     'Programming Language :: Python :: 3',
     'Programming Language :: Python :: 3.12',

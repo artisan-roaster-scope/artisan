@@ -15499,10 +15499,12 @@ class tgraphcanvas(QObject):
                         eventdescription=self.aw.extraeventsdescriptions[extraevent],takeLock=takeLock,
                         doupdategraphics=doupdategraphics,doupdatebackground=doupdatebackground)
                 else: # on "relative" event values, we take the last value set per event via the recordextraevent call before
-                    last_value:int|None = self.aw.extraeventsactionslastvalue[self.aw.extraeventstypes[extraevent]-5]
+                    offset = (10 if self.aw.extraeventstypes[extraevent] > 9 else 5)
+                    event_type_idx = self.aw.extraeventstypes[extraevent]-offset
+                    last_value:int|None = self.aw.extraeventsactionslastvalue[event_type_idx]
                     self.EventRecordAction(
                         extraevent=extraevent,
-                        eventtype=self.aw.extraeventstypes[extraevent]-5,
+                        eventtype=event_type_idx, # either regular relative or percent relative type
                         eventvalue=((self.eventsExternal2InternalValue(last_value) if last_value else None) if value is None else self.eventsExternal2InternalValue(value)),
                         eventdescription=self.aw.extraeventsdescriptions[extraevent],takeLock=takeLock,
                         doupdategraphics=doupdategraphics,doupdatebackground=doupdatebackground)

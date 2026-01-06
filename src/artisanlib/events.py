@@ -27,7 +27,7 @@ if TYPE_CHECKING:
     from PyQt6.QtGui import QCloseEvent # pylint: disable=unused-import
 
 from artisanlib.main import UI_MODE
-from artisanlib.util import uchr, comma2dot, eventtime2string
+from artisanlib.util import comma2dot, eventtime2string
 from artisanlib.dialogs import ArtisanResizeablDialog, ArtisanDialog
 from artisanlib.widgets import MyQComboBox, MyQDoubleSpinBox
 
@@ -2728,7 +2728,7 @@ class EventsDlg(ArtisanResizeablDialog):
                       QApplication.translate('ComboBox','ON')]
 
         std_extra_events = [self.etype0.text(),self.etype1.text(),self.etype2.text(),self.etype3.text(),'--']
-        std_extra_events += [uchr(177) + e for e in std_extra_events[:-1]] # chr(241)
+        std_extra_events += [f'\u00B1{e}' for e in std_extra_events[:-1]] + [f'\u00B1{e}%' for e in std_extra_events[:-1]] # chr(241)
         std_extra_events.insert(0,QApplication.translate('Label', '')) # we prepend the empty item that does not create an event entry
 
 
@@ -2749,8 +2749,10 @@ class EventsDlg(ArtisanResizeablDialog):
                 idx = 5
             elif self.extraeventstypes[i] == 4:
                 idx = 0
-            else:
+            elif self.extraeventstypes[i] < 9:
                 idx = self.extraeventstypes[i]+1
+            else:
+                idx = self.extraeventstypes[i]
 
             typeComboBox.setCurrentIndex(idx)
             typeComboBox.currentIndexChanged.connect(self.settypeeventbutton)
@@ -3003,6 +3005,8 @@ class EventsDlg(ArtisanResizeablDialog):
                     evType = 4 # and map the first entry to 4
                 elif evType == 4:
                     evType = 9 # and map the entry 4 to 9
+                elif evType > 8:
+                    evType += 1
                 self.extraeventstypes[i] = evType
             labeledit = cast(QLineEdit, self.eventbuttontable.cellWidget(i,0))
             label = labeledit.text()
