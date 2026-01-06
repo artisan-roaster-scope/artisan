@@ -1214,7 +1214,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.divots.setChecked(self.aw.qmc.divots_flag)
 
         # connect the ArtisanDialog standard OK/Cancel buttons
-        self.dialogbuttons.accepted.connect(self.accept)
+        self.dialogbuttons.accepted.connect(self.close_OK)
         self.dialogbuttons.rejected.connect(self.closeEvent)
 
         # container tare
@@ -5445,15 +5445,16 @@ class editGraphDlg(ArtisanResizeablDialog):
             if self.aw.qmc.timeindex[2]:
                 self.aw.qmc.phases[2] = max(0,int(round(self.aw.qmc.temp2[self.aw.qmc.timeindex[2]])))
 
+    #called from OK button
     @pyqtSlot()
-    @override
-    def accept(self) -> None:
+    def close_OK(self) -> None:
         redraw:bool = False # if set to True a redraw happens at the end of this function
         #check for graph
         if len(self.aw.qmc.timex):
             #prevents accidentally deleting a modified profile.
             self.aw.qmc.fileDirty()
-            self.saveMainEvents()
+            if self.aw.ui_mode is not UI_MODE.PRODUCTION:
+                self.saveMainEvents()
             if self.aw.qmc.timeindex[0] != self.org_timeindex[0]:
                 self.aw.qmc.xaxistosm(redraw=False) # we update axis if CHARGE event changed
                 self.aw.qmc.timealign(redraw=False)
