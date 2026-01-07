@@ -2101,6 +2101,10 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         importIkawaAction.triggered.connect(self.importIkawa)
         self.importMenu.addAction(importIkawaAction)
 
+        importKaleidoAction = QAction('Kaleido CSV...', self)
+        importKaleidoAction.triggered.connect(self.importKaleido)
+        self.importMenu.addAction(importKaleidoAction)
+
         importK202Action = QAction('K202...', self)
         importK202Action.triggered.connect(self.importK202)
         self.importMenu.addAction(importK202Action)
@@ -2162,6 +2166,10 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         fileConvertFromIKAWAAction = QAction(QApplication.translate('Menu', 'IKAWA CSV...'), self)
         fileConvertFromIKAWAAction.triggered.connect(self.convertFromIKAWA)
         self.convFromMenu.addAction(fileConvertFromIKAWAAction)
+
+        fileConvertFromKaleidoAction = QAction(QApplication.translate('Menu', 'Kaleido CSV...'), self)
+        fileConvertFromKaleidoAction.triggered.connect(self.convertFromKaleido)
+        self.convFromMenu.addAction(fileConvertFromKaleidoAction)
 
         fileConvertFromLoringAction = QAction(QApplication.translate('Menu', 'Loring CSV...'), self)
         fileConvertFromLoringAction.triggered.connect(self.convertFromLoring)
@@ -17200,6 +17208,12 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
 
     @pyqtSlot()
     @pyqtSlot(bool)
+    def convertFromKaleido(self, _:bool = False) -> None:
+        from artisanlib.kaleido import extractProfileKaleidoCSV
+        self.fileConvertFrom('*.csv', extractProfileKaleidoCSV)
+
+    @pyqtSlot()
+    @pyqtSlot(bool)
     def convertFromLoring(self, _:bool = False) -> None:
         from artisanlib.loring import extractProfileLoringCSV
         self.fileConvertFrom('*.csv', extractProfileLoringCSV)
@@ -25890,6 +25904,12 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
     def importIkawa(self, _:bool = False) -> None:
         from artisanlib.ikawa import extractProfileIkawaCSV
         self.importExternal(extractProfileIkawaCSV,QApplication.translate('Message','Import IKAWA CSV'),'*.csv')
+
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def importKaleido(self, _:bool = False) -> None:
+        from artisanlib.kaleido import extractProfileKaleidoCSV
+        self.importExternal(extractProfileKaleidoCSV,QApplication.translate('Message','Import Kaleido CSV'),'*.csv')
 
     @pyqtSlot()
     @pyqtSlot(bool)

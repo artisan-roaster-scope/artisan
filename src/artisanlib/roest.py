@@ -275,6 +275,6 @@ def extractProfileRoestCSV(file:str,
         res['specialeventsvalue'] = specialeventsvalue
         res['specialeventsStrings'] = specialeventsStrings
 
-    res['etypes'] = alt_etypesdefault
+    res['etypes'] = [encodeLocalStrict(etype) for etype in alt_etypesdefault]
 
     return res

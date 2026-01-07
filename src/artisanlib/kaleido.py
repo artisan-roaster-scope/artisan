@@ -22,12 +22,14 @@ from pymodbus.transport.serialtransport import create_serial_connection # patche
 
 import logging
 from collections.abc import Callable
+from functools import partial
 from typing import Final,  TypedDict, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from websockets.asyncio.client import ClientConnection # pylint: disable=unused-import
 
-from artisanlib.atypes import SerialSettings
+from artisanlib.util import encodeLocalStrict
+from artisanlib.atypes import SerialSettings, ProfileData
 from artisanlib.async_comm import AsyncLoopThread
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -631,3 +633,263 @@ class KaleidoPort:
         self._asyncLoopThread = None
         self._write_queue = None
         self.resetReadings()
+
+
+
+######
+
+# returns a dict containing all profile information contained in the given Kaleido CSV file
+def extractProfileKaleidoCSV(file:str,
+        _etypesdefault:list[str],
+        alt_etypesdefault:list[str],
+        _artisanflavordefaultlabels:list[str],
+        eventsExternal2InternalValue:Callable[[int],float]) -> ProfileData:
+    res:ProfileData = ProfileData() # the interpreted data set
+
+    # Initialize data list
+    timex:list[float] = []  # Timeline
+    temp1:list[float] = []  # ET
+    temp2:list[float] = []  # BT
+    BT_ror:list[float] = []  # BT RoR
+
+    specialevents:list[int] = []        # Special event time points
+    specialeventstype:list[int] = []    # Event Type (0=Fan, 1=Drum, 2=Damper, 3=Burner)
+    specialeventsvalue:list[float] = []   # Event value
+    specialeventsStrings:list[str] = [] # Event Description
+
+    timeindex:list[int] = [-1, 0, 0, 0, 0, 0, 0, 0]  # Time Index: [CHARGE, DRY END, FC START, FC END, SC START, SC END, DROP, COOL]
+                                            # CHARGE index init set to -1 as 0 could be an actual index used
+
+    # Analysis Kaleido CSV File（Kaleido The file is in text format and contains multiple sections.）
+    with open(file, encoding='utf-8') as f:
+        content = f.read()
+
+    # Split file content into different sections
+    sections:dict[str,list[str]] = {}
+    current_section:str|None = None
+    lines:list[str] = content.split('\n')
+
+    i:int = 0
+    while i < len(lines):
+        line = lines[i].strip()
+
+        # Check if it is a section tag, such as [{DATA}], [{EVENT}], [{CookDate}] ...
+        if line.startswith('[{') and line.endswith('}]'):
+            current_section = line[2:-2]  # Remove [{ and }]
+            sections[current_section] = []
+            i += 1
+            continue
+
+        # If currently in a certain section Inside, collecting content
+        if current_section and line:
+            sections[current_section].append(line)
+
+        i += 1
+
+    # Analyze basic information
+    # Analyzing the baking date and time
+    if 'CookDate' in sections and sections['CookDate']:
+        cook_date = sections['CookDate'][0].strip() if sections['CookDate'] else ''
+        if cook_date:
+            # Format: 25-05-18 19:32:48
+            try:
+                date_part, time_part = cook_date.split(' ')
+                year = f"20{date_part[:2]}"
+                month = date_part[3:5]
+                day = date_part[6:8]
+                res['roastdate'] = f"{year}-{month}-{day}"
+                res['roastisodate'] = f"{year}-{month}-{day}"
+                res['roasttime'] = time_part
+            except Exception: # pylint: disable=broad-except
+                _log.warning('Could not parse CookDate: %s', cook_date)
+
+    # Analyze comments/titles
+    if 'Comment' in sections and sections['Comment']:
+        comment = sections['Comment'][0].strip() if sections['Comment'] else ''
+        if comment:
+            res['title'] = comment
+
+    # Parse DATA section
+    if 'DATA' in sections:
+        data_lines = sections['DATA']
+
+        # First line is header
+        if data_lines:
+            #headers = [h.strip() for h in data_lines[0].split(',')]
+
+            # Store previous parameter values to detect changes
+            last_fan:float|None = None      # Corresponds to SM (Fan/Air) -> Fan (index 0)
+            last_drum:float|None = None     # Corresponds to RL (Rotation) -> Drum (index 1)
+            last_burner:float|None = None   # Corresponds to HP (Heat Power) -> Burner (index 3)
+
+            # Prepare lists for extra device data
+            sm_list:list[float] = []  # SM (Fan/Air) -> Fan %
+            rl_list:list[float] = []  # RL (Rotation) -> Drum %
+            hp_list:list[float] = []  # HP (Heat Power) -> Burner %
+            sv_list:list[float] = []  # SV (Set Value) -> Set Value
+            hpm_list:list[float] = [] # HPM (Manual/Auto mode) -> Mode (not displayed in Roast Properties Data)
+            # ps_list:list[float] = []  # PS (Status) -> Status (not displayed in Roast Properties Data)
+
+            for idx, line_raw in enumerate(data_lines[1:]):  # Skip the header row
+                line = line_raw.strip()
+                if line:
+                    parts = line.split(',')
+                    if len(parts) >= 11:  # Ensure there are enough columns
+                        try:
+                            # 解析数据列: Index,Time,BT,ET,RoR,SV,HPM,HP,SM,RL,PS
+                            # Index = parts[0] (跳过)
+                            time_ms = int(parts[1])      # Time (milliseconds)
+                            bt = float(parts[2])         # BT
+                            et = float(parts[3])         # ET
+                            ror = float(parts[4])        # RoR
+                            sv = float(parts[5])         # Set value
+
+                            hpm_str = parts[6].strip()   # HPM (Manual/Auto Mode - M=Manual Heating, A=PID Heating Control based on SV value)
+                            hp_str = parts[7].strip()    # HP (Burner)
+                            sm_str = parts[8].strip()    # SM (Air damper setting)
+                            rl_str = parts[9].strip()    # RL (RPM)
+#                            ps_str = parts[10].strip()   # PS (Burner Status - O OR C)
+
+                            # Conversion time (milliseconds to seconds)
+                            time_sec = time_ms / 1000.0
+
+                            # Convert each parameter value
+                            hpm = hpm_str if hpm_str else 'M'  # Default to manual mode
+                            hp = float(hp_str) if hp_str and hp_str not in ['0', ''] else 0.0
+                            sm = float(sm_str) if sm_str and sm_str not in ['0', ''] else 0.0
+                            rl = float(rl_str) if rl_str and rl_str not in ['0', ''] else 0.0
+#                            ps = ps_str if ps_str else 'O'  # Default to firepower on.
+
+                            # Add to the data list
+                            timex.append(time_sec)
+                            temp1.append(et)
+                            temp2.append(bt)
+                            BT_ror.append(ror)
+
+                            # Add to extra device data lists
+                            sm_list.append(sm)
+                            rl_list.append(rl)
+                            hp_list.append(hp)
+                            sv_list.append(sv)
+                            # HPM: M=Manual Heat (1), A=PID Heat Control based on SV value (0) - Kaleido machine mode, not displayed in Roast Properties Data
+                            hpm_numeric = 1 if hpm == 'M' else 0
+                            hpm_list.append(hpm_numeric) # HPM data not added to extra device list
+                            # PS: O=Heat On (1), C=Heat Off (0) - Kaleido machine specific, not displayed in Roast Properties Data
+                            # ps_numeric = 1 if ps == 'O' else 0
+                            # ps_list.append(ps_numeric) - PS data not added to extra device list
+
+                            # Detect Fan (SM - Fan/Air) changes - Map to Artisan Fan (index 0)
+                            if sm != last_fan:
+                                last_fan = sm
+                                specialeventsvalue.append(eventsExternal2InternalValue(int(sm)))
+                                specialevents.append(idx)
+                                specialeventstype.append(0)  # Fan
+                                specialeventsStrings.append(f'SM={int(sm)}%')
+
+                            # Detect Drum (RL - Rotation) changes - Map to Artisan Drum (index 1)
+                            if rl != last_drum:
+                                last_drum = rl
+                                specialeventsvalue.append(eventsExternal2InternalValue(int(rl)))
+                                specialevents.append(idx)
+                                specialeventstype.append(1)  # Drum
+                                specialeventsStrings.append(f'RL={int(rl)}%')
+
+                            # Detect Burner (HP - Heat Power) changes - Map to Artisan Burner (index 3)
+                            if hp != last_burner:
+                                last_burner = hp
+                                specialeventsvalue.append(eventsExternal2InternalValue(int(hp)))
+                                specialevents.append(idx)
+                                specialeventstype.append(3)  # Burner
+                                specialeventsStrings.append(f'HP={int(hp)}%')
+
+                        except (ValueError, IndexError) as e:
+                            # Skip unparsable lines
+                            _log.warning('Could not parse data line: %s, error: %s', line, str(e))
+                            continue
+
+            # Add extra device data - Include all Kaleido parameters except HPM and PS
+            if timex:  # Ensure there is data
+                res['extradevices'] = [141, 139, 140, 25]  # Device IDs
+                res['extraname1'] = ['{3}', 'SV', '{1}', 'RoR']
+                res['extraname2'] = ['{0}', 'AT', 'AH', '']
+                res['extratimex'] = [timex[:], timex[:], timex[:], timex[:]]
+                res['extratemp1'] = [hp_list, sv_list, rl_list, BT_ror]
+                res['extratemp2'] = [sm_list, [0]*len(timex), hpm_list, [0]*len(timex)]
+                res['extraDelta1'] = [False, False, False, True]
+                res['extraDelta2'] = [False, False, False, False]
+
+    # Parse event timestamps and map to Artisan timeindex
+    # Mapping relationship:
+    # StartBeansIn -> CHARGE (timeindex[0])
+    # TurntoYellow -> DRY END (timeindex[1])
+    # 1stBoomStart -> FC START (timeindex[2])
+    # 1stBoomEnd -> FC END (timeindex[3])
+    # 2ndBoomStart -> SC START (timeindex[4])
+    # 2ndBoomEnd -> SC END (timeindex[5])
+    # BeansColdDown -> DROP (timeindex[6])
+
+    event2timeindex = {
+        'StartBeansIn': 0,  # CHARGE
+        'TurntoYellow': 1,  # DRY END
+        '1stBoomStart': 2,  # FC START
+        '1stBoomEnd': 3,    # FC END
+        '2ndBoomStart': 4,  # SC START
+        '2ndBoomEnd': 5,    # SC END
+        'BeansColdDown': 6  # DROP
+    }
+
+    def timex_diff(time:int, i:int) -> float:
+        return abs(timex[i] - time)
+
+    # Process events
+    for event_name, time_idx in event2timeindex.items():
+        if event_name in sections:
+            event_data = sections[event_name][0] if sections[event_name] else ''
+            if event_data and '@' in event_data:
+                # Parse format like "170@00:00" -> temperature@time
+                try:
+                    time_str = event_data.split('@')[1]
+                    time_parts = time_str.split(':')
+                    if len(time_parts) == 2:
+                        minutes = int(time_parts[0])
+                        seconds = int(time_parts[1])
+                        time_seconds = minutes * 60 + seconds
+                        # Find closest time index
+                        if timex:  # Ensure timex is not empty
+                            closest_idx = min(range(len(timex)), key=partial(timex_diff, time_seconds))
+                            timeindex[time_idx] = closest_idx
+                except (ValueError, IndexError) as e:
+                    _log.warning('Could not parse event time for %s: %s, error: %s', event_name, event_data, str(e))
+
+    # Set basic roast information
+    res['samplinginterval'] = 1.5  # Kaleido CSV sampling interval is 1.5 seconds
+    res['mode'] = 'C'  # Default Celsius
+
+    # Set roast data
+    res['timex'] = timex
+    res['temp1'] = temp1
+    res['temp2'] = temp2
+
+    res['timeindex'] = timeindex
+
+    # Set special events (if exist)
+    if len(specialevents) > 0:
+        res['specialevents'] = specialevents
+        res['specialeventstype'] = specialeventstype
+        res['specialeventsvalue'] = specialeventsvalue
+        res['specialeventsStrings'] = specialeventsStrings
+
+    # Kaleido has only 3 control events, using 3 from Artisan:
+    # SM (Fan/Air) -> Fan (0)
+    # RL (Rotation) -> Drum (1)
+    # HP (Heat Power) -> Burner (3)
+    # HPM (M=Manual Heat, A=PID Heat Control based on SV value) - Kaleido machine mode, not used as Artisan control event
+    # PS (Status) - Kaleido machine specific, not mapped to Artisan control event
+    res['etypes'] = [encodeLocalStrict(etype) for etype in alt_etypesdefault]
+
+    # Set roaster information
+    res['roastertype'] = 'Kaleido Legacy'
+    res['roastersize'] = 0.1  # Default roaster size
+
+
+    return res

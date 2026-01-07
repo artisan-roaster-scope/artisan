@@ -13,7 +13,7 @@ from typing import Final
 
 from PyQt6.QtCore import QDateTime, Qt
 
-from artisanlib.util import encodeLocal, weight_units, weight_units_lower
+from artisanlib.util import encodeLocalStrict, encodeLocal, weight_units, weight_units_lower
 from artisanlib.atypes import ProfileData
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -165,7 +165,7 @@ def extractProfileHiBeanJSON(file:str,
             res['specialeventsStrings'] = specialeventsStrings
 
         alt_etypesdefault[2] = 'TS'
-        res['etypes'] = alt_etypesdefault
+        res['etypes'] = [encodeLocalStrict(etype) for etype in alt_etypesdefault]
 
 
 

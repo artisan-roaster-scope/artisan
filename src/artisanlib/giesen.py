@@ -160,6 +160,6 @@ def extractProfileGiesenCSV(file:str,
         res['specialeventsStrings'] = specialeventsStrings
         if power_event or speed_event:
             # first set etypes to defaults
-            res['etypes'] = etypesdefault
+            res['etypes'] = [encodeLocalStrict(etype) for etype in etypesdefault]
     res['title'] = encodeLocalStrict(Path(file).stem)
     return res

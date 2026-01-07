@@ -142,7 +142,7 @@ def extractProfileStrongholdXLSX(file:str,
                 res['specialeventstype'] = [e[1] for e in events]
                 res['specialeventsvalue'] = [eventsExternal2InternalValue(int(round(float(e[2])))) for e in events]
                 res['specialeventsStrings'] = ['']*len(events)
-                res['etypes'] = alt_etypesdefault
+                res['etypes'] = [encodeLocalStrict(etype) for etype in alt_etypesdefault]
                 res['etypes'][0] = res['etypes'][1] + 'H'
                 res['etypes'][0] = res['etypes'][0] + 'S'
 

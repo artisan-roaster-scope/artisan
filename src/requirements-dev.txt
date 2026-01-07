@@ -6,7 +6,7 @@ types-pyserial>=3.5.0.20251001
 types-python-dateutil==2.9.0.20251115
 types-pytz>=2025.2.0.20251108
 types-pyyaml>=6.0.12.20250915
-types-requests>=2.32.4.20250913
+types-requests>=2.32.4.20260107
 types-setuptools>=80.9.0.20251223
 types-urllib3>=1.26.25.14
 types-docutils>=0.22.3.20251115
@@ -28,7 +28,7 @@ pytest-datadir==1.8.0
 #PyVirtualDisplay==3.0
 #pytest-bdd==6.1.1
 #pytest-benchmark==4.0.0
-hypothesis>=6.149.0
+hypothesis>=6.150.0
 coverage>=7.13.1
 coverage-badge==1.1.2
 codespell==2.4.1

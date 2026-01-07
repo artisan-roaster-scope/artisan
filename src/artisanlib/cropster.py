@@ -1213,7 +1213,7 @@ def extractProfileCropsterXLS(file:str,
                 res['specialeventsStrings'] = specialeventsStrings
                 if gas_event or airflow_event:
                     # first set etypes to defaults
-                    res['etypes'] = etypesdefault
+                    res['etypes'] = [encodeLocalStrict(etype) for etype in etypesdefault]
         except Exception as e: # pylint: disable=broad-except
             _log.error(e)
 

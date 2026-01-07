@@ -15,6 +15,7 @@ from artisanlib.atypes import ProfileData
 
 from artisanlib.giesen import extractProfileGiesenCSV
 from artisanlib.ikawa import extractProfileIkawaCSV
+from artisanlib.kaleido import extractProfileKaleidoCSV
 from artisanlib.loring import extractProfileLoringCSV
 from artisanlib.petroncini import extractProfilePetronciniCSV
 from artisanlib.roest import extractProfileRoestCSV
@@ -68,6 +69,7 @@ import_specs:list[ImportSpecs] = [
     (extractProfileCropsterXLS, 'cropster', '.xls'),
     (extractProfileGiesenCSV, 'giesen', '.csv'),
     (extractProfileIkawaCSV, 'ikawa', '.csv'),
+    (extractProfileKaleidoCSV, 'kaleido', '.csv'),
     (extractProfileLoringCSV, 'loring', '.csv'),
     (extractProfilePetronciniCSV, 'petroncini', '.csv'),
     (extractProfileRoestCSV, 'roest', '.csv'),
