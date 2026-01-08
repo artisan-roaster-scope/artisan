@@ -1,6 +1,6 @@
-<img align="right" src="https://raw.githubusercontent.com/artisan-roaster-scope/artisan/master/wiki/screenshots/artisan.png" width="70">
+<a href="https://artisan-scope.org/"><img align="right" src="https://raw.githubusercontent.com/artisan-roaster-scope/artisan/master/wiki/screenshots/artisan.png" width="70"></a>
 
-[Artisan](https://artisan-scope.org/)
+Artisan
 ==========
 Visual scope for coffee roasters
 
