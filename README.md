@@ -1,4 +1,4 @@
-<a href="https://artisan-scope.org/"><img align="right" src="https://raw.githubusercontent.com/artisan-roaster-scope/artisan/master/wiki/screenshots/artisan.png" width="70"></a>
+<img align="right" src="https://raw.githubusercontent.com/artisan-roaster-scope/artisan/master/wiki/screenshots/artisan.png" width="70">
 
 Artisan
 ==========
