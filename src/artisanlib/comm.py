@@ -1840,6 +1840,14 @@ class serialport:
     def ARC_METIT(self) -> tuple[float,float,float]:
         self.aw.qmc.extraArduinoTX = self.aw.qmc.timeclock.elapsedMilli()
         self.SP = self.aw.ser.SP # we link to the serial port object of the main device
+        if not self.SP.is_open:
+            # for proper serial error message set the serial parameters from main serial port object
+            self.comport = self.SP.port or self.comport
+            self.baudrate = self.SP.baudrate
+            self.bytesize = self.SP.bytesize
+            self.parity = self.SP.parity
+            self.stopbits = int(round(self.SP.stopbits))
+            self.timeout = self.SP.timeout or self.timeout
         t1,t2 = self.ARDUINOTC4temperature('1200') # t1 = chan1 (MET/Exhaust); t2 = chan2 (IT)
 # if the machine would return 4 channel (see comment in ARC_BTET above, one could fetch data with two requests (still a CHAN is needed before every READ!)
 #        t1 = self.aw.qmc.extraArduinoT1
@@ -1854,6 +1862,14 @@ class serialport:
     def HB_DTIT(self) -> tuple[float,float,float]:
         self.aw.qmc.extraArduinoTX = self.aw.qmc.timeclock.elapsedMilli()
         self.SP = self.aw.ser.SP # we link to the serial port object of the main device
+        if not self.SP.is_open:
+            # for proper serial error message set the serial parameters from main serial port object
+            self.comport = self.SP.port or self.comport
+            self.baudrate = self.SP.baudrate
+            self.bytesize = self.SP.bytesize
+            self.parity = self.SP.parity
+            self.stopbits = int(round(self.SP.stopbits))
+            self.timeout = self.SP.timeout or self.timeout
         t2,t1 = self.ARDUINOTC4temperature('2400')  # t2 = Extra2 = chan2 (Exhaust/MET); t1 = Extra1 = chan4 (ET/Drum)
         return self.aw.qmc.extraArduinoTX,t2,t1 # tx, Extra2, Extra1
 

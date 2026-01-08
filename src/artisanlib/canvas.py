@@ -19601,7 +19601,7 @@ class SampleThread(QThread): # pyrefly:ignore[invalid-inheritance] # pyright: ig
             while True:
                 if self.aw.qmc.flagon:
                     if next_time is None:
-                        next_time = libtime.perf_counter() + interval
+                        next_time = libtime.perf_counter()
                     else:
                         time_to_sleep = next_time - libtime.perf_counter()
                         if time_to_sleep>=0:

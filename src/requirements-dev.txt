@@ -14,7 +14,7 @@ types-xlrd>=2.0.0.20251020
 types-qrcode>=8.2.0.20250914
 lxml-stubs>=0.5.1
 mypy==1.19.1
-pyright==1.1.407
+pyright==1.1.408
 ruff>=0.14.9
 pylint==4.0.4
 pre-commit>=4.5.1
