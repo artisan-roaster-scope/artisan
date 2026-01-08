@@ -4069,9 +4069,13 @@ class tgraphcanvas(QObject):
                     return
 
     #PLUS
-                if not self.designerflag and not self.wheelflag and event.inaxes is None and not self.flagstart and not self.flagon and event.button == 1 and event.dblclick and \
-                        event.x < event.y and self.roastUUID is not None:
-                    QDesktopServices.openUrl(QUrl(roastLink(self.roastUUID), QUrl.ParsingMode.TolerantMode))
+                if not self.designerflag and not self.wheelflag and event.inaxes is None and not self.flagstart and not self.flagon and event.button == 1 and \
+                        event.x < event.y:
+                    if event.dblclick and self.roastUUID is not None:
+                        QDesktopServices.openUrl(QUrl(roastLink(self.roastUUID), QUrl.ParsingMode.TolerantMode))
+                        return
+                    # title not set => open Roast Properties dialog
+                    self.aw.open_roast_properties_dialog(start_recording_on_exit=False)
                     return
 
                 if event.dblclick and event.button == 1 and not self.designerflag and not self.wheelflag and event.inaxes:
@@ -14262,7 +14266,9 @@ class tgraphcanvas(QObject):
             if (self.aw.plus_account is not None and              # plus connected
                     not self.roastpropertiesAutoOpenFlag and      # no "Open on CHARGE"
                     not self.roastpropertiesAutoOpenDropFlag and  # no "Open on DROP"
-                    (self.plus_coffee is None and self.plus_blend_spec is None)): # beans are not set
+                    (self.plus_coffee is None and self.plus_blend_spec is None and self.beans == '') and # beans are not set
+                    (self.aw.schedule_window is None or self.aw.schedule_window.selected_remaining_item is None) # scheduler is off or no schedule item selected
+                    ):
                 self.aw.open_roast_properties_dialog(start_recording_on_exit=True)
                 return
 

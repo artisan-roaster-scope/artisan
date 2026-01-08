@@ -4524,6 +4524,15 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         self.set_menu(ui_mode)
         # configure toolbar
         self.set_toolbar(ui_mode)
+        # send message
+        if ui_mode is UI_MODE.PRODUCTION:
+            mode_name = QApplication.translate('Menu', 'Production')
+        elif ui_mode is UI_MODE.EXPERT:
+            mode_name = QApplication.translate('Menu', 'Expert')
+        else:
+            mode_name = QApplication.translate('Menu', 'Default')
+        self.sendmessageSignal.emit(
+            f"{QApplication.translate('Menu', 'Mode')}: {mode_name}",True,None)
 
     #
 
@@ -12485,6 +12494,11 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                             self.graphwheel()
                             self.wheeleditorAction.setChecked(self.qmc.wheelflag)
                         self.releaseminieditor()
+
+                    if self.qmc.foreground_event_last_picked_ind is not None or self.qmc.foreground_event_last_picked_pos is not None:
+                        self.qmc.clear_last_picked_event_selection()
+                        self.qmc.redraw_keep_view(recomputeAllDeltas=False)
+
                 elif k == Qt.Key.Key_Left: # 16777234:            #LEFT (moves background left / moves button selection left)
                     if self.qmc.foreground_event_last_picked_ind is not None and self.qmc.foreground_event_last_picked_pos is not None:
                         # a foreground event is selected; move it up

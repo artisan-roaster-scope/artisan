@@ -5727,7 +5727,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 self.aw.plus_account is not None and                 # plus connected
                 not self.aw.qmc.roastpropertiesAutoOpenFlag and      # no "Open on CHARGE"
                 not self.aw.qmc.roastpropertiesAutoOpenDropFlag and  # no "Open on DROP"
-                not (self.aw.qmc.plus_coffee is None and self.aw.qmc.plus_blend_spec is None)): # beans are set
+                (self.aw.qmc.plus_coffee is not None or self.aw.qmc.plus_blend_spec is not None or self.aw.qmc.beans != '')): # beans are set
             # we trigger the START of the recording on leaving this dialog
             self.aw.qmc.toggleRecorderSignal.emit()
 
