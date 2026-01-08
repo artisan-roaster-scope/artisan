@@ -393,7 +393,7 @@ class tgraphcanvas(QObject):
 
         #default palette of colors
         self.locale_str:str = locale
-        self.alpha:dict[str,float] = {'analysismask':0.4,'statsanalysisbkgnd':1.0,'legendbg':0.4}
+        self.alpha:dict[str,float] = {'analysismask':0.4,'statsanalysisbkgnd':1.0,'legendbg':0.8}
         self.palette:dict[str,str] = {'background':'#ffffff','grid':'#e5e5e5','ylabel':'#808080','xlabel':'#808080','title':'#0c6aa6',
                         'title_focus':'#cc0f50', 'title_hidden':'#808080',
                         'rect1':'#e5e5e5','rect2':'#b2b2b2','rect3':'#e5e5e5','rect4':'#bde0ee','rect5':'#d3d3d3',
@@ -1241,7 +1241,7 @@ class tgraphcanvas(QObject):
         self.delta_ax = self.ax.twinx()  # ty:ignore[possibly-missing-attribute]
 
         #legend location
-        self.legendloc:int = 7
+        self.legendloc:int = 4
         self.legendloc_pos:tuple[float,float]|None = None # holds the custom position of the legend set on profile load and reset after first redraw
 
         self.fig.subplots_adjust(
