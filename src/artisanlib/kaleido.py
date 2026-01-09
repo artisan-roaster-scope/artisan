@@ -21,12 +21,15 @@ import websockets
 from pymodbus.transport.serialtransport import create_serial_connection # patched pyserial-asyncio
 
 import logging
-from typing import Final, Optional, TypedDict, Union, Callable, Set, Any, Dict, Tuple, TYPE_CHECKING  #for Python >= 3.9: can remove 'List' since type hints can now use the generic 'list'
+from collections.abc import Callable
+from functools import partial
+from typing import Final,  TypedDict, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from websockets.asyncio.client import ClientConnection # pylint: disable=unused-import
 
-from artisanlib.atypes import SerialSettings
+from artisanlib.util import encodeLocalStrict
+from artisanlib.atypes import SerialSettings, ProfileData
 from artisanlib.async_comm import AsyncLoopThread
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -52,9 +55,9 @@ class KaleidoPort:
 
     def __init__(self) -> None:
         # internals
-        self._asyncLoopThread: Optional[AsyncLoopThread]     = None  # the asyncio AsyncLoopThread object
-        self._write_queue: Optional[asyncio.Queue[str]]      = None  # the write queue
-        self._running:bool                                   = False # while True we keep running the thread
+        self._asyncLoopThread: AsyncLoopThread|None     = None  # the asyncio AsyncLoopThread object
+        self._write_queue: asyncio.Queue[str]|None      = None  # the write queue
+        self._running:bool                              = False # while True we keep running the thread
 
         self._default_data_stream:Final[str] = 'A0'
         self._open_timeout:Final[float] = 6      # in seconds
@@ -77,7 +80,7 @@ class KaleidoPort:
         self._single_await_var_prefix = '!'
 
         # associates var names to pending request asyncio.Event locks
-        self._pending_requests: Dict[str, asyncio.Event] = {}
+        self._pending_requests: dict[str, asyncio.Event] = {}
 
         # configuration
         self._logging = False # if True device communication is logged
@@ -86,7 +89,7 @@ class KaleidoPort:
         self._logging = b
 
     # getETBT triggers a 'Read Device Data' request to the machine also fetching data other than BT/ET
-    def getBTET(self) -> Tuple[float,float, int]:
+    def getBTET(self) -> tuple[float,float, int]:
         if self.get_state('sid') is not None and self.get_state('TU') is not None:
             # only if initialization is complete (sid and TU received) we request data
             self.send_request('RD', self._default_data_stream, 'BT')
@@ -100,21 +103,21 @@ class KaleidoPort:
             return bt, et, sid
         return -1, -1, 0
 
-    def getSVAT(self) -> Tuple[float,float]:
+    def getSVAT(self) -> tuple[float,float]:
         ts = self.get_state('TS')
         at = self.get_state('AT')
         assert isinstance(ts, float)
         assert isinstance(at, float)
         return ts, at
 
-    def getDrumAH(self) -> Tuple[float,float]:
+    def getDrumAH(self) -> tuple[float,float]:
         rc = self.get_state('RC')
         ah = self.get_state('AH')
         assert isinstance(rc, int)
         assert isinstance(ah, int)
         return float(rc), float(ah)
 
-    def getHeaterFan(self) -> Tuple[float,float]:
+    def getHeaterFan(self) -> tuple[float,float]:
         hp = self.get_state('HP')
         fc = self.get_state('FC')
         assert isinstance(hp, int)
@@ -159,9 +162,9 @@ class KaleidoPort:
 
     # sync version of the corresponding get_state_async variant below
     # returns the current state of the given var or None (for sid/TU/SC/CL) and -1 (otherwise) if the state is unknown
-    def get_state(self, var:str) -> Optional[Union[str,int,float]]:
+    def get_state(self, var:str) -> str|int|float|None:
         if var in self._state:
-            return self._state[var] # type: ignore # TypedDict key must be a string literal
+            return self._state[var] # type: ignore[literal-required, no-any-return] # TypedDict key must be a string literal
         if var in {'sid', 'TU', 'SC', 'CL', 'SN'}:
             return None
         if self.intVar(var):
@@ -171,21 +174,21 @@ class KaleidoPort:
     # asyncio
 
     # returns the current state of the given var or None (for sid/TU/SC/CL/SN) and -1 (otherwise) if the state is unknown
-    async def get_state_async(self, var:str) -> Optional[Union[str,int,float]]:
+    async def get_state_async(self, var:str) -> str|int|float|None:
         return self.get_state(var)
 
     # if single_res is True we assume the state is set from a single var/value pair response and thus we clear the var prefixed by _single_await_var_prefix
     async def set_state(self, var:str, value:str, single_res:bool) -> None:
         if self.intVar(var):
-            self._state[var] = int(round(float(value))) # type: ignore # TypedDict key must be a string literal
+            self._state[var] = int(round(float(value))) # type: ignore[literal-required] # TypedDict key must be a string literal
         elif self.strVar(var):
-            self._state[var] = value # type: ignore # TypedDict key must be a string literal
+            self._state[var] = value # type: ignore[literal-required] # TypedDict key must be a string literal
         else:
             try:
-                self._state[var] = float(value) # type: ignore # TypedDict key must be a string literal
+                self._state[var] = float(value) # type: ignore[literal-required] # TypedDict key must be a string literal
             except Exception: # pylint: disable=broad-except
                 # if conversion to a float failed (maybe an unknown tag), we still keep the reading as original string
-                self._state[var] = value # type: ignore # TypedDict key must be a string literal
+                self._state[var] = value # type: ignore[literal-required] # TypedDict key must be a string literal
         clear_var = var
         if single_res:
             # value received by a response with a single var/value pair thus we clear the prefixed variable
@@ -225,7 +228,7 @@ class KaleidoPort:
 
     async def ws_handle_reads(self, websocket:'ClientConnection') -> None:
         while self._running:
-            res:Union[str,bytes] = await asyncio.wait_for(websocket.recv(), timeout=self._read_timeout)
+            res:str|bytes = await asyncio.wait_for(websocket.recv(), timeout=self._read_timeout)
             message:str = (str(res, 'utf-8') if isinstance(res, bytes) else res) # pyright: ignore[reportAssignmentType]
             if self._logging:
                 _log.info('received: %s',message.strip())
@@ -248,7 +251,7 @@ class KaleidoPort:
         if self._logging:
             _log.info('ws_write_process(%s)',message)
         await asyncio.wait_for(self.ws_write(websocket, message), self._send_timeout)
-        res:Union[str,bytes] = await asyncio.wait_for(websocket.recv(), self._ping_timeout)
+        res:str|bytes = await asyncio.wait_for(websocket.recv(), self._ping_timeout)
         response:str = (str(res, 'utf-8') if isinstance(res, bytes) else res) # pyright: ignore[reportAssignmentType]
         # register response
         await self.process_message(response.strip())
@@ -261,7 +264,7 @@ class KaleidoPort:
             try:
                 # send PING
                 await self.ws_write_process(websocket, self.create_msg('PI'))
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 _log.debug('ping response timeout')
             # check if response is ok
             if self.get_state('sid') is not None:
@@ -272,29 +275,29 @@ class KaleidoPort:
         try:
             # ping was successful, now we send the temperature mode via the queue
             await self.ws_write_process(websocket, self.create_msg('TU', mode))
-        except asyncio.TimeoutError:
+        except TimeoutError:
             _log.debug('TU response timeout')
         # send SC (start guard)
         try:
             # ping was successful, now we send the start guard via the queue
             await self.ws_write_process(websocket, self.create_msg('SC', 'AR'))
-        except asyncio.TimeoutError:
+        except TimeoutError:
             _log.debug('SC AR timeout')
 
     async def ws_connect(self, mode:str, host:str, port:int, path:str,
-                connected_handler:Optional[Callable[[], None]] = None,
-                disconnected_handler:Optional[Callable[[], None]] = None) -> None:
+                connected_handler:Callable[[], None]|None = None,
+                disconnected_handler:Callable[[], None]|None = None) -> None:
         while self._running:
             try:
                 _log.debug('connecting to ws://%s:%s/%s ...',host, port, path)
 
                 async for websocket in websockets.connect(f'ws://{host}:{port}/{path}', open_timeout=self._open_timeout):
-                    done: Set[asyncio.Task[Any]] = set()
-                    pending: Set[asyncio.Task[Any]] = set()
+                    done: set[asyncio.Task[Any]] = set()
+                    pending: set[asyncio.Task[Any]] = set()
                     try:
                         self._write_queue = asyncio.Queue()
                         await asyncio.wait_for(self.ws_initialize(websocket, mode), timeout=self._init_timeout)
-                        SN:Optional[Union[str,int,float]] = await self.get_state_async('SN')
+                        SN:str|int|float|None = await self.get_state_async('SN')
                         _log.debug('connected (%s)', SN)
                         if connected_handler is not None:
                             try:
@@ -323,7 +326,7 @@ class KaleidoPort:
                             if isinstance(exception, Exception):
                                 raise exception
 
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 _log.debug('connection timeout')
             except Exception as e: # pylint: disable=broad-except
                 _log.error(e)
@@ -342,8 +345,8 @@ class KaleidoPort:
 #---- Serial transport
 
     @staticmethod
-    async def open_serial_connection(url:str, *, loop:Optional[asyncio.AbstractEventLoop] = None,
-            limit:Optional[int] = None, **kwargs:Union[int,float,str]) -> Tuple[asyncio.StreamReader, asyncio.StreamWriter]:
+    async def open_serial_connection(url:str, *, loop:asyncio.AbstractEventLoop|None = None,
+            limit:int|None = None, **kwargs:int|float|str) -> tuple[asyncio.StreamReader, asyncio.StreamWriter]:
         """A wrapper for create_serial_connection() returning a (reader,
         writer) pair.
 
@@ -407,7 +410,7 @@ class KaleidoPort:
             try:
                 # send PING
                 await self.serial_write_process(reader, writer, self.create_msg('PI'))
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 _log.debug('ping response timeout')
             # check if response is ok
             if self.get_state('sid') is not None:
@@ -417,20 +420,20 @@ class KaleidoPort:
         try:
             # ping was successful, now we send the temperature mode
             await self.serial_write_process(reader, writer, self.create_msg('TU', mode))
-        except asyncio.TimeoutError:
+        except TimeoutError:
             _log.debug('TU response timeout')
         # send SC (start guard)
         try:
             # ping was successful, now we send the safe guard
             await self.serial_write_process(reader, writer, self.create_msg('SC', 'AR'))
-        except asyncio.TimeoutError:
+        except TimeoutError:
             _log.debug('SC AR timeout')
 
     async def serial_connect(self, mode:str, serial:SerialSettings,
-                connected_handler:Optional[Callable[[], None]] = None,
-                disconnected_handler:Optional[Callable[[], None]] = None) -> None:
+                connected_handler:Callable[[], None]|None = None,
+                disconnected_handler:Callable[[], None]|None = None) -> None:
 
-        writer:Optional[asyncio.StreamWriter] = None
+        writer:asyncio.StreamWriter|None = None
         while self._running:
             try:
                 _log.debug('connecting to %s@%s ...',serial['port'],serial['baudrate'])
@@ -445,7 +448,7 @@ class KaleidoPort:
                 # Wait for 2 seconds, then raise TimeoutError
                 reader, writer = await asyncio.wait_for(connect, timeout=self._open_timeout)
 
-                if reader is not None and writer is not None:
+                if writer is not None: # pyright:ignore[reportUnnecessaryComparison] # reader is never None!
                     self._write_queue = asyncio.Queue()
                     await asyncio.wait_for(self.serial_initialize(reader, writer, mode), timeout=self._init_timeout)
 
@@ -468,7 +471,7 @@ class KaleidoPort:
                         exception = task.exception()
                         if isinstance(exception, Exception):
                             raise exception
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 _log.debug('connection timeout')
             except Exception as e: # pylint: disable=broad-except
                 _log.error(e)
@@ -480,7 +483,7 @@ class KaleidoPort:
                             self._write_queue.task_done()
                     except Exception as e: # pylint: disable=broad-except
                         _log.error(e)
-                if writer is not None and writer.transport is not None:
+                if writer is not None:
                     try:
                         writer.transport.close()
                     except Exception as e: # pylint: disable=broad-except
@@ -508,7 +511,7 @@ class KaleidoPort:
 
     # message encoder
     # encodes given tag and value in a message respecting the expected type of the value per tag
-    def create_msg(self, tag:str, value:Optional[str] = None) -> str:
+    def create_msg(self, tag:str, value:str|None = None) -> str:
         if value is None:
             return f'{{[{tag}]}}\n'
         value_encoded:str
@@ -528,7 +531,7 @@ class KaleidoPort:
                 pass
         return f'{{[{tag} {value_encoded}]}}\n'
 
-    def send_msg(self, target:str, value:Optional[str] = None, timeout:Optional[float] = None) -> None:
+    def send_msg(self, target:str, value:str|None = None, timeout:float|None = None) -> None:
         send_timeout = self._send_timeout
         if timeout is not None:
             send_timeout = timeout
@@ -545,7 +548,7 @@ class KaleidoPort:
                     _log.error(ex)
 
     # adds message to write queue and awaits new data for var
-    async def write_await(self, message:str, var:str, await_var:str, timeout:Optional[float] = None) -> Optional[str]:
+    async def write_await(self, message:str, var:str, await_var:str, timeout:float|None = None) -> str|None:
         send_timeout:float = self._send_timeout
         if timeout is not None:
             send_timeout = timeout
@@ -557,7 +560,7 @@ class KaleidoPort:
         try:
             await asyncio.wait_for(task.wait(), send_timeout)
             return str(await self.get_state_async(var))
-        except asyncio.TimeoutError:
+        except TimeoutError:
             if self._logging:
                 _log.info('write_await timeout (msg=%s, timeout:%s, send_timeout:%s)',message.strip(),timeout,send_timeout)
         return None
@@ -566,8 +569,8 @@ class KaleidoPort:
     # <target> is the tag indicating the receiver of the <value>
     # will await new data assigned to given <var>, if <var> is not given, a response with a single <target>/value pair is awaited
     # using the target prefixed by _single_await_var_prefix as async.Event lock variable
-    def send_request(self, target:str, value:Optional[str] = None, var:Optional[str] = None,
-                timeout:Optional[float] = None, single_request:bool = False) -> Optional[str]:
+    def send_request(self, target:str, value:str|None = None, var:str|None = None,
+                timeout:float|None = None, single_request:bool = False) -> str|None:
         send_timeout:float = self._send_timeout
         if timeout is not None:
             send_timeout = timeout
@@ -598,9 +601,9 @@ class KaleidoPort:
     # mode: temperature mode; either C or F
     # if serial settings are given, host/port are ignore and communication handled by the given serial port
     def start(self, mode:str, host:str = '127.0.0.1', port:int = 80, path:str = 'ws',
-                serial:Optional[SerialSettings] = None,
-                connected_handler:Optional[Callable[[], None]] = None,
-                disconnected_handler:Optional[Callable[[], None]] = None) -> None:
+                serial:SerialSettings|None = None,
+                connected_handler:Callable[[], None]|None = None,
+                disconnected_handler:Callable[[], None]|None = None) -> None:
         try:
             # initialize data structures
             self._state = {}
@@ -630,3 +633,282 @@ class KaleidoPort:
         self._asyncLoopThread = None
         self._write_queue = None
         self.resetReadings()
+
+
+
+######
+
+# returns a dict containing all profile information contained in the given Kaleido CSV file
+def extractProfileKaleidoCSV(file:str,
+        _etypesdefault:list[str],
+        alt_etypesdefault:list[str],
+        _artisanflavordefaultlabels:list[str],
+        eventsExternal2InternalValue:Callable[[int],float]) -> ProfileData:
+    res:ProfileData = ProfileData() # the interpreted data set
+
+    # Initialize data list
+    timex:list[float] = []  # Timeline
+    temp1:list[float] = []  # ET
+    temp2:list[float] = []  # BT
+    BT_ror:list[float] = []  # BT RoR
+
+    specialevents:list[int] = []        # Special event time points
+    specialeventstype:list[int] = []    # Event Type (0=Fan, 1=Drum, 2=Damper, 3=Burner)
+    specialeventsvalue:list[float] = []   # Event value
+    specialeventsStrings:list[str] = [] # Event Description
+
+    timeindex:list[int] = [-1, 0, 0, 0, 0, 0, 0, 0]  # Time Index: [CHARGE, DRY END, FC START, FC END, SC START, SC END, DROP, COOL]
+                                            # CHARGE index init set to -1 as 0 could be an actual index used
+
+    # Analysis Kaleido CSV File（Kaleido The file is in text format and contains multiple sections.）
+    # Try multiple encodings to handle files with different character sets, especially Chinese characters
+    content = ''
+    encodings_to_try = ['utf-8', 'gbk', 'gb2312', 'latin-1']
+    for encoding in encodings_to_try:
+        try:
+            with open(file, encoding=encoding) as f:
+                content = f.read()
+            break  # If successful, exit the loop
+        except UnicodeDecodeError:
+            continue
+    else:
+        # If all encodings fail, try with utf-8 and ignore errors
+        with open(file, encoding='utf-8', errors='ignore') as f:
+            content = f.read()
+
+    # Split file content into different sections
+    sections:dict[str,list[str]] = {}
+    current_section:str|None = None
+    lines:list[str] = content.split('\n')
+
+    i:int = 0
+    while i < len(lines):
+        line = lines[i].strip()
+
+        # Check if it is a section tag, such as [{DATA}], [{EVENT}], [{CookDate}] ...
+        if line.startswith('[{') and line.endswith('}]'):
+            current_section = line[2:-2]  # Remove [{ and }]
+            sections[current_section] = []
+            i += 1
+            continue
+
+        # If currently in a certain section Inside, collecting content
+        if current_section and line:
+            sections[current_section].append(line)
+
+        i += 1
+
+    # Analyze basic information
+    # Analyzing the baking date and time
+    if 'CookDate' in sections and sections['CookDate']:
+        cook_date = sections['CookDate'][0].strip() if sections['CookDate'] else ''
+        if cook_date:
+            # Format: 25-05-18 19:32:48
+            try:
+                date_part, time_part = cook_date.split(' ')
+                year = f"20{date_part[:2]}"
+                month = date_part[3:5]
+                day = date_part[6:8]
+                res['roastdate'] = f"{year}-{month}-{day}"
+                res['roastisodate'] = f"{year}-{month}-{day}"
+                res['roasttime'] = time_part
+            except Exception: # pylint: disable=broad-except
+                _log.warning('Could not parse CookDate: %s', cook_date)
+
+    # Analyze comments/titles
+    if 'Comment' in sections and sections['Comment']:
+        comment_raw = sections['Comment'][0].strip() if sections['Comment'] else ''
+        if comment_raw:
+            # Handle encoding conversion for potential Chinese characters
+            try:
+                # Use encodeLocalStrict to properly handle different encodings
+                comment = encodeLocalStrict(comment_raw)
+                res['title'] = comment
+            except Exception:
+                # Fallback to raw comment if encoding fails
+                res['title'] = comment_raw
+
+    # Parse DATA section
+    if 'DATA' in sections:
+        data_lines = sections['DATA']
+
+        # First line is header
+        if data_lines:
+            #headers = [h.strip() for h in data_lines[0].split(',')]
+
+            # Store previous parameter values to detect changes
+            last_fan:float|None = None      # Corresponds to SM (Fan/Air) -> Fan (index 0)
+            last_drum:float|None = None     # Corresponds to RL (Rotation) -> Drum (index 1)
+            last_burner:float|None = None   # Corresponds to HP (Heat Power) -> Burner (index 3)
+
+            # Prepare lists for extra device data
+            sm_list:list[float] = []  # SM (Fan/Air) -> Fan %
+            rl_list:list[float] = []  # RL (Rotation) -> Drum %
+            hp_list:list[float] = []  # HP (Heat Power) -> Burner %
+            sv_list:list[float] = []  # SV (Set Value) -> Set Value
+            hpm_list:list[float] = [] # HPM (Manual/Auto mode) -> Mode (not displayed in Roast Properties Data)
+            # ps_list:list[float] = []  # PS (Status) -> Status (not displayed in Roast Properties Data)
+
+            for idx, line_raw in enumerate(data_lines[1:]):  # Skip the header row
+                line = line_raw.strip()
+                if line:
+                    parts = line.split(',')
+                    if len(parts) >= 11:  # Ensure there are enough columns
+                        try:
+                            # 解析数据列: Index,Time,BT,ET,RoR,SV,HPM,HP,SM,RL,PS
+                            # Index = parts[0] (跳过)
+                            time_ms = int(parts[1])      # Time (milliseconds)
+                            bt = float(parts[2])         # BT
+                            et = float(parts[3])         # ET
+                            ror = float(parts[4])        # RoR
+                            sv = float(parts[5])         # Set value
+
+                            hpm_str = parts[6].strip()   # HPM (Manual/Auto Mode - M=Manual Heating, A=PID Heating Control based on SV value)
+                            hp_str = parts[7].strip()    # HP (Burner)
+                            sm_str = parts[8].strip()    # SM (Air damper setting)
+                            rl_str = parts[9].strip()    # RL (RPM)
+#                            ps_str = parts[10].strip()   # PS (Burner Status - O OR C)
+
+                            # Conversion time (milliseconds to seconds)
+                            time_sec = time_ms / 1000.0
+
+                            # Convert each parameter value
+                            hpm = hpm_str if hpm_str else 'M'  # Default to manual mode
+                            hp = float(hp_str) if hp_str and hp_str not in ['0', ''] else 0.0
+                            sm = float(sm_str) if sm_str and sm_str not in ['0', ''] else 0.0
+                            rl = float(rl_str) if rl_str and rl_str not in ['0', ''] else 0.0
+#                            ps = ps_str if ps_str else 'O'  # Default to firepower on.
+
+                            # Add to the data list
+                            timex.append(time_sec)
+                            temp1.append(et)
+                            temp2.append(bt)
+                            BT_ror.append(ror)
+
+                            # Add to extra device data lists
+                            sm_list.append(sm)
+                            rl_list.append(rl)
+                            hp_list.append(hp)
+                            sv_list.append(sv)
+                            # HPM: M=Manual Heat (1), A=PID Heat Control based on SV value (0) - Kaleido machine mode, not displayed in Roast Properties Data
+                            hpm_numeric = 1 if hpm == 'M' else 0
+                            hpm_list.append(hpm_numeric) # HPM data not added to extra device list
+                            # PS: O=Heat On (1), C=Heat Off (0) - Kaleido machine specific, not displayed in Roast Properties Data
+                            # ps_numeric = 1 if ps == 'O' else 0
+                            # ps_list.append(ps_numeric) - PS data not added to extra device list
+
+                            # Detect Fan (SM - Fan/Air) changes - Map to Artisan Fan (index 0)
+                            if sm != last_fan:
+                                last_fan = sm
+                                specialeventsvalue.append(eventsExternal2InternalValue(int(sm)))
+                                specialevents.append(idx)
+                                specialeventstype.append(0)  # Fan
+                                specialeventsStrings.append(encodeLocalStrict(f'SM={int(sm)}%'))
+
+                            # Detect Drum (RL - Rotation) changes - Map to Artisan Drum (index 1)
+                            if rl != last_drum:
+                                last_drum = rl
+                                specialeventsvalue.append(eventsExternal2InternalValue(int(rl)))
+                                specialevents.append(idx)
+                                specialeventstype.append(1)  # Drum
+                                specialeventsStrings.append(encodeLocalStrict(f'RL={int(rl)}%'))
+
+                            # Detect Burner (HP - Heat Power) changes - Map to Artisan Burner (index 3)
+                            if hp != last_burner:
+                                last_burner = hp
+                                specialeventsvalue.append(eventsExternal2InternalValue(int(hp)))
+                                specialevents.append(idx)
+                                specialeventstype.append(3)  # Burner
+                                specialeventsStrings.append(encodeLocalStrict(f'HP={int(hp)}%'))
+
+                        except (ValueError, IndexError) as e:
+                            # Skip unparsable lines
+                            _log.warning('Could not parse data line: %s, error: %s', line, str(e))
+                            continue
+
+            # Add extra device data - Include all Kaleido parameters except HPM and PS
+            if timex:  # Ensure there is data
+                res['extradevices'] = [141, 139, 140, 25]  # Device IDs
+                res['extraname1'] = ['{3}', 'SV', '{1}', 'RoR']
+                res['extraname2'] = ['{0}', 'AT', 'AH', '']
+                res['extratimex'] = [timex[:], timex[:], timex[:], timex[:]]
+                res['extratemp1'] = [hp_list, sv_list, rl_list, BT_ror]
+                res['extratemp2'] = [sm_list, [0]*len(timex), hpm_list, [0]*len(timex)]
+                res['extraDelta1'] = [False, False, False, True]
+                res['extraDelta2'] = [False, False, False, False]
+
+    # Parse event timestamps and map to Artisan timeindex
+    # Mapping relationship:
+    # StartBeansIn -> CHARGE (timeindex[0])
+    # TurntoYellow -> DRY END (timeindex[1])
+    # 1stBoomStart -> FC START (timeindex[2])
+    # 1stBoomEnd -> FC END (timeindex[3])
+    # 2ndBoomStart -> SC START (timeindex[4])
+    # 2ndBoomEnd -> SC END (timeindex[5])
+    # BeansColdDown -> DROP (timeindex[6])
+
+    event2timeindex = {
+        'StartBeansIn': 0,  # CHARGE
+        'TurntoYellow': 1,  # DRY END
+        '1stBoomStart': 2,  # FC START
+        '1stBoomEnd': 3,    # FC END
+        '2ndBoomStart': 4,  # SC START
+        '2ndBoomEnd': 5,    # SC END
+        'BeansColdDown': 6  # DROP
+    }
+
+    def timex_diff(time:int, i:int) -> float:
+        return abs(timex[i] - time)
+
+    # Process events
+    for event_name, time_idx in event2timeindex.items():
+        if event_name in sections:
+            event_data = sections[event_name][0] if sections[event_name] else ''
+            if event_data and '@' in event_data:
+                # Parse format like "170@00:00" -> temperature@time
+                try:
+                    time_str = event_data.split('@')[1]
+                    time_parts = time_str.split(':')
+                    if len(time_parts) == 2:
+                        minutes = int(time_parts[0])
+                        seconds = int(time_parts[1])
+                        time_seconds = minutes * 60 + seconds
+                        # Find closest time index
+                        if timex:  # Ensure timex is not empty
+                            closest_idx = min(range(len(timex)), key=partial(timex_diff, time_seconds))
+                            timeindex[time_idx] = closest_idx
+                except (ValueError, IndexError) as e:
+                    _log.warning('Could not parse event time for %s: %s, error: %s', event_name, event_data, str(e))
+
+    # Set basic roast information
+    res['samplinginterval'] = 1.5  # Kaleido CSV sampling interval is 1.5 seconds
+    res['mode'] = 'C'  # Default Celsius
+
+    # Set roast data
+    res['timex'] = timex
+    res['temp1'] = temp1
+    res['temp2'] = temp2
+
+    res['timeindex'] = timeindex
+
+    # Set special events (if exist)
+    if len(specialevents) > 0:
+        res['specialevents'] = specialevents
+        res['specialeventstype'] = specialeventstype
+        res['specialeventsvalue'] = specialeventsvalue
+        res['specialeventsStrings'] = specialeventsStrings
+
+    # Kaleido has only 3 control events, using 3 from Artisan:
+    # SM (Fan/Air) -> Fan (0)
+    # RL (Rotation) -> Drum (1)
+    # HP (Heat Power) -> Burner (3)
+    # HPM (M=Manual Heat, A=PID Heat Control based on SV value) - Kaleido machine mode, not used as Artisan control event
+    # PS (Status) - Kaleido machine specific, not mapped to Artisan control event
+    res['etypes'] = [encodeLocalStrict(etype) for etype in alt_etypesdefault]
+
+    # Set roaster information
+    res['roastertype'] = 'Kaleido Legacy'
+    res['roastersize'] = 0.1  # Default roaster size
+
+
+    return res
