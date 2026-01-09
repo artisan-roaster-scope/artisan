@@ -661,8 +661,20 @@ def extractProfileKaleidoCSV(file:str,
                                             # CHARGE index init set to -1 as 0 could be an actual index used
 
     # Analysis Kaleido CSV File（Kaleido The file is in text format and contains multiple sections.）
-    with open(file, encoding='utf-8') as f:
-        content = f.read()
+    # Try multiple encodings to handle files with different character sets, especially Chinese characters
+    content:str = ''
+    encodings_to_try = ['utf-8', 'gbk', 'gb2312', 'latin-1']
+    for encoding in encodings_to_try:
+        try:
+            with open(file, encoding=encoding) as f:
+                content = f.read()
+            break  # If successful, exit the loop
+        except UnicodeDecodeError:
+            continue
+    else:
+        # If all encodings fail, try with utf-8 and ignore errors
+        with open(file, encoding='utf-8', errors='ignore') as f:
+            content = f.read()
 
     # Split file content into different sections
     sections:dict[str,list[str]] = {}
@@ -705,9 +717,15 @@ def extractProfileKaleidoCSV(file:str,
 
     # Analyze comments/titles
     if 'Comment' in sections and sections['Comment']:
-        comment = sections['Comment'][0].strip() if sections['Comment'] else ''
-        if comment:
-            res['title'] = comment
+        comment_raw = sections['Comment'][0].strip() if sections['Comment'] else ''
+        if comment_raw:
+            # Handle encoding conversion for potential Chinese characters
+            try:
+                # Use encodeLocalStrict to properly handle different encodings
+                res['title'] = encodeLocalStrict(comment_raw)
+            except Exception: # pylint: disable=broad-except
+                # Fallback to raw comment if encoding fails
+                res['title'] = comment_raw
 
     # Parse DATA section
     if 'DATA' in sections:
