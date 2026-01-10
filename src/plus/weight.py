@@ -1202,11 +1202,12 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefl
                         # only if Task Display Roasted is active; strictly not necessary,
                         #   but this way it allows to deactivate the mechanism
                     self.roasted_task_scale == 0 and                                       # no scale yet assigned to the roasted task
-                    # either there is no current roasted weight item or there is a single one
-                    (self.sm_roasted.current_weight_item is None or
-                        # the current weight item is the only non-completed one (first and last uncompleted):
-                        (self.aw.schedule_window is not None and
-                         self.aw.schedule_window.is_only_not_completed_item(self.sm_roasted.current_weight_item.uuid))) and
+#                    # either there is no current roasted weight item or there is a single one
+#                    (self.sm_roasted.current_weight_item is None or
+#                        # the current weight item is the only non-completed one (first and last uncompleted):
+#                        # this restriction may avoids confusion by measure/assign weight to wrong (roasted) batch (check disabled for now)
+#                        (self.aw.schedule_window is not None and
+#                         self.aw.schedule_window.is_only_not_completed_item(self.sm_roasted.current_weight_item.uuid))) and
                     self.empty_bucket_placed(step, (None if self.sm_roasted.current_weight_item is None else self.sm_roasted.current_weight_item.weight), False)): # empty roasted bucket recognized
 
                 self.sm_roasted.set_accuracy(0)

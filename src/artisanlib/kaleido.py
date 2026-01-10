@@ -782,7 +782,8 @@ def extractProfileKaleidoCSV(file:str,
                             timex.append(time_sec)
                             temp1.append(et)
                             temp2.append(bt)
-                            BT_ror.append(ror)
+                            # Convert ROR from C/30s to C/60s for Artisan compatibility
+                            BT_ror.append(ror * 2) # Kaleido ROR is in C/30s, Artisan expects C/60s
 
                             # Add to extra device data lists
                             sm_list.append(sm)
@@ -831,7 +832,7 @@ def extractProfileKaleidoCSV(file:str,
                 res['extraname1'] = ['{3}', 'SV', '{1}', 'RoR']
                 res['extraname2'] = ['{0}', 'AT', 'AH', '']
                 res['extratimex'] = [timex[:], timex[:], timex[:], timex[:]]
-                res['extratemp1'] = [hp_list, sv_list, rl_list, BT_ror]
+                res['extratemp1'] = [hp_list, sv_list, rl_list, [r * 2 for r in BT_ror]] # Convert ROR values to C/60s
                 res['extratemp2'] = [sm_list, [0]*len(timex), hpm_list, [0]*len(timex)]
                 res['extraDelta1'] = [False, False, False, True]
                 res['extraDelta2'] = [False, False, False, False]

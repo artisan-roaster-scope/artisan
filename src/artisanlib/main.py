@@ -2555,7 +2555,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
         self.productionModeAction.setChecked(False)
         self.UIModeMenu.addAction(self.productionModeAction)
         #
-        self.defaultModeAction:QAction = QAction(QApplication.translate('Menu', 'Default'), self)
+        self.defaultModeAction:QAction = QAction(QApplication.translate('Menu', 'Standard'), self)
         self.defaultModeAction.triggered.connect(self.setDefaultMode)
         self.defaultModeAction.setCheckable(True)
         self.defaultModeAction.setChecked(True)
