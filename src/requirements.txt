@@ -40,12 +40,12 @@ pyusb==1.3.1
 persist-queue==1.1.0
 portalocker==3.2.0
 xlrd==2.0.2
-websockets==15.0.1
+websockets==16.0
 PyYAML==6.0.3
 psutil==7.2.1
-protobuf==6.33.2
-numpy==2.4.0
-scipy==1.16.3
+protobuf==6.33.3
+numpy==2.4.1
+scipy==1.17.0
 wquantiles==0.6
 colorspacious==1.1.2
 openpyxl==3.1.5

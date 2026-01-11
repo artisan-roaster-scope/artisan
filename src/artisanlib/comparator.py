@@ -18,8 +18,8 @@
 import sys
 import platform
 import numpy
-from matplotlib import ticker, transforms # type:ignore[untyped-import,unused-ignore]
-from matplotlib import rcParams # type:ignore[untyped-import,unused-ignore]
+from matplotlib import ticker, transforms # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore]
+from matplotlib import rcParams # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore]
 import logging
 from collections.abc import Callable, Sequence
 from typing import override, Final, TypedDict, Literal, cast, TYPE_CHECKING
@@ -27,9 +27,9 @@ from typing import override, Final, TypedDict, Literal, cast, TYPE_CHECKING
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
     from artisanlib.atypes import ProfileData # pylint: disable=unused-import
-    from matplotlib.lines import Line2D # type:ignore[untyped-import,unused-ignore]# pylint: disable=unused-import
-    from matplotlib.backend_bases import PickEvent # type:ignore[untyped-import,unused-ignore] # pylint: disable=unused-import
-    from matplotlib.legend import Legend # type:ignore[untyped-import,unused-ignore] # pylint: disable=unused-import
+    from matplotlib.lines import Line2D # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore] # pylint: disable=unused-import
+    from matplotlib.backend_bases import PickEvent # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore] # pylint: disable=unused-import
+    from matplotlib.legend import Legend # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore] # pylint: disable=unused-import
     from PyQt6.QtWidgets import QLayoutItem, QLayout, QScrollBar # pylint: disable=unused-import
     from PyQt6.QtGui import QStandardItem, QKeyEvent, QDropEvent, QDragEnterEvent, QCloseEvent # pylint: disable=unused-import
     from PyQt6.QtCore import QMimeData # pylint: disable=unused-import
@@ -87,7 +87,7 @@ class RoastProfile:
         self.aligned:bool = True # if the profile could not be aligned it is not drawn
         self.active:bool = True # if selected or all are unselected; active profiles are drawn in color, inactive profiles in gray
         self.color:tuple[float, float, float, float] = color
-        hslf:tuple[float|None, float|None, float|None, float|None] = QColor.fromRgbF(*color).getHslF() # ty:ignore[missing-argument]
+        hslf:tuple[float|None, float|None, float|None, float|None] = QColor.fromRgbF(*color).getHslF()
         self.gray:tuple[float, float, float, float]
         ch:float|None = hslf[0]
         cl:float|None = hslf[2]
@@ -420,11 +420,11 @@ class RoastProfile:
         self.events1 = []
         self.events2 = []
         self.events_timex = []
-        if self.stemp1 is not None and self.stemp2 is not None: # type:ignore[redundant-expr]
+        if self.stemp1 is not None and self.stemp2 is not None: # type:ignore[redundant-expr] # ty:ignore[ignore]
             for ti in self.timeindex[:-1]:
-                temp1:float|None = (self.stemp1[ti] if len(self.stemp1)>ti else None) # pyrefly: ignore
-                temp2:float|None = (self.stemp2[ti] if len(self.stemp2)>ti else None) # pyrefly: ignore
-                if ((len(self.events1) == 0 and ti != -1) or ti > 0): # pyrefly: ignore[bad-argument-type]
+                temp1:float|None = (self.stemp1[ti] if len(self.stemp1)>ti else None)
+                temp2:float|None = (self.stemp2[ti] if len(self.stemp2)>ti else None)
+                if ((len(self.events1) == 0 and ti != -1) or ti > 0):
                     self.events1.append(temp1)
                     self.events2.append(temp2)
                     self.events_timex.append(self.timex[ti])
@@ -458,8 +458,8 @@ class RoastProfile:
             for i,e in enumerate(self.specialevents):
                 try:
                     etime:float = self.timex[e]
-                    etype:float = self.specialeventstype[i]  # pyrefly: ignore[unsupported-operation]
-                    evalue:float = self.aw.qmc.eventsInternal2ExternalValue(self.specialeventsvalue[i]) * value_factor + value_offset # pyrefly: ignore[unsupported-operation]
+                    etype:float = self.specialeventstype[i]
+                    evalue:float = self.aw.qmc.eventsInternal2ExternalValue(self.specialeventsvalue[i]) * value_factor + value_offset
                     # remember last event value per type before CHARGE
                     if (not self.aw.qmc.compareBBP and self.timeindex[0] != -1 and e < self.timeindex[0]):
                         if etype == 0:
@@ -618,7 +618,7 @@ class RoastProfile:
         if self.aw.qmc.swapdeltalcds:
             alpha[2] = self.alpha[3]
             alpha[3] = self.alpha[2]
-        for ll, a in zip( # type:ignore[unused-ignore] # pright: error: "object*" is not iterable
+        for ll, a in zip(
                 [
                     self.l_mainEvents2, self.l_temp2,
                     self.l_mainEvents1, self.l_temp1,
@@ -672,7 +672,7 @@ class RoastProfile:
                 ll.set_xdata(numpy.array([x-offset for x in self.timex]))
 
         # shifting the extra curves
-        for i, (ll1, ll2) in enumerate(zip(self.l_extratemp1, self.l_extratemp2, strict=True)): # ty:ignore
+        for i, (ll1, ll2) in enumerate(zip(self.l_extratemp1, self.l_extratemp2, strict=True)):
             if ll1 is not None:
                 ll1.set_transform(deltaTransZero if self.extraDelta1[i] else tempTransZero) # we reset the transformation to avoid a double shift along the timeaxis
                 ll1.set_xdata(numpy.array([x-offset for x in self.extratimex[i]]))
@@ -735,7 +735,7 @@ class RoastProfile:
         self.l_events2 = None
         self.l_events3 = None
         self.l_events4 = None
-        for i, (ll1, ll2) in enumerate(zip(self.l_extratemp1, self.l_extratemp2, strict=True)): # ty:ignore
+        for i, (ll1, ll2) in enumerate(zip(self.l_extratemp1, self.l_extratemp2, strict=True)):
             try:
                 if ll1 is not None:
                     ll1.remove()
@@ -899,7 +899,7 @@ class RoastProfile:
     def drawEvents(self, events:list[tuple[float, float]], n:int) -> 'Line2D|None':
         if self.aw.qmc.ax is not None:
             if events:
-                timex,values = zip(*events, strict=True) # ty:ignore
+                timex,values = zip(*events, strict=True)
             else:
                 timex,values = (),()
             line, = self.aw.qmc.ax.plot(list(timex), list(values), color=(self.color if self.active else self.gray),
@@ -922,7 +922,7 @@ class RoastProfile:
         self.l_events4 =  self.drawEvents(self.E4, 3)
 
 
-class CompareTableWidget(QTableWidget): # pyrefly:ignore[invalid-inheritance] # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+class CompareTableWidget(QTableWidget):
     deleteKeyPressed = pyqtSignal()
 
     @pyqtSlot('QKeyEvent')
@@ -1093,7 +1093,7 @@ class roastCompareDlg(ArtisanDialog):
         self.disableButtons()
         self.aw.disableEditMenus(compare=True)
 
-        self.pick_handler_id = self.aw.qmc.fig.canvas.mpl_connect('pick_event', self.onpick_event) # type: ignore[arg-type] # incompatible type "Callable[[PickEvent], None]"; expected "Callable[[Event], Any]
+        self.pick_handler_id = self.aw.qmc.fig.canvas.mpl_connect('pick_event', self.onpick_event) # type: ignore[arg-type] # ty:ignore[ignore] # incompatible type "Callable[[PickEvent], None]"; expected "Callable[[Event], Any]
 
         settings = QSettings()
         if settings.contains('CompareGeometry'):
@@ -1413,7 +1413,7 @@ class roastCompareDlg(ArtisanDialog):
                     frame.set_alpha(self.aw.qmc.alpha['legendbg'])
                     frame.set_edgecolor(self.aw.qmc.palette['legendborder'])
                     frame.set_linewidth(0.5)
-                    for line,text in zip(self.legend.get_lines(), self.legend.get_texts(), strict=True): # ty:ignore
+                    for line,text in zip(self.legend.get_lines(), self.legend.get_texts(), strict=True):
                         text.set_color(line.get_color())
             elif self.legend is not None:
                 self.legend.remove()
@@ -1450,7 +1450,7 @@ class roastCompareDlg(ArtisanDialog):
 
     def setProfileTableRow(self, i:int) -> None:
         profile = self.profiles[i]
-        c = QColor.fromRgbF(*profile.color)  # ty:ignore[missing-argument]
+        c = QColor.fromRgbF(*profile.color)
         color = QTableWidgetItem()
         color.setBackground(c)
         color.setFlags(Qt.ItemFlag.ItemIsEnabled) # do not change background color on row selection of the color items
@@ -1803,7 +1803,7 @@ class roastCompareDlg(ArtisanDialog):
     def updateAlignMenu(self, top:RoastProfile|None) -> None:
         if top is not None:
             model = self.alignComboBox.model()
-            assert isinstance(model, QStandardItemModel) # pyrefly: ignore[invalid-argument]
+            assert isinstance(model, QStandardItemModel)
             for i in range(model.rowCount()):
                 item: QStandardItem|None = model.item(i)
                 if item is not None:
@@ -1844,7 +1844,7 @@ class roastCompareDlg(ArtisanDialog):
         if top is not None and len(top.extraname1) > 0:
             self.cb.insertSeparator(6)
             offset:int = 7
-            for i, (name1, name2) in enumerate(zip(top.extraname1, top.extraname2, strict=True)): # ty:ignore
+            for i, (name1, name2) in enumerate(zip(top.extraname1, top.extraname2, strict=True)):
                 self.cb.addItem(QApplication.translate('CheckBox',name1))
                 i1 = offset + i*2
                 item1 = self.model.item(i1)
@@ -1882,9 +1882,9 @@ class roastCompareDlg(ArtisanDialog):
             w = self.profileTable.item(i,0)
             if w is not None:
                 if p.active:
-                    c = QColor.fromRgbF(*p.color) # ty:ignore[missing-argument]
+                    c = QColor.fromRgbF(*p.color)
                 else:
-                    c = QColor.fromRgbF(*p.gray)  # ty:ignore[missing-argument]
+                    c = QColor.fromRgbF(*p.gray)
                 w.setBackground(c)
         if self.aw.qpc is not None:
             self.aw.qpc.update_phases(self.getPhasesData())
@@ -2085,7 +2085,7 @@ class roastCompareDlg(ArtisanDialog):
                 p1:float = dry
                 p3:float = total - fcs if fcs != 0 else 0
                 p2:float = total - p1 - p3 if p1 != 0 and p3 != 0 else 0
-                c:QColor = QColor.fromRgbF(*p.color) # ty:ignore[missing-argument]
+                c:QColor = QColor.fromRgbF(*p.color)
                 t1:float = p.temp2[p.timeindex[1]] if p.timeindex[1] != 0 and len(p.temp2) > p.timeindex[1] else -1
                 t2:float = p.temp2[p.timeindex[2]] if p.timeindex[2] != 0 and len(p.temp2) > p.timeindex[2] else -1
                 t3:float = p.temp2[p.timeindex[6]] if p.timeindex[6] != 0 and len(p.temp2) > p.timeindex[6] else (p.temp2[-1] if len(p.temp2)>0 else -1)

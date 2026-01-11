@@ -2681,8 +2681,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 item0 = layout.itemAt(0)
                 if item0 is not None:
                     checkBox = item0.widget()
-                    if checkBox is not None and isinstance(checkBox, QCheckBox): # pyrefly: ignore[invalid-argument]
-                        return checkBox.isChecked() # type:ignore[reportAttributeAccessIssue, unused-ignore] # pyright reports isChecked not known for QWidget
+                    if checkBox is not None and isinstance(checkBox, QCheckBox):
+                        return checkBox.isChecked() # type:ignore[reportAttributeAccessIssue, unused-ignore]  # ty:ignore[ignore # pyright reports isChecked not known for QWidget
         return False
 
     def createDeviceTable(self) -> None:
@@ -4869,7 +4869,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(bool)
     def showExtradevHelp(self, _checked:bool = False) -> None:
-        from help import symbolic_help # type: ignore [attr-defined,unused-ignore] # pylint: disable=no-name-in-module
+        from help import symbolic_help # type: ignore [attr-defined,unused-ignore]  # ty:ignore[ignore # pylint: disable=no-name-in-module
         self.helpdialog = self.aw.showHelpDialog(
                 self,            # this dialog as parent
                 self.helpdialog, # the existing help dialog
@@ -4878,7 +4878,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(bool)
     def showSymbolicHelp(self, _checked:bool = False) -> None:
-        from help import symbolic_help # type: ignore [attr-defined,unused-ignore] # pylint: disable=no-name-in-module
+        from help import symbolic_help # type: ignore [attr-defined,unused-ignore]  # ty:ignore[ignore # pylint: disable=no-name-in-module
         self.helpdialog = self.aw.showHelpDialog(
                 self,            # this dialog as parent
                 self.helpdialog, # the existing help dialog
@@ -4887,7 +4887,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(bool)
     def showhelpprogram(self, _checked:bool = False) -> None:
-        from help import programs_help # type: ignore [attr-defined,unused-ignore] # pylint: disable=no-name-in-module
+        from help import programs_help # type: ignore [attr-defined,unused-ignore]  # ty:ignore[ignore # pylint: disable=no-name-in-module
         self.helpdialog = self.aw.showHelpDialog(
                 self,            # this dialog as parent
                 self.helpdialog, # the existing help dialog

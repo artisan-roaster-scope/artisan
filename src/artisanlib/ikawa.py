@@ -18,7 +18,7 @@ from PyQt6.QtCore import QDateTime, Qt, QMutex, QWaitCondition, QUrl
 from artisanlib.util import encodeLocal, encodeLocalStrict
 from artisanlib.atypes import ProfileData
 from artisanlib.ble_port import ClientBLE
-from proto import IkawaCmd_pb2 # type:ignore[unused-ignore]
+from proto import IkawaCmd_pb2 # type:ignore[unused-ignore] # ty:ignore[ignore]
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -206,7 +206,7 @@ def extractProfileIkawaCSV(file:str,
         last_item:dict[str,str]|None = None
         for row in data:
             i = i + 1
-            items = list(zip(header, row, strict=False)) # ty:ignore
+            items = list(zip(header, row, strict=False))
             item:dict[str,str] = {}
             for (name, value) in items:
                 item[name] = value.strip()

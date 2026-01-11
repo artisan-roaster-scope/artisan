@@ -93,7 +93,7 @@ def addPath(uuid: str, path: str) -> None:
     fh:IO[str]
     try:
         register_semaphore.acquire(1)
-        with portalocker.Lock(uuid_cache_path_lock, timeout=0.5) as fh: # pyrefly: ignore
+        with portalocker.Lock(uuid_cache_path_lock, timeout=0.5) as fh:
             addPathShelve(uuid, path, fh)
     except portalocker.exceptions.LockException as e:
         _log.exception(e)
@@ -106,7 +106,7 @@ def addPath(uuid: str, path: str) -> None:
             _log.debug(
                 'retry register:addPath(%s,%s)', str(uuid), str(path)
             )
-            with portalocker.Lock(uuid_cache_path_lock, timeout=0.3) as fh:  # pyrefly: ignore
+            with portalocker.Lock(uuid_cache_path_lock, timeout=0.3) as fh:
                 addPathShelve(uuid, path, fh)
         except Exception as ex:  # pylint: disable=broad-except
             _log.exception(ex)
@@ -126,7 +126,7 @@ def getPath(uuid: str) -> str|None:
     db:shelve.Shelf[str]
     try:
         register_semaphore.acquire(1)
-        with portalocker.Lock(uuid_cache_path_lock, timeout=0.5) as fh: # pyrefly: ignore
+        with portalocker.Lock(uuid_cache_path_lock, timeout=0.5) as fh:
             try:
                 with shelve.open(uuid_cache_path) as db:
                     try:
@@ -154,7 +154,7 @@ def getPath(uuid: str) -> str|None:
             )
             Path(uuid_cache_path_lock).unlink()
             _log.debug('retry register:getPath(%s)', str(uuid))
-            with portalocker.Lock(uuid_cache_path_lock, timeout=0.3) as fh: # pyrefly: ignore
+            with portalocker.Lock(uuid_cache_path_lock, timeout=0.3) as fh:
                 try:
                     with shelve.open(uuid_cache_path) as db:
                         try:

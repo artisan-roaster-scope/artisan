@@ -29,7 +29,7 @@ from PyQt6.QtWidgets import (
     QStyleOptionMenuItem, QStyleOptionViewItem, QStylePainter, QWidget)
 
 
-class CheckComboBox(QComboBox): # pyrefly:ignore[invalid-inheritance] # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+class CheckComboBox(QComboBox):
     """A QComboBox allowing multiple item selection.
     """
 
@@ -38,7 +38,7 @@ class CheckComboBox(QComboBox): # pyrefly:ignore[invalid-inheritance] # pyright:
     __slots__ = [ '__popupIsShown', '__blockMouseReleaseTimer', '__initialMousePos', '__separator', '__placeholderText' ]
 
 
-    class ComboItemDelegate(QStyledItemDelegate): # pyrefly:ignore[invalid-inheritance] # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+    class ComboItemDelegate(QStyledItemDelegate):
         """Helper styled delegate (mostly based on existing private Qt's
         delegate used by the QComboBox). Used to style the popup like a
         list view (e.g windows style).
@@ -68,7 +68,7 @@ class CheckComboBox(QComboBox): # pyrefly:ignore[invalid-inheritance] # pyright:
             else:
                 super().paint(painter, option, index)
 
-    class ComboMenuDelegate(QAbstractItemDelegate): # pyrefly:ignore[invalid-inheritance] # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+    class ComboMenuDelegate(QAbstractItemDelegate):
         """Helper styled delegate (mostly based on existing private Qt's
         delegate used by the QComboBox). Used to style the popup like a
         menu. (e.g osx aqua style).
@@ -84,7 +84,7 @@ class CheckComboBox(QComboBox): # pyrefly:ignore[invalid-inheritance] # pyright:
             style = option.widget.style()
             if style is not None:
                 style.drawControl(QStyle.ControlElement.CE_MenuItem, menuopt, painter,
-                                  option.widget) # pyrefly: ignore[bad-argument-type]
+                                  option.widget)
 
         @override
         def sizeHint(self, option:QStyleOptionViewItem, index:'QModelIndex') -> QSize:
@@ -94,21 +94,21 @@ class CheckComboBox(QComboBox): # pyrefly:ignore[invalid-inheritance] # pyright:
             if style is not None:
                 return style.sizeFromContents(
                     QStyle.ContentsType.CT_MenuItem, menuopt, menuopt.rect.size(),
-                    option.widget)  # pyrefly: ignore[bad-argument-type]
+                    option.widget)
             return QSize()
 
         def _getMenuStyleOption(self, option:QStyleOptionViewItem, index:'QModelIndex') -> 'QStyleOption':
             menuoption = QStyleOptionMenuItem()
             palette = option.palette.resolve(QApplication.palette('QMenu'))
             foreground = index.data(Qt.ItemDataRole.ForegroundRole)
-            if isinstance(foreground, (QBrush, QColor, QPixmap)): # pyrefly: ignore[invalid-argument]
+            if isinstance(foreground, (QBrush, QColor, QPixmap)):
                 foreground = QBrush(foreground)
                 palette.setBrush(QPalette.ColorRole.Text, foreground)
                 palette.setBrush(QPalette.ColorRole.ButtonText, foreground)
                 palette.setBrush(QPalette.ColorRole.WindowText, foreground)
 
             background = index.data(Qt.ItemDataRole.BackgroundRole)
-            if isinstance(background, (QBrush, QColor, QPixmap)): # pyrefly: ignore[invalid-argument]
+            if isinstance(background, (QBrush, QColor, QPixmap)):
                 background = QBrush(background)
                 try:
                     palette.setBrush(QPalette.ColorRole.Base, background)
@@ -120,7 +120,7 @@ class CheckComboBox(QComboBox): # pyrefly:ignore[invalid-inheritance] # pyright:
             menuoption.palette = palette
 
             decoration = index.data(Qt.ItemDataRole.DecorationRole)
-            if isinstance(decoration, QIcon): # pyrefly: ignore[invalid-argument]
+            if isinstance(decoration, QIcon):
                 menuoption.icon = decoration # pyrefly: ignore[bad-assignment]
 
             if self.isSeparator(index):
@@ -136,7 +136,7 @@ class CheckComboBox(QComboBox): # pyrefly:ignore[invalid-inheritance] # pyright:
             check = index.data(Qt.ItemDataRole.CheckStateRole)
             menuoption.checked = check == Qt.CheckState.Checked
 
-            menuoption.font = option.widget.font()                    # pyrefly: ignore[bad-assignment]
+            menuoption.font = option.widget.font()
 #            if option.widget is not None:
 #                menuoption.font = option.widget.font()
 #            else:
@@ -178,7 +178,7 @@ class CheckComboBox(QComboBox): # pyrefly:ignore[invalid-inheritance] # pyright:
 
     def __init__(self, parent:QWidget|None = None, placeholderText:str = '', separator:str = ', ',
                  **kwargs:dict[str,Any]) -> None:
-        super().__init__(parent, **kwargs)  # pyrefly: ignore[bad-argument-count]
+        super().__init__(parent, **kwargs)
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
 
         self.__popupIsShown:bool = False
@@ -322,7 +322,7 @@ class CheckComboBox(QComboBox): # pyrefly:ignore[invalid-inheritance] # pyright:
         state : Qt.CheckState
         """
         state = self.itemData(index, role=Qt.ItemDataRole.CheckStateRole)
-        if isinstance(state, (int, Qt.CheckState)): # pyrefly: ignore[invalid-argument]
+        if isinstance(state, (int, Qt.CheckState)):
             return Qt.CheckState(state)
         return Qt.CheckState.Unchecked
 
@@ -405,7 +405,7 @@ def example() -> int:
     cb = CheckComboBox(placeholderText='None')
     model = cb.model()
     if model is not None:
-        assert isinstance(model, QStandardItemModel) # pyrefly: ignore[invalid-argument]
+        assert isinstance(model, QStandardItemModel)
         cb.addItem('First')
         item0 = model.item(0)
         if item0 is not None:

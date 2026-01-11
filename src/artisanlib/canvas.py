@@ -49,14 +49,14 @@ if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
     from plus.stock import Blend # pylint: disable=unused-import
     from plus.blend import CustomBlend # pylint: disable=unused-import
-    from matplotlib.collections import PolyCollection # type:ignore[untyped-import,unused-ignore] # pylint: disable=unused-import
-    from matplotlib.axes import Axes # type:ignore[untyped-import,unused-ignore]# pylint: disable=unused-import
-    from matplotlib.axes._base import _AxesBase # type:ignore[untyped-import,unused-ignore]# pyright:ignore[reportPrivateImportUsage] # pylint: disable=unused-import
-    from matplotlib.image import AxesImage # type:ignore[untyped-import,unused-ignore]# pylint: disable=unused-import
-    from matplotlib.legend import Legend # type:ignore[untyped-import,unused-ignore]# pylint: disable=unused-import
-    from matplotlib.backend_bases import Event # type:ignore[untyped-import,unused-ignore]# pylint: disable=unused-import
-    from matplotlib.font_manager import FontProperties # type:ignore[untyped-import,unused-ignore]# pylint: disable=unused-import
-    from matplotlib.ticker import Locator # type:ignore[untyped-import,unused-ignore]# pylint: disable=unused-import
+    from matplotlib.collections import PolyCollection # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore] # pylint: disable=unused-import
+    from matplotlib.axes import Axes # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore] # pylint: disable=unused-import
+    from matplotlib.axes._base import _AxesBase # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore] # pyright:ignore[reportPrivateImportUsage] # pylint: disable=unused-import
+    from matplotlib.image import AxesImage # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore] # pylint: disable=unused-import
+    from matplotlib.legend import Legend # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore] # pylint: disable=unused-import
+    from matplotlib.backend_bases import Event # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore] # pylint: disable=unused-import
+    from matplotlib.font_manager import FontProperties # type:ignore[untyped-import,unused-ignore]# ty:ignore[ignore] # pylint: disable=unused-import
+    from matplotlib.ticker import Locator # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore] # pylint: disable=unused-import
     import numpy.typing as npt # pylint: disable=unused-import
     from PyQt6.QtGui import QResizeEvent # pylint: disable=unused-import
 
@@ -89,25 +89,25 @@ from PyQt6.QtCore import (QLocale, pyqtSignal, pyqtSlot,
 from PyQt6 import sip
 
 
-from matplotlib.figure import Figure # type:ignore[untyped-import,unused-ignore]
-from matplotlib import rcParams, patches, transforms, ticker # type:ignore[untyped-import,unused-ignore]
-import matplotlib.patheffects as PathEffects # type:ignore[untyped-import,unused-ignore]
-from matplotlib.patches import Polygon, Rectangle # type:ignore[untyped-import,unused-ignore]
-from matplotlib.transforms import Bbox, Transform # type:ignore[untyped-import,unused-ignore]
-from matplotlib.backend_bases import PickEvent, MouseEvent # type:ignore[untyped-import,unused-ignore]
-from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas # type:ignore[untyped-import,unused-ignore]
-from matplotlib.projections.polar import PolarAxes # type:ignore[untyped-import,unused-ignore]
-from matplotlib.text import Annotation, Text # type:ignore[untyped-import,unused-ignore]
-from matplotlib.lines import Line2D # type:ignore[untyped-import,unused-ignore]
-from matplotlib.offsetbox import DraggableAnnotation # type:ignore[untyped-import,unused-ignore]
-from matplotlib.colors import to_hex, to_rgba # type:ignore[untyped-import,unused-ignore]
+from matplotlib.figure import Figure # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore]
+from matplotlib import rcParams, patches, transforms, ticker # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore]
+import matplotlib.patheffects as PathEffects # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore]
+from matplotlib.patches import Polygon, Rectangle # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore]
+from matplotlib.transforms import Bbox, Transform # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore]
+from matplotlib.backend_bases import PickEvent, MouseEvent # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore]
+from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore]
+from matplotlib.projections.polar import PolarAxes # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore]
+from matplotlib.text import Annotation, Text # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore]
+from matplotlib.lines import Line2D # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore]
+from matplotlib.offsetbox import DraggableAnnotation # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore]
+from matplotlib.colors import to_hex, to_rgba # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore]
 
 from artisanlib.phidgets import PhidgetManager
-from Phidget22.VoltageRange import VoltageRange # type: ignore[import-untyped]
+from Phidget22.VoltageRange import VoltageRange # type: ignore[import-untyped] # ty:ignore[ignore]
 
 try:
     # spanning a second multiprocessing instance on macOS falils to import the YAPI interface
-    from yoctopuce.yocto_api import YAPI # type: ignore[import-untyped]
+    from yoctopuce.yocto_api import YAPI # type: ignore[import-untyped] # ty:ignore[ignore]
 except Exception: # pylint: disable=broad-except
     pass
 
@@ -148,7 +148,7 @@ type Interp1dKind = Literal['linear', 'nearest', 'nearest-up', 'zero', 'slinear'
 #################### Ambient Data Collection  #########################################
 #######################################################################################
 
-class AmbientWorker(QObject): # pyrefly:ignore[invalid-inheritance] # pylint: disable=too-few-public-methods # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+class AmbientWorker(QObject):
     finished = pyqtSignal()
 
     def __init__(self, aw:'ApplicationWindow') -> None:
@@ -172,7 +172,7 @@ class MplCanvas(FigureCanvas):
 
         self.fig:Figure = Figure(tight_layout=tight_layout_params, frameon=True, dpi=dpi)
         # with tight_layout=True, the matplotlib canvas expands to the maximum using figure.autolayout
-        super().__init__(self.fig) # type: ignore[no-untyped-call]
+        super().__init__(self.fig) # type: ignore[no-untyped-call] # ty:ignore[ignore]
         self.setParent(parent)
 
         self.lazyredraw_on_resize_timer:QTimer =  QTimer()
@@ -184,8 +184,8 @@ class MplCanvas(FigureCanvas):
         self.lazyredraw(recomputeAllDeltas=False)
 
     @override
-    def resizeEvent(self, event:'QResizeEvent') -> None: # pyrefly:ignore[bad-override]
-        super().resizeEvent(event) # type:ignore[no-untyped-call]
+    def resizeEvent(self, event:'QResizeEvent') -> None:
+        super().resizeEvent(event) # type:ignore[no-untyped-call] # ty:ignore[ignore]
         # we only trigger a redraw on resize if a watermark is displayed to fix its aspect ratio
         if self.aw.redrawOnResize and self.aw.logofilename != '':
             dw = event.size().width() - event.oldSize().width()   # width change
@@ -1238,7 +1238,7 @@ class tgraphcanvas(QObject):
         self.ax:Axes|None
         self.ax = self.fig.add_subplot(111,facecolor=self.palette['background'])
         self.delta_ax:_AxesBase|None = None
-        self.delta_ax = self.ax.twinx()  # ty:ignore[possibly-missing-attribute]
+        self.delta_ax = self.ax.twinx()
 
         #legend location
         self.legendloc:int = 4
@@ -1251,10 +1251,10 @@ class tgraphcanvas(QObject):
             left=0.067, # the left side of the subplots of the figure (default: 0.125)
             right=.925) # the right side of the subplots of the figure (default: 0.9)
 
-        #self.fig.canvas.set_cursor = lambda _: None # type: ignore[assignment, method-assign] # deactivate the busy cursor on slow full redraws
+        #self.fig.canvas.set_cursor = lambda _: None # type: ignore[assignment, method-assign] # ty:ignore[ignore] # deactivate the busy cursor on slow full redraws
 
         # important to make the Qt canvas transparent (note that this changes stylesheets of children like popups too!):
-        if isinstance(self.fig.canvas, QWidget): # pyrefly: ignore[invalid-argument]
+        if isinstance(self.fig.canvas, QWidget):
             cast(QWidget, self.fig.canvas).setStyleSheet('background-color:transparent;') # default is white
 
         self.onclick_cid:int = self.fig.canvas.mpl_connect('button_press_event', self.onclick)
@@ -2020,15 +2020,15 @@ class tgraphcanvas(QObject):
         self.ystep_down:int = 0
         self.ystep_up:int = 0
 
-        self.ax.set_xlim(self.startofx, self.endofx)  # ty:ignore[possibly-missing-attribute]
-        self.ax.set_ylim(self.ylimit_min,self.ylimit) # ty:ignore[possibly-missing-attribute]
+        self.ax.set_xlim(self.startofx, self.endofx)
+        self.ax.set_ylim(self.ylimit_min,self.ylimit)
 
-        self.delta_ax.set_xlim(self.startofx, self.endofx)  # ty:ignore[possibly-missing-attribute]
-        self.delta_ax.set_ylim(self.zlimit_min,self.zlimit) # ty:ignore[possibly-missing-attribute]
-        self.delta_ax.set_autoscale_on(False)  # ty:ignore[possibly-missing-attribute]
+        self.delta_ax.set_xlim(self.startofx, self.endofx)
+        self.delta_ax.set_ylim(self.zlimit_min,self.zlimit)
+        self.delta_ax.set_autoscale_on(False)
 
         # disable figure autoscale
-        self.ax.set_autoscale_on(False)  # ty:ignore[possibly-missing-attribute]
+        self.ax.set_autoscale_on(False)
 
         #set grid + axis labels + title
         grid_axis:str|None = None
@@ -2039,8 +2039,8 @@ class tgraphcanvas(QObject):
         elif self.time_grid:
             grid_axis = 'x'
         if grid_axis is not None:
-            self.ax.grid(True, # ty:ignore[possibly-missing-attribute]
-                axis=grid_axis, # type: ignore[arg-type] # "grid" of "_AxesBase" has incompatible type "str"; expected "Literal['both', 'x', 'y']
+            self.ax.grid(True,
+                axis=grid_axis, # type: ignore[arg-type] # ty:ignore[ignore] # "grid" of "_AxesBase" has incompatible type "str"; expected "Literal['both', 'x', 'y']
                 color=self.palette['grid'],
                 linestyle = self.gridstyles[self.gridlinestyle],
                 linewidth = self.gridthickness,
@@ -2673,7 +2673,7 @@ class tgraphcanvas(QObject):
     def ax_lines_clear(self) -> None:
         if self.ax is not None:
             while len(self.ax.lines) > 0:
-                self.ax.lines[0].remove() # pyrefly: ignore[index-error]
+                self.ax.lines[0].remove()
 
     def ax_combo_text_annotations_clear(self) -> None:
         if self.ax is not None:
@@ -2897,7 +2897,7 @@ class tgraphcanvas(QObject):
             elif self.ambientTemp == 0.0 and self.device in {34, 58}: # Phidget 1048 or TMP1101 channel 4 (use internal temp)
                 try:
                     if self.aw.ser.PhidgetTemperatureSensor is not None and self.aw.ser.PhidgetTemperatureSensor[0].getAttached():
-                        from Phidget22.Devices.TemperatureSensor import TemperatureSensor as PhidgetTemperatureSensor # type: ignore[import-untyped]
+                        from Phidget22.Devices.TemperatureSensor import TemperatureSensor as PhidgetTemperatureSensor # type: ignore[import-untyped] # ty:ignore[ignore]
                         ambient = PhidgetTemperatureSensor()
                         ambient.setDeviceSerialNumber(self.aw.ser.PhidgetTemperatureSensor[0].getDeviceSerialNumber())
                         if self.device == 58:
@@ -4556,7 +4556,7 @@ class tgraphcanvas(QObject):
         # take trail of length l and remove items where temp[i]=None to fulfil precond. of numpy.interp
         tx_org:list[float] = []
         temp_trail:list[float] = []
-        for x, tp in zip(tx_in[-l:], temp_in[-l:], strict=True): # we only iterate over l-elements # ty:ignore
+        for x, tp in zip(tx_in[-l:], temp_in[-l:], strict=True): # we only iterate over l-elements
             if tp is not None and tp != -1:
                 tx_org.append(x)
                 temp_trail.append(tp)
@@ -4570,7 +4570,7 @@ class tgraphcanvas(QObject):
         tx_lin = numpy.flip(numpy.arange(tx_org[-1],tx_org[-1]-l*d,-d), axis=0) # by construction, len(tx_lin)=len(tx_org)=l
         temp_trail_re = numpy.interp(tx_lin, tx_org, temp_trail) # resample data into that linear spaced time
         try:
-            return float(numpy.average(temp_trail_re[-len(decay_weights):],axis=0,weights=decay_weights[-l:])) # pyrefly: ignore[bad-index] # ty: ignore[not-subscriptable] # len(decay_weights)>len(temp_trail_re)=l is possible
+            return float(numpy.average(temp_trail_re[-len(decay_weights):],axis=0,weights=decay_weights[-l:]))
         except Exception: # pylint: disable=broad-except
             # in case something goes very wrong we at least return the standard average over temp, this should always work as len(tx)=len(temp)
             return float(numpy.average(numpy.array(temp_trail)))
@@ -6024,7 +6024,7 @@ class tgraphcanvas(QObject):
     @staticmethod
     def lists2AlarmSet(l:list[Any]) -> 'AlarmSet':
         if len(l) == tgraphcanvas.ALARMSET_ITEMS:
-            return tgraphcanvas.makeAlarmSet(*l) # ty:ignore[missing-argument]
+            return tgraphcanvas.makeAlarmSet(*l)
         return tgraphcanvas.emptyAlarmSet()
 
     @staticmethod
@@ -6584,27 +6584,27 @@ class tgraphcanvas(QObject):
                 if self.projectionmode == 0 or (self.projectionmode == 1 and (self.timex[-1]-charge)<=60*5): # linear temperature projection mode based on current RoR
                     #calculate the temperature endpoint at endofx according to the latest rate of change
                     if self.l_BTprojection is not None:
-                        if self.BTcurve and len(self.unfiltereddelta2_pure) > 0 and len(self.ctemp2) > 0 and self.ctemp2[-1] is not None and self.ctemp2[-1] != -1 and not math.isnan(self.ctemp2[-1]): # ty:ignore[invalid-argument-type]
+                        if self.BTcurve and len(self.unfiltereddelta2_pure) > 0 and len(self.ctemp2) > 0 and self.ctemp2[-1] is not None and self.ctemp2[-1] != -1 and not math.isnan(self.ctemp2[-1]):
                             # projection extended to the plots current endofx
                             left = now
                             right = max(left, xlim_right + charge) # never have the right point be left of left;)
-                            BTprojection = self.ctemp2[-1] + self.unfiltereddelta2_pure[-1]*(right - left)/60. # ty:ignore[unsupported-operator] # pyrefly: ignore[unsupported-operation]
+                            BTprojection = self.ctemp2[-1] + self.unfiltereddelta2_pure[-1]*(right - left)/60. # pyrefly: ignore[unsupported-operation]
                             #plot projection
                             self.BTprojection_tx = [left,right]
-                            self.BTprojection_temp = [self.ctemp2[-1], BTprojection] # ty:ignore[invalid-assignment] # pyrefly: ignore[bad-assignment]
+                            self.BTprojection_temp = [self.ctemp2[-1], BTprojection] # pyrefly: ignore[bad-assignment]
                         else:
                             self.BTprojection_tx = []
                             self.BTprojection_temp = []
                         self.l_BTprojection.set_data(self.BTprojection_tx, self.BTprojection_temp)
                     if self.l_ETprojection is not None:
-                        if self.ETcurve and len(self.unfiltereddelta1_pure) > 0 and len(self.ctemp1) > 0 and self.ctemp1[-1] is not None and self.ctemp1[-1] != -1 and not math.isnan(self.ctemp1[-1]): # ty:ignore[invalid-argument-type]
+                        if self.ETcurve and len(self.unfiltereddelta1_pure) > 0 and len(self.ctemp1) > 0 and self.ctemp1[-1] is not None and self.ctemp1[-1] != -1 and not math.isnan(self.ctemp1[-1]):
                             # projection extended to the plots current endofx
                             left = now
                             right = max(left,xlim_right + charge) # never have the right point be left of left;)
-                            ETprojection = self.ctemp1[-1] + self.unfiltereddelta1_pure[-1]*(right - left)/60. # ty:ignore[unsupported-operator] # pyrefly: ignore[unsupported-operation]
+                            ETprojection = self.ctemp1[-1] + self.unfiltereddelta1_pure[-1]*(right - left)/60. # pyrefly: ignore[unsupported-operation]
                             #plot projection
                             self.ETprojection_tx = [left,right]
-                            self.ETprojection_temp = [self.ctemp1[-1], ETprojection] # ty:ignore[invalid-assignment] # pyrefly: ignore[bad-assignment]
+                            self.ETprojection_temp = [self.ctemp1[-1], ETprojection] # pyrefly: ignore[bad-assignment]
                         else:
                             self.ETprojection_tx = []
                             self.ETprojection_temp = []
@@ -6620,7 +6620,7 @@ class tgraphcanvas(QObject):
 
                     # NOTE: we use the unfiltered deltas here to make this work also with a delta symbolic formula like x/2 to render RoR in C/30sec
                     if self.l_BTprojection is not None:
-                        if (len(self.ctemp2) > 0 and self.ctemp2[-1] is not None and self.ctemp2[-1] != -1 and not math.isnan(self.ctemp2[-1]) and # ty:ignore[invalid-argument-type]
+                        if (len(self.ctemp2) > 0 and self.ctemp2[-1] is not None and self.ctemp2[-1] != -1 and not math.isnan(self.ctemp2[-1]) and
                                 len(self.unfiltereddelta2_pure)>delta_interval_BT and
                                 self.unfiltereddelta2_pure[-1] and
                                 self.unfiltereddelta2_pure[-1]>0 and
@@ -6639,14 +6639,14 @@ class tgraphcanvas(QObject):
                                 delta_sec = delta_sec + deltadelta_secsec*delay
                             #plot BT curve
                             self.BTprojection_tx = xpoints.tolist()
-                            self.BTprojection_temp = ypoints # ty:ignore[invalid-assignment] # pyrefly: ignore[bad-assignment]
+                            self.BTprojection_temp = ypoints # pyrefly: ignore[bad-assignment]
                         else:
                             self.BTprojection_tx = []
                             self.BTprojection_temp = []
                         self.l_BTprojection.set_data(self.BTprojection_tx, self.BTprojection_temp)
 
                     if self.l_ETprojection is not None:
-                        if (len(self.ctemp1) > 0 and self.ctemp1[-1] is not None and self.ctemp1[-1] != -1 and not math.isnan(self.ctemp1[-1]) and # ty:ignore[invalid-argument-type]
+                        if (len(self.ctemp1) > 0 and self.ctemp1[-1] is not None and self.ctemp1[-1] != -1 and not math.isnan(self.ctemp1[-1]) and
                                 len(self.unfiltereddelta1_pure)>delta_interval_BT and
                                 self.unfiltereddelta1_pure[-1] and
                                 self.unfiltereddelta1_pure[-1]>0 and
@@ -6665,7 +6665,7 @@ class tgraphcanvas(QObject):
                                 delta_sec = delta_sec + deltadelta_secsec*delay
                             #plot ET curve
                             self.ETprojection_tx = xpoints.tolist()
-                            self.ETprojection_temp = ypoints # ty:ignore[invalid-assignment] # pyrefly: ignore[bad-assignment]
+                            self.ETprojection_temp = ypoints # pyrefly: ignore[bad-assignment]
                         else:
                             self.ETprojection_tx = []
                             self.ETprojection_temp = []
@@ -6942,7 +6942,7 @@ class tgraphcanvas(QObject):
                     if idx > -1: # we passed the AUCbegin event
                         mathdictionary['AUCbase'] = sample_temp2[idx]
                     else:
-                        mathdictionary['AUCbase'] = None # Event not set yet, no AUCbase # ty:ignore[unsupported-operator] # pyrefly: ignore[unsupported-operation]
+                        mathdictionary['AUCbase'] = None # Event not set yet, no AUCbase
                 else:
                     mathdictionary['AUCbase'] = self.AUCbase
                 if self.AUCtargetFlag and self.backgroundprofile is not None and self.AUCbackground > 0:
@@ -7165,7 +7165,7 @@ class tgraphcanvas(QObject):
                                     #no shift
                                     elif mathexpression[i+k+1] == '1':
                                         if k == 0:
-                                            mathdictionary['R1'] = sample_delta1[index] # ty:ignore[unsupported-operator] # pyrefly: ignore[unsupported-operation]
+                                            mathdictionary['R1'] = sample_delta1[index]
                                         else:
                                             #if sampling
                                             if RTsname is not None and RTsname != '':
@@ -7174,7 +7174,7 @@ class tgraphcanvas(QObject):
                                                 idx = index
                                             # the index is resolved relative to the time of the foreground profile if available
                                             if not sample_timex:
-                                                mathdictionary['RB1'] = self.delta1B[idx] # ty:ignore[unsupported-operator] # pyrefly: ignore[unsupported-operation]
+                                                mathdictionary['RB1'] = self.delta1B[idx]
                                             else:
                                                 if RTsname is not None and RTsname != '':
                                                     if len(sample_timex)>2:
@@ -7189,10 +7189,10 @@ class tgraphcanvas(QObject):
                                                     res = self.delta1B[idx]
                                                 else:
                                                     res = -1
-                                                mathdictionary['RB1'] = res # ty:ignore[unsupported-operator] # pyrefly: ignore[unsupported-operation]
+                                                mathdictionary['RB1'] = res
                                     elif mathexpression[i+k+1] == '2':
                                         if k == 0:
-                                            mathdictionary['R2'] = sample_delta2[index] # ty:ignore[unsupported-operator] # pyrefly: ignore[unsupported-operation]
+                                            mathdictionary['R2'] = sample_delta2[index]
                                         else:
                                             if RTsname is not None and RTsname != '':
                                                 idx = index + 1
@@ -7200,7 +7200,7 @@ class tgraphcanvas(QObject):
                                                 idx = index
                                             # the index is resolved relative to the time of the foreground profile if available
                                             if not sample_timex:
-                                                mathdictionary['RB2'] = self.delta2B[idx] # ty:ignore[unsupported-operator] # pyrefly: ignore[unsupported-operation]
+                                                mathdictionary['RB2'] = self.delta2B[idx]
                                             else:
                                                 if RTsname is not None and RTsname != '':
                                                     if len(sample_timex)>2:
@@ -7215,7 +7215,7 @@ class tgraphcanvas(QObject):
                                                     res = self.delta2B[idx]
                                                 else:
                                                     res = -1
-                                                mathdictionary['RB2'] = res # ty:ignore[unsupported-operator] # pyrefly: ignore[unsupported-operation]
+                                                mathdictionary['RB2'] = res
                         except Exception: # pylint: disable=broad-except
                             # if deltas of backgrounds are not visible the data is not calculated and thus this fails with an exception
                             pass
@@ -8320,8 +8320,8 @@ class tgraphcanvas(QObject):
                 else:
                     result:list[float] = []
                     # ignore -1 readings in averaging and ensure a good ramp
-                    for i, v in enumerate(b): # ty: ignore[invalid-argument-type] # pyrefly: ignore [bad-argument-type]
-                        seq = b[max(0,i-window_len + 1):i+1] # ty: ignore[not-subscriptable] # pyrefly: ignore[bad-index]
+                    for i, v in enumerate(b):
+                        seq = b[max(0,i-window_len + 1):i+1]
                         w = decay_weights_internal[max(0,window_len-len(seq)):]  # preCond: len(decay_weights_internal)=window_len and len(seq) <= window_len; postCond: len(w)=len(seq)
                         if len(w) == 0:
                             # we don't average if there is are no weights (e.g. if the original seq did only contain -1 values and got empty)
@@ -8367,8 +8367,8 @@ class tgraphcanvas(QObject):
             # we mask the error value -1 and Numpy  in the temperature array
             mb:numpy.ndarray[tuple[Literal[1]],numpy.dtype[numpy.float64]] = cast(numpy.ndarray[tuple[Literal[1]],numpy.dtype[numpy.float64]], numpy.ma.masked_equal(b[fromIndex:toIndex], -1))
             # split in masked and
-            unmasked_slices = [(x,False) for x in numpy.ma.clump_unmasked(mb)] # type:ignore[no-untyped-call] # the valid readings
-            masked_slices = [(x,True) for x in numpy.ma.clump_masked(mb)]  # type:ignore[no-untyped-call] # the dropped values
+            unmasked_slices = [(x,False) for x in numpy.ma.clump_unmasked(mb)] # type:ignore[no-untyped-call] # ty:ignore[ignore] # the valid readings
+            masked_slices = [(x,True) for x in numpy.ma.clump_masked(mb)]  # type:ignore[no-untyped-call] # ty:ignore[ignore] # the dropped values
             sorted_slices = sorted(unmasked_slices + masked_slices, key=lambda tup: tup[0].start) # pyright:ignore[reportUnknownArgumentType] # pyright: ignore[reportGeneralTypeIssues]
             b_smoothed:list[npt.NDArray[numpy.double]] = [] # pyright:ignore[reportUnknownArgumentType] # b_smoothed collects the smoothed segments in order
             b_smoothed.append(numpy.full(fromIndex, numpy.nan, dtype=numpy.double)) # pyright:ignore[reportUnknownArgumentType] # append initial segment to the list of resulting segments
@@ -8962,7 +8962,7 @@ class tgraphcanvas(QObject):
             if len(ix)>1:
                 a = ix[0]
                 b = ix[-1]
-                verts = [ xy for xy in [(a, rtbt)] + list(zip(ix, iy, strict=True)) + [(b, rtbt)] if xy[1] > 0 ] # ty:ignore
+                verts = [ xy for xy in [(a, rtbt)] + list(zip(ix, iy, strict=True)) + [(b, rtbt)] if xy[1] > 0 ]
                 if verts:
                     poly = Polygon(numpy.array(verts), facecolor=self.palette['aucarea'], edgecolor='0.5', alpha=0.3)
                     self.ax.add_patch(poly)
@@ -9442,7 +9442,7 @@ class tgraphcanvas(QObject):
                         grid_axis = 'x'
                     if grid_axis is not None:
                         self.ax.grid(True,
-                            axis=grid_axis, # type: ignore[arg-type] # "grid" of "_AxesBase" has incompatible type "str"; expected "Literal['both', 'x', 'y']
+                            axis=grid_axis, # type: ignore[arg-type] # ty:ignore[ignore] # "grid" of "_AxesBase" has incompatible type "str"; expected "Literal['both', 'x', 'y']
                             color=self.palette['grid'],
                             linestyle=self.gridstyles[self.gridlinestyle],
                             linewidth=self.gridthickness,
@@ -11328,7 +11328,7 @@ class tgraphcanvas(QObject):
                             frame.set_alpha(self.alpha['legendbg'])
                             frame.set_edgecolor(self.palette['legendborder'])
                             frame.set_linewidth(0.5)
-                            for line,text in zip(leg.get_lines(), leg.get_texts(), strict=True): # ty:ignore
+                            for line,text in zip(leg.get_lines(), leg.get_texts(), strict=True):
                                 text.set_color(line.get_color())
                         except Exception as e: # pylint: disable=broad-except
                             _log.error(e)
@@ -11673,7 +11673,7 @@ class tgraphcanvas(QObject):
             #     ['', '20', 'Fresh Cut Grass', '|', '50', 'Hay', '|', '80', 'Baking Bread', '|', '100', 'A Point', '']
 #            pattern = re.compile(r'.*{ndo}(?P<nominalstr>[^{ndc}]+){ndc}'.format(ndo=nominalDelimopen,ndc=nominalDelimclose),_ignorecase)
             pattern = re.compile(fr'.*{nominalDelimopen}(?P<nominalstr>[^{nominalDelimclose}]+){nominalDelimclose}',_ignorecase)
-            matched = pattern.match(eventanno) # pyrefly: ignore[no-matching-overload]
+            matched = pattern.match(eventanno)
             if matched is not None:
                 pattern = re.compile(r'([0-9]+)([A-Za-z]+[A-Za-z 0-9]+)',_ignorecase)
                 matches = pattern.split(matched.group('nominalstr'))
@@ -11687,7 +11687,7 @@ class tgraphcanvas(QObject):
                     j += 3
 #                pattern = re.compile(r'({ndo}[^{ndc}]+{ndc})'.format(ndo=nominalDelimopen,ndc=nominalDelimclose))
                 pattern = re.compile(fr'({nominalDelimopen}[^{nominalDelimclose}]+{nominalDelimclose})')
-                eventanno = pattern.sub(replacestring,eventanno) # pyrefly: ignore
+                eventanno = pattern.sub(replacestring,eventanno)
 
             # make all the remaining substitutions
             for field in fields:
@@ -12395,7 +12395,7 @@ class tgraphcanvas(QObject):
                 self.aw.pidcontrol.conv2celsius()
             else:
                 self.aw.pidcontrol.conv2fahrenheit()
-            self.mode_tempsliders = self.mode # pyrefly: ignore[bad-assignment]
+            self.mode_tempsliders = self.mode
 
     #sets the graph display in Fahrenheit mode
     def fahrenheitMode(self, setdefaultaxes:bool = True) -> None:
@@ -12822,16 +12822,16 @@ class tgraphcanvas(QObject):
                 #annotate labels
                 self.flavorchart_labels = []
                 for i in range(len(self.flavorlabels)):
-                    if self.flavorchart_angles[i] > 2.*pi or self.flavorchart_angles[i] < 0.: # ty:ignore[unsupported-operator] # pyrefly: ignore[unsupported-operation]
-                        _,self.flavorchart_angles[i] = divmod(self.flavorchart_angles[i],(2.*pi)) # pyrefly: ignore[unsupported-operation]
-                    if self.flavorchart_angles[i] <= (pi/2.) or self.flavorchart_angles[i] >= (1.5*pi): #if < 90 or smaller than 270 degrees # pyrefly: ignore[unsupported-operation]
+                    if self.flavorchart_angles[i] > 2.*pi or self.flavorchart_angles[i] < 0.:
+                        _,self.flavorchart_angles[i] = divmod(self.flavorchart_angles[i],(2.*pi))
+                    if self.flavorchart_angles[i] <= (pi/2.) or self.flavorchart_angles[i] >= (1.5*pi): #if < 90 or smaller than 270 degrees
                         ha = 'left'
                     else:
                         ha = 'right'
-                    anno = self.ax1.annotate(self.flavorChartLabelText(i),xy =(self.flavorchart_angles[i],.9),  # pyrefly: ignore[unsupported-operation]
+                    anno = self.ax1.annotate(self.flavorChartLabelText(i),xy =(self.flavorchart_angles[i],.9),
                                         fontproperties=fontprop_small,
                                         color=self.palette['ylabel'],
-                                        xytext=(self.flavorchart_angles[i],1.1),horizontalalignment=ha,verticalalignment='center')  # ty:ignore[unsupported-operator] # pyrefly: ignore[unsupported-operation]
+                                        xytext=(self.flavorchart_angles[i],1.1),horizontalalignment=ha,verticalalignment='center')
                     anno.set_in_layout(False)  # remove text annotations from tight_layout calculation
                     self.flavorchart_labels.append(anno)
 
@@ -12888,7 +12888,7 @@ class tgraphcanvas(QObject):
         self.flavorchart_plotf.append(self.flavors[0])
         #normalize flavor values to 0-1 range
         for i,_ in enumerate(self.flavorchart_plotf):
-            self.flavorchart_plotf[i] /= 10. # ty:ignore[unsupported-operator] # pyrefly: ignore[unsupported-operation]
+            self.flavorchart_plotf[i] /= 10.
 
     @staticmethod
     def calcFlavorChartScoreFromFlavors(flavors:list[float], flavors_total_correction:float) -> float:
@@ -13060,11 +13060,11 @@ class tgraphcanvas(QObject):
 
     def addPhidgetServer(self) -> None:
         if not self.phidgetServerAdded:
-            from Phidget22.Net import Net as PhidgetNetwork # type: ignore[import-untyped]
+            from Phidget22.Net import Net as PhidgetNetwork # type: ignore[import-untyped] # ty:ignore[ignore]
             if self.phidgetServerID == '' and not self.phidgetServiceDiscoveryStarted:
                 try:
                     # we enable the automatic service discovery if no server host is given
-                    from Phidget22.PhidgetServerType import PhidgetServerType # type: ignore[import-untyped]
+                    from Phidget22.PhidgetServerType import PhidgetServerType # type: ignore[import-untyped] # ty:ignore[ignore]
                     PhidgetNetwork.enableServerDiscovery(PhidgetServerType.PHIDGETSERVER_DEVICEREMOTE)
                     self.phidgetServiceDiscoveryStarted = True
                     self.aw.sendmessage(QApplication.translate('Message','Phidget service discovery started...'))
@@ -13092,8 +13092,8 @@ class tgraphcanvas(QObject):
 
     @staticmethod
     def deviceLogDEBUG() -> None:
-        from Phidget22.Devices.Log import Log as PhidgetLog # type: ignore[import-untyped]
-        from Phidget22.LogLevel import LogLevel as PhidgetLogLevel # type: ignore[import-untyped]
+        from Phidget22.Devices.Log import Log as PhidgetLog # type: ignore[import-untyped] # ty:ignore[ignore]
+        from Phidget22.LogLevel import LogLevel as PhidgetLogLevel # type: ignore[import-untyped] # ty:ignore[ignore]
         PhidgetLog.setLevel(PhidgetLogLevel.PHIDGET_LOG_VERBOSE)
 
     @staticmethod
@@ -13317,7 +13317,7 @@ class tgraphcanvas(QObject):
                         disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('Kaleido'),True,None))
                 elif self.device == 142:
                     try:
-                        from artisanlib.ikawa import IKAWA_BLE # ty: ignore[possibly-missing-import]
+                        from artisanlib.ikawa import IKAWA_BLE
                         self.aw.ikawa = IKAWA_BLE(
                             connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('IKAWA'),True,None),
                             disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('IKAWA'),True,None))
@@ -13955,7 +13955,7 @@ class tgraphcanvas(QObject):
                         ser.YOCTOthread = None
                     ser.YOCTOvalues = [[],[]]
                     ser.YOCTOlastvalues = [-1.0]*2
-                    YAPI.FreeAPI() # type:ignore[reportUnboundVariable,unused-ignore]
+                    YAPI.FreeAPI() # type:ignore[reportUnboundVariable,unused-ignore] # ty:ignore[ignore]
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
         finally:
@@ -17187,7 +17187,7 @@ class tgraphcanvas(QObject):
                     self.timeB[i] -= float(step)
                 for xtB in self.extratimexB:
                     for j,_ in enumerate(xtB):
-                        xtB[j] -= float(step) # pyrefly: ignore[bad-assignment]
+                        xtB[j] -= float(step)
                 self.backgroundprofile_moved_x -= step
                 self.moveBackgroundAnnoPositionsX(-step)
 
@@ -17195,7 +17195,7 @@ class tgraphcanvas(QObject):
                 for i in range(lt):
                     self.timeB[i] += float(step)
                 for xtB in self.extratimexB:
-                    for j,_ in enumerate(xtB): # pyrefly: ignore[bad-assignment]
+                    for j,_ in enumerate(xtB):
                         xtB[j] += float(step)
                 self.backgroundprofile_moved_x += step
                 self.moveBackgroundAnnoPositionsX(step)
@@ -17435,13 +17435,13 @@ class tgraphcanvas(QObject):
                         hint = [-0.001, 0.5, 10]
                     elif power == 3:
                         hint =     [-0.00001, -0.0001, 0.5, 10]
-                    popt,_ = curve_fit(func, xa, yn, p0=hint, maxfev=3000) # pylint: disable=unbalanced-tuple-unpacking # pyrefly: ignore[bad-unpacking]
+                    popt,_ = curve_fit(func, xa, yn, p0=hint, maxfev=3000) # pylint: disable=unbalanced-tuple-unpacking
                 #perr = numpy.sqrt(numpy.diag(pcov))
                 if plot and self.ax is not None:
                     xb = numpy.array(self.timex)
                     xxb = xb + charge
                     xxa = xa + charge
-                    self.ax.plot(xxb, func(xb, *popt), color='#000000', linestyle = '-.', linewidth=3) # ty: ignore[missing-argument]
+                    self.ax.plot(xxb, func(xb, *popt), color='#000000', linestyle = '-.', linewidth=3)
                     self.ax.plot(xxa, yn, 'ro')
                     with warnings.catch_warnings():
                         warnings.simplefilter('ignore')
@@ -18243,23 +18243,23 @@ class tgraphcanvas(QObject):
 
             #convert all time values to temperature
 
-            if func2 is not None and self.DeltaBTflag and self.l_delta2 is not None and self.designer_timez is not None: # type:ignore[redundant-expr]
+            if func2 is not None and self.DeltaBTflag and self.l_delta2 is not None and self.designer_timez is not None: # type:ignore[redundant-expr] # ty:ignore[ignore]
                 funcDelta2 = func2.derivative()
                 deltabtvals = funcDelta2(self.designer_timez) * 60
                 self.l_delta2.set_data(numpy.array(self.designer_timez), deltabtvals)
                 self.ax.draw_artist(self.l_delta2)
 
-            if func1 is not None and self.DeltaETflag and self.l_delta1 is not None and self.designer_timez is not None: # type:ignore[redundant-expr]
+            if func1 is not None and self.DeltaETflag and self.l_delta1 is not None and self.designer_timez is not None: # type:ignore[redundant-expr] # ty:ignore[ignore]
                 funcDelta1 = func1.derivative()
                 deltaetvals = funcDelta1(self.designer_timez) * 60
                 self.l_delta1.set_data(numpy.array(self.designer_timez), deltaetvals)
                 self.ax.draw_artist(self.l_delta1)
 
             #add curves
-            if etvals is not None and self.ETcurve and self.l_temp1 is not None: # type:ignore[redundant-expr]
+            if etvals is not None and self.ETcurve and self.l_temp1 is not None: # type:ignore[redundant-expr] # ty:ignore[ignore]
                 self.l_temp1.set_data(numpy.array(self.designer_timez), etvals)
                 self.ax.draw_artist(self.l_temp1)
-            if btvals is not None and self.BTcurve and self.l_temp2 is not None: # type:ignore[redundant-expr]
+            if btvals is not None and self.BTcurve and self.l_temp2 is not None: # type:ignore[redundant-expr] # ty:ignore[ignore]
                 self.l_temp2.set_data(numpy.array(self.designer_timez), btvals)
                 self.ax.draw_artist(self.l_temp2)
 
@@ -18336,7 +18336,7 @@ class tgraphcanvas(QObject):
             configAction.triggered.connect(self.desconfig)
             designermenu.addAction(configAction)
 
-            designermenu.exec(QCursor.pos()) # ty:ignore
+            designermenu.exec(QCursor.pos())
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
 
@@ -18355,7 +18355,7 @@ class tgraphcanvas(QObject):
                     self.indexpoint = event_ind
                 elif isinstance(event_ind, (list, numpy.ndarray)):
                     if len(event_ind)>0: # pyright:ignore[reportUnknownArgumentType]
-                        i:int = event_ind[0] # ty:ignore[invalid-assignment]
+                        i:int = event_ind[0]
                         self.indexpoint = i
                     else:
                         return
@@ -19123,7 +19123,7 @@ class tgraphcanvas(QObject):
             editAction.triggered.connect(self.editmode)
             designermenu.addAction(editAction)
 
-            designermenu.exec(QCursor.pos()) # ty: ignore
+            designermenu.exec(QCursor.pos())
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -19266,7 +19266,7 @@ class tgraphcanvas(QObject):
                 barwheel.append(self.ax2.bar(theta, radii, width=segmentwidth, bottom=lbottom[z],edgecolor=self.wheellinecolor,
                                         linewidth=self.wheellinewidth,picker=3))
                 #set color, alpha, and text
-                for count, (_, barwheel[z]) in enumerate(zip(radii, barwheel[z], strict=True)): # noqa: B020 # type:ignore # pyright: error: "object*" is not iterable
+                for count, (_, barwheel[z]) in enumerate(zip(radii, barwheel[z], strict=True)): # noqa: B020 # pyright:ignore # pyright error: "object*" is not iterable
                     barwheel_z = barwheel[z]
                     if isinstance(barwheel_z, Rectangle):
                         barwheel_z.set_facecolor(self.wheelcolor[z][count])
@@ -19302,7 +19302,7 @@ class tgraphcanvas(QObject):
             for i in range(wlen):
                 color = QColor()
                 color.setHsv(int(round((360/wlen)*i*self.wheelcolorpattern)),255,255,255)
-                wc[i] = str(color.name()) # pyrefly: ignore[bad-assignment]
+                wc[i] = str(color.name())
 
     # sets parent and corrects segment lengths so that child fits inside parent (multiple children can be set to same parent)
     # input: z = index of parent in previous wheel    # wn = wheel number    # idx = index of element in wheel x
@@ -19465,7 +19465,7 @@ class tgraphcanvas(QObject):
 ###     Sample thread
 ########################################################################################
 
-class SampleThread(QThread): # pyrefly:ignore[invalid-inheritance] # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+class SampleThread(QThread):
     sample_processingSignal = pyqtSignal(bool,list,list,list)
     terminatingSignal = pyqtSignal()
 
@@ -19626,7 +19626,7 @@ class SampleThread(QThread): # pyrefly:ignore[invalid-inheritance] # pyright: ig
                             self.aw.qmc.flagsampling = False # we signal that we are done with sampling
                     # else: we don't self.quit() and break to end the thread as the simulator (paused) might still be running
                 else:
-                    self.aw.qmc.flagsampling = False # type: ignore[unreachable] # mypy: Statement is unreachable  # we signal that we are done with sampling
+                    self.aw.qmc.flagsampling = False # type: ignore[unreachable] # ty:ignore[ignore] # mypy: Statement is unreachable  # we signal that we are done with sampling
                     # port is disconnected in OFFmonitor by calling disconnectProbes() => disconnectProbesFromSerialDevice()
                     self.quit()
                     break  #thread ends
@@ -19647,7 +19647,7 @@ class SampleThread(QThread): # pyrefly:ignore[invalid-inheritance] # pyright: ig
 ###     Artisan thread Server
 #########################################################################################################
 
-class Athreadserver(QWidget): # pyrefly:ignore[invalid-inheritance] # pylint: disable=too-few-public-methods # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+class Athreadserver(QWidget):
     terminatingSignal = pyqtSignal()
 
     def __init__(self, aw:'ApplicationWindow') -> None:

@@ -28,7 +28,7 @@ def extractProfileStrongholdXLSX(file:str,
 
     book = openpyxl.load_workbook(file)
     sheet = book.worksheets[0] # first sheet
-    first_row = sheet[1]  # pyrefly: ignore[bad-argument-type]
+    first_row = sheet[1]
     keys:list[str]|None = None # data of columns with empty string as key are ignored
     machine:str = ''
     machine_size:float = 0
@@ -65,14 +65,14 @@ def extractProfileStrongholdXLSX(file:str,
             if key != '':
                 data[key] = []
         # extract data
-        for row in range(2, sheet.max_row + 1): # pyrefly: ignore[bad-argument-type]
+        for row in range(2, sheet.max_row + 1):
             try:
                 for i, key in enumerate(keys):
                     if key != '':
                         if key == 'Time':
-                            data[key].append(stringtoseconds(str(sheet.cell(row, i+1).value))) # pyrefly: ignore[bad-argument-type]
+                            data[key].append(stringtoseconds(str(sheet.cell(row, i+1).value)))
                         else:
-                            data[key].append(sheet.cell(row, i+1).value) # type:ignore[arg-type]
+                            data[key].append(sheet.cell(row, i+1).value) # type:ignore[arg-type] # ty:ignore[ignore]
             except Exception as e:  # pylint: disable=broad-except
                 _log.error(e)
 
@@ -81,7 +81,7 @@ def extractProfileStrongholdXLSX(file:str,
             res['title'] = encodeLocalStrict(Path(file).stem)
             res['roastertype'] = machine
             res['roastersize'] = machine_size
-            res['timex'] = data['Time'] # type:ignore[typeddict-item]
+            res['timex'] = data['Time'] # type:ignore[typeddict-item] # ty:ignore[ignore]
             tx_len = len(res['timex'])
             res['mode'] = 'C'
             # add CHARGE/DROP
@@ -94,11 +94,11 @@ def extractProfileStrongholdXLSX(file:str,
                     pass
             # add ET/BT
             if 'ET' in data and len(data['ET']) == tx_len:
-                res['temp1'] = data['ET'] # type:ignore[typeddict-item]
+                res['temp1'] = data['ET'] # type:ignore[typeddict-item] # ty:ignore[ignore]
             else:
                 res['temp2'] = [-1.0]*tx_len
             if 'BT' in data and len(data['BT']) == tx_len:
-                res['temp2'] = data['BT'] # type:ignore[typeddict-item]
+                res['temp2'] = data['BT'] # type:ignore[typeddict-item] # ty:ignore[ignore]
             else:
                 res['temp2'] = [-1.0]*tx_len
             res['extradevices'] = [25] # one extra virtual device
@@ -106,11 +106,11 @@ def extractProfileStrongholdXLSX(file:str,
             res['extraname2'] = ['DT']
             res['extratimex'] = [res['timex'][:]] # pyright:ignore
             if 'IT' in data and len(data['IT']) == tx_len:
-                res['extratemp1'] = [data['IT']] # type:ignore[list-item]
+                res['extratemp1'] = [data['IT']] # type:ignore[list-item] # ty:ignore[ignore]
             else:
                 res['extratemp1'] = [[-1.0]*tx_len]
             if 'DT' in data and len(data['DT']) == tx_len:
-                res['extratemp2'] = [data['DT']] # type:ignore[list-item]
+                res['extratemp2'] = [data['DT']] # type:ignore[list-item] # ty:ignore[ignore]
             else:
                 res['extratemp2'] = [[-1.0]*tx_len]
             res['extramathexpression1'] = ['']

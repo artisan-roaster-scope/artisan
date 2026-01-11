@@ -123,7 +123,7 @@ def sendPlusNotificationSeen(hr_id:str, date:datetime.datetime) -> None:
         _log.exception(e)
 
 
-class NotificationManager(QObject): # pyrefly:ignore[invalid-inheritance] # pyright: ignore [reportGeneralTypeIssues]
+class NotificationManager(QObject):
 
     __slots__ = ( 'notification_timeout', 'notification_queue_max_length', 'notification_queue_max_age',
                 'tray_menu', 'tray_icon', 'notifications_available', 'notifications_enabled', 'notifications_visible',
@@ -222,7 +222,7 @@ class NotificationManager(QObject): # pyrefly:ignore[invalid-inheritance] # pyri
                     pass
                 if self.active_notification.id:
                     n = self.active_notification.id # bind the number here such that is available after clearing active_notification
-                    QTimer.singleShot(500, lambda : sendPlusNotificationSeen(n, datetime.datetime.now(datetime.UTC))) # ty: ignore
+                    QTimer.singleShot(500, lambda : sendPlusNotificationSeen(n, datetime.datetime.now(datetime.UTC)))
                 self.removeNotificationItem(self.active_notification)
                 self.active_notification = None
         except Exception as e: # pylint: disable=broad-except
@@ -304,11 +304,6 @@ class NotificationManager(QObject): # pyrefly:ignore[invalid-inheritance] # pyri
                     self.tray_menu.addAction(action)
             else:
                 self.tray_icon.hide()
-#                try:
-#                    app = QApplication.instance()
-#                    app.setBadgeNumber(0) # type: ignore # "QCoreApplication" has no attribute "setBadgeNumber"
-#                except Exception: # pylint: disable=broad-except
-#                    pass # setBadgeNumber only supported by Qt 6.5 and newer
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
 
@@ -332,7 +327,7 @@ class NotificationManager(QObject): # pyrefly:ignore[invalid-inheritance] # pyri
                     NotificationType.PLUS_ADMIN,
                     NotificationType.PLUS_ADMIN]:
                 icon = self.notificationPlusIcon()
-            self.tray_icon.showMessage(notification.formatedTitle(), notification.message, icon, self.notification_timeout) # pyrefly: ignore[no-matching-overload]
+            self.tray_icon.showMessage(notification.formatedTitle(), notification.message, icon, self.notification_timeout)
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
 

@@ -1530,7 +1530,7 @@ class CurvesDlg(ArtisanDialog):
     @pyqtSlot(bool)
     def expradiobuttonClicked(self, _:bool = False) -> None:
         expradioButton = self.sender()
-        assert isinstance(expradioButton, QRadioButton) # pyrefly: ignore[invalid-argument]
+        assert isinstance(expradioButton, QRadioButton)
         power:int = 3
         if self.expradiobutton1.isChecked():
             power = 2

@@ -15,15 +15,15 @@
 # AUTHOR
 # Marko Luther, 2023
 
-from Phidget22.Devices.Manager import Manager # type: ignore[import-untyped]
-from Phidget22.DeviceID import DeviceID # type: ignore[import-untyped]
-from Phidget22.DeviceClass import DeviceClass # type: ignore[import-untyped]
+from Phidget22.Devices.Manager import Manager # type: ignore[import-untyped] # ty:ignore[ignore]
+from Phidget22.DeviceID import DeviceID # type: ignore[import-untyped] # ty:ignore[ignore]
+from Phidget22.DeviceClass import DeviceClass # type: ignore[import-untyped] # ty:ignore[ignore]
 
 import logging
 from typing import Final, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from Phidget22.Phidget import Phidget # type: ignore[import-untyped] # pylint: disable=unused-import
+    from Phidget22.Phidget import Phidget # type: ignore[import-untyped] # pylint: disable=unused-import # ty:ignore[ignore]
 
 from PyQt6.QtCore import QSemaphore
 
@@ -42,9 +42,9 @@ class PhidgetManager:
         #    False: occupied and connected to a software channel
         # access to this dict is protected by the managersemaphore and
         # should happen only via the methods addChannel and deleteChannel
-        self.attachedPhidgetChannels:dict[Phidget, bool] = {} # type:ignore[no-any-unimported,unused-ignore]
+        self.attachedPhidgetChannels:dict[Phidget, bool] = {} # type:ignore[no-any-unimported,unused-ignore] # ty:ignore[ignore]
         self.managersemaphore:QSemaphore = QSemaphore(1)
-        self.manager:Manager = Manager() # type:ignore[no-any-unimported,unused-ignore]
+        self.manager:Manager = Manager() # type:ignore[no-any-unimported,unused-ignore] # ty:ignore[ignore]
 
         self.manager.setOnAttachHandler(self.attachHandler)
         self.manager.setOnDetachHandler(self.detachHandler)
@@ -56,7 +56,7 @@ class PhidgetManager:
         self.attachedPhidgetChannels.clear()
         _log.debug('PhidgetManager closed')
 
-    def attachHandler(self,_:Manager , attachedChannel:'Phidget') -> None: # type:ignore[no-any-unimported,unused-ignore]
+    def attachHandler(self,_:Manager , attachedChannel:'Phidget') -> None: # type:ignore[no-any-unimported,unused-ignore] # ty:ignore[ignore]
         try:
             if attachedChannel.getParent().getDeviceClass() != DeviceClass.PHIDCLASS_HUB:
                 # we do not add the hub itself
@@ -64,13 +64,13 @@ class PhidgetManager:
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
 
-    def detachHandler(self, _:Manager, attachedChannel:'Phidget') -> None: # type:ignore[no-any-unimported,unused-ignore]
+    def detachHandler(self, _:Manager, attachedChannel:'Phidget') -> None: # type:ignore[no-any-unimported,unused-ignore] # ty:ignore[ignore]
         try:
             self.deleteChannel(attachedChannel)
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
 
-    def addChannel(self,channel:'Phidget') -> None: # type:ignore[no-any-unimported,unused-ignore]
+    def addChannel(self,channel:'Phidget') -> None: # type:ignore[no-any-unimported,unused-ignore] # ty:ignore[ignore]
 #        _log.debug("addChannel: %s %s", channel, type(channel))
         try:
             self.managersemaphore.acquire(1)
@@ -107,7 +107,7 @@ class PhidgetManager:
             if self.managersemaphore.available() < 1:
                 self.managersemaphore.release(1)
 
-    def deleteChannel(self,channel:'Phidget') -> None: # type:ignore[no-any-unimported,unused-ignore]
+    def deleteChannel(self,channel:'Phidget') -> None: # type:ignore[no-any-unimported,unused-ignore] # ty:ignore[ignore]
 #        _log.debug('deleteChannel: %s', channel)
         try:
             self.managersemaphore.acquire(1)
@@ -136,7 +136,7 @@ class PhidgetManager:
             if self.managersemaphore.available() < 1:
                 self.managersemaphore.release(1)
 
-    def getChannel(self,serial:int, port:int|None, channel:int, phidget_class_name:str, device_id:int, remote:bool, remoteOnly:bool) -> 'Phidget|None': # type:ignore[no-any-unimported,unused-ignore]
+    def getChannel(self,serial:int, port:int|None, channel:int, phidget_class_name:str, device_id:int, remote:bool, remoteOnly:bool) -> 'Phidget|None': # type:ignore[no-any-unimported,unused-ignore] # ty:ignore[ignore]
         try:
             self.managersemaphore.acquire(1)
             # we are looking for HUB ports
@@ -160,18 +160,18 @@ class PhidgetManager:
             if self.managersemaphore.available() < 1:
                 self.managersemaphore.release(1)
 
-    def reserveSerialPort(self, serial:int, port:int|None, channel:int, phidget_class_name:str, device_id:int, remote:bool = False, remoteOnly:bool = False) -> None: # type:ignore[no-any-unimported,unused-ignore]
+    def reserveSerialPort(self, serial:int, port:int|None, channel:int, phidget_class_name:str, device_id:int, remote:bool = False, remoteOnly:bool = False) -> None: # type:ignore[no-any-unimported,unused-ignore] # ty:ignore[ignore]
         chnl = self.getChannel(serial, port, channel, phidget_class_name, device_id, remote, remoteOnly)
         if chnl is not None:
             self.reserveChannel(chnl)
 
-    def releaseSerialPort(self, serial:int, port:int|None, channel:int, phidget_class_name:str, device_id:int, remote:bool = False, remoteOnly:bool = False) -> None: # type:ignore[no-any-unimported,unused-ignore]
+    def releaseSerialPort(self, serial:int, port:int|None, channel:int, phidget_class_name:str, device_id:int, remote:bool = False, remoteOnly:bool = False) -> None: # type:ignore[no-any-unimported,unused-ignore] # ty:ignore[ignore]
         chnl = self.getChannel(serial, port, channel, phidget_class_name, device_id, remote, remoteOnly)
         if chnl is not None:
             self.releaseChannel(chnl)
 
     # should be called from the attach handler that binds this hardware channel to a software channel
-    def reserveChannel(self,channel:'Phidget') -> None: # type:ignore[no-any-unimported,unused-ignore]
+    def reserveChannel(self,channel:'Phidget') -> None: # type:ignore[no-any-unimported,unused-ignore] # ty:ignore[ignore]
         _log.debug('reserveChannel: %s', channel)
         try:
             self.managersemaphore.acquire(1)
@@ -196,7 +196,7 @@ class PhidgetManager:
                 self.managersemaphore.release(1)
 
     # should be called from the detach handler that releases this hardware channel from a software channel
-    def releaseChannel(self,channel:'Phidget') -> None: # type:ignore[no-any-unimported,unused-ignore]
+    def releaseChannel(self,channel:'Phidget') -> None: # type:ignore[no-any-unimported,unused-ignore] # ty:ignore[ignore]
         _log.debug('releaseChannel: %s', channel)
         try:
             self.managersemaphore.acquire(1)

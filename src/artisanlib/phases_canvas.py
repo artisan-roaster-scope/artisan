@@ -24,10 +24,10 @@ from typing import Final, TypedDict, cast, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
-    from matplotlib.axes import Axes # type:ignore[untyped-import,unused-ignore] # pylint: disable=unused-import
-    from matplotlib.patches import Rectangle # type:ignore[untyped-import,unused-ignore] # pylint: disable=unused-import
-    from matplotlib.text import Annotation # type:ignore[untyped-import,unused-ignore] # pylint: disable=unused-import
-    from matplotlib.backend_bases import Event, MouseEvent # type:ignore[untyped-import,unused-ignore] # pylint: disable=unused-import
+    from matplotlib.axes import Axes # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore]# pylint: disable=unused-import
+    from matplotlib.patches import Rectangle # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore]# pylint: disable=unused-import
+    from matplotlib.text import Annotation # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore]# pylint: disable=unused-import
+    from matplotlib.backend_bases import Event, MouseEvent # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore]# pylint: disable=unused-import
 
 from artisanlib.suppress_errors import suppress_stdout_stderr
 from artisanlib.util import toGrey, toDim, stringfromseconds, float2float
@@ -39,10 +39,10 @@ from PyQt6.QtWidgets import QApplication
 
 
 with suppress_stdout_stderr():
-    import matplotlib as mpl # type:ignore[untyped-import,unused-ignore]
+    import matplotlib as mpl # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore]
 
-from matplotlib.figure import Figure # type:ignore[untyped-import,unused-ignore]
-from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas # type:ignore[untyped-import,unused-ignore] # @Reimport
+from matplotlib.figure import Figure # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore]
+from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore] # @Reimport
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
@@ -58,7 +58,7 @@ class MplPhasesCanvas(FigureCanvas):
     def __init__(self, tight_layout_params:dict[str,float], dpi:int) -> None:
         self.fig:Figure = Figure(tight_layout=tight_layout_params, frameon=True, dpi=dpi)
         # with tight_layout=True, the matplotlib canvas expands to the maximum using figure.autolayout
-        super().__init__(self.fig) # type: ignore[no-untyped-call]
+        super().__init__(self.fig) # type: ignore[no-untyped-call] # ty:ignore[ignore]
 
 class tphasescanvas(QObject):
 
@@ -178,7 +178,7 @@ class tphasescanvas(QObject):
                         self.canvas.fig.canvas.draw()
 #                        self.canvas.fig.canvas.update()
                     FigureCanvas.updateGeometry(self)  #@UndefinedVariable
-                self.aw.scroller.setMaximumHeight(self.canvas.sizeHint().height()) # type:ignore[no-untyped-call] # Call to untyped function "sizeHint" in typed context  [no-untyped-call]
+                self.aw.scroller.setMaximumHeight(self.canvas.sizeHint().height()) # type:ignore[no-untyped-call] # ty:ignore[ignore] # Call to untyped function "sizeHint" in typed context  [no-untyped-call]
             except Exception as e:  # pylint: disable=broad-except
                 _log.exception(e)
 
@@ -240,7 +240,7 @@ class tphasescanvas(QObject):
                         starts = widths.cumsum() - widths
                         if active:
                             labels = [f"{str(round(percent,digits)).rstrip('0').rstrip('.')}%  {stringfromseconds(tx,leadingzero=False)}" if percent>20 else (f"{str(round(percent,digits)).rstrip('0').rstrip('.')}%" if percent>10 else '')
-                                    for (percent,tx) in zip(phases_percentages, phases_times, strict=True)] # ty:ignore
+                                    for (percent,tx) in zip(phases_percentages, phases_times, strict=True)]
                         else:
                             labels = ['']*3
                         labels = [label, ''] + labels + ['', stringfromseconds(total_time,leadingzero=False)]
@@ -253,13 +253,13 @@ class tphasescanvas(QObject):
                         prects_patches:list[Rectangle] = rects.patches
                         if len(prects_patches)>4:
                             if len(phases_ror)>1:
-                                self.phase_temperatures[prects_patches[3]] = { # ty:ignore[invalid-assignment] # 2nd phase temperatures
+                                self.phase_temperatures[prects_patches[3]] = { # 2nd phase temperatures
                                         'BT_start_temp': phases_temps[0],
                                         'BT_end_temp': phases_temps[1],
                                         'BT_ROR_start_temp': phases_ror[0],
                                         'BT_ROR_end_temp': phases_ror[1]}
                             if len(phases_ror)>2:
-                                self.phase_temperatures[prects_patches[4]] = { # ty:ignore[invalid-assignment] # 3rd phase temperatures
+                                self.phase_temperatures[prects_patches[4]] = { # 3rd phase temperatures
                                         'BT_start_temp': phases_temps[1],
                                         'BT_end_temp': phases_temps[2],
                                         'BT_ROR_start_temp': phases_ror[1],
@@ -307,7 +307,7 @@ class tphasescanvas(QObject):
                     rects = self.ax.barh(i, widths, left=starts, height=self.barheight, color=patch_colors)
                     prects_patches = rects.patches
                     if len(prects_patches)>3 and len(phases_ror)>2:
-                        self.phase_temperatures[prects_patches[3]] = { # ty:ignore[invalid-assignment] # 3rd phase temperatures
+                        self.phase_temperatures[prects_patches[3]] = { # 3rd phase temperatures
                                     'BT_start_temp': phases_temps[1],
                                     'BT_end_temp': phases_temps[2],
                                     'BT_ROR_start_temp': phases_ror[1],
@@ -346,7 +346,7 @@ class tphasescanvas(QObject):
 #                  loc='upper center', fontsize='small', shadow=False, frameon=False, fancybox=False, labelcolor=legend_labelcolor)
 
             self.canvas.fig.canvas.draw_idle()
-            self.aw.scroller.setMaximumHeight(self.canvas.sizeHint().height()) # type:ignore[no-untyped-call] # Call to untyped function "sizeHint" in typed context  [no-untyped-call]
+            self.aw.scroller.setMaximumHeight(self.canvas.sizeHint().height()) # type:ignore[no-untyped-call] # ty:ignore[ignore] # Call to untyped function "sizeHint" in typed context  [no-untyped-call]
         else:
             # if no profiles are given we set the canvas height to 0
             QSettings().setValue('MainSplitter',self.aw.splitter.saveState())

@@ -476,9 +476,9 @@ class volumeCalculatorDlg(ArtisanDialog):
 ########################################################################################
 #####################  RECENT ROAST POPUP  #############################################
 
-class RoastsComboBox(QComboBox): # pyrefly:ignore[invalid-inheritance] # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+class RoastsComboBox(QComboBox):
     def __init__(self, parent:QWidget, aw:'ApplicationWindow', selection:str|None = None) -> None:
-        super().__init__(parent) # pyrefly: ignore[bad-argument-count]
+        super().__init__(parent)
         self.aw:ApplicationWindow = aw
         self.installEventFilter(self)
         self.selection:str|None = selection # just the roast title
@@ -587,7 +587,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 
         self.org_roasted_defects_mode = self.aw.qmc.roasted_defects_mode
 
-        self.setup_ui:SetupWidget.Ui_SetupWidget|None = None # type:ignore[no-any-unimported,unused-ignore]
+        self.setup_ui:SetupWidget.Ui_SetupWidget|None = None # type:ignore[no-any-unimported,unused-ignore] # ty:ignore[ignore]
 
         self.pus_amount_selected = None
 
@@ -1089,7 +1089,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         if isinstance(self.aw.qmc.color_system_idx, int):
             self.colorSystemComboBox.setCurrentIndex(self.aw.qmc.color_system_idx)
         else: # in older versions this could have been a string
-            self.aw.qmc.color_system_idx = 0 # type: ignore[unreachable]
+            self.aw.qmc.color_system_idx = 0 # type: ignore[unreachable] # ty:ignore[ignore]
         #Greens Temp
         greens_temp_label = QLabel('<b>' + QApplication.translate('Label', 'Beans') + '</b>')
         greens_temp_unit_label = QLabel(self.aw.qmc.mode)
@@ -1947,7 +1947,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 # limit to max 3 component links
                 line = f'{self.plus_blend_selected_label}: '
                 first_component = True
-                for i, ll in sorted(zip(self.plus_blend_selected_spec['ingredients'],self.plus_blend_selected_spec_labels, strict=True), key=lambda tup:tup[0]['ratio'],reverse = True)[:3]: # ty:ignore
+                for i, ll in sorted(zip(self.plus_blend_selected_spec['ingredients'],self.plus_blend_selected_spec_labels, strict=True), key=lambda tup:tup[0]['ratio'],reverse = True)[:3]:
                     if first_component:
                         first_component = False
                     else:
@@ -2373,7 +2373,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 if 'ratio_denom' in i:
                     entry['ratio_denom'] = i['ratio_denom']
                 ingredients.append(entry)
-            self.plus_blend_selected_spec['ingredients'] = ingredients # pyrefly: ignore[unsupported-operation]
+            self.plus_blend_selected_spec['ingredients'] = ingredients
             self.plus_amount_selected = plus.stock.getBlendMaxAmount(selected_blend)
             self.plus_amount_replace_selected = plus.stock.getBlendReplaceMaxAmount(selected_blend)
             self.fillBlendData(selected_blend,prev_coffee_label,prev_blend_label)
@@ -2434,10 +2434,10 @@ class editGraphDlg(ArtisanResizeablDialog):
                 if rr['colorSystem'] in self.aw.qmc.color_systems:
                     self.aw.qmc.color_system_idx = self.aw.qmc.color_systems.index(rr['colorSystem'])
                     self.colorSystemComboBox.setCurrentIndex(self.aw.qmc.color_system_idx)
-                elif isinstance(rr['colorSystem'], int) and rr['colorSystem'] < len(self.aw.qmc.color_systems):  # type: ignore[unreachable]
+                elif isinstance(rr['colorSystem'], int) and rr['colorSystem'] < len(self.aw.qmc.color_systems):  # type: ignore[unreachable] # ty:ignore[ignore] # compatibility to older versions where colorSystems could be an int
                     # to stay compatible with older versions were rr['colorSystem'] was an index instead of the name of a system
-                    self.aw.qmc.color_system_idx = rr['colorSystem'] # type: ignore[unreachable]
-                    self.colorSystemComboBox.setCurrentIndex(self.aw.qmc.color_system_idx) # type:ignore[unused-ignore]
+                    self.aw.qmc.color_system_idx = rr['colorSystem'] # type: ignore[unreachable] # ty:ignore[ignore] # compatibility to older versions where colorSystems could be an int
+                    self.colorSystemComboBox.setCurrentIndex(self.aw.qmc.color_system_idx)
 
             # items added in v1.4 might not be in the data set of previous stored recent roasts
             if 'beanSize_min' in rr:
@@ -3777,7 +3777,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     @pyqtSlot()
     def loadlabels_editingfinished(self) -> None:
         w = self.sender()
-        if w and isinstance(w, QLineEdit) and w.isModified(): # pyrefly: ignore[invalid-argument]
+        if w and isinstance(w, QLineEdit) and w.isModified():
             w.setText(w.text().strip())
             self.updateLoadLabels()
             self.loadsEdited()
@@ -3785,7 +3785,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     @pyqtSlot()
     def loadratings_editingfinished(self) -> None:
         w = self.sender()
-        if w and isinstance(w, QLineEdit) and w.isModified(): # pyrefly: ignore[invalid-argument]
+        if w and isinstance(w, QLineEdit) and w.isModified():
             w.setText(self.validateNumText(w.text()))
             self.updateLoadRatings()
             self.updateEnergyLabels()
@@ -3794,7 +3794,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     @pyqtSlot()
     def ratingunits_currentindexchanged(self) -> None:
         sender = self.sender()
-        if isinstance(sender, QComboBox): # pyrefly: ignore[invalid-argument]
+        if isinstance(sender, QComboBox):
             try:
                 i = [self.energy_ui.ratingunit0,self.energy_ui.ratingunit1,self.energy_ui.ratingunit2,self.energy_ui.ratingunit3].index(sender)
                 self.aw.qmc.ratingunits[i] = max(0, sender.currentIndex())
@@ -3807,7 +3807,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     @pyqtSlot()
     def sourcetypes_currentindexchanged(self) -> None:
         sender = self.sender()
-        if isinstance(sender, QComboBox): # pyrefly: ignore[invalid-argument]
+        if isinstance(sender, QComboBox):
             try:
                 i = [self.energy_ui.sourcetype0, self.energy_ui.sourcetype1, self.energy_ui.sourcetype2, self.energy_ui.sourcetype3].index(sender)
                 self.aw.qmc.sourcetypes[i] = max(0, sender.currentIndex())
@@ -3819,7 +3819,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     @pyqtSlot()
     def load_etypes_currentindexchanged(self) -> None:
         sender = self.sender()
-        if isinstance(sender, QComboBox): # pyrefly: ignore[invalid-argument]
+        if isinstance(sender, QComboBox):
             try:
                 i = [self.energy_ui.events0, self.energy_ui.events1, self.energy_ui.events2, self.energy_ui.events3].index(sender)
                 self.aw.qmc.load_etypes[i] = max(0, sender.currentIndex())
@@ -3837,7 +3837,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     @pyqtSlot(int)
     def pressureCheckBox_statechanged(self, _:int) -> None:
         sender = self.sender()
-        if isinstance(sender, QCheckBox): # pyrefly: ignore[invalid-argument]
+        if isinstance(sender, QCheckBox):
             try:
                 i = [self.energy_ui.pressureCheckBox0, self.energy_ui.pressureCheckBox1, self.energy_ui.pressureCheckBox2, self.energy_ui.pressureCheckBox3].index(sender)
                 self.aw.qmc.presssure_percents[i] = sender.isChecked()
@@ -3897,7 +3897,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     @pyqtSlot()
     def meterlabels_editingfinished(self) -> None:
         w = self.sender()
-        if w and isinstance(w, QLineEdit) and w.isModified(): # pyrefly: ignore[invalid-argument]
+        if w and isinstance(w, QLineEdit) and w.isModified():
             w.setText(w.text().strip())
             self.updateMeterLabels()
             self.loadsEdited()
@@ -3905,7 +3905,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     @pyqtSlot()
     def meterunits_currentindexchanged(self) -> None:
         sender = self.sender()
-        if isinstance(sender, QComboBox):# pyrefly: ignore[invalid-argument]
+        if isinstance(sender, QComboBox):
             try:
                 i = [self.energy_ui.meter1UnitComboBox,self.energy_ui.meter2UnitComboBox].index(sender)
                 self.aw.qmc.meterunits[i] = max(0, sender.currentIndex())
@@ -3919,7 +3919,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     @pyqtSlot()
     def meterfuels_currentindexchanged(self) -> None:
         sender = self.sender()
-        if isinstance(sender, QComboBox):# pyrefly: ignore[invalid-argument]
+        if isinstance(sender, QComboBox):
             try:
                 i = [self.energy_ui.meter1FuelComboBox,self.energy_ui.meter2FuelComboBox].index(sender)
                 self.aw.qmc.meterfuels[i] = max(0, sender.currentIndex())
@@ -3932,7 +3932,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     @pyqtSlot()
     def metersources_currentindexchanged(self) -> None:
         sender = self.sender()
-        if isinstance(sender, QComboBox): # pyrefly: ignore[invalid-argument]
+        if isinstance(sender, QComboBox):
             try:
                 i = [self.energy_ui.meter1SourceComboBox,self.energy_ui.meter2SourceComboBox].index(sender)
                 self.aw.qmc.metersources[i] = max(0, sender.currentIndex())

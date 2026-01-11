@@ -39,7 +39,7 @@ class QRImage(BaseImage):
         pass
 
     @override
-    def process(self) -> None: # pyrefly: ignore[bad-override]
+    def process(self) -> None:
         pass
 
     @override

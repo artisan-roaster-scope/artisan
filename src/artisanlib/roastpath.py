@@ -137,7 +137,7 @@ def extractProfileRoastPathHTML(url:'QUrl',
                 page_content = page.content.decode('latin-1')
             d = re.findall(fr"var {elem} = JSON\.parse\('(.+?)'\);", page_content, re.S)  # @UndefinedVariable
             if d:
-                data[elem] = json.loads(d[0]) # type: ignore[literal-required] # generic strings accessors cannot be handled by mypy
+                data[elem] = json.loads(d[0]) # type: ignore[literal-required] # ty:ignore[ignore] # generic strings accessors cannot be handled by mypy
 
         if 'btData' in data and len(data['btData']) > 0 and 'Timestamp' in data['btData'][0]:
             # BT
@@ -173,7 +173,7 @@ def extractProfileRoastPathHTML(url:'QUrl',
                         try:
 #                            tx_idx = res["timex"].index(tx) # does not cope with dropouts as the next line:
                             tx_idx = next(i for i,item in enumerate(res['timex']) if item >= tx)
-                            timeindex[marks[dd['EventName']]] = max(0, tx_idx) # pyrefly: ignore[index-error]
+                            timeindex[marks[dd['EventName']]] = max(0, tx_idx)
                         except Exception: # pylint: disable=broad-except
                             pass
             res['timeindex'] = timeindex

@@ -42,9 +42,9 @@ def wait_cursor() -> Iterator[None]:
     finally:
         QApplication.restoreOverrideCursor()
 
-class MyQComboBox(QComboBox): # pyrefly:ignore[invalid-inheritance] # pylint: disable=too-few-public-methods  # pyright: ignore [reportGeneralTypeIssues]# Argument to class must be a base class
+class MyQComboBox(QComboBox):
     def __init__(self, parent:'QWidget|None' = None, **kwargs:dict[Any,Any]) -> None:
-        super().__init__(parent, **kwargs) # pyrefly: ignore
+        super().__init__(parent, **kwargs)
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
 
@@ -55,7 +55,7 @@ class MyQComboBox(QComboBox): # pyrefly:ignore[invalid-inheritance] # pylint: di
 
 class MyContentLimitedQComboBox(MyQComboBox): # pylint: disable=too-few-public-methods  # pyright: ignore [reportGeneralTypeIssues]# Argument to class must be a base class
     def __init__(self, parent:'QWidget|None' = None, **kwargs:dict[Any,Any]) -> None:
-        super().__init__(parent, **kwargs) # pyrefly: ignore
+        super().__init__(parent, **kwargs)
         # setting max number visible limit
         self.setMaxVisibleItems(20)
         # ensure Qt style for this widget
@@ -65,9 +65,9 @@ class MyContentLimitedQComboBox(MyQComboBox): # pylint: disable=too-few-public-m
         if view is not None:
             view.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
 
-class MyQDoubleSpinBox(QDoubleSpinBox): # pyrefly:ignore[invalid-inheritance] # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+class MyQDoubleSpinBox(QDoubleSpinBox):
     def __init__(self, parent:'QWidget|None' = None, **kwargs:dict[str,Any]) -> None:
-        super().__init__(parent, **kwargs) # pyrefly: ignore
+        super().__init__(parent, **kwargs)
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.setLocale(QLocale('C'))
 
@@ -87,9 +87,9 @@ class MyQDoubleSpinBox(QDoubleSpinBox): # pyrefly:ignore[invalid-inheritance] # 
         super().mouseDoubleClickEvent(a0)
         super().mouseReleaseEvent(a0)
 
-class MyQTableWidget(QTableWidget): # pyrefly:ignore[invalid-inheritance] # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+class MyQTableWidget(QTableWidget):
     def __init__(self, parent:'QWidget|None' = None, **kwargs:dict[Any,Any]) -> None:
-        super().__init__(parent, **kwargs) # pyrefly: ignore
+        super().__init__(parent, **kwargs)
         self.installEventFilter(self)
         self.cursor_navigation:bool = True
 
@@ -124,16 +124,16 @@ class MyQTableWidget(QTableWidget): # pyrefly:ignore[invalid-inheritance] # pyri
 
 
 
-class MyTableWidgetItemQLineEdit(QTableWidgetItem): # pyrefly:ignore[invalid-inheritance] # pylint: disable= too-few-public-methods  # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+class MyTableWidgetItemQLineEdit(QTableWidgetItem):
     __slots__ = ['sortKey'] # save some memory by using slots
     def __init__(self, sortKey:QLineEdit) -> None:
         #call custom constructor with UserType item type
-        super().__init__('', 1001) #QTableWidgetItem.ItemType.UserType) # pyrefly: ignore
+        super().__init__('', 1001) #QTableWidgetItem.ItemType.UserType)
         self.sortKey = sortKey
 
     #Qt uses a simple < check for sorting items, override this to use the sortKey
     @override
-    def __lt__(self, other:'MyTableWidgetItemQLineEdit') -> bool: # type: ignore[override]
+    def __lt__(self, other:'MyTableWidgetItemQLineEdit') -> bool: # type: ignore[override] # ty:ignore[unused]
         a = self.sortKey.text()
         b = other.sortKey.text()
         try:
@@ -146,58 +146,58 @@ class MyTableWidgetItemQLineEdit(QTableWidgetItem): # pyrefly:ignore[invalid-inh
             # else we do a string compare
             return a < b
 
-class MyTableWidgetItemQTime(QTableWidgetItem): # pyrefly:ignore[invalid-inheritance] # pylint: disable= too-few-public-methods  # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+class MyTableWidgetItemQTime(QTableWidgetItem):
     __slots__ = ['sortKey'] # save some memory by using slots
     def __init__(self, sortKey:'QTimeEdit') -> None:
         #call custom constructor with UserType item type
-        super().__init__('', 1002) #QTableWidgetItem.ItemType.UserType) # pyrefly: ignore
+        super().__init__('', 1002) #QTableWidgetItem.ItemType.UserType)
         self.sortKey = sortKey
 
     #Qt uses a simple < check for sorting items, override this to use the sortKey
     @override
-    def __lt__(self, other:'MyTableWidgetItemQTime') -> bool: # type: ignore[override]
+    def __lt__(self, other:'MyTableWidgetItemQTime') -> bool: # type: ignore[override] # ty:ignore[unused]
         a = self.sortKey.time().minute() * 60 + self.sortKey.time().second()
         b = other.sortKey.time().minute() * 60 + other.sortKey.time().second()
         return a < b
 
-class MyTableWidgetItemNumber(QTableWidgetItem): # pyrefly:ignore[invalid-inheritance] # pylint: disable= too-few-public-methods  # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+class MyTableWidgetItemNumber(QTableWidgetItem):
     __slots__ = ['sortKey'] # save some memory by using slots
     def __init__(self, text:str, sortKey:float) -> None:
-        super().__init__(text, 1003) #QTableWidgetItem.ItemType.UserType) # pyrefly: ignore
+        super().__init__(text, 1003) #QTableWidgetItem.ItemType.UserType)
         self.sortKey = sortKey
 
     #Qt uses a simple < check for sorting items, override this to use the sortKey
     @override
-    def __lt__(self, other:'MyTableWidgetItemNumber') -> bool: # type: ignore[override]
+    def __lt__(self, other:'MyTableWidgetItemNumber') -> bool: # type: ignore[override] # ty:ignore[unused]
         return self.sortKey < other.sortKey
 
-class MyTableWidgetItemQCheckBox(QTableWidgetItem): # pyrefly:ignore[invalid-inheritance] # pylint: disable= too-few-public-methods  # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base clas
+class MyTableWidgetItemQCheckBox(QTableWidgetItem):
     __slots__ = ['sortKey'] # save some memory by using slots
     def __init__(self, sortKey:'QCheckBox') -> None:
         #call custom constructor with UserType item type
-        super().__init__('', 1004) #QTableWidgetItem.ItemType.UserType) # pyrefly: ignore
+        super().__init__('', 1004) #QTableWidgetItem.ItemType.UserType)
         self.sortKey = sortKey
 
     #Qt uses a simple < check for sorting items, override this to use the sortKey
     @override
-    def __lt__(self, other:'MyTableWidgetItemQCheckBox') -> bool:  # type: ignore[override]
+    def __lt__(self, other:'MyTableWidgetItemQCheckBox') -> bool:  # type: ignore[override] # ty:ignore[unused]
         return self.sortKey.isChecked() < other.sortKey.isChecked()
 
-class MyTableWidgetItemQComboBox(QTableWidgetItem): # pyrefly:ignore[invalid-inheritance] # pylint: disable= too-few-public-methods  # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+class MyTableWidgetItemQComboBox(QTableWidgetItem):
     __slots__ = ['sortKey'] # save some memory by using slots
     def __init__(self, sortKey:'QComboBox') -> None:
         #call custom constructor with UserType item type
-        super().__init__('', 1005) # QTableWidgetItem.ItemType.UserType) # pyrefly: ignore
+        super().__init__('', 1005) # QTableWidgetItem.ItemType.UserType)
         self.sortKey = sortKey
 
     #Qt uses a simple < check for sorting items, override this to use the sortKey
     @override
-    def __lt__(self, other:'MyTableWidgetItemQComboBox') -> bool: # type: ignore[override]
+    def __lt__(self, other:'MyTableWidgetItemQComboBox') -> bool: # type: ignore[override] # ty:ignore[unused]
         return str(self.sortKey.currentText()) < str(other.sortKey.currentText())
 
 
 # Slider which does not move if slider widget is clicked, only if slider bar is clicked
-class SliderUnclickable(QSlider): # pyrefly:ignore[invalid-inheritance] # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+class SliderUnclickable(QSlider):
     focus_in = pyqtSignal()
     focus_out = pyqtSignal()
 
@@ -226,9 +226,9 @@ class SliderUnclickable(QSlider): # pyrefly:ignore[invalid-inheritance] # pyrigh
 
 
 # QLabel that automatically resizes its text font
-class MyQLabel(QLabel): # pyrefly:ignore[invalid-inheritance] # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+class MyQLabel(QLabel):
     def __init__(self, text: str|None = None, parent: 'QWidget|None' = None, flags: Qt.WindowType = Qt.WindowType.Widget) -> None:
-        super().__init__(text, parent, flags) # pyrefly: ignore
+        super().__init__(text, parent, flags)
         self.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Ignored,QSizePolicy.Policy.Ignored))
         self.setMinSize(14)
 
@@ -271,7 +271,7 @@ class MyQLabel(QLabel): # pyrefly:ignore[invalid-inheritance] # pyright: ignore 
             self.setFont(f)
 
 
-class ClickableQLabel(QLabel): # pyrefly:ignore[invalid-inheritance] # pylint: disable=too-few-public-methods # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+class ClickableQLabel(QLabel):
     clicked = pyqtSignal()
     left_clicked = pyqtSignal()
     right_clicked = pyqtSignal()
@@ -286,7 +286,7 @@ class ClickableQLabel(QLabel): # pyrefly:ignore[invalid-inheritance] # pylint: d
             elif ev.button() == Qt.MouseButton.RightButton:
                 self.right_clicked.emit()
 
-class ClickableQGroupBox(QGroupBox): # pyrefly:ignore[invalid-inheritance] # pylint: disable=too-few-public-methods # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+class ClickableQGroupBox(QGroupBox):
     clicked = pyqtSignal()
     left_clicked = pyqtSignal()
     right_clicked = pyqtSignal()
@@ -301,7 +301,7 @@ class ClickableQGroupBox(QGroupBox): # pyrefly:ignore[invalid-inheritance] # pyl
             elif event.button() == Qt.MouseButton.RightButton:
                 self.right_clicked.emit()
 
-class MyQLCDNumber(QLCDNumber): # pyrefly:ignore[invalid-inheritance] # pylint: disable=too-few-public-methods # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+class MyQLCDNumber(QLCDNumber):
     clicked = pyqtSignal()
     left_clicked = pyqtSignal()
     right_clicked = pyqtSignal()
@@ -323,7 +323,7 @@ class MyQLCDNumber(QLCDNumber): # pyrefly:ignore[invalid-inheritance] # pylint: 
         if a0 is not None:
             self.double_clicked.emit()
 
-class ClickableLCDFrame(QFrame): # pyrefly:ignore[invalid-inheritance] # pylint: disable=too-few-public-methods # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+class ClickableLCDFrame(QFrame):
     clicked = pyqtSignal()
     left_clicked = pyqtSignal()
     right_clicked = pyqtSignal()
@@ -340,13 +340,13 @@ class ClickableLCDFrame(QFrame): # pyrefly:ignore[invalid-inheritance] # pylint:
 
 
 # this one emits a clicked event on right-clicks and an editingFinished event when the text was changed and the focus got lost
-class ClickableTextEdit(QTextEdit): # pyrefly:ignore[invalid-inheritance] # pylint: disable=too-few-public-methods # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+class ClickableTextEdit(QTextEdit):
     clicked = pyqtSignal()
     editingFinished = pyqtSignal()
     receivedFocus = pyqtSignal()
 
     def __init__(self, parent:'QWidget|None' = None, **kwargs:dict[str,Any]) -> None:
-        super().__init__(parent, **kwargs) # pyrefly: ignore
+        super().__init__(parent, **kwargs)
         self._changed = False
         self.setTabChangesFocus(True)
         self.textChanged.connect(self._handle_text_changed)
@@ -381,13 +381,13 @@ class ClickableTextEdit(QTextEdit): # pyrefly:ignore[invalid-inheritance] # pyli
         self._changed = False
 
 # this one emits a clicked event on right-clicks and an editingFinished event when the text was changed and the focus got lost
-class ClickableQLineEdit(QLineEdit): # pyrefly:ignore[invalid-inheritance] # pylint: disable=too-few-public-methods # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+class ClickableQLineEdit(QLineEdit):
     clicked = pyqtSignal()
     editingFinished = pyqtSignal()
     receivedFocus = pyqtSignal()
 
     def __init__(self, parent:'QWidget|None' = None, **kwargs:dict[str,Any]) -> None:
-        super().__init__(parent, **kwargs) # pyrefly: ignore
+        super().__init__(parent, **kwargs)
         self._changed = False
         self.textChanged.connect(self._handle_text_changed)
 
@@ -440,9 +440,9 @@ def pushButtonColorStyle(
     font_size_str = ('' if font_size is None else f'font-size:{font_size}pt;')
     return f'{class_name}{selector}{state}{{{color}{background}{font_size_str}}}'
 
-class EventPushButton(QPushButton): # pyrefly:ignore[invalid-inheritance] # pylint: disable=too-few-public-methods # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+class EventPushButton(QPushButton):
     def __init__(self, text:str, parent:'QWidget|None' = None, background_color:str = '#777777') -> None:
-        super().__init__(text, parent) # pyrefly: ignore
+        super().__init__(text, parent)
         self.default_background_color = background_color
         self.default_style = pushButtonColorStyle('*',
             selector='[Selected=false]',
@@ -558,7 +558,7 @@ class AuxEventPushButton(EventPushButton): # pylint: disable=too-few-public-meth
 ###
 
 # only vertical mode supported by SplitterHandler for now
-class SplitterHandle(QSplitterHandle): # pyrefly:ignore[invalid-inheritance] # pyright: ignore [reportGeneralTypeIssues]# Argument to class must be a base class
+class SplitterHandle(QSplitterHandle):
 
     def __init__(self, *args:Any, **kwargs:Any) -> None:
         super().__init__(*args, **kwargs)
@@ -607,7 +607,7 @@ class SplitterHandle(QSplitterHandle): # pyrefly:ignore[invalid-inheritance] # p
 
 
 # only vertical mode supported by SplitterHandler for now
-class Splitter(QSplitter):  # pyrefly:ignore[invalid-inheritance] # pyright: ignore [reportGeneralTypeIssues]# Argument to class must be a base class
+class Splitter(QSplitter):
     def __init__(self, *args:Any, **kwargs:Any):
         super().__init__(*args, *kwargs)
         self.setHandleWidth(10)

@@ -23,7 +23,7 @@ import logging
 from pymodbus.pdu import ExceptionResponse
 from pymodbus.client import AsyncModbusSerialClient, AsyncModbusUdpClient, AsyncModbusTcpClient
 from pymodbus.client.mixin import ModbusClientMixin
-from pymodbus.framer import FramerType # type:ignore[attr-defined,unused-ignore]
+from pymodbus.framer import FramerType
 
 from typing import Final, Literal, Any, TYPE_CHECKING
 
@@ -187,48 +187,48 @@ class modbusport:
         return 'little' if self.wordorderLittle else 'big'
 
     def convert_16bit_uint_to_registers(self, value:int) -> list [int]:
-        return ModbusClientMixin.convert_to_registers(value, ModbusClientMixin.DATATYPE.UINT16, word_order=self.word_order()) # type:ignore[call-arg, unused-ignore]
+        return ModbusClientMixin.convert_to_registers(value, ModbusClientMixin.DATATYPE.UINT16, word_order=self.word_order())
 
     def convert_32bit_int_to_registers(self, value:int) -> list [int]:
-        return ModbusClientMixin.convert_to_registers(value, ModbusClientMixin.DATATYPE.INT32, word_order=self.word_order()) # type:ignore[call-arg, unused-ignore]
+        return ModbusClientMixin.convert_to_registers(value, ModbusClientMixin.DATATYPE.INT32, word_order=self.word_order())
 
     def convert_float_to_registers(self, value:float) -> list[int]:
-        return ModbusClientMixin.convert_to_registers(value, ModbusClientMixin.DATATYPE.FLOAT32, word_order=self.word_order()) # type:ignore[call-arg, unused-ignore]
+        return ModbusClientMixin.convert_to_registers(value, ModbusClientMixin.DATATYPE.FLOAT32, word_order=self.word_order())
 
 
 ##############################
 
 
     def convert_16bit_uint_from_registers(self, registers:list[int]) -> int:
-        res = ModbusClientMixin.convert_from_registers(registers, ModbusClientMixin.DATATYPE.UINT16, word_order=self.word_order()) # type:ignore[call-arg, unused-ignore]
+        res = ModbusClientMixin.convert_from_registers(registers, ModbusClientMixin.DATATYPE.UINT16, word_order=self.word_order())
         if isinstance(res, int):
             return res
         return -1
 
 
     def convert_16bit_int_from_registers(self, registers:list[int]) -> int:
-        res = ModbusClientMixin.convert_from_registers(registers, ModbusClientMixin.DATATYPE.INT16, word_order=self.word_order()) # type:ignore[call-arg, unused-ignore]
+        res = ModbusClientMixin.convert_from_registers(registers, ModbusClientMixin.DATATYPE.INT16, word_order=self.word_order())
         if isinstance(res, int):
             return res
         return -1
 
 
     def convert_32bit_uint_from_registers(self, registers:list[int]) -> int:
-        res = ModbusClientMixin.convert_from_registers(registers, ModbusClientMixin.DATATYPE.UINT32, word_order=self.word_order()) # type:ignore[call-arg, unused-ignore]
+        res = ModbusClientMixin.convert_from_registers(registers, ModbusClientMixin.DATATYPE.UINT32, word_order=self.word_order())
         if isinstance(res, int):
             return res
         return -1
 
 
     def convert_32bit_int_from_registers(self, registers:list[int]) -> int:
-        res = ModbusClientMixin.convert_from_registers(registers, ModbusClientMixin.DATATYPE.INT32, word_order=self.word_order()) # type:ignore[call-arg, unused-ignore]
+        res = ModbusClientMixin.convert_from_registers(registers, ModbusClientMixin.DATATYPE.INT32, word_order=self.word_order())
         if isinstance(res, int):
             return res
         return -1
 
 
     def convert_float_from_registers(self, registers:list[int]) -> float:
-        res = ModbusClientMixin.convert_from_registers(registers, ModbusClientMixin.DATATYPE.FLOAT32, word_order=self.word_order()) # type:ignore[call-arg, unused-ignore]
+        res = ModbusClientMixin.convert_from_registers(registers, ModbusClientMixin.DATATYPE.FLOAT32, word_order=self.word_order())
         if isinstance(res, float):
             return res
         return -1
@@ -301,7 +301,7 @@ class modbusport:
                 # as in the following the port is None, no port is opened on creation of the (py)serial object
                 if self.type == 1: # Serial ASCII
                     self._client = AsyncModbusSerialClient(
-                        framer=FramerType.ASCII, # type:ignore[unused-ignore]
+                        framer=FramerType.ASCII,
                         port=self.comport,
                         baudrate=self.baudrate,
                         bytesize=self.bytesize,
@@ -340,7 +340,7 @@ class modbusport:
 #                    self.readRetries = self.IP_retries # retire Artisan-level retries
                 else: # Serial RTU
                     self._client = AsyncModbusSerialClient(
-                        framer=FramerType.RTU, # type:ignore[unused-ignore]
+                        framer=FramerType.RTU,
                         port=self.comport,
                         baudrate=self.baudrate,
                         bytesize=self.bytesize,

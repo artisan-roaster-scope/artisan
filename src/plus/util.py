@@ -74,8 +74,7 @@ def datetime2epoch(dt:datetime.datetime) -> float:
 
 
 def epoch2datetime(epoch:float) -> datetime.datetime:
-#    return datetime.datetime.utcfromtimestamp(epoch) # considered dangerous!
-    return datetime.datetime.fromtimestamp(epoch, tz=datetime.UTC)  # ty:ignore
+    return datetime.datetime.fromtimestamp(epoch, tz=datetime.UTC)
 
 
 # given a epoch returns e.g. '2018-10-12T12:55:12.999Z'
@@ -90,7 +89,7 @@ def ISO86012epoch(ts:str) -> float:
 def getGMToffset() -> int:
     try:
         offset = datetime.datetime.now(
-            datetime.UTC).astimezone().utcoffset() # ty:ignore
+            datetime.UTC).astimezone().utcoffset()
         if offset is not None:
             return offset // datetime.timedelta(seconds=1)
     except Exception: # pylint: disable=broad-except
@@ -262,7 +261,7 @@ def addAllNum2dict(
         if isinstance(p, tuple):
             (key_source, key_target) = p
         else:
-            key_source = key_target = p # ty:ignore[invalid-assignment]
+            key_source = key_target = p
         addNum2dict(
             dict_source,
             key_source,
@@ -276,7 +275,7 @@ def addAllNum2dict(
 
 
 def addTime2dict(dict_source:'ProfileData|ComputedProfileInformation', key_source:str, dict_target:dict[str, Any], key_target:str) -> None:
-    if key_source in dict_source and dict_source[key_source]:  # type:ignore[literal-required] # pyrefly: ignore # ty:ignore[invalid-key] # TypedDict key must be a string literal; expected one of
+    if key_source in dict_source and dict_source[key_source]:  # type:ignore[literal-required] # pyrefly: ignore # TypedDict key must be a string literal; expected one of
         tx = limittime(dict_source[key_source])  # type:ignore[literal-required] # pyrefly: ignore # TypedDict key must be a string literal; expected one of
         if tx is not None:
             dict_target[key_target] = float2floatMin(tx)
@@ -291,7 +290,7 @@ def addAllTime2dict(dict_source:'ProfileData|ComputedProfileInformation', dict_t
         if isinstance(p, tuple):
             (key_source, key_target) = p
         else:
-            key_source = key_target = p # ty:ignore[invalid-assignment]
+            key_source = key_target = p
         addTime2dict(dict_source, key_source, dict_target, key_target)
 
 
@@ -303,7 +302,7 @@ def addTemp2dict(dict_source:'ProfileData|ComputedProfileInformation', key_sourc
             dict_target[key_target] = float2floatMin(temp)
 
 def addTempDiff2dict(dict_source:'ProfileData|ComputedProfileInformation', key_source:str, dict_target:dict[str, Any], key_target:str) -> None:
-    if key_source in dict_source and dict_source[key_source]:  # type:ignore[literal-required] # ty:ignore[invalid-key] # pyrefly: ignore # TypedDict key must be a string literal; expected one of
+    if key_source in dict_source and dict_source[key_source]:  # type:ignore[literal-required] # pyrefly: ignore # TypedDict key must be a string literal; expected one of
         temp = limittemp(tempDiff2C(dict_source[key_source]))  # type:ignore[literal-required] # pyrefly: ignore # TypedDict key must be a string literal; expected one of
         if temp is not None and temp != -1 and not numpy.isnan(temp):
             dict_target[key_target] = float2floatMin(temp)
@@ -317,7 +316,7 @@ def addAllTemp2dict(dict_source:'ProfileData|ComputedProfileInformation', dict_t
         if isinstance(p, tuple):
             (key_source, key_target) = p
         else:
-            key_source = key_target = p # ty:ignore[invalid-assignment]
+            key_source = key_target = p
         addTemp2dict(dict_source, key_source, dict_target, key_target)
 
 

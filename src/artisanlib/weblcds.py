@@ -41,9 +41,9 @@ class WebView:
 
         self._loop:        asyncio.AbstractEventLoop|None = None # the asyncio loop
         self._thread:      Thread|None                    = None # the thread running the asyncio loop
-        self._app = web.Application(debug=True) # ty: ignore
+        self._app = web.Application(debug=True)
         self._app['websockets'] = weakref.WeakSet()
-        self._app.on_shutdown.append(self.on_shutdown) # type:ignore[arg-type, unused-ignore]
+        self._app.on_shutdown.append(self.on_shutdown)
 
         self._last_send:float = time.time() # timestamp of the last message send to the clients
         self._last_message:str|None = None  # last message send to connected clients; sent to new clients on connect
@@ -54,16 +54,16 @@ class WebView:
         self._index_path:str = index_path
         self._websocket_path:str = websocket_path
 
-        self._runner: web.AppRunner|None = None # ty: ignore
+        self._runner: web.AppRunner|None = None
 
 
         aiohttp_jinja2.setup(self._app,
             loader=jinja2.FileSystemLoader(resource_path))
 
         self._app.add_routes([
-            web.get(f'/{self._index_path}', self.index), # ty: ignore
-            web.get(f'/{self._websocket_path}', self.websocket_handler), # ty: ignore
-            web.static('/', resource_path, append_version=True) # ty: ignore
+            web.get(f'/{self._index_path}', self.index),
+            web.get(f'/{self._websocket_path}', self.websocket_handler),
+            web.static('/', resource_path, append_version=True)
         ])
 
 
@@ -72,7 +72,7 @@ class WebView:
     async def index(self, _request: 'Request') -> dict[str,str]: # pylint:disable=no-self-use
         return {}
 
-    async def send_msg_to_ws(self, ws:web.WebSocketResponse, message:str) -> None: # ty: ignore
+    async def send_msg_to_ws(self, ws:web.WebSocketResponse, message:str) -> None:
         try:
             await ws.send_str(message)
         except Exception as e: # pylint: disable=broad-except
@@ -103,8 +103,8 @@ class WebView:
                 _log.error(ex)
 
     # route that establishes the websocket between the Artisan app and the clients
-    async def websocket_handler(self, request: 'Request') -> web.WebSocketResponse: # ty: ignore
-        ws:web.WebSocketResponse = web.WebSocketResponse()  # ty: ignore
+    async def websocket_handler(self, request: 'Request') -> web.WebSocketResponse:
+        ws:web.WebSocketResponse = web.WebSocketResponse()
         await ws.prepare(request)
         request.app['websockets'].add(ws)
         try:
@@ -120,15 +120,15 @@ class WebView:
         return ws
 
     @staticmethod
-    async def on_shutdown(app:web.Application) -> None:  # ty: ignore
+    async def on_shutdown(app:web.Application) -> None:
         for ws in set(app['websockets']):
             await ws.close(code=WSCloseCode.GOING_AWAY,
                            message='Server shutdown')
 
     async def startup(self) -> None:
-        self._runner = web.AppRunner(self._app)  # ty: ignore
+        self._runner = web.AppRunner(self._app)
         await self._runner.setup()
-        site = web.TCPSite(self._runner, '0.0.0.0', self._port)  # ty: ignore
+        site = web.TCPSite(self._runner, '0.0.0.0', self._port)
         await asyncio.wait_for(site.start(), 0.7)
 
     @staticmethod
@@ -163,7 +163,7 @@ class WebView:
             if self._runner is not None:
                 future = asyncio.run_coroutine_threadsafe(self._runner.cleanup(), self._loop)
                 future.result()
-            self._loop.call_soon_threadsafe(self._loop.stop)  # pyrefly: ignore
+            self._loop.call_soon_threadsafe(self._loop.stop)
             self._loop = None
         # wait for the thread to finish
         if self._thread is not None:
@@ -234,7 +234,7 @@ class WebGreen(WebView):
         self._title = title
         self._min_send_interval = 0 # send all updates
 
-    @aiohttp_jinja2.template(template_name) # pyrefly: ignore
+    @aiohttp_jinja2.template(template_name)
     @override
     async def index(self, _request: 'Request') -> dict[str,str]:
         return {
@@ -269,7 +269,7 @@ class WebRoasted(WebView):
         self._title = title
         self._min_send_interval = 0 # send all updates
 
-    @aiohttp_jinja2.template(template_name) # pyrefly: ignore
+    @aiohttp_jinja2.template(template_name)
     @override
     async def index(self, _request: 'Request') -> dict[str,str]:
         return {

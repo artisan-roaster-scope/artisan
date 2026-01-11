@@ -36,12 +36,12 @@ if TYPE_CHECKING:
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
-class ArtisanDialog(QDialog): # pyrefly:ignore[invalid-inheritance] # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+class ArtisanDialog(QDialog):
 
     __slots__ = ['aw', 'dialogbuttons']
 
     def __init__(self, parent:QWidget|None, aw:'ApplicationWindow') -> None:
-        super().__init__(parent)  # pyrefly: ignore[bad-argument-count]
+        super().__init__(parent)
         self.aw = aw # the Artisan application window
 
         # IMPORTANT NOTE: if dialog items have to be access after it has been closed, this Qt.WidgetAttribute.WA_DeleteOnClose attribute
@@ -132,12 +132,12 @@ class ArtisanResizeablDialog(ArtisanDialog):
             self.setWindowFlags(windowFlags)
 
 # if modal=False the message box is not rendered as native dialog on macOS!
-class ArtisanMessageBox(QMessageBox): # pyrefly:ignore[invalid-inheritance] # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+class ArtisanMessageBox(QMessageBox):
 
     __slots__ = ['timeout', 'currentTime']
 
     def __init__(self, parent:QWidget|None = None, title:str|None = None, text:str|None = None, timeout:int = 0, modal:bool = True) -> None:
-        super().__init__(parent) # pyrefly: ignore[bad-argument-count]
+        super().__init__(parent)
         self.setWindowTitle(title)
         self.setText(text)
         self.setModal(modal)
@@ -722,7 +722,7 @@ class tareDlg(ArtisanDialog):
     @pyqtSlot()
     def weightEdited(self) -> None:
         sender = self.sender()
-        if sender and isinstance(sender, QLineEdit): # pyrefly: ignore[invalid-argument]
+        if sender and isinstance(sender, QLineEdit):
             text = sender.text().strip()
             if text == '':
                 w:float|None = self.get_scale_weight() # read value from scale in 'g'

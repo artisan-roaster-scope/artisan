@@ -147,32 +147,6 @@ def clearCredentials(remove_from_keychain: bool = True) -> None:
         if token_semaphore.available() < 1:
             token_semaphore.release(1)
 
-#def setKeyring() -> None:
-#    try:
-#        if platform.system().startswith('Windows'):
-#            import keyring.backends.Windows  # @UnusedImport
-#        elif platform.system() == 'Darwin':
-#            import keyring.backends.macOS  # @UnusedImport @UnresolvedImport
-#        else:
-#            import keyring.backends.SecretService  # @UnusedImport
-#        import keyring  # @Reimport # imported last to make py2app work
-#
-#        # HACK set keyring backend explicitly
-#        if platform.system().startswith('Windows'):
-#            keyring.set_keyring(
-#                keyring.backends.Windows.WinVaultKeyring() # type:ignore[no-untyped-call]
-#            )  # @UndefinedVariable
-#        elif platform.system() == 'Darwin':
-#            try:
-#                keyring.set_keyring(keyring.backends.macOS.Keyring()) # type:ignore[no-untyped-call]
-#            except Exception:  # pylint: disable=broad-except
-#                keyring.set_keyring(keyring.backends.OS_X.Keyring())   # type: ignore  # pylint: disable=no-member
-#        else:  # Linux
-#            keyring.set_keyring(keyring.backends.SecretService.Keyring()) # type:ignore[no-untyped-call]
-#        # _log.debug("keyring: %s",str(keyring.get_keyring()))
-#    except Exception as e:  # pylint: disable=broad-except
-#        _log.exception(e)
-
 # returns True on successful authentication
 # NOTE: authentify might be called from outside the GUI thread
 def authentify() -> bool:
@@ -185,14 +159,7 @@ def authentify() -> bool:
         ):  # @UndefinedVariable
             # fetch passwd
             if config.passwd is None:
-#                setKeyring()
                 try:
-#                    if platform.system().startswith('Windows'):
-#                        import keyring.backends.Windows  # @UnusedImport
-#                    elif platform.system() == 'Darwin':
-#                        import keyring.backends.macOS  # @UnusedImport @UnresolvedImport
-#                    else:
-#                        import keyring.backends.SecretService  # @UnusedImport
                     import keyring  # @Reimport # imported last to make py2app work
 
                     config.passwd = keyring.get_password(
@@ -285,7 +252,7 @@ def authentify() -> bool:
                             if paidUntil != '' and (
                                 dateutil.parser.parse(paidUntil).date()
     #                            - datetime.datetime.now().date()  # DTZ005 The use of `datetime.datetime.now()` without `tz` argument is not allowed
-                                - datetime.datetime.now(datetime.UTC).date() # ty:ignore
+                                - datetime.datetime.now(datetime.UTC).date()
                             ).days < (-config.expired_subscription_max_days):
                                 _log.debug(
                                         '-> authentication failed due to'

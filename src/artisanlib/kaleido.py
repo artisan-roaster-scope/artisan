@@ -832,10 +832,11 @@ def extractProfileKaleidoCSV(file:str,
                 res['extraname1'] = ['{3}', 'SV', '{1}', 'RoR']
                 res['extraname2'] = ['{0}', 'AT', 'AH', '']
                 res['extratimex'] = [timex[:], timex[:], timex[:], timex[:]]
-                res['extratemp1'] = [hp_list, sv_list, rl_list, [r * 2 for r in BT_ror]] # Convert ROR values to C/60s
+                res['extratemp1'] = [hp_list, sv_list, rl_list, BT_ror] # Convert ROR values to C/60s
                 res['extratemp2'] = [sm_list, [0]*len(timex), hpm_list, [0]*len(timex)]
-                res['extraDelta1'] = [False, False, False, True]
-                res['extraDelta2'] = [False, False, False, False]
+                # NOTE: assuming aw.nLCDs = 10 here:
+                res['extraDelta1'] = [False, False, False, True, False, False, False, False, False, False]
+                res['extraDelta2'] = [False, False, False, False, False, False, False, False, False, False]
 
     # Parse event timestamps and map to Artisan timeindex
     # Mapping relationship:

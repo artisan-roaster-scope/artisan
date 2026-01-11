@@ -59,7 +59,7 @@ worker_thread:QThread|None = None
 queueWorkerSemaphore = QSemaphore(1) # ensure that only one worker thread is running
 
 
-class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # pyrefly: ignore # Argument to class must be a base class
+class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues]
     startSignal = pyqtSignal()
     replySignal = pyqtSignal(float, float, str, int, list) # rlimit:float, rused:float, pu:str, notifications:int, machines:list[str]
 
@@ -124,15 +124,15 @@ class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # pyrefly: ig
                             # we upload only full roast records, or partial updates
                             # in case they are under sync
                             # (registered in the sync cache)
-                            if is_full_roast_record(item['data']) or (     # pyrefly: ignore
-                                'roast_id' in item['data']                 # pyrefly: ignore
-                                and sync.getSync(item['data']['roast_id']) # pyrefly: ignore
+                            if is_full_roast_record(item['data']) or (
+                                'roast_id' in item['data']
+                                and sync.getSync(item['data']['roast_id'])
                             ):
                                 controller.connect(
                                     clear_on_failure=False, interactive=False
                                 )
                                 r = connection.sendData(
-                                    item['url'], item['data'], item['verb'] # pyrefly: ignore
+                                    item['url'], item['data'], item['verb']
                                 )
                                 r.raise_for_status()
                                 aw = config.app_window
@@ -145,14 +145,14 @@ class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # pyrefly: ig
                                     )  # @UndefinedVariable
                                 # successfully transmitted, we add/update the
                                 # roasts UUID sync-cache
-                                self.addSyncItem(item) # pyrefly: ignore
+                                self.addSyncItem(item)
                                 # if current roast was just successfully uploaded,
                                 # we set the syncRecordHash to the full sync record
                                 # to track further edits. Note we take
                                 # a fresh (full) SyncRecord here as the uploaded
                                 # record might contain only changed attributes
                                 sr, h = roast.getSyncRecord()
-                                if item['data']['roast_id'] == sr['roast_id']: # pyrefly: ignore
+                                if item['data']['roast_id'] == sr['roast_id']:
                                     sync.setSyncRecordHash(sync_record=sr, h=h)
                                 try:
                                     if r.status_code != 204 and r.headers['content-type'].strip().startswith('application/json'):
@@ -170,13 +170,13 @@ class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # pyrefly: ig
                                     _log.error('Response content is not valid JSON')
                                 except Exception as e:  # pylint: disable=broad-except
                                     _log.exception(e)
-                            elif 'url' in item and item['url'].startswith(config.lock_schedule_url): # pyrefly: ignore
+                            elif 'url' in item and item['url'].startswith(config.lock_schedule_url):
                                 # this is not be a roast record, but a lock schedule message to be send to the server
                                 controller.connect(
                                     clear_on_failure=False, interactive=False
                                 )
                                 r = connection.sendData(
-                                    item['url'], item['data'], item['verb'] # pyrefly: ignore
+                                    item['url'], item['data'], item['verb']
                                 )
                                 r.raise_for_status()
 # maybe to much noise:

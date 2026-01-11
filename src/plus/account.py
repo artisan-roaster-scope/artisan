@@ -120,7 +120,7 @@ def setAccount(account_id: str) -> int|None:
         fh:IO[str]
         account_cache_semaphore.acquire(1)
         _log.debug('setAccount(%s)', account_id)
-        with portalocker.Lock(account_cache_lock_path, timeout=0.5) as fh: # pyrefly: ignore
+        with portalocker.Lock(account_cache_lock_path, timeout=0.5) as fh:
             return setAccountShelve(account_id, fh)
     except portalocker.exceptions.LockException as e:
         _log.exception(e)
@@ -133,7 +133,7 @@ def setAccount(account_id: str) -> int|None:
         _log.debug(
             'retry setAccount(%s)', account_id
         )
-        with portalocker.Lock(account_cache_lock_path, timeout=0.3) as fh: # pyrefly: ignore
+        with portalocker.Lock(account_cache_lock_path, timeout=0.3) as fh:
             return setAccountShelve(account_id, fh)
     except Exception as e:  # pylint: disable=broad-except
         _log.exception(e)

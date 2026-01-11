@@ -179,7 +179,7 @@ class scanModbusDlg(ArtisanDialog):
                     res = self.aw.modbus.peekSingleRegister(self.deviceID, int(register), code=3)
                     if res is not None:
                         result += str(register) + '(3),' + str(res) + '<br>'
-                        self.modbusEdit.setHtml(result) # pyrefly: ignore[bad-assignment]
+                        self.modbusEdit.setHtml(result)
             self.aw.modbus.disconnect()
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
@@ -343,7 +343,7 @@ class scanS7Dlg(ArtisanDialog):
                     res = self.aw.s7.peekInt(self.area,self.DBnr,register)
                 if res is not None:
                     result += f'{str(register)}: {str(res)}<br>'
-                    self.S7Edit.setHtml(result) # pyrefly: ignore[bad-assignment]
+                    self.S7Edit.setHtml(result)
                 time.sleep(0.4)
             self.aw.s7.disconnect()
         except Exception as e: # pylint: disable=broad-except
@@ -484,12 +484,12 @@ class comportDlg(ArtisanResizeablDialog):
         modbus_input1divlabel = QLabel(QApplication.translate('Label', 'Divider'))
         modbus_input1modelabel = QLabel(QApplication.translate('Label', 'Mode'))
 
-        self.modbus_inputDeviceEdits:list[QLineEdit|None] = [None] * self.aw.modbus.channels # pyrefly: ignore[bad-assignment]
-        self.modbus_inputRegisterEdits:list[QLineEdit|None] = [None]*self.aw.modbus.channels # pyrefly: ignore[bad-assignment]
-        self.modbus_inputCodes:list[QComboBox|None] = [None]*self.aw.modbus.channels # pyrefly: ignore[bad-assignment]
-        self.modbus_inputDivs:list[QComboBox|None] = [None]*self.aw.modbus.channels # pyrefly: ignore[bad-assignment]
-        self.modbus_inputModes:list[QComboBox|None] = [None]*self.aw.modbus.channels # pyrefly: ignore[bad-assignment]
-        self.modbus_inputDecodes:list[QComboBox|None] = [None]*self.aw.modbus.channels # pyrefly: ignore[bad-assignment]
+        self.modbus_inputDeviceEdits:list[QLineEdit|None] = [None] * self.aw.modbus.channels
+        self.modbus_inputRegisterEdits:list[QLineEdit|None] = [None]*self.aw.modbus.channels
+        self.modbus_inputCodes:list[QComboBox|None] = [None]*self.aw.modbus.channels
+        self.modbus_inputDivs:list[QComboBox|None] = [None]*self.aw.modbus.channels
+        self.modbus_inputModes:list[QComboBox|None] = [None]*self.aw.modbus.channels
+        self.modbus_inputDecodes:list[QComboBox|None] = [None]*self.aw.modbus.channels
 
         for i in range(self.aw.modbus.channels):
             modbus_inputDeviceEdit:QLineEdit = QLineEdit(str(self.aw.modbus.inputDeviceIds[i]))

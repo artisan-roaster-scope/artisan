@@ -47,7 +47,7 @@ from PyQt6.QtWidgets import (QApplication, QWidget, QLabel, QLineEdit, QComboBox
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 
-class AlignDelegate(QStyledItemDelegate): # pyrefly:ignore[invalid-inheritance] # pyright:ignore[reportGeneralTypeIssues]
+class AlignDelegate(QStyledItemDelegate):
     @override
     def initStyleOption(self, option:'QStyleOptionViewItem|None', index:'QModelIndex') -> None:
         super().initStyleOption(option, index)
@@ -724,7 +724,7 @@ class AlarmDlg(ArtisanResizeablDialog):
         self.accept()
 
     @override
-    def closeEvent(self, a0:'QCloseEvent|None') -> None: # pyrefly: ignore
+    def closeEvent(self, a0:'QCloseEvent|None') -> None:
         del a0
         self.closealarms()
 

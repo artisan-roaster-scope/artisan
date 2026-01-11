@@ -115,14 +115,14 @@ class LargeLCDs(ArtisanDialog):
             self.upperLabelssvisibility(True)
 
     def hideOuterEmptyLabels(self) -> None:
-        all_frames = [val for pair in zip(self.lcds1frames, self.lcds2frames, strict=True) for val in pair] # ty:ignore
+        all_frames = [val for pair in zip(self.lcds1frames, self.lcds2frames, strict=True) for val in pair]
         visible_frames = []
         for i, _ in enumerate(all_frames):
             if len(self.visibleFrames) > i:
                 visible_frames.append(all_frames[i])
 
         if visible_frames:
-            all_upper_labels = [val for pair in zip(self.lcds1labelsUpper, self.lcds2labelsUpper, strict=True) for val in pair] # ty:ignore
+            all_upper_labels = [val for pair in zip(self.lcds1labelsUpper, self.lcds2labelsUpper, strict=True) for val in pair]
             for i, ll in enumerate(all_upper_labels):
                 if (all_frames[i] == visible_frames[0] and ll.text().strip() == ''):
                     # hide first visible upper label if empty
@@ -130,7 +130,7 @@ class LargeLCDs(ArtisanDialog):
                         ll.setVisible(False)
                 elif len(self.visibleFrames) > i and ll.isHidden():
                     ll.setVisible(True)
-            all_lower_labels = [val for pair in zip(self.lcds1labelsLower, self.lcds2labelsLower, strict=True) for val in pair] # ty:ignore
+            all_lower_labels = [val for pair in zip(self.lcds1labelsLower, self.lcds2labelsLower, strict=True) for val in pair]
             for i, ll in enumerate(all_lower_labels):
                 if (all_frames[i] == visible_frames[-1] and ll.text().strip() == ''):
                     # hide last visible label if empty
@@ -140,13 +140,13 @@ class LargeLCDs(ArtisanDialog):
                     ll.setVisible(True)
 
     def lowerLabelssvisibility(self, b:bool) -> None:
-        lower_labels = [val for pair in zip(self.lcds1labelsLower, self.lcds2labelsLower, strict=True) for val in pair] # ty:ignore
+        lower_labels = [val for pair in zip(self.lcds1labelsLower, self.lcds2labelsLower, strict=True) for val in pair]
         for i, ll in enumerate(lower_labels):
             if len(self.visibleFrames) > i and ll.isHidden() == b:
                 ll.setVisible(b)
 
     def upperLabelssvisibility(self, b:bool) -> None:
-        upper_labels = [val for pair in zip(self.lcds1labelsUpper, self.lcds2labelsUpper, strict=True) for val in pair] # ty:ignore
+        upper_labels = [val for pair in zip(self.lcds1labelsUpper, self.lcds2labelsUpper, strict=True) for val in pair]
         for i, ll in enumerate(upper_labels):
             if len(self.visibleFrames) > i and ll.isHidden() == b:
                 ll.setVisible(b)
@@ -255,7 +255,7 @@ class LargeLCDs(ArtisanDialog):
     # in horizontal layouts we add one more digit per LCD than needed as spacer for separation
     # in vertical layouts we add only the exact number of digits that are needed to fully display the number to save space (tight mode)
     def updateDecimals(self) -> None:
-        for i,(lcd1,lcd2) in enumerate(zip(self.lcds1, self.lcds2, strict=True)): # ty:ignore
+        for i,(lcd1,lcd2) in enumerate(zip(self.lcds1, self.lcds2, strict=True)):
             for j,lcd in enumerate([lcd1,lcd2]):
                 if self.aw.qmc.LCDdecimalplaces and not self.aw.qmc.intChannel(i,j):
                     if self.tight:
@@ -817,7 +817,7 @@ class LargePhasesLCDs(LargeLCDs):
         for i, ll in enumerate(map(self.formatLabel,labels)):
             if ll is not None:
                 self.labels[i] = ll
-        super().updateLabels([' ']*2,[' ']*2,[self.labels[0],self.labels[2]],[self.labels[1],self.labels[3]]) # pyrefly: ignore[bad-argument-type]
+        super().updateLabels([' ']*2,[' ']*2,[self.labels[0],self.labels[2]],[self.labels[1],self.labels[3]])
 
     def updateAUCstyle(self, style:str) -> None:
         self.lcds2[1].setStyleSheet(style)
@@ -894,7 +894,7 @@ class LargeScaleLCDs(LargeLCDs):
 
     @override
     def updateDecimals(self) -> None:
-        for (lcd1,lcd2) in zip(self.lcds1, self.lcds2, strict=True): # ty:ignore
+        for (lcd1,lcd2) in zip(self.lcds1, self.lcds2, strict=True):
             for lcd in [lcd1,lcd2]:
                 if self.tight:
                     lcd.setDigitCount(6)

@@ -775,7 +775,7 @@ def extractProfileCropsterXLS(file:str,
     general_sh = book.sheet_by_index(0)
     if general_sh.nrows >= 1:
         row1 = general_sh.row(1)
-        general_data = dict(zip([x.value for x in general_sh.row(0)], row1, strict=True)) # ty:ignore
+        general_data = dict(zip([x.value for x in general_sh.row(0)], row1, strict=True))
 
         res['samplinginterval'] = 1.0
 

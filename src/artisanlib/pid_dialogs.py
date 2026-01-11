@@ -1358,7 +1358,7 @@ class PID_DlgControl(ArtisanDialog):
     def setRS(self, _:bool = False) -> None:
         try:
             sender = self.sender()
-            assert isinstance(sender, QPushButton) # pyrefly: ignore[invalid-argument]
+            assert isinstance(sender, QPushButton)
             n = self.RSnButtons.index(sender)
             self.aw.pidcontrol.svLabel = self.getRSnSVLabel(n)
             self.aw.pidcontrol.svValues = self.getRSnSVvalues(n)

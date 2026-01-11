@@ -28,9 +28,9 @@ import numpy
 import functools
 from bisect import bisect_right
 from pathlib import Path
-from matplotlib import colors # type:ignore[untyped-import,unused-ignore]
+from matplotlib import colors
 from collections.abc import Iterator
-from typing import Final, Literal, Any, TypeGuard, cast, TYPE_CHECKING # ty:ignore
+from typing import Final, Literal, Any, TypeGuard, cast, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -542,19 +542,19 @@ def createGradient(rgb:QColor|str, tint_factor:float = 0.1, shade_factor:float =
 def createRGBGradient(rgb:QColor|str, tint_factor:float = 0.3, shade_factor:float = 0.3) -> tuple[str,str]:
     try:
         rgb_tuple: tuple[float, float, float]
-        if isinstance(rgb, QColor): # pyrefly: ignore[invalid-argument]
-            r,g,b,_ = rgb.getRgbF() # type:ignore[unused-ignore]
+        if isinstance(rgb, QColor):
+            r,g,b,_ = rgb.getRgbF()
             if r is not None and g is not None and b is not None:
                 rgb_tuple = (r,g,b)
             else:
                 rgb_tuple = (0.5,0.5,0.5)
-        elif rgb[0:1] == '#':   # hex input like "#ffaa00" # type: ignore
+        elif rgb[0:1] == '#':   # hex input like "#ffaa00"
 #            rgb_tuple = tuple(int(rgb[i:i+2], 16)/255 for i in (1, 3 ,5))
-            rgb_tuple = (float(int(rgb[1:3], 16)/255),float(int(rgb[3:5], 16)/255),float(int(rgb[5:7], 16)/255)) # type:ignore[unused-ignore]
+            rgb_tuple = (float(int(rgb[1:3], 16)/255),float(int(rgb[3:5], 16)/255),float(int(rgb[5:7], 16)/255))
         else:                 # color name
-            rgb_tuple = colors.hex2color(colors.cnames[rgb]) # type:ignore[unused-ignore]
+            rgb_tuple = colors.hex2color(colors.cnames[rgb])
         #ref: https://stackoverflow.com/questions/6615002/given-an-rgb-value-how-do-i-create-a-tint-or-shade
-        r,g,b = tuple(int(255 * (x * (1 - shade_factor))) for x in rgb_tuple) # type:ignore[unused-ignore]
+        r,g,b = tuple(int(255 * (x * (1 - shade_factor))) for x in rgb_tuple)
         darker_rgb = f'#{r:02x}{g:02x}{b:02x}'
         r,g,b = tuple(int(255 * (x + (1 - x) * tint_factor)) for x in rgb_tuple)
         lighter_rgb = f'#{r:02x}{g:02x}{b:02x}'
@@ -1045,7 +1045,7 @@ def csv_load(csvFile:io.TextIOWrapper) -> 'ProfileData':
     for row in data:
         i = i + 1
         try:
-            items = list(zip(fields, row, strict=True)) # ty:ignore
+            items = list(zip(fields, row, strict=True))
             item:dict[str,str] = {}
             for (name, value) in items:
                 item[name] = value.strip()
@@ -1150,7 +1150,7 @@ def exportProfile2CSV(filename:str, profile:'ProfileData') -> bool:
                 'COOL:' + eventtime2string(COOL),
                 'Time:' + QTime.fromString(decodeLocalStrict(profile['roasttime'])).toString()[:-3]]) # pyright: ignore[reportTypedDictNotRequiredAccess]
             headrow:list[str] = (['Time1','Time2','ET','BT','Event'] + functools.reduce(lambda x,y : x + [str(y[0]),str(y[1])],
-                    (list(zip(profile['extraname1'][0:extradevices],profile['extraname2'][0:extradevices], strict=True)) if 'extraname1' in profile and 'extraname2' in profile else []), # ty:ignore
+                    (list(zip(profile['extraname1'][0:extradevices],profile['extraname2'][0:extradevices], strict=True)) if 'extraname1' in profile and 'extraname2' in profile else []),
                     cast(list[str], [])))
             writer.writerow(headrow)
             last_time:str|None = None
@@ -1235,4 +1235,4 @@ def min_blocks(registers:list[int]) -> list[tuple[int,int]]:
     # edges iter returns in sequence [12392, 12394, 12462, 12463, 12465, 12465]
     edges:Iterator[int] = iter(registers_sorted[:1] + sum(gaps, cast(list[int], [])) + registers_sorted[-1:])
     # sequences: eg. [(12392, 12394), (12462, 12463), (12465, 12465)]
-    return list(zip(edges, edges, strict=True)) # ty:ignore
+    return list(zip(edges, edges, strict=True))

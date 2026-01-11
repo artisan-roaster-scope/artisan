@@ -170,7 +170,6 @@ class BLE:
             try:
                 return bytes(fut.result())
             except Exception: # pylint: disable=broad-except
-                #raise fut.exception() from e # type: ignore[misc]
                 _log.error('exception in read: %s', fut.exception())
         return None
 
@@ -202,7 +201,6 @@ class BLE:
             _log.error('Bluetooth is not supported, turned off or permission is denied')
             return None, None, None
         except Exception: # pylint: disable=broad-except
-            #raise fut.exception() from e # type: ignore[misc]
             _log.error('exception in scan_and_connect: %s', fut.exception())
             return None, None, None
 
@@ -220,7 +218,6 @@ class BLE:
             try:
                 fut.result()
             except Exception:  # pylint: disable=broad-except
-                #raise fut.exception() from e # type: ignore[misc]
                 _log.error('exception in start_notify: %s', fut.exception())
 
     def stop_notify(self, client:'BleakClient', uuid:str) -> None:
@@ -231,7 +228,6 @@ class BLE:
             try:
                 fut.result()
             except Exception:  # pylint: disable=broad-except
-                #raise fut.exception() from e # type: ignore[misc]
                 _log.error('exception in stop_notify: %s', fut.exception())
 
 ble = BLE() # unique to module
@@ -242,7 +238,7 @@ ble = BLE() # unique to module
 
 
 
-class ClientBLE(QObject): # pyrefly:ignore[invalid-inheritance] # pyright:ignore[reportGeneralTypeIssues] # error: Argument to class must be a base class
+class ClientBLE(QObject):
 
     SCAN_BETWEEN_SCANS_START:Final[float] = 0.1 # initial sleep between scans in seconds
     SCAN_BETWEEN_SCANS_INC:Final[float] = 0.1   # increase of sleep time per scan

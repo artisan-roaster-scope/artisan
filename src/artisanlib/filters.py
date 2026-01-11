@@ -63,8 +63,8 @@ class LiveLFilter(LiveFilter):
         """
         self.b = b_
         self.a = a_
-        self._xs:deque[float] = deque([0.0] * len(self.b), maxlen=len(self.b))         # pyrefly: ignore[bad-argument-type]
-        self._ys:deque[float] = deque([0.0] * (len(self.a) - 1), maxlen=len(self.a)-1) # pyrefly: ignore[bad-argument-type]
+        self._xs:deque[float] = deque([0.0] * len(self.b), maxlen=len(self.b))
+        self._ys:deque[float] = deque([0.0] * (len(self.a) - 1), maxlen=len(self.a)-1)
 
     @override
     def _process(self, x:float) -> float:
@@ -215,7 +215,7 @@ if __name__ == '__main__':
     from scipy.signal import iirfilter, lfilter, sosfilt # type # ignore[import-untyped]
     #
     # define lowpass filter with 2.5 Hz cutoff frequency of order 4 (note: delay increases with order)
-    b, a = iirfilter(4, Wn=2.5, fs=fs, btype='low', ftype='butter') # pyrefly: ignore
+    b, a = iirfilter(4, Wn=2.5, fs=fs, btype='low', ftype='butter')
     y_scipy_lfilter = lfilter(b, a, yraw)
 
     live_lfilter = LiveLFilter(b, a)
@@ -249,7 +249,7 @@ if __name__ == '__main__':
 
 
     # plot the data
-    import matplotlib.pyplot as plt # type:ignore[untyped-import,unused-ignore]
+    import matplotlib.pyplot as plt # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore]
     plt.figure(figsize=(6.4, 2.4))
     plt.plot(ts, yraw, label='Noisy signal')
 #    plt.plot(ts, y_scipy_lfilter, lw=1, label="SciPy lfilter")

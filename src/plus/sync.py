@@ -109,7 +109,7 @@ def addSync(uuid:str, modified_at:float) -> None:
     try:
         sync_cache_semaphore.acquire(1)
         _log.debug('addSync(%s,%s)', uuid, modified_at)
-        with portalocker.Lock(getSyncPath(lock=True), timeout=0.5) as fh: # pyrefly: ignore
+        with portalocker.Lock(getSyncPath(lock=True), timeout=0.5) as fh:
             addSyncShelve(uuid, modified_at, fh)
     except portalocker.exceptions.LockException as e:
         _log.exception(e)
@@ -122,7 +122,7 @@ def addSync(uuid:str, modified_at:float) -> None:
         _log.debug(
             'retry sync:addSync(%s,%s)', str(uuid), str(modified_at)
         )
-        with portalocker.Lock(lock_path, timeout=0.3) as fh: # pyrefly: ignore
+        with portalocker.Lock(lock_path, timeout=0.3) as fh:
             addSyncShelve(uuid, modified_at, fh)
     except Exception as e:  # pylint: disable=broad-except
         _log.exception(e)
@@ -141,7 +141,7 @@ def getSync(uuid:str) -> float|None:
     try:
         sync_cache_semaphore.acquire(1)
         _log.debug('getSync(%s)', str(uuid))
-        with portalocker.Lock(getSyncPath(lock=True), timeout=0.5) as fh: # pyrefly: ignore
+        with portalocker.Lock(getSyncPath(lock=True), timeout=0.5) as fh:
             try:
                 with shelve.open(getSyncPath()) as db:
                     try:
@@ -166,7 +166,7 @@ def getSync(uuid:str) -> float|None:
         _log.info('clean lock %s', str(lock_path))
         lock_path.unlink()
         _log.debug('retry sync:getSync(%s)', str(uuid))
-        with portalocker.Lock(getSyncPath(lock=True), timeout=0.3) as fh: # pyrefly: ignore
+        with portalocker.Lock(getSyncPath(lock=True), timeout=0.3) as fh:
             try:
                 with shelve.open(getSyncPath()) as db:
                     try:
@@ -197,7 +197,7 @@ def delSync(uuid:str) -> None:
     try:
         sync_cache_semaphore.acquire(1)
         _log.debug('delSync(%s)', str(uuid))
-        with portalocker.Lock(getSyncPath(lock=True), timeout=0.5) as fh: # pyrefly: ignore
+        with portalocker.Lock(getSyncPath(lock=True), timeout=0.5) as fh:
             try:
                 with shelve.open(getSyncPath()) as db:
                     del db[uuid]
@@ -215,7 +215,7 @@ def delSync(uuid:str) -> None:
         _log.info('clean lock %s', str(lock_path))
         lock_path.unlink()
         _log.debug('retry sync:delSync(%s)', str(uuid))
-        with portalocker.Lock(getSyncPath(lock=True), timeout=0.3) as fh: # pyrefly: ignore
+        with portalocker.Lock(getSyncPath(lock=True), timeout=0.3) as fh:
             try:
                 with shelve.open(getSyncPath()) as db:
                     del db[uuid]

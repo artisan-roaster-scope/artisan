@@ -2518,7 +2518,7 @@ class EventsDlg(ArtisanResizeablDialog):
                 if len(copy)>25:
                     self.aw.buttonpalette_label = copy[25]
                 else:
-                    self.aw.buttonpalette_label = self.aw.buttonpalette_default_label # type:ignore[unreachable, unused-ignore]
+                    self.aw.buttonpalette_label = self.aw.buttonpalette_default_label # type:ignore[unreachable, unused-ignore] # ty:ignore[ignore]
                 if len(copy)>26 and len(copy[26]) == 4:
                     self.aw.eventquantifieraction = copy[26][:]
                 else:
@@ -3172,7 +3172,7 @@ class EventsDlg(ArtisanResizeablDialog):
             return
         try:
             focusWidget = QApplication.focusWidget()
-            if focusWidget is not None and isinstance(focusWidget, QLineEdit): # pyrefly: ignore[invalid-argument]
+            if focusWidget is not None and isinstance(focusWidget, QLineEdit):
                 fw:QLineEdit = focusWidget
                 fw.editingFinished.emit()
         except Exception: # pylint: disable=broad-except
@@ -3840,7 +3840,7 @@ class SliderCalculator(ArtisanDialog):
         self.sliderMin = sliderMin
         self.sliderMax = sliderMax
         self.ui = SliderCalculatorDialog.Ui_SliderCalculator()
-        self.ui.setupUi(self) # type:ignore[no-untyped-call, unused-ignore]
+        self.ui.setupUi(self) # type:ignore[no-untyped-call, unused-ignore] # ty:ignore[ignore]
         self.setWindowTitle(QApplication.translate('Form Caption','Slider Calculator'))
         self.ui.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel|QDialogButtonBox.StandardButton.Apply)
         # hack to assign the Apply button the AcceptRole without losing default system translations

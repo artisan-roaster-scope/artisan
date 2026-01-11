@@ -84,7 +84,7 @@ def extractProfileRoestCSV(file:str,
         i:int = -1
         for row in data:
             i += 1
-            items = list(zip(header, row, strict=True)) # ty:ignore
+            items = list(zip(header, row, strict=True))
             item:dict[str,str] = {}
             for (name, value) in items:
                 item[name] = value.strip()

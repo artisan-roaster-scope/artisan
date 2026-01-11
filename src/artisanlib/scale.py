@@ -73,7 +73,7 @@ class STATE_ACTION(IntEnum):
 
 
 # NOTE: this class and all subclasses are not allowed to hold __slots__
-class Scale(QObject): # pyrefly:ignore[invalid-inheritance] # pyright:ignore[reportGeneralTypeIssues] # error: Argument to class must be a base class
+class Scale(QObject):
 
     scanned_signal = pyqtSignal(list)               # delivers discovered device details
     weight_changed_signal = pyqtSignal(float, bool) # delivers new weight in g with decimals for accurate
@@ -148,7 +148,7 @@ class Scale(QObject): # pyrefly:ignore[invalid-inheritance] # pyright:ignore[rep
         pass
 
 
-class ScaleManager(QObject): # pyrefly:ignore[invalid-inheritance] # pyright:ignore[reportGeneralTypeIssues] # error: Argument to class must be a base class
+class ScaleManager(QObject):
 
     # triggered from clients:
 

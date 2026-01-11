@@ -348,7 +348,7 @@ class PID:
         finally:
             self.pidSemaphore.release(1)
 
-    def isActive(self) -> bool:  # pyrefly: ignore[bad-return]
+    def isActive(self) -> bool:
         try:
             self.pidSemaphore.acquire(1)
             return self.active
@@ -541,7 +541,7 @@ class PID:
         finally:
             self.pidSemaphore.release(1)
 
-    def getTarget(self) -> float: # pyrefly: ignore[bad-return]
+    def getTarget(self) -> float:
         try:
             self.pidSemaphore.acquire(1)
             return self.target
@@ -615,28 +615,28 @@ class PID:
         finally:
             self.pidSemaphore.release(1)
 
-    def getPterm(self) -> float: # pyrefly: ignore[bad-return]
+    def getPterm(self) -> float:
         try:
             self.pidSemaphore.acquire(1)
             return self.Pterm
         finally:
             self.pidSemaphore.release(1)
 
-    def getIterm(self) -> float: # pyrefly: ignore[bad-return]
+    def getIterm(self) -> float:
         try:
             self.pidSemaphore.acquire(1)
             return self.Iterm
         finally:
             self.pidSemaphore.release(1)
 
-    def getDterm(self) -> float: # pyrefly: ignore[bad-return]
+    def getDterm(self) -> float:
         try:
             self.pidSemaphore.acquire(1)
             return self.Dterm
         finally:
             self.pidSemaphore.release(1)
 
-    def getError(self) -> float: # pyrefly: ignore[bad-return]
+    def getError(self) -> float:
         try:
             self.pidSemaphore.acquire(1)
             return self.lastError or 0
@@ -691,7 +691,7 @@ class PID:
         finally:
             self.pidSemaphore.release(1)
 
-    def getDerivativeLimit(self) -> float: # pyrefly: ignore[bad-return]
+    def getDerivativeLimit(self) -> float:
         """Get the current derivative limit."""
         try:
             self.pidSemaphore.acquire(1)
@@ -707,7 +707,7 @@ class PID:
         finally:
             self.pidSemaphore.release(1)
 
-    def getIntegralWindupPrevention(self) -> bool: # pyrefly: ignore[bad-return]
+    def getIntegralWindupPrevention(self) -> bool:
         """Get the current integral windup prevention setting."""
         try:
             self.pidSemaphore.acquire(1)
@@ -723,7 +723,7 @@ class PID:
         finally:
             self.pidSemaphore.release(1)
 
-    def getIntegralResetOnSP(self) -> bool: # pyrefly: ignore[bad-return]
+    def getIntegralResetOnSP(self) -> bool:
         """Get the current integral reset on SP setting."""
         try:
             self.pidSemaphore.acquire(1)
@@ -739,7 +739,7 @@ class PID:
         finally:
             self.pidSemaphore.release(1)
 
-    def getIntegralLimitFactor(self) -> float: # pyrefly: ignore[bad-return]
+    def getIntegralLimitFactor(self) -> float:
         """Get the current integral limit factor."""
         try:
             self.pidSemaphore.acquire(1)
@@ -755,7 +755,7 @@ class PID:
         finally:
             self.pidSemaphore.release(1)
 
-    def getSetpointChangeThreshold(self) -> float: # pyrefly: ignore[bad-return]
+    def getSetpointChangeThreshold(self) -> float:
         """Get the current setpoint change threshold."""
         try:
             self.pidSemaphore.acquire(1)

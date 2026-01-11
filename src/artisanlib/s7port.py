@@ -24,7 +24,7 @@ if TYPE_CHECKING:
     from snap7.client import Client as S7Client
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
 
-from snap7.type import Area # type:ignore[import-not-found, unused-ignore]
+from snap7.type import Area
 from snap7.util.getters import get_bool, get_int, get_real
 from snap7.util.setters import set_bool, set_int, set_real
 
@@ -100,7 +100,7 @@ class s7port:
         self.COMsemaphore:QSemaphore = QSemaphore(1)
 
         # we do not use the snap7 enums here to avoid the import for non S7 users
-        self.areas:list[Area]|None = None # type:ignore[reportPossiblyUnboundVariable, unused-ignore, no-any-unimported] # lazy initialized in initArray() on connect
+        self.areas:list[Area]|None = None # lazy initialized in initArray() on connect
         self.last_request_timestamp:float = time.time()
         self.min_time_between_requests:float = 0.04
 
@@ -286,14 +286,6 @@ class s7port:
         for area, db_numbers in activeRegisters.items():
             for db_nr, registers in db_numbers.items():
                 sequences:list[tuple[int, int]] = (max_blocks(registers, max_register_segment=s7port.MAX_REGISTER_SEGMENT) if self.fetch_max_blocks else min_blocks(registers))
-#                sorted_registers:list[int] = sorted(registers)
-#                if self.fetch_max_blocks:
-#                    sequences = [(sorted_registers[0],sorted_registers[-1])]
-#                else:
-#                    # split in successive sequences
-#                    gaps:list[list[int]] = [[s, e] for s, e in zip(sorted_registers, sorted_registers[1:], strict=False) if s+1 < e]
-#                    edges:Iterator[int] = iter(sorted_registers[:1] + sum(gaps, []) + sorted_registers[-1:])
-#                    sequences = list(zip(edges, edges, strict=True)) # list of pairs of the form (start-register,end-register) # ty:ignore
                 if area not in self.activeRegisterSequences:
                     self.activeRegisterSequences[area] = {}
                 self.activeRegisterSequences[area][db_nr] = sequences

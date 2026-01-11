@@ -37,7 +37,7 @@ import functools
 from artisanlib.util import (decodeLocal, encodeLocal, getDirectory, is_int_list, is_float_list, render_weight,
     weight_units, float2float, convertWeight)
 from plus import config, connection, controller, util
-from typing import Final, TypedDict, TextIO, NotRequired # ty:ignore
+from typing import Final, TypedDict, TextIO, NotRequired
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -181,7 +181,7 @@ def has_duplicate_origin_label(c:Coffee) -> bool:
 worker:'Worker|None' = None
 worker_thread:QThread|None = None
 
-class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues] # pyrefly: ignore # Argument to class must be a base class
+class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues]
     startSignal = pyqtSignal(bool)
     replySignal = pyqtSignal(float, float, str, int, list) # rlimit:float, rused:float, pu:str, notifications:int, machines:list[str]
     updatedSignal = pyqtSignal()  # issued once the stock was updated
@@ -1026,12 +1026,12 @@ def getBlendBlendDict(blend:BlendStructure, weight:float|None = None) -> Blend:
             if not is_float_list(moistures):
                 del res['moisture']
             else:
-                res['moisture'] = float2float(sum(moistures)) # ty:ignore
+                res['moisture'] = float2float(sum(moistures))
         except Exception:  # pylint: disable=broad-except
             pass
         try:
             if is_float_list(densities):
-                res['density'] = int(round(sum(densities))) # ty:ignore
+                res['density'] = int(round(sum(densities)))
             else:
                 del res['density']
         except Exception:  # pylint: disable=broad-except
@@ -1046,7 +1046,7 @@ def getBlendBlendDict(blend:BlendStructure, weight:float|None = None) -> Blend:
             pass
         try:
             if is_int_list(screen_mins) and is_int_list(screen_maxs):
-                sizes:list[int] = screen_mins + screen_maxs # ty:ignore
+                sizes:list[int] = screen_mins + screen_maxs
                 if len(sizes) > 0:
                     min_size = min(sizes)
                     max_size = max(sizes)
@@ -1438,7 +1438,7 @@ def getBlends(weight_unit_idx:int, store:str|None, customBlend:Blend|None, acqui
                             # only if the moisture of all components is known,
                             # we can estimate the moisture of this blend
                             if is_float_list(moistures) and config.app_window is not None:
-                                m = float2float(sum(moistures), 1) # ty:ignore
+                                m = float2float(sum(moistures), 1)
                                 new_blend[
                                     'moisture'
                                 ] = m  # @UndefinedVariable
@@ -1451,7 +1451,7 @@ def getBlends(weight_unit_idx:int, store:str|None, customBlend:Blend|None, acqui
                             # we can estimate the density of this blend
                             if is_float_list(densities): # component densities are floats as they are ints multiplied by ratio!
                                 new_blend['density'] = int(
-                                    round(sum(densities)) # ty:ignore
+                                    round(sum(densities))
                                 )  # @UndefinedVariable
                                 if not replacementBlends:
                                     # if we are processing the original blend,
@@ -1464,8 +1464,8 @@ def getBlends(weight_unit_idx:int, store:str|None, customBlend:Blend|None, acqui
                             ):
                                 sizes:list[int|None] = screen_mins + screen_maxs
                                 if len(sizes) > 0 and is_int_list(sizes):
-                                    min_size = min(sizes)  # ty:ignore
-                                    max_size = max(sizes)  # ty:ignore
+                                    min_size = min(sizes)
+                                    max_size = max(sizes)
                                     new_blend['screen_min'] = min_size
                                     if not replacementBlends:
                                         # if we are processing the original
@@ -1749,7 +1749,7 @@ def matchBlendDict(blendSpec:Blend, blendDict:Blend, sameLabel:bool=True) -> boo
             return all(
                     i1['coffee'] == i2['coffee'] and i1['ratio'] == i2['ratio']
                     for (i1, i2) in (
-                        zip( # ty:ignore
+                        zip(
                             blendSpec['ingredients'],
                             blendDict['ingredients'],
                             strict=True

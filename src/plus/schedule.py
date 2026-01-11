@@ -221,8 +221,8 @@ class ScheduledItem(BaseModel):
     title: str
     coffee: str|None = Field(default=None)      # None or coffee hr_id
     blend: str|None = Field(default=None)       # None or blend hr_id
-    store: str = Field(..., alias='location')            # pyrefly: ignore
-    weight: float = Field(..., alias='amount')       # batch size in kg # pyrefly: ignore
+    store: str = Field(..., alias='location')
+    weight: float = Field(..., alias='amount')       # batch size in kg
     loss: float = default_loss                       # default loss based calculated by magic on the server in % (if not given defaults to 15%)
     machine: str|None = Field(default=None)
     user: str|None = Field(default=None)
@@ -231,7 +231,7 @@ class ScheduledItem(BaseModel):
     note: str|None = Field(default=None)
     roasts: set[UUID4] = Field(default=set())        # note that this generates UUID objects. To get a UUID string without dashes use uuid.hex.
 
-    @field_validator('*', mode='before') # pyrefly: ignore
+    @field_validator('*', mode='before')
     def remove_blank_strings(cls: BaseModel, v: str|None) -> str|None:   # pylint: disable=no-self-argument,no-self-use
         """Removes whitespace characters and return None if empty"""
         if isinstance(v, str):
@@ -248,7 +248,7 @@ class ScheduledItem(BaseModel):
             raise ValueError('Either coffee or blend must be specified, but not both')
         if len(self.title) == 0:
             raise ValueError('Title cannot be empty')
-        if (self.date - datetime.datetime.now(datetime.UTC).astimezone().date()).days < 0: # ty:ignore
+        if (self.date - datetime.datetime.now(datetime.UTC).astimezone().date()).days < 0:
             raise ValueError('Date should not be in the past')
         return self
 
@@ -278,7 +278,7 @@ class CompletedItem(BaseModel):
     cuppingnotes: str = Field(default='')
     roasttime: int = Field(default=0)
 
-    @computed_field  # type:ignore[prop-decorator] # Decorators on top of @property are not supported
+    @computed_field  # type:ignore[prop-decorator] # ty:ignore[unused] # Decorators on top of @property are not supported
     @property
     def prefix(self) -> str:
         res = ''
@@ -307,11 +307,11 @@ class CompletedItem(BaseModel):
         return self
 
     @field_serializer('roastdate', when_used='json')
-    def serialize_roastdate_to_epoch(roastdate: datetime.datetime) -> int: # type:ignore[misc] # pylint: disable=no-self-argument
+    def serialize_roastdate_to_epoch(roastdate: datetime.datetime) -> int: # type:ignore[misc] # ty:ignore[unused] # pylint: disable=no-self-argument
         return int(roastdate.timestamp())
 
     @field_serializer('roastUUID', when_used='json')
-    def serialize_roastUUID_to_str(roastUUID: UUID4) -> str: # type:ignore[misc] # pylint: disable=no-self-argument
+    def serialize_roastUUID_to_str(roastUUID: UUID4) -> str: # type:ignore[misc] # ty:ignore[unused] # pylint: disable=no-self-argument
         return str(roastUUID.hex)
 
 
@@ -480,7 +480,7 @@ def load_completed(plus_account_id:str|None, force:bool = True) -> None:
                     completed_roasts = completed_roasts_cache_data[plus_account_id]
                     today_completed:list[CompletedItemDict] = []
                     previously_completed:list[CompletedItemDict] = []
-                    today = datetime.datetime.now(datetime.UTC) # ty:ignore
+                    today = datetime.datetime.now(datetime.UTC)
                     for ci in completed_roasts:
                         if 'roastdate' in ci:
                             if epoch2datetime(ci['roastdate']).astimezone().date() == today.astimezone().date():
@@ -1001,14 +1001,14 @@ def remove_prefix(s:str, prefix:str) -> str:
         if s.startswith(prefix):
             return s[len(prefix):]
         return s
-    return s.removeprefix(prefix) # type:ignore[attr-defined, no-any-return, reportAttributeAccessIssue, unused-ignore] # not known under Python 3.8 which we use for pyright type checking
+    return s.removeprefix(prefix)
 
 def remove_suffix(s:str, suffix:str) -> str:
     if Version(python_version()) < Version('3.9.0'):
         if s.endswith(suffix):
             return s[:-len(suffix)]
         return s
-    return s.removesuffix(suffix) # type:ignore[attr-defined, no-any-return, reportAttributeAccessIssue, unused-ignore] # not known under Python 3.8 which we use for pyright type checking
+    return s.removesuffix(suffix)
 
 
 def locale_format_timedelta(locale:str, seconds:float) -> str:
@@ -1071,12 +1071,12 @@ def locale_format_date_no_year(locale:str, date:datetime.date) -> str:
 
 #--------
 
-class QLabelRight(QLabel): # pyright: ignore [reportGeneralTypeIssues] # pyrefly: ignore # Argument to class must be a base class
+class QLabelRight(QLabel): # pyright: ignore [reportGeneralTypeIssues]
     ...
 
 
 ##### https://stackoverflow.com/questions/11446478/pyside-pyqt-truncate-text-in-qlabel-based-on-minimumsize
-class QElidedLabel(QLabel): # pyright: ignore[reportGeneralTypeIssues] # pyrefly: ignore # Argument to class must be a base class
+class QElidedLabel(QLabel): # pyright: ignore[reportGeneralTypeIssues]
     """Label with text elision.
 
     QLabel which will elide text too long to fit the widget.  Based on:
@@ -1160,9 +1160,9 @@ class QElidedLabel(QLabel): # pyright: ignore[reportGeneralTypeIssues] # pyrefly
 
 
 
-class DragTargetIndicator(QFrame): # pyright: ignore[reportGeneralTypeIssues] # pyrefly: ignore # Argument to class must be a base class
+class DragTargetIndicator(QFrame): # pyright: ignore[reportGeneralTypeIssues]
     def __init__(self, parent:QWidget|None = None) -> None:
-        super().__init__(parent) # pyrefly: ignore
+        super().__init__(parent)
         layout = QHBoxLayout()
         layout.addWidget(QLabel())
         layout.setSpacing(0)
@@ -1173,7 +1173,7 @@ class DragTargetIndicator(QFrame): # pyright: ignore[reportGeneralTypeIssues] # 
 
 
 
-class StandardItem(QFrame): # pyright: ignore[reportGeneralTypeIssues] # pyrefly: ignore # Argument to class must be a base class
+class StandardItem(QFrame): # pyright: ignore[reportGeneralTypeIssues]
 
     clicked = pyqtSignal()
     selected = pyqtSignal()
@@ -1190,7 +1190,7 @@ class StandardItem(QFrame): # pyright: ignore[reportGeneralTypeIssues] # pyrefly
             layout.addSpacing(2)
         self.second_label = QElidedLabel(self.getMiddle())
         layout.addWidget(self.second_label)
-        self.third_label = QLabelRight(self.getRight()) # pyrefly: ignore
+        self.third_label = QLabelRight(self.getRight())
         layout.addWidget(self.third_label)
         layout.setSpacing(5)
         layout.setContentsMargins(5,5,5,5)
@@ -1662,11 +1662,11 @@ class DragItem(StandardItem):
 
 
 
-class BaseWidget(QWidget): # pyright: ignore[reportGeneralTypeIssues] # pyrefly: ignore # Argument to class must be a base class
+class BaseWidget(QWidget): # pyright: ignore[reportGeneralTypeIssues]
     """Widget list
     """
     def __init__(self, parent:QWidget|None = None, orientation:Qt.Orientation = Qt.Orientation.Vertical) -> None:
-        super().__init__(parent) # pyrefly: ignore
+        super().__init__(parent)
         # Store the orientation for drag checks later.
         self.orientation = orientation
         self.blayout:QBoxLayout
@@ -2051,7 +2051,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.roasted_weight.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.roasted_weight.editingFinished.connect(self.roasted_weight_changed)
         self.roasted_weight.receivedFocus.connect(self.roasted_weight_selected)
-        self.roasted_weight_suffix = ClickableQLabel(weight_unit_str)  # pyrefly: ignore
+        self.roasted_weight_suffix = ClickableQLabel(weight_unit_str)
 
         # calculate unit label max_width
         font = self.roasted_weight_suffix.font()
@@ -2072,7 +2072,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.roasted_yield.setValidator(self.aw.createCLocaleDoubleValidator(0., 9999999., 4, self.roasted_yield, ''))
         self.roasted_yield.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.roasted_yield.editingFinished.connect(self.roasted_yield_changed)
-        self.roasted_yield_suffix = ClickableQLabel(weight_unit_str)  # pyrefly: ignore
+        self.roasted_yield_suffix = ClickableQLabel(weight_unit_str)
         self.roasted_yield_suffix.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         self.roasted_yield_suffix.setFixedWidth(weight_suffix_width)
         self.roasted_yield_suffix.setAlignment (Qt.AlignmentFlag.AlignLeft)
@@ -2082,7 +2082,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.roasted_defects.setValidator(self.aw.createCLocaleDoubleValidator(0., 9999999., 4, self.roasted_defects, ''))
         self.roasted_defects.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.roasted_defects.editingFinished.connect(self.defects_weight_changed)
-        self.roasted_defects_suffix = ClickableQLabel(weight_unit_str) # pyrefly: ignore
+        self.roasted_defects_suffix = ClickableQLabel(weight_unit_str)
         self.roasted_defects_suffix.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         self.roasted_defects_suffix.setFixedWidth(weight_suffix_width)
         self.roasted_defects_suffix.setAlignment (Qt.AlignmentFlag.AlignLeft)
@@ -2786,7 +2786,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
 
     @pyqtSlot('QCloseEvent')
     @override
-    def closeEvent(self, a0:'QCloseEvent|None' = None) -> None: # type:ignore[reportIncompatibleMethodOverride, unused-ignore]
+    def closeEvent(self, a0:'QCloseEvent|None' = None) -> None:
         if self.aw.scheduler_auto_open and len(self.scheduled_items) > 0 and self.aw.plus_account is not None:
             self.aw.scheduler_auto_open = False
             string = QApplication.translate('Message','Roasts will not adjust the schedule<br>while the schedule window is closed')
@@ -2867,7 +2867,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
     # returns True if the (visible filtered) schedule changed significantly by the updated new_schedule vs the previous old_schedule such that the
     # user has to be informed
     def schedule_changed_significantly(self, old_schedule:list[ScheduledItem], new_schedule:list[plus.stock.ScheduledItem]) -> bool:
-        today:datetime.date = datetime.datetime.now(datetime.UTC).astimezone().date() # ty:ignore
+        today:datetime.date = datetime.datetime.now(datetime.UTC).astimezone().date()
         for item in filter(lambda x: self.aw.scheduledItemsfilter(today, x, is_hidden(x)), old_schedule):
             nitem = next((x for x in new_schedule if x.get('_id', None) == item.id), None)
             if nitem is not None:
@@ -2896,7 +2896,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
     # updates the current schedule items by joining its roast with those received as part of a stock update from the server
     # adding new items at the end
     def updateScheduledItems(self) -> None:
-        today = datetime.datetime.now(datetime.UTC).astimezone().date() # ty:ignore
+        today = datetime.datetime.now(datetime.UTC).astimezone().date()
         # remove outdated items which remained in the open app from yesterday
         current_schedule:list[ScheduledItem] = [si for si in self.scheduled_items if (si.date - today).days >= 0]
         plus.stock.init()
@@ -2929,9 +2929,9 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                 # take new item (but merge completed items)
                 if idx_existing_item is not None:
                     # remember existing item
-                    existing_item = current_schedule[idx_existing_item] # pyrefly: ignore[index-error]
+                    existing_item = current_schedule[idx_existing_item]
                     # replace the current item with the updated one from the server
-                    current_schedule[idx_existing_item] = schedule_item # pyrefly: ignore[unsupported-operation]
+                    current_schedule[idx_existing_item] = schedule_item
                     # merge the completed roasts and set them to the newly received item
                     schedule_item.roasts.update(existing_item.roasts)
                     # if all done, remove that item as it is completed
@@ -3052,7 +3052,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                         if 'ratio_denom' in i:
                             entry['ratio_denom'] = i['ratio_denom']
                         ingredients.append(entry)
-                    self.aw.qmc.plus_blend_spec['ingredients'] = ingredients # ty:ignore[possibly-missing-implicit-call] # pyrefly: ignore[unsupported-operation] # ty:ignore[invalid-assignment]
+                    self.aw.qmc.plus_blend_spec['ingredients'] = ingredients
                     # set beans description
                     blend_lines = plus.stock.blend2beans(blend_structure, weight_unit_idx, self.aw.qmc.weight[0])
                     self.aw.qmc.beans = '\n'.join(blend_lines)
@@ -3171,7 +3171,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.set_next(True)
 
     def next_not_prepared_item(self) -> GreenWeightItem|None:
-        today:datetime.date = datetime.datetime.now(datetime.UTC).astimezone().date() # ty:ignore
+        today:datetime.date = datetime.datetime.now(datetime.UTC).astimezone().date()
         for item in filter(lambda x: self.aw.scheduledItemsfilter(today, x, is_hidden(x)), self.scheduled_items):
             prepared:int = len(get_prepared(item))
             roasted:int = len(item.roasts)
@@ -3201,7 +3201,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
 
     def next_not_completed_item(self) -> RoastedWeightItem|None:
         completed_items = self.completed_items
-        today = datetime.datetime.now(datetime.UTC).astimezone().date() # ty:ignore
+        today = datetime.datetime.now(datetime.UTC).astimezone().date()
         todays_completed_items = [ci for ci in self.completed_items if ci.roastdate.astimezone().date() == today]
         if len(todays_completed_items) != 0:
             # in case there are completed items for todays sessions, the WeightManager ignores all items of the previous session
@@ -3228,7 +3228,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
     # returns number of visible scheduled items
     def updateRemainingItems(self) -> int:
         self.drag_remaining.clearItems()
-        today:datetime.date = datetime.datetime.now(datetime.UTC).astimezone().date() # ty:ignore
+        today:datetime.date = datetime.datetime.now(datetime.UTC).astimezone().date()
         drag_items_first_label_max_width = 0
         drag_first_labels = []
         selected_item:DragItem|None = None
@@ -3335,7 +3335,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                     scheduled_items.append(schedule_item)
                 except Exception:  # pylint: disable=broad-except
                     pass # validation fails for outdated items
-            today:datetime.date = datetime.datetime.now(datetime.UTC).astimezone().date() # ty:ignore
+            today:datetime.date = datetime.datetime.now(datetime.UTC).astimezone().date()
             return sum(max(0, x.count - len(x.roasts)) for x in scheduled_items if aw.scheduledItemsfilter(today, x, is_hidden(x)))
         except Exception:  # pylint: disable=broad-except
 #            _log.exception(e) # this can raise an exception on macOS if Artisan is started using sudo as the logging framework might not fully initialized
@@ -3706,7 +3706,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
 
     def updateRoastedItems(self) -> None:
         self.nodrag_roasted.clearItems()
-        now:datetime.datetime = datetime.datetime.now(datetime.UTC) # ty:ignore
+        now:datetime.datetime = datetime.datetime.now(datetime.UTC)
         nodrag_items_first_label_max_width = 0
         nodrag_first_labels = []
         new_selected_completed_item:NoDragItem|None = None
@@ -3777,7 +3777,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
     def prev_roast_session_data(self) -> datetime.date:
         if self.completed_items:
             return self.completed_items[-1].roastdate.date()
-        return datetime.datetime.now(datetime.UTC).astimezone().date() # ty:ignore
+        return datetime.datetime.now(datetime.UTC).astimezone().date()
 
     def get_scheduled_items_ids(self) -> list[str]:
         return [si.id for si in self.scheduled_items]

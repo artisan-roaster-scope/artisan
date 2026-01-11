@@ -62,7 +62,7 @@ def extractProfileRubasseCSV(file:str,
 
         i = 0
         for row in data:
-            items = list(zip(header, row, strict=False)) # ty:ignore
+            items = list(zip(header, row, strict=False))
             item:dict[str,str] = {}
             for (name, value) in items:
                 item[name] = value.strip()

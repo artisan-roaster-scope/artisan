@@ -351,7 +351,7 @@ class wsport:
     def stop(self) -> None:
         # self._loop.stop() needs to be called as follows as the event loop class is not thread safe
         if self._loop is not None:
-            self._loop.call_soon_threadsafe(self._loop.stop) # pyrefly: ignore
+            self._loop.call_soon_threadsafe(self._loop.stop)
             self._loop = None
         # wait for the thread to finish
         if self._thread is not None:

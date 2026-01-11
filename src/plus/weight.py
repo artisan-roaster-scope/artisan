@@ -425,7 +425,7 @@ class GreenWeighingState(StateMachine):
 # TESTING
 #    # from statemachine import Event
 #    @staticmethod
-#    def on_transition(event_data, event: 'Event') -> None: # type:ignore
+#    def on_transition(event_data, event: 'Event') -> None:
 #        # The `event` parameter can be declared as `str` or `Event`, since `Event` is a subclass of `str`
 #        # Note also that in this example, we're using `on_transition` instead of `on_cycle`, as this
 #        # binds the action to run for every transition instead of a specific event ID.
@@ -699,7 +699,7 @@ class RoastedWeighingState(StateMachine):
 
 # TESTING
 #    @staticmethod
-#    def on_transition(event_data, event: 'Event') -> None: # type:ignore
+#    def on_transition(event_data, event: 'Event') -> None:
 #        # The `event` parameter can be declared as `str` or `Event`, since `Event` is a subclass of `str`
 #        # Note also that in this example, we're using `on_transition` instead of `on_cycle`, as this
 #        # binds the action to run for every transition instead of a specific event ID.
@@ -731,7 +731,7 @@ class RoastedWeighingState(StateMachine):
 
 
 
-class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues] # pyrefly: ignore [invalid-inheritance] # error: Argument to class must be a base class
+class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues]
 
     __slots__ = [ 'scale_manager', 'next_green_item',  'next_roasted_item',
                     'greenItemSemaphore', 'roastedItemSemaphore', 'sm_green' ]

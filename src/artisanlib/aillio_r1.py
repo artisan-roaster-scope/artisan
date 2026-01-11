@@ -24,15 +24,15 @@ from multiprocessing import Pipe
 from platform import system
 from collections.abc import Generator
 
-import usb.core # type: ignore[import-untyped]
-import usb.util # type: ignore[import-untyped]
+import usb.core # type: ignore[import-untyped] # ty:ignore[ignore]
+import usb.util # type: ignore[import-untyped] # ty:ignore[ignore]
 
 
 if system().startswith('Windows'):
     import libusb_package # pyright:ignore[reportMissingImports] # pylint: disable=import-error # ty:ignore[unresolved-import]
 
 #import requests
-#from requests_file import FileAdapter # type: ignore # @UnresolvedImport
+#from requests_file import FileAdapter # type: ignore # @UnresolvedImport # ty:ignore[ignore]
 #import json
 #from lxml import html # unused
 
@@ -41,16 +41,16 @@ from typing import Final, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     try:
-        from multiprocessing.connection import PipeConnection as Connection # type: ignore[unused-ignore,attr-defined,assignment] # pylint: disable=unused-import
+        from multiprocessing.connection import PipeConnection as Connection # type: ignore[unused-ignore,attr-defined,assignment] # ty:ignore[ignore] # pylint: disable=unused-import
     except ImportError:
-        from multiprocessing.connection import Connection # type: ignore[unused-ignore,attr-defined,assignment] # pylint: disable=unused-import
+        from multiprocessing.connection import Connection # type: ignore[unused-ignore,attr-defined,assignment] # ty:ignore[ignore] # pylint: disable=unused-import
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 
 def _load_library(find_library:Any = None) -> Any:
-    import usb.libloader # type: ignore[import-untyped, unused-ignore] # pylint: disable=redefined-outer-name
+    import usb.libloader # type: ignore[import-untyped, unused-ignore] # ty:ignore[ignore] # pylint: disable=redefined-outer-name
     return usb.libloader.load_locate_library(
                 ('usb-1.0', 'libusb-1.0', 'usb'),
                 'cygusb-1.0.dll', 'Libusb 1',
@@ -85,7 +85,7 @@ class AillioR1:
         self.simulated = False
         self.AILLIO_DEBUG = debug
         self.__dbg('init')
-        self.usbhandle:Generator[usb.core.Device, Any, None]|usb.core.Device|None = None # type:ignore[no-any-unimported,unused-ignore]
+        self.usbhandle:Generator[usb.core.Device, Any, None]|usb.core.Device|None = None # type:ignore[no-any-unimported,unused-ignore] # ty:ignore[ignore]
         self.bt:float = 0
         self.dt:float = 0
         self.heater:float = 0
@@ -101,8 +101,8 @@ class AillioR1:
         self.roast_number:int = -1
         self.fan_rpm:float = 0
 
-        self.parent_pipe:Connection|None = None # type:ignore[no-any-unimported,unused-ignore]
-        self.child_pipe:Connection|None = None # type:ignore[no-any-unimported,unused-ignore]
+        self.parent_pipe:Connection|None = None # type:ignore[no-any-unimported,unused-ignore] # ty:ignore[ignore]
+        self.child_pipe:Connection|None = None # type:ignore[no-any-unimported,unused-ignore] # ty:ignore[ignore]
         self.irt:float = 0
         self.pcbt:float = 0
         self.coil_fan:int = 0
@@ -144,15 +144,15 @@ class AillioR1:
                         '/usr/lib/aarch64-linux-gnu/libusb-1.0.so'
                         '/usr/lib/aarch64-linux-gnu/libusb-1.0.so.0']:
                     if os.path.isfile(shared_libusb_path):
-                        import usb.backend.libusb1 as libusb10 # type: ignore[import-untyped, unused-ignore]
-                        libusb10._load_library = _load_library # pylint: disable=protected-access # ty: ignore[invalid-assignment] # overwrite the overwrite of the pyinstaller runtime hook pyi_rth_usb.py
-                        from usb.backend.libusb1 import get_backend  # type: ignore[import-untyped, unused-ignore]
+                        import usb.backend.libusb1 as libusb10 # type: ignore[import-untyped, unused-ignore] # ty:ignore[ignore]
+                        libusb10._load_library = _load_library # pylint: disable=protected-access # overwrite the overwrite of the pyinstaller runtime hook pyi_rth_usb.py
+                        from usb.backend.libusb1 import get_backend  # type: ignore[import-untyped, unused-ignore] # ty:ignore[ignore]
                         backend = get_backend(find_library=lambda _,shared_libusb_path=shared_libusb_path: shared_libusb_path)
                         break
             self.usbhandle = usb.core.find(idVendor=self.AILLIO_VID,
-                                           idProduct=self.AILLIO_PID, backend=backend) # pyrefly: ignore[bad-assignment]
+                                           idProduct=self.AILLIO_PID, backend=backend)
             if self.usbhandle is None:
-                self.usbhandle = usb.core.find(idVendor=self.AILLIO_VID, # pyrefly: ignore[bad-assignment]
+                self.usbhandle = usb.core.find(idVendor=self.AILLIO_VID,
                                                idProduct=self.AILLIO_PID_REV3, backend=backend)
         else:
             self.usbhandle = libusb_package.find(idVendor=self.AILLIO_VID, # pyright:ignore[reportPossiblyUnboundVariable] # pylint: disable=possibly-used-before-assignment
@@ -340,7 +340,7 @@ class AillioR1:
         if cmd == 'prs':
             self.prs()
 
-    def __updatestate(self, p:'Connection') -> None: # type:ignore[no-any-unimported,unused-ignore]
+    def __updatestate(self, p:'Connection') -> None: # type:ignore[no-any-unimported,unused-ignore] # ty:ignore[ignore]
         while self.worker_thread_run:
             state1:array.array[int] = array.array('B', bytes(0)) # pylint: disable=unsubscriptable-object
             state2:array.array[int] = array.array('B', bytes(0)) # pylint: disable=unsubscriptable-object
@@ -385,26 +385,26 @@ class AillioR1:
         if self.parent_pipe is None or not self.parent_pipe.poll():
             return
         state = self.parent_pipe.recv()
-        valid = state[41]        # type:ignore[reportIndexIssue, unused-ignore]
+        valid = state[41]        # type:ignore[reportIndexIssue, unused-ignore] # ty:ignore[ignore]
         # Heuristic to find out if the data is valid
         # It looks like we get a different message every 15 seconds
         # when we're not roasting.  Ignore this message for now.
         if valid == 10:
-            self.bt = round(unpack('f', state[0:4])[0], 1)      # type:ignore[reportIndexIssue, unused-ignore]
-            self.bt_ror = round(unpack('f', state[4:8])[0], 1)  # type:ignore[reportIndexIssue, unused-ignore]
-            self.dt = round(unpack('f', state[8:12])[0], 1)     # type:ignore[reportIndexIssue, unused-ignore]
-            self.exitt = round(unpack('f', state[16:20])[0], 1) # type:ignore[reportIndexIssue, unused-ignore]
-            self.minutes = state[24]   # type:ignore[reportIndexIssue, unused-ignore]
-            self.seconds = state[25]   # type:ignore[reportIndexIssue, unused-ignore]
-            self.fan = state[26]       # type:ignore[reportIndexIssue, unused-ignore]
-            self.heater = state[27]    # type:ignore[reportIndexIssue, unused-ignore]
-            self.drum = state[28]      # type:ignore[reportIndexIssue, unused-ignore]
-            self.r1state = state[29]   # type:ignore[reportIndexIssue, unused-ignore]
-            self.irt = round(unpack('f', state[32:36])[0], 1)  # type:ignore[reportIndexIssue, unused-ignore]
-            self.pcbt = round(unpack('f', state[36:40])[0], 1) # type:ignore[reportIndexIssue, unused-ignore]
-            self.fan_rpm = unpack('h', state[44:46])[0]        # type:ignore[reportIndexIssue, unused-ignore]
-            self.voltage = unpack('h', state[48:50])[0]        # type:ignore[reportIndexIssue, unused-ignore]
-            self.coil_fan = round(unpack('i', state[52:56])[0], 1) # type:ignore[reportIndexIssue, unused-ignore]
+            self.bt = round(unpack('f', state[0:4])[0], 1)      # type:ignore[reportIndexIssue, unused-ignore] # ty:ignore[ignore]
+            self.bt_ror = round(unpack('f', state[4:8])[0], 1)  # type:ignore[reportIndexIssue, unused-ignore] # ty:ignore[ignore]
+            self.dt = round(unpack('f', state[8:12])[0], 1)     # type:ignore[reportIndexIssue, unused-ignore] # ty:ignore[ignore]
+            self.exitt = round(unpack('f', state[16:20])[0], 1) # type:ignore[reportIndexIssue, unused-ignore] # ty:ignore[ignore]
+            self.minutes = state[24]   # type:ignore[reportIndexIssue, unused-ignore] # ty:ignore[ignore]
+            self.seconds = state[25]   # type:ignore[reportIndexIssue, unused-ignore] # ty:ignore[ignore]
+            self.fan = state[26]       # type:ignore[reportIndexIssue, unused-ignore] # ty:ignore[ignore]
+            self.heater = state[27]    # type:ignore[reportIndexIssue, unused-ignore] # ty:ignore[ignore]
+            self.drum = state[28]      # type:ignore[reportIndexIssue, unused-ignore] # ty:ignore[ignore]
+            self.r1state = state[29]   # type:ignore[reportIndexIssue, unused-ignore] # ty:ignore[ignore]
+            self.irt = round(unpack('f', state[32:36])[0], 1)  # type:ignore[reportIndexIssue, unused-ignore] # ty:ignore[ignore]
+            self.pcbt = round(unpack('f', state[36:40])[0], 1) # type:ignore[reportIndexIssue, unused-ignore] # ty:ignore[ignore]
+            self.fan_rpm = unpack('h', state[44:46])[0]        # type:ignore[reportIndexIssue, unused-ignore] # ty:ignore[ignore]
+            self.voltage = unpack('h', state[48:50])[0]        # type:ignore[reportIndexIssue, unused-ignore] # ty:ignore[ignore]
+            self.coil_fan = round(unpack('i', state[52:56])[0], 1) # type:ignore[reportIndexIssue, unused-ignore] # ty:ignore[ignore]
             self.__dbg('BT: ' + str(self.bt))
             self.__dbg('BT RoR: ' + str(self.bt_ror))
             self.__dbg('DT: ' + str(self.dt))
@@ -418,9 +418,9 @@ class AillioR1:
             self.__dbg(f'drum speed: {self.drum}')
             self.__dbg('time: {self.minutes}:{self.seconds}')
 
-        state = state[64:]         # type:ignore[reportIndexIssue, unused-ignore]
-        self.coil_fan2 = round(unpack('i', state[32:36])[0], 1) # type:ignore[reportIndexIssue, unused-ignore]
-        self.pht = unpack('H', state[40:42])[0] # type:ignore[reportIndexIssue, unused-ignore]
+        state = state[64:]         # type:ignore[reportIndexIssue, unused-ignore] # ty:ignore[ignore]
+        self.coil_fan2 = round(unpack('i', state[32:36])[0], 1) # type:ignore[reportIndexIssue, unused-ignore] # ty:ignore[ignore]
+        self.pht = unpack('H', state[40:42])[0] # type:ignore[reportIndexIssue, unused-ignore] # ty:ignore[ignore]
         self.__dbg('pre-heat temperature: ' + str(self.pht))
         if self.r1state == self.AILLIO_STATE_OFF:
             self.state_str = 'off'
