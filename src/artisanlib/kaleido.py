@@ -640,7 +640,7 @@ class KaleidoPort:
 
 # returns a dict containing all profile information contained in the given Kaleido CSV file
 def extractProfileKaleidoCSV(file:str,
-        _etypesdefault:list[str],
+        etypesdefault:list[str],
         alt_etypesdefault:list[str],
         _artisanflavordefaultlabels:list[str],
         eventsExternal2InternalValue:Callable[[int],float]) -> ProfileData:
@@ -906,6 +906,7 @@ def extractProfileKaleidoCSV(file:str,
     # HPM (M=Manual Heat, A=PID Heat Control based on SV value) - Kaleido machine mode, not used as Artisan control event
     # PS (Status) - Kaleido machine specific, not mapped to Artisan control event
     res['etypes'] = [encodeLocalStrict(etype) for etype in alt_etypesdefault]
+    res['etypes'][2] = encodeLocalStrict(etypesdefault[2])
 
     # Set roaster information
     res['roastertype'] = 'Kaleido Legacy'

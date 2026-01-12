@@ -4375,7 +4375,8 @@ class ApplicationWindow(QMainWindow):
             config_menu.addAction(self.batchAction)
             config_menu.addSeparator()
             config_menu.addMenu(self.temperatureConfMenu)
-        config_menu.addMenu(self.languageMenu)
+        if ui_mode is not UI_MODE.PRODUCTION:
+            config_menu.addMenu(self.languageMenu)
         # the UI mode selector should always be present
         config_menu.addSeparator()
         config_menu.addMenu(self.UIModeMenu)
@@ -13091,42 +13092,49 @@ class ApplicationWindow(QMainWindow):
     #automatation of filename when saving a file through keyboard shortcut. Speeds things up for batch roasting.
     # returns filename on success, None otherwise
     def automaticsave(self, interactive:bool = True) -> str|None:
+        filename:str|None = None
         try:
-            if self.qmc.autosavepath and self.qmc.autosaveflag:
-                prefix = ''
-                if self.qmc.autosaveprefix != '':
-                    prefix = self.qmc.autosaveprefix
-                elif self.qmc.batchcounter > -1 and self.qmc.roastbatchnr > 0:
-                    prefix += self.qmc.batchprefix + str(self.qmc.roastbatchnr)
-                elif self.qmc.batchprefix != '':
-                    prefix += self.qmc.batchprefix
-                filename = self.generateFilename(prefix=prefix)
-                filename_path = os.path.join(self.qmc.autosavepath,filename)
-                oldDir = str(QDir.current())
-                res = QDir.setCurrent(self.qmc.autosavepath)
-                if res:
-                    #write
-                    pf = self.getProfile()
-                    sync_record_hash = plus.controller.updateSyncRecordHashAndSync()
-                    if sync_record_hash is not None:
-                        # we add the hash over the sync record to be able to detect offline changes
-                        hash_encoded = encodeLocal(sync_record_hash)
-                        if hash_encoded is not None:
-                            pf['plus_sync_record_hash'] = hash_encoded
-                    self.plusAddPath(cast(dict[str, Any], pf), filename_path)
-                    serialize(filename_path, cast(dict[str, Any], pf))
-                    self.sendmessage(QApplication.translate('Message','Profile {0} saved in: {1}').format(filename,self.qmc.autosavepath))
-                    self.setCurrentFile(filename_path,self.qmc.autosaveaddtorecentfilesflag)
-                    self.qmc.fileCleanSignal.emit()
-
-                    if self.qmc.autosaveimage and not self.qmc.flagon:
-                        if self.qmc.autosavealsopath != '':
-                            other_filename_path = os.path.join(self.qmc.autosavealsopath,filename)
-                        else:
-                            other_filename_path = os.path.join(self.qmc.autosavepath,filename)
-                        if other_filename_path.endswith('.alog'):
-                            other_filename_path = other_filename_path[0:-5]
-                        self.autosave(other_filename_path)
+            if self.qmc.autosaveflag:
+                if self.qmc.autosavepath == '':
+                    # if autosave is ON and autosavepath is empty, we clean the file without saving anything if autosave has not been triggered manually
+                    if not interactive:
+                        self.qmc.fileCleanSignal.emit()
+                else:
+                    prefix = ''
+                    if self.qmc.autosaveprefix != '':
+                        prefix = self.qmc.autosaveprefix
+                    elif self.qmc.batchcounter > -1 and self.qmc.roastbatchnr > 0:
+                        prefix += self.qmc.batchprefix + str(self.qmc.roastbatchnr)
+                    elif self.qmc.batchprefix != '':
+                        prefix += self.qmc.batchprefix
+                    filename = self.generateFilename(prefix=prefix)
+                    filename_path = os.path.join(self.qmc.autosavepath,filename)
+                    oldDir = str(QDir.current())
+                    res = QDir.setCurrent(self.qmc.autosavepath)
+                    if res:
+                        #write
+                        pf = self.getProfile()
+                        sync_record_hash = plus.controller.updateSyncRecordHashAndSync()
+                        if sync_record_hash is not None:
+                            # we add the hash over the sync record to be able to detect offline changes
+                            hash_encoded = encodeLocal(sync_record_hash)
+                            if hash_encoded is not None:
+                                pf['plus_sync_record_hash'] = hash_encoded
+                        self.plusAddPath(cast(dict[str, Any], pf), filename_path)
+                        serialize(filename_path, cast(dict[str, Any], pf))
+                        self.sendmessage(QApplication.translate('Message','Profile {0} saved in: {1}').format(filename,self.qmc.autosavepath))
+                        self.setCurrentFile(filename_path,self.qmc.autosaveaddtorecentfilesflag)
+                        self.qmc.fileCleanSignal.emit()
+                        if self.qmc.autosaveimage and not self.qmc.flagon:
+                            if self.qmc.autosavealsopath != '':
+                                other_filename_path = os.path.join(self.qmc.autosavealsopath,filename)
+                            else:
+                                other_filename_path = os.path.join(self.qmc.autosavepath,filename)
+                            if other_filename_path.endswith('.alog'):
+                                other_filename_path = other_filename_path[0:-5]
+                            self.autosave(other_filename_path)
+                    else:
+                        self.sendmessage(QApplication.translate('Message','Autosave path does not exist. Autosave failed.'))
                     #restore dirs
                     QDir.setCurrent(oldDir)
                     # file might be autosaved but not uploaded to plus yet (no DROP registered). This needs to be indicated by a red plus icon
@@ -13134,19 +13142,11 @@ class ApplicationWindow(QMainWindow):
                         self.updatePlusStatus()
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
-
-                    return filename
-                self.sendmessage(QApplication.translate('Message','Autosave path does not exist. Autosave failed.'))
-                return None
-            if interactive:
-                self.sendmessage(QApplication.translate('Message','Empty path or box unchecked in Autosave'))
-                self.autosaveconf()
-                return None
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
             _, _, exc_tb = sys.exc_info()
             self.qmc.adderror((QApplication.translate('Error Message', 'Error:') + ' automaticsave() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
-        return None
+        return filename
 
     @pyqtSlot()
     @pyqtSlot(bool)

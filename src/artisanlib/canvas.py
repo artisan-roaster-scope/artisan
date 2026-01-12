@@ -13541,9 +13541,9 @@ class tgraphcanvas(QObject):
 #            QApplication.processEvents()  # solves the issue (but is more general as the MPL flush_events (takes ~1sec)
 
             # we autosave after full redraw after OFF to have the optional generated PDF containing all information
-            if len(self.timex) > 2 and self.autosaveflag != 0 and self.autosavepath:
+            if len(self.timex) > 2 and self.autosaveflag != 0:
                 try:
-                    self.aw.automaticsave()
+                    self.aw.automaticsave(False)
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
 
@@ -14224,9 +14224,9 @@ class tgraphcanvas(QObject):
                     self.aw.clusterEvents()
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
-            if autosave and self.autosaveflag != 0 and self.autosavepath and self.timeindex[0] != -1 and self.timeindex[6] != 0: # only autosave if CHARGE and DROP are set
+            if autosave and self.autosaveflag != 0 and self.timeindex[0] != -1 and self.timeindex[6] != 0: # only autosave if CHARGE and DROP are set
                 try:
-                    self.aw.automaticsave()
+                    self.aw.automaticsave(False)
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
             self.aw.sendmessage(QApplication.translate('Message','Scope recording stopped'))

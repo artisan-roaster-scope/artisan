@@ -6,7 +6,7 @@ v3.6.0 (Jan XX, 2026)
 ------------------
 
 * ADDITIONS
-  - adds UI modes (production, default, expert)
+  - adds UI modes (production, standard, expert)
   - adds support of the [Lebrew RoastSee NEXT](https://lebrewtech.com/products/roastsee-next) real-time Agtron and crack analyzer
   - adds support for [Acaia Pyxis Black (2025)](https://eu.acaia.co/products/pyxis-black)
   - adds support for Yoccto Meteo as well as Phidget TMP1000, HUM1000 and PRE1000 as extra devices
@@ -19,12 +19,12 @@ v3.6.0 (Jan XX, 2026)
   - adds Artisan Command `pidWeights` to set 2DOFPID parameters beta and gamma
   - adds calculation of energy data from PID Duty %
   - adds OPTION click on ET/BT or DeltaET/DeltaBT LCDs to hide/show the corresponding background curves
-  - adds title click shortcut to opens Roast Properties dialog
-  - adds deselection of event using ESC key
+  - adds title click shortcut to open Roast Properties dialog
+  - adds deselection of selected event using key ESC
 
 * CHANGES
-  - removed the term `slave` from the project but for 2 lines (to be removed in later versions) to keep compatibility with older settings
-  - improved ramping event tracking with lookahead, avoiding non-linearities
+  - removed the term `slave` from the project but for 2 lines (to be removed in later versions) needed to keep compatibility with older settings
+  - improved ramping event tracking with lookahead, avoiding non-linearities and bumps
 
 ----
 v3.4.0 (Oct 31, 2025)
