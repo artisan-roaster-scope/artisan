@@ -736,7 +736,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
     def __init__(self, plotCanvas:tgraphcanvas, parent:QWidget, white_icons:bool = False) -> None:
 
         # toolitem entries of the form (text, tooltip_text, image_file, callback)
-        self.toolitems: list[tuple[str, ...] | tuple[None, ...]] = [
+        self.toolitems: list[tuple[str, ...] | tuple[None, ...]] = [ # pyrefly:ignore[bad-override]
                 ('Plus', QApplication.translate('Tooltip', 'Connect to plus service'), 'plus', 'plus'),
                 ('', QApplication.translate('Tooltip', 'Subscription'), 'plus-pro', 'subscription'),
                 (QApplication.translate('Toolbar', 'Home'), QApplication.translate('Tooltip', 'Reset original view'), 'home', 'home'),
@@ -4479,8 +4479,9 @@ class ApplicationWindow(QMainWindow):
             self.ConfMenu = self.create_config_menu(ui_mode)
             menuBar.addMenu(self.ConfMenu)
             # Tools menu
-            self.ToolkitMenu = self.create_tools_menu(ui_mode)
-            menuBar.addMenu(self.ToolkitMenu)
+            if ui_mode in {UI_MODE.EXPERT, UI_MODE.DEFAULT}: # no Tools menu in Production mode
+                self.ToolkitMenu = self.create_tools_menu(ui_mode)
+                menuBar.addMenu(self.ToolkitMenu)
             # View menu
             self.viewMenu = self.create_view_menu(ui_mode)
             menuBar.addMenu(self.viewMenu)
@@ -12564,7 +12565,8 @@ class ApplicationWindow(QMainWindow):
                 elif k == Qt.Key.Key_Z: # 90:                       #Z (toggle xy coordinates between 0: cursor, 1: BT, 2: ET, 3: BTB, 4: ETB)
                     if not self.qmc.designerflag and not self.qmc.wheelflag and self.comparator is None:
                         self.qmc.nextFmtDataCurve()
-                elif k == Qt.Key.Key_U and self.ui_mode is not UI_MODE.PRODUCTION: # 85:  #U (toggle running LCDs on/off)
+                elif k == Qt.Key.Key_U and modifiers == Qt.KeyboardModifier.NoModifier: # 85:  #U (toggle running LCDs on/off)
+                    _log.debug('PRINT modifiers: %s',modifiers)
                     if not self.qmc.flagon:
                         if self.qmc.running_LCDs == 0 and self.curFile:
                             self.qmc.running_LCDs = 1
@@ -13099,49 +13101,52 @@ class ApplicationWindow(QMainWindow):
                     # if autosave is ON and autosavepath is empty, we clean the file without saving anything if autosave has not been triggered manually
                     if not interactive:
                         self.qmc.fileCleanSignal.emit()
+                    return None
+                prefix = ''
+                if self.qmc.autosaveprefix != '':
+                    prefix = self.qmc.autosaveprefix
+                elif self.qmc.batchcounter > -1 and self.qmc.roastbatchnr > 0:
+                    prefix += self.qmc.batchprefix + str(self.qmc.roastbatchnr)
+                elif self.qmc.batchprefix != '':
+                    prefix += self.qmc.batchprefix
+                filename = self.generateFilename(prefix=prefix)
+                filename_path = os.path.join(self.qmc.autosavepath,filename)
+                oldDir = str(QDir.current())
+                res = QDir.setCurrent(self.qmc.autosavepath)
+                if res:
+                    #write
+                    pf = self.getProfile()
+                    sync_record_hash = plus.controller.updateSyncRecordHashAndSync()
+                    if sync_record_hash is not None:
+                        # we add the hash over the sync record to be able to detect offline changes
+                        hash_encoded = encodeLocal(sync_record_hash)
+                        if hash_encoded is not None:
+                            pf['plus_sync_record_hash'] = hash_encoded
+                    self.plusAddPath(cast(dict[str, Any], pf), filename_path)
+                    serialize(filename_path, cast(dict[str, Any], pf))
+                    self.sendmessage(QApplication.translate('Message','Profile {0} saved in: {1}').format(filename,self.qmc.autosavepath))
+                    self.setCurrentFile(filename_path,self.qmc.autosaveaddtorecentfilesflag)
+                    self.qmc.fileCleanSignal.emit()
                 else:
-                    prefix = ''
-                    if self.qmc.autosaveprefix != '':
-                        prefix = self.qmc.autosaveprefix
-                    elif self.qmc.batchcounter > -1 and self.qmc.roastbatchnr > 0:
-                        prefix += self.qmc.batchprefix + str(self.qmc.roastbatchnr)
-                    elif self.qmc.batchprefix != '':
-                        prefix += self.qmc.batchprefix
-                    filename = self.generateFilename(prefix=prefix)
-                    filename_path = os.path.join(self.qmc.autosavepath,filename)
-                    oldDir = str(QDir.current())
-                    res = QDir.setCurrent(self.qmc.autosavepath)
-                    if res:
-                        #write
-                        pf = self.getProfile()
-                        sync_record_hash = plus.controller.updateSyncRecordHashAndSync()
-                        if sync_record_hash is not None:
-                            # we add the hash over the sync record to be able to detect offline changes
-                            hash_encoded = encodeLocal(sync_record_hash)
-                            if hash_encoded is not None:
-                                pf['plus_sync_record_hash'] = hash_encoded
-                        self.plusAddPath(cast(dict[str, Any], pf), filename_path)
-                        serialize(filename_path, cast(dict[str, Any], pf))
-                        self.sendmessage(QApplication.translate('Message','Profile {0} saved in: {1}').format(filename,self.qmc.autosavepath))
-                        self.setCurrentFile(filename_path,self.qmc.autosaveaddtorecentfilesflag)
-                        self.qmc.fileCleanSignal.emit()
-                        if self.qmc.autosaveimage and not self.qmc.flagon:
-                            if self.qmc.autosavealsopath != '':
-                                other_filename_path = os.path.join(self.qmc.autosavealsopath,filename)
-                            else:
-                                other_filename_path = os.path.join(self.qmc.autosavepath,filename)
-                            if other_filename_path.endswith('.alog'):
-                                other_filename_path = other_filename_path[0:-5]
-                            self.autosave(other_filename_path)
+                    self.sendmessage(QApplication.translate('Message','Autosave path does not exist. Autosave failed.'))
+                #restore dirs
+                QDir.setCurrent(oldDir)
+                # file might be autosaved but not uploaded to plus yet (no DROP registered). This needs to be indicated by a red plus icon
+                try:
+                    self.updatePlusStatus()
+                except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
+                # autosave "other" (eg. PDF) even if autosavepath is empty
+                if self.qmc.autosaveimage and not self.qmc.flagon:
+                    if self.qmc.autosavealsopath != '':
+                        other_filename_path = os.path.join(self.qmc.autosavealsopath,filename)
+                    elif self.qmc.autosavepath != '':
+                        other_filename_path = os.path.join(self.qmc.autosavepath,filename)
                     else:
-                        self.sendmessage(QApplication.translate('Message','Autosave path does not exist. Autosave failed.'))
-                    #restore dirs
-                    QDir.setCurrent(oldDir)
-                    # file might be autosaved but not uploaded to plus yet (no DROP registered). This needs to be indicated by a red plus icon
-                    try:
-                        self.updatePlusStatus()
-                    except Exception as e: # pylint: disable=broad-except
-                        _log.exception(e)
+                        return None # no path set
+                    if other_filename_path.endswith('.alog'):
+                        other_filename_path = other_filename_path[0:-5]
+                    self.autosave(other_filename_path)
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
             _, _, exc_tb = sys.exc_info()
@@ -13439,10 +13444,6 @@ class ApplicationWindow(QMainWindow):
         #       START
         #########################################
 
-        # turn keepOn temporary off
-        tmpKeepON = self.qmc.flagKeepON
-        self.qmc.flagKeepON = False
-
         if self.qmc.flagstart:
             if self.qmc.timeindex[0] == -1:
                 self.sendmessage(QApplication.translate('Message','NEW ROAST canceled: incomplete profile lacking CHARGE and DROP found'))
@@ -13453,18 +13454,22 @@ class ApplicationWindow(QMainWindow):
                 self.sendmessage(QApplication.translate('Message','NEW ROAST canceled: incomplete profile lacking DROP found'))
                 return False
             #invoke "OFF"
-            self.qmc.OffMonitor()
-
-            filename = self.automaticsave(interactive=False)
-            if self.qmc.reset():
-                #start new roast
-                self.qmc.ToggleRecorder()
-                if filename is not None:
-                    self.sendmessage(QApplication.translate('Message','{0} has been saved. New roast has started').format(filename))
+            _log.debug('PRINT newRoast: before OffMonitor')
+            self.qmc.monitorClosedDown.connect(self.startNewRoast)
+            self.qmc.OffMonitor(respectAlwaysON=False)
         elif len(self.qmc.timex) > 1 or self.qmc.reset():
             self.qmc.ToggleRecorder()
-        self.qmc.flagKeepON = tmpKeepON
         return True
+
+    @pyqtSlot()
+    def startNewRoast(self) -> None:
+        _log.debug('PRINT startNewRoast')
+        self.qmc.monitorClosedDown.disconnect(self.startNewRoast)
+        libtime.sleep(.3) # sleep a moment to ensure all serial devices have been disconnected
+        if self.qmc.reset():
+            #start new roast
+            self.qmc.ToggleRecorder()
+            self.sendmessage(QApplication.translate('Message','New roast has started'))
 
     @pyqtSlot()
     @pyqtSlot(bool)

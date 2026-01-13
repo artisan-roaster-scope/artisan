@@ -21,16 +21,18 @@ v3.6.0 (Jan XX, 2026)
   - adds OPTION click on ET/BT or DeltaET/DeltaBT LCDs to hide/show the corresponding background curves
   - adds title click shortcut to open Roast Properties dialog
   - adds deselection of selected event using key ESC
+  - adds temporary autozoom gesture (double-click on the graph canvas) to scale the y-axis such that all data is rendered on screen
 
 * CHANGES
-  - removed the term `slave` from the project but for 2 lines (to be removed in later versions) needed to keep compatibility with older settings
   - improved ramping event tracking with lookahead, avoiding non-linearities and bumps
+  - removed the term `slave` from the project but for 2 lines (to be removed in later versions) needed to keep compatibility with older settings
+  - removes support for Qt5, Python versions before v3.12 as well as previous legacy build infrastructure
 
 ----
 v3.4.0 (Oct 31, 2025)
 ------------------
 
-Last version featuring legacy builds supporting macOS 10.13+, Window 8 and Windows 9.
+Last version featuring legacy builds supporting macOS 10.13+, Window 8, as well as last version supporting macOS 13 and RPi OS bookworm.
 
 * ADDITIONS
   - adds tooltip to phases widget in Comparator displaying 2nd and 3rd phase bean temperatures (or RoR if ALT/Option key is pressed) limits ([Issue #1906](../../../issues/1906))
@@ -111,7 +113,7 @@ Last version featuring legacy builds supporting macOS 10.13+, Window 8 and Windo
 v3.2.0 (June 23, 2025)
 ------------------
 
-Last version supporting macOS 12, Ubuntu 22.04 and RedHat 8.4.
+Last version supporting macOS 12, Ubuntu 22.04 and RedHat 8.4 (glibc 2.3.5).
 
 * ADDITIONS
   - adds [batch manager](https://doc.artisan.plus/docs/batch-manager)

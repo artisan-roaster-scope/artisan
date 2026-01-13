@@ -12,6 +12,7 @@ BTBColor=#cc0f50
 BTBdeltaColor=#cc0f50
 ETBColor=#0a5c90
 ETBdeltaColor=#0a5c90
+step100temp=100
 
 
 [Units]

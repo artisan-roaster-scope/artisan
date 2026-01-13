@@ -235,6 +235,7 @@ class tgraphcanvas(QObject):
     showBackgroundEventsSignal = pyqtSignal(bool)
     redrawSignal = pyqtSignal(bool,bool,bool,bool,bool)
     redrawKeepViewSignal = pyqtSignal(bool,bool,bool,bool,bool)
+    monitorClosedDown = pyqtSignal()
 
     umlaute_dict : Final[dict[str, str]] = {
        uchr(228): 'ae',  # U+00E4   \xc3\xa4
@@ -4068,7 +4069,6 @@ class tgraphcanvas(QObject):
                     self.fig.canvas.draw_idle()
                     return
 
-    #PLUS
                 if not self.designerflag and not self.wheelflag and event.inaxes is None and not self.flagstart and not self.flagon and event.button == 1 and \
                         event.x < event.y:
                     if event.dblclick and self.roastUUID is not None:
@@ -4083,6 +4083,7 @@ class tgraphcanvas(QObject):
                         self.ax.autoscale(enable=False, axis='y', tight=False)
                         self.redraw(recomputeAllDeltas=False)
                     else:
+                        self.ax.yaxis.set_major_locator(ticker.AutoLocator())
                         self.ax.autoscale(enable=True, axis='y', tight=False)
                         self.fig.canvas.draw_idle()
 
@@ -13412,11 +13413,19 @@ class tgraphcanvas(QObject):
 
     # OffMonitorCloseDown is called after the sampling loop stopped
     @pyqtSlot()
-    def OffMonitorCloseDown(self) -> None:
+    def OffMonitorCloseDownIgnoreAlwaysON(self) -> None:
+        self.OffMonitorCloseDown(False)
+    def OffMonitorCloseDownRespectAlwaysON(self) -> None:
+        self.OffMonitorCloseDown(True)
+
+    def OffMonitorCloseDown(self, respectAlwaysON:bool) -> None:
         _log.debug('MODE: OffMonitorCloseDown')
         try:
 
-            self.threadserver.terminatingSignal.disconnect(self.OffMonitorCloseDown)
+            if respectAlwaysON:
+                self.threadserver.terminatingSignal.disconnect(self.OffMonitorCloseDownRespectAlwaysON)
+            else:
+                self.threadserver.terminatingSignal.disconnect(self.OffMonitorCloseDownIgnoreAlwaysON)
 
             # reset WebLCDs
             resLCD = '-.-' if self.LCDdecimalplaces else '--'
@@ -13571,17 +13580,19 @@ class tgraphcanvas(QObject):
             self.aw.buttonCONTROL.setEnabled(True)
             self.aw.buttonCONTROL.setGraphicsEffect(self.aw.makeShadow())
 
-            if self.flagKeepON and len(self.timex) > 10:
+            if respectAlwaysON and self.flagKeepON and len(self.timex) > 10:
                 QTimer.singleShot(300, self.onMonitorSignal.emit)
 
             self.aw.updatePlusStatusSignal.emit() # update plus icon (roast might not have been uploaded yet)
+            self.monitorClosedDown.emit()
 
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
             self.adderror((QApplication.translate('Error Message', 'Exception:') + ' OffMonitorCloseDown() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+        _log.debug('MODE: OffMonitorCloseDown DONE')
 
-    def OffMonitor(self) -> None:
+    def OffMonitor(self, respectAlwaysON:bool = True) -> None:
         _log.info('MODE: OFF MONITOR')
         if self.flagon:
             try:
@@ -13612,8 +13623,10 @@ class tgraphcanvas(QObject):
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
 
-
-                self.threadserver.terminatingSignal.connect(self.OffMonitorCloseDown)
+                if respectAlwaysON:
+                    self.threadserver.terminatingSignal.connect(self.OffMonitorCloseDownRespectAlwaysON)
+                else:
+                    self.threadserver.terminatingSignal.connect(self.OffMonitorCloseDownIgnoreAlwaysON)
                 self.flagon = False
 
                 self.getMeterReads()
@@ -13622,6 +13635,7 @@ class tgraphcanvas(QObject):
                 _log.exception(ex)
                 _, _, exc_tb = sys.exc_info()
                 self.adderror((QApplication.translate('Error Message', 'Exception:') + ' OffMonitor() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+        _log.info('MODE: OFF MONITOR DONE')
 
     # input: extratemp, outputs: modified extratemp, rollover_index, error_flag
     def conditionMeterData(self,extratemp:list[float]) -> tuple[list[float], int, bool]:

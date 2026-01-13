@@ -19,7 +19,7 @@
 ######
 # the following commented package versions are read by appveyor.yml and downloaded outside of pip.
 #
-# pyinstaller==6.17.0; platform_system='Windows'
+# pyinstaller==6.18.0; platform_system='Windows'
 # libusb==1.0.26;  platform_system='Linux'
 # dotenv==2.8.1;   platform_system='Linux'  # v3.0.0 not compatible with fpm  # gem installed, not pip
 #
@@ -43,7 +43,7 @@ xlrd==2.0.2
 websockets==16.0
 PyYAML==6.0.3
 psutil==7.2.1
-protobuf==6.33.3
+protobuf==6.33.4
 numpy==2.4.1
 scipy==1.17.0
 wquantiles==0.6
@@ -73,7 +73,7 @@ qt6-tools==6.5.0.1.3
 # packages that differ per platform
 #
 ###
-pyinstaller==6.17.0; platform_system=='Linux' or sys_platform=='darwin' # on Windows pyinstaller is separately installed (see above)
+pyinstaller==6.18.0; platform_system=='Linux' or sys_platform=='darwin' # on Windows pyinstaller is separately installed (see above)
 #
 ########
 ### macOS specific packages
@@ -97,7 +97,7 @@ SecretStorage==3.5.0; platform_system=='Linux'
 ########
 ### Windows specific packages
 ###
-build==1.3.0; platform_system=='Windows'
+build==1.4.0; platform_system=='Windows'
 pywin32==311; platform_system=='Windows'
 pyinstaller-versionfile==3.0.1; platform_system=='Windows'
 #libusb-package==1.0.26.3; platform_system=='Windows'  # temp removed for Py 3.14, monkey patched into .appveyor.yml until a Py3.14 wheel is available on pypi

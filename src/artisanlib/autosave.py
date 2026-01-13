@@ -19,8 +19,8 @@ from typing import override, cast, TYPE_CHECKING
 from artisanlib.dialogs import ArtisanDialog
 
 from PyQt6.QtCore import Qt, pyqtSlot, QSettings
-from PyQt6.QtWidgets import (QApplication, QLabel, QPushButton, QDialogButtonBox,
-    QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout, QLineEdit)
+from PyQt6.QtWidgets import (QApplication, QMessageBox, QLabel, QPushButton, QDialogButtonBox, QFrame,
+    QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout, QLineEdit, QSpacerItem)
 from PyQt6.QtGui import QStandardItemModel
 
 
@@ -113,6 +113,12 @@ class autosaveDlg(ArtisanDialog):
         autochecklabelplus.addWidget(addtorecentfileslabel)
         autochecklabelplus.addStretch()
 
+        linea = QFrame()
+        linea.setLineWidth(0)
+        linea.setMidLineWidth(1)
+        linea.setFrameShape(QFrame.Shape.HLine)
+        linea.setFrameShadow(QFrame.Shadow.Sunken)
+
         buttonLayout = QHBoxLayout()
         buttonLayout.addWidget(self.dialogbuttons)
         autolayout = QGridLayout()
@@ -126,11 +132,14 @@ class autosaveDlg(ArtisanDialog):
         autolayout.addWidget(self.prefixPreviewrecording,3,1)
         autolayout.addWidget(pathButton,4,0)
         autolayout.addWidget(self.pathEdit,4,1,1,2)
-        autolayout.addWidget(self.autopdfcheckbox,5,0,Qt.AlignmentFlag.AlignRight)
-        autolayout.addWidget(autopdflabel,5,1)
-        autolayout.addWidget(self.imageTypesComboBox,5,2)
-        autolayout.addWidget(pathAlsoButton,6,0)
-        autolayout.addWidget(self.pathAlsoEdit,6,1,1,2)
+        autolayout.addItem(QSpacerItem(0,12),5,0)
+        autolayout.addWidget(linea,6,0,1,3)
+        autolayout.addItem(QSpacerItem(0,7),7,0)
+        autolayout.addWidget(self.autopdfcheckbox,8,0,Qt.AlignmentFlag.AlignRight)
+        autolayout.addWidget(autopdflabel,8,1)
+        autolayout.addWidget(self.imageTypesComboBox,8,2)
+        autolayout.addWidget(pathAlsoButton,9,0)
+        autolayout.addWidget(self.pathAlsoEdit,9,1,1,2)
         autolayout.setColumnStretch(0,0)
         autolayout.setColumnStretch(1,10)
         autolayout.setColumnStretch(2,0)
@@ -214,3 +223,8 @@ class autosaveDlg(ArtisanDialog):
         settings = QSettings()
         #save window geometry
         settings.setValue('autosaveGeometry',self.saveGeometry())
+
+        if self.aw.qmc.autosaveflag and self.aw.qmc.autosavepath == '':
+            QMessageBox.warning(None, #self.aw, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
+                QApplication.translate('Message', 'Warning', None),
+                QApplication.translate('Message', 'Autosave turned ON, but filepath empty!\n\nATTENTION: Recorded data will get cleared without confirmation'))
