@@ -24,7 +24,7 @@
         </tr>
         <tr>
             <td>LEFT,RIGHT</td>
-            <td>Change roast event key focus</td>
+            <td>Change roast event key focus (when Keyboard Shortcuts are ON)</td>
         </tr>
         <tr>
             <td>LEFT,RIGHT,UP,DOWN</td>
@@ -68,7 +68,7 @@
         </tr>
         <tr>
             <td>Y</td>
-            <td>Shows/Hides Mini Event editor (on recording)</td>
+            <td>Shows/Hides Mini Event editor</td>
         </tr>
         <tr>
             <td>M</td>
@@ -111,23 +111,15 @@
             <td>Load alarms</td>
         </tr>
         <tr>
-            <td>+,-</td>
-            <td>Inc/dec PID lookahead</td>
-        </tr>
-        <tr>
-            <td>⌘ +,- [Mac]<br>CRTL +,- [Win]</td>
-            <td>Inc/dec graph resolution</td>
-        </tr>
-        <tr>
             <td>⌘ 0-9 [Mac]<br>CRTL 0-9 [Win]</td>
             <td>Changes Event Button Palettes</td>
         </tr>
         <tr>
-            <td>;</td>
+            <td>;<br>Expert and Standard modes</td>
             <td>Application ScreenShot</td>
         </tr>
         <tr>
-            <td>:</td>
+            <td>:<br>Expert and Standard modes</td>
             <td>Desktop ScreenShot</td>
         </tr>
         <tr>
@@ -164,16 +156,28 @@
             <td>Return/Enter key to execute the search</td>
         </tr>
         <tr>
+            <td>Click on Roast Title</td>
+            <td>Graph</td>
+            <td>Open Roast Properties</td>
+            <td>&#160;</td>
+        </tr>
+        <tr>
             <td>Double click on Roast Title</td>
             <td>Graph</td>
             <td>Open the roast in artisan.plus</td>
             <td>Requires an artisan.plus account</td>
         </tr>
         <tr>
-            <td>Double Click on Background Profile Title</td>
+            <td>Double click on Background Profile Title</td>
             <td>Graph & Designer</td>
             <td>Toggle Show/Hide Background Profile</td>
             <td>Only when a Background profile is loaded</td>
+        </tr>
+        <tr>
+            <td>Double click on Graph canvas</td>
+            <td>Graph</td>
+            <td>Auto zoom out to show min and max of temperature curves<br>Double click again to zoom in to original view</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>Right click on BT curve</td>
@@ -224,10 +228,16 @@
             <td>&#160;</td>
         </tr>
         <tr>
+            <td>OPTION File&gt;&gt; New&gt;&gt; &lt;recent-roast&gt; [Mac]<br>ALT File&gt;&gt; New&gt;&gt; &lt;recent-roast&gt; [Win]</td>
+            <td>Graph</td>
+            <td>Sets roast properties to &lt;recent-roast&gt; without starting a new roast</td>
+            <td>&#160;</td>
+        </tr>
+        <tr>
             <td>Click on LCD</td>
             <td>Graph</td>
             <td>Hide or Show corresponding Curve</td>
-            <td>In  OFF state this changes the Artisan Settings, in ON/START states the change is temporary until OFF state</td>
+            <td>In OFF state this changes the Artisan Settings, in ON/START states the change is temporary until OFF state</td>
         </tr>
         <tr>
             <td>Click on label in the Legend</td>
@@ -257,7 +267,13 @@
             <td>⌘ click &#39;CONTROL&#39; Button [Mac]<br>CTRL click &#39;CONTROL&#39; Button [Win]</td>
             <td>Graph</td>
             <td>Toggle PID</td>
-            <td>Device = &lt;all others&gt;, Control enabled in Config&gt;&gt; Device</td>
+            <td>Device = &lt;all others&gt;, Control enabled in Expert mode: Config&gt;&gt; Device</td>
+        </tr>
+        <tr>
+            <td>PLUS, MINUS</td>
+            <td>Graph</td>
+            <td>Increase or Decrease PID lookahead</td>
+            <td>&#160;</td>
         </tr>
         <tr>
             <td>⌘+PLUS, ⌘+MINUS [Mac]<br>CTRL+SHIFT+PLUS, CTRL+MINUS [Win]</td>
@@ -266,38 +282,62 @@
             <td>Same as Config&gt;&gt; Curves&gt;&gt; UI tab&gt;&gt; Graph % +/-</td>
         </tr>
         <tr>
+            <td>Click on a custom Event</td>
+            <td>Graph</td>
+            <td>Select a custom Event</td>
+            <td>Event time highlighted with vertical yellow line</td>
+        </tr>
+        <tr>
+            <td>PLUS, MINUS</td>
+            <td>Graph when Event selected</td>
+            <td>Increase or Decrease Event value</td>
+            <td>&#160;</td>
+        </tr>
+        <tr>
+            <td>BACKSPACE</td>
+            <td>Graph when Event selected</td>
+            <td>Delete the selected Event</td>
+            <td>&#160;</td>
+        </tr>
+        <tr>
+            <td>ESC</td>
+            <td>Graph when Event selected</td>
+            <td>Deselect the custom Event</td>
+            <td>&#160;</td>
+        </tr>
+        <tr>
             <td>TAB</td>
             <td>Graph when Sliders visible</td>
             <td>Sequence slider select</td>
-            <td>Requires Keyboard Control enabled in Config&gt;&gt; Events<br>Keyboard Shortcuts must be turned off (ENTER)</td>
+            <td>Requires Keyboard Control enabled in Expert mode: Config&gt;&gt; Events&gt;&gt; Sliders<br>Keyboard Shortcuts must be turned off (ENTER)</td>
         </tr>
         <tr>
             <td>UP,DOWN,RIGHT,LEFT</td>
             <td>Graph when Sliders visible</td>
             <td>Increment selected slider up or down by step amount</td>
-            <td>Requires Keyboard Control enabled in Config&gt;&gt; Events<br>Keyboard Shortcuts must be turned off (ENTER)</td>
+            <td>Requires Keyboard Control enabled in Expert mode: Config&gt;&gt; Events&gt;&gt; Sliders<br>Keyboard Shortcuts must be turned off (ENTER)</td>
         </tr>
         <tr>
             <td>OPTION+UP, OPTION+DOWN [Mac]<br>PAGEUP,PAGEDOWN [Win]</td>
             <td>Graph when Sliders visible</td>
             <td>Increment selected slider up or down by 10</td>
-            <td>Requires Keyboard Control enabled in Config&gt;&gt; Events<br>Keyboard Shortcuts must be turned off (ENTER)</td>
+            <td>Requires Keyboard Control enabled in Expert mode: Config&gt;&gt; Events&gt;&gt; Sliders<br>Keyboard Shortcuts must be turned off (ENTER)</td>
         </tr>
         <tr>
             <td>HOME,END</td>
             <td>Graph when Sliders visible</td>
             <td>Set selected slider to minimum or maximum value</td>
-            <td>Requires Keyboard Control enabled in Config&gt;&gt; Events<br>Keyboard Shortcuts must be disabled (ENTER)</td>
+            <td>Requires Keyboard Control enabled in Expert mode: Config&gt;&gt; Events&gt;&gt; Sliders<br>Keyboard Shortcuts must be disabled (ENTER)</td>
         </tr>
         <tr>
-            <td>Click on timer</td>
+            <td>Click on timer<br>Expert mode</td>
             <td>Simulator</td>
             <td>Toggle Pause/Continue Simulation</td>
-            <td>Simulator speed may be changd while paused (hold shift  (1x), OPTION/ALT (2x) or COMMAND/CTRL (4x) on restart).</td>
+            <td>Simulator speed may be changed while paused (hold shift  (1x), OPTION/ALT (2x) or COMMAND/CTRL (4x) on restart).</td>
         </tr>
         <tr>
-            <td>OPTION Tools&gt;&gt;Simulator [Mac]<br>ALT Tools&gt;&gt;Simulator [Win]</td>
-            <td>Graph/Simulator</td>
+            <td>OPTION Tools&gt;&gt;Simulator [Mac]<br>ALT Tools&gt;&gt;Simulator [Win]<br>Expert mode</td>
+            <td>Graph/Simulator<br>[Expert mode]</td>
             <td>Start or change Simulator speed to 2x mode</td>
             <td>&#160;</td>
         </tr>
@@ -323,12 +363,6 @@
             <td>OPTION click  &#39;+&#39;  button [Mac]<br>ALT click  &#39;+&#39;  button [Win]</td>
             <td>Roast Properties Roast tab</td>
             <td>Adds Weight Roasted, Volume Roasted, Moisture Roasted, ColorWhole, and Color Ground to the recent roast</td>
-            <td>&#160;</td>
-        </tr>
-        <tr>
-            <td>OPTION File&gt;&gt; New&gt;&gt; &lt;recent-roast&gt; [Mac]<br>ALT File&gt;&gt; New&gt;&gt; &lt;recent-roast&gt; [Win]</td>
-            <td>Roast Properties Roast tab</td>
-            <td>Sets roast properties to &lt;recent-roast&gt; without starting a new roast</td>
             <td>&#160;</td>
         </tr>
         <tr>
@@ -424,6 +458,11 @@
             <td>Save</td>
         </tr>
         <tr>
+            <td>⌘+SHIFT+S [Mac]<br>CTRL+SHIFT+S [Win]</td>
+            <td>File</td>
+            <td>Save As...</td>
+        </tr>
+        <tr>
             <td>⌘+P [Mac]<br>CTRL+P [Win]</td>
             <td>File</td>
             <td>Print</td>
@@ -454,42 +493,42 @@
             <td>Open Profile Background dialog</td>
         </tr>
         <tr>
-            <td>⌘+W [Mac]<br>CTRL+F4 [Win]</td>
+            <td>⌘+W [Mac]<br>CTRL+F4 [Win]<br>Expert and Standard modes</td>
             <td>Roast</td>
             <td>Switch Profiles (Foreground&lt;=&gt;Background)</td>
         </tr>
         <tr>
-            <td>⌘+D [Mac]<br>CTRL+D [Win]</td>
+            <td>⌘+D [Mac]<br>CTRL+D [Win]<br>Expert mode only</td>
             <td>Config</td>
             <td>Open Devices dialog</td>
         </tr>
         <tr>
-            <td>⌘+U [Mac]<br>CTRL+U [Win]</td>
+            <td>⌘+U [Mac]<br>CTRL+U [Win]<br>Expert mode only</td>
             <td>Config</td>
             <td>Open Curves dialog</td>
         </tr>
         <tr>
-            <td>⌘+E [Mac]<br>CTRL+E [Win]</td>
+            <td>⌘+E [Mac]<br>CTRL+E [Win]<br>Expert and Standard modes</td>
             <td>Config</td>
             <td>Open Events dialog</td>
         </tr>
         <tr>
-            <td>⌘+A [Mac]<br>CTRL+A [Win]</td>
+            <td>⌘+A [Mac]<br>CTRL+A [Win]<br>Expert and Standard modes</td>
             <td>Config</td>
             <td>Open Alarms dialog</td>
         </tr>
         <tr>
-            <td>⌘+SHIFT+A [Mac]<br>CTRL+SHIFT+A [Win]</td>
+            <td>⌘+SHIFT+A [Mac]<br>CTRL+SHIFT+A [Win]<br>Expert and Standard modes</td>
             <td>Config</td>
             <td>Open Axes dialog</td>
         </tr>
         <tr>
-            <td>⌘+K [Mac]<br>CTRL+K [Win]</td>
+            <td>⌘+K [Mac]<br>CTRL+K [Win]<br>Expert mode only</td>
             <td>Tools</td>
             <td>Analyzer Auto All</td>
         </tr>
         <tr>
-            <td>⌘+OPTION+A [Mac]<br>CTRL+ALT+K [Win]</td>
+            <td>⌘+OPTION+A [Mac]<br>CTRL+ALT+K [Win]<br>Expert mode only</td>
             <td>Tools</td>
             <td>Analyzer Clear Results</td>
         </tr>
