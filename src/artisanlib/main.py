@@ -7456,7 +7456,7 @@ class ApplicationWindow(QMainWindow):
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
             _, _, exc_tb = sys.exc_info()
-            self.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' curveSimilatrity2(): {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
+            self.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' curveSimilarity2(): {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
         # build the dict to return
         result['mse_BT'] = float(mse_BT)
@@ -7528,34 +7528,57 @@ class ApplicationWindow(QMainWindow):
                 np_btb = numpy.array(self.qmc.temp2B)
                 np_timeB = numpy.array(self.qmc.timeB) + dropTimeDelta # shift background times such that they are aligned with foreground profile @ DROP
 
-                # we masked the -1 error values
-                np_etb_masked = numpy.ma.masked_equal(np_etb, -1)
-                np_btb_masked = numpy.ma.masked_equal(np_btb, -1)
-                np_timeB_etb_masked = numpy.ma.masked_array(np_timeB, np_etb_masked.mask) # pylint:disable=no-member
-                np_timeB_btb_masked = numpy.ma.masked_array(np_timeB, np_btb_masked.mask) # pylint:disable=no-member
-                # ignore the masked error values on computing the interpolation and fill (especially on the left) with -1 values
-                interp_np_etb = numpy.interp(np_timex,np_timeB_etb_masked.compressed(),np_etb_masked.compressed(),left=-1,right=-1) # pyright:ignore[reportUnknownArgumentType]  # pylint:disable=no-member
-                interp_np_btb = numpy.interp(np_timex,np_timeB_btb_masked.compressed(),np_btb_masked.compressed(),left=-1,right=-1) # pyright:ignore[reportUnknownArgumentType]  # pylint:disable=no-member
+                RMSE_et:float|None = None
+                RMSE_bt:float|None = None
+                try:
+                    # we masked the -1 error values
+                    np_etb_masked = numpy.ma.masked_equal(np_etb, -1)
+                    np_timeB_etb_masked = numpy.ma.masked_array(np_timeB, np_etb_masked.mask) # pylint:disable=no-member
+                    # ignore the masked error values on computing the interpolation and fill (especially on the left) with -1 values
+                    interp_np_etb = numpy.interp(np_timex,np_timeB_etb_masked.compressed(),np_etb_masked.compressed(),left=-1,right=-1) # pyright:ignore[reportUnknownArgumentType]  # pylint:disable=no-member
 
-                # at his point the background arrays interp_np_etb/interp_np_btb have the same length then their foreground counter parts np_et/np_bt
-                # however, all those errors may contain -1 error values and inf/nan readings. Let's mask them to be ignored in the computation.
+                    # at his point the background arrays interp_np_etb/interp_np_btb have the same length then their foreground counter parts np_et/np_bt
+                    # however, all those errors may contain -1 error values and inf/nan readings. Let's mask them to be ignored in the computation.
 
-                # mask the -1 padding resulting from interpolating the background data as well as the inf/nan readings
-                interp_np_etb_masked = numpy.ma.masked_equal(numpy.ma.masked_invalid(interp_np_etb), -1) # mask -1, inf, nan to be ignored
-                interp_np_btb_masked = numpy.ma.masked_equal(numpy.ma.masked_invalid(interp_np_btb), -1) # mask -1, inf, nan to be ignored
+                    # mask the -1 padding resulting from interpolating the background data as well as the inf/nan readings
+                    interp_np_etb_masked = numpy.ma.masked_equal(numpy.ma.masked_invalid(interp_np_etb), -1) # mask -1, inf, nan to be ignored
 
-                # mask the -1 error values as well as the inf/nan readings
-                np_et_masked = numpy.ma.masked_equal(numpy.ma.masked_invalid(np_et), -1) # mask -1, inf, nan to be ignored
-                np_bt_masked = numpy.ma.masked_equal(numpy.ma.masked_invalid(np_bt), -1) # mask -1, inf, nan to be ignored
+                    # mask the -1 error values as well as the inf/nan readings
+                    np_et_masked = numpy.ma.masked_equal(numpy.ma.masked_invalid(np_et), -1) # mask -1, inf, nan to be ignored
 
-                # all readings that are masked in the one or the other array are ignored and do not contribute in the following
-                RMSE_et = numpy.sqrt(numpy.mean(numpy.square(np_et_masked - interp_np_etb_masked))) # pyright:ignore[reportUnknownArgumentType]
-                RMSE_bt = numpy.sqrt(numpy.mean(numpy.square(np_bt_masked - interp_np_btb_masked))) # pyright:ignore[reportUnknownArgumentType]
+                    # all readings that are masked in the one or the other array are ignored and do not contribute in the following
+                    RMSE_et = numpy.sqrt(numpy.mean(numpy.square(np_et_masked - interp_np_etb_masked))) # pyright:ignore[reportUnknownArgumentType]
 
-                if numpy.isnan(RMSE_et):
-                    RMSE_et = None
-                if numpy.isnan(RMSE_bt):
-                    RMSE_bt = None
+                    if numpy.isnan(RMSE_et):
+                        RMSE_et = None
+                except Exception as e: # pylint: disable=broad-except
+                    # numpy.interp and numpy.sqrt fail with "array of sample points is empty" on empty input
+                    pass
+
+                try:
+                    # we masked the -1 error values
+                    np_btb_masked = numpy.ma.masked_equal(np_btb, -1)
+                    np_timeB_btb_masked = numpy.ma.masked_array(np_timeB, np_btb_masked.mask) # pylint:disable=no-member
+                    # ignore the masked error values on computing the interpolation and fill (especially on the left) with -1 values
+                    interp_np_btb = numpy.interp(np_timex,np_timeB_btb_masked.compressed(),np_btb_masked.compressed(),left=-1,right=-1) # pyright:ignore[reportUnknownArgumentType]  # pylint:disable=no-member
+
+                    # at his point the background arrays interp_np_etb/interp_np_btb have the same length then their foreground counter parts np_et/np_bt
+                    # however, all those errors may contain -1 error values and inf/nan readings. Let's mask them to be ignored in the computation.
+
+                    # mask the -1 padding resulting from interpolating the background data as well as the inf/nan readings
+                    interp_np_btb_masked = numpy.ma.masked_equal(numpy.ma.masked_invalid(interp_np_btb), -1) # mask -1, inf, nan to be ignored
+
+                    # mask the -1 error values as well as the inf/nan readings
+                    np_bt_masked = numpy.ma.masked_equal(numpy.ma.masked_invalid(np_bt), -1) # mask -1, inf, nan to be ignored
+
+                    # all readings that are masked in the one or the other array are ignored and do not contribute in the following
+                    RMSE_bt = numpy.sqrt(numpy.mean(numpy.square(np_bt_masked - interp_np_btb_masked))) # pyright:ignore[reportUnknownArgumentType]
+
+                    if numpy.isnan(RMSE_bt):
+                        RMSE_bt = None
+                except Exception as e: # pylint: disable=broad-except
+                    # numpy.interp and numpy.sqrt fail with "array of sample points is empty" on empty input
+                    pass
 
                 return RMSE_et,RMSE_bt
 
@@ -7564,7 +7587,7 @@ class ApplicationWindow(QMainWindow):
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
             _, _, exc_tb = sys.exc_info()
-            self.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' curveSimilatrity(): {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
+            self.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' curveSimilarity(): {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             return None, None
 
     def setLCDsDigitCount(self, n:int) -> None:
