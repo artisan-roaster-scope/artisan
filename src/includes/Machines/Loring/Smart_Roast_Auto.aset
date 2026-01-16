@@ -44,6 +44,10 @@ extramathexpression2=, "bit(0,x)"
 extraname1={3}, Stack
 extraname2=Inlet, auto
 
+[events]
+autoCharge=false
+autoDrop=false
+
 [Modbus]
 PID_OFF_action=
 PID_ON_action=

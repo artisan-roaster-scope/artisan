@@ -299,14 +299,25 @@ def authentify() -> bool:
             _log.error('204: empty response')
             clearCredentials()
         return False
+    except (requests.exceptions.ConnectTimeout, requests.exceptions.ReadTimeout) as e:
+        _log.info(e)
+        raise e
+    except requests.exceptions.SSLError as e:
+        _log.info(e)
+        clearCredentials()
+        aw = config.app_window
+        if aw is not None:
+            aw.sendmessage('SSLError')
+        raise e
     except requests.exceptions.RequestException as e:
+        # most likely some protocol issue
         _log.info(e)
         raise e
     except json.decoder.JSONDecodeError as e:
         if not e.doc:
             raise ValueError('Empty response.') from e
         raise ValueError(f"Decoding error at char {e.pos} (line {e.lineno}, col {e.colno}): '{e.doc}'") from e
-    except Exception as e:  # ylint: disable=broad-except
+    except Exception as e:  # pylint: disable=broad-except
         _log.exception(e)
         clearCredentials()
         raise e

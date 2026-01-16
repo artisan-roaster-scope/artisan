@@ -5355,7 +5355,7 @@ class ApplicationWindow(QMainWindow):
                                     subscription_icon = 'plus-pro-low'
                 else:
                     plus_icon = 'plus-on'
-                    tooltip = QApplication.translate('Tooltip', 'Connect artisan.plus')
+                    tooltip = QApplication.translate('Tooltip', 'Disonnect artisan.plus')
             else:
                 plus_icon = 'plus-off'
                 tooltip = QApplication.translate('Tooltip', 'Connect artisan.plus')
@@ -7549,9 +7549,9 @@ class ApplicationWindow(QMainWindow):
                     # all readings that are masked in the one or the other array are ignored and do not contribute in the following
                     RMSE_et = numpy.sqrt(numpy.mean(numpy.square(np_et_masked - interp_np_etb_masked))) # pyright:ignore[reportUnknownArgumentType]
 
-                    if numpy.isnan(RMSE_et):
+                    if RMSE_et is not None and numpy.isnan(RMSE_et):
                         RMSE_et = None
-                except Exception as e: # pylint: disable=broad-except
+                except Exception: # pylint: disable=broad-except
                     # numpy.interp and numpy.sqrt fail with "array of sample points is empty" on empty input
                     pass
 
@@ -7574,9 +7574,9 @@ class ApplicationWindow(QMainWindow):
                     # all readings that are masked in the one or the other array are ignored and do not contribute in the following
                     RMSE_bt = numpy.sqrt(numpy.mean(numpy.square(np_bt_masked - interp_np_btb_masked))) # pyright:ignore[reportUnknownArgumentType]
 
-                    if numpy.isnan(RMSE_bt):
+                    if RMSE_bt is not None and numpy.isnan(RMSE_bt):
                         RMSE_bt = None
-                except Exception as e: # pylint: disable=broad-except
+                except Exception: # pylint: disable=broad-except
                     # numpy.interp and numpy.sqrt fail with "array of sample points is empty" on empty input
                     pass
 
@@ -12271,6 +12271,7 @@ class ApplicationWindow(QMainWindow):
                 control_modifier = modifiers == Qt.KeyboardModifier.ControlModifier # command/apple k on macOS, CONTROL on Windows
                 alt_modifier = modifiers == Qt.KeyboardModifier.AltModifier # OPTION on macOS, ALT on Windows
                 shift_modifier = modifiers == Qt.KeyboardModifier.ShiftModifier # SHIFT
+                keypad_modifier = modifiers == Qt.KeyboardModifier.KeypadModifier # keypad
                 control_alt_modifier = modifiers == (Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.AltModifier)
                 control_shift_modifier = modifiers == (Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.ShiftModifier)
                 no_modifier = modifiers == Qt.KeyboardModifier.NoModifier
@@ -12307,7 +12308,7 @@ class ApplicationWindow(QMainWindow):
                             self.sendmessage(QApplication.translate('Message','Auto Axis Graph Mode is off'))
                 elif self.buttonpalette_shortcuts and control_modifier and k in numberkeys: # palette switch via COMMAND-NUM-Keys
                     self.setbuttonsfrom(numberkeys.index(Qt.Key(k)), only_non_empty=True)
-                elif k == Qt.Key.Key_J and no_modifier: # 74:       #J (toggle Playback Events)
+                elif k == Qt.Key.Key_J and no_modifier and self.ui_mode is not UI_MODE.PRODUCTION: # 74:       #J (toggle Playback Events)
                     self.togglePlaybackEvents()
                 elif k == Qt.Key.Key_I and no_modifier: # 73:       #I (toggle foreground showfull flag)
                     self.toggleForegroundShowfullFlag()
@@ -12326,7 +12327,7 @@ class ApplicationWindow(QMainWindow):
                             filename = self.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Load Background'),ext='*.alog')
                             if len(filename) != 0:
                                 self.loadBackgroundSignal.emit(filename)
-                elif k == Qt.Key.Key_L and no_modifier: # 76:       #L (load alarms)
+                elif k == Qt.Key.Key_L and no_modifier and self.ui_mode is not UI_MODE.PRODUCTION: # 76:       #L (load alarms)
                     if not self.qmc.designerflag and self.comparator is None:
                         filename = self.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Load Alarms'),ext='*.alrm')
                         if len(filename) == 0:
@@ -12373,10 +12374,10 @@ class ApplicationWindow(QMainWindow):
                     elif self.qmc.background_event_last_picked_ind is not None and self.qmc.background_event_last_picked_pos is not None:
                         # a background event is selected; move it up
                         self.qmc.move_custom_event(False, self.qmc.background_event_last_picked_ind, self.qmc.background_event_last_picked_pos, ystep=-1)
-                    elif self.qmc.device == 0 and self.qmc.Controlbuttonflag: # FUJI PID
+                    elif self.qmc.device == 0 and self.qmc.Controlbuttonflag and self.ui_mode is not UI_MODE.PRODUCTION: # FUJI PID
                         self.fujipid.lookahead = max(0,self.fujipid.lookahead-1)
                         self.sendmessage(QApplication.translate('Message','PID Lookahead: {0}').format(self.fujipid.lookahead))
-                    elif self.qmc.Controlbuttonflag: # MODBUS hardware PID
+                    elif self.qmc.Controlbuttonflag and self.ui_mode is not UI_MODE.PRODUCTION: # MODBUS hardware PID
                         self.pidcontrol.svLookahead = max(0,self.pidcontrol.svLookahead-1)
                         self.sendmessage(QApplication.translate('Message','PID Lookahead: {0}').format(self.pidcontrol.svLookahead))
                 elif k_txt == '+'and no_modifier: #k == Qt.Key.Key_Plus: k == 43:         #+ (increase dpi, zoom in / increase PID lookahead)
@@ -12390,10 +12391,10 @@ class ApplicationWindow(QMainWindow):
                     elif self.qmc.background_event_last_picked_ind is not None and self.qmc.background_event_last_picked_pos is not None:
                         # a background event is selected; move it up
                         self.qmc.move_custom_event(False, self.qmc.background_event_last_picked_ind, self.qmc.background_event_last_picked_pos, ystep=1)
-                    elif self.qmc.device == 0 and self.qmc.Controlbuttonflag: # FUJI PID
+                    elif self.qmc.device == 0 and self.qmc.Controlbuttonflag and self.ui_mode is not UI_MODE.PRODUCTION: # FUJI PID
                         self.fujipid.lookahead = self.fujipid.lookahead+1
                         self.sendmessage(QApplication.translate('Message','PID Lookahead: {0}').format(self.fujipid.lookahead))
-                    elif self.qmc.Controlbuttonflag: # MODBUS hardware PID
+                    elif self.qmc.Controlbuttonflag and self.ui_mode is not UI_MODE.PRODUCTION: # MODBUS hardware PID
                         self.pidcontrol.svLookahead = self.pidcontrol.svLookahead+1
                         self.sendmessage(QApplication.translate('Message','PID Lookahead: {0}').format(self.pidcontrol.svLookahead))
                 elif k == Qt.Key.Key_Space and no_modifier: # 32:                       #SPACE (selects active button)
@@ -12519,7 +12520,7 @@ class ApplicationWindow(QMainWindow):
                         self.qmc.clear_last_picked_event_selection()
                         self.qmc.redraw_keep_view(recomputeAllDeltas=False)
 
-                elif k == Qt.Key.Key_Left and no_modifier: # 16777234:    #LEFT (moves background left / moves button selection left)
+                elif k == Qt.Key.Key_Left and (no_modifier or keypad_modifier): # 16777234:    #LEFT (moves background left / moves button selection left)
                     if self.qmc.foreground_event_last_picked_ind is not None and self.qmc.foreground_event_last_picked_pos is not None:
                         # a foreground event is selected; move it up
                         self.qmc.move_custom_event(True, self.qmc.foreground_event_last_picked_ind, self.qmc.foreground_event_last_picked_pos, xstep=-1)
@@ -12530,7 +12531,7 @@ class ApplicationWindow(QMainWindow):
                         self.moveKbutton('left')
                     elif self.qmc.background and self.qmc.backgroundKeyboardControlFlag:
                         self.qmc.moveBackgroundSignal.emit('left',self.qmc.backgroundmovespeed)
-                elif k == Qt.Key.Key_Right and no_modifier: # 16777236:    #RIGHT (moves background right / moves button selection right)
+                elif k == Qt.Key.Key_Right and (no_modifier or keypad_modifier): # 16777236:    #RIGHT (moves background right / moves button selection right)
                     if self.qmc.foreground_event_last_picked_ind is not None and self.qmc.foreground_event_last_picked_pos is not None:
                         # a foreground event is selected; move it up
                         self.qmc.move_custom_event(True, self.qmc.foreground_event_last_picked_ind, self.qmc.foreground_event_last_picked_pos, xstep=1)
@@ -12541,7 +12542,7 @@ class ApplicationWindow(QMainWindow):
                         self.moveKbutton('right')
                     elif self.qmc.background and self.qmc.backgroundKeyboardControlFlag:
                         self.qmc.moveBackgroundSignal.emit('right',self.qmc.backgroundmovespeed)
-                elif k == Qt.Key.Key_Up and no_modifier: # 16777235:       #UP (moves background up)
+                elif k == Qt.Key.Key_Up and (no_modifier or keypad_modifier): # 16777235:       #UP (moves background up)
                     if self.qmc.foreground_event_last_picked_ind is not None and self.qmc.foreground_event_last_picked_pos is not None:
                         # a foreground event is selected; move it up
                         self.qmc.move_custom_event(True, self.qmc.foreground_event_last_picked_ind, self.qmc.foreground_event_last_picked_pos, ystep=1)
@@ -12550,7 +12551,7 @@ class ApplicationWindow(QMainWindow):
                         self.qmc.move_custom_event(False, self.qmc.background_event_last_picked_ind, self.qmc.background_event_last_picked_pos, ystep=1)
                     elif self.qmc.background and self.qmc.backgroundKeyboardControlFlag:
                         self.qmc.moveBackgroundSignal.emit('up',self.qmc.backgroundmovespeed)
-                elif k == Qt.Key.Key_Down and no_modifier: # 16777237:     #DOWN (moves background down)
+                elif k == Qt.Key.Key_Down and (no_modifier or keypad_modifier): # 16777237:     #DOWN (moves background down)
                     if self.qmc.foreground_event_last_picked_ind is not None and self.qmc.foreground_event_last_picked_pos is not None:
                         # a foreground event is selected; move it up
                         self.qmc.move_custom_event(True, self.qmc.foreground_event_last_picked_ind, self.qmc.foreground_event_last_picked_pos, ystep=-1)
@@ -12588,7 +12589,6 @@ class ApplicationWindow(QMainWindow):
                     if not self.qmc.designerflag and not self.qmc.wheelflag and self.comparator is None:
                         self.qmc.nextFmtDataCurve()
                 elif k == Qt.Key.Key_U and no_modifier: # 85:    #U (toggle running LCDs on/off)
-                    _log.debug('PRINT modifiers: %s',modifiers)
                     if not self.qmc.flagon:
                         if self.qmc.running_LCDs == 0 and self.curFile:
                             self.qmc.running_LCDs = 1
@@ -12623,8 +12623,8 @@ class ApplicationWindow(QMainWindow):
                 elif k == Qt.Key.Key_S and no_modifier: # 83:          #S (toggle sliders)
                     if not self.app.artisanviewerMode and not self.qmc.designerflag and not self.qmc.wheelflag:
                         self.toggleSliders()
-                elif k == Qt.Key.Key_T and (no_modifier or control_shift_modifier): # 84 and not self.qmc.flagon and self.ui_mode is not UI_MODE.PRODUCTION:  #T (toggle mouse cross)
-                    self.qmc.togglecrosslines()
+                elif k == Qt.Key.Key_T and (no_modifier or control_shift_modifier):
+                    self.qmc.togglecrosslines()                        #T (toggle mouse cross)
                 elif k == Qt.Key.Key_Q and no_modifier: # 81:          #Q (quick entry of custom event 1)
                     if not self.qmc.designerflag and self.comparator is None:
                         self.quickEventShortCut = (0,'')
@@ -13476,7 +13476,6 @@ class ApplicationWindow(QMainWindow):
                 self.sendmessage(QApplication.translate('Message','NEW ROAST canceled: incomplete profile lacking DROP found'))
                 return False
             #invoke "OFF"
-            _log.debug('PRINT newRoast: before OffMonitor')
             self.qmc.monitorClosedDown.connect(self.startNewRoast)
             self.qmc.OffMonitor(respectAlwaysON=False)
         elif len(self.qmc.timex) > 1 or self.qmc.reset():
@@ -13485,7 +13484,6 @@ class ApplicationWindow(QMainWindow):
 
     @pyqtSlot()
     def startNewRoast(self) -> None:
-        _log.debug('PRINT startNewRoast')
         self.qmc.monitorClosedDown.disconnect(self.startNewRoast)
         libtime.sleep(.3) # sleep a moment to ensure all serial devices have been disconnected
         if self.qmc.reset():
@@ -15096,12 +15094,12 @@ class ApplicationWindow(QMainWindow):
                         row1_cell = ws.cell(row=1,column=f+1)
                         if not isinstance(row1_cell, MergedCell):
                             row1_cell.value = fe[0]
-                        ws.cell(row=1,column=f+1).font = bf
+                        ws.cell(row=1,column=f+1).font = bf # pyrefly:ignore[bad-assignment]
                         row2_cell = ws.cell(row=2,column=f+1)
                         if not isinstance(row2_cell, MergedCell):
                             row2_cell.value = fe[1]
-                        ws.cell(row=1,column=f+1).alignment = Alignment(horizontal='center')
-                        ws.cell(row=2,column=f+1).alignment = Alignment(horizontal='center')
+                        ws.cell(row=1,column=f+1).alignment = Alignment(horizontal='center')  # pyrefly:ignore[bad-assignment]
+                        ws.cell(row=2,column=f+1).alignment = Alignment(horizontal='center')  # pyrefly:ignore[bad-assignment]
 
                     #profile data
                     fieldlist = [
@@ -15134,8 +15132,8 @@ class ApplicationWindow(QMainWindow):
                             pass
 
                     for i in range(ws.max_column):
-                        ws.cell(row=r,column=i+1).font = bf
-                        ws.cell(row=r,column=i+1).alignment = Alignment(horizontal='center')
+                        ws.cell(row=r,column=i+1).font = bf  # pyrefly:ignore[bad-assignment]
+                        ws.cell(row=r,column=i+1).alignment = Alignment(horizontal='center')  # pyrefly:ignore[bad-assignment]
                     r += 1
 
                     last_time:str|None = None
@@ -21828,13 +21826,13 @@ class ApplicationWindow(QMainWindow):
                         ws['A1'].font = bf
                         ws['B1'] = QApplication.translate('HTML Report Template', 'Time')
                         ws['B1'].font = bf
-                        ws.column_dimensions['B'].width = 18
+                        ws.column_dimensions['B'].width = 18  # pyrefly:ignore[bad-assignment]
                         ws['C1'] = QApplication.translate('HTML Report Template', 'Profile')
                         ws['C1'].font = bf
-                        ws.column_dimensions['C'].width = 25
+                        ws.column_dimensions['C'].width = 25  # pyrefly:ignore[bad-assignment]
                         ws['D1'] = QApplication.translate('HTML Report Template', 'Beans')
                         ws['D1'].font = bf
-                        ws.column_dimensions['D'].width = 25
+                        ws.column_dimensions['D'].width = 25  # pyrefly:ignore[bad-assignment]
                         ws['E1'] = QApplication.translate('HTML Report Template', 'In') + ' (' + str(unit.lower()) + ')'
                         ws['E1'].font = bf
                         ws['F1'] = QApplication.translate('HTML Report Template', 'Out') + ' (' + str(unit.lower()) + ')'
@@ -23091,12 +23089,12 @@ class ApplicationWindow(QMainWindow):
                     else:
                         suffix = ''
                     cell = ws.cell(column=i+1, row=1, value=f'{name}{suffix}')
-                    cell.font = bf
-                    cell.alignment = Alignment(horizontal='center')
+                    cell.font = bf   # pyrefly:ignore[bad-assignment]
+                    cell.alignment = Alignment(horizontal='center')   # pyrefly:ignore[bad-assignment]
                     width = len(name + suffix) + 2.
                     if width > widths[i]:
                         widths[i] = width
-                        ws.column_dimensions[get_column_letter(i+1)].width = width
+                        ws.column_dimensions[get_column_letter(i+1)].width = width   # pyrefly:ignore[bad-assignment]
 
                 # write data
                 c = 1
@@ -23157,7 +23155,7 @@ class ApplicationWindow(QMainWindow):
                                         width = float(units)
                                     if width > widths[i]:
                                         widths[i] = width
-                                        ws.column_dimensions[get_column_letter(cnum)].width = width
+                                        ws.column_dimensions[get_column_letter(cnum)].width = width   # pyrefly:ignore[bad-assignment]
                                     ws[cr].alignment = Alignment(wrap_text=True)
                                 elif typ == 'int':
                                     ws[cr] = conv_fld  # type: ignore[assignment, unused-ignore] # ty:ignore[ignore]
@@ -23194,7 +23192,7 @@ class ApplicationWindow(QMainWindow):
                                     width = len(fmt) + 2.
                                     if width > widths[i]:
                                         widths[i] = width
-                                        ws.column_dimensions[get_column_letter(cnum)].width = width
+                                        ws.column_dimensions[get_column_letter(cnum)].width = width   # pyrefly:ignore[bad-assignment]
                                 elif typ == 'bool':
                                     ws[cr] = str(conv_fld) # pyright:ignore[reportUnknownArgumentType]
 

@@ -2728,7 +2728,8 @@ class editGraphDlg(ArtisanResizeablDialog):
                     self.defectsWeight(True,overwrite=True)
             elif key == 68 and control_modifier and self.TabWidget.currentIndex() == 0: #ctrl D on Roast tab => send scale weight to defects-weight field
                 self.defectsWeight(True)
-            elif key == 76 and control_modifier and self.TabWidget.currentIndex() == 0: #ctrl L on Roast tab => open volume calculator
+            elif (key == 76 and control_modifier and self.TabWidget.currentIndex() == 0 and
+                    self.aw.ui_mode is not UI_MODE.PRODUCTION):                         #ctrl L on Roast tab => open volume calculator (disabled in Production mode)
                 self.volumeCalculatorTimer(True)
             elif key == 73 and control_modifier and self.TabWidget.currentIndex() == 0: #ctrl I on Roast tab => send scale weight to in-weight field
                 self.inWeight(True)

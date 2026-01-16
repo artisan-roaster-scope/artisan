@@ -22,7 +22,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt6.QtCore import QSemaphore, QTimer, Qt, pyqtSlot
-from PyQt6.QtWidgets import QWidget, QApplication, QMessageBox
+from PyQt6.QtWidgets import QApplication, QMessageBox
 
 import platform
 import threading
@@ -101,11 +101,20 @@ def toggle(app_window:'ApplicationWindow') -> None:
                 remove_credentials=(modifiers == Qt.KeyboardModifier.ControlModifier),
                 keepON=False,
             )
-    elif is_on() and modifiers != Qt.KeyboardModifier.ControlModifier:
-        # active but not connected (dark grey plus icon)
-        # if modifier is pressed we disconnect, otherwise we try to reconnect
-        # we lost connection, let's try to reconnect
-        connect(clear_on_failure=False, interactive=False) # ensure we are connected (reconnect if needed)
+    elif is_on():
+        # active but not connected (dark grey plus icon); we might have lost connection
+        control_pressed = modifiers == Qt.KeyboardModifier.ControlModifier
+        if control_pressed or not disconnect_confirmed():
+            # if modifier is pressed reconnect
+            connect(clear_on_failure=False, interactive=False) # ensure we are connected (reconnect if needed)
+        elif not control_pressed:
+            # disconnect got confirmed while modifier is not pressed, we disconnect without further interactive action
+            disconnect(
+                remove_credentials=False,
+                stop_queue=True,
+                interactive=False,
+                keepON=False,
+            )
     else:
         disconnect(
             remove_credentials=False,
@@ -312,22 +321,12 @@ def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
 # show a dialog to have the user confirm the disconnect action
 def disconnect_confirmed() -> bool:
     string = QApplication.translate('Plus', 'Disconnect artisan.plus?')
-    aw = config.app_window
-    assert isinstance(aw, QWidget)
-#    reply = QMessageBox.question(
-#        aw,
-#        QApplication.translate('Plus', 'Disconnect?'),
-#        string,
-#        QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel,
-#    )
-#    return QMessageBox.StandardButton.Ok == reply
-    mbox = QMessageBox() #(aw) # only without super this one shows the native dialog on macOS under Qt 6.6.2
+    mbox = QMessageBox()
     mbox.setText(string)
     util.setPlusIcon(mbox)
     mbox.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
     res = mbox.exec()
     return QMessageBox.StandardButton.Yes == res
-
 
 # if keepON is set (the default), the credentials are not removed at all and
 # just the connected flag is toggled to keep plus in ON (dark-grey) state

@@ -378,7 +378,8 @@ class tgraphcanvas(QObject):
         'foreground_event_pos', 'plus_lockSchedule_sent_account', 'plus_lockSchedule_sent_date', 'specialeventplaybackramp', 'ramp_lookahead',
         'CO2kg_per_BTU_default', 'CO2kg_per_BTU', 'Biogas_CO2_Reduction', 'Biogas_CO2_Reduction_default',
         'meterunitnames', 'meterreads_default', 'meterreads', 'meterlabels_setup', 'meterlabels', 'meterunits_setup', 'meterunits',
-        'meterfuels_setup', 'meterfuels', 'metersources_setup', 'metersources', 'playbackdrop_min_roasttime', 'TP_max_roasttime'
+        'meterfuels_setup', 'meterfuels', 'metersources_setup', 'metersources', 'playbackdrop_min_roasttime', 'TP_max_roasttime',
+        'single_click_mpl_upperleft_corner_timer', 'single_click_mpl_upperleft_corner_TIMEOUT'
         ]
 
 
@@ -1975,8 +1976,8 @@ class tgraphcanvas(QObject):
         # RoR display limits
         # user configurable RoR limits (only applied if flag is True; applied before TP during recording as well as full redraw)
         self.RoRlimitFlag:bool = True
-        self.RoRlimit:int = 95
-        self.RoRlimitm:int = -95
+        self.RoRlimit:int = 113 # 113F/min = 45C/min # was 95F/min
+        self.RoRlimitm:int = 14 # 14F/min = -10C/min # was: -95F/min
         # system fixed RoR limits (only applied if flag is True; usually higher than the user configurable once and always applied)
         self.maxRoRlimit: Final[int] = 170
         # axis limits
@@ -2510,6 +2511,12 @@ class tgraphcanvas(QObject):
         self.eventmessage = ''
         self.backgroundeventmessage = ''
         self.eventmessagetimer:QTimer|None = None
+
+        # used to differentiate between a double click that opens the roastUUID on plus and a single click which opens the Roast Properties dialog
+        self.single_click_mpl_upperleft_corner_timer = QTimer()
+        self.single_click_mpl_upperleft_corner_timer.setSingleShot(True)
+        self.single_click_mpl_upperleft_corner_timer.timeout.connect(self.aw.open_roast_properties_dialog)
+        self.single_click_mpl_upperleft_corner_TIMEOUT:Final[int] = 200 # time in milliseconds before disconnect state is terminated by a 'reset'
 
         self.resizeredrawing = 0 # holds timestamp of last resize triggered redraw
 
@@ -4072,10 +4079,11 @@ class tgraphcanvas(QObject):
                 if not self.designerflag and not self.wheelflag and event.inaxes is None and not self.flagstart and not self.flagon and event.button == 1 and \
                         event.x < event.y:
                     if event.dblclick and self.roastUUID is not None:
+                        self.single_click_mpl_upperleft_corner_timer.stop()
                         QDesktopServices.openUrl(QUrl(roastLink(self.roastUUID), QUrl.ParsingMode.TolerantMode))
                         return
                     # title not set => open Roast Properties dialog
-                    self.aw.open_roast_properties_dialog(start_recording_on_exit=False)
+                    self.single_click_mpl_upperleft_corner_timer.start(self.single_click_mpl_upperleft_corner_TIMEOUT)
                     return
 
                 if event.dblclick and event.button == 1 and not self.designerflag and not self.wheelflag and event.inaxes:
@@ -9207,6 +9215,7 @@ class tgraphcanvas(QObject):
         else:
             _log.info('lazyredraw(): failed to get profileDataSemaphore lock')
 
+    # if smooth is set or stemp1/stemp2 are empty, data is re-smoothed (and drops potentially interpolated) and assigned to stemp1/stemp2, otherwise the existing stemp1/stemp2
     def smoothETBT(self, smooth:bool, recomputeAllDeltas:bool, decay_smoothing_p:bool) -> None:
         try:
             # we resample the temperatures to regular interval timestamps
@@ -11070,10 +11079,13 @@ class tgraphcanvas(QObject):
                                         decay_smoothing=decay_smoothing_p,
                                         a_lin=timexi_lin,
                                         delta=False).tolist()
-                                elif self.interpolateDropsflag: # we don't smooth, but remove the dropouts
-                                    self.extrastemp1[i] = fill_gaps(self.extratemp1[i])
-                                else:
-                                    self.extrastemp1[i] = self.extratemp1[i]
+                                elif len(self.extrastemp1[i]) != len(self.extratimex[i]):
+                                    # extratemp1 does not exist and we are not re-smoothing, we take the raw data (potentially with dropouts interpolated)
+                                    if self.interpolateDropsflag: # we don't smooth, but remove the dropouts
+                                        self.extrastemp1[i] = fill_gaps(self.extratemp1[i])
+                                    else:
+                                        self.extrastemp1[i] = self.extratemp1[i]
+
                                 if self.aw.extraDelta1[i] and self.delta_ax is not None:
                                     trans = self.delta_ax.transData
                                 else:
@@ -11118,10 +11130,13 @@ class tgraphcanvas(QObject):
                                         decay_smoothing=decay_smoothing_p,
                                         a_lin=timexi_lin,
                                         delta=False).tolist()
-                                elif self.interpolateDropsflag:
-                                    self.extrastemp2[i] = fill_gaps(self.extratemp2[i])
-                                else:
-                                    self.extrastemp2[i] = self.extratemp2[i]
+                                elif len(self.extrastemp2[i]) != len(self.extratimex[i]):
+                                    # extratemp2 does not exist and we are not re-smoothing, we take the raw data (potentially with dropouts interpolated)
+                                    if self.interpolateDropsflag:
+                                        self.extrastemp2[i] = fill_gaps(self.extratemp2[i])
+                                    else:
+                                        self.extrastemp2[i] = self.extratemp2[i]
+
                                 if self.aw.extraDelta2[i] and self.delta_ax is not None:
                                     trans = self.delta_ax.transData
                                 else:
@@ -13978,6 +13993,7 @@ class tgraphcanvas(QObject):
 
     # close Phidget and and Yocto outputs
     def closePhidgetOUTPUTs(self) -> None:
+        _log.debug('closePhidgetOUTPUTs')
         # close Phidget Digital Outputs
         self.aw.ser.phidgetOUTclose()
         # close Phidget Digital Outputs on Hub
@@ -14004,6 +14020,7 @@ class tgraphcanvas(QObject):
         self.aw.ser.yoctoPWMclose()
 
     def closePhidgetAMBIENTs(self) -> None:
+        _log.debug('closePhidgetAMBIENTs')
         # note that we do not unregister this detach in the self.phidgetManager as we only support one of those devices
         try:
             if self.aw.ser.TMP1000temp is not None and self.aw.ser.TMP1000temp.getAttached():
@@ -17902,7 +17919,7 @@ class tgraphcanvas(QObject):
         # init designer timez
         self.designer_timez = [float(w) for w in numpy.arange(self.timex[0],self.timex[-1],self.time_step_size)]
         # set initial RoR z-axis limits
-        self.setDesignerDeltaAxisLimits(self.DeltaETflag, self.DeltaBTflag)
+        self.setDesignerDeltaAxisLimits(self.DeltaETflag and self.autodeltaxET, self.DeltaBTflag and self.autodeltaxBT)
         self.redrawdesigner(force=True)
 
     #loads main points from a profile so that they can be edited
@@ -18019,7 +18036,7 @@ class tgraphcanvas(QObject):
         # init designer timez
         self.designer_timez = [float(w) for w in numpy.arange(self.timex[0],self.timex[-1],self.time_step_size)]
         # set initial RoR z-axis limits
-        self.setDesignerDeltaAxisLimits(self.DeltaETflag, self.DeltaBTflag)
+        self.setDesignerDeltaAxisLimits(self.DeltaETflag and self.autodeltaxET, self.DeltaBTflag and self.autodeltaxBT)
 
         self.redrawdesigner(force=True)                                   #redraw the designer screen
 
@@ -19349,7 +19366,7 @@ class tgraphcanvas(QObject):
 #############################     MOUSE CROSS     #############################
 
     def togglecrosslines(self) -> None:
-        if not self.crossmarker and not self.designerflag and not self.flagstart:  #if not projection flag
+        if not self.crossmarker and not self.designerflag and not self.flagon:  #if not projection flag
             #turn ON
             self.l_horizontalcrossline = None
             self.l_verticalcrossline = None

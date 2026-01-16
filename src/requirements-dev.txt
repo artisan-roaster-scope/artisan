@@ -1,7 +1,7 @@
 types-openpyxl>=3.1.5.20250919
 types-Pillow>=10.2.0.20240822
 types-protobuf>=6.32.1.20251210
-types-psutil>=7.2.1.20251231
+types-psutil>=7.2.1.20260116
 types-pyserial>=3.5.0.20251001
 types-python-dateutil==2.9.0.20251115
 types-pytz>=2025.2.0.20251108
@@ -15,7 +15,7 @@ types-qrcode>=8.2.0.20250914
 lxml-stubs>=0.5.1
 mypy==1.19.1
 pyright==1.1.408
-ruff>=0.14.11
+ruff>=0.14.13
 pylint==4.0.4
 pre-commit>=4.5.1
 pytest>=9.0.2
@@ -28,12 +28,12 @@ pytest-datadir==1.8.0
 #PyVirtualDisplay==3.0
 #pytest-bdd==6.1.1
 #pytest-benchmark==4.0.0
-hypothesis>=6.150.1
+hypothesis>=6.150.2
 coverage>=7.13.1
 coverage-badge==1.1.2
 codespell==2.4.1
 # the following 2 packages are not installed along aiohttp on Python3.12 and make mypy complain
 async_timeout==5.0.1
 cycler==0.12.1
-scipy-stubs==1.17.0.0
+scipy-stubs==1.17.0.1
 #matplotlib-stubs==0.3.11
