@@ -5355,7 +5355,7 @@ class ApplicationWindow(QMainWindow):
                                     subscription_icon = 'plus-pro-low'
                 else:
                     plus_icon = 'plus-on'
-                    tooltip = QApplication.translate('Tooltip', 'Disonnect artisan.plus')
+                    tooltip = QApplication.translate('Tooltip', 'Disconnect artisan.plus')
             else:
                 plus_icon = 'plus-off'
                 tooltip = QApplication.translate('Tooltip', 'Connect artisan.plus')

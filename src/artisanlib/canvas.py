@@ -181,7 +181,11 @@ class MplCanvas(FigureCanvas):
 
     @pyqtSlot()
     def lazyredraw_on_resize(self) -> None:
-        self.lazyredraw(recomputeAllDeltas=False)
+        try:
+            # self.aw.qmc might not be established yet
+            self.aw.qmc.lazyredraw(recomputeAllDeltas=False)
+        except Exception:
+            pass
 
     @override
     def resizeEvent(self, event:'QResizeEvent') -> None:
@@ -190,11 +194,6 @@ class MplCanvas(FigureCanvas):
         if self.aw.redrawOnResize and self.aw.logofilename != '':
             dw = event.size().width() - event.oldSize().width()   # width change
             dh = event.size().height() - event.oldSize().height() # height change
-#            t = libtime.time()
-#            # ensure that we redraw during resize only once per second
-#            if self.resizeredrawing + 0.5 < t and ((dw != 0) or (dh != 0)):
-#                self.resizeredrawing = t
-#                QTimer.singleShot(1, lazyredraw_on_resize)
             if ((dw != 0) or (dh != 0)):
                 self.lazyredraw_on_resize_timer.start(10)
 
