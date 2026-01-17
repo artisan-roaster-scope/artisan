@@ -6906,8 +6906,10 @@ When Meter=NONE opens dialog to manually enter temperatures during roast</source
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="38" />
-        <source>Toggle Playback Events</source>
-        <translation>Перемикати події відтворення</translation>
+        <source>Toggle Playback Events
+(Expert and Standard modes)</source>
+        <translation>Перемикання подій відтворення
+(Режими «Експерт» та «Стандартний»)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="39" />
@@ -6931,23 +6933,29 @@ When Meter=NONE opens dialog to manually enter temperatures during roast</source
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="43" />
-        <source>Load alarms</source>
-        <translation>Сигналізація навантаження</translation>
+        <source>Load alarms
+(Expert and Standard modes)</source>
+        <translation>Завантаження тривог
+(Режими «Експерт» та «Стандартний»)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="44" />
-        <source>Changes Event Button Palettes</source>
-        <translation>Змінює палітри кнопок подій</translation>
+        <source>Changes Event Button Palettes
+(Can be disabled or enabled in Expert mode Config&gt;&gt; Events&gt;&gt; Palettes&gt;&gt; Switch Using Number Keys and Cmd)</source>
+        <translation>Змінює палітри кнопок подій
+(Можна вимкнути або ввімкнути в режимі експерта: Налаштування &gt;&gt; Події &gt;&gt; Палітри &gt;&gt; Перемикання за допомогою цифрових клавіш та Cmd)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="45" />
-        <source>Application ScreenShot</source>
-        <translation>Скріншот програми</translation>
+        <source>Application ScreenShot
+(Expert and Standard modes)</source>
+        <translation>Знімок екрана програми (режими «Експерт» та «Стандартний»)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="46" />
-        <source>Desktop ScreenShot</source>
-        <translation>Скріншот робочого столу</translation>
+        <source>Desktop ScreenShot
+(Expert and Standard modes)</source>
+        <translation>Знімок екрана робочого столу (режими «Експерт» та «Стандартний»)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="47" />
@@ -7410,15 +7418,14 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
-        <source>Click on timer
-Expert mode</source>
-        <translation>Натисніть на таймер
-Режим експерта</translation>
+        <source>Click on timer</source>
+        <translation>Натисніть таймер</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
-        <source>Simulator</source>
-        <translation>Симулятор</translation>
+        <source>Simulator
+(Expert mode)</source>
+        <translation>Симулятор (режим експерта)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
@@ -7433,18 +7440,17 @@ Expert mode</source>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
         <source>OPTION Tools&gt;&gt;Simulator [Mac]
-ALT Tools&gt;&gt;Simulator [Win]
-Expert mode</source>
+ALT Tools&gt;&gt;Simulator [Win]</source>
         <translation>Інструменти OPTION&gt;&gt;Симулятор [Mac]
-Інструменти ALT&gt;&gt;Симулятор [Win]
-Режим експерта</translation>
+Інструменти ALT&gt;&gt;Симулятор [Win]</translation>
     </message>
     <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="89" />
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
         <source>Graph/Simulator
-[Expert mode]</source>
+(Expert mode)</source>
         <translation>Графіка/Симулятор
-[Режим експерта]</translation>
+(Режим експерта)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
@@ -7460,11 +7466,6 @@ CTRL Tools&gt;&gt;Simulator [Win]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="89" />
-        <source>Graph/Simulator</source>
-        <translation>Графік/Симулятор</translation>
-    </message>
-    <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="89" />
         <source>Start or change Simulator speed to 4x mode</source>
         <translation>Запустіть або змініть швидкість симулятора на режим 4x</translation>
     </message>
@@ -7476,14 +7477,10 @@ CTRL+L [Win]</source>
 CTRL+L [Перемога]</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="95" />
-        <location filename="../help/keyboardshortcuts_help.py" line="94" />
-        <location filename="../help/keyboardshortcuts_help.py" line="93" />
-        <location filename="../help/keyboardshortcuts_help.py" line="92" />
-        <location filename="../help/keyboardshortcuts_help.py" line="91" />
         <location filename="../help/keyboardshortcuts_help.py" line="90" />
-        <source>Roast Properties Roast tab</source>
-        <translation>Властивості смаження Вкладка смаження</translation>
+        <source>Roast Properties Roast tab
+(Expert and Standard modes)</source>
+        <translation>Властивості обсмажування Вкладка «Обсмажування» (режими «Експерт» та «Стандарт»)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="90" />
@@ -7496,6 +7493,15 @@ CTRL+L [Перемога]</translation>
 ALT click Stock [Win]</source>
         <translation>OPTION натисніть Stock [Mac]
 Клацніть ALT Stock [Win]</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="95" />
+        <location filename="../help/keyboardshortcuts_help.py" line="94" />
+        <location filename="../help/keyboardshortcuts_help.py" line="93" />
+        <location filename="../help/keyboardshortcuts_help.py" line="92" />
+        <location filename="../help/keyboardshortcuts_help.py" line="91" />
+        <source>Roast Properties Roast tab</source>
+        <translation>Властивості смаження Вкладка смаження</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="91" />
@@ -7760,7 +7766,6 @@ Hold Shift+Alt [Win]</source>
         <translation>Вставити</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="120" />
         <location filename="../help/keyboardshortcuts_help.py" line="119" />
         <location filename="../help/keyboardshortcuts_help.py" line="118" />
         <source>Roast</source>
@@ -7778,17 +7783,22 @@ Hold Shift+Alt [Win]</source>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="120" />
+        <source>Roast
+(Expert and Standard modes)</source>
+        <translation>Обсмажування (режими «Експерт» та «Стандарт»)</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="120" />
         <source>Switch Profiles (Foreground&lt;=&gt;Background)</source>
         <translation>Перемикання профілів (передній план&lt;=&gt;фон)</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="125" />
-        <location filename="../help/keyboardshortcuts_help.py" line="124" />
-        <location filename="../help/keyboardshortcuts_help.py" line="123" />
         <location filename="../help/keyboardshortcuts_help.py" line="122" />
         <location filename="../help/keyboardshortcuts_help.py" line="121" />
-        <source>Config</source>
-        <translation>конфіг</translation>
+        <source>Config
+(Expert mode)</source>
+        <translation>Налаштування
+(Режим експерта)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="121" />
@@ -7799,6 +7809,14 @@ Hold Shift+Alt [Win]</source>
         <location filename="../help/keyboardshortcuts_help.py" line="122" />
         <source>Open Curves dialog</source>
         <translation>Відкрити діалогове вікно «Криві».</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="125" />
+        <location filename="../help/keyboardshortcuts_help.py" line="124" />
+        <location filename="../help/keyboardshortcuts_help.py" line="123" />
+        <source>Config
+(Expert and Standard modes)</source>
+        <translation>Конфігурація (режими «Експерт» та «Стандарт»)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="123" />
@@ -7818,8 +7836,9 @@ Hold Shift+Alt [Win]</source>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="127" />
         <location filename="../help/keyboardshortcuts_help.py" line="126" />
-        <source>Tools</source>
-        <translation>Інструменти</translation>
+        <source>Tools
+(Expert mode)</source>
+        <translation>Інструменти (режим експерта)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="126" />
@@ -11333,6 +11352,62 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
         <translation>F1 посилається на попередній результат фактичної формули для реалізації циклу зворотного зв’язку. Це корисно в конструкціях фільтрів. Так само F2 посилається на другий попередній результат тощо.</translation>
     </message>
     <message>
+        <source>Toggle Playback Events</source>
+        <translation type="vanished">Перемикати події відтворення</translation>
+    </message>
+    <message>
+        <source>Load alarms</source>
+        <translation type="vanished">Сигналізація навантаження</translation>
+    </message>
+    <message>
+        <source>Changes Event Button Palettes</source>
+        <translation type="vanished">Змінює палітри кнопок подій</translation>
+    </message>
+    <message>
+        <source>Application ScreenShot</source>
+        <translation type="vanished">Скріншот програми</translation>
+    </message>
+    <message>
+        <source>Desktop ScreenShot</source>
+        <translation type="vanished">Скріншот робочого столу</translation>
+    </message>
+    <message>
+        <source>Click on timer
+Expert mode</source>
+        <translation type="vanished">Натисніть на таймер
+Режим експерта</translation>
+    </message>
+    <message>
+        <source>Simulator</source>
+        <translation type="vanished">Симулятор</translation>
+    </message>
+    <message>
+        <source>OPTION Tools&gt;&gt;Simulator [Mac]
+ALT Tools&gt;&gt;Simulator [Win]
+Expert mode</source>
+        <translation type="vanished">Інструменти OPTION&gt;&gt;Симулятор [Mac]
+Інструменти ALT&gt;&gt;Симулятор [Win]
+Режим експерта</translation>
+    </message>
+    <message>
+        <source>Graph/Simulator
+[Expert mode]</source>
+        <translation type="vanished">Графіка/Симулятор
+[Режим експерта]</translation>
+    </message>
+    <message>
+        <source>Graph/Simulator</source>
+        <translation type="vanished">Графік/Симулятор</translation>
+    </message>
+    <message>
+        <source>Config</source>
+        <translation type="vanished">конфіг</translation>
+    </message>
+    <message>
+        <source>Tools</source>
+        <translation type="vanished">Інструменти</translation>
+    </message>
+    <message>
         <source>Change roast event key focus</source>
         <translation type="vanished">Змінити ключовий фокус події обсмажування</translation>
     </message>
@@ -11371,10 +11446,6 @@ Keyboard Shortcuts must be turned off (ENTER)</source>
 Keyboard Shortcuts must be disabled (ENTER)</source>
         <translation type="vanished">Необхідно ввімкнути керування клавіатурою в Config&gt;&gt; Events
 Комбінації клавіш мають бути вимкнені (ENTER)</translation>
-    </message>
-    <message>
-        <source>Click on timer</source>
-        <translation type="vanished">Натисніть таймер</translation>
     </message>
     <message>
         <source>Simulator speed may be changd while paused (hold shift  (1x), OPTION/ALT (2x) or COMMAND/CTRL (4x) on restart).</source>
@@ -15342,7 +15413,7 @@ Repeat Operation at the end: {0}</source>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2487" />
-        <source>Recomended Mode = 0</source>
+        <source>Recommended Mode = 0</source>
         <translation>Рекомендований режим = 0</translation>
     </message>
     <message>
@@ -17740,6 +17811,10 @@ Profile missing [CHARGE] or [DROP]</source>
         <location filename="../plus/schedule.py" line="3644" />
         <source>Fetching completed roast properties failed</source>
         <translation>Не вдалося отримати готові властивості смаження</translation>
+    </message>
+    <message>
+        <source>Recomended Mode = 0</source>
+        <translation type="vanished">Рекомендований режим = 0</translation>
     </message>
     <message>
         <source>Empty path or box unchecked in Autosave</source>

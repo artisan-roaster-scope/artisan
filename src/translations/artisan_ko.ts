@@ -7582,8 +7582,10 @@ Meter=NONE일 때 로스팅 중 온도를 수동으로 입력하기 위한 대�
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="38" />
-        <source>Toggle Playback Events</source>
-        <translation>Toggle 재생 이벤트</translation>
+        <source>Toggle Playback Events
+(Expert and Standard modes)</source>
+        <translation>재생 이벤트 전환
+(전문가 모드 및 표준 모드)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="39" />
@@ -7607,23 +7609,31 @@ Meter=NONE일 때 로스팅 중 온도를 수동으로 입력하기 위한 대�
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="43" />
-        <source>Load alarms</source>
-        <translation>부하 경보</translation>
+        <source>Load alarms
+(Expert and Standard modes)</source>
+        <translation>부하 경보
+(전문가 모드 및 표준 모드)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="44" />
-        <source>Changes Event Button Palettes</source>
-        <translation>이벤트 버튼 팔레트 변경</translation>
+        <source>Changes Event Button Palettes
+(Can be disabled or enabled in Expert mode Config&gt;&gt; Events&gt;&gt; Palettes&gt;&gt; Switch Using Number Keys and Cmd)</source>
+        <translation>이벤트 버튼 팔레트 변경
+(전문가 모드에서 설정 &gt; 이벤트 &gt; 팔레트 &gt; 숫자 키 및 Cmd를 사용한 전환을 통해 활성화 또는 비활성화할 수 있습니다.)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="45" />
-        <source>Application ScreenShot</source>
-        <translation>애플리케이션 스크린샷</translation>
+        <source>Application ScreenShot
+(Expert and Standard modes)</source>
+        <translation>애플리케이션 스크린샷
+(전문가 모드 및 표준 모드)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="46" />
-        <source>Desktop ScreenShot</source>
-        <translation>데스크톱 스크린샷</translation>
+        <source>Desktop ScreenShot
+(Expert and Standard modes)</source>
+        <translation>데스크톱 화면 캡처
+(전문가 모드 및 표준 모드)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="47" />
@@ -8087,15 +8097,15 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
-        <source>Click on timer
-Expert mode</source>
-        <translation>타이머를 클릭하세요
-전문가 모드</translation>
+        <source>Click on timer</source>
+        <translation>타이머 클릭</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
-        <source>Simulator</source>
-        <translation type="unfinished">시뮬레이터</translation>
+        <source>Simulator
+(Expert mode)</source>
+        <translation>시뮬레이터
+(전문가 모드)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
@@ -8110,18 +8120,17 @@ Expert mode</source>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
         <source>OPTION Tools&gt;&gt;Simulator [Mac]
-ALT Tools&gt;&gt;Simulator [Win]
-Expert mode</source>
-        <translation>옵션 도구 &gt;&gt; 시뮬레이터 [Mac]
-대체 도구 &gt;&gt; 시뮬레이터 [Win]
-전문가 모드</translation>
+ALT Tools&gt;&gt;Simulator [Win]</source>
+        <translation>옵션 도구&gt;&gt;시뮬레이터 [Mac]
+ALT 도구&gt;&gt;시뮬레이터 [Win]</translation>
     </message>
     <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="89" />
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
         <source>Graph/Simulator
-[Expert mode]</source>
+(Expert mode)</source>
         <translation>그래프/시뮬레이터
-[전문가 모드]</translation>
+(전문가 모드)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
@@ -8137,11 +8146,6 @@ CTRL 도구&gt;&gt;시뮬레이터 [Win]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="89" />
-        <source>Graph/Simulator</source>
-        <translation>그래프/시뮬레이터</translation>
-    </message>
-    <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="89" />
         <source>Start or change Simulator speed to 4x mode</source>
         <translation>시뮬레이터 속도를 4x 모드로 시작 또는 변경</translation>
     </message>
@@ -8153,14 +8157,11 @@ CTRL+L [Win]</source>
 CTRL+L [승리]</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="95" />
-        <location filename="../help/keyboardshortcuts_help.py" line="94" />
-        <location filename="../help/keyboardshortcuts_help.py" line="93" />
-        <location filename="../help/keyboardshortcuts_help.py" line="92" />
-        <location filename="../help/keyboardshortcuts_help.py" line="91" />
         <location filename="../help/keyboardshortcuts_help.py" line="90" />
-        <source>Roast Properties Roast tab</source>
-        <translation>로스트 속성 로스트 탭</translation>
+        <source>Roast Properties Roast tab
+(Expert and Standard modes)</source>
+        <translation>로스팅 속성 로스팅 탭
+(전문가 모드 및 일반 모드)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="90" />
@@ -8173,6 +8174,15 @@ CTRL+L [승리]</translation>
 ALT click Stock [Win]</source>
         <translation>OPTION 스톡 클릭 [Mac]
 ALT 클릭 주식 [승리]</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="95" />
+        <location filename="../help/keyboardshortcuts_help.py" line="94" />
+        <location filename="../help/keyboardshortcuts_help.py" line="93" />
+        <location filename="../help/keyboardshortcuts_help.py" line="92" />
+        <location filename="../help/keyboardshortcuts_help.py" line="91" />
+        <source>Roast Properties Roast tab</source>
+        <translation>로스트 속성 로스트 탭</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="91" />
@@ -8437,7 +8447,6 @@ Shift+Alt 누르기 [Win]</translation>
         <translation type="unfinished">붙이기</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="120" />
         <location filename="../help/keyboardshortcuts_help.py" line="119" />
         <location filename="../help/keyboardshortcuts_help.py" line="118" />
         <source>Roast</source>
@@ -8455,17 +8464,23 @@ Shift+Alt 누르기 [Win]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="120" />
+        <source>Roast
+(Expert and Standard modes)</source>
+        <translation>로스팅
+(전문가 모드 및 일반 모드)</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="120" />
         <source>Switch Profiles (Foreground&lt;=&gt;Background)</source>
         <translation>프로필 전환(전경&lt;=&gt;백그라운드)</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="125" />
-        <location filename="../help/keyboardshortcuts_help.py" line="124" />
-        <location filename="../help/keyboardshortcuts_help.py" line="123" />
         <location filename="../help/keyboardshortcuts_help.py" line="122" />
         <location filename="../help/keyboardshortcuts_help.py" line="121" />
-        <source>Config</source>
-        <translation type="unfinished">설정</translation>
+        <source>Config
+(Expert mode)</source>
+        <translation>설정
+(전문가 모드)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="121" />
@@ -8476,6 +8491,15 @@ Shift+Alt 누르기 [Win]</translation>
         <location filename="../help/keyboardshortcuts_help.py" line="122" />
         <source>Open Curves dialog</source>
         <translation>곡선 열기 대화상자</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="125" />
+        <location filename="../help/keyboardshortcuts_help.py" line="124" />
+        <location filename="../help/keyboardshortcuts_help.py" line="123" />
+        <source>Config
+(Expert and Standard modes)</source>
+        <translation>설정
+(전문가 모드 및 표준 모드)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="123" />
@@ -8495,8 +8519,10 @@ Shift+Alt 누르기 [Win]</translation>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="127" />
         <location filename="../help/keyboardshortcuts_help.py" line="126" />
-        <source>Tools</source>
-        <translation type="unfinished">도구</translation>
+        <source>Tools
+(Expert mode)</source>
+        <translation>도구
+(전문가 모드)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="126" />
@@ -12010,6 +12036,62 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
         <translation>F1은 피드백 루프를 구현하기 위한 실제 공식의 이전 결과를 나타냅니다. 이는 필터 설계에 유용합니다. 마찬가지로 F2는 두 번째 이전 결과 등을 나타냅니다.</translation>
     </message>
     <message>
+        <source>Toggle Playback Events</source>
+        <translation type="vanished">Toggle 재생 이벤트</translation>
+    </message>
+    <message>
+        <source>Load alarms</source>
+        <translation type="vanished">부하 경보</translation>
+    </message>
+    <message>
+        <source>Changes Event Button Palettes</source>
+        <translation type="vanished">이벤트 버튼 팔레트 변경</translation>
+    </message>
+    <message>
+        <source>Application ScreenShot</source>
+        <translation type="vanished">애플리케이션 스크린샷</translation>
+    </message>
+    <message>
+        <source>Desktop ScreenShot</source>
+        <translation type="vanished">데스크톱 스크린샷</translation>
+    </message>
+    <message>
+        <source>Click on timer
+Expert mode</source>
+        <translation type="vanished">타이머를 클릭하세요
+전문가 모드</translation>
+    </message>
+    <message>
+        <source>Simulator</source>
+        <translation type="vanished">시뮬레이터</translation>
+    </message>
+    <message>
+        <source>OPTION Tools&gt;&gt;Simulator [Mac]
+ALT Tools&gt;&gt;Simulator [Win]
+Expert mode</source>
+        <translation type="vanished">옵션 도구 &gt;&gt; 시뮬레이터 [Mac]
+대체 도구 &gt;&gt; 시뮬레이터 [Win]
+전문가 모드</translation>
+    </message>
+    <message>
+        <source>Graph/Simulator
+[Expert mode]</source>
+        <translation type="vanished">그래프/시뮬레이터
+[전문가 모드]</translation>
+    </message>
+    <message>
+        <source>Graph/Simulator</source>
+        <translation type="vanished">그래프/시뮬레이터</translation>
+    </message>
+    <message>
+        <source>Config</source>
+        <translation type="vanished">설정</translation>
+    </message>
+    <message>
+        <source>Tools</source>
+        <translation type="vanished">도구</translation>
+    </message>
+    <message>
         <source>Change roast event key focus</source>
         <translation type="vanished">로스트 이벤트 키 포커스 변경</translation>
     </message>
@@ -12050,18 +12132,8 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
 키보드 단축키를 비활성화해야 합니다(ENTER).</translation>
     </message>
     <message>
-        <source>Click on timer</source>
-        <translation type="vanished">타이머 클릭</translation>
-    </message>
-    <message>
         <source>Simulator speed may be changd while paused (hold shift  (1x), OPTION/ALT (2x) or COMMAND/CTRL (4x) on restart).</source>
         <translation type="vanished">일시 중지된 동안 시뮬레이터 속도가 변경될 수 있습니다(다시 시작 시 Shift(1x), OPTION/ALT(2x) 또는 COMMAND/CTRL(4x) 누르기).</translation>
-    </message>
-    <message>
-        <source>OPTION Tools&gt;&gt;Simulator [Mac]
-ALT Tools&gt;&gt;Simulator [Win]</source>
-        <translation type="vanished">옵션 도구&gt;&gt;시뮬레이터 [Mac]
-ALT 도구&gt;&gt;시뮬레이터 [Win]</translation>
     </message>
     <message>
         <source>&lt;button number&gt;</source>
@@ -16652,7 +16724,7 @@ Repeat Operation at the end: {0}</source>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2487" />
-        <source>Recomended Mode = 0</source>
+        <source>Recommended Mode = 0</source>
         <translation>권장 모드 = 0</translation>
     </message>
     <message>
@@ -19050,6 +19122,10 @@ Profile missing [CHARGE] or [DROP]</source>
         <location filename="../plus/schedule.py" line="3644" />
         <source>Fetching completed roast properties failed</source>
         <translation>완료된 로스트 속성을 가져오는 데 실패했습니다.</translation>
+    </message>
+    <message>
+        <source>Recomended Mode = 0</source>
+        <translation type="vanished">권장 모드 = 0</translation>
     </message>
     <message>
         <source>Empty path or box unchecked in Autosave</source>

@@ -6918,8 +6918,10 @@ Meter=NONE の場合、焙煎中に温度を手動で入力するためのダイ
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="38" />
-        <source>Toggle Playback Events</source>
-        <translation>再生イベントの切り替え</translation>
+        <source>Toggle Playback Events
+(Expert and Standard modes)</source>
+        <translation>再生イベントの切り替え
+(エキスパートモードと標準モード)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="39" />
@@ -6943,23 +6945,31 @@ Meter=NONE の場合、焙煎中に温度を手動で入力するためのダイ
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="43" />
-        <source>Load alarms</source>
-        <translation>ロードアラーム</translation>
+        <source>Load alarms
+(Expert and Standard modes)</source>
+        <translation>負荷アラーム
+(エキスパートモードと標準モード)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="44" />
-        <source>Changes Event Button Palettes</source>
-        <translation>イベントボタンパレットの変更</translation>
+        <source>Changes Event Button Palettes
+(Can be disabled or enabled in Expert mode Config&gt;&gt; Events&gt;&gt; Palettes&gt;&gt; Switch Using Number Keys and Cmd)</source>
+        <translation>イベントボタンパレットを変更します
+(エキスパートモードの「設定」&gt;&gt;「イベント」&gt;&gt;「パレット」&gt;&gt;「数字キーとコマンドキーで切り替え」で有効または無効にできます)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="45" />
-        <source>Application ScreenShot</source>
-        <translation>アプリケーションのスクリーンショット</translation>
+        <source>Application ScreenShot
+(Expert and Standard modes)</source>
+        <translation>アプリケーションスクリーンショット
+(エキスパートモードと標準モード)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="46" />
-        <source>Desktop ScreenShot</source>
-        <translation>デスクトップのスクリーンショット</translation>
+        <source>Desktop ScreenShot
+(Expert and Standard modes)</source>
+        <translation>デスクトップスクリーンショット
+(エキスパートモードとスタンダードモード)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="47" />
@@ -7423,15 +7433,15 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
-        <source>Click on timer
-Expert mode</source>
-        <translation>タイマーをクリック
-エキスパートモード</translation>
+        <source>Click on timer</source>
+        <translation>タイマーをクリック</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
-        <source>Simulator</source>
-        <translation>シミュレーター</translation>
+        <source>Simulator
+(Expert mode)</source>
+        <translation>シミュレーター
+(エキスパートモード)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
@@ -7446,18 +7456,17 @@ Expert mode</source>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
         <source>OPTION Tools&gt;&gt;Simulator [Mac]
-ALT Tools&gt;&gt;Simulator [Win]
-Expert mode</source>
-        <translation>OPTION ツール&gt;&gt;シミュレータ [Mac]
-ALT ツール&gt;&gt;シミュレータ [Win]
-エキスパートモード</translation>
+ALT Tools&gt;&gt;Simulator [Win]</source>
+        <translation>OPTION Tools&gt;&gt;シミュレータ【Mac】
+ALTツール&gt;&gt;シミュレーター[Win]</translation>
     </message>
     <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="89" />
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
         <source>Graph/Simulator
-[Expert mode]</source>
+(Expert mode)</source>
         <translation>グラフ/シミュレーター
-[エキスパートモード]</translation>
+(エキスパートモード)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
@@ -7473,11 +7482,6 @@ CTRL ツール &gt;&gt; シミュレーター [Win]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="89" />
-        <source>Graph/Simulator</source>
-        <translation>グラフ・シミュレータ</translation>
-    </message>
-    <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="89" />
         <source>Start or change Simulator speed to 4x mode</source>
         <translation>シミュレーターの速度を 4x モードに開始または変更します</translation>
     </message>
@@ -7489,14 +7493,11 @@ CTRL+L [Win]</source>
 CTRL+L [勝利]</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="95" />
-        <location filename="../help/keyboardshortcuts_help.py" line="94" />
-        <location filename="../help/keyboardshortcuts_help.py" line="93" />
-        <location filename="../help/keyboardshortcuts_help.py" line="92" />
-        <location filename="../help/keyboardshortcuts_help.py" line="91" />
         <location filename="../help/keyboardshortcuts_help.py" line="90" />
-        <source>Roast Properties Roast tab</source>
-        <translation>焙煎のプロパティ [焙煎] タブ</translation>
+        <source>Roast Properties Roast tab
+(Expert and Standard modes)</source>
+        <translation>焙煎特性の焙煎タブ
+(エキスパートモードとスタンダードモード)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="90" />
@@ -7509,6 +7510,15 @@ CTRL+L [勝利]</translation>
 ALT click Stock [Win]</source>
         <translation>オプションをクリックして「ストック」[Mac]
 ALT で「株式」をクリック [Win]</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="95" />
+        <location filename="../help/keyboardshortcuts_help.py" line="94" />
+        <location filename="../help/keyboardshortcuts_help.py" line="93" />
+        <location filename="../help/keyboardshortcuts_help.py" line="92" />
+        <location filename="../help/keyboardshortcuts_help.py" line="91" />
+        <source>Roast Properties Roast tab</source>
+        <translation>焙煎のプロパティ [焙煎] タブ</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="91" />
@@ -7773,7 +7783,6 @@ Shift+Alt を押したままにする [Win]</translation>
         <translation>貼り付け</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="120" />
         <location filename="../help/keyboardshortcuts_help.py" line="119" />
         <location filename="../help/keyboardshortcuts_help.py" line="118" />
         <source>Roast</source>
@@ -7791,17 +7800,23 @@ Shift+Alt を押したままにする [Win]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="120" />
+        <source>Roast
+(Expert and Standard modes)</source>
+        <translation>ロースト
+（エキスパートモードとスタンダードモード）</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="120" />
         <source>Switch Profiles (Foreground&lt;=&gt;Background)</source>
         <translation>プロファイルの切り替え (フォアグラウンド&lt;=&gt;バックグラウンド)</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="125" />
-        <location filename="../help/keyboardshortcuts_help.py" line="124" />
-        <location filename="../help/keyboardshortcuts_help.py" line="123" />
         <location filename="../help/keyboardshortcuts_help.py" line="122" />
         <location filename="../help/keyboardshortcuts_help.py" line="121" />
-        <source>Config</source>
-        <translation>構成</translation>
+        <source>Config
+(Expert mode)</source>
+        <translation>設定
+(エキスパートモード)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="121" />
@@ -7812,6 +7827,15 @@ Shift+Alt を押したままにする [Win]</translation>
         <location filename="../help/keyboardshortcuts_help.py" line="122" />
         <source>Open Curves dialog</source>
         <translation>曲線ダイアログを開く</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="125" />
+        <location filename="../help/keyboardshortcuts_help.py" line="124" />
+        <location filename="../help/keyboardshortcuts_help.py" line="123" />
+        <source>Config
+(Expert and Standard modes)</source>
+        <translation>設定
+(エキスパートモードとスタンダードモード)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="123" />
@@ -7831,8 +7855,10 @@ Shift+Alt を押したままにする [Win]</translation>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="127" />
         <location filename="../help/keyboardshortcuts_help.py" line="126" />
-        <source>Tools</source>
-        <translation>ツール</translation>
+        <source>Tools
+(Expert mode)</source>
+        <translation>ツール
+(エキスパートモード)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="126" />
@@ -11343,6 +11369,62 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
         <translation>F1 は、フィードバック ループを実現するために、実際の式の前の結果を参照します。これはフィルター設計に役立ちます。同様に、F2 は 2 つ前の結果などを参照します。</translation>
     </message>
     <message>
+        <source>Toggle Playback Events</source>
+        <translation type="vanished">再生イベントの切り替え</translation>
+    </message>
+    <message>
+        <source>Load alarms</source>
+        <translation type="vanished">ロードアラーム</translation>
+    </message>
+    <message>
+        <source>Changes Event Button Palettes</source>
+        <translation type="vanished">イベントボタンパレットの変更</translation>
+    </message>
+    <message>
+        <source>Application ScreenShot</source>
+        <translation type="vanished">アプリケーションのスクリーンショット</translation>
+    </message>
+    <message>
+        <source>Desktop ScreenShot</source>
+        <translation type="vanished">デスクトップのスクリーンショット</translation>
+    </message>
+    <message>
+        <source>Click on timer
+Expert mode</source>
+        <translation type="vanished">タイマーをクリック
+エキスパートモード</translation>
+    </message>
+    <message>
+        <source>Simulator</source>
+        <translation type="vanished">シミュレーター</translation>
+    </message>
+    <message>
+        <source>OPTION Tools&gt;&gt;Simulator [Mac]
+ALT Tools&gt;&gt;Simulator [Win]
+Expert mode</source>
+        <translation type="vanished">OPTION ツール&gt;&gt;シミュレータ [Mac]
+ALT ツール&gt;&gt;シミュレータ [Win]
+エキスパートモード</translation>
+    </message>
+    <message>
+        <source>Graph/Simulator
+[Expert mode]</source>
+        <translation type="vanished">グラフ/シミュレーター
+[エキスパートモード]</translation>
+    </message>
+    <message>
+        <source>Graph/Simulator</source>
+        <translation type="vanished">グラフ・シミュレータ</translation>
+    </message>
+    <message>
+        <source>Config</source>
+        <translation type="vanished">構成</translation>
+    </message>
+    <message>
+        <source>Tools</source>
+        <translation type="vanished">ツール</translation>
+    </message>
+    <message>
         <source>Change roast event key focus</source>
         <translation type="vanished">ローストイベントのキーフォーカスを変更する</translation>
     </message>
@@ -11383,18 +11465,8 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
 キーボード ショートカットを無効にする必要があります (ENTER)</translation>
     </message>
     <message>
-        <source>Click on timer</source>
-        <translation type="vanished">タイマーをクリック</translation>
-    </message>
-    <message>
         <source>Simulator speed may be changd while paused (hold shift  (1x), OPTION/ALT (2x) or COMMAND/CTRL (4x) on restart).</source>
         <translation type="vanished">シミュレータの速度は、一時停止中に変更できます (再起動時に Shift (1 回)、OPTION/ALT (2 回)、または COMMAND/CTRL (4 回) を押したままにします)。</translation>
-    </message>
-    <message>
-        <source>OPTION Tools&gt;&gt;Simulator [Mac]
-ALT Tools&gt;&gt;Simulator [Win]</source>
-        <translation type="vanished">OPTION Tools&gt;&gt;シミュレータ【Mac】
-ALTツール&gt;&gt;シミュレーター[Win]</translation>
     </message>
     <message>
         <source>&lt;button number&gt;</source>
@@ -15358,7 +15430,7 @@ Repeat Operation at the end: {0}</source>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2487" />
-        <source>Recomended Mode = 0</source>
+        <source>Recommended Mode = 0</source>
         <translation>推奨モード = 0</translation>
     </message>
     <message>
@@ -17756,6 +17828,10 @@ Profile missing [CHARGE] or [DROP]</source>
         <location filename="../plus/schedule.py" line="3644" />
         <source>Fetching completed roast properties failed</source>
         <translation>完了したロースト プロパティの取得に失敗しました</translation>
+    </message>
+    <message>
+        <source>Recomended Mode = 0</source>
+        <translation type="vanished">推奨モード = 0</translation>
     </message>
     <message>
         <source>Empty path or box unchecked in Autosave</source>

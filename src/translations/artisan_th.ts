@@ -6925,8 +6925,10 @@ When Meter=NONE opens dialog to manually enter temperatures during roast</source
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="38" />
-        <source>Toggle Playback Events</source>
-        <translation>สลับเหตุการณ์การเล่น</translation>
+        <source>Toggle Playback Events
+(Expert and Standard modes)</source>
+        <translation>สลับการแสดงผลเหตุการณ์การเล่น
+(โหมดผู้เชี่ยวชาญและโหมดมาตรฐาน)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="39" />
@@ -6950,23 +6952,31 @@ When Meter=NONE opens dialog to manually enter temperatures during roast</source
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="43" />
-        <source>Load alarms</source>
-        <translation>โหลดการเตือน</translation>
+        <source>Load alarms
+(Expert and Standard modes)</source>
+        <translation>สัญญาณเตือนการบรรทุก
+(โหมดผู้เชี่ยวชาญและโหมดมาตรฐาน)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="44" />
-        <source>Changes Event Button Palettes</source>
-        <translation>เปลี่ยนจานสีปุ่มเหตุการณ์</translation>
+        <source>Changes Event Button Palettes
+(Can be disabled or enabled in Expert mode Config&gt;&gt; Events&gt;&gt; Palettes&gt;&gt; Switch Using Number Keys and Cmd)</source>
+        <translation>เปลี่ยนชุดปุ่มเหตุการณ์
+(สามารถปิดหรือเปิดใช้งานได้ในโหมดผู้เชี่ยวชาญ การตั้งค่า &gt;&gt; เหตุการณ์ &gt;&gt; ชุดปุ่ม &gt;&gt; สลับโดยใช้ปุ่มตัวเลขและคำสั่ง Cmd)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="45" />
-        <source>Application ScreenShot</source>
-        <translation>ภาพหน้าจอแอปพลิเคชัน</translation>
+        <source>Application ScreenShot
+(Expert and Standard modes)</source>
+        <translation>ภาพหน้าจอแอปพลิเคชัน
+(โหมดผู้เชี่ยวชาญและโหมดมาตรฐาน)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="46" />
-        <source>Desktop ScreenShot</source>
-        <translation>ภาพหน้าจอเดสก์ท็อป</translation>
+        <source>Desktop ScreenShot
+(Expert and Standard modes)</source>
+        <translation>ภาพหน้าจอเดสก์ท็อป
+(โหมดผู้เชี่ยวชาญและโหมดมาตรฐาน)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="47" />
@@ -7430,15 +7440,15 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
-        <source>Click on timer
-Expert mode</source>
-        <translation>คลิกที่ตัวจับเวลา
-โหมดผู้เชี่ยวชาญ</translation>
+        <source>Click on timer</source>
+        <translation>คลิกที่ตัวจับเวลา</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
-        <source>Simulator</source>
-        <translation type="unfinished">เครื่องจำลอง</translation>
+        <source>Simulator
+(Expert mode)</source>
+        <translation>โปรแกรมจำลอง
+(โหมดผู้เชี่ยวชาญ)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
@@ -7453,18 +7463,17 @@ Expert mode</source>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
         <source>OPTION Tools&gt;&gt;Simulator [Mac]
-ALT Tools&gt;&gt;Simulator [Win]
-Expert mode</source>
-        <translation>ตัวเลือก เครื่องมือ &gt;&gt; โปรแกรมจำลอง [Mac]
-ตัวเลือกเสริม เครื่องมือ &gt;&gt; โปรแกรมจำลอง [Win]
-โหมดผู้เชี่ยวชาญ</translation>
+ALT Tools&gt;&gt;Simulator [Win]</source>
+        <translation>OPTION Tools&gt;&gt;โปรแกรมจำลอง [Mac]
+ALT Tools&gt;&gt;Simulator [ชนะ]</translation>
     </message>
     <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="89" />
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
         <source>Graph/Simulator
-[Expert mode]</source>
+(Expert mode)</source>
         <translation>กราฟ/โปรแกรมจำลอง
-[โหมดผู้เชี่ยวชาญ]</translation>
+(โหมดผู้เชี่ยวชาญ)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
@@ -7480,11 +7489,6 @@ CTRL Tools&gt;&gt;Simulator [ชนะ]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="89" />
-        <source>Graph/Simulator</source>
-        <translation>กราฟ/เครื่องจำลอง</translation>
-    </message>
-    <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="89" />
         <source>Start or change Simulator speed to 4x mode</source>
         <translation>เริ่มหรือเปลี่ยนความเร็วของ Simulator เป็นโหมด 4x</translation>
     </message>
@@ -7496,14 +7500,11 @@ CTRL+L [Win]</source>
 CTRL+L [ชนะ]</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="95" />
-        <location filename="../help/keyboardshortcuts_help.py" line="94" />
-        <location filename="../help/keyboardshortcuts_help.py" line="93" />
-        <location filename="../help/keyboardshortcuts_help.py" line="92" />
-        <location filename="../help/keyboardshortcuts_help.py" line="91" />
         <location filename="../help/keyboardshortcuts_help.py" line="90" />
-        <source>Roast Properties Roast tab</source>
-        <translation>คุณสมบัติการย่าง แท็บย่าง</translation>
+        <source>Roast Properties Roast tab
+(Expert and Standard modes)</source>
+        <translation>คุณสมบัติการคั่ว แท็บการคั่ว
+(โหมดผู้เชี่ยวชาญและโหมดมาตรฐาน)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="90" />
@@ -7516,6 +7517,15 @@ CTRL+L [ชนะ]</translation>
 ALT click Stock [Win]</source>
         <translation>OPTION คลิก หุ้น [Mac]
 ALT คลิก หุ้น [ชนะ]</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="95" />
+        <location filename="../help/keyboardshortcuts_help.py" line="94" />
+        <location filename="../help/keyboardshortcuts_help.py" line="93" />
+        <location filename="../help/keyboardshortcuts_help.py" line="92" />
+        <location filename="../help/keyboardshortcuts_help.py" line="91" />
+        <source>Roast Properties Roast tab</source>
+        <translation>คุณสมบัติการย่าง แท็บย่าง</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="91" />
@@ -7780,7 +7790,6 @@ Hold Shift+Alt [Win]</source>
         <translation type="unfinished">แปะ</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="120" />
         <location filename="../help/keyboardshortcuts_help.py" line="119" />
         <location filename="../help/keyboardshortcuts_help.py" line="118" />
         <source>Roast</source>
@@ -7798,17 +7807,23 @@ Hold Shift+Alt [Win]</source>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="120" />
+        <source>Roast
+(Expert and Standard modes)</source>
+        <translation>การคั่ว
+(โหมดผู้เชี่ยวชาญและโหมดมาตรฐาน)</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="120" />
         <source>Switch Profiles (Foreground&lt;=&gt;Background)</source>
         <translation>สลับโปรไฟล์ (เบื้องหน้า&lt;=&gt;พื้นหลัง)</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="125" />
-        <location filename="../help/keyboardshortcuts_help.py" line="124" />
-        <location filename="../help/keyboardshortcuts_help.py" line="123" />
         <location filename="../help/keyboardshortcuts_help.py" line="122" />
         <location filename="../help/keyboardshortcuts_help.py" line="121" />
-        <source>Config</source>
-        <translation type="unfinished">การตั้งค่า</translation>
+        <source>Config
+(Expert mode)</source>
+        <translation>การตั้งค่า
+(โหมดผู้เชี่ยวชาญ)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="121" />
@@ -7819,6 +7834,15 @@ Hold Shift+Alt [Win]</source>
         <location filename="../help/keyboardshortcuts_help.py" line="122" />
         <source>Open Curves dialog</source>
         <translation>เปิดกล่องโต้ตอบ Curves</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="125" />
+        <location filename="../help/keyboardshortcuts_help.py" line="124" />
+        <location filename="../help/keyboardshortcuts_help.py" line="123" />
+        <source>Config
+(Expert and Standard modes)</source>
+        <translation>การตั้งค่า
+(โหมดผู้เชี่ยวชาญและโหมดมาตรฐาน)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="123" />
@@ -7838,8 +7862,10 @@ Hold Shift+Alt [Win]</source>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="127" />
         <location filename="../help/keyboardshortcuts_help.py" line="126" />
-        <source>Tools</source>
-        <translation type="unfinished">เครื่องมือ</translation>
+        <source>Tools
+(Expert mode)</source>
+        <translation>เครื่องมือ
+(โหมดผู้เชี่ยวชาญ)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="126" />
@@ -11353,6 +11379,62 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
         <translation>F1 หมายถึงผลลัพธ์ก่อนหน้าของสูตรจริงเพื่อให้ทราบถึงลูปป้อนกลับ สิ่งนี้มีประโยชน์ในการออกแบบตัวกรอง ในทำนองเดียวกัน F2 หมายถึงผลลัพธ์ที่สองก่อนหน้า ฯลฯ</translation>
     </message>
     <message>
+        <source>Toggle Playback Events</source>
+        <translation type="vanished">สลับเหตุการณ์การเล่น</translation>
+    </message>
+    <message>
+        <source>Load alarms</source>
+        <translation type="vanished">โหลดการเตือน</translation>
+    </message>
+    <message>
+        <source>Changes Event Button Palettes</source>
+        <translation type="vanished">เปลี่ยนจานสีปุ่มเหตุการณ์</translation>
+    </message>
+    <message>
+        <source>Application ScreenShot</source>
+        <translation type="vanished">ภาพหน้าจอแอปพลิเคชัน</translation>
+    </message>
+    <message>
+        <source>Desktop ScreenShot</source>
+        <translation type="vanished">ภาพหน้าจอเดสก์ท็อป</translation>
+    </message>
+    <message>
+        <source>Click on timer
+Expert mode</source>
+        <translation type="vanished">คลิกที่ตัวจับเวลา
+โหมดผู้เชี่ยวชาญ</translation>
+    </message>
+    <message>
+        <source>Simulator</source>
+        <translation type="vanished">เครื่องจำลอง</translation>
+    </message>
+    <message>
+        <source>OPTION Tools&gt;&gt;Simulator [Mac]
+ALT Tools&gt;&gt;Simulator [Win]
+Expert mode</source>
+        <translation type="vanished">ตัวเลือก เครื่องมือ &gt;&gt; โปรแกรมจำลอง [Mac]
+ตัวเลือกเสริม เครื่องมือ &gt;&gt; โปรแกรมจำลอง [Win]
+โหมดผู้เชี่ยวชาญ</translation>
+    </message>
+    <message>
+        <source>Graph/Simulator
+[Expert mode]</source>
+        <translation type="vanished">กราฟ/โปรแกรมจำลอง
+[โหมดผู้เชี่ยวชาญ]</translation>
+    </message>
+    <message>
+        <source>Graph/Simulator</source>
+        <translation type="vanished">กราฟ/เครื่องจำลอง</translation>
+    </message>
+    <message>
+        <source>Config</source>
+        <translation type="vanished">การตั้งค่า</translation>
+    </message>
+    <message>
+        <source>Tools</source>
+        <translation type="vanished">เครื่องมือ</translation>
+    </message>
+    <message>
         <source>Change roast event key focus</source>
         <translation type="vanished">เปลี่ยนโฟกัสคีย์เหตุการณ์ย่าง</translation>
     </message>
@@ -11393,18 +11475,8 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
 ต้องปิดใช้งานแป้นพิมพ์ลัด (ENTER)</translation>
     </message>
     <message>
-        <source>Click on timer</source>
-        <translation type="vanished">คลิกที่ตัวจับเวลา</translation>
-    </message>
-    <message>
         <source>Simulator speed may be changd while paused (hold shift  (1x), OPTION/ALT (2x) or COMMAND/CTRL (4x) on restart).</source>
         <translation type="vanished">ความเร็วของตัวจำลองอาจมีการเปลี่ยนแปลงในขณะที่หยุดชั่วคราว (กด Shift ค้างไว้ (1x), OPTION/ALT (2x) หรือ COMMAND/CTRL (4x) เมื่อรีสตาร์ท)</translation>
-    </message>
-    <message>
-        <source>OPTION Tools&gt;&gt;Simulator [Mac]
-ALT Tools&gt;&gt;Simulator [Win]</source>
-        <translation type="vanished">OPTION Tools&gt;&gt;โปรแกรมจำลอง [Mac]
-ALT Tools&gt;&gt;Simulator [ชนะ]</translation>
     </message>
     <message>
         <source>&lt;button number&gt;</source>
@@ -15368,7 +15440,7 @@ Repeat Operation at the end: {0}</source>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2487" />
-        <source>Recomended Mode = 0</source>
+        <source>Recommended Mode = 0</source>
         <translation>โหมดที่แนะนำ = 0</translation>
     </message>
     <message>
@@ -17766,6 +17838,10 @@ Profile missing [CHARGE] or [DROP]</source>
         <location filename="../plus/schedule.py" line="3644" />
         <source>Fetching completed roast properties failed</source>
         <translation>การเรียกคุณสมบัติการย่างที่เสร็จสมบูรณ์ล้มเหลว</translation>
+    </message>
+    <message>
+        <source>Recomended Mode = 0</source>
+        <translation type="vanished">โหมดที่แนะนำ = 0</translation>
     </message>
     <message>
         <source>Empty path or box unchecked in Autosave</source>

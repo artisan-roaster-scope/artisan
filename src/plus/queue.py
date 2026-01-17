@@ -463,7 +463,7 @@ def addRoast(roast_record:dict[str, Any]|None = None, unsynced:bool=False) -> No
                 else:
                     rr = r
                 # send zero values like 0 and '' for corresponding attributes as None to allow the server to clean those up
-                rr = sync.surpress_zero_values(rr)
+                rr = sync.suppress_zero_values(rr)
                 queued:bool = queue_roast_item(rr)
                 if queued:
                     _log.debug('-> roast queued up')

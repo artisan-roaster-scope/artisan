@@ -2484,7 +2484,7 @@ class PXRpidDlgControl(PXpidDlgControl):
         string += QApplication.translate('Message','Output status while ramp/soak operation set to OFF: {0}').format(mode[3]) + '\n'
         string += QApplication.translate('Message','\nRepeat Operation at the end: {0}').format(mode[4]) + '\n'
         string += '-----------------------------------------------------------------------\n'
-        string += QApplication.translate('Message','Recomended Mode = 0') + '\n\n'
+        string += QApplication.translate('Message','Recommended Mode = 0') + '\n\n'
         string += QApplication.translate('Message','If you need to change it, change it now and come back later') + '\n'
         string += QApplication.translate('Message','Use the Parameter Loader Software by Fuji if you need to\n\n') + '\n\n\n'
         string += QApplication.translate('Message','Continue?')

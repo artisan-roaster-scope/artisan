@@ -6916,8 +6916,9 @@ Amikor Meter=NONE párbeszédablak nyílik meg a hőmérséklet kézi beviteléh
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="38" />
-        <source>Toggle Playback Events</source>
-        <translation>Lejátszási események váltása</translation>
+        <source>Toggle Playback Events
+(Expert and Standard modes)</source>
+        <translation>Lejátszási események ki-/bekapcsolása (Szakértői és Normál mód)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="39" />
@@ -6941,23 +6942,31 @@ Amikor Meter=NONE párbeszédablak nyílik meg a hőmérséklet kézi beviteléh
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="43" />
-        <source>Load alarms</source>
-        <translation>Riasztások betöltése</translation>
+        <source>Load alarms
+(Expert and Standard modes)</source>
+        <translation>Riasztások betöltése
+(Szakértői és Standard módok)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="44" />
-        <source>Changes Event Button Palettes</source>
-        <translation>Módosítja az eseménygomb palettáit</translation>
+        <source>Changes Event Button Palettes
+(Can be disabled or enabled in Expert mode Config&gt;&gt; Events&gt;&gt; Palettes&gt;&gt; Switch Using Number Keys and Cmd)</source>
+        <translation>Eseménygomb paletták módosítása
+(Szakértő módban letiltható vagy engedélyezhető a Konfiguráció&gt;&gt; Események&gt;&gt; Paletták&gt;&gt; Váltás számbillentyűkkel és Cmd billentyűkombinációval menüpontban)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="45" />
-        <source>Application ScreenShot</source>
-        <translation>Alkalmazás képernyőképe</translation>
+        <source>Application ScreenShot
+(Expert and Standard modes)</source>
+        <translation>Alkalmazás képernyőképe
+(Szakértői és Normál mód)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="46" />
-        <source>Desktop ScreenShot</source>
-        <translation>Asztali képernyőkép</translation>
+        <source>Desktop ScreenShot
+(Expert and Standard modes)</source>
+        <translation>Asztali képernyőkép
+(Szakértői és Normál mód)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="47" />
@@ -7421,15 +7430,15 @@ A billentyűparancsokat le kell tiltani (ENTER)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
-        <source>Click on timer
-Expert mode</source>
-        <translation>Kattintson az időzítőre
-Szakértői mód</translation>
+        <source>Click on timer</source>
+        <translation>Kattintson az időzítőre</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
-        <source>Simulator</source>
-        <translation type="unfinished">Szimulátor</translation>
+        <source>Simulator
+(Expert mode)</source>
+        <translation>Szimulátor
+(Szakértő mód)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
@@ -7444,18 +7453,17 @@ Szakértői mód</translation>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
         <source>OPTION Tools&gt;&gt;Simulator [Mac]
-ALT Tools&gt;&gt;Simulator [Win]
-Expert mode</source>
-        <translation>OPCIÓ Eszközök&gt;&gt;Szimulátor [Mac]
-ALT Eszközök&gt;&gt;Szimulátor [Win]
-Szakértői mód</translation>
+ALT Tools&gt;&gt;Simulator [Win]</source>
+        <translation>OPTION Eszközök&gt;&gt; Szimulátor [Mac]
+ALT eszközök&gt;&gt;szimulátor [Win]</translation>
     </message>
     <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="89" />
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
         <source>Graph/Simulator
-[Expert mode]</source>
+(Expert mode)</source>
         <translation>Grafikon/Szimulátor
-[Szakértői mód]</translation>
+(Szakértői mód)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
@@ -7471,11 +7479,6 @@ CTRL Eszközök&gt;&gt; Szimulátor [Win]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="89" />
-        <source>Graph/Simulator</source>
-        <translation>Grafikon/szimulátor</translation>
-    </message>
-    <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="89" />
         <source>Start or change Simulator speed to 4x mode</source>
         <translation>Indítsa el vagy módosítsa a szimulátor sebességét 4x módra</translation>
     </message>
@@ -7487,14 +7490,11 @@ CTRL+L [Win]</source>
 CTRL+L [Windows]</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="95" />
-        <location filename="../help/keyboardshortcuts_help.py" line="94" />
-        <location filename="../help/keyboardshortcuts_help.py" line="93" />
-        <location filename="../help/keyboardshortcuts_help.py" line="92" />
-        <location filename="../help/keyboardshortcuts_help.py" line="91" />
         <location filename="../help/keyboardshortcuts_help.py" line="90" />
-        <source>Roast Properties Roast tab</source>
-        <translation>Roast Properties Roast fül</translation>
+        <source>Roast Properties Roast tab
+(Expert and Standard modes)</source>
+        <translation>Sütési tulajdonságok Sütés fül
+(Szakértői és Normál módok)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="90" />
@@ -7507,6 +7507,15 @@ CTRL+L [Windows]</translation>
 ALT click Stock [Win]</source>
         <translation>OPTION kattintás Raktár [Mac]
 ALT kattintás Részvény [Win]</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="95" />
+        <location filename="../help/keyboardshortcuts_help.py" line="94" />
+        <location filename="../help/keyboardshortcuts_help.py" line="93" />
+        <location filename="../help/keyboardshortcuts_help.py" line="92" />
+        <location filename="../help/keyboardshortcuts_help.py" line="91" />
+        <source>Roast Properties Roast tab</source>
+        <translation>Roast Properties Roast fül</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="91" />
@@ -7771,7 +7780,6 @@ Tartsa lenyomva a Shift+Alt [Win]</translation>
         <translation type="unfinished">Beillesztés</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="120" />
         <location filename="../help/keyboardshortcuts_help.py" line="119" />
         <location filename="../help/keyboardshortcuts_help.py" line="118" />
         <source>Roast</source>
@@ -7789,17 +7797,22 @@ Tartsa lenyomva a Shift+Alt [Win]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="120" />
+        <source>Roast
+(Expert and Standard modes)</source>
+        <translation>Sütés
+(Szakértő és Normál mód)</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="120" />
         <source>Switch Profiles (Foreground&lt;=&gt;Background)</source>
         <translation>Profilok váltása (előtérben&lt;=&gt;háttérben)</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="125" />
-        <location filename="../help/keyboardshortcuts_help.py" line="124" />
-        <location filename="../help/keyboardshortcuts_help.py" line="123" />
         <location filename="../help/keyboardshortcuts_help.py" line="122" />
         <location filename="../help/keyboardshortcuts_help.py" line="121" />
-        <source>Config</source>
-        <translation type="unfinished">Konfiguráció</translation>
+        <source>Config
+(Expert mode)</source>
+        <translation>Konfiguráció (Szakértői mód)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="121" />
@@ -7810,6 +7823,15 @@ Tartsa lenyomva a Shift+Alt [Win]</translation>
         <location filename="../help/keyboardshortcuts_help.py" line="122" />
         <source>Open Curves dialog</source>
         <translation>Nyissa meg a Görbék párbeszédpanelt</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="125" />
+        <location filename="../help/keyboardshortcuts_help.py" line="124" />
+        <location filename="../help/keyboardshortcuts_help.py" line="123" />
+        <source>Config
+(Expert and Standard modes)</source>
+        <translation>Konfiguráció
+(Szakértői és Normál módok)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="123" />
@@ -7829,8 +7851,10 @@ Tartsa lenyomva a Shift+Alt [Win]</translation>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="127" />
         <location filename="../help/keyboardshortcuts_help.py" line="126" />
-        <source>Tools</source>
-        <translation type="unfinished">Eszközök</translation>
+        <source>Tools
+(Expert mode)</source>
+        <translation>Eszközök
+(Szakértői mód)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="126" />
@@ -11345,6 +11369,62 @@ A matematikai képletek használata a plotterben lehetővé teszi a P és F szim
         <translation>Az F1 a tényleges képlet előző eredményére utal, hogy megvalósítsa a visszacsatolási hurkot. Ez hasznos a szűrők kialakításánál. Hasonlóképpen az F2 a második előző eredményre utal stb.</translation>
     </message>
     <message>
+        <source>Toggle Playback Events</source>
+        <translation type="vanished">Lejátszási események váltása</translation>
+    </message>
+    <message>
+        <source>Load alarms</source>
+        <translation type="vanished">Riasztások betöltése</translation>
+    </message>
+    <message>
+        <source>Changes Event Button Palettes</source>
+        <translation type="vanished">Módosítja az eseménygomb palettáit</translation>
+    </message>
+    <message>
+        <source>Application ScreenShot</source>
+        <translation type="vanished">Alkalmazás képernyőképe</translation>
+    </message>
+    <message>
+        <source>Desktop ScreenShot</source>
+        <translation type="vanished">Asztali képernyőkép</translation>
+    </message>
+    <message>
+        <source>Click on timer
+Expert mode</source>
+        <translation type="vanished">Kattintson az időzítőre
+Szakértői mód</translation>
+    </message>
+    <message>
+        <source>Simulator</source>
+        <translation type="vanished">Szimulátor</translation>
+    </message>
+    <message>
+        <source>OPTION Tools&gt;&gt;Simulator [Mac]
+ALT Tools&gt;&gt;Simulator [Win]
+Expert mode</source>
+        <translation type="vanished">OPCIÓ Eszközök&gt;&gt;Szimulátor [Mac]
+ALT Eszközök&gt;&gt;Szimulátor [Win]
+Szakértői mód</translation>
+    </message>
+    <message>
+        <source>Graph/Simulator
+[Expert mode]</source>
+        <translation type="vanished">Grafikon/Szimulátor
+[Szakértői mód]</translation>
+    </message>
+    <message>
+        <source>Graph/Simulator</source>
+        <translation type="vanished">Grafikon/szimulátor</translation>
+    </message>
+    <message>
+        <source>Config</source>
+        <translation type="vanished">Konfiguráció</translation>
+    </message>
+    <message>
+        <source>Tools</source>
+        <translation type="vanished">Eszközök</translation>
+    </message>
+    <message>
         <source>Change roast event key focus</source>
         <translation type="vanished">Változtassa meg a sült esemény kulcsfontosságát</translation>
     </message>
@@ -11385,18 +11465,8 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
 A billentyűparancsokat le kell tiltani (ENTER)</translation>
     </message>
     <message>
-        <source>Click on timer</source>
-        <translation type="vanished">Kattintson az időzítőre</translation>
-    </message>
-    <message>
         <source>Simulator speed may be changd while paused (hold shift  (1x), OPTION/ALT (2x) or COMMAND/CTRL (4x) on restart).</source>
         <translation type="vanished">A szimulátor sebessége módosítható szüneteltetés közben (tartsa lenyomva a shiftet (1x), OPTION/ALT (2x) vagy COMMAND/CTRL (4x) újraindításkor).</translation>
-    </message>
-    <message>
-        <source>OPTION Tools&gt;&gt;Simulator [Mac]
-ALT Tools&gt;&gt;Simulator [Win]</source>
-        <translation type="vanished">OPTION Eszközök&gt;&gt; Szimulátor [Mac]
-ALT eszközök&gt;&gt;szimulátor [Win]</translation>
     </message>
     <message>
         <source>&lt;button number&gt;</source>
@@ -15360,7 +15430,7 @@ Ismételje meg a műveletet a végén: {0}</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2487" />
-        <source>Recomended Mode = 0</source>
+        <source>Recommended Mode = 0</source>
         <translation>Ajánlott mód = 0</translation>
     </message>
     <message>
@@ -17758,6 +17828,10 @@ Hiányzik a profilból [CHARGE] vagy [DROP]</translation>
         <location filename="../plus/schedule.py" line="3644" />
         <source>Fetching completed roast properties failed</source>
         <translation>Nem sikerült lekérni a kész sütési tulajdonságokat</translation>
+    </message>
+    <message>
+        <source>Recomended Mode = 0</source>
+        <translation type="vanished">Ajánlott mód = 0</translation>
     </message>
     <message>
         <source>Empty path or box unchecked in Autosave</source>

@@ -6914,8 +6914,9 @@ När Meter=NONE öppnar dialogrutan för att manuellt ange temperaturer under st
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="38" />
-        <source>Toggle Playback Events</source>
-        <translation>Växla uppspelningshändelser</translation>
+        <source>Toggle Playback Events
+(Expert and Standard modes)</source>
+        <translation>Växla uppspelningshändelser (Expert- och standardläge)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="39" />
@@ -6939,23 +6940,28 @@ När Meter=NONE öppnar dialogrutan för att manuellt ange temperaturer under st
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="43" />
-        <source>Load alarms</source>
-        <translation>Ladda larm</translation>
+        <source>Load alarms
+(Expert and Standard modes)</source>
+        <translation>Ladda larm (Expert- och standardlägen)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="44" />
-        <source>Changes Event Button Palettes</source>
-        <translation>Ändrar händelseknappspaletter</translation>
+        <source>Changes Event Button Palettes
+(Can be disabled or enabled in Expert mode Config&gt;&gt; Events&gt;&gt; Palettes&gt;&gt; Switch Using Number Keys and Cmd)</source>
+        <translation>Ändrar händelseknappspaletter
+(Kan inaktiveras eller aktiveras i expertläge Konfiguration &gt;&gt; Händelser &gt;&gt; Paletter &gt;&gt; Växla med siffertangenterna och kommandot)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="45" />
-        <source>Application ScreenShot</source>
-        <translation>Skärmdump av programmet</translation>
+        <source>Application ScreenShot
+(Expert and Standard modes)</source>
+        <translation>Skärmdump av applikationen (Expert- och standardlägen)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="46" />
-        <source>Desktop ScreenShot</source>
-        <translation>Skärmdump på skrivbordet</translation>
+        <source>Desktop ScreenShot
+(Expert and Standard modes)</source>
+        <translation>Skärmdump av skrivbordet (Expert- och standardlägen)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="47" />
@@ -7419,15 +7425,14 @@ Tangentbordsgenvägar måste vara inaktiverade (ENTER)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
-        <source>Click on timer
-Expert mode</source>
-        <translation>Klicka på timern
-Expertläge</translation>
+        <source>Click on timer</source>
+        <translation>Klicka på timer</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
-        <source>Simulator</source>
-        <translation type="unfinished" />
+        <source>Simulator
+(Expert mode)</source>
+        <translation>Simulator (Expertläge)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
@@ -7442,18 +7447,16 @@ Expertläge</translation>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
         <source>OPTION Tools&gt;&gt;Simulator [Mac]
-ALT Tools&gt;&gt;Simulator [Win]
-Expert mode</source>
-        <translation>ALTERNATIV Verktyg&gt;&gt;Simulator [Mac]
-ALT Verktyg&gt;&gt;Simulator [Win]
-Expertläge</translation>
+ALT Tools&gt;&gt;Simulator [Win]</source>
+        <translation>ALTERNATIV Verktyg &gt;&gt; Simulator [Mac]
+ALT-verktyg &gt;&gt; Simulator [Win]</translation>
     </message>
     <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="89" />
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
         <source>Graph/Simulator
-[Expert mode]</source>
-        <translation>Graf/Simulator
-[Expertläge]</translation>
+(Expert mode)</source>
+        <translation>Graf/Simulator (Expertläge)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
@@ -7469,11 +7472,6 @@ CTRL-verktyg &gt;&gt; Simulator [Win]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="89" />
-        <source>Graph/Simulator</source>
-        <translation>Graf/simulator</translation>
-    </message>
-    <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="89" />
         <source>Start or change Simulator speed to 4x mode</source>
         <translation>Starta eller ändra simulatorhastigheten till 4x-läge</translation>
     </message>
@@ -7485,14 +7483,11 @@ CTRL+L [Win]</source>
 CTRL+L [Vinn]</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="95" />
-        <location filename="../help/keyboardshortcuts_help.py" line="94" />
-        <location filename="../help/keyboardshortcuts_help.py" line="93" />
-        <location filename="../help/keyboardshortcuts_help.py" line="92" />
-        <location filename="../help/keyboardshortcuts_help.py" line="91" />
         <location filename="../help/keyboardshortcuts_help.py" line="90" />
-        <source>Roast Properties Roast tab</source>
-        <translation>Grillegenskaper Fliken Rost</translation>
+        <source>Roast Properties Roast tab
+(Expert and Standard modes)</source>
+        <translation>Rostningsegenskaper Fliken Rostning
+(Expert- och Standardlägen)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="90" />
@@ -7505,6 +7500,15 @@ CTRL+L [Vinn]</translation>
 ALT click Stock [Win]</source>
         <translation>OPTION klicka på Lager [Mac]
 ALT klicka på aktie [Vinn]</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="95" />
+        <location filename="../help/keyboardshortcuts_help.py" line="94" />
+        <location filename="../help/keyboardshortcuts_help.py" line="93" />
+        <location filename="../help/keyboardshortcuts_help.py" line="92" />
+        <location filename="../help/keyboardshortcuts_help.py" line="91" />
+        <source>Roast Properties Roast tab</source>
+        <translation>Grillegenskaper Fliken Rost</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="91" />
@@ -7769,7 +7773,6 @@ Håll ned Skift+Alt [Win]</translation>
         <translation type="unfinished">Klistra</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="120" />
         <location filename="../help/keyboardshortcuts_help.py" line="119" />
         <location filename="../help/keyboardshortcuts_help.py" line="118" />
         <source>Roast</source>
@@ -7787,17 +7790,21 @@ Håll ned Skift+Alt [Win]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="120" />
+        <source>Roast
+(Expert and Standard modes)</source>
+        <translation>Rosta (Expert- och Standardlägen)</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="120" />
         <source>Switch Profiles (Foreground&lt;=&gt;Background)</source>
         <translation>Byt profiler (förgrund&lt;=&gt;bakgrund)</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="125" />
-        <location filename="../help/keyboardshortcuts_help.py" line="124" />
-        <location filename="../help/keyboardshortcuts_help.py" line="123" />
         <location filename="../help/keyboardshortcuts_help.py" line="122" />
         <location filename="../help/keyboardshortcuts_help.py" line="121" />
-        <source>Config</source>
-        <translation type="unfinished">Konfigurera</translation>
+        <source>Config
+(Expert mode)</source>
+        <translation>Konfiguration (Expertläge)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="121" />
@@ -7808,6 +7815,14 @@ Håll ned Skift+Alt [Win]</translation>
         <location filename="../help/keyboardshortcuts_help.py" line="122" />
         <source>Open Curves dialog</source>
         <translation>Öppna dialogrutan Kurvor</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="125" />
+        <location filename="../help/keyboardshortcuts_help.py" line="124" />
+        <location filename="../help/keyboardshortcuts_help.py" line="123" />
+        <source>Config
+(Expert and Standard modes)</source>
+        <translation>Konfiguration (Expert- och standardlägen)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="123" />
@@ -7827,8 +7842,9 @@ Håll ned Skift+Alt [Win]</translation>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="127" />
         <location filename="../help/keyboardshortcuts_help.py" line="126" />
-        <source>Tools</source>
-        <translation type="unfinished">Verktyg</translation>
+        <source>Tools
+(Expert mode)</source>
+        <translation>Verktyg (Expertläge)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="126" />
@@ -11342,6 +11358,58 @@ Att använda matematiska formler i plottern gör det också möjligt att använd
         <translation>F1 hänvisar till det tidigare resultatet av den faktiska formeln för att realisera en återkopplingsslinga. Detta är användbart i filterdesigner. På samma sätt hänvisar F2 till det andra föregående resultatet etc.</translation>
     </message>
     <message>
+        <source>Toggle Playback Events</source>
+        <translation type="vanished">Växla uppspelningshändelser</translation>
+    </message>
+    <message>
+        <source>Load alarms</source>
+        <translation type="vanished">Ladda larm</translation>
+    </message>
+    <message>
+        <source>Changes Event Button Palettes</source>
+        <translation type="vanished">Ändrar händelseknappspaletter</translation>
+    </message>
+    <message>
+        <source>Application ScreenShot</source>
+        <translation type="vanished">Skärmdump av programmet</translation>
+    </message>
+    <message>
+        <source>Desktop ScreenShot</source>
+        <translation type="vanished">Skärmdump på skrivbordet</translation>
+    </message>
+    <message>
+        <source>Click on timer
+Expert mode</source>
+        <translation type="vanished">Klicka på timern
+Expertläge</translation>
+    </message>
+    <message>
+        <source>OPTION Tools&gt;&gt;Simulator [Mac]
+ALT Tools&gt;&gt;Simulator [Win]
+Expert mode</source>
+        <translation type="vanished">ALTERNATIV Verktyg&gt;&gt;Simulator [Mac]
+ALT Verktyg&gt;&gt;Simulator [Win]
+Expertläge</translation>
+    </message>
+    <message>
+        <source>Graph/Simulator
+[Expert mode]</source>
+        <translation type="vanished">Graf/Simulator
+[Expertläge]</translation>
+    </message>
+    <message>
+        <source>Graph/Simulator</source>
+        <translation type="vanished">Graf/simulator</translation>
+    </message>
+    <message>
+        <source>Config</source>
+        <translation type="vanished">Konfigurera</translation>
+    </message>
+    <message>
+        <source>Tools</source>
+        <translation type="vanished">Verktyg</translation>
+    </message>
+    <message>
         <source>Change roast event key focus</source>
         <translation type="vanished">Ändra stekhändelsens nyckelfokus</translation>
     </message>
@@ -11382,18 +11450,8 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
 Kortkommandon måste vara inaktiverade (ENTER)</translation>
     </message>
     <message>
-        <source>Click on timer</source>
-        <translation type="vanished">Klicka på timer</translation>
-    </message>
-    <message>
         <source>Simulator speed may be changd while paused (hold shift  (1x), OPTION/ALT (2x) or COMMAND/CTRL (4x) on restart).</source>
         <translation type="vanished">Simulatorhastigheten kan ändras när den är pausad (håll skift (1x), OPTION/ALT (2x) eller COMMAND/CTRL (4x) vid omstart).</translation>
-    </message>
-    <message>
-        <source>OPTION Tools&gt;&gt;Simulator [Mac]
-ALT Tools&gt;&gt;Simulator [Win]</source>
-        <translation type="vanished">ALTERNATIV Verktyg &gt;&gt; Simulator [Mac]
-ALT-verktyg &gt;&gt; Simulator [Win]</translation>
     </message>
     <message>
         <source>&lt;button number&gt;</source>
@@ -15353,7 +15411,7 @@ Upprepa operationen i slutet: {0}</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2487" />
-        <source>Recomended Mode = 0</source>
+        <source>Recommended Mode = 0</source>
         <translation>Rekommenderat läge = 0</translation>
     </message>
     <message>
@@ -17751,6 +17809,10 @@ Profil saknar [CHARGE] eller [DROP]</translation>
         <location filename="../plus/schedule.py" line="3644" />
         <source>Fetching completed roast properties failed</source>
         <translation>Det gick inte att hämta färdiga stekegenskaper</translation>
+    </message>
+    <message>
+        <source>Recomended Mode = 0</source>
+        <translation type="vanished">Rekommenderat läge = 0</translation>
     </message>
     <message>
         <source>Empty path or box unchecked in Autosave</source>

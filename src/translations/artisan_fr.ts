@@ -6925,8 +6925,11 @@ Lorsque Meter=NONE ouvre la boîte de dialogue pour saisir manuellement les temp
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="38" />
-        <source>Toggle Playback Events</source>
-        <translation>Basculer les événements de lecture</translation>
+        <source>Toggle Playback Events
+(Expert and Standard modes)</source>
+        <translation>Activer/désactiver la lecture des événements
+
+(Modes Expert et Standard)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="39" />
@@ -6950,23 +6953,35 @@ Lorsque Meter=NONE ouvre la boîte de dialogue pour saisir manuellement les temp
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="43" />
-        <source>Load alarms</source>
-        <translation>Charger les alarmes</translation>
+        <source>Load alarms
+(Expert and Standard modes)</source>
+        <translation>Alarmes de charge
+
+(Modes Expert et Standard)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="44" />
-        <source>Changes Event Button Palettes</source>
-        <translation>Modifie les palettes de boutons d'événement</translation>
+        <source>Changes Event Button Palettes
+(Can be disabled or enabled in Expert mode Config&gt;&gt; Events&gt;&gt; Palettes&gt;&gt; Switch Using Number Keys and Cmd)</source>
+        <translation>Modification des palettes des boutons d'événements
+
+(Peut être désactivée ou activée en mode Expert : Configuration &gt;&gt; Événements &gt;&gt; Palettes &gt;&gt; Basculer à l'aide des touches numériques et de la commande)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="45" />
-        <source>Application ScreenShot</source>
-        <translation>Capture d'écran de l'application</translation>
+        <source>Application ScreenShot
+(Expert and Standard modes)</source>
+        <translation>Capture d'écran de l'application
+
+(Modes Expert et Standard)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="46" />
-        <source>Desktop ScreenShot</source>
-        <translation>Capture d'écran du bureau</translation>
+        <source>Desktop ScreenShot
+(Expert and Standard modes)</source>
+        <translation>Capture d'écran du bureau
+
+(Modes Expert et Standard)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="47" />
@@ -7430,15 +7445,16 @@ Les raccourcis clavier doivent être désactivés (ENTRÉE)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
-        <source>Click on timer
-Expert mode</source>
-        <translation>Cliquez sur le minuteur
-Mode expert</translation>
+        <source>Click on timer</source>
+        <translation>Cliquez sur la minuterie</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
-        <source>Simulator</source>
-        <translation>Simulateur</translation>
+        <source>Simulator
+(Expert mode)</source>
+        <translation>Simulateur
+
+(Mode expert)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
@@ -7453,19 +7469,18 @@ Mode expert</translation>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
         <source>OPTION Tools&gt;&gt;Simulator [Mac]
-ALT Tools&gt;&gt;Simulator [Win]
-Expert mode</source>
-        <translation>OPTIONS Outils &gt;&gt; Simulateur [Mac]
-ALT Outils &gt;&gt; Simulateur [Win]
-Mode expert</translation>
+ALT Tools&gt;&gt;Simulator [Win]</source>
+        <translation>OPTION Outils&gt;&gt;Simulateur [Mac]
+Outils ALT&gt;&gt;Simulateur [Win]</translation>
     </message>
     <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="89" />
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
         <source>Graph/Simulator
-[Expert mode]</source>
+(Expert mode)</source>
         <translation>Graphique/Simulateur
 
-[Mode expert]</translation>
+(Mode expert)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
@@ -7481,11 +7496,6 @@ CTRL Outils&gt;&gt;Simulateur [Win]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="89" />
-        <source>Graph/Simulator</source>
-        <translation>Graphique/Simulateur</translation>
-    </message>
-    <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="89" />
         <source>Start or change Simulator speed to 4x mode</source>
         <translation>Démarrer ou modifier la vitesse du simulateur en mode 4x</translation>
     </message>
@@ -7497,14 +7507,12 @@ CTRL+L [Win]</source>
 CTRL+L [Gagner]</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="95" />
-        <location filename="../help/keyboardshortcuts_help.py" line="94" />
-        <location filename="../help/keyboardshortcuts_help.py" line="93" />
-        <location filename="../help/keyboardshortcuts_help.py" line="92" />
-        <location filename="../help/keyboardshortcuts_help.py" line="91" />
         <location filename="../help/keyboardshortcuts_help.py" line="90" />
-        <source>Roast Properties Roast tab</source>
-        <translation>Onglet Torréfaction Propriétés</translation>
+        <source>Roast Properties Roast tab
+(Expert and Standard modes)</source>
+        <translation>Propriétés de torréfaction - Onglet Torréfaction
+
+(Modes Expert et Standard)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="90" />
@@ -7517,6 +7525,15 @@ CTRL+L [Gagner]</translation>
 ALT click Stock [Win]</source>
         <translation>OPTION cliquez sur Stock [Mac]
 ALT cliquez sur Stock [Gagner]</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="95" />
+        <location filename="../help/keyboardshortcuts_help.py" line="94" />
+        <location filename="../help/keyboardshortcuts_help.py" line="93" />
+        <location filename="../help/keyboardshortcuts_help.py" line="92" />
+        <location filename="../help/keyboardshortcuts_help.py" line="91" />
+        <source>Roast Properties Roast tab</source>
+        <translation>Onglet Torréfaction Propriétés</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="91" />
@@ -7781,7 +7798,6 @@ Maintenez Shift + Alt [Win]</translation>
         <translation>Coller</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="120" />
         <location filename="../help/keyboardshortcuts_help.py" line="119" />
         <location filename="../help/keyboardshortcuts_help.py" line="118" />
         <source>Roast</source>
@@ -7799,17 +7815,25 @@ Maintenez Shift + Alt [Win]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="120" />
+        <source>Roast
+(Expert and Standard modes)</source>
+        <translation>Torréfaction
+
+(Modes Expert et Standard)</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="120" />
         <source>Switch Profiles (Foreground&lt;=&gt;Background)</source>
         <translation>Changer de profil (avant-plan&lt;=&gt;arrière-plan)</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="125" />
-        <location filename="../help/keyboardshortcuts_help.py" line="124" />
-        <location filename="../help/keyboardshortcuts_help.py" line="123" />
         <location filename="../help/keyboardshortcuts_help.py" line="122" />
         <location filename="../help/keyboardshortcuts_help.py" line="121" />
-        <source>Config</source>
-        <translation>Config</translation>
+        <source>Config
+(Expert mode)</source>
+        <translation>Configuration
+
+(Mode expert)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="121" />
@@ -7820,6 +7844,16 @@ Maintenez Shift + Alt [Win]</translation>
         <location filename="../help/keyboardshortcuts_help.py" line="122" />
         <source>Open Curves dialog</source>
         <translation>Ouvrir la boîte de dialogue Courbes</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="125" />
+        <location filename="../help/keyboardshortcuts_help.py" line="124" />
+        <location filename="../help/keyboardshortcuts_help.py" line="123" />
+        <source>Config
+(Expert and Standard modes)</source>
+        <translation>Configuration
+
+(Modes Expert et Standard)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="123" />
@@ -7839,8 +7873,11 @@ Maintenez Shift + Alt [Win]</translation>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="127" />
         <location filename="../help/keyboardshortcuts_help.py" line="126" />
-        <source>Tools</source>
-        <translation>Outils</translation>
+        <source>Tools
+(Expert mode)</source>
+        <translation>Outils
+
+(Mode expert)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="126" />
@@ -11353,6 +11390,63 @@ L'utilisation de formules mathématiques dans le traceur permet également d'uti
         <translation>F1 fait référence au résultat précédent de la formule réelle pour réaliser une boucle de rétroaction. Ceci est utile dans les conceptions de filtres. De même, F2 fait référence au deuxième résultat précédent, etc.</translation>
     </message>
     <message>
+        <source>Toggle Playback Events</source>
+        <translation type="vanished">Basculer les événements de lecture</translation>
+    </message>
+    <message>
+        <source>Load alarms</source>
+        <translation type="vanished">Charger les alarmes</translation>
+    </message>
+    <message>
+        <source>Changes Event Button Palettes</source>
+        <translation type="vanished">Modifie les palettes de boutons d'événement</translation>
+    </message>
+    <message>
+        <source>Application ScreenShot</source>
+        <translation type="vanished">Capture d'écran de l'application</translation>
+    </message>
+    <message>
+        <source>Desktop ScreenShot</source>
+        <translation type="vanished">Capture d'écran du bureau</translation>
+    </message>
+    <message>
+        <source>Click on timer
+Expert mode</source>
+        <translation type="vanished">Cliquez sur le minuteur
+Mode expert</translation>
+    </message>
+    <message>
+        <source>Simulator</source>
+        <translation type="vanished">Simulateur</translation>
+    </message>
+    <message>
+        <source>OPTION Tools&gt;&gt;Simulator [Mac]
+ALT Tools&gt;&gt;Simulator [Win]
+Expert mode</source>
+        <translation type="vanished">OPTIONS Outils &gt;&gt; Simulateur [Mac]
+ALT Outils &gt;&gt; Simulateur [Win]
+Mode expert</translation>
+    </message>
+    <message>
+        <source>Graph/Simulator
+[Expert mode]</source>
+        <translation type="vanished">Graphique/Simulateur
+
+[Mode expert]</translation>
+    </message>
+    <message>
+        <source>Graph/Simulator</source>
+        <translation type="vanished">Graphique/Simulateur</translation>
+    </message>
+    <message>
+        <source>Config</source>
+        <translation type="vanished">Config</translation>
+    </message>
+    <message>
+        <source>Tools</source>
+        <translation type="vanished">Outils</translation>
+    </message>
+    <message>
         <source>Change roast event key focus</source>
         <translation type="vanished">Changer le focus de la clé de l'événement de torréfaction</translation>
     </message>
@@ -11393,18 +11487,8 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
 Les raccourcis clavier doivent être désactivés (ENTER)</translation>
     </message>
     <message>
-        <source>Click on timer</source>
-        <translation type="vanished">Cliquez sur la minuterie</translation>
-    </message>
-    <message>
         <source>Simulator speed may be changd while paused (hold shift  (1x), OPTION/ALT (2x) or COMMAND/CTRL (4x) on restart).</source>
         <translation type="vanished">La vitesse du simulateur peut être modifiée pendant la pause (maintenez Shift (1x), OPTION/ALT (2x) ou COMMAND/CTRL (4x) au redémarrage).</translation>
-    </message>
-    <message>
-        <source>OPTION Tools&gt;&gt;Simulator [Mac]
-ALT Tools&gt;&gt;Simulator [Win]</source>
-        <translation type="vanished">OPTION Outils&gt;&gt;Simulateur [Mac]
-Outils ALT&gt;&gt;Simulateur [Win]</translation>
     </message>
     <message>
         <source>&lt;button number&gt;</source>
@@ -15367,7 +15451,7 @@ Répétez l'opération à la fin: {0}</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2487" />
-        <source>Recomended Mode = 0</source>
+        <source>Recommended Mode = 0</source>
         <translation>Mode recommandé = 0</translation>
     </message>
     <message>
@@ -17765,6 +17849,10 @@ Profile manquant [CHARGE] ou [VIDAGE]</translation>
         <location filename="../plus/schedule.py" line="3644" />
         <source>Fetching completed roast properties failed</source>
         <translation>La récupération des propriétés du rôti a échoué</translation>
+    </message>
+    <message>
+        <source>Recomended Mode = 0</source>
+        <translation type="vanished">Mode recommandé = 0</translation>
     </message>
     <message>
         <source>Empty path or box unchecked in Autosave</source>

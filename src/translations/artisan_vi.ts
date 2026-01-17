@@ -6920,8 +6920,10 @@ Khi Đồng hồ đo=NONE mở hộp thoại để nhập nhiệt độ theo cá
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="38" />
-        <source>Toggle Playback Events</source>
-        <translation>Chuyển đổi sự kiện phát lại</translation>
+        <source>Toggle Playback Events
+(Expert and Standard modes)</source>
+        <translation>Bật/tắt sự kiện phát lại
+(Chế độ Chuyên gia và Tiêu chuẩn)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="39" />
@@ -6945,23 +6947,31 @@ Khi Đồng hồ đo=NONE mở hộp thoại để nhập nhiệt độ theo cá
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="43" />
-        <source>Load alarms</source>
-        <translation>Tải lên các Báo Hiệu</translation>
+        <source>Load alarms
+(Expert and Standard modes)</source>
+        <translation>Cảnh báo tải
+(Chế độ Chuyên gia và Tiêu chuẩn)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="44" />
-        <source>Changes Event Button Palettes</source>
-        <translation>Thay đổi Bảng màu Nút Sự kiện</translation>
+        <source>Changes Event Button Palettes
+(Can be disabled or enabled in Expert mode Config&gt;&gt; Events&gt;&gt; Palettes&gt;&gt; Switch Using Number Keys and Cmd)</source>
+        <translation>Thay đổi bảng màu nút sự kiện
+(Có thể tắt hoặc bật trong chế độ Chuyên gia: Cấu hình &gt;&gt; Sự kiện &gt;&gt; Bảng màu &gt;&gt; Chuyển đổi bằng phím số và Cmd)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="45" />
-        <source>Application ScreenShot</source>
-        <translation>Ảnh chụp màn hình ứng dụng</translation>
+        <source>Application ScreenShot
+(Expert and Standard modes)</source>
+        <translation>Ảnh chụp màn hình ứng dụng
+(Chế độ Chuyên gia và Tiêu chuẩn)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="46" />
-        <source>Desktop ScreenShot</source>
-        <translation>Màn hình máy tính để bàn</translation>
+        <source>Desktop ScreenShot
+(Expert and Standard modes)</source>
+        <translation>Ảnh chụp màn hình máy tính để bàn
+(Chế độ Chuyên gia và Tiêu chuẩn)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="47" />
@@ -7425,15 +7435,15 @@ Phím tắt bàn phím phải được tắt (ENTER)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
-        <source>Click on timer
-Expert mode</source>
-        <translation>Nhấp vào bộ đếm thời gian
-Chế độ chuyên gia</translation>
+        <source>Click on timer</source>
+        <translation>Bấm vào bộ đếm thời gian</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
-        <source>Simulator</source>
-        <translation type="unfinished">Giả lập</translation>
+        <source>Simulator
+(Expert mode)</source>
+        <translation>Trình mô phỏng
+(Chế độ chuyên gia)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
@@ -7448,18 +7458,17 @@ Chế độ chuyên gia</translation>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
         <source>OPTION Tools&gt;&gt;Simulator [Mac]
-ALT Tools&gt;&gt;Simulator [Win]
-Expert mode</source>
-        <translation>Tùy chọn Công cụ &gt;&gt; Trình giả lập [Mac]
-Phím ALT Công cụ &gt;&gt; Trình giả lập [Win]
-Chế độ chuyên gia</translation>
+ALT Tools&gt;&gt;Simulator [Win]</source>
+        <translation>TÙY CHỌN Công cụ &gt;&gt; Trình mô phỏng [Mac]
+ALT Tools &gt;&gt; Simulator [Win]</translation>
     </message>
     <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="89" />
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
         <source>Graph/Simulator
-[Expert mode]</source>
+(Expert mode)</source>
         <translation>Đồ thị/Mô phỏng
-[Chế độ chuyên gia]</translation>
+(Chế độ chuyên gia)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
@@ -7475,11 +7484,6 @@ CTRL Tools &gt;&gt; Simulator [Win]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="89" />
-        <source>Graph/Simulator</source>
-        <translation>Đồ thị / Trình mô phỏng</translation>
-    </message>
-    <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="89" />
         <source>Start or change Simulator speed to 4x mode</source>
         <translation>Bắt đầu hoặc thay đổi tốc độ mô phỏng sang chế độ 4x</translation>
     </message>
@@ -7491,14 +7495,11 @@ CTRL+L [Win]</source>
 CTRL + L [Thắng]</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="95" />
-        <location filename="../help/keyboardshortcuts_help.py" line="94" />
-        <location filename="../help/keyboardshortcuts_help.py" line="93" />
-        <location filename="../help/keyboardshortcuts_help.py" line="92" />
-        <location filename="../help/keyboardshortcuts_help.py" line="91" />
         <location filename="../help/keyboardshortcuts_help.py" line="90" />
-        <source>Roast Properties Roast tab</source>
-        <translation>Thuộc tính Roast Roast tab</translation>
+        <source>Roast Properties Roast tab
+(Expert and Standard modes)</source>
+        <translation>Thuộc tính rang (Tab Rang)
+(Chế độ Chuyên gia và Tiêu chuẩn)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="90" />
@@ -7511,6 +7512,15 @@ CTRL + L [Thắng]</translation>
 ALT click Stock [Win]</source>
         <translation>TÙY CHỌN nhấp vào Chứng khoán [Mac]
 ALT nhấp vào Chứng khoán [Thắng]</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="95" />
+        <location filename="../help/keyboardshortcuts_help.py" line="94" />
+        <location filename="../help/keyboardshortcuts_help.py" line="93" />
+        <location filename="../help/keyboardshortcuts_help.py" line="92" />
+        <location filename="../help/keyboardshortcuts_help.py" line="91" />
+        <source>Roast Properties Roast tab</source>
+        <translation>Thuộc tính Roast Roast tab</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="91" />
@@ -7775,7 +7785,6 @@ Giữ Shift+Alt [Thắng]</translation>
         <translation type="unfinished">Dán</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="120" />
         <location filename="../help/keyboardshortcuts_help.py" line="119" />
         <location filename="../help/keyboardshortcuts_help.py" line="118" />
         <source>Roast</source>
@@ -7793,17 +7802,23 @@ Giữ Shift+Alt [Thắng]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="120" />
+        <source>Roast
+(Expert and Standard modes)</source>
+        <translation>Rang
+(Chế độ Chuyên gia và Tiêu chuẩn)</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="120" />
         <source>Switch Profiles (Foreground&lt;=&gt;Background)</source>
         <translation>Chuyển đổi cấu hình (Nền trước &lt;=&gt; Nền)</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="125" />
-        <location filename="../help/keyboardshortcuts_help.py" line="124" />
-        <location filename="../help/keyboardshortcuts_help.py" line="123" />
         <location filename="../help/keyboardshortcuts_help.py" line="122" />
         <location filename="../help/keyboardshortcuts_help.py" line="121" />
-        <source>Config</source>
-        <translation type="unfinished">Cấu hình</translation>
+        <source>Config
+(Expert mode)</source>
+        <translation>Cấu hình
+(Chế độ chuyên gia)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="121" />
@@ -7814,6 +7829,15 @@ Giữ Shift+Alt [Thắng]</translation>
         <location filename="../help/keyboardshortcuts_help.py" line="122" />
         <source>Open Curves dialog</source>
         <translation>Mở hộp thoại Curves</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="125" />
+        <location filename="../help/keyboardshortcuts_help.py" line="124" />
+        <location filename="../help/keyboardshortcuts_help.py" line="123" />
+        <source>Config
+(Expert and Standard modes)</source>
+        <translation>Cấu hình
+(Chế độ Chuyên gia và Tiêu chuẩn)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="123" />
@@ -7833,8 +7857,10 @@ Giữ Shift+Alt [Thắng]</translation>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="127" />
         <location filename="../help/keyboardshortcuts_help.py" line="126" />
-        <source>Tools</source>
-        <translation type="unfinished">Các công cụ</translation>
+        <source>Tools
+(Expert mode)</source>
+        <translation>Công cụ
+(Chế độ chuyên gia)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="126" />
@@ -11346,6 +11372,62 @@ Việc sử dụng các công thức toán học trong máy vẽ cũng cho phép
         <translation>F1 đề cập đến kết quả trước đó của công thức thực tế để nhận ra một vòng phản hồi. Điều này rất hữu ích trong các thiết kế bộ lọc. Tương tự, F2 đề cập đến kết quả thứ hai trước đó, v.v.</translation>
     </message>
     <message>
+        <source>Toggle Playback Events</source>
+        <translation type="vanished">Chuyển đổi sự kiện phát lại</translation>
+    </message>
+    <message>
+        <source>Load alarms</source>
+        <translation type="vanished">Tải lên các Báo Hiệu</translation>
+    </message>
+    <message>
+        <source>Changes Event Button Palettes</source>
+        <translation type="vanished">Thay đổi Bảng màu Nút Sự kiện</translation>
+    </message>
+    <message>
+        <source>Application ScreenShot</source>
+        <translation type="vanished">Ảnh chụp màn hình ứng dụng</translation>
+    </message>
+    <message>
+        <source>Desktop ScreenShot</source>
+        <translation type="vanished">Màn hình máy tính để bàn</translation>
+    </message>
+    <message>
+        <source>Click on timer
+Expert mode</source>
+        <translation type="vanished">Nhấp vào bộ đếm thời gian
+Chế độ chuyên gia</translation>
+    </message>
+    <message>
+        <source>Simulator</source>
+        <translation type="vanished">Giả lập</translation>
+    </message>
+    <message>
+        <source>OPTION Tools&gt;&gt;Simulator [Mac]
+ALT Tools&gt;&gt;Simulator [Win]
+Expert mode</source>
+        <translation type="vanished">Tùy chọn Công cụ &gt;&gt; Trình giả lập [Mac]
+Phím ALT Công cụ &gt;&gt; Trình giả lập [Win]
+Chế độ chuyên gia</translation>
+    </message>
+    <message>
+        <source>Graph/Simulator
+[Expert mode]</source>
+        <translation type="vanished">Đồ thị/Mô phỏng
+[Chế độ chuyên gia]</translation>
+    </message>
+    <message>
+        <source>Graph/Simulator</source>
+        <translation type="vanished">Đồ thị / Trình mô phỏng</translation>
+    </message>
+    <message>
+        <source>Config</source>
+        <translation type="vanished">Cấu hình</translation>
+    </message>
+    <message>
+        <source>Tools</source>
+        <translation type="vanished">Các công cụ</translation>
+    </message>
+    <message>
         <source>Change roast event key focus</source>
         <translation type="vanished">Thay đổi tiêu điểm chính của sự kiện rang</translation>
     </message>
@@ -11386,18 +11468,8 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
 Phím tắt phải được tắt (ENTER)</translation>
     </message>
     <message>
-        <source>Click on timer</source>
-        <translation type="vanished">Bấm vào bộ đếm thời gian</translation>
-    </message>
-    <message>
         <source>Simulator speed may be changd while paused (hold shift  (1x), OPTION/ALT (2x) or COMMAND/CTRL (4x) on restart).</source>
         <translation type="vanished">Tốc độ mô phỏng có thể thay đổi khi tạm dừng (giữ shift (1x), OPTION/ALT (2x) hoặc COMMAND/CTRL (4x) khi khởi động lại).</translation>
-    </message>
-    <message>
-        <source>OPTION Tools&gt;&gt;Simulator [Mac]
-ALT Tools&gt;&gt;Simulator [Win]</source>
-        <translation type="vanished">TÙY CHỌN Công cụ &gt;&gt; Trình mô phỏng [Mac]
-ALT Tools &gt;&gt; Simulator [Win]</translation>
     </message>
     <message>
         <source>&lt;button number&gt;</source>
@@ -15361,8 +15433,8 @@ Lặp lại Thao tác ở cuối: {0}</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2487" />
-        <source>Recomended Mode = 0</source>
-        <translation>Chế độ được đề xuất = 0</translation>
+        <source>Recommended Mode = 0</source>
+        <translation>Chế độ đề xuất = 0</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2488" />
@@ -17759,6 +17831,10 @@ Hồ sơ thiếu [CHARGE] hoặc [DROP]</translation>
         <location filename="../plus/schedule.py" line="3644" />
         <source>Fetching completed roast properties failed</source>
         <translation>Tìm nạp các thuộc tính rang đã hoàn thành không thành công</translation>
+    </message>
+    <message>
+        <source>Recomended Mode = 0</source>
+        <translation type="vanished">Chế độ được đề xuất = 0</translation>
     </message>
     <message>
         <source>Empty path or box unchecked in Autosave</source>

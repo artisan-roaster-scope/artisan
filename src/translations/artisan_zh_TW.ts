@@ -6924,8 +6924,11 @@ When Meter=NONE opens dialog to manually enter temperatures during roast</source
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="38" />
-        <source>Toggle Playback Events</source>
-        <translation>切換播放事件</translation>
+        <source>Toggle Playback Events
+(Expert and Standard modes)</source>
+        <translation>切換播放事件
+
+（專家模式和標準模式）</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="39" />
@@ -6949,23 +6952,35 @@ When Meter=NONE opens dialog to manually enter temperatures during roast</source
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="43" />
-        <source>Load alarms</source>
-        <translation>負載警報</translation>
+        <source>Load alarms
+(Expert and Standard modes)</source>
+        <translation>負載警報
+
+（專家模式和標準模式）</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="44" />
-        <source>Changes Event Button Palettes</source>
-        <translation>更改事件按鈕面板</translation>
+        <source>Changes Event Button Palettes
+(Can be disabled or enabled in Expert mode Config&gt;&gt; Events&gt;&gt; Palettes&gt;&gt; Switch Using Number Keys and Cmd)</source>
+        <translation>更改事件按鈕面板
+
+（可在專家模式下啟用或停用：設定 &gt;&gt; 事件 &gt;&gt; 面板 &gt;&gt; 使用數字鍵和 Cmd 切換）</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="45" />
-        <source>Application ScreenShot</source>
-        <translation>應用程序截圖</translation>
+        <source>Application ScreenShot
+(Expert and Standard modes)</source>
+        <translation>應用程式螢幕截圖
+
+（專家模式和標準模式）</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="46" />
-        <source>Desktop ScreenShot</source>
-        <translation>桌面截圖</translation>
+        <source>Desktop ScreenShot
+(Expert and Standard modes)</source>
+        <translation>桌面螢幕截圖
+
+（專家模式和標準模式）</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="47" />
@@ -7432,16 +7447,16 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
-        <source>Click on timer
-Expert mode</source>
-        <translation>點擊計時器
-
-專家模式</translation>
+        <source>Click on timer</source>
+        <translation>點擊計時器</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
-        <source>Simulator</source>
-        <translation>模擬器</translation>
+        <source>Simulator
+(Expert mode)</source>
+        <translation>模擬器
+
+（專家模式）</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
@@ -7456,21 +7471,18 @@ Expert mode</source>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
         <source>OPTION Tools&gt;&gt;Simulator [Mac]
-ALT Tools&gt;&gt;Simulator [Win]
-Expert mode</source>
-        <translation>選項工具&gt;&gt;模擬器 [Mac]
-
-ALT 工具&gt;&gt;模擬器 [Win]
-
-專家模式</translation>
+ALT Tools&gt;&gt;Simulator [Win]</source>
+        <translation>選項工具&gt;&gt;模擬器[Mac]
+ALT工具&gt;&gt;模擬器[Win]</translation>
     </message>
     <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="89" />
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
         <source>Graph/Simulator
-[Expert mode]</source>
+(Expert mode)</source>
         <translation>圖形/模擬器
 
-[專家模式]</translation>
+（專家模式）</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
@@ -7486,11 +7498,6 @@ CTRL工具&gt;&gt;模擬器[Win]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="89" />
-        <source>Graph/Simulator</source>
-        <translation>圖形/模擬器</translation>
-    </message>
-    <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="89" />
         <source>Start or change Simulator speed to 4x mode</source>
         <translation>啟動或將模擬器速度更改為 4 倍模式</translation>
     </message>
@@ -7502,14 +7509,12 @@ CTRL+L [Win]</source>
 CTRL+L [贏]</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="95" />
-        <location filename="../help/keyboardshortcuts_help.py" line="94" />
-        <location filename="../help/keyboardshortcuts_help.py" line="93" />
-        <location filename="../help/keyboardshortcuts_help.py" line="92" />
-        <location filename="../help/keyboardshortcuts_help.py" line="91" />
         <location filename="../help/keyboardshortcuts_help.py" line="90" />
-        <source>Roast Properties Roast tab</source>
-        <translation>烘焙屬性 烘焙選項卡</translation>
+        <source>Roast Properties Roast tab
+(Expert and Standard modes)</source>
+        <translation>烘焙屬性 烘焙選項卡
+
+（專家模式和標準模式）</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="90" />
@@ -7522,6 +7527,15 @@ CTRL+L [贏]</translation>
 ALT click Stock [Win]</source>
         <translation>選項單擊庫存 [Mac]
 ALT 點擊股票 [獲勝]</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="95" />
+        <location filename="../help/keyboardshortcuts_help.py" line="94" />
+        <location filename="../help/keyboardshortcuts_help.py" line="93" />
+        <location filename="../help/keyboardshortcuts_help.py" line="92" />
+        <location filename="../help/keyboardshortcuts_help.py" line="91" />
+        <source>Roast Properties Roast tab</source>
+        <translation>烘焙屬性 烘焙選項卡</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="91" />
@@ -7786,7 +7800,6 @@ Hold Shift+Alt [Win]</source>
         <translation>貼上</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="120" />
         <location filename="../help/keyboardshortcuts_help.py" line="119" />
         <location filename="../help/keyboardshortcuts_help.py" line="118" />
         <source>Roast</source>
@@ -7804,17 +7817,25 @@ Hold Shift+Alt [Win]</source>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="120" />
+        <source>Roast
+(Expert and Standard modes)</source>
+        <translation>烘焙
+
+（專家模式和標準模式）</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="120" />
         <source>Switch Profiles (Foreground&lt;=&gt;Background)</source>
         <translation>切換配置文件（前台&lt;=&gt;後台）</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="125" />
-        <location filename="../help/keyboardshortcuts_help.py" line="124" />
-        <location filename="../help/keyboardshortcuts_help.py" line="123" />
         <location filename="../help/keyboardshortcuts_help.py" line="122" />
         <location filename="../help/keyboardshortcuts_help.py" line="121" />
-        <source>Config</source>
-        <translation>設定</translation>
+        <source>Config
+(Expert mode)</source>
+        <translation>配置
+
+（專家模式）</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="121" />
@@ -7825,6 +7846,16 @@ Hold Shift+Alt [Win]</source>
         <location filename="../help/keyboardshortcuts_help.py" line="122" />
         <source>Open Curves dialog</source>
         <translation>打開曲線對話框</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="125" />
+        <location filename="../help/keyboardshortcuts_help.py" line="124" />
+        <location filename="../help/keyboardshortcuts_help.py" line="123" />
+        <source>Config
+(Expert and Standard modes)</source>
+        <translation>配置
+
+（專家模式和標準模式）</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="123" />
@@ -7844,8 +7875,11 @@ Hold Shift+Alt [Win]</source>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="127" />
         <location filename="../help/keyboardshortcuts_help.py" line="126" />
-        <source>Tools</source>
-        <translation>工具</translation>
+        <source>Tools
+(Expert mode)</source>
+        <translation>工具
+
+（專家模式）</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="126" />
@@ -11367,6 +11401,66 @@ https://artisan-roasterscope.blogspot.com/2015/10/signals-symbolic-assignments-a
 </translation>
     </message>
     <message>
+        <source>Toggle Playback Events</source>
+        <translation type="vanished">切換播放事件</translation>
+    </message>
+    <message>
+        <source>Load alarms</source>
+        <translation type="vanished">負載警報</translation>
+    </message>
+    <message>
+        <source>Changes Event Button Palettes</source>
+        <translation type="vanished">更改事件按鈕面板</translation>
+    </message>
+    <message>
+        <source>Application ScreenShot</source>
+        <translation type="vanished">應用程序截圖</translation>
+    </message>
+    <message>
+        <source>Desktop ScreenShot</source>
+        <translation type="vanished">桌面截圖</translation>
+    </message>
+    <message>
+        <source>Click on timer
+Expert mode</source>
+        <translation type="vanished">點擊計時器
+
+專家模式</translation>
+    </message>
+    <message>
+        <source>Simulator</source>
+        <translation type="vanished">模擬器</translation>
+    </message>
+    <message>
+        <source>OPTION Tools&gt;&gt;Simulator [Mac]
+ALT Tools&gt;&gt;Simulator [Win]
+Expert mode</source>
+        <translation type="vanished">選項工具&gt;&gt;模擬器 [Mac]
+
+ALT 工具&gt;&gt;模擬器 [Win]
+
+專家模式</translation>
+    </message>
+    <message>
+        <source>Graph/Simulator
+[Expert mode]</source>
+        <translation type="vanished">圖形/模擬器
+
+[專家模式]</translation>
+    </message>
+    <message>
+        <source>Graph/Simulator</source>
+        <translation type="vanished">圖形/模擬器</translation>
+    </message>
+    <message>
+        <source>Config</source>
+        <translation type="vanished">設定</translation>
+    </message>
+    <message>
+        <source>Tools</source>
+        <translation type="vanished">工具</translation>
+    </message>
+    <message>
         <source>Change roast event key focus</source>
         <translation type="vanished">更改烘焙事件的關鍵焦點</translation>
     </message>
@@ -11407,18 +11501,8 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
 必須禁用鍵盤快捷鍵 (ENTER)</translation>
     </message>
     <message>
-        <source>Click on timer</source>
-        <translation type="vanished">點擊計時器</translation>
-    </message>
-    <message>
         <source>Simulator speed may be changd while paused (hold shift  (1x), OPTION/ALT (2x) or COMMAND/CTRL (4x) on restart).</source>
         <translation type="vanished">模擬器速度可以在暫停時變更（重新啟動時按住 Shift (1x)、OPTION/ALT (2x) 或 COMMAND/CTRL (4x)）。</translation>
-    </message>
-    <message>
-        <source>OPTION Tools&gt;&gt;Simulator [Mac]
-ALT Tools&gt;&gt;Simulator [Win]</source>
-        <translation type="vanished">選項工具&gt;&gt;模擬器[Mac]
-ALT工具&gt;&gt;模擬器[Win]</translation>
     </message>
     <message>
         <source>&lt;button number&gt;</source>
@@ -15383,7 +15467,7 @@ Repeat Operation at the end: {0}</source>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2487" />
-        <source>Recomended Mode = 0</source>
+        <source>Recommended Mode = 0</source>
         <translation>推薦模式 = 0</translation>
     </message>
     <message>
@@ -17782,6 +17866,10 @@ Profile missing [CHARGE] or [DROP]</source>
         <location filename="../plus/schedule.py" line="3644" />
         <source>Fetching completed roast properties failed</source>
         <translation>取得已完成的烘焙屬性失敗</translation>
+    </message>
+    <message>
+        <source>Recomended Mode = 0</source>
+        <translation type="vanished">推薦模式 = 0</translation>
     </message>
     <message>
         <source>Empty path or box unchecked in Autosave</source>

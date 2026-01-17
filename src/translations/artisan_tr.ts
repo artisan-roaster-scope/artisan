@@ -6928,8 +6928,10 @@ Klavye Kısayolları KAPALI olduğunda özel bir etkinlik eklenir
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="38" />
-        <source>Toggle Playback Events</source>
-        <translation>Oynatma Olaylarını Değiştir</translation>
+        <source>Toggle Playback Events
+(Expert and Standard modes)</source>
+        <translation>Oynatma Olaylarını Aç/Kapat
+(Uzman ve Standart modlar)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="39" />
@@ -6953,23 +6955,31 @@ Klavye Kısayolları KAPALI olduğunda özel bir etkinlik eklenir
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="43" />
-        <source>Load alarms</source>
-        <translation>Yük alarmları</translation>
+        <source>Load alarms
+(Expert and Standard modes)</source>
+        <translation>Yük alarmları
+(Uzman ve Standart modlar)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="44" />
-        <source>Changes Event Button Palettes</source>
-        <translation>Etkinlik Düğmesi Paletlerini Değiştirir</translation>
+        <source>Changes Event Button Palettes
+(Can be disabled or enabled in Expert mode Config&gt;&gt; Events&gt;&gt; Palettes&gt;&gt; Switch Using Number Keys and Cmd)</source>
+        <translation>Etkinlik Düğmesi Paletlerini Değiştirir
+(Uzman modunda Yapılandırma &gt;&gt; Etkinlikler &gt;&gt; Paletler &gt;&gt; Sayı Tuşları ve Cmd Kullanarak Değiştirme bölümünden devre dışı bırakılabilir veya etkinleştirilebilir)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="45" />
-        <source>Application ScreenShot</source>
-        <translation>Uygulama Ekran Görüntüsü</translation>
+        <source>Application ScreenShot
+(Expert and Standard modes)</source>
+        <translation>Uygulama Ekran Görüntüsü
+(Uzman ve Standart modlar)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="46" />
-        <source>Desktop ScreenShot</source>
-        <translation>Masaüstü Ekran Görüntüsü</translation>
+        <source>Desktop ScreenShot
+(Expert and Standard modes)</source>
+        <translation>Masaüstü Ekran Görüntüsü
+(Uzman ve Standart modlar)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="47" />
@@ -7433,15 +7443,15 @@ Klavye Kısayolları devre dışı bırakılmalıdır (ENTER)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
-        <source>Click on timer
-Expert mode</source>
-        <translation>Zamanlayıcıya tıklayın
-Uzman modu</translation>
+        <source>Click on timer</source>
+        <translation>zamanlayıcıya tıklayın</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
-        <source>Simulator</source>
-        <translation>Simülatör</translation>
+        <source>Simulator
+(Expert mode)</source>
+        <translation>Simülatör
+(Uzman modu)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
@@ -7456,18 +7466,17 @@ Uzman modu</translation>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
         <source>OPTION Tools&gt;&gt;Simulator [Mac]
-ALT Tools&gt;&gt;Simulator [Win]
-Expert mode</source>
+ALT Tools&gt;&gt;Simulator [Win]</source>
         <translation>SEÇENEK Araçlar&gt;&gt;Simülatör [Mac]
-ALT Araçlar&gt;&gt;Simülatör [Win]
-Uzman modu</translation>
+ALT Araçları&gt;&gt;Simülatör [Kazan]</translation>
     </message>
     <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="89" />
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
         <source>Graph/Simulator
-[Expert mode]</source>
+(Expert mode)</source>
         <translation>Grafik/Simülatör
-[Uzman modu]</translation>
+(Uzman modu)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
@@ -7483,11 +7492,6 @@ CTRL Araçları &gt;&gt;Simülatör [Win]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="89" />
-        <source>Graph/Simulator</source>
-        <translation>Grafik/Simülatör</translation>
-    </message>
-    <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="89" />
         <source>Start or change Simulator speed to 4x mode</source>
         <translation>Simülatör hızını 4x moduna başlatın veya değiştirin</translation>
     </message>
@@ -7499,14 +7503,11 @@ CTRL+L [Win]</source>
 CTRL+L [Kazan]</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="95" />
-        <location filename="../help/keyboardshortcuts_help.py" line="94" />
-        <location filename="../help/keyboardshortcuts_help.py" line="93" />
-        <location filename="../help/keyboardshortcuts_help.py" line="92" />
-        <location filename="../help/keyboardshortcuts_help.py" line="91" />
         <location filename="../help/keyboardshortcuts_help.py" line="90" />
-        <source>Roast Properties Roast tab</source>
-        <translation>Kızartma Özellikleri Kızartma sekmesi</translation>
+        <source>Roast Properties Roast tab
+(Expert and Standard modes)</source>
+        <translation>Kavurma Özellikleri Kavurma sekmesi
+(Uzman ve Standart modlar)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="90" />
@@ -7519,6 +7520,15 @@ CTRL+L [Kazan]</translation>
 ALT click Stock [Win]</source>
         <translation>SEÇENEK Hisse Senedi'ne tıklayın [Mac]
 ALT hisse senedine tıklayın [Kazan]</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="95" />
+        <location filename="../help/keyboardshortcuts_help.py" line="94" />
+        <location filename="../help/keyboardshortcuts_help.py" line="93" />
+        <location filename="../help/keyboardshortcuts_help.py" line="92" />
+        <location filename="../help/keyboardshortcuts_help.py" line="91" />
+        <source>Roast Properties Roast tab</source>
+        <translation>Kızartma Özellikleri Kızartma sekmesi</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="91" />
@@ -7783,7 +7793,6 @@ Shift+Alt tuşunu basılı tutun [Win]</translation>
         <translation>Yapıştır</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="120" />
         <location filename="../help/keyboardshortcuts_help.py" line="119" />
         <location filename="../help/keyboardshortcuts_help.py" line="118" />
         <source>Roast</source>
@@ -7801,17 +7810,23 @@ Shift+Alt tuşunu basılı tutun [Win]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="120" />
+        <source>Roast
+(Expert and Standard modes)</source>
+        <translation>Kavurma
+(Uzman ve Standart modlar)</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="120" />
         <source>Switch Profiles (Foreground&lt;=&gt;Background)</source>
         <translation>Profilleri Değiştir (Ön Plan&lt;=&gt; Arka Plan)</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="125" />
-        <location filename="../help/keyboardshortcuts_help.py" line="124" />
-        <location filename="../help/keyboardshortcuts_help.py" line="123" />
         <location filename="../help/keyboardshortcuts_help.py" line="122" />
         <location filename="../help/keyboardshortcuts_help.py" line="121" />
-        <source>Config</source>
-        <translation>Ayarlar</translation>
+        <source>Config
+(Expert mode)</source>
+        <translation>Yapılandırma
+(Uzman modu)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="121" />
@@ -7822,6 +7837,15 @@ Shift+Alt tuşunu basılı tutun [Win]</translation>
         <location filename="../help/keyboardshortcuts_help.py" line="122" />
         <source>Open Curves dialog</source>
         <translation>Eğriler iletişim kutusunu aç</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="125" />
+        <location filename="../help/keyboardshortcuts_help.py" line="124" />
+        <location filename="../help/keyboardshortcuts_help.py" line="123" />
+        <source>Config
+(Expert and Standard modes)</source>
+        <translation>Yapılandırma
+(Uzman ve Standart modlar)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="123" />
@@ -7841,8 +7865,10 @@ Shift+Alt tuşunu basılı tutun [Win]</translation>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="127" />
         <location filename="../help/keyboardshortcuts_help.py" line="126" />
-        <source>Tools</source>
-        <translation>Aletler</translation>
+        <source>Tools
+(Expert mode)</source>
+        <translation>Araçlar
+(Uzman modu)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="126" />
@@ -11356,6 +11382,62 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
         <translation>F1, bir geri besleme döngüsü gerçekleştirmek için gerçek formülün önceki sonucunu ifade eder. Bu, filtre tasarımlarında kullanışlıdır. Benzer şekilde, F2 önceki ikinci sonucu ifade eder vb.</translation>
     </message>
     <message>
+        <source>Toggle Playback Events</source>
+        <translation type="vanished">Oynatma Olaylarını Değiştir</translation>
+    </message>
+    <message>
+        <source>Load alarms</source>
+        <translation type="vanished">Yük alarmları</translation>
+    </message>
+    <message>
+        <source>Changes Event Button Palettes</source>
+        <translation type="vanished">Etkinlik Düğmesi Paletlerini Değiştirir</translation>
+    </message>
+    <message>
+        <source>Application ScreenShot</source>
+        <translation type="vanished">Uygulama Ekran Görüntüsü</translation>
+    </message>
+    <message>
+        <source>Desktop ScreenShot</source>
+        <translation type="vanished">Masaüstü Ekran Görüntüsü</translation>
+    </message>
+    <message>
+        <source>Click on timer
+Expert mode</source>
+        <translation type="vanished">Zamanlayıcıya tıklayın
+Uzman modu</translation>
+    </message>
+    <message>
+        <source>Simulator</source>
+        <translation type="vanished">Simülatör</translation>
+    </message>
+    <message>
+        <source>OPTION Tools&gt;&gt;Simulator [Mac]
+ALT Tools&gt;&gt;Simulator [Win]
+Expert mode</source>
+        <translation type="vanished">SEÇENEK Araçlar&gt;&gt;Simülatör [Mac]
+ALT Araçlar&gt;&gt;Simülatör [Win]
+Uzman modu</translation>
+    </message>
+    <message>
+        <source>Graph/Simulator
+[Expert mode]</source>
+        <translation type="vanished">Grafik/Simülatör
+[Uzman modu]</translation>
+    </message>
+    <message>
+        <source>Graph/Simulator</source>
+        <translation type="vanished">Grafik/Simülatör</translation>
+    </message>
+    <message>
+        <source>Config</source>
+        <translation type="vanished">Ayarlar</translation>
+    </message>
+    <message>
+        <source>Tools</source>
+        <translation type="vanished">Aletler</translation>
+    </message>
+    <message>
         <source>Change roast event key focus</source>
         <translation type="vanished">Kızartma olayı anahtar odağını değiştir</translation>
     </message>
@@ -11396,18 +11478,8 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
 Klavye Kısayolları devre dışı bırakılmalıdır (ENTER)</translation>
     </message>
     <message>
-        <source>Click on timer</source>
-        <translation type="vanished">zamanlayıcıya tıklayın</translation>
-    </message>
-    <message>
         <source>Simulator speed may be changd while paused (hold shift  (1x), OPTION/ALT (2x) or COMMAND/CTRL (4x) on restart).</source>
         <translation type="vanished">Simülatörün hızı duraklatıldığında değişebilir (vardiyayı basılı tutun (1x), OPTION/ALT (2x) veya COMMAND/CTRL (4x) yeniden başlatıldığında).</translation>
-    </message>
-    <message>
-        <source>OPTION Tools&gt;&gt;Simulator [Mac]
-ALT Tools&gt;&gt;Simulator [Win]</source>
-        <translation type="vanished">SEÇENEK Araçlar&gt;&gt;Simülatör [Mac]
-ALT Araçları&gt;&gt;Simülatör [Kazan]</translation>
     </message>
     <message>
         <source>&lt;button number&gt;</source>
@@ -15371,8 +15443,8 @@ Komando sondan tekrarlamak: {0}</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2487" />
-        <source>Recomended Mode = 0</source>
-        <translation>Tavsiye edilen mod = 0</translation>
+        <source>Recommended Mode = 0</source>
+        <translation>Önerilen Mod = 0</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2488" />
@@ -17768,6 +17840,10 @@ Profile missing [CHARGE] or [DROP]</source>
         <location filename="../plus/schedule.py" line="3644" />
         <source>Fetching completed roast properties failed</source>
         <translation>Tamamlanan kızartma özellikleri getirilemedi</translation>
+    </message>
+    <message>
+        <source>Recomended Mode = 0</source>
+        <translation type="vanished">Tavsiye edilen mod = 0</translation>
     </message>
     <message>
         <source>Empty path or box unchecked in Autosave</source>

@@ -305,7 +305,7 @@ def syncRecordUpdated(roast_record:dict[str, Any]|None = None) -> bool:
 
 
 # replaces zero values like 0 and '' by None for attributes enabled for suppression to save data space on server
-def surpress_zero_values(roast_record:dict[str, Any]) -> dict[str, Any]:
+def suppress_zero_values(roast_record:dict[str, Any]) -> dict[str, Any]:
     for key in roast.sync_record_zero_supressed_attributes:
         if key in roast_record and roast_record[key] == 0:
             roast_record[key] = None

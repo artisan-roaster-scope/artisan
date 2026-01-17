@@ -184,7 +184,7 @@ class MplCanvas(FigureCanvas):
         try:
             # self.aw.qmc might not be established yet
             self.aw.qmc.lazyredraw(recomputeAllDeltas=False)
-        except Exception:
+        except Exception: # pylint: disable=broad-except
             pass
 
     @override

@@ -6918,8 +6918,10 @@ Keď Meter=NONE otvorí dialógové okno na manuálne zadanie teplôt počas pe�
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="38" />
-        <source>Toggle Playback Events</source>
-        <translation>Prepnúť udalosti prehrávania</translation>
+        <source>Toggle Playback Events
+(Expert and Standard modes)</source>
+        <translation>Prepínanie udalostí prehrávania
+(Expertný a Štandardný režim)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="39" />
@@ -6943,23 +6945,30 @@ Keď Meter=NONE otvorí dialógové okno na manuálne zadanie teplôt počas pe�
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="43" />
-        <source>Load alarms</source>
-        <translation>Načítať alarmy</translation>
+        <source>Load alarms
+(Expert and Standard modes)</source>
+        <translation>Načítať alarmy
+(Expertný a Štandardný režim)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="44" />
-        <source>Changes Event Button Palettes</source>
-        <translation>Zmení palety tlačidiel udalostí</translation>
+        <source>Changes Event Button Palettes
+(Can be disabled or enabled in Expert mode Config&gt;&gt; Events&gt;&gt; Palettes&gt;&gt; Switch Using Number Keys and Cmd)</source>
+        <translation>Zmení palety tlačidiel udalostí
+(Možno zakázať alebo povoliť v režime Expert Konfigurácia &gt;&gt; Udalosti &gt;&gt; Palety &gt;&gt; Prepínanie pomocou číselných klávesov a Cmd)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="45" />
-        <source>Application ScreenShot</source>
-        <translation>Snímka obrazovky aplikácie</translation>
+        <source>Application ScreenShot
+(Expert and Standard modes)</source>
+        <translation>Snímka obrazovky aplikácie (režim Expert a Štandard)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="46" />
-        <source>Desktop ScreenShot</source>
-        <translation>Snímka obrazovky pracovnej plochy</translation>
+        <source>Desktop ScreenShot
+(Expert and Standard modes)</source>
+        <translation>Snímka obrazovky pracovnej plochy
+(Expertný a štandardný režim)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="47" />
@@ -7422,15 +7431,14 @@ Klávesové skratky musia byť vypnuté (ENTER)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
-        <source>Click on timer
-Expert mode</source>
-        <translation>Kliknite na časovač
-Expertný režim</translation>
+        <source>Click on timer</source>
+        <translation>Kliknite na časovač</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
-        <source>Simulator</source>
-        <translation type="unfinished">Simulátor</translation>
+        <source>Simulator
+(Expert mode)</source>
+        <translation>Simulátor (Expertný režim)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
@@ -7445,18 +7453,17 @@ Expertný režim</translation>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
         <source>OPTION Tools&gt;&gt;Simulator [Mac]
-ALT Tools&gt;&gt;Simulator [Win]
-Expert mode</source>
-        <translation>MOŽNOSTI Nástroje&gt;&gt;Simulátor [Mac]
-ALT Nástroje&gt;&gt;Simulátor [Win]
-Expertný režim</translation>
+ALT Tools&gt;&gt;Simulator [Win]</source>
+        <translation>OPTION Tools&gt;&gt;Simulator [Mac]
+Nástroje ALT&gt;&gt;Simulátor [Win]</translation>
     </message>
     <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="89" />
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
         <source>Graph/Simulator
-[Expert mode]</source>
+(Expert mode)</source>
         <translation>Graf/Simulátor
-[Expertný režim]</translation>
+(Expertný režim)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
@@ -7472,11 +7479,6 @@ CTRL Nástroje&gt;&gt;Simulátor [Win]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="89" />
-        <source>Graph/Simulator</source>
-        <translation>Graf/Simulátor</translation>
-    </message>
-    <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="89" />
         <source>Start or change Simulator speed to 4x mode</source>
         <translation>Spustite alebo zmeňte rýchlosť simulátora na režim 4x</translation>
     </message>
@@ -7488,14 +7490,10 @@ CTRL+L [Win]</source>
 CTRL+L [vyhrať]</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="95" />
-        <location filename="../help/keyboardshortcuts_help.py" line="94" />
-        <location filename="../help/keyboardshortcuts_help.py" line="93" />
-        <location filename="../help/keyboardshortcuts_help.py" line="92" />
-        <location filename="../help/keyboardshortcuts_help.py" line="91" />
         <location filename="../help/keyboardshortcuts_help.py" line="90" />
-        <source>Roast Properties Roast tab</source>
-        <translation>Vlastnosti praženia Karta praženie</translation>
+        <source>Roast Properties Roast tab
+(Expert and Standard modes)</source>
+        <translation>Vlastnosti pečenia Karta Pečenie (režimy Expert a Standard)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="90" />
@@ -7508,6 +7506,15 @@ CTRL+L [vyhrať]</translation>
 ALT click Stock [Win]</source>
         <translation>OPTION kliknite na Stock [Mac]
 ALT kliknite na Stock [Win]</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="95" />
+        <location filename="../help/keyboardshortcuts_help.py" line="94" />
+        <location filename="../help/keyboardshortcuts_help.py" line="93" />
+        <location filename="../help/keyboardshortcuts_help.py" line="92" />
+        <location filename="../help/keyboardshortcuts_help.py" line="91" />
+        <source>Roast Properties Roast tab</source>
+        <translation>Vlastnosti praženia Karta praženie</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="91" />
@@ -7771,7 +7778,6 @@ Podržte Shift+Alt [Win]</translation>
         <translation type="unfinished">Vložiť</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="120" />
         <location filename="../help/keyboardshortcuts_help.py" line="119" />
         <location filename="../help/keyboardshortcuts_help.py" line="118" />
         <source>Roast</source>
@@ -7789,17 +7795,22 @@ Podržte Shift+Alt [Win]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="120" />
+        <source>Roast
+(Expert and Standard modes)</source>
+        <translation>Pečenie (režimy Expert a Standard)</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="120" />
         <source>Switch Profiles (Foreground&lt;=&gt;Background)</source>
         <translation>Prepnúť profily (popredie&lt;=&gt;Pozadie)</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="125" />
-        <location filename="../help/keyboardshortcuts_help.py" line="124" />
-        <location filename="../help/keyboardshortcuts_help.py" line="123" />
         <location filename="../help/keyboardshortcuts_help.py" line="122" />
         <location filename="../help/keyboardshortcuts_help.py" line="121" />
-        <source>Config</source>
-        <translation type="unfinished">Konfig</translation>
+        <source>Config
+(Expert mode)</source>
+        <translation>Konfigurácia
+(Expertný režim)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="121" />
@@ -7810,6 +7821,14 @@ Podržte Shift+Alt [Win]</translation>
         <location filename="../help/keyboardshortcuts_help.py" line="122" />
         <source>Open Curves dialog</source>
         <translation>Otvorte dialógové okno Krivky</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="125" />
+        <location filename="../help/keyboardshortcuts_help.py" line="124" />
+        <location filename="../help/keyboardshortcuts_help.py" line="123" />
+        <source>Config
+(Expert and Standard modes)</source>
+        <translation>Konfigurácia (Expertný a Štandardný režim)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="123" />
@@ -7829,8 +7848,10 @@ Podržte Shift+Alt [Win]</translation>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="127" />
         <location filename="../help/keyboardshortcuts_help.py" line="126" />
-        <source>Tools</source>
-        <translation type="unfinished">Náradie</translation>
+        <source>Tools
+(Expert mode)</source>
+        <translation>Nástroje
+(Expertný režim)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="126" />
@@ -11344,6 +11365,62 @@ Používanie matematických vzorcov v plotri tiež umožňuje používať symbol
         <translation>F1 sa vzťahuje na predchádzajúci výsledok skutočného vzorca na realizáciu spätnej väzby. To je užitočné pri návrhoch filtrov. Podobne F2 odkazuje na druhý predchádzajúci výsledok atď.</translation>
     </message>
     <message>
+        <source>Toggle Playback Events</source>
+        <translation type="vanished">Prepnúť udalosti prehrávania</translation>
+    </message>
+    <message>
+        <source>Load alarms</source>
+        <translation type="vanished">Načítať alarmy</translation>
+    </message>
+    <message>
+        <source>Changes Event Button Palettes</source>
+        <translation type="vanished">Zmení palety tlačidiel udalostí</translation>
+    </message>
+    <message>
+        <source>Application ScreenShot</source>
+        <translation type="vanished">Snímka obrazovky aplikácie</translation>
+    </message>
+    <message>
+        <source>Desktop ScreenShot</source>
+        <translation type="vanished">Snímka obrazovky pracovnej plochy</translation>
+    </message>
+    <message>
+        <source>Click on timer
+Expert mode</source>
+        <translation type="vanished">Kliknite na časovač
+Expertný režim</translation>
+    </message>
+    <message>
+        <source>Simulator</source>
+        <translation type="vanished">Simulátor</translation>
+    </message>
+    <message>
+        <source>OPTION Tools&gt;&gt;Simulator [Mac]
+ALT Tools&gt;&gt;Simulator [Win]
+Expert mode</source>
+        <translation type="vanished">MOŽNOSTI Nástroje&gt;&gt;Simulátor [Mac]
+ALT Nástroje&gt;&gt;Simulátor [Win]
+Expertný režim</translation>
+    </message>
+    <message>
+        <source>Graph/Simulator
+[Expert mode]</source>
+        <translation type="vanished">Graf/Simulátor
+[Expertný režim]</translation>
+    </message>
+    <message>
+        <source>Graph/Simulator</source>
+        <translation type="vanished">Graf/Simulátor</translation>
+    </message>
+    <message>
+        <source>Config</source>
+        <translation type="vanished">Konfig</translation>
+    </message>
+    <message>
+        <source>Tools</source>
+        <translation type="vanished">Náradie</translation>
+    </message>
+    <message>
         <source>Change roast event key focus</source>
         <translation type="vanished">Zmeňte zameranie kľúčovej udalosti pečenia</translation>
     </message>
@@ -11384,18 +11461,8 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
 Klávesové skratky musia byť zakázané (ENTER)</translation>
     </message>
     <message>
-        <source>Click on timer</source>
-        <translation type="vanished">Kliknite na časovač</translation>
-    </message>
-    <message>
         <source>Simulator speed may be changd while paused (hold shift  (1x), OPTION/ALT (2x) or COMMAND/CTRL (4x) on restart).</source>
         <translation type="vanished">Rýchlosť simulátora je možné zmeniť počas pozastavenia (podržať posun (1x), OPTION/ALT (2x) alebo COMMAND/CTRL (4x) pri reštarte).</translation>
-    </message>
-    <message>
-        <source>OPTION Tools&gt;&gt;Simulator [Mac]
-ALT Tools&gt;&gt;Simulator [Win]</source>
-        <translation type="vanished">OPTION Tools&gt;&gt;Simulator [Mac]
-Nástroje ALT&gt;&gt;Simulátor [Win]</translation>
     </message>
     <message>
         <source>&lt;button number&gt;</source>
@@ -15359,7 +15426,7 @@ Opakujte operáciu na konci: {0}</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2487" />
-        <source>Recomended Mode = 0</source>
+        <source>Recommended Mode = 0</source>
         <translation>Odporúčaný režim = 0</translation>
     </message>
     <message>
@@ -17757,6 +17824,10 @@ V profile chýba [CHARGE] alebo [DROP]</translation>
         <location filename="../plus/schedule.py" line="3644" />
         <source>Fetching completed roast properties failed</source>
         <translation>Načítanie dokončených vlastností pečenia zlyhalo</translation>
+    </message>
+    <message>
+        <source>Recomended Mode = 0</source>
+        <translation type="vanished">Odporúčaný režim = 0</translation>
     </message>
     <message>
         <source>Empty path or box unchecked in Autosave</source>

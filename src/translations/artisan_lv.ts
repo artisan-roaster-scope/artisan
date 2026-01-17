@@ -6902,8 +6902,9 @@ Kad Meter=NONE tiek atvērts dialoglodziņš, lai manuāli ievadītu temperatūr
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="38" />
-        <source>Toggle Playback Events</source>
-        <translation>Pārslēgt atskaņošanas notikumus</translation>
+        <source>Toggle Playback Events
+(Expert and Standard modes)</source>
+        <translation>Pārslēgt atskaņošanas notikumus (ekspertu un standarta režīmi)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="39" />
@@ -6927,23 +6928,31 @@ Kad Meter=NONE tiek atvērts dialoglodziņš, lai manuāli ievadītu temperatūr
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="43" />
-        <source>Load alarms</source>
-        <translation>Ielādēt trauksmes signālus</translation>
+        <source>Load alarms
+(Expert and Standard modes)</source>
+        <translation>Ielādēt trauksmes signālus
+(Eksperta un standarta režīmi)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="44" />
-        <source>Changes Event Button Palettes</source>
-        <translation>Maina notikumu pogu paletes</translation>
+        <source>Changes Event Button Palettes
+(Can be disabled or enabled in Expert mode Config&gt;&gt; Events&gt;&gt; Palettes&gt;&gt; Switch Using Number Keys and Cmd)</source>
+        <translation>Maina notikumu pogu paletes
+(Var atspējot vai iespējot eksperta režīmā Konfigurācija&gt;&gt; Notikumi&gt;&gt; Paletes&gt;&gt; Pārslēgt, izmantojot ciparu taustiņus un komandu komandu)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="45" />
-        <source>Application ScreenShot</source>
-        <translation>Lietojumprogrammas ekrānuzņēmums</translation>
+        <source>Application ScreenShot
+(Expert and Standard modes)</source>
+        <translation>Lietojumprogrammas ekrānuzņēmums
+(Eksperta un standarta režīmi)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="46" />
-        <source>Desktop ScreenShot</source>
-        <translation>Darbvirsmas ekrānuzņēmums</translation>
+        <source>Desktop ScreenShot
+(Expert and Standard modes)</source>
+        <translation>Darbvirsmas ekrānuzņēmums
+(Eksperta un standarta režīmi)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="47" />
@@ -7407,15 +7416,14 @@ Jāatspējo īsinājumtaustiņi (ENTER)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
-        <source>Click on timer
-Expert mode</source>
-        <translation>Noklikšķiniet uz taimera
-Eksperta režīms</translation>
+        <source>Click on timer</source>
+        <translation>Noklikšķiniet uz taimera</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
-        <source>Simulator</source>
-        <translation type="unfinished">Simulators</translation>
+        <source>Simulator
+(Expert mode)</source>
+        <translation>Simulators (eksperta režīms)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
@@ -7430,18 +7438,16 @@ Eksperta režīms</translation>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
         <source>OPTION Tools&gt;&gt;Simulator [Mac]
-ALT Tools&gt;&gt;Simulator [Win]
-Expert mode</source>
-        <translation>OPCIJAS Rīki&gt;&gt;Simulators [Mac]
-ALT Rīki&gt;&gt;Simulators [Win]
-Eksperta režīms</translation>
+ALT Tools&gt;&gt;Simulator [Win]</source>
+        <translation>OPTION Rīki&gt;&gt; Simulators [Mac]
+ALT rīki&gt;&gt; Simulators [Win]</translation>
     </message>
     <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="89" />
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
         <source>Graph/Simulator
-[Expert mode]</source>
-        <translation>Grafik/Simulators
-[Eksperta režīms]</translation>
+(Expert mode)</source>
+        <translation>Grafik/simulators (eksperta režīms)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
@@ -7457,11 +7463,6 @@ CTRL rīki&gt;&gt; Simulators [Win]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="89" />
-        <source>Graph/Simulator</source>
-        <translation>Grafiks/simulators</translation>
-    </message>
-    <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="89" />
         <source>Start or change Simulator speed to 4x mode</source>
         <translation>Sāciet vai mainiet simulatora ātrumu uz 4x režīmu</translation>
     </message>
@@ -7473,14 +7474,10 @@ CTRL+L [Win]</source>
 CTRL+L [uzvarēt]</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="95" />
-        <location filename="../help/keyboardshortcuts_help.py" line="94" />
-        <location filename="../help/keyboardshortcuts_help.py" line="93" />
-        <location filename="../help/keyboardshortcuts_help.py" line="92" />
-        <location filename="../help/keyboardshortcuts_help.py" line="91" />
         <location filename="../help/keyboardshortcuts_help.py" line="90" />
-        <source>Roast Properties Roast tab</source>
-        <translation>Cepšanas īpašības Cilne Cepšana</translation>
+        <source>Roast Properties Roast tab
+(Expert and Standard modes)</source>
+        <translation>Cepšanas īpašības Cepšanas cilne (Eksperta un standarta režīmi)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="90" />
@@ -7493,6 +7490,15 @@ CTRL+L [uzvarēt]</translation>
 ALT click Stock [Win]</source>
         <translation>OPTION noklikšķiniet Stock [Mac]
 ALT noklikšķiniet Stock [Uzvara]</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="95" />
+        <location filename="../help/keyboardshortcuts_help.py" line="94" />
+        <location filename="../help/keyboardshortcuts_help.py" line="93" />
+        <location filename="../help/keyboardshortcuts_help.py" line="92" />
+        <location filename="../help/keyboardshortcuts_help.py" line="91" />
+        <source>Roast Properties Roast tab</source>
+        <translation>Cepšanas īpašības Cilne Cepšana</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="91" />
@@ -7757,7 +7763,6 @@ Turiet Shift+Alt [Win]</translation>
         <translation type="unfinished">Ielīmēt</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="120" />
         <location filename="../help/keyboardshortcuts_help.py" line="119" />
         <location filename="../help/keyboardshortcuts_help.py" line="118" />
         <source>Roast</source>
@@ -7775,17 +7780,22 @@ Turiet Shift+Alt [Win]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="120" />
+        <source>Roast
+(Expert and Standard modes)</source>
+        <translation>Cepšana
+(Eksperta un standarta režīmi)</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="120" />
         <source>Switch Profiles (Foreground&lt;=&gt;Background)</source>
         <translation>Profilu pārslēgšana (priekšplānā&lt;=&gt;fonā)</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="125" />
-        <location filename="../help/keyboardshortcuts_help.py" line="124" />
-        <location filename="../help/keyboardshortcuts_help.py" line="123" />
         <location filename="../help/keyboardshortcuts_help.py" line="122" />
         <location filename="../help/keyboardshortcuts_help.py" line="121" />
-        <source>Config</source>
-        <translation type="unfinished">Konfigurēt</translation>
+        <source>Config
+(Expert mode)</source>
+        <translation>Konfigurācija (eksperta režīms)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="121" />
@@ -7796,6 +7806,14 @@ Turiet Shift+Alt [Win]</translation>
         <location filename="../help/keyboardshortcuts_help.py" line="122" />
         <source>Open Curves dialog</source>
         <translation>Atveriet dialoglodziņu Līknes</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="125" />
+        <location filename="../help/keyboardshortcuts_help.py" line="124" />
+        <location filename="../help/keyboardshortcuts_help.py" line="123" />
+        <source>Config
+(Expert and Standard modes)</source>
+        <translation>Konfigurācija (eksperta un standarta režīmi)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="123" />
@@ -7815,8 +7833,10 @@ Turiet Shift+Alt [Win]</translation>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="127" />
         <location filename="../help/keyboardshortcuts_help.py" line="126" />
-        <source>Tools</source>
-        <translation type="unfinished">Rīki</translation>
+        <source>Tools
+(Expert mode)</source>
+        <translation>Rīki
+(Eksperta režīms)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="126" />
@@ -11330,6 +11350,62 @@ Matemātisko formulu izmantošana ploterī ļauj izmantot arī simboliskos main�
         <translation>F1 attiecas uz faktiskās formulas iepriekšējo rezultātu, lai realizētu atgriezeniskās saites cilpu. Tas ir noderīgi filtru konstrukcijās. Līdzīgi F2 attiecas uz otro iepriekšējo rezultātu utt.</translation>
     </message>
     <message>
+        <source>Toggle Playback Events</source>
+        <translation type="vanished">Pārslēgt atskaņošanas notikumus</translation>
+    </message>
+    <message>
+        <source>Load alarms</source>
+        <translation type="vanished">Ielādēt trauksmes signālus</translation>
+    </message>
+    <message>
+        <source>Changes Event Button Palettes</source>
+        <translation type="vanished">Maina notikumu pogu paletes</translation>
+    </message>
+    <message>
+        <source>Application ScreenShot</source>
+        <translation type="vanished">Lietojumprogrammas ekrānuzņēmums</translation>
+    </message>
+    <message>
+        <source>Desktop ScreenShot</source>
+        <translation type="vanished">Darbvirsmas ekrānuzņēmums</translation>
+    </message>
+    <message>
+        <source>Click on timer
+Expert mode</source>
+        <translation type="vanished">Noklikšķiniet uz taimera
+Eksperta režīms</translation>
+    </message>
+    <message>
+        <source>Simulator</source>
+        <translation type="vanished">Simulators</translation>
+    </message>
+    <message>
+        <source>OPTION Tools&gt;&gt;Simulator [Mac]
+ALT Tools&gt;&gt;Simulator [Win]
+Expert mode</source>
+        <translation type="vanished">OPCIJAS Rīki&gt;&gt;Simulators [Mac]
+ALT Rīki&gt;&gt;Simulators [Win]
+Eksperta režīms</translation>
+    </message>
+    <message>
+        <source>Graph/Simulator
+[Expert mode]</source>
+        <translation type="vanished">Grafik/Simulators
+[Eksperta režīms]</translation>
+    </message>
+    <message>
+        <source>Graph/Simulator</source>
+        <translation type="vanished">Grafiks/simulators</translation>
+    </message>
+    <message>
+        <source>Config</source>
+        <translation type="vanished">Konfigurēt</translation>
+    </message>
+    <message>
+        <source>Tools</source>
+        <translation type="vanished">Rīki</translation>
+    </message>
+    <message>
         <source>Change roast event key focus</source>
         <translation type="vanished">Mainiet cepšanas pasākuma galveno fokusu</translation>
     </message>
@@ -11370,18 +11446,8 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
 Tastatūras īsinājumtaustiņi ir jāatspējo (ENTER)</translation>
     </message>
     <message>
-        <source>Click on timer</source>
-        <translation type="vanished">Noklikšķiniet uz taimera</translation>
-    </message>
-    <message>
         <source>Simulator speed may be changd while paused (hold shift  (1x), OPTION/ALT (2x) or COMMAND/CTRL (4x) on restart).</source>
         <translation type="vanished">Simulatora ātrumu var mainīt, kamēr tas ir apturēts (restartējot turiet pārslēgšanu (1x), OPTION/ALT (2x) vai COMMAND/CTRL (4x).</translation>
-    </message>
-    <message>
-        <source>OPTION Tools&gt;&gt;Simulator [Mac]
-ALT Tools&gt;&gt;Simulator [Win]</source>
-        <translation type="vanished">OPTION Rīki&gt;&gt; Simulators [Mac]
-ALT rīki&gt;&gt; Simulators [Win]</translation>
     </message>
     <message>
         <source>&lt;button number&gt;</source>
@@ -15345,7 +15411,7 @@ Atkārtojiet darbību beigās: {0}</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2487" />
-        <source>Recomended Mode = 0</source>
+        <source>Recommended Mode = 0</source>
         <translation>Ieteicamais režīms = 0</translation>
     </message>
     <message>
@@ -17743,6 +17809,10 @@ Profilā trūkst [CHARGE] vai [DROP]</translation>
         <location filename="../plus/schedule.py" line="3644" />
         <source>Fetching completed roast properties failed</source>
         <translation>Neizdevās ienest pabeigtos grauzdēšanas rekvizītus</translation>
+    </message>
+    <message>
+        <source>Recomended Mode = 0</source>
+        <translation type="vanished">Ieteicamais režīms = 0</translation>
     </message>
     <message>
         <source>Empty path or box unchecked in Autosave</source>

@@ -6918,8 +6918,9 @@ Nuair a dh'fhosglas Meter=CHAN EIL an còmhradh gus teodhachd a chuir a-steach l
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="38" />
-        <source>Toggle Playback Events</source>
-        <translation>Tog tachartasan Playback</translation>
+        <source>Toggle Playback Events
+(Expert and Standard modes)</source>
+        <translation>Toglaich Tachartasan Ath-chluich (Modhan Eòlaiche is Coitcheann)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="39" />
@@ -6943,23 +6944,29 @@ Nuair a dh'fhosglas Meter=CHAN EIL an còmhradh gus teodhachd a chuir a-steach l
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="43" />
-        <source>Load alarms</source>
-        <translation>Luchdaich a-nuas alarms</translation>
+        <source>Load alarms
+(Expert and Standard modes)</source>
+        <translation>Luchdaich innealan-rabhaidh (modhan eòlach is àbhaisteach)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="44" />
-        <source>Changes Event Button Palettes</source>
-        <translation>Ag atharrachadh Palettes Putan Tachartas</translation>
+        <source>Changes Event Button Palettes
+(Can be disabled or enabled in Expert mode Config&gt;&gt; Events&gt;&gt; Palettes&gt;&gt; Switch Using Number Keys and Cmd)</source>
+        <translation>Atharraich Paileatan Putan Tachartais
+(Faodar a dhì-chomasachadh no a chomasachadh ann am modh Eòlaiche Config&gt;&gt; Tachartasan&gt;&gt; Paileatan&gt;&gt; Gluais a’ cleachdadh iuchraichean Àireamh agus Cmd)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="45" />
-        <source>Application ScreenShot</source>
-        <translation>Glacadh-sgrìn aplacaid</translation>
+        <source>Application ScreenShot
+(Expert and Standard modes)</source>
+        <translation>Dealbh-sgrìn den aplacaid
+(Modhan eòlach is àbhaisteach)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="46" />
-        <source>Desktop ScreenShot</source>
-        <translation>Glacadh-sgrìn Deasg</translation>
+        <source>Desktop ScreenShot
+(Expert and Standard modes)</source>
+        <translation>Dealbh-sgrìn den deasg (modhan eòlach is àbhaisteach)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="47" />
@@ -7423,15 +7430,14 @@ Feumaidh Ath-ghoiridean Meur-chlàir a bhith air an cur à comas (ENTER)</transl
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
-        <source>Click on timer
-Expert mode</source>
-        <translation>Briog air an timer
-Modh eòlach</translation>
+        <source>Click on timer</source>
+        <translation>Cliog air timer</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
-        <source>Simulator</source>
-        <translation type="unfinished" />
+        <source>Simulator
+(Expert mode)</source>
+        <translation>Simulator (Modh eòlaiche)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
@@ -7446,18 +7452,16 @@ Modh eòlach</translation>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
         <source>OPTION Tools&gt;&gt;Simulator [Mac]
-ALT Tools&gt;&gt;Simulator [Win]
-Expert mode</source>
-        <translation>Innealan ROGHAINN &gt;&gt; Simulator [Mac]
-Innealan ALT &gt;&gt; Simulator [Win]
-Modh eòlaiche</translation>
+ALT Tools&gt;&gt;Simulator [Win]</source>
+        <translation>Innealan ROGHA &gt;&gt; Simulator [Mac]
+Innealan ALT &gt;&gt; Simulator [Win]</translation>
     </message>
     <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="89" />
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
         <source>Graph/Simulator
-[Expert mode]</source>
-        <translation>Graf/Samhlaiche
-[Modh eòlaiche]</translation>
+(Expert mode)</source>
+        <translation>Graf/Samhlaiche (Modh Eòlaiche)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
@@ -7473,11 +7477,6 @@ Innealan CTRL &gt;&gt; Simulator [Win]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="89" />
-        <source>Graph/Simulator</source>
-        <translation>Graf/Simuladair</translation>
-    </message>
-    <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="89" />
         <source>Start or change Simulator speed to 4x mode</source>
         <translation>Tòisich no atharraich astar Simulator gu modh 4x</translation>
     </message>
@@ -7489,14 +7488,11 @@ CTRL+L [Win]</source>
 CTRL+L [Buann]</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="95" />
-        <location filename="../help/keyboardshortcuts_help.py" line="94" />
-        <location filename="../help/keyboardshortcuts_help.py" line="93" />
-        <location filename="../help/keyboardshortcuts_help.py" line="92" />
-        <location filename="../help/keyboardshortcuts_help.py" line="91" />
         <location filename="../help/keyboardshortcuts_help.py" line="90" />
-        <source>Roast Properties Roast tab</source>
-        <translation>Togalaichean Ròstadh taba Ròstadh</translation>
+        <source>Roast Properties Roast tab
+(Expert and Standard modes)</source>
+        <translation>Togalaichean Ròstadh Taba Ròstadh
+(Modhan Eòlaiche is Àbhaisteach)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="90" />
@@ -7509,6 +7505,15 @@ CTRL+L [Buann]</translation>
 ALT click Stock [Win]</source>
         <translation>ROGHA cliog air Stoc [Mac]
 ALT cliog air Stock [Win]</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="95" />
+        <location filename="../help/keyboardshortcuts_help.py" line="94" />
+        <location filename="../help/keyboardshortcuts_help.py" line="93" />
+        <location filename="../help/keyboardshortcuts_help.py" line="92" />
+        <location filename="../help/keyboardshortcuts_help.py" line="91" />
+        <source>Roast Properties Roast tab</source>
+        <translation>Togalaichean Ròstadh taba Ròstadh</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="91" />
@@ -7773,7 +7778,6 @@ Cùm Shift + Alt [Win]</translation>
         <translation>Cuir a-steach</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="120" />
         <location filename="../help/keyboardshortcuts_help.py" line="119" />
         <location filename="../help/keyboardshortcuts_help.py" line="118" />
         <source>Roast</source>
@@ -7791,17 +7795,21 @@ Cùm Shift + Alt [Win]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="120" />
+        <source>Roast
+(Expert and Standard modes)</source>
+        <translation>Ròstadh (Modhan Eòlaiche is Coitcheann)</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="120" />
         <source>Switch Profiles (Foreground&lt;=&gt;Background)</source>
         <translation>Pròifilean suidse (aghaidh &lt;=&gt; Cùl-fhiosrachadh)</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="125" />
-        <location filename="../help/keyboardshortcuts_help.py" line="124" />
-        <location filename="../help/keyboardshortcuts_help.py" line="123" />
         <location filename="../help/keyboardshortcuts_help.py" line="122" />
         <location filename="../help/keyboardshortcuts_help.py" line="121" />
-        <source>Config</source>
-        <translation>Rèiteachadh</translation>
+        <source>Config
+(Expert mode)</source>
+        <translation>Rèiteachadh (Modh eòlaiche)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="121" />
@@ -7812,6 +7820,14 @@ Cùm Shift + Alt [Win]</translation>
         <location filename="../help/keyboardshortcuts_help.py" line="122" />
         <source>Open Curves dialog</source>
         <translation>Còmhradh fosgailte Curves</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="125" />
+        <location filename="../help/keyboardshortcuts_help.py" line="124" />
+        <location filename="../help/keyboardshortcuts_help.py" line="123" />
+        <source>Config
+(Expert and Standard modes)</source>
+        <translation>Rèiteachadh (Modhan Eòlaiche is Coitcheann)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="123" />
@@ -7831,8 +7847,9 @@ Cùm Shift + Alt [Win]</translation>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="127" />
         <location filename="../help/keyboardshortcuts_help.py" line="126" />
-        <source>Tools</source>
-        <translation type="unfinished">Innealan</translation>
+        <source>Tools
+(Expert mode)</source>
+        <translation>Innealan (Modh eòlaiche)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="126" />
@@ -11346,6 +11363,58 @@ Le bhith a’ cleachdadh foirmlean matamataigeach anns a’ chuilbheart cuideach
         <translation>Tha F1 a’ toirt iomradh air an toradh a bh’ ann roimhe den fhìor fhoirmle gus lùb fios-air-ais a thoirt gu buil. Tha seo feumail ann an dealbhadh sìoltachain. San aon dòigh, tha F2 a’ toirt iomradh air an dàrna toradh roimhe msaa.</translation>
     </message>
     <message>
+        <source>Toggle Playback Events</source>
+        <translation type="vanished">Tog tachartasan Playback</translation>
+    </message>
+    <message>
+        <source>Load alarms</source>
+        <translation type="vanished">Luchdaich a-nuas alarms</translation>
+    </message>
+    <message>
+        <source>Changes Event Button Palettes</source>
+        <translation type="vanished">Ag atharrachadh Palettes Putan Tachartas</translation>
+    </message>
+    <message>
+        <source>Application ScreenShot</source>
+        <translation type="vanished">Glacadh-sgrìn aplacaid</translation>
+    </message>
+    <message>
+        <source>Desktop ScreenShot</source>
+        <translation type="vanished">Glacadh-sgrìn Deasg</translation>
+    </message>
+    <message>
+        <source>Click on timer
+Expert mode</source>
+        <translation type="vanished">Briog air an timer
+Modh eòlach</translation>
+    </message>
+    <message>
+        <source>OPTION Tools&gt;&gt;Simulator [Mac]
+ALT Tools&gt;&gt;Simulator [Win]
+Expert mode</source>
+        <translation type="vanished">Innealan ROGHAINN &gt;&gt; Simulator [Mac]
+Innealan ALT &gt;&gt; Simulator [Win]
+Modh eòlaiche</translation>
+    </message>
+    <message>
+        <source>Graph/Simulator
+[Expert mode]</source>
+        <translation type="vanished">Graf/Samhlaiche
+[Modh eòlaiche]</translation>
+    </message>
+    <message>
+        <source>Graph/Simulator</source>
+        <translation type="vanished">Graf/Simuladair</translation>
+    </message>
+    <message>
+        <source>Config</source>
+        <translation type="vanished">Rèiteachadh</translation>
+    </message>
+    <message>
+        <source>Tools</source>
+        <translation type="vanished">Innealan</translation>
+    </message>
+    <message>
         <source>Change roast event key focus</source>
         <translation type="vanished">Atharraich prìomh fhòcas tachartas ròsta</translation>
     </message>
@@ -11386,18 +11455,8 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
 Feumaidh ath-ghoiridean meur-chlàr a bhith à comas (ENTER)</translation>
     </message>
     <message>
-        <source>Click on timer</source>
-        <translation type="vanished">Cliog air timer</translation>
-    </message>
-    <message>
         <source>Simulator speed may be changd while paused (hold shift  (1x), OPTION/ALT (2x) or COMMAND/CTRL (4x) on restart).</source>
         <translation type="vanished">Faodar astar simuladair atharrachadh fhad ‘s a tha e air a stad (cùm shift (1x), OPTION / ALT (2x) no COMMAND / CTRL (4x) nuair a thèid ath-thòiseachadh).</translation>
-    </message>
-    <message>
-        <source>OPTION Tools&gt;&gt;Simulator [Mac]
-ALT Tools&gt;&gt;Simulator [Win]</source>
-        <translation type="vanished">Innealan ROGHA &gt;&gt; Simulator [Mac]
-Innealan ALT &gt;&gt; Simulator [Win]</translation>
     </message>
     <message>
         <source>&lt;button number&gt;</source>
@@ -15361,8 +15420,8 @@ Dèan a-rithist an gnìomh aig an deireadh: {0}</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2487" />
-        <source>Recomended Mode = 0</source>
-        <translation>Modh air a mholadh = 0</translation>
+        <source>Recommended Mode = 0</source>
+        <translation>Modh a thathar a’ moladh = 0</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2488" />
@@ -17759,6 +17818,10 @@ Pròifil a dhìth [CHARGE] no [DROP]</translation>
         <location filename="../plus/schedule.py" line="3644" />
         <source>Fetching completed roast properties failed</source>
         <translation>Dh'fhàillig le bhith a' faighinn thogalaichean ròsta crìochnaichte</translation>
+    </message>
+    <message>
+        <source>Recomended Mode = 0</source>
+        <translation type="vanished">Modh air a mholadh = 0</translation>
     </message>
     <message>
         <source>Empty path or box unchecked in Autosave</source>

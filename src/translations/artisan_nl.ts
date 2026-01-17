@@ -6918,8 +6918,10 @@ Wanneer Meter=NONE wordt een dialoogvenster geopend om handmatig de temperatuur 
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="38" />
-        <source>Toggle Playback Events</source>
-        <translation>Toggle Afspeelgebeurtenissen</translation>
+        <source>Toggle Playback Events
+(Expert and Standard modes)</source>
+        <translation>Afspeelgebeurtenissen in-/uitschakelen
+(Expert- en standaardmodus)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="39" />
@@ -6943,23 +6945,31 @@ Wanneer Meter=NONE wordt een dialoogvenster geopend om handmatig de temperatuur 
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="43" />
-        <source>Load alarms</source>
-        <translation>Laad alarmen</translation>
+        <source>Load alarms
+(Expert and Standard modes)</source>
+        <translation>Belastingsalarmen
+(Expert- en standaardmodus)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="44" />
-        <source>Changes Event Button Palettes</source>
-        <translation>Wijzigt gebeurtenisknoppenpaletten</translation>
+        <source>Changes Event Button Palettes
+(Can be disabled or enabled in Expert mode Config&gt;&gt; Events&gt;&gt; Palettes&gt;&gt; Switch Using Number Keys and Cmd)</source>
+        <translation>Wijzigingen in de paletweergave van de gebeurtenisknoppen
+(Kan worden in- of uitgeschakeld in de expertmodus: Config &gt;&gt; Gebeurtenissen &gt;&gt; Paletten &gt;&gt; Schakelen met cijfertoetsen en Cmd)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="45" />
-        <source>Application ScreenShot</source>
-        <translation>Applicatie Screenshot</translation>
+        <source>Application ScreenShot
+(Expert and Standard modes)</source>
+        <translation>Schermafbeelding van de applicatie
+(Expert- en standaardmodus)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="46" />
-        <source>Desktop ScreenShot</source>
-        <translation>Schermafdruk van bureaublad</translation>
+        <source>Desktop ScreenShot
+(Expert and Standard modes)</source>
+        <translation>Schermafbeelding van het bureaublad
+(Expert- en standaardmodus)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="47" />
@@ -7421,15 +7431,15 @@ Toetsenbordsneltoetsen moeten zijn uitgeschakeld (ENTER)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
-        <source>Click on timer
-Expert mode</source>
-        <translation>Klik op de timer
-Expertmodus</translation>
+        <source>Click on timer</source>
+        <translation>Klik op timer</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
-        <source>Simulator</source>
-        <translation type="unfinished" />
+        <source>Simulator
+(Expert mode)</source>
+        <translation>Simulator
+(Expertmodus)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
@@ -7444,18 +7454,17 @@ Expertmodus</translation>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
         <source>OPTION Tools&gt;&gt;Simulator [Mac]
-ALT Tools&gt;&gt;Simulator [Win]
-Expert mode</source>
-        <translation>OPTIE-hulpmiddelen &gt;&gt; Simulator [Mac]
-ALT-hulpmiddelen &gt;&gt; Simulator [Win]
-Expertmodus</translation>
+ALT Tools&gt;&gt;Simulator [Win]</source>
+        <translation>OPTIE Extra&gt;&gt;Simulator [Mac]
+ALT-tools&gt;&gt;Simulator [Winnen]</translation>
     </message>
     <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="89" />
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
         <source>Graph/Simulator
-[Expert mode]</source>
+(Expert mode)</source>
         <translation>Grafiek/Simulator
-[Expertmodus]</translation>
+(Expertmodus)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
@@ -7471,11 +7480,6 @@ CTRL-tools&gt;&gt;Simulator [Winnen]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="89" />
-        <source>Graph/Simulator</source>
-        <translation>Grafiek/Simulator</translation>
-    </message>
-    <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="89" />
         <source>Start or change Simulator speed to 4x mode</source>
         <translation>Start of wijzig de snelheid van de simulator in de 4x-modus</translation>
     </message>
@@ -7487,14 +7491,11 @@ CTRL+L [Win]</source>
 CTRL+L [Winnen]</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="95" />
-        <location filename="../help/keyboardshortcuts_help.py" line="94" />
-        <location filename="../help/keyboardshortcuts_help.py" line="93" />
-        <location filename="../help/keyboardshortcuts_help.py" line="92" />
-        <location filename="../help/keyboardshortcuts_help.py" line="91" />
         <location filename="../help/keyboardshortcuts_help.py" line="90" />
-        <source>Roast Properties Roast tab</source>
-        <translation>Eigenschappen braadstuk Tabblad Braadstuk</translation>
+        <source>Roast Properties Roast tab
+(Expert and Standard modes)</source>
+        <translation>Roostereigenschappen Tabblad Roosteren
+(Expert- en Standaardmodus)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="90" />
@@ -7507,6 +7508,15 @@ CTRL+L [Winnen]</translation>
 ALT click Stock [Win]</source>
         <translation>OPTIE klik op Stock [Mac]
 ALT klik op Stock [Winnen]</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="95" />
+        <location filename="../help/keyboardshortcuts_help.py" line="94" />
+        <location filename="../help/keyboardshortcuts_help.py" line="93" />
+        <location filename="../help/keyboardshortcuts_help.py" line="92" />
+        <location filename="../help/keyboardshortcuts_help.py" line="91" />
+        <source>Roast Properties Roast tab</source>
+        <translation>Eigenschappen braadstuk Tabblad Braadstuk</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="91" />
@@ -7771,7 +7781,6 @@ Houd Shift+Alt [Win] ingedrukt</translation>
         <translation type="unfinished">Plakken</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="120" />
         <location filename="../help/keyboardshortcuts_help.py" line="119" />
         <location filename="../help/keyboardshortcuts_help.py" line="118" />
         <source>Roast</source>
@@ -7789,17 +7798,23 @@ Houd Shift+Alt [Win] ingedrukt</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="120" />
+        <source>Roast
+(Expert and Standard modes)</source>
+        <translation>Roosteren
+(Expert- en standaardmodus)</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="120" />
         <source>Switch Profiles (Foreground&lt;=&gt;Background)</source>
         <translation>Schakel tussen profielen (voorgrond&lt;=&gt;achtergrond)</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="125" />
-        <location filename="../help/keyboardshortcuts_help.py" line="124" />
-        <location filename="../help/keyboardshortcuts_help.py" line="123" />
         <location filename="../help/keyboardshortcuts_help.py" line="122" />
         <location filename="../help/keyboardshortcuts_help.py" line="121" />
-        <source>Config</source>
-        <translation>configuratie</translation>
+        <source>Config
+(Expert mode)</source>
+        <translation>Configuratie
+(Expertmodus)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="121" />
@@ -7810,6 +7825,15 @@ Houd Shift+Alt [Win] ingedrukt</translation>
         <location filename="../help/keyboardshortcuts_help.py" line="122" />
         <source>Open Curves dialog</source>
         <translation>Open het dialoogvenster Curven</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="125" />
+        <location filename="../help/keyboardshortcuts_help.py" line="124" />
+        <location filename="../help/keyboardshortcuts_help.py" line="123" />
+        <source>Config
+(Expert and Standard modes)</source>
+        <translation>Configuratie
+(Expert- en standaardmodus)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="123" />
@@ -7829,8 +7853,10 @@ Houd Shift+Alt [Win] ingedrukt</translation>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="127" />
         <location filename="../help/keyboardshortcuts_help.py" line="126" />
-        <source>Tools</source>
-        <translation type="unfinished">Hulpmiddelen</translation>
+        <source>Tools
+(Expert mode)</source>
+        <translation>Gereedschap
+(Expertmodus)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="126" />
@@ -11344,6 +11370,58 @@ Door wiskundige formules in de plotter te gebruiken, kunnen ook de symbolische v
         <translation>F1 verwijst naar het vorige resultaat van de eigenlijke formule om een feedbacklus te realiseren. Dit is handig bij filterontwerpen. Evenzo verwijst F2 naar het tweede vorige resultaat enz.</translation>
     </message>
     <message>
+        <source>Toggle Playback Events</source>
+        <translation type="vanished">Toggle Afspeelgebeurtenissen</translation>
+    </message>
+    <message>
+        <source>Load alarms</source>
+        <translation type="vanished">Laad alarmen</translation>
+    </message>
+    <message>
+        <source>Changes Event Button Palettes</source>
+        <translation type="vanished">Wijzigt gebeurtenisknoppenpaletten</translation>
+    </message>
+    <message>
+        <source>Application ScreenShot</source>
+        <translation type="vanished">Applicatie Screenshot</translation>
+    </message>
+    <message>
+        <source>Desktop ScreenShot</source>
+        <translation type="vanished">Schermafdruk van bureaublad</translation>
+    </message>
+    <message>
+        <source>Click on timer
+Expert mode</source>
+        <translation type="vanished">Klik op de timer
+Expertmodus</translation>
+    </message>
+    <message>
+        <source>OPTION Tools&gt;&gt;Simulator [Mac]
+ALT Tools&gt;&gt;Simulator [Win]
+Expert mode</source>
+        <translation type="vanished">OPTIE-hulpmiddelen &gt;&gt; Simulator [Mac]
+ALT-hulpmiddelen &gt;&gt; Simulator [Win]
+Expertmodus</translation>
+    </message>
+    <message>
+        <source>Graph/Simulator
+[Expert mode]</source>
+        <translation type="vanished">Grafiek/Simulator
+[Expertmodus]</translation>
+    </message>
+    <message>
+        <source>Graph/Simulator</source>
+        <translation type="vanished">Grafiek/Simulator</translation>
+    </message>
+    <message>
+        <source>Config</source>
+        <translation type="vanished">configuratie</translation>
+    </message>
+    <message>
+        <source>Tools</source>
+        <translation type="vanished">Hulpmiddelen</translation>
+    </message>
+    <message>
         <source>Change roast event key focus</source>
         <translation type="vanished">Verander de belangrijkste focus van het gebraden evenement</translation>
     </message>
@@ -11384,18 +11462,8 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
 Sneltoetsen moeten zijn uitgeschakeld (ENTER)</translation>
     </message>
     <message>
-        <source>Click on timer</source>
-        <translation type="vanished">Klik op timer</translation>
-    </message>
-    <message>
         <source>Simulator speed may be changd while paused (hold shift  (1x), OPTION/ALT (2x) or COMMAND/CTRL (4x) on restart).</source>
         <translation type="vanished">De snelheid van de simulator kan worden gewijzigd terwijl deze is gepauzeerd (houd shift (1x), OPTION/ALT (2x) of COMMAND/CTRL (4x) ingedrukt bij opnieuw opstarten).</translation>
-    </message>
-    <message>
-        <source>OPTION Tools&gt;&gt;Simulator [Mac]
-ALT Tools&gt;&gt;Simulator [Win]</source>
-        <translation type="vanished">OPTIE Extra&gt;&gt;Simulator [Mac]
-ALT-tools&gt;&gt;Simulator [Winnen]</translation>
     </message>
     <message>
         <source>&lt;button number&gt;</source>
@@ -15355,7 +15423,7 @@ Herhaal bewerking aan het einde: {0}</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2487" />
-        <source>Recomended Mode = 0</source>
+        <source>Recommended Mode = 0</source>
         <translation>Aanbevolen modus = 0</translation>
     </message>
     <message>
@@ -17753,6 +17821,10 @@ Profiel ontbreekt [CHARGE] of [DROP]</translation>
         <location filename="../plus/schedule.py" line="3644" />
         <source>Fetching completed roast properties failed</source>
         <translation>Het ophalen van voltooide braadeigenschappen is mislukt</translation>
+    </message>
+    <message>
+        <source>Recomended Mode = 0</source>
+        <translation type="vanished">Aanbevolen modus = 0</translation>
     </message>
     <message>
         <source>Empty path or box unchecked in Autosave</source>

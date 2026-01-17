@@ -6908,8 +6908,10 @@ When Meter=NONE opens dialog to manually enter temperatures during roast</source
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="38" />
-        <source>Toggle Playback Events</source>
-        <translation>Εναλλαγή συμβάντων αναπαραγωγής</translation>
+        <source>Toggle Playback Events
+(Expert and Standard modes)</source>
+        <translation>Εναλλαγή συμβάντων αναπαραγωγής
+(Λειτουργίες Expert και Standard)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="39" />
@@ -6933,23 +6935,31 @@ When Meter=NONE opens dialog to manually enter temperatures during roast</source
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="43" />
-        <source>Load alarms</source>
-        <translation>Φόρτωση συναγερμών</translation>
+        <source>Load alarms
+(Expert and Standard modes)</source>
+        <translation>Φόρτωση συναγερμών
+(Λειτουργίες Expert και Standard)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="44" />
-        <source>Changes Event Button Palettes</source>
-        <translation>Αλλαγές παλετών κουμπιών συμβάντων</translation>
+        <source>Changes Event Button Palettes
+(Can be disabled or enabled in Expert mode Config&gt;&gt; Events&gt;&gt; Palettes&gt;&gt; Switch Using Number Keys and Cmd)</source>
+        <translation>Αλλαγές στις Παλέτες Κουμπιών Συμβάντων
+(Μπορεί να απενεργοποιηθεί ή να ενεργοποιηθεί σε λειτουργία Ειδικού Διαμόρφωση&gt;&gt; Συμβάντα&gt;&gt; Παλέτες&gt;&gt; Εναλλαγή με χρήση Αριθμητικών Πλήκτρων και Cmd)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="45" />
-        <source>Application ScreenShot</source>
-        <translation>Εφαρμογή ScreenShot</translation>
+        <source>Application ScreenShot
+(Expert and Standard modes)</source>
+        <translation>Στιγμιότυπο οθόνης εφαρμογής
+(Λειτουργίες Expert και Standard)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="46" />
-        <source>Desktop ScreenShot</source>
-        <translation>Στιγμιότυπο οθόνης επιφάνειας εργασίας</translation>
+        <source>Desktop ScreenShot
+(Expert and Standard modes)</source>
+        <translation>Στιγμιότυπο οθόνης επιφάνειας εργασίας
+(Λειτουργίες Expert και Standard)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="47" />
@@ -7413,15 +7423,15 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
-        <source>Click on timer
-Expert mode</source>
-        <translation>Κάντε κλικ στο χρονόμετρο
-Λειτουργία ειδικού</translation>
+        <source>Click on timer</source>
+        <translation>Κάντε κλικ στο χρονόμετρο</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
-        <source>Simulator</source>
-        <translation>Προσομοιωτής</translation>
+        <source>Simulator
+(Expert mode)</source>
+        <translation>Προσομοιωτής
+(Λειτουργία ειδικού)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
@@ -7436,18 +7446,17 @@ Expert mode</source>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
         <source>OPTION Tools&gt;&gt;Simulator [Mac]
-ALT Tools&gt;&gt;Simulator [Win]
-Expert mode</source>
-        <translation>ΕΠΙΛΟΓΗ Εργαλεία&gt;&gt;Προσομοιωτής [Mac]
-Εργαλεία ALT&gt;&gt;Προσομοιωτής [Win]
-Λειτουργία ειδικού</translation>
+ALT Tools&gt;&gt;Simulator [Win]</source>
+        <translation>OPTION Εργαλεία&gt;&gt;Προσομοιωτής [Mac]
+ALT Εργαλεία&gt;&gt;Προσομοιωτής [Win]</translation>
     </message>
     <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="89" />
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
         <source>Graph/Simulator
-[Expert mode]</source>
+(Expert mode)</source>
         <translation>Γράφημα/Προσομοιωτής
-[Λειτουργία ειδικού]</translation>
+(Λειτουργία ειδικού)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
@@ -7463,11 +7472,6 @@ CTRL Tools&gt;&gt;Simulator [Win]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="89" />
-        <source>Graph/Simulator</source>
-        <translation>Γράφημα/Προομοιωτής</translation>
-    </message>
-    <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="89" />
         <source>Start or change Simulator speed to 4x mode</source>
         <translation>Εκκινήστε ή αλλάξτε την ταχύτητα του προσομοιωτή σε λειτουργία 4x</translation>
     </message>
@@ -7479,14 +7483,11 @@ CTRL+L [Win]</source>
 CTRL+L [Νίκη]</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="95" />
-        <location filename="../help/keyboardshortcuts_help.py" line="94" />
-        <location filename="../help/keyboardshortcuts_help.py" line="93" />
-        <location filename="../help/keyboardshortcuts_help.py" line="92" />
-        <location filename="../help/keyboardshortcuts_help.py" line="91" />
         <location filename="../help/keyboardshortcuts_help.py" line="90" />
-        <source>Roast Properties Roast tab</source>
-        <translation>Ιδιότητες ψησίματος Καρτέλα ψητού</translation>
+        <source>Roast Properties Roast tab
+(Expert and Standard modes)</source>
+        <translation>Ιδιότητες ψησίματος Καρτέλα ψησίματος
+(Λειτουργίες Expert και Standard)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="90" />
@@ -7499,6 +7500,15 @@ CTRL+L [Νίκη]</translation>
 ALT click Stock [Win]</source>
         <translation>OPTION κάντε κλικ στο Stock [Mac]
 ALT κλικ Μετοχή [Νίκη]</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="95" />
+        <location filename="../help/keyboardshortcuts_help.py" line="94" />
+        <location filename="../help/keyboardshortcuts_help.py" line="93" />
+        <location filename="../help/keyboardshortcuts_help.py" line="92" />
+        <location filename="../help/keyboardshortcuts_help.py" line="91" />
+        <source>Roast Properties Roast tab</source>
+        <translation>Ιδιότητες ψησίματος Καρτέλα ψητού</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="91" />
@@ -7763,7 +7773,6 @@ Hold Shift+Alt [Win]</source>
         <translation>Επικολληση</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="120" />
         <location filename="../help/keyboardshortcuts_help.py" line="119" />
         <location filename="../help/keyboardshortcuts_help.py" line="118" />
         <source>Roast</source>
@@ -7781,17 +7790,23 @@ Hold Shift+Alt [Win]</source>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="120" />
+        <source>Roast
+(Expert and Standard modes)</source>
+        <translation>Ψήσιμο
+(Λειτουργίες Expert και Standard)</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="120" />
         <source>Switch Profiles (Foreground&lt;=&gt;Background)</source>
         <translation>Εναλλαγή προφίλ (Προσκηνίου&lt;=&gt;Φόντο)</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="125" />
-        <location filename="../help/keyboardshortcuts_help.py" line="124" />
-        <location filename="../help/keyboardshortcuts_help.py" line="123" />
         <location filename="../help/keyboardshortcuts_help.py" line="122" />
         <location filename="../help/keyboardshortcuts_help.py" line="121" />
-        <source>Config</source>
-        <translation>Διαμορφωση</translation>
+        <source>Config
+(Expert mode)</source>
+        <translation>Διαμόρφωση
+(Λειτουργία ειδικού)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="121" />
@@ -7802,6 +7817,15 @@ Hold Shift+Alt [Win]</source>
         <location filename="../help/keyboardshortcuts_help.py" line="122" />
         <source>Open Curves dialog</source>
         <translation>Άνοιγμα διαλόγου Καμπύλες</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="125" />
+        <location filename="../help/keyboardshortcuts_help.py" line="124" />
+        <location filename="../help/keyboardshortcuts_help.py" line="123" />
+        <source>Config
+(Expert and Standard modes)</source>
+        <translation>Διαμόρφωση
+(Λειτουργίες Expert και Standard)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="123" />
@@ -7821,8 +7845,10 @@ Hold Shift+Alt [Win]</source>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="127" />
         <location filename="../help/keyboardshortcuts_help.py" line="126" />
-        <source>Tools</source>
-        <translation>Εργαλεια</translation>
+        <source>Tools
+(Expert mode)</source>
+        <translation>Εργαλεία
+(Λειτουργία ειδικού)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="126" />
@@ -11336,6 +11362,62 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
         <translation>Το F1 αναφέρεται στο προηγούμενο αποτέλεσμα του πραγματικού τύπου για την πραγματοποίηση ενός βρόχου ανατροφοδότησης. Αυτό είναι χρήσιμο σε σχέδια φίλτρων. Ομοίως, το F2 αναφέρεται στο δεύτερο προηγούμενο αποτέλεσμα κ.λπ.</translation>
     </message>
     <message>
+        <source>Toggle Playback Events</source>
+        <translation type="vanished">Εναλλαγή συμβάντων αναπαραγωγής</translation>
+    </message>
+    <message>
+        <source>Load alarms</source>
+        <translation type="vanished">Φόρτωση συναγερμών</translation>
+    </message>
+    <message>
+        <source>Changes Event Button Palettes</source>
+        <translation type="vanished">Αλλαγές παλετών κουμπιών συμβάντων</translation>
+    </message>
+    <message>
+        <source>Application ScreenShot</source>
+        <translation type="vanished">Εφαρμογή ScreenShot</translation>
+    </message>
+    <message>
+        <source>Desktop ScreenShot</source>
+        <translation type="vanished">Στιγμιότυπο οθόνης επιφάνειας εργασίας</translation>
+    </message>
+    <message>
+        <source>Click on timer
+Expert mode</source>
+        <translation type="vanished">Κάντε κλικ στο χρονόμετρο
+Λειτουργία ειδικού</translation>
+    </message>
+    <message>
+        <source>Simulator</source>
+        <translation type="vanished">Προσομοιωτής</translation>
+    </message>
+    <message>
+        <source>OPTION Tools&gt;&gt;Simulator [Mac]
+ALT Tools&gt;&gt;Simulator [Win]
+Expert mode</source>
+        <translation type="vanished">ΕΠΙΛΟΓΗ Εργαλεία&gt;&gt;Προσομοιωτής [Mac]
+Εργαλεία ALT&gt;&gt;Προσομοιωτής [Win]
+Λειτουργία ειδικού</translation>
+    </message>
+    <message>
+        <source>Graph/Simulator
+[Expert mode]</source>
+        <translation type="vanished">Γράφημα/Προσομοιωτής
+[Λειτουργία ειδικού]</translation>
+    </message>
+    <message>
+        <source>Graph/Simulator</source>
+        <translation type="vanished">Γράφημα/Προομοιωτής</translation>
+    </message>
+    <message>
+        <source>Config</source>
+        <translation type="vanished">Διαμορφωση</translation>
+    </message>
+    <message>
+        <source>Tools</source>
+        <translation type="vanished">Εργαλεια</translation>
+    </message>
+    <message>
         <source>Change roast event key focus</source>
         <translation type="vanished">Αλλαγή βασικής εστίασης συμβάντος ψησίματος</translation>
     </message>
@@ -11374,10 +11456,6 @@ Keyboard Shortcuts must be turned off (ENTER)</source>
 Keyboard Shortcuts must be disabled (ENTER)</source>
         <translation type="vanished">Απαιτεί τον έλεγχο πληκτρολογίου ενεργοποιημένο στο Config&gt;&gt; Events
 Οι συντομεύσεις πληκτρολογίου πρέπει να είναι απενεργοποιημένες (ENTER)</translation>
-    </message>
-    <message>
-        <source>Click on timer</source>
-        <translation type="vanished">Κάντε κλικ στο χρονόμετρο</translation>
     </message>
     <message>
         <source>Simulator speed may be changd while paused (hold shift  (1x), OPTION/ALT (2x) or COMMAND/CTRL (4x) on restart).</source>
@@ -15345,8 +15423,8 @@ Repeat Operation at the end: {0}</source>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2487" />
-        <source>Recomended Mode = 0</source>
-        <translation>Συνιστωμενι θεση = 0</translation>
+        <source>Recommended Mode = 0</source>
+        <translation>Συνιστώμενη λειτουργία = 0</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2488" />
@@ -17742,6 +17820,10 @@ Profile missing [CHARGE] or [DROP]</source>
         <location filename="../plus/schedule.py" line="3644" />
         <source>Fetching completed roast properties failed</source>
         <translation>Η ανάκτηση ολοκληρωμένων ιδιοτήτων ψητού απέτυχε</translation>
+    </message>
+    <message>
+        <source>Recomended Mode = 0</source>
+        <translation type="vanished">Συνιστωμενι θεση = 0</translation>
     </message>
     <message>
         <source>Empty path or box unchecked in Autosave</source>

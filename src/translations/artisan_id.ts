@@ -6920,8 +6920,10 @@ Ketika Meter=NONE membuka dialog untuk memasukkan suhu secara manual selama pema
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="38" />
-        <source>Toggle Playback Events</source>
-        <translation>Beralih Acara Pemutaran</translation>
+        <source>Toggle Playback Events
+(Expert and Standard modes)</source>
+        <translation>Alihkan Acara Pemutaran
+(Mode Pakar dan Standar)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="39" />
@@ -6945,23 +6947,31 @@ Ketika Meter=NONE membuka dialog untuk memasukkan suhu secara manual selama pema
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="43" />
-        <source>Load alarms</source>
-        <translation>Muat alarm</translation>
+        <source>Load alarms
+(Expert and Standard modes)</source>
+        <translation>Alarm beban
+(Mode Pakar dan Standar)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="44" />
-        <source>Changes Event Button Palettes</source>
-        <translation>Mengubah Palet Tombol Acara</translation>
+        <source>Changes Event Button Palettes
+(Can be disabled or enabled in Expert mode Config&gt;&gt; Events&gt;&gt; Palettes&gt;&gt; Switch Using Number Keys and Cmd)</source>
+        <translation>Mengubah Palet Tombol Acara
+(Dapat dinonaktifkan atau diaktifkan dalam mode Pakar Config&gt;&gt; Events&gt;&gt; Palettes&gt;&gt; Switch Menggunakan Tombol Angka dan Cmd)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="45" />
-        <source>Application ScreenShot</source>
-        <translation>Tangkapan Layar Aplikasi</translation>
+        <source>Application ScreenShot
+(Expert and Standard modes)</source>
+        <translation>Tangkapan Layar Aplikasi
+(Mode Pakar dan Standar)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="46" />
-        <source>Desktop ScreenShot</source>
-        <translation>Tangkapan Layar Desktop</translation>
+        <source>Desktop ScreenShot
+(Expert and Standard modes)</source>
+        <translation>Tangkapan Layar Desktop
+(Mode Pakar dan Standar)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="47" />
@@ -7425,15 +7435,15 @@ Pintasan Keyboard harus dinonaktifkan (ENTER)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
-        <source>Click on timer
-Expert mode</source>
-        <translation>Klik pada pengatur waktu
-Mode ahli</translation>
+        <source>Click on timer</source>
+        <translation>Klik pengatur waktu</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
-        <source>Simulator</source>
-        <translation>Simulasi</translation>
+        <source>Simulator
+(Expert mode)</source>
+        <translation>Simulator
+(Mode ahli)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
@@ -7448,18 +7458,17 @@ Mode ahli</translation>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
         <source>OPTION Tools&gt;&gt;Simulator [Mac]
-ALT Tools&gt;&gt;Simulator [Win]
-Expert mode</source>
-        <translation>OPTION Alat&gt;&gt;Simulator [Mac]
-ALT Alat&gt;&gt;Simulator [Win]
-Mode Pakar</translation>
+ALT Tools&gt;&gt;Simulator [Win]</source>
+        <translation>Alat PILIHAN&gt;&gt;Simulator [Mac]
+Alat ALT&gt;&gt;Simulator [Menang]</translation>
     </message>
     <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="89" />
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
         <source>Graph/Simulator
-[Expert mode]</source>
+(Expert mode)</source>
         <translation>Grafik/Simulator
-[Mode Pakar]</translation>
+(Mode Pakar)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
@@ -7475,11 +7484,6 @@ Alat CTRL&gt;&gt;Simulator [Menang]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="89" />
-        <source>Graph/Simulator</source>
-        <translation>Grafik/Simulator</translation>
-    </message>
-    <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="89" />
         <source>Start or change Simulator speed to 4x mode</source>
         <translation>Mulai atau ubah kecepatan Simulator ke mode 4x</translation>
     </message>
@@ -7491,14 +7495,11 @@ CTRL+L [Win]</source>
 CTRL+L [Menang]</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="95" />
-        <location filename="../help/keyboardshortcuts_help.py" line="94" />
-        <location filename="../help/keyboardshortcuts_help.py" line="93" />
-        <location filename="../help/keyboardshortcuts_help.py" line="92" />
-        <location filename="../help/keyboardshortcuts_help.py" line="91" />
         <location filename="../help/keyboardshortcuts_help.py" line="90" />
-        <source>Roast Properties Roast tab</source>
-        <translation>Tab Roast Properties</translation>
+        <source>Roast Properties Roast tab
+(Expert and Standard modes)</source>
+        <translation>Properti Pemanggangan Tab Pemanggangan
+(Mode Pakar dan Standar)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="90" />
@@ -7511,6 +7512,15 @@ CTRL+L [Menang]</translation>
 ALT click Stock [Win]</source>
         <translation>PILIHAN klik Stock [Mac]
 ALT klik Saham [Menang]</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="95" />
+        <location filename="../help/keyboardshortcuts_help.py" line="94" />
+        <location filename="../help/keyboardshortcuts_help.py" line="93" />
+        <location filename="../help/keyboardshortcuts_help.py" line="92" />
+        <location filename="../help/keyboardshortcuts_help.py" line="91" />
+        <source>Roast Properties Roast tab</source>
+        <translation>Tab Roast Properties</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="91" />
@@ -7775,7 +7785,6 @@ Tahan Shift+Alt [Menang]</translation>
         <translation type="unfinished">Tempel</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="120" />
         <location filename="../help/keyboardshortcuts_help.py" line="119" />
         <location filename="../help/keyboardshortcuts_help.py" line="118" />
         <source>Roast</source>
@@ -7793,17 +7802,23 @@ Tahan Shift+Alt [Menang]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="120" />
+        <source>Roast
+(Expert and Standard modes)</source>
+        <translation>Panggang
+(Mode Pakar dan Standar)</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="120" />
         <source>Switch Profiles (Foreground&lt;=&gt;Background)</source>
         <translation>Ganti Profil (Latar Depan&lt;=&gt;Latar Belakang)</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="125" />
-        <location filename="../help/keyboardshortcuts_help.py" line="124" />
-        <location filename="../help/keyboardshortcuts_help.py" line="123" />
         <location filename="../help/keyboardshortcuts_help.py" line="122" />
         <location filename="../help/keyboardshortcuts_help.py" line="121" />
-        <source>Config</source>
-        <translation type="unfinished">Konfigurasi</translation>
+        <source>Config
+(Expert mode)</source>
+        <translation>Konfigurasi
+(Mode Pakar)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="121" />
@@ -7814,6 +7829,15 @@ Tahan Shift+Alt [Menang]</translation>
         <location filename="../help/keyboardshortcuts_help.py" line="122" />
         <source>Open Curves dialog</source>
         <translation>Buka dialog Kurva</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="125" />
+        <location filename="../help/keyboardshortcuts_help.py" line="124" />
+        <location filename="../help/keyboardshortcuts_help.py" line="123" />
+        <source>Config
+(Expert and Standard modes)</source>
+        <translation>Konfigurasi
+(Mode Pakar dan Standar)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="123" />
@@ -7833,8 +7857,10 @@ Tahan Shift+Alt [Menang]</translation>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="127" />
         <location filename="../help/keyboardshortcuts_help.py" line="126" />
-        <source>Tools</source>
-        <translation type="unfinished">Perlengkapan</translation>
+        <source>Tools
+(Expert mode)</source>
+        <translation>Alat
+(Mode Pakar)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="126" />
@@ -11348,6 +11374,62 @@ Menggunakan rumus matematika di plotter juga memungkinkan untuk menggunakan vari
         <translation>F1 mengacu pada hasil sebelumnya dari rumus aktual untuk mewujudkan loop umpan balik. Ini berguna dalam desain filter. Demikian pula, F2 mengacu pada hasil kedua sebelumnya, dll.</translation>
     </message>
     <message>
+        <source>Toggle Playback Events</source>
+        <translation type="vanished">Beralih Acara Pemutaran</translation>
+    </message>
+    <message>
+        <source>Load alarms</source>
+        <translation type="vanished">Muat alarm</translation>
+    </message>
+    <message>
+        <source>Changes Event Button Palettes</source>
+        <translation type="vanished">Mengubah Palet Tombol Acara</translation>
+    </message>
+    <message>
+        <source>Application ScreenShot</source>
+        <translation type="vanished">Tangkapan Layar Aplikasi</translation>
+    </message>
+    <message>
+        <source>Desktop ScreenShot</source>
+        <translation type="vanished">Tangkapan Layar Desktop</translation>
+    </message>
+    <message>
+        <source>Click on timer
+Expert mode</source>
+        <translation type="vanished">Klik pada pengatur waktu
+Mode ahli</translation>
+    </message>
+    <message>
+        <source>Simulator</source>
+        <translation type="vanished">Simulasi</translation>
+    </message>
+    <message>
+        <source>OPTION Tools&gt;&gt;Simulator [Mac]
+ALT Tools&gt;&gt;Simulator [Win]
+Expert mode</source>
+        <translation type="vanished">OPTION Alat&gt;&gt;Simulator [Mac]
+ALT Alat&gt;&gt;Simulator [Win]
+Mode Pakar</translation>
+    </message>
+    <message>
+        <source>Graph/Simulator
+[Expert mode]</source>
+        <translation type="vanished">Grafik/Simulator
+[Mode Pakar]</translation>
+    </message>
+    <message>
+        <source>Graph/Simulator</source>
+        <translation type="vanished">Grafik/Simulator</translation>
+    </message>
+    <message>
+        <source>Config</source>
+        <translation type="vanished">Konfigurasi</translation>
+    </message>
+    <message>
+        <source>Tools</source>
+        <translation type="vanished">Perlengkapan</translation>
+    </message>
+    <message>
         <source>Change roast event key focus</source>
         <translation type="vanished">Ubah fokus utama acara sangrai</translation>
     </message>
@@ -11388,18 +11470,8 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
 Pintasan Keyboard harus dinonaktifkan (ENTER)</translation>
     </message>
     <message>
-        <source>Click on timer</source>
-        <translation type="vanished">Klik pengatur waktu</translation>
-    </message>
-    <message>
         <source>Simulator speed may be changd while paused (hold shift  (1x), OPTION/ALT (2x) or COMMAND/CTRL (4x) on restart).</source>
         <translation type="vanished">Kecepatan simulator mungkin berubah saat dijeda (tahan shift (1x), OPTION/ALT (2x) atau COMMAND/CTRL (4x) saat restart).</translation>
-    </message>
-    <message>
-        <source>OPTION Tools&gt;&gt;Simulator [Mac]
-ALT Tools&gt;&gt;Simulator [Win]</source>
-        <translation type="vanished">Alat PILIHAN&gt;&gt;Simulator [Mac]
-Alat ALT&gt;&gt;Simulator [Menang]</translation>
     </message>
     <message>
         <source>&lt;button number&gt;</source>
@@ -15363,8 +15435,8 @@ Ulangi Operasi di akhir: {0}</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2487" />
-        <source>Recomended Mode = 0</source>
-        <translation>Mode yang Direkomendasikan = 0</translation>
+        <source>Recommended Mode = 0</source>
+        <translation>Mode yang Disarankan = 0</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2488" />
@@ -17761,6 +17833,10 @@ Profil tidak ada [CHARGE] atau [DROP]</translation>
         <location filename="../plus/schedule.py" line="3644" />
         <source>Fetching completed roast properties failed</source>
         <translation>Gagal mengambil properti sangrai yang telah selesai</translation>
+    </message>
+    <message>
+        <source>Recomended Mode = 0</source>
+        <translation type="vanished">Mode yang Direkomendasikan = 0</translation>
     </message>
     <message>
         <source>Empty path or box unchecked in Autosave</source>

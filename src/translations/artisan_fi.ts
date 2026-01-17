@@ -6918,8 +6918,9 @@ Kun Mittari=EI MITÄÄN, avaa valintaikkunan lämpötilan syöttämiseksi manuaa
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="38" />
-        <source>Toggle Playback Events</source>
-        <translation>Toistotapahtumat päälle/pois</translation>
+        <source>Toggle Playback Events
+(Expert and Standard modes)</source>
+        <translation>Toistotapahtumien näyttäminen (asiantuntija- ja vakiotilat)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="39" />
@@ -6943,23 +6944,31 @@ Kun Mittari=EI MITÄÄN, avaa valintaikkunan lämpötilan syöttämiseksi manuaa
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="43" />
-        <source>Load alarms</source>
-        <translation>Lataa hälytyksiä</translation>
+        <source>Load alarms
+(Expert and Standard modes)</source>
+        <translation>Lataa hälytykset
+(Asiantuntija- ja Vakiotilat)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="44" />
-        <source>Changes Event Button Palettes</source>
-        <translation>Muuttaa tapahtumapainikepaletteja</translation>
+        <source>Changes Event Button Palettes
+(Can be disabled or enabled in Expert mode Config&gt;&gt; Events&gt;&gt; Palettes&gt;&gt; Switch Using Number Keys and Cmd)</source>
+        <translation>Muuttaa tapahtumapainikkeiden paletteja
+(Voidaan poistaa käytöstä tai ottaa käyttöön asiantuntijatilassa kohdassa Määritys&gt;&gt; Tapahtumat&gt;&gt; Paletit&gt;&gt; Vaihda numeronäppäimillä ja komentopainikkeella)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="45" />
-        <source>Application ScreenShot</source>
-        <translation>Sovelluksen kuvakaappaus</translation>
+        <source>Application ScreenShot
+(Expert and Standard modes)</source>
+        <translation>Sovelluksen näyttökuva
+(Asiantuntija- ja Vakiotilat)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="46" />
-        <source>Desktop ScreenShot</source>
-        <translation>Työpöydän kuvakaappaus</translation>
+        <source>Desktop ScreenShot
+(Expert and Standard modes)</source>
+        <translation>Työpöydän näyttökuva
+(Asiantuntija- ja Vakiotilat)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="47" />
@@ -7423,15 +7432,15 @@ Pikanäppäinten on oltava pois käytöstä (ENTER)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
-        <source>Click on timer
-Expert mode</source>
-        <translation>Napsauta ajastinta
-Asiantuntijatila</translation>
+        <source>Click on timer</source>
+        <translation>Napsauta ajastinta</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
-        <source>Simulator</source>
-        <translation type="unfinished">Simulaattori</translation>
+        <source>Simulator
+(Expert mode)</source>
+        <translation>Simulaattori
+(Asiantuntijatila)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
@@ -7446,18 +7455,17 @@ Asiantuntijatila</translation>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
         <source>OPTION Tools&gt;&gt;Simulator [Mac]
-ALT Tools&gt;&gt;Simulator [Win]
-Expert mode</source>
-        <translation>OPTION Työkalut &gt;&gt; Simulaattori [Mac]
-ALT Työkalut &gt;&gt; Simulaattori [Win]
-Asiantuntijatila</translation>
+ALT Tools&gt;&gt;Simulator [Win]</source>
+        <translation>OPTION Työkalut&gt;&gt; Simulaattori [Mac]
+ALT-työkalut&gt;&gt; Simulaattori [Win]</translation>
     </message>
     <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="89" />
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
         <source>Graph/Simulator
-[Expert mode]</source>
+(Expert mode)</source>
         <translation>Graafi/simulaattori
-[Asiantuntijatila]</translation>
+(Asiantuntijatila)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
@@ -7473,11 +7481,6 @@ CTRL-työkalut&gt;&gt; Simulaattori [Win]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="89" />
-        <source>Graph/Simulator</source>
-        <translation>Kaavio/simulaattori</translation>
-    </message>
-    <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="89" />
         <source>Start or change Simulator speed to 4x mode</source>
         <translation>Käynnistä tai muuta simulaattorin nopeus 4x-tilaan</translation>
     </message>
@@ -7489,14 +7492,10 @@ CTRL+L [Win]</source>
 CTRL+L [voitto]</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="95" />
-        <location filename="../help/keyboardshortcuts_help.py" line="94" />
-        <location filename="../help/keyboardshortcuts_help.py" line="93" />
-        <location filename="../help/keyboardshortcuts_help.py" line="92" />
-        <location filename="../help/keyboardshortcuts_help.py" line="91" />
         <location filename="../help/keyboardshortcuts_help.py" line="90" />
-        <source>Roast Properties Roast tab</source>
-        <translation>Roast Properties Roast-välilehti</translation>
+        <source>Roast Properties Roast tab
+(Expert and Standard modes)</source>
+        <translation>Paahdon ominaisuudet Paahtaus-välilehti (Asiantuntija- ja Vakiotilat)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="90" />
@@ -7509,6 +7508,15 @@ CTRL+L [voitto]</translation>
 ALT click Stock [Win]</source>
         <translation>OPTION napsauta Osake [Mac]
 ALT click Osake [voitto]</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="95" />
+        <location filename="../help/keyboardshortcuts_help.py" line="94" />
+        <location filename="../help/keyboardshortcuts_help.py" line="93" />
+        <location filename="../help/keyboardshortcuts_help.py" line="92" />
+        <location filename="../help/keyboardshortcuts_help.py" line="91" />
+        <source>Roast Properties Roast tab</source>
+        <translation>Roast Properties Roast-välilehti</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="91" />
@@ -7773,7 +7781,6 @@ Pidä Shift + Alt [Win]</translation>
         <translation type="unfinished">Liitä</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="120" />
         <location filename="../help/keyboardshortcuts_help.py" line="119" />
         <location filename="../help/keyboardshortcuts_help.py" line="118" />
         <source>Roast</source>
@@ -7791,17 +7798,23 @@ Pidä Shift + Alt [Win]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="120" />
+        <source>Roast
+(Expert and Standard modes)</source>
+        <translation>Paahto
+(Asiantunteva ja Vakio-tilat)</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="120" />
         <source>Switch Profiles (Foreground&lt;=&gt;Background)</source>
         <translation>Vaihda profiileja (etualalla&lt;=&gt;taustalla)</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="125" />
-        <location filename="../help/keyboardshortcuts_help.py" line="124" />
-        <location filename="../help/keyboardshortcuts_help.py" line="123" />
         <location filename="../help/keyboardshortcuts_help.py" line="122" />
         <location filename="../help/keyboardshortcuts_help.py" line="121" />
-        <source>Config</source>
-        <translation type="unfinished">Konfig</translation>
+        <source>Config
+(Expert mode)</source>
+        <translation>Määritys
+(Asiantuntijatila)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="121" />
@@ -7812,6 +7825,15 @@ Pidä Shift + Alt [Win]</translation>
         <location filename="../help/keyboardshortcuts_help.py" line="122" />
         <source>Open Curves dialog</source>
         <translation>Avaa Käyrät-valintaikkuna</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="125" />
+        <location filename="../help/keyboardshortcuts_help.py" line="124" />
+        <location filename="../help/keyboardshortcuts_help.py" line="123" />
+        <source>Config
+(Expert and Standard modes)</source>
+        <translation>Määritys
+(Asiantuntija- ja Vakiotilat)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="123" />
@@ -7831,8 +7853,10 @@ Pidä Shift + Alt [Win]</translation>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="127" />
         <location filename="../help/keyboardshortcuts_help.py" line="126" />
-        <source>Tools</source>
-        <translation type="unfinished">Työkalut</translation>
+        <source>Tools
+(Expert mode)</source>
+        <translation>Työkalut
+(Asiantuntijatila)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="126" />
@@ -11347,6 +11371,62 @@ Matemaattisten kaavojen käyttö plotterissa mahdollistaa myös symbolisten muut
         <translation>F1 viittaa todellisen kaavan edelliseen tulokseen takaisinkytkentäsilmukan toteuttamiseksi. Tästä on hyötyä suodatinmalleissa. Vastaavasti F2 viittaa toiseen edelliseen tulokseen jne.</translation>
     </message>
     <message>
+        <source>Toggle Playback Events</source>
+        <translation type="vanished">Toistotapahtumat päälle/pois</translation>
+    </message>
+    <message>
+        <source>Load alarms</source>
+        <translation type="vanished">Lataa hälytyksiä</translation>
+    </message>
+    <message>
+        <source>Changes Event Button Palettes</source>
+        <translation type="vanished">Muuttaa tapahtumapainikepaletteja</translation>
+    </message>
+    <message>
+        <source>Application ScreenShot</source>
+        <translation type="vanished">Sovelluksen kuvakaappaus</translation>
+    </message>
+    <message>
+        <source>Desktop ScreenShot</source>
+        <translation type="vanished">Työpöydän kuvakaappaus</translation>
+    </message>
+    <message>
+        <source>Click on timer
+Expert mode</source>
+        <translation type="vanished">Napsauta ajastinta
+Asiantuntijatila</translation>
+    </message>
+    <message>
+        <source>Simulator</source>
+        <translation type="vanished">Simulaattori</translation>
+    </message>
+    <message>
+        <source>OPTION Tools&gt;&gt;Simulator [Mac]
+ALT Tools&gt;&gt;Simulator [Win]
+Expert mode</source>
+        <translation type="vanished">OPTION Työkalut &gt;&gt; Simulaattori [Mac]
+ALT Työkalut &gt;&gt; Simulaattori [Win]
+Asiantuntijatila</translation>
+    </message>
+    <message>
+        <source>Graph/Simulator
+[Expert mode]</source>
+        <translation type="vanished">Graafi/simulaattori
+[Asiantuntijatila]</translation>
+    </message>
+    <message>
+        <source>Graph/Simulator</source>
+        <translation type="vanished">Kaavio/simulaattori</translation>
+    </message>
+    <message>
+        <source>Config</source>
+        <translation type="vanished">Konfig</translation>
+    </message>
+    <message>
+        <source>Tools</source>
+        <translation type="vanished">Työkalut</translation>
+    </message>
+    <message>
         <source>Change roast event key focus</source>
         <translation type="vanished">Muuta paahtotapahtuman pääpainoa</translation>
     </message>
@@ -11387,18 +11467,8 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
 Pikanäppäimet on poistettava käytöstä (ENTER)</translation>
     </message>
     <message>
-        <source>Click on timer</source>
-        <translation type="vanished">Napsauta ajastinta</translation>
-    </message>
-    <message>
         <source>Simulator speed may be changd while paused (hold shift  (1x), OPTION/ALT (2x) or COMMAND/CTRL (4x) on restart).</source>
         <translation type="vanished">Simulaattorin nopeutta voidaan muuttaa tauon aikana (pidä vaihto (1x), OPTION/ALT (2x) tai COMMAND/CTRL (4x) uudelleenkäynnistettäessä).</translation>
-    </message>
-    <message>
-        <source>OPTION Tools&gt;&gt;Simulator [Mac]
-ALT Tools&gt;&gt;Simulator [Win]</source>
-        <translation type="vanished">OPTION Työkalut&gt;&gt; Simulaattori [Mac]
-ALT-työkalut&gt;&gt; Simulaattori [Win]</translation>
     </message>
     <message>
         <source>&lt;button number&gt;</source>
@@ -15362,7 +15432,7 @@ Toista toiminto lopussa: {0}</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2487" />
-        <source>Recomended Mode = 0</source>
+        <source>Recommended Mode = 0</source>
         <translation>Suositeltu tila = 0</translation>
     </message>
     <message>
@@ -17760,6 +17830,10 @@ Profiilista puuttuu [CHARGE] tai [DROP]</translation>
         <location filename="../plus/schedule.py" line="3644" />
         <source>Fetching completed roast properties failed</source>
         <translation>Valmiiden paahtoominaisuuksien nouto epäonnistui</translation>
+    </message>
+    <message>
+        <source>Recomended Mode = 0</source>
+        <translation type="vanished">Suositeltu tila = 0</translation>
     </message>
     <message>
         <source>Empty path or box unchecked in Autosave</source>

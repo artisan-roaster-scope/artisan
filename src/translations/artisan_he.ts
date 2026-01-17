@@ -6920,8 +6920,9 @@ When Meter=NONE opens dialog to manually enter temperatures during roast</source
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="38" />
-        <source>Toggle Playback Events</source>
-        <translation>החלף אירועי השמעה</translation>
+        <source>Toggle Playback Events
+(Expert and Standard modes)</source>
+        <translation>החלפת אירועי השמעה (מצב מומחה ומצב רגיל)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="39" />
@@ -6945,23 +6946,30 @@ When Meter=NONE opens dialog to manually enter temperatures during roast</source
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="43" />
-        <source>Load alarms</source>
-        <translation>טען אזעקות</translation>
+        <source>Load alarms
+(Expert and Standard modes)</source>
+        <translation>טעינת אזעקות (מצב מומחה ומצב רגיל)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="44" />
-        <source>Changes Event Button Palettes</source>
-        <translation>משנה את לוחות לחצני האירועים</translation>
+        <source>Changes Event Button Palettes
+(Can be disabled or enabled in Expert mode Config&gt;&gt; Events&gt;&gt; Palettes&gt;&gt; Switch Using Number Keys and Cmd)</source>
+        <translation>שינוי לוחות לחצני אירועים
+(ניתן להשבית או להפעיל במצב מומחה הגדרות &gt;&gt; אירועים &gt;&gt; לוחות &gt;&gt; החלפה באמצעות מקשי מספרים ו-Cmd)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="45" />
-        <source>Application ScreenShot</source>
-        <translation>צילום מסך של יישום</translation>
+        <source>Application ScreenShot
+(Expert and Standard modes)</source>
+        <translation>צילום מסך של האפליקציה
+(מצב מומחה ומצב רגיל)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="46" />
-        <source>Desktop ScreenShot</source>
-        <translation>צילום מסך של שולחן העבודה</translation>
+        <source>Desktop ScreenShot
+(Expert and Standard modes)</source>
+        <translation>צילום מסך של שולחן העבודה
+(מצב מומחה ומצב רגיל)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="47" />
@@ -7425,15 +7433,14 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
-        <source>Click on timer
-Expert mode</source>
-        <translation>לחץ על טיימר
-מצב מומחה</translation>
+        <source>Click on timer</source>
+        <translation>לחץ על טיימר</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
-        <source>Simulator</source>
-        <translation type="unfinished">מַדמֶה</translation>
+        <source>Simulator
+(Expert mode)</source>
+        <translation>סימולטור (מצב מומחה)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
@@ -7448,18 +7455,16 @@ Expert mode</source>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
         <source>OPTION Tools&gt;&gt;Simulator [Mac]
-ALT Tools&gt;&gt;Simulator [Win]
-Expert mode</source>
-        <translation>כלים&gt;&gt;סימולטור [מק]
-כלי ALT&gt;&gt;סימולטור [Win]
-מצב מומחה</translation>
+ALT Tools&gt;&gt;Simulator [Win]</source>
+        <translation>OPTION כלים&gt;&gt;סימולטור [Mac]
+ALT Tools&gt;&gt;סימולטור [Win]</translation>
     </message>
     <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="89" />
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
         <source>Graph/Simulator
-[Expert mode]</source>
-        <translation>גרף/סימולטור
-[מצב מומחה]</translation>
+(Expert mode)</source>
+        <translation>גרף/סימולטור (מצב מומחה)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
@@ -7475,11 +7480,6 @@ CTRL Tools&gt;&gt;Simulator [Win]</source>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="89" />
-        <source>Graph/Simulator</source>
-        <translation>גרף/סימולטור</translation>
-    </message>
-    <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="89" />
         <source>Start or change Simulator speed to 4x mode</source>
         <translation>הפעל או שנה את מהירות הסימולטור למצב פי 4</translation>
     </message>
@@ -7491,14 +7491,11 @@ CTRL+L [Win]</source>
 CTRL+L [ניצחון]</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="95" />
-        <location filename="../help/keyboardshortcuts_help.py" line="94" />
-        <location filename="../help/keyboardshortcuts_help.py" line="93" />
-        <location filename="../help/keyboardshortcuts_help.py" line="92" />
-        <location filename="../help/keyboardshortcuts_help.py" line="91" />
         <location filename="../help/keyboardshortcuts_help.py" line="90" />
-        <source>Roast Properties Roast tab</source>
-        <translation>מאפייני צלי לשונית צלי</translation>
+        <source>Roast Properties Roast tab
+(Expert and Standard modes)</source>
+        <translation>מאפייני צלייה כרטיסיית צלייה
+(מצבי מומחה ורגיל)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="90" />
@@ -7511,6 +7508,15 @@ CTRL+L [ניצחון]</translation>
 ALT click Stock [Win]</source>
         <translation>OPTION לחץ על מלאי [Mac]
 ALT click Stock [Win]</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="95" />
+        <location filename="../help/keyboardshortcuts_help.py" line="94" />
+        <location filename="../help/keyboardshortcuts_help.py" line="93" />
+        <location filename="../help/keyboardshortcuts_help.py" line="92" />
+        <location filename="../help/keyboardshortcuts_help.py" line="91" />
+        <source>Roast Properties Roast tab</source>
+        <translation>מאפייני צלי לשונית צלי</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="91" />
@@ -7775,7 +7781,6 @@ Hold Shift+Alt [Win]</source>
         <translation type="unfinished">הדבק</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="120" />
         <location filename="../help/keyboardshortcuts_help.py" line="119" />
         <location filename="../help/keyboardshortcuts_help.py" line="118" />
         <source>Roast</source>
@@ -7793,17 +7798,21 @@ Hold Shift+Alt [Win]</source>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="120" />
+        <source>Roast
+(Expert and Standard modes)</source>
+        <translation>צלייה (מצבי מומחה ורגיל)</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="120" />
         <source>Switch Profiles (Foreground&lt;=&gt;Background)</source>
         <translation>החלף פרופילים (חזית&lt;=&gt;רקע)</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="125" />
-        <location filename="../help/keyboardshortcuts_help.py" line="124" />
-        <location filename="../help/keyboardshortcuts_help.py" line="123" />
         <location filename="../help/keyboardshortcuts_help.py" line="122" />
         <location filename="../help/keyboardshortcuts_help.py" line="121" />
-        <source>Config</source>
-        <translation type="unfinished">קונפיגורציה</translation>
+        <source>Config
+(Expert mode)</source>
+        <translation>תצורה (מצב מומחה)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="121" />
@@ -7814,6 +7823,14 @@ Hold Shift+Alt [Win]</source>
         <location filename="../help/keyboardshortcuts_help.py" line="122" />
         <source>Open Curves dialog</source>
         <translation>פתח תיבת דו-שיח Curves</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="125" />
+        <location filename="../help/keyboardshortcuts_help.py" line="124" />
+        <location filename="../help/keyboardshortcuts_help.py" line="123" />
+        <source>Config
+(Expert and Standard modes)</source>
+        <translation>תצורה (מצבי מומחה ומצבי רגיל)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="123" />
@@ -7833,8 +7850,9 @@ Hold Shift+Alt [Win]</source>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="127" />
         <location filename="../help/keyboardshortcuts_help.py" line="126" />
-        <source>Tools</source>
-        <translation type="unfinished">כלים</translation>
+        <source>Tools
+(Expert mode)</source>
+        <translation>כלים (מצב מומחה)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="126" />
@@ -11348,6 +11366,62 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
         <translation>F1 מתייחס לתוצאה הקודמת של הנוסחה בפועל למימוש לולאת משוב. זה שימושי בעיצובי מסננים. באופן דומה, F2 מתייחס לתוצאה הקודמת השנייה וכו'.</translation>
     </message>
     <message>
+        <source>Toggle Playback Events</source>
+        <translation type="vanished">החלף אירועי השמעה</translation>
+    </message>
+    <message>
+        <source>Load alarms</source>
+        <translation type="vanished">טען אזעקות</translation>
+    </message>
+    <message>
+        <source>Changes Event Button Palettes</source>
+        <translation type="vanished">משנה את לוחות לחצני האירועים</translation>
+    </message>
+    <message>
+        <source>Application ScreenShot</source>
+        <translation type="vanished">צילום מסך של יישום</translation>
+    </message>
+    <message>
+        <source>Desktop ScreenShot</source>
+        <translation type="vanished">צילום מסך של שולחן העבודה</translation>
+    </message>
+    <message>
+        <source>Click on timer
+Expert mode</source>
+        <translation type="vanished">לחץ על טיימר
+מצב מומחה</translation>
+    </message>
+    <message>
+        <source>Simulator</source>
+        <translation type="vanished">מַדמֶה</translation>
+    </message>
+    <message>
+        <source>OPTION Tools&gt;&gt;Simulator [Mac]
+ALT Tools&gt;&gt;Simulator [Win]
+Expert mode</source>
+        <translation type="vanished">כלים&gt;&gt;סימולטור [מק]
+כלי ALT&gt;&gt;סימולטור [Win]
+מצב מומחה</translation>
+    </message>
+    <message>
+        <source>Graph/Simulator
+[Expert mode]</source>
+        <translation type="vanished">גרף/סימולטור
+[מצב מומחה]</translation>
+    </message>
+    <message>
+        <source>Graph/Simulator</source>
+        <translation type="vanished">גרף/סימולטור</translation>
+    </message>
+    <message>
+        <source>Config</source>
+        <translation type="vanished">קונפיגורציה</translation>
+    </message>
+    <message>
+        <source>Tools</source>
+        <translation type="vanished">כלים</translation>
+    </message>
+    <message>
         <source>Change roast event key focus</source>
         <translation type="vanished">שנה את מיקוד מפתח אירוע צלי</translation>
     </message>
@@ -11388,18 +11462,8 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
 קיצורי מקשים חייבים להיות מושבתים (ENTER)</translation>
     </message>
     <message>
-        <source>Click on timer</source>
-        <translation type="vanished">לחץ על טיימר</translation>
-    </message>
-    <message>
         <source>Simulator speed may be changd while paused (hold shift  (1x), OPTION/ALT (2x) or COMMAND/CTRL (4x) on restart).</source>
         <translation type="vanished">מהירות הסימולטור עשויה להשתנות בזמן מושהה (החזק את ההילוך (1x), OPTION/ALT (2x) או COMMAND/CTRL (4x) בהפעלה מחדש).</translation>
-    </message>
-    <message>
-        <source>OPTION Tools&gt;&gt;Simulator [Mac]
-ALT Tools&gt;&gt;Simulator [Win]</source>
-        <translation type="vanished">OPTION כלים&gt;&gt;סימולטור [Mac]
-ALT Tools&gt;&gt;סימולטור [Win]</translation>
     </message>
     <message>
         <source>&lt;button number&gt;</source>
@@ -15363,7 +15427,7 @@ Repeat Operation at the end: {0}</source>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2487" />
-        <source>Recomended Mode = 0</source>
+        <source>Recommended Mode = 0</source>
         <translation>מצב מומלץ = 0</translation>
     </message>
     <message>
@@ -17760,6 +17824,10 @@ Profile missing [CHARGE] or [DROP]</source>
         <location filename="../plus/schedule.py" line="3644" />
         <source>Fetching completed roast properties failed</source>
         <translation>אחזור מאפייני הצלייה שהושלמו נכשל</translation>
+    </message>
+    <message>
+        <source>Recomended Mode = 0</source>
+        <translation type="vanished">מצב מומלץ = 0</translation>
     </message>
     <message>
         <source>Empty path or box unchecked in Autosave</source>

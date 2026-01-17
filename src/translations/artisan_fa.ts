@@ -6920,8 +6920,10 @@ When Meter=NONE opens dialog to manually enter temperatures during roast</source
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="38" />
-        <source>Toggle Playback Events</source>
-        <translation>رویدادهای پخش را تغییر دهید</translation>
+        <source>Toggle Playback Events
+(Expert and Standard modes)</source>
+        <translation>تغییر وضعیت رویدادهای پخش
+(حالت‌های حرفه‌ای و استاندارد)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="39" />
@@ -6945,23 +6947,28 @@ When Meter=NONE opens dialog to manually enter temperatures during roast</source
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="43" />
-        <source>Load alarms</source>
-        <translation>بارگذاری آلارم ها</translation>
+        <source>Load alarms
+(Expert and Standard modes)</source>
+        <translation>هشدارهای بار (حالت‌های حرفه‌ای و استاندارد)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="44" />
-        <source>Changes Event Button Palettes</source>
-        <translation>پالت های دکمه رویداد را تغییر می دهد</translation>
+        <source>Changes Event Button Palettes
+(Can be disabled or enabled in Expert mode Config&gt;&gt; Events&gt;&gt; Palettes&gt;&gt; Switch Using Number Keys and Cmd)</source>
+        <translation>پالت‌های دکمه رویداد را تغییر می‌دهد
+(می‌توان آن را در حالت حرفه‌ای غیرفعال یا فعال کرد: پیکربندی&gt;&gt; رویدادها&gt;&gt; پالت‌ها&gt;&gt; تغییر با استفاده از کلیدهای اعداد و Cmd)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="45" />
-        <source>Application ScreenShot</source>
-        <translation>اسکرین شات برنامه</translation>
+        <source>Application ScreenShot
+(Expert and Standard modes)</source>
+        <translation>اسکرین شات از برنامه (حالت‌های حرفه‌ای و استاندارد)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="46" />
-        <source>Desktop ScreenShot</source>
-        <translation>اسکرین شات دسکتاپ</translation>
+        <source>Desktop ScreenShot
+(Expert and Standard modes)</source>
+        <translation>اسکرین شات دسکتاپ (حالت‌های حرفه‌ای و استاندارد)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="47" />
@@ -7425,15 +7432,14 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
-        <source>Click on timer
-Expert mode</source>
-        <translation>روی تایمر کلیک کنید
-حالت حرفه‌ای</translation>
+        <source>Click on timer</source>
+        <translation>روی تایمر کلیک کنید</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
-        <source>Simulator</source>
-        <translation type="unfinished">شبیه ساز</translation>
+        <source>Simulator
+(Expert mode)</source>
+        <translation>شبیه‌ساز (حالت حرفه‌ای)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
@@ -7448,18 +7454,17 @@ Expert mode</source>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
         <source>OPTION Tools&gt;&gt;Simulator [Mac]
-ALT Tools&gt;&gt;Simulator [Win]
-Expert mode</source>
+ALT Tools&gt;&gt;Simulator [Win]</source>
         <translation>ابزارهای OPTION&gt;&gt;شبیه‌ساز [مک]
-ابزارهای ALT&gt;&gt;شبیه‌ساز [ویندوز]
-حالت حرفه‌ای</translation>
+ابزارهای ALT&gt;&gt;شبیه‌ساز [ویندوز]</translation>
     </message>
     <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="89" />
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
         <source>Graph/Simulator
-[Expert mode]</source>
+(Expert mode)</source>
         <translation>نمودار/شبیه‌ساز
-[حالت حرفه‌ای]</translation>
+(حالت حرفه‌ای)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
@@ -7475,11 +7480,6 @@ CTRL Tools&gt;&gt;Simulator [Win]</source>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="89" />
-        <source>Graph/Simulator</source>
-        <translation>نمودار/شبیه ساز</translation>
-    </message>
-    <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="89" />
         <source>Start or change Simulator speed to 4x mode</source>
         <translation>سرعت شبیه ساز را به حالت 4x راه اندازی یا تغییر دهید</translation>
     </message>
@@ -7491,14 +7491,10 @@ CTRL+L [Win]</source>
 CTRL+L [برنده]</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="95" />
-        <location filename="../help/keyboardshortcuts_help.py" line="94" />
-        <location filename="../help/keyboardshortcuts_help.py" line="93" />
-        <location filename="../help/keyboardshortcuts_help.py" line="92" />
-        <location filename="../help/keyboardshortcuts_help.py" line="91" />
         <location filename="../help/keyboardshortcuts_help.py" line="90" />
-        <source>Roast Properties Roast tab</source>
-        <translation>Roast Properties برگه Roast</translation>
+        <source>Roast Properties Roast tab
+(Expert and Standard modes)</source>
+        <translation>تب ویژگی‌های برشته‌کاری (حالت‌های حرفه‌ای و استاندارد)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="90" />
@@ -7511,6 +7507,15 @@ CTRL+L [برنده]</translation>
 ALT click Stock [Win]</source>
         <translation>OPTION روی سهام [Mac] کلیک کنید
 ALT کلیک کنید سهام [برنده]</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="95" />
+        <location filename="../help/keyboardshortcuts_help.py" line="94" />
+        <location filename="../help/keyboardshortcuts_help.py" line="93" />
+        <location filename="../help/keyboardshortcuts_help.py" line="92" />
+        <location filename="../help/keyboardshortcuts_help.py" line="91" />
+        <source>Roast Properties Roast tab</source>
+        <translation>Roast Properties برگه Roast</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="91" />
@@ -7775,7 +7780,6 @@ Shift+Alt [Win] را نگه دارید</translation>
         <translation type="unfinished">چسباندن</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="120" />
         <location filename="../help/keyboardshortcuts_help.py" line="119" />
         <location filename="../help/keyboardshortcuts_help.py" line="118" />
         <source>Roast</source>
@@ -7793,17 +7797,22 @@ Shift+Alt [Win] را نگه دارید</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="120" />
+        <source>Roast
+(Expert and Standard modes)</source>
+        <translation>برشته کردن
+(حالت‌های حرفه‌ای و استاندارد)</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="120" />
         <source>Switch Profiles (Foreground&lt;=&gt;Background)</source>
         <translation>تغییر نمایه ها (پیش زمینه&lt;=&gt;پس زمینه)</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="125" />
-        <location filename="../help/keyboardshortcuts_help.py" line="124" />
-        <location filename="../help/keyboardshortcuts_help.py" line="123" />
         <location filename="../help/keyboardshortcuts_help.py" line="122" />
         <location filename="../help/keyboardshortcuts_help.py" line="121" />
-        <source>Config</source>
-        <translation type="unfinished">پیکربندی</translation>
+        <source>Config
+(Expert mode)</source>
+        <translation>پیکربندی (حالت حرفه‌ای)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="121" />
@@ -7814,6 +7823,14 @@ Shift+Alt [Win] را نگه دارید</translation>
         <location filename="../help/keyboardshortcuts_help.py" line="122" />
         <source>Open Curves dialog</source>
         <translation>گفتگوی Curves را باز کنید</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="125" />
+        <location filename="../help/keyboardshortcuts_help.py" line="124" />
+        <location filename="../help/keyboardshortcuts_help.py" line="123" />
+        <source>Config
+(Expert and Standard modes)</source>
+        <translation>پیکربندی (حالت‌های حرفه‌ای و استاندارد)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="123" />
@@ -7833,8 +7850,10 @@ Shift+Alt [Win] را نگه دارید</translation>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="127" />
         <location filename="../help/keyboardshortcuts_help.py" line="126" />
-        <source>Tools</source>
-        <translation type="unfinished">ابزار</translation>
+        <source>Tools
+(Expert mode)</source>
+        <translation>ابزارها
+(حالت حرفه‌ای)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="126" />
@@ -11349,6 +11368,62 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
         <translation>F1 به نتیجه قبلی فرمول واقعی برای تحقق یک حلقه بازخورد اشاره دارد. این در طراحی فیلتر مفید است. به طور مشابه، F2 به دومین نتیجه قبلی و غیره اشاره دارد.</translation>
     </message>
     <message>
+        <source>Toggle Playback Events</source>
+        <translation type="vanished">رویدادهای پخش را تغییر دهید</translation>
+    </message>
+    <message>
+        <source>Load alarms</source>
+        <translation type="vanished">بارگذاری آلارم ها</translation>
+    </message>
+    <message>
+        <source>Changes Event Button Palettes</source>
+        <translation type="vanished">پالت های دکمه رویداد را تغییر می دهد</translation>
+    </message>
+    <message>
+        <source>Application ScreenShot</source>
+        <translation type="vanished">اسکرین شات برنامه</translation>
+    </message>
+    <message>
+        <source>Desktop ScreenShot</source>
+        <translation type="vanished">اسکرین شات دسکتاپ</translation>
+    </message>
+    <message>
+        <source>Click on timer
+Expert mode</source>
+        <translation type="vanished">روی تایمر کلیک کنید
+حالت حرفه‌ای</translation>
+    </message>
+    <message>
+        <source>Simulator</source>
+        <translation type="vanished">شبیه ساز</translation>
+    </message>
+    <message>
+        <source>OPTION Tools&gt;&gt;Simulator [Mac]
+ALT Tools&gt;&gt;Simulator [Win]
+Expert mode</source>
+        <translation type="vanished">ابزارهای OPTION&gt;&gt;شبیه‌ساز [مک]
+ابزارهای ALT&gt;&gt;شبیه‌ساز [ویندوز]
+حالت حرفه‌ای</translation>
+    </message>
+    <message>
+        <source>Graph/Simulator
+[Expert mode]</source>
+        <translation type="vanished">نمودار/شبیه‌ساز
+[حالت حرفه‌ای]</translation>
+    </message>
+    <message>
+        <source>Graph/Simulator</source>
+        <translation type="vanished">نمودار/شبیه ساز</translation>
+    </message>
+    <message>
+        <source>Config</source>
+        <translation type="vanished">پیکربندی</translation>
+    </message>
+    <message>
+        <source>Tools</source>
+        <translation type="vanished">ابزار</translation>
+    </message>
+    <message>
         <source>Change roast event key focus</source>
         <translation type="vanished">تغییر کانون کلید رویداد roast</translation>
     </message>
@@ -11389,18 +11464,8 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
 میانبرهای صفحه کلید باید غیرفعال شود (ENTER)</translation>
     </message>
     <message>
-        <source>Click on timer</source>
-        <translation type="vanished">روی تایمر کلیک کنید</translation>
-    </message>
-    <message>
         <source>Simulator speed may be changd while paused (hold shift  (1x), OPTION/ALT (2x) or COMMAND/CTRL (4x) on restart).</source>
         <translation type="vanished">سرعت شبیه‌ساز ممکن است در حین توقف تغییر کند (Shift را نگه دارید (1x)، OPTION/ALT (2x) یا COMMAND/CTRL (4x) در راه‌اندازی مجدد).</translation>
-    </message>
-    <message>
-        <source>OPTION Tools&gt;&gt;Simulator [Mac]
-ALT Tools&gt;&gt;Simulator [Win]</source>
-        <translation type="vanished">ابزارهای OPTION&gt;&gt;شبیه‌ساز [مک]
-ابزارهای ALT&gt;&gt;شبیه‌ساز [ویندوز]</translation>
     </message>
     <message>
         <source>&lt;button number&gt;</source>
@@ -15364,8 +15429,8 @@ Repeat Operation at the end: {0}</source>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2487" />
-        <source>Recomended Mode = 0</source>
-        <translation>حالت پیشنهادی = 0</translation>
+        <source>Recommended Mode = 0</source>
+        <translation>حالت پیشنهادی = ۰</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2488" />
@@ -17762,6 +17827,10 @@ Profile missing [CHARGE] or [DROP]</source>
         <location filename="../plus/schedule.py" line="3644" />
         <source>Fetching completed roast properties failed</source>
         <translation>واکشی خواص برشته کامل انجام نشد</translation>
+    </message>
+    <message>
+        <source>Recomended Mode = 0</source>
+        <translation type="vanished">حالت پیشنهادی = 0</translation>
     </message>
     <message>
         <source>Empty path or box unchecked in Autosave</source>

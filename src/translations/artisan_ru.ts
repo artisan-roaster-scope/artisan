@@ -6922,8 +6922,10 @@ When Meter=NONE opens dialog to manually enter temperatures during roast</source
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="38" />
-        <source>Toggle Playback Events</source>
-        <translation>Переключить события воспроизведения</translation>
+        <source>Toggle Playback Events
+(Expert and Standard modes)</source>
+        <translation>Переключить воспроизведение событий
+(Экспертный и Стандартный режимы)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="39" />
@@ -6947,23 +6949,31 @@ When Meter=NONE opens dialog to manually enter temperatures during roast</source
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="43" />
-        <source>Load alarms</source>
-        <translation>Загрузить тревоги</translation>
+        <source>Load alarms
+(Expert and Standard modes)</source>
+        <translation>Сигналы тревоги нагрузки
+(Экспертный и Стандартный режимы)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="44" />
-        <source>Changes Event Button Palettes</source>
-        <translation>Изменяет палитры кнопок событий</translation>
+        <source>Changes Event Button Palettes
+(Can be disabled or enabled in Expert mode Config&gt;&gt; Events&gt;&gt; Palettes&gt;&gt; Switch Using Number Keys and Cmd)</source>
+        <translation>Изменение палитр кнопок событий
+(Можно отключить или включить в режиме эксперта: Настройки &gt;&gt; События &gt;&gt; Палитры &gt;&gt; Переключение с помощью цифровых клавиш и Cmd)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="45" />
-        <source>Application ScreenShot</source>
-        <translation>Скриншот приложения</translation>
+        <source>Application ScreenShot
+(Expert and Standard modes)</source>
+        <translation>Скриншот приложения
+(Экспертный и Стандартный режимы)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="46" />
-        <source>Desktop ScreenShot</source>
-        <translation>Скриншот рабочего стола</translation>
+        <source>Desktop ScreenShot
+(Expert and Standard modes)</source>
+        <translation>Скриншот рабочего стола
+(Экспертный и Стандартный режимы)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="47" />
@@ -7426,15 +7436,15 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
-        <source>Click on timer
-Expert mode</source>
-        <translation>Нажмите на таймер
-Экспертный режим</translation>
+        <source>Click on timer</source>
+        <translation>Нажмите на таймер</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
-        <source>Simulator</source>
-        <translation type="unfinished">Симулятор</translation>
+        <source>Simulator
+(Expert mode)</source>
+        <translation>Симулятор
+(Экспертный режим)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="87" />
@@ -7449,18 +7459,17 @@ Expert mode</source>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
         <source>OPTION Tools&gt;&gt;Simulator [Mac]
-ALT Tools&gt;&gt;Simulator [Win]
-Expert mode</source>
-        <translation>ПАРАМЕТРЫ Инструменты &gt;&gt; Симулятор [Mac]
-ALT Инструменты &gt;&gt; Симулятор [Win]
-Экспертный режим</translation>
+ALT Tools&gt;&gt;Simulator [Win]</source>
+        <translation>ОПЦИЯ Инструменты&gt;&gt;Симулятор [Mac]
+ALT Tools&gt;&gt;Симулятор [Победа]</translation>
     </message>
     <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="89" />
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
         <source>Graph/Simulator
-[Expert mode]</source>
+(Expert mode)</source>
         <translation>График/Симулятор
-[Экспертный режим]</translation>
+(Экспертный режим)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="88" />
@@ -7476,11 +7485,6 @@ CTRL Tools&gt;&gt;Simulator [Win]</source>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="89" />
-        <source>Graph/Simulator</source>
-        <translation>График/Симулятор</translation>
-    </message>
-    <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="89" />
         <source>Start or change Simulator speed to 4x mode</source>
         <translation>Запустите или измените скорость симулятора на режим 4x.</translation>
     </message>
@@ -7492,14 +7496,11 @@ CTRL+L [Win]</source>
 CTRL+L [Победа]</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="95" />
-        <location filename="../help/keyboardshortcuts_help.py" line="94" />
-        <location filename="../help/keyboardshortcuts_help.py" line="93" />
-        <location filename="../help/keyboardshortcuts_help.py" line="92" />
-        <location filename="../help/keyboardshortcuts_help.py" line="91" />
         <location filename="../help/keyboardshortcuts_help.py" line="90" />
-        <source>Roast Properties Roast tab</source>
-        <translation>Свойства обжарки Вкладка «Обжарка»</translation>
+        <source>Roast Properties Roast tab
+(Expert and Standard modes)</source>
+        <translation>Свойства обжарки. Вкладка «Обжарка»
+(Экспертный и Стандартный режимы)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="90" />
@@ -7512,6 +7513,15 @@ CTRL+L [Победа]</translation>
 ALT click Stock [Win]</source>
         <translation>ВАРИАНТ нажмите Stock [Mac]
 ALT нажмите Stock [Победа]</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="95" />
+        <location filename="../help/keyboardshortcuts_help.py" line="94" />
+        <location filename="../help/keyboardshortcuts_help.py" line="93" />
+        <location filename="../help/keyboardshortcuts_help.py" line="92" />
+        <location filename="../help/keyboardshortcuts_help.py" line="91" />
+        <source>Roast Properties Roast tab</source>
+        <translation>Свойства обжарки Вкладка «Обжарка»</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="91" />
@@ -7776,7 +7786,6 @@ Hold Shift+Alt [Win]</source>
         <translation type="unfinished">Вставить</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="120" />
         <location filename="../help/keyboardshortcuts_help.py" line="119" />
         <location filename="../help/keyboardshortcuts_help.py" line="118" />
         <source>Roast</source>
@@ -7794,17 +7803,23 @@ Hold Shift+Alt [Win]</source>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="120" />
+        <source>Roast
+(Expert and Standard modes)</source>
+        <translation>Обжарка
+(Экспертный и Стандартный режимы)</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="120" />
         <source>Switch Profiles (Foreground&lt;=&gt;Background)</source>
         <translation>Переключение профилей (передний план&lt;=&gt;фон)</translation>
     </message>
     <message>
-        <location filename="../help/keyboardshortcuts_help.py" line="125" />
-        <location filename="../help/keyboardshortcuts_help.py" line="124" />
-        <location filename="../help/keyboardshortcuts_help.py" line="123" />
         <location filename="../help/keyboardshortcuts_help.py" line="122" />
         <location filename="../help/keyboardshortcuts_help.py" line="121" />
-        <source>Config</source>
-        <translation type="unfinished">Конфиг</translation>
+        <source>Config
+(Expert mode)</source>
+        <translation>Настройки
+(Экспертный режим)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="121" />
@@ -7815,6 +7830,15 @@ Hold Shift+Alt [Win]</source>
         <location filename="../help/keyboardshortcuts_help.py" line="122" />
         <source>Open Curves dialog</source>
         <translation>Диалоговое окно «Открыть кривые»</translation>
+    </message>
+    <message>
+        <location filename="../help/keyboardshortcuts_help.py" line="125" />
+        <location filename="../help/keyboardshortcuts_help.py" line="124" />
+        <location filename="../help/keyboardshortcuts_help.py" line="123" />
+        <source>Config
+(Expert and Standard modes)</source>
+        <translation>Настройки
+(Экспертный и Стандартный режимы)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="123" />
@@ -7834,8 +7858,10 @@ Hold Shift+Alt [Win]</source>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="127" />
         <location filename="../help/keyboardshortcuts_help.py" line="126" />
-        <source>Tools</source>
-        <translation type="unfinished">Инструменты</translation>
+        <source>Tools
+(Expert mode)</source>
+        <translation>Инструменты
+(Экспертный режим)</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="126" />
@@ -11349,6 +11375,62 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
         <translation>F1 относится к предыдущему результату фактической формулы для реализации цикла обратной связи. Это полезно в конструкциях фильтров. Точно так же F2 относится ко второму предыдущему результату и т. д.</translation>
     </message>
     <message>
+        <source>Toggle Playback Events</source>
+        <translation type="vanished">Переключить события воспроизведения</translation>
+    </message>
+    <message>
+        <source>Load alarms</source>
+        <translation type="vanished">Загрузить тревоги</translation>
+    </message>
+    <message>
+        <source>Changes Event Button Palettes</source>
+        <translation type="vanished">Изменяет палитры кнопок событий</translation>
+    </message>
+    <message>
+        <source>Application ScreenShot</source>
+        <translation type="vanished">Скриншот приложения</translation>
+    </message>
+    <message>
+        <source>Desktop ScreenShot</source>
+        <translation type="vanished">Скриншот рабочего стола</translation>
+    </message>
+    <message>
+        <source>Click on timer
+Expert mode</source>
+        <translation type="vanished">Нажмите на таймер
+Экспертный режим</translation>
+    </message>
+    <message>
+        <source>Simulator</source>
+        <translation type="vanished">Симулятор</translation>
+    </message>
+    <message>
+        <source>OPTION Tools&gt;&gt;Simulator [Mac]
+ALT Tools&gt;&gt;Simulator [Win]
+Expert mode</source>
+        <translation type="vanished">ПАРАМЕТРЫ Инструменты &gt;&gt; Симулятор [Mac]
+ALT Инструменты &gt;&gt; Симулятор [Win]
+Экспертный режим</translation>
+    </message>
+    <message>
+        <source>Graph/Simulator
+[Expert mode]</source>
+        <translation type="vanished">График/Симулятор
+[Экспертный режим]</translation>
+    </message>
+    <message>
+        <source>Graph/Simulator</source>
+        <translation type="vanished">График/Симулятор</translation>
+    </message>
+    <message>
+        <source>Config</source>
+        <translation type="vanished">Конфиг</translation>
+    </message>
+    <message>
+        <source>Tools</source>
+        <translation type="vanished">Инструменты</translation>
+    </message>
+    <message>
         <source>Change roast event key focus</source>
         <translation type="vanished">Изменить ключевой фокус события обжарки</translation>
     </message>
@@ -11389,18 +11471,8 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
 Сочетания клавиш должны быть отключены (ENTER)</translation>
     </message>
     <message>
-        <source>Click on timer</source>
-        <translation type="vanished">Нажмите на таймер</translation>
-    </message>
-    <message>
         <source>Simulator speed may be changd while paused (hold shift  (1x), OPTION/ALT (2x) or COMMAND/CTRL (4x) on restart).</source>
         <translation type="vanished">Скорость симулятора можно изменить во время паузы (удерживайте Shift (1x), OPTION/ALT (2x) или COMMAND/CTRL (4x) при перезапуске).</translation>
-    </message>
-    <message>
-        <source>OPTION Tools&gt;&gt;Simulator [Mac]
-ALT Tools&gt;&gt;Simulator [Win]</source>
-        <translation type="vanished">ОПЦИЯ Инструменты&gt;&gt;Симулятор [Mac]
-ALT Tools&gt;&gt;Симулятор [Победа]</translation>
     </message>
     <message>
         <source>&lt;button number&gt;</source>
@@ -15364,8 +15436,8 @@ Repeat Operation at the end: {0}</source>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2487" />
-        <source>Recomended Mode = 0</source>
-        <translation type="unfinished">Рекомендуемый Режим = 0</translation>
+        <source>Recommended Mode = 0</source>
+        <translation>Рекомендуемый режим = 0</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2488" />
@@ -17762,6 +17834,10 @@ Profile missing [CHARGE] or [DROP]</source>
         <location filename="../plus/schedule.py" line="3644" />
         <source>Fetching completed roast properties failed</source>
         <translation>Не удалось получить готовые свойства обжарки.</translation>
+    </message>
+    <message>
+        <source>Recomended Mode = 0</source>
+        <translation type="vanished">Рекомендуемый Режим = 0</translation>
     </message>
     <message>
         <source>Empty path or box unchecked in Autosave</source>
