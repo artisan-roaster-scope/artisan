@@ -8547,7 +8547,7 @@ Shift+Alt 누르기 [Win]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="129" />
-        <source>Toggle Full Screen Mode                                                                                                                                             </source>
+        <source>Toggle Full Screen Mode</source>
         <translation>전체 화면 모드 전환</translation>
     </message>
     <message>
@@ -12034,6 +12034,10 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
         <location filename="../help/symbolic_help.py" line="194" />
         <source>F1 refers to the previous result of the actual formula to realize a feedback loop. This is useful in filter designs. Similarly, F2 refers to the second previous result etc.</source>
         <translation>F1은 피드백 루프를 구현하기 위한 실제 공식의 이전 결과를 나타냅니다. 이는 필터 설계에 유용합니다. 마찬가지로 F2는 두 번째 이전 결과 등을 나타냅니다.</translation>
+    </message>
+    <message>
+        <source>Toggle Full Screen Mode                                                                                                                                             </source>
+        <translation type="vanished">전체 화면 모드 전환</translation>
     </message>
     <message>
         <source>Toggle Playback Events</source>

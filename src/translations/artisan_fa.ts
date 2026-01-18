@@ -7878,8 +7878,8 @@ Shift+Alt [Win] را نگه دارید</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="129" />
-        <source>Toggle Full Screen Mode                                                                                                                                             </source>
-        <translation>حالت تمام صفحه را تغییر دهید</translation>
+        <source>Toggle Full Screen Mode</source>
+        <translation>تغییر حالت تمام صفحه</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="130" />
@@ -11366,6 +11366,10 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
         <location filename="../help/symbolic_help.py" line="194" />
         <source>F1 refers to the previous result of the actual formula to realize a feedback loop. This is useful in filter designs. Similarly, F2 refers to the second previous result etc.</source>
         <translation>F1 به نتیجه قبلی فرمول واقعی برای تحقق یک حلقه بازخورد اشاره دارد. این در طراحی فیلتر مفید است. به طور مشابه، F2 به دومین نتیجه قبلی و غیره اشاره دارد.</translation>
+    </message>
+    <message>
+        <source>Toggle Full Screen Mode                                                                                                                                             </source>
+        <translation type="vanished">حالت تمام صفحه را تغییر دهید</translation>
     </message>
     <message>
         <source>Toggle Playback Events</source>

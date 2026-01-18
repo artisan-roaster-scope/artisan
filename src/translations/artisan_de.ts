@@ -7870,8 +7870,8 @@ Halten Sie Umschalt+Alt [Win] gedrückt</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="129" />
-        <source>Toggle Full Screen Mode                                                                                                                                             </source>
-        <translation>Vollbildmodus</translation>
+        <source>Toggle Full Screen Mode</source>
+        <translation>Vollbildmodus Ein-/Aus</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="130" />
@@ -11357,6 +11357,10 @@ Die Verwendung von mathematischen Formeln im Plotter ermöglicht auch die Verwen
         <location filename="../help/symbolic_help.py" line="194" />
         <source>F1 refers to the previous result of the actual formula to realize a feedback loop. This is useful in filter designs. Similarly, F2 refers to the second previous result etc.</source>
         <translation>F1 bezieht sich auf das vorherige Ergebnis der tatsächlichen Formel, um eine Rückkopplungsschleife zu realisieren. Dies ist nützlich bei Filterdesigns. In ähnlicher Weise bezieht sich F2 auf das zweite vorherige Ergebnis usw.</translation>
+    </message>
+    <message>
+        <source>Toggle Full Screen Mode                                                                                                                                             </source>
+        <translation type="vanished">Vollbildmodus</translation>
     </message>
     <message>
         <source>Toggle Playback Events</source>

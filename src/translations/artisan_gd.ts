@@ -7874,8 +7874,8 @@ Cùm Shift + Alt [Win]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="129" />
-        <source>Toggle Full Screen Mode                                                                                                                                             </source>
-        <translation>Tog am modh làn-sgrìn</translation>
+        <source>Toggle Full Screen Mode</source>
+        <translation>Gluais Modh Làn-sgrìn</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="130" />
@@ -11361,6 +11361,10 @@ Le bhith a’ cleachdadh foirmlean matamataigeach anns a’ chuilbheart cuideach
         <location filename="../help/symbolic_help.py" line="194" />
         <source>F1 refers to the previous result of the actual formula to realize a feedback loop. This is useful in filter designs. Similarly, F2 refers to the second previous result etc.</source>
         <translation>Tha F1 a’ toirt iomradh air an toradh a bh’ ann roimhe den fhìor fhoirmle gus lùb fios-air-ais a thoirt gu buil. Tha seo feumail ann an dealbhadh sìoltachain. San aon dòigh, tha F2 a’ toirt iomradh air an dàrna toradh roimhe msaa.</translation>
+    </message>
+    <message>
+        <source>Toggle Full Screen Mode                                                                                                                                             </source>
+        <translation type="vanished">Tog am modh làn-sgrìn</translation>
     </message>
     <message>
         <source>Toggle Playback Events</source>

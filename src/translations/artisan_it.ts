@@ -7888,7 +7888,7 @@ Tieni premuto Maiusc+Alt [Vinci]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="129" />
-        <source>Toggle Full Screen Mode                                                                                                                                             </source>
+        <source>Toggle Full Screen Mode</source>
         <translation>Attiva/disattiva la modalità a schermo intero</translation>
     </message>
     <message>
@@ -11375,6 +11375,10 @@ L'utilizzo di formule matematiche nel plotter permette anche di utilizzare le va
         <location filename="../help/symbolic_help.py" line="194" />
         <source>F1 refers to the previous result of the actual formula to realize a feedback loop. This is useful in filter designs. Similarly, F2 refers to the second previous result etc.</source>
         <translation>F1 si riferisce al risultato precedente della formula effettiva per realizzare un ciclo di feedback. Questo è utile nei progetti di filtri. Allo stesso modo, F2 si riferisce al secondo risultato precedente ecc.</translation>
+    </message>
+    <message>
+        <source>Toggle Full Screen Mode                                                                                                                                             </source>
+        <translation type="vanished">Attiva/disattiva la modalità a schermo intero</translation>
     </message>
     <message>
         <source>Toggle Playback Events</source>

@@ -7879,8 +7879,8 @@ Tartsa lenyomva a Shift+Alt [Win]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="129" />
-        <source>Toggle Full Screen Mode                                                                                                                                             </source>
-        <translation>Teljes képernyős mód váltása</translation>
+        <source>Toggle Full Screen Mode</source>
+        <translation>Teljes képernyős mód be-/kikapcsolása</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="130" />
@@ -11367,6 +11367,10 @@ A matematikai képletek használata a plotterben lehetővé teszi a P és F szim
         <location filename="../help/symbolic_help.py" line="194" />
         <source>F1 refers to the previous result of the actual formula to realize a feedback loop. This is useful in filter designs. Similarly, F2 refers to the second previous result etc.</source>
         <translation>Az F1 a tényleges képlet előző eredményére utal, hogy megvalósítsa a visszacsatolási hurkot. Ez hasznos a szűrők kialakításánál. Hasonlóképpen az F2 a második előző eredményre utal stb.</translation>
+    </message>
+    <message>
+        <source>Toggle Full Screen Mode                                                                                                                                             </source>
+        <translation type="vanished">Teljes képernyős mód váltása</translation>
     </message>
     <message>
         <source>Toggle Playback Events</source>

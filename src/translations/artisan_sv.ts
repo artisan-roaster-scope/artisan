@@ -7869,7 +7869,7 @@ Håll ned Skift+Alt [Win]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="129" />
-        <source>Toggle Full Screen Mode                                                                                                                                             </source>
+        <source>Toggle Full Screen Mode</source>
         <translation>Växla helskärmsläge</translation>
     </message>
     <message>
@@ -11356,6 +11356,10 @@ Att använda matematiska formler i plottern gör det också möjligt att använd
         <location filename="../help/symbolic_help.py" line="194" />
         <source>F1 refers to the previous result of the actual formula to realize a feedback loop. This is useful in filter designs. Similarly, F2 refers to the second previous result etc.</source>
         <translation>F1 hänvisar till det tidigare resultatet av den faktiska formeln för att realisera en återkopplingsslinga. Detta är användbart i filterdesigner. På samma sätt hänvisar F2 till det andra föregående resultatet etc.</translation>
+    </message>
+    <message>
+        <source>Toggle Full Screen Mode                                                                                                                                             </source>
+        <translation type="vanished">Växla helskärmsläge</translation>
     </message>
     <message>
         <source>Toggle Playback Events</source>

@@ -7893,8 +7893,8 @@ Mantenga presionada la tecla Mayús+Alt [Ganar]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="129" />
-        <source>Toggle Full Screen Mode                                                                                                                                             </source>
-        <translation>Alternar modo de pantalla completa</translation>
+        <source>Toggle Full Screen Mode</source>
+        <translation>Activar o desactivar el modo de pantalla completa</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="130" />
@@ -11379,6 +11379,10 @@ El uso de fórmulas matemáticas en el trazador también permite utilizar las va
         <location filename="../help/symbolic_help.py" line="194" />
         <source>F1 refers to the previous result of the actual formula to realize a feedback loop. This is useful in filter designs. Similarly, F2 refers to the second previous result etc.</source>
         <translation>F1 se refiere al resultado anterior de la fórmula real para realizar un ciclo de retroalimentación. Esto es útil en los diseños de filtros. De manera similar, F2 se refiere al segundo resultado anterior, etc.</translation>
+    </message>
+    <message>
+        <source>Toggle Full Screen Mode                                                                                                                                             </source>
+        <translation type="vanished">Alternar modo de pantalla completa</translation>
     </message>
     <message>
         <source>Toggle Playback Events</source>

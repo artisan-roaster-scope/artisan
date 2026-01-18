@@ -7904,8 +7904,8 @@ Hold Shift+Alt [Win]</source>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="129" />
-        <source>Toggle Full Screen Mode                                                                                                                                             </source>
-        <translation>切換全屏模式</translation>
+        <source>Toggle Full Screen Mode</source>
+        <translation>切換全螢幕模式</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="130" />
@@ -11399,6 +11399,10 @@ https://artisan-roasterscope.blogspot.com/2015/10/signals-symbolic-assignments-a
         <source>F1 refers to the previous result of the actual formula to realize a feedback loop. This is useful in filter designs. Similarly, F2 refers to the second previous result etc.</source>
         <translation>F1...F9作用為將前計算結果當成當下方程回饋迴圈,這在設計濾波時相當有用.  同樣的, F2 也是作為之前第P2變量的結果的回饋變數, 以此類推.
 </translation>
+    </message>
+    <message>
+        <source>Toggle Full Screen Mode                                                                                                                                             </source>
+        <translation type="vanished">切換全屏模式</translation>
     </message>
     <message>
         <source>Toggle Playback Events</source>

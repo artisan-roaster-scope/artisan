@@ -7881,8 +7881,8 @@ Pidä Shift + Alt [Win]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="129" />
-        <source>Toggle Full Screen Mode                                                                                                                                             </source>
-        <translation>Koko näytön tila päälle/pois</translation>
+        <source>Toggle Full Screen Mode</source>
+        <translation>Koko näytön tilan vaihto</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="130" />
@@ -11369,6 +11369,10 @@ Matemaattisten kaavojen käyttö plotterissa mahdollistaa myös symbolisten muut
         <location filename="../help/symbolic_help.py" line="194" />
         <source>F1 refers to the previous result of the actual formula to realize a feedback loop. This is useful in filter designs. Similarly, F2 refers to the second previous result etc.</source>
         <translation>F1 viittaa todellisen kaavan edelliseen tulokseen takaisinkytkentäsilmukan toteuttamiseksi. Tästä on hyötyä suodatinmalleissa. Vastaavasti F2 viittaa toiseen edelliseen tulokseen jne.</translation>
+    </message>
+    <message>
+        <source>Toggle Full Screen Mode                                                                                                                                             </source>
+        <translation type="vanished">Koko näytön tila päälle/pois</translation>
     </message>
     <message>
         <source>Toggle Playback Events</source>

@@ -7873,8 +7873,8 @@ Przytrzymaj Shift+Alt [Win]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="129" />
-        <source>Toggle Full Screen Mode                                                                                                                                             </source>
-        <translation>Przełącz tryb pełnego ekranu</translation>
+        <source>Toggle Full Screen Mode</source>
+        <translation>Przełącz tryb pełnoekranowy</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="130" />
@@ -11360,6 +11360,10 @@ Używanie formuł matematycznych w ploterze pozwala również na użycie zmienny
         <location filename="../help/symbolic_help.py" line="194" />
         <source>F1 refers to the previous result of the actual formula to realize a feedback loop. This is useful in filter designs. Similarly, F2 refers to the second previous result etc.</source>
         <translation>F1 odnosi się do poprzedniego wyniku rzeczywistej formuły, aby zrealizować pętlę sprzężenia zwrotnego. Jest to przydatne w projektach filtrów. Podobnie F2 odnosi się do drugiego poprzedniego wyniku itd.</translation>
+    </message>
+    <message>
+        <source>Toggle Full Screen Mode                                                                                                                                             </source>
+        <translation type="vanished">Przełącz tryb pełnego ekranu</translation>
     </message>
     <message>
         <source>Toggle Playback Events</source>

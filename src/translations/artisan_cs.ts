@@ -7850,8 +7850,8 @@ Podržte Shift+Alt [Win]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="129" />
-        <source>Toggle Full Screen Mode                                                                                                                                             </source>
-        <translation>Přepnout režim celé obrazovky                                                                                                                                                                         </translation>
+        <source>Toggle Full Screen Mode</source>
+        <translation>Přepnout režim celé obrazovky</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="130" />
@@ -11323,6 +11323,10 @@ Použití matematických vzorců v plotru umožňuje také použití symbolický
         <location filename="../help/symbolic_help.py" line="194" />
         <source>F1 refers to the previous result of the actual formula to realize a feedback loop. This is useful in filter designs. Similarly, F2 refers to the second previous result etc.</source>
         <translation>F1 odkazuje na předchozí výsledek skutečného vzorce pro realizaci zpětnovazební smyčky. To je užitečné při návrzích filtrů. Podobně F2 odkazuje na druhý předchozí výsledek atd.</translation>
+    </message>
+    <message>
+        <source>Toggle Full Screen Mode                                                                                                                                             </source>
+        <translation type="vanished">Přepnout režim celé obrazovky                                                                                                                                                                         </translation>
     </message>
     <message>
         <source>Toggle Playback Events</source>

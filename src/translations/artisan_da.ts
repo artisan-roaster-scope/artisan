@@ -7855,8 +7855,8 @@ Hold Shift+Alt nede [Win]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="129" />
-        <source>Toggle Full Screen Mode                                                                                                                                             </source>
-        <translation>Skift fuldskærmstilstand</translation>
+        <source>Toggle Full Screen Mode</source>
+        <translation>Slå fuldskærmstilstand til/fra</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="130" />
@@ -11341,6 +11341,10 @@ Brug af matematiske formler i plotteren giver også mulighed for at bruge de sym
         <location filename="../help/symbolic_help.py" line="194" />
         <source>F1 refers to the previous result of the actual formula to realize a feedback loop. This is useful in filter designs. Similarly, F2 refers to the second previous result etc.</source>
         <translation>F1 refererer til det tidligere resultat af den faktiske formel for at realisere en feedback-loop. Dette er nyttigt i filterdesign. På samme måde refererer F2 til det andet foregående resultat osv.</translation>
+    </message>
+    <message>
+        <source>Toggle Full Screen Mode                                                                                                                                             </source>
+        <translation type="vanished">Skift fuldskærmstilstand</translation>
     </message>
     <message>
         <source>Toggle Playback Events</source>

@@ -7891,8 +7891,8 @@ Segure Shift+Alt [Win]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="129" />
-        <source>Toggle Full Screen Mode                                                                                                                                             </source>
-        <translation>Alternar o modo de tela cheia</translation>
+        <source>Toggle Full Screen Mode</source>
+        <translation>Alternar modo de tela cheia</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="130" />
@@ -11378,6 +11378,10 @@ O uso de fórmulas matemáticas no plotter também permite usar as variáveis si
         <location filename="../help/symbolic_help.py" line="194" />
         <source>F1 refers to the previous result of the actual formula to realize a feedback loop. This is useful in filter designs. Similarly, F2 refers to the second previous result etc.</source>
         <translation>F1 se refere ao resultado anterior da fórmula real para realizar um ciclo de feedback. Isso é útil em designs de filtro. Da mesma forma, F2 se refere ao segundo resultado anterior, etc.</translation>
+    </message>
+    <message>
+        <source>Toggle Full Screen Mode                                                                                                                                             </source>
+        <translation type="vanished">Alternar o modo de tela cheia</translation>
     </message>
     <message>
         <source>Toggle Playback Events</source>

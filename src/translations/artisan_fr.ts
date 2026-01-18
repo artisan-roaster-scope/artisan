@@ -7902,8 +7902,8 @@ Maintenez Shift + Alt [Win]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="129" />
-        <source>Toggle Full Screen Mode                                                                                                                                             </source>
-        <translation>Basculer en mode plein écran</translation>
+        <source>Toggle Full Screen Mode</source>
+        <translation>Activer/désactiver le mode plein écran</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="130" />
@@ -11388,6 +11388,10 @@ L'utilisation de formules mathématiques dans le traceur permet également d'uti
         <location filename="../help/symbolic_help.py" line="194" />
         <source>F1 refers to the previous result of the actual formula to realize a feedback loop. This is useful in filter designs. Similarly, F2 refers to the second previous result etc.</source>
         <translation>F1 fait référence au résultat précédent de la formule réelle pour réaliser une boucle de rétroaction. Ceci est utile dans les conceptions de filtres. De même, F2 fait référence au deuxième résultat précédent, etc.</translation>
+    </message>
+    <message>
+        <source>Toggle Full Screen Mode                                                                                                                                             </source>
+        <translation type="vanished">Basculer en mode plein écran</translation>
     </message>
     <message>
         <source>Toggle Playback Events</source>

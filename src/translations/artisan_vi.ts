@@ -7885,8 +7885,8 @@ Giữ Shift+Alt [Thắng]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="129" />
-        <source>Toggle Full Screen Mode                                                                                                                                             </source>
-        <translation>Bật chế độ toàn màn hình</translation>
+        <source>Toggle Full Screen Mode</source>
+        <translation>Bật/tắt Chế độ toàn màn hình</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="130" />
@@ -11370,6 +11370,10 @@ Việc sử dụng các công thức toán học trong máy vẽ cũng cho phép
         <location filename="../help/symbolic_help.py" line="194" />
         <source>F1 refers to the previous result of the actual formula to realize a feedback loop. This is useful in filter designs. Similarly, F2 refers to the second previous result etc.</source>
         <translation>F1 đề cập đến kết quả trước đó của công thức thực tế để nhận ra một vòng phản hồi. Điều này rất hữu ích trong các thiết kế bộ lọc. Tương tự, F2 đề cập đến kết quả thứ hai trước đó, v.v.</translation>
+    </message>
+    <message>
+        <source>Toggle Full Screen Mode                                                                                                                                             </source>
+        <translation type="vanished">Bật chế độ toàn màn hình</translation>
     </message>
     <message>
         <source>Toggle Playback Events</source>

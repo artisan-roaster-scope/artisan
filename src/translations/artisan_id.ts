@@ -7885,7 +7885,7 @@ Tahan Shift+Alt [Menang]</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="129" />
-        <source>Toggle Full Screen Mode                                                                                                                                             </source>
+        <source>Toggle Full Screen Mode</source>
         <translation>Alihkan Mode Layar Penuh</translation>
     </message>
     <message>
@@ -11372,6 +11372,10 @@ Menggunakan rumus matematika di plotter juga memungkinkan untuk menggunakan vari
         <location filename="../help/symbolic_help.py" line="194" />
         <source>F1 refers to the previous result of the actual formula to realize a feedback loop. This is useful in filter designs. Similarly, F2 refers to the second previous result etc.</source>
         <translation>F1 mengacu pada hasil sebelumnya dari rumus aktual untuk mewujudkan loop umpan balik. Ini berguna dalam desain filter. Demikian pula, F2 mengacu pada hasil kedua sebelumnya, dll.</translation>
+    </message>
+    <message>
+        <source>Toggle Full Screen Mode                                                                                                                                             </source>
+        <translation type="vanished">Alihkan Mode Layar Penuh</translation>
     </message>
     <message>
         <source>Toggle Playback Events</source>
