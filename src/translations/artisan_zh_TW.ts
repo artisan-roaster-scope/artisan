@@ -178,6 +178,26 @@
 </context><context>
     <name>Button</name>
     <message>
+        <location filename="../artisanlib/dialogs.py" line="623" />
+        <location filename="../artisanlib/dialogs.py" line="87" />
+        <location filename="../artisanlib/comm.py" line="200" />
+        <location filename="../artisanlib/pid_dialogs.py" line="2813" />
+        <location filename="../artisanlib/pid_dialogs.py" line="1942" />
+        <location filename="../artisanlib/pid_dialogs.py" line="923" />
+        <location filename="../plus/login.py" line="73" />
+        <source>OK</source>
+        <translation>確認</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/dialogs.py" line="624" />
+        <location filename="../artisanlib/dialogs.py" line="88" />
+        <location filename="../artisanlib/comm.py" line="201" />
+        <location filename="../artisanlib/pid_dialogs.py" line="3101" />
+        <location filename="../plus/login.py" line="78" />
+        <source>Cancel</source>
+        <translation>取消</translation>
+    </message>
+    <message>
         <location filename="../artisanlib/colors.py" line="567" />
         <location filename="../artisanlib/designer.py" line="244" />
         <location filename="../artisanlib/phases.py" line="119" />
@@ -297,17 +317,6 @@
         <location filename="../artisanlib/pid_dialogs.py" line="903" />
         <source>Save</source>
         <translation>儲存</translation>
-    </message>
-    <message>
-        <location filename="../plus/login.py" line="73" />
-        <location filename="../artisanlib/dialogs.py" line="623" />
-        <location filename="../artisanlib/dialogs.py" line="87" />
-        <location filename="../artisanlib/comm.py" line="200" />
-        <location filename="../artisanlib/pid_dialogs.py" line="2813" />
-        <location filename="../artisanlib/pid_dialogs.py" line="1942" />
-        <location filename="../artisanlib/pid_dialogs.py" line="923" />
-        <source>OK</source>
-        <translation>確認</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="925" />
@@ -520,15 +529,6 @@
         <location filename="../artisanlib/pid_dialogs.py" line="3095" />
         <source>Write PIDs</source>
         <translation>寫入PIDs</translation>
-    </message>
-    <message>
-        <location filename="../plus/login.py" line="78" />
-        <location filename="../artisanlib/dialogs.py" line="624" />
-        <location filename="../artisanlib/dialogs.py" line="88" />
-        <location filename="../artisanlib/comm.py" line="201" />
-        <location filename="../artisanlib/pid_dialogs.py" line="3101" />
-        <source>Cancel</source>
-        <translation>取消</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3169" />
@@ -1122,6 +1122,17 @@ END</source>
 </context><context>
     <name>CheckBox</name>
     <message>
+        <location filename="../artisanlib/curves.py" line="1027" />
+        <location filename="../artisanlib/curves.py" line="938" />
+        <location filename="../artisanlib/curves.py" line="932" />
+        <location filename="../artisanlib/curves.py" line="925" />
+        <location filename="../artisanlib/curves.py" line="907" />
+        <location filename="../artisanlib/background.py" line="62" />
+        <location filename="../plus/schedule.py" line="1580" />
+        <source>Show</source>
+        <translation>顯示</translation>
+    </message>
+    <message>
         <location filename="../artisanlib/axis.py" line="167" />
         <source>Expand</source>
         <translation>自動延伸</translation>
@@ -1311,17 +1322,6 @@ END</source>
         <location filename="../artisanlib/ports.py" line="1363" />
         <source>OFF on DROP</source>
         <translation>下豆後關閉</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1580" />
-        <location filename="../artisanlib/curves.py" line="1027" />
-        <location filename="../artisanlib/curves.py" line="938" />
-        <location filename="../artisanlib/curves.py" line="932" />
-        <location filename="../artisanlib/curves.py" line="925" />
-        <location filename="../artisanlib/curves.py" line="907" />
-        <location filename="../artisanlib/background.py" line="62" />
-        <source>Show</source>
-        <translation>顯示</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="400" />
@@ -2423,6 +2423,36 @@ END</source>
 </context><context>
     <name>Contextual Menu</name>
     <message>
+        <location filename="../plus/schedule.py" line="1554" />
+        <source>All batches prepared</source>
+        <translation>所有批次均已準備好</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1557" />
+        <source>One more batch prepared</source>
+        <translation>又準備了一批</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1561" />
+        <source>One less batch prepared</source>
+        <translation>少準備一批</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1564" />
+        <source>No batch prepared</source>
+        <translation>沒有準備批次</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1576" />
+        <source>Register roast</source>
+        <translation>註冊烘焙</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1584" />
+        <source>Hide</source>
+        <translation>隱藏</translation>
+    </message>
+    <message>
         <location filename="../artisanlib/canvas.py" line="18341" />
         <source>Add point</source>
         <translation>增加點</translation>
@@ -2466,36 +2496,6 @@ END</source>
         <location filename="../artisanlib/canvas.py" line="19152" />
         <source>Edit</source>
         <translation>編輯</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1554" />
-        <source>All batches prepared</source>
-        <translation>所有批次均已準備好</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1557" />
-        <source>One more batch prepared</source>
-        <translation>又準備了一批</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1561" />
-        <source>One less batch prepared</source>
-        <translation>少準備一批</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1564" />
-        <source>No batch prepared</source>
-        <translation>沒有準備批次</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1576" />
-        <source>Register roast</source>
-        <translation>註冊烘焙</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1584" />
-        <source>Hide</source>
-        <translation>隱藏</translation>
     </message>
 </context><context>
     <name>Countries</name>
@@ -4489,6 +4489,12 @@ END</source>
 </context><context>
     <name>Form Caption</name>
     <message>
+        <location filename="../artisanlib/roast_properties.py" line="1768" />
+        <location filename="../plus/blend.py" line="130" />
+        <source>Custom Blend</source>
+        <translation>自定配方</translation>
+    </message>
+    <message>
         <location filename="../artisanlib/axis.py" line="70" />
         <source>Axes</source>
         <translation>坐標軸</translation>
@@ -4645,12 +4651,6 @@ END</source>
         <location filename="../artisanlib/roast_properties.py" line="560" />
         <source>Roast Properties</source>
         <translation>烘焙屬性</translation>
-    </message>
-    <message>
-        <location filename="../plus/blend.py" line="130" />
-        <location filename="../artisanlib/roast_properties.py" line="1768" />
-        <source>Custom Blend</source>
-        <translation>自定配方</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="4200" />
@@ -6924,11 +6924,8 @@ When Meter=NONE opens dialog to manually enter temperatures during roast</source
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="38" />
-        <source>Toggle Playback Events
-(Expert and Standard modes)</source>
-        <translation>切換播放事件
-
-（專家模式和標準模式）</translation>
+        <source>Toggle Playback Events</source>
+        <translation>切換播放事件</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="39" />
@@ -8791,8 +8788,8 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
     <message>
         <location filename="../help/eventbuttons_help.py" line="217" />
         <location filename="../help/eventsliders_help.py" line="141" />
-        <source>sets playback mode to 0: off, 1: time, 2: BT, 3: ET</source>
-        <translation>將播放模式設置為 0：關閉，1：時間，2：BT，3：ET</translation>
+        <source>sets playback mode to 0: off, 1: time, 2: BT, 3: ET; 4: BT/time; 5: ET/time</source>
+        <translation>播放模式設定為：0：關閉；1：時間；2：藍牙；3：ET；4：藍牙/時間；5：ET/時間</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="218" />
@@ -11406,6 +11403,17 @@ https://artisan-roasterscope.blogspot.com/2015/10/signals-symbolic-assignments-a
 </translation>
     </message>
     <message>
+        <source>Toggle Playback Events
+(Expert and Standard modes)</source>
+        <translation type="vanished">切換播放事件
+
+（專家模式和標準模式）</translation>
+    </message>
+    <message>
+        <source>sets playback mode to 0: off, 1: time, 2: BT, 3: ET</source>
+        <translation type="vanished">將播放模式設置為 0：關閉，1：時間，2：BT，3：ET</translation>
+    </message>
+    <message>
         <source>Data used to replace the fields in the Autosave File Name Prefix are pulled from the current Roast Properties.  </source>
         <translation type="vanished">用於替換自動保存文件名前綴中的字段的數據是從當前烘焙屬性中提取的。</translation>
     </message>
@@ -11454,10 +11462,6 @@ For a sensory milestone (see notes above) the value 50 corresponds to the "Hay" 
     <message>
         <source>Toggle Full Screen Mode                                                                                                                                             </source>
         <translation type="vanished">切換全屏模式</translation>
-    </message>
-    <message>
-        <source>Toggle Playback Events</source>
-        <translation type="vanished">切換播放事件</translation>
     </message>
     <message>
         <source>Load alarms</source>
@@ -11573,6 +11577,105 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
     </message>
 </context><context>
     <name>Label</name>
+    <message>
+        <location filename="../artisanlib/canvas.py" line="11970" />
+        <location filename="../artisanlib/large_lcds.py" line="851" />
+        <location filename="../artisanlib/roast_properties.py" line="906" />
+        <location filename="../artisanlib/roast_properties.py" line="221" />
+        <location filename="../artisanlib/roast_properties.py" line="148" />
+        <location filename="../plus/schedule.py" line="2049" />
+        <location filename="../plus/blend.py" line="157" />
+        <source>Weight</source>
+        <translation>重量</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/statistics.py" line="202" />
+        <location filename="../artisanlib/roast_properties.py" line="1094" />
+        <location filename="../artisanlib/roast_properties.py" line="897" />
+        <location filename="../plus/blend.py" line="343" />
+        <source>Beans</source>
+        <translation>咖啡豆</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/statistics.py" line="231" />
+        <location filename="../artisanlib/roast_properties.py" line="1724" />
+        <location filename="../plus/schedule.py" line="2071" />
+        <source>Yield</source>
+        <translation>屈服</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="23588" />
+        <location filename="../artisanlib/roast_properties.py" line="1723" />
+        <location filename="../plus/schedule.py" line="2081" />
+        <source>Defects</source>
+        <translation type="unfinished">瑕疵</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/canvas.py" line="11914" />
+        <location filename="../artisanlib/roast_properties.py" line="998" />
+        <location filename="../plus/schedule.py" line="2091" />
+        <source>Density</source>
+        <translation>密度</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/roast_properties.py" line="1069" />
+        <location filename="../artisanlib/events.py" line="449" />
+        <location filename="../plus/schedule.py" line="2101" />
+        <source>Color</source>
+        <translation>顏色</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/canvas.py" line="11919" />
+        <location filename="../artisanlib/roast_properties.py" line="1106" />
+        <location filename="../plus/schedule.py" line="2111" />
+        <source>Moisture</source>
+        <translation>含水量</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/statistics.py" line="213" />
+        <location filename="../artisanlib/roast_properties.py" line="1180" />
+        <location filename="../plus/schedule.py" line="2122" />
+        <location filename="../plus/schedule.py" line="2121" />
+        <source>Roasting Notes</source>
+        <translation>烘焙筆記</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2126" />
+        <source>Score</source>
+        <translation>分數</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/statistics.py" line="214" />
+        <location filename="../plus/schedule.py" line="2127" />
+        <source>Cupping Score</source>
+        <translation>拔罐分數</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/statistics.py" line="215" />
+        <location filename="../artisanlib/roast_properties.py" line="1184" />
+        <location filename="../plus/schedule.py" line="2134" />
+        <location filename="../plus/schedule.py" line="2133" />
+        <source>Cupping Notes</source>
+        <translation>杯測筆記</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/roast_properties.py" line="905" />
+        <location filename="../artisanlib/roast_properties.py" line="279" />
+        <location filename="../plus/schedule.py" line="4068" />
+        <location filename="../plus/schedule.py" line="2222" />
+        <source>Roasted</source>
+        <translation>熟豆</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/canvas.py" line="11970" />
+        <location filename="../artisanlib/canvas.py" line="11919" />
+        <location filename="../artisanlib/canvas.py" line="11914" />
+        <location filename="../artisanlib/roast_properties.py" line="904" />
+        <location filename="../artisanlib/roast_properties.py" line="206" />
+        <location filename="../plus/schedule.py" line="4066" />
+        <source>Green</source>
+        <translation>生豆</translation>
+    </message>
     <message>
         <location filename="../artisanlib/events.py" line="3811" />
         <location filename="../artisanlib/events.py" line="1010" />
@@ -12407,13 +12510,6 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <translation>標記</translation>
     </message>
     <message>
-        <location filename="../plus/schedule.py" line="2101" />
-        <location filename="../artisanlib/roast_properties.py" line="1069" />
-        <location filename="../artisanlib/events.py" line="449" />
-        <source>Color</source>
-        <translation>顏色</translation>
-    </message>
-    <message>
         <location filename="../artisanlib/events.py" line="451" />
         <source>Text Color</source>
         <translation>文字顏色</translation>
@@ -12892,40 +12988,11 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <translation>克</translation>
     </message>
     <message>
-        <location filename="../plus/schedule.py" line="2049" />
-        <location filename="../plus/blend.py" line="157" />
-        <location filename="../artisanlib/canvas.py" line="11970" />
-        <location filename="../artisanlib/large_lcds.py" line="851" />
-        <location filename="../artisanlib/roast_properties.py" line="906" />
-        <location filename="../artisanlib/roast_properties.py" line="221" />
-        <location filename="../artisanlib/roast_properties.py" line="148" />
-        <source>Weight</source>
-        <translation>重量</translation>
-    </message>
-    <message>
         <location filename="../artisanlib/roast_properties.py" line="967" />
         <location filename="../artisanlib/roast_properties.py" line="236" />
         <location filename="../artisanlib/roast_properties.py" line="163" />
         <source>Volume</source>
         <translation>體積</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="4066" />
-        <location filename="../artisanlib/canvas.py" line="11970" />
-        <location filename="../artisanlib/canvas.py" line="11919" />
-        <location filename="../artisanlib/canvas.py" line="11914" />
-        <location filename="../artisanlib/roast_properties.py" line="904" />
-        <location filename="../artisanlib/roast_properties.py" line="206" />
-        <source>Green</source>
-        <translation>生豆</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="4068" />
-        <location filename="../plus/schedule.py" line="2222" />
-        <location filename="../artisanlib/roast_properties.py" line="905" />
-        <location filename="../artisanlib/roast_properties.py" line="279" />
-        <source>Roasted</source>
-        <translation>熟豆</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="866" />
@@ -12937,21 +13004,6 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <location filename="../artisanlib/roast_properties.py" line="871" />
         <source>Batch</source>
         <translation>批次</translation>
-    </message>
-    <message>
-        <location filename="../plus/blend.py" line="343" />
-        <location filename="../artisanlib/statistics.py" line="202" />
-        <location filename="../artisanlib/roast_properties.py" line="1094" />
-        <location filename="../artisanlib/roast_properties.py" line="897" />
-        <source>Beans</source>
-        <translation>咖啡豆</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2091" />
-        <location filename="../artisanlib/canvas.py" line="11914" />
-        <location filename="../artisanlib/roast_properties.py" line="998" />
-        <source>Density</source>
-        <translation>密度</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1051" />
@@ -12969,13 +13021,6 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <translation>粉色</translation>
     </message>
     <message>
-        <location filename="../plus/schedule.py" line="2111" />
-        <location filename="../artisanlib/canvas.py" line="11919" />
-        <location filename="../artisanlib/roast_properties.py" line="1106" />
-        <source>Moisture</source>
-        <translation>含水量</translation>
-    </message>
-    <message>
         <location filename="../artisanlib/roast_properties.py" line="1134" />
         <location filename="../artisanlib/roast_properties.py" line="1107" />
         <source>%</source>
@@ -12985,22 +13030,6 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <location filename="../artisanlib/roast_properties.py" line="1132" />
         <source>Ambient Conditions</source>
         <translation>環境狀態</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2122" />
-        <location filename="../plus/schedule.py" line="2121" />
-        <location filename="../artisanlib/statistics.py" line="213" />
-        <location filename="../artisanlib/roast_properties.py" line="1180" />
-        <source>Roasting Notes</source>
-        <translation>烘焙筆記</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2134" />
-        <location filename="../plus/schedule.py" line="2133" />
-        <location filename="../artisanlib/statistics.py" line="215" />
-        <location filename="../artisanlib/roast_properties.py" line="1184" />
-        <source>Cupping Notes</source>
-        <translation>杯測筆記</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1362" />
@@ -13016,20 +13045,6 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <location filename="../artisanlib/roast_properties.py" line="1366" />
         <source>Blend</source>
         <translation>混合物</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2081" />
-        <location filename="../artisanlib/main.py" line="23588" />
-        <location filename="../artisanlib/roast_properties.py" line="1723" />
-        <source>Defects</source>
-        <translation type="unfinished">瑕疵</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2071" />
-        <location filename="../artisanlib/statistics.py" line="231" />
-        <location filename="../artisanlib/roast_properties.py" line="1724" />
-        <source>Yield</source>
-        <translation>屈服</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1934" />
@@ -13515,12 +13530,6 @@ LCDs All</source>
         <location filename="../artisanlib/statistics.py" line="200" />
         <source>Roaster</source>
         <translation>烘培機</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2127" />
-        <location filename="../artisanlib/statistics.py" line="214" />
-        <source>Cupping Score</source>
-        <translation>拔罐分數</translation>
     </message>
     <message>
         <location filename="../artisanlib/statistics.py" line="228" />
@@ -14545,11 +14554,6 @@ Fewer nodes: simpler curve but may lose detail</source>
         <translation>縱橫比</translation>
     </message>
     <message>
-        <location filename="../plus/schedule.py" line="2126" />
-        <source>Score</source>
-        <translation>分數</translation>
-    </message>
-    <message>
         <source>Continuous</source>
         <translation type="vanished">持續</translation>
     </message>
@@ -14651,6 +14655,12 @@ Fewer nodes: simpler curve but may lose detail</source>
     </message>
 </context><context>
     <name>Menu</name>
+    <message>
+        <location filename="../artisanlib/main.py" line="2667" />
+        <location filename="../plus/schedule.py" line="2427" />
+        <source>Schedule</source>
+        <translation>計劃</translation>
+    </message>
     <message>
         <location filename="../artisanlib/main.py" line="4349" />
         <location filename="../artisanlib/pid_dialogs.py" line="751" />
@@ -15162,12 +15172,6 @@ Fewer nodes: simpler curve but may lose detail</source>
         <translation>控制滑桿</translation>
     </message>
     <message>
-        <location filename="../plus/schedule.py" line="2427" />
-        <location filename="../artisanlib/main.py" line="2667" />
-        <source>Schedule</source>
-        <translation>計劃</translation>
-    </message>
-    <message>
         <location filename="../artisanlib/main.py" line="2705" />
         <source>Full Screen</source>
         <translation>全螢幕</translation>
@@ -15276,6 +15280,63 @@ Fewer nodes: simpler curve but may lose detail</source>
     </message>
 </context><context>
     <name>Message</name>
+    <message>
+        <location filename="../plus/schedule.py" line="1523" />
+        <source>Register the currently loaded roast profile&lt;br&gt;in the selected entry.&lt;br&gt;This will overwrite some roast properties.</source>
+        <translation>在所選條目中&lt;br&gt;註冊目前載入的烘焙設定檔。</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1537" />
+        <location filename="../plus/schedule.py" line="1528" />
+        <source>Register Roast</source>
+        <translation>註冊烤肉</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2481" />
+        <source>Scheduler started</source>
+        <translation>調度程序已啟動</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2792" />
+        <source>Roasts will not adjust the schedule&lt;br&gt;while the schedule window is closed</source>
+        <translation>行程視窗關閉時，烘焙不會調整行程&lt;br&gt;</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2806" />
+        <location filename="../plus/schedule.py" line="2797" />
+        <source>Close Scheduler</source>
+        <translation>關閉調度程序</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2864" />
+        <source>Scheduler stopped</source>
+        <translation>調度程序已停止</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="3578" />
+        <location filename="../plus/schedule.py" line="3170" />
+        <source>Updating completed roast properties failed</source>
+        <translation>更新已完成的烘焙屬性失敗</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="3750" />
+        <location filename="../plus/schedule.py" line="3289" />
+        <source>1 batch</source>
+        <translation>1批</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="3765" />
+        <location filename="../plus/schedule.py" line="3756" />
+        <location filename="../plus/schedule.py" line="3297" />
+        <location filename="../plus/schedule.py" line="3291" />
+        <source>{} batches</source>
+        <translation>{} 批次</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="3644" />
+        <source>Fetching completed roast properties failed</source>
+        <translation>取得已完成的烘焙屬性失敗</translation>
+    </message>
     <message>
         <location filename="../artisanlib/axis.py" line="896" />
         <source>xlimit = ({2},{3}) ylimit = ({0},{1}) zlimit = ({4},{5})</source>
@@ -17866,63 +17927,6 @@ Profile missing [CHARGE] or [DROP]</source>
         <translation>沒有發現背景曲線</translation>
     </message>
     <message>
-        <location filename="../plus/schedule.py" line="1523" />
-        <source>Register the currently loaded roast profile&lt;br&gt;in the selected entry.&lt;br&gt;This will overwrite some roast properties.</source>
-        <translation>在所選條目中&lt;br&gt;註冊目前載入的烘焙設定檔。</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1537" />
-        <location filename="../plus/schedule.py" line="1528" />
-        <source>Register Roast</source>
-        <translation>註冊烤肉</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2481" />
-        <source>Scheduler started</source>
-        <translation>調度程序已啟動</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2792" />
-        <source>Roasts will not adjust the schedule&lt;br&gt;while the schedule window is closed</source>
-        <translation>行程視窗關閉時，烘焙不會調整行程&lt;br&gt;</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2806" />
-        <location filename="../plus/schedule.py" line="2797" />
-        <source>Close Scheduler</source>
-        <translation>關閉調度程序</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2864" />
-        <source>Scheduler stopped</source>
-        <translation>調度程序已停止</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="3578" />
-        <location filename="../plus/schedule.py" line="3170" />
-        <source>Updating completed roast properties failed</source>
-        <translation>更新已完成的烘焙屬性失敗</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="3750" />
-        <location filename="../plus/schedule.py" line="3289" />
-        <source>1 batch</source>
-        <translation>1批</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="3765" />
-        <location filename="../plus/schedule.py" line="3756" />
-        <location filename="../plus/schedule.py" line="3297" />
-        <location filename="../plus/schedule.py" line="3291" />
-        <source>{} batches</source>
-        <translation>{} 批次</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="3644" />
-        <source>Fetching completed roast properties failed</source>
-        <translation>取得已完成的烘焙屬性失敗</translation>
-    </message>
-    <message>
         <source>Recomended Mode = 0</source>
         <translation type="vanished">推薦模式 = 0</translation>
     </message>
@@ -18017,51 +18021,6 @@ Continue?</source>
     </message>
 </context><context>
     <name>Plus</name>
-    <message>
-        <location filename="../artisanlib/main.py" line="1208" />
-        <source>debug logging ON</source>
-        <translation>開啟除錯紀錄</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1209" />
-        <source>debug logging OFF</source>
-        <translation>關閉除錯紀錄</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1222" />
-        <source>1 day left</source>
-        <translation>僅剩1天</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1224" />
-        <source>{} days left</source>
-        <translation>還剩{}天</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1226" />
-        <source>Paid until</source>
-        <translation>付費至</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1253" />
-        <source>Please visit our {0}shop{1} to extend your subscription</source>
-        <translation>請至我們的{0}商店{1}以延展您的訂閱</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1266" />
-        <source>Do you want to extend your subscription?</source>
-        <translation>你想延長你的訂閱嗎？</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1267" />
-        <source>Your subscription ends on</source>
-        <translation>您的訂閱結束於</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1267" />
-        <source>Your subscription ended on</source>
-        <translation>您的訂閱結束於</translation>
-    </message>
     <message>
         <location filename="../plus/queue.py" line="141" />
         <source>Roast successfully uploaded to {}</source>
@@ -18291,6 +18250,51 @@ Continue?</source>
         <source>Remember</source>
         <translation>記住</translation>
     </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1208" />
+        <source>debug logging ON</source>
+        <translation>開啟除錯紀錄</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1209" />
+        <source>debug logging OFF</source>
+        <translation>關閉除錯紀錄</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1222" />
+        <source>1 day left</source>
+        <translation>僅剩1天</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1224" />
+        <source>{} days left</source>
+        <translation>還剩{}天</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1226" />
+        <source>Paid until</source>
+        <translation>付費至</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1253" />
+        <source>Please visit our {0}shop{1} to extend your subscription</source>
+        <translation>請至我們的{0}商店{1}以延展您的訂閱</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1266" />
+        <source>Do you want to extend your subscription?</source>
+        <translation>你想延長你的訂閱嗎？</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1267" />
+        <source>Your subscription ends on</source>
+        <translation>您的訂閱結束於</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1267" />
+        <source>Your subscription ended on</source>
+        <translation>您的訂閱結束於</translation>
+    </message>
 </context><context>
     <name>Radio Button</name>
     <message>
@@ -18378,7 +18382,6 @@ Continue?</source>
 </context><context>
     <name>Scope Title</name>
     <message>
-        <location filename="../plus/schedule.py" line="2972" />
         <location filename="../artisanlib/canvas.py" line="9038" />
         <location filename="../artisanlib/canvas.py" line="7943" />
         <location filename="../artisanlib/canvas.py" line="1342" />
@@ -18388,6 +18391,7 @@ Continue?</source>
         <location filename="../artisanlib/roast_properties.py" line="2513" />
         <location filename="../artisanlib/roast_properties.py" line="2168" />
         <location filename="../artisanlib/roast_properties.py" line="2155" />
+        <location filename="../plus/schedule.py" line="2972" />
         <source>Roaster Scope</source>
         <translation>烘焙紀錄儀</translation>
     </message>
@@ -18762,6 +18766,16 @@ Continue?</source>
 </context><context>
     <name>Tab</name>
     <message>
+        <location filename="../plus/schedule.py" line="2328" />
+        <source>To-Do</source>
+        <translation>去做</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2329" />
+        <source>Completed</source>
+        <translation>完全的</translation>
+    </message>
+    <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3335" />
         <location filename="../artisanlib/pid_dialogs.py" line="2182" />
         <location filename="../artisanlib/pid_dialogs.py" line="948" />
@@ -18999,16 +19013,6 @@ Continue?</source>
         <location filename="../artisanlib/colors.py" line="557" />
         <source>LCDs</source>
         <translation>LCDs</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2328" />
-        <source>To-Do</source>
-        <translation>去做</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2329" />
-        <source>Completed</source>
-        <translation>完全的</translation>
     </message>
     <message>
         <source>Color</source>
@@ -19730,6 +19734,11 @@ Continue?</source>
     </message>
 </context><context>
     <name>Tooltip</name>
+    <message>
+        <location filename="../plus/schedule.py" line="2262" />
+        <source>Update schedule</source>
+        <translation>更新時間表</translation>
+    </message>
     <message>
         <location filename="../artisanlib/axis.py" line="83" />
         <source>100% event values in step mode are aligned with the given y-axis value or the lowest phases limit if left empty</source>
@@ -21476,11 +21485,6 @@ Currently in TEMP MODE</source>
         <location filename="../artisanlib/colors.py" line="571" />
         <source>Sets button colors to grey scale and LCD colors to black and white</source>
         <translation>將按鈕顏色設為灰度，將 LCD 顏色設定為黑白</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2262" />
-        <source>Update schedule</source>
-        <translation>更新時間表</translation>
     </message>
     <message>
         <source>Automatically extend the time axis by 3min on need</source>

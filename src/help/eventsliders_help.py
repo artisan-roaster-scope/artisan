@@ -138,7 +138,7 @@ def content() -> str:
     tbl_Commands.add_row(['&#160;','resetCanvasColor',QApplication.translate('HelpDlg','resets canvas color'),'&#160;'])
     tbl_Commands.add_row(['&#160;','button(<name>)',QApplication.translate('HelpDlg','activates button <name> from { START, CHARGE, DRY, FCs, FCe, SCs, SCe, DROP, COOL, OFF } '),'&#160;'])
     tbl_Commands.add_row(['&#160;','palette(<p>)',QApplication.translate('HelpDlg','activates palette <p> with <p> either a number 0-9 or a palette label'),'&#160;'])
-    tbl_Commands.add_row(['&#160;','playbackmode(<int>)',QApplication.translate('HelpDlg','sets playback mode to 0: off, 1: time, 2: BT, 3: ET'),'&#160;'])
+    tbl_Commands.add_row(['&#160;','playbackmode(<int>)',QApplication.translate('HelpDlg','sets playback mode to 0: off, 1: time, 2: BT, 3: ET; 4: BT/time; 5: ET/time'),'&#160;'])
     tbl_Commands.add_row(['&#160;','playbackdropmode(<int>)',QApplication.translate('HelpDlg','sets playback DROP mode to 0: off, 1: time, 2: BT, 3: ET'),'&#160;'])
     tbl_Commands.add_row(['&#160;','playback(n,<bool>)',QApplication.translate('HelpDlg','toggles playback per event type n from {1,2,3,4}'),'&#160;'])
     tbl_Commands.add_row(['&#160;','ramp(n,<bool>)',QApplication.translate('HelpDlg','toggles playback ramping per event type n from {1,2,3,4}'),'&#160;'])

@@ -48,7 +48,7 @@ class PROCESS_STATE(IntEnum):
     DONE = 3
     CANCELD = 4
 
-@dataclass # creates an __eq__ method comparing objects by property values
+@dataclass(slots=True) # creates an __eq__ method comparing objects by property values
 class WeightItem:
     uuid:str                 # the UUID of the ScheduledItem or CompletedItem
     title:str                # the title (schedule item name of a ScheduledItem, or batch number and roast name of a CompletedItem
@@ -64,11 +64,11 @@ class WeightItem:
     weight_unit_idx:int      # the weight unit, one of (0:'g', 1:'kg', 2:'lb', 3:'oz')
     callback:Callable[[str, float], None] # the function to be called with id:str and weight (in kg) on completion
 
-@dataclass
+@dataclass(slots=True)
 class GreenWeightItem(WeightItem):
     ...
 
-@dataclass
+@dataclass(slots=True)
 class RoastedWeightItem(WeightItem):
     ...
 

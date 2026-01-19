@@ -178,6 +178,26 @@
 </context><context>
     <name>Button</name>
     <message>
+        <location filename="../artisanlib/dialogs.py" line="623" />
+        <location filename="../artisanlib/dialogs.py" line="87" />
+        <location filename="../artisanlib/comm.py" line="200" />
+        <location filename="../artisanlib/pid_dialogs.py" line="2813" />
+        <location filename="../artisanlib/pid_dialogs.py" line="1942" />
+        <location filename="../artisanlib/pid_dialogs.py" line="923" />
+        <location filename="../plus/login.py" line="73" />
+        <source>OK</source>
+        <translation>OK</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/dialogs.py" line="624" />
+        <location filename="../artisanlib/dialogs.py" line="88" />
+        <location filename="../artisanlib/comm.py" line="201" />
+        <location filename="../artisanlib/pid_dialogs.py" line="3101" />
+        <location filename="../plus/login.py" line="78" />
+        <source>Cancel</source>
+        <translation>Batal</translation>
+    </message>
+    <message>
         <location filename="../artisanlib/colors.py" line="567" />
         <location filename="../artisanlib/designer.py" line="244" />
         <location filename="../artisanlib/phases.py" line="119" />
@@ -297,17 +317,6 @@
         <location filename="../artisanlib/pid_dialogs.py" line="903" />
         <source>Save</source>
         <translation type="unfinished">Simpan</translation>
-    </message>
-    <message>
-        <location filename="../plus/login.py" line="73" />
-        <location filename="../artisanlib/dialogs.py" line="623" />
-        <location filename="../artisanlib/dialogs.py" line="87" />
-        <location filename="../artisanlib/comm.py" line="200" />
-        <location filename="../artisanlib/pid_dialogs.py" line="2813" />
-        <location filename="../artisanlib/pid_dialogs.py" line="1942" />
-        <location filename="../artisanlib/pid_dialogs.py" line="923" />
-        <source>OK</source>
-        <translation>OK</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="925" />
@@ -520,15 +529,6 @@
         <location filename="../artisanlib/pid_dialogs.py" line="3095" />
         <source>Write PIDs</source>
         <translation type="unfinished">Tulis PID</translation>
-    </message>
-    <message>
-        <location filename="../plus/login.py" line="78" />
-        <location filename="../artisanlib/dialogs.py" line="624" />
-        <location filename="../artisanlib/dialogs.py" line="88" />
-        <location filename="../artisanlib/comm.py" line="201" />
-        <location filename="../artisanlib/pid_dialogs.py" line="3101" />
-        <source>Cancel</source>
-        <translation>Batal</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3169" />
@@ -1118,6 +1118,17 @@ END</source>
 </context><context>
     <name>CheckBox</name>
     <message>
+        <location filename="../artisanlib/curves.py" line="1027" />
+        <location filename="../artisanlib/curves.py" line="938" />
+        <location filename="../artisanlib/curves.py" line="932" />
+        <location filename="../artisanlib/curves.py" line="925" />
+        <location filename="../artisanlib/curves.py" line="907" />
+        <location filename="../artisanlib/background.py" line="62" />
+        <location filename="../plus/schedule.py" line="1580" />
+        <source>Show</source>
+        <translation type="unfinished">Tampilkan</translation>
+    </message>
+    <message>
         <location filename="../artisanlib/axis.py" line="167" />
         <source>Expand</source>
         <translation type="unfinished">Kembangkan</translation>
@@ -1307,17 +1318,6 @@ END</source>
         <location filename="../artisanlib/ports.py" line="1363" />
         <source>OFF on DROP</source>
         <translation>MATI saat DROP</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1580" />
-        <location filename="../artisanlib/curves.py" line="1027" />
-        <location filename="../artisanlib/curves.py" line="938" />
-        <location filename="../artisanlib/curves.py" line="932" />
-        <location filename="../artisanlib/curves.py" line="925" />
-        <location filename="../artisanlib/curves.py" line="907" />
-        <location filename="../artisanlib/background.py" line="62" />
-        <source>Show</source>
-        <translation type="unfinished">Tampilkan</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="400" />
@@ -2419,6 +2419,36 @@ END</source>
 </context><context>
     <name>Contextual Menu</name>
     <message>
+        <location filename="../plus/schedule.py" line="1554" />
+        <source>All batches prepared</source>
+        <translation>Semua batch sudah disiapkan</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1557" />
+        <source>One more batch prepared</source>
+        <translation>Satu batch lagi sudah siap</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1561" />
+        <source>One less batch prepared</source>
+        <translation>Satu batch lebih sedikit yang sudah disiapkan</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1564" />
+        <source>No batch prepared</source>
+        <translation>Tidak ada batch yang disiapkan</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1576" />
+        <source>Register roast</source>
+        <translation>Daftar panggang</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1584" />
+        <source>Hide</source>
+        <translation>Bersembunyi</translation>
+    </message>
+    <message>
         <location filename="../artisanlib/canvas.py" line="18341" />
         <source>Add point</source>
         <translation>Tambah titik</translation>
@@ -2462,36 +2492,6 @@ END</source>
         <location filename="../artisanlib/canvas.py" line="19152" />
         <source>Edit</source>
         <translation>Sunting</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1554" />
-        <source>All batches prepared</source>
-        <translation>Semua batch sudah disiapkan</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1557" />
-        <source>One more batch prepared</source>
-        <translation>Satu batch lagi sudah siap</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1561" />
-        <source>One less batch prepared</source>
-        <translation>Satu batch lebih sedikit yang sudah disiapkan</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1564" />
-        <source>No batch prepared</source>
-        <translation>Tidak ada batch yang disiapkan</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1576" />
-        <source>Register roast</source>
-        <translation>Daftar panggang</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1584" />
-        <source>Hide</source>
-        <translation>Bersembunyi</translation>
     </message>
 </context><context>
     <name>Countries</name>
@@ -4485,6 +4485,12 @@ END</source>
 </context><context>
     <name>Form Caption</name>
     <message>
+        <location filename="../artisanlib/roast_properties.py" line="1768" />
+        <location filename="../plus/blend.py" line="130" />
+        <source>Custom Blend</source>
+        <translation>Campuran Khusus</translation>
+    </message>
+    <message>
         <location filename="../artisanlib/axis.py" line="70" />
         <source>Axes</source>
         <translation>Sumbu</translation>
@@ -4641,12 +4647,6 @@ END</source>
         <location filename="../artisanlib/roast_properties.py" line="560" />
         <source>Roast Properties</source>
         <translation>Properti Panggang</translation>
-    </message>
-    <message>
-        <location filename="../plus/blend.py" line="130" />
-        <location filename="../artisanlib/roast_properties.py" line="1768" />
-        <source>Custom Blend</source>
-        <translation>Campuran Khusus</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="4200" />
@@ -6920,10 +6920,8 @@ Ketika Meter=NONE membuka dialog untuk memasukkan suhu secara manual selama pema
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="38" />
-        <source>Toggle Playback Events
-(Expert and Standard modes)</source>
-        <translation>Alihkan Acara Pemutaran
-(Mode Pakar dan Standar)</translation>
+        <source>Toggle Playback Events</source>
+        <translation>Beralih Acara Pemutaran</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="39" />
@@ -8770,8 +8768,8 @@ Muat profil yang direkam pada mesin yang lebih kecil dan buka Transposer. Pilih 
     <message>
         <location filename="../help/eventbuttons_help.py" line="217" />
         <location filename="../help/eventsliders_help.py" line="141" />
-        <source>sets playback mode to 0: off, 1: time, 2: BT, 3: ET</source>
-        <translation>menyetel mode pemutaran ke 0: mati, 1: waktu, 2: BT, 3: ET</translation>
+        <source>sets playback mode to 0: off, 1: time, 2: BT, 3: ET; 4: BT/time; 5: ET/time</source>
+        <translation>Mengatur mode pemutaran ke 0: mati, 1: waktu, 2: BT, 3: ET; 4: BT/waktu; 5: ET/waktu</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="218" />
@@ -11379,6 +11377,16 @@ Menggunakan rumus matematika di plotter juga memungkinkan untuk menggunakan vari
         <translation>F1 mengacu pada hasil sebelumnya dari rumus aktual untuk mewujudkan loop umpan balik. Ini berguna dalam desain filter. Demikian pula, F2 mengacu pada hasil kedua sebelumnya, dll.</translation>
     </message>
     <message>
+        <source>Toggle Playback Events
+(Expert and Standard modes)</source>
+        <translation type="vanished">Alihkan Acara Pemutaran
+(Mode Pakar dan Standar)</translation>
+    </message>
+    <message>
+        <source>sets playback mode to 0: off, 1: time, 2: BT, 3: ET</source>
+        <translation type="vanished">menyetel mode pemutaran ke 0: mati, 1: waktu, 2: BT, 3: ET</translation>
+    </message>
+    <message>
         <source>Data used to replace the fields in the Autosave File Name Prefix are pulled from the current Roast Properties.  </source>
         <translation type="vanished">Data yang digunakan untuk mengganti bidang di Awalan Nama Berkas Penyimpanan Otomatis diambil dari Properti Panggang saat ini.</translation>
     </message>
@@ -11427,10 +11435,6 @@ Untuk tonggak sensorik (lihat catatan di atas) nilai 50 sesuai dengan aroma "Hay
     <message>
         <source>Toggle Full Screen Mode                                                                                                                                             </source>
         <translation type="vanished">Alihkan Mode Layar Penuh</translation>
-    </message>
-    <message>
-        <source>Toggle Playback Events</source>
-        <translation type="vanished">Beralih Acara Pemutaran</translation>
     </message>
     <message>
         <source>Load alarms</source>
@@ -11542,6 +11546,105 @@ Pintasan Keyboard harus dinonaktifkan (ENTER)</translation>
     </message>
 </context><context>
     <name>Label</name>
+    <message>
+        <location filename="../artisanlib/canvas.py" line="11970" />
+        <location filename="../artisanlib/large_lcds.py" line="851" />
+        <location filename="../artisanlib/roast_properties.py" line="906" />
+        <location filename="../artisanlib/roast_properties.py" line="221" />
+        <location filename="../artisanlib/roast_properties.py" line="148" />
+        <location filename="../plus/schedule.py" line="2049" />
+        <location filename="../plus/blend.py" line="157" />
+        <source>Weight</source>
+        <translation type="unfinished">Bobot</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/statistics.py" line="202" />
+        <location filename="../artisanlib/roast_properties.py" line="1094" />
+        <location filename="../artisanlib/roast_properties.py" line="897" />
+        <location filename="../plus/blend.py" line="343" />
+        <source>Beans</source>
+        <translation type="unfinished">Biji</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/statistics.py" line="231" />
+        <location filename="../artisanlib/roast_properties.py" line="1724" />
+        <location filename="../plus/schedule.py" line="2071" />
+        <source>Yield</source>
+        <translation>Menghasilkan</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="23588" />
+        <location filename="../artisanlib/roast_properties.py" line="1723" />
+        <location filename="../plus/schedule.py" line="2081" />
+        <source>Defects</source>
+        <translation type="unfinished">Defect</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/canvas.py" line="11914" />
+        <location filename="../artisanlib/roast_properties.py" line="998" />
+        <location filename="../plus/schedule.py" line="2091" />
+        <source>Density</source>
+        <translation type="unfinished">Densitas</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/roast_properties.py" line="1069" />
+        <location filename="../artisanlib/events.py" line="449" />
+        <location filename="../plus/schedule.py" line="2101" />
+        <source>Color</source>
+        <translation type="unfinished">Warna</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/canvas.py" line="11919" />
+        <location filename="../artisanlib/roast_properties.py" line="1106" />
+        <location filename="../plus/schedule.py" line="2111" />
+        <source>Moisture</source>
+        <translation>Kelembaban</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/statistics.py" line="213" />
+        <location filename="../artisanlib/roast_properties.py" line="1180" />
+        <location filename="../plus/schedule.py" line="2122" />
+        <location filename="../plus/schedule.py" line="2121" />
+        <source>Roasting Notes</source>
+        <translation>Catatan Panggang</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2126" />
+        <source>Score</source>
+        <translation>Skor</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/statistics.py" line="214" />
+        <location filename="../plus/schedule.py" line="2127" />
+        <source>Cupping Score</source>
+        <translation>Skor Bekam</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/statistics.py" line="215" />
+        <location filename="../artisanlib/roast_properties.py" line="1184" />
+        <location filename="../plus/schedule.py" line="2134" />
+        <location filename="../plus/schedule.py" line="2133" />
+        <source>Cupping Notes</source>
+        <translation>Catatan Bekam</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/roast_properties.py" line="905" />
+        <location filename="../artisanlib/roast_properties.py" line="279" />
+        <location filename="../plus/schedule.py" line="4068" />
+        <location filename="../plus/schedule.py" line="2222" />
+        <source>Roasted</source>
+        <translation type="unfinished">matang</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/canvas.py" line="11970" />
+        <location filename="../artisanlib/canvas.py" line="11919" />
+        <location filename="../artisanlib/canvas.py" line="11914" />
+        <location filename="../artisanlib/roast_properties.py" line="904" />
+        <location filename="../artisanlib/roast_properties.py" line="206" />
+        <location filename="../plus/schedule.py" line="4066" />
+        <source>Green</source>
+        <translation>hijau</translation>
+    </message>
     <message>
         <location filename="../artisanlib/events.py" line="3811" />
         <location filename="../artisanlib/events.py" line="1010" />
@@ -12376,13 +12479,6 @@ Pintasan Keyboard harus dinonaktifkan (ENTER)</translation>
         <translation type="unfinished">Penanda</translation>
     </message>
     <message>
-        <location filename="../plus/schedule.py" line="2101" />
-        <location filename="../artisanlib/roast_properties.py" line="1069" />
-        <location filename="../artisanlib/events.py" line="449" />
-        <source>Color</source>
-        <translation type="unfinished">Warna</translation>
-    </message>
-    <message>
         <location filename="../artisanlib/events.py" line="451" />
         <source>Text Color</source>
         <translation type="unfinished">Warna Teks</translation>
@@ -12861,40 +12957,11 @@ Pintasan Keyboard harus dinonaktifkan (ENTER)</translation>
         <translation type="unfinished">g</translation>
     </message>
     <message>
-        <location filename="../plus/schedule.py" line="2049" />
-        <location filename="../plus/blend.py" line="157" />
-        <location filename="../artisanlib/canvas.py" line="11970" />
-        <location filename="../artisanlib/large_lcds.py" line="851" />
-        <location filename="../artisanlib/roast_properties.py" line="906" />
-        <location filename="../artisanlib/roast_properties.py" line="221" />
-        <location filename="../artisanlib/roast_properties.py" line="148" />
-        <source>Weight</source>
-        <translation type="unfinished">Bobot</translation>
-    </message>
-    <message>
         <location filename="../artisanlib/roast_properties.py" line="967" />
         <location filename="../artisanlib/roast_properties.py" line="236" />
         <location filename="../artisanlib/roast_properties.py" line="163" />
         <source>Volume</source>
         <translation type="unfinished">Volume</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="4066" />
-        <location filename="../artisanlib/canvas.py" line="11970" />
-        <location filename="../artisanlib/canvas.py" line="11919" />
-        <location filename="../artisanlib/canvas.py" line="11914" />
-        <location filename="../artisanlib/roast_properties.py" line="904" />
-        <location filename="../artisanlib/roast_properties.py" line="206" />
-        <source>Green</source>
-        <translation>hijau</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="4068" />
-        <location filename="../plus/schedule.py" line="2222" />
-        <location filename="../artisanlib/roast_properties.py" line="905" />
-        <location filename="../artisanlib/roast_properties.py" line="279" />
-        <source>Roasted</source>
-        <translation type="unfinished">matang</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="866" />
@@ -12906,21 +12973,6 @@ Pintasan Keyboard harus dinonaktifkan (ENTER)</translation>
         <location filename="../artisanlib/roast_properties.py" line="871" />
         <source>Batch</source>
         <translation type="unfinished">Batch</translation>
-    </message>
-    <message>
-        <location filename="../plus/blend.py" line="343" />
-        <location filename="../artisanlib/statistics.py" line="202" />
-        <location filename="../artisanlib/roast_properties.py" line="1094" />
-        <location filename="../artisanlib/roast_properties.py" line="897" />
-        <source>Beans</source>
-        <translation type="unfinished">Biji</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2091" />
-        <location filename="../artisanlib/canvas.py" line="11914" />
-        <location filename="../artisanlib/roast_properties.py" line="998" />
-        <source>Density</source>
-        <translation type="unfinished">Densitas</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1051" />
@@ -12938,13 +12990,6 @@ Pintasan Keyboard harus dinonaktifkan (ENTER)</translation>
         <translation>Tanah</translation>
     </message>
     <message>
-        <location filename="../plus/schedule.py" line="2111" />
-        <location filename="../artisanlib/canvas.py" line="11919" />
-        <location filename="../artisanlib/roast_properties.py" line="1106" />
-        <source>Moisture</source>
-        <translation>Kelembaban</translation>
-    </message>
-    <message>
         <location filename="../artisanlib/roast_properties.py" line="1134" />
         <location filename="../artisanlib/roast_properties.py" line="1107" />
         <source>%</source>
@@ -12954,22 +12999,6 @@ Pintasan Keyboard harus dinonaktifkan (ENTER)</translation>
         <location filename="../artisanlib/roast_properties.py" line="1132" />
         <source>Ambient Conditions</source>
         <translation>Kondisi Sekitar</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2122" />
-        <location filename="../plus/schedule.py" line="2121" />
-        <location filename="../artisanlib/statistics.py" line="213" />
-        <location filename="../artisanlib/roast_properties.py" line="1180" />
-        <source>Roasting Notes</source>
-        <translation>Catatan Panggang</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2134" />
-        <location filename="../plus/schedule.py" line="2133" />
-        <location filename="../artisanlib/statistics.py" line="215" />
-        <location filename="../artisanlib/roast_properties.py" line="1184" />
-        <source>Cupping Notes</source>
-        <translation>Catatan Bekam</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1362" />
@@ -12985,20 +13014,6 @@ Pintasan Keyboard harus dinonaktifkan (ENTER)</translation>
         <location filename="../artisanlib/roast_properties.py" line="1366" />
         <source>Blend</source>
         <translation>Campur</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2081" />
-        <location filename="../artisanlib/main.py" line="23588" />
-        <location filename="../artisanlib/roast_properties.py" line="1723" />
-        <source>Defects</source>
-        <translation type="unfinished">Defect</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2071" />
-        <location filename="../artisanlib/statistics.py" line="231" />
-        <location filename="../artisanlib/roast_properties.py" line="1724" />
-        <source>Yield</source>
-        <translation>Menghasilkan</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1934" />
@@ -13484,12 +13499,6 @@ Semua LCD</translation>
         <location filename="../artisanlib/statistics.py" line="200" />
         <source>Roaster</source>
         <translation>Pemanggang</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2127" />
-        <location filename="../artisanlib/statistics.py" line="214" />
-        <source>Cupping Score</source>
-        <translation>Skor Bekam</translation>
     </message>
     <message>
         <location filename="../artisanlib/statistics.py" line="228" />
@@ -14513,11 +14522,6 @@ Lebih sedikit node: kurva lebih sederhana tetapi mungkin kehilangan detail</tran
         <translation>Rasio Aspek</translation>
     </message>
     <message>
-        <location filename="../plus/schedule.py" line="2126" />
-        <source>Score</source>
-        <translation>Skor</translation>
-    </message>
-    <message>
         <source>Continuous</source>
         <translation type="vanished">Kontinu</translation>
     </message>
@@ -14619,6 +14623,12 @@ Lebih sedikit node: kurva lebih sederhana tetapi mungkin kehilangan detail</tran
     </message>
 </context><context>
     <name>Menu</name>
+    <message>
+        <location filename="../artisanlib/main.py" line="2667" />
+        <location filename="../plus/schedule.py" line="2427" />
+        <source>Schedule</source>
+        <translation>Rencana</translation>
+    </message>
     <message>
         <location filename="../artisanlib/main.py" line="4349" />
         <location filename="../artisanlib/pid_dialogs.py" line="751" />
@@ -15130,12 +15140,6 @@ Lebih sedikit node: kurva lebih sederhana tetapi mungkin kehilangan detail</tran
         <translation>Tombol geser</translation>
     </message>
     <message>
-        <location filename="../plus/schedule.py" line="2427" />
-        <location filename="../artisanlib/main.py" line="2667" />
-        <source>Schedule</source>
-        <translation>Rencana</translation>
-    </message>
-    <message>
         <location filename="../artisanlib/main.py" line="2705" />
         <source>Full Screen</source>
         <translation>Tampilan Penuh</translation>
@@ -15244,6 +15248,63 @@ Lebih sedikit node: kurva lebih sederhana tetapi mungkin kehilangan detail</tran
     </message>
 </context><context>
     <name>Message</name>
+    <message>
+        <location filename="../plus/schedule.py" line="1523" />
+        <source>Register the currently loaded roast profile&lt;br&gt;in the selected entry.&lt;br&gt;This will overwrite some roast properties.</source>
+        <translation>Daftarkan profil sangrai yang saat ini dimuat&lt;br&gt;di entri yang dipilih.&lt;br&gt;Ini akan menimpa beberapa properti sangrai.</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1537" />
+        <location filename="../plus/schedule.py" line="1528" />
+        <source>Register Roast</source>
+        <translation>Daftar Panggang</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2481" />
+        <source>Scheduler started</source>
+        <translation>Penjadwal dimulai</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2792" />
+        <source>Roasts will not adjust the schedule&lt;br&gt;while the schedule window is closed</source>
+        <translation>Roasting tidak akan menyesuaikan jadwal&lt;br&gt;saat jendela jadwal ditutup</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2806" />
+        <location filename="../plus/schedule.py" line="2797" />
+        <source>Close Scheduler</source>
+        <translation>Tutup Penjadwal</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2864" />
+        <source>Scheduler stopped</source>
+        <translation>Penjadwal berhenti</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="3578" />
+        <location filename="../plus/schedule.py" line="3170" />
+        <source>Updating completed roast properties failed</source>
+        <translation>Gagal memperbarui properti sangrai yang telah selesai</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="3750" />
+        <location filename="../plus/schedule.py" line="3289" />
+        <source>1 batch</source>
+        <translation>1 kelompok</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="3765" />
+        <location filename="../plus/schedule.py" line="3756" />
+        <location filename="../plus/schedule.py" line="3297" />
+        <location filename="../plus/schedule.py" line="3291" />
+        <source>{} batches</source>
+        <translation>{} kumpulan</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="3644" />
+        <source>Fetching completed roast properties failed</source>
+        <translation>Gagal mengambil properti sangrai yang telah selesai</translation>
+    </message>
     <message>
         <location filename="../artisanlib/axis.py" line="896" />
         <source>xlimit = ({2},{3}) ylimit = ({0},{1}) zlimit = ({4},{5})</source>
@@ -17833,63 +17894,6 @@ Profil tidak ada [CHARGE] atau [DROP]</translation>
         <translation>Profil latar belakang tidak ditemukan</translation>
     </message>
     <message>
-        <location filename="../plus/schedule.py" line="1523" />
-        <source>Register the currently loaded roast profile&lt;br&gt;in the selected entry.&lt;br&gt;This will overwrite some roast properties.</source>
-        <translation>Daftarkan profil sangrai yang saat ini dimuat&lt;br&gt;di entri yang dipilih.&lt;br&gt;Ini akan menimpa beberapa properti sangrai.</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1537" />
-        <location filename="../plus/schedule.py" line="1528" />
-        <source>Register Roast</source>
-        <translation>Daftar Panggang</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2481" />
-        <source>Scheduler started</source>
-        <translation>Penjadwal dimulai</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2792" />
-        <source>Roasts will not adjust the schedule&lt;br&gt;while the schedule window is closed</source>
-        <translation>Roasting tidak akan menyesuaikan jadwal&lt;br&gt;saat jendela jadwal ditutup</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2806" />
-        <location filename="../plus/schedule.py" line="2797" />
-        <source>Close Scheduler</source>
-        <translation>Tutup Penjadwal</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2864" />
-        <source>Scheduler stopped</source>
-        <translation>Penjadwal berhenti</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="3578" />
-        <location filename="../plus/schedule.py" line="3170" />
-        <source>Updating completed roast properties failed</source>
-        <translation>Gagal memperbarui properti sangrai yang telah selesai</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="3750" />
-        <location filename="../plus/schedule.py" line="3289" />
-        <source>1 batch</source>
-        <translation>1 kelompok</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="3765" />
-        <location filename="../plus/schedule.py" line="3756" />
-        <location filename="../plus/schedule.py" line="3297" />
-        <location filename="../plus/schedule.py" line="3291" />
-        <source>{} batches</source>
-        <translation>{} kumpulan</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="3644" />
-        <source>Fetching completed roast properties failed</source>
-        <translation>Gagal mengambil properti sangrai yang telah selesai</translation>
-    </message>
-    <message>
         <source>Recomended Mode = 0</source>
         <translation type="vanished">Mode yang Direkomendasikan = 0</translation>
     </message>
@@ -17985,51 +17989,6 @@ Melanjutkan?</translation>
     </message>
 </context><context>
     <name>Plus</name>
-    <message>
-        <location filename="../artisanlib/main.py" line="1208" />
-        <source>debug logging ON</source>
-        <translation>debug masuk ON</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1209" />
-        <source>debug logging OFF</source>
-        <translation>debug logging OFF</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1222" />
-        <source>1 day left</source>
-        <translation>1 hari lagi</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1224" />
-        <source>{} days left</source>
-        <translation>{} hari tersisa</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1226" />
-        <source>Paid until</source>
-        <translation>Dibayar sampai</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1253" />
-        <source>Please visit our {0}shop{1} to extend your subscription</source>
-        <translation>Kunjungi {0} toko {1} kami untuk memperpanjang langganan Anda</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1266" />
-        <source>Do you want to extend your subscription?</source>
-        <translation>Apakah Anda ingin memperpanjang langganan Anda?</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1267" />
-        <source>Your subscription ends on</source>
-        <translation>Langganan Anda berakhir</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1267" />
-        <source>Your subscription ended on</source>
-        <translation>Langganan Anda berakhir pada</translation>
-    </message>
     <message>
         <location filename="../plus/queue.py" line="141" />
         <source>Roast successfully uploaded to {}</source>
@@ -18259,6 +18218,51 @@ Melanjutkan?</translation>
         <source>Remember</source>
         <translation>Ingat</translation>
     </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1208" />
+        <source>debug logging ON</source>
+        <translation>debug masuk ON</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1209" />
+        <source>debug logging OFF</source>
+        <translation>debug logging OFF</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1222" />
+        <source>1 day left</source>
+        <translation>1 hari lagi</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1224" />
+        <source>{} days left</source>
+        <translation>{} hari tersisa</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1226" />
+        <source>Paid until</source>
+        <translation>Dibayar sampai</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1253" />
+        <source>Please visit our {0}shop{1} to extend your subscription</source>
+        <translation>Kunjungi {0} toko {1} kami untuk memperpanjang langganan Anda</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1266" />
+        <source>Do you want to extend your subscription?</source>
+        <translation>Apakah Anda ingin memperpanjang langganan Anda?</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1267" />
+        <source>Your subscription ends on</source>
+        <translation>Langganan Anda berakhir</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1267" />
+        <source>Your subscription ended on</source>
+        <translation>Langganan Anda berakhir pada</translation>
+    </message>
 </context><context>
     <name>Radio Button</name>
     <message>
@@ -18346,7 +18350,6 @@ Melanjutkan?</translation>
 </context><context>
     <name>Scope Title</name>
     <message>
-        <location filename="../plus/schedule.py" line="2972" />
         <location filename="../artisanlib/canvas.py" line="9038" />
         <location filename="../artisanlib/canvas.py" line="7943" />
         <location filename="../artisanlib/canvas.py" line="1342" />
@@ -18356,6 +18359,7 @@ Melanjutkan?</translation>
         <location filename="../artisanlib/roast_properties.py" line="2513" />
         <location filename="../artisanlib/roast_properties.py" line="2168" />
         <location filename="../artisanlib/roast_properties.py" line="2155" />
+        <location filename="../plus/schedule.py" line="2972" />
         <source>Roaster Scope</source>
         <translation>Mari ngopi</translation>
     </message>
@@ -18730,6 +18734,16 @@ Melanjutkan?</translation>
 </context><context>
     <name>Tab</name>
     <message>
+        <location filename="../plus/schedule.py" line="2328" />
+        <source>To-Do</source>
+        <translation>Melakukan</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2329" />
+        <source>Completed</source>
+        <translation>Lengkap</translation>
+    </message>
+    <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3335" />
         <location filename="../artisanlib/pid_dialogs.py" line="2182" />
         <location filename="../artisanlib/pid_dialogs.py" line="948" />
@@ -18967,16 +18981,6 @@ Melanjutkan?</translation>
         <location filename="../artisanlib/colors.py" line="557" />
         <source>LCDs</source>
         <translation type="unfinished">LCD</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2328" />
-        <source>To-Do</source>
-        <translation>Melakukan</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2329" />
-        <source>Completed</source>
-        <translation>Lengkap</translation>
     </message>
     <message>
         <source>Color</source>
@@ -19698,6 +19702,11 @@ Melanjutkan?</translation>
     </message>
 </context><context>
     <name>Tooltip</name>
+    <message>
+        <location filename="../plus/schedule.py" line="2262" />
+        <source>Update schedule</source>
+        <translation>Jadwal pembaruan</translation>
+    </message>
     <message>
         <location filename="../artisanlib/axis.py" line="83" />
         <source>100% event values in step mode are aligned with the given y-axis value or the lowest phases limit if left empty</source>
@@ -21445,11 +21454,6 @@ Saat ini dalam MODE SUHU</translation>
         <location filename="../artisanlib/colors.py" line="571" />
         <source>Sets button colors to grey scale and LCD colors to black and white</source>
         <translation>Mengatur warna tombol menjadi skala abu-abu dan warna LCD menjadi hitam putih</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2262" />
-        <source>Update schedule</source>
-        <translation>Jadwal pembaruan</translation>
     </message>
     <message>
         <source>Automatically extend the time axis by 3min on need</source>

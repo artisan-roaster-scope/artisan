@@ -12308,7 +12308,7 @@ class ApplicationWindow(QMainWindow):
                             self.sendmessage(QApplication.translate('Message','Auto Axis Graph Mode is off'))
                 elif self.buttonpalette_shortcuts and control_modifier and k in numberkeys: # palette switch via COMMAND-NUM-Keys
                     self.setbuttonsfrom(numberkeys.index(Qt.Key(k)), only_non_empty=True)
-                elif k == Qt.Key.Key_J and no_modifier and self.ui_mode is not UI_MODE.PRODUCTION: # 74:       #J (toggle Playback Events)
+                elif k == Qt.Key.Key_J and no_modifier: # 74:       #J (toggle Playback Events)
                     self.togglePlaybackEvents()
                 elif k == Qt.Key.Key_I and no_modifier: # 73:       #I (toggle foreground showfull flag)
                     self.toggleForegroundShowfullFlag()

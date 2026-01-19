@@ -180,6 +180,26 @@ Kusurlu Çekirdek Ağırlığı</translation>
 </context><context>
     <name>Button</name>
     <message>
+        <location filename="../artisanlib/dialogs.py" line="623" />
+        <location filename="../artisanlib/dialogs.py" line="87" />
+        <location filename="../artisanlib/comm.py" line="200" />
+        <location filename="../artisanlib/pid_dialogs.py" line="2813" />
+        <location filename="../artisanlib/pid_dialogs.py" line="1942" />
+        <location filename="../artisanlib/pid_dialogs.py" line="923" />
+        <location filename="../plus/login.py" line="73" />
+        <source>OK</source>
+        <translation>ok</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/dialogs.py" line="624" />
+        <location filename="../artisanlib/dialogs.py" line="88" />
+        <location filename="../artisanlib/comm.py" line="201" />
+        <location filename="../artisanlib/pid_dialogs.py" line="3101" />
+        <location filename="../plus/login.py" line="78" />
+        <source>Cancel</source>
+        <translation>İptal</translation>
+    </message>
+    <message>
         <location filename="../artisanlib/colors.py" line="567" />
         <location filename="../artisanlib/designer.py" line="244" />
         <location filename="../artisanlib/phases.py" line="119" />
@@ -299,17 +319,6 @@ Kusurlu Çekirdek Ağırlığı</translation>
         <location filename="../artisanlib/pid_dialogs.py" line="903" />
         <source>Save</source>
         <translation>Kaydet</translation>
-    </message>
-    <message>
-        <location filename="../plus/login.py" line="73" />
-        <location filename="../artisanlib/dialogs.py" line="623" />
-        <location filename="../artisanlib/dialogs.py" line="87" />
-        <location filename="../artisanlib/comm.py" line="200" />
-        <location filename="../artisanlib/pid_dialogs.py" line="2813" />
-        <location filename="../artisanlib/pid_dialogs.py" line="1942" />
-        <location filename="../artisanlib/pid_dialogs.py" line="923" />
-        <source>OK</source>
-        <translation>ok</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="925" />
@@ -522,15 +531,6 @@ Kusurlu Çekirdek Ağırlığı</translation>
         <location filename="../artisanlib/pid_dialogs.py" line="3095" />
         <source>Write PIDs</source>
         <translation>PID'leri yaz</translation>
-    </message>
-    <message>
-        <location filename="../plus/login.py" line="78" />
-        <location filename="../artisanlib/dialogs.py" line="624" />
-        <location filename="../artisanlib/dialogs.py" line="88" />
-        <location filename="../artisanlib/comm.py" line="201" />
-        <location filename="../artisanlib/pid_dialogs.py" line="3101" />
-        <source>Cancel</source>
-        <translation>İptal</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3169" />
@@ -1121,6 +1121,17 @@ END</source>
 </context><context>
     <name>CheckBox</name>
     <message>
+        <location filename="../artisanlib/curves.py" line="1027" />
+        <location filename="../artisanlib/curves.py" line="938" />
+        <location filename="../artisanlib/curves.py" line="932" />
+        <location filename="../artisanlib/curves.py" line="925" />
+        <location filename="../artisanlib/curves.py" line="907" />
+        <location filename="../artisanlib/background.py" line="62" />
+        <location filename="../plus/schedule.py" line="1580" />
+        <source>Show</source>
+        <translation>Göster</translation>
+    </message>
+    <message>
         <location filename="../artisanlib/axis.py" line="167" />
         <source>Expand</source>
         <translation>Genişlet</translation>
@@ -1310,17 +1321,6 @@ END</source>
         <location filename="../artisanlib/ports.py" line="1363" />
         <source>OFF on DROP</source>
         <translation>Bitişte Kapat</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1580" />
-        <location filename="../artisanlib/curves.py" line="1027" />
-        <location filename="../artisanlib/curves.py" line="938" />
-        <location filename="../artisanlib/curves.py" line="932" />
-        <location filename="../artisanlib/curves.py" line="925" />
-        <location filename="../artisanlib/curves.py" line="907" />
-        <location filename="../artisanlib/background.py" line="62" />
-        <source>Show</source>
-        <translation>Göster</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="400" />
@@ -2427,6 +2427,36 @@ END</source>
 </context><context>
     <name>Contextual Menu</name>
     <message>
+        <location filename="../plus/schedule.py" line="1554" />
+        <source>All batches prepared</source>
+        <translation>Tüm Partiler Hazırlandı</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1557" />
+        <source>One more batch prepared</source>
+        <translation>Bir parti daha hazırlandı</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1561" />
+        <source>One less batch prepared</source>
+        <translation>Bir parti daha azaltıldı</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1564" />
+        <source>No batch prepared</source>
+        <translation>Hazır Parti Yok</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1576" />
+        <source>Register roast</source>
+        <translation>Kavurmayı Kaydet</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1584" />
+        <source>Hide</source>
+        <translation>Gizle</translation>
+    </message>
+    <message>
         <location filename="../artisanlib/canvas.py" line="18341" />
         <source>Add point</source>
         <translation>Nokta Ekle</translation>
@@ -2470,36 +2500,6 @@ END</source>
         <location filename="../artisanlib/canvas.py" line="19152" />
         <source>Edit</source>
         <translation>Düzenle</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1554" />
-        <source>All batches prepared</source>
-        <translation>Tüm Partiler Hazırlandı</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1557" />
-        <source>One more batch prepared</source>
-        <translation>Bir parti daha hazırlandı</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1561" />
-        <source>One less batch prepared</source>
-        <translation>Bir parti daha azaltıldı</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1564" />
-        <source>No batch prepared</source>
-        <translation>Hazır Parti Yok</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1576" />
-        <source>Register roast</source>
-        <translation>Kavurmayı Kaydet</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1584" />
-        <source>Hide</source>
-        <translation>Gizle</translation>
     </message>
 </context><context>
     <name>Countries</name>
@@ -4493,6 +4493,12 @@ END</source>
 </context><context>
     <name>Form Caption</name>
     <message>
+        <location filename="../artisanlib/roast_properties.py" line="1768" />
+        <location filename="../plus/blend.py" line="130" />
+        <source>Custom Blend</source>
+        <translation>Özel Harman</translation>
+    </message>
+    <message>
         <location filename="../artisanlib/axis.py" line="70" />
         <source>Axes</source>
         <translation>Eksenler</translation>
@@ -4649,12 +4655,6 @@ END</source>
         <location filename="../artisanlib/roast_properties.py" line="560" />
         <source>Roast Properties</source>
         <translation>Kavurma Özellikleri</translation>
-    </message>
-    <message>
-        <location filename="../plus/blend.py" line="130" />
-        <location filename="../artisanlib/roast_properties.py" line="1768" />
-        <source>Custom Blend</source>
-        <translation>Özel Harman</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="4200" />
@@ -6928,10 +6928,8 @@ Klavye Kısayolları KAPALI olduğunda özel bir etkinlik eklenir
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="38" />
-        <source>Toggle Playback Events
-(Expert and Standard modes)</source>
-        <translation>Oynatma Olaylarını Aç/Kapat
-(Uzman ve Standart modlar)</translation>
+        <source>Toggle Playback Events</source>
+        <translation>Oynatma Olaylarını Değiştir</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="39" />
@@ -8778,8 +8776,8 @@ Daha küçük makinede kaydedilen profili yükleyin ve Aktarıcıyı açın. Do�
     <message>
         <location filename="../help/eventbuttons_help.py" line="217" />
         <location filename="../help/eventsliders_help.py" line="141" />
-        <source>sets playback mode to 0: off, 1: time, 2: BT, 3: ET</source>
-        <translation>oynatma modunu 0: kapalı, 1: süre, 2: BT, 3: ET olarak ayarlar</translation>
+        <source>sets playback mode to 0: off, 1: time, 2: BT, 3: ET; 4: BT/time; 5: ET/time</source>
+        <translation>Oynatma modunu şu şekilde ayarlar: 0: kapalı, 1: saat, 2: Bluetooth, 3: Doğu Zamanı; 4: Bluetooth/saat; 5: Doğu Zamanı/saat</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="218" />
@@ -11386,6 +11384,16 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
         <translation>F1, bir geri besleme döngüsü gerçekleştirmek için gerçek formülün önceki sonucunu ifade eder. Bu, filtre tasarımlarında kullanışlıdır. Benzer şekilde, F2 önceki ikinci sonucu ifade eder vb.</translation>
     </message>
     <message>
+        <source>Toggle Playback Events
+(Expert and Standard modes)</source>
+        <translation type="vanished">Oynatma Olaylarını Aç/Kapat
+(Uzman ve Standart modlar)</translation>
+    </message>
+    <message>
+        <source>sets playback mode to 0: off, 1: time, 2: BT, 3: ET</source>
+        <translation type="vanished">oynatma modunu 0: kapalı, 1: süre, 2: BT, 3: ET olarak ayarlar</translation>
+    </message>
+    <message>
         <source>Data used to replace the fields in the Autosave File Name Prefix are pulled from the current Roast Properties.  </source>
         <translation type="vanished">Otomatik Kaydetme Dosya Adı Önekindeki alanları değiştirmek için kullanılan veriler, geçerli Kızartma Özelliklerinden alınır.</translation>
     </message>
@@ -11434,10 +11442,6 @@ Duyusal bir dönüm noktası için (yukarıdaki notlara bakın) 50 değeri "Sama
     <message>
         <source>Toggle Full Screen Mode                                                                                                                                             </source>
         <translation type="vanished">Tam Ekran Modunu Değiştir</translation>
-    </message>
-    <message>
-        <source>Toggle Playback Events</source>
-        <translation type="vanished">Oynatma Olaylarını Değiştir</translation>
     </message>
     <message>
         <source>Load alarms</source>
@@ -11549,6 +11553,105 @@ Klavye Kısayolları devre dışı bırakılmalıdır (ENTER)</translation>
     </message>
 </context><context>
     <name>Label</name>
+    <message>
+        <location filename="../artisanlib/canvas.py" line="11970" />
+        <location filename="../artisanlib/large_lcds.py" line="851" />
+        <location filename="../artisanlib/roast_properties.py" line="906" />
+        <location filename="../artisanlib/roast_properties.py" line="221" />
+        <location filename="../artisanlib/roast_properties.py" line="148" />
+        <location filename="../plus/schedule.py" line="2049" />
+        <location filename="../plus/blend.py" line="157" />
+        <source>Weight</source>
+        <translation>Ağırlık</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/statistics.py" line="202" />
+        <location filename="../artisanlib/roast_properties.py" line="1094" />
+        <location filename="../artisanlib/roast_properties.py" line="897" />
+        <location filename="../plus/blend.py" line="343" />
+        <source>Beans</source>
+        <translation>Çekirdekler</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/statistics.py" line="231" />
+        <location filename="../artisanlib/roast_properties.py" line="1724" />
+        <location filename="../plus/schedule.py" line="2071" />
+        <source>Yield</source>
+        <translation>Verim</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="23588" />
+        <location filename="../artisanlib/roast_properties.py" line="1723" />
+        <location filename="../plus/schedule.py" line="2081" />
+        <source>Defects</source>
+        <translation>Kusurlular</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/canvas.py" line="11914" />
+        <location filename="../artisanlib/roast_properties.py" line="998" />
+        <location filename="../plus/schedule.py" line="2091" />
+        <source>Density</source>
+        <translation>Yoğunluk</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/roast_properties.py" line="1069" />
+        <location filename="../artisanlib/events.py" line="449" />
+        <location filename="../plus/schedule.py" line="2101" />
+        <source>Color</source>
+        <translation>Renk</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/canvas.py" line="11919" />
+        <location filename="../artisanlib/roast_properties.py" line="1106" />
+        <location filename="../plus/schedule.py" line="2111" />
+        <source>Moisture</source>
+        <translation>Nem</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/statistics.py" line="213" />
+        <location filename="../artisanlib/roast_properties.py" line="1180" />
+        <location filename="../plus/schedule.py" line="2122" />
+        <location filename="../plus/schedule.py" line="2121" />
+        <source>Roasting Notes</source>
+        <translation>Kavurma Notları</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2126" />
+        <source>Score</source>
+        <translation>Gol</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/statistics.py" line="214" />
+        <location filename="../plus/schedule.py" line="2127" />
+        <source>Cupping Score</source>
+        <translation>Tadım Puanı</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/statistics.py" line="215" />
+        <location filename="../artisanlib/roast_properties.py" line="1184" />
+        <location filename="../plus/schedule.py" line="2134" />
+        <location filename="../plus/schedule.py" line="2133" />
+        <source>Cupping Notes</source>
+        <translation>Tadım Notları</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/roast_properties.py" line="905" />
+        <location filename="../artisanlib/roast_properties.py" line="279" />
+        <location filename="../plus/schedule.py" line="4068" />
+        <location filename="../plus/schedule.py" line="2222" />
+        <source>Roasted</source>
+        <translation>Kavrulmuş</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/canvas.py" line="11970" />
+        <location filename="../artisanlib/canvas.py" line="11919" />
+        <location filename="../artisanlib/canvas.py" line="11914" />
+        <location filename="../artisanlib/roast_properties.py" line="904" />
+        <location filename="../artisanlib/roast_properties.py" line="206" />
+        <location filename="../plus/schedule.py" line="4066" />
+        <source>Green</source>
+        <translation>Yeşil</translation>
+    </message>
     <message>
         <location filename="../artisanlib/events.py" line="3811" />
         <location filename="../artisanlib/events.py" line="1010" />
@@ -12383,13 +12486,6 @@ Klavye Kısayolları devre dışı bırakılmalıdır (ENTER)</translation>
         <translation>İşaretleyiciler</translation>
     </message>
     <message>
-        <location filename="../plus/schedule.py" line="2101" />
-        <location filename="../artisanlib/roast_properties.py" line="1069" />
-        <location filename="../artisanlib/events.py" line="449" />
-        <source>Color</source>
-        <translation>Renk</translation>
-    </message>
-    <message>
         <location filename="../artisanlib/events.py" line="451" />
         <source>Text Color</source>
         <translation>Metin rengi</translation>
@@ -12868,40 +12964,11 @@ Klavye Kısayolları devre dışı bırakılmalıdır (ENTER)</translation>
         <translation>g</translation>
     </message>
     <message>
-        <location filename="../plus/schedule.py" line="2049" />
-        <location filename="../plus/blend.py" line="157" />
-        <location filename="../artisanlib/canvas.py" line="11970" />
-        <location filename="../artisanlib/large_lcds.py" line="851" />
-        <location filename="../artisanlib/roast_properties.py" line="906" />
-        <location filename="../artisanlib/roast_properties.py" line="221" />
-        <location filename="../artisanlib/roast_properties.py" line="148" />
-        <source>Weight</source>
-        <translation>Ağırlık</translation>
-    </message>
-    <message>
         <location filename="../artisanlib/roast_properties.py" line="967" />
         <location filename="../artisanlib/roast_properties.py" line="236" />
         <location filename="../artisanlib/roast_properties.py" line="163" />
         <source>Volume</source>
         <translation>Hacim</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="4066" />
-        <location filename="../artisanlib/canvas.py" line="11970" />
-        <location filename="../artisanlib/canvas.py" line="11919" />
-        <location filename="../artisanlib/canvas.py" line="11914" />
-        <location filename="../artisanlib/roast_properties.py" line="904" />
-        <location filename="../artisanlib/roast_properties.py" line="206" />
-        <source>Green</source>
-        <translation>Yeşil</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="4068" />
-        <location filename="../plus/schedule.py" line="2222" />
-        <location filename="../artisanlib/roast_properties.py" line="905" />
-        <location filename="../artisanlib/roast_properties.py" line="279" />
-        <source>Roasted</source>
-        <translation>Kavrulmuş</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="866" />
@@ -12913,21 +12980,6 @@ Klavye Kısayolları devre dışı bırakılmalıdır (ENTER)</translation>
         <location filename="../artisanlib/roast_properties.py" line="871" />
         <source>Batch</source>
         <translation>Parti</translation>
-    </message>
-    <message>
-        <location filename="../plus/blend.py" line="343" />
-        <location filename="../artisanlib/statistics.py" line="202" />
-        <location filename="../artisanlib/roast_properties.py" line="1094" />
-        <location filename="../artisanlib/roast_properties.py" line="897" />
-        <source>Beans</source>
-        <translation>Çekirdekler</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2091" />
-        <location filename="../artisanlib/canvas.py" line="11914" />
-        <location filename="../artisanlib/roast_properties.py" line="998" />
-        <source>Density</source>
-        <translation>Yoğunluk</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1051" />
@@ -12945,13 +12997,6 @@ Klavye Kısayolları devre dışı bırakılmalıdır (ENTER)</translation>
         <translation>Öğütülmüş</translation>
     </message>
     <message>
-        <location filename="../plus/schedule.py" line="2111" />
-        <location filename="../artisanlib/canvas.py" line="11919" />
-        <location filename="../artisanlib/roast_properties.py" line="1106" />
-        <source>Moisture</source>
-        <translation>Nem</translation>
-    </message>
-    <message>
         <location filename="../artisanlib/roast_properties.py" line="1134" />
         <location filename="../artisanlib/roast_properties.py" line="1107" />
         <source>%</source>
@@ -12961,22 +13006,6 @@ Klavye Kısayolları devre dışı bırakılmalıdır (ENTER)</translation>
         <location filename="../artisanlib/roast_properties.py" line="1132" />
         <source>Ambient Conditions</source>
         <translation>Çevre Koşulları</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2122" />
-        <location filename="../plus/schedule.py" line="2121" />
-        <location filename="../artisanlib/statistics.py" line="213" />
-        <location filename="../artisanlib/roast_properties.py" line="1180" />
-        <source>Roasting Notes</source>
-        <translation>Kavurma Notları</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2134" />
-        <location filename="../plus/schedule.py" line="2133" />
-        <location filename="../artisanlib/statistics.py" line="215" />
-        <location filename="../artisanlib/roast_properties.py" line="1184" />
-        <source>Cupping Notes</source>
-        <translation>Tadım Notları</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1362" />
@@ -12992,20 +13021,6 @@ Klavye Kısayolları devre dışı bırakılmalıdır (ENTER)</translation>
         <location filename="../artisanlib/roast_properties.py" line="1366" />
         <source>Blend</source>
         <translation>Harman</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2081" />
-        <location filename="../artisanlib/main.py" line="23588" />
-        <location filename="../artisanlib/roast_properties.py" line="1723" />
-        <source>Defects</source>
-        <translation>Kusurlular</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2071" />
-        <location filename="../artisanlib/statistics.py" line="231" />
-        <location filename="../artisanlib/roast_properties.py" line="1724" />
-        <source>Yield</source>
-        <translation>Verim</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1934" />
@@ -13491,12 +13506,6 @@ LCD'ler Tümü</translation>
         <location filename="../artisanlib/statistics.py" line="200" />
         <source>Roaster</source>
         <translation>Kavurma Makinesi</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2127" />
-        <location filename="../artisanlib/statistics.py" line="214" />
-        <source>Cupping Score</source>
-        <translation>Tadım Puanı</translation>
     </message>
     <message>
         <location filename="../artisanlib/statistics.py" line="228" />
@@ -14520,11 +14529,6 @@ Daha az düğüm: daha basit eğri ancak ayrıntı kaybı olabilir</translation>
         <translation>En/Boy Oranı</translation>
     </message>
     <message>
-        <location filename="../plus/schedule.py" line="2126" />
-        <source>Score</source>
-        <translation>Gol</translation>
-    </message>
-    <message>
         <source>Continuous</source>
         <translation type="vanished">Sürekli</translation>
     </message>
@@ -14626,6 +14630,12 @@ Daha az düğüm: daha basit eğri ancak ayrıntı kaybı olabilir</translation>
     </message>
 </context><context>
     <name>Menu</name>
+    <message>
+        <location filename="../artisanlib/main.py" line="2667" />
+        <location filename="../plus/schedule.py" line="2427" />
+        <source>Schedule</source>
+        <translation>Plan</translation>
+    </message>
     <message>
         <location filename="../artisanlib/main.py" line="4349" />
         <location filename="../artisanlib/pid_dialogs.py" line="751" />
@@ -15137,12 +15147,6 @@ Daha az düğüm: daha basit eğri ancak ayrıntı kaybı olabilir</translation>
         <translation>Kaydırıcı Düğmeleri</translation>
     </message>
     <message>
-        <location filename="../plus/schedule.py" line="2427" />
-        <location filename="../artisanlib/main.py" line="2667" />
-        <source>Schedule</source>
-        <translation>Plan</translation>
-    </message>
-    <message>
         <location filename="../artisanlib/main.py" line="2705" />
         <source>Full Screen</source>
         <translation>Tam ekran</translation>
@@ -15251,6 +15255,63 @@ Daha az düğüm: daha basit eğri ancak ayrıntı kaybı olabilir</translation>
     </message>
 </context><context>
     <name>Message</name>
+    <message>
+        <location filename="../plus/schedule.py" line="1523" />
+        <source>Register the currently loaded roast profile&lt;br&gt;in the selected entry.&lt;br&gt;This will overwrite some roast properties.</source>
+        <translation>Şu anda yüklenen kavurma profilini&lt;br&gt;seçili girişe kaydedin.&lt;br&gt;Bu, bazı kavurma özelliklerinin üzerine yazacaktır.</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1537" />
+        <location filename="../plus/schedule.py" line="1528" />
+        <source>Register Roast</source>
+        <translation>Kayıt Kızartma</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2481" />
+        <source>Scheduler started</source>
+        <translation>Planlayıcı başlatıldı</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2792" />
+        <source>Roasts will not adjust the schedule&lt;br&gt;while the schedule window is closed</source>
+        <translation>Program penceresi kapalıyken kavurma programı ayarlanmaz</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2806" />
+        <location filename="../plus/schedule.py" line="2797" />
+        <source>Close Scheduler</source>
+        <translation>Planlayıcıyı Kapat</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2864" />
+        <source>Scheduler stopped</source>
+        <translation>Zamanlayıcı durduruldu</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="3578" />
+        <location filename="../plus/schedule.py" line="3170" />
+        <source>Updating completed roast properties failed</source>
+        <translation>Tamamlanan kızartma özellikleri güncellenemedi</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="3750" />
+        <location filename="../plus/schedule.py" line="3289" />
+        <source>1 batch</source>
+        <translation>1 parti</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="3765" />
+        <location filename="../plus/schedule.py" line="3756" />
+        <location filename="../plus/schedule.py" line="3297" />
+        <location filename="../plus/schedule.py" line="3291" />
+        <source>{} batches</source>
+        <translation>{} partiler</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="3644" />
+        <source>Fetching completed roast properties failed</source>
+        <translation>Tamamlanan kızartma özellikleri getirilemedi</translation>
+    </message>
     <message>
         <location filename="../artisanlib/axis.py" line="896" />
         <source>xlimit = ({2},{3}) ylimit = ({0},{1}) zlimit = ({4},{5})</source>
@@ -17839,63 +17900,6 @@ Profile missing [CHARGE] or [DROP]</source>
         <translation>Arka plan profili bulunmadı</translation>
     </message>
     <message>
-        <location filename="../plus/schedule.py" line="1523" />
-        <source>Register the currently loaded roast profile&lt;br&gt;in the selected entry.&lt;br&gt;This will overwrite some roast properties.</source>
-        <translation>Şu anda yüklenen kavurma profilini&lt;br&gt;seçili girişe kaydedin.&lt;br&gt;Bu, bazı kavurma özelliklerinin üzerine yazacaktır.</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1537" />
-        <location filename="../plus/schedule.py" line="1528" />
-        <source>Register Roast</source>
-        <translation>Kayıt Kızartma</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2481" />
-        <source>Scheduler started</source>
-        <translation>Planlayıcı başlatıldı</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2792" />
-        <source>Roasts will not adjust the schedule&lt;br&gt;while the schedule window is closed</source>
-        <translation>Program penceresi kapalıyken kavurma programı ayarlanmaz</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2806" />
-        <location filename="../plus/schedule.py" line="2797" />
-        <source>Close Scheduler</source>
-        <translation>Planlayıcıyı Kapat</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2864" />
-        <source>Scheduler stopped</source>
-        <translation>Zamanlayıcı durduruldu</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="3578" />
-        <location filename="../plus/schedule.py" line="3170" />
-        <source>Updating completed roast properties failed</source>
-        <translation>Tamamlanan kızartma özellikleri güncellenemedi</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="3750" />
-        <location filename="../plus/schedule.py" line="3289" />
-        <source>1 batch</source>
-        <translation>1 parti</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="3765" />
-        <location filename="../plus/schedule.py" line="3756" />
-        <location filename="../plus/schedule.py" line="3297" />
-        <location filename="../plus/schedule.py" line="3291" />
-        <source>{} batches</source>
-        <translation>{} partiler</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="3644" />
-        <source>Fetching completed roast properties failed</source>
-        <translation>Tamamlanan kızartma özellikleri getirilemedi</translation>
-    </message>
-    <message>
         <source>Recomended Mode = 0</source>
         <translation type="vanished">Tavsiye edilen mod = 0</translation>
     </message>
@@ -17991,51 +17995,6 @@ Devam et?</translation>
     </message>
 </context><context>
     <name>Plus</name>
-    <message>
-        <location filename="../artisanlib/main.py" line="1208" />
-        <source>debug logging ON</source>
-        <translation>hata ayıklama günlüğü AÇIK</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1209" />
-        <source>debug logging OFF</source>
-        <translation>hata ayıklama günlüğü KAPALI</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1222" />
-        <source>1 day left</source>
-        <translation>1 gün kaldı</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1224" />
-        <source>{} days left</source>
-        <translation>{} Kalan günler</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1226" />
-        <source>Paid until</source>
-        <translation>Tarihine kadar ödendi</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1253" />
-        <source>Please visit our {0}shop{1} to extend your subscription</source>
-        <translation>Aboneliğinizi uzatmak için lütfen {0} mağazamızı {1} ziyaret edin</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1266" />
-        <source>Do you want to extend your subscription?</source>
-        <translation>Aboneliğinizi uzatmak istiyor musunuz?</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1267" />
-        <source>Your subscription ends on</source>
-        <translation>Aboneliğiniz şu tarihte sona eriyor</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1267" />
-        <source>Your subscription ended on</source>
-        <translation>Aboneliğiniz tarihinde sona erdi</translation>
-    </message>
     <message>
         <location filename="../plus/queue.py" line="141" />
         <source>Roast successfully uploaded to {}</source>
@@ -18265,6 +18224,51 @@ Devam et?</translation>
         <source>Remember</source>
         <translation>Hatırlamak</translation>
     </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1208" />
+        <source>debug logging ON</source>
+        <translation>hata ayıklama günlüğü AÇIK</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1209" />
+        <source>debug logging OFF</source>
+        <translation>hata ayıklama günlüğü KAPALI</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1222" />
+        <source>1 day left</source>
+        <translation>1 gün kaldı</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1224" />
+        <source>{} days left</source>
+        <translation>{} Kalan günler</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1226" />
+        <source>Paid until</source>
+        <translation>Tarihine kadar ödendi</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1253" />
+        <source>Please visit our {0}shop{1} to extend your subscription</source>
+        <translation>Aboneliğinizi uzatmak için lütfen {0} mağazamızı {1} ziyaret edin</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1266" />
+        <source>Do you want to extend your subscription?</source>
+        <translation>Aboneliğinizi uzatmak istiyor musunuz?</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1267" />
+        <source>Your subscription ends on</source>
+        <translation>Aboneliğiniz şu tarihte sona eriyor</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1267" />
+        <source>Your subscription ended on</source>
+        <translation>Aboneliğiniz tarihinde sona erdi</translation>
+    </message>
 </context><context>
     <name>Radio Button</name>
     <message>
@@ -18352,7 +18356,6 @@ Devam et?</translation>
 </context><context>
     <name>Scope Title</name>
     <message>
-        <location filename="../plus/schedule.py" line="2972" />
         <location filename="../artisanlib/canvas.py" line="9038" />
         <location filename="../artisanlib/canvas.py" line="7943" />
         <location filename="../artisanlib/canvas.py" line="1342" />
@@ -18362,6 +18365,7 @@ Devam et?</translation>
         <location filename="../artisanlib/roast_properties.py" line="2513" />
         <location filename="../artisanlib/roast_properties.py" line="2168" />
         <location filename="../artisanlib/roast_properties.py" line="2155" />
+        <location filename="../plus/schedule.py" line="2972" />
         <source>Roaster Scope</source>
         <translation>Kavurmacının Tuvali</translation>
     </message>
@@ -18736,6 +18740,16 @@ Devam et?</translation>
 </context><context>
     <name>Tab</name>
     <message>
+        <location filename="../plus/schedule.py" line="2328" />
+        <source>To-Do</source>
+        <translation>Yapılacaklar</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2329" />
+        <source>Completed</source>
+        <translation>Tamamlanmış</translation>
+    </message>
+    <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3335" />
         <location filename="../artisanlib/pid_dialogs.py" line="2182" />
         <location filename="../artisanlib/pid_dialogs.py" line="948" />
@@ -18973,16 +18987,6 @@ Devam et?</translation>
         <location filename="../artisanlib/colors.py" line="557" />
         <source>LCDs</source>
         <translation>LCD's</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2328" />
-        <source>To-Do</source>
-        <translation>Yapılacaklar</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2329" />
-        <source>Completed</source>
-        <translation>Tamamlanmış</translation>
     </message>
     <message>
         <source>Color</source>
@@ -19704,6 +19708,11 @@ Devam et?</translation>
     </message>
 </context><context>
     <name>Tooltip</name>
+    <message>
+        <location filename="../plus/schedule.py" line="2262" />
+        <source>Update schedule</source>
+        <translation>Güncelleme programı</translation>
+    </message>
     <message>
         <location filename="../artisanlib/axis.py" line="83" />
         <source>100% event values in step mode are aligned with the given y-axis value or the lowest phases limit if left empty</source>
@@ -21444,11 +21453,6 @@ Currently in TEMP MODE</source>
         <location filename="../artisanlib/colors.py" line="571" />
         <source>Sets button colors to grey scale and LCD colors to black and white</source>
         <translation>Düğme renklerini gri tonlamaya ve LCD renklerini siyah beyaza ayarlar</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2262" />
-        <source>Update schedule</source>
-        <translation>Güncelleme programı</translation>
     </message>
     <message>
         <source>Automatically extend the time axis by 3min on need</source>

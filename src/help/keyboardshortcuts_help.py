@@ -35,7 +35,7 @@ def content() -> str:
     tbl_KeyboardShortcuts.add_row(['B',QApplication.translate('HelpDlg','Shows/Hides Extra Event Buttons')])
     tbl_KeyboardShortcuts.add_row(['S',QApplication.translate('HelpDlg','Shows/Hides Event Sliders')])
     tbl_KeyboardShortcuts.add_row(['P',QApplication.translate('HelpDlg','Toggle PID mode')])
-    tbl_KeyboardShortcuts.add_row(['J',QApplication.translate('HelpDlg','Toggle Playback Events\n(Expert and Standard modes)')])
+    tbl_KeyboardShortcuts.add_row(['J',QApplication.translate('HelpDlg','Toggle Playback Events')])
     tbl_KeyboardShortcuts.add_row(['H\nCTRL+H [Win]',QApplication.translate('HelpDlg','Load background profile')])
     tbl_KeyboardShortcuts.add_row(['OPTION+H [Mac]\nCTRL+SHIFT+H [Win]',QApplication.translate('HelpDlg','Remove background profile')])
     tbl_KeyboardShortcuts.add_row(['I',QApplication.translate('HelpDlg','Toggle foreground curves “show full”')])
