@@ -178,26 +178,6 @@
 </context><context>
     <name>Button</name>
     <message>
-        <location filename="../artisanlib/dialogs.py" line="623" />
-        <location filename="../artisanlib/dialogs.py" line="87" />
-        <location filename="../artisanlib/comm.py" line="200" />
-        <location filename="../artisanlib/pid_dialogs.py" line="2813" />
-        <location filename="../artisanlib/pid_dialogs.py" line="1942" />
-        <location filename="../artisanlib/pid_dialogs.py" line="923" />
-        <location filename="../plus/login.py" line="73" />
-        <source>OK</source>
-        <translation>ตกลง</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/dialogs.py" line="624" />
-        <location filename="../artisanlib/dialogs.py" line="88" />
-        <location filename="../artisanlib/comm.py" line="201" />
-        <location filename="../artisanlib/pid_dialogs.py" line="3101" />
-        <location filename="../plus/login.py" line="78" />
-        <source>Cancel</source>
-        <translation>ปฏิเสธ</translation>
-    </message>
-    <message>
         <location filename="../artisanlib/colors.py" line="567" />
         <location filename="../artisanlib/designer.py" line="244" />
         <location filename="../artisanlib/phases.py" line="119" />
@@ -317,6 +297,17 @@
         <location filename="../artisanlib/pid_dialogs.py" line="903" />
         <source>Save</source>
         <translation type="unfinished">บันทึก</translation>
+    </message>
+    <message>
+        <location filename="../plus/login.py" line="73" />
+        <location filename="../artisanlib/dialogs.py" line="623" />
+        <location filename="../artisanlib/dialogs.py" line="87" />
+        <location filename="../artisanlib/comm.py" line="200" />
+        <location filename="../artisanlib/pid_dialogs.py" line="2813" />
+        <location filename="../artisanlib/pid_dialogs.py" line="1942" />
+        <location filename="../artisanlib/pid_dialogs.py" line="923" />
+        <source>OK</source>
+        <translation>ตกลง</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="925" />
@@ -529,6 +520,15 @@
         <location filename="../artisanlib/pid_dialogs.py" line="3095" />
         <source>Write PIDs</source>
         <translation type="unfinished">เขียน PIDs</translation>
+    </message>
+    <message>
+        <location filename="../plus/login.py" line="78" />
+        <location filename="../artisanlib/dialogs.py" line="624" />
+        <location filename="../artisanlib/dialogs.py" line="88" />
+        <location filename="../artisanlib/comm.py" line="201" />
+        <location filename="../artisanlib/pid_dialogs.py" line="3101" />
+        <source>Cancel</source>
+        <translation>ปฏิเสธ</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3169" />
@@ -1123,17 +1123,6 @@ END</source>
 </context><context>
     <name>CheckBox</name>
     <message>
-        <location filename="../artisanlib/curves.py" line="1027" />
-        <location filename="../artisanlib/curves.py" line="938" />
-        <location filename="../artisanlib/curves.py" line="932" />
-        <location filename="../artisanlib/curves.py" line="925" />
-        <location filename="../artisanlib/curves.py" line="907" />
-        <location filename="../artisanlib/background.py" line="62" />
-        <location filename="../plus/schedule.py" line="1580" />
-        <source>Show</source>
-        <translation type="unfinished">แสดง</translation>
-    </message>
-    <message>
         <location filename="../artisanlib/axis.py" line="167" />
         <source>Expand</source>
         <translation>ขยาย</translation>
@@ -1323,6 +1312,17 @@ END</source>
         <location filename="../artisanlib/ports.py" line="1363" />
         <source>OFF on DROP</source>
         <translation>ปิดบน DROP</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1580" />
+        <location filename="../artisanlib/curves.py" line="1027" />
+        <location filename="../artisanlib/curves.py" line="938" />
+        <location filename="../artisanlib/curves.py" line="932" />
+        <location filename="../artisanlib/curves.py" line="925" />
+        <location filename="../artisanlib/curves.py" line="907" />
+        <location filename="../artisanlib/background.py" line="62" />
+        <source>Show</source>
+        <translation type="unfinished">แสดง</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="400" />
@@ -2424,36 +2424,6 @@ END</source>
 </context><context>
     <name>Contextual Menu</name>
     <message>
-        <location filename="../plus/schedule.py" line="1554" />
-        <source>All batches prepared</source>
-        <translation>เตรียมไว้ทุกชุดแล้ว</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1557" />
-        <source>One more batch prepared</source>
-        <translation>เตรียมพร้อมอีกชุดหนึ่งแล้ว</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1561" />
-        <source>One less batch prepared</source>
-        <translation>เตรียมน้อยลงหนึ่งชุด</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1564" />
-        <source>No batch prepared</source>
-        <translation>ไม่ได้เตรียมแบทช์ไว้</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1576" />
-        <source>Register roast</source>
-        <translation>ลงทะเบียนย่าง</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1584" />
-        <source>Hide</source>
-        <translation>ซ่อน</translation>
-    </message>
-    <message>
         <location filename="../artisanlib/canvas.py" line="18341" />
         <source>Add point</source>
         <translation>เพิ่มจุด</translation>
@@ -2497,6 +2467,36 @@ END</source>
         <location filename="../artisanlib/canvas.py" line="19152" />
         <source>Edit</source>
         <translation>แก้ไข</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1554" />
+        <source>All batches prepared</source>
+        <translation>เตรียมไว้ทุกชุดแล้ว</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1557" />
+        <source>One more batch prepared</source>
+        <translation>เตรียมพร้อมอีกชุดหนึ่งแล้ว</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1561" />
+        <source>One less batch prepared</source>
+        <translation>เตรียมน้อยลงหนึ่งชุด</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1564" />
+        <source>No batch prepared</source>
+        <translation>ไม่ได้เตรียมแบทช์ไว้</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1576" />
+        <source>Register roast</source>
+        <translation>ลงทะเบียนย่าง</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1584" />
+        <source>Hide</source>
+        <translation>ซ่อน</translation>
     </message>
 </context><context>
     <name>Countries</name>
@@ -4490,12 +4490,6 @@ END</source>
 </context><context>
     <name>Form Caption</name>
     <message>
-        <location filename="../artisanlib/roast_properties.py" line="1768" />
-        <location filename="../plus/blend.py" line="130" />
-        <source>Custom Blend</source>
-        <translation>ผสมผสานแบบกำหนดเอง</translation>
-    </message>
-    <message>
         <location filename="../artisanlib/axis.py" line="70" />
         <source>Axes</source>
         <translation type="unfinished">แกน</translation>
@@ -4652,6 +4646,12 @@ END</source>
         <location filename="../artisanlib/roast_properties.py" line="560" />
         <source>Roast Properties</source>
         <translation type="unfinished">คุณสมบัติการคั่ว</translation>
+    </message>
+    <message>
+        <location filename="../plus/blend.py" line="130" />
+        <location filename="../artisanlib/roast_properties.py" line="1768" />
+        <source>Custom Blend</source>
+        <translation>ผสมผสานแบบกำหนดเอง</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="4200" />
@@ -6273,8 +6273,8 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="32" />
-        <source>Commands for alarms with an action go here.  Anything after a &amp;#39;#&amp;#39; character is considered a comment and is ignored when processing the alarm.  </source>
-        <translation>คำสั่งสำหรับการเตือนด้วยการดำเนินการไปที่นี่ อะไรก็ตามหลังจาก &amp;#39;#&amp;#39; อักขระถือเป็นความคิดเห็นและจะถูกละเว้นเมื่อประมวลผลการเตือน</translation>
+        <source>Commands for alarms with an action go here.  Anything after a &amp;#39;#&amp;#39; character is considered a comment and is ignored when processing the alarm.</source>
+        <translation>คำสั่งสำหรับสัญญาณเตือนพร้อมการดำเนินการจะอยู่ตรงนี้ ข้อความใดๆ ที่อยู่หลังเครื่องหมาย &amp;#39;#&amp;#39; จะถือเป็นข้อความแสดงความคิดเห็นและจะถูกละเว้นเมื่อประมวลผลสัญญาณเตือน</translation>
     </message>
     <message>
         <location filename="../help/alarms_help.py" line="35" />
@@ -9469,8 +9469,8 @@ Function 4 (Read Input Registers): registers 0 to 65535 corresponding to numbers
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="119" />
-        <source>write 16bit BCD encoded value to register of device with DeviceID </source>
-        <translation>เขียนค่าเข้ารหัส BCD 16 บิตเพื่อลงทะเบียนอุปกรณ์ด้วย DeviceID</translation>
+        <source>write 16bit BCD encoded value to register of device with DeviceID</source>
+        <translation>เขียนค่าที่เข้ารหัสแบบ BCD 16 บิตลงในรีจิสเตอร์ของอุปกรณ์ที่มี DeviceID</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="123" />
@@ -9769,9 +9769,9 @@ Field is hidden when the RoR value is not available.</source>
     <message>
         <location filename="../help/eventannotations_help.py" line="47" />
         <source>Assumptions:  The event value is 50.  In the case of Gas the value 50 corresponds to either 5.0kPh or 50%.  
-For a sensory milestone (see notes above) the value 50 corresponds to the "Hay" aroma. </source>
-        <translation>สมมติฐาน: ค่าเหตุการณ์คือ 50 ในกรณีของ Gas ค่า 50 จะสอดคล้องกับ 5.0kPh หรือ 50%
-สำหรับเหตุการณ์สำคัญทางประสาทสัมผัส (ดูหมายเหตุด้านบน) ค่า 50 จะสอดคล้องกับกลิ่นของ "หญ้าแห้ง"</translation>
+For a sensory milestone (see notes above) the value 50 corresponds to the "Hay" aroma.</source>
+        <translation>ข้อสมมติฐาน: ค่าของเหตุการณ์คือ 50 ในกรณีของก๊าซ ค่า 50 จะสอดคล้องกับ 5.0 กิโลฟาเรนไฮต์ หรือ 50%
+สำหรับจุดสำคัญทางประสาทสัมผัส (ดูหมายเหตุข้างต้น) ค่า 50 จะสอดคล้องกับกลิ่น "หญ้าแห้ง"</translation>
     </message>
     <message>
         <location filename="../help/eventannotations_help.py" line="50" />
@@ -10019,13 +10019,13 @@ Follow the steps below to set the energy inputs for the roast machine and afterb
     </message>
     <message>
         <location filename="../help/energy_help.py" line="40" />
-        <source>Artisan allows the direct reading of 2 energy meters to support the use of measured energy consumption values in place of estimated values defined by the Loads. These energy meters could measure gas or electricity. As an energy meter the instantaneous power reading must be accumulated over a period of time.  Energy readings are typically in kWh or BTU, though other units are supported.  Artisan will use the Meter reading at the start of recording and end of recording to calculate energy consumption for the roast batch.  Intermediate reads at major roast events are also used in presenting phase energy consumption.  </source>
-        <translation>Artisan อนุญาตให้อ่านค่ามิเตอร์วัดพลังงานโดยตรง 2 ตัว เพื่อรองรับการใช้ค่าการใช้พลังงานที่วัดได้แทนค่าประมาณที่กำหนดโดยโหลด มิเตอร์วัดพลังงานเหล่านี้สามารถวัดก๊าซหรือไฟฟ้าได้ ในฐานะมิเตอร์วัดพลังงาน การอ่านค่าพลังงานทันทีจะต้องสะสมไว้เป็นระยะเวลาหนึ่ง การอ่านค่าพลังงานโดยทั่วไปจะมีหน่วยเป็น kWh หรือ BTU แม้ว่าจะรองรับหน่วยอื่นๆ ก็ตาม Artisan จะใช้การอ่านค่ามิเตอร์ในช่วงเริ่มต้นการบันทึกและสิ้นสุดการบันทึกเพื่อคำนวณการใช้พลังงานสำหรับชุดการคั่ว การอ่านค่ากลางในงานการคั่วหลักยังใช้ในการนำเสนอการใช้พลังงานในแต่ละเฟสด้วย</translation>
+        <source>Artisan allows the direct reading of 2 energy meters to support the use of measured energy consumption values in place of estimated values defined by the Loads. These energy meters could measure gas or electricity. As an energy meter the instantaneous power reading must be accumulated over a period of time.  Energy readings are typically in kWh or BTU, though other units are supported.  Artisan will use the Meter reading at the start of recording and end of recording to calculate energy consumption for the roast batch.  Intermediate reads at major roast events are also used in presenting phase energy consumption.</source>
+        <translation>โปรแกรม Artisan อนุญาตให้อ่านค่ามิเตอร์พลังงาน 2 ตัวโดยตรง เพื่อสนับสนุนการใช้ค่าการใช้พลังงานที่วัดได้จริง แทนค่าประมาณที่กำหนดโดยโหลด มิเตอร์พลังงานเหล่านี้สามารถวัดก๊าซหรือไฟฟ้าได้ เนื่องจากเป็นมิเตอร์พลังงาน ค่าพลังงานที่อ่านได้แบบทันทีจะต้องสะสมในช่วงระยะเวลาหนึ่ง โดยทั่วไปค่าพลังงานจะอยู่ในหน่วย kWh หรือ BTU แม้ว่าจะรองรับหน่วยอื่นๆ ด้วยก็ตาม Artisan จะใช้ค่าที่อ่านได้จากมิเตอร์ ณ จุดเริ่มต้นและจุดสิ้นสุดของการบันทึก เพื่อคำนวณการใช้พลังงานสำหรับรอบการคั่ว นอกจากนี้ยังใช้ค่าที่อ่านได้ระหว่างช่วงการคั่วที่สำคัญๆ ในการแสดงการใช้พลังงานในแต่ละเฟสด้วย</translation>
     </message>
     <message>
         <location filename="../help/energy_help.py" line="40" />
-        <source>Energy meter data must be recorded in an Extra Device (Config&gt;&gt; Devices&gt;&gt; Extra devices tab).  The Extra Device is then used as the Source for the meter in the Energy tab.  Connectivity to the meter is typically via MODBUS. Some devices, like the YoctoWatt, have direct connection support in Artisan.  The data recorded in the Extra Device must be scaled to one of the units supported in the Energy tab such as kWh, BTU, kJ, kCal or therms (thm).  For instance, an electricity meter that returns energy readings in Wh that must be scaled to kWh buy using the symbolic equation "x/1000". </source>
-        <translation>ข้อมูลมิเตอร์วัดพลังงานจะต้องบันทึกไว้ในอุปกรณ์เสริม (แท็บ Config&gt;&gt; Devices&gt;&gt; Extra devices) จากนั้นอุปกรณ์พิเศษจะถูกใช้เป็นแหล่งที่มาของมิเตอร์ในแท็บ Energy การเชื่อมต่อกับมิเตอร์มักจะทำผ่าน MODBUS อุปกรณ์บางอย่าง เช่น YoctoWatt มีการรองรับการเชื่อมต่อโดยตรงใน Artisan ข้อมูลที่บันทึกไว้ในอุปกรณ์พิเศษจะต้องปรับขนาดให้เท่ากับหน่วยใดหน่วยหนึ่งที่รองรับในแท็บ Energy เช่น kWh, BTU, kJ, kCal หรือ therms (thm) ตัวอย่างเช่น มิเตอร์ไฟฟ้าที่ส่งค่าพลังงานเป็น Wh ซึ่งจะต้องปรับขนาดเป็น kWh โดยใช้สมการเชิงสัญลักษณ์ "x/1000"</translation>
+        <source>Energy meter data must be recorded in an Extra Device (Config&gt;&gt; Devices&gt;&gt; Extra devices tab).  The Extra Device is then used as the Source for the meter in the Energy tab.  Connectivity to the meter is typically via MODBUS. Some devices, like the YoctoWatt, have direct connection support in Artisan.  The data recorded in the Extra Device must be scaled to one of the units supported in the Energy tab such as kWh, BTU, kJ, kCal or therms (thm).  For instance, an electricity meter that returns energy readings in Wh that must be scaled to kWh buy using the symbolic equation "x/1000".</source>
+        <translation>ข้อมูลจากมิเตอร์วัดพลังงานจะต้องบันทึกไว้ในอุปกรณ์เสริม (Config&gt;&gt; Devices&gt;&gt; แท็บ Extra devices) จากนั้นจึงใช้อุปกรณ์เสริมนี้เป็นแหล่งข้อมูลสำหรับมิเตอร์ในแท็บ Energy การเชื่อมต่อกับมิเตอร์โดยทั่วไปจะใช้ MODBUS อุปกรณ์บางอย่าง เช่น YoctoWatt รองรับการเชื่อมต่อโดยตรงใน Artisan ข้อมูลที่บันทึกไว้ในอุปกรณ์เสริมจะต้องปรับขนาดให้เป็นหนึ่งในหน่วยที่รองรับในแท็บ Energy เช่น kWh, BTU, kJ, kCal หรือ therms (thm) ตัวอย่างเช่น มิเตอร์ไฟฟ้าที่แสดงค่าพลังงานเป็น Wh จะต้องปรับขนาดเป็น kWh โดยใช้สมการเชิงสัญลักษณ์ "x/1000"</translation>
     </message>
     <message>
         <location filename="../help/energy_help.py" line="44" />
@@ -10044,8 +10044,8 @@ Follow the steps below to set the energy inputs for the roast machine and afterb
     </message>
     <message>
         <location filename="../help/energy_help.py" line="45" />
-        <source>This is the power rating of the load  Choose the units in the next column.  </source>
-        <translation>นี่คือพิกัดกำลังของโหลด เลือกหน่วยในคอลัมน์ถัดไป</translation>
+        <source>This is the power rating of the load.  Choose the units in the next column.</source>
+        <translation>นี่คือค่ากำลังไฟฟ้าของอุปกรณ์ เลือกหน่วยในคอลัมน์ถัดไป</translation>
     </message>
     <message>
         <location filename="../help/energy_help.py" line="46" />
@@ -10168,10 +10168,9 @@ When blank the load is assumed to be at a constant setting, which is the percent
         <translation type="unfinished">บันทึกค่าเริ่มต้น</translation>
     </message>
     <message>
-        <location filename="../help/energy_help.py" line="77" />
         <location filename="../help/energy_help.py" line="58" />
-        <source>Stores the current settings on this sub-tab as defaults to be recalled later.  The default values will be stored when saving settings (Help&gt;Save Settings) to a file.  </source>
-        <translation>เก็บการตั้งค่าปัจจุบันบนแท็บย่อยนี้เป็นค่าเริ่มต้นที่จะเรียกคืนในภายหลัง ค่าเริ่มต้นจะถูกเก็บไว้เมื่อบันทึกการตั้งค่า (ช่วยเหลือ&gt;บันทึกการตั้งค่า) ลงในไฟล์</translation>
+        <source>Stores the current settings on this sub-tab as defaults to be recalled later. The default values will be stored when saving settings (Help&gt;Save Settings) to a file.</source>
+        <translation>บันทึกการตั้งค่าปัจจุบันในแท็บย่อยนี้เป็นค่าเริ่มต้นเพื่อเรียกใช้ในภายหลัง ค่าเริ่มต้นจะถูกบันทึกเมื่อบันทึกการตั้งค่า (ช่วยเหลือ &gt; บันทึกการตั้งค่า) ลงในไฟล์</translation>
     </message>
     <message>
         <location filename="../help/energy_help.py" line="78" />
@@ -10291,6 +10290,11 @@ Pre-Heating energy is applied only to the first batch of a roasting session.</so
         <location filename="../help/energy_help.py" line="76" />
         <source>This box should be ticked when a Between Batches protocol run is done after the Pre-heating and before the roast.</source>
         <translation>ควรทำเครื่องหมายที่ช่องนี้เมื่อมีการเรียกใช้โปรโตคอลระหว่างชุดงานหลังจากการทำความร้อนล่วงหน้าและก่อนการคั่ว</translation>
+    </message>
+    <message>
+        <location filename="../help/energy_help.py" line="77" />
+        <source>Stores the current settings on this sub-tab as defaults to be recalled later.  The default values will be stored when saving settings (Help&gt;Save Settings) to a file.  </source>
+        <translation>เก็บการตั้งค่าปัจจุบันบนแท็บย่อยนี้เป็นค่าเริ่มต้นที่จะเรียกคืนในภายหลัง ค่าเริ่มต้นจะถูกเก็บไว้เมื่อบันทึกการตั้งค่า (ช่วยเหลือ&gt;บันทึกการตั้งค่า) ลงในไฟล์</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="14" />
@@ -10488,8 +10492,8 @@ From Roast&gt;Properties&gt;Beans</source>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="52" />
-        <source>Current date and time with seconds in format yy-MM-dd_hhmmss.  Not the same as roast time. </source>
-        <translation>วันที่และเวลาปัจจุบันที่มีวินาทีในรูปแบบ yy-MM-dd_hhmmss ไม่เหมือนกับเวลาย่าง</translation>
+        <source>Current date and time with seconds in format yy-MM-dd_hhmmss. Not the same as roast time.</source>
+        <translation>วันที่และเวลาปัจจุบันพร้อมวินาทีในรูปแบบ yy-MM-dd_hhmmss ไม่เหมือนกับเวลาในการคั่ว</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="53" />
@@ -10678,8 +10682,8 @@ From Roast&gt;Properties&gt;Beans</source>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="90" />
-        <source>From Config&gt;Temperature - the current temperature mode C or F.  </source>
-        <translation>จาก Config&gt;Temperature - โหมดอุณหภูมิปัจจุบัน C หรือ F</translation>
+        <source>From Config&gt;Temperature - the current temperature mode C or F</source>
+        <translation>จากเมนูการตั้งค่า &gt; อุณหภูมิ - เลือกโหมดอุณหภูมิปัจจุบัน (เซลเซียสหรือฟาเรนไฮต์)</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="91" />
@@ -10817,8 +10821,8 @@ From Roast&gt;Properties&gt;Cupping Notes</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="127" />
-        <source>Data used to replace the fields in the Autosave File Name Prefix are pulled from the current Roast Properties.  </source>
-        <translation>ข้อมูลที่ใช้แทนที่ฟิลด์ในคำนำหน้าชื่อไฟล์บันทึกอัตโนมัติจะถูกดึงจากคุณสมบัติย่างปัจจุบัน</translation>
+        <source>Data used to replace the fields in the Autosave File Name Prefix are pulled from the current Roast Properties.</source>
+        <translation>ข้อมูลที่ใช้แทนที่ฟิลด์ในคำนำหน้าชื่อไฟล์บันทึกอัตโนมัติจะดึงมาจากคุณสมบัติการคั่วปัจจุบัน</translation>
     </message>
     <message>
         <location filename="../help/autosave_help.py" line="130" />
@@ -11095,13 +11099,13 @@ For example, while "Y2" returns the current bean temperature (BT), "Y2[-1]" retu
     </message>
     <message>
         <location filename="../help/symbolic_help.py" line="87" />
-        <source>Scaling factor from RoR to Temp axis. The range of the temperature scale divided by the range of the delta scale. </source>
-        <translation>ตัวคูณสเกลจากแกน RoR ถึงแกนอุณหภูมิ ช่วงของมาตราส่วนอุณหภูมิหารด้วยช่วงของมาตราส่วนเดลต้า</translation>
+        <source>Scaling factor from RoR to Temp axis. The range of the temperature scale divided by the range of the delta scale.</source>
+        <translation>ตัวคูณมาตราส่วนจาก RoR ไปยังแกนอุณหภูมิ ช่วงของมาตราส่วนอุณหภูมิหารด้วยช่วงของมาตราส่วนเดลต้า</translation>
     </message>
     <message>
         <location filename="../help/symbolic_help.py" line="88" />
-        <source>Offset from RoR to Temp axis. </source>
-        <translation>ออฟเซ็ตจากแกน RoR ถึงแกนอุณหภูมิ</translation>
+        <source>Offset from RoR to Temp axis.</source>
+        <translation>ค่าชดเชยจากแกน RoR ไปยังแกน Temp</translation>
     </message>
     <message>
         <location filename="../help/symbolic_help.py" line="92" />
@@ -11379,6 +11383,52 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
         <translation>F1 หมายถึงผลลัพธ์ก่อนหน้าของสูตรจริงเพื่อให้ทราบถึงลูปป้อนกลับ สิ่งนี้มีประโยชน์ในการออกแบบตัวกรอง ในทำนองเดียวกัน F2 หมายถึงผลลัพธ์ที่สองก่อนหน้า ฯลฯ</translation>
     </message>
     <message>
+        <source>Data used to replace the fields in the Autosave File Name Prefix are pulled from the current Roast Properties.  </source>
+        <translation type="vanished">ข้อมูลที่ใช้แทนที่ฟิลด์ในคำนำหน้าชื่อไฟล์บันทึกอัตโนมัติจะถูกดึงจากคุณสมบัติย่างปัจจุบัน</translation>
+    </message>
+    <message>
+        <source>Scaling factor from RoR to Temp axis. The range of the temperature scale divided by the range of the delta scale. </source>
+        <translation type="vanished">ตัวคูณสเกลจากแกน RoR ถึงแกนอุณหภูมิ ช่วงของมาตราส่วนอุณหภูมิหารด้วยช่วงของมาตราส่วนเดลต้า</translation>
+    </message>
+    <message>
+        <source>Offset from RoR to Temp axis. </source>
+        <translation type="vanished">ออฟเซ็ตจากแกน RoR ถึงแกนอุณหภูมิ</translation>
+    </message>
+    <message>
+        <source>Commands for alarms with an action go here.  Anything after a &amp;#39;#&amp;#39; character is considered a comment and is ignored when processing the alarm.  </source>
+        <translation type="vanished">คำสั่งสำหรับการเตือนด้วยการดำเนินการไปที่นี่ อะไรก็ตามหลังจาก &amp;#39;#&amp;#39; อักขระถือเป็นความคิดเห็นและจะถูกละเว้นเมื่อประมวลผลการเตือน</translation>
+    </message>
+    <message>
+        <source>write 16bit BCD encoded value to register of device with DeviceID </source>
+        <translation type="vanished">เขียนค่าเข้ารหัส BCD 16 บิตเพื่อลงทะเบียนอุปกรณ์ด้วย DeviceID</translation>
+    </message>
+    <message>
+        <source>Assumptions:  The event value is 50.  In the case of Gas the value 50 corresponds to either 5.0kPh or 50%.  
+For a sensory milestone (see notes above) the value 50 corresponds to the "Hay" aroma. </source>
+        <translation type="vanished">สมมติฐาน: ค่าเหตุการณ์คือ 50 ในกรณีของ Gas ค่า 50 จะสอดคล้องกับ 5.0kPh หรือ 50%
+สำหรับเหตุการณ์สำคัญทางประสาทสัมผัส (ดูหมายเหตุด้านบน) ค่า 50 จะสอดคล้องกับกลิ่นของ "หญ้าแห้ง"</translation>
+    </message>
+    <message>
+        <source>Artisan allows the direct reading of 2 energy meters to support the use of measured energy consumption values in place of estimated values defined by the Loads. These energy meters could measure gas or electricity. As an energy meter the instantaneous power reading must be accumulated over a period of time.  Energy readings are typically in kWh or BTU, though other units are supported.  Artisan will use the Meter reading at the start of recording and end of recording to calculate energy consumption for the roast batch.  Intermediate reads at major roast events are also used in presenting phase energy consumption.  </source>
+        <translation type="vanished">Artisan อนุญาตให้อ่านค่ามิเตอร์วัดพลังงานโดยตรง 2 ตัว เพื่อรองรับการใช้ค่าการใช้พลังงานที่วัดได้แทนค่าประมาณที่กำหนดโดยโหลด มิเตอร์วัดพลังงานเหล่านี้สามารถวัดก๊าซหรือไฟฟ้าได้ ในฐานะมิเตอร์วัดพลังงาน การอ่านค่าพลังงานทันทีจะต้องสะสมไว้เป็นระยะเวลาหนึ่ง การอ่านค่าพลังงานโดยทั่วไปจะมีหน่วยเป็น kWh หรือ BTU แม้ว่าจะรองรับหน่วยอื่นๆ ก็ตาม Artisan จะใช้การอ่านค่ามิเตอร์ในช่วงเริ่มต้นการบันทึกและสิ้นสุดการบันทึกเพื่อคำนวณการใช้พลังงานสำหรับชุดการคั่ว การอ่านค่ากลางในงานการคั่วหลักยังใช้ในการนำเสนอการใช้พลังงานในแต่ละเฟสด้วย</translation>
+    </message>
+    <message>
+        <source>Energy meter data must be recorded in an Extra Device (Config&gt;&gt; Devices&gt;&gt; Extra devices tab).  The Extra Device is then used as the Source for the meter in the Energy tab.  Connectivity to the meter is typically via MODBUS. Some devices, like the YoctoWatt, have direct connection support in Artisan.  The data recorded in the Extra Device must be scaled to one of the units supported in the Energy tab such as kWh, BTU, kJ, kCal or therms (thm).  For instance, an electricity meter that returns energy readings in Wh that must be scaled to kWh buy using the symbolic equation "x/1000". </source>
+        <translation type="vanished">ข้อมูลมิเตอร์วัดพลังงานจะต้องบันทึกไว้ในอุปกรณ์เสริม (แท็บ Config&gt;&gt; Devices&gt;&gt; Extra devices) จากนั้นอุปกรณ์พิเศษจะถูกใช้เป็นแหล่งที่มาของมิเตอร์ในแท็บ Energy การเชื่อมต่อกับมิเตอร์มักจะทำผ่าน MODBUS อุปกรณ์บางอย่าง เช่น YoctoWatt มีการรองรับการเชื่อมต่อโดยตรงใน Artisan ข้อมูลที่บันทึกไว้ในอุปกรณ์พิเศษจะต้องปรับขนาดให้เท่ากับหน่วยใดหน่วยหนึ่งที่รองรับในแท็บ Energy เช่น kWh, BTU, kJ, kCal หรือ therms (thm) ตัวอย่างเช่น มิเตอร์ไฟฟ้าที่ส่งค่าพลังงานเป็น Wh ซึ่งจะต้องปรับขนาดเป็น kWh โดยใช้สมการเชิงสัญลักษณ์ "x/1000"</translation>
+    </message>
+    <message>
+        <source>This is the power rating of the load  Choose the units in the next column.  </source>
+        <translation type="vanished">นี่คือพิกัดกำลังของโหลด เลือกหน่วยในคอลัมน์ถัดไป</translation>
+    </message>
+    <message>
+        <source>Current date and time with seconds in format yy-MM-dd_hhmmss.  Not the same as roast time. </source>
+        <translation type="vanished">วันที่และเวลาปัจจุบันที่มีวินาทีในรูปแบบ yy-MM-dd_hhmmss ไม่เหมือนกับเวลาย่าง</translation>
+    </message>
+    <message>
+        <source>From Config&gt;Temperature - the current temperature mode C or F.  </source>
+        <translation type="vanished">จาก Config&gt;Temperature - โหมดอุณหภูมิปัจจุบัน C หรือ F</translation>
+    </message>
+    <message>
         <source>Toggle Full Screen Mode                                                                                                                                             </source>
         <translation type="vanished">สลับโหมดเต็มหน้าจอ</translation>
     </message>
@@ -11496,105 +11546,6 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
     </message>
 </context><context>
     <name>Label</name>
-    <message>
-        <location filename="../artisanlib/canvas.py" line="11970" />
-        <location filename="../artisanlib/large_lcds.py" line="851" />
-        <location filename="../artisanlib/roast_properties.py" line="906" />
-        <location filename="../artisanlib/roast_properties.py" line="221" />
-        <location filename="../artisanlib/roast_properties.py" line="148" />
-        <location filename="../plus/schedule.py" line="2049" />
-        <location filename="../plus/blend.py" line="157" />
-        <source>Weight</source>
-        <translation type="unfinished">น้ำหนัก</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/statistics.py" line="202" />
-        <location filename="../artisanlib/roast_properties.py" line="1094" />
-        <location filename="../artisanlib/roast_properties.py" line="897" />
-        <location filename="../plus/blend.py" line="343" />
-        <source>Beans</source>
-        <translation type="unfinished">เมล็ด</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/statistics.py" line="231" />
-        <location filename="../artisanlib/roast_properties.py" line="1724" />
-        <location filename="../plus/schedule.py" line="2071" />
-        <source>Yield</source>
-        <translation>ผลผลิต</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="23588" />
-        <location filename="../artisanlib/roast_properties.py" line="1723" />
-        <location filename="../plus/schedule.py" line="2081" />
-        <source>Defects</source>
-        <translation>ข้อบกพร่อง</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/canvas.py" line="11914" />
-        <location filename="../artisanlib/roast_properties.py" line="998" />
-        <location filename="../plus/schedule.py" line="2091" />
-        <source>Density</source>
-        <translation type="unfinished">ความหนาแน่น</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/roast_properties.py" line="1069" />
-        <location filename="../artisanlib/events.py" line="449" />
-        <location filename="../plus/schedule.py" line="2101" />
-        <source>Color</source>
-        <translation type="unfinished">สี</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/canvas.py" line="11919" />
-        <location filename="../artisanlib/roast_properties.py" line="1106" />
-        <location filename="../plus/schedule.py" line="2111" />
-        <source>Moisture</source>
-        <translation>ความชื้น</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/statistics.py" line="213" />
-        <location filename="../artisanlib/roast_properties.py" line="1180" />
-        <location filename="../plus/schedule.py" line="2122" />
-        <location filename="../plus/schedule.py" line="2121" />
-        <source>Roasting Notes</source>
-        <translation type="unfinished">จดบันทึกการคั่ว</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2126" />
-        <source>Score</source>
-        <translation>คะแนน</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/statistics.py" line="214" />
-        <location filename="../plus/schedule.py" line="2127" />
-        <source>Cupping Score</source>
-        <translation type="unfinished">คะแนนป้อง</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/statistics.py" line="215" />
-        <location filename="../artisanlib/roast_properties.py" line="1184" />
-        <location filename="../plus/schedule.py" line="2134" />
-        <location filename="../plus/schedule.py" line="2133" />
-        <source>Cupping Notes</source>
-        <translation type="unfinished">จดบันทึกการชิม</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/roast_properties.py" line="905" />
-        <location filename="../artisanlib/roast_properties.py" line="279" />
-        <location filename="../plus/schedule.py" line="4068" />
-        <location filename="../plus/schedule.py" line="2222" />
-        <source>Roasted</source>
-        <translation type="unfinished">กาแฟคั่ว</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/canvas.py" line="11970" />
-        <location filename="../artisanlib/canvas.py" line="11919" />
-        <location filename="../artisanlib/canvas.py" line="11914" />
-        <location filename="../artisanlib/roast_properties.py" line="904" />
-        <location filename="../artisanlib/roast_properties.py" line="206" />
-        <location filename="../plus/schedule.py" line="4066" />
-        <source>Green</source>
-        <translation>สีเขียว</translation>
-    </message>
     <message>
         <location filename="../artisanlib/events.py" line="3811" />
         <location filename="../artisanlib/events.py" line="1010" />
@@ -12429,6 +12380,13 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <translation type="unfinished">เครื่องหมาย</translation>
     </message>
     <message>
+        <location filename="../plus/schedule.py" line="2101" />
+        <location filename="../artisanlib/roast_properties.py" line="1069" />
+        <location filename="../artisanlib/events.py" line="449" />
+        <source>Color</source>
+        <translation type="unfinished">สี</translation>
+    </message>
+    <message>
         <location filename="../artisanlib/events.py" line="451" />
         <source>Text Color</source>
         <translation type="unfinished">สีตัวอักษร</translation>
@@ -12907,11 +12865,40 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <translation type="unfinished">กรัม</translation>
     </message>
     <message>
+        <location filename="../plus/schedule.py" line="2049" />
+        <location filename="../plus/blend.py" line="157" />
+        <location filename="../artisanlib/canvas.py" line="11970" />
+        <location filename="../artisanlib/large_lcds.py" line="851" />
+        <location filename="../artisanlib/roast_properties.py" line="906" />
+        <location filename="../artisanlib/roast_properties.py" line="221" />
+        <location filename="../artisanlib/roast_properties.py" line="148" />
+        <source>Weight</source>
+        <translation type="unfinished">น้ำหนัก</translation>
+    </message>
+    <message>
         <location filename="../artisanlib/roast_properties.py" line="967" />
         <location filename="../artisanlib/roast_properties.py" line="236" />
         <location filename="../artisanlib/roast_properties.py" line="163" />
         <source>Volume</source>
         <translation type="unfinished">ปริมาตร</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="4066" />
+        <location filename="../artisanlib/canvas.py" line="11970" />
+        <location filename="../artisanlib/canvas.py" line="11919" />
+        <location filename="../artisanlib/canvas.py" line="11914" />
+        <location filename="../artisanlib/roast_properties.py" line="904" />
+        <location filename="../artisanlib/roast_properties.py" line="206" />
+        <source>Green</source>
+        <translation>สีเขียว</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="4068" />
+        <location filename="../plus/schedule.py" line="2222" />
+        <location filename="../artisanlib/roast_properties.py" line="905" />
+        <location filename="../artisanlib/roast_properties.py" line="279" />
+        <source>Roasted</source>
+        <translation type="unfinished">กาแฟคั่ว</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="866" />
@@ -12923,6 +12910,21 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <location filename="../artisanlib/roast_properties.py" line="871" />
         <source>Batch</source>
         <translation type="unfinished">ชุด</translation>
+    </message>
+    <message>
+        <location filename="../plus/blend.py" line="343" />
+        <location filename="../artisanlib/statistics.py" line="202" />
+        <location filename="../artisanlib/roast_properties.py" line="1094" />
+        <location filename="../artisanlib/roast_properties.py" line="897" />
+        <source>Beans</source>
+        <translation type="unfinished">เมล็ด</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2091" />
+        <location filename="../artisanlib/canvas.py" line="11914" />
+        <location filename="../artisanlib/roast_properties.py" line="998" />
+        <source>Density</source>
+        <translation type="unfinished">ความหนาแน่น</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1051" />
@@ -12940,6 +12942,13 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <translation>พื้น</translation>
     </message>
     <message>
+        <location filename="../plus/schedule.py" line="2111" />
+        <location filename="../artisanlib/canvas.py" line="11919" />
+        <location filename="../artisanlib/roast_properties.py" line="1106" />
+        <source>Moisture</source>
+        <translation>ความชื้น</translation>
+    </message>
+    <message>
         <location filename="../artisanlib/roast_properties.py" line="1134" />
         <location filename="../artisanlib/roast_properties.py" line="1107" />
         <source>%</source>
@@ -12949,6 +12958,22 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <location filename="../artisanlib/roast_properties.py" line="1132" />
         <source>Ambient Conditions</source>
         <translation type="unfinished">สภาวะแวดล้อม</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2122" />
+        <location filename="../plus/schedule.py" line="2121" />
+        <location filename="../artisanlib/statistics.py" line="213" />
+        <location filename="../artisanlib/roast_properties.py" line="1180" />
+        <source>Roasting Notes</source>
+        <translation type="unfinished">จดบันทึกการคั่ว</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2134" />
+        <location filename="../plus/schedule.py" line="2133" />
+        <location filename="../artisanlib/statistics.py" line="215" />
+        <location filename="../artisanlib/roast_properties.py" line="1184" />
+        <source>Cupping Notes</source>
+        <translation type="unfinished">จดบันทึกการชิม</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1362" />
@@ -12964,6 +12989,20 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <location filename="../artisanlib/roast_properties.py" line="1366" />
         <source>Blend</source>
         <translation>ผสมผสาน</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2081" />
+        <location filename="../artisanlib/main.py" line="23588" />
+        <location filename="../artisanlib/roast_properties.py" line="1723" />
+        <source>Defects</source>
+        <translation>ข้อบกพร่อง</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2071" />
+        <location filename="../artisanlib/statistics.py" line="231" />
+        <location filename="../artisanlib/roast_properties.py" line="1724" />
+        <source>Yield</source>
+        <translation>ผลผลิต</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1934" />
@@ -13449,6 +13488,12 @@ LCD ทั้งหมด</translation>
         <location filename="../artisanlib/statistics.py" line="200" />
         <source>Roaster</source>
         <translation>เครื่องคั่ว</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2127" />
+        <location filename="../artisanlib/statistics.py" line="214" />
+        <source>Cupping Score</source>
+        <translation type="unfinished">คะแนนป้อง</translation>
     </message>
     <message>
         <location filename="../artisanlib/statistics.py" line="228" />
@@ -14472,6 +14517,11 @@ Fewer nodes: simpler curve but may lose detail</source>
         <translation type="unfinished">อัตราส่วน</translation>
     </message>
     <message>
+        <location filename="../plus/schedule.py" line="2126" />
+        <source>Score</source>
+        <translation>คะแนน</translation>
+    </message>
+    <message>
         <source>Continuous</source>
         <translation type="vanished">ต่อเนื่อง</translation>
     </message>
@@ -14573,12 +14623,6 @@ Fewer nodes: simpler curve but may lose detail</source>
     </message>
 </context><context>
     <name>Menu</name>
-    <message>
-        <location filename="../artisanlib/main.py" line="2667" />
-        <location filename="../plus/schedule.py" line="2427" />
-        <source>Schedule</source>
-        <translation>วางแผน</translation>
-    </message>
     <message>
         <location filename="../artisanlib/main.py" line="4349" />
         <location filename="../artisanlib/pid_dialogs.py" line="751" />
@@ -15090,6 +15134,12 @@ Fewer nodes: simpler curve but may lose detail</source>
         <translation>แถบเลื่อน</translation>
     </message>
     <message>
+        <location filename="../plus/schedule.py" line="2427" />
+        <location filename="../artisanlib/main.py" line="2667" />
+        <source>Schedule</source>
+        <translation>วางแผน</translation>
+    </message>
+    <message>
         <location filename="../artisanlib/main.py" line="2705" />
         <source>Full Screen</source>
         <translation>เต็มจอ</translation>
@@ -15198,63 +15248,6 @@ Fewer nodes: simpler curve but may lose detail</source>
     </message>
 </context><context>
     <name>Message</name>
-    <message>
-        <location filename="../plus/schedule.py" line="1523" />
-        <source>Register the currently loaded roast profile&lt;br&gt;in the selected entry.&lt;br&gt;This will overwrite some roast properties.</source>
-        <translation>ลงทะเบียนโปรไฟล์การคั่วที่โหลดในปัจจุบัน&lt;br&gt;ในรายการที่เลือก&lt;br&gt;การดำเนินการนี้จะเขียนทับคุณสมบัติการคั่วบางส่วน</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1537" />
-        <location filename="../plus/schedule.py" line="1528" />
-        <source>Register Roast</source>
-        <translation>ลงทะเบียนย่าง</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2481" />
-        <source>Scheduler started</source>
-        <translation>เริ่มวางกำหนดการแล้ว</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2792" />
-        <source>Roasts will not adjust the schedule&lt;br&gt;while the schedule window is closed</source>
-        <translation>การคั่วจะไม่ปรับตารางเวลา&lt;br&gt;ในขณะที่หน้าต่างตารางเวลาปิดอยู่</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2806" />
-        <location filename="../plus/schedule.py" line="2797" />
-        <source>Close Scheduler</source>
-        <translation>ปิดตัวจัดกำหนดการ</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2864" />
-        <source>Scheduler stopped</source>
-        <translation>ตัวกำหนดเวลาหยุดทำงานแล้ว</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="3578" />
-        <location filename="../plus/schedule.py" line="3170" />
-        <source>Updating completed roast properties failed</source>
-        <translation>การอัปเดตคุณสมบัติการย่างที่เสร็จสมบูรณ์ล้มเหลว</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="3750" />
-        <location filename="../plus/schedule.py" line="3289" />
-        <source>1 batch</source>
-        <translation>1 ชุด</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="3765" />
-        <location filename="../plus/schedule.py" line="3756" />
-        <location filename="../plus/schedule.py" line="3297" />
-        <location filename="../plus/schedule.py" line="3291" />
-        <source>{} batches</source>
-        <translation>{} ชุด</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="3644" />
-        <source>Fetching completed roast properties failed</source>
-        <translation>การเรียกคุณสมบัติการย่างที่เสร็จสมบูรณ์ล้มเหลว</translation>
-    </message>
     <message>
         <location filename="../artisanlib/axis.py" line="896" />
         <source>xlimit = ({2},{3}) ylimit = ({0},{1}) zlimit = ({4},{5})</source>
@@ -17844,6 +17837,63 @@ Profile missing [CHARGE] or [DROP]</source>
         <translation>ไม่พบโปรไฟล์พื้นหลัง</translation>
     </message>
     <message>
+        <location filename="../plus/schedule.py" line="1523" />
+        <source>Register the currently loaded roast profile&lt;br&gt;in the selected entry.&lt;br&gt;This will overwrite some roast properties.</source>
+        <translation>ลงทะเบียนโปรไฟล์การคั่วที่โหลดในปัจจุบัน&lt;br&gt;ในรายการที่เลือก&lt;br&gt;การดำเนินการนี้จะเขียนทับคุณสมบัติการคั่วบางส่วน</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1537" />
+        <location filename="../plus/schedule.py" line="1528" />
+        <source>Register Roast</source>
+        <translation>ลงทะเบียนย่าง</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2481" />
+        <source>Scheduler started</source>
+        <translation>เริ่มวางกำหนดการแล้ว</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2792" />
+        <source>Roasts will not adjust the schedule&lt;br&gt;while the schedule window is closed</source>
+        <translation>การคั่วจะไม่ปรับตารางเวลา&lt;br&gt;ในขณะที่หน้าต่างตารางเวลาปิดอยู่</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2806" />
+        <location filename="../plus/schedule.py" line="2797" />
+        <source>Close Scheduler</source>
+        <translation>ปิดตัวจัดกำหนดการ</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2864" />
+        <source>Scheduler stopped</source>
+        <translation>ตัวกำหนดเวลาหยุดทำงานแล้ว</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="3578" />
+        <location filename="../plus/schedule.py" line="3170" />
+        <source>Updating completed roast properties failed</source>
+        <translation>การอัปเดตคุณสมบัติการย่างที่เสร็จสมบูรณ์ล้มเหลว</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="3750" />
+        <location filename="../plus/schedule.py" line="3289" />
+        <source>1 batch</source>
+        <translation>1 ชุด</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="3765" />
+        <location filename="../plus/schedule.py" line="3756" />
+        <location filename="../plus/schedule.py" line="3297" />
+        <location filename="../plus/schedule.py" line="3291" />
+        <source>{} batches</source>
+        <translation>{} ชุด</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="3644" />
+        <source>Fetching completed roast properties failed</source>
+        <translation>การเรียกคุณสมบัติการย่างที่เสร็จสมบูรณ์ล้มเหลว</translation>
+    </message>
+    <message>
         <source>Recomended Mode = 0</source>
         <translation type="vanished">โหมดที่แนะนำ = 0</translation>
     </message>
@@ -17939,6 +17989,51 @@ Continue?</source>
     </message>
 </context><context>
     <name>Plus</name>
+    <message>
+        <location filename="../artisanlib/main.py" line="1208" />
+        <source>debug logging ON</source>
+        <translation>ดีบักเข้าสู่ระบบ</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1209" />
+        <source>debug logging OFF</source>
+        <translation>ดีบักเข้าสู่ระบบปิด</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1222" />
+        <source>1 day left</source>
+        <translation>เหลืออีก 1 วัน</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1224" />
+        <source>{} days left</source>
+        <translation>{} วันที่เหลือ</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1226" />
+        <source>Paid until</source>
+        <translation>ชำระเงินจนถึง</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1253" />
+        <source>Please visit our {0}shop{1} to extend your subscription</source>
+        <translation>โปรดไปที่ {0} ร้านค้า {1} ของเราเพื่อขยายการสมัครของคุณ</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1266" />
+        <source>Do you want to extend your subscription?</source>
+        <translation>คุณต้องการขยายการสมัครของคุณหรือไม่?</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1267" />
+        <source>Your subscription ends on</source>
+        <translation>การสมัครของคุณสิ้นสุดลงในวันที่</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1267" />
+        <source>Your subscription ended on</source>
+        <translation>การสมัครของคุณสิ้นสุดลงเมื่อ</translation>
+    </message>
     <message>
         <location filename="../plus/queue.py" line="141" />
         <source>Roast successfully uploaded to {}</source>
@@ -18168,51 +18263,6 @@ Continue?</source>
         <source>Remember</source>
         <translation>จำไว้</translation>
     </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1208" />
-        <source>debug logging ON</source>
-        <translation>ดีบักเข้าสู่ระบบ</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1209" />
-        <source>debug logging OFF</source>
-        <translation>ดีบักเข้าสู่ระบบปิด</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1222" />
-        <source>1 day left</source>
-        <translation>เหลืออีก 1 วัน</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1224" />
-        <source>{} days left</source>
-        <translation>{} วันที่เหลือ</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1226" />
-        <source>Paid until</source>
-        <translation>ชำระเงินจนถึง</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1253" />
-        <source>Please visit our {0}shop{1} to extend your subscription</source>
-        <translation>โปรดไปที่ {0} ร้านค้า {1} ของเราเพื่อขยายการสมัครของคุณ</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1266" />
-        <source>Do you want to extend your subscription?</source>
-        <translation>คุณต้องการขยายการสมัครของคุณหรือไม่?</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1267" />
-        <source>Your subscription ends on</source>
-        <translation>การสมัครของคุณสิ้นสุดลงในวันที่</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1267" />
-        <source>Your subscription ended on</source>
-        <translation>การสมัครของคุณสิ้นสุดลงเมื่อ</translation>
-    </message>
 </context><context>
     <name>Radio Button</name>
     <message>
@@ -18300,6 +18350,7 @@ Continue?</source>
 </context><context>
     <name>Scope Title</name>
     <message>
+        <location filename="../plus/schedule.py" line="2972" />
         <location filename="../artisanlib/canvas.py" line="9038" />
         <location filename="../artisanlib/canvas.py" line="7943" />
         <location filename="../artisanlib/canvas.py" line="1342" />
@@ -18309,7 +18360,6 @@ Continue?</source>
         <location filename="../artisanlib/roast_properties.py" line="2513" />
         <location filename="../artisanlib/roast_properties.py" line="2168" />
         <location filename="../artisanlib/roast_properties.py" line="2155" />
-        <location filename="../plus/schedule.py" line="2972" />
         <source>Roaster Scope</source>
         <translation>ขอบเขตการคั่ว</translation>
     </message>
@@ -18669,26 +18719,20 @@ Continue?</source>
     </message>
     <message>
         <location filename="../artisanlib/pid_control.py" line="455" />
-        <source>{0} successfully sent to pid </source>
-        <translation>ส่ง {0} ไปยัง pid เรียบร้อยแล้ว</translation>
+        <source>{0} successfully sent to pid</source>
+        <translation type="unfinished" />
     </message>
     <message>
         <location filename="../artisanlib/pid_control.py" line="464" />
         <source>setpid(): There was a problem setting {0}</source>
         <translation>setpid(): มีปัญหาในการตั้งค่า {0}</translation>
     </message>
+    <message>
+        <source>{0} successfully sent to pid </source>
+        <translation type="vanished">ส่ง {0} ไปยัง pid เรียบร้อยแล้ว</translation>
+    </message>
 </context><context>
     <name>Tab</name>
-    <message>
-        <location filename="../plus/schedule.py" line="2328" />
-        <source>To-Do</source>
-        <translation>ทำ</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2329" />
-        <source>Completed</source>
-        <translation>สมบูรณ์</translation>
-    </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3335" />
         <location filename="../artisanlib/pid_dialogs.py" line="2182" />
@@ -18927,6 +18971,16 @@ Continue?</source>
         <location filename="../artisanlib/colors.py" line="557" />
         <source>LCDs</source>
         <translation type="unfinished">จอแอลซีดี</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2328" />
+        <source>To-Do</source>
+        <translation>ทำ</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2329" />
+        <source>Completed</source>
+        <translation>สมบูรณ์</translation>
     </message>
     <message>
         <source>Color</source>
@@ -19648,11 +19702,6 @@ Continue?</source>
     </message>
 </context><context>
     <name>Tooltip</name>
-    <message>
-        <location filename="../plus/schedule.py" line="2262" />
-        <source>Update schedule</source>
-        <translation>ตารางการอัพเดท</translation>
-    </message>
     <message>
         <location filename="../artisanlib/axis.py" line="83" />
         <source>100% event values in step mode are aligned with the given y-axis value or the lowest phases limit if left empty</source>
@@ -21399,6 +21448,11 @@ Currently in TEMP MODE</source>
         <location filename="../artisanlib/colors.py" line="571" />
         <source>Sets button colors to grey scale and LCD colors to black and white</source>
         <translation>ตั้งค่าสีของปุ่มเป็นระดับสีเทาและสี LCD เป็นขาวดำ</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2262" />
+        <source>Update schedule</source>
+        <translation>ตารางการอัพเดท</translation>
     </message>
     <message>
         <source>Automatically extend the time axis by 3min on need</source>

@@ -84,8 +84,8 @@ def content() -> str:
     strlist.append('</b>')
     tbl_AxisMapping = prettytable.PrettyTable()
     tbl_AxisMapping.field_names = [QApplication.translate('HelpDlg','Symbol'),QApplication.translate('HelpDlg','Description')]
-    tbl_AxisMapping.add_row(['k',QApplication.translate('HelpDlg','Scaling factor from RoR to Temp axis. The range of the temperature scale divided by the range of the delta scale. ')])
-    tbl_AxisMapping.add_row(['o',QApplication.translate('HelpDlg','Offset from RoR to Temp axis. ')])
+    tbl_AxisMapping.add_row(['k',QApplication.translate('HelpDlg','Scaling factor from RoR to Temp axis. The range of the temperature scale divided by the range of the delta scale.')])
+    tbl_AxisMapping.add_row(['o',QApplication.translate('HelpDlg','Offset from RoR to Temp axis.')])
     strlist.append(tbl_AxisMapping.get_html_string(attributes={'width':'100%','border':'1','padding':'1','border-collapse':'collapse'}))
     tbl_AxisMappingbottom = prettytable.PrettyTable()
     tbl_AxisMappingbottom.header = False

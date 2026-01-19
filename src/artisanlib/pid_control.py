@@ -452,7 +452,7 @@ class FujiPID:
                 r = self.aw.ser.sendFUJIcommand(command,8)
 
         if len(r) == 8:
-            message = QApplication.translate('StatusBar','{0} successfully sent to pid ').format(var)
+            message = QApplication.translate('StatusBar','{0} successfully sent to pid').format(var)
             self.aw.sendmessage(message)
             if var == 'p':
                 self.aw.fujipid.PXR['p'][0] = int(v)

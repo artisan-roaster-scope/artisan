@@ -10,6 +10,9 @@ BINARIES = [(os.path.join(get_package_paths('snap7')[1], 'lib/libsnap7.so'), 'sn
 # add yocto libs
 yocto_lib_path = os.path.join(get_package_paths('yoctopuce')[1], 'cdll')
 BINARIES.extend([(os.path.join(yocto_lib_path, fn),'yoctopuce/cdll') for fn in os.listdir(yocto_lib_path) if fn.endswith('.so')])
+# add phidgets libs
+phidgets_lib_path = os.path.join(get_package_paths('Phidget22')[1], '.libs')
+BINARIES.extend([(os.path.join(phidgets_lib_path, fn),'Phidget22/.libs') for fn in os.listdir(phidgets_lib_path) if fn.endswith('.so')])
 
 path=os.environ['HOME'] + '/artisan-master/src'
 if not os.path.isdir(path):

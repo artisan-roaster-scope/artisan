@@ -49,7 +49,7 @@ def content() -> str:
     tbl_AutosaveFields.add_row(['~dd',QApplication.translate('HelpDlg','Roast day in format dd'),'05'])
     tbl_AutosaveFields.add_row(['~hour',QApplication.translate('HelpDlg','Roast hour in format hh'),17])
     tbl_AutosaveFields.add_row(['~minute',QApplication.translate('HelpDlg','Roast minute in format mm'),42])
-    tbl_AutosaveFields.add_row(['~currtime',QApplication.translate('HelpDlg','Current date and time with seconds in format yy-MM-dd_hhmmss.  Not the same as roast time. '),'21-01-18_093609'])
+    tbl_AutosaveFields.add_row(['~currtime',QApplication.translate('HelpDlg','Current date and time with seconds in format yy-MM-dd_hhmmss. Not the same as roast time.'),'21-01-18_093609'])
     tbl_AutosaveFields.add_row(['~operator',QApplication.translate('HelpDlg','From Roast>Properties>Operator'),'Dave'])
     tbl_AutosaveFields.add_row(['~organization',QApplication.translate('HelpDlg','From Roast>Properties>Organization'),'Dave&#39;s Coffee'])
     tbl_AutosaveFields.add_row(['~machine',QApplication.translate('HelpDlg','From Roast>Properties>Machine'),'SF-6'])
@@ -87,7 +87,7 @@ def content() -> str:
     tbl_AutosaveFields.add_row(['~dtr',QApplication.translate('HelpDlg','From Profile Statistics - DTR (in percent)'),22.1])
     tbl_AutosaveFields.add_row(['~auc',QApplication.translate('HelpDlg','From the Profile Statistics - AUC'),218])
     tbl_AutosaveFields.add_row(['~aucbase',QApplication.translate('HelpDlg','From the Profile Statistics - AUC Base'),300])
-    tbl_AutosaveFields.add_row(['~mode',QApplication.translate('HelpDlg','From Config>Temperature - the current temperature mode C or F.  '),'F'])
+    tbl_AutosaveFields.add_row(['~mode',QApplication.translate('HelpDlg','From Config>Temperature - the current temperature mode C or F'),'F'])
     tbl_AutosaveFields.add_row(['~chargeet',QApplication.translate('HelpDlg','From the Profile - ET at CHARGE'),379.4])
     tbl_AutosaveFields.add_row(['~chargebt',QApplication.translate('HelpDlg','From the Profile - BT at CHARGE'),375.2])
     tbl_AutosaveFields.add_row(['~fcset',QApplication.translate('HelpDlg','From the Profile - ET at FCs'),397.4])
@@ -124,7 +124,7 @@ def content() -> str:
     strlist.append('</b>')
     tbl_Examplestop = prettytable.PrettyTable()
     tbl_Examplestop.header = False
-    tbl_Examplestop.add_row([QApplication.translate('HelpDlg','Data used to replace the fields in the Autosave File Name Prefix are pulled from the current Roast Properties.  ')])
+    tbl_Examplestop.add_row([QApplication.translate('HelpDlg','Data used to replace the fields in the Autosave File Name Prefix are pulled from the current Roast Properties.')])
     strlist.append(tbl_Examplestop.get_html_string(attributes={'width':'100%','border':'1','padding':'1','border-collapse':'collapse'}))
     tbl_Examples = prettytable.PrettyTable()
     tbl_Examples.field_names = [QApplication.translate('HelpDlg','Autosave Field'),QApplication.translate('HelpDlg','Example File Name')]

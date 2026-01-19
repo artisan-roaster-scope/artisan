@@ -44,7 +44,7 @@ def content() -> str:
     strlist.append('</b>')
     tbl_Examplestop = prettytable.PrettyTable()
     tbl_Examplestop.header = False
-    tbl_Examplestop.add_row([QApplication.translate('HelpDlg','Assumptions:  The event value is 50.  In the case of Gas the value 50 corresponds to either 5.0kPh or 50%.  \nFor a sensory milestone (see notes above) the value 50 corresponds to the "Hay" aroma. ')])
+    tbl_Examplestop.add_row([QApplication.translate('HelpDlg','Assumptions:  The event value is 50.  In the case of Gas the value 50 corresponds to either 5.0kPh or 50%.  \nFor a sensory milestone (see notes above) the value 50 corresponds to the "Hay" aroma.')])
     strlist.append(tbl_Examplestop.get_html_string(attributes={'width':'100%','border':'1','padding':'1','border-collapse':'collapse'}))
     tbl_Examples = prettytable.PrettyTable()
     tbl_Examples.field_names = [QApplication.translate('HelpDlg','Annotation Field'),QApplication.translate('HelpDlg','Displays')]
