@@ -37,16 +37,6 @@ if not defined PYTHON_PATH (
         exit /b 1
     )
 )
-if not defined ARTISAN_LEGACY (
-    echo ARTISAN_LEGACY not set, defaulting to False
-    set ARTISAN_LEGACY=False
-    set ARTISAN_SPEC=win
-)
-if not defined ARTISAN_SPEC (
-    echo ARTISAN_SPEC not set.
-    echo Set it manually to win or win-legacy.  Exiting...
-    exit /b 1
-)
 if not defined PYUIC (
     echo PYUIC not set, defaulting to pyuic6.exe
     set PYUIC=pyuic6.exe
@@ -76,15 +66,10 @@ echo ** Success
 
 :: Process translation files
 echo ************* pylupdate **************
-if /i "%ARTISAN_LEGACY%" == "True" (
-    echo *** Processing translation files defined in artisan.pro with pylupdate5.py
-    %PYTHON_PATH%\Scripts\pylupdate5.exe artisan.pro
-    if ERRORLEVEL 1 (echo ** Failed in pylupdate5.py & exit /b 1) else (echo ** Success)
-) else (
-    echo *** Processing translation files with pylupdate6pro.py
-    python pylupdate6pro.py
-    if ERRORLEVEL 1 (echo ** Failed in pylupdate6pro.py & exit /b 1) else (echo ** Success)
-)
+echo *** Processing translation files with pylupdate6pro.py
+python pylupdate6pro.py
+if ERRORLEVEL 1 (echo ** Failed in pylupdate6pro.py & exit /b 1) else (echo ** Success)
+
 echo ************* lrelease **************
 cd translations
 for /r %%a IN (*.ts) DO (
@@ -95,7 +80,7 @@ echo ** Success
 cd ..
 
 :: Zip the generated files
-7z a ..\generated-%ARTISAN_SPEC%.zip ..\doc\help_dialogs\Output_html\ help\ translations\ uic\
+7z a ..\generated-win.zip ..\doc\help_dialogs\Output_html\ help\ translations\ uic\
 if ERRORLEVEL 1 (echo ** Failed in 7z & exit /b 1) else (echo ** Success)
 ::
 ::  End of generating derived files

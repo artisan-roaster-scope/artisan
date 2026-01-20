@@ -24,12 +24,6 @@ if /i "%APPVEYOR%" NEQ "True" (
     echo This file is for use on Appveyor CI only.
     exit /b 1
 )
-:: used in build-derived-win-bat
-if /i "%ARTISAN_LEGACY%" NEQ "True" (
-    set ARTISAN_SPEC=win
-) else (
-    set ARTISAN_SPEC=win-legacy
-)
 :: ----------------------------------------------------------------------
 
 python -V
@@ -72,7 +66,7 @@ echo **** Running NSIS makensis.exe file date %NSIS_DATE%
 
 ::
 :: run NSIS to build the install .exe file
-%NSIS_EXE% /DPRODUCT_VERSION=%ARTISAN_VERSION% /DPRODUCT_BUILD=%ARTISAN_BUILD% /DLEGACY=%ARTISAN_LEGACY% setup-install3-pi.nsi
+%NSIS_EXE% /DPRODUCT_VERSION=%ARTISAN_VERSION% /DPRODUCT_BUILD=%ARTISAN_BUILD% setup-install3-pi.nsi
 if ERRORLEVEL 1 (echo ** Failed in NSIS & exit /b 1) else (echo ** Success)
 
 

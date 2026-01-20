@@ -23,11 +23,7 @@ if /i "%APPVEYOR%" NEQ "True" (
     echo This file is for use on Appveyor CI only.
     exit /b 1
 )
-if /i "%ARTISAN_LEGACY%" NEQ "True" (
-    set ARTISAN_SPEC=win
-) else (
-    set ARTISAN_SPEC=win-legacy
-)
+set ARTISAN_SPEC=win
 :: ----------------------------------------------------------------------
 
 ver

@@ -1,6 +1,6 @@
 # ABOUT
 # Appveyor CI configuration to build Artisan install packages
-#     for Windows, Windows legacy, macOS, and Linux
+#     for Windows, macOS (Intel), and Linux
 #
 # LICENSE
 # This program or module is free software: you can redistribute it and/or
@@ -17,10 +17,10 @@
 
 # Include "skip ci" in the commit message to prevent this build process from running
 environment:
-  # Set the default Appveyor Python version here. Does not affect windows_legacy. Can be overridden in platform environment.
+  # Set the default Appveyor Python version here. Can be overridden in platform environment.
   PYTHON_V: 3.13
   # Upgrade to specific version (for platforms supporting upgrade). Upgrade skipped if env var is missing or blank.
-  PYUPGRADE_WIN_VER: 3.14.0
+  #PYUPGRADE_WIN_VER: 3.14.0
   #PYUPGRADE_MACOS_V: 3.12.1  # when upgrading see the notes in the deploy phase
 
   matrix:
@@ -64,11 +64,11 @@ for:
     fast_finish: false
 
   environment:
+    PYTHON_V: 3.14  # Override the stack key
     QT_PATH: "C:/qt/6.5.1/msvc2019_64"  #there is no msvc2022_64 under /qt*
     PYQT: "6"
     PYUIC: "pyuic6.exe"
     BUILD_PYINSTALLER: "False"
-    ARTISAN_LEGACY: "False"
     VC_REDIST: "https://aka.ms/vs/17/release/vc_redist.x64.exe"  #redistributable for VS 2015-2022
     VCVARSALL: "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Auxiliary/Build/vcvarsall.bat"
 
@@ -213,7 +213,7 @@ for:
     fast_finish: false
 
   environment:
-    #PYTHON_V: 3.11
+    PYTHON_V: 3.13  # Override the stack key
     ARTISAN_OS: linux
     PYTHONSITEPKGS: /home/appveyor/venv${PYTHON_V}/lib/python${PYTHON_V}/site-packages
     QT_PATH: $PYTHON_PATH/PyQt6/Qt6

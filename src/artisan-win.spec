@@ -95,7 +95,6 @@ if os.environ.get('APPVEYOR'):
     PYTHON = os.environ.get('PYTHON_PATH')
     PYQT = os.environ.get('PYQT')
     QT_TRANSL = os.environ.get('QT_TRANSL')
-    ARTISAN_LEGACY = os.environ.get('ARTISAN_LEGACY')
 else:
     msg =f'artisan-win.spec is intended only to run on Appveyor CI.'
     logging.error(msg)
@@ -117,7 +116,6 @@ if is_module_satisfies('scipy >= 1.3.2'):
 else:
     SCIPY_BIN = PYTHON_PACKAGES + r'\scipy\extra-dll'
 
-logging.info("** ARTISAN_LEGACY: %s", ARTISAN_LEGACY)
 logging.info("** QT_TRANSL: %s",QT_TRANSL)
 
 ###################################
@@ -132,11 +130,7 @@ hiddenimports_list=['charset_normalizer.md__mypyc', # part of requests 2.28.2 # 
                             'pywintypes',
                             'win32cred',
                             'win32timezone',
-                            'babel.numbers'  # should not be needed as it got fixed in pyinstaller 6.11
-                            ]
-# Add the hidden imports not required by legacy Windows.
-if not ARTISAN_LEGACY=='True':
-    hiddenimports_list[len(hiddenimports_list):] = [
+                            'babel.numbers',  # should not be needed as it got fixed in pyinstaller 6.11
                             'PyQt6.QtWebChannel',
                             'PyQt6.QtWebEngineCore',
                             'importlib_resources',
@@ -224,28 +218,23 @@ for tr in [
 #    'qtconnectivity_hu.qm',
 #    'qtconnectivity_ko.qm',
 #    'qtconnectivity_tr.qm',
+    'qtbase_cs.qm',
+    'qtbase_da.qm',
+    'qtbase_fa.qm',
+    'qtbase_gd.qm',
+    'qtbase_lv.qm',
+    'qtbase_nl.qm',
+    'qtbase_pt_BR.qm',
+    'qtbase_ru.qm',
+    'qtbase_sk.qm',
+    'qtbase_zh_CN.qm',
+#    'qtconnectivity_da.qm',
+#    'qtconnectivity_ko.qm',
+#    'qtconnectivity_nl.qm',
+#    'qtconnectivity_pt_BR.qm',
+#    'qtconnectivity_zh_CN.qm',
     ]:
     copy_file(QT_TRANSL + '\\' + tr, TARGET + 'translations',False)
-# Add the translations not available in PyQt5 for legacy Windows.
-if not ARTISAN_LEGACY=='True':
-    for tr in [
-        'qtbase_cs.qm',
-        'qtbase_da.qm',
-        'qtbase_fa.qm',
-        'qtbase_gd.qm',
-        'qtbase_lv.qm',
-        'qtbase_nl.qm',
-        'qtbase_pt_BR.qm',
-        'qtbase_ru.qm',
-        'qtbase_sk.qm',
-        'qtbase_zh_CN.qm',
-#        'qtconnectivity_da.qm',
-#        'qtconnectivity_ko.qm',
-#        'qtconnectivity_nl.qm',
-#        'qtconnectivity_pt_BR.qm',
-#        'qtconnectivity_zh_CN.qm',
-        ]:
-        copy_file(QT_TRANSL + '\\' + tr, TARGET + 'translations',False)
 
 
 # YOCTO HACK BEGIN: manually copy over the dlls
@@ -356,89 +345,87 @@ for root, _, files in os.walk(rootdir + r'\babel\locale-data'):
             del_file(file_path, True)
             #logging.info(file_path)
 
-# remove unneeded files and folders from Windows (not implemented for legacy)
-if not ARTISAN_LEGACY=='True':
-    logging.info(">>>>> Removing unneeded files")
-    for fn in [
-        r'_internal\PyQt6\Qt6\bin\Qt6Multimedia.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6MultimediaQuick.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6PdfQuick.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6PositioningQuick.dll',
-#        r'_internal\PyQt6\Qt6\bin\Qt6QmlWorkerScript.dll',  # required for pyqt6 v6.8
-        r'_internal\PyQt6\Qt6\bin\Qt6Quick3D.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6Quick3DAssetImport.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6Quick3DAssetUtils.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6Quick3DEffects.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6Quick3DHelpers.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6Quick3DHelpersImpl.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6Quick3DParticles.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6Quick3DPhysics.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6Quick3DPhysicsHelpers.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6Quick3DRuntimeRender.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6Quick3DSpatialAudio.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6Quick3DUtils.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6QuickControls2.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6QuickControls2Basic.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6QuickControls2BasicStyleImpl.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6QuickControls2Fusion.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6QuickControls2FusionStyleImpl.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6QuickControls2Imagine.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6QuickControls2ImagineStyleImpl.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6QuickControls2Impl.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6QuickControls2Material.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6QuickControls2MaterialStyleImpl.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6QuickControls2Universal.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6QuickControls2UniversalStyleImpl.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6QuickDialogs2.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6QuickDialogs2QuickImpl.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6QuickDialogs2Utils.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6QuickLayouts.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6QuickParticles.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6QuickShapes.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6QuickTemplates2.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6QuickTest.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6QuickTimeline.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6QuickTimelineBlendTrees.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6RemoteObjects.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6RemoteObjectsQml.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6Sensors.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6SensorsQuick.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6SerialPort.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6ShaderTools.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6SpatialAudio.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6Test.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6TextToSpeech.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6WebChannelQuick.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6WebEngineQuick.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6WebEngineQuickDelegatesQml.dll',
-        r'_internal\PyQt6\Qt6\bin\Qt6WebSockets.dll',
-        r'_internal\PyQt6\Qt6\plugins\platforms\qminimal.dll',
-        r'_internal\PyQt6\Qt6\plugins\platforms\qoffscreen.dll',
-        r'_internal\PyQt6\Qt6\plugins\imageformats\qicns.dll',
-        r'_internal\PyQt6\Qt6\plugins\imageformats\qtga.dll',
-        r'_internal\PyQt6\Qt6\plugins\imageformats\qtiff.dll',
-        r'_internal\PyQt6\Qt6\plugins\imageformats\qwebp.dll',
-        ]:
-        del_file(f'{TARGET}{fn}', True)
+# remove unneeded files and folders from Windows
+logging.info(">>>>> Removing unneeded files")
+for fn in [
+    r'_internal\PyQt6\Qt6\bin\Qt6Multimedia.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6MultimediaQuick.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6PdfQuick.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6PositioningQuick.dll',
+    #r'_internal\PyQt6\Qt6\bin\Qt6QmlWorkerScript.dll',  # required for pyqt6 v6.8
+    r'_internal\PyQt6\Qt6\bin\Qt6Quick3D.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6Quick3DAssetImport.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6Quick3DAssetUtils.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6Quick3DEffects.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6Quick3DHelpers.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6Quick3DHelpersImpl.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6Quick3DParticles.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6Quick3DPhysics.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6Quick3DPhysicsHelpers.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6Quick3DRuntimeRender.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6Quick3DSpatialAudio.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6Quick3DUtils.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6QuickControls2.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6QuickControls2Basic.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6QuickControls2BasicStyleImpl.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6QuickControls2Fusion.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6QuickControls2FusionStyleImpl.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6QuickControls2Imagine.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6QuickControls2ImagineStyleImpl.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6QuickControls2Impl.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6QuickControls2Material.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6QuickControls2MaterialStyleImpl.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6QuickControls2Universal.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6QuickControls2UniversalStyleImpl.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6QuickDialogs2.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6QuickDialogs2QuickImpl.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6QuickDialogs2Utils.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6QuickLayouts.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6QuickParticles.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6QuickShapes.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6QuickTemplates2.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6QuickTest.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6QuickTimeline.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6QuickTimelineBlendTrees.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6RemoteObjects.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6RemoteObjectsQml.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6Sensors.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6SensorsQuick.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6SerialPort.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6ShaderTools.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6SpatialAudio.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6Test.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6TextToSpeech.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6WebChannelQuick.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6WebEngineQuick.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6WebEngineQuickDelegatesQml.dll',
+    r'_internal\PyQt6\Qt6\bin\Qt6WebSockets.dll',
+    r'_internal\PyQt6\Qt6\plugins\platforms\qminimal.dll',
+    r'_internal\PyQt6\Qt6\plugins\platforms\qoffscreen.dll',
+    r'_internal\PyQt6\Qt6\plugins\imageformats\qicns.dll',
+    r'_internal\PyQt6\Qt6\plugins\imageformats\qtga.dll',
+    r'_internal\PyQt6\Qt6\plugins\imageformats\qtiff.dll',
+    r'_internal\PyQt6\Qt6\plugins\imageformats\qwebp.dll',
+    ]:
+    del_file(f'{TARGET}{fn}', True)
 
-    # The api-ms-win*.dll files are generated on Appveyer CI and are not required
-    for root, _, files in os.walk(TARGET):
-        for file in files:
-            if (file.startswith('api-ms-win')):
-                file_path = os.path.join(root, file)
-                del_file(file_path, True)
+# The api-ms-win*.dll files are generated on Appveyer CI and are not required
+for root, _, files in os.walk(TARGET):
+    for file in files:
+        if (file.startswith('api-ms-win')):
+            file_path = os.path.join(root, file)
+            del_file(file_path, True)
 
-    logging.info(">>>>> Removing unneeded folders")
-    for dp in [
-        r'_internal\PyQt6\Qt6\plugins\generic',
-        r'_internal\PyQt6\Qt6\plugins\networkinformation',
-        r'_internal\PyQt6\Qt6\plugins\position',
-        r'_internal\PyQt6\Qt6\plugins\tls',
-        r'_internal\PyQt6\Qt6\qml',
-        r'_internal\matplotlib\mpl-data\sample_data',
-        ]:
-        remove_dir(f'{TARGET}{dp}', True)
-
+logging.info(">>>>> Removing unneeded folders")
+for dp in [
+    r'_internal\PyQt6\Qt6\plugins\generic',
+    r'_internal\PyQt6\Qt6\plugins\networkinformation',
+    r'_internal\PyQt6\Qt6\plugins\position',
+    r'_internal\PyQt6\Qt6\plugins\tls',
+    r'_internal\PyQt6\Qt6\qml',
+    r'_internal\matplotlib\mpl-data\sample_data',
+    ]:
+    remove_dir(f'{TARGET}{dp}', True)
 
 
 ###################################
