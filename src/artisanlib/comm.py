@@ -6817,8 +6817,8 @@ class serialport:
     # if chan is given, it is expected to be a string <s> send along the "CHAN;<s>" command on each call
     # (not sending the unit or filter commands afterwards) and overwriting the self.arduinoETChannel and self.arduinoBTChannel settings
     def ARDUINOTC4temperature(self, chan:str|None = None) -> tuple[float, float]:
-        t1:float = 0.
-        t2:float = 0.
+        t1:float = -1.
+        t2:float = -1.
         res:list[str] = []
         command = ''
         try:

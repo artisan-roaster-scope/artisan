@@ -8100,10 +8100,10 @@ class ApplicationWindow(QMainWindow):
                             DRYlabel = '&darr;' + QApplication.translate('Label', 'DRY')
                         else:
                             DRYlabel = '&raquo;' + QApplication.translate('Label', 'DRY')
-                        if self.qmc.timeindex[0] > -1 and self.qmc.TPalarmtimeindex and len(self.qmc.delta2) > 0 and self.qmc.delta2[-1] is not None and self.qmc.delta2[-1] > 0:  # ty:ignore[unsupported-operator] # pyrefly: ignore[unsupported-operation]
+                        if self.qmc.timeindex[0] > -1 and self.qmc.TPalarmtimeindex and len(self.qmc.delta2) > 0 and self.qmc.delta2[-1] is not None and self.qmc.delta2[-1] > 0:  # pyrefly: ignore[unsupported-operation]
                             # display expected time to reach DRY as defined in the background profile or the phases dialog
                             if drytarget > self.qmc.temp2[-1]:
-                                dryexpectedtime = (drytarget - self.qmc.temp2[-1])/(self.qmc.delta2[-1]/60.) # ty:ignore[unsupported-operator] # pyrefly: ignore[unsupported-operation]
+                                dryexpectedtime = (drytarget - self.qmc.temp2[-1])/(self.qmc.delta2[-1]/60.) # pyrefly: ignore[unsupported-operation]
                                 if self.qmc.phasesLCDmode == 2:
                                     tstring = stringfromseconds(dryexpectedtime,leadingzero=False)
                                 else:
@@ -8178,7 +8178,7 @@ class ApplicationWindow(QMainWindow):
                             DRY2FCsframeTooltip = QApplication.translate('Label','TEMP MODE')
                             TP2DRYframeTooltip = QApplication.translate('Label','TEMP MODE')
                             FCslabel = '&darr;' + QApplication.translate('Label', 'FCs')
-                        if self.qmc.timeindex[0] > -1 and (self.qmc.timeindex[1] or (drytarget <= self.qmc.temp2[-1])) and len(self.qmc.delta2) > 0 and self.qmc.delta2[-1] is not None and self.qmc.delta2[-1] > 0: # ty:ignore[unsupported-operator] # pyrefly: ignore[unsupported-operation]
+                        if self.qmc.timeindex[0] > -1 and (self.qmc.timeindex[1] or (drytarget <= self.qmc.temp2[-1])) and len(self.qmc.delta2) > 0 and self.qmc.delta2[-1] is not None and self.qmc.delta2[-1] > 0: # pyrefly: ignore[unsupported-operation]
                             ## after DRY:
                             # display expected time to reach FCs as defined in the background profile or the phases dialog
                             if self.qmc.backgroundprofile is not None and self.qmc.timeindexB[2]:
@@ -8186,7 +8186,7 @@ class ApplicationWindow(QMainWindow):
                             else:
                                 fcstarget = self.qmc.phases[2] # FCs min phases definition
                             if fcstarget > self.qmc.temp2[-1]:
-                                fcsexpectedtime = (fcstarget - self.qmc.temp2[-1])/(self.qmc.delta2[-1]/60.) # pyrefly:ignore[unsupported-operation] # ty:ignore[unsupported-operator] pyrefly: ignore[unsupported-operation]
+                                fcsexpectedtime = (fcstarget - self.qmc.temp2[-1])/(self.qmc.delta2[-1]/60.) # pyrefly:ignore[unsupported-operation]
                                 if self.qmc.phasesLCDmode == 2:
                                     tstring = stringfromseconds(fcsexpectedtime, leadingzero=False)
                                 else:
@@ -8842,6 +8842,7 @@ class ApplicationWindow(QMainWindow):
             else:
                 eventActionThread = EventActionThread(self, action, cmd, eventtype)
                 eventActionThread.finished.connect(self.eventactionThreadDone_slot)
+                eventActionThread.finished.connect(eventActionThread.deleteLater)
                 try:
                     self.qmc.eventactionsemaphore.acquire(1)
                     self.eventaction_running_threads.append(eventActionThread)
@@ -23983,7 +23984,7 @@ class ApplicationWindow(QMainWindow):
 
     # updates AUC guide (expected time to hit target AUC; self.qmc.AUCguideTime) based on current AUC, target, base, and RoR
     def updateAUCguide(self) -> None:
-        if (len(self.qmc.delta2) > 0 and self.qmc.delta2[-1] is not None and self.qmc.delta2[-1] > 0 and # we have a positive BT RoR # ty:ignore[unsupported-operator] # pyrefly:ignore[unsupported-operation]
+        if (len(self.qmc.delta2) > 0 and self.qmc.delta2[-1] is not None and self.qmc.delta2[-1] > 0 and # we have a positive BT RoR # pyrefly:ignore[unsupported-operation]
             self.qmc.TPalarmtimeindex is not None and  # we passed TP
             self.qmc.AUCvalue > 0): # there is already some AUC available
 

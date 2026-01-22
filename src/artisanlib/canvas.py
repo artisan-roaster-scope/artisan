@@ -4558,7 +4558,7 @@ class tgraphcanvas(QObject):
     def decay_average(self, tx_in:list[float], temp_in:Sequence[float|None], decay_weights:list[int]|None) -> float:
         if decay_weights is None or len(decay_weights)<2 or len(tx_in) != len(temp_in):
             if len(temp_in)>0 and temp_in[-1] is not None:
-                return temp_in[-1] # ty: ignore[invalid-return-type] # pyrefly: ignore[bad-return]
+                return temp_in[-1] # pyrefly: ignore[bad-return]
             return -1
         l = min(len(decay_weights),len(temp_in))
         # take trail of length l and remove items where temp[i]=None to fulfil precond. of numpy.interp
@@ -6643,7 +6643,7 @@ class tgraphcanvas(QObject):
                             ypoints = [self.ctemp2[-1]]
                             delta_sec = self.unfiltereddelta2_pure[-1]/60
                             for _ in range(len(xpoints)-1):
-                                ypoints.append(ypoints[-1] + delta_sec*delay) # ty:ignore[unsupported-operator] # pyrefly: ignore[unsupported-operation]
+                                ypoints.append(ypoints[-1] + delta_sec*delay) # pyrefly: ignore[unsupported-operation]
                                 delta_sec = delta_sec + deltadelta_secsec*delay
                             #plot BT curve
                             self.BTprojection_tx = xpoints.tolist()
@@ -6669,7 +6669,7 @@ class tgraphcanvas(QObject):
                             ypoints = [self.ctemp1[-1]]
                             delta_sec = self.unfiltereddelta1_pure[-1]/60
                             for _ in range(len(xpoints)-1):
-                                ypoints.append(ypoints[-1] + delta_sec*delay) # ty:ignore[unsupported-operator] # pyrefly: ignore[unsupported-operation]
+                                ypoints.append(ypoints[-1] + delta_sec*delay) # pyrefly: ignore[unsupported-operation]
                                 delta_sec = delta_sec + deltadelta_secsec*delay
                             #plot ET curve
                             self.ETprojection_tx = xpoints.tolist()
@@ -6910,7 +6910,7 @@ class tgraphcanvas(QObject):
             # this evaluates to None before TP and 0 after the event
             try:
                 for v in ['pDRY','pFCs']:
-                    if len(sample_delta2) > 0 and len(sample_delta2)>0 and sample_delta2[-1] and sample_delta2[-1] > 0:  # ty:ignore[unsupported-operator] # pyrefly: ignore[unsupported-operation]
+                    if len(sample_delta2) > 0 and len(sample_delta2)>0 and sample_delta2[-1] and sample_delta2[-1] > 0: # pyrefly: ignore[unsupported-operation]
                         mathdictionary[v] = 0
                         if v == 'pDRY':
                             if self.backgroundprofile is not None and self.timeindexB[1] and not self.autoDRYflag: # with AutoDRY, we always use the set DRY phase temperature as target
@@ -6918,7 +6918,7 @@ class tgraphcanvas(QObject):
                             else:
                                 drytarget = self.phases[1] # Drying max phases definition
                             if drytarget > sample_temp2[-1]:
-                                mathdictionary[v] = (drytarget - sample_temp2[-1])/(sample_delta2[-1]/60.) # ty:ignore[unsupported-operator] # pyrefly: ignore[unsupported-operation]
+                                mathdictionary[v] = (drytarget - sample_temp2[-1])/(sample_delta2[-1]/60.) # pyrefly: ignore[unsupported-operation]
                         elif v == 'pFCs':
                             # display expected time to reach FCs as defined in the background profile or the phases dialog
                             if self.backgroundprofile is not None and self.timeindexB[2]:
@@ -6926,7 +6926,7 @@ class tgraphcanvas(QObject):
                             else:
                                 fcstarget = self.phases[2] # FCs min phases definition
                             if fcstarget > sample_temp2[-1]:
-                                mathdictionary[v] = (fcstarget - sample_temp2[-1])/(sample_delta2[-1]/60.) # ty:ignore[unsupported-operator] # pyrefly: ignore[unsupported-operation]
+                                mathdictionary[v] = (fcstarget - sample_temp2[-1])/(sample_delta2[-1]/60.) # pyrefly: ignore[unsupported-operation]
                     else:
                         # if a prediction is not possible (before TP), we return the error value -1
                         mathdictionary[v] = -1
@@ -19658,7 +19658,6 @@ class SampleThread(QThread):
                 else:
                     self.aw.qmc.flagsampling = False # type: ignore[unreachable] # ty:ignore[ignore] # mypy: Statement is unreachable  # we signal that we are done with sampling
                     # port is disconnected in OFFmonitor by calling disconnectProbes() => disconnectProbesFromSerialDevice()
-                    self.quit()
                     break  #thread ends
                 # increment the next_time stamp by one interval, but skip tasks if we are behind schedule:
                 # NOTE: libtime.perf_counter() - next_time can get negative if we are too early thus we need a max(0, ) here
@@ -19690,6 +19689,7 @@ class Athreadserver(QWidget):
 
             #connect graphics to GUI thread
             sthread.sample_processingSignal.connect(self.aw.qmc.sample_processing)
+            sthread.finished.connect(sthread.deleteLater)
             sthread.terminatingSignal.connect(self.terminating)
             sthread.start(QThread.Priority.TimeCriticalPriority) # TimeCriticalPriority > HighestPriority > HighPriority > NormalPriority > LowPriority
             sthread.wait(300)    #needed in some Win OS
