@@ -20,7 +20,7 @@ environment:
   # Set the default Appveyor Python version here. Can be overridden in platform environment.
   PYTHON_V: 3.13
   # Upgrade to specific version (for platforms supporting upgrade). Upgrade skipped if env var is missing or blank.
-  #PYUPGRADE_WIN_VER: 3.14.0
+  PYUPGRADE_WIN_VER: 3.14.2
   #PYUPGRADE_MACOS_V: 3.12.1  # when upgrading see the notes in the deploy phase
 
   matrix:
@@ -65,7 +65,7 @@ for:
 
   environment:
     PYTHON_V: 3.14  # Override the stack key
-    QT_PATH: "C:/qt/6.5.1/msvc2019_64"  #there is no msvc2022_64 under /qt*
+    QT_PATH: "C:/qt/6.9.3/msvc2022_64"
     PYQT: "6"
     PYUIC: "pyuic6.exe"
     BUILD_PYINSTALLER: "False"
@@ -99,7 +99,7 @@ for:
 
     # generate the path to PyQt translations files
     - ps: $env:QT_TRANSL = "$env:PYTHON_PATH/Lib/site-packages/PyQt6/Qt6/translations"
-
+        
     # pull library versions from requirements file
     - ps: $env:PYINSTALLER_VER = Select-String -Path ./src/requirements.txt "pyinstaller==([\d\.]*).*platform_system='Windows'" -List | ForEach-Object {$_.Matches.Groups[1].Value}
     - ps: Write-Host "PYINSTALLER_VER= $env:PYINSTALLER_VER"

@@ -91,15 +91,15 @@ goto NoUpgrade
 :Upgrade
 :: Before upgrading, check whether the requested version is already
 echo ***** Upgrading Python from !PREV_PYTHON_VER! to !PYUPGRADE_WIN_VER!
-rem echo *** Downloading Python install exe
-rem curl -L -O https://www.python.org/ftp/python/!PYUPGRADE_WIN_VER!/python-!PYUPGRADE_WIN_VER!-amd64.exe
-rem if not exist python-!PYUPGRADE_WIN_VER!-amd64.exe (exit /b 80)
-rem echo *** Installing Python !PYUPGRADE_WIN_VER!
-rem python-!PYUPGRADE_WIN_VER!-amd64.exe /quiet PrependPath=1
-rem if not exist !PYTHON_PATH!\python.exe (exit /b 90)
-rem echo ***** Upgrade Complete
-rem echo Python Version Now:
-rem !PYTHON_PATH!\python -V
+echo *** Downloading Python install exe
+curl -L -O https://www.python.org/ftp/python/!PYUPGRADE_WIN_VER!/python-!PYUPGRADE_WIN_VER!-amd64.exe
+if not exist python-!PYUPGRADE_WIN_VER!-amd64.exe (exit /b 80)
+echo *** Installing Python !PYUPGRADE_WIN_VER!
+python-!PYUPGRADE_WIN_VER!-amd64.exe /quiet PrependPath=1
+if not exist !PYTHON_PATH!\python.exe (exit /b 90)
+echo ***** Upgrade Complete
+echo Python Version Now:
+!PYTHON_PATH!\python -V
 goto End
 
 :NoUpgrade
