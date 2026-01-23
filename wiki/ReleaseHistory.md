@@ -2,7 +2,7 @@ Detailed Release History
 ========================
 
 ----
-v3.6.0 (Jan XX, 2026)
+v4.0.0 (Jan XX, 2026)
 ------------------
 
 * ADDITIONS

@@ -341,6 +341,7 @@ class CurvesDlg(ArtisanDialog):
         self.DeltaBT.setChecked(self.aw.qmc.DeltaBTflag)
         DeltaBTlabel = QLabel(deltaLabelUTF8 + QApplication.translate('Label', 'BT'))
         filterlabel = QLabel(QApplication.translate('Label', 'Smoothing'))
+        filterlabel.setToolTip(QApplication.translate('Tooltip','RoR linear decay average filter size'))
         #DeltaFilter holds the number of pads in filter
         self.DeltaETfilter = QSpinBox()
         self.DeltaETfilter.setSingleStep(1)
@@ -367,6 +368,7 @@ class CurvesDlg(ArtisanDialog):
         self.PolyFitFlag.stateChanged.connect(self.changePolyFitFlagFlag)
 
         curvefilterlabel = QLabel(QApplication.translate('Label', 'Smooth Curves'))
+        curvefilterlabel.setToolTip(QApplication.translate('Tooltip','Linear decay average filter, applied if not recording. Resulting signal is used for RoR computation.'))
         #Filter holds the number of pads in filter
         self.Filter = QSpinBox()
         self.Filter.setSingleStep(1)
@@ -376,11 +378,13 @@ class CurvesDlg(ArtisanDialog):
         self.Filter.valueChanged.connect(self.changeFilter)
         #filterspikes
         self.FilterSpikes = QCheckBox(QApplication.translate('CheckBox', 'Smooth Spikes'))
+        self.FilterSpikes.setToolTip(QApplication.translate('Tooltip', 'Minimal-delay low-pass filter eliminating tiny spikes, applied if not recording'))
         self.FilterSpikes.setChecked(self.aw.qmc.filterDropOuts)
         self.FilterSpikes.stateChanged.connect(self.changeDropFilter)
         self.FilterSpikes.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         #dropduplicates
         self.DropDuplicates = QCheckBox(QApplication.translate('CheckBox', 'Interpolate Duplicates'))
+        self.DropDuplicates.setToolTip(QApplication.translate('Tooltip','Removes stair-step patterns caused by duplicate readings through interpolation'))
         self.DropDuplicates.setChecked(self.aw.qmc.dropDuplicates)
         self.DropDuplicates.stateChanged.connect(self.changeDuplicatesFilter)
         self.DropDuplicates.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -398,23 +402,27 @@ class CurvesDlg(ArtisanDialog):
 
         #show full
         self.ShowFull = QCheckBox(QApplication.translate('CheckBox', 'Show Full'))
+        self.ShowFull.setToolTip(QApplication.translate('Tooltip','Render curves before CHARGE and after DROP'))
         self.ShowFull.setChecked(self.aw.qmc.foregroundShowFullflag)
         self.ShowFull.stateChanged.connect(self.changeShowFullFilter)
         self.ShowFull.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
         #interpolate drops
         self.InterpolateDrops = QCheckBox(QApplication.translate('CheckBox', 'Interpolate Drops'))
+        self.InterpolateDrops.setToolTip(QApplication.translate('Tooltip','Applies interpolation to substitute missing data'))
         self.InterpolateDrops.setChecked(self.aw.qmc.interpolateDropsflag)
         self.InterpolateDrops.stateChanged.connect(self.changeInterpolageDrops)
         self.InterpolateDrops.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
         #dropspikes
         self.DropSpikes = QCheckBox(QApplication.translate('CheckBox', 'Drop Spikes'))
+        self.DropSpikes.setToolTip(QApplication.translate('Tooltip','Removes large spikes'))
         self.DropSpikes.setChecked(self.aw.qmc.dropSpikes)
         self.DropSpikes.stateChanged.connect(self.changeSpikeFilter)
         self.DropSpikes.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         #min-max-limits
         self.MinMaxLimits = QCheckBox(QApplication.translate('CheckBox', 'Limits'))
+        self.MinMaxLimits.setToolTip(QApplication.translate('Tooltip','Removes readings out of range'))
         self.MinMaxLimits.setChecked(self.aw.qmc.minmaxLimits)
         self.MinMaxLimits.stateChanged.connect(self.changeMinMaxLimits)
         self.MinMaxLimits.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -460,6 +468,7 @@ class CurvesDlg(ArtisanDialog):
         self.projectDeltaCheck.stateChanged.connect(self.changeDeltaProjection) #toggle
 
         deltaSpanLabel = QLabel(QApplication.translate('Label', 'Delta Span'))
+        deltaSpanLabel.setToolTip(QApplication.translate('Tooltip','RoR computation interval'))
         self.spanitems = range(31)
         self.deltaBTspan = QComboBox()
         self.deltaBTspan.addItems([str(i) + 's' for i in self.spanitems])
@@ -608,6 +617,7 @@ class CurvesDlg(ArtisanDialog):
         inputFilterVBox.addLayout(inputFilter2)
         inputFilterVBox.addStretch()
         inputFilterGroupLayout = QGroupBox(QApplication.translate('GroupBox','Input Filter'))
+        inputFilterGroupLayout.setToolTip(QApplication.translate('Tooltip','Applies filters directly on the incoming data before it is recorded, thus filtered data is lost forever'))
         inputFilterGroupLayout.setLayout(inputFilterVBox)
 
         inputFilter0.setContentsMargins(0,0,0,0)
@@ -635,6 +645,7 @@ class CurvesDlg(ArtisanDialog):
 
         #swapETBT flag
         self.rorFilter = QCheckBox(QApplication.translate('CheckBox', 'Limits'))
+        self.rorFilter.setToolTip(QApplication.translate('Tooltip','Hide RoR readings out of range'))
         self.rorFilter.setChecked(self.aw.qmc.RoRlimitFlag)
         self.rorFilter.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         rorminlabel = QLabel(QApplication.translate('Label', 'min','abbrev of minimum'))

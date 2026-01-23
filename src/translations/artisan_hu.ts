@@ -240,7 +240,7 @@
         <location filename="../artisanlib/alarms.py" line="90" />
         <location filename="../artisanlib/dialogs.py" line="616" />
         <location filename="../artisanlib/statistics.py" line="289" />
-        <location filename="../artisanlib/curves.py" line="1363" />
+        <location filename="../artisanlib/curves.py" line="1374" />
         <location filename="../artisanlib/roast_properties.py" line="808" />
         <location filename="../artisanlib/background.py" line="85" />
         <location filename="../artisanlib/events.py" line="672" />
@@ -268,7 +268,7 @@
         <translation type="unfinished">Szín beállítás</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1204" />
+        <location filename="../artisanlib/curves.py" line="1215" />
         <location filename="../artisanlib/pid_dialogs.py" line="4689" />
         <location filename="../artisanlib/pid_dialogs.py" line="3151" />
         <location filename="../artisanlib/pid_dialogs.py" line="3149" />
@@ -282,7 +282,7 @@
     </message>
     <message>
         <location filename="../artisanlib/alarms.py" line="100" />
-        <location filename="../artisanlib/curves.py" line="1361" />
+        <location filename="../artisanlib/curves.py" line="1372" />
         <location filename="../artisanlib/background.py" line="83" />
         <location filename="../artisanlib/events.py" line="723" />
         <location filename="../artisanlib/pid_dialogs.py" line="2797" />
@@ -547,7 +547,7 @@
         <location filename="../artisanlib/devices.py" line="158" />
         <location filename="../artisanlib/devices.py" line="156" />
         <location filename="../artisanlib/alarms.py" line="116" />
-        <location filename="../artisanlib/curves.py" line="846" />
+        <location filename="../artisanlib/curves.py" line="857" />
         <location filename="../artisanlib/roast_properties.py" line="2897" />
         <location filename="../artisanlib/ports.py" line="781" />
         <location filename="../artisanlib/events.py" line="975" />
@@ -704,25 +704,25 @@
         <translation>Alapértelmezések mentése</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="803" />
-        <location filename="../artisanlib/curves.py" line="800" />
-        <location filename="../artisanlib/curves.py" line="797" />
-        <location filename="../artisanlib/curves.py" line="794" />
-        <location filename="../artisanlib/curves.py" line="791" />
-        <location filename="../artisanlib/curves.py" line="788" />
-        <location filename="../artisanlib/curves.py" line="785" />
-        <location filename="../artisanlib/curves.py" line="782" />
-        <location filename="../artisanlib/curves.py" line="779" />
+        <location filename="../artisanlib/curves.py" line="814" />
+        <location filename="../artisanlib/curves.py" line="811" />
+        <location filename="../artisanlib/curves.py" line="808" />
+        <location filename="../artisanlib/curves.py" line="805" />
+        <location filename="../artisanlib/curves.py" line="802" />
+        <location filename="../artisanlib/curves.py" line="799" />
+        <location filename="../artisanlib/curves.py" line="796" />
+        <location filename="../artisanlib/curves.py" line="793" />
+        <location filename="../artisanlib/curves.py" line="790" />
         <source>Color</source>
         <translation type="unfinished">Szín</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="825" />
+        <location filename="../artisanlib/curves.py" line="836" />
         <source>Plot</source>
         <translation type="unfinished">Rajz</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="828" />
+        <location filename="../artisanlib/curves.py" line="839" />
         <source>Data</source>
         <translation type="unfinished">Adat</translation>
     </message>
@@ -736,33 +736,33 @@
         <location filename="../artisanlib/colors.py" line="331" />
         <location filename="../artisanlib/colors.py" line="328" />
         <location filename="../artisanlib/colors.py" line="125" />
-        <location filename="../artisanlib/curves.py" line="832" />
+        <location filename="../artisanlib/curves.py" line="843" />
         <source>Background</source>
         <translation type="unfinished">Háttér</translation>
     </message>
     <message>
         <location filename="../artisanlib/cup_profile.py" line="101" />
-        <location filename="../artisanlib/curves.py" line="838" />
+        <location filename="../artisanlib/curves.py" line="849" />
         <source>Save Image</source>
         <translation type="unfinished">Kép mentése</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="928" />
+        <location filename="../artisanlib/curves.py" line="939" />
         <source>Info</source>
         <translation type="unfinished">Információ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1007" />
+        <location filename="../artisanlib/curves.py" line="1018" />
         <source>Create Background Curve</source>
         <translation>Háttérgörbe létrehozása</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1713" />
+        <location filename="../artisanlib/curves.py" line="1724" />
         <source>ET/BT</source>
         <translation>ET / BT</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1716" />
+        <location filename="../artisanlib/curves.py" line="1727" />
         <source>Create Virtual
 Extra Device</source>
         <translation>Hozzon létre virtuális
@@ -1314,17 +1314,17 @@ VÉGE</translation>
     </message>
     <message>
         <location filename="../plus/schedule.py" line="1580" />
-        <location filename="../artisanlib/curves.py" line="1027" />
-        <location filename="../artisanlib/curves.py" line="938" />
-        <location filename="../artisanlib/curves.py" line="932" />
-        <location filename="../artisanlib/curves.py" line="925" />
-        <location filename="../artisanlib/curves.py" line="907" />
+        <location filename="../artisanlib/curves.py" line="1038" />
+        <location filename="../artisanlib/curves.py" line="949" />
+        <location filename="../artisanlib/curves.py" line="943" />
+        <location filename="../artisanlib/curves.py" line="936" />
+        <location filename="../artisanlib/curves.py" line="918" />
         <location filename="../artisanlib/background.py" line="62" />
         <source>Show</source>
         <translation>Előadás</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="400" />
+        <location filename="../artisanlib/curves.py" line="404" />
         <location filename="../artisanlib/background.py" line="71" />
         <source>Show Full</source>
         <translation>Teljes megjelenítése</translation>
@@ -1335,7 +1335,7 @@ VÉGE</translation>
         <translation type="unfinished">Visszajátszási Segítség</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1207" />
+        <location filename="../artisanlib/curves.py" line="1218" />
         <location filename="../artisanlib/background.py" line="224" />
         <source>Beep</source>
         <translation>Hangjelzés</translation>
@@ -1486,77 +1486,77 @@ VÉGE</translation>
         <translation>Soros napló BE / KI</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="358" />
+        <location filename="../artisanlib/curves.py" line="359" />
         <source>Optimal Smoothing Post Roast</source>
         <translation>Optimális simító oszlop pörkölt</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="364" />
+        <location filename="../artisanlib/curves.py" line="365" />
         <source>Polyfit computation</source>
         <translation>Polyfit számítás</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="378" />
+        <location filename="../artisanlib/curves.py" line="380" />
         <source>Smooth Spikes</source>
         <translation>Sima tüskék</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="383" />
+        <location filename="../artisanlib/curves.py" line="386" />
         <source>Interpolate Duplicates</source>
         <translation>Interpolálja a másolatokat</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="406" />
+        <location filename="../artisanlib/curves.py" line="411" />
         <source>Interpolate Drops</source>
         <translation>Interpolálja a kieséseket</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="412" />
+        <location filename="../artisanlib/curves.py" line="418" />
         <source>Drop Spikes</source>
         <translation>Csepp tüskék</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="637" />
-        <location filename="../artisanlib/curves.py" line="417" />
+        <location filename="../artisanlib/curves.py" line="647" />
+        <location filename="../artisanlib/curves.py" line="424" />
         <source>Limits</source>
         <translation>Határértékek</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="443" />
-        <location filename="../artisanlib/curves.py" line="442" />
-        <location filename="../artisanlib/curves.py" line="441" />
-        <location filename="../artisanlib/curves.py" line="440" />
+        <location filename="../artisanlib/curves.py" line="451" />
+        <location filename="../artisanlib/curves.py" line="450" />
+        <location filename="../artisanlib/curves.py" line="449" />
+        <location filename="../artisanlib/curves.py" line="448" />
         <source>Projection</source>
         <translation>Kivetítés</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="92" />
-        <location filename="../artisanlib/curves.py" line="502" />
+        <location filename="../artisanlib/curves.py" line="511" />
         <source>Swap</source>
         <translation>Csere</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1211" />
+        <location filename="../artisanlib/curves.py" line="1222" />
         <source>Glow</source>
         <translation>Világít</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1215" />
+        <location filename="../artisanlib/curves.py" line="1226" />
         <source>Notifications</source>
         <translation>Értesítések</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1260" />
+        <location filename="../artisanlib/curves.py" line="1271" />
         <source>Decimal Places</source>
         <translation>Tizedes jel</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1297" />
+        <location filename="../artisanlib/curves.py" line="1308" />
         <source>Alarm Popups</source>
         <translation>Riasztás felugró ablakok</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1357" />
+        <location filename="../artisanlib/curves.py" line="1368" />
         <source>Hide Image During Roast</source>
         <translation>Kép elrejtése pörkölés közben</translation>
     </message>
@@ -1868,7 +1868,7 @@ VÉGE</translation>
         <location filename="../artisanlib/canvas.py" line="18566" />
         <location filename="../artisanlib/alarms.py" line="910" />
         <location filename="../artisanlib/alarms.py" line="854" />
-        <location filename="../artisanlib/curves.py" line="2121" />
+        <location filename="../artisanlib/curves.py" line="2132" />
         <location filename="../artisanlib/roast_properties.py" line="4476" />
         <location filename="../artisanlib/roast_properties.py" line="754" />
         <location filename="../artisanlib/background.py" line="1081" />
@@ -2134,13 +2134,13 @@ VÉGE</translation>
         <translation>nagy</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="2236" />
+        <location filename="../artisanlib/curves.py" line="2247" />
         <location filename="../artisanlib/events.py" line="1097" />
         <source>ET</source>
         <translation type="unfinished">KÖRNY. HŐ</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="2237" />
+        <location filename="../artisanlib/curves.py" line="2248" />
         <location filename="../artisanlib/events.py" line="1098" />
         <source>BT</source>
         <translation type="unfinished">BAB HŐ</translation>
@@ -2221,51 +2221,51 @@ VÉGE</translation>
     </message>
     <message>
         <location filename="../artisanlib/transposer.py" line="146" />
-        <location filename="../artisanlib/curves.py" line="914" />
-        <location filename="../artisanlib/curves.py" line="445" />
+        <location filename="../artisanlib/curves.py" line="925" />
+        <location filename="../artisanlib/curves.py" line="453" />
         <source>linear</source>
         <translation type="unfinished">lineáris</translation>
     </message>
     <message>
         <location filename="../artisanlib/transposer.py" line="147" />
-        <location filename="../artisanlib/curves.py" line="446" />
+        <location filename="../artisanlib/curves.py" line="454" />
         <source>quadratic</source>
         <translation>négyzetes</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="702" />
+        <location filename="../artisanlib/curves.py" line="713" />
         <source>classic</source>
         <translation>klasszikus</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="703" />
+        <location filename="../artisanlib/curves.py" line="714" />
         <source>xkcd</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="710" />
+        <location filename="../artisanlib/curves.py" line="721" />
         <source>Default</source>
         <translation>Alapértelmezett</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="915" />
+        <location filename="../artisanlib/curves.py" line="926" />
         <source>cubic</source>
         <translation type="unfinished">kubikus</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="916" />
+        <location filename="../artisanlib/curves.py" line="927" />
         <source>nearest</source>
         <translation type="unfinished">legközelebbi</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="989" />
-        <location filename="../artisanlib/curves.py" line="957" />
+        <location filename="../artisanlib/curves.py" line="1000" />
+        <location filename="../artisanlib/curves.py" line="968" />
         <source>120 secs before FCs</source>
         <translation>120 mp az FC-k előtt</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="990" />
-        <location filename="../artisanlib/curves.py" line="958" />
+        <location filename="../artisanlib/curves.py" line="1001" />
+        <location filename="../artisanlib/curves.py" line="969" />
         <source>Custom</source>
         <translation>Egyedi</translation>
     </message>
@@ -4012,17 +4012,17 @@ VÉGE</translation>
         <location filename="../artisanlib/alarms.py" line="706" />
         <location filename="../artisanlib/alarms.py" line="677" />
         <location filename="../artisanlib/statistics.py" line="761" />
-        <location filename="../artisanlib/curves.py" line="2492" />
-        <location filename="../artisanlib/curves.py" line="2432" />
-        <location filename="../artisanlib/curves.py" line="2414" />
-        <location filename="../artisanlib/curves.py" line="2382" />
-        <location filename="../artisanlib/curves.py" line="1978" />
-        <location filename="../artisanlib/curves.py" line="1969" />
-        <location filename="../artisanlib/curves.py" line="1902" />
-        <location filename="../artisanlib/curves.py" line="1889" />
-        <location filename="../artisanlib/curves.py" line="1876" />
-        <location filename="../artisanlib/curves.py" line="1707" />
-        <location filename="../artisanlib/curves.py" line="1657" />
+        <location filename="../artisanlib/curves.py" line="2503" />
+        <location filename="../artisanlib/curves.py" line="2443" />
+        <location filename="../artisanlib/curves.py" line="2425" />
+        <location filename="../artisanlib/curves.py" line="2393" />
+        <location filename="../artisanlib/curves.py" line="1989" />
+        <location filename="../artisanlib/curves.py" line="1980" />
+        <location filename="../artisanlib/curves.py" line="1913" />
+        <location filename="../artisanlib/curves.py" line="1900" />
+        <location filename="../artisanlib/curves.py" line="1887" />
+        <location filename="../artisanlib/curves.py" line="1718" />
+        <location filename="../artisanlib/curves.py" line="1668" />
         <location filename="../artisanlib/pid_control.py" line="950" />
         <location filename="../artisanlib/pid_control.py" line="935" />
         <location filename="../artisanlib/pid_control.py" line="919" />
@@ -4308,23 +4308,23 @@ VÉGE</translation>
         <translation>pid.readoneword(): {0} RX bájt érkezett (7 szükséges) az egységazonosítóhoz={1}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="2040" />
-        <location filename="../artisanlib/curves.py" line="1985" />
+        <location filename="../artisanlib/curves.py" line="2051" />
+        <location filename="../artisanlib/curves.py" line="1996" />
         <source>Univariate: no profile data available</source>
         <translation>Egyváltozós: nem állnak rendelkezésre profiladatok</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1999" />
+        <location filename="../artisanlib/curves.py" line="2010" />
         <source>ln(): no profile data available</source>
         <translation>ln(): nem állnak rendelkezésre profiladatok</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="2018" />
+        <location filename="../artisanlib/curves.py" line="2029" />
         <source>expvar(): no profile data available</source>
         <translation>expvar(): nem állnak rendelkezésre profiladatok</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="2272" />
+        <location filename="../artisanlib/curves.py" line="2283" />
         <source>Polyfit: no profile data available</source>
         <translation>Polyfit: nem állnak rendelkezésre profiladatok</translation>
     </message>
@@ -4707,7 +4707,7 @@ VÉGE</translation>
     <message>
         <location filename="../artisanlib/devices.py" line="4885" />
         <location filename="../artisanlib/devices.py" line="4876" />
-        <location filename="../artisanlib/curves.py" line="2534" />
+        <location filename="../artisanlib/curves.py" line="2545" />
         <source>Symbolic Formulas Help</source>
         <translation>A szimbolikus képletek segítenek</translation>
     </message>
@@ -4787,7 +4787,7 @@ VÉGE</translation>
     <message>
         <location filename="../artisanlib/devices.py" line="2716" />
         <location filename="../artisanlib/devices.py" line="2715" />
-        <location filename="../artisanlib/curves.py" line="1042" />
+        <location filename="../artisanlib/curves.py" line="1053" />
         <location filename="../artisanlib/axis.py" line="427" />
         <source>Axis</source>
         <translation>Tengely</translation>
@@ -4974,102 +4974,102 @@ VÉGE</translation>
         <translation>Extrakciós hozam</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="563" />
+        <location filename="../artisanlib/curves.py" line="572" />
         <source>Rate of Rise Curves</source>
         <translation>Az emelkedési görbék aránya</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="565" />
+        <location filename="../artisanlib/curves.py" line="574" />
         <source>Rate of Rise LCDs</source>
         <translation>Rise LCD-k</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="584" />
+        <location filename="../artisanlib/curves.py" line="593" />
         <source>Rate of Rise Symbolic Assignments</source>
         <translation>Szimbolikus hozzárendelések emelkedése</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="610" />
+        <location filename="../artisanlib/curves.py" line="619" />
         <source>Input Filter</source>
         <translation>Bemeneti szűrő</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="622" />
+        <location filename="../artisanlib/curves.py" line="632" />
         <source>Curve Filter</source>
         <translation>Görbe szűrő</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="631" />
+        <location filename="../artisanlib/curves.py" line="641" />
         <source>Display Filter</source>
         <translation>Kijelző szűrő</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="680" />
+        <location filename="../artisanlib/curves.py" line="691" />
         <source>Rate of Rise Filter</source>
         <translation>Rise Rise Filter</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1069" />
+        <location filename="../artisanlib/curves.py" line="1080" />
         <source>Interpolate</source>
         <translation>Interpolál</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1075" />
+        <location filename="../artisanlib/curves.py" line="1086" />
         <source>Univariate</source>
         <translation>Egyváltozós</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1083" />
+        <location filename="../artisanlib/curves.py" line="1094" />
         <source>ln()</source>
         <translation>ln ()</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1098" />
+        <location filename="../artisanlib/curves.py" line="1109" />
         <source>Exponent</source>
         <translation>Kitevő</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1130" />
+        <location filename="../artisanlib/curves.py" line="1141" />
         <source>Polyfit</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1154" />
+        <location filename="../artisanlib/curves.py" line="1165" />
         <source>Curve Fit Options</source>
         <translation>Görbe illesztési opciók</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1167" />
+        <location filename="../artisanlib/curves.py" line="1178" />
         <source>Interval of Interest Options</source>
         <translation>Intervallum opciók</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1181" />
+        <location filename="../artisanlib/curves.py" line="1192" />
         <source>Analyze Options</source>
         <translation>Elemezze az opciókat</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1239" />
+        <location filename="../artisanlib/curves.py" line="1250" />
         <source>Appearance</source>
         <translation>Megjelenés</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1249" />
+        <location filename="../artisanlib/curves.py" line="1260" />
         <source>Resolution</source>
         <translation>Felbontás</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1325" />
+        <location filename="../artisanlib/curves.py" line="1336" />
         <source>WebLCDs</source>
         <translation>WebLCD-k</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1340" />
+        <location filename="../artisanlib/curves.py" line="1351" />
         <source>Rename ET and BT</source>
         <translation>Nevezze át az ET és a BT nevet</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1379" />
+        <location filename="../artisanlib/curves.py" line="1390" />
         <source>Logo Image File</source>
         <translation>Logó képfájl</translation>
     </message>
@@ -11588,7 +11588,7 @@ A billentyűparancsokat le kell tiltani (ENTER)</translation>
         <translation>Lépés</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="700" />
+        <location filename="../artisanlib/curves.py" line="711" />
         <location filename="../artisanlib/axis.py" line="280" />
         <source>Style</source>
         <translation type="unfinished">Stílus</translation>
@@ -11653,13 +11653,13 @@ A billentyűparancsokat le kell tiltani (ENTER)</translation>
         <location filename="../artisanlib/main.py" line="3699" />
         <location filename="../artisanlib/main.py" line="3392" />
         <location filename="../artisanlib/main.py" line="3382" />
-        <location filename="../artisanlib/curves.py" line="2232" />
-        <location filename="../artisanlib/curves.py" line="1570" />
-        <location filename="../artisanlib/curves.py" line="1332" />
-        <location filename="../artisanlib/curves.py" line="541" />
-        <location filename="../artisanlib/curves.py" line="504" />
-        <location filename="../artisanlib/curves.py" line="442" />
-        <location filename="../artisanlib/curves.py" line="422" />
+        <location filename="../artisanlib/curves.py" line="2243" />
+        <location filename="../artisanlib/curves.py" line="1581" />
+        <location filename="../artisanlib/curves.py" line="1343" />
+        <location filename="../artisanlib/curves.py" line="550" />
+        <location filename="../artisanlib/curves.py" line="513" />
+        <location filename="../artisanlib/curves.py" line="450" />
+        <location filename="../artisanlib/curves.py" line="430" />
         <location filename="../artisanlib/curves.py" line="342" />
         <location filename="../artisanlib/designer.py" line="219" />
         <location filename="../artisanlib/designer.py" line="74" />
@@ -11686,13 +11686,13 @@ A billentyűparancsokat le kell tiltani (ENTER)</translation>
         <location filename="../artisanlib/main.py" line="3698" />
         <location filename="../artisanlib/main.py" line="3387" />
         <location filename="../artisanlib/main.py" line="3377" />
-        <location filename="../artisanlib/curves.py" line="2227" />
-        <location filename="../artisanlib/curves.py" line="1579" />
-        <location filename="../artisanlib/curves.py" line="1329" />
-        <location filename="../artisanlib/curves.py" line="540" />
-        <location filename="../artisanlib/curves.py" line="498" />
-        <location filename="../artisanlib/curves.py" line="441" />
-        <location filename="../artisanlib/curves.py" line="422" />
+        <location filename="../artisanlib/curves.py" line="2238" />
+        <location filename="../artisanlib/curves.py" line="1590" />
+        <location filename="../artisanlib/curves.py" line="1340" />
+        <location filename="../artisanlib/curves.py" line="549" />
+        <location filename="../artisanlib/curves.py" line="507" />
+        <location filename="../artisanlib/curves.py" line="449" />
+        <location filename="../artisanlib/curves.py" line="430" />
         <location filename="../artisanlib/curves.py" line="337" />
         <location filename="../artisanlib/designer.py" line="218" />
         <location filename="../artisanlib/designer.py" line="76" />
@@ -11728,7 +11728,7 @@ A billentyűparancsokat le kell tiltani (ENTER)</translation>
         <location filename="../artisanlib/alarms.py" line="912" />
         <location filename="../artisanlib/alarms.py" line="846" />
         <location filename="../artisanlib/statistics.py" line="97" />
-        <location filename="../artisanlib/curves.py" line="2113" />
+        <location filename="../artisanlib/curves.py" line="2124" />
         <location filename="../artisanlib/designer.py" line="628" />
         <location filename="../artisanlib/designer.py" line="341" />
         <location filename="../artisanlib/designer.py" line="44" />
@@ -11831,7 +11831,7 @@ A billentyűparancsokat le kell tiltani (ENTER)</translation>
         <location filename="../artisanlib/devices.py" line="1176" />
         <location filename="../artisanlib/alarms.py" line="909" />
         <location filename="../artisanlib/alarms.py" line="853" />
-        <location filename="../artisanlib/curves.py" line="2120" />
+        <location filename="../artisanlib/curves.py" line="2131" />
         <location filename="../artisanlib/designer.py" line="634" />
         <location filename="../artisanlib/designer.py" line="347" />
         <location filename="../artisanlib/designer.py" line="57" />
@@ -12091,9 +12091,9 @@ A billentyűparancsokat le kell tiltani (ENTER)</translation>
         <location filename="../artisanlib/alarms.py" line="904" />
         <location filename="../artisanlib/alarms.py" line="848" />
         <location filename="../artisanlib/statistics.py" line="99" />
-        <location filename="../artisanlib/curves.py" line="2115" />
-        <location filename="../artisanlib/curves.py" line="988" />
-        <location filename="../artisanlib/curves.py" line="956" />
+        <location filename="../artisanlib/curves.py" line="2126" />
+        <location filename="../artisanlib/curves.py" line="999" />
+        <location filename="../artisanlib/curves.py" line="967" />
         <location filename="../artisanlib/designer.py" line="629" />
         <location filename="../artisanlib/designer.py" line="342" />
         <location filename="../artisanlib/designer.py" line="47" />
@@ -12113,7 +12113,7 @@ A billentyűparancsokat le kell tiltani (ENTER)</translation>
         <location filename="../artisanlib/alarms.py" line="905" />
         <location filename="../artisanlib/alarms.py" line="849" />
         <location filename="../artisanlib/statistics.py" line="100" />
-        <location filename="../artisanlib/curves.py" line="2116" />
+        <location filename="../artisanlib/curves.py" line="2127" />
         <location filename="../artisanlib/designer.py" line="630" />
         <location filename="../artisanlib/designer.py" line="343" />
         <location filename="../artisanlib/designer.py" line="49" />
@@ -12130,7 +12130,7 @@ A billentyűparancsokat le kell tiltani (ENTER)</translation>
         <location filename="../artisanlib/canvas.py" line="4153" />
         <location filename="../artisanlib/alarms.py" line="906" />
         <location filename="../artisanlib/alarms.py" line="850" />
-        <location filename="../artisanlib/curves.py" line="2117" />
+        <location filename="../artisanlib/curves.py" line="2128" />
         <location filename="../artisanlib/designer.py" line="631" />
         <location filename="../artisanlib/designer.py" line="344" />
         <location filename="../artisanlib/designer.py" line="51" />
@@ -12149,7 +12149,7 @@ A billentyűparancsokat le kell tiltani (ENTER)</translation>
         <location filename="../artisanlib/transposer.py" line="1129" />
         <location filename="../artisanlib/alarms.py" line="907" />
         <location filename="../artisanlib/alarms.py" line="851" />
-        <location filename="../artisanlib/curves.py" line="2118" />
+        <location filename="../artisanlib/curves.py" line="2129" />
         <location filename="../artisanlib/designer.py" line="632" />
         <location filename="../artisanlib/designer.py" line="345" />
         <location filename="../artisanlib/designer.py" line="53" />
@@ -12166,7 +12166,7 @@ A billentyűparancsokat le kell tiltani (ENTER)</translation>
         <location filename="../artisanlib/canvas.py" line="4155" />
         <location filename="../artisanlib/alarms.py" line="908" />
         <location filename="../artisanlib/alarms.py" line="852" />
-        <location filename="../artisanlib/curves.py" line="2119" />
+        <location filename="../artisanlib/curves.py" line="2130" />
         <location filename="../artisanlib/designer.py" line="633" />
         <location filename="../artisanlib/designer.py" line="346" />
         <location filename="../artisanlib/designer.py" line="55" />
@@ -12398,7 +12398,7 @@ A billentyűparancsokat le kell tiltani (ENTER)</translation>
         <translation>Vastagság</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1348" />
+        <location filename="../artisanlib/curves.py" line="1359" />
         <location filename="../artisanlib/events.py" line="457" />
         <source>Opacity</source>
         <translation>Átlátszatlanság</translation>
@@ -12583,7 +12583,7 @@ A billentyűparancsokat le kell tiltani (ENTER)</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="7413" />
-        <location filename="../artisanlib/curves.py" line="1033" />
+        <location filename="../artisanlib/curves.py" line="1044" />
         <location filename="../artisanlib/ports.py" line="963" />
         <location filename="../artisanlib/ports.py" line="254" />
         <source>Start</source>
@@ -12685,7 +12685,7 @@ A billentyűparancsokat le kell tiltani (ENTER)</translation>
         <location filename="../artisanlib/devices.py" line="1211" />
         <location filename="../artisanlib/devices.py" line="1162" />
         <location filename="../artisanlib/devices.py" line="951" />
-        <location filename="../artisanlib/curves.py" line="1280" />
+        <location filename="../artisanlib/curves.py" line="1291" />
         <location filename="../artisanlib/ports.py" line="1219" />
         <location filename="../artisanlib/ports.py" line="928" />
         <location filename="../artisanlib/ports.py" line="575" />
@@ -13184,16 +13184,16 @@ A billentyűparancsokat le kell tiltani (ENTER)</translation>
         <translation>Végső</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="640" />
-        <location filename="../artisanlib/curves.py" line="427" />
+        <location filename="../artisanlib/curves.py" line="651" />
+        <location filename="../artisanlib/curves.py" line="435" />
         <location filename="../artisanlib/phases.py" line="49" />
         <source>min</source>
         <comment>abbrev of minimum</comment>
         <translation>perc</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="641" />
-        <location filename="../artisanlib/curves.py" line="428" />
+        <location filename="../artisanlib/curves.py" line="652" />
+        <location filename="../artisanlib/curves.py" line="436" />
         <location filename="../artisanlib/phases.py" line="50" />
         <source>max</source>
         <translation type="unfinished" />
@@ -13334,132 +13334,132 @@ LCD-k Mind</translation>
         <translation>Simítás</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="369" />
+        <location filename="../artisanlib/curves.py" line="370" />
         <source>Smooth Curves</source>
         <translation>Sima görbék</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="462" />
+        <location filename="../artisanlib/curves.py" line="470" />
         <source>Delta Span</source>
         <translation>Delta-terjedelem</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="252" />
-        <location filename="../artisanlib/curves.py" line="569" />
+        <location filename="../artisanlib/curves.py" line="578" />
         <source>ET Y(x)</source>
         <translation>ET Y (x)</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="253" />
-        <location filename="../artisanlib/curves.py" line="570" />
+        <location filename="../artisanlib/curves.py" line="579" />
         <source>BT Y(x)</source>
         <translation>BT Y (x)</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="688" />
+        <location filename="../artisanlib/curves.py" line="699" />
         <source>Path Effects</source>
         <translation>Útvonalhatások</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="707" />
+        <location filename="../artisanlib/curves.py" line="718" />
         <source>Font</source>
         <translation>Betűtípus</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="751" />
+        <location filename="../artisanlib/curves.py" line="762" />
         <source>P1</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="752" />
+        <location filename="../artisanlib/curves.py" line="763" />
         <source>P2</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="753" />
+        <location filename="../artisanlib/curves.py" line="764" />
         <source>P3</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="754" />
+        <location filename="../artisanlib/curves.py" line="765" />
         <source>P4</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="755" />
+        <location filename="../artisanlib/curves.py" line="766" />
         <source>P5</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="756" />
+        <location filename="../artisanlib/curves.py" line="767" />
         <source>P6</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="757" />
+        <location filename="../artisanlib/curves.py" line="768" />
         <source>P7</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="758" />
+        <location filename="../artisanlib/curves.py" line="769" />
         <source>P8</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="759" />
+        <location filename="../artisanlib/curves.py" line="770" />
         <source>P9</source>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="950" />
+        <location filename="../artisanlib/curves.py" line="961" />
         <source>Offset seconds from CHARGE</source>
         <translation>Eltolt másodpercek a CHARGE-tól</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="955" />
+        <location filename="../artisanlib/curves.py" line="966" />
         <source>Start of Analyze interval of interest</source>
         <translation>Az érdeklődés intervallumának elemzése kezdete</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="997" />
-        <location filename="../artisanlib/curves.py" line="965" />
+        <location filename="../artisanlib/curves.py" line="1008" />
+        <location filename="../artisanlib/curves.py" line="976" />
         <source>Custom offset seconds from CHARGE</source>
         <translation>Egyedi eltolási másodperc a CHARGE-tól</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="974" />
+        <location filename="../artisanlib/curves.py" line="985" />
         <source>Number of samples considered significant</source>
         <translation>Jelentősnek tekintett minták száma</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="980" />
+        <location filename="../artisanlib/curves.py" line="991" />
         <source>Delta RoR Actual-to-Fit considered significant</source>
         <translation>A Delta RoR Actual-to-Fit jelentősnek tekinthető</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="987" />
+        <location filename="../artisanlib/curves.py" line="998" />
         <source>Start of Curve Fit window</source>
         <translation>A Curve Fit ablak kezdete</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1013" />
+        <location filename="../artisanlib/curves.py" line="1024" />
         <source>deg</source>
         <translation>fok</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1034" />
+        <location filename="../artisanlib/curves.py" line="1045" />
         <source>End</source>
         <translation>Vége</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="1947" />
-        <location filename="../artisanlib/curves.py" line="1320" />
+        <location filename="../artisanlib/curves.py" line="1331" />
         <source>Not available in ArtisanViewer</source>
         <translation>Nem érhető el az ArtisanViewer alkalmazásban</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="4174" />
-        <location filename="../artisanlib/curves.py" line="2126" />
+        <location filename="../artisanlib/curves.py" line="2137" />
         <source>EVENT</source>
         <translation>ESEMÉNY</translation>
     </message>
@@ -16065,33 +16065,33 @@ FIGYELEM: A rögzített adatok megerősítés nélkül törlődnek.</translation
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="27372" />
-        <location filename="../artisanlib/curves.py" line="1751" />
+        <location filename="../artisanlib/curves.py" line="1762" />
         <source>Incompatible variables found in %s</source>
         <translation>Nem kompatibilis változók találhatók itt: %s</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="27374" />
-        <location filename="../artisanlib/curves.py" line="1753" />
+        <location filename="../artisanlib/curves.py" line="1764" />
         <source>Assignment problem</source>
         <translation>Hozzárendelési probléma</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1788" />
+        <location filename="../artisanlib/curves.py" line="1799" />
         <source>New Extra Device: virtual: y1(x) =[{}]; y2(x)=[{}]</source>
         <translation>Új extra eszköz: virtuális: y1(x) =[{}]; y2(x)=[{}]</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="2290" />
+        <location filename="../artisanlib/curves.py" line="2301" />
         <source>Interpolation failed: no profile available</source>
         <translation>Az interpoláció sikertelen: nincs elérhető profil</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="2300" />
+        <location filename="../artisanlib/curves.py" line="2311" />
         <source>Sound turned ON</source>
         <translation>A hang be van kapcsolva</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="2304" />
+        <location filename="../artisanlib/curves.py" line="2315" />
         <source>Sound turned OFF</source>
         <translation>Hang kikapcsolva</translation>
     </message>
@@ -18868,37 +18868,37 @@ Folytatni?</translation>
     </message>
     <message>
         <location filename="../artisanlib/colors.py" line="554" />
-        <location filename="../artisanlib/curves.py" line="1241" />
+        <location filename="../artisanlib/curves.py" line="1252" />
         <source>Graph</source>
         <translation type="unfinished">Grafikon</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1402" />
+        <location filename="../artisanlib/curves.py" line="1413" />
         <source>RoR</source>
         <translation>Elköltözés</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1408" />
+        <location filename="../artisanlib/curves.py" line="1419" />
         <source>Filters</source>
         <translation>Szűrők</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1414" />
+        <location filename="../artisanlib/curves.py" line="1425" />
         <source>Plotter</source>
         <translation type="unfinished">Rajzoló</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1420" />
+        <location filename="../artisanlib/curves.py" line="1431" />
         <source>Math</source>
         <translation type="unfinished">Matek</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1426" />
+        <location filename="../artisanlib/curves.py" line="1437" />
         <source>Analyze</source>
         <translation>Elemezze</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1432" />
+        <location filename="../artisanlib/curves.py" line="1443" />
         <source>UI</source>
         <translation>Felhasználói felület</translation>
     </message>
@@ -19825,7 +19825,7 @@ Folytatni?</translation>
         <translation>Grafikon mentése szöveges fájlba.wg</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="840" />
+        <location filename="../artisanlib/curves.py" line="851" />
         <location filename="../artisanlib/wheels.py" line="120" />
         <source>Save image using current graph size to a png format</source>
         <translation>Mentse a képet az aktuális grafikonmérettel png formátumba</translation>
@@ -20784,22 +20784,77 @@ specified by the lookahead</source>
         <translation>ON/OFF naplózza a soros kommunikációt</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="359" />
+        <location filename="../artisanlib/curves.py" line="344" />
+        <source>RoR linear decay average filter size</source>
+        <translation>RoR lineáris bomlási átlagos szűrőméret</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/curves.py" line="360" />
         <source>Use an optimal smoothing algorithm (only applicable offline, after recording)</source>
         <translation>Használjon optimális simító algoritmust (csak offline, felvétel után alkalmazható)</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="365" />
+        <location filename="../artisanlib/curves.py" line="366" />
         <source>Compute the rate-of-rise over the delta span interval by a linear polyfit</source>
         <translation>Számítsa ki a delta span intervallumon belüli emelkedési sebességet lineáris polifit segítségével</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="830" />
+        <location filename="../artisanlib/curves.py" line="371" />
+        <source>Linear decay average filter, applied if not recording. Resulting signal is used for RoR computation.</source>
+        <translation>Lineáris bomlási átlagszűrő, akkor alkalmazva, ha nincs rögzítés. A kapott jelet az RoR kiszámításához használják.</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/curves.py" line="381" />
+        <source>Minimal-delay low-pass filter eliminating tiny spikes, applied if not recording</source>
+        <translation>Minimális késleltetésű aluláteresztő szűrő, amely kiküszöböli az apró jeltüskéket, és akkor kerül alkalmazásra, ha nincs felvétel</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/curves.py" line="387" />
+        <source>Removes stair-step patterns caused by duplicate readings through interpolation</source>
+        <translation>Interpolációval eltávolítja a duplikált leolvasások okozta lépcsőzetes mintázatokat</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/curves.py" line="405" />
+        <source>Render curves before CHARGE and after DROP</source>
+        <translation>Görbék renderelése TÖLTÉS előtt és DROP után</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/curves.py" line="412" />
+        <source>Applies interpolation to substitute missing data</source>
+        <translation>Interpolációt alkalmaz a hiányzó adatok helyettesítésére</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/curves.py" line="419" />
+        <source>Removes large spikes</source>
+        <translation>Eltávolítja a nagy tüskéket</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/curves.py" line="425" />
+        <source>Removes readings out of range</source>
+        <translation>Eltávolítja a tartományon kívüli értékeket</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/curves.py" line="471" />
+        <source>RoR computation interval</source>
+        <translation>RoR számítási intervallum</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/curves.py" line="620" />
+        <source>Applies filters directly on the incoming data before it is recorded, thus filtered data is lost forever</source>
+        <translation>Közvetlenül a bejövő adatokra alkalmaz szűrőket a rögzítés előtt, így a szűrt adatok örökre elvesznek</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/curves.py" line="648" />
+        <source>Hide RoR readings out of range</source>
+        <translation>Tartományon kívüli RoR-értékek elrejtése</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/curves.py" line="841" />
         <source>Shows data table of plots</source>
         <translation>A telkek adattáblázatát mutatja</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="919" />
+        <location filename="../artisanlib/curves.py" line="930" />
         <source>linear: linear interpolation
 cubic: 3rd order spline interpolation
 nearest: y value of the nearest point</source>
@@ -20808,22 +20863,22 @@ köbös: 3. rendű spline interpoláció
 legközelebbi: a legközelebbi pont y értéke</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="961" />
+        <location filename="../artisanlib/curves.py" line="972" />
         <source>Choose the start point of analysis interval of interest</source>
         <translation>Válassza ki a kívánt elemzési intervallum kezdőpontját</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="993" />
+        <location filename="../artisanlib/curves.py" line="1004" />
         <source>Choose the start point of curve fitting</source>
         <translation>Válassza ki a görbe illesztésének kezdőpontját</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1714" />
+        <location filename="../artisanlib/curves.py" line="1725" />
         <source>Add P1 and P2 as ET and BT</source>
         <translation>Adja hozzá a P1-et és a P2-t ET és BT-ként</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1719" />
+        <location filename="../artisanlib/curves.py" line="1730" />
         <source>Add P1 and P2 as:
 
 1 an Extra virtual device if a profile is loaded
@@ -20836,18 +20891,18 @@ legközelebbi: a legközelebbi pont y értéke</translation>
 </translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1722" />
+        <location filename="../artisanlib/curves.py" line="1733" />
         <source>No more Virtual Extra Devices available</source>
         <translation>Nincs több virtuális extra eszköz</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1727" />
-        <location filename="../artisanlib/curves.py" line="1725" />
+        <location filename="../artisanlib/curves.py" line="1738" />
+        <location filename="../artisanlib/curves.py" line="1736" />
         <source>Not available during recording</source>
         <translation>Felvétel közben nem elérhető</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1730" />
+        <location filename="../artisanlib/curves.py" line="1741" />
         <source>Set P1 as ET background B1
 Set P2 as BT background B2
 Note: Erases all existing background curves.</source>

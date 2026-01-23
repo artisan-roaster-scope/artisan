@@ -240,7 +240,7 @@
         <location filename="../artisanlib/alarms.py" line="90" />
         <location filename="../artisanlib/dialogs.py" line="616" />
         <location filename="../artisanlib/statistics.py" line="289" />
-        <location filename="../artisanlib/curves.py" line="1363" />
+        <location filename="../artisanlib/curves.py" line="1374" />
         <location filename="../artisanlib/roast_properties.py" line="808" />
         <location filename="../artisanlib/background.py" line="85" />
         <location filename="../artisanlib/events.py" line="672" />
@@ -268,7 +268,7 @@
         <translation>設定顏色</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1204" />
+        <location filename="../artisanlib/curves.py" line="1215" />
         <location filename="../artisanlib/pid_dialogs.py" line="4689" />
         <location filename="../artisanlib/pid_dialogs.py" line="3151" />
         <location filename="../artisanlib/pid_dialogs.py" line="3149" />
@@ -282,7 +282,7 @@
     </message>
     <message>
         <location filename="../artisanlib/alarms.py" line="100" />
-        <location filename="../artisanlib/curves.py" line="1361" />
+        <location filename="../artisanlib/curves.py" line="1372" />
         <location filename="../artisanlib/background.py" line="83" />
         <location filename="../artisanlib/events.py" line="723" />
         <location filename="../artisanlib/pid_dialogs.py" line="2797" />
@@ -547,7 +547,7 @@
         <location filename="../artisanlib/devices.py" line="158" />
         <location filename="../artisanlib/devices.py" line="156" />
         <location filename="../artisanlib/alarms.py" line="116" />
-        <location filename="../artisanlib/curves.py" line="846" />
+        <location filename="../artisanlib/curves.py" line="857" />
         <location filename="../artisanlib/roast_properties.py" line="2897" />
         <location filename="../artisanlib/ports.py" line="781" />
         <location filename="../artisanlib/events.py" line="975" />
@@ -704,25 +704,25 @@
         <translation>儲存預設值</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="803" />
-        <location filename="../artisanlib/curves.py" line="800" />
-        <location filename="../artisanlib/curves.py" line="797" />
-        <location filename="../artisanlib/curves.py" line="794" />
-        <location filename="../artisanlib/curves.py" line="791" />
-        <location filename="../artisanlib/curves.py" line="788" />
-        <location filename="../artisanlib/curves.py" line="785" />
-        <location filename="../artisanlib/curves.py" line="782" />
-        <location filename="../artisanlib/curves.py" line="779" />
+        <location filename="../artisanlib/curves.py" line="814" />
+        <location filename="../artisanlib/curves.py" line="811" />
+        <location filename="../artisanlib/curves.py" line="808" />
+        <location filename="../artisanlib/curves.py" line="805" />
+        <location filename="../artisanlib/curves.py" line="802" />
+        <location filename="../artisanlib/curves.py" line="799" />
+        <location filename="../artisanlib/curves.py" line="796" />
+        <location filename="../artisanlib/curves.py" line="793" />
+        <location filename="../artisanlib/curves.py" line="790" />
         <source>Color</source>
         <translation>顏色</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="825" />
+        <location filename="../artisanlib/curves.py" line="836" />
         <source>Plot</source>
         <translation>繪製</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="828" />
+        <location filename="../artisanlib/curves.py" line="839" />
         <source>Data</source>
         <translation>數據</translation>
     </message>
@@ -736,33 +736,33 @@
         <location filename="../artisanlib/colors.py" line="331" />
         <location filename="../artisanlib/colors.py" line="328" />
         <location filename="../artisanlib/colors.py" line="125" />
-        <location filename="../artisanlib/curves.py" line="832" />
+        <location filename="../artisanlib/curves.py" line="843" />
         <source>Background</source>
         <translation>背景顏色</translation>
     </message>
     <message>
         <location filename="../artisanlib/cup_profile.py" line="101" />
-        <location filename="../artisanlib/curves.py" line="838" />
+        <location filename="../artisanlib/curves.py" line="849" />
         <source>Save Image</source>
         <translation>儲存圖片</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="928" />
+        <location filename="../artisanlib/curves.py" line="939" />
         <source>Info</source>
         <translation>資訊</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1007" />
+        <location filename="../artisanlib/curves.py" line="1018" />
         <source>Create Background Curve</source>
         <translation>新增背景曲線</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1713" />
+        <location filename="../artisanlib/curves.py" line="1724" />
         <source>ET/BT</source>
         <translation>出風溫/豆溫</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1716" />
+        <location filename="../artisanlib/curves.py" line="1727" />
         <source>Create Virtual
 Extra Device</source>
         <translation>新增虛擬
@@ -1314,17 +1314,17 @@ END</source>
     </message>
     <message>
         <location filename="../plus/schedule.py" line="1580" />
-        <location filename="../artisanlib/curves.py" line="1027" />
-        <location filename="../artisanlib/curves.py" line="938" />
-        <location filename="../artisanlib/curves.py" line="932" />
-        <location filename="../artisanlib/curves.py" line="925" />
-        <location filename="../artisanlib/curves.py" line="907" />
+        <location filename="../artisanlib/curves.py" line="1038" />
+        <location filename="../artisanlib/curves.py" line="949" />
+        <location filename="../artisanlib/curves.py" line="943" />
+        <location filename="../artisanlib/curves.py" line="936" />
+        <location filename="../artisanlib/curves.py" line="918" />
         <location filename="../artisanlib/background.py" line="62" />
         <source>Show</source>
         <translation>顯示</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="400" />
+        <location filename="../artisanlib/curves.py" line="404" />
         <location filename="../artisanlib/background.py" line="71" />
         <source>Show Full</source>
         <translation>顯示全域</translation>
@@ -1335,7 +1335,7 @@ END</source>
         <translation>重撥輔助</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1207" />
+        <location filename="../artisanlib/curves.py" line="1218" />
         <location filename="../artisanlib/background.py" line="224" />
         <source>Beep</source>
         <translation>嗶嗶聲</translation>
@@ -1486,77 +1486,77 @@ END</source>
         <translation>結構化日誌 開/關</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="358" />
+        <location filename="../artisanlib/curves.py" line="359" />
         <source>Optimal Smoothing Post Roast</source>
         <translation>烘焙後曲線最佳平滑化顯示</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="364" />
+        <location filename="../artisanlib/curves.py" line="365" />
         <source>Polyfit computation</source>
         <translation>多項式擬合計算</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="378" />
+        <location filename="../artisanlib/curves.py" line="380" />
         <source>Smooth Spikes</source>
         <translation>突波平滑</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="383" />
+        <location filename="../artisanlib/curves.py" line="386" />
         <source>Interpolate Duplicates</source>
         <translation>插值重複項</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="406" />
+        <location filename="../artisanlib/curves.py" line="411" />
         <source>Interpolate Drops</source>
         <translation>插值處理滴落數據</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="412" />
+        <location filename="../artisanlib/curves.py" line="418" />
         <source>Drop Spikes</source>
         <translation>驟降尖峰</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="637" />
-        <location filename="../artisanlib/curves.py" line="417" />
+        <location filename="../artisanlib/curves.py" line="647" />
+        <location filename="../artisanlib/curves.py" line="424" />
         <source>Limits</source>
         <translation>限制範圍</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="443" />
-        <location filename="../artisanlib/curves.py" line="442" />
-        <location filename="../artisanlib/curves.py" line="441" />
-        <location filename="../artisanlib/curves.py" line="440" />
+        <location filename="../artisanlib/curves.py" line="451" />
+        <location filename="../artisanlib/curves.py" line="450" />
+        <location filename="../artisanlib/curves.py" line="449" />
+        <location filename="../artisanlib/curves.py" line="448" />
         <source>Projection</source>
         <translation>預測投射</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="92" />
-        <location filename="../artisanlib/curves.py" line="502" />
+        <location filename="../artisanlib/curves.py" line="511" />
         <source>Swap</source>
         <translation>交換位置</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1211" />
+        <location filename="../artisanlib/curves.py" line="1222" />
         <source>Glow</source>
         <translation>輝光</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1215" />
+        <location filename="../artisanlib/curves.py" line="1226" />
         <source>Notifications</source>
         <translation>通知</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1260" />
+        <location filename="../artisanlib/curves.py" line="1271" />
         <source>Decimal Places</source>
         <translation>小數位數</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1297" />
+        <location filename="../artisanlib/curves.py" line="1308" />
         <source>Alarm Popups</source>
         <translation>警報彈出通知</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1357" />
+        <location filename="../artisanlib/curves.py" line="1368" />
         <source>Hide Image During Roast</source>
         <translation>烘焙時隱藏圖片</translation>
     </message>
@@ -1868,7 +1868,7 @@ END</source>
         <location filename="../artisanlib/canvas.py" line="18566" />
         <location filename="../artisanlib/alarms.py" line="910" />
         <location filename="../artisanlib/alarms.py" line="854" />
-        <location filename="../artisanlib/curves.py" line="2121" />
+        <location filename="../artisanlib/curves.py" line="2132" />
         <location filename="../artisanlib/roast_properties.py" line="4476" />
         <location filename="../artisanlib/roast_properties.py" line="754" />
         <location filename="../artisanlib/background.py" line="1081" />
@@ -2134,13 +2134,13 @@ END</source>
         <translation>大型</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="2236" />
+        <location filename="../artisanlib/curves.py" line="2247" />
         <location filename="../artisanlib/events.py" line="1097" />
         <source>ET</source>
         <translation>排風溫</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="2237" />
+        <location filename="../artisanlib/curves.py" line="2248" />
         <location filename="../artisanlib/events.py" line="1098" />
         <source>BT</source>
         <translation>豆溫</translation>
@@ -2221,51 +2221,51 @@ END</source>
     </message>
     <message>
         <location filename="../artisanlib/transposer.py" line="146" />
-        <location filename="../artisanlib/curves.py" line="914" />
-        <location filename="../artisanlib/curves.py" line="445" />
+        <location filename="../artisanlib/curves.py" line="925" />
+        <location filename="../artisanlib/curves.py" line="453" />
         <source>linear</source>
         <translation>線性</translation>
     </message>
     <message>
         <location filename="../artisanlib/transposer.py" line="147" />
-        <location filename="../artisanlib/curves.py" line="446" />
+        <location filename="../artisanlib/curves.py" line="454" />
         <source>quadratic</source>
         <translation>二次</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="702" />
+        <location filename="../artisanlib/curves.py" line="713" />
         <source>classic</source>
         <translation>經典</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="703" />
+        <location filename="../artisanlib/curves.py" line="714" />
         <source>xkcd</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="710" />
+        <location filename="../artisanlib/curves.py" line="721" />
         <source>Default</source>
         <translation>預設</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="915" />
+        <location filename="../artisanlib/curves.py" line="926" />
         <source>cubic</source>
         <translation>立方</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="916" />
+        <location filename="../artisanlib/curves.py" line="927" />
         <source>nearest</source>
         <translation>最接近的</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="989" />
-        <location filename="../artisanlib/curves.py" line="957" />
+        <location filename="../artisanlib/curves.py" line="1000" />
+        <location filename="../artisanlib/curves.py" line="968" />
         <source>120 secs before FCs</source>
         <translation>一爆前120秒</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="990" />
-        <location filename="../artisanlib/curves.py" line="958" />
+        <location filename="../artisanlib/curves.py" line="1001" />
+        <location filename="../artisanlib/curves.py" line="969" />
         <source>Custom</source>
         <translation>自定義</translation>
     </message>
@@ -4020,17 +4020,17 @@ END</source>
         <location filename="../artisanlib/alarms.py" line="706" />
         <location filename="../artisanlib/alarms.py" line="677" />
         <location filename="../artisanlib/statistics.py" line="761" />
-        <location filename="../artisanlib/curves.py" line="2492" />
-        <location filename="../artisanlib/curves.py" line="2432" />
-        <location filename="../artisanlib/curves.py" line="2414" />
-        <location filename="../artisanlib/curves.py" line="2382" />
-        <location filename="../artisanlib/curves.py" line="1978" />
-        <location filename="../artisanlib/curves.py" line="1969" />
-        <location filename="../artisanlib/curves.py" line="1902" />
-        <location filename="../artisanlib/curves.py" line="1889" />
-        <location filename="../artisanlib/curves.py" line="1876" />
-        <location filename="../artisanlib/curves.py" line="1707" />
-        <location filename="../artisanlib/curves.py" line="1657" />
+        <location filename="../artisanlib/curves.py" line="2503" />
+        <location filename="../artisanlib/curves.py" line="2443" />
+        <location filename="../artisanlib/curves.py" line="2425" />
+        <location filename="../artisanlib/curves.py" line="2393" />
+        <location filename="../artisanlib/curves.py" line="1989" />
+        <location filename="../artisanlib/curves.py" line="1980" />
+        <location filename="../artisanlib/curves.py" line="1913" />
+        <location filename="../artisanlib/curves.py" line="1900" />
+        <location filename="../artisanlib/curves.py" line="1887" />
+        <location filename="../artisanlib/curves.py" line="1718" />
+        <location filename="../artisanlib/curves.py" line="1668" />
         <location filename="../artisanlib/pid_control.py" line="950" />
         <location filename="../artisanlib/pid_control.py" line="935" />
         <location filename="../artisanlib/pid_control.py" line="919" />
@@ -4316,23 +4316,23 @@ END</source>
         <translation>pid.readoneword(): {0} RX bytes 已接收 (需要7bytes) 來自單元ID={1}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="2040" />
-        <location filename="../artisanlib/curves.py" line="1985" />
+        <location filename="../artisanlib/curves.py" line="2051" />
+        <location filename="../artisanlib/curves.py" line="1996" />
         <source>Univariate: no profile data available</source>
         <translation>Univariate:無有效曲線數據</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1999" />
+        <location filename="../artisanlib/curves.py" line="2010" />
         <source>ln(): no profile data available</source>
         <translation>自然對數函數: 無有效曲線數據</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="2018" />
+        <location filename="../artisanlib/curves.py" line="2029" />
         <source>expvar(): no profile data available</source>
         <translation>expvar(): 無有效曲線數據</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="2272" />
+        <location filename="../artisanlib/curves.py" line="2283" />
         <source>Polyfit: no profile data available</source>
         <translation>Polyfit:無有效曲線數據</translation>
     </message>
@@ -4715,7 +4715,7 @@ END</source>
     <message>
         <location filename="../artisanlib/devices.py" line="4885" />
         <location filename="../artisanlib/devices.py" line="4876" />
-        <location filename="../artisanlib/curves.py" line="2534" />
+        <location filename="../artisanlib/curves.py" line="2545" />
         <source>Symbolic Formulas Help</source>
         <translation>符號方程說明</translation>
     </message>
@@ -4795,7 +4795,7 @@ END</source>
     <message>
         <location filename="../artisanlib/devices.py" line="2716" />
         <location filename="../artisanlib/devices.py" line="2715" />
-        <location filename="../artisanlib/curves.py" line="1042" />
+        <location filename="../artisanlib/curves.py" line="1053" />
         <location filename="../artisanlib/axis.py" line="427" />
         <source>Axis</source>
         <translation>坐標軸</translation>
@@ -4982,102 +4982,102 @@ END</source>
         <translation>萃取率</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="563" />
+        <location filename="../artisanlib/curves.py" line="572" />
         <source>Rate of Rise Curves</source>
         <translation>ROR曲線</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="565" />
+        <location filename="../artisanlib/curves.py" line="574" />
         <source>Rate of Rise LCDs</source>
         <translation>ROR LCDs</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="584" />
+        <location filename="../artisanlib/curves.py" line="593" />
         <source>Rate of Rise Symbolic Assignments</source>
         <translation>RoR 符號分配</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="610" />
+        <location filename="../artisanlib/curves.py" line="619" />
         <source>Input Filter</source>
         <translation>輸入濾波器</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="622" />
+        <location filename="../artisanlib/curves.py" line="632" />
         <source>Curve Filter</source>
         <translation>曲線濾波器</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="631" />
+        <location filename="../artisanlib/curves.py" line="641" />
         <source>Display Filter</source>
         <translation>顯示濾波器</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="680" />
+        <location filename="../artisanlib/curves.py" line="691" />
         <source>Rate of Rise Filter</source>
         <translation>ROR濾波器</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1069" />
+        <location filename="../artisanlib/curves.py" line="1080" />
         <source>Interpolate</source>
         <translation>內差</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1075" />
+        <location filename="../artisanlib/curves.py" line="1086" />
         <source>Univariate</source>
         <translation>單變量</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1083" />
+        <location filename="../artisanlib/curves.py" line="1094" />
         <source>ln()</source>
         <translation>自然對數函數</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1098" />
+        <location filename="../artisanlib/curves.py" line="1109" />
         <source>Exponent</source>
         <translation>指數</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1130" />
+        <location filename="../artisanlib/curves.py" line="1141" />
         <source>Polyfit</source>
         <translation>多項式擬合</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1154" />
+        <location filename="../artisanlib/curves.py" line="1165" />
         <source>Curve Fit Options</source>
         <translation>曲線擬合選項</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1167" />
+        <location filename="../artisanlib/curves.py" line="1178" />
         <source>Interval of Interest Options</source>
         <translation>目標範圍選項</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1181" />
+        <location filename="../artisanlib/curves.py" line="1192" />
         <source>Analyze Options</source>
         <translation>分析選項</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1239" />
+        <location filename="../artisanlib/curves.py" line="1250" />
         <source>Appearance</source>
         <translation>外觀</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1249" />
+        <location filename="../artisanlib/curves.py" line="1260" />
         <source>Resolution</source>
         <translation>解析度(文字顯示尺寸)</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1325" />
+        <location filename="../artisanlib/curves.py" line="1336" />
         <source>WebLCDs</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1340" />
+        <location filename="../artisanlib/curves.py" line="1351" />
         <source>Rename ET and BT</source>
         <translation>重新命名出風溫(ET)和豆溫(BT)</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1379" />
+        <location filename="../artisanlib/curves.py" line="1390" />
         <source>Logo Image File</source>
         <translation>Logo圖片檔</translation>
     </message>
@@ -11625,7 +11625,7 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <translation>標示區間</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="700" />
+        <location filename="../artisanlib/curves.py" line="711" />
         <location filename="../artisanlib/axis.py" line="280" />
         <source>Style</source>
         <translation>格線型式</translation>
@@ -11690,13 +11690,13 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <location filename="../artisanlib/main.py" line="3699" />
         <location filename="../artisanlib/main.py" line="3392" />
         <location filename="../artisanlib/main.py" line="3382" />
-        <location filename="../artisanlib/curves.py" line="2232" />
-        <location filename="../artisanlib/curves.py" line="1570" />
-        <location filename="../artisanlib/curves.py" line="1332" />
-        <location filename="../artisanlib/curves.py" line="541" />
-        <location filename="../artisanlib/curves.py" line="504" />
-        <location filename="../artisanlib/curves.py" line="442" />
-        <location filename="../artisanlib/curves.py" line="422" />
+        <location filename="../artisanlib/curves.py" line="2243" />
+        <location filename="../artisanlib/curves.py" line="1581" />
+        <location filename="../artisanlib/curves.py" line="1343" />
+        <location filename="../artisanlib/curves.py" line="550" />
+        <location filename="../artisanlib/curves.py" line="513" />
+        <location filename="../artisanlib/curves.py" line="450" />
+        <location filename="../artisanlib/curves.py" line="430" />
         <location filename="../artisanlib/curves.py" line="342" />
         <location filename="../artisanlib/designer.py" line="219" />
         <location filename="../artisanlib/designer.py" line="74" />
@@ -11723,13 +11723,13 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <location filename="../artisanlib/main.py" line="3698" />
         <location filename="../artisanlib/main.py" line="3387" />
         <location filename="../artisanlib/main.py" line="3377" />
-        <location filename="../artisanlib/curves.py" line="2227" />
-        <location filename="../artisanlib/curves.py" line="1579" />
-        <location filename="../artisanlib/curves.py" line="1329" />
-        <location filename="../artisanlib/curves.py" line="540" />
-        <location filename="../artisanlib/curves.py" line="498" />
-        <location filename="../artisanlib/curves.py" line="441" />
-        <location filename="../artisanlib/curves.py" line="422" />
+        <location filename="../artisanlib/curves.py" line="2238" />
+        <location filename="../artisanlib/curves.py" line="1590" />
+        <location filename="../artisanlib/curves.py" line="1340" />
+        <location filename="../artisanlib/curves.py" line="549" />
+        <location filename="../artisanlib/curves.py" line="507" />
+        <location filename="../artisanlib/curves.py" line="449" />
+        <location filename="../artisanlib/curves.py" line="430" />
         <location filename="../artisanlib/curves.py" line="337" />
         <location filename="../artisanlib/designer.py" line="218" />
         <location filename="../artisanlib/designer.py" line="76" />
@@ -11765,7 +11765,7 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <location filename="../artisanlib/alarms.py" line="912" />
         <location filename="../artisanlib/alarms.py" line="846" />
         <location filename="../artisanlib/statistics.py" line="97" />
-        <location filename="../artisanlib/curves.py" line="2113" />
+        <location filename="../artisanlib/curves.py" line="2124" />
         <location filename="../artisanlib/designer.py" line="628" />
         <location filename="../artisanlib/designer.py" line="341" />
         <location filename="../artisanlib/designer.py" line="44" />
@@ -11868,7 +11868,7 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <location filename="../artisanlib/devices.py" line="1176" />
         <location filename="../artisanlib/alarms.py" line="909" />
         <location filename="../artisanlib/alarms.py" line="853" />
-        <location filename="../artisanlib/curves.py" line="2120" />
+        <location filename="../artisanlib/curves.py" line="2131" />
         <location filename="../artisanlib/designer.py" line="634" />
         <location filename="../artisanlib/designer.py" line="347" />
         <location filename="../artisanlib/designer.py" line="57" />
@@ -12128,9 +12128,9 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <location filename="../artisanlib/alarms.py" line="904" />
         <location filename="../artisanlib/alarms.py" line="848" />
         <location filename="../artisanlib/statistics.py" line="99" />
-        <location filename="../artisanlib/curves.py" line="2115" />
-        <location filename="../artisanlib/curves.py" line="988" />
-        <location filename="../artisanlib/curves.py" line="956" />
+        <location filename="../artisanlib/curves.py" line="2126" />
+        <location filename="../artisanlib/curves.py" line="999" />
+        <location filename="../artisanlib/curves.py" line="967" />
         <location filename="../artisanlib/designer.py" line="629" />
         <location filename="../artisanlib/designer.py" line="342" />
         <location filename="../artisanlib/designer.py" line="47" />
@@ -12150,7 +12150,7 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <location filename="../artisanlib/alarms.py" line="905" />
         <location filename="../artisanlib/alarms.py" line="849" />
         <location filename="../artisanlib/statistics.py" line="100" />
-        <location filename="../artisanlib/curves.py" line="2116" />
+        <location filename="../artisanlib/curves.py" line="2127" />
         <location filename="../artisanlib/designer.py" line="630" />
         <location filename="../artisanlib/designer.py" line="343" />
         <location filename="../artisanlib/designer.py" line="49" />
@@ -12167,7 +12167,7 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <location filename="../artisanlib/canvas.py" line="4153" />
         <location filename="../artisanlib/alarms.py" line="906" />
         <location filename="../artisanlib/alarms.py" line="850" />
-        <location filename="../artisanlib/curves.py" line="2117" />
+        <location filename="../artisanlib/curves.py" line="2128" />
         <location filename="../artisanlib/designer.py" line="631" />
         <location filename="../artisanlib/designer.py" line="344" />
         <location filename="../artisanlib/designer.py" line="51" />
@@ -12186,7 +12186,7 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <location filename="../artisanlib/transposer.py" line="1129" />
         <location filename="../artisanlib/alarms.py" line="907" />
         <location filename="../artisanlib/alarms.py" line="851" />
-        <location filename="../artisanlib/curves.py" line="2118" />
+        <location filename="../artisanlib/curves.py" line="2129" />
         <location filename="../artisanlib/designer.py" line="632" />
         <location filename="../artisanlib/designer.py" line="345" />
         <location filename="../artisanlib/designer.py" line="53" />
@@ -12203,7 +12203,7 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <location filename="../artisanlib/canvas.py" line="4155" />
         <location filename="../artisanlib/alarms.py" line="908" />
         <location filename="../artisanlib/alarms.py" line="852" />
-        <location filename="../artisanlib/curves.py" line="2119" />
+        <location filename="../artisanlib/curves.py" line="2130" />
         <location filename="../artisanlib/designer.py" line="633" />
         <location filename="../artisanlib/designer.py" line="346" />
         <location filename="../artisanlib/designer.py" line="55" />
@@ -12435,7 +12435,7 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <translation>厚度</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1348" />
+        <location filename="../artisanlib/curves.py" line="1359" />
         <location filename="../artisanlib/events.py" line="457" />
         <source>Opacity</source>
         <translation>不透明度</translation>
@@ -12620,7 +12620,7 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="7413" />
-        <location filename="../artisanlib/curves.py" line="1033" />
+        <location filename="../artisanlib/curves.py" line="1044" />
         <location filename="../artisanlib/ports.py" line="963" />
         <location filename="../artisanlib/ports.py" line="254" />
         <source>Start</source>
@@ -12722,7 +12722,7 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <location filename="../artisanlib/devices.py" line="1211" />
         <location filename="../artisanlib/devices.py" line="1162" />
         <location filename="../artisanlib/devices.py" line="951" />
-        <location filename="../artisanlib/curves.py" line="1280" />
+        <location filename="../artisanlib/curves.py" line="1291" />
         <location filename="../artisanlib/ports.py" line="1219" />
         <location filename="../artisanlib/ports.py" line="928" />
         <location filename="../artisanlib/ports.py" line="575" />
@@ -13221,16 +13221,16 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <translation>發展</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="640" />
-        <location filename="../artisanlib/curves.py" line="427" />
+        <location filename="../artisanlib/curves.py" line="651" />
+        <location filename="../artisanlib/curves.py" line="435" />
         <location filename="../artisanlib/phases.py" line="49" />
         <source>min</source>
         <comment>abbrev of minimum</comment>
         <translation>最小</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="641" />
-        <location filename="../artisanlib/curves.py" line="428" />
+        <location filename="../artisanlib/curves.py" line="652" />
+        <location filename="../artisanlib/curves.py" line="436" />
         <location filename="../artisanlib/phases.py" line="50" />
         <source>max</source>
         <translation>最大</translation>
@@ -13371,132 +13371,132 @@ LCDs All</source>
         <translation>平滑</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="369" />
+        <location filename="../artisanlib/curves.py" line="370" />
         <source>Smooth Curves</source>
         <translation>平滑曲線</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="462" />
+        <location filename="../artisanlib/curves.py" line="470" />
         <source>Delta Span</source>
         <translation>範圍差值</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="252" />
-        <location filename="../artisanlib/curves.py" line="569" />
+        <location filename="../artisanlib/curves.py" line="578" />
         <source>ET Y(x)</source>
         <translation>出風溫 Y(x)</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="253" />
-        <location filename="../artisanlib/curves.py" line="570" />
+        <location filename="../artisanlib/curves.py" line="579" />
         <source>BT Y(x)</source>
         <translation>豆溫 Y(x)</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="688" />
+        <location filename="../artisanlib/curves.py" line="699" />
         <source>Path Effects</source>
         <translation>路徑效果</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="707" />
+        <location filename="../artisanlib/curves.py" line="718" />
         <source>Font</source>
         <translation>字體</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="751" />
+        <location filename="../artisanlib/curves.py" line="762" />
         <source>P1</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="752" />
+        <location filename="../artisanlib/curves.py" line="763" />
         <source>P2</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="753" />
+        <location filename="../artisanlib/curves.py" line="764" />
         <source>P3</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="754" />
+        <location filename="../artisanlib/curves.py" line="765" />
         <source>P4</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="755" />
+        <location filename="../artisanlib/curves.py" line="766" />
         <source>P5</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="756" />
+        <location filename="../artisanlib/curves.py" line="767" />
         <source>P6</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="757" />
+        <location filename="../artisanlib/curves.py" line="768" />
         <source>P7</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="758" />
+        <location filename="../artisanlib/curves.py" line="769" />
         <source>P8</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="759" />
+        <location filename="../artisanlib/curves.py" line="770" />
         <source>P9</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="950" />
+        <location filename="../artisanlib/curves.py" line="961" />
         <source>Offset seconds from CHARGE</source>
         <translation>從入豆起計算補償時間</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="955" />
+        <location filename="../artisanlib/curves.py" line="966" />
         <source>Start of Analyze interval of interest</source>
         <translation>分析間隔開始</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="997" />
-        <location filename="../artisanlib/curves.py" line="965" />
+        <location filename="../artisanlib/curves.py" line="1008" />
+        <location filename="../artisanlib/curves.py" line="976" />
         <source>Custom offset seconds from CHARGE</source>
         <translation>自定義入豆後的時間補償秒數</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="974" />
+        <location filename="../artisanlib/curves.py" line="985" />
         <source>Number of samples considered significant</source>
         <translation>有效值數量</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="980" />
+        <location filename="../artisanlib/curves.py" line="991" />
         <source>Delta RoR Actual-to-Fit considered significant</source>
         <translation>實際擬合的ROR差值需要慎重考慮</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="987" />
+        <location filename="../artisanlib/curves.py" line="998" />
         <source>Start of Curve Fit window</source>
         <translation>畫面上曲線的擬合起點</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1013" />
+        <location filename="../artisanlib/curves.py" line="1024" />
         <source>deg</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1034" />
+        <location filename="../artisanlib/curves.py" line="1045" />
         <source>End</source>
         <translation>結束</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="1947" />
-        <location filename="../artisanlib/curves.py" line="1320" />
+        <location filename="../artisanlib/curves.py" line="1331" />
         <source>Not available in ArtisanViewer</source>
         <translation>在ArtisanViewer中無效</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="4174" />
-        <location filename="../artisanlib/curves.py" line="2126" />
+        <location filename="../artisanlib/curves.py" line="2137" />
         <source>EVENT</source>
         <translation>事件</translation>
     </message>
@@ -16103,33 +16103,33 @@ ATTENTION: Recorded data will get cleared without confirmation</source>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="27372" />
-        <location filename="../artisanlib/curves.py" line="1751" />
+        <location filename="../artisanlib/curves.py" line="1762" />
         <source>Incompatible variables found in %s</source>
         <translation>在 %s 中發現不兼容的變量</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="27374" />
-        <location filename="../artisanlib/curves.py" line="1753" />
+        <location filename="../artisanlib/curves.py" line="1764" />
         <source>Assignment problem</source>
         <translation>任務分配問題</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1788" />
+        <location filename="../artisanlib/curves.py" line="1799" />
         <source>New Extra Device: virtual: y1(x) =[{}]; y2(x)=[{}]</source>
         <translation>新的額外設備：虛擬：y1（x）=[{}]；y2（x）=[{}]</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="2290" />
+        <location filename="../artisanlib/curves.py" line="2301" />
         <source>Interpolation failed: no profile available</source>
         <translation>內插失敗: 沒有發現有效的曲線</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="2300" />
+        <location filename="../artisanlib/curves.py" line="2311" />
         <source>Sound turned ON</source>
         <translation>開啟聲音</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="2304" />
+        <location filename="../artisanlib/curves.py" line="2315" />
         <source>Sound turned OFF</source>
         <translation>關閉聲音</translation>
     </message>
@@ -18914,37 +18914,37 @@ Continue?</source>
     </message>
     <message>
         <location filename="../artisanlib/colors.py" line="554" />
-        <location filename="../artisanlib/curves.py" line="1241" />
+        <location filename="../artisanlib/curves.py" line="1252" />
         <source>Graph</source>
         <translation>圖形</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1402" />
+        <location filename="../artisanlib/curves.py" line="1413" />
         <source>RoR</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1408" />
+        <location filename="../artisanlib/curves.py" line="1419" />
         <source>Filters</source>
         <translation>濾波器</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1414" />
+        <location filename="../artisanlib/curves.py" line="1425" />
         <source>Plotter</source>
         <translation>繪圖儀</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1420" />
+        <location filename="../artisanlib/curves.py" line="1431" />
         <source>Math</source>
         <translation>計算</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1426" />
+        <location filename="../artisanlib/curves.py" line="1437" />
         <source>Analyze</source>
         <translation>分析</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1432" />
+        <location filename="../artisanlib/curves.py" line="1443" />
         <source>UI</source>
         <translation>界面</translation>
     </message>
@@ -19871,7 +19871,7 @@ Continue?</source>
         <translation>儲存圖形為wg檔</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="840" />
+        <location filename="../artisanlib/curves.py" line="851" />
         <location filename="../artisanlib/wheels.py" line="120" />
         <source>Save image using current graph size to a png format</source>
         <translation>使用目前圖形尺寸儲存為PNG格式圖片</translation>
@@ -20830,22 +20830,77 @@ specified by the lookahead</source>
         <translation>開啟/關閉 序列通訊記錄</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="359" />
+        <location filename="../artisanlib/curves.py" line="344" />
+        <source>RoR linear decay average filter size</source>
+        <translation>RoR線性衰減平均濾波器尺寸</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/curves.py" line="360" />
         <source>Use an optimal smoothing algorithm (only applicable offline, after recording)</source>
         <translation>使用最佳平滑算法（僅適用於烘焙後的離線數據）</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="365" />
+        <location filename="../artisanlib/curves.py" line="366" />
         <source>Compute the rate-of-rise over the delta span interval by a linear polyfit</source>
         <translation>通過線性多項式擬和曲線計算差值範圍的ROR</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="830" />
+        <location filename="../artisanlib/curves.py" line="371" />
+        <source>Linear decay average filter, applied if not recording. Resulting signal is used for RoR computation.</source>
+        <translation>如果未進行錄音，則套用線性衰減平均濾波器。所得訊號用於 RoR 計算。</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/curves.py" line="381" />
+        <source>Minimal-delay low-pass filter eliminating tiny spikes, applied if not recording</source>
+        <translation>低通濾波器延遲極低，用於消除微小尖峰訊號，僅在不錄音時應用。</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/curves.py" line="387" />
+        <source>Removes stair-step patterns caused by duplicate readings through interpolation</source>
+        <translation>透過內插法消除重複讀數引起的階梯狀模式</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/curves.py" line="405" />
+        <source>Render curves before CHARGE and after DROP</source>
+        <translation>在充電之前和下降之後渲染曲線</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/curves.py" line="412" />
+        <source>Applies interpolation to substitute missing data</source>
+        <translation>應用插值法填補缺失數據</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/curves.py" line="419" />
+        <source>Removes large spikes</source>
+        <translation>去除大刺</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/curves.py" line="425" />
+        <source>Removes readings out of range</source>
+        <translation>移除超出範圍的讀數</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/curves.py" line="471" />
+        <source>RoR computation interval</source>
+        <translation>RoR 計算區間</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/curves.py" line="620" />
+        <source>Applies filters directly on the incoming data before it is recorded, thus filtered data is lost forever</source>
+        <translation>在記錄資料之前直接對其套用過濾器，因此過濾後的資料將永久遺失。</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/curves.py" line="648" />
+        <source>Hide RoR readings out of range</source>
+        <translation>隱藏超出範圍的 RoR 讀數</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/curves.py" line="841" />
         <source>Shows data table of plots</source>
         <translation>顯示繪圖數據表</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="919" />
+        <location filename="../artisanlib/curves.py" line="930" />
         <source>linear: linear interpolation
 cubic: 3rd order spline interpolation
 nearest: y value of the nearest point</source>
@@ -20854,22 +20909,22 @@ nearest: y value of the nearest point</source>
 最近點:以最接近的y值計算</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="961" />
+        <location filename="../artisanlib/curves.py" line="972" />
         <source>Choose the start point of analysis interval of interest</source>
         <translation>選擇欲分析段落的起始點</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="993" />
+        <location filename="../artisanlib/curves.py" line="1004" />
         <source>Choose the start point of curve fitting</source>
         <translation>選擇曲線擬合的起始點</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1714" />
+        <location filename="../artisanlib/curves.py" line="1725" />
         <source>Add P1 and P2 as ET and BT</source>
         <translation>加入P1和P2作為出風溫和豆溫</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1719" />
+        <location filename="../artisanlib/curves.py" line="1730" />
         <source>Add P1 and P2 as:
 
 1 an Extra virtual device if a profile is loaded
@@ -20881,18 +20936,18 @@ nearest: y value of the nearest point</source>
 2 未載入曲線檔時為出風溫和豆溫</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1722" />
+        <location filename="../artisanlib/curves.py" line="1733" />
         <source>No more Virtual Extra Devices available</source>
         <translation>無更多虛擬額外設備</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1727" />
-        <location filename="../artisanlib/curves.py" line="1725" />
+        <location filename="../artisanlib/curves.py" line="1738" />
+        <location filename="../artisanlib/curves.py" line="1736" />
         <source>Not available during recording</source>
         <translation>記錄期間無法使用</translation>
     </message>
     <message>
-        <location filename="../artisanlib/curves.py" line="1730" />
+        <location filename="../artisanlib/curves.py" line="1741" />
         <source>Set P1 as ET background B1
 Set P2 as BT background B2
 Note: Erases all existing background curves.</source>

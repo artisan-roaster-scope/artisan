@@ -168,7 +168,7 @@ exe = EXE(pyz,
 try:
     minimumSystemVersion = os.environ['MACOSX_DEPLOYMENT_TARGET']
 except Exception: # pylint: disable=broad-except
-    minimumSystemVersion = '14.0' # assuming the new-style numpy/scipy libs which define the minimum; Qt 6.10 requires >= 13.0
+    minimumSystemVersion = '13.0' # assuming the new-style numpy/scipy libs which define the minimum; Qt 6.10 requires >= 13.0
 
 plist = {}
 with open('Info.plist', 'rb') as infile:
