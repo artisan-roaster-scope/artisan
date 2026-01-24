@@ -232,11 +232,11 @@ for:
     fast_finish: false
 
   environment:
+    PYTHON_UPGRADE_V: 3.14  # Upgrade to this version (installs the latest dot release)
     PYTHON_V: 3.13  # Override the stack key
     ARTISAN_OS: linux
     PYTHONSITEPKGS: /home/appveyor/venv${PYTHON_V}/lib/python${PYTHON_V}/site-packages
     QT_PATH: $PYTHON_PATH/PyQt6/Qt6
-    QT_SRC_PATH: /home/appveyor/Qt/6.4/gcc_64 # latest points still to 5.15.2
     PYUIC: pyuic6
     PYLUPDATE: ./pylupdate6pro.py  #the dot slash is necessary
 
@@ -244,6 +244,24 @@ for:
     #- ls -la /home/appveyor/Qt/
     - echo "Linux Install"
     - chmod +x .ci/*.sh
+
+    # Upgrade Python version
+    - echo "Upgrading Python to $PYTHON_UPGRADE_V"
+    - sudo apt update
+    - sudo apt install -y software-properties-common
+    - sudo add-apt-repository -y ppa:deadsnakes/ppa
+    - sudo apt update
+    - sudo apt install -y python${PYTHON_UPGRADE_V} python${PYTHON_UPGRADE_V}-venv libpython${PYTHON_UPGRADE_V}
+    # Create and activate virtual environment
+    - echo "Creating and activating virtual environment"
+    - python${PYTHON_UPGRADE_V} -m venv venv${PYTHON_UPGRADE_V}
+    - source venv${PYTHON_UPGRADE_V}/bin/activate
+    # Log for confirmation
+    - echo "Confirming Python version and location"
+    - python -m pip --version
+    - which python
+    - python3 -V
+    - echo "Finshed Upgrading Python"
 
     # pull library versions from requirments file
     - ps: $env:LIBUSB_VER = Select-String -Path ./src/requirements.txt "libusb==([\d\.]*).*platform_system='Linux'" -List | ForEach-Object {$_.Matches.Groups[1].Value}
