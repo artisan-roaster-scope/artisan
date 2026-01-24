@@ -6755,7 +6755,7 @@ class serialport:
                         else:
                             self.YOCTOlastvalues[0] = probe1
                     if probe1 == -1 and self.YOCTOsensor and self.YOCTOsensor.isOnline():
-                        probe1 = self.YOCTOsensor.get_currentValue()
+                        probe1 = cast(float, self.YOCTOsensor.get_currentValue())
                     if probe1 != -1:
                         # convert temperature scale
                         if self.aw.qmc.YOCTOchanUnit == 'C' and self.aw.qmc.mode == 'F':

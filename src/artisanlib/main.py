@@ -7699,11 +7699,17 @@ class ApplicationWindow(QMainWindow):
                 elif platform.system() == 'Linux':
                     mpl.rcParams['font.family'] = ['DejaVu Sans','DejaVu Sans Mono', 'sans-serif'] # default; works for Greek
                     if self.locale_str == 'ar':
-                        mpl.rcParams['font.family'] = ['DejaVu Sans','DejaVu Sans Mono','Times New Roman', 'sans-serif']
+                        mpl.rcParams['font.family'] = ['Noto Sans Arabic', 'DejaVu Sans','DejaVu Sans Mono','Times New Roman', 'sans-serif']
+                    elif self.locale_str == 'he':
+                        mpl.rcParams['font.family'] = ['Noto Sans Hebrew', 'DejaVu Sans', 'sans-serif']
                     elif self.locale_str == 'ja':
-                        mpl.rcParams['font.family'] = ['TakaoPGothic', 'DejaVu Sans', 'sans-serif']
-                    elif self.locale_str in {'zh_CN', 'zh_TW'}:
-                        mpl.rcParams['font.family'] = ['NanumGothic', 'DejaVu Sans', 'DejaVu Sans Mono', 'sans-serif']
+                        mpl.rcParams['font.family'] = ['Noto Sans CJK JP', 'Noto Sans JP', 'TakaoPGothic', 'DejaVu Sans', 'sans-serif']
+                    elif self.locale_str in {'kr'}:
+                        mpl.rcParams['font.family'] = ['Noto Sans KR', 'Noto Sans CJK KR', 'Noto Sans CJK JP', 'NanumGothic', 'DejaVu Sans', 'DejaVu Sans Mono', 'sans-serif']
+                    elif self.locale_str in {'zh_CN'}:
+                        mpl.rcParams['font.family'] = ['Noto Sans SC', 'Noto Sans CJK SC', 'Noto Sans CJK JP', 'Source Han Sans CN', 'NanumGothic', 'DejaVu Sans', 'DejaVu Sans Mono', 'sans-serif']
+                    elif self.locale_str in {'zh_TW'}:
+                        mpl.rcParams['font.family'] = ['Noto Sans TC', 'Noto Sans CJK TC', 'Noto Sans CJK JP', 'Source Han Sans CN', 'NanumGothic', 'DejaVu Sans', 'DejaVu Sans Mono', 'sans-serif']
                     self.mpl_fontproperties = FontProperties()
                 else: # Windows:
                     mpl.rcParams['font.family'] = ['Microsoft Sans Serif', 'DejaVu Sans', 'Arial', 'sans-serif'] # works for Greek and Arabic
@@ -10444,7 +10450,7 @@ class ApplicationWindow(QMainWindow):
                                                     self.eventquantifieractive[event_type - 1] = False
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
-                            # slider(<int>, <bool>) with <int> from {1,2,3,4} selecting one of the four event types
+                            # slider(<int>, <bool>) with <int> from {1,2,3,4,5} selecting one of the four event types or with 5 the PID SV slider
                             elif cs.startswith('slider(') and cs.endswith(')'):
                                 try:
                                     args = cs[len('slider('):-1].split(',')
@@ -10457,10 +10463,21 @@ class ApplicationWindow(QMainWindow):
                                             except Exception: # pylint: disable=broad-except
                                                 value_str = args[1].strip()
                                                 if value_str.lower() in {'yes', 'true', 't', '1'}:
-                                                    self.eventslidervisibilities[event_type - 1] = True
+                                                    self.eventslidervisibilities[event_type - 1] = 1
                                                 else:
-                                                    self.eventslidervisibilities[event_type - 1] = False
+                                                    self.eventslidervisibilities[event_type - 1] = 0
                                             QTimer.singleShot(100, self.updateSlidersProperties) # needs to run in the GUI thread!
+                                        elif event_type == 5:
+                                            try:
+                                                state = toBool(eval(args[1])) # pylint: disable=eval-used
+                                                self.pidcontrol.svSlider = state
+                                            except Exception: # pylint: disable=broad-except
+                                                value_str = args[1].strip()
+                                                if value_str.lower() in {'yes', 'true', 't', '1'}:
+                                                    self.pidcontrol.svSlider = True
+                                                else:
+                                                    self.pidcontrol.svSlider = False
+                                            QTimer.singleShot(100, self.updateSVsliderVisibility) # needs to run in the GUI thread!
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
                             # setBatchSize(<float>) : if <float> is negative, the batchsize of the background profile is used if any
@@ -11804,6 +11821,9 @@ class ApplicationWindow(QMainWindow):
             self.hideLCDs()
         else:
             self.showLCDs()
+
+    def updateSVsliderVisibility(self) -> None:
+        self.sliderGrpBoxSV.setVisible(self.pidcontrol.svSlider)
 
     def updateSlidersProperties(self) -> None:
         # update slider properties and event type names
