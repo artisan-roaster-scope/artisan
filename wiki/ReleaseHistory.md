@@ -30,12 +30,13 @@ v4.0.0 (Jan XX, 2026)
 
 * FIXES
   - fixes regression which skipped the second sample ([Issue #2091](../../../issues/2091))
+  - fixes encoding errors on loading points in designer ([Issue #2103](../../../issues/2103))
 
 ----
 v3.4.0 (Oct 31, 2025)
 ------------------
 
-Last version featuring legacy builds supporting macOS 10.13+, Window 8, as well as last version supporting macOS 13 and RPi OS bookworm.
+Last version featuring legacy builds supporting macOS 10.13+, Window 8, as well as last version supporting RPi OS bookworm.
 
 * ADDITIONS
   - adds tooltip to phases widget in Comparator displaying 2nd and 3rd phase bean temperatures (or RoR if ALT/Option key is pressed) limits ([Issue #1906](../../../issues/1906))
