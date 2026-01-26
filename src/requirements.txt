@@ -26,7 +26,7 @@
 ######
 # packages that are required on all platforms
 #
-setuptools==70.3.0 # py2app fails on 71.0.3 and 71.0.4; pyinstaller windows/linux fails on 71.0.0 <= < 71.0.3
+setuptools==80.10.2
 wheel==0.46.3
 pyserial==3.5
 pymodbus==3.11.4

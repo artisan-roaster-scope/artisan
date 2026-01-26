@@ -28,8 +28,8 @@ pytest-datadir==1.8.0
 #PyVirtualDisplay==3.0
 #pytest-bdd==6.1.1
 #pytest-benchmark==4.0.0
-hypothesis>=6.150.3
-coverage>=7.13.1
+hypothesis>=6.151.2
+coverage>=7.13.2
 coverage-badge==1.1.2
 codespell==2.4.1
 # the following 2 packages are not installed along aiohttp on Python3.12 and make mypy complain

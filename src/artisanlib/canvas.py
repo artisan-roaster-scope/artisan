@@ -61,7 +61,7 @@ if TYPE_CHECKING:
     from PyQt6.QtGui import QResizeEvent # pylint: disable=unused-import
 
 from artisanlib.util import (uchr, fill_gaps, deltaLabelPrefix, deltaLabelUTF8, deltaLabelMathPrefix, stringfromseconds,
-        fromFtoC, fromFtoCstrict, fromCtoF, fromCtoFstrict, RoRfromFtoC, RoRfromFtoCstrict, RoRfromCtoF, toInt, toString,
+        fromFtoC, fromFtoCstrict, fromCtoF, fromCtoFstrict, RoRfromFtoC, RoRfromFtoCstrict, RoRfromCtoF, RoRfromCtoFstrict, toInt, toString,
         toFloat, application_name, getResourcePath, getDirectory, convertWeight, right_to_left, float2str,
         abbrevString, scaleFloat2String, is_proper_temp, weight_units, render_weight, volume_units, float2float, timearray2index,
         events_internal_to_external_value, events_external_to_internal_value)
@@ -252,7 +252,7 @@ class tgraphcanvas(QObject):
     __slots__ = [ 'aw', 'canvas', 'alignnames', 'locale_str', 'alpha', 'palette', 'palette1', 'EvalueColor_default', 'EvalueTextColor_default', 'artisanflavordefaultlabels', 'customflavorlabels',
         'SCAAflavordefaultlabels', 'SCAflavordefaultlabels', 'CQIflavordefaultlabels', 'SweetMariasflavordefaultlabels', 'Cflavordefaultlabels', 'Eflavordefaultlabels', 'coffeegeekflavordefaultlabels',
         'Intelligentsiaflavordefaultlabels', 'IstitutoInternazionaleAssaggiatoriCaffe', 'WorldCoffeeRoastingChampionship', 'ax1', 'ax2', 'ambiWorker', 'ambiThread', 'afterTP',
-        'decay_weights', 'temp_decay_weights', 'flavorlabels', 'flavors', 'flavors_total_correction', 'flavorstartangle', 'flavoraspect', 'flavorchart_plotf', 'flavorchart_angles', 'flavorchart_plot',
+        'decay_weights', 'temp_decay_weights', 'flavorlabels', 'flavors', 'flavors_total_correction', 'flavorstartangle', 'flavoraspect', 'flavorchart_plotf', 'flavorchart_angles', 'flavorchart_plot', 'flavorchart_background_plot',
         'flavorchart_fill', 'flavorchart_labels', 'flavorchart_total', 'mode', 'mode_tempsliders', 'errorlog', 'default_delay', 'delay', 'min_delay', 'extra_event_sampling_delay',
         'phases_fahrenheit_defaults', 'phases_celsius_defaults', 'phases', 'phasesbuttonflag', 'phasesfromBackgroundflag', 'watermarksflag', 'step100temp', 'phasesLCDflag',
         'phasesLCDmode', 'phasesLCDmode_l', 'phasesLCDmode_all', 'statisticsflags', 'statisticsmode', 'AUCbegin', 'AUCbase', 'AUCbaseFlag', 'AUCtarget', 'AUCbackground',
@@ -574,6 +574,7 @@ class tgraphcanvas(QObject):
         self.flavorchart_plotf:list[float]|None = None
         self.flavorchart_angles:list[float]|None = None
         self.flavorchart_plot:Line2D|None = None
+        self.flavorchart_background_plot:Line2D|None = None
         self.flavorchart_fill:PolyCollection|None = None
         self.flavorchart_labels:list[Annotation]|None = None
         self.flavorchart_total:Text|None = None
@@ -1975,8 +1976,8 @@ class tgraphcanvas(QObject):
         # RoR display limits
         # user configurable RoR limits (only applied if flag is True; applied before TP during recording as well as full redraw)
         self.RoRlimitFlag:bool = True
-        self.RoRlimit:int = 113 # 113F/min = 45C/min # was 95F/min
-        self.RoRlimitm:int = 14 # 14F/min = -10C/min # was: -95F/min
+        self.RoRlimit:int = int(round(RoRfromCtoFstrict(45))) # 81F/min = 45C/min # was 95F/min
+        self.RoRlimitm:int = int(round(RoRfromCtoFstrict(-10))) # -18F/min = -10C/min # was: -95F/min
         # system fixed RoR limits (only applied if flag is True; usually higher than the user configurable once and always applied)
         self.maxRoRlimit: Final[int] = 170
         # axis limits
@@ -12430,8 +12431,8 @@ class tgraphcanvas(QObject):
                 self.step100temp = int(round(fromCtoFstrict(self.step100temp)))
             self.AUCbase = int(round(fromCtoFstrict(self.AUCbase)))
             self.dropDuplicatesLimit = float2float(fromCtoFstrict(100 + self.dropDuplicatesLimit) - fromCtoFstrict(100),2)
-            self.RoRlimitm = int(round(fromCtoFstrict(self.RoRlimitm)))
-            self.RoRlimit = int(round(fromCtoFstrict(self.RoRlimit)))
+            self.RoRlimitm = int(round(RoRfromCtoFstrict(self.RoRlimitm)))
+            self.RoRlimit = int(round(RoRfromCtoFstrict(self.RoRlimit)))
             self.alarmtemperature = [(fromCtoFstrict(t) if t != 500 else t) for t in self.alarmtemperature]
         if self.ax is not None:
             self.ax.set_ylabel('F',size=16,color = self.palette['ylabel']) #Write "F" on Y axis
@@ -12464,8 +12465,8 @@ class tgraphcanvas(QObject):
                 self.step100temp = int(round(fromFtoCstrict(self.step100temp)))
             self.AUCbase = int(round(fromFtoCstrict(self.AUCbase)))
             self.dropDuplicatesLimit = float2float(fromFtoCstrict(212 + self.dropDuplicatesLimit) - fromFtoCstrict(212),2)
-            self.RoRlimitm = int(round(fromFtoCstrict(self.RoRlimitm)))
-            self.RoRlimit = int(round(fromFtoCstrict(self.RoRlimit)))
+            self.RoRlimitm = int(round(RoRfromFtoCstrict(self.RoRlimitm)))
+            self.RoRlimit = int(round(RoRfromFtoCstrict(self.RoRlimit)))
             self.alarmtemperature = [(fromFtoCstrict(t) if t != 500 else t) for t in self.alarmtemperature]
         if self.ax is not None:
             self.ax.set_ylabel('C',size=16,color = self.palette['ylabel']) #Write "C" on Y axis
@@ -12751,6 +12752,7 @@ class tgraphcanvas(QObject):
         self.flavorchart_plotf = None
         self.flavorchart_angles = None
         self.flavorchart_plot = None
+        self.flavorchart_background_plot = None
         self.flavorchart_fill = None
         self.flavorchart_labels = None
         self.flavorchart_total = None
@@ -12783,6 +12785,9 @@ class tgraphcanvas(QObject):
             # fixing yticks with matplotlib.ticker "FixedLocator"
             self.updateFlavorChartData()
             if self.flavorchart_angles is not None:
+                legend_handles:list[Line2D] = []
+                legend_labels:list[str] = []
+
                 try:
                     ticks_loc = [float(tick) for tick in self.ax1.get_yticks()] # pyrefly:ignore[not-callable]
                     self.ax1.yaxis.set_major_locator(ticker.FixedLocator(ticks_loc))
@@ -12871,14 +12876,28 @@ class tgraphcanvas(QObject):
                         for i,_ in enumerate(backgroundplotf):
                             backgroundplotf[i] /= 10.
 
-                        self.ax1.plot(self.flavorchart_angles,backgroundplotf,color='#cc0f50',marker='o',alpha=.5)
+                        self.flavorchart_background_plot, = self.ax1.plot(self.flavorchart_angles,backgroundplotf,color='#cc0f50',marker='o',alpha=.5)
                         #needs matplotlib 1.0.0+
                         self.ax1.fill_between(self.flavorchart_angles,0,backgroundplotf, facecolor='#ff5871', alpha=0.1, interpolate=True)
 
                 #add to plot
                 self.flavorchart_plot, = self.ax1.plot(self.flavorchart_angles,numpy.array(self.flavorchart_plotf),color='#0c6aa6',marker='o')
 
+                if self.title_text is not None:
+                    legend_handles.append(self.flavorchart_plot)
+                    legend_labels.append(self.title_text)
+                if self.flavorchart_background_plot is not None:
+                    legend_handles.append(self.flavorchart_background_plot)
+                    legend_labels.append(self.titleB if self.roastbatchnrB == 0 else f'{self.roastbatchprefixB}{self.roastbatchnrB} {self.titleB}')
+
                 self.flavorchart_fill = self.ax1.fill_between(self.flavorchart_angles,0,numpy.array(self.flavorchart_plotf), facecolor='#1985ba', alpha=0.1, interpolate=True)
+
+                #add legend
+                prop = self.aw.mpl_fontproperties.copy()
+                prop.set_size('x-small')
+                self.ax1.legend(legend_handles,legend_labels,
+                            fancybox=True,prop=prop,shadow=False,frameon=True)
+
 
                 #self.fig.canvas.draw()
                 self.fig.canvas.draw_idle()
