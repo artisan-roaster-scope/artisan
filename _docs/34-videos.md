@@ -8,6 +8,10 @@ author: Michael Herbert
 author_profile: true
 gallery:
 
+  - url: https://youtu.be/FstdgnbaM2k
+    image_path: /assets/images/gsg/video_PIDemystified.webp
+    alt: "PIDemystified"
+    title: "2025-11 PIDemystified!"
   - url: https://youtu.be/iUOO6tkkCbc
     image_path: /assets/images/gsg/video_two_batches.webp
     alt: "Roasting Two Batches"
