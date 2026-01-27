@@ -9166,7 +9166,7 @@ class ApplicationWindow(QMainWindow):
                                     cmds = eval(cs[len('read'):]) # pylint: disable=eval-used
                                     if isinstance(cmds,tuple) and len(cmds) == 2:
                                         # cmd has format "read(s,r)"
-                                        self.modbus.lastReadResult = self.modbus.readSingleRegister(*cmds,force=True)  # pyrefly: ignore[bad-keyword-argument] # ty:ignore[parameter-already-assigned]
+                                        self.modbus.lastReadResult = self.modbus.readSingleRegister(*cmds,force=True)  # pyrefly: ignore[bad-keyword-argument]
                                         followupCmd = 0.03
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
@@ -9175,7 +9175,7 @@ class ApplicationWindow(QMainWindow):
                                     cmds = eval(cs[len('readSigned'):]) # pylint: disable=eval-used
                                     if isinstance(cmds,tuple) and len(cmds) == 2:
                                         # cmd has format "readSigned(s,r)"
-                                        self.modbus.lastReadResult = self.modbus.readSingleRegister(*cmds,force=True,signed=True)  # pyrefly: ignore[bad-keyword-argument] # ty:ignore[parameter-already-assigned]
+                                        self.modbus.lastReadResult = self.modbus.readSingleRegister(*cmds,force=True,signed=True)  # pyrefly: ignore[bad-keyword-argument]
                                         followupCmd = 0.03
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
@@ -9184,7 +9184,7 @@ class ApplicationWindow(QMainWindow):
                                     cmds = eval(cs[len('readBCD'):]) # pylint: disable=eval-used
                                     if isinstance(cmds,tuple) and len(cmds) == 2:
                                         # cmd has format "readBCD(s,r)"
-                                        self.modbus.lastReadResult = self.modbus.readBCDint(*cmds,force=True)  # pyrefly: ignore[bad-keyword-argument] # ty:ignore[parameter-already-assigned]
+                                        self.modbus.lastReadResult = self.modbus.readBCDint(*cmds,force=True)  # pyrefly: ignore[bad-keyword-argument]
                                         followupCmd = 0.03
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
@@ -9193,7 +9193,7 @@ class ApplicationWindow(QMainWindow):
                                     cmds = eval(cs[len('read32'):]) # pylint: disable=eval-used
                                     if isinstance(cmds,tuple) and len(cmds) == 2:
                                         # cmd has format "read32(s,r)"
-                                        self.modbus.lastReadResult = self.modbus.readInt32(*cmds,force=True)  # pyrefly: ignore[bad-keyword-argument] # ty:ignore[parameter-already-assigned]
+                                        self.modbus.lastReadResult = self.modbus.readInt32(*cmds,force=True)  # pyrefly: ignore[bad-keyword-argument]
                                         followupCmd = 0.03
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
@@ -9202,7 +9202,7 @@ class ApplicationWindow(QMainWindow):
                                     cmds = eval(cs[len('read32Signed'):]) # pylint: disable=eval-used
                                     if isinstance(cmds,tuple) and len(cmds) == 2:
                                         # cmd has format "read32Signed(s,r)"
-                                        self.modbus.lastReadResult = self.modbus.readInt32(*cmds,force=True,signed=True)  # pyrefly: ignore[bad-keyword-argument] # ty:ignore[parameter-already-assigned]
+                                        self.modbus.lastReadResult = self.modbus.readInt32(*cmds,force=True,signed=True)  # pyrefly: ignore[bad-keyword-argument]
                                         followupCmd = 0.03
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
@@ -9211,7 +9211,7 @@ class ApplicationWindow(QMainWindow):
                                     cmds = eval(cs[len('read32BCD'):]) # pylint: disable=eval-used
                                     if isinstance(cmds,tuple) and len(cmds) == 2:
                                         # cmd has format "read32BCD(s,r)"
-                                        self.modbus.lastReadResult = self.modbus.readBCD(*cmds,force=True)  # pyrefly: ignore[bad-keyword-argument] # ty:ignore[parameter-already-assigned]
+                                        self.modbus.lastReadResult = self.modbus.readBCD(*cmds,force=True)  # pyrefly: ignore[bad-keyword-argument]
                                         followupCmd = 0.03
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
@@ -9220,7 +9220,7 @@ class ApplicationWindow(QMainWindow):
                                     cmds = eval(cs[len('readFloat'):]) # pylint: disable=eval-used
                                     if isinstance(cmds,tuple) and len(cmds) == 2:
                                         # cmd has format "readFloat(s,r)"
-                                        res:float|None = self.modbus.readFloat(*cmds,force=True)  # pyrefly: ignore[bad-keyword-argument] # ty:ignore[parameter-already-assigned]
+                                        res:float|None = self.modbus.readFloat(*cmds,force=True)  # pyrefly: ignore[bad-keyword-argument]
                                         self.modbus.lastReadResult = (res if res is None else int(round(res)))
                                         followupCmd = 0.03
                                 except Exception as e: # pylint: disable=broad-except
@@ -23130,6 +23130,8 @@ class ApplicationWindow(QMainWindow):
                         for i, rdf in enumerate(ranking_data_fields):
                             cnum += 1
                             cr:str = f'{get_column_letter(cnum)}{c}'
+
+                            res_fld:float
 
                             name = rdf[field_index.index('name')]
                             fld:str = rdf[field_index.index('fld')]

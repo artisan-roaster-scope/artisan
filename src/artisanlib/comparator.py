@@ -1227,39 +1227,6 @@ class roastCompareDlg(ArtisanDialog):
         randomness = 12 # 2 (16 default)
         rcParams['path.sketch'] = (scale, length, randomness)
 
-        if self.aw.qmc.ax is None:
-            self.aw.qmc.ax = self.aw.qmc.fig.add_subplot(111,facecolor=self.aw.qmc.palette['background'])
-        if self.aw.qmc.delta_ax is None:
-            self.aw.qmc.delta_ax = self.aw.qmc.ax.twinx()
-
-        self.aw.qmc.fig.suptitle('')
-        self.aw.qmc.ax.set_title('')
-        self.aw.qmc.ax.clear()
-        self.aw.qmc.ax.set_facecolor(self.aw.qmc.palette['background'])
-        self.aw.qmc.delta_ax.clear()
-        self.aw.qmc.ax.set_ylim(self.aw.qmc.ylimit_min, self.aw.qmc.ylimit)
-        grid_axis:Literal['both', 'x', 'y']|None = None
-        if self.aw.qmc.temp_grid and self.aw.qmc.time_grid:
-            grid_axis = 'both'
-        elif self.aw.qmc.temp_grid:
-            grid_axis = 'y'
-        elif self.aw.qmc.time_grid:
-            grid_axis = 'x'
-        if grid_axis is not None:
-            self.aw.qmc.ax.grid(True,
-                axis = grid_axis,
-                color = self.aw.qmc.palette['grid'],
-                linestyle = self.aw.qmc.gridstyles[self.aw.qmc.gridlinestyle],
-                linewidth = self.aw.qmc.gridthickness,
-                alpha = self.aw.qmc.gridalpha,
-                sketch_params = 0,
-                path_effects = [])
-
-        self.aw.qmc.ax.spines.top.set_visible(bool(self.aw.qmc.xgrid != 0 and self.aw.qmc.ygrid != 0 and self.aw.qmc.zgrid != 0 and self.delta_axis_visible))
-        self.aw.qmc.ax.spines.bottom.set_visible(self.aw.qmc.xgrid != 0)
-        self.aw.qmc.ax.spines.left.set_visible(self.aw.qmc.ygrid != 0)
-        self.aw.qmc.ax.spines.right.set_visible(bool(self.aw.qmc.zgrid != 0 and self.delta_axis_visible))
-
         prop = self.aw.mpl_fontproperties.copy()
         prop.set_size('small')
         fontprop_medium = self.aw.mpl_fontproperties.copy()
@@ -1267,97 +1234,136 @@ class roastCompareDlg(ArtisanDialog):
         fontprop_large = self.aw.mpl_fontproperties.copy()
         fontprop_large.set_size('large')
 
-        temp_axis_label = ('' if self.aw.qmc.ygrid == 0 else self.aw.qmc.mode)
-        self.aw.qmc.ax.set_ylabel(temp_axis_label,color=self.aw.qmc.palette['ylabel'],rotation=0,labelpad=10,fontproperties=fontprop_medium)
+        self.aw.qmc.fig.suptitle('')
 
-        #time_axis_label = ("" if self.aw.qmc.xgrid == 0 else self.aw.arabicReshape(QApplication.translate('Label', 'min')))
-        time_axis_label = '' # always hide as not very productive
-        self.aw.qmc.set_xlabel(time_axis_label)
+        if self.aw.qmc.ax is None:
+            self.aw.qmc.ax = self.aw.qmc.fig.add_subplot(111,facecolor=self.aw.qmc.palette['background'])
+        if self.aw.qmc.delta_ax is None and self.aw.qmc.ax is not None: # pyright:ignore[reportUnnecessaryComparison]
+            self.aw.qmc.delta_ax = self.aw.qmc.ax.twinx()
 
-        tick_dir = 'inout'
-        self.aw.qmc.ax.tick_params(\
-            axis='x',           # changes apply to the x-axis
-            which='both',       # both major and minor ticks are affected
-            bottom=True,        # ticks along the bottom edge are on
-            top=False,          # ticks along the top edge are off
-            direction=tick_dir,
-            labelbottom=True)   # labels along the bottom edge are on
-        self.aw.qmc.ax.tick_params(\
-            axis='y',           # changes apply to the y-axis
-            which='both',       # both major and minor ticks are affected
-            right=False,
-            bottom=True,        # ticks along the bottom edge are on
-            top=False,          # ticks along the top edge are off
-            direction=tick_dir,
-            labelbottom=True)   # labels along the bottom edge are on
+        if self.aw.qmc.ax is not None: # pyright:ignore[reportUnnecessaryComparison]
+            self.aw.qmc.ax.set_title('')
+            self.aw.qmc.ax.clear()
+            self.aw.qmc.ax.set_facecolor(self.aw.qmc.palette['background'])
 
-        for label in self.aw.qmc.ax.get_xticklabels():  # pyrefly:ignore[not-callable]
-            label.set_fontproperties(prop)
-        for label in self.aw.qmc.ax.get_yticklabels():  # pyrefly:ignore[not-callable]
-            label.set_fontproperties(prop)
+            self.aw.qmc.ax.set_ylim(self.aw.qmc.ylimit_min, self.aw.qmc.ylimit)
+            grid_axis:Literal['both', 'x', 'y']|None = None
+            if self.aw.qmc.temp_grid and self.aw.qmc.time_grid:
+                grid_axis = 'both'
+            elif self.aw.qmc.temp_grid:
+                grid_axis = 'y'
+            elif self.aw.qmc.time_grid:
+                grid_axis = 'x'
+            if grid_axis is not None:
+                self.aw.qmc.ax.grid(True,
+                    axis = grid_axis,
+                    color = self.aw.qmc.palette['grid'],
+                    linestyle = self.aw.qmc.gridstyles[self.aw.qmc.gridlinestyle],
+                    linewidth = self.aw.qmc.gridthickness,
+                    alpha = self.aw.qmc.gridalpha,
+                    sketch_params = 0,
+                    path_effects = [])
 
-        # format temperature as int, not float in the cursor position coordinate indicator
-        self.aw.qmc.ax.fmt_ydata = self.aw.qmc.fmt_data # pyrefly:ignore[bad-assignment] # not assignable to attribute `fmt_ydata` with type `Formatter | None`
-        self.aw.qmc.ax.fmt_xdata = self.aw.qmc.fmt_timedata # pyrefly:ignore[bad-assignment] # not assignable to attribute `fmt_ydata` with type `Formatter | None`
+            self.aw.qmc.ax.spines.top.set_visible(bool(self.aw.qmc.xgrid != 0 and self.aw.qmc.ygrid != 0 and self.aw.qmc.zgrid != 0 and self.delta_axis_visible))
+            self.aw.qmc.ax.spines.bottom.set_visible(self.aw.qmc.xgrid != 0)
+            self.aw.qmc.ax.spines.left.set_visible(self.aw.qmc.ygrid != 0)
+            self.aw.qmc.ax.spines.right.set_visible(bool(self.aw.qmc.zgrid != 0 and self.delta_axis_visible))
 
-        self.aw.qmc.ax.set_zorder(self.aw.qmc.delta_ax.get_zorder()+1) # put ax in front of delta_ax (which remains empty!)
-        #create a second set of axes in the same position as self.ax
+            temp_axis_label = ('' if self.aw.qmc.ygrid == 0 else self.aw.qmc.mode)
+            self.aw.qmc.ax.set_ylabel(temp_axis_label,color=self.aw.qmc.palette['ylabel'],rotation=0,labelpad=10,fontproperties=fontprop_medium)
 
-        self.aw.qmc.delta_ax.tick_params(\
-            axis='y',           # changes apply to the y-axis
-            which='both',       # both major and minor ticks are affected
-            left=False,         # ticks along the left edge are off
-            bottom=False,       # ticks along the bottom edge are off
-            top=False,          # ticks along the top edge are off
-            direction='inout', # tick_dir # this does not work as ticks are not drawn at all in ON mode with this!?
-            labelright=True,
-            labelleft=False,
-            labelbottom=False)   # labels along the bottom edge are off
+            #time_axis_label = ("" if self.aw.qmc.xgrid == 0 else self.aw.arabicReshape(QApplication.translate('Label', 'min')))
+            time_axis_label = '' # always hide as not very productive
+            self.aw.qmc.set_xlabel(time_axis_label)
 
-        self.aw.qmc.ax.patch.set_visible(True)
+            tick_dir = 'inout'
+            self.aw.qmc.ax.tick_params(\
+                axis='x',           # changes apply to the x-axis
+                which='both',       # both major and minor ticks are affected
+                bottom=True,        # ticks along the bottom edge are on
+                top=False,          # ticks along the top edge are off
+                direction=tick_dir,
+                labelbottom=True)   # labels along the bottom edge are on
+            self.aw.qmc.ax.tick_params(\
+                axis='y',           # changes apply to the y-axis
+                which='both',       # both major and minor ticks are affected
+                right=False,
+                bottom=True,        # ticks along the bottom edge are on
+                top=False,          # ticks along the top edge are off
+                direction=tick_dir,
+                labelbottom=True)   # labels along the bottom edge are on
 
-        delta_axis_label = (self.aw.qmc.mode + self.aw.arabicReshape(QApplication.translate('Label', '/min')) if self.aw.qmc.zgrid>0 and self.delta_axis_visible else '')
-        self.aw.qmc.delta_ax.set_ylabel(delta_axis_label,color = self.aw.qmc.palette['ylabel'],fontproperties=fontprop_medium)
-
-        self.aw.qmc.delta_ax.yaxis.set_label_position('right')
-
-        self.aw.qmc.delta_ax.set_ylim(self.aw.qmc.zlimit_min,self.aw.qmc.zlimit)
-        if self.delta_axis_visible and self.aw.qmc.zgrid>0:
-            self.aw.qmc.delta_ax.yaxis.set_major_locator(ticker.MultipleLocator(self.aw.qmc.zgrid))
-            self.aw.qmc.delta_ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
-            for i in self.aw.qmc.delta_ax.get_yticklines():  # pyrefly:ignore[not-callable]
-                i.set_markersize(10)
-            for i in self.aw.qmc.delta_ax.yaxis.get_minorticklines():
-                i.set_markersize(5)
-            for label in self.aw.qmc.delta_ax.get_yticklabels():  # pyrefly:ignore[not-callable]
+            for label in self.aw.qmc.ax.get_xticklabels():  # pyrefly:ignore[not-callable]
                 label.set_fontproperties(prop)
-        else:
-            self.aw.qmc.delta_ax.yaxis.set_major_locator(ticker.NullLocator())
-            self.aw.qmc.delta_ax.yaxis.set_minor_locator(ticker.NullLocator())
+            for label in self.aw.qmc.ax.get_yticklabels():  # pyrefly:ignore[not-callable]
+                label.set_fontproperties(prop)
 
-        # translate y-coordinate from delta into temp range to ensure the cursor position display (x,y) coordinate in the temp axis
-        self.aw.qmc.delta_ax.fmt_ydata = self.aw.qmc.fmt_data # pyrefly:ignore[bad-assignment] # not assignable to attribute `fmt_ydata` with type `Formatter | None`
-        self.aw.qmc.delta_ax.fmt_xdata = self.aw.qmc.fmt_timedata # pyrefly:ignore[bad-assignment] # not assignable to attribute `fmt_ydata` with type `Formatter | None`
+            # format temperature as int, not float in the cursor position coordinate indicator
+            self.aw.qmc.ax.fmt_ydata = self.aw.qmc.fmt_data # pyrefly:ignore[bad-assignment] # not assignable to attribute `fmt_ydata` with type `Formatter | None`
+            self.aw.qmc.ax.fmt_xdata = self.aw.qmc.fmt_timedata # pyrefly:ignore[bad-assignment] # not assignable to attribute `fmt_ydata` with type `Formatter | None`
 
-        self.aw.qmc.ax.spines['top'].set_color('0.40')
-        self.aw.qmc.ax.spines['bottom'].set_color('0.40')
-        self.aw.qmc.ax.spines['left'].set_color('0.40')
-        self.aw.qmc.ax.spines['right'].set_color('0.40')
+            if self.aw.qmc.delta_ax is not None:
+                self.aw.qmc.ax.set_zorder(self.aw.qmc.delta_ax.get_zorder()+1) # put ax in front of delta_ax (which remains empty!)
+                #create a second set of axes in the same position as self.ax
 
-        if self.aw.qmc.ygrid > 0:
-            self.aw.qmc.ax.yaxis.set_major_locator(ticker.MultipleLocator(self.aw.qmc.ygrid))
-            self.aw.qmc.ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
-            for i in self.aw.qmc.ax.get_yticklines(): # pyrefly:ignore[not-callable]
-                i.set_markersize(10)
-            for i in self.aw.qmc.ax.yaxis.get_minorticklines():
-                i.set_markersize(5)
-        else:
-            self.aw.qmc.ax.yaxis.set_major_locator(ticker.NullLocator())
-            self.aw.qmc.ax.yaxis.set_minor_locator(ticker.NullLocator())
+        if self.aw.qmc.delta_ax is not None:
+            self.aw.qmc.delta_ax.clear()
+            self.aw.qmc.delta_ax.tick_params(\
+                axis='y',           # changes apply to the y-axis
+                which='both',       # both major and minor ticks are affected
+                left=False,         # ticks along the left edge are off
+                bottom=False,       # ticks along the bottom edge are off
+                top=False,          # ticks along the top edge are off
+                direction='inout', # tick_dir # this does not work as ticks are not drawn at all in ON mode with this!?
+                labelright=True,
+                labelleft=False,
+                labelbottom=False)   # labels along the bottom edge are off
 
-        if self.aw.qmc.xgrid <= 0:
-            self.aw.qmc.ax.xaxis.set_major_locator(ticker.NullLocator())
-            self.aw.qmc.ax.xaxis.set_minor_locator(ticker.NullLocator())
+            delta_axis_label = (self.aw.qmc.mode + self.aw.arabicReshape(QApplication.translate('Label', '/min')) if self.aw.qmc.zgrid>0 and self.delta_axis_visible else '')
+            self.aw.qmc.delta_ax.set_ylabel(delta_axis_label,color = self.aw.qmc.palette['ylabel'],fontproperties=fontprop_medium)
+
+            self.aw.qmc.delta_ax.yaxis.set_label_position('right')
+
+            self.aw.qmc.delta_ax.set_ylim(self.aw.qmc.zlimit_min,self.aw.qmc.zlimit)
+            if self.delta_axis_visible and self.aw.qmc.zgrid>0:
+                self.aw.qmc.delta_ax.yaxis.set_major_locator(ticker.MultipleLocator(self.aw.qmc.zgrid))
+                self.aw.qmc.delta_ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
+                for i in self.aw.qmc.delta_ax.get_yticklines():  # pyrefly:ignore[not-callable]
+                    i.set_markersize(10)
+                for i in self.aw.qmc.delta_ax.yaxis.get_minorticklines():
+                    i.set_markersize(5)
+                for label in self.aw.qmc.delta_ax.get_yticklabels():  # pyrefly:ignore[not-callable]
+                    label.set_fontproperties(prop)
+            else:
+                self.aw.qmc.delta_ax.yaxis.set_major_locator(ticker.NullLocator())
+                self.aw.qmc.delta_ax.yaxis.set_minor_locator(ticker.NullLocator())
+
+            # translate y-coordinate from delta into temp range to ensure the cursor position display (x,y) coordinate in the temp axis
+            self.aw.qmc.delta_ax.fmt_ydata = self.aw.qmc.fmt_data # pyrefly:ignore[bad-assignment] # not assignable to attribute `fmt_ydata` with type `Formatter | None`
+            self.aw.qmc.delta_ax.fmt_xdata = self.aw.qmc.fmt_timedata # pyrefly:ignore[bad-assignment] # not assignable to attribute `fmt_ydata` with type `Formatter | None`
+
+        if self.aw.qmc.ax is not None:  # pyright:ignore[reportUnnecessaryComparison]
+            self.aw.qmc.ax.patch.set_visible(True)
+
+            self.aw.qmc.ax.spines['top'].set_color('0.40')
+            self.aw.qmc.ax.spines['bottom'].set_color('0.40')
+            self.aw.qmc.ax.spines['left'].set_color('0.40')
+            self.aw.qmc.ax.spines['right'].set_color('0.40')
+
+            if self.aw.qmc.ygrid > 0:
+                self.aw.qmc.ax.yaxis.set_major_locator(ticker.MultipleLocator(self.aw.qmc.ygrid))
+                self.aw.qmc.ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
+                for i in self.aw.qmc.ax.get_yticklines(): # pyrefly:ignore[not-callable]
+                    i.set_markersize(10)
+                for i in self.aw.qmc.ax.yaxis.get_minorticklines():
+                    i.set_markersize(5)
+            else:
+                self.aw.qmc.ax.yaxis.set_major_locator(ticker.NullLocator())
+                self.aw.qmc.ax.yaxis.set_minor_locator(ticker.NullLocator())
+
+            if self.aw.qmc.xgrid <= 0:
+                self.aw.qmc.ax.xaxis.set_major_locator(ticker.NullLocator())
+                self.aw.qmc.ax.xaxis.set_minor_locator(ticker.NullLocator())
 
 
         #update X ticks, labels, and colors

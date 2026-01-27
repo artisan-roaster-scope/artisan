@@ -68,23 +68,60 @@
 
   <releases>
 
+    <release version="4.0.0" date="2026-01-27">
+      <url type="details">https://github.com/artisan-roaster-scope/artisan/releases/tag/v4.0.0</url>
+      <description>
+        <p>ADDITIONS</p>
+        <ul>
+          <li>adds UI modes (production, standard, expert)</li>
+          <li>adds support for Lebrew RoastSee NEXT real-time Agtron and crack analyzer</li>
+          <li>adds support for Acaia Pyxis Black (2025)</li>
+          <li>adds support for Yoccto Meteo as well as Phidget TMP1000, HUM1000 and PRE1000 configured as extra devices (Issue #1251)</li>
+          <li>adds Kaleido CSV importer (PR #2090 contributed by Terracotta-6)</li>
+          <li>adds possibility to overwrite the event button value on alarm action 'Event Button' by the number given after the button number and the &gt; sign, like in <pre>1&gt;3,3&gt;2,4 # activate button 1 with value 3, button 3 with value 2 and button 4</pre></li>
+          <li>adds relative percent event types (Issue #2086)</li>
+          <li>adds visual clue to curve LCDs indicating hidden curves</li>
+          <li>adds Designer spline fitting (PR #2050) contributed by Thomas)</li>
+          <li>adds 2DOF PID implementation including classical DoE, PoE, DoM, and PoM PID variants, interpolated gain scheduling, bumpless transfer, duty and derivative IIR SOS filter respecting sampling interval, and SV FIR filter for background follow mode</li>
+          <li>adds Artisan Command <pre>pidWeights</pre> to set 2DOFPID parameters beta and gamma</li>
+          <li>adds calculation of energy data from PID Duty %</li>
+          <li>adds OPTION click on ET/BT or DeltaET/DeltaBT LCDs to hide/show the corresponding background curves</li>
+          <li>adds title click shortcut to open Roast Properties dialog</li>
+          <li>adds deselection of selected event using key ESC</li>
+          <li>adds temporary autozoom gesture (double-click on the graph canvas) to scale the y-axis such that all data is rendered on screen</li>
+          <li>adds legend to cupping spider chart</li>
+        </ul>
+        <p>CHANGES</p>
+        <ul>
+          <li>improved ramping event tracking with lookahead, avoiding non-linearities and bumps</li>
+          <li>removed the term `slave` from the project but for 2 lines (to be removed in later versions) needed to keep compatibility with older settings</li>
+          <li>removes support for Qt5, Python versions before v3.12 as well as previous legacy build infrastructure</li>
+        </ul>
+        <p>FIXES</p>
+        <ul>
+          <li>fixes regression which skipped the second sample (Issue #2091)</li>
+          <li>fixes encoding errors on loading points in designer (Issue #2103)</li>
+        </ul>
+      </description>
+    </release>
+
     <release version="3.4.0" date="2025-10-11">
       <url type="details">https://github.com/artisan-roaster-scope/artisan/releases/tag/v3.4.0</url>
       <description>
         <p>ADDITIONS</p>
         <ul>
           <li>adds tooltip to phases widget in Comparator displaying 2nd and 3rd phase bean temperatures (or RoR if ALT/Option key is pressed) limits (Issue #1906)</li>
-          <li>adds support for Kraffe](https://artisan-scope.org/machines/kraffe/) shop roasters</li>
-          <li>adds support for [Berto Essential and Autonics](https://artisan-scope.org/machines/berto/) models</li>
-          <li>adds support for [Nordic](https://artisan-scope.org/machines/nordic/) PLC models supporting burner, airflow, and drum speed control</li>
-          <li>adds support for [Prisma](https://artisan-scope.org/machines/prisma/) USB and PLC models supporting burner, airflow, and drum speed control</li>
-          <li>adds support for [Cogen roasting machines](https://artisan-scope.org/machines/cogen/) with Siemens PLC (v2)</li>
-          <li>adds support for [Easyster Smart](https://artisan-scope.org/machines/easyster/), legacy [Proaster](https://artisan-scope.org/machines/proaster/) THCR-01A as well as Easyster/Proaster machines with air pressure sensor</li>
-          <li>adds support for [Toper roasting machines](https://artisan-scope.org/machines/toper/) with PLC and touch screen produced after 2025 supporting burner, airflow, and drum speed control</li>
-          <li>extended setups for [Sweet Coffee Italia Gemma_2IND and Gemma_6-8IND machines](https://artisan-scope.org/machines/sci/)</li>
-          <li>extended setup for [Joper](https://joper-roasters.com/) PLC-based machines adding buttons to control the burner, cooler and stirrer states (ON/OFF)</li>
-          <li>adds support for the 4 channel K/J type TC meter [Tasi TA612C](https://artisan-scope.org/devices/meters/) (Discussion #1997)</li>
-          <li>adds support for [Shelly energy meters](https://artisan-scope.org/devices/shelly/)</li>
+          <li>adds support for Kraffe shop roasters</li>
+          <li>adds support for Berto Essential and Autonics models</li>
+          <li>adds support for Nordic PLC models supporting burner, airflow, and drum speed control</li>
+          <li>adds support for Prisma USB and PLC models supporting burner, airflow, and drum speed control</li>
+          <li>adds support for Cogen roasting machines with Siemens PLC (v2)</li>
+          <li>adds support for Easyster Smart, legacy Proaster THCR-01A as well as Easyster/Proaster machines with air pressure sensor</li>
+          <li>adds support for Toper roasting machines with PLC and touch screen produced after 2025 supporting burner, airflow, and drum speed control</li>
+          <li>extended setups for Sweet Coffee Italia Gemma_2IND and Gemma_6-8IND machines</li>
+          <li>extended setup for Joper PLC-based machines adding buttons to control the burner, cooler and stirrer states (ON/OFF)</li>
+          <li>adds support for the 4 channel K/J type TC meter Tasi TA612C (Discussion #1997)</li>
+          <li>adds support for Shelly energy meters</li>
           <li>adds batch conversion from Cropster XLS, Giesen CSV, IKAWA CSV, Loring CSV, Petroncini CSV, ROEST CSV, Rubase CSV, and Stronghold XLSX profiles to Artisan `.alog` profiles</li>
           <li>adds drag-and-drop import of a Artisan JSON, Cropster XLS, Giesen CSV and Stronghold XLSX profiles</li>
           <li>adds HiBean importer/converter</li>
@@ -103,7 +140,7 @@
           <li>BREAKING VISUAL CHANGE, but only when consecutive hidden buttons with Type or Action defined are first at the top of the Events Buttons table: The visual button layout may change as hidden buttons with Type or Action defined at the top of the Events Buttons table are no longer counted in the first row's button count, which is limited by the Max Buttons per Row setting.  All other hidden buttons continue to be counted in each row's button count.</li>
           <li>updates Spanish localization (thanks to Juan Carlos Bonilla)</li>)
           <li>updates Chinese localization (thanks to Terracotta-6)</li>
-          <li>updates Korean localization (thanks to [HarioSwitch](https://github.com/hakulog))</li>
+          <li>updates Korean localization (thanks to HarioSwitch)</li>
           <li>unlimited number of buttons can be created while display is limited to maximum 10 rows with maximum 50 buttons each</li>
           <li>palette load uses and updates the user selected profile path</li>
           <li>increases the maximum number of recent roast entries from 25 to 40</li>
@@ -116,11 +153,11 @@
           <li>updates MPL default font selection for Asian and Arabic languages under Windows</li>
           <li>the batch counter and autosave mechanisms are now active by default after first installation or a factory reset</li>
           <li>the configuration for taking ambient temperature from a data curve moved from the Roast Properties dialog to the Devices configuration dialog and configurations for taking ambient humidity and ambient pressure from curve data have been added (Issue #586 and PR #1882)</li>
-          <li>ensures that the default file suffixes on file save are applied (PR #1965). Thanks [Scott](https://github.com/scottjames)!</li>
+          <li>ensures that the default file suffixes on file save are applied (PR #1965). Thanks Scott!</li>
           <li>activates large PID LCDs for internal software PID and external TC4/MODBUS/S7 PIDs</li>
-          <li>the scheduler indicates now significant changes to the current schedule as received from [artisan.aplus](https://artisan.aplus), which have to be acknowledged by the user</li>
+          <li>the scheduler indicates now significant changes to the current schedule as received from artisan.aplus, which have to be acknowledged by the user</li>
           <li>changes `COOL` in alarms to `COOL END` for consistency (PR #1976)</li>
-          <li>remember loaded settings filename as default on save ([PR #1975)</li>
+          <li>remember loaded settings filename as default on save (PR #1975)</li>
           <li>BatchManager resets on tare triggered by button press on the Acaia scale</li>
           <li>automatic timeline extension now relative to sampling interval</li>
           <li>Linux builds require now glibc >=2.39</li>
@@ -156,7 +193,7 @@
       <description>
         <p>ADDITIONS</p>
         <ul>
-          <li>adds [batch manager](https://doc.artisan.plus/docs/batch-manager)</li>
+          <li>adds batch manager</li>
           <li>adds support for Acaia relay scales like the Umbra and the Cosmo</li>
           <li>adds custom local scale names</li>
           <li>adds button to manual update the roast schedule</li>
@@ -176,7 +213,7 @@
         </ul>
         <p>FIXES</p>
         <ul>
-          <li>fixes an unhandled exception on loading settings related to scales configurations ([ssue #1847)</li>
+          <li>fixes an unhandled exception on loading settings related to scales configurations (ssue #1847)</li>
           <li>fixes regression which broke show-events-on-BT in v3.1.2 and v3.1.4</li>
           <li>fixes delayed closing of the Roast Properties dialog on some configurations (Issue #1852)</li>
           <li>hardens event name substitution on background load (Issue #1863)</li>
