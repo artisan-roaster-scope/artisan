@@ -68,7 +68,7 @@ for:
     QT_PATH: "C:/qt/6.9.3/msvc2022_64"
     PYQT: "6"
     PYUIC: "pyuic6.exe"
-    BUILD_PYINSTALLER: "False"
+    BUILD_PYINSTALLER: "True"
     VC_REDIST: "https://aka.ms/vs/17/release/vc_redist.x64.exe"  #redistributable for VS 2015-2022
     VCVARSALL: "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Auxiliary/Build/vcvarsall.bat"
 
