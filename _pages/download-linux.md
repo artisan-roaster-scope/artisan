@@ -30,10 +30,12 @@ gallery:
 
 ---
 
-<p><img fetchpriority="high" src="https://img.shields.io/github/downloads/artisan-roaster-scope/artisan/latest/total?logo=github&amp;label=downloads&amp;color=f5f5f5&amp;labelColor=9C9C9C&amp;style=flat" alt="Github Latest Releases" class="align-right" /></p>
-
-
-
+<p style="text-align:left;">
+    <a href="https://artisan-roasterscope.blogspot.com/2026/01/artisan-4.html">Release Notes</a>
+    <span style="float:right;">
+        <img fetchpriority="high" src="https://img.shields.io/github/downloads/artisan-roaster-scope/artisan/latest/total?logo=github&amp;label=downloads&amp;color=f5f5f5&amp;labelColor=9C9C9C&amp;style=flat" alt="Github Latest Releases" class="align-right" />
+    </span>
+</p>
 **artisan 4**
 {: style="color: #4C97C3; font-size: larger; text-align: center; font-weight:bold;" }
 ---
