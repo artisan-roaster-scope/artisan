@@ -78,12 +78,12 @@
           <li>adds support for Acaia Pyxis Black (2025)</li>
           <li>adds support for Yoccto Meteo as well as Phidget TMP1000, HUM1000 and PRE1000 configured as extra devices (Issue #1251)</li>
           <li>adds Kaleido CSV importer (PR #2090 contributed by Terracotta-6)</li>
-          <li>adds possibility to overwrite the event button value on alarm action 'Event Button' by the number given after the button number and the &gt; sign, like in <pre>1&gt;3,3&gt;2,4 # activate button 1 with value 3, button 3 with value 2 and button 4</pre></li>
+          <li>adds possibility to overwrite the event button value on alarm action 'Event Button' by the number given after the button number and the &gt; sign</li>
           <li>adds relative percent event types (Issue #2086)</li>
           <li>adds visual clue to curve LCDs indicating hidden curves</li>
           <li>adds Designer spline fitting (PR #2050) contributed by Thomas)</li>
           <li>adds 2DOF PID implementation including classical DoE, PoE, DoM, and PoM PID variants, interpolated gain scheduling, bumpless transfer, duty and derivative IIR SOS filter respecting sampling interval, and SV FIR filter for background follow mode</li>
-          <li>adds Artisan Command <pre>pidWeights</pre> to set 2DOFPID parameters beta and gamma</li>
+          <li>adds Artisan Command pidWeights to set 2DOFPID parameters beta and gamma</li>
           <li>adds calculation of energy data from PID Duty %</li>
           <li>adds OPTION click on ET/BT or DeltaET/DeltaBT LCDs to hide/show the corresponding background curves</li>
           <li>adds title click shortcut to open Roast Properties dialog</li>
