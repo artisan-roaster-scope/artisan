@@ -51,9 +51,11 @@
   <screenshots>
     <screenshot type="default">
       <image>https://github.com/artisan-roaster-scope/artisan/blob/2c94e7d03f51221771a6f5e10c3a55fd1a26e744/wiki/screenshots/artisan-cover.png?raw=true</image>
+      <caption>Main window of the application</caption>
     </screenshot>
     <screenshot>
       <image>https://github.com/artisan-roaster-scope/artisan/blob/2c94e7d03f51221771a6f5e10c3a55fd1a26e744/wiki/screenshots/artisan-cover2.png?raw=true</image>
+      <caption>Main window with custom event buttons</caption>
     </screenshot>
   </screenshots>
 

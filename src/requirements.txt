@@ -31,7 +31,7 @@ wheel==0.46.3
 pyserial==3.5
 pymodbus==3.11.4
 python-snap7==2.0.2
-Phidget22==1.23.20251006
+Phidget22==1.24.20260127
 Unidecode==1.4.0
 qrcode==8.2
 requests==2.32.5
@@ -42,7 +42,7 @@ portalocker==3.2.0
 xlrd==2.0.2
 websockets==16.0
 PyYAML==6.0.3
-psutil==7.2.1
+psutil==7.2.2
 protobuf==6.33.4
 numpy==2.4.1
 scipy==1.17.0

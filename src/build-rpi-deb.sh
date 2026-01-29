@@ -40,5 +40,5 @@ rm -f ${NAME}_PiOS64-bookworm.deb
 sudo chmod 755 debian/DEBIAN
 sudo chmod 755 debian/DEBIAN/postinst
 sudo chmod 755 debian/DEBIAN/prerm
-(while :; do ps ax | grep dpkg; sleep 300;done)&
+#(while :; do ps ax | grep dpkg; sleep 300;done)&
 dpkg-deb --build debian ${NAME}_PiOS64-bookworm.deb
