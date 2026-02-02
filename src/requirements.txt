@@ -60,7 +60,7 @@ python-bidi==0.6.7
 arabic-reshaper==3.0.0
 pillow==12.1.0
 pydantic==2.12.5
-babel==2.17.0
+babel==2.18.0
 bleak==2.1.1
 python-statemachine==2.5.0
 yoctopuce==2.1.11416
