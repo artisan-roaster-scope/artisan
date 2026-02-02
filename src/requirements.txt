@@ -44,7 +44,7 @@ websockets==16.0
 PyYAML==6.0.3
 psutil==7.2.2
 protobuf==6.33.4
-numpy==2.4.1
+numpy==2.4.2
 scipy==1.17.0
 wquantiles==0.6
 colorspacious==1.1.2
