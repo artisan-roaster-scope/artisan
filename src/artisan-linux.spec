@@ -24,6 +24,9 @@ if not os.path.isdir(path):
 hiddenimports_list=[
     'matplotlib.backends.backend_pdf',
     'matplotlib.backends.backend_svg',
+    'PyQt6.QtWebChannel',
+    'PyQt6.QtWebEngineCore',
+    'PyQt6.QtWebEngineWidgets',
     'babel.numbers'  # should not be needed as it got fixed in pyinstaller 6.11
 ] + collect_submodules('dbus_fast')
 
@@ -61,6 +64,8 @@ a = Analysis(['artisan.py'],
     win_no_prefer_redirects=False,
     win_private_assemblies=False,
     cipher=block_cipher)
+
+    PySide6.QtQml
 
 
 
