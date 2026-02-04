@@ -136,9 +136,9 @@ cp -R includes/Icons/* dist/Icons
 # remove unused Qt modules
 
 keep_qt_modules="libQt6Bluetooth libQt6Concurrent libQt6Core libQt6DBus libQt6Gui libQt6Network
- libQt6OpenGL libQt6Positioning libQt6PrintSupport libQt6Qml libQt6QmlModels libQt6Quick libQt6QuickWidgets
+ libQt6OpenGL libQt6Positioning libQt6PrintSupport libQt6Qml libQt6QmlModels libQt6QmlMeta libQt6Quick libQt6QuickWidgets
  libQt6Svg libQt6WaylandClient libQt6WaylandEglClientHwIntegration libQt6WebChannel libQt6WebEngineCore
- libQt6WebEngineWidgets libQt6Widgets libQt6WlShellIntegration libQt6XcbQpa libQt6QmlMeta"
+ libQt6WebEngineWidgets libQt6Widgets libQt6WlShellIntegration libQt6XcbQpa"
 
 for qtlib in $(find dist/_internal/PyQt6/Qt6/lib -type f -name "libQt6*.so.*"); do
     qtlib_filename="${qtlib##*/}"
