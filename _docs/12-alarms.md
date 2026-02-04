@@ -11,7 +11,7 @@ author_profile: true
 
 Menu: `Config` >> `Alarms`
 
-Alarms are for intermediate and advanced users.  Beginners should be aware they exist and as you gain experience with Artisan come back here and learn more about how powerful they can be as, you can even control the roaster with Alarms.
+Alarms are for intermediate and advanced users.  Beginners should be aware they exist and as you gain experience with Artisan come back here and learn more about how powerful they can be as, you can even control the roaster with Alarms.   Some of the choices here are only available in the UI mode, Expert.  `Config` >> `Mode`
 
 Alarms trigger certain actions to happen. Artisan alarms can help you in keeping the focus while roasting. The actions can be PopUPs, spoken words, or even controlling the roaster.  For example, if we would like Artisan to show a popup once the BT (bean temperature) raises beyond 180C, reminding us to turn down the heat on approaching FCs (First Crack Start). Here BT beyond 180C is the trigger and showing a popup is the action.
 
