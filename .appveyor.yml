@@ -20,14 +20,14 @@ environment:
   # Set the default Appveyor Python version here. Can be overridden in platform environment.
   PYTHON_V: 3.13
   # Upgrade to specific version (for platforms supporting upgrade). Upgrade skipped if env var is missing or blank.
-  PYUPGRADE_WIN_VER: 3.14.2
+  PYUPGRADE_WIN_VER: 3.14.3
   #PYUPGRADE_MACOS_V: 3.12.1  # when upgrading see the notes in the deploy phase
 
   matrix:
-  - job_name: windows
-    appveyor_build_worker_image: Visual Studio 2022
-  - job_name: macos
-    appveyor_build_worker_image: macos-ventura
+#  - job_name: windows
+#    appveyor_build_worker_image: Visual Studio 2022
+#  - job_name: macos
+#    appveyor_build_worker_image: macos-ventura
   - job_name: linux
     appveyor_build_worker_image: Ubuntu2204
 
@@ -57,172 +57,172 @@ stack:
   python ${PYTHON_V}
 
 for:
-#-
-#  matrix:
-#    only:
-#      - job_name: windows
-#    fast_finish: false
-#
-#  environment:
-#    PYTHON_V: 3.14  # Override the stack key
-#    QT_PATH: "C:/qt/6.9.3/msvc2022_64"
-#    PYQT: "6"
-#    PYUIC: "pyuic6.exe"
-#    BUILD_PYINSTALLER: "True"
-#    VC_REDIST: "https://aka.ms/vs/17/release/vc_redist.x64.exe"  #redistributable for VS 2015-2022
-#    VCVARSALL: "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Auxiliary/Build/vcvarsall.bat"
-#
-#  install:
-#    - cmd: echo Windows Install
-#
-#    # Update the Python version when PYUPGRADE_WIN_VER is set.  The upgrade happens in upgrade-py-win.bat
-#    # Note that the paths set below may not exist yet.
-#    - ps: |
-#        if (Test-Path env:PYUPGRADE_WIN_VER) {
-#            $env:PREV_PYTHON_V = $env:PYTHON_V
-#            $env:PREV_PYTHON_PATH = "C:/Python$($env:PYTHON_V -replace '\.','')-x64"
-#            $env:PYTHON_V = ($env:PYUPGRADE_WIN_VER -split '\.')[0..1] -join '.'
-#        }
-#
-#    # derive the path to python.exe from the version number
-#    - ps: $env:PYTHON_PATH = "C:/Python$($env:PYTHON_V -replace '\.','')-x64"
-#    - ps: Write-Host $env:PYTHON_PATH
-#
-#    # upgrade the python version installed if necessary
-#    - cmd: .ci/upgrade-py-win.bat
-#
-#    # update path env var
-#    - cmd: set PATH=%PYTHON_PATH%;%PYTHON_PATH%\Scripts;%PATH%
-#
-#    # expose the python version
-#    - cmd: python -V
-#
-#    # generate the path to PyQt translations files
-#    - ps: $env:QT_TRANSL = "$env:PYTHON_PATH/Lib/site-packages/PyQt6/Qt6/translations"
-#
-#    # pull library versions from requirements file
-#    - ps: $env:PYINSTALLER_VER = Select-String -Path ./src/requirements.txt "pyinstaller==([\d\.]*).*platform_system='Windows'" -List | ForEach-Object {$_.Matches.Groups[1].Value}
-#    - ps: Write-Host "PYINSTALLER_VER= $env:PYINSTALLER_VER"
-#
-#    # patch for libusb_package until a Python 3.14 version is available on pypi.org
-#    - cmd: if "%PYTHON_V%"=="3.14" (echo *** PATCH install version of libusb_package modified for Python 3.14)
-#    - cmd: if "%PYTHON_V%"=="3.14" (pip install .ci\patches\libusb_package-1.0.26.3-py314-none-win_amd64.whl)
-#
-#    # run the install script
-#    - cmd: .ci/install-win.bat
-#
-#    # patch for pylupdate6 until this is fixed on pypi.org
-#    - cmd: if "%PYTHON_V%"=="3.14" (echo *** PATCH pylupdate6 for Python 3.14)
-#    - cmd: if "%PYTHON_V%"=="3.14" (copy /Y .ci\patches\python_source.py C:\Python314-x64\Lib\site-packages\PyQt6\lupdate\python_source.py)
-#
-#  build_script:
-#    - cmd: echo Windows Build
-#    - cmd: cd src
-#
-#    #update the copyright year used by pyinstaller to set exe properties for Windows
-#    - ps: $YEAR=(Get-Date).year
-#    - ps: gc version-metadata.yml | %{ $_ -replace "yyyy", "$YEAR" } | out-file newfile -encoding ascii
-#    - ps: move -force newfile version-metadata.yml
-#
-#    # update the __revision__ field with the left seven of the GIT commit hash
-#    - ps: $GIT_VERSION=git rev-parse --verify --short HEAD
-#    - ps: gc artisanlib/__init__.py | %{ $_ -replace "__revision__ = '.*'", "__revision__ = '$GIT_VERSION'" } | out-file newfile -encoding ascii
-#    - ps: move -force newfile artisanlib/__init__.py
-#
-#    # run the build script
-#    - cmd: build-win3-pi.bat
-#
-##  test_script:
-##    - cmd: python -m unittest discover
-#
-#  artifacts:
-##    - path: 'generated-win.zip'
-#    - path: 'src\%artifact_prefix%-win*setup.exe'
-#
-#  deploy_script:
-#    - cmd: bash ../.ci/upload.sh artisan-win*setup.exe
-#
-##  # uncomment this section for remote desktop connection to build image
-##  on_finish:
-##    - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
-#
-#
-#-
-#  matrix:
-#    only:
-#      - job_name: macos
-#    fast_finish: false
-#
-#  environment:
-#    PYTHON_UPGRADE_V: 3.14.2  # Upgrade to this version
-#    PYTHON_V: 3.12  # Override the stack key with latest Appveyor version
-#    ARTISAN_OS: macos
-#    MACOSX_DEPLOYMENT_TARGET: 13.0
-#    PYUIC: pyuic6
-#    PYLUPDATE: ./pylupdate6pro.py  #the dot slash is necessary
-#
-#  install:
-#    - echo "MacOS Install"
-#    - chmod +x .ci/*.sh
-#
-#    # update the __revision__ field with the left seven of the GIT commit hash
-#    - export GIT_VERSION=`git rev-parse --verify --short HEAD 2>/dev/null|| echo "???"`
-#    - sed -i'' -e "s/__revision__ = '.*'/__revision__ = '$GIT_VERSION'/" src/artisanlib/__init__.py
-#
-#    # upgrade python
-#    - echo "Deactivating the active virtual environment"
-#    - deactivate || echo "No active virtual environment found"
-#    - echo "Downloading Python ${PYTHON_UPGRADE_V} installer"
-#    - curl -O https://www.python.org/ftp/python/${PYTHON_UPGRADE_V}/python-${PYTHON_UPGRADE_V}-macos11.pkg
-#    - echo "Installing Python ${PYTHON_UPGRADE_V}"
-#    - sudo installer -pkg python-${PYTHON_UPGRADE_V}-macos11.pkg -target /
-#
-#    # Update the environment
-#    - export PYTHON_V="${PYTHON_UPGRADE_V%.*}"  # drop the dot build number
-#    - export PYTHONSITEPKGS="/Users/appveyor/venv${PYTHON_V}/lib/python${PYTHON_V}/site-packages"
-#    - export QT_PATH="${PYTHONSITEPKGS}/PyQt6/Qt6"
-#
-#    # Create and activate a new virtual environment
-#    - echo "Creating virtual environment"
-#    - python3 -m venv /Users/appveyor/venv${PYTHON_V}
-#    - echo "Activating virtual environment"
-#    - source /Users/appveyor/venv${PYTHON_V}/bin/activate
-#
-#    # Create symbolic link
-#    - ln -s /Users/appveyor/venv${PYTHON_V} /Users/appveyor/venv${PYTHON_UPGRADE_V}
-#
-#    # run the install script
-#    - .ci/install-macos.sh
-#
-#  build_script:
-#    - echo "MacOS Build"
-#    - chmod +x src/*.sh
-#    - chmod +x src/pylupdate6pro.py
-#
-#    # run the build script
-#    - cd src
-#    - ./build-macos3.sh
-#
-## unit test fails as it runs on Py3.9 while the build installs under brew installed Py3.10 (see build-mac3.py)
-##  test_script:
-##    - python -m unittest discover -s src
-#
-#  artifacts:
-##    - path: 'generated-macos.zip'
-#    - path: 'src/%artifact_prefix%-*.dmg'
-#
-#  deploy_script:
-#    # we upgrade libidn2 and curl to prevent issues caused by the previous python update
-#    # on running curl for later upload (libunistring.2.dylib not found)
-#    # this is done here after generating the build to prevent SSL issues
-#    # ...at present python is not updated so we can skip this and save the time
-#    #- brew upgrade libidn2 # 2.3.4 -> 2.3.4_1
-#    - ../.ci/upload.sh artisan-*.dmg
-#
-##  # uncomment this section for ssh connection to the build image
-##  on_finish:
-##    - sh: export APPVEYOR_SSH_BLOCK=true
-##    - sh: curl -sflL 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-ssh.sh' | bash -e -
+-
+  matrix:
+    only:
+      - job_name: windows
+    fast_finish: false
+
+  environment:
+    PYTHON_V: 3.14  # Override the stack key
+    QT_PATH: "C:/qt/6.9.3/msvc2022_64"
+    PYQT: "6"
+    PYUIC: "pyuic6.exe"
+    BUILD_PYINSTALLER: "True"
+    VC_REDIST: "https://aka.ms/vs/17/release/vc_redist.x64.exe"  #redistributable for VS 2015-2022
+    VCVARSALL: "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Auxiliary/Build/vcvarsall.bat"
+
+  install:
+    - cmd: echo Windows Install
+
+    # Update the Python version when PYUPGRADE_WIN_VER is set.  The upgrade happens in upgrade-py-win.bat
+    # Note that the paths set below may not exist yet.
+    - ps: |
+        if (Test-Path env:PYUPGRADE_WIN_VER) {
+            $env:PREV_PYTHON_V = $env:PYTHON_V
+            $env:PREV_PYTHON_PATH = "C:/Python$($env:PYTHON_V -replace '\.','')-x64"
+            $env:PYTHON_V = ($env:PYUPGRADE_WIN_VER -split '\.')[0..1] -join '.'
+        }
+
+    # derive the path to python.exe from the version number
+    - ps: $env:PYTHON_PATH = "C:/Python$($env:PYTHON_V -replace '\.','')-x64"
+    - ps: Write-Host $env:PYTHON_PATH
+
+    # upgrade the python version installed if necessary
+    - cmd: .ci/upgrade-py-win.bat
+
+    # update path env var
+    - cmd: set PATH=%PYTHON_PATH%;%PYTHON_PATH%\Scripts;%PATH%
+
+    # expose the python version
+    - cmd: python -V
+
+    # generate the path to PyQt translations files
+    - ps: $env:QT_TRANSL = "$env:PYTHON_PATH/Lib/site-packages/PyQt6/Qt6/translations"
+
+    # pull library versions from requirements file
+    - ps: $env:PYINSTALLER_VER = Select-String -Path ./src/requirements.txt "pyinstaller==([\d\.]*).*platform_system='Windows'" -List | ForEach-Object {$_.Matches.Groups[1].Value}
+    - ps: Write-Host "PYINSTALLER_VER= $env:PYINSTALLER_VER"
+
+    # patch for libusb_package until a Python 3.14 version is available on pypi.org
+    - cmd: if "%PYTHON_V%"=="3.14" (echo *** PATCH install version of libusb_package modified for Python 3.14)
+    - cmd: if "%PYTHON_V%"=="3.14" (pip install .ci\patches\libusb_package-1.0.26.3-py314-none-win_amd64.whl)
+
+    # run the install script
+    - cmd: .ci/install-win.bat
+
+    # patch for pylupdate6 until this is fixed on pypi.org
+    - cmd: if "%PYTHON_V%"=="3.14" (echo *** PATCH pylupdate6 for Python 3.14)
+    - cmd: if "%PYTHON_V%"=="3.14" (copy /Y .ci\patches\python_source.py C:\Python314-x64\Lib\site-packages\PyQt6\lupdate\python_source.py)
+
+  build_script:
+    - cmd: echo Windows Build
+    - cmd: cd src
+
+    #update the copyright year used by pyinstaller to set exe properties for Windows
+    - ps: $YEAR=(Get-Date).year
+    - ps: gc version-metadata.yml | %{ $_ -replace "yyyy", "$YEAR" } | out-file newfile -encoding ascii
+    - ps: move -force newfile version-metadata.yml
+
+    # update the __revision__ field with the left seven of the GIT commit hash
+    - ps: $GIT_VERSION=git rev-parse --verify --short HEAD
+    - ps: gc artisanlib/__init__.py | %{ $_ -replace "__revision__ = '.*'", "__revision__ = '$GIT_VERSION'" } | out-file newfile -encoding ascii
+    - ps: move -force newfile artisanlib/__init__.py
+
+    # run the build script
+    - cmd: build-win3-pi.bat
+
+#  test_script:
+#    - cmd: python -m unittest discover
+
+  artifacts:
+#    - path: 'generated-win.zip'
+    - path: 'src\%artifact_prefix%-win*setup.exe'
+
+  deploy_script:
+    - cmd: bash ../.ci/upload.sh artisan-win*setup.exe
+
+#  # uncomment this section for remote desktop connection to build image
+#  on_finish:
+#    - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+
+
+-
+  matrix:
+    only:
+      - job_name: macos
+    fast_finish: false
+
+  environment:
+    PYTHON_UPGRADE_V: 3.14.3  # Upgrade to this version
+    PYTHON_V: 3.12  # Override the stack key with latest Appveyor version
+    ARTISAN_OS: macos
+    MACOSX_DEPLOYMENT_TARGET: 13.0
+    PYUIC: pyuic6
+    PYLUPDATE: ./pylupdate6pro.py  #the dot slash is necessary
+
+  install:
+    - echo "MacOS Install"
+    - chmod +x .ci/*.sh
+
+    # update the __revision__ field with the left seven of the GIT commit hash
+    - export GIT_VERSION=`git rev-parse --verify --short HEAD 2>/dev/null|| echo "???"`
+    - sed -i'' -e "s/__revision__ = '.*'/__revision__ = '$GIT_VERSION'/" src/artisanlib/__init__.py
+
+    # upgrade python
+    - echo "Deactivating the active virtual environment"
+    - deactivate || echo "No active virtual environment found"
+    - echo "Downloading Python ${PYTHON_UPGRADE_V} installer"
+    - curl -O https://www.python.org/ftp/python/${PYTHON_UPGRADE_V}/python-${PYTHON_UPGRADE_V}-macos11.pkg
+    - echo "Installing Python ${PYTHON_UPGRADE_V}"
+    - sudo installer -pkg python-${PYTHON_UPGRADE_V}-macos11.pkg -target /
+
+    # Update the environment
+    - export PYTHON_V="${PYTHON_UPGRADE_V%.*}"  # drop the dot build number
+    - export PYTHONSITEPKGS="/Users/appveyor/venv${PYTHON_V}/lib/python${PYTHON_V}/site-packages"
+    - export QT_PATH="${PYTHONSITEPKGS}/PyQt6/Qt6"
+
+    # Create and activate a new virtual environment
+    - echo "Creating virtual environment"
+    - python3 -m venv /Users/appveyor/venv${PYTHON_V}
+    - echo "Activating virtual environment"
+    - source /Users/appveyor/venv${PYTHON_V}/bin/activate
+
+    # Create symbolic link
+    - ln -s /Users/appveyor/venv${PYTHON_V} /Users/appveyor/venv${PYTHON_UPGRADE_V}
+
+    # run the install script
+    - .ci/install-macos.sh
+
+  build_script:
+    - echo "MacOS Build"
+    - chmod +x src/*.sh
+    - chmod +x src/pylupdate6pro.py
+
+    # run the build script
+    - cd src
+    - ./build-macos3.sh
+
+# unit test fails as it runs on Py3.9 while the build installs under brew installed Py3.10 (see build-mac3.py)
+#  test_script:
+#    - python -m unittest discover -s src
+
+  artifacts:
+#    - path: 'generated-macos.zip'
+    - path: 'src/%artifact_prefix%-*.dmg'
+
+  deploy_script:
+    # we upgrade libidn2 and curl to prevent issues caused by the previous python update
+    # on running curl for later upload (libunistring.2.dylib not found)
+    # this is done here after generating the build to prevent SSL issues
+    # ...at present python is not updated so we can skip this and save the time
+    #- brew upgrade libidn2 # 2.3.4 -> 2.3.4_1
+    - ../.ci/upload.sh artisan-*.dmg
+
+#  # uncomment this section for ssh connection to the build image
+#  on_finish:
+#    - sh: export APPVEYOR_SSH_BLOCK=true
+#    - sh: curl -sflL 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-ssh.sh' | bash -e -
 
 
 -
