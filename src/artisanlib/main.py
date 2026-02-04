@@ -127,8 +127,7 @@ try:
     from PyQt6.QtWebEngineWidgets import QWebEngineView
     from PyQt6.QtWebEngineCore import QWebEngineProfile
     QtWebEngineSupport = True
-except ImportError as e:
-    _log.exception(e)
+except ImportError:
     # on the RPi platform there is no native package PyQt-WebEngine nor PyQt6-WebEngine
     pass
 from PyQt6 import sip
@@ -686,6 +685,13 @@ if QtWebEngineSupport:
     _log.info('QtWebEngine found => PDF report rendering enabled')
 else:
     _log.info('QtWebEngine not found => PDF report rendering disabled')
+    # temp test
+    try:
+        from PyQt6.QtWebEngineWidgets import QWebEngineView
+        from PyQt6.QtWebEngineCore import QWebEngineProfile
+    except Exception as e: # pylint: disable=broad-except
+        _log.exception(e)
+
 
 if platform.system().startswith('Windows'):
     # on Windows we use the Fusion style per default which supports the dark mode

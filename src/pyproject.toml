@@ -240,7 +240,7 @@ enable='''c-extension-no-member,'''
 ## mypy conf
 
 [tool.mypy]
-files = ["artisanlib/*.py", "plus/*.py", "test/**/*.py"]
+files = ["*.py", "artisanlib/*.py", "plus/*.py", "test/**/*.py"]
 exclude = ['build', 'dist', 'uic', 'misc']
 python_version = "3.12"
 
