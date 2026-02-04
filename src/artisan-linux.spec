@@ -65,8 +65,6 @@ a = Analysis(['artisan.py'],
     win_private_assemblies=False,
     cipher=block_cipher)
 
-    PySide6.QtQml
-
 
 
 # exclude libs from the build
