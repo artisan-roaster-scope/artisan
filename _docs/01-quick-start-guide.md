@@ -49,7 +49,7 @@ Pick ˚F or ˚C.
 2.	Run `Config` >> `Machine`, or set up your devices, and make sure the LCDs show your temps.  Some of these configurations will change the sampling rate and that’s ok.  
 3.	`Config`>> `Events` and `Config` >> `Alarms`  
 This is where you will focus your most time in setting things up the first time.  `Config` >> [`Events`](https://artisan-scope.org/docs/events/) and `Config` >> [`Alarms`](https://artisan-scope.org/docs/alarms/)  
-These are critical, but they also take some work.  For this step it's really critical that you read the QSG in detail. First thing decide if you will use buttons or sliders to record gas changes. Decide which boxes you want to check, including `Auto DROP` and `Auto CHARGE`. I use `Auto DROP` and `Auto CHARGE`. If you use `Auto CHARGE`, make sure you hit Start at least 10 seconds before you drop your beans.  I mark TP, MET and I show the Time Guide. For Buttons, there are additional settings in Expert Mode.  
+These are critical, but they also take some work.  For this step it's really critical that you read the QSG in detail. First thing decide if you will use buttons or sliders to record gas changes. Decide which boxes you want to check, including `Auto DROP` and `Auto CHARGE`. I use `Auto DROP` and `Auto CHARGE`. If you use `Auto CHARGE`, make sure you hit Start at least 10 seconds before you drop your beans.  I mark TP, MET and I show the Time Guide. For both Buttons and Alarms, there are additional settings in Expert Mode.  
 4.	`Config` >> [`Axes`](https://artisan-scope.org/docs/axes/)  
 Check Auto, and set your range for your Temperature and Delta axes. Starting points could be 0-500 ˚F and 0-40˚F/min, or 0-250˚C and 0-20˚C/min.
 5.	`Config` >> [`Batch`](https://artisan-scope.org/docs/batches/)  
