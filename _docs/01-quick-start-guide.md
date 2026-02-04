@@ -48,7 +48,8 @@ New as of 2026 are User Interface Modes:  Standard, Expert, and Production.  Art
 Pick ˚F or ˚C.
 2.	Run `Config` >> `Machine`, or set up your devices, and make sure the LCDs show your temps.  Some of these configurations will change the sampling rate and that’s ok.  
 3.	`Config`>> `Events` and `Config` >> `Alarms`  
-these are the more complex steps and are addressed in the steps below.  
+This is where you will focus your most time in setting things up the first time.  `Config` >> [`Events`](https://artisan-scope.org/docs/events/) and `Config` >> [`Alarms`](https://artisan-scope.org/docs/alarms/)  
+These are critical, but they also take some work.  For this step it's really critical that you read the QSG in detail. First thing decide if you will use buttons or sliders to record gas changes. Decide which boxes you want to check, including `Auto DROP` and `Auto CHARGE`. I use `Auto DROP` and `Auto CHARGE`. If you use `Auto CHARGE`, make sure you hit Start at least 10 seconds before you drop your beans.  I mark TP, MET and I show the Time Guide. For Buttons, there are additional settings in Expert Mode.  
 4.	`Config` >> [`Axes`](https://artisan-scope.org/docs/axes/)  
 Check Auto, and set your range for your Temperature and Delta axes. Starting points could be 0-500 ˚F and 0-40˚F/min, or 0-250˚C and 0-20˚C/min.
 5.	`Config` >> [`Batch`](https://artisan-scope.org/docs/batches/)  
@@ -65,25 +66,25 @@ Once you have roasted a few batches, go back and read the documentation on the i
 7.	[Shortcuts](https://artisan-scope.org/docs/shortcuts/)  
 Go to `Help` >> `Shortcuts` to see how to enable them and see what keyboard shortcuts are available.  
 8.	Standard Mode personalization  
- `Config` >> [Themes](https://artisan-scope.org/docs/themes/) to explore the options.    `Config` >> `Curves`, UI, pick a font and background image, IF you wish to personalize your use
+ `Config` >> [Themes](https://artisan-scope.org/docs/themes/) to explore the options.    
 
 
 **Expert Mode Choices**
 
 1.	`Config` >> [`Sampling`](https://artisan-scope.org/docs/sampling/)  
-Leave at 3 for now. After you have done 25-30 roasts and know the program better you can reduce it if your devices support that. Under Curves your Delta Span should be at least twice your sampling rate.  Leave Oversampling unselected/unchecked.
-2.	`Config` >> [`Events`](https://artisan-scope.org/docs/events/) and `Config` >> [`Alarms`](https://artisan-scope.org/docs/alarms/)  
-These are critical, but they also take some work. I put them near the end so that other important concepts aren't passed over while you work on this. For this step it's really critical that you read the QSG in detail. First thing decide if you will use buttons or sliders to record gas changes. Decide which boxes you want to check, including `Auto DROP` and `Auto CHARGE`. I use `Auto DROP` but not `Auto CHARGE` as that helps me focus on the start of the roast. If you use `Auto CHARGE`, make sure you hit Start at least 15 seconds before you drop your beans.  I mark TP, MET and I show the Time Guide. For Buttons choosing the Label of the Button and the Description are important. The Description will show your graph, using the Event Annotations - last tab. Make sure you complete the Event Annotations tab so you can see your gas and air changes on your profile. Design Alarms as you need them. I love talking Alarms to remind me of temps and return my air to the starting point. I also use Alarms to mark my initial settings.
-3.	`Config` >> [`Curves`](https://artisan-scope.org/docs/curves/)   
+Leave at 3 for now. After you have done 25-30 roasts and know the program better you can reduce it if your devices support that. Under Curves your Delta Span should be at least twice your sampling rate. 
+2.	`Config` >> [`Curves`](https://artisan-scope.org/docs/curves/)   
 Check the boxes needed on the RoR tab and set the values on the Filters page. Suggest you start with zero for all smoothing and check the Drop Spikes and Smooth Spikes choices. Set Delta Span at twice your sampling rate (3 by default) so 6.  If you find zero smoothing give you too many spikes, slowing increase the numbers.  Once you have an Artisan profile, you can change the numbers and see the results on screen.  Also in the`Config` >> `Curves` dialog, last tab, UI, you can pick a font and background image, IF you wish to personalize your screen.  
-4.	`Config` >> [`Statistics`](https://artisan-scope.org/docs/statistics/)  
+3.	`Config` >> [`Statistics`](https://artisan-scope.org/docs/statistics/)  
 Check all the boxes on the top row.
-5.	`Roast` >> [`Background`](https://artisan-scope.org/docs/background/)  
+4.	`Roast` >> [`Background`](https://artisan-scope.org/docs/background/)  
 See the documentation on how to load a profile into the background to follow during roasting.
-6.	 Tools Menu 
-In Expert Mode you will also have Analyzer,Simulator, Wheel Graph, Transposer and Calculator.
-7. Expert Mode Personalization includes Colors `Config` >> [Colors](https://artisan-scope.org/docs/colors/).  For some graph configuations, they are accessed with the last icon in the set on the left on the Roast graph (the one with jagged up arrow).
-After you have completed some roasting, please watch the video [Getting the Most from Artisan's Tools](https://www.youtube.com/watch?v=8ivsccu9e_Y&t=3094s){:target="_blank"} to learn more about how to improve your roasting.  
+5.  Expert Mode Events Buttons and Alarms
+   In Expert Mode, you can have the Default Buttons run an Alarm and you have access to custom Buttons and Annotations under `Config` >> [`Events`](https://artisan-scope.org/docs/events/).  For Buttons in Expert Mode choosing the Label of the Button and the Description are important. The Description will show your graph, using the Event Annotations - last tab. Make sure you complete the Event Annotations tab so you can see your gas and air changes on your profile. Design Alarms as you need them. I love talking Alarms to remind me of temps and return my air to the starting point. I also use Alarms to mark my initial settings.  There are a few additional Alarm settings in Expert mode in the bottom row including Load From Profile and Load from Background.  
+7.	 Tools Menu 
+In Expert Mode you will also have Analyzer,Simulator, Wheel Graph, Transposer and Calculator.  After you have completed some roasting, please watch the video [Getting the Most from Artisan's Tools](https://www.youtube.com/watch?v=8ivsccu9e_Y&t=3094s){:target="_blank"} to learn more about how to improve your roasting.  
+8. Expert Mode Personalization includes Colors `Config` >> [Colors](https://artisan-scope.org/docs/colors/).  For some graph configuations, they are accessed with the last icon in the set on the left on the Roast graph (the one with jagged up arrow). 
+
 
 The main controls look like this:
 ![View Controls](/assets/images/gsg/view menu controls.png)
