@@ -24,14 +24,21 @@ if not os.path.isdir(path):
 hiddenimports_list=[
     'matplotlib.backends.backend_pdf',
     'matplotlib.backends.backend_svg',
+    'PyQt6.QtQuick',
+    'PyQt6.QtQml',
     'PyQt6.QtQmlMeta',
+    'PyQt6.QtQmlWorkerScript',
+    'PyQt6.OpenGL',
+    'PyQt6.QtWebChannel',
+    'PyQt6.QtPositioning',
+    'PyQt6.QtWebEngineQuick'
     'babel.numbers'  # should not be needed as it got fixed in pyinstaller 6.11
 ] + collect_submodules('dbus_fast')
 
 EXCLUDES = [
     'PyQt5',
-    'PyQt6.Multimedia',
-    'PyQt6.Network',
+#    'PyQt6.Multimedia',
+#    'PyQt6.Network',
     'PyQt6.PrintSupport',
     'PyQt6.QtRemoteObjects',
     'PyQt6.QtSensors',
