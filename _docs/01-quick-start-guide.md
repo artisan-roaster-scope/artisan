@@ -30,7 +30,7 @@ The [artisan.plus service](https://artisan.plus/en/) features support for
 - multiple users, machines and stores
 - blends & certifications
 - charts, tax reports & predictions
-- artisan integration support offline roasting
+- Support for offline roasting which Cropster doesn't.  Your roasts and profiles are uploaded when you reconnect to Plus.  
 
 
 ### Learn what Artisan can do and Your First Roast 
