@@ -15,7 +15,7 @@ phidgets_lib_path = os.path.join(get_package_paths('Phidget22')[1], '.libs')
 BINARIES.extend([(os.path.join(phidgets_lib_path, fn),'Phidget22/.libs') for fn in os.listdir(phidgets_lib_path) if fn.endswith('.so')])
 
 # add missing Qt6QmlMeta.so
-BINARIES.append((os.path.join(get_package_paths('PyQt6-Qt6')[1], 'PyQt6/Qt6/lib/libQt6QmlMeta.so.6'), 'PyQt6/Qt6/lib'))
+BINARIES.append((os.path.join(get_package_paths('PyQt6')[1], 'Qt6/lib/libQt6QmlMeta.so.6'), 'PyQt6/Qt6/lib'))
 
 
 path=os.environ['HOME'] + '/artisan-master/src'
