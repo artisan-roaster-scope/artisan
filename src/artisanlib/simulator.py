@@ -43,6 +43,8 @@ class Simulator:
         self.extratemp1: list[list[float]]
         self.extratemp2: list[list[float]]
         self.extratimex: list[list[float]]
+        self.extraDelta1: list[bool] # note that in contrast to aw.extraDelta1, this one has the length of self.extratimex and NOT aw.nLCDS
+        self.extraDelta2: list[bool] # note that in contrast to aw.extraDelta1, this one has the length of self.extratimex and NOT aw.nLCDS
 
         self.temp1_array:npt.NDArray[numpy.double]
         self.temp2_array:npt.NDArray[numpy.double]
@@ -72,6 +74,7 @@ class Simulator:
             self.extraDelta1 = profile['extraDelta1']
             self.extraDelta2 = profile['extraDelta2']
         else:
+            # len of this local self.extraDelta1/2 here is that of self.extratimex and NOT of aw.nLCDs as in other places
             self.extraDelta1 = [False]*len(self.extratimex)
             self.extraDelta2 = [False]*len(self.extratimex)
         self.extraNoneTempHint1:list[bool] = (profile.get('extraNoneTempHint1', []) if profile is not None else [])

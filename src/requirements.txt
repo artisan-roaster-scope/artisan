@@ -43,8 +43,8 @@ xlrd==2.0.2
 websockets==16.0
 PyYAML==6.0.3
 psutil==7.2.2
-protobuf==6.33.4
-numpy==2.4.1
+protobuf==6.33.5
+numpy==2.4.2
 scipy==1.17.0
 wquantiles==0.6
 colorspacious==1.1.2
@@ -60,10 +60,10 @@ python-bidi==0.6.7
 arabic-reshaper==3.0.0
 pillow==12.1.0
 pydantic==2.12.5
-babel==2.17.0
+babel==2.18.0
 bleak==2.1.1
 python-statemachine==2.5.0
-yoctopuce==2.1.11416
+yoctopuce==2.1.11632
 PyQt6==6.10.2
 PyQt6-WebEngine==6.10.0
 qt6-tools==6.5.0.1.3

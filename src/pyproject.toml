@@ -374,7 +374,6 @@ omit = [
     "artisan.py",
     "conftest.py",
     "pylupdate6pro.py",
-    "artisan.py ",
     "setup-*.py",
     ]
 [tool.coverage.report]

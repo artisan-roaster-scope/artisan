@@ -181,6 +181,7 @@ def extractProfileRoastLog(url:'QUrl',
                         res['extraLCDvisibility2'] = [temp4_visibility]
                         res['extraCurveVisibility1'] = [temp3_visibility]
                         res['extraCurveVisibility2'] = [temp4_visibility]
+                        ##
                         res['extraDelta1'] = [False]
                         res['extraDelta2'] = [False]
                         res['extraFill1'] = [False]

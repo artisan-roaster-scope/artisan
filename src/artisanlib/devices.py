@@ -3110,6 +3110,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             _t, _e, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' resetextradevices(): {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
+    # x the index of the extra device to be deleted
     def delextradevice(self, x:int) -> None:
         try:
             self.aw.qmc.extradevices.pop(x)
@@ -3147,10 +3148,11 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             if self.aw.extraCurveVisibility2[x]:
                 self.aw.qmc.extratemp2lines.pop(before2)
 
+            # lists of constant length (self.aw.nLCDS)
             self.aw.extraLCDvisibility1.pop(x)
-            self.aw.extraLCDvisibility1.append(True) # keep length constant (self.aw.nLCDS)
+            self.aw.extraLCDvisibility1.append(False) # keep length constant (self.aw.nLCDS)
             self.aw.extraLCDvisibility2.pop(x)
-            self.aw.extraLCDvisibility2.append(True) # keep length constant (self.aw.nLCDS)
+            self.aw.extraLCDvisibility2.append(False) # keep length constant (self.aw.nLCDS)
             self.aw.extraCurveVisibility1.pop(x)
             self.aw.extraCurveVisibility1.append(True) # keep length constant (self.aw.nLCDS)
             self.aw.extraCurveVisibility2.pop(x)

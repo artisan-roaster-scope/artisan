@@ -1428,11 +1428,11 @@ def getBlends(weight_unit_idx:int, store:str|None, customBlend:Blend|None, acqui
                                 for i in ingredients
                             ]
                             screen_mins = [
-                                coffee_screen_min.get(i['coffee'], None)
+                                coffee_screen_min.get(i['coffee'])
                                 for i in ingredients
                             ]
                             screen_maxs = [
-                                coffee_screen_max.get(i['coffee'], None)
+                                coffee_screen_max.get(i['coffee'])
                                 for i in ingredients
                             ]
                             # only if the moisture of all components is known,

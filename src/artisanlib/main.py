@@ -127,7 +127,8 @@ try:
     from PyQt6.QtWebEngineWidgets import QWebEngineView
     from PyQt6.QtWebEngineCore import QWebEngineProfile
     QtWebEngineSupport = True
-except ImportError:
+except ImportError as e:
+    _log.exception(e)
     # on the RPi platform there is no native package PyQt-WebEngine nor PyQt6-WebEngine
     pass
 from PyQt6 import sip
@@ -2034,13 +2035,19 @@ class ApplicationWindow(QMainWindow):
 
         #FILE menu
         self.newRoastMenu:QMenu = QMenu(QApplication.translate('Menu', 'New'))
+        if QIcon.hasThemeIcon('document-new'):
+            self.newRoastMenu.setIcon(QIcon.fromTheme('document-new'))
 
         self.fileLoadAction = QAction(QApplication.translate('Menu', 'Open...'),self)
         self.fileLoadAction.setMenuRole(QAction.MenuRole.NoRole)
         self.fileLoadAction.setShortcut(QKeySequence.StandardKey.Open)
+        if QIcon.hasThemeIcon('document-open'):
+            self.fileLoadAction.setIcon(QIcon.fromTheme('document-open'))
         self.fileLoadAction.triggered.connect(self.fileLoad)
 
         self.openRecentMenu = QMenu(QApplication.translate('Menu', 'Open Recent'))
+        if QIcon.hasThemeIcon('document-open-recent'):
+            self.openRecentMenu.setIcon(QIcon.fromTheme('document-open-recent'))
         orm_action = self.openRecentMenu.menuAction()
         if orm_action is not None:
             orm_action.setMenuRole(QAction.MenuRole.NoRole)
@@ -2189,9 +2196,13 @@ class ApplicationWindow(QMainWindow):
 
         self.fileSaveAction = QAction(QApplication.translate('Menu', 'Save'), self)
         self.fileSaveAction.setShortcut(QKeySequence.StandardKey.Save)
+        if QIcon.hasThemeIcon('document-save'):
+            self.fileSaveAction.setIcon(QIcon.fromTheme('document-save'))
         self.fileSaveAction.triggered.connect(self.fileSave_current_action)
 
         self.fileSaveAsAction = QAction(QApplication.translate('Menu', 'Save As...'), self)
+        if QIcon.hasThemeIcon('document-save-as'):
+            self.fileSaveAsAction.setIcon(QIcon.fromTheme('document-save-as'))
         self.fileSaveAsAction.setShortcut(QKeySequence.StandardKey.SaveAs)
         self.fileSaveAsAction.triggered.connect(self.fileSave_new_action)
 
@@ -2200,6 +2211,8 @@ class ApplicationWindow(QMainWindow):
         self.fileSaveCopyAsAction.triggered.connect(self.fileSave_copy_action)
 
         self.exportMenu:QMenu = QMenu(QApplication.translate('Menu', 'Export'))
+        if QIcon.hasThemeIcon('document-export'):
+            self.exportMenu.setIcon(QIcon.fromTheme('document-export'))
         fileExportCSVAction = QAction(QApplication.translate('Menu', 'Artisan CSV...'), self)
         fileExportCSVAction.triggered.connect(self.fileExportCSV)
         self.exportMenu.addAction(fileExportCSVAction)
@@ -2389,6 +2402,8 @@ class ApplicationWindow(QMainWindow):
         self.saveStatisticsMenu.addAction(savestatisticsTXTAction)
 
         self.printAction:QAction = QAction(QApplication.translate('Menu', 'Print...'), self)
+        if QIcon.hasThemeIcon('document-print'):
+            self.printAction.setIcon(QIcon.fromTheme('document-print'))
         self.printAction.setShortcut(QKeySequence.StandardKey.Print)
         self.printAction.triggered.connect(self.filePrint)
 
@@ -2718,6 +2733,8 @@ class ApplicationWindow(QMainWindow):
             self.helpAboutAction = QAction(QApplication.translate('MAC_APPLICATION_MENU', 'About {0}').format(application_name), self)
         self.helpAboutAction.setMenuRole(QAction.MenuRole.AboutRole)
         self.helpAboutAction.triggered.connect(self.helpAbout)
+        if QIcon.hasThemeIcon('help-about'):
+            self.helpAboutAction.setIcon(QIcon.fromTheme('help-about'))
 
         self.aboutQtAction = QAction(QApplication.translate('Menu', 'About Qt'), self)
         self.aboutQtAction.setMenuRole(QAction.MenuRole.AboutQtRole)
@@ -2725,6 +2742,8 @@ class ApplicationWindow(QMainWindow):
 
         self.helpDocumentationAction = QAction(QApplication.translate('Menu', 'Documentation'), self)
         self.helpDocumentationAction.triggered.connect(self.helpHelp)
+        if QIcon.hasThemeIcon('help-faq'):
+            self.helpDocumentationAction.setIcon(QIcon.fromTheme('help-faq'))
         self.helpDocumentationAction.setShortcut(QKeySequence.StandardKey.HelpContents)
 
         self.KshortCAction = QAction(QApplication.translate('Menu', 'Keyboard Shortcuts'), self)
@@ -2767,6 +2786,7 @@ class ApplicationWindow(QMainWindow):
         self.resetAction.setMenuRole(QAction.MenuRole.NoRole)
         self.resetAction.triggered.connect(self.resetApplication)
 
+        # this one does not include the edit menu cut/copy/paste shortcuts which should never be disabled
         self.main_menu_actions_with_shortcuts:list[QAction|None] = [
             # file menu
             self.newRoastAction,
@@ -2776,10 +2796,10 @@ class ApplicationWindow(QMainWindow):
             self.htmlAction,
             self.printAction,
             self.quitAction,
-            # edit menu
-            self.cutAction,
-            self.copyAction,
-            self.pasteAction,
+#            # edit menu
+#            self.cutAction,
+#            self.copyAction,
+#            self.pasteAction,
             # roast menu
             self.editGraphAction,
             self.backgroundAction,
@@ -4278,9 +4298,9 @@ class ApplicationWindow(QMainWindow):
         if not self.app.artisanviewerMode:
             self.notificationManager = NotificationManager()
 
-        if sys.platform.startswith('darwin') and QVersionNumber.fromString(qVersion())[0] < QVersionNumber(6,5,0):
-            # only on macOS we install the eventFilter to catch the signal on switching between light and dark modes
-            self.installEventFilter(self)
+#        if sys.platform.startswith('darwin') and QVersionNumber.fromString(qVersion())[0] < QVersionNumber(6,5,0):
+#            # only on macOS we install the eventFilter to catch the signal on switching between light and dark modes
+#            self.installEventFilter(self)
 
 #PLUS
         self.updatePlusStatusSignal.connect(self.updatePlusStatusSlot)
@@ -14161,13 +14181,15 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.extratimexB = timex
 
                 if 'extraDelta1' in profile:
-                    self.extraDelta1 = profile['extraDelta1']
+                    self.extraDelta1 = profile['extraDelta1'][:self.nLCDS]
+                    self.extraDelta1 = self.extraDelta1 + [False]*max(0,self.nLCDS-len(self.extraDelta1))
                 else:
-                    self.extraDelta1 = [False]*len(names1x)
+                    self.extraDelta1 = [False]*self.nLCDS
                 if 'extraDelta2' in profile:
-                    self.extraDelta2 = profile['extraDelta2']
+                    self.extraDelta2 = profile['extraDelta2'][:self.nLCDS]
+                    self.extraDelta2 = self.extraDelta2 + [False]*max(0,self.nLCDS-len(self.extraDelta2))
                 else:
-                    self.extraDelta2 = [False]*len(names2x)
+                    self.extraDelta2 = [False]*self.nLCDS
 
                 # we fill_gaps for all background curves on load, not to have to re-compute those on most redraws
                 if self.qmc.interpolateDropsflag:
@@ -14370,14 +14392,22 @@ class ApplicationWindow(QMainWindow):
             self.qmc.extramathexpression2.append('')
 
             # ensure that the curves and LCDs of the new device are visible:
-            self.extraLCDvisibility1[n-1] = True
-            self.extraLCDvisibility2[n-1] = True
-            self.extraCurveVisibility1[n-1] = True
-            self.extraCurveVisibility2[n-1] = True
-            self.extraDelta1[n-1] = False
-            self.extraDelta2[n-1] = False
-            self.extraFill1[n-1] = 0
-            self.extraFill2[n-1] = 0
+            if len(self.extraLCDvisibility1)>n-1:
+                self.extraLCDvisibility1[n-1] = True
+            if len(self.extraLCDvisibility2)>n-1:
+                self.extraLCDvisibility2[n-1] = True
+            if len(self.extraCurveVisibility1)>n-1:
+                self.extraCurveVisibility1[n-1] = True
+            if len(self.extraCurveVisibility2)>n-1:
+                self.extraCurveVisibility2[n-1] = True
+            if len(self.extraDelta1)>n-1:
+                self.extraDelta1[n-1] = False
+            if len(self.extraDelta2)>n-1:
+                self.extraDelta2[n-1] = False
+            if len(self.extraFill1)>n-1:
+                self.extraFill1[n-1] = 0
+            if len(self.extraFill2)>n-1:
+                self.extraFill2[n-1] = 0
 
             #create new serial port (but don't open it yet). Store initial settings
             self.addSerialPort()
@@ -15242,6 +15272,24 @@ class ApplicationWindow(QMainWindow):
         self.qmc.extradevicecolor1 = self.qmc.extradevicecolor1 + ['#000000']*max(0,len(self.qmc.extradevices)-len(self.qmc.extradevicecolor1))
         self.qmc.extradevicecolor2 = self.qmc.extradevicecolor2[:len(self.qmc.extradevices)]
         self.qmc.extradevicecolor2 = self.qmc.extradevicecolor2 + ['#000000']*max(0,len(self.qmc.extradevices)-len(self.qmc.extradevicecolor2))
+        # with fixed length of self.nLCDS:
+        self.extraLCDvisibility1 = self.extraLCDvisibility1[:self.nLCDS]
+        self.extraLCDvisibility1 = self.extraLCDvisibility1 + [False]*max(0,self.nLCDS-len(self.extraLCDvisibility1))
+        self.extraLCDvisibility2 = self.extraLCDvisibility2[:self.nLCDS]
+        self.extraLCDvisibility2 = self.extraLCDvisibility2 + [False]*max(0,self.nLCDS-len(self.extraLCDvisibility2))
+        self.extraCurveVisibility1 = self.extraCurveVisibility1[:self.nLCDS]
+        self.extraCurveVisibility1 = self.extraCurveVisibility1 + [True]*max(0,self.nLCDS-len(self.extraCurveVisibility1))
+        self.extraCurveVisibility2 = self.extraCurveVisibility2[:self.nLCDS]
+        self.extraCurveVisibility2 = self.extraCurveVisibility2 + [True]*max(0,self.nLCDS-len(self.extraCurveVisibility2))
+        self.extraDelta1 = self.extraDelta1[:self.nLCDS]
+        self.extraDelta1 = self.extraDelta1 + [False]*max(0,self.nLCDS-len(self.extraDelta1))
+        self.extraDelta2 = self.extraDelta2[:self.nLCDS]
+        self.extraDelta2 = self.extraDelta2 + [False]*max(0,self.nLCDS-len(self.extraDelta2))
+        self.extraFill1 = self.extraFill1[:self.nLCDS]
+        self.extraFill1 = self.extraFill1 + [0]*max(0,self.nLCDS-len(self.extraFill1))
+        self.extraFill2 = self.extraFill2[:self.nLCDS]
+        self.extraFill2 = self.extraFill2 + [0]*max(0,self.nLCDS-len(self.extraFill2))
+
 
     def saveExtradeviceSettings(self) -> None:
         self.org_extradevicesettings = cast('ExtraDeviceSettings', {
@@ -15711,39 +15759,48 @@ class ApplicationWindow(QMainWindow):
                         self.qmc.extradevicecolor1 = [decodeLocalStrict(x, '#000000') for x in profile['extradevicecolor1']]
                     if 'extradevicecolor2' in profile:
                         self.qmc.extradevicecolor2 = [decodeLocalStrict(x, '#000000') for x in profile['extradevicecolor2']]
-
+                    ## lists of fixed length (self.nLCDS)
                     if 'extraLCDvisibility1' in profile:
-                        self.extraLCDvisibility1 = profile['extraLCDvisibility1']
+                        self.extraLCDvisibility1 = profile['extraLCDvisibility1'][:self.nLCDS]
+                        self.extraLCDvisibility1 = self.extraLCDvisibility1 + [False]*max(0,self.nLCDS-len(self.extraLCDvisibility1))
                     else:
                         self.extraLCDvisibility1 = [False]*self.nLCDS
                     if 'extraLCDvisibility2' in profile:
-                        self.extraLCDvisibility2 = profile['extraLCDvisibility2']
+                        self.extraLCDvisibility2 = profile['extraLCDvisibility2'][:self.nLCDS]
+                        self.extraLCDvisibility2 = self.extraLCDvisibility2 + [False]*max(0,self.nLCDS-len(self.extraLCDvisibility2))
                     else:
                         self.extraLCDvisibility2 = [False]*self.nLCDS
                     if 'extraCurveVisibility1' in profile:
-                        self.extraCurveVisibility1 = profile['extraCurveVisibility1']
+                        self.extraCurveVisibility1 = profile['extraCurveVisibility1'][:self.nLCDS]
+                        self.extraCurveVisibility1 = self.extraCurveVisibility1 + [True]*max(0,self.nLCDS-len(self.extraCurveVisibility1))
                     else:
-                        self.extraCurveVisibility1 = [False]*self.nLCDS
+                        self.extraCurveVisibility1 = [True]*self.nLCDS
                     if 'extraCurveVisibility2' in profile:
-                        self.extraCurveVisibility2 = profile['extraCurveVisibility2']
+                        self.extraCurveVisibility2 = profile['extraCurveVisibility2'][:self.nLCDS]
+                        self.extraCurveVisibility2 = self.extraCurveVisibility2 + [True]*max(0,self.nLCDS-len(self.extraCurveVisibility2))
                     else:
-                        self.extraCurveVisibility2 = [False]*self.nLCDS
+                        self.extraCurveVisibility2 = [True]*self.nLCDS
                     if 'extraDelta1' in profile:
-                        self.extraDelta1 = profile['extraDelta1']
+                        self.extraDelta1 = profile['extraDelta1'][:self.nLCDS]
+                        self.extraDelta1 = self.extraDelta1 + [False]*max(0,self.nLCDS-len(self.extraDelta1))
                     else:
                         self.extraDelta1 = [False]*self.nLCDS
                     if 'extraDelta2' in profile:
-                        self.extraDelta2 = profile['extraDelta2']
+                        self.extraDelta2 = profile['extraDelta2'][:self.nLCDS]
+                        self.extraDelta2 = self.extraDelta2 + [False]*max(0,self.nLCDS-len(self.extraDelta2))
                     else:
                         self.extraDelta2 = [False]*self.nLCDS
                     if 'extraFill1' in profile:
-                        self.extraFill1 = profile['extraFill1']
+                        self.extraFill1 = profile['extraFill1'][:self.nLCDS]
+                        self.extraFill1 = self.extraFill1 + [0]*max(0,self.nLCDS-len(self.extraFill1))
                     else:
                         self.extraFill1 = [0]*self.nLCDS
                     if 'extraFill2' in profile:
-                        self.extraFill2 = profile['extraFill2']
+                        self.extraFill2 = profile['extraFill2'][:self.nLCDS]
+                        self.extraFill2 = self.extraFill2 + [0]*max(0,self.nLCDS-len(self.extraFill2))
                     else:
                         self.extraFill2 = [0]*self.nLCDS
+                    ##
                     if 'extramarkersizes1' in profile:
                         self.qmc.extramarkersizes1 = [max(self.qmc.markersize_min, float(ms)) for ms in profile['extramarkersizes1']]
                     else:
@@ -16196,6 +16253,7 @@ class ApplicationWindow(QMainWindow):
             elif len(self.qmc.timex)>2:
                 self.qmc.profile_sampling_interval = (self.qmc.timex[-1] - self.qmc.timex[0])/(len(self.qmc.timex) -1)
             self.qmc.updateDeltaSamples()
+
             # Ramp/Soak Profiles
             if self.pidcontrol.loadRampSoakFromProfile and filename is not None:
                 self.loadRampSoakFromProfile(filename,profile)
@@ -16228,6 +16286,7 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.phases[2] = int(round(self.qmc.temp2[self.qmc.timeindex[2]]))
             # ensure that timeindex has the proper length
             self.qmc.timeindex = self.qmc.timeindex + [0 for _ in range(8-len(self.qmc.timeindex))]
+
             # reset linecount caches
             self.qmc.resetlinecountcaches()
             # try to reload background profile
@@ -16954,6 +17013,7 @@ class ApplicationWindow(QMainWindow):
             profile['moisture_greens'] = self.qmc.moisture_greens
             profile['greens_temp'] = self.qmc.greens_temp
             profile['moisture_roasted'] = self.qmc.moisture_roasted
+            self.ensureCorrectExtraDeviceListLength() # make sure that all extra device structures have consistent length
             profile['extradevices'] = self.qmc.extradevices
             profile['extraname1'] = [encodeLocalStrict(n, 'Extra 1') for n in self.qmc.extraname1]
             profile['extraname2'] = [encodeLocalStrict(n, 'Extra 2') for n in self.qmc.extraname2]

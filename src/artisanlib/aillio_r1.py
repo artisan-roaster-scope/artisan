@@ -642,14 +642,25 @@ class AillioR1:
 #            res['extraname2'] = ['RoR']
 #            res['extramathexpression1'] = ['']
 #            res['extramathexpression2'] = ['']
-#            res['extraLCDvisibility1'] = [temp3_visibility]
-#            res['extraLCDvisibility2'] = [temp4_visibility]
-#            res['extraCurveVisibility1'] = [temp3_visibility]
-#            res['extraCurveVisibility2'] = [temp4_visibility]
-#            res['extraDelta1'] = [False]
-#            res['extraDelta2'] = [True]
-#            res['extraFill1'] = [False]
-#            res['extraFill2'] = [False]
+###
+#            res['extraLCDvisibility1'] = [False] * aw.self.nLCDS
+#            res['extraLCDvisibility2'] = [False] * aw.self.nLCDS
+#            res['extraCurveVisibility1'] = [False] * aw.self.nLCDS
+#            res['extraCurveVisibility2'] = [False] * aw.self.nLCDS
+#            res['extraDelta1'] = [False] * aw.self.nLCDS
+#            res['extraDelta2'] = [False] * aw.self.nLCDS
+#            res['extraFill1'] = [0] * aw.self.nLCDS
+#            res['extraFill2'] = [0] * aw.self.nLCDS
+#            if aw.self.nLCDS>0:
+#               res['extraLCDvisibility1'][0] = temp3_visibility
+#               res['extraLCDvisibility2'][0] = temp4_visibility
+#               res['extraCurveVisibility1'][0] = temp3_visibility
+#               res['extraCurveVisibility2'][0] = temp4_visibility
+#               res['extraDelta1'][0] = False
+#               res['extraDelta2'][0] = True
+#               res['extraFill1'][0] = 0
+#               res['extraFill2'][0] = 0
+##
 #            res['extradevicecolor1'] = ['black']
 #            res['extradevicecolor2'] = ['black']
 #            res['extramarkersizes1'] = [6.0]

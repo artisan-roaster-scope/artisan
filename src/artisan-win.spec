@@ -148,6 +148,7 @@ a = Analysis(['artisan.py'],
              datas=datas, # + copy_metadata('tzdata')
              hookspath=[],
              runtime_hooks=[r'pyinstaller_hooks\rthooks\pyi_rth_mplconfig.py'], # overwrites default MPL runtime hook which keeps loading font cache from (new) temp directory
+             additional_hooks_dir=[],
              excludes=[],
              hiddenimports=hiddenimports_list,
              win_no_prefer_redirects=False,
