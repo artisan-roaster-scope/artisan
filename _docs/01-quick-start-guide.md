@@ -104,4 +104,4 @@ You can save your graphs under `File` >> `Save Graph` to various size formats or
 
 To review your own files you can use `File` >> `Open` and search for a file or use the list under `File` >> `Open Recent`.  When starting a roast you can choose `File` >> `New` and pick one of the previous Roast Profiles you may have saved.  
 
-##READY FOR YOUR FIRST ROAST
+## READY FOR YOUR FIRST ROAST
