@@ -16,6 +16,7 @@ BINARIES.extend([(os.path.join(phidgets_lib_path, fn),'Phidget22/.libs') for fn 
 
 # add missing Qt6QmlMeta.so
 BINARIES.append((os.path.join(get_package_paths('PyQt6')[1], 'Qt6/lib/libQt6QmlMeta.so.6'), 'PyQt6/Qt6/lib'))
+BINARIES.append((os.path.join(get_package_paths('PyQt6')[1], 'Qt6/lib/libQt6QmlWorkerScript.so.6'), 'PyQt6/Qt6/lib'))
 
 
 path=os.environ['HOME'] + '/artisan-master/src'
@@ -29,9 +30,6 @@ hiddenimports_list=[
     'matplotlib.backends.backend_pdf',
     'matplotlib.backends.backend_svg',
 #    'PyQt6.QtPositioning', # unclear
-#    'PyQt6.QtQmlMeta',  # does not exist!
-#    'PyQt6.QtQmlWorkerScript', # does not exist
-#    'PyQt6.OpenGL', # does not exist
     'PyQt6.QtWebChannel', ## Win incl., but did not help
     'PyQt6.QtWebEngineCore', ## Win incl.
 #    'PyQt6.QtQuick', # links to QmlMeta, but did not help
