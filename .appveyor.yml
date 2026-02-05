@@ -13,7 +13,7 @@
 # the GNU General Public License for more details.
 #
 # AUTHOR
-# Dave Baxter, Marko Luther 2025
+# Dave Baxter, Marko Luther 2026
 
 # Include "skip ci" in the commit message to prevent this build process from running
 environment:
@@ -24,10 +24,10 @@ environment:
   #PYUPGRADE_MACOS_V: 3.12.1  # when upgrading see the notes in the deploy phase
 
   matrix:
-#  - job_name: windows
-#    appveyor_build_worker_image: Visual Studio 2022
-#  - job_name: macos
-#    appveyor_build_worker_image: macos-ventura
+  - job_name: windows
+    appveyor_build_worker_image: Visual Studio 2022
+  - job_name: macos
+    appveyor_build_worker_image: macos-ventura
   - job_name: linux
     appveyor_build_worker_image: Ubuntu2204
 

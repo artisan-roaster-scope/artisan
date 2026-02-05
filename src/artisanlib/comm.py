@@ -247,7 +247,8 @@ class serialport:
         'YOCTOthread','YOCTOvoltageOutputs','YOCTOcurrentOutputs','YOCTOrelays','YOCTOservos','YOCTOpwmOutputs','HH506RAid','MS6514PrevTemp1','MS6514PrevTemp2','DT301PrevTemp','EXTECH755PrevTemp',\
         'controlETpid','readBTpid','useModbusPort','showFujiLCDs','arduinoETChannel','arduinoBTChannel','arduinoATChannel',\
         'ArduinoIsInitialized','ArduinoFILT','HH806Winitflag','R1','devicefunctionlist','externalprogram',\
-        'externaloutprogram','externaloutprogramFlag','PhidgetHUMtemp','PhidgetHUMhum','PhidgetPREpre','TMP1000temp', 'colorTrackSerial', 'colorTrackBT', 'CM_ET_readings_count', 'CM_BT_readings_count', 'CM_ET_sum_of_squared_differences', 'CM_BT_sum_of_squared_differences' ]
+        'externaloutprogram','externaloutprogramFlag','PhidgetHUMtemp','PhidgetHUMhum','PhidgetPREpre','TMP1000temp', 'colorTrackSerial', 'colorTrackBT',
+        'CM_reference_timeb', 'CM_ET_readings_count', 'CM_BT_readings_count', 'CM_ET_sum_of_squared_differences', 'CM_BT_sum_of_squared_differences' ]
 
     def __init__(self, aw:'ApplicationWindow') -> None:
 
@@ -333,6 +334,7 @@ class serialport:
         self.colorTrackSerial:ColorTrack|None = None
         self.colorTrackBT:ColorTrackBLE|None = None
 
+        self.CM_reference_timeb:float|None = None # set on adding first reading to detect updated horizontal background profile alignment which resets calculation
         self.CM_ET_readings_count:int = 0
         self.CM_BT_readings_count:int = 0
         self.CM_ET_sum_of_squared_differences:float = 0
@@ -1018,39 +1020,45 @@ class serialport:
     def CM_ETBT(self) -> tuple[float,float,float]:
         tx = self.aw.qmc.timeclock.elapsedMilli()
         try:
-            t1 = -1
-            t2 = -1
-            # update counts and sum_of_squared_differences
-            BTlimit = self.aw.qmc.phases[1]
-            BT = (self.aw.qmc.temp2[-1] if len(self.aw.qmc.temp2)>0 else -1)
-            if (BTlimit < BT and self.aw.qmc.timeindex[0] > -1 and
-                    (tx - self.aw.qmc.timex[self.aw.qmc.timeindex[0]] > 90) and
-                    self.aw.qmc.timeindex[6] == 0):
-                # BT above DRY END as specified in Phased dialog, at least 1:30m after CHARGE and before DROP is registered
-                ET = (self.aw.qmc.temp1[-1] if len(self.aw.qmc.temp1)>0 else -1)
-                nowB = self.aw.qmc.backgroundtime2index(tx) # points to the last entry if tx > all elements in btimex
-                ETB = (self.aw.qmc.temp1B[nowB] if len(self.aw.qmc.temp1B)>nowB>-1 else -1)
-                BTB = (self.aw.qmc.temp2B[nowB] if len(self.aw.qmc.temp2B)>nowB>-1 else -1)
-                if ET > -1 and ETB > -1:
-                    self.CM_ET_readings_count += 1
-                    ET_squared_diff = (ET - ETB)**2
-                    self.CM_ET_sum_of_squared_differences += ET_squared_diff
-                if BT > -1 and BTB > -1:
-                    self.CM_BT_readings_count += 1
-                    BT_squared_diff = (BT - BTB)**2
-                    self.CM_BT_sum_of_squared_differences += BT_squared_diff
-            elif self.aw.qmc.timeindex[0] == 0:
-                # if CHARGE is not set reset readings, keep readings otherwise (eg. after DROP)
-                self.CM_ET_readings_count = 0
-                self.CM_ET_sum_of_squared_differences = 0
-                self.CM_BT_readings_count = 0
-                self.CM_BT_sum_of_squared_differences = 0
-            # calc results
-            if self.CM_ET_readings_count > 0:
-                t1 = numpy.sqrt(self.CM_ET_sum_of_squared_differences / self.CM_ET_readings_count)
-            if self.CM_BT_readings_count > 0:
-                t2 = numpy.sqrt(self.CM_BT_sum_of_squared_differences / self.CM_BT_readings_count)
-            return tx,t2,t1
+            if self.aw.qmc.backgroundprofile is not None and len(self.aw.qmc.timeB)>0: # a non-empty background profile is loaded
+                # set CM reference timeb to first reading of the background profile, if any
+                first_timeb:float = self.aw.qmc.timeB[0]
+                t1 = -1
+                t2 = -1
+                # update counts and sum_of_squared_differences
+                BTlimit = self.aw.qmc.phases[1]
+                BT = (self.aw.qmc.temp2[-1] if len(self.aw.qmc.temp2)>0 else -1)
+                if (BTlimit < BT and self.aw.qmc.timeindex[0] > -1 and
+                        (self.CM_reference_timeb is None or self.CM_reference_timeb == first_timeb) and
+                        (tx - self.aw.qmc.timex[self.aw.qmc.timeindex[0]] > 90) and
+                        self.aw.qmc.timeindex[6] == 0):
+                    # BT above DRY END as specified in Phased dialog, at least 1:30m after CHARGE and before DROP is registered
+                    ET = (self.aw.qmc.temp1[-1] if len(self.aw.qmc.temp1)>0 else -1)
+                    nowB = self.aw.qmc.backgroundtime2index(tx) # points to the last entry if tx > all elements in btimex (-1 if btime is empty!)
+                    ETB = (self.aw.qmc.temp1B[nowB] if len(self.aw.qmc.temp1B)>nowB>-1 else -1)
+                    BTB = (self.aw.qmc.temp2B[nowB] if len(self.aw.qmc.temp2B)>nowB>-1 else -1)
+                    if ET > -1 and ETB > -1:
+                        self.CM_ET_readings_count += 1
+                        ET_squared_diff = (ET - ETB)**2
+                        self.CM_ET_sum_of_squared_differences += ET_squared_diff
+                    if BT > -1 and BTB > -1:
+                        self.CM_BT_readings_count += 1
+                        BT_squared_diff = (BT - BTB)**2
+                        self.CM_BT_sum_of_squared_differences += BT_squared_diff
+                    self.CM_reference_timeb = first_timeb
+                elif self.aw.qmc.timeindex[0] == 0 or (self.CM_reference_timeb is not None and self.CM_reference_timeb != first_timeb):
+                    # if CHARGE is not set reset readings, keep readings otherwise (eg. after DROP)
+                    self.CM_reference_timeb = None
+                    self.CM_ET_readings_count = 0
+                    self.CM_ET_sum_of_squared_differences = 0
+                    self.CM_BT_readings_count = 0
+                    self.CM_BT_sum_of_squared_differences = 0
+                # calc results
+                if self.CM_ET_readings_count > 0:
+                    t1 = numpy.sqrt(self.CM_ET_sum_of_squared_differences / self.CM_ET_readings_count)
+                if self.CM_BT_readings_count > 0:
+                    t2 = numpy.sqrt(self.CM_BT_sum_of_squared_differences / self.CM_BT_readings_count)
+                return tx,t2,t1
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
         return tx, -1, -1

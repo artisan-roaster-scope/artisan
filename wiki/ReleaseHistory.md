@@ -2,6 +2,18 @@ Detailed Release History
 ========================
 
 ----
+v4.0.1
+------------------
+
+* CHANGES
+  - event replay is OFF by default for all event types
+  - reset CM ET/BT device calculation on background profile horizontal re-alignment
+
+* FIXES
+  - fixes regression where cut/copy/paste shortcuts are not working in file selector dialogs ([Issue #2114](../../../issues/2114))
+  - fixes build issues which broke PDF reports on Linux and macOS ([Issue #2113](../../../issues/2113))
+
+----
 v4.0.0 (Jan 28, 2026)
 ------------------
 

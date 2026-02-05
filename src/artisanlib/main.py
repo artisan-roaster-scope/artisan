@@ -685,13 +685,6 @@ if QtWebEngineSupport:
     _log.info('QtWebEngine found => PDF report rendering enabled')
 else:
     _log.info('QtWebEngine not found => PDF report rendering disabled')
-    # temp test
-    try:
-        from PyQt6.QtWebEngineWidgets import QWebEngineView
-        from PyQt6.QtWebEngineCore import QWebEngineProfile
-    except Exception as e: # pylint: disable=broad-except
-        _log.exception(e)
-
 
 if platform.system().startswith('Windows'):
     # on Windows we use the Fusion style per default which supports the dark mode
@@ -27916,8 +27909,6 @@ def main() -> None:
     appWindow.restoreExtraDeviceSettingsBackup() # load settings backup if it exists (like on RESET)
     _log.info('loaded %s settings in %.2fs', len(QSettings().allKeys()), libtime.process_time() - start_time)
 #    _log.debug("PRINT mpl.get_cachedir(): %s",mpl.get_cachedir())
-
-    _log.debug('PRINT QLibraryInfo.LibraryPath.TranslationsPath: %s', QLibraryInfo.path(QLibraryInfo.LibraryPath.TranslationsPath))
 
     appWindow.set_ui_mode(appWindow.ui_mode)
 

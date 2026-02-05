@@ -1820,7 +1820,7 @@ class tgraphcanvas(QObject):
         self.specialeventannotations:list[str] = ['','','','']
         self.specialeventannovisibilities:list[int] = [0,0,0,0]
         self.specialeventplaybackaid:list[bool] = [True, True, True, True]          # per event type decides if playback aid is active (note that eventtype 4 "--" is not replayed)
-        self.specialeventplayback:list[bool] = [True, True, True, True]             # per event type decides if background events are play-backed or not
+        self.specialeventplayback:list[bool] = [False, False, False, False]         # per event type decides if background events are play-backed or not
         self.specialeventplaybackramp:list[bool] = [False, False, False, False]     # per event type decides if playback ramping is applied or not
         self.ramp_lookahead:int = 0 # lookahead of ramping event replay in seconds
         self.overlappct:int = 100
