@@ -1493,6 +1493,7 @@ class ApplicationWindow(QMainWindow):
         'lcd6', 'lcd7', 'label2', 'label3', 'label4', 'label5', 'label6', 'label7', 'extraLCD1', 'extraLCD2', 'extraLCDlabel1', 'extraLCDlabel2',
         'extraLCDframe1', 'extraLCDframe2', 'extraLCDvisibility1', 'extraLCDvisibility2', 'extraCurveVisibility1', 'extraCurveVisibility2',
         'extraDelta1', 'extraDelta2', 'extraFill1', 'extraFill2', 'channel_tare_values', 'messagehist', 'eventlabel', 'eNumberSpinBox',
+        'extraDelta1b', 'extraDelta2b',
         'lineEvent', 'etypeComboBox', 'valueEdit', 'etimeline', 'buttonminiEvent', 'buttonlist', 'buttonStates', 'lastbuttonpressed', 'buttonlistmaxlen',
         'buttonpalette_default_label', 'buttonpalette_label', 'buttonpalettemaxlen_min', 'buttonpalettemaxlen_max',
         'buttonpalettemaxlen_default', 'buttonpalettemaxlen', 'buttonpalette_shortcuts', 'buttonsize_default', 'buttonsize',
@@ -3432,6 +3433,8 @@ class ApplicationWindow(QMainWindow):
         self.extraCurveVisibility2: list[bool] = [True]*self.nLCDS
         self.extraDelta1: list[bool] = [False]*self.nLCDS
         self.extraDelta2: list[bool] = [False]*self.nLCDS
+        self.extraDelta1b: list[bool] = [False]*self.nLCDS # background curves
+        self.extraDelta2b: list[bool] = [False]*self.nLCDS # background curves
         self.extraFill1: list[int] = [0]*self.nLCDS # alpha values 0-100 in % of fill between extra curve and x-axis
         self.extraFill2: list[int] = [0]*self.nLCDS # alpha values 0-100 in % of fill between extra curve and x-axis
         for i in range(self.nLCDS):
@@ -14180,15 +14183,15 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.extratimexB = timex
 
                 if 'extraDelta1' in profile:
-                    self.extraDelta1 = profile['extraDelta1'][:self.nLCDS]
-                    self.extraDelta1 = self.extraDelta1 + [False]*max(0,self.nLCDS-len(self.extraDelta1))
+                    self.extraDelta1b = profile['extraDelta1'][:self.nLCDS]
+                    self.extraDelta1b = self.extraDelta1b + [False]*max(0,self.nLCDS-len(self.extraDelta1b))
                 else:
-                    self.extraDelta1 = [False]*self.nLCDS
+                    self.extraDelta1b = self.extraDelta1[:] # by default use the same y-axis as the foreground extra devices
                 if 'extraDelta2' in profile:
-                    self.extraDelta2 = profile['extraDelta2'][:self.nLCDS]
-                    self.extraDelta2 = self.extraDelta2 + [False]*max(0,self.nLCDS-len(self.extraDelta2))
+                    self.extraDelta2b = profile['extraDelta2'][:self.nLCDS]
+                    self.extraDelta2b = self.extraDelta2b + [False]*max(0,self.nLCDS-len(self.extraDelta2b))
                 else:
-                    self.extraDelta2 = [False]*self.nLCDS
+                    self.extraDelta2b = self.extraDelta2[:] # by default use the same y-axis as the foreground extra devices
 
                 # we fill_gaps for all background curves on load, not to have to re-compute those on most redraws
                 if self.qmc.interpolateDropsflag:

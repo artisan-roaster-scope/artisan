@@ -9772,7 +9772,7 @@ class tgraphcanvas(QObject):
                                     # re-smooth the extra background curve
                                     tx_lin = numpy.linspace(tx[0],tx[-1],len(tx))
                                 if self.xtcurveidx % 2:
-                                    if len(self.aw.extraDelta1)>n3 and self.aw.extraDelta1[n3] and self.delta_ax is not None:
+                                    if len(self.aw.extraDelta1b)>n3 and self.aw.extraDelta1b[n3] and self.delta_ax is not None:
                                         trans = self.delta_ax.transData
                                     else:
                                         trans = self.ax.transData
@@ -9784,7 +9784,7 @@ class tgraphcanvas(QObject):
                                     else:
                                         stemp3B = self.stemp1BX[n3]
                                 else:
-                                    if len(self.aw.extraDelta2)>n3 and self.aw.extraDelta2[n3] and self.delta_ax is not None:
+                                    if len(self.aw.extraDelta2b)>n3 and self.aw.extraDelta2b[n3] and self.delta_ax is not None:
                                         trans = self.delta_ax.transData
                                     else:
                                         trans = self.ax.transData
@@ -9829,7 +9829,7 @@ class tgraphcanvas(QObject):
                                     else:
                                         tx_lin = None
                                 if self.ytcurveidx % 2:
-                                    if len(self.aw.extraDelta1)>n4 and self.aw.extraDelta1[n4] and self.delta_ax is not None:
+                                    if len(self.aw.extraDelta1b)>n4 and self.aw.extraDelta1b[n4] and self.delta_ax is not None:
                                         trans = self.delta_ax.transData
                                     else:
                                         trans = self.ax.transData
@@ -9841,7 +9841,7 @@ class tgraphcanvas(QObject):
                                     else:
                                         stemp4B = self.stemp1BX[n4]
                                 else:
-                                    if len(self.aw.extraDelta2)>n4 and self.aw.extraDelta2[n4] and self.delta_ax is not None:
+                                    if len(self.aw.extraDelta2b)>n4 and self.aw.extraDelta2b[n4] and self.delta_ax is not None:
                                         trans = self.delta_ax.transData
                                     else:
                                         trans = self.ax.transData
