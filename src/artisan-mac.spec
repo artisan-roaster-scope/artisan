@@ -287,7 +287,7 @@ qt_plugin_files = [
     'libqjpeg.dylib',
 #    'libqmacjp2.dylib',
 #    'libqpdf.dylib',
-	'libqsvg.dylib',
+    'libqsvg.dylib',
 #    'libqtga.dylib',
 #   'libqtiff.dylib',
 #    'libqwbmp.dylib',
@@ -296,7 +296,6 @@ qt_plugin_files = [
     'libcocoaprintersupport.dylib',
     'libqmacstyle.dylib'
 ]
-
 
 ## remove unused Qt frameworks libs (not in Qt_modules_frameworks)
 for subdir, dirs, _files in os.walk('./Artisan.app/Contents/Frameworks/PyQt6/Qt6/lib'):

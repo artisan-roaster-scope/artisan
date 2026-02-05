@@ -14,7 +14,7 @@ BINARIES.extend([(os.path.join(yocto_lib_path, fn),'yoctopuce/cdll') for fn in o
 phidgets_lib_path = os.path.join(get_package_paths('Phidget22')[1], '.libs')
 BINARIES.extend([(os.path.join(phidgets_lib_path, fn),'Phidget22/.libs') for fn in os.listdir(phidgets_lib_path) if fn.endswith('.so')])
 
-# add missing Qt6QmlMeta.so
+# add missing QtWebEngine shared libs
 BINARIES.append((os.path.join(get_package_paths('PyQt6')[1], 'Qt6/lib/libQt6QmlMeta.so.6'), 'PyQt6/Qt6/lib'))
 BINARIES.append((os.path.join(get_package_paths('PyQt6')[1], 'Qt6/lib/libQt6QmlWorkerScript.so.6'), 'PyQt6/Qt6/lib'))
 
@@ -29,13 +29,9 @@ if not os.path.isdir(path):
 hiddenimports_list=[
     'matplotlib.backends.backend_pdf',
     'matplotlib.backends.backend_svg',
-#    'PyQt6.QtPositioning', # unclear
+    'PyQt6.QtPositioning',
     'PyQt6.QtWebChannel', ## Win incl., but did not help
     'PyQt6.QtWebEngineCore', ## Win incl.
-#    'PyQt6.QtQuick', # links to QmlMeta, but did not help
-#    'PyQt6.QtWebEngineQuick', # links to QmlMeta, but did not help
-#    'PyQt6.QtQml',  # unclear, but did not help
-#    'PyQt6.QtQuick3D', # links to QmlMeta, not tried yet
     'babel.numbers'  # should not be needed as it got fixed in pyinstaller 6.11
 ] + collect_submodules('dbus_fast')
 
@@ -62,10 +58,16 @@ EXCLUDES = [
 #    'PyQt6.QtWebEngineQuick'
 ]
 
+
+DATA_FILES = [
+#    (os.path.join(get_package_paths('PyQt6')[1], 'Qt6/translations/qtwebengine_locales/en-US.pak'), 'locales')
+    (os.path.join(get_package_paths('PyQt6')[1], 'Qt6/translations/qtwebengine_locales/en-US.pak'), 'PyQt6/Qt6/translations/qtwebengine_locale')
+]
+
 a = Analysis(['artisan.py'],
     pathex=[path],
     binaries=BINARIES,
-    datas=[],
+    datas=DATA_FILES,
     hookspath=[],
     runtime_hooks=['./pyinstaller_hooks/rthooks/pyi_rth_mplconfig.py'], # overwrites default MPL runtime hook which keeps loading font cache from (new) temp directory
 #    excludes=EXCLUDES,

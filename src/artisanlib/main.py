@@ -27917,6 +27917,8 @@ def main() -> None:
     _log.info('loaded %s settings in %.2fs', len(QSettings().allKeys()), libtime.process_time() - start_time)
 #    _log.debug("PRINT mpl.get_cachedir(): %s",mpl.get_cachedir())
 
+    _log.debug('PRINT QLibraryInfo.LibraryPath.TranslationsPath: %s', QLibraryInfo.path(QLibraryInfo.LibraryPath.TranslationsPath))
+
     appWindow.set_ui_mode(appWindow.ui_mode)
 
     # inform the user the debug logging is on
