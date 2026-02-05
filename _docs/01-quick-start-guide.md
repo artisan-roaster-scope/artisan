@@ -46,25 +46,24 @@ New as of 2026 are User Interface Modes:  Standard, Expert, and Production.  Art
 
 1.	`Config` >> `Temperature`  
 Pick ˚F or ˚C.
-2.	Run `Config` >> `Machine`, or set up your devices, and make sure the LCDs show your temps.  Some of these configurations will change the sampling rate and that’s ok.  
+2.	Run `Config` >> `Machine` and make sure the LCDs show your temps.  Some of these configurations will change the sampling rate of the temperature readings, and that’s ok. If your LCD's don't show your temperatures, make sure your devices are connected correctly and that you have chosen the correct machine configuration.  
 3.	`Config`>> `Events` and `Config` >> `Alarms`  
 This is where you will focus your most time in setting things up the first time.  `Config` >> [`Events`](https://artisan-scope.org/docs/events/) and `Config` >> [`Alarms`](https://artisan-scope.org/docs/alarms/)  
-These are critical, but they also take some work.  For this step it's really critical that you read the QSG in detail. First thing decide if you will use buttons or sliders to record gas changes. Decide which boxes you want to check, including `Auto DROP` and `Auto CHARGE`. I use `Auto DROP` and `Auto CHARGE`. If you use `Auto CHARGE`, make sure you hit Start at least 10 seconds before you drop your beans.  I mark TP, MET and I show the Time Guide. For both Buttons and Alarms, there are additional settings in Expert Mode.  
+These are critical, but they also take some work. Although if your temps are being read, you can start with the defaults,it's really critical that you read the QSG in detail so that you get the broad perspective of possiblities.  Decide which boxes you want to check, including `Auto DROP` and `Auto CHARGE`. I use `Auto DROP` and `Auto CHARGE`. If you use `Auto CHARGE`, make sure you hit Start at least 10 seconds before you drop your beans.  I mark TP, MET and I show the Time Guide. For both Buttons and Alarms, there are additional settings in Expert Mode.  If you want to configure buttons or sliders to record gas changes you will need to be in Expert mode.
 4.	`Config` >> [`Axes`](https://artisan-scope.org/docs/axes/)  
-Check Auto, and set your range for your Temperature and Delta axes. Starting points could be 0-500 ˚F and 0-40˚F/min, or 0-250˚C and 0-20˚C/min.
+See if the defaults are what you might expect and make adjustments if you think you need them. 
 5.	`Config` >> [`Batch`](https://artisan-scope.org/docs/batches/)  
 Choose a prefix name and turn on the counter. 
 6.	`Config` >> [`Autosave`](https://artisan-scope.org/docs/autosave/)  
-Check autosave and add to recent. Choose a location and set the path.   If you use cloud storage, you can access your profiles from any device anywhere.  Choose a file name prefix. Check the Help screen to decide what to include. See the Quick Start Guide for examples. If you don't use Autosave, then use `File` >> `Report` and `File` >> `Save Graph`  
-to export reports on your roasts and graphs to post. You can use “;” to take a screenshot. 
+Check autosave and add to recent. Choose a location and set the path.   If you use cloud storage, you can access your profiles from any device anywhere.  Choose a file name prefix. Check the Help screen to decide what to include. See the Quick Start Guide for examples. If you don't use Autosave, then use `File` >> `Report`, or `File` >> `Save Graph` to export reports on your roasts and graphs to post. You can use “;” to take a screenshot. Use `File` >> `Save To` for the profile itself. 
 7.	`Config` >> [`Phases`](https://artisan-scope.org/docs/phases/)  
 For Phases LCD mode, choose time for Drying, Temp for Maillard, and check the box Phases LCD All in the Finishing Line. Other choices are yours.
 8.	`Roast` >> [`Properties`](https://artisan-scope.org/docs/properties/)  
-Fill in the information and start saving the various roast profiles that you may use again. You can click on the Roast Properties line on top of the graph to open the Roast Properties dialog.
+Fill in the information and start saving the various roast profiles that you may use again as described in Step 6. You can click on the Roast Title line on top of the graph to open the Roast Properties dialog.
 6.	 Tools Menu  
 Once you have roasted a few batches, go back and read the documentation on the items in the Tools menu:  Comparator and Designer.  In Expert mode you will also have Analyzer,Simulator, Wheel Graph, Transposer and Calculator.
 7.	[Shortcuts](https://artisan-scope.org/docs/shortcuts/)  
-Go to `Help` >> `Shortcuts` to see how to enable them and see what keyboard shortcuts are available.  
+Go to `Help` >> `Shortcuts` to see what keyboard shortcuts are available.  
 8.	Standard Mode personalization  
  `Config` >> [Themes](https://artisan-scope.org/docs/themes/) to explore the options.    
 
