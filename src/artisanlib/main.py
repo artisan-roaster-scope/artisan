@@ -2802,7 +2802,7 @@ class ApplicationWindow(QMainWindow):
             self.htmlAction,
             self.printAction,
             self.quitAction,
-#            # edit menu
+#            # edit menu (not disabled to have same working in file dialogs)
 #            self.cutAction,
 #            self.copyAction,
 #            self.pasteAction,
