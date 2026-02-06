@@ -11,18 +11,18 @@ author_profile: false
 
 
 gallery:
-  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v4.0.0/artisan-win-x64-4.0.0-setup.exe
+  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v4.0.2/artisan-win-x64-4.0.2-setup.exe
     image_path: /assets/images/download-icon-windows.svg
     alt: "Windows"
     title: "Windows"
-  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v4.0.0/artisan-mac-arm-4.0.0.dmg
+  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v4.0.2/artisan-mac-arm-4.0.2.dmg
     image_path: /assets/images/download-icon-macos-arm.svg
     alt: "macOS ARM"
     title: "macOS ARM"
     
 
 gallery_legacy:
-  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v4.0.0/artisan-mac-intel-4.0.0.dmg
+  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v4.0.2/artisan-mac-intel-4.0.2.dmg
     image_path: /assets/images/download-icon-macos-intel.svg
     alt: "macOS Intel"
     title: "macOS Intel"
@@ -30,7 +30,7 @@ gallery_legacy:
     image_path: /assets/images/download-icon-linux.svg
     alt: "Linux"
     title: "Linux"
-  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v4.0.0/artisan-linux-4.0.0_PiOS64-trixie.deb
+  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v4.0.2/artisan-linux-4.0.2_PiOS64-trixie.deb
     image_path: /assets/images/download-icon-rpi-trixie.svg
     alt: "RPi Trixie"
     title: "RPi Trixie"
@@ -44,7 +44,7 @@ gallery_legacy:
         <img fetchpriority="high" src="https://img.shields.io/github/downloads/artisan-roaster-scope/artisan/latest/total?logo=github&amp;label=downloads&amp;color=f5f5f5&amp;labelColor=9C9C9C&amp;style=flat" alt="Github Latest Releases" class="align-right" />
     </span>
 </p>
-**artisan 4**
+**artisan 4.0.2**
 {: style="color: #4C97C3; font-size: larger; text-align: center; font-weight:bold;" }
 ---
 Help keep **<span style="color: #4C97C3;">artisan</span>** free for personal and commercial use by [sending a donation](/donate) 

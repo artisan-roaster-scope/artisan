@@ -10,15 +10,15 @@ author: Marko Luther
 author_profile: false
 
 gallery:
-  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v4.0.0/artisan-linux-4.0.0.AppImage
+  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v4.0.2/artisan-linux-4.0.2.AppImage
     image_path: /assets/images/download-icon-linux-AppImage.svg
     alt: "Linux AppImage"
     title: "Linux AppImage"
-  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v4.0.0/artisan-linux-4.0.0.deb
+  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v4.0.2/artisan-linux-4.0.2.deb
     image_path: /assets/images/download-icon-linux-deb.svg
     alt: "Linux deb"
     title: "Linux deb"
-  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v4.0.0/artisan-linux-4.0.0.rpm
+  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v4.0.2/artisan-linux-4.0.2.rpm
     image_path: /assets/images/download-icon-linux-rpm.svg
     alt: "Linux rpm"
     title: "Linux rpm"
@@ -36,7 +36,7 @@ gallery:
         <img fetchpriority="high" src="https://img.shields.io/github/downloads/artisan-roaster-scope/artisan/latest/total?logo=github&amp;label=downloads&amp;color=f5f5f5&amp;labelColor=9C9C9C&amp;style=flat" alt="Github Latest Releases" class="align-right" />
     </span>
 </p>
-**artisan 4**
+**artisan 4.0.2**
 {: style="color: #4C97C3; font-size: larger; text-align: center; font-weight:bold;" }
 ---
 Help keep **<span style="color: #4C97C3;">artisan</span>** free for personal and commercial use by [sending a donation](/donate) 
