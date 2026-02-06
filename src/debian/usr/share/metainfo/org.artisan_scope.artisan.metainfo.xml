@@ -70,6 +70,23 @@
 
   <releases>
 
+     <release version="4.0.2" date="2026-02-07">
+      <url type="details">https://github.com/artisan-roaster-scope/artisan/releases/tag/v4.0.2</url>
+      <description>
+        <p>CHANGES</p>
+        <ul>
+          <li>event replay is OFF by default for all event types</li>
+          <li>reset CM ET/BT device calculation on background profile horizontal re-alignment</li>
+        </ul>
+        <p>FIXES</p>
+        <ul>
+          <li>fixes regression where cut/copy/paste shortcuts are not working in file selector dialogs (Issue #2114)</li>
+          <li>fixes build issues which broke PDF reports on Linux and macOS (Issue #2113)</li>
+          <li>fixes issue with delta axis assignents in extra device setups on loading background profiles</li>
+        </ul>
+      </description>
+    </release>
+
     <release version="4.0.0" date="2026-01-27">
       <url type="details">https://github.com/artisan-roaster-scope/artisan/releases/tag/v4.0.0</url>
       <description>

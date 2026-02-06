@@ -2,7 +2,7 @@ Detailed Release History
 ========================
 
 ----
-v4.0.1
+v4.0.2 (Feb 7, 2026)
 ------------------
 
 * CHANGES
@@ -12,6 +12,7 @@ v4.0.1
 * FIXES
   - fixes regression where cut/copy/paste shortcuts are not working in file selector dialogs ([Issue #2114](../../../issues/2114))
   - fixes build issues which broke PDF reports on Linux and macOS ([Issue #2113](../../../issues/2113))
+  - fixes issue with delta axis assignents in extra device setups on loading background profiles
 
 ----
 v4.0.0 (Jan 28, 2026)

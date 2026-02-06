@@ -1,11 +1,17 @@
-artisan (4.0.0-0) precise; urgency=low
+artisan (4.0.2-0) precise; urgency=low
+  * new upstream release
+  * changes since 4.0.0:
+   - bug fixes
+ --  <marko.luther@gmx.net>  Sat, 7 Jan 2026 19:32:14 +0200
+
+ artisan (4.0.0-0) precise; urgency=low
   * new upstream release
   * changes since 3.4.0:
    - adds UI modes
    - adds generalized 2DOF PID
    - performance improvements
    - bug fixes
- --  <marko.luther@gmx.net>  Wed, 28 Jan 2025 19:32:14 +0200
+ --  <marko.luther@gmx.net>  Wed, 28 Jan 2026 19:32:14 +0200
 
 artisan (3.4.0-0) precise; urgency=low
   * new upstream release
