@@ -28,7 +28,7 @@ import usb.core # type: ignore[import-untyped] # ty:ignore[ignore]
 import usb.util # type: ignore[import-untyped] # ty:ignore[ignore]
 
 if system().startswith('Windows'):
-    import libusb_package # pyright:ignore[reportMissingImports] # pylint: disable=import-error # ty:ignore[unresolved-import]
+    import libusb_package # type: ignore[import-not-found, unused-ignore] # pyright:ignore[reportMissingImports] # pylint: disable=import-error
 
 
 import logging

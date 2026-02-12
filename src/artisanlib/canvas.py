@@ -416,7 +416,7 @@ class tgraphcanvas(QObject):
 
 
         # standard math functions allowed in symbolic formulas
-        self.mathdictionary_base:dict[str,float|Callable[[Any], float]|Callable[[Any, Any], float]] = {
+        self.mathdictionary_base:dict[str,float|Callable[[Any], float]|Callable[[Any, Any], float]] = { # zuban:ignore[assignment,unused-ignore]
             'min':min,'max':max,'sin':math.sin,'cos':math.cos,'tan':math.tan,
             'pow':math.pow,'exp':math.exp,'pi':math.pi,'e':math.e,
             'abs':abs,'acos':math.acos,'asin':math.asin,'atan':math.atan,
@@ -6052,11 +6052,12 @@ class tgraphcanvas(QObject):
             try:
                 if beep:
                     QApplication.beep()
+                alarm_description = string.split('#') # first part is the action description, second part the alarm comment
                 if action == 0:
                     self.showAlarmPopupSignal.emit(string,self.alarm_popup_timout)
                 elif action == 1:
                     # alarm call program
-                    fname = string.split('#')[0]
+                    fname = alarm_description[0]
         # take c the QDir().current() directory changes with loads and saves
         #            QDesktopServices.openUrl(QUrl("file:///" + str(QDir().current().absolutePath()) + "/" + fname, QUrl.ParsingMode.TolerantMode))
 #                    if False: # and platform.system() == 'Windows': # this Windows version fails on commands with arguments # pylint: disable=condition-evals-to-constant,using-constant-test
@@ -6089,7 +6090,7 @@ class tgraphcanvas(QObject):
                         self.adderror(QApplication.translate('Message','Calling alarm failed on {0}').format(fname))
                 elif action == 2:
                     # alarm event button, a comma separated list of button specifications with an optional trailing comment after a hash symbol
-                    text = string.split('#')[0]
+                    text = alarm_description[0]
                     bnrs = text.split(',')
                     for bnr in bnrs:
                         button_number:int|None = None           # the referenced button number
@@ -6108,7 +6109,7 @@ class tgraphcanvas(QObject):
                     # alarm slider 1-4
                     slidernr = None
                     try:
-                        text = string.split('#')[0].strip()
+                        text = alarm_description[0].strip()
                         if action == 3:
                             slidernr = 0
                         elif action == 4:
@@ -6198,7 +6199,7 @@ class tgraphcanvas(QObject):
                 elif action == 21:
                     # SV slider alarm
                     try:
-                        text = string.split('#')[0]
+                        text = alarm_description[0]
                         sv = float(str(text))
                         if self.device == 0:
                             if sv != self.aw.fujipid.sv:
@@ -6229,8 +6230,10 @@ class tgraphcanvas(QObject):
                 elif action == 25:
                     # Reset Canvas Color
                     self.aw.resetCanvasColorSignal.emit()
-
-                self.aw.sendmessageSignal.emit(QApplication.translate('Message','Alarm {0} triggered').format(number), True, None)
+                alarm_comment:str = ''
+                if len(alarm_description)>1:
+                    alarm_comment = f': {alarm_description[1]}'
+                self.aw.sendmessageSignal.emit(QApplication.translate('Message','Alarm {0} triggered').format(number) + alarm_comment, True, None)
             except Exception as ex: # pylint: disable=broad-except
                 _log.exception(ex)
                 _, _, exc_tb = sys.exc_info()
@@ -6817,7 +6820,7 @@ class tgraphcanvas(QObject):
     def eval_math_expression(self,mathexpression:str, t:float, equeditnumber:int|None = None,
                 RTsname:str|None = None, RTsval:float|None = None, t_offset:float = 0.) -> float:
         if len(mathexpression):
-            mathdictionary:dict[str,None|float|Callable[[Any], float|None]|Callable[[Any, Any], float|None]] = {}
+            mathdictionary:dict[str,None|float|Callable[[Any], float|None]|Callable[[Any, Any], float|None]] = {} # zuban:ignore[assignment,unused-ignore]
             mathdictionary.update(self.mathdictionary_base) # extend by the standard math symbolic formulas
 
             if self.flagstart or not self.flagon:
@@ -7891,7 +7894,6 @@ class tgraphcanvas(QObject):
             self.scheduleID = None
             self.scheduleDate = None
 
-            self.aw.sendmessage(QApplication.translate('Message','Scope has been reset'))
             self.aw.AUClcd.setNumDigits(3)
             self.aw.buttonFCs.setDisabled(False)
             self.aw.buttonFCe.setDisabled(False)
@@ -8212,6 +8214,8 @@ class tgraphcanvas(QObject):
             pass
 
 
+        self.aw.sendmessage(QApplication.translate('Message','Scope has been reset'))
+
         #QApplication.processEvents() # this one seems to be needed for a proper redraw in fullscreen mode on OS X if a profile was loaded and NEW is pressed
         #   this processEvents() seems not to be needed any longer!?
         return True
@@ -8265,12 +8269,12 @@ class tgraphcanvas(QObject):
                     res = ys[hwl:-hwl]
                     if len(res)+1 == len(y) and len(res) > 0:
                         try:
-                            return ys[hwl-1:-hwl]
+                            return ys[hwl-1:-hwl] # zuban:ignore[return-value,unused-ignore]
                         except Exception: # pylint: disable=broad-except
                             return y
                     elif len(res) != len(y):
                         return y
-                    return res
+                    return res # zuban:ignore[return-value,unused-ignore]
                 return y
             return y
         except Exception as ex: # pylint: disable=broad-except
@@ -13015,9 +13019,9 @@ class tgraphcanvas(QObject):
                 self.samplingAction()
             self.StopAsyncSamplingAction()
             self.aw.AsyncSamplingTimer = QTimer()
-            self.aw.AsyncSamplingTimer.timeout.connect(self.AsyncSamplingActionTrigger) # ty:ignore[possibly-missing-attribute]
-            self.aw.AsyncSamplingTimer.setSingleShot(True) # ty:ignore[possibly-missing-attribute]
-            self.aw.AsyncSamplingTimer.start(int(round(self.extra_event_sampling_delay))) # ty:ignore[possibly-missing-attribute]
+            self.aw.AsyncSamplingTimer.timeout.connect(self.AsyncSamplingActionTrigger)
+            self.aw.AsyncSamplingTimer.setSingleShot(True)
+            self.aw.AsyncSamplingTimer.start(int(round(self.extra_event_sampling_delay)))
 
     @pyqtSlot()
     def StartAsyncSamplingAction(self) -> None:
@@ -13289,8 +13293,8 @@ class tgraphcanvas(QObject):
                         serial=hottop_serial,
                         connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('Hottop'),True,None),
                         disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('Hottop'),True,None))
-                    self.aw.hottop.setLogging(self.device_logging) # ty:ignore[possibly-missing-attribute]
-                    self.aw.hottop.start() # ty:ignore[possibly-missing-attribute]
+                    self.aw.hottop.setLogging(self.device_logging)
+                    self.aw.hottop.start()
                 elif self.device == 134:
                     # connect Santoker
                     from artisanlib.santoker import Santoker
@@ -13314,29 +13318,29 @@ class tgraphcanvas(QObject):
                         fcs_handler=lambda : (self.markFCsSignal.emit(False) if (len(self.aw.santokerEventFlags)>2 and self.aw.santokerEventFlags[2] and self.timeindex[2] == 0) else None),
                         scs_handler=lambda : (self.markSCsSignal.emit(False) if (len(self.aw.santokerEventFlags)>4 and self.aw.santokerEventFlags[4] and self.timeindex[4] == 0) else None),
                         drop_handler=lambda : (self.markDropSignal.emit(False) if (len(self.aw.santokerEventFlags)>6 and self.aw.santokerEventFlags[6] and self.timeindex[6] == 0) else None))
-                    self.aw.santoker.setLogging(self.device_logging) # ty:ignore[possibly-missing-attribute]
-                    self.aw.santoker.start() # ty:ignore[possibly-missing-attribute]
+                    self.aw.santoker.setLogging(self.device_logging)
+                    self.aw.santoker.start()
                 elif self.device == 171:
                     # connect Santoker R
                     from artisanlib.santoker_r import SantokerR
                     self.aw.santokerR = SantokerR(
                         connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('Santoker R'),True,None),
                         disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('Santoker R'),True,None))
-                    self.aw.santokerR.setLogging(self.device_logging) # ty:ignore[possibly-missing-attribute]
-                    self.aw.santokerR.start(case_sensitive=False) # ty:ignore[possibly-missing-attribute]
+                    self.aw.santokerR.setLogging(self.device_logging)
+                    self.aw.santokerR.start(case_sensitive=False)
                 elif self.device == 175:
                     # connect Thermoworks BlueDOT
                     from artisanlib.bluedot import BlueDOT
                     self.aw.thermoworksBlueDOT = BlueDOT(
                         connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('Thermoworks BlueDOT'),True,None),
                         disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('Thermoworks BlueDOT'),True,None))
-                    self.aw.thermoworksBlueDOT.setLogging(self.device_logging) # ty:ignore[possibly-missing-attribute]
-                    self.aw.thermoworksBlueDOT.start(case_sensitive=False) # ty:ignore[possibly-missing-attribute]
+                    self.aw.thermoworksBlueDOT.setLogging(self.device_logging)
+                    self.aw.thermoworksBlueDOT.start(case_sensitive=False)
                 elif self.device == 138:
                     # connect Kaleido
                     from artisanlib.kaleido import KaleidoPort
                     self.aw.kaleido = KaleidoPort()
-                    self.aw.kaleido.setLogging(self.device_logging) # ty:ignore[possibly-missing-attribute]
+                    self.aw.kaleido.setLogging(self.device_logging)
                     kaleido_serial:SerialSettings|None = None
                     if self.aw.kaleidoSerial:
                         kaleido_serial = SerialSettings(
@@ -13346,7 +13350,7 @@ class tgraphcanvas(QObject):
                                 stopbits = self.aw.ser.stopbits,
                                 parity = self.aw.ser.parity,
                                 timeout = self.aw.ser.timeout)
-                    self.aw.kaleido.start(self.mode, self.aw.kaleidoHost, self.aw.kaleidoPort, # ty:ignore[possibly-missing-attribute]
+                    self.aw.kaleido.start(self.mode, self.aw.kaleidoHost, self.aw.kaleidoPort,
                         serial=kaleido_serial,
                         connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('Kaleido'),True,None),
                         disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('Kaleido'),True,None))
@@ -13356,8 +13360,8 @@ class tgraphcanvas(QObject):
                         self.aw.ikawa = IKAWA_BLE(
                             connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('IKAWA'),True,None),
                             disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('IKAWA'),True,None))
-                        self.aw.ikawa.setLogging(self.device_logging) # ty:ignore[possibly-missing-attribute]
-                        self.aw.ikawa.start_sampling() # ty:ignore[possibly-missing-attribute]
+                        self.aw.ikawa.setLogging(self.device_logging)
+                        self.aw.ikawa.start_sampling()
                         self.aw.sendmessageSignal.emit(QApplication.translate('Message', 'scanning for device'),True,None)
                     except Exception as ex:  # pylint: disable=broad-except
                         _log.error(ex)
@@ -13369,8 +13373,8 @@ class tgraphcanvas(QObject):
                     self.aw.mugma = Mugma(self.aw.mugmaHost, self.aw.mugmaPort, self.device_logging,
                         connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('Mugma'),True,None),
                         disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('Mugma'),True,None))
-                    self.aw.mugma.setLogging(self.device_logging) # ty:ignore[possibly-missing-attribute]
-                    self.aw.mugma.start() # ty:ignore[possibly-missing-attribute]
+                    self.aw.mugma.setLogging(self.device_logging)
+                    self.aw.mugma.start()
 
 
             self.aw.initializedMonitoringExtraDeviceStructures()
@@ -17277,8 +17281,8 @@ class tgraphcanvas(QObject):
     def findpoints(self) -> tuple[list[float],list[float]]:
         #if profile found
         if self.timeindex[0] != -1:
-            Xpoints = []                        #make temporary lists to hold the values to return
-            Ypoints = []
+            Xpoints:list[float] = []                        #make temporary lists to hold the values to return
+            Ypoints:list[float] = []
 
             idx_added:set[int] = set() # indices already added to the result set
             def addPoint(idx:int) -> None:

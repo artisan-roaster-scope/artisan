@@ -129,7 +129,7 @@ a = Analysis(['artisan.py'],
              hiddenimports=['babel.numbers'], # should not be needed as it got fixed in pyinstaller 6.11
              hooksconfig={
                 'matplotlib': {
-                'backends': ['QtAgg', 'svg'] # 'auto',  # auto-detect; the default behavior (QtAgg
+                'backends': ['QtAgg', 'svg', 'pdf'] # 'auto',  # auto-detect; the default behavior (QtAgg
                 },
              },
              hookspath=[],

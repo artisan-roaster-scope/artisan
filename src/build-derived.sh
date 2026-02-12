@@ -21,7 +21,9 @@ echo "build-derived.sh"
 # required environment variables...
 PYUIC="${PYUIC:-pyuic6}"
 PYLUPDATE="${PYLUPDATE:-./pylupdate6pro.py}"
-QTTOOLS=qt6-tools;
+#QTTOOLS=qt6-tools;
+export PYTHON_PATH=`python3 -c 'import sysconfig; print(sysconfig.get_paths()["purelib"])'`
+QT_SRC_PATH_QTTOOLS=$PYTHON_PATH/qt6_applications/Qt
 
 # Check if an argument was passed
 if [ $# != 0 ]; then
@@ -64,10 +66,15 @@ python3 $PYLUPDATE
 if [ $? -ne 0 ]; then exit $?; else echo "** Success"; fi
 
 echo "************* lrelease **************"
+
 echo "*** compiling translations"
 if [ -f "$QT_SRC_PATH/bin/lrelease" ]; then
     echo "*** using env QT_SRC_PATH: $QT_SRC_PATH/bin/lrelease"
     $QT_SRC_PATH/bin/lrelease -verbose translations/*.ts
+    if [ $? -ne 0 ]; then exit $?; else echo "** Success"; fi
+elif [ -f "$QT_SRC_PATH_QTTOOLS/bin/lrelease" ]; then
+    echo "*** using env QT_SRC_PATH_QTTOOLS: $QT_SRC_PATH_QTTOOLS/bin/lrelease"
+    $QT_SRC_PATH_QTTOOLS/bin/lrelease -verbose translations/*.ts
     if [ $? -ne 0 ]; then exit $?; else echo "** Success"; fi
 elif [[ $(type -P "$QTTOOLS") ]]; then
     echo "*** using env QTTOOLS: $QTTOOLS"

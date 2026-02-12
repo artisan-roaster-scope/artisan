@@ -267,7 +267,7 @@ def trimBlendSpec(blend_spec:stock.Blend) -> stock.Blend|None:
                     res_ingredient:stock.BlendIngredient = {} # type: ignore[typeddict-item] # missing required fields (added later)
                     for tag in ['coffee', 'ratio', 'ratio_num', 'ratio_denom']:
                         if tag in ingredient:
-                            res_ingredient[tag] = ingredient[tag] # type: ignore[literal-required] # field vars like 'tag' are not supported by mypy for TypedDicts
+                            res_ingredient[tag] = ingredient[tag] # type: ignore[literal-required, misc, unused-ignore] # field vars like 'tag' are not supported by mypy for TypedDicts
                     if res_ingredient['coffee'] and res_ingredient['ratio'] > 0:
                         res_ingredients.append(res_ingredient)
                     else:

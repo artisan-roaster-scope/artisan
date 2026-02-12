@@ -1069,9 +1069,9 @@ class serialport:
             self.aw.lebrew_roastseeNEXT = Lebrew_RoastSeeNEXT(
                 connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('RoastSee NEXT'),True,None),
                 disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('RoastSee NEXT'),True,None))
-            if not self.aw.lebrew_roastseeNEXT.client_started(): # ty: ignore[possibly-missing-attribute]
-                self.aw.lebrew_roastseeNEXT.setLogging(self.aw.qmc.device_logging)  # ty: ignore[possibly-missing-attribute]
-                self.aw.lebrew_roastseeNEXT.start()  # ty: ignore[possibly-missing-attribute]
+            if not self.aw.lebrew_roastseeNEXT.client_started():
+                self.aw.lebrew_roastseeNEXT.setLogging(self.aw.qmc.device_logging)
+                self.aw.lebrew_roastseeNEXT.start()
 
     def RoastSeeNEXT_AGTRON_CRACK(self) -> tuple[float,float,float]:
         agtron:float = -1
@@ -2420,29 +2420,29 @@ class serialport:
             # Temperature
             if self.aw.ser.TMP1000temp is None:
                 self.aw.ser.TMP1000temp = PhidgetTemperatureSensor()
-            if not self.aw.ser.TMP1000temp.getAttached() and self.aw.qmc.phidgetManager is not None:  # ty:ignore[possibly-missing-attribute]
+            if not self.aw.ser.TMP1000temp.getAttached() and self.aw.qmc.phidgetManager is not None:
                 ser, port = self.aw.qmc.phidgetManager.getFirstMatchingPhidget(
                     'PhidgetTemperatureSensor',
                     DeviceID.PHIDID_TMP1000,
                     remote=self.aw.qmc.phidgetRemoteFlag,
                     remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag)
                 if ser:
-                    self.aw.ser.TMP1000temp.setDeviceSerialNumber(ser) # ty:ignore[possibly-missing-attribute]
-                    self.aw.ser.TMP1000temp.setHubPort(port)  # ty:ignore[possibly-missing-attribute]  #explicitly set the port to where the HUM is attached
+                    self.aw.ser.TMP1000temp.setDeviceSerialNumber(ser)
+                    self.aw.ser.TMP1000temp.setHubPort(port)  # explicitly set the port to where the HUM is attached
                     if self.aw.qmc.phidgetRemoteFlag:
                         self.addPhidgetServer()
                     if self.aw.qmc.phidgetRemoteFlag and self.aw.qmc.phidgetRemoteOnlyFlag:
-                        self.aw.ser.TMP1000temp.setIsRemote(True) # ty:ignore[possibly-missing-attribute]
-                        self.aw.ser.TMP1000temp.setIsLocal(False) # ty:ignore[possibly-missing-attribute]
-                    self.aw.ser.TMP1000temp.openWaitForAttachment(1500) # ty:ignore[possibly-missing-attribute]
-                    if self.aw.ser.TMP1000temp.getAttached():  # ty:ignore[possibly-missing-attribute]
+                        self.aw.ser.TMP1000temp.setIsRemote(True)
+                        self.aw.ser.TMP1000temp.setIsLocal(False)
+                    self.aw.ser.TMP1000temp.openWaitForAttachment(1500)
+                    if self.aw.ser.TMP1000temp.getAttached():
                         _log.debug('Phidget TMP1000 temperature channel attached')
                         libtime.sleep(0.3)
                         # note that we do not register the attach in the aw.qmc.phidgetManager as we only support one of those devices
                     else:
                         _log.debug('Phidget TEMP1000 temperature could not be attached')
-            if self.aw.ser.TMP1000temp.getAttached():  # ty:ignore[possibly-missing-attribute]
-                res = float(self.aw.ser.TMP1000temp.getTemperature()) # ty:ignore[possibly-missing-attribute]
+            if self.aw.ser.TMP1000temp.getAttached():
+                res = float(self.aw.ser.TMP1000temp.getTemperature())
                 _log.debug('Phidget TMP1000 temperature received: %s', res)
                 return res
             return None
@@ -2465,7 +2465,7 @@ class serialport:
             # HUM Temperature
             if self.aw.ser.PhidgetHUMtemp is None:
                 self.aw.ser.PhidgetHUMtemp = PhidgetTemperatureSensor()
-            if not self.aw.ser.PhidgetHUMtemp.getAttached() and self.aw.qmc.phidgetManager is not None:  # ty:ignore[possibly-missing-attribute]
+            if not self.aw.ser.PhidgetHUMtemp.getAttached() and self.aw.qmc.phidgetManager is not None:
                 ser, port = self.aw.qmc.phidgetManager.getFirstMatchingPhidget(
                     'PhidgetTemperatureSensor',
                     DeviceID.PHIDID_HUM1000,
@@ -2478,22 +2478,22 @@ class serialport:
                         remote=self.aw.qmc.phidgetRemoteFlag,
                         remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag)
                 if ser:
-                    self.aw.ser.PhidgetHUMtemp.setDeviceSerialNumber(ser)  # ty:ignore[possibly-missing-attribute]
-                    self.aw.ser.PhidgetHUMtemp.setHubPort(port)  # ty:ignore[possibly-missing-attribute]  #explicitly set the port to where the HUM is attached
+                    self.aw.ser.PhidgetHUMtemp.setDeviceSerialNumber(ser)
+                    self.aw.ser.PhidgetHUMtemp.setHubPort(port)  # explicitly set the port to where the HUM is attached
                     if self.aw.qmc.phidgetRemoteFlag:
                         self.addPhidgetServer()
                     if self.aw.qmc.phidgetRemoteFlag and self.aw.qmc.phidgetRemoteOnlyFlag:
-                        self.aw.ser.PhidgetHUMtemp.setIsRemote(True) # ty:ignore[possibly-missing-attribute]
-                        self.aw.ser.PhidgetHUMtemp.setIsLocal(False) # ty:ignore[possibly-missing-attribute]
-                    self.aw.ser.PhidgetHUMtemp.openWaitForAttachment(1500)  # ty:ignore[possibly-missing-attribute]
-                    if self.aw.ser.PhidgetHUMtemp.getAttached():  # ty:ignore[possibly-missing-attribute]
+                        self.aw.ser.PhidgetHUMtemp.setIsRemote(True)
+                        self.aw.ser.PhidgetHUMtemp.setIsLocal(False)
+                    self.aw.ser.PhidgetHUMtemp.openWaitForAttachment(1500)
+                    if self.aw.ser.PhidgetHUMtemp.getAttached():
                         _log.debug('Phidget HUM100x temperature channel attached')
                         libtime.sleep(0.3)
                         # note that we do not register the attach in the aw.qmc.phidgetManager as we only support one of those devices
                     else:
                         _log.debug('Phidget HUM100x temperature could not be attached')
-            if self.aw.ser.PhidgetHUMtemp.getAttached():  # ty:ignore[possibly-missing-attribute]
-                res = float(self.aw.ser.PhidgetHUMtemp.getTemperature())  # ty:ignore[possibly-missing-attribute]
+            if self.aw.ser.PhidgetHUMtemp.getAttached():
+                res = float(self.aw.ser.PhidgetHUMtemp.getTemperature())
                 _log.debug('Phidget HUM100x temperature received: %s', res)
                 # we don't close the HUM here, but in closePhidgetAMBIENTs
                 return res
@@ -2517,7 +2517,7 @@ class serialport:
             # HUM Humidity
             if self.aw.ser.PhidgetHUMhum is None:
                 self.aw.ser.PhidgetHUMhum = PhidgetHumiditySensor()
-            if not self.aw.ser.PhidgetHUMhum.getAttached() and self.aw.qmc.phidgetManager is not None:  # ty:ignore[possibly-missing-attribute]
+            if not self.aw.ser.PhidgetHUMhum.getAttached() and self.aw.qmc.phidgetManager is not None:
                 ser, port = self.aw.qmc.phidgetManager.getFirstMatchingPhidget(
                     'PhidgetTemperatureSensor',
                     DeviceID.PHIDID_HUM1000,
@@ -2530,22 +2530,22 @@ class serialport:
                         remote=self.aw.qmc.phidgetRemoteFlag,
                         remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag)
                 if ser:
-                    self.aw.ser.PhidgetHUMhum.setDeviceSerialNumber(ser)  # ty:ignore[possibly-missing-attribute]
-                    self.aw.ser.PhidgetHUMhum.setHubPort(port)  # ty:ignore[possibly-missing-attribute]  #explicitly set the port to where the HUM is attached
+                    self.aw.ser.PhidgetHUMhum.setDeviceSerialNumber(ser)
+                    self.aw.ser.PhidgetHUMhum.setHubPort(port)  # explicitly set the port to where the HUM is attached
                     if self.aw.qmc.phidgetRemoteFlag:
                         self.addPhidgetServer()
                     if self.aw.qmc.phidgetRemoteFlag and self.aw.qmc.phidgetRemoteOnlyFlag:
-                        self.aw.ser.PhidgetHUMhum.setIsRemote(True)  # ty:ignore[possibly-missing-attribute]
-                        self.aw.ser.PhidgetHUMhum.setIsLocal(False)  # ty:ignore[possibly-missing-attribute]
-                    self.aw.ser.PhidgetHUMhum.openWaitForAttachment(1500)  # ty:ignore[possibly-missing-attribute]
-                    if self.aw.ser.PhidgetHUMhum.getAttached():  # ty:ignore[possibly-missing-attribute]
+                        self.aw.ser.PhidgetHUMhum.setIsRemote(True)
+                        self.aw.ser.PhidgetHUMhum.setIsLocal(False)
+                    self.aw.ser.PhidgetHUMhum.openWaitForAttachment(1500)
+                    if self.aw.ser.PhidgetHUMhum.getAttached():
                         _log.debug('Phidget HUM100x humidity channel attached')
                         libtime.sleep(0.3)
                         # note that we do not register the attach in the aw.qmc.phidgetManager as we only support one of those devices
                     else:
                         _log.debug('Phidget HUM100x humidity could not be attached')
-            if self.aw.ser.PhidgetHUMhum.getAttached():  # ty:ignore[possibly-missing-attribute]
-                res = float(self.aw.ser.PhidgetHUMhum.getHumidity())  # ty:ignore[possibly-missing-attribute]
+            if self.aw.ser.PhidgetHUMhum.getAttached():
+                res = float(self.aw.ser.PhidgetHUMhum.getHumidity())
                 _log.debug('Phidget HUM100x humidity received: %s', res)
                 # we don't close the HUM here, but in closePhidgetAMBIENTs
                 return res
@@ -2569,29 +2569,29 @@ class serialport:
             # PRE Pressure
             if self.aw.ser.PhidgetPREpre is None:
                 self.aw.ser.PhidgetPREpre = PhidgetPressureSensor()
-            if not self.aw.ser.PhidgetPREpre.getAttached() and self.aw.qmc.phidgetManager is not None:  # ty:ignore[possibly-missing-attribute]
+            if not self.aw.ser.PhidgetPREpre.getAttached() and self.aw.qmc.phidgetManager is not None:
                 ser, port = self.aw.qmc.phidgetManager.getFirstMatchingPhidget(
                     'PhidgetPressureSensor',
                     DeviceID.PHIDID_PRE1000,
                     remote=self.aw.qmc.phidgetRemoteFlag,
                     remoteOnly=self.aw.qmc.phidgetRemoteOnlyFlag)
                 if ser:
-                    self.aw.ser.PhidgetPREpre.setDeviceSerialNumber(ser)  # ty:ignore[possibly-missing-attribute]
-                    self.aw.ser.PhidgetPREpre.setHubPort(port)    # ty:ignore[possibly-missing-attribute] #explicitly set the port to where the HUM is attached
+                    self.aw.ser.PhidgetPREpre.setDeviceSerialNumber(ser)
+                    self.aw.ser.PhidgetPREpre.setHubPort(port)     # explicitly set the port to where the HUM is attached
                     if self.aw.qmc.phidgetRemoteFlag:
                         self.addPhidgetServer()
                     if self.aw.qmc.phidgetRemoteFlag and self.aw.qmc.phidgetRemoteOnlyFlag:
-                        self.aw.ser.PhidgetPREpre.setIsRemote(True)  # ty:ignore[possibly-missing-attribute]
-                        self.aw.ser.PhidgetPREpre.setIsLocal(False)  # ty:ignore[possibly-missing-attribute]
-                    self.aw.ser.PhidgetPREpre.openWaitForAttachment(1500)  # ty:ignore[possibly-missing-attribute]
-                    if self.aw.ser.PhidgetPREpre.getAttached():  # ty:ignore[possibly-missing-attribute]
+                        self.aw.ser.PhidgetPREpre.setIsRemote(True)
+                        self.aw.ser.PhidgetPREpre.setIsLocal(False)
+                    self.aw.ser.PhidgetPREpre.openWaitForAttachment(1500)
+                    if self.aw.ser.PhidgetPREpre.getAttached():
                         _log.debug('Phidget PRE1000 pressure channel attached')
                         libtime.sleep(0.3)
                         # note that we do not register the attach in the aw.qmc.phidgetManager as we only support one of those devices
                     else:
                         _log.debug('Phidget PRE1000 pressure could not be attached')
-            if self.aw.ser.PhidgetPREpre.getAttached(): # ty:ignore[possibly-missing-attribute]
-                res = float(self.aw.ser.PhidgetPREpre.getPressure()) # ty:ignore[possibly-missing-attribute]
+            if self.aw.ser.PhidgetPREpre.getAttached():
+                res = float(self.aw.ser.PhidgetPREpre.getPressure())
                 _log.debug('Phidget PRE1000 pressure received: %s', res)
                 # we don't close the PRE here, but in closePhidgetAMBIENTs
                 return res

@@ -601,12 +601,12 @@ class RoastedWeighingState(StateMachine):
     def after_current_item(self, weight_item:RoastedWeightItem, source:State) -> None:
         self.current_weight_item = weight_item
         # update displays
-        if source == self.prepared and self.process_state == PROCESS_STATE.WEIGHING:
+        if source == self.prepared and self.process_state == PROCESS_STATE.WEIGHING: # zuban:ignore[no-untyped-call]
             # if we are coming from PREPARED, we reset the PROCESS_STATE back from the temporary WEIGHING to CONNECTED to ensure
             # that DISPLAY.show_item() sets the self.last_process_state correctly for the DISPLAY.show_progress() below to be effective
             self.process_state = PROCESS_STATE.CONNECTED
         self.update_displays()
-        if source == self.prepared:
+        if source == self.prepared:  # zuban:ignore[no-untyped-call]
             self.process_state = PROCESS_STATE.WEIGHING
             self.update_displays(progress=True) # from PREPARED to FILLING we need to ensure that 'weight' gets calculated and set in the displays
 
@@ -1100,7 +1100,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues]
 
             # 3. Cancel Roasted Cancel
             if (self.roasted_task_scale == scale_nr and
-                    self.sm_roasted.current_state == RoastedWeighingState.cancel_filling and
+                    self.sm_roasted.current_state == RoastedWeighingState.cancel_filling and  # zuban:ignore[no-untyped-call]
                     self.roasted_task_canceled_step < 0 and abs(step + self.roasted_task_canceled_step) < self.CANCELED_STEP_RECOGNITION_TOLERANCE):
                 # Cancel of the cancel operation; we restart at the canceled state
                 self.signal_roasted_task_scale(STATE_ACTION.INTERRUPTED)
@@ -1110,7 +1110,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues]
 
             # 4. Cancel Roasted Done
             elif (self.roasted_task_scale == scale_nr and
-                    self.sm_roasted.current_state == RoastedWeighingState.done_filling and
+                    self.sm_roasted.current_state == RoastedWeighingState.done_filling and  # zuban:ignore[no-untyped-call]
                     self.roasted_task_done_step < 0 and abs(step + self.roasted_task_done_step) < self.DONE_STEP_RECOGNITION_TOLERANCE):
                 # Cancel of the done operation; we restart at the done state
                 self.done_roasted_task_timer.stop()
@@ -1122,7 +1122,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues]
 
             # 5. Cancel Container Swap (from EMPTY TO WEIHING1; bucket_put_back_swapped
             elif (self.green_task_scale == scale_nr and
-                    self.sm_green.current_state == GreenWeighingState.empty and
+                    self.sm_green.current_state == GreenWeighingState.empty and  # zuban:ignore[no-untyped-call]
                     self.task_swapped_step < 0 and abs(step + self.task_swapped_step) < self.SWAP_STEP_RECOGNITION_TOLERANCE):
                 # Cancel of the done operation; we restart at the done state
                 self.task_swapped_step = 0
@@ -1213,13 +1213,13 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues]
                 self.sm_roasted.set_accuracy(0)
 
                 if self.sm_roasted.current_weight_item is not None:
-                    if self.sm_roasted.current_state == RoastedWeighingState.cancel_filling:
+                    if self.sm_roasted.current_state == RoastedWeighingState.cancel_filling:  # zuban:ignore[no-untyped-call]
                         # if task got canceled and cancel timer is still running we stop it here
                         self.cancel_roasted_task_timer.stop()
                         self.roasted_task_canceled_step = 0
                         self.sm_roasted.send('cancel', block_scale_release=True)
                         self.sm_roasted.current_weight_item.callback('', 0) # trigger an refresh of the next weight_item, a previous fetch_next_roasted update might have been blocked while processing
-                    elif self.sm_roasted.current_state == RoastedWeighingState.done_filling:
+                    elif self.sm_roasted.current_state == RoastedWeighingState.done_filling: # zuban:ignore[no-untyped-call]
                         # if task got completed and done timer is still running we stop it here
                         self.done_roasted_task_timer.stop()
                         self.sm_roasted.send('end', self.roasted_task_done_weight, block_scale_release=True)
@@ -1249,7 +1249,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues]
             # 8. Place Full Roasted Bucket
             elif (self.aw.taskWebDisplayRoastedActive and                                  # only if Task Display Roasted is active
                     self.sm_roasted.current_weight_item is not None and                    # current roasted weight item is established
-                    self.sm_roasted.current_state == RoastedWeighingState.ready and        # roasted State Machine is in READY state
+                    self.sm_roasted.current_state == RoastedWeighingState.ready and  # zuban:ignore[no-untyped-call]       # roasted State Machine is in READY state
                     self.roasted_task_scale == 0 and                                       # no scale yet assigned to the roasted task
                     0 <= self.aw.container2_idx <= len(self.aw.qmc.container_weights) and  # a roasted container is set
                     self.filled_roasted_container_placed(
@@ -1342,7 +1342,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues]
                 self.roasted_task_scale == scale_nr):
             # weight removed completely, scale empty now
 
-            if self.sm_roasted.current_weight_item is None and self.sm_roasted.current_state == RoastedWeighingState.prepared:
+            if self.sm_roasted.current_weight_item is None and self.sm_roasted.current_state == RoastedWeighingState.prepared:  # zuban:ignore[no-untyped-call]
                 # no weight item set yet, but empty bucket removed
                 self.sm_roasted.send('reset')
             if self.sm_roasted.current_weight_item is not None:
@@ -1350,7 +1350,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues]
                 weight = ((self.scale1_last_stable_weight if scale_nr == 1 else self.scale2_last_stable_weight)
                     - self.roasted_task_scale_tare_weight)             # remove tare weight
 
-                if self.sm_roasted.current_state == RoastedWeighingState.weighing and abs(self.roasted_task_scale_total_weight + step) < self.ROASTED_BUCKET_REMOVALE_TOLERANCE:
+                if self.sm_roasted.current_state == RoastedWeighingState.weighing and abs(self.roasted_task_scale_total_weight + step) < self.ROASTED_BUCKET_REMOVALE_TOLERANCE:  # zuban:ignore[no-untyped-call]
                     # 1. full roasted bucket weighing finished:
                     weight = int(round(self.roasted_task_scale_total_weight - self.aw.qmc.container_weights[self.aw.container2_idx]))
                     self.roasted_task_done_weight = weight
@@ -1358,7 +1358,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues]
                     self.sm_roasted.send('task_completed', self.roasted_task_done_weight)
                     self.signal_roasted_task_scale(STATE_ACTION.OK_ENTER)
                     self.done_roasted_task_timer.start(self.WAIT_BEFORE_DONE)
-                elif (self.sm_roasted.current_state == RoastedWeighingState.filling and
+                elif (self.sm_roasted.current_state == RoastedWeighingState.filling and  # zuban:ignore[no-untyped-call]
                         # weight > estimated minimal weight based on
                         weight > self.filled_roasted_bucket_estimated_minimal_weight(self.sm_roasted.current_weight_item.weight_estimate, 0) < weight):
                     # 2. roasted bucket filling finished:
@@ -1367,14 +1367,14 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues]
                     self.sm_roasted.send('task_completed', self.roasted_task_done_weight)
                     self.signal_roasted_task_scale(STATE_ACTION.OK_ENTER)
                     self.done_roasted_task_timer.start(self.WAIT_BEFORE_DONE)
-                elif self.sm_roasted.current_state == RoastedWeighingState.filling and weight >= batchsize * 0.5:
+                elif self.sm_roasted.current_state == RoastedWeighingState.filling and weight >= batchsize * 0.5:  # zuban:ignore[no-untyped-call]
                     # 3. roasted bucket filling canceled at a fill weight >= 50% of the batch size, but below the estimated minimal weight
                     _log.debug(r'BatchManager: roasted bucket removed at >50 percent of the batch size, but lower then the estimated minimal weight. Roasted weighing task canceled.')
                     self.roasted_task_canceled_step = step
                     self.cancel_roasted_task_timer.start(self.WAIT_BEFORE_CANCEL)
                     self.sm_roasted.send('task_canceled')
                     self.signal_roasted_task_scale(STATE_ACTION.CANCEL_ENTER)
-                elif self.sm_roasted.current_state == RoastedWeighingState.filling and weight < batchsize * 0.5:
+                elif self.sm_roasted.current_state == RoastedWeighingState.filling and weight < batchsize * 0.5:  # zuban:ignore[no-untyped-call]
                     # 4. roasted bucket filling removed at fill weight < 50% of the batch size
                     _log.debug(r'BatchManager: roasted bucket removed at <50 percent of the batch size')
                     self.sm_roasted.send('bucket_removed')
@@ -1387,7 +1387,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues]
                     self.sm_roasted.current_weight_item.callback('', 0) # trigger an refresh of the next weight_item, a previous fetch_next_roasted update might have been blocked while processing, update now to the latest
 
         # independent on the step direction do always update the roasting weight while weighing the roasted container
-        if self.roasted_task_done_weight == 0 and self.roasted_task_scale == scale_nr and self.sm_roasted.current_state == RoastedWeighingState.weighing:
+        if self.roasted_task_done_weight == 0 and self.roasted_task_scale == scale_nr and self.sm_roasted.current_state == RoastedWeighingState.weighing:  # zuban:ignore[no-untyped-call]
             # while roasting scale is in weighing state, we updated the
             self.roasted_task_scale_total_weight = stable_weight - self.roasted_task_empty_scale_weight
             self.sm_roasted.send('update',int(round(self.roasted_task_scale_total_weight - self.aw.qmc.container_weights[self.aw.container2_idx])))
@@ -1532,7 +1532,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues]
 
     @pyqtSlot()
     def cancel_roasted_task_slot(self) -> None:
-        if self.sm_roasted.current_state == RoastedWeighingState.cancel_filling:
+        if self.sm_roasted.current_state == RoastedWeighingState.cancel_filling:  # zuban:ignore[no-untyped-call]
             self.signal_roasted_task_scale(STATE_ACTION.CANCEL_EXIT)
             self.sm_roasted.send('cancel')
             self.task_canceled_step = 0
@@ -1653,13 +1653,13 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues]
                 self.tap_cancel_green_task_timer.start(WeightManager.TAP_CANCEL_PERIOD)
         elif self.roasted_task_scale == 1:
             self.last_nonstable_roasted_weight = weight
-            if (self.sm_roasted.current_state == RoastedWeighingState.done and
+            if (self.sm_roasted.current_state == RoastedWeighingState.done and  # zuban:ignore[no-untyped-call]
                  weight > self.roasted_task_empty_scale_weight + WeightManager.TAP_CANCEL_THRESHOLD):
                 self.tap_cancel_roasted_task_timer.start(WeightManager.TAP_CANCEL_PERIOD)
-            elif self.sm_roasted.current_state == RoastedWeighingState.filling:
+            elif self.sm_roasted.current_state == RoastedWeighingState.filling:  # zuban:ignore[no-untyped-call]
                 new_weight = weight - self.roasted_task_scale_tare_weight + self.roasted_task_stable_weight_before_connection_loss
                 self.sm_roasted.send('fill', max(0, new_weight), weight>self.scale1_last_stable_weight) # only update display on increasing weights or if larger than the last stable weight
-            elif (self.sm_roasted.current_state == RoastedWeighingState.done_filling and
+            elif (self.sm_roasted.current_state == RoastedWeighingState.done_filling and  # zuban:ignore[no-untyped-call]
                         weight > self.roasted_task_empty_scale_weight + WeightManager.TAP_CANCEL_THRESHOLD):
                 self.tap_cancel_roasted_task_timer.start(WeightManager.TAP_CANCEL_PERIOD)
 
@@ -1705,13 +1705,13 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues]
                 self.tap_cancel_green_task_timer.start(WeightManager.TAP_CANCEL_PERIOD)
         elif self.roasted_task_scale == 2:
             self.last_nonstable_roasted_weight = weight
-            if (self.sm_roasted.current_state == RoastedWeighingState.done and
+            if (self.sm_roasted.current_state == RoastedWeighingState.done and  # zuban:ignore[no-untyped-call]
                  weight > self.roasted_task_empty_scale_weight + WeightManager.TAP_CANCEL_THRESHOLD):
                 self.tap_cancel_roasted_task_timer.start(WeightManager.TAP_CANCEL_PERIOD)
-            elif self.sm_roasted.current_state == RoastedWeighingState.filling:
+            elif self.sm_roasted.current_state == RoastedWeighingState.filling:  # zuban:ignore[no-untyped-call]
                 new_weight = weight - self.roasted_task_scale_tare_weight + self.roasted_task_stable_weight_before_connection_loss
                 self.sm_roasted.send('fill', max(0, new_weight), weight>self.scale2_last_stable_weight) # only update display on increasing weights or if larger than the last stable weight
-            elif (self.sm_roasted.current_state == RoastedWeighingState.done_filling and
+            elif (self.sm_roasted.current_state == RoastedWeighingState.done_filling and  # zuban:ignore[no-untyped-call]
                         weight > self.roasted_task_empty_scale_weight + WeightManager.TAP_CANCEL_THRESHOLD):
                 self.tap_cancel_roasted_task_timer.start(WeightManager.TAP_CANCEL_PERIOD)
 

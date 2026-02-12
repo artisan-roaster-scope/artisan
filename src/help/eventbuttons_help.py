@@ -199,6 +199,7 @@ def content() -> str:
     tbl_Commands.add_row(['&#160;','adjustSV(<float>)',QApplication.translate('HelpDlg','increases or decreases the current target SV value by <float>')])
     tbl_Commands.add_row(['&#160;','pidSV(<float>)',QApplication.translate('HelpDlg','sets the PID target set value SV')])
     tbl_Commands.add_row(['&#160;','pidSVC(<float>)',QApplication.translate('HelpDlg','sets the PID target set value SV given in C')])
+    tbl_Commands.add_row(['&#160;','pidSVbuttons(<bool>)',QApplication.translate('HelpDlg','toggles the visibility of the PID SV buttons')])
     tbl_Commands.add_row(['&#160;','pidRS(<rs>)',QApplication.translate('HelpDlg','activates the PID Ramp-Soak pattern number <rs> (1-based!) or the one labeled <rs>')])
     tbl_Commands.add_row(['&#160;','pidSource(<int>)',QApplication.translate('HelpDlg','selects the PID input source with <n> 0: BT, 1: ET (Software PID); <n> in {0,..,3} (Arduino PID)')])
     tbl_Commands.add_row(['&#160;','pidLookahead(<int>)',QApplication.translate('HelpDlg','sets the PID lookahead in seconds')])

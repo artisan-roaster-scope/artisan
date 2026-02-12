@@ -810,7 +810,7 @@ def extractProfileCropsterXLS(file:str,
                 if value is None and len(row1)>ipos:
                     value = row1[ipos].value
                 if value is not None:
-                    res[itag] = float(value) # type: ignore[literal-required] # mypy cannot check generic labels accessing the res of type TypedDict
+                    res[itag] = float(value) # type: ignore[literal-required, misc, unused-ignore] # mypy cannot check generic labels accessing the res of type TypedDict
             except Exception: # pylint: disable=broad-except
                 pass
 
@@ -826,7 +826,7 @@ def extractProfileCropsterXLS(file:str,
                 if value is None and pos is not None and len(row1)>pos:
                     value = row1[pos].value
                 if value is not None:
-                    res[tag] = encodeLocalStrict(value) # type: ignore[literal-required] # mypy cannot check generic labels accessing the res of type TypedDict
+                    res[tag] = encodeLocalStrict(value) # type: ignore[literal-required, misc, unused-ignore] # mypy cannot check generic labels accessing the res of type TypedDict
             except Exception: # pylint: disable=broad-except
                 pass
 

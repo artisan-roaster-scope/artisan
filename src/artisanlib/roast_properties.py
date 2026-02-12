@@ -1782,7 +1782,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             if res is not None: # not canceled
                 self.aw.qmc.plus_custom_blend = res
                 self.populatePlusCoffeeBlendCombos() # we update the blend menu to reflect the current custom blend
-                if self.aw.qmc.plus_custom_blend.name.strip() == '' and self.plus_blend_selected_spec is not None and 'hr_id' in self.plus_blend_selected_spec and self.plus_blend_selected_spec['hr_id'] == '': # ty:ignore[possibly-missing-attribute]
+                if self.aw.qmc.plus_custom_blend.name.strip() == '' and self.plus_blend_selected_spec is not None and 'hr_id' in self.plus_blend_selected_spec and self.plus_blend_selected_spec['hr_id'] == '':
                     # if the custom blend entry was selected before, which is now removed, we select the empty first entry
                     self.plus_blends_combo.setCurrentIndex(0)
                     self.blendSelectionChanged(0)
@@ -4142,7 +4142,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         if not self.tabInitialized[5]:
             # fill Setup tab
             self.setup_ui = SetupWidget.Ui_SetupWidget()
-            self.setup_ui.setupUi(self.C6Widget)
+            self.setup_ui.setupUi(self.C6Widget) # zuban:ignore[no-untyped-call]
             self.setup_ui.doubleSpinBoxRoasterSize.setLocale(QLocale('C'))
             # explicitly reset labels to have them translated with a controlled context
             self.setup_ui.doubleSpinBoxRoasterSize.setToolTip(QApplication.translate('Tooltip', 'The maximum nominal batch size of the machine in kg'))
@@ -5890,7 +5890,7 @@ class EnergyMeasuringDialog(ArtisanDialog):
     def __init__(self, parent:QWidget, aw:'ApplicationWindow') -> None:
         super().__init__(parent, aw)
         self.ui = MeasureDialog.Ui_setMeasureDialog()
-        self.ui.setupUi(self)
+        self.ui.setupUi(self) # zuban:ignore[no-untyped-call]
         self.setWindowTitle(QApplication.translate('Form Caption','Set Measure from Profile'))
         self.ui.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel|QDialogButtonBox.StandardButton.Apply)
         # hack to assign the Apply button the AcceptRole without losing default system translations
