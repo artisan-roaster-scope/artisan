@@ -33,7 +33,7 @@ v4.0.0 (Jan 28, 2026)
   - adds calculation of energy data from PID Duty %
   - adds OPTION click on ET/BT or DeltaET/DeltaBT LCDs to hide/show the corresponding background curves
   - adds title click shortcut to open Roast Properties dialog
-  - adds deselection of selected event using key ESC
+  - adds deselection of selected custom event using key ESC
   - adds temporary autozoom gesture (double-click on the graph canvas) to scale the y-axis such that all data is rendered on screen
   - adds legend to cupping spider chart
 
