@@ -263,8 +263,10 @@ class phasesGraphDlg(ArtisanDialog):
         if self.aw.qmc.flagstart:
             if self.aw.qmc.phasesLCDflag:
                 self.aw.phasesLCDs.show()
+                self.aw.DTRLCD.show()
             else:
                 self.aw.phasesLCDs.hide()
+                self.aw.DTRLCD.hide()
 
     @pyqtSlot(int)
     def autoDRYflagChanged(self, _:int) -> None:

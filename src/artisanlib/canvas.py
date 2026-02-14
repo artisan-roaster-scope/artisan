@@ -93,6 +93,7 @@ from matplotlib.figure import Figure # type:ignore[untyped-import,unused-ignore]
 from matplotlib import rcParams, patches, transforms, ticker # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore]
 import matplotlib.patheffects as PathEffects # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore]
 from matplotlib.patches import Polygon, Rectangle # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore]
+from matplotlib.collections import LineCollection # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore]
 from matplotlib.transforms import Bbox, Transform # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore]
 from matplotlib.backend_bases import PickEvent, MouseEvent # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore]
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore]
@@ -1674,6 +1675,13 @@ class tgraphcanvas(QObject):
 
         self.patheffects:int = 1
         self.glow:int = 1
+
+        self.ror_color_coding:bool = True  # enable RoR trend color coding
+        self.ror_decline_color:str = '#4caf50'  # green for declining RoR
+        self.ror_flat_color:str = '#ff9800'     # amber for flat RoR
+        self.ror_crash_color:str = '#f44336'    # red for crash/flick
+        self._ror_lc:LineCollection | None = None
+
         self.graphstyle:int = 0
         self.graphfont:int = 0
 
@@ -9187,25 +9195,70 @@ class tgraphcanvas(QObject):
                     self.l_delta2.remove()
             except Exception: # pylint: disable=broad-except
                 pass
+            # Also remove any existing LineCollection for RoR coloring
+            if self._ror_lc is not None:
+                try:
+                    self._ror_lc.remove()
+                except Exception: # pylint: disable=broad-except
+                    pass
+                self._ror_lc = None
             if start < end < len(self.timex):
                 timex = numpy.array(self.timex[start:end])
                 delta2 = numpy.array(self.delta2[start:end])
             else:
                 timex = numpy.array([])
                 delta2 = numpy.array([])
-            self.l_delta2, = self.ax.plot(
-                    timex,
-                    delta2,
-                    transform=trans,
-                    markersize=self.BTdeltamarkersize,
-                    marker=self.BTdeltamarker,
-                    sketch_params=None,
-                    path_effects = self.line_path_effects(self.glow, self.patheffects, self.aw.light_background_p, self.BTdeltalinewidth, self.palette['deltabt']),
-                    linewidth=self.BTdeltalinewidth,
+            if self.ror_color_coding and len(timex) > 2:
+                # Use LineCollection for per-segment coloring
+                # Compute RoR slope (change in RoR between consecutive points)
+                ror_diff = numpy.diff(delta2.astype(float))
+                # Build segments: each segment connects two consecutive points
+                points = numpy.array([timex, delta2]).T.reshape(-1, 1, 2)
+                segments = numpy.concatenate([points[:-1], points[1:]], axis=1)
+                # Classify each segment
+                colors = []
+                for d in ror_diff:
+                    if d < -0.5:
+                        colors.append(self.ror_decline_color)   # declining = good
+                    elif d > 1.0:
+                        colors.append(self.ror_crash_color)     # rising/flick = bad
+                    else:
+                        colors.append(self.ror_flat_color)      # flat = caution
+                lc = LineCollection(segments,
+                    colors=colors,
+                    linewidths=self.BTdeltalinewidth,
                     linestyle=self.BTdeltalinestyle,
-                    drawstyle=self.BTdeltadrawstyle,
-                    color=self.palette['deltabt'],
+                    transform=trans,
                     label=self.aw.arabicReshape(f"{deltaLabelUTF8}{QApplication.translate('Label', 'BT')}"))
+                self._ror_lc = self.ax.add_collection(lc)
+                # Still create invisible line for legend and data access
+                self.l_delta2, = self.ax.plot(
+                        timex,
+                        delta2,
+                        transform=trans,
+                        markersize=self.BTdeltamarkersize,
+                        marker=self.BTdeltamarker,
+                        sketch_params=None,
+                        path_effects=[],
+                        linewidth=0,
+                        linestyle='None',
+                        drawstyle=self.BTdeltadrawstyle,
+                        color=self.palette['deltabt'],
+                        label='')
+            else:
+                self.l_delta2, = self.ax.plot(
+                        timex,
+                        delta2,
+                        transform=trans,
+                        markersize=self.BTdeltamarkersize,
+                        marker=self.BTdeltamarker,
+                        sketch_params=None,
+                        path_effects = self.line_path_effects(self.glow, self.patheffects, self.aw.light_background_p, self.BTdeltalinewidth, self.palette['deltabt']),
+                        linewidth=self.BTdeltalinewidth,
+                        linestyle=self.BTdeltalinestyle,
+                        drawstyle=self.BTdeltadrawstyle,
+                        color=self.palette['deltabt'],
+                        label=self.aw.arabicReshape(f"{deltaLabelUTF8}{QApplication.translate('Label', 'BT')}"))
 
     # if profileDataSemaphore lock cannot be fetched the redraw is not performed
     def lazyredraw(self, recomputeAllDeltas:bool = True, smooth:bool = True) -> None:
@@ -14210,6 +14263,7 @@ class tgraphcanvas(QObject):
             self.aw.updateReadingsLCDsVisibility() # update visibility of reading LCDs based on the user preference
             if self.phasesLCDflag:
                 self.aw.phasesLCDs.show()
+                self.aw.DTRLCD.show()
                 self.aw.TP2DRYlabel.setStyleSheet("background-color:'transparent'; color: " + self.palette['messages'][:7] + ';')
                 self.aw.DRY2FCslabel.setStyleSheet("background-color:'transparent'; color: " + self.palette['messages'][:7] + ';')
             if self.AUClcdFlag:
@@ -14288,6 +14342,7 @@ class tgraphcanvas(QObject):
             self.aw.lowerbuttondialog.setVisible(False)
             self.aw.messagelabel.setVisible(True)
             self.aw.phasesLCDs.hide()
+            self.aw.DTRLCD.hide()
             self.aw.AUCLCD.hide()
             self.aw.hideEventsMinieditor()
 

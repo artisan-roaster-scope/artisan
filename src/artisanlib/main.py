@@ -1506,7 +1506,7 @@ class ApplicationWindow(QMainWindow):
         'keyboardmoveflag', 'lastkeyboardcmd', 'error_dlg', 'serial_dlg', 'message_dlg', 'ETname', 'BTname', 'level1frame', 'level1layout', 'qpc', 'splitter', 'scroller', 'EventsGroupLayout',
         'LCD2frame', 'LCD3frame', 'LCD4frame', 'LCD5frame', 'LCD6frame', 'LCD7frame', 'TPlabel', 'TPlcd', 'TPlcdFrame', 'TP2DRYlabel', 'TP2DRYframe',
         'DRYlabel', 'DRYlcd', 'DRYlcdFrame', 'DRY2FCslabel', 'DRY2FCsframe', 'FCslabel', 'FCslcd', 'FCslcdFrame', 'AUClabel', 'AUClcd', 'AUClcdFrame',
-        'AUCLCD', 'phasesLCDs', 'extrabuttonsLayout', 'extrabuttondialogs', 'slider1', 'slider2', 'slider3', 'slider4', 'sliderLCD1', 'sliderLCD2', 'sliderLCD3',
+        'AUCLCD', 'DTRlabel', 'DTRlcd', 'DTRlcdFrame', 'DTRLCD', 'phasesLCDs', 'extrabuttonsLayout', 'extrabuttondialogs', 'slider1', 'slider2', 'slider3', 'slider4', 'sliderLCD1', 'sliderLCD2', 'sliderLCD3',
         'sliderLCD4', 'sliderGrpBox1', 'sliderGrpBox2', 'sliderGrpBox3', 'sliderGrpBox4', 'sliderSV', 'sliderLCDSV', 'sliderGrpBoxSV', 'leftlayout',
         'sliderFrame', 'sliderDock', 'lcdFrame', 'midlayout', 'editgraphdialog', 'html_loader', 'QtWebEngineSupport', 'artisanviewerFirstStart',
         'buttonpalette', 'extraeventbuttontextcolor', 'extraeventsactions', 'extraeventsdescriptions', 'extraeventstypes', 'extraeventsvalues',
@@ -3881,6 +3881,16 @@ class ApplicationWindow(QMainWindow):
         self.AUClcd.setMinimumWidth(65)
         self.AUClcdFrame.setStyleSheet('QLCDNumber{border-radius:4; border-width: 0; border-color: black; border-style:solid; color: black; background-color: #e6e6e6;}')
 
+        # DTR LCD
+        self.DTRlabel: QLabel = QLabel()
+        self.DTRlabel.setText('<small><b>' + QApplication.translate('Label', 'DTR') + '</b></small>')
+        self.DTRlcd: QLCDNumber = QLCDNumber()
+        self.DTRlcd.display('--')
+        self.DTRlcdFrame: QFrame = self.makePhasesLCDbox(self.DTRlabel, self.DTRlcd)
+        self.DTRlcd.setNumDigits(5)
+        self.DTRlcd.setMinimumWidth(65)
+        self.DTRlcdFrame.setStyleSheet('QLCDNumber{border-radius:4; border-width: 0; border-color: black; border-style:solid; color: black; background-color: #e6e6e6;}')
+
         AUCLayout = QHBoxLayout()
         AUCLayout.addSpacing(20)
         AUCLayout.addWidget(self.AUClcdFrame)
@@ -3891,6 +3901,17 @@ class ApplicationWindow(QMainWindow):
         self.AUCLCD.setContentsMargins(0, 0, 0, 0)
         self.AUCLCD.setLayout(AUCLayout)
         self.AUCLCD.hide()
+
+        DTRLayout = QHBoxLayout()
+        DTRLayout.addSpacing(20)
+        DTRLayout.addWidget(self.DTRlcdFrame)
+        DTRLayout.setContentsMargins(0, 0, 0, 0)
+        DTRLayout.setSpacing(0)
+
+        self.DTRLCD: QFrame = QFrame()
+        self.DTRLCD.setContentsMargins(0, 0, 0, 0)
+        self.DTRLCD.setLayout(DTRLayout)
+        self.DTRLCD.hide()
 
 
         self.phasesLCDs: QFrame = QFrame()
@@ -3911,6 +3932,7 @@ class ApplicationWindow(QMainWindow):
         self.level1layout.addStretch()
         self.level1layout.addWidget(self.phasesLCDs)
         self.level1layout.addWidget(self.AUCLCD)
+        self.level1layout.addWidget(self.DTRLCD)
         self.level1layout.addSpacing(20)
         self.level1layout.addWidget(self.buttonRESET)
         self.level1layout.addSpacing(10)
@@ -8319,6 +8341,31 @@ class ApplicationWindow(QMainWindow):
                             self.largePhasesLCDs_dialog.updatePhasesLabels([TPlabel,DRYlabel,FCslabel,None])
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
+
+            # DTR update
+            if self.qmc.timeindex[2] > 0 and self.qmc.timeindex[0] > -1:
+                # FC has been marked, compute DTR
+                if self.qmc.timeindex[6] > 0:
+                    # After DROP
+                    dev_time = self.qmc.timex[self.qmc.timeindex[6]] - self.qmc.timex[self.qmc.timeindex[2]]
+                    total_time = self.qmc.timex[self.qmc.timeindex[6]] - self.qmc.timex[self.qmc.timeindex[0]]
+                else:
+                    # Still roasting
+                    tx = self.qmc.timex[-1] if len(self.qmc.timex) > 0 else 0
+                    dev_time = tx - self.qmc.timex[self.qmc.timeindex[2]]
+                    total_time = tx - self.qmc.timex[self.qmc.timeindex[0]]
+                if total_time > 0:
+                    dtr = (dev_time / total_time) * 100.0
+                    self.DTRlcd.display(f'{dtr:.1f}')
+                    # Color-code: green 20-25%, yellow outside, red extreme
+                    if 20.0 <= dtr <= 25.0:
+                        self.DTRlcdFrame.setStyleSheet('QLCDNumber{border-radius:4; border-width: 0; border-color: black; border-style:solid; color: #2e7d32; background-color: #e8f5e9;}')
+                    elif 15.0 <= dtr < 20.0 or 25.0 < dtr <= 30.0:
+                        self.DTRlcdFrame.setStyleSheet('QLCDNumber{border-radius:4; border-width: 0; border-color: black; border-style:solid; color: #f57f17; background-color: #fff8e1;}')
+                    else:
+                        self.DTRlcdFrame.setStyleSheet('QLCDNumber{border-radius:4; border-width: 0; border-color: black; border-style:solid; color: #c62828; background-color: #ffebee;}')
+            else:
+                self.DTRlcd.display('--')
 
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
