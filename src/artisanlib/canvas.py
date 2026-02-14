@@ -4764,23 +4764,22 @@ class tgraphcanvas(QObject):
                     self.aw.sendNotificationMessage(title, message, NotificationType.ARTISAN_SYSTEM)
 
             # 4. UNDERDEVELOPED: DROP is marked with DTR < 15%
-            if not self._defect_underdeveloped_notified and self.timeindex[6] > 0:  # DROP is marked
+            if not self._defect_underdeveloped_notified and self.timeindex[6] > 0 and self.timeindex[2] > 0 and self.timeindex[0] > -1:  # DROP, FCs and CHARGE are marked
                 # Calculate DTR: 100 * (time_at_DROP - time_at_FCs) / (time_at_DROP - time_at_CHARGE)
-                if self.timeindex[2] > 0 and self.timeindex[0] > -1:  # FCs and CHARGE are marked
-                    time_drop = self.timex[self.timeindex[6]]
-                    time_fcs = self.timex[self.timeindex[2]]
-                    time_charge = self.timex[self.timeindex[0]]
+                time_drop = self.timex[self.timeindex[6]]
+                time_fcs = self.timex[self.timeindex[2]]
+                time_charge = self.timex[self.timeindex[0]]
 
-                    if time_drop > time_charge:  # Avoid division by zero
-                        dtr = 100 * (time_drop - time_fcs) / (time_drop - time_charge)
+                if time_drop > time_charge:  # Avoid division by zero
+                    dtr = 100 * (time_drop - time_fcs) / (time_drop - time_charge)
 
-                        if dtr < 15.0:
-                            # Underdeveloped defect detected
-                            self._defect_underdeveloped_notified = True
-                            title = 'Roast Defect: Underdeveloped'
-                            message = f'DTR is {dtr:.1f}% (< 15%)'
-                            self.aw.sendmessage(message)
-                            self.aw.sendNotificationMessage(title, message, NotificationType.ARTISAN_SYSTEM)
+                    if dtr < 15.0:
+                        # Underdeveloped defect detected
+                        self._defect_underdeveloped_notified = True
+                        title = 'Roast Defect: Underdeveloped'
+                        message = f'DTR is {dtr:.1f}% (< 15%)'
+                        self.aw.sendmessage(message)
+                        self.aw.sendNotificationMessage(title, message, NotificationType.ARTISAN_SYSTEM)
 
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)

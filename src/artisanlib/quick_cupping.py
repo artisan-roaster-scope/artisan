@@ -22,10 +22,9 @@ if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
     from PyQt6.QtWidgets import QWidget # pylint: disable=unused-import
 
-from PyQt6.QtCore import Qt, pyqtSlot
+from PyQt6.QtCore import pyqtSlot
 from PyQt6.QtWidgets import (QApplication, QCheckBox, QHBoxLayout, QVBoxLayout, QLabel,
-                             QLineEdit, QPushButton, QButtonGroup, QRadioButton, QGroupBox,
-                             QDialogButtonBox)
+                             QLineEdit, QButtonGroup, QRadioButton, QGroupBox)
 
 from artisanlib.dialogs import ArtisanDialog
 

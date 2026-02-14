@@ -170,7 +170,6 @@ if TYPE_CHECKING:
     from artisanlib.comparator import roastCompareDlg # pylint: disable=unused-import
     from artisanlib.wheels import WheelDlg # pylint: disable=unused-import
     from artisanlib.hottop import Hottop # pylint: disable=unused-import
-    from artisanlib.quick_cupping import QuickCuppingDlg # pylint: disable=unused-import
     from artisanlib.weblcds import WebLCDs, WebGreen, WebRoasted # pylint: disable=unused-import
     from artisanlib.santoker import Santoker # pylint: disable=unused-import
     from artisanlib.santoker_r import SantokerR # pylint: disable=unused-import
@@ -8599,7 +8598,7 @@ class ApplicationWindow(QMainWindow):
                 return
 
             detected_port:str|None = None
-            detected_desc:str = ''
+            _detected_desc:str = ''
 
             # Look for Kaleido device by common USB-serial chip identifiers
             # Common chips: CH340, CP210x, FTDI
@@ -8614,7 +8613,7 @@ class ApplicationWindow(QMainWindow):
                     'cp210' in port_desc or 'cp210' in port_product or
                     'ftdi' in port_desc or 'ftdi' in port_manufacturer):
                     detected_port = port.device
-                    detected_desc = port.description or port.device
+                    _detected_desc = port.description or port.device
                     break
 
             # If we found a candidate port, prompt the user
