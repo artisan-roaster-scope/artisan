@@ -70,6 +70,7 @@ from artisanlib.time import ArtisanTime
 #from artisanlib.filters import LiveMedian
 from artisanlib.dialogs import ArtisanMessageBox
 from artisanlib.atypes import SerialSettings, BTBreakParams, BbpCache, AlarmSet, EnergyMetrics
+from artisanlib.notifications import NotificationType
 
 # import artisan.plus modules
 from plus.util import roastLink
@@ -379,7 +380,8 @@ class tgraphcanvas(QObject):
         'CO2kg_per_BTU_default', 'CO2kg_per_BTU', 'Biogas_CO2_Reduction', 'Biogas_CO2_Reduction_default',
         'meterunitnames', 'meterreads_default', 'meterreads', 'meterlabels_setup', 'meterlabels', 'meterunits_setup', 'meterunits',
         'meterfuels_setup', 'meterfuels', 'metersources_setup', 'metersources', 'playbackdrop_min_roasttime', 'TP_max_roasttime',
-        'single_click_mpl_upperleft_corner_timer', 'single_click_mpl_upperleft_corner_TIMEOUT'
+        'single_click_mpl_upperleft_corner_timer', 'single_click_mpl_upperleft_corner_TIMEOUT',
+        'background_tracking_text'
         ]
 
 
@@ -1337,6 +1339,13 @@ class tgraphcanvas(QObject):
 
         self.replayedBackgroundEvents:set[int] = set()  # set of BackgroundEvent indices that have already been replayed (cleared in ClearMeasurements)
         self.beepedBackgroundEvents:set[int] = set()   # set of BackgroundEvent indices that have already been beeped for (cleared in ClearMeasurements)
+
+        # Phase 3C: Roast defect detection flags (one notification per defect type per roast)
+        self._defect_baking_notified:bool = False
+        self._defect_crash_notified:bool = False
+        self._defect_scorching_notified:bool = False
+        self._defect_underdeveloped_notified:bool = False
+        self._baking_start_time:float = 0.0
 
         self.roastpropertiesflag:int = 1  #resets roast properties if not zero
         self.roastpropertiesAutoOpenFlag:int = 0  #open roast properties dialog on CHARGE if not zero
@@ -2553,6 +2562,9 @@ class tgraphcanvas(QObject):
         self.xlabel_text:str|None = None
         self.xlabel_artist:Text|None = None
         self.xlabel_width:float|None = None
+
+        # background profile tracking HUD text overlay
+        self.background_tracking_text:Text|None = None
 
         self.updategraphicsSignal.connect(self.updategraphics, type=Qt.ConnectionType.QueuedConnection) # type: ignore[call-arg]
         self.updateLargeLCDsSignal.connect(self.updateLargeLCDs)
@@ -4497,6 +4509,91 @@ class tgraphcanvas(QObject):
                     self.ax.draw_artist(self.l_DeltaBTprojection)
             if self.l_AUCguide is not None and self.AUCguideFlag and self.AUCguideTime > 0 and self.AUCguideTime < self.endofx:
                 self.ax.draw_artist(self.l_AUCguide)
+            # draw background tracking HUD
+            self.drawBackgroundTrackingHUD()
+
+    def drawBackgroundTrackingHUD(self) -> None:
+        """Draw a HUD overlay showing how the current roast compares to the background profile."""
+        try:
+            # Only show if background profile is loaded and we're recording
+            if self.backgroundprofile is None or not self.flagstart:
+                # Remove the text if it exists but shouldn't be shown
+                if self.background_tracking_text is not None:
+                    self.background_tracking_text.remove()
+                    self.background_tracking_text = None
+                return
+
+            # Need at least some data points and a CHARGE event
+            if len(self.timex) < 2 or len(self.temp2) < 2 or self.timeindex[0] == -1:
+                return
+
+            # Need background data
+            if len(self.timeB) < 2 or len(self.temp2B) < 2:
+                return
+
+            # Get current time and BT
+            current_time = self.timex[-1]
+            current_bt = self.temp2[-1]
+
+            # Skip if current BT is invalid
+            if current_bt == -1:
+                return
+
+            # Interpolate background BT at current time
+            # timeB is the background time array, temp2B is background BT array
+            try:
+                background_bt = float(numpy.interp(current_time, self.timeB, self.temp2B))
+            except Exception:
+                # If interpolation fails (e.g., current_time is outside timeB range), skip
+                return
+
+            # Compute delta: current BT - background BT
+            delta = current_bt - background_bt
+
+            # Format delta string
+            if delta >= 0:
+                delta_str = f'BT: +{delta:.1f}{self.mode}'
+            else:
+                delta_str = f'BT: {delta:.1f}{self.mode}'
+
+            # Determine color based on delta magnitude
+            abs_delta = abs(delta)
+            if abs_delta <= 3:
+                color = '#4CAF50'  # green
+            elif abs_delta <= 5:
+                color = '#FFC107'  # yellow/amber
+            else:
+                color = '#F44336'  # red
+
+            # Position in upper-right corner using axes coordinates
+            x_pos = 0.98  # 98% from left (near right edge)
+            y_pos = 0.98  # 98% from bottom (near top)
+
+            # Create or update the text
+            if self.background_tracking_text is None:
+                # Create new text artist
+                self.background_tracking_text = self.ax.text(
+                    x_pos, y_pos, delta_str,
+                    transform=self.ax.transAxes,
+                    fontsize=10,
+                    color=color,
+                    horizontalalignment='right',
+                    verticalalignment='top',
+                    bbox={'boxstyle': 'round,pad=0.5', 'facecolor': '#212121', 'alpha': 0.7, 'edgecolor': 'none'},
+                    zorder=100
+                )
+                self.background_tracking_text.set_in_layout(False)
+            else:
+                # Update existing text
+                self.background_tracking_text.set_text(delta_str)
+                self.background_tracking_text.set_color(color)
+                self.background_tracking_text.set_position((x_pos, y_pos))
+
+            # Draw the artist
+            self.ax.draw_artist(self.background_tracking_text)
+
+        except Exception as e:  # pylint: disable=broad-except
+            _log.exception(e)
 
     # input filter
     # if temp (the actual reading) is outside of the interval [tmin,tmax] or
@@ -4606,6 +4703,88 @@ class tgraphcanvas(QObject):
     # sample devices at interval self.delay milliseconds.
     # we can assume within the processing of sample_processing() that flagon=True
     # NOTE: sample_processing is processed in the GUI thread NOT the sample thread!
+    # Phase 3C: Check for roasting defects and send notifications
+    def checkRoastDefects(self) -> None:
+        try:
+            # Only check defects during recording (flagstart=True)
+            if not self.flagstart or len(self.timex) == 0:
+                return
+
+            current_time = self.timex[-1]
+            current_bt = self.temp2[-1] if len(self.temp2) > 0 else -1
+            current_ror = self.rateofchange2 if hasattr(self, 'rateofchange2') else 0.0
+
+            # 1. BAKING: RoR (delta2) < 2.0 C/min for >30 seconds after FC is marked
+            if not self._defect_baking_notified and self.timeindex[2] > 0:  # FCs is marked
+                # Convert to Celsius if in Fahrenheit mode
+                ror_threshold = 2.0 if self.mode == 'C' else 3.6  # 2.0 C/min = 3.6 F/min
+
+                if current_ror < ror_threshold:
+                    if self._baking_start_time == 0.0:
+                        self._baking_start_time = current_time
+                    elif (current_time - self._baking_start_time) > 30:  # >30 seconds
+                        # Baking defect detected
+                        self._defect_baking_notified = True
+                        title = 'Roast Defect: Baking'
+                        message = f'RoR below {ror_threshold:.1f} °{"C" if self.mode == "C" else "F"}/min for >30s after FC'
+                        self.aw.sendmessage(message)
+                        self.aw.sendNotificationMessage(title, message, NotificationType.ARTISAN_SYSTEM)
+                else:
+                    # Reset the timer if RoR goes back above threshold
+                    self._baking_start_time = 0.0
+
+            # 2. CRASH: RoR drops >5 C/min between consecutive samples
+            if not self._defect_crash_notified and len(self.delta2) >= 2:
+                prev_ror = self.delta2[-2] if self.delta2[-2] is not None else 0.0
+                curr_ror = self.delta2[-1] if self.delta2[-1] is not None else 0.0
+
+                # Convert to Celsius if in Fahrenheit mode
+                crash_threshold = 5.0 if self.mode == 'C' else 9.0  # 5.0 C/min = 9.0 F/min
+
+                ror_drop = prev_ror - curr_ror
+                if ror_drop > crash_threshold:
+                    # Crash defect detected
+                    self._defect_crash_notified = True
+                    title = 'Roast Defect: Crash'
+                    message = f'RoR dropped {ror_drop:.1f} °{"C" if self.mode == "C" else "F"}/min between samples'
+                    self.aw.sendmessage(message)
+                    self.aw.sendNotificationMessage(title, message, NotificationType.ARTISAN_SYSTEM)
+
+            # 3. SCORCHING: BT > 220C before DRY is marked
+            if not self._defect_scorching_notified and self.timeindex[1] == 0 and current_bt != -1:  # DRY not yet marked
+                # Convert to Celsius if in Fahrenheit mode
+                scorch_threshold = 220 if self.mode == 'C' else 428  # 220C = 428F
+
+                if current_bt > scorch_threshold:
+                    # Scorching defect detected
+                    self._defect_scorching_notified = True
+                    title = 'Roast Defect: Scorching'
+                    message = f'BT exceeded {scorch_threshold}°{"C" if self.mode == "C" else "F"} before DRY'
+                    self.aw.sendmessage(message)
+                    self.aw.sendNotificationMessage(title, message, NotificationType.ARTISAN_SYSTEM)
+
+            # 4. UNDERDEVELOPED: DROP is marked with DTR < 15%
+            if not self._defect_underdeveloped_notified and self.timeindex[6] > 0:  # DROP is marked
+                # Calculate DTR: 100 * (time_at_DROP - time_at_FCs) / (time_at_DROP - time_at_CHARGE)
+                if self.timeindex[2] > 0 and self.timeindex[0] > -1:  # FCs and CHARGE are marked
+                    time_drop = self.timex[self.timeindex[6]]
+                    time_fcs = self.timex[self.timeindex[2]]
+                    time_charge = self.timex[self.timeindex[0]]
+
+                    if time_drop > time_charge:  # Avoid division by zero
+                        dtr = 100 * (time_drop - time_fcs) / (time_drop - time_charge)
+
+                        if dtr < 15.0:
+                            # Underdeveloped defect detected
+                            self._defect_underdeveloped_notified = True
+                            title = 'Roast Defect: Underdeveloped'
+                            message = f'DTR is {dtr:.1f}% (< 15%)'
+                            self.aw.sendmessage(message)
+                            self.aw.sendNotificationMessage(title, message, NotificationType.ARTISAN_SYSTEM)
+
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
+
     def sample_processing(self, local_flagstart:bool, temp1_readings:list[float], temp2_readings:list[float], timex_readings:list[float]) -> None: # pyright: ignore [reportGeneralTypeIssues] # Code is too complex to analyze; reduce complexity by refactoring into subroutines or reducing conditional code paths
         ##### (try to) lock resources  #########
         wait_period = 200  # we try to catch a lock within the next 200ms
@@ -5174,6 +5353,9 @@ class tgraphcanvas(QObject):
                         except Exception as e: # pylint: disable=broad-except
                             _log.exception(e)
 
+                    # Phase 3C: Check for roast defects
+                    if local_flagstart: # only during recording
+                        self.checkRoastDefects()
 
                     #output ET, BT, ETB, BTB to output program
                     if self.aw.ser.externaloutprogramFlag:
@@ -7808,6 +7990,14 @@ class tgraphcanvas(QObject):
                 self.extractimex1[i],self.extractimex2[i],self.extractemp1[i],self.extractemp2[i] = [],[],[],[]
             self.replayedBackgroundEvents=set()
             self.beepedBackgroundEvents=set()
+
+            # Phase 3C: Reset roast defect detection flags
+            self._defect_baking_notified = False
+            self._defect_crash_notified = False
+            self._defect_scorching_notified = False
+            self._defect_underdeveloped_notified = False
+            self._baking_start_time = 0.0
+
             self.clearEvents() # clear special events
             self.aw.lcd1.display('00:00')
             if self.aw.WebLCDs:
@@ -8143,6 +8333,7 @@ class tgraphcanvas(QObject):
             self.l_background_annotations = [] # initiate the background event annotations
 
             self.l_timeline = None # clear timeline Artist to get the linecount correct after changning a machine setup
+            self.background_tracking_text = None # clear background tracking HUD text overlay
 
             if not self.flagon:
                 self.aw.hideDefaultButtons()
@@ -13332,6 +13523,8 @@ class tgraphcanvas(QObject):
 
             # ADD DEVICE: # start communication/connect
             if not bool(self.aw.simulator):
+                # Hide connection indicator by default (will be shown only for Kaleido - device 138)
+                self.aw.setConnectionIndicatorVisible(False)
                 if self.device == 53 and self.aw.hottop is None: # only start Hottop connection if there is not already one
                     # connect HOTTOP
                     from artisanlib.hottop import Hottop
@@ -13394,6 +13587,8 @@ class tgraphcanvas(QObject):
                     from artisanlib.kaleido import KaleidoPort
                     self.aw.kaleido = KaleidoPort()
                     self.aw.kaleido.setLogging(self.device_logging)
+                    # Show connection indicator for Kaleido
+                    self.aw.setConnectionIndicatorVisible(True)
                     kaleido_serial:SerialSettings|None = None
                     if self.aw.kaleidoSerial:
                         kaleido_serial = SerialSettings(
@@ -13403,10 +13598,24 @@ class tgraphcanvas(QObject):
                                 stopbits = self.aw.ser.stopbits,
                                 parity = self.aw.ser.parity,
                                 timeout = self.aw.ser.timeout)
+                    def kaleido_connected_handler() -> None:
+                        self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('Kaleido'),True,None)
+                        self.aw.updateConnectionIndicator('connected')
+                        # Show the Kaleido AH button when connected
+                        if hasattr(self.aw, 'buttonKaleidoAH'):
+                            self.aw.buttonKaleidoAH.setVisible(True)
+
+                    def kaleido_disconnected_handler() -> None:
+                        self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('Kaleido'),True,None)
+                        self.aw.updateConnectionIndicator('disconnected')
+                        # Hide the Kaleido AH button when disconnected
+                        if hasattr(self.aw, 'buttonKaleidoAH'):
+                            self.aw.buttonKaleidoAH.setVisible(False)
+
                     self.aw.kaleido.start(self.mode, self.aw.kaleidoHost, self.aw.kaleidoPort,
                         serial=kaleido_serial,
-                        connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('Kaleido'),True,None),
-                        disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('Kaleido'),True,None))
+                        connected_handler=kaleido_connected_handler,
+                        disconnected_handler=kaleido_disconnected_handler)
                 elif self.device == 142:
                     try:
                         from artisanlib.ikawa import IKAWA_BLE
@@ -15372,6 +15581,8 @@ class tgraphcanvas(QObject):
                                 _log.exception(e)
                         if self.roastpropertiesAutoOpenDropFlag:
                             self.aw.openPropertiesSignal.emit()
+                        # Show quick cupping dialog after DROP
+                        self.aw.showQuickCupping()
                     self.aw.onMarkMoveToNext(self.aw.buttonDROP)
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)

@@ -2201,6 +2201,12 @@ class serialport:
                         self.aw.pidOffSignal.emit()
                 except Exception as e: # pylint: disable=broad-except
                     _log.error(e)
+            # Update the Kaleido AH button state
+            try:
+                ah = bool(round(t2))
+                self.aw.kaleidoAHStateSignal.emit(ah)
+            except Exception as e: # pylint: disable=broad-except
+                _log.error(e)
         else:
             t1 = t2 = -1
         return tx,t2,t1 # time), AH (chan2), Drum (chan1)

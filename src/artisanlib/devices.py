@@ -4249,6 +4249,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ####  DEVICE 138 is Kaleido BT/ET
                 elif meter == 'Kaleido BT/ET':
                     self.aw.qmc.device = 138
+                    self.aw.configureKaleidoSliders()
                     message = QApplication.translate('Message','Device set to {0}').format(meter)
                 ##########################
                 ##########################

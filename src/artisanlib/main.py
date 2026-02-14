@@ -170,6 +170,7 @@ if TYPE_CHECKING:
     from artisanlib.comparator import roastCompareDlg # pylint: disable=unused-import
     from artisanlib.wheels import WheelDlg # pylint: disable=unused-import
     from artisanlib.hottop import Hottop # pylint: disable=unused-import
+    from artisanlib.quick_cupping import QuickCuppingDlg # pylint: disable=unused-import
     from artisanlib.weblcds import WebLCDs, WebGreen, WebRoasted # pylint: disable=unused-import
     from artisanlib.santoker import Santoker # pylint: disable=unused-import
     from artisanlib.santoker_r import SantokerR # pylint: disable=unused-import
@@ -1424,6 +1425,7 @@ class ApplicationWindow(QMainWindow):
     pidOnSignal = pyqtSignal()
     pidOffSignal = pyqtSignal()
     pidToggleSignal = pyqtSignal()
+    kaleidoAHStateSignal = pyqtSignal(bool)
     notificationsSetEnabledSignal = pyqtSignal(bool)
     santokerSendMessageSignal = pyqtSignal(bytes,int)
     kaleidoSendMessageSignal = pyqtSignal(str,str)
@@ -1463,7 +1465,7 @@ class ApplicationWindow(QMainWindow):
         'seriallog', 'ser', 'modbus', 'extraMODBUStemps', 'extraMODBUStx', 's7', 'extraS7tx', 'ws', 'extraser', 'extracomport', 'extrabaudrate',
         'extrabytesize', 'extraparity', 'extrastopbits', 'extratimeout', 'hottop', 'santokerHost', 'santokerPort', 'santokerSerial', 'santokerBLE', 'santokerEventFlags', 'santoker', 'santokerR', 'lebrew_roastseeNEXT', 'thermoworksBlueDOT', 'fujipid', 'dtapid', 'pidcontrol', 'soundflag', 'recentRoasts', 'maxRecentRoasts',
         'mugmaHost','mugmaPort', 'mugma', 'mugma_default_host', 'shelly_3EMPro_host', 'shelly_PlusPlug_host',
-        'kaleido_default_host', 'kaleidoHost', 'kaleidoPort', 'kaleidoSerial', 'kaleidoPID', 'kaleido', 'kaleidoEventFlags', 'colorTrack_mean_window_size', 'colorTrack_median_window_size', 'ikawa',
+        'kaleido_default_host', 'kaleidoHost', 'kaleidoPort', 'kaleidoSerial', 'kaleidoPID', 'kaleido', 'kaleidoEventFlags', 'kaleidoAutoDetect', 'colorTrack_mean_window_size', 'colorTrack_median_window_size', 'ikawa',
         'lcdpaletteB', 'lcdpaletteF', 'extraeventsbuttonsflags', 'extraeventslabels', 'extraeventbuttoncolor', 'extraeventsactionstrings',
         'extraeventbuttonround', 'block_quantification_sampling_ticks', 'sampling_seconds_to_block_quantifiction', 'sampling_ticks_to_block_quantifiction', 'extraeventsactionslastvalue',
         'org_extradevicesettings', 'eventslidervalues', 'eventslidervisibilities', 'eventsliderKeyboardControl', 'eventsliderAlternativeLayout_default',
@@ -1484,11 +1486,11 @@ class ApplicationWindow(QMainWindow):
         'designerAction', 'simulatorAction', 'wheeleditorAction', 'transformAction', 'temperatureMenu', 'ConvertToFahrenheitAction',
         'ConvertToCelsiusAction', 'controlsAction', 'readingsAction', 'eventsEditorAction', 'buttonsAction', 'slidersAction', 'scheduleAction', 'lcdsAction', 'deltalcdsAction',
         'pidlcdsAction', 'scalelcdsAction', 'extralcdsAction', 'phaseslcdsAction', 'fullscreenAction', 'newRoastAction', 'loadSettingsAction', 'openRecentSettingMenu',
-        'saveAsSettingsAction', 'resetAction', 'messagelabel', 'button_font_size_pt', 'button_font_size', 'button_font_size_small', 'button_font_size_small_selected',
+        'saveAsSettingsAction', 'resetAction', 'messagelabel', 'connectionIndicator', 'button_font_size_pt', 'button_font_size', 'button_font_size_small', 'button_font_size_small_selected',
         'button_font_size_tiny', 'button_font_size_micro',
         'pushbuttonstyles_simulator', 'pushbuttonstyles', 'standard_button_tiny_height', 'standard_button_small_height', 'standard_button_height',
         'buttonONOFF', 'buttonSTARTSTOP', 'buttonFCs', 'buttonFCe', 'buttonSCs', 'buttonSCe', 'buttonRESET', 'buttonCHARGE', 'buttonDROP',
-        'buttonCONTROL', 'buttonEVENT', 'buttonSVp5', 'buttonSVp10', 'buttonSVp20', 'buttonSVm20', 'buttonSVm10', 'buttonSVm5', 'buttonDRY',
+        'buttonCONTROL', 'buttonEVENT', 'buttonSVp5', 'buttonSVp10', 'buttonSVp20', 'buttonSVm20', 'buttonSVm10', 'buttonSVm5', 'buttonKaleidoAH', 'buttonDRY',
         'buttonCOOL', 'lcd1', 'lcd2', 'lcd3', 'lcd4', 'lcd5',
         'lcd6', 'lcd7', 'label2', 'label3', 'label4', 'label5', 'label6', 'label7', 'extraLCD1', 'extraLCD2', 'extraLCDlabel1', 'extraLCDlabel2',
         'extraLCDframe1', 'extraLCDframe2', 'extraLCDvisibility1', 'extraLCDvisibility2', 'extraCurveVisibility1', 'extraCurveVisibility2',
@@ -1521,7 +1523,8 @@ class ApplicationWindow(QMainWindow):
         'schedule_visible_filter', 'scheduler_tasks_visible', 'scheduler_completed_details_visible', 'scheduler_filters_visible', 'scheduler_auto_open',
         'main_menu_actions_with_shortcuts', 'ui_mode', 'UIModeMenu',  'productionModeAction', 'defaultModeAction', 'expertModeAction', 'calculatorAction',
         'helpAboutAction', 'checkUpdateAction', 'errorAction', 'messageAction', 'serialAction', 'platformAction', 'aboutQtAction',
-        'helpDocumentationAction', 'KshortCAction' ]
+        'helpDocumentationAction', 'KshortCAction',
+        'beginnerMode', 'beginnerModeAction' ]
 
     nLCDS: Final[int] = 10 # maximum number of LCDs and extra devices (2x10 => 20 in total!)
 
@@ -1535,6 +1538,7 @@ class ApplicationWindow(QMainWindow):
         self.app:Artisan = app
         self.superusermode:bool = False
         self.ui_mode:UI_MODE = UI_MODE.DEFAULT
+        self.beginnerMode:bool = False
 
         self.sample_loop_running:bool = True
         self.time_stopped:float = 0
@@ -1839,6 +1843,7 @@ class ApplicationWindow(QMainWindow):
         self.kaleidoPID:bool = True # if True the external Kaleido PID is operated, otherwise the internal Artisan PID is active
         self.kaleido:KaleidoPort|None = None # holds the Kaleido instance created on connect; reset to None on disconnect
         self.kaleidoEventFlags:list[bool] = [False, False, False, False, False, False, False ] # CHARGE, DRY, FCs, FCe, SCs, SCe, DROP
+        self.kaleidoAutoDetect:bool = True # if True, auto-detect Kaleido USB on startup
 
         # Ikawa BLE
         self.ikawa:'IKAWA_BLE|None' = None # noqa: UP037
@@ -2054,6 +2059,20 @@ class ApplicationWindow(QMainWindow):
         for i in range(self.MaxRecentFiles):
             self.openRecentMenu.addAction(self.recentFileActs[i])
         self.updateRecentFileActions()
+
+        self.kaleidoTemplatesMenu:QMenu = QMenu(QApplication.translate('Menu', 'Kaleido Templates'))
+
+        kaleidoLightCityAction = QAction('Light City', self)
+        kaleidoLightCityAction.triggered.connect(self.loadKaleidoLightCity)
+        self.kaleidoTemplatesMenu.addAction(kaleidoLightCityAction)
+
+        kaleidoFullCityAction = QAction('Full City', self)
+        kaleidoFullCityAction.triggered.connect(self.loadKaleidoFullCity)
+        self.kaleidoTemplatesMenu.addAction(kaleidoFullCityAction)
+
+        kaleidoViennaAction = QAction('Vienna', self)
+        kaleidoViennaAction.triggered.connect(self.loadKaleidoVienna)
+        self.kaleidoTemplatesMenu.addAction(kaleidoViennaAction)
 
         self.importMenu:QMenu = QMenu(QApplication.translate('Menu', 'Import'))
         urlImportAction = QAction('Artisan URL...', self)
@@ -2724,6 +2743,10 @@ class ApplicationWindow(QMainWindow):
         self.fullscreenAction.setShortcut('Ctrl+F')
         self.fullscreenAction.setMenuRole(QAction.MenuRole.NoRole)
 
+        self.beginnerModeAction: QAction = QAction(QApplication.translate('Menu', 'Beginner Mode'), self)
+        self.beginnerModeAction.triggered.connect(self.toggleBeginnerMode)
+        self.beginnerModeAction.setCheckable(True)
+        self.beginnerModeAction.setChecked(False)
 
         # HELP menu
 
@@ -2832,6 +2855,12 @@ class ApplicationWindow(QMainWindow):
         self.messagelabel.setFont(f)
 
         self.messagelabel.setIndent(6)
+
+        # create connection status indicator for Kaleido
+        self.connectionIndicator: QLabel = QLabel()
+        self.connectionIndicator.setVisible(False)  # initially hidden, shown only when device == 138
+        self.connectionIndicator.setIndent(6)
+
         # set a few broad style parameters
         if platform.system() == 'Linux':
             self.button_font_size_pt = 11
@@ -3324,6 +3353,13 @@ class ApplicationWindow(QMainWindow):
         self.buttonSVm5.setToolTip(QApplication.translate('Tooltip', 'Decreases the current SV value by 5'))
         self.buttonSVm5.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
+        #create Kaleido Auto-Heating PID toggle button
+        self.buttonKaleidoAH: EventPushButton = EventPushButton(QApplication.translate('Button', 'PID'))
+        self.buttonKaleidoAH.setMinimumWidth(90)
+        self.buttonKaleidoAH.setMinimumHeight(self.standard_button_height)
+        self.buttonKaleidoAH.setToolTip(QApplication.translate('Tooltip', 'Toggle Kaleido Auto-Heating PID mode'))
+        self.buttonKaleidoAH.setVisible(False)
+
         #HUD button (button_18 was removed)
 
         #create DRY button
@@ -3343,6 +3379,7 @@ class ApplicationWindow(QMainWindow):
         self.buttonSVm20.clicked.connect(self.adjustPIDsv20m)
         self.buttonSVm10.clicked.connect(self.adjustPIDsv10m)
         self.buttonSVm5.clicked.connect(self.adjustPIDsv5m)
+        self.buttonKaleidoAH.clicked.connect(self.toggleKaleidoAH)
 
         # NavigationToolbar VMToolbar
         self.ntb: VMToolbar = VMToolbar(self.qmc.canvas, self.main_widget)
@@ -3814,6 +3851,7 @@ class ApplicationWindow(QMainWindow):
         del w
 
         #PID Buttons
+        pidbuttonLayout.addWidget(self.buttonKaleidoAH)
         pidbuttonLayout.addWidget(self.buttonSVp20)
         pidbuttonLayout.addWidget(self.buttonSVp10)
         pidbuttonLayout.addWidget(self.buttonSVp5)
@@ -4011,6 +4049,7 @@ class ApplicationWindow(QMainWindow):
         midleftlayout.setSpacing(0)
         midleftlayout.setContentsMargins(0,0,0,0)
         midleftlayout.addWidget(self.messagelabel)
+        midleftlayout.addWidget(self.connectionIndicator)
         midleftlayout.addLayout(level3layout)
         midleftlayout.addWidget(self.lowerbuttondialog)
         midleftlayout.addWidget(self.extrabuttondialogs)
@@ -4295,6 +4334,7 @@ class ApplicationWindow(QMainWindow):
         self.pidOnSignal.connect(self.pidOn)
         self.pidOffSignal.connect(self.pidOff)
         self.pidToggleSignal.connect(self.pidToggle)
+        self.kaleidoAHStateSignal.connect(self.updateKaleidoAHButtonState)
         self.notificationsSetEnabledSignal.connect(self.notificationsSetEnabled)
         self.santokerSendMessageSignal.connect(self.santokerSendMessage)
         self.kaleidoSendMessageSignal.connect(self.kaleidoSendMessage)
@@ -4346,6 +4386,7 @@ class ApplicationWindow(QMainWindow):
         file_menu.addMenu(self.newRoastMenu)
         file_menu.addAction(self.fileLoadAction)       # Open
         file_menu.addMenu(self.openRecentMenu)         # Open recent
+        file_menu.addMenu(self.kaleidoTemplatesMenu)   # Kaleido Templates
         if ui_mode in {UI_MODE.EXPERT, UI_MODE.DEFAULT}:
             file_menu.addMenu(self.importMenu)         # Import
             file_menu.addMenu(self.convFromMenu)       # Convert from
@@ -4477,6 +4518,8 @@ class ApplicationWindow(QMainWindow):
 #            self.fullscreenAction.setShortcut('Ctrl+F')
 #            self.fullscreenAction.setMenuRole(QAction.MenuRole.NoRole)
             view_menu.addAction(self.fullscreenAction)
+        view_menu.addSeparator()
+        view_menu.addAction(self.beginnerModeAction)
         return view_menu
 
 
@@ -7140,6 +7183,22 @@ class ApplicationWindow(QMainWindow):
     def adjustPIDsv5m(self, _:bool = False) -> None:
         self.adjustPIDsv(-5)
 
+    @pyqtSlot(bool)
+    def toggleKaleidoAH(self, _:bool = False) -> None:
+        if self.qmc.device == 138 and self.kaleido is not None:
+            # Toggle the AH state
+            ah = self.kaleido.get_state('AH')
+            if ah:
+                self.kaleido.pidOFF()
+            else:
+                self.kaleido.pidON()
+
+    @pyqtSlot(bool)
+    def updateKaleidoAHButtonState(self, ah_state:bool) -> None:
+        # Update the button's selected state to reflect the Kaleido AH state
+        if hasattr(self, 'buttonKaleidoAH'):
+            self.buttonKaleidoAH.setSelected(ah_state)
+
     # compute the 12 (if step size is 10) or 21 (if step size is 5) or 102 (if step size is 1) event quantifier linespace for type n in [0,3]
     def computeLinespace(self, n:int) -> 'npt.NDArray[numpy.double]':
         if self.eventquantifiercoarse[n] == 1: # step size 10
@@ -8478,6 +8537,114 @@ class ApplicationWindow(QMainWindow):
 #    def slider4Moved(self,v):
 #        self.eventslidermoved[3]=1
 #        self.updateSliderLCD(3,v)
+
+
+    # Auto-configure sliders for Kaleido M1 Lite device
+    def configureKaleidoSliders(self) -> None:
+        # Slider 1: Heat (HP, 0-100%, red accent)
+        self.eventslidervisibilities[0] = 1
+        self.eventslideractions[0] = 11  # IO Command
+        self.eventslidercommands[0] = 'kaleido(HP,{})'
+        self.eventslideroffsets[0] = 0.0
+        self.eventsliderfactors[0] = 1.0
+        self.eventslidermin[0] = 0
+        self.eventslidermax[0] = 100
+        self.eventslidercoarse[0] = 0
+        self.qmc.etypes[0] = 'Heat'
+
+        # Slider 2: Fan (FC, 0-100%, blue accent)
+        self.eventslidervisibilities[1] = 1
+        self.eventslideractions[1] = 11  # IO Command
+        self.eventslidercommands[1] = 'kaleido(FC,{})'
+        self.eventslideroffsets[1] = 0.0
+        self.eventsliderfactors[1] = 1.0
+        self.eventslidermin[1] = 0
+        self.eventslidermax[1] = 100
+        self.eventslidercoarse[1] = 0
+        self.qmc.etypes[1] = 'Fan'
+
+        # Slider 3: Drum (RC, 0-100%, teal accent)
+        self.eventslidervisibilities[2] = 1
+        self.eventslideractions[2] = 11  # IO Command
+        self.eventslidercommands[2] = 'kaleido(RC,{})'
+        self.eventslideroffsets[2] = 0.0
+        self.eventsliderfactors[2] = 1.0
+        self.eventslidermin[2] = 0
+        self.eventslidermax[2] = 100
+        self.eventslidercoarse[2] = 0
+        self.qmc.etypes[2] = 'Drum'
+
+        # Slider 4: Hidden
+        self.eventslidervisibilities[3] = 0
+        self.eventslideractions[3] = 0  # None
+        self.eventslidercommands[3] = ''
+        self.eventslideroffsets[3] = 0.0
+        self.eventsliderfactors[3] = 1.0
+        self.eventslidermin[3] = 0
+        self.eventslidermax[3] = 100
+        self.eventslidercoarse[3] = 0
+
+    def autoDetectKaleido(self) -> None:
+        """Auto-detect Kaleido USB serial device on startup and offer one-click configuration."""
+        try:
+            # Only auto-detect if no device is configured yet or device is set to None (0)
+            if not self.kaleidoAutoDetect or self.qmc.device != 0:
+                return
+
+            import serial.tools.list_ports
+
+            # Scan available COM ports
+            comports = list(serial.tools.list_ports.comports())
+            if not comports:
+                return
+
+            detected_port:str|None = None
+            detected_desc:str = ''
+
+            # Look for Kaleido device by common USB-serial chip identifiers
+            # Common chips: CH340, CP210x, FTDI
+            for port in comports:
+                port_desc = (port.description or '').lower()
+                port_product = (port.product or '').lower()
+                port_manufacturer = (port.manufacturer or '').lower()
+
+                # Check for Kaleido-specific identifiers or common USB-serial chips
+                if ('kaleido' in port_desc or 'kaleido' in port_product or
+                    'ch340' in port_desc or 'ch340' in port_product or
+                    'cp210' in port_desc or 'cp210' in port_product or
+                    'ftdi' in port_desc or 'ftdi' in port_manufacturer):
+                    detected_port = port.device
+                    detected_desc = port.description or port.device
+                    break
+
+            # If we found a candidate port, prompt the user
+            if detected_port:
+                response = QMessageBox.question(
+                    self,
+                    QApplication.translate('Message', 'Kaleido Detected'),
+                    QApplication.translate('Message',
+                        'Kaleido USB device detected on {0}.\n\nConfigure Kaleido automatically?').format(detected_port),
+                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                    QMessageBox.StandardButton.Yes
+                )
+
+                if response == QMessageBox.StandardButton.Yes:
+                    # Set device to Kaleido (device 138)
+                    self.qmc.device = 138
+                    # Configure for serial connection
+                    self.kaleidoSerial = True
+                    # Set the serial port
+                    self.ser.comport = detected_port
+                    # Configure Kaleido sliders
+                    self.configureKaleidoSliders()
+                    # Notify user
+                    self.sendmessage(QApplication.translate('Message',
+                        'Kaleido configured on {0}').format(detected_port))
+                    _log.info('Kaleido auto-configured on %s', detected_port)
+
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
+            # Silently fail - this is a convenience feature
 
     pyqtSlot()
     def slider1lcdClicked(self) -> None:
@@ -11715,6 +11882,30 @@ class ApplicationWindow(QMainWindow):
             if self.qmc.messagesemaphore.available() < 1:
                 self.qmc.messagesemaphore.release(1)
 
+    # Connection indicator methods for Kaleido
+    def updateConnectionIndicator(self, status:str) -> None:
+        """Update the connection indicator with the given status.
+
+        Args:
+            status: One of 'connected', 'disconnected', or 'reconnecting'
+        """
+        if status == 'connected':
+            # Green circle with "Connected" text
+            self.connectionIndicator.setStyleSheet("color: #00AA00; background-color: transparent;")
+            self.connectionIndicator.setText('\u25CF ' + QApplication.translate('Message', 'Connected'))
+        elif status == 'disconnected':
+            # Red circle with "Disconnected" text
+            self.connectionIndicator.setStyleSheet("color: #CC0000; background-color: transparent;")
+            self.connectionIndicator.setText('\u25CF ' + QApplication.translate('Message', 'Disconnected'))
+        elif status == 'reconnecting':
+            # Yellow/orange circle with "Reconnecting..." text
+            self.connectionIndicator.setStyleSheet("color: #FF8800; background-color: transparent;")
+            self.connectionIndicator.setText('\u25CF ' + QApplication.translate('Message', 'Reconnecting...'))
+
+    def setConnectionIndicatorVisible(self, visible:bool) -> None:
+        """Show or hide the connection indicator based on device type."""
+        self.connectionIndicator.setVisible(visible)
+
     def hideDefaultButtons(self) -> None:
         self.lowerbuttondialog.setVisible(False)
 
@@ -11860,6 +12051,51 @@ class ApplicationWindow(QMainWindow):
             self.hideSliders()
         else:
             self.showSliders()
+
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def toggleBeginnerMode(self, _:bool = False) -> None:
+        self.beginnerMode = not self.beginnerMode
+        self.beginnerModeAction.setChecked(self.beginnerMode)
+        self.applyBeginnerMode()
+
+    def applyBeginnerMode(self) -> None:
+        if self.beginnerMode:
+            # hide extra device LCDs (LCD6/LCD7 are PID LCDs)
+            self.LCD6frame.setVisible(False)
+            self.LCD7frame.setVisible(False)
+            # hide all extra device LCD frames
+            for i in range(self.nLCDS):
+                self.extraLCDframe1[i].setVisible(False)
+                self.extraLCDframe2[i].setVisible(False)
+            # hide SV buttons
+            self.pidcontrol.hideSVButtons()
+            # hide extra event buttons
+            self.extrabuttondialogs.setVisible(False)
+            self.buttonsAction.setChecked(False)
+            # hide slider 4 and SV slider
+            self.sliderGrpBox4.setVisible(False)
+            self.sliderGrpBoxSV.setVisible(False)
+            # disable advanced Tools menu items
+            self.roastCompareAction.setEnabled(False)
+            self.designerAction.setEnabled(False)
+            self.simulatorAction.setEnabled(False)
+            self.wheeleditorAction.setEnabled(False)
+        else:
+            # restore LCD visibility based on normal settings
+            self.updateLCDproperties()
+            # restore SV buttons based on settings
+            self.pidcontrol.activateONOFFeasySV(self.pidcontrol.svButtons)
+            # restore extra event buttons based on settings
+            self.updateExtraButtonsVisibility()
+            # restore slider visibility based on settings
+            self.updateSlidersProperties()
+            self.updateSVsliderVisibility()
+            # re-enable advanced Tools menu items
+            self.roastCompareAction.setEnabled(True)
+            self.designerAction.setEnabled(True)
+            self.simulatorAction.setEnabled(True)
+            self.wheeleditorAction.setEnabled(True)
 
     def hideControls(self, changeDefault:bool = True) -> None:
         self.level1frame.hide()
@@ -18165,6 +18401,7 @@ class ApplicationWindow(QMainWindow):
             self.kaleidoPort = toInt(settings.value('kaleidoPort',self.kaleidoPort))
             self.kaleidoSerial = toBool(settings.value('kaleidoSerial',self.kaleidoSerial))
             self.kaleidoPID = toBool(settings.value('kaleidoPID',self.kaleidoPID))
+            self.kaleidoAutoDetect = toBool(settings.value('kaleidoAutoDetect',self.kaleidoAutoDetect))
             if settings.contains('kaleidoEventFlags'):
                 self.kaleidoEventFlags = [toBool(x) for x in toList(settings.value('kaleidoEventFlags',self.kaleidoEventFlags))]
             self.mugmaHost = toString(settings.value('mugmaHost',self.mugmaHost))
@@ -18331,6 +18568,7 @@ class ApplicationWindow(QMainWindow):
             self.qmc.AUCshowFlag = toBool(settings.value('AUCshowFlag',self.qmc.AUCshowFlag))
             self.keyboardmoveflag = toInt(settings.value('keyboardmoveflag',int(self.keyboardmoveflag)))
             self.ui_mode = UI_MODE(toInt(settings.value('UI_mode',int(self.ui_mode))))
+            self.beginnerMode = toBool(settings.value('beginnerMode',self.beginnerMode))
             self.qmc.ambientTempSource = toInt(settings.value('AmbientTempSource',int(self.qmc.ambientTempSource)))
             self.qmc.ambientHumiditySource = toInt(settings.value('AmbientHumiditySource',int(self.qmc.ambientHumiditySource)))
             self.qmc.ambientPressureSource = toInt(settings.value('AmbientPressureSource',int(self.qmc.ambientPressureSource)))
@@ -20231,6 +20469,7 @@ class ApplicationWindow(QMainWindow):
             self.settingsSetValue(settings, default_settings, 'kaleidoPort',self.kaleidoPort, read_defaults)
             self.settingsSetValue(settings, default_settings, 'kaleidoSerial',self.kaleidoSerial, read_defaults)
             self.settingsSetValue(settings, default_settings, 'kaleidoPID',self.kaleidoPID, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'kaleidoAutoDetect',self.kaleidoAutoDetect, read_defaults)
             self.settingsSetValue(settings, default_settings, 'kaleidoEventFlags',self.kaleidoEventFlags, read_defaults)
             self.settingsSetValue(settings, default_settings, 'mugmaHost',self.mugmaHost, read_defaults)
             self.settingsSetValue(settings, default_settings, 'mugmaPort',self.mugmaPort, read_defaults)
@@ -20347,6 +20586,8 @@ class ApplicationWindow(QMainWindow):
             #save UI Mode
             if not read_defaults:
                 settings.setValue('UI_mode',int(self.ui_mode)) # 'UI_mode' is always stored to ease the transition (old settings default to Expert, new to Default)
+            #save beginner mode
+            self.settingsSetValue(settings, default_settings, 'beginnerMode',self.beginnerMode, read_defaults)
             #save ambient temperature source
             self.settingsSetValue(settings, default_settings, 'AmbientTempSource',self.qmc.ambientTempSource, read_defaults)
             self.settingsSetValue(settings, default_settings, 'AmbientHumiditySource',self.qmc.ambientHumiditySource, read_defaults)
@@ -21248,6 +21489,8 @@ class ApplicationWindow(QMainWindow):
                 # disconnect Kaleido
                 self.kaleido.stop()
                 self.kaleido = None
+                # Hide connection indicator
+                self.setConnectionIndicatorVisible(False)
             elif self.qmc.device == 164 and self.mugma is not None:
                 # disconnect Mugma
                 self.mugma.stop()
@@ -25329,6 +25572,34 @@ class ApplicationWindow(QMainWindow):
         dialog = backgroundDlg(self,self,self.backgroundDlg_activeTab)
         dialog.show()
 
+
+    @pyqtSlot()
+    def loadKaleidoLightCity(self) -> None:
+        import os
+        template_path = os.path.join(getResourcePath(), 'Profiles', 'Kaleido', 'Light_City.alog')
+        if os.path.isfile(template_path):
+            self.loadbackground(template_path)
+            self.qmc.background = True
+            self.qmc.redraw(recomputeAllDeltas=False)
+
+    @pyqtSlot()
+    def loadKaleidoFullCity(self) -> None:
+        import os
+        template_path = os.path.join(getResourcePath(), 'Profiles', 'Kaleido', 'Full_City.alog')
+        if os.path.isfile(template_path):
+            self.loadbackground(template_path)
+            self.qmc.background = True
+            self.qmc.redraw(recomputeAllDeltas=False)
+
+    @pyqtSlot()
+    def loadKaleidoVienna(self) -> None:
+        import os
+        template_path = os.path.join(getResourcePath(), 'Profiles', 'Kaleido', 'Vienna.alog')
+        if os.path.isfile(template_path):
+            self.loadbackground(template_path)
+            self.qmc.background = True
+            self.qmc.redraw(recomputeAllDeltas=False)
+
     def deleteBackground(self) -> None:
         self.qmc.background = False
         self.qmc.backgroundprofile = None
@@ -25434,6 +25705,13 @@ class ApplicationWindow(QMainWindow):
         dialog = flavorDlg(self,self)
         dialog.show()
 
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def showQuickCupping(self, _:bool = False) -> None:
+        """Show quick cupping dialog after DROP event"""
+        from artisanlib.quick_cupping import QuickCuppingDlg
+        dialog = QuickCuppingDlg(self, self)
+        dialog.exec()
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -27998,11 +28276,19 @@ def main() -> None:
 
     appWindow.set_ui_mode(appWindow.ui_mode)
 
+    # apply beginner mode if it was persisted
+    if appWindow.beginnerMode:
+        appWindow.beginnerModeAction.setChecked(True)
+        appWindow.applyBeginnerMode()
+
     # inform the user the debug logging is on
     if debugLogLevelActive():
         appWindow.sendmessage(QApplication.translate('Message', 'debug logging ON'))
 
     appWindow.show()
+
+    # Auto-detect Kaleido USB device on startup (if no device is configured)
+    QTimer.singleShot(500, appWindow.autoDetectKaleido)
 
     try:
         if sys.argv and len(sys.argv) > 1:
