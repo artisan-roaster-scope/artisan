@@ -1,5 +1,92 @@
 from artisanlib.util import createGradient
 
+artisan_event_button_style_dark: str = """
+            EventPushButton {{
+                min-width: {min_width}px;
+                min-height: {min_height}px;
+                font-size: {default_font_size}pt;
+                font-weight: bold;
+                padding: {padding}px;
+                border-style:solid;
+                border-radius:4;
+                border-color:#3a3a5a;
+                border-width:0;
+                color: #e0e0e0;
+            }}
+
+            EventPushButton[Selected=true] {{
+                font-size: {selected_font_size}pt;
+                background-color:""" + createGradient('#ff6b6b') + """ ;
+            }}
+            EventPushButton[Selected=true]:flat {{
+                color: #9e9e9e;
+                background-color: #2a2a4a;
+            }}
+            EventPushButton[Selected=true]:flat:!pressed:hover {{
+                color: #e0e0e0;
+                background-color: #4a2d3d;
+            }}
+            EventPushButton[Selected=true]:flat:pressed {{
+                color: #e0e0e0;
+                background-color: #ff6b6b;
+            }}
+            EventPushButton[Selected=true]:!flat:pressed {{
+                color: white;
+                background-color:""" + createGradient('#cc4444') + """ ;
+            }}
+            EventPushButton[Selected=true]:!pressed:hover {{
+                color: white;
+                background-color:""" + createGradient('#ff8888') + """ ;
+            }}
+
+            MajorEventPushButton[Selected=false]:flat {{
+                color: #9e9e9e;
+                background-color: #2a2a4a;
+            }}
+            MajorEventPushButton[Selected=false]:flat:!pressed:hover {{
+                color: #e0e0e0;
+                background-color: #3a3a5a;
+            }}
+            MajorEventPushButton[Selected=false]:flat:pressed {{
+                color: #e0e0e0;
+                background-color: #4a4a6a;
+            }}
+            MajorEventPushButton[Selected=false]:!flat:pressed {{
+                color: #e0e0e0;
+                background-color:""" + createGradient('#2d3d4a') + """ ;
+            }}
+            MajorEventPushButton[Selected=false]:!pressed:hover {{
+                background-color:""" + createGradient('#42a5f5') + """ ;
+            }}
+
+            MinorEventPushButton[Selected=false]:flat {{
+                color: #7a7a9a;
+                background-color: #1a1a2e;
+            }}
+            MinorEventPushButton[Selected=false]:flat:!pressed:hover {{
+                color: #e0e0e0;
+                background-color: #2a2a4a;
+            }}
+            MinorEventPushButton[Selected=false]:flat:pressed {{
+                color: #e0e0e0;
+                background-color: #3a3a5a;
+            }}
+            MinorEventPushButton[Selected=false]:!flat:pressed {{
+                color: #e0e0e0;
+                background-color:""" + createGradient('#2d4a3e') + """ ;
+            }}
+            MinorEventPushButton[Selected=false]:!pressed:hover {{
+                background-color:""" + createGradient('#4ecdc4') + """ ;
+            }}
+
+            AuxEventPushButton[Selected=false]:pressed {{
+                background-color:""" + createGradient('#3a3a5a') + """ ;
+            }}
+            AuxEventPushButton[Selected=false]:!pressed:hover {{
+                background-color:""" + createGradient('#4a4a6a') + """ ;
+            }}
+"""
+
 artisan_event_button_style: str = """
             EventPushButton {{
                 min-width: {min_width}px;

@@ -1673,7 +1673,7 @@ class tgraphcanvas(QObject):
         self.polyfitRoRcalc:bool = False
 
         self.patheffects:int = 1
-        self.glow:int = 0
+        self.glow:int = 1
         self.graphstyle:int = 0
         self.graphfont:int = 0
 
@@ -1831,9 +1831,9 @@ class tgraphcanvas(QObject):
 
         self.linestyle_default: Final[str] = '-'
         self.drawstyle_default: Final[str] = 'default'
-        self.linewidth_default: Final[float] = 1.5
+        self.linewidth_default: Final[float] = 2.5
         self.back_linewidth_default: Final[float] = 2
-        self.delta_linewidth_default: Final[float] = 1
+        self.delta_linewidth_default: Final[float] = 1.5
         self.back_delta_linewidth_default: Final[float] = 1.5
         self.extra_linewidth_default: Final[float] = 1
         self.marker_default: Final[str] = 'None'

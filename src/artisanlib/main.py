@@ -694,8 +694,8 @@ if platform.system().startswith('Windows'):
 from artisanlib.s7port import s7port
 from artisanlib.wsport import wsport
 from artisanlib.modbusport import modbusport
-from artisanlib.slider_style import artisan_slider_style
-from artisanlib.event_button_style import artisan_event_button_style
+from artisanlib.slider_style import artisan_slider_style, artisan_slider_style_dark
+from artisanlib.event_button_style import artisan_event_button_style, artisan_event_button_style_dark
 from artisanlib.simulator import Simulator
 from artisanlib.dialogs import HelpDlg, ArtisanInputDialog, ArtisanComboBoxDialog, ArtisanPortsDialog, ArtisanSliderLCDinputDlg
 from artisanlib.large_lcds import (LargeMainLCDs, LargeDeltaLCDs, LargePIDLCDs, LargeExtraLCDs, LargePhasesLCDs, LargeScaleLCDs)
@@ -3581,7 +3581,7 @@ class ApplicationWindow(QMainWindow):
         # All stylesheet of its children (the actual event buttons) needs to be non-conflicting.
         # Any conflict will turn off merging of parent styles and just rely on the child stylesheet.
         self.lowerbuttondialog.setStyleSheet(
-            artisan_event_button_style.format(
+            (artisan_event_button_style_dark if not self.light_background_p else artisan_event_button_style).format(
                 min_width=self.standard_button_min_width_px - 6,
                 min_height=self.standard_button_height - 7,
                 padding=3,
@@ -6532,17 +6532,17 @@ class ApplicationWindow(QMainWindow):
             self.qmc.canvas.setStyleSheet('background-color:transparent;')
             self.ntb.setStyleSheet('QToolBar {background-color:transparent;}')
 
+        if hasattr(self, 'light_background_p'):
+            # reset the cached property self.light_background_p before updating styles
+            del self.light_background_p
+
         self.updateSliderColors()
         self.updatePhasesLCDsColors()
+        self.updateEventButtonColors()
 
         if checkColors:
             colorPairsToCheck = self.getcolorPairsToCheck()
             self.checkColors(colorPairsToCheck)
-
-
-        if hasattr(self, 'light_background_p'):
-            # reset the cached property self.light_background_p
-            del self.light_background_p
 
 
     # called from within the sample loop thread!
@@ -6629,6 +6629,18 @@ class ApplicationWindow(QMainWindow):
         self.slider3.setStyleSheet(self.slideStyle(2))
         self.slider4.setStyleSheet(self.slideStyle(3))
         self.sliderSV.setStyleSheet(self.slideStyle(4))
+
+    def updateEventButtonColors(self) -> None:
+        btn_style = artisan_event_button_style_dark if not self.light_background_p else artisan_event_button_style
+        font_small = self.button_font_size_pt - 3
+        font_small_sel = self.button_font_size_pt - 2
+        self.lowerbuttondialog.setStyleSheet(
+            btn_style.format(
+                min_width=self.standard_button_min_width_px - 6,
+                min_height=self.standard_button_height - 7,
+                padding=3,
+                default_font_size=font_small,
+                selected_font_size=font_small_sel))
 
     def updatePhasesLCDsColors(self) -> None:
         label_style = 'QLabel { color : ' + self.qmc.palette['messages']  + '; }'
@@ -12267,10 +12279,11 @@ class ApplicationWindow(QMainWindow):
         self.updatePlaybackIndicatorSignal.emit()
 
     def slideStyle(self, n:int) -> str:
+        style = artisan_slider_style_dark if not self.light_background_p else artisan_slider_style
         if n == 4:
-            return artisan_slider_style.format(color=self.qmc.palette['title'])
+            return style.format(color=self.qmc.palette['title'])
         if 0 <= n < 4:
-            return artisan_slider_style.format(color=self.qmc.EvalueColor[n])
+            return style.format(color=self.qmc.EvalueColor[n])
         return ''
 
     def sliderLCDstyle(self, n:int) -> str:

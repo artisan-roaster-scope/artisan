@@ -62,11 +62,11 @@ class KaleidoPort:
         self._default_data_stream:Final[str] = 'A0'
         self._open_timeout:Final[float] = 6      # in seconds
         self._init_timeout:Final[float] = 6      # in seconds
-        self._ping_timeout:Final[float] = 0.8    # in seconds
-        self._send_timeout:Final[float] = 0.4    # in seconds
-        self._read_timeout:Final[float] = 4      # in seconds
+        self._ping_timeout:Final[float] = 1.2    # in seconds (increased for USB serial reliability)
+        self._send_timeout:Final[float] = 0.6    # in seconds (increased for USB serial reliability)
+        self._read_timeout:Final[float] = 5      # in seconds (increased for USB serial reliability)
         self._ping_retry_delay:Final[float] = 1  # in seconds
-        self._reconnect_delay:Final[float] = 0.2 # in seconds
+        self._reconnect_delay:Final[float] = 0.5 # in seconds (increased to avoid overwhelming USB stack)
 
         self.send_button_timeout:Final[float] = 1.2  # in seconds
 
