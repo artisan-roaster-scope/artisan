@@ -147,7 +147,7 @@ class IteratorReader:
 class AsyncComm:
 
     __slots__ = [ '_asyncLoopThread', '_write_queue', '_running', '_host', '_port', '_serial', '_connected_handler', '_disconnected_handler',
-                    '_verify_crc', '_logging' ]
+                    '_verify_crc', '_logging', '_send_timeout' ]
 
     def __init__(self, host:str = '127.0.0.1', port:int = 8080, serial:'SerialSettings|None' = None,
                 connected_handler:Callable[[], None]|None = None,
@@ -169,6 +169,7 @@ class AsyncComm:
         # configuration
         self._verify_crc:bool = True  # if True the CRC of incoming messages is verified
         self._logging = False         # if True device communication is logged
+        self._send_timeout:Final[float] = 0.6    # in seconds
 
 
     # external API
@@ -326,6 +327,38 @@ class AsyncComm:
     def send(self, message:bytes) -> None:
         if self.async_loop_thread is not None and self._write_queue is not None:
             asyncio.run_coroutine_threadsafe(self._write_queue.put(message), self.async_loop_thread.loop)
+
+
+    # adds message to write queue and awaits new data
+    async def write_await(self, message:bytes, event:asyncio.Event, send_timeout:float) -> None:
+        if self._write_queue is None:
+            return
+        await self._write_queue.put(message)
+        # await a response containing a new value for var with timeout
+        try:
+            await asyncio.wait_for(event.wait(), send_timeout)
+        except TimeoutError:
+            if self._logging:
+                _log.info('write_await (msg=%s, send_timeout:%s)', message.strip(), send_timeout)
+
+    def send_await(self, message:bytes, event:asyncio.Event, timeout:float|None = None) -> None:
+        if self.async_loop_thread is not None and self._write_queue is not None:
+            send_timeout:float = self._send_timeout
+            if timeout is not None:
+                send_timeout = timeout
+            task = self.write_await(message, event, send_timeout)
+            if self._asyncLoopThread is not None:
+                future = asyncio.run_coroutine_threadsafe(task, self._asyncLoopThread.loop)
+                try:
+                    future.result()
+                except TimeoutError:
+                    # the coroutine took too long, cancelling the task...
+                    if self._logging:
+                        _log.info('send_request timeout (msg=%s, timeout:%s, send_timeout:%s)',message,timeout,send_timeout)
+                    future.cancel()
+                except Exception as ex: # pylint: disable=broad-except
+                    _log.error(ex)
+
 
 
     # start/stop sample thread

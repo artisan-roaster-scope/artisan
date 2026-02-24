@@ -177,6 +177,7 @@ if TYPE_CHECKING:
     from artisanlib.bluedot import BlueDOT # pylint: disable=unused-import
     from artisanlib.mugma import Mugma # pylint: disable=unused-import
     from artisanlib.kaleido import KaleidoPort # pylint: disable=unused-import
+    from artisanlib.orbiter import Orbiter # pylint: disable=unused-import
     from artisanlib.phases_canvas import tphasescanvas # pylint: disable=unused-import
     try:
         from artisanlib.ikawa import IKAWA_BLE # pylint: disable=unused-import
@@ -1428,6 +1429,7 @@ class ApplicationWindow(QMainWindow):
     santokerSendMessageSignal = pyqtSignal(bytes,int)
     kaleidoSendMessageSignal = pyqtSignal(str,str)
     kaleidoSendMessageAwaitSignal = pyqtSignal(str,str,int,int)
+    orbiterSendMessageSignal = pyqtSignal(bytes,bytes,bytes)
     addEventSignal = pyqtSignal(int,int,bool,bool,bool)
     addRawEventSignal = pyqtSignal(int,float,int,bool,bool,bool)
     updateMessageLogSignal = pyqtSignal()
@@ -1839,6 +1841,9 @@ class ApplicationWindow(QMainWindow):
         self.kaleidoPID:bool = True # if True the external Kaleido PID is operated, otherwise the internal Artisan PID is active
         self.kaleido:KaleidoPort|None = None # holds the Kaleido instance created on connect; reset to None on disconnect
         self.kaleidoEventFlags:list[bool] = [False, False, False, False, False, False, False ] # CHARGE, DRY, FCs, FCe, SCs, SCe, DROP
+
+        # Orbiter
+        self.orbiter:Orbiter|None = None # holds the Orbiter instance created on connect; reset to None on disconnect
 
         # Ikawa BLE
         self.ikawa:'IKAWA_BLE|None' = None # noqa: UP037
@@ -4277,6 +4282,7 @@ class ApplicationWindow(QMainWindow):
         self.santokerSendMessageSignal.connect(self.santokerSendMessage)
         self.kaleidoSendMessageSignal.connect(self.kaleidoSendMessage)
         self.kaleidoSendMessageAwaitSignal.connect(self.kaleidoSendMessageAwait)
+        self.orbiterSendMessageSignal.connect(self.orbiterSendMessage)
         self.addEventSignal.connect(self.addEventSlot, type=Qt.ConnectionType.QueuedConnection) # type: ignore[call-arg]
         self.addRawEventSignal.connect(self.addRawEventSlot, type=Qt.ConnectionType.QueuedConnection) # type: ignore[call-arg]
            # by default the connection type is AutoConnection (If the emitter & receiver are in the same thread, a DirectConnection is used. Otherwise, a QueuedConnection is used.)
@@ -5945,7 +5951,7 @@ class ApplicationWindow(QMainWindow):
                             self.mugmaHost = host
                         else:
                             res = False
-                    elif (self.qmc.device in {0, 9, 19, 53, 101, 115, 126} or ((self.qmc.device == 29 or 29 in self.qmc.extradevices) and self.modbus.type in {0, 1, 2}) or
+                    elif (self.qmc.device in {0, 9, 19, 53, 101, 115, 126, 196} or ((self.qmc.device == 29 or 29 in self.qmc.extradevices) and self.modbus.type in {0, 1, 2}) or
                             (self.qmc.device == 134 and self.santokerSerial and not self.santokerBLE) or
                             (self.qmc.device == 138 and self.kaleidoSerial)): # Fuji, Center301, TC4, Hottop, Behmor or MODBUS serial, HB/ARC
                         select_device_name = None
@@ -9550,6 +9556,30 @@ class ApplicationWindow(QMainWindow):
                                                 # or event type is set to -1 and result of event action should be awaited and bound to $ changing event button state # used by toggle buttons
                                                 # send message, await new value and create an event with the new value
                                                 self.kaleidoSendMessageAwaitSignal.emit(target, vs, eventtype, lastbuttonpressed)
+
+
+                                ##  orbiter(<cmd>[,<value>[,<param>]]) : <cmd>: command (1 byte in hex syntax), optional: <value> a 16bit positive number, <param> a number 0-255
+                                #     ex: orbiter(0D,7) => set heater power to 7
+                                elif c.startswith('orbiter'):
+                                    if self.orbiter is not None:
+                                        args = c[len('orbiter'):]
+                                        if args.startswith('(') and args.endswith(')'):
+                                            parts = args[1:-1].split(',')
+                                            try:
+                                                if len(parts) > 0:
+                                                    orbiter_cmd:bytes = bytes.fromhex(parts[0])
+                                                    orbiter_data:bytes
+                                                    if len(parts) > 2:
+                                                        orbiter_param = min(255, max(0, int(round(float(parts[2]))))).to_bytes(1, 'little')
+                                                    else:
+                                                        orbiter_param = b'\x00'
+                                                    if len(parts) > 1:
+                                                        orbiter_data = min(65535, max(0, int(round(float(parts[1]))))).to_bytes(2, 'little')
+                                                    else:
+                                                        orbiter_data = b'\x00\x00'
+                                                    self.orbiterSendMessageSignal.emit(orbiter_cmd, orbiter_data, orbiter_param)
+                                            except Exception as e: # pylint: disable=broad-except
+                                                _log.error(e)
 
                                 ##  shellyrelay(n,b) : switches Shelly plug number <n> ON if b is true or 1, and OFF otherwise
                                 elif c.startswith('shellyrelay'):
@@ -17797,6 +17827,12 @@ class ApplicationWindow(QMainWindow):
     def kaleidoSendMessage(self, target:str, value:str) -> None:
         if self.kaleido is not None:
             self.kaleido.send_msg(target, value)
+
+    # orbiterSendMessage() just sends out the message to the machine without waiting for a response
+    @pyqtSlot(bytes,bytes,bytes)
+    def orbiterSendMessage(self, cmd:bytes, data:bytes, param:bytes) -> None:
+        if self.orbiter is not None:
+            self.orbiter.send_msg(cmd, data, param)
 
     # if record is True, an event is added during recording, otherwise only the slider is moved
     # if fire_slider_action is True, the slider action is fired

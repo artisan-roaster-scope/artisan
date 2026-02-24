@@ -570,7 +570,12 @@ class serialport:
                                    self.Phidget_HUM1000_HumTemp,     #192
                                    self.Phidget_PRE1000,             #193
                                    self.Yocto_Meteo_HumTemp,         #194
-                                   self.Yocto_Meteo_Pressure         #195
+                                   self.Yocto_Meteo_Pressure,        #195
+                                   self.Orbiter_BTET,                #196
+                                   self.Orbiter_ITDT,                #197
+                                   self.Orbiter_Sound_Drum,          #198
+                                   self.Orbiter_Damper_Heater,       #199
+                                   self.Orbiter_Air_RoR              #200
                                    ]
         #string with the name of the program for device #27
         self.externalprogram:str = 'test.py'
@@ -2211,7 +2216,56 @@ class serialport:
             t1,t2 = self.aw.kaleido.getHeaterFan()
         else:
             t1 = t2 = -1
-        return tx,t2,t1 # time Fan (chan2), Heater (chan1)
+        return tx,t2,t1 # time, Fan (chan2), Heater (chan1)
+
+# Orbiter
+
+    def Orbiter_BTET(self) -> tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        t1:float = -1
+        t2:float = -1
+        if self.aw.orbiter is not None:
+            t1 = self.aw.orbiter.getBT()
+            t2 = self.aw.orbiter.getET()
+        return tx,t2,t1
+
+    def Orbiter_ITDT(self) -> tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        t1:float = -1
+        t2:float = -1
+        if self.aw.orbiter is not None:
+            t1 = self.aw.orbiter.getIT()
+            t2 = self.aw.orbiter.getDT()
+        return tx,t2,t1 # time, DT (chan2), IT (chan1)
+
+    def Orbiter_Sound_Drum(self) -> tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        t1:float = -1
+        t2:float = -1
+        if self.aw.orbiter is not None:
+            t1 = self.aw.orbiter.getSound()
+            t2 = self.aw.orbiter.getDrum()
+        return tx,t2,t1 # time, Drum (chan2), Sound (chan1)
+
+    def Orbiter_Damper_Heater(self) -> tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        t1:float = -1
+        t2:float = -1
+        if self.aw.orbiter is not None:
+            t1 = self.aw.orbiter.getDamper()
+            t2 = self.aw.orbiter.getHeater()
+        return tx,t2,t1 # time, Heater (chan2), Damper (chan1)
+
+    def Orbiter_Air_RoR(self) -> tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        t1:float = -1
+        t2:float = -1
+        if self.aw.orbiter is not None:
+            t1 = self.aw.orbiter.getAir()
+            t2 = self.aw.orbiter.getRoR()
+        return tx,t2,t1 # time, RoR (chan2), Air (chan1)
+
+# IKAWA
 
     def Ikawa(self) -> tuple[float,float,float]:
         tx = self.aw.qmc.timeclock.elapsedMilli()

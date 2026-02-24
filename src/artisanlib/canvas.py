@@ -992,7 +992,12 @@ class tgraphcanvas(QObject):
                        '+Phidget HUM1000 Hum/Temp',  #192
                        '+Phidget PRE1000',           #193
                        '+Yocto Meteo Hum/Temp',      #194
-                       '+Yocto Meteo Pressure'       #195
+                       '+Yocto Meteo Pressure',      #195
+                       'Orbiter BT/ET',              #196
+                       '+Orbiter IT/DT',             #197
+                       '+Orbiter Sound/Drum',        #198
+                       '+Orbiter Damper/Heater',     #199
+                       '+Orbiter Air/RoR'            #200
                        ]
 
         # ADD DEVICE:
@@ -1156,7 +1161,10 @@ class tgraphcanvas(QObject):
             192, # +Phidget HUM1000 Hum/Temp
             193, # +Phidget PRE1000
             194, # +Yocto Meteo Hum/Temp
-            195  # +Yocto Meteo Pressure
+            195, # +Yocto Meteo Pressure
+            198, # +Orbiter Sound/Drum
+            199, # +Orbiter Damper/Heater
+            200  # +Orbiter Air/RoR
         ]
 
         # ADD DEVICE:
@@ -4455,7 +4463,9 @@ class tgraphcanvas(QObject):
                             (self.aw.s7.div[idx*2 + c] == 0 or self.aw.s7.type[idx*2 + c] == 2) and
                             no_math_formula_defined)
             # others
-            if self.extradevices[n] in {54, 90, 91, 135, 136, 140, 141, 165}: # Hottop Heater/Fan, Slider 12, Slider 34, Santoker Power / Fan, Kaleido Fan/Drum, Kaleido Heater/AH, Mugma Heater/Fan
+            if self.extradevices[n] in {54, 90, 91, 135, 136, 140, 141, 165,
+                198, 199
+                }: # Hottop Heater/Fan, Slider 12, Slider 34, Santoker Power / Fan, Kaleido Fan/Drum, Kaleido Heater/AH, Mugma Heater/Fan, Orbiter Sound/Drum, Orbiter Damper/Heater
                 return True
             if self.extradevices[n] == 136 and c == 0: # Santoker Drum
                 return True
@@ -13376,6 +13386,21 @@ class tgraphcanvas(QObject):
                     self.aw.mugma.setLogging(self.device_logging)
                     self.aw.mugma.start()
 
+                elif self.device == 196:
+                    # connect Orbiter
+                    from artisanlib.orbiter import Orbiter
+                    orbiter_serial = SerialSettings(
+                                port = self.aw.ser.comport,
+                                baudrate = self.aw.ser.baudrate,
+                                bytesize = self.aw.ser.bytesize,
+                                stopbits = self.aw.ser.stopbits,
+                                parity = self.aw.ser.parity,
+                                timeout = self.aw.ser.timeout)
+                    self.aw.orbiter = Orbiter(orbiter_serial,
+                        connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('Orbiter'),True,None),
+                        disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('Orbiter'),True,None))
+                    self.aw.orbiter.setLogging(self.device_logging)
+                    self.aw.orbiter.start()
 
             self.aw.initializedMonitoringExtraDeviceStructures()
 
@@ -13525,6 +13550,11 @@ class tgraphcanvas(QObject):
                 if not bool(self.aw.simulator) and self.device == 164 and self.aw.mugma is not None:
                     self.aw.mugma.stop()
                     self.aw.mugma = None
+
+                # disconnect Orbiter
+                if not bool(self.aw.simulator) and self.device == 196 and self.aw.orbiter is not None:
+                    self.aw.orbiter.stop()
+                    self.aw.orbiter = None
 
                 # at OFF we stop the follow-background on FujiPIDs and set the SV to 0
                 if self.device == 0 and self.aw.fujipid.followBackground and self.aw.fujipid.sv and self.aw.fujipid.sv > 0:
