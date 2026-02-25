@@ -57,7 +57,7 @@ class Orbiter(AsyncComm):
     CMD_INIT:Final[bytes] = b'\x01'
     CMD_SYNC:Final[bytes] = b'\x00'
 
-    __slots__ = [ 'send_timeout', '_logging', '_connected', '_new_readings_available', '_BT', '_ET', '_IT', '_DT', '_air', '_drum', '_damper',
+    __slots__ = [ 'send_timeout', '_connected', '_new_readings_available', '_BT', '_ET', '_IT', '_DT', '_air', '_drum', '_damper',
             '_heater', '_sound', '_RoR', '_master_control',
             '_SERIAL',  '_FW_VERSION', '_PCB_VERSION', '_DASHBOARD_STATUS', '_MODEL', '_MODEL_NUM' ]
 
@@ -165,8 +165,8 @@ class Orbiter(AsyncComm):
                 if self._logging:
                     _log.debug('Orbiter data: %s', data)
                 # check CRC
-                if self.crc(cmd[0:1] + data[:24]) == data[24]:
-                    try:
+                try:
+                    if self.crc(cmd[0:1] + data[:24]) == data[24]:
                         self._BT = int.from_bytes(data[7:9], 'little', signed=True)
                         self._IT = int.from_bytes(data[9:11], 'little', signed=True)
                         self._DT = int.from_bytes(data[11:13], 'little', signed=True)
@@ -179,10 +179,10 @@ class Orbiter(AsyncComm):
                         self._sound = data[22]
                         self._master_control = data[23]
                         self._new_readings_available.set()
-                    except Exception as e:
-                        _log.exception(e)
-                else:
-                    _log.debug('Orbiter CRC failed')
+                    else:
+                        _log.debug('Orbiter CRC failed: %s != %s', self.crc(cmd[0:1] + data[:24]), data[24])
+                except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
             elif cmd[0] == 1: # init ack (total 28 bytes)
                 if self._logging:
                     _log.debug('Orbiter CMD init ack')
@@ -190,25 +190,28 @@ class Orbiter(AsyncComm):
                 if self._logging:
                     _log.debug('Orbiter ack init data: %s', data)
                 # check CRC
-                if self.crc(cmd[0:1] + data[:24]) == data[24]:
-                    self._SERIAL = data[1:8].decode('ascii')
-                    self._FW_VERSION = data[8:15].decode('ascii')
-                    self._PCB_VERSION = data[15]
-                    self._DASHBOARD_STATUS = data[17:19]
-                    self._MODEL = data[19:21].decode('ascii')
-                    self._MODEL_NUM = data[21]
-                    self._sound = data[22]
-                    self._master_control = data[23]
-                    _log.debug("Orbiter SERIAL: '%s'", self._SERIAL)
-                    _log.debug("Orbiter FW_VERSION: '%s'", self._FW_VERSION)
-                    _log.debug('Orbiter PCB_VERSION: %s', self._PCB_VERSION)
-                    _log.debug('Orbiter DASHBOARD_STATUS: %s', self._DASHBOARD_STATUS)
-                    _log.debug('Orbiter MODEL: %s', self._MODEL)
-                    _log.debug('Orbiter MODEL_NUM: %s', self._MODEL_NUM)
-                    _log.debug('Orbiter _sound: %s', self._sound)
-                    _log.debug('Orbiter _master_control: %s', self._master_control)
-                else:
-                    _log.debug('Orbiter CRC failed: %s != %s', self.crc(cmd[0:1] + data[:24]), data[24])
+                try:
+                    if self.crc(cmd[0:1] + data[:24]) == data[24]:
+                        self._SERIAL = data[1:8].decode('ascii')
+                        self._FW_VERSION = data[8:15].decode('ascii')
+                        self._PCB_VERSION = data[15]
+                        self._DASHBOARD_STATUS = data[17:19]
+                        self._MODEL = data[19:21].decode('ascii')
+                        self._MODEL_NUM = data[21]
+                        self._sound = data[22]
+                        self._master_control = data[23]
+                        _log.debug("Orbiter SERIAL: '%s'", self._SERIAL)
+                        _log.debug("Orbiter FW_VERSION: '%s'", self._FW_VERSION)
+                        _log.debug('Orbiter PCB_VERSION: %s', self._PCB_VERSION)
+                        _log.debug('Orbiter DASHBOARD_STATUS: %s', self._DASHBOARD_STATUS)
+                        _log.debug('Orbiter MODEL: %s', self._MODEL)
+                        _log.debug('Orbiter MODEL_NUM: %s', self._MODEL_NUM)
+                        _log.debug('Orbiter _sound: %s', self._sound)
+                        _log.debug('Orbiter _master_control: %s', self._master_control)
+                    else:
+                        _log.debug('Orbiter CRC failed: %s != %s', self.crc(cmd[0:1] + data[:24]), data[24])
+                except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
 
 
     # send message interface
