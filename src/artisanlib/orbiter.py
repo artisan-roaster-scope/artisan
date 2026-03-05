@@ -52,14 +52,13 @@ class State(TypedDict, total=False):
 class Orbiter(AsyncComm):
 
     HEADER:Final[bytes] = b'\xFF\xFF'
-    TIME:Final[bytes] = b'\x00\x00'
     EVENT:Final[bytes] = b'\x00'
     CMD_INIT:Final[bytes] = b'\x01'
     CMD_SYNC:Final[bytes] = b'\x00'
 
     __slots__ = [ 'send_timeout', '_connected', '_new_readings_available', '_BT', '_ET', '_IT', '_DT', '_air', '_drum', '_damper',
-            '_heater', '_sound', '_RoR', '_master_control',
-            '_SERIAL',  '_FW_VERSION', '_PCB_VERSION', '_DASHBOARD_STATUS', '_MODEL', '_MODEL_NUM' ]
+            '_heater', '_sound', '_RoR', '_master_control', '_SERIAL',  '_FW_VERSION', '_PCB_VERSION', '_DASHBOARD_STATUS', '_MODEL', '_MODEL_NUM',
+            'isRoaster_Roasting' ]
 
     def __init__(self, serial:'SerialSettings',
                 connected_handler:Callable[[], None]|None = None,
@@ -77,7 +76,7 @@ class Orbiter(AsyncComm):
         #-
         self._BT:float = -1      # bean temperature
         self._ET:float = -1      # environmental temperature
-        self._IT:float = -1      # inlet temperature
+        self._IT:float = -1      # interlayer temperature
         self._DT:float = -1      # drum temperature
         self._air:float = -1     # air pressure
         self._drum:int = -1      # drum speed (50-90 RPM)
@@ -94,6 +93,8 @@ class Orbiter(AsyncComm):
         self._DASHBOARD_STATUS:bytes = b'\x00\x00' # 2 bytes
         self._MODEL:str = ''                       # 2 bytes
         self._MODEL_NUM:int = 0                    # 1 byte
+        # machine status
+        self.isRoaster_Roasting:bool = False
 
     @override
     def setLogging(self, b:bool) -> None:
@@ -103,9 +104,10 @@ class Orbiter(AsyncComm):
     # external API to access machine state
 
     # getBT triggers fetching a complete set of new readings
-    def getBT(self) -> float:
+    # time is the preheat/roasting/cooling time in seconds send along the sync command to the machine
+    def getBT(self, time:int = 0) -> float:
         if not self._new_readings_available.is_set():
-            self.send_sync_await()
+            self.send_sync_await(time)
         self._new_readings_available.clear()
         return self._BT
     def getET(self) -> float:
@@ -148,6 +150,14 @@ class Orbiter(AsyncComm):
     def register_reading(self, target:bytes, data:bytes) -> None:
         pass
 
+    # decoding utils
+
+    # returns True if bit at offset is 1 else False
+    @staticmethod
+    def test_bit(b:int, offset:int) -> bool:
+        mask = 1 << offset
+        return (b & mask) != 0
+
     # asyncio read implementation
 
     # https://www.oreilly.com/library/view/using-asyncio-in/9781492075325/ch04.html
@@ -167,9 +177,19 @@ class Orbiter(AsyncComm):
                 # check CRC
                 try:
                     if self.crc(cmd[0:1] + data[:24]) == data[24]:
+                        dashboard_state = data[3:5]
+                        dashboard_state_low = dashboard_state[0]
+#                        dashboard_state_high = dashboard_state[1]
+                        #
+                        self.isRoaster_Roasting = self.test_bit(dashboard_state_low, 2)
+#                        if self.isRoaster_Roasting:
+#                            _log.debug("isRoaster_Roasting")
+#                        else:
+#                            _log.debug("NOT isRoaster_Roasting")
+                        #
                         self._BT = int.from_bytes(data[7:9], 'little', signed=True)
-                        self._IT = int.from_bytes(data[9:11], 'little', signed=True)
-                        self._DT = int.from_bytes(data[11:13], 'little', signed=True)
+                        self._DT = int.from_bytes(data[9:11], 'little', signed=True)
+                        self._IT = int.from_bytes(data[11:13], 'little', signed=True)
                         self._ET = int.from_bytes(data[13:15], 'little', signed=True)
                         self._RoR = int.from_bytes(data[15:17], 'little', signed=True) / 4.
                         self._air = int.from_bytes(data[17:19], 'little', signed=True)
@@ -224,24 +244,24 @@ class Orbiter(AsyncComm):
         return crc
 
     # message encoder (HEADER-CMD-PARA-DATA-TIME-EVENT-CRC)
-    def create_msg(self, cmd:bytes, data:bytes, param:bytes) -> bytes:
+    def create_msg(self, cmd:bytes, data:bytes, param:bytes, time:int) -> bytes:
         if len(data) == 0:
             data = b'\x00\x00'
         if len(data) == 1:
             data = b'\x00' + data
         data = data[:2] # data is exactly 2 bytes
-        payload = cmd[:1] + param + data + self.TIME + self.EVENT
+        payload = cmd[:1] + param + data + min(max(0,time),65535).to_bytes(2, 'little') + self.EVENT
         crc:int = self.crc(payload)
         return self.HEADER + payload + crc.to_bytes(1, 'little')
 
     # data byte order: LSB last (little-endian); eg. data=b'\x07\x00' equals 7
-    def send_msg(self, cmd:bytes, data:bytes = b'\x00\x00', param:bytes = b'\x00') -> None:
+    def send_msg(self, cmd:bytes, data:bytes = b'\x00\x00', param:bytes = b'\x00', time:int = 0) -> None:
         # send via socket
-        self.send(self.create_msg(cmd, data, param))
+        self.send(self.create_msg(cmd, data, param, time))
 
-    def send_msg_await(self, event:asyncio.Event, timeout:float, cmd:bytes, data:bytes = b'\x00\x00', param:bytes = b'\x00') -> None:
+    def send_msg_await(self, event:asyncio.Event, timeout:float, cmd:bytes, data:bytes = b'\x00\x00', param:bytes = b'\x00', time:int = 0) -> None:
         # send via socket
-        self.send_await(self.create_msg(cmd, data, param), event, timeout)
+        self.send_await(self.create_msg(cmd, data, param, time), event, timeout)
 
     #
 
@@ -251,8 +271,8 @@ class Orbiter(AsyncComm):
     def send_sync(self) -> None:
         self.send_msg(self.CMD_SYNC)
 
-    def send_sync_await(self) -> None:
-        self.send_msg_await(self._new_readings_available, self.send_timeout, self.CMD_SYNC)
+    def send_sync_await(self, time:int) -> None:
+        self.send_msg_await(self._new_readings_available, self.send_timeout, self.CMD_SYNC, time=time)
 
     #
 

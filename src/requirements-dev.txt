@@ -3,8 +3,8 @@ types-Pillow>=10.2.0.20240822
 types-protobuf>=6.32.1.20260221
 types-psutil>=7.2.2.20260130
 types-pyserial>=3.5.0.20251001
-types-python-dateutil>=2.9.0.20260124
-types-pytz>=2025.2.0.20251108
+types-python-dateutil>=2.9.0.20260305
+types-pytz>=2026.1.1.20260304
 types-pyyaml>=6.0.12.20250915
 types-requests>=2.32.4.20260107
 types-setuptools>=82.0.0.20260210
@@ -15,7 +15,7 @@ types-qrcode>=8.2.0.20250914
 lxml-stubs>=0.5.1
 mypy==1.19.1
 pyright==1.1.408
-ruff>=0.15.2
+ruff>=0.15.4
 pylint==4.0.5
 pre-commit>=4.5.1
 pytest>=9.0.2

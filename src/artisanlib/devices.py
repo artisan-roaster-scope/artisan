@@ -1680,14 +1680,16 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 self.scale2NameComboBox.setEnabled(False)
                 self.scale2EditButton.setEnabled(False)
                 self.scale2ScanButton.setEnabled(False)
-            elif self.aw.scale2_model < len(SUPPORTED_SCALES):
-                self.scale2ModelComboBox.setCurrentIndex(self.aw.scale2_model + 1)
-                if self.aw.scale2_name is None:
-                    self.scale2NameComboBox.setEnabled(False)
-                    self.scale2EditButton.setEnabled(False)
-                else:
-                    self.scale2NameComboBox.setEnabled(True)
-                    self.scale2EditButton.setEnabled(True)
+            else:
+                s2m:int = self.aw.scale2_model # hack to keep ty happy
+                if s2m < len(SUPPORTED_SCALES):
+                    self.scale2ModelComboBox.setCurrentIndex(s2m + 1)
+                    if self.aw.scale2_name is None:
+                        self.scale2NameComboBox.setEnabled(False)
+                        self.scale2EditButton.setEnabled(False)
+                    else:
+                        self.scale2NameComboBox.setEnabled(True)
+                        self.scale2EditButton.setEnabled(True)
             self.scale2ModelComboBox.currentIndexChanged.connect(self.scale2ModelChanged)
             self.scale2NameComboBox.currentIndexChanged.connect(self.scale2NameChanged)
             self.scale2ScanButton.clicked.connect(self.scanScale2)
