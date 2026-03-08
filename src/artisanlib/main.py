@@ -501,7 +501,7 @@ class Artisan(QtSingleApplication):
                 aw:ApplicationWindow|None = self.activationWindow()
                 if aw is not None:
                     url:QUrl = cast(QUrl, a0.url()) # type: ignore[attr-defined] # "QEvent" has no attribute "url"
-                    # files cannot be opend while
+                    # files cannot be opened while
                     # - sampling
                     # - in Designer mode
                     # - in Wheel graph mode
@@ -24771,7 +24771,7 @@ class ApplicationWindow(QMainWindow):
                 self.buttonCONTROL.setStyleSheet(self.pushbuttonstyles['PID'])
 
     def HottopControlOn(self, autosuper:bool=True) -> None:
-        # if super holds, the superusermode is autoatically activated (if control is activated via an HOTTOP Command 'control')
+        # if super holds, the superusermode is automatically activated (if control is activated via an HOTTOP Command 'control')
         # on just pressing the CONTROL button the superusermode is not automatically activated and has to be activated manually by the user (for safety reasons)
         if autosuper:
             self.superusermode = True

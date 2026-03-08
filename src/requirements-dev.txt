@@ -15,7 +15,7 @@ types-qrcode>=8.2.0.20250914
 lxml-stubs>=0.5.1
 mypy==1.19.1
 pyright==1.1.408
-ruff>=0.15.4
+ruff>=0.15.5
 pylint==4.0.5
 pre-commit>=4.5.1
 pytest>=9.0.2
@@ -31,7 +31,7 @@ pytest-datadir==1.8.0
 hypothesis>=6.151.9
 coverage>=7.13.4
 coverage-badge==1.1.2
-codespell==2.4.1
+codespell==2.4.2
 # the following 2 packages are not installed along aiohttp on Python3.12 and make mypy complain
 async_timeout==5.0.1
 cycler==0.12.1

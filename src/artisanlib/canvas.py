@@ -1609,7 +1609,7 @@ class tgraphcanvas(QObject):
         self.batchprefix:str = '#'
         self.neverUpdateBatchCounter:bool = False
         # profile batch nr
-        self.roastbatchnr:int = 0 # batch number of the roast; if roastbatchnr=0, prefix/counter is hidden/inactiv (initialized to 0 on roast START)
+        self.roastbatchnr:int = 0 # batch number of the roast; if roastbatchnr=0, prefix/counter is hidden/inactive (initialized to 0 on roast START)
         self.roastbatchprefix:str = self.batchprefix # batch prefix of the roast
         self.roastbatchpos:int = 1 # position of the roast in the roast session (first batch, second batch,..)
         self.roasttzoffset:int = libtime.timezone # timezone offset to be added to roastepoch to get time in local timezone; NOTE: this is not set/updated on loading a .alog profile!
@@ -5077,10 +5077,13 @@ class tgraphcanvas(QObject):
                                 self.l_delta2.set_data([], [])
 
                         #readjust xlimit of plot if needed
-                        if  not self.fixmaxtime and not self.locktimex:
-                            now = (sample_timex[-1] if self.timeindex[0] == -1 else sample_timex[-1] - sample_timex[self.timeindex[0]])
-                            if now > (self.endofx - 45*self.delay/1000):         # if difference is smaller than 45 seconds on 1sec sampling interval
-                                self.endofx = now + 3*60*self.delay/1000    # increase x limit by 3 minutes (180.) if sampling interval is 1sec
+                        if not self.fixmaxtime and not self.locktimex:
+                            charge_offset:float = (0 if self.timeindex[0] == -1 else sample_timex[self.timeindex[0]])
+                            now = sample_timex[-1] - charge_offset
+                            trigger_period:float = (self.endofx - self.startofx - charge_offset) / 14 # 14th part of the total x-axis length
+                            if now > (self.endofx - trigger_period):
+                                extension_period:float = trigger_period * 4
+                                self.endofx = now + extension_period
                                 self.xaxistosm()
                         if self.ETprojectFlag or self.BTprojectFlag:
                             self.updateProjection()

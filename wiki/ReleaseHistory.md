@@ -13,6 +13,7 @@ v4.0.2 (Feb 7, 2026)
   - fixes regression where cut/copy/paste shortcuts are not working in file selector dialogs ([Issue #2114](../../../issues/2114))
   - fixes build issues which broke PDF reports on Linux and macOS ([Issue #2113](../../../issues/2113))
   - fixes issue with delta axis assignments in extra device setups on loading background profiles
+  - fixes regression which led to large automatic x-axis extensions for larger sampling rates ([Issue #2142](../../../issues/2142))
 
 ----
 v4.0.0 (Jan 28, 2026)

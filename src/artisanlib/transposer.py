@@ -836,7 +836,7 @@ class profileTransformatorDlg(ArtisanDialog):
     @staticmethod
     def calcDiscretefits(sources:list[float|None], targets:list[float|None]) -> 'list[npt.NDArray[numpy.float64]|None]':
         if len(sources) != len(targets):
-            return [None]*len(sources)
+            return [None]*len(sources) # ty:ignore # Return type does not match returned value
         fits:list[npt.NDArray[numpy.float64]|None] = [None]*len(sources)
         last_fit:npt.NDArray[numpy.float64]|None = None
         for i, _ in enumerate(sources):
