@@ -4605,6 +4605,47 @@ class tgraphcanvas(QObject):
             self.afterTP = True
         return self.afterTP
 
+    @staticmethod # pre condition: 1 < left_index <= len(temp) = len(timex)
+    def compute_ror_simple(timex:list[float], temp:list[float], left_index:int) -> float:
+        timed = timex[-1] - timex[-left_index]   #time difference between last readings
+        # average the left point of the RoR interval (3 points) without introducing a delay
+        if len(temp)>=left_index+2 and 2-left_index<0:
+            return ((temp[-1] - (temp[-left_index - 2] + temp[-left_index - 1] + temp[-left_index] + temp[-left_index + 1] + temp[-left_index + 2])/5.)/timed)*60.  #delta BT (degrees/minute)
+        if len(temp)>=left_index+1 and 1-left_index<0:
+            return ((temp[-1] - (temp[-left_index - 1] + temp[-left_index] + temp[-left_index + 1])/3.)/timed)*60.  #delta BT (degrees/minute)
+        return ((temp[-1] - temp[-left_index])/timed)*60.  #delta BT (degrees/minute)
+
+    def compute_ror(self, t_final:float, timex:list[float], temp:list[float], unfiltereddelta:list[float]) -> float:
+        # compute RoR
+        try:
+            if t_final == -1 or len(timex)<2:  # we repeat the last RoR if underlying temperature dropped
+                if unfiltereddelta:
+                    return unfiltereddelta[-1]
+                return 0.
+            # normal data received
+            #   Delta T = (changeTemp/ChangeTime)*60. =  degrees per minute;
+            left_index = min(len(timex),len(temp),max(2, self.deltaETsamples + 1))
+            # ****** Instead of basing the estimate on the window extremal points,
+            #        grab the full set of points and do a formal LS solution to a straight line and use the slope estimate for RoR
+            if self.polyfitRoRcalc:
+                try:
+                    time_vec = timex[-left_index:]
+                    temp_samples = temp[-left_index:]
+                    with warnings.catch_warnings():
+                        warnings.simplefilter('ignore')
+                        # using stable polyfit from numpy polyfit module
+                        LS_fit = numpy.polynomial.polynomial.polyfit(time_vec, temp_samples, 1)
+                        return float(LS_fit[1]*60.)
+                except Exception: # pylint: disable=broad-except
+                    # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an exception "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
+                    # https://github.com/numpy/numpy/issues/16744
+                    # we fall back to the two point algo below
+                    pass
+            return self.compute_ror_simple(timex, temp, left_index)
+        except Exception as e: # pylint: disable=broad-except
+            _log.error(e)
+            return 0.
+
     # sample devices at interval self.delay milliseconds.
     # we can assume within the processing of sample_processing() that flagon=True
     # NOTE: sample_processing is processed in the GUI thread NOT the sample thread!
@@ -4931,72 +4972,10 @@ class tgraphcanvas(QObject):
                     #we need a minimum of two readings to calculate rate of change
                     if length_of_qmc_timex > 1:
                         # compute T1 RoR
-                        try:
-                            if t1_final == -1 or len(sample_ctimex1)<2:  # we repeat the last RoR if underlying temperature dropped
-                                if sample_unfiltereddelta1:
-                                    self.rateofchange1 = sample_unfiltereddelta1[-1]
-                                else:
-                                    self.rateofchange1 = 0.
-                            else: # normal data received
-                                #   Delta T = (changeTemp/ChangeTime)*60. =  degrees per minute;
-                                left_index = min(len(sample_ctimex1),len(sample_tstemp1),max(2, self.deltaETsamples + 1))
-                                # ****** Instead of basing the estimate on the window extremal points,
-                                #        grab the full set of points and do a formal LS solution to a straight line and use the slope estimate for RoR
-                                if self.polyfitRoRcalc:
-                                    try:
-                                        time_vec = sample_ctimex1[-left_index:]
-                                        temp_samples = sample_tstemp1[-left_index:]
-                                        with warnings.catch_warnings():
-                                            warnings.simplefilter('ignore')
-                                            # using stable polyfit from numpy polyfit module
-                                            LS_fit = numpy.polynomial.polynomial.polyfit(time_vec, temp_samples, 1)
-                                            self.rateofchange1 = LS_fit[1]*60.
-                                    except Exception: # pylint: disable=broad-except
-                                        # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an exception "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
-                                        # https://github.com/numpy/numpy/issues/16744
-                                        # we fall back to the two point algo
-                                        timed = sample_ctimex1[-1] - sample_ctimex1[-left_index]   #time difference between last self.deltaETsamples readings
-                                        self.rateofchange1 = ((sample_tstemp1[-1] - sample_tstemp1[-left_index])/timed)*60.  #delta ET (degrees/minute)
-                                else:
-                                    timed = sample_ctimex1[-1] - sample_ctimex1[-left_index]   #time difference between last self.deltaETsamples readings
-                                    self.rateofchange1 = ((sample_tstemp1[-1] - sample_tstemp1[-left_index])/timed)*60.  #delta ET (degrees/minute)
-                        except Exception as e: # pylint: disable=broad-except
-                            _log.error(e)
-                            self.rateofchange1 = 0.
+                        self.rateofchange1 = self.compute_ror(t1_final, sample_ctimex1, sample_tstemp1, sample_unfiltereddelta1)
 
                         # compute T2 RoR
-                        try:
-                            if t2_final == -1 or len(sample_ctimex2)<2:  # we repeat the last RoR if underlying temperature dropped
-                                if sample_unfiltereddelta2:
-                                    self.rateofchange2 = sample_unfiltereddelta2[-1]
-                                else:
-                                    self.rateofchange2 = 0.
-                            else: # normal data received
-                                #   Delta T = (changeTemp/ChangeTime)*60. =  degrees per minute;
-                                left_index = min(len(sample_ctimex2),len(sample_tstemp2),max(2, self.deltaBTsamples + 1))
-                                # ****** Instead of basing the estimate on the window extremal points,
-                                #        grab the full set of points and do a formal LS solution to a straight line and use the slope estimate for RoR
-                                if self.polyfitRoRcalc:
-                                    try:
-                                        time_vec = sample_ctimex2[-left_index:]
-                                        temp_samples = sample_tstemp2[-left_index:]
-                                        with warnings.catch_warnings():
-                                            warnings.simplefilter('ignore')
-                                            LS_fit = numpy.polynomial.polynomial.polyfit(time_vec, temp_samples, 1)
-                                            self.rateofchange2 = LS_fit[1]*60.
-                                    except Exception: # pylint: disable=broad-except
-                                        # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an exception "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
-                                        # https://github.com/numpy/numpy/issues/16744
-                                        # we fall back to the two point algo
-                                        timed = sample_ctimex2[-1] - sample_ctimex2[-left_index]   #time difference between last self.deltaBTsamples readings
-                                        self.rateofchange2 = ((sample_tstemp2[-1] - sample_tstemp2[-left_index])/timed)*60.  #delta BT (degrees/minute)
-                                else:
-                                    timed = sample_ctimex2[-1] - sample_ctimex2[-left_index]   #time difference between last self.deltaBTsamples readings
-                                    self.rateofchange2 = ((sample_tstemp2[-1] - sample_tstemp2[-left_index])/timed)*60.  #delta BT (degrees/minute)
-                        except Exception as e: # pylint: disable=broad-except
-                            _log.error(e)
-                            self.rateofchange1 = 0.
-
+                        self.rateofchange2 = self.compute_ror(t2_final, sample_ctimex2, sample_tstemp2, sample_unfiltereddelta2)
 
                         # self.unfiltereddelta{1,2}_pure contain the RoR values respecting the delta_span, but without any delta smoothing NOR delta mathformulas applied
                         self.unfiltereddelta1_pure.append(self.rateofchange1)
