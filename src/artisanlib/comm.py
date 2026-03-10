@@ -2225,13 +2225,15 @@ class serialport:
         t1:float = -1
         t2:float = -1
         if self.aw.orbiter is not None:
+            previous_isRoaster_Roasting:bool = self.aw.orbiter.isRoaster_Roasting # keep previous roasting state to be able to detect a change after getting new data via getBT()
             t1 = self.aw.orbiter.getBT(self.aw.qmc.current_time())
             t2 = self.aw.orbiter.getET()
 
             # autoCHARGE/autoDROP triggered by machine
             if self.aw.qmc.timeindex[0] == -1 and self.aw.orbiter.isRoaster_Roasting:
                 self.aw.qmc.markChargeSignal.emit(True) # CHARGE
-            elif self.aw.qmc.timeindex[0] > -1 and self.aw.qmc.timeindex[6] == 0 and self.aw.qmc.autoDropIdx == 0 and not self.aw.orbiter.isRoaster_Roasting:
+            elif (self.aw.qmc.timeindex[0] > -1 and self.aw.qmc.timeindex[6] == 0 and self.aw.qmc.autoDropIdx == 0 and
+                    previous_isRoaster_Roasting and not self.aw.orbiter.isRoaster_Roasting):
                 self.aw.qmc.autoDropIdx = len(self.aw.qmc.timex) - 1
                 self.aw.qmc.markDropSignal.emit(True) # DROP
 

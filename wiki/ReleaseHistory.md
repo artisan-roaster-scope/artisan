@@ -6,6 +6,8 @@ v4.0.4 (Mar XX, 2026)
 ------------------
 
 * ADDITIONS
+  - adds support for [Orbiter](https://artisan-scope.org/machines/orbiter/) smart roasters
+  - adds support for [Pratter](https://artisan-scope.org/machines/pratter/) roasting machines
   - adds Artisan Command `pidSVbuttons(<bool>)` ([Issue #2121](../../../issues/2121))
 * CHANGES
   - added a popup explaining the reason the Roast Properties dialog is opened on START if plus is connected and disabled the OK button until beans are specified  ([Issue #2133](../../../issues/2133))

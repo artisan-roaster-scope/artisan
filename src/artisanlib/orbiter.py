@@ -256,6 +256,7 @@ class Orbiter(AsyncComm):
 
     # data byte order: LSB last (little-endian); eg. data=b'\x07\x00' equals 7
     def send_msg(self, cmd:bytes, data:bytes = b'\x00\x00', param:bytes = b'\x00', time:int = 0) -> None:
+#        _log.debug("PRINT send_msg(%s,%s,%s,%s)",cmd,data,param,time)
         # send via socket
         self.send(self.create_msg(cmd, data, param, time))
 

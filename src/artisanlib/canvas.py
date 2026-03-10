@@ -4615,7 +4615,7 @@ class tgraphcanvas(QObject):
             return ((temp[-1] - (temp[-left_index - 1] + temp[-left_index] + temp[-left_index + 1])/3.)/timed)*60.  #delta BT (degrees/minute)
         return ((temp[-1] - temp[-left_index])/timed)*60.  #delta BT (degrees/minute)
 
-    def compute_ror(self, t_final:float, timex:list[float], temp:list[float], unfiltereddelta:list[float]) -> float:
+    def compute_ror(self, t_final:float, timex:list[float], temp:list[float], unfiltereddelta:list[float], deltaTempSamples:int) -> float:
         # compute RoR
         try:
             if t_final == -1 or len(timex)<2:  # we repeat the last RoR if underlying temperature dropped
@@ -4624,7 +4624,7 @@ class tgraphcanvas(QObject):
                 return 0.
             # normal data received
             #   Delta T = (changeTemp/ChangeTime)*60. =  degrees per minute;
-            left_index = min(len(timex),len(temp),max(2, self.deltaETsamples + 1))
+            left_index = min(len(timex),len(temp),max(2, deltaTempSamples + 1))
             # ****** Instead of basing the estimate on the window extremal points,
             #        grab the full set of points and do a formal LS solution to a straight line and use the slope estimate for RoR
             if self.polyfitRoRcalc:
@@ -4972,10 +4972,10 @@ class tgraphcanvas(QObject):
                     #we need a minimum of two readings to calculate rate of change
                     if length_of_qmc_timex > 1:
                         # compute T1 RoR
-                        self.rateofchange1 = self.compute_ror(t1_final, sample_ctimex1, sample_tstemp1, sample_unfiltereddelta1)
+                        self.rateofchange1 = self.compute_ror(t1_final, sample_ctimex1, sample_tstemp1, sample_unfiltereddelta1, self.deltaETsamples)
 
                         # compute T2 RoR
-                        self.rateofchange2 = self.compute_ror(t2_final, sample_ctimex2, sample_tstemp2, sample_unfiltereddelta2)
+                        self.rateofchange2 = self.compute_ror(t2_final, sample_ctimex2, sample_tstemp2, sample_unfiltereddelta2, self.deltaBTsamples)
 
                         # self.unfiltereddelta{1,2}_pure contain the RoR values respecting the delta_span, but without any delta smoothing NOR delta mathformulas applied
                         self.unfiltereddelta1_pure.append(self.rateofchange1)
@@ -13697,8 +13697,10 @@ class tgraphcanvas(QObject):
 
                 try:
                     # trigger event action before disconnecting from devices
-                    if self.extrabuttonactions[1] != 18: # Artisan Commands are executed after the OFFMonitor action is fully executed as they might trigger another buttons
+                    if self.extrabuttonactions[1] not in {0, 18}: # Artisan Commands are executed after the OFFMonitor action is fully executed as they might trigger other buttons
+                        # for all actions (buttonaction!=0) which are not Artisan Command (buttonaction!=18)
                         self.aw.eventactionx(self.extrabuttonactions[1],self.extrabuttonactionstrings[1])
+                        libtime.sleep(.3) # we wait a moment to increase the change that a potential write command can be succeed before connections are closed
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
 
