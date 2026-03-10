@@ -116,6 +116,10 @@ machines:
         url: /machines/nordic/
       - title: "Opp Roaster"
         url: /machines/opp/
+      - title: "Orbiter"
+        url: /machines/orbiter/
+      - title: "Pratter"
+        url: /machines/pratter/
       - title: "Ozturk"
         url: /machines/ozturk/
       - title: "Petroncini"

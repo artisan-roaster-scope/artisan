@@ -391,9 +391,11 @@ The development of **<span style="color: #4C97C3;">artisan</span>** is supported
       <a target="_blank" href="https://finecoffeeroaster.com/" title="Mugma Roasters">
           <img src="/assets/images/mugma-logo.svg" alt="Mugma Roasters" loading="lazy" decoding="async" />
       </a>
+<!--
       <a target="_blank" href="https://www.beangocube.com/" title="BeanGo">
           <img src="/assets/images/beango-logo.svg" alt="BeanGo" loading="lazy" decoding="async" />
       </a>
+-->
       <a target="_blank" href="http://www.santoker.com/" title="Santoker">
           <img src="/assets/images/santoker-logo.svg" alt="Santoker" loading="lazy" decoding="async" />
       </a>
@@ -420,6 +422,10 @@ The development of **<span style="color: #4C97C3;">artisan</span>** is supported
       <a target="_blank" href="https://algrano.com/artisan?utm_source=artisan_blog&amp;utm_medium=referral&amp;utm_campaign=algrano_x_artisan&amp;utm_content=blog" title="Algrano">
           <img src="/assets/images/algrano-logo.svg" alt="Algrano" loading="lazy" decoding="async" />
       </a>
+      <a target="_blank" href="https://orbiter.coffee/" title="Orbiter">
+          <img src="/assets/images/orbiter-logo.svg" alt="Orbiter" loading="lazy" decoding="async" />
+      </a>
+      
 </figure>
 
 

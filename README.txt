@@ -4,7 +4,7 @@
 
 run locally with
 
-# docker-compose up site
+# docker compose up site
 
 
 http://localhost:4000/
