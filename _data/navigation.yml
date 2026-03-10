@@ -118,10 +118,10 @@ machines:
         url: /machines/opp/
       - title: "Orbiter"
         url: /machines/orbiter/
-      - title: "Pratter"
-        url: /machines/pratter/
       - title: "Ozturk"
         url: /machines/ozturk/
+      - title: "Pratter"
+        url: /machines/pratter/
       - title: "Petroncini"
         url: /machines/petroncini/
       - title: "Phoenix"
