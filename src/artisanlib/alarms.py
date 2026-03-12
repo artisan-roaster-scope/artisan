@@ -319,8 +319,8 @@ class AlarmDlg(ArtisanResizeablDialog):
             self.createalarmtable()
         elif i == 1:
             # Alarm Sets
-            # save column widths
-            self.aw.qmc.alarmtablecolumnwidths = [self.alarmtable.columnWidth(c) for c in range(self.alarmtable.columnCount())]
+            # create the table
+            self.createalarmtable()
             # establish alarm table
             self.savealarms()
             # we update the current alarmset label
