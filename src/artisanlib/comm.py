@@ -1797,7 +1797,8 @@ class serialport:
                     bytesize = self.bytesize,
                     stopbits = self.stopbits,
                     parity = self.parity,
-                    timeout = self.timeout)
+                    timeout = self.timeout,
+                    clear_HUPCL = False)
                 self.colorTrackSerial = ColorTrack(serial=colortrack_serial)
                 self.colorTrackSerial.setLogging(self.aw.qmc.device_logging)
                 self.colorTrackSerial.start()

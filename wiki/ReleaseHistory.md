@@ -12,8 +12,9 @@ v4.0.4 (Mar XX, 2026)
 * CHANGES
   - added a popup explaining the reason the Roast Properties dialog is opened on START if plus is connected and disabled the OK button until beans are specified  ([Issue #2133](../../../issues/2133))
 * FIXES
-  - fixes regression which led to large automatic x-axis extensions for larger sampling rates ([Issue #2142](../../../issues/2142))
   - fixes autosave as PDF on regular `Save` on macOS ([Issue #2118](../../../issues/2118))
+  - fixes regression which led to large automatic x-axis extensions for larger sampling rates ([Issue #2142](../../../issues/2142))
+  - fixes issue w.r.t. alarm set activations which could cause alarm table to be lost on re-opening the Alarms dialog in some cases ([Issue #2144](../../../issues/2144))
 
 ----
 v4.0.2 (Feb 7, 2026)

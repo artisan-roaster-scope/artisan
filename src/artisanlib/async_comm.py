@@ -13,17 +13,21 @@
 # the GNU General Public License for more details.
 
 # AUTHOR
-# Marko Luther, 2023
+# Marko Luther, 2026
 
+import os
+import sys
 import time
 import logging
+import serial as pyserial
 import asyncio
+import platform
 
 from contextlib import suppress
 from threading import Thread
-from pymodbus.transport.serialtransport import create_serial_connection # patched pyserial-asyncio
+from pymodbus.transport.serialtransport import SerialTransport # patched pyserial-asyncio
 from collections.abc import Callable, AsyncIterator
-from typing import Final, TYPE_CHECKING
+from typing import Final, Any, TYPE_CHECKING
 
 
 if TYPE_CHECKING:
@@ -144,6 +148,107 @@ class IteratorReader:
                     break
         return res
 
+
+# clone from pymodbus/serialtransport.py extended by parameter 'do_not_open' (default False) which prevents opening the created serial port if set to True
+class ArtisanSerialTransport(SerialTransport):
+    """An asyncio serial transport."""
+
+    force_poll: bool = os.name == 'nt'
+    # async_loop: asyncio.AbstractEventLoop
+
+    def __init__(self, # pylint: disable=super-init-not-called
+            loop:asyncio.AbstractEventLoop,
+            protocol:asyncio.Protocol,
+            url:str,
+            baudrate:int,
+            bytesize:int,
+            parity:str,
+            stopbits:float,
+            timeout:float,
+            do_not_open:bool = False) -> None:
+        """Initialize."""
+        # we call __init__ of async.Transport, but NOT that of pymodbus SerialTransport which would open the port
+        asyncio.Transport.__init__(self) # pylint: disable=non-parent-init-called
+        if 'serial' not in sys.modules:
+            raise RuntimeError(
+                'Serial client requires pyserial '
+                'Please install with "pip install pyserial" and try again.'
+            )
+        self.async_loop = loop
+        self.intern_protocol: asyncio.BaseProtocol = protocol
+        self.sync_serial = pyserial.serial_for_url(url, exclusive=True,
+            baudrate=baudrate, bytesize=bytesize, parity=parity, stopbits=stopbits, timeout=timeout,
+            do_not_open=do_not_open)
+        self.intern_write_buffer: list[bytes] = []
+        self.poll_task: asyncio.Task[Any] | None = None
+        self._poll_wait_time = 0.0005
+        self.sync_serial.timeout = 0
+        self.sync_serial.write_timeout = 0
+
+
+async def create_serial_connection(
+    loop:asyncio.AbstractEventLoop,
+    protocol_factory:Callable[[], asyncio.Protocol],
+    url:str,
+    baudrate:int,
+    bytesize:int,
+    parity:str,
+    stopbits:float,
+    timeout:float,
+    clear_HUPCL:bool = False # if True, try to prevent toggling the RTS/DTR lines on opening the port to prevent to trigger a reboot on the connected device (ESP32/Orbiter)
+) -> tuple[asyncio.Transport, asyncio.BaseProtocol]:
+    """Create a connection to a new serial port instance."""
+    protocol = protocol_factory()
+    transport = ArtisanSerialTransport(loop, protocol, url,
+                    baudrate,
+                    bytesize,
+                    parity,
+                    stopbits,
+                    timeout,
+                    clear_HUPCL) # prevent opening the serial port on creation if clear_HUPCL is set
+    ####
+
+    # first we need to clear HUPCL, Hang Up on Close, (UNIX) or clear RTS/DTR (Windows) so the device will not reboot based on RTS and/or DTR
+    # stty -F /dev/ttyACM0 -hupcl to clear the HUPCL (Hang Up on Close) flag, preventing the reset when the port closes or reopens.
+    # see https://github.com/pyserial/pyserial/issues/124
+    # and https://github.com/npat-efault/picocom/blob/master/lowerrts.md
+    if clear_HUPCL:
+        # the transport serial port is not open yet in this case
+        try:
+            if platform.system() != 'Windows':
+                import termios # pylint: disable=C0415,E0401
+                port:str = url.replace('/dev/tty.','/dev/cu.')
+                # the following might hang on macOS for non-callup devices
+                with open(port, encoding='utf8') as f:
+                    attrs = termios.tcgetattr(f)
+                    attrs[2] = attrs[2] & ~termios.HUPCL
+                    termios.tcsetattr(f, termios.TCSAFLUSH, attrs)
+                    f.close()
+                time.sleep(0.1)
+        except Exception as e: # pylint: disable=broad-except
+            _log.error(e)
+        try:
+            # for Windows the following should be enough
+            transport.sync_serial.dtr = False
+            transport.sync_serial.rts = False
+        except Exception as e: # pylint: disable=broad-except
+            _log.error(e)
+
+    # in any case we open the serial port
+    if not transport.sync_serial.is_open:
+        transport.sync_serial.open() # ty:ignore
+
+    # and if clear_HUPCL, we immediately set the dtr/rts again
+    if clear_HUPCL:
+        try:
+            transport.sync_serial.dtr = False
+            transport.sync_serial.rts = False
+        except Exception as e: # pylint: disable=broad-except
+            _log.error(e)
+
+    loop.call_soon(transport.setup)
+    return transport, protocol
+
 class AsyncComm:
 
     __slots__ = [ '_asyncLoopThread', '_write_queue', '_running', '_host', '_port', '_serial', '_connected_handler', '_disconnected_handler',
@@ -210,7 +315,7 @@ class AsyncComm:
         reader = asyncio.StreamReader(limit=limit, loop=loop)
         protocol = asyncio.StreamReaderProtocol(reader, loop=loop)
         transport, _ = await create_serial_connection(
-            loop, lambda: protocol, url, **kwargs
+            loop, lambda: protocol, url, **kwargs # type: ignore[arg-type] # ty:ignore[unused-ignore-comment]
         )
         writer = asyncio.StreamWriter(transport, protocol, reader, loop)
         return reader, writer
@@ -277,7 +382,8 @@ class AsyncComm:
                         bytesize = self._serial['bytesize'],
                         stopbits = self._serial['stopbits'],
                         parity = self._serial['parity'],
-                        timeout = self._serial['timeout'])
+                        timeout = self._serial['timeout'],
+                        clear_HUPCL = self._serial['clear_HUPCL'])
                 else:
                     _log.debug('connecting to %s:%s ...', self._host, self._port)
                     connect = asyncio.open_connection(self._host, self._port)

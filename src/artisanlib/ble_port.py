@@ -18,7 +18,7 @@
 import asyncio
 import logging
 from bleak import BleakScanner, BleakClient
-from bleak.exc import BleakCharacteristicNotFoundError, BleakBluetoothNotAvailableError
+from bleak.exc import BleakError, BleakCharacteristicNotFoundError, BleakBluetoothNotAvailableError
 
 
 from PyQt6.QtCore import QObject
@@ -200,6 +200,9 @@ class BLE:
         except BleakBluetoothNotAvailableError:
             _log.error('Bluetooth is not supported, turned off or permission is denied')
             return None, None, None
+        except BleakError as e:
+            _log.error('BLE exception: %s', e)
+            return None, None, None
         except Exception: # pylint: disable=broad-except
             _log.error('exception in scan_and_connect: %s', fut.exception())
             return None, None, None
@@ -353,8 +356,11 @@ class ClientBLE(QObject):
                 self._disconnected_event.clear()
                 await self._disconnected_event.wait()
                 _log.debug('BLE reconnect')
-            await asyncio.sleep(self._sleep_between_scans)
-            self._sleep_between_scans = max(self._sleep_between_scans + self.SCAN_BETWEEN_SCANS_INC, self.SCAN_BETWEEN_SCANS_MAX)
+            try:
+                await asyncio.sleep(self._sleep_between_scans)
+                self._sleep_between_scans = max(self._sleep_between_scans + self.SCAN_BETWEEN_SCANS_INC, self.SCAN_BETWEEN_SCANS_MAX)
+            except Exception as e: # pylint: disable=broad-except
+                _log.warning(e)
 
     # release the async lock _disconnected_event after disconnect triggered to enable the automatic reconnect
     async def set_event(self) -> None:
@@ -370,7 +376,7 @@ class ClientBLE(QObject):
         if hasattr(self, '_async_loop_thread') and self._async_loop_thread is not None:
             asyncio.run_coroutine_threadsafe(self.set_event(), self._async_loop_thread.loop)
 
-    def send(self, message:bytes, response:bool = False, write_characteristic:str|None = None) -> None:
+    def send(self, message:bytes, response:bool = False, write_characteristic:str|None = None, chunk:int = 20) -> None:
         if self._ble_client is not None and self._connected_service_uuid is not None and self._connected_service_uuid in self._writers:
             if self._logging:
                 _log.debug('send to %s: %s', self._writers[self._connected_service_uuid], message)
@@ -388,7 +394,7 @@ class ClientBLE(QObject):
                 else:
                     _log.debug('send failed. Characteristic %s not registered for write for service %s', write_characteristic, self._connected_service_uuid)
             else:
-                ble.write(self._ble_client, wc, message, response)
+                ble.write(self._ble_client, wc, message, response, chunk)
 
     def read(self, read_characteristic:str|None = None) -> bytes|None:
         if self._ble_client is not None and self._connected_service_uuid is not None and self._connected_service_uuid in self._readers:
@@ -439,6 +445,8 @@ class ClientBLE(QObject):
                     return list(res.values())
         except BleakBluetoothNotAvailableError:
             _log.error('Bluetooth is not supported, turned off or permission is denied')
+        except BleakError as e:
+            _log.error('BLE exception: %s', e)
         except Exception as e:  # pylint: disable=broad-except
             _log.exception(e)
         return []
@@ -471,7 +479,9 @@ class ClientBLE(QObject):
             if self._ble_client is None:
                 ble.terminate_scan() # we stop ongoing scanning
             self._disconnect()
-            self._async_loop_thread = None
+            if self._async_loop_thread is not None:
+                del self._async_loop_thread
+                self._async_loop_thread = None
             self._ble_client = None
             self._connected_service_uuid = None
             self._connected_device_name = None

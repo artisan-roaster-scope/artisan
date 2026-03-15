@@ -540,6 +540,7 @@ class SerialSettings(TypedDict):
     stopbits: int
     parity: str
     timeout: float
+    clear_HUPCL: bool # if True, try to prevent toggling the RTS/DTR lines on opening the port to prevent to trigger a reboot on the connected device (ESP32/Orbiter
 
 class BTBreakParams(TypedDict):
     delay: list[list[float]]

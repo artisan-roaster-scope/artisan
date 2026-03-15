@@ -1348,6 +1348,11 @@ class tgraphcanvas(QObject):
         self.roastpropertiesflag:int = 1  #resets roast properties if not zero
         self.roastpropertiesAutoOpenFlag:int = 0  #open roast properties dialog on CHARGE if not zero
         self.roastpropertiesAutoOpenDropFlag:int = 0  #open roast properties dialog on DROP if not zero
+
+        # if True and plus is connected reminds user to set beans and open Roast Properties dialog if not yet set (once)
+        # this flag is reset after the warning dialog popped up once and is set to True again on OFF and
+        self.plus_beans_reminder_on_start:bool = True
+
         self.title:str = QApplication.translate('Scope Title', 'Roaster Scope')
         self.title_show_always:bool = False
         self.ambientTemp:float = 0.
@@ -13309,7 +13314,8 @@ class tgraphcanvas(QObject):
                                 bytesize = self.aw.ser.bytesize,
                                 stopbits = self.aw.ser.stopbits,
                                 parity = self.aw.ser.parity,
-                                timeout = self.aw.ser.timeout)
+                                timeout = self.aw.ser.timeout,
+                                clear_HUPCL = False)
                     self.aw.hottop = Hottop(
                         serial=hottop_serial,
                         connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('Hottop'),True,None),
@@ -13327,7 +13333,8 @@ class tgraphcanvas(QObject):
                                 bytesize = self.aw.ser.bytesize,
                                 stopbits = self.aw.ser.stopbits,
                                 parity = self.aw.ser.parity,
-                                timeout = self.aw.ser.timeout)
+                                timeout = self.aw.ser.timeout,
+                                clear_HUPCL = False)
                     self.aw.santoker = Santoker(self.aw.santokerHost, self.aw.santokerPort,
                         santoker_serial, self.aw.santokerBLE,
                         connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('Santoker'),True,None),
@@ -13370,7 +13377,8 @@ class tgraphcanvas(QObject):
                                 bytesize = self.aw.ser.bytesize,
                                 stopbits = self.aw.ser.stopbits,
                                 parity = self.aw.ser.parity,
-                                timeout = self.aw.ser.timeout)
+                                timeout = self.aw.ser.timeout,
+                                clear_HUPCL = False)
                     self.aw.kaleido.start(self.mode, self.aw.kaleidoHost, self.aw.kaleidoPort,
                         serial=kaleido_serial,
                         connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('Kaleido'),True,None),
@@ -13406,7 +13414,8 @@ class tgraphcanvas(QObject):
                                 bytesize = self.aw.ser.bytesize,
                                 stopbits = self.aw.ser.stopbits,
                                 parity = self.aw.ser.parity,
-                                timeout = self.aw.ser.timeout)
+                                timeout = self.aw.ser.timeout,
+                                clear_HUPCL = True)
                     self.aw.orbiter = Orbiter(orbiter_serial,
                         connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('Orbiter'),True,None),
                         disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('Orbiter'),True,None))
@@ -13675,7 +13684,10 @@ class tgraphcanvas(QObject):
         _log.info('MODE: OFF MONITOR')
         if self.flagon:
             try:
-                # first activate "Stopping Mode" to ensure that sample() is not resetting the timer now (independent of the flagstart state)
+                # reset
+                self.plus_beans_reminder_on_start = True # ensure that for the next recording the corresponding warning is shown if beans are not specified for plus
+
+                # activate "Stopping Mode" to ensure that sample() is not resetting the timer now (independent of the flagstart state)
 
                 self.aw.buttonONOFF.setEnabled(False)
                 ge:QGraphicsEffect|None = self.aw.buttonONOFF.graphicsEffect()
@@ -14363,6 +14375,7 @@ class tgraphcanvas(QObject):
             if (self.aw.plus_account is not None and              # plus connected
                     not self.roastpropertiesAutoOpenFlag and      # no "Open on CHARGE"
                     not self.roastpropertiesAutoOpenDropFlag and  # no "Open on DROP"
+                    self.plus_beans_reminder_on_start and         # warning was not yet shown for this recording
                     (self.plus_coffee is None and self.plus_blend_spec is None and self.beans == '') and # beans are not set
                     (self.aw.schedule_window is None or self.aw.schedule_window.selected_remaining_item is None) # scheduler is off or no schedule item selected
                     ):

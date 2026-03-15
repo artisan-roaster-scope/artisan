@@ -205,7 +205,8 @@ def main() -> None:
         bytesize = 8,
         stopbits = 1,
         parity = 'N',
-        timeout = 0.3)
+        timeout = 0.3,
+        clear_HUPCL = False)
     colorTrack = ColorTrack(serial=colortrack_serial)
     colorTrack.start()
     for _ in range(4):

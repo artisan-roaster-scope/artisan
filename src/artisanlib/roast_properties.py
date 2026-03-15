@@ -1686,6 +1686,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             plus.util.setPlusIcon(mbox)
             mbox.setStandardButtons(QMessageBox.StandardButton.Ok)
             mbox.exec()
+            self.aw.qmc.plus_beans_reminder_on_start = False # prevent this warning to be shown again for this recording
 
         self.setLayout(totallayout)
 

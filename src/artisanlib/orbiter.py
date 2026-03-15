@@ -295,7 +295,8 @@ def main() -> None:
         bytesize = 8,
         stopbits = 1,
         parity = 'N',
-        timeout = 0.5)
+        timeout = 0.5,
+        clear_HUPCL = True)
     orbiter = Orbiter(serial)
     orbiter.start()
     for _ in range(4):

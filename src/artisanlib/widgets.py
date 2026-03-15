@@ -16,7 +16,7 @@
 # Marko Luther, 2023
 
 from contextlib import contextmanager
-from collections.abc import Iterator
+from collections.abc import Generator
 from typing import override, Any, TYPE_CHECKING
 
 from artisanlib.util import stringtoseconds, createGradient
@@ -35,7 +35,7 @@ from PyQt6.QtGui import QPen, QPainter, QFontMetrics, QColor, QCursor, QEnterEve
 
 
 @contextmanager
-def wait_cursor() -> Iterator[None]:
+def wait_cursor() -> Generator[None]:
     try:
         QApplication.setOverrideCursor(Qt.CursorShape.BusyCursor)
         yield

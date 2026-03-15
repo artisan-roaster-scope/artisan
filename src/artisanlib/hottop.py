@@ -210,7 +210,8 @@ def main() -> None:
         bytesize = 8,
         stopbits = 1,
         parity = 'N',
-        timeout = 0.3)
+        timeout = 0.3,
+        clear_HUPCL = False)
     hottop = Hottop(serial=hottop_serial)
     hottop.start()
     for _ in range(4):

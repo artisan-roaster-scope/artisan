@@ -287,6 +287,7 @@ class TestAsyncComm:
             'stopbits': 1,
             'parity': 'N',
             'timeout': 1.0,
+            'clear_HUPCL': False,
         }
 
         comm = AsyncComm(
@@ -484,6 +485,7 @@ class TestAsyncCommEdgeCases:
             'stopbits': 0,
             'parity': 'INVALID',
             'timeout': -1.0,
+            'clear_HUPCL': False,
         }
 
         comm = AsyncComm(serial=invalid_serial)

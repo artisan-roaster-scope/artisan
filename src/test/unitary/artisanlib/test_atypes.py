@@ -544,6 +544,7 @@ class TestSerialSettings:
             'stopbits': 1,
             'parity': 'N',
             'timeout': 1.0,
+            'clear_HUPCL': False,
         }
 
         # Act & Assert
@@ -565,10 +566,11 @@ class TestSerialSettings:
             'stopbits': 2,
             'parity': 'E',
             'timeout': 2.5,
+            'clear_HUPCL': False,
         }
 
         # Act & Assert
-        assert len(complete_settings) == 6
+        assert len(complete_settings) == 7
         expected_keys = ['port', 'baudrate', 'bytesize', 'stopbits', 'parity', 'timeout']
         assert all(key in complete_settings for key in expected_keys)
 

@@ -498,7 +498,7 @@ class TestClientBLE:
             client_ble_instance.send(message, response=True)
 
             # Assert
-            mock_ble.write.assert_called_once_with(mock_client, 'write-uuid-1', message, True)
+            mock_ble.write.assert_called_once_with(mock_client, 'write-uuid-1', message, True, 20)
 
     def test_send_with_specific_write_characteristic(self, client_ble_instance: ClientBLE) -> None:
         """Test send with specific write characteristic."""
@@ -514,7 +514,7 @@ class TestClientBLE:
             client_ble_instance.send(message, write_characteristic='write-uuid-2')
 
             # Assert
-            mock_ble.write.assert_called_once_with(mock_client, 'write-uuid-2', message, False)
+            mock_ble.write.assert_called_once_with(mock_client, 'write-uuid-2', message, False, 20)
 
     def test_send_no_client(self, client_ble_instance: ClientBLE) -> None:
         """Test send when no client is connected."""
