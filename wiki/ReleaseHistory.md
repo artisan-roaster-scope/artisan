@@ -9,12 +9,17 @@ v4.0.4 (Mar XX, 2026)
   - adds support for [Orbiter](https://artisan-scope.org/machines/orbiter/) smart roasters
   - adds support for [Pratter](https://artisan-scope.org/machines/pratter/) roasting machines
   - adds Artisan Command `pidSVbuttons(<bool>)` ([Issue #2121](../../../issues/2121))
+  - adds Excel and Orbiter formats to the autosave "save also" options
 * CHANGES
   - added a popup explaining the reason the Roast Properties dialog is opened on START if plus is connected and disabled the OK button until beans are specified  ([Issue #2133](../../../issues/2133))
+  - adds hack to prevent dtr/rts signaling on connecting serial ports
+  - preserves weight/volume unit setup on loading/importing profiles
 * FIXES
   - fixes autosave as PDF on regular `Save` on macOS ([Issue #2118](../../../issues/2118))
   - fixes regression which led to large automatic x-axis extensions for larger sampling rates ([Issue #2142](../../../issues/2142))
   - fixes issue w.r.t. alarm set activations which could cause alarm table to be lost on re-opening the Alarms dialog in some cases ([Issue #2144](../../../issues/2144))
+* REMOVALS
+  - removes RoastTime, RoastPath and Probat Pilot import/exports
 
 ----
 v4.0.2 (Feb 7, 2026)

@@ -22,6 +22,7 @@ from artisanlib.roest import extractProfileRoestCSV
 from artisanlib.rubasse import extractProfileRubasseCSV
 from artisanlib.stronghold import extractProfileStrongholdXLSX
 from artisanlib.cropster import extractProfileCropsterXLS
+from artisanlib.orbiter import extractProfileOrbiterROP
 
 
 #######
@@ -75,6 +76,8 @@ import_specs:list[ImportSpecs] = [
     (extractProfileRoestCSV, 'roest', '.csv'),
     (extractProfileRubasseCSV, 'rubasse', '.csv'),
     (extractProfileStrongholdXLSX, 'stronghold', '.xlsx'),
+    (extractProfileOrbiterROP, 'orbiter', '.zip'),
+    (extractProfileOrbiterROP, 'orbiter', '.rop')
 ]
 
 
@@ -206,7 +209,7 @@ class TestProfileImport:
             test_validation_profile_path = (import_data['directory'] / f"{import_data['filename']}.json")
             # Skip test if file doesn't exist
             if not test_validation_profile_path.exists():
-                pytest.skip('Test validation profile file not found')
+                pytest.skip(f'Test validation profile file not found: {test_validation_profile_path}')
             with open(test_validation_profile_path, encoding='utf-8') as infile:
                 json_obj = json_load(infile)
                 for key, value in csv_obj.items():

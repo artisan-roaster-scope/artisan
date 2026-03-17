@@ -235,7 +235,7 @@ async def create_serial_connection(
             _log.error(e)
 
     # in any case we open the serial port
-    if not transport.sync_serial.is_open:
+    if not transport.sync_serial.is_open: # ty:ignore
         transport.sync_serial.open() # ty:ignore
 
     # and if clear_HUPCL, we immediately set the dtr/rts again

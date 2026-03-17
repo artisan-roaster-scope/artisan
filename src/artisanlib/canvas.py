@@ -1792,7 +1792,7 @@ class tgraphcanvas(QObject):
                                 QApplication.translate('ComboBox', 'Heater'),
                                 '--']
         self.default_etypes_set: list[int] = [0,0,0,0,0] # if 1 the default is taken from alt_etypesdefault if 0 from etypesdefault
-        #stores the type of each event as index of self.etypes. None = 0, Power = 1, etc.
+        #stores the type of each event as index of self.etypes. Air = 0, Drum = 1, etc.
         self.specialeventstype:list[int] = []
         #stores text string descriptions for each event.
         self.specialeventsStrings:list[str] = []
@@ -2028,7 +2028,7 @@ class tgraphcanvas(QObject):
 
         self.autosaveimage:bool = False # if true save an image along alog files
 
-        self.autoasaveimageformat_types:list[str] = ['PDF', 'PDF Report', 'SVG', 'PNG', 'JPEG', 'CSV', 'JSON']
+        self.autoasaveimageformat_types:list[str] = ['PDF', 'PDF Report', 'SVG', 'PNG', 'JPEG', 'CSV', 'JSON', 'Excel', 'Orbiter']
         self.autosaveimageformat:str = 'PDF' # one of the supported image file formats PDF, PDF Report, SVG, PNG, JPEG, CSV, JSON
 
         #used to place correct height of text to avoid placing text over text (annotations)

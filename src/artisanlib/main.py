@@ -419,15 +419,19 @@ class Artisan(QtSingleApplication):
                 elif file_suffix == 'xls' and not aw.app.artisanviewerMode and aw.comparator is None:
                     # import Cropster XLS profile
                     from artisanlib.cropster import extractProfileCropsterXLS
-                    aw.importExternal(extractProfileCropsterXLS, QApplication.translate('Message','Import Cropster XLS'),'*.xls',filename)
+                    aw.importExternal(extractProfileCropsterXLS, QApplication.translate('Message','Import {}').format('Cropster XLS'),'*.xls',filename)
                 elif file_suffix == 'csv' and not aw.app.artisanviewerMode and aw.comparator is None:
                     # import Giesen CSV profile
                     from artisanlib.giesen import extractProfileGiesenCSV
-                    aw.importExternal(extractProfileGiesenCSV, QApplication.translate('Message','Import Giesen CSV'),'*.csv',filename)
+                    aw.importExternal(extractProfileGiesenCSV, QApplication.translate('Message','Import {}').format('Giesen CSV'),'*.csv',filename)
                 elif file_suffix == 'xlsx' and not aw.app.artisanviewerMode and aw.comparator is None:
                     # import Stronghold XLSX profile
                     from artisanlib.stronghold import extractProfileStrongholdXLSX
-                    aw.importExternal(extractProfileStrongholdXLSX, QApplication.translate('Message','Import Stronghold XLSX'),'*.xlsx',filename)
+                    aw.importExternal(extractProfileStrongholdXLSX, QApplication.translate('Message','Import {}').format('Stronghold XLSX'),'*.xlsx',filename)
+                if filename.endswith('.rop.zip') and not aw.app.artisanviewerMode and aw.comparator is None:
+                    # import Orbiter .rop.zip profile
+                    from artisanlib.orbiter import extractProfileOrbiterROP
+                    aw.importExternal(extractProfileOrbiterROP, QApplication.translate('Message','Import {}').format('Orbiter'),'(*.rop *.rop.zip)',filename)
 
 
         elif platform.system() == 'Windows' and not self.artisanviewerMode:
@@ -2075,15 +2079,15 @@ class ApplicationWindow(QMainWindow):
 
         self.importMenu.addSeparator()
 
-        importBulletAction = QAction('Aillio RoasTime...', self)
-        #importBulletAction.triggered.connect(self.importBullet)
-        self.importMenu.addAction(importBulletAction)
-        importBulletAction.setEnabled(False)
-
-        importBulletAction = QAction('Aillio Roast.World URL...', self)
-        #importBulletAction.triggered.connect(self.importBulletURL)
-        self.importMenu.addAction(importBulletAction)
-        importBulletAction.setEnabled(False)
+#        importBulletAction = QAction('Aillio RoasTime...', self)
+#        #importBulletAction.triggered.connect(self.importBullet)
+#        self.importMenu.addAction(importBulletAction)
+#        importBulletAction.setEnabled(False)
+#
+#        importBulletAction = QAction('Aillio Roast.World URL...', self)
+#        #importBulletAction.triggered.connect(self.importBulletURL)
+#        self.importMenu.addAction(importBulletAction)
+#        importBulletAction.setEnabled(False)
 
         importCropsterAction = QAction('Cropster XLS...', self)
         importCropsterAction.triggered.connect(self.importCropster)
@@ -2125,6 +2129,10 @@ class ApplicationWindow(QMainWindow):
         importLoringAction.triggered.connect(self.importLoring)
         self.importMenu.addAction(importLoringAction)
 
+        imporOrbiterAction = QAction('Orbiter...', self)
+        imporOrbiterAction.triggered.connect(self.importOrbiter)
+        self.importMenu.addAction(imporOrbiterAction)
+
         importPetronciniAction = QAction('Petroncini CSV...', self)
         importPetronciniAction.triggered.connect(self.importPetroncini)
         self.importMenu.addAction(importPetronciniAction)
@@ -2137,22 +2145,22 @@ class ApplicationWindow(QMainWindow):
         importRubasseAction.triggered.connect(self.importRubasse)
         self.importMenu.addAction(importRubasseAction)
 
-        importPilotAction = QAction('Probat Pilot...', self)
-        importPilotAction.triggered.connect(self.importPilot)
-        self.importMenu.addAction(importPilotAction)
+#        importPilotAction = QAction('Probat Pilot...', self)
+#        importPilotAction.triggered.connect(self.importPilot)
+#        self.importMenu.addAction(importPilotAction)
 
-        fileImportRoastLoggerAction = QAction('RoastLogger...', self)
-        fileImportRoastLoggerAction.triggered.connect(self.fileImportRoastLogger)
-        self.importMenu.addAction(fileImportRoastLoggerAction)
+#        fileImportRoastLoggerAction = QAction('RoastLogger...', self)
+#        fileImportRoastLoggerAction.triggered.connect(self.fileImportRoastLogger)
+#        self.importMenu.addAction(fileImportRoastLoggerAction)
 
         importRoastLogAction = QAction('RoastLog URL...',self)
         importRoastLogAction.triggered.connect(self.importRoastLog)
         self.importMenu.addAction(importRoastLogAction)
 
-        importRoastPathAction = QAction('RoastPATH URL...',self)
-        #importRoastPathAction.triggered.connect(self.importRoastPATH)
-        self.importMenu.addAction(importRoastPathAction)
-        importRoastPathAction.setEnabled(False)
+#        importRoastPathAction = QAction('RoastPATH URL...',self)
+#        #importRoastPathAction.triggered.connect(self.importRoastPATH)
+#        self.importMenu.addAction(importRoastPathAction)
+#        importRoastPathAction.setEnabled(False)
 
         importStrongholdAction = QAction('Stronghold XLSX...', self)
         importStrongholdAction.triggered.connect(self.importStronghold)
@@ -2182,6 +2190,10 @@ class ApplicationWindow(QMainWindow):
         fileConvertFromLoringAction = QAction(QApplication.translate('Menu', 'Loring CSV...'), self)
         fileConvertFromLoringAction.triggered.connect(self.convertFromLoring)
         self.convFromMenu.addAction(fileConvertFromLoringAction)
+
+        fileConvertFromOrbiterAction = QAction('Orbiter...', self)
+        fileConvertFromOrbiterAction.triggered.connect(self.convertFromOrbiter)
+        self.convFromMenu.addAction(fileConvertFromOrbiterAction)
 
         fileConvertFromPetronciniAction = QAction(QApplication.translate('Menu', 'Petroncini CSV...'), self)
         fileConvertFromPetronciniAction.triggered.connect(self.convertFromPetroncini)
@@ -2234,13 +2246,17 @@ class ApplicationWindow(QMainWindow):
 
         self.exportMenu.addSeparator()
 
-        fileExportPilotAction = QAction(QApplication.translate('Menu', 'Probat Pilot...'), self)
-        fileExportPilotAction.triggered.connect(self.fileExportPilot)
-        self.exportMenu.addAction(fileExportPilotAction)
+        fileExportOrbiterAction = QAction('Orbiter...', self)
+        fileExportOrbiterAction.triggered.connect(self.fileExportOrbiter)
+        self.exportMenu.addAction(fileExportOrbiterAction)
 
-        fileExportRoastLoggerAction = QAction(QApplication.translate('Menu', 'RoastLogger...'), self)
-        fileExportRoastLoggerAction.triggered.connect(self.fileExportRoastLogger)
-        self.exportMenu.addAction(fileExportRoastLoggerAction)
+#        fileExportPilotAction = QAction(QApplication.translate('Menu', 'Probat Pilot...'), self)
+#        fileExportPilotAction.triggered.connect(self.fileExportPilot)
+#        self.exportMenu.addAction(fileExportPilotAction)
+#
+#        fileExportRoastLoggerAction = QAction(QApplication.translate('Menu', 'RoastLogger...'), self)
+#        fileExportRoastLoggerAction.triggered.connect(self.fileExportRoastLogger)
+#        self.exportMenu.addAction(fileExportRoastLoggerAction)
 
         self.convMenu:QMenu = QMenu(QApplication.translate('Menu', 'Convert To'))
         fileConvertFahrenheitAction = QAction(QApplication.translate('Menu', 'Fahrenheit...'), self)
@@ -2250,12 +2266,6 @@ class ApplicationWindow(QMainWindow):
         fileConvertCelsiusAction = QAction(QApplication.translate('Menu', 'Celsius...'), self)
         fileConvertCelsiusAction.triggered.connect(self.fileConvertToCelsius)
         self.convMenu.addAction(fileConvertCelsiusAction)
-
-        self.convMenu.addSeparator()
-
-        fileConvertExcelAction = QAction(QApplication.translate('Menu', 'Excel...'), self)
-        fileConvertExcelAction.triggered.connect(self.fileConvertExcel)
-        self.convMenu.addAction(fileConvertExcelAction)
 
         self.convMenu.addSeparator()
 
@@ -2269,13 +2279,23 @@ class ApplicationWindow(QMainWindow):
 
         self.convMenu.addSeparator()
 
-        fileConvertProbatAction = QAction(QApplication.translate('Menu', 'Probat Pilot...'), self)
-        fileConvertProbatAction.triggered.connect(self.fileConvertPilot)
-        self.convMenu.addAction(fileConvertProbatAction)
+        fileConvertOrbiterAction = QAction('Orbiter...', self)
+        fileConvertOrbiterAction.triggered.connect(self.fileConvertOrbiter)
+        self.convMenu.addAction(fileConvertOrbiterAction)
 
-        fileConvertRoastLoggerAction = QAction(QApplication.translate('Menu', 'RoastLogger...'), self)
-        fileConvertRoastLoggerAction.triggered.connect(self.fileConvertRoastLogger)
-        self.convMenu.addAction(fileConvertRoastLoggerAction)
+#        fileConvertProbatAction = QAction(QApplication.translate('Menu', 'Probat Pilot...'), self)
+#        fileConvertProbatAction.triggered.connect(self.fileConvertPilot)
+#        self.convMenu.addAction(fileConvertProbatAction)
+#
+#        fileConvertRoastLoggerAction = QAction(QApplication.translate('Menu', 'RoastLogger...'), self)
+#        fileConvertRoastLoggerAction.triggered.connect(self.fileConvertRoastLogger)
+#        self.convMenu.addAction(fileConvertRoastLoggerAction)
+
+        self.convMenu.addSeparator()
+
+        fileConvertExcelAction = QAction(QApplication.translate('Menu', 'Excel...'), self)
+        fileConvertExcelAction.triggered.connect(self.fileConvertExcel)
+        self.convMenu.addAction(fileConvertExcelAction)
 
         self.convMenu.addSeparator()
 
@@ -13204,6 +13224,10 @@ class ApplicationWindow(QMainWindow):
             self.exportCSV(filename + '.csv')
         elif self.qmc.autosaveimageformat == 'JSON':
             self.exportJSON(filename + '.json')
+        elif self.qmc.autosaveimageformat == 'Excel':
+            self.exportExcel(filename + '.xlsx')
+        elif self.qmc.autosaveimageformat == 'Orbiter':
+            self.exportOrbiterROP(filename + '.rop.zip')
         else:
             self.resizeImgToSize(0,0,self.qmc.autosaveimageformat,fname=filename)
 
@@ -14524,13 +14548,26 @@ class ApplicationWindow(QMainWindow):
                 from json import dump as json_dump
                 json_dump(self.getProfile(), outfile, indent=None, separators=(',', ':'), ensure_ascii=False)
                 outfile.write('\n')
-            self.sendmessage(f"{QApplication.translate('Message','Artisan JSON file saved successfully')} ({filename})")
+            self.sendmessage(f"{QApplication.translate('Message','{} file saved successfully').format('Artisan JSON')} ({filename})")
             return True
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
             self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' exportJSON() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             return False
+
+    def exportOrbiterROP(self, filename:str) -> bool:
+        from artisanlib.orbiter import saveOrbiterROP
+        try:
+            res:bool = saveOrbiterROP(filename, self.getProfile())
+            if res:
+                self.sendmessage(f"{QApplication.translate('Message','{} file saved successfully').format('Orbiter')} ({filename})")
+                return True
+        except Exception as ex: # pylint: disable=broad-except
+            _log.exception(ex)
+            _, _, exc_tb = sys.exc_info()
+            self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' exportOrbiterROP() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+        return False
 
     def indent(self, elem:'XMLElement', level:int = 0) -> None:
         i = '\r\n' + level*'  ' # Windows line ending (as Pilot is only available on Windows)
@@ -14548,209 +14585,209 @@ class ApplicationWindow(QMainWindow):
         elif level and (not elem_tail or not elem_tail.strip()):
             elem.tail = i
 
-    def exportPilot(self, filename:str) -> bool:
-        try:
-            # warning popup if filename contains more than one _
-            # only contain one _ followed by an index number like Name_0.xml
-            s = filename.split('_')
-            if (len(s) < 2 or len(s) > 2):
-                QMessageBox.warning(None, #self, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
-                    QApplication.translate('Message', 'Warning'),QApplication.translate('Message', 'The Probat Shop Pilot Software expects files named <Name>_<Index>.xml like in Test_0.xml on import'))
+#    def exportPilot(self, filename:str) -> bool:
+#        try:
+#            # warning popup if filename contains more than one _
+#            # only contain one _ followed by an index number like Name_0.xml
+#            s = filename.split('_')
+#            if (len(s) < 2 or len(s) > 2):
+#                QMessageBox.warning(None, #self, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
+#                    QApplication.translate('Message', 'Warning'),QApplication.translate('Message', 'The Probat Shop Pilot Software expects files named <Name>_<Index>.xml like in Test_0.xml on import'))
+#
+#            import xml.etree.ElementTree as ET
+#            tree = ET.Element('recipe')
+#
+#            charge = ET.SubElement(tree, 'charge')
+#            charge.text = str(float2float(convertWeight(self.qmc.weight[0],weight_units.index(self.qmc.weight[2]),1)))
+#
+#            beans = ET.SubElement(tree, 'coffeetype')
+#            if self.qmc.beans and self.qmc.beans != '':
+#                beans.text = self.qmc.beans
+#
+#            color = ET.SubElement(tree, 'coffeecolor')
+#            if self.qmc.ground_color:
+#                color.text = str(self.qmc.ground_color)
+#
+#            endtemperature = ET.SubElement(tree, 'endtemperature')
+#            endtime = ET.SubElement(tree, 'endtime')
+#            cooling = ET.SubElement(tree, 'coolingtime')
+#
+#            roaster = ET.SubElement(tree, 'roaster')
+#            if self.qmc.roastertype and self.qmc.roastertype != '':
+#                roaster.text = self.qmc.roastertype
+#
+#            notes = ET.SubElement(tree, 'notes')
+#            if self.qmc.roastingnotes and self.qmc.roastingnotes != '':
+#                notes.text = self.qmc.roastingnotes
+#
+#            roasttype = ET.SubElement(tree, 'roasttype')
+#            roasttype.text = '0' # 0: global, 1: time, 2: temp
+#
+#            recipedata = ET.SubElement(tree, 'recipedata_temp_unit')
+#            recipedata.text = self.qmc.mode
+#
+#            diagrampoints = ET.SubElement(tree, 'diagrampoints')
+#
+#            time_tag = 'sTime'
+#            temp_tag = 'nTemperature'
+#            burner_tag = 'nBurnercapacity'
+#            rising_tag = 'bRising'
+#
+#            # if CHARGE is defined, only export from CHARGE
+#            # if DROP is defined only export until DROP
+#            end_temp = None
+#            end_time = None
+#            idx = 1
+#            for i, tx in enumerate(self.qmc.timex):
+#                if (self.qmc.timeindex[0] < 0 or i >= self.qmc.timeindex[0]) and (self.qmc.timeindex[6] == 0 or i <= self.qmc.timeindex[6]):
+#                    data = ET.SubElement(diagrampoints, 'data', index=str(idx))
+#                    t = tx
+#                    if self.qmc.timeindex[0] > -1:
+#                        t = t - self.qmc.timex[self.qmc.timeindex[0]]
+#                    time = ET.SubElement(data,time_tag)
+#                    di, mo = divmod(t,60)
+#                    time.text = f'{di:02.0f}:{mo:02.0f}'
+#                    end_time = time.text
+#                    temp = ET.SubElement(data,temp_tag)
+#                    temp.text = str(int(round(self.qmc.temp2[i])))
+#                    end_temp = temp.text
+#                    burner = ET.SubElement(data,burner_tag)
+#                    if len(self.qmc.extradevices) > 0:
+#                        burner.text = str(max(0,int(round(self.qmc.extratemp1[0][i]))))
+#                    else:
+#                        burner.text = '0'
+#                    rising = ET.SubElement(data,rising_tag)
+#                    delta2i = self.qmc.delta2[i]
+#                    if delta2i is not None and delta2i > 0:
+#                        rising.text = 'true'
+#                    else:
+#                        rising.text = 'false'
+#                    idx = idx + 1
+#
+#            if end_temp:
+#                endtemperature.text = end_temp
+#
+#            if end_temp:
+#                endtime.text = end_time
+#
+#            if self.qmc.timeindex[7]:
+#                t = self.qmc.timex[self.qmc.timeindex[7]] - self.qmc.timex[self.qmc.timeindex[6]]
+#                di,mo = divmod(t,60)
+#                cooling.text = f'{di:02.0f}:{mo:02.0f}'
+#            else:
+#                cooling.text = '00:00'
+#
+#            switchpoints = ET.SubElement(tree, 'switchpoints')
+#            # take data from 2nd extra event type
+#            idx = 1
+#            for i, spe in enumerate(self.qmc.specialevents):
+#                if self.qmc.specialeventstype[i] == 3 and (self.qmc.timeindex[0] < 0 or spe >= self.qmc.timeindex[0]) and (self.qmc.timeindex[6] == 0 or spe <= self.qmc.timeindex[6]):
+#                    data = ET.SubElement(switchpoints, 'data', index=str(idx))
+#                    if self.qmc.timeindex[0] > -1 and len(self.qmc.timex) > self.qmc.timeindex[0]:
+#                        timez = stringfromseconds(self.qmc.timex[spe]-self.qmc.timex[self.qmc.timeindex[0]])
+#                    else:
+#                        timez = stringfromseconds(self.qmc.timex[spe])
+#                    t = spe
+#                    if self.qmc.timeindex[0] > -1:
+#                        t = t - self.qmc.timeindex[0]
+#                    time = ET.SubElement(data,time_tag)
+#                    time.text = timez
+#                    temp = ET.SubElement(data,temp_tag)
+#                    temp.text = str(int(round(self.qmc.temp2[spe])))
+#                    burner = ET.SubElement(data,burner_tag)
+#                    b = self.qmc.eventsInternal2ExternalValue(self.qmc.specialeventsvalue[i])
+#                    burner.text = str(int(round(b)))
+#                    rising = ET.SubElement(data,rising_tag)
+#                    delta2i = self.qmc.delta2[i]
+#                    if delta2i is not None and delta2i > 0:
+#                        rising.text = 'true'
+#                    else:
+#                        rising.text = 'false'
+#                    idx = idx + 1
+#            self.indent(tree)
+#            ET.ElementTree(tree).write(filename,encoding='utf-8', xml_declaration=True)
+#            return True
+#        except Exception as ex: # pylint: disable=broad-except
+#            _log.exception(ex)
+#            _, _, exc_tb = sys.exc_info()
+#            self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' exportPilot() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+#            return False
 
-            import xml.etree.ElementTree as ET
-            tree = ET.Element('recipe')
-
-            charge = ET.SubElement(tree, 'charge')
-            charge.text = str(float2float(convertWeight(self.qmc.weight[0],weight_units.index(self.qmc.weight[2]),1)))
-
-            beans = ET.SubElement(tree, 'coffeetype')
-            if self.qmc.beans and self.qmc.beans != '':
-                beans.text = self.qmc.beans
-
-            color = ET.SubElement(tree, 'coffeecolor')
-            if self.qmc.ground_color:
-                color.text = str(self.qmc.ground_color)
-
-            endtemperature = ET.SubElement(tree, 'endtemperature')
-            endtime = ET.SubElement(tree, 'endtime')
-            cooling = ET.SubElement(tree, 'coolingtime')
-
-            roaster = ET.SubElement(tree, 'roaster')
-            if self.qmc.roastertype and self.qmc.roastertype != '':
-                roaster.text = self.qmc.roastertype
-
-            notes = ET.SubElement(tree, 'notes')
-            if self.qmc.roastingnotes and self.qmc.roastingnotes != '':
-                notes.text = self.qmc.roastingnotes
-
-            roasttype = ET.SubElement(tree, 'roasttype')
-            roasttype.text = '0' # 0: global, 1: time, 2: temp
-
-            recipedata = ET.SubElement(tree, 'recipedata_temp_unit')
-            recipedata.text = self.qmc.mode
-
-            diagrampoints = ET.SubElement(tree, 'diagrampoints')
-
-            time_tag = 'sTime'
-            temp_tag = 'nTemperature'
-            burner_tag = 'nBurnercapacity'
-            rising_tag = 'bRising'
-
-            # if CHARGE is defined, only export from CHARGE
-            # if DROP is defined only export until DROP
-            end_temp = None
-            end_time = None
-            idx = 1
-            for i, tx in enumerate(self.qmc.timex):
-                if (self.qmc.timeindex[0] < 0 or i >= self.qmc.timeindex[0]) and (self.qmc.timeindex[6] == 0 or i <= self.qmc.timeindex[6]):
-                    data = ET.SubElement(diagrampoints, 'data', index=str(idx))
-                    t = tx
-                    if self.qmc.timeindex[0] > -1:
-                        t = t - self.qmc.timex[self.qmc.timeindex[0]]
-                    time = ET.SubElement(data,time_tag)
-                    di, mo = divmod(t,60)
-                    time.text = f'{di:02.0f}:{mo:02.0f}'
-                    end_time = time.text
-                    temp = ET.SubElement(data,temp_tag)
-                    temp.text = str(int(round(self.qmc.temp2[i])))
-                    end_temp = temp.text
-                    burner = ET.SubElement(data,burner_tag)
-                    if len(self.qmc.extradevices) > 0:
-                        burner.text = str(max(0,int(round(self.qmc.extratemp1[0][i]))))
-                    else:
-                        burner.text = '0'
-                    rising = ET.SubElement(data,rising_tag)
-                    delta2i = self.qmc.delta2[i]
-                    if delta2i is not None and delta2i > 0:
-                        rising.text = 'true'
-                    else:
-                        rising.text = 'false'
-                    idx = idx + 1
-
-            if end_temp:
-                endtemperature.text = end_temp
-
-            if end_temp:
-                endtime.text = end_time
-
-            if self.qmc.timeindex[7]:
-                t = self.qmc.timex[self.qmc.timeindex[7]] - self.qmc.timex[self.qmc.timeindex[6]]
-                di,mo = divmod(t,60)
-                cooling.text = f'{di:02.0f}:{mo:02.0f}'
-            else:
-                cooling.text = '00:00'
-
-            switchpoints = ET.SubElement(tree, 'switchpoints')
-            # take data from 2nd extra event type
-            idx = 1
-            for i, spe in enumerate(self.qmc.specialevents):
-                if self.qmc.specialeventstype[i] == 3 and (self.qmc.timeindex[0] < 0 or spe >= self.qmc.timeindex[0]) and (self.qmc.timeindex[6] == 0 or spe <= self.qmc.timeindex[6]):
-                    data = ET.SubElement(switchpoints, 'data', index=str(idx))
-                    if self.qmc.timeindex[0] > -1 and len(self.qmc.timex) > self.qmc.timeindex[0]:
-                        timez = stringfromseconds(self.qmc.timex[spe]-self.qmc.timex[self.qmc.timeindex[0]])
-                    else:
-                        timez = stringfromseconds(self.qmc.timex[spe])
-                    t = spe
-                    if self.qmc.timeindex[0] > -1:
-                        t = t - self.qmc.timeindex[0]
-                    time = ET.SubElement(data,time_tag)
-                    time.text = timez
-                    temp = ET.SubElement(data,temp_tag)
-                    temp.text = str(int(round(self.qmc.temp2[spe])))
-                    burner = ET.SubElement(data,burner_tag)
-                    b = self.qmc.eventsInternal2ExternalValue(self.qmc.specialeventsvalue[i])
-                    burner.text = str(int(round(b)))
-                    rising = ET.SubElement(data,rising_tag)
-                    delta2i = self.qmc.delta2[i]
-                    if delta2i is not None and delta2i > 0:
-                        rising.text = 'true'
-                    else:
-                        rising.text = 'false'
-                    idx = idx + 1
-            self.indent(tree)
-            ET.ElementTree(tree).write(filename,encoding='utf-8', xml_declaration=True)
-            return True
-        except Exception as ex: # pylint: disable=broad-except
-            _log.exception(ex)
-            _, _, exc_tb = sys.exc_info()
-            self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' exportPilot() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
-            return False
-
-    #Write readings to RoastLogger CSV file
-    def exportRoastLogger(self, filename:str) -> bool:
-        import csv
-        try:
-            with open(filename, 'w', encoding='utf-8') as outfile:
-                outfile.write('Log created at 09:00:00 '+ self.qmc.roastdate.date().toString("dd'/'MM'/'yyyy") + '\n')
-                outfile.write('Use Options|Set template for new log to modify this template.\n')
-                outfile.write('------------------------------------------------------\n')
-                outfile.write('Bean/Blend name:\n')
-                outfile.write('\n')
-                outfile.write('Profile description:\n')
-                outfile.write('\n')
-                outfile.write('Roast notes:\n')
-                outfile.write('\n')
-                outfile.write('Cupping results:\n')
-                outfile.write('\n')
-                outfile.write('Roast Logger Copyright ? T. R. Coxon (GreenBean TMC).\n')
-                outfile.write('Roast started at 09:00:00 ' + self.qmc.roastdate.date().toString("dd'/'MM'/'yyyy") + '\n')
-                if len(self.qmc.timex) > 0:
-                    CHARGE = self.qmc.timex[self.qmc.timeindex[0]]
-                else:
-                    CHARGE = 0
-                writer= csv.writer(outfile,delimiter=',')
-                writer.writerow(['Elapsed time ',' T1 ',' T2 ',' Event type'])
-                for i, _ in enumerate(self.qmc.timex):
-                    if i == self.qmc.timeindex[0]:
-                        kind = 'Beans loaded'
-                    elif i!=0 and i == self.qmc.timeindex[2]:
-                        kind = 'First crack start'
-                    elif i!=0 and i == self.qmc.timeindex[3]:
-                        kind = 'First crack end'
-                    elif i!=0 and i == self.qmc.timeindex[4]:
-                        kind = 'Second crack start'
-                    elif i!=0 and i == self.qmc.timeindex[6]:
-                        kind = 'Beans ejected'
-                    else:
-                        kind = 'timer'
-                    writer.writerow([stringfromseconds(self.qmc.timex[i]-CHARGE),f'{self.qmc.temp2[i]:.1f}',f'{self.qmc.temp1[i]:.1f}',kind])
-                outfile.write('\n')
-                outfile.write('@actionT1Table\n')
-                outfile.write('120|null|30\n')
-                outfile.write('178|65|null\n')
-                outfile.write('null|null|null\n')
-                outfile.write('null|null|null\n')
-                outfile.write('null|null|null\n')
-                outfile.write('null|null|null\n')
-                outfile.write('null|null|null\n')
-                outfile.write('null|null|null\n')
-                outfile.write('null|null|null\n')
-                outfile.write('null|null|null\n')
-                outfile.write('\n')
-                outfile.write('@actionSecsFCTable\n')
-                outfile.write('60|50|null\n')
-                outfile.write('null|null|null\n')
-                outfile.write('null|null|null\n')
-                outfile.write('null|null|null\n')
-                outfile.write('null|null|null\n')
-                outfile.write('null|null|null\n')
-                outfile.write('null|null|null\n')
-                outfile.write('null|null|null\n')
-                outfile.write('null|null|null\n')
-                outfile.write('null|null|null\n')
-                outfile.write('\n')
-                outfile.write('@actionResetTable\n')
-                outfile.write('100|0\n')
-                outfile.write('\n')
-                outfile.write('@loadBeansTable\n')
-                outfile.write('146\n')
-                outfile.write('\n')
-            return True
-        except Exception as ex: # pylint: disable=broad-except
-            _log.exception(ex)
-            _, _, exc_tb = sys.exc_info()
-            self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' exportRoastLogger() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
-            return False
+#    #Write readings to RoastLogger CSV file
+#    def exportRoastLogger(self, filename:str) -> bool:
+#        import csv
+#        try:
+#            with open(filename, 'w', encoding='utf-8') as outfile:
+#                outfile.write('Log created at 09:00:00 '+ self.qmc.roastdate.date().toString("dd'/'MM'/'yyyy") + '\n')
+#                outfile.write('Use Options|Set template for new log to modify this template.\n')
+#                outfile.write('------------------------------------------------------\n')
+#                outfile.write('Bean/Blend name:\n')
+#                outfile.write('\n')
+#                outfile.write('Profile description:\n')
+#                outfile.write('\n')
+#                outfile.write('Roast notes:\n')
+#                outfile.write('\n')
+#                outfile.write('Cupping results:\n')
+#                outfile.write('\n')
+#                outfile.write('Roast Logger Copyright ? T. R. Coxon (GreenBean TMC).\n')
+#                outfile.write('Roast started at 09:00:00 ' + self.qmc.roastdate.date().toString("dd'/'MM'/'yyyy") + '\n')
+#                if len(self.qmc.timex) > 0:
+#                    CHARGE = self.qmc.timex[self.qmc.timeindex[0]]
+#                else:
+#                    CHARGE = 0
+#                writer= csv.writer(outfile,delimiter=',')
+#                writer.writerow(['Elapsed time ',' T1 ',' T2 ',' Event type'])
+#                for i, _ in enumerate(self.qmc.timex):
+#                    if i == self.qmc.timeindex[0]:
+#                        kind = 'Beans loaded'
+#                    elif i!=0 and i == self.qmc.timeindex[2]:
+#                        kind = 'First crack start'
+#                    elif i!=0 and i == self.qmc.timeindex[3]:
+#                        kind = 'First crack end'
+#                    elif i!=0 and i == self.qmc.timeindex[4]:
+#                        kind = 'Second crack start'
+#                    elif i!=0 and i == self.qmc.timeindex[6]:
+#                        kind = 'Beans ejected'
+#                    else:
+#                        kind = 'timer'
+#                    writer.writerow([stringfromseconds(self.qmc.timex[i]-CHARGE),f'{self.qmc.temp2[i]:.1f}',f'{self.qmc.temp1[i]:.1f}',kind])
+#                outfile.write('\n')
+#                outfile.write('@actionT1Table\n')
+#                outfile.write('120|null|30\n')
+#                outfile.write('178|65|null\n')
+#                outfile.write('null|null|null\n')
+#                outfile.write('null|null|null\n')
+#                outfile.write('null|null|null\n')
+#                outfile.write('null|null|null\n')
+#                outfile.write('null|null|null\n')
+#                outfile.write('null|null|null\n')
+#                outfile.write('null|null|null\n')
+#                outfile.write('null|null|null\n')
+#                outfile.write('\n')
+#                outfile.write('@actionSecsFCTable\n')
+#                outfile.write('60|50|null\n')
+#                outfile.write('null|null|null\n')
+#                outfile.write('null|null|null\n')
+#                outfile.write('null|null|null\n')
+#                outfile.write('null|null|null\n')
+#                outfile.write('null|null|null\n')
+#                outfile.write('null|null|null\n')
+#                outfile.write('null|null|null\n')
+#                outfile.write('null|null|null\n')
+#                outfile.write('null|null|null\n')
+#                outfile.write('\n')
+#                outfile.write('@actionResetTable\n')
+#                outfile.write('100|0\n')
+#                outfile.write('\n')
+#                outfile.write('@loadBeansTable\n')
+#                outfile.write('146\n')
+#                outfile.write('\n')
+#            return True
+#        except Exception as ex: # pylint: disable=broad-except
+#            _log.exception(ex)
+#            _, _, exc_tb = sys.exc_info()
+#            self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' exportRoastLogger() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+#            return False
 
     def importJSON(self, filename:str) -> None:
         try:
@@ -14791,20 +14828,20 @@ class ApplicationWindow(QMainWindow):
             _, _, exc_tb = sys.exc_info()
             self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' importCSV() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
-    def importRoastLogger(self, filename:str) -> None:
-        self.resetExtraDevices()
-        # the RoastLogger file might be in utf-8 or latin1 encoding, we cannot know so let's test both
-        try:
-            try:
-                self.importRoastLoggerEnc(filename,'utf-8')
-            except Exception: # pylint: disable=broad-except
-                self.importRoastLoggerEnc(filename,'latin1')
-            self.qmc.fileDirtySignal.emit()
-            self.sendmessage(f"{QApplication.translate('Message','RoastLogger file loaded successfully')} ({filename})")
-        except Exception as ex: # pylint: disable=broad-except
-            _log.exception(ex)
-            _, _, exc_tb = sys.exc_info()
-            self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' importRoastLogger() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+#    def importRoastLogger(self, filename:str) -> None:
+#        self.resetExtraDevices()
+#        # the RoastLogger file might be in utf-8 or latin1 encoding, we cannot know so let's test both
+#        try:
+#            try:
+#                self.importRoastLoggerEnc(filename,'utf-8')
+#            except Exception: # pylint: disable=broad-except
+#                self.importRoastLoggerEnc(filename,'latin1')
+#            self.qmc.fileDirtySignal.emit()
+#            self.sendmessage(f"{QApplication.translate('Message','RoastLogger file loaded successfully')} ({filename})")
+#        except Exception as ex: # pylint: disable=broad-except
+#            _log.exception(ex)
+#            _, _, exc_tb = sys.exc_info()
+#            self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' importRoastLogger() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     def resetExtraDevices(self) -> None:
         try:
@@ -14842,270 +14879,270 @@ class ApplicationWindow(QMainWindow):
             _, _, exc_tb = sys.exc_info()
             self.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' resetExtraDevices(): {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
-    def importRoastLoggerEnc(self, filename:str, enc:str = 'utf-8') -> None:
-        import csv
-        roastlogger_action_section = ''
-        # use io.open instead of open to have encoding support on Python 2
-        with open(filename, encoding=enc) as infile:
-            obj:ProfileData = ProfileData()
-            obj['mode'] = 'C'
-            obj['title'] = str(QFileInfo(filename).fileName())
-            roastdate_str = encodeLocal(QDate.currentDate().toString())
-            if roastdate_str is not None:
-                obj['roastdate'] = roastdate_str
-            # read roastdate from file
-            while True:
-                l = infile.readline()
-                if l.startswith('Roast started at '):
-                    #extract roast date
-                    roastdate = QDateTime(QDate.fromString(l.split(' ')[-1][0:10],"dd'/'MM'/'yyyy"), QTime())
-                    if not roastdate.isNull():
-                        roastdate_str = encodeLocal(roastdate.date().toString())
-                        if roastdate_str is not None:
-                            obj['roastdate'] = roastdate_str
-                    break
-                if l == '':
-                    break
-            timeindex:list[int] = [-1,0,0,0,0,0,0,0]
-            timex:list[float] = []
-            temp1:list[float] = []
-            temp2:list[float] = []
-            data = csv.reader(infile,delimiter=',')
-            #read file header
-            next(data) # we do not use the labels
-            #header = list(map(lambda s:s.strip(),next(data)))
-            while True:
-                fields = next(data)
-                if len(fields) == 0:
-                    break
-                try:
-                    timex.append(float(stringtoseconds(fields[0])))
-                    try:
-                        t1 = float(fields[1])
-                    except Exception: # pylint: disable=broad-except
-                        t1 = -1
-                    temp1.append(t1)
-                    try:
-                        t2 = float(fields[2])
-                    except Exception: # pylint: disable=broad-except
-                        t2 = -1
-                    temp2.append(t2)
-                    event = fields[3]
-                    if event == 'Beans loaded':
-                        timeindex[0] = max(-1,len(timex) - 1)
-                    elif event == 'First crack start':
-                        timeindex[2] = max(0,len(timex) - 1)
-                    elif event == 'First crack end':
-                        timeindex[3] = max(0,len(timex) - 1)
-                    elif event == 'Second crack start':
-                        timeindex[4] = max(0,len(timex) - 1)
-                    elif event == 'Beans ejected':
-                        timeindex[6] = max(0,len(timex) - 1)
-                except Exception: # pylint: disable=broad-except
-                    pass # stringtoseconds might have detected an invalid timestamp thus we skip this row
-            obj['timeindex'] = timeindex
-            obj['timex'] = timex
-            obj['temp1'] = temp2
-            obj['temp2'] = temp1
-
-            if len(obj['timex']) > 2:
-                obj['samplinginterval'] = (obj['timex'][-1] - obj['timex'][0])/(len(obj['timex']) - 1)
-
-            res = self.setProfile(filename,obj)
-
-            error_msg:str = ''
-            try:
-                if self.qmc.loadalarmsfromprofile:
-                    self.qmc.alarmsfile = filename
-                    roastlogger_action_section = 'No actions loaded'
-
-                    #Find sliders - exact names of the sliders must be defined
-                    slider_power = -1
-                    slider_fan = -1
-                    try:
-                        slider_power=self.qmc.etypes.index('Power')
-                    except Exception: # pylint: disable=broad-except
-                        pass
-                    try:
-                        slider_fan=self.qmc.etypes.index('Fan')
-                    except Exception: # pylint: disable=broad-except
-                        pass
-                    #load only "Power" and "Fan" events
-                    if slider_power != -1 and slider_fan != -1:
-                        data_action = csv.reader(infile,delimiter='|')
-
-                        self.qmc.alarmsetlabel = ''
-                        self.qmc.alarmflag = []
-                        self.qmc.alarmguard = []
-                        self.qmc.alarmnegguard = []
-                        self.qmc.alarmtime = []
-                        self.qmc.alarmoffset = []
-                        self.qmc.alarmcond = []
-                        self.qmc.alarmstate = []
-                        self.qmc.alarmsource = []
-                        self.qmc.alarmtemperature = []
-                        self.qmc.alarmaction = []
-                        self.qmc.alarmbeep = []
-                        self.qmc.alarmstrings = []
-
-                        while True:
-                            fields_action = next(data_action)
-                            if len(fields_action) == 0:
-                                pass
-                            elif len(fields_action) == 1 and fields_action[0].startswith('@'):
-                                roastlogger_action_section=fields_action[0]
-                            #process items in the section
-                            elif roastlogger_action_section.startswith('@actionT1Table'):
-                                if len(fields_action) == 3 and fields_action[0] != 'null':
-                                    #add temp alarm - POWER
-                                    self.qmc.alarmflag.append(1)
-                                    self.qmc.alarmguard.append(-1)
-                                    self.qmc.alarmnegguard.append(-1)
-                                    self.qmc.alarmtime.append(8)        #after TP
-                                    self.qmc.alarmoffset.append(0)
-                                    self.qmc.alarmcond.append(1)
-                                    self.qmc.alarmstate.append(-1)
-                                    self.qmc.alarmsource.append(1)    #BT
-                                    self.qmc.alarmtemperature.append(float(fields_action[0]))
-                                    self.qmc.alarmaction.append(3+slider_power)    #SLIDER POWER
-                                    self.qmc.alarmbeep.append(0)
-                                    self.qmc.alarmstrings.append(QApplication.translate('Label',fields_action[1]))
-
-                                    #add temp alarm - FAN
-                                    self.qmc.alarmflag.append(1)
-                                    self.qmc.alarmguard.append(-1)
-                                    self.qmc.alarmnegguard.append(-1)
-                                    self.qmc.alarmtime.append(8)        #after TP
-                                    self.qmc.alarmoffset.append(0)
-                                    self.qmc.alarmcond.append(1)
-                                    self.qmc.alarmstate.append(-1)
-                                    self.qmc.alarmsource.append(1)    #BT
-                                    self.qmc.alarmtemperature.append(int(fields_action[0]))
-                                    self.qmc.alarmaction.append(3+slider_fan)    #SLIDER FAN
-                                    self.qmc.alarmbeep.append(0)
-                                    self.qmc.alarmstrings.append(QApplication.translate('Label',fields_action[2]))
-
-                            elif roastlogger_action_section.startswith('@actionSecsFCTable'):
-                                if len(fields_action) == 3 and fields_action[0] != 'null':
-
-                                    #add time alarm - POWER
-                                    self.qmc.alarmflag.append(1)
-                                    self.qmc.alarmguard.append(-1)
-                                    self.qmc.alarmnegguard.append(-1)
-                                    self.qmc.alarmtime.append(2)        #after FC
-                                    self.qmc.alarmoffset.append(int(fields_action[0]))
-                                    self.qmc.alarmcond.append(1)
-                                    self.qmc.alarmstate.append(-1)
-                                    self.qmc.alarmsource.append(-3)       #no source - this is time alarm
-                                    self.qmc.alarmtemperature.append(0)
-                                    self.qmc.alarmaction.append(3+slider_power)    #SLIDER POWER
-                                    self.qmc.alarmbeep.append(0)
-                                    self.qmc.alarmstrings.append(QApplication.translate('Label',fields_action[1]))
-
-                                    #add time alarm - FAN
-                                    self.qmc.alarmflag.append(1)
-                                    self.qmc.alarmguard.append(-1)
-                                    self.qmc.alarmnegguard.append(-1)
-                                    self.qmc.alarmtime.append(2)        #after FC
-                                    self.qmc.alarmoffset.append(int(fields_action[0]))
-                                    self.qmc.alarmcond.append(1)
-                                    self.qmc.alarmstate.append(-1)
-                                    self.qmc.alarmsource.append(-3)       #no source - this is time alarm
-                                    self.qmc.alarmtemperature.append(0)
-                                    self.qmc.alarmaction.append(3+slider_fan)    #SLIDER FAN
-                                    self.qmc.alarmbeep.append(0)
-                                    self.qmc.alarmstrings.append(QApplication.translate('Label',fields_action[2]))
-
-                            elif roastlogger_action_section.startswith('@actionResetTable'):
-                                if len(fields_action) == 2 and fields_action[0] != 'null':
-
-                                    #add temp alarm - POWER
-                                    self.qmc.alarmflag.insert(0,1)
-                                    self.qmc.alarmguard.insert(0,-1)
-                                    self.qmc.alarmnegguard.insert(0,-1)
-                                    self.qmc.alarmtime.insert(0,9)        #after ON
-                                    self.qmc.alarmoffset.insert(0,0)
-                                    self.qmc.alarmcond.insert(0,1)
-                                    self.qmc.alarmstate.insert(0,-1)
-                                    self.qmc.alarmsource.insert(0,1)    #BT
-                                    self.qmc.alarmtemperature.insert(0,0)
-                                    self.qmc.alarmaction.insert(0,3+slider_power)    #SLIDER POWER
-                                    self.qmc.alarmbeep.insert(0,0)
-                                    self.qmc.alarmstrings.insert(0,QApplication.translate('Label',fields_action[0]))
-
-                                    #add temp alarm - FAN
-                                    self.qmc.alarmflag.insert(0,1)
-                                    self.qmc.alarmguard.insert(0,-1)
-                                    self.qmc.alarmnegguard.insert(0,-1)
-                                    self.qmc.alarmtime.insert(0,9)        #after ON
-                                    self.qmc.alarmoffset.insert(0,0)
-                                    self.qmc.alarmcond.insert(0,1)
-                                    self.qmc.alarmstate.insert(0,-1)
-                                    self.qmc.alarmsource.insert(0,1)    #BT
-                                    self.qmc.alarmtemperature.insert(0,0)
-                                    self.qmc.alarmaction.insert(0,3+slider_fan)    #SLIDER POWER
-                                    self.qmc.alarmbeep.insert(0,0)
-                                    self.qmc.alarmstrings.insert(0,QApplication.translate('Label',fields_action[1]))
-
-                            elif roastlogger_action_section.startswith('@loadBeansTable'):
-                                if len(fields_action) == 1 and fields_action[0] != 'null':
-
-                                    #add START TRIGGER - 10 DEG before charge temp
-                                    self.qmc.alarmflag.insert(2,1)
-                                    self.qmc.alarmguard.insert(2,-1)
-                                    self.qmc.alarmnegguard.insert(2,-1)
-                                    self.qmc.alarmtime.insert(0,9)        #after ON
-                                    self.qmc.alarmoffset.insert(2,0)
-                                    self.qmc.alarmcond.insert(2,1)
-                                    self.qmc.alarmstate.insert(2,-1)
-                                    self.qmc.alarmsource.insert(2,1)    #BT
-                                    self.qmc.alarmtemperature.insert(2,float(fields_action[0])-10)
-                                    self.qmc.alarmaction.insert(2,7)    #initiate 7 (START)
-                                    self.qmc.alarmbeep.insert(2,0)
-                                    self.qmc.alarmstrings.insert(2,QApplication.translate('Label','Start recording'))
-
-                                    #add CHARGE alarm
-                                    self.qmc.alarmflag.insert(3,1)
-                                    self.qmc.alarmguard.insert(3,-1)
-                                    self.qmc.alarmnegguard.insert(3,-1)
-                                    self.qmc.alarmtime.insert(3,-1)        #after START
-                                    self.qmc.alarmoffset.insert(3,0)
-                                    self.qmc.alarmcond.insert(3,1)
-                                    self.qmc.alarmstate.insert(3,-1)
-                                    self.qmc.alarmsource.insert(3,1)    #BT
-                                    self.qmc.alarmtemperature.insert(3,float(fields_action[0]))
-                                    self.qmc.alarmaction.insert(3,0)    #POPUP
-                                    self.qmc.alarmbeep.insert(3,1)      #do beep for charge
-                                    self.qmc.alarmstrings.insert(3,QApplication.translate('Label','Charge the beans'))
-                                break
-                    else:
-                        if slider_power == -1:
-                            error_msg += "Could not find slider named 'Power' "
-                        if slider_fan == -1:
-                            error_msg += "Could not find slider named 'Fan' "
-                        error_msg += 'Please rename sliders in Config - Events menu'
-
-            except Exception as e: # pylint: disable=broad-except
-                _log.exception(e)
-                if roastlogger_action_section == 'No actions loaded':
-                    error_msg += 'Roastlogger file does not contain actions.  Alarms will not be loaded.'
-                else:
-                    error_msg += "Roastlogger actions are not complete. Last loaded section is '" + roastlogger_action_section + "'"
-
-            finally:
-                if res:
-                    self.autoAdjustAxis()
-                    self.qmc.redraw()
-
-            if error_msg != '':
-                self.qmc.adderror(QApplication.translate('Error Message','Roastlogger log file exception: ' + error_msg))
+#    def importRoastLoggerEnc(self, filename:str, enc:str = 'utf-8') -> None:
+#        import csv
+#        roastlogger_action_section = ''
+#        # use io.open instead of open to have encoding support on Python 2
+#        with open(filename, encoding=enc) as infile:
+#            obj:ProfileData = ProfileData()
+#            obj['mode'] = 'C'
+#            obj['title'] = str(QFileInfo(filename).fileName())
+#            roastdate_str = encodeLocal(QDate.currentDate().toString())
+#            if roastdate_str is not None:
+#                obj['roastdate'] = roastdate_str
+#            # read roastdate from file
+#            while True:
+#                l = infile.readline()
+#                if l.startswith('Roast started at '):
+#                    #extract roast date
+#                    roastdate = QDateTime(QDate.fromString(l.split(' ')[-1][0:10],"dd'/'MM'/'yyyy"), QTime())
+#                    if not roastdate.isNull():
+#                        roastdate_str = encodeLocal(roastdate.date().toString())
+#                        if roastdate_str is not None:
+#                            obj['roastdate'] = roastdate_str
+#                    break
+#                if l == '':
+#                    break
+#            timeindex:list[int] = [-1,0,0,0,0,0,0,0]
+#            timex:list[float] = []
+#            temp1:list[float] = []
+#            temp2:list[float] = []
+#            data = csv.reader(infile,delimiter=',')
+#            #read file header
+#            next(data) # we do not use the labels
+#            #header = list(map(lambda s:s.strip(),next(data)))
+#            while True:
+#                fields = next(data)
+#                if len(fields) == 0:
+#                    break
+#                try:
+#                    timex.append(float(stringtoseconds(fields[0])))
+#                    try:
+#                        t1 = float(fields[1])
+#                    except Exception: # pylint: disable=broad-except
+#                        t1 = -1
+#                    temp1.append(t1)
+#                    try:
+#                        t2 = float(fields[2])
+#                    except Exception: # pylint: disable=broad-except
+#                        t2 = -1
+#                    temp2.append(t2)
+#                    event = fields[3]
+#                    if event == 'Beans loaded':
+#                        timeindex[0] = max(-1,len(timex) - 1)
+#                    elif event == 'First crack start':
+#                        timeindex[2] = max(0,len(timex) - 1)
+#                    elif event == 'First crack end':
+#                        timeindex[3] = max(0,len(timex) - 1)
+#                    elif event == 'Second crack start':
+#                        timeindex[4] = max(0,len(timex) - 1)
+#                    elif event == 'Beans ejected':
+#                        timeindex[6] = max(0,len(timex) - 1)
+#                except Exception: # pylint: disable=broad-except
+#                    pass # stringtoseconds might have detected an invalid timestamp thus we skip this row
+#            obj['timeindex'] = timeindex
+#            obj['timex'] = timex
+#            obj['temp1'] = temp2
+#            obj['temp2'] = temp1
+#
+#            if len(obj['timex']) > 2:
+#                obj['samplinginterval'] = (obj['timex'][-1] - obj['timex'][0])/(len(obj['timex']) - 1)
+#
+#            res = self.setProfile(filename,obj)
+#
+#            error_msg:str = ''
+#            try:
+#                if self.qmc.loadalarmsfromprofile:
+#                    self.qmc.alarmsfile = filename
+#                    roastlogger_action_section = 'No actions loaded'
+#
+#                    #Find sliders - exact names of the sliders must be defined
+#                    slider_power = -1
+#                    slider_fan = -1
+#                    try:
+#                        slider_power=self.qmc.etypes.index('Power')
+#                    except Exception: # pylint: disable=broad-except
+#                        pass
+#                    try:
+#                        slider_fan=self.qmc.etypes.index('Fan')
+#                    except Exception: # pylint: disable=broad-except
+#                        pass
+#                    #load only "Power" and "Fan" events
+#                    if slider_power != -1 and slider_fan != -1:
+#                        data_action = csv.reader(infile,delimiter='|')
+#
+#                        self.qmc.alarmsetlabel = ''
+#                        self.qmc.alarmflag = []
+#                        self.qmc.alarmguard = []
+#                        self.qmc.alarmnegguard = []
+#                        self.qmc.alarmtime = []
+#                        self.qmc.alarmoffset = []
+#                        self.qmc.alarmcond = []
+#                        self.qmc.alarmstate = []
+#                        self.qmc.alarmsource = []
+#                        self.qmc.alarmtemperature = []
+#                        self.qmc.alarmaction = []
+#                        self.qmc.alarmbeep = []
+#                        self.qmc.alarmstrings = []
+#
+#                        while True:
+#                            fields_action = next(data_action)
+#                            if len(fields_action) == 0:
+#                                pass
+#                            elif len(fields_action) == 1 and fields_action[0].startswith('@'):
+#                                roastlogger_action_section=fields_action[0]
+#                            #process items in the section
+#                            elif roastlogger_action_section.startswith('@actionT1Table'):
+#                                if len(fields_action) == 3 and fields_action[0] != 'null':
+#                                    #add temp alarm - POWER
+#                                    self.qmc.alarmflag.append(1)
+#                                    self.qmc.alarmguard.append(-1)
+#                                    self.qmc.alarmnegguard.append(-1)
+#                                    self.qmc.alarmtime.append(8)        #after TP
+#                                    self.qmc.alarmoffset.append(0)
+#                                    self.qmc.alarmcond.append(1)
+#                                    self.qmc.alarmstate.append(-1)
+#                                    self.qmc.alarmsource.append(1)    #BT
+#                                    self.qmc.alarmtemperature.append(float(fields_action[0]))
+#                                    self.qmc.alarmaction.append(3+slider_power)    #SLIDER POWER
+#                                    self.qmc.alarmbeep.append(0)
+#                                    self.qmc.alarmstrings.append(QApplication.translate('Label',fields_action[1]))
+#
+#                                    #add temp alarm - FAN
+#                                    self.qmc.alarmflag.append(1)
+#                                    self.qmc.alarmguard.append(-1)
+#                                    self.qmc.alarmnegguard.append(-1)
+#                                    self.qmc.alarmtime.append(8)        #after TP
+#                                    self.qmc.alarmoffset.append(0)
+#                                    self.qmc.alarmcond.append(1)
+#                                    self.qmc.alarmstate.append(-1)
+#                                    self.qmc.alarmsource.append(1)    #BT
+#                                    self.qmc.alarmtemperature.append(int(fields_action[0]))
+#                                    self.qmc.alarmaction.append(3+slider_fan)    #SLIDER FAN
+#                                    self.qmc.alarmbeep.append(0)
+#                                    self.qmc.alarmstrings.append(QApplication.translate('Label',fields_action[2]))
+#
+#                            elif roastlogger_action_section.startswith('@actionSecsFCTable'):
+#                                if len(fields_action) == 3 and fields_action[0] != 'null':
+#
+#                                    #add time alarm - POWER
+#                                    self.qmc.alarmflag.append(1)
+#                                    self.qmc.alarmguard.append(-1)
+#                                    self.qmc.alarmnegguard.append(-1)
+#                                    self.qmc.alarmtime.append(2)        #after FC
+#                                    self.qmc.alarmoffset.append(int(fields_action[0]))
+#                                    self.qmc.alarmcond.append(1)
+#                                    self.qmc.alarmstate.append(-1)
+#                                    self.qmc.alarmsource.append(-3)       #no source - this is time alarm
+#                                    self.qmc.alarmtemperature.append(0)
+#                                    self.qmc.alarmaction.append(3+slider_power)    #SLIDER POWER
+#                                    self.qmc.alarmbeep.append(0)
+#                                    self.qmc.alarmstrings.append(QApplication.translate('Label',fields_action[1]))
+#
+#                                    #add time alarm - FAN
+#                                    self.qmc.alarmflag.append(1)
+#                                    self.qmc.alarmguard.append(-1)
+#                                    self.qmc.alarmnegguard.append(-1)
+#                                    self.qmc.alarmtime.append(2)        #after FC
+#                                    self.qmc.alarmoffset.append(int(fields_action[0]))
+#                                    self.qmc.alarmcond.append(1)
+#                                    self.qmc.alarmstate.append(-1)
+#                                    self.qmc.alarmsource.append(-3)       #no source - this is time alarm
+#                                    self.qmc.alarmtemperature.append(0)
+#                                    self.qmc.alarmaction.append(3+slider_fan)    #SLIDER FAN
+#                                    self.qmc.alarmbeep.append(0)
+#                                    self.qmc.alarmstrings.append(QApplication.translate('Label',fields_action[2]))
+#
+#                            elif roastlogger_action_section.startswith('@actionResetTable'):
+#                                if len(fields_action) == 2 and fields_action[0] != 'null':
+#
+#                                    #add temp alarm - POWER
+#                                    self.qmc.alarmflag.insert(0,1)
+#                                    self.qmc.alarmguard.insert(0,-1)
+#                                    self.qmc.alarmnegguard.insert(0,-1)
+#                                    self.qmc.alarmtime.insert(0,9)        #after ON
+#                                    self.qmc.alarmoffset.insert(0,0)
+#                                    self.qmc.alarmcond.insert(0,1)
+#                                    self.qmc.alarmstate.insert(0,-1)
+#                                    self.qmc.alarmsource.insert(0,1)    #BT
+#                                    self.qmc.alarmtemperature.insert(0,0)
+#                                    self.qmc.alarmaction.insert(0,3+slider_power)    #SLIDER POWER
+#                                    self.qmc.alarmbeep.insert(0,0)
+#                                    self.qmc.alarmstrings.insert(0,QApplication.translate('Label',fields_action[0]))
+#
+#                                    #add temp alarm - FAN
+#                                    self.qmc.alarmflag.insert(0,1)
+#                                    self.qmc.alarmguard.insert(0,-1)
+#                                    self.qmc.alarmnegguard.insert(0,-1)
+#                                    self.qmc.alarmtime.insert(0,9)        #after ON
+#                                    self.qmc.alarmoffset.insert(0,0)
+#                                    self.qmc.alarmcond.insert(0,1)
+#                                    self.qmc.alarmstate.insert(0,-1)
+#                                    self.qmc.alarmsource.insert(0,1)    #BT
+#                                    self.qmc.alarmtemperature.insert(0,0)
+#                                    self.qmc.alarmaction.insert(0,3+slider_fan)    #SLIDER POWER
+#                                    self.qmc.alarmbeep.insert(0,0)
+#                                    self.qmc.alarmstrings.insert(0,QApplication.translate('Label',fields_action[1]))
+#
+#                            elif roastlogger_action_section.startswith('@loadBeansTable'):
+#                                if len(fields_action) == 1 and fields_action[0] != 'null':
+#
+#                                    #add START TRIGGER - 10 DEG before charge temp
+#                                    self.qmc.alarmflag.insert(2,1)
+#                                    self.qmc.alarmguard.insert(2,-1)
+#                                    self.qmc.alarmnegguard.insert(2,-1)
+#                                    self.qmc.alarmtime.insert(0,9)        #after ON
+#                                    self.qmc.alarmoffset.insert(2,0)
+#                                    self.qmc.alarmcond.insert(2,1)
+#                                    self.qmc.alarmstate.insert(2,-1)
+#                                    self.qmc.alarmsource.insert(2,1)    #BT
+#                                    self.qmc.alarmtemperature.insert(2,float(fields_action[0])-10)
+#                                    self.qmc.alarmaction.insert(2,7)    #initiate 7 (START)
+#                                    self.qmc.alarmbeep.insert(2,0)
+#                                    self.qmc.alarmstrings.insert(2,QApplication.translate('Label','Start recording'))
+#
+#                                    #add CHARGE alarm
+#                                    self.qmc.alarmflag.insert(3,1)
+#                                    self.qmc.alarmguard.insert(3,-1)
+#                                    self.qmc.alarmnegguard.insert(3,-1)
+#                                    self.qmc.alarmtime.insert(3,-1)        #after START
+#                                    self.qmc.alarmoffset.insert(3,0)
+#                                    self.qmc.alarmcond.insert(3,1)
+#                                    self.qmc.alarmstate.insert(3,-1)
+#                                    self.qmc.alarmsource.insert(3,1)    #BT
+#                                    self.qmc.alarmtemperature.insert(3,float(fields_action[0]))
+#                                    self.qmc.alarmaction.insert(3,0)    #POPUP
+#                                    self.qmc.alarmbeep.insert(3,1)      #do beep for charge
+#                                    self.qmc.alarmstrings.insert(3,QApplication.translate('Label','Charge the beans'))
+#                                break
+#                    else:
+#                        if slider_power == -1:
+#                            error_msg += "Could not find slider named 'Power' "
+#                        if slider_fan == -1:
+#                            error_msg += "Could not find slider named 'Fan' "
+#                        error_msg += 'Please rename sliders in Config - Events menu'
+#
+#            except Exception as e: # pylint: disable=broad-except
+#                _log.exception(e)
+#                if roastlogger_action_section == 'No actions loaded':
+#                    error_msg += 'Roastlogger file does not contain actions.  Alarms will not be loaded.'
+#                else:
+#                    error_msg += "Roastlogger actions are not complete. Last loaded section is '" + roastlogger_action_section + "'"
+#
+#            finally:
+#                if res:
+#                    self.autoAdjustAxis()
+#                    self.qmc.redraw()
+#
+#            if error_msg != '':
+#                self.qmc.adderror(QApplication.translate('Error Message','Roastlogger log file exception: ' + error_msg))
 
 
     #Write readings to Artisan csv file
     def exportCSV(self, filename:str) -> bool:
         try:
             if exportProfile2CSV(filename, self.getProfile()):
-                self.sendmessage(f"{QApplication.translate('Message','Artisan CSV file saved successfully')} ({filename})")
+                self.sendmessage(f"{QApplication.translate('Message','{} file saved successfully').format('Artisan CSV')} ({filename})")
                 return True
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
@@ -15931,10 +15968,9 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.flavoraspect = min(2.0, max(0.5, float(profile['flavoraspect'])))
             else:
                 self.qmc.flavoraspect = 1.
+            self.qmc.title = QApplication.translate('Scope Title', 'Roaster Scope')
             if 'title' in profile:
-                self.qmc.title = decodeLocalStrict(profile['title'], 'Roaster Scope')
-            else:
-                self.qmc.title = QApplication.translate('Scope Title', 'Roaster Scope')
+                self.qmc.title = decodeLocalStrict(profile['title'], self.qmc.title)
 
 #PLUS
             if 'plus_store' in profile:
@@ -15977,21 +16013,53 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.beans = decodeLocalStrict(profile['beans'])
             else:
                 self.qmc.beans = ''
+            #
+            weight_unit_idx = 0
+            # we keep the user selected weight unit and convert the profiles weights accordingly
+            try:
+                current_weight_unit_idx = weight_units.index(self.qmc.weight[2])
+            except ValueError:
+                current_weight_unit_idx = 0
             if 'weight' in profile:
                 weight = profile['weight']
-                self.qmc.weight = (float(weight[0]),float(weight[1]),decodeLocalStrict(weight[2], 'g'))
+                unit = decodeLocalStrict(weight[2], 'g')
+                try:
+                    weight_unit_idx = weight_units.index(unit)
+                except ValueError:
+                    weight_unit_idx = 0
+                self.qmc.weight = (
+                    convertWeight(float(weight[0]), weight_unit_idx, current_weight_unit_idx),
+                    convertWeight(float(weight[1]), weight_unit_idx, current_weight_unit_idx),
+                    self.qmc.weight[2])
             else:
-                self.qmc.weight = (0,0,'g')
+                self.qmc.weight = (0,0,self.qmc.weight[2])
+            #
             if 'defects_weight' in profile:
                 defects = profile['defects_weight']
-                self.qmc.roasted_defects_weight = min(self.qmc.weight[1], max(0.,float(defects)))
+                self.qmc.roasted_defects_weight = convertWeight(min(self.qmc.weight[1], max(0.,float(defects))), weight_unit_idx, current_weight_unit_idx)
             else:
                 self.qmc.roasted_defects_weight = 0
+            #
             if 'volume' in profile:
                 volume = profile['volume']
-                self.qmc.volume = (float(volume[0]),float(volume[1]),decodeLocalStrict(volume[2], 'l'))
+                unit = decodeLocalStrict(volume[2], 'l')
+                try:
+                    volume_unit_idx = volume_units.index(unit)
+                except ValueError:
+                    volume_unit_idx = 0
+                # we keep the user selected volume unit and convert the profiles volume accordingly
+                try:
+                    current_volume_unit_idx = volume_units.index(self.qmc.volume[2])
+                except ValueError:
+                    current_volume_unit_idx = 0
+                self.qmc.volume = (
+                    convertVolume(float(volume[0]), volume_unit_idx, current_volume_unit_idx),
+                    convertVolume(float(volume[1]), volume_unit_idx, current_volume_unit_idx),
+                    self.qmc.volume[2])
             else:
-                self.qmc.volume = (0,0,'l')
+                self.qmc.volume = (0,0,self.qmc.volume[2])
+            #
+
             if 'density' in profile:
                 density = profile['density']
                 self.qmc.density = (float(density[0]),decodeLocalStrict(density[1], 'g'),float(density[2]),decodeLocalStrict(density[3], 'l'))
@@ -16409,7 +16477,10 @@ class ApplicationWindow(QMainWindow):
 
                 # Count the number of decimal places in a float
                 def ndec(num:float) -> int:
-                    return len(re.sub(r'(?:[{0}]+$)', '', str(num)).split('.')[1])
+                    try:
+                        return len(re.sub(r'(?:[{0}]+$)', '', str(num)).split('.')[1])
+                    except Exception: # pylint: disable=broad-except
+                        return 0
 
                 # Total number of samples
                 totalSamples = len(self.qmc.timex)
@@ -17327,27 +17398,32 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     @pyqtSlot(bool)
     def fileExportExcel(self, _:bool = False) -> None:
-        self.fileExport(QApplication.translate('Message', 'Export Excel'),'*.xlsx',self.exportExcel)
+        self.fileExport(QApplication.translate('Message', 'Export {}').format('Excel'),'*.xlsx',self.exportExcel)
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def fileExportCSV(self, _:bool = False) -> None:
-        self.fileExport(QApplication.translate('Message', 'Export CSV'),'*.csv',self.exportCSV)
+        self.fileExport(QApplication.translate('Message', 'Export {}').format('CSV'),'*.csv',self.exportCSV)
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def fileExportJSON(self, _:bool = False) -> None:
-        self.fileExport(QApplication.translate('Message', 'Export JSON'),'*.json',self.exportJSON)
+        self.fileExport(QApplication.translate('Message', 'Export {}').format('JSON'),'*.json',self.exportJSON)
 
     @pyqtSlot()
     @pyqtSlot(bool)
-    def fileExportRoastLogger(self, _:bool = False) -> None:
-        self.fileExport(QApplication.translate('Message', 'Export RoastLogger'),'*.csv',self.exportRoastLogger)
+    def fileExportOrbiter(self, _:bool = False) -> None:
+        self.fileExport(QApplication.translate('Message', 'Export {}').format('Orbiter'),'*.rop.zip',self.exportOrbiterROP)
 
-    @pyqtSlot()
-    @pyqtSlot(bool)
-    def fileExportPilot(self, _:bool = False) -> None:
-        self.fileExport(QApplication.translate('Message', 'Export Probat Pilot'),'*.xml',self.exportPilot)
+#    @pyqtSlot()
+#    @pyqtSlot(bool)
+#    def fileExportRoastLogger(self, _:bool = False) -> None:
+#        self.fileExport(QApplication.translate('Message', 'Export RoastLogger'),'*.csv',self.exportRoastLogger)
+#
+#    @pyqtSlot()
+#    @pyqtSlot(bool)
+#    def fileExportPilot(self, _:bool = False) -> None:
+#        self.fileExport(QApplication.translate('Message', 'Export Probat Pilot'),'*.xml',self.exportPilot)
 
 #--
 
@@ -17392,6 +17468,12 @@ class ApplicationWindow(QMainWindow):
     def convertFromPetroncini(self, _:bool = False) -> None:
         from artisanlib.petroncini import extractProfilePetronciniCSV
         self.fileConvertFrom('*.csv', extractProfilePetronciniCSV)
+
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def convertFromOrbiter(self, _:bool = False) -> None:
+        from artisanlib.orbiter import extractProfileOrbiterROP
+        self.fileConvertFrom('(*.rop *.rop.zip)', extractProfileOrbiterROP)
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -17526,13 +17608,18 @@ class ApplicationWindow(QMainWindow):
 
     @pyqtSlot()
     @pyqtSlot(bool)
-    def fileConvertRoastLogger(self, _:bool = False) -> None:
-        self.fileConvert('.csv',self.exportRoastLogger)
+    def fileConvertOrbiter(self, _:bool = False) -> None:
+        self.fileConvert('.rop.zip',self.exportOrbiterROP)
 
-    @pyqtSlot()
-    @pyqtSlot(bool)
-    def fileConvertPilot(self, _:bool = False) -> None:
-        self.fileConvert('.xml',self.exportPilot)
+#    @pyqtSlot()
+#    @pyqtSlot(bool)
+#    def fileConvertRoastLogger(self, _:bool = False) -> None:
+#        self.fileConvert('.csv',self.exportRoastLogger)
+#
+#    @pyqtSlot()
+#    @pyqtSlot(bool)
+#    def fileConvertPilot(self, _:bool = False) -> None:
+#        self.fileConvert('.xml',self.exportPilot)
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -17784,24 +17871,24 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot(bool)
     def urlImport(self, _:bool = False) -> None:
         try:
-            self.importExternalURL(self.artisanURLextractor, QApplication.translate('Message','Import Artisan URL'))
+            self.importExternalURL(self.artisanURLextractor, QApplication.translate('Message','Import {}').format('Artisan URL'))
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def fileImportCSV(self, _:bool = False) -> None:
-        self.fileImport(QApplication.translate('Message', 'Import CSV'),self.importCSV,True)
+        self.fileImport(QApplication.translate('Message', 'Import {}').format('CSV'),self.importCSV,True)
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def fileImportJSON(self, _:bool = False) -> None:
-        self.fileImport(QApplication.translate('Message', 'Import JSON'),self.importJSON,True)
+        self.fileImport(QApplication.translate('Message', 'Import {}').format('JSON'),self.importJSON,True)
 
-    @pyqtSlot()
-    @pyqtSlot(bool)
-    def fileImportRoastLogger(self, _:bool = False) -> None:
-        self.fileImport(QApplication.translate('Message', 'Import RoastLogger'),self.importRoastLogger,True)
+#    @pyqtSlot()
+#    @pyqtSlot(bool)
+#    def fileImportRoastLogger(self, _:bool = False) -> None:
+#        self.fileImport(QApplication.translate('Message', 'Import {}').format('RoastLogger'),self.importRoastLogger,True)
 
     @pyqtSlot(bool)
     def notificationsSetEnabled(self, enabled:bool) -> None:
@@ -21802,7 +21889,7 @@ class ApplicationWindow(QMainWindow):
                         full_path = 'file:///' + filename # Explorer refuses to start otherwise
                     if pdf:
                         # select file
-                        filename = self.ArtisanSaveFileDialog(msg='Export PDF',ext='*.pdf')
+                        filename = self.ArtisanSaveFileDialog(msg=QApplication.translate('Message', 'Export {}').format('PDF'),ext='*.pdf')
                         if filename:
                             self.html2pdf(full_path, filename, landscape=True)
                     else:
@@ -21884,7 +21971,7 @@ class ApplicationWindow(QMainWindow):
         profiles = self.reportFiles()
         if profiles and len(profiles) > 0:
             # select file
-            filename = self.ArtisanSaveFileDialog(msg='Export CSV',ext='*.csv')
+            filename = self.ArtisanSaveFileDialog(msg=QApplication.translate('Message', 'Export {}').format('CSV'),ext='*.csv')
             if filename:
                 try:
                     # write header
@@ -21945,7 +22032,7 @@ class ApplicationWindow(QMainWindow):
         profiles = self.reportFiles()
         if profiles and len(profiles) > 0:
             # select file
-            filename = self.ArtisanSaveFileDialog(msg='Export Excel',ext='*.xlsx')
+            filename = self.ArtisanSaveFileDialog(msg=QApplication.translate('Message', 'Export {}').format('Excel'),ext='*.xlsx')
             if filename:
                 try:
                     # open file
@@ -23160,7 +23247,7 @@ class ApplicationWindow(QMainWindow):
 
                         if pdf:
                             # select file
-                            filename = self.ArtisanSaveFileDialog(msg='Export PDF',ext='*.pdf')
+                            filename = self.ArtisanSaveFileDialog(msg=QApplication.translate('Message', 'Export {}').format('PDF'),ext='*.pdf')
                             if filename:
                                 self.html2pdf(full_path, filename, landscape=True)
                         else:
@@ -23177,7 +23264,7 @@ class ApplicationWindow(QMainWindow):
         profiles = self.reportFiles()
         if profiles and len(profiles) > 0:
             # select file
-            filename = self.ArtisanSaveFileDialog(msg='Export CSV',ext='*.csv')
+            filename = self.ArtisanSaveFileDialog(msg=QApplication.translate('Message', 'Export {}').format('CSV'),ext='*.csv')
             if filename:
                 self.rankingSpreadsheetCreate(filename, profiles, 'csv')
 
@@ -23188,7 +23275,7 @@ class ApplicationWindow(QMainWindow):
         profiles = self.reportFiles()
         if profiles and len(profiles) > 0:
             # select file
-            filename = self.ArtisanSaveFileDialog(msg='Export Excel',ext='*.xlsx')
+            filename = self.ArtisanSaveFileDialog(msg=QApplication.translate('Message', 'Export {}').format('Excel'),ext='*.xlsx')
             if filename:
                 self.rankingSpreadsheetCreate(filename, profiles, 'excel')
 
@@ -23437,7 +23524,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot(bool)
     def pdfReport(self, _:bool = False) -> None:
         # select file
-        filename = self.ArtisanSaveFileDialog(msg='Export PDF',ext='*.pdf')
+        filename = self.ArtisanSaveFileDialog(msg=QApplication.translate('Message', 'Export {}').format('PDF'),ext='*.pdf')
         if filename:
             self.roastReport(pdf_filename=filename)
 
@@ -25539,7 +25626,7 @@ class ApplicationWindow(QMainWindow):
     def importK202(self, _:bool = False) -> None:
         import csv
         try:
-            filename = self.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Import K202 CSV'))
+            filename = self.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Import {}').format('K202 CSV'))
             if len(filename) == 0:
                 return
             if self.qmc.reset():
@@ -25605,7 +25692,7 @@ class ApplicationWindow(QMainWindow):
     def importK204(self, _:bool = False) -> None:
         import csv
         try:
-            filename = self.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Import K204 CSV'))
+            filename = self.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Import {}').format('K204 CSV'))
             if len(filename) == 0:
                 return
             if self.qmc.reset():
@@ -25694,207 +25781,207 @@ class ApplicationWindow(QMainWindow):
         for child in root:
             self.normalize_attr(child)
 
-    @pyqtSlot()
-    @pyqtSlot(bool)
-    def importPilot(self, _:bool = False) -> None: # pyright: ignore [reportGeneralTypeIssues] # Code is too complex to analyze; reduce complexity by refactoring into subroutines or reducing
-        try:
-            import xml.etree.ElementTree as ET
-            filename = self.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Import Probat Recipe'))
-            if len(filename) == 0:
-                return
-            if self.qmc.reset():
-                tree = ET.ElementTree(file=filename)
-                root = tree.getroot()
-                if root is not None:
-                    self.normalize_tags(root) # normalize tags to lower case
-                    self.normalize_attr(root) # normalize attributes to lower case
-
-                    if root.tag == 'history':
-                        date = root.find('historydate')
-                        time = root.find('historytime')
-                        if date is not None and time is not None:
-                            date_str = date.text
-                            time_str = time.text
-                            if date_str is not None and time_str is not None:
-                                self.qmc.roastdate = QDateTime(QDate.fromString(date_str,'M/d/yyyy'),QTime.fromString(time_str,'h:mm AP'))
-
-                    title = root.find('roasttype')
-                    if title is None:
-                        self.qmc.title = str(os.path.basename(filename))
-                    else:
-                        self.qmc.title = str(title.text)
-
-                    beans = root.find('coffeetype')
-                    if beans is not None and beans.text is not None:
-                        self.qmc.beans = str(beans.text)
-
-                    roaster = root.find('roaster')
-                    if roaster is not None and roaster.text is not None:
-                        self.qmc.roastertype = str(roaster.text)
-
-                    chargestr = root.find('charge')
-                    if chargestr is None:
-                        chargestr = root.find('chargingcapacity')
-                    if chargestr is not None: # contains floating point number; default unit Kg
-                        try:
-                            weight_in_str = chargestr.text
-                            if weight_in_str is not None:
-                                self.qmc.weight = (float(weight_in_str), self.qmc.weight[1], 'Kg')
-                        except Exception: # pylint: disable=broad-except
-                            pass
-
-                    dischargestr = root.find('dischargingcapacity')
-                    if dischargestr is not None: # contains floating point number; default unit Kg
-                        try:
-                            weight_out_str = dischargestr.text
-                            if weight_out_str is not None:
-                                self.qmc.weight = (self.qmc.weight[0], float(weight_out_str), 'Kg')
-                        except Exception: # pylint: disable=broad-except
-                            pass
-
-                    colorstr = root.find('coffeecolor')
-                    if colorstr is not None:
-                        c = None
-                        colorstr_text = colorstr.text
-                        if colorstr_text is not None:
-                            for e in colorstr_text.strip().split():
-                                try:
-                                    c = int(e)
-                                    break
-                                except Exception: # pylint: disable=broad-except
-                                    pass
-                        if c:
-                            self.qmc.ground_color = c
-
-                    notes = root.find('notes')
-                    if notes is not None and notes.text is not None:
-                        self.qmc.roastingnotes = str(notes.text)
-
-                    recipedata = None
-                    historydata = None
-                    recipedata = tree.find('recipedata')
-                    m = None
-                    if recipedata is not None:
-                        m = recipedata.get('temp_unit')
-                    else:
-                        mt = tree.find('recipedata_temp_unit')
-                        if mt is not None:
-                            m = mt.text
-                    if m is None:
-                        historydata = tree.find('historydata')
-                        if historydata is not None:
-                            m = historydata.get('temp_unit')
-                        else:
-                            mt = tree.find('historydata_temp_unit')
-                            if mt is not None:
-                                m = mt.text
-                    if m is not None:
-                        m = m.lower()
-                        if m == 'c' and self.qmc.mode == 'F':
-                            self.qmc.celsiusMode()
-                        elif m == 'f' and self.qmc.mode == 'C':
-                            self.qmc.fahrenheitMode()
-
-                    # add extra device if needed
-                    for __ in range(max(0,1 - len(self.qmc.extradevices))):
-                        self.addDevice()
-                    if self.qmc.extraname1[0] == 'Extra 1':
-                        self.qmc.extraname1[0] = 'Burner'
-
-                    diagrampoints = None
-                    if recipedata is not None:
-                        diagrampoints = tree.find('recipedata/diagrampoints')
-                    if diagrampoints is None:
-                        diagrampoints = tree.find('diagrampoints')
-                    if diagrampoints is None:
-                        diagrampoints = tree.find('historydata')
-                    last_timez = 0.
-                    if diagrampoints is not None:
-                        for elem in diagrampoints.findall('data'):
-                            time_entry = elem.find('time')
-                            if time_entry is None:
-                                time_entry = elem.find('stime')
-                            last_timez = last_timez + 1
-                            timez = last_timez
-                            try:
-                                if time_entry is not None:
-                                    time_entry_text = time_entry.text
-                                    if time_entry_text is not None:
-                                        timez = float(stringtoseconds(time_entry_text))
-                                        last_timez = timez
-                            except Exception: # pylint: disable=broad-except
-                                pass # invalid input can make stringtoseconds fail
-                            self.qmc.timex.append(timez)
-                            self.qmc.temp1.append(-1)
-                            temp_entry = elem.find('temperature')
-                            if temp_entry is None:
-                                temp_entry = elem.find('ntemperature')
-                            if temp_entry is not None:
-                                bt = temp_entry.text
-                                if bt is not None:
-                                    bt = bt.replace(',','.')
-                                    self.qmc.temp2.append(float(bt))
-                                    self.qmc.extratimex[0].append(timez)
-                                    burner_entry = elem.find('burnercapacity')
-                                    if burner_entry is None:
-                                        burner_entry = elem.find('nburnercapacity')
-                                    if burner_entry is not None:
-                                        burner = burner_entry.text
-                                        if burner is not None:
-                                            burner = burner.replace(',','.')
-                                            self.qmc.extratemp1[0].append(float(burner))
-                                            self.qmc.extratemp2[0].append(-1)
-
-                    if len(self.qmc.timex) > 2:
-                        self.qmc.profile_sampling_interval = (self.qmc.timex[-1] - self.qmc.timex[0])/(len(self.qmc.timex) - 1)
-                    self.qmc.updateDeltaSamples()
-
-                    # set CHARGE and DROP
-                    self.qmc.timeindex[0] = 0
-                    self.qmc.timeindex[6] = max(0,len(self.qmc.timex) - 1)
-
-                    if recipedata is not None:
-                        switchpoints = tree.find('recipedata/switchpoints')
-                    else:
-                        switchpoints = tree.find('switchpoints')
-                    if switchpoints is not None:
-                        for elem in switchpoints.findall('data'):
-                            time_entry = elem.find('time')
-                            if time_entry is None:
-                                time_entry = elem.find('stime')
-                            if time_entry is not None:
-                                time_str = time_entry.text
-                                if time_str is not None:
-                                    try:
-                                        time_in_seconds = float(stringtoseconds(time_str))
-                                        burner_entry = elem.find('burnercapacity')
-                                        if burner_entry is None:
-                                            burner_entry = elem.find('nburnercapacity')
-                                        if burner_entry is not None:
-                                            burner = burner_entry.text
-                                            if burner is not None:
-                                                self.qmc.addEvent(
-                                                    self.qmc.time2index(time_in_seconds),
-                                                    3,
-                                                    '',
-                                                    self.qmc.str2eventsvalue(burner))
-                                    except Exception: # pylint: disable=broad-except
-                                        pass # invalid input can make stringtoseconds
-
-                    self.autoAdjustAxis()
-
-                    self.sendmessage(QApplication.translate('Message','Probat Pilot data imported successfully'))
-                    self.qmc.redraw()
-                    self.qmc.fileDirtySignal.emit()
-        except OSError as ex:
-            self.qmc.adderror((QApplication.translate('Error Message','IO Error:') + ' importPilot(): {0}').format(str(ex)))
-        except ValueError as ex:
-            self.qmc.adderror((QApplication.translate('Error Message','Value Error:') + ' importPilot(): {0}').format(str(ex)))
-        except Exception as ex: # pylint: disable=broad-except
-            _log.exception(ex)
-            _a, _b, exc_tb = sys.exc_info()
-            self.sendmessage(QApplication.translate('Message','Import Probat Pilot failed'))
-            self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' importPilot() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+#    @pyqtSlot()
+#    @pyqtSlot(bool)
+#    def importPilot(self, _:bool = False) -> None: # pyright: ignore [reportGeneralTypeIssues] # Code is too complex to analyze; reduce complexity by refactoring into subroutines or reducing
+#        try:
+#            import xml.etree.ElementTree as ET
+#            filename = self.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Import Probat Recipe'))
+#            if len(filename) == 0:
+#                return
+#            if self.qmc.reset():
+#                tree = ET.ElementTree(file=filename)
+#                root = tree.getroot()
+#                if root is not None:
+#                    self.normalize_tags(root) # normalize tags to lower case
+#                    self.normalize_attr(root) # normalize attributes to lower case
+#
+#                    if root.tag == 'history':
+#                        date = root.find('historydate')
+#                        time = root.find('historytime')
+#                        if date is not None and time is not None:
+#                            date_str = date.text
+#                            time_str = time.text
+#                            if date_str is not None and time_str is not None:
+#                                self.qmc.roastdate = QDateTime(QDate.fromString(date_str,'M/d/yyyy'),QTime.fromString(time_str,'h:mm AP'))
+#
+#                    title = root.find('roasttype')
+#                    if title is None:
+#                        self.qmc.title = str(os.path.basename(filename))
+#                    else:
+#                        self.qmc.title = str(title.text)
+#
+#                    beans = root.find('coffeetype')
+#                    if beans is not None and beans.text is not None:
+#                        self.qmc.beans = str(beans.text)
+#
+#                    roaster = root.find('roaster')
+#                    if roaster is not None and roaster.text is not None:
+#                        self.qmc.roastertype = str(roaster.text)
+#
+#                    chargestr = root.find('charge')
+#                    if chargestr is None:
+#                        chargestr = root.find('chargingcapacity')
+#                    if chargestr is not None: # contains floating point number; default unit Kg
+#                        try:
+#                            weight_in_str = chargestr.text
+#                            if weight_in_str is not None:
+#                                self.qmc.weight = (float(weight_in_str), self.qmc.weight[1], 'Kg')
+#                        except Exception: # pylint: disable=broad-except
+#                            pass
+#
+#                    dischargestr = root.find('dischargingcapacity')
+#                    if dischargestr is not None: # contains floating point number; default unit Kg
+#                        try:
+#                            weight_out_str = dischargestr.text
+#                            if weight_out_str is not None:
+#                                self.qmc.weight = (self.qmc.weight[0], float(weight_out_str), 'Kg')
+#                        except Exception: # pylint: disable=broad-except
+#                            pass
+#
+#                    colorstr = root.find('coffeecolor')
+#                    if colorstr is not None:
+#                        c = None
+#                        colorstr_text = colorstr.text
+#                        if colorstr_text is not None:
+#                            for e in colorstr_text.strip().split():
+#                                try:
+#                                    c = int(e)
+#                                    break
+#                                except Exception: # pylint: disable=broad-except
+#                                    pass
+#                        if c:
+#                            self.qmc.ground_color = c
+#
+#                    notes = root.find('notes')
+#                    if notes is not None and notes.text is not None:
+#                        self.qmc.roastingnotes = str(notes.text)
+#
+#                    recipedata = None
+#                    historydata = None
+#                    recipedata = tree.find('recipedata')
+#                    m = None
+#                    if recipedata is not None:
+#                        m = recipedata.get('temp_unit')
+#                    else:
+#                        mt = tree.find('recipedata_temp_unit')
+#                        if mt is not None:
+#                            m = mt.text
+#                    if m is None:
+#                        historydata = tree.find('historydata')
+#                        if historydata is not None:
+#                            m = historydata.get('temp_unit')
+#                        else:
+#                            mt = tree.find('historydata_temp_unit')
+#                            if mt is not None:
+#                                m = mt.text
+#                    if m is not None:
+#                        m = m.lower()
+#                        if m == 'c' and self.qmc.mode == 'F':
+#                            self.qmc.celsiusMode()
+#                        elif m == 'f' and self.qmc.mode == 'C':
+#                            self.qmc.fahrenheitMode()
+#
+#                    # add extra device if needed
+#                    for __ in range(max(0,1 - len(self.qmc.extradevices))):
+#                        self.addDevice()
+#                    if self.qmc.extraname1[0] == 'Extra 1':
+#                        self.qmc.extraname1[0] = 'Burner'
+#
+#                    diagrampoints = None
+#                    if recipedata is not None:
+#                        diagrampoints = tree.find('recipedata/diagrampoints')
+#                    if diagrampoints is None:
+#                        diagrampoints = tree.find('diagrampoints')
+#                    if diagrampoints is None:
+#                        diagrampoints = tree.find('historydata')
+#                    last_timez = 0.
+#                    if diagrampoints is not None:
+#                        for elem in diagrampoints.findall('data'):
+#                            time_entry = elem.find('time')
+#                            if time_entry is None:
+#                                time_entry = elem.find('stime')
+#                            last_timez = last_timez + 1
+#                            timez = last_timez
+#                            try:
+#                                if time_entry is not None:
+#                                    time_entry_text = time_entry.text
+#                                    if time_entry_text is not None:
+#                                        timez = float(stringtoseconds(time_entry_text))
+#                                        last_timez = timez
+#                            except Exception: # pylint: disable=broad-except
+#                                pass # invalid input can make stringtoseconds fail
+#                            self.qmc.timex.append(timez)
+#                            self.qmc.temp1.append(-1)
+#                            temp_entry = elem.find('temperature')
+#                            if temp_entry is None:
+#                                temp_entry = elem.find('ntemperature')
+#                            if temp_entry is not None:
+#                                bt = temp_entry.text
+#                                if bt is not None:
+#                                    bt = bt.replace(',','.')
+#                                    self.qmc.temp2.append(float(bt))
+#                                    self.qmc.extratimex[0].append(timez)
+#                                    burner_entry = elem.find('burnercapacity')
+#                                    if burner_entry is None:
+#                                        burner_entry = elem.find('nburnercapacity')
+#                                    if burner_entry is not None:
+#                                        burner = burner_entry.text
+#                                        if burner is not None:
+#                                            burner = burner.replace(',','.')
+#                                            self.qmc.extratemp1[0].append(float(burner))
+#                                            self.qmc.extratemp2[0].append(-1)
+#
+#                    if len(self.qmc.timex) > 2:
+#                        self.qmc.profile_sampling_interval = (self.qmc.timex[-1] - self.qmc.timex[0])/(len(self.qmc.timex) - 1)
+#                    self.qmc.updateDeltaSamples()
+#
+#                    # set CHARGE and DROP
+#                    self.qmc.timeindex[0] = 0
+#                    self.qmc.timeindex[6] = max(0,len(self.qmc.timex) - 1)
+#
+#                    if recipedata is not None:
+#                        switchpoints = tree.find('recipedata/switchpoints')
+#                    else:
+#                        switchpoints = tree.find('switchpoints')
+#                    if switchpoints is not None:
+#                        for elem in switchpoints.findall('data'):
+#                            time_entry = elem.find('time')
+#                            if time_entry is None:
+#                                time_entry = elem.find('stime')
+#                            if time_entry is not None:
+#                                time_str = time_entry.text
+#                                if time_str is not None:
+#                                    try:
+#                                        time_in_seconds = float(stringtoseconds(time_str))
+#                                        burner_entry = elem.find('burnercapacity')
+#                                        if burner_entry is None:
+#                                            burner_entry = elem.find('nburnercapacity')
+#                                        if burner_entry is not None:
+#                                            burner = burner_entry.text
+#                                            if burner is not None:
+#                                                self.qmc.addEvent(
+#                                                    self.qmc.time2index(time_in_seconds),
+#                                                    3,
+#                                                    '',
+#                                                    self.qmc.str2eventsvalue(burner))
+#                                    except Exception: # pylint: disable=broad-except
+#                                        pass # invalid input can make stringtoseconds
+#
+#                    self.autoAdjustAxis()
+#
+#                    self.sendmessage(QApplication.translate('Message','Probat Pilot data imported successfully'))
+#                    self.qmc.redraw()
+#                    self.qmc.fileDirtySignal.emit()
+#        except OSError as ex:
+#            self.qmc.adderror((QApplication.translate('Error Message','IO Error:') + ' importPilot(): {0}').format(str(ex)))
+#        except ValueError as ex:
+#            self.qmc.adderror((QApplication.translate('Error Message','Value Error:') + ' importPilot(): {0}').format(str(ex)))
+#        except Exception as ex: # pylint: disable=broad-except
+#            _log.exception(ex)
+#            _a, _b, exc_tb = sys.exc_info()
+#            self.sendmessage(QApplication.translate('Message','Import Probat Pilot failed'))
+#            self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' importPilot() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
 #    @pyqtSlot()
 #    @pyqtSlot(bool)
@@ -26031,86 +26118,92 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot(bool)
     def importCropster(self, _:bool = False) -> None:
         from artisanlib.cropster import extractProfileCropsterXLS
-        self.importExternal(extractProfileCropsterXLS, QApplication.translate('Message','Import Cropster XLS'),'*.xls')
+        self.importExternal(extractProfileCropsterXLS, QApplication.translate('Message','Import {}').format('Cropster XLS'),'*.xls')
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def importStronghold(self, _:bool = False) -> None:
         from artisanlib.stronghold import extractProfileStrongholdXLSX
-        self.importExternal(extractProfileStrongholdXLSX, QApplication.translate('Message','Import Stronghold XLSX'), '*.xlsx')
+        self.importExternal(extractProfileStrongholdXLSX, QApplication.translate('Message','Import {}').format('Stronghold XLSX'), '*.xlsx')
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def importRoastLog(self, _:bool = False) -> None:
         from artisanlib.roastlog import extractProfileRoastLog
-        self.importExternalURL(extractProfileRoastLog,QApplication.translate('Message','Import RoastLog URL'))
+        self.importExternalURL(extractProfileRoastLog,QApplication.translate('Message','Import {}').format('RoastLog URL'))
 
 #    @pyqtSlot()
 #    @pyqtSlot(bool)
 #    def importRoastPATH(self, _:bool = False) -> None:
 #        from artisanlib.roastpath import extractProfileRoastPathHTML
-#        self.importExternalURL(extractProfileRoastPathHTML,QApplication.translate('Message','Import RoastPATH URL'))
+#        self.importExternalURL(extractProfileRoastPathHTML,QApplication.translate('Message','Import {}').format('RoastPath URL'))
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def importHiBean(self, _:bool = False) -> None:
         from artisanlib.hibean import extractProfileHiBeanJSON
-        self.importExternal(extractProfileHiBeanJSON,QApplication.translate('Message','Import HiBean JSON'),'*.json')
+        self.importExternal(extractProfileHiBeanJSON,QApplication.translate('Message','Import {}').format('HiBean JSON'),'*.json')
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def importGiesen(self, _:bool = False) -> None:
         from artisanlib.giesen import extractProfileGiesenCSV
-        self.importExternal(extractProfileGiesenCSV,QApplication.translate('Message','Import Giesen CSV'),'*.csv')
+        self.importExternal(extractProfileGiesenCSV,QApplication.translate('Message','Import {}').format('Giesen CSV'),'*.csv')
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def importPetroncini(self, _:bool = False) -> None:
         from artisanlib.petroncini import extractProfilePetronciniCSV
-        self.importExternal(extractProfilePetronciniCSV,QApplication.translate('Message','Import Petroncini CSV'),'*.csv')
+        self.importExternal(extractProfilePetronciniCSV,QApplication.translate('Message','Import {}').format('Petroncini CSV'),'*.csv')
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def importIkawaURL(self, _:bool = False) -> None:
         from artisanlib.ikawa import extractProfileIkawaURL
-        self.importExternalURL(extractProfileIkawaURL,QApplication.translate('Message','Import IKAWA URL'))
+        self.importExternalURL(extractProfileIkawaURL,QApplication.translate('Message','Import {}').format('IKAWA URL'))
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def importIkawa(self, _:bool = False) -> None:
         from artisanlib.ikawa import extractProfileIkawaCSV
-        self.importExternal(extractProfileIkawaCSV,QApplication.translate('Message','Import IKAWA CSV'),'*.csv')
+        self.importExternal(extractProfileIkawaCSV,QApplication.translate('Message','Import {}').format('IKAWA CSV'),'*.csv')
+
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def importOrbiter(self, _:bool = False) -> None:
+        from artisanlib.orbiter import extractProfileOrbiterROP
+        self.importExternal(extractProfileOrbiterROP,QApplication.translate('Message','Import {}').format('Orbiter'),'(*.rop *.rop.zip)')
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def importKaleido(self, _:bool = False) -> None:
         from artisanlib.kaleido import extractProfileKaleidoCSV
-        self.importExternal(extractProfileKaleidoCSV,QApplication.translate('Message','Import Kaleido CSV'),'*.csv')
+        self.importExternal(extractProfileKaleidoCSV,QApplication.translate('Message','Import {}').format('Kaleido CSV'),'*.csv')
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def importLoring(self, _:bool = False) -> None:
         from artisanlib.loring import extractProfileLoringCSV
-        self.importExternal(extractProfileLoringCSV,QApplication.translate('Message','Import Loring CSV'),'*.csv')
+        self.importExternal(extractProfileLoringCSV,QApplication.translate('Message','Import {}').format('Loring CSV'),'*.csv')
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def importRoest(self, _:bool = False) -> None:
         from artisanlib.roest import extractProfileRoestCSV
-        self.importExternal(extractProfileRoestCSV,QApplication.translate('Message','Import ROEST CSV'),'*.csv')
+        self.importExternal(extractProfileRoestCSV,QApplication.translate('Message','Import {}').format('ROEST CSV'),'*.csv')
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def importRubasse(self, _:bool = False) -> None:
         from artisanlib.rubasse import extractProfileRubasseCSV
-        self.importExternal(extractProfileRubasseCSV,QApplication.translate('Message','Import Rubasse CSV'),'*.csv')
+        self.importExternal(extractProfileRubasseCSV,QApplication.translate('Message','Import {}').format('Rubasse CSV'),'*.csv')
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def importHH506RA(self, _:bool = False) -> None:
         import csv
         try:
-            filename = self.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Import HH506RA CSV'))
+            filename = self.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Import {}').format('HH506RA CSV'))
             if len(filename) == 0:
                 return
             if self.qmc.reset():

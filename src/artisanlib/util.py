@@ -362,8 +362,10 @@ def fill_gaps(ll:'Sequence[float|int]|npt.NDArray[numpy.floating[Any]]', interpo
 def replace_duplicates(data:list[float]) -> list[float]:
     lv:float = -1
     data_core:list[float] = []
+    max_eliminations: Final[int] = 20
     for v in data:
-        if v == lv:
+        if v == lv and not all(val == -1 for val in data_core[-(min(max_eliminations,len(data_core))):]):
+            # replace by -1, only if the previous max_eliminations once were not replaced
             data_core.append(-1)
         else:
             data_core.append(v)
