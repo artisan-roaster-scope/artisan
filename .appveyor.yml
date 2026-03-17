@@ -65,7 +65,7 @@ for:
 
   environment:
     PYTHON_V: 3.14  # Override the stack key
-    QT_PATH: "C:/qt/6.9.3/msvc2022_64"
+    QT_PATH: "C:/qt/6.9/msvc2022_64"  #symbolic linked to latest 6.9.x folder
     PYQT: "6"
     PYUIC: "pyuic6.exe"
     BUILD_PYINSTALLER: "True"
