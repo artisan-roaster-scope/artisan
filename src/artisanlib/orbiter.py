@@ -356,9 +356,8 @@ def extractProfileOrbiter(f:IO[bytes],
             if header == b'\xff\xff' and int(data_crc) == computed_crc:
                 count = packet[2:4]
                 time = packet[4:6]
-                # header
                 if total_packets == 0 and count == b'\x00\x00':
-                    # first data packet
+                    # header; first data packet
                     total_packets = int.from_bytes(time, 'little', signed = False)
                     batchsize = int.from_bytes(packet[6:8], 'little', signed = False)
                     roasted = int.from_bytes(packet[8:10], 'little', signed = False)
@@ -401,7 +400,7 @@ def extractProfileOrbiter(f:IO[bytes],
                     damper = packet[22] * 10
                     event = packet[23]
 
-                    if event == 1 and timeindex[0] == -1:
+                    if timeindex[0] == -1: # and event == 0: # the first reading is marked CHARGE
                         timeindex[0] = len(timex)
                     elif event == 3 and timeindex[1] == 0:
                         timeindex[1] = len(timex)
@@ -546,6 +545,7 @@ def saveOrbiter(outfile:IO[bytes], profile:ProfileData) -> bool:
         #
         #
         time:int = -1
+        time_offset:float = 0
         heater:int = 0
         drum:int = 0
         damper:int = 0
@@ -556,55 +556,58 @@ def saveOrbiter(outfile:IO[bytes], profile:ProfileData) -> bool:
         SCs:bool = False
         DROP:bool = False
         for idx,tx in enumerate(timex):
-            if len(specialevents)>0 and idx >= specialevents[0]:
-                # we passed the next special event
-                if specialeventstype[0] == 0:
-                    damper = int(round(events_internal_to_external_value(specialeventsvalue[0])/10))
-                elif specialeventstype[0] == 1:
-                    drum = events_internal_to_external_value(specialeventsvalue[0])
-                elif specialeventstype[0] == 3:
-                    heater = int(round(events_internal_to_external_value(specialeventsvalue[0])/10))
-                # we consume the event
-                specialevents = specialevents[1:]
-                specialeventstype = specialeventstype[1:]
-                specialeventsvalue = specialeventsvalue[1:]
+            if not (DROP or (timeindex[0] > -1 and tx < timex[timeindex[0]])): # ignore all readings before CHARGE and after DROP
+                if len(specialevents)>0 and idx >= specialevents[0]:
+                    # we passed the next special event
+                    if specialeventstype[0] == 0:
+                        damper = int(round(events_internal_to_external_value(specialeventsvalue[0])/10))
+                    elif specialeventstype[0] == 1:
+                        drum = events_internal_to_external_value(specialeventsvalue[0])
+                    elif specialeventstype[0] == 3:
+                        heater = int(round(events_internal_to_external_value(specialeventsvalue[0])/10))
+                    # we consume the event
+                    specialevents = specialevents[1:]
+                    specialeventstype = specialeventstype[1:]
+                    specialeventsvalue = specialeventsvalue[1:]
 
-            if not CHARGE and timeindex[0] > -1 and tx >= timex[timeindex[0]]:
-                event = 1
-                CHARGE = True
-            elif not DRY and timeindex[1] > 0 and tx >= timex[timeindex[1]]:
-                event = 3
-                DRY = True
-            elif not FCs and timeindex[2] > 0 and tx >= timex[timeindex[2]]:
-                event = 5
-                FCs = True
-            elif not SCs and timeindex[4] > 0 and tx >= timex[timeindex[4]]:
-                event = 6
-                SCs = True
-            elif not DROP and timeindex[6] > 0 and tx >= timex[timeindex[6]]:
-                event = 7
-                DROP = True
+                if not CHARGE: # and timeindex[0] > -1 and tx >= timex[timeindex[0]]: # mark the first reading as CHARGE
+                    event = 0
+                    CHARGE = True
+                    time_offset = timex[timeindex[0]]
+                elif not DRY and timeindex[1] > 0 and tx >= timex[timeindex[1]]:
+                    event = 3
+                    DRY = True
+                elif not FCs and timeindex[2] > 0 and tx >= timex[timeindex[2]]:
+                    event = 5
+                    FCs = True
+                elif not SCs and timeindex[4] > 0 and tx >= timex[timeindex[4]]:
+                    event = 6
+                    SCs = True
+                elif timeindex[6] > 0 and tx >= timex[timeindex[6]]: # and not DROP
+                    event = 7
+                    DROP = True
 
-            tx_new = int(round(tx))
-            if tx_new != time:
-                # ignore readings with timestamps already used to prevent the introduction of duplicates
-                time = tx_new
+                tx_new = int(round(tx - time_offset))
 
-                values:bytes = time.to_bytes(2, 'little') + \
-                    int(float(temp2[idx])).to_bytes(2, 'little') + \
-                    (int(float(extratemp2[0][idx])).to_bytes(2, 'little') if len(extratemp2)>0 else b'\x00\x00') + \
-                    (int(float(extratemp1[0][idx])).to_bytes(2, 'little') if len(extratemp1)>0 else b'\x00\x00') + \
-                    int(float(temp1[idx])).to_bytes(2, 'little') + \
-                    b'\x00\x00' + \
-                    (int(float(extratemp1[3][idx])).to_bytes(2, 'little') if len(extratemp1)>3 else b'\x00\x00') + \
-                    b'\x00\x00' + \
-                    heater.to_bytes(1, 'little') + \
-                    drum.to_bytes(1, 'little') + \
-                    damper.to_bytes(1, 'little') + \
-                    event.to_bytes(1, 'little') + \
-                    b'\x00' # reserve
-                event = 255
-                readings.append(values)
+                if tx_new != time:
+                    # ignore readings with timestamps already used to prevent the introduction of duplicates
+                    time = tx_new
+
+                    values:bytes = time.to_bytes(2, 'little') + \
+                        int(float(temp2[idx])).to_bytes(2, 'little') + \
+                        (int(float(extratemp2[0][idx])).to_bytes(2, 'little') if len(extratemp2)>0 else b'\x00\x00') + \
+                        (int(float(extratemp1[0][idx])).to_bytes(2, 'little') if len(extratemp1)>0 else b'\x00\x00') + \
+                        int(float(temp1[idx])).to_bytes(2, 'little') + \
+                        b'\x00\x00' + \
+                        (int(float(extratemp1[3][idx])).to_bytes(2, 'little') if len(extratemp1)>3 else b'\x00\x00') + \
+                        b'\x00\x00' + \
+                        heater.to_bytes(1, 'little') + \
+                        drum.to_bytes(1, 'little') + \
+                        damper.to_bytes(1, 'little') + \
+                        event.to_bytes(1, 'little') + \
+                        b'\x00' # reserve
+                    event = 255
+                    readings.append(values)
 
         title_length:int = 30
         title_bytes = title.encode('utf-8')[:title_length].ljust(title_length, b'\00')

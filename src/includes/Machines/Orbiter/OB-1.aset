@@ -6,6 +6,8 @@ roasterheating_setup=3
 roastertype_setup=Orbiter OB-1
 roastersize_setup=1.2
 roastersize_setup_default=1.2
+autosaveimageformat=Orbiter
+
 
 [RoC]
 DeltaBT=false

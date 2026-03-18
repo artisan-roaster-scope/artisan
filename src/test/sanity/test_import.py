@@ -167,13 +167,16 @@ def pytest_generate_tests(metafunc:'Metafunc') -> None:
     def get_import_data(extractor:Extractor, dir_name:str, ext:str) -> list[ImportData]:
         profiles_dir = (data_dir / dir_name)
         import_data:list[ImportData] = []
-        for filename in [f.stem for f in profiles_dir.iterdir() if f.is_file() and f.suffix == ext]:
-            roest_data:ImportData = {
-                'extractor': extractor,
-                'directory': profiles_dir,
-                'filename': filename,
-                'ext': ext}
-            import_data.append(roest_data)
+        try:
+            for filename in [f.stem for f in profiles_dir.iterdir() if f.is_file() and f.suffix == ext]:
+                roest_data:ImportData = {
+                    'extractor': extractor,
+                    'directory': profiles_dir,
+                    'filename': filename,
+                    'ext': ext}
+                import_data.append(roest_data)
+        except FileNotFoundError:
+            pass
         return import_data
 
     if 'import_data' in metafunc.fixturenames:

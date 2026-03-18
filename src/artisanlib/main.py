@@ -428,10 +428,10 @@ class Artisan(QtSingleApplication):
                     # import Stronghold XLSX profile
                     from artisanlib.stronghold import extractProfileStrongholdXLSX
                     aw.importExternal(extractProfileStrongholdXLSX, QApplication.translate('Message','Import {}').format('Stronghold XLSX'),'*.xlsx',filename)
-                if filename.endswith('.rop.zip') and not aw.app.artisanviewerMode and aw.comparator is None:
-                    # import Orbiter .rop.zip profile
+                if filename.endswith(('.zip', '.rop')) and not aw.app.artisanviewerMode and aw.comparator is None:
+                    # import Orbiter .rop/.zip profile
                     from artisanlib.orbiter import extractProfileOrbiterROP
-                    aw.importExternal(extractProfileOrbiterROP, QApplication.translate('Message','Import {}').format('Orbiter'),'(*.rop *.rop.zip)',filename)
+                    aw.importExternal(extractProfileOrbiterROP, QApplication.translate('Message','Import {}').format('Orbiter'),'(*.rop *.zip)',filename)
 
 
         elif platform.system() == 'Windows' and not self.artisanviewerMode:
@@ -13227,7 +13227,7 @@ class ApplicationWindow(QMainWindow):
         elif self.qmc.autosaveimageformat == 'Excel':
             self.exportExcel(filename + '.xlsx')
         elif self.qmc.autosaveimageformat == 'Orbiter':
-            self.exportOrbiterROP(filename + '.rop.zip')
+            self.exportOrbiterROP(filename + '.zip')
         else:
             self.resizeImgToSize(0,0,self.qmc.autosaveimageformat,fname=filename)
 
@@ -17413,7 +17413,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     @pyqtSlot(bool)
     def fileExportOrbiter(self, _:bool = False) -> None:
-        self.fileExport(QApplication.translate('Message', 'Export {}').format('Orbiter'),'*.rop.zip',self.exportOrbiterROP)
+        self.fileExport(QApplication.translate('Message', 'Export {}').format('Orbiter'),'*.zip',self.exportOrbiterROP)
 
 #    @pyqtSlot()
 #    @pyqtSlot(bool)
@@ -17473,7 +17473,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot(bool)
     def convertFromOrbiter(self, _:bool = False) -> None:
         from artisanlib.orbiter import extractProfileOrbiterROP
-        self.fileConvertFrom('(*.rop *.rop.zip)', extractProfileOrbiterROP)
+        self.fileConvertFrom('(*.rop *.zip)', extractProfileOrbiterROP)
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -17609,7 +17609,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     @pyqtSlot(bool)
     def fileConvertOrbiter(self, _:bool = False) -> None:
-        self.fileConvert('.rop.zip',self.exportOrbiterROP)
+        self.fileConvert('.zip',self.exportOrbiterROP)
 
 #    @pyqtSlot()
 #    @pyqtSlot(bool)
@@ -26172,7 +26172,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot(bool)
     def importOrbiter(self, _:bool = False) -> None:
         from artisanlib.orbiter import extractProfileOrbiterROP
-        self.importExternal(extractProfileOrbiterROP,QApplication.translate('Message','Import {}').format('Orbiter'),'(*.rop *.rop.zip)')
+        self.importExternal(extractProfileOrbiterROP,QApplication.translate('Message','Import {}').format('Orbiter'),'(*.rop *.zip)')
 
     @pyqtSlot()
     @pyqtSlot(bool)
