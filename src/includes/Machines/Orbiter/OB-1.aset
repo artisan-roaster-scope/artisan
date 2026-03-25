@@ -21,8 +21,8 @@ weight=g
 buttonactions=5, 0, 0, 0, 0, 0, 5, 5
 buttonactionstrings="orbiter(13,1);sleep(0.1);orbiter(02)", , , , , , "orbiter(14,1);sleep(0.1);orbiter(03);orbiter(0F,1)", "orbiter(0F,0);orbiter(01)"
 buttonvisibility=true, true, true, true, true, false, true, true
-extrabuttonactions=5, 0, 0
-extrabuttonactionstrings="orbiter(01)", orbiter(06), 
+extrabuttonactions=5, 5, 0
+extrabuttonactionstrings=orbiter(01), orbiter(06), 
 xextrabuttonactions=0, 5
 xextrabuttonactionstrings=, "orbiter(07,0,1)"
 
@@ -53,8 +53,8 @@ extraLCDvisibility2=false, false, false, true, false, false, false, false, false
 extradevicecolor1=#ff5d00ff, #000000ff, #43a7cfff, #43a7cfff
 extradevicecolor2=#000000ff, #49b160ff, #ad0427ff, #000000
 extradevices=197, 198, 199, 200
-extramathexpression1=, , , 
-extramathexpression2=, , , 
+extramathexpression1=, , x*10, 
+extramathexpression2=, , x*10, 
 extraname1=IT, Sound, {2}, {0}
 extraname2=DT, {1}, {3}, RoR
 
