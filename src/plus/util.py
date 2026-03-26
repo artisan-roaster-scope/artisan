@@ -211,7 +211,7 @@ def limittext(maxlen: int, s: str|None) -> str|None:
 
 
 def addString2dict(dict_source:'ProfileData', key_source:str, dict_target:dict[str, Any], key_target:str, maxlen:int) -> None:
-    if key_source in dict_source and dict_source[key_source]: # type:ignore[literal-required, misc, unused-ignore] # pyrefly: ignore # TypedDict key must be a string literal; expected one of (
+    if key_source in dict_source and dict_source[key_source]: # type:ignore[literal-required, misc, invalid-key, unused-ignore] # pyrefly: ignore # TypedDict key must be a string literal; expected one of (
         txt = limittext(maxlen, decodeLocal(dict_source[key_source])) # type:ignore[literal-required, misc, unused-ignore] # pyrefly: ignore # TypedDict key must be a string literal; expected one of
         if txt is not None:
             dict_target[key_target] = txt
@@ -332,7 +332,7 @@ def addRoRTemp2dict(dict_source:'ProfileData|ComputedProfileInformation', key_so
 # dict_source[key_source] value if key_source in dict_source and not empty
 def add2dict(dict_source:'ProfileData', key_source:str, dict_target:dict[str, Any], key_target:str, if_non_empty:bool = True) -> None:
     if key_source in dict_source and (not if_non_empty or dict_source[key_source]):  # type:ignore[literal-required, misc, unused-ignore] # pyrefly: ignore # TypedDict key must be a string literal; expected one of
-        dict_target[key_target] = dict_source[key_source]  # type:ignore[literal-required, misc, unused-ignore] # pyrefly: ignore] # TypedDict key must be a string literal; expected one of
+        dict_target[key_target] = dict_source[key_source]  # type:ignore[literal-required, misc, unused-ignore] # pyrefly: ignore # TypedDict key must be a string literal; expected one of
 
 
 def getLanguage() -> str:

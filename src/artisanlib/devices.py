@@ -2684,7 +2684,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 if item0 is not None:
                     checkBox = item0.widget()
                     if checkBox is not None and isinstance(checkBox, QCheckBox):
-                        return checkBox.isChecked() # type:ignore[reportAttributeAccessIssue, unused-ignore]  # ty:ignore[ignore # pyright reports isChecked not known for QWidget
+                        return checkBox.isChecked() # type:ignore[reportAttributeAccessIssue, unused-ignore] # pyright reports isChecked not known for QWidget
         return False
 
     def createDeviceTable(self) -> None:
@@ -4498,7 +4498,25 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ##########################
                 ####  DEVICE 200 is +Orbiter Air/RoR but +DEVICE cannot be set as main device
                 ##########################
-
+                ##########################
+                elif meter == 'MQTT':
+                    self.aw.qmc.device = 201
+                    message = QApplication.translate('Message','Device set to {0}').format(meter)
+                ##########################
+                ####  DEVICE 202 is +WebSocket 34 but +DEVICE cannot be set as main device
+                ##########################
+                ##########################
+                ####  DEVICE 203 is +WebSocket 56 but +DEVICE cannot be set as main device
+                ##########################
+                ##########################
+                ####  DEVICE 204 is +WebSocket 78 but +DEVICE cannot be set as main device
+                ##########################
+                ##########################
+                ####  DEVICE 205 is +WebSocket 910 but +DEVICE cannot be set as main device
+                ##########################
+                ##########################
+                ####  DEVICE 206 is +WebSocket 1112 but +DEVICE cannot be set as main device
+                ##########################
 
                 # ADD DEVICE:
 
@@ -4718,7 +4736,13 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 8, # 197
                 8, # 198
                 8, # 199
-                8  # 200
+                8, # 200
+                1, # 201
+                1, # 202
+                1, # 203
+                1, # 204
+                1, # 205
+                1  # 206
                 ]
             #init serial settings of extra devices
             for i, _ in enumerate(self.aw.qmc.extradevices):
@@ -4902,7 +4926,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(bool)
     def showExtradevHelp(self, _checked:bool = False) -> None:
-        from help import symbolic_help # type: ignore [attr-defined,unused-ignore]  # ty:ignore[ignore # pylint: disable=no-name-in-module
+        from help import symbolic_help # type: ignore [attr-defined,unused-ignore]  # pylint: disable=no-name-in-module
         self.helpdialog = self.aw.showHelpDialog(
                 self,            # this dialog as parent
                 self.helpdialog, # the existing help dialog
@@ -4911,7 +4935,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(bool)
     def showSymbolicHelp(self, _checked:bool = False) -> None:
-        from help import symbolic_help # type: ignore [attr-defined,unused-ignore]  # ty:ignore[ignore # pylint: disable=no-name-in-module
+        from help import symbolic_help # type: ignore [attr-defined,unused-ignore]  # pylint: disable=no-name-in-module
         self.helpdialog = self.aw.showHelpDialog(
                 self,            # this dialog as parent
                 self.helpdialog, # the existing help dialog
@@ -4920,7 +4944,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(bool)
     def showhelpprogram(self, _checked:bool = False) -> None:
-        from help import programs_help # type: ignore [attr-defined,unused-ignore]  # ty:ignore[ignore # pylint: disable=no-name-in-module
+        from help import programs_help # type: ignore [attr-defined,unused-ignore]  # pylint: disable=no-name-in-module
         self.helpdialog = self.aw.showHelpDialog(
                 self,            # this dialog as parent
                 self.helpdialog, # the existing help dialog

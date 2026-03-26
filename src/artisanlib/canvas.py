@@ -49,14 +49,14 @@ if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
     from plus.stock import Blend # pylint: disable=unused-import
     from plus.blend import CustomBlend # pylint: disable=unused-import
-    from matplotlib.collections import PolyCollection # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore] # pylint: disable=unused-import
-    from matplotlib.axes import Axes # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore] # pylint: disable=unused-import
-    from matplotlib.axes._base import _AxesBase # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore] # pyright:ignore[reportPrivateImportUsage] # pylint: disable=unused-import
-    from matplotlib.image import AxesImage # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore] # pylint: disable=unused-import
-    from matplotlib.legend import Legend # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore] # pylint: disable=unused-import
-    from matplotlib.backend_bases import Event # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore] # pylint: disable=unused-import
-    from matplotlib.font_manager import FontProperties # type:ignore[untyped-import,unused-ignore]# ty:ignore[ignore] # pylint: disable=unused-import
-    from matplotlib.ticker import Locator # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore] # pylint: disable=unused-import
+    from matplotlib.collections import PolyCollection # type:ignore[untyped-import,unused-ignore] # pylint: disable=unused-import
+    from matplotlib.axes import Axes # type:ignore[untyped-import,unused-ignore] # pylint: disable=unused-import
+    from matplotlib.axes._base import _AxesBase # type:ignore[untyped-import,unused-ignore] # pyright:ignore[reportPrivateImportUsage] # pylint: disable=unused-import
+    from matplotlib.image import AxesImage # type:ignore[untyped-import,unused-ignore] # pylint: disable=unused-import
+    from matplotlib.legend import Legend # type:ignore[untyped-import,unused-ignore] # pylint: disable=unused-import
+    from matplotlib.backend_bases import Event # type:ignore[untyped-import,unused-ignore] # pylint: disable=unused-import
+    from matplotlib.font_manager import FontProperties # type:ignore[untyped-import,unused-ignore] # pylint: disable=unused-import
+    from matplotlib.ticker import Locator # type:ignore[untyped-import,unused-ignore] # pylint: disable=unused-import
     import numpy.typing as npt # pylint: disable=unused-import
     from PyQt6.QtGui import QResizeEvent # pylint: disable=unused-import
 
@@ -89,25 +89,25 @@ from PyQt6.QtCore import (QLocale, pyqtSignal, pyqtSlot,
 from PyQt6 import sip
 
 
-from matplotlib.figure import Figure # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore]
-from matplotlib import rcParams, patches, transforms, ticker # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore]
-import matplotlib.patheffects as PathEffects # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore]
-from matplotlib.patches import Polygon, Rectangle # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore]
-from matplotlib.transforms import Bbox, Transform # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore]
-from matplotlib.backend_bases import PickEvent, MouseEvent # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore]
-from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore]
-from matplotlib.projections.polar import PolarAxes # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore]
-from matplotlib.text import Annotation, Text # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore]
-from matplotlib.lines import Line2D # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore]
-from matplotlib.offsetbox import DraggableAnnotation # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore]
-from matplotlib.colors import to_hex, to_rgba # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore]
+from matplotlib.figure import Figure # type:ignore[untyped-import,unused-ignore]
+from matplotlib import rcParams, patches, transforms, ticker # type:ignore[untyped-import,unused-ignore]
+import matplotlib.patheffects as PathEffects # type:ignore[untyped-import,unused-ignore]
+from matplotlib.patches import Polygon, Rectangle # type:ignore[untyped-import,unused-ignore]
+from matplotlib.transforms import Bbox, Transform # type:ignore[untyped-import,unused-ignore]
+from matplotlib.backend_bases import PickEvent, MouseEvent # type:ignore[untyped-import,unused-ignore]
+from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas # type:ignore[untyped-import,unused-ignore]
+from matplotlib.projections.polar import PolarAxes # type:ignore[untyped-import,unused-ignore]
+from matplotlib.text import Annotation, Text # type:ignore[untyped-import,unused-ignore]
+from matplotlib.lines import Line2D # type:ignore[untyped-import,unused-ignore]
+from matplotlib.offsetbox import DraggableAnnotation # type:ignore[untyped-import,unused-ignore]
+from matplotlib.colors import to_hex, to_rgba # type:ignore[untyped-import,unused-ignore]
 
 from artisanlib.phidgets import PhidgetManager
-from Phidget22.VoltageRange import VoltageRange # type: ignore[import-untyped] # ty:ignore[ignore]
+from Phidget22.VoltageRange import VoltageRange # type: ignore[import-untyped]
 
 try:
     # spanning a second multiprocessing instance on macOS falils to import the YAPI interface
-    from yoctopuce.yocto_api import YAPI # type: ignore[import-untyped] # ty:ignore[ignore]
+    from yoctopuce.yocto_api import YAPI # type: ignore[import-untyped]
 except Exception: # pylint: disable=broad-except
     pass
 
@@ -172,7 +172,7 @@ class MplCanvas(FigureCanvas):
 
         self.fig:Figure = Figure(tight_layout=tight_layout_params, frameon=True, dpi=dpi)
         # with tight_layout=True, the matplotlib canvas expands to the maximum using figure.autolayout
-        super().__init__(self.fig) # type: ignore[no-untyped-call] # ty:ignore[ignore]
+        super().__init__(self.fig) # type: ignore[no-untyped-call]
         self.setParent(parent)
 
         self.lazyredraw_on_resize_timer:QTimer =  QTimer()
@@ -189,7 +189,7 @@ class MplCanvas(FigureCanvas):
 
     @override
     def resizeEvent(self, event:'QResizeEvent') -> None:
-        super().resizeEvent(event) # type:ignore[no-untyped-call] # ty:ignore[ignore]
+        super().resizeEvent(event) # type:ignore[no-untyped-call]
         # we only trigger a redraw on resize if a watermark is displayed to fix its aspect ratio
         if self.aw.redrawOnResize and self.aw.logofilename != '':
             dw = event.size().width() - event.oldSize().width()   # width change
@@ -997,7 +997,13 @@ class tgraphcanvas(QObject):
                        '+Orbiter IT/DT',             #197
                        '+Orbiter Sound/Drum',        #198
                        '+Orbiter Damper/Heater',     #199
-                       '+Orbiter Air/RoR'            #200
+                       '+Orbiter Air/RoR',           #200
+                       'MQTT',                       #201
+                       '+MQTT 34',                   #202
+                       '+MQTT 56',                   #203
+                       '+MQTT 78',                   #204
+                       '+MQTT 910',                  #205
+                       '+MQTT 1112',                 #206
                        ]
 
         # ADD DEVICE:
@@ -1261,7 +1267,7 @@ class tgraphcanvas(QObject):
             left=0.067, # the left side of the subplots of the figure (default: 0.125)
             right=.925) # the right side of the subplots of the figure (default: 0.9)
 
-        #self.fig.canvas.set_cursor = lambda _: None # type: ignore[assignment, method-assign] # ty:ignore[ignore] # deactivate the busy cursor on slow full redraws
+        #self.fig.canvas.set_cursor = lambda _: None # type: ignore[assignment, method-assign] # deactivate the busy cursor on slow full redraws
 
         # important to make the Qt canvas transparent (note that this changes stylesheets of children like popups too!):
         if isinstance(self.fig.canvas, QWidget):
@@ -2055,7 +2061,7 @@ class tgraphcanvas(QObject):
             grid_axis = 'x'
         if grid_axis is not None:
             self.ax.grid(True,
-                axis=grid_axis, # type: ignore[arg-type] # ty:ignore[ignore] # "grid" of "_AxesBase" has incompatible type "str"; expected "Literal['both', 'x', 'y']
+                axis=grid_axis, # type: ignore[arg-type] # "grid" of "_AxesBase" has incompatible type "str"; expected "Literal['both', 'x', 'y']
                 color=self.palette['grid'],
                 linestyle = self.gridstyles[self.gridlinestyle],
                 linewidth = self.gridthickness,
@@ -2918,7 +2924,7 @@ class tgraphcanvas(QObject):
             elif self.ambientTemp == 0.0 and self.device in {34, 58}: # Phidget 1048 or TMP1101 channel 4 (use internal temp)
                 try:
                     if self.aw.ser.PhidgetTemperatureSensor is not None and self.aw.ser.PhidgetTemperatureSensor[0].getAttached():
-                        from Phidget22.Devices.TemperatureSensor import TemperatureSensor as PhidgetTemperatureSensor # type: ignore[import-untyped] # ty:ignore[ignore]
+                        from Phidget22.Devices.TemperatureSensor import TemperatureSensor as PhidgetTemperatureSensor # type: ignore[import-untyped]
                         ambient = PhidgetTemperatureSensor()
                         ambient.setDeviceSerialNumber(self.aw.ser.PhidgetTemperatureSensor[0].getDeviceSerialNumber())
                         if self.device == 58:
@@ -4611,14 +4617,19 @@ class tgraphcanvas(QObject):
         return self.afterTP
 
     @staticmethod # pre condition: 1 < left_index <= len(temp) = len(timex)
-    def compute_ror_simple(timex:list[float], temp:list[float], left_index:int) -> float:
+    def compute_ror_simple(timex:list[float], temp:list[float], left_index:int, unfiltereddelta:list[float]) -> float:
         timed = timex[-1] - timex[-left_index]   #time difference between last readings
-        # average the left point of the RoR interval (3 points) without introducing a delay
-        if len(temp)>=left_index+2 and 2-left_index<0:
-            return ((temp[-1] - (temp[-left_index - 2] + temp[-left_index - 1] + temp[-left_index] + temp[-left_index + 1] + temp[-left_index + 2])/5.)/timed)*60.  #delta BT (degrees/minute)
-        if len(temp)>=left_index+1 and 1-left_index<0:
-            return ((temp[-1] - (temp[-left_index - 1] + temp[-left_index] + temp[-left_index + 1])/3.)/timed)*60.  #delta BT (degrees/minute)
-        return ((temp[-1] - temp[-left_index])/timed)*60.  #delta BT (degrees/minute)
+        if temp[-1] != -1 and temp[-left_index] != -1:
+            # average the left point of the RoR interval (3 points) without introducing a delay
+            if len(temp)>=left_index+2 and 2-left_index<0 and 1-left_index<0 and temp[-left_index-1] != -1 and temp[-left_index + 1] != -1 and temp[-left_index - 2] != -1 and temp[-left_index + 2] != -1:
+                return ((temp[-1] - (temp[-left_index - 2] + temp[-left_index - 1] + temp[-left_index] + temp[-left_index + 1] + temp[-left_index + 2])/5.)/timed)*60.  #delta BT (degrees/minute)
+            if len(temp)>=left_index+1 and 1-left_index<0 and temp[-left_index-1] != -1 and temp[-left_index + 1] != -1:
+                return ((temp[-1] - (temp[-left_index - 1] + temp[-left_index] + temp[-left_index + 1])/3.)/timed)*60.  #delta BT (degrees/minute)
+            return ((temp[-1] - temp[-left_index])/timed)*60.  #delta BT (degrees/minute)
+        # if any of the readings is -1 we repeat the last RoR reading
+        if unfiltereddelta:
+            return unfiltereddelta[-1]
+        return 0.
 
     def compute_ror(self, t_final:float, timex:list[float], temp:list[float], unfiltereddelta:list[float], deltaTempSamples:int) -> float:
         # compute RoR
@@ -4646,9 +4657,9 @@ class tgraphcanvas(QObject):
                     # https://github.com/numpy/numpy/issues/16744
                     # we fall back to the two point algo below
                     pass
-            return self.compute_ror_simple(timex, temp, left_index)
+            return self.compute_ror_simple(timex, temp, left_index, unfiltereddelta)
         except Exception as e: # pylint: disable=broad-except
-            _log.error(e)
+            _log.exception(e)
             return 0.
 
     # sample devices at interval self.delay milliseconds.
@@ -4971,16 +4982,16 @@ class tgraphcanvas(QObject):
                                 process_value = sample_extratemp2[ps // 2][-1]
                         self.pid.update(process_value)
 
-                    rateofchange1plot:float|None
-                    rateofchange2plot:float|None
+                    rateofchange1plot:float|None = None
+                    rateofchange2plot:float|None = None
 
                     #we need a minimum of two readings to calculate rate of change
                     if length_of_qmc_timex > 1:
                         # compute T1 RoR
-                        self.rateofchange1 = self.compute_ror(t1_final, sample_ctimex1, sample_tstemp1, sample_unfiltereddelta1, self.deltaETsamples)
+                        self.rateofchange1 = self.compute_ror(t1_final, sample_timex, sample_tstemp1, sample_unfiltereddelta1, self.deltaETsamples)
 
                         # compute T2 RoR
-                        self.rateofchange2 = self.compute_ror(t2_final, sample_ctimex2, sample_tstemp2, sample_unfiltereddelta2, self.deltaBTsamples)
+                        self.rateofchange2 = self.compute_ror(t2_final, sample_timex, sample_tstemp2, sample_unfiltereddelta2, self.deltaBTsamples)
 
                         # self.unfiltereddelta{1,2}_pure contain the RoR values respecting the delta_span, but without any delta smoothing NOR delta mathformulas applied
                         self.unfiltereddelta1_pure.append(self.rateofchange1)
@@ -5033,9 +5044,9 @@ class tgraphcanvas(QObject):
 
                     # limit displayed RoR #(only before TP is recognized) # WHY?
                     if self.RoRlimitFlag: # not self.TPalarmtimeindex and self.RoRlimitFlag:
-                        if not max(-self.maxRoRlimit,self.RoRlimitm) < rateofchange1plot < min(self.maxRoRlimit,self.RoRlimit):
+                        if rateofchange1plot is not None and (not max(-self.maxRoRlimit,self.RoRlimitm) < rateofchange1plot < min(self.maxRoRlimit,self.RoRlimit)): # type:ignore[redundant-expr]
                             rateofchange1plot = None
-                        if not max(-self.maxRoRlimit,self.RoRlimitm) < rateofchange2plot < min(self.maxRoRlimit,self.RoRlimit):
+                        if rateofchange2plot is not None and (not max(-self.maxRoRlimit,self.RoRlimitm) < rateofchange2plot < min(self.maxRoRlimit,self.RoRlimit)): # type:ignore[redundant-expr]
                             rateofchange2plot = None
 
                     # append new data to the rateofchange arrays
@@ -6614,7 +6625,8 @@ class tgraphcanvas(QObject):
                 if self.projectionmode == 0 or (self.projectionmode == 1 and (self.timex[-1]-charge)<=60*5): # linear temperature projection mode based on current RoR
                     #calculate the temperature endpoint at endofx according to the latest rate of change
                     if self.l_BTprojection is not None:
-                        if self.BTcurve and len(self.unfiltereddelta2_pure) > 0 and len(self.ctemp2) > 0 and self.ctemp2[-1] is not None and self.ctemp2[-1] != -1 and not math.isnan(self.ctemp2[-1]):
+                        # only draw if BT RoR is not exactly 0 (as on start)
+                        if self.unfiltereddelta2_pure[-1] != 0 and self.BTcurve and len(self.unfiltereddelta2_pure) > 0 and len(self.ctemp2) > 0 and self.ctemp2[-1] is not None and self.ctemp2[-1] != -1 and not math.isnan(self.ctemp2[-1]):
                             # projection extended to the plots current endofx
                             left = now
                             right = max(left, xlim_right + charge) # never have the right point be left of left;)
@@ -6627,7 +6639,8 @@ class tgraphcanvas(QObject):
                             self.BTprojection_temp = []
                         self.l_BTprojection.set_data(self.BTprojection_tx, self.BTprojection_temp)
                     if self.l_ETprojection is not None:
-                        if self.ETcurve and len(self.unfiltereddelta1_pure) > 0 and len(self.ctemp1) > 0 and self.ctemp1[-1] is not None and self.ctemp1[-1] != -1 and not math.isnan(self.ctemp1[-1]):
+                        # only draw if ET RoR is not exactly 0 (as on start)
+                        if self.unfiltereddelta1_pure[-1] != 0 and self.ETcurve and len(self.unfiltereddelta1_pure) > 0 and len(self.ctemp1) > 0 and self.ctemp1[-1] is not None and self.ctemp1[-1] != -1 and not math.isnan(self.ctemp1[-1]):
                             # projection extended to the plots current endofx
                             left = now
                             right = max(left,xlim_right + charge) # never have the right point be left of left;)
@@ -7017,6 +7030,9 @@ class tgraphcanvas(QObject):
                         if i+5+offset < mlen and mathexpression[i+2+offset] == '[':
                             Yshiftval = int(mathexpression[i+offset+4])
                             sign = mathexpression[i+offset+3]
+                            if RTsname is not None and sign == '-':
+                                # on realtime logging we need to adjust the Yshiftval for left shifts by 1 to have "Y[-1]" access the last and not the but last reading
+                                Yshiftval -= 1 # thus a Yshiftval of 1 becomes 0 accessing the last available reading
 
                             #timeshift with two digits
                             if mathexpression[i+offset+5].isdigit():
@@ -7529,6 +7545,7 @@ class tgraphcanvas(QObject):
                                 mathdictionary[tsexpr] = timeshiftexpressionsvalues[i]
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
+
 
                 reslt:float = -1
                 #background symbols just in case there was no profile loaded but a background loaded.
@@ -8066,7 +8083,7 @@ class tgraphcanvas(QObject):
             try:
                 self.aw.ntb.update() # reset the MPL navigation history
             except Exception as e: # pylint: disable=broad-except
-                _log.error(e)
+                _log.exception(e)
 
             #roast flags
             self.heavyFC_flag = False
@@ -8398,8 +8415,8 @@ class tgraphcanvas(QObject):
             # we mask the error value -1 and Numpy  in the temperature array
             mb:numpy.ndarray[tuple[Literal[1]],numpy.dtype[numpy.float64]] = cast(numpy.ndarray[tuple[Literal[1]],numpy.dtype[numpy.float64]], numpy.ma.masked_equal(b[fromIndex:toIndex], -1))
             # split in masked and
-            unmasked_slices = [(x,False) for x in numpy.ma.clump_unmasked(mb)] # type:ignore[no-untyped-call] # ty:ignore[ignore] # the valid readings
-            masked_slices = [(x,True) for x in numpy.ma.clump_masked(mb)]  # type:ignore[no-untyped-call] # ty:ignore[ignore] # the dropped values
+            unmasked_slices = [(x,False) for x in numpy.ma.clump_unmasked(mb)] # type:ignore[no-untyped-call] # the valid readings
+            masked_slices = [(x,True) for x in numpy.ma.clump_masked(mb)]  # type:ignore[no-untyped-call] # the dropped values
             sorted_slices = sorted(unmasked_slices + masked_slices, key=lambda tup: tup[0].start) # pyright:ignore[reportUnknownArgumentType] # pyright: ignore[reportGeneralTypeIssues]
             b_smoothed:list[npt.NDArray[numpy.double]] = [] # pyright:ignore[reportUnknownArgumentType] # b_smoothed collects the smoothed segments in order
             b_smoothed.append(numpy.full(fromIndex, numpy.nan, dtype=numpy.double)) # pyright:ignore[reportUnknownArgumentType] # append initial segment to the list of resulting segments
@@ -9373,12 +9390,12 @@ class tgraphcanvas(QObject):
                 try:
                     return get_unit_name('duration-minute', length='short', locale=self.aw.locale_str) or 'min'
                 except Exception as e:  # pylint: disable=broad-except # UnknownLocaleError
-                    _log.error(e)
+                    _log.exception(e)
                     return get_unit_name('duration-minute', length='short', locale='en') or 'min'
             try:
                 return get_unit_name('duration-hour', length='short', locale=self.aw.locale_str) or 'h'
             except Exception as e:  # pylint: disable=broad-except # UnknownLocaleError
-                _log.error(e)
+                _log.exception(e)
                 return get_unit_name('duration-hour', length='short', locale='en') or 'h'
         if right_to_left(self.locale_str):
             return f"{(render_weight(self.roastersize_setup, 1, weight_units.index(self.weight[2]), right_to_left_lang=True) if self.roastersize_setup>=0 else '')}  {self.__dijkstra_to_ascii(self.roastertype_setup)}"
@@ -9476,7 +9493,7 @@ class tgraphcanvas(QObject):
                         grid_axis = 'x'
                     if grid_axis is not None:
                         self.ax.grid(True,
-                            axis=grid_axis, # type: ignore[arg-type] # ty:ignore[ignore] # "grid" of "_AxesBase" has incompatible type "str"; expected "Literal['both', 'x', 'y']
+                            axis=grid_axis, # type: ignore[arg-type] # "grid" of "_AxesBase" has incompatible type "str"; expected "Literal['both', 'x', 'y']
                             color=self.palette['grid'],
                             linestyle=self.gridstyles[self.gridlinestyle],
                             linewidth=self.gridthickness,
@@ -11375,7 +11392,7 @@ class tgraphcanvas(QObject):
                             for line,text in zip(leg.get_lines(), leg.get_texts(), strict=True):
                                 text.set_color(line.get_color())
                         except Exception as e: # pylint: disable=broad-except
-                            _log.error(e)
+                            _log.exception(e)
 
                     else:
                         self.legend = None
@@ -13107,29 +13124,53 @@ class tgraphcanvas(QObject):
             elif d == 111: # WebSocket
                 self.extraNoneTempHint1.append(not bool(self.aw.ws.channel_modes[0]))
                 self.extraNoneTempHint2.append(not bool(self.aw.ws.channel_modes[1]))
-            elif d == 112: # +S7 34
+            elif d == 112: # +WebSocket 34
                 self.extraNoneTempHint1.append(not bool(self.aw.ws.channel_modes[2]))
                 self.extraNoneTempHint2.append(not bool(self.aw.ws.channel_modes[3]))
-            elif d == 113: # +S7 56
+            elif d == 113: # +WebSocket 56
                 self.extraNoneTempHint1.append(not bool(self.aw.ws.channel_modes[4]))
                 self.extraNoneTempHint2.append(not bool(self.aw.ws.channel_modes[5]))
-            elif d == 118: # +S7 78
+            elif d == 118: # +WebSocket 78
                 self.extraNoneTempHint1.append(not bool(self.aw.ws.channel_modes[6]))
                 self.extraNoneTempHint2.append(not bool(self.aw.ws.channel_modes[7]))
-            elif d == 119: # +S7 910
+            elif d == 119: # +WebSocket 910
                 self.extraNoneTempHint1.append(not bool(self.aw.ws.channel_modes[8]))
                 self.extraNoneTempHint2.append(not bool(self.aw.ws.channel_modes[9]))
+            elif d == 150: # +MODBUS 910
+                self.extraNoneTempHint1.append(not bool(self.aw.s7.mode[8]))
+                self.extraNoneTempHint2.append(not bool(self.aw.s7.mode[9]))
+            elif d == 151: # +S7 1112
+                self.extraNoneTempHint1.append(not bool(self.aw.s7.mode[10]))
+                self.extraNoneTempHint2.append(not bool(self.aw.s7.mode[11]))
+            elif d == 201: # MQTT 12
+                self.extraNoneTempHint1.append(not bool(self.aw.mqtt.channel_modes[0]))
+                self.extraNoneTempHint2.append(not bool(self.aw.mqtt.channel_modes[1]))
+            elif d == 202: # MQTT 34
+                self.extraNoneTempHint1.append(not bool(self.aw.mqtt.channel_modes[2]))
+                self.extraNoneTempHint2.append(not bool(self.aw.mqtt.channel_modes[3]))
+            elif d == 203: # MQTT 56
+                self.extraNoneTempHint1.append(not bool(self.aw.mqtt.channel_modes[4]))
+                self.extraNoneTempHint2.append(not bool(self.aw.mqtt.channel_modes[5]))
+            elif d == 204: # MQTT 78
+                self.extraNoneTempHint1.append(not bool(self.aw.mqtt.channel_modes[6]))
+                self.extraNoneTempHint2.append(not bool(self.aw.mqtt.channel_modes[7]))
+            elif d == 205: # MQTT 910
+                self.extraNoneTempHint1.append(not bool(self.aw.mqtt.channel_modes[8]))
+                self.extraNoneTempHint2.append(not bool(self.aw.mqtt.channel_modes[9]))
+            elif d == 206: # MQTT 1112
+                self.extraNoneTempHint1.append(not bool(self.aw.mqtt.channel_modes[10]))
+                self.extraNoneTempHint2.append(not bool(self.aw.mqtt.channel_modes[11]))
             else:
                 self.extraNoneTempHint1.append(False)
                 self.extraNoneTempHint2.append(False)
 
     def addPhidgetServer(self) -> None:
         if not self.phidgetServerAdded:
-            from Phidget22.Net import Net as PhidgetNetwork # type: ignore[import-untyped] # ty:ignore[ignore]
+            from Phidget22.Net import Net as PhidgetNetwork # type: ignore[import-untyped]
             if self.phidgetServerID == '' and not self.phidgetServiceDiscoveryStarted:
                 try:
                     # we enable the automatic service discovery if no server host is given
-                    from Phidget22.PhidgetServerType import PhidgetServerType # type: ignore[import-untyped] # ty:ignore[ignore]
+                    from Phidget22.PhidgetServerType import PhidgetServerType # type: ignore[import-untyped]
                     PhidgetNetwork.enableServerDiscovery(PhidgetServerType.PHIDGETSERVER_DEVICEREMOTE)
                     self.phidgetServiceDiscoveryStarted = True
                     self.aw.sendmessage(QApplication.translate('Message','Phidget service discovery started...'))
@@ -13157,8 +13198,8 @@ class tgraphcanvas(QObject):
 
     @staticmethod
     def deviceLogDEBUG() -> None:
-        from Phidget22.Devices.Log import Log as PhidgetLog # type: ignore[import-untyped] # ty:ignore[ignore]
-        from Phidget22.LogLevel import LogLevel as PhidgetLogLevel # type: ignore[import-untyped] # ty:ignore[ignore]
+        from Phidget22.Devices.Log import Log as PhidgetLog # type: ignore[import-untyped]
+        from Phidget22.LogLevel import LogLevel as PhidgetLogLevel # type: ignore[import-untyped]
         PhidgetLog.setLevel(PhidgetLogLevel.PHIDGET_LOG_VERBOSE)
 
     @staticmethod
@@ -13393,7 +13434,7 @@ class tgraphcanvas(QObject):
                         self.aw.ikawa.start_sampling()
                         self.aw.sendmessageSignal.emit(QApplication.translate('Message', 'scanning for device'),True,None)
                     except Exception as ex:  # pylint: disable=broad-except
-                        _log.error(ex)
+                        _log.exception(ex)
                         _, _, exc_tb = sys.exc_info()
                         self.adderror((QApplication.translate('Error Message', 'Exception:') + ' Bluetooth BLE support not available {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
                 elif self.device == 164:
@@ -13421,6 +13462,10 @@ class tgraphcanvas(QObject):
                         disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('Orbiter'),True,None))
                     self.aw.orbiter.setLogging(self.device_logging)
                     self.aw.orbiter.start()
+
+                elif self.device == 201 or 201 in self.extradevices:
+                    # connect MQTT
+                    self.aw.mqtt.start(self.aw.qmc.device_logging)
 
             self.aw.initializedMonitoringExtraDeviceStructures()
 
@@ -13474,7 +13519,7 @@ class tgraphcanvas(QObject):
                 try:
                     self.aw.eventactionx(self.extrabuttonactions[0],self.extrabuttonactionstrings[0])
                 except Exception as e: # pylint: disable=broad-except
-                    _log.error(e)
+                    _log.exception(e)
                 QApplication.processEvents()
             self.threadserver.createSampleThread()
             if self.device != 138:
@@ -13482,7 +13527,7 @@ class tgraphcanvas(QObject):
                 try:
                     self.aw.eventactionx(self.extrabuttonactions[0],self.extrabuttonactionstrings[0])
                 except Exception as e: # pylint: disable=broad-except
-                    _log.error(e)
+                    _log.exception(e)
 
             if not bool(self.aw.simulator):
                 QTimer.singleShot(300,self.StartAsyncSamplingAction)
@@ -13563,7 +13608,7 @@ class tgraphcanvas(QObject):
                         if self.aw.ikawa.ambient_pressure != -1:
                             self.ambient_pressure = self.aw.ikawa.ambient_pressure
                     except Exception as e: # pylint: disable=broad-except
-                        _log.error(e)
+                        _log.exception(e)
                     self.aw.ikawa = None
 
                 # disconnect Mugma
@@ -13575,6 +13620,10 @@ class tgraphcanvas(QObject):
                 if not bool(self.aw.simulator) and self.device == 196 and self.aw.orbiter is not None:
                     self.aw.orbiter.stop()
                     self.aw.orbiter = None
+
+                # disconnect MQTT
+                if not bool(self.aw.simulator) and self.device == 201:
+                    self.aw.mqtt.stop()
 
                 # at OFF we stop the follow-background on FujiPIDs and set the SV to 0
                 if self.device == 0 and self.aw.fujipid.followBackground and self.aw.fujipid.sv and self.aw.fujipid.sv > 0:
@@ -14062,7 +14111,7 @@ class tgraphcanvas(QObject):
                         ser.YOCTOthread = None
                     ser.YOCTOvalues = [[],[]]
                     ser.YOCTOlastvalues = [-1.0]*2
-                    YAPI.FreeAPI() # type:ignore[reportUnboundVariable,unused-ignore] # ty:ignore[ignore]
+                    YAPI.FreeAPI() # type:ignore[reportUnboundVariable,unused-ignore]
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
         finally:
@@ -14327,7 +14376,7 @@ class tgraphcanvas(QObject):
                 try:
                     self.aw.ntb.update() # reset the MPL navigation history
                 except Exception as e: # pylint: disable=broad-except
-                    _log.error(e)
+                    _log.exception(e)
             try:
                 if self.aw.clusterEventsFlag:
                     self.aw.clusterEvents()
@@ -17840,7 +17889,7 @@ class tgraphcanvas(QObject):
             return fitted_times, fitted_temp1, fitted_temp2
 
         except Exception as e: # pylint: disable=broad-except
-            _log.error('Spline fitting failed: %s',e)
+            _log.exception('Spline fitting failed: %s',e)
             # Fall back to simple uniform sampling if spline fitting fails
             indices = numpy.linspace(0, len(time_data)-1, num_nodes, dtype=int)
             return ([float(time_data[i]) for i in indices],
@@ -18353,23 +18402,23 @@ class tgraphcanvas(QObject):
 
             #convert all time values to temperature
 
-            if func2 is not None and self.DeltaBTflag and self.l_delta2 is not None and self.designer_timez is not None: # type:ignore[redundant-expr] # ty:ignore[ignore]
+            if func2 is not None and self.DeltaBTflag and self.l_delta2 is not None and self.designer_timez is not None: # type:ignore[redundant-expr]
                 funcDelta2 = func2.derivative()
                 deltabtvals = funcDelta2(self.designer_timez) * 60
                 self.l_delta2.set_data(numpy.array(self.designer_timez), deltabtvals)
                 self.ax.draw_artist(self.l_delta2)
 
-            if func1 is not None and self.DeltaETflag and self.l_delta1 is not None and self.designer_timez is not None: # type:ignore[redundant-expr] # ty:ignore[ignore]
+            if func1 is not None and self.DeltaETflag and self.l_delta1 is not None and self.designer_timez is not None: # type:ignore[redundant-expr]
                 funcDelta1 = func1.derivative()
                 deltaetvals = funcDelta1(self.designer_timez) * 60
                 self.l_delta1.set_data(numpy.array(self.designer_timez), deltaetvals)
                 self.ax.draw_artist(self.l_delta1)
 
             #add curves
-            if etvals is not None and self.ETcurve and self.l_temp1 is not None: # type:ignore[redundant-expr] # ty:ignore[ignore]
+            if etvals is not None and self.ETcurve and self.l_temp1 is not None: # type:ignore[redundant-expr]
                 self.l_temp1.set_data(numpy.array(self.designer_timez), etvals)
                 self.ax.draw_artist(self.l_temp1)
-            if btvals is not None and self.BTcurve and self.l_temp2 is not None: # type:ignore[redundant-expr] # ty:ignore[ignore]
+            if btvals is not None and self.BTcurve and self.l_temp2 is not None: # type:ignore[redundant-expr]
                 self.l_temp2.set_data(numpy.array(self.designer_timez), btvals)
                 self.ax.draw_artist(self.l_temp2)
 
@@ -19736,7 +19785,7 @@ class SampleThread(QThread):
                             self.aw.qmc.flagsampling = False # we signal that we are done with sampling
                     # else: we don't self.quit() and break to end the thread as the simulator (paused) might still be running
                 else:
-                    self.aw.qmc.flagsampling = False # type: ignore[unreachable] # ty:ignore[ignore] # mypy: Statement is unreachable  # we signal that we are done with sampling
+                    self.aw.qmc.flagsampling = False # type: ignore[unreachable] # mypy: Statement is unreachable  # we signal that we are done with sampling
                     # port is disconnected in OFFmonitor by calling disconnectProbes() => disconnectProbesFromSerialDevice()
                     break  #thread ends
                 # increment the next_time stamp by one interval, but skip tasks if we are behind schedule:

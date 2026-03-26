@@ -151,6 +151,10 @@ def content() -> str:
     tbl_Expressions.field_names = [QApplication.translate('HelpDlg','Expression'),QApplication.translate('HelpDlg','Description')]
     tbl_Expressions.add_row(['(<true-expr> if <cond> else <false-expr>)',QApplication.translate('HelpDlg','Conditional. Evaluates to the value of the expression <true-expr> if the condition <cond> holds, otherwise to the value of the expression <false-expr>. The rules of Python are applied to decide if a value holds or not. Thus the boolean values "True" and "False" have the obvious semantic. Any number unequal to 0 evaluates to True and 0 evaluates to False. The value "None" is also evaluated to False.')])
     strlist.append(tbl_Expressions.get_html_string(attributes={'width':'100%','border':'1','padding':'1','border-collapse':'collapse'}))
+    tbl_Expressionsbottom = prettytable.PrettyTable()
+    tbl_Expressionsbottom.header = False
+    tbl_Expressionsbottom.add_row([QApplication.translate('HelpDlg','Note: If any of the referenced symbolic variables contained in a symbolic expression evaluates to the error value -1, the whole expression evaluates to -1. This can be prevented by surrounding the whole expression by regular brackets. Thus, with Y1 evaluating to -1, the expression "Y1 + 1" evaluates to -1, but "(Y1 + 1)" evaluates to 0.')])
+    strlist.append(tbl_Expressionsbottom.get_html_string(attributes={'width':'100%','border':'1','padding':'1','border-collapse':'collapse'}))
     strlist.append('<br/><br/><b>')
     strlist.append(QApplication.translate('HelpDlg','MATHEMATICAL FORMULAS'))
     strlist.append('</b>')

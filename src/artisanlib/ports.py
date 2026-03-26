@@ -384,6 +384,24 @@ class scanS7Dlg(ArtisanDialog):
 
 
 class comportDlg(ArtisanResizeablDialog):
+
+    __slots__ = [ 'comportEdit', 'baudrateComboBox', 'bauds', 'bytesizeComboBox', 'bytesizes', 'parityComboBox', 'parity', 'stopbitsComboBox', 'stopbits',
+        'timeoutEdit', 'serialtable', 'modbus_comportEdit', 'modbus_baudrateComboBox', 'modbus_bauds', 'modbus_bytesizeComboBox', 'modbus_bytesizes',
+        'modbus_bytesizeComboBox', 'modbus_parityComboBox', 'modbus_parity', 'modbus_stopbitsComboBox', 'modbus_stopbits', 'modbus_timeoutEdit',
+        'modbus_inputDeviceEdits', 'modbus_inputRegisterEdits', 'modbus_inputCodes', 'modbus_inputDivs', 'modbus_inputModes', 'modbus_inputDecodes',
+        'modbus_littleEndianWords', 'modbus_type', 'modbus_hostEdit', 'modbus_portEdit', 'modbus_PIDdevice_Edit', 'modbus_SVregister_Edit', 'SVComboBox',
+        'modbus_SVmultiplier', 'modbus_PIDmultiplier', 'modbus_Pregister_Edit', 'modbus_Iregister_Edit', 'modbus_Dregister_Edit', 'modbus_pid_off',
+        'modbus_pid_on', 'modbus_Serial_delayEdit', 'modbus_Serial_retriesComboBox', 'modbus_IP_timeoutEdit', 'modbus_IP_retriesComboBox', 'modbus_optimize',
+        'modbus_full_block', 's7_hostEdit', 's7_portEdit', 's7_rackEdit', 's7_slotEdit', 's7_optimize', 's7_full_block', 's7_areaCombos', 's7_dbEdits',
+        's7_startEdits', 's7_typeCombos', 's7_modeCombos', 's7_divCombos', 's7_PIDarea', 's7_PIDdb_nr_Edit', 's7_SVregister_Edit', 's7_SVtype', 's7_SVmultiplier',
+        's7_PIDmultiplier', 's7_Pregister_Edit', 's7_Iregister_Edit', 's7_Dregister_Edit', 's7_pid_off', 's7_pid_on', 'ws_hostEdit', 'ws_portEdit', 'ws_pathEdit',
+        'ws_machineIDEdit', 'ws_connect_timeout', 'ws_reconnect_timeout', 'ws_request_timeout', 'ws_messageID', 'ws_message', 'ws_command', 'ws_data',
+        'ws_data_request', 'ws_charge', 'ws_drop', 'ws_STARTonCHARGE', 'ws_OFFonDROP', 'ws_event_message', 'ws_event', 'ws_DRY', 'ws_FCs', 'ws_FCe', 'ws_SCs',
+        'ws_SCe', 'ws_requestEdits', 'ws_nodeEdits', 'ws_modeCombos', 'ws_compression', 'mqtt_hostEdit', 'mqtt_portEdit', 'mqtt_tls_checkBox',
+        'mqtt_transportCombo', 'mqtt_protocolCombo', 'mqtt_user_Edit', 'mqtt_password_Edit', 'mqtt_connect_timeoutEdit', 'mqtt_keepaliveEdit', 'mqtt_topic_Edit',
+        'mqtt_inputTopics', 'mqtt_inputNodes', 'mqtt_inputModes', 'TabWidget'
+    ]
+
     def __init__(self, parent:'QWidget', aw:'ApplicationWindow') -> None:
         super().__init__(parent, aw)
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose, False) # overwrite the ArtisanDialog class default here!!
@@ -493,13 +511,13 @@ class comportDlg(ArtisanResizeablDialog):
 
         for i in range(self.aw.modbus.channels):
             modbus_inputDeviceEdit:QLineEdit = QLineEdit(str(self.aw.modbus.inputDeviceIds[i]))
-            modbus_inputDeviceEdit.setValidator(QIntValidator(0, 247, self.modbus_inputDeviceEdits[i]))
+            modbus_inputDeviceEdit.setValidator(QIntValidator(0, 247, modbus_inputDeviceEdit))
             modbus_inputDeviceEdit.setFixedWidth(75)
             modbus_inputDeviceEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
             self.modbus_inputDeviceEdits[i] = modbus_inputDeviceEdit
             #
             modbus_inputRegisterEdit:QLineEdit = QLineEdit(str(self.aw.modbus.inputRegisters[i]))
-            modbus_inputRegisterEdit.setValidator(QIntValidator(0,65536,self.modbus_inputRegisterEdits[i]))
+            modbus_inputRegisterEdit.setValidator(QIntValidator(0,65536,modbus_inputRegisterEdit))
             modbus_inputRegisterEdit.setFixedWidth(75)
             modbus_inputRegisterEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
             self.modbus_inputRegisterEdits[i] = modbus_inputRegisterEdit
@@ -779,7 +797,7 @@ class comportDlg(ArtisanResizeablDialog):
         if helpButton is not None:
             helpButton.setToolTip(QApplication.translate('Tooltip','Show help'))
             self.setButtonTranslations(helpButton,'Help',QApplication.translate('Button','Help'))
-            helpButton.clicked.connect(self.showModbusbuttonhelp)
+            helpButton.clicked.connect(self.showButtonhelp)
             helpButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
         #button layout
@@ -1209,6 +1227,9 @@ class comportDlg(ArtisanResizeablDialog):
         tab4Layout.setContentsMargins(0,0,0,0)
         tab4Layout.setSpacing(5)
 
+
+## START WEBSOCKET TAB
+
         #
         # host (IP or hostname)
         ws_hostlabel = QLabel(QApplication.translate('Label', 'Host'))
@@ -1488,16 +1509,221 @@ class comportDlg(ArtisanResizeablDialog):
         ws_line5.addWidget(self.ws_compression)
         ws_line5.addStretch()
 
+        tab5Layout = QVBoxLayout()
+        tab5Layout.addLayout(ws_line1)
+        tab5Layout.addLayout(ws_line2)
+        tab5Layout.addLayout(ws_line3)
+        tab5Layout.addLayout(ws_line4)
+        tab5Layout.addLayout(ws_line5)
+        tab5Layout.addStretch()
+        tab5Layout.setSpacing(8)
+        tab5Layout.setContentsMargins(5,5,5,5)
 
-        tab7Layout = QVBoxLayout()
-        tab7Layout.addLayout(ws_line1)
-        tab7Layout.addLayout(ws_line2)
-        tab7Layout.addLayout(ws_line3)
-        tab7Layout.addLayout(ws_line4)
-        tab7Layout.addLayout(ws_line5)
-        tab7Layout.addStretch()
-        tab7Layout.setSpacing(8)
-        tab7Layout.setContentsMargins(5,5,5,5)
+## END WEBSOCKET TAB
+
+
+## START MQTT TAB
+
+        # host (IP or hostname)
+        mqtt_host_label = QLabel(QApplication.translate('Label', 'Host'))
+        self.mqtt_hostEdit = QLineEdit(str(self.aw.mqtt.host))
+        self.mqtt_hostEdit.setMinimumWidth(200)
+        self.mqtt_hostEdit.setSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Fixed)
+#        self.mqtt_hostEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
+
+        # port (default 1883)
+        mqtt_port_label = QLabel(QApplication.translate('Label', 'Port'))
+        self.mqtt_portEdit = QLineEdit(str(self.aw.mqtt.port))
+        self.mqtt_portEdit.setValidator(QIntValidator(1,65535,self.ws_portEdit))
+        self.mqtt_portEdit.setFixedWidth(40)
+#        self.mqtt_portEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
+
+        # TLS flag
+        self.mqtt_tls_checkBox = QCheckBox('TLS')
+        self.mqtt_tls_checkBox.setChecked(self.aw.mqtt.tls)
+
+        # transport
+        mqtt_transport_label = QLabel(QApplication.translate('Label', 'Transport'))
+        self.mqtt_transportCombo = QComboBox()
+        self.mqtt_transportCombo.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.mqtt_transportCombo.addItems(self.aw.mqtt.SUPPORTED_TRANSPORT)
+        self.mqtt_transportCombo.setCurrentIndex(self.aw.mqtt.transport)
+
+        # protocol
+        mqtt_protocol_label = QLabel(QApplication.translate('Label', 'Protocol'))
+        self.mqtt_protocolCombo = QComboBox()
+        self.mqtt_protocolCombo.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.mqtt_protocolCombo.addItems(list(self.aw.mqtt.PROTOCOL_VERSION_LABELS.values()))
+        self.mqtt_protocolCombo.setCurrentIndex(self.aw.mqtt.protocol_version)
+
+        # user
+        mqtt_user_Label = QLabel(QApplication.translate('Label','Username'))
+        self.mqtt_user_Edit = QLineEdit(self.aw.mqtt.user)
+        self.mqtt_user_Edit.textChanged.connect(self.mqtt_user_changed)
+        self.mqtt_user_Edit.setMinimumWidth(150)
+
+        # passwd
+        mqtt_password_Label = QLabel(QApplication.translate('Label','Password'))
+        self.mqtt_password_Edit = QLineEdit(self.aw.mqtt.password)
+        self.mqtt_password_Edit.setEchoMode(QLineEdit.EchoMode.PasswordEchoOnEdit)
+        self.mqtt_password_Edit.setEnabled(self.aw.mqtt.user.strip() != '')
+        self.mqtt_password_Edit.setMinimumWidth(150)
+
+        # connect timeout
+        mqtt_connect_timeout_label = QLabel(QApplication.translate('Label', 'Timeout'))
+        self.mqtt_connect_timeoutEdit = QLineEdit(str(self.aw.mqtt.connect_timeout))
+        self.mqtt_connect_timeoutEdit.setValidator(self.aw.createCLocaleDoubleValidator(1, 14, 1, self.mqtt_connect_timeoutEdit))
+        self.mqtt_connect_timeoutEdit.setFixedWidth(40)
+        self.mqtt_connect_timeoutEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.mqtt_connect_timeoutEdit.setToolTip(QApplication.translate('Tooltip', 'Connect timeout in seconds'))
+
+        # keepalive
+        mqtt_keepalive_label = QLabel(QApplication.translate('Label', 'Keepalive'))
+        self.mqtt_keepaliveEdit = QLineEdit(str(self.aw.mqtt.keepalive))
+        self.mqtt_keepaliveEdit.setValidator(QIntValidator(1, 200, self.mqtt_keepaliveEdit))
+        self.mqtt_keepaliveEdit.setFixedWidth(25)
+        self.mqtt_keepaliveEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.mqtt_keepaliveEdit.setToolTip(QApplication.translate('Tooltip', 'Maximum period in seconds between communications with the broker'))
+
+        # topic
+        self.mqtt_topic_Edit = QLineEdit(self.aw.mqtt.topic)
+        self.mqtt_topic_Edit.setMinimumWidth(200)
+        self.mqtt_topic_Edit.setToolTip(QApplication.translate('Tooltip', 'Main topic subscribed on connect'))
+
+
+        # input labels
+        mqtt_input_topic_label = QLabel(QApplication.translate('Label', 'Topic'))
+        mqtt_input_topic_label.setToolTip(QApplication.translate('Tooltip', 'Topics per input subscribed on connect.\nIf inputs topic is empty, payloads received for main topic are interpreted.'))
+        mqtt_input_node_label = QLabel(QApplication.translate('Label', 'Node'))
+        mqtt_input_node_label.setToolTip(QApplication.translate('Tooltip', 'Path expression to extract reading from JSON payload.\nIf input topic is given and node is empty, the received payload is interpreted as number'))
+        mqtt_input_mode_label = QLabel(QApplication.translate('Label', 'Mode'))
+
+        # inputs
+
+        self.mqtt_inputTopics:list[QLineEdit|None] = [None] * self.aw.mqtt.CHANNELS
+        self.mqtt_inputNodes:list[QLineEdit|None] = [None] * self.aw.mqtt.CHANNELS
+        self.mqtt_inputModes:list[QComboBox|None] = [None] * self.aw.mqtt.CHANNELS
+
+        for i in range(self.aw.mqtt.CHANNELS):
+            mqtt_input_topic:QLineEdit = QLineEdit(str(self.aw.mqtt.channel_topics[i]))
+            mqtt_input_topic.setFixedWidth(100)
+            self.mqtt_inputTopics[i] = mqtt_input_topic
+            #
+            mqtt_input_node:QLineEdit = QLineEdit(str(self.aw.mqtt.channel_nodes[i]))
+            mqtt_input_node.setFixedWidth(100)
+            self.mqtt_inputNodes[i] = mqtt_input_node
+            #
+            mqtt_input_mode:QComboBox = QComboBox()
+            mqtt_input_mode.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            mqtt_input_mode.addItems(modbus_modes)
+            mqtt_input_mode.setCurrentIndex(modbus_modes.index(str(self.aw.mqtt.channel_modes[i])))
+            mqtt_input_mode.setFixedWidth(100)
+            self.mqtt_inputModes[i] = mqtt_input_mode
+
+        # MQTT LAYOUT
+
+        mqtt_broker_layout = QHBoxLayout()
+        mqtt_broker_layout.addWidget(mqtt_host_label)
+        mqtt_broker_layout.addWidget(self.mqtt_hostEdit)
+        mqtt_broker_layout.addSpacing(10)
+        mqtt_broker_layout.addWidget(mqtt_port_label)
+        mqtt_broker_layout.addWidget(self.mqtt_portEdit)
+        mqtt_broker_layout.addSpacing(10)
+        mqtt_broker_layout.addWidget(self.mqtt_tls_checkBox)
+        mqtt_broker_layout.addStretch()
+        mqtt_broker_layout.addWidget(mqtt_transport_label)
+        mqtt_broker_layout.addWidget(self.mqtt_transportCombo)
+        mqtt_broker_layout.addSpacing(10)
+        mqtt_broker_layout.addWidget(mqtt_protocol_label)
+        mqtt_broker_layout.addWidget(self.mqtt_protocolCombo)
+
+        mqtt_line1 = QGroupBox('Broker')
+        mqtt_line1.setLayout(mqtt_broker_layout)
+
+        mqtt_credentials_layout = QHBoxLayout()
+
+        mqtt_credentials_layout = QHBoxLayout()
+        mqtt_credentials_layout.addWidget(mqtt_user_Label)
+        mqtt_credentials_layout.addWidget(self.mqtt_user_Edit)
+        mqtt_broker_layout.addSpacing(15)
+        mqtt_credentials_layout.addWidget(mqtt_password_Label)
+        mqtt_credentials_layout.addWidget(self.mqtt_password_Edit)
+
+        mqtt_topic_layout = QHBoxLayout()
+        mqtt_topic_layout.addWidget(self.mqtt_topic_Edit)
+
+        mqtt_topic_group = QGroupBox(QApplication.translate('Label','Topic'))
+        mqtt_topic_group.setLayout(mqtt_topic_layout)
+
+        mqtt_credentials_group = QGroupBox(QApplication.translate('GroupBox','Credentials'))
+        mqtt_credentials_group.setLayout(mqtt_credentials_layout)
+
+        mqtt_connection_layout = QHBoxLayout()
+        mqtt_connection_layout.addWidget(mqtt_connect_timeout_label)
+        mqtt_connection_layout.addWidget(self.mqtt_connect_timeoutEdit)
+        mqtt_connection_layout.addSpacing(10)
+        mqtt_connection_layout.addWidget(mqtt_keepalive_label)
+        mqtt_connection_layout.addWidget(self.mqtt_keepaliveEdit)
+
+
+        mqtt_connection_group = QGroupBox(QApplication.translate('GroupBox','Connection'))
+        mqtt_connection_group.setLayout(mqtt_connection_layout)
+
+        mqtt_line2 = QHBoxLayout()
+        mqtt_line2.addWidget(mqtt_topic_group)
+        mqtt_line2.addStretch()
+        mqtt_line2.addWidget(mqtt_credentials_group)
+        mqtt_line2.addStretch()
+        mqtt_line2.addWidget(mqtt_connection_group)
+
+
+        mqtt_input_grid = QGridLayout()
+
+        mqtt_input_grid.addWidget(mqtt_input_topic_label,1,0,Qt.AlignmentFlag.AlignRight)
+        mqtt_input_grid.addWidget(mqtt_input_node_label,2,0,Qt.AlignmentFlag.AlignRight)
+        mqtt_input_grid.addWidget(mqtt_input_mode_label,3,0,Qt.AlignmentFlag.AlignRight)
+
+        for i in range(self.aw.mqtt.CHANNELS):
+            if (len(self.mqtt_inputTopics)>i and
+                    len(self.mqtt_inputNodes)>i and
+                    len(self.mqtt_inputModes)>i):
+                mqtt_input_grid.addWidget(QLabel(QApplication.translate('GroupBox', 'Input') + ' ' + str(i+1)),0,i+1,Qt.AlignmentFlag.AlignCenter)
+                inputTopic:QLineEdit|None = self.mqtt_inputTopics[i]
+                inputNode:QLineEdit|None = self.mqtt_inputNodes[i]
+                inputTemperatureMode:QComboBox|None = self.mqtt_inputModes[i]
+                if (inputTopic is not None and inputNode is not None and
+                        inputTemperatureMode is not None):
+                    mqtt_input_grid.addWidget(inputTopic, 1, i + 1)
+                    mqtt_input_grid.addWidget(inputNode,2,i+1)
+                    mqtt_input_grid.addWidget(inputTemperatureMode,3,i+1)
+
+        # for content
+
+        mqtt_input_grid.setContentsMargins(5,5,5,5)
+        mqtt_input_grid.setSpacing(6)
+
+        mqtt_input_scroll_content = QFrame()
+        mqtt_input_scroll_content.setSizePolicy(QSizePolicy.Policy.MinimumExpanding,QSizePolicy.Policy.Ignored)
+        mqtt_input_scroll_content.setLayout(mqtt_input_grid)
+
+        mqtt_line3 = QScrollArea()
+        mqtt_line3.setWidgetResizable(False)
+        mqtt_line3.setWidget(mqtt_input_scroll_content)
+
+
+        tab6Layout = QVBoxLayout()
+        tab6Layout.addWidget(mqtt_line1)
+        tab6Layout.addSpacing(20)
+        tab6Layout.addLayout(mqtt_line2)
+        tab6Layout.addSpacing(30)
+        tab6Layout.addWidget(mqtt_line3)
+        tab6Layout.addSpacing(40)
+        tab6Layout.setSpacing(8)
+        tab6Layout.setContentsMargins(5,5,5,5)
+
+## END MQTT TAB
+
+
         #tab widget
         self.TabWidget = QTabWidget()
         C1Widget = QWidget()
@@ -1508,13 +1734,17 @@ class comportDlg(ArtisanResizeablDialog):
         self.TabWidget.addTab(C2Widget,QApplication.translate('Tab','Extra'))
         C3Widget = QWidget()
         C3Widget.setLayout(tab3Layout)
-        self.TabWidget.addTab(C3Widget,QApplication.translate('Tab','Modbus'))
+        self.TabWidget.addTab(C3Widget,'MODBUS')
         C4Widget = QWidget()
         C4Widget.setLayout(tab4Layout)
-        self.TabWidget.addTab(C4Widget,QApplication.translate('Tab','S7'))
-        C7Widget = QWidget()
-        C7Widget.setLayout(tab7Layout)
-        self.TabWidget.addTab(C7Widget,QApplication.translate('Tab','WebSocket'))
+        self.TabWidget.addTab(C4Widget,'S7')
+        C5Widget = QWidget()
+        C5Widget.setLayout(tab5Layout)
+        self.TabWidget.addTab(C5Widget,'WebSocket')
+        C6Widget = QWidget()
+        C6Widget.setLayout(tab6Layout)
+        self.TabWidget.addTab(C6Widget,'MQTT')
+
         self.TabWidget.currentChanged.connect(self.tabSwitched)
 
         if devid == 29 or (devid == 0 and self.aw.ser.useModbusPort) : # switch to MODBUS tab if MODBUS device was selected as main device
@@ -1524,11 +1754,14 @@ class comportDlg(ArtisanResizeablDialog):
             self.TabWidget.setCurrentIndex(3)
         elif devid == 111:  # switch to WebSocket tab if WebSocket device was selected as main device
             self.TabWidget.setCurrentIndex(4)
+        elif devid == 201:  # switch to MQTT tab if MQTT device was selected as main device
+            self.TabWidget.setCurrentIndex(5)
+
         #incorporate layouts
         Mlayout = QVBoxLayout()
         Mlayout.addWidget(self.TabWidget)
         Mlayout.addLayout(buttonLayout)
-        Mlayout.setContentsMargins(5,15,5,5)
+        Mlayout.setContentsMargins(10,15,10,10) # left, top, right, bottom
         Mlayout.setSpacing(5)
         self.setLayout(Mlayout)
         if platform.system() != 'Windows':
@@ -1540,6 +1773,10 @@ class comportDlg(ArtisanResizeablDialog):
         settings = QSettings()
         if settings.contains('PortsGeometry'):
             self.restoreGeometry(settings.value('PortsGeometry'))
+
+    @pyqtSlot(str)
+    def mqtt_user_changed(self, s:str) -> None:
+        self.mqtt_password_Edit.setEnabled(s.strip() != '')
 
     @pyqtSlot(int)
     def s7_optimize_toggle(self, i:int) -> None:
@@ -1696,21 +1933,28 @@ class comportDlg(ArtisanResizeablDialog):
             self.aw.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' saveserialtable(): {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot(bool)
-    def showModbusbuttonhelp(self, _:bool = False) -> None:
+    def showButtonhelp(self, _:bool = False) -> None:
         if self.TabWidget.currentIndex() == 2:
-            from help import modbus_help # pyright: ignore [attr-defined] # pylint: disable=no-name-in-module
+            from help import modbus_help # pyright: ignore[attr-defined] # pylint: disable=no-name-in-module
             self.helpdialog = self.aw.showHelpDialog(
                     self,            # this dialog as parent
                     self.helpdialog, # the existing help dialog
                     QApplication.translate('Form Caption','MODBUS Help'),
                     modbus_help.content())
         elif self.TabWidget.currentIndex() == 3:
-            from help import s7_help # pyright: ignore [attr-defined] # pylint: disable=no-name-in-module
+            from help import s7_help # pyright: ignore[attr-defined] # pylint: disable=no-name-in-module
             self.helpdialog = self.aw.showHelpDialog(
                     self,            # this dialog as parent
                     self.helpdialog, # the existing help dialog
                     QApplication.translate('Form Caption','S7 Help'),
                     s7_help.content())
+        elif self.TabWidget.currentIndex() == 5:
+            from help import mqtt_help # pyright: ignoreattr-defined] # pylint: disable=no-name-in-module
+            self.helpdialog = self.aw.showHelpDialog(
+                    self,            # this dialog as parent
+                    self.helpdialog, # the existing help dialog
+                    QApplication.translate('Form Caption','MQTT Help'),
+                    mqtt_help.content())
 
     def closeHelp(self) -> None:
         self.aw.closeHelpDialog(self.helpdialog)

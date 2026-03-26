@@ -80,6 +80,7 @@ class Login(ArtisanDialog):
 
         self.dialogbuttons.accepted.connect(self.setCredentials)
         self.dialogbuttons.rejected.connect(self.reject)
+
         self.ok_button = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
         if self.ok_button is not None:
             self.ok_button.setEnabled(False)

@@ -1,0 +1,80 @@
+[General]
+Delay=1000
+roastertype_setup=ROEST 100
+roasterheating_setup=3
+roastersize_setup=0.2
+dropDuplicates=true
+dropDuplicatesLimit=0.01
+KeepON=true
+
+[Units]
+weight=g
+
+[events]
+default_etypes_set=1, 0, 0, 1, 0
+
+[Device]
+id=201
+
+[ExtraComm]
+extrabaudrate=19200, 19200, 19200, 19200, 19200, 9600
+extrabytesize=8, 8, 8, 8, 8, 8
+extracomport=COM1, COM1, COM1, COM1, COM1, COM1
+extraparity=E, E, E, E, E, N
+extrastopbits=1, 1, 1, 1, 1, 1
+extratimeout=0.5, 0.5, 0.5, 0.5, 0.5, 0.5
+
+[ExtraDev]
+extraCurveVisibility1=false, true, false, false, false, true, true, true, true, true
+extraCurveVisibility2=true, true, false, false, false, false, true, true, true, true
+extraDelta1=false, false, false, false, false, false, false, false, false, false
+extraDelta2=false, false, false, false, false, false, false, false, false, false
+extraFill1=0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+extraFill2=0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+extraLCDvisibility1=true, true, false, false, false, false, false, false, false, false
+extraLCDvisibility2=true, true, false, false, false, false, false, false, false, false
+extradevicecolor1=#000000, #ad0427ff, #49b160ff, #dd8627ff, #4c4c4cff, #dd8627ff
+extradevicecolor2=#d25343ff, #43a7cfff, #000000, #000000, #800080ff, #000000
+extradevices=202, 203, 204, 205, 206, 50
+extramathexpression1=, , , , , "(max(0, Y9+Y13[-1]))"
+extramathexpression2=, , , , , 
+extraname1=DT, {3}, {1}, cracks, XT, total cracks
+extraname2=IT, {0}, event, pressure, target, Extra 2
+
+[MQTT]
+channel_modes=C, C, C, C, , , , , , , C, C
+channel_nodes=data.bt, data.et, data.drum_temp, data.inlet_temp, data.heat, data.fan, data.rpm, events[-1].type, data.crack, data.air_pressure, "avg(data.temperature_sensors[?name=='rtd2'].value)", data.target
+channel_topics=, , , , , , , , , , , 
+connect_timeout=3
+host=coap.roestcoffee.com
+keepalive=2
+port=8883
+protocol_version=1
+tls=true
+transport=0
+
+[Quantifiers]
+clusterEventsFlag=false
+eventquantifierSV=1, 1, 0, 1
+eventquantifieraction=0, 0, 0, 0
+quantifieractive=1, 1, 0, 1
+quantifiercoarse=0, 0, 0, 0
+quantifiermax=100, 100, 100, 100
+quantifiermin=0, 0, 0, 0
+quantifiersource=5, 6, 0, 4
+
+[Alarms]
+alarmaction=7, 16, 8, 9, 13, 15
+alarmbeep=0, 0, 0, 0, 0, 0
+alarmcond=2, 2, 2, 2, 2, 2
+alarmflag=1, 1, 1, 1, 1, 1
+alarmguard=-1, 0, -1, -1, -1, 4
+alarmnegguard=-1, -1, -1, -1, -1, -1
+alarmoffset=0, 1, 0, 0, 0, 1
+alarmsource=7, -3, 7, 7, 7, 7
+alarmstrings=# start recording, # CHARGE on START, # DRY, # FCs, # DROP, # OFF
+alarmtemperature=0, 0, 4, 5, 1, 1
+alarmtime=9, -1, 0, 0, 0, 10
+
+[EnergyDefaults]
+ratings=@Variant(\0\0\0\x7f\0\0\0\xePyQt_PyObject\0\0\0\x1-\x80\x5\x95\"\x1\0\0\0\0\0\0}\x94K\x3}\x94G?\xc9\x99\x99\x99\x99\x99\x9a}\x94(\x8c\nloadlabels\x94]\x94(\x8c\x6Heater\x94\x8c\x3\x46\x61n\x94\x8c\nElectronic\x94\x8c\0\x94\x65\x8c\vloadratings\x94]\x94(G?\xfa\x66\x66\x66\x66\x66\x66G?\xb9\x99\x99\x99\x99\x99\x9aG?\x8e\xb8Q\xeb\x85\x1e\xb8K\0\x65\x8c\vratingunits\x94]\x94(K\x3K\x3K\x3K\0\x65\x8c\vsourcetypes\x94]\x94(K\x2K\x2K\x2K\0\x65\x8c\vload_etypes\x94]\x94(K\x4K\x1K\0K\0\x65\x8c\x12presssure_percents\x94]\x94(\x89\x89\x89\x89\x65\x8c\x12loadevent_zeropcts\x94]\x94(K\0K\0K\0K\0\x65\x8c\x12loadevent_hundpcts\x94]\x94(KdKdKdKdeuss.)

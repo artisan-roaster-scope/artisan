@@ -258,13 +258,13 @@ def getTemplate(bp: 'ProfileData', background:bool=False) -> dict[str, Any]:
 # remove all data but for what is to be synced with the server
 def trimBlendSpec(blend_spec:stock.Blend) -> stock.Blend|None:
     try:
-        res:stock.Blend = {} # type: ignore[typeddict-item] # missing required fields (added later)
+        res:stock.Blend = {} # type: ignore[typeddict-item]  # ty:ignore[missing-typed-dict-key] # missing required fields (added later)
         if blend_spec['label']:
             res['label'] = blend_spec['label']
             if blend_spec['ingredients']:
                 res_ingredients:list[stock.BlendIngredient] = []
                 for ingredient in blend_spec['ingredients']:
-                    res_ingredient:stock.BlendIngredient = {} # type: ignore[typeddict-item] # missing required fields (added later)
+                    res_ingredient:stock.BlendIngredient = {} # type: ignore[typeddict-item] # ty:ignore[missing-typed-dict-key] # missing required fields (added later)
                     for tag in ['coffee', 'ratio', 'ratio_num', 'ratio_denom']:
                         if tag in ingredient:
                             res_ingredient[tag] = ingredient[tag] # type: ignore[literal-required, misc, unused-ignore] # field vars like 'tag' are not supported by mypy for TypedDicts

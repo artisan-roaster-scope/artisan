@@ -133,7 +133,7 @@ class MyTableWidgetItemQLineEdit(QTableWidgetItem):
 
     #Qt uses a simple < check for sorting items, override this to use the sortKey
     @override
-    def __lt__(self, other:'MyTableWidgetItemQLineEdit') -> bool: # type: ignore[override] # ty:ignore[unused]
+    def __lt__(self, other:'MyTableWidgetItemQLineEdit') -> bool: # type: ignore[override]
         a = self.sortKey.text()
         b = other.sortKey.text()
         try:
@@ -155,7 +155,7 @@ class MyTableWidgetItemQTime(QTableWidgetItem):
 
     #Qt uses a simple < check for sorting items, override this to use the sortKey
     @override
-    def __lt__(self, other:'MyTableWidgetItemQTime') -> bool: # type: ignore[override] # ty:ignore[unused]
+    def __lt__(self, other:'MyTableWidgetItemQTime') -> bool: # type: ignore[override]
         a = self.sortKey.time().minute() * 60 + self.sortKey.time().second()
         b = other.sortKey.time().minute() * 60 + other.sortKey.time().second()
         return a < b
@@ -168,7 +168,7 @@ class MyTableWidgetItemNumber(QTableWidgetItem):
 
     #Qt uses a simple < check for sorting items, override this to use the sortKey
     @override
-    def __lt__(self, other:'MyTableWidgetItemNumber') -> bool: # type: ignore[override] # ty:ignore[unused]
+    def __lt__(self, other:'MyTableWidgetItemNumber') -> bool: # type: ignore[override]
         return self.sortKey < other.sortKey
 
 class MyTableWidgetItemQCheckBox(QTableWidgetItem):
@@ -180,7 +180,7 @@ class MyTableWidgetItemQCheckBox(QTableWidgetItem):
 
     #Qt uses a simple < check for sorting items, override this to use the sortKey
     @override
-    def __lt__(self, other:'MyTableWidgetItemQCheckBox') -> bool:  # type: ignore[override] # ty:ignore[unused]
+    def __lt__(self, other:'MyTableWidgetItemQCheckBox') -> bool:  # type: ignore[override]
         return self.sortKey.isChecked() < other.sortKey.isChecked()
 
 class MyTableWidgetItemQComboBox(QTableWidgetItem):
@@ -192,7 +192,7 @@ class MyTableWidgetItemQComboBox(QTableWidgetItem):
 
     #Qt uses a simple < check for sorting items, override this to use the sortKey
     @override
-    def __lt__(self, other:'MyTableWidgetItemQComboBox') -> bool: # type: ignore[override] # ty:ignore[unused]
+    def __lt__(self, other:'MyTableWidgetItemQComboBox') -> bool: # type: ignore[override]
         return str(self.sortKey.currentText()) < str(other.sortKey.currentText())
 
 

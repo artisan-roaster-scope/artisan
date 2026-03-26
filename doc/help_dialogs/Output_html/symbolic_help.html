@@ -384,6 +384,12 @@
             <td>Conditional. Evaluates to the value of the expression &lt;true-expr&gt; if the condition &lt;cond&gt; holds, otherwise to the value of the expression &lt;false-expr&gt;. The rules of Python are applied to decide if a value holds or not. Thus the boolean values &quot;True&quot; and &quot;False&quot; have the obvious semantic. Any number unequal to 0 evaluates to True and 0 evaluates to False. The value &quot;None&quot; is also evaluated to False.</td>
         </tr>
     </tbody>
+</table><table width="100%" border="1" padding="1" border-collapse="collapse">
+    <tbody>
+        <tr>
+            <td>Note: If any of the referenced symbolic variables contained in a symbolic expression evaluates to the error value -1, the whole expression evaluates to -1. This can be prevented by surrounding the whole expression by regular brackets. Thus, with Y1 evaluating to -1, the expression &quot;Y1 + 1&quot; evaluates to -1, but &quot;(Y1 + 1)&quot; evaluates to 0.</td>
+        </tr>
+    </tbody>
 </table><br/><br/><b>MATHEMATICAL FORMULAS</b><table width="100%" border="1" padding="1" border-collapse="collapse">
     <thead>
         <tr>

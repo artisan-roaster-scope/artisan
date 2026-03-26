@@ -18,8 +18,8 @@
 import sys
 import platform
 import numpy
-from matplotlib import ticker, transforms # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore]
-from matplotlib import rcParams # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore]
+from matplotlib import ticker, transforms # type:ignore[untyped-import,unused-ignore]
+from matplotlib import rcParams # type:ignore[untyped-import,unused-ignore]
 import logging
 from collections.abc import Callable, Sequence
 from typing import override, Final, TypedDict, Literal, cast, TYPE_CHECKING
@@ -27,9 +27,9 @@ from typing import override, Final, TypedDict, Literal, cast, TYPE_CHECKING
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
     from artisanlib.atypes import ProfileData # pylint: disable=unused-import
-    from matplotlib.lines import Line2D # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore] # pylint: disable=unused-import
-    from matplotlib.backend_bases import PickEvent # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore] # pylint: disable=unused-import
-    from matplotlib.legend import Legend # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore] # pylint: disable=unused-import
+    from matplotlib.lines import Line2D # type:ignore[untyped-import,unused-ignore] # pylint: disable=unused-import
+    from matplotlib.backend_bases import PickEvent # type:ignore[untyped-import,unused-ignore] # pylint: disable=unused-import
+    from matplotlib.legend import Legend # type:ignore[untyped-import,unused-ignore] # pylint: disable=unused-import
     from PyQt6.QtWidgets import QLayoutItem, QLayout, QScrollBar # pylint: disable=unused-import
     from PyQt6.QtGui import QStandardItem, QKeyEvent, QDropEvent, QDragEnterEvent, QCloseEvent # pylint: disable=unused-import
     from PyQt6.QtCore import QMimeData # pylint: disable=unused-import
@@ -420,7 +420,7 @@ class RoastProfile:
         self.events1 = []
         self.events2 = []
         self.events_timex = []
-        if self.stemp1 is not None and self.stemp2 is not None: # type:ignore[redundant-expr] # ty:ignore[ignore]
+        if self.stemp1 is not None and self.stemp2 is not None: # type:ignore[redundant-expr]
             for ti in self.timeindex[:-1]:
                 temp1:float|None = (self.stemp1[ti] if len(self.stemp1)>ti else None)
                 temp2:float|None = (self.stemp2[ti] if len(self.stemp2)>ti else None)
@@ -1093,7 +1093,7 @@ class roastCompareDlg(ArtisanDialog):
         self.disableButtons()
         self.aw.disableEditMenus(compare=True)
 
-        self.pick_handler_id = self.aw.qmc.fig.canvas.mpl_connect('pick_event', self.onpick_event) # type: ignore[arg-type] # ty:ignore[ignore] # incompatible type "Callable[[PickEvent], None]"; expected "Callable[[Event], Any]
+        self.pick_handler_id = self.aw.qmc.fig.canvas.mpl_connect('pick_event', self.onpick_event) # type: ignore[arg-type] # incompatible type "Callable[[PickEvent], None]"; expected "Callable[[Event], Any]
 
         settings = QSettings()
         if settings.contains('CompareGeometry'):

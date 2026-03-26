@@ -278,7 +278,7 @@ class CompletedItem(BaseModel):
     cuppingnotes: str = Field(default='')
     roasttime: int = Field(default=0)
 
-    @computed_field  # type:ignore[prop-decorator] # ty:ignore[unused] # Decorators on top of @property are not supported
+    @computed_field  # type:ignore[prop-decorator] # Decorators on top of @property are not supported
     @property
     def prefix(self) -> str:
         res = ''
@@ -307,11 +307,11 @@ class CompletedItem(BaseModel):
         return self
 
     @field_serializer('roastdate', when_used='json')
-    def serialize_roastdate_to_epoch(roastdate: datetime.datetime) -> int: # type:ignore[misc] # ty:ignore[unused] # pylint: disable=no-self-argument
+    def serialize_roastdate_to_epoch(roastdate: datetime.datetime) -> int: # type:ignore[misc] # pylint: disable=no-self-argument
         return int(roastdate.timestamp())
 
     @field_serializer('roastUUID', when_used='json')
-    def serialize_roastUUID_to_str(roastUUID: UUID4) -> str: # type:ignore[misc] # ty:ignore[unused] # pylint: disable=no-self-argument
+    def serialize_roastUUID_to_str(roastUUID: UUID4) -> str: # type:ignore[misc] # pylint: disable=no-self-argument
         return str(roastUUID.hex)
 
 

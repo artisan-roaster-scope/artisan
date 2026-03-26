@@ -5,10 +5,14 @@ Detailed Release History
 v4.0.4 (Mar XX, 2026)
 ------------------
 
+-
 * ADDITIONS
+  - adds support for [ROEST](https://artisan-scope.org/machines/orbiter/) sample and production roasters
   - adds support for [Orbiter](https://artisan-scope.org/machines/orbiter/) smart roasters
   - adds support for [Pratter](https://artisan-scope.org/machines/pratter/) roasting machines
   - adds support for [Probat G/UG 2026 models](https://artisan-scope.org/machines/probat/) communicating via WebSockets
+  - adds MQTT support
+  - adds IO Command `publish(<topic>, <data>)` to publish payloads to the connected MQTT broker
   - adds Artisan Command `pidSVbuttons(<bool>)` ([Issue #2121](../../../issues/2121))
   - adds Excel and Orbiter formats to the autosave "save also" options
 * CHANGES

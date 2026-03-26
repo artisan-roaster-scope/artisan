@@ -72,7 +72,7 @@ def extractProfileStrongholdXLSX(file:str,
                         if key == 'Time':
                             data[key].append(stringtoseconds(str(sheet.cell(row, i+1).value)))
                         else:
-                            data[key].append(sheet.cell(row, i+1).value) # type:ignore[arg-type] # ty:ignore[ignore]
+                            data[key].append(sheet.cell(row, i+1).value) # type:ignore[arg-type]
             except Exception as e:  # pylint: disable=broad-except
                 _log.error(e)
 
@@ -81,7 +81,7 @@ def extractProfileStrongholdXLSX(file:str,
             res['title'] = encodeLocalStrict(Path(file).stem)
             res['roastertype'] = machine
             res['roastersize'] = machine_size
-            res['timex'] = data['Time'] # type:ignore[typeddict-item] # ty:ignore[ignore]
+            res['timex'] = data['Time'] # type:ignore[typeddict-item]
             tx_len = len(res['timex'])
             res['mode'] = 'C'
             # add CHARGE/DROP
@@ -94,11 +94,11 @@ def extractProfileStrongholdXLSX(file:str,
                     pass
             # add ET/BT
             if 'ET' in data and len(data['ET']) == tx_len:
-                res['temp1'] = data['ET'] # type:ignore[typeddict-item] # ty:ignore[ignore]
+                res['temp1'] = data['ET'] # type:ignore[typeddict-item]
             else:
                 res['temp2'] = [-1.0]*tx_len
             if 'BT' in data and len(data['BT']) == tx_len:
-                res['temp2'] = data['BT'] # type:ignore[typeddict-item] # ty:ignore[ignore]
+                res['temp2'] = data['BT'] # type:ignore[typeddict-item]
             else:
                 res['temp2'] = [-1.0]*tx_len
             res['extradevices'] = [25] # one extra virtual device
@@ -106,11 +106,11 @@ def extractProfileStrongholdXLSX(file:str,
             res['extraname2'] = ['DT']
             res['extratimex'] = [res['timex'][:]] # pyright:ignore
             if 'IT' in data and len(data['IT']) == tx_len:
-                res['extratemp1'] = [data['IT']] # type:ignore[list-item] # ty:ignore[ignore]
+                res['extratemp1'] = [data['IT']] # type:ignore[list-item]
             else:
                 res['extratemp1'] = [[-1.0]*tx_len]
             if 'DT' in data and len(data['DT']) == tx_len:
-                res['extratemp2'] = [data['DT']] # type:ignore[list-item] # ty:ignore[ignore]
+                res['extratemp2'] = [data['DT']] # type:ignore[list-item]
             else:
                 res['extratemp2'] = [[-1.0]*tx_len]
             res['extramathexpression1'] = ['']

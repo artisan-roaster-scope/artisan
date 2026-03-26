@@ -587,7 +587,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 
         self.org_roasted_defects_mode = self.aw.qmc.roasted_defects_mode
 
-        self.setup_ui:SetupWidget.Ui_SetupWidget|None = None # type:ignore[no-any-unimported,unused-ignore] # ty:ignore[ignore]
+        self.setup_ui:SetupWidget.Ui_SetupWidget|None = None # type:ignore[no-any-unimported,unused-ignore]
 
         self.pus_amount_selected = None
 
@@ -1089,7 +1089,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         if isinstance(self.aw.qmc.color_system_idx, int):
             self.colorSystemComboBox.setCurrentIndex(self.aw.qmc.color_system_idx)
         else: # in older versions this could have been a string
-            self.aw.qmc.color_system_idx = 0 # type: ignore[unreachable] # ty:ignore[ignore]
+            self.aw.qmc.color_system_idx = 0 # type: ignore[unreachable]
         #Greens Temp
         greens_temp_label = QLabel('<b>' + QApplication.translate('Label', 'Beans') + '</b>')
         greens_temp_unit_label = QLabel(self.aw.qmc.mode)
@@ -2458,9 +2458,9 @@ class editGraphDlg(ArtisanResizeablDialog):
                 if rr['colorSystem'] in self.aw.qmc.color_systems:
                     self.aw.qmc.color_system_idx = self.aw.qmc.color_systems.index(rr['colorSystem'])
                     self.colorSystemComboBox.setCurrentIndex(self.aw.qmc.color_system_idx)
-                elif isinstance(rr['colorSystem'], int) and rr['colorSystem'] < len(self.aw.qmc.color_systems):  # type: ignore[unreachable] # ty:ignore[ignore] # compatibility to older versions where colorSystems could be an int
+                elif isinstance(rr['colorSystem'], int) and rr['colorSystem'] < len(self.aw.qmc.color_systems):  # type: ignore[unreachable] # compatibility to older versions where colorSystems could be an int
                     # to stay compatible with older versions were rr['colorSystem'] was an index instead of the name of a system
-                    self.aw.qmc.color_system_idx = rr['colorSystem'] # type: ignore[unreachable] # ty:ignore[ignore] # compatibility to older versions where colorSystems could be an int
+                    self.aw.qmc.color_system_idx = rr['colorSystem'] # type: ignore[unreachable] # compatibility to older versions where colorSystems could be an int
                     self.colorSystemComboBox.setCurrentIndex(self.aw.qmc.color_system_idx)
 
             # items added in v1.4 might not be in the data set of previous stored recent roasts

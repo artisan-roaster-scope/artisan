@@ -137,7 +137,7 @@ def extractProfileRoastPathHTML(url:'QUrl',
                 page_content = page.content.decode('latin-1')
             d = re.findall(fr"var {elem} = JSON\.parse\('(.+?)'\);", page_content, re.S)  # @UndefinedVariable
             if d:
-                data[elem] = json.loads(d[0]) # type: ignore[literal-required, misc, unused-ignore] # ty:ignore[ignore] # generic strings accessors cannot be handled by mypy
+                data[elem] = json.loads(d[0]) # type: ignore[literal-required, misc, unused-ignore] # generic strings accessors cannot be handled by mypy
 
         if 'btData' in data and len(data['btData']) > 0 and 'Timestamp' in data['btData'][0]:
             # BT

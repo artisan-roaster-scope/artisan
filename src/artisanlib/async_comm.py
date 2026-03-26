@@ -235,8 +235,8 @@ async def create_serial_connection(
             _log.error(e)
 
     # in any case we open the serial port
-    if not transport.sync_serial.is_open: # ty:ignore
-        transport.sync_serial.open() # ty:ignore
+    if not transport.sync_serial.is_open:
+        transport.sync_serial.open()
 
     # and if clear_HUPCL, we immediately set the dtr/rts again
     if clear_HUPCL:
@@ -315,7 +315,7 @@ class AsyncComm:
         reader = asyncio.StreamReader(limit=limit, loop=loop)
         protocol = asyncio.StreamReaderProtocol(reader, loop=loop)
         transport, _ = await create_serial_connection(
-            loop, lambda: protocol, url, **kwargs # type: ignore[arg-type] # ty:ignore[unused-ignore-comment]
+            loop, lambda: protocol, url, **kwargs # type: ignore[arg-type]
         )
         writer = asyncio.StreamWriter(transport, protocol, reader, loop)
         return reader, writer

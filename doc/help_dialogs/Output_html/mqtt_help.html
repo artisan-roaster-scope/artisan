@@ -1,0 +1,21 @@
+<head><style> td, th {border: 1px solid #ddd;  padding: 6px;} th {padding-top: 6px;padding-bottom: 6px;text-align: left;background-color: #0C6AA6; color: white;} </style></head> <body><b>PORTS CONFIGURATION</b><table width="100%" border="1" padding="1" border-collapse="collapse">
+    <thead>
+        <tr>
+            <th>MQTT SETTINGS</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>The MQTT communication is respecting the broker&#39;s host IP and port for communication over TCP or WebSockets using the MQTT protocol v3.1, v3.1.1, or v5. Encryption can be enabled by ticking the TLS option. Connect timeout and keepalive periods can be configured in seconds, and access credentials can be set.</td>
+        </tr>
+        <tr>
+            <td>Artisan establishes a connection with the broker and subscribes to the specified topics if the ON button is pressed. Each input extracts its data from the payloads received for the main topic or, if provided, the input-specific topics. For each input, a JMESPath (jmespath.org) expression is used to determine how to extract the data for that input is extracted from the received payload.</td>
+        </tr>
+        <tr>
+            <td>For example, for the payload {&quot;foo&quot;: {&quot;bar&quot;: [1, 2]}}, the JMESPath expression foo.bar[0] will result in the value 1.</td>
+        </tr>
+        <tr>
+            <td>If mode is set to C or F, readings are automatically converted to the temperature unit set for display.</td>
+        </tr>
+    </tbody>
+</table></body>

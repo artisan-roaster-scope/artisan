@@ -18,7 +18,7 @@ from PyQt6.QtCore import QDateTime, Qt, QMutex, QWaitCondition, QUrl
 from artisanlib.util import encodeLocal, encodeLocalStrict
 from artisanlib.atypes import ProfileData
 from artisanlib.ble_port import ClientBLE
-from proto import IkawaCmd_pb2 # type:ignore[unused-ignore] # ty:ignore[ignore]
+from proto import IkawaCmd_pb2 # type:ignore[unused-ignore]
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)

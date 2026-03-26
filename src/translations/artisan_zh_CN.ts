@@ -4,80 +4,80 @@
 <context>
     <name>About</name>
     <message>
-        <location filename="../artisanlib/main.py" line="5058" />
+        <location filename="../artisanlib/main.py" line="5061" />
         <source>Release Sponsor</source>
         <translation>发布赞助商</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24510" />
+        <location filename="../artisanlib/main.py" line="24574" />
         <source>About</source>
         <translation>关于</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24528" />
+        <location filename="../artisanlib/main.py" line="24592" />
         <source>Core Developers</source>
         <translation>核心开发人员</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24531" />
+        <location filename="../artisanlib/main.py" line="24595" />
         <source>License</source>
         <translation>版权</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24552" />
+        <location filename="../artisanlib/main.py" line="24616" />
         <source>There was a problem retrieving the latest version information.  Please check your Internet connection, try again later, or check manually.</source>
         <translation>检索最新版本时出现问题。请检查你的网络连接，稍后再试，或者手动检查更新。</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24566" />
+        <location filename="../artisanlib/main.py" line="24630" />
         <source>A new release is available.</source>
         <translation>有新版本可用。</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24568" />
+        <location filename="../artisanlib/main.py" line="24632" />
         <source>Show Change list</source>
         <translation>显示改变列表</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24570" />
+        <location filename="../artisanlib/main.py" line="24634" />
         <source>Download Release</source>
         <translation>下载最新版本</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24572" />
+        <location filename="../artisanlib/main.py" line="24636" />
         <source>You are using the latest release.</source>
         <translation>您正在使用最新版本。</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24574" />
+        <location filename="../artisanlib/main.py" line="24638" />
         <source>You are using a beta continuous build.</source>
         <translation>你正在使用一个自动编译的测试版本.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24575" />
+        <location filename="../artisanlib/main.py" line="24639" />
         <source>You will see a notice here once a new official release is available.</source>
         <translation>当有一个新官方版本可用时，这里会显示通知。</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24590" />
+        <location filename="../artisanlib/main.py" line="24654" />
         <source>Update status</source>
         <translation>更新状态</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="9499" />
+        <location filename="../artisanlib/canvas.py" line="9516" />
         <source>sponsored by {}</source>
         <translation>由{}赞助</translation>
     </message>
 </context><context>
     <name>AddlInfo</name>
     <message>
-        <location filename="../artisanlib/canvas.py" line="11859" />
+        <location filename="../artisanlib/canvas.py" line="11876" />
         <location filename="../artisanlib/statistics.py" line="198" />
         <source>Roast of the Day</source>
         <translation>当日烘焙序号</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="11936" />
+        <location filename="../artisanlib/canvas.py" line="11953" />
         <location filename="../artisanlib/statistics.py" line="203" />
         <source>Screen Size</source>
         <translation>生豆目数</translation>
@@ -93,110 +93,90 @@
         <translation>生豆含水量</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="11954" />
+        <location filename="../artisanlib/canvas.py" line="11971" />
         <location filename="../artisanlib/statistics.py" line="206" />
         <source>Batch Size</source>
         <translation>批次大小</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="11962" />
+        <location filename="../artisanlib/canvas.py" line="11979" />
         <location filename="../artisanlib/statistics.py" line="207" />
         <source>Density Roasted</source>
         <translation>熟豆密度</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="11966" />
+        <location filename="../artisanlib/canvas.py" line="11983" />
         <location filename="../artisanlib/statistics.py" line="208" />
         <source>Moisture Roasted</source>
         <translation>熟豆含水量</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="11970" />
+        <location filename="../artisanlib/canvas.py" line="11987" />
         <location filename="../artisanlib/statistics.py" line="209" />
         <source>Ground Color</source>
         <translation>咖啡粉色值</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="11974" />
+        <location filename="../artisanlib/canvas.py" line="11991" />
         <location filename="../artisanlib/statistics.py" line="210" />
         <source>Energy</source>
         <translation>能源</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="11980" />
+        <location filename="../artisanlib/canvas.py" line="11997" />
         <location filename="../artisanlib/statistics.py" line="211" />
         <source>CO2</source>
         <translation>二氧化碳</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="12012" />
+        <location filename="../artisanlib/canvas.py" line="12029" />
         <location filename="../artisanlib/statistics.py" line="217" />
         <source>Weight Roasted</source>
         <translation>烘焙后重量</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="12016" />
+        <location filename="../artisanlib/canvas.py" line="12033" />
         <location filename="../artisanlib/statistics.py" line="218" />
         <source>Weight Loss</source>
         <translation>失重</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="11899" />
+        <location filename="../artisanlib/canvas.py" line="11916" />
         <source>From</source>
         <translation>来自</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="11900" />
+        <location filename="../artisanlib/canvas.py" line="11917" />
         <source>Bottom</source>
         <translation>底部</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="11985" />
+        <location filename="../artisanlib/canvas.py" line="12002" />
         <source>AUC</source>
         <translation>曲线下面积（AUC）</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="12073" />
+        <location filename="../artisanlib/canvas.py" line="12090" />
         <source>Defects Weight</source>
         <translation>缺陷重量</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="12078" />
+        <location filename="../artisanlib/canvas.py" line="12095" />
         <source>Defects Loss</source>
         <translation>缺陷损失</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="12083" />
+        <location filename="../artisanlib/canvas.py" line="12100" />
         <source>Yield</source>
         <translation>产量</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="12089" />
+        <location filename="../artisanlib/canvas.py" line="12106" />
         <source>Total Loss</source>
         <translation>烘焙总损失</translation>
     </message>
 </context><context>
     <name>Button</name>
-    <message>
-        <location filename="../artisanlib/dialogs.py" line="623" />
-        <location filename="../artisanlib/dialogs.py" line="87" />
-        <location filename="../artisanlib/comm.py" line="200" />
-        <location filename="../artisanlib/pid_dialogs.py" line="2813" />
-        <location filename="../artisanlib/pid_dialogs.py" line="1942" />
-        <location filename="../artisanlib/pid_dialogs.py" line="923" />
-        <location filename="../plus/login.py" line="73" />
-        <source>OK</source>
-        <translation>确认</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/dialogs.py" line="624" />
-        <location filename="../artisanlib/dialogs.py" line="88" />
-        <location filename="../artisanlib/comm.py" line="201" />
-        <location filename="../artisanlib/pid_dialogs.py" line="3101" />
-        <location filename="../plus/login.py" line="78" />
-        <source>Cancel</source>
-        <translation>取消</translation>
-    </message>
     <message>
         <location filename="../artisanlib/colors.py" line="567" />
         <location filename="../artisanlib/designer.py" line="244" />
@@ -270,7 +250,7 @@
         <translation>删除</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3559" />
+        <location filename="../artisanlib/main.py" line="3562" />
         <location filename="../artisanlib/wheels.py" line="437" />
         <source>Update</source>
         <translation>更新</translation>
@@ -317,6 +297,17 @@
         <location filename="../artisanlib/pid_dialogs.py" line="903" />
         <source>Save</source>
         <translation>保存</translation>
+    </message>
+    <message>
+        <location filename="../plus/login.py" line="73" />
+        <location filename="../artisanlib/dialogs.py" line="623" />
+        <location filename="../artisanlib/dialogs.py" line="87" />
+        <location filename="../artisanlib/comm.py" line="200" />
+        <location filename="../artisanlib/pid_dialogs.py" line="2813" />
+        <location filename="../artisanlib/pid_dialogs.py" line="1942" />
+        <location filename="../artisanlib/pid_dialogs.py" line="923" />
+        <source>OK</source>
+        <translation>确认</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="925" />
@@ -531,6 +522,15 @@
         <translation>写入PIDs</translation>
     </message>
     <message>
+        <location filename="../plus/login.py" line="78" />
+        <location filename="../artisanlib/dialogs.py" line="624" />
+        <location filename="../artisanlib/dialogs.py" line="88" />
+        <location filename="../artisanlib/comm.py" line="201" />
+        <location filename="../artisanlib/pid_dialogs.py" line="3101" />
+        <source>Cancel</source>
+        <translation>取消</translation>
+    </message>
+    <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3169" />
         <source>Set ET PID to MM:SS time units</source>
         <translation>设定ET PID时间格式为MM:SS</translation>
@@ -549,8 +549,8 @@
         <location filename="../artisanlib/alarms.py" line="116" />
         <location filename="../artisanlib/curves.py" line="857" />
         <location filename="../artisanlib/roast_properties.py" line="2921" />
-        <location filename="../artisanlib/ports.py" line="781" />
-        <location filename="../artisanlib/events.py" line="975" />
+        <location filename="../artisanlib/ports.py" line="799" />
+        <location filename="../artisanlib/events.py" line="987" />
         <location filename="../artisanlib/events.py" line="687" />
         <location filename="../artisanlib/events.py" line="261" />
         <location filename="../artisanlib/autosave.py" line="93" />
@@ -598,7 +598,7 @@
     <message>
         <location filename="../artisanlib/transposer.py" line="131" />
         <location filename="../artisanlib/designer.py" line="241" />
-        <location filename="../artisanlib/events.py" line="1165" />
+        <location filename="../artisanlib/events.py" line="1177" />
         <source>Apply</source>
         <translation>应用</translation>
     </message>
@@ -611,8 +611,8 @@
     <message>
         <location filename="../artisanlib/devices.py" line="1664" />
         <location filename="../artisanlib/devices.py" line="1593" />
-        <location filename="../artisanlib/ports.py" line="946" />
-        <location filename="../artisanlib/ports.py" line="758" />
+        <location filename="../artisanlib/ports.py" line="964" />
+        <location filename="../artisanlib/ports.py" line="776" />
         <source>Scan</source>
         <translation>扫描</translation>
     </message>
@@ -795,116 +795,116 @@ Extra Device</source>
     </message>
     <message>
         <location filename="../artisanlib/colors.py" line="180" />
-        <location filename="../artisanlib/main.py" line="2425" />
+        <location filename="../artisanlib/main.py" line="2428" />
         <source>Text</source>
         <translation>文本</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="13614" />
-        <location filename="../artisanlib/canvas.py" line="7935" />
-        <location filename="../artisanlib/main.py" line="3213" />
+        <location filename="../artisanlib/canvas.py" line="13663" />
+        <location filename="../artisanlib/canvas.py" line="7952" />
+        <location filename="../artisanlib/main.py" line="3216" />
         <source>ON</source>
         <translation>打开</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="14342" />
-        <location filename="../artisanlib/canvas.py" line="11898" />
-        <location filename="../artisanlib/canvas.py" line="7940" />
-        <location filename="../artisanlib/main.py" line="3227" />
+        <location filename="../artisanlib/canvas.py" line="14391" />
+        <location filename="../artisanlib/canvas.py" line="11915" />
+        <location filename="../artisanlib/canvas.py" line="7957" />
+        <location filename="../artisanlib/main.py" line="3230" />
         <source>START</source>
         <translation>开始</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3242" />
+        <location filename="../artisanlib/main.py" line="3245" />
         <source>FC
 START</source>
         <translation>一爆
 开始</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3246" />
+        <location filename="../artisanlib/main.py" line="3249" />
         <source>FC
 END</source>
         <translation>一爆
 结束</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3250" />
+        <location filename="../artisanlib/main.py" line="3253" />
         <source>SC
 START</source>
         <translation>二爆
 开始</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3254" />
+        <location filename="../artisanlib/main.py" line="3257" />
         <source>SC
 END</source>
         <translation>二爆
 结束</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3259" />
+        <location filename="../artisanlib/main.py" line="3262" />
         <source>RESET</source>
         <translation>重置</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3271" />
+        <location filename="../artisanlib/main.py" line="3274" />
         <source>CHARGE</source>
         <translation>投豆</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3276" />
+        <location filename="../artisanlib/main.py" line="3279" />
         <source>DROP</source>
         <translation>排豆</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3281" />
+        <location filename="../artisanlib/main.py" line="3284" />
         <source>CONTROL</source>
         <translation>控制</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3294" />
+        <location filename="../artisanlib/main.py" line="3297" />
         <source>EVENT</source>
         <translation>事件</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3299" />
+        <location filename="../artisanlib/main.py" line="3302" />
         <source>SV +5</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3308" />
+        <location filename="../artisanlib/main.py" line="3311" />
         <source>SV +10</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3317" />
+        <location filename="../artisanlib/main.py" line="3320" />
         <source>SV +20</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3326" />
+        <location filename="../artisanlib/main.py" line="3329" />
         <source>SV -20</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3335" />
+        <location filename="../artisanlib/main.py" line="3338" />
         <source>SV -10</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3344" />
+        <location filename="../artisanlib/main.py" line="3347" />
         <source>SV -5</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3355" />
+        <location filename="../artisanlib/main.py" line="3358" />
         <source>DRY
 END</source>
         <translation>脱水结束</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3360" />
+        <location filename="../artisanlib/main.py" line="3363" />
         <source>COOL
 END</source>
         <translation>冷却结束</translation>
@@ -930,25 +930,25 @@ END</source>
     </message>
     <message>
         <location filename="../artisanlib/colors.py" line="160" />
-        <location filename="../artisanlib/canvas.py" line="12042" />
+        <location filename="../artisanlib/canvas.py" line="12059" />
         <source>Finishing Phase</source>
         <translation>完成阶段</translation>
     </message>
     <message>
         <location filename="../artisanlib/colors.py" line="155" />
-        <location filename="../artisanlib/canvas.py" line="12050" />
+        <location filename="../artisanlib/canvas.py" line="12067" />
         <source>Maillard Phase</source>
         <translation>美拉德反应阶段</translation>
     </message>
     <message>
         <location filename="../artisanlib/colors.py" line="150" />
-        <location filename="../artisanlib/canvas.py" line="12057" />
+        <location filename="../artisanlib/canvas.py" line="12074" />
         <source>Drying Phase</source>
         <translation>脱水阶段</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="14244" />
-        <location filename="../artisanlib/canvas.py" line="13458" />
+        <location filename="../artisanlib/canvas.py" line="14293" />
+        <location filename="../artisanlib/canvas.py" line="13503" />
         <source>OFF</source>
         <translation>关闭</translation>
     </message>
@@ -1122,17 +1122,6 @@ END</source>
 </context><context>
     <name>CheckBox</name>
     <message>
-        <location filename="../artisanlib/curves.py" line="1038" />
-        <location filename="../artisanlib/curves.py" line="949" />
-        <location filename="../artisanlib/curves.py" line="943" />
-        <location filename="../artisanlib/curves.py" line="936" />
-        <location filename="../artisanlib/curves.py" line="918" />
-        <location filename="../artisanlib/background.py" line="62" />
-        <location filename="../plus/schedule.py" line="1580" />
-        <source>Show</source>
-        <translation>显示</translation>
-    </message>
-    <message>
         <location filename="../artisanlib/axis.py" line="167" />
         <source>Expand</source>
         <translation>扩展</translation>
@@ -1284,12 +1273,12 @@ END</source>
     </message>
     <message>
         <location filename="../artisanlib/background.py" line="72" />
-        <location filename="../artisanlib/events.py" line="977" />
+        <location filename="../artisanlib/events.py" line="989" />
         <source>Keyboard Control</source>
         <translation>键盘控制</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="980" />
+        <location filename="../artisanlib/events.py" line="992" />
         <source>Alternative Layout</source>
         <translation>替代布局</translation>
     </message>
@@ -1314,14 +1303,25 @@ END</source>
         <translation>漂浮</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1361" />
+        <location filename="../artisanlib/ports.py" line="1382" />
         <source>START on CHARGE</source>
         <translation>投豆时开始</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1363" />
+        <location filename="../artisanlib/ports.py" line="1384" />
         <source>OFF on DROP</source>
         <translation>排豆后关闭</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1580" />
+        <location filename="../artisanlib/curves.py" line="1038" />
+        <location filename="../artisanlib/curves.py" line="949" />
+        <location filename="../artisanlib/curves.py" line="943" />
+        <location filename="../artisanlib/curves.py" line="936" />
+        <location filename="../artisanlib/curves.py" line="918" />
+        <location filename="../artisanlib/background.py" line="62" />
+        <source>Show</source>
+        <translation>显示</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="404" />
@@ -1386,61 +1386,61 @@ END</source>
         <translation>总是显示</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23931" />
+        <location filename="../artisanlib/main.py" line="23995" />
         <location filename="../artisanlib/roast_properties.py" line="1189" />
         <source>Heavy FC</source>
         <translation>较强一爆</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23933" />
+        <location filename="../artisanlib/main.py" line="23997" />
         <location filename="../artisanlib/roast_properties.py" line="1192" />
         <source>Low FC</source>
         <translation>较弱一爆</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23935" />
+        <location filename="../artisanlib/main.py" line="23999" />
         <location filename="../artisanlib/roast_properties.py" line="1195" />
         <source>Light Cut</source>
         <translation>浅色中线</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23937" />
+        <location filename="../artisanlib/main.py" line="24001" />
         <location filename="../artisanlib/roast_properties.py" line="1198" />
         <source>Dark Cut</source>
         <translation>深色中线</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23939" />
+        <location filename="../artisanlib/main.py" line="24003" />
         <location filename="../artisanlib/roast_properties.py" line="1201" />
         <source>Drops</source>
         <translation>滴油</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23941" />
+        <location filename="../artisanlib/main.py" line="24005" />
         <location filename="../artisanlib/roast_properties.py" line="1204" />
         <source>Oily</source>
         <translation>豆表有油</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23943" />
+        <location filename="../artisanlib/main.py" line="24007" />
         <location filename="../artisanlib/roast_properties.py" line="1207" />
         <source>Uneven</source>
         <translation>不均匀</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23945" />
+        <location filename="../artisanlib/main.py" line="24009" />
         <location filename="../artisanlib/roast_properties.py" line="1209" />
         <source>Tipping</source>
         <translation>不规则</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23947" />
+        <location filename="../artisanlib/main.py" line="24011" />
         <location filename="../artisanlib/roast_properties.py" line="1211" />
         <source>Scorching</source>
         <translation>焦烧</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23949" />
+        <location filename="../artisanlib/main.py" line="24013" />
         <location filename="../artisanlib/roast_properties.py" line="1213" />
         <source>Divots</source>
         <translation>裂缝</translation>
@@ -1831,7 +1831,7 @@ END</source>
     </message>
     <message>
         <location filename="../artisanlib/alarms.py" line="897" />
-        <location filename="../artisanlib/events.py" line="1257" />
+        <location filename="../artisanlib/events.py" line="1269" />
         <location filename="../artisanlib/events.py" line="764" />
         <location filename="../artisanlib/events.py" line="126" />
         <location filename="../artisanlib/pid_dialogs.py" line="826" />
@@ -1865,21 +1865,21 @@ END</source>
         <translation>开始</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="18646" />
+        <location filename="../artisanlib/canvas.py" line="18695" />
         <location filename="../artisanlib/alarms.py" line="910" />
         <location filename="../artisanlib/alarms.py" line="854" />
         <location filename="../artisanlib/curves.py" line="2132" />
         <location filename="../artisanlib/roast_properties.py" line="4500" />
         <location filename="../artisanlib/roast_properties.py" line="754" />
         <location filename="../artisanlib/background.py" line="1081" />
-        <location filename="../artisanlib/events.py" line="1348" />
+        <location filename="../artisanlib/events.py" line="1381" />
         <location filename="../artisanlib/pid_dialogs.py" line="839" />
         <source>COOL END</source>
         <translation>冷却结束</translation>
     </message>
     <message>
         <location filename="../artisanlib/alarms.py" line="911" />
-        <location filename="../artisanlib/events.py" line="2727" />
+        <location filename="../artisanlib/events.py" line="2790" />
         <location filename="../artisanlib/pid_dialogs.py" line="840" />
         <source>OFF</source>
         <translation>关闭</translation>
@@ -1915,14 +1915,14 @@ END</source>
         <translation>SV</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12314" />
+        <location filename="../artisanlib/main.py" line="12362" />
         <location filename="../artisanlib/alarms.py" line="918" />
         <location filename="../artisanlib/pid_dialogs.py" line="847" />
         <source>Playback ON</source>
         <translation>打开回放</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12316" />
+        <location filename="../artisanlib/main.py" line="12364" />
         <location filename="../artisanlib/alarms.py" line="919" />
         <location filename="../artisanlib/pid_dialogs.py" line="848" />
         <source>Playback OFF</source>
@@ -1941,137 +1941,137 @@ END</source>
         <translation>重置画布颜色</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="1256" />
+        <location filename="../artisanlib/events.py" line="1268" />
         <location filename="../artisanlib/events.py" line="761" />
         <location filename="../artisanlib/events.py" line="125" />
         <source>Serial Command</source>
         <translation>串行指令</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="1275" />
+        <location filename="../artisanlib/events.py" line="1287" />
         <location filename="../artisanlib/events.py" line="127" />
         <source>Multiple Event</source>
         <translation>多个事件</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="1258" />
+        <location filename="../artisanlib/events.py" line="1270" />
         <location filename="../artisanlib/events.py" line="762" />
         <location filename="../artisanlib/events.py" line="128" />
         <source>Modbus Command</source>
         <translation>Modbus 指令</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="1259" />
+        <location filename="../artisanlib/events.py" line="1271" />
         <location filename="../artisanlib/events.py" line="763" />
         <location filename="../artisanlib/events.py" line="129" />
         <source>DTA Command</source>
         <translation>DTA 指令</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="1260" />
+        <location filename="../artisanlib/events.py" line="1272" />
         <location filename="../artisanlib/events.py" line="771" />
         <location filename="../artisanlib/events.py" line="130" />
         <source>IO Command</source>
         <translation>IO 指令</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="1261" />
+        <location filename="../artisanlib/events.py" line="1273" />
         <location filename="../artisanlib/events.py" line="765" />
         <location filename="../artisanlib/events.py" line="131" />
         <source>Hottop Heater</source>
         <translation>Hottop 加热器</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="1262" />
+        <location filename="../artisanlib/events.py" line="1274" />
         <location filename="../artisanlib/events.py" line="766" />
         <location filename="../artisanlib/events.py" line="132" />
         <source>Hottop Fan</source>
         <translation>Hottop 风机</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="1263" />
+        <location filename="../artisanlib/events.py" line="1275" />
         <location filename="../artisanlib/events.py" line="767" />
         <location filename="../artisanlib/events.py" line="133" />
         <source>Hottop Command</source>
         <translation>Hottop 指令</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="1264" />
+        <location filename="../artisanlib/events.py" line="1276" />
         <location filename="../artisanlib/events.py" line="134" />
         <source>p-i-d</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="1265" />
+        <location filename="../artisanlib/events.py" line="1277" />
         <location filename="../artisanlib/events.py" line="768" />
         <location filename="../artisanlib/events.py" line="135" />
         <source>Fuji Command</source>
         <translation>Fuji 指令</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="1266" />
+        <location filename="../artisanlib/events.py" line="1278" />
         <location filename="../artisanlib/events.py" line="769" />
         <location filename="../artisanlib/events.py" line="136" />
         <source>PWM Command</source>
         <translation>PWM 指令</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="1267" />
+        <location filename="../artisanlib/events.py" line="1279" />
         <location filename="../artisanlib/events.py" line="770" />
         <location filename="../artisanlib/events.py" line="137" />
         <source>VOUT Command</source>
         <translation>VOUT 指令</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="1268" />
+        <location filename="../artisanlib/events.py" line="1280" />
         <location filename="../artisanlib/events.py" line="772" />
         <location filename="../artisanlib/events.py" line="138" />
         <source>S7 Command</source>
         <translation>S7 指令</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="1269" />
+        <location filename="../artisanlib/events.py" line="1281" />
         <location filename="../artisanlib/events.py" line="773" />
         <location filename="../artisanlib/events.py" line="139" />
         <source>Aillio R1 Heater</source>
         <translation>Aillio R1加热器</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="1270" />
+        <location filename="../artisanlib/events.py" line="1282" />
         <location filename="../artisanlib/events.py" line="774" />
         <location filename="../artisanlib/events.py" line="140" />
         <source>Aillio R1 Fan</source>
         <translation>Aillio R1风机</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="1271" />
+        <location filename="../artisanlib/events.py" line="1283" />
         <location filename="../artisanlib/events.py" line="775" />
         <location filename="../artisanlib/events.py" line="141" />
         <source>Aillio R1 Drum</source>
         <translation>Aillio R1滚筒</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="1272" />
+        <location filename="../artisanlib/events.py" line="1284" />
         <location filename="../artisanlib/events.py" line="142" />
         <source>Aillio R1 Command</source>
         <translation>Aillio R1指令</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="1273" />
+        <location filename="../artisanlib/events.py" line="1285" />
         <location filename="../artisanlib/events.py" line="776" />
         <location filename="../artisanlib/events.py" line="143" />
         <source>Artisan Command</source>
         <translation>Artisan 指令</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="1274" />
+        <location filename="../artisanlib/events.py" line="1286" />
         <location filename="../artisanlib/events.py" line="777" />
         <location filename="../artisanlib/events.py" line="144" />
         <source>RC Command</source>
         <translation>RC 指令</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="1276" />
+        <location filename="../artisanlib/events.py" line="1288" />
         <location filename="../artisanlib/events.py" line="778" />
         <location filename="../artisanlib/events.py" line="145" />
         <source>WebSocket Command</source>
@@ -2135,42 +2135,42 @@ END</source>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="2247" />
-        <location filename="../artisanlib/events.py" line="1097" />
+        <location filename="../artisanlib/events.py" line="1109" />
         <source>ET</source>
         <translation />
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="2248" />
-        <location filename="../artisanlib/events.py" line="1098" />
+        <location filename="../artisanlib/events.py" line="1110" />
         <source>BT</source>
         <translation />
     </message>
     <message>
         <location filename="../artisanlib/alarms.py" line="844" />
         <location filename="../artisanlib/alarms.py" line="820" />
-        <location filename="../artisanlib/events.py" line="2728" />
+        <location filename="../artisanlib/events.py" line="2791" />
         <source>ON</source>
         <translation>打开</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="552" />
+        <location filename="../artisanlib/ports.py" line="570" />
         <source>words</source>
         <translation>数据</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="951" />
-        <location filename="../artisanlib/ports.py" line="763" />
+        <location filename="../artisanlib/ports.py" line="969" />
+        <location filename="../artisanlib/ports.py" line="781" />
         <source>optimize</source>
         <translation>最优化</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="956" />
-        <location filename="../artisanlib/ports.py" line="768" />
+        <location filename="../artisanlib/ports.py" line="974" />
+        <location filename="../artisanlib/ports.py" line="786" />
         <source>fetch full blocks</source>
         <translation>获取完整块</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1479" />
+        <location filename="../artisanlib/ports.py" line="1500" />
         <source>compression</source>
         <translation>压缩</translation>
     </message>
@@ -2305,66 +2305,66 @@ END</source>
         <translation>离散</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="1782" />
-        <location filename="../artisanlib/canvas.py" line="1775" />
-        <location filename="../artisanlib/canvas.py" line="1547" />
+        <location filename="../artisanlib/canvas.py" line="1788" />
+        <location filename="../artisanlib/canvas.py" line="1781" />
+        <location filename="../artisanlib/canvas.py" line="1553" />
         <source>Air</source>
         <translation>气流</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="1790" />
-        <location filename="../artisanlib/canvas.py" line="1783" />
-        <location filename="../artisanlib/canvas.py" line="1776" />
-        <location filename="../artisanlib/canvas.py" line="1548" />
+        <location filename="../artisanlib/canvas.py" line="1796" />
+        <location filename="../artisanlib/canvas.py" line="1789" />
+        <location filename="../artisanlib/canvas.py" line="1782" />
+        <location filename="../artisanlib/canvas.py" line="1554" />
         <source>Drum</source>
         <translation>滚筒</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="1784" />
-        <location filename="../artisanlib/canvas.py" line="1777" />
-        <location filename="../artisanlib/canvas.py" line="1549" />
+        <location filename="../artisanlib/canvas.py" line="1790" />
+        <location filename="../artisanlib/canvas.py" line="1783" />
+        <location filename="../artisanlib/canvas.py" line="1555" />
         <source>Damper</source>
         <translation>风门</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="1785" />
-        <location filename="../artisanlib/canvas.py" line="1778" />
-        <location filename="../artisanlib/canvas.py" line="1550" />
+        <location filename="../artisanlib/canvas.py" line="1791" />
+        <location filename="../artisanlib/canvas.py" line="1784" />
+        <location filename="../artisanlib/canvas.py" line="1556" />
         <source>Burner</source>
         <translation>火力</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="1577" />
+        <location filename="../artisanlib/canvas.py" line="1583" />
         <source>Propane Gas (LPG)</source>
         <translation>丙烷 (LPG)</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="1578" />
+        <location filename="../artisanlib/canvas.py" line="1584" />
         <source>Natural Gas (NG)</source>
         <translation>天然气 (NG)</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="1579" />
+        <location filename="../artisanlib/canvas.py" line="1585" />
         <source>Electric</source>
         <translation>电力</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="1789" />
+        <location filename="../artisanlib/canvas.py" line="1795" />
         <source>Fan</source>
         <translation>风机</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="1791" />
+        <location filename="../artisanlib/canvas.py" line="1797" />
         <source>Cooling</source>
         <translation>冷却</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="1792" />
+        <location filename="../artisanlib/canvas.py" line="1798" />
         <source>Heater</source>
         <translation>加热器</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="2420" />
+        <location filename="../artisanlib/canvas.py" line="2426" />
         <source>Elec</source>
         <translation>电</translation>
     </message>
@@ -2423,6 +2423,51 @@ END</source>
 </context><context>
     <name>Contextual Menu</name>
     <message>
+        <location filename="../artisanlib/canvas.py" line="18470" />
+        <source>Add point</source>
+        <translation>增加点</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/canvas.py" line="18474" />
+        <source>Remove point</source>
+        <translation>移除点</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/canvas.py" line="18480" />
+        <source>Load points</source>
+        <translation>读取点</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/canvas.py" line="18484" />
+        <source>Save points</source>
+        <translation>保存点</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/canvas.py" line="18490" />
+        <source>Reset Designer</source>
+        <translation>重置曲线设计器</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/canvas.py" line="18494" />
+        <source>Config...</source>
+        <translation>配置表...</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/canvas.py" line="19271" />
+        <source>Add to Cupping Notes</source>
+        <translation>加入杯测记录</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/canvas.py" line="19275" />
+        <source>Add to Roasting Notes</source>
+        <translation>加入烘焙记录</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/canvas.py" line="19281" />
+        <source>Edit</source>
+        <translation>编辑</translation>
+    </message>
+    <message>
         <location filename="../plus/schedule.py" line="1554" />
         <source>All batches prepared</source>
         <translation>所有批次已准备好</translation>
@@ -2451,51 +2496,6 @@ END</source>
         <location filename="../plus/schedule.py" line="1584" />
         <source>Hide</source>
         <translation>隐藏</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/canvas.py" line="18421" />
-        <source>Add point</source>
-        <translation>增加点</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/canvas.py" line="18425" />
-        <source>Remove point</source>
-        <translation>移除点</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/canvas.py" line="18431" />
-        <source>Load points</source>
-        <translation>读取点</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/canvas.py" line="18435" />
-        <source>Save points</source>
-        <translation>保存点</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/canvas.py" line="18441" />
-        <source>Reset Designer</source>
-        <translation>重置曲线设计器</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/canvas.py" line="18445" />
-        <source>Config...</source>
-        <translation>配置表...</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/canvas.py" line="19222" />
-        <source>Add to Cupping Notes</source>
-        <translation>加入杯测记录</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/canvas.py" line="19226" />
-        <source>Add to Roasting Notes</source>
-        <translation>加入烘焙记录</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/canvas.py" line="19232" />
-        <source>Edit</source>
-        <translation>编辑</translation>
     </message>
 </context><context>
     <name>Countries</name>
@@ -3829,102 +3829,102 @@ END</source>
 </context><context>
     <name>Error Message</name>
     <message>
-        <location filename="../artisanlib/main.py" line="27149" />
-        <location filename="../artisanlib/main.py" line="27111" />
-        <location filename="../artisanlib/main.py" line="26968" />
-        <location filename="../artisanlib/main.py" line="26520" />
-        <location filename="../artisanlib/main.py" line="26450" />
-        <location filename="../artisanlib/main.py" line="26399" />
-        <location filename="../artisanlib/main.py" line="26258" />
-        <location filename="../artisanlib/main.py" line="26109" />
-        <location filename="../artisanlib/main.py" line="25762" />
-        <location filename="../artisanlib/main.py" line="25682" />
-        <location filename="../artisanlib/main.py" line="23914" />
-        <location filename="../artisanlib/main.py" line="23257" />
-        <location filename="../artisanlib/main.py" line="21899" />
-        <location filename="../artisanlib/main.py" line="17396" />
-        <location filename="../artisanlib/main.py" line="14419" />
-        <location filename="../artisanlib/main.py" line="13760" />
+        <location filename="../artisanlib/main.py" line="27251" />
+        <location filename="../artisanlib/main.py" line="27213" />
+        <location filename="../artisanlib/main.py" line="27070" />
+        <location filename="../artisanlib/main.py" line="26622" />
+        <location filename="../artisanlib/main.py" line="26552" />
+        <location filename="../artisanlib/main.py" line="26501" />
+        <location filename="../artisanlib/main.py" line="26360" />
+        <location filename="../artisanlib/main.py" line="26211" />
+        <location filename="../artisanlib/main.py" line="25864" />
+        <location filename="../artisanlib/main.py" line="25784" />
+        <location filename="../artisanlib/main.py" line="23978" />
+        <location filename="../artisanlib/main.py" line="23321" />
+        <location filename="../artisanlib/main.py" line="21963" />
+        <location filename="../artisanlib/main.py" line="17444" />
+        <location filename="../artisanlib/main.py" line="14467" />
+        <location filename="../artisanlib/main.py" line="13808" />
         <location filename="../artisanlib/wheels.py" line="644" />
         <source>IO Error:</source>
         <translation>IO错误:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="19406" />
-        <location filename="../artisanlib/canvas.py" line="18967" />
-        <location filename="../artisanlib/canvas.py" line="18863" />
-        <location filename="../artisanlib/canvas.py" line="18821" />
-        <location filename="../artisanlib/canvas.py" line="18716" />
-        <location filename="../artisanlib/canvas.py" line="18698" />
-        <location filename="../artisanlib/canvas.py" line="17941" />
-        <location filename="../artisanlib/canvas.py" line="17919" />
-        <location filename="../artisanlib/canvas.py" line="17634" />
-        <location filename="../artisanlib/canvas.py" line="17608" />
-        <location filename="../artisanlib/canvas.py" line="17423" />
-        <location filename="../artisanlib/canvas.py" line="17261" />
-        <location filename="../artisanlib/canvas.py" line="17204" />
-        <location filename="../artisanlib/canvas.py" line="17174" />
-        <location filename="../artisanlib/canvas.py" line="16543" />
-        <location filename="../artisanlib/canvas.py" line="16508" />
-        <location filename="../artisanlib/canvas.py" line="16243" />
-        <location filename="../artisanlib/canvas.py" line="15954" />
-        <location filename="../artisanlib/canvas.py" line="15861" />
-        <location filename="../artisanlib/canvas.py" line="15633" />
-        <location filename="../artisanlib/canvas.py" line="15448" />
-        <location filename="../artisanlib/canvas.py" line="15315" />
-        <location filename="../artisanlib/canvas.py" line="15134" />
-        <location filename="../artisanlib/canvas.py" line="15018" />
-        <location filename="../artisanlib/canvas.py" line="14908" />
-        <location filename="../artisanlib/canvas.py" line="14802" />
-        <location filename="../artisanlib/canvas.py" line="14689" />
-        <location filename="../artisanlib/canvas.py" line="14606" />
-        <location filename="../artisanlib/canvas.py" line="14546" />
-        <location filename="../artisanlib/canvas.py" line="14357" />
-        <location filename="../artisanlib/canvas.py" line="14294" />
-        <location filename="../artisanlib/canvas.py" line="13730" />
-        <location filename="../artisanlib/canvas.py" line="13680" />
-        <location filename="../artisanlib/canvas.py" line="13493" />
-        <location filename="../artisanlib/canvas.py" line="13398" />
-        <location filename="../artisanlib/canvas.py" line="12327" />
-        <location filename="../artisanlib/canvas.py" line="12091" />
-        <location filename="../artisanlib/canvas.py" line="11845" />
-        <location filename="../artisanlib/canvas.py" line="11804" />
-        <location filename="../artisanlib/canvas.py" line="11759" />
-        <location filename="../artisanlib/canvas.py" line="11504" />
-        <location filename="../artisanlib/canvas.py" line="11443" />
-        <location filename="../artisanlib/canvas.py" line="11198" />
-        <location filename="../artisanlib/canvas.py" line="11146" />
-        <location filename="../artisanlib/canvas.py" line="10777" />
-        <location filename="../artisanlib/canvas.py" line="10737" />
-        <location filename="../artisanlib/canvas.py" line="10697" />
-        <location filename="../artisanlib/canvas.py" line="10656" />
-        <location filename="../artisanlib/canvas.py" line="10209" />
-        <location filename="../artisanlib/canvas.py" line="10173" />
-        <location filename="../artisanlib/canvas.py" line="10137" />
-        <location filename="../artisanlib/canvas.py" line="10101" />
-        <location filename="../artisanlib/canvas.py" line="9336" />
-        <location filename="../artisanlib/canvas.py" line="9284" />
-        <location filename="../artisanlib/canvas.py" line="8944" />
-        <location filename="../artisanlib/canvas.py" line="8769" />
-        <location filename="../artisanlib/canvas.py" line="8301" />
-        <location filename="../artisanlib/canvas.py" line="8178" />
-        <location filename="../artisanlib/canvas.py" line="7833" />
-        <location filename="../artisanlib/canvas.py" line="7584" />
-        <location filename="../artisanlib/canvas.py" line="6774" />
-        <location filename="../artisanlib/canvas.py" line="6604" />
-        <location filename="../artisanlib/canvas.py" line="6276" />
-        <location filename="../artisanlib/canvas.py" line="6258" />
-        <location filename="../artisanlib/canvas.py" line="6233" />
-        <location filename="../artisanlib/canvas.py" line="5875" />
-        <location filename="../artisanlib/canvas.py" line="5744" />
-        <location filename="../artisanlib/canvas.py" line="5730" />
-        <location filename="../artisanlib/canvas.py" line="5345" />
-        <location filename="../artisanlib/canvas.py" line="5332" />
-        <location filename="../artisanlib/canvas.py" line="4568" />
-        <location filename="../artisanlib/canvas.py" line="4211" />
-        <location filename="../artisanlib/canvas.py" line="3777" />
-        <location filename="../artisanlib/canvas.py" line="3330" />
-        <location filename="../artisanlib/devices.py" line="4895" />
+        <location filename="../artisanlib/canvas.py" line="19455" />
+        <location filename="../artisanlib/canvas.py" line="19016" />
+        <location filename="../artisanlib/canvas.py" line="18912" />
+        <location filename="../artisanlib/canvas.py" line="18870" />
+        <location filename="../artisanlib/canvas.py" line="18765" />
+        <location filename="../artisanlib/canvas.py" line="18747" />
+        <location filename="../artisanlib/canvas.py" line="17990" />
+        <location filename="../artisanlib/canvas.py" line="17968" />
+        <location filename="../artisanlib/canvas.py" line="17683" />
+        <location filename="../artisanlib/canvas.py" line="17657" />
+        <location filename="../artisanlib/canvas.py" line="17472" />
+        <location filename="../artisanlib/canvas.py" line="17310" />
+        <location filename="../artisanlib/canvas.py" line="17253" />
+        <location filename="../artisanlib/canvas.py" line="17223" />
+        <location filename="../artisanlib/canvas.py" line="16592" />
+        <location filename="../artisanlib/canvas.py" line="16557" />
+        <location filename="../artisanlib/canvas.py" line="16292" />
+        <location filename="../artisanlib/canvas.py" line="16003" />
+        <location filename="../artisanlib/canvas.py" line="15910" />
+        <location filename="../artisanlib/canvas.py" line="15682" />
+        <location filename="../artisanlib/canvas.py" line="15497" />
+        <location filename="../artisanlib/canvas.py" line="15364" />
+        <location filename="../artisanlib/canvas.py" line="15183" />
+        <location filename="../artisanlib/canvas.py" line="15067" />
+        <location filename="../artisanlib/canvas.py" line="14957" />
+        <location filename="../artisanlib/canvas.py" line="14851" />
+        <location filename="../artisanlib/canvas.py" line="14738" />
+        <location filename="../artisanlib/canvas.py" line="14655" />
+        <location filename="../artisanlib/canvas.py" line="14595" />
+        <location filename="../artisanlib/canvas.py" line="14406" />
+        <location filename="../artisanlib/canvas.py" line="14343" />
+        <location filename="../artisanlib/canvas.py" line="13779" />
+        <location filename="../artisanlib/canvas.py" line="13729" />
+        <location filename="../artisanlib/canvas.py" line="13538" />
+        <location filename="../artisanlib/canvas.py" line="13439" />
+        <location filename="../artisanlib/canvas.py" line="12344" />
+        <location filename="../artisanlib/canvas.py" line="12108" />
+        <location filename="../artisanlib/canvas.py" line="11862" />
+        <location filename="../artisanlib/canvas.py" line="11821" />
+        <location filename="../artisanlib/canvas.py" line="11776" />
+        <location filename="../artisanlib/canvas.py" line="11521" />
+        <location filename="../artisanlib/canvas.py" line="11460" />
+        <location filename="../artisanlib/canvas.py" line="11215" />
+        <location filename="../artisanlib/canvas.py" line="11163" />
+        <location filename="../artisanlib/canvas.py" line="10794" />
+        <location filename="../artisanlib/canvas.py" line="10754" />
+        <location filename="../artisanlib/canvas.py" line="10714" />
+        <location filename="../artisanlib/canvas.py" line="10673" />
+        <location filename="../artisanlib/canvas.py" line="10226" />
+        <location filename="../artisanlib/canvas.py" line="10190" />
+        <location filename="../artisanlib/canvas.py" line="10154" />
+        <location filename="../artisanlib/canvas.py" line="10118" />
+        <location filename="../artisanlib/canvas.py" line="9353" />
+        <location filename="../artisanlib/canvas.py" line="9301" />
+        <location filename="../artisanlib/canvas.py" line="8961" />
+        <location filename="../artisanlib/canvas.py" line="8786" />
+        <location filename="../artisanlib/canvas.py" line="8318" />
+        <location filename="../artisanlib/canvas.py" line="8195" />
+        <location filename="../artisanlib/canvas.py" line="7850" />
+        <location filename="../artisanlib/canvas.py" line="7601" />
+        <location filename="../artisanlib/canvas.py" line="6787" />
+        <location filename="../artisanlib/canvas.py" line="6615" />
+        <location filename="../artisanlib/canvas.py" line="6287" />
+        <location filename="../artisanlib/canvas.py" line="6269" />
+        <location filename="../artisanlib/canvas.py" line="6244" />
+        <location filename="../artisanlib/canvas.py" line="5886" />
+        <location filename="../artisanlib/canvas.py" line="5755" />
+        <location filename="../artisanlib/canvas.py" line="5741" />
+        <location filename="../artisanlib/canvas.py" line="5356" />
+        <location filename="../artisanlib/canvas.py" line="5343" />
+        <location filename="../artisanlib/canvas.py" line="4574" />
+        <location filename="../artisanlib/canvas.py" line="4217" />
+        <location filename="../artisanlib/canvas.py" line="3783" />
+        <location filename="../artisanlib/canvas.py" line="3336" />
+        <location filename="../artisanlib/devices.py" line="4919" />
         <location filename="../artisanlib/devices.py" line="3390" />
         <location filename="../artisanlib/devices.py" line="3290" />
         <location filename="../artisanlib/devices.py" line="3243" />
@@ -3934,84 +3934,84 @@ END</source>
         <location filename="../artisanlib/devices.py" line="3099" />
         <location filename="../artisanlib/devices.py" line="3084" />
         <location filename="../artisanlib/devices.py" line="2890" />
-        <location filename="../artisanlib/main.py" line="27683" />
-        <location filename="../artisanlib/main.py" line="27577" />
-        <location filename="../artisanlib/main.py" line="27404" />
-        <location filename="../artisanlib/main.py" line="27390" />
-        <location filename="../artisanlib/main.py" line="27154" />
-        <location filename="../artisanlib/main.py" line="27116" />
-        <location filename="../artisanlib/main.py" line="26530" />
-        <location filename="../artisanlib/main.py" line="26264" />
-        <location filename="../artisanlib/main.py" line="26115" />
-        <location filename="../artisanlib/main.py" line="26068" />
-        <location filename="../artisanlib/main.py" line="25768" />
-        <location filename="../artisanlib/main.py" line="25688" />
-        <location filename="../artisanlib/main.py" line="25255" />
-        <location filename="../artisanlib/main.py" line="25043" />
-        <location filename="../artisanlib/main.py" line="24586" />
-        <location filename="../artisanlib/main.py" line="24399" />
-        <location filename="../artisanlib/main.py" line="23925" />
-        <location filename="../artisanlib/main.py" line="23521" />
-        <location filename="../artisanlib/main.py" line="23516" />
-        <location filename="../artisanlib/main.py" line="23447" />
-        <location filename="../artisanlib/main.py" line="23431" />
-        <location filename="../artisanlib/main.py" line="23187" />
-        <location filename="../artisanlib/main.py" line="23038" />
-        <location filename="../artisanlib/main.py" line="22913" />
-        <location filename="../artisanlib/main.py" line="22542" />
-        <location filename="../artisanlib/main.py" line="22142" />
-        <location filename="../artisanlib/main.py" line="21964" />
-        <location filename="../artisanlib/main.py" line="21925" />
-        <location filename="../artisanlib/main.py" line="21906" />
-        <location filename="../artisanlib/main.py" line="21282" />
-        <location filename="../artisanlib/main.py" line="21239" />
-        <location filename="../artisanlib/main.py" line="20068" />
-        <location filename="../artisanlib/main.py" line="19665" />
-        <location filename="../artisanlib/main.py" line="19574" />
-        <location filename="../artisanlib/main.py" line="17850" />
-        <location filename="../artisanlib/main.py" line="17382" />
-        <location filename="../artisanlib/main.py" line="17292" />
-        <location filename="../artisanlib/main.py" line="17285" />
-        <location filename="../artisanlib/main.py" line="17270" />
-        <location filename="../artisanlib/main.py" line="17007" />
-        <location filename="../artisanlib/main.py" line="16994" />
-        <location filename="../artisanlib/main.py" line="16940" />
-        <location filename="../artisanlib/main.py" line="16924" />
-        <location filename="../artisanlib/main.py" line="16813" />
-        <location filename="../artisanlib/main.py" line="16789" />
-        <location filename="../artisanlib/main.py" line="16771" />
-        <location filename="../artisanlib/main.py" line="16454" />
-        <location filename="../artisanlib/main.py" line="15338" />
-        <location filename="../artisanlib/main.py" line="15150" />
-        <location filename="../artisanlib/main.py" line="14880" />
-        <location filename="../artisanlib/main.py" line="14829" />
-        <location filename="../artisanlib/main.py" line="14809" />
-        <location filename="../artisanlib/main.py" line="14569" />
-        <location filename="../artisanlib/main.py" line="14556" />
-        <location filename="../artisanlib/main.py" line="14430" />
-        <location filename="../artisanlib/main.py" line="14075" />
-        <location filename="../artisanlib/main.py" line="14024" />
-        <location filename="../artisanlib/main.py" line="13983" />
-        <location filename="../artisanlib/main.py" line="13778" />
-        <location filename="../artisanlib/main.py" line="13624" />
-        <location filename="../artisanlib/main.py" line="13363" />
-        <location filename="../artisanlib/main.py" line="9697" />
-        <location filename="../artisanlib/main.py" line="9008" />
-        <location filename="../artisanlib/main.py" line="8718" />
-        <location filename="../artisanlib/main.py" line="8340" />
-        <location filename="../artisanlib/main.py" line="8278" />
-        <location filename="../artisanlib/main.py" line="7979" />
-        <location filename="../artisanlib/main.py" line="7637" />
-        <location filename="../artisanlib/main.py" line="7506" />
-        <location filename="../artisanlib/main.py" line="6744" />
-        <location filename="../artisanlib/main.py" line="6369" />
-        <location filename="../artisanlib/main.py" line="6344" />
-        <location filename="../artisanlib/main.py" line="6315" />
-        <location filename="../artisanlib/main.py" line="6284" />
-        <location filename="../artisanlib/main.py" line="5712" />
-        <location filename="../artisanlib/main.py" line="5434" />
-        <location filename="../artisanlib/main.py" line="1324" />
-        <location filename="../artisanlib/alarms.py" line="1052" />
+        <location filename="../artisanlib/main.py" line="27785" />
+        <location filename="../artisanlib/main.py" line="27679" />
+        <location filename="../artisanlib/main.py" line="27506" />
+        <location filename="../artisanlib/main.py" line="27492" />
+        <location filename="../artisanlib/main.py" line="27256" />
+        <location filename="../artisanlib/main.py" line="27218" />
+        <location filename="../artisanlib/main.py" line="26632" />
+        <location filename="../artisanlib/main.py" line="26366" />
+        <location filename="../artisanlib/main.py" line="26217" />
+        <location filename="../artisanlib/main.py" line="26170" />
+        <location filename="../artisanlib/main.py" line="25870" />
+        <location filename="../artisanlib/main.py" line="25790" />
+        <location filename="../artisanlib/main.py" line="25357" />
+        <location filename="../artisanlib/main.py" line="25145" />
+        <location filename="../artisanlib/main.py" line="24650" />
+        <location filename="../artisanlib/main.py" line="24463" />
+        <location filename="../artisanlib/main.py" line="23989" />
+        <location filename="../artisanlib/main.py" line="23585" />
+        <location filename="../artisanlib/main.py" line="23580" />
+        <location filename="../artisanlib/main.py" line="23511" />
+        <location filename="../artisanlib/main.py" line="23495" />
+        <location filename="../artisanlib/main.py" line="23251" />
+        <location filename="../artisanlib/main.py" line="23102" />
+        <location filename="../artisanlib/main.py" line="22977" />
+        <location filename="../artisanlib/main.py" line="22606" />
+        <location filename="../artisanlib/main.py" line="22206" />
+        <location filename="../artisanlib/main.py" line="22028" />
+        <location filename="../artisanlib/main.py" line="21989" />
+        <location filename="../artisanlib/main.py" line="21970" />
+        <location filename="../artisanlib/main.py" line="21346" />
+        <location filename="../artisanlib/main.py" line="21303" />
+        <location filename="../artisanlib/main.py" line="20140" />
+        <location filename="../artisanlib/main.py" line="19737" />
+        <location filename="../artisanlib/main.py" line="19646" />
+        <location filename="../artisanlib/main.py" line="17898" />
+        <location filename="../artisanlib/main.py" line="17430" />
+        <location filename="../artisanlib/main.py" line="17340" />
+        <location filename="../artisanlib/main.py" line="17333" />
+        <location filename="../artisanlib/main.py" line="17318" />
+        <location filename="../artisanlib/main.py" line="17055" />
+        <location filename="../artisanlib/main.py" line="17042" />
+        <location filename="../artisanlib/main.py" line="16988" />
+        <location filename="../artisanlib/main.py" line="16972" />
+        <location filename="../artisanlib/main.py" line="16861" />
+        <location filename="../artisanlib/main.py" line="16837" />
+        <location filename="../artisanlib/main.py" line="16819" />
+        <location filename="../artisanlib/main.py" line="16502" />
+        <location filename="../artisanlib/main.py" line="15386" />
+        <location filename="../artisanlib/main.py" line="15198" />
+        <location filename="../artisanlib/main.py" line="14928" />
+        <location filename="../artisanlib/main.py" line="14877" />
+        <location filename="../artisanlib/main.py" line="14857" />
+        <location filename="../artisanlib/main.py" line="14617" />
+        <location filename="../artisanlib/main.py" line="14604" />
+        <location filename="../artisanlib/main.py" line="14478" />
+        <location filename="../artisanlib/main.py" line="14123" />
+        <location filename="../artisanlib/main.py" line="14072" />
+        <location filename="../artisanlib/main.py" line="14031" />
+        <location filename="../artisanlib/main.py" line="13826" />
+        <location filename="../artisanlib/main.py" line="13672" />
+        <location filename="../artisanlib/main.py" line="13411" />
+        <location filename="../artisanlib/main.py" line="9745" />
+        <location filename="../artisanlib/main.py" line="9044" />
+        <location filename="../artisanlib/main.py" line="8754" />
+        <location filename="../artisanlib/main.py" line="8376" />
+        <location filename="../artisanlib/main.py" line="8314" />
+        <location filename="../artisanlib/main.py" line="8015" />
+        <location filename="../artisanlib/main.py" line="7673" />
+        <location filename="../artisanlib/main.py" line="7542" />
+        <location filename="../artisanlib/main.py" line="6780" />
+        <location filename="../artisanlib/main.py" line="6405" />
+        <location filename="../artisanlib/main.py" line="6380" />
+        <location filename="../artisanlib/main.py" line="6351" />
+        <location filename="../artisanlib/main.py" line="6320" />
+        <location filename="../artisanlib/main.py" line="5715" />
+        <location filename="../artisanlib/main.py" line="5437" />
+        <location filename="../artisanlib/main.py" line="1325" />
+        <location filename="../artisanlib/alarms.py" line="1055" />
         <location filename="../artisanlib/alarms.py" line="799" />
         <location filename="../artisanlib/alarms.py" line="706" />
         <location filename="../artisanlib/alarms.py" line="677" />
@@ -4035,41 +4035,41 @@ END</source>
         <location filename="../artisanlib/pid_control.py" line="710" />
         <location filename="../artisanlib/roast_properties.py" line="3657" />
         <location filename="../artisanlib/roast_properties.py" line="2641" />
-        <location filename="../artisanlib/ports.py" line="1696" />
-        <location filename="../artisanlib/ports.py" line="1653" />
-        <location filename="../artisanlib/events.py" line="3706" />
-        <location filename="../artisanlib/comm.py" line="7430" />
-        <location filename="../artisanlib/comm.py" line="7401" />
-        <location filename="../artisanlib/comm.py" line="7290" />
-        <location filename="../artisanlib/comm.py" line="7105" />
-        <location filename="../artisanlib/comm.py" line="6891" />
-        <location filename="../artisanlib/comm.py" line="6416" />
-        <location filename="../artisanlib/comm.py" line="4610" />
-        <location filename="../artisanlib/comm.py" line="4393" />
-        <location filename="../artisanlib/comm.py" line="4323" />
-        <location filename="../artisanlib/comm.py" line="4074" />
-        <location filename="../artisanlib/comm.py" line="3952" />
-        <location filename="../artisanlib/comm.py" line="3723" />
-        <location filename="../artisanlib/comm.py" line="3639" />
-        <location filename="../artisanlib/comm.py" line="3576" />
-        <location filename="../artisanlib/comm.py" line="3527" />
-        <location filename="../artisanlib/comm.py" line="3482" />
-        <location filename="../artisanlib/comm.py" line="3422" />
-        <location filename="../artisanlib/comm.py" line="3369" />
-        <location filename="../artisanlib/comm.py" line="3308" />
-        <location filename="../artisanlib/comm.py" line="3263" />
-        <location filename="../artisanlib/comm.py" line="3055" />
-        <location filename="../artisanlib/comm.py" line="3018" />
-        <location filename="../artisanlib/comm.py" line="2991" />
-        <location filename="../artisanlib/comm.py" line="2950" />
-        <location filename="../artisanlib/comm.py" line="2927" />
-        <location filename="../artisanlib/comm.py" line="2873" />
-        <location filename="../artisanlib/comm.py" line="2825" />
-        <location filename="../artisanlib/comm.py" line="2396" />
-        <location filename="../artisanlib/comm.py" line="984" />
-        <location filename="../artisanlib/comm.py" line="617" />
-        <location filename="../artisanlib/comm.py" line="613" />
-        <location filename="../artisanlib/comm.py" line="609" />
+        <location filename="../artisanlib/ports.py" line="1933" />
+        <location filename="../artisanlib/ports.py" line="1890" />
+        <location filename="../artisanlib/events.py" line="3772" />
+        <location filename="../artisanlib/comm.py" line="7474" />
+        <location filename="../artisanlib/comm.py" line="7445" />
+        <location filename="../artisanlib/comm.py" line="7334" />
+        <location filename="../artisanlib/comm.py" line="7149" />
+        <location filename="../artisanlib/comm.py" line="6935" />
+        <location filename="../artisanlib/comm.py" line="6460" />
+        <location filename="../artisanlib/comm.py" line="4654" />
+        <location filename="../artisanlib/comm.py" line="4437" />
+        <location filename="../artisanlib/comm.py" line="4367" />
+        <location filename="../artisanlib/comm.py" line="4118" />
+        <location filename="../artisanlib/comm.py" line="3996" />
+        <location filename="../artisanlib/comm.py" line="3767" />
+        <location filename="../artisanlib/comm.py" line="3683" />
+        <location filename="../artisanlib/comm.py" line="3620" />
+        <location filename="../artisanlib/comm.py" line="3571" />
+        <location filename="../artisanlib/comm.py" line="3526" />
+        <location filename="../artisanlib/comm.py" line="3466" />
+        <location filename="../artisanlib/comm.py" line="3413" />
+        <location filename="../artisanlib/comm.py" line="3352" />
+        <location filename="../artisanlib/comm.py" line="3307" />
+        <location filename="../artisanlib/comm.py" line="3099" />
+        <location filename="../artisanlib/comm.py" line="3062" />
+        <location filename="../artisanlib/comm.py" line="3035" />
+        <location filename="../artisanlib/comm.py" line="2994" />
+        <location filename="../artisanlib/comm.py" line="2971" />
+        <location filename="../artisanlib/comm.py" line="2917" />
+        <location filename="../artisanlib/comm.py" line="2869" />
+        <location filename="../artisanlib/comm.py" line="2440" />
+        <location filename="../artisanlib/comm.py" line="990" />
+        <location filename="../artisanlib/comm.py" line="623" />
+        <location filename="../artisanlib/comm.py" line="619" />
+        <location filename="../artisanlib/comm.py" line="615" />
         <location filename="../artisanlib/pid_dialogs.py" line="4539" />
         <location filename="../artisanlib/pid_dialogs.py" line="3537" />
         <location filename="../artisanlib/pid_dialogs.py" line="3512" />
@@ -4098,169 +4098,184 @@ END</source>
         <translation>部分数值无法写入到PID</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="616" />
-        <location filename="../artisanlib/comm.py" line="612" />
-        <location filename="../artisanlib/comm.py" line="608" />
+        <location filename="../artisanlib/comm.py" line="622" />
+        <location filename="../artisanlib/comm.py" line="618" />
+        <location filename="../artisanlib/comm.py" line="614" />
         <source>F80h Error</source>
         <translation>F80h错误</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="625" />
+        <location filename="../artisanlib/comm.py" line="631" />
         <source>CRC16 data corruption ERROR. TX does not match RX. Check wiring</source>
         <translation>CRC16数据发生错误. 传入传出不匹配.请检查线路</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="627" />
+        <location filename="../artisanlib/comm.py" line="633" />
         <source>No RX data received</source>
         <translation>没有接收到传入数据</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="7508" />
-        <location filename="../artisanlib/comm.py" line="7500" />
-        <location filename="../artisanlib/comm.py" line="7483" />
-        <location filename="../artisanlib/comm.py" line="2692" />
-        <location filename="../artisanlib/comm.py" line="923" />
-        <location filename="../artisanlib/comm.py" line="632" />
+        <location filename="../artisanlib/comm.py" line="7552" />
+        <location filename="../artisanlib/comm.py" line="7544" />
+        <location filename="../artisanlib/comm.py" line="7527" />
+        <location filename="../artisanlib/comm.py" line="2736" />
+        <location filename="../artisanlib/comm.py" line="929" />
+        <location filename="../artisanlib/comm.py" line="638" />
         <source>Serial Exception:</source>
         <translation>串行通信错误:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="917" />
+        <location filename="../artisanlib/comm.py" line="923" />
         <source>DTAcommand(): {0} bytes received but 15 needed</source>
         <translation>DTA指令(): {0} bytes已接收但需要至少15bytes</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="986" />
+        <location filename="../artisanlib/comm.py" line="992" />
         <source>callprogram() received:</source>
         <translation>运行程序() 已接收:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="2373" />
+        <location filename="../artisanlib/comm.py" line="2417" />
         <source>Extech755pressure(): conversion error, {0} bytes received</source>
         <translation>Extech755pressure():转换失败,{0} bytes 已接收</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="2384" />
+        <location filename="../artisanlib/comm.py" line="2428" />
         <source>Extech755pressure(): {0} bytes received but 10 needed</source>
         <translation>Extech755pressure(): {0} bytes已接收但需要至少10bytes</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="2692" />
+        <location filename="../artisanlib/comm.py" line="2736" />
         <source>Unable to open serial port</source>
         <translation>无法打开串行端口</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="2819" />
+        <location filename="../artisanlib/comm.py" line="2863" />
         <source>MS6514temperature(): {0} bytes received but 18 needed</source>
         <translation>MS6514温度(): {0} bytes已接收但需要至少18bytes</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="2867" />
+        <location filename="../artisanlib/comm.py" line="2911" />
         <source>DT301temperature(): {0} bytes received but 11 needed</source>
         <translation>DT301温度(): {0} bytes已接收但需要至少11bytes</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="2985" />
+        <location filename="../artisanlib/comm.py" line="3029" />
         <source>HH806AUtemperature(): {0} bytes received</source>
         <translation>HH806AU温度(): {0} bytes已接收</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="3031" />
+        <location filename="../artisanlib/comm.py" line="3075" />
         <source>HH806Wtemperature(): Unable to initiate device</source>
         <translation>HH806W温度(): 无法初始化设备</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="3258" />
+        <location filename="../artisanlib/comm.py" line="3302" />
         <source>HH506RAGetID: {0} bytes received but 5 needed</source>
         <translation>HH506RA获取ID: {0} bytes已接收但需要至少5bytes</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="3277" />
+        <location filename="../artisanlib/comm.py" line="3321" />
         <source>HH506RAtemperature(): Unable to get id from HH506RA device </source>
         <translation>HH506RA温度():无法从HH506RA设备获取ID </translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="3302" />
+        <location filename="../artisanlib/comm.py" line="3346" />
         <source>HH506RAtemperature(): {0} bytes received but 14 needed</source>
         <translation>HH506RA温度(): {0} bytes已接收但需要至少14bytes</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="3361" />
+        <location filename="../artisanlib/comm.py" line="3405" />
         <source>TA612C(): {0} bytes received but 13 needed</source>
         <translation>TA612C()：已接收 {0} 个字节，但需要 13 个</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="3414" />
+        <location filename="../artisanlib/comm.py" line="3458" />
         <source>CENTER302temperature(): {0} bytes received but 7 needed</source>
         <translation>CENTER302温度(): {0} bytes已接收但需要至少7bytes</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="3474" />
+        <location filename="../artisanlib/comm.py" line="3518" />
         <source>CENTER303temperature(): {0} bytes received but 8 needed</source>
         <translation>CENTER303温度(): {0} bytes已接收但需要至少8bytes</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="3518" />
+        <location filename="../artisanlib/comm.py" line="3562" />
         <source>VOLTCRAFTPL125T2temperature(): {0} bytes received but 26 needed</source>
         <translation>VOLTCRAFTPL125T2温度(): {0} bytes已接收但需要至少26bytes</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="3567" />
+        <location filename="../artisanlib/comm.py" line="3611" />
         <source>VOLTCRAFTPL125T4temperature(): {0} bytes received but 26 needed</source>
         <translation>VOLTCRAFTPL125T4温度(): {0} bytes已接收但需要至少26bytes</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="3630" />
+        <location filename="../artisanlib/comm.py" line="3674" />
         <source>CENTER306temperature(): {0} bytes received but 10 needed</source>
         <translation>CENTER306温度(): {0} bytes已接收但需要至少10bytes</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="3717" />
+        <location filename="../artisanlib/comm.py" line="3761" />
         <source>CENTER309temperature(): {0} bytes received but 45 needed</source>
         <translation>CENTER309温度(): {0} bytes已接收但需要至少45bytes</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="6950" />
+        <location filename="../artisanlib/comm.py" line="6994" />
         <source>Arduino could not set channels</source>
         <translation>Arduino无法设置频道</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="6966" />
+        <location filename="../artisanlib/comm.py" line="7010" />
         <source>Arduino could not set temperature unit</source>
         <translation>Arduino无法设置温度单位</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="6976" />
+        <location filename="../artisanlib/comm.py" line="7020" />
         <source>Arduino could not set filters</source>
         <translation>Arduino无法设置筛选器</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="19400" />
-        <location filename="../artisanlib/canvas.py" line="18961" />
-        <location filename="../artisanlib/canvas.py" line="17629" />
-        <location filename="../artisanlib/canvas.py" line="17603" />
-        <location filename="../artisanlib/canvas.py" line="17417" />
-        <location filename="../artisanlib/main.py" line="26525" />
-        <location filename="../artisanlib/main.py" line="26260" />
-        <location filename="../artisanlib/main.py" line="26111" />
-        <location filename="../artisanlib/main.py" line="25764" />
-        <location filename="../artisanlib/main.py" line="25684" />
-        <location filename="../artisanlib/main.py" line="14424" />
-        <location filename="../artisanlib/main.py" line="13774" />
-        <location filename="../artisanlib/comm.py" line="7384" />
-        <location filename="../artisanlib/comm.py" line="7281" />
+        <location filename="../artisanlib/canvas.py" line="19449" />
+        <location filename="../artisanlib/canvas.py" line="19010" />
+        <location filename="../artisanlib/canvas.py" line="17678" />
+        <location filename="../artisanlib/canvas.py" line="17652" />
+        <location filename="../artisanlib/canvas.py" line="17466" />
+        <location filename="../artisanlib/main.py" line="26627" />
+        <location filename="../artisanlib/main.py" line="26362" />
+        <location filename="../artisanlib/main.py" line="26213" />
+        <location filename="../artisanlib/main.py" line="25866" />
+        <location filename="../artisanlib/main.py" line="25786" />
+        <location filename="../artisanlib/main.py" line="14472" />
+        <location filename="../artisanlib/main.py" line="13822" />
+        <location filename="../artisanlib/comm.py" line="7428" />
+        <location filename="../artisanlib/comm.py" line="7325" />
         <source>Value Error:</source>
         <translation>数值错误:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1757" />
+        <location filename="../artisanlib/ports.py" line="2001" />
         <source>Serial Exception: invalid comm port</source>
         <translation>串行异常:无效端口</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1761" />
+        <location filename="../artisanlib/ports.py" line="2005" />
         <source>Serial Exception: timeout</source>
         <translation>串行异常: 超时</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/mqttport.py" line="106" />
+        <source>MQTT failed to subscribe to {0}: {1}</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <location filename="../artisanlib/mqttport.py" line="119" />
+        <source>MQTT failed to connect to {0}: {1}</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <location filename="../artisanlib/mqttport.py" line="130" />
+        <source>MQTT subscribe error: {0}</source>
+        <translation type="unfinished" />
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="5379" />
@@ -4367,128 +4382,122 @@ END</source>
         <translation>S7 通信错误</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="16698" />
-        <location filename="../artisanlib/main.py" line="16621" />
-        <location filename="../artisanlib/main.py" line="13293" />
-        <location filename="../artisanlib/main.py" line="13213" />
+        <location filename="../artisanlib/main.py" line="16746" />
+        <location filename="../artisanlib/main.py" line="16669" />
+        <location filename="../artisanlib/main.py" line="13341" />
+        <location filename="../artisanlib/main.py" line="13261" />
         <source>Error:</source>
         <translation>错误:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18026" />
+        <location filename="../artisanlib/main.py" line="18074" />
         <source>Exception: {} not a valid settings file</source>
         <translation>例外：{}不是有效的设置文件</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="21282" />
-        <location filename="../artisanlib/main.py" line="21239" />
-        <location filename="../artisanlib/main.py" line="21230" />
-        <location filename="../artisanlib/main.py" line="19665" />
-        <location filename="../artisanlib/main.py" line="19574" />
+        <location filename="../artisanlib/main.py" line="21346" />
+        <location filename="../artisanlib/main.py" line="21303" />
+        <location filename="../artisanlib/main.py" line="21294" />
+        <location filename="../artisanlib/main.py" line="19737" />
+        <location filename="../artisanlib/main.py" line="19646" />
         <source>Error</source>
         <translation>错误</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19702" />
+        <location filename="../artisanlib/main.py" line="19774" />
         <source>Exception: WebLCDs not supported by this build</source>
         <translation>例外：此版本不支持 WebLCD</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19708" />
+        <location filename="../artisanlib/main.py" line="19780" />
         <source>Could not start WebLCDs. Selected port might be busy.</source>
         <translation>无法启动 WebLCD。所选端口可能正忙。</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19752" />
+        <location filename="../artisanlib/main.py" line="19824" />
         <source>Exception: Task Green remote display not supported by this build</source>
         <translation>异常：此版本不支持 Task Green 远程显示</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19758" />
+        <location filename="../artisanlib/main.py" line="19830" />
         <source>Could not start Task Green remote display. Selected port might be busy.</source>
         <translation>无法启动 Task Green 远程显示。所选端口可能正忙。</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19802" />
+        <location filename="../artisanlib/main.py" line="19874" />
         <source>Exception: Task Roasted remote display not supported by this build</source>
         <translation>异常：此版本不支持 Task Roasted 远程显示</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19808" />
+        <location filename="../artisanlib/main.py" line="19880" />
         <source>Could not start Task Roasted remote display. Selected port might be busy.</source>
         <translation>无法启动 Task Roasted 远程显示。所选端口可能正忙。</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="21230" />
+        <location filename="../artisanlib/main.py" line="21294" />
         <source>Failed to save settings</source>
         <translation>保存设置失败</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23119" />
-        <location filename="../artisanlib/main.py" line="22745" />
+        <location filename="../artisanlib/main.py" line="23183" />
+        <location filename="../artisanlib/main.py" line="22809" />
         <source>Exception (probably due to an empty profile):</source>
         <translation>错误 (可能是因为一个空的配置文件):</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="27200" />
+        <location filename="../artisanlib/main.py" line="27302" />
         <source>Analyze: CHARGE event required, none found</source>
         <translation>分析：需要投豆事件，并没有找到</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="27204" />
+        <location filename="../artisanlib/main.py" line="27306" />
         <source>Analyze: DROP event required, none found</source>
         <translation>分析：需要排豆事件，并没有找到</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="27295" />
+        <location filename="../artisanlib/main.py" line="27397" />
         <source>Analyze: no background profile data available</source>
         <translation>分析: 无有效背景曲线配置数据</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="27301" />
+        <location filename="../artisanlib/main.py" line="27403" />
         <source>Analyze: background profile requires CHARGE and DROP events</source>
         <translation>分析: 背景曲线配置需要投豆和排豆事件</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="12092" />
+        <location filename="../artisanlib/canvas.py" line="12109" />
         <source>Unexpected value for n, got</source>
         <translation>n 的值不符合预期，得到</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="13233" />
+        <location filename="../artisanlib/canvas.py" line="13274" />
         <source>Exception: phidgetServer couldn't be added. Verify that the Phidget driver is correctly installed!</source>
         <translation>异常：无法添加 phidgetServer。请验证 Phidget 驱动程序是否已正确安装！</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="13241" />
+        <location filename="../artisanlib/canvas.py" line="13282" />
         <source>Exception: PhidgetManager couldn't be started. Verify that the Phidget driver is correctly installed!</source>
         <translation>错误: Phidget管理器不能被启动. 校验Phidget驱动是否正常安装!</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="13784" />
-        <location filename="../artisanlib/canvas.py" line="13758" />
+        <location filename="../artisanlib/canvas.py" line="13833" />
+        <location filename="../artisanlib/canvas.py" line="13807" />
         <source>Unstable meter data</source>
         <translation>电表数据不稳定</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="17569" />
+        <location filename="../artisanlib/canvas.py" line="17618" />
         <source>Error in lnRegression:</source>
         <translation>回归错误:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="18350" />
-        <location filename="../artisanlib/canvas.py" line="18346" />
+        <location filename="../artisanlib/canvas.py" line="18399" />
+        <location filename="../artisanlib/canvas.py" line="18395" />
         <source>Exception: redrawdesigner() Roast events may be out of order. Resetting Designer.</source>
         <translation>例外：redrawdesigner() 烘焙事件可能无序。重置设计师。</translation>
     </message>
 </context><context>
     <name>Form Caption</name>
-    <message>
-        <location filename="../artisanlib/roast_properties.py" line="1779" />
-        <location filename="../plus/blend.py" line="130" />
-        <source>Custom Blend</source>
-        <translation>自定义混合</translation>
-    </message>
     <message>
         <location filename="../artisanlib/axis.py" line="70" />
         <source>Axes</source>
@@ -4575,35 +4584,35 @@ END</source>
         <translation>事件</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="3844" />
-        <location filename="../artisanlib/events.py" line="897" />
-        <location filename="../artisanlib/events.py" line="892" />
-        <location filename="../artisanlib/events.py" line="888" />
-        <location filename="../artisanlib/events.py" line="883" />
+        <location filename="../artisanlib/events.py" line="3910" />
+        <location filename="../artisanlib/events.py" line="909" />
+        <location filename="../artisanlib/events.py" line="904" />
+        <location filename="../artisanlib/events.py" line="900" />
+        <location filename="../artisanlib/events.py" line="895" />
         <source>Slider Calculator</source>
         <translation>滑块计算器</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="3724" />
+        <location filename="../artisanlib/events.py" line="3790" />
         <source>Event Custom Buttons Help</source>
         <translation>事件自定义按钮帮助</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="3733" />
+        <location filename="../artisanlib/events.py" line="3799" />
         <source>Event Custom Sliders Help</source>
         <translation>事件自定义滑动条帮助</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="3742" />
+        <location filename="../artisanlib/events.py" line="3808" />
         <source>Event Annotations Help</source>
         <translation>事件说明帮助</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13331" />
-        <location filename="../artisanlib/main.py" line="3521" />
+        <location filename="../artisanlib/main.py" line="13379" />
+        <location filename="../artisanlib/main.py" line="3524" />
         <location filename="../artisanlib/calculator.py" line="60" />
         <location filename="../artisanlib/calculator.py" line="58" />
-        <location filename="../artisanlib/events.py" line="3881" />
+        <location filename="../artisanlib/events.py" line="3947" />
         <source>Event</source>
         <translation>事件</translation>
     </message>
@@ -4618,19 +4627,24 @@ END</source>
         <translation>扫描 S7</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="390" />
+        <location filename="../artisanlib/ports.py" line="408" />
         <source>Ports Configuration</source>
         <translation>端口配置</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1705" />
+        <location filename="../artisanlib/ports.py" line="1942" />
         <source>MODBUS Help</source>
         <translation>通信协议帮助</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1712" />
+        <location filename="../artisanlib/ports.py" line="1949" />
         <source>S7 Help</source>
         <translation>S7 帮助</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/ports.py" line="1956" />
+        <source>MQTT Help</source>
+        <translation type="unfinished" />
     </message>
     <message>
         <location filename="../artisanlib/background.py" line="49" />
@@ -4646,6 +4660,12 @@ END</source>
         <location filename="../artisanlib/roast_properties.py" line="560" />
         <source>Roast Properties</source>
         <translation>烘焙属性</translation>
+    </message>
+    <message>
+        <location filename="../plus/blend.py" line="130" />
+        <location filename="../artisanlib/roast_properties.py" line="1779" />
+        <source>Custom Blend</source>
+        <translation>自定义混合</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="4224" />
@@ -4708,8 +4728,8 @@ END</source>
         <translation>曲线</translation>
     </message>
     <message>
-        <location filename="../artisanlib/devices.py" line="4918" />
-        <location filename="../artisanlib/devices.py" line="4909" />
+        <location filename="../artisanlib/devices.py" line="4942" />
+        <location filename="../artisanlib/devices.py" line="4933" />
         <location filename="../artisanlib/curves.py" line="2545" />
         <source>Symbolic Formulas Help</source>
         <translation>符号公式帮助</translation>
@@ -4731,12 +4751,12 @@ END</source>
         <translation>警报</translation>
     </message>
     <message>
-        <location filename="../artisanlib/alarms.py" line="1160" />
+        <location filename="../artisanlib/alarms.py" line="1163" />
         <source>Alarms Help</source>
         <translation>警报帮助</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13303" />
+        <location filename="../artisanlib/main.py" line="13351" />
         <source>Keyboard Shortcuts Help</source>
         <translation>键盘快捷键帮助</translation>
     </message>
@@ -4751,7 +4771,7 @@ END</source>
         <translation>设备分配</translation>
     </message>
     <message>
-        <location filename="../artisanlib/devices.py" line="4927" />
+        <location filename="../artisanlib/devices.py" line="4951" />
         <source>External Programs Help</source>
         <translation>外部程序帮助</translation>
     </message>
@@ -4838,96 +4858,107 @@ END</source>
         <translation>占空比</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="1195" />
+        <location filename="../artisanlib/events.py" line="1207" />
         <source>Automatic Marking</source>
         <translation>自动打标</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="1253" />
+        <location filename="../artisanlib/events.py" line="1265" />
         <source>Event Types</source>
         <translation>事件类型</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="1453" />
+        <location filename="../artisanlib/events.py" line="1504" />
         <source>Default Buttons</source>
         <translation>默认按钮</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="1465" />
+        <location filename="../artisanlib/events.py" line="1516" />
         <source>Sampling</source>
         <translation>采样</translation>
     </message>
     <message>
         <location filename="../artisanlib/alarms.py" line="215" />
-        <location filename="../artisanlib/events.py" line="1536" />
+        <location filename="../artisanlib/events.py" line="1587" />
         <source>Management</source>
         <translation>管理</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1130" />
-        <location filename="../artisanlib/ports.py" line="665" />
+        <location filename="../artisanlib/ports.py" line="1148" />
+        <location filename="../artisanlib/ports.py" line="683" />
         <source>Registers</source>
         <translation>寄存器</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1340" />
-        <location filename="../artisanlib/ports.py" line="1147" />
-        <location filename="../artisanlib/ports.py" line="682" />
+        <location filename="../artisanlib/ports.py" line="1361" />
+        <location filename="../artisanlib/ports.py" line="1165" />
+        <location filename="../artisanlib/ports.py" line="700" />
         <source>Commands</source>
         <translation>指令</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="1411" />
-        <location filename="../artisanlib/ports.py" line="1170" />
-        <location filename="../artisanlib/ports.py" line="694" />
+        <location filename="../artisanlib/ports.py" line="1188" />
+        <location filename="../artisanlib/ports.py" line="712" />
         <source>PID</source>
         <translation>PID</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="836" />
-        <location filename="../artisanlib/ports.py" line="723" />
+        <location filename="../artisanlib/ports.py" line="854" />
+        <location filename="../artisanlib/ports.py" line="741" />
         <source>Serial</source>
         <translation>串行</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="750" />
+        <location filename="../artisanlib/ports.py" line="768" />
         <source>UDP/TCP</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="856" />
+        <location filename="../artisanlib/ports.py" line="1690" />
+        <location filename="../artisanlib/ports.py" line="874" />
         <source>Input</source>
         <translation>输入</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1252" />
+        <location filename="../artisanlib/ports.py" line="1273" />
         <source>Machine</source>
         <translation>机器</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1291" />
+        <location filename="../artisanlib/ports.py" line="1312" />
         <source>Timeout</source>
         <translation>超时</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1328" />
+        <location filename="../artisanlib/ports.py" line="1349" />
         <source>Nodes</source>
         <translation>节点</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1358" />
+        <location filename="../artisanlib/ports.py" line="1379" />
         <source>Messages</source>
         <translation>信息</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1371" />
+        <location filename="../artisanlib/ports.py" line="1392" />
         <source>Flags</source>
         <translation>标志</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1430" />
+        <location filename="../artisanlib/ports.py" line="1451" />
         <source>Events</source>
         <translation>事件</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/ports.py" line="1658" />
+        <source>Credentials</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <location filename="../artisanlib/ports.py" line="1669" />
+        <source>Connection</source>
+        <translation type="unfinished" />
     </message>
     <message>
         <location filename="../artisanlib/background.py" line="470" />
@@ -4935,15 +4966,15 @@ END</source>
         <translation>回放</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="16175" />
-        <location filename="../artisanlib/canvas.py" line="16113" />
+        <location filename="../artisanlib/canvas.py" line="16224" />
+        <location filename="../artisanlib/canvas.py" line="16162" />
         <location filename="../artisanlib/roast_properties.py" line="2926" />
         <source>Energy</source>
         <translation>能源</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="16176" />
-        <location filename="../artisanlib/canvas.py" line="16114" />
+        <location filename="../artisanlib/canvas.py" line="16225" />
+        <location filename="../artisanlib/canvas.py" line="16163" />
         <location filename="../artisanlib/roast_properties.py" line="2927" />
         <source>CO2</source>
         <translation>二氧化碳</translation>
@@ -5095,12 +5126,12 @@ END</source>
         <translation>统计摘要</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19733" />
+        <location filename="../artisanlib/main.py" line="19805" />
         <source>Task Green</source>
         <translation>生豆任务</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="19783" />
+        <location filename="../artisanlib/main.py" line="19855" />
         <source>Task Roasted</source>
         <translation>烘焙任务</translation>
     </message>
@@ -5206,15 +5237,15 @@ END</source>
 </context><context>
     <name>HTML Report Template</name>
     <message>
-        <location filename="../artisanlib/canvas.py" line="12019" />
-        <location filename="../artisanlib/main.py" line="22426" />
+        <location filename="../artisanlib/canvas.py" line="12036" />
+        <location filename="../artisanlib/main.py" line="22490" />
         <location filename="../artisanlib/statistics.py" line="219" />
         <source>BBP Total Time</source>
         <translation>批次间规程(BBP) 总时间</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="12022" />
-        <location filename="../artisanlib/main.py" line="22427" />
+        <location filename="../artisanlib/canvas.py" line="12039" />
+        <location filename="../artisanlib/main.py" line="22491" />
         <location filename="../artisanlib/statistics.py" line="220" />
         <source>BBP Bottom Temp</source>
         <translation>批次间规程(BBP) 底部温度</translation>
@@ -5230,880 +5261,880 @@ END</source>
         <translation>批次间规程(BBP) 紧凑摘要</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="12064" />
-        <location filename="../artisanlib/main.py" line="22324" />
+        <location filename="../artisanlib/canvas.py" line="12081" />
+        <location filename="../artisanlib/main.py" line="22388" />
         <location filename="../artisanlib/statistics.py" line="227" />
         <source>Whole Color</source>
         <translation>整豆色值</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22305" />
-        <location filename="../artisanlib/main.py" line="22057" />
-        <location filename="../artisanlib/main.py" line="15215" />
+        <location filename="../artisanlib/main.py" line="22369" />
+        <location filename="../artisanlib/main.py" line="22121" />
+        <location filename="../artisanlib/main.py" line="15263" />
         <source>Profile</source>
         <translation>配置</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="21854" />
+        <location filename="../artisanlib/main.py" line="21918" />
         <source>Roast Batches</source>
         <translation>烘焙批次</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22303" />
-        <location filename="../artisanlib/main.py" line="22052" />
-        <location filename="../artisanlib/main.py" line="21862" />
+        <location filename="../artisanlib/main.py" line="22367" />
+        <location filename="../artisanlib/main.py" line="22116" />
+        <location filename="../artisanlib/main.py" line="21926" />
         <source>Batch</source>
         <translation>批次</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23207" />
-        <location filename="../artisanlib/main.py" line="21863" />
+        <location filename="../artisanlib/main.py" line="23271" />
+        <location filename="../artisanlib/main.py" line="21927" />
         <source>Date</source>
         <translation>日期</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22393" />
-        <location filename="../artisanlib/main.py" line="22060" />
-        <location filename="../artisanlib/main.py" line="21865" />
+        <location filename="../artisanlib/main.py" line="22457" />
+        <location filename="../artisanlib/main.py" line="22124" />
+        <location filename="../artisanlib/main.py" line="21929" />
         <source>Beans</source>
         <translation>生豆</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23209" />
-        <location filename="../artisanlib/main.py" line="22063" />
-        <location filename="../artisanlib/main.py" line="21866" />
+        <location filename="../artisanlib/main.py" line="23273" />
+        <location filename="../artisanlib/main.py" line="22127" />
+        <location filename="../artisanlib/main.py" line="21930" />
         <source>In</source>
         <translation>开始</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22065" />
-        <location filename="../artisanlib/main.py" line="21867" />
+        <location filename="../artisanlib/main.py" line="22129" />
+        <location filename="../artisanlib/main.py" line="21931" />
         <source>Out</source>
         <translation>结束</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23210" />
-        <location filename="../artisanlib/main.py" line="22067" />
-        <location filename="../artisanlib/main.py" line="21868" />
+        <location filename="../artisanlib/main.py" line="23274" />
+        <location filename="../artisanlib/main.py" line="22131" />
+        <location filename="../artisanlib/main.py" line="21932" />
         <source>Loss</source>
         <translation>损失</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="21869" />
+        <location filename="../artisanlib/main.py" line="21933" />
         <source>Def.</source>
         <translation>Def。</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="21870" />
+        <location filename="../artisanlib/main.py" line="21934" />
         <source>Def.L</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22118" />
-        <location filename="../artisanlib/main.py" line="21871" />
+        <location filename="../artisanlib/main.py" line="22182" />
+        <location filename="../artisanlib/main.py" line="21935" />
         <source>SUM</source>
         <translation>合计</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22046" />
+        <location filename="../artisanlib/main.py" line="22110" />
         <source>Production Report</source>
         <translation>生产报告</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22304" />
-        <location filename="../artisanlib/main.py" line="22054" />
+        <location filename="../artisanlib/main.py" line="22368" />
+        <location filename="../artisanlib/main.py" line="22118" />
         <source>Time</source>
         <translation>时间</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22069" />
+        <location filename="../artisanlib/main.py" line="22133" />
         <source>Defects</source>
         <translation>瑕疵</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22071" />
+        <location filename="../artisanlib/main.py" line="22135" />
         <source>Defects Loss</source>
         <translation>缺陷损失</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22376" />
-        <location filename="../artisanlib/main.py" line="22306" />
+        <location filename="../artisanlib/main.py" line="22440" />
+        <location filename="../artisanlib/main.py" line="22370" />
         <source>Weight In</source>
         <translation>投豆重量</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22331" />
-        <location filename="../artisanlib/main.py" line="22307" />
+        <location filename="../artisanlib/main.py" line="22395" />
+        <location filename="../artisanlib/main.py" line="22371" />
         <source>CHARGE BT</source>
         <translation>投豆 BT</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22338" />
-        <location filename="../artisanlib/main.py" line="22308" />
+        <location filename="../artisanlib/main.py" line="22402" />
+        <location filename="../artisanlib/main.py" line="22372" />
         <source>FCs Time</source>
         <translation>一爆时间</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22340" />
-        <location filename="../artisanlib/main.py" line="22309" />
+        <location filename="../artisanlib/main.py" line="22404" />
+        <location filename="../artisanlib/main.py" line="22373" />
         <source>FCs BT</source>
         <translation>一爆温度</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22350" />
-        <location filename="../artisanlib/main.py" line="22310" />
+        <location filename="../artisanlib/main.py" line="22414" />
+        <location filename="../artisanlib/main.py" line="22374" />
         <source>DROP Time</source>
         <translation>排豆时间</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22352" />
-        <location filename="../artisanlib/main.py" line="22311" />
+        <location filename="../artisanlib/main.py" line="22416" />
+        <location filename="../artisanlib/main.py" line="22375" />
         <source>DROP BT</source>
         <translation>排豆温度</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22312" />
+        <location filename="../artisanlib/main.py" line="22376" />
         <source>Dry Percent</source>
         <translation>脱水占比</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22313" />
+        <location filename="../artisanlib/main.py" line="22377" />
         <source>MAI Percent</source>
         <translation>梅纳占比</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22314" />
+        <location filename="../artisanlib/main.py" line="22378" />
         <source>Dev Percent</source>
         <translation>发展占比</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22370" />
-        <location filename="../artisanlib/main.py" line="22315" />
+        <location filename="../artisanlib/main.py" line="22434" />
+        <location filename="../artisanlib/main.py" line="22379" />
         <source>AUC</source>
         <translation>曲线下面积（AUC）</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22378" />
-        <location filename="../artisanlib/main.py" line="22316" />
+        <location filename="../artisanlib/main.py" line="22442" />
+        <location filename="../artisanlib/main.py" line="22380" />
         <source>Weight Loss</source>
         <translation>失重</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23211" />
-        <location filename="../artisanlib/main.py" line="22317" />
+        <location filename="../artisanlib/main.py" line="23275" />
+        <location filename="../artisanlib/main.py" line="22381" />
         <source>Color</source>
         <translation>颜色</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22318" />
+        <location filename="../artisanlib/main.py" line="22382" />
         <source>Cupping</source>
         <translation>杯测</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22319" />
+        <location filename="../artisanlib/main.py" line="22383" />
         <source>Roaster</source>
         <translation>烘焙机</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22320" />
+        <location filename="../artisanlib/main.py" line="22384" />
         <source>Capacity</source>
         <translation>容量</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22321" />
+        <location filename="../artisanlib/main.py" line="22385" />
         <source>Operator</source>
         <translation>烘焙师</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22322" />
+        <location filename="../artisanlib/main.py" line="22386" />
         <source>Organization</source>
         <translation>组织</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22323" />
+        <location filename="../artisanlib/main.py" line="22387" />
         <source>Drum Speed</source>
         <translation>滚筒转速</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22325" />
+        <location filename="../artisanlib/main.py" line="22389" />
         <source>Ground Color</source>
         <translation>咖啡粉色值</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22326" />
+        <location filename="../artisanlib/main.py" line="22390" />
         <source>Color System</source>
         <translation>颜色系统</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22327" />
+        <location filename="../artisanlib/main.py" line="22391" />
         <source>Screen Min</source>
         <translation>豆目最小</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22328" />
+        <location filename="../artisanlib/main.py" line="22392" />
         <source>Screen Max</source>
         <translation>豆目最大</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22329" />
+        <location filename="../artisanlib/main.py" line="22393" />
         <source>Bean Temp</source>
         <translation>豆温</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22330" />
+        <location filename="../artisanlib/main.py" line="22394" />
         <source>CHARGE ET</source>
         <translation>投豆 ET</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22332" />
+        <location filename="../artisanlib/main.py" line="22396" />
         <source>TP Time</source>
         <translation>回温点时间</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22333" />
+        <location filename="../artisanlib/main.py" line="22397" />
         <source>TP ET</source>
         <translation>回温点ET</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22334" />
+        <location filename="../artisanlib/main.py" line="22398" />
         <source>TP BT</source>
         <translation>回温点BT</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22335" />
+        <location filename="../artisanlib/main.py" line="22399" />
         <source>DRY Time</source>
         <translation>转黄点时间</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22336" />
+        <location filename="../artisanlib/main.py" line="22400" />
         <source>DRY ET</source>
         <translation>转黄点ET</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22337" />
+        <location filename="../artisanlib/main.py" line="22401" />
         <source>DRY BT</source>
         <translation>转黄点BT</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22339" />
+        <location filename="../artisanlib/main.py" line="22403" />
         <source>FCs ET</source>
         <translation>第一次爆裂ET</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22341" />
+        <location filename="../artisanlib/main.py" line="22405" />
         <source>FCe Time</source>
         <translation>一爆结束时间</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22342" />
+        <location filename="../artisanlib/main.py" line="22406" />
         <source>FCe ET</source>
         <translation>一爆结束ET</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22343" />
+        <location filename="../artisanlib/main.py" line="22407" />
         <source>FCe BT</source>
         <translation>一爆结束BT</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22344" />
+        <location filename="../artisanlib/main.py" line="22408" />
         <source>SCs Time</source>
         <translation>第二次爆裂时间</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22345" />
+        <location filename="../artisanlib/main.py" line="22409" />
         <source>SCs ET</source>
         <translation>二爆结束ET</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22346" />
+        <location filename="../artisanlib/main.py" line="22410" />
         <source>SCs BT</source>
         <translation>第二次爆裂BT</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22347" />
+        <location filename="../artisanlib/main.py" line="22411" />
         <source>SCe Time</source>
         <translation>二爆结束时间</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22348" />
+        <location filename="../artisanlib/main.py" line="22412" />
         <source>SCe ET</source>
         <translation>二爆结束ET</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22349" />
+        <location filename="../artisanlib/main.py" line="22413" />
         <source>SCe BT</source>
         <translation>二爆结束 BT</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22351" />
+        <location filename="../artisanlib/main.py" line="22415" />
         <source>DROP ET</source>
         <translation>排豆 ET</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22353" />
+        <location filename="../artisanlib/main.py" line="22417" />
         <source>COOL Time</source>
         <translation>冷却时间</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22354" />
+        <location filename="../artisanlib/main.py" line="22418" />
         <source>COOL ET</source>
         <translation>冷却ET</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22355" />
+        <location filename="../artisanlib/main.py" line="22419" />
         <source>COOL BT</source>
         <translation>冷却BT</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22356" />
+        <location filename="../artisanlib/main.py" line="22420" />
         <source>Total Time</source>
         <translation>总时长</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22357" />
+        <location filename="../artisanlib/main.py" line="22421" />
         <source>Dry Phase Time</source>
         <translation>脱水阶段时间</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22358" />
+        <location filename="../artisanlib/main.py" line="22422" />
         <source>Mid Phase Time</source>
         <translation>梅纳阶段时间</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22359" />
+        <location filename="../artisanlib/main.py" line="22423" />
         <source>Finish Phase Time</source>
         <translation>结束阶段时间</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22360" />
+        <location filename="../artisanlib/main.py" line="22424" />
         <source>Dry Phase RoR</source>
         <translation>脱水阶段RoR</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22361" />
+        <location filename="../artisanlib/main.py" line="22425" />
         <source>Mid Phase RoR</source>
         <translation>梅纳阶段RoR</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22362" />
+        <location filename="../artisanlib/main.py" line="22426" />
         <source>Finish Phase RoR</source>
         <translation>结束阶段RoR</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22363" />
+        <location filename="../artisanlib/main.py" line="22427" />
         <source>Dry Phase Delta BT</source>
         <translation>脱水阶段达美BT</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22364" />
+        <location filename="../artisanlib/main.py" line="22428" />
         <source>Mid Phase Delta BT</source>
         <translation>梅纳阶段达美BT</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22365" />
+        <location filename="../artisanlib/main.py" line="22429" />
         <source>Finish Phase Delta BT</source>
         <translation>结束阶段达美BT</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22366" />
+        <location filename="../artisanlib/main.py" line="22430" />
         <source>Finish Phase Rise</source>
         <translation>结束阶段上升</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22367" />
+        <location filename="../artisanlib/main.py" line="22431" />
         <source>Total RoR</source>
         <translation>全程平均RoR</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22368" />
+        <location filename="../artisanlib/main.py" line="22432" />
         <source>FCs RoR</source>
         <translation>第一次爆裂RoR</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22369" />
+        <location filename="../artisanlib/main.py" line="22433" />
         <source>MET</source>
         <translation>最高环境温度</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22371" />
+        <location filename="../artisanlib/main.py" line="22435" />
         <source>AUC Begin</source>
         <translation>AUC开始</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22372" />
+        <location filename="../artisanlib/main.py" line="22436" />
         <source>AUC Base</source>
         <translation>AUC 基础</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22373" />
+        <location filename="../artisanlib/main.py" line="22437" />
         <source>Dry Phase AUC</source>
         <translation>脱水阶段 AUC</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22374" />
+        <location filename="../artisanlib/main.py" line="22438" />
         <source>Mid Phase AUC</source>
         <translation>梅纳阶段AUC</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22375" />
+        <location filename="../artisanlib/main.py" line="22439" />
         <source>Finish Phase AUC</source>
         <translation>结束阶段AUC</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22377" />
+        <location filename="../artisanlib/main.py" line="22441" />
         <source>Weight Out</source>
         <translation>排豆重量</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22379" />
+        <location filename="../artisanlib/main.py" line="22443" />
         <source>Defects Weight</source>
         <translation>缺陷重量</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22380" />
+        <location filename="../artisanlib/main.py" line="22444" />
         <source>Defect Loss</source>
         <translation>缺陷损失</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22381" />
+        <location filename="../artisanlib/main.py" line="22445" />
         <source>Volume In</source>
         <translation>投豆 体积</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22382" />
+        <location filename="../artisanlib/main.py" line="22446" />
         <source>Volume Out</source>
         <translation>排豆体积</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22383" />
+        <location filename="../artisanlib/main.py" line="22447" />
         <source>Volume Gain</source>
         <translation>体积增加</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22384" />
+        <location filename="../artisanlib/main.py" line="22448" />
         <source>Green Density</source>
         <translation>生豆密度</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22385" />
+        <location filename="../artisanlib/main.py" line="22449" />
         <source>Roasted Density</source>
         <translation>熟豆密度</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22386" />
+        <location filename="../artisanlib/main.py" line="22450" />
         <source>Moisture Greens</source>
         <translation>生豆含水率</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22387" />
+        <location filename="../artisanlib/main.py" line="22451" />
         <source>Moisture Roasted</source>
         <translation>熟豆含水率</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22388" />
+        <location filename="../artisanlib/main.py" line="22452" />
         <source>Moisture Loss</source>
         <translation>水份流失</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22389" />
+        <location filename="../artisanlib/main.py" line="22453" />
         <source>Organic Loss</source>
         <translation>有机物流失</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22390" />
+        <location filename="../artisanlib/main.py" line="22454" />
         <source>Ambient Humidity</source>
         <translation>环境湿度</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22391" />
+        <location filename="../artisanlib/main.py" line="22455" />
         <source>Ambient Pressure</source>
         <translation>环境压力</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22392" />
+        <location filename="../artisanlib/main.py" line="22456" />
         <source>Ambient Temperature</source>
         <translation>室内温度</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23882" />
-        <location filename="../artisanlib/main.py" line="22394" />
+        <location filename="../artisanlib/main.py" line="23946" />
+        <location filename="../artisanlib/main.py" line="22458" />
         <source>Roasting Notes</source>
         <translation>烘焙笔记</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23891" />
-        <location filename="../artisanlib/main.py" line="22395" />
+        <location filename="../artisanlib/main.py" line="23955" />
+        <location filename="../artisanlib/main.py" line="22459" />
         <source>Cupping Notes</source>
         <translation>杯测笔记</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22396" />
+        <location filename="../artisanlib/main.py" line="22460" />
         <source>Heavy FC</source>
         <translation>较强一爆</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22397" />
+        <location filename="../artisanlib/main.py" line="22461" />
         <source>Low FC</source>
         <translation>较弱一爆</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22398" />
+        <location filename="../artisanlib/main.py" line="22462" />
         <source>Light Cut</source>
         <translation>浅中线</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22399" />
+        <location filename="../artisanlib/main.py" line="22463" />
         <source>Dark Cut</source>
         <translation>深中线</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22400" />
+        <location filename="../artisanlib/main.py" line="22464" />
         <source>Drops</source>
         <translation>滴油</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22401" />
+        <location filename="../artisanlib/main.py" line="22465" />
         <source>Oily</source>
         <translation>油腻</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22402" />
+        <location filename="../artisanlib/main.py" line="22466" />
         <source>Uneven</source>
         <translation>不均匀</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22403" />
+        <location filename="../artisanlib/main.py" line="22467" />
         <source>Tipping</source>
         <translation>点灼伤</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22404" />
+        <location filename="../artisanlib/main.py" line="22468" />
         <source>Scorching</source>
         <translation>灼伤</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22405" />
+        <location filename="../artisanlib/main.py" line="22469" />
         <source>Divots</source>
         <translation>破裂</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22406" />
+        <location filename="../artisanlib/main.py" line="22470" />
         <source>Mode</source>
         <translation>模式</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22407" />
+        <location filename="../artisanlib/main.py" line="22471" />
         <source>BTU Batch</source>
         <translation>BTU 批量</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22408" />
+        <location filename="../artisanlib/main.py" line="22472" />
         <source>BTU Batch per green kg</source>
         <translation>BTU批量每公斤生豆</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22409" />
+        <location filename="../artisanlib/main.py" line="22473" />
         <source>CO2 Batch</source>
         <translation>CO2 批量</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22410" />
+        <location filename="../artisanlib/main.py" line="22474" />
         <source>BTU Preheat</source>
         <translation>BTU 预热</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22411" />
+        <location filename="../artisanlib/main.py" line="22475" />
         <source>CO2 Preheat</source>
         <translation>CO2 预热</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22412" />
+        <location filename="../artisanlib/main.py" line="22476" />
         <source>BTU BBP</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22413" />
+        <location filename="../artisanlib/main.py" line="22477" />
         <source>CO2 BBP</source>
         <translation>二氧化碳 BBP</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22414" />
+        <location filename="../artisanlib/main.py" line="22478" />
         <source>BTU Cooling</source>
         <translation>BTU 冷却</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22415" />
+        <location filename="../artisanlib/main.py" line="22479" />
         <source>CO2 Cooling</source>
         <translation>CO2 冷却</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22416" />
+        <location filename="../artisanlib/main.py" line="22480" />
         <source>BTU Roast</source>
         <translation>BTU 烘焙</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22417" />
+        <location filename="../artisanlib/main.py" line="22481" />
         <source>BTU Roast per green kg</source>
         <translation>BTU烘焙每公斤生豆</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22418" />
+        <location filename="../artisanlib/main.py" line="22482" />
         <source>CO2 Roast</source>
         <translation>CO2 烘焙</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22419" />
+        <location filename="../artisanlib/main.py" line="22483" />
         <source>CO2 Batch per green kg</source>
         <translation>CO2批量每公斤生豆</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22420" />
+        <location filename="../artisanlib/main.py" line="22484" />
         <source>BTU LPG</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22421" />
+        <location filename="../artisanlib/main.py" line="22485" />
         <source>BTU NG</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22422" />
+        <location filename="../artisanlib/main.py" line="22486" />
         <source>BTU ELEC</source>
         <translation>BTU 电力</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22423" />
+        <location filename="../artisanlib/main.py" line="22487" />
         <source>Efficiency Batch</source>
         <translation>有效批量</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22424" />
+        <location filename="../artisanlib/main.py" line="22488" />
         <source>Efficiency Roast</source>
         <translation>有效烘焙</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22425" />
+        <location filename="../artisanlib/main.py" line="22489" />
         <source>BBP Begin</source>
         <translation>BBP开始</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22428" />
+        <location filename="../artisanlib/main.py" line="22492" />
         <source>BBP Begin to Bottom Time</source>
         <translation>BBP 开始到底部时间</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22429" />
+        <location filename="../artisanlib/main.py" line="22493" />
         <source>BBP Bottom to CHARGE Time</source>
         <translation>BBP 触底至 CHARGE 时间</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22430" />
+        <location filename="../artisanlib/main.py" line="22494" />
         <source>BBP Begin to Bottom RoR</source>
         <translation>BBP 开始触底 RoR</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22431" />
+        <location filename="../artisanlib/main.py" line="22495" />
         <source>BBP Bottom to CHARGE RoR</source>
         <translation>BBP 底部至 CHARGE RoR</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22433" />
+        <location filename="../artisanlib/main.py" line="22497" />
         <source>File Name</source>
         <translation>文件名</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23206" />
+        <location filename="../artisanlib/main.py" line="23270" />
         <source>Roast Ranking</source>
         <translation>烘焙排名</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23291" />
+        <location filename="../artisanlib/main.py" line="23355" />
         <source>Ranking Report</source>
         <translation>排名报告</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23459" />
+        <location filename="../artisanlib/main.py" line="23523" />
         <source>AVG</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23810" />
+        <location filename="../artisanlib/main.py" line="23874" />
         <source>Roasting Report</source>
         <translation>烘焙属性</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23811" />
+        <location filename="../artisanlib/main.py" line="23875" />
         <source>Date:</source>
         <translation>日期:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23813" />
+        <location filename="../artisanlib/main.py" line="23877" />
         <source>Beans:</source>
         <translation>豆名:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23815" />
+        <location filename="../artisanlib/main.py" line="23879" />
         <source>Weight:</source>
         <translation>重量:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23819" />
+        <location filename="../artisanlib/main.py" line="23883" />
         <source>Volume:</source>
         <translation>体积:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23821" />
+        <location filename="../artisanlib/main.py" line="23885" />
         <source>Roaster:</source>
         <translation>烘焙机:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23823" />
+        <location filename="../artisanlib/main.py" line="23887" />
         <source>Operator:</source>
         <translation>烘焙师:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23825" />
+        <location filename="../artisanlib/main.py" line="23889" />
         <source>Organization:</source>
         <translation>组织:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="11993" />
-        <location filename="../artisanlib/main.py" line="23827" />
+        <location filename="../artisanlib/canvas.py" line="12010" />
+        <location filename="../artisanlib/main.py" line="23891" />
         <source>Cupping:</source>
         <translation>杯测:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23829" />
+        <location filename="../artisanlib/main.py" line="23893" />
         <source>Color:</source>
         <translation>颜色:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23831" />
+        <location filename="../artisanlib/main.py" line="23895" />
         <source>Energy:</source>
         <translation>能源:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23833" />
+        <location filename="../artisanlib/main.py" line="23897" />
         <source>CO2:</source>
         <translation>二氧化碳:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23835" />
+        <location filename="../artisanlib/main.py" line="23899" />
         <source>CHARGE:</source>
         <translation>投豆:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23837" />
+        <location filename="../artisanlib/main.py" line="23901" />
         <source>Size:</source>
         <translation>大小:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23840" />
+        <location filename="../artisanlib/main.py" line="23904" />
         <source>Density:</source>
         <translation>密度:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23842" />
+        <location filename="../artisanlib/main.py" line="23906" />
         <source>Moisture:</source>
         <translation>含水量:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23844" />
+        <location filename="../artisanlib/main.py" line="23908" />
         <source>Ambient:</source>
         <translation>环境:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23846" />
+        <location filename="../artisanlib/main.py" line="23910" />
         <source>TP:</source>
         <translation>回温点:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23848" />
+        <location filename="../artisanlib/main.py" line="23912" />
         <source>DRY:</source>
         <translation>脱水:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23850" />
+        <location filename="../artisanlib/main.py" line="23914" />
         <source>FCs:</source>
         <translation>第一次爆裂:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23852" />
+        <location filename="../artisanlib/main.py" line="23916" />
         <source>FCe:</source>
         <translation>一爆结束:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23854" />
+        <location filename="../artisanlib/main.py" line="23918" />
         <source>SCs:</source>
         <translation>第二次爆裂:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23856" />
+        <location filename="../artisanlib/main.py" line="23920" />
         <source>SCe:</source>
         <translation>二爆结束:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23858" />
+        <location filename="../artisanlib/main.py" line="23922" />
         <source>DROP:</source>
         <translation>排豆:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23860" />
+        <location filename="../artisanlib/main.py" line="23924" />
         <source>COOL:</source>
         <translation>冷却:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23862" />
+        <location filename="../artisanlib/main.py" line="23926" />
         <source>MET:</source>
         <translation>最高环境温度:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23864" />
+        <location filename="../artisanlib/main.py" line="23928" />
         <source>CM:</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23866" />
+        <location filename="../artisanlib/main.py" line="23930" />
         <source>Drying:</source>
         <translation>脱水:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23868" />
+        <location filename="../artisanlib/main.py" line="23932" />
         <source>Maillard:</source>
         <translation>梅纳反应:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23870" />
+        <location filename="../artisanlib/main.py" line="23934" />
         <source>Finishing:</source>
         <translation>完成:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23872" />
+        <location filename="../artisanlib/main.py" line="23936" />
         <source>Cooling:</source>
         <translation>冷却:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23874" />
+        <location filename="../artisanlib/main.py" line="23938" />
         <source>Background:</source>
         <translation>背景曲线:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23876" />
+        <location filename="../artisanlib/main.py" line="23940" />
         <source>Alarms:</source>
         <translation>警报:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23878" />
+        <location filename="../artisanlib/main.py" line="23942" />
         <source>RoR:</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23880" />
+        <location filename="../artisanlib/main.py" line="23944" />
         <source>AUC:</source>
         <translation>曲线下面积（AUC）:</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23888" />
+        <location filename="../artisanlib/main.py" line="23952" />
         <source>Events</source>
         <translation>事件</translation>
     </message>
@@ -6130,8 +6161,8 @@ Alarms are scanned in order from the top of the table to the bottom.</source>
         <translation>字段</translation>
     </message>
     <message>
-        <location filename="../help/symbolic_help.py" line="192" />
-        <location filename="../help/symbolic_help.py" line="158" />
+        <location filename="../help/symbolic_help.py" line="196" />
+        <location filename="../help/symbolic_help.py" line="162" />
         <location filename="../help/symbolic_help.py" line="151" />
         <location filename="../help/symbolic_help.py" line="142" />
         <location filename="../help/symbolic_help.py" line="129" />
@@ -8101,15 +8132,15 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
         <translation>保存通过 MODBUS 读取的最后一个值的变量</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="254" />
-        <location filename="../help/eventbuttons_help.py" line="192" />
-        <location filename="../help/eventbuttons_help.py" line="172" />
-        <location filename="../help/eventbuttons_help.py" line="169" />
+        <location filename="../help/eventbuttons_help.py" line="255" />
+        <location filename="../help/eventbuttons_help.py" line="193" />
+        <location filename="../help/eventbuttons_help.py" line="173" />
+        <location filename="../help/eventbuttons_help.py" line="170" />
         <location filename="../help/eventbuttons_help.py" line="144" />
         <location filename="../help/eventbuttons_help.py" line="103" />
-        <location filename="../help/eventsliders_help.py" line="177" />
-        <location filename="../help/eventsliders_help.py" line="119" />
-        <location filename="../help/eventsliders_help.py" line="104" />
+        <location filename="../help/eventsliders_help.py" line="178" />
+        <location filename="../help/eventsliders_help.py" line="120" />
+        <location filename="../help/eventsliders_help.py" line="105" />
         <location filename="../help/eventsliders_help.py" line="98" />
         <location filename="../help/eventsliders_help.py" line="79" />
         <location filename="../help/eventsliders_help.py" line="40" />
@@ -8117,7 +8148,7 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
         <translation>sleep：添加 &lt;float&gt; 秒的延迟</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="174" />
+        <location filename="../help/eventbuttons_help.py" line="175" />
         <location filename="../help/eventbuttons_help.py" line="105" />
         <location filename="../help/eventsliders_help.py" line="41" />
         <source>sets calling button to “pressed” if argument is 1 or True</source>
@@ -8244,77 +8275,77 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
         <translation>启动和外部程序</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="149" />
+        <location filename="../help/eventbuttons_help.py" line="150" />
         <location filename="../help/eventsliders_help.py" line="60" />
         <source>Hottop Heater</source>
         <translation>Hottop加热器</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="183" />
-        <location filename="../help/eventbuttons_help.py" line="149" />
-        <location filename="../help/eventsliders_help.py" line="112" />
+        <location filename="../help/eventbuttons_help.py" line="184" />
+        <location filename="../help/eventbuttons_help.py" line="150" />
+        <location filename="../help/eventsliders_help.py" line="113" />
         <location filename="../help/eventsliders_help.py" line="60" />
         <source>sets heater to value</source>
         <translation>将加热器设置为值</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="150" />
+        <location filename="../help/eventbuttons_help.py" line="151" />
         <location filename="../help/eventsliders_help.py" line="61" />
         <source>Hottop Fan</source>
         <translation>Hottop风机</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="184" />
-        <location filename="../help/eventbuttons_help.py" line="150" />
-        <location filename="../help/eventsliders_help.py" line="113" />
+        <location filename="../help/eventbuttons_help.py" line="185" />
+        <location filename="../help/eventbuttons_help.py" line="151" />
+        <location filename="../help/eventsliders_help.py" line="114" />
         <location filename="../help/eventsliders_help.py" line="61" />
         <source>sets fan to value</source>
         <translation>设定风机到值</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="151" />
+        <location filename="../help/eventbuttons_help.py" line="152" />
         <location filename="../help/eventsliders_help.py" line="62" />
         <source>Hottop Command</source>
         <translation>Hottop指令</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="151" />
+        <location filename="../help/eventbuttons_help.py" line="152" />
         <location filename="../help/eventsliders_help.py" line="62" />
         <source>with n={0 ,1},h={0,..100},f={0,..10}</source>
         <translation>n={0 ,1},h={0,..100},f={0,..10}</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="153" />
+        <location filename="../help/eventbuttons_help.py" line="154" />
         <location filename="../help/eventsliders_help.py" line="63" />
         <source>Fuji Command</source>
         <translation>Fuji指令</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="154" />
+        <location filename="../help/eventbuttons_help.py" line="155" />
         <location filename="../help/eventsliders_help.py" line="64" />
         <source>PWM Command</source>
         <translation>PWM指令</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="154" />
+        <location filename="../help/eventbuttons_help.py" line="155" />
         <location filename="../help/eventsliders_help.py" line="64" />
         <source>PHIDGET PWM Output: &lt;value&gt; in [0-100]</source>
         <translation>PHIDGET PWM 输出：&lt;值&gt; in [0-100]</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="155" />
+        <location filename="../help/eventbuttons_help.py" line="156" />
         <location filename="../help/eventsliders_help.py" line="65" />
         <source>PHIDGET PWM Frequency: &lt;value&gt; in Hz</source>
         <translation>PHIDGET PWM 频率：&lt;值&gt;（单位：Hz）</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="156" />
+        <location filename="../help/eventbuttons_help.py" line="157" />
         <location filename="../help/eventsliders_help.py" line="66" />
         <source>PHIDGET PWM Output: toggles &lt;channel&gt;</source>
         <translation>PHIDGET PWM 输出：切换 &lt;通道&gt;</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="157" />
+        <location filename="../help/eventbuttons_help.py" line="158" />
         <location filename="../help/eventsliders_help.py" line="67" />
         <source>PHIDGET PWM Output: turn &lt;channel&gt; on for &lt;millis&gt; milliseconds</source>
         <translation>PHIDGET PWM 输出：开启 &lt;channel&gt; 持续 &lt;millis&gt; 毫秒</translation>
@@ -8335,31 +8366,31 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
         <translation>PHIDGET HUB PWM 输出：开启 &lt;channel&gt; 持续 &lt;millis&gt; 毫秒</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="161" />
+        <location filename="../help/eventbuttons_help.py" line="162" />
         <location filename="../help/eventsliders_help.py" line="71" />
         <source>YOCTOPUCE PWM Output: PWM running state</source>
         <translation>YOCTOPUCE PWM输出：PWM运行状态</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="162" />
+        <location filename="../help/eventbuttons_help.py" line="163" />
         <location filename="../help/eventsliders_help.py" line="72" />
         <source>YOCTOPUCE PWM Output: set PWM frequency to f (Hz)</source>
         <translation>YOCTOPUCE PWM 输出：将 PWM 频率设置为 f (Hz)</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="163" />
+        <location filename="../help/eventbuttons_help.py" line="164" />
         <location filename="../help/eventsliders_help.py" line="73" />
         <source>YOCTOPUCE PWM Output: set PWM period with the duty cycle in % as a float [0.0-100.0]</source>
         <translation>YOCTOPUCE PWM 输出：设置 PWM 周期，以 % 为单位的占空比为浮点数 [0.0-100.0]</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="164" />
+        <location filename="../help/eventbuttons_help.py" line="165" />
         <location filename="../help/eventsliders_help.py" line="74" />
         <source>YOCTOPUCE PWM Output: changes progressively the PWM to the specified value over the given time interval</source>
         <translation>YOCTOPUCE PWM 输出：在给定的时间间隔内逐渐将 PWM 更改为指定值</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="165" />
+        <location filename="../help/eventbuttons_help.py" line="166" />
         <location filename="../help/eventsliders_help.py" line="75" />
         <source>VOUT Command</source>
         <translation>VOUT指令</translation>
@@ -8370,19 +8401,19 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
         <translation>对于 PHIDGET OUTPUT 模块：设置电压电压范围（r5V 时 r=5，10V 时 r=10）</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="166" />
+        <location filename="../help/eventbuttons_help.py" line="167" />
         <location filename="../help/eventsliders_help.py" line="76" />
         <source>for PHIDGET OUTPUT modules: set analog output channel n to output voltage value v in V (eg. 5.5 for 5.5V)</source>
         <translation>对于 PHIDGET OUTPUT 模块：将模拟输出通道 n 设置为以 V 为单位的输出电压值 v（例如 5.5 表示 5.5V）</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="167" />
+        <location filename="../help/eventbuttons_help.py" line="168" />
         <location filename="../help/eventsliders_help.py" line="77" />
         <source>for YOCTOPUCE VOLTAGE OUT modules with c the channel (1 or 2),v the voltage as float [0.0-10.0]</source>
         <translation>对于带有 c 通道（1 或 2）的 YOCTOPUCE VOLTAGE OUT 模块，v 电压为浮动 [0.0-10.0]</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="168" />
+        <location filename="../help/eventbuttons_help.py" line="169" />
         <location filename="../help/eventsliders_help.py" line="78" />
         <source>for YOCTOPUCE CURRENT OUT modules with c the current as float [3.0-21.0]</source>
         <translation>对于 YOCTOPUCE CURRENT OUT 模块，c 电流为浮点 [3.0-21.0]</translation>
@@ -8484,8 +8515,8 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
         <translation>关闭 (b=0) 和打开 (b=1) PHIDGET 二进制输出通道 c 并根据值 b 将按钮 i 设置为按下或正常</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="255" />
-        <location filename="../help/eventbuttons_help.py" line="173" />
+        <location filename="../help/eventbuttons_help.py" line="256" />
+        <location filename="../help/eventbuttons_help.py" line="174" />
         <location filename="../help/eventbuttons_help.py" line="141" />
         <location filename="../help/eventbuttons_help.py" line="104" />
         <location filename="../help/eventsliders_help.py" line="95" />
@@ -8499,9 +8530,9 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
         <translation>如果值 b 为 yes、true、t 或 1，则将按钮设置为按下，否则设置为正常</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="257" />
-        <location filename="../help/eventbuttons_help.py" line="216" />
-        <location filename="../help/eventbuttons_help.py" line="175" />
+        <location filename="../help/eventbuttons_help.py" line="258" />
+        <location filename="../help/eventbuttons_help.py" line="217" />
+        <location filename="../help/eventbuttons_help.py" line="176" />
         <location filename="../help/eventbuttons_help.py" line="143" />
         <location filename="../help/eventbuttons_help.py" line="106" />
         <location filename="../help/eventsliders_help.py" line="97" />
@@ -8533,480 +8564,487 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
         <translation>如果 b 为真或 1，则将 Shelly 插头编号 &lt;n&gt; 切换为 ON，否则切换为 OFF</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="170" />
+        <location filename="../help/eventbuttons_help.py" line="149" />
         <location filename="../help/eventsliders_help.py" line="103" />
+        <source>converts the given data to JSON and publish it on the MQTT server to the given topic</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <location filename="../help/eventbuttons_help.py" line="171" />
+        <location filename="../help/eventsliders_help.py" line="104" />
         <source>S7 Command</source>
         <translation>S7指令</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="170" />
-        <location filename="../help/eventsliders_help.py" line="103" />
+        <location filename="../help/eventbuttons_help.py" line="171" />
+        <location filename="../help/eventsliders_help.py" line="104" />
         <source>variable holding the last value read via S7</source>
         <translation>保存通过 S7 读取的最后一个值的变量</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="256" />
-        <location filename="../help/eventsliders_help.py" line="178" />
-        <location filename="../help/eventsliders_help.py" line="105" />
+        <location filename="../help/eventbuttons_help.py" line="257" />
+        <location filename="../help/eventsliders_help.py" line="179" />
+        <location filename="../help/eventsliders_help.py" line="106" />
         <source>sets calling button to “pressed” if argument evaluates to 1 or True</source>
         <translation>如果参数评估为 1 或 True，则将调用按钮设置为“按下”</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="176" />
-        <location filename="../help/eventsliders_help.py" line="106" />
+        <location filename="../help/eventbuttons_help.py" line="177" />
+        <location filename="../help/eventsliders_help.py" line="107" />
         <source>read bool from S7 DB</source>
         <translation>从 S7 DB 中读取布尔值</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="177" />
-        <location filename="../help/eventsliders_help.py" line="107" />
+        <location filename="../help/eventbuttons_help.py" line="178" />
+        <location filename="../help/eventsliders_help.py" line="108" />
         <source>read int from S7 DB</source>
         <translation>从 S7 DB 中读取 int</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="178" />
-        <location filename="../help/eventsliders_help.py" line="108" />
+        <location filename="../help/eventbuttons_help.py" line="179" />
+        <location filename="../help/eventsliders_help.py" line="109" />
         <source>read float from S7 DB</source>
         <translation>从 S7 DB 读取浮点数</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="179" />
-        <location filename="../help/eventsliders_help.py" line="109" />
+        <location filename="../help/eventbuttons_help.py" line="180" />
+        <location filename="../help/eventsliders_help.py" line="110" />
         <source>write bool to S7 DB</source>
         <translation>将布尔值写入 S7 DB</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="180" />
-        <location filename="../help/eventsliders_help.py" line="110" />
+        <location filename="../help/eventbuttons_help.py" line="181" />
+        <location filename="../help/eventsliders_help.py" line="111" />
         <source>write int to S7 DB</source>
         <translation>将 int 写入 S7 DB</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="182" />
-        <location filename="../help/eventsliders_help.py" line="111" />
+        <location filename="../help/eventbuttons_help.py" line="183" />
+        <location filename="../help/eventsliders_help.py" line="112" />
         <source>write float to S7 DB</source>
         <translation>将浮点数写入 S7 DB</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="183" />
-        <location filename="../help/eventsliders_help.py" line="112" />
+        <location filename="../help/eventbuttons_help.py" line="184" />
+        <location filename="../help/eventsliders_help.py" line="113" />
         <source>Aillio R1 Heater</source>
         <translation>Aillio R1加热器</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="184" />
-        <location filename="../help/eventsliders_help.py" line="113" />
+        <location filename="../help/eventbuttons_help.py" line="185" />
+        <location filename="../help/eventsliders_help.py" line="114" />
         <source>Aillio R1 Fan</source>
         <translation>Aillio R1风机</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="185" />
-        <location filename="../help/eventsliders_help.py" line="114" />
+        <location filename="../help/eventbuttons_help.py" line="186" />
+        <location filename="../help/eventsliders_help.py" line="115" />
         <source>Aillio R1 Drum</source>
         <translation>Aillio R1滚筒</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="185" />
-        <location filename="../help/eventsliders_help.py" line="114" />
+        <location filename="../help/eventbuttons_help.py" line="186" />
+        <location filename="../help/eventsliders_help.py" line="115" />
         <source>sets drum speed to value</source>
         <translation>将滚筒速度设置为值</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="187" />
-        <location filename="../help/eventsliders_help.py" line="115" />
+        <location filename="../help/eventbuttons_help.py" line="188" />
+        <location filename="../help/eventsliders_help.py" line="116" />
         <source>Artisan Command</source>
         <translation>Artisan指令</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="189" />
-        <location filename="../help/eventsliders_help.py" line="115" />
+        <location filename="../help/eventbuttons_help.py" line="190" />
+        <location filename="../help/eventsliders_help.py" line="116" />
         <source>enables/disables alarms</source>
         <translation>启用/禁用警报</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="188" />
-        <location filename="../help/eventsliders_help.py" line="116" />
+        <location filename="../help/eventbuttons_help.py" line="189" />
+        <location filename="../help/eventsliders_help.py" line="117" />
         <source>enables/disables alarm number n</source>
         <translation>启用/禁用警报号 n</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="190" />
-        <location filename="../help/eventsliders_help.py" line="117" />
+        <location filename="../help/eventbuttons_help.py" line="191" />
+        <location filename="../help/eventsliders_help.py" line="118" />
         <source>enables/disables autoCHARGE</source>
         <translation>启用/禁用自动充电</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="191" />
-        <location filename="../help/eventsliders_help.py" line="118" />
+        <location filename="../help/eventbuttons_help.py" line="192" />
+        <location filename="../help/eventsliders_help.py" line="119" />
         <source>enables/disables autoDROP</source>
         <translation>启用/禁用 autoDROP</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="193" />
-        <location filename="../help/eventsliders_help.py" line="120" />
+        <location filename="../help/eventbuttons_help.py" line="194" />
+        <location filename="../help/eventsliders_help.py" line="121" />
         <source>tare channel &lt;int&gt; with 1 =&gt; ET, 2 =&gt; BT, 3 =&gt; E1c1, 4: E1c2,..</source>
         <translation>使用 1 =&gt; ET, 2 =&gt; BT, 3 =&gt; E1c1, 4: E1c2,.. 去皮通道 &lt;int&gt;,..</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="194" />
-        <location filename="../help/eventsliders_help.py" line="121" />
+        <location filename="../help/eventbuttons_help.py" line="195" />
+        <location filename="../help/eventsliders_help.py" line="122" />
         <source>turns PID on</source>
         <translation>打开PID</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="195" />
-        <location filename="../help/eventsliders_help.py" line="122" />
+        <location filename="../help/eventbuttons_help.py" line="196" />
+        <location filename="../help/eventsliders_help.py" line="123" />
         <source>turns PID off</source>
         <translation>关闭 PID</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="196" />
-        <location filename="../help/eventsliders_help.py" line="123" />
+        <location filename="../help/eventbuttons_help.py" line="197" />
+        <location filename="../help/eventsliders_help.py" line="124" />
         <source>toggles the PID state</source>
         <translation>切换 PID 状态</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="197" />
-        <location filename="../help/eventsliders_help.py" line="124" />
+        <location filename="../help/eventbuttons_help.py" line="198" />
+        <location filename="../help/eventsliders_help.py" line="125" />
         <source>sets PID mode to 0: manual, 1: RS, 2: background follow</source>
         <translation>设置PID模式为0：手动，1：RS，2：后台跟随</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="198" />
-        <location filename="../help/eventsliders_help.py" line="125" />
+        <location filename="../help/eventbuttons_help.py" line="199" />
+        <location filename="../help/eventsliders_help.py" line="126" />
         <source>sets the p-i-d parameters of the PID</source>
         <translation>设置 PID 的 p-i-d 参数</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="199" />
-        <location filename="../help/eventsliders_help.py" line="126" />
+        <location filename="../help/eventbuttons_help.py" line="200" />
+        <location filename="../help/eventsliders_help.py" line="127" />
         <source>sets the beta and gamma parameters of the PID</source>
         <translation>设置PID的beta和gamma参数</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="200" />
-        <location filename="../help/eventsliders_help.py" line="127" />
+        <location filename="../help/eventbuttons_help.py" line="201" />
+        <location filename="../help/eventsliders_help.py" line="128" />
         <source>increases or decreases the current target SV value by &lt;float&gt;</source>
         <translation>将当前目标 SV 值增加或减少 &lt;float&gt;</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="201" />
-        <location filename="../help/eventsliders_help.py" line="128" />
+        <location filename="../help/eventbuttons_help.py" line="202" />
+        <location filename="../help/eventsliders_help.py" line="129" />
         <source>sets the PID target set value SV</source>
         <translation>设定 PID 目标设定值 SV</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="202" />
-        <location filename="../help/eventsliders_help.py" line="129" />
+        <location filename="../help/eventbuttons_help.py" line="203" />
+        <location filename="../help/eventsliders_help.py" line="130" />
         <source>sets the PID target set value SV given in C</source>
         <translation>设置C中给定的PID目标设定值SV</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="203" />
-        <location filename="../help/eventsliders_help.py" line="130" />
+        <location filename="../help/eventbuttons_help.py" line="204" />
+        <location filename="../help/eventsliders_help.py" line="131" />
         <source>toggles the visibility of the PID SV buttons</source>
         <translation>切换 PID SV 按钮的可见性</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="204" />
-        <location filename="../help/eventsliders_help.py" line="131" />
+        <location filename="../help/eventbuttons_help.py" line="205" />
+        <location filename="../help/eventsliders_help.py" line="132" />
         <source>activates the PID Ramp-Soak pattern number &lt;rs&gt; (1-based!) or the one labeled &lt;rs&gt;</source>
         <translation>激活PID 缓升-恒温 程式编码&lt;rs&gt; (1-based!) or the one labeled &lt;rs&gt;</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="205" />
-        <location filename="../help/eventsliders_help.py" line="132" />
+        <location filename="../help/eventbuttons_help.py" line="206" />
+        <location filename="../help/eventsliders_help.py" line="133" />
         <source>selects the PID input source with &lt;n&gt; 0: BT, 1: ET (Software PID); &lt;n&gt; in {0,..,3} (Arduino PID)</source>
         <translation>用 &lt;n&gt; 选择 PID 输入源 0：BT，1：ET（软件 PID）； &lt;n&gt; 在 {0,..,3} (Arduino PID)</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="206" />
-        <location filename="../help/eventsliders_help.py" line="133" />
+        <location filename="../help/eventbuttons_help.py" line="207" />
+        <location filename="../help/eventsliders_help.py" line="134" />
         <source>sets the PID lookahead in seconds</source>
         <translation>以秒为单位设置 PID 前瞻</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="207" />
-        <location filename="../help/eventsliders_help.py" line="134" />
+        <location filename="../help/eventbuttons_help.py" line="208" />
+        <location filename="../help/eventsliders_help.py" line="135" />
         <source>sets the Ramping Event Replay lookahead in seconds</source>
         <translation>以秒为单位设置斜坡事件重播前瞻</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="208" />
-        <location filename="../help/eventsliders_help.py" line="135" />
+        <location filename="../help/eventbuttons_help.py" line="209" />
+        <location filename="../help/eventsliders_help.py" line="136" />
         <source>shows popup with message &lt;msg&gt; which optionally automatically closes after &lt;int&gt; seconds</source>
         <translation>显示带有消息 &lt;msg&gt; 的弹出窗口，该消息可选择在 &lt;int&gt; 秒后自动关闭</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="209" />
-        <location filename="../help/eventsliders_help.py" line="136" />
+        <location filename="../help/eventbuttons_help.py" line="210" />
+        <location filename="../help/eventsliders_help.py" line="137" />
         <source>shows message &lt;msg&gt; in the message line</source>
         <translation>在消息行中显示消息 &lt;msg&gt;</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="210" />
-        <location filename="../help/eventsliders_help.py" line="137" />
+        <location filename="../help/eventbuttons_help.py" line="211" />
+        <location filename="../help/eventsliders_help.py" line="138" />
         <source>enables/disables notifications; while disabled issued notifications are ignored</source>
         <translation>启用/禁用通知；虽然禁用发出的通知被忽略</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="211" />
-        <location filename="../help/eventsliders_help.py" line="138" />
+        <location filename="../help/eventbuttons_help.py" line="212" />
+        <location filename="../help/eventsliders_help.py" line="139" />
         <source>sends notification with title &lt;title&gt; and optional message &lt;msg&gt;</source>
         <translation>发送带有标题 &lt;title&gt; 和可选消息 &lt;msg&gt; 的通知</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="212" />
-        <location filename="../help/eventsliders_help.py" line="139" />
+        <location filename="../help/eventbuttons_help.py" line="213" />
+        <location filename="../help/eventsliders_help.py" line="140" />
         <source>sets canvas color to the RGB-hex &lt;color&gt; like #27f1d3</source>
         <translation>将画布颜色设置为 RGB-hex &lt;color&gt; 像 #27f1d3</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="213" />
-        <location filename="../help/eventsliders_help.py" line="140" />
+        <location filename="../help/eventbuttons_help.py" line="214" />
+        <location filename="../help/eventsliders_help.py" line="141" />
         <source>resets canvas color</source>
         <translation>重置画布颜色</translation>
     </message>
     <message>
-        <location filename="../help/eventsliders_help.py" line="141" />
+        <location filename="../help/eventsliders_help.py" line="142" />
         <source>activates button &lt;name&gt; from { START, CHARGE, DRY, FCs, FCe, SCs, SCe, DROP, COOL, OFF } </source>
         <translation>从 { START, CHARGE, DRY, FCs, FCe, SCs, SCe, DROP, COOL, OFF } 激活按钮 &lt;名称&gt; </translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="218" />
-        <location filename="../help/eventsliders_help.py" line="142" />
+        <location filename="../help/eventbuttons_help.py" line="219" />
+        <location filename="../help/eventsliders_help.py" line="143" />
         <source>activates palette &lt;p&gt; with &lt;p&gt; either a number 0-9 or a palette label</source>
         <translation>使用 &lt;p&gt; 数字 0-9 或调色板标签激活调色板 &lt;p&gt;</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="219" />
-        <location filename="../help/eventsliders_help.py" line="143" />
+        <location filename="../help/eventbuttons_help.py" line="220" />
+        <location filename="../help/eventsliders_help.py" line="144" />
         <source>sets playback mode to 0: off, 1: time, 2: BT, 3: ET; 4: BT/time; 5: ET/time</source>
         <translation>播放模式设置为：0：关闭；1：时间；2：蓝牙；3：ET；4：蓝牙/时间；5：ET/时间</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="220" />
-        <location filename="../help/eventsliders_help.py" line="144" />
+        <location filename="../help/eventbuttons_help.py" line="221" />
+        <location filename="../help/eventsliders_help.py" line="145" />
         <source>sets playback DROP mode to 0: off, 1: time, 2: BT, 3: ET</source>
         <translation>将播放 DROP 模式设置为 0：关闭、1：时间、2：BT、3：ET</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="221" />
-        <location filename="../help/eventsliders_help.py" line="145" />
+        <location filename="../help/eventbuttons_help.py" line="222" />
+        <location filename="../help/eventsliders_help.py" line="146" />
         <source>toggles playback per event type n from {1,2,3,4}</source>
         <translation>切换每个事件类型 n 的播放，范围为 {1,2,3,4}</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="222" />
-        <location filename="../help/eventsliders_help.py" line="146" />
+        <location filename="../help/eventbuttons_help.py" line="223" />
+        <location filename="../help/eventsliders_help.py" line="147" />
         <source>toggles playback ramping per event type n from {1,2,3,4}</source>
         <translation>根据事件类型 n 切换播放渐变（从 {1,2,3,4} 开始）</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="223" />
-        <location filename="../help/eventsliders_help.py" line="147" />
+        <location filename="../help/eventbuttons_help.py" line="224" />
+        <location filename="../help/eventsliders_help.py" line="148" />
         <source>show/hide slider per event type n from {1,2,3,4}; n=5 toggles the PID SV slider visibility</source>
         <translation>显示/隐藏每个事件类型 n 的滑块（来自 {1,2,3,4}; n=5 可切换 PID SV 滑块的可见性</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="224" />
-        <location filename="../help/eventsliders_help.py" line="148" />
+        <location filename="../help/eventbuttons_help.py" line="225" />
+        <location filename="../help/eventsliders_help.py" line="149" />
         <source>activate/deactivate quantification per event type n from {1,2,3,4}</source>
         <translation>激活/停用每个事件类型 n 的量化（从 {1,2,3,4} 开始）</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="225" />
-        <location filename="../help/eventsliders_help.py" line="149" />
+        <location filename="../help/eventbuttons_help.py" line="226" />
+        <location filename="../help/eventsliders_help.py" line="150" />
         <source>set the batch size to the given value. If the value is negative, the batch size is taken from the background profile, if any is loaded</source>
         <translation>将批处理大小设置为给定值。如果值为负数，则批处理大小取自背景配置文件（如果已加载）</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="226" />
-        <location filename="../help/eventsliders_help.py" line="150" />
+        <location filename="../help/eventbuttons_help.py" line="227" />
+        <location filename="../help/eventsliders_help.py" line="151" />
         <source>opens the Roast Properties dialog</source>
         <translation>打开烘焙属性对话框</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="227" />
-        <location filename="../help/eventsliders_help.py" line="151" />
+        <location filename="../help/eventbuttons_help.py" line="228" />
+        <location filename="../help/eventsliders_help.py" line="152" />
         <source>loads the .alog profile at the given filepath as background profile</source>
         <translation>在给定的文件路径中加载 .alog 配置文件作为后台配置文件</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="228" />
-        <location filename="../help/eventsliders_help.py" line="152" />
+        <location filename="../help/eventbuttons_help.py" line="229" />
+        <location filename="../help/eventsliders_help.py" line="153" />
         <source>clears the current background profile</source>
         <translation>清除当前背景配置文件</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="229" />
-        <location filename="../help/eventsliders_help.py" line="153" />
+        <location filename="../help/eventbuttons_help.py" line="230" />
+        <location filename="../help/eventsliders_help.py" line="154" />
         <source>activates the alarmset with the given number or label</source>
         <translation>使用给定的数字或标签激活警报集</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="230" />
-        <location filename="../help/eventsliders_help.py" line="154" />
+        <location filename="../help/eventbuttons_help.py" line="231" />
+        <location filename="../help/eventsliders_help.py" line="155" />
         <source>moves the background profile the indicated number of steps towards &lt;direction&gt;, with &lt;direction&gt; one of up, down, left, right</source>
         <translation>将背景配置文件向 &lt;direction&gt; 移动指示的步数，&lt;direction&gt; 为上、下、左、右之一</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="231" />
-        <location filename="../help/eventsliders_help.py" line="155" />
+        <location filename="../help/eventbuttons_help.py" line="232" />
+        <location filename="../help/eventsliders_help.py" line="156" />
         <source>enables/disables keyboard mode</source>
         <translation>启用/禁用键盘模式</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="232" />
-        <location filename="../help/eventsliders_help.py" line="156" />
+        <location filename="../help/eventbuttons_help.py" line="233" />
+        <location filename="../help/eventsliders_help.py" line="157" />
         <source>enables/disables the Keep ON flag</source>
         <translation>启用/禁用 Keep ON 标志</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="233" />
-        <location filename="../help/eventsliders_help.py" line="157" />
+        <location filename="../help/eventbuttons_help.py" line="234" />
+        <location filename="../help/eventsliders_help.py" line="158" />
         <source>shows/hides the curve indicated by &lt;name&gt; which is one of { ET, BT, DeltaET, DeltaBT, BackgroundET, BackgroundBT}</source>
         <translation>显示/隐藏 &lt;name&gt; 指示的曲线，该曲线是 { ET, BT, DeltaET, DeltaBT, BackgroundET, BackgroundBT} 之一</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="234" />
-        <location filename="../help/eventsliders_help.py" line="158" />
+        <location filename="../help/eventbuttons_help.py" line="235" />
+        <location filename="../help/eventsliders_help.py" line="159" />
         <source>shows/hides the &lt;curve&gt; (one of {T1,T2}) of the zero-based &lt;extra_device&gt; number</source>
         <translation>显示/隐藏从零开始的 &lt;extra_device&gt; 数字的 &lt;curve&gt;（{T1,T2} 之一）</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="235" />
-        <location filename="../help/eventsliders_help.py" line="159" />
+        <location filename="../help/eventbuttons_help.py" line="236" />
+        <location filename="../help/eventsliders_help.py" line="160" />
         <source>shows/hides the events of &lt;event_type&gt; in [1,..,5]</source>
         <translation>显示/隐藏 [1,..,5] 中 &lt;event_type&gt; 的事件</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="236" />
-        <location filename="../help/eventsliders_help.py" line="160" />
+        <location filename="../help/eventbuttons_help.py" line="237" />
+        <location filename="../help/eventsliders_help.py" line="161" />
         <source>shows/hides the events of the background profile</source>
         <translation>显示/隐藏背景配置文件的事件</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="237" />
-        <location filename="../help/eventsliders_help.py" line="161" />
+        <location filename="../help/eventbuttons_help.py" line="238" />
+        <location filename="../help/eventsliders_help.py" line="162" />
         <source>RC Command</source>
         <translation>RC指令</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="237" />
-        <location filename="../help/eventsliders_help.py" line="161" />
+        <location filename="../help/eventbuttons_help.py" line="238" />
+        <location filename="../help/eventsliders_help.py" line="162" />
         <source>for PHIDGET RC modules: sets the min/max pulse width in microseconds</source>
         <translation>对于 PHIDGET RC 模块：以微秒为单位设置最小/最大脉冲宽度</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="238" />
-        <location filename="../help/eventsliders_help.py" line="162" />
+        <location filename="../help/eventbuttons_help.py" line="239" />
+        <location filename="../help/eventsliders_help.py" line="163" />
         <source>for PHIDGET RC modules: sets the min/max position</source>
         <translation>对于 PHIDGET RC 模块：设置最小/最大位置</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="239" />
-        <location filename="../help/eventsliders_help.py" line="163" />
+        <location filename="../help/eventbuttons_help.py" line="240" />
+        <location filename="../help/eventsliders_help.py" line="164" />
         <source>for PHIDGET RC modules: engage (b=1) or disengage (b = 0)</source>
         <translation>对于 PHIDGET RC 模块：接合 (b=1) 或脱离 (b = 0)</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="240" />
-        <location filename="../help/eventsliders_help.py" line="164" />
+        <location filename="../help/eventbuttons_help.py" line="241" />
+        <location filename="../help/eventsliders_help.py" line="165" />
         <source>for PHIDGET RC modules: activates or deactivates the speed ramping state</source>
         <translation>对于 PHIDGET RC 模块：激活或禁用速度斜坡状态</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="241" />
-        <location filename="../help/eventsliders_help.py" line="165" />
+        <location filename="../help/eventbuttons_help.py" line="242" />
+        <location filename="../help/eventsliders_help.py" line="166" />
         <source>for PHIDGET RC modules: set the voltage to one of 5, 6 or 7.4 in Volt</source>
         <translation>对于 PHIDGET RC 模块：将电压设置为 5、6 或 7.4 in Volt 之一</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="242" />
-        <location filename="../help/eventsliders_help.py" line="166" />
+        <location filename="../help/eventbuttons_help.py" line="243" />
+        <location filename="../help/eventsliders_help.py" line="167" />
         <source>for PHIDGET RC modules: set the acceleration</source>
         <translation>对于 PHIDGET RC 模块：设置加速度</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="243" />
-        <location filename="../help/eventsliders_help.py" line="167" />
+        <location filename="../help/eventbuttons_help.py" line="244" />
+        <location filename="../help/eventsliders_help.py" line="168" />
         <source>for PHIDGET RC modules: set the velocity</source>
         <translation>对于 PHIDGET RC 模块：设置速度</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="244" />
-        <location filename="../help/eventsliders_help.py" line="168" />
+        <location filename="../help/eventbuttons_help.py" line="245" />
+        <location filename="../help/eventsliders_help.py" line="169" />
         <source>for PHIDGET RC modules: set the target position</source>
         <translation>对于 PHIDGET RC 模块：设置目标位置</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="245" />
-        <location filename="../help/eventsliders_help.py" line="169" />
+        <location filename="../help/eventbuttons_help.py" line="246" />
+        <location filename="../help/eventsliders_help.py" line="170" />
         <source>for YOCTOPUCE RC modules: with c:int the channel, b a bool (eg. enabled(0,1) or enabled(0,True))</source>
         <translation>对于 YOCTOPUCE RC 模块：使用 c:int 通道，b a bool（例如启用（0,1）或启用（0,True））</translation>
     </message>
     <message>
-        <location filename="../help/eventsliders_help.py" line="170" />
+        <location filename="../help/eventsliders_help.py" line="171" />
         <source>for YOCTOPUCE RC modules: with c:int the channel, p:int the target position, the optional t the duration in ms</source>
         <translation>对于 YOCTOPUCE RC 模块：使用 c:int 通道，p:int 目标位置，可选的 t 持续时间以毫秒为单位</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="247" />
-        <location filename="../help/eventsliders_help.py" line="171" />
+        <location filename="../help/eventbuttons_help.py" line="248" />
+        <location filename="../help/eventsliders_help.py" line="172" />
         <source>for YOCTOPUCE RC modules: with n an int [0..65000] in us</source>
         <translation>对于 YOCTOPUCE RC 模块：在我们中使用 n 和 int [0..65000]</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="248" />
-        <location filename="../help/eventsliders_help.py" line="172" />
+        <location filename="../help/eventbuttons_help.py" line="249" />
+        <location filename="../help/eventsliders_help.py" line="173" />
         <source>for YOCTOPUCE RC modules: with r an int in %</source>
         <translation>对于 YOCTOPUCE RC 模块：使用 r 和 int，以 % 为单位</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="249" />
-        <location filename="../help/eventsliders_help.py" line="173" />
+        <location filename="../help/eventbuttons_help.py" line="250" />
+        <location filename="../help/eventsliders_help.py" line="174" />
         <source>Stepper Command</source>
         <translation>步进命令</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="249" />
-        <location filename="../help/eventsliders_help.py" line="173" />
+        <location filename="../help/eventbuttons_help.py" line="250" />
+        <location filename="../help/eventsliders_help.py" line="174" />
         <source>for PHIDGET Stepper Motors: set the target position</source>
         <translation>对于 PHIDGET 步进电机：设置目标位置</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="250" />
-        <location filename="../help/eventsliders_help.py" line="174" />
+        <location filename="../help/eventbuttons_help.py" line="251" />
+        <location filename="../help/eventsliders_help.py" line="175" />
         <source>for PHIDGET Stepper Motors: set the rescale factor</source>
         <translation>对于 PHIDGET 步进电机：设置重新缩放因子</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="251" />
-        <location filename="../help/eventsliders_help.py" line="175" />
+        <location filename="../help/eventbuttons_help.py" line="252" />
+        <location filename="../help/eventsliders_help.py" line="176" />
         <source>for PHIDGET Stepper Motors: engage (b=1) or disengage (b = 0)</source>
         <translation>对于 PHIDGET 步进电机：接合（b=1）或脱离（b = 0）</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="252" />
-        <location filename="../help/eventsliders_help.py" line="176" />
+        <location filename="../help/eventbuttons_help.py" line="253" />
+        <location filename="../help/eventsliders_help.py" line="177" />
         <source>WebSocket Command</source>
         <translation>WebSocket指令</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="253" />
-        <location filename="../help/eventsliders_help.py" line="176" />
+        <location filename="../help/eventbuttons_help.py" line="254" />
+        <location filename="../help/eventsliders_help.py" line="177" />
         <source>If {} substitutions are used, json brackets need to be duplicated to escape them like in send({{ “value”: {}}})</source>
         <translation>如果使用 {} 替换，则需要复制 json 括号以将它们转义，如 send({{ “value”: {}}})</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="258" />
-        <location filename="../help/eventsliders_help.py" line="179" />
+        <location filename="../help/eventbuttons_help.py" line="259" />
+        <location filename="../help/eventsliders_help.py" line="180" />
         <source>if the `&lt;json&gt;` text respects the JSON format it is send to the connected WebSocket server and the response is bound to the variable `_`</source>
         <translation>如果 `&lt;json&gt;` 文本遵守 JSON 格式，则将其发送到连接的 WebSocket 服务器，并且响应绑定到变量 `_`</translation>
     </message>
     <message>
         <location filename="../help/s7_help.py" line="14" />
+        <location filename="../help/mqtt_help.py" line="14" />
         <location filename="../help/modbus_help.py" line="14" />
         <source>PORTS CONFIGURATION</source>
         <translation>端口配置</translation>
@@ -9061,16 +9099,40 @@ Function 4 (Read Input Registers): registers 0 to 65535 corresponding to numbers
         <translation>PID 控制对话框可以使用给定的 PID 寄存器来设置 p-i-d 参数和设定值 (SV)，从而操作已连接的 PID。您可以从该 PID 控制对话框中指定 MODBUS 命令来打开和关闭 PID。有关可用的 MODBUS 写入命令的文档，请参阅事件对话框中的帮助页面。</translation>
     </message>
     <message>
-        <location filename="../help/s7_help.py" line="24" />
         <location filename="../help/modbus_help.py" line="25" />
         <source>The Scan button opens a simple MODBUS scanner to search for data holding registers in the connected device.</source>
         <translation>Scan 按钮打开一个简单的 MODBUS 扫描仪以搜索连接设备中的数据保存寄存器。</translation>
     </message>
     <message>
-        <location filename="../help/s7_help.py" line="25" />
         <location filename="../help/modbus_help.py" line="26" />
         <source>Refer to the User Manual of your MODBUS device for information specific to the setup required for your device.</source>
         <translation>有关您的设备所需设置的特定信息，请参阅您的 MODBUS 设备的用户手册。</translation>
+    </message>
+    <message>
+        <location filename="../help/mqtt_help.py" line="17" />
+        <source>MQTT SETTINGS</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <location filename="../help/mqtt_help.py" line="18" />
+        <source>The MQTT communication is respecting the broker&amp;#39;s host IP and port for communication over TCP or WebSockets using the MQTT protocol v3.1, v3.1.1, or v5. Encryption can be enabled by ticking the TLS option. Connect timeout and keepalive periods can be configured in seconds, and access credentials can be set.</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <location filename="../help/mqtt_help.py" line="19" />
+        <source>Artisan establishes a connection with the broker and subscribes to the specified topics if the ON button is pressed. Each input extracts its data from the payloads received for the main topic or, if provided, the input-specific topics. For each input, a JMESPath (jmespath.org) expression is used to determine how to extract the data for that input is extracted from the received payload.</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <location filename="../help/mqtt_help.py" line="20" />
+        <source>For example, for the payload {"foo": {"bar": [1, 2]}}, the JMESPath expression foo.bar[0] will result in the value 1.</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <location filename="../help/s7_help.py" line="22" />
+        <location filename="../help/mqtt_help.py" line="21" />
+        <source>If mode is set to C or F, readings are automatically converted to the temperature unit set for display.</source>
+        <translation>如果模式设置为 C 或 F，读数将自动转换为设置的温度单位以供显示。</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="14" />
@@ -9460,9 +9522,9 @@ Function 4 (Read Input Registers): registers 0 to 65535 corresponding to numbers
         <translation>触发其他按钮</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="252" />
-        <location filename="../help/eventbuttons_help.py" line="187" />
-        <location filename="../help/eventbuttons_help.py" line="171" />
+        <location filename="../help/eventbuttons_help.py" line="253" />
+        <location filename="../help/eventbuttons_help.py" line="188" />
+        <location filename="../help/eventbuttons_help.py" line="172" />
         <location filename="../help/eventbuttons_help.py" line="125" />
         <location filename="../help/eventbuttons_help.py" line="102" />
         <source>variable holding the last state of the button pressed (1 or 0)</source>
@@ -9491,67 +9553,67 @@ Always multiply with 10 if value Unit: 0.1 / ex. 4719:0 stops heating</source>
         <translation>保存最后一个结果值的变量</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="152" />
+        <location filename="../help/eventbuttons_help.py" line="153" />
         <source>p-i-d</source>
         <translation />
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="152" />
+        <location filename="../help/eventbuttons_help.py" line="153" />
         <source>configures PID to the values &lt;p&gt;;&lt;i&gt;;&lt;d&gt;</source>
         <translation>将 PID 配置为值 &lt;p&gt;;&lt;i&gt;;&lt;d&gt;</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="158" />
+        <location filename="../help/eventbuttons_help.py" line="159" />
         <source>PHIDGET HUB PWM Output ON port &lt;port&gt; to  &lt;value&gt; in [0-100]</source>
         <translation>PHIDGET HUB PWM 输出 ON 端口 &lt;port&gt; 到 &lt;value&gt;（范围：[0-100]）</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="159" />
+        <location filename="../help/eventbuttons_help.py" line="160" />
         <source>PHIDGET HUB PWM Output: toggles &lt;port&gt;</source>
         <translation>PHIDGET HUB PWM 输出：切换&lt;port&gt;</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="160" />
+        <location filename="../help/eventbuttons_help.py" line="161" />
         <source>PHIDGET HUB PWM Output:  turn &lt;port&gt; ON for &lt;millis&gt; milliseconds</source>
         <translation>PHIDGET HUB PWM 输出：打开 &lt;port&gt; 并持续 &lt;millis&gt; 毫秒</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="165" />
+        <location filename="../help/eventbuttons_help.py" line="166" />
         <source>for PHIDGET OUTPUT modules: sets voltage voltage range (r=5 for 5V and r=10 for 10V)</source>
         <translation>对于 PHIDGET OUTPUT 模块：设置电压电压范围（5V 时 r=5，10V 时 r=10）</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="181" />
+        <location filename="../help/eventbuttons_help.py" line="182" />
         <source>write value where bits are replaced by those from orMask at positions where andMask bits are not set</source>
         <translation>在未设置 andMask 位的位置写入位被 orMask 中的位替换的值</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="186" />
+        <location filename="../help/eventbuttons_help.py" line="187" />
         <source>Aillio R1 Command</source>
         <translation>Aillio R1指令</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="186" />
+        <location filename="../help/eventbuttons_help.py" line="187" />
         <source>Sends PRS command</source>
         <translation>发送 PRS 命令</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="214" />
+        <location filename="../help/eventbuttons_help.py" line="215" />
         <source>sets button i to pressed if value of b is yes, true, t, or 1, otherwise to normal</source>
         <translation>如果 b 的值为 yes、true、t 或 1，则将按钮 i 设置为按下，否则设置为正常</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="215" />
+        <location filename="../help/eventbuttons_help.py" line="216" />
         <source>activates button &lt;name&gt; from { START, CHARGE, DRY, FCs, FCe, SCs, SCe, DROP, COOL, OFF } ; sets calling button to “pressed” if argument is 1 or True</source>
         <translation>从 { START, CHARGE, DRY, FCs, FCe, SCs, SCe, DROP, COOL, OFF } 激活按钮 &lt;name&gt; ；如果参数为 1 或 True，则将调用按钮设置为“按下”</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="217" />
+        <location filename="../help/eventbuttons_help.py" line="218" />
         <source>sets button i to visible if value of b is yes, true, t, or 1, otherwise to hidden</source>
         <translation>如果 b 的值为 yes、true、t 或 1，则将按钮 i 设置为可见，否则设置为隐藏</translation>
     </message>
     <message>
-        <location filename="../help/eventbuttons_help.py" line="246" />
+        <location filename="../help/eventbuttons_help.py" line="247" />
         <source>for YOCTOPUCE RC modules: with c:int the channel, p:int the target position, the optional t the duration in ms, sn the optional modules serial number or logical name</source>
         <translation>对于 YOCTOPUCE RC 模块：c:int 通道，p:int 目标位置，可选 t 持续时间（毫秒），sn 可选模块序列号或逻辑名称</translation>
     </message>
@@ -9578,14 +9640,19 @@ Inputs with the area set to the empty input are turned off.</source>
         <translation>因子 1/10 和 1/100 可以设置为分隔符，以重新创建作为整数乘以 10 或 100 传输的浮点数的小数。例如。 145.2 的值可能会作为 1452 传输，然后通过 1/10 分频器将其转换回 145.2。</translation>
     </message>
     <message>
-        <location filename="../help/s7_help.py" line="22" />
-        <source>If mode is set to C or F, readings are automatically converted to the temperature unit set for display.</source>
-        <translation>如果模式设置为 C 或 F，读数将自动转换为设置的温度单位以供显示。</translation>
-    </message>
-    <message>
         <location filename="../help/s7_help.py" line="23" />
         <source>The PID Control dialog can operate a connected PID using the given PID registers to set the p-i-d parameters and the set value (SV). S7 commands can be specified to turn the PID on and off from that PID Control dialog. See the help page in the Events Dialog for documentation of available S7 write commands.</source>
         <translation>PID 控制对话框可以使用给定的 PID 寄存器来设置 p-i-d 参数和设定值 (SV)，从而操作已连接的 PID。可以通过该 PID 控制对话框指定 S7 命令来打开和关闭 PID。有关可用的 S7 写入命令的文档，请参阅事件对话框中的帮助页面。</translation>
+    </message>
+    <message>
+        <location filename="../help/s7_help.py" line="24" />
+        <source>The Scan button opens a simple S7 scanner to search for data holding registers in the connected device.</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <location filename="../help/s7_help.py" line="25" />
+        <source>Refer to the User Manual of your S7 device for information specific to the setup required for your device.</source>
+        <translation type="unfinished" />
     </message>
     <message>
         <location filename="../help/eventannotations_help.py" line="14" />
@@ -10851,8 +10918,8 @@ From Roast&gt;Properties&gt;Cupping Notes</source>
         <translation>注意：所有符号变量都区分大小写！</translation>
     </message>
     <message>
-        <location filename="../help/symbolic_help.py" line="192" />
-        <location filename="../help/symbolic_help.py" line="180" />
+        <location filename="../help/symbolic_help.py" line="196" />
+        <location filename="../help/symbolic_help.py" line="184" />
         <location filename="../help/symbolic_help.py" line="142" />
         <location filename="../help/symbolic_help.py" line="129" />
         <location filename="../help/symbolic_help.py" line="117" />
@@ -11267,124 +11334,129 @@ The prediction value is the calculated time in seconds to reach the DRY or FCs t
         <translation>有条件的。如果条件 &lt;cond&gt; 成立，则计算表达式 &lt;true-expr&gt; 的值，否则计算表达式 &lt;false-expr&gt; 的值。 Python 的规则用于决定一个值是否成立。因此布尔值“True”和“False”具有明显的语义。任何不等于 0 的数字都计算为 True，0 计算为 False。值“None”也被评估为 False。</translation>
     </message>
     <message>
-        <location filename="../help/symbolic_help.py" line="155" />
+        <location filename="../help/symbolic_help.py" line="156" />
+        <source>Note: If any of the referenced symbolic variables contained in a symbolic expression evaluates to the error value -1, the whole expression evaluates to -1. This can be prevented by surrounding the whole expression by regular brackets. Thus, with Y1 evaluating to -1, the expression "Y1 + 1" evaluates to -1, but "(Y1 + 1)" evaluates to 0.</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <location filename="../help/symbolic_help.py" line="159" />
         <source>MATHEMATICAL FORMULAS</source>
         <translation>数学公式</translation>
     </message>
     <message>
-        <location filename="../help/symbolic_help.py" line="158" />
+        <location filename="../help/symbolic_help.py" line="162" />
         <source>Formula</source>
         <translation>公式</translation>
     </message>
     <message>
-        <location filename="../help/symbolic_help.py" line="159" />
+        <location filename="../help/symbolic_help.py" line="163" />
         <source>Return the absolute value of x.</source>
         <translation>返回 x 的绝对值。</translation>
     </message>
     <message>
-        <location filename="../help/symbolic_help.py" line="160" />
+        <location filename="../help/symbolic_help.py" line="164" />
         <source>Return the arc cosine (measured in radians) of x.</source>
         <translation>返回 x 的反余弦值（以弧度为单位）。</translation>
     </message>
     <message>
-        <location filename="../help/symbolic_help.py" line="161" />
+        <location filename="../help/symbolic_help.py" line="165" />
         <source>Return the arc sine (measured in radians) of x.</source>
         <translation>返回 x 的反正弦值（以弧度为单位）。</translation>
     </message>
     <message>
-        <location filename="../help/symbolic_help.py" line="162" />
+        <location filename="../help/symbolic_help.py" line="166" />
         <source>Return the arc tangent (measured in radians) of x.</source>
         <translation>返回 x 的反正切值（以弧度为单位）。</translation>
     </message>
     <message>
-        <location filename="../help/symbolic_help.py" line="163" />
+        <location filename="../help/symbolic_help.py" line="167" />
         <source>Return the cosine of x (measured in radians).</source>
         <translation>返回 x 的余弦值（x 以弧度为单位）。</translation>
     </message>
     <message>
-        <location filename="../help/symbolic_help.py" line="164" />
+        <location filename="../help/symbolic_help.py" line="168" />
         <source>Convert angle x from radians to degrees.</source>
         <translation>将角度 x 从弧度转换为度。</translation>
     </message>
     <message>
-        <location filename="../help/symbolic_help.py" line="165" />
+        <location filename="../help/symbolic_help.py" line="169" />
         <source>Return e raised to the power of x.</source>
         <translation>返回 e 的 x 次方。</translation>
     </message>
     <message>
-        <location filename="../help/symbolic_help.py" line="166" />
+        <location filename="../help/symbolic_help.py" line="170" />
         <source>Return the logarithm of x to the given base.</source>
         <translation>将 x 的对数返回到给定的底数。</translation>
     </message>
     <message>
-        <location filename="../help/symbolic_help.py" line="167" />
+        <location filename="../help/symbolic_help.py" line="171" />
         <source>Return the minimum of the given values.</source>
         <translation>返回给定值的最小值。</translation>
     </message>
     <message>
-        <location filename="../help/symbolic_help.py" line="168" />
+        <location filename="../help/symbolic_help.py" line="172" />
         <source>Return the maximum of the given values.</source>
         <translation>返回给定值的最大值。</translation>
     </message>
     <message>
-        <location filename="../help/symbolic_help.py" line="169" />
+        <location filename="../help/symbolic_help.py" line="173" />
         <source>Return x**y (x to the power of y).</source>
         <translation>返回 x 的 y 次方（x 的 y 次幂）。</translation>
     </message>
     <message>
-        <location filename="../help/symbolic_help.py" line="170" />
+        <location filename="../help/symbolic_help.py" line="174" />
         <source>Convert angle x from degrees to radians.</source>
         <translation>将角度 x 从度转换为弧度。</translation>
     </message>
     <message>
-        <location filename="../help/symbolic_help.py" line="171" />
+        <location filename="../help/symbolic_help.py" line="175" />
         <source>Return the sine of x (measured in radians).</source>
         <translation>返回 x 的正弦值（x 以弧度为单位）。</translation>
     </message>
     <message>
-        <location filename="../help/symbolic_help.py" line="172" />
+        <location filename="../help/symbolic_help.py" line="176" />
         <source>Return the square root of x.</source>
         <translation>返回 x 的平方根。</translation>
     </message>
     <message>
-        <location filename="../help/symbolic_help.py" line="173" />
+        <location filename="../help/symbolic_help.py" line="177" />
         <source>Return the tangent of x (measured in radians).</source>
         <translation>返回 x 的正切值（以弧度为单位）。</translation>
     </message>
     <message>
-        <location filename="../help/symbolic_help.py" line="174" />
+        <location filename="../help/symbolic_help.py" line="178" />
         <source>Return 1 if the bit n of value x (interpreted as integer) is set, otherwise 0.</source>
         <translation>如果值 x（解释为整数）的位 n 已设置，则返回 1，则返回 0。</translation>
     </message>
     <message>
-        <location filename="../help/symbolic_help.py" line="177" />
+        <location filename="../help/symbolic_help.py" line="181" />
         <source>MATHEMATICAL CONSTANTS</source>
         <translation>数学常数</translation>
     </message>
     <message>
-        <location filename="../help/symbolic_help.py" line="180" />
+        <location filename="../help/symbolic_help.py" line="184" />
         <source>Value</source>
         <translation>数值</translation>
     </message>
     <message>
-        <location filename="../help/symbolic_help.py" line="185" />
+        <location filename="../help/symbolic_help.py" line="189" />
         <source>PLOTTER EXTENSIONS</source>
         <translation>绘图仪扩展</translation>
     </message>
     <message>
-        <location filename="../help/symbolic_help.py" line="189" />
+        <location filename="../help/symbolic_help.py" line="193" />
         <source>Note:  This section applies only to the Plotter
 Using math formulas in the plotter also allows to use the symbolic variables P and F (see Signals, Symbolic Assignments and the Plotter).</source>
         <translation>注意：本节仅适用于绘图仪
 在绘图仪中使用数学公式还允许使用符号变量 P 和 F（请参阅信号、符号分配和绘图仪）。</translation>
     </message>
     <message>
-        <location filename="../help/symbolic_help.py" line="193" />
+        <location filename="../help/symbolic_help.py" line="197" />
         <source>The variables P1,..,P9 represent the results from plot #1,..,#9. You can perform calculations in a later plot on variables of an earlier plot. That way, the plot variables P1,..,P9 allow the cascading or intermediate results. For example, plot #3 can refer to the results of plot 1 using the variable P1.</source>
         <translation>变量 P1,..,P9 代表绘图 #1,..,#9 的结果。您可以在稍后的绘图中对较早绘图的变量执行计算。这样，绘图变量 P1,..,P9 允许级联或中间结果。例如，情节 #3 可以使用变量 P1 引用情节 1 的结果。</translation>
     </message>
     <message>
-        <location filename="../help/symbolic_help.py" line="194" />
+        <location filename="../help/symbolic_help.py" line="198" />
         <source>F1 refers to the previous result of the actual formula to realize a feedback loop. This is useful in filter designs. Similarly, F2 refers to the second previous result etc.</source>
         <translation>F1参考实际公式的前一个结果来实现一个反馈循环。这在滤波器设计中很有用。同样，F2 指的是第二个先前的结果等。</translation>
     </message>
@@ -11547,107 +11619,8 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
 </context><context>
     <name>Label</name>
     <message>
-        <location filename="../artisanlib/canvas.py" line="12001" />
-        <location filename="../artisanlib/large_lcds.py" line="851" />
-        <location filename="../artisanlib/roast_properties.py" line="906" />
-        <location filename="../artisanlib/roast_properties.py" line="221" />
-        <location filename="../artisanlib/roast_properties.py" line="148" />
-        <location filename="../plus/schedule.py" line="2049" />
-        <location filename="../plus/blend.py" line="157" />
-        <source>Weight</source>
-        <translation>重量</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/statistics.py" line="202" />
-        <location filename="../artisanlib/roast_properties.py" line="1094" />
-        <location filename="../artisanlib/roast_properties.py" line="897" />
-        <location filename="../plus/blend.py" line="343" />
-        <source>Beans</source>
-        <translation>生豆</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/statistics.py" line="231" />
-        <location filename="../artisanlib/roast_properties.py" line="1735" />
-        <location filename="../plus/schedule.py" line="2071" />
-        <source>Yield</source>
-        <translation>产量</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="23817" />
-        <location filename="../artisanlib/roast_properties.py" line="1734" />
-        <location filename="../plus/schedule.py" line="2081" />
-        <source>Defects</source>
-        <translation>瑕疵</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/canvas.py" line="11945" />
-        <location filename="../artisanlib/roast_properties.py" line="998" />
-        <location filename="../plus/schedule.py" line="2091" />
-        <source>Density</source>
-        <translation>密度</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/roast_properties.py" line="1069" />
-        <location filename="../artisanlib/events.py" line="449" />
-        <location filename="../plus/schedule.py" line="2101" />
-        <source>Color</source>
-        <translation>颜色测量</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/canvas.py" line="11950" />
-        <location filename="../artisanlib/roast_properties.py" line="1106" />
-        <location filename="../plus/schedule.py" line="2111" />
-        <source>Moisture</source>
-        <translation>含水量</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/statistics.py" line="213" />
-        <location filename="../artisanlib/roast_properties.py" line="1180" />
-        <location filename="../plus/schedule.py" line="2122" />
-        <location filename="../plus/schedule.py" line="2121" />
-        <source>Roasting Notes</source>
-        <translation>烘焙笔记</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2126" />
-        <source>Score</source>
-        <translation>分数</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/statistics.py" line="214" />
-        <location filename="../plus/schedule.py" line="2127" />
-        <source>Cupping Score</source>
-        <translation>杯测分数</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/statistics.py" line="215" />
-        <location filename="../artisanlib/roast_properties.py" line="1184" />
-        <location filename="../plus/schedule.py" line="2134" />
-        <location filename="../plus/schedule.py" line="2133" />
-        <source>Cupping Notes</source>
-        <translation>杯测笔记</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/roast_properties.py" line="905" />
-        <location filename="../artisanlib/roast_properties.py" line="279" />
-        <location filename="../plus/schedule.py" line="4068" />
-        <location filename="../plus/schedule.py" line="2222" />
-        <source>Roasted</source>
-        <translation>熟豆</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/canvas.py" line="12001" />
-        <location filename="../artisanlib/canvas.py" line="11950" />
-        <location filename="../artisanlib/canvas.py" line="11945" />
-        <location filename="../artisanlib/roast_properties.py" line="904" />
-        <location filename="../artisanlib/roast_properties.py" line="206" />
-        <location filename="../plus/schedule.py" line="4066" />
-        <source>Green</source>
-        <translation>生豆</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/events.py" line="3811" />
-        <location filename="../artisanlib/events.py" line="1010" />
+        <location filename="../artisanlib/events.py" line="3877" />
+        <location filename="../artisanlib/events.py" line="1022" />
         <location filename="../artisanlib/events.py" line="744" />
         <location filename="../artisanlib/pid_dialogs.py" line="550" />
         <location filename="../artisanlib/pid_dialogs.py" line="489" />
@@ -11660,8 +11633,8 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <translation>最大</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="3810" />
-        <location filename="../artisanlib/events.py" line="1008" />
+        <location filename="../artisanlib/events.py" line="3876" />
+        <location filename="../artisanlib/events.py" line="1020" />
         <location filename="../artisanlib/events.py" line="742" />
         <location filename="../artisanlib/pid_dialogs.py" line="542" />
         <location filename="../artisanlib/pid_dialogs.py" line="480" />
@@ -11684,7 +11657,7 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <translation>记录</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="1012" />
+        <location filename="../artisanlib/events.py" line="1024" />
         <location filename="../artisanlib/events.py" line="748" />
         <location filename="../artisanlib/axis.py" line="254" />
         <location filename="../artisanlib/axis.py" line="244" />
@@ -11699,7 +11672,7 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <translation>风格</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="882" />
+        <location filename="../artisanlib/main.py" line="883" />
         <location filename="../artisanlib/axis.py" line="293" />
         <source>Width</source>
         <translation>宽度</translation>
@@ -11717,8 +11690,8 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <translation>纵横比</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="6272" />
-        <location filename="../artisanlib/main.py" line="6169" />
+        <location filename="../artisanlib/main.py" line="6308" />
+        <location filename="../artisanlib/main.py" line="6205" />
         <location filename="../artisanlib/wheels.py" line="70" />
         <source>Text</source>
         <translation>文字</translation>
@@ -11729,7 +11702,7 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <translation>边缘</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="879" />
+        <location filename="../artisanlib/main.py" line="880" />
         <location filename="../artisanlib/wheels.py" line="83" />
         <source>Line</source>
         <translation>线条</translation>
@@ -11745,19 +11718,19 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="18272" />
-        <location filename="../artisanlib/canvas.py" line="18262" />
-        <location filename="../artisanlib/canvas.py" line="9226" />
-        <location filename="../artisanlib/canvas.py" line="9170" />
-        <location filename="../artisanlib/main.py" line="18897" />
-        <location filename="../artisanlib/main.py" line="6214" />
-        <location filename="../artisanlib/main.py" line="6208" />
-        <location filename="../artisanlib/main.py" line="6184" />
-        <location filename="../artisanlib/main.py" line="6160" />
-        <location filename="../artisanlib/main.py" line="6154" />
-        <location filename="../artisanlib/main.py" line="3746" />
-        <location filename="../artisanlib/main.py" line="3437" />
-        <location filename="../artisanlib/main.py" line="3427" />
+        <location filename="../artisanlib/canvas.py" line="18321" />
+        <location filename="../artisanlib/canvas.py" line="18311" />
+        <location filename="../artisanlib/canvas.py" line="9243" />
+        <location filename="../artisanlib/canvas.py" line="9187" />
+        <location filename="../artisanlib/main.py" line="18969" />
+        <location filename="../artisanlib/main.py" line="6250" />
+        <location filename="../artisanlib/main.py" line="6244" />
+        <location filename="../artisanlib/main.py" line="6220" />
+        <location filename="../artisanlib/main.py" line="6196" />
+        <location filename="../artisanlib/main.py" line="6190" />
+        <location filename="../artisanlib/main.py" line="3749" />
+        <location filename="../artisanlib/main.py" line="3440" />
+        <location filename="../artisanlib/main.py" line="3430" />
         <location filename="../artisanlib/curves.py" line="2243" />
         <location filename="../artisanlib/curves.py" line="1581" />
         <location filename="../artisanlib/curves.py" line="1343" />
@@ -11778,19 +11751,19 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="18269" />
-        <location filename="../artisanlib/canvas.py" line="18258" />
-        <location filename="../artisanlib/canvas.py" line="9199" />
-        <location filename="../artisanlib/canvas.py" line="9148" />
-        <location filename="../artisanlib/main.py" line="18890" />
-        <location filename="../artisanlib/main.py" line="6211" />
-        <location filename="../artisanlib/main.py" line="6205" />
-        <location filename="../artisanlib/main.py" line="6181" />
-        <location filename="../artisanlib/main.py" line="6163" />
-        <location filename="../artisanlib/main.py" line="6157" />
-        <location filename="../artisanlib/main.py" line="3745" />
-        <location filename="../artisanlib/main.py" line="3432" />
-        <location filename="../artisanlib/main.py" line="3422" />
+        <location filename="../artisanlib/canvas.py" line="18318" />
+        <location filename="../artisanlib/canvas.py" line="18307" />
+        <location filename="../artisanlib/canvas.py" line="9216" />
+        <location filename="../artisanlib/canvas.py" line="9165" />
+        <location filename="../artisanlib/main.py" line="18962" />
+        <location filename="../artisanlib/main.py" line="6247" />
+        <location filename="../artisanlib/main.py" line="6241" />
+        <location filename="../artisanlib/main.py" line="6217" />
+        <location filename="../artisanlib/main.py" line="6199" />
+        <location filename="../artisanlib/main.py" line="6193" />
+        <location filename="../artisanlib/main.py" line="3748" />
+        <location filename="../artisanlib/main.py" line="3435" />
+        <location filename="../artisanlib/main.py" line="3425" />
         <location filename="../artisanlib/curves.py" line="2238" />
         <location filename="../artisanlib/curves.py" line="1590" />
         <location filename="../artisanlib/curves.py" line="1340" />
@@ -11819,15 +11792,15 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <translation>对齐</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="18625" />
-        <location filename="../artisanlib/canvas.py" line="14509" />
-        <location filename="../artisanlib/canvas.py" line="14443" />
-        <location filename="../artisanlib/canvas.py" line="12218" />
-        <location filename="../artisanlib/canvas.py" line="11897" />
-        <location filename="../artisanlib/canvas.py" line="8575" />
-        <location filename="../artisanlib/canvas.py" line="8570" />
-        <location filename="../artisanlib/canvas.py" line="4164" />
-        <location filename="../artisanlib/canvas.py" line="1319" />
+        <location filename="../artisanlib/canvas.py" line="18674" />
+        <location filename="../artisanlib/canvas.py" line="14558" />
+        <location filename="../artisanlib/canvas.py" line="14492" />
+        <location filename="../artisanlib/canvas.py" line="12235" />
+        <location filename="../artisanlib/canvas.py" line="11914" />
+        <location filename="../artisanlib/canvas.py" line="8592" />
+        <location filename="../artisanlib/canvas.py" line="8587" />
+        <location filename="../artisanlib/canvas.py" line="4170" />
+        <location filename="../artisanlib/canvas.py" line="1325" />
         <location filename="../artisanlib/transposer.py" line="1197" />
         <location filename="../artisanlib/devices.py" line="1170" />
         <location filename="../artisanlib/alarms.py" line="912" />
@@ -11841,8 +11814,8 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <location filename="../artisanlib/roast_properties.py" line="657" />
         <location filename="../artisanlib/background.py" line="1060" />
         <location filename="../artisanlib/background.py" line="96" />
-        <location filename="../artisanlib/ports.py" line="1351" />
-        <location filename="../artisanlib/events.py" line="1278" />
+        <location filename="../artisanlib/ports.py" line="1372" />
+        <location filename="../artisanlib/events.py" line="1290" />
         <location filename="../artisanlib/events.py" line="569" />
         <location filename="../artisanlib/events.py" line="558" />
         <location filename="../artisanlib/events.py" line="554" />
@@ -11854,11 +11827,11 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <translation>投豆</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="8268" />
-        <location filename="../artisanlib/main.py" line="8262" />
-        <location filename="../artisanlib/main.py" line="8095" />
-        <location filename="../artisanlib/main.py" line="8063" />
-        <location filename="../artisanlib/main.py" line="3853" />
+        <location filename="../artisanlib/main.py" line="8304" />
+        <location filename="../artisanlib/main.py" line="8298" />
+        <location filename="../artisanlib/main.py" line="8131" />
+        <location filename="../artisanlib/main.py" line="8099" />
+        <location filename="../artisanlib/main.py" line="3856" />
         <location filename="../artisanlib/statistics.py" line="98" />
         <location filename="../artisanlib/events.py" line="607" />
         <location filename="../artisanlib/events.py" line="598" />
@@ -11867,70 +11840,70 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <translation>回温点</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="1320" />
+        <location filename="../artisanlib/canvas.py" line="1326" />
         <location filename="../artisanlib/devices.py" line="1171" />
-        <location filename="../artisanlib/main.py" line="8269" />
-        <location filename="../artisanlib/main.py" line="8155" />
-        <location filename="../artisanlib/main.py" line="8153" />
-        <location filename="../artisanlib/main.py" line="8141" />
-        <location filename="../artisanlib/main.py" line="8120" />
-        <location filename="../artisanlib/main.py" line="3871" />
+        <location filename="../artisanlib/main.py" line="8305" />
+        <location filename="../artisanlib/main.py" line="8191" />
+        <location filename="../artisanlib/main.py" line="8189" />
+        <location filename="../artisanlib/main.py" line="8177" />
+        <location filename="../artisanlib/main.py" line="8156" />
+        <location filename="../artisanlib/main.py" line="3874" />
         <location filename="../artisanlib/background.py" line="97" />
-        <location filename="../artisanlib/ports.py" line="1416" />
+        <location filename="../artisanlib/ports.py" line="1437" />
         <location filename="../artisanlib/comparator.py" line="1012" />
         <source>DRY</source>
         <translation>脱水</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="1321" />
+        <location filename="../artisanlib/canvas.py" line="1327" />
         <location filename="../artisanlib/devices.py" line="1172" />
-        <location filename="../artisanlib/main.py" line="8270" />
-        <location filename="../artisanlib/main.py" line="8233" />
-        <location filename="../artisanlib/main.py" line="8229" />
-        <location filename="../artisanlib/main.py" line="8225" />
-        <location filename="../artisanlib/main.py" line="8206" />
-        <location filename="../artisanlib/main.py" line="8190" />
-        <location filename="../artisanlib/main.py" line="8040" />
-        <location filename="../artisanlib/main.py" line="8031" />
-        <location filename="../artisanlib/main.py" line="3889" />
+        <location filename="../artisanlib/main.py" line="8306" />
+        <location filename="../artisanlib/main.py" line="8269" />
+        <location filename="../artisanlib/main.py" line="8265" />
+        <location filename="../artisanlib/main.py" line="8261" />
+        <location filename="../artisanlib/main.py" line="8242" />
+        <location filename="../artisanlib/main.py" line="8226" />
+        <location filename="../artisanlib/main.py" line="8076" />
+        <location filename="../artisanlib/main.py" line="8067" />
+        <location filename="../artisanlib/main.py" line="3892" />
         <location filename="../artisanlib/background.py" line="98" />
-        <location filename="../artisanlib/ports.py" line="1418" />
+        <location filename="../artisanlib/ports.py" line="1439" />
         <location filename="../artisanlib/comparator.py" line="1013" />
         <source>FCs</source>
         <translation>第一次爆裂</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="1322" />
+        <location filename="../artisanlib/canvas.py" line="1328" />
         <location filename="../artisanlib/devices.py" line="1173" />
         <location filename="../artisanlib/background.py" line="99" />
-        <location filename="../artisanlib/ports.py" line="1420" />
+        <location filename="../artisanlib/ports.py" line="1441" />
         <location filename="../artisanlib/comparator.py" line="1014" />
         <source>FCe</source>
         <translation>一爆结束</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="1323" />
+        <location filename="../artisanlib/canvas.py" line="1329" />
         <location filename="../artisanlib/devices.py" line="1174" />
         <location filename="../artisanlib/background.py" line="100" />
-        <location filename="../artisanlib/ports.py" line="1422" />
+        <location filename="../artisanlib/ports.py" line="1443" />
         <location filename="../artisanlib/comparator.py" line="1015" />
         <source>SCs</source>
         <translation>第二次爆裂</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="1324" />
+        <location filename="../artisanlib/canvas.py" line="1330" />
         <location filename="../artisanlib/devices.py" line="1175" />
         <location filename="../artisanlib/background.py" line="101" />
-        <location filename="../artisanlib/ports.py" line="1424" />
+        <location filename="../artisanlib/ports.py" line="1445" />
         <location filename="../artisanlib/comparator.py" line="1016" />
         <source>SCe</source>
         <translation>二爆结束</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="18643" />
-        <location filename="../artisanlib/canvas.py" line="11898" />
-        <location filename="../artisanlib/canvas.py" line="4170" />
-        <location filename="../artisanlib/canvas.py" line="1325" />
+        <location filename="../artisanlib/canvas.py" line="18692" />
+        <location filename="../artisanlib/canvas.py" line="11915" />
+        <location filename="../artisanlib/canvas.py" line="4176" />
+        <location filename="../artisanlib/canvas.py" line="1331" />
         <location filename="../artisanlib/transposer.py" line="1201" />
         <location filename="../artisanlib/transposer.py" line="1130" />
         <location filename="../artisanlib/devices.py" line="1176" />
@@ -11944,8 +11917,8 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <location filename="../artisanlib/roast_properties.py" line="740" />
         <location filename="../artisanlib/background.py" line="1078" />
         <location filename="../artisanlib/background.py" line="102" />
-        <location filename="../artisanlib/ports.py" line="1353" />
-        <location filename="../artisanlib/events.py" line="1338" />
+        <location filename="../artisanlib/ports.py" line="1374" />
+        <location filename="../artisanlib/events.py" line="1368" />
         <location filename="../artisanlib/events.py" line="607" />
         <location filename="../artisanlib/events.py" line="579" />
         <location filename="../artisanlib/events.py" line="576" />
@@ -11961,20 +11934,20 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <translation>/分钟</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="26586" />
-        <location filename="../artisanlib/main.py" line="26585" />
-        <location filename="../artisanlib/main.py" line="26584" />
-        <location filename="../artisanlib/ports.py" line="1137" />
-        <location filename="../artisanlib/ports.py" line="672" />
-        <location filename="../artisanlib/events.py" line="1358" />
+        <location filename="../artisanlib/main.py" line="26688" />
+        <location filename="../artisanlib/main.py" line="26687" />
+        <location filename="../artisanlib/main.py" line="26686" />
+        <location filename="../artisanlib/ports.py" line="1155" />
+        <location filename="../artisanlib/ports.py" line="690" />
+        <location filename="../artisanlib/events.py" line="1394" />
         <location filename="../artisanlib/comparator.py" line="1560" />
         <source>ON</source>
         <translation>打开</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23208" />
-        <location filename="../artisanlib/main.py" line="21864" />
-        <location filename="../artisanlib/main.py" line="6196" />
+        <location filename="../artisanlib/main.py" line="23272" />
+        <location filename="../artisanlib/main.py" line="21928" />
+        <location filename="../artisanlib/main.py" line="6232" />
         <location filename="../artisanlib/statistics.py" line="196" />
         <location filename="../artisanlib/roast_properties.py" line="830" />
         <location filename="../artisanlib/comparator.py" line="1561" />
@@ -11992,10 +11965,10 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <translation>PV</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="8495" />
-        <location filename="../artisanlib/main.py" line="4162" />
-        <location filename="../artisanlib/ports.py" line="1051" />
-        <location filename="../artisanlib/ports.py" line="587" />
+        <location filename="../artisanlib/main.py" line="8531" />
+        <location filename="../artisanlib/main.py" line="4165" />
+        <location filename="../artisanlib/ports.py" line="1069" />
+        <location filename="../artisanlib/ports.py" line="605" />
         <location filename="../artisanlib/events.py" line="753" />
         <location filename="../artisanlib/pid_dialogs.py" line="4763" />
         <location filename="../artisanlib/pid_dialogs.py" line="437" />
@@ -12014,8 +11987,8 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <translation>同步</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1454" />
-        <location filename="../artisanlib/ports.py" line="989" />
+        <location filename="../artisanlib/ports.py" line="1475" />
+        <location filename="../artisanlib/ports.py" line="1007" />
         <location filename="../artisanlib/pid_dialogs.py" line="287" />
         <source>Input</source>
         <translation>输入</translation>
@@ -12033,7 +12006,7 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <translation>冷却</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="6269" />
+        <location filename="../artisanlib/main.py" line="6305" />
         <location filename="../artisanlib/pid_dialogs.py" line="469" />
         <location filename="../artisanlib/pid_dialogs.py" line="337" />
         <source>Slider</source>
@@ -12061,9 +12034,10 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="783" />
-        <location filename="../artisanlib/ports.py" line="1445" />
-        <location filename="../artisanlib/ports.py" line="965" />
-        <location filename="../artisanlib/ports.py" line="485" />
+        <location filename="../artisanlib/ports.py" line="1599" />
+        <location filename="../artisanlib/ports.py" line="1466" />
+        <location filename="../artisanlib/ports.py" line="983" />
+        <location filename="../artisanlib/ports.py" line="503" />
         <location filename="../artisanlib/pid_dialogs.py" line="454" />
         <source>Mode</source>
         <translation>模式</translation>
@@ -12080,29 +12054,29 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <translation>缓升/恒温</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="2643" />
-        <location filename="../artisanlib/canvas.py" line="2641" />
+        <location filename="../artisanlib/canvas.py" line="2649" />
+        <location filename="../artisanlib/canvas.py" line="2647" />
         <location filename="../artisanlib/devices.py" line="3386" />
         <location filename="../artisanlib/devices.py" line="3372" />
-        <location filename="../artisanlib/main.py" line="6269" />
-        <location filename="../artisanlib/main.py" line="6263" />
-        <location filename="../artisanlib/main.py" line="6254" />
-        <location filename="../artisanlib/main.py" line="6247" />
+        <location filename="../artisanlib/main.py" line="6305" />
+        <location filename="../artisanlib/main.py" line="6299" />
+        <location filename="../artisanlib/main.py" line="6290" />
+        <location filename="../artisanlib/main.py" line="6283" />
+        <location filename="../artisanlib/main.py" line="6257" />
+        <location filename="../artisanlib/main.py" line="6224" />
         <location filename="../artisanlib/main.py" line="6221" />
-        <location filename="../artisanlib/main.py" line="6188" />
-        <location filename="../artisanlib/main.py" line="6185" />
-        <location filename="../artisanlib/main.py" line="6184" />
-        <location filename="../artisanlib/main.py" line="6182" />
-        <location filename="../artisanlib/main.py" line="6181" />
-        <location filename="../artisanlib/main.py" line="6179" />
-        <location filename="../artisanlib/main.py" line="6176" />
-        <location filename="../artisanlib/main.py" line="6173" />
-        <location filename="../artisanlib/main.py" line="6170" />
-        <location filename="../artisanlib/main.py" line="6167" />
-        <location filename="../artisanlib/main.py" line="6164" />
-        <location filename="../artisanlib/main.py" line="6161" />
-        <location filename="../artisanlib/main.py" line="6158" />
-        <location filename="../artisanlib/main.py" line="6155" />
+        <location filename="../artisanlib/main.py" line="6220" />
+        <location filename="../artisanlib/main.py" line="6218" />
+        <location filename="../artisanlib/main.py" line="6217" />
+        <location filename="../artisanlib/main.py" line="6215" />
+        <location filename="../artisanlib/main.py" line="6212" />
+        <location filename="../artisanlib/main.py" line="6209" />
+        <location filename="../artisanlib/main.py" line="6206" />
+        <location filename="../artisanlib/main.py" line="6203" />
+        <location filename="../artisanlib/main.py" line="6200" />
+        <location filename="../artisanlib/main.py" line="6197" />
+        <location filename="../artisanlib/main.py" line="6194" />
+        <location filename="../artisanlib/main.py" line="6191" />
         <location filename="../artisanlib/pid_dialogs.py" line="458" />
         <source>Background</source>
         <translation>背景曲线</translation>
@@ -12190,7 +12164,7 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <translation>设定点变化时重置积分</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="878" />
+        <location filename="../artisanlib/main.py" line="879" />
         <location filename="../artisanlib/alarms.py" line="139" />
         <location filename="../artisanlib/roast_properties.py" line="2987" />
         <location filename="../artisanlib/roast_properties.py" line="2986" />
@@ -12201,8 +12175,8 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <translation>标签</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="18628" />
-        <location filename="../artisanlib/canvas.py" line="4165" />
+        <location filename="../artisanlib/canvas.py" line="18677" />
+        <location filename="../artisanlib/canvas.py" line="4171" />
         <location filename="../artisanlib/transposer.py" line="1198" />
         <location filename="../artisanlib/transposer.py" line="1127" />
         <location filename="../artisanlib/alarms.py" line="904" />
@@ -12217,14 +12191,14 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <location filename="../artisanlib/roast_properties.py" line="4482" />
         <location filename="../artisanlib/roast_properties.py" line="668" />
         <location filename="../artisanlib/background.py" line="1063" />
-        <location filename="../artisanlib/events.py" line="1288" />
+        <location filename="../artisanlib/events.py" line="1303" />
         <location filename="../artisanlib/pid_dialogs.py" line="833" />
         <source>DRY END</source>
         <translation>脱水结束</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="18631" />
-        <location filename="../artisanlib/canvas.py" line="4166" />
+        <location filename="../artisanlib/canvas.py" line="18680" />
+        <location filename="../artisanlib/canvas.py" line="4172" />
         <location filename="../artisanlib/transposer.py" line="1199" />
         <location filename="../artisanlib/transposer.py" line="1128" />
         <location filename="../artisanlib/alarms.py" line="905" />
@@ -12237,14 +12211,14 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <location filename="../artisanlib/roast_properties.py" line="4485" />
         <location filename="../artisanlib/roast_properties.py" line="682" />
         <location filename="../artisanlib/background.py" line="1066" />
-        <location filename="../artisanlib/events.py" line="1298" />
+        <location filename="../artisanlib/events.py" line="1316" />
         <location filename="../artisanlib/pid_dialogs.py" line="834" />
         <source>FC START</source>
         <translation>第一次爆裂</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="18634" />
-        <location filename="../artisanlib/canvas.py" line="4167" />
+        <location filename="../artisanlib/canvas.py" line="18683" />
+        <location filename="../artisanlib/canvas.py" line="4173" />
         <location filename="../artisanlib/alarms.py" line="906" />
         <location filename="../artisanlib/alarms.py" line="850" />
         <location filename="../artisanlib/curves.py" line="2128" />
@@ -12254,14 +12228,14 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <location filename="../artisanlib/roast_properties.py" line="4488" />
         <location filename="../artisanlib/roast_properties.py" line="697" />
         <location filename="../artisanlib/background.py" line="1069" />
-        <location filename="../artisanlib/events.py" line="1308" />
+        <location filename="../artisanlib/events.py" line="1329" />
         <location filename="../artisanlib/pid_dialogs.py" line="835" />
         <source>FC END</source>
         <translation>一爆结束</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="18637" />
-        <location filename="../artisanlib/canvas.py" line="4168" />
+        <location filename="../artisanlib/canvas.py" line="18686" />
+        <location filename="../artisanlib/canvas.py" line="4174" />
         <location filename="../artisanlib/transposer.py" line="1200" />
         <location filename="../artisanlib/transposer.py" line="1129" />
         <location filename="../artisanlib/alarms.py" line="907" />
@@ -12273,14 +12247,14 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <location filename="../artisanlib/roast_properties.py" line="4491" />
         <location filename="../artisanlib/roast_properties.py" line="711" />
         <location filename="../artisanlib/background.py" line="1072" />
-        <location filename="../artisanlib/events.py" line="1318" />
+        <location filename="../artisanlib/events.py" line="1342" />
         <location filename="../artisanlib/pid_dialogs.py" line="836" />
         <source>SC START</source>
         <translation>第二次爆裂</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="18640" />
-        <location filename="../artisanlib/canvas.py" line="4169" />
+        <location filename="../artisanlib/canvas.py" line="18689" />
+        <location filename="../artisanlib/canvas.py" line="4175" />
         <location filename="../artisanlib/alarms.py" line="908" />
         <location filename="../artisanlib/alarms.py" line="852" />
         <location filename="../artisanlib/curves.py" line="2130" />
@@ -12290,7 +12264,7 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <location filename="../artisanlib/roast_properties.py" line="4494" />
         <location filename="../artisanlib/roast_properties.py" line="725" />
         <location filename="../artisanlib/background.py" line="1075" />
-        <location filename="../artisanlib/events.py" line="1328" />
+        <location filename="../artisanlib/events.py" line="1355" />
         <location filename="../artisanlib/pid_dialogs.py" line="837" />
         <source>SC END</source>
         <translation>第二爆结束</translation>
@@ -12414,22 +12388,22 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <translation>最大SV</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1082" />
-        <location filename="../artisanlib/ports.py" line="618" />
+        <location filename="../artisanlib/ports.py" line="1100" />
+        <location filename="../artisanlib/ports.py" line="636" />
         <location filename="../artisanlib/pid_dialogs.py" line="2992" />
         <source>P</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1088" />
-        <location filename="../artisanlib/ports.py" line="624" />
+        <location filename="../artisanlib/ports.py" line="1106" />
+        <location filename="../artisanlib/ports.py" line="642" />
         <location filename="../artisanlib/pid_dialogs.py" line="2998" />
         <source>I</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1094" />
-        <location filename="../artisanlib/ports.py" line="630" />
+        <location filename="../artisanlib/ports.py" line="1112" />
+        <location filename="../artisanlib/ports.py" line="648" />
         <location filename="../artisanlib/pid_dialogs.py" line="3004" />
         <source>D</source>
         <translation />
@@ -12485,10 +12459,17 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <translation>允许重叠说明</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="6166" />
+        <location filename="../artisanlib/main.py" line="6202" />
         <location filename="../artisanlib/events.py" line="317" />
         <source>Markers</source>
         <translation>标记</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2101" />
+        <location filename="../artisanlib/roast_properties.py" line="1069" />
+        <location filename="../artisanlib/events.py" line="449" />
+        <source>Color</source>
+        <translation>颜色测量</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="451" />
@@ -12496,7 +12477,7 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <translation>文字颜色</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="884" />
+        <location filename="../artisanlib/main.py" line="885" />
         <location filename="../artisanlib/designer.py" line="70" />
         <location filename="../artisanlib/events.py" line="453" />
         <source>Marker</source>
@@ -12514,24 +12495,24 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <translation>不透明度</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="886" />
+        <location filename="../artisanlib/main.py" line="887" />
         <location filename="../artisanlib/events.py" line="459" />
         <source>Size</source>
         <translation>大小</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="26610" />
-        <location filename="../artisanlib/main.py" line="26609" />
-        <location filename="../artisanlib/main.py" line="26605" />
-        <location filename="../artisanlib/events.py" line="1404" />
+        <location filename="../artisanlib/main.py" line="26712" />
+        <location filename="../artisanlib/main.py" line="26711" />
+        <location filename="../artisanlib/main.py" line="26707" />
+        <location filename="../artisanlib/events.py" line="1452" />
         <location filename="../artisanlib/events.py" line="569" />
         <location filename="../artisanlib/events.py" line="558" />
         <source>START</source>
         <translation>开始</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="16057" />
-        <location filename="../artisanlib/canvas.py" line="16048" />
+        <location filename="../artisanlib/canvas.py" line="16106" />
+        <location filename="../artisanlib/canvas.py" line="16097" />
         <location filename="../artisanlib/events.py" line="603" />
         <source>MET</source>
         <translation>最大环境温度</translation>
@@ -12557,12 +12538,12 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <translation>当前：</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="6272" />
-        <location filename="../artisanlib/main.py" line="6266" />
-        <location filename="../artisanlib/main.py" line="6263" />
+        <location filename="../artisanlib/main.py" line="6308" />
+        <location filename="../artisanlib/main.py" line="6302" />
+        <location filename="../artisanlib/main.py" line="6299" />
         <location filename="../artisanlib/roast_properties.py" line="2973" />
-        <location filename="../artisanlib/ports.py" line="1411" />
-        <location filename="../artisanlib/events.py" line="1004" />
+        <location filename="../artisanlib/ports.py" line="1432" />
+        <location filename="../artisanlib/events.py" line="1016" />
         <location filename="../artisanlib/events.py" line="732" />
         <source>Event</source>
         <translation>事件</translation>
@@ -12574,20 +12555,20 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <translation>动作</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1319" />
+        <location filename="../artisanlib/ports.py" line="1340" />
         <location filename="../artisanlib/events.py" line="736" />
         <source>Command</source>
         <translation>指令</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="3815" />
+        <location filename="../artisanlib/events.py" line="3881" />
         <location filename="../artisanlib/events.py" line="738" />
         <source>Offset</source>
         <translation>补偿</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="966" />
-        <location filename="../artisanlib/events.py" line="3814" />
+        <location filename="../artisanlib/ports.py" line="984" />
+        <location filename="../artisanlib/events.py" line="3880" />
         <location filename="../artisanlib/events.py" line="740" />
         <source>Factor</source>
         <translation>因子</translation>
@@ -12614,150 +12595,151 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="2993" />
         <location filename="../artisanlib/roast_properties.py" line="2992" />
-        <location filename="../artisanlib/events.py" line="1006" />
+        <location filename="../artisanlib/events.py" line="1018" />
         <source>Source</source>
         <translation>来源</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="1168" />
+        <location filename="../artisanlib/events.py" line="1180" />
         <source>Cluster</source>
         <translation>群组</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="26586" />
-        <location filename="../artisanlib/main.py" line="26585" />
-        <location filename="../artisanlib/main.py" line="26583" />
-        <location filename="../artisanlib/ports.py" line="1134" />
-        <location filename="../artisanlib/ports.py" line="669" />
-        <location filename="../artisanlib/events.py" line="1373" />
+        <location filename="../artisanlib/main.py" line="26688" />
+        <location filename="../artisanlib/main.py" line="26687" />
+        <location filename="../artisanlib/main.py" line="26685" />
+        <location filename="../artisanlib/ports.py" line="1152" />
+        <location filename="../artisanlib/ports.py" line="687" />
+        <location filename="../artisanlib/events.py" line="1415" />
         <source>OFF</source>
         <translation>关闭</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="1396" />
+        <location filename="../artisanlib/events.py" line="1441" />
         <source>RESET</source>
         <translation>重置</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12766" />
-        <location filename="../artisanlib/main.py" line="12342" />
-        <location filename="../artisanlib/main.py" line="6278" />
-        <location filename="../artisanlib/events.py" line="3105" />
-        <location filename="../artisanlib/events.py" line="3086" />
+        <location filename="../artisanlib/main.py" line="12814" />
+        <location filename="../artisanlib/main.py" line="12390" />
+        <location filename="../artisanlib/main.py" line="6314" />
+        <location filename="../artisanlib/events.py" line="3171" />
+        <location filename="../artisanlib/events.py" line="3152" />
         <source>Event button</source>
         <translation>事件按钮</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="6278" />
-        <location filename="../artisanlib/events.py" line="3105" />
-        <location filename="../artisanlib/events.py" line="3086" />
+        <location filename="../artisanlib/main.py" line="6314" />
+        <location filename="../artisanlib/events.py" line="3171" />
+        <location filename="../artisanlib/events.py" line="3152" />
         <source>its text</source>
         <translation>其文本</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="3812" />
+        <location filename="../artisanlib/events.py" line="3878" />
         <source>Slider Value</source>
         <translation>滑块值</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="3813" />
+        <location filename="../artisanlib/events.py" line="3879" />
         <source>Target Value</source>
         <translation>目标数值</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="582" />
-        <location filename="../artisanlib/ports.py" line="480" />
+        <location filename="../artisanlib/ports.py" line="600" />
+        <location filename="../artisanlib/ports.py" line="498" />
         <location filename="../artisanlib/ports.py" line="72" />
         <source>Device</source>
         <translation>设备</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="481" />
+        <location filename="../artisanlib/ports.py" line="499" />
         <location filename="../artisanlib/ports.py" line="78" />
         <source>Register</source>
         <translation>注册</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1040" />
-        <location filename="../artisanlib/ports.py" line="961" />
+        <location filename="../artisanlib/ports.py" line="1058" />
+        <location filename="../artisanlib/ports.py" line="979" />
         <location filename="../artisanlib/ports.py" line="240" />
         <source>Area</source>
         <translation>区域</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1046" />
-        <location filename="../artisanlib/ports.py" line="962" />
+        <location filename="../artisanlib/ports.py" line="1064" />
+        <location filename="../artisanlib/ports.py" line="980" />
         <location filename="../artisanlib/ports.py" line="247" />
         <source>DB#</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="7460" />
+        <location filename="../artisanlib/main.py" line="7496" />
         <location filename="../artisanlib/curves.py" line="1044" />
-        <location filename="../artisanlib/ports.py" line="963" />
+        <location filename="../artisanlib/ports.py" line="981" />
         <location filename="../artisanlib/ports.py" line="254" />
         <source>Start</source>
         <translation>开始</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="437" />
-        <location filename="../artisanlib/ports.py" line="394" />
+        <location filename="../artisanlib/ports.py" line="455" />
+        <location filename="../artisanlib/ports.py" line="412" />
         <source>Comm Port</source>
         <translation>通信端口</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="443" />
-        <location filename="../artisanlib/ports.py" line="398" />
+        <location filename="../artisanlib/ports.py" line="461" />
+        <location filename="../artisanlib/ports.py" line="416" />
         <source>Baud Rate</source>
         <translation>传输速率</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="452" />
-        <location filename="../artisanlib/ports.py" line="404" />
+        <location filename="../artisanlib/ports.py" line="470" />
+        <location filename="../artisanlib/ports.py" line="422" />
         <source>Byte Size</source>
         <translation>字节大小</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="458" />
-        <location filename="../artisanlib/ports.py" line="410" />
+        <location filename="../artisanlib/ports.py" line="476" />
+        <location filename="../artisanlib/ports.py" line="428" />
         <source>Parity</source>
         <translation>校验</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="465" />
-        <location filename="../artisanlib/ports.py" line="417" />
+        <location filename="../artisanlib/ports.py" line="483" />
+        <location filename="../artisanlib/ports.py" line="435" />
         <source>Stopbits</source>
         <translation>停止位</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="727" />
-        <location filename="../artisanlib/ports.py" line="471" />
-        <location filename="../artisanlib/ports.py" line="423" />
+        <location filename="../artisanlib/ports.py" line="1573" />
+        <location filename="../artisanlib/ports.py" line="745" />
+        <location filename="../artisanlib/ports.py" line="489" />
+        <location filename="../artisanlib/ports.py" line="441" />
         <source>Timeout</source>
         <translation>超时</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="426" />
+        <location filename="../artisanlib/ports.py" line="444" />
         <source>Settings for non-Modbus devices</source>
         <translation>无协议设备设置</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="482" />
+        <location filename="../artisanlib/ports.py" line="500" />
         <source>Decode</source>
         <translation>解码</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="483" />
+        <location filename="../artisanlib/ports.py" line="501" />
         <source>Function</source>
         <translation>功能</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="484" />
+        <location filename="../artisanlib/ports.py" line="502" />
         <source>Divider</source>
         <translation>分频器</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="550" />
+        <location filename="../artisanlib/ports.py" line="568" />
         <source>little-endian</source>
         <translation>小端序</translation>
     </message>
@@ -12769,9 +12751,9 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <location filename="../artisanlib/roast_properties.py" line="2991" />
         <location filename="../artisanlib/roast_properties.py" line="2990" />
         <location filename="../artisanlib/roast_properties.py" line="2971" />
-        <location filename="../artisanlib/ports.py" line="1059" />
-        <location filename="../artisanlib/ports.py" line="964" />
-        <location filename="../artisanlib/ports.py" line="558" />
+        <location filename="../artisanlib/ports.py" line="1077" />
+        <location filename="../artisanlib/ports.py" line="982" />
+        <location filename="../artisanlib/ports.py" line="576" />
         <source>Type</source>
         <translation>类型</translation>
     </message>
@@ -12782,9 +12764,10 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <location filename="../artisanlib/devices.py" line="1205" />
         <location filename="../artisanlib/devices.py" line="1156" />
         <location filename="../artisanlib/devices.py" line="939" />
-        <location filename="../artisanlib/ports.py" line="1214" />
-        <location filename="../artisanlib/ports.py" line="923" />
-        <location filename="../artisanlib/ports.py" line="570" />
+        <location filename="../artisanlib/ports.py" line="1528" />
+        <location filename="../artisanlib/ports.py" line="1235" />
+        <location filename="../artisanlib/ports.py" line="941" />
+        <location filename="../artisanlib/ports.py" line="588" />
         <source>Host</source>
         <translation>主机</translation>
     </message>
@@ -12796,104 +12779,138 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <location filename="../artisanlib/devices.py" line="1162" />
         <location filename="../artisanlib/devices.py" line="951" />
         <location filename="../artisanlib/curves.py" line="1291" />
-        <location filename="../artisanlib/ports.py" line="1219" />
-        <location filename="../artisanlib/ports.py" line="928" />
-        <location filename="../artisanlib/ports.py" line="575" />
+        <location filename="../artisanlib/ports.py" line="1535" />
+        <location filename="../artisanlib/ports.py" line="1240" />
+        <location filename="../artisanlib/ports.py" line="946" />
+        <location filename="../artisanlib/ports.py" line="593" />
         <source>Port</source>
         <translation>端口</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1068" />
-        <location filename="../artisanlib/ports.py" line="604" />
+        <location filename="../artisanlib/ports.py" line="1086" />
+        <location filename="../artisanlib/ports.py" line="622" />
         <source>SV Factor</source>
         <translation>SV 因子</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1075" />
-        <location filename="../artisanlib/ports.py" line="611" />
+        <location filename="../artisanlib/ports.py" line="1093" />
+        <location filename="../artisanlib/ports.py" line="629" />
         <source>pid Factor</source>
         <translation>pid 因子</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="700" />
+        <location filename="../artisanlib/ports.py" line="718" />
         <source>Delay</source>
         <translation>延迟</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="734" />
-        <location filename="../artisanlib/ports.py" line="707" />
+        <location filename="../artisanlib/ports.py" line="752" />
+        <location filename="../artisanlib/ports.py" line="725" />
         <source>Retries</source>
         <translation>重试</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="934" />
+        <location filename="../artisanlib/ports.py" line="952" />
         <source>Rack</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="940" />
+        <location filename="../artisanlib/ports.py" line="958" />
         <source>Slot</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1225" />
+        <location filename="../artisanlib/ports.py" line="1246" />
         <source>Path</source>
         <translation>路径</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1231" />
+        <location filename="../artisanlib/ports.py" line="1252" />
         <source>ID</source>
         <translation>ID</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1280" />
+        <location filename="../artisanlib/ports.py" line="1301" />
         <source>Connect</source>
         <translation>连接</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1283" />
+        <location filename="../artisanlib/ports.py" line="1304" />
         <source>Reconnect</source>
         <translation>重连</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1443" />
-        <location filename="../artisanlib/ports.py" line="1286" />
+        <location filename="../artisanlib/ports.py" line="1464" />
+        <location filename="../artisanlib/ports.py" line="1307" />
         <source>Request</source>
         <translation>请求</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1315" />
+        <location filename="../artisanlib/ports.py" line="1336" />
         <source>Message ID</source>
         <translation>信息 ID</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1317" />
+        <location filename="../artisanlib/ports.py" line="1338" />
         <source>Machine ID</source>
         <translation>机器ID</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1321" />
+        <location filename="../artisanlib/ports.py" line="1342" />
         <source>Data</source>
         <translation>数据</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1323" />
+        <location filename="../artisanlib/ports.py" line="1344" />
         <source>Message</source>
         <translation>信息</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1335" />
+        <location filename="../artisanlib/ports.py" line="1356" />
         <source>Data Request</source>
         <translation>请求数据</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1444" />
-        <location filename="../artisanlib/ports.py" line="1413" />
+        <location filename="../artisanlib/ports.py" line="1597" />
+        <location filename="../artisanlib/ports.py" line="1465" />
+        <location filename="../artisanlib/ports.py" line="1434" />
         <source>Node</source>
         <translation>节点</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="1326" />
+        <location filename="../artisanlib/ports.py" line="1546" />
+        <source>Transport</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <location filename="../artisanlib/ports.py" line="1553" />
+        <source>Protocol</source>
+        <translation type="unfinished">规范</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/ports.py" line="1560" />
+        <source>Username</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <location filename="../artisanlib/devices.py" line="944" />
+        <location filename="../artisanlib/ports.py" line="1566" />
+        <source>Password</source>
+        <translation>密码</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/ports.py" line="1581" />
+        <source>Keepalive</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <location filename="../artisanlib/ports.py" line="1655" />
+        <location filename="../artisanlib/ports.py" line="1595" />
+        <source>Topic</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <location filename="../artisanlib/canvas.py" line="1332" />
         <location filename="../artisanlib/background.py" line="103" />
         <source>ALL</source>
         <translation>全部</translation>
@@ -12969,11 +12986,40 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <translation>克</translation>
     </message>
     <message>
+        <location filename="../plus/schedule.py" line="2049" />
+        <location filename="../plus/blend.py" line="157" />
+        <location filename="../artisanlib/canvas.py" line="12018" />
+        <location filename="../artisanlib/large_lcds.py" line="851" />
+        <location filename="../artisanlib/roast_properties.py" line="906" />
+        <location filename="../artisanlib/roast_properties.py" line="221" />
+        <location filename="../artisanlib/roast_properties.py" line="148" />
+        <source>Weight</source>
+        <translation>重量</translation>
+    </message>
+    <message>
         <location filename="../artisanlib/roast_properties.py" line="967" />
         <location filename="../artisanlib/roast_properties.py" line="236" />
         <location filename="../artisanlib/roast_properties.py" line="163" />
         <source>Volume</source>
         <translation>体积</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="4066" />
+        <location filename="../artisanlib/canvas.py" line="12018" />
+        <location filename="../artisanlib/canvas.py" line="11967" />
+        <location filename="../artisanlib/canvas.py" line="11962" />
+        <location filename="../artisanlib/roast_properties.py" line="904" />
+        <location filename="../artisanlib/roast_properties.py" line="206" />
+        <source>Green</source>
+        <translation>生豆</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="4068" />
+        <location filename="../plus/schedule.py" line="2222" />
+        <location filename="../artisanlib/roast_properties.py" line="905" />
+        <location filename="../artisanlib/roast_properties.py" line="279" />
+        <source>Roasted</source>
+        <translation>熟豆</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="866" />
@@ -12985,6 +13031,21 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <location filename="../artisanlib/roast_properties.py" line="871" />
         <source>Batch</source>
         <translation>批次</translation>
+    </message>
+    <message>
+        <location filename="../plus/blend.py" line="343" />
+        <location filename="../artisanlib/statistics.py" line="202" />
+        <location filename="../artisanlib/roast_properties.py" line="1094" />
+        <location filename="../artisanlib/roast_properties.py" line="897" />
+        <source>Beans</source>
+        <translation>生豆</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2091" />
+        <location filename="../artisanlib/canvas.py" line="11962" />
+        <location filename="../artisanlib/roast_properties.py" line="998" />
+        <source>Density</source>
+        <translation>密度</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1051" />
@@ -13002,6 +13063,13 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <translation>咖啡粉</translation>
     </message>
     <message>
+        <location filename="../plus/schedule.py" line="2111" />
+        <location filename="../artisanlib/canvas.py" line="11967" />
+        <location filename="../artisanlib/roast_properties.py" line="1106" />
+        <source>Moisture</source>
+        <translation>含水量</translation>
+    </message>
+    <message>
         <location filename="../artisanlib/roast_properties.py" line="1134" />
         <location filename="../artisanlib/roast_properties.py" line="1107" />
         <source>%</source>
@@ -13011,6 +13079,22 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <location filename="../artisanlib/roast_properties.py" line="1132" />
         <source>Ambient Conditions</source>
         <translation>环境条件</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2122" />
+        <location filename="../plus/schedule.py" line="2121" />
+        <location filename="../artisanlib/statistics.py" line="213" />
+        <location filename="../artisanlib/roast_properties.py" line="1180" />
+        <source>Roasting Notes</source>
+        <translation>烘焙笔记</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2134" />
+        <location filename="../plus/schedule.py" line="2133" />
+        <location filename="../artisanlib/statistics.py" line="215" />
+        <location filename="../artisanlib/roast_properties.py" line="1184" />
+        <source>Cupping Notes</source>
+        <translation>杯测笔记</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1362" />
@@ -13026,6 +13110,20 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <location filename="../artisanlib/roast_properties.py" line="1366" />
         <source>Blend</source>
         <translation>混合物</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2081" />
+        <location filename="../artisanlib/main.py" line="23881" />
+        <location filename="../artisanlib/roast_properties.py" line="1734" />
+        <source>Defects</source>
+        <translation>瑕疵</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2071" />
+        <location filename="../artisanlib/statistics.py" line="231" />
+        <location filename="../artisanlib/roast_properties.py" line="1735" />
+        <source>Yield</source>
+        <translation>产量</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1945" />
@@ -13115,7 +13213,7 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <translation>(mm:ss)</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="7461" />
+        <location filename="../artisanlib/main.py" line="7497" />
         <location filename="../artisanlib/roast_properties.py" line="3012" />
         <source>Duration</source>
         <translation>持续时间</translation>
@@ -13138,7 +13236,7 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <translation>BBP</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="16181" />
+        <location filename="../artisanlib/canvas.py" line="16230" />
         <location filename="../artisanlib/roast_properties.py" line="3623" />
         <location filename="../artisanlib/roast_properties.py" line="3618" />
         <location filename="../artisanlib/roast_properties.py" line="3594" />
@@ -13180,7 +13278,7 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <translation>型号</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="6029" />
+        <location filename="../artisanlib/main.py" line="6065" />
         <location filename="../artisanlib/roast_properties.py" line="4177" />
         <source>Heating</source>
         <translation>热源</translation>
@@ -13252,7 +13350,7 @@ LCDs All</source>
         <translation>找到的错误数 {0}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="1298" />
+        <location filename="../artisanlib/main.py" line="1299" />
         <location filename="../artisanlib/designer.py" line="72" />
         <source>Time</source>
         <translation>时间</translation>
@@ -13492,7 +13590,7 @@ LCDs All</source>
         <translation>在ArtisanViewer中无效</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="4188" />
+        <location filename="../artisanlib/canvas.py" line="4194" />
         <location filename="../artisanlib/curves.py" line="2137" />
         <source>EVENT</source>
         <translation>事件</translation>
@@ -13516,6 +13614,12 @@ LCDs All</source>
         <location filename="../artisanlib/statistics.py" line="200" />
         <source>Roaster</source>
         <translation>烘焙机</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2127" />
+        <location filename="../artisanlib/statistics.py" line="214" />
+        <source>Cupping Score</source>
+        <translation>杯测分数</translation>
     </message>
     <message>
         <location filename="../artisanlib/statistics.py" line="228" />
@@ -13590,19 +13694,19 @@ Fewer nodes: simpler curve but may lose detail</source>
         <translation>当前警报设置</translation>
     </message>
     <message>
-        <location filename="../artisanlib/alarms.py" line="938" />
+        <location filename="../artisanlib/alarms.py" line="941" />
         <location filename="../artisanlib/alarms.py" line="483" />
         <source>Enter description</source>
         <translation>输入说明</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3442" />
+        <location filename="../artisanlib/main.py" line="3445" />
         <location filename="../artisanlib/large_lcds.py" line="579" />
         <source>PID SV</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3446" />
+        <location filename="../artisanlib/main.py" line="3449" />
         <location filename="../artisanlib/large_lcds.py" line="587" />
         <source>PID %</source>
         <translation />
@@ -13613,457 +13717,457 @@ Fewer nodes: simpler curve but may lose detail</source>
         <translation>总重量</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="880" />
+        <location filename="../artisanlib/main.py" line="881" />
         <source>Line style</source>
         <translation>线型</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="881" />
+        <location filename="../artisanlib/main.py" line="882" />
         <source>Draw style</source>
         <translation>画风</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="883" />
+        <location filename="../artisanlib/main.py" line="884" />
         <source>Color (RGBA)</source>
         <translation>颜色 (RGBA)</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="885" />
+        <location filename="../artisanlib/main.py" line="886" />
         <source>Symbol</source>
         <translation>象征</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="887" />
+        <location filename="../artisanlib/main.py" line="888" />
         <source>Face color (RGBA)</source>
         <translation>面部颜色 (RGBA)</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="888" />
+        <location filename="../artisanlib/main.py" line="889" />
         <source>Edge color (RGBA)</source>
         <translation>边缘颜色 (RGBA)</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23729" />
-        <location filename="../artisanlib/main.py" line="1241" />
+        <location filename="../artisanlib/main.py" line="23793" />
+        <location filename="../artisanlib/main.py" line="1242" />
         <source>roasted</source>
         <translation>熟豆</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="16058" />
-        <location filename="../artisanlib/canvas.py" line="16045" />
-        <location filename="../artisanlib/main.py" line="7943" />
-        <location filename="../artisanlib/main.py" line="7069" />
-        <location filename="../artisanlib/main.py" line="7067" />
-        <location filename="../artisanlib/main.py" line="3898" />
+        <location filename="../artisanlib/canvas.py" line="16107" />
+        <location filename="../artisanlib/canvas.py" line="16094" />
+        <location filename="../artisanlib/main.py" line="7979" />
+        <location filename="../artisanlib/main.py" line="7105" />
+        <location filename="../artisanlib/main.py" line="7103" />
+        <location filename="../artisanlib/main.py" line="3901" />
         <source>AUC</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="6172" />
+        <location filename="../artisanlib/main.py" line="6208" />
         <source>Time Guide</source>
         <translation>时间指引</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="6175" />
+        <location filename="../artisanlib/main.py" line="6211" />
         <source>Background ET</source>
         <translation>背景曲线ET</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="6178" />
+        <location filename="../artisanlib/main.py" line="6214" />
         <source>Background BT</source>
         <translation>背景曲线BT</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="6187" />
+        <location filename="../artisanlib/main.py" line="6223" />
         <source>Background Extra</source>
         <translation>背景曲线额外</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="6190" />
+        <location filename="../artisanlib/main.py" line="6226" />
         <source>X Label</source>
         <translation>X轴标签</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="6197" />
-        <location filename="../artisanlib/main.py" line="6194" />
-        <location filename="../artisanlib/main.py" line="6191" />
+        <location filename="../artisanlib/main.py" line="6233" />
+        <location filename="../artisanlib/main.py" line="6230" />
+        <location filename="../artisanlib/main.py" line="6227" />
         <source>Canvas</source>
         <translation>画布</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="6193" />
+        <location filename="../artisanlib/main.py" line="6229" />
         <source>Y Label</source>
         <translation>Y轴标签</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="6199" />
+        <location filename="../artisanlib/main.py" line="6235" />
         <source>SpecialEventText</source>
         <translation>特别事件文字</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="6200" />
+        <location filename="../artisanlib/main.py" line="6236" />
         <source>SpecialEventBox</source>
         <translation>特别事件标记</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="6202" />
+        <location filename="../artisanlib/main.py" line="6238" />
         <source>Bg SpecialEventText</source>
         <translation>背景曲线特别事件文字</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="6203" />
+        <location filename="../artisanlib/main.py" line="6239" />
         <source>Bg SpecialEventBox</source>
         <translation>背景曲线特别事件标记</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="3387" />
         <location filename="../artisanlib/devices.py" line="3373" />
-        <location filename="../artisanlib/main.py" line="6266" />
-        <location filename="../artisanlib/main.py" line="6257" />
-        <location filename="../artisanlib/main.py" line="6250" />
-        <location filename="../artisanlib/main.py" line="6215" />
-        <location filename="../artisanlib/main.py" line="6212" />
-        <location filename="../artisanlib/main.py" line="6209" />
-        <location filename="../artisanlib/main.py" line="6206" />
+        <location filename="../artisanlib/main.py" line="6302" />
+        <location filename="../artisanlib/main.py" line="6293" />
+        <location filename="../artisanlib/main.py" line="6286" />
+        <location filename="../artisanlib/main.py" line="6251" />
+        <location filename="../artisanlib/main.py" line="6248" />
+        <location filename="../artisanlib/main.py" line="6245" />
+        <location filename="../artisanlib/main.py" line="6242" />
         <source>Legend bkgnd</source>
         <translation>背景曲线图例</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="6217" />
+        <location filename="../artisanlib/main.py" line="6253" />
         <source>MET Text</source>
         <translation>最大环境温度文字</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="6220" />
-        <location filename="../artisanlib/main.py" line="6218" />
+        <location filename="../artisanlib/main.py" line="6256" />
+        <location filename="../artisanlib/main.py" line="6254" />
         <source>MET Box</source>
         <translation>最大环境温度标记</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="6224" />
+        <location filename="../artisanlib/main.py" line="6260" />
         <source>Timer LCD Digits</source>
         <translation>数显LCD计时器</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="6225" />
+        <location filename="../artisanlib/main.py" line="6261" />
         <source>Timer LCD Background</source>
         <translation>背景曲线LCD计时器</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="6233" />
-        <location filename="../artisanlib/main.py" line="6227" />
+        <location filename="../artisanlib/main.py" line="6269" />
+        <location filename="../artisanlib/main.py" line="6263" />
         <source>ET LCD Digits</source>
         <translation>ET数显LCD</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="6234" />
-        <location filename="../artisanlib/main.py" line="6228" />
+        <location filename="../artisanlib/main.py" line="6270" />
+        <location filename="../artisanlib/main.py" line="6264" />
         <source>ET LCD Background</source>
         <translation>ET背景曲线LCD</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="6236" />
-        <location filename="../artisanlib/main.py" line="6230" />
+        <location filename="../artisanlib/main.py" line="6272" />
+        <location filename="../artisanlib/main.py" line="6266" />
         <source>BT LCD Digits</source>
         <translation>BT数显LCD</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="6237" />
-        <location filename="../artisanlib/main.py" line="6231" />
+        <location filename="../artisanlib/main.py" line="6273" />
+        <location filename="../artisanlib/main.py" line="6267" />
         <source>BT LCD Background</source>
         <translation>BT背景曲线LCD</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="6239" />
+        <location filename="../artisanlib/main.py" line="6275" />
         <source>Extra/PID LCD Digits</source>
         <translation>额外/PID 数显LCD</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="6240" />
+        <location filename="../artisanlib/main.py" line="6276" />
         <source>Extra/PID LCD Background</source>
         <translation>背景曲线额外/PID 数显LCD</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="7071" />
+        <location filename="../artisanlib/main.py" line="7107" />
         <source>AUC FCs</source>
         <translation>AUC 第一次爆裂</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="17575" />
-        <location filename="../artisanlib/main.py" line="27381" />
-        <location filename="../artisanlib/main.py" line="7438" />
+        <location filename="../artisanlib/canvas.py" line="17624" />
+        <location filename="../artisanlib/main.py" line="27483" />
+        <location filename="../artisanlib/main.py" line="7474" />
         <source>ln()</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="27379" />
-        <location filename="../artisanlib/main.py" line="27377" />
-        <location filename="../artisanlib/main.py" line="7441" />
-        <location filename="../artisanlib/main.py" line="7440" />
+        <location filename="../artisanlib/main.py" line="27481" />
+        <location filename="../artisanlib/main.py" line="27479" />
+        <location filename="../artisanlib/main.py" line="7477" />
+        <location filename="../artisanlib/main.py" line="7476" />
         <source>x</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="27375" />
-        <location filename="../artisanlib/main.py" line="27326" />
-        <location filename="../artisanlib/main.py" line="7442" />
+        <location filename="../artisanlib/main.py" line="27477" />
+        <location filename="../artisanlib/main.py" line="27428" />
+        <location filename="../artisanlib/main.py" line="7478" />
         <source>Bkgnd</source>
         <translation>背景曲线</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="7453" />
-        <location filename="../artisanlib/main.py" line="7449" />
-        <location filename="../artisanlib/main.py" line="7445" />
+        <location filename="../artisanlib/main.py" line="7489" />
+        <location filename="../artisanlib/main.py" line="7485" />
+        <location filename="../artisanlib/main.py" line="7481" />
         <source>On</source>
         <translation>打开</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="7455" />
-        <location filename="../artisanlib/main.py" line="7451" />
-        <location filename="../artisanlib/main.py" line="7447" />
+        <location filename="../artisanlib/main.py" line="7491" />
+        <location filename="../artisanlib/main.py" line="7487" />
+        <location filename="../artisanlib/main.py" line="7483" />
         <source>Off</source>
         <translation>关闭</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="7462" />
+        <location filename="../artisanlib/main.py" line="7498" />
         <source>Max Delta</source>
         <translation>最大差值</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="7463" />
+        <location filename="../artisanlib/main.py" line="7499" />
         <source>Swing</source>
         <translation>波动值</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="7464" />
+        <location filename="../artisanlib/main.py" line="7500" />
         <source>ABC/secs</source>
         <translation>曲线间面积/秒</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="7475" />
+        <location filename="../artisanlib/main.py" line="7511" />
         <source>Segment Analysis (rise, crash and flick)</source>
         <translation>片段分析 (暴增, 失温, 和波动)</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="7480" />
+        <location filename="../artisanlib/main.py" line="7516" />
         <source>Background Align</source>
         <translation>背景对齐</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="7494" />
+        <location filename="../artisanlib/main.py" line="7530" />
         <source>Curve Fit</source>
         <translation>曲线优化</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="7495" />
+        <location filename="../artisanlib/main.py" line="7531" />
         <source>Samples Threshold</source>
         <translation>采样阈</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="7495" />
+        <location filename="../artisanlib/main.py" line="7531" />
         <source>Delta Threshold</source>
         <translation>差值阈</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="7496" />
+        <location filename="../artisanlib/main.py" line="7532" />
         <source>Sample rate (secs)</source>
         <translation>采样率(秒)</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="7496" />
+        <location filename="../artisanlib/main.py" line="7532" />
         <source>Smooth Curves/Spikes</source>
         <translation>曲线/峰值平滑度</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="7497" />
+        <location filename="../artisanlib/main.py" line="7533" />
         <source>Delta Span/Smoothing</source>
         <translation>范围差值</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="7497" />
+        <location filename="../artisanlib/main.py" line="7533" />
         <source>Polyfit/Optimal Smoothing</source>
         <translation>多项式拟合/最佳平滑</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="7498" />
+        <location filename="../artisanlib/main.py" line="7534" />
         <source>Fit RoRoR (C/min/min)</source>
         <translation>优化RoRoR (C/min/min)</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="7498" />
+        <location filename="../artisanlib/main.py" line="7534" />
         <source>Actual RoR at FCs</source>
         <translation>第一次爆裂时的真实ROR</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="8030" />
+        <location filename="../artisanlib/main.py" line="8066" />
         <source>ALL FINISHING MODE</source>
         <translation>全部完成模式</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="8195" />
-        <location filename="../artisanlib/main.py" line="8049" />
+        <location filename="../artisanlib/main.py" line="8231" />
+        <location filename="../artisanlib/main.py" line="8085" />
         <source>DEV%</source>
         <translation>发展%</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="8265" />
-        <location filename="../artisanlib/main.py" line="8081" />
+        <location filename="../artisanlib/main.py" line="8301" />
+        <location filename="../artisanlib/main.py" line="8117" />
         <source>DRY%</source>
         <translation>脱水%</translation>
     </message>
     <message>
+        <location filename="../artisanlib/main.py" line="8260" />
+        <location filename="../artisanlib/main.py" line="8259" />
+        <location filename="../artisanlib/main.py" line="8225" />
         <location filename="../artisanlib/main.py" line="8224" />
-        <location filename="../artisanlib/main.py" line="8223" />
-        <location filename="../artisanlib/main.py" line="8189" />
-        <location filename="../artisanlib/main.py" line="8188" />
-        <location filename="../artisanlib/main.py" line="8119" />
+        <location filename="../artisanlib/main.py" line="8155" />
         <source>TIME MODE</source>
         <translation>时间模式</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="8228" />
-        <location filename="../artisanlib/main.py" line="8227" />
-        <location filename="../artisanlib/main.py" line="8194" />
-        <location filename="../artisanlib/main.py" line="8193" />
-        <location filename="../artisanlib/main.py" line="8123" />
+        <location filename="../artisanlib/main.py" line="8264" />
+        <location filename="../artisanlib/main.py" line="8263" />
+        <location filename="../artisanlib/main.py" line="8230" />
+        <location filename="../artisanlib/main.py" line="8229" />
+        <location filename="../artisanlib/main.py" line="8159" />
         <source>PERCENTAGE MODE</source>
         <translation>百分比模式</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="8132" />
+        <location filename="../artisanlib/main.py" line="8168" />
         <source>RAMP%</source>
         <translation>缓升%</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="8232" />
-        <location filename="../artisanlib/main.py" line="8231" />
-        <location filename="../artisanlib/main.py" line="8205" />
-        <location filename="../artisanlib/main.py" line="8204" />
-        <location filename="../artisanlib/main.py" line="8135" />
+        <location filename="../artisanlib/main.py" line="8268" />
+        <location filename="../artisanlib/main.py" line="8267" />
+        <location filename="../artisanlib/main.py" line="8241" />
+        <location filename="../artisanlib/main.py" line="8240" />
+        <location filename="../artisanlib/main.py" line="8171" />
         <source>TEMP MODE</source>
         <translation>温度模式</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23709" />
+        <location filename="../artisanlib/main.py" line="23773" />
         <source>/m</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23725" />
+        <location filename="../artisanlib/main.py" line="23789" />
         <source>greens</source>
         <translation>生豆</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="26601" />
-        <location filename="../artisanlib/main.py" line="26588" />
-        <location filename="../artisanlib/main.py" line="26587" />
+        <location filename="../artisanlib/main.py" line="26703" />
+        <location filename="../artisanlib/main.py" line="26690" />
+        <location filename="../artisanlib/main.py" line="26689" />
         <source>AUTO</source>
         <translation>自动</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="26601" />
-        <location filename="../artisanlib/main.py" line="26600" />
-        <location filename="../artisanlib/main.py" line="26588" />
+        <location filename="../artisanlib/main.py" line="26703" />
+        <location filename="../artisanlib/main.py" line="26702" />
+        <location filename="../artisanlib/main.py" line="26690" />
         <source>MANUAL</source>
         <translation>手动</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="26589" />
+        <location filename="../artisanlib/main.py" line="26691" />
         <source>FLAP</source>
         <translation>瓣膜</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="26603" />
-        <location filename="../artisanlib/main.py" line="26591" />
-        <location filename="../artisanlib/main.py" line="26590" />
+        <location filename="../artisanlib/main.py" line="26705" />
+        <location filename="../artisanlib/main.py" line="26693" />
+        <location filename="../artisanlib/main.py" line="26692" />
         <source>CLOSE</source>
         <translation>关闭</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="26603" />
-        <location filename="../artisanlib/main.py" line="26602" />
-        <location filename="../artisanlib/main.py" line="26591" />
+        <location filename="../artisanlib/main.py" line="26705" />
+        <location filename="../artisanlib/main.py" line="26704" />
+        <location filename="../artisanlib/main.py" line="26693" />
         <source>OPEN</source>
         <translation>打开</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="26592" />
+        <location filename="../artisanlib/main.py" line="26694" />
         <source>CONTROL</source>
         <translation>控制</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="26593" />
+        <location filename="../artisanlib/main.py" line="26695" />
         <source>DISCHARGE</source>
         <translation>释放</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="26595" />
+        <location filename="../artisanlib/main.py" line="26697" />
         <source>HEATING</source>
         <translation>加热</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="26596" />
+        <location filename="../artisanlib/main.py" line="26698" />
         <source>STIRRER</source>
         <translation>搅拌器</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="26597" />
+        <location filename="../artisanlib/main.py" line="26699" />
         <source>FILL</source>
         <translation>充满</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="26599" />
+        <location filename="../artisanlib/main.py" line="26701" />
         <source>COOLING</source>
         <translation>冷却</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="26610" />
-        <location filename="../artisanlib/main.py" line="26605" />
-        <location filename="../artisanlib/main.py" line="26604" />
+        <location filename="../artisanlib/main.py" line="26712" />
+        <location filename="../artisanlib/main.py" line="26707" />
+        <location filename="../artisanlib/main.py" line="26706" />
         <source>STOP</source>
         <translation>停止</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="26608" />
+        <location filename="../artisanlib/main.py" line="26710" />
         <source>RELEASE</source>
         <translation>发布</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="27368" />
+        <location filename="../artisanlib/main.py" line="27470" />
         <source>Fit</source>
         <comment>Curve Fit Type</comment>
         <translatorcomment>擬合曲線</translatorcomment>
         <translation>拟合曲线</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="27369" />
+        <location filename="../artisanlib/main.py" line="27471" />
         <source>RMSE BT</source>
         <translation>均方根误差</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="27370" />
+        <location filename="../artisanlib/main.py" line="27472" />
         <source>MSE BT</source>
         <translation>均方误差</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="16058" />
-        <location filename="../artisanlib/canvas.py" line="16047" />
-        <location filename="../artisanlib/main.py" line="27371" />
+        <location filename="../artisanlib/canvas.py" line="16107" />
+        <location filename="../artisanlib/canvas.py" line="16096" />
+        <location filename="../artisanlib/main.py" line="27473" />
         <source>RoR</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="27371" />
+        <location filename="../artisanlib/main.py" line="27473" />
         <source>@FCs</source>
         <translation>爆开始时</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="27372" />
+        <location filename="../artisanlib/main.py" line="27474" />
         <source>Max+/Max- RoR</source>
         <translation>最大+/最大- RoR</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="27382" />
+        <location filename="../artisanlib/main.py" line="27484" />
         <source>Curve Fit Analysis</source>
         <translation>曲线拟合分析</translation>
     </message>
@@ -14180,11 +14284,6 @@ Fewer nodes: simpler curve but may lose detail</source>
         <translation>范围</translation>
     </message>
     <message>
-        <location filename="../artisanlib/devices.py" line="944" />
-        <source>Password</source>
-        <translation>密码</translation>
-    </message>
-    <message>
         <location filename="../artisanlib/devices.py" line="955" />
         <source>Remote Only</source>
         <translation>仅远程</translation>
@@ -14267,245 +14366,245 @@ Fewer nodes: simpler curve but may lose detail</source>
         <translation>映射</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="2453" />
+        <location filename="../artisanlib/canvas.py" line="2459" />
         <source>Preheat Measured</source>
         <translation>预热值</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="2454" />
+        <location filename="../artisanlib/canvas.py" line="2460" />
         <source>Preheat %</source>
         <translation>预热 %</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="2455" />
+        <location filename="../artisanlib/canvas.py" line="2461" />
         <source>BBP Measured</source>
         <translation>BBP值</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="2456" />
+        <location filename="../artisanlib/canvas.py" line="2462" />
         <source>BBP %</source>
         <translation>BBP %</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="2457" />
+        <location filename="../artisanlib/canvas.py" line="2463" />
         <source>Cooling Measured</source>
         <translation>冷却值</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="2458" />
+        <location filename="../artisanlib/canvas.py" line="2464" />
         <source>Cooling %</source>
         <translation>冷却 %</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="2459" />
+        <location filename="../artisanlib/canvas.py" line="2465" />
         <source>Continuous Roast</source>
         <translation>连续烘焙</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="2460" />
+        <location filename="../artisanlib/canvas.py" line="2466" />
         <source>Roast Event</source>
         <translation>烘焙事件</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="2461" />
+        <location filename="../artisanlib/canvas.py" line="2467" />
         <source>Meter Batch</source>
         <translation>批次计量</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="2462" />
+        <location filename="../artisanlib/canvas.py" line="2468" />
         <source>PID Duty %</source>
         <translation>PID 占空比百分比</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="2463" />
+        <location filename="../artisanlib/canvas.py" line="2469" />
         <source>Meter Preheat</source>
         <translation>预热计量</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="2464" />
+        <location filename="../artisanlib/canvas.py" line="2470" />
         <source>Meter BBP</source>
         <translation>BBP 计量</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="2465" />
+        <location filename="../artisanlib/canvas.py" line="2471" />
         <source>Meter Roast</source>
         <translation>烘焙计量</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="2466" />
+        <location filename="../artisanlib/canvas.py" line="2472" />
         <source>Meter Cooling</source>
         <translation>冷却计量</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="2467" />
+        <location filename="../artisanlib/canvas.py" line="2473" />
         <source>PID Duty % BBP</source>
         <translation>PID 占空比 BBP</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="2468" />
+        <location filename="../artisanlib/canvas.py" line="2474" />
         <source>PID Duty % Roast</source>
         <translation>PID 占空比 BBP</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="2469" />
+        <location filename="../artisanlib/canvas.py" line="2475" />
         <source>PID Duty % Cooling</source>
         <translation>PID 占空比 冷却</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="2470" />
+        <location filename="../artisanlib/canvas.py" line="2476" />
         <source>Preheat Event</source>
         <translation>预热阶段触发事件</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="2471" />
+        <location filename="../artisanlib/canvas.py" line="2477" />
         <source>BBP Event</source>
         <translation>BBP 事件</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="2472" />
+        <location filename="../artisanlib/canvas.py" line="2478" />
         <source>Cooling Event</source>
         <translation>冷却事件</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="2473" />
+        <location filename="../artisanlib/canvas.py" line="2479" />
         <source>PID Duty % Preheat</source>
         <translation>PID 预热占空比</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="2474" />
+        <location filename="../artisanlib/canvas.py" line="2480" />
         <source>Continuous Batch</source>
         <translation>连续批次</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="2475" />
+        <location filename="../artisanlib/canvas.py" line="2481" />
         <source>Continuous Preheat</source>
         <translation>连续预热</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="2476" />
+        <location filename="../artisanlib/canvas.py" line="2482" />
         <source>Continuous BBP</source>
         <translation>连续 BBP</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="2477" />
+        <location filename="../artisanlib/canvas.py" line="2483" />
         <source>Continuous Cooling</source>
         <translation>连续冷却</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="2478" />
+        <location filename="../artisanlib/canvas.py" line="2484" />
         <source>Event Batch</source>
         <translation>事件批次</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="4161" />
-        <location filename="../artisanlib/canvas.py" line="4159" />
+        <location filename="../artisanlib/canvas.py" line="4167" />
+        <location filename="../artisanlib/canvas.py" line="4165" />
         <source>at</source>
         <translation>在</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="4171" />
+        <location filename="../artisanlib/canvas.py" line="4177" />
         <source>COOL</source>
         <translation>冷却</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="9842" />
+        <location filename="../artisanlib/canvas.py" line="9859" />
         <source>BackgroundXT</source>
         <translation>背景曲线XT</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="9899" />
+        <location filename="../artisanlib/canvas.py" line="9916" />
         <source>BackgroundYT</source>
         <translation>背景YT</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="18237" />
-        <location filename="../artisanlib/canvas.py" line="9933" />
+        <location filename="../artisanlib/canvas.py" line="18286" />
+        <location filename="../artisanlib/canvas.py" line="9950" />
         <source>BackgroundET</source>
         <translation>背景曲线ET</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="18241" />
-        <location filename="../artisanlib/canvas.py" line="9964" />
+        <location filename="../artisanlib/canvas.py" line="18290" />
+        <location filename="../artisanlib/canvas.py" line="9981" />
         <source>BackgroundBT</source>
         <translation>背景曲线BT</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="9990" />
+        <location filename="../artisanlib/canvas.py" line="10007" />
         <source>BackgroundDeltaET</source>
         <translation>背景曲线DeltaET</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="10009" />
+        <location filename="../artisanlib/canvas.py" line="10026" />
         <source>BackgroundDeltaBT</source>
         <translation>背景曲线DeltaBT</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="11402" />
+        <location filename="../artisanlib/canvas.py" line="11419" />
         <source>ETprojection</source>
         <translation>ET推测</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="11410" />
+        <location filename="../artisanlib/canvas.py" line="11427" />
         <source>DeltaETprojection</source>
         <translation>DeltaET推测</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="11416" />
+        <location filename="../artisanlib/canvas.py" line="11433" />
         <source>BTprojection</source>
         <translation>BT推测</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="11424" />
+        <location filename="../artisanlib/canvas.py" line="11441" />
         <source>DeltaBTprojection</source>
         <translation>DeltaBT推测</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="11428" />
+        <location filename="../artisanlib/canvas.py" line="11445" />
         <source>TIMEguide</source>
         <translation>时间指引</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="11433" />
+        <location filename="../artisanlib/canvas.py" line="11450" />
         <source>AUCguide</source>
         <translation>AUC指引</translation>
     </message>
     <message>
         <location filename="../artisanlib/cup_profile.py" line="81" />
-        <location filename="../artisanlib/canvas.py" line="13009" />
-        <location filename="../artisanlib/canvas.py" line="12844" />
-        <location filename="../artisanlib/canvas.py" line="12068" />
+        <location filename="../artisanlib/canvas.py" line="13026" />
+        <location filename="../artisanlib/canvas.py" line="12861" />
+        <location filename="../artisanlib/canvas.py" line="12085" />
         <source>Correction</source>
         <translation>杯测更正</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="15840" />
+        <location filename="../artisanlib/canvas.py" line="15889" />
         <source>Event #&lt;b&gt;{0} &lt;/b&gt;</source>
         <translation>事件 #&lt;b&gt;{0} &lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="16060" />
-        <location filename="../artisanlib/canvas.py" line="16051" />
+        <location filename="../artisanlib/canvas.py" line="16109" />
+        <location filename="../artisanlib/canvas.py" line="16100" />
         <source>CM</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="16062" />
-        <location filename="../artisanlib/canvas.py" line="16053" />
+        <location filename="../artisanlib/canvas.py" line="16111" />
+        <location filename="../artisanlib/canvas.py" line="16102" />
         <source>FC</source>
         <translation>一爆</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="18208" />
+        <location filename="../artisanlib/canvas.py" line="18257" />
         <source>Designer</source>
         <translation>曲线设计器</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="19021" />
+        <location filename="../artisanlib/canvas.py" line="19070" />
         <source>BT {0} {1}/min for {2}</source>
         <translation>{2}BT {0} {1}/分钟</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="19034" />
+        <location filename="../artisanlib/canvas.py" line="19083" />
         <source>ET {0} {1}/min for {2}</source>
         <translation>{2}ET {0} {1}/分钟</translation>
     </message>
@@ -14530,6 +14629,11 @@ Fewer nodes: simpler curve but may lose detail</source>
         <translation>纵横比</translation>
     </message>
     <message>
+        <location filename="../plus/schedule.py" line="2126" />
+        <source>Score</source>
+        <translation>分数</translation>
+    </message>
+    <message>
         <source>Start recording</source>
         <translation type="vanished">开始记录</translation>
     </message>
@@ -14548,40 +14652,40 @@ Fewer nodes: simpler curve but may lose detail</source>
 </context><context>
     <name>MAC_APPLICATION_MENU</name>
     <message>
-        <location filename="../artisanlib/main.py" line="2024" />
+        <location filename="../artisanlib/main.py" line="2027" />
         <source>Services</source>
         <translation>服务</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2025" />
+        <location filename="../artisanlib/main.py" line="2028" />
         <source>Hide {0}</source>
         <translation>隐藏 {0}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2026" />
+        <location filename="../artisanlib/main.py" line="2029" />
         <source>Hide Others</source>
         <translation>隐藏其他</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2027" />
+        <location filename="../artisanlib/main.py" line="2030" />
         <source>Show All</source>
         <translation>全部显示</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2028" />
+        <location filename="../artisanlib/main.py" line="2031" />
         <source>Preferences...</source>
         <translation>偏好...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2439" />
-        <location filename="../artisanlib/main.py" line="2029" />
+        <location filename="../artisanlib/main.py" line="2442" />
+        <location filename="../artisanlib/main.py" line="2032" />
         <source>Quit {0}</source>
         <translation>退出 {0}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2758" />
-        <location filename="../artisanlib/main.py" line="2756" />
-        <location filename="../artisanlib/main.py" line="2030" />
+        <location filename="../artisanlib/main.py" line="2761" />
+        <location filename="../artisanlib/main.py" line="2759" />
+        <location filename="../artisanlib/main.py" line="2033" />
         <source>About {0}</source>
         <translation>关于 {0}</translation>
     </message>
@@ -14640,609 +14744,609 @@ Fewer nodes: simpler curve but may lose detail</source>
 </context><context>
     <name>Menu</name>
     <message>
-        <location filename="../artisanlib/main.py" line="2707" />
-        <location filename="../plus/schedule.py" line="2427" />
-        <source>Schedule</source>
-        <translation>烘焙计划</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="4397" />
+        <location filename="../artisanlib/main.py" line="4400" />
         <location filename="../artisanlib/pid_dialogs.py" line="751" />
         <source>Config</source>
         <translation>配置</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2714" />
+        <location filename="../artisanlib/main.py" line="2717" />
         <location filename="../artisanlib/large_lcds.py" line="351" />
         <source>Main LCDs</source>
         <translation>主要信息LCD</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2720" />
+        <location filename="../artisanlib/main.py" line="2723" />
         <location filename="../artisanlib/large_lcds.py" line="518" />
         <source>Delta LCDs</source>
         <translation>变化率 LCDs</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2725" />
+        <location filename="../artisanlib/main.py" line="2728" />
         <location filename="../artisanlib/large_lcds.py" line="572" />
         <source>PID LCDs</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2730" />
+        <location filename="../artisanlib/main.py" line="2733" />
         <location filename="../artisanlib/large_lcds.py" line="620" />
         <source>Extra LCDs</source>
         <translation>额外LCD</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2735" />
+        <location filename="../artisanlib/main.py" line="2738" />
         <location filename="../artisanlib/large_lcds.py" line="742" />
         <source>Phases LCDs</source>
         <translation>阶段LCD</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2740" />
+        <location filename="../artisanlib/main.py" line="2743" />
         <location filename="../artisanlib/large_lcds.py" line="844" />
         <source>Scale LCDs</source>
         <translation>电子秤 LCD</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="5746" />
-        <location filename="../artisanlib/main.py" line="2046" />
+        <location filename="../artisanlib/main.py" line="5749" />
+        <location filename="../artisanlib/main.py" line="2049" />
         <source>New</source>
         <translation>新建</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2050" />
+        <location filename="../artisanlib/main.py" line="2053" />
         <source>Open...</source>
         <translation>打开...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2057" />
+        <location filename="../artisanlib/main.py" line="2060" />
         <source>Open Recent</source>
         <translation>最近打开</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2067" />
+        <location filename="../artisanlib/main.py" line="2070" />
         <source>Import</source>
         <translation>导入</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2169" />
+        <location filename="../artisanlib/main.py" line="2172" />
         <source>Convert From</source>
         <translation>转换自</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2170" />
+        <location filename="../artisanlib/main.py" line="2173" />
         <source>Cropster XLS...</source>
         <translation>Cropster XLS...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2174" />
+        <location filename="../artisanlib/main.py" line="2177" />
         <source>Giesen CSV...</source>
         <translation>吉森 CSV...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2178" />
+        <location filename="../artisanlib/main.py" line="2181" />
         <source>HiBean JSON...</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2182" />
+        <location filename="../artisanlib/main.py" line="2185" />
         <source>IKAWA CSV...</source>
         <translation>伊川 CSV...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2186" />
+        <location filename="../artisanlib/main.py" line="2189" />
         <source>Kaleido CSV...</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2190" />
+        <location filename="../artisanlib/main.py" line="2193" />
         <source>Loring CSV...</source>
         <translation>洛林 CSV...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2198" />
+        <location filename="../artisanlib/main.py" line="2201" />
         <source>Petroncini CSV...</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2202" />
+        <location filename="../artisanlib/main.py" line="2205" />
         <source>ROEST CSV...</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2206" />
+        <location filename="../artisanlib/main.py" line="2209" />
         <source>Rubase CSV...</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2210" />
+        <location filename="../artisanlib/main.py" line="2213" />
         <source>Stronghold XLSX...</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2214" />
+        <location filename="../artisanlib/main.py" line="2217" />
         <source>Save</source>
         <translation>保存</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2220" />
+        <location filename="../artisanlib/main.py" line="2223" />
         <source>Save As...</source>
         <translation>保存为...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2227" />
+        <location filename="../artisanlib/main.py" line="2230" />
         <source>Save a Copy As...</source>
         <translation>另存为...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2230" />
+        <location filename="../artisanlib/main.py" line="2233" />
         <source>Export</source>
         <translation>导出</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2272" />
-        <location filename="../artisanlib/main.py" line="2233" />
+        <location filename="../artisanlib/main.py" line="2275" />
+        <location filename="../artisanlib/main.py" line="2236" />
         <source>Artisan CSV...</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2276" />
-        <location filename="../artisanlib/main.py" line="2237" />
+        <location filename="../artisanlib/main.py" line="2279" />
+        <location filename="../artisanlib/main.py" line="2240" />
         <source>Artisan JSON...</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2417" />
-        <location filename="../artisanlib/main.py" line="2400" />
-        <location filename="../artisanlib/main.py" line="2296" />
-        <location filename="../artisanlib/main.py" line="2243" />
+        <location filename="../artisanlib/main.py" line="2420" />
+        <location filename="../artisanlib/main.py" line="2403" />
+        <location filename="../artisanlib/main.py" line="2299" />
+        <location filename="../artisanlib/main.py" line="2246" />
         <source>Excel...</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2261" />
+        <location filename="../artisanlib/main.py" line="2264" />
         <source>Convert To</source>
         <translation>转换为</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2262" />
+        <location filename="../artisanlib/main.py" line="2265" />
         <source>Fahrenheit...</source>
         <translation>华氏度...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2266" />
+        <location filename="../artisanlib/main.py" line="2269" />
         <source>Celsius...</source>
         <translation>摄氏度...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2333" />
-        <location filename="../artisanlib/main.py" line="2302" />
+        <location filename="../artisanlib/main.py" line="2336" />
+        <location filename="../artisanlib/main.py" line="2305" />
         <source>PNG...</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2306" />
+        <location filename="../artisanlib/main.py" line="2309" />
         <source>JPEG...</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2310" />
+        <location filename="../artisanlib/main.py" line="2313" />
         <source>SVG...</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2422" />
-        <location filename="../artisanlib/main.py" line="2406" />
-        <location filename="../artisanlib/main.py" line="2389" />
-        <location filename="../artisanlib/main.py" line="2376" />
-        <location filename="../artisanlib/main.py" line="2314" />
+        <location filename="../artisanlib/main.py" line="2425" />
+        <location filename="../artisanlib/main.py" line="2409" />
+        <location filename="../artisanlib/main.py" line="2392" />
+        <location filename="../artisanlib/main.py" line="2379" />
+        <location filename="../artisanlib/main.py" line="2317" />
         <source>PDF...</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2318" />
+        <location filename="../artisanlib/main.py" line="2321" />
         <source>Roast Report PDF...</source>
         <translation>烘焙报告PDF...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2324" />
+        <location filename="../artisanlib/main.py" line="2327" />
         <source>Save Graph</source>
         <translation>保存图表</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2373" />
+        <location filename="../artisanlib/main.py" line="2376" />
         <source>Report</source>
         <translation>报告</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="4385" />
-        <location filename="../artisanlib/main.py" line="2374" />
+        <location filename="../artisanlib/main.py" line="4388" />
+        <location filename="../artisanlib/main.py" line="2377" />
         <source>Roast</source>
         <translation>烘焙</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2411" />
-        <location filename="../artisanlib/main.py" line="2394" />
-        <location filename="../artisanlib/main.py" line="2382" />
+        <location filename="../artisanlib/main.py" line="2414" />
+        <location filename="../artisanlib/main.py" line="2397" />
+        <location filename="../artisanlib/main.py" line="2385" />
         <source>Web...</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2387" />
+        <location filename="../artisanlib/main.py" line="2390" />
         <source>Batches</source>
         <translation>批次</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2414" />
-        <location filename="../artisanlib/main.py" line="2397" />
+        <location filename="../artisanlib/main.py" line="2417" />
+        <location filename="../artisanlib/main.py" line="2400" />
         <source>CSV...</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2404" />
+        <location filename="../artisanlib/main.py" line="2407" />
         <source>Ranking</source>
         <translation>排名</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2429" />
+        <location filename="../artisanlib/main.py" line="2432" />
         <source>Print...</source>
         <translation>打印...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2445" />
+        <location filename="../artisanlib/main.py" line="2448" />
         <source>Cut</source>
         <translation>剪切</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2448" />
+        <location filename="../artisanlib/main.py" line="2451" />
         <source>Copy</source>
         <translation>复制</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2451" />
+        <location filename="../artisanlib/main.py" line="2454" />
         <source>Paste</source>
         <translation>粘贴</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2456" />
+        <location filename="../artisanlib/main.py" line="2459" />
         <source>Properties...</source>
         <translation>烘焙属性...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2461" />
+        <location filename="../artisanlib/main.py" line="2464" />
         <source>Background...</source>
         <translation>背景曲线...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2465" />
+        <location filename="../artisanlib/main.py" line="2468" />
         <source>Cup Profile...</source>
         <translation>杯测记录...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2468" />
+        <location filename="../artisanlib/main.py" line="2471" />
         <source>Switch Profiles</source>
         <translation>切换曲线</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2472" />
+        <location filename="../artisanlib/main.py" line="2475" />
         <source>Switch ET&lt;-&gt;BT</source>
         <translation>切换ET&lt;-&gt;BT</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2478" />
+        <location filename="../artisanlib/main.py" line="2481" />
         <source>Machine</source>
         <translation>机器</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2483" />
+        <location filename="../artisanlib/main.py" line="2486" />
         <source>Device...</source>
         <translation>设备...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2487" />
+        <location filename="../artisanlib/main.py" line="2490" />
         <source>Port...</source>
         <translation>端口...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2490" />
+        <location filename="../artisanlib/main.py" line="2493" />
         <source>Sampling...</source>
         <translation>采样...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2493" />
+        <location filename="../artisanlib/main.py" line="2496" />
         <source>Curves...</source>
         <translation>曲线...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2497" />
+        <location filename="../artisanlib/main.py" line="2500" />
         <source>Events...</source>
         <translation>事件...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2501" />
+        <location filename="../artisanlib/main.py" line="2504" />
         <source>Alarms...</source>
         <translation>警报...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2509" />
+        <location filename="../artisanlib/main.py" line="2512" />
         <source>Phases...</source>
         <translation>阶段...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2512" />
+        <location filename="../artisanlib/main.py" line="2515" />
         <source>Statistics...</source>
         <translation>统计...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2515" />
+        <location filename="../artisanlib/main.py" line="2518" />
         <source>Axes...</source>
         <translation>坐标轴...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2519" />
+        <location filename="../artisanlib/main.py" line="2522" />
         <source>Colors...</source>
         <translation>颜色...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2522" />
+        <location filename="../artisanlib/main.py" line="2525" />
         <source>Themes</source>
         <translation>主题</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2528" />
+        <location filename="../artisanlib/main.py" line="2531" />
         <source>Autosave...</source>
         <translation>自动保存...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2531" />
+        <location filename="../artisanlib/main.py" line="2534" />
         <source>Batch...</source>
         <translation>批次...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2534" />
+        <location filename="../artisanlib/main.py" line="2537" />
         <source>Temperature</source>
         <translation>温度单位</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2538" />
+        <location filename="../artisanlib/main.py" line="2541" />
         <source>Fahrenheit Mode</source>
         <translation>华氏模式</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2541" />
+        <location filename="../artisanlib/main.py" line="2544" />
         <source>Celsius Mode</source>
         <translation>摄氏模式</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2545" />
+        <location filename="../artisanlib/main.py" line="2548" />
         <source>Language</source>
         <translation>语言</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="4581" />
-        <location filename="../artisanlib/main.py" line="2587" />
+        <location filename="../artisanlib/main.py" line="4584" />
+        <location filename="../artisanlib/main.py" line="2590" />
         <source>Mode</source>
         <translation>模式</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="4575" />
-        <location filename="../artisanlib/main.py" line="2588" />
+        <location filename="../artisanlib/main.py" line="4578" />
+        <location filename="../artisanlib/main.py" line="2591" />
         <source>Production</source>
         <translation>生产模式</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="4579" />
-        <location filename="../artisanlib/main.py" line="2594" />
+        <location filename="../artisanlib/main.py" line="4582" />
+        <location filename="../artisanlib/main.py" line="2597" />
         <source>Standard</source>
         <translation>标准</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="4577" />
-        <location filename="../artisanlib/main.py" line="2600" />
+        <location filename="../artisanlib/main.py" line="4580" />
+        <location filename="../artisanlib/main.py" line="2603" />
         <source>Expert</source>
         <translation>专家模式</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2609" />
+        <location filename="../artisanlib/main.py" line="2612" />
         <source>Analyzer</source>
         <translation>分析</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2610" />
+        <location filename="../artisanlib/main.py" line="2613" />
         <source>Auto All</source>
         <translation>全自动</translation>
     </message>
     <message>
+        <location filename="../artisanlib/main.py" line="2624" />
         <location filename="../artisanlib/main.py" line="2621" />
         <location filename="../artisanlib/main.py" line="2618" />
-        <location filename="../artisanlib/main.py" line="2615" />
         <source>Fit BT to</source>
         <translation>拟合BT曲线为</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2625" />
+        <location filename="../artisanlib/main.py" line="2628" />
         <source>Fit BT to Bkgnd</source>
         <translation>拟合BT到背景曲线</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2629" />
+        <location filename="../artisanlib/main.py" line="2632" />
         <source>Clear results</source>
         <translation>清除结果</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2634" />
+        <location filename="../artisanlib/main.py" line="2637" />
         <source>Comparator</source>
         <translation>比较器</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2639" />
+        <location filename="../artisanlib/main.py" line="2642" />
         <source>Designer</source>
         <translation>曲线设计器</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2644" />
+        <location filename="../artisanlib/main.py" line="2647" />
         <source>Simulator</source>
         <translation>模拟器</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2649" />
+        <location filename="../artisanlib/main.py" line="2652" />
         <source>Wheel Graph</source>
         <translation>风味轮</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2654" />
+        <location filename="../artisanlib/main.py" line="2657" />
         <source>Transposer</source>
         <translation>曲线配置转换</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2657" />
+        <location filename="../artisanlib/main.py" line="2660" />
         <source>Convert Profile Temperature</source>
         <translation>转换配置温度</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2658" />
+        <location filename="../artisanlib/main.py" line="2661" />
         <source>Convert to Fahrenheit</source>
         <translation>转换为华氏</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2661" />
+        <location filename="../artisanlib/main.py" line="2664" />
         <source>Convert to Celsius</source>
         <translation>转换为摄氏</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2672" />
+        <location filename="../artisanlib/main.py" line="2675" />
         <source>Calculator</source>
         <translation>烘焙计算器</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2677" />
+        <location filename="../artisanlib/main.py" line="2680" />
         <source>Controls</source>
         <translation>控制按钮</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2683" />
+        <location filename="../artisanlib/main.py" line="2686" />
         <source>Readings</source>
         <translation>显示仪表</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2689" />
+        <location filename="../artisanlib/main.py" line="2692" />
         <source>Events Editor</source>
         <translation>事件 编辑器</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2695" />
+        <location filename="../artisanlib/main.py" line="2698" />
         <source>Buttons</source>
         <translation>控制按钮</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2701" />
+        <location filename="../artisanlib/main.py" line="2704" />
         <source>Sliders</source>
         <translation>控制滑块</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2745" />
+        <location filename="../plus/schedule.py" line="2427" />
+        <location filename="../artisanlib/main.py" line="2710" />
+        <source>Schedule</source>
+        <translation>烘焙计划</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="2748" />
         <source>Full Screen</source>
         <translation>全屏</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2764" />
+        <location filename="../artisanlib/main.py" line="2767" />
         <source>About Qt</source>
         <translation>关于 Qt</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2768" />
+        <location filename="../artisanlib/main.py" line="2771" />
         <source>Documentation</source>
         <translation>帮助文档</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2774" />
+        <location filename="../artisanlib/main.py" line="2777" />
         <source>Keyboard Shortcuts</source>
         <translation>键盘快捷键</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2777" />
+        <location filename="../artisanlib/main.py" line="2780" />
         <source>Check for Updates</source>
         <translation>检查更新</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2781" />
+        <location filename="../artisanlib/main.py" line="2784" />
         <source>Errors</source>
         <translation>错误记录</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2784" />
+        <location filename="../artisanlib/main.py" line="2787" />
         <source>Messages</source>
         <translation>历史信息</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2787" />
+        <location filename="../artisanlib/main.py" line="2790" />
         <source>Serial</source>
         <translation>串行日志</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2791" />
+        <location filename="../artisanlib/main.py" line="2794" />
         <source>Platform</source>
         <translation>Artisan 平台</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2797" />
+        <location filename="../artisanlib/main.py" line="2800" />
         <source>Load Settings...</source>
         <translation>载入设置...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="2801" />
+        <location filename="../artisanlib/main.py" line="2804" />
         <source>Load Recent Settings</source>
         <translation>载入近期设置</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="5865" />
-        <location filename="../artisanlib/main.py" line="2806" />
+        <location filename="../artisanlib/main.py" line="5868" />
+        <location filename="../artisanlib/main.py" line="2809" />
         <source>Save Settings...</source>
         <translation>保存设置...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="5865" />
-        <location filename="../artisanlib/main.py" line="2810" />
+        <location filename="../artisanlib/main.py" line="5868" />
+        <location filename="../artisanlib/main.py" line="2813" />
         <source>Factory Reset</source>
         <translation>恢复出厂设置</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="4349" />
+        <location filename="../artisanlib/main.py" line="4352" />
         <source>File</source>
         <translation>文件</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="4378" />
+        <location filename="../artisanlib/main.py" line="4381" />
         <source>Edit</source>
         <translation>编辑</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="4434" />
+        <location filename="../artisanlib/main.py" line="4437" />
         <source>Tools</source>
         <translation>工具</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="4453" />
+        <location filename="../artisanlib/main.py" line="4456" />
         <source>View</source>
         <translation>查看</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="5864" />
-        <location filename="../artisanlib/main.py" line="4488" />
+        <location filename="../artisanlib/main.py" line="5867" />
+        <location filename="../artisanlib/main.py" line="4491" />
         <source>Help</source>
         <translation>帮助</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="6121" />
+        <location filename="../artisanlib/main.py" line="6157" />
         <source>Load Theme...</source>
         <translation>载入主题...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="6125" />
+        <location filename="../artisanlib/main.py" line="6161" />
         <source>Save Theme...</source>
         <translation>保存主题...</translation>
     </message>
@@ -15256,63 +15360,6 @@ Fewer nodes: simpler curve but may lose detail</source>
     </message>
 </context><context>
     <name>Message</name>
-    <message>
-        <location filename="../plus/schedule.py" line="1523" />
-        <source>Register the currently loaded roast profile&lt;br&gt;in the selected entry.&lt;br&gt;This will overwrite some roast properties.</source>
-        <translation>在选定的条目中注册当前加载的烘焙配置文件&lt;br&gt;。&lt;br&gt;这将覆盖一些烘焙属性。</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1537" />
-        <location filename="../plus/schedule.py" line="1528" />
-        <source>Register Roast</source>
-        <translation>批次 + 正式录入归档</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2481" />
-        <source>Scheduler started</source>
-        <translation>调度程序已启动</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2792" />
-        <source>Roasts will not adjust the schedule&lt;br&gt;while the schedule window is closed</source>
-        <translation>当计划窗口关闭时，烘焙不会调整计划</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2806" />
-        <location filename="../plus/schedule.py" line="2797" />
-        <source>Close Scheduler</source>
-        <translation>关闭调度程序</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2864" />
-        <source>Scheduler stopped</source>
-        <translation>调度程序已停止</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="3578" />
-        <location filename="../plus/schedule.py" line="3170" />
-        <source>Updating completed roast properties failed</source>
-        <translation>更新已完成烘焙的属性失败</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="3750" />
-        <location filename="../plus/schedule.py" line="3289" />
-        <source>1 batch</source>
-        <translation>1 单批次烘焙任务</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="3765" />
-        <location filename="../plus/schedule.py" line="3756" />
-        <location filename="../plus/schedule.py" line="3297" />
-        <location filename="../plus/schedule.py" line="3291" />
-        <source>{} batches</source>
-        <translation>{} 多批次烘焙任务</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="3644" />
-        <source>Fetching completed roast properties failed</source>
-        <translation>获取已完成的烘焙属性失败</translation>
-    </message>
     <message>
         <location filename="../artisanlib/axis.py" line="896" />
         <source>xlimit = ({2},{3}) ylimit = ({0},{1}) zlimit = ({4},{5})</source>
@@ -15329,39 +15376,41 @@ Fewer nodes: simpler curve but may lose detail</source>
         <translation>已保存风味轮</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="19163" />
+        <location filename="../artisanlib/canvas.py" line="19212" />
         <location filename="../artisanlib/wheels.py" line="648" />
         <source>Open Wheel Graph</source>
         <translation>打开风味轮</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="13420" />
-        <location filename="../artisanlib/canvas.py" line="13403" />
-        <location filename="../artisanlib/canvas.py" line="13390" />
-        <location filename="../artisanlib/canvas.py" line="13384" />
-        <location filename="../artisanlib/canvas.py" line="13363" />
-        <location filename="../artisanlib/canvas.py" line="13355" />
-        <location filename="../artisanlib/canvas.py" line="13340" />
-        <location filename="../artisanlib/canvas.py" line="13321" />
-        <location filename="../artisanlib/main.py" line="4598" />
-        <location filename="../artisanlib/comm.py" line="1819" />
-        <location filename="../artisanlib/comm.py" line="1075" />
+        <location filename="../artisanlib/canvas.py" line="13461" />
+        <location filename="../artisanlib/canvas.py" line="13444" />
+        <location filename="../artisanlib/canvas.py" line="13431" />
+        <location filename="../artisanlib/canvas.py" line="13425" />
+        <location filename="../artisanlib/canvas.py" line="13404" />
+        <location filename="../artisanlib/canvas.py" line="13396" />
+        <location filename="../artisanlib/canvas.py" line="13381" />
+        <location filename="../artisanlib/canvas.py" line="13362" />
+        <location filename="../artisanlib/main.py" line="4601" />
+        <location filename="../artisanlib/mqttport.py" line="95" />
+        <location filename="../artisanlib/comm.py" line="1825" />
+        <location filename="../artisanlib/comm.py" line="1081" />
         <location filename="../artisanlib/wsport.py" line="282" />
         <source>{} connected</source>
         <translation>{} 连接的</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="13421" />
-        <location filename="../artisanlib/canvas.py" line="13404" />
-        <location filename="../artisanlib/canvas.py" line="13391" />
-        <location filename="../artisanlib/canvas.py" line="13385" />
-        <location filename="../artisanlib/canvas.py" line="13364" />
-        <location filename="../artisanlib/canvas.py" line="13356" />
-        <location filename="../artisanlib/canvas.py" line="13341" />
-        <location filename="../artisanlib/canvas.py" line="13322" />
-        <location filename="../artisanlib/main.py" line="4605" />
-        <location filename="../artisanlib/comm.py" line="1820" />
-        <location filename="../artisanlib/comm.py" line="1076" />
+        <location filename="../artisanlib/canvas.py" line="13462" />
+        <location filename="../artisanlib/canvas.py" line="13445" />
+        <location filename="../artisanlib/canvas.py" line="13432" />
+        <location filename="../artisanlib/canvas.py" line="13426" />
+        <location filename="../artisanlib/canvas.py" line="13405" />
+        <location filename="../artisanlib/canvas.py" line="13397" />
+        <location filename="../artisanlib/canvas.py" line="13382" />
+        <location filename="../artisanlib/canvas.py" line="13363" />
+        <location filename="../artisanlib/main.py" line="4608" />
+        <location filename="../artisanlib/mqttport.py" line="123" />
+        <location filename="../artisanlib/comm.py" line="1826" />
+        <location filename="../artisanlib/comm.py" line="1082" />
         <location filename="../artisanlib/wsport.py" line="333" />
         <location filename="../artisanlib/wsport.py" line="318" />
         <location filename="../artisanlib/wsport.py" line="311" />
@@ -15622,238 +15671,238 @@ Repeat Operation at the end: {0}</source>
         <translation>目前 pid = {0}. 现在更改到 pid ={1}?</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="3869" />
+        <location filename="../artisanlib/comm.py" line="3913" />
         <source>Phidget Temperature Sensor IR attached</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="3872" />
+        <location filename="../artisanlib/comm.py" line="3916" />
         <source>Phidget Temperature Sensor 1-input attached</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="3875" />
+        <location filename="../artisanlib/comm.py" line="3919" />
         <source>Phidget Isolated Thermocouple 1-input attached</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="3881" />
+        <location filename="../artisanlib/comm.py" line="3925" />
         <source>Phidget VINT RTD 1-input attached</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="3893" />
+        <location filename="../artisanlib/comm.py" line="3937" />
         <source>Phidget Temperature Sensor IR detached</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="3895" />
+        <location filename="../artisanlib/comm.py" line="3939" />
         <source>Phidget Temperature Sensor 1-input detached</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="3897" />
+        <location filename="../artisanlib/comm.py" line="3941" />
         <source>Phidget Isolated Thermocouple 1-input detached</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="3899" />
+        <location filename="../artisanlib/comm.py" line="3943" />
         <source>Phidget VINT RTD 1-input detached</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="4186" />
+        <location filename="../artisanlib/comm.py" line="4230" />
         <source>Phidget Temperature Sensor 4-input attached</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="4197" />
+        <location filename="../artisanlib/comm.py" line="4241" />
         <source>Phidget Temperature Sensor 4-input detached</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="4496" />
+        <location filename="../artisanlib/comm.py" line="4540" />
         <source>Phidget 1046 attached</source>
         <translation>附Phidget 1046</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="4498" />
+        <location filename="../artisanlib/comm.py" line="4542" />
         <source>Phidget DAQ1500 attached</source>
         <translation>附Phidget DAQ1500</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="4510" />
+        <location filename="../artisanlib/comm.py" line="4554" />
         <source>Phidget 1046 detached</source>
         <translation>Phidget 1046分离</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="4512" />
+        <location filename="../artisanlib/comm.py" line="4556" />
         <source>Phidget DAQ1500 detached</source>
         <translation>Phidget DAQ1500分离</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="6191" />
+        <location filename="../artisanlib/comm.py" line="6235" />
         <source>Phidget IO 2/2/2 attached</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="6193" />
+        <location filename="../artisanlib/comm.py" line="6237" />
         <source>Phidget IO 6/6/6 attached</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="6195" />
+        <location filename="../artisanlib/comm.py" line="6239" />
         <source>Phidget IO 8/8/8 attached</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="6197" />
+        <location filename="../artisanlib/comm.py" line="6241" />
         <source>Phidget DAQ1000 attached</source>
         <translation>附有 Phidg​​et DAQ1000</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="6199" />
+        <location filename="../artisanlib/comm.py" line="6243" />
         <source>Phidget DAQ1200 attached</source>
         <translation>已连接 Phidg​​et DAQ1200</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="6201" />
+        <location filename="../artisanlib/comm.py" line="6245" />
         <source>Phidget DAQ1300 attached</source>
         <translation>已连接 Phidg​​et DAQ1300</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="6203" />
+        <location filename="../artisanlib/comm.py" line="6247" />
         <source>Phidget DAQ1301 attached</source>
         <translation>已连接 Phidg​​et DAQ1301</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="6205" />
+        <location filename="../artisanlib/comm.py" line="6249" />
         <source>Phidget DAQ1400 attached</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="6207" />
+        <location filename="../artisanlib/comm.py" line="6251" />
         <source>Phidget VCP1000 attached</source>
         <translation>Phidget VCP1000 已连接</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="6209" />
+        <location filename="../artisanlib/comm.py" line="6253" />
         <source>Phidget VCP1001 attached</source>
         <translation>Phidget VCP1001 已连接</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="6211" />
+        <location filename="../artisanlib/comm.py" line="6255" />
         <source>Phidget VCP1002 attached</source>
         <translation>Phidget VCP1002 已连接</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="6213" />
+        <location filename="../artisanlib/comm.py" line="6257" />
         <source>Phidget IO attached</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="6225" />
+        <location filename="../artisanlib/comm.py" line="6269" />
         <source>Phidget IO 2/2/2 detached</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="6227" />
+        <location filename="../artisanlib/comm.py" line="6271" />
         <source>Phidget IO 6/6/6 detached</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="6229" />
+        <location filename="../artisanlib/comm.py" line="6273" />
         <source>Phidget IO 8/8/8 detached</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="6231" />
+        <location filename="../artisanlib/comm.py" line="6275" />
         <source>Phidget DAQ1000 detached</source>
         <translation>Phidg​​et DAQ1000 已分离</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="6233" />
+        <location filename="../artisanlib/comm.py" line="6277" />
         <source>Phidget DAQ1200 detached</source>
         <translation>Phidg​​et DAQ1200 分离式</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="6235" />
+        <location filename="../artisanlib/comm.py" line="6279" />
         <source>Phidget DAQ1300 detached</source>
         <translation>Phidg​​et DAQ1300 分离式</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="6237" />
+        <location filename="../artisanlib/comm.py" line="6281" />
         <source>Phidget DAQ1301 detached</source>
         <translation>Phidg​​et DAQ1301 分离式</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="6239" />
+        <location filename="../artisanlib/comm.py" line="6283" />
         <source>Phidget DAQ1400 detached</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="6241" />
+        <location filename="../artisanlib/comm.py" line="6285" />
         <source>Phidget VCP1000 detached</source>
         <translation>Phidget VCP1000 分离的</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="6243" />
+        <location filename="../artisanlib/comm.py" line="6287" />
         <source>Phidget VCP1001 detached</source>
         <translation>Phidget VCP1001 分离的</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="6245" />
+        <location filename="../artisanlib/comm.py" line="6289" />
         <source>Phidget VCP1002 detached</source>
         <translation>Phidget VCP1002 分离的</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="6247" />
+        <location filename="../artisanlib/comm.py" line="6291" />
         <source>Phidget IO detached</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="6550" />
+        <location filename="../artisanlib/comm.py" line="6594" />
         <source>Yocto Thermocouple attached</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="6552" />
+        <location filename="../artisanlib/comm.py" line="6596" />
         <source>Yocto IR attached</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="6609" />
+        <location filename="../artisanlib/comm.py" line="6653" />
         <source>Yocto PT100 attached</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="6710" />
-        <location filename="../artisanlib/comm.py" line="6648" />
+        <location filename="../artisanlib/comm.py" line="6754" />
+        <location filename="../artisanlib/comm.py" line="6692" />
         <source>Yocto Sensor attached</source>
         <translation>附有 Yocto 传感器</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="6654" />
+        <location filename="../artisanlib/comm.py" line="6698" />
         <source>Yocto Watt Power attached</source>
         <translation>附有 Yocto Watt Power</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="6660" />
+        <location filename="../artisanlib/comm.py" line="6704" />
         <source>Yocto Watt Energy attached</source>
         <translation>附有 Yocto Watt Energy</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="6677" />
+        <location filename="../artisanlib/comm.py" line="6721" />
         <source>Yocto Watt Voltage attached</source>
         <translation>附有 Yocto Watt 电压</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="6694" />
+        <location filename="../artisanlib/comm.py" line="6738" />
         <source>Yocto Watt Current attached</source>
         <translation>附有 Yocto 瓦特电流</translation>
     </message>
     <message>
-        <location filename="../artisanlib/comm.py" line="6979" />
+        <location filename="../artisanlib/comm.py" line="7023" />
         <source>TC4 initialized</source>
         <translation>TC4 已初始化</translation>
     </message>
@@ -15868,7 +15917,7 @@ Repeat Operation at the end: {0}</source>
         <translation>自动保存关闭. 前缀: {0}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24876" />
+        <location filename="../artisanlib/main.py" line="24978" />
         <location filename="../artisanlib/sampling.py" line="132" />
         <location filename="../artisanlib/autosave.py" line="229" />
         <source>Warning</source>
@@ -15884,28 +15933,28 @@ ATTENTION: Recorded data will get cleared without confirmation</source>
 注意：记录的数据将在未经确认的情况下被清除</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="1928" />
+        <location filename="../artisanlib/events.py" line="1979" />
         <source>Load Palettes</source>
         <translation>载入调色板</translation>
     </message>
     <message>
         <location filename="../artisanlib/statistics.py" line="652" />
-        <location filename="../artisanlib/events.py" line="2920" />
+        <location filename="../artisanlib/events.py" line="2986" />
         <source>Event Button table copied to clipboard</source>
         <translation>事件按钮表已复制到剪贴板</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="3689" />
+        <location filename="../artisanlib/events.py" line="3755" />
         <source>Event configuration saved</source>
         <translation>事件配置已保存</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="3703" />
+        <location filename="../artisanlib/events.py" line="3769" />
         <source>Found empty event type box</source>
         <translation>找到空的事件类型标记</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1755" />
+        <location filename="../artisanlib/ports.py" line="1999" />
         <source>Serial Port Settings: {0}, {1}, {2}, {3}, {4}, {5}</source>
         <translation>串行端口设置: {0}, {1}, {2}, {3}, {4}, {5}</translation>
     </message>
@@ -15935,13 +15984,13 @@ ATTENTION: Recorded data will get cleared without confirmation</source>
         <translation>在{0}秒后设置打开回放辅助设备</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12441" />
+        <location filename="../artisanlib/main.py" line="12489" />
         <location filename="../artisanlib/background.py" line="860" />
         <source>Load Background</source>
         <translation>载入背景曲线</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14133" />
+        <location filename="../artisanlib/main.py" line="14181" />
         <location filename="../artisanlib/background.py" line="863" />
         <source>Reading background profile...</source>
         <translation>读取背景曲线配置...</translation>
@@ -15951,6 +16000,22 @@ ATTENTION: Recorded data will get cleared without confirmation</source>
         <location filename="../artisanlib/background.py" line="1138" />
         <source>Event table copied to clipboard</source>
         <translation>事件表已复制到剪贴板</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/mqttport.py" line="213" />
+        <source>Error: Failed to store MQTT password</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <location filename="../artisanlib/mqttport.py" line="231" />
+        <location filename="../artisanlib/mqttport.py" line="224" />
+        <source>Error: failed to retrieve MQTT password</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <location filename="../artisanlib/mqttport.py" line="242" />
+        <source>Error: failed to clear MQTT password</source>
+        <translation type="unfinished" />
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1683" />
@@ -16141,13 +16206,13 @@ ATTENTION: Recorded data will get cleared without confirmation</source>
         <translation>紧密的采样间隔可能会导致某些机器不稳定。我们建议至少为 1s。</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="27608" />
+        <location filename="../artisanlib/main.py" line="27710" />
         <location filename="../artisanlib/curves.py" line="1762" />
         <source>Incompatible variables found in %s</source>
         <translation>在 %s 中发现不兼容的变量</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="27610" />
+        <location filename="../artisanlib/main.py" line="27712" />
         <location filename="../artisanlib/curves.py" line="1764" />
         <source>Assignment problem</source>
         <translation>任务分配问题</translation>
@@ -16193,7 +16258,7 @@ ATTENTION: Recorded data will get cleared without confirmation</source>
         <translation>S7 连接失败</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="5981" />
+        <location filename="../artisanlib/main.py" line="6017" />
         <location filename="../artisanlib/dialogs.py" line="522" />
         <source>Port Configuration</source>
         <translation>端口配置</translation>
@@ -16204,7 +16269,7 @@ ATTENTION: Recorded data will get cleared without confirmation</source>
         <translation>通信端口</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12446" />
+        <location filename="../artisanlib/main.py" line="12494" />
         <location filename="../artisanlib/alarms.py" line="634" />
         <source>Load Alarms</source>
         <translation>载入警报</translation>
@@ -16220,7 +16285,7 @@ ATTENTION: Recorded data will get cleared without confirmation</source>
         <translation>保存警报</translation>
     </message>
     <message>
-        <location filename="../artisanlib/alarms.py" line="1152" />
+        <location filename="../artisanlib/alarms.py" line="1155" />
         <source>Alarm table copied to clipboard</source>
         <translation>警报表已复制到剪贴板</translation>
     </message>
@@ -16231,25 +16296,25 @@ ATTENTION: Recorded data will get cleared without confirmation</source>
         <translation>网址打开曲线配置: {0}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="26206" />
-        <location filename="../artisanlib/main.py" line="26199" />
-        <location filename="../artisanlib/main.py" line="26193" />
-        <location filename="../artisanlib/main.py" line="26187" />
-        <location filename="../artisanlib/main.py" line="26181" />
-        <location filename="../artisanlib/main.py" line="26175" />
-        <location filename="../artisanlib/main.py" line="26169" />
-        <location filename="../artisanlib/main.py" line="26163" />
-        <location filename="../artisanlib/main.py" line="26157" />
-        <location filename="../artisanlib/main.py" line="26151" />
-        <location filename="../artisanlib/main.py" line="26145" />
-        <location filename="../artisanlib/main.py" line="26133" />
-        <location filename="../artisanlib/main.py" line="26127" />
-        <location filename="../artisanlib/main.py" line="26121" />
-        <location filename="../artisanlib/main.py" line="25695" />
-        <location filename="../artisanlib/main.py" line="25629" />
-        <location filename="../artisanlib/main.py" line="17886" />
-        <location filename="../artisanlib/main.py" line="17881" />
-        <location filename="../artisanlib/main.py" line="17874" />
+        <location filename="../artisanlib/main.py" line="26308" />
+        <location filename="../artisanlib/main.py" line="26301" />
+        <location filename="../artisanlib/main.py" line="26295" />
+        <location filename="../artisanlib/main.py" line="26289" />
+        <location filename="../artisanlib/main.py" line="26283" />
+        <location filename="../artisanlib/main.py" line="26277" />
+        <location filename="../artisanlib/main.py" line="26271" />
+        <location filename="../artisanlib/main.py" line="26265" />
+        <location filename="../artisanlib/main.py" line="26259" />
+        <location filename="../artisanlib/main.py" line="26253" />
+        <location filename="../artisanlib/main.py" line="26247" />
+        <location filename="../artisanlib/main.py" line="26235" />
+        <location filename="../artisanlib/main.py" line="26229" />
+        <location filename="../artisanlib/main.py" line="26223" />
+        <location filename="../artisanlib/main.py" line="25797" />
+        <location filename="../artisanlib/main.py" line="25731" />
+        <location filename="../artisanlib/main.py" line="17934" />
+        <location filename="../artisanlib/main.py" line="17929" />
+        <location filename="../artisanlib/main.py" line="17922" />
         <location filename="../artisanlib/main.py" line="434" />
         <location filename="../artisanlib/main.py" line="430" />
         <location filename="../artisanlib/main.py" line="426" />
@@ -16258,109 +16323,109 @@ ATTENTION: Recorded data will get cleared without confirmation</source>
         <translation>导入 {}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="1037" />
+        <location filename="../artisanlib/main.py" line="1038" />
         <source>follow on</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="1039" />
+        <location filename="../artisanlib/main.py" line="1040" />
         <source>follow off</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="21954" />
-        <location filename="../artisanlib/main.py" line="21915" />
-        <location filename="../artisanlib/main.py" line="2421" />
+        <location filename="../artisanlib/main.py" line="22018" />
+        <location filename="../artisanlib/main.py" line="21979" />
+        <location filename="../artisanlib/main.py" line="2424" />
         <source>Save Statistics</source>
         <translation>保存统计</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="4249" />
+        <location filename="../artisanlib/main.py" line="4252" />
         <source>Welcome to version {0} of Artisan!</source>
         <translation>欢迎使用Artisan的{0}版本!</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="4250" />
+        <location filename="../artisanlib/main.py" line="4253" />
         <source>This is a one time message to inform you about a change in Artisan.</source>
         <translation>这是一条一次性消息，通知您有关Artisan的更改.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="4251" />
+        <location filename="../artisanlib/main.py" line="4254" />
         <source>If you never run older versions of Artisan you can skip this message, the change does not affect you.</source>
         <translation>如果未使用过旧版本的Artisan，则可以跳过此消息，这些更改不会影响你.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="4252" />
+        <location filename="../artisanlib/main.py" line="4255" />
         <source>Artisan preserves all your configuration settings when you exit so they will automatically be available the next time you start Artisan.</source>
         <translation>退出时Artisan会保留所有配置设置，以便下次启动Artisan时它们将自动恢复。.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="4253" />
+        <location filename="../artisanlib/main.py" line="4256" />
         <source>Beginning with release v2.0, settings will no longer be automatically shared at start-up with versions before v2.0.</source>
         <translation>从版本v2.0开始，在启动时将不再自动与v2.0之前的版本共享设置。</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="4254" />
+        <location filename="../artisanlib/main.py" line="4257" />
         <source>Do not worry. Since this is the first time you opened this new version Artisan has already loaded your last used settings.</source>
         <translation>别担心。由于这是第一次打开此新版本，Artisan已加载上次使用的设置。</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="4255" />
+        <location filename="../artisanlib/main.py" line="4258" />
         <source>To share settings between this version and Artisan versions before v2.0 use 'Help&gt;Save Settings' and 'Help&gt;Load Settings'.</source>
         <translation>若要在此版本和Artisan v2.0之前的版本之间共享设置,请使用'帮助&gt;保存设置'和'帮助&gt;载入设置'.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="4256" />
+        <location filename="../artisanlib/main.py" line="4259" />
         <source>Enjoy using Artisan, The Artisan Team</source>
         <translation>希望你用的开心，Artisan团队</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="4257" />
+        <location filename="../artisanlib/main.py" line="4260" />
         <source>One time message about loading settings at start-up</source>
         <translation>关于启动时载入设置的一次性消息</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="4261" />
+        <location filename="../artisanlib/main.py" line="4264" />
         <source>Welcome to the ArtisanViewer!</source>
         <translation>欢迎来到ArtisanViewer!</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="4262" />
+        <location filename="../artisanlib/main.py" line="4265" />
         <source>This is a one time message to introduce you to the ArtisanViewer.</source>
         <translation>这是一次向您介绍ArtisanViewer的消息。</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="4263" />
+        <location filename="../artisanlib/main.py" line="4266" />
         <source>The ArtisanViewer opens whenever a copy of Artisan is already running.</source>
         <translation>只要已有Artisan副本运行，ArtisanViewer便会打开。</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="4264" />
+        <location filename="../artisanlib/main.py" line="4267" />
         <source>ArtisanViewer will preserve all your configuration settings when you exit so they will automatically be available the next time you start ArtisanViewer.</source>
         <translation>ArtisanViewer会在您退出时保留所有配置设置，以便下次启动ArtisanViewer时将自动可用。</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="4265" />
+        <location filename="../artisanlib/main.py" line="4268" />
         <source>Caution, the only way to share settings between Artisan and ArtisanViewer is to explicitly save and load them using 'Help&gt;Save Settings' and 'Help&gt;Load Settings'.</source>
         <translation>注意，在Artisan和ArtisanViewer之间共享设置的唯一方法是使用“帮助&gt;保存设置”和“帮助&gt;加载设置”显式保存和加载它们。</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="4266" />
+        <location filename="../artisanlib/main.py" line="4269" />
         <source>Enjoy using ArtisanViewer,</source>
         <translation>享受使用ArtisanViewer的乐趣，</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="4267" />
+        <location filename="../artisanlib/main.py" line="4270" />
         <source>The Artisan Team</source>
         <translation>Artisan团队</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="4268" />
+        <location filename="../artisanlib/main.py" line="4271" />
         <source>One time message about ArtisanViewer</source>
         <translation>关于ArtisanViewer的一次消息</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="5099" />
+        <location filename="../artisanlib/main.py" line="5102" />
         <source>Artisan is free to use!
 
 To keep it free and current please support us with your donation and subscribe to artisan.plus to suppress this dialog!</source>
@@ -16369,472 +16434,473 @@ To keep it free and current please support us with your donation and subscribe t
 为了保持它的免费和最新，请通过您的捐赠支持我们并订阅 artisan.plus 以抑制此对话框！</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="5865" />
+        <location filename="../artisanlib/main.py" line="5868" />
         <source>Configure for&lt;br&gt;{0}?&lt;br&gt;&lt;br&gt;Some of your settings will be modified!&lt;br&gt;&lt;br&gt;Before proceeding it is best to save your current settings and reset Artisan&lt;br&gt;(first menu {1} &gt;&gt; {2} then {4} &gt;&gt; {3})</source>
         <translation>配置&lt;br&gt;{0}？&lt;br&gt;&lt;br&gt;您的某些设置将被修改！&lt;br&gt;&lt;br&gt;在继续之前，最好保存当前设置并重置 Artisan&lt;br&gt;（第一个菜单 {1} &gt;&gt; {2} 然后 {4} &gt;&gt; {3})</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="5866" />
+        <location filename="../artisanlib/main.py" line="5869" />
         <source>Adjust Settings</source>
         <translation>调整设置</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="5901" />
+        <location filename="../artisanlib/main.py" line="5905" />
         <source>Ambient</source>
         <translation>环境</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="5902" />
+        <location filename="../artisanlib/main.py" line="5906" />
         <source>Elevation (MASL)</source>
         <translation>海拔(MASL)</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="7764" />
-        <location filename="../artisanlib/main.py" line="6104" />
-        <location filename="../artisanlib/main.py" line="5910" />
+        <location filename="../artisanlib/canvas.py" line="7781" />
+        <location filename="../artisanlib/main.py" line="6140" />
+        <location filename="../artisanlib/main.py" line="5950" />
+        <location filename="../artisanlib/main.py" line="5914" />
         <source>Action canceled</source>
         <translation>动作已取消</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="6028" />
-        <location filename="../artisanlib/main.py" line="6007" />
-        <location filename="../artisanlib/main.py" line="5967" />
-        <location filename="../artisanlib/main.py" line="5956" />
-        <location filename="../artisanlib/main.py" line="5945" />
-        <location filename="../artisanlib/main.py" line="5934" />
-        <location filename="../artisanlib/main.py" line="5923" />
+        <location filename="../artisanlib/main.py" line="6064" />
+        <location filename="../artisanlib/main.py" line="6043" />
+        <location filename="../artisanlib/main.py" line="6003" />
+        <location filename="../artisanlib/main.py" line="5992" />
+        <location filename="../artisanlib/main.py" line="5981" />
+        <location filename="../artisanlib/main.py" line="5970" />
+        <location filename="../artisanlib/main.py" line="5959" />
         <source>Machine</source>
         <translation>机器</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="5968" />
-        <location filename="../artisanlib/main.py" line="5957" />
-        <location filename="../artisanlib/main.py" line="5946" />
-        <location filename="../artisanlib/main.py" line="5935" />
-        <location filename="../artisanlib/main.py" line="5924" />
+        <location filename="../artisanlib/main.py" line="6004" />
+        <location filename="../artisanlib/main.py" line="5993" />
+        <location filename="../artisanlib/main.py" line="5982" />
+        <location filename="../artisanlib/main.py" line="5971" />
+        <location filename="../artisanlib/main.py" line="5960" />
         <source>Network name or IP address</source>
         <translation>网络名称或IP地址</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="4272" />
-        <location filename="../artisanlib/main.py" line="6001" />
+        <location filename="../artisanlib/main.py" line="6037" />
         <source>Bluetootooth access denied</source>
         <translation>蓝牙访问被拒绝</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="6008" />
+        <location filename="../artisanlib/main.py" line="6044" />
         <source>Machine Capacity (kg)</source>
         <translation>机器容量 (kg)</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="6081" />
+        <location filename="../artisanlib/main.py" line="6117" />
         <source>Energy loads configured for {0} {1}kg</source>
         <translation>针对 {0} {1}kg 的能源负荷配置</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="6082" />
+        <location filename="../artisanlib/main.py" line="6118" />
         <source>Artisan configured for {0}</source>
         <translation>为{0}配置的Artisan</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="25194" />
-        <location filename="../artisanlib/main.py" line="6138" />
+        <location filename="../artisanlib/main.py" line="25296" />
+        <location filename="../artisanlib/main.py" line="6174" />
         <source>Load theme {0}?</source>
         <translation>载入主题 {0}?</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="25195" />
-        <location filename="../artisanlib/main.py" line="6139" />
+        <location filename="../artisanlib/main.py" line="25297" />
+        <location filename="../artisanlib/main.py" line="6175" />
         <source>Adjust Theme Related Settings</source>
         <translation>调整主题相关设置</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="25201" />
-        <location filename="../artisanlib/main.py" line="6145" />
+        <location filename="../artisanlib/main.py" line="25303" />
+        <location filename="../artisanlib/main.py" line="6181" />
         <source>Loaded theme {0}</source>
         <translation>主题 {0} 已载入</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="6337" />
+        <location filename="../artisanlib/main.py" line="6373" />
         <source>Detected a color pair that may be hard to see: </source>
         <translation>监测到颜色组合难以区分: </translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="27782" />
-        <location filename="../artisanlib/main.py" line="27739" />
-        <location filename="../artisanlib/main.py" line="7041" />
+        <location filename="../artisanlib/main.py" line="27884" />
+        <location filename="../artisanlib/main.py" line="27841" />
+        <location filename="../artisanlib/main.py" line="7077" />
         <source>Simulator started @{}x</source>
         <translation>模拟器已开始 @{}x</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="7052" />
+        <location filename="../artisanlib/main.py" line="7088" />
         <source>super on</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="7055" />
+        <location filename="../artisanlib/main.py" line="7091" />
         <source>super off</source>
         <translation>super aus</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9413" />
+        <location filename="../artisanlib/main.py" line="9451" />
         <source>Failed to toggle ({})</source>
         <translation>切换失败（{}）</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9434" />
+        <location filename="../artisanlib/main.py" line="9472" />
         <source>Pulse out of range (%d)</source>
         <translation>脉冲超出范围 (%d)</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="9685" />
+        <location filename="../artisanlib/main.py" line="9733" />
         <source>IO Command {}] unknown</source>
         <translation>IO 命令 {}] 未知</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10206" />
+        <location filename="../artisanlib/main.py" line="10254" />
         <source>Alarms on</source>
         <translation>警报打开</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10209" />
+        <location filename="../artisanlib/main.py" line="10257" />
         <source>Alarms off</source>
         <translation>警报关闭</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10218" />
+        <location filename="../artisanlib/main.py" line="10266" />
         <source>autoCHARGE on</source>
         <translation>自动投豆打开</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10221" />
+        <location filename="../artisanlib/main.py" line="10269" />
         <source>autoCHARGE off</source>
         <translation>自动投豆关闭</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10230" />
+        <location filename="../artisanlib/main.py" line="10278" />
         <source>autoDROP on</source>
         <translation>自动排豆打开</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10233" />
+        <location filename="../artisanlib/main.py" line="10281" />
         <source>autoDROP off</source>
         <translation>自动排豆关闭</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24890" />
-        <location filename="../artisanlib/main.py" line="10281" />
-        <location filename="../artisanlib/main.py" line="10259" />
+        <location filename="../artisanlib/main.py" line="24992" />
+        <location filename="../artisanlib/main.py" line="10329" />
+        <location filename="../artisanlib/main.py" line="10307" />
         <source>PID set to OFF</source>
         <translation>PID 设置为OFF</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24894" />
-        <location filename="../artisanlib/main.py" line="10278" />
-        <location filename="../artisanlib/main.py" line="10268" />
+        <location filename="../artisanlib/main.py" line="24996" />
+        <location filename="../artisanlib/main.py" line="10326" />
+        <location filename="../artisanlib/main.py" line="10316" />
         <source>PID set to ON</source>
         <translation>PID设置为ON</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10306" />
-        <location filename="../artisanlib/main.py" line="10294" />
+        <location filename="../artisanlib/main.py" line="10354" />
+        <location filename="../artisanlib/main.py" line="10342" />
         <source>PID mode manual</source>
         <translation>PID手动模式</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10309" />
-        <location filename="../artisanlib/main.py" line="10298" />
+        <location filename="../artisanlib/main.py" line="10357" />
+        <location filename="../artisanlib/main.py" line="10346" />
         <source>PID mode Ramp/Soak</source>
         <translation>PID模式 缓升/恒温</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10312" />
-        <location filename="../artisanlib/main.py" line="10302" />
+        <location filename="../artisanlib/main.py" line="10360" />
+        <location filename="../artisanlib/main.py" line="10350" />
         <source>PID mode background</source>
         <translation>PID 背景曲线模式</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10322" />
+        <location filename="../artisanlib/main.py" line="10370" />
         <source>playback off</source>
         <translation>回放关闭</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10326" />
+        <location filename="../artisanlib/main.py" line="10374" />
         <source>playback by time</source>
         <translation>按时间回放</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10330" />
+        <location filename="../artisanlib/main.py" line="10378" />
         <source>playback by BT</source>
         <translation>按BT回放</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10334" />
+        <location filename="../artisanlib/main.py" line="10382" />
         <source>playback by ET</source>
         <translation>按ET回放</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10338" />
+        <location filename="../artisanlib/main.py" line="10386" />
         <source>playback by time/BT</source>
         <translation>按时间/BT播放</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10342" />
+        <location filename="../artisanlib/main.py" line="10390" />
         <source>playback by time/ET</source>
         <translation>按时间/ET播放</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10354" />
+        <location filename="../artisanlib/main.py" line="10402" />
         <source>playback DROP off</source>
         <translation>播放中断</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10358" />
+        <location filename="../artisanlib/main.py" line="10406" />
         <source>playback DROP by time</source>
         <translation>播放按时间 DROP</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10362" />
+        <location filename="../artisanlib/main.py" line="10410" />
         <source>playback DROP by BT</source>
         <translation>通过 BT 播放 DROP</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10366" />
+        <location filename="../artisanlib/main.py" line="10414" />
         <source>playback DROP by ET</source>
         <translation>播放 ET 的 DROP</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10430" />
+        <location filename="../artisanlib/main.py" line="10478" />
         <source>Notifications on</source>
         <translation>通知于</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10433" />
+        <location filename="../artisanlib/main.py" line="10481" />
         <source>Notifications off</source>
         <translation>关闭通知</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10533" />
+        <location filename="../artisanlib/main.py" line="10581" />
         <source>PID SV buttons on</source>
         <translation>PID SV按钮开启</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10537" />
+        <location filename="../artisanlib/main.py" line="10585" />
         <source>PID SV buttons off</source>
         <translation>PID SV按钮关闭</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12513" />
-        <location filename="../artisanlib/main.py" line="12510" />
-        <location filename="../artisanlib/main.py" line="12496" />
-        <location filename="../artisanlib/main.py" line="12493" />
-        <location filename="../artisanlib/main.py" line="10870" />
-        <location filename="../artisanlib/main.py" line="10867" />
+        <location filename="../artisanlib/main.py" line="12561" />
+        <location filename="../artisanlib/main.py" line="12558" />
+        <location filename="../artisanlib/main.py" line="12544" />
+        <location filename="../artisanlib/main.py" line="12541" />
+        <location filename="../artisanlib/main.py" line="10918" />
+        <location filename="../artisanlib/main.py" line="10915" />
         <source>PID Lookahead: {0}</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10878" />
+        <location filename="../artisanlib/main.py" line="10926" />
         <source>Replay Lookahead: {0}</source>
         <translation>重播前瞻：{0}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10896" />
+        <location filename="../artisanlib/main.py" line="10944" />
         <source>Keep ON enabled</source>
         <translation>保持启用状态</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="10899" />
+        <location filename="../artisanlib/main.py" line="10947" />
         <source>Keep ON disable</source>
         <translation>保持开启禁用</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="11599" />
+        <location filename="../artisanlib/main.py" line="11647" />
         <source>Do you want to reset all settings?&lt;br&gt; ArtisanViewer has to be restarted!</source>
         <translation>你想要重置所有设置吗?&lt;br&gt; ArtisanViewer将被重启!</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="11601" />
+        <location filename="../artisanlib/main.py" line="11649" />
         <source>Do you want to reset all settings?&lt;br&gt; Artisan has to be restarted!</source>
         <translation>你确认想要重置所有设置吗?&lt;br&gt; Artisan将会重启!</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="11616" />
-        <location filename="../artisanlib/main.py" line="11607" />
+        <location filename="../artisanlib/main.py" line="11664" />
+        <location filename="../artisanlib/main.py" line="11655" />
         <source>Factory Reset</source>
         <translation>恢复出厂设置</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12412" />
+        <location filename="../artisanlib/main.py" line="12460" />
         <source>Auto Axis Graph Mode: Roast</source>
         <translation>自动轴图模式：烘焙</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12414" />
+        <location filename="../artisanlib/main.py" line="12462" />
         <source>Auto Axis Graph Mode: BBP+Roast</source>
         <translation>自动轴图模式：BBP+Roast</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12416" />
+        <location filename="../artisanlib/main.py" line="12464" />
         <source>Auto Axis Graph Mode: BBP</source>
         <translation>自动轴图模式：BBP</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12422" />
+        <location filename="../artisanlib/main.py" line="12470" />
         <source>Auto Axis Graph Mode is off</source>
         <translation>自动轴图模式已关闭</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12477" />
-        <location filename="../artisanlib/main.py" line="12461" />
+        <location filename="../artisanlib/main.py" line="12525" />
+        <location filename="../artisanlib/main.py" line="12509" />
         <source>PID Mode: Ramp/Soak</source>
         <translation>PID模式: 缓升/恒温</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12479" />
-        <location filename="../artisanlib/main.py" line="12466" />
+        <location filename="../artisanlib/main.py" line="12527" />
+        <location filename="../artisanlib/main.py" line="12514" />
         <source>PID Mode: Background</source>
         <translation>PID 模式: 背景曲线</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12475" />
-        <location filename="../artisanlib/main.py" line="12470" />
+        <location filename="../artisanlib/main.py" line="12523" />
+        <location filename="../artisanlib/main.py" line="12518" />
         <source>PID Mode: Manual</source>
         <translation>PID 模式: 手动</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12621" />
+        <location filename="../artisanlib/main.py" line="12669" />
         <source>Exit Designer?</source>
         <translation>退出曲线设计器?</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12622" />
+        <location filename="../artisanlib/main.py" line="12670" />
         <source>Designer Mode ON</source>
         <translation>打开曲线设计模式</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12709" />
+        <location filename="../artisanlib/main.py" line="12757" />
         <source>LCD cursor on profile data</source>
         <translation>配置文件数据上的 LCD 光标</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12712" />
+        <location filename="../artisanlib/main.py" line="12760" />
         <source>LCD cursor on template data</source>
         <translation>模板数据上的 LCD 光标</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12715" />
+        <location filename="../artisanlib/main.py" line="12763" />
         <source>LCD cursor OFF</source>
         <translation>LCD 光标关闭</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12924" />
+        <location filename="../artisanlib/main.py" line="12972" />
         <source>Keyboard moves turned ON</source>
         <translation>已打开键盘移动</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="12932" />
+        <location filename="../artisanlib/main.py" line="12980" />
         <source>Keyboard moves turned OFF</source>
         <translation>已关闭键盘移动</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13267" />
+        <location filename="../artisanlib/main.py" line="13315" />
         <source>Profile {0} saved in: {1}</source>
         <translation>配置 {0} 已保存到: {1}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13271" />
+        <location filename="../artisanlib/main.py" line="13319" />
         <source>Autosave path does not exist. Autosave failed.</source>
         <translation>自动保存路径不存在.自动保存失败.</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13408" />
+        <location filename="../artisanlib/main.py" line="13456" />
         <source>Event #{0}:  {1} has been updated</source>
         <translation>事件 #{0}:  {1} 已经更新</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13486" />
+        <location filename="../artisanlib/main.py" line="13534" />
         <source>Select</source>
         <translation>选择</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13513" />
-        <location filename="../artisanlib/main.py" line="13501" />
+        <location filename="../artisanlib/main.py" line="13561" />
+        <location filename="../artisanlib/main.py" line="13549" />
         <source>Open</source>
         <translation>打开</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13515" />
+        <location filename="../artisanlib/main.py" line="13563" />
         <source>URL</source>
         <translation />
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13533" />
+        <location filename="../artisanlib/main.py" line="13581" />
         <source>Save</source>
         <translation>保存</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13551" />
+        <location filename="../artisanlib/main.py" line="13599" />
         <source>Select Directory</source>
         <translation>选择目录</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13589" />
+        <location filename="../artisanlib/main.py" line="13637" />
         <source>NEW ROAST canceled: incomplete profile lacking CHARGE and DROP found</source>
         <translation>新烘焙已取消: 发现不完整的曲线配置缺少投豆和排豆</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13594" />
+        <location filename="../artisanlib/main.py" line="13642" />
         <source>NEW ROAST canceled: incomplete profile lacking DROP found</source>
         <translation>新烘焙已取消: 发现不完整的曲线配置缺少排豆</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13610" />
+        <location filename="../artisanlib/main.py" line="13658" />
         <source>New roast has started</source>
         <translation>新一轮烘焙开始了</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="27785" />
-        <location filename="../artisanlib/main.py" line="14416" />
-        <location filename="../artisanlib/main.py" line="13646" />
+        <location filename="../artisanlib/main.py" line="27887" />
+        <location filename="../artisanlib/main.py" line="14464" />
+        <location filename="../artisanlib/main.py" line="13694" />
         <source>Invalid artisan format</source>
         <translation>无效Artisan格式</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13742" />
+        <location filename="../artisanlib/main.py" line="13790" />
         <source>{0}  loaded </source>
         <translation>{0}已载入 </translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13990" />
+        <location filename="../artisanlib/main.py" line="14038" />
         <source>No profile data.  ET/BT not recalculated</source>
         <translation>没有配置数据.ET/BT未重新计算</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="13993" />
+        <location filename="../artisanlib/main.py" line="14041" />
         <source>Problem with the profile data.  ET/BT not recalculated</source>
         <translation>配置数据中发现问题.ET/BT未重新计算</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14410" />
+        <location filename="../artisanlib/main.py" line="14458" />
         <source>Background {0} loaded successfully {1}</source>
         <translation>背景曲线 {0} 已成功载入 {1}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15145" />
-        <location filename="../artisanlib/main.py" line="14564" />
-        <location filename="../artisanlib/main.py" line="14551" />
+        <location filename="../artisanlib/main.py" line="15193" />
+        <location filename="../artisanlib/main.py" line="14612" />
+        <location filename="../artisanlib/main.py" line="14599" />
         <source>{} file saved successfully</source>
         <translation>{} 文件保存成功</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="14825" />
-        <location filename="../artisanlib/main.py" line="14805" />
+        <location filename="../artisanlib/main.py" line="14873" />
+        <location filename="../artisanlib/main.py" line="14853" />
         <source>Artisan JSON file loaded successfully</source>
         <translation>Artisan JSON 文件加载成功</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15758" />
+        <location filename="../artisanlib/main.py" line="15806" />
         <source>To fully load this profile the extra device configuration needs to be modified.
 
 Overwrite your extra device definitions using the values from the profile?
@@ -16847,360 +16913,360 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
 建议先保存当前设置（菜单 帮助, &gt;&gt; 保存设置).</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="15762" />
+        <location filename="../artisanlib/main.py" line="15810" />
         <source>Found a different set of extra devices</source>
         <translation>发现额外设备的一个不同设置</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17329" />
+        <location filename="../artisanlib/main.py" line="17377" />
         <source>Save Profile</source>
         <translation>保存曲线配置</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17349" />
+        <location filename="../artisanlib/main.py" line="17397" />
         <source>Profile saved</source>
         <translation>配置已保存</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="25251" />
-        <location filename="../artisanlib/main.py" line="25181" />
-        <location filename="../artisanlib/main.py" line="25113" />
-        <location filename="../artisanlib/main.py" line="25039" />
-        <location filename="../artisanlib/main.py" line="17846" />
-        <location filename="../artisanlib/main.py" line="17393" />
-        <location filename="../artisanlib/main.py" line="17377" />
-        <location filename="../artisanlib/main.py" line="17375" />
+        <location filename="../artisanlib/main.py" line="25353" />
+        <location filename="../artisanlib/main.py" line="25283" />
+        <location filename="../artisanlib/main.py" line="25215" />
+        <location filename="../artisanlib/main.py" line="25141" />
+        <location filename="../artisanlib/main.py" line="17894" />
+        <location filename="../artisanlib/main.py" line="17441" />
+        <location filename="../artisanlib/main.py" line="17425" />
+        <location filename="../artisanlib/main.py" line="17423" />
         <source>Cancelled</source>
         <translation>已取消</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17391" />
+        <location filename="../artisanlib/main.py" line="17439" />
         <source>Readings exported</source>
         <translation>已导出读数</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23527" />
-        <location filename="../artisanlib/main.py" line="23278" />
-        <location filename="../artisanlib/main.py" line="23267" />
-        <location filename="../artisanlib/main.py" line="23250" />
-        <location filename="../artisanlib/main.py" line="22035" />
-        <location filename="../artisanlib/main.py" line="21974" />
-        <location filename="../artisanlib/main.py" line="21892" />
-        <location filename="../artisanlib/main.py" line="17416" />
-        <location filename="../artisanlib/main.py" line="17411" />
-        <location filename="../artisanlib/main.py" line="17406" />
-        <location filename="../artisanlib/main.py" line="17401" />
+        <location filename="../artisanlib/main.py" line="23591" />
+        <location filename="../artisanlib/main.py" line="23342" />
+        <location filename="../artisanlib/main.py" line="23331" />
+        <location filename="../artisanlib/main.py" line="23314" />
+        <location filename="../artisanlib/main.py" line="22099" />
+        <location filename="../artisanlib/main.py" line="22038" />
+        <location filename="../artisanlib/main.py" line="21956" />
+        <location filename="../artisanlib/main.py" line="17464" />
+        <location filename="../artisanlib/main.py" line="17459" />
+        <location filename="../artisanlib/main.py" line="17454" />
+        <location filename="../artisanlib/main.py" line="17449" />
         <source>Export {}</source>
         <translation>导出 {}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17802" />
-        <location filename="../artisanlib/main.py" line="17749" />
-        <location filename="../artisanlib/main.py" line="17707" />
-        <location filename="../artisanlib/main.py" line="17644" />
-        <location filename="../artisanlib/main.py" line="17559" />
-        <location filename="../artisanlib/main.py" line="17512" />
+        <location filename="../artisanlib/main.py" line="17850" />
+        <location filename="../artisanlib/main.py" line="17797" />
+        <location filename="../artisanlib/main.py" line="17755" />
+        <location filename="../artisanlib/main.py" line="17692" />
+        <location filename="../artisanlib/main.py" line="17607" />
+        <location filename="../artisanlib/main.py" line="17560" />
         <source>Converting...</source>
         <translation>转换...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17824" />
-        <location filename="../artisanlib/main.py" line="17771" />
-        <location filename="../artisanlib/main.py" line="17729" />
-        <location filename="../artisanlib/main.py" line="17676" />
-        <location filename="../artisanlib/main.py" line="17581" />
-        <location filename="../artisanlib/main.py" line="17538" />
-        <location filename="../artisanlib/main.py" line="17536" />
+        <location filename="../artisanlib/main.py" line="17872" />
+        <location filename="../artisanlib/main.py" line="17819" />
+        <location filename="../artisanlib/main.py" line="17777" />
+        <location filename="../artisanlib/main.py" line="17724" />
+        <location filename="../artisanlib/main.py" line="17629" />
+        <location filename="../artisanlib/main.py" line="17586" />
+        <location filename="../artisanlib/main.py" line="17584" />
         <source>Target file {0} exists. {1} not converted.</source>
         <translation>目标文件 {0} 存在.{1} 不转换</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="17844" />
+        <location filename="../artisanlib/main.py" line="17892" />
         <source>Readings imported</source>
         <translation>已导入读数</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18041" />
+        <location filename="../artisanlib/main.py" line="18089" />
         <source>Your batch counter is currently turned off. Turn it on and set it to {} from the settings file to be imported?</source>
         <translation>您的批次计数器目前已关闭。请将其打开，并从要导入的设置文件中将其设置为 {}？</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18043" />
+        <location filename="../artisanlib/main.py" line="18091" />
         <source>Your batch counter is set to {}. Turn it off as in the settings file to be imported?</source>
         <translation>您的批次计数器设置为 {}。要像要导入的设置文件一样将其关闭吗？</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18045" />
+        <location filename="../artisanlib/main.py" line="18093" />
         <source>Overwrite your current batch counter {} by {} from the settings file to be imported?</source>
         <translation>是否使用要导入的设置文件中的 {} 覆盖您当前的批次计数器 {}？</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18046" />
+        <location filename="../artisanlib/main.py" line="18094" />
         <source>Batch Counter</source>
         <translation>批次计数器</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="18049" />
+        <location filename="../artisanlib/main.py" line="18097" />
         <source>Load Settings canceled</source>
         <translation>已取消载入设置</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="21959" />
-        <location filename="../artisanlib/main.py" line="21920" />
+        <location filename="../artisanlib/main.py" line="22023" />
+        <location filename="../artisanlib/main.py" line="21984" />
         <source>Statistics Saved</source>
         <translation>统计已保存</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="21942" />
+        <location filename="../artisanlib/main.py" line="22006" />
         <source>No statistics found</source>
         <translation>没有找到统计</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22138" />
+        <location filename="../artisanlib/main.py" line="22202" />
         <source>Excel Production Report exported to {0}</source>
         <translation>Excel生产报告{0}已导出</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22936" />
+        <location filename="../artisanlib/main.py" line="23000" />
         <source>Ranking Report</source>
         <translation>排名报告</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="22937" />
+        <location filename="../artisanlib/main.py" line="23001" />
         <source>Ranking graphs are only generated up to {0} profiles</source>
         <translation>排名图最多只能生成{0}个配置文件</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23146" />
+        <location filename="../artisanlib/main.py" line="23210" />
         <source>Profile missing DRY event</source>
         <translation>配置文件缺少 DRY 事件</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23161" />
+        <location filename="../artisanlib/main.py" line="23225" />
         <source>Profile missing phase events</source>
         <translation>配置缺少阶段事件</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23445" />
+        <location filename="../artisanlib/main.py" line="23509" />
         <source>CSV Ranking Report exported to {0}</source>
         <translation>CSV排名报告已导出到{0}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="23513" />
+        <location filename="../artisanlib/main.py" line="23577" />
         <source>Excel Ranking Report exported to {0}</source>
         <translation>Excel 排名报告{0} 已导出</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24853" />
+        <location filename="../artisanlib/main.py" line="24955" />
         <source>Hottop control turned off</source>
         <translation>Hottop 控制已关闭</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24872" />
+        <location filename="../artisanlib/main.py" line="24974" />
         <source>Hottop control turned on</source>
         <translation>Hottop 控制已打开</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="24876" />
+        <location filename="../artisanlib/main.py" line="24978" />
         <source>To control a Hottop you need to activate the super user mode via a right click on the timer LCD first!</source>
         <translation>要控制Hottop先需要右键点击计时器LCD,激活超级用户模式!</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="25153" />
-        <location filename="../artisanlib/main.py" line="25083" />
+        <location filename="../artisanlib/main.py" line="25255" />
+        <location filename="../artisanlib/main.py" line="25185" />
         <source>Settings not found</source>
         <translation>没有找到设置</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="25093" />
+        <location filename="../artisanlib/main.py" line="25195" />
         <source>artisan-settings</source>
         <translation>artisan设置</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="25094" />
+        <location filename="../artisanlib/main.py" line="25196" />
         <source>Save Settings</source>
         <translation>保存设置</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="25098" />
+        <location filename="../artisanlib/main.py" line="25200" />
         <source>Settings saved</source>
         <translation>设置已保存</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="25160" />
+        <location filename="../artisanlib/main.py" line="25262" />
         <source>artisan-theme</source>
         <translation>artisan主题</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="25161" />
+        <location filename="../artisanlib/main.py" line="25263" />
         <source>Save Theme</source>
         <translation>保存主题</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="25164" />
+        <location filename="../artisanlib/main.py" line="25266" />
         <source>Theme saved</source>
         <translation>主题已保存</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="25192" />
+        <location filename="../artisanlib/main.py" line="25294" />
         <source>Load Theme</source>
         <translation>载入主题</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="25218" />
+        <location filename="../artisanlib/main.py" line="25320" />
         <source>Theme loaded</source>
         <translation>主题已载入</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="25422" />
+        <location filename="../artisanlib/main.py" line="25524" />
         <source>Background profile removed</source>
         <translation>删除背景资料</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="25565" />
+        <location filename="../artisanlib/main.py" line="25667" />
         <source>Alarm Config</source>
         <translation>警报配置</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="25566" />
+        <location filename="../artisanlib/main.py" line="25668" />
         <source>Alarms are not available for device None</source>
         <translation>警报不适用于未连接设备</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="25583" />
+        <location filename="../artisanlib/main.py" line="25685" />
         <source>Switching the language needs a restart. Restart now?</source>
         <translation>切换语言需要重启.现在就重启吗?</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="25585" />
+        <location filename="../artisanlib/main.py" line="25687" />
         <source>Restart</source>
         <translation>重启</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="25679" />
+        <location filename="../artisanlib/main.py" line="25781" />
         <source>K202 file loaded successfully</source>
         <translation>K202文件已成功载入</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="25759" />
+        <location filename="../artisanlib/main.py" line="25861" />
         <source>K204 file loaded successfully</source>
         <translation>K204文件已成功载入</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="26105" />
-        <location filename="../artisanlib/main.py" line="26059" />
+        <location filename="../artisanlib/main.py" line="26207" />
+        <location filename="../artisanlib/main.py" line="26161" />
         <source>{0} imported</source>
         <translation>{0} 已导入</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="26062" />
+        <location filename="../artisanlib/main.py" line="26164" />
         <source>an error occurred on importing {0}</source>
         <translation>导入 {0} 时出错</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="26255" />
+        <location filename="../artisanlib/main.py" line="26357" />
         <source>HH506RA file loaded successfully</source>
         <translation>HH506RA文件已成功载入</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="26335" />
+        <location filename="../artisanlib/main.py" line="26437" />
         <source>Save Graph as</source>
         <translation>保存图表为</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="26396" />
+        <location filename="../artisanlib/main.py" line="26498" />
         <source>{0}  size({1},{2}) saved</source>
         <translation>{0}  尺寸({1},{2}) 已保存</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="26407" />
+        <location filename="../artisanlib/main.py" line="26509" />
         <source>Save Graph as PDF</source>
         <translation>保存图表为PDF格式</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="26409" />
+        <location filename="../artisanlib/main.py" line="26511" />
         <source>Save Graph as SVG</source>
         <translation>保存图表为SVG格式</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="26448" />
+        <location filename="../artisanlib/main.py" line="26550" />
         <source>{0} saved</source>
         <translation>{0}已保存</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="26509" />
+        <location filename="../artisanlib/main.py" line="26611" />
         <source>Wheel {0} loaded</source>
         <translation>风味轮 {0} 已载入</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="26512" />
+        <location filename="../artisanlib/main.py" line="26614" />
         <source>Invalid Wheel graph format</source>
         <translation>无效的风味轮格式</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="26869" />
+        <location filename="../artisanlib/main.py" line="26971" />
         <source>Buttons copied to Palette #</source>
         <translation>复制到调色板的按钮 #</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="26932" />
+        <location filename="../artisanlib/main.py" line="27034" />
         <source>Palette #%i restored</source>
         <translation>调色板 #%i 已恢复</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="26937" />
+        <location filename="../artisanlib/main.py" line="27039" />
         <source>Palette #%i empty</source>
         <translation>调色板 #%i 为空</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="26962" />
+        <location filename="../artisanlib/main.py" line="27064" />
         <source>Save Palettes</source>
         <translation>保存调色板</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="26966" />
+        <location filename="../artisanlib/main.py" line="27068" />
         <source>Palettes saved</source>
         <translation>调色板已保存</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="27103" />
+        <location filename="../artisanlib/main.py" line="27205" />
         <source>Palettes loaded</source>
         <translation>已载入调色板</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="27106" />
+        <location filename="../artisanlib/main.py" line="27208" />
         <source>Invalid palettes file format</source>
         <translation>无效的调色板文件格式</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="27145" />
+        <location filename="../artisanlib/main.py" line="27247" />
         <source>Alarms loaded</source>
         <translation>已载入警报</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="27219" />
+        <location filename="../artisanlib/main.py" line="27321" />
         <source>Fitting curves...</source>
         <translation>拟合曲线中...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="27478" />
+        <location filename="../artisanlib/main.py" line="27580" />
         <source>Warning: The start of the analysis interval of interest is earlier than the start of curve fitting.
 Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
         <translation>警告：相关分析区间的起始时间早于曲线拟合的起始时间。
 请在 “配置&gt; 曲线 &gt; 分析” 选项卡上更正此问题。</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="27480" />
+        <location filename="../artisanlib/main.py" line="27582" />
         <source>Analysis earlier than Curve fit</source>
         <translation>在曲线拟合前分析</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="27749" />
+        <location filename="../artisanlib/main.py" line="27851" />
         <source>Simulator stopped</source>
         <translation>模拟器已停止</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="28072" />
+        <location filename="../artisanlib/main.py" line="28174" />
         <source>debug logging ON</source>
         <translation>调试记录打开</translation>
     </message>
@@ -17319,6 +17385,7 @@ Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
         <translation>设备设置为{0},与Omega HH806AU相同.请先选择串行端口</translation>
     </message>
     <message>
+        <location filename="../artisanlib/devices.py" line="4504" />
         <location filename="../artisanlib/devices.py" line="4487" />
         <location filename="../artisanlib/devices.py" line="4413" />
         <location filename="../artisanlib/devices.py" line="4406" />
@@ -17395,395 +17462,395 @@ Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
         <translation>设备设置为{0},与CENTER 302相同.请先选择串行端口</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="2645" />
+        <location filename="../artisanlib/canvas.py" line="2651" />
         <source>set y-coordinate to {}</source>
         <translation>将 y 坐标设置为 {}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="3133" />
+        <location filename="../artisanlib/canvas.py" line="3139" />
         <source>seconds before FCs</source>
         <translation>秒在第一次爆裂前</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="3136" />
+        <location filename="../artisanlib/canvas.py" line="3142" />
         <source>seconds after FCs</source>
         <translation>秒在第一次爆裂后</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="4385" />
+        <location filename="../artisanlib/canvas.py" line="4391" />
         <source>Alarm notice</source>
         <translation>警报通知</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="6106" />
+        <location filename="../artisanlib/canvas.py" line="6117" />
         <source>Alarm is calling: {0}</source>
         <translation>警报正在响: {0}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="6108" />
+        <location filename="../artisanlib/canvas.py" line="6119" />
         <source>Calling alarm failed on {0}</source>
         <translation>调用警报失败: {0}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="6123" />
+        <location filename="../artisanlib/canvas.py" line="6134" />
         <source>Alarm trigger button error, description '{0}' not a number</source>
         <translation>报警触发按钮错误, 类型 '{0}' 不是一个数字</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="6151" />
+        <location filename="../artisanlib/canvas.py" line="6162" />
         <source>Alarm trigger slider error, description '{0}' not a valid number [0-100]</source>
         <translation>报警触发滑动条错误, 类型 '{0}' 不是一个有效数字[0-100]</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="6234" />
+        <location filename="../artisanlib/canvas.py" line="6245" />
         <source>Alarm trigger SV slider error, description '{0}' not a valid number</source>
         <translation>警报触发 SV 滑动条错误, 说明 '{0}' 不是一个有效数字</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="6254" />
+        <location filename="../artisanlib/canvas.py" line="6265" />
         <source>Alarm {0} triggered</source>
         <translation>警报 {0} 触发</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="7747" />
+        <location filename="../artisanlib/canvas.py" line="7764" />
         <source>Save profile?</source>
         <translation>保存个人信息？</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="7756" />
+        <location filename="../artisanlib/canvas.py" line="7773" />
         <source>Profile unsaved</source>
         <translation>配置未保存</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="8235" />
+        <location filename="../artisanlib/canvas.py" line="8252" />
         <source>Scope has been reset</source>
         <translation>记录仪已重置</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="11821" />
+        <location filename="../artisanlib/canvas.py" line="11838" />
         <source>Load Image File</source>
         <translation>载入图像文件</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="11828" />
+        <location filename="../artisanlib/canvas.py" line="11845" />
         <source>Loaded watermark image {0}</source>
         <translation>载入水印图像{0}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="11839" />
+        <location filename="../artisanlib/canvas.py" line="11856" />
         <source>Unable to load watermark image {0}</source>
         <translation>无法加载水印图像 {0}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="12546" />
+        <location filename="../artisanlib/canvas.py" line="12563" />
         <source>Convert profile data to Fahrenheit?</source>
         <translation>转换配置数据为华氏度?</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="12659" />
-        <location filename="../artisanlib/canvas.py" line="12607" />
-        <location filename="../artisanlib/canvas.py" line="12597" />
-        <location filename="../artisanlib/canvas.py" line="12547" />
+        <location filename="../artisanlib/canvas.py" line="12676" />
+        <location filename="../artisanlib/canvas.py" line="12624" />
+        <location filename="../artisanlib/canvas.py" line="12614" />
+        <location filename="../artisanlib/canvas.py" line="12564" />
         <source>Convert Profile Temperature</source>
         <translation>转换配置温度单位</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="12594" />
+        <location filename="../artisanlib/canvas.py" line="12611" />
         <source>Profile changed to Fahrenheit</source>
         <translation>配置转换为华氏度</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="12598" />
+        <location filename="../artisanlib/canvas.py" line="12615" />
         <source>Unable to comply. You already are in Fahrenheit</source>
         <translation>无法操作.你目前正在使用华氏度</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="12661" />
-        <location filename="../artisanlib/canvas.py" line="12599" />
+        <location filename="../artisanlib/canvas.py" line="12678" />
+        <location filename="../artisanlib/canvas.py" line="12616" />
         <source>Profile not changed</source>
         <translation>配置没有被改变</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="12606" />
+        <location filename="../artisanlib/canvas.py" line="12623" />
         <source>Convert profile data to Celsius?</source>
         <translation>转换配置数据为摄氏度?</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="12656" />
+        <location filename="../artisanlib/canvas.py" line="12673" />
         <source>Profile changed to Celsius</source>
         <translation>配置转换为摄氏度</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="12660" />
+        <location filename="../artisanlib/canvas.py" line="12677" />
         <source>Unable to comply. You already are in Celsius</source>
         <translation>无法操作.你目前正在使用摄氏度</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="12668" />
+        <location filename="../artisanlib/canvas.py" line="12685" />
         <source>Convert Profile Scale</source>
         <translation>转换配置范围</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="12669" />
+        <location filename="../artisanlib/canvas.py" line="12686" />
         <source>No profile data found</source>
         <translation>没有找到配置数据</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="12696" />
-        <location filename="../artisanlib/canvas.py" line="12680" />
+        <location filename="../artisanlib/canvas.py" line="12713" />
+        <location filename="../artisanlib/canvas.py" line="12697" />
         <source>Colors set to defaults</source>
         <translation>恢复默认颜色</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="12684" />
+        <location filename="../artisanlib/canvas.py" line="12701" />
         <source>Colors set to Default Theme</source>
         <translation>颜色设置为主题默认</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="12700" />
+        <location filename="../artisanlib/canvas.py" line="12717" />
         <source>Colors set to grey</source>
         <translation>颜色设置为灰色</translation>
     </message>
     <message>
         <location filename="../artisanlib/cup_profile.py" line="258" />
-        <location filename="../artisanlib/canvas.py" line="12900" />
+        <location filename="../artisanlib/canvas.py" line="12917" />
         <source>Background does not match number of labels</source>
         <translation>背景曲线不符合标签编号</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="13135" />
+        <location filename="../artisanlib/canvas.py" line="13176" />
         <source>Phidget service discovery started...</source>
         <translation>Phidg​​et 服务发现开始...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="13394" />
+        <location filename="../artisanlib/canvas.py" line="13435" />
         <source>scanning for device</source>
         <translation>扫描设备</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="13442" />
+        <location filename="../artisanlib/canvas.py" line="13487" />
         <source>Scope monitoring...</source>
         <translation>记录监测中...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="13613" />
+        <location filename="../artisanlib/canvas.py" line="13662" />
         <source>Scope stopped</source>
         <translation>记录停止</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="13910" />
+        <location filename="../artisanlib/canvas.py" line="13959" />
         <source>Humidity: {}%</source>
         <translation>湿度: {}%</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="13918" />
+        <location filename="../artisanlib/canvas.py" line="13967" />
         <source>Temperature: {}{}</source>
         <translation>温度: {}{}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="13924" />
+        <location filename="../artisanlib/canvas.py" line="13973" />
         <source>Pressure: {}hPa</source>
         <translation>气压: {}hPa</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="14239" />
+        <location filename="../artisanlib/canvas.py" line="14288" />
         <source>Scope recording...</source>
         <translation>记录仪记录中...</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="14341" />
+        <location filename="../artisanlib/canvas.py" line="14390" />
         <source>Scope recording stopped</source>
         <translation>记录仪记录已停止</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="14481" />
+        <location filename="../artisanlib/canvas.py" line="14530" />
         <source>Not enough data collected yet. Try again in a few seconds</source>
         <translation>还没有收集到足够的数据.几秒钟后再试一次</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="14541" />
+        <location filename="../artisanlib/canvas.py" line="14590" />
         <source>CHARGE: Scope is not recording</source>
         <translation>投豆：记录仪未在录制中</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="14566" />
+        <location filename="../artisanlib/canvas.py" line="14615" />
         <source>Roast time starts now 00:00 BT = {0}</source>
         <translation>烘焙计时现在开始 00:00 BT = {0}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="14600" />
+        <location filename="../artisanlib/canvas.py" line="14649" />
         <source>[TP] recorded at {0} BT = {1}</source>
         <translation>[TP] 记录于 {0} BT = {1}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="14684" />
+        <location filename="../artisanlib/canvas.py" line="14733" />
         <source>DRY END: Scope is not recording</source>
         <translation>脱水结束：记录仪未在录制中</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="14720" />
+        <location filename="../artisanlib/canvas.py" line="14769" />
         <source>[DRY END] recorded at {0} BT = {1}</source>
         <translation>[脱水结束] 记录于 {0} BT = {1}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="14797" />
+        <location filename="../artisanlib/canvas.py" line="14846" />
         <source>FC START: Scope is not recording</source>
         <translation>第一次爆裂：记录仪未在录制中</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="14835" />
+        <location filename="../artisanlib/canvas.py" line="14884" />
         <source>[FC START] recorded at {0} BT = {1}</source>
         <translation>[第一次爆裂] 记录于 {0} BT = {1}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="14903" />
+        <location filename="../artisanlib/canvas.py" line="14952" />
         <source>FC END: Scope is not recording</source>
         <translation>一爆结束：记录仪未在录制中</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="14945" />
+        <location filename="../artisanlib/canvas.py" line="14994" />
         <source>[FC END] recorded at {0} BT = {1}</source>
         <translation>[一爆结束] 记录于 {0} BT = {1}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="15013" />
+        <location filename="../artisanlib/canvas.py" line="15062" />
         <source>SC START: Scope is not recording</source>
         <translation>第二次爆裂：记录仪未在录制中</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="15061" />
+        <location filename="../artisanlib/canvas.py" line="15110" />
         <source>[SC START] recorded at {0} BT = {1}</source>
         <translation>[第二次爆裂] 记录于 {0} BT = {1}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="15129" />
+        <location filename="../artisanlib/canvas.py" line="15178" />
         <source>SC END: Scope is not recording</source>
         <translation>二爆结束：记录仪未在录制中</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="15176" />
+        <location filename="../artisanlib/canvas.py" line="15225" />
         <source>[SC END] recorded at {0} BT = {1}</source>
         <translation>[二爆结束] 记录于 {0} BT = {1}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="15310" />
+        <location filename="../artisanlib/canvas.py" line="15359" />
         <source>DROP: Scope is not recording</source>
         <translation>排豆：记录仪未在录制中</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="15363" />
+        <location filename="../artisanlib/canvas.py" line="15412" />
         <source>Roast ended at {0} BT = {1}</source>
         <translation>烘焙结束于 {0} BT = {1}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="15443" />
+        <location filename="../artisanlib/canvas.py" line="15492" />
         <source>COOL: Scope is not recording</source>
         <translation>冷却：记录仪未在录制中</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="15492" />
+        <location filename="../artisanlib/canvas.py" line="15541" />
         <source>[COOL END] recorded at {0} BT = {1}</source>
         <translation>[冷却结束] 记录于 {0} BT = {1}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="15887" />
-        <location filename="../artisanlib/canvas.py" line="15837" />
+        <location filename="../artisanlib/canvas.py" line="15936" />
+        <location filename="../artisanlib/canvas.py" line="15886" />
         <source>Event # {0} recorded at BT = {1}{2} Time = {3}</source>
         <translation>事件 # {0} 记录于 BT = {1}{2} 时间 = {3}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="15857" />
+        <location filename="../artisanlib/canvas.py" line="15906" />
         <source>Timer is OFF</source>
         <translation>计时器已关闭</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="17334" />
+        <location filename="../artisanlib/canvas.py" line="17383" />
         <source>Unable to move background</source>
         <translation>无法移动背景曲线</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="17386" />
+        <location filename="../artisanlib/canvas.py" line="17435" />
         <source>No finished profile found</source>
         <translation>没有发现已完成的曲线配置</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="17403" />
+        <location filename="../artisanlib/canvas.py" line="17452" />
         <source>Polynomial coefficients (Horner form):</source>
         <translation>多项式系数 (来自Horner):</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="17405" />
+        <location filename="../artisanlib/canvas.py" line="17454" />
         <source>Knots:</source>
         <translation>节点：</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="17407" />
+        <location filename="../artisanlib/canvas.py" line="17456" />
         <source>Residual:</source>
         <translation>剩余：</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="17409" />
+        <location filename="../artisanlib/canvas.py" line="17458" />
         <source>Roots:</source>
         <translation>根源：</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="17412" />
+        <location filename="../artisanlib/canvas.py" line="17461" />
         <source>Profile information</source>
         <translation>配置信息</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="17906" />
+        <location filename="../artisanlib/canvas.py" line="17955" />
         <source>Save Points</source>
         <translation>保存点</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="17915" />
+        <location filename="../artisanlib/canvas.py" line="17964" />
         <source>Points saved</source>
         <translation>点已保存</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="17925" />
+        <location filename="../artisanlib/canvas.py" line="17974" />
         <source>Load Points</source>
         <translation>载入点</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="17937" />
+        <location filename="../artisanlib/canvas.py" line="17986" />
         <source>Points loaded</source>
         <translation>点已载入</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="18015" />
+        <location filename="../artisanlib/canvas.py" line="18064" />
         <source>Designer Init</source>
         <translation>初始化曲线设计器</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="18016" />
+        <location filename="../artisanlib/canvas.py" line="18065" />
         <source>Unable to start designer.
 Profile missing [CHARGE] or [DROP]</source>
         <translation>无法开始曲线设计.曲线配置缺少[投豆]或[排豆]</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="18957" />
+        <location filename="../artisanlib/canvas.py" line="19006" />
         <source>New profile created</source>
         <translation>新的曲线配置已创建</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="19177" />
+        <location filename="../artisanlib/canvas.py" line="19226" />
         <source> added to cupping notes</source>
         <translation> 已添加到杯测记录</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="19188" />
+        <location filename="../artisanlib/canvas.py" line="19237" />
         <source> added to roasting notes</source>
         <translation> 已添加到烘焙记录</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="19454" />
+        <location filename="../artisanlib/canvas.py" line="19503" />
         <source>Mouse Cross ON: move mouse around</source>
         <translation>Mouse Cross ON：移动鼠标</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="19499" />
+        <location filename="../artisanlib/canvas.py" line="19548" />
         <source>Mouse cross OFF</source>
         <translation>鼠标交叉关闭</translation>
     </message>
@@ -17807,6 +17874,63 @@ Profile missing [CHARGE] or [DROP]</source>
         <location filename="../artisanlib/cup_profile.py" line="254" />
         <source>Background profile not found</source>
         <translation>没有发现背景曲线配置</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1523" />
+        <source>Register the currently loaded roast profile&lt;br&gt;in the selected entry.&lt;br&gt;This will overwrite some roast properties.</source>
+        <translation>在选定的条目中注册当前加载的烘焙配置文件&lt;br&gt;。&lt;br&gt;这将覆盖一些烘焙属性。</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1537" />
+        <location filename="../plus/schedule.py" line="1528" />
+        <source>Register Roast</source>
+        <translation>批次 + 正式录入归档</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2481" />
+        <source>Scheduler started</source>
+        <translation>调度程序已启动</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2792" />
+        <source>Roasts will not adjust the schedule&lt;br&gt;while the schedule window is closed</source>
+        <translation>当计划窗口关闭时，烘焙不会调整计划</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2806" />
+        <location filename="../plus/schedule.py" line="2797" />
+        <source>Close Scheduler</source>
+        <translation>关闭调度程序</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2864" />
+        <source>Scheduler stopped</source>
+        <translation>调度程序已停止</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="3578" />
+        <location filename="../plus/schedule.py" line="3170" />
+        <source>Updating completed roast properties failed</source>
+        <translation>更新已完成烘焙的属性失败</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="3750" />
+        <location filename="../plus/schedule.py" line="3289" />
+        <source>1 batch</source>
+        <translation>1 单批次烘焙任务</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="3765" />
+        <location filename="../plus/schedule.py" line="3756" />
+        <location filename="../plus/schedule.py" line="3297" />
+        <location filename="../plus/schedule.py" line="3291" />
+        <source>{} batches</source>
+        <translation>{} 多批次烘焙任务</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="3644" />
+        <source>Fetching completed roast properties failed</source>
+        <translation>获取已完成的烘焙属性失败</translation>
     </message>
     <message>
         <source>Import Cropster XLS</source>
@@ -18024,6 +18148,56 @@ Continue?</source>
 </context><context>
     <name>Plus</name>
     <message>
+        <location filename="../artisanlib/mqttport.py" line="211" />
+        <source>Keyring Error: Ensure that gnome-keyring is installed.</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1214" />
+        <source>debug logging ON</source>
+        <translation>调试记录打开</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1215" />
+        <source>debug logging OFF</source>
+        <translation>调试记录关闭</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1228" />
+        <source>1 day left</source>
+        <translation>仅剩1天</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1230" />
+        <source>{} days left</source>
+        <translation>还剩{}天</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1232" />
+        <source>Paid until</source>
+        <translation>付费至</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1259" />
+        <source>Please visit our {0}shop{1} to extend your subscription</source>
+        <translation>请访问我们的{0}商店{1}以扩展您的订阅</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1272" />
+        <source>Do you want to extend your subscription?</source>
+        <translation>你想延长你的订阅吗？</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1273" />
+        <source>Your subscription ends on</source>
+        <translation>您的订阅结束于</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1273" />
+        <source>Your subscription ended on</source>
+        <translation>您的订阅结束于</translation>
+    </message>
+    <message>
         <location filename="../plus/queue.py" line="141" />
         <source>Roast successfully uploaded to {}</source>
         <translation>烘焙已成功上传至{}</translation>
@@ -18238,64 +18412,19 @@ Continue?</source>
         <translation>重设密码</translation>
     </message>
     <message>
-        <location filename="../plus/login.py" line="107" />
+        <location filename="../plus/login.py" line="108" />
         <source>Password</source>
         <translation>密码</translation>
     </message>
     <message>
-        <location filename="../plus/login.py" line="112" />
+        <location filename="../plus/login.py" line="113" />
         <source>Email</source>
         <translation>电邮</translation>
     </message>
     <message>
-        <location filename="../plus/login.py" line="121" />
+        <location filename="../plus/login.py" line="122" />
         <source>Remember</source>
         <translation>记住</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1213" />
-        <source>debug logging ON</source>
-        <translation>调试记录打开</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1214" />
-        <source>debug logging OFF</source>
-        <translation>调试记录关闭</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1227" />
-        <source>1 day left</source>
-        <translation>仅剩1天</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1229" />
-        <source>{} days left</source>
-        <translation>还剩{}天</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1231" />
-        <source>Paid until</source>
-        <translation>付费至</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1258" />
-        <source>Please visit our {0}shop{1} to extend your subscription</source>
-        <translation>请访问我们的{0}商店{1}以扩展您的订阅</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1271" />
-        <source>Do you want to extend your subscription?</source>
-        <translation>你想延长你的订阅吗？</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1272" />
-        <source>Your subscription ends on</source>
-        <translation>您的订阅结束于</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1272" />
-        <source>Your subscription ended on</source>
-        <translation>您的订阅结束于</translation>
     </message>
 </context><context>
     <name>Radio Button</name>
@@ -18322,58 +18451,58 @@ Continue?</source>
 </context><context>
     <name>Scope Annotation</name>
     <message>
-        <location filename="../artisanlib/canvas.py" line="14591" />
-        <location filename="../artisanlib/canvas.py" line="8599" />
-        <location filename="../artisanlib/canvas.py" line="8587" />
+        <location filename="../artisanlib/canvas.py" line="14640" />
+        <location filename="../artisanlib/canvas.py" line="8616" />
+        <location filename="../artisanlib/canvas.py" line="8604" />
         <source>TP {0}</source>
         <translation>回温点 {0}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="14668" />
-        <location filename="../artisanlib/canvas.py" line="14635" />
-        <location filename="../artisanlib/canvas.py" line="8613" />
+        <location filename="../artisanlib/canvas.py" line="14717" />
+        <location filename="../artisanlib/canvas.py" line="14684" />
+        <location filename="../artisanlib/canvas.py" line="8630" />
         <source>DE {0}</source>
         <translation>脱水结束 {0}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="14783" />
-        <location filename="../artisanlib/canvas.py" line="14750" />
-        <location filename="../artisanlib/canvas.py" line="8628" />
+        <location filename="../artisanlib/canvas.py" line="14832" />
+        <location filename="../artisanlib/canvas.py" line="14799" />
+        <location filename="../artisanlib/canvas.py" line="8645" />
         <source>FCs {0}</source>
         <translation>第一次爆裂 {0}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="14891" />
-        <location filename="../artisanlib/canvas.py" line="14861" />
-        <location filename="../artisanlib/canvas.py" line="8642" />
+        <location filename="../artisanlib/canvas.py" line="14940" />
+        <location filename="../artisanlib/canvas.py" line="14910" />
+        <location filename="../artisanlib/canvas.py" line="8659" />
         <source>FCe {0}</source>
         <translation>一爆结束 {0}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="15001" />
-        <location filename="../artisanlib/canvas.py" line="14972" />
-        <location filename="../artisanlib/canvas.py" line="8664" />
+        <location filename="../artisanlib/canvas.py" line="15050" />
+        <location filename="../artisanlib/canvas.py" line="15021" />
+        <location filename="../artisanlib/canvas.py" line="8681" />
         <source>SCs {0}</source>
         <translation>第二次爆裂 {0}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="15117" />
-        <location filename="../artisanlib/canvas.py" line="15088" />
-        <location filename="../artisanlib/canvas.py" line="8678" />
+        <location filename="../artisanlib/canvas.py" line="15166" />
+        <location filename="../artisanlib/canvas.py" line="15137" />
+        <location filename="../artisanlib/canvas.py" line="8695" />
         <source>SCe {0}</source>
         <translation>二爆结束 {0}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="15250" />
-        <location filename="../artisanlib/canvas.py" line="15208" />
-        <location filename="../artisanlib/canvas.py" line="12216" />
-        <location filename="../artisanlib/canvas.py" line="8712" />
+        <location filename="../artisanlib/canvas.py" line="15299" />
+        <location filename="../artisanlib/canvas.py" line="15257" />
+        <location filename="../artisanlib/canvas.py" line="12233" />
+        <location filename="../artisanlib/canvas.py" line="8729" />
         <source>DROP {0}</source>
         <translation>排豆 {0}</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="15431" />
-        <location filename="../artisanlib/canvas.py" line="15400" />
+        <location filename="../artisanlib/canvas.py" line="15480" />
+        <location filename="../artisanlib/canvas.py" line="15449" />
         <source>CE {0}</source>
         <translation>冷却结束 {0}</translation>
     </message>
@@ -18384,17 +18513,17 @@ Continue?</source>
 </context><context>
     <name>Scope Title</name>
     <message>
-        <location filename="../artisanlib/canvas.py" line="9061" />
-        <location filename="../artisanlib/canvas.py" line="7964" />
-        <location filename="../artisanlib/canvas.py" line="1356" />
-        <location filename="../artisanlib/main.py" line="15971" />
-        <location filename="../artisanlib/main.py" line="12973" />
+        <location filename="../plus/schedule.py" line="2972" />
+        <location filename="../artisanlib/canvas.py" line="9078" />
+        <location filename="../artisanlib/canvas.py" line="7981" />
+        <location filename="../artisanlib/canvas.py" line="1362" />
+        <location filename="../artisanlib/main.py" line="16019" />
+        <location filename="../artisanlib/main.py" line="13021" />
         <location filename="../artisanlib/roast_properties.py" line="2567" />
         <location filename="../artisanlib/roast_properties.py" line="2537" />
         <location filename="../artisanlib/roast_properties.py" line="2192" />
         <location filename="../artisanlib/roast_properties.py" line="2179" />
-        <location filename="../artisanlib/orbiter.py" line="512" />
-        <location filename="../plus/schedule.py" line="2972" />
+        <location filename="../artisanlib/orbiter.py" line="511" />
         <source>Roaster Scope</source>
         <translation>烘焙记录仪</translation>
     </message>
@@ -18769,16 +18898,6 @@ Continue?</source>
 </context><context>
     <name>Tab</name>
     <message>
-        <location filename="../plus/schedule.py" line="2328" />
-        <source>To-Do</source>
-        <translation>去做</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2329" />
-        <source>Completed</source>
-        <translation>完全的</translation>
-    </message>
-    <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3335" />
         <location filename="../artisanlib/pid_dialogs.py" line="2182" />
         <location filename="../artisanlib/pid_dialogs.py" line="948" />
@@ -18810,7 +18929,7 @@ Continue?</source>
         <translation>设置RS</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1508" />
+        <location filename="../artisanlib/ports.py" line="1734" />
         <location filename="../artisanlib/pid_dialogs.py" line="3341" />
         <location filename="../artisanlib/pid_dialogs.py" line="2188" />
         <source>Extra</source>
@@ -18823,59 +18942,44 @@ Continue?</source>
     </message>
     <message>
         <location filename="../artisanlib/background.py" line="508" />
-        <location filename="../artisanlib/events.py" line="1711" />
+        <location filename="../artisanlib/events.py" line="1762" />
         <source>Config</source>
         <translation>配置</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="1718" />
+        <location filename="../artisanlib/events.py" line="1769" />
         <source>Buttons</source>
         <translation>控制按钮</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="1724" />
+        <location filename="../artisanlib/events.py" line="1775" />
         <source>Sliders</source>
         <translation>控制滑块</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="1730" />
+        <location filename="../artisanlib/events.py" line="1781" />
         <source>Quantifiers</source>
         <translation>范围</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="1737" />
+        <location filename="../artisanlib/events.py" line="1788" />
         <source>Palettes</source>
         <translation>调色板</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="1744" />
+        <location filename="../artisanlib/events.py" line="1795" />
         <source>Style</source>
         <translation>风格</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="1748" />
+        <location filename="../artisanlib/events.py" line="1799" />
         <source>Annotations</source>
         <translation>备注</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="1961" />
-        <location filename="../artisanlib/ports.py" line="1505" />
+        <location filename="../artisanlib/ports.py" line="1731" />
         <source>ET/BT</source>
-        <translation />
-    </message>
-    <message>
-        <location filename="../artisanlib/ports.py" line="1511" />
-        <source>Modbus</source>
-        <translation>通信协议</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/ports.py" line="1514" />
-        <source>S7</source>
-        <translation />
-    </message>
-    <message>
-        <location filename="../artisanlib/ports.py" line="1517" />
-        <source>WebSocket</source>
         <translation />
     </message>
     <message>
@@ -18977,8 +19081,8 @@ Continue?</source>
         <translation>警报设置</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="4604" />
-        <location filename="../artisanlib/main.py" line="4597" />
+        <location filename="../artisanlib/main.py" line="4607" />
+        <location filename="../artisanlib/main.py" line="4600" />
         <source>Scale</source>
         <translation>电子秤</translation>
     </message>
@@ -19018,6 +19122,20 @@ Continue?</source>
         <translation>LCDs</translation>
     </message>
     <message>
+        <location filename="../plus/schedule.py" line="2328" />
+        <source>To-Do</source>
+        <translation>去做</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2329" />
+        <source>Completed</source>
+        <translation>完全的</translation>
+    </message>
+    <message>
+        <source>Modbus</source>
+        <translation type="vanished">通信协议</translation>
+    </message>
+    <message>
         <source>Color</source>
         <translation type="vanished">颜色</translation>
     </message>
@@ -19025,7 +19143,7 @@ Continue?</source>
     <name>Table</name>
     <message>
         <location filename="../artisanlib/cup_profile.py" line="220" />
-        <location filename="../artisanlib/events.py" line="2699" />
+        <location filename="../artisanlib/events.py" line="2762" />
         <location filename="../artisanlib/wheels.py" line="201" />
         <source>Label</source>
         <translation>标签</translation>
@@ -19041,7 +19159,7 @@ Continue?</source>
         <translation>宽度</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="2706" />
+        <location filename="../artisanlib/events.py" line="2769" />
         <location filename="../artisanlib/wheels.py" line="422" />
         <location filename="../artisanlib/wheels.py" line="204" />
         <source>Color</source>
@@ -19118,26 +19236,26 @@ Continue?</source>
         <translation>恒温</translation>
     </message>
     <message>
-        <location filename="../artisanlib/alarms.py" line="1001" />
-        <location filename="../artisanlib/events.py" line="2703" />
+        <location filename="../artisanlib/alarms.py" line="1004" />
+        <location filename="../artisanlib/events.py" line="2766" />
         <location filename="../artisanlib/pid_dialogs.py" line="975" />
         <location filename="../artisanlib/pid_dialogs.py" line="821" />
         <source>Action</source>
         <translation>动作</translation>
     </message>
     <message>
-        <location filename="../artisanlib/alarms.py" line="1002" />
+        <location filename="../artisanlib/alarms.py" line="1005" />
         <location filename="../artisanlib/pid_dialogs.py" line="976" />
         <location filename="../artisanlib/pid_dialogs.py" line="822" />
         <source>Beep</source>
         <translation>提示音</translation>
     </message>
     <message>
-        <location filename="../artisanlib/alarms.py" line="1003" />
+        <location filename="../artisanlib/alarms.py" line="1006" />
         <location filename="../artisanlib/roast_properties.py" line="4553" />
         <location filename="../artisanlib/background.py" line="905" />
-        <location filename="../artisanlib/events.py" line="3890" />
-        <location filename="../artisanlib/events.py" line="2700" />
+        <location filename="../artisanlib/events.py" line="3956" />
+        <location filename="../artisanlib/events.py" line="2763" />
         <location filename="../artisanlib/pid_dialogs.py" line="977" />
         <location filename="../artisanlib/pid_dialogs.py" line="823" />
         <source>Description</source>
@@ -19156,75 +19274,75 @@ Continue?</source>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="4554" />
         <location filename="../artisanlib/background.py" line="906" />
-        <location filename="../artisanlib/events.py" line="3892" />
-        <location filename="../artisanlib/events.py" line="2701" />
+        <location filename="../artisanlib/events.py" line="3958" />
+        <location filename="../artisanlib/events.py" line="2764" />
         <source>Type</source>
         <translation>类型</translation>
     </message>
     <message>
         <location filename="../artisanlib/cup_profile.py" line="221" />
-        <location filename="../artisanlib/alarms.py" line="1000" />
+        <location filename="../artisanlib/alarms.py" line="1003" />
         <location filename="../artisanlib/roast_properties.py" line="4555" />
         <location filename="../artisanlib/background.py" line="907" />
-        <location filename="../artisanlib/events.py" line="3898" />
-        <location filename="../artisanlib/events.py" line="2702" />
+        <location filename="../artisanlib/events.py" line="3964" />
+        <location filename="../artisanlib/events.py" line="2765" />
         <source>Value</source>
         <translation>数值</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="2704" />
+        <location filename="../artisanlib/events.py" line="2767" />
         <source>Documentation</source>
         <translation>文档</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="2705" />
+        <location filename="../artisanlib/events.py" line="2768" />
         <source>Visibility</source>
         <translation>可见性</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="2707" />
+        <location filename="../artisanlib/events.py" line="2770" />
         <source>Text Color</source>
         <translation>文字颜色</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="2706" />
-        <location filename="../artisanlib/ports.py" line="1593" />
+        <location filename="../artisanlib/ports.py" line="1830" />
         <source>Device</source>
         <translation>设备</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1594" />
+        <location filename="../artisanlib/ports.py" line="1831" />
         <source>Comm Port</source>
         <translation>通信端口</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1595" />
+        <location filename="../artisanlib/ports.py" line="1832" />
         <source>Baud Rate</source>
         <translation>传输速率</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1596" />
+        <location filename="../artisanlib/ports.py" line="1833" />
         <source>Byte Size</source>
         <translation>字节大小</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1597" />
+        <location filename="../artisanlib/ports.py" line="1834" />
         <source>Parity</source>
         <translation>校验</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1598" />
+        <location filename="../artisanlib/ports.py" line="1835" />
         <source>Stopbits</source>
         <translation>停止位</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1599" />
+        <location filename="../artisanlib/ports.py" line="1836" />
         <source>Timeout</source>
         <translation>超时</translation>
     </message>
     <message>
         <location filename="../artisanlib/transposer.py" line="189" />
-        <location filename="../artisanlib/alarms.py" line="997" />
+        <location filename="../artisanlib/alarms.py" line="1000" />
         <location filename="../artisanlib/curves.py" line="128" />
         <location filename="../artisanlib/roast_properties.py" line="4550" />
         <location filename="../artisanlib/roast_properties.py" line="4393" />
@@ -19260,7 +19378,7 @@ Continue?</source>
         <translation>载入</translation>
     </message>
     <message>
-        <location filename="../artisanlib/alarms.py" line="998" />
+        <location filename="../artisanlib/alarms.py" line="1001" />
         <location filename="../artisanlib/roast_properties.py" line="2948" />
         <source>Source</source>
         <translation>来源</translation>
@@ -19339,32 +19457,32 @@ Continue?</source>
         <translation>重量</translation>
     </message>
     <message>
-        <location filename="../artisanlib/alarms.py" line="992" />
+        <location filename="../artisanlib/alarms.py" line="995" />
         <source>Nr</source>
         <translation>编号</translation>
     </message>
     <message>
-        <location filename="../artisanlib/alarms.py" line="993" />
+        <location filename="../artisanlib/alarms.py" line="996" />
         <source>Status</source>
         <translation>状态</translation>
     </message>
     <message>
-        <location filename="../artisanlib/alarms.py" line="994" />
+        <location filename="../artisanlib/alarms.py" line="997" />
         <source>If Alarm</source>
         <translation>If Alarm（依赖触发）</translation>
     </message>
     <message>
-        <location filename="../artisanlib/alarms.py" line="995" />
+        <location filename="../artisanlib/alarms.py" line="998" />
         <source>But Not</source>
         <translation>But Not（排除触发）</translation>
     </message>
     <message>
-        <location filename="../artisanlib/alarms.py" line="996" />
+        <location filename="../artisanlib/alarms.py" line="999" />
         <source>From</source>
         <translation>来自</translation>
     </message>
     <message>
-        <location filename="../artisanlib/alarms.py" line="999" />
+        <location filename="../artisanlib/alarms.py" line="1002" />
         <source>Condition</source>
         <translation>条件</translation>
     </message>
@@ -19705,43 +19823,38 @@ Continue?</source>
 </context><context>
     <name>Toolbar</name>
     <message>
-        <location filename="../artisanlib/main.py" line="747" />
+        <location filename="../artisanlib/main.py" line="748" />
         <source>Home</source>
         <translation>家</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="748" />
+        <location filename="../artisanlib/main.py" line="749" />
         <source>Back</source>
         <translation>后退</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="749" />
+        <location filename="../artisanlib/main.py" line="750" />
         <source>Forward</source>
         <translation>向前</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="751" />
+        <location filename="../artisanlib/main.py" line="752" />
         <source>Pan</source>
         <translation>移动</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="752" />
+        <location filename="../artisanlib/main.py" line="753" />
         <source>Zoom</source>
         <translation>缩放</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="941" />
-        <location filename="../artisanlib/main.py" line="837" />
+        <location filename="../artisanlib/main.py" line="942" />
+        <location filename="../artisanlib/main.py" line="838" />
         <source>Lines</source>
         <translation>线</translation>
     </message>
 </context><context>
     <name>Tooltip</name>
-    <message>
-        <location filename="../plus/schedule.py" line="2262" />
-        <source>Update schedule</source>
-        <translation>更新时间表</translation>
-    </message>
     <message>
         <location filename="../artisanlib/axis.py" line="83" />
         <source>100% event values in step mode are aligned with the given y-axis value or the lowest phases limit if left empty</source>
@@ -20303,7 +20416,7 @@ initiated by the PID</source>
     </message>
     <message>
         <location filename="../artisanlib/alarms.py" line="117" />
-        <location filename="../artisanlib/ports.py" line="780" />
+        <location filename="../artisanlib/ports.py" line="798" />
         <location filename="../artisanlib/events.py" line="686" />
         <source>Show help</source>
         <translation>显示帮助</translation>
@@ -20329,15 +20442,15 @@ initiated by the PID</source>
         <translation>如果源提供了设定值（SV）而不是过程值（PV），则没有处理延迟</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="797" />
-        <location filename="../artisanlib/events.py" line="792" />
-        <location filename="../artisanlib/events.py" line="787" />
+        <location filename="../artisanlib/events.py" line="806" />
+        <location filename="../artisanlib/events.py" line="798" />
+        <location filename="../artisanlib/events.py" line="790" />
         <location filename="../artisanlib/events.py" line="782" />
         <source>Action Type</source>
         <translation>动作类型</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="900" />
+        <location filename="../artisanlib/events.py" line="912" />
         <source>Applies the Bernoulli's gas law to the values computed
 by applying the given factor and offset to the slider value
 assuming that the gas pressure and not the gas flow is controlled.
@@ -20350,145 +20463,172 @@ has to be reduced by 4 times.</source>
 必须降低 4 倍。</translation>
     </message>
     <message>
+        <location filename="../artisanlib/events.py" line="1062" />
+        <location filename="../artisanlib/events.py" line="1056" />
         <location filename="../artisanlib/events.py" line="1050" />
         <location filename="../artisanlib/events.py" line="1044" />
-        <location filename="../artisanlib/events.py" line="1038" />
-        <location filename="../artisanlib/events.py" line="1032" />
-        <location filename="../artisanlib/events.py" line="935" />
-        <location filename="../artisanlib/events.py" line="930" />
-        <location filename="../artisanlib/events.py" line="925" />
-        <location filename="../artisanlib/events.py" line="920" />
+        <location filename="../artisanlib/events.py" line="947" />
+        <location filename="../artisanlib/events.py" line="942" />
+        <location filename="../artisanlib/events.py" line="937" />
+        <location filename="../artisanlib/events.py" line="932" />
         <source>Step Size</source>
         <translation>一步的大小</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="940" />
+        <location filename="../artisanlib/events.py" line="952" />
         <source>Slider values interpreted as temperatures</source>
         <translation>把滑块值作为温度</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="958" />
+        <location filename="../artisanlib/events.py" line="970" />
         <source>Unit to be added to generated event descriptions</source>
         <translation>添加到生成的事件说明中的单位</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="978" />
+        <location filename="../artisanlib/events.py" line="990" />
         <source>Move slider under focus using the up/down cursor keys</source>
         <translation>使用上/下光标键将滑块移动到焦点下</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="981" />
+        <location filename="../artisanlib/events.py" line="993" />
         <source>Group Slider 1 with Slider 4 and Slider 2 with Slider 3</source>
         <translation>组滑块 1 与滑块 4 以及滑块 2 与滑块 3</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="1073" />
-        <location filename="../artisanlib/events.py" line="1068" />
-        <location filename="../artisanlib/events.py" line="1063" />
-        <location filename="../artisanlib/events.py" line="1058" />
+        <location filename="../artisanlib/events.py" line="1085" />
+        <location filename="../artisanlib/events.py" line="1080" />
+        <location filename="../artisanlib/events.py" line="1075" />
+        <location filename="../artisanlib/events.py" line="1070" />
         <source>fire slider action</source>
         <translation>火滑块动作</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="1093" />
-        <location filename="../artisanlib/events.py" line="1088" />
-        <location filename="../artisanlib/events.py" line="1083" />
-        <location filename="../artisanlib/events.py" line="1078" />
+        <location filename="../artisanlib/events.py" line="1105" />
+        <location filename="../artisanlib/events.py" line="1100" />
+        <location filename="../artisanlib/events.py" line="1095" />
+        <location filename="../artisanlib/events.py" line="1090" />
         <source>If source is a Set Value quantification gets never blocked</source>
         <translation>如果源是设置值量化永远不会被阻止</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="1350" />
-        <location filename="../artisanlib/events.py" line="1340" />
-        <location filename="../artisanlib/events.py" line="1330" />
-        <location filename="../artisanlib/events.py" line="1320" />
-        <location filename="../artisanlib/events.py" line="1310" />
-        <location filename="../artisanlib/events.py" line="1300" />
-        <location filename="../artisanlib/events.py" line="1289" />
-        <location filename="../artisanlib/events.py" line="1280" />
+        <location filename="../artisanlib/events.py" line="1383" />
+        <location filename="../artisanlib/events.py" line="1370" />
+        <location filename="../artisanlib/events.py" line="1357" />
+        <location filename="../artisanlib/events.py" line="1344" />
+        <location filename="../artisanlib/events.py" line="1331" />
+        <location filename="../artisanlib/events.py" line="1318" />
+        <location filename="../artisanlib/events.py" line="1304" />
+        <location filename="../artisanlib/events.py" line="1292" />
         <source>Display the button during roast</source>
         <translation>烘焙期间显示按钮</translation>
     </message>
     <message>
+        <location filename="../artisanlib/events.py" line="1454" />
+        <location filename="../artisanlib/events.py" line="1443" />
         <location filename="../artisanlib/events.py" line="1406" />
-        <location filename="../artisanlib/events.py" line="1398" />
-        <location filename="../artisanlib/events.py" line="1367" />
-        <location filename="../artisanlib/events.py" line="1360" />
-        <location filename="../artisanlib/events.py" line="1352" />
-        <location filename="../artisanlib/events.py" line="1342" />
-        <location filename="../artisanlib/events.py" line="1332" />
-        <location filename="../artisanlib/events.py" line="1322" />
-        <location filename="../artisanlib/events.py" line="1312" />
-        <location filename="../artisanlib/events.py" line="1302" />
-        <location filename="../artisanlib/events.py" line="1292" />
-        <location filename="../artisanlib/events.py" line="1282" />
+        <location filename="../artisanlib/events.py" line="1396" />
+        <location filename="../artisanlib/events.py" line="1385" />
+        <location filename="../artisanlib/events.py" line="1372" />
+        <location filename="../artisanlib/events.py" line="1359" />
+        <location filename="../artisanlib/events.py" line="1346" />
+        <location filename="../artisanlib/events.py" line="1333" />
+        <location filename="../artisanlib/events.py" line="1320" />
+        <location filename="../artisanlib/events.py" line="1307" />
+        <location filename="../artisanlib/events.py" line="1294" />
         <source>Action type to fire when the button is clicked</source>
         <translation>单击按钮时触发的操作类型</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="1411" />
-        <location filename="../artisanlib/events.py" line="1403" />
-        <location filename="../artisanlib/events.py" line="1372" />
-        <location filename="../artisanlib/events.py" line="1365" />
-        <location filename="../artisanlib/events.py" line="1357" />
-        <location filename="../artisanlib/events.py" line="1347" />
-        <location filename="../artisanlib/events.py" line="1337" />
-        <location filename="../artisanlib/events.py" line="1327" />
-        <location filename="../artisanlib/events.py" line="1317" />
-        <location filename="../artisanlib/events.py" line="1307" />
-        <location filename="../artisanlib/events.py" line="1297" />
-        <location filename="../artisanlib/events.py" line="1287" />
+        <location filename="../artisanlib/events.py" line="1462" />
+        <location filename="../artisanlib/events.py" line="1451" />
+        <location filename="../artisanlib/events.py" line="1414" />
+        <location filename="../artisanlib/events.py" line="1404" />
+        <location filename="../artisanlib/events.py" line="1393" />
+        <location filename="../artisanlib/events.py" line="1380" />
+        <location filename="../artisanlib/events.py" line="1367" />
+        <location filename="../artisanlib/events.py" line="1354" />
+        <location filename="../artisanlib/events.py" line="1341" />
+        <location filename="../artisanlib/events.py" line="1328" />
+        <location filename="../artisanlib/events.py" line="1315" />
+        <location filename="../artisanlib/events.py" line="1302" />
         <source>Event action command</source>
         <translation>事件动作命令</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="1375" />
+        <location filename="../artisanlib/events.py" line="1417" />
         <source>Sampling action type</source>
         <translation>采样动作类型</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="1383" />
+        <location filename="../artisanlib/events.py" line="1428" />
         <source>Sampling action command</source>
         <translation>采样动作指令</translation>
     </message>
     <message>
-        <location filename="../artisanlib/events.py" line="1385" />
+        <location filename="../artisanlib/events.py" line="1430" />
         <source>Run the sampling action synchronously ({}) every sampling interval or select a repating time interval to run it asynchronously while sampling</source>
         <translation>每个采样间隔同步运行采样操作 ({})，或选择重复时间间隔以在采样时异步运行采样操作</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1136" />
-        <location filename="../artisanlib/ports.py" line="671" />
+        <location filename="../artisanlib/ports.py" line="1154" />
+        <location filename="../artisanlib/ports.py" line="689" />
         <source>OFF Action String</source>
         <translation>关闭动作</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="1139" />
-        <location filename="../artisanlib/ports.py" line="674" />
+        <location filename="../artisanlib/ports.py" line="1157" />
+        <location filename="../artisanlib/ports.py" line="692" />
         <source>ON Action String</source>
         <translation>打开动作</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="706" />
-        <location filename="../artisanlib/ports.py" line="701" />
+        <location filename="../artisanlib/ports.py" line="724" />
+        <location filename="../artisanlib/ports.py" line="719" />
         <source>Extra delay after connect in seconds before sending requests (needed by Arduino devices restarting on connect)</source>
         <translation>连接后发送请求前的额外延迟（Arduino 设备在连接时重新启动所需）</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="733" />
-        <location filename="../artisanlib/ports.py" line="728" />
+        <location filename="../artisanlib/ports.py" line="751" />
+        <location filename="../artisanlib/ports.py" line="746" />
         <source>IP timeout in seconds, not larger than half of the sampling interval</source>
         <translation>IP超时时间，以秒为单位，不大于采样间隔的一半</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="759" />
+        <location filename="../artisanlib/ports.py" line="777" />
         <source>Scan MODBUS</source>
         <translation>扫描通讯协议</translation>
     </message>
     <message>
-        <location filename="../artisanlib/ports.py" line="947" />
+        <location filename="../artisanlib/ports.py" line="965" />
         <source>Scan S7</source>
         <translation>扫描 S7</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/ports.py" line="1578" />
+        <source>Connect timeout in seconds</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <location filename="../artisanlib/ports.py" line="1586" />
+        <source>Maximum period in seconds between communications with the broker</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <location filename="../artisanlib/ports.py" line="1591" />
+        <source>Main topic subscribed on connect</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <location filename="../artisanlib/ports.py" line="1596" />
+        <source>Topics per input subscribed on connect.
+If inputs topic is empty, payloads received for main topic are interpreted.</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <location filename="../artisanlib/ports.py" line="1598" />
+        <source>Path expression to extract reading from JSON payload.
+If input topic is given and node is empty, the received payload is interpreted as number</source>
+        <translation type="unfinished" />
     </message>
     <message>
         <location filename="../artisanlib/background.py" line="73" />
@@ -20531,6 +20671,11 @@ has to be reduced by 4 times.</source>
         <source>On ramping the ramp value is taken with a positive time offset
 specified by the lookahead</source>
         <translation>在斜坡控制阶段，斜坡值的获取会采用由前瞻（参数）指定的正向时间偏移。</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/roest.py" line="465" />
+        <source>Update machines</source>
+        <translation type="unfinished" />
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="772" />
@@ -21089,272 +21234,272 @@ Unchecked: Fits a smooth spline to preserve curve shape.</source>
         <translation>清除警报表</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="745" />
+        <location filename="../artisanlib/main.py" line="746" />
         <source>Connect to plus service</source>
         <translation>连接到plus服务</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="746" />
+        <location filename="../artisanlib/main.py" line="747" />
         <source>Subscription</source>
         <translation>订阅</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="747" />
+        <location filename="../artisanlib/main.py" line="748" />
         <source>Reset original view</source>
         <translation>重置原始视图</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="748" />
+        <location filename="../artisanlib/main.py" line="749" />
         <source>Back to  previous view</source>
         <translation>返回上一视图</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="749" />
+        <location filename="../artisanlib/main.py" line="750" />
         <source>Forward to next view</source>
         <translation>前进到下一个视图</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="751" />
+        <location filename="../artisanlib/main.py" line="752" />
         <source>Pan axes with left mouse, zoom with right</source>
         <translation>鼠标左键平移轴，右键缩放</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="752" />
+        <location filename="../artisanlib/main.py" line="753" />
         <source>Zoom to rectangle</source>
         <translation>缩放到矩形</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="839" />
+        <location filename="../artisanlib/main.py" line="840" />
         <source>Line styles</source>
         <translation>线条样式</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="13612" />
-        <location filename="../artisanlib/main.py" line="3215" />
+        <location filename="../artisanlib/canvas.py" line="13661" />
+        <location filename="../artisanlib/main.py" line="3218" />
         <source>Start monitoring</source>
         <translation>开始监测</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3229" />
+        <location filename="../artisanlib/main.py" line="3232" />
         <source>Start recording</source>
         <translation>开始记录</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3243" />
+        <location filename="../artisanlib/main.py" line="3246" />
         <source>First Crack Start</source>
         <translation>第一次爆裂</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3247" />
+        <location filename="../artisanlib/main.py" line="3250" />
         <source>First Crack End</source>
         <translation>一爆结束</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3251" />
+        <location filename="../artisanlib/main.py" line="3254" />
         <source>Second Crack Start</source>
         <translation>第二次爆裂</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3255" />
+        <location filename="../artisanlib/main.py" line="3258" />
         <source>Second Crack End</source>
         <translation>二爆结束</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3267" />
+        <location filename="../artisanlib/main.py" line="3270" />
         <source>Reset</source>
         <translation>重置</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3272" />
+        <location filename="../artisanlib/main.py" line="3275" />
         <source>Charge</source>
         <translation>投豆</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3277" />
+        <location filename="../artisanlib/main.py" line="3280" />
         <source>Drop</source>
         <translation>排豆</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3295" />
+        <location filename="../artisanlib/main.py" line="3298" />
         <source>Event</source>
         <translation>事件</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3304" />
+        <location filename="../artisanlib/main.py" line="3307" />
         <source>Increases the current SV value by 5</source>
         <translation>将当前SV值增加5</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3313" />
+        <location filename="../artisanlib/main.py" line="3316" />
         <source>Increases the current SV value by 10</source>
         <translation>将当前SV值增加10</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3322" />
+        <location filename="../artisanlib/main.py" line="3325" />
         <source>Increases the current SV value by 20</source>
         <translation>将当前SV值增加20</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3331" />
+        <location filename="../artisanlib/main.py" line="3334" />
         <source>Decreases the current SV value by 20</source>
         <translation>将当前SV值减少20</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3340" />
+        <location filename="../artisanlib/main.py" line="3343" />
         <source>Decreases the current SV value by 10</source>
         <translation>将当前SV值减少10</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3349" />
+        <location filename="../artisanlib/main.py" line="3352" />
         <source>Decreases the current SV value by 5</source>
         <translation>将当前SV值减少5</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3356" />
+        <location filename="../artisanlib/main.py" line="3359" />
         <source>Dry End</source>
         <translation>脱水结束</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3361" />
+        <location filename="../artisanlib/main.py" line="3364" />
         <source>Cool End</source>
         <translation>冷却结束</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3411" />
+        <location filename="../artisanlib/main.py" line="3414" />
         <source>Timer</source>
         <translation>计时器</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3412" />
+        <location filename="../artisanlib/main.py" line="3415" />
         <source>ET Temperature</source>
         <translation>ET温度</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3413" />
+        <location filename="../artisanlib/main.py" line="3416" />
         <source>BT Temperature</source>
         <translation>BT温度</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3414" />
+        <location filename="../artisanlib/main.py" line="3417" />
         <source>ET/time (degrees/min)</source>
         <translation>ET/时间(度/分钟)</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3415" />
+        <location filename="../artisanlib/main.py" line="3418" />
         <source>BT/time (degrees/min)</source>
         <translation>BT/时间(度/分钟)</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3416" />
+        <location filename="../artisanlib/main.py" line="3419" />
         <source>Value of SV in PID</source>
         <translation>PID的SV值</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3417" />
+        <location filename="../artisanlib/main.py" line="3420" />
         <source>PID power %</source>
         <translation>PID 火力%</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3527" />
+        <location filename="../artisanlib/main.py" line="3530" />
         <source>Number of events found</source>
         <translation>发现事件编号</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3543" />
+        <location filename="../artisanlib/main.py" line="3546" />
         <source>Type of event</source>
         <translation>事件类型</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3550" />
+        <location filename="../artisanlib/main.py" line="3553" />
         <source>Value of event</source>
         <translation>事件数值</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3562" />
+        <location filename="../artisanlib/main.py" line="3565" />
         <source>Updates the event</source>
         <translation>更新事件</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="3933" />
+        <location filename="../artisanlib/main.py" line="3936" />
         <source>Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE</source>
         <translation>阶段 LCDs: 右键点击循环切换时间/百分比/温度模式</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="5369" />
+        <location filename="../artisanlib/main.py" line="5372" />
         <source>Syncing with artisan.plus</source>
         <translation>同步artisan.plus</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="5406" />
-        <location filename="../artisanlib/main.py" line="5372" />
+        <location filename="../artisanlib/main.py" line="5409" />
+        <location filename="../artisanlib/main.py" line="5375" />
         <source>Disconnect artisan.plus</source>
         <translation>断开artisan.plus</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="5375" />
+        <location filename="../artisanlib/main.py" line="5378" />
         <source>Upload to artisan.plus</source>
         <translation>上传到artisan.plus</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="5409" />
+        <location filename="../artisanlib/main.py" line="5412" />
         <source>Connect artisan.plus</source>
         <translation>连接artisan.plus</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="8025" />
+        <location filename="../artisanlib/main.py" line="8061" />
         <source>Phase LCDs
 Currently in ALL FINISHING MODE</source>
         <translation>阶段 LCDs
 当前处于全部完成模式</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="8062" />
+        <location filename="../artisanlib/main.py" line="8098" />
         <source>Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE
 Currently in TIME MODE</source>
         <translation>阶段 LCDs: 右键点击循环切换时间/百分比/温度模式
 目前为时间模式</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="8080" />
+        <location filename="../artisanlib/main.py" line="8116" />
         <source>Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE
 Currently in PERCENTAGE MODE</source>
         <translation>阶段 LCDs: 右键点击循环切换时间/百分比/温度模式
 目前为百分比模式</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="8094" />
+        <location filename="../artisanlib/main.py" line="8130" />
         <source>Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE
 Currently in TEMP MODE</source>
         <translation>阶段 LCDs: 右键点击循环切换时间/百分比/温度模式
 目前为温度模式</translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="26828" />
+        <location filename="../artisanlib/main.py" line="26930" />
         <source>&lt;b&gt;Label&lt;/b&gt;= </source>
         <translation>&lt;b&gt;标签&lt;/b&gt;= </translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="26829" />
+        <location filename="../artisanlib/main.py" line="26931" />
         <source>&lt;b&gt;Description &lt;/b&gt;= </source>
         <translation>&lt;b&gt;说明&lt;/b&gt;= </translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="26830" />
+        <location filename="../artisanlib/main.py" line="26932" />
         <source>&lt;b&gt;Type &lt;/b&gt;= </source>
         <translation>&lt;b&gt;类型&lt;/b&gt;= </translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="26832" />
+        <location filename="../artisanlib/main.py" line="26934" />
         <source>&lt;b&gt;Value &lt;/b&gt;= </source>
         <translation>&lt;b&gt;数值&lt;/b&gt;= </translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="26834" />
+        <location filename="../artisanlib/main.py" line="26936" />
         <source>&lt;b&gt;Documentation &lt;/b&gt;= </source>
         <translation>&lt;b&gt;文档&lt;/b&gt;= </translation>
     </message>
     <message>
-        <location filename="../artisanlib/main.py" line="26835" />
+        <location filename="../artisanlib/main.py" line="26937" />
         <source>&lt;b&gt;Button# &lt;/b&gt;= </source>
         <translation>&lt;b&gt;按钮# &lt;/b&gt;= </translation>
     </message>
@@ -21500,12 +21645,12 @@ Currently in TEMP MODE</source>
         <translation>例如: 100 + x</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="13459" />
+        <location filename="../artisanlib/canvas.py" line="13504" />
         <source>Stop monitoring</source>
         <translation>停止监测</translation>
     </message>
     <message>
-        <location filename="../artisanlib/canvas.py" line="14245" />
+        <location filename="../artisanlib/canvas.py" line="14294" />
         <source>Stop recording</source>
         <translation>停止记录</translation>
     </message>
@@ -21543,6 +21688,11 @@ Currently in TEMP MODE</source>
         <location filename="../artisanlib/colors.py" line="571" />
         <source>Sets button colors to grey scale and LCD colors to black and white</source>
         <translation>将按钮颜色设置为灰度，将 LCD 颜色设置为黑白</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2262" />
+        <source>Update schedule</source>
+        <translation>更新时间表</translation>
     </message>
     <message>
         <source>Automatically extend the time axis by 3min on need</source>

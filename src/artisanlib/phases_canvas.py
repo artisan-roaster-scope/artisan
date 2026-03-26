@@ -24,10 +24,10 @@ from typing import Final, TypedDict, cast, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
-    from matplotlib.axes import Axes # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore]# pylint: disable=unused-import
-    from matplotlib.patches import Rectangle # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore]# pylint: disable=unused-import
-    from matplotlib.text import Annotation # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore]# pylint: disable=unused-import
-    from matplotlib.backend_bases import Event, MouseEvent # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore]# pylint: disable=unused-import
+    from matplotlib.axes import Axes # type:ignore[untyped-import,unused-ignore] # pylint: disable=unused-import
+    from matplotlib.patches import Rectangle # type:ignore[untyped-import,unused-ignore] # pylint: disable=unused-import
+    from matplotlib.text import Annotation # type:ignore[untyped-import,unused-ignore] # pylint: disable=unused-import
+    from matplotlib.backend_bases import Event, MouseEvent # type:ignore[untyped-import,unused-ignore] # pylint: disable=unused-import
 
 from artisanlib.suppress_errors import suppress_stdout_stderr
 from artisanlib.util import toGrey, toDim, stringfromseconds, float2float
@@ -39,10 +39,10 @@ from PyQt6.QtWidgets import QApplication
 
 
 with suppress_stdout_stderr():
-    import matplotlib as mpl # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore]
+    import matplotlib as mpl # type:ignore[untyped-import,unused-ignore]
 
-from matplotlib.figure import Figure # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore]
-from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore] # @Reimport
+from matplotlib.figure import Figure # type:ignore[untyped-import,unused-ignore]
+from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas # type:ignore[untyped-import,unused-ignore] # @Reimport
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
@@ -58,7 +58,7 @@ class MplPhasesCanvas(FigureCanvas):
     def __init__(self, tight_layout_params:dict[str,float], dpi:int) -> None:
         self.fig:Figure = Figure(tight_layout=tight_layout_params, frameon=True, dpi=dpi)
         # with tight_layout=True, the matplotlib canvas expands to the maximum using figure.autolayout
-        super().__init__(self.fig) # type: ignore[no-untyped-call] # ty:ignore[ignore]
+        super().__init__(self.fig) # type: ignore[no-untyped-call]
 
 class tphasescanvas(QObject):
 
@@ -178,7 +178,7 @@ class tphasescanvas(QObject):
                         self.canvas.fig.canvas.draw()
 #                        self.canvas.fig.canvas.update()
                     FigureCanvas.updateGeometry(self)  #@UndefinedVariable
-                self.aw.scroller.setMaximumHeight(self.canvas.sizeHint().height()) # type:ignore[no-untyped-call] # ty:ignore[ignore] # Call to untyped function "sizeHint" in typed context  [no-untyped-call]
+                self.aw.scroller.setMaximumHeight(self.canvas.sizeHint().height()) # type:ignore[no-untyped-call] # Call to untyped function "sizeHint" in typed context  [no-untyped-call]
             except Exception as e:  # pylint: disable=broad-except
                 _log.exception(e)
 
@@ -346,7 +346,7 @@ class tphasescanvas(QObject):
 #                  loc='upper center', fontsize='small', shadow=False, frameon=False, fancybox=False, labelcolor=legend_labelcolor)
 
             self.canvas.fig.canvas.draw_idle()
-            self.aw.scroller.setMaximumHeight(self.canvas.sizeHint().height()) # type:ignore[no-untyped-call] # ty:ignore[ignore] # Call to untyped function "sizeHint" in typed context  [no-untyped-call]
+            self.aw.scroller.setMaximumHeight(self.canvas.sizeHint().height()) # type:ignore[no-untyped-call] # Call to untyped function "sizeHint" in typed context  [no-untyped-call]
         else:
             # if no profiles are given we set the canvas height to 0
             QSettings().setValue('MainSplitter',self.aw.splitter.saveState())

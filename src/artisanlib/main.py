@@ -43,10 +43,10 @@ import io
 import functools
 import dateutil.parser
 import copy as copyd
-import arabic_reshaper # type:ignore[import-untyped] # ty:ignore [ignore]
+import arabic_reshaper # type:ignore[import-untyped]
 from enum import IntEnum
 from pathlib import Path
-from bidi import get_display # type:ignore[import-untyped] # ty:ignore [ignore] # newer rust based implementation of the above Python implementation
+from bidi import get_display # type:ignore[import-untyped] # newer rust based implementation of the above Python implementation
 
 # links CTR-C signals to the system default (ignore)
 import signal
@@ -136,30 +136,30 @@ from PyQt6 import sip
 from artisanlib.suppress_errors import suppress_stdout_stderr
 
 with suppress_stdout_stderr():
-    import matplotlib as mpl # type:ignore[untyped-import,unused-ignore] # ty:ignore [ignore]
-    from matplotlib import colormaps # type:ignore[untyped-import,unused-ignore] # ty:ignore [ignore]
-    import matplotlib.colors as mcolors # type:ignore[untyped-import,unused-ignore] # ty:ignore [ignore]
+    import matplotlib as mpl # type:ignore[untyped-import,unused-ignore]
+    from matplotlib import colormaps # type:ignore[untyped-import,unused-ignore]
+    import matplotlib.colors as mcolors # type:ignore[untyped-import,unused-ignore]
 
 #try:
 #    mpl_version = [int(i) for i in mpl.__version__.split('.')]
 #except Exception: # pylint: disable=broad-except
 #    mpl_version = [7,7,7] # a trunk version
 
-from matplotlib.backend_bases import _Mode as MPL_Mode # type:ignore[untyped-import,unused-ignore] # ty:ignore [ignore] # pylint: disable=import-private-name,unknown-option-value # @UnresolvedImport
+from matplotlib.backend_bases import _Mode as MPL_Mode # type:ignore[untyped-import,unused-ignore] # pylint: disable=import-private-name,unknown-option-value # @UnresolvedImport
 
 svgsupport = next((x for x in QImageReader.supportedImageFormats() if x == b'svg'),None)
 
-from matplotlib.figure import Figure # type:ignore[untyped-import,unused-ignore] # ty:ignore [ignore]
-from matplotlib import rcParams, ticker # type:ignore[untyped-import,unused-ignore] # ty:ignore [ignore]
-from matplotlib.font_manager import FontProperties, fontManager # type:ignore[untyped-import,unused-ignore] # ty:ignore [ignore]
-from matplotlib.transforms import Bbox # type:ignore[untyped-import,unused-ignore] # ty:ignore [ignore]
+from matplotlib.figure import Figure # type:ignore[untyped-import,unused-ignore]
+from matplotlib import rcParams, ticker # type:ignore[untyped-import,unused-ignore]
+from matplotlib.font_manager import FontProperties, fontManager # type:ignore[untyped-import,unused-ignore]
+from matplotlib.transforms import Bbox # type:ignore[untyped-import,unused-ignore]
 
-from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas # type:ignore[untyped-import,unused-ignore] # ty:ignore [ignore] # @Reimport
-from matplotlib.backends.backend_qt import NavigationToolbar2QT as NavigationToolbar # type:ignore[untyped-import,unused-ignore] # ty:ignore [ignore] # @Reimport
-from matplotlib.backend_bases import LocationEvent as mplLocationevent # type:ignore[untyped-import,unused-ignore] # ty:ignore [ignore]
+from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas # type:ignore[untyped-import,unused-ignore] # @Reimport
+from matplotlib.backends.backend_qt import NavigationToolbar2QT as NavigationToolbar # type:ignore[untyped-import,unused-ignore] # @Reimport
+from matplotlib.backend_bases import LocationEvent as mplLocationevent # type:ignore[untyped-import,unused-ignore]
 
-from matplotlib.backends.qt_editor import figureoptions # type:ignore[untyped-import,unused-ignore] # ty:ignore [ignore]
-import matplotlib.backends.qt_editor._formlayout as formlayout # type:ignore[untyped-import,unused-ignore] # ty:ignore [ignore]
+from matplotlib.backends.qt_editor import figureoptions # type:ignore[untyped-import,unused-ignore]
+import matplotlib.backends.qt_editor._formlayout as formlayout # type:ignore[untyped-import,unused-ignore]
 
 
 if TYPE_CHECKING:
@@ -183,16 +183,16 @@ if TYPE_CHECKING:
         from artisanlib.ikawa import IKAWA_BLE # pylint: disable=unused-import
     except Exception: # pylint: disable=broad-except
         pass
-    from matplotlib.text import Annotation # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore] # pylint: disable=unused-import
+    from matplotlib.text import Annotation # type:ignore[untyped-import,unused-ignore] # pylint: disable=unused-import
     from openpyxl.worksheet.worksheet import Worksheet # pylint: disable=unused-import
     import numpy.typing as npt # pylint: disable=unused-import
     from PyQt6.QtWidgets import QTableWidgetItem, QTableWidget, QScrollBar # pylint: disable=unused-import
     from PyQt6.QtGui import QStyleHints, QClipboard, QKeyEvent, QMouseEvent, QDropEvent, QDragEnterEvent, QCloseEvent, QResizeEvent, QValidator # pylint: disable=unused-import
     from PyQt6.QtCore import QFile, QObject, QPermission, QMessageLogContext  # noqa: F401 # pylint: disable=unused-import,reimported # QFile is reimported for mypy!?
     from PyQt6.QtWebEngineCore import QWebEnginePage  # noqa: F401 # pylint: disable=unused-import
-    from matplotlib.backend_bases import Event as MplEvent, MouseEvent # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore] # pylint: disable=unused-import
-    from matplotlib.artist import Artist # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore] # pylint: disable=unused-import
-    from matplotlib.lines import Line2D # type:ignore[untyped-import,unused-ignore] # ty:ignore[ignore] # pylint: disable=unused-import
+    from matplotlib.backend_bases import Event as MplEvent, MouseEvent # type:ignore[untyped-import,unused-ignore] # pylint: disable=unused-import
+    from matplotlib.artist import Artist # type:ignore[untyped-import,unused-ignore] # pylint: disable=unused-import
+    from matplotlib.lines import Line2D # type:ignore[untyped-import,unused-ignore] # pylint: disable=unused-import
     from xml.etree.ElementTree import Element as XMLElement
 
 # fix socket.inet_pton on Windows (used by pymodbus TCP/UDP)
@@ -221,14 +221,14 @@ from artisanlib.qtsingleapplication import QtSingleApplication
 
 try:
     # spanning a second multiprocessing instance (Hottop server) on macOS falils to import the YAPI interface
-    from yoctopuce.yocto_api import YAPI # type: ignore[import-untyped] # ty:ignore[ignore]
+    from yoctopuce.yocto_api import YAPI # type: ignore[import-untyped]
 except ImportError:
     pass
 
 # platform dependent imports:
 if sys.platform.startswith('darwin'):
     # control app napping on OS X >= 10.9
-    import appnope # type: ignore[import-untyped]  # ty:ignore[ignore # @UnresolvedImport # pylint: disable=import-error
+    import appnope # type: ignore[import-untyped]  # @UnresolvedImport # pylint: disable=import-error
     appnope.nope()
 
 
@@ -538,7 +538,7 @@ class Artisan(QtSingleApplication):
             from PyQt6.QtCore import QBluetoothPermission # pylint: disable=no-name-in-module
             try:
                 def permissionUpdated(permission:'QPermission') -> None:
-                    if permission.status() == Qt.PermissionStatus.Granted: # type:ignore[union-attr,unused-ignore] # ty:ignore[ignore
+                    if permission.status() == Qt.PermissionStatus.Granted: # type:ignore[union-attr,unused-ignore]
                         _log.info('Bluetooth permission updated: granted')
                     else:
                         _log.info('Bluetooth permission updated: denied')
@@ -547,7 +547,7 @@ class Artisan(QtSingleApplication):
                 if res == Qt.PermissionStatus.Undetermined:
                     _log.info('Bluetooth permission not granted. Requesting permission...')
                     if request:
-                        self.requestPermission(bluetoothPermission, permissionUpdated) # type:ignore[arg-type] # ty:ignore[ignore]
+                        self.requestPermission(bluetoothPermission, permissionUpdated) # type:ignore[arg-type]
                     return None
                 return res == Qt.PermissionStatus.Granted
             except Exception as e:
@@ -698,6 +698,7 @@ if platform.system().startswith('Windows'):
 
 from artisanlib.s7port import s7port
 from artisanlib.wsport import wsport
+from artisanlib.mqttport import mqttport
 from artisanlib.modbusport import modbusport
 from artisanlib.slider_style import artisan_slider_style
 from artisanlib.event_button_style import artisan_event_button_style
@@ -763,7 +764,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
         # holds the last known cursor event while mouse pointer is in canvas, set by mouse_move()
         self._last_event:mplLocationevent|None = None
 
-        NavigationToolbar.__init__(self, plotCanvas, parent) # type:ignore[no-untyped-call] # ty:ignore[ignore]
+        NavigationToolbar.__init__(self, plotCanvas, parent) # type:ignore[no-untyped-call]
 
         # lets make the font of the coordinates QLabel a little larger
         f = self.locLabel.font()
@@ -807,13 +808,13 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
 
         self.aw.updatePlusStatus(self)
 
-        self.update_view_org = self._update_view # type: ignore[has-type] # ty:ignore[ignore] # Cannot determine type of "_update_view"
+        self.update_view_org = self._update_view # type: ignore[has-type] # Cannot determine type of "_update_view"
         self._update_view = self.update_view_new # pyright: ignore # Cannot assign to a method  [method-assign]
 
         self.release_pan_org = self.release_pan
-        self.release_pan = self.release_pan_new # type:ignore[method-assign,misc,unused-ignore] # ty:ignore[unused-ignore]  # Cannot assign to a method  [method-assign]
+        self.release_pan = self.release_pan_new # type:ignore[method-assign,misc,unused-ignore]  # Cannot assign to a method  [method-assign]
         self.release_zoom_org = self.release_zoom
-        self.release_zoom = self.release_zoom_new # type:ignore[method-assign,misc,unused-ignore] # ty:ignore[unused-ignore] # Cannot assign to a method  [method-assign]
+        self.release_zoom = self.release_zoom_new # type:ignore[method-assign,misc,unused-ignore] # Cannot assign to a method  [method-assign]
 
 #        # monkey patch matplotlib figureoptions that links to svg icon by default (crashes Windows Qt4 builds!)
 #        if not svgsupport:
@@ -907,7 +908,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
                                         translated_tpls.append(tuple(tpl_list))# pyright:ignore[reportUnknownArgumentType]
                                     else:
                                         translated_tpls.append(tpl) # pyright:ignore[reportUnknownArgumentType]
-                            l[0] = translated_tpls # type: ignore[index] # ty:ignore[ignore] # Unsupported target for indexed assignment ("List[Any]|tuple[Any,...]")
+                            l[0] = translated_tpls # type: ignore[index] # Unsupported target for indexed assignment ("List[Any]|tuple[Any,...]")
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
                 def my_apply(data:dict[Any,Any]) -> None:
@@ -938,7 +939,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
                                 tb.push_current()
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
-                dialog = formlayout.FormDialog(data, QApplication.translate('Toolbar', 'Lines'), comment, icon, parent, my_apply) # type: ignore[no-untyped-call] # ty:ignore[ignore]
+                dialog = formlayout.FormDialog(data, QApplication.translate('Toolbar', 'Lines'), comment, icon, parent, my_apply) # type: ignore[no-untyped-call]
                 dialog.exec()
 
 #######################################################################################
@@ -1087,10 +1088,10 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
         backgroundtimeindex = None # caches the background timex index computed at x cursor position
         # update xy cursor position widget
         if self._last_event is None:
-            self.set_message(f'<PRE>{self.mode}</PRE>') # type:ignore[no-untyped-call] # ty:ignore[ignore]
+            self.set_message(f'<PRE>{self.mode}</PRE>') # type:ignore[no-untyped-call]
         else:
             if not self.qmc.fmt_data_ON:
-                self.set_message(f'<PRE>{self.mode}</PRE>') # type:ignore[no-untyped-call] # ty:ignore[ignore]
+                self.set_message(f'<PRE>{self.mode}</PRE>') # type:ignore[no-untyped-call]
             else:
                 try:
                     channel = ''
@@ -1143,15 +1144,15 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
                             if inaxes is not None and self._last_event.ydata is not None:
                                 ys = float(inaxes.format_ydata(self._last_event.ydata))
                 except Exception: # pylint: disable=broad-except
-                    self.set_message(f'<PRE>{self.mode}</PRE>') # type:ignore[no-untyped-call] # ty:ignore[ignore]
+                    self.set_message(f'<PRE>{self.mode}</PRE>') # type:ignore[no-untyped-call]
                 else:
                     min_temp_digits = 5 if self.qmc.LCDdecimalplaces else 3
                     if self.qmc.fmt_data_RoR:
                         min_temp_digits -= 1
                     if self.mode:
-                        self.set_message(f"<PRE>{self.mode}  {xs: >5}\n{channel} {'' if ys is None else ys: >{min_temp_digits}}\u00B0{self.qmc.mode}{'/min' if self.qmc.fmt_data_RoR else ''}</PRE>") # type:ignore[no-untyped-call] # ty:ignore[ignore]
+                        self.set_message(f"<PRE>{self.mode}  {xs: >5}\n{channel} {'' if ys is None else ys: >{min_temp_digits}}\u00B0{self.qmc.mode}{'/min' if self.qmc.fmt_data_RoR else ''}</PRE>") # type:ignore[no-untyped-call]
                     else:
-                        self.set_message(f"<PRE>{xs: >5}\n{channel} {'' if ys is None else ys: >{min_temp_digits}}\u00B0{self.qmc.mode}{'/min' if self.qmc.fmt_data_RoR else ''}</PRE>") # type:ignore[no-untyped-call] # ty:ignore[ignore]
+                        self.set_message(f"<PRE>{xs: >5}\n{channel} {'' if ys is None else ys: >{min_temp_digits}}\u00B0{self.qmc.mode}{'/min' if self.qmc.fmt_data_RoR else ''}</PRE>") # type:ignore[no-untyped-call]
             # update running LCDs
             if not self.qmc.flagon and self.aw.comparator is None and self._last_event.xdata is not None:
                 if self.qmc.running_LCDs == 1: # show foreground profile readings at cursor position in LCDs
@@ -1309,7 +1310,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
 
                     with warnings.catch_warnings():
                         warnings.filterwarnings('ignore') # , category=numpy.VisibleDeprecationWarning)
-                        figureoptions.figure_edit(axes) # type:ignore[no-untyped-call] # ty:ignore[ignore]
+                        figureoptions.figure_edit(axes) # type:ignore[no-untyped-call]
 #                        for line in steps_post_lines:
 #                            line.set_drawstyle("steps-post")
 
@@ -1784,8 +1785,10 @@ class ApplicationWindow(QMainWindow):
         #create an s7 port object (main s7 device)
         self.s7:s7port = s7port(self)
         self.extraS7tx:float = 0.
-        #create an WebSocket port object (main device eg Probat Sample)
+        #create an WebSocket port object
         self.ws:wsport = wsport(self)
+        #create an MQTT port object
+        self.mqtt:mqttport = mqttport(self)
         #list with extra serial ports (extra devices)
         self.extraser:list[serialport] = []
         #extra comm port settings
@@ -5633,9 +5636,9 @@ class ApplicationWindow(QMainWindow):
         if 'colorSystem' in rr:
             if rr['colorSystem'] in self.qmc.color_systems:
                 self.qmc.color_system_idx = self.qmc.color_systems.index(rr['colorSystem'])
-            elif isinstance(rr['colorSystem'], int) and rr['colorSystem'] < len(self.qmc.color_systems): # type: ignore[unreachable] # ty:ignore[ignore]
+            elif isinstance(rr['colorSystem'], int) and rr['colorSystem'] < len(self.qmc.color_systems): # type: ignore[unreachable]
                 # to stay compatible with older versions were rr['colorSystem'] was an index instead of the name of a system
-                self.qmc.color_system_idx = rr['colorSystem'] # type: ignore[unreachable] # ty:ignore[ignore]
+                self.qmc.color_system_idx = rr['colorSystem'] # type: ignore[unreachable]
 
         # Note: the background profile will not be changed if recent roast is activated from Roast Properties
 #PLUS
@@ -5895,6 +5898,7 @@ class ApplicationWindow(QMainWindow):
                     self.loadSettings(fn=action.data()[0],remember=False,machine=True,reload=False)
                     res:bool = False
                     res2: bool|None = None
+                    ### setup specific configuration dialogs
                     if action.data()[1] == 'Phidget':
                         if action.text() == 'VINT Ambient Modules':
                             elevation, res2 = QInputDialog.getInt(self,
@@ -5913,9 +5917,41 @@ class ApplicationWindow(QMainWindow):
                             self.qmc.machinesetup = action.text()
                         if res:
                             QTimer.singleShot(700, self.qmc.startPhidgetManager)
+                    elif action.data()[1] == 'ROEST' and self.qmc.device:
+                        # select ROEST machine and retrieve MQTT credentials
+                        from artisanlib.roest import RoestMachine, selectROESTmachine
+                        roest_machine:RoestMachine|None = selectROESTmachine(self)
+                        if roest_machine is not None:
+                            self.mqtt.user = roest_machine['mqtt_user']
+                            self.mqtt.password = roest_machine['mqtt_password']
+                            self.mqtt.topic = roest_machine['mqtt_topic']
+
+                            has_drum = roest_machine.get('has_drum', None)
+                            if has_drum is not None:
+                                self.extraLCDvisibility1[0] = has_drum
+                                self.extraLCDframe1[0].setVisible(has_drum)
+                                self.extraCurveVisibility1[0] = has_drum
+                                self.qmc.resetlinecountcaches()
+
+                            has_inlet = roest_machine.get('has_inlet', None)
+                            if has_inlet is not None:
+                                self.extraLCDvisibility2[0] = has_inlet
+                                self.extraLCDframe2[0].setVisible(has_inlet)
+                                self.extraCurveVisibility2[0] = has_inlet
+                                self.qmc.resetlinecountcaches()
+
+                            if 'next_batch_number' in roest_machine:
+                                self.qmc.batchcounter = max(0, roest_machine['next_batch_number'] - 1)
+                            if 'elevation' in roest_machine:
+                                self.qmc.elevation = roest_machine['elevation']
+                            res = True
+                        else:
+                            res = False
+                            self.sendmessage(QApplication.translate('Message','Action canceled'))
                     else:
                         self.qmc.machinesetup = action.text()
                         res = True
+                    ###
                     if (self.qmc.device == 29 or 29 in self.qmc.extradevices) and self.modbus.type in {3,4}: # MODBUS TCP or UDP
                         # as default we offer the current settings MODBUS host, or if this is set to its default as after a factory reset (self.modbus.default_host) we take the one from the machine setup
                         defaultModbusHost:str = (self.modbus.host if org_modbus_host == self.modbus.default_host else org_modbus_host)
@@ -6289,7 +6325,7 @@ class ApplicationWindow(QMainWindow):
     def colorDifference(self, color1:str|None, color2:str|None) -> float:
         cDiff = 100
         try:
-            from colorspacious import deltaE # type: ignore[import-untyped] # ty:ignore[ignore]
+            from colorspacious import deltaE # type: ignore[import-untyped]
             if color1 is None or color1 == 'None':
                 color1 = '#f0f0f0'
             if color2 is None or color2 == 'None':
@@ -6501,9 +6537,9 @@ class ApplicationWindow(QMainWindow):
             self.level1layout.removeWidget(self.ntb) # remove current bar
 
             if self.ntb.mode == MPL_Mode.PAN:
-                self.ntb.pan() # type:ignore[no-untyped-call] # ty:ignore[ignore] # PAN is active, we deactivate it before changing the ToolBar
+                self.ntb.pan() # type:ignore[no-untyped-call] # PAN is active, we deactivate it before changing the ToolBar
             if self.ntb.mode == MPL_Mode.ZOOM:
-                self.ntb.zoom() # type:ignore[no-untyped-call] # ty:ignore[ignore] # ZOOM is active, we deactivate it before changing the ToolBar
+                self.ntb.zoom() # type:ignore[no-untyped-call] # ZOOM is active, we deactivate it before changing the ToolBar
             self.removeToolBar(self.ntb)
 #            self.ntb.hide() # seems not to be necessary anymore with the removeToolBar() above
             self.ntb.destroy()
@@ -9361,6 +9397,8 @@ class ApplicationWindow(QMainWindow):
                     ##  santoker(<target>,<value>) : the byte <target> indicates where <value> of type integer should be written to
                     ##  kaleido(<target>,<value>) : the <target> string indicates where <value> of type string should be written to
                     ##  shellyrelay(n,b) : switches Shelly plug number <n> ON if b is true or 1, and OFF otherwise
+                    ##  publish(<topic>,<data>) : converts the given data to JSON and publishs it on the MQTT server to the given topic.
+                    #      Publish will connect to the specified broker if not yet connected and subscribe to the configured topics
                     #
                     if cmd_str:
                         cmds = filter(None, cmd_str.split(';')) # allows for sequences of commands like in "<cmd>;<cmd>;...;<cmd>"
@@ -9620,6 +9658,16 @@ class ApplicationWindow(QMainWindow):
                                         except Exception as e: # pylint: disable=broad-except
                                             _log.error(e)
 
+                                ##  publish(<topic>,<data>) : converts the given data to JSON and publishs it on the MQTT server to the given topic.
+                                #      Publish will connect to the specified broker if not yet connected and subscribe to the configured topics
+                                elif c.startswith('publish'):
+                                    if self.mqtt is not None:
+                                        args = c[len('publish'):]
+                                        if args.startswith('(') and args.endswith(')'):
+                                            comma_pos = args.index(',')
+                                            topic = args[1:comma_pos]
+                                            data = eval(args[comma_pos+1:-1]) # pylint: disable=eval-used
+                                            self.mqtt.publish(topic, data, self.qmc.device_logging)
 
                                 # Yoctopuce Relay Command Actions
                                 # yset(c,b[,sn])
@@ -11238,7 +11286,7 @@ class ApplicationWindow(QMainWindow):
                             # command not recognized
                             _log.info('WebSocket Command <%s> not recognized', cs)
                 elif action == 23:
-                    # PHIDGETS   sn : has the form <hub_serial>[:<hub_port>], an optional serial number of the hub, optionally specifying the port number the module is connected to
+                    # Stepper Command   sn : has the form <hub_serial>[:<hub_port>], an optional serial number of the hub, optionally specifying the port number the module is connected to
                     ##  rescale(ch,rs,[,sn]) : sets the rescaleFactor
                     ##  engaged(ch,b[,sn])   : engage (b=1) or disengage (b = 0)
                     ##  set(ch,pos[,sn])     : set the target position
@@ -14029,7 +14077,7 @@ class ApplicationWindow(QMainWindow):
         try:
             dirty = False
             for j,xd in enumerate(self.qmc.extradevices):
-                if xd == 25:  #virtual device
+                if xd in {25, 50}:  #virtual or dummy device
                     if len(self.qmc.extratimex[j]) > 0 and not update:  # move on if the virtual device already has data
                         continue
 
@@ -15210,7 +15258,7 @@ class ApplicationWindow(QMainWindow):
                 from openpyxl.cell import MergedCell
 
                 wb = Workbook()
-                ws:Worksheet|None = wb.active # type: ignore[assignment,unused-ignore] # ty:ignore[ignore] # Incompatible types in assignment (expression has type "_WorkbookChild|None", variable has type "Worksheet|None")
+                ws:Worksheet|None = wb.active # type: ignore[assignment,unused-ignore] # Incompatible types in assignment (expression has type "_WorkbookChild|None", variable has type "Worksheet|None")
                 if ws is not None:
                     ws.title = QApplication.translate('HTML Report Template', 'Profile')
 
@@ -15286,8 +15334,8 @@ class ApplicationWindow(QMainWindow):
                             time2 = '' #@UnusedVariable #@UnusedVariable # pylint: disable=unused-variable # noqa: F841
                         event:str = ''     #@UnusedVariable #@UnusedVariable # pylint: disable=unused-variable # noqa: F841
                         for ev in events:
-                            if not ev[2] and int(round(tx)) == int(round(ev[0])): # type: ignore[arg-type] # ty:ignore[ignore]
-                                event = ev[1] # type: ignore[assignment] # ty:ignore[ignore] # #@UnusedVariable #@UnusedVariable # pylint: disable=unused-variable # noqa: F841
+                            if not ev[2] and int(round(tx)) == int(round(ev[0])): # type: ignore[arg-type]
+                                event = ev[1] # type: ignore[assignment] # #@UnusedVariable #@UnusedVariable # pylint: disable=unused-variable # noqa: F841
                                 ev[2] = True
                                 break
                         if i in self.qmc.specialevents:
@@ -18565,6 +18613,30 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
 #--- END GROUP S7
 
+#--- BEGIN GROUP MQTT
+            #restore MQTT port
+            settings.beginGroup('MQTT')
+            self.mqtt.protocol_version = toInt(settings.value('protocol_version',self.mqtt.protocol_version))
+            self.mqtt.transport = toInt(settings.value('transport',self.mqtt.transport))
+            self.mqtt.tls = toBool(settings.value('tls',self.mqtt.tls))
+            self.mqtt.host = toString(settings.value('host',self.mqtt.host))
+            self.mqtt.port = toInt(settings.value('port',self.mqtt.port))
+            self.mqtt.user = toString(settings.value('user',self.mqtt.user))
+            self.mqtt.connect_timeout = toFloat(settings.value('connect_timeout',self.mqtt.connect_timeout))
+            self.mqtt.keepalive = toInt(settings.value('keepalive',self.mqtt.keepalive))
+            self.mqtt.topic = toString(settings.value('topic',self.mqtt.topic))
+            self.mqtt.channel_topics = list(toStringList(settings.value('channel_topics',self.mqtt.channel_topics)))[:self.mqtt.CHANNELS]
+            self.mqtt.channel_topics = self.mqtt.channel_topics + ['']*max(0, self.mqtt.CHANNELS - len(self.mqtt.channel_topics))
+            self.mqtt.channel_nodes = list(toStringList(settings.value('channel_nodes',self.mqtt.channel_nodes)))[:self.mqtt.CHANNELS]
+            self.mqtt.channel_nodes = self.mqtt.channel_nodes + ['']*max(0, self.mqtt.CHANNELS - len(self.mqtt.channel_nodes))
+            self.mqtt.channel_modes = list(toStringList(settings.value('channel_modes',self.mqtt.channel_modes)))[:self.mqtt.CHANNELS]
+            self.mqtt.channel_modes = self.mqtt.channel_modes + ['']*max(0, self.mqtt.CHANNELS - len(self.mqtt.channel_modes))
+            settings.endGroup()
+#--- END GROUP MQTT
+
+            self.mqtt.load_credentials() # if self.mqtt.user is set we try to load the self.mqtt.password from the keychain
+
+
 #--- BEGIN GROUP Modbus
             #restore modbus port
             settings.beginGroup('Modbus')
@@ -20084,40 +20156,14 @@ class ApplicationWindow(QMainWindow):
     @functools.cache
     def get_os() -> tuple[str,str,str]:
         # subprocess above below is problematic in signed builds on macOS 14 especially on AppleSilicon
-#        def get_macOS_version():
-#            # platform.mac_ver() returns 10.16-style version info on BigSur
-#            # and is likely to do so until Python is compiled with the macOS 11 SDK
-#            # which may not happen for a while. And Apple's odd tricks mean that even
-#            # reading /System/Library/CoreServices/SystemVersion.plist is unreliable.
-#            import subprocess
-#            try:
-#                os_version_tuple = subprocess.check_output(
-#                    ('/usr/bin/sw_vers', '-productVersion'),
-#                    env={'SYSTEM_VERSION_COMPAT': '0'}
-#                ).decode('UTF-8').rstrip().split('.')
-#            except subprocess.CalledProcessError:
-#                os_version_tuple = platform.mac_ver()[0].split('.')
-#            os_version_tuple = platform.mac_ver()[0].split('.')
-#            os_version_tuple = os_version_tuple[0:2]
-#            return '.'.join(os_version_tuple)
-# cpuinfo.get_cpu_info().get('brand_raw') hangs on macOS 14 if app is signed (not cpuinfo needs multiprocessing.freeze_support() !)
-#        def get_macOS_arch():
-#            # platform.machine() returns x86_64 on M1 macs running Artisan under Rossetta2
-#            try:
-#                import cpuinfo # type: ignore # ty:ignore[ignore]
-#                manufacturer = cpuinfo.get_cpu_info().get('brand_raw')
-#                return 'm1' if 'm1' in manufacturer.lower() else 'x86_64'
-#            except Exception as e: # pylint: disable=broad-except
-#                return platform.machine()
         try:
             if platform.system().startswith('Darwin'):
-#                return 'macOS', get_macOS_version(), get_macOS_arch()
                 return 'macOS', platform.mac_ver()[0], platform.machine() # reports wrong version on macOS 12 on older Python versions
             if platform.system().startswith('Windows'):
                 return 'Windows', platform.release(), platform.machine()
             # we assume Linux
-            if os.uname()[4][:3] == 'arm': # type:ignore[unused-ignore,attr-defined] # ty:ignore[ignore] # pylint: disable=no-member # not available on Windows
-                return 'RPi',platform.release(),os.uname()[4] # type:ignore[unused-ignore,attr-defined] # ty:ignore[ignore] # pylint: disable=no-member # not available on Windows
+            if os.uname()[4][:3] == 'arm': # type:ignore[unused-ignore,attr-defined] # pylint: disable=no-member # not available on Windows
+                return 'RPi',platform.release(),os.uname()[4] # type:ignore[unused-ignore,attr-defined] # pylint: disable=no-member # not available on Windows
             try:
                 lib,version = platform.libc_ver()
                 return 'Linux',f'{lib} {version}', platform.machine()
@@ -20526,6 +20572,24 @@ class ApplicationWindow(QMainWindow):
             self.settingsSetValue(settings, default_settings, 'fetch_max_blocks',self.s7.fetch_max_blocks, read_defaults)
             settings.endGroup()
 #--- END GROUP S7
+
+#--- BEGIN GROUP MQTT
+            #restore MQTT port
+            settings.beginGroup('MQTT')
+            self.settingsSetValue(settings, default_settings, 'protocol_version',self.mqtt.protocol_version, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'transport',self.mqtt.transport, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'tls',self.mqtt.tls, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'host',self.mqtt.host, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'port',self.mqtt.port, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'user',self.mqtt.user, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'connect_timeout',self.mqtt.connect_timeout, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'keepalive',self.mqtt.keepalive, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'topic',self.mqtt.topic, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'channel_topics',self.mqtt.channel_topics, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'channel_nodes',self.mqtt.channel_nodes, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'channel_modes',self.mqtt.channel_modes, read_defaults)
+            settings.endGroup()
+#--- END GROUP MQTT
 
 #--- BEGIN GROUP Modbus
             #save modbus port
@@ -22040,7 +22104,7 @@ class ApplicationWindow(QMainWindow):
                     from openpyxl.utils.cell import get_column_letter  # @UnusedImport # pylint: disable=unused-import # noqa: F401
                     from openpyxl.styles import Font, Fill  # @UnusedImport # pylint: disable=unused-import # noqa: F401
                     wb = Workbook()
-                    ws:Worksheet|None = wb.active # type: ignore[assignment,unused-ignore] # ty:ignore[ignore] # Incompatible types in assignment (expression has type "_WorkbookChild|None", variable has type "Worksheet|None")
+                    ws:Worksheet|None = wb.active # type: ignore[assignment,unused-ignore] # Incompatible types in assignment (expression has type "_WorkbookChild|None", variable has type "Worksheet|None")
 
                     if ws is not None:
                         ws.title = QApplication.translate('HTML Report Template', 'Production Report')
@@ -22090,7 +22154,7 @@ class ApplicationWindow(QMainWindow):
                                 c += 1
                                 d = self.productionData2string(raw_data,units=False)
                                 ws[f'A{c}'] = d['id']
-                                ws[f'B{c}'] = QDateTime(d['datetime']).toPyDateTime() # type: ignore[assignment, unused-ignore] # ty:ignore[ignore] # Incompatible types in assignment (expression has type "datetime", target has type "str")
+                                ws[f'B{c}'] = QDateTime(d['datetime']).toPyDateTime() # type: ignore[assignment, unused-ignore] # Incompatible types in assignment (expression has type "datetime", target has type "str")
                                 ws[f'B{c}'].number_format = 'YYYY-MM-DD HH:MM'
                                 ws[f'C{c}'] = d['title']
                                 ws[f'D{c}'] = d['beans']
@@ -22098,15 +22162,15 @@ class ApplicationWindow(QMainWindow):
                                 weight = raw_data.get('weight', (0, 0, weight_units[1]))
                                 w_in = (convertWeight(weight[0],weight_units.index(weight[2]),weight_units.index(unit)) if weight is not None else 0)
                                 w_out = (convertWeight(weight[1],weight_units.index(weight[2]),weight_units.index(unit)) if weight is not None else 0)
-                                ws[f'E{c}'] = w_in # type: ignore[assignment, unused-ignore]# ty:ignore[ignore]  # Incompatible types in assignment (expression has type "float", target has type "str")
+                                ws[f'E{c}'] = w_in # type: ignore[assignment, unused-ignore]  # Incompatible types in assignment (expression has type "float", target has type "str")
                                 ws[f'E{c}'].number_format = num_format
-                                ws[f'F{c}'] = w_out # type: ignore[assignment, unused-ignore] # ty:ignore[ignore] # Incompatible types in assignment (expression has type "float", target has type "str")
+                                ws[f'F{c}'] = w_out # type: ignore[assignment, unused-ignore] # Incompatible types in assignment (expression has type "float", target has type "str")
                                 ws[f'F{c}'].number_format = num_format
                                 ws[f'G{c}'] = avgFormat(c,'E','F')
                                 ws[f'G{c}'].number_format = ('0.00%' if self.percent_decimals == 2 else '0.0%')
 
                                 w_def = (convertWeight(raw_data.get('defects_weight',0),weight_units.index(weight[2]),weight_units.index(unit)) if weight is not None else 0)
-                                ws[f'H{c}'] = w_def # type: ignore[assignment, unused-ignore] # ty:ignore[ignore] # Incompatible types in assignment (expression has type "float", target has type "str")
+                                ws[f'H{c}'] = w_def # type: ignore[assignment, unused-ignore] # Incompatible types in assignment (expression has type "float", target has type "str")
                                 ws[f'H{c}'].number_format = num_format
                                 ws[f'I{c}'] = f'=IF(F{c}=0,0,(H{c}) / F{c})'
                                 ws[f'I{c}'].number_format = ('0.00%' if self.percent_decimals == 2 else '0.0%')
@@ -23286,7 +23350,7 @@ class ApplicationWindow(QMainWindow):
             from openpyxl.utils.cell import get_column_letter,column_index_from_string  # @UnusedImport # pylint: disable=unused-import # noqa: F401
             from openpyxl.styles import Font, Fill, Alignment # @UnusedImport # pylint: disable=unused-import # noqa: F401
             wb = Workbook()
-            ws:Worksheet|None = wb.active # type: ignore[assignment,unused-ignore] # ty:ignore[ignore] # Incompatible types in assignment (expression has type "_WorkbookChild|None", variable has type "Worksheet|None")
+            ws:Worksheet|None = wb.active # type: ignore[assignment,unused-ignore] # Incompatible types in assignment (expression has type "_WorkbookChild|None", variable has type "Worksheet|None")
             if ws is not None:
                 ws.title = QApplication.translate('HTML Report Template', 'Ranking Report')
                 bf = Font(name='Calibri',size='11',bold=True)
@@ -23378,7 +23442,7 @@ class ApplicationWindow(QMainWindow):
                                     conv_fld = res_fld
 
                                 if typ == 'text':
-                                    ws[cr] = conv_fld # type: ignore[assignment, unused-ignore] # ty:ignore[ignore]
+                                    ws[cr] = conv_fld # type: ignore[assignment, unused-ignore]
                                     width = len(str(conv_fld)) + 2. # pyright:ignore[reportUnknownArgumentType]
                                     if re.match(r'[0-9]+',units) and width > float(units):
                                         width = float(units)
@@ -23387,35 +23451,35 @@ class ApplicationWindow(QMainWindow):
                                         ws.column_dimensions[get_column_letter(cnum)].width = width   # pyrefly:ignore[bad-assignment]
                                     ws[cr].alignment = Alignment(wrap_text=True)
                                 elif typ == 'int':
-                                    ws[cr] = conv_fld  # type: ignore[assignment, unused-ignore] # ty:ignore[ignore]
+                                    ws[cr] = conv_fld  # type: ignore[assignment, unused-ignore]
                                 elif typ == 'float1':
-                                    ws[cr] = conv_fld  # type: ignore[assignment, unused-ignore] # ty:ignore[ignore]
+                                    ws[cr] = conv_fld  # type: ignore[assignment, unused-ignore]
                                     ws[cr].number_format = '0.0'
                                 elif typ == 'float2':
-                                    ws[cr] = conv_fld  # type: ignore[assignment, unused-ignore] # ty:ignore[ignore]
+                                    ws[cr] = conv_fld  # type: ignore[assignment, unused-ignore]
                                     ws[cr].number_format = '0.00'
                                 elif typ == 'float4':
-                                    ws[cr] = conv_fld  # type: ignore[assignment, unused-ignore] # ty:ignore[ignore]
+                                    ws[cr] = conv_fld  # type: ignore[assignment, unused-ignore]
                                     ws[cr].number_format = '0.0000'
                                 elif typ == 'text2float1':
-                                    ws[cr] = float2float(toFloat(conv_fld)) # type: ignore[assignment, unused-ignore] # ty:ignore[ignore] #  Incompatible types in assignment (expression has type "float", target has type "str")
+                                    ws[cr] = float2float(toFloat(conv_fld)) # type: ignore[assignment, unused-ignore] #  Incompatible types in assignment (expression has type "float", target has type "str")
                                     ws[cr].number_format = '0.0'
                                 elif typ == 'text2float2':
-                                    ws[cr] = float2float(toFloat(conv_fld)) # type: ignore[assignment, unused-ignore] # ty:ignore[ignore] # Incompatible types in assignment (expression has type "float", target has type "str")
+                                    ws[cr] = float2float(toFloat(conv_fld)) # type: ignore[assignment, unused-ignore] # Incompatible types in assignment (expression has type "float", target has type "str")
                                     ws[cr].number_format = '0.00'
                                 elif typ == 'text2int':
-                                    ws[cr] = toInt(conv_fld) # type: ignore[assignment, unused-ignore] # ty:ignore[ignore]
+                                    ws[cr] = toInt(conv_fld) # type: ignore[assignment, unused-ignore]
                                     ws[cr].number_format = '0'
                                 elif typ == 'percent':
-                                    ws[cr] = conv_fld/100. # type: ignore[assignment, unused-ignore] # ty:ignore[ignore]
+                                    ws[cr] = conv_fld/100. # type: ignore[assignment, unused-ignore]
                                     ws[cr].number_format = ('0.00%' if self.percent_decimals == 2 else '0.0%')
                                 elif typ == 'time':
                                     h,m = divmod(conv_fld, 60.0) # pyright:ignore[reportUnknownArgumentType]
                                     dt = datetime.time(int(h),int(m),0) # note that rounding h and m might lead to failure of .time() as round(59.99) = 60 which is >59 thus not accepted by .time()
-                                    ws[cr] = dt # type: ignore[assignment, unused-ignore] # ty:ignore[ignore] # Incompatible types in assignment (expression has type "time", target has type "str")
+                                    ws[cr] = dt # type: ignore[assignment, unused-ignore] # Incompatible types in assignment (expression has type "time", target has type "str")
                                     ws[cr].number_format = 'H:MM'
                                 elif typ == 'date':
-                                    ws[cr] = QDateTime(conv_fld).toPyDateTime() # type: ignore[call-overload] # ty:ignore[ignore] # Incompatible types in assignment (expression has type "datetime", target has type "str")
+                                    ws[cr] = QDateTime(conv_fld).toPyDateTime() # type: ignore[call-overload] # Incompatible types in assignment (expression has type "datetime", target has type "str")
                                     fmt = 'YYYY-MM-DD HH:MM'
                                     ws[cr].number_format = fmt
                                     width = len(fmt) + 2.
@@ -24491,18 +24555,18 @@ class ApplicationWindow(QMainWindow):
         name:str = (application_viewer_name if self.app.artisanviewerMode else application_name)
         otherlibs:str = ''
         try:
-            from Phidget22.Phidget import Phidget as PhidgetDriver # type: ignore[import-untyped] # ty:ignore[ignore]
+            from Phidget22.Phidget import Phidget as PhidgetDriver # type: ignore[import-untyped]
             phidgetlibversion = PhidgetDriver.getLibraryVersion()
             otherlibs += ', ' + phidgetlibversion
         except Exception as e: # pylint: disable=broad-except
             _log.debug(e)
         try:
-            from Phidget22 import __version__ as phidget_lib_version # type: ignore[import-untyped] # ty:ignore[ignore # @UnresolvedImport
+            from Phidget22 import __version__ as phidget_lib_version # type: ignore[import-untyped] # @UnresolvedImport
             otherlibs += f' ({phidget_lib_version})'
         except Exception: # pylint: disable=broad-except
             pass
         try:
-            yocto_version = YAPI.GetAPIVersion() # type:ignore[reportPossibleUnboundVariable,unused-ignore] # ty:ignore[ignore]
+            yocto_version = YAPI.GetAPIVersion() # type:ignore[reportPossibleUnboundVariable,unused-ignore]
             otherlibs += ', Yoctopuce ' + yocto_version
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
@@ -24767,6 +24831,44 @@ class ApplicationWindow(QMainWindow):
                 self.modbus.port = toInt(str(dialog.modbus_portEdit.text()))
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
+
+            # MQTT Setup
+            try:
+                self.mqtt.protocol_version = dialog.mqtt_protocolCombo.currentIndex()
+                self.mqtt.transport = dialog.mqtt_transportCombo.currentIndex()
+                self.mqtt.tls = dialog.mqtt_tls_checkBox.isChecked()
+                self.mqtt.host = str(dialog.mqtt_hostEdit.text()).strip()
+                self.mqtt.port = toInt(str(dialog.mqtt_portEdit.text()))
+                self.mqtt.user = str(dialog.mqtt_user_Edit.text()).strip()
+                password = str(dialog.mqtt_password_Edit.text()).strip()
+                self.mqtt.connect_timeout = float(dialog.mqtt_connect_timeoutEdit.text())
+                self.mqtt.keepalive = toInt(str(dialog.mqtt_keepaliveEdit.text()))
+                self.mqtt.topic = str(dialog.mqtt_topic_Edit.text()).strip()
+                if password != self.mqtt.password:
+                    self.mqtt.password = password
+                    self.mqtt.store_credentials() # store/update MQTT credentials in keychain
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
+
+            for i in range(self.mqtt.CHANNELS):
+                try:
+                    mqtt_input_topic = dialog.mqtt_inputTopics[i]
+                    if mqtt_input_topic is not None:
+                        self.mqtt.channel_topics[i] = str(mqtt_input_topic.text()).strip()
+                except Exception: # pylint: disable=broad-except
+                    self.mqtt.channel_topics[i] = ''
+                try:
+                    mqtt_input_nodes = dialog.mqtt_inputNodes[i]
+                    if mqtt_input_nodes is not None:
+                        self.mqtt.channel_nodes[i] = str(mqtt_input_nodes.text()).strip()
+                except Exception: # pylint: disable=broad-except
+                    self.mqtt.channel_nodes[i] = ''
+                try:
+                    inputMode = dialog.mqtt_inputModes[i]
+                    if inputMode is not None:
+                        self.mqtt.channel_modes[i] = str(inputMode.currentText())
+                except Exception: # pylint: disable=broad-except
+                    self.mqtt.channel_modes[i] = 'C'
 
             # WebSocket Setup
             try:
@@ -27873,7 +27975,7 @@ sys.excepthook = excepthook
 # "The Artisan Profile type doesn't map to any NSDocumentClass." on startup (since pyobjc-core 3.1.1)
 if sys.platform.startswith('darwin'):
     from Cocoa import NSDocument # type: ignore[import-untyped] # @UnresolvedImport # pylint: disable=import-error,no-name-in-module
-    class Document(NSDocument): # type: ignore[misc,no-any-unimported] # ty:ignore[ignore] # pylint: disable= too-few-public-methods
+    class Document(NSDocument): # type: ignore[misc,no-any-unimported] # pylint: disable= too-few-public-methods
 #        def windowNibName(self):
 #            return None #"Document"
         def makeWindowControllers(self) -> None:
@@ -28041,7 +28143,7 @@ def main() -> None:
 
     # only here deactivating the app napping seems to have an effect
     if sys.platform.startswith('darwin'):
-        import appnope # pyright: ignore # @UnresolvedImport # type: ignore # ty:ignore[ignore] # pylint: disable=import-error,redefined-outer-name
+        import appnope # pyright:ignore # @UnresolvedImport # type:ignore[import-not-found, unused-ignore] # pylint: disable=import-error,redefined-outer-name
         appnope.nope()
 
     if locale_str in {'ar', 'he', 'fa'}:

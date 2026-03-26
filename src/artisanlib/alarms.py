@@ -919,7 +919,10 @@ class AlarmDlg(ArtisanResizeablDialog):
                                  QApplication.translate('ComboBox','Playback OFF'),
                                  QApplication.translate('ComboBox','Set Canvas Color'),
                                  QApplication.translate('ComboBox','Reset Canvas Color')])
-        actionComboBox.setCurrentIndex(self.aw.qmc.alarmaction[i] + 1)
+        try:
+            actionComboBox.setCurrentIndex(self.aw.qmc.alarmaction[i] + 1)
+        except Exception: # pylint: disable=broad-except
+            pass
         #10: beep
         beepWidget = QWidget()
         beepCheckBox = QCheckBox()

@@ -411,9 +411,13 @@ include = [
 ]
 
 [tool.ty.rules]
+invalid-key = "ignore"
 invalid-argument-type = "ignore"
 invalid-method-override = "ignore"
 invalid-assignment = "ignore"
+unknown-argument = "ignore"
+unresolved-attribute = "ignore"
+unresolved-import = "ignore"
 #unused-ignore-comment = "warn"
 #redundant-cast = "ignore"
 #possibly-unbound-attribute = "error"
