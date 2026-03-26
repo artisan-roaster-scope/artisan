@@ -178,6 +178,26 @@
 </context><context>
     <name>Button</name>
     <message>
+        <location filename="../artisanlib/dialogs.py" line="623" />
+        <location filename="../artisanlib/dialogs.py" line="87" />
+        <location filename="../artisanlib/comm.py" line="200" />
+        <location filename="../artisanlib/pid_dialogs.py" line="2813" />
+        <location filename="../artisanlib/pid_dialogs.py" line="1942" />
+        <location filename="../artisanlib/pid_dialogs.py" line="923" />
+        <location filename="../plus/login.py" line="73" />
+        <source>OK</source>
+        <translation>OK</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/dialogs.py" line="624" />
+        <location filename="../artisanlib/dialogs.py" line="88" />
+        <location filename="../artisanlib/comm.py" line="201" />
+        <location filename="../artisanlib/pid_dialogs.py" line="3101" />
+        <location filename="../plus/login.py" line="78" />
+        <source>Cancel</source>
+        <translation>Mégsem</translation>
+    </message>
+    <message>
         <location filename="../artisanlib/colors.py" line="567" />
         <location filename="../artisanlib/designer.py" line="244" />
         <location filename="../artisanlib/phases.py" line="119" />
@@ -297,17 +317,6 @@
         <location filename="../artisanlib/pid_dialogs.py" line="903" />
         <source>Save</source>
         <translation type="unfinished">Mentés</translation>
-    </message>
-    <message>
-        <location filename="../plus/login.py" line="73" />
-        <location filename="../artisanlib/dialogs.py" line="623" />
-        <location filename="../artisanlib/dialogs.py" line="87" />
-        <location filename="../artisanlib/comm.py" line="200" />
-        <location filename="../artisanlib/pid_dialogs.py" line="2813" />
-        <location filename="../artisanlib/pid_dialogs.py" line="1942" />
-        <location filename="../artisanlib/pid_dialogs.py" line="923" />
-        <source>OK</source>
-        <translation>OK</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="925" />
@@ -520,15 +529,6 @@
         <location filename="../artisanlib/pid_dialogs.py" line="3095" />
         <source>Write PIDs</source>
         <translation>PID-k írása</translation>
-    </message>
-    <message>
-        <location filename="../plus/login.py" line="78" />
-        <location filename="../artisanlib/dialogs.py" line="624" />
-        <location filename="../artisanlib/dialogs.py" line="88" />
-        <location filename="../artisanlib/comm.py" line="201" />
-        <location filename="../artisanlib/pid_dialogs.py" line="3101" />
-        <source>Cancel</source>
-        <translation>Mégsem</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3169" />
@@ -1122,6 +1122,17 @@ VÉGE</translation>
 </context><context>
     <name>CheckBox</name>
     <message>
+        <location filename="../artisanlib/curves.py" line="1038" />
+        <location filename="../artisanlib/curves.py" line="949" />
+        <location filename="../artisanlib/curves.py" line="943" />
+        <location filename="../artisanlib/curves.py" line="936" />
+        <location filename="../artisanlib/curves.py" line="918" />
+        <location filename="../artisanlib/background.py" line="62" />
+        <location filename="../plus/schedule.py" line="1580" />
+        <source>Show</source>
+        <translation>Előadás</translation>
+    </message>
+    <message>
         <location filename="../artisanlib/axis.py" line="167" />
         <source>Expand</source>
         <translation>Kiterjed</translation>
@@ -1311,17 +1322,6 @@ VÉGE</translation>
         <location filename="../artisanlib/ports.py" line="1384" />
         <source>OFF on DROP</source>
         <translation>KI a DROP-on</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1580" />
-        <location filename="../artisanlib/curves.py" line="1038" />
-        <location filename="../artisanlib/curves.py" line="949" />
-        <location filename="../artisanlib/curves.py" line="943" />
-        <location filename="../artisanlib/curves.py" line="936" />
-        <location filename="../artisanlib/curves.py" line="918" />
-        <location filename="../artisanlib/background.py" line="62" />
-        <source>Show</source>
-        <translation>Előadás</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="404" />
@@ -2415,6 +2415,36 @@ VÉGE</translation>
 </context><context>
     <name>Contextual Menu</name>
     <message>
+        <location filename="../plus/schedule.py" line="1554" />
+        <source>All batches prepared</source>
+        <translation>Minden adag elkészítve</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1557" />
+        <source>One more batch prepared</source>
+        <translation>Még egy adag elkészült</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1561" />
+        <source>One less batch prepared</source>
+        <translation>Egy adaggal kevesebb elkészítve</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1564" />
+        <source>No batch prepared</source>
+        <translation>Nincs kész tétel</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1576" />
+        <source>Register roast</source>
+        <translation>Regisztráció sült</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1584" />
+        <source>Hide</source>
+        <translation>Elrejt</translation>
+    </message>
+    <message>
         <location filename="../artisanlib/canvas.py" line="18470" />
         <source>Add point</source>
         <translation>Pont hozzáadása</translation>
@@ -2458,36 +2488,6 @@ VÉGE</translation>
         <location filename="../artisanlib/canvas.py" line="19281" />
         <source>Edit</source>
         <translation>Szerkesztés</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1554" />
-        <source>All batches prepared</source>
-        <translation>Minden adag elkészítve</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1557" />
-        <source>One more batch prepared</source>
-        <translation>Még egy adag elkészült</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1561" />
-        <source>One less batch prepared</source>
-        <translation>Egy adaggal kevesebb elkészítve</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1564" />
-        <source>No batch prepared</source>
-        <translation>Nincs kész tétel</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1576" />
-        <source>Register roast</source>
-        <translation>Regisztráció sült</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1584" />
-        <source>Hide</source>
-        <translation>Elrejt</translation>
     </message>
 </context><context>
     <name>Countries</name>
@@ -4257,17 +4257,17 @@ VÉGE</translation>
     <message>
         <location filename="../artisanlib/mqttport.py" line="106" />
         <source>MQTT failed to subscribe to {0}: {1}</source>
-        <translation type="unfinished" />
+        <translation>Az MQTT nem tudott feliratkozni a(z) {0}: {1} szolgáltatásra</translation>
     </message>
     <message>
         <location filename="../artisanlib/mqttport.py" line="119" />
         <source>MQTT failed to connect to {0}: {1}</source>
-        <translation type="unfinished" />
+        <translation>Az MQTT nem tudott csatlakozni a következőhöz: {0}: {1}</translation>
     </message>
     <message>
         <location filename="../artisanlib/mqttport.py" line="130" />
         <source>MQTT subscribe error: {0}</source>
-        <translation type="unfinished" />
+        <translation>MQTT feliratkozási hiba: {0}</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="5379" />
@@ -4491,6 +4491,12 @@ VÉGE</translation>
 </context><context>
     <name>Form Caption</name>
     <message>
+        <location filename="../artisanlib/roast_properties.py" line="1779" />
+        <location filename="../plus/blend.py" line="130" />
+        <source>Custom Blend</source>
+        <translation>Egyedi keverék</translation>
+    </message>
+    <message>
         <location filename="../artisanlib/axis.py" line="70" />
         <source>Axes</source>
         <translation type="unfinished">Tengelyek</translation>
@@ -4636,7 +4642,7 @@ VÉGE</translation>
     <message>
         <location filename="../artisanlib/ports.py" line="1956" />
         <source>MQTT Help</source>
-        <translation type="unfinished" />
+        <translation>MQTT Súgó</translation>
     </message>
     <message>
         <location filename="../artisanlib/background.py" line="49" />
@@ -4652,12 +4658,6 @@ VÉGE</translation>
         <location filename="../artisanlib/roast_properties.py" line="560" />
         <source>Roast Properties</source>
         <translation>Pörkölés Beállításai</translation>
-    </message>
-    <message>
-        <location filename="../plus/blend.py" line="130" />
-        <location filename="../artisanlib/roast_properties.py" line="1779" />
-        <source>Custom Blend</source>
-        <translation>Egyedi keverék</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="4224" />
@@ -4943,12 +4943,12 @@ VÉGE</translation>
     <message>
         <location filename="../artisanlib/ports.py" line="1658" />
         <source>Credentials</source>
-        <translation type="unfinished" />
+        <translation>Hitelesítő adatok</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1669" />
         <source>Connection</source>
-        <translation type="unfinished" />
+        <translation>Kapcsolat</translation>
     </message>
     <message>
         <location filename="../artisanlib/background.py" line="470" />
@@ -8555,8 +8555,8 @@ Töltse be a kisebb gépre rögzített profilt, és nyissa meg a Transzponálót
     <message>
         <location filename="../help/eventbuttons_help.py" line="149" />
         <location filename="../help/eventsliders_help.py" line="103" />
-        <source>converts the given data to JSON and publish it on the MQTT server to the given topic</source>
-        <translation type="unfinished" />
+        <source>converts the given data to JSON and publishes it on the MQTT server to the given topic</source>
+        <translation>JSON formátumba konvertálja a megadott adatokat, és közzéteszi azokat az MQTT szerveren a megadott témában</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="171" />
@@ -9101,22 +9101,22 @@ Function 4 (Read Input Registers): registers 0 to 65535 corresponding to numbers
     <message>
         <location filename="../help/mqtt_help.py" line="17" />
         <source>MQTT SETTINGS</source>
-        <translation type="unfinished" />
+        <translation>MQTT BEÁLLÍTÁSOK</translation>
     </message>
     <message>
         <location filename="../help/mqtt_help.py" line="18" />
         <source>The MQTT communication is respecting the broker&amp;#39;s host IP and port for communication over TCP or WebSockets using the MQTT protocol v3.1, v3.1.1, or v5. Encryption can be enabled by ticking the TLS option. Connect timeout and keepalive periods can be configured in seconds, and access credentials can be set.</source>
-        <translation type="unfinished" />
+        <translation>Az MQTT kommunikáció tiszteletben tartja a bróker gazdagépének IP-címét és portját a TCP vagy WebSockets protokollon keresztüli kommunikációhoz az MQTT v3.1, v3.1.1 vagy v5 protokollt használva. A titkosítás a TLS opció bejelölésével engedélyezhető. A csatlakozási időtúllépés és a keepalive időszakok másodpercben konfigurálhatók, valamint a hozzáférési hitelesítő adatok is beállíthatók.</translation>
     </message>
     <message>
         <location filename="../help/mqtt_help.py" line="19" />
         <source>Artisan establishes a connection with the broker and subscribes to the specified topics if the ON button is pressed. Each input extracts its data from the payloads received for the main topic or, if provided, the input-specific topics. For each input, a JMESPath (jmespath.org) expression is used to determine how to extract the data for that input is extracted from the received payload.</source>
-        <translation type="unfinished" />
+        <translation>Az Artisan kapcsolatot létesít a brókerrel, és feliratkozik a megadott témákra, ha megnyomják az ON gombot. Minden bemenet a fő témához kapott hasznos adatokból, vagy ha meg van adva, a bemenetre jellemző témákból vonja ki az adatait. Minden bemenethez egy JMESPath (jmespath.org) kifejezés kerül felhasználásra annak meghatározására, hogy hogyan kell kinyerni az adott bemenet adatait a fogadott hasznos adatokból.</translation>
     </message>
     <message>
         <location filename="../help/mqtt_help.py" line="20" />
         <source>For example, for the payload {"foo": {"bar": [1, 2]}}, the JMESPath expression foo.bar[0] will result in the value 1.</source>
-        <translation type="unfinished" />
+        <translation>Például a {"foo": {"bar": [1, 2]}} hasznos adat esetén a foo.bar[0] JMESPath kifejezés 1 értéket fog eredményezni.</translation>
     </message>
     <message>
         <location filename="../help/s7_help.py" line="22" />
@@ -9637,12 +9637,12 @@ Azok a bemenetek, amelyeknél a terület üres bemenetre van állítva, ki vanna
     <message>
         <location filename="../help/s7_help.py" line="24" />
         <source>The Scan button opens a simple S7 scanner to search for data holding registers in the connected device.</source>
-        <translation type="unfinished" />
+        <translation>A Szkennelés gomb egy egyszerű S7 szkennert nyit meg, amellyel megkereshetők a csatlakoztatott eszközben található adattároló regiszterek.</translation>
     </message>
     <message>
         <location filename="../help/s7_help.py" line="25" />
         <source>Refer to the User Manual of your S7 device for information specific to the setup required for your device.</source>
-        <translation type="unfinished" />
+        <translation>Az eszközhöz szükséges beállításokkal kapcsolatos információkért lásd az S7 eszköz felhasználói kézikönyvét.</translation>
     </message>
     <message>
         <location filename="../help/eventannotations_help.py" line="14" />
@@ -11326,7 +11326,7 @@ Az előrejelzési érték a DRY vagy FCs hőmérséklet eléréséig számított
     <message>
         <location filename="../help/symbolic_help.py" line="156" />
         <source>Note: If any of the referenced symbolic variables contained in a symbolic expression evaluates to the error value -1, the whole expression evaluates to -1. This can be prevented by surrounding the whole expression by regular brackets. Thus, with Y1 evaluating to -1, the expression "Y1 + 1" evaluates to -1, but "(Y1 + 1)" evaluates to 0.</source>
-        <translation type="unfinished" />
+        <translation>Megjegyzés: Ha egy szimbolikus kifejezésben található bármelyik hivatkozott szimbolikus változó -1 hibaértéket ad ki, akkor a teljes kifejezés -1-re értékelődik. Ez megakadályozható, ha a teljes kifejezést szögletes zárójelbe tesszük. Így, ha az Y1 -1-re értékelődik, az "Y1 + 1" kifejezés -1-re értékelődik, de az "(Y1 + 1)" kifejezés 0-ra értékelődik.</translation>
     </message>
     <message>
         <location filename="../help/symbolic_help.py" line="159" />
@@ -11449,6 +11449,10 @@ A matematikai képletek használata a plotterben lehetővé teszi a P és F szim
         <location filename="../help/symbolic_help.py" line="198" />
         <source>F1 refers to the previous result of the actual formula to realize a feedback loop. This is useful in filter designs. Similarly, F2 refers to the second previous result etc.</source>
         <translation>Az F1 a tényleges képlet előző eredményére utal, hogy megvalósítsa a visszacsatolási hurkot. Ez hasznos a szűrők kialakításánál. Hasonlóképpen az F2 a második előző eredményre utal stb.</translation>
+    </message>
+    <message>
+        <source>converts the given data to JSON and publish it on the MQTT server to the given topic</source>
+        <translation type="vanished">JSON formátumba konvertálja a megadott adatokat, és közzéteszi azokat az MQTT szerveren a megadott témában</translation>
     </message>
     <message>
         <source>show/hide slider per event type n from {1,2,3,4}</source>
@@ -11623,6 +11627,105 @@ A billentyűparancsokat le kell tiltani (ENTER)</translation>
     </message>
 </context><context>
     <name>Label</name>
+    <message>
+        <location filename="../artisanlib/canvas.py" line="12018" />
+        <location filename="../artisanlib/large_lcds.py" line="851" />
+        <location filename="../artisanlib/roast_properties.py" line="906" />
+        <location filename="../artisanlib/roast_properties.py" line="221" />
+        <location filename="../artisanlib/roast_properties.py" line="148" />
+        <location filename="../plus/schedule.py" line="2049" />
+        <location filename="../plus/blend.py" line="157" />
+        <source>Weight</source>
+        <translation>Súly</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/statistics.py" line="202" />
+        <location filename="../artisanlib/roast_properties.py" line="1094" />
+        <location filename="../artisanlib/roast_properties.py" line="897" />
+        <location filename="../plus/blend.py" line="343" />
+        <source>Beans</source>
+        <translation>Bab</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/statistics.py" line="231" />
+        <location filename="../artisanlib/roast_properties.py" line="1735" />
+        <location filename="../plus/schedule.py" line="2071" />
+        <source>Yield</source>
+        <translation>Hozam</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="23881" />
+        <location filename="../artisanlib/roast_properties.py" line="1734" />
+        <location filename="../plus/schedule.py" line="2081" />
+        <source>Defects</source>
+        <translation>Hibák</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/canvas.py" line="11962" />
+        <location filename="../artisanlib/roast_properties.py" line="998" />
+        <location filename="../plus/schedule.py" line="2091" />
+        <source>Density</source>
+        <translation>Sűrűség</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/roast_properties.py" line="1069" />
+        <location filename="../artisanlib/events.py" line="449" />
+        <location filename="../plus/schedule.py" line="2101" />
+        <source>Color</source>
+        <translation type="unfinished">Szín</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/canvas.py" line="11967" />
+        <location filename="../artisanlib/roast_properties.py" line="1106" />
+        <location filename="../plus/schedule.py" line="2111" />
+        <source>Moisture</source>
+        <translation>Nedvesség</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/statistics.py" line="213" />
+        <location filename="../artisanlib/roast_properties.py" line="1180" />
+        <location filename="../plus/schedule.py" line="2122" />
+        <location filename="../plus/schedule.py" line="2121" />
+        <source>Roasting Notes</source>
+        <translation>Sütési jegyzetek</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2126" />
+        <source>Score</source>
+        <translation>Pontszám</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/statistics.py" line="214" />
+        <location filename="../plus/schedule.py" line="2127" />
+        <source>Cupping Score</source>
+        <translation>Kupázási pontszám</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/statistics.py" line="215" />
+        <location filename="../artisanlib/roast_properties.py" line="1184" />
+        <location filename="../plus/schedule.py" line="2134" />
+        <location filename="../plus/schedule.py" line="2133" />
+        <source>Cupping Notes</source>
+        <translation>Köpölyözés jegyzetek</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/roast_properties.py" line="905" />
+        <location filename="../artisanlib/roast_properties.py" line="279" />
+        <location filename="../plus/schedule.py" line="4068" />
+        <location filename="../plus/schedule.py" line="2222" />
+        <source>Roasted</source>
+        <translation>Sült</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/canvas.py" line="12018" />
+        <location filename="../artisanlib/canvas.py" line="11967" />
+        <location filename="../artisanlib/canvas.py" line="11962" />
+        <location filename="../artisanlib/roast_properties.py" line="904" />
+        <location filename="../artisanlib/roast_properties.py" line="206" />
+        <location filename="../plus/schedule.py" line="4066" />
+        <source>Green</source>
+        <translation>Zöld</translation>
+    </message>
     <message>
         <location filename="../artisanlib/events.py" line="3877" />
         <location filename="../artisanlib/events.py" line="1022" />
@@ -12458,13 +12561,6 @@ A billentyűparancsokat le kell tiltani (ENTER)</translation>
         <translation type="unfinished">Markerek</translation>
     </message>
     <message>
-        <location filename="../plus/schedule.py" line="2101" />
-        <location filename="../artisanlib/roast_properties.py" line="1069" />
-        <location filename="../artisanlib/events.py" line="449" />
-        <source>Color</source>
-        <translation type="unfinished">Szín</translation>
-    </message>
-    <message>
         <location filename="../artisanlib/events.py" line="451" />
         <source>Text Color</source>
         <translation>Szöveg szín</translation>
@@ -12873,7 +12969,7 @@ A billentyűparancsokat le kell tiltani (ENTER)</translation>
     <message>
         <location filename="../artisanlib/ports.py" line="1546" />
         <source>Transport</source>
-        <translation type="unfinished" />
+        <translation>Szállítás</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1553" />
@@ -12883,7 +12979,7 @@ A billentyűparancsokat le kell tiltani (ENTER)</translation>
     <message>
         <location filename="../artisanlib/ports.py" line="1560" />
         <source>Username</source>
-        <translation type="unfinished" />
+        <translation>Felhasználónév</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="944" />
@@ -12894,13 +12990,13 @@ A billentyűparancsokat le kell tiltani (ENTER)</translation>
     <message>
         <location filename="../artisanlib/ports.py" line="1581" />
         <source>Keepalive</source>
-        <translation type="unfinished" />
+        <translation>KeepAlive</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1655" />
         <location filename="../artisanlib/ports.py" line="1595" />
         <source>Topic</source>
-        <translation type="unfinished" />
+        <translation>Téma</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="1332" />
@@ -12979,40 +13075,11 @@ A billentyűparancsokat le kell tiltani (ENTER)</translation>
         <translation type="unfinished" />
     </message>
     <message>
-        <location filename="../plus/schedule.py" line="2049" />
-        <location filename="../plus/blend.py" line="157" />
-        <location filename="../artisanlib/canvas.py" line="12018" />
-        <location filename="../artisanlib/large_lcds.py" line="851" />
-        <location filename="../artisanlib/roast_properties.py" line="906" />
-        <location filename="../artisanlib/roast_properties.py" line="221" />
-        <location filename="../artisanlib/roast_properties.py" line="148" />
-        <source>Weight</source>
-        <translation>Súly</translation>
-    </message>
-    <message>
         <location filename="../artisanlib/roast_properties.py" line="967" />
         <location filename="../artisanlib/roast_properties.py" line="236" />
         <location filename="../artisanlib/roast_properties.py" line="163" />
         <source>Volume</source>
         <translation>Hangerő</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="4066" />
-        <location filename="../artisanlib/canvas.py" line="12018" />
-        <location filename="../artisanlib/canvas.py" line="11967" />
-        <location filename="../artisanlib/canvas.py" line="11962" />
-        <location filename="../artisanlib/roast_properties.py" line="904" />
-        <location filename="../artisanlib/roast_properties.py" line="206" />
-        <source>Green</source>
-        <translation>Zöld</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="4068" />
-        <location filename="../plus/schedule.py" line="2222" />
-        <location filename="../artisanlib/roast_properties.py" line="905" />
-        <location filename="../artisanlib/roast_properties.py" line="279" />
-        <source>Roasted</source>
-        <translation>Sült</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="866" />
@@ -13024,21 +13091,6 @@ A billentyűparancsokat le kell tiltani (ENTER)</translation>
         <location filename="../artisanlib/roast_properties.py" line="871" />
         <source>Batch</source>
         <translation>Köteg</translation>
-    </message>
-    <message>
-        <location filename="../plus/blend.py" line="343" />
-        <location filename="../artisanlib/statistics.py" line="202" />
-        <location filename="../artisanlib/roast_properties.py" line="1094" />
-        <location filename="../artisanlib/roast_properties.py" line="897" />
-        <source>Beans</source>
-        <translation>Bab</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2091" />
-        <location filename="../artisanlib/canvas.py" line="11962" />
-        <location filename="../artisanlib/roast_properties.py" line="998" />
-        <source>Density</source>
-        <translation>Sűrűség</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1051" />
@@ -13056,13 +13108,6 @@ A billentyűparancsokat le kell tiltani (ENTER)</translation>
         <translation>Talaj</translation>
     </message>
     <message>
-        <location filename="../plus/schedule.py" line="2111" />
-        <location filename="../artisanlib/canvas.py" line="11967" />
-        <location filename="../artisanlib/roast_properties.py" line="1106" />
-        <source>Moisture</source>
-        <translation>Nedvesség</translation>
-    </message>
-    <message>
         <location filename="../artisanlib/roast_properties.py" line="1134" />
         <location filename="../artisanlib/roast_properties.py" line="1107" />
         <source>%</source>
@@ -13072,22 +13117,6 @@ A billentyűparancsokat le kell tiltani (ENTER)</translation>
         <location filename="../artisanlib/roast_properties.py" line="1132" />
         <source>Ambient Conditions</source>
         <translation>Környezeti feltételek</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2122" />
-        <location filename="../plus/schedule.py" line="2121" />
-        <location filename="../artisanlib/statistics.py" line="213" />
-        <location filename="../artisanlib/roast_properties.py" line="1180" />
-        <source>Roasting Notes</source>
-        <translation>Sütési jegyzetek</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2134" />
-        <location filename="../plus/schedule.py" line="2133" />
-        <location filename="../artisanlib/statistics.py" line="215" />
-        <location filename="../artisanlib/roast_properties.py" line="1184" />
-        <source>Cupping Notes</source>
-        <translation>Köpölyözés jegyzetek</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1362" />
@@ -13103,20 +13132,6 @@ A billentyűparancsokat le kell tiltani (ENTER)</translation>
         <location filename="../artisanlib/roast_properties.py" line="1366" />
         <source>Blend</source>
         <translation>Keverék</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2081" />
-        <location filename="../artisanlib/main.py" line="23881" />
-        <location filename="../artisanlib/roast_properties.py" line="1734" />
-        <source>Defects</source>
-        <translation>Hibák</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2071" />
-        <location filename="../artisanlib/statistics.py" line="231" />
-        <location filename="../artisanlib/roast_properties.py" line="1735" />
-        <source>Yield</source>
-        <translation>Hozam</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1945" />
@@ -13607,12 +13622,6 @@ LCD-k Mind</translation>
         <location filename="../artisanlib/statistics.py" line="200" />
         <source>Roaster</source>
         <translation type="unfinished">Pecsenyesütő</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2127" />
-        <location filename="../artisanlib/statistics.py" line="214" />
-        <source>Cupping Score</source>
-        <translation>Kupázási pontszám</translation>
     </message>
     <message>
         <location filename="../artisanlib/statistics.py" line="228" />
@@ -14621,11 +14630,6 @@ Kevesebb csomópont: egyszerűbb görbe, de részletekben gazdagabb lehet</trans
         <translation>Képarány</translation>
     </message>
     <message>
-        <location filename="../plus/schedule.py" line="2126" />
-        <source>Score</source>
-        <translation>Pontszám</translation>
-    </message>
-    <message>
         <source>Start recording</source>
         <translation type="vanished">Felvétel megkezdése</translation>
     </message>
@@ -14735,6 +14739,12 @@ Kevesebb csomópont: egyszerűbb görbe, de részletekben gazdagabb lehet</trans
     </message>
 </context><context>
     <name>Menu</name>
+    <message>
+        <location filename="../artisanlib/main.py" line="2710" />
+        <location filename="../plus/schedule.py" line="2427" />
+        <source>Schedule</source>
+        <translation>Terv</translation>
+    </message>
     <message>
         <location filename="../artisanlib/main.py" line="4400" />
         <location filename="../artisanlib/pid_dialogs.py" line="751" />
@@ -15234,12 +15244,6 @@ Kevesebb csomópont: egyszerűbb görbe, de részletekben gazdagabb lehet</trans
         <translation>Csúszkák</translation>
     </message>
     <message>
-        <location filename="../plus/schedule.py" line="2427" />
-        <location filename="../artisanlib/main.py" line="2710" />
-        <source>Schedule</source>
-        <translation>Terv</translation>
-    </message>
-    <message>
         <location filename="../artisanlib/main.py" line="2748" />
         <source>Full Screen</source>
         <translation>Teljes képernyő</translation>
@@ -15352,6 +15356,63 @@ Kevesebb csomópont: egyszerűbb görbe, de részletekben gazdagabb lehet</trans
     </message>
 </context><context>
     <name>Message</name>
+    <message>
+        <location filename="../plus/schedule.py" line="1523" />
+        <source>Register the currently loaded roast profile&lt;br&gt;in the selected entry.&lt;br&gt;This will overwrite some roast properties.</source>
+        <translation>Regisztrálja az aktuálisan betöltött pörkölt profilt&lt;br&gt;a kiválasztott bejegyzésben.&lt;br&gt;Ez felülír néhány pörkölt tulajdonságot.</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1537" />
+        <location filename="../plus/schedule.py" line="1528" />
+        <source>Register Roast</source>
+        <translation>Regisztráció Roast</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2481" />
+        <source>Scheduler started</source>
+        <translation>Az ütemező elindult</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2792" />
+        <source>Roasts will not adjust the schedule&lt;br&gt;while the schedule window is closed</source>
+        <translation>A Roasts nem módosítja az ütemezést,&lt;br&gt;míg az ütemezési ablak be van zárva</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2806" />
+        <location filename="../plus/schedule.py" line="2797" />
+        <source>Close Scheduler</source>
+        <translation>Ütemező bezárása</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2864" />
+        <source>Scheduler stopped</source>
+        <translation>Az ütemező leállt</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="3578" />
+        <location filename="../plus/schedule.py" line="3170" />
+        <source>Updating completed roast properties failed</source>
+        <translation>A kész pörkölés tulajdonságainak frissítése nem sikerült</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="3750" />
+        <location filename="../plus/schedule.py" line="3289" />
+        <source>1 batch</source>
+        <translation>1 tétel</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="3765" />
+        <location filename="../plus/schedule.py" line="3756" />
+        <location filename="../plus/schedule.py" line="3297" />
+        <location filename="../plus/schedule.py" line="3291" />
+        <source>{} batches</source>
+        <translation>{} köteg</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="3644" />
+        <source>Fetching completed roast properties failed</source>
+        <translation>Nem sikerült lekérni a kész sütési tulajdonságokat</translation>
+    </message>
     <message>
         <location filename="../artisanlib/axis.py" line="896" />
         <source>xlimit = ({2},{3}) ylimit = ({0},{1}) zlimit = ({4},{5})</source>
@@ -15996,18 +16057,18 @@ FIGYELEM: A rögzített adatok megerősítés nélkül törlődnek.</translation
     <message>
         <location filename="../artisanlib/mqttport.py" line="213" />
         <source>Error: Failed to store MQTT password</source>
-        <translation type="unfinished" />
+        <translation>Hiba: Nem sikerült tárolni az MQTT jelszót</translation>
     </message>
     <message>
         <location filename="../artisanlib/mqttport.py" line="231" />
         <location filename="../artisanlib/mqttport.py" line="224" />
         <source>Error: failed to retrieve MQTT password</source>
-        <translation type="unfinished" />
+        <translation>Hiba: nem sikerült lekérni az MQTT jelszót</translation>
     </message>
     <message>
         <location filename="../artisanlib/mqttport.py" line="242" />
         <source>Error: failed to clear MQTT password</source>
-        <translation type="unfinished" />
+        <translation>Hiba: nem sikerült törölni az MQTT jelszót</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1683" />
@@ -17869,63 +17930,6 @@ Hiányzik a profilból [CHARGE] vagy [DROP]</translation>
         <translation>Háttérprofil nem található</translation>
     </message>
     <message>
-        <location filename="../plus/schedule.py" line="1523" />
-        <source>Register the currently loaded roast profile&lt;br&gt;in the selected entry.&lt;br&gt;This will overwrite some roast properties.</source>
-        <translation>Regisztrálja az aktuálisan betöltött pörkölt profilt&lt;br&gt;a kiválasztott bejegyzésben.&lt;br&gt;Ez felülír néhány pörkölt tulajdonságot.</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1537" />
-        <location filename="../plus/schedule.py" line="1528" />
-        <source>Register Roast</source>
-        <translation>Regisztráció Roast</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2481" />
-        <source>Scheduler started</source>
-        <translation>Az ütemező elindult</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2792" />
-        <source>Roasts will not adjust the schedule&lt;br&gt;while the schedule window is closed</source>
-        <translation>A Roasts nem módosítja az ütemezést,&lt;br&gt;míg az ütemezési ablak be van zárva</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2806" />
-        <location filename="../plus/schedule.py" line="2797" />
-        <source>Close Scheduler</source>
-        <translation>Ütemező bezárása</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2864" />
-        <source>Scheduler stopped</source>
-        <translation>Az ütemező leállt</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="3578" />
-        <location filename="../plus/schedule.py" line="3170" />
-        <source>Updating completed roast properties failed</source>
-        <translation>A kész pörkölés tulajdonságainak frissítése nem sikerült</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="3750" />
-        <location filename="../plus/schedule.py" line="3289" />
-        <source>1 batch</source>
-        <translation>1 tétel</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="3765" />
-        <location filename="../plus/schedule.py" line="3756" />
-        <location filename="../plus/schedule.py" line="3297" />
-        <location filename="../plus/schedule.py" line="3291" />
-        <source>{} batches</source>
-        <translation>{} köteg</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="3644" />
-        <source>Fetching completed roast properties failed</source>
-        <translation>Nem sikerült lekérni a kész sütési tulajdonságokat</translation>
-    </message>
-    <message>
         <source>Import Cropster XLS</source>
         <translation type="vanished">Importálja a Cropster XLS-t</translation>
     </message>
@@ -18137,56 +18141,6 @@ Folytatni?</translation>
     </message>
 </context><context>
     <name>Plus</name>
-    <message>
-        <location filename="../artisanlib/mqttport.py" line="211" />
-        <source>Keyring Error: Ensure that gnome-keyring is installed.</source>
-        <translation type="unfinished" />
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1214" />
-        <source>debug logging ON</source>
-        <translation>hibakeresési naplózás BE</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1215" />
-        <source>debug logging OFF</source>
-        <translation>hibakeresési naplózás KI</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1228" />
-        <source>1 day left</source>
-        <translation>1 nap maradt</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1230" />
-        <source>{} days left</source>
-        <translation>{} nap van hátra</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1232" />
-        <source>Paid until</source>
-        <translation>Addig fizetett</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1259" />
-        <source>Please visit our {0}shop{1} to extend your subscription</source>
-        <translation>Kérjük, látogassa meg {0} üzletünket {1} előfizetésének meghosszabbításához</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1272" />
-        <source>Do you want to extend your subscription?</source>
-        <translation>Szeretné meghosszabbítani előfizetését?</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1273" />
-        <source>Your subscription ends on</source>
-        <translation>Előfizetése ekkor lejár</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1273" />
-        <source>Your subscription ended on</source>
-        <translation>Előfizetése lejárt</translation>
-    </message>
     <message>
         <location filename="../plus/queue.py" line="141" />
         <source>Roast successfully uploaded to {}</source>
@@ -18416,6 +18370,56 @@ Folytatni?</translation>
         <source>Remember</source>
         <translation>Emlékezik</translation>
     </message>
+    <message>
+        <location filename="../artisanlib/mqttport.py" line="211" />
+        <source>Keyring Error: Ensure that gnome-keyring is installed.</source>
+        <translation>Kulcstartó hiba: Győződjön meg arról, hogy a gnome-keyring telepítve van.</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1214" />
+        <source>debug logging ON</source>
+        <translation>hibakeresési naplózás BE</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1215" />
+        <source>debug logging OFF</source>
+        <translation>hibakeresési naplózás KI</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1228" />
+        <source>1 day left</source>
+        <translation>1 nap maradt</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1230" />
+        <source>{} days left</source>
+        <translation>{} nap van hátra</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1232" />
+        <source>Paid until</source>
+        <translation>Addig fizetett</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1259" />
+        <source>Please visit our {0}shop{1} to extend your subscription</source>
+        <translation>Kérjük, látogassa meg {0} üzletünket {1} előfizetésének meghosszabbításához</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1272" />
+        <source>Do you want to extend your subscription?</source>
+        <translation>Szeretné meghosszabbítani előfizetését?</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1273" />
+        <source>Your subscription ends on</source>
+        <translation>Előfizetése ekkor lejár</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1273" />
+        <source>Your subscription ended on</source>
+        <translation>Előfizetése lejárt</translation>
+    </message>
 </context><context>
     <name>Radio Button</name>
     <message>
@@ -18503,7 +18507,6 @@ Folytatni?</translation>
 </context><context>
     <name>Scope Title</name>
     <message>
-        <location filename="../plus/schedule.py" line="2972" />
         <location filename="../artisanlib/canvas.py" line="9078" />
         <location filename="../artisanlib/canvas.py" line="7981" />
         <location filename="../artisanlib/canvas.py" line="1362" />
@@ -18514,6 +18517,7 @@ Folytatni?</translation>
         <location filename="../artisanlib/roast_properties.py" line="2192" />
         <location filename="../artisanlib/roast_properties.py" line="2179" />
         <location filename="../artisanlib/orbiter.py" line="511" />
+        <location filename="../plus/schedule.py" line="2972" />
         <source>Roaster Scope</source>
         <translation type="unfinished" />
     </message>
@@ -18888,6 +18892,16 @@ Folytatni?</translation>
 </context><context>
     <name>Tab</name>
     <message>
+        <location filename="../plus/schedule.py" line="2328" />
+        <source>To-Do</source>
+        <translation>Csinálni</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2329" />
+        <source>Completed</source>
+        <translation>Befejezve</translation>
+    </message>
+    <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3335" />
         <location filename="../artisanlib/pid_dialogs.py" line="2182" />
         <location filename="../artisanlib/pid_dialogs.py" line="948" />
@@ -19110,16 +19124,6 @@ Folytatni?</translation>
         <location filename="../artisanlib/colors.py" line="557" />
         <source>LCDs</source>
         <translation type="unfinished">LCDk</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2328" />
-        <source>To-Do</source>
-        <translation>Csinálni</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2329" />
-        <source>Completed</source>
-        <translation>Befejezve</translation>
     </message>
     <message>
         <source>Color</source>
@@ -19841,6 +19845,11 @@ Folytatni?</translation>
     </message>
 </context><context>
     <name>Tooltip</name>
+    <message>
+        <location filename="../plus/schedule.py" line="2262" />
+        <source>Update schedule</source>
+        <translation>Frissítési ütemterv</translation>
+    </message>
     <message>
         <location filename="../artisanlib/axis.py" line="83" />
         <source>100% event values in step mode are aligned with the given y-axis value or the lowest phases limit if left empty</source>
@@ -20592,29 +20601,31 @@ négyszeresére kell csökkenteni.</translation>
     <message>
         <location filename="../artisanlib/ports.py" line="1578" />
         <source>Connect timeout in seconds</source>
-        <translation type="unfinished" />
+        <translation>Csatlakozási időtúllépés másodpercben</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1586" />
         <source>Maximum period in seconds between communications with the broker</source>
-        <translation type="unfinished" />
+        <translation>A brókerrel folytatott kommunikációk közötti maximális időtartam másodpercben</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1591" />
         <source>Main topic subscribed on connect</source>
-        <translation type="unfinished" />
+        <translation>Fő téma feliratkozva a connect oldalon</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1596" />
         <source>Topics per input subscribed on connect.
 If inputs topic is empty, payloads received for main topic are interpreted.</source>
-        <translation type="unfinished" />
+        <translation>Csatlakozáskor feliratkozott bemenetek szerinti témák.
+Ha a bemeneti téma üres, a fő témához fogadott hasznos adatok értelmeződnek.</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1598" />
         <source>Path expression to extract reading from JSON payload.
 If input topic is given and node is empty, the received payload is interpreted as number</source>
-        <translation type="unfinished" />
+        <translation>Útvonalkifejezés a JSON hasznos adatból való olvasás kinyeréséhez.
+Ha a bemeneti téma meg van adva, és a csomópont üres, a fogadott hasznos adatot számként értelmezi a rendszer.</translation>
     </message>
     <message>
         <location filename="../artisanlib/background.py" line="73" />
@@ -20661,7 +20672,7 @@ specified by the lookahead</source>
     <message>
         <location filename="../artisanlib/roest.py" line="465" />
         <source>Update machines</source>
-        <translation type="unfinished" />
+        <translation>Frissítő gépek</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="772" />
@@ -21674,11 +21685,6 @@ Jelenleg TEMP MODE-ban van</translation>
         <location filename="../artisanlib/colors.py" line="571" />
         <source>Sets button colors to grey scale and LCD colors to black and white</source>
         <translation>A gombok színét szürkeárnyalatosra, az LCD színeit pedig fekete-fehérre állítja</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2262" />
-        <source>Update schedule</source>
-        <translation>Frissítési ütemterv</translation>
     </message>
     <message>
         <source>Automatically extend the time axis by 3min on need</source>

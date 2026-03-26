@@ -100,7 +100,7 @@ def content() -> str:
     tbl_Commands.add_row(['&#160;','kaleido(<target>,<value>)',QApplication.translate('HelpDlg','sends <value> to <target> via the Kaleido Serial or Network protocol'),'&#160;'])
     tbl_Commands.add_row(['&#160;','orbiter(<cmd>[,<value>[,<param>]])',QApplication.translate('HelpDlg','sends <cmd> (1byte in HEX) and optional <value> (0-65535) and <param> (0-255) to Orbiter'),'&#160;'])
     tbl_Commands.add_row(['&#160;','shellyrelay(n,b)',QApplication.translate('HelpDlg','switches Shelly plug number <n> ON if b is true or 1, and OFF otherwise'),'&#160;'])
-    tbl_Commands.add_row(['&#160;','publish(<topic>, <value>)',QApplication.translate('HelpDlg','converts the given data to JSON and publish it on the MQTT server to the given topic'),'&#160;'])
+    tbl_Commands.add_row(['&#160;','publish(<topic>, <value>)',QApplication.translate('HelpDlg','converts the given data to JSON and publishes it on the MQTT server to the given topic'),'&#160;'])
     tbl_Commands.add_row([QApplication.translate('HelpDlg','S7 Command'),'_',QApplication.translate('HelpDlg','variable holding the last value read via S7'),'&#160;'])
     tbl_Commands.add_row(['&#160;','sleep(<float>)',QApplication.translate('HelpDlg','sleep: add a delay of <float> seconds'),'&#160;'])
     tbl_Commands.add_row(['&#160;','button(<bool>)',QApplication.translate('HelpDlg','sets calling button to “pressed” if argument evaluates to 1 or True'),'&#160;'])

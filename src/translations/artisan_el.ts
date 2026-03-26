@@ -178,6 +178,26 @@
 </context><context>
     <name>Button</name>
     <message>
+        <location filename="../artisanlib/dialogs.py" line="623" />
+        <location filename="../artisanlib/dialogs.py" line="87" />
+        <location filename="../artisanlib/comm.py" line="200" />
+        <location filename="../artisanlib/pid_dialogs.py" line="2813" />
+        <location filename="../artisanlib/pid_dialogs.py" line="1942" />
+        <location filename="../artisanlib/pid_dialogs.py" line="923" />
+        <location filename="../plus/login.py" line="73" />
+        <source>OK</source>
+        <translation>Ενταξει</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/dialogs.py" line="624" />
+        <location filename="../artisanlib/dialogs.py" line="88" />
+        <location filename="../artisanlib/comm.py" line="201" />
+        <location filename="../artisanlib/pid_dialogs.py" line="3101" />
+        <location filename="../plus/login.py" line="78" />
+        <source>Cancel</source>
+        <translation>Ακύρωση</translation>
+    </message>
+    <message>
         <location filename="../artisanlib/colors.py" line="567" />
         <location filename="../artisanlib/designer.py" line="244" />
         <location filename="../artisanlib/phases.py" line="119" />
@@ -297,17 +317,6 @@
         <location filename="../artisanlib/pid_dialogs.py" line="903" />
         <source>Save</source>
         <translation>Αποθηκευση</translation>
-    </message>
-    <message>
-        <location filename="../plus/login.py" line="73" />
-        <location filename="../artisanlib/dialogs.py" line="623" />
-        <location filename="../artisanlib/dialogs.py" line="87" />
-        <location filename="../artisanlib/comm.py" line="200" />
-        <location filename="../artisanlib/pid_dialogs.py" line="2813" />
-        <location filename="../artisanlib/pid_dialogs.py" line="1942" />
-        <location filename="../artisanlib/pid_dialogs.py" line="923" />
-        <source>OK</source>
-        <translation>Ενταξει</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="925" />
@@ -520,15 +529,6 @@
         <location filename="../artisanlib/pid_dialogs.py" line="3095" />
         <source>Write PIDs</source>
         <translation>Γράψτε PID</translation>
-    </message>
-    <message>
-        <location filename="../plus/login.py" line="78" />
-        <location filename="../artisanlib/dialogs.py" line="624" />
-        <location filename="../artisanlib/dialogs.py" line="88" />
-        <location filename="../artisanlib/comm.py" line="201" />
-        <location filename="../artisanlib/pid_dialogs.py" line="3101" />
-        <source>Cancel</source>
-        <translation>Ακύρωση</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3169" />
@@ -1118,6 +1118,17 @@ END</source>
 </context><context>
     <name>CheckBox</name>
     <message>
+        <location filename="../artisanlib/curves.py" line="1038" />
+        <location filename="../artisanlib/curves.py" line="949" />
+        <location filename="../artisanlib/curves.py" line="943" />
+        <location filename="../artisanlib/curves.py" line="936" />
+        <location filename="../artisanlib/curves.py" line="918" />
+        <location filename="../artisanlib/background.py" line="62" />
+        <location filename="../plus/schedule.py" line="1580" />
+        <source>Show</source>
+        <translation>Εμφανιση</translation>
+    </message>
+    <message>
         <location filename="../artisanlib/axis.py" line="167" />
         <source>Expand</source>
         <translation>Επεκτείνουν</translation>
@@ -1307,17 +1318,6 @@ END</source>
         <location filename="../artisanlib/ports.py" line="1384" />
         <source>OFF on DROP</source>
         <translation>ΑΠΕΝΕΡΓΟΠΟΙΗΜΕΝΟ</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1580" />
-        <location filename="../artisanlib/curves.py" line="1038" />
-        <location filename="../artisanlib/curves.py" line="949" />
-        <location filename="../artisanlib/curves.py" line="943" />
-        <location filename="../artisanlib/curves.py" line="936" />
-        <location filename="../artisanlib/curves.py" line="918" />
-        <location filename="../artisanlib/background.py" line="62" />
-        <source>Show</source>
-        <translation>Εμφανιση</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="404" />
@@ -2407,6 +2407,36 @@ END</source>
 </context><context>
     <name>Contextual Menu</name>
     <message>
+        <location filename="../plus/schedule.py" line="1554" />
+        <source>All batches prepared</source>
+        <translation>Όλες οι παρτίδες έτοιμες</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1557" />
+        <source>One more batch prepared</source>
+        <translation>Μια ακόμη παρτίδα έτοιμη</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1561" />
+        <source>One less batch prepared</source>
+        <translation>Μία παρτίδα λιγότερη έτοιμη</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1564" />
+        <source>No batch prepared</source>
+        <translation>Καμία παρτίδα δεν προετοιμάστηκε</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1576" />
+        <source>Register roast</source>
+        <translation>Εγγραφή ψητό</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1584" />
+        <source>Hide</source>
+        <translation>Κρύβω</translation>
+    </message>
+    <message>
         <location filename="../artisanlib/canvas.py" line="18470" />
         <source>Add point</source>
         <translation>Προσθηκη σημειου</translation>
@@ -2450,36 +2480,6 @@ END</source>
         <location filename="../artisanlib/canvas.py" line="19281" />
         <source>Edit</source>
         <translation>Επεξεργασια</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1554" />
-        <source>All batches prepared</source>
-        <translation>Όλες οι παρτίδες έτοιμες</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1557" />
-        <source>One more batch prepared</source>
-        <translation>Μια ακόμη παρτίδα έτοιμη</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1561" />
-        <source>One less batch prepared</source>
-        <translation>Μία παρτίδα λιγότερη έτοιμη</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1564" />
-        <source>No batch prepared</source>
-        <translation>Καμία παρτίδα δεν προετοιμάστηκε</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1576" />
-        <source>Register roast</source>
-        <translation>Εγγραφή ψητό</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1584" />
-        <source>Hide</source>
-        <translation>Κρύβω</translation>
     </message>
 </context><context>
     <name>Countries</name>
@@ -4216,7 +4216,7 @@ END</source>
     <message>
         <location filename="../artisanlib/comm.py" line="7020" />
         <source>Arduino could not set filters</source>
-        <translation type="unfinished" />
+        <translation>Το Arduino δεν μπόρεσε να ορίσει φίλτρα</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="19449" />
@@ -4249,17 +4249,17 @@ END</source>
     <message>
         <location filename="../artisanlib/mqttport.py" line="106" />
         <source>MQTT failed to subscribe to {0}: {1}</source>
-        <translation type="unfinished" />
+        <translation>Η εγγραφή του MQTT στο {0} απέτυχε: {1}</translation>
     </message>
     <message>
         <location filename="../artisanlib/mqttport.py" line="119" />
         <source>MQTT failed to connect to {0}: {1}</source>
-        <translation type="unfinished" />
+        <translation>Η σύνδεση του MQTT με το {0} απέτυχε: {1}</translation>
     </message>
     <message>
         <location filename="../artisanlib/mqttport.py" line="130" />
         <source>MQTT subscribe error: {0}</source>
-        <translation type="unfinished" />
+        <translation>Σφάλμα εγγραφής MQTT: {0}</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="5379" />
@@ -4483,6 +4483,12 @@ END</source>
 </context><context>
     <name>Form Caption</name>
     <message>
+        <location filename="../artisanlib/roast_properties.py" line="1779" />
+        <location filename="../plus/blend.py" line="130" />
+        <source>Custom Blend</source>
+        <translation>Προσαρμοσμένο μείγμα</translation>
+    </message>
+    <message>
         <location filename="../artisanlib/axis.py" line="70" />
         <source>Axes</source>
         <translation>Αξονες</translation>
@@ -4628,7 +4634,7 @@ END</source>
     <message>
         <location filename="../artisanlib/ports.py" line="1956" />
         <source>MQTT Help</source>
-        <translation type="unfinished" />
+        <translation>Βοήθεια MQTT</translation>
     </message>
     <message>
         <location filename="../artisanlib/background.py" line="49" />
@@ -4644,12 +4650,6 @@ END</source>
         <location filename="../artisanlib/roast_properties.py" line="560" />
         <source>Roast Properties</source>
         <translation>Ιδιοτητες ψησιματος</translation>
-    </message>
-    <message>
-        <location filename="../plus/blend.py" line="130" />
-        <location filename="../artisanlib/roast_properties.py" line="1779" />
-        <source>Custom Blend</source>
-        <translation>Προσαρμοσμένο μείγμα</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="4224" />
@@ -4935,12 +4935,12 @@ END</source>
     <message>
         <location filename="../artisanlib/ports.py" line="1658" />
         <source>Credentials</source>
-        <translation type="unfinished" />
+        <translation>Διαπιστευτήρια</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1669" />
         <source>Connection</source>
-        <translation type="unfinished" />
+        <translation>Σύνδεση</translation>
     </message>
     <message>
         <location filename="../artisanlib/background.py" line="470" />
@@ -8548,8 +8548,8 @@ Load the profile recorded on the smaller machine and open the Transposer. Select
     <message>
         <location filename="../help/eventbuttons_help.py" line="149" />
         <location filename="../help/eventsliders_help.py" line="103" />
-        <source>converts the given data to JSON and publish it on the MQTT server to the given topic</source>
-        <translation type="unfinished" />
+        <source>converts the given data to JSON and publishes it on the MQTT server to the given topic</source>
+        <translation>μετατρέπει τα δεδομένα σε JSON και τα δημοσιεύει στον διακομιστή MQTT στο δεδομένο θέμα</translation>
     </message>
     <message>
         <location filename="../help/eventbuttons_help.py" line="171" />
@@ -9093,22 +9093,22 @@ Function 4 (Read Input Registers): registers 0 to 65535 corresponding to numbers
     <message>
         <location filename="../help/mqtt_help.py" line="17" />
         <source>MQTT SETTINGS</source>
-        <translation type="unfinished" />
+        <translation>ΡΥΘΜΙΣΕΙΣ MQTT</translation>
     </message>
     <message>
         <location filename="../help/mqtt_help.py" line="18" />
         <source>The MQTT communication is respecting the broker&amp;#39;s host IP and port for communication over TCP or WebSockets using the MQTT protocol v3.1, v3.1.1, or v5. Encryption can be enabled by ticking the TLS option. Connect timeout and keepalive periods can be configured in seconds, and access credentials can be set.</source>
-        <translation type="unfinished" />
+        <translation>Η επικοινωνία MQTT σέβεται την IP και τη θύρα του κεντρικού υπολογιστή του broker για επικοινωνία μέσω TCP ή WebSockets χρησιμοποιώντας το πρωτόκολλο MQTT v3.1, v3.1.1 ή v5. Η κρυπτογράφηση μπορεί να ενεργοποιηθεί επιλέγοντας την επιλογή TLS. Οι περίοδοι χρονικού ορίου σύνδεσης και διατήρησης ζωντανής λειτουργίας μπορούν να ρυθμιστούν σε δευτερόλεπτα και μπορούν να οριστούν διαπιστευτήρια πρόσβασης.</translation>
     </message>
     <message>
         <location filename="../help/mqtt_help.py" line="19" />
         <source>Artisan establishes a connection with the broker and subscribes to the specified topics if the ON button is pressed. Each input extracts its data from the payloads received for the main topic or, if provided, the input-specific topics. For each input, a JMESPath (jmespath.org) expression is used to determine how to extract the data for that input is extracted from the received payload.</source>
-        <translation type="unfinished" />
+        <translation>Το Artisan δημιουργεί μια σύνδεση με τον μεσίτη και εγγράφεται στα καθορισμένα θέματα εάν πατηθεί το κουμπί ON. Κάθε είσοδος εξάγει τα δεδομένα της από τα ωφέλιμα φορτία που λαμβάνονται για το κύριο θέμα ή, εάν παρέχονται, τα θέματα που αφορούν συγκεκριμένα την είσοδο. Για κάθε είσοδο, χρησιμοποιείται μια έκφραση JMESPath (jmespath.org) για να προσδιοριστεί ο τρόπος εξαγωγής των δεδομένων για αυτήν την είσοδο που εξάγεται από το ληφθέν ωφέλιμο φορτίο.</translation>
     </message>
     <message>
         <location filename="../help/mqtt_help.py" line="20" />
         <source>For example, for the payload {"foo": {"bar": [1, 2]}}, the JMESPath expression foo.bar[0] will result in the value 1.</source>
-        <translation type="unfinished" />
+        <translation>Για παράδειγμα, για το ωφέλιμο φορτίο {"foo": {"bar": [1, 2]}}, η έκφραση JMESPath foo.bar[0] θα έχει ως αποτέλεσμα την τιμή 1.</translation>
     </message>
     <message>
         <location filename="../help/s7_help.py" line="22" />
@@ -9629,12 +9629,12 @@ Inputs with the area set to the empty input are turned off.</source>
     <message>
         <location filename="../help/s7_help.py" line="24" />
         <source>The Scan button opens a simple S7 scanner to search for data holding registers in the connected device.</source>
-        <translation type="unfinished" />
+        <translation>Το κουμπί Σάρωση ανοίγει έναν απλό σαρωτή S7 για να αναζητήσει καταχωρητές που περιέχουν δεδομένα στη συνδεδεμένη συσκευή.</translation>
     </message>
     <message>
         <location filename="../help/s7_help.py" line="25" />
         <source>Refer to the User Manual of your S7 device for information specific to the setup required for your device.</source>
-        <translation type="unfinished" />
+        <translation>Ανατρέξτε στο Εγχειρίδιο Χρήστη της συσκευής S7 σας για πληροφορίες σχετικά με την απαιτούμενη ρύθμιση της συσκευής σας.</translation>
     </message>
     <message>
         <location filename="../help/eventannotations_help.py" line="14" />
@@ -11319,7 +11319,7 @@ The prediction value is the calculated time in seconds to reach the DRY or FCs t
     <message>
         <location filename="../help/symbolic_help.py" line="156" />
         <source>Note: If any of the referenced symbolic variables contained in a symbolic expression evaluates to the error value -1, the whole expression evaluates to -1. This can be prevented by surrounding the whole expression by regular brackets. Thus, with Y1 evaluating to -1, the expression "Y1 + 1" evaluates to -1, but "(Y1 + 1)" evaluates to 0.</source>
-        <translation type="unfinished" />
+        <translation>Σημείωση: Εάν οποιαδήποτε από τις αναφερόμενες συμβολικές μεταβλητές που περιέχονται σε μια συμβολική έκφραση αποτιμηθεί στην τιμή σφάλματος -1, ολόκληρη η έκφραση αποτιμάται σε -1. Αυτό μπορεί να αποτραπεί περικλείοντας ολόκληρη την έκφραση με κανονικές αγκύλες. Έτσι, με το Y1 να αποτιμάται σε -1, η έκφραση "Y1 + 1" αποτιμάται σε -1, αλλά το "(Y1 + 1)" αποτιμάται σε 0.</translation>
     </message>
     <message>
         <location filename="../help/symbolic_help.py" line="159" />
@@ -11442,6 +11442,10 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
         <location filename="../help/symbolic_help.py" line="198" />
         <source>F1 refers to the previous result of the actual formula to realize a feedback loop. This is useful in filter designs. Similarly, F2 refers to the second previous result etc.</source>
         <translation>Το F1 αναφέρεται στο προηγούμενο αποτέλεσμα του πραγματικού τύπου για την πραγματοποίηση ενός βρόχου ανατροφοδότησης. Αυτό είναι χρήσιμο σε σχέδια φίλτρων. Ομοίως, το F2 αναφέρεται στο δεύτερο προηγούμενο αποτέλεσμα κ.λπ.</translation>
+    </message>
+    <message>
+        <source>converts the given data to JSON and publish it on the MQTT server to the given topic</source>
+        <translation type="vanished">μετατρέπει τα δεδομένα σε JSON και τα δημοσιεύει στον διακομιστή MQTT στο δεδομένο θέμα</translation>
     </message>
     <message>
         <source>show/hide slider per event type n from {1,2,3,4}</source>
@@ -11617,6 +11621,105 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
     </message>
 </context><context>
     <name>Label</name>
+    <message>
+        <location filename="../artisanlib/canvas.py" line="12018" />
+        <location filename="../artisanlib/large_lcds.py" line="851" />
+        <location filename="../artisanlib/roast_properties.py" line="906" />
+        <location filename="../artisanlib/roast_properties.py" line="221" />
+        <location filename="../artisanlib/roast_properties.py" line="148" />
+        <location filename="../plus/schedule.py" line="2049" />
+        <location filename="../plus/blend.py" line="157" />
+        <source>Weight</source>
+        <translation>Βαρος</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/statistics.py" line="202" />
+        <location filename="../artisanlib/roast_properties.py" line="1094" />
+        <location filename="../artisanlib/roast_properties.py" line="897" />
+        <location filename="../plus/blend.py" line="343" />
+        <source>Beans</source>
+        <translation>Κοκκοι</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/statistics.py" line="231" />
+        <location filename="../artisanlib/roast_properties.py" line="1735" />
+        <location filename="../plus/schedule.py" line="2071" />
+        <source>Yield</source>
+        <translation>Απόδοση παραγωγής</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="23881" />
+        <location filename="../artisanlib/roast_properties.py" line="1734" />
+        <location filename="../plus/schedule.py" line="2081" />
+        <source>Defects</source>
+        <translation type="unfinished">Ελαττωματα</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/canvas.py" line="11962" />
+        <location filename="../artisanlib/roast_properties.py" line="998" />
+        <location filename="../plus/schedule.py" line="2091" />
+        <source>Density</source>
+        <translation>Πυκνοτητα</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/roast_properties.py" line="1069" />
+        <location filename="../artisanlib/events.py" line="449" />
+        <location filename="../plus/schedule.py" line="2101" />
+        <source>Color</source>
+        <translation>Χρωμα</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/canvas.py" line="11967" />
+        <location filename="../artisanlib/roast_properties.py" line="1106" />
+        <location filename="../plus/schedule.py" line="2111" />
+        <source>Moisture</source>
+        <translation>Υγρασία</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/statistics.py" line="213" />
+        <location filename="../artisanlib/roast_properties.py" line="1180" />
+        <location filename="../plus/schedule.py" line="2122" />
+        <location filename="../plus/schedule.py" line="2121" />
+        <source>Roasting Notes</source>
+        <translation>Σημειωσεις Ψησιματος</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2126" />
+        <source>Score</source>
+        <translation>Σκορ</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/statistics.py" line="214" />
+        <location filename="../plus/schedule.py" line="2127" />
+        <source>Cupping Score</source>
+        <translation>Βαθμολογία cupping</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/statistics.py" line="215" />
+        <location filename="../artisanlib/roast_properties.py" line="1184" />
+        <location filename="../plus/schedule.py" line="2134" />
+        <location filename="../plus/schedule.py" line="2133" />
+        <source>Cupping Notes</source>
+        <translation>Σημειωσεις Cupping</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/roast_properties.py" line="905" />
+        <location filename="../artisanlib/roast_properties.py" line="279" />
+        <location filename="../plus/schedule.py" line="4068" />
+        <location filename="../plus/schedule.py" line="2222" />
+        <source>Roasted</source>
+        <translation>Ψημένος</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/canvas.py" line="12018" />
+        <location filename="../artisanlib/canvas.py" line="11967" />
+        <location filename="../artisanlib/canvas.py" line="11962" />
+        <location filename="../artisanlib/roast_properties.py" line="904" />
+        <location filename="../artisanlib/roast_properties.py" line="206" />
+        <location filename="../plus/schedule.py" line="4066" />
+        <source>Green</source>
+        <translation>Πράσινος</translation>
+    </message>
     <message>
         <location filename="../artisanlib/events.py" line="3877" />
         <location filename="../artisanlib/events.py" line="1022" />
@@ -12452,13 +12555,6 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <translation>Δεικτες</translation>
     </message>
     <message>
-        <location filename="../plus/schedule.py" line="2101" />
-        <location filename="../artisanlib/roast_properties.py" line="1069" />
-        <location filename="../artisanlib/events.py" line="449" />
-        <source>Color</source>
-        <translation>Χρωμα</translation>
-    </message>
-    <message>
         <location filename="../artisanlib/events.py" line="451" />
         <source>Text Color</source>
         <translation>Χρωμα Κειμενου</translation>
@@ -12867,7 +12963,7 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
     <message>
         <location filename="../artisanlib/ports.py" line="1546" />
         <source>Transport</source>
-        <translation type="unfinished" />
+        <translation>Μεταφορά</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1553" />
@@ -12877,7 +12973,7 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
     <message>
         <location filename="../artisanlib/ports.py" line="1560" />
         <source>Username</source>
-        <translation type="unfinished" />
+        <translation>Όνομα χρήστη</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="944" />
@@ -12888,13 +12984,13 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
     <message>
         <location filename="../artisanlib/ports.py" line="1581" />
         <source>Keepalive</source>
-        <translation type="unfinished" />
+        <translation>Διατήρηση ζωντανής λειτουργίας</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1655" />
         <location filename="../artisanlib/ports.py" line="1595" />
         <source>Topic</source>
-        <translation type="unfinished" />
+        <translation>Θέμα</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="1332" />
@@ -12973,40 +13069,11 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <translation>γραμ</translation>
     </message>
     <message>
-        <location filename="../plus/schedule.py" line="2049" />
-        <location filename="../plus/blend.py" line="157" />
-        <location filename="../artisanlib/canvas.py" line="12018" />
-        <location filename="../artisanlib/large_lcds.py" line="851" />
-        <location filename="../artisanlib/roast_properties.py" line="906" />
-        <location filename="../artisanlib/roast_properties.py" line="221" />
-        <location filename="../artisanlib/roast_properties.py" line="148" />
-        <source>Weight</source>
-        <translation>Βαρος</translation>
-    </message>
-    <message>
         <location filename="../artisanlib/roast_properties.py" line="967" />
         <location filename="../artisanlib/roast_properties.py" line="236" />
         <location filename="../artisanlib/roast_properties.py" line="163" />
         <source>Volume</source>
         <translation>Ογκος</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="4066" />
-        <location filename="../artisanlib/canvas.py" line="12018" />
-        <location filename="../artisanlib/canvas.py" line="11967" />
-        <location filename="../artisanlib/canvas.py" line="11962" />
-        <location filename="../artisanlib/roast_properties.py" line="904" />
-        <location filename="../artisanlib/roast_properties.py" line="206" />
-        <source>Green</source>
-        <translation>Πράσινος</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="4068" />
-        <location filename="../plus/schedule.py" line="2222" />
-        <location filename="../artisanlib/roast_properties.py" line="905" />
-        <location filename="../artisanlib/roast_properties.py" line="279" />
-        <source>Roasted</source>
-        <translation>Ψημένος</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="866" />
@@ -13018,21 +13085,6 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <location filename="../artisanlib/roast_properties.py" line="871" />
         <source>Batch</source>
         <translation>Σύνολο παραγωγής</translation>
-    </message>
-    <message>
-        <location filename="../plus/blend.py" line="343" />
-        <location filename="../artisanlib/statistics.py" line="202" />
-        <location filename="../artisanlib/roast_properties.py" line="1094" />
-        <location filename="../artisanlib/roast_properties.py" line="897" />
-        <source>Beans</source>
-        <translation>Κοκκοι</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2091" />
-        <location filename="../artisanlib/canvas.py" line="11962" />
-        <location filename="../artisanlib/roast_properties.py" line="998" />
-        <source>Density</source>
-        <translation>Πυκνοτητα</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1051" />
@@ -13050,13 +13102,6 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <translation>Αλεσμένος</translation>
     </message>
     <message>
-        <location filename="../plus/schedule.py" line="2111" />
-        <location filename="../artisanlib/canvas.py" line="11967" />
-        <location filename="../artisanlib/roast_properties.py" line="1106" />
-        <source>Moisture</source>
-        <translation>Υγρασία</translation>
-    </message>
-    <message>
         <location filename="../artisanlib/roast_properties.py" line="1134" />
         <location filename="../artisanlib/roast_properties.py" line="1107" />
         <source>%</source>
@@ -13066,22 +13111,6 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <location filename="../artisanlib/roast_properties.py" line="1132" />
         <source>Ambient Conditions</source>
         <translation>Συνθηκες Περιβαλλοντος</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2122" />
-        <location filename="../plus/schedule.py" line="2121" />
-        <location filename="../artisanlib/statistics.py" line="213" />
-        <location filename="../artisanlib/roast_properties.py" line="1180" />
-        <source>Roasting Notes</source>
-        <translation>Σημειωσεις Ψησιματος</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2134" />
-        <location filename="../plus/schedule.py" line="2133" />
-        <location filename="../artisanlib/statistics.py" line="215" />
-        <location filename="../artisanlib/roast_properties.py" line="1184" />
-        <source>Cupping Notes</source>
-        <translation>Σημειωσεις Cupping</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1362" />
@@ -13097,20 +13126,6 @@ Keyboard Shortcuts must be disabled (ENTER)</source>
         <location filename="../artisanlib/roast_properties.py" line="1366" />
         <source>Blend</source>
         <translation>Μείγμα</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2081" />
-        <location filename="../artisanlib/main.py" line="23881" />
-        <location filename="../artisanlib/roast_properties.py" line="1734" />
-        <source>Defects</source>
-        <translation type="unfinished">Ελαττωματα</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2071" />
-        <location filename="../artisanlib/statistics.py" line="231" />
-        <location filename="../artisanlib/roast_properties.py" line="1735" />
-        <source>Yield</source>
-        <translation>Απόδοση παραγωγής</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1945" />
@@ -13601,12 +13616,6 @@ LCDs All</source>
         <location filename="../artisanlib/statistics.py" line="200" />
         <source>Roaster</source>
         <translation>Ψηστηρι</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2127" />
-        <location filename="../artisanlib/statistics.py" line="214" />
-        <source>Cupping Score</source>
-        <translation>Βαθμολογία cupping</translation>
     </message>
     <message>
         <location filename="../artisanlib/statistics.py" line="228" />
@@ -14615,11 +14624,6 @@ Fewer nodes: simpler curve but may lose detail</source>
         <translation>Αναλογια</translation>
     </message>
     <message>
-        <location filename="../plus/schedule.py" line="2126" />
-        <source>Score</source>
-        <translation>Σκορ</translation>
-    </message>
-    <message>
         <source>Start recording</source>
         <translation type="vanished">Εναρξη καταγραφης</translation>
     </message>
@@ -14729,6 +14733,12 @@ Fewer nodes: simpler curve but may lose detail</source>
     </message>
 </context><context>
     <name>Menu</name>
+    <message>
+        <location filename="../artisanlib/main.py" line="2710" />
+        <location filename="../plus/schedule.py" line="2427" />
+        <source>Schedule</source>
+        <translation>Σχέδιο</translation>
+    </message>
     <message>
         <location filename="../artisanlib/main.py" line="4400" />
         <location filename="../artisanlib/pid_dialogs.py" line="751" />
@@ -15228,12 +15238,6 @@ Fewer nodes: simpler curve but may lose detail</source>
         <translation>Ρυθμιστικά</translation>
     </message>
     <message>
-        <location filename="../plus/schedule.py" line="2427" />
-        <location filename="../artisanlib/main.py" line="2710" />
-        <source>Schedule</source>
-        <translation>Σχέδιο</translation>
-    </message>
-    <message>
         <location filename="../artisanlib/main.py" line="2748" />
         <source>Full Screen</source>
         <translation>Πλήρης οθόνη</translation>
@@ -15350,6 +15354,63 @@ Fewer nodes: simpler curve but may lose detail</source>
     </message>
 </context><context>
     <name>Message</name>
+    <message>
+        <location filename="../plus/schedule.py" line="1523" />
+        <source>Register the currently loaded roast profile&lt;br&gt;in the selected entry.&lt;br&gt;This will overwrite some roast properties.</source>
+        <translation>Καταχωρίστε το τρέχον φορτωμένο προφίλ ψητού&lt;br&gt;στην επιλεγμένη καταχώριση.&lt;br&gt;Αυτό θα αντικαταστήσει ορισμένες ιδιότητες ψητού.</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="1537" />
+        <location filename="../plus/schedule.py" line="1528" />
+        <source>Register Roast</source>
+        <translation>Εγγραφή Ψητό</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2481" />
+        <source>Scheduler started</source>
+        <translation>Ο προγραμματιστής ξεκίνησε</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2792" />
+        <source>Roasts will not adjust the schedule&lt;br&gt;while the schedule window is closed</source>
+        <translation>Τα Roasts δεν θα προσαρμόσουν το χρονοδιάγραμμα&lt;br&gt;όσο το παράθυρο χρονοδιαγράμματος είναι κλειστό</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2806" />
+        <location filename="../plus/schedule.py" line="2797" />
+        <source>Close Scheduler</source>
+        <translation>Κλείσιμο Προγραμματιστή</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2864" />
+        <source>Scheduler stopped</source>
+        <translation>Ο προγραμματιστής σταμάτησε</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="3578" />
+        <location filename="../plus/schedule.py" line="3170" />
+        <source>Updating completed roast properties failed</source>
+        <translation>Η ενημέρωση ολοκληρωμένων ιδιοτήτων ψητού απέτυχε</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="3750" />
+        <location filename="../plus/schedule.py" line="3289" />
+        <source>1 batch</source>
+        <translation>1 παρτίδα</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="3765" />
+        <location filename="../plus/schedule.py" line="3756" />
+        <location filename="../plus/schedule.py" line="3297" />
+        <location filename="../plus/schedule.py" line="3291" />
+        <source>{} batches</source>
+        <translation>{} παρτίδες</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="3644" />
+        <source>Fetching completed roast properties failed</source>
+        <translation>Η ανάκτηση ολοκληρωμένων ιδιοτήτων ψητού απέτυχε</translation>
+    </message>
     <message>
         <location filename="../artisanlib/axis.py" line="896" />
         <source>xlimit = ({2},{3}) ylimit = ({0},{1}) zlimit = ({4},{5})</source>
@@ -15994,18 +16055,18 @@ ATTENTION: Recorded data will get cleared without confirmation</source>
     <message>
         <location filename="../artisanlib/mqttport.py" line="213" />
         <source>Error: Failed to store MQTT password</source>
-        <translation type="unfinished" />
+        <translation>Σφάλμα: Αποτυχία αποθήκευσης κωδικού πρόσβασης MQTT</translation>
     </message>
     <message>
         <location filename="../artisanlib/mqttport.py" line="231" />
         <location filename="../artisanlib/mqttport.py" line="224" />
         <source>Error: failed to retrieve MQTT password</source>
-        <translation type="unfinished" />
+        <translation>Σφάλμα: απέτυχε η ανάκτηση του κωδικού πρόσβασης MQTT</translation>
     </message>
     <message>
         <location filename="../artisanlib/mqttport.py" line="242" />
         <source>Error: failed to clear MQTT password</source>
-        <translation type="unfinished" />
+        <translation>Σφάλμα: απέτυχε η διαγραφή του κωδικού πρόσβασης MQTT</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1683" />
@@ -17866,63 +17927,6 @@ Profile missing [CHARGE] or [DROP]</source>
         <translation>Προφιλ Φοντου δεν ευρεθει</translation>
     </message>
     <message>
-        <location filename="../plus/schedule.py" line="1523" />
-        <source>Register the currently loaded roast profile&lt;br&gt;in the selected entry.&lt;br&gt;This will overwrite some roast properties.</source>
-        <translation>Καταχωρίστε το τρέχον φορτωμένο προφίλ ψητού&lt;br&gt;στην επιλεγμένη καταχώριση.&lt;br&gt;Αυτό θα αντικαταστήσει ορισμένες ιδιότητες ψητού.</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="1537" />
-        <location filename="../plus/schedule.py" line="1528" />
-        <source>Register Roast</source>
-        <translation>Εγγραφή Ψητό</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2481" />
-        <source>Scheduler started</source>
-        <translation>Ο προγραμματιστής ξεκίνησε</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2792" />
-        <source>Roasts will not adjust the schedule&lt;br&gt;while the schedule window is closed</source>
-        <translation>Τα Roasts δεν θα προσαρμόσουν το χρονοδιάγραμμα&lt;br&gt;όσο το παράθυρο χρονοδιαγράμματος είναι κλειστό</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2806" />
-        <location filename="../plus/schedule.py" line="2797" />
-        <source>Close Scheduler</source>
-        <translation>Κλείσιμο Προγραμματιστή</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2864" />
-        <source>Scheduler stopped</source>
-        <translation>Ο προγραμματιστής σταμάτησε</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="3578" />
-        <location filename="../plus/schedule.py" line="3170" />
-        <source>Updating completed roast properties failed</source>
-        <translation>Η ενημέρωση ολοκληρωμένων ιδιοτήτων ψητού απέτυχε</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="3750" />
-        <location filename="../plus/schedule.py" line="3289" />
-        <source>1 batch</source>
-        <translation>1 παρτίδα</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="3765" />
-        <location filename="../plus/schedule.py" line="3756" />
-        <location filename="../plus/schedule.py" line="3297" />
-        <location filename="../plus/schedule.py" line="3291" />
-        <source>{} batches</source>
-        <translation>{} παρτίδες</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="3644" />
-        <source>Fetching completed roast properties failed</source>
-        <translation>Η ανάκτηση ολοκληρωμένων ιδιοτήτων ψητού απέτυχε</translation>
-    </message>
-    <message>
         <source>Import Cropster XLS</source>
         <translation type="vanished">Εισαγωγή Cropster XLS</translation>
     </message>
@@ -18144,56 +18148,6 @@ Continue?</source>
     </message>
 </context><context>
     <name>Plus</name>
-    <message>
-        <location filename="../artisanlib/mqttport.py" line="211" />
-        <source>Keyring Error: Ensure that gnome-keyring is installed.</source>
-        <translation type="unfinished" />
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1214" />
-        <source>debug logging ON</source>
-        <translation>εντοπισμός σφαλμάτων ON</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1215" />
-        <source>debug logging OFF</source>
-        <translation>εντοπισμός σφαλμάτων OFF</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1228" />
-        <source>1 day left</source>
-        <translation>Απομένει 1 ημέρα</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1230" />
-        <source>{} days left</source>
-        <translation>{} μέρες που απομένουν</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1232" />
-        <source>Paid until</source>
-        <translation>Πληρώθηκε έως</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1259" />
-        <source>Please visit our {0}shop{1} to extend your subscription</source>
-        <translation>Επισκεφτείτε το {0} κατάστημα {1} μας για να επεκτείνετε τη συνδρομή σας</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1272" />
-        <source>Do you want to extend your subscription?</source>
-        <translation>Θέλετε να επεκτείνετε τη συνδρομή σας;</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1273" />
-        <source>Your subscription ends on</source>
-        <translation>Η συνδρομή σας λήγει στις</translation>
-    </message>
-    <message>
-        <location filename="../artisanlib/main.py" line="1273" />
-        <source>Your subscription ended on</source>
-        <translation>Η συνδρομή σας έληξε στις</translation>
-    </message>
     <message>
         <location filename="../plus/queue.py" line="141" />
         <source>Roast successfully uploaded to {}</source>
@@ -18423,6 +18377,56 @@ Continue?</source>
         <source>Remember</source>
         <translation>Θυμάμαι</translation>
     </message>
+    <message>
+        <location filename="../artisanlib/mqttport.py" line="211" />
+        <source>Keyring Error: Ensure that gnome-keyring is installed.</source>
+        <translation>Σφάλμα Keyring: Βεβαιωθείτε ότι το gnome-keyring είναι εγκατεστημένο.</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1214" />
+        <source>debug logging ON</source>
+        <translation>εντοπισμός σφαλμάτων ON</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1215" />
+        <source>debug logging OFF</source>
+        <translation>εντοπισμός σφαλμάτων OFF</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1228" />
+        <source>1 day left</source>
+        <translation>Απομένει 1 ημέρα</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1230" />
+        <source>{} days left</source>
+        <translation>{} μέρες που απομένουν</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1232" />
+        <source>Paid until</source>
+        <translation>Πληρώθηκε έως</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1259" />
+        <source>Please visit our {0}shop{1} to extend your subscription</source>
+        <translation>Επισκεφτείτε το {0} κατάστημα {1} μας για να επεκτείνετε τη συνδρομή σας</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1272" />
+        <source>Do you want to extend your subscription?</source>
+        <translation>Θέλετε να επεκτείνετε τη συνδρομή σας;</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1273" />
+        <source>Your subscription ends on</source>
+        <translation>Η συνδρομή σας λήγει στις</translation>
+    </message>
+    <message>
+        <location filename="../artisanlib/main.py" line="1273" />
+        <source>Your subscription ended on</source>
+        <translation>Η συνδρομή σας έληξε στις</translation>
+    </message>
 </context><context>
     <name>Radio Button</name>
     <message>
@@ -18510,7 +18514,6 @@ Continue?</source>
 </context><context>
     <name>Scope Title</name>
     <message>
-        <location filename="../plus/schedule.py" line="2972" />
         <location filename="../artisanlib/canvas.py" line="9078" />
         <location filename="../artisanlib/canvas.py" line="7981" />
         <location filename="../artisanlib/canvas.py" line="1362" />
@@ -18521,6 +18524,7 @@ Continue?</source>
         <location filename="../artisanlib/roast_properties.py" line="2192" />
         <location filename="../artisanlib/roast_properties.py" line="2179" />
         <location filename="../artisanlib/orbiter.py" line="511" />
+        <location filename="../plus/schedule.py" line="2972" />
         <source>Roaster Scope</source>
         <translation>Καταγραφεας</translation>
     </message>
@@ -18895,6 +18899,16 @@ Continue?</source>
 </context><context>
     <name>Tab</name>
     <message>
+        <location filename="../plus/schedule.py" line="2328" />
+        <source>To-Do</source>
+        <translation>Να κάνω</translation>
+    </message>
+    <message>
+        <location filename="../plus/schedule.py" line="2329" />
+        <source>Completed</source>
+        <translation>Ολοκληρώθηκε το</translation>
+    </message>
+    <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3335" />
         <location filename="../artisanlib/pid_dialogs.py" line="2182" />
         <location filename="../artisanlib/pid_dialogs.py" line="948" />
@@ -19117,16 +19131,6 @@ Continue?</source>
         <location filename="../artisanlib/colors.py" line="557" />
         <source>LCDs</source>
         <translation>LCDς</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2328" />
-        <source>To-Do</source>
-        <translation>Να κάνω</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2329" />
-        <source>Completed</source>
-        <translation>Ολοκληρώθηκε το</translation>
     </message>
     <message>
         <source>Modbus</source>
@@ -19852,6 +19856,11 @@ Continue?</source>
     </message>
 </context><context>
     <name>Tooltip</name>
+    <message>
+        <location filename="../plus/schedule.py" line="2262" />
+        <source>Update schedule</source>
+        <translation>Πρόγραμμα ενημέρωσης</translation>
+    </message>
     <message>
         <location filename="../artisanlib/axis.py" line="83" />
         <source>100% event values in step mode are aligned with the given y-axis value or the lowest phases limit if left empty</source>
@@ -20603,29 +20612,31 @@ has to be reduced by 4 times.</source>
     <message>
         <location filename="../artisanlib/ports.py" line="1578" />
         <source>Connect timeout in seconds</source>
-        <translation type="unfinished" />
+        <translation>Χρονικό όριο σύνδεσης σε δευτερόλεπτα</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1586" />
         <source>Maximum period in seconds between communications with the broker</source>
-        <translation type="unfinished" />
+        <translation>Μέγιστο χρονικό διάστημα σε δευτερόλεπτα μεταξύ των επικοινωνιών με τον μεσίτη</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1591" />
         <source>Main topic subscribed on connect</source>
-        <translation type="unfinished" />
+        <translation>Κύριο θέμα που έχει εγγραφεί στο Connect</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1596" />
         <source>Topics per input subscribed on connect.
 If inputs topic is empty, payloads received for main topic are interpreted.</source>
-        <translation type="unfinished" />
+        <translation>Θέματα ανά είσοδο που έχει εγγραφεί στη σύνδεση.
+Εάν το θέμα εισόδου είναι κενό, τα ωφέλιμα φορτία που λαμβάνονται για το κύριο θέμα ερμηνεύονται.</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1598" />
         <source>Path expression to extract reading from JSON payload.
 If input topic is given and node is empty, the received payload is interpreted as number</source>
-        <translation type="unfinished" />
+        <translation>Παράσταση διαδρομής για την εξαγωγή ανάγνωσης από το ωφέλιμο φορτίο JSON.
+Εάν δοθεί το θέμα εισόδου και ο κόμβος είναι κενός, το ληφθέν ωφέλιμο φορτίο ερμηνεύεται ως αριθμός</translation>
     </message>
     <message>
         <location filename="../artisanlib/background.py" line="73" />
@@ -20672,7 +20683,7 @@ specified by the lookahead</source>
     <message>
         <location filename="../artisanlib/roest.py" line="465" />
         <source>Update machines</source>
-        <translation type="unfinished" />
+        <translation>Ενημέρωση μηχανημάτων</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="772" />
@@ -21685,11 +21696,6 @@ Currently in TEMP MODE</source>
         <location filename="../artisanlib/colors.py" line="571" />
         <source>Sets button colors to grey scale and LCD colors to black and white</source>
         <translation>Ορίζει τα χρώματα κουμπιών σε κλίμακα του γκρι και τα χρώματα LCD σε ασπρόμαυρο</translation>
-    </message>
-    <message>
-        <location filename="../plus/schedule.py" line="2262" />
-        <source>Update schedule</source>
-        <translation>Πρόγραμμα ενημέρωσης</translation>
     </message>
     <message>
         <source>Automatically extend the time axis by 3min on need</source>

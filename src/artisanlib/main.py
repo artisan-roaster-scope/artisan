@@ -9397,7 +9397,7 @@ class ApplicationWindow(QMainWindow):
                     ##  santoker(<target>,<value>) : the byte <target> indicates where <value> of type integer should be written to
                     ##  kaleido(<target>,<value>) : the <target> string indicates where <value> of type string should be written to
                     ##  shellyrelay(n,b) : switches Shelly plug number <n> ON if b is true or 1, and OFF otherwise
-                    ##  publish(<topic>,<data>) : converts the given data to JSON and publishs it on the MQTT server to the given topic.
+                    ##  publish(<topic>,<data>) : converts the given data to JSON and publishes it on the MQTT server to the given topic.
                     #      Publish will connect to the specified broker if not yet connected and subscribe to the configured topics
                     #
                     if cmd_str:
@@ -9658,7 +9658,7 @@ class ApplicationWindow(QMainWindow):
                                         except Exception as e: # pylint: disable=broad-except
                                             _log.error(e)
 
-                                ##  publish(<topic>,<data>) : converts the given data to JSON and publishs it on the MQTT server to the given topic.
+                                ##  publish(<topic>,<data>) : converts the given data to JSON and publishes it on the MQTT server to the given topic.
                                 #      Publish will connect to the specified broker if not yet connected and subscribe to the configured topics
                                 elif c.startswith('publish'):
                                     if self.mqtt is not None:
