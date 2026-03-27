@@ -9,7 +9,7 @@ header:
   teaser: assets/images/mqtt-logo.webp
 ---
 
-Artisan implements versions 5.0, 3.1.1, and 3.1 of the [MQTT protocol](https://mqtt.org/){:target="_blank"} over TCP or WebSockets with optional Transport Layer Security (TLS) and broker authentication. Credentials are stored in the operating systems keychain system. Connect timeout and keepalive periods can be configured. 
+Artisan implements versions 5.0, 3.1.1, and 3.1 of the [MQTT protocol](https://mqtt.org/){:target="_blank"} over TCP or WebSockets with optional Transport Layer Security (TLS) and broker authentication. Credentials are stored in the operating system's keychain system. Connect timeout and keepalive periods can be configured. 
 
 # Input Channels
 
@@ -17,7 +17,7 @@ Artisan supports 12 MQTT input data channels assigned to the corresponding devic
 
 ## Nodes
 
-For each input, a [JMESPath](https://jmespath.org/){:target="_blank"} node expression is used to extract the reading from the received payload. The [JMESPath query language](https://jmespath.org/tutorial.html) provides basic expressions, slicing, projections, pipe expressions, multi selects, and functions on JSON data.
+For each input, a [JMESPath](https://jmespath.org/){:target="_blank"} node expression is used to extract the reading from the received payload. The [JMESPath query language](https://jmespath.org/tutorial.html) provides basic expressions, slicing, projections, pipe expressions, multi-selects, and functions on JSON data.
 
 For example, for the payload 
 
@@ -37,3 +37,43 @@ extracts the value `1`.
 ## Modes
 
 If mode for a channel is set to `C` or `F`, extracted readings are automatically converted to Artisans temperature unit.
+
+
+## Publish
+
+Artisan provides the `IO Command`
+
+```
+publish(<topic>, <value>)
+```
+
+to publish the value `<value>` to the topic `<topic>` on the connected MQTT broker. This command can be used in alarm, button or slider actions.
+
+For example, in the example below, the first button with the `IO Command` action
+
+```
+publish(/my/topic,{{"value":10}})
+```
+
+sends the fixed JSON message 
+
+```
+{"value":10}
+```
+
+to the topic `/my/topic`. Note that the curled brackets need to be quoted by duplication.
+
+<figure>
+<a href="{{ site.baseurl }}/assets/images/mqtt-publish.webp">
+<img src="{{ site.baseurl }}/assets/images/mqtt-publish.webp"></a>
+    <figcaption>MQTT publish</figcaption>
+</figure>
+
+The second button with the `IO Command` action
+
+
+```
+publish(/my/topic,{})
+```
+
+sends the button's value (here `19`) to the same topic `/my/topic`. Note that the placeholder symbol `{}` (no quoting here!) gets substituted by the button value in button actions.
