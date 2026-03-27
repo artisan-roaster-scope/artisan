@@ -9412,15 +9412,13 @@ class tgraphcanvas(QObject):
     @pyqtSlot(bool,bool,bool,bool,bool)
     def redraw(self, recomputeAllDeltas:bool = True, re_smooth_foreground:bool = True, takelock:bool = True, forceRenewAxis:bool = False, re_smooth_background:bool = False) -> None: # pyright: ignore [reportGeneralTypeIssues] # Code is too complex to analyze; reduce complexity by refactoring into subroutines or reducing conditional code paths
 #        _log.debug("PRINT redraw(recomputeAllDeltas: %s, re_smooth_foreground: %s, takelock: %s, forceRenewAxis: %s, re_smooth_background: %s)",recomputeAllDeltas, re_smooth_foreground, takelock, forceRenewAxis, re_smooth_background)
-
         if self.designerflag:
             self.redrawdesigner(force=True)
         elif self.aw.comparator is not None:
             self.aw.comparator.redraw()
             if self.aw.qpc is not None:
                 self.aw.qpc.redraw_phases()
-        elif self.ax is not None:
-            ax:Axes = self.ax
+        else:
             titleB = ''
             try:
                 #### lock shared resources   ####
@@ -9442,7 +9440,7 @@ class tgraphcanvas(QObject):
                     rcParams['path.sketch'] = (scale, length, randomness)
 
                     # if no axis are set, we need to forceRenewAxis in any case
-                    if self.delta_ax is None:
+                    if self.ax is None or self.delta_ax is None:
                         forceRenewAxis = True
 
                     xlabel_alpha_color = to_hex(to_rgba(self.palette['xlabel'], 0.47), keep_alpha=True)
@@ -11058,32 +11056,31 @@ class tgraphcanvas(QObject):
                             self.drawDeltaBT(trans,0,0)
 
                     if self.delta_ax is not None:
-                        delta_ax:_AxesBase = self.delta_ax
-                        delta_ax.set_yticks([]) # pyrefly:ignore[not-callable]
+                        self.delta_ax.set_yticks([]) # pyrefly:ignore[not-callable]
                         if two_ax_mode:
                             self.aw.autoAdjustAxis(timex=False)
-                            delta_ax.set_ylim(self.zlimit_min,self.zlimit)
+                            self.delta_ax.set_ylim(self.zlimit_min,self.zlimit)
                             if self.zgrid > 0:
                                 major_locator = ticker.MultipleLocator(self.zgrid)
-                                delta_ax.yaxis.set_major_locator(major_locator)
+                                self.delta_ax.yaxis.set_major_locator(major_locator)
                                 if len(major_locator()) > 50: # accept a maximum of 20 major ticks
                                     min_grid = (self.aw.qmc.zlimit - self.aw.qmc.zlimit_min) / 50
                                     # set grid to closest of min_grid from regular grids [1, 2, 5, 10, 20, 50, 100]
                                     major_locator.set_params(min([1, 2, 5, 10, 20, 50, 100], key=lambda x:abs(x-min_grid)))
-                                delta_major_tick_lines:list[Line2D] = delta_ax.get_yticklines() # pyrefly:ignore[not-callable]
+                                delta_major_tick_lines:list[Line2D] = self.delta_ax.get_yticklines() # pyrefly:ignore[not-callable]
                                 for ytl in delta_major_tick_lines:
                                     ytl.set_markersize(10)
-                                for label in delta_ax.get_yticklabels(): # pyrefly:ignore[not-callable]
+                                for label in self.delta_ax.get_yticklabels(): # pyrefly:ignore[not-callable]
                                     label.set_fontsize('small')
                                 if not self.LCDdecimalplaces:
-                                    delta_ax.minorticks_off()
+                                    self.delta_ax.minorticks_off()
                                 else:
                                     minor_locator = ticker.AutoMinorLocator() # locator parameter n, default: n='auto' => 4 or 5, n=2 => 1
-                                    delta_ax.yaxis.set_minor_locator(minor_locator)
+                                    self.delta_ax.yaxis.set_minor_locator(minor_locator)
                                     if len(minor_locator()) > 50:
                                         # we limit the total number of minor tick locators for performance and esthetic reasons
-                                        delta_ax.yaxis.set_minor_locator(ticker.NullLocator())
-                                    delta_minor_tick_lines:list[Line2D] = delta_ax.yaxis.get_minorticklines()
+                                        self.delta_ax.yaxis.set_minor_locator(ticker.NullLocator())
+                                    delta_minor_tick_lines:list[Line2D] = self.delta_ax.yaxis.get_minorticklines()
                                     for mtl in delta_minor_tick_lines:
                                         mtl.set_markersize(5)
 
@@ -11129,10 +11126,9 @@ class tgraphcanvas(QObject):
                                         self.extrastemp1[i] = self.extratemp1[i]
 
                                 if self.aw.extraDelta1[i] and self.delta_ax is not None:
-                                    delta_ax = self.delta_ax
-                                    trans = delta_ax.transData
+                                    trans = self.delta_ax.transData
                                 else:
-                                    trans = ax.transData
+                                    trans = self.ax.transData
                                 visible_extratemp1 : npt.NDArray[numpy.double]
                                 if not self.flagstart and not self.foregroundShowFullflag and (not self.autotimex or self.autotimexMode == 0) and len(self.extrastemp1[i]) > 0:
                                     visible_extratemp1 = numpy.concatenate((
@@ -11147,8 +11143,8 @@ class tgraphcanvas(QObject):
                                     visible_extratemp1 = numpy.array(self.extrastemp1[i], dtype=numpy.double)
                                 # first draw the fill if any, but not during recording!
                                 if not self.flagstart and self.aw.extraFill1[i] > 0:
-                                    ax.fill_between(self.extratimex[i], 0, visible_extratemp1,transform=trans,color=self.extradevicecolor1[i],alpha=self.aw.extraFill1[i]/100.,sketch_params=None)
-                                self.extratemp1lines.append(ax.plot(self.extratimex[i],visible_extratemp1,transform=trans,color=self.extradevicecolor1[i],
+                                    self.ax.fill_between(self.extratimex[i], 0, visible_extratemp1,transform=trans,color=self.extradevicecolor1[i],alpha=self.aw.extraFill1[i]/100.,sketch_params=None)
+                                self.extratemp1lines.append(self.ax.plot(self.extratimex[i],visible_extratemp1,transform=trans,color=self.extradevicecolor1[i],
                                     sketch_params=None,
                                     path_effects=self.line_path_effects(self.glow, self.patheffects, self.aw.light_background_p, self.extralinewidths1[i],self.extradevicecolor1[i]),
                                     markersize=self.extramarkersizes1[i],
@@ -11181,10 +11177,9 @@ class tgraphcanvas(QObject):
                                         self.extrastemp2[i] = self.extratemp2[i]
 
                                 if self.aw.extraDelta2[i] and self.delta_ax is not None:
-                                    delta_ax = self.delta_ax
-                                    trans = delta_ax.transData
+                                    trans = self.delta_ax.transData
                                 else:
-                                    trans = ax.transData
+                                    trans = self.ax.transData
                                 visible_extratemp2 : npt.NDArray[numpy.double]
                                 if not self.flagstart and not self.foregroundShowFullflag and (not self.autotimex or self.autotimexMode == 0) and len(self.extrastemp2[i]) > 0:
                                     visible_extratemp2 = numpy.concatenate((
@@ -11199,8 +11194,8 @@ class tgraphcanvas(QObject):
                                     visible_extratemp2 = numpy.array(self.extrastemp2[i], dtype=numpy.double)
                                 # first draw the fill if any
                                 if not self.flagstart and self.aw.extraFill2[i] > 0:
-                                    ax.fill_between(self.extratimex[i], 0, visible_extratemp2,transform=trans,color=self.extradevicecolor2[i],alpha=self.aw.extraFill2[i]/100.,sketch_params=None)
-                                self.extratemp2lines.append(ax.plot(self.extratimex[i],visible_extratemp2,transform=trans,color=self.extradevicecolor2[i],
+                                    self.ax.fill_between(self.extratimex[i], 0, visible_extratemp2,transform=trans,color=self.extradevicecolor2[i],alpha=self.aw.extraFill2[i]/100.,sketch_params=None)
+                                self.extratemp2lines.append(self.ax.plot(self.extratimex[i],visible_extratemp2,transform=trans,color=self.extradevicecolor2[i],
                                     sketch_params=None,
                                     path_effects=self.line_path_effects(self.glow, self.patheffects, self.aw.light_background_p, self.extralinewidths2[i],self.extradevicecolor2[i]),
                                     markersize=self.extramarkersizes2[i],
@@ -11342,13 +11337,12 @@ class tgraphcanvas(QObject):
                         self.drawAUC()
 
                     #update label rotating_colors
-                    for label in ax.xaxis.get_ticklabels():
+                    for label in self.ax.xaxis.get_ticklabels():
                         label.set_color(self.palette['xlabel'])
-                    for label in ax.yaxis.get_ticklabels():
+                    for label in self.ax.yaxis.get_ticklabels():
                         label.set_color(self.palette['ylabel'])
                     if two_ax_mode and self.delta_ax is not None:
-                        delta_ax = self.delta_ax
-                        for label in delta_ax.yaxis.get_ticklabels():
+                        for label in self.delta_ax.yaxis.get_ticklabels():
                             label.set_color(self.palette['ylabel'])
 
                     #write legend
@@ -11371,7 +11365,7 @@ class tgraphcanvas(QObject):
                         else:
                             loc = self.legend._loc # type: ignore[attr-defined] # "Legend" has no attribute "_loc" # pylint: disable=protected-access
                         try:
-                            leg = ax.legend(self.handles,self.labels, loc=loc,
+                            leg = self.ax.legend(self.handles,self.labels, loc=loc,
                                 ncols=ncol,fancybox=True,prop=prop,shadow=False,frameon=True)
                             leg.set_in_layout(False) # remove legend from tight_layout calculation
                             self.legend = leg
@@ -11392,7 +11386,7 @@ class tgraphcanvas(QObject):
                             for line,text in zip(leg.get_lines(), leg.get_texts(), strict=True):
                                 text.set_color(line.get_color())
                         except Exception as e: # pylint: disable=broad-except
-                            _log.exception(e)
+                            _log.error(e)
 
                     else:
                         self.legend = None
@@ -11414,39 +11408,37 @@ class tgraphcanvas(QObject):
                 # add projection and AUC guide lines last as those are removed by updategraphics for optimized redrawing and not cached
                 if self.ETprojectFlag:
                     if self.ETcurve:
-                        self.l_ETprojection, = ax.plot(self.ETprojection_tx, self.ETprojection_temp,color = self.palette['et'],
+                        self.l_ETprojection, = self.ax.plot(self.ETprojection_tx, self.ETprojection_temp,color = self.palette['et'],
                                                     dashes=dashes_setup,
                                                     label=self.aw.arabicReshape(QApplication.translate('Label', 'ETprojection')),
                                                     linestyle = '-.', linewidth= 8, alpha = .3,sketch_params=None,path_effects=[])
                     if self.projectDeltaFlag and self.DeltaETflag and self.delta_ax is not None:
-                        delta_ax = self.delta_ax
-                        trans = delta_ax.transData
-                        self.l_DeltaETprojection, = ax.plot(self.DeltaETprojection_tx, self.DeltaETprojection_temp,color = self.palette['deltaet'],
+                        trans = self.delta_ax.transData
+                        self.l_DeltaETprojection, = self.ax.plot(self.DeltaETprojection_tx, self.DeltaETprojection_temp,color = self.palette['deltaet'],
                                                     dashes=dashes_setup,
                                                     transform=trans,
                                                     label=self.aw.arabicReshape(QApplication.translate('Label', 'DeltaETprojection')),
                                                     linestyle = '-.', linewidth= 8, alpha = .3,sketch_params=None,path_effects=[])
                 if self.BTprojectFlag:
                     if self.BTcurve:
-                        self.l_BTprojection, = ax.plot(self.BTprojection_tx, self.BTprojection_temp,color = self.palette['bt'],
+                        self.l_BTprojection, = self.ax.plot(self.BTprojection_tx, self.BTprojection_temp,color = self.palette['bt'],
                                                     dashes=dashes_setup,
                                                     label=self.aw.arabicReshape(QApplication.translate('Label', 'BTprojection')),
                                                     linestyle = '-.', linewidth= 8, alpha = .3,sketch_params=None,path_effects=[])
                     if self.projectDeltaFlag and self.DeltaBTflag and self.delta_ax is not None:
-                        delta_ax = self.delta_ax
-                        trans = delta_ax.transData
-                        self.l_DeltaBTprojection, = ax.plot(self.DeltaBTprojection_tx, self.DeltaBTprojection_temp,color = self.palette['deltabt'],
+                        trans = self.delta_ax.transData
+                        self.l_DeltaBTprojection, = self.ax.plot(self.DeltaBTprojection_tx, self.DeltaBTprojection_temp,color = self.palette['deltabt'],
                                                     dashes=dashes_setup,
                                                     transform=trans,
                                                     label=self.aw.arabicReshape(QApplication.translate('Label', 'DeltaBTprojection')),
                                                     linestyle = '-.', linewidth= 8, alpha = .3,sketch_params=None,path_effects=[])
                 if (self.device == 18 and self.aw.simulator is None) or self.showtimeguide: # not NONE device
-                    self.l_timeline = ax.axvline(self.timeclock.elapsedMilli(),color = self.palette['timeguide'],
+                    self.l_timeline = self.ax.axvline(self.timeclock.elapsedMilli(),color = self.palette['timeguide'],
                                             label=self.aw.arabicReshape(QApplication.translate('Label', 'TIMEguide')),
                                             visible=self.flagstart,
                                             linestyle = '-', linewidth= 1, alpha = .5,sketch_params=None,path_effects=[])
-                if self.AUCguideFlag and self.ax is not None:
-                    self.l_AUCguide = ax.axvline(self.AUCguideTime,visible=(self.AUCguideTime > 0 and self.AUCguideTime < self.endofx),color = self.palette['aucguide'],
+                if self.AUCguideFlag:
+                    self.l_AUCguide = self.ax.axvline(self.AUCguideTime,visible=(self.AUCguideTime > 0 and self.AUCguideTime < self.endofx),color = self.palette['aucguide'],
                                                 label=self.aw.arabicReshape(QApplication.translate('Label', 'AUCguide')),
                                                 linestyle = '-', linewidth= 1, alpha = .5,sketch_params=None,path_effects=[])
 
@@ -11482,6 +11474,7 @@ class tgraphcanvas(QObject):
                 # we update the canvas immediately to get the RoR projections drawn again
                 if self.flagstart and self.timeindex[0] > -1:
                     self.updategraphicsSignal.emit()
+
 
     def checkOverlap(self, anno:'Annotation') -> bool:
         if self.ax is None:

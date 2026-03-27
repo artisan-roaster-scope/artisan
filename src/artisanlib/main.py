@@ -27975,7 +27975,7 @@ sys.excepthook = excepthook
 # "The Artisan Profile type doesn't map to any NSDocumentClass." on startup (since pyobjc-core 3.1.1)
 if sys.platform.startswith('darwin'):
     from Cocoa import NSDocument # type: ignore[import-untyped] # @UnresolvedImport # pylint: disable=import-error,no-name-in-module
-    class Document(NSDocument): # type: ignore[misc,no-any-unimported] # pylint: disable= too-few-public-methods
+    class Document(NSDocument): # type:ignore[misc,no-any-unimported] # zuban: ignore # pylint: disable= too-few-public-methods
 #        def windowNibName(self):
 #            return None #"Document"
         def makeWindowControllers(self) -> None:
