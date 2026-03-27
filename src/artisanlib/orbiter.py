@@ -63,10 +63,9 @@ class Orbiter(AsyncComm):
 
     HEADER:Final[bytes] = b'\xFF\xFF'
     EVENT:Final[bytes] = b'\x00'
-    CMD_INIT:Final[bytes] = b'\x01'
     CMD_SYNC:Final[bytes] = b'\x00'
 
-    __slots__ = [ 'send_timeout', '_connected', '_new_readings_available', '_BT', '_ET', '_IT', '_DT', '_air', '_drum', '_damper',
+    __slots__ = [ 'send_timeout', '_connected', '_ACK_received', '_BT', '_ET', '_IT', '_DT', '_air', '_drum', '_damper',
             '_heater', '_sound', '_RoR', '_master_control', '_SERIAL',  '_FW_VERSION', '_PCB_VERSION', '_DASHBOARD_STATUS', '_MODEL', '_MODEL_NUM',
             'isRoaster_Roasting' ]
 
@@ -82,7 +81,7 @@ class Orbiter(AsyncComm):
 
         # current readings
         self._connected:int = 0  # connection status (0:disconnected, 1:connected)
-        self._new_readings_available:asyncio.Event = asyncio.Event()
+        self._ACK_received:asyncio.Event = asyncio.Event()
         #-
         self._BT:float = -1      # bean temperature
         self._ET:float = -1      # environmental temperature
@@ -116,9 +115,8 @@ class Orbiter(AsyncComm):
     # getBT triggers fetching a complete set of new readings
     # time is the preheat/roasting/cooling time in seconds send along the sync command to the machine
     def getBT(self, time:int = 0) -> float:
-        if not self._new_readings_available.is_set():
+        if not self._ACK_received.is_set(): # only send if no sync command is currently send
             self.send_sync_await(time)
-        self._new_readings_available.clear()
         return self._BT
     def getET(self) -> float:
         return self._ET
@@ -178,7 +176,7 @@ class Orbiter(AsyncComm):
         # check for the second header byte
         if await stream.readexactly(1) == self.HEADER[1:2]:
             cmd = await stream.readexactly(1)
-            if cmd[0] == 0: # sync data (total 28 bytes)
+            if cmd[0] == 0: # sync data ACK (total 28 bytes)
                 if self._logging:
                     _log.debug('Orbiter CMD sync data')
                 data = await stream.readexactly(25)
@@ -207,7 +205,7 @@ class Orbiter(AsyncComm):
                         self._damper = data[21]
                         self._sound = data[22]
                         self._master_control = data[23]
-                        self._new_readings_available.set()
+                        self._ACK_received.set()
                     else:
                         _log.debug('Orbiter CRC failed: %s != %s', compute_crc(cmd[0:1] + data[:24]), data[24])
                 except Exception as e: # pylint: disable=broad-except
@@ -237,6 +235,7 @@ class Orbiter(AsyncComm):
                         _log.debug('Orbiter MODEL_NUM: %s', self._MODEL_NUM)
                         _log.debug('Orbiter _sound: %s', self._sound)
                         _log.debug('Orbiter _master_control: %s', self._master_control)
+                        self._ACK_received.set()
                     else:
                         _log.debug('Orbiter CRC failed: %s != %s', compute_crc(cmd[0:1] + data[:24]), data[24])
                 except Exception as e: # pylint: disable=broad-except
@@ -257,24 +256,15 @@ class Orbiter(AsyncComm):
         return self.HEADER + payload + crc.to_bytes(1, 'little')
 
     # data byte order: LSB last (little-endian); eg. data=b'\x07\x00' equals 7
-    def send_msg(self, cmd:bytes, data:bytes = b'\x00\x00', param:bytes = b'\x00', time:int = 0) -> None:
-        # send via socket
-        self.send(self.create_msg(cmd, data, param, time))
-
-    def send_msg_await(self, event:asyncio.Event, timeout:float, cmd:bytes, data:bytes = b'\x00\x00', param:bytes = b'\x00', time:int = 0) -> None:
-        # send via socket
-        self.send_await(self.create_msg(cmd, data, param, time), event, timeout)
+    def send_msg_await(self, cmd:bytes, data:bytes = b'\x00\x00', param:bytes = b'\x00', time:int = 0) -> None:
+        # send via socket using a request/response pattern (serialize=True) awaiting a response that sets the _ACK_received event
+        # ensuring a 100ms delay between those request/response pairs
+        self.send_await(self.create_msg(cmd, data, param, time), self._ACK_received, self.send_timeout, serialize=True, delay=0.1)
 
     #
 
-    def send_init(self) -> None:
-        self.send_msg(self.CMD_INIT)
-
-    def send_sync(self) -> None:
-        self.send_msg(self.CMD_SYNC)
-
     def send_sync_await(self, time:int) -> None:
-        self.send_msg_await(self._new_readings_available, self.send_timeout, self.CMD_SYNC, time=time)
+        self.send_msg_await(self.CMD_SYNC, time=time)
 
     #
 
@@ -672,7 +662,7 @@ def main() -> None:
     for _ in range(4):
         print('>>> hallo')
         val:int = 7
-        orbiter.send_msg(b'\x0D', val.to_bytes(2, 'little')) # set power to 7
+        orbiter.send_msg_await(b'\x0D', val.to_bytes(2, 'little')) # set power to 7
         time.sleep(1)
         print('BT', orbiter.getBT())
         time.sleep(1)

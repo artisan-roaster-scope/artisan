@@ -17967,7 +17967,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot(bytes,bytes,bytes,int)
     def orbiterSendMessage(self, cmd:bytes, data:bytes, param:bytes, time:int) -> None:
         if self.orbiter is not None:
-            self.orbiter.send_msg(cmd, data, param, time)
+            self.orbiter.send_msg_await(cmd, data, param, time)
 
     # if record is True, an event is added during recording, otherwise only the slider is moved
     # if fire_slider_action is True, the slider action is fired

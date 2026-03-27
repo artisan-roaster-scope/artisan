@@ -251,7 +251,7 @@ async def create_serial_connection(
 
 class AsyncComm:
 
-    __slots__ = [ '_asyncLoopThread', '_write_queue', '_running', '_host', '_port', '_serial', '_connected_handler', '_disconnected_handler',
+    __slots__ = [ '_asyncLoopThread', '_write_queue', '_running', '_serialize_write_lock', '_host', '_port', '_serial', '_connected_handler', '_disconnected_handler',
                     '_verify_crc', '_logging', '_send_timeout' ]
 
     def __init__(self, host:str = '127.0.0.1', port:int = 8080, serial:'SerialSettings|None' = None,
@@ -261,6 +261,9 @@ class AsyncComm:
         self._asyncLoopThread: AsyncLoopThread|None       = None # the asyncio AsyncLoopThread object
         self._write_queue:  asyncio.Queue[bytes]|None     = None # noqa: UP037 # quotes for Python3.8 # the write_queue
         self._running:bool                                = False              # while true we keep running the thread
+
+        # lock to serialize write_await calls to realize request/response patterns
+        self._serialize_write_lock:asyncio.Lock = asyncio.Lock()
 
         # connection
         self._host:str = host
@@ -355,12 +358,12 @@ class AsyncComm:
         try:
             with suppress(asyncio.CancelledError):
 # assignments in while are only only available from Python 3.8
-#                while (message := await queue.get()) != b'':
-#                    await self.write(writer, message)
-                message = await queue.get()
-                while message != b'':
+                while (message := await queue.get()) != b'':
                     await self.write(writer, message)
-                    message = await queue.get()
+#                message = await queue.get()
+#                while message != b'':
+#                    await self.write(writer, message)
+#                    message = await queue.get()
                 # on empty messages we close the connection
                 writer.close()
         except Exception as e: # pylint: disable=broad-except
@@ -434,29 +437,52 @@ class AsyncComm:
         if self.async_loop_thread is not None and self._write_queue is not None:
             asyncio.run_coroutine_threadsafe(self._write_queue.put(message), self.async_loop_thread.loop)
 
-
-    # adds message to write queue and awaits new data
-    async def write_await(self, message:bytes, event:asyncio.Event, send_timeout:float) -> None:
+    # adds message to write queue and awaits new data which is assumed to event.set() once received()
+    # if serialize is set, writes are serialized such that at any momemnt only one response is awaited using the given events
+    # ensuring minimum delay of 'delay' between writes (in seconds)
+    # returns True on success and False on timeout
+    # on return the event is always cleared
+    async def write_await(self, message:bytes, event:asyncio.Event, send_timeout:float, serialize:bool, delay:float) -> bool:
         if self._write_queue is None:
-            return
-        await self._write_queue.put(message)
-        # await a response containing a new value for var with timeout
+            return False
         try:
-            await asyncio.wait_for(event.wait(), send_timeout)
-        except TimeoutError:
-            if self._logging:
-                _log.info('write_await (msg=%s, send_timeout:%s)', message.strip(), send_timeout)
+            if serialize:
+                was_writing = self._serialize_write_lock.locked() # remember if writing was in progress
+                try:
+                    await asyncio.wait_for(self._serialize_write_lock.acquire(), send_timeout)
+                except TimeoutError:
+                    pass
+                if was_writing and delay > 0: # only if writing was in progress we add a delay before writing
+                    await asyncio.sleep(delay)
+            # write out the message
+            await self._write_queue.put(message)
+            # await a response with timeout indicated by the event being set
+            try:
+                await asyncio.wait_for(event.wait(), send_timeout)
+                return True
+            except TimeoutError:
+                if self._logging:
+                    _log.info('write_await (msg=%s, send_timeout:%s)', message.strip(), send_timeout)
+            return False
+        finally:
+            # in any case, clear the event belonging to this message
+            event.clear()
+            if serialize:
+                # release the serializing write lock
+                self._serialize_write_lock.release()
 
-    def send_await(self, message:bytes, event:asyncio.Event, timeout:float|None = None) -> None:
+
+    # returns True if message was sent successfully
+    def send_await(self, message:bytes, event:asyncio.Event, timeout:float|None = None, serialize:bool = False, delay:float = 0) -> bool:
         if self.async_loop_thread is not None and self._write_queue is not None:
             send_timeout:float = self._send_timeout
             if timeout is not None:
                 send_timeout = timeout
-            task = self.write_await(message, event, send_timeout)
+            task = self.write_await(message, event, send_timeout, serialize, delay)
             if self._asyncLoopThread is not None:
                 future = asyncio.run_coroutine_threadsafe(task, self._asyncLoopThread.loop)
                 try:
-                    future.result()
+                    return future.result()
                 except TimeoutError:
                     # the coroutine took too long, cancelling the task...
                     if self._logging:
@@ -464,6 +490,7 @@ class AsyncComm:
                     future.cancel()
                 except Exception as ex: # pylint: disable=broad-except
                     _log.error(ex)
+        return False
 
 
 
