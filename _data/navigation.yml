@@ -197,10 +197,12 @@ devices:
         url: /devices/arduino/
       - title: "ColorTrack"
         url: /devices/colortrack/
-      - title: "Modbus"
-        url: /devices/modbus/
       - title: "Meters"
         url: /devices/meters/
+      - title: "MODBUS"
+        url: /devices/modbus/
+      - title: "MQTT"
+        url: /devices/mqtt/
       - title: "PID"
         url: /devices/pid/
       - title: "Phidgets"

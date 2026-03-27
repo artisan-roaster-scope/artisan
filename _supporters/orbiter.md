@@ -16,3 +16,5 @@ sidebar:
 * __Machines:__ OB-1
 * __Connection:__ Serial / Bluetooth; might require the installation of a [serial driver](/modbus_serial/)
 * __Features:__ reads beans temperature (BT), environmental temperature (ET), drum temperature (DT), air flow and heater/fan/drum settings. The setting allows to control the fan and heater levels as well as the drum speed via sliders and buttons.
+
+Artisan supports the import of Orbiter profiles in `.rop` and `.zip` format (also per drag-and-drop on the main Artisan window) and the export in `.zip` format which can be imported directly into the Orbiter app.
