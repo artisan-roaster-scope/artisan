@@ -39,7 +39,7 @@ extracts the value `1`.
 If mode for a channel is set to `C` or `F`, extracted readings are automatically converted to Artisans temperature unit.
 
 
-## Publish
+# Publish
 
 Artisan provides the `IO Command`
 
