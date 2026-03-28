@@ -9,7 +9,7 @@ header:
   teaser: assets/images/mqtt-logo.webp
 ---
 
-Artisan implements versions 5.0, 3.1.1, and 3.1 of the [MQTT protocol](https://mqtt.org/){:target="_blank"} over TCP or WebSockets with optional Transport Layer Security (TLS) and broker authentication. Credentials are stored in the operating system's keychain system. Connect timeout and keepalive periods can be configured. 
+Artisan implements versions 5.0, 3.1.1, and 3.1 of the [MQTT protocol](https://mqtt.org/){:target="_blank"} over TCP or WebSockets with optional Transport Layer Security (TLS) and authentication. Credentials are stored in the operating system's keychain system. Connect timeout and keepalive periods can be configured. 
 
 # Input Channels
 
