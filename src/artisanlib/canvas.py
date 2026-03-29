@@ -4537,12 +4537,12 @@ class tgraphcanvas(QObject):
                 pdtemp = tempx[-1] - tempx[-n]
                 pdtime = timex[-1] - timex[-n]
                 if pdtime > 0:
-                    pRoR = abs(pdtemp/pdtime)
-                    dtemp = tempx[-1] - temp
-                    dtime = timex[-1] - time
+                    pRoR = pdtemp/pdtime
+                    dtemp = temp - tempx[-1]
+                    dtime = time - timex[-1]
                     if dtime > 0:
-                        RoR = abs(dtemp/dtime)
-                        if RoR > (pRoR + dRoR_limit):
+                        RoR = dtemp/dtime
+                        if (pRoR - dRoR_limit) < RoR < (pRoR + dRoR_limit):
                             wrong_reading = 2
             #########################
             # c) handle outliers if it could be detected

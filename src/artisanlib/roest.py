@@ -456,6 +456,7 @@ class ROESTdialog(ArtisanDialog):
 
         self.textClientSecret:QLineEdit = QLineEdit(self)
         self.textClientSecret.setPlaceholderText('Secret')
+        self.textClientSecret.setEchoMode(QLineEdit.EchoMode.PasswordEchoOnEdit)
         self.textClientSecret.setText(self.client_secret)
 
         self.textClientId.textChanged.connect(self.textChanged)
