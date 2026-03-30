@@ -14584,6 +14584,8 @@ class ApplicationWindow(QMainWindow):
             if self.qmc.ax is not None:
                 self.qmc.extratemp1lines.append(self.qmc.ax.plot(self.qmc.extratimex[l], self.qmc.extratemp1[l],color=self.qmc.extradevicecolor1[l],markersize=self.qmc.extramarkersizes1[l],marker=self.qmc.extramarkers1[l],linewidth=self.qmc.extralinewidths1[l],linestyle=self.qmc.extralinestyles1[l],drawstyle=self.qmc.extradrawstyles1[l],label=self.qmc.extraname1[l])[0])
                 self.qmc.extratemp2lines.append(self.qmc.ax.plot(self.qmc.extratimex[l], self.qmc.extratemp2[l],color=self.qmc.extradevicecolor2[l],markersize=self.qmc.extramarkersizes2[l],marker=self.qmc.extramarkers2[l],linewidth=self.qmc.extralinewidths2[l],linestyle=self.qmc.extralinestyles2[l],drawstyle=self.qmc.extradrawstyles2[l],label=self.qmc.extraname2[l])[0])
+                self.qmc.extrafill1lines.append(None)
+                self.qmc.extrafill2lines.append(None)
 
             self.updateLCDproperties()
         except Exception as e: # pylint: disable=broad-except
@@ -14904,6 +14906,7 @@ class ApplicationWindow(QMainWindow):
             self.qmc.extractimex1,self.qmc.extractimex2 = [],[]
             self.qmc.extractemp1,self.qmc.extractemp2 = [],[]
             self.qmc.extratemp1lines,self.qmc.extratemp2lines = [],[]
+            self.qmc.extrafill1lines,self.qmc.extrafill2lines = [],[]
             self.qmc.extralinestyles1,self.qmc.extralinestyles2 = [],[]
             self.qmc.extradrawstyles1,self.qmc.extradrawstyles2 = [],[]
             self.qmc.extralinewidths1,self.qmc.extralinewidths2 = [],[]

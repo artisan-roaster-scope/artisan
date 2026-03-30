@@ -19,6 +19,7 @@ v4.0.4 (Mar XX, 2026)
   - added a popup explaining the reason the Roast Properties dialog is opened on START if plus is connected and disabled the OK button until beans are specified  ([Issue #2133](../../../issues/2133))
   - adds hack to prevent dtr/rts signaling on connecting serial ports
   - preserves weight/volume unit setup on loading/importing profiles
+  - enables extra device curve fills on recording
 * FIXES
   - fixes autosave as PDF on regular `Save` on macOS ([Issue #2118](../../../issues/2118))
   - fixes regression which led to large automatic x-axis extensions for larger sampling rates ([Issue #2142](../../../issues/2142))

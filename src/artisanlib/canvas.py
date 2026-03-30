@@ -184,8 +184,8 @@ class MplCanvas(FigureCanvas):
         try:
             # self.aw.qmc might not be established yet
             self.aw.qmc.lazyredraw(recomputeAllDeltas=False)
-        except Exception: # pylint: disable=broad-except
-            pass
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
 
     @override
     def resizeEvent(self, event:'QResizeEvent') -> None:
@@ -269,7 +269,7 @@ class tgraphcanvas(QObject):
         'phidget1018_changeTriggers', 'phidget1018_changeTriggersValues', 'phidget1018_changeTriggersStrings', 'phidgetVCP100x_voltageRanges', 'phidgetVCP100x_voltageRangeValues',
         'phidgetVCP100x_voltageRangeStrings', 'phidgetDAQ1400_powerSupplyStrings', 'phidgetDAQ1400_powerSupply', 'phidgetDAQ1400_inputModeStrings', 'phidgetDAQ1400_inputMode',
         'devices', 'phidgetDevices', 'nonSerialDevices', 'nonTempDevices', 'specialDevices', 'binaryDevices', 'extradevices', 'extratimex', 'extradevicecolor1', 'extradevicecolor2', 'extratemp1',
-        'extratemp2', 'extrastemp1', 'extrastemp2', 'extractimex1', 'extractimex2', 'extractemp1', 'extractemp2', 'extratemp1lines', 'extratemp2lines',
+        'extratemp2', 'extrastemp1', 'extrastemp2', 'extractimex1', 'extractimex2', 'extractemp1', 'extractemp2', 'extratemp1lines', 'extratemp2lines', 'extrafill1lines', 'extrafill2lines',
         'extraname1', 'extraname2', 'extramathexpression1', 'extramathexpression2', 'extralinestyles1', 'extralinestyles2', 'extradrawstyles1', 'extradrawstyles2',
         'extralinewidths1', 'extralinewidths2', 'extramarkers1', 'extramarkers2', 'extramarkersizes1', 'extramarkersizes2', 'devicetablecolumnwidths', 'energytablecolumnwidths', 'extraNoneTempHint1',
         'extraNoneTempHint2', 'plotcurves', 'plotcurvecolor', 'overlapList', 'tight_layout_params', 'cupping_tight_layout_params', 'fig', 'ax', 'delta_ax', 'legendloc', 'legendloc_pos', 'onclick_cid',
@@ -1216,6 +1216,8 @@ class tgraphcanvas(QObject):
         # however, the invariants len(extractimex1) = len(extractemp1) and len(extractimex2) = len(extractemp2) always hold
         self.extratemp1lines:list[Line2D] = []                      # lists with extra lines for speed drawing
         self.extratemp2lines:list[Line2D] = []
+        self.extrafill1lines:list[PolyCollection|None] = []         # lists with extra polycollections from fill_inbetween for speed drawing (None if no file at that extratemp1lines position)
+        self.extrafill2lines:list[PolyCollection|None] = []           # extrafill1lines/extrafill2lines have always the same length as extratemp1lines/extratemp2lines
         self.extraname1:list[str] = []                              # name of labels for line (like ET or BT) - legend
         self.extraname2:list[str] = []
         self.extramathexpression1:list[str] = []                    # list with user defined math evaluating strings. Example "2*cos(x)"
@@ -2811,6 +2813,9 @@ class tgraphcanvas(QObject):
         if not self.designerflag:
             self.resetlinecountcaches() # ensure that the line counts are up to date
             self.resetlines() # get rid of projection, cross lines and AUC line
+            for fill in self.extrafill1lines + self.extrafill2lines:
+                if fill is not None:
+                    fill.set_visible(False)
             try:
                 with warnings.catch_warnings():
                     warnings.simplefilter('ignore')
@@ -2830,8 +2835,14 @@ class tgraphcanvas(QObject):
                 if axfig is not None and hasattr(self.fig.canvas,'copy_from_bbox'):
                     self.ax_background = self.fig.canvas.copy_from_bbox(axfig.bbox) # ty:ignore[call-non-callable] # pyright: ignore[reportAttributeAccessIssue]
                     # we redraw the additional artists like the projection lines, the timeline and the AUC guide line
+
+                    for fill in self.extrafill1lines + self.extrafill2lines:
+                        if fill is not None:
+                            fill.set_visible(True)
+
                     self.update_additional_artists()
                     self.fig.canvas.blit(axfig.bbox)
+                    self.updategraphicsSignal.emit()
 
     def device_name_subst(self, device_name:str) -> str:
         try:
@@ -5517,6 +5528,15 @@ class tgraphcanvas(QObject):
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
 
+    # helper function to update fill_petween PolyCollections
+    @staticmethod
+    def vertices_between(x:Any, y1:Any, y2:Any) -> Any:
+        if isinstance(y2, float | int):
+            y2 = numpy.full(len(x), y2)
+        new_x = numpy.hstack((x, x[::-1]))
+        new_y = numpy.hstack((y1, y2[::-1]))
+        return numpy.vstack((new_x, new_y)).T
+
     # runs from GUI thread.
     # this function is called by a signal at the end of the thread sample() from sample_processing()
     # during sample, updates to GUI widgets or anything GUI must be done here (never from thread)
@@ -5666,25 +5686,45 @@ class tgraphcanvas(QObject):
                                                     _log.exception(e)
 
                                         # draw extra curves
-                                        xtra_dev_lines1 = 0
-                                        xtra_dev_lines2 = 0
+                                        xtra_dev_lines1:int = 0
+                                        xtra_dev_lines2:int = 0
 
                                         try:
-                                            for i in range(min(len(self.aw.extraCurveVisibility1),len(self.aw.extraCurveVisibility1),len(sample_extratimex),len(sample_extratemp1),len(self.extradevicecolor1),len(self.extraname1),len(sample_extratemp2),len(self.extradevicecolor2),len(self.extraname2))):
+                                            for i in range(min(len(self.aw.extraCurveVisibility1),
+                                                    len(self.aw.extraCurveVisibility1),len(sample_extratimex),
+                                                    len(sample_extratemp1),len(self.extradevicecolor1),
+                                                    len(self.extraname1),len(sample_extratemp2),len(self.extradevicecolor2),len(self.extraname2))):
                                                 if self.aw.extraCurveVisibility1[i] and len(self.extratemp1lines) > xtra_dev_lines1:
+                                                    #
+                                                    line1 = self.extratemp1lines[xtra_dev_lines1]
                                                     try:
-                                                        self.ax.draw_artist(self.extratemp1lines[xtra_dev_lines1])
+                                                        fill1 = self.extrafill1lines[xtra_dev_lines1]
+                                                        if fill1 is not None:
+                                                            fill1.set_verts([self.vertices_between(line1.get_xdata(), line1.get_ydata(), 0)])
+                                                            self.ax.draw_artist(fill1)
+                                                    except Exception as e: # pylint: disable=broad-except
+                                                        _log.exception(e)
+                                                    try:
+                                                        self.ax.draw_artist(line1)
                                                     except Exception as e: # pylint: disable=broad-except
                                                         _log.exception(e)
                                                     xtra_dev_lines1 = xtra_dev_lines1 + 1
                                                 if self.aw.extraCurveVisibility2[i] and len(self.extratemp2lines) > xtra_dev_lines2:
+                                                    line2 = self.extratemp2lines[xtra_dev_lines2]
                                                     try:
-                                                        self.ax.draw_artist(self.extratemp2lines[xtra_dev_lines2])
+                                                        fill2 = self.extrafill2lines[xtra_dev_lines2]
+                                                        if fill2 is not None:
+                                                            fill2.set_verts([self.vertices_between(line2.get_xdata(), line2.get_ydata(), 0)])
+                                                            self.ax.draw_artist(fill2)
+                                                    except Exception as e: # pylint: disable=broad-except
+                                                        _log.exception(e)
+                                                    try:
+                                                        self.ax.draw_artist(line2)
                                                     except Exception as e: # pylint: disable=broad-except
                                                         _log.exception(e)
                                                     xtra_dev_lines2 = xtra_dev_lines2 + 1
-                                        except Exception: # pylint: disable=broad-except
-                                            pass
+                                        except Exception as e: # pylint: disable=broad-except
+                                            _log.exception(e)
                                         if self.swaplcds:
                                             # draw ET
                                             if self.ETcurve and self.l_temp1 is not None:
@@ -5730,7 +5770,7 @@ class tgraphcanvas(QObject):
                                     else:
                                         # we do not have a background to bitblit, so do a full redraw
                                         self.updateBackground() # does the canvas draw, but also fills the ax_background cache
-                                        self.update_additional_artists()
+                                        #self.update_additional_artists() # done in updateBackground
                                 finally:
                                     if self.profileDataSemaphore.available() < 1:
                                         self.profileDataSemaphore.release(1)
@@ -5860,12 +5900,13 @@ class tgraphcanvas(QObject):
                 btime = self.timeB[self.timeindexB[0]]
             elif self.timeindexB[0] != -1: # if no foreground profile, align 0:00 to the CHARGE event of the background profile
                 ptime = 0
-                if self.flagstart:
+                if self.flagstart and self.backgroundShowFullflag:
                     btime = self.timeB[0] if len(self.timeB) > 0 else 0
                 elif len(self.timeB)>self.timeindexB[0]:
                     btime = self.timeB[self.timeindexB[0]]
                 else:
                     btime = 0
+
             if ptime is not None and btime is not None:
                 difference = ptime - btime
                 if difference > 0:
@@ -7642,8 +7683,7 @@ class tgraphcanvas(QObject):
                 mfactor1 =  round(float(2. + abs( int(round(first_reading_time)) / int(round(self.xgrid)) )))
                 # mfactor2: number of ticks after CHARGE
                 mfactor2 =  round(float(2. + abs( int(round(last_reading_time)) / int(round(self.xgrid)) )))
-
-                majorloc = numpy.arange(starttime-(self.xgrid*mfactor1),starttime+(self.xgrid*mfactor2), self.xgrid)
+                majorloc = numpy.arange(starttime-(self.xgrid*mfactor1), starttime+(self.xgrid*mfactor2), self.xgrid)
                 if len(majorloc) > 50:
                     # we reduce the number of major ticks by a factor of 4
                     majorloc = majorloc[0:len(majorloc):4]
@@ -8207,13 +8247,10 @@ class tgraphcanvas(QObject):
 
         # if background is loaded we move it back to its original position (after regular load):
         if self.backgroundprofile is not None:
-            moved = self.backgroundprofile_moved_x != 0 or self.backgroundprofile_moved_y != 0
             if self.backgroundprofile_moved_x != 0:
                 self.movebackground('left',self.backgroundprofile_moved_x)
             if self.backgroundprofile_moved_y != 0:
                 self.movebackground('down',self.backgroundprofile_moved_y)
-            if moved:
-                self.timealign(redraw=False)
 
         if not (self.autotimex and self.background):
             if self.locktimex:
@@ -10439,8 +10476,8 @@ class tgraphcanvas(QObject):
                                         self.timeindex, # timeindex2
                                         TP_time_loaded=self.TP_time_B_loaded,
                                         draggable=True))
-                            except Exception: # pylint: disable=broad-except
-                                pass
+                            except Exception as e: # pylint: disable=broad-except
+                                _log.exception(e)
 
                         #show the analysis results if they exist
     #                    if len(self.analysisresultsstr) > 0:
@@ -11094,6 +11131,13 @@ class tgraphcanvas(QObject):
                         except Exception: # pylint: disable=broad-except
                             pass
                     self.extratemp1lines,self.extratemp2lines = [],[]
+                    for lf in self.extrafill1lines + self.extrafill2lines:
+                        try:
+                            if lf is not None:
+                                lf.remove()
+                        except Exception: # pylint: disable=broad-except
+                            pass
+                    self.extrafill1lines,self.extrafill2lines = [],[]
                     for i in range(min(
                             len(self.extratimex),
                             len(self.extratemp1),
@@ -11141,9 +11185,14 @@ class tgraphcanvas(QObject):
                                         numpy.full(len(self.extratimex[i])-drop_idx-1, numpy.nan, dtype=numpy.double)))
                                 else:
                                     visible_extratemp1 = numpy.array(self.extrastemp1[i], dtype=numpy.double)
-                                # first draw the fill if any, but not during recording!
-                                if not self.flagstart and self.aw.extraFill1[i] > 0:
-                                    self.ax.fill_between(self.extratimex[i], 0, visible_extratemp1,transform=trans,color=self.extradevicecolor1[i],alpha=self.aw.extraFill1[i]/100.,sketch_params=None)
+                                # first draw the fill if any
+                                if self.aw.extraFill1[i] > 0:
+                                    self.extrafill1lines.append(self.ax.fill_between(
+                                            self.extratimex[i], visible_extratemp1, 0, transform=trans,
+                                            color=self.extradevicecolor1[i],alpha=self.aw.extraFill1[i]/100.,
+                                            sketch_params=None))
+                                else:
+                                    self.extrafill1lines.append(None)
                                 self.extratemp1lines.append(self.ax.plot(self.extratimex[i],visible_extratemp1,transform=trans,color=self.extradevicecolor1[i],
                                     sketch_params=None,
                                     path_effects=self.line_path_effects(self.glow, self.patheffects, self.aw.light_background_p, self.extralinewidths1[i],self.extradevicecolor1[i]),
@@ -11193,8 +11242,13 @@ class tgraphcanvas(QObject):
                                 else:
                                     visible_extratemp2 = numpy.array(self.extrastemp2[i], dtype=numpy.double)
                                 # first draw the fill if any
-                                if not self.flagstart and self.aw.extraFill2[i] > 0:
-                                    self.ax.fill_between(self.extratimex[i], 0, visible_extratemp2,transform=trans,color=self.extradevicecolor2[i],alpha=self.aw.extraFill2[i]/100.,sketch_params=None)
+                                if self.aw.extraFill2[i] > 0:
+                                    self.extrafill2lines.append(self.ax.fill_between(
+                                            self.extratimex[i], visible_extratemp2, 0, transform=trans,
+                                            color=self.extradevicecolor2[i],alpha=self.aw.extraFill2[i]/100.,
+                                            sketch_params=None))
+                                else:
+                                    self.extrafill2lines.append(None)
                                 self.extratemp2lines.append(self.ax.plot(self.extratimex[i],visible_extratemp2,transform=trans,color=self.extradevicecolor2[i],
                                     sketch_params=None,
                                     path_effects=self.line_path_effects(self.glow, self.patheffects, self.aw.light_background_p, self.extralinewidths2[i],self.extradevicecolor2[i]),
@@ -11361,7 +11415,7 @@ class tgraphcanvas(QObject):
                             if self.legendloc_pos is None:
                                 loc = self.legendloc # a position selected in the axis dialog
                             else:
-                                loc = self.legendloc_pos # a user define legend position set by drag-and-drop
+                                loc = self.legendloc_pos # pyrefly:ignore[bad-assignment] # a user define legend position set by drag-and-drop
                         else:
                             loc = self.legend._loc # type: ignore[attr-defined] # "Legend" has no attribute "_loc" # pylint: disable=protected-access
                         try:
@@ -13675,8 +13729,8 @@ class tgraphcanvas(QObject):
             # this happens after real recordings or simlator runs and also if signals onclick/onpick/ondraw are disconnected
             # solutions are to run an updateBackground() or another redraw() about in 100s using a QTimer
             # also a call  to self.fig.canvas.flush_events() or QApplication.processEvents() here resolves it. A libtime.sleep(1) does not solve the issue
-            QTimer.singleShot(100,self.updateBackground) # solves the issue and is faster than the other 2 options
-#            self.fig.canvas.flush_events() # solves the issue (takes ~1sec)
+#            QTimer.singleShot(100,self.updateBackground) # solves the issue and is faster than the other 2 options; but does not show the line fills
+            self.fig.canvas.flush_events() # solves the issue (takes ~1sec); shows the line fills
 #            QApplication.processEvents()  # solves the issue (but is more general as the MPL flush_events (takes ~1sec)
 
             # we autosave after full redraw after OFF to have the optional generated PDF containing all information
@@ -14256,11 +14310,14 @@ class tgraphcanvas(QObject):
 
             self.flagstart = True
 
-            self.timealign(redraw=True)
+
 
             # start Monitor if not yet running
             if not self.flagon:
+                self.timealign(redraw=False)
                 self.OnMonitor()
+            else:
+                self.timealign(redraw=True) # need to redraw here which is otherwise done in OnOnitor to align behavior of OFF->START with OFF->ON->START
             try:
                 self.aw.eventactionx(self.xextrabuttonactions[1],self.xextrabuttonactionstrings[1])
             except Exception as e: # pylint: disable=broad-except
@@ -14497,7 +14554,7 @@ class tgraphcanvas(QObject):
                             self.l_annotations = self.l_annotations[:-2]
                             if 0 in self.l_annotations_dict:
                                 del self.l_annotations_dict[0]
-                            self.xaxistosm(redraw=False, set_xlim=not zoomed_in)
+                        self.xaxistosm(redraw=False, set_xlim=not zoomed_in) # need to fix uneven x-axis labels like -0:13
                     elif not self.aw.buttonCHARGE.isFlat():
                         if self.device == 18 and self.aw.simulator is None: #manual mode
                             tx,et,bt = self.aw.ser.NONE()
