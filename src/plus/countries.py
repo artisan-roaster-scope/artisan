@@ -279,7 +279,7 @@ QApplication.translate(
     'Countries', 'United Kingdom of Great Britain and Northern Ireland'
 )
 QApplication.translate(
-    'Countries', 'United States Minor Outlying Islands', None
+    'Countries', 'United States Minor Outlying Islands'
 )
 QApplication.translate('Countries', 'USA')
 QApplication.translate('Countries', 'United States of America')

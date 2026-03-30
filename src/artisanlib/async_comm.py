@@ -393,15 +393,15 @@ class AsyncComm:
                 # Wait for 2 seconds, then raise TimeoutError
                 reader, writer = await asyncio.wait_for(connect, timeout=connect_timeout)
                 if writer is not None: # pyright:ignore[reportUnnecessaryComparison] # reader is of type asyncio.streams.StreamReader and thus never None
+                    self._write_queue = asyncio.Queue()
+                    read_handler = asyncio.create_task(self.handle_reads(reader))
+                    write_handler = asyncio.create_task(self.handle_writes(writer, self._write_queue))
                     _log.debug('connected')
                     if self._connected_handler is not None:
                         try:
                             self._connected_handler()
                         except Exception as e: # pylint: disable=broad-except
                             _log.exception(e)
-                    self._write_queue = asyncio.Queue()
-                    read_handler = asyncio.create_task(self.handle_reads(reader))
-                    write_handler = asyncio.create_task(self.handle_writes(writer, self._write_queue))
                     done, pending = await asyncio.wait([read_handler, write_handler], return_when=asyncio.FIRST_COMPLETED)
                     _log.debug('disconnected')
 
@@ -437,8 +437,8 @@ class AsyncComm:
         if self.async_loop_thread is not None and self._write_queue is not None:
             asyncio.run_coroutine_threadsafe(self._write_queue.put(message), self.async_loop_thread.loop)
 
-    # adds message to write queue and awaits new data which is assumed to event.set() once received()
-    # if serialize is set, writes are serialized such that at any momemnt only one response is awaited using the given events
+    # adds message to write queue and awaits new data which is assumed to event.set() in read_msg() once received
+    # if serialize is set, writes are serialized such that at any moment only one response is awaited using the given event
     # ensuring minimum delay of 'delay' between writes (in seconds)
     # returns True on success and False on timeout
     # on return the event is always cleared

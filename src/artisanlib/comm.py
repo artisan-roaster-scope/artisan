@@ -2190,32 +2190,33 @@ class serialport:
             t1, t2, _sid = self.aw.kaleido.getBTET()
 # it remains unclear what those machine exactly report and when. In some cases processingn this event flag can lead to unfavorable situations so we do not process them at all
 # now the syncing of those event flags can be user configurable and is by default OFF
-            try:
-                event_flag:int = _sid & 15 # last 4 bits of the sid
-                if len(self.aw.kaleidoEventFlags)>0 and self.aw.kaleidoEventFlags[0] and event_flag == 1 and self.aw.qmc.timeindex[0] == -1:
-                    self.aw.qmc.markChargeSignal.emit(True) # CHARGE
-#                elif event_flag == 2 and self.aw.qmc.TPalarmtimeindex is None:
-#                    self.aw.qmc.markTPSignal.emit() # TP
-                elif len(self.aw.kaleidoEventFlags)>1 and self.aw.kaleidoEventFlags[1] and event_flag == 3 and self.aw.qmc.timeindex[1] == 0:
-                    self.aw.qmc.markDRYSignal.emit(True) # DRY
-                elif len(self.aw.kaleidoEventFlags)>2 and self.aw.kaleidoEventFlags[2] and event_flag == 4 and self.aw.qmc.timeindex[2] == 0:
-                    self.aw.qmc.markFCsSignal.emit(True) # FCs
-                elif len(self.aw.kaleidoEventFlags)>3 and self.aw.kaleidoEventFlags[3] and event_flag == 5 and self.aw.qmc.timeindex[3] == 0:
-                    self.aw.qmc.markFCeSignal.emit(True) # FCe
-                elif len(self.aw.kaleidoEventFlags)>4 and self.aw.kaleidoEventFlags[4] and event_flag == 6 and self.aw.qmc.timeindex[4] == 0:
-                    self.aw.qmc.markSCsSignal.emit(True) # SCs
-                elif len(self.aw.kaleidoEventFlags)>5 and self.aw.kaleidoEventFlags[5] and event_flag == 7 and self.aw.qmc.timeindex[5] == 0:
-                    self.aw.qmc.markSCeSignal.emit(True) # SCe
-                elif len(self.aw.kaleidoEventFlags)>6 and self.aw.kaleidoEventFlags[6] and (event_flag == 8 and self.aw.qmc.timeindex[6] == 0 and
-                    self.aw.qmc.timeindex[0] > -1 and self.aw.qmc.autoDropIdx == 0 and
-                    (self.aw.qmc.timex[-1] - self.aw.qmc.timex[self.aw.qmc.timeindex[0]]) > 7*60):
-                    # only after 7min into the roast and if CHARGE is marked
-                    self.aw.qmc.autoDropIdx = len(self.aw.qmc.timex) - 2
-                    self.aw.qmc.markDropSignal.emit(True) # DROP
-#                elif event_flag == 9 and self.aw.qmc.timeindex[0] > -1 and self.aw.qmc.timeindex[6] >= 0 and self.aw.qmc.timeindex[7] == 0:
-#                    self.aw.qmc.markCoolSignal.emit(True) # COOL
-            except Exception as e: # pylint: disable=broad-except
-                _log.error(e)
+            if self.aw.qmc.flagstart:
+                try:
+                    event_flag:int = _sid & 15 # last 4 bits of the sid
+                    if len(self.aw.kaleidoEventFlags)>0 and self.aw.kaleidoEventFlags[0] and event_flag == 1 and self.aw.qmc.timeindex[0] == -1:
+                        self.aw.qmc.markChargeSignal.emit(True) # CHARGE
+    #                elif event_flag == 2 and self.aw.qmc.TPalarmtimeindex is None:
+    #                    self.aw.qmc.markTPSignal.emit() # TP
+                    elif len(self.aw.kaleidoEventFlags)>1 and self.aw.kaleidoEventFlags[1] and event_flag == 3 and self.aw.qmc.timeindex[1] == 0:
+                        self.aw.qmc.markDRYSignal.emit(True) # DRY
+                    elif len(self.aw.kaleidoEventFlags)>2 and self.aw.kaleidoEventFlags[2] and event_flag == 4 and self.aw.qmc.timeindex[2] == 0:
+                        self.aw.qmc.markFCsSignal.emit(True) # FCs
+                    elif len(self.aw.kaleidoEventFlags)>3 and self.aw.kaleidoEventFlags[3] and event_flag == 5 and self.aw.qmc.timeindex[3] == 0:
+                        self.aw.qmc.markFCeSignal.emit(True) # FCe
+                    elif len(self.aw.kaleidoEventFlags)>4 and self.aw.kaleidoEventFlags[4] and event_flag == 6 and self.aw.qmc.timeindex[4] == 0:
+                        self.aw.qmc.markSCsSignal.emit(True) # SCs
+                    elif len(self.aw.kaleidoEventFlags)>5 and self.aw.kaleidoEventFlags[5] and event_flag == 7 and self.aw.qmc.timeindex[5] == 0:
+                        self.aw.qmc.markSCeSignal.emit(True) # SCe
+                    elif len(self.aw.kaleidoEventFlags)>6 and self.aw.kaleidoEventFlags[6] and (event_flag == 8 and self.aw.qmc.timeindex[6] == 0 and
+                        self.aw.qmc.timeindex[0] > -1 and self.aw.qmc.autoDropIdx == 0 and
+                        (self.aw.qmc.timex[-1] - self.aw.qmc.timex[self.aw.qmc.timeindex[0]]) > 7*60):
+                        # only after 7min into the roast and if CHARGE is marked
+                        self.aw.qmc.autoDropIdx = len(self.aw.qmc.timex) - 2
+                        self.aw.qmc.markDropSignal.emit(True) # DROP
+    #                elif event_flag == 9 and self.aw.qmc.timeindex[0] > -1 and self.aw.qmc.timeindex[6] >= 0 and self.aw.qmc.timeindex[7] == 0:
+    #                    self.aw.qmc.markCoolSignal.emit(True) # COOL
+                except Exception as e: # pylint: disable=broad-except
+                    _log.error(e)
         return tx,t2,t1 # time, ET (chan2), BT (chan1)
 
 
@@ -2275,12 +2276,13 @@ class serialport:
             t2 = self.aw.orbiter.getET()
 
             # autoCHARGE/autoDROP triggered by machine
-            if self.aw.qmc.timeindex[0] == -1 and self.aw.orbiter.isRoaster_Roasting:
-                self.aw.qmc.markChargeSignal.emit(True) # CHARGE
-            elif (self.aw.qmc.timeindex[0] > -1 and self.aw.qmc.timeindex[6] == 0 and self.aw.qmc.autoDropIdx == 0 and
-                    previous_isRoaster_Roasting and not self.aw.orbiter.isRoaster_Roasting):
-                self.aw.qmc.autoDropIdx = len(self.aw.qmc.timex) - 1
-                self.aw.qmc.markDropSignal.emit(True) # DROP
+            if self.aw.qmc.flagstart:
+                if self.aw.qmc.timeindex[0] == -1 and self.aw.orbiter.isRoaster_Roasting:
+                    self.aw.qmc.markChargeSignal.emit(True) # CHARGE
+                elif (self.aw.qmc.timeindex[0] > -1 and self.aw.qmc.timeindex[6] == 0 and self.aw.qmc.autoDropIdx == 0 and
+                        previous_isRoaster_Roasting and not self.aw.orbiter.isRoaster_Roasting):
+                    self.aw.qmc.autoDropIdx = len(self.aw.qmc.timex) - 1
+                    self.aw.qmc.markDropSignal.emit(True) # DROP
 
         return tx,t2,t1
 
@@ -6991,7 +6993,7 @@ class serialport:
                     except Exception: # pylint: disable=broad-except
                         pass
                     if (not len(result) == 0 and not result.startswith('#')):
-                        raise Exception(QApplication.translate('Error Message','Arduino could not set channels',None)) # pylint: disable=broad-exception-raised
+                        raise Exception(QApplication.translate('Error Message','Arduino could not set channels')) # pylint: disable=broad-exception-raised
 
                     if self.aw.seriallogflag:
                         settings = str(self.comport) + ',' + str(self.baudrate) + ',' + str(self.bytesize)+ ',' + str(self.parity) + ',' + str(self.stopbits) + ',' + str(self.timeout)
@@ -7007,7 +7009,7 @@ class serialport:
                         libtime.sleep(.1)
                         result = self.SP.readline().decode('utf-8')[:-2]
                         if (not len(result) == 0 and not result.startswith('#')):
-                            raise Exception(QApplication.translate('Error Message','Arduino could not set temperature unit',None)) # pylint: disable=broad-exception-raised
+                            raise Exception(QApplication.translate('Error Message','Arduino could not set temperature unit')) # pylint: disable=broad-exception-raised
                         #OK. NOW SET FILTER
                         self.SP.reset_input_buffer()
                         self.SP.reset_output_buffer()
@@ -7017,10 +7019,10 @@ class serialport:
                         self.SP.write(str2cmd(command))
                         result = self.SP.readline().decode('utf-8')[:-2]
                         if (not len(result) == 0 and not result.startswith('#')):
-                            raise Exception(QApplication.translate('Error Message','Arduino could not set filters',None)) # pylint: disable=broad-exception-raised
+                            raise Exception(QApplication.translate('Error Message','Arduino could not set filters')) # pylint: disable=broad-exception-raised
                         ### EVERYTHING OK  ###
                         self.ArduinoIsInitialized = 1
-                        self.aw.sendmessage(QApplication.translate('Message','TC4 initialized',None))
+                        self.aw.sendmessage(QApplication.translate('Message','TC4 initialized'))
                 #READ TEMPERATURE
                 command = 'READ\n'  #Read command.
                 self.SP.reset_input_buffer()
@@ -7146,7 +7148,7 @@ class serialport:
             _log.exception(e)
             # self.closeport() # closing the port on error is to serve as the Arduino needs time to restart and has to be reinitialized!
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate('Error Message', 'Exception:',None) + ' ser.ARDUINOTC4temperature(): {0}').format(str(e)),(exc_tb.tb_lineno if exc_tb is not None else 0))
+            self.aw.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' ser.ARDUINOTC4temperature(): {0}').format(str(e)),(exc_tb.tb_lineno if exc_tb is not None else 0))
             return -1.,-1.
         finally:
             if self.COMsemaphore.available() < 1:

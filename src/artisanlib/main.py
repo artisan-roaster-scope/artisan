@@ -5275,9 +5275,7 @@ class ApplicationWindow(QMainWindow):
     @staticmethod
     def QColorBrightness(c:QColor) -> float:
         r,g,b,_ = c.getRgb()
-        if r is not None and g is not None and b is not None:
-            return ((r*299) + (g*587) + (b*114)) / 1000
-        return 127
+        return ((r*299) + (g*587) + (b*114)) / 1000
 
     # this is important to have . as decimal separator independent of the systems locale
     # dec: number of decimals
@@ -5904,7 +5902,7 @@ class ApplicationWindow(QMainWindow):
                             elevation, res2 = QInputDialog.getInt(self,
                                 QApplication.translate('Message', 'Ambient'),
                                 QApplication.translate('Message', 'Elevation (MASL)'),value=self.qmc.elevation)
-                            if res2 is not None and res2:
+                            if res2:
                                 try:
                                     self.qmc.elevation = int(elevation)
                                 except Exception: # pylint: disable=broad-except
@@ -5958,7 +5956,7 @@ class ApplicationWindow(QMainWindow):
                         host, res2 = QInputDialog.getText(self,
                             f"{QApplication.translate('Message', 'Machine')} (MODBUS)",
                             QApplication.translate('Message', 'Network name or IP address'),text=defaultModbusHost)
-                        if res2 is not None and res2:
+                        if res2:
                             res = res2
                             self.modbus.host = host
                         else:
@@ -5969,7 +5967,7 @@ class ApplicationWindow(QMainWindow):
                         host, res2 = QInputDialog.getText(self,
                             f"{QApplication.translate('Message', 'Machine')} (S7)",
                             QApplication.translate('Message', 'Network name or IP address'),text=defaultS7Host)
-                        if res2 is not None and res2:
+                        if res2:
                             res = res2
                             self.s7.host = host
                         else:
@@ -5980,7 +5978,7 @@ class ApplicationWindow(QMainWindow):
                         host, res2 = QInputDialog.getText(self,
                             f"{QApplication.translate('Message', 'Machine')} (WebSocket)",
                             QApplication.translate('Message', 'Network name or IP address'),text=defaultWSHost)
-                        if res2 is not None and res2:
+                        if res2:
                             res = res2
                             self.ws.host = host
                         else:
@@ -5991,7 +5989,7 @@ class ApplicationWindow(QMainWindow):
                         host, res2 = QInputDialog.getText(self,
                             QApplication.translate('Message', 'Machine'),
                             QApplication.translate('Message', 'Network name or IP address'),text=defaultKaleidoHost)
-                        if res2 is not None and res2:
+                        if res2:
                             res = res2
                             self.kaleidoHost = host
                         else:
@@ -6002,7 +6000,7 @@ class ApplicationWindow(QMainWindow):
                         host, res2 = QInputDialog.getText(self,
                             QApplication.translate('Message', 'Machine'),
                             QApplication.translate('Message', 'Network name or IP address'),text=defaultMugmaHost)
-                        if res2 is not None and res2:
+                        if res2:
                             res = res2
                             self.mugmaHost = host
                         else:
@@ -6046,7 +6044,7 @@ class ApplicationWindow(QMainWindow):
                                 0, # min
                                 999, # max
                                 1) # decimals
-                            if res2 is not None and res2:
+                            if res2:
                                 res = res2
                                 self.qmc.roastersize_setup = self.qmc.roastersize = batchsize
                         else:
@@ -17464,7 +17462,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     @pyqtSlot(bool)
     def fileExportOrbiter(self, _:bool = False) -> None:
-        self.fileExport(QApplication.translate('Message', 'Export {}').format('Orbiter'),'*.zip',self.exportOrbiterROP)
+        self.fileExport(QApplication.translate('Message', 'Export {}').format('Orbiter'),'*.rop.zip',self.exportOrbiterROP)
 
 #    @pyqtSlot()
 #    @pyqtSlot(bool)
@@ -21294,7 +21292,7 @@ class ApplicationWindow(QMainWindow):
 
             if settings.status() != QSettings.Status.NoError:
                 _log.error('Failed to save settings')
-                QMessageBox.information(self, QApplication.translate('Error Message', 'Error',None),QApplication.translate('Error Message', 'Failed to save settings'))
+                QMessageBox.information(self, QApplication.translate('Error Message', 'Error'),QApplication.translate('Error Message', 'Failed to save settings'))
                 return False
             if not read_defaults:
                 _log.info('wrote %s settings in %.2fs', len(settings.allKeys()), libtime.process_time() - start_time)
@@ -21303,7 +21301,7 @@ class ApplicationWindow(QMainWindow):
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
             _, _, exc_tb = sys.exc_info()
-            QMessageBox.information(self, QApplication.translate('Error Message', 'Error',None),QApplication.translate('Error Message', 'Exception:') + ' saveAllSettings()  @line ' + str(getattr(exc_tb, 'tb_lineno', '?')))
+            QMessageBox.information(self, QApplication.translate('Error Message', 'Error'),QApplication.translate('Error Message', 'Exception:') + ' saveAllSettings()  @line ' + str(getattr(exc_tb, 'tb_lineno', '?')))
         return False
 
     def closeEventSettings_theme(self, filename:str|None = None) -> None:
@@ -21346,7 +21344,7 @@ class ApplicationWindow(QMainWindow):
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
             _, _, exc_tb = sys.exc_info()
-            QMessageBox.information(self, QApplication.translate('Error Message', 'Error',None),QApplication.translate('Error Message', 'Exception:') + ' closeEventSettings_theme()  @line ' + str(getattr(exc_tb, 'tb_lineno', '?')))
+            QMessageBox.information(self, QApplication.translate('Error Message', 'Error'),QApplication.translate('Error Message', 'Exception:') + ' closeEventSettings_theme()  @line ' + str(getattr(exc_tb, 'tb_lineno', '?')))
 
 
     def stopActivities(self) -> None:

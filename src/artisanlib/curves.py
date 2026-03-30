@@ -427,7 +427,7 @@ class CurvesDlg(ArtisanDialog):
         self.MinMaxLimits.stateChanged.connect(self.changeMinMaxLimits)
         self.MinMaxLimits.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         #swapETBT flag
-        self.swapETBT = QCheckBox(QApplication.translate('Label', 'ET', None) + ' <-> ' + QApplication.translate('Label', 'BT'))
+        self.swapETBT = QCheckBox(QApplication.translate('Label', 'ET') + ' <-> ' + QApplication.translate('Label', 'BT'))
         self.swapETBT.setChecked(self.aw.qmc.swapETBT)
         self.swapETBT.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.swapETBT.stateChanged.connect(self.changeSwapETBT)
@@ -446,8 +446,8 @@ class CurvesDlg(ArtisanDialog):
         self.maxLimit.setValue(int(self.aw.qmc.filterDropOut_tmax))
         #show projection
         self.projectCheck = QCheckBox(QApplication.translate('CheckBox', 'Projection'))
-        self.ETprojectCheck = QCheckBox(f"{QApplication.translate('Label', 'ET', None)} {QApplication.translate('CheckBox', 'Projection')}")
-        self.BTprojectCheck = QCheckBox(f"{QApplication.translate('Label', 'BT', None)} {QApplication.translate('CheckBox', 'Projection')}")
+        self.ETprojectCheck = QCheckBox(f"{QApplication.translate('Label', 'ET')} {QApplication.translate('CheckBox', 'Projection')}")
+        self.BTprojectCheck = QCheckBox(f"{QApplication.translate('Label', 'BT')} {QApplication.translate('CheckBox', 'Projection')}")
         self.projectDeltaCheck = QCheckBox(deltaLabelUTF8 + QApplication.translate('CheckBox', 'Projection'))
         self.projectionmodeComboBox = QComboBox()
         self.projectionmodeComboBox.addItems([QApplication.translate('ComboBox','linear'),

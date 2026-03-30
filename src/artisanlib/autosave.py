@@ -226,5 +226,5 @@ class autosaveDlg(ArtisanDialog):
 
         if self.aw.qmc.autosaveflag and self.aw.qmc.autosavepath == '':
             QMessageBox.warning(None, #self.aw, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
-                QApplication.translate('Message', 'Warning', None),
+                QApplication.translate('Message', 'Warning'),
                 QApplication.translate('Message', 'Autosave turned ON, but filepath empty!\n\nATTENTION: Recorded data will get cleared without confirmation'))

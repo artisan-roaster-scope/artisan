@@ -129,7 +129,7 @@ class SamplingDlg(ArtisanDialog):
         self.aw.setSamplingRate(int(interval))
         if self.aw.qmc.delay < self.aw.qmc.default_delay:
             QMessageBox.warning(None, #self.aw, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
-                QApplication.translate('Message', 'Warning', None),
+                QApplication.translate('Message', 'Warning'),
                 QApplication.translate('Message', 'A tight sampling interval might lead to instability on some machines. We suggest a minimum of 1s.'))
         self.storeSettings()
         self.accept()

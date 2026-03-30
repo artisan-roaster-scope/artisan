@@ -11874,8 +11874,7 @@ class tgraphcanvas(QObject):
         width = img.width()
         height = img.height()
         imgsize = img.bits()
-        if imgsize is not None:
-            imgsize.setsize(img.sizeInBytes())
+        imgsize.setsize(img.sizeInBytes())
         return numpy.array(imgsize).reshape((height, width, int(32/8)))
 
     #watermark image

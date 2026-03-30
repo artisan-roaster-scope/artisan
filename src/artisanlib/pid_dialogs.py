@@ -3382,7 +3382,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
 
     @pyqtSlot(bool)
     def load(self, _:bool = False) -> None:
-        self.aw.fileImport(QApplication.translate('Message', 'Load PID Settings',None),self.loadPIDJSON)
+        self.aw.fileImport(QApplication.translate('Message', 'Load PID Settings'),self.loadPIDJSON)
 
     def loadPIDJSON(self, filename:str) -> None:
         try:
@@ -3443,7 +3443,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
             self.createsegmenttable()
         except Exception as ex: # pylint: disable=broad-exception-caught
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate('Error Message','Exception:',None) + ' loadPIDJSON() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+            self.aw.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' loadPIDJSON() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot(bool)
     def writeSetValues(self, _:bool = False) -> None:
@@ -3471,7 +3471,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
 
     @pyqtSlot(bool)
     def save(self, _:bool = False) -> None:
-        self.aw.fileExport(QApplication.translate('Message', 'Save PID Settings',None),'*.apid',self.savePIDJSON)
+        self.aw.fileExport(QApplication.translate('Message', 'Save PID Settings'),'*.apid',self.savePIDJSON)
 
     def savePIDJSON(self, filename:str) -> bool:
         try:
@@ -3509,7 +3509,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
             return True
         except Exception as ex: # pylint: disable=broad-exception-caught
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate('Error Message', 'Exception:',None) + ' savePIDJSON(): {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+            self.aw.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' savePIDJSON(): {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
             return False
 
     @pyqtSlot(bool)
@@ -3528,13 +3528,13 @@ class PXG4pidDlgControl(PXpidDlgControl):
                 r = self.aw.ser.sendFUJIcommand(command,8)
             #check response from pid and update message on main window
             if r == command:
-                message = QApplication.translate('StatusBar','Time Units successfully set to MM:SS',None)
+                message = QApplication.translate('StatusBar','Time Units successfully set to MM:SS')
                 self.status.showMessage(message, 5000)
             else:
-                self.status.showMessage(QApplication.translate('StatusBar','Problem setting time units',None),5000)
+                self.status.showMessage(QApplication.translate('StatusBar','Problem setting time units'),5000)
         except Exception as e: # pylint: disable=broad-exception-caught
             _i, _r, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate('Error Message', 'Exception:',None) + ' settimeunits(): {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
+            self.aw.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' settimeunits(): {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     @pyqtSlot(int)
     def paintlabels(self, _:int = 0) -> None:
@@ -3679,8 +3679,8 @@ class PXG4pidDlgControl(PXpidDlgControl):
         # if current svN is different than requested svN
         if N is not None and N != -1:
             if svn != N:
-                string = QApplication.translate('Message','Current sv = {0}. Change now to sv = {1}?',None).format(str(N),str(svn))
-                reply = QMessageBox.question(self.aw,QApplication.translate('Message','Change svN',None),string,
+                string = QApplication.translate('Message','Current sv = {0}. Change now to sv = {1}?').format(str(N),str(svn))
+                reply = QMessageBox.question(self.aw,QApplication.translate('Message','Change svN'),string,
                                     QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
                 if reply == QMessageBox.StandardButton.Yes:
                     #change variable svN
@@ -3696,13 +3696,13 @@ class PXG4pidDlgControl(PXpidDlgControl):
                         if svn > 0:
                             reg_dict['selectsv'][0] = svn
                             key = 'sv' + str(svn)
-                            message = QApplication.translate('StatusBar','SV{0} set to {1}',None).format(str(svn),str(reg_dict[key][0]))
+                            message = QApplication.translate('StatusBar','SV{0} set to {1}').format(str(svn),str(reg_dict[key][0]))
                             self.aw.lcd6.display(str(reg_dict[key][0]))
                             self.status.showMessage(message, 5000)
                     else:
-                        self.status.showMessage(QApplication.translate('StatusBar','Problem setting SV',None),5000)
+                        self.status.showMessage(QApplication.translate('StatusBar','Problem setting SV'),5000)
                 elif reply == QMessageBox.StandardButton.Cancel:
-                    self.status.showMessage(QApplication.translate('StatusBar','Cancelled svN change',None),5000)
+                    self.status.showMessage(QApplication.translate('StatusBar','Cancelled svN change'),5000)
                     #set radio button
                     if N == 1:
                         self.radiosv1.setChecked(True)
@@ -3720,10 +3720,10 @@ class PXG4pidDlgControl(PXpidDlgControl):
                         self.radiosv7.setChecked(True)
                     return
             else:
-                mssg = QApplication.translate('StatusBar','PID already using sv{0}',None).format(str(N))
+                mssg = QApplication.translate('StatusBar','PID already using sv{0}').format(str(N))
                 self.status.showMessage(mssg,1000)
         else:
-            mssg = QApplication.translate('StatusBar','setNsv(): bad response',None)
+            mssg = QApplication.translate('StatusBar','setNsv(): bad response')
             self.status.showMessage(mssg,1000)
             self.aw.qmc.adderror(mssg)
 
@@ -3761,8 +3761,8 @@ class PXG4pidDlgControl(PXpidDlgControl):
             reg_dict['selectedpid'][0] = N
             # if current svN is different than requested svN
             if pidn != N:
-                string = QApplication.translate('Message','Current pid = {0}. Change now to pid ={1}?',None).format(str(N),str(pidn))
-                reply = QMessageBox.question(self.aw,QApplication.translate('Message','Change svN',None),string,
+                string = QApplication.translate('Message','Current pid = {0}. Change now to pid ={1}?').format(str(N),str(pidn))
+                reply = QMessageBox.question(self.aw,QApplication.translate('Message','Change svN'),string,
                                     QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
                 if reply == QMessageBox.StandardButton.Yes:
                     #change variable svN
@@ -3777,14 +3777,14 @@ class PXG4pidDlgControl(PXpidDlgControl):
                     if r == command:
                         reg_dict['selectedpid'][0] = pidn
                         #key = "sv" + str(pidn)
-                        message = QApplication.translate('StatusBar','pid changed to {0}',None).format(str(pidn))
+                        message = QApplication.translate('StatusBar','pid changed to {0}').format(str(pidn))
                         self.status.showMessage(message, 5000)
                     else:
-                        mssg = QApplication.translate('StatusBar','setNpid(): bad confirmation',None)
+                        mssg = QApplication.translate('StatusBar','setNpid(): bad confirmation')
                         self.status.showMessage(mssg,1000)
                         self.aw.qmc.adderror(mssg)
                 elif reply == QMessageBox.StandardButton.Cancel:
-                    self.status.showMessage(QApplication.translate('StatusBar','Cancelled pid change',None),5000)
+                    self.status.showMessage(QApplication.translate('StatusBar','Cancelled pid change'),5000)
                     #put back radio button
                     if N == 1:
                         self.radiosv1.setChecked(True)
@@ -3809,10 +3809,10 @@ class PXG4pidDlgControl(PXpidDlgControl):
                         self.radiopid7.setChecked(True)
                     return
             else:
-                mssg = QApplication.translate('StatusBar','PID was already using pid {0}',None).format(str(N))
+                mssg = QApplication.translate('StatusBar','PID was already using pid {0}').format(str(N))
                 self.status.showMessage(mssg,1000)
         else:
-            mssg = QApplication.translate('StatusBar','setNpid(): Unable to set pid {0} ',None).format(str(N))
+            mssg = QApplication.translate('StatusBar','setNpid(): Unable to set pid {0} ').format(str(N))
             self.status.showMessage(mssg,1000)
             self.aw.qmc.adderror(mssg)
 
@@ -3891,49 +3891,49 @@ class PXG4pidDlgControl(PXpidDlgControl):
             if i == 1:
                 self.sv1edit.setText(comma2dot(str(self.sv1edit.text())))
                 reg_dict[svkey][0] = toFloat(self.sv1edit.text())
-                message = QApplication.translate('StatusBar','SV{0} successfully set to {1}',None).format(str(i),str(self.sv1edit.text()))
+                message = QApplication.translate('StatusBar','SV{0} successfully set to {1}').format(str(i),str(self.sv1edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNsv(1)
                 self.aw.lcd6.display(self.sv1edit.text())
             elif i == 2:
                 self.sv2edit.setText(comma2dot(str(self.sv2edit.text())))
                 reg_dict[svkey][0] = toFloat(str(self.sv2edit.text()))
-                message = QApplication.translate('StatusBar','SV{0} successfully set to {1}',None).format(str(i),str(self.sv2edit.text()))
+                message = QApplication.translate('StatusBar','SV{0} successfully set to {1}').format(str(i),str(self.sv2edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNsv(2)
                 self.aw.lcd6.display(self.sv2edit.text())
             elif i == 3:
                 self.sv3edit.setText(comma2dot(str(self.sv3edit.text())))
                 reg_dict[svkey][0] = toFloat(str(self.sv3edit.text()))
-                message = QApplication.translate('StatusBar','SV{0} successfully set to {1}',None).format(str(i),str(self.sv3edit.text()))
+                message = QApplication.translate('StatusBar','SV{0} successfully set to {1}').format(str(i),str(self.sv3edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNsv(3)
                 self.aw.lcd6.display(self.sv3edit.text())
             elif i == 4:
                 self.sv4edit.setText(comma2dot(str(self.sv4edit.text())))
                 reg_dict[svkey][0] = toFloat(str(self.sv4edit.text()))
-                message = QApplication.translate('StatusBar','SV{0} successfully set to {1}',None).format(str(i),str(self.sv4edit.text()))
+                message = QApplication.translate('StatusBar','SV{0} successfully set to {1}').format(str(i),str(self.sv4edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNsv(4)
                 self.aw.lcd6.display(self.sv4edit.text())
             elif i == 5:
                 self.sv5edit.setText(comma2dot(str(self.sv5edit.text())))
                 reg_dict[svkey][0] = toFloat(str(self.sv5edit.text()))
-                message = QApplication.translate('StatusBar','SV{0} successfully set to {1}',None).format(str(i),str(self.sv5edit.text()))
+                message = QApplication.translate('StatusBar','SV{0} successfully set to {1}').format(str(i),str(self.sv5edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNsv(5)
                 self.aw.lcd6.display(self.sv5edit.text())
             elif i == 6:
                 self.sv6edit.setText(comma2dot(str(self.sv6edit.text())))
                 reg_dict[svkey][0] = toFloat(str(self.sv6edit.text()))
-                message = QApplication.translate('StatusBar','SV{0} successfully set to {1}',None).format(str(i),str(self.sv6edit.text()))
+                message = QApplication.translate('StatusBar','SV{0} successfully set to {1}').format(str(i),str(self.sv6edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNsv(6)
                 self.aw.lcd6.display(self.sv6edit.text())
             elif i == 7:
                 self.sv7edit.setText(comma2dot(str(self.sv7edit.text())))
                 reg_dict[svkey][0] = toFloat(str(self.sv7edit.text()))
-                message = QApplication.translate('StatusBar','SV{0} successfully set to {1}',None).format(str(i),str(self.sv7edit.text()))
+                message = QApplication.translate('StatusBar','SV{0} successfully set to {1}').format(str(i),str(self.sv7edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNsv(7)
                 self.aw.lcd6.display(self.sv7edit.text())
@@ -3944,7 +3944,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
                 strcommand = f'SETSV::{newSVvalue/10.:.1f}'
                 self.aw.qmc.DeviceEventRecord(strcommand)
         else:
-            mssg = QApplication.translate('StatusBar','setsv(): Unable to set SV',None)
+            mssg = QApplication.translate('StatusBar','setsv(): Unable to set SV')
             self.status.showMessage(mssg,5000)
             self.aw.qmc.adderror(mssg)
 
@@ -4031,7 +4031,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
                 reg_dict[pkey][0] = toFloat(str(self.p1edit.text().replace(',','.')))
                 reg_dict[ikey][0] = toFloat(str(self.i1edit.text().replace(',','.')))
                 reg_dict[dkey][0] = toFloat(str(self.d1edit.text().replace(',','.')))
-                message = (QApplication.translate('StatusBar','pid #{0} successfully set to ({1},{2},{3})',None
+                message = (QApplication.translate('StatusBar','pid #{0} successfully set to ({1},{2},{3})'
                                                    )).format(str(k),str(self.p1edit.text()),str(self.i1edit.text()),str(self.d1edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNpid(1)
@@ -4039,7 +4039,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
                 reg_dict[pkey][0] = toFloat(str(self.p2edit.text().replace(',','.')))
                 reg_dict[ikey][0] = toFloat(str(self.i2edit.text().replace(',','.')))
                 reg_dict[dkey][0] = toFloat(str(self.d2edit.text().replace(',','.')))
-                message = (QApplication.translate('StatusBar','pid #{0} successfully set to ({1},{2},{3})',None
+                message = (QApplication.translate('StatusBar','pid #{0} successfully set to ({1},{2},{3})'
                                                    )).format(str(k),str(self.p2edit.text()),str(self.i2edit.text()),str(self.d2edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNpid(2)
@@ -4047,7 +4047,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
                 reg_dict[pkey][0] = toFloat(str(self.p3edit.text().replace(',','.')))
                 reg_dict[ikey][0] = toFloat(str(self.i3edit.text().replace(',','.')))
                 reg_dict[dkey][0] = toFloat(str(self.d3edit.text().replace(',','.')))
-                message = (QApplication.translate('StatusBar','pid #{0} successfully set to ({1},{2},{3})',None
+                message = (QApplication.translate('StatusBar','pid #{0} successfully set to ({1},{2},{3})'
                                                    )).format(str(k),str(self.p3edit.text()),str(self.i3edit.text()),str(self.d3edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNpid(3)
@@ -4055,7 +4055,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
                 reg_dict[pkey][0] = toFloat(str(self.p4edit.text().replace(',','.')))
                 reg_dict[ikey][0] = toFloat(str(self.i4edit.text().replace(',','.')))
                 reg_dict[dkey][0] = toFloat(str(self.d4edit.text().replace(',','.')))
-                message = (QApplication.translate('StatusBar','pid #{0} successfully set to ({1},{2},{3})',None
+                message = (QApplication.translate('StatusBar','pid #{0} successfully set to ({1},{2},{3})'
                                                    )).format(str(k),str(self.p4edit.text()),str(self.i4edit.text()),str(self.d4edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNpid(4)
@@ -4063,7 +4063,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
                 reg_dict[pkey][0] = toFloat(str(self.p5edit.text().replace(',','.')))
                 reg_dict[ikey][0] = toFloat(str(self.i5edit.text().replace(',','.')))
                 reg_dict[dkey][0] = toFloat(str(self.d5edit.text().replace(',','.')))
-                message = (QApplication.translate('StatusBar','pid #{0} successfully set to ({1},{2},{3})',None
+                message = (QApplication.translate('StatusBar','pid #{0} successfully set to ({1},{2},{3})'
                                                    )).format(str(k),str(self.p5edit.text()),str(self.i5edit.text()),str(self.d5edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNpid(5)
@@ -4071,7 +4071,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
                 reg_dict[pkey][0] = toFloat(str(self.p6edit.text().replace(',','.')))
                 reg_dict[ikey][0] = toFloat(str(self.i6edit.text().replace(',','.')))
                 reg_dict[dkey][0] = toFloat(str(self.d6edit.text().replace(',','.')))
-                message = (QApplication.translate('StatusBar','pid #{0} successfully set to ({1},{2},{3})',None
+                message = (QApplication.translate('StatusBar','pid #{0} successfully set to ({1},{2},{3})'
                                                    )).format(str(k),str(self.p6edit.text()),str(self.i6edit.text()),str(self.d6edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNpid(6)
@@ -4079,7 +4079,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
                 reg_dict[pkey][0] = toFloat(str(self.p7edit.text().replace(',','.')))
                 reg_dict[ikey][0] = toFloat(str(self.i7edit.text().replace(',','.')))
                 reg_dict[dkey][0] = toFloat(str(self.d7edit.text().replace(',','.')))
-                message = (QApplication.translate('StatusBar','pid #{0} successfully set to ({1},{2},{3})',None
+                message = (QApplication.translate('StatusBar','pid #{0} successfully set to ({1},{2},{3})'
                                                    )).format(str(k),str(self.p7edit.text()),str(self.i7edit.text()),str(self.d7edit.text()))
                 self.status.showMessage(message,5000)
                 self.setNpid(7)
@@ -4087,7 +4087,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
             lp = len(p)
             li = len(i)
             ld = len(d)
-            mssg = QApplication.translate('StatusBar','pid command failed. Bad data at pid{0} (8,8,8): ({1},{2},{3}) ',None
+            mssg = QApplication.translate('StatusBar','pid command failed. Bad data at pid{0} (8,8,8): ({1},{2},{3}) '
                                                    ).format(str(k),str(lp),str(li),str(ld))
             self.status.showMessage(mssg,5000)
             self.aw.qmc.adderror(mssg)
@@ -4102,7 +4102,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
             pkey = 'p' + str(k)
             ikey = 'i' + str(k)
             dkey = 'd' + str(k)
-            msg = QApplication.translate('StatusBar','sending commands for p{0} i{1} d{2}',None).format(str(k),str(k),str(k))
+            msg = QApplication.translate('StatusBar','sending commands for p{0} i{1} d{2}').format(str(k),str(k),str(k))
             self.status.showMessage(msg,1000)
             p:float
             if self.aw.ser.useModbusPort:
@@ -4190,7 +4190,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
                     mssg = pkey + '=' + str(p) + ' ' + ikey + '=' + str(i) + ' ' + dkey + '=' + str(dd)
                     self.status.showMessage(mssg,1000)
             else:
-                mssg = QApplication.translate('StatusBar','getallpid(): Unable to read pid values',None)
+                mssg = QApplication.translate('StatusBar','getallpid(): Unable to read pid values')
                 self.status.showMessage(mssg,5000)
                 self.aw.qmc.adderror(mssg)
                 return
@@ -4218,10 +4218,10 @@ class PXG4pidDlgControl(PXpidDlgControl):
                 self.radiopid6.setChecked(True)
             elif N == 7:
                 self.radiopid7.setChecked(True)
-            mssg = QApplication.translate('StatusBar','PID is using pid = {0}',None).format(str(N))
+            mssg = QApplication.translate('StatusBar','PID is using pid = {0}').format(str(N))
             self.status.showMessage(mssg,5000)
         else:
-            mssg = QApplication.translate('StatusBar','getallpid(): Unable to read current sv',None)
+            mssg = QApplication.translate('StatusBar','getallpid(): Unable to read current sv')
             self.status.showMessage(mssg,5000)
             self.aw.qmc.adderror(mssg)
 
@@ -4299,107 +4299,107 @@ class PXG4pidDlgControl(PXpidDlgControl):
             self.radiosv6.setChecked(True)
         elif N == 7:
             self.radiosv7.setChecked(True)
-        mssg = QApplication.translate('StatusBar','PID is using SV = {0}',None).format(str(N))
+        mssg = QApplication.translate('StatusBar','PID is using SV = {0}').format(str(N))
         self.status.showMessage(mssg,5000)
 
     def checkrampsoakmode(self) -> int:
         currentmode = self.aw.fujipid.getCurrentRampSoakMode()
         if currentmode == 0:
             mode = ['0',
-                    QApplication.translate('Message','OFF',None),
-                    QApplication.translate('Message','CONTINUOUS CONTROL',None),
-                    QApplication.translate('Message','CONTINUOUS CONTROL',None),
-                    QApplication.translate('Message','OFF',None)]
+                    QApplication.translate('Message','OFF'),
+                    QApplication.translate('Message','CONTINUOUS CONTROL'),
+                    QApplication.translate('Message','CONTINUOUS CONTROL'),
+                    QApplication.translate('Message','OFF')]
         elif currentmode == 1:
             mode = ['1',
-                    QApplication.translate('Message','OFF',None),
-                    QApplication.translate('Message','CONTINUOUS CONTROL',None),
-                    QApplication.translate('Message','CONTINUOUS CONTROL',None),
-                    QApplication.translate('Message','ON',None)]
+                    QApplication.translate('Message','OFF'),
+                    QApplication.translate('Message','CONTINUOUS CONTROL'),
+                    QApplication.translate('Message','CONTINUOUS CONTROL'),
+                    QApplication.translate('Message','ON')]
         elif currentmode == 2:
             mode = ['2',
-                    QApplication.translate('Message','OFF',None),
-                    QApplication.translate('Message','CONTINUOUS CONTROL',None),
-                    QApplication.translate('Message','STANDBY MODE',None),
-                    QApplication.translate('Message','OFF',None)]
+                    QApplication.translate('Message','OFF'),
+                    QApplication.translate('Message','CONTINUOUS CONTROL'),
+                    QApplication.translate('Message','STANDBY MODE'),
+                    QApplication.translate('Message','OFF')]
         elif currentmode == 3:
             mode = ['3',
-                    QApplication.translate('Message','OFF',None),
-                    QApplication.translate('Message','CONTINUOUS CONTROL',None),
-                    QApplication.translate('Message','STANDBY MODE',None),
-                    QApplication.translate('Message','ON',None)]
+                    QApplication.translate('Message','OFF'),
+                    QApplication.translate('Message','CONTINUOUS CONTROL'),
+                    QApplication.translate('Message','STANDBY MODE'),
+                    QApplication.translate('Message','ON')]
         elif currentmode == 4:
             mode = ['4',
-                    QApplication.translate('Message','OFF',None),
-                    QApplication.translate('Message','STANDBY MODE',None),
-                    QApplication.translate('Message','CONTINUOUS CONTROL',None),
-                    QApplication.translate('Message','OFF',None)]
+                    QApplication.translate('Message','OFF'),
+                    QApplication.translate('Message','STANDBY MODE'),
+                    QApplication.translate('Message','CONTINUOUS CONTROL'),
+                    QApplication.translate('Message','OFF')]
         elif currentmode == 5:
             mode = ['5',
-                    QApplication.translate('Message','OFF',None),
-                    QApplication.translate('Message','STANDBY MODE',None),
-                    QApplication.translate('Message','CONTINUOUS CONTROL',None),
-                    QApplication.translate('Message','ON',None)]
+                    QApplication.translate('Message','OFF'),
+                    QApplication.translate('Message','STANDBY MODE'),
+                    QApplication.translate('Message','CONTINUOUS CONTROL'),
+                    QApplication.translate('Message','ON')]
         elif currentmode == 6:
             mode = ['6',
-                    QApplication.translate('Message','OFF',None),
-                    QApplication.translate('Message','STANDBY MODE',None),
-                    QApplication.translate('Message','STANDBY MODE',None),
-                    QApplication.translate('Message','OFF',None)]
+                    QApplication.translate('Message','OFF'),
+                    QApplication.translate('Message','STANDBY MODE'),
+                    QApplication.translate('Message','STANDBY MODE'),
+                    QApplication.translate('Message','OFF')]
         elif currentmode == 7:
             mode = ['7',
-                    QApplication.translate('Message','OFF',None),
-                    QApplication.translate('Message','STANDBY MODE',None),
-                    QApplication.translate('Message','STANDBY MODE',None),
-                    QApplication.translate('Message','ON',None)]
+                    QApplication.translate('Message','OFF'),
+                    QApplication.translate('Message','STANDBY MODE'),
+                    QApplication.translate('Message','STANDBY MODE'),
+                    QApplication.translate('Message','ON')]
         elif currentmode == 8:
             mode = ['8',
-                    QApplication.translate('Message','ON',None),
-                    QApplication.translate('Message','CONTINUOUS CONTROL',None),
-                    QApplication.translate('Message','CONTINUOUS CONTROL',None),
-                    QApplication.translate('Message','OFF',None)]
+                    QApplication.translate('Message','ON'),
+                    QApplication.translate('Message','CONTINUOUS CONTROL'),
+                    QApplication.translate('Message','CONTINUOUS CONTROL'),
+                    QApplication.translate('Message','OFF')]
         elif currentmode == 9:
             mode = ['9',
-                    QApplication.translate('Message','ON',None),
-                    QApplication.translate('Message','CONTINUOUS CONTROL',None),
-                    QApplication.translate('Message','CONTINUOUS CONTROL',None),
-                    QApplication.translate('Message','ON',None)]
+                    QApplication.translate('Message','ON'),
+                    QApplication.translate('Message','CONTINUOUS CONTROL'),
+                    QApplication.translate('Message','CONTINUOUS CONTROL'),
+                    QApplication.translate('Message','ON')]
         elif currentmode == 10:
             mode = ['10',
-                    QApplication.translate('Message','ON',None),
-                    QApplication.translate('Message','CONTINUOUS CONTROL',None),
-                    QApplication.translate('Message','STANDBY MODE',None),
-                    QApplication.translate('Message','OFF',None)]
+                    QApplication.translate('Message','ON'),
+                    QApplication.translate('Message','CONTINUOUS CONTROL'),
+                    QApplication.translate('Message','STANDBY MODE'),
+                    QApplication.translate('Message','OFF')]
         elif currentmode == 11:
             mode = ['11',
-                    QApplication.translate('Message','ON',None),
-                    QApplication.translate('Message','CONTINUOUS CONTROL',None),
-                    QApplication.translate('Message','STANDBY MODE',None),
-                    QApplication.translate('Message','ON',None)]
+                    QApplication.translate('Message','ON'),
+                    QApplication.translate('Message','CONTINUOUS CONTROL'),
+                    QApplication.translate('Message','STANDBY MODE'),
+                    QApplication.translate('Message','ON')]
         elif currentmode == 12:
             mode = ['12',
-                    QApplication.translate('Message','ON',None),
-                    QApplication.translate('Message','STANDBY MODE',None),
-                    QApplication.translate('Message','CONTINUOUS CONTROL',None),
-                    QApplication.translate('Message','OFF',None)]
+                    QApplication.translate('Message','ON'),
+                    QApplication.translate('Message','STANDBY MODE'),
+                    QApplication.translate('Message','CONTINUOUS CONTROL'),
+                    QApplication.translate('Message','OFF')]
         elif currentmode == 13:
             mode = ['13',
-                    QApplication.translate('Message','ON',None),
-                    QApplication.translate('Message','STANDBY MODE',None),
-                    QApplication.translate('Message','CONTINUOUS CONTROL',None),
-                    QApplication.translate('Message','ON',None)]
+                    QApplication.translate('Message','ON'),
+                    QApplication.translate('Message','STANDBY MODE'),
+                    QApplication.translate('Message','CONTINUOUS CONTROL'),
+                    QApplication.translate('Message','ON')]
         elif currentmode == 14:
             mode = ['14',
-                    QApplication.translate('Message','ON',None),
-                    QApplication.translate('Message','STANDBY MODE',None),
-                    QApplication.translate('Message','STANDBY MODE',None),
-                    QApplication.translate('Message','OFF',None)]
+                    QApplication.translate('Message','ON'),
+                    QApplication.translate('Message','STANDBY MODE'),
+                    QApplication.translate('Message','STANDBY MODE'),
+                    QApplication.translate('Message','OFF')]
         elif currentmode == 15:
             mode = ['15',
-                    QApplication.translate('Message','ON',None),
-                    QApplication.translate('Message','STANDBY MODE',None),
-                    QApplication.translate('Message','STANDBY MODE',None),
-                    QApplication.translate('Message','ON',None)]
+                    QApplication.translate('Message','ON'),
+                    QApplication.translate('Message','STANDBY MODE'),
+                    QApplication.translate('Message','STANDBY MODE'),
+                    QApplication.translate('Message','ON')]
         else:
             return -1
         string = 'The rampsoak-mode tells how to start and end the ramp/soak\n\n'
@@ -4415,7 +4415,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
         string += '\nIf you need to change it, change it now and come back later'
         string += '\nUse the Parameter Loader Software by Fuji if you need to\n\n'
         string += '\n\n\nContinue?'
-        reply = QMessageBox.question(self.aw,QApplication.translate('Message','Ramp Soak start-end mode',None),string,
+        reply = QMessageBox.question(self.aw,QApplication.translate('Message','Ramp Soak start-end mode'),string,
                             QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
         if reply == QMessageBox.StandardButton.Yes:
             return 1
@@ -4437,28 +4437,28 @@ class PXG4pidDlgControl(PXpidDlgControl):
         if flag == 1:
             check = self.checkrampsoakmode()
             if check == 0:
-                self.status.showMessage(QApplication.translate('StatusBar','Ramp/Soak operation cancelled',None), 5000)
+                self.status.showMessage(QApplication.translate('StatusBar','Ramp/Soak operation cancelled'), 5000)
                 return
             if check == -1:
-                self.status.showMessage(QApplication.translate('StatusBar','No RX data',None), 5000)
-            self.status.showMessage(QApplication.translate('StatusBar','RS ON',None),500)
+                self.status.showMessage(QApplication.translate('StatusBar','No RX data'), 5000)
+            self.status.showMessage(QApplication.translate('StatusBar','RS ON'),500)
             selectedmode = self.patternComboBox.currentIndex()
             currentmode = self.aw.fujipid.getrampsoakmode()
             if currentmode != selectedmode:
                 #set mode in pid to match the mode selected in the combobox
-                self.status.showMessage(QApplication.translate('StatusBar','Need to change pattern mode...',None),1000)
+                self.status.showMessage(QApplication.translate('StatusBar','Need to change pattern mode...'),1000)
                 res = self.aw.fujipid.setrampsoakmode(selectedmode)
                 if res:
-                    self.status.showMessage(QApplication.translate('StatusBar','Pattern has been changed. Wait 5 secs.',None), 500)
+                    self.status.showMessage(QApplication.translate('StatusBar','Pattern has been changed. Wait 5 secs.'), 500)
                 else:
-                    self.status.showMessage(QApplication.translate('StatusBar','Pattern could not be changed',None), 5000)
+                    self.status.showMessage(QApplication.translate('StatusBar','Pattern could not be changed'), 5000)
                     return
             #combobox mode matches pid mode
             #set ramp soak mode ON/OFF
             res = self.aw.fujipid.setrampsoak(flag)
             if res:
                 #record command as an Event if flag = 1
-                self.status.showMessage(QApplication.translate('StatusBar','RS ON',None), 5000)
+                self.status.showMessage(QApplication.translate('StatusBar','RS ON'), 5000)
                 pattern = ((1,4),(5,8),(1,8),(9,12),(13,16),(9,16),(1,16))
                 if self.aw.ser.controlETpid[0] == 0: #Fuji PXG
                     reg_dict = self.aw.fujipid.PXG4
@@ -4480,10 +4480,10 @@ class PXG4pidDlgControl(PXpidDlgControl):
                 result = result.strip(':')
                 self.aw.qmc.DeviceEventRecord(result)
             else:
-                self.status.showMessage(QApplication.translate('StatusBar','RampSoak could not be changed',None), 5000)
+                self.status.showMessage(QApplication.translate('StatusBar','RampSoak could not be changed'), 5000)
         #set ramp soak OFF
         elif flag == 0:
-            self.status.showMessage(QApplication.translate('StatusBar','RS OFF',None),500)
+            self.status.showMessage(QApplication.translate('StatusBar','RS OFF'),500)
             self.aw.fujipid.setrampsoak(flag)
 
 #    def setpattern(self):
@@ -4502,14 +4502,14 @@ class PXG4pidDlgControl(PXpidDlgControl):
 #            #check response from pid and update message on main window
 #            if r == command:
 #                patterns = ['1-4','5-8','1-8','9-12','13-16','9-16','1-16']
-#                message = QApplication.translate('Message','Pattern changed to {0}', None).format(patterns[self.aw.fujipid.PXG4['rampsoakpattern'][0]])
+#                message = QApplication.translate('Message','Pattern changed to {0}').format(patterns[self.aw.fujipid.PXG4['rampsoakpattern'][0]])
 #            else:
-#                message = QApplication.translate('Message','Pattern did not changed',None)
+#                message = QApplication.translate('Message','Pattern did not changed')
 #            self.aw.sendmessage(message)
 #        elif onoff == 1:
-#            self.aw.sendmessage(QApplication.translate('Message','Ramp/Soak was found ON! Turn it off before changing the pattern', None))
+#            self.aw.sendmessage(QApplication.translate('Message','Ramp/Soak was found ON! Turn it off before changing the pattern'))
 #        elif onoff == 2:
-#            self.aw.sendmessage(QApplication.translate('Message','Ramp/Soak was found in Hold! Turn it off before changing the pattern', None))
+#            self.aw.sendmessage(QApplication.translate('Message','Ramp/Soak was found in Hold! Turn it off before changing the pattern'))
 
     @pyqtSlot(bool)
     def setONstandby(self, _:bool = False) -> None:
@@ -4523,34 +4523,34 @@ class PXG4pidDlgControl(PXpidDlgControl):
         try:
             #standby ON (pid off) will reset: rampsoak modes/autotuning/self tuning
             #flag = 0 standby OFF, flag = 1 standby ON (pid off)
-            self.status.showMessage(QApplication.translate('StatusBar','wait...',None),500)
+            self.status.showMessage(QApplication.translate('StatusBar','wait...'),500)
             res = self.aw.fujipid.setONOFFstandby(flag)
             if res:
                 if flag == 1:
-                    message = QApplication.translate('StatusBar','PID set to OFF',None)     #put pid in standby 1 (pid on)
+                    message = QApplication.translate('StatusBar','PID set to OFF')     #put pid in standby 1 (pid on)
                 else:
-                    message = QApplication.translate('StatusBar','PID set to ON',None)      #put pid in standby 0 (pid off)
+                    message = QApplication.translate('StatusBar','PID set to ON')      #put pid in standby 0 (pid off)
                 self.status.showMessage(message,5000)
             else:
-                message = QApplication.translate('StatusBar','Unable',None)
-                self.status.showMessage(QApplication.translate('StatusBar','No data received',None),5000)
+                message = QApplication.translate('StatusBar','Unable')
+                self.status.showMessage(QApplication.translate('StatusBar','No data received'),5000)
         except Exception as e: # pylint: disable=broad-except
             _, _, exc_tb = sys.exc_info()
-            self.aw.qmc.adderror((QApplication.translate('Error Message','Exception:',None) + ' setONOFFstandby() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
+            self.aw.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' setONOFFstandby() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
 
     #get all Ramp Soak values for all 8 segments
     @pyqtSlot(bool)
     def getallsegments(self, _:bool = False) -> None:
         for i in range(1,17):
-            msg = QApplication.translate('StatusBar','Reading Ramp/Soak {0} ...',None).format(str(i))
+            msg = QApplication.translate('StatusBar','Reading Ramp/Soak {0} ...').format(str(i))
             self.status.showMessage(msg,500)
             k = self.aw.fujipid.getsegment(i)
             libtime.sleep(0.035)
             if k == -1:
-                self.status.showMessage(QApplication.translate('StatusBar','problem reading Ramp/Soak',None),5000)
+                self.status.showMessage(QApplication.translate('StatusBar','problem reading Ramp/Soak'),5000)
                 return
             self.paintlabels()
-        self.status.showMessage(QApplication.translate('StatusBar','Finished reading Ramp/Soak val.',None),5000)
+        self.status.showMessage(QApplication.translate('StatusBar','Finished reading Ramp/Soak val.'),5000)
         self.createsegmenttable()
 
     @pyqtSlot(bool)
@@ -4566,7 +4566,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
             reg_dict = self.aw.fujipid.PXG4
         else:
             reg_dict = self.aw.fujipid.PXF
-        self.status.showMessage(QApplication.translate('StatusBar','setting autotune...',None),500)
+        self.status.showMessage(QApplication.translate('StatusBar','setting autotune...'),500)
         #read current pidN
         if self.aw.ser.useModbusPort:
             reg = self.aw.modbus.address2register(reg_dict['selectedpid'][1],3)
@@ -4577,11 +4577,11 @@ class PXG4pidDlgControl(PXpidDlgControl):
         if N is None:
             return
         reg_dict['selectedpid'][0] = N
-        string = QApplication.translate('StatusBar','Current pid = {0}. Proceed with autotune command?',None).format(str(N))
-        reply = QMessageBox.question(self.aw,QApplication.translate('Message','Ramp Soak start-end mode',None),string,
+        string = QApplication.translate('StatusBar','Current pid = {0}. Proceed with autotune command?').format(str(N))
+        reply = QMessageBox.question(self.aw,QApplication.translate('Message','Ramp Soak start-end mode'),string,
                             QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
         if reply == QMessageBox.StandardButton.Cancel:
-            self.status.showMessage(QApplication.translate('StatusBar','Autotune cancelled',None),5000)
+            self.status.showMessage(QApplication.translate('StatusBar','Autotune cancelled'),5000)
             return
         if reply == QMessageBox.StandardButton.Yes:
             if self.aw.ser.useModbusPort:
@@ -4595,12 +4595,12 @@ class PXG4pidDlgControl(PXpidDlgControl):
             if len(r) == 8:
                 if flag == 0:
                     reg_dict['autotuning'][0] = 0
-                    self.status.showMessage(QApplication.translate('StatusBar','Autotune successfully turned OFF',None),5000)
+                    self.status.showMessage(QApplication.translate('StatusBar','Autotune successfully turned OFF'),5000)
                 if flag == 1:
                     reg_dict['autotuning'][0] = 1
-                    self.status.showMessage(QApplication.translate('StatusBar','Autotune successfully turned ON',None),5000)
+                    self.status.showMessage(QApplication.translate('StatusBar','Autotune successfully turned ON'),5000)
             else:
-                self.status.showMessage(QApplication.translate('StatusBar','UNABLE to set Autotune',None),5000)
+                self.status.showMessage(QApplication.translate('StatusBar','UNABLE to set Autotune'),5000)
 
     @pyqtSlot(bool)
     @override
@@ -4663,9 +4663,9 @@ class PXG4pidDlgControl(PXpidDlgControl):
     def createsegmenttable(self) -> None:
         self.segmenttable.setRowCount(16)
         self.segmenttable.setColumnCount(4)
-        self.segmenttable.setHorizontalHeaderLabels([QApplication.translate('StatusBar','SV',None),
-                                                     QApplication.translate('StatusBar','Ramp (MM:SS)',None),
-                                                     QApplication.translate('StatusBar','Soak (MM:SS)',None),''])
+        self.segmenttable.setHorizontalHeaderLabels([QApplication.translate('StatusBar','SV'),
+                                                     QApplication.translate('StatusBar','Ramp (MM:SS)'),
+                                                     QApplication.translate('StatusBar','Soak (MM:SS)'),''])
         self.segmenttable.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
         self.segmenttable.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         self.segmenttable.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
@@ -4686,7 +4686,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
             rampedit.setValidator(QRegularExpressionValidator(regextime,self))
             soakedit  = QLineEdit(stringfromseconds(self.aw.fujipid.PXG4[soakkey][0]))
             soakedit.setValidator(QRegularExpressionValidator(regextime,self))
-            setButton = QPushButton(QApplication.translate('Button','Set',None))
+            setButton = QPushButton(QApplication.translate('Button','Set'))
             setButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             setButton.clicked.connect(self.setsegment)
             #add widgets to the table
@@ -4742,9 +4742,9 @@ class PXG4pidDlgControl(PXpidDlgControl):
             self.aw.fujipid.PXG4[rampkey][0] = ramp
             self.aw.fujipid.PXG4[soakkey][0] = soak
             self.paintlabels()
-            self.status.showMessage(QApplication.translate('StatusBar','Ramp/Soak successfully written',None),5000)
+            self.status.showMessage(QApplication.translate('StatusBar','Ramp/Soak successfully written'),5000)
         else:
-            self.aw.qmc.adderror(QApplication.translate('Error Message','Segment values could not be written into PID',None))
+            self.aw.qmc.adderror(QApplication.translate('Error Message','Segment values could not be written into PID'))
 
 
 ############################################################################
@@ -4756,15 +4756,15 @@ class DTApidDlgControl(ArtisanDialog):
         super().__init__(parent, aw)
         self.setModal(True)
         #self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose) # default is to set to True, which is already set in ArtisanDialog
-        self.setWindowTitle(QApplication.translate('Form Caption','Delta DTA PID Control',None))
+        self.setWindowTitle(QApplication.translate('Form Caption','Delta DTA PID Control'))
         self.status = QStatusBar()
         self.status.setSizeGripEnabled(False)
-        self.status.showMessage(QApplication.translate('StatusBar','Work in Progress',None),5000)
-        svlabel = QLabel(QApplication.translate('Label', 'SV', None))
+        self.status.showMessage(QApplication.translate('StatusBar','Work in Progress'),5000)
+        svlabel = QLabel(QApplication.translate('Label', 'SV'))
         self.svedit = QLineEdit(str(self.aw.dtapid.dtamem['sv'][0]))
         self.svedit.setValidator(self.aw.createCLocaleDoubleValidator(0., 999.,1, self.svedit))
-        readsvbutton = QPushButton(QApplication.translate('Button','Read', None))
-        writesvbutton = QPushButton(QApplication.translate('Button','Write', None))
+        readsvbutton = QPushButton(QApplication.translate('Button','Read'))
+        writesvbutton = QPushButton(QApplication.translate('Button','Write'))
         readsvbutton.clicked.connect(self.readsv)
         writesvbutton.clicked.connect(self.writesv)
         tab1Layout = QGridLayout()
@@ -4776,7 +4776,7 @@ class DTApidDlgControl(ArtisanDialog):
         TabWidget = QTabWidget()
         C1Widget = QWidget()
         C1Widget.setLayout(tab1Layout)
-        TabWidget.addTab(C1Widget,QApplication.translate('Tab','General',None))
+        TabWidget.addTab(C1Widget,QApplication.translate('Tab','General'))
         mainlayout = QVBoxLayout()
         mainlayout.addWidget(self.status,0)
         mainlayout.addWidget(TabWidget,1)
@@ -4795,7 +4795,7 @@ class DTApidDlgControl(ArtisanDialog):
         #update sv LCD
         self.aw.lcd6.display(sv)
         #update status
-        message = f"{QApplication.translate('StatusBar','SV =', None)} {sv}"
+        message = f"{QApplication.translate('StatusBar','SV =')} {sv}"
         self.status.showMessage(message,5000)
 
     #write uses function = 6

@@ -87,15 +87,12 @@ class RoastProfile:
         self.aligned:bool = True # if the profile could not be aligned it is not drawn
         self.active:bool = True # if selected or all are unselected; active profiles are drawn in color, inactive profiles in gray
         self.color:tuple[float, float, float, float] = color
-        hslf:tuple[float|None, float|None, float|None, float|None] = QColor.fromRgbF(*color).getHslF()
+        hslf:tuple[float, float, float, float] = QColor.fromRgbF(*color).getHslF()
         self.gray:tuple[float, float, float, float]
-        ch:float|None = hslf[0]
-        cl:float|None = hslf[2]
-        ca:float|None = hslf[3]
-        if ch is not None and cl is not None and ca is not None:
-            g0 = QColor.fromHslF(ch,0,cl,ca)
-        else:
-            g0 = QColor.fromHslF(0.5,0,0.5,0.5) # saturation set to 0
+        ch:float = hslf[0]
+        cl:float = hslf[2]
+        ca:float = hslf[3]
+        g0 = QColor.fromHslF(ch,0,cl,ca)
         self.gray = (
                 g0.redF(),
                 g0.greenF(),

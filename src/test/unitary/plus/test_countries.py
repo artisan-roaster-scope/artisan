@@ -832,18 +832,6 @@ class TestCountriesSpecialCases:
                         )
                 i += 1
 
-    def test_translation_with_none_parameter(self) -> None:
-        """Test translation calls that include None parameter."""
-        # Act & Assert - Check source code contains the translation with None parameter
-        import plus.countries
-
-        with open(plus.countries.__file__, encoding='utf-8') as f:
-            content = f.read()
-            # Handle multi-line format for this specific translation
-            assert (
-                "'Countries', 'United States Minor Outlying Islands', None" in content
-            ), 'Translation with None parameter not found in source'
-
     def test_comprehensive_country_count(self) -> None:
         """Test that a reasonable number of countries are translated."""
         # Act & Assert - Count translation calls in source code
