@@ -28,6 +28,7 @@ hiddenimports_list=[
 ] + collect_submodules('dbus_fast')
 
 EXCLUDES = [
+    'pkg_resources',
     'PyQt5',
     'PyQt6.Multimedia',
     'PyQt6.Network',

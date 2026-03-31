@@ -33,7 +33,7 @@ if TYPE_CHECKING:
 from artisanlib.async_comm import AsyncComm, IteratorReader
 from artisanlib.atypes import ProfileData
 from artisanlib.util import (replace_duplicates, encodeLocalStrict, encodeLocal, decodeLocalStrict, weight_units,
-    convertWeight, fromFtoCstrict, events_internal_to_external_value)
+    convertWeight, fromFtoCstrict, events_internal_to_external_value, to_ascii)
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
@@ -621,7 +621,7 @@ def saveOrbiter(filename:str, outfile:IO[bytes], profile:ProfileData) -> bool:
                     readings.append(values)
 
         title_length:int = 30
-        title_bytes = title.encode('utf-8')[:title_length].ljust(title_length, b'\00')
+        title_bytes = to_ascii(title).encode('utf-8')[:title_length].ljust(title_length, b'\00')
         preheat_temperature = int(round(temp2[CHARGE_idx] if len(temp2)>CHARGE_idx else 0))
         drop_time_seconds:int = (int(round(timex[-1])) if len(timex)>0 else 0)
         header = b'\xff\xff'

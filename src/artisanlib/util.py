@@ -79,6 +79,22 @@ def appFrozen() -> bool:
         _log.exception(e)
     return ib
 
+##
+
+def replace_umlauts(text: str) -> str:
+    """replace special German umlauts (vowel mutations) from text."""
+    vowel_char_map = {
+        ord('ä'): 'ae', ord('ü'): 'ue', ord('ö'): 'oe', ord('ß'): 'ss',
+        ord('Ä'): 'Ae', ord('Ü'): 'Ue', ord('Ö'): 'Oe'
+    }
+    return text.translate(vowel_char_map)
+
+def to_ascii(s:str) -> str:
+    from unidecode import unidecode
+    return unidecode(replace_umlauts(s))
+
+##
+
 # returns empty string for values out of the valid Unicode range
 def uchr(x:int) -> str:
     try:

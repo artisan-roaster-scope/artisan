@@ -60,7 +60,7 @@ if TYPE_CHECKING:
     import numpy.typing as npt # pylint: disable=unused-import
     from PyQt6.QtGui import QResizeEvent # pylint: disable=unused-import
 
-from artisanlib.util import (uchr, fill_gaps, deltaLabelPrefix, deltaLabelUTF8, deltaLabelMathPrefix, stringfromseconds,
+from artisanlib.util import (to_ascii, uchr, fill_gaps, deltaLabelPrefix, deltaLabelUTF8, deltaLabelMathPrefix, stringfromseconds,
         fromFtoC, fromFtoCstrict, fromCtoF, fromCtoFstrict, RoRfromFtoC, RoRfromFtoCstrict, RoRfromCtoF, RoRfromCtoFstrict, toInt, toString,
         toFloat, application_name, getResourcePath, getDirectory, convertWeight, right_to_left, float2str,
         abbrevString, scaleFloat2String, is_proper_temp, weight_units, render_weight, volume_units, float2float, timearray2index,
@@ -8765,7 +8765,7 @@ class tgraphcanvas(QObject):
                             ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[tidx],stemp[tidx],d)
                         st1 = self.aw.arabicReshape(QApplication.translate('Scope Annotation','DROP {0}'),stringfromseconds(timex[tidx]-t0,False))
                         if self.graphfont == 1:
-                            st1 = self.__to_ascii(st1)
+                            st1 = to_ascii(st1)
                         a = self.backgroundalpha if timeindex2 else 1.0
                         e = 0
 
@@ -19650,17 +19650,10 @@ class tgraphcanvas(QObject):
                 if self.profileDataSemaphore.available() < 1:
                     self.profileDataSemaphore.release(1)
 
-    def __to_ascii(self, s:str) -> str:
-        utf8_string = str(s)
-        for k, uml in self.umlaute_dict.items():
-            utf8_string = utf8_string.replace(k, uml)
-        from unidecode import unidecode
-        return unidecode(utf8_string)
-
     # convert German Umlauts if Dijkstra font is selected
     def __dijkstra_to_ascii(self, s:str) -> str:
         if self.graphfont in {1,9,10}: # font Humor, Dijkstra, or Xkcd selected
-            return self.__to_ascii(s)
+            return to_ascii(s)
         return s
 
     # this method may be called from outside tpgraphcanvas
