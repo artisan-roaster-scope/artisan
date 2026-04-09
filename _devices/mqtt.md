@@ -51,9 +51,9 @@ to publish the value `<value>` to the topic `<topic>` on the connected MQTT brok
 
 For example, in the example below, the first button with the `IO Command` action
 
-```
-publish(/my/topic, { {"value" : 10} })
-```
+{% raw %}```
+publish(/my/topic, {{"value" : 10}})
+```{% endraw %}
 
 sends the fixed JSON message 
 
