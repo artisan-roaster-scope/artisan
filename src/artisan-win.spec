@@ -153,6 +153,7 @@ a = Analysis(['artisan.py'],
              hiddenimports=hiddenimports_list,
              win_no_prefer_redirects=False,
              win_private_assemblies=False,
+             optimize=2,
              cipher=block_cipher)
 
 pyz = PYZ(a.pure, a.zipped_data,cipher=block_cipher)

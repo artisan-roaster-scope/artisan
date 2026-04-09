@@ -1,6 +1,6 @@
 #
 # ABOUT
-# Artisan Fuji PID Dialog
+# Artisan PID Dialogs
 
 # LICENSE
 # This program or module is free software: you can redistribute it and/or
@@ -1586,8 +1586,8 @@ class PID_DlgControl(ArtisanDialog):
                     self.aw.pidcontrol.invertControl = self.invertControlFlag.isChecked()
                 # we configure all parameters of the software pid from current pidcontrol settings
                 self.aw.pidcontrol.confSoftwarePID()
-            else:
-                self.aw.pidcontrol.confPID(kp,ki,kd,source,cycle)
+        else:
+            self.aw.pidcontrol.confPID(kp,ki,kd,source,cycle)
 
     @pyqtSlot(bool)
     def setSV(self, _:bool = False) -> None: # and DutySteps
@@ -3937,8 +3937,6 @@ class PXG4pidDlgControl(PXpidDlgControl):
                 self.status.showMessage(message,5000)
                 self.setNsv(7)
                 self.aw.lcd6.display(self.sv7edit.text())
-            else:
-                return
             #record command as an Event
             if newSVvalue is not None:
                 strcommand = f'SETSV::{newSVvalue/10.:.1f}'

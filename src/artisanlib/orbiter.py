@@ -623,7 +623,7 @@ def saveOrbiter(filename:str, outfile:IO[bytes], profile:ProfileData) -> bool:
         title_length:int = 30
         title_bytes = to_ascii(title).encode('utf-8')[:title_length].ljust(title_length, b'\00')
         preheat_temperature = int(round(temp2[CHARGE_idx] if len(temp2)>CHARGE_idx else 0))
-        drop_time_seconds:int = (int(round(timex[-1])) if len(timex)>0 else 0)
+        total_time_seconds:int = int(round((timex[-1] if len(timex)>0 else 0) - (timex[CHARGE_idx] if len(timex)>CHARGE_idx else 0)))
         header = b'\xff\xff'
         # header
         header_data = b'\x00\x00' + \
@@ -631,7 +631,7 @@ def saveOrbiter(filename:str, outfile:IO[bytes], profile:ProfileData) -> bool:
             batchsize.to_bytes(2, 'little') + \
             roasted_weight.to_bytes(2, 'little') + \
             preheat_temperature.to_bytes(2, 'little') + \
-            drop_time_seconds.to_bytes(2, 'little') + \
+            total_time_seconds.to_bytes(2, 'little') + \
             b'\x00\x00' + b'\x00\x00' + b'\x00\x00' + \
             b'\x00\x00\x00\x00\x00'
         header_data_crc = compute_crc(header_data)

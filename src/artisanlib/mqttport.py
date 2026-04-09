@@ -15,12 +15,12 @@
 # AUTHOR
 # Marko Luther, 2026
 
-
+import ssl
 import platform
 import json
 import logging
-import jmespath
 import paho.mqtt.client as mqtt
+from requests.utils import DEFAULT_CA_BUNDLE_PATH
 from paho.mqtt.enums import CallbackAPIVersion, MQTTProtocolVersion
 from PyQt6.QtWidgets import QApplication
 from typing import Any, Final, TYPE_CHECKING
@@ -30,6 +30,7 @@ if TYPE_CHECKING:
     from paho.mqtt.reasoncodes import ReasonCodes
     from paho.mqtt.properties import Properties
     from paho.mqtt.client import DisconnectFlags
+    import jmespath
 
 from artisanlib.util import fromCtoFstrict, fromFtoCstrict
 
@@ -166,6 +167,7 @@ class mqttport:
         self.readings = [-1.0]*self.CHANNELS
 
     def compile_node_expressions(self) -> None:
+        import jmespath
         for i, node in enumerate(self.channel_nodes):
             try:
                 self.channel_node_expressions[i] = jmespath.compile(node)
@@ -173,6 +175,7 @@ class mqttport:
                 self.channel_node_expressions[i] = None
 
     def update_data(self, data:Any, topic:str) -> None:
+        import jmespath
         for i, channel_topic in enumerate(self.channel_topics):
             node_expression:jmespath.parser.ParsedResult|None = self.channel_node_expressions[i]
             res:float|None = None
@@ -269,7 +272,9 @@ class mqttport:
 
         # configure
         if self.tls:
-            self.client.tls_set()
+#            import certifi
+#            self.client.tls_set(ca_certs=certifi.where(), cert_reqs=ssl.CERT_REQUIRED)
+            self.client.tls_set(ca_certs=DEFAULT_CA_BUNDLE_PATH, cert_reqs=ssl.CERT_REQUIRED)
         if self.user != '':
             self.client.username_pw_set(self.user, self.password)
         # set paho callbacks

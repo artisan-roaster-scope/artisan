@@ -178,6 +178,7 @@ def stringfromseconds(seconds_raw:float, leadingzero:bool = True) -> str:
 # Converts a string into a seconds integer. Use for example to interpret times from Roaster Properties Dlg inputs
 # accepted formats: "00:00","-00:00"
 # raises ValueError or IndexError on invalid inputs
+@functools.lru_cache(maxsize=100)
 def stringtoseconds(string:str) -> int:
     timeparts = string.split(':') # mm:ss
     hours:bool = False
@@ -586,6 +587,7 @@ def isOpen(ip: str, port: int) -> bool:
         _log.info(e)
     return False
 
+
 # Logging
 
 @functools.cache
@@ -706,6 +708,7 @@ def float2floatNone(f:float|None, n:int=1) -> float|None:
 
 # the int n>=0 specifies the number of digits
 # returns 0 if f is not a number
+@functools.lru_cache(maxsize=500)
 def float2float(f:float|str, n:int=1) -> float:
     n = max(n, 0)
     f = float(f)

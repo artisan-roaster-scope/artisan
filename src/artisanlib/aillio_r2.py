@@ -340,10 +340,10 @@ class AillioR2:
             self.ep_in = None
 
             for ep in intf:
-                self.__dbg(f'Found endpoint: {ep.bEndpointAddress:#x}')  # pyright:ignore[reportAttributeAccessIssue]
-                if usb.util.endpoint_direction(ep.bEndpointAddress) == usb.util.ENDPOINT_OUT: # pyright:ignore[reportUnknownArgumentType,reportAttributeAccessIssue]
+                self.__dbg(f'Found endpoint: {ep.bEndpointAddress:#x}') # type:ignore[attr-defined, unused-ignore] # pyright:ignore[reportAttributeAccessIssue]
+                if usb.util.endpoint_direction(ep.bEndpointAddress) == usb.util.ENDPOINT_OUT: # type:ignore[attr-defined, unused-ignore] # pyright:ignore[reportUnknownArgumentType,reportAttributeAccessIssue]
                     self.ep_out = ep
-                elif usb.util.endpoint_direction(ep.bEndpointAddress) == usb.util.ENDPOINT_IN: # pyright:ignore[reportUnknownArgumentType,reportAttributeAccessIssue]
+                elif usb.util.endpoint_direction(ep.bEndpointAddress) == usb.util.ENDPOINT_IN: # type:ignore[attr-defined, unused-ignore] # pyright:ignore[reportUnknownArgumentType,reportAttributeAccessIssue]
                     self.ep_in = ep
 
             if self.ep_out is None:
@@ -352,8 +352,8 @@ class AillioR2:
                 raise OSError('Input endpoint not found')
 
             self.__dbg('Endpoints configured successfully')
-            self.__dbg(f'Output endpoint: {self.ep_out.bEndpointAddress:#x}') # pyright:ignore[reportAttributeAccessIssue]
-            self.__dbg(f'Input endpoint: {self.ep_in.bEndpointAddress:#x}') # pyright:ignore[reportAttributeAccessIssue]
+            self.__dbg(f'Output endpoint: {self.ep_out.bEndpointAddress:#x}') # type:ignore[attr-defined, unused-ignore] # pyright:ignore[reportAttributeAccessIssue]
+            self.__dbg(f'Input endpoint: {self.ep_in.bEndpointAddress:#x}') # type:ignore[attr-defined, unused-ignore] # pyright:ignore[reportAttributeAccessIssue]
 
             self.parent_pipe, self.child_pipe = Pipe() # pyright:ignore[reportAttributeAccessIssue]
             self.worker_thread = threading.Thread(target=self.__updatestate,

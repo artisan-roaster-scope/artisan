@@ -44,9 +44,9 @@ import functools
 import dateutil.parser
 import copy as copyd
 import arabic_reshaper # type:ignore[import-untyped]
+from bidi import get_display # type:ignore[import-untyped] # newer rust based implementation of the original Python implementation
 from enum import IntEnum
 from pathlib import Path
-from bidi import get_display # type:ignore[import-untyped] # newer rust based implementation of the above Python implementation
 
 # links CTR-C signals to the system default (ignore)
 import signal
@@ -102,7 +102,6 @@ except Exception: # pylint: disable=broad-except
 #    syslog.syslog(syslog.LOG_ALERT, str(e))
 #    syslog.syslog(syslog.LOG_ALERT, str(traceback.format_exc()))
 
-QtWebEngineSupport:bool = False # set to True if the QtWebEngine was successfully imported
 
 
 from PyQt6.QtWidgets import (QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog, QGraphicsDropShadowEffect,
@@ -122,6 +121,7 @@ from PyQt6.QtCore import (QStandardPaths, QLibraryInfo, QTranslator, QLocale, QF
                           QRegularExpression, QDate, QUrl, QUrlQuery, QDir, Qt, QPoint, QEvent, QDateTime, QThread, qInstallMessageHandler)
 from PyQt6.QtNetwork import QLocalSocket
 
+QtWebEngineSupport:bool = False # set to True if the QtWebEngine was successfully imported
 #QtWebEngineWidgets must be imported before a QCoreApplication instance is created
 try:
     from PyQt6.QtWebEngineWidgets import QWebEngineView
@@ -220,7 +220,6 @@ from artisanlib.qtsingleapplication import QtSingleApplication
 
 
 try:
-    # spanning a second multiprocessing instance (Hottop server) on macOS falils to import the YAPI interface
     from yoctopuce.yocto_api import YAPI # type: ignore[import-untyped]
 except ImportError:
     pass
@@ -1045,11 +1044,11 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
 
     @override
     def _icon(self, name:str) -> QIcon:
-        if name.startswith('plus'):
+        if name.startswith('plus') or self.white_icons:
             basedir = os.path.join(getResourcePath(),'Icons')
         else:
             basedir = os.path.join(mpl.get_data_path(), 'images')
-        if name.startswith('plus') and not self.white_icons:
+        if (self.white_icons and not name.startswith('plus')) or not self.white_icons and name.startswith('plus'):
             name = 'white_' + name
         #dirty hack to prefer .svg over .png Toolbar icons
         if not svgsupport:
@@ -1060,24 +1059,24 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
         name = name.replace('.png', '_large.png')
         p = os.path.join(basedir, name)
         pm = QPixmap(p)
-        if not name.startswith('plus') and not name.startswith('white_plus'):
-            if self.white_icons:
-                pm = self.recolorIcon(pm, QColor('#dfdfdf'))
-            else:
-                pm = self.recolorIcon(pm, QColor('#424242'))
+#        if not name.startswith('plus') and not name.startswith('white_plus'):
+#            if self.white_icons:
+#                pm = self.recolorIcon(pm, QColor('#dfdfdf'))
+#            else:
+#                pm = self.recolorIcon(pm, QColor('#424242'))
         if hasattr(pm, 'setDevicePixelRatio'):
             pm.setDevicePixelRatio(self.devicePixelRatioF() or 1) # pyright:ignore[reportUnknownArgumentType]
 
         return QIcon(pm)
 
-    @staticmethod
-    def recolorIcon(pixmap:QPixmap, color:QColor) -> QPixmap:
-        tmp = pixmap.toImage()
-        for y in range(tmp.height()):
-            for x in range(tmp.width()):
-                color.setAlpha(tmp.pixelColor(x,y).alpha())
-                tmp.setPixelColor(x,y,color)
-        return QPixmap.fromImage(tmp)
+#    @staticmethod
+#    def recolorIcon(pixmap:QPixmap, color:QColor) -> QPixmap:
+#        tmp = pixmap.toImage()
+#        for y in range(tmp.height()):
+#            for x in range(tmp.width()):
+#                color.setAlpha(tmp.pixelColor(x,y).alpha())
+#                tmp.setPixelColor(x,y,color)
+#        return QPixmap.fromImage(tmp)
 
     def update_message(self) -> None:
         if not self.qmc.twoAxisMode():
@@ -4563,6 +4562,16 @@ class ApplicationWindow(QMainWindow):
         if self.ui_mode is not UI_MODE.EXPERT:
             self.set_ui_mode(UI_MODE.EXPERT)
 
+    def announce_current_ui_mode(self) -> None:
+        if self.ui_mode is UI_MODE.PRODUCTION:
+            mode_name = QApplication.translate('Menu', 'Production')
+        elif self.ui_mode is UI_MODE.EXPERT:
+            mode_name = QApplication.translate('Menu', 'Expert')
+        else:
+            mode_name = QApplication.translate('Menu', 'Standard')
+        self.sendmessageSignal.emit(
+            f"{QApplication.translate('Menu', 'Mode')}: {mode_name}",True,None)
+
     # configures apps UI for different usage scenario by adjusting menus, dialogs, and shortcuts
     def set_ui_mode(self, ui_mode:UI_MODE) -> None:
         self.ui_mode = ui_mode
@@ -4574,14 +4583,7 @@ class ApplicationWindow(QMainWindow):
         # configure toolbar
         self.set_toolbar(ui_mode)
         # send message
-        if ui_mode is UI_MODE.PRODUCTION:
-            mode_name = QApplication.translate('Menu', 'Production')
-        elif ui_mode is UI_MODE.EXPERT:
-            mode_name = QApplication.translate('Menu', 'Expert')
-        else:
-            mode_name = QApplication.translate('Menu', 'Standard')
-        self.sendmessageSignal.emit(
-            f"{QApplication.translate('Menu', 'Mode')}: {mode_name}",True,None)
+        self.announce_current_ui_mode()
 
     #
 
@@ -10688,21 +10690,22 @@ class ApplicationWindow(QMainWindow):
                                         elif event == 'START' and not self.qmc.flagstart:
                                             #self.lastbuttonpressed = -1 # action triggers reset which resets all button states
                                             self.qmc.toggleRecorderSignal.emit()
-                                        elif event == 'CHARGE':
+                                        elif event == 'CHARGE' and self.qmc.timeindex[0] < 0:
+                                            # only mark CHARGE from an alarm if not yet set to prevent an undo CHARGE
                                             self.qmc.markChargeDelaySignal.emit(0)
-                                        elif event == 'DRY':
+                                        elif event == 'DRY' and self.qmc.timeindex[1] == 0:
                                             self.qmc.markDRYSignal.emit(False)
-                                        elif event == 'FCs':
+                                        elif event == 'FCs' and self.qmc.timeindex[2] == 0:
                                             self.qmc.markFCsSignal.emit(False)
-                                        elif event == 'FCe':
+                                        elif event == 'FCe' and self.qmc.timeindex[3] == 0:
                                             self.qmc.markFCeSignal.emit(False)
-                                        elif event == 'SCs':
+                                        elif event == 'SCs' and self.qmc.timeindex[4] == 0:
                                             self.qmc.markSCsSignal.emit(False)
-                                        elif event == 'SCe':
+                                        elif event == 'SCe' and self.qmc.timeindex[5] == 0:
                                             self.qmc.markSCeSignal.emit(False)
-                                        elif event == 'DROP':
+                                        elif event == 'DROP' and self.qmc.timeindex[6] == 0:
                                             self.qmc.markDropSignal.emit(False)
-                                        elif event == 'COOL':
+                                        elif event == 'COOL' and self.qmc.timeindex[7] == 0:
                                             self.qmc.markCoolSignal.emit(False)
                                         elif event == 'OFF' and self.qmc.flagon:
                                             self.qmc.toggleMonitorSignal.emit()
@@ -12927,7 +12930,7 @@ class ApplicationWindow(QMainWindow):
     # and enables/disables buttons depending if undo is applicable
     def onMarkMoveToNext(self, button:EventPushButton) -> None:
         try:
-            this_index = self.keyboardButtonList.index(button)
+            this_index = self.keyboardButtonList.index(button) # zuban:ignore[arg-type]
             if self.qmc.buttonvisibility[this_index]:
                 if button.isFlat():
                     if self.keyboardmoveflag:
@@ -13798,8 +13801,6 @@ class ApplicationWindow(QMainWindow):
 
                 #check colors
                 self.checkColors(self.getcolorPairsToCheck())
-                #update menus
-                self.set_ui_mode(self.ui_mode)
 
         except OSError as ex:
             _, _, exc_tb = sys.exc_info()
@@ -22009,7 +22010,7 @@ class ApplicationWindow(QMainWindow):
             else:
                 return
             # 2. convert those to display coordinates
-            rect_extents_display = self.qmc.ax.transData.transform(rect_extents)
+            rect_extents_display = self.qmc.ax.transData.transform(rect_extents) # zuban:ignore[arg-type]
             # 3. convert display coordinates to figure-inches
             rect_extents_bbox_inches = self.qmc.fig.dpi_scale_trans.inverted().transform(rect_extents_display)
             # 4. generate
@@ -27726,7 +27727,7 @@ class ApplicationWindow(QMainWindow):
                         else:
                             toff = 0
                     else:
-                        x_range = list(range(int(self.qmc.startofx),int(self.qmc.endofx))) # Object of type `list[int]` is not assignable to `list[int | float]`
+                        x_range = [float(x) for x in range(int(self.qmc.startofx),int(self.qmc.endofx))]
                         toff = 0
                     #create y range
                     y_range:list[float] = []
@@ -27975,7 +27976,7 @@ sys.excepthook = excepthook
 # the following avoids the "No document could be created" dialog and the Console message
 # "The Artisan Profile type doesn't map to any NSDocumentClass." on startup (since pyobjc-core 3.1.1)
 if sys.platform.startswith('darwin'):
-    from Cocoa import NSDocument # type: ignore[import-untyped] # @UnresolvedImport # pylint: disable=import-error,no-name-in-module
+    from Cocoa import NSDocument # type: ignore[import-untyped, attr-defined, unused-ignore] # @UnresolvedImport # pylint: disable=import-error,no-name-in-module
     class Document(NSDocument): # type:ignore[misc,no-any-unimported] # zuban: ignore # pylint: disable= too-few-public-methods
 #        def windowNibName(self):
 #            return None #"Document"
@@ -28049,7 +28050,7 @@ def initialize_locale(my_app:Artisan) -> str:
 
     if locale == '':
         if platform.system() == 'Darwin':
-            from Cocoa import NSUserDefaults # type:ignore[import-not-found,unused-ignore]  # @UnresolvedImport # pylint: disable=import-error,no-name-in-module
+            from Cocoa import NSUserDefaults # type:ignore[import-not-found,attr-defined,unused-ignore]  # @UnresolvedImport # pylint: disable=import-error,no-name-in-module
             defs = NSUserDefaults.standardUserDefaults()
             langs = defs.objectForKey_('AppleLanguages') # pyright:ignore[reportUnknownArgumentType]
             if langs.objectAtIndex_(0)[:7] == 'zh_Hans': # pyright:ignore[reportUnknownArgumentType]

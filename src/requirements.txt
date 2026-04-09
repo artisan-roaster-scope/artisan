@@ -31,7 +31,7 @@ wheel==0.46.3
 pyserial==3.5
 pymodbus==3.12.0
 python-snap7==2.1.0
-Phidget22==1.24.20260127
+Phidget22==1.25.20260408
 Unidecode==1.4.0
 qrcode==8.2
 requests==2.33.1
@@ -54,11 +54,11 @@ prettytable==3.17.0
 lxml==6.0.2
 matplotlib==3.10.8
 jinja2==3.1.6
-aiohttp==3.13.4
+aiohttp==3.13.5
 aiohttp_jinja2==1.6
 python-bidi==0.6.7
 arabic-reshaper==3.0.0
-pillow==12.1.1
+pillow==12.2.0
 pydantic==2.12.5
 babel==2.18.0
 bleak==3.0.1
@@ -103,4 +103,4 @@ build==1.4.0; platform_system=='Windows'
 pywin32==311; platform_system=='Windows'
 pyinstaller-versionfile==3.0.1; platform_system=='Windows'
 #libusb-package==1.0.26.3; platform_system=='Windows'  # temp removed for Py 3.14, monkey patched into .appveyor.yml until a Py3.14 wheel is available on pypi
-tzdata==2025.3; platform_system=='Windows' # to prevent pyinstaller WARNING: Hidden import "tzdata" not found!
+tzdata==2026.1; platform_system=='Windows' # to prevent pyinstaller WARNING: Hidden import "tzdata" not found!

@@ -3288,12 +3288,12 @@ class serialport:
             if self.SP.is_open:
                 self.SP.reset_input_buffer()
                 self.SP.reset_output_buffer()
-                sync = None
+                sync:bytes|None = None
                 while sync != b'Err\r\n':
                     self.SP.write(b'\r\n')
                     sync = self.SP.read(5)
                     libtime.sleep(1)
-                self.SP.write(b'%000R')
+                self.SP.write(b'%000R') # zuban:ignore[unreachable]
                 self.SP.flush()
                 libtime.sleep(.1)
                 ID = self.SP.read(5)
@@ -4036,7 +4036,7 @@ class serialport:
 
                                 # average by calculating the weighted median
                                 import wquantiles # type: ignore[import-untyped]
-                                async_res = float(wquantiles.median(readings, times)) # pyright: ignore[reportArgumentType]
+                                async_res = float(wquantiles.median(readings, times)) # type:ignore[arg-type, unused-ignore] # pyright: ignore[reportArgumentType]
 
 #                                # alternative to the use of the median is to use a polyfit
 #                                with warnings.catch_warnings():
@@ -4151,7 +4151,7 @@ class serialport:
                     readings = [r for (r,t) in valid_readings]
                     weights = [t for (r,t) in valid_readings]
                     import wquantiles
-                    res = float(wquantiles.median(numpy.array(readings),numpy.array(weights))) # pyright: ignore[reportArgumentType]
+                    res = float(wquantiles.median(numpy.array(readings),numpy.array(weights))) # type:ignore[arg-type, unused-ignore] # pyright: ignore[reportArgumentType]
 #                    res = numpy.median(numpy.array(readings))
                     # 3. consume old readings
                     self.Phidget1048values[channel] = []
@@ -4474,7 +4474,7 @@ class serialport:
                     readings = [r for (r, _) in valid_readings]
                     weights = [t for (_, t) in valid_readings]
                     import wquantiles
-                    res = float(wquantiles.median(numpy.array(readings),numpy.array(weights))) # pyright: ignore[reportArgumentType]
+                    res = float(wquantiles.median(numpy.array(readings),numpy.array(weights))) # type:ignore[arg-type, unused-ignore] # pyright: ignore[reportArgumentType]
                     # 3. consume old readings
                     self.Phidget1046values[channel] = []
 
@@ -6087,7 +6087,7 @@ class serialport:
                         readings = [r for (r,t) in valid_readings]
                         weights = [t for (r,t) in valid_readings]
                         import wquantiles
-                        res = float(wquantiles.median(numpy.array(readings),numpy.array(weights))) # pyright: ignore[reportArgumentType]
+                        res = float(wquantiles.median(numpy.array(readings),numpy.array(weights))) # type:ignore[arg-type, unused-ignore] # pyright: ignore[reportArgumentType]
                         # 3. consume old readings
                         self.PhidgetIOvalues[i] = []
                 except Exception as e: # pylint: disable=broad-except
@@ -6478,12 +6478,12 @@ class serialport:
                     YOCTOsensor:'YGenericSensor|YPower|YVoltage|YCurrent|YSensor|YTemperature|None', # pyright: ignore[reportUnknownParameterType]
                     productNameFilter:str|None = None) -> 'YGenericSensor|YPower|YVoltage|YCurrent|YSensor|YTemperature|None':
         if YOCTOsensor is not None:
-            productName = YOCTOsensor.get_module().get_productName()
-            if (YOCTOsensor.get_hardwareId() not in connected_yoctos) and  \
+            productName:str|None = YOCTOsensor.get_module().get_productName()
+            if (productName is not None and YOCTOsensor.get_hardwareId() not in connected_yoctos) and  \
                 ((mode == 0 and productName.startswith('Yocto-Thermocouple')) or (mode == 1 and productName.startswith('Yocto-PT100')) or \
                  (mode == 2 and productName.startswith('Yocto-Temperature-IR')) or \
                  (mode == 3 and productName.startswith('Yocto-Meteo')) or \
-                 (mode == 4 and productName is not None and productName.startswith(productNameFilter)) or # pyrefly: ignore[bad-argument-type] # pyright: ignore[reportArgumentType]
+                 (mode == 4 and productNameFilter is not None and productName.startswith(productNameFilter)) or # pyrefly: ignore[bad-argument-type] # pyright: ignore[reportArgumentType]
                  (mode in {5, 6, 7, 8} and productName.startswith('Yocto-Watt')) or \
                  (mode == 9)):
                 return YOCTOsensor
@@ -6778,7 +6778,7 @@ class serialport:
                                 readings = [r for (r,t) in valid_readings]
                                 weights = [t for (r,t) in valid_readings]
                                 import wquantiles
-                                probe1 = float(wquantiles.median(numpy.array(readings),numpy.array(weights))) # pyright: ignore[reportArgumentType]
+                                probe1 = float(wquantiles.median(numpy.array(readings),numpy.array(weights))) # type:ignore[arg-type, unused-ignore] # pyright: ignore[reportArgumentType]
                                 # 3. consume old readings
                                 self.YOCTOvalues[0] = []
 #                            if len(self.YOCTOvalues[0]) > 0:
@@ -6829,7 +6829,7 @@ class serialport:
                                 readings = [r for (r,t) in valid_readings]
                                 weights = [t for (r,t) in valid_readings]
                                 import wquantiles # @Reimport
-                                probe2 = float(wquantiles.median(numpy.array(readings),numpy.array(weights))) # pyright: ignore[reportArgumentType]
+                                probe2 = float(wquantiles.median(numpy.array(readings),numpy.array(weights))) # type:ignore[arg-type, unused-ignore] # pyright: ignore[reportArgumentType]
                                 # 3. consume old readings
                                 self.YOCTOvalues[1] = []
 #                            if len(self.YOCTOvalues[1]) > 0:

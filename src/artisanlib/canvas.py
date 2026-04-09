@@ -3771,7 +3771,7 @@ class tgraphcanvas(QObject):
                 self.analysispickflag = False
                 bboxpatch = self.aw.analysisresultsanno.get_bbox_patch()
                 if bboxpatch is not None:
-                    corners = self.ax.transAxes.inverted().transform(bboxpatch.get_extents())
+                    corners = self.ax.transAxes.inverted().transform(bboxpatch.get_extents()) # zuban:ignore[arg-type]
                     self.analysisresultsloc = (toFloat(corners[0][0]), toFloat(corners[0][1] + (corners[1][1] - corners[0][1])/2))
                     #reset the annotation location if the origin is out of the screen
                     for dim in self.analysisresultsloc:
@@ -3782,7 +3782,7 @@ class tgraphcanvas(QObject):
                 self.segmentpickflag = False
                 bbox_patch = self.aw.segmentresultsanno.get_bbox_patch()
                 if bbox_patch is not None:
-                    corners = self.ax.transAxes.inverted().transform(bbox_patch.get_extents())
+                    corners = self.ax.transAxes.inverted().transform(bbox_patch.get_extents())  # zuban:ignore[arg-type]
                     self.segmentresultsloc = (toFloat(corners[0][0]), toFloat(corners[0][1] + (corners[1][1] - corners[0][1])/2))
                     #reset the annotation location if the origin is out of the screen
                     for dim in self.segmentresultsloc:
@@ -3907,14 +3907,10 @@ class tgraphcanvas(QObject):
             if event.button != 1:
                 return
             event_xdata = event.xdata
-            if event_xdata in (float('-inf'),float('inf')):
-                return
-            if event_xdata is None:
+            if event_xdata is None or event_xdata in (float('-inf'),float('inf')):
                 return
             event_ydata = event.ydata
-            if event_ydata in (float('-inf'),float('inf')):
-                return
-            if event_ydata is None:
+            if event_ydata is None or event_ydata in (float('-inf'),float('inf')):
                 return
             tempo:float|None = None
             if  (self.foreground_event_ind is not None and self.foreground_event_pos is not None and self.foreground_event_pick_position is not None and
@@ -4609,7 +4605,7 @@ class tgraphcanvas(QObject):
         d = self.delay / 1000.
         # we create a linearly spaced time array starting from the newest timestamp in sampling interval distance
         tx_lin = numpy.flip(numpy.arange(tx_org[-1],tx_org[-1]-l*d,-d), axis=0) # by construction, len(tx_lin)=len(tx_org)=l
-        temp_trail_re = numpy.interp(tx_lin, tx_org, temp_trail) # resample data into that linear spaced time
+        temp_trail_re = cast(numpy.ndarray[Any], numpy.interp(tx_lin, tx_org, temp_trail)) # resample data into that linear spaced time
         try:
             return float(numpy.average(temp_trail_re[-len(decay_weights):],axis=0,weights=decay_weights[-l:]))
         except Exception: # pylint: disable=broad-except
@@ -4935,7 +4931,7 @@ class tgraphcanvas(QObject):
                     #we populate the temporary smoothed ET/BT data arrays (with readings cleansed from -1 dropouts)
                     cf = self.curvefilter
                     if self.temp_decay_weights is None or len(self.temp_decay_weights) != cf: # recompute only on changes
-                        self.temp_decay_weights = list(numpy.arange(1,cf+1))
+                        self.temp_decay_weights = [int(x) for x in numpy.arange(1,cf+1)]
                     # we don't smooth st'x if last, or butlast temperature value were a drop-out not to confuse the RoR calculation
                     if -1 in sample_temp1[-(cf+1):]:
                         dw1 = [1]
@@ -5038,13 +5034,13 @@ class tgraphcanvas(QObject):
                             user_filter = int(round(self.deltaETfilter/2.))
                             if user_filter and length_of_qmc_timex > user_filter and (len(sample_unfiltereddelta1) > user_filter):
                                 if self.decay_weights is None or len(self.decay_weights) != user_filter: # recompute only on changes
-                                    self.decay_weights = list(numpy.arange(1,user_filter+1))
+                                    self.decay_weights = [int(x) for x in numpy.arange(1,user_filter+1)]
                                 self.rateofchange1 = self.decay_average(sample_timex,sample_unfiltereddelta1,self.decay_weights)
                         if self.deltaBTfilter:
                             user_filter = int(round(self.deltaBTfilter/2.))
                             if user_filter and length_of_qmc_timex > user_filter and (len(sample_unfiltereddelta2) > user_filter):
                                 if self.decay_weights is None or len(self.decay_weights) != user_filter: # recompute only on changes
-                                    self.decay_weights = list(numpy.arange(1,user_filter+1))
+                                    self.decay_weights = [int(x) for x in numpy.arange(1,user_filter+1)]
                                 self.rateofchange2 = self.decay_average(sample_timex,sample_unfiltereddelta2,self.decay_weights)
                         rateofchange1plot = self.rateofchange1
                         rateofchange2plot = self.rateofchange2
@@ -6206,37 +6202,36 @@ class tgraphcanvas(QObject):
                     # START
                     if self.aw.buttonSTARTSTOP.isEnabled():
                         self.ToggleRecorder()
-                elif action == 8:
+                elif action == 8 and self.timeindex[1] == 0:
                     # DRY
                     self.markDRYSignal.emit(False) # queued
-                elif action == 9:
+                elif action == 9 and self.timeindex[2] == 0:
                     # FCs
                     self.markFCsSignal.emit(False) # queued
-                elif action == 10:
+                elif action == 10 and self.timeindex[3] == 0:
                     # FCe
                     if self.aw.buttonFCe.isEnabled():
                         self.markFCeSignal.emit(False) # queued
-                elif action == 11:
+                elif action == 11 and self.timeindex[4] == 0:
                     # SCs
                     if self.aw.buttonSCs.isEnabled():
                         self.markSCsSignal.emit(False) # queued
-                elif action == 12:
+                elif action == 12 and self.timeindex[5] == 0:
                     # SCe
                     if self.aw.buttonSCe.isEnabled():
                         self.markSCeSignal.emit(False) # queued
-                elif action == 13 and self.timex:
+                elif action == 13 and self.timeindex[6] == 0 and self.timex:
                     # DROP
                     self.autoDropIdx = max(0, len(self.timex) - 1)
                     self.markDropSignal.emit(False) # this queues an event which forces a realignment/redraw by resetting the cache ax_background and fires the CHARGE action
-                elif action == 14:
+                elif action == 14 and self.timeindex[7] == 0:
                     # COOL
-                    if self.aw.buttonCOOL.isEnabled():
-                        self.markCoolSignal.emit(False) # queued
+                    self.markCoolSignal.emit(False) # queued
                 elif action == 15:
                     # OFF
                     if self.aw.buttonONOFF.isEnabled():
                         self.ToggleMonitor()
-                elif action == 16:
+                elif action == 16 and self.timeindex[0] < 0:
                     # CHARGE
                     self.autoChargeIdx = len(self.timex)
                     self.markChargeSignal.emit(False) # this queues an event which forces a realignment/redraw by resetting the cache ax_background and fires the CHARGE action
@@ -8266,7 +8261,7 @@ class tgraphcanvas(QObject):
 
         self.aw.updatePlusStatus()
 
-        self.aw.set_ui_mode(self.aw.ui_mode)
+        self.aw.announce_current_ui_mode()
 
         ### REDRAW  ##
         if redraw:
@@ -8341,12 +8336,12 @@ class tgraphcanvas(QObject):
                     res = ys[hwl:-hwl]
                     if len(res)+1 == len(y) and len(res) > 0:
                         try:
-                            return ys[hwl-1:-hwl] # zuban:ignore[return-value,unused-ignore]
+                            return ys[hwl-1:-hwl] # zuban:ignore[return-value,no-any-return,unused-ignore]
                         except Exception: # pylint: disable=broad-except
                             return y
                     elif len(res) != len(y):
                         return y
-                    return res # zuban:ignore[return-value,unused-ignore]
+                    return res # zuban:ignore[return-value,no-any-return,unused-ignore]
                 return y
             return y
         except Exception as ex: # pylint: disable=broad-except
@@ -8370,7 +8365,7 @@ class tgraphcanvas(QObject):
                 a_mod = cast(numpy.ndarray[tuple[Literal[1]]], numpy.linspace(a[0],a[-1],len(a)))
             else:
                 a_mod = a_lin
-            b = numpy.interp(a_mod, a, b) # resample data to linear spaced time
+            b = cast(numpy.ndarray[Any], numpy.interp(a_mod, a, b)) # resample data to linear spaced time
         else:
             a_mod = a
         res:npt.NDArray[numpy.floating] = b # just in case the precondition (self.filterDropOuts or window_len>2) does not hold
@@ -8424,7 +8419,7 @@ class tgraphcanvas(QObject):
                     res = b
         # 4. sample back
         if re_sample and back_sample:
-            res = numpy.interp(a, a_mod, res) # pyright:ignore[reportUnknownArgumentType] # re-sampled back to original timestamps
+            res = cast(numpy.ndarray[Any], numpy.interp(a, a_mod, res)) # pyright:ignore[reportUnknownArgumentType] # re-sampled back to original timestamps
         return numpy.array(res).astype(numpy.double)
 
     # takes lists a (time array) and b (temperature array) containing invalid segments of -1/None values and returns a list with all segments of valid values smoothed
@@ -8452,8 +8447,8 @@ class tgraphcanvas(QObject):
             # we mask the error value -1 and Numpy  in the temperature array
             mb:numpy.ndarray[tuple[Literal[1]],numpy.dtype[numpy.float64]] = cast(numpy.ndarray[tuple[Literal[1]],numpy.dtype[numpy.float64]], numpy.ma.masked_equal(b[fromIndex:toIndex], -1))
             # split in masked and
-            unmasked_slices = [(x,False) for x in numpy.ma.clump_unmasked(mb)] # type:ignore[no-untyped-call] # the valid readings
-            masked_slices = [(x,True) for x in numpy.ma.clump_masked(mb)]  # type:ignore[no-untyped-call] # the dropped values
+            unmasked_slices = [(x,False) for x in numpy.ma.clump_unmasked(mb)] # type:ignore[no-untyped-call,attr-defined,unused-ignore] # the valid readings
+            masked_slices = [(x,True) for x in numpy.ma.clump_masked(mb)]  # type:ignore[no-untyped-call,attr-defined,unused-ignore] # the dropped values
             sorted_slices = sorted(unmasked_slices + masked_slices, key=lambda tup: tup[0].start) # pyright:ignore[reportUnknownArgumentType] # pyright: ignore[reportGeneralTypeIssues]
             b_smoothed:list[npt.NDArray[numpy.double]] = [] # pyright:ignore[reportUnknownArgumentType] # b_smoothed collects the smoothed segments in order
             b_smoothed.append(numpy.full(fromIndex, numpy.nan, dtype=numpy.double)) # pyright:ignore[reportUnknownArgumentType] # append initial segment to the list of resulting segments
@@ -8887,7 +8882,7 @@ class tgraphcanvas(QObject):
                                 lin = numpy.linspace(timex[0],timex[-1],lt)
                             else:
                                 lin = timex_lin
-                            ntemp_lin = numpy.interp(lin, timex, ntemp) # pyright:ignore[reportUnknownArgumentType] # resample data in ntemp to linear spaced time
+                            ntemp_lin = cast(numpy.ndarray[Any], numpy.interp(lin, timex, ntemp)) # pyright:ignore[reportUnknownArgumentType] # resample data in ntemp to linear spaced time
                             dist:float = (lin[-1] - lin[0]) / (len(lin) - 1) # pyright:ignore[reportUnknownArgumentType]
                             from scipy.signal import savgol_filter # type # ignore # @Reimport
                             z1 = savgol_filter(ntemp_lin, dss, 1, deriv=1, delta=dss)
@@ -10830,14 +10825,14 @@ class tgraphcanvas(QObject):
                                         except Exception as e: # pylint: disable=broad-except
                                             _log.exception(e)
 
-                            E1x:list[float|None]
-                            E1y:list[float|None]
-                            E2x:list[float|None]
-                            E2y:list[float|None]
-                            E3x:list[float|None]
-                            E3y:list[float|None]
-                            E4x:list[float|None]
-                            E4y:list[float|None]
+                            E1x:Sequence[float|None]
+                            E1y:Sequence[float|None]
+                            E2x:Sequence[float|None]
+                            E2y:Sequence[float|None]
+                            E3x:Sequence[float|None]
+                            E3y:Sequence[float|None]
+                            E4x:Sequence[float|None]
+                            E4y:Sequence[float|None]
                             if len(self.E1timex) > 0 and len(self.E1values) == len(self.E1timex):
                                 pos = max(0,int(round((self.specialeventsvalue[E1_last]-1)*10)))
                                 if not self.clampEvents: # in clamp mode we render also event values higher than 100:
@@ -11582,7 +11577,7 @@ class tgraphcanvas(QObject):
         if r is not None:
             anno.update_bbox_position_size(renderer=r) # pyright:ignore[reportUnknownArgumentType]
             bb = anno.get_window_extent(renderer=r) # pyright:ignore[reportUnknownArgumentType] # bounding box in display space
-            bbox_data = self.ax.transData.inverted().transform(bb)
+            bbox_data = self.ax.transData.inverted().transform(bb)  # zuban:ignore[arg-type]
             bbox = Bbox(bbox_data) # x0, y0, width, height
             return (bbox.bounds[0],bbox.bounds[0]+bbox.bounds[2],bbox.bounds[1],bbox.bounds[1]+bbox.bounds[3])  # x0, x1, y0, y1
         return 0,0,0,0
@@ -12442,7 +12437,7 @@ class tgraphcanvas(QObject):
             if r is not None:
                 t.update_bbox_position_size(r) # pyright:ignore[reportUnknownArgumentType]
                 bb = t.get_window_extent(renderer=r) # bounding box in display space # pyright:ignore[reportUnknownArgumentType]
-                bbox_data = self.ax.transData.inverted().transform(bb) # bounding box in data space
+                bbox_data = self.ax.transData.inverted().transform(bb)  # zuban:ignore[arg-type] # bounding box in data space
                 bbox = Bbox(bbox_data)
                 t.remove()
                 return bbox.bounds  # x0, y0, width, height.  Relative to the start of the curve and self.ylimit_min
@@ -13511,7 +13506,10 @@ class tgraphcanvas(QObject):
 
                 elif self.device == 201 or 201 in self.extradevices:
                     # connect MQTT
-                    self.aw.mqtt.start(self.aw.qmc.device_logging)
+                    try:
+                        self.aw.mqtt.start(self.aw.qmc.device_logging)
+                    except Exception as e:  # pylint: disable=broad-except
+                        _log.error(e)
 
             self.aw.initializedMonitoringExtraDeviceStructures()
 
@@ -19793,7 +19791,7 @@ class SampleThread(QThread):
         try:
             self.aw.qmc.flagsamplingthreadrunning = True
             if sys.platform.startswith('darwin'):
-                from Foundation import NSAutoreleasePool # type: ignore[import-untyped] # @UnresolvedImport  # pylint: disable=import-error,no-name-in-module
+                from Foundation import NSAutoreleasePool # type:ignore[attr-defined, import-untyped, unused-ignore] # @UnresolvedImport  # pylint: disable=import-error,no-name-in-module
                 pool = NSAutoreleasePool.alloc().init()  # @UndefinedVariable # pylint: disable=maybe-no-member # noqa: F841
             self.aw.qmc.afterTP = False
             if not self.aw.qmc.flagon:

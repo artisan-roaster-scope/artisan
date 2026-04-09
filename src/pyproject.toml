@@ -453,3 +453,4 @@ bad-argument-type = false # pyrefly misinterprets @pyqtSlot() declarations
 [tool.zuban]
 files = ["artisanlib/*.py", "plus/*.py"]
 exclude = ['build', 'dist', 'uic', 'misc']
+disallow_untyped_calls = false

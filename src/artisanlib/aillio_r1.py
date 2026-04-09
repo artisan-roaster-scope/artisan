@@ -165,18 +165,18 @@ class AillioR1:
         if isinstance(self.usbhandle, Generator): # pyrefly:ignore[invalid-argument,unsafe-overlap]
             raise OSError('Generator not supported')
         self.__dbg('device found!')
-        if not system().startswith('Windows') and self.usbhandle.is_kernel_driver_active(self.AILLIO_INTERFACE):
+        if not system().startswith('Windows') and self.usbhandle.is_kernel_driver_active(self.AILLIO_INTERFACE): # type:ignore[union-attr, unused-ignore]
             try:
-                self.usbhandle.detach_kernel_driver(self.AILLIO_INTERFACE)
+                self.usbhandle.detach_kernel_driver(self.AILLIO_INTERFACE) # type:ignore[union-attr, unused-ignore]
             except Exception: # pylint: disable=broad-except
                 pass
                 # detach fails on libusb 1.0.26 and newer on macOS >v12 if not running under sudo and seems not to be needed on those configurations
 #                self.usbhandle = None
 #                raise OSError('unable to detach kernel driver') from e
         try:
-            config = self.usbhandle.get_active_configuration()
+            config = self.usbhandle.get_active_configuration() # type:ignore[union-attr, unused-ignore]
             if config is not None and config.bConfigurationValue != self.AILLIO_CONFIGURATION: # pyright:ignore[reportAttributeAccessIssue]
-                self.usbhandle.set_configuration(configuration=self.AILLIO_CONFIGURATION)
+                self.usbhandle.set_configuration(configuration=self.AILLIO_CONFIGURATION) # type:ignore[union-attr, unused-ignore]
         except Exception as e:  # pylint: disable=broad-except
             self.usbhandle = None
             raise OSError('unable to configure') from e

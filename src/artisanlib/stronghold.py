@@ -106,11 +106,11 @@ def extractProfileStrongholdXLSX(file:str,
             res['extraname2'] = ['DT']
             res['extratimex'] = [res['timex'][:]] # pyright:ignore
             if 'IT' in data and len(data['IT']) == tx_len:
-                res['extratemp1'] = [data['IT']] # type:ignore[list-item]
+                res['extratemp1'] = [[float(x) for x in data['IT']]]
             else:
                 res['extratemp1'] = [[-1.0]*tx_len]
             if 'DT' in data and len(data['DT']) == tx_len:
-                res['extratemp2'] = [data['DT']] # type:ignore[list-item]
+                res['extratemp2'] = [[float(x) for x in data['DT']]]
             else:
                 res['extratemp2'] = [[-1.0]*tx_len]
             res['extramathexpression1'] = ['']

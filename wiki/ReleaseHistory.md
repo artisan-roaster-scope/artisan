@@ -5,7 +5,6 @@ Detailed Release History
 v4.0.4 (Mar XX, 2026)
 ------------------
 
--
 * ADDITIONS
   - adds support for [ROEST](https://artisan-scope.org/machines/roest/) sample and production roasters
   - adds support for [Orbiter](https://artisan-scope.org/machines/orbiter/) smart roasters
@@ -24,6 +23,9 @@ v4.0.4 (Mar XX, 2026)
   - fixes autosave as PDF on regular `Save` on macOS ([Issue #2118](../../../issues/2118))
   - fixes regression which led to large automatic x-axis extensions for larger sampling rates ([Issue #2142](../../../issues/2142))
   - fixes issue w.r.t. alarm set activations which could cause alarm table to be lost on re-opening the Alarms dialog in some cases ([Issue #2144](../../../issues/2144))
+  - prevents undo of main events for events triggered from alarm rule actions or custom event button actions ([Issue #2157](../../../issues/2157))
+  - fixes regression that prevented to set the p-i-d parameters on external MODBUS PIDs ([Issue #2159](../../../issues/2159))
+
 * REMOVALS
   - removes RoastTime, RoastPath and Probat Pilot import/exports
 
@@ -521,7 +523,7 @@ v2.10.0 (November 28, 2023)
   - fixes German translation error ([Issue #1270](../../../issues/1270))
   - prevents stacking graph updates which can lead to high memory consumption during recording on slow machines
   - fixes regression which broke WebLCDs on Windows and Linux in Artisan v2.8.4 ([Issue #1229](../../../issues/1229))
-  - fixes regression which broke S7 communnication on Linux builds in v2.8.4
+  - fixes regression which broke S7 communication on Linux builds in v2.8.4
   - fixes regression which broke even action Artisan Command `loadBackground` in v2.8.4 by substituting the underline symbol ([Issue #1288](../../../issues/1288))
   - fixes language selection for ArtisanViewer
   - fixes wrong message on toggling the `Beep` flag of the UI tab ([Issue #1283](../../../issues/1283))
