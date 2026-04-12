@@ -4833,10 +4833,10 @@ class tgraphcanvas(QObject):
                                 # update extra lines
                                 if local_flagstart:
                                     if self.aw.extraCurveVisibility1[i] and len(self.extratemp1lines) > xtra_dev_lines1 and self.extratemp1lines[xtra_dev_lines1] is not None:
-                                        self.extratemp1lines[xtra_dev_lines1].set_data(sample_extractimex1[i], numpy.array(sample_extractemp1[i]))
+                                        self.extratemp1lines[xtra_dev_lines1].set_data(numpy.array(sample_extractimex1[i]), numpy.array(sample_extractemp1[i]))
                                         xtra_dev_lines1 = xtra_dev_lines1 + 1
                                     if self.aw.extraCurveVisibility2[i] and len(self.extratemp2lines) > xtra_dev_lines2 and self.extratemp2lines[xtra_dev_lines2] is not None:
-                                        self.extratemp2lines[xtra_dev_lines2].set_data(sample_extractimex2[i], numpy.array(sample_extractemp2[i]))
+                                        self.extratemp2lines[xtra_dev_lines2].set_data(numpy.array(sample_extractimex2[i]), numpy.array(sample_extractemp2[i]))
                                         xtra_dev_lines2 = xtra_dev_lines2 + 1
                         #ERROR FOUND
                         else:
@@ -5696,7 +5696,15 @@ class tgraphcanvas(QObject):
                                                     try:
                                                         fill1 = self.extrafill1lines[xtra_dev_lines1]
                                                         if fill1 is not None:
-                                                            fill1.set_verts([self.vertices_between(line1.get_xdata(), line1.get_ydata(), 0)])
+                                                            l1x = line1.get_xdata()
+                                                            l1y = line1.get_ydata()
+                                                            assert isinstance(l1x, numpy.ndarray)
+                                                            assert isinstance(l1y, numpy.ndarray)
+                                                            fill1.set_verts([self.vertices_between(
+                                                                # we need to filter out None values from the (temp) data to avoid collapses of the fill
+                                                                l1x[l1y != None], # noqa: E711 # pylint: disable=singleton-comparison
+                                                                l1y[l1y != None], # noqa: E711 # pylint: disable=singleton-comparison
+                                                                0)])
                                                             self.ax.draw_artist(fill1)
                                                     except Exception as e: # pylint: disable=broad-except
                                                         _log.exception(e)
@@ -5710,7 +5718,15 @@ class tgraphcanvas(QObject):
                                                     try:
                                                         fill2 = self.extrafill2lines[xtra_dev_lines2]
                                                         if fill2 is not None:
-                                                            fill2.set_verts([self.vertices_between(line2.get_xdata(), line2.get_ydata(), 0)])
+                                                            l2x = line2.get_xdata()
+                                                            l2y = line2.get_ydata()
+                                                            assert isinstance(l2x, numpy.ndarray)
+                                                            assert isinstance(l2y, numpy.ndarray)
+                                                            fill2.set_verts([self.vertices_between(
+                                                                # we need to filter out None values from the (temp) data to avoid collapses of the fill
+                                                                l2x[l2y != None], # noqa: E711 # pylint: disable=singleton-comparison
+                                                                l2y[l2y != None], # noqa: E711 # pylint: disable=singleton-comparison
+                                                                0)])
                                                             self.ax.draw_artist(fill2)
                                                     except Exception as e: # pylint: disable=broad-except
                                                         _log.exception(e)
@@ -6563,7 +6579,6 @@ class tgraphcanvas(QObject):
                                         next_event_temp:float|None = None
                                         current_temp:float|None = None
 
-                                        # for ramp by BT only after TP
                                         if (last_event_temp2 is not None and (self.replayType == 1 or (self.replayType == 3 and value_decreasing)) and len(self.temp2)>1 and self.temp2[-1] != -1 and
                                                 self.temp2[-2] != -1 and self.temp2[-1] >= self.temp2[-2] and
                                                 len(self.temp2B) > bge):
@@ -11188,7 +11203,7 @@ class tgraphcanvas(QObject):
                                             sketch_params=None))
                                 else:
                                     self.extrafill1lines.append(None)
-                                self.extratemp1lines.append(self.ax.plot(self.extratimex[i],visible_extratemp1,transform=trans,color=self.extradevicecolor1[i],
+                                self.extratemp1lines.append(self.ax.plot(numpy.array(self.extratimex[i]),visible_extratemp1,transform=trans,color=self.extradevicecolor1[i],
                                     sketch_params=None,
                                     path_effects=self.line_path_effects(self.glow, self.patheffects, self.aw.light_background_p, self.extralinewidths1[i],self.extradevicecolor1[i]),
                                     markersize=self.extramarkersizes1[i],
@@ -11244,7 +11259,7 @@ class tgraphcanvas(QObject):
                                             sketch_params=None))
                                 else:
                                     self.extrafill2lines.append(None)
-                                self.extratemp2lines.append(self.ax.plot(self.extratimex[i],visible_extratemp2,transform=trans,color=self.extradevicecolor2[i],
+                                self.extratemp2lines.append(self.ax.plot(numpy.array(self.extratimex[i]),visible_extratemp2,transform=trans,color=self.extradevicecolor2[i],
                                     sketch_params=None,
                                     path_effects=self.line_path_effects(self.glow, self.patheffects, self.aw.light_background_p, self.extralinewidths2[i],self.extradevicecolor2[i]),
                                     markersize=self.extramarkersizes2[i],

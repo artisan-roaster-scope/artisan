@@ -29,7 +29,7 @@
 setuptools==82.0.1
 wheel==0.46.3
 pyserial==3.5
-pymodbus==3.12.0
+pymodbus==3.13.0
 python-snap7==2.1.0
 Phidget22==1.25.20260408
 Unidecode==1.4.0
@@ -99,8 +99,8 @@ SecretStorage==3.5.0; platform_system=='Linux'
 ########
 ### Windows specific packages
 ###
-build==1.4.0; platform_system=='Windows'
+build==1.4.3; platform_system=='Windows'
 pywin32==311; platform_system=='Windows'
-pyinstaller-versionfile==3.0.1; platform_system=='Windows'
+pyinstaller-versionfile==3.1.0; platform_system=='Windows'
 #libusb-package==1.0.26.3; platform_system=='Windows'  # temp removed for Py 3.14, monkey patched into .appveyor.yml until a Py3.14 wheel is available on pypi
 tzdata==2026.1; platform_system=='Windows' # to prevent pyinstaller WARNING: Hidden import "tzdata" not found!

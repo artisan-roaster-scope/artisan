@@ -203,6 +203,7 @@ class Orbiter(AsyncComm):
                         dashboard_state = data[3:5]
                         dashboard_state_low = dashboard_state[0]
                         #
+#                        self.isRoaster_Cooling = self.test_bit(dashboard_state_low, 3)
                         self.isRoaster_Roasting = self.test_bit(dashboard_state_low, 2)
 #                        if self.isRoaster_Roasting:
 #                            _log.debug("isRoaster_Roasting")
@@ -565,7 +566,8 @@ def saveOrbiter(filename:str, outfile:IO[bytes], profile:ProfileData) -> bool:
         FCs:bool = False
         SCs:bool = False
         DROP:bool = False
-        CHARGE_idx = (timeindex[0] if timeindex[0]>=0 else 0)
+        CHARGE_idx = max(0, (timeindex[0] if timeindex[0]>=0 else 0))
+        DROP_idx = max(0, (timeindex[6] if timeindex[6]>0 else len(timex) - 1))
         for idx,tx in enumerate(timex):
             if not (DROP or (timeindex[0] > -1 and tx < timex[timeindex[0]])): # ignore all readings before CHARGE and after DROP
                 if len(specialevents)>0 and idx >= specialevents[0]:
@@ -623,7 +625,7 @@ def saveOrbiter(filename:str, outfile:IO[bytes], profile:ProfileData) -> bool:
         title_length:int = 30
         title_bytes = to_ascii(title).encode('utf-8')[:title_length].ljust(title_length, b'\00')
         preheat_temperature = int(round(temp2[CHARGE_idx] if len(temp2)>CHARGE_idx else 0))
-        total_time_seconds:int = int(round((timex[-1] if len(timex)>0 else 0) - (timex[CHARGE_idx] if len(timex)>CHARGE_idx else 0)))
+        total_time_seconds:int = (int(round(timex[DROP_idx] - timex[CHARGE_idx])) if len(timex)>DROP_idx and len(timex)>CHARGE_idx and DROP_idx>CHARGE_idx else 0)
         header = b'\xff\xff'
         # header
         header_data = b'\x00\x00' + \
