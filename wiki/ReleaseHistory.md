@@ -19,6 +19,7 @@ v4.0.4 (Mar XX, 2026)
   - adds hack to prevent dtr/rts signaling on connecting serial ports
   - preserves weight/volume unit setup on loading/importing profiles
   - enables extra device curve fills on recording
+  - timer LCD displays cooling time after DROP
 * FIXES
   - fixes autosave as PDF on regular `Save` on macOS ([Issue #2118](../../../issues/2118))
   - fixes regression which led to large automatic x-axis extensions for larger sampling rates ([Issue #2142](../../../issues/2142))

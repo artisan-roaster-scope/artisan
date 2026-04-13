@@ -5834,22 +5834,17 @@ class tgraphcanvas(QObject):
             try:
                 if self.aw.sample_loop_running and len(self.timeindex) == 8: # ensure we have a valid self.timeindex array
 
-                    if self.timeindex[0] != -1 and len(self.timex) > self.timeindex[0]:
+                    if self.timeindex[6] != 0 and len(self.timex) > self.timeindex[6]:
+                        ts = tx - self.timex[self.timeindex[6]]
+                    elif self.timeindex[0] != -1 and len(self.timex) > self.timeindex[0]:
                         ts = tx - self.timex[self.timeindex[0]]
                     else:
                         ts = tx
 
                     # if more than max cool (from statistics) past DROP and not yet COOLend turn the time LCD red:
-                    if (self.timeindex[0]!=-1 and self.timeindex[6] and
-                            not self.timeindex[7] and
-                            ((len(self.timex) == 1+self.timeindex[6]) or
-                                (len(self.timex)>self.timeindex[6] and (4*60+2 > (tx - self.timex[self.timeindex[6]]) > 4*60)))):
-                        # switch LCD color to "cooling" color (only after 4min cooling we switch to slowcoolingtimer color)
-                        if (tx - self.timex[self.timeindex[6]]) > 4*60:
-                            timer_color = 'slowcoolingtimer'
-                        else:
-                            timer_color = 'rstimer'
-                        self.aw.setTimerColor(timer_color)
+                    if (self.timeindex[0]!=-1 and self.timeindex[6] != 0 and not self.timeindex[7] and
+                                len(self.timex) > self.timeindex[6] and (tx - self.timex[self.timeindex[6]]) > 4*60):
+                            self.aw.setTimerColor('slowcoolingtimer')
 
                     if self.chargeTimerFlag and self.timeindex[0] == -1 and self.chargeTimerPeriod != 0:
                         if self.chargeTimerPeriod > ts:
@@ -15308,6 +15303,7 @@ class tgraphcanvas(QObject):
                     # we check if this is the first DROP mark on this roast
                     firstDROP = self.timeindex[6] == 0 # on UNDO DROP we do not send the record to plus
                     if self.aw.buttonDROP.isFlat() and self.timeindex[6] > 0:
+                        self.aw.setTimerColor('timer') # reset cooling timer color back to the default
                         self.autoDropIdx = -1 # disable autoDROP to allow manual re-DROP
                         # undo wrongly set FCs
                         # deactivate autoDROP
@@ -15331,6 +15327,7 @@ class tgraphcanvas(QObject):
                             if 6 in self.l_annotations_dict:
                                 del self.l_annotations_dict[6]
                     elif not self.aw.buttonDROP.isFlat():
+                        self.aw.setTimerColor('rstimer') # cooling timer color
                         self.incBatchCounter()
                         # generate UUID
                         if self.roastUUID is None: # there might be already one assigned by undo and redo the markDROP!
