@@ -75,11 +75,11 @@ def reset_bluedot_state() -> Generator[None, None, None]:
 
     yield
 
-    # Clean up after each test
-    # Force garbage collection to clean up any BLE handles or connections
-    import gc
-
-    gc.collect()
+#    # Clean up after each test
+#    # Force garbage collection to clean up any BLE handles or connections
+#    import gc
+#
+#    gc.collect()
 
 
 class TestBlueDOTModuleImport:

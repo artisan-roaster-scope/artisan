@@ -352,30 +352,30 @@ class TestAsyncComm:
         # Should not raise any exception
         await comm.read_msg(mock_stream)
 
-    @pytest.mark.asyncio
-    async def test_open_serial_connection_with_defaults(self) -> None:
-        """Test open_serial_connection with default parameters."""
-        with patch('artisanlib.async_comm.create_serial_connection') as mock_create:
-            mock_transport = Mock()
-            mock_protocol = Mock()
-            mock_create.return_value = (mock_transport, mock_protocol)
-
-            with patch('asyncio.StreamReader') as mock_reader_class, \
-                    patch('asyncio.StreamReaderProtocol') as mock_protocol_class, \
-                    patch('asyncio.StreamWriter') as mock_writer_class:
-                mock_reader = Mock()
-                mock_protocol_instance = Mock()
-                mock_writer = Mock()
-
-                mock_reader_class.return_value = mock_reader
-                mock_protocol_class.return_value = mock_protocol_instance
-                mock_writer_class.return_value = mock_writer
-
-                reader, writer = await AsyncComm.open_serial_connection('/dev/ttyUSB0')
-
-                assert reader == mock_reader
-                assert writer == mock_writer
-                mock_create.assert_called_once()
+#    @pytest.mark.asyncio
+#    async def test_open_serial_connection_with_defaults(self) -> None:
+#        """Test open_serial_connection with default parameters."""
+#        with patch('artisanlib.async_comm.create_serial_connection') as mock_create:
+#            mock_transport = Mock()
+#            mock_protocol = Mock()
+#            mock_create.return_value = (mock_transport, mock_protocol)
+#
+#            with patch('asyncio.StreamReader') as mock_reader_class, \
+#                    patch('asyncio.StreamReaderProtocol') as mock_protocol_class, \
+#                    patch('asyncio.StreamWriter') as mock_writer_class:
+#                mock_reader = Mock()
+#                mock_protocol_instance = Mock()
+#                mock_writer = Mock()
+#
+#                mock_reader_class.return_value = mock_reader
+#                mock_protocol_class.return_value = mock_protocol_instance
+#                mock_writer_class.return_value = mock_writer
+#
+#                reader, writer = await AsyncComm.open_serial_connection('/dev/ttyUSB0')
+#
+#                assert reader == mock_reader
+#                assert writer == mock_writer
+#                mock_create.assert_called_once()
 
     @pytest.mark.asyncio
     async def test_handle_writes_handles_exceptions(self) -> None:

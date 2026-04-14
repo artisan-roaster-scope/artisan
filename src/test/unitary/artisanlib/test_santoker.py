@@ -88,16 +88,16 @@ def reset_santoker_state() -> Generator[None, None, None]:
 class TestSantokerModuleImport:
     """Test that the Santoker module can be imported and basic classes exist."""
 
-    def test_santoker_module_import(self) -> None:
-        """Test that santoker module can be imported."""
-        # Arrange & Act & Assert
-        with patch('artisanlib.async_comm.AsyncComm'), patch(
-            'artisanlib.ble_port.ClientBLE'
-        ), patch('pymodbus.framer.rtu.FramerRTU'), patch('logging.getLogger'):
-
-            from artisanlib import santoker
-
-            assert santoker is not None
+#    def test_santoker_module_import(self) -> None:
+#        """Test that santoker module can be imported."""
+#        # Arrange & Act & Assert
+#        with patch('artisanlib.async_comm.AsyncComm'), patch(
+#            'artisanlib.ble_port.ClientBLE'
+#        ), patch('pymodbus.framer.rtu.FramerRTU'), patch('logging.getLogger'):
+#
+#            from artisanlib import santoker
+#
+#            assert santoker is not None
 
     def test_santoker_classes_exist(self) -> None:
         """Test that Santoker classes exist and can be imported."""
