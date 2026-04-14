@@ -535,6 +535,7 @@ def extractProfileCropsterXLS(file:str,
 
     curve_gas_control_trans:list[str] = [
         'Curve - Gas control', # EN
+        'Curve - gasControl', # EN alt
         'Kurve - Gas-Kontrolle', # DE
         'Curva - Control del gas', # ES
         'Curva  Control del gas', # ES new
@@ -549,6 +550,7 @@ def extractProfileCropsterXLS(file:str,
     ]
     curve_drum_speed_trans:list[str] = [
         'Curve - Drum speed', # EN
+        'Curve - drumSpeed', # EN alt
         'Kurve - Trommelgeschw.', # DE
         'Curva - Velocidad del tambor', # ES
         'Curva  Velocidad del tambor', # ES new
@@ -606,6 +608,7 @@ def extractProfileCropsterXLS(file:str,
 #    ]
     curve_drum_pressure_trans:list[str] = [
         'Curve - Drum pressure', # EN
+        'Curve - drumPressure', # EN alt
         'Kurve - Trommeldruck', # DE
         'Curva - Presi\u00f3n del tambor', # ES
         'Curva  Presi\u00f3n del tambor', # ES new
@@ -620,6 +623,8 @@ def extractProfileCropsterXLS(file:str,
     ]
     curve_airflow_control_trans:list[str] = [
         'Curve - Airflow control', # EN
+        'Curve - airflowControl', # EN alt
+        'Curve - airFlowControl', # EN alt2
         'Kurve - Airflow-Steuerung', # DE
         'Curva - Regulaci\u00f3n del caudal de aire', # ES
         'Curva  Regulaci\u00f3n del caudal de', # ES new
@@ -638,47 +643,103 @@ def extractProfileCropsterXLS(file:str,
     ]
     curve_fan_speed_trans:list[str] = [
         'Curve - fanSpeed', # EN
+        'Curve - Fan speed', # EN alt
         'Kurve - fanSpeed', # DE
+        'Kurve - Fan speed', # DE alt
         'Curva - Velocidad del ventilador', # ES
         'Curva  Velocidad del ventilador', # ES new
         'Courbe fanSpeed', # FR
-        'Curva - fanSpeed', # IT, ES
-        'Curva - fanSpeed', # PT
+        'Courbe Fan speed', # FR alt
+        'Curva - fanSpeed', # IT, ES, PT
+        'Curva - Fan speed', # IT, ES, PT alt
         '\u041a\u0440\u0438\u0432\u0430\u044f - fanSpeed', # RU
+        '\u041a\u0440\u0438\u0432\u0430\u044f - Fan speed', # RU alt
         '\ucee4\ube0c - fanSpeed', # KO
+        '\ucee4\ube0c - Fan speed', # KO alt
         '\u30ab\u30fc\u30d6 - fanSpeed', # JP
+        '\u30ab\u30fc\u30d6 - Fan speed', # JP alt
         '\u66f2\u7ebf - fanSpeed', # CN Simplified
+        '\u66f2\u7ebf - Fan speed', # CN Simplified alt
         '\u66f2\u7dda - fanSpeed', # CN Traditional
+        '\u66f2\u7dda - Fan speed', # CN Traditional alt
     ]
 
     # Drum speed control
     curve_drum_speed_control_trans:list[str] = [
         'Curve - drumSpeedControl', # EN
+        'Curve - Drum speed control', # EN alt
         'Kurve - drumSpeedControl', # DE
+        'Kurve - Drum speed control', # DE alt
         'Curva  drumSpeedControl', # ES
+        'Curva  Drum speed control', # ES alt
         'Courbe drumSpeedControl', # FR
+        'Courbe Drum speed control', # FR alt
         'Curva - drumSpeedControl', # IT
+        'Curva - Drum speed control', # IT alt
         'Curva - drumSpeedControl', # PT
+        'Curva - Drum speed control', # PT alt
         '\u041a\u0440\u0438\u0432\u0430\u044f - drumSpeedControl', # RU
+        '\u041a\u0440\u0438\u0432\u0430\u044f - Drum speed control', # RU alt
         '\ucee4\ube0c - drumSpeedControl', # KO
+        '\ucee4\ube0c - Drum speed control', # KO alt
         '\u30ab\u30fc\u30d6 - drumSpeedControl', # JP
+        '\u30ab\u30fc\u30d6 - Drum speed control', # JP alt
         '\u66f2\u7ebf - drumSpeedControl', # CN Simplified
+        '\u66f2\u7ebf - Drum speed control', # CN Simplified alt
         '\u66f2\u7dda - drumSpeedControl', # CN Traditional
+        '\u66f2\u7dda - Drum speed control', # CN Traditional alt
+    ]
+
+    # Drum pressure control
+    curve_drum_pressure_control_trans:list[str] = [
+        'Curve - Drum pressure control', # EN
+        'Curve - drumPressureControl', # EN alt
+        'Kurve - Drum pressure control', # DE
+        'Kurve - drumPressureControl', # DE alt
+        'Curva  Drum pressure control', # ES
+        'Curva  drumPressureControl', # ES alt
+        'Courbe Drum pressure control', # FR
+        'Courbe drumPressureControl', # FR alt
+        'Curva - Drum pressure control', # IT
+        'Curva - drumPressureControl', # IT alt
+        'Curva - Drum pressure control', # PT
+        'Curva - drumPressureControl', # PT alt
+        '\u041a\u0440\u0438\u0432\u0430\u044f - Drum pressure control', # RU
+        '\u041a\u0440\u0438\u0432\u0430\u044f - drumPressureControl', # RU alt
+        '\ucee4\ube0c - Drum pressure control', # KO
+        '\ucee4\ube0c - drumPressureControl', # KO alt
+        '\u30ab\u30fc\u30d6 - Drum pressure control', # JP
+        '\u30ab\u30fc\u30d6 - drumPressureControl', # JP alt
+        '\u66f2\u7ebf - Drum pressure control', # CN Simplified
+        '\u66f2\u7ebf - drumPressureControl', # CN Simplified alt
+        '\u66f2\u7dda - Drum pressure control', # CN Traditional
+        '\u66f2\u7dda - drumPressureControl', # CN Traditional alt
     ]
 
     # Set temperature
     curve_set_temperature_control_trans:list[str] = [
         'Curve - setTemperatureControl', # EN
+        'Curve - Set temperature control', # EN alt
         'Kurve - setTemperatureControl', # DE
+        'Kurve - Set temperature control', # DE alt
         'Curva  setTemperatureControl', # ES
+        'Curva  Set temperature control', # ES alt
         'Courbe setTemperatureControl', # FR
+        'Courbe Set temperature control', # FR alt
         'Curva - setTemperatureControl', # IT
+        'Curva - Set temperature control', # IT at
         'Curva - setTemperatureControl', # PT
+        'Curva - Set temperature control', # PT alt
         '\u041a\u0440\u0438\u0432\u0430\u044f - setTemperatureControl', # RU
+        '\u041a\u0440\u0438\u0432\u0430\u044f - Set temperature control', # RU alt
         '\ucee4\ube0c - setTemperatureControl', # KO
+        '\ucee4\ube0c - Set temperature control', # KO alt
         '\u30ab\u30fc\u30d6 - setTemperatureControl', # JP
+        '\u30ab\u30fc\u30d6 - Set temperature control', # JP alt
         '\u66f2\u7ebf - setTemperatureControl', # CN Simplified
+        '\u66f2\u7ebf - Set temperature control', # CN Simplified alt
         '\u66f2\u7dda - setTemperatureControl', # CN Traditional
+        '\u66f2\u7dda - Set temperature control', # CN Traditional alt
     ]
 
     curve_custom_trans:list[str] = [
@@ -737,6 +798,7 @@ def extractProfileCropsterXLS(file:str,
         curve_airflow_control_trans + \
         curve_fan_speed_trans + \
         curve_drum_speed_control_trans + \
+        curve_drum_pressure_control_trans + \
         curve_custom_trans
         #curve_gas_comments_trans
 
@@ -1044,102 +1106,11 @@ def extractProfileCropsterXLS(file:str,
 
     # extra temperature curves (only if ET or BT and its corresponding timex was already parsed successfully)
     if len(res['timex']) > 0:
-        channel = 1 # toggle between channel 1 and 2 to be filled with extra temperature curve data
-        for sno in ordered_sheet_names:
-            snn:str = sno.strip()
-            if snn in extra_temp_curve_trans:
-                temp_curve = True
-            elif snn in extra_nontemp_curve_trans:
-                temp_curve = False
-            else:
-                continue
-            try:
-                if 'extradevices' not in res:
-                    res['extradevices'] = []
-                if 'extraname1' not in res:
-                    res['extraname1'] = []
-                if 'extraname2' not in res:
-                    res['extraname2'] = []
-                if 'extratimex' not in res:
-                    res['extratimex'] = []
-                if 'extratemp1' not in res:
-                    res['extratemp1'] = []
-                if 'extratemp2' not in res:
-                    res['extratemp2'] = []
-                if 'extramathexpression1' not in res:
-                    res['extramathexpression1'] = []
-                if 'extramathexpression2' not in res:
-                    res['extramathexpression2'] = []
-                if 'extraNoneTempHint1' not in res:
-                    res['extraNoneTempHint1'] = []
-                if 'extraNoneTempHint2' not in res:
-                    res['extraNoneTempHint2'] = []
-
-                CT_idx = sheet_idx[snn]
-                CT_sh = book.sheet_by_index(CT_idx)
-                if CT_sh.ncols >= 1:
-                    time = CT_sh.col(0)
-                    temp = CT_sh.col(1)
-                    if len(time) > 0 and len(temp) > 0 and len(time) == len(temp):
-                        extra_curve_name = snn
-                        # we split of the "Curve -" prefix
-                        for px in curve_prefixa:
-                            if extra_curve_name.startswith(px):
-                                sp = extra_curve_name.split(px)
-                                extra_curve_name = sp[1] if len(sp) > 1 else sp[0]
-                                extra_curve_name = extra_curve_name.strip()
-                                break
-
-                        # we split of also the "temp." postfix
-                        for px in curve_postfixa:
-                            if extra_curve_name.endswith(px):
-                                extra_curve_name = extra_curve_name.split(px)[0].strip()
-                                break
-                        if channel == 1:
-                            channel = 2
-                            if temp_curve:
-                                # apply temp conversion
-                                res['extraNoneTempHint1'].append(False)
-                            else:
-                                # no temp conversion
-                                res['extraNoneTempHint1'].append(True)
-                            res['extradevices'].append(25) # Virtual Device
-
-                            name1:str = 'extra1'
-                            name1 = encodeLocalStrict(extra_curve_name)
-                            res['extraname1'].append(name1)
-
-                            res['extratimex'].append([float(t.value) for t in time[1:]])
-                            res['extratemp1'].append([float(t.value) for t in temp[1:]])
-                            res['extramathexpression1'].append('')
-                        elif (len(time) -1) == len(res['extratimex'][-1]): # only if time lengths is same as of channel 1
-                            channel = 1
-                            if temp_curve:
-                                # apply temp conversion
-                                res['extraNoneTempHint2'].append(False)
-                            else:
-                                # no temp conversion
-                                res['extraNoneTempHint2'].append(True)
-
-                            name2:str = 'extra2'
-                            name2 = encodeLocalStrict(extra_curve_name)
-                            res['extraname2'].append(name2)
-
-                            res['extratemp2'].append([float(t.value) for t in temp[1:]])
-                            res['extramathexpression2'].append('')
-            except Exception: # pylint: disable=broad-except
-                pass
 
 
-        if 'extratemp1' in res and 'extratemp2' in res and 'extraNoneTempHint2' in res and 'extramathexpression2' in res and 'extraname1' in res and 'extraname2' in res and len(res['extraname1']) != len(res['extraname2']):
-
-            res['extraname2'].append('Extra 2')
-
-            res['extratemp2'].append([-1.0]*len(res['extratemp1'][-1]))
-            res['extraNoneTempHint2'].append(True)
-            res['extramathexpression2'].append('')
 
         # add events
+        control_curve_events:set[int] = set() # set of control curve sheet idx from which events have been extracted
         try:
             COMMENTS_idx = 1
             try:
@@ -1147,12 +1118,13 @@ def extractProfileCropsterXLS(file:str,
             except Exception: # pylint: disable=broad-except
                 pass
             COMMENTS_sh = book.sheet_by_index(COMMENTS_idx)
-            gas_event = False # set to True if a Gas event exists
-            airflow_event = False # set to True if an Airflow event exists
+            gas_event:bool = False # set to True if a Gas event have been extracted
+            airflow_event:bool = False # set to True if an Airflow event have been extracted
             specialevents:list[int] = []
             specialeventstype:list[int] = []
             specialeventsvalue:list[float] = []
             specialeventsStrings:list[str] = []
+            # import custom events from COMMENTS section (if any)
             if COMMENTS_sh.ncols >= 4:
                 for r in range(COMMENTS_sh.nrows):
                     if r>0:
@@ -1206,16 +1178,159 @@ def extractProfileCropsterXLS(file:str,
                                         specialeventsStrings.append(event_value_str)
                         except Exception: # pylint: disable=broad-except
                             pass
+            # import custom events from control curves (if any)
+            # associates control curve name tags to Artisan event types
+            control_curves:list[tuple[list[str], int]] = [
+                (curve_airflow_control_trans, 0),
+                (curve_drum_speed_control_trans, 1),
+                (curve_drum_pressure_control_trans, 2),
+                (curve_gas_control_trans, 3),
+            ]
+            for control_curve_tags, event_type in control_curves:
+                event_value:int|None = None # holds last processed curve event value
+                for sno in ordered_sheet_names:
+                    snn:str = sno.strip()
+                    if snn in control_curve_tags:
+                        CT_idx = sheet_idx[snn]
+                        CT_sh = book.sheet_by_index(CT_idx)
+                        if CT_sh.ncols >= 1:
+                            for timex, control_curve in zip(CT_sh.col(0), CT_sh.col(1), strict=False):
+                                try:
+                                    time_epoc = float(timex.value)
+                                    c = takeClosest(time_epoc,res['timex'])
+                                    timex_idx = res['timex'].index(c)
+                                    value = int(round(float(control_curve.value)))
+                                    if event_value is None or event_value != value:
+                                        # value changed
+                                        event_value = value
+                                        control_curve_events.add(CT_idx)
+                                        specialeventsvalue.append(eventsExternal2InternalValue(value))
+                                        specialevents.append(timex_idx)
+                                        specialeventstype.append(event_type)
+                                        specialeventsStrings.append(f"{value}")
+                                except Exception: # pylint: disable=broad-except
+                                    # first row contains title and will thus fail to convert
+                                    pass
+
+            # generate the special event data
             if len(specialevents) > 0:
                 res['specialevents'] = specialevents
                 res['specialeventstype'] = specialeventstype
                 res['specialeventsvalue'] = specialeventsvalue
                 res['specialeventsStrings'] = specialeventsStrings
-                if gas_event or airflow_event:
+                if gas_event or airflow_event or not bool(control_curve_events):
                     # first set etypes to defaults
                     res['etypes'] = [encodeLocalStrict(etype) for etype in etypesdefault]
         except Exception as e: # pylint: disable=broad-except
             _log.error(e)
+
+        channel = 1 # toggle between channel 1 and 2 to be filled with extra temperature curve data
+        for sno in ordered_sheet_names:
+            snn = sno.strip()
+            if snn in extra_temp_curve_trans:
+                temp_curve = True
+            elif snn in extra_nontemp_curve_trans:
+                temp_curve = False
+            else:
+                continue
+            try:
+                if 'extradevices' not in res:
+                    res['extradevices'] = []
+                if 'extraname1' not in res:
+                    res['extraname1'] = []
+                if 'extraname2' not in res:
+                    res['extraname2'] = []
+                if 'extratimex' not in res:
+                    res['extratimex'] = []
+                if 'extratemp1' not in res:
+                    res['extratemp1'] = []
+                if 'extratemp2' not in res:
+                    res['extratemp2'] = []
+                if 'extraCurveVisibility1' not in res:
+                    res['extraCurveVisibility1'] = []
+                if 'extraCurveVisibility2' not in res:
+                    res['extraCurveVisibility2'] = []
+                if 'extramathexpression1' not in res:
+                    res['extramathexpression1'] = []
+                if 'extramathexpression2' not in res:
+                    res['extramathexpression2'] = []
+                if 'extraNoneTempHint1' not in res:
+                    res['extraNoneTempHint1'] = []
+                if 'extraNoneTempHint2' not in res:
+                    res['extraNoneTempHint2'] = []
+
+                CT_idx = sheet_idx[snn]
+                CT_sh = book.sheet_by_index(CT_idx)
+                if CT_sh.ncols >= 1:
+                    time = CT_sh.col(0)
+                    temp = CT_sh.col(1)
+                    if len(time) > 0 and len(temp) > 0 and len(time) == len(temp):
+                        extra_curve_name = snn
+                        # we split of the "Curve -" prefix
+                        for px in curve_prefixa:
+                            if extra_curve_name.startswith(px):
+                                sp = extra_curve_name.split(px)
+                                extra_curve_name = sp[1] if len(sp) > 1 else sp[0]
+                                extra_curve_name = extra_curve_name.strip()
+                                break
+
+                        # we split of also the "temp." postfix
+                        for px in curve_postfixa:
+                            if extra_curve_name.endswith(px):
+                                extra_curve_name = extra_curve_name.split(px)[0].strip()
+                                break
+
+                        # hide the curve if it was used to extract custom events from
+                        curve_visible:bool = CT_idx not in control_curve_events
+
+                        if channel == 1:
+                            channel = 2
+                            if temp_curve:
+                                # apply temp conversion
+                                res['extraNoneTempHint1'].append(False)
+                            else:
+                                # no temp conversion
+                                res['extraNoneTempHint1'].append(True)
+                            res['extradevices'].append(25) # Virtual Device
+
+                            name1:str = 'extra1'
+                            name1 = encodeLocalStrict(extra_curve_name)
+                            res['extraname1'].append(name1)
+
+                            res['extratimex'].append([float(t.value) for t in time[1:]])
+                            res['extratemp1'].append([float(t.value) for t in temp[1:]])
+                            res['extramathexpression1'].append('')
+                            res['extraCurveVisibility1'].append(curve_visible)
+                        elif (len(time) -1) == len(res['extratimex'][-1]): # only if time lengths is same as of channel 1
+                            channel = 1
+                            if temp_curve:
+                                # apply temp conversion
+                                res['extraNoneTempHint2'].append(False)
+                            else:
+                                # no temp conversion
+                                res['extraNoneTempHint2'].append(True)
+
+                            name2:str = 'extra2'
+                            name2 = encodeLocalStrict(extra_curve_name)
+                            res['extraname2'].append(name2)
+
+                            res['extratemp2'].append([float(t.value) for t in temp[1:]])
+                            res['extramathexpression2'].append('')
+                            res['extraCurveVisibility2'].append(curve_visible)
+            except Exception: # pylint: disable=broad-except
+                pass
+
+
+        # add another Extra2 data set if needed
+        if 'extratemp1' in res and 'extratemp2' in res and 'extraNoneTempHint2' in res and 'extramathexpression2' in res and 'extraname1' in res and 'extraname2' in res and len(res['extraname1']) != len(res['extraname2']):
+
+            res['extraname2'].append('Extra 2')
+
+            res['extratemp2'].append([-1.0]*len(res['extratemp1'][-1]))
+            res['extraNoneTempHint2'].append(True)
+            res['extramathexpression2'].append('')
+            res['extraCurveVisibility2'].append(False)
+
 
     # extra device data can be shorter, make them all equal in length to main device
     if 'timex' in res and 'extradevices' in res and 'samplinginterval' in res:

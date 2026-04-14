@@ -795,7 +795,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.createalarmTableButton.setMaximumSize(self.createalarmTableButton.sizeHint())
         self.createalarmTableButton.setMinimumSize(self.createalarmTableButton.minimumSizeHint())
         self.createalarmTableButton.clicked.connect(self.createAlarmEventTable)
-        self.ordereventTableButton = QPushButton(QApplication.translate('Button', 'Order'))
+        self.ordereventTableButton = QPushButton(QApplication.translate('Button', 'Sort'))
         self.ordereventTableButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.ordereventTableButton.setMaximumSize(self.ordereventTableButton.sizeHint())
         self.ordereventTableButton.setMinimumSize(self.ordereventTableButton.minimumSizeHint())

@@ -59,11 +59,11 @@ aiohttp_jinja2==1.6
 python-bidi==0.6.7
 arabic-reshaper==3.0.0
 pillow==12.2.0
-pydantic==2.12.5
+pydantic==2.13.0
 babel==2.18.0
 bleak==3.0.1
 python-statemachine==3.0.0
-yoctopuce==2.1.12413
+yoctopuce==2.1.12672
 PyQt6==6.11.0
 PyQt6-WebEngine==6.11.0
 qt6-tools==6.5.0.1.3

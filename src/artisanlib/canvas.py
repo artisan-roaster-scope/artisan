@@ -5844,7 +5844,7 @@ class tgraphcanvas(QObject):
                     # if more than max cool (from statistics) past DROP and not yet COOLend turn the time LCD red:
                     if (self.timeindex[0]!=-1 and self.timeindex[6] != 0 and not self.timeindex[7] and
                                 len(self.timex) > self.timeindex[6] and (tx - self.timex[self.timeindex[6]]) > 4*60):
-                            self.aw.setTimerColor('slowcoolingtimer')
+                        self.aw.setTimerColor('slowcoolingtimer')
 
                     if self.chargeTimerFlag and self.timeindex[0] == -1 and self.chargeTimerPeriod != 0:
                         if self.chargeTimerPeriod > ts:

@@ -625,7 +625,7 @@ def saveOrbiter(filename:str, outfile:IO[bytes], profile:ProfileData) -> bool:
         title_length:int = 30
         title_bytes = to_ascii(title).encode('utf-8')[:title_length].ljust(title_length, b'\00')
         preheat_temperature = int(round(temp2[CHARGE_idx] if len(temp2)>CHARGE_idx else 0))
-        total_time_seconds:int = (int(round(timex[DROP_idx] - timex[CHARGE_idx])) if len(timex)>DROP_idx and len(timex)>CHARGE_idx and DROP_idx>CHARGE_idx else 0)
+        total_time_seconds:int = (int(round(timex[DROP_idx] - timex[CHARGE_idx])) if len(timex) > DROP_idx > CHARGE_idx else 0)
         header = b'\xff\xff'
         # header
         header_data = b'\x00\x00' + \
