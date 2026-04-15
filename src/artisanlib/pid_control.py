@@ -1445,7 +1445,8 @@ class PIDcontrol:
 
 
     # the internal software PID should be configured on ON, but not be activated yet to warm it up
-    def confSoftwarePID(self) -> None:
+    # if reset the PID is initialized which resets its iTerm to 0 and initializes the derivative filter with the configured sampling rate
+    def confSoftwarePID(self, reset:bool=False) -> None:
         # software PID
         self.aw.qmc.pid.setSamplingRate(self.aw.qmc.delay/1000)
         self.aw.qmc.pid.setPID(self.pidKp,self.pidKi,self.pidKd)
@@ -1468,6 +1469,8 @@ class PIDcontrol:
         self.aw.qmc.pid.setGainSCheduleQuadratic(self.pidGainSchedulingQuadratic)
         self.aw.qmc.pid.setGainSchedule(self.pidKp1,self.pidKi1,self.pidKd1,self.pidKp2,self.pidKi2,self.pidKd2,
             self.pidSchedule0,self.pidSchedule1,self.pidSchedule2)
+        if reset:
+            self.aw.qmc.pid.reset()
 
 
     # if send_command is False, the pidOn command is not forwarded to the external PID (TC4, Kaleido, ..)

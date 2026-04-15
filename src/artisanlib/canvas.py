@@ -13392,7 +13392,7 @@ class tgraphcanvas(QObject):
 
             # warm up software PID (write current p-i-d settings,..) configured
             if self.aw.pidcontrol.externalPIDControl() == 0  and self.Controlbuttonflag:
-                self.aw.pidcontrol.confSoftwarePID()
+                self.aw.pidcontrol.confSoftwarePID(reset=True) # we initialize the software pid (iTerm=0, derivative filter cleared and conf. with current sampling rate)
                 self.aw.pidcontrol.setSV(self.aw.sliderSV.value())
 
             # ADD DEVICE: # start communication/connect

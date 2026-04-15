@@ -68,7 +68,7 @@ class AsyncLoopThread:
         if not self.__loop.is_closed():
             self.__loop.call_soon_threadsafe(self.__loop.stop)
 #        self.__thread.join()
-# WARNING: we don't join and expect the clients running on this thread to stop them
+# WARNING: we don't join and expect the clients running on this thread to stop themself
 # (using self._running) to finally get rid of this thread to prevent hangs
 
     @property

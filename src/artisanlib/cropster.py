@@ -1254,6 +1254,10 @@ def extractProfileCropsterXLS(file:str,
                     res['extramathexpression1'] = []
                 if 'extramathexpression2' not in res:
                     res['extramathexpression2'] = []
+                if 'extraCurveVisibility1' not in res:
+                    res['extraCurveVisibility1'] = []
+                if 'extraCurveVisibility2' not in res:
+                    res['extraCurveVisibility2'] = []
                 if 'extraNoneTempHint1' not in res:
                     res['extraNoneTempHint1'] = []
                 if 'extraNoneTempHint2' not in res:
@@ -1322,7 +1326,8 @@ def extractProfileCropsterXLS(file:str,
 
 
         # add another Extra2 data set if needed
-        if 'extratemp1' in res and 'extratemp2' in res and 'extraNoneTempHint2' in res and 'extramathexpression2' in res and 'extraname1' in res and 'extraname2' in res and len(res['extraname1']) != len(res['extraname2']):
+        if ('extratemp1' in res and 'extratemp2' in res and 'extraNoneTempHint2' in res and 'extramathexpression2' in res and 'extraCurveVisibility2' in res
+                and 'extraname1' in res and 'extraname2' in res and len(res['extraname1']) != len(res['extraname2'])):
 
             res['extraname2'].append('Extra 2')
 

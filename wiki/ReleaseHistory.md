@@ -26,7 +26,7 @@ v4.0.4 (Mar XX, 2026)
   - fixes issue w.r.t. alarm set activations which could cause alarm table to be lost on re-opening the Alarms dialog in some cases ([Issue #2144](../../../issues/2144))
   - prevents undo of main events for events triggered from alarm rule actions or custom event button actions ([Issue #2157](../../../issues/2157))
   - fixes regression that prevented to set the p-i-d parameters on external MODBUS PIDs ([Issue #2159](../../../issues/2159))
-
+  - fixes regression where iTerm of the internal PID did not get reset between roasts (reported by Peter)
 * REMOVALS
   - removes RoastTime, RoastPath and Probat Pilot import/exports
 

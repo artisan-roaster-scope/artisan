@@ -498,12 +498,12 @@ class PID:
         self.init()
 
     # re-initalize the PID on restarting it after a temporary off state
-    def init(self, lock: bool = True, sampling_rate:float = 1.) -> None:
+    def init(self, lock: bool = True) -> None:
         try:
             if lock:
                 self.pidSemaphore.acquire(1)
             # reset the filters on each filter level change (also on PID ON)
-            self.derivative_filter = self.derivativeFilter(sampling_rate)
+            self.derivative_filter = self.derivativeFilter(self.sampling_rate)
             self.output_filter = self.outputFilter(self.sampling_rate)
             #
             self.errSum = 0.0
