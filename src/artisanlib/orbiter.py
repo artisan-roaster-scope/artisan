@@ -474,6 +474,8 @@ def extractProfileOrbiter(f:IO[bytes],
         res['extraLCDvisibility2'] = [False, False, False, True, True, True, True, True, True, True]
         res['extraCurveVisibility1'] = [True, False, False, False, True, True, True, True, True, True]
         res['extraCurveVisibility2'] = [False, False, False, True, True, True, True, True, True, True]
+        res['extraDelta1'] = [False, False, False, False, False, False, False, False, False, False]
+        res['extraDelta2'] = [False, False, False, True, False, False, False, False, False, False]
 
         if len(specialevents) > 0:
             res['specialevents'] = specialevents

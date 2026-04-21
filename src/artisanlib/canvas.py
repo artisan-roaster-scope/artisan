@@ -4565,7 +4565,6 @@ class tgraphcanvas(QObject):
 # new (symmetric and more conservative):
                         RoR = dtemp/dtime
                         if (pRoR + dRoR_limit) < RoR < (pRoR - dRoR_limit):
-                            _log.debug('PRINT pRoR/RoR %s/%s',pRoR,RoR)
                             wrong_reading = 2
 
             #########################
