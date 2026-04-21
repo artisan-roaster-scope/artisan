@@ -215,11 +215,11 @@ async def create_serial_connection(
     if clear_HUPCL:
         # the transport serial port is not open yet in this case
         try:
-            if platform.system() != 'Windows':
+            if platform.system() == 'Linux': # seems not to resolve the issue on macOS
                 import termios # pylint: disable=C0415,E0401
-                port:str = url.replace('/dev/tty.','/dev/cu.')
                 # the following might hang on macOS for non-callup devices
-                with open(port, encoding='utf8') as f:
+                #url = url.replace('/dev/tty.','/dev/cu.')
+                with open(url, encoding='utf8') as f:
                     attrs = termios.tcgetattr(f)
                     attrs[2] = attrs[2] & ~termios.HUPCL
                     termios.tcsetattr(f, termios.TCSAFLUSH, attrs)
@@ -228,7 +228,7 @@ async def create_serial_connection(
         except Exception as e: # pylint: disable=broad-except
             _log.error(e)
         try:
-            # for Windows the following should be enough
+            # for Windows the following should be enough (and for the other platforms it should not harm)
             transport.sync_serial.dtr = False
             transport.sync_serial.rts = False
         except Exception as e: # pylint: disable=broad-except

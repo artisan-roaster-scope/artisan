@@ -12815,7 +12815,7 @@ class ApplicationWindow(QMainWindow):
                         self.sendmessage(f"{QApplication.translate('Label','Event button')}", append=False)
                     elif no_modifier and not self.app.artisanviewerMode and not self.qmc.designerflag and not self.qmc.wheelflag:
                         self.toggleextraeventrows()
-                elif k == Qt.Key.Key_M and no_modifier: # 77:                          #M (hides/shows standard buttons row)
+                elif k == Qt.Key.Key_M and no_modifier: # 77:          #M (hides/shows standard buttons row)
                     if self.qmc.flagstart:
                         self.standardButtonsVisibility()
                 #Extra event buttons palette. Numerical keys [0,1,2,3,4,5,6,7,8,9]

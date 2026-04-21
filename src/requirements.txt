@@ -51,7 +51,7 @@ colorspacious==1.1.2
 openpyxl==3.1.5
 keyring==25.7.0
 prettytable==3.17.0
-lxml==6.0.4
+lxml==6.1.0
 matplotlib==3.10.8
 jinja2==3.1.6
 aiohttp==3.13.5
@@ -59,7 +59,7 @@ aiohttp_jinja2==1.6
 python-bidi==0.6.7
 arabic-reshaper==3.0.0
 pillow==12.2.0
-pydantic==2.13.0
+pydantic==2.13.2
 babel==2.18.0
 bleak==3.0.1
 python-statemachine==3.0.0

@@ -4544,13 +4544,30 @@ class tgraphcanvas(QObject):
                 pdtemp = tempx[-1] - tempx[-n]
                 pdtime = timex[-1] - timex[-n]
                 if pdtime > 0:
+
+# old (asymmetric):
+#                    pRoR = abs(pdtemp/pdtime)
+#                    dtemp = tempx[-1] - temp
+#                    dtime = timex[-1] - time
+
+# new (symmetric and more conservative:
                     pRoR = pdtemp/pdtime
-                    dtemp = temp - tempx[-1]
-                    dtime = time - timex[-1]
+                    dtemp = temp - tempx[-n + 1]
+                    dtime = time - timex[-n + 1]
+
                     if dtime > 0:
+
+# old (asymmetric)
+#                        RoR = abs(dtemp/dtime)
+#                        if RoR > (pRoR + dRoR_limit):
+#                            wrong_reading = 2
+
+# new (symmetric and more conservative):
                         RoR = dtemp/dtime
-                        if (pRoR - dRoR_limit) < RoR < (pRoR + dRoR_limit):
+                        if (pRoR + dRoR_limit) < RoR < (pRoR - dRoR_limit):
+                            _log.debug('PRINT pRoR/RoR %s/%s',pRoR,RoR)
                             wrong_reading = 2
+
             #########################
             # c) handle outliers if it could be detected
             if wrong_reading:

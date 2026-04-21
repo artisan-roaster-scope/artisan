@@ -18,6 +18,7 @@
 import sys
 import platform
 import numpy
+from pathlib import Path
 from matplotlib import ticker, transforms # type:ignore[untyped-import,unused-ignore]
 from matplotlib import rcParams # type:ignore[untyped-import,unused-ignore]
 import logging
@@ -324,15 +325,15 @@ class RoastProfile:
                 self.metadata['weight'] = str(w).rstrip('0').rstrip('.') + weight_unit
         if 'moisture_greens' in profile and profile['moisture_greens'] != 0.0:
             self.metadata['moisture_greens'] = profile['moisture_greens']
-        if 'ambientTemp' in profile:
+        if 'ambientTemp' in profile and self.ambientTemp != 0:
             self.metadata['ambientTemp'] = f'{float2float(self.ambientTemp):g}{self.aw.qmc.mode}'
-        if 'ambient_humidity' in profile:
+        if 'ambient_humidity' in profile and profile['ambient_humidity'] != 0:
             self.metadata['ambient_humidity'] = f"{float2float(profile['ambient_humidity']):g}%"
-        if 'ambient_pressure' in profile:
+        if 'ambient_pressure' in profile and profile['ambient_pressure'] != 0:
             self.metadata['ambient_pressure'] = f"{float2float(profile['ambient_pressure']):g}hPa"
         if 'computed' in profile and 'weight_loss' in profile['computed']:
             self.metadata['weight_loss'] = f"-{profile['computed']['weight_loss']:g}%"
-        if 'ground_color' in profile:
+        if 'ground_color' in profile and profile['ground_color'] != 0:
             self.metadata['ground_color'] = f"#{float2str(profile['ground_color'])}"
         if 'computed' in profile and 'AUC' in profile['computed'] and \
                 profile['computed']['AUC'] != 0:
@@ -1476,10 +1477,10 @@ class roastCompareDlg(ArtisanDialog):
         self.profileTable.setVerticalHeaderItem(i,header)
 
     def renderToolTip(self, profile:RoastProfile) -> str:
-        tooltip:str = ''
+        tooltip:str = f'{Path(profile.filepath).name}\n-\n'
         try:
             if 'roastdate' in profile.metadata:
-                tooltip = profile.metadata['roastdate'].date().toString()
+                tooltip += profile.metadata['roastdate'].date().toString()
                 tooltip += ', ' + profile.metadata['roastdate'].time().toString()[:-3]
             if 'roastoftheday' in profile.metadata:
                 if tooltip != '':
@@ -1497,6 +1498,8 @@ class roastCompareDlg(ArtisanDialog):
                 tooltip += profile.metadata['beans'].strip()
                 if 'moisture_greens' in profile.metadata:
                     tooltip += f" ({float2float(profile.metadata['moisture_greens'],self.aw.percent_decimals):g}%)"
+            if tooltip != '':
+                tooltip += '\n'
             if 'ambientTemp' in profile.metadata:
                 if tooltip != '':
                     tooltip += '\n'

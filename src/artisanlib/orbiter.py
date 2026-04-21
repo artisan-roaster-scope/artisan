@@ -28,7 +28,7 @@ from PyQt6.QtWidgets import QApplication
 from typing import override, Final, TypedDict, IO, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from artisanlib.atypes import SerialSettings # pylint: disable=unused-import
+    from artisanlib.atypes import SerialSettings, ComputedProfileInformation # pylint: disable=unused-import
 
 from artisanlib.async_comm import AsyncComm, IteratorReader
 from artisanlib.atypes import ProfileData
@@ -562,12 +562,18 @@ def saveOrbiter(filename:str, outfile:IO[bytes], profile:ProfileData) -> bool:
         damper:int = 0
         event:int = 255 # main event
         CHARGE:bool = False
+        TP:bool = False
         DRY:bool = False
         FCs:bool = False
         SCs:bool = False
         DROP:bool = False
         CHARGE_idx = max(0, (timeindex[0] if timeindex[0]>=0 else 0))
         DROP_idx = max(0, (timeindex[6] if timeindex[6]>0 else len(timex) - 1))
+        computed:ComputedProfileInformation|None = None
+        TP_idx:int|None = None
+        if 'computed' in profile:
+            computed = profile['computed']
+            TP_idx = computed.get('TP_idx', None)
         for idx,tx in enumerate(timex):
             if not (DROP or (timeindex[0] > -1 and tx < timex[timeindex[0]])): # ignore all readings before CHARGE and after DROP
                 if len(specialevents)>0 and idx >= specialevents[0]:
@@ -587,6 +593,9 @@ def saveOrbiter(filename:str, outfile:IO[bytes], profile:ProfileData) -> bool:
                     event = 0
                     CHARGE = True
                     time_offset = (timex[CHARGE_idx] if len(timex)>CHARGE_idx else 0)
+                elif not TP and TP_idx is not None and TP_idx > 0 and tx >= timex[TP_idx]:
+                    event = 1
+                    TP = True
                 elif not DRY and timeindex[1] > 0 and tx >= timex[timeindex[1]]:
                     event = 3
                     DRY = True
