@@ -1533,6 +1533,8 @@ class ApplicationWindow(QMainWindow):
 
     def __init__(self, parent:QWidget|None = None, *, locale:str, WebEngineSupport:bool, artisanviewerFirstStart:bool) -> None:
 
+        self.pwroffset: float = 0.0
+
         self.defaultSettings: dict[str, Any] = {}
                 # holds default values of all app QSettings
                 # filled on app start by calling self.saveAllSettings(QSettings(), self.defaultSettings) before self.settingsLoad()
@@ -10629,7 +10631,38 @@ class ApplicationWindow(QMainWindow):
                                             self.qmc.weight = (cmds,self.qmc.weight[1],self.qmc.weight[2])
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
+                            # setPwrOffset(<float>)
+                            elif cs.startswith('setPwrOffset') and cs.endswith(')'):
+                                try:
+                                    cmds = eval(cs[len('setPwrOffset'):]) # pylint: disable=eval-used
+                                    if isinstance(cmds,(float,int)):
+                                        # cmd has format "setPwrOffset(xx.yy)"
 
+                                        offset = cmds
+                                        offsetold = self.pwroffset
+                                        self.pwroffset = offset
+                                        offsetdiff = offset - offsetold
+
+                                        n = self.pidcontrol.pidPositiveTarget - 1
+                                        # n=1
+                                        slider = getattr(self, "slider%s" % (n + 1))
+                                        v = slider.value()
+                                        vnew = v + offsetdiff
+                                        slider.setValue(int(vnew))
+                                        self.sliderReleased(n, True, False)
+
+                                        _log.info('Artisan Command: <%s>', cs)
+                                        self.sendmessage(f"Offset set to: {offset}. before: {offsetold}, n: {n}, v: {v}, diff: {offsetdiff}, vnew: {getattr(self, "slider%s"%(n+1)).value()}")
+                                except Exception as e: # pylint: disable=broad-except
+                                    self.sendmessage(f"Error setPwrOffset")
+                                    _log.exception(e)
+                            elif cs.startswith('resetPID') and cs.endswith(')'):
+                                try:
+                                    self.qmc.pid.reset()
+                                    self.sendmessage(f"PID Reset")
+                                except Exception as e: # pylint: disable=broad-except
+                                    self.sendmessage(f"PID Reset failed")
+                                    _log.exception(e)
                             ##  visible(<i>,<b>) : sets the visibility of <button> visible
                             #        (visibility=ON) if value b is yes, true, t, or 1, otherwise to hidden (visibility=OFF)
                             elif cs.startswith('visible'):

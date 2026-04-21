@@ -1292,6 +1292,7 @@ class PIDcontrol:
     def setEnergy(self, v:float) -> None:
         try:
             # if invertControl we invert min/max to max/min
+            v = v + self.aw.pwroffset
             vx = float(numpy.interp(v,[self.dutyMin,self.dutyMax],[self.dutyMax,self.dutyMin]) if self.invertControl else v)
             if self.pidPositiveTarget:
                 slidernr = self.pidPositiveTarget - 1

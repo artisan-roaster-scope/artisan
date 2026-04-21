@@ -143,6 +143,7 @@ class PID:
         self.pidSemaphore: QSemaphore = QSemaphore(1)
 
         self.outMin: int = 0  # minimum output value
+        #self.outMin: int = -20  # minimum output value
         self.outMax: int = 100  # maximum output value
         self.dutySteps: int = (
             1  # change [1-10] between previous and new PID duty to trigger call of control function
