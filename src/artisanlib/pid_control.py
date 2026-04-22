@@ -1452,7 +1452,7 @@ class PIDcontrol:
         self.aw.qmc.pid.setSamplingRate(self.aw.qmc.delay/1000)
         self.aw.qmc.pid.setPID(self.pidKp,self.pidKi,self.pidKd)
         self.aw.qmc.pid.setWeights(self.pidPsetpointWeight,self.pidDsetpointWeight)
-        self.aw.qmc.pid.setLimits((-100 if self.pidNegativeTarget else 0),(100 if self.pidPositiveTarget else 0))
+        self.aw.qmc.pid.setLimits((self.aw.pwroffset * -1 if self.aw.pwroffset > 0 else (-100 if self.pidNegativeTarget else 0)), (100 if self.pidPositiveTarget else 0))
         self.aw.qmc.pid.setDutySteps(self.dutySteps)
         self.aw.qmc.pid.setDutyMin(self.dutyMin)
         self.aw.qmc.pid.setDutyMax(self.dutyMax)
