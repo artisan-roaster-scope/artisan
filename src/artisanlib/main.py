@@ -11373,6 +11373,7 @@ class ApplicationWindow(QMainWindow):
                                 _log.info('Stepper Command <%s> not recognized', cs)
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
+
     def set_pwroffset(self, offset) -> None:
         offsetold = self.pwroffset
         self.pwroffset = offset
