@@ -1533,7 +1533,7 @@ class ApplicationWindow(QMainWindow):
 
     def __init__(self, parent:QWidget|None = None, *, locale:str, WebEngineSupport:bool, artisanviewerFirstStart:bool) -> None:
 
-        self.pwroffset: float = 0.0
+        self.pwroffset: int = 0
 
         self.defaultSettings: dict[str, Any] = {}
                 # holds default values of all app QSettings
@@ -10631,29 +10631,30 @@ class ApplicationWindow(QMainWindow):
                                             self.qmc.weight = (cmds,self.qmc.weight[1],self.qmc.weight[2])
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
-                            # setPwrOffset(<float>)
+                            # setPwrOffset(<int>)
                             elif cs.startswith('setPwrOffset') and cs.endswith(')'):
                                 try:
                                     cmds = eval(cs[len('setPwrOffset'):]) # pylint: disable=eval-used
-                                    if isinstance(cmds,(float,int)):
-                                        # cmd has format "setPwrOffset(xx.yy)"
-
+                                    if isinstance(cmds,(int)):
+                                        # cmd has format "setPwrOffset(xx)"
                                         offset = cmds
-                                        offsetold = self.pwroffset
-                                        self.pwroffset = offset
-                                        offsetdiff = offset - offsetold
-
-                                        n = self.pidcontrol.pidPositiveTarget - 1
-                                        # n=1
-                                        slider = getattr(self, "slider%s" % (n + 1))
-                                        v = slider.value()
-                                        vnew = v + offsetdiff
-                                        slider.setValue(int(vnew))
-                                        self.sliderReleased(n, True, False)
-
+                                        self.set_pwroffset(offset)
                                         _log.info('Artisan Command: <%s>', cs)
-                                        self.sendmessage(f"Offset set to: {offset}. before: {offsetold}, n: {n}, v: {v}, diff: {offsetdiff}, vnew: {getattr(self, "slider%s"%(n+1)).value()}")
+                                        self.sendmessage(f"Offset set to: {offset}")
                                 except Exception as e: # pylint: disable=broad-except
+                                    self.sendmessage(f"Error setPwrOffset")
+                                    _log.exception(e)
+                            # modifyPwrOffset(<int>)
+                            elif cs.startswith('modifyPwrOffset') and cs.endswith(')'):
+                                try:
+                                    cmds = eval(cs[len('modifyPwrOffset'):])  # pylint: disable=eval-used
+                                    if isinstance(cmds, (int)):
+                                        # cmd has format "modifyPwrOffset(xx)" x: -100...100
+                                        offset = self.pwroffset+cmds
+                                        self.set_pwroffset(offset)
+                                        _log.info('Artisan Command: <%s>', cs)
+                                        self.sendmessage(f"Offset set to: {offset}")
+                                except Exception as e:  # pylint: disable=broad-except
                                     self.sendmessage(f"Error setPwrOffset")
                                     _log.exception(e)
                             elif cs.startswith('resetPID') and cs.endswith(')'):
@@ -11372,6 +11373,17 @@ class ApplicationWindow(QMainWindow):
                                 _log.info('Stepper Command <%s> not recognized', cs)
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
+    def set_pwroffset(self, offset) -> None:
+        offsetold = self.pwroffset
+        self.pwroffset = offset
+        offsetdiff = offset - offsetold
+
+        n = self.pidcontrol.pidPositiveTarget - 1
+        slider = getattr(self, "slider%s" % (n + 1))
+        v = slider.value()
+        vnew = v + offsetdiff
+        slider.setValue(int(vnew))
+        self.sliderReleased(n, True, False)
 
     @staticmethod
     @functools.cache
