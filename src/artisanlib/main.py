@@ -1533,6 +1533,8 @@ class ApplicationWindow(QMainWindow):
 
     def __init__(self, parent:QWidget|None = None, *, locale:str, WebEngineSupport:bool, artisanviewerFirstStart:bool) -> None:
 
+        self.pwroffset: int = 0
+
         self.defaultSettings: dict[str, Any] = {}
                 # holds default values of all app QSettings
                 # filled on app start by calling self.saveAllSettings(QSettings(), self.defaultSettings) before self.settingsLoad()
@@ -10629,7 +10631,39 @@ class ApplicationWindow(QMainWindow):
                                             self.qmc.weight = (cmds,self.qmc.weight[1],self.qmc.weight[2])
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
-
+                            # setPwrOffset(<int>)
+                            elif cs.startswith('setPwrOffset') and cs.endswith(')'):
+                                try:
+                                    cmds = eval(cs[len('setPwrOffset'):]) # pylint: disable=eval-used
+                                    if isinstance(cmds,(int)):
+                                        # cmd has format "setPwrOffset(xx)"
+                                        offset = cmds
+                                        self.set_pwroffset(offset)
+                                        _log.info('Artisan Command: <%s>', cs)
+                                        self.sendmessage(f"Offset set to: {offset}")
+                                except Exception as e: # pylint: disable=broad-except
+                                    self.sendmessage(f"Error setPwrOffset")
+                                    _log.exception(e)
+                            # modifyPwrOffset(<int>)
+                            elif cs.startswith('modifyPwrOffset') and cs.endswith(')'):
+                                try:
+                                    cmds = eval(cs[len('modifyPwrOffset'):])  # pylint: disable=eval-used
+                                    if isinstance(cmds, (int)):
+                                        # cmd has format "modifyPwrOffset(xx)" x: -100...100
+                                        offset = self.pwroffset+cmds
+                                        self.set_pwroffset(offset)
+                                        _log.info('Artisan Command: <%s>', cs)
+                                        self.sendmessage(f"Offset set to: {offset}")
+                                except Exception as e:  # pylint: disable=broad-except
+                                    self.sendmessage(f"Error setPwrOffset")
+                                    _log.exception(e)
+                            elif cs.startswith('resetPID') and cs.endswith(')'):
+                                try:
+                                    self.qmc.pid.reset()
+                                    self.sendmessage(f"PID Reset")
+                                except Exception as e: # pylint: disable=broad-except
+                                    self.sendmessage(f"PID Reset failed")
+                                    _log.exception(e)
                             ##  visible(<i>,<b>) : sets the visibility of <button> visible
                             #        (visibility=ON) if value b is yes, true, t, or 1, otherwise to hidden (visibility=OFF)
                             elif cs.startswith('visible'):
@@ -11339,6 +11373,18 @@ class ApplicationWindow(QMainWindow):
                                 _log.info('Stepper Command <%s> not recognized', cs)
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
+
+    def set_pwroffset(self, offset) -> None:
+        offsetold = self.pwroffset
+        self.pwroffset = offset
+        offsetdiff = offset - offsetold
+
+        n = self.pidcontrol.pidPositiveTarget - 1
+        slider = getattr(self, "slider%s" % (n + 1))
+        v = slider.value()
+        vnew = v + offsetdiff
+        slider.setValue(int(vnew))
+        self.sliderReleased(n, True, False)
 
     @staticmethod
     @functools.cache
