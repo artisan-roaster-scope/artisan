@@ -78,6 +78,10 @@ def extractProfileRubasseCSV(file:str,
             temp1.append(et)
 
             bt:float = -1.0
+            try:
+                bt = float(item['BT'])
+            except Exception: # pylint: disable=broad-except
+                pass
             temp2.append(bt)
 
             heaterV:float = -1.0
@@ -174,7 +178,7 @@ def extractProfileRubasseCSV(file:str,
                                 specialeventsvalue.append(eventsExternal2InternalValue(int(round(v))))
                                 specialevents.append(i)
                                 specialeventstype.append(3)
-                                specialeventsStrings.append(f"{float(item['Heater'])}%")
+                                specialeventsStrings.append(f"{float(item['Heater']):.0f}%")
                         else:
                             heater_last = None
                 except Exception as e: # pylint: disable=broad-except
@@ -230,8 +234,8 @@ def extractProfileRubasseCSV(file:str,
     res['extratemp2'] = [extra2,extra4,extra6]
     res['extramathexpression2'] = ['','','']
 
-    res['extraCurveVisibility1'] = [False, True, False, False, True, True, True, True, True, True]
-    res['extraCurveVisibility2'] = [False, False, False, False, True, True, True, True, True, True]
+    res['extraCurveVisibility1'] = [False, False, False, False, True, True, True, True, True, True]
+    res['extraCurveVisibility2'] = [False, True, True, False, True, True, True, True, True, True]
     res['extraDelta1'] = [False]*10
     res['extraDelta2'] = [False]*10
     res['extraNoneTempHint1'] = [True, True, True]

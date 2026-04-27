@@ -19,7 +19,7 @@
 ######
 # the following commented package versions are read by appveyor.yml and downloaded outside of pip.
 #
-# pyinstaller==6.19.0; platform_system='Windows'
+# pyinstaller==6.20.0; platform_system='Windows'
 # libusb==1.0.26;  platform_system='Linux'
 # dotenv==2.8.1;   platform_system='Linux'  # v3.0.0 not compatible with fpm  # gem installed, not pip
 #
@@ -27,7 +27,7 @@
 # packages that are required on all platforms
 #
 setuptools==82.0.1
-wheel==0.46.3
+wheel==0.47.0
 pyserial==3.5
 pymodbus==3.13.0
 python-snap7==2.1.0
@@ -52,7 +52,7 @@ openpyxl==3.1.5
 keyring==25.7.0
 prettytable==3.17.0
 lxml==6.1.0
-matplotlib==3.10.8
+matplotlib==3.10.9
 jinja2==3.1.6
 aiohttp==3.13.5
 aiohttp_jinja2==1.6
@@ -75,7 +75,7 @@ jmespath==1.1.0
 # packages that differ per platform
 #
 ###
-pyinstaller==6.19.0; platform_system=='Linux' or sys_platform=='darwin' # on Windows pyinstaller is separately installed (see above)
+pyinstaller==6.20.0; platform_system=='Linux' or sys_platform=='darwin' # on Windows pyinstaller is separately installed (see above)
 #
 ########
 ### macOS specific packages
@@ -99,7 +99,7 @@ SecretStorage==3.5.0; platform_system=='Linux'
 ########
 ### Windows specific packages
 ###
-build==1.4.3; platform_system=='Windows'
+build==1.4.4; platform_system=='Windows'
 pywin32==311; platform_system=='Windows'
 pyinstaller-versionfile==3.1.0; platform_system=='Windows'
 #libusb-package==1.0.26.3; platform_system=='Windows'  # temp removed for Py 3.14, monkey patched into .appveyor.yml until a Py3.14 wheel is available on pypi

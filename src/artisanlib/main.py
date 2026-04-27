@@ -14239,19 +14239,19 @@ class ApplicationWindow(QMainWindow):
                 f.close()
                 profile = deserialize(filename)
                 self.plusAddPath(profile, filename)
-                self.qmc.backgroundprofile = cast('ProfileData',profile)
-                tb = profile['timex']
-                t1 = profile['temp1']
-                t2 = profile['temp2']
+                self.qmc.backgroundprofile = cast('ProfileData', profile)
+                tb:list[float] = profile['timex']
+                t1:list[float] = profile['temp1']
+                t2:list[float] = profile['temp2']
                 # ensure that timex, temp1 and temp2 are all of the same (minimal-)length
                 data_len:int = min(len(tb), len(t1), len(t2))
                 tb = tb[:data_len]
                 t1 = t1[:data_len]
                 t2 = t2[:data_len]
 
-                timex = profile['extratimex']
-                t1x = profile['extratemp1']
-                t2x = profile['extratemp2']
+                timex:list[list[float]] = profile['extratimex']
+                t1x:list[list[float]] = profile['extratemp1']
+                t2x:list[list[float]] = profile['extratemp2']
                 # ensure that number of extra device data is consistent
                 number_extra_devices = min(len(timex), len(t1x), len(t2x))
                 timex = timex[:number_extra_devices]
@@ -14265,9 +14265,9 @@ class ApplicationWindow(QMainWindow):
                     if len(timex[c]) != data_len:
                         timex[c] = tb[:]
                     if len(t1x[c]) != data_len:
-                        t1x[c] = [-1]*data_len
+                        t1x[c] = [-1.]*data_len
                     if len(t2x[c]) != data_len:
-                        t2x[c] = [-1]*data_len
+                        t2x[c] = [-1.]*data_len
 
 
                 # reset the movebackground cache:
@@ -14300,7 +14300,7 @@ class ApplicationWindow(QMainWindow):
 
                 names1x = [decodeLocalStrict(x) for x in profile['extraname1']]
                 names2x = [decodeLocalStrict(x) for x in profile['extraname2']]
-                self.qmc.temp1B,self.qmc.temp2B,self.qmc.timeB, self.qmc.temp1BX, self.qmc.temp2BX = t1,t2,tb,t1x,t2x
+                self.qmc.temp1B,self.qmc.temp2B,self.qmc.timeB, self.qmc.temp1BX, self.qmc.temp2BX = t1,t2,tb,[numpy.array(tx) for tx in t1x],[numpy.array(tx) for tx in t2x]
                 self.qmc.abs_timeB = tb.copy()  #invariant copy of timeB
                 self.qmc.extratimexB = timex
 
@@ -14325,7 +14325,7 @@ class ApplicationWindow(QMainWindow):
 
                 # we resample the temperatures to regular interval timestamps
                 tb_lin:numpy.ndarray[tuple[Literal[1]],numpy.dtype[numpy.double]]|None = None
-                if tb is not None and tb:
+                if tb:
                     tb_lin = cast(numpy.ndarray[tuple[Literal[1]]], numpy.linspace(tb[0],tb[-1],len(tb)))
                 decay_smoothing_p = not self.qmc.optimalSmoothing
                 b1 = self.qmc.smooth_list(tb,t1,window_len=self.qmc.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tb_lin)
@@ -14344,7 +14344,7 @@ class ApplicationWindow(QMainWindow):
                     if (self.qmc.xtcurveidx > 0 and n3 == i) or (self.qmc.ytcurveidx > 0 and n4 == i): # this is the 3rd or 4th background curve to be drawn, we smooth it
                         tx=timex[i]
                         tx_lin:numpy.ndarray[tuple[Literal[1]],numpy.dtype[numpy.double]]|None = None
-                        if tx is not None and tx:
+                        if tx:
                             tx_lin = cast(numpy.ndarray[tuple[Literal[1]],numpy.dtype[numpy.double]], numpy.linspace(tx[0],tx[-1],len(tx)))
                         if (self.qmc.xtcurveidx > 0 and n3 == i and self.qmc.xtcurveidx % 2) or (self.qmc.ytcurveidx > 0 and n4 == i and self.qmc.ytcurveidx % 2):
                             b1x.append(self.qmc.smooth_list(tx,t1x[i],window_len=self.qmc.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin))

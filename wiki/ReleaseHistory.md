@@ -2,7 +2,7 @@ Detailed Release History
 ========================
 
 ----
-v4.0.4 (Mar XX, 2026)
+v4.0.4 (Jun XX, 2026)
 ------------------
 
 * ADDITIONS
@@ -10,6 +10,7 @@ v4.0.4 (Mar XX, 2026)
   - adds support for [Orbiter](https://artisan-scope.org/machines/orbiter/) smart roasters
   - adds support for [Pratter](https://artisan-scope.org/machines/pratter/) roasting machines
   - adds support for [Probat G/UG 2026 models](https://artisan-scope.org/machines/probat/) communicating via WebSockets
+  - adds support for [Neuhaus Neotec RFB Junior, RFB-S and Neoroast](https://artisan-scope.org/machines/neuhaus/) machines
   - adds [MQTT support](https://artisan-scope.org/devices/s7/)
   - adds IO Command `publish(<topic>, <data>)` to publish payloads to the connected MQTT broker
   - adds Artisan Command `pidSVbuttons(<bool>)` ([Issue #2121](../../../issues/2121))
@@ -27,6 +28,7 @@ v4.0.4 (Mar XX, 2026)
   - prevents undo of main events for events triggered from alarm rule actions or custom event button actions ([Issue #2157](../../../issues/2157))
   - fixes regression that prevented to set the p-i-d parameters on external MODBUS PIDs ([Issue #2159](../../../issues/2159))
   - fixes regression where iTerm of the internal PID did not get reset between roasts (reported by Peter)
+  - fixes long standing regression which broke the Rubasse importer ([Issue #1958](../../../issues/1958))
 * REMOVALS
   - removes RoastTime, RoastPath and Probat Pilot import/exports
 

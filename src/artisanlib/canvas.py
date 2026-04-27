@@ -7220,14 +7220,14 @@ class tgraphcanvas(QObject):
                                         else:
                                             delta_readings = self.delta2B
                                         if k == 0:
-                                            val, evalsign = self.shiftValueEvalsign(delta_readings,index,sign,Yshiftval)
+                                            val, evalsign = self.shiftValueEvalsign(delta_readings,index,sign,Yshiftval) # pyright:ignore[reportUnknownArgumentType]
                                         else:
                                             #if sampling
                                             if RTsname is not None and RTsname != '':
                                                 idx = index + 1
                                             else:
                                                 idx = index
-                                            val, evalsign = self.shiftValueEvalsignBackground(sample_timex, self.timeB,delta_readings,idx,sign,Yshiftval)
+                                            val, evalsign = self.shiftValueEvalsignBackground(sample_timex, self.timeB,delta_readings,idx,sign,Yshiftval)  # pyright:ignore[reportUnknownArgumentType]
 
                                         #add expression and values found
                                         evaltimeexpression = ''.join((c,mathexpression[i+k+1],evalsign*2,mathexpression[i+k+4],seconddigitstr,evalsign))
