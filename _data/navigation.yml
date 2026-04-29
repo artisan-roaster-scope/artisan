@@ -86,14 +86,14 @@ machines:
         url: /machines/ikawa/
       - title: "IMF"
         url: /machines/imf/
-      - title: "Joper"
-        url: /machines/joper/
-      - title: "Kaleido"
-        url: /machines/kaleido/
       - title: "iRm"
         url: /machines/iRm/
+      - title: "Joper"
+        url: /machines/joper/
       - title: "Kaldi"
         url: /machines/kaldi/
+      - title: "Kaleido"
+        url: /machines/kaleido/
       - title: "KapoK"
         url: /machines/kapok/
       - title: "Kirsch & Mausser"
@@ -110,6 +110,8 @@ machines:
         url: /machines/mcr/
       - title: "Mugma Roasters"
         url: /machines/mugma/
+      - title: "Neuhaus"
+        url: /machines/neuhaus/
       - title: "NOR Coffee Roaster"
         url: /machines/nor/
       - title: "Nordic"
@@ -120,22 +122,22 @@ machines:
         url: /machines/orbiter/
       - title: "Ozturk"
         url: /machines/ozturk/
-      - title: "Pratter"
-        url: /machines/pratter/
       - title: "Petroncini"
         url: /machines/petroncini/
       - title: "Phoenix"
         url: /machines/phoenix/
+      - title: "Pratter"
+        url: /machines/pratter/
       - title: "Primo"
         url: /machines/primo/
       - title: "Prisma"
         url: /machines/prisma/
       - title: "Proaster"
         url: /machines/proaster/
-      - title: "Prometheus"
-        url: /machines/prometheus/
       - title: "Probat"
         url: /machines/probat/
+      - title: "Prometheus"
+        url: /machines/prometheus/
       - title: "Rasco Mac"
         url: /machines/rascomac/
       - title: "Roaster & Roaster"
