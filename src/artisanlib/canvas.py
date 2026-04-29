@@ -13584,23 +13584,16 @@ class tgraphcanvas(QObject):
             self.block_update = False # unblock the updating of the bitblit canvas
             self.aw.updateReadingsLCDsVisibility() # this one triggers the resize and the recreation of the bitblit canvas
 
-            if self.device == 138:
-                # if Kaleido Serial or Network is selected we run the ON action before starting the sample thread
-                try:
-                    self.aw.eventactionx(self.extrabuttonactions[0],self.extrabuttonactionstrings[0])
-                except Exception as e: # pylint: disable=broad-except
-                    _log.exception(e)
-                QApplication.processEvents()
-            self.threadserver.createSampleThread()
-            if self.device != 138:
+            if self.device in {138, 196}:
+                # if Kaleido Serial or Network, or Orbiter, is selected we run the ON action before starting the sample thread
+                QTimer.singleShot(1,self.runOnEventAction)
+            QTimer.singleShot(200,self.threadserver.createSampleThread)
+            if self.device not in {138, 196}:
                 # if not Kaleido Serial or Network we run the ON action after starting the sample thread which might start the connection in the first place
-                try:
-                    self.aw.eventactionx(self.extrabuttonactions[0],self.extrabuttonactionstrings[0])
-                except Exception as e: # pylint: disable=broad-except
-                    _log.exception(e)
+                QTimer.singleShot(300,self.runOnEventAction)
 
             if not bool(self.aw.simulator):
-                QTimer.singleShot(300,self.StartAsyncSamplingAction)
+                QTimer.singleShot(400,self.StartAsyncSamplingAction)
             _log.info('MODE: ON MONITOR (sampling @%ss)', float2float(self.delay/1000))
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
@@ -13608,6 +13601,13 @@ class tgraphcanvas(QObject):
             self.adderror((QApplication.translate('Error Message', 'Exception:') + ' OnMonitor() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         finally:
             self.block_update = False # unblock the updating of the bitblit canvas
+
+    @pyqtSlot()
+    def runOnEventAction(self) -> None:
+        try:
+            self.aw.eventactionx(self.extrabuttonactions[0],self.extrabuttonactionstrings[0])
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
 
     # OffMonitorCloseDown is called after the sampling loop stopped
     @pyqtSlot()

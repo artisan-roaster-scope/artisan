@@ -29,6 +29,7 @@ v4.0.4 (Jun XX, 2026)
   - fixes regression that prevented to set the p-i-d parameters on external MODBUS PIDs ([Issue #2159](../../../issues/2159))
   - fixes regression where iTerm of the internal PID did not get reset between roasts (reported by Peter)
   - fixes long standing regression which broke the Rubasse importer ([Issue #1958](../../../issues/1958))
+  - improves the endian label in MODBUS dialog ([Issue #2174](../../../issues/2174))
 * REMOVALS
   - removes RoastTime, RoastPath and Probat Pilot import/exports
 

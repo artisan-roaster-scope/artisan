@@ -565,9 +565,7 @@ class comportDlg(ArtisanResizeablDialog):
             modbus_inputDecode.setFixedWidth(85)
             self.modbus_inputDecodes[i] = modbus_inputDecode
 
-        modbus_endianlabel = QLabel(QApplication.translate('Label', 'little-endian'))
-
-        self.modbus_littleEndianWords = QCheckBox(QApplication.translate('ComboBox','words'))
+        self.modbus_littleEndianWords = QCheckBox(f'{QApplication.translate('Label', 'little-endian')} {QApplication.translate('ComboBox','words')}')
         self.modbus_littleEndianWords.setChecked(self.aw.modbus.wordorderLittle)
         self.modbus_littleEndianWords.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
@@ -909,8 +907,6 @@ class comportDlg(ArtisanResizeablDialog):
         modbus_setup.addWidget(scanButton)
         modbus_setup.addStretch()
         modbus_setup.addSpacing(7)
-        modbus_setup.addWidget(modbus_endianlabel)
-        modbus_setup.addSpacing(5)
         modbus_setup.addWidget(self.modbus_littleEndianWords)
         modbus_setup.addStretch()
         modbus_setup.addSpacing(15)
