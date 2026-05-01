@@ -50,7 +50,7 @@ except Exception:
     HOME = expanduser('~')
     QTDIR = HOME + r'/Qt/6.5.3/macos/'
 
-SUPPORTED_LANGUAGES = ['ar', 'cs', 'da', 'de','el','en','es','fa','fi','fr','gd', 'he','hu','id','it','ja','ko','lv', 'nl','no','pl','pt_BR','pt','sk', 'sv','th','tr','uk','vi','zh_CN','zh_TW']
+SUPPORTED_LANGUAGES = ['ar', 'bg', 'cs', 'da', 'de','el','en','es','fa','fi','fr','gd', 'he','hu','id','it','ja','ko','lv', 'nl','no','pl','pt_BR','pt','sk', 'sv','th','tr','uk','vi','zh_CN','zh_TW']
 
 DATA_FILES = [
         (r'Assets.car', '.'),

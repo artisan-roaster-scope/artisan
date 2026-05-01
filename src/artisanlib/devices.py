@@ -2748,13 +2748,14 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                         typeComboBox.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
 #                        typeComboBox.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
                         typeComboBox.addItems(devices[:])
+                        dev_name:str
                         try:
                             dev_name = self.aw.qmc.devices[max(0,self.aw.qmc.extradevices[i]-1)]
-                            if dev_name[0] == '+':
-                                dev_name = dev_name[1:]
-                            typeComboBox.setCurrentIndex(devices.index(dev_name))
                         except Exception: # pylint: disable=broad-except
-                            pass
+                            dev_name = self.aw.qmc.devices[24] # +Virtual
+                        if dev_name[0] == '+':
+                            dev_name = dev_name[1:]
+                        typeComboBox.setCurrentIndex(devices.index(dev_name))
                         # 1: color 1
                         color1Button = QPushButton(self.aw.qmc.extradevicecolor1[i])
                         color1Button.clicked.connect(self.setextracolor1)
@@ -3213,7 +3214,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     try: # might be a +device
                         self.aw.qmc.extradevices[i] = self.aw.qmc.devices.index('+' + str(typecombobox.currentText())) + 1
                     except Exception: # pylint: disable=broad-except
-                        self.aw.qmc.extradevices[i] = 0
+                        self.aw.qmc.extradevices[i] = 25
                 self.aw.qmc.extraname1[i] = name1edit.text()
                 self.aw.qmc.extraname2[i] = name2edit.text()
 
@@ -4746,28 +4747,32 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ]
             #init serial settings of extra devices
             for i, _ in enumerate(self.aw.qmc.extradevices):
+                dsettings: tuple[int,int,str,int,float]
                 if self.aw.qmc.extradevices[i] < len(devssettings) and devssettings[self.aw.qmc.extradevices[i]] < len(ssettings):
-                    dsettings: tuple[int,int,str,int,float] = ssettings[devssettings[self.aw.qmc.extradevices[i]]]
-                    if i < len(self.aw.extrabaudrate):
-                        self.aw.extrabaudrate[i] = dsettings[0]
-                    else:
-                        self.aw.extrabaudrate.append(dsettings[0])
-                    if i < len(self.aw.extrabytesize):
-                        self.aw.extrabytesize[i] = dsettings[1]
-                    else:
-                        self.aw.extrabytesize.append(dsettings[1])
-                    if i < len(self.aw.extraparity):
-                        self.aw.extraparity[i] = dsettings[2]
-                    else:
-                        self.aw.extraparity.append(dsettings[2])
-                    if i < len(self.aw.extrastopbits):
-                        self.aw.extrastopbits[i] = dsettings[3]
-                    else:
-                        self.aw.extrastopbits.append(dsettings[3])
-                    if i < len(self.aw.extratimeout):
-                        self.aw.extratimeout[i] = dsettings[4]
-                    else:
-                        self.aw.extratimeout.append(dsettings[4])
+                    dsettings = ssettings[devssettings[self.aw.qmc.extradevices[i]]]
+                else:
+                    # defaults in case device id is unknown
+                    dsettings = (9600,8,'O',1,0.5)
+                if i < len(self.aw.extrabaudrate):
+                    self.aw.extrabaudrate[i] = dsettings[0]
+                else:
+                    self.aw.extrabaudrate.append(dsettings[0])
+                if i < len(self.aw.extrabytesize):
+                    self.aw.extrabytesize[i] = dsettings[1]
+                else:
+                    self.aw.extrabytesize.append(dsettings[1])
+                if i < len(self.aw.extraparity):
+                    self.aw.extraparity[i] = dsettings[2]
+                else:
+                    self.aw.extraparity.append(dsettings[2])
+                if i < len(self.aw.extrastopbits):
+                    self.aw.extrastopbits[i] = dsettings[3]
+                else:
+                    self.aw.extrastopbits.append(dsettings[3])
+                if i < len(self.aw.extratimeout):
+                    self.aw.extratimeout[i] = dsettings[4]
+                else:
+                    self.aw.extratimeout.append(dsettings[4])
             if self.nonpidButton.isChecked():
                 self.aw.buttonSVp5.setVisible(False)
                 self.aw.buttonSVp10.setVisible(False)

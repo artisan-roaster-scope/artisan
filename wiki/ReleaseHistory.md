@@ -15,6 +15,7 @@ v4.0.4 (Jun XX, 2026)
   - adds IO Command `publish(<topic>, <data>)` to publish payloads to the connected MQTT broker
   - adds Artisan Command `pidSVbuttons(<bool>)` ([Issue #2121](../../../issues/2121))
   - adds Excel and Orbiter formats to the autosave "save also" options
+  - adds initial Bulgarian localization ([Issue #2175](../../../issues/2175))
 * CHANGES
   - added a popup explaining the reason the Roast Properties dialog is opened on START if plus is connected and disabled the OK button until beans are specified  ([Issue #2133](../../../issues/2133))
   - adds hack to prevent dtr/rts signaling on connecting serial ports
@@ -27,11 +28,17 @@ v4.0.4 (Jun XX, 2026)
   - fixes issue w.r.t. alarm set activations which could cause alarm table to be lost on re-opening the Alarms dialog in some cases ([Issue #2144](../../../issues/2144))
   - prevents undo of main events for events triggered from alarm rule actions or custom event button actions ([Issue #2157](../../../issues/2157))
   - fixes regression that prevented to set the p-i-d parameters on external MODBUS PIDs ([Issue #2159](../../../issues/2159))
-  - fixes regression where iTerm of the internal PID did not get reset between roasts (reported by Peter)
+  - fixes regression where Iterm of the internal PID did not get reset between roasts (reported by Peter)
   - fixes long standing regression which broke the Rubasse importer ([Issue #1958](../../../issues/1958))
   - improves the endian label in MODBUS dialog ([Issue #2174](../../../issues/2174))
+  - adds explicit `clear settings` on Factory Reset to prevent issues on migrating from releases before v4 ([Issue #2173](../../../issues/2173))
+  - hardness profile loading w.r.t. unknown devices
 * REMOVALS
   - removes RoastTime, RoastPath and Probat Pilot import/exports
+
+
+
+
 
 ----
 v4.0.2 (Feb 7, 2026)

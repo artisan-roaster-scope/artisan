@@ -2552,6 +2552,7 @@ class ApplicationWindow(QMainWindow):
         # use s.encode("ascii", 'backslashreplace').decode("utf-8") and remove the duplicate \\
         for iso, name in [
                 ('ar', '\u0627\u0644\u0639\u0631\u0628\u064a\u0629'),
+                ('bg', '\u0431\u044a\u043b\u0433\u0430\u0440\u0441\u043a\u0438'),
                 ('cs', '\u010d\u0065\u0161\u0074\u0069\u006e\u0061'),
                 ('da', 'Dansk'),
                 ('de', 'Deutsch'),
@@ -17271,7 +17272,7 @@ class ApplicationWindow(QMainWindow):
             try:
                 ds = list(self.qmc.extradevices)
                 ds.insert(0,self.qmc.device)
-                profile['devices'] = [('PID' if d==0 else self.qmc.devices[d-1]) for d in ds]
+                profile['devices'] = [('PID' if d==0 else (self.qmc.devices[24] if d > len(self.qmc.devices) else self.qmc.devices[d-1])) for d in ds]
             except Exception: # pylint: disable=broad-except
                 pass
             profile['elevation'] = self.qmc.elevation
@@ -18122,7 +18123,7 @@ class ApplicationWindow(QMainWindow):
 
             if self.resetqsettings or (filename is None and QApplication.queryKeyboardModifiers() == (Qt.KeyboardModifier.AltModifier | Qt.KeyboardModifier.ShiftModifier)):
                 self.resetqsettings = 0
-#                settings.clear() # this allows to get rid of old Artisan settings via "Save Settings >> Factory Reset >> Load Settings"
+                settings.clear() # this allows to get rid of old Artisan settings via "Save Settings >> Factory Reset >> Load Settings"
                 if 'canvas' in self.qmc.palette:
                     self.updateCanvasColors(checkColors=False)
                 # remove window geometry and splitter settings
@@ -19159,7 +19160,7 @@ class ApplicationWindow(QMainWindow):
 
             try:
                 _log.info('machine: %s (%s, %skg, %s)', self.qmc.machinesetup, self.qmc.roastertype_setup, self.qmc.roastersize_setup, ([''] + self.qmc.sourcenames)[self.qmc.roasterheating_setup])
-                _log.info('device: %s (%s extra devices)', (['Fuji PID']+self.qmc.devices)[self.qmc.device], len(self.qmc.extradevices))
+                _log.info('device: %s (%s extra devices)', ('??' if self.qmc.device > len(self.qmc.devices) else (['PID']+self.qmc.devices)[self.qmc.device]), len(self.qmc.extradevices))
                 _log.info('serial: %s @%s', self.ser.comport, self.ser.baudrate)
                 _log.info('MODBUS %s: %s, %s %s%s%s@%s (%s, %s, %s / %s, %s)', ['Serial RTU','Serial ASCII','Serial Binary','TCP','UDP'][self.modbus.type],
                         self.modbus.host, self.modbus.comport, self.modbus.bytesize, self.modbus.parity, self.modbus.stopbits, self.modbus.baudrate, self.modbus.timeout, self.modbus.modbus_serial_connect_delay, self.modbus.serial_readRetries, self.modbus.IP_timeout, self.modbus.IP_retries)
@@ -28012,9 +28013,9 @@ def initialize_locale(my_app:Artisan) -> str:
 #        'qtwebengine' # we do not use any UI
     ]
 
-    # NOTE: on updates, need to update util.py:locale2full_local() as well
     supported_languages:list[str] = [
         'ar',
+        'bg',
         'cs',
         'da',
         'de',
