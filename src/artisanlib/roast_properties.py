@@ -773,7 +773,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.roastpropertiesAutoOpen.setChecked(bool(self.aw.qmc.roastpropertiesAutoOpenFlag))
         self.roastpropertiesAutoOpen.stateChanged.connect(self.roastpropertiesAutoOpenChanged)
         self.roastpropertiesAutoOpenDROP = QCheckBox(QApplication.translate('CheckBox','Open on DROP'))
-        self.roastpropertiesAutoOpen.setToolTip(QApplication.translate('Tooltip','Open roast properties dialog on DROP'))
+        self.roastpropertiesAutoOpenDROP.setToolTip(QApplication.translate('Tooltip','Open roast properties dialog on DROP'))
         self.roastpropertiesAutoOpenDROP.setChecked(bool(self.aw.qmc.roastpropertiesAutoOpenDropFlag))
         self.roastpropertiesAutoOpenDROP.stateChanged.connect(self.roastpropertiesAutoOpenDROPChanged)
         # EVENTS

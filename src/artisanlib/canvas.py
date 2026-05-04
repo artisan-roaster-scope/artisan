@@ -4102,7 +4102,7 @@ class tgraphcanvas(QObject):
                     self.fig.canvas.draw_idle()
                     return
 
-                if not self.designerflag and not self.wheelflag and event.inaxes is None and not self.flagstart and not self.flagon and event.button == 1 and \
+                if not self.designerflag and not self.wheelflag and event.inaxes is None and event.button == 1 and \
                         event.x < event.y:
                     if event.dblclick and self.roastUUID is not None:
                         self.single_click_mpl_upperleft_corner_timer.stop()
@@ -7934,6 +7934,7 @@ class tgraphcanvas(QObject):
     # if keepProperties=True (a call from OnMonitor()), we keep all the pre-set roast properties
     # onMonitor is set if called from onMonitor
     def reset(self,redraw:bool = True, soundOn:bool = True, keepProperties:bool = False, fireResetAction:bool = True, onMonitor:bool = False) -> bool:
+        _log.debug('PRINT reset(keepProperties=%s,onMonitor=%s)',keepProperties,onMonitor)
         try:
             focused_widget = QApplication.focusWidget()
             if focused_widget and focused_widget != self.aw.centralWidget():

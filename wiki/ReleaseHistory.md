@@ -22,6 +22,7 @@ v4.0.4 (Jun XX, 2026)
   - preserves weight/volume unit setup on loading/importing profiles
   - enables extra device curve fills on recording
   - timer LCD displays cooling time after DROP
+  - enables title click to open Roast Properties also during sampling and recording
 * FIXES
   - fixes autosave as PDF on regular `Save` on macOS ([Issue #2118](../../../issues/2118))
   - fixes regression which led to large automatic x-axis extensions for larger sampling rates ([Issue #2142](../../../issues/2142))
@@ -30,6 +31,7 @@ v4.0.4 (Jun XX, 2026)
   - fixes regression that prevented to set the p-i-d parameters on external MODBUS PIDs ([Issue #2159](../../../issues/2159))
   - fixes regression where Iterm of the internal PID did not get reset between roasts (reported by Peter)
   - fixes long standing regression which broke the Rubasse importer ([Issue #1958](../../../issues/1958))
+  - fixes a typo in the [Petronciini TT i06 Avantgarde](https://artisan-scope.org/machines/petroncini/) machine setup which prevented the Airflow and DrumSpeed to be rendered correctly
   - improves the endian label in MODBUS dialog ([Issue #2174](../../../issues/2174))
   - adds explicit `clear settings` on Factory Reset to prevent issues on migrating from releases before v4 ([Issue #2173](../../../issues/2173))
   - hardness profile loading w.r.t. unknown devices

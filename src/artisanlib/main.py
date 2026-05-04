@@ -12488,7 +12488,12 @@ class ApplicationWindow(QMainWindow):
                             self.qmc.redraw()
                         # load background when there are no modifiers
                         elif no_modifier or control_modifier:
-                            filename = self.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Load Background'),ext='*.alog')
+                            # path
+                            path:str|None = None
+                            if bool(self.qmc.backgroundprofile is not None) and self.qmc.backgroundpath:
+                                # if a background profile is loaded we open the file selector using its path
+                                path = self.qmc.backgroundpath
+                            filename = self.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Load Background'),path =path, ext='*.alog')
                             if len(filename) != 0:
                                 self.loadBackgroundSignal.emit(filename)
                 elif k == Qt.Key.Key_L and no_modifier and self.ui_mode is not UI_MODE.PRODUCTION: # 76:       #L (load alarms)
