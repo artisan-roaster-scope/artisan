@@ -143,6 +143,7 @@ class PID:
         self.pidSemaphore: QSemaphore = QSemaphore(1)
 
         self.outMin: int = 0  # minimum output value
+        #self.outMin: int = -20  # minimum output value
         self.outMax: int = 100  # maximum output value
         self.dutySteps: int = (
             1  # change [1-10] between previous and new PID duty to trigger call of control function
@@ -257,6 +258,9 @@ class PID:
         error = self.gamma*self.target - current_input
         last_error = self.gamma*self.lastTarget - self.lastInput
         derror = (error - last_error) / dt
+        #_log.info('PID calculate D: target=<%s>, current_input=<%s>, lastTarget=<%s>, lastInput=<%s>', self.target, current_input, self.lastTarget, self.lastInput)
+        #_log.info('PID calculate D: error=<%s>, last_error=<%s>, derror=<%s>', error, last_error, derror)
+        derror1 = derror
 
         # apply derative filter before estimating limits in DoM mode
         if self.derivative_filter_level > 0:
@@ -273,8 +277,12 @@ class PID:
         # Reduce derivative action if measurement discontinuity is detected
         if self._detect_measurement_discontinuity(current_input):
             derror *= 0.3  # Reduce derivative action by 70%
-
-        return self.getKd(current_input) * derror
+        #_log.info('PID calculate D: derror1=<%s>, derror=<%s>', derror1, derror)
+        kd_currinput = self.getKd(current_input)
+        rt = kd_currinput * derror
+        #_log.info('PID calculate D: kd_currinput=<%s>, rt=<%s>', kd_currinput, rt)
+        return rt
+        #return self.getKd(current_input) * derror
 
     def _update_measurement_history(self, current_input: float) -> None:
         """Update measurement history for discontinuity detection."""
@@ -418,12 +426,13 @@ class PID:
                 self.lastInput = i
             elif (dt := now - self.lastTime) >= 0.05:
 
+                #_log.info('now (%s)', now)
                 # Check if setpoint has changed since last update and handle integral
                 setpoint_change = self.target - self.lastTarget
                 if abs(setpoint_change) > 0.001:
                     self.setpoint_changed_significantly = abs(setpoint_change) > self.significant_setup_change_limit > 0
                     self._handle_setpoint_change_integral(setpoint_change)
-                    self.lastTarget = self.target
+                    #self.lastTarget = self.target
                 else:
                     # Gradually clear the setpoint changed flags
                     self.setpoint_changed_significantly = False
@@ -446,6 +455,9 @@ class PID:
                 self.integral_just_reset = False
 
                 self.Dterm = self._calculate_derivative(i, dt)
+
+                #if abs(setpoint_change) > 0.001: self.lastTarget = self.target
+                self.lastTarget = self.target
 
                 # Update measurement history for discontinuity detection (after calculating D which calls detect discontinuity)
                 self._update_measurement_history(i)
