@@ -456,7 +456,8 @@ class PID:
 
                 self.Dterm = self._calculate_derivative(i, dt)
 
-                if abs(setpoint_change) > 0.001: self.lastTarget = self.target
+                #if abs(setpoint_change) > 0.001: self.lastTarget = self.target
+                self.lastTarget = self.target
 
                 # Update measurement history for discontinuity detection (after calculating D which calls detect discontinuity)
                 self._update_measurement_history(i)
