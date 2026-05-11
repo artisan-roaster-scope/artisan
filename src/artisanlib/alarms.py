@@ -633,7 +633,7 @@ class AlarmDlg(ArtisanResizeablDialog):
     def importalarms(self, _:bool = False) -> None:
         self.aw.fileImport(QApplication.translate('Message', 'Load Alarms'),self.importalarmsJSON,ext='*.alrm *.alog')
 
-    def importalarmsJSON(self, filename:str) -> None:
+    def importalarmsJSON(self, filename:str) -> bool:
         try:
             _,ext = os.path.splitext(filename)
             if ext == '.alrm':
@@ -662,7 +662,8 @@ class AlarmDlg(ArtisanResizeablDialog):
             elif ext == '.alog':
                 obj = deserialize(filename)
                 self.aw.plusAddPath(obj, filename)
-                self.aw.loadAlarmsFromProfile(filename, cast('ProfileData', obj))
+                profile:ProfileData = self.aw.validateProfileDict(obj)
+                self.aw.loadAlarmsFromProfile(filename, profile)
                 self.alarmsfile.setText(self.aw.qmc.alarmsfile)
             self.aw.qmc.alarmstate = [-1]*len(self.aw.qmc.alarmflag)
             aitems = self.buildAlarmSourceList()
@@ -670,11 +671,13 @@ class AlarmDlg(ArtisanResizeablDialog):
                 if self.aw.qmc.alarmsource[i] + 3 >= len(aitems):
                     self.aw.qmc.alarmsource[i] = 1 # BT
             self.createalarmtable()
+            return True
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
             self.aw.sendmessage(QApplication.translate('Message','Error loading alarm file'))
             self.aw.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' importalarmsJSON() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+        return False
 
     @pyqtSlot(bool)
     def exportalarms(self, _:bool = False) -> None:

@@ -294,6 +294,7 @@ for fn in [
     r'includes\safari-pinned-tab.svg',
     r'includes\site.webmanifest',
     r'includes\logging.yaml',
+    r'includes\artisan_public_key.pem',
     ]:
     copy_file(fn, TARGET)
 

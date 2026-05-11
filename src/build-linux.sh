@@ -115,6 +115,7 @@ cp includes/mstile-150x150.png dist
 cp includes/safari-pinned-tab.svg dist
 cp includes/site.webmanifest dist
 cp includes/logging.yaml dist
+cp includes/artisan_public_key.pem dist
 cp -R icons dist
 cp -R Wheels dist
 cp README.txt dist

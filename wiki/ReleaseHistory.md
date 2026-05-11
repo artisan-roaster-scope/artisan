@@ -34,7 +34,8 @@ v4.0.4 (Jun XX, 2026)
   - fixes a typo in the [Petronciini TT i06 Avantgarde](https://artisan-scope.org/machines/petroncini/) machine setup which prevented the Airflow and DrumSpeed to be rendered correctly
   - improves the endian label in MODBUS dialog ([Issue #2174](../../../issues/2174))
   - adds explicit `clear settings` on Factory Reset to prevent issues on migrating from releases before v4 ([Issue #2173](../../../issues/2173))
-  - hardness profile loading w.r.t. unknown devices
+  - improving robustness of profile loading w.r.t. unknown devices
+  - fixes a regression in the software PID calculation of the Dterm (thanks Peter for reporting!)
 * REMOVALS
   - removes RoastTime, RoastPath and Probat Pilot import/exports
 

@@ -2890,7 +2890,7 @@ class serialport:
                 libtime.sleep(0.01)  # this may not be necessary but works well
                 r = self.SP.read(11)
                 if len(r)==11:
-                    data = bytearray(r)
+                    data = bytes(r)
                     if len(data)==11 and data[0] == 0xfc and data[1] == 0x13 and data[10] == 0xf3:
                         for i in range(2,6):
                             temp = (temp << 4) | (data[i] & 0xf)

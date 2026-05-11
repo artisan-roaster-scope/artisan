@@ -1432,7 +1432,7 @@ class PID_DlgControl(ArtisanDialog):
         for i in range(self.aw.pidcontrol.svLen):
             self.RSnTab_DescriptionWidgets[n][i].setText(self.aw.pidcontrol.RS_svDescriptions[n][i])
 
-    def importrampsoaksJSON(self, filename:str) -> None:
+    def importrampsoaksJSON(self, filename:str) -> bool:
         try:
             self.aw.qmc.rampSoakSemaphore.acquire(1)
             from json import load as json_load
@@ -1447,6 +1447,7 @@ class PID_DlgControl(ArtisanDialog):
             self.aw.pidcontrol.svDescriptions = rampsoaks['svDescriptions']
             self.aw.qmc.rsfile = filename
             self.rsfile.setText(self.aw.qmc.rsfile)
+            return True
         except Exception as ex: # pylint: disable=broad-exception-caught
             _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
@@ -1455,6 +1456,7 @@ class PID_DlgControl(ArtisanDialog):
             if self.aw.qmc.rampSoakSemaphore.available() < 1:
                 self.aw.qmc.rampSoakSemaphore.release(1)
             self.setrampsoaks()
+        return False
 
     @pyqtSlot(bool)
     def exportrampsoaks(self, _:bool = False) -> None:
@@ -3384,7 +3386,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
     def load(self, _:bool = False) -> None:
         self.aw.fileImport(QApplication.translate('Message', 'Load PID Settings'),self.loadPIDJSON)
 
-    def loadPIDJSON(self, filename:str) -> None:
+    def loadPIDJSON(self, filename:str) -> bool:
         try:
             from json import load as json_load
             with open(filename, encoding='utf-8') as infile:
@@ -3441,9 +3443,11 @@ class PXG4pidDlgControl(PXpidDlgControl):
                 self.aw.fujipid.PXG4[rampkey][0] = stringtoseconds(segments[rampkey])
                 self.aw.fujipid.PXG4[soakkey][0] = stringtoseconds(segments[soakkey])
             self.createsegmenttable()
+            return True
         except Exception as ex: # pylint: disable=broad-exception-caught
             _, _, exc_tb = sys.exc_info()
             self.aw.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' loadPIDJSON() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
+        return False
 
     @pyqtSlot(bool)
     def writeSetValues(self, _:bool = False) -> None:

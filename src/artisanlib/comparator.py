@@ -331,7 +331,7 @@ class RoastProfile:
             self.metadata['ambient_humidity'] = f"{float2float(profile['ambient_humidity']):g}%"
         if 'ambient_pressure' in profile and profile['ambient_pressure'] != 0:
             self.metadata['ambient_pressure'] = f"{float2float(profile['ambient_pressure']):g}hPa"
-        if 'computed' in profile and 'weight_loss' in profile['computed']:
+        if 'computed' in profile and 'weight_loss' in profile['computed'] and 'weight' in profile and profile['weight'][1] != 0.0:
             self.metadata['weight_loss'] = f"-{profile['computed']['weight_loss']:g}%"
         if 'ground_color' in profile and profile['ground_color'] != 0:
             self.metadata['ground_color'] = f"#{float2str(profile['ground_color'])}"
@@ -420,16 +420,17 @@ class RoastProfile:
         self.events_timex = []
         if self.stemp1 is not None and self.stemp2 is not None: # type:ignore[redundant-expr]
             for ti in self.timeindex[:-1]:
-                temp1:float|None = (self.stemp1[ti] if len(self.stemp1)>ti else None)
-                temp2:float|None = (self.stemp2[ti] if len(self.stemp2)>ti else None)
-                if ((len(self.events1) == 0 and ti != -1) or ti > 0):
-                    self.events1.append(temp1)
-                    self.events2.append(temp2)
-                    self.events_timex.append(self.timex[ti])
-                else:
-                    self.events1.append(None)
-                    self.events2.append(None)
-                    self.events_timex.append(None)
+                if ti >= 0 and len(self.timex)>0:
+                    temp1:float|None = (self.stemp1[ti] if len(self.stemp1)>ti else None)
+                    temp2:float|None = (self.stemp2[ti] if len(self.stemp2)>ti else None)
+                    if ((len(self.events1) == 0 and ti != -1) or ti > 0):
+                        self.events1.append(temp1)
+                        self.events2.append(temp2)
+                        self.events_timex.append(self.timex[ti])
+                    else:
+                        self.events1.append(None)
+                        self.events2.append(None)
+                        self.events_timex.append(None)
         # update special events
         if self.specialevents is not None and self.specialeventstype is not None and self.specialeventsvalue is not None:
             # calculated bot and top corresponding to the temperature positions of the event values 0 and 100
@@ -497,19 +498,21 @@ class RoastProfile:
                 except Exception as ex: # pylint: disable=broad-except
                     _log.exception(ex)
             # add a last event at DROP/END to extend the lines to the end of roast
-            if not self.aw.qmc.compareRoast and self.aw.qmc.compareBBP:
-                # BBP-only mode
-                end = (self.timex[-1] if self.timeindex[0] == -1 else self.timex[self.timeindex[0]])
-            else:
-                end = (self.timex[-1] if self.timeindex[6] == 0 else self.timex[self.timeindex[6]])
-            if self.E1:
-                self.E1.append((end,self.E1[-1][1]))
-            if self.E2:
-                self.E2.append((end,self.E2[-1][1]))
-            if self.E3:
-                self.E3.append((end,self.E3[-1][1]))
-            if self.E4:
-                self.E4.append((end,self.E4[-1][1]))
+            # (only for non-empty profiles)
+            if len(self.timex)>0:
+                if not self.aw.qmc.compareRoast and self.aw.qmc.compareBBP:
+                    # BBP-only mode
+                    end = (self.timex[-1] if self.timeindex[0] == -1 else self.timex[self.timeindex[0]])
+                else:
+                    end = (self.timex[-1] if self.timeindex[6] == 0 else self.timex[self.timeindex[6]])
+                if self.E1:
+                    self.E1.append((end,self.E1[-1][1]))
+                if self.E2:
+                    self.E2.append((end,self.E2[-1][1]))
+                if self.E3:
+                    self.E3.append((end,self.E3[-1][1]))
+                if self.E4:
+                    self.E4.append((end,self.E4[-1][1]))
 
     def firstTime(self) -> float:
         try:
@@ -527,7 +530,7 @@ class RoastProfile:
         try:
             return self.timex[self.endTimeIdx]
         except Exception: # pylint: disable=broad-except
-            return self.timex[-1]
+            return (self.timex[-1] if len(self.timex)>0 else 0)
 
     def setVisible(self, b:bool) -> None:
         self.visible = b
@@ -2034,21 +2037,24 @@ class roastCompareDlg(ArtisanDialog):
                 if firstChar == '{':
                     f.close()
                     obj = deserialize(filename)
+                    profile_data = self.aw.validateProfileDict(obj)
                     self.aw.plusAddPath(obj, filename)
-                    self.addProfile(filename,cast('ProfileData', obj))
+                    self.addProfile(filename,profile_data)
         except Exception as ex: # pylint: disable=broad-except
+            self.aw.sendmessage(f"{filename}: {QApplication.translate('Message','invalid artisan file')}")
             _log.exception(ex)
 
     def addProfiles(self, filenames:list[str]) -> None:
         if len(filenames) > 0:
             for filename in filenames:
                 self.addProfileFromFile(filename)
-            self.updateMenus()
-            self.realign()
-            self.updateZorders()
-            self.redrawOnDeltaAxisVisibilityChanged()
-            if self.aw.qpc is not None:
-                self.aw.qpc.update_phases(self.getPhasesData())
+            if len(self.profiles)>0:
+                self.updateMenus()
+                self.realign()
+                self.updateZorders()
+                self.redrawOnDeltaAxisVisibilityChanged()
+                if self.aw.qpc is not None:
+                    self.aw.qpc.update_phases(self.getPhasesData())
 
     def deleteProfile(self, i:int) -> None:
         self.profileTable.removeRow(i)
@@ -2084,17 +2090,17 @@ class roastCompareDlg(ArtisanDialog):
         for p in reversed(profiles):
             if p.visible:
                 start_idx = p.timeindex[0] if p.timeindex[0] != -1 else 0
-                start:float = p.timex[start_idx]
-                total:float = p.timex[p.timeindex[6]] - start if p.timeindex[6] != 0 else p.timex[-1]
-                dry:float = p.timex[p.timeindex[1]] - start if p.timeindex[1] != 0 else 0
-                fcs:float = p.timex[p.timeindex[2]] - start if p.timeindex[2] != 0 else 0
+                start:float = (p.timex[start_idx] if len(p.timex)>start_idx else 0)
+                total:float = (p.timex[p.timeindex[6]] - start if p.timeindex[6] != 0 else p.timex[-1] if len(p.timex) > p.timeindex[6] else 0)
+                dry:float = p.timex[p.timeindex[1]] - start if len(p.timex) > p.timeindex[1] > 0 else 0
+                fcs:float = p.timex[p.timeindex[2]] - start if len(p.timex) > p.timeindex[2] > 0 else 0
                 p1:float = dry
                 p3:float = total - fcs if fcs != 0 else 0
                 p2:float = total - p1 - p3 if p1 != 0 and p3 != 0 else 0
                 c:QColor = QColor.fromRgbF(*p.color)
-                t1:float = p.temp2[p.timeindex[1]] if p.timeindex[1] != 0 and len(p.temp2) > p.timeindex[1] else -1
-                t2:float = p.temp2[p.timeindex[2]] if p.timeindex[2] != 0 and len(p.temp2) > p.timeindex[2] else -1
-                t3:float = p.temp2[p.timeindex[6]] if p.timeindex[6] != 0 and len(p.temp2) > p.timeindex[6] else (p.temp2[-1] if len(p.temp2)>0 else -1)
+                t1:float = p.temp2[p.timeindex[1]] if len(p.temp2) > p.timeindex[1] > 0 else -1
+                t2:float = p.temp2[p.timeindex[2]] if len(p.temp2) > p.timeindex[2] > 0 else -1
+                t3:float = p.temp2[p.timeindex[6]] if len(p.temp2) > p.timeindex[6] > 0 else (p.temp2[-1] if len(p.temp2)>0 else -1)
                 r1:float = -1
                 r2:float = -1
                 r3:float = -1

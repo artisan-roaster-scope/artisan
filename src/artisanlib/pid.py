@@ -423,7 +423,6 @@ class PID:
                 if abs(setpoint_change) > 0.001:
                     self.setpoint_changed_significantly = abs(setpoint_change) > self.significant_setup_change_limit > 0
                     self._handle_setpoint_change_integral(setpoint_change)
-                    self.lastTarget = self.target
                 else:
                     # Gradually clear the setpoint changed flags
                     self.setpoint_changed_significantly = False
@@ -447,12 +446,14 @@ class PID:
 
                 self.Dterm = self._calculate_derivative(i, dt)
 
+
                 # Update measurement history for discontinuity detection (after calculating D which calls detect discontinuity)
                 self._update_measurement_history(i)
 
                 self.lastTime = now
                 self.lastError = err
                 self.lastInput = i
+                self.lastTarget = self.target
                 output: float = self.Pterm + self.Iterm + self.Dterm
 
                 output = self._smooth_output(output)

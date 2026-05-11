@@ -21,7 +21,6 @@ import time
 import logging
 import serial as pyserial
 import asyncio
-import platform
 
 from contextlib import suppress
 from threading import Thread
@@ -215,7 +214,7 @@ async def create_serial_connection(
     if clear_HUPCL:
         # the transport serial port is not open yet in this case
         try:
-            if platform.system() == 'Linux': # seems not to resolve the issue on macOS
+            if sys.platform.startswith('linux'): # seems not to resolve the issue on macOS
                 import termios # pylint: disable=C0415,E0401
                 # the following might hang on macOS for non-callup devices
                 #url = url.replace('/dev/tty.','/dev/cu.')

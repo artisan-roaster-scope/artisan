@@ -413,13 +413,17 @@ class CompletedItem(BaseModel):
 def get_total_roasting_time_and_title(uuid:str) -> tuple[float|None, str|None]:
     filepath = plus.register.getPath(uuid)
     if filepath is not None:
-        template:ProfileData = cast('ProfileData', deserialize(filepath))
-        roast_title:str|None = template.get('title', None)
-        if roast_title is not None:
-            batchnr = template.get('roastbatchnr', 0)
-            if batchnr > 0:
-                roast_title = f"{template.get('roastbatchprefix', '')}{batchnr} {roast_title}"
-        return get_total_roast_time_from_profile(template), roast_title
+        try:
+            template:ProfileData = cast('ProfileData', deserialize(filepath))
+            roast_title:str|None = template.get('title', None)
+            if roast_title is not None:
+                batchnr = template.get('roastbatchnr', 0)
+                if batchnr > 0:
+                    roast_title = f"{template.get('roastbatchprefix', '')}{batchnr} {roast_title}"
+            return get_total_roast_time_from_profile(template), roast_title
+        except Exception: # pylint: disable=broad-except
+            # profile could be broken!
+            pass
     return None, None
 
 

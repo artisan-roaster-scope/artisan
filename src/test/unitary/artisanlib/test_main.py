@@ -159,7 +159,7 @@ def ensure_main_qt_isolation() -> Generator[None, None, None]:
 # Set up QApplication before importing artisanlib modules
 # Use PyQt6 only as requested (ignore PyQt5)
 try:
-    from PyQt6.QtCore import QLocale, QSettings, Qt, QTime, QUrl
+    from PyQt6.QtCore import QLocale, QSettings, Qt, QTime
     from PyQt6.QtGui import QColor
     from PyQt6.QtWidgets import (
         QApplication,
@@ -265,7 +265,7 @@ def mock_application_window(mock_qmc: Mock) -> Mock:
     # Configure default attributes and behaviors
     aw.qmc = mock_qmc
     aw.comparator = None
-    aw.setProfile = Mock(return_value=True)
+    aw.setProfileDict = Mock(return_value=True)
     aw.orderEvents = Mock()
     aw.etypeComboBox = Mock()
     aw.setCurrentFile = Mock()
@@ -392,7 +392,7 @@ class TestLoadFile:
             main_module.QFile = mock_qfile    # type:ignore[misc]
             main_module.QTextStream = mock_qtextstream  # type:ignore[misc]
 
-            aw.setProfile = mock_application_window.setProfile  # type: ignore[method-assign]
+            aw.setProfileDict = mock_application_window.setProfileDict  # type: ignore[method-assign]
             aw.orderEvents = mock_application_window.orderEvents  # type: ignore[method-assign]
             aw.etypeComboBox = mock_application_window.etypeComboBox
             aw.setCurrentFile = mock_application_window.setCurrentFile  # type: ignore[method-assign]
@@ -427,7 +427,7 @@ class TestLoadFile:
             mock_stream_instance.read.assert_called_once_with(1)
             mock_file_instance.close.assert_called()
             mock_application_window.qmc.reset.assert_called_once_with(redraw=False, soundOn=False)
-            mock_application_window.setProfile.assert_called_once()
+            mock_application_window.setProfileDict.assert_called_once()
             mock_application_window.orderEvents.assert_called_once()
             mock_application_window.setCurrentFile.assert_called_once_with(absolute_path)
             aw.qmc.fileCleanSignal.emit.assert_called_once()  # pyright: ignore[reportAttributeAccessIssue]
@@ -574,7 +574,7 @@ class TestLoadFile:
             aw.qmc.wheelflag = False  # Must be False
             aw.qmc.ax = Mock()  # Must not be None
             aw.comparator = None
-            aw.setProfile = mock_application_window.setProfile  # type: ignore[method-assign]
+            aw.setProfileDict = mock_application_window.setProfileDict  # type: ignore[method-assign]
             aw.orderEvents = mock_application_window.orderEvents  # type: ignore[method-assign]
             aw.etypeComboBox = mock_application_window.etypeComboBox
             aw.setCurrentFile = mock_application_window.setCurrentFile  # type: ignore[method-assign]
@@ -612,7 +612,7 @@ class TestLoadFile:
                 pass  # Ignore cleanup errors
 
             # Assert
-            mock_application_window.setProfile.assert_called_once()
+            mock_application_window.setProfileDict.assert_called_once()
 
     def test_load_file_with_actual_profile(self, mock_application_window: Mock) -> None:
         """Test loading the actual profile1.alog file from test resources."""
@@ -651,7 +651,7 @@ class TestLoadFile:
             aw = ApplicationWindow.__new__(ApplicationWindow)
             aw.qmc = mock_application_window.qmc
             aw.comparator = None
-            aw.setProfile = mock_application_window.setProfile  # type: ignore[method-assign]
+            aw.setProfileDict = mock_application_window.setProfileDict  # type: ignore[method-assign]
             aw.orderEvents = mock_application_window.orderEvents  # type: ignore[method-assign]
             aw.etypeComboBox = mock_application_window.etypeComboBox
             aw.setCurrentFile = mock_application_window.setCurrentFile  # type: ignore[method-assign]
@@ -667,7 +667,7 @@ class TestLoadFile:
 
             # Assert
             mock_application_window.qmc.reset.assert_called_once_with(redraw=False, soundOn=False)
-            mock_application_window.setProfile.assert_called_once()
+            mock_application_window.setProfileDict.assert_called_once()
 
     def test_load_file_file_open_error(self, mock_application_window: Mock) -> None:
         """Test handling of file open errors."""
@@ -886,9 +886,9 @@ class TestImportJSON:
             aw.qmc = mock_application_window.qmc
             aw.qmc.etypes = ['Air', 'Drum', 'Damper', 'Burner', '--']
             aw.comparator = None
-            aw.setProfile = mock_application_window.setProfile  # type: ignore[method-assign]
-            mock_application_window.setProfile.return_value = (
-                True  # setProfile returns True on success
+            aw.setProfileDict = mock_application_window.setProfileDict  # type: ignore[method-assign]
+            mock_application_window.setProfileDict.return_value = (
+                True  # setProfileDict returns True on success
             )
             aw.etypeComboBox = Mock()
             aw.sendmessage = mock_application_window.sendmessage  # type: ignore[method-assign]
@@ -900,7 +900,7 @@ class TestImportJSON:
             # Assert
             mock_open.assert_called_once_with(str(test_json_path), encoding='utf-8')
             mock_json_load.assert_called_once_with(mock_file_handle)
-            mock_application_window.setProfile.assert_called_once_with(
+            mock_application_window.setProfileDict.assert_called_once_with(
                 str(test_json_path), mock_profile_data
             )
             aw.etypeComboBox.clear.assert_called_once()
@@ -935,9 +935,9 @@ class TestImportJSON:
             aw.qmc = mock_application_window.qmc
             aw.qmc.etypes = ['Air', 'Drum', 'Damper', 'Burner', '--']
             aw.comparator = None
-            aw.setProfile = mock_application_window.setProfile  # type: ignore[method-assign]
-            mock_application_window.setProfile.return_value = (
-                False  # setProfile returns False on failure
+            aw.setProfileDict = mock_application_window.setProfileDict  # type: ignore[method-assign]
+            mock_application_window.setProfileDict.return_value = (
+                False  # setProfileDict returns False on failure
             )
             aw.etypeComboBox = Mock()
             aw.sendmessage = mock_application_window.sendmessage  # type: ignore[method-assign]
@@ -947,10 +947,10 @@ class TestImportJSON:
             aw.importJSON(test_json_path)
 
             # Assert
-            mock_application_window.setProfile.assert_called_once_with(
+            mock_application_window.setProfileDict.assert_called_once_with(
                 test_json_path, mock_profile_data
             )
-            # When setProfile returns False, the other methods should not be called
+            # When setProfileDict returns False, the other methods should not be called
             aw.etypeComboBox.clear.assert_not_called()
             mock_application_window.sendmessage.assert_not_called()
 
@@ -2170,54 +2170,6 @@ class TestMakeListLength:
         # Assert
         assert len(result) == 0
         assert result == []
-
-
-class TestArtisanURLextractor:
-    """Test artisanURLextractor static method."""
-
-    @patch('requests.get')
-    def test_artisanURLextractor_success(self, mock_get: Mock) -> None:
-        """Test artisanURLextractor with successful request."""
-        # Arrange
-        mock_url = Mock(spec=QUrl)
-        mock_url.toString.return_value = 'https://example.com/profile.json'
-
-        mock_response = Mock()
-        mock_response.json.return_value = {'title': 'Test Profile'}
-        mock_get.return_value = mock_response
-
-        def eventsExternal2InternalValue(_n: int) -> float:
-            return 0
-
-        # Act
-        result = ApplicationWindow.artisanURLextractor(
-            mock_url, [], [], [], eventsExternal2InternalValue
-        )
-
-        # Assert
-        mock_get.assert_called_once()
-        # Result should be a profile data dictionary or None
-        assert result is not None or result is None  # Can be either
-
-    @patch('requests.get')
-    def test_artisanURLextractor_request_failure(self, mock_get: Mock) -> None:
-        """Test artisanURLextractor with request failure."""
-        # Arrange
-        mock_url = Mock(spec=QUrl)
-        mock_url.toString.return_value = 'https://example.com/profile.json'
-
-        mock_get.side_effect = Exception('Network error')
-
-        def eventsExternal2InternalValue(_n: int) -> float:
-            return 0
-
-        # Act
-        result = ApplicationWindow.artisanURLextractor(
-            mock_url, [], [], [], eventsExternal2InternalValue
-        )
-
-        # Assert
-        assert result is None  # Should return None on exception
 
 
 class TestClearWindowGeometry:
@@ -3724,54 +3676,6 @@ class TestRankingDataUtilities:
             assert isinstance(field, list)
             assert len(field) == len(field_index)
 
-
-class TestURLExtractorUtilities:
-    """Test URL extractor utility static methods."""
-
-    def test_artisanURLextractor_with_mock_url(self) -> None:
-        """Test artisanURLextractor with mocked URL."""
-        # Arrange
-        mock_url = Mock()
-        mock_url.toString.return_value = 'http://example.com/profile'
-        etypes_default: list[str] = []
-        alt_etypes_default: list[str] = []
-        flavor_labels: list[str] = []
-        extractor_func = Mock(return_value=0.0)
-
-        # Mock requests to avoid actual network calls
-        with patch('requests.get') as mock_get:
-            mock_response = Mock()
-            mock_response.text = "{'title': 'Test Profile', 'timex': [0, 1, 2]}"
-            mock_get.return_value = mock_response
-
-            # Act
-            ApplicationWindow.artisanURLextractor(
-                mock_url, etypes_default, alt_etypes_default, flavor_labels, extractor_func
-            )
-
-            # Assert
-            mock_url.toString.assert_called_once()
-            mock_get.assert_called_once()
-
-    def test_artisanURLextractor_with_network_error(self) -> None:
-        """Test artisanURLextractor with network error."""
-        # Arrange
-        mock_url = Mock()
-        mock_url.toString.return_value = 'http://invalid-url.com'
-        etypes_default: list[str] = []
-        alt_etypes_default: list[str] = []
-        flavor_labels: list[str] = []
-        extractor_func = Mock(return_value=0.0)
-
-        # Mock requests to raise an exception
-        with patch('requests.get', side_effect=Exception('Network error')):
-            # Act
-            result = ApplicationWindow.artisanURLextractor(
-                mock_url, etypes_default, alt_etypes_default, flavor_labels, extractor_func
-            )
-
-            # Assert
-            assert result is None
 
 
 class TestAdvancedUtilities:
