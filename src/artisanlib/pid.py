@@ -127,7 +127,9 @@ class PID:
         'Kd2',
         'Schedule0',
         'Schedule1',
-        'Schedule2'
+        'Schedule2',
+        'd_filter_arr',
+        'd_filter_len'
     ]
 
     def __init__(
@@ -141,6 +143,9 @@ class PID:
         sampling_rate: float = 1. # >0 in seconds
     ) -> None:
         self.pidSemaphore: QSemaphore = QSemaphore(1)
+
+        self.d_filter_arr=[]
+        self.d_filter_len = 5 # must be an odd number!
 
         self.outMin: int = 0  # minimum output value
         #self.outMin: int = -20  # minimum output value
@@ -263,8 +268,16 @@ class PID:
         derror1 = derror
 
         # apply derative filter before estimating limits in DoM mode
-        if self.derivative_filter_level > 0:
-            derror = self.derivative_filter(derror)
+        #if self.derivative_filter_level > 0:
+            #derror = self.derivative_filter(derror)
+        if (not self.d_filter_arr): self.d_filter_arr = [derror]*self.d_filter_len
+        self.d_filter_arr.append(derror)
+        self.d_filter_arr.pop(0)
+        _log.info('PID calculate D: d_error_arr=<%s>, derror=<%s>', self.d_filter_arr)
+        d_filter_arr2 = self.d_filter_arr.copy()
+        d_filter_arr2.sort()
+        derror = d_filter_arr2[int(self.d_filter_len/2)]
+        _log.info('PID calculate D: d_error_arr=<%s>, d_error_arr2=<%s>, derror=<%s>', self.d_filter_arr, d_filter_arr2, derror)
 
         # Apply derivative limiting to prevent excessive derivative action
         if abs(derror) > self.derivative_limit:
