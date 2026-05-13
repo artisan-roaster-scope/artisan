@@ -333,6 +333,7 @@ class ProfileData(TypedDict, total=False):
     bbp_dropbt: float
     bbp_dropet: float
     bbp_drop_to_end: float
+    hash: str
 
 class ExtraDeviceSettings(TypedDict):
     extradevices           : list[int]

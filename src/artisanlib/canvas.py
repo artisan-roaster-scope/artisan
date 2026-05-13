@@ -654,6 +654,7 @@ class tgraphcanvas(QObject):
 
         #DEVICES
         self.device:int = 18                                    # default device selected to None (18). Calls appropriate function
+                                                                # note that the self.device number is one higher than the index in self.devices thus we access as self.devices[self.device -1]
 
         self.device_logging:bool = False # turn on/off device debug logging (MODBUS, ..) # Note that MODBUS log messages are written to the main artisan log file
         # Phidget messages are logged to the artisan device log
@@ -796,7 +797,8 @@ class tgraphcanvas(QObject):
         # ADD DEVICE: to add a device you have to modify several places. Search for the tag "ADD DEVICE:" in the code
         # (check also the tags in comm.py and devices.py!!)
         # - add to self.devices
-        self.devices: Final[list[str]] = [
+        self.devices: Final[list[str]] = [  # NOTE: the index of the elements in this list is one less than the device id indicated in the comments below
+                                            # The index of device "NONE" in self.devices is 17 not 18!
                         #Fuji PID               #0
                        'Omega HH806AU',         #1
                        'Omega HH506RA',         #2
@@ -1744,7 +1746,7 @@ class tgraphcanvas(QObject):
         #[0]weight in, [1]weight out, [2]units (string)
         self.weight:tuple[float,float,str] = (0, 0, weight_units[1])
 
-        self.roasted_defects_weight:float = 0 # weight of defects sorted from roasted weight in unit self.weight[2] (should always be positive and less than self.weight[1])
+        self.roasted_defects_weight:float = 0.0 # weight of defects sorted from roasted weight in unit self.weight[2] (should always be positive and less than self.weight[1])
 
         #[0]volume in, [1]volume out, [2]units (string)
         self.volume:tuple[float,float,str] = (0, 0, volume_units[0])
@@ -8080,7 +8082,7 @@ class tgraphcanvas(QObject):
             else:
                 self.weight = (self.weight[0],0,self.weight[2])
                 self.volume = (self.volume[0],0,self.volume[2])
-            self.roasted_defects_weight = 0 # is cleared in any case!
+            self.roasted_defects_weight = 0.0 # is cleared in any case!
             if len(self.timex) > 20:
                 # roast notes of an existing roast are reset
                 self.roastingnotes = ''
@@ -12152,13 +12154,13 @@ class tgraphcanvas(QObject):
                 if self.aw.qmc.flavors_total_correction != 0:
                     stattype_str += (f"{newline}{QApplication.translate('Label','Correction')} {self.aw.qmc.flavors_total_correction}")
             elif n == 33:  #Defects Weight
-                if self.roasted_defects_weight != 0:
+                if self.roasted_defects_weight != 0.0:
                     weight_unit_index = weight_units.index(self.weight[2])
                     w = render_weight(self.roasted_defects_weight,weight_unit_index,weight_unit_index)
                     stattype_str += (f"{newline}{QApplication.translate('AddlInfo', 'Defects Weight')}: "
                         f'{w}')
             elif n == 34:  #Defects Loss
-                if self.weight[1] != 0 and self.roasted_defects_weight != 0:  # noqa: SIM102
+                if self.weight[1] != 0 and self.roasted_defects_weight != 0.0:  # noqa: SIM102
                     roast_defects_loss = self.aw.weight_loss(self.weight[1], self.weight[1]-self.roasted_defects_weight)
                     stattype_str += f"{newline}{QApplication.translate('AddlInfo', 'Defects Loss')} -{dropZeroDecimal(roast_defects_loss, self.aw.percent_decimals)}%"
             elif n == 35:  #Yield (batch size - roast loss - roast defect loss)
@@ -19725,17 +19727,18 @@ class SampleThread(QThread):
             return tx,-1.0,-1.0
 
     def sample_extra_device(self, i:int) -> tuple[float,float,float]:
-        try:
-            if self.aw.simulator is None or self.aw.qmc.extradevices[i] == 22: # the PID SV/DUTY we show from the computed readings
-                tx,t1,t2 = self.aw.extraser[i].devicefunctionlist[self.aw.qmc.extradevices[i]]()
-            else:
-                tx = self.aw.qmc.timeclock.elapsedMilli()
-                t1,t2 = self.aw.simulator.readextra(i,(tx if self.aw.qmc.flagstart else 0))
-            return tx,float(t1),float(t2)
-        except Exception: # pylint: disable=broad-except
-#            _log.exception(e)
-            tx = self.aw.qmc.timeclock.elapsedMilli()
-            return tx,-1.0,-1.0
+        if self.aw.qmc.extradevices[i] != 18: # manual device 'NONE' cannot be used as extra device
+            try:
+                if self.aw.simulator is None or self.aw.qmc.extradevices[i] == 22: # the PID SV/DUTY we show from the computed readings
+                    tx,t1,t2 = self.aw.extraser[i].devicefunctionlist[self.aw.qmc.extradevices[i]]()
+                else:
+                    tx = self.aw.qmc.timeclock.elapsedMilli()
+                    t1,t2 = self.aw.simulator.readextra(i,(tx if self.aw.qmc.flagstart else 0))
+                return tx,float(t1),float(t2)
+            except Exception: # pylint: disable=broad-except
+                pass
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        return tx,-1.0,-1.0
 
     # fetch the raw samples from the main and all extra devices once per interval
     def sample(self) -> None:

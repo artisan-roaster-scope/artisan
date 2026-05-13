@@ -862,7 +862,7 @@ class backgroundDlg(ArtisanResizeablDialog):
             return
         self.aw.sendmessage(QApplication.translate('Message','Reading background profile...'))
         self.aw.qmc.resetlinecountcaches()
-        self.aw.loadbackground(self.filename)
+        self.aw.loadbackground(self.filename, quiet=False)
 
         # reset XT curve popup
         curvenames = [''] # first entry is the empty one (no extra curve displayed)

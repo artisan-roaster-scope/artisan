@@ -2037,11 +2037,11 @@ class roastCompareDlg(ArtisanDialog):
                 if firstChar == '{':
                     f.close()
                     obj = deserialize(filename)
-                    profile_data = self.aw.validateProfileDict(obj)
+                    profile_data = self.aw.validateProfileDict(obj, validate_signature=True, quiet=False)
                     self.aw.plusAddPath(obj, filename)
                     self.addProfile(filename,profile_data)
         except Exception as ex: # pylint: disable=broad-except
-            self.aw.sendmessage(f"{filename}: {QApplication.translate('Message','invalid artisan file')}")
+            self.aw.sendmessage(f"{QApplication.translate('Message','Invalid artisan format')}: {filename}")
             _log.exception(ex)
 
     def addProfiles(self, filenames:list[str]) -> None:

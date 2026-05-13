@@ -62,6 +62,7 @@ deltaLabelMathPrefix:Final[str] = r'$\Delta\/$'  # prefix for labels in matplibg
 
 
 
+@functools.lru_cache
 def appFrozen() -> bool:
     ib = False
     try:
@@ -78,6 +79,9 @@ def appFrozen() -> bool:
     except Exception as e: # pylint: disable=broad-except
         _log.exception(e)
     return ib
+
+def signature_message(version:str, revision:str, artisan_os:str) -> bytes:
+    return bytes(f'{version}{revision}{artisan_os}', encoding='ascii')
 
 ##
 
@@ -321,6 +325,19 @@ def toStringList(x:list[Any]) -> list[str]:
     if x:
         return [str(s) for s in x]
     return []
+
+# turns all integer values to floats in recursive list/dict structures
+def rec_int_to_float(data:Any) -> Any:
+    if isinstance(data, int):
+        return float(data)
+    if isinstance(data, dict):
+        data_copy = data.copy()
+        for k, v in data_copy.items():
+            data_copy[k] = rec_int_to_float(v)
+        return data_copy
+    if isinstance(data, list):
+        return [rec_int_to_float(v) for v in data]
+    return data
 
 def removeAll(ll:list[str], s:str) -> None:
     for _ in range(ll.count(s)):  # @UndefinedVariable
@@ -1127,13 +1144,13 @@ def exportProfile2CSV(filename:str, profile:'ProfileData') -> bool:
         CHARGE = timex_zero[timeindex[0]] if timeindex[0] > -1 else -1
         TP_index = findTPint(timeindex, timex, temp2)
         TP = timex_zero[TP_index] if TP_index and TP_index < len(timex_zero) else 0.
-        DRYe = timex_zero[timeindex[1]] if timeindex[1] else 0.
-        FCs = timex_zero[timeindex[2]] if timeindex[2] else 0.
-        FCe = timex_zero[timeindex[3]] if timeindex[3] else 0.
-        SCs = timex_zero[timeindex[4]] if timeindex[4] else 0.
-        SCe = timex_zero[timeindex[5]] if timeindex[5] else 0.
-        DROP = timex_zero[timeindex[6]] if timeindex[6] else 0.
-        COOL = timex_zero[timeindex[7]] if timeindex[7] else 0.
+        DRYe = timex_zero[timeindex[1]] if timeindex[1] and timeindex[1] < len(timex) else 0.
+        FCs = timex_zero[timeindex[2]] if timeindex[2] and timeindex[2] < len(timex) else 0.
+        FCe = timex_zero[timeindex[3]] if timeindex[3] and timeindex[3] < len(timex) else 0.
+        SCs = timex_zero[timeindex[4]] if timeindex[4] and timeindex[4] < len(timex) else 0.
+        SCe = timex_zero[timeindex[5]] if timeindex[5] and timeindex[5] < len(timex) else 0.
+        DROP = timex_zero[timeindex[6]] if timeindex[6] and timeindex[6] < len(timex) else 0.
+        COOL = timex_zero[timeindex[7]] if timeindex[7] and timeindex[7] < len(timex) else 0.
         events:list[tuple[float,str]] = [
             (CHARGE,'CHARGE'),
             (TP,'TP'),

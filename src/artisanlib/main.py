@@ -21,12 +21,8 @@
 import time as libtime
 startup_time = libtime.process_time()
 
-from artisanlib import __version__
-from artisanlib import __revision__
-from artisanlib import __build__
-from artisanlib import __signature__
+from artisanlib import __version__, __revision__, __build__, __signature__, __release_sponsor_name__
 
-from artisanlib import __release_sponsor_name__
 
 import os
 import sys  # @UnusedImport
@@ -48,6 +44,9 @@ import arabic_reshaper # type:ignore[import-untyped]
 from bidi import get_display # type:ignore[import-untyped] # newer rust based implementation of the original Python implementation
 from enum import IntEnum
 from pathlib import Path
+from cryptography.hazmat.primitives.asymmetric import ed25519
+from cryptography.hazmat.primitives import serialization
+from cryptography.exceptions import InvalidSignature
 
 # links CTR-C signals to the system default (ignore)
 import signal
@@ -215,7 +214,7 @@ from artisanlib.util import (appFrozen, uchr, decodeLocal, decodeLocalStrict, en
         debugLogLevelActive, setDebugLogLevel, createGradient, natsort, setDeviceDebugLogLevel,
         comma2dot, is_proper_temp, weight_units, volume_units, float2float, float2str,
         convertWeight, convertVolume, rgba_colorname2argb_colorname, render_weight, serialize, deserialize, csv_load, exportProfile2CSV, findTPint,
-        eventtime2string, toDim)
+        eventtime2string, toDim, signature_message, rec_int_to_float)
 
 from artisanlib.qtsingleapplication import QtSingleApplication
 
@@ -405,7 +404,7 @@ class Artisan(QtSingleApplication):
                     # load Artisan profile on double-click on *.alog file or as result of a drag-and-drop action to the canvas
                     # in case OPTION/ALT key is hold, load into background, else foreground
                     elif (url_query is not None and url_query == 'template') or modifiers == Qt.KeyboardModifier.AltModifier:
-                        aw.loadBackgroundSignal.emit(filename)
+                        aw.loadBackgroundSignal.emit(filename, True)
                     else:
                         aw.loadFileSignal.emit(filename)
                 elif file_suffix == 'alrm' and not aw.app.artisanviewerMode:
@@ -1400,6 +1399,10 @@ class UI_MODE(IntEnum):
     DEFAULT = 2
     PRODUCTION = 3
 
+
+class InvalidProfileHash(Exception):
+    pass
+
 # NOTE: to have pylint to verify proper __slot__ definitions with pylint one has to remove the super class QMainWindow here temporarily
 #   as this class does not has __slot__ definitions and thus __dict__ is contained which suppresses the warnings
 #class ApplicationWindow():
@@ -1416,7 +1419,7 @@ class ApplicationWindow(QMainWindow):
     resetCanvasColorSignal = pyqtSignal()
     setbuttonsfromSignal = pyqtSignal(int)
     setExtraEventButtonStyleSignal = pyqtSignal(int,str)
-    loadBackgroundSignal = pyqtSignal(str)
+    loadBackgroundSignal = pyqtSignal(str, bool)
     clearBackgroundSignal = pyqtSignal()
     setTareSignal = pyqtSignal(int)
     adjustSVSignal = pyqtSignal(float)
@@ -1529,7 +1532,7 @@ class ApplicationWindow(QMainWindow):
         'schedule_visible_filter', 'scheduler_tasks_visible', 'scheduler_completed_details_visible', 'scheduler_filters_visible', 'scheduler_auto_open',
         'main_menu_actions_with_shortcuts', 'ui_mode', 'UIModeMenu',  'productionModeAction', 'defaultModeAction', 'expertModeAction', 'calculatorAction',
         'helpAboutAction', 'checkUpdateAction', 'errorAction', 'messageAction', 'serialAction', 'platformAction', 'aboutQtAction',
-        'helpDocumentationAction', 'KshortCAction', 'profile_data_type_adapter' ]
+        'helpDocumentationAction', 'KshortCAction', 'profile_data_type_adapter', 'official_build' ]
 
     nLCDS: Final[int] = 10 # maximum number of LCDs and extra devices (2x10 => 20 in total!)
 
@@ -1541,6 +1544,7 @@ class ApplicationWindow(QMainWindow):
 
         self.locale_str:str = locale
         self.app:Artisan = app
+        self.official_build:bool = appFrozen() and __signature__ != '' and self.app_signature_valid() # type:ignore[reportUnnecessaryComparison,unused-ignore]
         self.superusermode:bool = False
         self.ui_mode:UI_MODE = UI_MODE.DEFAULT
 
@@ -4350,7 +4354,21 @@ class ApplicationWindow(QMainWindow):
         self.zoomOutShortcut = QShortcut(QKeySequence.StandardKey.ZoomOut, self)
         self.zoomOutShortcut.activated.connect(self.zoomOut)
 
-    #
+
+    # checks a builds signature using the public key
+    def app_signature_valid(self) -> bool:
+        try:
+            with open(getResourcePath() + 'artisan_public_key.pem', 'rb') as f:
+                public_key:ed25519.Ed25519PublicKey = cast(ed25519.Ed25519PublicKey, serialization.load_pem_public_key(f.read()))
+                os_name,_,_ = self.get_os()
+                message:bytes = signature_message(__version__, __revision__, os_name)
+                signature:bytes = bytes.fromhex(__signature__)
+                public_key.verify(signature, message)
+                return True
+        except Exception: # pylint: disable=broad-except
+            pass
+        _log.error('app signature invalid')
+        return False
 
     def create_file_menu(self, ui_mode:UI_MODE) -> QMenu:
         file_menu = QMenu(f"&{QApplication.translate('Menu', 'File')}")
@@ -10863,7 +10881,7 @@ class ApplicationWindow(QMainWindow):
                                         fp = str(eval(c[len('loadBackground('):-1])) # pylint: disable=eval-used
                                     except Exception: # pylint: disable=broad-except
                                         fp = str(cs[len('loadBackground('):-1])
-                                    self.loadBackgroundSignal.emit(fp)
+                                    self.loadBackgroundSignal.emit(fp, True)
                                     self.sendmessage(f'Artisan Command: {c}')
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
@@ -12499,7 +12517,7 @@ class ApplicationWindow(QMainWindow):
                                 path = self.qmc.backgroundpath
                             filename = self.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Load Background'),path =path, ext='*.alog')
                             if len(filename) != 0:
-                                self.loadBackgroundSignal.emit(filename)
+                                self.loadBackgroundSignal.emit(filename, False)
                 elif k == Qt.Key.Key_L and no_modifier and self.ui_mode is not UI_MODE.PRODUCTION: # 76:       #L (load alarms)
                     if not self.qmc.designerflag and self.comparator is None:
                         filename = self.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Load Alarms'),ext='*.alrm')
@@ -13725,7 +13743,7 @@ class ApplicationWindow(QMainWindow):
                 org_obj_extra_devs = []
             if res:
                 # we avoid the reset within setProfile as we just did a reset and do not want to confuse the ExtraDeviceSettingsBackup
-                res = self.setProfileDict(filename,obj_dict,quiet=quiet,reset=False)
+                res = self.setProfileDict(filename,obj_dict,quiet=quiet,reset=False, validate_signature=True)
             if res:
                 #order custom events
                 self.orderEvents()
@@ -14203,8 +14221,8 @@ class ApplicationWindow(QMainWindow):
         self.autoAdjustAxis()
         self.qmc.redraw()
 
-    @pyqtSlot(str)
-    def loadbackgroundRedraw(self, filename:str) -> None:
+    @pyqtSlot(str,bool)
+    def loadbackgroundRedraw(self, filename:str, quiet:bool) -> None:
         if len(filename) == 0:
             return
         try:
@@ -14215,7 +14233,7 @@ class ApplicationWindow(QMainWindow):
             try:
                 self.sendmessage(QApplication.translate('Message','Reading background profile...'))
                 self.qmc.resetlinecountcaches()
-                self.loadbackground(filename)
+                self.loadbackground(filename, quiet=quiet)
                 self.qmc.background = not self.qmc.hideBgafterprofileload
                 self.qmc.timealign(redraw=False)
                 self.qmc.redraw()
@@ -14262,7 +14280,7 @@ class ApplicationWindow(QMainWindow):
 
     # Loads background profile
     # NOTE: this does NOT set the self.qmc.background flag to make the loaded background visible.
-    def loadbackground(self, filename:str) -> None: # pyright: ignore[reportGeneralTypeIssues] # code to complex to analyze
+    def loadbackground(self, filename:str, quiet:bool = True) -> None: # pyright: ignore[reportGeneralTypeIssues] # code to complex to analyze
         f:QFile|None = None
         try:
             f = QFile(filename)
@@ -14286,7 +14304,8 @@ class ApplicationWindow(QMainWindow):
                 if 'extramarkers2' in profile:
                     profile['extramarkers2'] = [('None' if em is None else em) for em in profile['extramarkers2']]
 
-                self.qmc.backgroundprofile = self.validateProfileDict(profile)
+                self.qmc.backgroundprofile = self.validateProfileDict(profile, validate_signature=True, quiet=quiet)
+
                 tb:list[float] = profile['timex']
                 t1:list[float] = profile['temp1']
                 t2:list[float] = profile['temp2']
@@ -14511,9 +14530,9 @@ class ApplicationWindow(QMainWindow):
             self.qmc.adderror((QApplication.translate('Error Message', 'IO Error:') + ' loadbackground() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
             return
 
-        except ValidationError as e:
+        except (ValidationError, InvalidSignature, InvalidProfileHash) as e:
             # pydantic validation against ProfileData TypedDict failed
-            self.sendmessage(f"{filename}: {QApplication.translate('Message','invalid artisan file')}")
+            self.sendmessage(f"{QApplication.translate('Message','Invalid artisan format')}: {filename}")
             _log.error(e)
 
         except ValueError as e:
@@ -14893,7 +14912,7 @@ class ApplicationWindow(QMainWindow):
             from json import load as json_load
             with open(filename, encoding='utf-8') as infile:
                 obj = json_load(infile)
-                res = self.setProfileDict(filename, obj)
+                res = self.setProfileDict(filename, obj, validate_signature=True, quiet=False)
             if res:
                 #update etypes combo box
                 self.etypeComboBox.clear()
@@ -15226,6 +15245,31 @@ class ApplicationWindow(QMainWindow):
         self.extraFill1 = self.extraFill1 + [0]*max(0,self.nLCDS-len(self.extraFill1))
         self.extraFill2 = self.extraFill2[:self.nLCDS]
         self.extraFill2 = self.extraFill2 + [0]*max(0,self.nLCDS-len(self.extraFill2))
+        #
+        self.qmc.extralinestyles1 = self.qmc.extralinestyles1[:len(self.qmc.extradevices)]
+        self.qmc.extralinestyles1 = self.qmc.extralinestyles1 + [self.qmc.linestyle_default]*max(0,len(self.qmc.extradevices)-len(self.qmc.extralinestyles1))
+        self.qmc.extralinestyles2 = self.qmc.extralinestyles2[:len(self.qmc.extradevices)]
+        self.qmc.extralinestyles2 = self.qmc.extralinestyles2 + [self.qmc.linestyle_default]*max(0,len(self.qmc.extradevices)-len(self.qmc.extralinestyles2))
+        #
+        self.qmc.extradrawstyles1 = self.qmc.extradrawstyles1[:len(self.qmc.extradevices)]
+        self.qmc.extradrawstyles1 = self.qmc.extradrawstyles1 + [self.qmc.drawstyle_default]*max(0,len(self.qmc.extradevices)-len(self.qmc.extradrawstyles1))
+        self.qmc.extradrawstyles2 = self.qmc.extradrawstyles2[:len(self.qmc.extradevices)]
+        self.qmc.extradrawstyles2 = self.qmc.extradrawstyles2 + [self.qmc.drawstyle_default]*max(0,len(self.qmc.extradevices)-len(self.qmc.extradrawstyles2))
+        #
+        self.qmc.extralinewidths1 = self.qmc.extralinewidths1[:len(self.qmc.extradevices)]
+        self.qmc.extralinewidths1 = self.qmc.extralinewidths1 + [self.qmc.extra_linewidth_default]*max(0,len(self.qmc.extradevices)-len(self.qmc.extralinewidths1))
+        self.qmc.extralinewidths2 = self.qmc.extralinewidths2[:len(self.qmc.extradevices)]
+        self.qmc.extralinewidths2 = self.qmc.extralinewidths2 + [self.qmc.extra_linewidth_default]*max(0,len(self.qmc.extradevices)-len(self.qmc.extralinewidths2))
+        #
+        self.qmc.extramarkers1 = self.qmc.extramarkers1[:len(self.qmc.extradevices)]
+        self.qmc.extramarkers1 = self.qmc.extramarkers1 + [self.qmc.marker_default]*max(0,len(self.qmc.extradevices)-len(self.qmc.extramarkers1))
+        self.qmc.extramarkers2 = self.qmc.extramarkers2[:len(self.qmc.extradevices)]
+        self.qmc.extramarkers2 = self.qmc.extramarkers2 + [self.qmc.marker_default]*max(0,len(self.qmc.extradevices)-len(self.qmc.extramarkers2))
+        #
+        self.qmc.extramarkersizes1 = self.qmc.extramarkersizes1[:len(self.qmc.extradevices)]
+        self.qmc.extramarkersizes1 = self.qmc.extramarkersizes1 + [self.qmc.markersize_default]*max(0,len(self.qmc.extradevices)-len(self.qmc.extramarkersizes1))
+        self.qmc.extramarkersizes2 = self.qmc.extramarkersizes2[:len(self.qmc.extradevices)]
+        self.qmc.extramarkersizes2 = self.qmc.extramarkersizes2 + [self.qmc.markersize_default]*max(0,len(self.qmc.extradevices)-len(self.qmc.extramarkersizes2))
 
 
     def saveExtradeviceSettings(self) -> None:
@@ -15449,6 +15493,7 @@ class ApplicationWindow(QMainWindow):
 
     def getExtraDeviceSettings(self, settings:QSettings) -> None:
         self.qmc.extradevices = [toInt(x) for x in toList(settings.value('extradevices',self.qmc.extradevices))]
+        self.qmc.extradevices = [(x if (0 < x < len(self.qmc.devices)-1 and x != 18) else 25) for x in self.qmc.extradevices] # if out of range (note index is shifted by 1) or NONE, set to VIRTUAL
         self.qmc.extraname1 = list(map(str,list(toStringList(settings.value('extraname1',self.qmc.extraname1)))))
         self.qmc.extraname2 = list(map(str,list(toStringList(settings.value('extraname2',self.qmc.extraname2)))))
         self.qmc.extramathexpression1 = list(map(str,list(toStringList(settings.value('extramathexpression1',self.qmc.extramathexpression1)))))
@@ -15570,20 +15615,67 @@ class ApplicationWindow(QMainWindow):
         return self.profile_data_type_adapter
 
     # returns either the given dict as a ProfileData TypedDict or raises an exception
-    def validateProfileDict(self, profile_dict:dict[str,Any]) -> ProfileData:
+    # if validate_signature the signature is used to validate that the profile data was generated by an official Artisan build
+    # if not silent and the validation of the signature failed the user is consulted allowing him to allow the loading anyhow or cancel the operation
+    def validateProfileDict(self, profile_dict:dict[str,Any], quiet:bool=True, validate_signature:bool = False) -> ProfileData:
         ta:TypeAdapter[ProfileData] = self.getProfileDataTypeAdapter()
-        return ta.validate_python(profile_dict)
+        profile:ProfileData = ta.validate_python(profile_dict)
+        if self.official_build and validate_signature and 'version' in profile and QVersionNumber.fromString(profile['version'])[0] >= QVersionNumber(4,1,0):
+#        # testing:
+#        if self.official_build and validate_signature and 'version' in profile and 'signature' in profile:
+            # official builds validate all profile signatures for files generated by Artisan versions >= v4.1
+            # we validate the signature
+            try:
+                with open(getResourcePath() + 'artisan_public_key.pem', 'rb') as f:
+                    public_key:ed25519.Ed25519PublicKey = cast(ed25519.Ed25519PublicKey, serialization.load_pem_public_key(f.read()))
+                    version = profile['version']
+                    revision = profile['revision'] # pyright: ignore[reportTypedDictNotRequiredAccess]
+                    artisan_os = profile['artisan_os'] # pyright: ignore[reportTypedDictNotRequiredAccess]
+                    message:bytes = signature_message(version, revision, artisan_os)
+                    signature:bytes = bytes.fromhex(profile['signature']) # pyright: ignore[reportTypedDictNotRequiredAccess]
+                    public_key.verify(signature, message)
+            except Exception: # pylint: disable=broad-except
+                _log.error('profile signature invalid')
+                if not quiet:
+                    reply = QMessageBox.question(self,
+                                QApplication.translate('Message', 'Load profile?'),
+                                QApplication.translate('Message', 'Not a genuine Artisan profile. Load it anyway?'),
+                                QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
+                    if reply == QMessageBox.StandardButton.Yes:
+                        return profile
+                raise # let the profile loading fail
 
-    # validates profile as type correct ProfileData and calls setProfile on success to establish this data
-    def setProfileDict(self, filename:str|None, profile_dict:dict[str,Any], quiet:bool = False, reset:bool = True) -> bool:
+            if 'hash' in profile:
+                import hashlib
+                import json
+                profile_hash:str = profile['hash']
+                del profile['hash']
+                computed_hash = hashlib.sha256(json.dumps(rec_int_to_float(profile), sort_keys=True, ensure_ascii=True, separators=(',', ':')).encode()).hexdigest()
+                if profile_hash != computed_hash:
+                    _log.error('profile hash invalid')
+                    if not quiet:
+                        reply = QMessageBox.question(self,
+                                    QApplication.translate('Message', 'Load profile?'),
+                                    QApplication.translate('Message', 'Modified Artisan profile. Load it anyway?'),
+                                    QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
+                        if reply == QMessageBox.StandardButton.Yes:
+                            return profile
+                    raise InvalidProfileHash
+
+        return profile
+
+    # validates profile as type correctProfileData, optional as from an official Artisan build and calls setProfile on success to establish this data
+    # called by loadFile(), importJSON(), ..
+    # if validate_signature the signature is used to validate that the profile data was generated by an official Artisan build
+    def setProfileDict(self, filename:str|None, profile_dict:dict[str,Any], quiet:bool = False, reset:bool = True, validate_signature:bool = False) -> bool:
         try:
-            return self.setProfile(filename, self.validateProfileDict(profile_dict), quiet, reset)
+            return self.setProfile(filename, self.validateProfileDict(profile_dict, quiet, validate_signature), quiet, reset)
         except Exception as e: # pylint: disable=broad-except
-            self.sendmessage(f"{filename}: {QApplication.translate('Message','invalid artisan file')}")
+            self.sendmessage(f"{QApplication.translate('Message','Invalid artisan format')}: {filename}")
             _log.error(e)
         return False
 
-    #called by fileLoad() and various import functions
+    #called by various import functions
     # we assume that before a reset action was issues and among others timeindex got initialized to its defaults
     # returns False if action was canceled or failed, True otherwise
     def setProfile(self, filename:str|None, profile:'ProfileData', quiet:bool = False, reset:bool = True) -> bool: # pyright: ignore [reportGeneralTypeIssues] # Code is too complex to analyze; reduce complexity by refactoring into subroutines or reducing conditional code paths
@@ -15897,13 +15989,13 @@ class ApplicationWindow(QMainWindow):
                     convertWeight(float(weight[1]), weight_unit_idx, current_weight_unit_idx),
                     self.qmc.weight[2])
             else:
-                self.qmc.weight = (0,0,self.qmc.weight[2])
+                self.qmc.weight = (0., 0., self.qmc.weight[2])
             #
             if 'defects_weight' in profile:
                 defects = profile['defects_weight']
                 self.qmc.roasted_defects_weight = convertWeight(min(self.qmc.weight[1], max(0.,float(defects))), weight_unit_idx, current_weight_unit_idx)
             else:
-                self.qmc.roasted_defects_weight = 0
+                self.qmc.roasted_defects_weight = 0.
             #
             if 'volume' in profile and len(profile['volume']) == 3:
                 volume = profile['volume']
@@ -15922,19 +16014,19 @@ class ApplicationWindow(QMainWindow):
                     convertVolume(float(volume[1]), volume_unit_idx, current_volume_unit_idx),
                     self.qmc.volume[2])
             else:
-                self.qmc.volume = (0,0,self.qmc.volume[2])
+                self.qmc.volume = (0. ,0., self.qmc.volume[2])
             #
 
             if 'density' in profile and len(profile['density']) == 4:
                 density = profile['density']
                 self.qmc.density = (float(density[0]),decodeLocalStrict(density[1], 'g'),float(density[2]),decodeLocalStrict(density[3], 'l'))
             else:
-                self.qmc.density = (0,'g',1,'l')
+                self.qmc.density = (0., 'g', 1., 'l')
             if 'density_roasted' in profile:
                 density_roasted = profile['density_roasted']
                 self.qmc.density_roasted = (float(density_roasted[0]),decodeLocalStrict(density_roasted[1], 'g'),float(density_roasted[2]),decodeLocalStrict(density_roasted[3], 'l'))
             else:
-                self.qmc.density_roasted = (0,'g',1,'l')
+                self.qmc.density_roasted = (0., 'g', 1.,'l')
             if 'roastertype' in profile:
                 self.qmc.roastertype = decodeLocalStrict(profile['roastertype'])
             else:
@@ -16891,6 +16983,7 @@ class ApplicationWindow(QMainWindow):
             profile['artisan_os'] = os_name
             profile['artisan_os_version'] = os_version
             profile['artisan_os_arch'] = os_arch
+            #
             profile['mode'] = self.qmc.mode
             profile['viewerMode'] = self.app.artisanviewerMode
             profile['timeindex'] = self.qmc.timeindex
@@ -17152,6 +17245,10 @@ class ApplicationWindow(QMainWindow):
                 _, _, exc_tb = sys.exc_info()
                 self.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' getProfile(): {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
+            # add hash
+            import hashlib
+            import json
+            profile['hash'] = hashlib.sha256(json.dumps(rec_int_to_float(profile), sort_keys=True, ensure_ascii=True, separators=(',', ':')).encode()).hexdigest()
 
             return profile
         except Exception as ex: # pylint: disable=broad-except
@@ -17384,6 +17481,7 @@ class ApplicationWindow(QMainWindow):
                 progress.show()
                 i = 1
                 flag_temp = self.qmc.roastpropertiesflag
+                os_name,os_version,os_arch = self.get_os()
                 for f in files:
                     try:
                         progress.setValue(i)
@@ -17399,6 +17497,15 @@ class ApplicationWindow(QMainWindow):
                                     self.qmc.eventsExternal2InternalValue)
                             if pd is not None:
                                 self.plusAddPath(cast(dict[str,Any], pd), fconv)
+                                # add creator information
+                                pd['version'] = str(__version__)
+                                pd['revision'] = str(__revision__)
+                                pd['build'] = str(__build__)
+                                pd['signature'] = str(__signature__)
+                                pd['artisan_os'] = os_name
+                                pd['artisan_os_version'] = os_version
+                                pd['artisan_os_arch'] = os_arch
+                                # serialize to file
                                 serialize(fconv, cast(dict[str,Any], pd))
                             else:
                                 self.sendmessage(QApplication.translate('Message','Target file {0} exists. {1} not converted.').format(fconv,fname + str(ext)))
@@ -17652,14 +17759,14 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     @pyqtSlot(bool)
     def fileConvertToFahrenheit(self, _:bool = False) -> None:
-        self.fileConverToTemp('F')
+        self.fileConvertToTemp('F')
 
     @pyqtSlot()
     @pyqtSlot(bool)
     def fileConvertToCelsius(self, _:bool = False) -> None:
-        self.fileConverToTemp('C')
+        self.fileConvertToTemp('C')
 
-    def fileConverToTemp(self, t:str) -> None:
+    def fileConvertToTemp(self, t:str) -> None:
         files = self.ArtisanOpenFilesDialog(ext='*.alog')
         if files and len(files) > 0:
             self.saveExtradeviceSettings()
@@ -17684,7 +17791,7 @@ class ApplicationWindow(QMainWindow):
                             self.qmc.reset(redraw=False,soundOn=False)
                             profile = deserialize(f)
                             self.plusAddPath(profile, f)
-                            res = self.setProfileDict(f,profile,quiet=True)
+                            res = self.setProfileDict(f,profile, validate_signature=True, quiet=True)
                             if res:
                                 self.qmc.convertTemperature(t,True)
                                 self.fileSave(fconv)
@@ -17733,7 +17840,7 @@ class ApplicationWindow(QMainWindow):
                 headers={'Accept-Encoding' : 'gzip'},
     #            verify=False
                 )
-            return self.validateProfileDict(ast.literal_eval(r.text))
+            return self.validateProfileDict(ast.literal_eval(r.text), validate_signature=True, quiet=False)
         except Exception: # pylint: disable=broad-except
             return None
 
@@ -17896,6 +18003,28 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.adderror(QApplication.translate('Error Message','Exception: {} not a valid settings file').format(str(filename)))
                     return False
 
+                # check signature if official build and settings 'artisan_version' is >= 4.1
+                if (self.official_build and not debugLogLevelActive() and
+                        settings.contains('artisan_version') and QVersionNumber.fromString(settings.value('artisan_version',__version__))[0] >= QVersionNumber(4,1,0)):
+#                # testing:
+#                if (self.official_build and not debugLogLevelActive() and
+#                        settings.contains('System/artisan_version') and settings.contains('System/artisan_signature')):
+                    # we validate the signature
+                    try:
+                        with open(getResourcePath() + 'artisan_public_key.pem', 'rb') as f:
+                            public_key:ed25519.Ed25519PublicKey = cast(ed25519.Ed25519PublicKey, serialization.load_pem_public_key(f.read()))
+                            version = settings.value('System/artisan_version','')
+                            revision = settings.value('System/artisan_revision','')
+                            artisan_os = settings.value('System/artisan_os','')
+                            message:bytes = signature_message(version, revision, artisan_os)
+                            signature:bytes = bytes.fromhex(settings.value('System/artisan_signature','')) # pyright: ignore[reportTypedDictNotRequiredAccess]
+                            public_key.verify(signature, message)
+                    except Exception: # pylint: disable=broad-except
+                        _log.error('settings signature invalid')
+                        self.qmc.adderror(QApplication.translate('Error Message','Exception: {} not a valid settings file').format(str(filename)))
+                        return False
+
+
                 if self.qmc.neverUpdateBatchCounter or self.app.artisanviewerMode:
                     updateBatchCounter = False
                 else:
@@ -18042,6 +18171,8 @@ class ApplicationWindow(QMainWindow):
                 except Exception: # pylint: disable=broad-except
                     pass
             self.qmc.device = toInt(settings.value('id',self.qmc.device))
+            if self.qmc.device < 0 or self.qmc.device-1 < len(self.qmc.devices):
+                self.qmc.device = 18
             # Phidget configurations
             self.qmc.phidget1048_types = [toInt(x) for x in toList(settings.value('phidget1048_types',self.qmc.phidget1048_types))]
             self.qmc.phidget1048_async = [toBool(x) for x in toList(settings.value('phidget1048_async',self.qmc.phidget1048_async))]
@@ -18967,15 +19098,14 @@ class ApplicationWindow(QMainWindow):
             self.ser.externalprogram = toString(settings.value('externalprogram',self.ser.externalprogram))
             self.ser.externaloutprogram = toString(settings.value('externaloutprogram',self.ser.externaloutprogram))
             self.ser.externaloutprogramFlag = toBool(settings.value('externaloutprogramFlag',self.ser.externaloutprogramFlag))
-            if not theme:
 #--- BEGIN GROUP ExtraDev
-                settings.beginGroup('ExtraDev')
-                self.getExtraDeviceSettings(settings)
-                settings.endGroup()
+            settings.beginGroup('ExtraDev')
+            self.getExtraDeviceSettings(settings)
+            settings.endGroup()
 #--- END GROUP ExtraDev
-                # ensure that extra list length are of the size of the extradevices:
-                self.ensureCorrectExtraDeviceListLength()
-                self.updateExtradeviceSettings()
+            # ensure that extra list length are of the size of the extradevices:
+            self.ensureCorrectExtraDeviceListLength()
+            self.updateExtradeviceSettings()
 
             try:
                 _log.info('machine: %s (%s, %skg, %s)', self.qmc.machinesetup, self.qmc.roastertype_setup, self.qmc.roastersize_setup, ([''] + self.qmc.sourcenames)[self.qmc.roasterheating_setup])
@@ -19048,6 +19178,10 @@ class ApplicationWindow(QMainWindow):
             self.qmc.YTbackmarker = s2a(toString(settings.value('YTbackmarker',self.qmc.YTbackmarker)))
             self.qmc.YTbackmarkersize = max(0.1,float2float(toFloat(settings.value('YTbackmarkersize',self.qmc.YTbackmarkersize))))
             self.getExtraDeviceCurveStyles(settings)
+            # ensure that extra list length are of the size of the extradevices:
+            self.ensureCorrectExtraDeviceListLength()
+            self.updateExtradeviceSettings()
+            #
             self.qmc.BTBdeltalinestyle = s2a(toString(settings.value('BTBdeltalinestyle',self.qmc.BTBdeltalinestyle)))
             self.qmc.BTBdeltadrawstyle = s2a(toString(settings.value('BTBdeltadrawstyle',self.qmc.BTBdeltadrawstyle)))
             self.qmc.BTBdeltalinewidth = max(0.1,float2float(toFloat(settings.value('BTBdeltalinewidth',self.qmc.BTBdeltalinewidth))))
@@ -20087,7 +20221,7 @@ class ApplicationWindow(QMainWindow):
                 settings.setValue('artisan_version',__version__)
                 settings.setValue('artisan_revision',__revision__)
                 settings.setValue('artisan_build',__build__)
-                settings.setValue('artisan_build',__signature__)
+                settings.setValue('artisan_signature',__signature__)
                 os_name,os_version,os_arch = self.get_os()
                 settings.setValue('artisan_os',os_name)
                 settings.setValue('artisan_os_version',os_version)
@@ -24393,9 +24527,10 @@ class ApplicationWindow(QMainWindow):
             otherlibs += ', Yoctopuce ' + yocto_version
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
+        unofficial = ('' if not appFrozen() or self.official_build else QApplication.translate('Message', 'unoffical build')) # fork, mod
         box.about(self,
                 QApplication.translate('About', 'About'),
-                """<h2>{0} {1}{14}{2}</h2>
+                """<h2>{0} {1}{14}{2}</h2>{17}
                 <p>
                 <small>Python {3}, Qt {4}, PyQt {5}, Matplotlib {6}, NumPy {7}, SciPy {8}, pymodbus {11}{15}</small>
                 </p>
@@ -24419,7 +24554,8 @@ class ApplicationWindow(QMainWindow):
                 '<a href="http://www.gnu.org/copyleft/gpl.html">GNU Public Licence (GPLv3.0)</a>',
                 build,
                 otherlibs, # pyright:ignore[reportUnknownArgumentType]
-                '<a href="https://artisan-scope.org">https://artisan-scope.org</a>'))
+                '<a href="https://artisan-scope.org">https://artisan-scope.org</a>',
+                unofficial))
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -28046,7 +28182,7 @@ def main() -> None:
             # we try to reload the last loaded profile or background
             if appWindow.lastLoadedProfile:
                 try:
-                    appWindow.loadFile(appWindow.lastLoadedProfile)
+                    appWindow.loadFile(appWindow.lastLoadedProfile, quiet=True)
                     if appWindow.curFile is None:
                         # load failed
                         appWindow.lastLoadedProfile = ''

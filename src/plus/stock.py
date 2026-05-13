@@ -1133,7 +1133,7 @@ def blend2weight_beans(blend:BlendStructure, weight_unit_idx:int, weightIn:float
             c = getBlendCoffeeLabelDict(blend)[i['coffee']]
             w = ''
             if weightIn:
-                w = render_weight(i['ratio'] * weightIn, 1, weight_unit_idx)
+                w = render_weight(i['ratio'] * weightIn, 1, weight_unit_idx,smart_unit_upgrade=False)
             res.append((w,c))
     except Exception as e:  # pylint: disable=broad-except
         _log.exception(e)

@@ -2751,6 +2751,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                         dev_name:str
                         try:
                             dev_name = self.aw.qmc.devices[max(0,self.aw.qmc.extradevices[i]-1)]
+                            if dev_name == 'NONE': # manual device not available among extra devices
+                                dev_name = self.aw.qmc.devices[24] # +Virtual
                         except Exception: # pylint: disable=broad-except
                             dev_name = self.aw.qmc.devices[24] # +Virtual
                         if dev_name[0] == '+':

@@ -901,7 +901,7 @@ class TestImportJSON:
             mock_open.assert_called_once_with(str(test_json_path), encoding='utf-8')
             mock_json_load.assert_called_once_with(mock_file_handle)
             mock_application_window.setProfileDict.assert_called_once_with(
-                str(test_json_path), mock_profile_data
+                str(test_json_path), mock_profile_data, validate_signature=True, quiet=False
             )
             aw.etypeComboBox.clear.assert_called_once()
             aw.etypeComboBox.addItems.assert_called_once()
@@ -948,7 +948,7 @@ class TestImportJSON:
 
             # Assert
             mock_application_window.setProfileDict.assert_called_once_with(
-                test_json_path, mock_profile_data
+                test_json_path, mock_profile_data, validate_signature=True, quiet=False
             )
             # When setProfileDict returns False, the other methods should not be called
             aw.etypeComboBox.clear.assert_not_called()

@@ -1841,11 +1841,14 @@ class comportDlg(ArtisanResizeablDialog):
                 for i in range(nssdevices):
                     if len(self.aw.qmc.extradevices) > i:
                         devid = self.aw.qmc.extradevices[i]
+                        if devid == 18: # manual device not available among extra devices
+                            devid = 25
                         try:
                             devicename = self.aw.qmc.devices[max(0,devid-1)]
                         except Exception: # pylint: disable=broad-except
                             # if referenced device id is out of range we resolve to the default
                             devicename = self.aw.qmc.devices[24] # +Virtual
+                            devid = 25
                         if devicename[0] == '+':
                             devname = devicename[1:]
                         else:
@@ -1895,6 +1898,8 @@ class comportDlg(ArtisanResizeablDialog):
             for i in range(ser_ports):
                 if len(self.aw.qmc.extradevices) > i:
                     devid = self.aw.qmc.extradevices[i]
+                    if devid == 18: # manual extra device not available
+                        devid = 25 # virtual
                     if devid-1 < len(self.aw.qmc.devices):
                         devicename = self.aw.qmc.devices[devid-1]    #type identification of the device. Non editable
                         if (devid not in self.aw.qmc.nonSerialDevices) and devid != 29 and devicename[0] != '+': # hide serial confs for MODBUS and "+XX" extra devices
