@@ -181,7 +181,6 @@ def reset_config_state() -> Generator[None, None, None]:
     # Store original config module state
     original_app_window = getattr(config, 'app_window', None)
     original_connected = getattr(config, 'connected', None)
-    original_passwd = getattr(config, 'passwd', None)
     original_token = getattr(config, 'token', None)
     original_nickname = getattr(config, 'nickname', None)
     original_account_nr = getattr(config, 'account_nr', None)
@@ -194,8 +193,6 @@ def reset_config_state() -> Generator[None, None, None]:
         config.app_window = original_app_window
     if original_connected is not None:
         config.connected = original_connected
-    if original_passwd is not None:
-        config.passwd = original_passwd
     if original_token is not None:
         config.token = original_token
     if original_nickname is not None:
@@ -505,11 +502,6 @@ class TestRuntimeVariables:
         # Assert
         assert config.connected is False
         assert isinstance(config.connected, bool)
-
-    def test_passwd_initial_value(self) -> None:
-        """Test passwd initial value."""
-        # Assert
-        assert config.passwd is None
 
     def test_token_initial_value(self) -> None:
         """Test token initial value."""

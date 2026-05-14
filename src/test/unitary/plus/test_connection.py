@@ -135,8 +135,6 @@ with patch('artisanlib.__version__', '2.8.4'), patch(
 ), patch(
     'plus.config.nickname', None
 ), patch(
-    'plus.config.passwd', None
-), patch(
     'plus.config.connected', False
 ), patch(
     'plus.config.app_window', None
@@ -201,7 +199,6 @@ def isolated_test_environment() -> Generator[None, None, None]:
         config_mock.post_compression_threshold = 500 # type: ignore[attr-defined]
         config_mock.token = None  # type: ignore[attr-defined]
         config_mock.nickname = None # type: ignore[attr-defined]
-        config_mock.passwd = None # type: ignore[attr-defined]
         config_mock.connected = False # type: ignore[attr-defined]
         config_mock.app_window = None # type: ignore[attr-defined]
 
@@ -319,7 +316,6 @@ def reset_connection_state() -> Generator[None, None, None]:
     original_nickname = getattr(connection.config, 'nickname', None)
     original_app_window = getattr(connection.config, 'app_window', None)
     original_connected = getattr(connection.config, 'connected', False)
-    original_passwd = getattr(connection.config, 'passwd', None)
 
     # Reset semaphore mocks if they exist and are actually mocks
     if hasattr(connection, 'token_semaphore'):
@@ -339,7 +335,6 @@ def reset_connection_state() -> Generator[None, None, None]:
     connection.config.nickname = original_nickname
     connection.config.app_window = original_app_window
     connection.config.connected = original_connected
-    connection.config.passwd = original_passwd
 
 
 @pytest.fixture
@@ -496,7 +491,6 @@ class TestCredentialManagement:
             mock_config.app_name = 'artisan.plus'
             mock_config.token = 'test_token'
             mock_config.nickname = 'test_nickname'
-            mock_config.passwd = 'test_password'
             mock_config.account_nr = 123
 
             # Act
@@ -506,7 +500,6 @@ class TestCredentialManagement:
             mock_delete_password.assert_called_once_with('artisan.plus', 'test@example.com')
             assert mock_config.token is None
             assert mock_config.nickname is None
-            assert mock_config.passwd is None
             assert mock_config.account_nr is None
 
     def test_clear_credentials_without_keychain_removal(self, mock_app_window: Mock) -> None:
@@ -519,7 +512,6 @@ class TestCredentialManagement:
             mock_config.app_window = mock_app_window
             mock_config.token = 'test_token'
             mock_config.nickname = 'test_nickname'
-            mock_config.passwd = 'test_password'
             mock_config.account_nr = 123
 
             # Act
@@ -529,7 +521,6 @@ class TestCredentialManagement:
             mock_delete_password.assert_not_called()
             assert mock_config.token is None
             assert mock_config.nickname is None
-            assert mock_config.passwd is None
             assert mock_config.account_nr is None
 
     def test_clear_credentials_keychain_exception_handling(self, mock_app_window: Mock) -> None:

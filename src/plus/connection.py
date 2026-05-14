@@ -24,10 +24,11 @@
 from PyQt6.QtCore import QSemaphore
 
 from artisanlib import __version__
-from typing import Final, Any
+from typing import Final, Any, Protocol
 
 import time
 import uuid
+import base64
 import datetime
 import gzip
 import json
@@ -37,6 +38,7 @@ import dateutil.parser
 import requests
 import requests.models
 import requests.exceptions
+from cryptography.fernet import Fernet
 
 from plus import config, account, util
 
@@ -117,16 +119,7 @@ def clearCredentials(remove_from_keychain: bool = True) -> None:
             and remove_from_keychain
         ):  # @UndefinedVariable
             try:
-
-#                if platform.system().startswith('Windows'):
-#                    import keyring.backends.Windows  # @UnusedImport
-#                elif platform.system() == 'Darwin':
-#                    import keyring.backends.macOS  # @UnusedImport @UnresolvedImport
-#                else:
-#                    import keyring.backends.SecretService  # @UnusedImport
-#                import keyring  # @Reimport # imported last to make py2app work
                 import keyring
-
                 keyring.delete_password(
                     config.app_name, aw.plus_account
                 )  # @UndefinedVariable
@@ -140,188 +133,225 @@ def clearCredentials(remove_from_keychain: bool = True) -> None:
         config.token = None
         if aw is not None:
             aw.plus_account = None
-        config.passwd = None
         config.nickname = None
         config.account_nr = None
+        # finally clear out the in-memory password cache
+        authentify(clear_password_cache=True)
     finally:
         if token_semaphore.available() < 1:
             token_semaphore.release(1)
 
 # returns True on successful authentication
+# if passwd is given we can assume that it was already stored in the keychain if possible thus we don't try to store it
+#  however that does not guarantee that those credentials are valid
+# keychain_success is set if passwd was successfully stored in keychain
 # NOTE: authentify might be called from outside the GUI thread
-def authentify() -> bool:
-    _log.debug('authentify()')
-    try:
-        aw = config.app_window
-        if (
-            aw is not None
-            and aw.plus_account is not None
-        ):  # @UndefinedVariable
-            # fetch passwd
-            if config.passwd is None:
-                try:
-                    import keyring  # @Reimport # imported last to make py2app work
 
-                    config.passwd = keyring.get_password(
-                        config.app_name, aw.plus_account
-                    )  # @UndefinedVariable
-                except Exception as e:  # pylint: disable=broad-except
-                    _log.exception(e)
-            if config.passwd is None:
-                _log.debug('-> password not found')
-                clearCredentials()
-                return False
-            _log.debug(
-                '-> authentifying %s',
-                aw.plus_account,
-            )  # @UndefinedVariable
-            data = {
-                'email': aw.plus_account,
-                'password': config.passwd,
-            }  # @UndefinedVariable
-            r = sendData(config.auth_url, data, 'POST', False)
-            _log.debug(
-                '-> authentifying reply status code: %s',
-                r.status_code,
-            )  # @UndefinedVariable
-            # returns 404: login wrong and 401: passwd wrong
-            if r.status_code != 204 and r.headers['content-type'].strip().startswith('application/json'):
-                res = r.json()
-                if (
-                    'success' in res
-                    and res['success']
-                    and 'result' in res
-                    and 'user' in res['result']
-                    and 'token' in res['result']['user']
-                ):
-                    _log.debug(
-                        '-> authentified, token received'
-                    )
-                    # extract in user/account data
-                    nickname = util.extractInfo(
-                        res['result']['user'], 'nickname', None
-                    )
-                    aw.plus_language = util.extractInfo(
-                        res['result']['user'], 'language', 'en'
-                    )
-                    aw.plus_user_id = util.extractInfo(
-                        res['result']['user'], 'user_id', None
-                    )
-                    aw.plus_paidUntil = None
-                    aw.plus_subscription = None
-                    aw.plus_rlimit = 0
-                    aw.plus_used = 0
-                    if 'account' in res['result']['user']:
-                        res_account = res['result']['user']['account']
-                        if '_id' in res_account:
-                            aw.plus_account_id = res_account['_id']
-                        subscription = util.extractInfo(
-                            res_account, 'subscription', ''
-                        )
-                        aw.updateSubscriptionSignal.emit(subscription)
-                        paidUntil = util.extractInfo(
-                            res_account, 'paidUntil', ''
-                        )
-                        rlimit = -1
-                        rused = -1
-                        notifications = 0 # unqualified notifications
-                        machines = [] # list of machine names with matching notifications
-                        try:
-                            if 'limit' in res['result']['user']['account']:
-                                ol = res_account['limit']
-                                if 'rlimit' in ol:
-                                    rlimit = ol['rlimit']
-                                if 'rused' in ol:
-                                    rused = ol['rused']
-                        except Exception as e:  # pylint: disable=broad-except
-                            _log.exception(e)
+class Authentifier(Protocol):
+    def __call__(self, passwd:str|None = ..., keychain_success: bool = ..., clear_password_cache: bool = ...) -> bool:
+        ...
 
-                        if 'notifications' in res:
-                            notificationDict = res['notifications']
-                            if notificationDict:
-                                notifications = util.extractInfo(notificationDict, 'unqualified', 0)
-                                machines = util.extractInfo(notificationDict, 'machines', [])
+def make_authentify() -> Authentifier:
+    # in-memory password stored in closure only if keychain is not available
+    passwd_encrypted:bytes|None = None
+
+    def authentify_method(passwd:str|None = None, keychain_success:bool = False, clear_password_cache:bool = True) -> bool:
+        nonlocal passwd_encrypted
+        _log.debug('authentify(_,%s)', keychain_success)
+
+        if clear_password_cache:
+            passwd_encrypted = None
+            return True
+
+        # hash on seed used to create the secrete to produce the symmetric cryptographic key
+        def seed() -> None:
+            return None
+
+        try:
+            aw = config.app_window
+            if (
+                aw is not None
+                and aw.plus_account is not None
+            ):  # @UndefinedVariable
+                passwd_encrypted_decrypted:bool = False
+                if passwd is None and passwd_encrypted is not None:
+                    # if passwd is not given we use the cached one
+                    fernet = Fernet(base64.urlsafe_b64encode(str(hash(seed)).encode().ljust(32)[:32]))
+                    passwd = fernet.decrypt(passwd_encrypted).decode()
+                    passwd_encrypted_decrypted = True
+                    del fernet
+                if passwd is None:
+                    # fetch passwd from keychain
+                    try:
+                        import keyring  # @Reimport # imported last to make py2app work
+                        passwd = keyring.get_password(
+                            config.app_name, aw.plus_account
+                        )  # @UndefinedVariable
+                    except Exception as e:  # pylint: disable=broad-except
+                        _log.exception(e)
+                if passwd is not None and not keychain_success and not passwd_encrypted_decrypted:
+                    # only if password is given and could not be stored in keychain we keep it in-memory
+                    fernet = Fernet(base64.urlsafe_b64encode(str(hash(seed)).encode().ljust(32)[:32]))
+                    passwd_encrypted = fernet.encrypt(passwd.encode())
+                    del fernet
+                if passwd is None:
+                    _log.debug('-> password not found')
+                    clearCredentials()
+                    return False
+                _log.debug(
+                    '-> authentifying %s',
+                    aw.plus_account,
+                )  # @UndefinedVariable
+                data = {
+                    'email': aw.plus_account,
+                    'password': passwd,
+                }  # @UndefinedVariable
+                r = sendData(config.auth_url, data, 'POST', False)
+                del data
+                del passwd
+                _log.debug(
+                    '-> authentifying reply status code: %s',
+                    r.status_code,
+                )  # @UndefinedVariable
+                # returns 404: login wrong and 401: passwd wrong
+                if r.status_code != 204 and r.headers['content-type'].strip().startswith('application/json'):
+                    res = r.json()
+                    if (
+                        'success' in res
+                        and res['success']
+                        and 'result' in res
+                        and 'user' in res['result']
+                        and 'token' in res['result']['user']
+                    ):
+                        _log.debug(
+                            '-> authentified, token received'
+                        )
+                        # extract in user/account data
+                        nickname = util.extractInfo(
+                            res['result']['user'], 'nickname', None
+                        )
+                        aw.plus_language = util.extractInfo(
+                            res['result']['user'], 'language', 'en'
+                        )
+                        aw.plus_user_id = util.extractInfo(
+                            res['result']['user'], 'user_id', None
+                        )
+                        aw.plus_paidUntil = None
+                        aw.plus_subscription = None
+                        aw.plus_rlimit = 0
+                        aw.plus_used = 0
+                        if 'account' in res['result']['user']:
+                            res_account = res['result']['user']['account']
+                            if '_id' in res_account:
+                                aw.plus_account_id = res_account['_id']
+                            subscription = util.extractInfo(
+                                res_account, 'subscription', ''
+                            )
+                            aw.updateSubscriptionSignal.emit(subscription)
+                            paidUntil = util.extractInfo(
+                                res_account, 'paidUntil', ''
+                            )
+                            rlimit = -1
+                            rused = -1
+                            notifications = 0 # unqualified notifications
+                            machines = [] # list of machine names with matching notifications
                             try:
-                                aw.updateLimitsSignal.emit(rlimit,rused,paidUntil,notifications,machines)
+                                if 'limit' in res['result']['user']['account']:
+                                    ol = res_account['limit']
+                                    if 'rlimit' in ol:
+                                        rlimit = ol['rlimit']
+                                    if 'rused' in ol:
+                                        rused = ol['rused']
                             except Exception as e:  # pylint: disable=broad-except
                                 _log.exception(e)
 
+                            if 'notifications' in res:
+                                notificationDict = res['notifications']
+                                if notificationDict:
+                                    notifications = util.extractInfo(notificationDict, 'unqualified', 0)
+                                    machines = util.extractInfo(notificationDict, 'machines', [])
+                                try:
+                                    aw.updateLimitsSignal.emit(rlimit,rused,paidUntil,notifications,machines)
+                                except Exception as e:  # pylint: disable=broad-except
+                                    _log.exception(e)
 
-                        # note, here we have to convert the dateUtil string locally , instead of accessing aw.plus_paidUntil which might not yet have been set via the signal processing above
-                        try:
-                            if paidUntil != '' and (
-                                dateutil.parser.parse(paidUntil).date()
-    #                            - datetime.datetime.now().date()  # DTZ005 The use of `datetime.datetime.now()` without `tz` argument is not allowed
-                                - datetime.datetime.now(datetime.UTC).date()
-                            ).days < (-config.expired_subscription_max_days):
-                                _log.debug(
-                                        '-> authentication failed due to'
-                                        ' long expired subscription'
-                                )
-                                if 'error' in res:
-                                    aw.sendmessage(
-                                        res['error']
-                                    )  # @UndefinedVariable
-                                clearCredentials()
-                                return False
-                        except Exception as e:  # pylint: disable=broad-except
-                            _log.exception(e)
 
-                    if 'readonly' in res['result']['user'] and isinstance(
-                        res['result']['user']['readonly'], bool
-                    ):
-                        aw.plus_readonly = res['result']['user'][
-                            'readonly'
-                        ]
-                    else:
-                        aw.plus_readonly = False
-                    #
-                    setToken(res['result']['user']['token'], nickname)
-                    if (
-                        'account' in res['result']['user']
-                        and '_id' in res['result']['user']['account']
-                    ):
-                        account_nr = account.setAccount(
-                            res['result']['user']['account']['_id']
-                        )
-                        config.account_nr = account_nr
-                        _log.debug(
-                            '-> account: %s', account_nr
-                        )
-                    return True
-                _log.debug('-> authentication failed')
-                if 'error' in res:
-                    aw.sendmessage(
-                        res['error']
-                    )  # @UndefinedVariable
+                            # note, here we have to convert the dateUtil string locally , instead of accessing aw.plus_paidUntil which might not yet have been set via the signal processing above
+                            try:
+                                if paidUntil != '' and (
+                                    dateutil.parser.parse(paidUntil).date()
+        #                            - datetime.datetime.now().date()  # DTZ005 The use of `datetime.datetime.now()` without `tz` argument is not allowed
+                                    - datetime.datetime.now(datetime.UTC).date()
+                                ).days < (-config.expired_subscription_max_days):
+                                    _log.debug(
+                                            '-> authentication failed due to'
+                                            ' long expired subscription'
+                                    )
+                                    if 'error' in res:
+                                        aw.sendmessage(
+                                            res['error']
+                                        )  # @UndefinedVariable
+                                    clearCredentials()
+                                    return False
+                            except Exception as e:  # pylint: disable=broad-except
+                                _log.exception(e)
+
+                        if 'readonly' in res['result']['user'] and isinstance(
+                            res['result']['user']['readonly'], bool
+                        ):
+                            aw.plus_readonly = res['result']['user'][
+                                'readonly'
+                            ]
+                        else:
+                            aw.plus_readonly = False
+                        #
+                        setToken(res['result']['user']['token'], nickname)
+                        if (
+                            'account' in res['result']['user']
+                            and '_id' in res['result']['user']['account']
+                        ):
+                            account_nr = account.setAccount(
+                                res['result']['user']['account']['_id']
+                            )
+                            config.account_nr = account_nr
+                            _log.debug(
+                                '-> account: %s', account_nr
+                            )
+                        return True
+                    _log.debug('-> authentication failed')
+                    if 'error' in res:
+                        aw.sendmessage(
+                            res['error']
+                        )  # @UndefinedVariable
+                    clearCredentials()
+                    return False
+                _log.error('204: empty response')
                 clearCredentials()
-                return False
-            _log.error('204: empty response')
+            return False
+        except (requests.exceptions.ConnectTimeout, requests.exceptions.ReadTimeout) as e:
+            _log.info(e)
+            raise e
+        except requests.exceptions.SSLError as e:
+            _log.info(e)
             clearCredentials()
-        return False
-    except (requests.exceptions.ConnectTimeout, requests.exceptions.ReadTimeout) as e:
-        _log.info(e)
-        raise e
-    except requests.exceptions.SSLError as e:
-        _log.info(e)
-        clearCredentials()
-        aw = config.app_window
-        if aw is not None:
-            aw.sendmessage('SSLError')
-        raise e
-    except requests.exceptions.RequestException as e:
-        # most likely some protocol issue
-        _log.info(e)
-        raise e
-    except json.decoder.JSONDecodeError as e:
-        if not e.doc:
-            raise ValueError('Empty response.') from e
-        raise ValueError(f"Decoding error at char {e.pos} (line {e.lineno}, col {e.colno}): '{e.doc}'") from e
-    except Exception as e:  # pylint: disable=broad-except
-        _log.exception(e)
-        clearCredentials()
-        raise e
-
+            aw = config.app_window
+            if aw is not None:
+                aw.sendmessage('SSLError')
+            raise e
+        except requests.exceptions.RequestException as e:
+            # most likely some protocol issue
+            _log.info(e)
+            raise e
+        except json.decoder.JSONDecodeError as e:
+            if not e.doc:
+                raise ValueError('Empty response.') from e
+            raise ValueError(f"Decoding error at char {e.pos} (line {e.lineno}, col {e.colno}): '{e.doc}'") from e
+        except Exception as e:  # pylint: disable=broad-except
+            _log.exception(e)
+            clearCredentials()
+            raise e
+    return authentify_method
+authentify = make_authentify()
 
 def getHeaders(
     authorized: bool = True, decompress: bool = True) -> dict[str, str]:

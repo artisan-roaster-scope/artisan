@@ -168,8 +168,6 @@ with patch('PyQt6.QtCore.QSemaphore', MockQSemaphore), patch(
 ), patch(
     'plus.config.app_window', None
 ), patch(
-    'plus.config.passwd', None
-), patch(
     'plus.config.app_name', 'artisan.plus'
 ), patch(
     'keyring.set_password', Mock()
@@ -260,7 +258,6 @@ def reset_controller_state() -> Generator[None, None, None]:
     # Store original values
     original_connected = getattr(controller.config, 'connected', False)
     original_app_window = getattr(controller.config, 'app_window', None)
-    original_passwd = getattr(controller.config, 'passwd', None)
 
     # Reset semaphore mocks if they exist and are actually mocks
     if hasattr(controller, 'connect_semaphore'):
@@ -278,7 +275,6 @@ def reset_controller_state() -> Generator[None, None, None]:
     # Restore original values
     controller.config.connected = original_connected
     controller.config.app_window = original_app_window
-    controller.config.passwd = original_passwd
 
 
 @pytest.fixture
@@ -608,7 +604,6 @@ class TestConnectFunction:
         ):
 
             mock_config.app_window = mock_app_window
-            mock_config.passwd = 'password123'
             mock_connection.authentify = Mock(return_value=True)
             mock_qsemaphore.available.return_value = 0  # Semaphore acquired
 
@@ -638,7 +633,6 @@ class TestConnectFunction:
         ):
 
             mock_config.app_window = mock_app_window
-            mock_config.passwd = 'password123'
             mock_connection.authentify = Mock(return_value=False)
             mock_qsemaphore.available.return_value = 0  # Semaphore acquired
 
@@ -665,7 +659,6 @@ class TestConnectFunction:
         ) as mock_login:
 
             mock_config.app_window = mock_app_window
-            mock_config.passwd = None
             mock_connection.authentify = Mock(return_value=True)
             mock_qsemaphore.available.return_value = 0  # Semaphore acquired
 
@@ -675,7 +668,6 @@ class TestConnectFunction:
             # Assert
             mock_login.assert_called_once()
             assert mock_app_window.plus_account == 'test@example.com'
-            assert mock_config.passwd == 'password123'
 
     def test_connect_login_dialog_cancelled(
         self, mock_app_window: Mock, mock_qsemaphore: Mock
@@ -692,7 +684,6 @@ class TestConnectFunction:
         ):
 
             mock_config.app_window = mock_app_window
-            mock_config.passwd = None
             mock_qsemaphore.available.return_value = 0  # Semaphore acquired
 
             # Act
@@ -716,7 +707,6 @@ class TestConnectFunction:
         ):
 
             mock_config.app_window = mock_app_window
-            mock_config.passwd = 'password123'
             mock_connection.authentify = Mock(return_value=False)
             mock_qsemaphore.available.return_value = 0  # Semaphore acquired
 
@@ -744,26 +734,3 @@ class TestConnectFunction:
 
             # Should still release semaphore despite exception
             mock_qsemaphore.release.assert_called_once_with(1)
-
-#    def test_connect_non_interactive_mode(
-#        self, mock_app_window: Mock, mock_qsemaphore: Mock
-#    ) -> None:
-#        """Test connect in non-interactive mode."""
-#        # Arrange
-#        mock_app_window.plus_account = None
-#
-#        with patch("plus.controller.is_connected", return_value=False), patch(
-#            "plus.controller.connect_semaphore", mock_qsemaphore
-#        ), patch("plus.controller.config") as mock_config, patch(
-#            "plus.login.plus_login"
-#        ) as mock_login:
-#
-#            mock_config.app_window = mock_app_window
-#            mock_config.passwd = None
-#            mock_qsemaphore.available.return_value = 0  # Semaphore acquired
-#
-#            # Act
-#            controller.connect(interactive=False)
-#
-#            # Assert
-#            mock_login.assert_not_called()  # Should not show login dialog

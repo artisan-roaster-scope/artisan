@@ -139,7 +139,6 @@ app_window: 'ApplicationWindow|None' = None  # handle to the main Artisan applic
 #   app_window.updatePlusIcon() is a function that updates the toolbar
 #   plus service connection indicator icon
 connected: bool = False  # connection status
-passwd: str|None = None
 # the session token
 token: str|None = None
 # login nickname assigned on login with session token

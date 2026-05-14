@@ -128,6 +128,7 @@ def toggle(app_window:'ApplicationWindow') -> None:
 # NOTE: authentify might be called from outside the GUI thread (interactive must be False in this case!)
 @pyqtSlot()
 def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
+    config_passwd:str|None = None
     if not is_connected():
         _log.debug(
             'connect(%s,%s)', clear_on_failure, interactive
@@ -135,6 +136,7 @@ def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
         aw = config.app_window
         try:
             connect_semaphore.acquire(1)
+            keychain_success:bool = False # True once credentials could be successfully store in keychain
             if aw is not None:
                 import keyring  # @Reimport # imported last to make py2app work
                 account = aw.plus_account
@@ -150,15 +152,16 @@ def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
                 if account is not None:  # @UndefinedVariable
                     try:
                         # try-catch as the keyring might not work
-                        config.passwd = keyring.get_password(
+                        config_passwd = keyring.get_password(
                             config.app_name, account
                         )  # @UndefinedVariable
-                        if config.passwd is None:
+                        if config_passwd is None:
                             _log.debug(
                                 '-> keyring.get_password'
                                  ' returned None'
                             )
                         else:
+                            keychain_success = True
                             _log.debug(
                                 '-> keyring passwd received'
                             )
@@ -166,7 +169,7 @@ def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
                         _log.exception(e)
                 if interactive and (
                     aw.plus_account is None
-                    or config.passwd is None
+                    or config_passwd is None
                 ):  # @UndefinedVariable
                     # ask user for credentials
                     import plus.login
@@ -175,7 +178,7 @@ def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
                         aw,
                         aw,
                         aw.plus_email,
-                        config.passwd,
+                        config_passwd,
                         aw.plus_remember_credentials,
                     )  # @UndefinedVariable
                     if res:  # Login dialog not Canceled
@@ -187,16 +190,16 @@ def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
                         else:
                             aw.plus_email = None
                         # store the passwd in the keychain
-                        if (
-                            login is not None
+                        if (login is not None
                             and passwd is not None
-                            and remember
-                        ):
+                            and remember):
+                            # save credentials in keychain
                             try:
                                 # try-catch as the keyring might not work
                                 keyring.set_password(
                                     config.app_name, login, passwd
                                 )
+                                keychain_success = True
                                 _log.debug('keyring set password (%s)', login)
                             # pylint: disable=broad-except
                             except Exception as e:
@@ -216,8 +219,19 @@ def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
                                         True,
                                         None,
                                     )  # @UndefinedVariable
+                        elif login is not None and passwd is not None and not remember:
+                            # remove credentials from keychain, as it might have been stored before
+                            try:
+                                import keyring
+                                keyring.delete_password(
+                                    config.app_name, login
+                                )  # @UndefinedVariable
+                            except Exception:  # pylint: disable=broad-except
+                                pass
+
+
                         # remember password in memory for this session
-                        config.passwd = passwd
+                        config_passwd = passwd
             if aw is not None:
                 if aw.plus_account is None:  # @UndefinedVariable
                     if interactive:
@@ -227,7 +241,7 @@ def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
                             None,
                         )  # @UndefinedVariable
                 else:
-                    success = connection.authentify()
+                    success = connection.authentify(config_passwd, keychain_success)
                     if success:
                         config.connected = success
                         aw.sendmessageSignal.emit(
