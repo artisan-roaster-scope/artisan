@@ -22,6 +22,9 @@ environment:
   # Upgrade to specific version (for platforms supporting upgrade). Upgrade skipped if env var is missing or blank.
   PYUPGRADE_WIN_VER: 3.14.3
   #PYUPGRADE_MACOS_V: 3.12.1  # when upgrading see the notes in the deploy phase
+  
+  ARTISAN_KEY:
+    secure: 4BswEsF7OdFwgn3gMbnjkmCyAfJtmnak+3rmXzggbpitK0txN22SERo/sIh3wxse1L3rFDIPc+NDEEagMTFsODcmM8/gsclDbeJA4S5UTIY=
 
   matrix:
   - job_name: windows
@@ -128,6 +131,9 @@ for:
     - ps: $GIT_VERSION=git rev-parse --verify --short HEAD
     - ps: gc artisanlib/__init__.py | %{ $_ -replace "__revision__ = '.*'", "__revision__ = '$GIT_VERSION'" } | out-file newfile -encoding ascii
     - ps: move -force newfile artisanlib/__init__.py
+        
+    # Generate signature
+    - python generate_signature.py
 
     # run the build script
     - cmd: build-win3-pi.bat
@@ -198,9 +204,12 @@ for:
     - echo "MacOS Build"
     - chmod +x src/*.sh
     - chmod +x src/pylupdate6pro.py
+    - cd src
+
+    # Generate signature
+    - python generate_signature.py
 
     # run the build script
-    - cd src
     - ./build-macos3.sh
 
 # unit test fails as it runs on Py3.9 while the build installs under brew installed Py3.10 (see build-mac3.py)
@@ -280,6 +289,9 @@ for:
     - echo "Linux Build"
     - chmod +x src/*.sh
     - cd src
+
+    # Generate signature
+    - python generate_signature.py
 
     # run the build scripts
     - ./build-linux.sh

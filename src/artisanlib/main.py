@@ -18005,7 +18005,9 @@ class ApplicationWindow(QMainWindow):
 
                 # check signature if official build and settings 'artisan_version' is >= 4.2
                 if (self.official_build and not debugLogLevelActive() and
-                        settings.contains('artisan_version') and QVersionNumber.fromString(settings.value('artisan_version',__version__))[0] >= QVersionNumber(4,2,0)):
+                        settings.contains('System/artisan_version') and 
+                        QVersionNumber.fromString(settings.value('System/artisan_version'))[0] >= QVersionNumber(4,2,0) and
+                        QVersionNumber.fromString(settings.value('artisan_version',__version__))[0] >= QVersionNumber(4,2,0)):
 #                # testing:
 #                if (self.official_build and not debugLogLevelActive() and
 #                        settings.contains('System/artisan_version') and settings.contains('System/artisan_signature')):
@@ -18021,7 +18023,7 @@ class ApplicationWindow(QMainWindow):
                             public_key.verify(signature, message)
                     except Exception: # pylint: disable=broad-except
                         _log.error('settings signature invalid')
-                        self.qmc.adderror(QApplication.translate('Error Message','Exception: {} not a valid settings file').format(str(filename)))
+                        self.qmc.adderror(QApplication.translate('Error Message','Exception: {} not a Genuine Artisan settings file').format(str(filename)))
                         return False
 
 
