@@ -2866,6 +2866,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
             self.aw.qmc.scheduleID = None
             self.aw.qmc.scheduleDate = None
         self.aw.sendmessage(QApplication.translate('Message','Scheduler stopped'))
+        self.aw.disconnectPlusSignal.disconnect(self.updateScheduleWindow)
         self.accept()
 
     # returns True if the (visible filtered) schedule changed significantly by the updated new_schedule vs the previous old_schedule such that the

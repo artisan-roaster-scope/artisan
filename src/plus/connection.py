@@ -155,7 +155,7 @@ def make_authentify() -> Authentifier:
     # in-memory password stored in closure only if keychain is not available
     passwd_encrypted:bytes|None = None
 
-    def authentify_method(passwd:str|None = None, keychain_success:bool = False, clear_password_cache:bool = True) -> bool:
+    def authentify_method(passwd:str|None = None, keychain_success:bool = False, clear_password_cache:bool = False) -> bool:
         nonlocal passwd_encrypted
         _log.debug('authentify(_,%s)', keychain_success)
 
@@ -187,6 +187,7 @@ def make_authentify() -> Authentifier:
                         passwd = keyring.get_password(
                             config.app_name, aw.plus_account
                         )  # @UndefinedVariable
+                        keychain_success = True
                     except Exception as e:  # pylint: disable=broad-except
                         _log.exception(e)
                 if passwd is not None and not keychain_success and not passwd_encrypted_decrypted:
@@ -408,6 +409,7 @@ def sendData(
     _log.debug('-> size %s', len(jsondata))
 #    _log.debug("PRINT jsondata: %s",jsondata)
     headers, postdata = getHeadersAndData(authorized, compress, jsondata, verb)
+#    _log.debug("PRINT headers: %s",headers)
 
     try:
         if verb == 'POST':
@@ -464,6 +466,11 @@ def sendData(
 def getData(url: str, authorized: bool = True, params:dict[str,str]|None = None) -> requests.models.Response|None:
     _log.debug('getData(%s,%s,%s)', url, authorized, params)
     headers = getHeaders(authorized)
+    if authorized and 'Authorization' not in headers:
+        _log.debug('no access token')
+        # we don't have a token yet, lets first authorize
+        if not authentify():
+            return None
     params = params or {}
     #    _log.debug("-> request headers %s",headers)
     try:

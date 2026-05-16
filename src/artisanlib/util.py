@@ -316,7 +316,7 @@ def toBool(x:Any) -> bool:
         if x_lower in {'no', 'false', 'f', '0'}:
             return False
         try:
-            return bool(eval(x)) # pylint: disable=eval-used
+            return bool(eval(x[:100])) # pylint: disable=eval-used
         except Exception: # pylint: disable=broad-except
             return False
     return bool(x)

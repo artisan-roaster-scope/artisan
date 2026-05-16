@@ -16,6 +16,12 @@ DeltaBTlcd=false
 [Units]
 weight=g
 
+[Axis]
+ymax=350
+zmax=50
+
+[grid]
+zgrid=10
 
 [DefaultButtons]
 buttonactions=5, 0, 0, 0, 0, 0, 5, 5

@@ -643,11 +643,20 @@ class PID_DlgControl(ArtisanDialog):
             self.dTermSPweightSpinBox.valueChanged.connect(self.dTermSPweightChanged)
 
             # only for the internal PID we support a derative filter setting
-            self.derivativeFilterFlag = QCheckBox(QApplication.translate('Label','Derivative Filter'))
-            self.derivativeFilterFlag.setChecked(bool(self.aw.pidcontrol.derivative_filter))
+#            self.derivativeFilterFlag = QCheckBox(QApplication.translate('Label','Derivative Filter'))
+#            self.derivativeFilterFlag.setChecked(bool(self.aw.pidcontrol.derivative_filter))
+
+            derivativeFilterLabel = QLabel(QApplication.translate('Label','Derivative Filter'))
+            self.dFilterSpinBox = QSpinBox()
+            self.dFilterSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
+            self.dFilterSpinBox.setRange(0,5)
+            self.dFilterSpinBox.setSingleStep(1)
+            self.dFilterSpinBox.setValue(self.aw.pidcontrol.derivative_filter)
 
             DFilterBox = QHBoxLayout()
-            DFilterBox.addWidget(self.derivativeFilterFlag)
+#            DFilterBox.addWidget(self.derivativeFilterFlag)
+            DFilterBox.addWidget(derivativeFilterLabel)
+            DFilterBox.addWidget(self.dFilterSpinBox)
             DFilterBox.addStretch()
             DFilterBox.setContentsMargins(0,0,0,0)
 
@@ -1625,7 +1634,8 @@ class PID_DlgControl(ArtisanDialog):
             self.aw.pidcontrol.dutyMin = min(self.dutyMin.value(),self.dutyMax.value())
             self.aw.pidcontrol.dutyMax = max(self.dutyMin.value(),self.dutyMax.value())
             self.aw.pidcontrol.dutySteps = self.pidDutySteps.value()
-            self.aw.pidcontrol.derivative_filter = int(self.derivativeFilterFlag.isChecked())
+#            self.aw.pidcontrol.derivative_filter = int(self.derivativeFilterFlag.isChecked())
+            self.aw.pidcontrol.derivative_filter = int(self.dFilterSpinBox.value())
             self.aw.pidcontrol.duty_filter = int(self.dutyFilterFlag.isChecked())
             self.aw.pidcontrol.sv_filter = int(self.svFilterFlag.isChecked())
             self.aw.pidcontrol.pidDlimit = int(self.dLimitSpinBox.value())
