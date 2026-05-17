@@ -18,6 +18,7 @@ v4.0.4 (Jun XX, 2026)
   - adds initial Bulgarian localization ([Issue #2175](../../../issues/2175))
   - adds validation of profiles and settings
   - adds PID derivative filter size setting
+  - adds option to disable UNDO action on main event buttons
 * CHANGES
   - added a popup explaining the reason the Roast Properties dialog is opened on START if plus is connected and disabled the OK button until beans are specified  ([Issue #2133](../../../issues/2133))
   - adds hack to prevent dtr/rts signaling on connecting serial ports

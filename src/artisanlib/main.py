@@ -3720,7 +3720,7 @@ class ApplicationWindow(QMainWindow):
                              self.qmc.mark2Cstart,self.qmc.mark2Cend,self.qmc.markDrop,self.qmc.markCoolEnd,self.qmc.EventRecord]
         # list of buttons that can be controlled via the keyboard
         # RESET -> ON/OFF -> .. -> EVENT (RESET at index 0 is never used)
-        self.keyboardButtonList = [ # this list corresponds to the self.qmc.buttonvisibility, but has additionally the entry for the EVENT button
+        self.keyboardButtonList:list[EventPushButton] = [ # this list corresponds to the self.qmc.buttonvisibility, but has additionally the entry for the EVENT button
             self.buttonCHARGE,  # 0 CHARGE
             self.buttonDRY, # 1 DRY END
             self.buttonFCs,  # 2 FC START
@@ -12969,12 +12969,21 @@ class ApplicationWindow(QMainWindow):
                         # if we found our button, move one more to the right
                         if this_index == self.keyboardmoveindex:
                             self.moveKbutton('right') # now to the next
+                    # if undo is disabled, we also disable the button at this_index
+                    if not self.qmc.main_event_buttons_undo_enabled:
+                        self.keyboardButtonList[this_index].setEnabled(False)
                     # disable all buttons before this_index until the previous registered event
                     for i in range(this_index-1,-1,-1):
                         self.keyboardButtonList[i].setEnabled(False)
                         if self.qmc.timeindex[i]>0:
                             # stop if already marked
                             break
+
+                    visible_and_enabled_buttons = [idx for idx, key in enumerate(self.keyboardButtonList) if key.isEnabled() and (self.qmc.buttonvisibility + [bool(self.eventsbuttonflag)])[idx]]
+                    if len(visible_and_enabled_buttons) == 0:
+                        # if no more button is visible and enabled we reset all button marks
+                        self.resetKeyboardButtonMarks()
+
                 else:
                     # an undo action
                     # enable all buttons before this_index until the previous registered event
@@ -13017,16 +13026,22 @@ class ApplicationWindow(QMainWindow):
                 else: # we ignore this event
                     return
             else:
-                if kcommand == 'left':
-                    nextcmd = self.previousActiveButton(self.keyboardmoveindex)
+                visible_and_enabled_buttons = [idx for idx, key in enumerate(self.keyboardButtonList) if key.isEnabled() and (self.qmc.buttonvisibility + [bool(self.eventsbuttonflag)])[idx]]
+                if len(visible_and_enabled_buttons)>1:
+                    # only if there is more than one visible enabled button we move
+                    if kcommand == 'left':
+                        nextcmd = self.previousActiveButton(self.keyboardmoveindex)
+                    else:
+                        nextcmd = self.nextActiveButton(self.keyboardmoveindex)
+                    # activate the button at index nextcmd
+                    self.keyboardButtonList[nextcmd].setSelected(True)
+                    self.keyboardButtonList[self.keyboardmoveindex].setSelected(False)
+                    # update self.keyboardmoveindex
+                    self.keyboardmoveindex = nextcmd
                 else:
-                    nextcmd = self.nextActiveButton(self.keyboardmoveindex)
-                # activate the button at index nextcmd
-                self.keyboardButtonList[nextcmd].setSelected(True)
-                self.keyboardButtonList[self.keyboardmoveindex].setSelected(False)
-                # update self.keyboardmoveindex
-                self.keyboardmoveindex = nextcmd
-        # we enable keyboard event processing again
+                    # last visible enabled button pressed
+                    self.keyboardmoveindex += 1
+                    self.keyboardButtonList[self.keyboardmoveindex].setSelected(True)
 
     #sound feedback when pressing a push button
     @pyqtSlot()
@@ -18070,7 +18085,28 @@ class ApplicationWindow(QMainWindow):
 
             if self.resetqsettings or (filename is None and QApplication.queryKeyboardModifiers() == (Qt.KeyboardModifier.AltModifier | Qt.KeyboardModifier.ShiftModifier)):
                 self.resetqsettings = 0
-                settings.clear() # this allows to get rid of old Artisan settings via "Save Settings >> Factory Reset >> Load Settings"
+
+                # settings.clear()
+                # this ensures to get rid of old Artisan settings that have been retired via "Save Settings >> Factory Reset >> Load Settings"
+                # however, settings.clear() has the consequence that recent files/settings, the starts counter and lastdonationpopup
+                # are cleared as well such that the donation popup is shown always after a Factory Reset and recent files/settings menu entries are lost
+                # thus we have to take care to preserve those over this FactoryReset here
+                lastdonationpopup:int|None = None
+                if settings.contains('lastdonationpopup'):
+                    lastdonationpopup = toInt(settings.value('lastdonationpopup'))
+                starts:int|None = None
+                if settings.contains('starts'):
+                    starts = toInt(settings.value('starts'))
+                recentSettings = toStringList(settings.value('recentSettingList'))
+                settings.clear()
+                if lastdonationpopup is not None:
+                    settings.setValue('lastdonationpopup',lastdonationpopup)
+                if starts is not None:
+                    settings.setValue('starts',starts)
+                settings.setValue('recentRoasts',self.recentRoasts)
+                settings.setValue('recentSettingList', recentSettings)
+
+
                 if 'canvas' in self.qmc.palette:
                     self.updateCanvasColors(checkColors=False)
                 # remove window geometry and splitter settings
@@ -18894,6 +18930,7 @@ class ApplicationWindow(QMainWindow):
             self.qmc.extrabuttonactionstrings = list(map(str,list(toStringList(settings.value('extrabuttonactionstrings',self.qmc.extrabuttonactionstrings)))))
             self.qmc.xextrabuttonactions = [toInt(x) for x in toList(settings.value('xextrabuttonactions', self.qmc.xextrabuttonactions))]
             self.qmc.xextrabuttonactionstrings = list(map(str,list(toStringList(settings.value('xextrabuttonactionstrings',self.qmc.xextrabuttonactionstrings)))))
+            self.qmc.main_event_buttons_undo_enabled = toBool(settings.value('buttons_undo',self.qmc.main_event_buttons_undo_enabled))
             settings.endGroup()
 #--- END GROUP DefaultButtons
 
@@ -20743,6 +20780,7 @@ class ApplicationWindow(QMainWindow):
             self.settingsSetValue(settings, default_settings, 'extrabuttonactionstrings',self.qmc.extrabuttonactionstrings, read_defaults)
             self.settingsSetValue(settings, default_settings, 'xextrabuttonactions',self.qmc.xextrabuttonactions, read_defaults)
             self.settingsSetValue(settings, default_settings, 'xextrabuttonactionstrings',self.qmc.xextrabuttonactionstrings, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'buttons_undo',self.qmc.main_event_buttons_undo_enabled, read_defaults)
             settings.endGroup()
 #--- END GROUP DefaultButtons
 

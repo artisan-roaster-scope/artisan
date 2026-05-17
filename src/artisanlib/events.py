@@ -1501,8 +1501,24 @@ class EventsDlg(ArtisanResizeablDialog):
         defaultButtonsLayout.setHorizontalSpacing(10)
         defaultButtonsLayout.setVerticalSpacing(5)
         defaultButtonsLayout.setColumnMinimumWidth(3,20)
+
+        self.eventUndo = QCheckBox(QApplication.translate('CheckBox','UNDO'))
+        self.eventUndo.setToolTip(QApplication.translate('Tooltip', 'Undoing of event markers by pressing the corresponding main event button again'))
+        self.eventUndo.setChecked(bool(self.aw.qmc.main_event_buttons_undo_enabled))
+
+        defaultButtonsOptionsQHBoxLayout = QHBoxLayout()
+        defaultButtonsOptionsQHBoxLayout.addStretch()
+        defaultButtonsOptionsQHBoxLayout.addWidget(self.eventUndo)
+        defaultButtonsOptionsQHBoxLayout.addStretch()
+
+        defaultButtonsQVBoxLayout = QVBoxLayout()
+        defaultButtonsQVBoxLayout.addLayout(defaultButtonsLayout)
+        defaultButtonsQVBoxLayout.addLayout(defaultButtonsOptionsQHBoxLayout)
+
         ButtonGroupLayout = QGroupBox(QApplication.translate('GroupBox','Default Buttons'))
-        ButtonGroupLayout.setLayout(defaultButtonsLayout)
+#        ButtonGroupLayout.setLayout(defaultButtonsLayout)
+        ButtonGroupLayout.setLayout(defaultButtonsQVBoxLayout)
+
         if self.app.artisanviewerMode:
             ButtonGroupLayout.setEnabled(False)
 
@@ -3640,6 +3656,7 @@ class EventsDlg(ArtisanResizeablDialog):
                 # save column widths
                 self.aw.eventbuttontablecolumnwidths = [self.eventbuttontable.columnWidth(c) for c in range(self.eventbuttontable.columnCount())]
                 #save default buttons
+                self.aw.qmc.main_event_buttons_undo_enabled = self.eventUndo.isChecked()
                 self.aw.qmc.buttonvisibility[0] = self.CHARGEbutton.isChecked()
                 self.aw.buttonCHARGE.setVisible(bool(self.aw.qmc.buttonvisibility[0]))
                 if bool(self.aw.qmc.buttonvisibility[0]) and not self.aw.buttonCHARGE.isFlat() and not self.aw.buttonCHARGE.animating:

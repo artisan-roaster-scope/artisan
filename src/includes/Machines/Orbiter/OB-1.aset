@@ -31,6 +31,7 @@ extrabuttonactions=5, 5, 0
 extrabuttonactionstrings=orbiter(01), orbiter(06), 
 xextrabuttonactions=0, 5
 xextrabuttonactionstrings=, "orbiter(07,0,1)"
+buttons_undo=false
 
 [events]
 default_etypes_set=0, 0, 0, 1, 0

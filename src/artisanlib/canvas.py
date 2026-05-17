@@ -1702,15 +1702,16 @@ class tgraphcanvas(QObject):
 
         #variables to configure the 8 default buttons
         # button = 0:CHARGE, 1:DRY_END, 2:FC_START, 3:FC_END, 4:SC_START, 5:SC_END, 6:DROP, 7:COOL_END;
-        self.buttonvisibility = [True,True,True,True,True,False,True,False]
-        self.buttonactions = [0]*8
-        self.buttonactionstrings = ['']*8
+        self.buttonvisibility:list[bool] = [True,True,True,True,True,False,True,False]
+        self.buttonactions:list[int] = [0]*8
+        self.buttonactionstrings:list[str] = ['']*8
         #variables to configure the 0: ON, 1: OFF, 2: SAMPLE, 3:RESET, 4:START
-        self.extrabuttonactions = [0]*3
-        self.extrabuttonactionstrings = ['']*3
+        self.extrabuttonactions:list[int] = [0]*3
+        self.extrabuttonactionstrings:list[str] = ['']*3
         #variables to configure the 0:RESET, 1:START
-        self.xextrabuttonactions = [0]*2
-        self.xextrabuttonactionstrings = ['']*2
+        self.xextrabuttonactions:list[int] = [0]*2
+        self.xextrabuttonactionstrings:list[str] = ['']*2
+        self.main_event_buttons_undo_enabled:bool = True
 
         #flag to activate the automatic marking of the CHARGE and DROP events
         self.chargeTimerFlag: bool = False
@@ -6690,7 +6691,14 @@ class tgraphcanvas(QObject):
                     #calculate the temperature endpoint at endofx according to the latest rate of change
                     if self.l_BTprojection is not None:
                         # only draw if BT RoR is not exactly 0 (as on start)
-                        if self.unfiltereddelta2_pure[-1] != 0 and self.BTcurve and len(self.unfiltereddelta2_pure) > 0 and len(self.ctemp2) > 0 and self.ctemp2[-1] is not None and self.ctemp2[-1] != -1 and not math.isnan(self.ctemp2[-1]):
+                        if (len(self.unfiltereddelta2_pure) > 0 and
+                                self.unfiltereddelta2_pure[-1] != 0 and
+                                self.BTcurve and
+                                len(self.unfiltereddelta2_pure) > 0 and
+                                len(self.ctemp2) > 0 and
+                                self.ctemp2[-1] is not None and
+                                self.ctemp2[-1] != -1 and
+                                not math.isnan(self.ctemp2[-1])):
                             # projection extended to the plots current endofx
                             left = now
                             right = max(left, xlim_right + charge) # never have the right point be left of left;)
@@ -6704,7 +6712,14 @@ class tgraphcanvas(QObject):
                         self.l_BTprojection.set_data(self.BTprojection_tx, self.BTprojection_temp)
                     if self.l_ETprojection is not None:
                         # only draw if ET RoR is not exactly 0 (as on start)
-                        if self.unfiltereddelta1_pure[-1] != 0 and self.ETcurve and len(self.unfiltereddelta1_pure) > 0 and len(self.ctemp1) > 0 and self.ctemp1[-1] is not None and self.ctemp1[-1] != -1 and not math.isnan(self.ctemp1[-1]):
+                        if (len(self.unfiltereddelta1_pure) > 0 and
+                                self.unfiltereddelta1_pure[-1] != 0 and
+                                self.ETcurve and
+                                len(self.unfiltereddelta1_pure) > 0 and
+                                len(self.ctemp1) > 0 and
+                                self.ctemp1[-1] is not None and
+                                self.ctemp1[-1] != -1 and
+                                not math.isnan(self.ctemp1[-1])):
                             # projection extended to the plots current endofx
                             left = now
                             right = max(left,xlim_right + charge) # never have the right point be left of left;)
