@@ -74,7 +74,7 @@
         <location filename="../artisanlib/canvas.py" line="11947"/>
         <location filename="../artisanlib/statistics.py" line="198"/>
         <source>Roast of the Day</source>
-        <translation>Печено на деня</translation>
+        <translation>Печене на деня</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="12024"/>
@@ -102,19 +102,19 @@
         <location filename="../artisanlib/canvas.py" line="12050"/>
         <location filename="../artisanlib/statistics.py" line="207"/>
         <source>Density Roasted</source>
-        <translation>Плътност на печене</translation>
+        <translation>Плътност на изпеченото кафе</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="12054"/>
         <location filename="../artisanlib/statistics.py" line="208"/>
         <source>Moisture Roasted</source>
-        <translation>Печено на влага</translation>
+        <translation>Влажност на изпеченото кафе</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="12058"/>
         <location filename="../artisanlib/statistics.py" line="209"/>
         <source>Ground Color</source>
-        <translation>Цвят на основата</translation>
+        <translation>Цвят на смляното кафе</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="12062"/>
@@ -138,7 +138,7 @@
         <location filename="../artisanlib/canvas.py" line="12104"/>
         <location filename="../artisanlib/statistics.py" line="218"/>
         <source>Weight Loss</source>
-        <translation>Отслабване</translation>
+        <translation>Загуба на тегло</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="11987"/>
@@ -168,7 +168,7 @@
     <message>
         <location filename="../artisanlib/canvas.py" line="12171"/>
         <source>Yield</source>
-        <translation>Доходност</translation>
+        <translation>Добив</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="12177"/>
@@ -253,7 +253,7 @@
     <message>
         <location filename="../artisanlib/wheels.py" line="136"/>
         <source>Open</source>
-        <translation>Отворено</translation>
+        <translation>Отвори</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="292"/>
@@ -298,7 +298,7 @@
         <location filename="../artisanlib/pid_dialogs.py" line="450"/>
         <location filename="../artisanlib/pid_dialogs.py" line="299"/>
         <source>Set</source>
-        <translation>Комплект</translation>
+        <translation>Задай</translation>
     </message>
     <message>
         <location filename="../artisanlib/alarms.py" line="100"/>
@@ -365,27 +365,27 @@
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="1955"/>
         <source>Write SV</source>
-        <translation>Напишете SV</translation>
+        <translation>Запиши SV</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="1966"/>
         <source>Read SV</source>
-        <translation>Прочетете SV</translation>
+        <translation>Прочети SV</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="1981"/>
         <source>Set p</source>
-        <translation>Задайте p</translation>
+        <translation>Задай p</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="1983"/>
         <source>Set i</source>
-        <translation>Комплект i</translation>
+        <translation>Задай i</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="1985"/>
         <source>Set d</source>
-        <translation>Комплект d</translation>
+        <translation>Задай d</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3099"/>
@@ -411,7 +411,7 @@
         <location filename="../artisanlib/pid_dialogs.py" line="2035"/>
         <location filename="../artisanlib/pid_dialogs.py" line="2033"/>
         <source>Read</source>
-        <translation>Прочетете</translation>
+        <translation>Прочети</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3167"/>
@@ -443,47 +443,47 @@
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2886"/>
         <source>Write SV1</source>
-        <translation>Напишете SV1</translation>
+        <translation>Запиши SV1</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2888"/>
         <source>Write SV2</source>
-        <translation>Напишете SV2</translation>
+        <translation>Запиши SV2</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2890"/>
         <source>Write SV3</source>
-        <translation>Напишете SV3</translation>
+        <translation>Запиши SV3</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2892"/>
         <source>Write SV4</source>
-        <translation>Напишете SV4</translation>
+        <translation>Запиши SV4</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2894"/>
         <source>Write SV5</source>
-        <translation>Напишете SV5</translation>
+        <translation>Запиши SV5</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2896"/>
         <source>Write SV6</source>
-        <translation>Напишете SV6</translation>
+        <translation>Запиши SV6</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2898"/>
         <source>Write SV7</source>
-        <translation>Напишете SV7</translation>
+        <translation>Запиши SV7</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2977"/>
         <source>Read SV (7-0)</source>
-        <translation>Прочетете SV (7-0)</translation>
+        <translation>Прочети SV (7-0)</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2979"/>
         <source>Write SV (7-0)</source>
-        <translation>Напишете SV (7-0)</translation>
+        <translation>Запиши SV (7-0)</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="3081"/>
@@ -538,7 +538,7 @@
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="4769"/>
         <source>Write</source>
-        <translation>Пишете</translation>
+        <translation>Запиши</translation>
     </message>
     <message>
         <location filename="../artisanlib/transposer.py" line="137"/>
@@ -588,7 +588,7 @@
     <message>
         <location filename="../artisanlib/events.py" line="700"/>
         <source>&lt;&lt; Store Palette</source>
-        <translation>&lt;&lt; Палитра на магазина</translation>
+        <translation>&lt;&lt; Съхрани палитра</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="702"/>
@@ -719,7 +719,7 @@
     <message>
         <location filename="../artisanlib/curves.py" line="836"/>
         <source>Plot</source>
-        <translation>Сюжет</translation>
+        <translation>Начертай</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="839"/>
@@ -738,7 +738,7 @@
         <location filename="../artisanlib/colors.py" line="125"/>
         <location filename="../artisanlib/curves.py" line="843"/>
         <source>Background</source>
-        <translation>Предистория</translation>
+        <translation>Фон</translation>
     </message>
     <message>
         <location filename="../artisanlib/cup_profile.py" line="101"/>
@@ -849,12 +849,12 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="3282"/>
         <source>CHARGE</source>
-        <translation>ЗАРАЖДАНЕ</translation>
+        <translation>ЗАРЯД</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="3287"/>
         <source>DROP</source>
-        <translation>КАПАНЕ</translation>
+        <translation>ИЗСИПВАНЕ</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="3292"/>
@@ -900,15 +900,13 @@ END</source>
         <location filename="../artisanlib/main.py" line="3366"/>
         <source>DRY
 END</source>
-        <translation>СУХО
-КРАЙ</translation>
+        <translation>КРАЙ НА СУШЕНЕТО</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="3371"/>
         <source>COOL
 END</source>
-        <translation>ГОТИНО
-КРАЙ</translation>
+        <translation>КРАЙ НА ОХЛАЖДАНЕТО</translation>
     </message>
     <message>
         <location filename="../artisanlib/transposer.py" line="134"/>
@@ -939,7 +937,7 @@ END</source>
         <location filename="../artisanlib/colors.py" line="155"/>
         <location filename="../artisanlib/canvas.py" line="12138"/>
         <source>Maillard Phase</source>
-        <translation>Фаза на Майлар</translation>
+        <translation>Фаза на Майяр</translation>
     </message>
     <message>
         <location filename="../artisanlib/colors.py" line="150"/>
@@ -959,7 +957,7 @@ END</source>
         <location filename="../artisanlib/colors.py" line="67"/>
         <location filename="../artisanlib/colors.py" line="57"/>
         <source>ET</source>
-        <translation>Източно време</translation>
+        <translation>ET</translation>
     </message>
     <message>
         <location filename="../artisanlib/colors.py" line="93"/>
@@ -1072,7 +1070,7 @@ END</source>
     <message>
         <location filename="../artisanlib/colors.py" line="257"/>
         <source>MET Text</source>
-        <translation>Текст за ТРЕТИРАНИ ОБЕКТИ</translation>
+        <translation>MET текст</translation>
     </message>
     <message>
         <location filename="../artisanlib/colors.py" line="262"/>
@@ -1162,7 +1160,7 @@ END</source>
         <location filename="../artisanlib/comm.py" line="193"/>
         <location filename="../artisanlib/axis.py" line="266"/>
         <source>ET</source>
-        <translation>Източно време</translation>
+        <translation>ET</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="89"/>
@@ -1303,12 +1301,12 @@ END</source>
     <message>
         <location filename="../artisanlib/ports.py" line="267"/>
         <source>Int</source>
-        <translation>Международен</translation>
+        <translation>Цяло число</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="270"/>
         <source>Float</source>
-        <translation>Плуване</translation>
+        <translation>Дробно число</translation>
     </message>
     <message>
         <location filename="../artisanlib/ports.py" line="1378"/>
@@ -1410,13 +1408,13 @@ END</source>
         <location filename="../artisanlib/main.py" line="23963"/>
         <location filename="../artisanlib/roast_properties.py" line="1201"/>
         <source>Drops</source>
-        <translation>Капки</translation>
+        <translation>Изсипване</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="23965"/>
         <location filename="../artisanlib/roast_properties.py" line="1204"/>
         <source>Oily</source>
-        <translation>Мазна</translation>
+        <translation>Мазни зърна</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="23967"/>
@@ -1428,19 +1426,19 @@ END</source>
         <location filename="../artisanlib/main.py" line="23969"/>
         <location filename="../artisanlib/roast_properties.py" line="1209"/>
         <source>Tipping</source>
-        <translation>Бакшиш</translation>
+        <translation>Обгаряне на върховете</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="23971"/>
         <location filename="../artisanlib/roast_properties.py" line="1211"/>
         <source>Scorching</source>
-        <translation>Парещо</translation>
+        <translation>Изгаряне</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="23973"/>
         <location filename="../artisanlib/roast_properties.py" line="1213"/>
         <source>Divots</source>
-        <translation>Дивоти</translation>
+        <translation>Вдлъбнатини</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1418"/>
@@ -1510,7 +1508,7 @@ END</source>
     <message>
         <location filename="../artisanlib/curves.py" line="418"/>
         <source>Drop Spikes</source>
-        <translation>Капка шипове</translation>
+        <translation>Изсипване на шипове</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="647"/>
@@ -1560,7 +1558,7 @@ END</source>
     <message>
         <location filename="../artisanlib/statistics.py" line="59"/>
         <source>Bar</source>
-        <translation>Бар</translation>
+        <translation>Лента</translation>
     </message>
     <message>
         <location filename="../artisanlib/statistics.py" line="67"/>
@@ -1581,7 +1579,7 @@ END</source>
         <location filename="../artisanlib/cup_profile.py" line="109"/>
         <location filename="../artisanlib/statistics.py" line="131"/>
         <source>Background</source>
-        <translation>Предистория</translation>
+        <translation>Фон</translation>
     </message>
     <message>
         <location filename="../artisanlib/statistics.py" line="136"/>
@@ -1694,7 +1692,7 @@ END</source>
         <location filename="../artisanlib/comparator.py" line="994"/>
         <location filename="../artisanlib/axis.py" line="193"/>
         <source>Roast</source>
-        <translation>Печено</translation>
+        <translation>Печене</translation>
     </message>
     <message>
         <location filename="../artisanlib/comparator.py" line="995"/>
@@ -2102,7 +2100,7 @@ END</source>
         <location filename="../artisanlib/curves.py" line="2247"/>
         <location filename="../artisanlib/events.py" line="1109"/>
         <source>ET</source>
-        <translation>Източно време</translation>
+        <translation>ET</translation>
     </message>
     <message>
         <location filename="../artisanlib/curves.py" line="2248"/>
@@ -4425,7 +4423,7 @@ END</source>
     <message>
         <location filename="../artisanlib/axis.py" line="70"/>
         <source>Axes</source>
-        <translation>Брадви</translation>
+        <translation>Оси</translation>
     </message>
     <message>
         <location filename="../artisanlib/wheels.py" line="41"/>
@@ -4766,12 +4764,12 @@ END</source>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="606"/>
         <source>Clamp</source>
-        <translation>Скоба</translation>
+        <translation>Ограничение</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="621"/>
         <source>Duty</source>
-        <translation>Мито</translation>
+        <translation>Работен цикъл</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="1207"/>
@@ -5213,7 +5211,7 @@ END</source>
         <location filename="../artisanlib/main.py" line="22084"/>
         <location filename="../artisanlib/main.py" line="21889"/>
         <source>Beans</source>
-        <translation>Боб</translation>
+        <translation>Зърна</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="23233"/>
@@ -5238,12 +5236,12 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="21893"/>
         <source>Def.</source>
-        <translation>Защита.</translation>
+        <translation>Деф.</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="21894"/>
         <source>Def.L</source>
-        <translation>Защита Л</translation>
+        <translation>Деф. Загуба</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="22142"/>
@@ -5333,7 +5331,7 @@ END</source>
         <location filename="../artisanlib/main.py" line="22402"/>
         <location filename="../artisanlib/main.py" line="22340"/>
         <source>Weight Loss</source>
-        <translation>Отслабване</translation>
+        <translation>Загуба на тегло</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="23235"/>
@@ -5344,12 +5342,12 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="22342"/>
         <source>Cupping</source>
-        <translation>Вендузи</translation>
+        <translation>Каппинг</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="22343"/>
         <source>Roaster</source>
-        <translation>Пекарна</translation>
+        <translation>Ростер</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="22344"/>
@@ -5559,7 +5557,7 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="22391"/>
         <source>Total RoR</source>
-        <translation>Обща възвръщаемост на риска</translation>
+        <translation>Общ RoR</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="22392"/>
@@ -5599,7 +5597,7 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="22401"/>
         <source>Weight Out</source>
-        <translation>Отслабване</translation>
+        <translation>Изходно тегло</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="22403"/>
@@ -5644,7 +5642,7 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="22411"/>
         <source>Moisture Roasted</source>
-        <translation>Печено на влага</translation>
+        <translation>Влажност след печене</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="22412"/>
@@ -5681,7 +5679,7 @@ END</source>
         <location filename="../artisanlib/main.py" line="23915"/>
         <location filename="../artisanlib/main.py" line="22419"/>
         <source>Cupping Notes</source>
-        <translation>Бележки за вендузи</translation>
+        <translation>Бележки от каппинг</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="22420"/>
@@ -5886,7 +5884,7 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="23837"/>
         <source>Beans:</source>
-        <translation>Боб:</translation>
+        <translation>Зърна:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="23839"/>
@@ -5901,7 +5899,7 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="23845"/>
         <source>Roaster:</source>
-        <translation>Пекарна:</translation>
+        <translation>Ростер:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="23847"/>
@@ -6042,7 +6040,7 @@ END</source>
     <message>
         <location filename="../artisanlib/main.py" line="23902"/>
         <source>RoR:</source>
-        <translation>Доказателство за маршрут:</translation>
+        <translation>RoR:</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="23904"/>
@@ -7725,7 +7723,7 @@ Hold Shift+Alt [Win]</source>
         <location filename="../help/keyboardshortcuts_help.py" line="119"/>
         <location filename="../help/keyboardshortcuts_help.py" line="118"/>
         <source>Roast</source>
-        <translation>Печено</translation>
+        <translation>Печене</translation>
     </message>
     <message>
         <location filename="../help/keyboardshortcuts_help.py" line="118"/>
@@ -11372,7 +11370,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
         <location filename="../artisanlib/roast_properties.py" line="897"/>
         <location filename="../plus/blend.py" line="343"/>
         <source>Beans</source>
-        <translation>Боб</translation>
+        <translation>Зърна</translation>
     </message>
     <message>
         <location filename="../artisanlib/statistics.py" line="231"/>
@@ -11426,7 +11424,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
         <location filename="../artisanlib/statistics.py" line="214"/>
         <location filename="../plus/schedule.py" line="2131"/>
         <source>Cupping Score</source>
-        <translation>Резултат от купинг</translation>
+        <translation>Оценка от каппинг</translation>
     </message>
     <message>
         <location filename="../artisanlib/statistics.py" line="215"/>
@@ -11434,7 +11432,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
         <location filename="../plus/schedule.py" line="2138"/>
         <location filename="../plus/schedule.py" line="2137"/>
         <source>Cupping Notes</source>
-        <translation>Бележки за вендузи</translation>
+        <translation>Бележки от каппинг</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="905"/>
@@ -11551,7 +11549,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
     <message>
         <location filename="../artisanlib/wheels.py" line="447"/>
         <source> dg</source>
-        <translation>генерален директор</translation>
+        <translation>°</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="18400"/>
@@ -11614,7 +11612,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
         <location filename="../artisanlib/events.py" line="293"/>
         <location filename="../artisanlib/comparator.py" line="862"/>
         <source>ET</source>
-        <translation>Източно време</translation>
+        <translation>ET</translation>
     </message>
     <message>
         <location filename="../artisanlib/comparator.py" line="894"/>
@@ -11798,7 +11796,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="165"/>
         <source>PV</source>
-        <translation>Фотоволтаична система</translation>
+        <translation>PV</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="8554"/>
@@ -11910,7 +11908,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
         <location filename="../artisanlib/main.py" line="6214"/>
         <location filename="../artisanlib/pid_dialogs.py" line="458"/>
         <source>Background</source>
-        <translation>Предистория</translation>
+        <translation>Фон</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="465"/>
@@ -11950,7 +11948,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="654"/>
         <source>PoE</source>
-        <translation>Поверителен сертификат за валидност</translation>
+        <translation>PoE</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="656"/>
@@ -11960,7 +11958,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="659"/>
         <source>DoE</source>
-        <translation>Министерство на природосъобразността</translation>
+        <translation>DoE</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="661"/>
@@ -12106,7 +12104,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="1918"/>
         <source>Ramp/Soak Pattern</source>
-        <translation>Модел на рампа/накисване</translation>
+        <translation>Шаблон за рампа/накисване</translation>
     </message>
     <message>
         <location filename="../artisanlib/pid_dialogs.py" line="2950"/>
@@ -12332,7 +12330,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
         <location filename="../artisanlib/canvas.py" line="16176"/>
         <location filename="../artisanlib/events.py" line="603"/>
         <source>MET</source>
-        <translation>ТРЕТИРАН ПЛАЩАНЕ</translation>
+        <translation>МЕТ</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="631"/>
@@ -12823,7 +12821,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1051"/>
         <source>Screen</source>
-        <translation>Екран</translation>
+        <translation>Сито</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1070"/>
@@ -12833,7 +12831,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1077"/>
         <source>Ground</source>
-        <translation>Земя</translation>
+        <translation>Смляно</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1134"/>
@@ -12849,7 +12847,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1362"/>
         <source>Stock</source>
-        <translation>Запас</translation>
+        <translation>Наличност</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1364"/>
@@ -12978,7 +12976,7 @@ Using math formulas in the plotter also allows to use the symbolic variables P a
         <location filename="../artisanlib/roast_properties.py" line="3594"/>
         <location filename="../artisanlib/roast_properties.py" line="3589"/>
         <source>Roast</source>
-        <translation>Печено</translation>
+        <translation>Печене</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="3632"/>
@@ -13349,7 +13347,7 @@ LCD дисплеи Всички</translation>
     <message>
         <location filename="../artisanlib/statistics.py" line="200"/>
         <source>Roaster</source>
-        <translation>Пекарна</translation>
+        <translation>Ростер</translation>
     </message>
     <message>
         <location filename="../artisanlib/statistics.py" line="228"/>
@@ -13433,7 +13431,7 @@ Fewer nodes: simpler curve but may lose detail</source>
         <location filename="../artisanlib/main.py" line="3453"/>
         <location filename="../artisanlib/large_lcds.py" line="579"/>
         <source>PID SV</source>
-        <translation>ПИД променлив ток</translation>
+        <translation>ПИД зададена стойност</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="3457"/>
@@ -13565,7 +13563,7 @@ Fewer nodes: simpler curve but may lose detail</source>
     <message>
         <location filename="../artisanlib/main.py" line="6276"/>
         <source>MET Text</source>
-        <translation>Текст за ТРЕТИРАНИ ОБЕКТИ</translation>
+        <translation>МЕТ Текст</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="6279"/>
@@ -13799,7 +13797,7 @@ Fewer nodes: simpler curve but may lose detail</source>
         <location filename="../artisanlib/main.py" line="26664"/>
         <location filename="../artisanlib/main.py" line="26652"/>
         <source>MANUAL</source>
-        <translation>РЪКОВОДСТВО</translation>
+        <translation>РЪЧНО</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="26653"/>
@@ -13843,7 +13841,7 @@ Fewer nodes: simpler curve but may lose detail</source>
     <message>
         <location filename="../artisanlib/main.py" line="26661"/>
         <source>FILL</source>
-        <translation>ПОПЪЛНЕТЕ</translation>
+        <translation>ПЪЛНЕНЕ</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="26663"/>
@@ -13913,7 +13911,7 @@ Fewer nodes: simpler curve but may lose detail</source>
     <message>
         <location filename="../artisanlib/devices.py" line="114"/>
         <source>Logging</source>
-        <translation>Дърводобив</translation>
+        <translation>Протоколиране</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="117"/>
@@ -13982,7 +13980,7 @@ Fewer nodes: simpler curve but may lose detail</source>
         <location filename="../artisanlib/devices.py" line="433"/>
         <location filename="../artisanlib/devices.py" line="385"/>
         <source>Rate</source>
-        <translation>Оцени</translation>
+        <translation>Скорост</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="1011"/>
@@ -13993,7 +13991,7 @@ Fewer nodes: simpler curve but may lose detail</source>
     <message>
         <location filename="../artisanlib/devices.py" line="555"/>
         <source>Gain</source>
-        <translation>Печалба</translation>
+        <translation>Усилване</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="715"/>
@@ -14030,7 +14028,7 @@ Fewer nodes: simpler curve but may lose detail</source>
     <message>
         <location filename="../artisanlib/devices.py" line="1123"/>
         <source>MASL</source>
-        <translation>МДС</translation>
+        <translation>MASL</translation>
     </message>
     <message>
         <location filename="../artisanlib/devices.py" line="1124"/>
@@ -14674,7 +14672,7 @@ Fewer nodes: simpler curve but may lose detail</source>
         <location filename="../artisanlib/main.py" line="4410"/>
         <location filename="../artisanlib/main.py" line="2384"/>
         <source>Roast</source>
-        <translation>Печено</translation>
+        <translation>Печене</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="2421"/>
@@ -16870,7 +16868,7 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
     <message>
         <location filename="../artisanlib/main.py" line="25157"/>
         <source>artisan-settings</source>
-        <translation>занаятчийски обстановки</translation>
+        <translation>artisan-настройки</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="25158"/>
@@ -16885,7 +16883,7 @@ It is advisable to save your current settings beforehand via menu Help &gt;&gt; 
     <message>
         <location filename="../artisanlib/main.py" line="25224"/>
         <source>artisan-theme</source>
-        <translation>занаятчийска тема</translation>
+        <translation>artisan-тема</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="25225"/>
@@ -17460,7 +17458,7 @@ Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
     <message>
         <location filename="../artisanlib/canvas.py" line="14667"/>
         <source>CHARGE: Scope is not recording</source>
-        <translation>ЗАРЕЖДАНЕ: Телескопът не записва</translation>
+        <translation>ЗАРЯД: Осцилоскопът не записва</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="14692"/>
@@ -17475,7 +17473,7 @@ Correct this on the Config&gt;Curves&gt;Analyze tab.</source>
     <message>
         <location filename="../artisanlib/canvas.py" line="14810"/>
         <source>DRY END: Scope is not recording</source>
-        <translation>СУХ КРАЙ: Телескопът не записва</translation>
+        <translation>КРАЙ НА СУШЕНЕ: Осцилоскопът не записва</translation>
     </message>
     <message>
         <location filename="../artisanlib/canvas.py" line="14846"/>
@@ -17743,7 +17741,7 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
         <location filename="../plus/stock.py" line="470"/>
         <source>bag</source>
-        <translation>чанта</translation>
+        <translation>чувал</translation>
     </message>
     <message>
         <location filename="../plus/stock.py" line="471"/>
@@ -17753,12 +17751,12 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
         <location filename="../plus/stock.py" line="472"/>
         <source>barrel</source>
-        <translation>барел</translation>
+        <translation>бъчва</translation>
     </message>
     <message>
         <location filename="../plus/stock.py" line="475"/>
         <source>bags</source>
-        <translation>чанти</translation>
+        <translation>чували</translation>
     </message>
     <message>
         <location filename="../plus/stock.py" line="476"/>
@@ -18520,7 +18518,7 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1653"/>
         <source>Roast</source>
-        <translation>Печено</translation>
+        <translation>Печене</translation>
     </message>
     <message>
         <location filename="../artisanlib/roast_properties.py" line="1656"/>
@@ -19298,7 +19296,7 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
         <location filename="../artisanlib/main.py" line="748"/>
         <source>Home</source>
-        <translation>Дом</translation>
+        <translation>Начало</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="749"/>
@@ -19313,7 +19311,7 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
         <location filename="../artisanlib/main.py" line="752"/>
         <source>Pan</source>
-        <translation>Тиган</translation>
+        <translation>Преместване</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="753"/>
@@ -19977,7 +19975,7 @@ has to be reduced by 4 times.</source>
         <location filename="../artisanlib/events.py" line="1075"/>
         <location filename="../artisanlib/events.py" line="1070"/>
         <source>fire slider action</source>
-        <translation>действие на плъзгача за огън</translation>
+        <translation>задейства действието на плъзгача</translation>
     </message>
     <message>
         <location filename="../artisanlib/events.py" line="1105"/>
@@ -20766,12 +20764,12 @@ Unchecked: Fits a smooth spline to preserve curve shape.</source>
     <message>
         <location filename="../artisanlib/main.py" line="3254"/>
         <source>First Crack Start</source>
-        <translation>Първият старт на пукнатината</translation>
+        <translation>Начало на Първа пукнатина</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="3258"/>
         <source>First Crack End</source>
-        <translation>Първият край на пукнатината</translation>
+        <translation>Край на Първа пукнатина</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="3262"/>
@@ -20791,12 +20789,12 @@ Unchecked: Fits a smooth spline to preserve curve shape.</source>
     <message>
         <location filename="../artisanlib/main.py" line="3283"/>
         <source>Charge</source>
-        <translation>Такса</translation>
+        <translation>Заряд</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="3288"/>
         <source>Drop</source>
-        <translation>Пуснете</translation>
+        <translation>Изсипване</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="3306"/>
@@ -20851,7 +20849,7 @@ Unchecked: Fits a smooth spline to preserve curve shape.</source>
     <message>
         <location filename="../artisanlib/main.py" line="3423"/>
         <source>ET Temperature</source>
-        <translation>Източноевропейска температура</translation>
+        <translation>ET Температура</translation>
     </message>
     <message>
         <location filename="../artisanlib/main.py" line="3424"/>
