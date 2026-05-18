@@ -18,9 +18,9 @@ v4.0.4 (Jun XX, 2026)
   - adds initial Bulgarian localization ([Issue #2175](../../../issues/2175))
   - adds validation of profiles and settings
   - adds PID derivative filter size setting
-  - adds option to disable UNDO action on main event buttons
+  - adds option to disable UNDO actions on main event buttons
 * CHANGES
-  - added a popup explaining the reason the Roast Properties dialog is opened on START if plus is connected and disabled the OK button until beans are specified  ([Issue #2133](../../../issues/2133))
+  - added a popup explaining the reason the Roast Properties dialog is opened on START if plus is connected until beans are specified  ([Issue #2133](../../../issues/2133))
   - adds hack to prevent dtr/rts signaling on connecting serial ports
   - preserves weight/volume unit setup on loading/importing profiles
   - enables extra device curve fills on recording
@@ -43,10 +43,6 @@ v4.0.4 (Jun XX, 2026)
   - enables keypad number keys to update event slider values (thanks Balázs for the hint!)
 * REMOVALS
   - removes RoastTime, RoastPath and Probat Pilot import/exports
-
-
-
-
 
 ----
 v4.0.2 (Feb 7, 2026)

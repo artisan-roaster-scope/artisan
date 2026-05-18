@@ -9646,15 +9646,12 @@ class ApplicationWindow(QMainWindow):
                                             try:
                                                 if len(parts) > 0:
                                                     orbiter_cmd:bytes = bytes.fromhex(parts[0])
-                                                    orbiter_data:bytes
-                                                    if len(parts) > 2:
-                                                        orbiter_param = min(255, max(0, int(round(float(parts[2]))))).to_bytes(1, 'little')
-                                                    else:
-                                                        orbiter_param = b'\x00'
+                                                    orbiter_data:bytes = b'\x00\x00'
+                                                    orbiter_param:bytes = b'\x00'
                                                     if len(parts) > 1:
                                                         orbiter_data = min(65535, max(0, int(round(float(parts[1]))))).to_bytes(2, 'little')
-                                                    else:
-                                                        orbiter_data = b'\x00\x00'
+                                                    if len(parts) > 2:
+                                                        orbiter_param = min(255, max(0, int(round(float(parts[2]))))).to_bytes(1, 'little')
                                                     self.orbiterSendMessageSignal.emit(orbiter_cmd, orbiter_data, orbiter_param, self.qmc.current_time())
                                             except Exception as e: # pylint: disable=broad-except
                                                 _log.error(e)

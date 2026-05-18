@@ -2279,9 +2279,9 @@ class serialport:
             if self.aw.qmc.flagstart:
                 if self.aw.qmc.timeindex[0] == -1 and self.aw.orbiter.isRoaster_Roasting:
                     self.aw.qmc.markChargeSignal.emit(True) # CHARGE
-                elif (self.aw.qmc.timeindex[0] > -1 and self.aw.qmc.timeindex[6] == 0 and self.aw.qmc.autoDropIdx == 0 and
+                elif (self.aw.qmc.timeindex[0] > -1 and self.aw.qmc.timeindex[6] == 0 and
                         previous_isRoaster_Roasting and not self.aw.orbiter.isRoaster_Roasting):
-                    self.aw.qmc.autoDropIdx = len(self.aw.qmc.timex) - 1
+                    #self.aw.qmc.autoDropIdx = len(self.aw.qmc.timex) - 1
                     self.aw.qmc.markDropSignal.emit(True) # DROP
 
         return tx,t2,t1

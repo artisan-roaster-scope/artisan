@@ -13630,16 +13630,29 @@ class tgraphcanvas(QObject):
 
     # OffMonitorCloseDown is called after the sampling loop stopped
     @pyqtSlot()
+    def OffMonitorCloseDownIgnoreAlwaysONwasRecording(self) -> None:
+        self.OffMonitorCloseDown(False, True)
+    @pyqtSlot()
+    def OffMonitorCloseDownRespectAlwaysONwasRecording(self) -> None:
+        self.OffMonitorCloseDown(True, True)
+    @pyqtSlot()
     def OffMonitorCloseDownIgnoreAlwaysON(self) -> None:
-        self.OffMonitorCloseDown(False)
+        self.OffMonitorCloseDown(False, False)
+    @pyqtSlot()
     def OffMonitorCloseDownRespectAlwaysON(self) -> None:
-        self.OffMonitorCloseDown(True)
+        self.OffMonitorCloseDown(True, False)
 
-    def OffMonitorCloseDown(self, respectAlwaysON:bool) -> None:
+
+    def OffMonitorCloseDown(self, respectAlwaysON:bool, wasRecording:bool) -> None:
         _log.debug('MODE: OffMonitorCloseDown')
         try:
 
-            if respectAlwaysON:
+            if wasRecording:
+                if respectAlwaysON:
+                    self.threadserver.terminatingSignal.disconnect(self.OffMonitorCloseDownRespectAlwaysONwasRecording)
+                else:
+                    self.threadserver.terminatingSignal.disconnect(self.OffMonitorCloseDownIgnoreAlwaysONwasRecording)
+            elif respectAlwaysON:
                 self.threadserver.terminatingSignal.disconnect(self.OffMonitorCloseDownRespectAlwaysON)
             else:
                 self.threadserver.terminatingSignal.disconnect(self.OffMonitorCloseDownIgnoreAlwaysON)
@@ -13707,7 +13720,8 @@ class tgraphcanvas(QObject):
 
                 # disconnect Orbiter
                 if not bool(self.aw.simulator) and self.device == 196 and self.aw.orbiter is not None:
-                    self.aw.orbiter.stop()
+#                    self.aw.orbiter.stop()
+                    self.aw.orbiter.disconnect(wasRecording, self.timeindex[6] != 0)
                     self.aw.orbiter = None
 
                 # disconnect MQTT
@@ -13821,6 +13835,7 @@ class tgraphcanvas(QObject):
     def OffMonitor(self, respectAlwaysON:bool = True) -> None:
         _log.info('MODE: OFF MONITOR')
         if self.flagon:
+            was_recording:bool = self.flagstart
             try:
                 # reset
                 self.plus_beans_reminder_on_start = True # ensure that for the next recording the corresponding warning is shown if beans are not specified for plus
@@ -13854,7 +13869,12 @@ class tgraphcanvas(QObject):
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
 
-                if respectAlwaysON:
+                if was_recording:
+                    if respectAlwaysON:
+                        self.threadserver.terminatingSignal.connect(self.OffMonitorCloseDownRespectAlwaysONwasRecording)
+                    else:
+                        self.threadserver.terminatingSignal.connect(self.OffMonitorCloseDownIgnoreAlwaysONwasRecording)
+                elif respectAlwaysON:
                     self.threadserver.terminatingSignal.connect(self.OffMonitorCloseDownRespectAlwaysON)
                 else:
                     self.threadserver.terminatingSignal.connect(self.OffMonitorCloseDownIgnoreAlwaysON)

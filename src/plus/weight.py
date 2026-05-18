@@ -285,18 +285,15 @@ class GreenWeighingState(StateMachine):
         self.empty_state_reset_timer.setSingleShot(True)
         self.empty_state_reset_timer.timeout.connect(lambda : self.send('reset'))
 
-#        super().__init__(allow_event_without_transition=True) # no errors for events which do not lead to transitions # replaced in state_machine v3 by variable
         super().__init__()
 
 ##
     # checks if any of the given states is currently a current states
     def is_current_state_one_of(self, states:set[State]) -> bool:
-#        return self.current_state in states # state_machine v2
         return not self.configuration.isdisjoint(states) # state_machine v3
 
     # checks if any of the given state is currently a current states
     def is_current_state(self, state:State) -> bool:
-#        return self.current_state == state # state_machine v2
         return state in self.configuration # state_machine v3
 
 ##
@@ -607,18 +604,15 @@ class RoastedWeighingState(StateMachine):
         self.connection_loss_reset_timer.setSingleShot(True)
         self.connection_loss_reset_timer.timeout.connect(lambda : self.send('reset'))
 
-#        super().__init__(allow_event_without_transition=True) # no errors for events which do not lead to transitions # replaced in state_machine v3 by variable
         super().__init__()
 
 ##
     # checks if any of the given states is currently a current states
     def is_current_state_one_of(self, states:set[State]) -> bool:
-#        return self.current_state in states # state_machine v2
         return not self.configuration.isdisjoint(states) # state_machine v3
 
     # checks if any of the given state is currently a current states
     def is_current_state(self, state:State) -> bool:
-#        return self.current_state == state # state_machine v2
         return state in self.configuration # state_machine v3
 
 ##
@@ -1392,7 +1386,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues]
                     self.done_roasted_task_timer.start(self.WAIT_BEFORE_DONE)
                 elif (self.sm_roasted.is_current_state(RoastedWeighingState.filling) and  # zuban:ignore[no-untyped-call]
                         # weight > estimated minimal weight based on
-                        weight > self.filled_roasted_bucket_estimated_minimal_weight(self.sm_roasted.current_weight_item.weight_estimate, 0) < weight):
+                        self.filled_roasted_bucket_estimated_minimal_weight(self.sm_roasted.current_weight_item.weight_estimate, 0) < weight):
                     # 2. roasted bucket filling finished:
                     self.roasted_task_done_weight = weight
                     self.roasted_task_done_step = step

@@ -487,7 +487,11 @@ class AsyncComm:
             return False
         finally:
             # in any case, clear the event belonging to this message
-            self._ACK_received.clear()
+            try:
+                # self._ACK_received might be None now:
+                self._ACK_received.clear()
+            except Exception: # pylint: disable=broad-except
+                pass
             if serialize:
                 # release the serializing write lock
                 self._serialize_write_lock.release()

@@ -275,10 +275,10 @@ class Orbiter(AsyncComm):
 
     # data byte order: LSB last (little-endian); eg. data=b'\x07\x00' equals 7
     # returns True if response was received in time, otherwise False
-    def send_msg_await(self, cmd:bytes, data:bytes = b'\x00\x00', param:bytes = b'\x00', time:int = 0) -> bool:
+    def send_msg_await(self, cmd:bytes, data:bytes = b'\x00\x00', param:bytes = b'\x00', time:int = 0, delay:float = 0.1) -> bool:
         # send via socket using a request/response pattern (serialize=True) awaiting a response that sets the acknowledge_received() event
         # ensuring a 100ms delay between those request/response pairs
-        return self.send_await(self.create_msg(cmd, data, param, time), self.send_timeout, serialize=True, delay=0.1)
+        return self.send_await(self.create_msg(cmd, data, param, time), self.send_timeout, serialize=True, delay=delay)
 
     #
 
@@ -295,6 +295,32 @@ class Orbiter(AsyncComm):
 #    @override
 #    def stop(self) -> None:
 #        super().stop()
+
+
+    def disconnect(self, recording:bool, after_drop:bool) -> None:
+        try:
+            if recording:
+                # only on OFF while recording, termination commands are sent
+                if after_drop:
+                    # OFF after DROP just "Stop Cooling" is sent
+                    self.send_msg_await(b'\x06', b'\x00\x00', b'\x00')
+                else:
+                    # if OFF a full reset machine sequence is sent
+                    for (cmd, data, param) in [
+                            # cmd, data, param
+                            (b'\x07', b'\x00\x00', b'\x01'),
+                            (b'\x13', b'\x01\x00', b'\x00'),
+                            (b'\x02', b'\x00\x00', b'\x00'),
+                            (b'\x14', b'\x01\x00', b'\x00'),
+                            (b'\x03', b'\x00\x00', b'\x00'),
+                            (b'\x0F', b'\x00\x00', b'\x00'),
+                            (b'\x06', b'\x00\x00', b'\x00')]:
+                        self.send_msg_await(cmd, data, param)
+                        libtime.sleep(.3)
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
+        self.stop()
+
 
 
 #######
