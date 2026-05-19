@@ -14596,6 +14596,7 @@ class tgraphcanvas(QObject):
                     #prevents accidentally deleting a modified profile.
                     self.fileDirtySignal.emit()
                     if self.aw.buttonCHARGE.isFlat() and self.timeindex[0] > -1:
+                        _log.debug('EVENT: undo CHARGE')
                         self.autoChargeIdx = -1 # disable autoCharge to allow manual re-CHARGE
                         # undo wrongly set CHARGE
                         ## deactivate autoCHARGE
@@ -14618,6 +14619,7 @@ class tgraphcanvas(QObject):
                                 del self.l_annotations_dict[0]
                         self.xaxistosm(redraw=False, set_xlim=not zoomed_in) # need to fix uneven x-axis labels like -0:13
                     elif not self.aw.buttonCHARGE.isFlat():
+                        _log.debug('EVENT: CHARGE')
                         if self.device == 18 and self.aw.simulator is None: #manual mode
                             tx,et,bt = self.aw.ser.NONE()
                             if bt != 1 and et != -1:  #cancel
@@ -14788,6 +14790,7 @@ class tgraphcanvas(QObject):
                     else:
                         start = 0
                     if self.aw.buttonDRY.isFlat() and self.timeindex[1] > 0:
+                        _log.debug('EVENT: undo DRY')
                         # undo wrongly set DRY
                         # deactivate autoDRY
                         self.autoDRYenabled = False
@@ -14808,6 +14811,7 @@ class tgraphcanvas(QObject):
                             if 1 in self.l_annotations_dict:
                                 del self.l_annotations_dict[1]
                     elif not self.aw.buttonDRY.isFlat():
+                        _log.debug('EVENT: DRY')
                         if self.device != 18 or self.aw.simulator is not None:
                             self.timeindex[1] = max(0,len(self.timex)-1)
                         else:
@@ -14903,6 +14907,7 @@ class tgraphcanvas(QObject):
                     else:
                         start = 0
                     if self.aw.buttonFCs.isFlat() and self.timeindex[2] > 0:
+                        _log.debug('EVENT: undo FCs')
                         # undo wrongly set FCs
                         # deactivate autoFCs
                         self.autoFCsenabled = False
@@ -14923,6 +14928,7 @@ class tgraphcanvas(QObject):
                             if 2 in self.l_annotations_dict:
                                 del self.l_annotations_dict[2]
                     elif not self.aw.buttonFCs.isFlat():
+                        _log.debug('EVENT: FCs')
                         # record 1Cs only if Charge mark has been done
                         if self.device != 18 or self.aw.simulator is not None:
                             self.timeindex[2] = max(0,len(self.timex)-1)
@@ -15016,6 +15022,7 @@ class tgraphcanvas(QObject):
                     else:
                         start = 0
                     if self.aw.buttonFCe.isFlat() and self.timeindex[3] > 0:
+                        _log.debug('EVENT: undo FCe')
                         # undo wrongly set FCe
                         self.timeindex[3] = 0
                         removed = True
@@ -15034,6 +15041,7 @@ class tgraphcanvas(QObject):
                             if 3 in self.l_annotations_dict:
                                 del self.l_annotations_dict[3]
                     elif not self.aw.buttonFCe.isFlat():
+                        _log.debug('EVENT: FCe')
                         if self.device != 18 or self.aw.simulator is not None:
                             self.timeindex[3] = max(0,len(self.timex)-1)
                         else:
@@ -15127,6 +15135,7 @@ class tgraphcanvas(QObject):
                     else:
                         start = 0
                     if self.aw.buttonSCs.isFlat() and self.timeindex[4] > 0:
+                        _log.debug('EVENT: undo SCs')
                         # undo wrongly set SCs
                         self.timeindex[4] = 0
                         removed = True
@@ -15145,6 +15154,7 @@ class tgraphcanvas(QObject):
                             if 4 in self.l_annotations_dict:
                                 del self.l_annotations_dict[4]
                     elif not self.aw.buttonSCs.isFlat():
+                        _log.debug('EVENT: SCs')
                         if self.device != 18 or self.aw.simulator is not None:
                             self.timeindex[4] = max(0,len(self.timex)-1)
                         else:
@@ -15243,6 +15253,7 @@ class tgraphcanvas(QObject):
                     else:
                         start = 0
                     if self.aw.buttonSCe.isFlat() and self.timeindex[5] > 0:
+                        _log.debug('EVENT: undo SCe')
                         # undo wrongly set SCe
                         self.timeindex[5] = 0
                         removed = True
@@ -15261,6 +15272,7 @@ class tgraphcanvas(QObject):
                             if 5 in self.l_annotations_dict:
                                 del self.l_annotations_dict[5]
                     elif not self.aw.buttonSCe.isFlat():
+                        _log.debug('EVENT: SCe')
                         if self.device != 18 or self.aw.simulator is not None:
                             self.timeindex[5] = max(0,len(self.timex)-1)
                         else:
@@ -15358,6 +15370,7 @@ class tgraphcanvas(QObject):
                     # we check if this is the first DROP mark on this roast
                     firstDROP = self.timeindex[6] == 0 # on UNDO DROP we do not send the record to plus
                     if self.aw.buttonDROP.isFlat() and self.timeindex[6] > 0:
+                        _log.debug('EVENT: undo DROP')
                         self.aw.setTimerColorSignal.emit('timer')  # reset cooling timer color back to the default
                         self.autoDropIdx = -1 # disable autoDROP to allow manual re-DROP
                         # undo wrongly set FCs
@@ -15382,6 +15395,7 @@ class tgraphcanvas(QObject):
                             if 6 in self.l_annotations_dict:
                                 del self.l_annotations_dict[6]
                     elif not self.aw.buttonDROP.isFlat():
+                        _log.debug('EVENT: DROP')
                         self.aw.setTimerColorSignal.emit('rstimer') # cooling timer color
                         self.incBatchCounter()
                         # generate UUID
@@ -15557,6 +15571,7 @@ class tgraphcanvas(QObject):
                     else:
                         start = 0
                     if self.aw.buttonCOOL.isFlat() and self.timeindex[7] > 0:
+                        _log.debug('EVENT: undo COOL')
                         # undo wrongly set COOL
                         self.timeindex[7] = 0
                         removed = True
@@ -15576,6 +15591,7 @@ class tgraphcanvas(QObject):
                                 del self.l_annotations_dict[7]
 
                     elif not self.aw.buttonCOOL.isFlat():
+                        _log.debug('EVENT: COOL')
                         if self.device != 18 or self.aw.simulator is not None:
                             self.timeindex[7] = max(0,len(self.timex)-1)
                         else:
