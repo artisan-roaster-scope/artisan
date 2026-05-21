@@ -80,6 +80,7 @@ def appFrozen() -> bool:
         _log.exception(e)
     return ib
 
+@functools.lru_cache
 def signature_message(version:str, revision:str, artisan_os:str) -> bytes:
     return bytes(f'{version}{revision}{artisan_os}', encoding='ascii')
 

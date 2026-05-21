@@ -4,7 +4,7 @@ types-openpyxl>=3.1.5.20260518
 types-Pillow>=10.2.0.20240822
 types-protobuf>=7.34.1.20260518
 types-psutil>=7.2.2.20260518
-types-pyserial>=3.5.0.20260518
+types-pyserial>=3.5.0.20260519
 types-python-dateutil>=2.9.0.20260518
 types-pytz>=2026.2.0.20260518
 types-pyyaml>=6.0.12.20260518
@@ -29,7 +29,7 @@ pytest-datadir==1.8.0
 #PyVirtualDisplay==3.0
 #pytest-bdd==6.1.1
 #pytest-benchmark==4.0.0
-hypothesis>=6.152.7
+hypothesis>=6.152.9
 coverage>=7.14.0
 coverage-badge==1.1.2
 codespell==2.4.2

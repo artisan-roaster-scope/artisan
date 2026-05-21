@@ -71,7 +71,7 @@ class Orbiter(AsyncComm):
     __slots__ = [ 'send_timeout', 'connected', 'outer_connected_handler', 'outer_disconnected_handler',
             '_BT', '_ET', '_IT', '_DT', '_air', '_drum', '_damper', '_heater', '_sound', '_RoR', '_master_control',
             '_SERIAL',  '_FW_VERSION', '_PCB_VERSION', '_DASHBOARD_STATUS', '_MODEL', '_MODEL_NUM',
-            'isRoaster_Roasting' ]
+            'isRoaster_Roasting', 'isRoaster_Cooling' ]
 
     def __init__(self, serial:'SerialSettings',
                 connected_handler:Callable[[], None]|None = None,
@@ -112,6 +112,7 @@ class Orbiter(AsyncComm):
         self._MODEL_NUM:int = 0                    # 1 byte
         # machine status
         self.isRoaster_Roasting:bool = False
+        self.isRoaster_Cooling:bool = False
 
     def connected_handler(self) -> None:
         self.connected = True
@@ -206,7 +207,12 @@ class Orbiter(AsyncComm):
                         dashboard_state = data[3:5]
                         dashboard_state_low = dashboard_state[0]
                         #
-#                        self.isRoaster_Cooling = self.test_bit(dashboard_state_low, 3)
+                        self.isRoaster_Cooling = self.test_bit(dashboard_state_low, 3)
+#                        if self.isRoaster_Cooling:
+#                            _log.debug("isRoaster_Cooling")
+#                        else:
+#                            _log.debug("NOT isRoaster_Cooling")
+                        #
                         self.isRoaster_Roasting = self.test_bit(dashboard_state_low, 2)
 #                        if self.isRoaster_Roasting:
 #                            _log.debug("isRoaster_Roasting")
