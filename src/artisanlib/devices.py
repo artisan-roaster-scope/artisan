@@ -22,6 +22,7 @@ import re
 import platform
 import logging
 from PIL import ImageColor
+from babel.units import get_unit_name
 from typing import override, Final, cast, TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -1824,7 +1825,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.containerGreenTareWeight = QLabel('')
             self.containerGreenTareWeight.setToolTip(QApplication.translate('Tooltip','Weight of your green coffee container'))
             self.containerGreenComboBox = QComboBox()
-            self.containerGreenComboBox.setToolTip(QApplication.translate('Tooltip','Identify your green coffee container and its weight. If a container is selected only that container is recognized. If no container is selected, all defined containers are recognized.'))
+            self.containerGreenComboBox.setToolTip(QApplication.translate('Tooltip','Identify your green coffee container and its weight.\nIf a container is selected only that container is recognized.\nIf no container is selected, all defined containers are recognized.'))
             self.containerGreenComboBox.setMaximumWidth(120)
             self.containerGreenComboBox.setMinimumWidth(120)
             self.updateGreenContainerPopup(adjust_index=False)
@@ -1840,11 +1841,13 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             basedir = os.path.join(getResourcePath(),'Icons')
             p = os.path.join(basedir, ('bucket_empty_dark.svg' if self.aw.app.darkmode else 'bucket_empty_light.svg')) # bucket_filled
             self.bucket_button1 = QToolButton()
+            self.bucket_button1.setToolTip(QApplication.translate('Tooltip','The one-bucket mode assumes that the entire batch fits into a single bucket'))
             self.bucket_button1.setIcon(QIcon(p))
             self.bucket_button1.setFixedHeight(20)
             self.bucket_button1.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             self.bucket_button1.setStyleSheet('QToolButton {border:none;}')
             self.bucket_button2 = QToolButton()
+            self.bucket_button2.setToolTip(QApplication.translate('Tooltip','The two-bucket mode allows splitting a batch into two buckets for easier lifting'))
             self.bucket_button2.setIcon(QIcon(p))
             self.bucket_button2.setFixedHeight(20)
             self.bucket_button2.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -1886,13 +1889,12 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
             greenTaskPrecisionLabel = QLabel(QApplication.translate('Label', 'Accuracy'))
             self.greenTaskPrecision = MyQDoubleSpinBox()
-            self.greenTaskPrecision.setToolTip(QApplication.translate('Tooltip','Target accuracy expressed as a percentage of the batch size. If zero is selected, the check is disabled.'))
+            self.greenTaskPrecision.setToolTip(QApplication.translate('Tooltip','Target accuracy expressed as a percentage of the batch size.\nIf zero is selected, the check is disabled.'))
             self.greenTaskPrecision.setDecimals(1)
             self.greenTaskPrecision.setSingleStep(0.1)
             self.greenTaskPrecision.setRange(0, 10.)
             self.greenTaskPrecision.setAlignment(Qt.AlignmentFlag.AlignRight)
             self.greenTaskPrecision.setMinimumWidth(40)
-            self.greenTaskPrecision.setValue(self.aw.qmc.dropDuplicatesLimit)
             self.greenTaskPrecision.setSuffix('%')
             self.greenTaskPrecision.setValue(self.aw.green_task_precision)
 
@@ -1910,7 +1912,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.containerRoastedTareWeight = QLabel('')
             self.containerRoastedTareWeight.setToolTip(QApplication.translate('Tooltip','Weight of your roasted coffee container'))
             self.containerRoastedComboBox = QComboBox()
-            self.containerRoastedComboBox.setToolTip(QApplication.translate('Tooltip','Identify your roasted coffee container and its weight. If no roasted container is selected, the weighing of roasted batches is disabled.'))
+            self.containerRoastedComboBox.setToolTip(QApplication.translate('Tooltip','Identify your roasted coffee container and its weight.\nIf no roasted container is selected,\nthe weighing of roasted batches is disabled.'))
             self.containerRoastedComboBox.setMaximumWidth(120)
             self.containerRoastedComboBox.setMinimumWidth(120)
             self.updateRoastedContainerPopup(adjust_index=False)
@@ -1918,12 +1920,25 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.containerRoastedComboBox.setCurrentIndex(self.container_menu_idx(self.aw.container2_idx))
             self.updateRoastedContainerWeight()
 
+            automaticRegistrationPeriodLabel = QLabel(QApplication.translate('Label', 'Automatic registration'))
+            automaticRegistrationPeriodLabel.setToolTip(QApplication.translate('Tooltip','Register the weight of a roasted batch automatically\nafter the given time (if not set to zero) without removing the filled container,\nenabling the addition of more batches'))
+            self.automaticRegistrationPeriod = QSpinBox()
+            self.automaticRegistrationPeriod.setToolTip(QApplication.translate('Tooltip','Register the weight of a roasted batch automatically\nafter the given time (if not set to zero) without removing the filled container,\nenabling the addition of more batches'))
+            self.automaticRegistrationPeriod.setRange(0, 30)
+            self.automaticRegistrationPeriod.setAlignment(Qt.AlignmentFlag.AlignRight)
+            unit_name = get_unit_name('duration-minute', length='short', locale=self.aw.locale_str)
+            self.automaticRegistrationPeriod.setSuffix(f" {unit_name if unit_name is not None else 'min'}")
+            self.automaticRegistrationPeriod.setValue(int(round(self.aw.automatic_registration_period/60.)))
+
             containerRoastedGridLayout = QGridLayout()
             containerRoastedGridLayout.addWidget(self.containerRoastedComboBox,0,0)
             containerRoastedGridLayout.addWidget(self.containerRoastedTareWeight,0,1)
 
             containerRoastedHLayout = QHBoxLayout()
             containerRoastedHLayout.addLayout(containerRoastedGridLayout)
+            containerRoastedHLayout.addStretch()
+            containerRoastedHLayout.addWidget(automaticRegistrationPeriodLabel)
+            containerRoastedHLayout.addWidget(self.automaticRegistrationPeriod)
             containerRoastedHLayout.addStretch()
 
             # Bucket Hobbock, Container, Bin
@@ -4908,6 +4923,11 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 self.aw.qmc.restartPhidgetManager()
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
+
+            try:
+                self.aw.automatic_registration_period = self.automaticRegistrationPeriod.value()*60
+            except Exception: # pylint: disable=broad-except
+                pass
 
             self.aw.qmc.intChannel.cache_clear() # device type and thus int channels might have been changed
             self.aw.qmc.clearLCDs()
