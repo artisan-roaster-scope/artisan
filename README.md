@@ -15,7 +15,7 @@ Visual scope for coffee roasters
 [![pytest](https://github.com/artisan-roaster-scope/artisan/actions/workflows/pytest.yaml/badge.svg?branch=master)](https://github.com/artisan-roaster-scope/artisan/actions/workflows/pytest.yaml)
 ![coverage](./src/coverage.svg)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
-![Made in Bavaria](https://github.com/artisan-roaster-scope/artisan/blob/master/wiki/screenshots/made-in-bavaria.svg?raw=true)
+![Made in Bavaria](https://github.com/artisan-roaster-scope/artisan/blob/master/wiki/screenshots/with-love-from-bavaria?raw=true)
 
 
 *WARNING: pre-release (continuous) builds may not work.  Use at your own risk.*
