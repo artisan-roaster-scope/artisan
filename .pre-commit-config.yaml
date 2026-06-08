@@ -5,7 +5,7 @@ repos:
     -   id: check-yaml
     -   id: check-xml
     -   id: end-of-file-fixer
-        exclude: ^(src/uic/|src/translations/|src/includes/|src/test/data/|src/test/sanity/data/)
+        exclude: ^(src/uic/|wiki/screenshots/|src/translations/|src/includes/|src/test/data/|src/test/sanity/data/)
     -   id: trailing-whitespace
         exclude: ^(src/uic/|src/translations/|src/includes/|src/test/data/|src/test/sanity/data/)
     -   id: double-quote-string-fixer
