@@ -80,6 +80,21 @@ Help keep **<span style="color: #4C97C3;">artisan</span>** free for personal and
       </a>
 </figure>
 
+
 ---
 [Release History](https://github.com/artisan-roaster-scope/artisan/blob/master/wiki/ReleaseHistory.md)
 {: target="_blank" style="text-align: center;"}
+
+
+--- 
+
+<center>
+<small>
+<i>Downloads for outdated operating systems</i><br>
+<a href="https://github.com/artisan-roaster-scope/artisan/releases/download/v3.4.0/artisan-win-x64-legacy-3.4.0-setup.exe">Windows 8 (Artisan v3.4 legacy)</a> <br>
+<a href="https://github.com/artisan-roaster-scope/artisan/releases/download/v3.2.0/artisan-mac-3.2.0.dmg">macOS 12+ Intel/ARM (Artisan v3.2)</a> &bull; <a href="https://github.com/artisan-roaster-scope/artisan/releases/download/v3.4.0/artisan-mac-legacy-3.4.0.dmg">macOS 10.13+ Intel (Artisan v3.4 legacy)</a> <br>
+<a href="https://github.com/artisan-roaster-scope/artisan/releases/download/v3.2.0/artisan-linux-3.2.0.deb">Ubuntu 22.04 (Artisan v3.2)</a> &bull;  <a href="https://github.com/artisan-roaster-scope/artisan/releases/download/v3.2.0/artisan-linux-3.2.0.rpm">RedHat 8.4 (Artisan v3.2)</a><br>
+<a href="https://github.com/artisan-roaster-scope/artisan/releases/download/v3.4.0/artisan-linux-3.4.0_PiOS64-bookworm.deb">RPi Bookworm (Artisan v3.4)</a> &bull; <a href="https://github.com/artisan-roaster-scope/artisan/releases/download/v2.8.0/artisan-linux-2.8.0_raspbian-buster.deb">RPi Buster (Artisan v2.8)</a>
+
+</small>
+</center>
