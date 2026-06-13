@@ -116,6 +116,8 @@ machines:
         url: /machines/nor/
       - title: "Nordic"
         url: /machines/nordic/
+      - title: "North"
+        url: /machines/north/
       - title: "Opp Roaster"
         url: /machines/opp/
       - title: "Orbiter"
