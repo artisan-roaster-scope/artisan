@@ -1094,7 +1094,7 @@ class roastCompareDlg(ArtisanDialog):
         self.disableButtons()
         self.aw.disableEditMenus(compare=True)
 
-        self.pick_handler_id = self.aw.qmc.fig.canvas.mpl_connect('pick_event', self.onpick_event) # type: ignore[arg-type] # incompatible type "Callable[[PickEvent], None]"; expected "Callable[[Event], Any]
+        self.pick_handler_id = self.aw.qmc.fig.canvas.mpl_connect('pick_event', self.onpick_event)
 
         settings = QSettings()
         if settings.contains('CompareGeometry'):

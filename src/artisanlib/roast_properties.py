@@ -311,7 +311,7 @@ class volumeCalculatorDlg(ArtisanDialog):
     @pyqtSlot()
     def scale_disconnected(self) -> None:
         self.scale_weight = None
-        self.updateWeightLCD('----')
+        self.updateWeightLCD('')
 
     def updateWeightLCD(self, txt_value:str, txt_unit:str = '') -> None:
         if self.aw.scale_manager.is_scale1_configured():
@@ -454,6 +454,7 @@ class volumeCalculatorDlg(ArtisanDialog):
         del a0
         if self.aw.largeScaleLCDs_dialog is not None:
             self.aw.largeScaleLCDs_dialog.updateWeightUnit()
+        self.aw.qmc.updateLargeScaleLCDs('')
 
         try:
             self.parent_dialog.volumedialog = None
@@ -2650,6 +2651,8 @@ class editGraphDlg(ArtisanResizeablDialog):
         del a0
         # restore
         self.restoreAllEnergySettings()
+
+        self.aw.qmc.updateLargeScaleLCDs('')
 
         self.aw.qmc.beans = self.org_beans
         self.aw.qmc.density = self.org_density
@@ -5474,6 +5477,9 @@ class editGraphDlg(ArtisanResizeablDialog):
     @pyqtSlot()
     def close_OK(self) -> None:
         redraw:bool = False # if set to True a redraw happens at the end of this function
+
+        self.aw.qmc.updateLargeScaleLCDs('')
+
         #check for graph
         if len(self.aw.qmc.timex):
             #prevents accidentally deleting a modified profile.

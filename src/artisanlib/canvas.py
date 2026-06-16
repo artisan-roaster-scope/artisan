@@ -623,7 +623,7 @@ class tgraphcanvas(QObject):
         #show phases LCDs during roasts
         self.phasesLCDflag:bool = True
         self.phasesLCDmode:int = 1 # one of 0: time, 1: percentage, 2: temp mode
-        self.phasesLCDmode_l:list[int] = [1,1,1] # stores last phases LCD mode per app state (OFF/ON/RECORDING)
+        self.phasesLCDmode_l:list[int] = [1,1,1] # stores last phases LCD mode per roast phase (Drying, Mailard, Finishing)
         self.phasesLCDmode_all:list[bool] = [False,False,True]
 
 

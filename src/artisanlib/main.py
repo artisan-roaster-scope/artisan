@@ -6345,7 +6345,7 @@ class ApplicationWindow(QMainWindow):
 
 
     def colorDifference(self, color1:str|None, color2:str|None) -> float:
-        cDiff = 100
+        cDiff:float = 100
         try:
             from colorspacious import deltaE # type: ignore[import-untyped]
             if color1 is None or color1 == 'None':
@@ -6366,7 +6366,7 @@ class ApplicationWindow(QMainWindow):
             c2 = QColor(color2[:7]).name()
             c1_rgb = tuple(int(c1[i:i+2], 16) for i in (1, 3 ,5))
             c2_rgb = tuple(int(c2[i:i+2], 16) for i in (1, 3 ,5))
-            cDiff = deltaE(c1_rgb, c2_rgb, input_space='sRGB255', uniform_space='CIELab')
+            cDiff = float(deltaE(c1_rgb, c2_rgb, input_space='sRGB255', uniform_space='CIELab'))
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
             _, _, exc_tb = sys.exc_info()
@@ -6419,7 +6419,7 @@ class ApplicationWindow(QMainWindow):
             nc_greyscale_JCh[..., 1] = 0
             nc_greyscale_sRGB:numpy.ndarray[tuple[Literal[1]],numpy.dtype[numpy.double]] = cspace_convert(nc_greyscale_JCh, 'JCh', 'sRGB255')
             nc_greyscale_sRGB = numpy.clip(nc_greyscale_sRGB, 0, 255) # pyright:ignore[reportUnknownArgumentType]
-            nc_greyscale = f'#{int(nc_greyscale_sRGB[0]):2x}{int(nc_greyscale_sRGB[1]):2x}{int(nc_greyscale_sRGB[2]):2x}'
+            nc_greyscale = f'#{int(nc_greyscale_sRGB[0]):2x}{int(nc_greyscale_sRGB[1]):2x}{int(nc_greyscale_sRGB[2]):2x}' # pyright:ignore[reportUnknownArgumentType]
             nc = str(QColor(nc_greyscale).name())
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
@@ -7132,10 +7132,11 @@ class ApplicationWindow(QMainWindow):
             self.largePhasesLCDs_dialog.updatePhasesLabels([None,None,None,label])
         self.updateAUCLCD()
 
+    # color dialogs without buttons (noButtons=True) only supported on macOS for now
     def colordialog(self, c:QColor, noButtons:bool=False, parent:QWidget|None = None, alphasupport:bool=False) -> QColor:
         if parent is None:
             parent = self
-        if platform.system() == 'Darwin' and noButtons:
+        if platform.system() == 'Darwin' and noButtons: # used to specify extra device colors in devices.py
             cd = QColorDialog(parent)
             cd.setModal(True)
             cd.setWindowModality(Qt.WindowModality.ApplicationModal)
@@ -7146,7 +7147,6 @@ class ApplicationWindow(QMainWindow):
             cd.setCurrentColor(c)
             cd.exec()
             return cd.currentColor()
-#        return QColorDialog.getColor(c)
         return QColorDialog.getColor(c, parent, '',
             (QColorDialog.ColorDialogOption.ShowAlphaChannel if alphasupport else
                 QColorDialog.ColorDialogOption(0)))
@@ -7638,7 +7638,7 @@ class ApplicationWindow(QMainWindow):
                 try:
                     # we masked the -1 error values
                     np_etb_masked = numpy.ma.masked_equal(np_etb, -1)
-                    np_timeB_etb_masked = numpy.ma.masked_array(np_timeB, np_etb_masked.mask) # pylint:disable=no-member
+                    np_timeB_etb_masked = numpy.ma.masked_array(np_timeB, np_etb_masked.mask) # type:ignore[operator] # ty:ignore[call-non-callable] # pylint:disable=no-member
                     # ignore the masked error values on computing the interpolation and fill (especially on the left) with -1 values
                     interp_np_etb = numpy.interp(np_timex,np_timeB_etb_masked.compressed(),np_etb_masked.compressed(),left=-1,right=-1) # pyright:ignore[reportUnknownArgumentType]  # pylint:disable=no-member
 
@@ -7663,7 +7663,7 @@ class ApplicationWindow(QMainWindow):
                 try:
                     # we masked the -1 error values
                     np_btb_masked = numpy.ma.masked_equal(np_btb, -1)
-                    np_timeB_btb_masked = numpy.ma.masked_array(np_timeB, np_btb_masked.mask) # pylint:disable=no-member
+                    np_timeB_btb_masked = numpy.ma.masked_array(np_timeB, np_btb_masked.mask) # type:ignore[operator] # ty:ignore[call-non-callable] # pylint:disable=no-member
                     # ignore the masked error values on computing the interpolation and fill (especially on the left) with -1 values
                     interp_np_btb = numpy.interp(np_timex,np_timeB_btb_masked.compressed(),np_btb_masked.compressed(),left=-1,right=-1) # pyright:ignore[reportUnknownArgumentType]  # pylint:disable=no-member
 
@@ -13724,8 +13724,7 @@ class ApplicationWindow(QMainWindow):
         f:QFile|None = None
         try:
             f = QFile(filename)
-            if self.qmc.clearBgbeforeprofileload:
-                self.deleteBackground()
+            firstChar:str = ''
             if not f.open(QFile.OpenModeFlag.ReadOnly):
                 raise OSError(f.errorString())
             stream = QTextStream(f)
@@ -13734,6 +13733,8 @@ class ApplicationWindow(QMainWindow):
             if firstChar != '{':
                 self.sendmessage(QApplication.translate('Message','Invalid artisan format'))
                 return
+            if self.qmc.clearBgbeforeprofileload:
+                self.deleteBackground()
             res = self.qmc.reset(redraw=False,soundOn=False)
             obj_dict = deserialize(filename)
             self.plusAddPath(obj_dict, filename)
@@ -18086,8 +18087,8 @@ class ApplicationWindow(QMainWindow):
             if self.resetqsettings or (filename is None and QApplication.queryKeyboardModifiers() == (Qt.KeyboardModifier.AltModifier | Qt.KeyboardModifier.ShiftModifier)):
                 self.resetqsettings = 0
 
-                # settings.clear()
-                # this ensures to get rid of old Artisan settings that have been retired via "Save Settings >> Factory Reset >> Load Settings"
+                # the call to settings.clear() below
+                # ensures to get rid of old Artisan settings that have been retired via "Save Settings >> Factory Reset >> Load Settings"
                 # however, settings.clear() has the consequence that recent files/settings, the starts counter and lastdonationpopup
                 # are cleared as well such that the donation popup is shown always after a Factory Reset and recent files/settings menu entries are lost
                 # thus we have to take care to preserve those over this FactoryReset here
@@ -18097,13 +18098,18 @@ class ApplicationWindow(QMainWindow):
                 starts:int|None = None
                 if settings.contains('starts'):
                     starts = toInt(settings.value('starts'))
+                # keep recent file list
+                recentFiles = toStringList(settings.value('recentFileList'))
+                # keep recentSettings
                 recentSettings = toStringList(settings.value('recentSettingList'))
                 settings.clear()
                 if lastdonationpopup is not None:
                     settings.setValue('lastdonationpopup',lastdonationpopup)
                 if starts is not None:
                     settings.setValue('starts',starts)
-                settings.setValue('recentRoasts',self.recentRoasts)
+                # reset recent file list
+                settings.setValue('recentFileList', recentFiles)
+                # reset recent settings
                 settings.setValue('recentSettingList', recentSettings)
 
 
@@ -18119,6 +18125,7 @@ class ApplicationWindow(QMainWindow):
                     pass
                 _log.info('Factory reset')
                 return True  #don't load any more settings. They could be bad (corrupted). Stop here.
+
 
             # we remember from which location we loaded the last settings file
             # to be able to update the batch counter in this file from qmc.incBatchCounter()/qmc.decBatchCounter()

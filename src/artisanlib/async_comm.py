@@ -19,8 +19,9 @@ import os
 import sys
 import time
 import logging
-import serial as pyserial
 import asyncio
+import serial as pyserial
+from  serial.serialutil import SerialException
 
 from contextlib import suppress
 from threading import Thread
@@ -248,6 +249,8 @@ async def create_serial_connection(
     loop.call_soon(transport.setup)
     return transport, protocol
 
+
+
 class AsyncComm:
 
     __slots__ = [ '_asyncLoopThread', '_write_queue', '_running', '_serialize_write_lock', '_ACK_received', '_write_errors_without_disconnect', 'write_error_sem',
@@ -347,6 +350,9 @@ class AsyncComm:
             with suppress(asyncio.CancelledError):
                 while not reader.at_eof():
                     await self.read_msg(reader)
+        except SerialException as e:
+            # we raise serial exceptions to trigger a disconnect/reconnect immediately
+            raise e
         except Exception as e: # pylint: disable=broad-except
             _log.error(e)
 
@@ -358,8 +364,14 @@ class AsyncComm:
                 _log.info('write(%s)',message)
             writer.write(message)
             await writer.drain()
+        except SerialException as e:
+            # we raise serial exceptions to trigger a disconnect/reconnect immediately
+            raise e
         except Exception as e: # pylint: disable=broad-except
             _log.error(e)
+        finally:
+            with suppress(asyncio.CancelledError, ConnectionResetError):
+                await writer.drain()
 
     async def handle_writes(self, writer: asyncio.StreamWriter, queue: 'asyncio.Queue[bytes]') -> None:
         try:
@@ -368,6 +380,9 @@ class AsyncComm:
                     await self.write(writer, message)
                 # on empty messages we close the connection
                 writer.close()
+        except SerialException as e:
+            # we raise serial exceptions to trigger a disconnect/reconnect immediately
+            raise e
         except Exception as e: # pylint: disable=broad-except
             _log.error(e)
         finally:
@@ -396,8 +411,8 @@ class AsyncComm:
                 reader, writer = await asyncio.wait_for(connect, timeout=connect_timeout)
                 if writer is not None: # pyright:ignore[reportUnnecessaryComparison] # reader is of type asyncio.streams.StreamReader and thus never None
                     self._write_queue = asyncio.Queue()
-                    read_handler = asyncio.create_task(self.handle_reads(reader))
                     write_handler = asyncio.create_task(self.handle_writes(writer, self._write_queue))
+                    read_handler = asyncio.create_task(self.handle_reads(reader))
                     self._ACK_received = asyncio.Event()
                     _log.debug('connected')
                     if self._connected_handler is not None:
@@ -410,14 +425,24 @@ class AsyncComm:
 
                     for task in pending:
                         task.cancel()
+                        try:
+                            task.exception()
+                        except Exception: # pylint: disable=broad-except
+                            pass
                     for task in done:
-                        exception = task.exception()
-                        if isinstance(exception, Exception):
-                            raise exception
+                        try:
+                            task.exception()
+                        except Exception: # pylint: disable=broad-except
+                            pass
+#                        exception = task.exception()
+#                        if isinstance(exception, Exception):
+#                            raise exception
                     self._ACK_received = None
 
             except TimeoutError:
                 _log.debug('connection timeout')
+            except SerialException as e:
+                _log.debug('serial exception: %s',e)
             except Exception as e: # pylint: disable=broad-except
                 _log.error(e)
             finally:
@@ -427,11 +452,13 @@ class AsyncComm:
                     try:
                         self._disconnected_handler()
                     except Exception as e: # pylint: disable=broad-except
-                        _log.exception(e)
+                        _log.error(e)
                 if writer is not None:
                     try:
                         writer.close()
                         await asyncio.wait_for(writer.wait_closed(), timeout=0.3)
+                    except SerialException as e:
+                        _log.debug('serial exception: %s',e)
                     except Exception as e: # pylint: disable=broad-except
                         _log.error(e)
                 await asyncio.sleep(0.5)
@@ -526,6 +553,13 @@ class AsyncComm:
         if self._asyncLoopThread is not None:
             asyncio.run_coroutine_threadsafe(task, self._asyncLoopThread.loop)
 
+    @staticmethod
+    def exception_handler(_loop:asyncio.AbstractEventLoop, context:dict[str,Any]) -> None:
+        # get details of the exception
+        exception = context['exception']
+        message = context['message']
+        # log exception
+        _log.debug('Task failed, msg = %s, exception = %s', message, exception)
 
     # start/stop sample thread
 
@@ -536,7 +570,9 @@ class AsyncComm:
                 self._running = True
                 self._asyncLoopThread = AsyncLoopThread()
                 # run sample task in async loop
-                asyncio.run_coroutine_threadsafe(self.connect(connect_timeout), self._asyncLoopThread.loop)
+                loop:asyncio.AbstractEventLoop = self._asyncLoopThread.loop
+                loop.set_exception_handler(self.exception_handler)
+                asyncio.run_coroutine_threadsafe(self.connect(connect_timeout), loop)
         except Exception as e:  # pylint: disable=broad-except
             _log.exception(e)
 

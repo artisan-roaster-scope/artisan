@@ -76,7 +76,7 @@ class ApproxBaseReprMixin(ApproxBase):
                 return tuple(recur_repr_helper(o) for o in obj)
             if isinstance(obj, list):
                 return [recur_repr_helper(o) for o in obj]
-            return self._approx_scalar(obj)
+            return self._approx_scalar(obj) # type:ignore[return-value]
 
         return f'approx({recur_repr_helper(self.expected)})'
 

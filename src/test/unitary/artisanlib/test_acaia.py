@@ -369,16 +369,16 @@ class TestAcaiaProtocolFunctions:
                 if 'artisanlib.acaia' in sys.modules:
                     del sys.modules['artisanlib.acaia']
 
-                from artisanlib.acaia import AcaiaBLE
+                from artisanlib.acaia import AcaiaProtocol
 
                 # Test with known payload
                 payload = b'\x07\x02\x14\x02'
-                result = AcaiaBLE.crc(payload)
+                result = AcaiaProtocol.crc(payload)
 
                 assert isinstance(result, bytes)
                 assert len(result) == 2
                 # CRC should be deterministic for same input
-                assert result == AcaiaBLE.crc(payload)
+                assert result == AcaiaProtocol.crc(payload)
 
                 # Test specific values
                 expected_cksum1 = (0x07 + 0x14) & 0xFF  # Even positions: 0, 2
@@ -388,7 +388,7 @@ class TestAcaiaProtocolFunctions:
 
                 # Test with different payload
                 payload2 = b'\x01\x02\x03\x04\x05'
-                result2 = AcaiaBLE.crc(payload2)
+                result2 = AcaiaProtocol.crc(payload2)
                 assert isinstance(result2, bytes)
                 assert len(result2) == 2
 
@@ -398,17 +398,17 @@ class TestAcaiaProtocolFunctions:
                 assert result2[1] == 0x06
 
                 # Test with empty payload
-                empty_result = AcaiaBLE.crc(b'')
+                empty_result = AcaiaProtocol.crc(b'')
                 assert empty_result == b'\x00\x00'
 
                 # Test with single byte
-                single_result = AcaiaBLE.crc(b'\xff')
+                single_result = AcaiaProtocol.crc(b'\xff')
                 assert single_result[0] == 0xFF  # Even position
                 assert single_result[1] == 0x00  # No odd position
 
                 # Test with list input (the method accepts Union[bytes, list[int]])
                 list_payload = [0x07, 0x02, 0x14, 0x02]
-                list_result = AcaiaBLE.crc(list_payload)
+                list_result = AcaiaProtocol.crc(list_payload)
                 assert list_result == result  # Should match bytes input
 
     def test_time_decoding_algorithm(self) -> None:
@@ -441,30 +441,30 @@ class TestAcaiaProtocolFunctions:
                 if 'artisanlib.acaia' in sys.modules:
                     del sys.modules['artisanlib.acaia']
 
-                from artisanlib.acaia import AcaiaBLE
+                from artisanlib.acaia import AcaiaProtocol
 
                 # Test with known time payload: 1 minute, 30 seconds, 5 deciseconds
                 payload = b'\x01\x1e\x05'  # 1 * 60 + 30 + 0.5 = 90.5 seconds
-                result = AcaiaBLE.decode_time(payload)
+                result = AcaiaProtocol.decode_time(payload)
 
                 assert isinstance(result, float)
                 assert result == 90.5
 
                 # Test edge cases
                 payload_zero = b'\x00\x00\x00'
-                assert AcaiaBLE.decode_time(payload_zero) == 0.0
+                assert AcaiaProtocol.decode_time(payload_zero) == 0.0
 
                 payload_max_deciseconds = b'\x00\x00\x09'
-                assert AcaiaBLE.decode_time(payload_max_deciseconds) == 0.9
+                assert AcaiaProtocol.decode_time(payload_max_deciseconds) == 0.9
 
                 # Test deterministic behavior
-                assert AcaiaBLE.decode_time(payload) == AcaiaBLE.decode_time(payload)
+                assert AcaiaProtocol.decode_time(payload) == AcaiaProtocol.decode_time(payload)
 
                 # Test specific calculation components
                 # payload[0] = minutes, payload[1] = seconds, payload[2] = deciseconds
                 test_payload = b'\x02\x0f\x03'  # 2 minutes, 15 seconds, 3 deciseconds
                 expected = (2 * 60) + 15 + (3 / 10.0)  # 120 + 15 + 0.3 = 135.3
-                assert AcaiaBLE.decode_time(test_payload) == expected
+                assert AcaiaProtocol.decode_time(test_payload) == expected
 
     def test_weight_unit_conversions(self) -> None:
         """Test weight unit conversion logic."""
@@ -520,21 +520,21 @@ class TestAcaiaBLEStaticMethods:
                 if 'artisanlib.acaia' in sys.modules:
                     del sys.modules['artisanlib.acaia']
 
-                from artisanlib.acaia import EVENT_LEN, AcaiaBLE
+                from artisanlib.acaia import EVENT_LEN, AcaiaProtocol
 
                 # Test with valid timer payload
                 valid_payload = b'\x01\x1e\x05'  # 1 minute, 30 seconds, 5 deciseconds
-                result = AcaiaBLE.parse_timer_event(valid_payload)
+                result = AcaiaProtocol.parse_timer_event(valid_payload)
                 assert result == EVENT_LEN.TIMER
 
                 # Test with insufficient payload length
                 short_payload = b'\x01\x1e'  # Only 2 bytes, need 3
-                result_short = AcaiaBLE.parse_timer_event(short_payload)
+                result_short = AcaiaProtocol.parse_timer_event(short_payload)
                 assert result_short == -1
 
                 # Test with empty payload
                 empty_payload = b''
-                result_empty = AcaiaBLE.parse_timer_event(empty_payload)
+                result_empty = AcaiaProtocol.parse_timer_event(empty_payload)
                 assert result_empty == -1
 
 
@@ -570,7 +570,7 @@ class TestAcaiaBLEWeightDecoding:
                 def send(self, data: bytes) -> None:
                     pass
 
-                def add_device_description(self, service_uuid: str, device_name: str) -> None:
+                def add_device_description(self, service_uuid: str, device_name: str, device_manufacturer_key:int|None = None) -> None:
                     pass
 
                 def add_notify(self, notify_uuid: str, callback:'Callable[[BleakGATTCharacteristic, bytearray], None]') -> None:
@@ -590,15 +590,15 @@ class TestAcaiaBLEWeightDecoding:
 
                 # Create an instance to test instance methods
                 acaia_ble = AcaiaBLE()
-                acaia_ble.scale_class = SCALE_CLASS.MODERN
-                acaia_ble.unit = UNIT.G
+                acaia_ble.protocol.scale_class = SCALE_CLASS.MODERN
+                acaia_ble.protocol.unit = UNIT.G
 
                 # Test with valid weight payload (6 bytes minimum)
                 # Payload format: [weight_bytes(4)] + [factor] + [flags]
                 # Weight is little-endian: 1000 = 0x03e8 = [0xe8, 0x03, 0x00, 0x00]
                 # Stable flag is inverted: stable = (payload[5] & 0x01) != 0x01
                 test_payload = b'\xe8\x03\x00\x00\x01\x00'  # 1000 in little-endian, factor=TEN, stable (bit 0 = 0)
-                weight, stable = acaia_ble.decode_weight(test_payload)
+                weight, stable = acaia_ble.protocol.decode_weight(test_payload)
 
                 assert weight is not None
                 assert isinstance(weight, float)
@@ -607,22 +607,22 @@ class TestAcaiaBLEWeightDecoding:
 
                 # Test with different factor
                 test_payload_hundred = b'\xe8\x03\x00\x00\x02\x00'  # factor=HUNDRED, stable
-                weight_hundred, _ = acaia_ble.decode_weight(test_payload_hundred)
+                weight_hundred, _ = acaia_ble.protocol.decode_weight(test_payload_hundred)
                 assert weight_hundred == 10.0  # 1000 / 100 = 10.0
 
                 # Test with negative weight (bit 1 of last byte)
                 test_payload_negative = b'\xe8\x03\x00\x00\x01\x02'  # negative flag set (bit 1)
-                weight_neg, _ = acaia_ble.decode_weight(test_payload_negative)
+                weight_neg, _ = acaia_ble.protocol.decode_weight(test_payload_negative)
                 assert weight_neg == -100.0
 
                 # Test unstable reading (bit 0 = 1)
                 test_payload_unstable = b'\xe8\x03\x00\x00\x01\x01'  # unstable (bit 0 = 1)
-                _, stable_unstable = acaia_ble.decode_weight(test_payload_unstable)
+                _, stable_unstable = acaia_ble.protocol.decode_weight(test_payload_unstable)
                 assert stable_unstable is False  # unstable when bit 0 = 1
 
                 # Test with insufficient payload
                 short_payload = b'\x00\x00\x03'  # Only 3 bytes
-                weight_short, stable_short = acaia_ble.decode_weight(short_payload)
+                weight_short, stable_short = acaia_ble.protocol.decode_weight(short_payload)
                 assert weight_short is None
                 assert stable_short is False
 
@@ -659,7 +659,7 @@ class TestAcaiaBLEMessageConstruction:
                 def send(self, data: bytes) -> None:
                     pass
 
-                def add_device_description(self, service_uuid: str, device_name: str) -> None:
+                def add_device_description(self, service_uuid: str, device_name: str, device_manufacturer_key:int|None = None) -> None:
                     pass
 
                 def add_notify(self, notify_uuid: str, callback:'Callable[[BleakGATTCharacteristic, bytearray], None]') -> None:
@@ -675,7 +675,7 @@ class TestAcaiaBLEMessageConstruction:
                 if 'artisanlib.acaia' in sys.modules:
                     del sys.modules['artisanlib.acaia']
 
-                from artisanlib.acaia import AcaiaBLE
+                from artisanlib.acaia import AcaiaBLE, AcaiaProtocol, HEADER1, HEADER2
 
                 # Create an instance to test instance methods
                 acaia_ble = AcaiaBLE()
@@ -683,23 +683,23 @@ class TestAcaiaBLEMessageConstruction:
                 # Test message construction
                 test_type = 0x07  # INFO message type
                 test_payload = b'\x02\x14\x02'
-                message = acaia_ble.message(test_type, test_payload)
+                message = acaia_ble.protocol.message(test_type, test_payload)
 
                 # Verify message structure: HEADER1 + HEADER2 + type + payload + CRC
                 assert len(message) >= 7  # 1 + 1 + 1 + 3 + 2 = 8 bytes minimum
-                assert message[0:1] == AcaiaBLE.HEADER1  # b'\xef'
-                assert message[1:2] == AcaiaBLE.HEADER2  # b'\xdd'
+                assert message[0:1] == HEADER1  # b'\xef'
+                assert message[1:2] == HEADER2  # b'\xdd'
                 assert message[2] == test_type
                 assert message[3:6] == test_payload
 
                 # Verify CRC is appended (last 2 bytes)
-                expected_crc = AcaiaBLE.crc(test_payload)
+                expected_crc = AcaiaProtocol.crc(test_payload)
                 assert message[-2:] == expected_crc
 
                 # Test with empty payload
-                empty_message = acaia_ble.message(0x08, b'')
+                empty_message = acaia_ble.protocol.message(0x08, b'')
                 assert len(empty_message) == 5  # headers + type + empty payload + CRC
-                assert empty_message[-2:] == AcaiaBLE.crc(b'')  # CRC of empty payload
+                assert empty_message[-2:] == AcaiaProtocol.crc(b'')  # CRC of empty payload
 
     def test_payload_length_validation(self) -> None:
         """Test payload length validation logic."""
@@ -747,7 +747,7 @@ class TestAcaiaBLEEventParsing:
                 def send(self, data: bytes) -> None:
                     pass
 
-                def add_device_description(self, service_uuid: str, device_name: str) -> None:
+                def add_device_description(self, service_uuid: str, device_name: str, device_manufacturer_key:int|None = None) -> None:
                     pass
 
                 def add_notify(self, notify_uuid: str, callback:'Callable[[BleakGATTCharacteristic, bytearray], None]') -> None:
@@ -770,32 +770,32 @@ class TestAcaiaBLEEventParsing:
 
                 # Test with valid battery payload
                 valid_payload = b'\x4b'  # 75% battery
-                result = acaia_ble.parse_battery_event(valid_payload)
+                result = acaia_ble.protocol.parse_battery_event(valid_payload)
                 assert result == EVENT_LEN.BATTERY
-                assert acaia_ble.battery == 75
+                assert acaia_ble.protocol.battery == 75
 
                 # Test with 100% battery
                 full_payload = b'\x64'  # 100% battery
-                result_full = acaia_ble.parse_battery_event(full_payload)
+                result_full = acaia_ble.protocol.parse_battery_event(full_payload)
                 assert result_full == EVENT_LEN.BATTERY
-                assert acaia_ble.battery == 100
+                assert acaia_ble.protocol.battery == 100
 
                 # Test with 0% battery
                 empty_payload = b'\x00'  # 0% battery
-                result_empty = acaia_ble.parse_battery_event(empty_payload)
+                result_empty = acaia_ble.protocol.parse_battery_event(empty_payload)
                 assert result_empty == EVENT_LEN.BATTERY
-                assert acaia_ble.battery == 0
+                assert acaia_ble.protocol.battery == 0
 
                 # Test with invalid battery value (>100)
                 invalid_payload = b'\xff'  # 255% battery (invalid)
-                acaia_ble.battery = None  # Reset
-                result_invalid = acaia_ble.parse_battery_event(invalid_payload)
+                acaia_ble.protocol.battery = None  # Reset
+                result_invalid = acaia_ble.protocol.parse_battery_event(invalid_payload)
                 assert result_invalid == EVENT_LEN.BATTERY
-                assert acaia_ble.battery is None  # Should not be updated
+                assert acaia_ble.protocol.battery is None  # Should not be updated
 
                 # Test with insufficient payload
                 short_payload = b''  # Empty payload
-                result_short = acaia_ble.parse_battery_event(short_payload)
+                result_short = acaia_ble.protocol.parse_battery_event(short_payload)
                 assert result_short == -1
 
     def test_parse_weight_event(self) -> None:
@@ -827,7 +827,7 @@ class TestAcaiaBLEEventParsing:
                 def send(self, data: bytes) -> None:
                     pass
 
-                def add_device_description(self, service_uuid: str, device_name: str) -> None:
+                def add_device_description(self, service_uuid: str, device_name: str, device_manufacturer_key:int|None = None) -> None:
                     pass
 
                 def add_notify(self, notify_uuid: str, callback:'Callable[[BleakGATTCharacteristic, bytearray], None]') -> None:
@@ -852,19 +852,19 @@ class TestAcaiaBLEEventParsing:
 
                 # Create an instance to test instance methods
                 acaia_ble = AcaiaBLE()
-                acaia_ble.scale_class = SCALE_CLASS.MODERN
-                acaia_ble.unit = UNIT.G
+                acaia_ble.protocol.scale_class = SCALE_CLASS.MODERN
+                acaia_ble.protocol.unit = UNIT.G
 
                 # Test with valid weight payload (6 bytes minimum)
                 valid_payload = (
                     b'\xe8\x03\x00\x00\x01\x01'  # 1000 in little-endian, factor=TEN, stable
                 )
-                result = acaia_ble.parse_weight_event(valid_payload)
+                result = acaia_ble.protocol.parse_weight_event(valid_payload)
                 assert result == EVENT_LEN.WEIGHT
 
                 # Test with insufficient payload
                 short_payload = b'\x00\x00\x03'  # Only 3 bytes, need 6
-                result_short = acaia_ble.parse_weight_event(short_payload)
+                result_short = acaia_ble.protocol.parse_weight_event(short_payload)
                 assert result_short == -1
 
 
@@ -900,7 +900,7 @@ class TestAcaiaBLEScaleClassBehavior:
                 def send(self, data: bytes) -> None:
                     pass
 
-                def add_device_description(self, service_uuid: str, device_name: str) -> None:
+                def add_device_description(self, service_uuid: str, device_name: str, device_manufacturer_key:int|None = None) -> None:
                     pass
 
                 def add_notify(self, notify_uuid: str, callback:'Callable[[BleakGATTCharacteristic, bytearray], None]') -> None:
@@ -920,16 +920,16 @@ class TestAcaiaBLEScaleClassBehavior:
 
                 # Create an instance to test instance methods
                 acaia_ble = AcaiaBLE()
-                acaia_ble.scale_class = SCALE_CLASS.MODERN
+                acaia_ble.protocol.scale_class = SCALE_CLASS.MODERN
 
                 # Test unit conversion for MODERN scales
-                acaia_ble.unit = UNIT.KG
+                acaia_ble.protocol.unit = UNIT.KG
                 test_payload = b'\xe8\x03\x00\x00\x01\x01'  # 1000 in little-endian, factor=TEN
-                weight, _ = acaia_ble.decode_weight(test_payload)
+                weight, _ = acaia_ble.protocol.decode_weight(test_payload)
                 assert weight == 100000.0  # 100.0 * 1000 (kg to g conversion)
 
-                acaia_ble.unit = UNIT.OZ
-                weight_oz, _ = acaia_ble.decode_weight(test_payload)
+                acaia_ble.protocol.unit = UNIT.OZ
+                weight_oz, _ = acaia_ble.protocol.decode_weight(test_payload)
                 assert weight_oz is not None
                 assert abs(weight_oz - 2834.95) < 0.01  # 100.0 * 28.3495 (oz to g conversion)
 
@@ -962,7 +962,7 @@ class TestAcaiaBLEScaleClassBehavior:
                 def send(self, data: bytes) -> None:
                     pass
 
-                def add_device_description(self, service_uuid: str, device_name: str) -> None:
+                def add_device_description(self, service_uuid: str, device_name: str, device_manufacturer_key:int|None = None) -> None:
                     pass
 
                 def add_notify(self, notify_uuid: str, callback:'Callable[[BleakGATTCharacteristic, bytearray], None]') -> None:
@@ -982,21 +982,21 @@ class TestAcaiaBLEScaleClassBehavior:
 
                 # Create an instance to test instance methods
                 acaia_ble = AcaiaBLE()
-                acaia_ble.scale_class = SCALE_CLASS.RELAY
-                acaia_ble.unit = UNIT.KG  # Should not affect RELAY scales
+                acaia_ble.protocol.scale_class = SCALE_CLASS.RELAY
+                acaia_ble.protocol.unit = UNIT.KG  # Should not affect RELAY scales
 
                 # Test that RELAY scales always report in grams (no unit conversion)
                 test_payload = b'\xe8\x03\x00\x00\x01\x01'  # 1000 in little-endian, factor=TEN
-                weight, _ = acaia_ble.decode_weight(test_payload)
+                weight, _ = acaia_ble.protocol.decode_weight(test_payload)
                 assert weight == 100.0  # No conversion for RELAY scales
 
                 # Test stable bit behavior for RELAY scales (same as other scales in current implementation)
                 test_payload_stable = b'\xe8\x03\x00\x00\x01\x00'  # stable bit = 0
-                _, stable = acaia_ble.decode_weight(test_payload_stable)
+                _, stable = acaia_ble.protocol.decode_weight(test_payload_stable)
                 assert stable is True  # stable when bit 0 = 0
 
                 test_payload_unstable = b'\xe8\x03\x00\x00\x01\x01'  # stable bit = 1
-                _, stable_inv = acaia_ble.decode_weight(test_payload_unstable)
+                _, stable_inv = acaia_ble.protocol.decode_weight(test_payload_unstable)
                 assert stable_inv is False  # unstable when bit 0 = 1
 
 
@@ -1039,7 +1039,7 @@ class TestAcaiaWrapperClass:
                 def send(self, data: bytes) -> None:
                     pass
 
-                def add_device_description(self, service_uuid: str, device_name: str) -> None:
+                def add_device_description(self, service_uuid: str, device_name: str, device_manufacturer_key:int|None = None) -> None:
                     pass
 
                 def add_notify(self, notify_uuid: str, callback:'Callable[[BleakGATTCharacteristic, bytearray], None]') -> None:
@@ -1057,10 +1057,10 @@ class TestAcaiaWrapperClass:
                 if 'artisanlib.acaia' in sys.modules:
                     del sys.modules['artisanlib.acaia']
 
-                from artisanlib.acaia import Acaia
+                from artisanlib.acaia import AcaiaBluetooth
 
                 # Test Acaia wrapper initialization
-                acaia_wrapper = Acaia(
+                acaia_wrapper = AcaiaBluetooth(
                     model=1, ident='test_address', name='Test Scale', stable_only=True, decimals=2
                 )
 
@@ -1152,7 +1152,7 @@ class TestAcaiaWrapperClass:
                 def send(self, data: bytes) -> None:
                     pass
 
-                def add_device_description(self, service_uuid: str, device_name: str) -> None:
+                def add_device_description(self, service_uuid: str, device_name: str, device_manufacturer_key:int|None = None) -> None:
                     pass
 
                 def add_notify(self, notify_uuid: str, callback:'Callable[[BleakGATTCharacteristic, bytearray], None]') -> None:
@@ -1170,10 +1170,10 @@ class TestAcaiaWrapperClass:
                 if 'artisanlib.acaia' in sys.modules:
                     del sys.modules['artisanlib.acaia']
 
-                from artisanlib.acaia import Acaia
+                from artisanlib.acaia import AcaiaBluetooth
 
                 # Test Acaia wrapper methods
-                acaia_wrapper = Acaia(model=1, ident='test', name='Test')
+                acaia_wrapper = AcaiaBluetooth(model=1, ident='test', name='Test')
 
                 # Test initial connection state
                 assert acaia_wrapper.is_connected() is False
@@ -1199,9 +1199,3 @@ class TestAcaiaWrapperClass:
                 # Test disconnection state change
                 acaia_wrapper.scale_connected = False
                 assert acaia_wrapper.is_connected() is False
-
-                # Test max_weight and readability methods
-                acaia_wrapper.acaia.max_weight = 2000
-                acaia_wrapper.acaia.readability = 0.1
-                assert acaia_wrapper.max_weight() == 2000.0
-                assert acaia_wrapper.readability() == 0.1

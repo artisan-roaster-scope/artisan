@@ -25,7 +25,7 @@ from platform import system
 from collections.abc import Generator
 
 import usb.core # type: ignore[import-untyped]
-import usb.util # type: ignore[import-untyped]
+import usb.util # type: ignore[import-untyped] # zuban: ignore[no-redef]
 
 
 if system().startswith('Windows'):

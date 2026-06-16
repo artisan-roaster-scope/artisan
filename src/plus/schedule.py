@@ -3163,11 +3163,12 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                     # if previous selected roast is loaded we write the changes to its roast properties
                     if item.roastUUID.hex == self.aw.qmc.roastUUID:
                         self.updates_roast_properties_from_completed(item)
-                    # we update the completed_roasts_cache entry
-                    completed_item_dict = item.model_dump(mode='json')
-                    if 'prefix' in completed_item_dict:
-                        del completed_item_dict['prefix']
-                    add_completed(self.aw.plus_account_id, cast(CompletedItemDict, completed_item_dict))
+# this add_completed is already done by the above update_completed_item!!
+#                    # we update the completed_roasts_cache entry
+#                    completed_item_dict = item.model_dump(mode='json')
+#                    if 'prefix' in completed_item_dict:
+#                        del completed_item_dict['prefix']
+#                    add_completed(self.aw.plus_account_id, cast(CompletedItemDict, completed_item_dict))
                     self.updateRoastedItems() # updates widgets
             except Exception as e:  # pylint: disable=broad-except
                 # updating data to server failed

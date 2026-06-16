@@ -1610,6 +1610,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 self.scale1NameComboBox.setEnabled(False)
                 self.scale1EditButton.setEnabled(False)
                 self.scale1ScanButton.setEnabled(False)
+                self.updateScale1NameLabel(0)
             elif self.aw.scale1_model < len(SUPPORTED_SCALES):
                 self.scale1ModelComboBox.setCurrentIndex(self.aw.scale1_model + 1)
                 if self.aw.scale1_name is None:
@@ -1618,6 +1619,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 else:
                     self.scale1NameComboBox.setEnabled(True)
                     self.scale1EditButton.setEnabled(True)
+                self.updateScale1NameLabel(SUPPORTED_SCALES[self.aw.scale1_model][1])
             self.scale1ModelComboBox.currentIndexChanged.connect(self.scale1ModelChanged)
             self.scale1NameComboBox.currentIndexChanged.connect(self.scale1NameChanged)
             self.scale1ScanButton.clicked.connect(self.scanScale1)
@@ -1681,6 +1683,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 self.scale2NameComboBox.setEnabled(False)
                 self.scale2EditButton.setEnabled(False)
                 self.scale2ScanButton.setEnabled(False)
+                self.updateScale2NameLabel(0)
             else:
                 s2m:int = self.aw.scale2_model # hack to keep ty happy
                 if s2m < len(SUPPORTED_SCALES):
@@ -1691,6 +1694,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     else:
                         self.scale2NameComboBox.setEnabled(True)
                         self.scale2EditButton.setEnabled(True)
+                self.updateScale2NameLabel(SUPPORTED_SCALES[self.aw.scale2_model][1])
             self.scale2ModelComboBox.currentIndexChanged.connect(self.scale2ModelChanged)
             self.scale2NameComboBox.currentIndexChanged.connect(self.scale2NameChanged)
             self.scale2ScanButton.clicked.connect(self.scanScale2)
@@ -2097,6 +2101,13 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         except Exception: # pylint: disable=broad-except
             pass
 
+    # scale_type 0: Bluetooth => Name (default)
+    # scale_type 1: Serial => Port
+    # scale_type 2: WiFi => Name
+    def updateScale1NameLabel(self, scale_type:int) -> None:
+        self.scale1NameLabel.setText(QApplication.translate('Label','Port') if scale_type == 2 else
+                QApplication.translate('Label','Name'))
+
     @pyqtSlot(int)
     def scale1ModelChanged(self, i:int) -> None:
         self.scale1NameComboBox.setEnabled(False)
@@ -2104,12 +2115,14 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         if i > 0 and len(SUPPORTED_SCALES) > i-1 and len(SUPPORTED_SCALES[i-1]) > 0:
             self.aw.scale1_model = i-1
             self.scale1ScanButton.setEnabled(True)
+            self.updateScale1NameLabel(SUPPORTED_SCALES[i-1][1])
         else:
             self.aw.scale1_name = None
             self.aw.scale1_model = None
             self.scale1NameComboBox.clear()
             self.scale1ScanButton.setEnabled(False)
             self.update_scale1_weight(None)
+            self.updateScale1NameLabel(0)
 
     @pyqtSlot(int)
     def scale1NameChanged(self, i:int) -> None:
@@ -2198,6 +2211,18 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.scale1ScanButton.setEnabled(True)
         QApplication.restoreOverrideCursor()
 
+    def update_scale_names(self) -> None:
+        try:
+            self.scale1NameComboBox.blockSignals(True)
+            self.updateScale1devices(self.scale1_devices, keep_selection=True)
+        finally:
+            self.scale1NameComboBox.blockSignals(False)
+        try:
+            self.scale2NameComboBox.blockSignals(True)
+            self.updateScale2devices(self.scale2_devices, keep_selection=True)
+        finally:
+            self.scale2NameComboBox.blockSignals(False)
+
     @pyqtSlot(bool)
     def editScale1(self, _:bool = False) -> None:
         if self.aw.scale1_id and self.aw.scale1_name:
@@ -2208,12 +2233,18 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             if state:
                 self.aw.set_custom_scale_name(self.aw.scale1_id, new_name.strip())
                 # we need to update both popups
-                self.updateScale1devices(self.scale1_devices, keep_selection=True)
-                self.updateScale2devices(self.scale2_devices, keep_selection=True)
+                self.update_scale_names()
 
     @pyqtSlot(bool)
     def tareScale1(self, _:bool = False) -> None:
         self.aw.scale_manager.tare_scale1_signal.emit()
+
+    # scale_type 0: Bluetooth => Name (default)
+    # scale_type 1: Serial => Port
+    # scale_type 2: WiFi => Name
+    def updateScale2NameLabel(self, scale_type:int) -> None:
+        self.scale2NameLabel.setText(QApplication.translate('Label','Port') if scale_type == 2 else
+                QApplication.translate('Label','Name'))
 
     @pyqtSlot(int)
     def scale2ModelChanged(self, i:int) -> None:
@@ -2222,12 +2253,14 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         if i > 0 and len(SUPPORTED_SCALES) > i-1 and len(SUPPORTED_SCALES[i-1]) > 0:
             self.aw.scale2_model = i-1
             self.scale2ScanButton.setEnabled(True)
+            self.updateScale2NameLabel(SUPPORTED_SCALES[i-1][1])
         else:
             self.aw.scale2_name = None
             self.aw.scale2_model = None
             self.scale2NameComboBox.clear()
             self.scale2ScanButton.setEnabled(False)
             self.update_scale2_weight(None)
+            self.updateScale1NameLabel(0)
 
     @pyqtSlot(int)
     def scale2NameChanged(self, i:int) -> None:
@@ -2309,8 +2342,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             if state:
                 self.aw.set_custom_scale_name(self.aw.scale2_id, new_name.strip())
                 # we need to update both popups
-                self.updateScale1devices(self.scale1_devices, keep_selection=True)
-                self.updateScale2devices(self.scale2_devices, keep_selection=True)
+                self.update_scale_names()
 
     @pyqtSlot(bool)
     def tareScale2(self, _:bool = False) -> None:

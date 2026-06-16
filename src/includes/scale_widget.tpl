@@ -271,7 +271,7 @@ Receives data in the shape of
             elements.outer_frame.style.background = '#b5b5b5';
             elements.percent.style.color = 'black';
             elements.weight.style.color = 'black';
-            elements.percent.style.top = '-10%';
+            // elements.percent.style.top = '-10%';
         }
 
         function setTexts() {
@@ -415,7 +415,7 @@ Receives data in the shape of
                                 // display bucket on scale and %
                                 elements.scale_rect.style.display = 'block';
                                 elements.bucket_on_scale.style.display = 'block';
-                                elements.percent.style.display = 'block';                                
+                                elements.percent.style.display = 'block';
                                 if (parsedData.weight) {
                                     elements.percent.innerHTML = parsedData.percent.toFixed(0) + '%';
                                 } else {
@@ -429,6 +429,7 @@ Receives data in the shape of
                                 elements.percent.style.lineHeight = '30.5cqmin';
                                 elements.percent.style.fontSize = '24cqmin';
                                 elements.percent.style.fontWeight = '400';
+                                elements.percent.style.top = '0';
                                 elements.weight.style.display = 'block';
                                 elements.percent.classList.remove('fade-out');
                                 elements.weight.classList.remove('zoom-weight');
@@ -454,7 +455,7 @@ Receives data in the shape of
                                     elements.percent.style.fontSize = '24cqmin';
                                     elements.percent.style.fontWeight = '400';
                                     elements.weight.style.display = 'none';
-                                    elements.percent.style.top = '0';
+                                    elements.percent.style.top = '30%';
                                 } else {
                                     // ZOOM for >(100 - accuracy)% (and != 100)
 
@@ -472,6 +473,10 @@ Receives data in the shape of
                                     //     }, 25);
                                     // }
                                     elements.scale_rect.style.background = ABLUE;
+
+                                    if (parsedData.percent >= 97.5) {
+                                        elements.weight.style.color = 'white';
+                                    }
 
                                     elements.timer_progress.style.setProperty('--progress-color', 'white');
                                     // elements.percent.style.display = 'none';
@@ -1053,18 +1058,22 @@ Receives data in the shape of
             height: 76%;
             border: 0.5vmin solid #515151;
             border-radius: 100%;
-            align-content: center;
+            /* align-content: center; */
             display: block;
-            align-items: center;
+            /* align-items: center; */
         }
 
         .percent {
-            margin-top: auto;
-            margin-bottom: auto;
-            top: -10%;
+            /* margin-top: auto; */
+            /* margin-bottom: auto; */
+            /* top: -10%; */
             position: relative;
             background: none;
             z-index: 4;
+        }
+
+        .percent.big-font-weight {
+            margin-top: 13%;
         }
 
         .zoom-weight {

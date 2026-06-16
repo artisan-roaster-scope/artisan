@@ -28,6 +28,7 @@ from PyQt6.QtWidgets import QApplication
 from typing import override, Final, TypedDict, IO, TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
     from artisanlib.atypes import SerialSettings, ComputedProfileInformation # pylint: disable=unused-import
 
 from artisanlib.async_comm import AsyncComm, IteratorReader
@@ -62,6 +63,7 @@ class State(TypedDict, total=False):
 
 class Orbiter(AsyncComm):
 
+    BT_CUTOFF_TEMP:Final[int] = 250 # on BT temperatures beyond this temperature limit (in C) the heater power is set to zero
     HEADER:Final[bytes] = b'\xFF\xFF'
     EVENT:Final[bytes] = b'\x00'
     CMD_SYNC:Final[bytes] = b'\x00'
@@ -134,8 +136,14 @@ class Orbiter(AsyncComm):
 
     # getBT triggers fetching a complete set of new readings
     # time is the preheat/roasting/cooling time in seconds send along the sync command to the machine
-    def getBT(self, time:int = 0) -> float:
+    def getBT(self, aw:'ApplicationWindow|None' = None, time:int = 0) -> float:
         self.send_sync_await(time)
+        # check for critical cut of temperature and turn OFF the heater if needed
+        if aw is not None and self._BT > self.BT_CUTOFF_TEMP:
+            orbiter_cmd:bytes = bytes.fromhex('0D') # heater
+            orbiter_data:bytes = b'\x00\x00' # 0%
+            orbiter_param:bytes = b'\x00'
+            aw.orbiterSendMessageSignal.emit(orbiter_cmd, orbiter_data, orbiter_param, time)
         return self._BT
     def getET(self) -> float:
         return self._ET

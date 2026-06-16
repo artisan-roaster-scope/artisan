@@ -15,8 +15,6 @@
 # AUTHOR
 # Marko Luther, 2025
 
-import math
-import platform
 import time as libtime
 import logging
 from enum import IntEnum, unique
@@ -25,23 +23,21 @@ from typing import Final
 
 from PyQt6.QtCore import Qt, QObject, pyqtSignal, pyqtSlot, QTimer
 
-from artisanlib.util import toFloat
-
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 
 
 #  tuples (model name, connection type) with connection type from {0: BT, 1: WiFi, 2: Serial}
-SUPPORTED_SCALES:Final[list[tuple[str,int]]] = (
-[
-    ('Acaia', 0) # 0
-] if not (platform.system() == 'Windows' and math.floor(toFloat(platform.release())) < 10) else [])
+SUPPORTED_SCALES:Final[list[tuple[str,int]]] = [
+    ('Acaia Bluetooth', 0),
+    ('Acaia Serial', 1)
+]
 
-ScaleSpec = tuple[str,str] # scale name, scale id (eg. ble address)
+ScaleSpec = tuple[str,str] # scale name, scale id (eg. ble address or serial port)
 ScaleSpecs = list[ScaleSpec]
 
 # STABLE_TIMER_PERIOD should be >1sec if Acaia is reporting also non-stable readings, for stable readings a very short period is fine
-STABLE_TIMER_PERIOD =350 # period to wait until new weight stabilized before forwarding the new reading via scale_stable_weight_changed signals (> then scale update period!)
+STABLE_TIMER_PERIOD = 350 # period to wait until new weight stabilized before forwarding the new reading via scale_stable_weight_changed signals (> the scale update period!)
 MIN_STABLE_WEIGHT_CHANGE = 1 # The weight has to change for at least this amount (in g) to update the last stable weight
 
 
@@ -231,7 +227,7 @@ class ScaleManager(QObject):
         self.disconnect_all_signal.connect(self.disconnect_all_slot, type=Qt.ConnectionType.QueuedConnection) # type: ignore[call-arg]
         self.connect_all_signal.connect(self.connect_all_slot, type=Qt.ConnectionType.QueuedConnection) # type: ignore[call-arg]
 
-        self.scale1_last_weight:int|None = None    # in g; cleared by arrival of fresh non-stable weights, holding last weight to-be-come stable_weight
+        self.scale1_last_weight:int|None = None     # in g; cleared by arrival of fresh non-stable weights, holding last weight to-be-come stable_weight
         self.scale1_stable_reading_timer = QTimer()
         self.scale1_stable_reading_timer.setSingleShot(True)
         self.scale1_stable_reading_timer.timeout.connect(self.scale1_stable_reading_timer_slot)
@@ -247,8 +243,12 @@ class ScaleManager(QObject):
 
     def _get_scale(self, model:int, ident:str, name:str) -> Scale|None:
         if model == 0:
-            from artisanlib.acaia import Acaia
-            return Acaia(model, ident, name, lambda : self.connected_handler(ident, name), lambda : self.disconnected_handler(ident, name),
+            from artisanlib.acaia import AcaiaBluetooth
+            return AcaiaBluetooth(model, ident, name, lambda : self.connected_handler(ident, name), lambda : self.disconnected_handler(ident, name),
+                stable_only=False, decimals=0)
+        if model == 1:
+            from artisanlib.acaia import AcaiaSerial
+            return AcaiaSerial(model, ident, name, lambda : self.connected_handler(ident, name), lambda : self.disconnected_handler(ident, name),
                 stable_only=False, decimals=0)
         return None
 
@@ -308,8 +308,8 @@ class ScaleManager(QObject):
 
     @pyqtSlot(int)
     def scan_scale1_slot(self, model:int) -> None:
-        if model == 0: # Acaia
-            self.set_scale1_slot(0,'', '')
+        if model in {0, 1}: # Acaia Bluetooth or Serial
+            self.set_scale1_slot(model, '', '')
             if self.scale1 is not None:
                 self.scale1.scan()
 
@@ -368,8 +368,10 @@ class ScaleManager(QObject):
     # weight in g
     @pyqtSlot(float, bool)
     def scale1_weight_changed_slot(self, weight:float, stable:bool) -> None:
+        _log.debug('PRINT scale1_weight_changed_slot(%s,%s)',weight,stable)
+        _log.debug('PRINT self.scale1_last_weight: %s',self.scale1_last_weight)
         self.scale1_last_weight_sent = int(round(weight))
-        if stable:
+        if stable: # we expect at least on unstable weight (which in turn is turned into a stable reading by our timer!) after a stable one
             self.scale1_last_weight = None # prevent earlier non-stable weights to be send delayed as stable via the timer
             # weights marked as stable by the scale are immediately forwarded as stable weights
 #            _log.debug("PRINT stable weight forwarded: %s", self.scale1_last_weight_sent)
@@ -438,8 +440,8 @@ class ScaleManager(QObject):
 
     @pyqtSlot(int)
     def scan_scale2_slot(self, model:int) -> None:
-        if model == 0: # Acaia
-            self.set_scale2_slot(0,'', '')
+        if model in {0, 1}: # Acaia Bluetooth or Serial
+            self.set_scale2_slot(model, '', '')
             if self.scale2 is not None:
                 self.scale2.scan()
 

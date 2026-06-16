@@ -57,30 +57,41 @@ class BLE:
     def terminate_scan(self) -> None:
         self._terminate_scan_event.set()
 
-    # returns True if the given device name matches with the devices name or the local_name of the advertisement
+    # returns True if the given device_name is a prefix of the devices name or the local_name of the advertisement
     # returns True also in case the local_name is None, but the given service_uuid is within ad.service_uuids
     @staticmethod
-    def name_match(bd:'BLEDevice', ad:'AdvertisementData', device_name:str, case_sensitive:bool, service_uuid:str|None) -> bool:
-        return ((bd.name is not None and (bd.name.startswith(device_name) if
-                    case_sensitive else bd.name.casefold().startswith(device_name.casefold()))) or
-                (ad.local_name is not None and (ad.local_name.startswith(device_name) if
-                    case_sensitive else ad.local_name.casefold().startswith(device_name.casefold()))) or
+    def name_match(bd:'BLEDevice', ad:'AdvertisementData', device_name:str, case_sensitive:bool, service_uuid:str|None, manufacturer_key:int|None) -> bool:
+        def manufacturer_key_match() -> bool:
+            # if given Advertisement data lists service_uuids and the service_uuid is given (not None) it has to be contained among the service_uuids provided by the service
+            # to match, thus this function
+            # returns True if service_uuid is None or ad.service_uuids is []
+            # or if service_uuid is in ad.service_uuids
+            return service_uuid is None or manufacturer_key is None or manufacturer_key in ad.manufacturer_data
+
+        return ((manufacturer_key_match() and (
+                    (bd.name is not None and (bd.name.startswith(device_name) if
+                        case_sensitive else bd.name.casefold().startswith(device_name.casefold()))) or
+                    (ad.local_name is not None and (ad.local_name.startswith(device_name) if
+                        case_sensitive else ad.local_name.casefold().startswith(device_name.casefold()))))) or
                 (ad.local_name is None and service_uuid is not None and
                     service_uuid.casefold() in (uuid.casefold() for uuid in ad.service_uuids)))
 
     # matches the discovered BLEDevice and AdvertisementData
     # returns True on success and False otherwise, as well as the service_uuid str of the matching device_description
     def description_match(self, bd:'BLEDevice', ad:'AdvertisementData',
-            device_descriptions:dict[str|None,set[str]|None], case_sensitive:bool) -> tuple[bool, str|None]:
-        for service_uuid, device_names in device_descriptions.items():
-            if device_names is None or any(self.name_match(bd,ad,device_name,case_sensitive, service_uuid) for device_name in device_names):
+            device_descriptions:tuple[dict[str|None,set[str]|None], dict[str, dict[str, int]]], case_sensitive:bool) -> tuple[bool, str|None]:
+        for service_uuid, device_names in device_descriptions[0].items():
+            if device_names is None or any(self.name_match(bd,ad,device_name,case_sensitive, service_uuid,
+                            (device_descriptions[1][service_uuid][device_name] if
+                                service_uuid in device_descriptions[1] and device_name in device_descriptions[1][service_uuid] else None))
+                    for device_name in device_names):
                 return True, service_uuid
         return False, None
 
 
     # returns discovered_bd and service_uuid on success, or None
     async def _scan(self,
-            device_descriptions:dict[str|None,set[str]|None],
+            device_descriptions:tuple[dict[str|None,set[str]|None], dict[str, dict[str, int]]],
             blacklist:set[str],
             case_sensitive:bool,
             scan_timeout:float,
@@ -108,7 +119,7 @@ class BLE:
     # pylint: disable=too-many-positional-arguments
     # on success returns tuple of BleakClient, service UUID as str and device name
     async def _scan_and_connect(self,
-                device_descriptions:dict[str|None,set[str]|None],
+                device_descriptions:tuple[dict[str|None,set[str]|None], dict[str, dict[str, int]]],
                 blacklist:set[str], # client addresses to ignore
                 case_sensitive:bool,
                 disconnected_callback:Callable[[BleakClient], None]|None,
@@ -174,7 +185,7 @@ class BLE:
         return None
 
     def scan_and_connect(self,
-            device_descriptions: dict[str|None, set[str]|None],
+            device_descriptions: tuple[dict[str|None,set[str]|None], dict[str, dict[str, int]]],
             blacklist:set[str], # list of client addresses to ignore as they don't offer the required service
             case_sensitive:bool=True,
             disconnected_callback:Callable[[BleakClient], None]|None = None,
@@ -248,10 +259,6 @@ class ClientBLE(QObject):
     SCAN_BETWEEN_SCANS_MAX:Final[float] = 3     # maximum sleep between scans in seconds
 
 # NOTE: __slots__ are incompatible with multiple inheritance mixings in subclasses (e.g. with QObject)
-#    __slots__ = [ '_running', '_async_loop_thread', '_ble_client', '_connected_service_uuid', '_disconnected_event',
-#                    '_active_notification_uuids',
-#                    '_device_descriptions', '_notifications', '_writers', '_readers', '_heartbeat_frequency',
-#                    '_logging'  ]
 
     def __init__(self) -> None:
         super().__init__()
@@ -266,7 +273,8 @@ class ClientBLE(QObject):
         self._sleep_between_scans:float                      = self.SCAN_BETWEEN_SCANS_START
 
         # configuration
-        self._device_descriptions:dict[str|None, set[str]|None] = {}
+        self._device_descriptions:dict[str|None, set[str]|None] = {} # maps service UUIDs to a set of device name prefixes
+        self._device_manufacturer_keys:dict[str, dict[str, int]] = {} # maps a service UUID to a dict matching a name prefix to a mandatory advertisement manufacturer key
         self._notifications:dict[str, Callable[[BleakGATTCharacteristic, bytearray], None]] = {}
         self._writers:dict[str, list[str]] = {} # associates a service UUID with a list of write characteristics
         self._readers:dict[str, list[str]] = {} # associates a service UUID with a list of read characteristics
@@ -320,7 +328,7 @@ class ClientBLE(QObject):
             self._connected_service_uuid = None
             self._connected_device_name = None
             self._ble_client, service_uuid, device_name = ble.scan_and_connect(
-                                    self._device_descriptions,
+                                    (self._device_descriptions, self._device_manufacturer_keys),
                                     blacklist,
                                     case_sensitive,
                                     self.disconnected_callback,
@@ -507,22 +515,31 @@ class ClientBLE(QObject):
     # clears device descriptions used to match services
     def init_device_description(self) -> None:
         self._device_descriptions = {}
+        self._device_manufacturer_keys = {}
 
-    # adds the device description (service UUID and name) to the list of matchers used to filter discovered
-    # clients. Any name added with to an associated UUID will create a match. Associating a service UUID with
+    # adds the device description (service UUID and name) to the dict of matchers used to filter discovered
+    # clients. Any name added to an associated UUID can result in a match by prefix with the discovered client names. Associating a service UUID with
     # an empty name (None) will match independent of the discovered clients name, as long as the a service with
-    # the specified service UUID is supported. The empty service UUID (None) matches with any discovered client of the associated names.
+    # the specified service UUID is supported. The empty service UUID (None) matches with any discovered client reporting any of the associated names (prefix match).
     # If both, serviceUUID and device name are not given (both set to None), any service matches.
     # The initial device description as generated on init_device_description() does not match anything.
-    def add_device_description(self, service_uuid:str|None = None, device_name:str|None = None) -> None:
+    # Note that the descriptions are processed in service_uuid insertion order, thus descriptions service_uuids inserted first match before those added later
+    # if device_manufacturer_key is given, that key needs to occur in the advertisement manufacture data
+    def add_device_description(self, service_uuid:str|None = None, device_name:str|None = None, device_manufacturer_key:int|None = None) -> None:
         if service_uuid is None and device_name is None:
-            self._device_descriptions = {}
+            self._device_descriptions = {None: None}
         elif device_name is None:
             self._device_descriptions[service_uuid] = None
         elif service_uuid not in self._device_descriptions:
             self._device_descriptions[service_uuid] = { device_name }
         elif self._device_descriptions[service_uuid] is not None:
             self._device_descriptions[service_uuid].add(device_name) # type:ignore[union-attr]
+        #
+        if service_uuid is not None and device_name is not None and device_manufacturer_key is not None:
+            if service_uuid not in self._device_manufacturer_keys:
+                self._device_manufacturer_keys[service_uuid] = { device_name: device_manufacturer_key }
+            else:
+                self._device_manufacturer_keys[service_uuid][device_name] = device_manufacturer_key
 
     def add_notify(self, notify_uuid:str, callback:'Callable[[BleakGATTCharacteristic, bytearray], None]') -> None:
         self._notifications[notify_uuid] = callback
@@ -541,6 +558,7 @@ class ClientBLE(QObject):
 
     def set_heartbeat(self, frequency:float) -> None:
         self._heartbeat_frequency = frequency
+
 
     # to be implemented by subclasses
 

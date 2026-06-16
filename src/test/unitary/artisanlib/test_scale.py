@@ -423,7 +423,7 @@ class TestScaleManager:
     def test_get_scale_acaia(self, scale_manager_instance: ScaleManager) -> None:
         """Test _get_scale method for Acaia model."""
         # Arrange
-        with patch('artisanlib.acaia.Acaia') as mock_acaia:
+        with patch('artisanlib.acaia.AcaiaBluetooth') as mock_acaia:
             mock_acaia_instance = Mock()
             mock_acaia.return_value = mock_acaia_instance
 

@@ -2271,7 +2271,7 @@ class serialport:
         t1:float = -1
         t2:float = -1
         if self.aw.orbiter is not None:
-            t1 = self.aw.orbiter.getBT(self.aw.qmc.current_time())
+            t1 = self.aw.orbiter.getBT(self.aw, self.aw.qmc.current_time())
             t2 = self.aw.orbiter.getET()
 
             # autoCHARGE/autoDROP triggered by machine
@@ -6570,7 +6570,7 @@ class serialport:
                         self.YOCTOsensor = self.getNextYOCTOsensorOfType(mode,connected_yoctos,YPower.FirstPower()) # pyright:ignore[reportUnknownArgumentType]
                     elif mode == 6:
                         # NOTE: as we do not know which functions (mode 5 or 6) are used per power module, we restrict the "Energy" function to report always for the first connected unit only
-                        from yoctopuce.yocto_power import YPower
+                        from yoctopuce.yocto_power import YPower # zuban: ignore[no-redef]
                         self.YOCTOsensor = self.getNextYOCTOsensorOfType(mode,[],YPower.FirstPower()) # pyright:ignore[reportUnknownArgumentType]
                     elif mode == 7:
                         from yoctopuce.yocto_voltage import YVoltage
@@ -6588,7 +6588,7 @@ class serialport:
                     yocto_res = 0.0001 # while 0.001 seems to be the maximum accepted (equal to raw resolution), but just returning mostly 2 decimals (as the regular reading is still rounded by that one decimal)!?
                     if mode in {0, 2} and self.YOCTOsensor is not None and self.YOCTOsensor.isOnline():
                         serial = self.YOCTOsensor.get_module().get_serialNumber()
-                        from yoctopuce.yocto_temperature import YTemperature
+                        from yoctopuce.yocto_temperature import YTemperature  # zuban: ignore[no-redef]
                         self.YOCTOchan1 = YTemperature.FindTemperature(serial + '.temperature1')
                         self.YOCTOchan2 = YTemperature.FindTemperature(serial + '.temperature2')
                         if mode == 0:
@@ -6646,7 +6646,7 @@ class serialport:
                                 self.YOCTOthread = YoctoThread()
                             self.YOCTOthread.start()
                     elif mode == 1 and self.YOCTOsensor is not None and self.YOCTOsensor.isOnline():
-                        from yoctopuce.yocto_temperature import YTemperature
+                        from yoctopuce.yocto_temperature import YTemperature  # zuban: ignore[no-redef]
                         serial = self.YOCTOsensor.get_module().get_serialNumber()
                         self.YOCTOchan1 = YTemperature.FindTemperature(serial + '.temperature')
                         self.YOCTOchan2 = None
@@ -6683,7 +6683,7 @@ class serialport:
                                 self.YOCTOthread = YoctoThread()
                             self.YOCTOthread.start()
                     elif mode == 4 and self.YOCTOsensor is not None and self.YOCTOsensor.isOnline():
-                        from yoctopuce.yocto_genericsensor import YGenericSensor
+                        from yoctopuce.yocto_genericsensor import YGenericSensor  # zuban: ignore[no-redef]
                         serial=self.YOCTOsensor.get_module().get_serialNumber()
                         self.YOCTOchan1 = YGenericSensor.FindGenericSensor(serial + '.genericSensor1')
                         self.YOCTOchan2 = YGenericSensor.FindGenericSensor(serial + '.genericSensor2')
@@ -6692,19 +6692,19 @@ class serialport:
                         else:
                             self.aw.sendmessage(QApplication.translate('Message','Yocto Sensor attached'))
                     elif mode == 5 and self.YOCTOsensor is not None and self.YOCTOsensor.isOnline():
-                        from yoctopuce.yocto_power import YPower
+                        from yoctopuce.yocto_power import YPower  # zuban: ignore[no-redef]
                         serial=self.YOCTOsensor.get_module().get_serialNumber()
                         self.YOCTOchan1 = YPower.FindPower(serial + '.power')
                         self.YOCTOchan2 = None
                         self.aw.sendmessage(QApplication.translate('Message','Yocto Watt Power attached'))
                     elif mode == 6 and self.YOCTOsensor is not None and self.YOCTOsensor.isOnline():
-                        from yoctopuce.yocto_power import YPower
+                        from yoctopuce.yocto_power import YPower  # zuban: ignore[no-redef]
                         serial=self.YOCTOsensor.get_module().get_serialNumber()
                         self.YOCTOchan1 = YPower.FindPower(serial + '.power')
                         self.YOCTOchan2 = None
                         self.aw.sendmessage(QApplication.translate('Message','Yocto Watt Energy attached'))
                     elif mode == 7 and self.YOCTOsensor is not None and self.YOCTOsensor.isOnline():
-                        from yoctopuce.yocto_voltage import YVoltage
+                        from yoctopuce.yocto_voltage import YVoltage  # zuban: ignore[no-redef]
                         serial=self.YOCTOsensor.get_module().get_serialNumber()
                         self.YOCTOchan1 = YVoltage.FindVoltage(serial + '.voltage1')
                         self.YOCTOchan2 = YVoltage.FindVoltage(serial + '.voltage2')
@@ -6721,7 +6721,7 @@ class serialport:
                             pass
                         self.aw.sendmessage(QApplication.translate('Message','Yocto Watt Voltage attached'))
                     elif mode == 8 and self.YOCTOsensor is not None and self.YOCTOsensor.isOnline():
-                        from yoctopuce.yocto_current import YCurrent
+                        from yoctopuce.yocto_current import YCurrent  # zuban: ignore[no-redef]
                         serial=self.YOCTOsensor.get_module().get_serialNumber()
                         self.YOCTOchan1 = YCurrent.FindCurrent(serial + '.current1')
                         self.YOCTOchan2 = YCurrent.FindCurrent(serial + '.current2')
@@ -6738,7 +6738,7 @@ class serialport:
                             pass
                         self.aw.sendmessage(QApplication.translate('Message','Yocto Watt Current attached'))
                     elif mode == 9 and self.YOCTOsensor is not None and self.YOCTOsensor.isOnline():
-                        from yoctopuce.yocto_api import YSensor
+                        from yoctopuce.yocto_api import YSensor  # zuban: ignore[no-redef]
                         serial=self.YOCTOsensor.get_module().get_serialNumber()
                         self.YOCTOchan1 = self.YOCTOsensor
                         self.YOCTOchan2 = YSensor.nextSensor(self.YOCTOsensor)
@@ -6827,7 +6827,7 @@ class serialport:
                                 # we take the median of all valid_readings weighted by the time of arrival, preferrring newer readings
                                 readings = [r for (r,t) in valid_readings]
                                 weights = [t for (r,t) in valid_readings]
-                                import wquantiles # @Reimport
+                                import wquantiles # @Reimport  # zuban: ignore[no-redef]
                                 probe2 = float(wquantiles.median(numpy.array(readings),numpy.array(weights))) # type:ignore[arg-type, unused-ignore] # pyright: ignore[reportArgumentType]
                                 # 3. consume old readings
                                 self.YOCTOvalues[1] = []
@@ -6888,7 +6888,7 @@ class serialport:
                     _log.exception(e)
             elif mode == 5:
                 try:
-                    from yoctopuce.yocto_power import YPower
+                    from yoctopuce.yocto_power import YPower  # zuban: ignore[no-redef]
                     if self.YOCTOchan1 and self.YOCTOchan1.isOnline() and isinstance(self.YOCTOchan1, YPower):
                         probe1 = cast(float, self.YOCTOchan1.get_currentValue())  # pyrefly:ignore[redundant-cast]
                         probe2 = cast(float, self.YOCTOchan1.get_meter())  # pyrefly:ignore[redundant-cast]
@@ -6896,7 +6896,7 @@ class serialport:
                     _log.exception(e)
             elif mode == 6:
                 try:
-                    from yoctopuce.yocto_power import YPower
+                    from yoctopuce.yocto_power import YPower  # zuban: ignore[no-redef]
                     if self.YOCTOchan1 and self.YOCTOchan1.isOnline() and isinstance(self.YOCTOchan1, YPower):
                         probe1 = cast(float, self.YOCTOchan1.get_deliveredEnergyMeter())  # pyrefly:ignore[redundant-cast]
                         probe2 = cast(float, self.YOCTOchan1.get_receivedEnergyMeter())  # pyrefly:ignore[redundant-cast]

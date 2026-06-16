@@ -15,6 +15,7 @@
 # AUTHOR
 # Marko Luther, 2024
 
+import platform
 import asyncio
 import logging
 from enum import IntEnum, unique
@@ -27,10 +28,10 @@ if TYPE_CHECKING:
 from PyQt6.QtCore import pyqtSignal, pyqtSlot
 
 from artisanlib.ble_port import ClientBLE
-from artisanlib.async_comm import AsyncIterable, IteratorReader
+from artisanlib.async_comm import AsyncComm, AsyncIterable, IteratorReader
 from artisanlib.scale import Scale, ScaleSpecs, STATE_ACTION
 from artisanlib.util import float2float
-
+from artisanlib.atypes import SerialSettings
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
@@ -182,7 +183,10 @@ ACAIA_RELAY_WRITE_UUID:Final[str] = '0000fe41-8e22-4541-9d4c-21edae82ed19' # wri
 
 # Acaia Relay name prefixes
 ACAIA_UMBRA_NAME:Final[str] = 'UMBRA'    # Acaia Umbra
-ACAIA_COSMO_NAME:Final[str] = 'COSMO'    # Acaia Cosmo
+
+# Acaia Roasting scales
+ACAIA_COSMO10_NAME:Final[str] = 'COSMO-10'      # Acaia Cosmo 10
+ACAIA_COSMO100_NAME:Final[str] = 'COSMO-100'    # Acaia Cosmo 100
 
 # Acaia Pyxis Black 2025 name prefix
 ACAIA_PYXIS_BLACK_NAME:Final[str] = 'ACAIAS-P' # Acaia Pyxis Black 2025
@@ -199,62 +203,74 @@ ACAIA_SCALE_NAMES = [
     (ACAIA_CINCO_NAME, 'Cinco'),
     (ACAIA_PYXIS_NAME, 'Pyxis'),
     (ACAIA_UMBRA_NAME, 'Umbra'),
-    (ACAIA_COSMO_NAME, 'Cosmo')]
+    (ACAIA_COSMO10_NAME, 'Cosmo'),
+    (ACAIA_COSMO100_NAME, 'Cosmo')]
 
 
+#################
+# Acaia Serial
 
-class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+SERIAL_BAUDRATE:Final[int] = 115200
+SERIAL_BYTESIZE:Final[int] = 8
+SERIAL_STOPBITS:Final[int] = 1
+SERIAL_PARITY:Final[str] = 'N'
+SERIAL_TIMEOUT:Final[float] = 0.1  # short read timeout so the thread can poll-and-exit
 
-    weight_changed_signal = pyqtSignal(float, bool) # delivers new weight in g with decimals for accurate conversion, and flag indicaating stable readings
-    battery_changed_signal = pyqtSignal(int)  # delivers new batter level in %
-    tare_pressed_signal = pyqtSignal()   # issued on pressing the physical tare button
-    connected_signal = pyqtSignal()     # issued on connect
-    disconnected_signal = pyqtSignal()  # issued on disconnect
-
-    # Acaia message constants
-    HEADER1:Final[bytes]      = b'\xef'
-    HEADER2:Final[bytes]      = b'\xdd'
-
-    # Colors
-    BLACK:Final[Color] = (0,0,0)
-    WHITE:Final[Color] = (255,255,255)
-    RED:Final[Color] = (255,0,0)
-    GREEN:Final[Color] = (0,255,0)
-    BLUE:Final[Color] = (0,0,255)
-    LIGHT_BLUE:Final[Color] = (0,128,255)
-    MAGENTA:Final[Color] = (255,0,255)
-    CYAN:Final[Color] = (0,255,255)
-    ORANGE:Final[Color] = (255,128,0)
-    BROWN:Final[Color] = (255,60,0)
+#################
+# Acaia Protocol
 
 
-    HEARTBEAT_FREQUENCY = 5 # send the heartbeat every 5 sec
+# Acaia message constants
+HEADER1:Final[bytes]      = b'\xef'
+HEADER2:Final[bytes]      = b'\xdd'
+
+HEARTBEAT_FREQUENCY:Final[int] = 5 # send the heartbeat every 5 sec
+
+# Colors
+BLACK:Final[Color] = (0,0,0)
+WHITE:Final[Color] = (255,255,255)
+RED:Final[Color] = (255,0,0)
+GREEN:Final[Color] = (0,255,0)
+BLUE:Final[Color] = (0,0,255)
+LIGHT_BLUE:Final[Color] = (0,128,255)
+MAGENTA:Final[Color] = (255,0,255)
+CYAN:Final[Color] = (0,255,255)
+ORANGE:Final[Color] = (255,128,0)
+BROWN:Final[Color] = (255,60,0)
 
 
-# NOTE: __slots__ are incompatible with multiple inheritance mixings in subclasses (as done below in class Acaia with QObject)
-#    __slots__ = [ '_read_queue', '_input_stream',
-#            'id_sent', 'fast_notifications_sent', 'slow_notifications_sent', 'weight', 'battery', 'firmware', 'unit', 'max_weight'
-#            '_connected_handler', '_disconnected_handler' ]
+class AcaiaProtocol:
 
-    def __init__(self, connected_handler:Callable[[], None]|None = None,
-                       disconnected_handler:Callable[[], None]|None = None,
-                       stable_only:bool=True, # if True only stable weight readings are reported by weight_changed_signal
-                       decimals:int=1): # number of significant decimals (0, 1, ..) of the weight signal
+    __slots__ = [ '_send', '_weight_changed_handler', '_battery_changed_handler', '_tare_pressed_handler', '_logging', 'stable_only',
+            'decimals', 'heartbeat_frequency', 'scale_class', 'id_sent', 'fast_notifications_sent', 'slow_notifications_sent',
+            'weight', 'stable_weight', 'battery', 'firmware', 'unit', 'max_weight', 'readability', 'auto_off_timer', 'has_leds' ]
+
+
+    def __init__(self,
+            send:Callable[[bytes], None],
+            weight_changed_handler:Callable[[float,bool], None],
+            battery_changed_handler: Callable[[int], None],
+            tare_pressed_handler: Callable[[], None],
+            stable_only:bool=True, # if True only stable weight readings are reported by weight_changed_signal
+            decimals:int=1) -> None: # number of significant decimals (0, 1, ..) of the weight signal
         super().__init__()
 
         # handlers
-        self._connected_handler = connected_handler
-        self._disconnected_handler = disconnected_handler
+        self._send = send
+        self._weight_changed_handler = weight_changed_handler
+        self._battery_changed_handler = battery_changed_handler
+        self._tare_pressed_handler = tare_pressed_handler
 
         # configuration
+        self._logging:bool = False  # if True device communication is logged
         self.stable_only:bool = stable_only
         self.decimals:int = decimals
+        self.heartbeat_frequency = HEARTBEAT_FREQUENCY
 
         # scale class
         self.scale_class:SCALE_CLASS = SCALE_CLASS.MODERN
 
         # Protocol parser variables
-        self._read_queue : asyncio.Queue[bytes]|None = None
 
         self.id_sent:bool = False # ID is sent once after first data is received from scale
         self.fast_notifications_sent:bool = False # after connect we switch fast notification on to receive first reading fast
@@ -273,54 +289,33 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
 
         ###
 
-        # configure heartbeat
-        self.set_heartbeat(self.HEARTBEAT_FREQUENCY) # send keep-alive heartbeat all 5sec; only for LEGACY scales
+    # configuration
 
+    def get_max_weight(self) -> float:
+        return self.max_weight
 
-        # register Acaia Current UUIDs
-        for acaia_name in (ACAIA_PEARL_NAME, ACAIA_PEARLS_NAME, ACAIA_LUNAR_NAME, ACAIA_PYXIS_NAME, ACAIA_CINCO_NAME):
-            self.add_device_description(ACAIA_SERVICE_UUID, acaia_name)
-        self.add_notify(ACAIA_NOTIFY_UUID, self.notify_callback)
-        self.add_write(ACAIA_SERVICE_UUID, ACAIA_WRITE_UUID)
+    def get_readability(self) -> float:
+        return self.readability
 
-        # register Acaia Relay UUIDs
-        for acaia_name in (ACAIA_UMBRA_NAME, ACAIA_COSMO_NAME, ACAIA_PYXIS_BLACK_NAME):
-            self.add_device_description(ACAIA_RELAY_SERVICE_UUID, acaia_name)
-        self.add_notify(ACAIA_RELAY_NOTIFY_UUID, self.notify_callback)
-        self.add_write(ACAIA_RELAY_SERVICE_UUID, ACAIA_RELAY_WRITE_UUID)
+    def get_heartbeat_frequency(self) -> int:
+        return self.heartbeat_frequency
 
-        # register Acaia Legacy UUIDs (need to be added after the relay scales for the name overlap between ACAIA_LEGACY_LUNAR_NAME and ACAIA_PYXIS_BLACK_NAME)
-        for legacy_name in (ACAIA_LEGACY_LUNAR_NAME, ACAIA_LEGACY_PEARL_NAME):
-            self.add_device_description(ACAIA_LEGACY_SERVICE_UUID, legacy_name)
-        self.add_notify(ACAIA_LEGACY_NOTIFY_UUID, self.notify_callback)
-        self.add_write(ACAIA_LEGACY_SERVICE_UUID, ACAIA_LEGACY_WRITE_UUID)
+    def set_heartbeat_frequency(self, heartbeat_frequency:int) -> None:
+        self.heartbeat_frequency = heartbeat_frequency
+    #
 
+    def setLogging(self, b:bool) -> None:
+        self._logging = b
 
-    # protocol parser
+    # configure for the specific scale on connect
+    def on_connect(self, connected_service_UUID:str|None, connected_device_name:str|None) -> None:
+        self.reset_parser()
 
-
-    def reset_readings(self) -> None:
-        self.weight = None
-        self.stable_weight = None
-        self.battery = None
-        self.firmware = None
-        self.unit = UNIT.G
-        self.max_weight = 0
-        self.readability = 0
-
-
-    @override
-    def on_connect(self) -> None:
-        self.reset_readings()
-        self.id_sent = False
-        self.fast_notifications_sent = False
-        self.slow_notifications_sent = False
-        connected_service_UUID, connected_device_name = self.connected()
         self.has_leds = False
         if connected_service_UUID == ACAIA_LEGACY_SERVICE_UUID:
             _log.debug('connected to Acaia Legacy Scale (%s)', connected_device_name)
             self.scale_class = SCALE_CLASS.LEGACY
-            self.set_heartbeat(self.HEARTBEAT_FREQUENCY) # enable heartbeat
+            self.set_heartbeat_frequency(HEARTBEAT_FREQUENCY) # enable heartbeat
 
             if connected_device_name is not None:
                 # Acaia Pearl/Lunar (Legacy)
@@ -330,7 +325,7 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
         elif connected_service_UUID == ACAIA_RELAY_SERVICE_UUID:
             _log.debug('connected to Acaia Relay Scale (%s)', connected_device_name)
             self.scale_class = SCALE_CLASS.RELAY
-            self.set_heartbeat(0) # disable heartbeat
+            self.set_heartbeat_frequency(0) # disable heartbeat
 
             if connected_device_name is not None:
                 if connected_device_name.startswith('UMBRA'):
@@ -354,16 +349,16 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
                     self.max_weight = 1000
                     self.readability = 0.1
                 self.fast_notifications()
-                self.fast_notifications_sent = False
+                self.clear_fast_notifications_sent()
 
-        else: #connected_service_UUID == ACAIA_SERVICE_UUID:
+        elif connected_service_UUID == ACAIA_SERVICE_UUID:
             _log.debug('connected to Acaia Scale (%s)', connected_device_name)
             self.scale_class = SCALE_CLASS.MODERN
             # in principle the heartbeat on those newer scales with newer firmwares is not needed
             # but it seems to be needed at least on Pearl 2021 as in some cases (1 of 5) the scale stops sending ID events on connect
             # and thus never gets configured (slow/fast notifications) and thus sends weight messages
             # to be on the safe side we keep sending the heartbeat for those scales
-            self.set_heartbeat(self.HEARTBEAT_FREQUENCY)
+            self.set_heartbeat_frequency(HEARTBEAT_FREQUENCY)
 
             if connected_device_name is not None:
                 if connected_device_name.startswith(('PYXIS', 'CINCO')):
@@ -374,28 +369,57 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
                     # Acaia Pearl (2021)
                     self.max_weight = 2000
                     self.readability = 0.1
+                elif connected_device_name.startswith('COSMO-100'):
+                    # Acaia Cosmo 100kg
+                    self.max_weight = 100*1000
+                    self.readability = 10
+                    self.has_leds = True
+                    # COSMO is still a relay scale
+                    self.scale_class = SCALE_CLASS.RELAY
+                    self.set_heartbeat_frequency(0) # disable heartbeat
+                elif connected_device_name.startswith('COSMO-10'):
+                    self.max_weight = 10*1000
+                    self.readability = 0.1
+                    self.has_leds = True
+                    # COSMO is still a relay scale
+                    self.scale_class = SCALE_CLASS.RELAY
+                    self.set_heartbeat_frequency(0) # disable heartbeat
                 else:
                     # Acaia Lunar (PEARLS)
                     self.max_weight = 3000
                     self.readability = 0.1
+        elif connected_service_UUID is None: # serial COSMO
+            # Acaia Cosmo 10kg or 100kg
+            self.max_weight = 100*1000 # wrong for COSMO-10, but not essentially used
+            self.readability = 10
+            self.has_leds = True
+            # COSMO is still a relay scale
+            self.scale_class = SCALE_CLASS.RELAY
+            self.set_heartbeat_frequency(0) # disable heartbeat
 
-        if self._connected_handler is not None:
-            self._connected_handler()
-        self.connected_signal.emit()
 
-    @override
-    def on_disconnect(self) -> None:
-        _log.debug('disconnected')
-        if self._disconnected_handler is not None:
-            self._disconnected_handler()
-        self.disconnected_signal.emit()
+
+    # protocol parser
+
+
+    def reset_parser(self) -> None:
+        self.id_sent = False
+        self.fast_notifications_sent = False
+        self.slow_notifications_sent = False
+        self.weight = None
+        self.stable_weight = None
+        self.battery = None
+        self.firmware = None
+        self.unit = UNIT.G
+        self.max_weight = 0
+        self.readability = 0
 
 
     ##
 
 
     def parse_info(self, data:bytes) -> None:
-        _log.debug('INFO MSG')
+        _log.debug('INFO MSG: %s', data)
 
         if len(data)>5:
             self.firmware = (data[3],data[4],data[5])
@@ -459,12 +483,12 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
                 self.stable_weight = value_rounded
                 self.weight = self.weight # we also update the last weight value to prevent it to be send again
 #                _log.debug('PRINT new stable weight: %s', self.stable_weight)
-                self.weight_changed_signal.emit(self.stable_weight, stable)
+                self._weight_changed_handler(self.stable_weight, bool(stable))
             elif not stable and value_rounded != self.weight:
                 self.stable_weight = None # non-stable weights invalidate the last stable weight to ensure a sequence of equal stable weights is reported if interleaved with non-stable weights
                 self.weight = value_rounded
 #                _log.debug('PRINT new weight: %s', self.weight)
-                self.weight_changed_signal.emit(self.weight, stable)
+                self._weight_changed_handler(self.weight, bool(stable))
 
     # returns length of consumed data or -1 on error
     def parse_weight_event(self, payload:bytes) -> int:
@@ -480,7 +504,7 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
         b = payload[0]
         if 0 <= b <= 100:
             self.battery = int(payload[0])
-            self.battery_changed_signal.emit(self.battery)
+            self._battery_changed_handler(self.battery)
             _log.debug('battery: %s', self.battery)
         return EVENT_LEN.BATTERY
 
@@ -492,7 +516,7 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
     def parse_timer_event(payload:bytes) -> int:
         if len(payload) < EVENT_LEN.TIMER:
             return -1
-        value = AcaiaBLE.decode_time(payload)
+        value = AcaiaProtocol.decode_time(payload)
         _log.debug('time: %sm%s%sms, %s',payload[0],payload[1],payload[2], value)
         return EVENT_LEN.TIMER
 
@@ -559,7 +583,7 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
 
         if payload[0] == KEY_INFO.TARE:
             _log.debug('tare key')
-            self.tare_pressed_signal.emit()
+            self._tare_pressed_handler()
         elif payload[0] == KEY_INFO.START:
             _log.debug('start timer key')
         elif payload[0] == KEY_INFO.STOP:
@@ -617,8 +641,8 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
         # byte 1: battery level (7 bits of second byte) + TIMER_START (1bit)
         if payload and len(payload) > 1:
             self.battery = int(payload[1] & ~(1 << 7))
-            self.battery_changed_signal.emit(self.battery)
-#            _log.debug('battery: %s%%', self.battery)
+            self._battery_changed_handler(self.battery)
+            _log.debug('battery: %s%%', self.battery)
 
         # byte 2:
         if payload and len(payload) > 2:
@@ -683,7 +707,7 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
 #                sleep_modes = {0:'off', 1:'5sec', 2:'10sec', 3:'20sec', 4:'30sec', 5:'60sec'}
 #                _log.debug('sleep: %s%s', payload[4], (f' ({sleep_modes[payload[4]]})' if (payload[4] in sleep_modes) else ''))
 
-#        # byte 5:
+        # byte 5:
 #        if payload and len(payload) > 5:
 #            if self.scale_class == SCALE_CLASS.RELAY:
 #                # relay scales: resolution setting
@@ -762,10 +786,10 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
 
     # constructs message bytearray of the given type (int) and payload (bytearray) by adding headers and CRCs
     def message(self, tp:int, payload:bytes) -> bytes:
-        return self.HEADER1 + self.HEADER2 + tp.to_bytes(1, 'big') + payload + self.crc(payload)
+        return HEADER1 + HEADER2 + tp.to_bytes(1, 'big') + payload + self.crc(payload)
 
     def send_message(self, tp:int, payload:bytes) -> None:
-        self.send(self.message(tp, payload))
+        self._send(self.message(tp, payload))
         if self._logging:
             _log.debug('send: %s',payload)
 
@@ -777,12 +801,6 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
 
 
     ###
-
-    # keep alive should be send every 3-5sec
-    @override
-    def heartbeat(self) -> None:
-#        _log.debug('send heartbeat')
-        self.send_message(MSG.SYSTEM, b'\x02\x00')
 
     def send_stop(self) -> None: # stop what?
         _log.debug('send stop')
@@ -825,16 +843,16 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
             param])
 
     def send_default_effects_on(self) -> None:
-        self.send_led_cmd(self.led_color_payload(LED_CMD.TOGGLE_DEFAULT_EFFECT, self.BLACK, 1))
+        self.send_led_cmd(self.led_color_payload(LED_CMD.TOGGLE_DEFAULT_EFFECT, BLACK, 1))
 
     def send_default_effects_off(self) -> None:
-        self.send_led_cmd(self.led_color_payload(LED_CMD.TOGGLE_DEFAULT_EFFECT, self.BLACK, 0))
+        self.send_led_cmd(self.led_color_payload(LED_CMD.TOGGLE_DEFAULT_EFFECT, BLACK, 0))
 
     def send_leds_on(self, color:Color) -> None:
         self.send_led_cmd(self.led_color_payload(LED_CMD.ON, color))
 
     def send_leds_off(self) -> None:
-        self.send_led_cmd(self.led_color_payload(LED_CMD.OFF, self.BLACK))
+        self.send_led_cmd(self.led_color_payload(LED_CMD.OFF, BLACK))
 
     def send_leds_halo_off(self, color:Color) -> None:
         self.send_led_cmd(self.led_color_payload(LED_CMD.EFFECT, color, LED_EFFECT.HALO))
@@ -847,6 +865,42 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
 
     def send_leds_breathe(self, color:Color) -> None:
         self.send_led_cmd(self.led_color_payload(LED_CMD.EFFECT, color, LED_EFFECT.BREATHE))
+
+    def send_signal(self, action:STATE_ACTION) -> None:
+        if action == STATE_ACTION.DISCONNECTED:
+            self.send_leds_wipe_off(MAGENTA)
+            self.send_default_effects_on()
+        elif action == STATE_ACTION.CONNECTED:
+            self.send_default_effects_off()
+            self.send_leds_halo_off(CYAN)
+        elif action == STATE_ACTION.RELEASED:
+            self.send_leds_breathe(WHITE)
+        elif action == STATE_ACTION.ASSIGNED_GREEN:
+            self.send_leds_breathe(GREEN)
+        elif action == STATE_ACTION.ASSIGNED_ROASTED:
+            self.send_leds_breathe(BROWN)
+        elif action == STATE_ACTION.ZONE_ENTER:
+            self.send_leds_halo_on(LIGHT_BLUE)
+        elif action == STATE_ACTION.ZONE_EXIT:
+            self.send_leds_wipe_off(LIGHT_BLUE)
+        elif action == STATE_ACTION.SWAP_ENTER:
+            self.send_leds_on(ORANGE)
+        elif action == STATE_ACTION.SWAP_EXIT:
+            self.send_leds_off()
+        elif action == STATE_ACTION.TARGET_ENTER:
+            self.send_leds_on(BLUE)
+        elif action == STATE_ACTION.TARGET_EXIT:
+            self.send_leds_off()
+        elif action == STATE_ACTION.OK_ENTER:
+            self.send_leds_on(GREEN)
+        elif action == STATE_ACTION.OK_EXIT:
+            self.send_leds_wipe_off(GREEN)
+        elif action == STATE_ACTION.CANCEL_ENTER:
+            self.send_leds_on(RED)
+        elif action in {STATE_ACTION.CANCEL_EXIT, STATE_ACTION.INTERRUPTED}:
+            self.send_leds_wipe_off(RED)
+        elif action in {STATE_ACTION.COMPONENT_CHANGED, STATE_ACTION.TARE}:
+            self.send_leds_breathe(ORANGE)
 
     ###
 
@@ -875,7 +929,7 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
                     0])) # only SCALE_CLASS.RELAY # 0: only weight changes are reported; 1: streaming weight changes at 1/10
 
     def slow_notifications(self) -> None:
-        _log.debug('slow notifications')
+        _log.debug('slow notifications: %s', self.scale_class)
         if self.scale_class == SCALE_CLASS.RELAY:
             self.send_event(
                 bytes([ # pairs of key/setting
@@ -894,8 +948,8 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
     #                    255, #2,  # battery argument (if 0 : fast, 1 : slow)
     #                    2,  # timer id
     #                    255, #5,  # timer argument (number of heartbeats between timer messages)
-                        3,  # key id
-                        255, #4   # request to receive key events
+    #                    3,  # key id (no parameter)
+    #                    4,  # settings id (no parameter)
                     ]))
         self.slow_notifications_sent = True
 
@@ -911,12 +965,129 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
 #                    255, #2,  # battery argument (if 0 : fast, 1 : slow, 2: very slow; not set only once?)
 #                    2,  # timer id
 #                    255, #5,  # timer argument (number of heartbeats between timer messages; 0: many timer events)
-#                    3,  # key id
-#                    255, #4   # 0: fast, 1: normal
+#                    3,  # key id (no parameter)
+#                    4,  # settings id (no parameter)
                 ])
                 )
         self.fast_notifications_sent = True
 
+    def clear_fast_notifications_sent(self) -> None:
+        self.fast_notifications_sent = False
+
+
+    # EX: d = b'\xef\xdd\x07\x07\x02\x14\x02<\x14\x00W\x18\xef\xdd\x07' (len: 12)
+    # 2 header:     d[0:2]   = b'\xef\xdd'
+    # 1 cmd:        d[2]     = b'\x07'  => INFO
+    # 1 data_len:   d[3]     = b'\x07'  => 7
+    # 6 data:       d[4:10]  = b'\x02\x14\x02<\x14\x00'
+    # 2 crc:        d[10:12] = b'\x00W\x18'  # calculated over "data_len+data"
+
+
+    async def read_msg(self, stream: asyncio.StreamReader|IteratorReader) -> None:
+        await stream.readuntil(HEADER1)
+        if await stream.readexactly(1) == HEADER2:
+            cmd = int.from_bytes(await stream.readexactly(1), 'big')
+            if cmd in {CMD.SYSTEM_SA, CMD.INFO_A, CMD.STATUS_A, CMD.EVENT_SA}:
+                dl = await stream.readexactly(1)
+                data_len:int = int.from_bytes(dl, 'big')
+                data = await stream.readexactly(data_len - 1)
+                crc = await stream.readexactly(2)
+                data = dl+data
+                if crc == self.crc(data):
+                    self.parse_data(cmd, data)
+                else:
+                    _log.debug('CRC error: %s <- %s',self.crc(data),data)
+
+    async def parser(self, stream:asyncio.StreamReader|IteratorReader) -> None:
+        while True:
+            try:
+                await self.read_msg(stream)
+            except Exception as e:  # pylint: disable=broad-except
+                _log.error(e)
+
+
+
+class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+
+    weight_changed_signal = pyqtSignal(float, bool) # delivers new weight in g with decimals for accurate conversion, and flag indicating stable readings
+    battery_changed_signal = pyqtSignal(int)  # delivers new batter level in %
+    tare_pressed_signal = pyqtSignal()   # issued on pressing the physical tare button
+    #
+    connected_signal = pyqtSignal()     # issued on connect
+    disconnected_signal = pyqtSignal()  # issued on disconnect
+
+
+# NOTE: __slots__ are incompatible with multiple inheritance mixings in subclasses (as done below in class Acaia with QObject)
+#    __slots__ = [ '_read_queue', '_input_stream',
+#            'id_sent', 'fast_notifications_sent', 'slow_notifications_sent', 'weight', 'battery', 'firmware', 'unit', 'max_weight'
+#            '_connected_handler', '_disconnected_handler' ]
+
+    def __init__(self, connected_handler:Callable[[], None]|None = None,
+                       disconnected_handler:Callable[[], None]|None = None,
+                       stable_only:bool=True, # if True only stable weight readings are reported by weight_changed_signal
+                       decimals:int=1) -> None: # number of significant decimals (0, 1, ..) of the weight signal
+        super().__init__()
+
+        self.protocol:AcaiaProtocol = AcaiaProtocol(
+            self.send_message,
+            self.weight_changed,
+            self.battery_changed,
+            self.tare_pressed,
+            stable_only,
+            decimals)
+
+
+        # dev COSMO (need to be registered before the production versions) [TOBEREMOVED]
+        for acaia_name in (ACAIA_COSMO100_NAME, ACAIA_COSMO10_NAME):
+            self.add_device_description(ACAIA_RELAY_SERVICE_UUID, acaia_name, 34049)
+        self.add_notify(ACAIA_RELAY_NOTIFY_UUID, self.notify_callback)
+
+        # register Acaia Current UUIDs
+        for acaia_name in (ACAIA_PEARL_NAME, ACAIA_PEARLS_NAME, ACAIA_LUNAR_NAME, ACAIA_PYXIS_NAME, ACAIA_CINCO_NAME, ACAIA_COSMO100_NAME, ACAIA_COSMO10_NAME):
+            self.add_device_description(ACAIA_SERVICE_UUID, acaia_name)
+        self.add_notify(ACAIA_NOTIFY_UUID, self.notify_callback)
+        self.add_write(ACAIA_SERVICE_UUID, ACAIA_WRITE_UUID)
+
+        # register Acaia Relay UUIDs
+        for acaia_name in (ACAIA_UMBRA_NAME, ACAIA_PYXIS_BLACK_NAME):
+            self.add_device_description(ACAIA_RELAY_SERVICE_UUID, acaia_name)
+        self.add_write(ACAIA_RELAY_SERVICE_UUID, ACAIA_RELAY_WRITE_UUID)
+
+        # register Acaia Legacy UUIDs (need to be added after the relay scales for the name overlap between ACAIA_LEGACY_LUNAR_NAME and ACAIA_PYXIS_BLACK_NAME)
+        for legacy_name in (ACAIA_LEGACY_LUNAR_NAME, ACAIA_LEGACY_PEARL_NAME):
+            self.add_device_description(ACAIA_LEGACY_SERVICE_UUID, legacy_name)
+        self.add_notify(ACAIA_LEGACY_NOTIFY_UUID, self.notify_callback)
+        self.add_write(ACAIA_LEGACY_SERVICE_UUID, ACAIA_LEGACY_WRITE_UUID)
+
+        # handlers
+        self._connected_handler = connected_handler
+        self._disconnected_handler = disconnected_handler
+
+        # transport
+        self._read_queue : asyncio.Queue[bytes]|None = None
+
+
+    ###
+
+    def get_max_weight(self) -> float:
+        return self.protocol.get_max_weight()
+
+    def get_readability(self) -> float:
+        return self.protocol.get_readability()
+
+    ###
+
+    def send_message(self, payload:bytes) -> None:
+        self.send(payload)
+
+    def weight_changed(self, stable_weight:float, stable:bool) -> None:
+        self.weight_changed_signal.emit(stable_weight, stable)
+
+    def battery_changed(self, level:int) -> None:
+        self.battery_changed_signal.emit(level)
+
+    def tare_pressed(self) -> None:
+        self.tare_pressed_signal.emit()
 
     ###
 
@@ -928,35 +1099,21 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
             if self._logging:
                 _log.debug('received: %s',data)
 
+    def send_signal(self, action:STATE_ACTION) -> None:
+        self.protocol.send_signal(action)
 
-    # EX: d = b'\xef\xdd\x07\x07\x02\x14\x02<\x14\x00W\x18\xef\xdd\x07' (len: 12)
-    # 2 header:     d[0:2]   = b'\xef\xdd'
-    # 1 cmd:        d[2]     = b'\x07'  => INFO
-    # 1 data_len:   d[3]     = b'\x07'  => 7
-    # 6 data:       d[4:10]  = b'\x02\x14\x02<\x14\x00'
-    # 2 crc:        d[10:12] = b'\x00W\x18'  # calculated over "data_len+data"
+    def send_tare(self) -> None:
+        self.protocol.send_tare()
+
+    ###
 
     async def reader(self) -> None:
         self._read_queue = asyncio.Queue(maxsize=200) # queue needs to be started in the current async event loop!
         stream = IteratorReader(AsyncIterable(self._read_queue))
-        while True:
-            try:
-                await stream.readuntil(self.HEADER1)
-                if await stream.readexactly(1) == self.HEADER2:
-                    cmd = int.from_bytes(await stream.readexactly(1), 'big')
-                    if cmd in {CMD.SYSTEM_SA, CMD.INFO_A, CMD.STATUS_A, CMD.EVENT_SA}:
-                        dl = await stream.readexactly(1)
-                        data_len:int = int.from_bytes(dl, 'big')
-                        data = await stream.readexactly(data_len - 1)
-                        crc = await stream.readexactly(2)
-                        data = dl+data
-                        if crc == self.crc(data):
-                            self.parse_data(cmd, data)
-                        else:
-                            _log.debug('CRC error: %s <- %s',self.crc(data),data)
-            except Exception as e:  # pylint: disable=broad-except
-                _log.error(e)
+        await self.protocol.parser(stream)
 
+
+    ### ClientBLE interface
 
     @override
     def on_start(self) -> None:
@@ -966,13 +1123,119 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
                     self.reader(),
                     self._async_loop_thread.loop)
 
+    @override
+    def on_connect(self) -> None:
+        connected_service_UUID, connected_device_name = self.connected()
+        self.protocol.on_connect(connected_service_UUID, connected_device_name)
+        # configure heartbeat
+        self.set_heartbeat(self.protocol.get_heartbeat_frequency()) # send keep-alive heartbeat as configured by protocol.on_connect
+        # report connection
+        if self._connected_handler is not None:
+            self._connected_handler()
+        self.connected_signal.emit()
+
+    @override
+    def on_disconnect(self) -> None:
+        _log.debug('disconnected')
+        if self._disconnected_handler is not None:
+            self._disconnected_handler()
+        self.disconnected_signal.emit()
+
+    # keep alive should be send every 3-5sec
+    @override
+    def heartbeat(self) -> None:
+        _log.debug('send heartbeat')
+        self.protocol.send_message(MSG.SYSTEM, b'\x02\x00')
+
+
+class AcaiaAsync(AsyncComm):
+
+    __slots__ = [ 'outer_connected_handler', 'outer_disconnected_handler', 'protocol' ]
+
+
+    def __init__(self,
+                weight_changed:Callable[[float,bool], None],
+                battery_changed:Callable[[int], None],
+                tare_pressed:Callable[[], None],
+                host:str = '127.0.0.1', port:int = 8080, serial:'SerialSettings|None' = None,
+                connected_handler:Callable[[], None]|None = None,
+                disconnected_handler:Callable[[], None]|None = None,
+                stable_only:bool=True, # if True only stable weight readings are reported by weight_changed_signal
+                decimals:int=1) -> None: # number of significant decimals (0, 1, ..) of the weight signal
+        super().__init__(host, port, serial, self.connected_handler, self.disconnected_handler)
+        self.outer_connected_handler:Callable[[], None]|None = connected_handler
+        self.outer_disconnected_handler:Callable[[], None]|None = disconnected_handler
+
+        self.protocol:AcaiaProtocol = AcaiaProtocol(
+            self.send_message,
+            weight_changed,
+            battery_changed,
+            tare_pressed,
+            stable_only,
+            decimals)
+
+    @override
+    def reset_readings(self) -> None:
+        self.protocol.reset_parser()
+
+    @override
+    async def read_msg(self, stream: asyncio.StreamReader) -> None:
+        await self.protocol.read_msg(stream)
+
+    ###
+
+    def get_max_weight(self) -> float:
+        return self.protocol.get_max_weight()
+
+    def get_readability(self) -> float:
+        return self.protocol.get_readability()
+
+    ###
+
+    def send_message(self, payload:bytes) -> None:
+        self.send(payload)
+
+    def send_signal(self, action:STATE_ACTION) -> None:
+        self.protocol.send_signal(action)
+
+    def send_tare(self) -> None:
+        self.protocol.send_tare()
+
+    ###
+
+    def connected_handler(self) -> None:
+        self.protocol.on_connect(None, None)
+        if self.outer_connected_handler is not None:
+            self.outer_connected_handler()
+
+    def disconnected_handler(self) -> None:
+        if self.outer_disconnected_handler is not None:
+            self.outer_disconnected_handler()
+
+
+## Acaia Artisan Scales
+
+
 
 class Acaia(Scale): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+
+    def __init__(self, model:int, ident:str|None, name:str|None):
+        super().__init__(model, ident, name)
+        self.scale_connected = False
+
+    @override
+    def is_connected(self) -> bool:
+        return self.scale_connected
+
+
+### Artisan Bluetooth Scale
+
+class AcaiaBluetooth(Acaia): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
 
     def __init__(self, model:int, ident:str|None, name:str|None, connected_handler:Callable[[], None]|None = None,
                        disconnected_handler:Callable[[], None]|None = None,
                        stable_only:bool=False,
-                       decimals:int=1):
+                       decimals:int=1) -> None:
         super().__init__(model, ident, name)
         self.acaia = AcaiaBLE(connected_handler = connected_handler, disconnected_handler=disconnected_handler, stable_only=stable_only, decimals=decimals)
         self.acaia.weight_changed_signal.connect(self.weight_changed)
@@ -980,8 +1243,6 @@ class Acaia(Scale): # pyright: ignore [reportGeneralTypeIssues] # Argument to cl
         self.acaia.connected_signal.connect(self.on_connect)
         self.acaia.disconnected_signal.connect(self.on_disconnect)
         self.stable_only = stable_only
-
-        self.scale_connected = False
 
 
     @override
@@ -999,11 +1260,8 @@ class Acaia(Scale): # pyright: ignore [reportGeneralTypeIssues] # Argument to cl
         self.scanned_signal.emit(acaia_devices)
 
     @override
-    def is_connected(self) -> bool:
-        return self.scale_connected
-
-    @override
     def connect_scale(self, device_logging:bool) -> None:
+        self.acaia.protocol.setLogging(device_logging)
         self.acaia.setLogging(device_logging)
         self.acaia.start(address=self.ident)
 
@@ -1011,6 +1269,26 @@ class Acaia(Scale): # pyright: ignore [reportGeneralTypeIssues] # Argument to cl
     def disconnect_scale(self) -> None:
         self.acaia.stop()
         self.on_disconnect() # not called automatically by disconnecting via acaia.stop(), only called automatically if the scale itself disconnects
+
+    @override
+    def tare_scale(self) -> None:
+        self.acaia.send_tare()
+
+    @override
+    def max_weight(self) -> float:
+        return self.acaia.get_max_weight()
+
+    @override
+    def readability(self) -> float:
+        return self.acaia.get_readability()
+
+    # signal state actions to the user
+    @override
+    def signal_user(self, action:STATE_ACTION) -> None:
+        self.acaia.send_signal(action)
+
+
+### internal signals
 
     @pyqtSlot(float, bool)
     def weight_changed(self, new_value:float, stable:bool) -> None:
@@ -1033,53 +1311,122 @@ class Acaia(Scale): # pyright: ignore [reportGeneralTypeIssues] # Argument to cl
         self.scale_connected = False
         self.disconnected_signal.emit()
 
+
+
+### Artisan Serial Scale
+
+class AcaiaSerial(Acaia): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
+
+    def __init__(self, model:int, ident:str|None, name:str|None,
+                        connected_handler:Callable[[], None]|None = None,
+                        disconnected_handler:Callable[[], None]|None = None,
+                        stable_only:bool=False,
+                        decimals:int=1) -> None:
+        super().__init__(model, ident, name)
+        self.outer_connected_handler = connected_handler
+        self.outer_disconnected_handler = disconnected_handler
+        self.stable_only = stable_only
+        self.decimals = decimals
+
+        self.acaia:AcaiaAsync|None = None
+
+    ###
+
+    @override
+    def scan(self) -> None:
+        import serial.tools.list_ports
+        comports:ScaleSpecs = [((cp.product if cp.product is not None else cp.device), cp.device) for cp in serial.tools.list_ports.comports()]
+        # filter out system ports
+        if platform.system() == 'Darwin':
+            comports = [p for p in comports if (p[0] not in ['/dev/cu.Bluetooth-PDA-Sync', '/dev/cu.debug-console', '/dev/cu.wlan-debug',
+                '/dev/cu.Bluetooth-Modem','/dev/tty.Bluetooth-PDA-Sync','/dev/tty.Bluetooth-Modem',
+                '/dev/cu.Bluetooth-Incoming-Port', '/dev/tty.Bluetooth-Incoming-Port'
+                ])]
+        self.scanned_signal.emit(comports)
+
+
+    @override
+    def connect_scale(self, device_logging:bool) -> None:
+        if self.ident is not None:
+            acaia_serial = SerialSettings(
+                port = self.ident,
+                baudrate = SERIAL_BAUDRATE,
+                bytesize = SERIAL_BYTESIZE,
+                stopbits = SERIAL_STOPBITS,
+                parity = SERIAL_PARITY,
+                timeout = SERIAL_TIMEOUT,
+                clear_HUPCL = False)
+            self.acaia = AcaiaAsync(
+                self.weight_changed,
+                self.battery_changed,
+                self.tare_pressed,
+                serial = acaia_serial,
+                connected_handler = self.connected_handler,
+                disconnected_handler = self.disconnected_handler,
+                stable_only = self.stable_only,
+                decimals = self.decimals)
+            self.acaia.protocol.setLogging(device_logging)
+            self.acaia.start()
+
+    @override
+    def disconnect_scale(self) -> None:
+        if self.acaia is not None:
+            self.acaia.stop()
+            self.on_disconnect() # not called automatically by disconnecting via acaia.stop(), only called automatically if the scale itself disconnects
+            self.acaia = None
+
     @override
     def tare_scale(self) -> None:
-        self.acaia.send_tare()
+        if self.acaia is not None:
+            self.acaia.send_tare()
 
     @override
     def max_weight(self) -> float:
-        return self.acaia.max_weight
+        if self.acaia is not None:
+            return self.acaia.get_max_weight()
+        return 100
 
     @override
     def readability(self) -> float:
-        return self.acaia.readability
+        if self.acaia is not None:
+            return self.acaia.get_readability()
+        return 1
 
     # signal state actions to the user
     @override
     def signal_user(self, action:STATE_ACTION) -> None:
-#        _log.debug("PRINT signal_user(%s)", action)
-        if action == STATE_ACTION.DISCONNECTED:
-            self.acaia.send_leds_wipe_off(self.acaia.MAGENTA)
-            self.acaia.send_default_effects_on()
-        elif action == STATE_ACTION.CONNECTED:
-            self.acaia.send_default_effects_off()
-            self.acaia.send_leds_halo_off(self.acaia.CYAN)
-        elif action == STATE_ACTION.RELEASED:
-            self.acaia.send_leds_breathe(self.acaia.WHITE)
-        elif action == STATE_ACTION.ASSIGNED_GREEN:
-            self.acaia.send_leds_breathe(self.acaia.GREEN)
-        elif action == STATE_ACTION.ASSIGNED_ROASTED:
-            self.acaia.send_leds_breathe(self.acaia.BROWN)
-        elif action == STATE_ACTION.ZONE_ENTER:
-            self.acaia.send_leds_halo_on(self.acaia.LIGHT_BLUE)
-        elif action == STATE_ACTION.ZONE_EXIT:
-            self.acaia.send_leds_wipe_off(self.acaia.LIGHT_BLUE)
-        elif action == STATE_ACTION.SWAP_ENTER:
-            self.acaia.send_leds_on(self.acaia.ORANGE)
-        elif action == STATE_ACTION.SWAP_EXIT:
-            self.acaia.send_leds_off()
-        elif action == STATE_ACTION.TARGET_ENTER:
-            self.acaia.send_leds_on(self.acaia.BLUE)
-        elif action == STATE_ACTION.TARGET_EXIT:
-            self.acaia.send_leds_off()
-        elif action == STATE_ACTION.OK_ENTER:
-            self.acaia.send_leds_on(self.acaia.GREEN)
-        elif action == STATE_ACTION.OK_EXIT:
-            self.acaia.send_leds_wipe_off(self.acaia.GREEN)
-        elif action == STATE_ACTION.CANCEL_ENTER:
-            self.acaia.send_leds_on(self.acaia.RED)
-        elif action in {STATE_ACTION.CANCEL_EXIT, STATE_ACTION.INTERRUPTED}:
-            self.acaia.send_leds_wipe_off(self.acaia.RED)
-        elif action in {STATE_ACTION.COMPONENT_CHANGED, STATE_ACTION.TARE}:
-            self.acaia.send_leds_breathe(self.acaia.ORANGE)
+        if self.acaia is not None:
+            self.acaia.send_signal(action)
+
+
+    ###
+
+    def weight_changed(self, new_value:float, stable:bool) -> None:
+        self.weight_changed_signal.emit(new_value, stable)
+
+    def battery_changed(self, new_value:int) -> None:
+        self.battery_changed_signal.emit(new_value)
+
+    def tare_pressed(self) -> None:
+        self.tare_pressed_signal.emit()
+
+    def on_connect(self) -> None:
+        self.scale_connected = True
+        self.connected_signal.emit()
+
+    def on_disconnect(self) -> None:
+        self.scale_connected = False
+        self.disconnected_signal.emit()
+
+
+    ###
+
+    def connected_handler(self) -> None:
+        self.on_connect()
+        if self.outer_connected_handler is not None:
+            self.outer_connected_handler()
+
+    def disconnected_handler(self) -> None:
+        self.on_disconnect()
+        if self.outer_disconnected_handler is not None:
+            self.outer_disconnected_handler()

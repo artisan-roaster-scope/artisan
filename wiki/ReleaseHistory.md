@@ -11,6 +11,7 @@ v4.0.4 (Jun XX, 2026)
   - adds support for [Pratter](https://artisan-scope.org/machines/pratter/) roasting machines
   - adds support for [Probat G/UG 2026 models](https://artisan-scope.org/machines/probat/) communicating via WebSockets
   - adds support for [Neuhaus Neotec RFB Junior, RFB-S and Neoroast](https://artisan-scope.org/machines/neuhaus/) machines
+  - adds support for [North Roasters](https://artisan-scope.org/machines/north/)
   - adds [MQTT support](https://artisan-scope.org/devices/s7/)
   - adds IO Command `publish(<topic>, <data>)` to publish payloads to the connected MQTT broker
   - adds Artisan Command `pidSVbuttons(<bool>)` ([Issue #2121](../../../issues/2121))

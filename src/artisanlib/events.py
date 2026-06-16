@@ -2724,7 +2724,7 @@ class EventsDlg(ArtisanResizeablDialog):
         self.setcoloreventline(3)
 
     def setcoloreventline(self, b:int) -> None:
-        colorf = self.aw.colordialog(QColor(self.aw.qmc.EvalueColor[b]))
+        colorf = self.aw.colordialog(QColor(self.aw.qmc.EvalueColor[b]), parent=self)
         if colorf.isValid():
             colorname = str(colorf.name())
             self.aw.qmc.EvalueColor[b] = colorname
@@ -2746,7 +2746,7 @@ class EventsDlg(ArtisanResizeablDialog):
         self.setcoloreventtext(3)
 
     def setcoloreventtext(self, b:int) -> None:
-        colorf = self.aw.colordialog(QColor(self.aw.qmc.EvalueTextColor[b]))
+        colorf = self.aw.colordialog(QColor(self.aw.qmc.EvalueTextColor[b]), parent=self)
         if colorf.isValid():
             colorname = str(colorf.name())
             self.aw.qmc.EvalueTextColor[b] = colorname
@@ -3152,7 +3152,7 @@ class EventsDlg(ArtisanResizeablDialog):
     def setbuttoncolor(self, _:bool = False) -> None:
         i = self.aw.findWidgetsRow(self.eventbuttontable,self.sender(),7)
         if i is not None and i < len(self.extraeventbuttoncolor):
-            colorf = self.aw.colordialog(QColor(self.extraeventbuttoncolor[i]))
+            colorf = self.aw.colordialog(QColor(self.extraeventbuttoncolor[i]), parent=self)
             if colorf.isValid():
                 self.extraeventbuttoncolor[i] = str(colorf.name())
                 textColor = self.extraeventbuttontextcolor[i]
@@ -3171,7 +3171,7 @@ class EventsDlg(ArtisanResizeablDialog):
     def setbuttontextcolor(self, _:bool = False) -> None:
         i = self.aw.findWidgetsRow(self.eventbuttontable,self.sender(),8)
         if i is not None and i < len(self.extraeventbuttontextcolor):
-            colorf = self.aw.colordialog(QColor(self.extraeventbuttontextcolor[i]))
+            colorf = self.aw.colordialog(QColor(self.extraeventbuttontextcolor[i]), parent=self)
             if colorf.isValid():
                 self.extraeventbuttontextcolor[i] = str(colorf.name())
                 textColor = self.extraeventbuttontextcolor[i]

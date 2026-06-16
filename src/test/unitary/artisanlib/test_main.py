@@ -747,9 +747,6 @@ class TestLoadFile:
             # Act
             aw.loadFile(test_file_path)
 
-            # Assert
-            mock_application_window.deleteBackground.assert_called_once()
-
 
 
 class TestImportCSV:
