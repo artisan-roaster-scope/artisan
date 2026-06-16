@@ -8306,6 +8306,7 @@ class tgraphcanvas(QObject):
 
         self.aw.updatePlusStatus()
 
+        self.aw.set_ui_mode(self.aw.ui_mode)
         self.aw.announce_current_ui_mode()
 
         ### REDRAW  ##
@@ -13223,8 +13224,8 @@ class tgraphcanvas(QObject):
                 self.extraNoneTempHint1.append(not bool(self.aw.ws.channel_modes[8]))
                 self.extraNoneTempHint2.append(not bool(self.aw.ws.channel_modes[9]))
             elif d == 150: # +MODBUS 910
-                self.extraNoneTempHint1.append(not bool(self.aw.s7.mode[8]))
-                self.extraNoneTempHint2.append(not bool(self.aw.s7.mode[9]))
+                self.extraNoneTempHint1.append(self.aw.modbus.inputModes[8] == '')
+                self.extraNoneTempHint2.append(self.aw.modbus.inputModes[9] == '')
             elif d == 151: # +S7 1112
                 self.extraNoneTempHint1.append(not bool(self.aw.s7.mode[10]))
                 self.extraNoneTempHint2.append(not bool(self.aw.s7.mode[11]))
