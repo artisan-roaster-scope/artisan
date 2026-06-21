@@ -243,7 +243,7 @@ class TestScaleConstants:
     def test_stable_timer_period_constant(self) -> None:
         """Test STABLE_TIMER_PERIOD constant."""
         # Assert
-        assert STABLE_TIMER_PERIOD == 350
+        assert STABLE_TIMER_PERIOD == 400
 
 
 class TestScale:

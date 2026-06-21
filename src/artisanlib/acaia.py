@@ -247,7 +247,7 @@ BROWN:Final[Color] = (255,60,0)
 class AcaiaProtocol:
 
     __slots__ = [ '_send', '_weight_changed_handler', '_battery_changed_handler', '_tare_pressed_handler', '_logging', 'stable_only',
-            'decimals', 'heartbeat_frequency', 'scale_class', 'id_sent', 'device_identified', 'fast_notifications_sent', 'slow_notifications_sent',
+            'decimals', 'heartbeat_frequency', 'scale_class', 'id_sent', 'info_msg_received', 'device_identified', 'fast_notifications_sent', 'slow_notifications_sent',
             'weight', 'stable_weight', 'battery', 'isp_version', 'firmware', 'unit', 'max_weight', 'readability', 'repeatability', 'auto_off_timer', 'has_leds' ]
 
 
@@ -278,6 +278,7 @@ class AcaiaProtocol:
         # Protocol parser variables
 
         self.id_sent:bool = False # ID is sent once after first data is received from scale
+        self.info_msg_received:bool = False # set once the INFO message is receive
         self.device_identified:bool = False # set if device is properly identified from BLE or handshake information
         self.fast_notifications_sent:bool = False # after connect we switch fast notification on to receive first reading fast
         self.slow_notifications_sent:bool = False # after first reading is received we step down to slow readings again
@@ -467,6 +468,7 @@ class AcaiaProtocol:
 
     def reset_parser(self) -> None:
         self.id_sent = False
+        self.info_msg_received = False
         self.device_identified = False
         self.fast_notifications_sent = False
         self.slow_notifications_sent = False
@@ -489,7 +491,7 @@ class AcaiaProtocol:
 
         if len(data)>2:
             self.isp_version = data[2]
-            _log.debug('isp_version: %s', self.isp_version)
+#            _log.debug('isp_version: %s', self.isp_version)
 
         if len(data)>5:
             self.firmware = (data[3],data[4],data[5]) # main/sub/add
@@ -813,9 +815,10 @@ class AcaiaProtocol:
         try:
             if msg_type == CMD.INFO_A:
                 self.parse_info(data)
+                self.info_msg_received = True
                 if not self.id_sent:
                     self.send_ID() # send after very INFO_A as handshake confirmation
-            elif msg_type == CMD.STATUS_A:
+            elif msg_type == CMD.STATUS_A and self.info_msg_received:
                 self.parse_status(data)
                 self.id_sent = True # connection confirmed by device, no need for further handshake
                 self.identify_device()
