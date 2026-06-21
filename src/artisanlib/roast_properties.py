@@ -582,8 +582,8 @@ class editGraphDlg(ArtisanResizeablDialog):
 
         self.org_title = self.aw.qmc.title
         self.org_title_show_always = self.aw.qmc.title_show_always
-
         self.org_weight = self.aw.qmc.weight
+        self.org_end_weight_est = self.aw.qmc.end_weight_est
         self.org_volume = self.aw.qmc.volume
 
         self.org_roasted_defects_mode = self.aw.qmc.roasted_defects_mode
@@ -915,7 +915,11 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.weightinedit.setMinimumWidth(70)
         self.weightinedit.setMaximumWidth(70)
         self.weightinedit.setAlignment(Qt.AlignmentFlag.AlignRight)
-        self.weightoutedit = QLineEdit(outw)
+        self.weightoutedit = QLineEdit()
+        if self.aw.qmc.end_weight_est == 1:
+            self.weightoutedit.setPlaceholderText(outw)
+        else:
+            self.weightoutedit.setText(outw)
         self.weightoutedit.setToolTip(QApplication.translate('Tooltip', 'weight of roasted coffee'))
         self.weightoutedit.setValidator(self.aw.createCLocaleDoubleValidator(0., 9999999., 4, self.weightoutedit))  # the max limit has to be high enough otherwise the connected signals are not send!
         self.weightoutedit.setMinimumWidth(70)
@@ -947,7 +951,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.weightoutdefectsedit.setToolTip(QApplication.translate('Tooltip', 'weight of defects sorted from roasted coffee or weight of roasted coffee after defects have been removed'))
         if self.aw.qmc.roasted_defects_mode or defectsw != '0':
             self.weightoutdefectsedit.setText(defectsw)
-        self.weightoutdefectsedit.setPlaceholderText(self.weightoutedit.text())
+        self.weightoutdefectsedit.setPlaceholderText(self.weightoutedit_text())
         self.weightoutdefectsedit.setValidator(self.aw.createCLocaleDoubleValidator(0., 9999999., 4, self.weightoutdefectsedit))  # the max limit has to be high enough otherwise the connected signals are not send!
         self.weightoutdefectsedit.setMinimumWidth(70)
         self.weightoutdefectsedit.setMaximumWidth(70)
@@ -1227,6 +1231,9 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.tareComboBox.setCurrentIndex(self.aw.container1_idx + 3)
         self.tareComboBox.currentIndexChanged.connect(self.tareChanged)
 
+        self.scale1TareButton = QPushButton(QApplication.translate('Button', 'Tare'))
+        self.scale1TareButton.clicked.connect(self.tareScale1)
+
         # in button
         inButton = QPushButton(QApplication.translate('Button', 'in'))
         inButton.setToolTip(QApplication.translate('Tooltip', 'set scale weight as batch size'))
@@ -1476,6 +1483,8 @@ class editGraphDlg(ArtisanResizeablDialog):
 
         # we connect to scale1 if configured
         if self.aw.scale_manager.is_scale1_configured():
+
+            propGrid.addWidget(self.scale1TareButton,0,7)
 
             propGrid.addWidget(self.tareComboBox,1,6,1,2) # rowSpan=1, columnSpan=3
             propGrid.addLayout(inButtonLayout,1,8)
@@ -1731,6 +1740,15 @@ class editGraphDlg(ArtisanResizeablDialog):
         # some tabs are not rendered at all on Windows using Qt v6.5.1 (https://bugreports.qt.io/projects/QTBUG/issues/QTBUG-114204?filter=allissues)
         QTimer.singleShot(50, self.setActiveTab)
 
+    # returns self.weightoutedit.text() if not the empty string
+    # otherwise weightoutedit.placeholderText()
+    def weightoutedit_text(self) -> str:
+        return self.weightoutedit.text() or self.weightoutedit.placeholderText()
+
+    @pyqtSlot(bool)
+    def tareScale1(self, _:bool = False) -> None:
+        self.aw.scale_manager.tare_scale1_signal.emit()
+
     def updateWeightOutDefectsLabel(self) -> None:
         self.defectslabel.setText(f"<b>{QApplication.translate('Label', 'Defects')}</b>" if self.aw.qmc.roasted_defects_mode else
                 f"<b>{QApplication.translate('Label', 'Yield')}</b>")
@@ -1745,8 +1763,8 @@ class editGraphDlg(ArtisanResizeablDialog):
         if self.weightoutdefectsedit.text() != '':
             defects = float(comma2dot(self.weightoutdefectsedit.text()))
         weightout:float = 0
-        if self.weightoutedit.text() != '':
-            weightout = float(comma2dot(self.weightoutedit.text()))
+        if self.weightoutedit_text() != '':
+            weightout = float(comma2dot(self.weightoutedit_text()))
         defects = min(weightout, max(defects, 0))
         dw = 0 if defects == 0 else weightout - defects
         dw_txt = f'{float2floatWeightVolume(dw):g}'
@@ -2597,7 +2615,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 weightOut = volumeOut = densityRoasted = moistureRoasted = wholeColor = groundColor = None
                 if modifiers == Qt.KeyboardModifier.AltModifier:  #alt click
                     # we add weightOut, volumeOut, moistureRoasted, wholeColor, groundColor
-                    weightOut = float(comma2dot(str(self.weightoutedit.text())))
+                    weightOut = float(comma2dot(str(self.weightoutedit_text())))
                     volumeOut = float(comma2dot(str(self.volumeoutedit.text())))
                     densityRoasted = float(comma2dot(str(self.bean_density_out_edit.text())))
                     moistureRoasted = float(comma2dot(self.moisture_roasted_edit.text()))
@@ -2662,6 +2680,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.aw.qmc.moisture_greens = self.org_moisture_greens
 
         self.aw.qmc.weight = self.org_weight
+        self.aw.qmc.end_weight_est = self.org_end_weight_est
         self.aw.qmc.volume = self.org_volume
 
         self.aw.qmc.roasted_defects_mode = self.org_roasted_defects_mode
@@ -2823,10 +2842,16 @@ class editGraphDlg(ArtisanResizeablDialog):
                 if wi != 0.0:
                     converted = convertWeight(wi,o,i)
                     txt = f'{float2floatWeightVolume(converted):g}'
-                    if le == self.weightoutedit:
-                        self.weightouteditSetText(txt)
-                    else:
-                        le.setText(txt)
+                    le.setText(txt)
+        # convert also the weight out estimate (hold in the placeholder) if any
+        le = self.weightoutedit
+        if le.placeholderText() and le.placeholderText() != '':
+            wi = float(comma2dot(le.placeholderText()))
+            if wi != 0.0:
+                converted = convertWeight(wi,o,i)
+                txt = f'{float2floatWeightVolume(converted):g}'
+                le.setPlaceholderText(txt)
+
         self.calculated_density()
 #PLUS
         self.populatePlusCoffeeBlendCombos() # update the plus stock popups to display the correct unit
@@ -4278,7 +4303,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         except Exception: # pylint: disable=broad-except
             pass
         try:
-            weightout = float(comma2dot(self.weightoutedit.text()))
+            weightout = float(comma2dot(self.weightoutedit_text()))
         except Exception: # pylint: disable=broad-except
             pass
         k = 1.
@@ -4904,7 +4929,7 @@ class editGraphDlg(ArtisanResizeablDialog):
     def checkWeightOut(self) -> None:
         try:
             wi = float(self.weightinedit.text())
-            wo = float(self.weightoutedit.text())
+            wo = float(self.weightoutedit_text())
             self.markWidget(self.weightoutedit,wi != 0 and wo != 0 and wo > wi)
         except Exception: # pylint: disable=broad-except
             # weightinedit or weightoutedit could be the empty string
@@ -4942,29 +4967,35 @@ class editGraphDlg(ArtisanResizeablDialog):
         weight_in:float = 0
         weight_out:float = 0
         try:
-            weight_out_text = comma2dot(self.weightoutedit.text().strip())
-            if weight_out_text != '':
-                weight_out = float(weight_out_text)
-        except Exception: # pylint: disable=broad-except
-            pass
-        try:
             weight_in_text = comma2dot(self.weightinedit.text().strip())
             if weight_in_text != '':
                 weight_in = float(weight_in_text)
         except Exception: # pylint: disable=broad-except
             pass
-        if weight_units.index(self.aw.qmc.weight[2]) == 1 and weight_out > weight_in > 0:
-            # if in kg and weight_out > weight_in, we interpret weight_out in g
-            self.weightouteditSetText(f'{float2floatWeightVolume(convertWeight(weight_out,0,1)):g}')
+
+        if self.weightoutedit.text() == '0' and self.weightoutedit.placeholderText() != '':
+            self.aw.qmc.end_weight_est = 1
+            self.weightoutedit.clear()
         else:
-            self.weightouteditSetText(comma2dot(self.weightoutedit.text().strip()))
+            try:
+                weight_out_text = comma2dot(self.weightoutedit_text().strip())
+                if weight_out_text != '':
+                    weight_out = float(weight_out_text)
+            except Exception: # pylint: disable=broad-except
+                pass
+            if weight_units.index(self.aw.qmc.weight[2]) == 1 and weight_out > weight_in > 0:
+                # if in kg and weight_out > weight_in, we interpret weight_out in g
+                self.weightouteditSetText(f'{float2floatWeightVolume(convertWeight(weight_out,0,1)):g}')
+            else:
+                self.weightouteditSetText(comma2dot(self.weightoutedit_text().strip()))
+
         self.percent()
         self.defect_percent()
-        if ((self.bean_density_out_edit.text() in {'0',''} and self.volumeoutedit.text() not in {'0',''} and self.weightoutedit.text().strip() not in {'0',''}) or
-                (self.volumeoutedit.text() in {'0',''} and self.weightoutedit.text().strip() not in {'0',''})):
+        if ((self.bean_density_out_edit.text() in {'0',''} and self.volumeoutedit.text() not in {'0',''} and self.weightoutedit_text().strip() not in {'0',''}) or
+                (self.volumeoutedit.text() in {'0',''} and self.weightoutedit_text().strip() not in {'0',''})):
             self.calculated_density()
         self.density_out_editing_finished() # recalc volume_out
-        if self.weightoutedit.text() != '' and float(self.weightoutedit.text()) != 0:
+        if self.weightoutedit_text() != '' and float(self.weightoutedit_text()) != 0:
             self.density_out_editing_finished() # recalc volume_out
         # mark weightoutedit if higher than weightinedit
         self.checkWeightOut()
@@ -4975,7 +5006,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         weight_out:float = 0
         defects:float = 0
         try:
-            weight_out_text = comma2dot(self.weightoutedit.text().strip())
+            weight_out_text = comma2dot(self.weightoutedit_text().strip())
             if weight_out_text != '':
                 weight_out = float(weight_out_text)
         except Exception: # pylint: disable=broad-except
@@ -5102,8 +5133,8 @@ class editGraphDlg(ArtisanResizeablDialog):
     def percent(self) -> None:
         percent = 0.
         try:
-            if self.weightoutedit.text() != '' and float(comma2dot(self.weightoutedit.text())) != 0.0:
-                percent = self.aw.weight_loss(float(comma2dot(self.weightinedit.text())),float(comma2dot(self.weightoutedit.text())))
+            if self.weightoutedit_text() != '' and float(comma2dot(self.weightoutedit_text())) != 0.0:
+                percent = self.aw.weight_loss(float(comma2dot(self.weightinedit.text())),float(comma2dot(self.weightoutedit_text())))
         except Exception: # pylint: disable=broad-except
             pass
         if percent > 0:
@@ -5117,7 +5148,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         percentstring = ''
         try:
             defects:float = (float(comma2dot(self.weightoutdefectsedit.text())) if self.weightoutdefectsedit.text() != '' else 0)
-            weight_out:float = (float(comma2dot(self.weightoutedit.text())) if self.weightoutedit.text() != '' else 0)
+            weight_out:float = (float(comma2dot(self.weightoutedit_text())) if self.weightoutedit_text() != '' else 0)
             if 0 <= defects <= weight_out:
                 if self.aw.qmc.roasted_defects_mode:
                     percent = self.aw.weight_loss(weight_out,weight_out-defects)
@@ -5161,9 +5192,9 @@ class editGraphDlg(ArtisanResizeablDialog):
                     weight_idx = weight_units_lower.index(self.unitsComboBox.currentText())
                     weightin = convertWeight(weightin,weight_idx,0)
                     din = weightin / volumein
-            if self.volumeoutedit.text() != ''  and self.weightoutedit.text() != '':
+            if self.volumeoutedit.text() != ''  and self.weightoutedit_text() != '':
                 volumeout = float(comma2dot(self.volumeoutedit.text()))
-                weightout = float(comma2dot(self.weightoutedit.text()))
+                weightout = float(comma2dot(self.weightoutedit_text()))
                 if volumeout != 0.0 and weightout != 0.0:
                     vol_idx = volume_units.index(self.volumeUnitsComboBox.currentText())
                     volumeout = convertVolume(volumeout,vol_idx,0)
@@ -5270,9 +5301,9 @@ class editGraphDlg(ArtisanResizeablDialog):
         if self.bean_density_out_edit.text() != '':
             density_out = float(self.bean_density_out_edit.text())
             if density_out != 0:
-                if self.weightoutedit.text() != '': # and self.volumeoutedit.text().strip() in {'0',''}:
+                if self.weightoutedit_text() != '': # and self.volumeoutedit.text().strip() in {'0',''}:
                     # if density-out and weight-out is given, we re-calc volume-out:
-                    weight_out = float(comma2dot(self.weightoutedit.text()))
+                    weight_out = float(comma2dot(self.weightoutedit_text()))
                     if weight_out != 0:
                         weight_out = convertWeight(weight_out,self.unitsComboBox.currentIndex(),weight_units.index('g'))
                         volume_out = weight_out / density_out # in g/l
@@ -5330,15 +5361,15 @@ class editGraphDlg(ArtisanResizeablDialog):
             # convert volume in to l and calculate volume in
             volume_out = convertVolume(volume_out,self.volumeUnitsComboBox.currentIndex(),volume_units.index('l'))
             if volume_out != 0:
-                if self.weightoutedit.text() != '' and self.bean_density_out_edit.text().strip() in {'0',''}:
+                if self.weightoutedit_text() != '' and self.bean_density_out_edit.text().strip() in {'0',''}:
                     # if volume-out and weight-out is given, we re-calc density-out:
-                    weight_out = float(comma2dot(self.weightoutedit.text()))
+                    weight_out = float(comma2dot(self.weightoutedit_text()))
                     if weight_out != 0:
                         weight_out = convertWeight(weight_out,self.unitsComboBox.currentIndex(),weight_units.index('g'))
                         density_out = weight_out / volume_out # in g/l
                         self.bean_density_out_edit.setText(f'{float2float(density_out):g}')
                         self.volume_percent()
-                if self.bean_density_out_edit.text() != '' and self.weightoutedit.text().strip() in {'0',''}:
+                if self.bean_density_out_edit.text() != '' and self.weightoutedit_text().strip() in {'0',''}:
                     # if volume-out and density-out is given, we re-calc weight-out:
                     density_out = float(comma2dot(self.bean_density_out_edit.text()))
                     if density_out != 0:
@@ -5536,7 +5567,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         else:
             self.aw.qmc.last_batchsize = convertWeight(w0,weight_units.index(w2),0) # remember last used batch size (in g)
         try:
-            w1 = float(comma2dot(self.weightoutedit.text()))
+            w1 = float(comma2dot(self.weightoutedit_text()))
         except Exception: # pylint: disable=broad-except
             w1 = 0
         w2 = self.unitsComboBox.currentText()
@@ -5567,6 +5598,8 @@ class editGraphDlg(ArtisanResizeablDialog):
         w1 = min(w0,w1)
         self.aw.qmc.roasted_defects_weight = min(self.aw.qmc.roasted_defects_weight,w0)
         self.aw.qmc.weight = (w0,w1,w2)
+        if self.org_weight[1] != w1:
+            self.aw.qmc.end_weight_est = 0 # reset weight estimate indicator as out weight was set/updated (even if just the weight unit was updated!)
 
 
         #update volume

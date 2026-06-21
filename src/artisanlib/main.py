@@ -5619,6 +5619,7 @@ class ApplicationWindow(QMainWindow):
         if not self.qmc.flagstart or self.qmc.title_show_always:
             self.qmc.setProfileTitle(self.qmc.title,updatebackground=True)
         self.qmc.weight = (rr['weightIn'],self.qmc.weight[1],rr['weightUnit'])
+        self.qmc.end_weight_est = 0
         if 'weightOut' in rr:
             self.qmc.weight = (self.qmc.weight[0],rr['weightOut'],rr['weightUnit'])
         else:
@@ -6079,6 +6080,7 @@ class ApplicationWindow(QMainWindow):
                             weight_unit = self.qmc.weight[2]
                             self.qmc.last_batchsize = convertWeight(self.qmc.roastersize_setup,1,0) # nominal batch size in g
                             nominal_batch_size = convertWeight(self.qmc.roastersize_setup,1,weight_units.index(weight_unit))
+                            self.qmc.end_weight_est = 0
                             self.qmc.weight = (nominal_batch_size,0,weight_unit)
                         # size set, ask for heating
                         resi:int|None
@@ -6162,6 +6164,7 @@ class ApplicationWindow(QMainWindow):
                         self.sendmessage(QApplication.translate('Message','Action canceled'))
                     else:
                         # setup not canceled, we establish the last_batchsize
+                        self.qmc.end_weight_est = 0
                         self.qmc.weight = (convertWeight(self.qmc.last_batchsize,0,weight_units.index(self.qmc.weight[2])),0,self.qmc.weight[2])
                     self.establish_etypes()
                 self.qmc.redraw(False,False)
@@ -7638,7 +7641,7 @@ class ApplicationWindow(QMainWindow):
                 try:
                     # we masked the -1 error values
                     np_etb_masked = numpy.ma.masked_equal(np_etb, -1)
-                    np_timeB_etb_masked = numpy.ma.masked_array(np_timeB, np_etb_masked.mask) # type:ignore[operator,unused-ignore] # ty:ignore[call-non-callable] # pylint:disable=no-member
+                    np_timeB_etb_masked = numpy.ma.masked_array(np_timeB, np_etb_masked.mask) # type:ignore[operator,unused-ignore] # pylint:disable=no-member
                     # ignore the masked error values on computing the interpolation and fill (especially on the left) with -1 values
                     interp_np_etb = numpy.interp(np_timex,np_timeB_etb_masked.compressed(),np_etb_masked.compressed(),left=-1,right=-1) # pyright:ignore[reportUnknownArgumentType]  # pylint:disable=no-member
 
@@ -7663,7 +7666,7 @@ class ApplicationWindow(QMainWindow):
                 try:
                     # we masked the -1 error values
                     np_btb_masked = numpy.ma.masked_equal(np_btb, -1)
-                    np_timeB_btb_masked = numpy.ma.masked_array(np_timeB, np_btb_masked.mask) # type:ignore[operator,unused-ignore] # ty:ignore[call-non-callable] # pylint:disable=no-member
+                    np_timeB_btb_masked = numpy.ma.masked_array(np_timeB, np_btb_masked.mask) # type:ignore[operator,unused-ignore] # pylint:disable=no-member
                     # ignore the masked error values on computing the interpolation and fill (especially on the left) with -1 values
                     interp_np_btb = numpy.interp(np_timex,np_timeB_btb_masked.compressed(),np_btb_masked.compressed(),left=-1,right=-1) # pyright:ignore[reportUnknownArgumentType]  # pylint:disable=no-member
 
@@ -14529,6 +14532,7 @@ class ApplicationWindow(QMainWindow):
                 #  - scheduler is not active
                 if self.qmc.setBatchSizeFromBackground and (self.qmc.flagon or not self.curFile) and self.schedule_window is None:
                     self.qmc.weight = (profile['weight'][0],self.qmc.weight[1],profile['weight'][2])
+                    self.qmc.end_weight_est = 1 # this weight out is an estimate as it was not measure nor manual set
 
 
                 message = QApplication.translate('Message', 'Background {0} loaded successfully {1}').format(filename, '')
@@ -16001,8 +16005,10 @@ class ApplicationWindow(QMainWindow):
                     convertWeight(float(weight[0]), weight_unit_idx, current_weight_unit_idx),
                     convertWeight(float(weight[1]), weight_unit_idx, current_weight_unit_idx),
                     self.qmc.weight[2])
+                self.qmc.end_weight_est = profile.get('end_weight_est', 0)
             else:
                 self.qmc.weight = (0., 0., self.qmc.weight[2])
+                self.qmc.end_weight_est = 0
             #
             if 'defects_weight' in profile:
                 defects = profile['defects_weight']
@@ -17028,6 +17034,7 @@ class ApplicationWindow(QMainWindow):
 
             profile['beans'] = encodeLocalStrict(self.qmc.beans)
             profile['weight'] = [self.qmc.weight[0],self.qmc.weight[1],encodeLocalStrict(self.qmc.weight[2], 'g')]
+            profile['end_weight_est'] = self.qmc.end_weight_est
             profile['defects_weight'] = self.qmc.roasted_defects_weight
             profile['volume'] = [self.qmc.volume[0],self.qmc.volume[1],encodeLocalStrict(self.qmc.volume[2], 'l')]
             profile['density'] = [self.qmc.density[0],encodeLocalStrict(self.qmc.density[1], 'g'),self.qmc.density[2],encodeLocalStrict(self.qmc.density[3], 'l')]
@@ -18437,6 +18444,7 @@ class ApplicationWindow(QMainWindow):
             self.qmc.AUCshowFlag = toBool(settings.value('AUCshowFlag',self.qmc.AUCshowFlag))
             self.keyboardmoveflag = toInt(settings.value('keyboardmoveflag',int(self.keyboardmoveflag)))
             self.ui_mode = UI_MODE(toInt(settings.value('UI_mode',int(self.ui_mode))))
+            self.set_ui_mode(self.ui_mode)
             self.qmc.ambientTempSource = toInt(settings.value('AmbientTempSource',int(self.qmc.ambientTempSource)))
             self.qmc.ambientHumiditySource = toInt(settings.value('AmbientHumiditySource',int(self.qmc.ambientHumiditySource)))
             self.qmc.ambientPressureSource = toInt(settings.value('AmbientPressureSource',int(self.qmc.ambientPressureSource)))

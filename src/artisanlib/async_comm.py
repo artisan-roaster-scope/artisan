@@ -392,10 +392,11 @@ class AsyncComm:
     # if serial settings are given, the host/port settings are ignored and communication is handled by the given serial port
     async def connect(self, connect_timeout:float=5) -> None:
         writer:asyncio.StreamWriter|None = None
+        was_connected:bool = False # set by successful connection and used to report ONE disconnect message
         while self._running:
             try:
                 if self._serial is not None:
-                    _log.debug('connecting to serial port: %s ...', self._serial['port'])
+#                    _log.debug('connecting to serial port: %s ...', self._serial['port'])
                     connect = self.open_serial_connection(
                         url = self._serial['port'],
                         baudrate = self._serial['baudrate'],
@@ -415,6 +416,7 @@ class AsyncComm:
                     read_handler = asyncio.create_task(self.handle_reads(reader))
                     self._ACK_received = asyncio.Event()
                     _log.debug('connected')
+                    was_connected = True
                     if self._connected_handler is not None:
                         try:
                             self._connected_handler()
@@ -441,14 +443,15 @@ class AsyncComm:
 
             except TimeoutError:
                 _log.debug('connection timeout')
-            except SerialException as e:
-                _log.debug('serial exception: %s',e)
+            except SerialException:
+                #_log.debug('serial exception: %s',e)
+                pass
             except Exception as e: # pylint: disable=broad-except
                 _log.error(e)
             finally:
                 self._ACK_received = None
                 self.reset_readings()
-                if self._disconnected_handler is not None:
+                if was_connected and self._disconnected_handler is not None:
                     try:
                         self._disconnected_handler()
                     except Exception as e: # pylint: disable=broad-except
@@ -461,7 +464,7 @@ class AsyncComm:
                         _log.debug('serial exception: %s',e)
                     except Exception as e: # pylint: disable=broad-except
                         _log.error(e)
-                await asyncio.sleep(0.5)
+            await asyncio.sleep(1)
 
     def send(self, message:bytes) -> None:
         if self._asyncLoopThread is not None and self._write_queue is not None:

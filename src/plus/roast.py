@@ -305,6 +305,10 @@ def getRoast() -> dict[str, Any]:
         else:
             d['amount'] = 0
 
+        # adds end_weight estimated flag (always, no suppression of the 0)
+        if 'end_weight_est' in p:
+            d['end_weight_est'] = p['end_weight_est']
+
         # computed values added just for the profile, but not for
         # the profiles template
         try:
@@ -508,6 +512,7 @@ sync_record_non_supressed_attributes: list[str] = [
     'blend',          # default None
     'amount',         # default 0
     'end_weight',     # default 0
+    'end_weight_est', # default 0 # NOTE: end_weight_est can be toggled for now only on the Artisan side in both directions. Therefore it has to be send always
     'defects_weight', # default 0 # introduced in v3.1.2
     's_item_id',      # default None
 ]

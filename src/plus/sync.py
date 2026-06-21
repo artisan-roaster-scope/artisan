@@ -134,6 +134,8 @@ def addSync(uuid:str, modified_at:float) -> None:
 # returns None if given uuid is not registered for syncing, otherwise the
 # last modified_at timestamp in EPOC milliseconds
 def getSync(uuid:str) -> float|None:
+    if uuid == '':
+        return None
     import portalocker
     import shelve
     fh:IO[str]
@@ -482,6 +484,11 @@ def applyServerUpdates(data:dict[str, Any]) -> None:
             if dirty:
                 # register new data
                 aw.qmc.weight = (win,wout,wunit)
+
+            if 'end_weight_est' in data and data['end_weight_est'] != aw.qmc.end_weight_est:
+                aw.qmc.end_weight_est = data['end_weight_est']
+                dirty = True
+
             if 'defects_weight' in data and data['defects_weight'] is not None:
                 w = convertWeight(
                     data['defects_weight'],
@@ -784,7 +791,7 @@ def fetchServerUpdate(uuid: str, file:str|None = None, return_data:bool = False)
                 # if file modification date is newer than what is known on the
                 # version from the server via the sync cache
 
-                if file is not None and getSync(uuid) is None:
+                if file is not None and uuid != '' and getSync(uuid) is None:
                     _log.debug(
                         '-> file not in sync cache yet, we need to fetch'
                          ' the servers modification date and add the profile'
@@ -902,7 +909,7 @@ def fetchServerUpdate(uuid: str, file:str|None = None, return_data:bool = False)
 # this function might be called from a thread (eg. via QTimer)
 def getUpdate(uuid: str|None, file: str|None = None) -> None:
     _log.debug('getUpdate(%s,%s)', uuid, file)
-    if uuid is not None and config.app_window is not None:
+    if uuid is not None and uuid != '' and config.app_window is not None:
         aw = config.app_window
         if aw.editgraphdialog is None and controller.is_connected():
             try:

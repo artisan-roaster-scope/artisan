@@ -303,7 +303,7 @@ class tgraphcanvas(QObject):
         'patheffects', 'graphstyle', 'graphfont', 'buttonvisibility', 'buttonactions', 'buttonactionstrings', 'extrabuttonactions', 'extrabuttonactionstrings',
         'xextrabuttonactions', 'xextrabuttonactionstrings', 'chargeTimerFlag', 'autoChargeFlag', 'autoDropFlag', 'autoChargeMode', 'autoDropMode', 'autoChargeIdx', 'autoDropIdx', 'markTPflag',
         'autoDRYflag', 'autoFCsFlag', 'autoCHARGEenabled', 'autoDRYenabled', 'autoFCsenabled', 'autoDROPenabled', 'projectionconstant',
-        'projectionmode', 'transMappingMode', 'weight', 'roasted_defects_weight', 'volume', 'density', 'roasted_defects_mode', 'density_roasted', 'volumeCalcUnit', 'volumeCalcWeightInStr',
+        'projectionmode', 'transMappingMode', 'weight', 'end_weight_est', 'roasted_defects_weight', 'volume', 'density', 'roasted_defects_mode', 'density_roasted', 'volumeCalcUnit', 'volumeCalcWeightInStr',
         'volumeCalcWeightOutStr', 'container_names', 'container_weights', 'specialevents', 'etypes', 'etypesdefault',
         'alt_etypesdefault', 'default_etypes_set', 'specialeventstype',
         'specialeventsStrings', 'specialeventsvalue', 'eventsGraphflag', 'clampEvents', 'renderEventsDescr', 'eventslabelschars', 'eventsshowflag',
@@ -1746,6 +1746,7 @@ class tgraphcanvas(QObject):
 
         #[0]weight in, [1]weight out, [2]units (string)
         self.weight:tuple[float,float,str] = (0, 0, weight_units[1])
+        self.end_weight_est:int = 0 # 1: weight out in self.weight[1] is an estimate an not measured or manuel set; 0: otherwise
 
         self.roasted_defects_weight:float = 0.0 # weight of defects sorted from roasted weight in unit self.weight[2] (should always be positive and less than self.weight[1])
 
@@ -1762,7 +1763,7 @@ class tgraphcanvas(QObject):
 
 
         if platform.system() == 'Darwin':
-            # try to "guess" the users preferred temperature unit
+            # try to "guess" the users preferred weight unit
             try:
                 if not QSettings().value('AppleMetricUnits'):
                     self.weight = (0, 0, weight_units[2])
@@ -8056,6 +8057,8 @@ class tgraphcanvas(QObject):
             self.aw.recording_revision = str(__revision__)
             self.aw.recording_build = str(__build__)
 
+            self.end_weight_est = 0
+
             # if we are in KeepON mode, the reset triggered by ON should respect the roastpropertiesflag ("Delete Properties on Reset")
             if self.roastpropertiesflag and (self.flagKeepON or not keepProperties):
                 self.title = QApplication.translate('Scope Title', 'Roaster Scope')
@@ -8306,7 +8309,6 @@ class tgraphcanvas(QObject):
 
         self.aw.updatePlusStatus()
 
-        self.aw.set_ui_mode(self.aw.ui_mode)
         self.aw.announce_current_ui_mode()
 
         ### REDRAW  ##

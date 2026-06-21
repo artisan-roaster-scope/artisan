@@ -155,6 +155,7 @@ class ProfileData(TypedDict, total=False):
     plus_blend_spec_labels: list[str]
     beans: str
     weight: list[float|str] # NOTE: internally weight is a typed tuple
+    end_weight_est: int
     volume: list[float|str] # NOTE: internally volume is a typed tuple
     density: list[float|str] # NOTE: internally density is a typed tuple
     density_roasted: list[float|str] # NOTE: internally density_roasted is a typed tuple
