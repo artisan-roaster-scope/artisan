@@ -503,7 +503,7 @@ class AcaiaProtocol:
     def decode_weight(self, payload:bytes) -> tuple[float|None, bool]:
         try:
             # first 4 bytes encode the weight as unsigned long (little endian)
-            value = ((payload[3] & 0xff) << 24) + \
+            value:float = ((payload[3] & 0xff) << 24) + \
                     ((payload[2] & 0xff) << 16) + ((payload[1] & 0xff) << 8) + (payload[0] & 0xff)
 
             factor = payload[4]
