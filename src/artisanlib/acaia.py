@@ -30,7 +30,7 @@ from PyQt6.QtCore import pyqtSignal, pyqtSlot
 from artisanlib.ble_port import ClientBLE
 from artisanlib.async_comm import AsyncComm, AsyncIterable, IteratorReader
 from artisanlib.scale import Scale, ScaleSpecs, STATE_ACTION
-from artisanlib.util import float2float
+from artisanlib.util import float2float, round_base
 from artisanlib.atypes import SerialSettings
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -226,6 +226,8 @@ HEADER2:Final[bytes]      = b'\xdd'
 
 HEARTBEAT_FREQUENCY:Final[int] = 5 # send the heartbeat every 5 sec
 
+RELAY_STREAMING:Final[bool] = True
+
 
 # ISP versions -> device model (CSMO series)
 ISP_VERSION_CSMO_L = 35      # CSMO-L, large scale (100kg)
@@ -248,7 +250,7 @@ class AcaiaProtocol:
 
     __slots__ = [ '_send', '_weight_changed_handler', '_battery_changed_handler', '_tare_pressed_handler', '_logging', 'stable_only',
             'decimals', 'heartbeat_frequency', 'scale_class', 'id_sent', 'info_msg_received', 'device_identified', 'fast_notifications_sent', 'slow_notifications_sent',
-            'weight', 'stable_weight', 'battery', 'isp_version', 'firmware', 'unit', 'max_weight', 'readability', 'repeatability', 'auto_off_timer', 'has_leds' ]
+            'stable_weight', 'battery', 'isp_version', 'firmware', 'unit', 'max_weight', 'readability', 'repeatability', 'auto_off_timer', 'has_leds' ]
 
 
     def __init__(self,
@@ -284,7 +286,6 @@ class AcaiaProtocol:
         self.slow_notifications_sent:bool = False # after first reading is received we step down to slow readings again
 
         # readings
-        self.weight:float|None = None
         self.stable_weight:float|None = None
         self.battery:int|None = None
         self.isp_version:int|None = None
@@ -472,7 +473,6 @@ class AcaiaProtocol:
         self.device_identified = False
         self.fast_notifications_sent = False
         self.slow_notifications_sent = False
-        self.weight = None
         self.stable_weight = None
         self.battery = None
         self.isp_version = None
@@ -536,26 +536,27 @@ class AcaiaProtocol:
         except Exception:  # pylint: disable=broad-except
             return None, False
 
-
     def update_weight(self, value:float|None, stable:bool|None = False) -> None:
-        _log.debug('PRINT update_weight(%s,%s)', value, stable)
+##        _log.debug("PRINT update_weight(%s,%s)", value, stable)
         if value is not None and (not self.stable_only or stable):
-#            if self.repeatability > 1:
-#                # we round to full 10g
-#                value = round(value, -1)
+            if self.repeatability > 1:
+                # round to full 10g
+                #value = round(value, -1)
+                # round to full 5g
+                value = round_base(value, 5)
             # convert the weight in g delivered with one decimal to an int
             value_rounded:float = float2float(value, self.decimals)
             if stable and value_rounded != self.stable_weight:
                 # if value is fresh and reading is stable
+##                _log.debug("PRINT new stable weight: %s", value_rounded)
+                self._weight_changed_handler(value_rounded, True)
                 self.stable_weight = value_rounded
-                self.weight = value_rounded # we also update the last weight value to prevent it to be send again
-                _log.debug('PRINT new stable weight: %s', self.stable_weight)
-                self._weight_changed_handler(self.stable_weight, bool(stable))
-            elif not stable and value_rounded != self.weight:
+            elif not stable:
+##                _log.debug("PRINT new non-stable weight: %s", value_rounded)
+                self._weight_changed_handler(value_rounded, False)
                 self.stable_weight = None # non-stable weights invalidate the last stable weight to ensure a sequence of equal stable weights is reported if interleaved with non-stable weights
-                self.weight = value_rounded
-                _log.debug('PRINT new non-stable weight: %s', self.weight)
-                self._weight_changed_handler(self.weight, bool(stable))
+##            else:
+##                _log.debug("PRINT stable weight ignored")
 
     # returns length of consumed data or -1 on error
     def parse_weight_event(self, payload:bytes) -> int:
@@ -1001,7 +1002,7 @@ class AcaiaProtocol:
 
     def slow_notifications(self) -> None:
         _log.debug('slow notifications: %s', self.scale_class)
-        if self.scale_class == SCALE_CLASS.RELAY:
+        if self.scale_class == SCALE_CLASS.RELAY and not RELAY_STREAMING:
             self.send_event(
                 bytes([ # pairs of key/setting
                         0,  # weight id

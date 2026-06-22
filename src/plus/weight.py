@@ -972,13 +972,17 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues]
 
     @pyqtSlot()
     def scales_available(self) -> None:
-        self.sm_green.send('available')
-        self.sm_roasted.send('available')
+        if self.scale_manager.scale1_available() or (not self.aw.scale2_dedicated_for_roasted_only and self.scale_manager.scale2_available()):
+            self.sm_green.send('available')
+        if self.scale_manager.scale2_available() or (not self.aw.scale1_dedicated_for_green_only and self.scale_manager.scale1_available()):
+            self.sm_roasted.send('available')
 
     @pyqtSlot()
     def scales_unavailable(self) -> None:
-        self.sm_green.send('unavailable')
-        self.sm_roasted.send('unavailable')
+        if not self.scale_manager.scale1_available() and (self.aw.scale2_dedicated_for_roasted_only or not self.scale_manager.scale2_available()):
+            self.sm_green.send('unavailable')
+        if not self.scale_manager.scale2_available() and (self.aw.scale1_dedicated_for_green_only or not self.scale_manager.scale1_available()):
+            self.sm_roasted.send('unavailable')
 
     # returns roasted container weight in g if one is set
     def roasted_container_weight(self) -> int | None:
@@ -1034,7 +1038,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues]
     #     but not smaller than WeightManager.MIN_EMPTY_BUCKET_WEIGHT and WeightManager.MAX_EMPTY_BUCKET_WEIGHT
     # if green is True we check for an empty bucket to weigh greens otherwise to weigh roasted
     def empty_bucket_placed(self, step:int, batchsize: float | None, green:bool=True) -> bool:
-        _log.debug('PRINT empty_bucket_placed(%s,%s,%s)',step, batchsize, green)
+##        _log.debug('PRINT empty_bucket_placed(%s,%s,%s)',step, batchsize, green)
         # the empty bucket weight must be lighter than the total weight of a filled roasted bucket
         # to avoid overlapping recognition
         # NOTE: a very light roasting task can block the recognition of the placement of empty green buckets
@@ -1085,7 +1089,7 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues]
             max_tolerance = max(float(WeightManager.MIN_EMPTY_BUCKET_RECOGNITION_TOLERANCE),
                                 max_bucket_weight*WeightManager.EMPTY_BUCKET_RECOGNITION_TOLERANCE_PERCENT/100)
 
-            _log.debug('PRINT %s <= %s <= %s',min_bucket_weight - min_tolerance, step, max_bucket_weight + max_tolerance)
+##            _log.debug('PRINT %s <= %s <= %s',min_bucket_weight - min_tolerance, step, max_bucket_weight + max_tolerance)
             return min_bucket_weight - min_tolerance <= step <= max_bucket_weight + max_tolerance
 
         return False
@@ -1179,7 +1183,8 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues]
                 self.signal_green_task_scale(STATE_ACTION.INTERRUPTED)
 
             # 6. Place Empty Green Bucket (gets priority over placing an empty roasted bucket in the next clause!)
-            elif (self.aw.taskWebDisplayGreenActive and                                        # only if Task Display Green is active
+            elif ((scale_nr != 2 or not self.aw.scale2_dedicated_for_roasted_only) and         # not if scale_nr == 2 and scale2 is reserved for roasted only
+                    self.aw.taskWebDisplayGreenActive and                                      # only if Task Display Green is active
                     self.sm_green.current_weight_item is not None and                          # current green weight item is established
                     (((self.sm_green.is_current_state_one_of(
                         {GreenWeighingState.ready, GreenWeighingState.empty})) and             # green State Machine is in READY or EMPTY state
@@ -1246,7 +1251,8 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues]
                     self.sm_green.send('bucket_placed')
 
             # 7. Place Empty Roasted Bucket (only if empty green bucket not recognized)
-            elif ((self.aw.taskWebDisplayRoastedActive or (self.aw.schedule_window is not None and self.aw.schedule_window.TabWidget.currentIndex() == 1)) and
+            elif ((scale_nr != 1 or not self.aw.scale1_dedicated_for_green_only) and       # not if scale_nr == 1 and scale1 is reserved for green only
+                    (self.aw.taskWebDisplayRoastedActive or (self.aw.schedule_window is not None and self.aw.schedule_window.TabWidget.currentIndex() == 1)) and
                         # only if Task Display Roasted is active; strictly not necessary,
                         #   but this way it allows to deactivate the mechanism
                     self.roasted_task_scale == 0 and                                       # no scale yet assigned to the roasted task

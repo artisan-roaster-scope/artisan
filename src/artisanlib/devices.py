@@ -1587,6 +1587,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.scale1ModelComboBox.setToolTip(QApplication.translate('Tooltip','Choose the model of your scale'))
             self.scale1ModelComboBox.setMinimumWidth(150)
             self.scale1ModelComboBox.addItems([''] + [m for (m,_) in SUPPORTED_SCALES])
+            self.scale1GreenOnlyCheckBox = QCheckBox(QApplication.translate('Label','Greens only'))
+            self.scale1GreenOnlyCheckBox.setChecked(self.aw.scale1_dedicated_for_green_only)
+            self.scale1GreenOnlyCheckBox.setToolTip(QApplication.translate('Tooltip','Reserve scale 1 for green beans'))
             self.scale1NameLabel = QLabel(QApplication.translate('Label','Name'))
             self.scale1NameComboBox = QComboBox()
             self.scale1NameComboBox.setToolTip(QApplication.translate('Tooltip','Choose your scale'))
@@ -1633,6 +1636,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             scale1Grid = QGridLayout()
             scale1Grid.addWidget(scale1ModelLabel,0,0)
             scale1Grid.addWidget(self.scale1ModelComboBox,0,1)
+            scale1Grid.addWidget(self.scale1GreenOnlyCheckBox,0,2,1,4,Qt.AlignmentFlag.AlignRight)
             scale1Grid.addWidget(self.scale1NameLabel,1,0)
             scale1Grid.addWidget(self.scale1NameComboBox,1,1)
             scale1Grid.addWidget(self.scale1EditButton,1,2)
@@ -1660,6 +1664,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.scale2ModelComboBox.setToolTip(QApplication.translate('Tooltip','Choose the model of your scale'))
             self.scale2ModelComboBox.setMinimumWidth(150)
             self.scale2ModelComboBox.addItems([''] + [m for (m,_) in SUPPORTED_SCALES])
+            self.scale2RoastedOnlyCheckBox = QCheckBox(QApplication.translate('Label','Roasted only'))
+            self.scale2RoastedOnlyCheckBox.setChecked(self.aw.scale2_dedicated_for_roasted_only)
+            self.scale2RoastedOnlyCheckBox.setToolTip(QApplication.translate('Tooltip','Reserve scale 2 for roasted coffee'))
             self.scale2NameLabel = QLabel(QApplication.translate('Label','Name'))
             self.scale2NameComboBox = QComboBox()
             self.scale2NameComboBox.setToolTip(QApplication.translate('Tooltip','Choose your scale'))
@@ -1708,6 +1715,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             scale2Grid = QGridLayout()
             scale2Grid.addWidget(scale2ModelLabel,0,0)
             scale2Grid.addWidget(self.scale2ModelComboBox,0,1)
+            scale2Grid.addWidget(self.scale2RoastedOnlyCheckBox,0,2,1,4,Qt.AlignmentFlag.AlignRight)
             scale2Grid.addWidget(self.scale2NameLabel,1,0)
             scale2Grid.addWidget(self.scale2NameComboBox,1,1)
             scale2Grid.addWidget(self.scale2EditButton,1,2)
@@ -2113,15 +2121,18 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.scale1NameComboBox.setEnabled(False)
         self.scale1EditButton.setEnabled(False)
         if i > 0 and len(SUPPORTED_SCALES) > i-1 and len(SUPPORTED_SCALES[i-1]) > 0:
+            self.aw.scale1_name = None
+            self.scale1NameComboBox.clear()
+            self.update_scale1_weight(None)
             self.aw.scale1_model = i-1
             self.scale1ScanButton.setEnabled(True)
             self.updateScale1NameLabel(SUPPORTED_SCALES[i-1][1])
         else:
             self.aw.scale1_name = None
-            self.aw.scale1_model = None
             self.scale1NameComboBox.clear()
-            self.scale1ScanButton.setEnabled(False)
             self.update_scale1_weight(None)
+            self.aw.scale1_model = None
+            self.scale1ScanButton.setEnabled(False)
             self.updateScale1NameLabel(0)
 
     @pyqtSlot(int)
@@ -2251,15 +2262,18 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         self.scale2NameComboBox.setEnabled(False)
         self.scale2EditButton.setEnabled(False)
         if i > 0 and len(SUPPORTED_SCALES) > i-1 and len(SUPPORTED_SCALES[i-1]) > 0:
+            self.aw.scale2_name = None
+            self.scale2NameComboBox.clear()
+            self.update_scale2_weight(None)
             self.aw.scale2_model = i-1
             self.scale2ScanButton.setEnabled(True)
             self.updateScale2NameLabel(SUPPORTED_SCALES[i-1][1])
         else:
             self.aw.scale2_name = None
-            self.aw.scale2_model = None
             self.scale2NameComboBox.clear()
-            self.scale2ScanButton.setEnabled(False)
             self.update_scale2_weight(None)
+            self.aw.scale2_model = None
+            self.scale2ScanButton.setEnabled(False)
             self.updateScale1NameLabel(0)
 
     @pyqtSlot(int)
@@ -2455,13 +2469,6 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.aw.container2_idx = i - 3
             # update displayed scale weight
             self.updateRoastedContainerWeight()
-#        # we need to update availability, as roasted scale is only available if roasted container weight is set
-#        self.aw.scale_manager.update_availability(force=True)
-#        # if green display is ON, roasted display can only be turned ON if roasted container is selected
-#        if self.aw.taskWebDisplayGreenActive and self.aw.container2_idx == -1:
-#            self.taskWebDisplayRoasted(False)
-#        self.taskWebDisplayRoastedFlag.setDisabled(self.aw.taskWebDisplayGreenActive)# and self.aw.container2_idx == -1)
-#        self.taskWebDisplayRoastedPort.setDisabled(self.aw.taskWebDisplayGreenActive)# and self.aw.container2_idx == -1)
 
     def updateRoastedContainerWeight(self) -> None:
         weight = self.aw.qmc.get_container_weight(self.aw.container2_idx)
@@ -3532,6 +3539,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
             self.aw.two_bucket_mode = self.dual_bucket_mode.isChecked()
             self.aw.green_task_precision = self.greenTaskPrecision.value()
+
+            self.aw.scale1_dedicated_for_green_only = self.scale1GreenOnlyCheckBox.isChecked()
+            self.aw.scale2_dedicated_for_roasted_only = self.scale2RoastedOnlyCheckBox.isChecked()
 
             if self.pidButton.isChecked():
                 #type index[0]: 0 = PXG, 1 = PXR, 2 = DTA

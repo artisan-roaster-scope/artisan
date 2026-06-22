@@ -243,7 +243,7 @@ class TestScaleConstants:
     def test_stable_timer_period_constant(self) -> None:
         """Test STABLE_TIMER_PERIOD constant."""
         # Assert
-        assert STABLE_TIMER_PERIOD == 400
+        assert STABLE_TIMER_PERIOD == 500
 
 
 class TestScale:
@@ -923,42 +923,6 @@ class TestScaleManager:
         with patch.object(scale_manager_instance, 'unavailable_signal') as mock_signal:
             # Act
             scale_manager_instance.update_availability()
-
-            # Assert
-            mock_signal.emit.assert_called_once()
-            assert scale_manager_instance.available is False
-
-    def test_update_availability_no_change(self, scale_manager_instance: ScaleManager) -> None:
-        """Test update_availability when availability doesn't change."""
-        # Arrange
-        scale_manager_instance.scale1 = None
-        scale_manager_instance.scale2 = None
-        scale_manager_instance.available = False
-
-        with patch.object(
-            scale_manager_instance, 'available_signal'
-        ) as mock_available_signal, patch.object(
-            scale_manager_instance, 'unavailable_signal'
-        ) as mock_unavailable_signal:
-
-            # Act
-            scale_manager_instance.update_availability()
-
-            # Assert
-            mock_available_signal.emit.assert_not_called()
-            mock_unavailable_signal.emit.assert_not_called()
-            assert scale_manager_instance.available is False
-
-    def test_update_availability_force_signal(self, scale_manager_instance: ScaleManager) -> None:
-        """Test update_availability with force=True."""
-        # Arrange
-        scale_manager_instance.scale1 = None
-        scale_manager_instance.scale2 = None
-        scale_manager_instance.available = False
-
-        with patch.object(scale_manager_instance, 'unavailable_signal') as mock_signal:
-            # Act
-            scale_manager_instance.update_availability(force=True)
 
             # Assert
             mock_signal.emit.assert_called_once()
