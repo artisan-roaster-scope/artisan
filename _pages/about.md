@@ -399,6 +399,8 @@ The development of **<span style="color: #4C97C3;">artisan</span>** is supported
       <a target="_blank" href="http://www.santoker.com/" title="Santoker">
           <img src="/assets/images/santoker-logo.svg" alt="Santoker" loading="lazy" decoding="async" />
       </a>
+      
+<!--      
       <a target="_blank" href="https://www.primoroasting.com/" title="Primo">
           <picture>
           <source 
@@ -409,6 +411,19 @@ The development of **<span style="color: #4C97C3;">artisan</span>** is supported
             srcset="/assets/images/primo-logo.webp" alt="Primo" loading="lazy" decoding="async">
           </picture>  
       </a>
+-->      
+
+      <a target="_blank" href="https://labelisten.com/" title="LABEL!STEN">
+          <picture>
+          <source 
+            media="(max-width: 768px)"
+            srcset="
+             /assets/images/labelisten-logo-small.webp">
+           <img src="/assets/images/labelisten-logo.png" 
+            srcset="/assets/images/labelisten-logo.webp" alt="LABEL!STEN" loading="lazy" decoding="async">
+          </picture>  
+      </a>
+      
       <a target="_blank" href="https://www.sweetcoffeeitalia.com/" title="Sweet Coffee Italia">
           <picture>
           <source 

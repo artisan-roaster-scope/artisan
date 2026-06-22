@@ -4,7 +4,7 @@ header:
   teaser: /assets/images/posts/2025-06-26-WoC-Geneva_teaser.webp
   og_image: /assets/images/posts/2025-06-26-WoC-Geneva_teaser.webp
 title: "World of Coffee 2025"
-excerpt: "WoC Geneva, Switzerland"
+excerpt: "WoC Geneva"
 date: 2025-06-26
 categories:
   - event
@@ -12,7 +12,7 @@ tags:
   - artisan
   - artisan.plus
   - woc
-link: https://acaia.co/products/cosmo-landing
+link: https://europe.worldofcoffee.org/
 ---
 
 The Artisan Scope team has partnered with [Acaia](https://acaia.co/){:target="_blank"} to showcase the outcomes of their collaboration at this year's [World of Coffee](https://worldofcoffee.org/){:target="_blank"} in Geneva. 
@@ -31,7 +31,7 @@ We presented the first scale exclusively designed for coffee roasters, the [COSM
 
 
 
-> [World of Coffee](https://worldofcoffee.org/), booth **1253**   
+> [World of Coffee](https://worldofcoffee.org/){:target="_blank"}, booth **1253**   
 Jun 26 – 28 2025, Geneva, Switzerland
 
 

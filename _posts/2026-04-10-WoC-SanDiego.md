@@ -3,7 +3,7 @@ header:
   image: /assets/images/posts/2026-04-10-WoC-SanDiego.webp
   teaser: /assets/images/posts/2026-04-10-WoC-SanDiego_teaser.webp
   og_image: /assets/images/posts/2026-04-10-WoC-SanDiego_teaser.webp
-title: "World of Coffee 2026"
+title: "World of Coffee US, 2026"
 excerpt: "WoC San Diego"
 date: 2026-04-10
 categories:
@@ -20,7 +20,7 @@ Reach out via [sandiego@artisan.plus](mailto:sandiego@artisan.plus) to set up an
 
 
 
-> [World of Coffee](https://worldofcoffee.org/)
+> [World of Coffee](https://worldofcoffee.org/){:target="_blank"}
 Apr 10 – 12 2026, San Diego, USA
 
 

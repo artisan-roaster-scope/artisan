@@ -15,7 +15,7 @@ remote_theme             : "mmistakes/minimal-mistakes" # "mmistakes/minimal-mis
 minimal_mistakes_skin    : "default" # "default" "air", "aqua", "contrast", "dark", "dirt", "neon", "mint", "plum", "sunrise"
 
 # Site Settings
-future                   : true # show future posts
+future                   : false # show future posts
 locale                   : "en-US"
 title                    : "Leading coffee roasting software"
 title_separator          : "|"
