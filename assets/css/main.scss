@@ -84,3 +84,18 @@ $twitter-color: lightgray;
     color: $text-color;
   }
 }
+
+
+.page__title {
+  margin-top: 0;
+  line-height: 1;
+
+  a {
+    color: #4C97C3;
+    text-decoration: none;
+  }
+
+  & + .page__meta {
+    margin-top: -0.5em;
+  }
+}

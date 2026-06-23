@@ -20,6 +20,7 @@ link: https://europe.worldofcoffee.org/
 The artisan team is going to be at [World of Coffee](https://worldofcoffee.org/){:target="_blank"} in Brussels next week where we'll be joining [Acaia](https://acaia.co/){:target="_blank"} at their booth to showcase the new COSMO 10 & 100 scales.
 
 ## Precision Batch Dosing for the Modern Roastery
+{: style="color: #4C97C3;" }
 
 If you're at World of Coffee, come say hi and we'll show you how COSMO [integrates seamlessly]((https://doc.artisan.plus/docs/batch-manager/)){:target="_blank"} with artisan features like the roast scheduler to help make your roastery more efficient and productive.
 

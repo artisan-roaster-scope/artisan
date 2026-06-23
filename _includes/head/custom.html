@@ -13,4 +13,16 @@
 <meta name="theme-color" content="#ffffff">
 <meta name="msapplication-config" content="/assets/images/browserconfig.xml" />
 
+<!-- add header text_color tag -->
+<style>
+  {% if page.header.text_color %}
+    .page__hero--overlay .page__title,
+    .page__hero--overlay .page__meta,
+    .page__hero--overlay .page__lead,
+    .page__hero--overlay .btn {
+      color: {{page.header.text_color}} !important;
+    }
+  {% endif %}
+</style>
+
 <!-- end custom head snippets -->
