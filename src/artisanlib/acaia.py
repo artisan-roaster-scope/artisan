@@ -487,15 +487,18 @@ class AcaiaProtocol:
 
 
     def parse_info(self, data:bytes) -> None:
-#        _log.debug('INFO MSG: %s', data)
+        if self._logging:
+            _log.debug('INFO MSG: %s', data)
 
         if len(data)>2:
             self.isp_version = data[2]
-#            _log.debug('isp_version: %s', self.isp_version)
+            if self._logging:
+                _log.debug('isp_version: %s', self.isp_version)
 
         if len(data)>5:
             self.firmware = (data[3],data[4],data[5]) # main/sub/add
-#            _log.debug('firmware: %s.%s.%s', self.firmware[0], self.firmware[1], f'{self.firmware[2]:>03}')
+            if self._logging:
+                _log.debug('firmware: %s.%s.%s', self.firmware[0], self.firmware[1], f'{self.firmware[2]:>03}')
 
             # data[2] ISP_VERSION
 #        if len(data)>6:
@@ -537,7 +540,8 @@ class AcaiaProtocol:
             return None, False
 
     def update_weight(self, value:float|None, stable:bool|None = False) -> None:
-##        _log.debug("PRINT update_weight(%s,%s)", value, stable)
+        if self._logging:
+            _log.debug('update_weight(%s,%s)', value, stable)
         if value is not None and (not self.stable_only or stable):
             if self.repeatability > 1:
                 # round to full 10g
@@ -548,15 +552,11 @@ class AcaiaProtocol:
             value_rounded:float = float2float(value, self.decimals)
             if stable and value_rounded != self.stable_weight:
                 # if value is fresh and reading is stable
-##                _log.debug("PRINT new stable weight: %s", value_rounded)
                 self._weight_changed_handler(value_rounded, True)
                 self.stable_weight = value_rounded
             elif not stable:
-##                _log.debug("PRINT new non-stable weight: %s", value_rounded)
                 self._weight_changed_handler(value_rounded, False)
                 self.stable_weight = None # non-stable weights invalidate the last stable weight to ensure a sequence of equal stable weights is reported if interleaved with non-stable weights
-##            else:
-##                _log.debug("PRINT stable weight ignored")
 
     # returns length of consumed data or -1 on error
     def parse_weight_event(self, payload:bytes) -> int:
@@ -591,7 +591,8 @@ class AcaiaProtocol:
     def parse_ack_event(self, payload:bytes) -> int:
         if len(payload) < EVENT_LEN.ACK:
             return -1
-#        _log.debug('ACK EVENT')
+        if self._logging:
+            _log.debug('ACK EVENT')
         consumed_extra = self.parse_extra_weight_time_data(payload[1:])
         return EVENT_LEN.ACK + consumed_extra
 
@@ -702,7 +703,8 @@ class AcaiaProtocol:
     ##
 
     def parse_status(self, payload:bytes) -> None:
-#        _log.debug('STATUS')
+        if self._logging:
+            _log.debug('STATUS')
 
         # byte 0: message len
 
@@ -1171,8 +1173,8 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
             asyncio.run_coroutine_threadsafe(
                     self._read_queue.put(bytes(data)),
                     self._async_loop_thread.loop)
-            if self._logging:
-                _log.debug('received: %s',data)
+#            if self._logging:
+#                _log.debug('received: %s',data)
 
     def send_signal(self, action:STATE_ACTION) -> None:
         self.protocol.send_signal(action)

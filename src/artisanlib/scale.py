@@ -204,6 +204,8 @@ class ScaleManager(QObject):
 
     def __init__(self, connected_handler:Callable[[str, str], None], disconnected_handler:Callable[[str, str], None]) -> None:
         super().__init__()
+        self._logging: bool = False
+
         self.connected_handler = connected_handler
         self.disconnected_handler = disconnected_handler
         self.scale1: Scale|None = None
@@ -329,6 +331,7 @@ class ScaleManager(QObject):
 
     @pyqtSlot(bool)
     def connect_scale1_slot(self, device_logging:bool) -> None:
+        self._logging = device_logging
         if self.scale1 is not None:
             self.scale1.connect_scale(device_logging)
 
@@ -386,7 +389,8 @@ class ScaleManager(QObject):
     # weight in g
     @pyqtSlot(float, bool)
     def scale1_weight_changed_slot(self, weight:float, stable:bool) -> None:
-##        _log.debug("PRINT scale1_weight_changed_slot(%s,%s)",weight,stable)
+        if self._logging:
+            _log.debug('scale1_weight_changed_slot(%s,%s)',weight,stable)
         toa:float = libtime.time()
         prev_last_weight_sent = self.scale1_last_weight_sent
         self.scale1_last_weight_sent = int(round(weight))
@@ -400,14 +404,17 @@ class ScaleManager(QObject):
             self.scale1_stable_reading_timer.stop() # we stop a pending timer not to have it deliver outdated data as stable
             # weights marked as stable by the scale are immediately forwarded as stable weights
             self.scale1_stable_weight_changed_signal.emit(self.scale1_last_weight_sent)
-##            _log.debug("PRINT stable1 emit: %s",self.scale1_last_weight_sent)
+            if self._logging:
+                _log.debug('stable1 emit: %s',self.scale1_last_weight_sent)
         else:
-##            _log.debug("PRINT STABLE->UNSTABLE1 %s, %s", stable and (toa - self.scale1_last_stable_weight_received) > MIN_TIME_BETWEEN_STABLE_WEIGHTS, stable and (prev_last_weight_sent is None or abs(self.scale1_last_weight_sent - prev_last_weight_sent) < MIN_DELTA_BETWEEN_STABLE_WEIGHTS))
+            if self._logging:
+                _log.debug('STABLE->UNSTABLE1 %s, %s', stable and (toa - self.scale1_last_stable_weight_received) > MIN_TIME_BETWEEN_STABLE_WEIGHTS, stable and (prev_last_weight_sent is None or abs(self.scale1_last_weight_sent - prev_last_weight_sent) < MIN_DELTA_BETWEEN_STABLE_WEIGHTS))
             self.scale1_last_weight = self.scale1_last_weight_sent
             # fed into our stable weight timer system to ensure that the "last one" is also emitted as stable weight
             self.scale1_stable_reading_timer.start(STABLE_TIMER_PERIOD) # start/restart stable weight timer
             # non-stable weights are immediately forwarded as regular weight updates to keep the display fluid
-##            _log.debug("PRINT unstable1 emit: %s",self.scale1_last_weight_sent)
+            if self._logging:
+                _log.debug('unstable1 emit: %s',self.scale1_last_weight_sent)
             self.scale1_weight_changed_signal.emit(self.scale1_last_weight_sent)
 
     def scale1_tare_pressed_slot(self) -> None:
@@ -416,7 +423,8 @@ class ScaleManager(QObject):
     @pyqtSlot()
     def scale1_stable_reading_timer_slot(self) -> None:
         if self.scale1_last_weight is not None:
-##            _log.debug("PRINT artificial stable1 emit: %s",self.scale1_last_weight)
+            if self._logging:
+                _log.debug('artificial stable1 emit: %s',self.scale1_last_weight)
             self.scale1_stable_weight_changed_signal.emit(self.scale1_last_weight)
 
     def get_scale1_last_weight(self) -> int|None:
@@ -474,6 +482,7 @@ class ScaleManager(QObject):
 
     @pyqtSlot(bool)
     def connect_scale2_slot(self, device_logging:bool) -> None:
+        self._logging = device_logging
         if self.scale2 is not None:
             self.scale2.connect_scale(device_logging)
 
@@ -532,7 +541,8 @@ class ScaleManager(QObject):
     # weight in g
     @pyqtSlot(float, bool)
     def scale2_weight_changed_slot(self, weight:float, stable:bool) -> None:
-##        _log.debug("PRINT scale2_weight_changed_slot(%s,%s)",weight,stable)
+        if self._logging:
+            _log.debug('scale2_weight_changed_slot(%s,%s)',weight,stable)
         toa:float = libtime.time()
         prev_last_weight_sent = self.scale2_last_weight_sent
         self.scale2_last_weight_sent = int(round(weight))
@@ -546,14 +556,17 @@ class ScaleManager(QObject):
             self.scale2_stable_reading_timer.stop() # we stop a pending timer not to have it deliver outdated data as stable
             # weights marked as stable by the scale are immediately forwarded as stable weights
             self.scale2_stable_weight_changed_signal.emit(self.scale2_last_weight_sent)
-##            _log.debug("PRINT stable2 emit: %s",self.scale2_last_weight_sent)
+            if self._logging:
+                _log.debug('PRINT stable2 emit: %s',self.scale2_last_weight_sent)
         else:
-##            _log.debug("PRINT STABLE->UNSTABLE2 %s, %s", stable and (toa - self.scale2_last_stable_weight_received) > MIN_TIME_BETWEEN_STABLE_WEIGHTS, stable and (prev_last_weight_sent is None or abs(self.scale2_last_weight_sent - prev_last_weight_sent) < MIN_DELTA_BETWEEN_STABLE_WEIGHTS))
+            if self._logging:
+                _log.debug('STABLE->UNSTABLE2 %s, %s', stable and (toa - self.scale2_last_stable_weight_received) > MIN_TIME_BETWEEN_STABLE_WEIGHTS, stable and (prev_last_weight_sent is None or abs(self.scale2_last_weight_sent - prev_last_weight_sent) < MIN_DELTA_BETWEEN_STABLE_WEIGHTS))
             self.scale2_last_weight = self.scale2_last_weight_sent
             # fed into our stable weight timer system to ensure that the "last one" is also emitted as stable weight
             self.scale2_stable_reading_timer.start(STABLE_TIMER_PERIOD) # start/restart stable weight timer
             # non-stable weights are immediately forwarded as regular weight updates to keep the display fluid
-##            _log.debug("PRINT unstable2 emit: %s",self.scale2_last_weight_sent)
+            if self._logging:
+                _log.debug('unstable2 emit: %s',self.scale2_last_weight_sent)
             self.scale2_weight_changed_signal.emit(self.scale2_last_weight_sent)
 
     def scale2_tare_pressed_slot(self) -> None:
@@ -562,7 +575,8 @@ class ScaleManager(QObject):
     @pyqtSlot()
     def scale2_stable_reading_timer_slot(self) -> None:
         if self.scale2_last_weight is not None:
-##            _log.debug("PRINT artificial stable2 emit: %s",self.scale2_last_weight)
+            if self._logging:
+                _log.debug('artificial stable2 emit: %s',self.scale2_last_weight)
             self.scale2_stable_weight_changed_signal.emit(self.scale2_last_weight)
 
     def get_scale2_last_weight(self) -> int|None:
