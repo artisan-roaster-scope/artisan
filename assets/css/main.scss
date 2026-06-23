@@ -7,14 +7,16 @@ search: false
 $twitter-color: lightgray;
 
 
+
+@import "minimal-mistakes/skins/{{ site.minimal_mistakes_skin | default: 'default' }}"; // skin
+@import "minimal-mistakes"; // main partials
+
+
 .page__title a {
     color: #4C97C3;
     text-decoration: none
 }
 
-
-@import "minimal-mistakes/skins/{{ site.minimal_mistakes_skin | default: 'default' }}"; // skin
-@import "minimal-mistakes"; // main partials
 
 .btn--info {
     background-color: #4C97C3;
@@ -90,10 +92,4 @@ $twitter-color: lightgray;
   &:hover {
     color: $text-color;
   }
-}
-
-
-.page__title a {
-    color: #4C97C3;
-    text-decoration: none
 }
