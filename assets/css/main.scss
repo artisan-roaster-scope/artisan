@@ -6,6 +6,13 @@ search: false
 
 $twitter-color: lightgray;
 
+
+.page__title a {
+    color: #4C97C3;
+    text-decoration: none
+}
+
+
 @import "minimal-mistakes/skins/{{ site.minimal_mistakes_skin | default: 'default' }}"; // skin
 @import "minimal-mistakes"; // main partials
 
@@ -86,16 +93,7 @@ $twitter-color: lightgray;
 }
 
 
-.page__title {
-  margin-top: 0;
-  line-height: 1;
-
-  a {
+.page__title a {
     color: #4C97C3;
-    text-decoration: none;
-  }
-
-  & + .page__meta {
-    margin-top: -0.5em;
-  }
+    text-decoration: none
 }
