@@ -152,7 +152,7 @@ for:
 
   environment:
     PYTHON_UPGRADE_V: 3.14.6 # Upgrade to this version
-    #PYTHON_V: 3.14  # Override the stack key with latest Appveyor version
+    PYTHON_V: 3.12  # Override the stack key with latest Appveyor version
     ARTISAN_OS: macos
     MACOSX_DEPLOYMENT_TARGET: 13.0
     PYUIC: pyuic6
