@@ -1637,9 +1637,6 @@ class ApplicationWindow(QMainWindow):
         self.scheduler_filters_visible:bool = False # scheduler filter pane visible?
         self.scheduler_auto_open:bool = True # if set the scheduler is activated (window opened) automatically if there are scheduled items
 
-        # initialize the BBP metrics
-        self.resetBBPMetrics()
-
         # large LCDs
         self.largeLCDs_dialog:LargeMainLCDs|None = None
         self.LargeLCDsFlag:bool = False
@@ -16623,53 +16620,61 @@ class ApplicationWindow(QMainWindow):
         self.bbp_dropevents = []
         self.bbp_drop_to_end = 0
 
+        # clear bbpPrevRoast
+        self.qmc.bbpPrevRoast = {}
+
 
     #TODO Decide where else to display BBP metrics # pylint: disable=fixme
     # bbpCache holds data from the previous roast.  Set in cacheforBbp() which is called from OffRecorder()
-    # Needs to be called from somewhere betw CHARGE and OFF
-    def calcBBPMetrics(self,checkCache:bool=False) -> None:
+    # At CHARGE+5 the bbpCache data is copied to bbpPrevRoast
+    def calcBBPMetrics(self) -> None:
         try:
             #TODO revisit these preset times  # pylint: disable=fixme
             maxAllowedTime_fromPrevEnd_toStart = 60 #seconds, max gap time between roast recordings
             minBbpTime = 90 #seconds, the minimum amount of time recorded in the current roast before CHARGE
             # is there data from a prev roast?
-            if (self.qmc.bbpCache and checkCache and
-                    'end_roastepoch_msec' in self.qmc.bbpCache and
-                    'drop_to_end' in self.qmc.bbpCache and
-                    'drop_bt' in self.qmc.bbpCache and
-                    'drop_et' in self.qmc.bbpCache and
-                    'end_events' in self.qmc.bbpCache and
-                    'drop_events' in self.qmc.bbpCache and
-                    'drop_to_end' in self.qmc.bbpCache):
-                #_log.debug('bbpCache exists')
-                bbpGap = self.qmc.roastepoch - (self.qmc.bbpCache['end_roastepoch_msec']/1000)
-                # did the prev roast end shortly before this roast began?  If not clear bbpCache
+            if (self.qmc.bbpPrevRoast and
+                    'end_roastepoch_msec' in self.qmc.bbpPrevRoast and
+                    'drop_to_end' in self.qmc.bbpPrevRoast and
+                    'drop_bt' in self.qmc.bbpPrevRoast and
+                    'drop_et' in self.qmc.bbpPrevRoast and
+                    'end_events' in self.qmc.bbpPrevRoast and
+                    'drop_events' in self.qmc.bbpPrevRoast and
+                    'drop_to_end' in self.qmc.bbpPrevRoast):
+                bbpGap = self.qmc.roastepoch - (self.qmc.bbpPrevRoast['end_roastepoch_msec']/1000)
+                # did the prev roast end shortly before this roast began?  If not clear qmc.bbpPrevRoast
                 if bbpGap < maxAllowedTime_fromPrevEnd_toStart:
-                    self.bbp_time_added_from_prev = bbpGap + self.qmc.bbpCache['drop_to_end']
+                    self.bbp_time_added_from_prev = bbpGap + self.qmc.bbpPrevRoast['drop_to_end']
                     self.bbp_begin = 'DROP'
-                    self.bbp_dropbt = self.qmc.bbpCache['drop_bt']
-                    self.bbp_dropet = self.qmc.bbpCache['drop_et']
-                    self.bbp_endroast_epoch_msec = self.qmc.bbpCache['end_roastepoch_msec']
-                    self.bbp_endevents = self.qmc.bbpCache['end_events']
-                    self.bbp_dropevents = self.qmc.bbpCache['drop_events']
-                    self.bbp_drop_to_end = self.qmc.bbpCache['drop_to_end']
+                    self.bbp_dropbt = self.qmc.bbpPrevRoast['drop_bt']
+                    self.bbp_dropet = self.qmc.bbpPrevRoast['drop_et']
+                    self.bbp_endroast_epoch_msec = self.qmc.bbpPrevRoast['end_roastepoch_msec']
+                    self.bbp_endevents = self.qmc.bbpPrevRoast['end_events']
+                    self.bbp_dropevents = self.qmc.bbpPrevRoast['drop_events']
+                    self.bbp_drop_to_end = self.qmc.bbpPrevRoast['drop_to_end']
                 else:
-                    self.qmc.bbpCache = {}  # make empty to use as easy test later, "if self.qmc.bbpCache:"
-                    _log.debug('clearing bbpCache')
+                    self.qmc.bbpPrevRoast = {}  # make empty to use as easy test later, "if self.qmc.bbpPrevRoast:"
+
             # now calculate all the bbp data
             # does the current profile have the minimum time for bbp?
-            if (len(self.qmc.timeindex) > 0 and len(self.qmc.timex) > self.qmc.timeindex[0] > -1 and (self.qmc.timex[self.qmc.timeindex[0]] > 0) and
-                (self.qmc.timex[self.qmc.timeindex[0]] - self.qmc.timex[0] >= minBbpTime)):
+            if (len(self.qmc.timeindex) > 0 and
+                len(self.qmc.timex) > self.qmc.timeindex[0] > -1 and
+                (self.qmc.timex[self.qmc.timeindex[0]] > 0)):
+
+                # calculate the total BBP time
                 self.bbp_total_time = self.qmc.timex[self.qmc.timeindex[0]] - self.qmc.timex[0] + self.bbp_time_added_from_prev
-                # fake the events to use with findTPint
-                bbp_timeindex = [0, 0, self.qmc.timeindex[0], 0, 0, 0, self.qmc.timeindex[0], 0]
-                bbp_tpidx = findTPint(bbp_timeindex, self.qmc.timex, self.qmc.temp2)
-                if bbp_tpidx > 0:
-                    self.bbp_bottom_temp = self.qmc.temp2[bbp_tpidx]
-                    self.bbp_begin_to_bottom_time = self.qmc.timex[bbp_tpidx] - self.qmc.timex[0] + self.bbp_time_added_from_prev
-                    self.bbp_bottom_to_charge_time = self.qmc.timex[self.qmc.timeindex[0]] - self.qmc.timex[bbp_tpidx]
-                    self.bbp_begin_to_bottom_ror = 60 * (self.bbp_bottom_temp - self.qmc.temp2[0]) / (self.qmc.timex[bbp_tpidx] - self.qmc.timex[0] + self.bbp_time_added_from_prev)
-                    self.bbp_bottom_to_charge_ror = 60 * (self.qmc.temp2[self.qmc.timeindex[0]] - self.bbp_bottom_temp) / (self.qmc.timex[self.qmc.timeindex[0]] - self.qmc.timex[bbp_tpidx])
+
+                # calculate current roast metrics
+                if self.bbp_total_time >= minBbpTime:
+                    # fake the events to use with findTPint
+                    bbp_timeindex = [0, 0, self.qmc.timeindex[0], 0, 0, 0, self.qmc.timeindex[0], 0]
+                    bbp_tpidx = findTPint(bbp_timeindex, self.qmc.timex, self.qmc.temp2)
+                    if bbp_tpidx > 0:
+                        self.bbp_bottom_temp = self.qmc.temp2[bbp_tpidx]
+                        self.bbp_begin_to_bottom_time = self.qmc.timex[bbp_tpidx] - self.qmc.timex[0] + self.bbp_time_added_from_prev
+                        self.bbp_bottom_to_charge_time = self.qmc.timex[self.qmc.timeindex[0]] - self.qmc.timex[bbp_tpidx]
+                        self.bbp_begin_to_bottom_ror = 60 * (self.bbp_bottom_temp - self.qmc.temp2[0]) / (self.qmc.timex[bbp_tpidx] - self.qmc.timex[0] + self.bbp_time_added_from_prev)
+                        self.bbp_bottom_to_charge_ror = 60 * (self.qmc.temp2[self.qmc.timeindex[0]] - self.bbp_bottom_temp) / (self.qmc.timex[self.qmc.timeindex[0]] - self.qmc.timex[bbp_tpidx])
             #TODO now deal with the special events from the previous roast  # pylint: disable=fixme
 
         except Exception as e: # pylint: disable=broad-except

@@ -370,7 +370,7 @@ class tgraphcanvas(QObject):
         'segmentpickflag', 'segmentdeltathreshold', 'segmentsamplesthreshold', 'stats_summary_rect', 'title_text', 'title_artist', 'title_width',
         'background_title_width', 'xlabel_text', 'xlabel_artist', 'xlabel_width', 'mathdictionary_base',
         'ambient_pressure_sampled', 'ambient_humidity_sampled', 'ambientTemp_sampled', 'backgroundmovespeed', 'chargeTimerPeriod', 'flavors_default_value',
-        'fmt_data_ON', 'l_subtitle', 'projectDeltaFlag', 'btbreak_params','bbpCache', 'glow',
+        'fmt_data_ON', 'l_subtitle', 'projectDeltaFlag', 'btbreak_params','bbpCache', 'bbpPrevRoast', 'glow',
         'custom_event_dlg_default_type', 'custom_event_dlg_default_type', 'foreground_event_ind', 'foreground_event_pick_position', 'foreground_event_last_picked_ind',
         'foreground_event_last_picked_pos', 'background_event_ind', 'background_event_pos', 'background_event_pick_position',
         'background_event_last_picked_ind', 'background_event_last_picked_pos', 'event_selected',
@@ -2412,6 +2412,7 @@ class tgraphcanvas(QObject):
 
         # Cache for BBP calculations
         self.bbpCache: BbpCache = {}
+        self.bbpPrevRoast: BbpCache = {}
 
         #EnergyUse
         # Energy conversion canstants
@@ -5197,7 +5198,7 @@ class tgraphcanvas(QObject):
                     if local_flagstart: # only during recording
                         try:
                             if self.timeindex[0] > -1 and len(sample_timex) == self.timeindex[0] + 5:
-                                self.aw.calcBBPMetrics(checkCache=True)
+                                self.cacheforBbp(copyPrevRoast=True)
                         except Exception as e: # pylint: disable=broad-except
                             _log.exception(e)
 
@@ -16689,20 +16690,25 @@ class tgraphcanvas(QObject):
             _, _, exc_tb = sys.exc_info()
             self.adderror((QApplication.translate('Error Message','Exception:') + ' writestatistics() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
-    def cacheforBbp(self) -> None:
+    def cacheforBbp(self, copyPrevRoast:bool=False) -> None:
         try:
-            # mode
-            self.bbpCache['mode'] = self.mode
-            # drop temps
-            self.bbpCache['drop_bt'] = self.temp2[self.timeindex[6]]
-            self.bbpCache['drop_et'] = self.temp1[self.timeindex[6]]
-            # ending time epoch in mSec
-            self.bbpCache['end_roastepoch_msec'] = QDateTime.currentDateTime().toMSecsSinceEpoch()
-            # get the special events values at OFF and time of previous change relative to end
-            self.bbpCache['end_events'] = self.get_specialevents_at_timeindex(len(self.timex)-1)
-            # get the special events values at DROP and time of previous change relative to end
-            self.bbpCache['drop_events'] = self.get_specialevents_at_timeindex(self.timeindex[6])
-            self.bbpCache['drop_to_end'] = self.timex[-1] - self.timex[self.timeindex[6]]
+            if copyPrevRoast:
+                # copy the previous roast cache for use by this roast's bbp metric calculations
+                self.bbpPrevRoast = self.bbpCache.copy()
+            else:
+                # update the cache with current roast data ready to be used by the subsequent roast
+                # mode
+                self.bbpCache['mode'] = self.mode
+                # drop temps
+                self.bbpCache['drop_bt'] = self.temp2[self.timeindex[6]]
+                self.bbpCache['drop_et'] = self.temp1[self.timeindex[6]]
+                # ending time epoch in mSec
+                self.bbpCache['end_roastepoch_msec'] = QDateTime.currentDateTime().toMSecsSinceEpoch()
+                # get the special events values at OFF and time of previous change relative to end
+                self.bbpCache['end_events'] = self.get_specialevents_at_timeindex(len(self.timex)-1)
+                # get the special events values at DROP and time of previous change relative to end
+                self.bbpCache['drop_events'] = self.get_specialevents_at_timeindex(self.timeindex[6])
+                self.bbpCache['drop_to_end'] = self.timex[-1] - self.timex[self.timeindex[6]]
         except Exception: # pylint: disable=broad-except
             self.bbpCache = {}
 
