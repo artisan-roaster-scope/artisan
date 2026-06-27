@@ -31,6 +31,8 @@ SOURCES = \
     artisanlib/cup_profile.py \
     artisanlib/curves.py \
     artisanlib/designer.py \
+    artisanlib/device_protocol.py \
+    artisanlib/device_registry.py \
     artisanlib/devices.py \
     artisanlib/dialogs.py \
     artisanlib/events.py \
