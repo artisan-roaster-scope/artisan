@@ -48,6 +48,17 @@ if not exist %PYTHON_PATH%\Lib\site-packages\libusb_package\libusb-1.0.dll (
     echo *** ERROR - libusb-1.0.dll is missing from the libusb-package installation
     exit /b 95
 )
+
+::
+:: appveyor_build_worker_image: Visual Studio 2026 does not supply a working lrelease.exe in Qt/6.11
+::
+echo ***** Start Install QTLinguist/lrelease.exe
+curl -L -O https://github.com/thurask/Qt-Linguist/releases/download/20260425/linguist_6.11.0.zip
+if not exist linguist_6.11.0.zip (exit /b 98)
+7z x linguist_6.11.0.zip -o.\QtLinguist\
+if not exist QtLinguist/lrelease.exe (exit /b 99)
+echo ***** Finished install QTLinguist/lrelease
+
 ::
 :: custom build the pyinstaller bootloader or install a prebuilt
 ::

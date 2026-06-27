@@ -102,5 +102,5 @@ SecretStorage==3.5.0; platform_system=='Linux'
 build==1.5.0; platform_system=='Windows'
 pywin32==312; platform_system=='Windows'
 pyinstaller-versionfile==3.1.0; platform_system=='Windows'
-#libusb-package==1.0.26.3; platform_system=='Windows'  # temp removed for Py 3.14, monkey patched into .appveyor.yml until a Py3.14 wheel is available on pypi
+libusb-package==1.0.26.4; platform_system=='Windows'
 tzdata==2026.2; platform_system=='Windows' # to prevent pyinstaller WARNING: Hidden import "tzdata" not found!

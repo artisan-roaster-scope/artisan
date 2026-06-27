@@ -71,13 +71,16 @@ echo "*** compiling translations"
 if [ -f "$QT_SRC_PATH/bin/lrelease" ]; then
     echo "*** using env QT_SRC_PATH: $QT_SRC_PATH/bin/lrelease"
     $QT_SRC_PATH/bin/lrelease -verbose translations/*.ts
+     $QT_SRC_PATH/bin/lrelease -version
     if [ $? -ne 0 ]; then exit $?; else echo "** Success"; fi
 elif [ -f "$QT_SRC_PATH_QTTOOLS/bin/lrelease" ]; then
     echo "*** using env QT_SRC_PATH_QTTOOLS: $QT_SRC_PATH_QTTOOLS/bin/lrelease"
+    $QT_SRC_PATH_QTTOOLS/bin/lrelease -version
     $QT_SRC_PATH_QTTOOLS/bin/lrelease -verbose translations/*.ts
     if [ $? -ne 0 ]; then exit $?; else echo "** Success"; fi
 elif [[ $(type -P "$QTTOOLS") ]]; then
     echo "*** using env QTTOOLS: $QTTOOLS"
+    $QTTOOLS lrelease -version
     $QTTOOLS lrelease -verbose translations/*.ts
     if [ $? -ne 0 ]; then exit $?; else echo "** Success"; fi
 else

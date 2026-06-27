@@ -18,11 +18,11 @@
 # Include "skip ci" in the commit message to prevent this build process from running
 environment:
   # Set the default Appveyor Python version here. Can be overridden in platform environment.
-  PYTHON_V: 3.13
+  PYTHON_V: 3.14
   # Upgrade to specific version (for platforms supporting upgrade). Upgrade skipped if env var is missing or blank.
-  PYUPGRADE_WIN_VER: 3.14.3
+  PYUPGRADE_WIN_VER: 3.14.6
   #PYUPGRADE_MACOS_V: 3.12.1  # when upgrading see the notes in the deploy phase
-  
+
   ARTISAN_KEY:
     secure: 4BswEsF7OdFwgn3gMbnjkmCyAfJtmnak+3rmXzggbpitK0txN22SERo/sIh3wxse1L3rFDIPc+NDEEagMTFsODcmM8/gsclDbeJA4S5UTIY=
 
@@ -67,13 +67,11 @@ for:
     fast_finish: false
 
   environment:
-    PYTHON_V: 3.14  # Override the stack key
-    QT_PATH: "C:/qt/6.9/msvc2022_64"  #symbolic linked to latest 6.9.x folder
+    #PYTHON_V: 3.14  # Override the stack key
     PYQT: "6"
     PYUIC: "pyuic6.exe"
     BUILD_PYINSTALLER: "True"
-    VC_REDIST: "https://aka.ms/vs/17/release/vc_redist.x64.exe"  #redistributable for VS 2015-2022
-    VCVARSALL: "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Auxiliary/Build/vcvarsall.bat"
+    VC_REDIST: "https://aka.ms/vc14/vc_redist.x64.exe"  #redistributable for VS 2017-2026
 
   install:
     - cmd: echo Windows Install
@@ -100,23 +98,16 @@ for:
     # expose the python version
     - cmd: python -V
 
-    # generate the path to PyQt translations files
+    # generate the path to PyQt translations files (used by artisan-win.spec)
     - ps: $env:QT_TRANSL = "$env:PYTHON_PATH/Lib/site-packages/PyQt6/Qt6/translations"
 
     # pull library versions from requirements file
     - ps: $env:PYINSTALLER_VER = Select-String -Path ./src/requirements.txt "pyinstaller==([\d\.]*).*platform_system='Windows'" -List | ForEach-Object {$_.Matches.Groups[1].Value}
     - ps: Write-Host "PYINSTALLER_VER= $env:PYINSTALLER_VER"
 
-    # patch for libusb_package until a Python 3.14 version is available on pypi.org
-    - cmd: if "%PYTHON_V%"=="3.14" (echo *** PATCH install version of libusb_package modified for Python 3.14)
-    - cmd: if "%PYTHON_V%"=="3.14" (pip install .ci\patches\libusb_package-1.0.26.3-py314-none-win_amd64.whl)
-
     # run the install script
     - cmd: .ci/install-win.bat
 
-    # patch for pylupdate6 until this is fixed on pypi.org
-    - cmd: if "%PYTHON_V%"=="3.14" (echo *** PATCH pylupdate6 for Python 3.14)
-    - cmd: if "%PYTHON_V%"=="3.14" (copy /Y .ci\patches\python_source.py C:\Python314-x64\Lib\site-packages\PyQt6\lupdate\python_source.py)
 
   build_script:
     - cmd: echo Windows Build
@@ -131,7 +122,7 @@ for:
     - ps: $GIT_VERSION=git rev-parse --verify --short HEAD
     - ps: gc artisanlib/__init__.py | %{ $_ -replace "__revision__ = '.*'", "__revision__ = '$GIT_VERSION'" } | out-file newfile -encoding ascii
     - ps: move -force newfile artisanlib/__init__.py
-        
+
     # Generate signature
     - python generate_signature.py
 
@@ -160,8 +151,8 @@ for:
     fast_finish: false
 
   environment:
-    PYTHON_UPGRADE_V: 3.14.3  # Upgrade to this version
-    PYTHON_V: 3.12  # Override the stack key with latest Appveyor version
+    PYTHON_UPGRADE_V: 3.14.6 # Upgrade to this version
+    #PYTHON_V: 3.14  # Override the stack key with latest Appveyor version
     ARTISAN_OS: macos
     MACOSX_DEPLOYMENT_TARGET: 13.0
     PYUIC: pyuic6
@@ -182,20 +173,23 @@ for:
     - curl -O https://www.python.org/ftp/python/${PYTHON_UPGRADE_V}/python-${PYTHON_UPGRADE_V}-macos11.pkg
     - echo "Installing Python ${PYTHON_UPGRADE_V}"
     - sudo installer -pkg python-${PYTHON_UPGRADE_V}-macos11.pkg -target /
-
     # Update the environment
     - export PYTHON_V="${PYTHON_UPGRADE_V%.*}"  # drop the dot build number
     - export PYTHONSITEPKGS="/Users/appveyor/venv${PYTHON_V}/lib/python${PYTHON_V}/site-packages"
     - export QT_PATH="${PYTHONSITEPKGS}/PyQt6/Qt6"
-
     # Create and activate a new virtual environment
     - echo "Creating virtual environment"
     - python3 -m venv /Users/appveyor/venv${PYTHON_V}
     - echo "Activating virtual environment"
     - source /Users/appveyor/venv${PYTHON_V}/bin/activate
-
-    # Create symbolic link
+    # Create symbolic link to the venv
     - ln -s /Users/appveyor/venv${PYTHON_V} /Users/appveyor/venv${PYTHON_UPGRADE_V}
+    # Log for confirmation
+    - echo "Confirming Python version and location"
+    - python -m pip --version
+    - which python
+    - python3 -V
+    - echo "Finshed Upgrading Python"
 
     # run the install script
     - .ci/install-macos.sh
@@ -229,7 +223,9 @@ for:
     - ../.ci/upload.sh artisan-*.dmg
 
 #  # uncomment this section for ssh connection to the build image
-#  on_finish:
+  on_finish:
+    - echo "Using Python"
+    - python3 -V
 #    - sh: export APPVEYOR_SSH_BLOCK=true
 #    - sh: curl -sflL 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-ssh.sh' | bash -e -
 
@@ -241,8 +237,8 @@ for:
     fast_finish: false
 
   environment:
-    PYTHON_UPGRADE_V: 3.14  # Upgrade to this version (installs the latest dot release)
-    PYTHON_V: 3.13  # Override the stack key
+    PYTHON_UPGRADE_V: 3.14  # Upgrade to the latest maintenance release of this version
+    # PYTHON_V: 3.13  # Override the stack key
     ARTISAN_OS: linux
     PYTHONSITEPKGS: /home/appveyor/venv${PYTHON_V}/lib/python${PYTHON_V}/site-packages
     QT_PATH: $PYTHON_PATH/PyQt6/Qt6
@@ -260,6 +256,8 @@ for:
     - sudo apt install -y software-properties-common
     - sudo add-apt-repository -y ppa:deadsnakes/ppa
     - sudo apt update
+    - sh: FULL_VERSION=$(apt-cache policy python${PYTHON_UPGRADE_V} | grep Candidate | awk '{print $2}')
+    - echo "Installing Python $FULL_VERSION"
     - sudo apt install -y python${PYTHON_UPGRADE_V} python${PYTHON_UPGRADE_V}-venv libpython${PYTHON_UPGRADE_V}
     # Create and activate virtual environment
     - echo "Creating and activating virtual environment"

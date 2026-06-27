@@ -23,11 +23,6 @@
 @echo off
 :: test for existence of required environment variables
 setlocal enabledelayedexpansion
-if not defined QT_PATH (
-    echo QT_PATH not set, be sure Qt 6.x is installed.
-    echo Set QT_PATH appropriately, something like C:\Qt\6.4\msvc2019_64.  Exiting...
-    exit /b 1
-)
 if not defined PYTHON_PATH (
     if defined PYTHONPATH (
         set PYTHON_PATH=%PYTHONPATH%
@@ -72,9 +67,11 @@ if ERRORLEVEL 1 (echo ** Failed in pylupdate6pro.py & exit /b 1) else (echo ** S
 
 echo ************* lrelease **************
 cd translations
+set LRELEASE_PATH=..\..\QtLinguist\
+%LRELEASE_PATH%\lrelease.exe -version
 for /r %%a IN (*.ts) DO (
-    %QT_Path%\bin\lrelease.exe %%~a
-    if ERRORLEVEL 1 (echo ** Failed in %QT_Path%\bin\lrelease.exe step 2 & exit /b 1)
+    %LRELEASE_PATH%\lrelease.exe %%~a
+    if ERRORLEVEL 1 (echo ** Failed in %LRELEASE_PATH%\lrelease.exe %%~a & exit /b 1)
 )
 echo ** Success
 cd ..
