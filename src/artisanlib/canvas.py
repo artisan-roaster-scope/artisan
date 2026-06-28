@@ -1006,6 +1006,8 @@ class tgraphcanvas(QObject):
                        '+MQTT 78',                   #204
                        '+MQTT 910',                  #205
                        '+MQTT 1112',                 #206
+                       'Skywalker BT/ET',            #207 ## CYBER ## Cyberroaster (Skywalker V2)
+                       '+Skywalker Burner/Air',      #208 ## CYBER ## OT1/OT2 duty echoes
                        ]
 
         # ADD DEVICE:
@@ -1079,7 +1081,8 @@ class tgraphcanvas(QObject):
             175, # Thermoworks BlueDOT
             176, # Aillio Bullet R2
             194, # +Yocto Meteo Hum/Temp
-            195  # +Yocto Meteo Pressure
+            195, # +Yocto Meteo Pressure
+            207  # Skywalker BT/ET ## CYBER ## Cyberroaster is BLE (nonserial)
         ]
 
         # ADD DEVICE:
@@ -1172,7 +1175,8 @@ class tgraphcanvas(QObject):
             195, # +Yocto Meteo Pressure
             198, # +Orbiter Sound/Drum
             199, # +Orbiter Damper/Heater
-            200  # +Orbiter Air/RoR
+            200, # +Orbiter Air/RoR
+            208  # +Skywalker Burner/Air ## CYBER ## OT duty echoes are %, not temperatures
         ]
 
         # ADD DEVICE:
@@ -13487,6 +13491,14 @@ class tgraphcanvas(QObject):
                         disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('Santoker R'),True,None))
                     self.aw.santokerR.setLogging(self.device_logging)
                     self.aw.santokerR.start(case_sensitive=False)
+                elif self.device == 207:
+                    ## CYBER ## connect Skywalker V2 (Cyberroaster)
+                    from artisanlib.skywalker import Skywalker
+                    self.aw.skywalker = Skywalker(
+                        connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('Skywalker'),True,None),
+                        disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('Skywalker'),True,None))
+                    self.aw.skywalker.setLogging(self.device_logging)
+                    self.aw.skywalker.start(case_sensitive=False)
                 elif self.device == 175:
                     # connect Thermoworks BlueDOT
                     from artisanlib.bluedot import BlueDOT
@@ -13692,6 +13704,11 @@ class tgraphcanvas(QObject):
                 if not bool(self.aw.simulator) and self.device == 171 and self.aw.santokerR is not None:
                     self.aw.santokerR.stop()
                     self.aw.santokerR = None
+
+                ## CYBER ## disconnect Skywalker V2 (Cyberroaster)
+                if not bool(self.aw.simulator) and self.device == 207 and self.aw.skywalker is not None:
+                    self.aw.skywalker.stop()
+                    self.aw.skywalker = None
 
                 if self.aw.lebrew_roastseeNEXT is not None:
                     self.aw.lebrew_roastseeNEXT.stop()
