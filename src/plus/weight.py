@@ -1511,15 +1511,31 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues]
         self.done_green_task_timer.stop()
         self.cancel_green_task_timer.stop()
         if self.green_task_scale == 1:
-            self.scale_manager.scale1_connected_signal.disconnect(self.scale1_connected_slot)
-            self.scale_manager.scale1_disconnected_signal.disconnect(self.scale1_disconnected_slot)
+            try:
+                # disconnect can fail if not connected
+                self.scale_manager.scale1_connected_signal.disconnect(self.scale1_connected_slot)
+            except Exception:   # pylint: disable=broad-except
+                pass
+            try:
+                # disconnect can fail if not connected
+                self.scale_manager.scale1_disconnected_signal.disconnect(self.scale1_disconnected_slot)
+            except Exception:   # pylint: disable=broad-except
+                pass
             self.scale_manager.release_scale1_signal.emit()
             self.scale_manager.signal_user_scale1_signal.emit(STATE_ACTION.RELEASED)
 #            self.scale_manager.tare_scale1_signal.emit()
             self.green_task_stable_weight_before_connection_loss = 0 # reset potential offset from scale disconnect
         elif self.green_task_scale == 2:
-            self.scale_manager.scale2_connected_signal.disconnect(self.scale2_connected_slot)
-            self.scale_manager.scale2_disconnected_signal.disconnect(self.scale2_disconnected_slot)
+            try:
+                # disconnect can fail if not connected
+                self.scale_manager.scale2_connected_signal.disconnect(self.scale2_connected_slot)
+            except Exception:   # pylint: disable=broad-except
+                pass
+            try:
+                # disconnect can fail if not connected
+                self.scale_manager.scale2_disconnected_signal.disconnect(self.scale2_disconnected_slot)
+            except Exception:   # pylint: disable=broad-except
+                pass
             self.scale_manager.release_scale2_signal.emit()
             self.scale_manager.signal_user_scale2_signal.emit(STATE_ACTION.RELEASED)
 #            self.scale_manager.tare_scale2_signal.emit()
@@ -1808,12 +1824,44 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues]
         self.sm_roasted.send('reset')
 #        self.scale_manager.disconnect_all_signal.emit() # closing via signal does not work on app quite for unknown reasons thus we make a direct call
         self.scale_manager.disconnect_all_slot()
-        self.scale_manager.available_signal.disconnect(self.scales_available)
-        self.scale_manager.unavailable_signal.disconnect(self.scales_unavailable)
-        self.scale_manager.scale1_stable_weight_changed_signal.disconnect(self.scale1_stable_weight_changed_slot)
-        self.scale_manager.scale1_weight_changed_signal.disconnect(self.scale1_weight_changed_slot)
-        self.scale_manager.scale1_tare_pressed_signal.disconnect(self.scale1_tare_pressed_slot)
-        self.scale_manager.scale2_stable_weight_changed_signal.disconnect(self.scale2_stable_weight_changed_slot)
-        self.scale_manager.scale2_weight_changed_signal.disconnect(self.scale2_weight_changed_slot)
-        self.scale_manager.scale2_tare_pressed_signal.disconnect(self.scale2_tare_pressed_slot)
+        try:
+            # disconnect can fail if not connected
+            self.scale_manager.available_signal.disconnect(self.scales_available)
+        except Exception:   # pylint: disable=broad-except
+            pass
+        try:
+            # disconnect can fail if not connected
+            self.scale_manager.unavailable_signal.disconnect(self.scales_unavailable)
+        except Exception:   # pylint: disable=broad-except
+            pass
+        try:
+            # disconnect can fail if not connected
+            self.scale_manager.scale1_stable_weight_changed_signal.disconnect(self.scale1_stable_weight_changed_slot)
+        except Exception:   # pylint: disable=broad-except
+            pass
+        try:
+            # disconnect can fail if not connected
+            self.scale_manager.scale1_weight_changed_signal.disconnect(self.scale1_weight_changed_slot)
+        except Exception:   # pylint: disable=broad-except
+            pass
+        try:
+            # disconnect can fail if not connected
+            self.scale_manager.scale1_tare_pressed_signal.disconnect(self.scale1_tare_pressed_slot)
+        except Exception:   # pylint: disable=broad-except
+            pass
+        try:
+            # disconnect can fail if not connected
+            self.scale_manager.scale2_stable_weight_changed_signal.disconnect(self.scale2_stable_weight_changed_slot)
+        except Exception:   # pylint: disable=broad-except
+            pass
+        try:
+            # disconnect can fail if not connected
+            self.scale_manager.scale2_weight_changed_signal.disconnect(self.scale2_weight_changed_slot)
+        except Exception:   # pylint: disable=broad-except
+            pass
+        try:
+            # disconnect can fail if not connected
+            self.scale_manager.scale2_tare_pressed_signal.disconnect(self.scale2_tare_pressed_slot)
+        except Exception:   # pylint: disable=broad-except
+            pass
         _log.debug('BatchManager stopped')

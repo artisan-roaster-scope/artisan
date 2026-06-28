@@ -3542,6 +3542,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
             self.aw.scale1_dedicated_for_green_only = self.scale1GreenOnlyCheckBox.isChecked()
             self.aw.scale2_dedicated_for_roasted_only = self.scale2RoastedOnlyCheckBox.isChecked()
+            self.aw.scale_manager.update_availability() # availability might have changed based on the update of the scaleN_dedicated flags
 
             if self.pidButton.isChecked():
                 #type index[0]: 0 = PXG, 1 = PXR, 2 = DTA
