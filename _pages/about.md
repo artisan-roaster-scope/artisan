@@ -256,7 +256,13 @@ We believe in [open-source](https://www.youtube.com/watch?v=SpeDK1TPbew){:target
 __[Marko Luther](/authors/luther/)__ –– maintainer
 {: style="text-align: center;" }
 
-__[Dave Baxter](/authors/baxter/)__ –– design wizard, genius & CI
+__[Paul Holleis](/authors/holleis/)__ –– cloud architect
+{: style="text-align: center;" }
+
+__[Liam Robichaud](/authors/robichaud/)__ –– creative director
+{: style="text-align: center;" }
+
+__[Dave Baxter](/authors/baxter/)__ –– genius & CI
 {: style="text-align: center;" }
 
 __[Michael Herbert](/authors/herbert/)__ –– documentation & fundraising
@@ -290,6 +296,7 @@ Contact us via the [Contact Form](https://artisan-roasterscope.blogspot.com/p/co
 Language  | Translators
 ------------- | -------------
 CN  | Leo Huang, Lewis Li, Terracotta-6
+BG  | Alex Yovev
 DE  | MAKOMO
 ES  | Juan Carlos Bonilla
 FA  | Saeed Abdinasab

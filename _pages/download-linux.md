@@ -10,15 +10,15 @@ author: Marko Luther
 author_profile: false
 
 gallery:
-  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v4.0.2/artisan-linux-4.0.2.AppImage
+  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v4.2.0/artisan-linux-4.2.0.AppImage
     image_path: /assets/images/download-icon-linux-AppImage.svg
     alt: "Linux AppImage"
     title: "Linux AppImage"
-  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v4.0.2/artisan-linux-4.0.2.deb
+  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v4.0.2/artisan-linux-4.2.0.deb
     image_path: /assets/images/download-icon-linux-deb.svg
     alt: "Linux deb"
     title: "Linux deb"
-  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v4.0.2/artisan-linux-4.0.2.rpm
+  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v4.0.2/artisan-linux-4.2.0.rpm
     image_path: /assets/images/download-icon-linux-rpm.svg
     alt: "Linux rpm"
     title: "Linux rpm"
@@ -31,12 +31,12 @@ gallery:
 ---
 
 <p style="text-align:left;">
-    <a href="https://artisan-roasterscope.blogspot.com/2026/01/artisan-4.html">Release Notes</a>
+    <a href="https://artisan-scope.org/release/Artisan-v4.2/">Release Notes</a>
     <span style="float:right;">
         <img fetchpriority="high" src="https://img.shields.io/github/downloads/artisan-roaster-scope/artisan/latest/total?logo=github&amp;label=downloads&amp;color=f5f5f5&amp;labelColor=9C9C9C&amp;style=flat" alt="Github Latest Releases" class="align-right" />
     </span>
 </p>
-**artisan 4.0.2**
+**artisan 4.2.0**
 {: style="color: #4C97C3; font-size: larger; text-align: center; font-weight:bold;" }
 ---
 Help keep **<span style="color: #4C97C3;">artisan</span>** free for personal and commercial use by [sending a donation](/donate) 
@@ -60,8 +60,8 @@ Help keep **<span style="color: #4C97C3;">artisan</span>** free for personal and
 ---
 
 <figure>
-      <a aria-label="Release Sponsor artisan.plus" target="_blank" href="https://artisan.plus" title="artisan.plus">
-          <img src="/assets/images/artisan-plus.webp" alt="artisan.plus" 
+      <a aria-label="Release Sponsor LABEL!STEN" target="_blank" href="https://labelisten.com/" title="LABEL!ISTEN">
+          <img src="/assets/images/labelisten-logo.svg" alt="LABEL!ISTEN logo" 
            loading="lazy"
            fetchpriority="low"
            decoding="async"

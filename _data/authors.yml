@@ -17,6 +17,27 @@ Marko Luther:
       icon: "fab fa-fw fa-github"
       url: "https://github.com/MAKOMO"
 
+Paul Holleis:
+  name     : "Dr. Paul Holleis"
+  bio      : "cloud architect"
+  location : "Germany"
+  links:
+    - label: "artisan.plus"
+      icon: "fas fa-fw fa-link"
+      url: "https://artisan.plus"
+
+Liam Robichaud:
+  name     : "Liam Robichaud"
+  bio      : "creative director"
+  location : "Canada"
+  links:
+    - label: "artisan.plus"
+      icon: "fas fa-fw fa-link"
+      url: "https://artisan.plus"
+    - label: "LinkedIn"
+      icon: "fab fa-fw fa-linkedin"
+      url: "https://www.linkedin.com/in/liam-robichaud-998304296/"
+
 Michael Herbert:
   name     : "Michael Herbert"
   avatar   : "/assets/images/MichaelHerbert.webp"
