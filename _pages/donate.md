@@ -41,4 +41,4 @@ Another way to support the Artisan project is to [sign up](https://artisan.plus/
 
 &nbsp;&nbsp;&nbsp;&nbsp; ![image](/assets/images/artisan-plus-logo.svg){: style="width: 5%;"} [<span style="color: #4C97C3;font-weight:bold;">artisan.plus</span>](https://artisan.plus){:target="_blank"} inventory management
 
-A [yearly subscription for HOME roasters](https://buy.artisan.plus/Home-Roasters){:target="_blank"} is only 49.- EUR with the additional benefit of access to coupons by [green bean supplier partners](https://doc.artisan.plus/partners/){:target="_blank"}.
+A [yearly subscription for HOME roasters](https://buy.artisan.plus/Home-Roasters){:target="_blank"} is only 50.- EUR with the additional benefit of access to coupons by [green bean supplier partners](https://doc.artisan.plus/partners/){:target="_blank"}.
