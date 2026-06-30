@@ -4578,6 +4578,12 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ##########################
                 ####  DEVICE 206 is +WebSocket 1112 but +DEVICE cannot be set as main device
                 ##########################
+                ##########################
+                ####  DEVICE 207 is Skywalker BT/ET (Cyberroaster)  ## CYBER ##
+                elif meter == 'Skywalker BT/ET':
+                    self.aw.qmc.device = 207
+                    message = QApplication.translate('Message','Device set to {0}').format(meter)
+                ##########################
 
                 # ADD DEVICE:
 
@@ -4803,7 +4809,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 1, # 203
                 1, # 204
                 1, # 205
-                1  # 206
+                1, # 206
+                1, # 207 ## CYBER ## Skywalker (nonserial, value unused)
+                1  # 208 ## CYBER ## +Skywalker Burner/Air
                 ]
             #init serial settings of extra devices
             for i, _ in enumerate(self.aw.qmc.extradevices):

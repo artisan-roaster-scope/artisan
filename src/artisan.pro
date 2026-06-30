@@ -52,6 +52,7 @@ SOURCES = \
     artisanlib/rubasse.py \
     artisanlib/s7port.py \
     artisanlib/sampling.py \
+    artisanlib/skywalker.py \
     artisanlib/statistics.py \
     artisanlib/transposer.py \
     artisanlib/wheels.py \
