@@ -154,6 +154,8 @@ machines:
         url: /machines/santoker/
       - title: "San Franciscan"
         url: /machines/sf/
+      - title: "Schuilenburg"
+        url: /machines/schuilenburg/
       - title: "Sedona"
         url: /machines/sedona/
       - title: "Sivetz"
