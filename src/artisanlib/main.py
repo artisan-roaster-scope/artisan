@@ -4369,8 +4369,8 @@ class ApplicationWindow(QMainWindow):
                 signature:bytes = bytes.fromhex(__signature__)
                 public_key.verify(signature, message)
                 return True
-        except Exception: # pylint: disable=broad-except
-            pass
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
         _log.error('app signature invalid')
         return False
 
