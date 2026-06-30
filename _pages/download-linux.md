@@ -14,11 +14,11 @@ gallery:
     image_path: /assets/images/download-icon-linux-AppImage.svg
     alt: "Linux AppImage"
     title: "Linux AppImage"
-  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v4.0.2/artisan-linux-4.2.0.deb
+  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v4.2.0/artisan-linux-4.2.0.deb
     image_path: /assets/images/download-icon-linux-deb.svg
     alt: "Linux deb"
     title: "Linux deb"
-  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v4.0.2/artisan-linux-4.2.0.rpm
+  - url: https://github.com/artisan-roaster-scope/artisan/releases/download/v4.2.0/artisan-linux-4.2.0.rpm
     image_path: /assets/images/download-icon-linux-rpm.svg
     alt: "Linux rpm"
     title: "Linux rpm"
