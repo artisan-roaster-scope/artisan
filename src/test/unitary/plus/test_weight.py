@@ -783,8 +783,8 @@ class TestWeightManager:
         assert weight.WeightManager.MIN_EMPTY_BUCKET_RECOGNITION_TOLERANCE == 10
         assert weight.WeightManager.ROASTED_BUCKET_TOLERANCE == 15
         assert weight.WeightManager.TAP_CANCEL_THRESHOLD == 100
-        assert weight.WeightManager.WAIT_BEFORE_DONE == 5000
-        assert weight.WeightManager.WAIT_BEFORE_CANCEL == 5000
+        assert weight.WeightManager.WAIT_BEFORE_DONE == 3000
+        assert weight.WeightManager.WAIT_BEFORE_CANCEL == 3000
 
     def test_roasted_container_weight_valid_index(self, mock_displays:Mock) -> None:
         """Test roasted_container_weight method with valid index."""

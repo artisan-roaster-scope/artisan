@@ -782,8 +782,8 @@ class WeightManager(QObject): # pyright:ignore[reportGeneralTypeIssues]
     TAP_CANCEL_THRESHOLD = 100                              # threshold in g the measured weight has to exceed the empty scale weight for a tap-cancel action to be recognized
     TAP_CANCEL_PERIOD = 400                                 # time in ms after which the weight has to fall back to the empty scale weight for a tap-cancel action to be recognized
 
-    WAIT_BEFORE_CANCEL:Final[int] = 5000  # time in milliseconds to display the CANCEL message before returning to READY
-    WAIT_BEFORE_DONE:Final[int] = 5000    # time in milliseconds to display the DONE message before returning to READY
+    WAIT_BEFORE_CANCEL:Final[int] = 3000  # time in milliseconds to display the CANCEL message before returning to READY
+    WAIT_BEFORE_DONE:Final[int] = 3000    # time in milliseconds to display the DONE message before returning to READY
 
     def __init__(self, aw:'ApplicationWindow', displays:list[Display], scale_manager:ScaleManager) -> None:
         super().__init__()

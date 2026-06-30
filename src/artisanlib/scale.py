@@ -185,15 +185,15 @@ class ScaleManager(QObject):
     scale1_scanned_signal = pyqtSignal(list) # ScaleSpecs
     scale1_connected_signal = pyqtSignal()
     scale1_disconnected_signal = pyqtSignal()
-    scale1_weight_changed_signal = pyqtSignal(int)         # in g
-    scale1_stable_weight_changed_signal = pyqtSignal(int)  # in g
+    scale1_weight_changed_signal = pyqtSignal(int)         # in g : weight changed (stable or unstable)
+    scale1_stable_weight_changed_signal = pyqtSignal(int)  # in g : stable weight changed
     scale1_tare_pressed_signal = pyqtSignal()
 
     scale2_scanned_signal = pyqtSignal(list) # ScaleSpecs
     scale2_connected_signal = pyqtSignal()
     scale2_disconnected_signal = pyqtSignal()
-    scale2_weight_changed_signal = pyqtSignal(int)         # in g
-    scale2_stable_weight_changed_signal = pyqtSignal(int)  # in g
+    scale2_weight_changed_signal = pyqtSignal(int)         # in g : weight changed (stable or unstable)
+    scale2_stable_weight_changed_signal = pyqtSignal(int)  # in g : stable weight changed
     scale2_tare_pressed_signal = pyqtSignal()
 
     available_signal = pyqtSignal()    # issued if the first scale freshly connects or an already connected but assigned scale gets released from its assignment
@@ -283,6 +283,16 @@ class ScaleManager(QObject):
 
     def is_scale1_connected(self) -> bool:
         return self.scale1 is not None and self.scale1.is_connected()
+
+    def get_scale1_id(self) -> str|None:
+        if self.scale1 is not None and self.scale1.is_connected():
+            return self.scale1.get_ident()
+        return None
+
+    def get_scale1_name(self) -> str:
+        if self.scale1 is not None and self.scale1.is_connected():
+            return self.scale1.get_name() or ''
+        return ''
 
     def reset_scale1(self) -> None:
         if self.scale1 is not None:
@@ -403,6 +413,7 @@ class ScaleManager(QObject):
             self.scale1_last_weight = None # prevent earlier non-stable weights to be send delayed as stable via the timer
             self.scale1_stable_reading_timer.stop() # we stop a pending timer not to have it deliver outdated data as stable
             # weights marked as stable by the scale are immediately forwarded as stable weights
+            self.scale1_weight_changed_signal.emit(self.scale1_last_weight_sent)
             self.scale1_stable_weight_changed_signal.emit(self.scale1_last_weight_sent)
             if self._logging:
                 _log.debug('stable1 emit: %s',self.scale1_last_weight_sent)
@@ -425,6 +436,7 @@ class ScaleManager(QObject):
         if self.scale1_last_weight is not None:
             if self._logging:
                 _log.debug('artificial stable1 emit: %s',self.scale1_last_weight)
+            self.scale1_weight_changed_signal.emit(self.scale1_last_weight)
             self.scale1_stable_weight_changed_signal.emit(self.scale1_last_weight)
 
     def get_scale1_last_weight(self) -> int|None:
@@ -433,8 +445,21 @@ class ScaleManager(QObject):
 
 #- scale 2
 
+    def is_scale2_configured(self) -> bool:
+        return self.scale2 is not None
+
     def is_scale2_connected(self) -> bool:
         return self.scale2 is not None and self.scale2.is_connected()
+
+    def get_scale2_id(self) -> str|None:
+        if self.scale2 is not None and self.scale2.is_connected():
+            return self.scale2.get_ident()
+        return None
+
+    def get_scale2_name(self) -> str:
+        if self.scale2 is not None and self.scale2.is_connected():
+            return self.scale2.get_name() or ''
+        return ''
 
     def reset_scale2(self) -> None:
         if self.scale2 is not None:
@@ -555,9 +580,10 @@ class ScaleManager(QObject):
             self.scale2_last_weight = None # prevent earlier non-stable weights to be send delayed as stable via the timer
             self.scale2_stable_reading_timer.stop() # we stop a pending timer not to have it deliver outdated data as stable
             # weights marked as stable by the scale are immediately forwarded as stable weights
+            self.scale2_weight_changed_signal.emit(self.scale2_last_weight_sent)
             self.scale2_stable_weight_changed_signal.emit(self.scale2_last_weight_sent)
             if self._logging:
-                _log.debug('PRINT stable2 emit: %s',self.scale2_last_weight_sent)
+                _log.debug('stable2 emit: %s',self.scale2_last_weight_sent)
         else:
             if self._logging:
                 _log.debug('STABLE->UNSTABLE2 %s, %s', stable and (toa - self.scale2_last_stable_weight_received) > MIN_TIME_BETWEEN_STABLE_WEIGHTS, stable and (prev_last_weight_sent is None or abs(self.scale2_last_weight_sent - prev_last_weight_sent) < MIN_DELTA_BETWEEN_STABLE_WEIGHTS))
@@ -577,6 +603,7 @@ class ScaleManager(QObject):
         if self.scale2_last_weight is not None:
             if self._logging:
                 _log.debug('artificial stable2 emit: %s',self.scale2_last_weight)
+            self.scale2_weight_changed_signal.emit(self.scale2_last_weight)
             self.scale2_stable_weight_changed_signal.emit(self.scale2_last_weight)
 
     def get_scale2_last_weight(self) -> int|None:

@@ -4663,6 +4663,9 @@ class ApplicationWindow(QMainWindow):
                 self.custom_scale_names.append(name)
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
+        # we update the names of scales on the LargeScaleLCDs
+        self.updateScale1name()
+        self.updateScale2name()
 
     def getScaleName(self, scale_device:'ScaleSpec') -> str:
         custom_name = self.get_custom_scale_name(scale_device[1])
@@ -7546,10 +7549,10 @@ class ApplicationWindow(QMainWindow):
             # build table of general information
             tbl2 = prettytable.PrettyTable()
             tbl2.field_names = [ 'A','A1', 'B', 'B1'  ]
-            tbl2.align['A'] = 'l'
-            tbl2.align['A1'] = 'r'
-            tbl2.align['B'] = 'l'
-            tbl2.align['B1'] = 'r'
+            tbl2.align['A'] = 'l'   # pylint: disable=unsupported-assignment-operation
+            tbl2.align['A1'] = 'r'  # pylint: disable=unsupported-assignment-operation
+            tbl2.align['B'] = 'l'   # pylint: disable=unsupported-assignment-operation
+            tbl2.align['B1'] = 'r'  # pylint: disable=unsupported-assignment-operation
             tbl2.float_format = '5.2'
             tbl2.add_row([QApplication.translate('Label','Curve Fit'), fitType, bgAlignLabel, bgAlignType])
             tbl2.add_row([QApplication.translate('Label','Samples Threshold'), self.qmc.segmentsamplesthreshold, QApplication.translate('Label','Delta Threshold'), self.qmc.segmentdeltathreshold])
@@ -12493,8 +12496,8 @@ class ApplicationWindow(QMainWindow):
                             self.sendmessage(QApplication.translate('Message','Auto Axis Graph Mode is off'))
                 elif self.buttonpalette_shortcuts and control_modifier and k in numberkeys: # palette switch via COMMAND-NUM-Keys
                     self.setbuttonsfrom(numberkeys.index(Qt.Key(k)), only_non_empty=True)
-                elif k == Qt.Key.Key_J and no_modifier: # 74:       #J (toggle Playback Events)
-                    self.togglePlaybackEvents()
+#                elif k == Qt.Key.Key_J and no_modifier: # 74:       #J (toggle Playback Events) # deactivated as it might be activated accidentally
+#                    self.togglePlaybackEvents()
                 elif k == Qt.Key.Key_I and no_modifier: # 73:       #I (toggle foreground showfull flag)
                     self.toggleForegroundShowfullFlag()
                 elif k == Qt.Key.Key_O and no_modifier: # 79:       #O (toggle background showfull flag)
@@ -13718,7 +13721,7 @@ class ApplicationWindow(QMainWindow):
     def loadFileSlot(self, filename:str) -> None:
         self.loadFile(filename)
 
-    #loads stored profiles. Called from file menu
+    #loads stored profiles. Called from file menu (NOTE: background profile is not loaded if quiet=True!)
     def loadFile(self, filename:str, quiet:bool = False) -> None:
         if self.comparator is not None or self.qmc.designerflag or self.qmc.wheelflag or self.qmc.ax is None:
             # only load a profile if not in Comparator/Designer/WheelChart/FlavorChart mode
@@ -13880,6 +13883,8 @@ class ApplicationWindow(QMainWindow):
         finally:
             if f is not None:
                 f.close()
+
+
 
     def loadAlarmsFromProfile(self, filename:str, profile:'ProfileData') -> None:
         self.qmc.alarmsfile = filename
@@ -14191,8 +14196,8 @@ class ApplicationWindow(QMainWindow):
             self.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' calcVirtualdevices() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
         return False
 
-    def loadAndRedrawBackgroundUUID(self, filename:str|None = None, UUID:str|None = None, force_reload:bool=True) -> None:
-        if self.loadbackgroundUUID(filename, UUID, force_reload):
+    def loadAndRedrawBackgroundUUID(self, filename:str|None = None, UUID:str|None = None, force_reload:bool=True, verbose:bool=False) -> None:
+        if self.loadbackgroundUUID(filename, UUID, force_reload, verbose):
             try:
                 self.qmc.background = not self.qmc.hideBgafterprofileload
                 self.qmc.timealign(redraw=False)
@@ -14207,7 +14212,7 @@ class ApplicationWindow(QMainWindow):
 
     # tries to load background from the given path, if that fails try to deref the given UUID
     # returns True on success, Fail otherwise
-    def loadbackgroundUUID(self, filename:str|None = None, UUID:str|None = None, force_reload:bool=True) -> bool:
+    def loadbackgroundUUID(self, filename:str|None = None, UUID:str|None = None, force_reload:bool=True, verbose:bool=False) -> bool:
         if self.comparator is not None or self.qmc.designerflag or self.qmc.wheelflag or self.qmc.ax is None:
             # only load a background profile if not in Comparator/Designer/WheelChart/FlavorChart mode
             return False
@@ -14224,8 +14229,12 @@ class ApplicationWindow(QMainWindow):
                     self.loadbackground(filepath)
                     return True
                 except Exception: # pylint: disable=broad-except
+                    if verbose:
+                        self.sendmessageSignal.emit(f"{QApplication.translate('Message', 'Loading background template failed')}: {filepath}",True,None)
                     return False
             else:
+                if verbose:
+                    self.sendmessageSignal.emit(f"{QApplication.translate('Message', 'Loading background template failed')}: {UUID}",True,None)
                 return False
         else:
             return False
@@ -14293,19 +14302,45 @@ class ApplicationWindow(QMainWindow):
                     res[i] = self.qmc.get_etype_default(i, default_etypes_set)
         return res
 
-    # Loads background profile
-    # NOTE: this does NOT set the self.qmc.background flag to make the loaded background visible.
-    def loadbackground(self, filename:str, quiet:bool = True) -> None: # pyright: ignore[reportGeneralTypeIssues] # code to complex to analyze
+    @staticmethod
+    def loadableProfile(filename:str) -> bool:
         f:QFile|None = None
         try:
             f = QFile(filename)
             if not f.open(QIODevice.OpenModeFlag.ReadOnly):
                 raise OSError(f.errorString())
             stream = QTextStream(f)
-
-            firstChar = stream.read(1)
-            if firstChar == '{':
+            try:
+                firstChar = stream.read(1)
+                # if file is just a GoogleDrive/DropBox offline stubs firstChar==''
+                if firstChar == '{':
+                    return True
+            except Exception:
+                pass
+            finally:
                 f.close()
+            stream = QTextStream(f)
+            # we try again, hoping that the file is by now retrieved without timeout
+            try:
+                firstChar = stream.read(1)
+                # if file is just a GoogleDrive/DropBox offline stubs firstChar==''
+                if firstChar == '{':
+                    f.close()
+                    return True
+            except Exception:
+                pass
+            finally:
+                f.close()
+        except Exception:
+            pass
+        return False
+
+
+    # Loads background profile
+    # NOTE: this does NOT set the self.qmc.background flag to make the loaded background visible.
+    def loadbackground(self, filename:str, quiet:bool = True) -> None: # pyright: ignore[reportGeneralTypeIssues] # code to complex to analyze
+        if self.loadableProfile(filename):
+            try:
                 profile = deserialize(filename)
                 self.plusAddPath(profile, filename)
 
@@ -14539,31 +14574,28 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.backgroundpath = str(filename)
                 self.qmc.backgroundUUID = profile.get('roastUUID', None)
                 _log.info('background profile loaded: %s', filename)
-            else:
-                self.sendmessage(QApplication.translate('Message', 'Invalid artisan format'))
-        except OSError as e:
-            _, _, exc_tb = sys.exc_info()
-            self.qmc.adderror((QApplication.translate('Error Message', 'IO Error:') + ' loadbackground() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
-            return
+            except OSError as e:
+                _, _, exc_tb = sys.exc_info()
+                self.qmc.adderror((QApplication.translate('Error Message', 'IO Error:') + ' loadbackground() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
+                return
 
-        except (ValidationError, InvalidSignature, InvalidProfileHash) as e:
-            # pydantic validation against ProfileData TypedDict failed
-            self.sendmessage(f"{QApplication.translate('Message','Invalid artisan format')}: {filename}")
-            _log.error(e)
+            except (ValidationError, InvalidSignature, InvalidProfileHash) as e:
+                # pydantic validation against ProfileData TypedDict failed
+                self.sendmessage(f"{QApplication.translate('Message','Invalid artisan format')}: {filename}")
+                _log.error(e)
 
-        except ValueError as e:
-            _, _, exc_tb = sys.exc_info()
-            self.qmc.adderror((QApplication.translate('Error Message', 'Value Error:') + ' loadbackground() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
-            return
+            except ValueError as e:
+                _, _, exc_tb = sys.exc_info()
+                self.qmc.adderror((QApplication.translate('Error Message', 'Value Error:') + ' loadbackground() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
+                return
 
-        except Exception as e: # pylint: disable=broad-except
-            _log.exception(e)
-            _, _, exc_tb = sys.exc_info()
-            self.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' loadbackground() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
-            return
-        finally:
-            if f is not None:
-                f.close()
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
+                _, _, exc_tb = sys.exc_info()
+                self.qmc.adderror((QApplication.translate('Error Message', 'Exception:') + ' loadbackground() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
+                return
+        else:
+            self.sendmessage(QApplication.translate('Message', 'Invalid artisan format'))
 
 
     def addSerialPort(self) -> None:
@@ -25433,6 +25465,9 @@ class ApplicationWindow(QMainWindow):
             self.largePIDLCDs_dialog.close()
             self.largePIDLCDs_dialog = None
 
+
+    ### LargeScaleLCDs
+
     @pyqtSlot()
     @pyqtSlot(bool)
     def largeScaleLCDs(self, _:bool = False) -> None:
@@ -25441,10 +25476,96 @@ class ApplicationWindow(QMainWindow):
             self.largeScaleLCDs_dialog.setModal(False)
             self.LargeScaleLCDsFlag = True
             self.scalelcdsAction.setChecked(True)
+            self.updateScale1name()
+            self.updateScale2name()
+            self.scale_manager.scale1_connected_signal.connect(self.scale1connectedSlot)
+            self.scale_manager.scale1_disconnected_signal.connect(self.scale1disconnectedSlot)
+            self.scale_manager.scale1_weight_changed_signal.connect(self.scale1WeightChangedSlot)
+            self.scale_manager.scale2_connected_signal.connect(self.scale2connectedSlot)
+            self.scale_manager.scale2_disconnected_signal.connect(self.scale2disconnectedSlot)
+            self.scale_manager.scale2_weight_changed_signal.connect(self.scale2WeightChangedSlot)
             self.largeScaleLCDs_dialog.show()
         else:
+            try:
+                self.scale_manager.connect_scale1_signal.disconnect(self.scale1connectedSlot)
+            except Exception: # pylint: disable=broad-except
+                pass
+            try:
+                self.scale_manager.disconnect_scale1_signal.connect(self.scale1disconnectedSlot)
+            except Exception: # pylint: disable=broad-except
+                pass
+            try:
+                self.scale_manager.scale1_weight_changed_signal.disconnect(self.scale1WeightChangedSlot)
+            except Exception: # pylint: disable=broad-except
+                pass
+            try:
+                self.scale_manager.connect_scale2_signal.connect(self.scale2connectedSlot)
+            except Exception: # pylint: disable=broad-except
+                pass
+            try:
+                self.scale_manager.disconnect_scale2_signal.connect(self.scale2disconnectedSlot)
+            except Exception: # pylint: disable=broad-except
+                pass
             self.largeScaleLCDs_dialog.close()
             self.largeScaleLCDs_dialog = None
+
+
+    def weight2str(self, weight:int) -> str:
+        unit:int = weight_units.index(self.qmc.weight[2])
+        # metric
+        if unit == 0: # g selected
+            return str(weight)
+        if unit == 1: # kg selected
+            # metric (always keep the accuracy to the g
+            return f'{weight/1000:.3f}'
+        # non-metric
+        converted_weight:float = convertWeight(weight,0,unit)
+        return f'{converted_weight:.2f}'
+
+
+    def updateScale1name(self) -> None:
+        scale1_id:str|None = self.scale_manager.get_scale1_id()
+        if self.largeScaleLCDs_dialog is not None:
+            self.largeScaleLCDs_dialog.setScale1Name(self.get_custom_scale_name(scale1_id) if scale1_id else None)
+
+    @pyqtSlot()
+    def scale1connectedSlot(self) -> None:
+        self.updateScale1name()
+
+    @pyqtSlot()
+    def scale1disconnectedSlot(self) -> None:
+        if self.largeScaleLCDs_dialog is not None:
+            self.largeScaleLCDs_dialog.setScale1Name(None)
+        self.qmc.updateLargeScaleLCDs('')
+
+    @pyqtSlot(int)
+    def scale1WeightChangedSlot(self, weight:int) -> None:
+        self.qmc.updateLargeScaleLCDs(self.weight2str(weight))
+
+    #
+
+    def updateScale2name(self) -> None:
+        scale2_id:str|None = self.scale_manager.get_scale2_id()
+        if self.largeScaleLCDs_dialog is not None:
+            self.largeScaleLCDs_dialog.setScale2Name(self.get_custom_scale_name(scale2_id) if scale2_id else None)
+
+    @pyqtSlot()
+    def scale2connectedSlot(self) -> None:
+        scale2_id:str|None = self.scale_manager.get_scale2_id()
+        if self.largeScaleLCDs_dialog is not None:
+            self.largeScaleLCDs_dialog.setScale2Name(self.get_custom_scale_name(scale2_id) if scale2_id else None)
+
+    @pyqtSlot()
+    def scale2disconnectedSlot(self) -> None:
+        if self.largeScaleLCDs_dialog is not None:
+            self.largeScaleLCDs_dialog.setScale2Name(None)
+        self.qmc.updateLargeScaleLCDs(None, '')
+
+    @pyqtSlot(int)
+    def scale2WeightChangedSlot(self, weight:int) -> None:
+        self.qmc.updateLargeScaleLCDs(None, self.weight2str(weight))
+
+    ###
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -28247,7 +28368,7 @@ def main() -> None:
             # we try to reload the last loaded profile or background
             if appWindow.lastLoadedProfile:
                 try:
-                    appWindow.loadFile(appWindow.lastLoadedProfile, quiet=True)
+                    appWindow.loadFile(appWindow.lastLoadedProfile)
                     if appWindow.curFile is None:
                         # load failed
                         appWindow.lastLoadedProfile = ''

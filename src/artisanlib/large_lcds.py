@@ -15,8 +15,9 @@
 # AUTHOR
 # Marko Luther, 2023
 
+import platform
 import logging
-from artisanlib.dialogs import ArtisanDialog
+from artisanlib.dialogs import ArtisanResizeablDialog
 from artisanlib.widgets import MyQLabel, MyQLCDNumber, ClickableLCDFrame
 from artisanlib.util import rgba_colorname2argb_colorname
 
@@ -33,7 +34,7 @@ if TYPE_CHECKING:
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
-class LargeLCDs(ArtisanDialog):
+class LargeLCDs(ArtisanResizeablDialog):
 
 #    __slots__ = ['lcds1', 'lcds2', 'lcds1styles', 'lcds2styles', 'lcds1labelsUpper', 'lcds2labelsUpper', 'lcds1labelsLower', 'lcds2labelsLower',
 #        'lcds1frames', 'lcds2frames', 'visibleFrames', 'tight', 'layoutNr', 'swaplcds']
@@ -60,9 +61,24 @@ class LargeLCDs(ArtisanDialog):
         self.layoutNr:int = -1 # -1: unknown, 0: landscape, 1: portrait
         self.swaplcds:bool = False
 #        self.setWindowModality(Qt.WindowModality.NonModal) # this seems not to be effective on RPi bookworm thus we set the parent to None
-        windowFlags = self.windowFlags()
-        windowFlags |= Qt.WindowType.Tool
-        self.setWindowFlags(windowFlags)
+#        windowFlags = self.windowFlags()
+#        windowFlags |= Qt.WindowType.Tool
+#        self.setWindowFlags(windowFlags)
+
+        # we want minimize and close buttons, but no maximize buttons
+        if not platform.system().startswith('Windows'):
+            windowFlags = self.windowFlags()
+            windowFlags |= Qt.WindowType.Tool
+            windowFlags |= Qt.WindowType.CustomizeWindowHint # needed to be able to customize the close/min/max controls (at least on macOS)
+            windowFlags |= Qt.WindowType.WindowMinimizeButtonHint
+            windowFlags |= Qt.WindowType.WindowCloseButtonHint # not needed on macOS, but maybe on Linux
+            #windowFlags |= Qt.WindowType.WindowMinMaxButtonsHint # not needed on macOS
+            #windowFlags &= ~Qt.WindowType.WindowMaximizeButtonHint # not needed on macOS as the CustomizeWindowHint is removing min/max controls already
+            self.setWindowFlags(windowFlags)
+        self.setWindowFlag(Qt.WindowType.WindowMaximizeButtonHint, False)
+
+        if platform.system() == 'Darwin':
+            self.setAttribute(Qt.WidgetAttribute.WA_MacAlwaysShowToolWindow) # show tool window even if app is in background (see https://bugreports.qt.io/browse/QTBUG-57581)
 
     @override
     def resizeEvent(self, a0:'QResizeEvent|None') -> None:
@@ -836,6 +852,10 @@ class LargePhasesLCDs(LargeLCDs):
 class LargeScaleLCDs(LargeLCDs):
     def __init__(self, parent:'QWidget', aw:'ApplicationWindow') -> None:
         super().__init__(parent, aw)
+        self.lcd1:QLCDNumber|None = None # Scale1
+        self.lcd2:QLCDNumber|None = None # Scale2
+        self.scale1name:str = QApplication.translate('GroupBox', 'Scale {0}').format(1)
+        self.scale2name:str = QApplication.translate('GroupBox', 'Scale {0}').format(2)
         settings = QSettings()
         if settings.contains('ScaleLCDGeometry'):
             self.restoreGeometry(settings.value('ScaleLCDGeometry'))
@@ -845,41 +865,53 @@ class LargeScaleLCDs(LargeLCDs):
         self.chooseLayout(self.width(),self.height())
         self.updateValues([''],[''])
 
-    def weightLabel(self, unit:str|None = None) -> str:
+    def setScale1Name(self, name:str|None) -> None:
+        self.scale1name = (name if name else QApplication.translate('GroupBox', 'Scale {0}').format(1))
+        self.updateWeightUnit1()
+
+    def setScale2Name(self, name:str|None) -> None:
+        self.scale2name = (name if name else QApplication.translate('GroupBox', 'Scale {0}').format(2))
+        self.updateWeightUnit2()
+
+    def weightLabel1(self, unit:str|None = None) -> str:
         if unit is None:
             unit = self.aw.qmc.weight[2].lower()
-        return f"<b>{QApplication.translate('Label', 'Weight')} ({unit})</b> "
+        return f"<b>{self.scale1name} ({unit})</b> "
 
-    def totalLabel(self, unit:str|None = None) -> str:
+    def weightLabel2(self, unit:str|None = None) -> str:
         if unit is None or unit == '':
             unit = self.aw.qmc.weight[2].lower()
-        return f"<b>{QApplication.translate('Label', 'Total')} ({unit})</b> "
+        return f"<b>{self.scale2name} ({unit})</b> "
 
-    def updateWeightUnitWeight(self, unit:str|None = None) -> None:
+    def updateWeightUnit1(self, unit:str|None = None) -> None:
         if len(self.lcds1labelsUpper)>0:
-            self.lcds1labelsUpper[0].setText(self.weightLabel(unit))
+            self.lcds1labelsUpper[0].setText(self.weightLabel1(unit))
 
-    def updateWeightUnitTotal(self, unit:str|None = None) -> None:
+    def updateWeightUnit2(self, unit:str|None = None) -> None:
         if len(self.lcds2labelsUpper)>0:
-            self.lcds2labelsUpper[0].setText(self.totalLabel(unit))
+            self.lcds2labelsUpper[0].setText(self.weightLabel2(unit))
 
     def updateWeightUnit(self, unit:str|None = None) -> None:
-        self.updateWeightUnitWeight(unit)
-        self.updateWeightUnitTotal(unit)
+        self.updateWeightUnit1(unit)
+        self.updateWeightUnit2(unit)
 
     @override
     def makeLCDs(self) -> None:
-        self.lcds1styles = ['slowcoolingtimer']
-        self.lcds1 = [self.makeLCD(self.lcds1styles[0])] # Weight
-        label1Upper = self.makeLabel(self.weightLabel())
+        self.lcds1styles = ['rstimer']
+        self.lcd1 = self.makeLCD(self.lcds1styles[0])
+        self.lcd1.clicked.connect(self.aw.scale_manager.tare_scale1_slot)
+        self.lcds1 = [self.lcd1] # Scale 1 weight
+        label1Upper = self.makeLabel(self.weightLabel1())
         label1Lower = self.makeLabel(' ')
         self.lcds1labelsUpper = [label1Upper]
         self.lcds1labelsLower = [label1Lower]
         self.lcds1frames = [self.makeLCDframe(label1Upper,self.lcds1[0],label1Lower)]
         #
-        self.lcds2styles = ['sv']
-        self.lcds2 = [self.makeLCD(self.lcds2styles[0])] # Total
-        label2Upper = self.makeLabel(self.totalLabel())
+        self.lcds2styles = ['rstimer']
+        self.lcd2 = self.makeLCD(self.lcds2styles[0])
+        self.lcd2.clicked.connect(self.aw.scale_manager.tare_scale2_slot)
+        self.lcds2 = [self.lcd2] # Scale 2 weight
+        label2Upper = self.makeLabel(self.weightLabel2())
         label2Lower = self.makeLabel(' ')
         self.lcds2labelsUpper = [label2Upper]
         self.lcds2labelsLower = [label2Lower]

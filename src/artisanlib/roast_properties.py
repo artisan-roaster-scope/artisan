@@ -305,8 +305,6 @@ class volumeCalculatorDlg(ArtisanDialog):
 
         self.parent_dialog.scaleWeightUpdated.connect(self.update_scale_weight)
 
-        if self.aw.largeScaleLCDs_dialog is not None:
-            self.aw.largeScaleLCDs_dialog.updateWeightUnit('g')
 
     @pyqtSlot()
     def scale_disconnected(self) -> None:
@@ -316,7 +314,6 @@ class volumeCalculatorDlg(ArtisanDialog):
     def updateWeightLCD(self, txt_value:str, txt_unit:str = '') -> None:
         if self.aw.scale_manager.is_scale1_configured():
             self.scaleWeight.setText('' if txt_value == '' else txt_value+txt_unit.lower())
-            self.aw.qmc.updateLargeScaleLCDs(txt_value)
 
     @pyqtSlot(int)
     def scale_weight_changed(self, w:int) -> None:
@@ -452,9 +449,6 @@ class volumeCalculatorDlg(ArtisanDialog):
     @override
     def closeEvent(self, a0:'QCloseEvent|None' = None) -> None:
         del a0
-        if self.aw.largeScaleLCDs_dialog is not None:
-            self.aw.largeScaleLCDs_dialog.updateWeightUnit()
-        self.aw.qmc.updateLargeScaleLCDs('')
 
         try:
             self.parent_dialog.volumedialog = None
@@ -1233,6 +1227,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 
         self.scale1TareButton = QPushButton(QApplication.translate('Button', 'Tare'))
         self.scale1TareButton.clicked.connect(self.tareScale1)
+        self.scale1TareButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
         # in button
         inButton = QPushButton(QApplication.translate('Button', 'in'))
@@ -1828,9 +1823,6 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.scaleWeight.setText(txt_value+txt_unit.lower())
             total_txt, unit = self.updateScaleWeightAccumulated(total)
             self.scaleWeightAccumulated.setText(total_txt + unit.lower())
-            if self.aw.largeScaleLCDs_dialog is not None:
-                self.aw.largeScaleLCDs_dialog.updateWeightUnitTotal(unit)
-            self.aw.qmc.updateLargeScaleLCDs(txt_value, total_txt)
 
     @pyqtSlot(bool)
     def SetupSetDefaults(self, _:bool = False) -> None:
@@ -1891,7 +1883,6 @@ class editGraphDlg(ArtisanResizeablDialog):
     def resetScaleSet(self) -> None:
         self.scale_set = None
         self.scaleWeightAccumulated.setText('')
-        self.aw.qmc.updateLargeScaleLCDs(None, '')
 
     # takes total accumulated weight and renders it as text; returns the empty string if the total weight is not given
     def updateScaleWeightAccumulated(self,weight:float|None = None) -> tuple[str,str]:
@@ -2670,8 +2661,6 @@ class editGraphDlg(ArtisanResizeablDialog):
         # restore
         self.restoreAllEnergySettings()
 
-        self.aw.qmc.updateLargeScaleLCDs('')
-
         self.aw.qmc.beans = self.org_beans
         self.aw.qmc.density = self.org_density
         self.aw.qmc.density_roasted = self.org_density_roasted
@@ -2859,12 +2848,6 @@ class editGraphDlg(ArtisanResizeablDialog):
             # weight unit changed, we update the selected blend in plus mode
             if self.plus_blends_combo.currentIndex() > 0:
                 self.blendSelectionChanged(self.plus_blends_combo.currentIndex())
-        except Exception: # pylint: disable=broad-except
-            pass # self.plus_blends_combo might not be allocated
-        try:
-            if self.aw.largeScaleLCDs_dialog is not None:
-                self.aw.largeScaleLCDs_dialog.reLayout()
-            self.update_scale_weight()
         except Exception: # pylint: disable=broad-except
             pass # self.plus_blends_combo might not be allocated
         try:
@@ -5508,8 +5491,6 @@ class editGraphDlg(ArtisanResizeablDialog):
     @pyqtSlot()
     def close_OK(self) -> None:
         redraw:bool = False # if set to True a redraw happens at the end of this function
-
-        self.aw.qmc.updateLargeScaleLCDs('')
 
         #check for graph
         if len(self.aw.qmc.timex):

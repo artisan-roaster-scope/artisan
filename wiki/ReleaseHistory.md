@@ -12,14 +12,17 @@ v4.2.0 (Jun 30, 2026)
   - adds support for [Probat G/UG 2026 models](https://artisan-scope.org/machines/probat/) communicating via WebSockets
   - adds support for [Neuhaus Neotec RFB Junior, RFB-S and Neoroast](https://artisan-scope.org/machines/neuhaus/) machines
   - adds support for [North Roasters](https://artisan-scope.org/machines/north/)
+  - adds support for [Schuilenburg](https://artisan-scope.org/machines/schuilenburg/) machines equipped with Unitronics PLC
   - adds [MQTT support](https://artisan-scope.org/devices/mqtt/)
   - adds IO Command `publish(<topic>, <data>)` to publish payloads to the connected MQTT broker
   - adds Artisan Command `pidSVbuttons(<bool>)` ([Issue #2121](../../../issues/2121))
   - adds Excel and Orbiter formats to the autosave "save also" options
-  - adds initial Bulgarian localization ([Issue #2175](../../../issues/2175))
+  - adds Bulgarian localization ([Issue #2175](../../../issues/2175))
   - adds validation of profiles and settings
   - adds PID derivative filter size setting
   - adds option to disable UNDO actions on main event buttons
+  - adds ALT/OPTION click on template name to toggle event replay
+  - adds notification message if schedule fails to load template
 * CHANGES
   - added a popup explaining the reason the Roast Properties dialog is opened on START if plus is connected until beans are specified  ([Issue #2133](../../../issues/2133))
   - adds hack to prevent dtr/rts signaling on connecting serial ports
@@ -28,6 +31,8 @@ v4.2.0 (Jun 30, 2026)
   - timer LCD displays cooling time after DROP
   - enables title click to open Roast Properties also during sampling and recording
   - tooltip on scheduler item displays weight of all blend components in selected weight unit (thanks to HB:Theophilus for reporting)
+  - deactivates shortcut key J to toggle event replay to avoid the danger of activating it accidentally
+  - connects scale LCDs directly to scale 1 and 2
 * FIXES
   - fixes autosave as PDF on regular `Save` on macOS ([Issue #2118](../../../issues/2118))
   - fixes regression which led to large automatic x-axis extensions for larger sampling rates ([Issue #2142](../../../issues/2142))

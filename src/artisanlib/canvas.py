@@ -4126,7 +4126,7 @@ class tgraphcanvas(QObject):
                         self.ax.autoscale(enable=True, axis='y', tight=False)
                         self.fig.canvas.draw_idle()
 
-                if not self.wheelflag and event.inaxes is None and event.button == 1 and event.dblclick and event.x > event.y:
+                if not self.wheelflag and event.inaxes is None and event.button == 1 and event.x > event.y:
                     fig = self.ax.get_figure()
                     if fig is None:
                         return
@@ -4137,14 +4137,19 @@ class tgraphcanvas(QObject):
                                 QDesktopServices.openUrl(QUrl(__release_sponsor_url__, QUrl.ParsingMode.TolerantMode))
                                 return
                             if self.backgroundprofile is not None:
-                                # toggle background if right top corner above canvas where the subtitle is clicked
-                                self.background = not self.background
-                                self.aw.autoAdjustAxis(background=self.background and (not len(self.timex) > 3))
-                                if self.statssummary and self.autotimex:
-                                    self.redraw(recomputeAllDeltas=True)
-                                else:
-                                    self.redraw_keep_view(recomputeAllDeltas=True)
-                                return
+                                modifiers = QApplication.keyboardModifiers()
+                                if self.background and modifiers == Qt.KeyboardModifier.AltModifier:
+                                    self.aw.togglePlaybackEvents()
+                                    return
+                                if event.dblclick:
+                                    # toggle background if right top corner above canvas where the subtitle is clicked
+                                    self.background = not self.background
+                                    self.aw.autoAdjustAxis(background=self.background and (not len(self.timex) > 3))
+                                    if self.statssummary and self.autotimex:
+                                        self.redraw(recomputeAllDeltas=True)
+                                    else:
+                                        self.redraw_keep_view(recomputeAllDeltas=True)
+                                    return
 
 
                 event_xdata = event.xdata
@@ -4439,10 +4444,10 @@ class tgraphcanvas(QObject):
             _log.exception(e)
 
     # note that partial values might be given here
-    def updateLargeScaleLCDs(self, weight:str|None = None, total:str|None = None) -> None:
+    def updateLargeScaleLCDs(self, weight1:str|None = None, weight2:str|None = None) -> None:
         try:
             if self.aw.largeScaleLCDs_dialog is not None:
-                self.aw.largeScaleLCDs_dialog.updateValues([weight],[total])
+                self.aw.largeScaleLCDs_dialog.updateValues([weight1],[weight2])
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
 

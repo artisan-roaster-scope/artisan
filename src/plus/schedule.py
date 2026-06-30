@@ -1664,7 +1664,7 @@ class DragItem(StandardItem):
         if self.data.template is not None and aw.curFile is None and aw.qmc.timeindex[6] == 0:
             # if template is set and no profile is loaded and DROP is not set we load the template
             uuid:str = self.data.template.hex
-            QTimer.singleShot(500, lambda : aw.loadAndRedrawBackgroundUUID(UUID = uuid, force_reload=False))
+            QTimer.singleShot(500, lambda : aw.loadAndRedrawBackgroundUUID(UUID = uuid, force_reload=False, verbose=True))
 
 
     def deselect(self) -> None:
