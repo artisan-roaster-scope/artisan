@@ -30,11 +30,13 @@ gallery2:
 
 ---
 
-**artisan 4.2.0**
-{: style="color: #2899c7; font-size: x-large; text-align: center; font-weight:bold;" }
-
-<p style="text-align:left;">
-    <a href="https://artisan-scope.org/release/Artisan-v4.2/">Release Notes</a>
+<p style="text-align: center;">
+    <span style="float:left;">
+      <a href="https://artisan-scope.org/release/Artisan-v4.2/">Release Notes</a>
+    </span>
+    <span style="color: #2899c7; font-size: xx-large; font-weight:900;">
+      artisan 4.2
+    </span>
     <span style="float:right;">
         <img fetchpriority="high" src="https://img.shields.io/github/downloads/artisan-roaster-scope/artisan/latest/total?logo=github&amp;label=downloads&amp;color=f5f5f5&amp;labelColor=9C9C9C&amp;style=flat" alt="Github Latest Releases" class="align-right" />
     </span>
