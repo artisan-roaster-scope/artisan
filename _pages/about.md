@@ -20,7 +20,7 @@ header:
 
 > In 2009, the two Computer Scientists Rafael and [Marko](/authors/luther/) started **<span style="color: #2899c7;">artisan</span>**, a simple app for coffee lovers to track their roasts. Fast forward ten years, and **<span style="color: #2899c7;">artisan</span>** became the most trusted roasting software for commercial roasters thanks to the launch of **[<span style="color: #2899c7;">artisan.plus</span>](https://artisan.plus)**, a cloud-based extension adding professional features like inventory management. Today, **<span style="color: #2899c7;">artisan</span>** has a user base that's ten times bigger than any other roasting software. 
 
-<a name="Platforms"></a>
+<div id="Platforms"></div>
 **<span style="color: #2899c7;">Artisan</span>** runs on Windows, macOS, Linux, Raspberry Pi
 {: style="text-align: center;" }
 <br>
@@ -90,7 +90,7 @@ header:
             </picture>            
           </div>
         <div class="archive__item-body">
-            <h2 class="archive__item-title"><a name="Automation"></a><span style="color: #2899c7;">Roast Control &amp; Automation</span></h2>
+            <h2 class="archive__item-title"><div id="Automation"></div><span style="color: #2899c7;">Roast Control &amp; Automation</span></h2>
             <div class="archive__item-excerpt">
 <ul>
   <li>machine control by <a href="http://artisan-roasterscope.blogspot.de/2013/02/events-buttons-and-palettes.html" target="_blank">custom slider and button actions</a></li>
@@ -185,7 +185,7 @@ header:
             </picture>
           </div>
         <div class="archive__item-body">
-            <h2 class="archive__item-title"><a name="InventoryManagement"></a><span style="color: #2899c7;">Inventory Management</span></h2>
+            <h2 class="archive__item-title"><div id="InventoryManagement"></div><span style="color: #2899c7;">Inventory Management</span></h2>
             <div class="archive__item-excerpt">
 <ul>
   <li>the affordable <a href="https://artisan.plus"><strong><span style="color: #2899c7;">artisan.plus</span></strong></a> cloud extension adds multi-storage, multi-user, multi-machine, mobile-friendly transaction-based inventory management at one fixed price and with friendly 3 month free trial period</li>
