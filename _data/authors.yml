@@ -19,6 +19,7 @@ Marko Luther:
 
 Paul Holleis:
   name     : "Dr. Paul Holleis"
+  avatar   : "/assets/images/PaulHolleis.webp"
   bio      : "cloud architect"
   location : "Germany"
   links:
@@ -28,12 +29,13 @@ Paul Holleis:
 
 Liam Robichaud:
   name     : "Liam Robichaud"
+  avatar   : "/assets/images/LiamRobichaud.webp"
   bio      : "creative director"
   location : "Canada"
   links:
-    - label: "artisan.plus"
-      icon: "fas fa-fw fa-link"
-      url: "https://artisan.plus"
+    - label: "Instagram"
+      icon: "fab fa-fw fa-instagram"
+      url: "https://www.instagram.com/liamdoescoffeestuff/"
     - label: "LinkedIn"
       icon: "fab fa-fw fa-linkedin"
       url: "https://www.linkedin.com/in/liam-robichaud-998304296/"

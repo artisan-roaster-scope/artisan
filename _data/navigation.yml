@@ -7,6 +7,10 @@ main:
     url: /donate/
   - title: "Download"
     url: /download/
+  - title: "Docs"
+    url: /Docs/
+  - title: "Shop"
+    url: https://shop.artisan.plus/
 
 machines:
   - title: "Machines"
@@ -240,6 +244,8 @@ docs:
     children:
       - title: "Quick-Start Guide"
         url: /docs/quick-start-guide/
+      - title: "FAQ"
+        url: /docs/faq/
       - title: "Installation"
         url: /docs/installation/
       - title: "Setup"

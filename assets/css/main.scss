@@ -7,24 +7,47 @@ search: false
 $twitter-color: lightgray;
 
 
-
 @import "minimal-mistakes/skins/{{ site.minimal_mistakes_skin | default: 'default' }}"; // skin
+
+$serif              : "Nunito", Georgia, Times, serif;
+$sans-serif         : "Nunito", -apple-system, BlinkMacSystemFont, "Roboto", "Segoe UI", "Helvetica Neue", "Lucida Grande", Arial, sans-serif !default;
+$sans-serif-narrow  : "Nunito", -apple-system, BlinkMacSystemFont, "Roboto", "Segoe UI", "Helvetica Neue", "Lucida Grande", Arial, sans-serif;
+
+
+$global-font-family           : $serif !default;
+$header-font-family           : $sans-serif !default;
+$caption-font-family          : $serif !default;
+
+
 @import "minimal-mistakes"; // main partials
 
+/*
+GS: override any CSS with new CSS styles AFTER the `@import "minimal-mistakes";` line just above!
+See: https://github.com/mmistakes/minimal-mistakes/issues/1219#issuecomment-326809412
+Anything you place after this point will therefore "cascade and override" the previous CSS styles.
+*/
+
+.page__hero--overlay {
+    margin-left: 20px;
+    margin-right: 20px;
+    padding-left: 100px;
+    padding-bottom: 60px;
+    padding-top: 60px;
+}
 
 .page__title a {
-    color: #4C97C3;
-    text-decoration: none
+    color: #2899c7;
+    text-decoration: none;
 }
 
 
 .btn--info {
-    background-color: #4C97C3;
+    background-color: #2899c7;
     color: #fff;
 }
 
 .btn--info:visited {
-    background-color: #4C97C3;
+    background-color: #2899c7;
     color: #fff;
 }
 
@@ -47,7 +70,7 @@ $twitter-color: lightgray;
   background-color: #147bb3;
   color: #fff;
   font-size: 14px;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
+  font-family: "Nunito", "Roboto", "Helvetica Neue", sans-serif;
   font-weight: 500;
   box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);
 }

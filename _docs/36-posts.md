@@ -218,7 +218,7 @@ gallery:
     
 ---
 
-A selection of posts from the [**<span style="color: #4C97C3;">artisan</span>** blog](https://artisan-roasterscope.blogspot.com/){:target="_blank"} covering almost any relevant topic!
+A selection of posts from the [**<span style="color: #2899c7;">artisan</span>** blog](https://artisan-roasterscope.blogspot.com/){:target="_blank"} covering almost any relevant topic!
 
 {% include gallery id="gallery" %} 
 

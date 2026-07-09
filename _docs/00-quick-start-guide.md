@@ -9,6 +9,7 @@ author_profile: true
 ---
 
 ## Quick-Start Guide
+{: style="color: #2899c7;" }
 
 **Watch out!** 
 If you read through the topics on the left you will have a very good idea of how Artisan works.  This Quick-Start-Guide is not intended to answer all technical questions.
@@ -20,6 +21,7 @@ Artisan Quick-Start Guide is maintained by *Michael Herbert of [CarefreeBuzzBuzz
 
 
 ### artisan.plus
+{: style="color: #2899c7;" }
 
 Introduced as part of Artisan v2, [artisan.plus](https://artisan.plus/en/) is an inventory management system which is not covered in the Quick Start Guide. Artisan v2 connects to the inventory management service. This service manages your stock of beans and automatically subtracts batches as you roast them. Beans can be specified to every detail and only essential meta data of roasts is stored online in the cloud. All roast profiles stay local just with you and are not shared with the platform.  You can read the [Artisan Plus Quick Start Guide](https://doc.artisan.plus/docs/quick-start-guide/).  Signing up for this service is a great way to support Artisan.  
 
@@ -34,6 +36,7 @@ The [artisan.plus service](https://artisan.plus/en/) features support for
 
 
 ### Learn what Artisan can do and Your First Roast 
+{: style="color: #2899c7;" }
 
 **Best Practices - Learn to save your settings.**   Go to `Help` >> `Save Settings`  
 Maybe the most important step. Save your settings and make a habit of it before every upgrade and when you change settings.  Also after installing a new version do two things; read the release notes so you can spot anything relevant to your roasting, and look over the shortcuts as new ones are often being added.  

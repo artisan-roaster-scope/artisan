@@ -26,8 +26,8 @@ url                      : "https://artisan-scope.org" # the base hostname & pro
 baseurl                  : # the subpath of your site, e.g. "/blog"
 repository               : "artisan-roaster-scope/artisan" # GitHub username/repo-name e.g. "mmistakes/minimal-mistakes"
 teaser                   : "/assets/images/500x300.png" # path of fallback teaser image, e.g. "/assets/images/500x300.png"
-logo                     : "/assets/images/artisan-logo.svg" # path of logo image to 
-masthead_title           : "artisan" # overrides the website title displayed in the masthead, use " " for no title
+logo                     : "/assets/images/artisan-combo-mark-blue.svg" # path of logo image to 
+masthead_title           : " " # overrides the website title displayed in the masthead, use " " for no title
 #breadcrumbs            : false # true, false (default)
 words_per_minute         : 200
 comments:
@@ -96,8 +96,10 @@ social:
     - "https://www.instagram.com/artisanscope"
     - "https://www.linkedin.com/company/artisan-plus"
     - "https://www.youtube.com/@artisanplus"
-    - "https://masto.ai/@artisan"
+    - "https://fosstodon.org/@artisan"
     - "https://github.com/artisan-roaster-scope/artisan"
+    - "https://bsky.app/profile/artisanscope.bsky.social"
+#    - "https://masto.ai/@artisan"
 
 # Analytics
 analytics:
@@ -146,12 +148,15 @@ footer:
     - label: "Instagram"
       icon: "fab fa-fw fa-instagram"
       url: "https://www.instagram.com/artisanscope/"
+    - label: "Bluesky"
+      icon: "fab fa-brands fa-bluesky"
+      url: "https://bsky.app/profile/artisanscope.bsky.social"
     - label: "Linked.in"
       icon: "fab fa-fw fa-linkedin"
       url: "https://www.linkedin.com/company/artisan-plus"
     - label: "Mastodon"
       icon: "fab fa-fw fa-mastodon"
-      url: https://masto.ai/@artisan
+      url: https://fosstodon.org/@artisan
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
       url: "https://github.com/artisan-roaster-scope/artisan"

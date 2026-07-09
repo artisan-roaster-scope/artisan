@@ -21,7 +21,7 @@ It is generally accepted that when multiple roasts of the same green lot achieve
 
 
 ## Parameters, Goals, Exclusions
-{: style="color: #4C97C3;" }
+{: style="color: #2899c7;" }
 
 [RoastGuard](https://doc.artisan.plus/docs/roastguard){:target="_blank"} tracks several relevant roast parameters, including temperatures, development, and total time, as well as monitoring temperature correlation over time, energy input, batch size, yield, roast loss, and colour.
 
@@ -29,7 +29,7 @@ Each of the parameters is checked against a custom goal that you can set. You si
 
 
 ## Badges, Charts, Details
-{: style="color: #4C97C3;" }
+{: style="color: #2899c7;" }
 
 <figure>
 <img src="{{ site.baseurl }}/assets/images/posts/guard-result-details.gif">

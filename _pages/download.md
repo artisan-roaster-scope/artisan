@@ -1,10 +1,7 @@
 ---
 layout: single
 permalink: /download/
-header:
-  overlay_image: /assets/images/teaser-small.webp
-  image: /assets/images/teaser-small.webp
-title: "Download"
+title: ""
 toc: false
 author: Marko Luther
 author_profile: false
@@ -38,24 +35,21 @@ gallery_legacy:
 
 ---
 
+**artisan 4.2.0**
+{: style="color: #2899c7; font-size: xx-large; text-align: center; font-weight:bold;" }
+
 <p style="text-align:left;">
     <a href="https://artisan-scope.org/release/Artisan-v4.2/">Release Notes</a>
     <span style="float:right;">
         <img fetchpriority="high" src="https://img.shields.io/github/downloads/artisan-roaster-scope/artisan/latest/total?logo=github&amp;label=downloads&amp;color=f5f5f5&amp;labelColor=9C9C9C&amp;style=flat" alt="Github Latest Releases" class="align-right" />
     </span>
 </p>
-**artisan 4.2.0**
-{: style="color: #4C97C3; font-size: larger; text-align: center; font-weight:bold;" }
 ---
-Help keep **<span style="color: #4C97C3;">artisan</span>** free for personal and commercial use by [sending a donation](/donate) 
+Help keep **<span style="color: #2899c7;">artisan</span>** free for personal and commercial use by [sending a donation](/donate) 
 {: style="text-align: center; font-size: smaller; font-style: oblique;" }
 <p style="text-align: center;"><a aria-label="Donate to keep Artisan free and going" href="https://github.com/sponsors/artisan-roaster-scope"><img src="https://img.shields.io/static/v1?label=Sponsor&amp;message=%E2%9D%A4&amp;logo=GitHub&amp;color=%23fe8e86" alt="GitHub Sponsor Logo" /></a></p>
 ---
 
-<br>
-
-![image](/assets/images/artisan-plus-logo.svg){: style="width: 3%;"} [<span style="color: #4C97C3;font-weight:bold;">artisan.plus</span>](https://artisan.plus){:target="_blank"} inventory management
-{: style="text-align: center;" }
 
 {% include gallery id="gallery" %}
 
@@ -63,11 +57,13 @@ Help keep **<span style="color: #4C97C3;">artisan</span>** free for personal and
 {% include gallery id="gallery_legacy" %}
 
 
+![image](/assets/images/artisan-plus-logo.svg){: style="width: 3%;"} [<span style="color: #2899c7;font-weight:bold;">artisan.plus</span>](https://artisan.plus){:target="_blank"} inventory management
+{: style="text-align: center;" }
 
 <br>
 
 **Release Sponsor**
-{: style="color: #4C97C3; font-size: larger; text-align: center; font-weight:bold;" }
+{: style="color: #2899c7; font-size: larger; text-align: center; font-weight:bold;" }
 ---
 
 <figure>
