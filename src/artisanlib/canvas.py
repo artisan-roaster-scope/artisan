@@ -13653,7 +13653,7 @@ class tgraphcanvas(QObject):
 
 
     def OffMonitorCloseDown(self, respectAlwaysON:bool, wasRecording:bool) -> None:
-        _log.debug('MODE: OffMonitorCloseDown')
+        _log.debug('MODE: OffMonitorCloseDown(%s,%s)',respectAlwaysON,wasRecording)
         try:
 
             if wasRecording:

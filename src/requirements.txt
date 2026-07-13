@@ -26,10 +26,10 @@
 ######
 # packages that are required on all platforms
 #
-setuptools==81.0.0 # forced by numpy 25.1 (current would be 83.0.0)
+setuptools==81.0.0 # forced by numpy 2.5.1 (current would be 83.0.0)
 wheel==0.47.0
 pyserial==3.5
-pymodbus==3.13.1
+pymodbus==3.14.0
 python-snap7==2.1.0
 Phidget22==1.25.20260408
 Unidecode==1.4.0

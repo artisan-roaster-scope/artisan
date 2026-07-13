@@ -396,7 +396,7 @@ class AsyncComm:
         while self._running:
             try:
                 if self._serial is not None:
-#                    _log.debug('connecting to serial port: %s ...', self._serial['port'])
+                    _log.debug('connecting to serial port: %s ...', self._serial['port'])
                     connect = self.open_serial_connection(
                         url = self._serial['port'],
                         baudrate = self._serial['baudrate'],
@@ -447,7 +447,7 @@ class AsyncComm:
                 #_log.debug('serial exception: %s',e)
                 pass
             except Exception as e: # pylint: disable=broad-except
-                _log.error(e)
+                _log.error('exception 1: %s', e)
             finally:
                 self._ACK_received = None
                 self.reset_readings()
@@ -455,7 +455,7 @@ class AsyncComm:
                     try:
                         self._disconnected_handler()
                     except Exception as e: # pylint: disable=broad-except
-                        _log.error(e)
+                        _log.error('exception 2: %s', e)
                 if writer is not None:
                     try:
                         writer.close()
@@ -463,7 +463,7 @@ class AsyncComm:
                     except SerialException as e:
                         _log.debug('serial exception: %s',e)
                     except Exception as e: # pylint: disable=broad-except
-                        _log.error(e)
+                        _log.error('exception 3: %s', e)
             await asyncio.sleep(1)
 
     def send(self, message:bytes) -> None:
@@ -504,8 +504,9 @@ class AsyncComm:
                 return True
             except TimeoutError:
                 if self._logging:
-                    _log.info('write_await (msg=%s, send_timeout:%s)', message.strip(), send_timeout)
+                    _log.info('write_await (msg=%s, send_timeout:%s) timeout', message.strip(), send_timeout)
             if self.write_error_sem.locked():
+                _log.debug('write error count exhausted. Trigger disconnect.')
                 # trigger a disconnect as the allowed write errors count is exhausted
                 # disconnect by putting an empty message on the write queue which terminates the write handler
                 await self._write_queue.put(b'')
