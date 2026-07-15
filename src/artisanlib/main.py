@@ -212,7 +212,7 @@ from artisanlib.util import (appFrozen, uchr, decodeLocal, decodeLocalStrict, en
         toBool, toStringList, removeAll, application_name, application_viewer_name, application_organization_name,
         application_organization_domain, application_desktop_file_name, getDataDirectory, getDocumentsDirectory, getAppPath, getResourcePath, debugLogLevelToggle,
         debugLogLevelActive, setDebugLogLevel, createGradient, natsort, setDeviceDebugLogLevel,
-        comma2dot, is_proper_temp, weight_units, volume_units, float2float, float2str,
+        comma2dot, is_proper_temp, weight_units, weight_units_lower, volume_units, float2float, float2str,
         convertWeight, convertVolume, rgba_colorname2argb_colorname, render_weight, serialize, deserialize, csv_load, exportProfile2CSV, findTPint,
         eventtime2string, toDim, signature_message, rec_int_to_float)
 
@@ -16032,9 +16032,9 @@ class ApplicationWindow(QMainWindow):
                 current_weight_unit_idx = 0
             if 'weight' in profile and len(profile['weight']) == 3:
                 weight = profile['weight']
-                unit = decodeLocalStrict(weight[2], 'g')
+                unit = decodeLocalStrict(weight[2], 'g').lower()
                 try:
-                    weight_unit_idx = weight_units.index(unit)
+                    weight_unit_idx = weight_units_lower.index(unit)
                 except ValueError:
                     weight_unit_idx = 0
                 self.qmc.weight = (
@@ -16402,6 +16402,16 @@ class ApplicationWindow(QMainWindow):
                 timeindex_len = len(self.qmc.timeindex)
                 self.qmc.timeindex = [max(0,min(v,data_len-1)) if i>0 else max(-1,min(v,data_len-1)) for i,v in enumerate(profile['timeindex'][:timeindex_len])]
                 self.qmc.timeindex = self.qmc.timeindex + [0]*(max(0, timeindex_len - len(self.qmc.timeindex))) # ensure correct len
+
+                # disable out-of-order event indices from timeindex by setting them to zero
+                def remove_invalid_indices(l:list[int]) -> list[int]:
+                    prev_max_idx:int = -1
+                    res:list[int] = []
+                    for e in l:
+                        res.append(e if e == 0 or e >= prev_max_idx else 0)
+                        prev_max_idx = max(e, prev_max_idx)
+                    return res
+                self.qmc.timeindex = remove_invalid_indices(self.qmc.timeindex)
 
                 if self.qmc.locktimex:
                     if self.qmc.timeindex[0] != -1:
@@ -26867,7 +26877,7 @@ class ApplicationWindow(QMainWindow):
                 ('\\R', QApplication.translate('Label','RELEASE')),
                 ('\\s', QApplication.translate('Label','START')),
                 ('\\S', (QApplication.translate('Label','STOP') if state else QApplication.translate('Label','START'))),
-                ('\\T', f'{tempvalueC}{self.qmc.mode}'),
+                ('\\T', f'{sign}{tempvalueC}{self.qmc.mode}'),
                 ('\\V', f'{sign}{value}{percent}'),
                 ('\\w', self.qmc.etypes[1])
                 ]:
