@@ -49,7 +49,7 @@ message Roast {
   //          bt_ror_readings, et_ror_readings}:
   //      len(readings) == len(time)
   //   for curve in additional_curves:
-  //      len(curve.times) == len(annotationscurve.values)
+  //       len(curve.values) == len(times)
   // - if milestones.charge_idx is given:
   //      times[milestones.charge_idx] = 0
   //   elif len(times)>0:
@@ -77,11 +77,9 @@ message Roast {
     repeated float values = 4;
   }
 
-  // the value -1 is used as null value to indicate a missing reading in values
   message Signal {
     string name = 1;
-    repeated float times = 2;
-    repeated float values = 3;
+    repeated float values = 2;
   }
 
   string org_id = 1;           // id of organization
@@ -92,7 +90,7 @@ message Roast {
   repeated float times = 6;    // [s] relative to CHARGE
   Milestones milestones = 7;   // main roasting events like CHARGE, FCs, ...
   Annotations annotations = 8; // manual placed annotations
-  repeated Events events = 9;  // spares events of various types like power level
+  repeated Events events = 9;  // spares events of various types like power
   repeated float bt_readings = 10;  // [Celsius] bean temperatures
   repeated float et_readings = 11;  // [Celsius] environmental temperatures
   repeated float bt_ror_readings = 12; // [Celsius/min] BT RoR
