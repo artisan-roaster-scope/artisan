@@ -77,7 +77,7 @@ message Roast {
     repeated float values = 4;
   }
 
-  message Signal {
+  message Curve {
     string name = 1;
     repeated float values = 2;
   }
@@ -93,7 +93,7 @@ message Roast {
   repeated Events events = 9;  // spares events of various types like power
   repeated float bt_readings = 10;  // [Celsius] bean temperatures
   repeated float et_readings = 11;  // [Celsius] environmental temperatures
-  repeated float bt_ror_readings = 12; // [Celsius/min] BT RoR
-  repeated float et_ror_readings = 13; // [Celsius/min] ET RoR
-  repeated Signal additional_curves = 14;  // additional curves
+  repeated float bt_ror_readings = 12;   // [Celsius/min] BT RoR
+  repeated float et_ror_readings = 13;   // [Celsius/min] ET RoR
+  repeated Curve additional_curves = 14; // additional curves
 }
