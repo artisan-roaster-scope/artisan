@@ -37,8 +37,8 @@ message Roast {
 // - all indices of the given milestones are valid
 //   for idx in milestones.*_idx: 0 <= idx < len(times)
 // - all annotations are well defined and valid
-//   len(anotations.time_indices) == len(anotations.tags) and
-//   for idx in anotations.time_indices: 0 <= idx < len(times)
+//   len(annotations.time_indices) == len(annotations.tags) and
+//   for idx in annotations.time_indices: 0 <= idx < len(times)
 // - all events are well defined and valid
 //   for events in {events1, events2, events3, events4}:
 //     len(events.time_indices) == len(events.values) and
@@ -49,7 +49,7 @@ message Roast {
 //          bt_ror_readings, et_ror_readings}:
 //      len(readings) == len(time)
 //   for curve in additional_curves:
-//      len(curve.times) == len(anotationscurve.values)
+//      len(curve.times) == len(annotationscurve.values)
 
   message Milestones {
     int32 charge_idx = 1;
