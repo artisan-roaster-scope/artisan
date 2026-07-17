@@ -26,34 +26,34 @@ import "google/protobuf/timestamp.proto";
 
 message Roast {
 
-// NOTES
-//
-// The value -1 is used as a null value to indicate a missing
-// value in sequences of readings, such as bt_readings, et_readings,
-// bt_ror_readings, and et_ror_readings.
-//
-// INVARIANTS
-//
-// - all indices of the given milestones are valid
-//   for idx in milestones.*_idx: 0 <= idx < len(times)
-// - all annotations are well defined and valid
-//   len(annotations.time_indices) == len(annotations.tags) and
-//   for idx in annotations.time_indices: 0 <= idx < len(times)
-// - all events are well defined and valid
-//   for events in {events1, events2, events3, events4}:
-//     len(events.time_indices) == len(events.values) and
-//     for idx in events.time_indices: 0 <= idx <= len(times)
-// - all readings are valid
-//   for readings in {
-//          bt_readings, et_readings,
-//          bt_ror_readings, et_ror_readings}:
-//      len(readings) == len(time)
-//   for curve in additional_curves:
-//      len(curve.times) == len(annotationscurve.values)
-// - if milestones.charge_idx is given:
-//      times[milestones.charge_idx] = 0
-//   elif len(times)>0:
-//      times[0] = 0
+  // NOTES
+  //
+  // The value -1 is used as a null value to indicate a missing
+  // value in sequences of readings, such as bt_readings, et_readings,
+  // bt_ror_readings, and et_ror_readings.
+  //
+  // INVARIANTS
+  //
+  // - all indices of the given milestones are valid
+  //   for idx in milestones.*_idx: 0 <= idx < len(times)
+  // - all annotations are well defined and valid
+  //   len(annotations.time_indices) == len(annotations.tags) and
+  //   for idx in annotations.time_indices: 0 <= idx < len(times)
+  // - all events are well defined and valid
+  //   for events in {events1, events2, events3, events4}:
+  //     len(events.time_indices) == len(events.values) and
+  //     for idx in events.time_indices: 0 <= idx <= len(times)
+  // - all readings are valid
+  //   for readings in {
+  //          bt_readings, et_readings,
+  //          bt_ror_readings, et_ror_readings}:
+  //      len(readings) == len(time)
+  //   for curve in additional_curves:
+  //      len(curve.times) == len(annotationscurve.values)
+  // - if milestones.charge_idx is given:
+  //      times[milestones.charge_idx] = 0
+  //   elif len(times)>0:
+  //      times[0] = 0
 
   message Milestones {
     int32 charge_idx = 1;
@@ -92,13 +92,10 @@ message Roast {
   repeated float times = 6;    // [s] relative to CHARGE
   Milestones milestones = 7;   // main roasting events like CHARGE, FCs, ...
   Annotations annotations = 8; // manual placed annotations
-  Events events1 = 9;          // events of a custom type like fan speed
-  Events events2 = 10;         // events of a custom type like drum speed
-  Events events3 = 11;         // events of a custom type like damper
-  Events events4 = 12;         // events of a custom type like burner level
-  repeated float bt_readings = 13;  // [Celsius] bean temperatures
-  repeated float et_readings = 14;  // [Celsius] environmental temperatures
-  repeated float bt_ror_readings = 15; // [Celsius/min] BT RoR
-  repeated float et_ror_readings = 16; // [Celsius/min] ET RoR
-  repeated Signal additional_curves = 17;  // additional curves
+  repeated Events events = 9;  // spares events of various types like power level
+  repeated float bt_readings = 10;  // [Celsius] bean temperatures
+  repeated float et_readings = 11;  // [Celsius] environmental temperatures
+  repeated float bt_ror_readings = 12; // [Celsius/min] BT RoR
+  repeated float et_ror_readings = 13; // [Celsius/min] ET RoR
+  repeated Signal additional_curves = 14;  // additional curves
 }
