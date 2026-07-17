@@ -50,6 +50,10 @@ message Roast {
 //      len(readings) == len(time)
 //   for curve in additional_curves:
 //      len(curve.times) == len(annotationscurve.values)
+// - if milestones.charge_idx is given:
+//      times[milestones.charge_idx] = 0
+//   elif len(times)>0:
+//      times[0] = 0
 
   message Milestones {
     int32 charge_idx = 1;
