@@ -103,7 +103,7 @@ message Roast {
     string name = 1;
     string unit = 2;
     repeated int32 time_indices = 3;
-    repeated float values = 4;
+    repeated int32 values = 4;
   }
 
   message Curve {
@@ -118,8 +118,8 @@ message Roast {
   google.protobuf.Timestamp end = 5;     // end of roast
   repeated float times = 6;    // [s] roast time relative to CHARGE
   Milestones milestones = 7;   // main roasting events like CHARGE, FCs, ...
-  Annotations annotations = 8; // manual placed annotations
-  repeated Events events = 9;  // spares events of various types like power
+  Annotations annotations = 8; // text annotations
+  repeated Events events = 9;  // events like power changes
   repeated float bt_values = 10;  // [Celsius] bean temperatures
   repeated float et_values = 11;  // [Celsius] environmental temperatures
   repeated float bt_ror_values = 12;     // [Celsius/min] BT RoR
