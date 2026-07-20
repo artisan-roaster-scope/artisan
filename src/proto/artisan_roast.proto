@@ -109,6 +109,7 @@ message Roast {
   message Curve {
     string name = 1;
     repeated float values = 2;
+    bool temperatures = 3;
   }
 
   string org_id = 1;           // id of organization
