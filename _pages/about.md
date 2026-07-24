@@ -413,6 +413,7 @@ The development of **<span style="color: #2899c7;">artisan</span>** is supported
           <img src="/assets/images/santoker-logo.svg" alt="Santoker" loading="lazy" decoding="async" />
       </a>
       
+      
 <!--      
       <a target="_blank" href="https://www.primoroasting.com/" title="Primo">
           <picture>
@@ -445,6 +446,12 @@ The development of **<span style="color: #2899c7;">artisan</span>** is supported
       </a>
       <a target="_blank" href="https://orbiter.coffee/" title="Orbiter">
           <img src="/assets/images/orbiter-logo.svg" alt="Orbiter" loading="lazy" decoding="async" />
+      </a>
+      <a target="_blank" href="https://dutchmasterroasters.com/" title="Dutch Master Roasters">
+          <img src="/assets/images/dmr-logo.webp" alt="Dutch Master Roasters" loading="lazy" decoding="async" />
+      </a>
+      <a target="_blank" href="https://roasthubs.com/" title="RoastHubs">
+          <img src="/assets/images/roasthubs-logo.webp" alt="RoastHubs" loading="lazy" decoding="async" />
       </a>
       
 </figure>

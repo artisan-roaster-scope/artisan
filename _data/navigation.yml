@@ -66,6 +66,8 @@ machines:
         url: /machines/diedrich/
       - title: "Dongyi"
         url: /machines/dongyi/
+      - title: "Dutch Master Roasters"
+        url: /machines/dmr/
       - title: "Easyster"
         url: /machines/easyster/
       - title: "Fabrica Coffee Roasters"
