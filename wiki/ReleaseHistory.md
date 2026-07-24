@@ -6,6 +6,7 @@ v4.2.2
 ------------------
 
 * ADDITIONS
+  - adds support for [Dutch Master Roasters](https://artisan-scope.org/machines/dmr/)
   - adds autoCHARGE/DROP and drum speed control to the [Schuilenburg](https://artisan-scope.org/machines/schuilenburg/) PLC machine setup
 * FIXES
   - fixes faulty hash generation on files created using `Save As` causing `modified file` warnings on load ([Issue #2205](../../../issues/2205))

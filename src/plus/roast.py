@@ -60,6 +60,7 @@ def getTemplate(bp: 'ProfileData', background:bool=False) -> dict[str, Any]:
                 gmt_offset = util.limitnum(
                     -60000, 60000, util.getGMToffset()
                 )
+
                 if gmt_offset is not None:
                     d['GMT_offset'] = gmt_offset
         except Exception as e:  # pylint: disable=broad-except
@@ -218,6 +219,7 @@ def getTemplate(bp: 'ProfileData', background:bool=False) -> dict[str, Any]:
                 cp,
                 d,
                 [
+                    ('CHARGE_time', 'charge_time'),
                     'TP_time',
                     'DRY_time',
                     'FCs_time',

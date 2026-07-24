@@ -16,14 +16,66 @@ Key Features:
 """
 
 import os
+import warnings
+import math
 import pytest
 import tempfile
 import hypothesis.strategies as st
+import numpy as np
 from hypothesis import example, given, settings
 from pathlib import Path
 from collections.abc import Generator
-from typing import Any
+from typing import Any, cast
 
+# Import the atypes module directly without aggressive mocking
+# The atypes module only contains type definitions and doesn't need runtime mocking
+from artisanlib import atypes
+
+#######
+# Helpers
+
+
+@pytest.fixture
+def sample_profile_data() -> dict[str, Any]:
+    """Provide a sample ProfileData for testing."""
+    return {
+        'version': '2.8.4',
+        'build': '1234',
+        'title': 'Test Roast Profile',
+        'beans': 'Ethiopian Yirgacheffe',
+        'roastdate': 'Fri May 30 2025',
+        'roastisodate': '2025-05-30',
+        'roasttime': '17:32:08',
+        'roastepoch': 1748619128,
+        'roasttzoffset': -3600,
+        'roastUUID': 'eb4bfabfe18a4b31aba72f8961b74a07',
+        'weight': [1000.0, 845.0],
+        'volume': [1500.0, 2275.0],
+        'density': [0.65, 0.45],
+        'roastertype': 'Probat',
+        'roastersize': 12.0,
+        'operator': 'Test Operator',
+        'timeindex': [1,2,0,0,0,0,3,0],
+        'timex': [0.0, 30.0, 60.0, 90.0, 120.0],
+        'temp1': [20.0, 50.0, 80.0, 120.0, 150.0],
+        'temp2': [18.0, 45.0, 75.0, -1, 145.0],
+        'specialevents': [0, 1, 2, 3, 3, 2, 1],
+        'specialeventstype': [0, 1, 2, 2, 3, 4, 4],
+        'specialeventsvalue': [8.0, 2.5, 21.3, 11.0, 6.52, 0, 0],
+        'specialeventsStrings': ['', '', '', '', '', 'sample2', 'sample1'],
+        'etypes': ['Air', 'Drum', 'Damper', 'Burner', '--'],
+        'eventsliderunits': ['Pa', 'RPM', '', '%'],
+        'extradevices': [0, 1],
+        'extraname1': ['Extra 1', 'Extra 2'],
+        'extraname2': ['Extra 1 Ch2', 'Extra 2 Ch2'],
+        'roastbatchnr': 1,
+        'roastbatchprefix': 'B',
+        'whole_color': 65,
+        'ground_color': 70,
+        'color_system': 'Agtron',
+        'cuppingnotes': 'Bright acidity, floral notes',
+        'roastingnotes': 'Light roast, stopped at first crack',
+    }
 
 @pytest.fixture(scope='session', autouse=True)
 def session_level_isolation() -> Generator[None, None, None]:
@@ -120,7 +172,11 @@ from artisanlib.util import (
     timearray2index,
     findTPint,
     eventtime2string,
+    medfilt,
+    polyRoR,
+    arrayRoR,
     serialize,
+    roast_message,
     max_blocks,
     min_blocks,
 )
@@ -1960,7 +2016,171 @@ def test_eventtime2string_various_times(seconds: float, expected_format: str) ->
     assert result == expected_format
 
 
+class TestMedfilt:
+    """Test medfilt static method."""
 
+    def test_medfilt_basic(self) -> None:
+        """Test medfilt with basic input."""
+        # Arrange
+        x = np.array([1.0, 5.0, 2.0, 8.0, 3.0])
+        k = 3
+
+        # Act
+        result = medfilt(x, k)
+
+        # Assert
+        expected = np.array([1.0, 2.0, 5.0, 3.0, 3.0])
+        np.testing.assert_array_equal(result, expected)
+
+    def test_medfilt_single_element(self) -> None:
+        """Test medfilt with single element."""
+        # Arrange
+        x = np.array([5.0])
+        k = 1
+
+        # Act
+        result = medfilt(x, k)
+
+        # Assert
+        np.testing.assert_array_equal(result, np.array([5.0]))
+
+    def test_medfilt_larger_window(self) -> None:
+        """Test medfilt with larger window size."""
+        # Arrange
+        x = np.array([1.0, 2.0, 10.0, 3.0, 4.0, 5.0, 6.0])
+        k = 5
+
+        # Act
+        result = medfilt(x, k)
+
+        # Assert
+        assert len(result) == len(x)
+        # The outlier (10.0) should be filtered out
+        assert result[2] != 10.0
+
+    def test_medfilt_odd_window_size_required(self) -> None:
+        """Test medfilt raises assertion error for even window size."""
+        # Arrange
+        x = np.array([1.0, 2.0, 3.0])
+        k = 2  # Even number
+
+        # Act & Assert
+        with pytest.raises(AssertionError, match='Median filter length must be odd'):
+            medfilt(x, k)
+
+class TestPolyRoR:
+    """Test polyRoR static method."""
+
+    def test_polyRoR_basic(self) -> None:
+        """Test polyRoR with basic linear data."""
+        # Arrange - linear temperature increase
+        tx = np.array([0.0, 1.0, 2.0, 3.0, 4.0])
+        temp = np.array([20.0, 22.0, 24.0, 26.0, 28.0])  # 2°C per minute
+        wsize = 1
+        i = 2
+
+        # Act
+        result = polyRoR(tx, temp, wsize, i)
+
+        # Assert
+        # Expected RoR: 2°C/min * 60 = 120°C/hour
+        assert abs(result - 120.0) < 1e-10
+
+    def test_polyRoR_zero_index(self) -> None:
+        """Test polyRoR with index 0 (should use index 1)."""
+        # Arrange
+        tx = np.array([0.0, 1.0, 2.0])
+        temp = np.array([20.0, 25.0, 30.0])
+        wsize = 1
+        i = 0
+
+        # Act
+        result = polyRoR(tx, temp, wsize, i)
+
+        # Assert
+        # Should use index 1, so same as polyRoR(tx, temp, wsize, 1)
+        expected = polyRoR(tx, temp, wsize, 1)
+        assert result == expected
+
+    def test_polyRoR_out_of_bounds(self) -> None:
+        """Test polyRoR with out of bounds index."""
+        # Arrange
+        tx = np.array([0.0, 1.0, 2.0])
+        temp = np.array([20.0, 25.0, 30.0])
+        wsize = 1
+        i = 10  # Out of bounds
+
+        # Act
+        result = polyRoR(tx, temp, wsize, i)
+
+        # Assert
+        assert result == 0
+
+    def test_polyRoR_larger_window(self) -> None:
+        """Test polyRoR with larger window size."""
+        # Arrange
+        tx = np.array([0.0, 1.0, 2.0, 3.0, 4.0, 5.0])
+        temp = np.array([20.0, 22.0, 24.0, 26.0, 28.0, 30.0])
+        wsize = 3
+        i = 4
+
+        # Act
+        result = polyRoR(tx, temp, wsize, i)
+
+        # Assert
+        assert isinstance(result, float)
+        assert result > 0  # Should be positive for increasing temperature
+
+
+class TestArrayRoR:
+    """Test arrayRoR static method."""
+
+    def test_arrayRoR_basic(self) -> None:
+        """Test arrayRoR with basic linear data."""
+        # Arrange - linear temperature increase
+        tx = np.array([0.0, 1.0, 2.0, 3.0, 4.0])
+        temp = np.array([20.0, 22.0, 24.0, 26.0, 28.0])  # 2°C per minute
+        wsize = 1
+
+        # Act
+        result = arrayRoR(tx, temp, wsize)
+
+        # Assert
+        expected = np.array([120.0, 120.0, 120.0, 120.0])  # 2°C/min * 60 = 120°C/hour
+        np.testing.assert_array_almost_equal(result, expected)
+
+    def test_arrayRoR_larger_window(self) -> None:
+        """Test arrayRoR with larger window size."""
+        # Arrange
+        tx = np.array([0.0, 1.0, 2.0, 3.0, 4.0, 5.0])
+        temp = np.array([20.0, 22.0, 24.0, 26.0, 28.0, 30.0])
+        wsize = 2
+
+        # Act
+        result = arrayRoR(tx, temp, wsize)
+
+        # Assert
+        assert len(result) == len(tx) - wsize
+        assert len(result) == 4
+        # All values should be 120 for linear increase
+        np.testing.assert_array_almost_equal(result, np.array([120.0, 120.0, 120.0, 120.0]))
+
+    def test_arrayRoR_zero_time_difference(self) -> None:
+        """Test arrayRoR with zero time difference (should handle division by zero)."""
+        # Arrange
+        tx = np.array([1.0, 1.0, 2.0])  # Same time for first two points
+        temp = np.array([20.0, 25.0, 30.0])
+        wsize = 1
+
+        # Act - suppress expected divide by zero warning
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', RuntimeWarning)
+            result = arrayRoR(tx, temp, wsize)
+
+        # Assert
+        assert len(result) == 2
+        # First result should be inf due to division by zero
+        assert math.isinf(result[0])
 
 class TestSerialize:
     """Test serialize static method."""
@@ -2020,6 +2240,127 @@ class TestSerialize:
                 assert 'inner' in content
         finally:
             os.unlink(temp_filename)
+
+
+
+
+# pytest -s -k TestRoastMessage
+class TestRoastMessage:
+    """Test roast_message static method."""
+
+    def test_roast_message_sample_profile(self, sample_profile_data: dict[str, Any]) -> None:
+        profile_data: atypes.ProfileData = cast(atypes.ProfileData, sample_profile_data)
+        #print(profile_data)
+
+        # Act
+        msg = roast_message(profile_data, org_id = 'org1', machine_id = 'machine1', smooth_curves=True)
+
+        if msg is not None:
+
+            from google.protobuf.json_format import MessageToDict
+            msg_dict = MessageToDict(msg, preserving_proto_field_name=True)
+
+            # Assert
+            assert msg.HasField('org_id')
+            assert msg.HasField('machine_id')
+
+            # INVARIANTS
+
+            #// - roast_id is mandatory
+            #//   HasField(roast_id)
+            assert msg.HasField('roast_id')
+
+            #// - all indices of the given milestones are valid and strict monotonic
+            #//   milestone_idicies = [
+            #//      milestones.charge_idx,
+            #//      milestones.dry_end_idx,
+            #//      milestones.first_crack_start_idx,
+            #//      milestones.first_crack_end_idx,
+            #//      milestones.second_crack_start_idx,
+            #//      milestones.second_crack_end_idx,
+            #//      milestones.drop_idx
+            #//   ]
+            #//   for i, idx in enumerate(milestone_idicies):
+            #//     if hasValue(idx):
+            #//         0 <= idx < len(times) and
+            #//         for 0 <= j < i:
+            #//         if hasValue(milestone_idicies[j]
+            #//            milestone_idicies[j] < idx
+            if msg.HasField('milestones'):
+                milestone_indicies = [
+                    'charge_idx',
+                    'dry_end_idx',
+                    'first_crack_start_idx',
+                    'first_crack_end_idx',
+                    'second_crack_start_idx',
+                    'second_crack_end_idx',
+                    'drop_idx'
+                ]
+                for i, idx in enumerate(milestone_indicies):
+                    if idx in msg_dict['milestones']:
+                        assert 0 <= msg_dict['milestones'][idx] < len(msg.times)
+                        for j in range(i):
+                            if milestone_indicies[j] in msg_dict['milestones']:
+                                assert msg_dict['milestones'][milestone_indicies[j]] < msg_dict['milestones'][idx]
+
+            #// - all annotations are well defined and valid
+            #//   len(annotations.time_indices) == len(annotations.tags) and
+            #//   for idx in annotations.time_indices: 0 <= idx < len(times)
+            if msg.HasField('annotations'):
+                assert len(msg.annotations.time_indices) == len(msg.annotations.tags)
+                for ind in msg.annotations.time_indices:
+                    assert 0 <= ind <= len(msg.times)
+
+            #// - all events are well defined, valid and event values are positive
+            #//   for events:
+            #//       len(events.time_indices) == len(events.values) and
+            #//       for idx in events.time_indices:
+            #//          0 <= idx <= len(times)
+            #//       for v in events.values:
+            #//          v >= 0
+            for event in msg.events:
+                assert len(event.time_indices) == len(event.values)
+                for ind in event.time_indices:
+                    assert 0 <= ind <= len(msg.times)
+                for value in event.values:
+                    assert value >= 0
+
+            #// - all readings are valid
+            #//   for readings in {
+            #//          bt_values, et_values,
+            #//          bt_ror_values, et_ror_values}:
+            #//      len(readings) <= len(times)
+            #//   for curve in additional_curves:
+            #//       len(curve.values) <= len(times)
+            assert len(msg.bt_values) <= len(msg.times)
+            assert len(msg.et_values) <= len(msg.times)
+            assert len(msg.bt_ror_values) <= len(msg.times)
+            assert len(msg.et_ror_values) <= len(msg.times)
+            for curve in msg.additional_curves:
+                assert len(curve.values) <= len(msg.times)
+
+            #// - time is monotonic
+            #//   for i in range(0,len(times)):
+            #//      for 0 <= j < i:
+            #//         times[j] <= times[i]
+            assert all(x<=y for x, y in zip(msg.times, msg.times[1:], strict=False))
+
+            #// - time of CHARGE (start of roast)
+            #//   if HasField(milestones) and HasField(milestones.charge_idx):
+            #//      times[milestones.charge_idx] == 0
+            #//   elif len(times)>0:
+            #//      times[0] = 0
+            #//   NOTE: time[x]=0 corresponds to timestamp 'start'
+            if msg.HasField('milestones') and msg.milestones.HasField('charge_idx'):
+                assert msg.times[msg.milestones.charge_idx] == 0
+            elif len(msg.times)>0:
+                assert msg.times[0] == 0
+
+            #// - multiplication factor is >0 (defaults to 1 if not given)
+            #//   if HasField(factor):
+            #//      factor > 0
+            if msg.HasField('factor'):
+                assert msg.factor > 0
 
 
 @pytest.mark.parametrize(

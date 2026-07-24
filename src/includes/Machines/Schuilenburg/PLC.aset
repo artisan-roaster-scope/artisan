@@ -23,7 +23,7 @@ SVwriteLong=false
 baudrate=115200
 bytesize=8
 comport=COM5
-fetch_max_blocks=false
+fetch_max_blocks=true
 host=192.168.0.100
 input10BCDsAsInt=false
 input10FloatsAsInt=false
@@ -156,7 +156,7 @@ extradevicecolor1=#d25343ff, #ad0427ff, #49b160ff, #000000
 extradevicecolor2=#43a7cfff, #43a7cfff, #800080ff, #000000
 extradevices=33, 55, 109, 150
 extramathexpression1=, , , 
-extramathexpression2=, , , 
+extramathexpression2=, , x*10, 
 extraname1=IT, {3}, {1}, Charging
 extraname2=CT, {0}, Pa, Discharging
 
