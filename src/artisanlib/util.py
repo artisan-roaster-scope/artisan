@@ -15,6 +15,7 @@
 # AUTHOR
 # Marko Luther, 2023
 
+import warnings
 import codecs
 import logging
 import platform
@@ -26,10 +27,11 @@ import re
 import ast
 import numpy
 import functools
+import datetime
 from bisect import bisect_right
 from pathlib import Path
 from matplotlib import colors
-from collections.abc import Iterator
+from collections.abc import Iterator, Callable
 from typing import Final, Literal, Any, TypeGuard, cast, TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -38,6 +40,7 @@ if TYPE_CHECKING:
     import numpy.typing as npt # pylint: disable=unused-import
 
 from artisanlib.atypes import ProfileData
+from proto import artisan_roast_pb2 # type:ignore[unused-ignore]
 
 ##
 
@@ -50,7 +53,7 @@ application_organization_domain: Final[str] = 'artisan-scope.org'
 application_desktop_file_name: Final[str] = 'org.artisan_scope.artisan'
 
 
-from PyQt6.QtCore import QStandardPaths, QCoreApplication, QTime, QDate, QDateTime
+from PyQt6.QtCore import Qt, QStandardPaths, QCoreApplication, QTime, QDate, QDateTime
 from PyQt6.QtGui import QColor
 
 
@@ -999,7 +1002,344 @@ def events_external_to_internal_value(v:int) -> float:
     return v/10. - 1.
 
 
-# serialize/deserialize
+### curve smoothing
+
+
+# smoothes a list (or numpy.array) of values 'y' at taken at times indicated by the numbers in list 'x'
+# 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'
+# 'flat' results in moving average
+# window_len should be odd
+# based on http://wiki.scipy.org/Cookbook/SignalSmooth
+# returns a smoothed numpy array or the original y argument
+def smooth(x:'npt.NDArray[numpy.floating]', y:'npt.NDArray[numpy.float64]', window_len:int = 15, window:str = 'hanning') -> 'npt.NDArray[numpy.floating]':
+    try:
+        if len(x) == len(y) and len(x) > 1:
+            if window_len > 2:
+                # smooth curves
+                #s = numpy.r_[2*x[0]-y[window_len:1:-1],y,2*y[-1]-y[-1:-window_len:-1]]
+                #s=numpy.r_[y[window_len-1:0:-1],y,y[-2:-window_len-1:-1]]
+                #s = y
+                s = numpy.r_[y[window_len-1:0:-1],y,y[-1:-window_len:-1]]
+                if window == 'flat': #moving average
+                    w = numpy.ones(window_len,'d')
+                else:
+                    w = eval('numpy.'+window+'(window_len)') # pylint: disable=eval-used
+                try:
+                    ys = numpy.convolve(w/w.sum(), s, mode='valid')
+                except Exception: # pylint: disable=broad-except
+                    return y
+                hwl = int(window_len/2)
+                res = ys[hwl:-hwl]
+                if len(res)+1 == len(y) and len(res) > 0:
+                    try:
+                        return ys[hwl-1:-hwl] # zuban:ignore[return-value,no-any-return,unused-ignore]
+                    except Exception: # pylint: disable=broad-except
+                        return y
+                elif len(res) != len(y):
+                    return y
+                return res # zuban:ignore[return-value,no-any-return,unused-ignore]
+            return y
+        return y
+    except Exception as ex: # pylint: disable=broad-except
+        _log.exception(ex)
+        return x
+
+
+# https://gist.github.com/bhawkins/3535131
+def medfilt(x:'npt.NDArray[numpy.double]', k:int) -> 'npt.NDArray[numpy.double]':
+    """Apply a length-k median filter to a 1D array x.
+    Boundaries are extended by repeating endpoints.
+    """
+    assert k % 2 == 1, 'Median filter length must be odd.'
+    assert x.ndim == 1, 'Input must be one-dimensional.'
+    if len(x) == 0:
+        return x
+    k2 = (k - 1) // 2
+    y = numpy.zeros ((len (x), k), dtype=x.dtype)
+    y[:,k2] = x
+    for i in range (k2):
+        j = k2 - i
+        y[j:,i] = x[:-j]
+        y[:j,i] = x[0]
+        y[:-j,-(i+1)] = x[j:]
+        y[-j:,-(i+1)] = x[-1]
+    return numpy.median(y, axis=1)
+#    return numpy.nanmedian(y, axis=1) # produces artefacts
+
+# re-sample, filter and smooth slice
+# takes numpy arrays a (time) and b (temp) of the same length and returns a numpy array representing the processed b values
+# precondition: (filter_dropouts or window_len>2)
+def smooth_slice(a:'npt.NDArray[numpy.double]', b:'npt.NDArray[numpy.float64]',
+    window_len:int = 7, window:str = 'hanning', decay_weights:list[int]|None = None, decay_smoothing:bool = False,
+    re_sample:bool = True, back_sample:bool = True, a_lin:'npt.NDArray[numpy.double]|None' = None,
+    medfilt_factor:int = 3,
+    filter_dropouts:bool=False) -> 'npt.NDArray[numpy.double]':
+    a_mod:npt.NDArray[numpy.floating]
+    # 1. re-sample
+    if re_sample:
+        if a_lin is None or len(a_lin) != len(a):
+            a_mod = cast(numpy.ndarray[tuple[Literal[1]]], numpy.linspace(a[0],a[-1],len(a)))
+        else:
+            a_mod = a_lin
+        b = cast(numpy.ndarray[Any], numpy.interp(a_mod, a, b)) # resample data to linear spaced time
+    else:
+        a_mod = a
+    res:npt.NDArray[numpy.floating] = b # just in case the precondition (filter_dropouts or window_len>2) does not hold
+
+    # 2. filter spikes (only applied offline)
+    if filter_dropouts:
+        try:
+#            if self.flagon:
+#                online_medfilt = LiveMedian(median_filter_factor)
+#                b = numpy.array(list(map(online_medfilt, b)))
+            bb = medfilt(b, medfilt_factor)
+#            #scipyernative which performs equal, but produces larger artefacts at the borders and for intermediate NaN values for k>3
+#            from scipy.signal import medfilt as scipy_medfilt
+#            b = scipy_medfilt(b,3)
+            res = bb
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
+            res = b
+    # 3. smooth data
+    if window_len>2:
+        if decay_smoothing:
+            # decay smoothing
+            decay_weights_internal:npt.NDArray[numpy.int_]
+            if decay_weights is None:
+                decay_weights_internal = numpy.arange(1,window_len+1)
+            else:
+                window_len = len(decay_weights)
+                decay_weights_internal = numpy.array(decay_weights)
+            # invariant: window_len = len(decay_weights_internal)
+            if decay_weights_internal.sum() == 0:
+                res = b
+            else:
+                result:list[float] = []
+                # ignore -1 readings in averaging and ensure a good ramp
+                for i, v in enumerate(b):
+                    seq = b[max(0,i-window_len + 1):i+1]
+                    w = decay_weights_internal[max(0,window_len-len(seq)):]  # preCond: len(decay_weights_internal)=window_len and len(seq) <= window_len; postCond: len(w)=len(seq)
+                    if len(w) == 0:
+                        # we don't average if there is are no weights (e.g. if the original seq did only contain -1 values and got empty)
+                        result.append(v)
+                    else:
+                        result.append(float(numpy.average(seq,axis=0,weights=w))) # works only if len(seq) = len(w)
+                res = numpy.array(result)
+                # postCond: len(res) = len(b)
+        else:
+            # optimal smoothing (the default)
+            win_len = max(0,window_len)
+            # at the lowest level we turn smoothing completely off
+            res = (smooth(a_mod, b, win_len, window) if win_len != 1 else b)
+    # 4. sample back
+    if re_sample and back_sample:
+        res = cast(numpy.ndarray[Any], numpy.interp(a, a_mod, res)) # pyright:ignore[reportUnknownArgumentType] # re-sampled back to original timestamps
+    return numpy.array(res).astype(numpy.double)
+
+
+# takes lists a (time array) and b (temperature array) containing invalid segments of -1/None values and returns a list with all segments of valid values smoothed
+# a: list of timestamps
+# b: list of readings
+# re_sample: if true re-sample readings to a linear spaced time before smoothing
+# back_sample: if true results are back-sampled to original timestamps given in "a" after smoothing
+# a_lin: pre-computed linear spaced timestamps of equal length than a
+# result is a numpy array or the b as numpy array with drop out readings -1 replaced by NaN if replace_error_value is set
+def smooth_list(
+        aa:'npt.NDArray[numpy.double]|npt.NDArray[numpy.floating]|Sequence[float]',
+        b:'npt.NDArray[numpy.double]|npt.NDArray[numpy.floating]|Sequence[float]',
+        window_len:int = 7,
+        window:str = 'hanning',
+        decay_weights:list[int]|None = None,
+        decay_smoothing:bool = False,
+        fromIndex:int = -1,
+        toIndex:int = 0,
+        re_sample:bool = True,
+        back_sample:bool = True,
+        a_lin:'npt.NDArray[numpy.double]|None' = None,
+        medfilt_factor:int = 3,
+        filter_dropouts:bool=False,
+        replace_error_values:bool=True) -> 'npt.NDArray[numpy.double]':
+    if len(aa) > 1 and len(aa) == len(b) and (filter_dropouts or window_len>2):
+        #pylint: disable=E1103
+        # 1. truncate
+        if fromIndex > -1: # if fromIndex is set, replace prefix up to fromIndex by None
+            if toIndex==0: # no limit
+                toIndex=len(aa)
+        else: # smooth list on full length
+            fromIndex = 0
+            toIndex = len(aa)
+        a = numpy.array(aa[fromIndex:toIndex], dtype=numpy.double)
+        # we mask the error value -1 and Numpy  in the temperature array
+        mb:numpy.ndarray[tuple[Literal[1]],numpy.dtype[numpy.float64]] = cast(numpy.ndarray[tuple[Literal[1]],numpy.dtype[numpy.float64]], numpy.ma.masked_equal(b[fromIndex:toIndex], -1))
+        # split in masked and
+        unmasked_slices = [(x,False) for x in numpy.ma.clump_unmasked(mb)] # type:ignore[no-untyped-call,attr-defined,unused-ignore] # the valid readings
+        masked_slices = [(x,True) for x in numpy.ma.clump_masked(mb)]  # type:ignore[no-untyped-call,attr-defined,unused-ignore] # the dropped values
+        sorted_slices = sorted(unmasked_slices + masked_slices, key=lambda tup: tup[0].start) # pyright:ignore[reportUnknownArgumentType] # pyright: ignore[reportGeneralTypeIssues]
+        b_smoothed:list[npt.NDArray[numpy.double]] = [] # pyright:ignore[reportUnknownArgumentType] # b_smoothed collects the smoothed segments in order
+        b_smoothed.append(numpy.full(fromIndex, numpy.nan, dtype=numpy.double)) # pyright:ignore[reportUnknownArgumentType] # append initial segment to the list of resulting segments
+        # we just smooth the unmsked slices and add the unmasked slices with NaN values
+        for (s, m) in sorted_slices:
+            if m:
+                # a slice with all masked (invalid) readings
+                b_smoothed.append(numpy.full(s.stop - s.start, numpy.nan, dtype=numpy.double)) # pyright:ignore[reportUnknownArgumentType]
+            else:
+                # a slice with proper data
+                b_smoothed.append(smooth_slice(a[s], mb[s], window_len, window, decay_weights, decay_smoothing, re_sample, back_sample, a_lin,
+                    medfilt_factor, filter_dropouts)) # pyright:ignore[reportUnknownArgumentType]
+        b_smoothed.append(numpy.full(len(a)-toIndex, numpy.nan, dtype=numpy.double)) # append the final segment to the list of resulting segments
+        bb = numpy.concatenate(b_smoothed)
+    else:
+        bb = numpy.array(b, dtype=numpy.double)
+    if replace_error_values:
+        bb[bb == -1] = numpy.nan
+    else:
+        bb[numpy.isnan(bb)] = -1
+    return bb
+
+
+### RoR computation
+
+# computes the RoR over the time and temperature arrays tx and temp via polynoms of degree 1 at index i using a window of wsize
+# the window size wsize needs to be at least 1 (two succeeding readings)
+def polyRoR(tx:'npt.NDArray[numpy.double]', temp:'npt.NDArray[numpy.double]', wsize:int, i:int) -> float:
+    if i == 0: # we duplicate the first possible RoR value instead of returning a 0
+        i = 1
+    if 0 < i < min(len(tx), len(temp)):
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            left_index = max(0,i-wsize)
+            LS_fit = numpy.polynomial.polynomial.polyfit(tx[left_index:i+1],temp[left_index:i+1], 1)
+            return float(LS_fit[1]*60.)
+    else:
+        return 0
+
+# with window size wsize=1 the RoR is computed over succeeding readings; tx and temp assumed to be of type numpy.array
+def arrayRoR(tx:'npt.NDArray[numpy.double]', temp:'npt.NDArray[numpy.double]', wsize:int) -> 'npt.NDArray[numpy.floating]': # with wsize >=1
+    # length compensation done downstream, not necessary here!
+    with warnings.catch_warnings():
+        # suppress warning if time difference is 0 which leads to a div by zero resulting in a warning and an inf value
+        warnings.simplefilter('ignore')
+        return (temp[wsize:] - temp[:-wsize]) / ((tx[wsize:] - tx[:-wsize])/60.)
+
+# returns deltas and linearized timex;  both results can be None
+# timex: the time array
+# temp: the temperature array
+# ds: the number of delta samples
+# optimal_smoothing: use offline optimal smoothing algorithm (like a Savgol filter)
+# timex_lin: the linearized time array or None
+# delta_filter: delta filter setting
+# roast_start_idx: the index of CHARGE
+# roast_end_idx: the index of DROP
+# polyfit_ror: use the polyfit RoR algorithm (if optimal_smoothing is set => Savgol filter)
+# medfilt_factor: median filter factor
+# filter_dropouts: if set dropouts are filtered out
+# limit_ror: if set the resulting RoR is limited
+# ror_limit_min: lower RoR limit
+# ror_limit_max: upper RoR limit
+# delta_symbolic_function: the symbolic function to be applied to the delta or None
+# RTsname: the symbolic variable name of the delta (assigned for eval_math_expression)
+# eval_math_expression: if given, this function is applied to each ror reading
+
+# result is a numpy array or the b as numpy array which may contain NaN
+def computeDeltas(
+        timex:'npt.NDArray[numpy.double]',
+        temp:'list[float]|npt.NDArray[numpy.double]|None',
+        ds:int,
+        optimal_smoothing:bool,
+        timex_lin:'npt.NDArray[numpy.double]|None',
+        delta_filter:int,
+        roast_start_idx:int,
+        roast_end_idx:int,
+        polyfit_ror:bool,
+        medfilt_factor:int,
+        filter_dropouts:bool,
+        limit_ror:bool,
+        ror_limit_min:int,
+        ror_limit_max:int,
+        replace_error_values:bool = True,
+        RTsname:str = '',
+        delta_symbolic_function:str = '',
+        eval_math_expression:Callable[[str,float,str,float], float]|None = None
+        ) -> tuple[list[float|None]|None, 'npt.NDArray[numpy.double]|None']:
+    if temp is not None:
+        z1:npt.NDArray[numpy.floating]
+        with numpy.errstate(divide='ignore'):
+            lt = len(timex)
+            ntemp = numpy.array([0 if x is None else x for x in temp]) # pyright: ignore[reportGeneralTypeIssues]
+            if optimal_smoothing and polyfit_ror:
+                # optimal RoR computation using polynoms with out timeshift
+                dss = ds + 1 if ds % 2 == 0 else ds
+                if len(ntemp) > dss:
+                    try:
+                        # ntemp is not linearized yet:
+                        lin: npt.NDArray[numpy.double]
+                        if timex_lin is None or len(timex_lin) != len(ntemp):
+                            lin = numpy.linspace(timex[0],timex[-1],lt)
+                        else:
+                            lin = timex_lin
+                        ntemp_lin = cast(numpy.ndarray[Any], numpy.interp(lin, timex, ntemp)) # pyright:ignore[reportUnknownArgumentType] # resample data in ntemp to linear spaced time
+                        dist:float = (lin[-1] - lin[0]) / (len(lin) - 1) # pyright:ignore[reportUnknownArgumentType]
+                        from scipy.signal import savgol_filter # type # ignore # @Reimport
+                        z1 = savgol_filter(ntemp_lin, dss, 1, deriv=1, delta=dss)
+                        z1 = z1 * (60./dist) * dss
+                    except Exception: # pylint: disable=broad-except
+                        # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an exception "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
+                        # https://github.com/numpy/numpy/issues/16744
+                        # original version just picking the corner values:
+                        z1 = arrayRoR(timex,ntemp,ds)
+                else:
+                    # in this case we use the standard algo
+                    try:
+                        # variant using incremental polyfit RoR computation
+                        z1 = numpy.array([polyRoR(timex,ntemp,ds,i) for i in range(len(ntemp))])
+                    except Exception: # pylint: disable=broad-except
+                        # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an exception "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
+                        # https://github.com/numpy/numpy/issues/16744
+                        # original version just picking the corner values:
+                        z1 = arrayRoR(timex,ntemp,ds)
+            elif polyfit_ror:
+                try:
+                    # variant using incremental polyfit RoR computation
+                    z1 = numpy.array([polyRoR(timex,ntemp,ds,i) for i in range(len(ntemp))]) # windows size ds needs to be at least 2
+                except Exception: # pylint: disable=broad-except
+                    # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an exception "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
+                    # https://github.com/numpy/numpy/issues/16744
+                    # original version just picking the corner values:
+                    z1 = arrayRoR(timex,ntemp,ds)
+            else:
+                z1 = arrayRoR(timex,ntemp,ds)
+
+        ld1 = len(z1) # pyright:ignore[reportUnknownArgumentType]
+        # make lists equal in length
+        if lt > ld1:
+            z1 = numpy.append([z1[0] if ld1 else 0.]*(lt - ld1),z1) # pyright:ignore[reportUnknownArgumentType]
+        # apply smybolic formula
+        if delta_symbolic_function and eval_math_expression is not None and len(z1) == len(timex): # pyright:ignore[reportUnknownArgumentType]
+            try:
+                z1 = numpy.array([eval_math_expression(delta_symbolic_function, timex[i], RTsname, d) for i,d in enumerate(z1.tolist())]) # pyright:ignore[reportUnknownArgumentType]
+            except Exception: # pylint: disable=broad-except
+                pass
+        # apply smoothing
+        if optimal_smoothing:
+            user_filter = delta_filter
+        else:
+            user_filter = int(round(delta_filter/2.))
+        delta1 = smooth_list(timex,z1,window_len=user_filter,decay_smoothing=(not optimal_smoothing),a_lin=timex_lin, # pyright:ignore[reportUnknownArgumentType]
+                        medfilt_factor=medfilt_factor, filter_dropouts=filter_dropouts, replace_error_values=replace_error_values)
+
+        # cut out the part after DROP and before CHARGE and remove values beyond the RoRlimit
+        return [
+            d if ((roast_start_idx <= i <= roast_end_idx) and (d is not None and (not limit_ror or
+                ror_limit_min < d < ror_limit_max)))
+            else None
+            for i,d in enumerate(delta1)
+        ], timex_lin
+    return None, timex_lin
+
+
+
+
+### serialize/deserialize
 
 
 #Write object to file
@@ -1020,6 +1360,10 @@ def deserialize(filename:str) -> dict[str, Any]:
     except Exception as ex: # pylint: disable=broad-except
         _log.exception(ex)
     return obj
+
+
+
+### CSV import/export
 
 
 def csv_load(csvFile:io.TextIOWrapper) -> 'ProfileData':
@@ -1222,6 +1566,8 @@ def exportProfile2CSV(filename:str, profile:'ProfileData') -> bool:
     return False
 
 
+#### roast time
+
 # returns total roast time in seconds based on given timeindex and timex structures or None if data is not extractable
 def roast_time(timeindex:list[int], timex:list[float]) -> float|None:
     if len(timex) == 0 or len(timeindex) < 7:
@@ -1271,3 +1617,573 @@ def min_blocks(registers:list[int]) -> list[tuple[int,int]]:
     edges:Iterator[int] = iter(registers_sorted[:1] + sum(gaps, cast(list[int], [])) + registers_sorted[-1:])
     # sequences: eg. [(12392, 12394), (12462, 12463), (12465, 12465)]
     return list(zip(edges, edges, strict=True))
+
+
+
+### roast message paylaod
+
+
+# returns the profile encoded as roast message protobuf or None
+def roast_message(profile:ProfileData, org_id:str|None = None, machine_id:str|None = None,
+        interpolate_drops:bool = True,
+        smooth_curves:bool = False,
+        curvefilter:int = 3,
+        medfilt_factor:int = 3, # has to be uneven
+        decay_smoothing_p:bool = False,
+        add_additional_curves:int = 1, # 0:no additional curves, 1:visible additional curves, 2:all additional curves
+        rate_of_rise:int = 1, # 0: no RoR curve, 1: only BT RoR, 2: ET and BT RoR
+        limit_ror:bool = True,
+        delta_span_ET:int = 20, # delta span RoR ET in seconds
+        delta_span_BT:int = 20,  # delta span RoR BT in seconds
+        medfilt_factor_RoR:int = 3, # has to be uneven
+        delta_ET_filter:int = 7,
+        delta_BT_filter:int = 7,
+        min_sampling_interval:int = 1, # minimal sampling interval in seconds
+        seconds_before_charge:int|None = 30, # if None, no data is removed before CHARGE
+        seconds_after_drop:int|None = 30, # if None, no data is removed after DROP
+        factor:int = 100 # all values in the resulting roast payload are multiplied by this factor
+         # NOTE: a factor 10 results in visual steps in the computed RoR curve due to the low y-resolution of the delta axis
+        ) -> artisan_roast_pb2.Roast|None: # pylint: disable=no-member
+
+    from scipy.interpolate import interp1d
+
+    # timex
+    timex:list[float] = profile.get('timex', [])
+
+    if len(timex)<=0:
+        return None
+
+    ror_limit_min:Final[int] = 0    # C/min
+    ror_limit_max:Final[int] = 170  # C/min
+
+    mode:Final[str] = profile.get('mode', 'C')
+
+    roast:artisan_roast_pb2.Roast = artisan_roast_pb2.Roast() # pylint: disable=no-member
+    if org_id is not None:
+        roast.org_id = org_id
+    if machine_id is not None:
+        roast.machine_id = machine_id
+    if 'roastUUID' in profile:
+        roast.roast_id = profile['roastUUID']
+
+    roast.factor = factor
+
+    # epoch
+    # start of recording, corresponding to timex[0]
+    # initialized to epoch of now
+    roastepoch:int = QDateTime.currentDateTime().toSecsSinceEpoch()
+    roastdate:QDateTime|None
+    if 'roastepoch' in profile:
+        roastepoch = profile['roastepoch']
+    elif 'roastisodate' in profile:
+        try:
+            roastdate = None
+            date = QDate.fromString(decodeLocalStrict(profile['roastisodate']),Qt.DateFormat.ISODate)
+            if not date.isValid(): # ty:ignore[no-matching-overload]
+                date = QDate.currentDate()
+            if 'roasttime' in profile:
+                try:
+                    time = QTime.fromString(decodeLocalStrict(profile['roasttime']))
+                    if not time.isValid(): # ty:ignore[no-matching-overload]
+                        time = QTime().currentTime()
+                    roastdate = QDateTime(date,time)
+                except Exception: # pylint: disable=broad-except
+                    roastdate = QDateTime(date, QTime())
+            if roastdate is not None:
+                roastepoch = int(roastdate.toSecsSinceEpoch())
+        except Exception: # pylint: disable=broad-except
+            pass
+    elif 'roastdate' in profile:
+        try:
+            date = QDate.fromString(decodeLocalStrict(profile['roastdate']))
+            if not date.isValid(): # ty:ignore[no-matching-overload]
+                date = QDate.currentDate()
+            if 'roasttime' in profile:
+                try:
+                    time = QTime.fromString(decodeLocalStrict(profile['roasttime']))
+                    roastdate = QDateTime(date,time)
+                except Exception: # pylint: disable=broad-except
+                    roastdate = QDateTime(date, QTime())
+            else:
+                roastdate = QDateTime(date, QTime())
+            roastepoch = int(roastdate.toSecsSinceEpoch())
+        except Exception: # pylint: disable=broad-except
+            pass
+
+    # timeindex
+    timeindex:list[int] = [-1,0,0,0,0,0,0,0]
+    if 'timeindex' in profile and len(profile['timeindex']) == len(timeindex):
+        timeindex = profile['timeindex']
+
+    # samplint interval (we don't trust profile['samplinginterval'])
+    tx_diff = numpy.diff(numpy.array(timex[1:])) # we skip the first sample as it might have been delayed/skipped
+    sampling_interval = max(min_sampling_interval, int(round(float(numpy.average(tx_diff))))) # sampling interval in seconds
+
+    # remove readings before CHARGE and after DROP
+    start_idx:int = 0
+    end_idx:int = len(timex)
+    if seconds_before_charge is not None and timeindex[0]>-1 and timeindex[0]<len(timex):
+        readings_before,_ = divmod(seconds_before_charge,sampling_interval)
+        start_idx = max(0,timeindex[0]-readings_before)
+    if seconds_after_drop is not None and timeindex[6]>0 and timeindex[6]<len(timex):
+        readings_after,_ = divmod(seconds_after_drop,sampling_interval)
+        end_idx = min(end_idx, timeindex[6]+readings_after+1)
+    # adjust roastepoch (start of recording) by adding the duration removed
+    roastepoch += int(round(timex[start_idx] - timex[0]))
+    # adjust timex
+    timex = timex[start_idx:end_idx]
+    # adjust ET
+    if 'temp1' in profile:
+        profile['temp1'] = profile['temp1'][start_idx:end_idx]
+    # adjust BT
+    if 'temp2' in profile:
+        profile['temp2'] = profile['temp2'][start_idx:end_idx]
+    # adjust extra curves timex and temps
+    if 'extratimex' in profile:
+        profile['extratimex'] = profile['extratimex'][start_idx:end_idx]
+    if 'extratemp1' in profile:
+        for i,extratemp1 in enumerate(profile['extratemp1']):
+            profile['extratemp1'][i] = extratemp1[start_idx:end_idx]
+    if 'extratemp2' in profile:
+        for i,extratemp2 in enumerate(profile['extratemp2']):
+            profile['extratemp2'][i] = extratemp2[start_idx:end_idx]
+    # adjust timeindex
+    timeindex = [max(0,idx-start_idx) if idx!=0 else idx for idx in timeindex]
+    # adjust event indices
+    if 'specialevents' in profile:
+        profile['specialevents'] = [max(0,idx-start_idx) for idx in profile['specialevents']]
+
+
+    # resample
+    ## 1. make 0 the first timex
+    timex = [x - timex[0] for x in timex]
+    ## 2. resample tx
+    times_a = numpy.array(timex)
+    tx_a = cast('npt.NDArray[numpy.double]', numpy.linspace(times_a.min(),times_a.max(),times_a.size))
+    timex_resampled = cast('npt.NDArray[numpy.double]', numpy.arange(times_a.min(), times_a.max(), sampling_interval))
+    timex_resampled_list:list[float] = list(timex_resampled)
+    ## 3. milestones into idx of resampled tx
+    timeindex = [-1 if (i == 0 and (idx == -1 or idx >= len(timex))) else (0 if (idx == 0 or idx >= len(timex)) else timearray2index(timex_resampled_list, timex[idx])) for (i, idx) in enumerate(timeindex)]
+
+
+    # roast start / CHARGE
+    last_idx:int = 0
+    charge_offset:int = 0 # delta in seconds between time[0] (start of recording; roastepoch) and CHARGE (start of roast)
+    if len(timeindex)>0 and timeindex[0]>-1 and len(timex_resampled)>timeindex[0]:
+        charge_offset = timex_resampled[timeindex[0]]
+        roast.milestones.charge_idx = timeindex[0]
+        last_idx = timeindex[0]
+    charge_epoch:float = roastepoch + charge_offset # start of recording + charge_offset
+    roast.start = datetime.datetime.fromtimestamp(charge_epoch, tz=datetime.UTC) # type:ignore[assignment]
+
+    # DRY END
+    if len(timeindex)>1 and timeindex[1]>0 and len(timex_resampled)>timeindex[1]>last_idx:
+        roast.milestones.dry_end_idx = timeindex[1]
+        last_idx = timeindex[1]
+
+    # FIRST CRACK START
+    if len(timeindex)>1 and timeindex[2]>0 and len(timex_resampled)>timeindex[2]>last_idx:
+        roast.milestones.first_crack_start_idx = timeindex[2]
+        last_idx = timeindex[2]
+
+    # FIRST CRACK END
+    if len(timeindex)>1 and timeindex[3]>0 and len(timex_resampled)>timeindex[3]>last_idx:
+        roast.milestones.first_crack_end_idx = timeindex[3]
+        last_idx = timeindex[3]
+
+    # SECOND CRACK START
+    if len(timeindex)>1 and timeindex[4]>0 and len(timex_resampled)>timeindex[4]>last_idx:
+        roast.milestones.second_crack_start_idx = timeindex[4]
+        last_idx = timeindex[4]
+
+    # SECOND CRACK END
+    if len(timeindex)>1 and timeindex[5]>0 and len(timex_resampled)>timeindex[5]>last_idx:
+        roast.milestones.second_crack_end_idx = timeindex[5]
+        last_idx = timeindex[5]
+
+    # roast end / DROP
+    drop_epoch:float = roastepoch + (timex_resampled[-1] - timex_resampled[0])
+    if len(timeindex)>6 and timeindex[6]>0 and len(timex_resampled)>timeindex[6]>last_idx:
+        # DROP given, relative to CHARGE
+        drop_epoch = charge_epoch + max(0, (timex_resampled[timeindex[6]] - timex_resampled[timeindex[0]] if timeindex[0]>-1 else timex_resampled[timeindex[6]] - timex_resampled[0]))
+        roast.milestones.drop_idx = timeindex[6]
+    elif len(timex)>0:
+        # DROP not given, we take last timex reading
+        drop_epoch = charge_epoch + max(0, (timex_resampled[-1] - timex_resampled[timeindex[0]] if timeindex[0]>-1 else timex_resampled[-1] - timex_resampled[0]))
+    roast.end = datetime.datetime.fromtimestamp(drop_epoch, tz=datetime.UTC) # type:ignore[assignment]
+
+
+    # times (aligned such that CHARGE is at 0)
+    roast.times.extend([int(round(tx - charge_offset)) for tx in timex_resampled])
+
+    # event and annotations
+    events:dict[int, list[tuple[int, float]]] = {} # event_type_idx associated to (time_index, value) pairs
+    annotations:list[tuple[int, str]] = [] # time_index, tag
+    # collect events and annotations
+    if 'specialevents' in profile and 'specialeventstype' in profile:
+        for i, idx in enumerate(profile['specialevents']):
+            if i < len(profile['specialeventstype']) and idx < len(timex):
+                event_type = profile['specialeventstype'][i]
+                idx_resampled = timearray2index(timex_resampled_list, timex[idx])
+                if event_type < 4 and 'specialeventsvalue' in profile and i < len(profile['specialeventsvalue']):
+                    # one of the 4 custom event types
+                    event_value:float = profile['specialeventsvalue'][i]
+                    if event_type in events:
+                        events[event_type].append((idx_resampled, event_value))
+                    else:
+                        events[event_type] = [(idx_resampled, event_value)]
+                elif (event_type == 4 and 'specialeventsStrings' in profile and
+                        i < len(profile['specialeventsStrings'])):
+                    # an event annotation
+                    annotations.append((idx_resampled, profile['specialeventsStrings'][i]))
+    # add events
+    for event_type_idx, event_readings in events.items():
+        if len(event_readings)>0:
+            new_events = roast.events.add()
+            if 'etypes' in profile and event_type_idx < len(profile['etypes']):
+                new_events.name = decodeLocalStrict(profile['etypes'][event_type_idx]).strip()
+            if ('eventsliderunits' in profile and event_type_idx < len(profile['eventsliderunits']) and
+                    profile['eventsliderunits'][event_type_idx].strip() != ''):
+                new_events.unit = decodeLocalStrict(profile['eventsliderunits'][event_type_idx]).strip()
+            # sort events by index
+            event_readings_sorted = sorted(event_readings, key=lambda el: el[0])
+            new_events.time_indices.extend([el[0] for el in event_readings_sorted])
+            new_events.values.extend([max(0,events_internal_to_external_value(el[1])) for el in event_readings_sorted])
+    # add annotations
+    if len(annotations)>0:
+        # sort events by index
+        annotations_sorted = sorted(annotations, key=lambda el: el[0])
+        roast.annotations.time_indices.extend([el[0] for el in annotations_sorted])
+        roast.annotations.tags.extend([decodeLocalStrict(el[1]).strip() for el in annotations_sorted])
+
+    # reusable timex linspace
+    time_lin:numpy.ndarray[tuple[Literal[1]],numpy.dtype[numpy.double]]|None = None
+    if timex:
+        time_lin = cast(numpy.ndarray[tuple[Literal[1]]], numpy.linspace(timex[0],timex[-1],len(timex)))
+
+    # multiply reading by 10 and round to integer
+    def reading2value(x:float|None, factor:int) -> int:
+        return (-1 if x is None or x == -1 or math.isnan(x) else int(round(x*factor)))
+
+    # et_values
+    et_values = profile.get('temp1',[])
+    # same length as times
+    et_values = (et_values + [-1]*(len(timex) - len(et_values)))[:len(timex)]
+    if mode == 'F':
+        et_values = [fromFtoCstrict(et) for et in et_values]
+    if interpolate_drops:
+        et_values = fill_gaps(et_values)
+    if smooth_curves:
+        et_values = list(smooth_list(timex,et_values,
+            window_len=curvefilter,
+            decay_smoothing=decay_smoothing_p,
+            a_lin=time_lin,
+            medfilt_factor=medfilt_factor,
+            filter_dropouts=False, # already filtered above
+            replace_error_values=False)) # generate homogeneous list[float], preventing NaN
+    # resample and type convert
+    roast.et_values.extend([reading2value(x, factor) for x in interp1d(tx_a,numpy.array(et_values),fill_value='extrapolate')(timex_resampled)])
+
+    # bt_values
+    bt_values = profile.get('temp2',[])
+    # same length as times
+    bt_values = (bt_values + [-1]*(len(timex) - len(bt_values)))[:len(timex)]
+    if mode == 'F':
+        bt_values = [fromFtoCstrict(bt) for bt in bt_values]
+    if interpolate_drops:
+        bt_values = fill_gaps(bt_values)
+    if smooth_curves:
+        bt_values = list(smooth_list(timex,bt_values,
+            window_len=curvefilter,
+            decay_smoothing=decay_smoothing_p,
+            a_lin=time_lin,
+            medfilt_factor=medfilt_factor,
+            filter_dropouts=False, # already filtered above
+            replace_error_values=False))# generate homogeneous list[float], preventing NaN
+    # resample and type convert
+    roast.bt_values.extend([reading2value(x, factor) for x in interp1d(tx_a,numpy.array(bt_values),fill_value='extrapolate')(timex_resampled)])
+
+    # rate-of-rise
+    if rate_of_rise:
+        # ET RoR
+        if rate_of_rise > 1 and len(et_values)>0:
+            delta_ET_samples = max(1,int(round(delta_span_ET / sampling_interval)))
+            delta_et,_ = computeDeltas(
+                numpy.array(timex),
+                numpy.array(et_values),
+                delta_ET_samples,   # delta span
+                True,               # optimal smoothing
+                time_lin,
+                delta_ET_filter,    # delta filter
+                (timeindex[0] if len(timeindex)>0 and timeindex[0]>-1 and len(timex)>timeindex[0] else 0),           # roast_start_idx
+                (timeindex[6] if len(timeindex)>6 and timeindex[6]>0 and len(timex)>timeindex[6] else len(timex)-1), # roast_end_idx
+                True, # polyfit ror computation (in combination with optimal smoothing this results in the application of the optimal Savgol filter)
+                medfilt_factor_RoR, # median filter factor RoR
+                False,              # no further dropout filtering
+                limit_ror,          # limit RoR
+                ror_limit_min,      # min RoR
+                ror_limit_max       # max RoR
+            )
+            if delta_et is not None:
+                # resample and type convert
+                roast.et_ror_values.extend([reading2value(x, factor) for x in interp1d(tx_a,numpy.array(delta_et),fill_value='extrapolate')(timex_resampled)])
+        # BT RoR
+        if len(bt_values)>0:
+            delta_BT_samples = max(1,int(round(delta_span_BT / sampling_interval)))
+            delta_bt,_ = computeDeltas(
+                numpy.array(timex),
+                numpy.array(bt_values),
+                delta_BT_samples,   # delta span
+                True,               # optimal smoothing
+                time_lin,
+                delta_BT_filter,    # delta filter
+                (timeindex[0] if len(timeindex)>0 and timeindex[0]>-1 and len(timex)>timeindex[0] else 0),           # roast_start_idx
+                (timeindex[6] if len(timeindex)>6 and timeindex[6]>0 and len(timex)>timeindex[6] else len(timex)-1), # roast_end_idx
+                True, # polyfit ror computation (in combination with optimal smoothing this results in the application of the optimal Savgol filter)
+                medfilt_factor_RoR, # median filter factor RoR
+                False,              # no further dropout filtering
+                limit_ror,          # limit RoR
+                ror_limit_min,      # min RoR
+                ror_limit_max,      # max RoR
+                False               # don't replace error values -1 by NaN
+            )
+            if delta_bt is not None:
+                # resample and type convert
+                roast.bt_ror_values.extend([reading2value(x, factor) for x in interp1d(tx_a,numpy.array(delta_bt),fill_value='extrapolate')(timex_resampled)])
+
+    # additional_curves
+    extranames1 = profile.get('extraname1',[])
+    extravalues1 = profile.get('extratemp1',[])
+    extra_nonetemp_hints1 = profile.get('extraNoneTempHint1',[])
+    extra_nonetemp_hints1 += [False]*(len(extranames1) - len(extra_nonetemp_hints1)) # assume temperatures by default
+    extra_visibility1 = profile.get('extraCurveVisibility1', [])
+    extra_visibility1 += [True]*(len(extranames1) - len(extra_visibility1)) # assume curve visible by default
+    #
+    extranames2 = profile.get('extraname2',[])
+    extravalues2 = profile.get('extratemp2',[])
+    extra_nonetemp_hints2 = profile.get('extraNoneTempHint2',[])
+    extra_nonetemp_hints2 += [False]*(len(extranames2) - len(extra_nonetemp_hints2)) # assume temperatures by default
+    extra_visibility2 = profile.get('extraCurveVisibility2', [])
+    extra_visibility2 += [True]*(len(extranames2) - len(extra_visibility2)) # assume curve visible by default
+    #
+    additional_curves = (list(zip(extranames1, extravalues1, extra_nonetemp_hints1, extra_visibility1, strict=False)) +
+        list(zip(extranames2, extravalues2, extra_nonetemp_hints2, extra_visibility2, strict=False)))
+
+    #
+    if add_additional_curves:
+        for name, readings, none_temp_hint, visible in additional_curves:
+            if add_additional_curves == 2 or visible:
+                # same length as times
+                values = (readings + [-1]*(len(timex) - len(readings)))[:len(timex)]
+                if any(v != -1 for v in values):
+                    # only add curve is it contains readings
+                    if mode == 'F' and not none_temp_hint:
+                        values = [fromFtoCstrict(v) for v in values]
+                    if interpolate_drops:
+                        values = fill_gaps(values)
+                    if smooth_curves:
+                        values = list(smooth_list(timex,values,
+                            window_len=curvefilter,
+                            decay_smoothing=decay_smoothing_p,
+                            a_lin=time_lin,
+                            medfilt_factor=medfilt_factor,
+                            filter_dropouts=False, # already filtered above
+                            replace_error_values=False))# generate homogeneous list[float], preventing NaN
+                    curve = roast.additional_curves.add()
+                    curve.name = decodeLocalStrict(name).strip()
+                    # resample and type convert
+                    curve.values.extend([reading2value(x, factor) for x in interp1d(tx_a,numpy.array(values),fill_value='extrapolate')(timex_resampled)])
+                    curve.temperatures = not none_temp_hint
+
+    return roast
+
+
+def roast_message_to_profile(roast:artisan_roast_pb2.Roast) -> ProfileData: # pylint: disable=no-member
+    # adds RoR curves (if available) as extra curves for inspection
+    profile:ProfileData = {}
+
+    from google.protobuf.json_format import MessageToDict
+    roast_dict = MessageToDict(roast, preserving_proto_field_name=True)
+
+    factor:int = roast_dict.get('factor', 1) # multiplication factor of all payload values
+
+    # milestones
+    timeindex:list[int] = [-1,0,0,0,0,0,0,0]
+    if 'milestones' in roast_dict:
+        milestone_indicies = [
+                'charge_idx',
+                'dry_end_idx',
+                'first_crack_start_idx',
+                'first_crack_end_idx',
+                'second_crack_start_idx',
+                'second_crack_end_idx',
+                'drop_idx'
+        ]
+        for i, idx in enumerate(milestone_indicies):
+            if idx in roast_dict['milestones']:
+                timeindex[i] = roast_dict['milestones'][idx]
+    profile['timeindex'] = timeindex
+
+    specialevents: list[int] = []
+    specialeventstype: list[int] = []
+    specialeventsvalue: list[float] = []
+    specialeventsStrings: list[str] = []
+    eventsliderunits: list[str] = []
+    etypes: list[str] = []
+
+    # Annotations
+    if 'annotations' in roast_dict:
+        annotations:dict[str,list[int|str]] = roast_dict.get('annotations', {})
+        for ind, tag in zip(
+                cast(list[int], annotations.get('time_indices', [])),
+                cast(list[str], annotations.get('tags', [])),
+                strict=False):
+            specialevents.append(ind)
+            specialeventstype.append(4)
+            specialeventsvalue.append(0)
+            specialeventsStrings.append(tag)
+    # Events
+    if 'events' in roast_dict:
+        events:list[dict[str,str|list[int]]] = roast_dict.get('events', [])
+        for i, event in enumerate(events[:4]): # max 4 event types
+            eventsliderunits.append(cast(str, event.get('unit', '')))
+            etypes.append(cast(str, event.get('name', '')))
+            for ind, value in zip(
+                    cast(list[int], event.get('time_indices', [])),
+                    cast(list[int], event.get('values', [])),
+                    strict=False):
+                specialevents.append(ind)
+                specialeventstype.append(int(i))
+                specialeventsvalue.append(events_external_to_internal_value(value))
+                specialeventsStrings.append('')
+
+    if len(specialevents)>0 and len(specialevents) == len(specialeventstype) == len(specialeventsStrings) == len(specialeventsvalue):
+        # sort events by index
+        nevents = len(specialevents)
+        packed_events:list[tuple[int,int,str,float]] = []
+        # pack
+        for i in range(nevents):
+            packed_events.append(
+                (specialevents[i],
+                 specialeventstype[i],
+                 specialeventsStrings[i],
+                 specialeventsvalue[i]))
+        # sort
+        packed_events_sorted = sorted(packed_events, key=lambda tup: tup[0])
+        # unpack
+        profile['specialevents'] = [e[0] for e in packed_events_sorted]
+        profile['specialeventstype'] = [e[1] for e in packed_events_sorted]
+        profile['specialeventsStrings'] = [e[2] for e in packed_events_sorted]
+        profile['specialeventsvalue'] = [e[3] for e in packed_events_sorted]
+        # add unit and event names
+        profile['eventsliderunits'] = (eventsliderunits + ['']*(4 - len(eventsliderunits)))[:4] # exactly 4 units (default '')
+        profile['etypes'] = (etypes + ['']*(4- len(etypes)))[:4] + ['--'] # exactly 4 plus a last one '--'
+
+    # divide value by factor
+    def value2reading(x:int, factor:int) -> float:
+        return (-1 if x == -1 else x/factor)
+
+    #times # shift by time of CHARGE such that first time is 0
+    if 'times' in roast_dict:
+        times = roast_dict['times']
+        if len(times)>0:
+            profile['timex'] = [tx-times[0] for tx in times]
+            if 'et_values' in roast_dict:
+                profile['temp1'] = [value2reading(x, factor) for x in roast_dict['et_values']][:len(times)] + [-1.0]*(len(times) - len(roast_dict['et_values']))
+            if 'bt_values' in roast_dict:
+                profile['temp2'] = [value2reading(x, factor) for x in roast_dict['bt_values']][:len(times)] + [-1.0]*(len(times) - len(roast_dict['bt_values']))
+
+    if 'start' in roast_dict:
+        # start points to the start of the roast (CHARGE)
+        profile['roastepoch'] = int(round(datetime.datetime.fromisoformat(roast_dict['start']).timestamp()))
+
+
+    if 'timex' in profile:
+
+        # correct roastepoch which should point to the start of the recording
+        if len(profile['timex']) > 0 and 'roastepoch' in profile:
+            profile['roastepoch'] = profile['roastepoch'] + int(round(profile['timex'][0]))
+
+        additional_curves = roast_dict.get('additional_curves',[])
+        # make the number of additional curves even
+        if len(additional_curves) % 2 != 0:
+            additional_curves.append({
+                    'name': 'Extra',
+                    'values': [-1]*len(profile['timex']),
+                    'temperatures': False})
+        extradevices:list[int] = []
+        extratimex:list[list[float]] = []
+        extraname1:list[str] = []
+        extraname2:list[str] = []
+        extratemp1:list[list[float]] = []
+        extratemp2:list[list[float]] = []
+        extraCurveVisibility1:list[bool] = []
+        extraCurveVisibility2:list[bool] = []
+        extraDelta1:list[bool] = []
+        extraDelta2:list[bool] = []
+        for i, curve in enumerate(additional_curves):
+            curve_readings = [value2reading(v, factor) for v in curve.get('values', [-1]*len(profile['timex']))]
+            curve_readings = curve_readings[:len(profile['timex'])] + [-1.0]*(len(profile['timex']) - len(curve_readings))
+            if i % 2 == 0:
+                extraname2.append(curve.get('name', 'Extra'))
+                extratemp2.append(curve_readings)
+                extraCurveVisibility2.append(True)
+                extraDelta2.append(False)
+            else:
+                extradevices.append(25) # virtual device
+                extratimex.append(profile['timex'][:])
+                extraname1.append(curve.get('name', 'Extra'))
+                extratemp1.append(curve_readings)
+                extraCurveVisibility1.append(True)
+                extraDelta1.append(False)
+
+
+        # add RoR curves as extra curves
+        bt_ror_values:list[int] = roast_dict.get('bt_ror_values',[])
+        if len(bt_ror_values)>0:
+            bt_ror_readings:list[float] = [value2reading(v, factor) for v in bt_ror_values]
+            bt_ror_readings = bt_ror_readings[:len(profile['timex'])] + [-1.0]*(len(profile['timex']) - len(bt_ror_readings))
+            extradevices.append(25) # virtual device
+            extratimex.append(profile['timex'][:])
+            extraname1.append('BT RoR')
+            extratemp1.append(bt_ror_readings)
+            extraCurveVisibility1.append(False)
+            extraDelta1.append(True)
+        et_ror_values:list[int] = roast_dict.get('et_ror_values',[])
+        if len(et_ror_values)>0:
+            et_ror_readings:list[float] = [value2reading(v, factor) for v in et_ror_values]
+            et_ror_readings = et_ror_readings[:len(profile['timex'])] + [-1.0]*(len(profile['timex']) - len(et_ror_readings))
+            if len(bt_ror_values)>0:
+                # add as extra curve 2
+                extraname2.append('ET RoR')
+                extratemp2.append(et_ror_readings)
+                extraCurveVisibility2.append(False)
+                extraDelta2.append(True)
+            else:
+                # add as extra curve 1
+                extradevices.append(25) # virtual device
+                extratimex.append(profile['timex'][:])
+                extraname1.append('ET RoR')
+                extratemp1.append(et_ror_readings)
+                extraCurveVisibility1.append(False)
+                extraDelta1.append(True)
+        elif len(bt_ror_values)>0:
+            # add missing extra 2 curve
+            extraname2.append('Extra')
+            extratemp2.append([-1]*len(profile['timex']))
+            extraCurveVisibility2.append(False)
+            extraDelta2.append(False)
+
+        profile['extradevices'] = extradevices
+        profile['extratimex'] = extratimex
+        profile['extraname1'] = extraname1
+        profile['extraname2'] = extraname2
+        profile['extratemp1'] = extratemp1
+        profile['extratemp2'] = extratemp2
+        profile['extraCurveVisibility1'] = extraCurveVisibility1
+        profile['extraCurveVisibility2'] = extraCurveVisibility2
+        profile['extraDelta1'] = extraDelta1
+        profile['extraDelta2'] = extraDelta2
+
+
+    return profile

@@ -137,13 +137,15 @@ class Orbiter(AsyncComm):
     # getBT triggers fetching a complete set of new readings
     # time is the preheat/roasting/cooling time in seconds send along the sync command to the machine
     def getBT(self, aw:'ApplicationWindow|None' = None, time:int = 0) -> float:
-        self.send_sync_await(time)
-        # check for critical cut of temperature and turn OFF the heater if needed
-        if aw is not None and self._BT > self.BT_CUTOFF_TEMP:
-            orbiter_cmd:bytes = bytes.fromhex('0D') # heater
-            orbiter_data:bytes = b'\x00\x00' # 0%
-            orbiter_param:bytes = b'\x00'
-            aw.orbiterSendMessageSignal.emit(orbiter_cmd, orbiter_data, orbiter_param, time)
+        if aw is not None and aw.qmc.flagon and not (aw.qmc.timeindex[0]>-1 and not aw.qmc.flagstart):
+            # don't send SYNC if OFF or after CHARGE when recording was already finished as time==0 in this cases and that might confuse the machine leading to a disconnect
+            self.send_sync_await(time) # don't send out a request while OFF as then the time == 0 and machine disconnects
+            # check for critical cut of temperature and turn OFF the heater if needed
+            if self._BT > self.BT_CUTOFF_TEMP:
+                orbiter_cmd:bytes = bytes.fromhex('0D') # heater
+                orbiter_data:bytes = b'\x00\x00' # 0%
+                orbiter_param:bytes = b'\x00'
+                aw.orbiterSendMessageSignal.emit(orbiter_cmd, orbiter_data, orbiter_param, time)
         return self._BT
     def getET(self) -> float:
         return self._ET
@@ -329,8 +331,13 @@ class Orbiter(AsyncComm):
                             (b'\x03', b'\x00\x00', b'\x00'),
                             (b'\x0F', b'\x00\x00', b'\x00'),
                             (b'\x06', b'\x00\x00', b'\x00')]:
-                        self.send_msg_await(cmd, data, param)
+                        res = self.send_msg_await(cmd, data, param)
                         libtime.sleep(.3)
+                        if not res:
+                            _log.debug('sending disconnect command %s failed', cmd)
+                            # sent failed, we wait a moment longer and retry one time
+                            libtime.sleep(.2)
+                            self.send_msg_await(cmd, data, param)
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
         self.stop()

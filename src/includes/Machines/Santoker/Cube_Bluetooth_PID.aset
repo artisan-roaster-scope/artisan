@@ -147,6 +147,7 @@ invertControl=false
 negativeTargetMax=100
 negativeTargetMin=0
 negativeTargetRangeLimit=false
+pidGainScheduling=false
 pidKp=1.2
 pidKi=0.109
 pidKd=3.45

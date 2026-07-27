@@ -26,32 +26,33 @@ if TYPE_CHECKING:
     from plus.stock import BlendList, Blend
 
 class ComputedProfileInformation(TypedDict, total=False):
+    CHARGE_time: float # time in seconds since start of recording (roastdate/roastepoch)
     CHARGE_ET: float
     CHARGE_BT: float
     TP_idx: int
-    TP_time: float
+    TP_time: float # time in seconds since CHARGE
     TP_ET: float
     TP_BT: float
     MET: float
-    DRY_time: float
+    DRY_time: float # time in seconds since CHARGE
     DRY_ET: float
     DRY_BT: float
-    FCs_time: float
+    FCs_time: float # time in seconds since CHARGE
     FCs_ET: float
     FCs_BT: float
-    FCe_time: float
+    FCe_time: float # time in seconds since CHARGE
     FCe_ET: float
     FCe_BT: float
-    SCs_time: float
+    SCs_time: float # time in seconds since CHARGE
     SCs_ET: float
     SCs_BT: float
-    SCe_time: float
+    SCe_time: float # time in seconds since CHARGE
     SCe_ET: float
     SCe_BT: float
-    DROP_time: float
+    DROP_time: float # time in seconds since CHARGE
     DROP_ET: float
     DROP_BT: float
-    COOL_time: float
+    COOL_time: float # time in seconds since CHARGE
     COOL_ET: float
     COOL_BT: float
     totaltime: float
@@ -203,6 +204,7 @@ class ProfileData(TypedDict, total=False):
     default_etypes: list[bool]
     default_etypes_set: list[int]
     etypes: list[str]
+    eventsliderunits: list[str]
     cuppingnotes: str
     roastingnotes: str
     timex: list[float]
@@ -364,6 +366,7 @@ class ExtraDeviceSettings(TypedDict):
     extramarkersizes2      : list[float]
     default_etypes_set     : list[int]
     etypes                 : list[str]
+    eventsliderunits       : list[str]
 
 Palette = tuple[
     list[int],    # 0: event button types

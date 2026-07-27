@@ -29,14 +29,14 @@ if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
     from artisanlib.atypes import ProfileData # pylint: disable=unused-import
     from matplotlib.lines import Line2D # type:ignore[untyped-import,unused-ignore] # pylint: disable=unused-import
-    from matplotlib.backend_bases import PickEvent # type:ignore[untyped-import,unused-ignore] # pylint: disable=unused-import
+    from matplotlib.backend_bases import PickEvent, Event # type:ignore[untyped-import,unused-ignore] # pylint: disable=unused-import
     from matplotlib.legend import Legend # type:ignore[untyped-import,unused-ignore] # pylint: disable=unused-import
     from PyQt6.QtWidgets import QLayoutItem, QLayout, QScrollBar # pylint: disable=unused-import
     from PyQt6.QtGui import QStandardItem, QKeyEvent, QDropEvent, QDragEnterEvent, QCloseEvent # pylint: disable=unused-import
     from PyQt6.QtCore import QMimeData # pylint: disable=unused-import
 
 from artisanlib.util import (deltaLabelUTF8, decodeLocal, decodeLocalStrict, stringfromseconds, fromFtoCstrict,
-        fromCtoFstrict, fill_gaps, float2float, deserialize, float2str)
+        fromCtoFstrict, fill_gaps, float2float, deserialize, float2str, smooth_list)
 from artisanlib.suppress_errors import suppress_stdout_stderr
 from artisanlib.dialogs import ArtisanDialog
 from artisanlib.widgets import MyQComboBox
@@ -364,8 +364,10 @@ class RoastProfile:
             timex_lin = numpy.linspace(self.timex[0],self.timex[-1],len(self.timex))
         else:
             timex_lin = None
-        self.stemp1 = list(self.aw.qmc.smooth_list(self.timex,self.temp1,window_len=self.aw.qmc.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timex_lin))
-        self.stemp2 = list(self.aw.qmc.smooth_list(self.timex,self.temp2,window_len=self.aw.qmc.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timex_lin))
+        self.stemp1 = list(smooth_list(self.timex,self.temp1,window_len=self.aw.qmc.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timex_lin,
+                medfilt_factor=self.aw.qmc.median_filter_factor, filter_dropouts=self.aw.qmc.filterDropOuts))
+        self.stemp2 = list(smooth_list(self.timex,self.temp2,window_len=self.aw.qmc.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timex_lin,
+                medfilt_factor=self.aw.qmc.median_filter_factor, filter_dropouts=self.aw.qmc.filterDropOuts))
         # we resample the temperatures of extra device curves to regular interval timestamps
         self.extrastemp1 = []
         self.extrastemp2 = []
@@ -374,12 +376,16 @@ class RoastProfile:
                 timex_lin = numpy.linspace(timex[0],timex[-1],len(timex))
             else:
                 timex_lin = None
-            self.extrastemp1.append(list(self.aw.qmc.smooth_list(timex,self.extratemp1[i],window_len=self.aw.qmc.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)))
-            self.extrastemp2.append(list(self.aw.qmc.smooth_list(timex,self.extratemp2[i],window_len=self.aw.qmc.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)))
+            self.extrastemp1.append(list(smooth_list(timex,self.extratemp1[i],window_len=self.aw.qmc.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timex_lin,
+                medfilt_factor=self.aw.qmc.median_filter_factor, filter_dropouts=self.aw.qmc.filterDropOuts)))
+            self.extrastemp2.append(list(smooth_list(timex,self.extratemp2[i],window_len=self.aw.qmc.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timex_lin,
+                medfilt_factor=self.aw.qmc.median_filter_factor, filter_dropouts=self.aw.qmc.filterDropOuts)))
         # recompute deltas
         cf = self.aw.qmc.curvefilter*2 # we smooth twice as heavy for PID/RoR calculation as for normal curve smoothing
-        t1 = self.aw.qmc.smooth_list(self.timex,self.temp1,window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
-        t2 = self.aw.qmc.smooth_list(self.timex,self.temp2,window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timex_lin)
+        t1 = smooth_list(self.timex,self.temp1,window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timex_lin,
+                medfilt_factor=self.aw.qmc.median_filter_factor, filter_dropouts=self.aw.qmc.filterDropOuts)
+        t2 = smooth_list(self.timex,self.temp2,window_len=cf,decay_smoothing=decay_smoothing_p,a_lin=timex_lin,
+                medfilt_factor=self.aw.qmc.median_filter_factor, filter_dropouts=self.aw.qmc.filterDropOuts)
         if self.timeindex[0]>-1:
             RoR_start = min(self.timeindex[0]+10, len(self.timex)-1)
         else:
@@ -1094,7 +1100,7 @@ class roastCompareDlg(ArtisanDialog):
         self.disableButtons()
         self.aw.disableEditMenus(compare=True)
 
-        self.pick_handler_id = self.aw.qmc.fig.canvas.mpl_connect('pick_event', self.onpick_event)
+        self.pick_handler_id = self.aw.qmc.fig.canvas.mpl_connect('pick_event', cast('Callable[[Event],None]', self.onpick_event))
 
         settings = QSettings()
         if settings.contains('CompareGeometry'):

@@ -214,9 +214,9 @@ from artisanlib.util import (appFrozen, uchr, decodeLocal, decodeLocalStrict, en
         toBool, toStringList, removeAll, application_name, application_viewer_name, application_organization_name,
         application_organization_domain, application_desktop_file_name, getDataDirectory, getDocumentsDirectory, getAppPath, getResourcePath, debugLogLevelToggle,
         debugLogLevelActive, setDebugLogLevel, createGradient, natsort, setDeviceDebugLogLevel,
-        comma2dot, is_proper_temp, weight_units, volume_units, float2float, float2str,
+        comma2dot, is_proper_temp, weight_units, weight_units_lower, volume_units, float2float, float2str,
         convertWeight, convertVolume, rgba_colorname2argb_colorname, render_weight, serialize, deserialize, csv_load, exportProfile2CSV, findTPint,
-        eventtime2string, toDim, signature_message, rec_int_to_float)
+        eventtime2string, toDim, signature_message, rec_int_to_float, smooth_list)
 
 from artisanlib.qtsingleapplication import QtSingleApplication
 
@@ -14404,7 +14404,11 @@ class ApplicationWindow(QMainWindow):
                 t2 = t2[:data_len]
                 timex:list[list[float]] = profile.get('extratimex', [])
                 t1x:list[list[float]] = profile.get('extratemp1', [])
+                t1x_nonetemp:list[bool] = profile.get('extraNoneTempHint1', [])
+                t1x_nonetemp = (t1x_nonetemp + [False]*(len(t1x) - len(t1x_nonetemp)))[:len(t1x)]
                 t2x:list[list[float]] = profile.get('extratemp2', [])
+                t2x_nonetemp:list[bool] = profile.get('extraNoneTempHint2', [])
+                t2x_nonetemp = (t2x_nonetemp + [False]*(len(t2x) - len(t2x_nonetemp)))[:len(t2x)]
                 # ensure that number of extra device data is consistent
                 number_extra_devices = min(len(timex), len(t1x), len(t2x))
                 timex = timex[:number_extra_devices]
@@ -14418,9 +14422,9 @@ class ApplicationWindow(QMainWindow):
                     if len(timex[c]) != data_len:
                         timex[c] = tb[:]
                     if len(t1x[c]) != data_len:
-                        t1x[c] = [-1.]*data_len
+                        t1x[c].extend([-1]*(data_len - len(t1x[c])))
                     if len(t2x[c]) != data_len:
-                        t2x[c] = [-1.]*data_len
+                        t2x[c].extend([-1]*(data_len - len(t2x[c])))
 
                 # reset the movebackground cache:
                 self.qmc.backgroundprofile_moved_x = 0
@@ -14440,15 +14444,19 @@ class ApplicationWindow(QMainWindow):
                         t1 = [fromFtoCstrict(t) for t in t1]
                         t2 = [fromFtoCstrict(t) for t in t2]
                         for e, _ in enumerate(t1x):
-                            t1x[e] = [fromFtoCstrict(t) for t in t1x[e]]
-                            t2x[e] = [fromFtoCstrict(t) for t in t2x[e]]
+                            if not t1x_nonetemp[e]:
+                                t1x[e] = [fromFtoCstrict(t) for t in t1x[e]]
+                            if not t2x_nonetemp[e]:
+                                t2x[e] = [fromFtoCstrict(t) for t in t2x[e]]
                     if m == 'C' and self.qmc.mode == 'F':
                         # we have to convert all temperatures from C to F
                         t1 = [fromCtoFstrict(t) for t in t1]
                         t2 = [fromCtoFstrict(t) for t in t2]
                         for e,_ in enumerate(t1x):
-                            t1x[e] = [fromCtoFstrict(t) for t in t1x[e]]
-                            t2x[e] = [fromCtoFstrict(t) for t in t2x[e]]
+                            if not t1x_nonetemp[e]:
+                                t1x[e] = [fromCtoFstrict(t) for t in t1x[e]]
+                            if not t2x_nonetemp[e]:
+                                t2x[e] = [fromCtoFstrict(t) for t in t2x[e]]
 
                 names1x = [decodeLocalStrict(x) for x in profile.get('extraname1',[])]
                 names2x = [decodeLocalStrict(x) for x in profile.get('extraname2',[])]
@@ -14480,8 +14488,10 @@ class ApplicationWindow(QMainWindow):
                 if tb:
                     tb_lin = cast(numpy.ndarray[tuple[Literal[1]]], numpy.linspace(tb[0],tb[-1],len(tb)))
                 decay_smoothing_p = not self.qmc.optimalSmoothing
-                b1 = self.qmc.smooth_list(tb,t1,window_len=self.qmc.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tb_lin)
-                b2 = self.qmc.smooth_list(tb,t2,window_len=self.qmc.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tb_lin)
+                b1 = smooth_list(tb,t1,window_len=self.qmc.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tb_lin,
+                    medfilt_factor=self.qmc.median_filter_factor, filter_dropouts=self.qmc.filterDropOuts)
+                b2 = smooth_list(tb,t2,window_len=self.qmc.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tb_lin,
+                    medfilt_factor=self.qmc.median_filter_factor, filter_dropouts=self.qmc.filterDropOuts)
 
                 self.qmc.extraname1B,self.qmc.extraname2B = names1x,names2x
                 b1x = []
@@ -14492,18 +14502,20 @@ class ApplicationWindow(QMainWindow):
                 n4 = idx4 // 2
 
                 for i in range(min(len(t1x),len(t2x),len(timex))):
-# we smooth also that 3rd and 4th background courve only on redraw with the actual smoothing parameters
+# we smooth also that 3rd and 4th background curve only on redraw with the actual smoothing parameters
                     if (self.qmc.xtcurveidx > 0 and n3 == i) or (self.qmc.ytcurveidx > 0 and n4 == i): # this is the 3rd or 4th background curve to be drawn, we smooth it
                         tx=timex[i]
                         tx_lin:numpy.ndarray[tuple[Literal[1]],numpy.dtype[numpy.double]]|None = None
                         if tx:
                             tx_lin = cast(numpy.ndarray[tuple[Literal[1]],numpy.dtype[numpy.double]], numpy.linspace(tx[0],tx[-1],len(tx)))
                         if (self.qmc.xtcurveidx > 0 and n3 == i and self.qmc.xtcurveidx % 2) or (self.qmc.ytcurveidx > 0 and n4 == i and self.qmc.ytcurveidx % 2):
-                            b1x.append(self.qmc.smooth_list(tx,t1x[i],window_len=self.qmc.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin))
+                            b1x.append(smooth_list(tx,t1x[i],window_len=self.qmc.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin,
+                                medfilt_factor=self.qmc.median_filter_factor, filter_dropouts=self.qmc.filterDropOuts))
                             b2x.append(numpy.array(t2x[i]))
                         else:
                             b1x.append(numpy.array(t1x[i]))
-                            b2x.append(self.qmc.smooth_list(tx,t2x[i],window_len=self.qmc.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin))
+                            b2x.append(smooth_list(tx,t2x[i],window_len=self.qmc.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin,
+                                medfilt_factor=self.qmc.median_filter_factor, filter_dropouts=self.qmc.filterDropOuts))
                     else:
                         b1x.append(numpy.array(t1x[i]))
                         b2x.append(numpy.array(t2x[i]))
@@ -14516,8 +14528,8 @@ class ApplicationWindow(QMainWindow):
                 # order background events
                 self.orderBackgroundEvents()
                 #
-                self.qmc.backgroundFlavors = profile['flavors']
-                self.qmc.titleB = decodeLocalStrict(profile['title'])
+                self.qmc.backgroundFlavors = profile.get('flavors', [])
+                self.qmc.titleB = decodeLocalStrict(profile.get('title', QApplication.translate('Scope Title', 'Roaster Scope')))
 
                 if 'roastbatchnr' in profile:
                     try:
@@ -14548,7 +14560,7 @@ class ApplicationWindow(QMainWindow):
 
 
                 #if old format < 0.5.0 version  (identified by numbers less than 1.). convert
-                if self.qmc.backgroundFlavors[0] < 1. and self.qmc.backgroundFlavors[-1] < 1.:
+                if len(self.qmc.backgroundFlavors)>0 and self.qmc.backgroundFlavors[0] < 1. and self.qmc.backgroundFlavors[-1] < 1.:
                     l = len(self.qmc.backgroundFlavors)
                     for i in range(l):
                         self.qmc.backgroundFlavors[i] *= 10.
@@ -15396,7 +15408,8 @@ class ApplicationWindow(QMainWindow):
                 'extramarkersizes1'      : self.qmc.extramarkersizes1,
                 'extramarkersizes2'      : self.qmc.extramarkersizes2,
                 'default_etypes_set'     : self.qmc.default_etypes_set,
-                'etypes'                 : self.qmc.etypes
+                'etypes'                 : self.qmc.etypes,
+                'eventsliderunits'       : self.eventsliderunits
                 })
 
     def restoreExtradeviceSettings(self) -> None:
@@ -15428,6 +15441,7 @@ class ApplicationWindow(QMainWindow):
             self.qmc.extramarkersizes2    = self.org_extradevicesettings['extramarkersizes2']
             self.qmc.default_etypes_set   = self.org_extradevicesettings['default_etypes_set']
             self.qmc.etypes               = self.org_extradevicesettings['etypes']
+            self.eventsliderunits         = self.org_extradevicesettings['eventsliderunits']
             self.updateExtradeviceSettings()
 
     def updateExtradeviceSettings(self) -> None:
@@ -15574,6 +15588,12 @@ class ApplicationWindow(QMainWindow):
                     settings.setValue('default_etypes_set',self.qmc.default_etypes_set)
                     settings.setValue('etypes',self.qmc.etypes)
                     settings.endGroup()
+
+                    #save custom slider event units
+                    settings.beginGroup('Sliders')
+                    settings.setValue('eventsliderunits',self.eventsliderunits)
+                    settings.endGroup()
+
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
 
@@ -15675,6 +15695,12 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.default_etypes_set = [toInt(x) for x in toList(settings.value('default_etypes_set',self.qmc.default_etypes_set))]
                     self.qmc.etypes = toStringList(settings.value('etypes',self.qmc.etypes))
                     settings.endGroup()
+
+                    settings.beginGroup('Sliders')
+                    self.eventsliderunits = toStringList(settings.value('eventsliderunits',self.eventsliderunits))
+                    settings.endGroup()
+
+
                     # now remove the settings file
                     self.clearExtraDeviceSettingsBackup(filename)
 
@@ -15785,7 +15811,8 @@ class ApplicationWindow(QMainWindow):
                     # check for difference in the Data values between the profile and current settings
                     settingdev = ''.join([str(self.qmc.extradevices), str([encodeLocal(n) for n in self.qmc.extraname1]), str([encodeLocal(n) for n in self.qmc.extraname2]),
                                         str([encodeLocal(x) for x in self.qmc.extramathexpression1]), str([encodeLocal(x) for x in self.qmc.extramathexpression2]),
-                                        str([encodeLocal(x) for x in self.qmc.etypes[:4]])
+                                        str([encodeLocal(x) for x in self.qmc.etypes[:4]]),
+                                        str([encodeLocal(x) for x in self.eventsliderunits[:self.eventsliders]])
                                         ])
                     # fix missing extramathexpression arrays on import
                     if 'extramathexpression1' not in profile:
@@ -15795,7 +15822,8 @@ class ApplicationWindow(QMainWindow):
                     try:
                         profiledev = ''.join([str(profile['extradevices']), str(profile['extraname1']), str(profile['extraname2']),
                                             str(profile['extramathexpression1']), str(profile['extramathexpression2']),
-                                            str(profile_etypes[:4])
+                                            str(profile_etypes[:4]),
+                                            str(profile['eventsliderunits'])
                                             ])
                     except Exception: # pylint: disable=broad-except
                         profiledev = ''
@@ -16075,9 +16103,9 @@ class ApplicationWindow(QMainWindow):
                 current_weight_unit_idx = 0
             if 'weight' in profile and len(profile['weight']) == 3:
                 weight = profile['weight']
-                unit = decodeLocalStrict(weight[2], 'g')
+                unit = decodeLocalStrict(weight[2], 'g').lower()
                 try:
-                    weight_unit_idx = weight_units.index(unit)
+                    weight_unit_idx = weight_units_lower.index(unit)
                 except ValueError:
                     weight_unit_idx = 0
                 self.qmc.weight = (
@@ -16267,6 +16295,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.default_etypes_set = profile['default_etypes_set']
             if 'etypes' in profile:
                 self.qmc.etypes = profile_etypes
+            if 'eventsliderunits' in profile:
+                self.eventsliderunits = [decodeLocalStrict(u) for u in profile['eventsliderunits']]
 
             if updateRender:
                 # etypes might have been changed thus we need to update the slider labels
@@ -16445,6 +16475,16 @@ class ApplicationWindow(QMainWindow):
                 timeindex_len = len(self.qmc.timeindex)
                 self.qmc.timeindex = [max(0,min(v,data_len-1)) if i>0 else max(-1,min(v,data_len-1)) for i,v in enumerate(profile['timeindex'][:timeindex_len])]
                 self.qmc.timeindex = self.qmc.timeindex + [0]*(max(0, timeindex_len - len(self.qmc.timeindex))) # ensure correct len
+
+                # disable out-of-order event indices from timeindex by setting them to zero
+                def remove_invalid_indices(l:list[int]) -> list[int]:
+                    prev_max_idx:int = -1
+                    res:list[int] = []
+                    for e in l:
+                        res.append(e if e == 0 or e >= prev_max_idx else 0)
+                        prev_max_idx = max(e, prev_max_idx)
+                    return res
+                self.qmc.timeindex = remove_invalid_indices(self.qmc.timeindex)
 
                 if self.qmc.locktimex:
                     if self.qmc.timeindex[0] != -1:
@@ -16772,8 +16812,10 @@ class ApplicationWindow(QMainWindow):
         DRY_time_idx = None
         TP_index = 0
         try:
+            ######### CHARGE #########
             if self.qmc.timeindex[0] != -1:
-                start = self.qmc.timex[self.qmc.timeindex[0]]
+                start = self.qmc.timex[self.qmc.timeindex[0]] # start of roast (CHARGE)
+                computedProfile['CHARGE_time'] = float2float(start) # seconds after recording started
                 computedProfile['CHARGE_ET'] = float2float(self.qmc.temp1[self.qmc.timeindex[0]])
                 computedProfile['CHARGE_BT'] = float2float(self.qmc.temp2[self.qmc.timeindex[0]])
             else:
@@ -17196,6 +17238,7 @@ class ApplicationWindow(QMainWindow):
             profile['default_etypes'] = [item == self.qmc.etypesdefault[i] for i, item in enumerate(self.qmc.etypes)]
             profile['default_etypes_set'] = self.qmc.default_etypes_set
             profile['etypes'] = [encodeLocalStrict(et) for et in self.qmc.etypes[:]]
+            profile['eventsliderunits'] = [encodeLocalStrict(esu) for esu in self.eventsliderunits[:]]
             profile['roastingnotes'] = encodeLocalStrict(self.qmc.roastingnotes)
             profile['cuppingnotes'] = encodeLocalStrict(self.qmc.cuppingnotes)
             profile['timex'] = [float2float(x,10) for x in self.qmc.timex]
@@ -23018,10 +23061,12 @@ class ApplicationWindow(QMainWindow):
 
                                 temp = [convertTemp(t,rd['temp_unit'],self.qmc.mode) for t in rd['temp']]
                                 timex:list[float] = rd['timex']
-                                stemp = self.qmc.smooth_list(timex,
+                                stemp = smooth_list(timex,
                                     (fill_gaps(temp) if self.qmc.interpolateDropsflag else temp),
                                     window_len=self.qmc.curvefilter,
-                                    decay_smoothing=not self.qmc.optimalSmoothing)
+                                    decay_smoothing=not self.qmc.optimalSmoothing,
+                                    medfilt_factor=self.qmc.median_filter_factor, filter_dropouts=self.qmc.filterDropOuts)
+
                                 charge = max(0,rd['charge_idx']) # start of visible data
                                 drop:int = rd['drop_idx'] # end of visible data
                                 stemp = numpy.concatenate((
@@ -23063,7 +23108,9 @@ class ApplicationWindow(QMainWindow):
                                 if self.qmc.DeltaBTflag and self.qmc.delta_ax is not None:
                                     tx = numpy.array(timex)
                                     cf = self.qmc.curvefilter #*2 # we smooth twice as heavy for PID/RoR calculation as for normal curve smoothing
-                                    t1 = self.qmc.smooth_list(timex,(fill_gaps(temp) if self.qmc.interpolateDropsflag else temp),window_len=cf,decay_smoothing=not self.qmc.optimalSmoothing)
+                                    t1 = smooth_list(timex,(fill_gaps(temp) if self.qmc.interpolateDropsflag else temp),
+                                                window_len=cf,decay_smoothing=not self.qmc.optimalSmoothing,
+                                                medfilt_factor=self.qmc.median_filter_factor, filter_dropouts=self.qmc.filterDropOuts)
                                     if len(t1)>10 and len(tx) > 10:
                                         # we start RoR computation 10 readings after CHARGE to avoid this initial peak
                                         RoR_start = min(rd['charge_idx']+10,len(tx)-1)
@@ -26914,7 +26961,7 @@ class ApplicationWindow(QMainWindow):
                 ('\\R', QApplication.translate('Label','RELEASE')),
                 ('\\s', QApplication.translate('Label','START')),
                 ('\\S', (QApplication.translate('Label','STOP') if state else QApplication.translate('Label','START'))),
-                ('\\T', f'{tempvalueC}{self.qmc.mode}'),
+                ('\\T', f'{sign}{tempvalueC}{self.qmc.mode}'),
                 ('\\V', f'{sign}{value}{percent}'),
                 ('\\w', self.qmc.etypes[1])
                 ]:

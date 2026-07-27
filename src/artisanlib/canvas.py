@@ -64,7 +64,7 @@ from artisanlib.util import (to_ascii, uchr, fill_gaps, deltaLabelPrefix, deltaL
         fromFtoC, fromFtoCstrict, fromCtoF, fromCtoFstrict, RoRfromFtoC, RoRfromFtoCstrict, RoRfromCtoF, RoRfromCtoFstrict, toInt, toString,
         toFloat, application_name, getResourcePath, getDirectory, convertWeight, right_to_left, float2str,
         abbrevString, scaleFloat2String, is_proper_temp, weight_units, render_weight, volume_units, float2float, timearray2index,
-        events_internal_to_external_value, events_external_to_internal_value)
+        events_internal_to_external_value, events_external_to_internal_value, smooth_list, computeDeltas)
 from artisanlib import pid
 from artisanlib.time import ArtisanTime
 #from artisanlib.filters import LiveMedian
@@ -972,7 +972,7 @@ class tgraphcanvas(QObject):
                        'ColorTrack Serial',         #170
                        'Santoker R BT/ET',          #171
                        '+Santoker IR/Board',        #172
-                       '+Santoker DelatBT/DeltaET', #173
+                       '+Santoker DeltaBT/DeltaET', #173
                        'ColorTrack BT',             #174
                        'Thermoworks BlueDOT',       #175
                        'Aillio Bullet R2',          #176
@@ -1011,6 +1011,100 @@ class tgraphcanvas(QObject):
                        'Skycommand BT/ET',             #209 ## SKYBLE ## Skywalker V2 through SkyBLE dongle
                        '+Skycommand Burner/Air',         #210 ## SKYBLE ## OT1/OT2 duty echoes
                        ]
+
+        # ADD DEVICE:
+        # ids of devices temperature conversions should not be applied
+        self.nonTempDevices : Final[dict[int,tuple[bool,bool]]] = {
+            # channel 1, channel 2
+            22: (False, True), # +PID SV/DUTY %
+            25: (True, True), # +Virtual
+            40: (True, True), # Phidget IO 01
+            41: (True, True), # +Phidget IO 23
+            42: (True, True), # +Phidget IO 45
+            43: (True, True), # +Phidget IO 67
+            50: (True, True), # DUMMY
+            54: (True, True), # +Hottop Heater/Fan
+            57: (True, True), # EXTECH 755
+            62: (True, True), # Phidget 1011 IO 01
+            63: (True, True), # Phidget HUB IO 01
+            64: (True, True), # +Phidget HUB IO 23
+            65: (True, True), # +Phidget HUB IO 45
+            69: (True, True), # Phidget IO Digital 01
+            70: (True, True), # +Phidget IO Digital 23
+            71: (True, True), # +Phidget IO Digital 45
+            72: (True, True), # +Phidget IO Digital 67
+            73: (True, True), # Phidget 1011 IO Digital 01
+            74: (True, True), # Phidget HUB IO Digital 0
+            75: (True, True), # +Phidget HUB IO Digital 23
+            76: (True, True), # +Phidget HUB IO Digital 45
+            84: (True, True), # +Aillio Bullet R1 Heater/Fan
+            85: (True, True), # +Aillio Bullet R1 BT RoR/Drum
+            87: (True, True), # +Aillio Bullet R1 State
+            90: (True, True), # +Slider 01
+            91: (True, True), # +Slider 23
+            95: (True, True), # Phidget DAQ1400 Current
+            96: (True, True), # Phidget DAQ1400 Frequency
+            97: (True, True), # Phidget DAQ1400 Digital
+            98: (True, True), # Phidget DAQ1400 Voltage
+            106: (True, True), # Phidget HUB IO 0
+            107: (True, True), # Phidget HUB IO Digital 0
+            108: (True, True), # Yocto 4-20mA Rx
+            120: (True, True), # Yocto-0-10V-Rx
+            121: (True, True), # Yocto-milliVolt-Rx
+            122: (True, True), # Yocto-Serial
+            123: (True, True), # Phidget VCP1000
+            124: (True, True), # Phidget VCP1001
+            125: (True, True), # Phidget VCP1002
+            129: (True, True), # Yocto Power
+            130: (True, True), # Yocto Energy
+            131: (True, True), # Yocto Voltage
+            132: (True, True), # Yocto Current
+            133: (True, True), # Yocto Sensor
+            135: (True, True), # Santoker Power/Fan
+            136: (True, True), # Santoker Drum
+            137: (True, True), # Phidget DAQ1500
+            140: (True, True), # Kaleido Drum/AH
+            141: (True, True), # Kaleido Heater/Fan
+            143: (False, True), # IKAWA Set/RPM
+            144: (True, True), # IKAWA Heater/Fan
+            145: (True, True), # IKAWA State/Humidity
+            146: (True, True), # Phidget DAQ1000 01
+            147: (True, True), # +Phidget DAQ1000 23
+            148: (True, True), # +Phidget DAQ1000 45
+            149: (True, True), # +Phidget DAQ1000 67
+            152: (True, True), # Phidget DAQ1200 01
+            153: (True, True), # +Phidget DAQ1200 23
+            154: (True, True), # Phidget DAQ1300 01
+            155: (True, True), # +Phidget DAQ1300 23
+            156: (True, True), # Phidget DAQ1301 01
+            157: (True, True), # +Phidget DAQ1301 23
+            158: (True, True), # +Phidget DAQ1301 45
+            159: (True, True), # +Phidget DAQ1301 67
+            160: (True, True), # IKAWA \Delta Humidity / \Delat Humidity direction
+            165: (True, True), # +Mugma Heater/Fan
+            166: (True, True), # +Mugma Heater/Catalyzer
+            170: (True, True), # ColorTrack Serial
+            173: (True, True), # +Santoker BT RoR / ET RoR
+            174: (True, True), # ColorTrack BT
+            177: (True, True), # +PID P/I
+            178: (True, True), # +PID D/Error
+            179: (True, True), # +Shelly 3EM Pro Energy/Return
+            180: (True, True), # +Shelly Plug Total/Last
+            181: (True, True), # +Shelly 3EM Pro Power/S
+            182: (True, False), # +Shelly Plug Power/Temp
+            183: (True, True), # +Shelly Plug Voltage/Current
+            187: (True, True), # +RoastSeeNEXT Agtron/Crack
+            188: (True, True), # +RoastSeeNEXT RoR/FOR
+            189: (True, True), # +RoastSeeNEXT Distance/Time
+            190: (True, True), # +RoastSeeNEXT Yellow
+            192: (True, False), # +Phidget HUM1000 Hum/Temp
+            193: (True, True), # +Phidget PRE1000
+            194: (True, False), # +Yocto Meteo Hum/Temp
+            195: (True, True), # +Yocto Meteo Pressure
+            198: (True, True), # +Orbiter Sound/Drum
+            199: (True, True), # +Orbiter Damper/Heater
+            200: (True, True)  # +Orbiter Air/RoR
+        }
 
         # ADD DEVICE:
         # ids of (main) Phidget devices (without a + in front of their name string) as well as Phidget TMP100, HUM100 or PRE1000
@@ -6939,6 +7033,9 @@ class tgraphcanvas(QObject):
                     return (-1 if r is None else r), evalsign
         return -1, evalsign
 
+    def eval_math_expression_RT(self, mathexpression:str, t:float, RTsname:str, RTsval:float) -> float:
+        return self.eval_math_expression(mathexpression, t, RTsname=RTsname, RTsval=RTsval)
+
     # mathexpression = formula; t = a number to evaluate(usually time);
     # equeditnumber option = plotter edit window number; RTsname = option RealTime var name; RTsval = RealTime var val
     # The given mathexpression has to be a non-empty string!
@@ -8349,185 +8446,6 @@ class tgraphcanvas(QObject):
         #   this processEvents() seems not to be needed any longer!?
         return True
 
-    # https://gist.github.com/bhawkins/3535131
-    @staticmethod
-    def medfilt(x:'npt.NDArray[numpy.double]', k:int) -> 'npt.NDArray[numpy.double]':
-        """Apply a length-k median filter to a 1D array x.
-        Boundaries are extended by repeating endpoints.
-        """
-        assert k % 2 == 1, 'Median filter length must be odd.'
-        assert x.ndim == 1, 'Input must be one-dimensional.'
-        if len(x) == 0:
-            return x
-        k2 = (k - 1) // 2
-        y = numpy.zeros ((len (x), k), dtype=x.dtype)
-        y[:,k2] = x
-        for i in range (k2):
-            j = k2 - i
-            y[j:,i] = x[:-j]
-            y[:j,i] = x[0]
-            y[:-j,-(i+1)] = x[j:]
-            y[-j:,-(i+1)] = x[-1]
-        return numpy.median(y, axis=1)
-#        return numpy.nanmedian(y, axis=1) # produces artefacts
-
-    # smoothes a list (or numpy.array) of values 'y' at taken at times indicated by the numbers in list 'x'
-    # 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'
-    # 'flat' results in moving average
-    # window_len should be odd
-    # based on http://wiki.scipy.org/Cookbook/SignalSmooth
-    # returns a smoothed numpy array or the original y argument
-    def smooth(self, x:'npt.NDArray[numpy.floating]', y:'npt.NDArray[numpy.float64]', window_len:int = 15, window:str = 'hanning') -> 'npt.NDArray[numpy.floating]':
-        try:
-            if len(x) == len(y) and len(x) > 1:
-                if window_len > 2:
-                    # smooth curves
-                    #s = numpy.r_[2*x[0]-y[window_len:1:-1],y,2*y[-1]-y[-1:-window_len:-1]]
-                    #s=numpy.r_[y[window_len-1:0:-1],y,y[-2:-window_len-1:-1]]
-                    #s = y
-                    s = numpy.r_[y[window_len-1:0:-1],y,y[-1:-window_len:-1]]
-                    if window == 'flat': #moving average
-                        w = numpy.ones(window_len,'d')
-                    else:
-                        w = eval('numpy.'+window+'(window_len)') # pylint: disable=eval-used
-                    try:
-                        ys = numpy.convolve(w/w.sum(), s, mode='valid')
-                    except Exception: # pylint: disable=broad-except
-                        return y
-                    hwl = int(window_len/2)
-                    res = ys[hwl:-hwl]
-                    if len(res)+1 == len(y) and len(res) > 0:
-                        try:
-                            return ys[hwl-1:-hwl] # zuban:ignore[return-value,no-any-return,unused-ignore]
-                        except Exception: # pylint: disable=broad-except
-                            return y
-                    elif len(res) != len(y):
-                        return y
-                    return res # zuban:ignore[return-value,no-any-return,unused-ignore]
-                return y
-            return y
-        except Exception as ex: # pylint: disable=broad-except
-            _log.exception(ex)
-            _, _, exc_tb = sys.exc_info()
-            self.adderror((QApplication.translate('Error Message','Exception:') + ' smooth() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
-            return x
-
-    # re-sample, filter and smooth slice
-    # takes numpy arrays a (time) and b (temp) of the same length and returns a numpy array representing the processed b values
-    # delta: True if b is a RoR signal
-    # precondition: (self.filterDropOuts or window_len>2)
-    def smooth_slice(self, a:'npt.NDArray[numpy.double]', b:'npt.NDArray[numpy.float64]',
-        window_len:int = 7, window:str = 'hanning', decay_weights:list[int]|None = None, decay_smoothing:bool = False,
-        re_sample:bool = True, back_sample:bool = True, a_lin:'npt.NDArray[numpy.double]|None' = None,
-        delta:bool=False) -> 'npt.NDArray[numpy.double]':
-        a_mod:npt.NDArray[numpy.floating]
-        # 1. re-sample
-        if re_sample:
-            if a_lin is None or len(a_lin) != len(a):
-                a_mod = cast(numpy.ndarray[tuple[Literal[1]]], numpy.linspace(a[0],a[-1],len(a)))
-            else:
-                a_mod = a_lin
-            b = cast(numpy.ndarray[Any], numpy.interp(a_mod, a, b)) # resample data to linear spaced time
-        else:
-            a_mod = a
-        res:npt.NDArray[numpy.floating] = b # just in case the precondition (self.filterDropOuts or window_len>2) does not hold
-
-        # 2. filter spikes (only applied offline)
-        if self.filterDropOuts and not self.flagon:
-            try:
-#                if self.flagon:
-#                    online_medfilt = LiveMedian(median_filter_factor)
-#                    b = numpy.array(list(map(online_medfilt, b)))
-                bb = self.medfilt(b, (self.median_filter_factor_RoR if delta else self.median_filter_factor))
-# scipyernative which performs equal, but produces larger artefacts at the borders and for intermediate NaN values for k>3
-#                from scipy.signal import medfilt as scipy_medfilt
-#                b = scipy_medfilt(b,3)
-                res = bb
-            except Exception as e: # pylint: disable=broad-except
-                _log.exception(e)
-                res = b
-        # 3. smooth data
-        if window_len>2:
-            if decay_smoothing:
-                # decay smoothing
-                decay_weights_internal:npt.NDArray[numpy.int_]
-                if decay_weights is None:
-                    decay_weights_internal = numpy.arange(1,window_len+1)
-                else:
-                    window_len = len(decay_weights)
-                    decay_weights_internal = numpy.array(decay_weights)
-                # invariant: window_len = len(decay_weights_internal)
-                if decay_weights_internal.sum() == 0:
-                    res = b
-                else:
-                    result:list[float] = []
-                    # ignore -1 readings in averaging and ensure a good ramp
-                    for i, v in enumerate(b):
-                        seq = b[max(0,i-window_len + 1):i+1]
-                        w = decay_weights_internal[max(0,window_len-len(seq)):]  # preCond: len(decay_weights_internal)=window_len and len(seq) <= window_len; postCond: len(w)=len(seq)
-                        if len(w) == 0:
-                            # we don't average if there is are no weights (e.g. if the original seq did only contain -1 values and got empty)
-                            result.append(v)
-                        else:
-                            result.append(float(numpy.average(seq,axis=0,weights=w))) # works only if len(seq) = len(w)
-                    res = numpy.array(result)
-                    # postCond: len(res) = len(b)
-            else:
-                # optimal smoothing (the default)
-                win_len = max(0,window_len)
-                if win_len != 1: # at the lowest level we turn smoothing completely off
-                    res = self.smooth(a_mod, b, win_len, window) # pyright:ignore[reportUnknownArgumentType]
-                else:
-                    res = b
-        # 4. sample back
-        if re_sample and back_sample:
-            res = cast(numpy.ndarray[Any], numpy.interp(a, a_mod, res)) # pyright:ignore[reportUnknownArgumentType] # re-sampled back to original timestamps
-        return numpy.array(res).astype(numpy.double)
-
-    # takes lists a (time array) and b (temperature array) containing invalid segments of -1/None values and returns a list with all segments of valid values smoothed
-    # a: list of timestamps
-    # b: list of readings
-    # re_sample: if true re-sample readings to a linear spaced time before smoothing
-    # back_sample: if true results are back-sampled to original timestamps given in "a" after smoothing
-    # a_lin: pre-computed linear spaced timestamps of equal length than a
-    # delta: True if b is a RoR signal
-    # NOTE: result can contain NaN items on places where the input array contains the error element -1
-    # result is a numpy array or the b as numpy array with drop out readings -1 replaced by NaN
-    def smooth_list(self, aa:'npt.NDArray[numpy.double]|npt.NDArray[numpy.floating]|Sequence[float]', b:'npt.NDArray[numpy.double]|npt.NDArray[numpy.floating]|Sequence[float]', window_len:int = 7, window:str = 'hanning',
-            decay_weights:list[int]|None = None, decay_smoothing:bool = False, fromIndex:int = -1, toIndex:int = 0,
-            re_sample:bool = True, back_sample:bool = True, a_lin:'npt.NDArray[numpy.double]|None' = None, delta:bool=False) -> 'npt.NDArray[numpy.double]':
-        if len(aa) > 1 and len(aa) == len(b) and (self.filterDropOuts or window_len>2):
-            #pylint: disable=E1103
-            # 1. truncate
-            if fromIndex > -1: # if fromIndex is set, replace prefix up to fromIndex by None
-                if toIndex==0: # no limit
-                    toIndex=len(aa)
-            else: # smooth list on full length
-                fromIndex = 0
-                toIndex = len(aa)
-            a = numpy.array(aa[fromIndex:toIndex], dtype=numpy.double)
-            # we mask the error value -1 and Numpy  in the temperature array
-            mb:numpy.ndarray[tuple[Literal[1]],numpy.dtype[numpy.float64]] = cast(numpy.ndarray[tuple[Literal[1]],numpy.dtype[numpy.float64]], numpy.ma.masked_equal(b[fromIndex:toIndex], -1))
-            # split in masked and
-            unmasked_slices = [(x,False) for x in numpy.ma.clump_unmasked(mb)] # type:ignore[no-untyped-call,attr-defined,unused-ignore] # the valid readings
-            masked_slices = [(x,True) for x in numpy.ma.clump_masked(mb)]  # type:ignore[no-untyped-call,attr-defined,unused-ignore] # the dropped values
-            sorted_slices = sorted(unmasked_slices + masked_slices, key=lambda tup: tup[0].start) # pyright:ignore[reportUnknownArgumentType] # pyright: ignore[reportGeneralTypeIssues]
-            b_smoothed:list[npt.NDArray[numpy.double]] = [] # pyright:ignore[reportUnknownArgumentType] # b_smoothed collects the smoothed segments in order
-            b_smoothed.append(numpy.full(fromIndex, numpy.nan, dtype=numpy.double)) # pyright:ignore[reportUnknownArgumentType] # append initial segment to the list of resulting segments
-            # we just smooth the unmsked slices and add the unmasked slices with NaN values
-            for (s, m) in sorted_slices:
-                if m:
-                    # a slice with all masked (invalid) readings
-                    b_smoothed.append(numpy.full(s.stop - s.start, numpy.nan, dtype=numpy.double)) # pyright:ignore[reportUnknownArgumentType]
-                else:
-                    # a slice with proper data
-                    b_smoothed.append(self.smooth_slice(a[s], mb[s], window_len, window, decay_weights, decay_smoothing, re_sample, back_sample, a_lin, delta)) # pyright:ignore[reportUnknownArgumentType]
-            b_smoothed.append(numpy.full(len(a)-toIndex, numpy.nan, dtype=numpy.double)) # append the final segment to the list of resulting segments
-            return numpy.concatenate(b_smoothed)
-        bb = numpy.array(b, dtype=numpy.double)
-        bb[bb == -1] = numpy.nan
-        return bb
-
     # deletes saved annotation positions from l_annotations_dict
     # foreground annotations have position keys <=6, background annotation positions have keys > 6,
     def deleteAnnoPositions(self, foreground:bool = False, background:bool = False) -> None:
@@ -8880,124 +8798,6 @@ class tgraphcanvas(QObject):
             self.adderror((QApplication.translate('Error Message','Exception:') + ' place_annotations() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
         return anno_artists
 
-    def apply_symbolic_delta_formula(self, fct:str, deltas:list[float], timex:'npt.NDArray[numpy.double]', RTsname:str|None) -> list[float]:
-        try:
-            if len(deltas) == len(timex):
-                return [self.eval_math_expression(fct, timex[i], RTsname=RTsname, RTsval=d) for i,d in enumerate(deltas)]
-            return deltas
-        except Exception: # pylint: disable=broad-except
-            return deltas
-
-    # computes the RoR over the time and temperature arrays tx and temp via polynoms of degree 1 at index i using a window of wsize
-    # the window size wsize needs to be at least 1 (two succeeding readings)
-    @staticmethod
-    def polyRoR(tx:'npt.NDArray[numpy.double]', temp:'npt.NDArray[numpy.double]', wsize:int, i:int) -> float:
-        if i == 0: # we duplicate the first possible RoR value instead of returning a 0
-            i = 1
-        if 0 < i < min(len(tx), len(temp)):
-            with warnings.catch_warnings():
-                warnings.simplefilter('ignore')
-                left_index = max(0,i-wsize)
-                LS_fit = numpy.polynomial.polynomial.polyfit(tx[left_index:i+1],temp[left_index:i+1], 1)
-                return float(LS_fit[1]*60.)
-        else:
-            return 0
-
-    @staticmethod
-    # with window size wsize=1 the RoR is computed over succeeding readings; tx and temp assumed to be of type numpy.array
-    def arrayRoR(tx:'npt.NDArray[numpy.double]', temp:'npt.NDArray[numpy.double]', wsize:int) -> 'npt.NDArray[numpy.floating]': # with wsize >=1
-        # length compensation done downstream, not necessary here!
-        with warnings.catch_warnings():
-            # suppress warning if time difference is 0 which leads to a div by zero resulting in a warning and an inf value
-            warnings.simplefilter('ignore')
-            return (temp[wsize:] - temp[:-wsize]) / ((tx[wsize:] - tx[:-wsize])/60.)
-
-
-    # returns deltas and linearized timex;  both results can be None
-    # timex: the time array
-    # temp: the temperature array
-    # ds: the number of delta samples
-    # timex_lin: the linearized time array or None
-    # delta_symbolic_function: the symbolic function to be applied to the delta or None
-    # RTsname: the symbolic variable name of the delta
-    # deltaFilter: the deltaFilter setting
-    # roast_start_idx: the index of CHARGE
-    # roast_end_idx: the index of DROP
-    def computeDeltas(self, timex:'npt.NDArray[numpy.double]', temp:'list[float]|npt.NDArray[numpy.double]|None',
-            ds:int, optimalSmoothing:bool,
-            timex_lin:'npt.NDArray[numpy.double]|None', delta_symbolic_function:str,
-            RTsname:str, deltaFilter:int,
-            roast_start_idx:int, roast_end_idx:int) -> tuple[list[float|None]|None, 'npt.NDArray[numpy.double]|None']:
-        if temp is not None:
-            z1:npt.NDArray[numpy.floating]
-            with numpy.errstate(divide='ignore'):
-                lt = len(timex)
-                ntemp = numpy.array([0 if x is None else x for x in temp]) # pyright: ignore[reportGeneralTypeIssues]
-                if optimalSmoothing and self.polyfitRoRcalc:
-                    # optimal RoR computation using polynoms with out timeshift
-                    dss = ds + 1 if ds % 2 == 0 else ds
-                    if len(ntemp) > dss:
-                        try:
-                            # ntemp is not linearized yet:
-                            lin: npt.NDArray[numpy.double]
-                            if timex_lin is None or len(timex_lin) != len(ntemp):
-                                lin = numpy.linspace(timex[0],timex[-1],lt)
-                            else:
-                                lin = timex_lin
-                            ntemp_lin = cast(numpy.ndarray[Any], numpy.interp(lin, timex, ntemp)) # pyright:ignore[reportUnknownArgumentType] # resample data in ntemp to linear spaced time
-                            dist:float = (lin[-1] - lin[0]) / (len(lin) - 1) # pyright:ignore[reportUnknownArgumentType]
-                            from scipy.signal import savgol_filter # type # ignore # @Reimport
-                            z1 = savgol_filter(ntemp_lin, dss, 1, deriv=1, delta=dss)
-                            z1 = z1 * (60./dist) * dss
-                        except Exception: # pylint: disable=broad-except
-                            # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an exception "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
-                            # https://github.com/numpy/numpy/issues/16744
-                            # original version just picking the corner values:
-                            z1 = self.arrayRoR(timex,ntemp,ds)
-                    else:
-                        # in this case we use the standard algo
-                        try:
-                            # variant using incremental polyfit RoR computation
-                            z1 = numpy.array([self.polyRoR(timex,ntemp,ds,i) for i in range(len(ntemp))])
-                        except Exception: # pylint: disable=broad-except
-                            # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an exception "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
-                            # https://github.com/numpy/numpy/issues/16744
-                            # original version just picking the corner values:
-                            z1 = self.arrayRoR(timex,ntemp,ds)
-                elif self.polyfitRoRcalc:
-                    try:
-                        # variant using incremental polyfit RoR computation
-                        z1 = numpy.array([self.polyRoR(timex,ntemp,ds,i) for i in range(len(ntemp))]) # windows size ds needs to be at least 2
-                    except Exception: # pylint: disable=broad-except
-                        # a numpy/OpenBLAS polyfit bug can cause polyfit to throw an exception "SVD did not converge in Linear Least Squares" on Windows Windows 10 update 2004
-                        # https://github.com/numpy/numpy/issues/16744
-                        # original version just picking the corner values:
-                        z1 = self.arrayRoR(timex,ntemp,ds)
-                else:
-                    z1 = self.arrayRoR(timex,ntemp,ds)
-
-            ld1 = len(z1) # pyright:ignore[reportUnknownArgumentType]
-            # make lists equal in length
-            if lt > ld1:
-                z1 = numpy.append([z1[0] if ld1 else 0.]*(lt - ld1),z1) # pyright:ignore[reportUnknownArgumentType]
-            # apply smybolic formula
-            if delta_symbolic_function:
-                z1 = numpy.array(self.apply_symbolic_delta_formula(delta_symbolic_function, z1.tolist(), timex, RTsname=RTsname)) # pyright:ignore[reportUnknownArgumentType]
-            # apply smoothing
-            if optimalSmoothing:
-                user_filter = deltaFilter
-            else:
-                user_filter = int(round(deltaFilter/2.))
-            delta1 = self.smooth_list(timex,z1,window_len=user_filter,decay_smoothing=(not optimalSmoothing),a_lin=timex_lin,delta=True) # pyright:ignore[reportUnknownArgumentType]
-
-            # cut out the part after DROP and before CHARGE and remove values beyond the RoRlimit
-            return [
-                d if ((roast_start_idx <= i <= roast_end_idx) and (d is not None and (not self.RoRlimitFlag or
-                    max(-self.maxRoRlimit,self.RoRlimitm) < d < min(self.maxRoRlimit,self.RoRlimit))))
-                else None
-                for i,d in enumerate(delta1)
-            ], timex_lin
-        return None, timex_lin
 
     # computes the RoR deltas and returns the smoothed versions for both temperature channels
     # if t1 or t2 is not given (None), its RoR signal is not computed and None is returned instead
@@ -9025,28 +8825,44 @@ class tgraphcanvas(QObject):
                     timex_lin = numpy.array(timex_lin)
                 else:
                     timex_lin = None
-            delta1, timex_lin = self.computeDeltas(
+            delta1, timex_lin = computeDeltas(
                     tx_roast,
                     t1,
                     dsET,
                     optimalSmoothing,
                     timex_lin,
-                    self.DeltaETfunction,
-                    'R1',
                     self.deltaETfilter,
                     roast_start_idx,
-                    roast_end_idx)
-            delta2, _ = self.computeDeltas(
+                    roast_end_idx,
+                    self.polyfitRoRcalc,
+                    self.median_filter_factor_RoR,
+                    self.filterDropOuts and not self.flagon,
+                    self.RoRlimitFlag,
+                    max(-self.maxRoRlimit,self.RoRlimitm),
+                    min(self.maxRoRlimit,self.RoRlimit),
+                    True, # replace error values -1 by NaN
+                    'R1',
+                    self.DeltaETfunction,
+                    self.eval_math_expression_RT)
+            delta2, _ = computeDeltas(
                     tx_roast,
                     t2,
                     dsBT,
                     optimalSmoothing,
                     timex_lin,
-                    self.DeltaBTfunction,
-                    'R2',
                     self.deltaBTfilter,
                     roast_start_idx,
-                    roast_end_idx)
+                    roast_end_idx,
+                    self.polyfitRoRcalc,
+                    self.median_filter_factor_RoR,
+                    self.filterDropOuts and not self.flagon,
+                    self.RoRlimitFlag,
+                    max(-self.maxRoRlimit,self.RoRlimitm),
+                    min(self.maxRoRlimit,self.RoRlimit),
+                    True, # replace error values -1 by NaN
+                    'R2',
+                    self.DeltaBTfunction,
+                    self.eval_math_expression_RT)
 
             return delta1, delta2
         except Exception as e: # pylint: disable=broad-except
@@ -9363,7 +9179,8 @@ class tgraphcanvas(QObject):
                 else:
                     if len(self.timex)>1:
                         timex_lin = numpy.linspace(self.timex[0],self.timex[-1],len(self.timex))
-                    self.stemp1 = list(self.smooth_list(self.timex,temp1_nogaps,window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timex_lin,delta=False))
+                    self.stemp1 = list(smooth_list(self.timex,temp1_nogaps,window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timex_lin,
+                                        medfilt_factor=self.median_filter_factor, filter_dropouts=self.filterDropOuts and not self.flagon))
             if smooth or len(self.stemp2) != len(self.timex):
                 temp2_nogaps = self.resizeListStrict(self.temp2,len(self.timex))
                 if self.interpolateDropsflag:
@@ -9373,7 +9190,8 @@ class tgraphcanvas(QObject):
                 else:
                     if timex_lin is None and self.timex and len(self.timex)>1:
                         timex_lin = numpy.linspace(self.timex[0],self.timex[-1],len(self.timex))
-                    self.stemp2 = list(self.smooth_list(self.timex,temp2_nogaps,window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timex_lin,delta=False))
+                    self.stemp2 = list(smooth_list(self.timex,temp2_nogaps,window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=timex_lin,
+                                        medfilt_factor=self.median_filter_factor, filter_dropouts=self.filterDropOuts and not self.flagon))
 
             #populate delta ET (self.delta1) and delta BT (self.delta2)
             # calculated here to be available for parsepecialeventannotations(). the curve are plotted later.
@@ -9404,23 +9222,25 @@ class tgraphcanvas(QObject):
                 if self.flagon or len(self.stemp1B) != len(self.timex):
                     if self.timeB:
                         timeB_lin = numpy.linspace(self.timeB[0],self.timeB[-1],len(self.timeB))
-                    st1 = self.smooth_list(self.timeB,
+                    st1 = smooth_list(self.timeB,
                         (fill_gaps(self.temp1B) if self.interpolateDropsflag else self.temp1B),
                         window_len=self.curvefilter,
                         decay_smoothing=decay_smoothing_p,
                         a_lin=timeB_lin,
-                        delta=False)
+                        medfilt_factor=self.median_filter_factor,
+                        filter_dropouts=self.filterDropOuts and not self.flagon)
                 else:
                     st1 = self.stemp1B
                 if self.flagon or len(self.stemp2B) != len(self.timex):
                     if timeB_lin is None and self.timeB:
                         timeB_lin = numpy.linspace(self.timeB[0],self.timeB[-1],len(self.timeB))
-                    st2 = self.smooth_list(self.timeB,
+                    st2 = smooth_list(self.timeB,
                         (fill_gaps(self.temp2B) if self.interpolateDropsflag else self.temp2B),
                         window_len=self.curvefilter,
                         decay_smoothing=decay_smoothing_p,
                         a_lin=timeB_lin,
-                        delta=False)
+                        medfilt_factor=self.median_filter_factor,
+                        filter_dropouts=self.filterDropOuts and not self.flagon)
                 else:
                     st2 = self.stemp2B
 
@@ -9882,8 +9702,10 @@ class tgraphcanvas(QObject):
                                 tb_lin = numpy.linspace(tb[0],tb[-1],len(tb))
                             else:
                                 tb_lin = None
-                            self.stemp1B = self.smooth_list(tb,t1,window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tb_lin,delta=False)
-                            self.stemp2B = self.smooth_list(tb,t2,window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tb_lin,delta=False)
+                            self.stemp1B = smooth_list(tb,t1,window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tb_lin,
+                                    medfilt_factor=self.median_filter_factor, filter_dropouts=self.filterDropOuts and not self.flagon)
+                            self.stemp2B = smooth_list(tb,t2,window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tb_lin,
+                                    medfilt_factor=self.median_filter_factor, filter_dropouts=self.filterDropOuts and not self.flagon)
 
                         self.l_background_annotations = []
 
@@ -9910,7 +9732,9 @@ class tgraphcanvas(QObject):
                                     else:
                                         trans = self.ax.transData
                                     if re_smooth_background:
-                                        self.stemp1BX[n3] = self.smooth_list(tx,self.temp1BX[n3],window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin,delta=False)
+#                                        self.stemp1BX[n3] = self.smooth_list(tx,self.temp1BX[n3],window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin,delta=False)
+                                        self.stemp1BX[n3] = smooth_list(tx,self.temp1BX[n3],window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin,
+                                            medfilt_factor=self.median_filter_factor, filter_dropouts=self.filterDropOuts and not self.flagon)
                                     if self.flagon:
                                         # during recording we draw the unsmoothed background curves, with drops interpolated
                                         stemp3B = self.temp1BX[n3]
@@ -9922,7 +9746,8 @@ class tgraphcanvas(QObject):
                                     else:
                                         trans = self.ax.transData
                                     if re_smooth_background:
-                                        self.stemp2BX[n3] = self.smooth_list(tx,self.temp2BX[n3],window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin,delta=False)
+                                        self.stemp2BX[n3] = smooth_list(tx,self.temp2BX[n3],window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin,
+                                            medfilt_factor=self.median_filter_factor, filter_dropouts=self.filterDropOuts and not self.flagon)
                                     if self.flagon:
                                         # during recording we draw the unsmoothed background curves, with drops interpolated
                                         stemp3B = self.temp2BX[n3]
@@ -9967,7 +9792,8 @@ class tgraphcanvas(QObject):
                                     else:
                                         trans = self.ax.transData
                                     if re_smooth_background:
-                                        self.stemp1BX[n4] = self.smooth_list(tx,self.temp1BX[n4],window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin,delta=False)
+                                        self.stemp1BX[n4] = smooth_list(tx,self.temp1BX[n4],window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin,
+                                                medfilt_factor=self.median_filter_factor, filter_dropouts=self.filterDropOuts and not self.flagon)
                                     if self.flagon:
                                         # during recording we draw the unsmoothed background curves, with drops interpolated
                                         stemp4B = self.temp1BX[n4]
@@ -9979,7 +9805,8 @@ class tgraphcanvas(QObject):
                                     else:
                                         trans = self.ax.transData
                                     if re_smooth_background:
-                                        self.stemp2BX[n4] = self.smooth_list(tx,self.temp2BX[n4],window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin,delta=False)
+                                        self.stemp2BX[n4] = smooth_list(tx,self.temp2BX[n4],window_len=self.curvefilter,decay_smoothing=decay_smoothing_p,a_lin=tx_lin,
+                                                medfilt_factor=self.median_filter_factor, filter_dropouts=self.filterDropOuts and not self.flagon)
                                     if self.flagon:
                                         # during recording we draw the unsmoothed background curves, with drops interpolated
                                         stemp4B = self.temp2BX[n4]
@@ -11213,12 +11040,13 @@ class tgraphcanvas(QObject):
                                 if any(x in self.extramathexpression1[i] for x in ['R1', 'RB1']):
                                     self.extrastemp1[i] = self.extratemp1[i]
                                 elif not self.flagon and (re_smooth_foreground or len(self.extrastemp1[i]) != len(self.extratimex[i])):
-                                    self.extrastemp1[i] = self.smooth_list(self.extratimex[i],
+                                    self.extrastemp1[i] = smooth_list(self.extratimex[i],
                                         (fill_gaps(self.extratemp1[i]) if self.interpolateDropsflag else self.extratemp1[i]),
                                         window_len=self.curvefilter,
                                         decay_smoothing=decay_smoothing_p,
                                         a_lin=timexi_lin,
-                                        delta=False).tolist()
+                                        medfilt_factor=self.median_filter_factor,
+                                        filter_dropouts=self.filterDropOuts and not self.flagon).tolist()
                                 elif len(self.extrastemp1[i]) != len(self.extratimex[i]):
                                     # extratemp1 does not exist and we are not re-smoothing, we take the raw data (potentially with dropouts interpolated)
                                     if self.interpolateDropsflag: # we don't smooth, but remove the dropouts
@@ -11269,12 +11097,13 @@ class tgraphcanvas(QObject):
                                 if any(x in self.extramathexpression2[i] for x in ['R2', 'RB2']):
                                     self.extrastemp2[i] = self.extratemp2[i]
                                 elif not self.flagon and (re_smooth_foreground or len(self.extrastemp2[i]) != len(self.extratimex[i])):
-                                    self.extrastemp2[i] = self.smooth_list(self.extratimex[i],
+                                    self.extrastemp2[i] = smooth_list(self.extratimex[i],
                                         (fill_gaps(self.extratemp2[i]) if self.interpolateDropsflag else self.extratemp2[i]),
                                         window_len=self.curvefilter,
                                         decay_smoothing=decay_smoothing_p,
                                         a_lin=timexi_lin,
-                                        delta=False).tolist()
+                                        medfilt_factor=self.median_filter_factor,
+                                        filter_dropouts=self.filterDropOuts and not self.flagon).tolist()
                                 elif len(self.extrastemp2[i]) != len(self.extratimex[i]):
                                     # extratemp2 does not exist and we are not re-smoothing, we take the raw data (potentially with dropouts interpolated)
                                     if self.interpolateDropsflag:
@@ -13195,8 +13024,8 @@ class tgraphcanvas(QObject):
         self.extraNoneTempHint2 = []
         for d in self.extradevices:
             if d in self.nonTempDevices:
-                self.extraNoneTempHint1.append(True)
-                self.extraNoneTempHint2.append(True)
+                self.extraNoneTempHint1.append(self.nonTempDevices[d][0])
+                self.extraNoneTempHint2.append(self.nonTempDevices[d][1])
             elif d == 29: # MODBUS
                 self.extraNoneTempHint1.append(self.aw.modbus.inputModes[0] == '')
                 self.extraNoneTempHint2.append(self.aw.modbus.inputModes[1] == '')
@@ -13677,7 +13506,7 @@ class tgraphcanvas(QObject):
 
 
     def OffMonitorCloseDown(self, respectAlwaysON:bool, wasRecording:bool) -> None:
-        _log.debug('MODE: OffMonitorCloseDown')
+        _log.debug('MODE: OffMonitorCloseDown(%s,%s)',respectAlwaysON,wasRecording)
         try:
 
             if wasRecording:

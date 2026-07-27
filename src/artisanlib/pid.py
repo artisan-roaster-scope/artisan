@@ -20,6 +20,7 @@
 import logging
 import time
 import functools
+import warnings
 import numpy
 from collections.abc import Callable
 from typing import Final, TYPE_CHECKING
@@ -64,11 +65,15 @@ def _calculate_integral_limits(outMin:int, outMax:int, integral_limit_factor:flo
 
 @functools.lru_cache(maxsize=3)
 def _getParameterLinearFit(x1:float, x2:float, y1:float, y2:float) -> 'npt.NDArray[numpy.floating]':
-    return numpy.polyfit([x1,x2], [y1,y2], 1)
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        return numpy.polyfit([x1,x2], [y1,y2], 1)
 
 @functools.lru_cache(maxsize=3)
 def _getParameterQuadraticFit(x1:float, x2:float, x3:float, y1:float, y2:float, y3:float) -> 'npt.NDArray[numpy.floating]':
-    return numpy.polyfit([x1,x2,x3], [y1,y2,y3], 2)
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        return numpy.polyfit([x1,x2,x3], [y1,y2,y3], 2)
 
 
 # expects a function control that takes a value from [<outMin>,<outMax>] to control the heater as called on each update()
@@ -372,9 +377,9 @@ class PID:
             coefficients:npt.NDArray[numpy.floating] | None = None
             try:
                 with suppress_stdout_stderr():
-                    if self.gain_scheduling_quadratic:
+                    if self.gain_scheduling_quadratic and not self.Schedule0 == self.Schedule1 == self.Schedule2 == 0:
                         coefficients = _getParameterQuadraticFit(self.Schedule0,self.Schedule1,self.Schedule2,y1,y2,y3)
-                    else:
+                    elif not self.Schedule0 == self.Schedule1 == 0:
                         coefficients = _getParameterLinearFit(self.Schedule0,self.Schedule1,y1,y2)
             except Exception:  # pylint: disable=broad-except
                 pass

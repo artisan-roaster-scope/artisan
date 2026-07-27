@@ -1,0 +1,130 @@
+// ABOUT
+// Artisan profile payload
+//
+// LICENSE
+// This program or module is free software: you can redistribute it and/or
+// modify it under the terms of the GNU General Public License as published
+// by the Free Software Foundation, either version 2 of the License, or
+// version 3 of the License, or (at your option) any later version. It is
+// provided for educational purposes and is distributed in the hope that
+// it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
+// the GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+// MAINTAINER
+// Marko Luther, 2026
+
+edition = "2024";
+
+package artisan.roast.v1;
+
+import "google/protobuf/timestamp.proto";
+
+
+message Roast {
+
+  // NOTES
+  //
+  // The value -1 is used as a null value to indicate a missing
+  // value in sequences of readings, such as bt_values, et_values,
+  // bt_ror_values, and et_ror_values.
+  //
+  // INVARIANTS
+  //
+  // - all indices of the given milestones are valid and strict monotonic
+  //   milestone_idicies = [
+  //       milestones.charge_idx,
+  //       milestones.dry_end_idx,
+  //       milestones.first_crack_start_idx,
+  //       milestones.first_crack_end_idx,
+  //       milestones.second_crack_start_idx,
+  //       milestones.second_crack_end_idx,
+  //       milestones.drop_idx
+  //   ]
+  //   for i, idx in enumerate(milestone_idicies):
+  //       if HasField(idx):
+  //           0 <= idx < len(times) and
+  //           for 0 <= j < i:
+  //               if HasField(milestone_idicies[j]
+  //                  milestone_idicies[j] < idx
+  // - all annotations are well defined and valid
+  //   len(annotations.time_indices) == len(annotations.tags) and
+  //   for idx in annotations.time_indices: 0 <= idx < len(times)
+  // - all events are well defined and valid
+  //   for events in {events1, events2, events3, events4}:
+  //       len(events.time_indices) == len(events.values) and
+  //       for idx in events.time_indices: 0 <= idx <= len(times)
+  // - all readings are valid (every reading has an associated time)
+  //   for readings in {
+  //          bt_values, et_values,
+  //          bt_ror_values, et_ror_values}
+  //       len(readings) <= len(times)
+  //   for curve in additional_curves:
+  //       len(curve.values) <= len(times)
+  // - time is monotonic
+  //   for i in range(0,len(times)):
+  //       for 0 <= j < i:
+  //           times[j] <= times[i]
+  // - time of CHARGE (start of roast)
+  //   if HasField(milestones) and HasField(milestones.charge_idx):
+  //       times[milestones.charge_idx] == 0
+  //   elif len(times)>0:
+  //       times[0] == 0
+  //   NOTE: time[x]=0 corresponds to timestamp 'start'
+  // - time of DROP (end of roast)
+  //   if HasField(milestones) and HasField(milestones.drop_idx):
+  //       times[milestones.drop_idx]
+  //       NOTE: times[milestones.drop_idx] corresponds
+  //             to timestamp 'drop'
+  //   elif len(times)>0:
+  //       times[-1] // last reading
+  //       NOTE: times[-1] corresponds
+  //             to timestamp 'drop'
+
+  message Milestones {
+    uint32 charge_idx = 1;
+    uint32 dry_end_idx = 2;
+    uint32 first_crack_start_idx = 3;
+    uint32 first_crack_end_idx = 4;
+    uint32 second_crack_start_idx = 5;
+    uint32 second_crack_end_idx = 6;
+    uint32 drop_idx = 7;
+  }
+
+  message Annotations {
+    repeated uint32 time_indices = 1;
+    repeated string tags = 2;
+  }
+
+  message Events {
+    string name = 1;
+    string unit = 2;
+    repeated uint32 time_indices = 3;
+    repeated uint32 values = 4;
+  }
+
+  message Curve {
+    string name = 1;
+    repeated sint32 values = 2; // readings multiplied by 10
+    bool temperatures = 3;      // true if values are temperatures in C
+  }
+
+  string org_id = 1;           // id of organization
+  string machine_id = 2;       // id of machine
+  string roast_id = 3;         // roast UUID
+  google.protobuf.Timestamp start = 4;   // start of roast
+  google.protobuf.Timestamp end = 5;     // end of roast
+  repeated sint32 times = 6;   // [s] roast time relative to CHARGE
+  Milestones milestones = 7;   // main roasting events like CHARGE, FCs, ...
+  Annotations annotations = 8; // text annotations
+  repeated Events events = 9;  // events like power changes
+  repeated sint32 bt_values = 10; // [C] bean temperatures multiplied by 10
+  repeated sint32 et_values = 11; // [C] environmental temperatures mult. by 10
+  repeated sint32 bt_ror_values = 12;     // [C/min] BT RoR multiplied by 10
+  repeated sint32 et_ror_values = 13;     // [C/min] ET RoR multiplied by 10
+  repeated Curve additional_curves = 14;  // additional curves
+  uint32 factor = 15;  // multiplication factor of all values
+}
