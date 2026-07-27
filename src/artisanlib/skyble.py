@@ -35,8 +35,8 @@ class SkyBLE(ClientBLE):
 
     SKYCOMMAND_NAME:Final[str]    = 'ESP32_Skycommand_BLE'                  # advertised name prefix
     SKYCOMMAND_SERVICE:Final[str] = '6e400001-b5a3-f393-e0a9-e50e24dcca9e'  # advertised service UUID
-    SKYCOMMAND_NOTIFY:Final[str]  = '6e400002-b5a3-f393-e0a9-e50e24dcca9e'  # TC4 telemetry (RX)
-    SKYCOMMAND_WRITE:Final[str]   = '6e400003-b5a3-f393-e0a9-e50e24dcca9e'  # TC4 commands (TX)
+    SKYCOMMAND_NOTIFY:Final[str]  = '6e400003-b5a3-f393-e0a9-e50e24dcca9e'  # TC4 telemetry (RX)
+    SKYCOMMAND_WRITE:Final[str]   = '6e400002-b5a3-f393-e0a9-e50e24dcca9e'  # TC4 commands (TX)
 
     # TC4 protocol
     POLL_S:Final[float]  = 1.0          # READ poll cadence (keep <= sample interval / 2)
