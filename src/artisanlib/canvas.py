@@ -1103,7 +1103,11 @@ class tgraphcanvas(QObject):
             195: (True, True), # +Yocto Meteo Pressure
             198: (True, True), # +Orbiter Sound/Drum
             199: (True, True), # +Orbiter Damper/Heater
-            200: (True, True)  # +Orbiter Air/RoR
+            200: (True, True),  # +Orbiter Air/RoR
+            207: (False, False), # Skywalker BT/ET ## CYBER ## Cyberroaster is BLE (nonserial)
+            208: (True, True), # +Skywalker Burner/Air ## CYBER ## OT1/OT2 duty echoes
+            209: (False, False), # SkyBLE BT/ET ## SKYBLE ## Skywalker V2 through SkyBLE dongle
+            210: (True, True), # +Skycommand Burner/Air ## SKYBLE
         }
 
         # ADD DEVICE:
@@ -1180,101 +1184,6 @@ class tgraphcanvas(QObject):
             195, # +Yocto Meteo Pressure
             207,  # Skywalker BT/ET ## CYBER ## Cyberroaster is BLE (nonserial)
             209, # SkyBLE BT/ET ## SKYBLE ## Skywalker V2 through SkyBLE dongle
-        ]
-
-        # ADD DEVICE:
-        # ids of devices temperature conversions should not be applied
-        self.nonTempDevices : Final[list[int]] = [
-            22, # +PID SV/DUTY %
-            25, # +Virtual
-            40, # Phidget IO 01
-            41, # +Phidget IO 23
-            42, # +Phidget IO 45
-            43, # +Phidget IO 67
-            50, # DUMMY
-            54, # +Hottop Heater/Fan
-            57, # EXTECH 755
-            62, # Phidget 1011 IO 01
-            63, # Phidget HUB IO 01
-            64, # +Phidget HUB IO 23
-            65, # +Phidget HUB IO 45
-            69, # Phidget IO Digital 01
-            70, # +Phidget IO Digital 23
-            71, # +Phidget IO Digital 45
-            72, # +Phidget IO Digital 67
-            73, # Phidget 1011 IO Digital 01
-            74, # Phidget HUB IO Digital 0
-            75, # +Phidget HUB IO Digital 23
-            76, # +Phidget HUB IO Digital 45
-            84, # +Aillio Bullet R1 Heater/Fan
-            87, # +Aillio Bullet R1 State
-            90, # +Slider 01
-            91, # +Slider 23
-            95, # Phidget DAQ1400 Current
-            96, # Phidget DAQ1400 Frequency
-            97, # Phidget DAQ1400 Digital
-            98, # Phidget DAQ1400 Voltage
-            106, # Phidget HUB IO 0
-            107, # Phidget HUB IO Digital 0
-            108, # Yocto 4-20mA Rx
-            120, # Yocto-0-10V-Rx
-            121, # Yocto-milliVolt-Rx
-            122, # Yocto-Serial
-            123, # Phidget VCP1000
-            124, # Phidget VCP1001
-            125, # Phidget VCP1002
-            129, # Yocto Power
-            130, # Yocto Energy
-            131, # Yocto Voltage
-            132, # Yocto Current
-            133, # Yocto Sensor
-            135, # Santoker Power/Fan
-            136, # Santoker Drum
-            137, # Phidget DAQ1500
-            140, # Kaleido Drum/AH
-            141, # Kaleido Heater/Fan
-            143, # IKAWA Set/RPM
-            144, # IKAWA Heater/Fan
-            145, # IKAWA State/Humidity
-            146, # Phidget DAQ1000 01
-            147, # +Phidget DAQ1000 23
-            148, # +Phidget DAQ1000 45
-            149, # +Phidget DAQ1000 67
-            152, # Phidget DAQ1200 01
-            153, # +Phidget DAQ1200 23
-            154, # Phidget DAQ1300 01
-            155, # +Phidget DAQ1300 23
-            156, # Phidget DAQ1301 01
-            157, # +Phidget DAQ1301 23
-            158, # +Phidget DAQ1301 45
-            159, # +Phidget DAQ1301 67
-            160, # IKAWA \Delta Humidity / \Delat Humidity direction
-            165, # +Mugma Heater/Fan
-            166, # +Mugma Heater/Catalyzer
-            170, # ColorTrack Serial
-            173, # +Santoker BT RoR / ET RoR
-            174, # ColorTrack BT
-            177, # +PID P/I
-            178, # +PID D/Error
-            179, # +Shelly 3EM Pro Energy/Return
-            180, # +Shelly Plug Total/Last
-            181, # +Shelly 3EM Pro Power/S
-            182, # +Shelly Plug Power/Temp
-            183, # +Shelly Plug Voltage/Current
-            187, # +RoastSeeNEXT Agtron/Crack
-            188, # +RoastSeeNEXT RoR/FOR
-            189, # +RoastSeeNEXT Distance/Time
-            190, # +RoastSeeNEXT Yellow
-            191, # +Phidget TMP1000
-            192, # +Phidget HUM1000 Hum/Temp
-            193, # +Phidget PRE1000
-            194, # +Yocto Meteo Hum/Temp
-            195, # +Yocto Meteo Pressure
-            198, # +Orbiter Sound/Drum
-            199, # +Orbiter Damper/Heater
-            200, # +Orbiter Air/RoR
-            208, # +Skywalker Burner/Air ## CYBER ## 
-            210, # +SkyBLE Burner/Air ## SKYBLE ## 
         ]
 
         # ADD DEVICE:
