@@ -914,9 +914,9 @@ class TestCountriesModuleStructure:
         # Check for copyright and license information in the source
         with open(plus.countries.__file__, encoding='utf-8') as f:
             content: str = f.read()
-            assert 'Copyright' in content, 'Module should contain copyright information'
+            assert 'COPYRIGHT' in content, 'Module should contain copyright information'
             assert (
-                'GNU General Public License' in content
+                'GNU Affero General Public License' in content
             ), 'Module should contain license information'
 
     def test_module_translation_calls_are_at_module_level(self) -> None:

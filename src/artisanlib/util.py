@@ -1,17 +1,27 @@
 #
 # ABOUT
 # Artisan Utilities
-
+#
+# COPYRIGHT (C) 2010-2026 The Artisan team represented by
+#   Marko Luther <marko.luther@gmx.net> (maintainer) and all contributors
+#
 # LICENSE
-# This program or module is free software: you can redistribute it and/or
-# modify it under the terms of the GNU General Public License as published
-# by the Free Software Foundation, either version 2 of the License, or
-# version 3 of the License, or (at your option) any later version. It is
-# provided for educational purposes and is distributed in the hope that
-# it will be useful, but WITHOUT ANY WARRANTY; without even the implied
-# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
-# the GNU General Public License for more details.
-
+# This program or module is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+# MAINTAINER
+# Marko Luther, 2026
+#
 # AUTHOR
 # Marko Luther, 2023
 
@@ -38,9 +48,10 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
     from artisanlib.main import Artisan # pylint: disable=unused-import
     import numpy.typing as npt # pylint: disable=unused-import
+    from artisanlib.atypes import ProfileData # pylint: disable=unused-import
+    from proto import artisan_roast_pb2 # pylint: disable=unused-import
 
 from artisanlib.atypes import ProfileData
-from proto import artisan_roast_pb2 # type:ignore[unused-ignore]
 
 ##
 
@@ -1577,7 +1588,7 @@ def roast_time(timeindex:list[int], timex:list[float]) -> float|None:
     return endtime - starttime
 
 # return the total roasting time of the given profile in seconds
-def get_total_roast_time_from_profile(profile:ProfileData) -> float|None:
+def get_total_roast_time_from_profile(profile:'ProfileData') -> float|None:
     if 'timex' in profile and 'timeindex' in profile:
         timeindex = profile['timeindex']
         timex = profile['timex']
@@ -1620,13 +1631,12 @@ def min_blocks(registers:list[int]) -> list[tuple[int,int]]:
 
 
 
-### roast message paylaod
-
+### roast message payload
 
 # returns the profile encoded as roast message protobuf or None
-def roast_message(profile:ProfileData, org_id:str|None = None, machine_id:str|None = None,
+def roast_message(profile:'ProfileData', org_id:str|None = None, machine_id:str|None = None,
         interpolate_drops:bool = True,
-        smooth_curves:bool = False,
+        smooth_curves:bool = True,
         curvefilter:int = 3,
         medfilt_factor:int = 3, # has to be uneven
         decay_smoothing_p:bool = False,
@@ -1643,8 +1653,9 @@ def roast_message(profile:ProfileData, org_id:str|None = None, machine_id:str|No
         seconds_after_drop:int|None = 30, # if None, no data is removed after DROP
         factor:int = 100 # all values in the resulting roast payload are multiplied by this factor
          # NOTE: a factor 10 results in visual steps in the computed RoR curve due to the low y-resolution of the delta axis
-        ) -> artisan_roast_pb2.Roast|None: # pylint: disable=no-member
+        ) -> 'artisan_roast_pb2.Roast|None': # pylint: disable=no-member
 
+    from proto import artisan_roast_pb2 # type:ignore[unused-ignore]
     from scipy.interpolate import interp1d
 
     # timex
@@ -1998,11 +2009,12 @@ def roast_message(profile:ProfileData, org_id:str|None = None, machine_id:str|No
     return roast
 
 
-def roast_message_to_profile(roast:artisan_roast_pb2.Roast) -> ProfileData: # pylint: disable=no-member
+def roast_message_to_profile(roast:'artisan_roast_pb2.Roast') -> 'ProfileData': # pylint: disable=no-member
     # adds RoR curves (if available) as extra curves for inspection
     profile:ProfileData = {}
 
     from google.protobuf.json_format import MessageToDict
+
     roast_dict = MessageToDict(roast, preserving_proto_field_name=True)
 
     factor:int = roast_dict.get('factor', 1) # multiplication factor of all payload values

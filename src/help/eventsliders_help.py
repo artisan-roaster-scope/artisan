@@ -160,6 +160,7 @@ def content() -> str:
     tbl_Commands.add_row(['&#160;','showExtraCurve(<extra_device>,<curve>,<bool>)',QApplication.translate('HelpDlg','shows/hides the <curve> (one of {T1,T2}) of the zero-based <extra_device> number'),'&#160;'])
     tbl_Commands.add_row(['&#160;','showEvents(<event_type>, <bool>)',QApplication.translate('HelpDlg','shows/hides the events of <event_type> in [1,..,5]'),'&#160;'])
     tbl_Commands.add_row(['&#160;','showBackgroundEvents(<bool>)',QApplication.translate('HelpDlg','shows/hides the events of the background profile'),'&#160;'])
+    tbl_Commands.add_row(['&#160;','upload2RoastHubs',QApplication.translate('HelpDlg','upload current loaded profile to RoastHubs'),'&#160;'])
     tbl_Commands.add_row([QApplication.translate('HelpDlg','RC Command'),'pulse(ch,min,max[,sn])',QApplication.translate('HelpDlg','for PHIDGET RC modules: sets the min/max pulse width in microseconds'),'&#160;'])
     tbl_Commands.add_row(['&#160;','pos(ch,min,max[,sn])',QApplication.translate('HelpDlg','for PHIDGET RC modules: sets the min/max position'),'&#160;'])
     tbl_Commands.add_row(['&#160;','engaged(ch,b[,sn])',QApplication.translate('HelpDlg','for PHIDGET RC modules: engage (b=1) or disengage (b = 0)'),'&#160;'])
