@@ -2,23 +2,33 @@
 :: ABOUT
 :: Script to upgrade Python for Artisan Windows CI builds
 ::
+:: COPYRIGHT (C) 2010-2026 The Artisan team represented by
+::   Marko Luther <marko.luther@gmx.net> (maintainer) and all contributors
+::
 :: LICENSE
-:: This program or module is free software: you can redistribute it and/or
-:: modify it under the terms of the GNU General Public License as published
-:: by the Free Software Foundation, either version 2 of the License, or
-:: version 3 of the License, or (at your option) any later versison. It is
-:: provided for educational purposes and is distributed in the hope that
-:: it will be useful, but WITHOUT ANY WARRANTY; without even the implied
-:: warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
-:: the GNU General Public License for more details.
+:: This program or module is free software: you can redistribute it and/or modify
+:: it under the terms of the GNU Affero General Public License as
+:: published by the Free Software Foundation, either version 3 of the
+:: License, or (at your option) any later version.
+::
+:: This program is distributed in the hope that it will be useful,
+:: but WITHOUT ANY WARRANTY; without even the implied warranty of
+:: MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+:: GNU Affero General Public License for more details.
+::
+:: You should have received a copy of the GNU Affero General Public License
+:: along with this program.  If not, see <https://www.gnu.org/licenses/>.
+::
+:: MAINTAINER
+:: Marko Luther, 2026
 ::
 :: AUTHOR
 :: Dave Baxter 2025
 ::
 :: Upgrade the Python version to PYUPGRADE_WIN_VER whenever the environment variable exists
-::   and the upgrade version is greater than current Python version. 
+::   and the upgrade version is greater than current Python version.
 ::
-:: Requires environment variables set in .appveyor.yml: 
+:: Requires environment variables set in .appveyor.yml:
 ::      PYUPGRADE_WIN_VER set to the full version number for target upgrade, or blank, or non-existent.
 ::      PREV_PYTHON_PATH set to the python.exe path corresponding to the original environment: PYTHON_V variable.
 :: Creates local scope environment variables: PREV_PYTHON_VER, INSTALLED_PYTHON_VER not available outside this script.
@@ -41,7 +51,7 @@ if exist "%PREV_PYTHON_PATH%\python.exe" (
 :: Log an informational message
 echo *** Current Python Version: !PREV_PYTHON_VER!  Upgrade to: !PYUPGRADE_WIN_VER! requested
 
-:: Check if both current and upgrade full versions match 
+:: Check if both current and upgrade full versions match
 if "!PREV_PYTHON_VER!"=="!PYUPGRADE_WIN_VER!" (
     echo *** Versions are the same.  No need to upgrade.
     goto End
@@ -67,7 +77,7 @@ if !major_py! lss !major_up! (
     goto NoUpgrade
 )
 if !minor_py! lss !minor_up! (
-    echo PYTHON_PATH !PYTHON_PATH! 
+    echo PYTHON_PATH !PYTHON_PATH!
     if exist "!PYTHON_PATH!\python.exe" (
         echo !PYTHON_PATH!\python.exe EXISTS
         for /f "tokens=2 delims= " %%a in ('!PYTHON_PATH!\python -V 2^>^&1') do (

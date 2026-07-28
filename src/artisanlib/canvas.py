@@ -1,17 +1,27 @@
 #
 # ABOUT
 # Artisan Main Canvas
-
+#
+# COPYRIGHT (C) 2010-2026 The Artisan team represented by
+#   Marko Luther <marko.luther@gmx.net> (maintainer) and all contributors
+#
 # LICENSE
-# This program or module is free software: you can redistribute it and/or
-# modify it under the terms of the GNU General Public License as published
-# by the Free Software Foundation, either version 2 of the License, or
-# version 3 of the License, or (at your option) any later version. It is
-# provided for educational purposes and is distributed in the hope that
-# it will be useful, but WITHOUT ANY WARRANTY; without even the implied
-# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
-# the GNU General Public License for more details.
-
+# This program or module is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+# MAINTAINER
+# Marko Luther, 2026
+#
 # AUTHOR
 # Marko Luther, 2023
 
@@ -378,7 +388,7 @@ class tgraphcanvas(QObject):
         'CO2kg_per_BTU_default', 'CO2kg_per_BTU', 'Biogas_CO2_Reduction', 'Biogas_CO2_Reduction_default',
         'meterunitnames', 'meterreads_default', 'meterreads', 'meterlabels_setup', 'meterlabels', 'meterunits_setup', 'meterunits',
         'meterfuels_setup', 'meterfuels', 'metersources_setup', 'metersources', 'playbackdrop_min_roasttime', 'TP_max_roasttime',
-        'single_click_mpl_upperleft_corner_timer', 'single_click_mpl_upperleft_corner_TIMEOUT'
+        'single_click_mpl_upperleft_corner_timer', 'single_click_mpl_upperleft_corner_TIMEOUT', 'profile_upload_limit', 'last_profile_upload_times'
         ]
 
 
@@ -2573,6 +2583,9 @@ class tgraphcanvas(QObject):
         self.xlabel_text:str|None = None
         self.xlabel_artist:Text|None = None
         self.xlabel_width:float|None = None
+
+        self.profile_upload_limit:float = 1 # maximum upload frequency in seconds
+        self.last_profile_upload_times:float = 0
 
         self.updategraphicsSignal.connect(self.updategraphics, type=Qt.ConnectionType.QueuedConnection) # type: ignore[call-arg]
         self.updateLargeLCDsSignal.connect(self.updateLargeLCDs)
@@ -13403,6 +13416,9 @@ class tgraphcanvas(QObject):
             else:
                 self.threadserver.terminatingSignal.disconnect(self.OffMonitorCloseDownIgnoreAlwaysON)
 
+            if self.aw.roasthubs_token and len(self.timex) > 20: # RoastHubs configured and some data recorded
+                QTimer.singleShot(100, self.uploadRoastHubs) # must happen before QTimer(300, onMonitorSignal) below is fired!
+
             # reset WebLCDs
             resLCD = '-.-' if self.LCDdecimalplaces else '--'
             if self.aw.WebLCDs:
@@ -15094,6 +15110,31 @@ class tgraphcanvas(QObject):
                     message = QApplication.translate('Message','[SC END] recorded at {0} BT = {1}').format(st1,st2)
                     self.aw.sendmessage(message)
                 self.aw.onMarkMoveToNext(self.aw.buttonSCe)
+
+
+    # to run within the main UI thread (best called via a QTimer)
+    @pyqtSlot()
+    def uploadRoastHubs(self) -> None:
+        def on_upload_succeeded() -> None:
+            self.aw.sendmessageSignal.emit(QApplication.translate('Message','Uploaded to {}').format('RoastHubs'), True, None)
+        def on_upload_failure() -> None:
+            self.aw.sendmessageSignal.emit(QApplication.translate('Message','Upload to {} failed').format('RoastHubs'), True, None)
+
+        if (self.aw.roasthubs_token != '' and
+                libtime.time() - self.last_profile_upload_times > self.profile_upload_limit and
+                len(self.timex) > 20):
+            self.last_profile_upload_times = libtime.time()
+            import artisanlib.roasthubs
+            profile:ProfileData = self.aw.getProfile()
+            artisanlib.roasthubs.send_profile(
+                profile,
+                self.aw.roasthubs_org_id,
+                self.aw.roasthubs_machine_id,
+                self.aw.roasthubs_token,
+                on_upload_succeeded,
+                on_upload_failure)
+
+
 
     #record end of roast (drop of beans). Called from push button 'Drop'
     # if noaction is True, the button event action is not triggered

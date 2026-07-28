@@ -1,28 +1,31 @@
 # ABOUT
 # This program shows how to plot the temperature and its rate of change from a
-# Fuji PID or a thermocouple meter.
-
-# LICENSE
-# This program or module is free software: you can redistribute it and/or
-# modify it under the terms of the GNU General Public License as published
-# by the Free Software Foundation, either version 2 of the License, or
-# version 3 of the License, or (at your option) any later version. It is
-# provided for educational purposes and is distributed in the hope that
-# it will be useful, but WITHOUT ANY WARRANTY; without even the implied
-# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
-# the GNU General Public License for more details.
+# roasting machine, PID or a thermocouple meter.
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# COPYRIGHT (C) 2010-2026 The Artisan team represented by
+#   Marko Luther <marko.luther@gmx.net> (maintainer) and all contributors
+#
+# LICENSE
+# This program or module is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 # MAINTAINER
-# Marko Luther, 2025
+# Marko Luther, 2026
 
 import time as libtime
 startup_time = libtime.process_time()
 
 from artisanlib import __version__, __revision__, __build__, __signature__, __release_sponsor_name__
-
 
 import os
 import sys  # @UnusedImport
@@ -1533,7 +1536,7 @@ class ApplicationWindow(QMainWindow):
         'schedule_visible_filter', 'scheduler_tasks_visible', 'scheduler_completed_details_visible', 'scheduler_filters_visible', 'scheduler_auto_open',
         'main_menu_actions_with_shortcuts', 'ui_mode', 'UIModeMenu',  'productionModeAction', 'defaultModeAction', 'expertModeAction', 'calculatorAction',
         'helpAboutAction', 'checkUpdateAction', 'errorAction', 'messageAction', 'serialAction', 'platformAction', 'aboutQtAction',
-        'helpDocumentationAction', 'KshortCAction', 'profile_data_type_adapter', 'official_build' ]
+        'helpDocumentationAction', 'KshortCAction', 'profile_data_type_adapter', 'official_build', 'roasthubs_org_id', 'roasthubs_machine_id', 'roasthubs_token' ]
 
     nLCDS: Final[int] = 10 # maximum number of LCDs and extra devices (2x10 => 20 in total!)
 
@@ -1570,6 +1573,15 @@ class ApplicationWindow(QMainWindow):
         self.plus_rlimit:float = 0 # account amount limit (kg); if 0 then considered as not valid
         self.plus_used:float = 0   # account amount greens roasted within rlimit (kg); if 0 then considered as not valid
         self.plus_readonly:bool = False # True if the plus user has only read rights to the plus account (account might be deactivated, or user might be a read-only user)
+
+#ROSTHUBS
+
+        # if org_id and machine_id are empty string, the connector is inactive
+        self.roasthubs_org_id:str = ''
+        self.roasthubs_machine_id:str = ''
+        self.roasthubs_token:str = ''
+
+#OTHERS
 
         self.percent_decimals:int = 1 # number of decimals to render percentage values like weight loss (set to 0, 1 or 2)
 
@@ -2350,38 +2362,6 @@ class ApplicationWindow(QMainWindow):
         JPEGAction = QAction('JPEG...',self)
         JPEGAction.triggered.connect(self.resizeImg_0_1_JPEG)
         self.saveGraphMenu.addAction(JPEGAction)
-
-#        self.saveGraphMenu.addSeparator()
-#
-#        HomeBaristaAction = QAction('Home-Barista.com (1200x?)...', self)
-#        HomeBaristaAction.triggered.connect(self.resizeImg_1200_1)
-#        self.saveGraphMenu.addAction(HomeBaristaAction)
-#
-#        KaffeeNetzAction = QAction('Kaffee-Netz.de (800x?)...', self)
-#        KaffeeNetzAction.triggered.connect(self.resizeImg_800_1)
-#        self.saveGraphMenu.addAction(KaffeeNetzAction)
-#
-#        RiktigtKaffeAction = QAction('RiktigtKaffe.se (620x?)...', self)
-#        RiktigtKaffeAction.triggered.connect(self.resizeImg_620_1)
-#        self.saveGraphMenu.addAction(RiktigtKaffeAction)
-#
-#        PlanetCafeAction = QAction('PlanetCafe.fr (600x?)...', self)
-#        PlanetCafeAction.triggered.connect(self.resizeImg_600_1)
-#        self.saveGraphMenu.addAction(PlanetCafeAction)
-#
-#        CoffeeGeekAction = QAction('CoffeeGeek.com (500x?)...', self)
-#        CoffeeGeekAction.triggered.connect(self.resizeImg_500_1)
-#        self.saveGraphMenu.addAction(CoffeeGeekAction)
-#
-#        self.saveGraphMenu.addSeparator()
-#
-#        facebookSizeAction = QAction('Facebook (1200x628)...',self)
-#        facebookSizeAction.triggered.connect(self.resizeImgSize_1200_628)
-#        self.saveGraphMenu.addAction(facebookSizeAction)
-#
-#        instagramSizeAction = QAction('Instagram (1080x608)...', self)
-#        instagramSizeAction.triggered.connect(self.resizeImgSize_1080_608)
-#        self.saveGraphMenu.addAction(instagramSizeAction)
 
         self.reportMenu:QMenu = QMenu(QApplication.translate('Menu', 'Report'))
         self.roastReportMenu: QMenu = QMenu(QApplication.translate('Menu', 'Roast'))
@@ -5829,10 +5809,9 @@ class ApplicationWindow(QMainWindow):
             if len(res[k]) > 1:
                 if len(keys) == 1 and not forceSubmenu:
                     for e in res[k]:
-#                        a = QAction(self, visible=True, triggered=triggered)
                         a = QAction(self)
                         a.triggered.connect(triggered)
-                        a.setData((e[1],str(k)))
+                        a.setData((e[1],str(k),str(k)))
                         if k == resourceName:
                             menu_title = str(e[0]) # + "..."
                         else:
@@ -5845,17 +5824,13 @@ class ApplicationWindow(QMainWindow):
                     submenu_title = k.replace('&','&&') # a & in a menu entry is not displayed, but "&&" is displayed as "&"
                     submenu = menu.addMenu(submenu_title)
 
-# avoid slow importing natsort
-#                    import natsort
-#                    sorted_subentries = natsort.natsorted(res[k],key=lambda x: x[0])
                     sorted_subentries = sorted(res[k],key=lambda x: natsort(x[0]))
 
                     if submenu is not None:
                         for e in sorted_subentries: #res[k]:
-#                            a = QAction(self, visible=True, triggered=triggered)
                             a = QAction(self)
                             a.triggered.connect(triggered)
-                            a.setData((e[1],str(k)))
+                            a.setData((e[1],str(k),str(k)))
                             menu_title = str(e[0])
                             menu_title = menu_title.replace('&','&&') # a & in a menu entry is not displayed, but "&&" is displayed as "&"
                             a.setText(menu_title)
@@ -5863,10 +5838,9 @@ class ApplicationWindow(QMainWindow):
                             one_added = True
             else:
                 entry = res[k][0]
-#                a = QAction(self, visible=True, triggered=triggered)
                 a = QAction(self)
                 a.triggered.connect(triggered)
-                a.setData((entry[1],''))
+                a.setData((entry[1],'',str(k)))
                 if k == resourceName:
                     menu_title = str(entry[0])
                 else:
@@ -5942,6 +5916,12 @@ class ApplicationWindow(QMainWindow):
                             self.qmc.machinesetup = action.text()
                         if res:
                             QTimer.singleShot(700, self.qmc.startPhidgetManager)
+                    elif action.data()[2] == 'RoastHubs':
+                        from artisanlib.roasthubs import configureConnection
+                        res = configureConnection(self)
+                        _log.debug('PRINT res: %s',res)
+                        if not res:
+                            self.sendmessage(QApplication.translate('Message','Action canceled'))
                     elif action.data()[1] == 'ROEST' and self.qmc.device:
                         # select ROEST machine and retrieve MQTT credentials
                         from artisanlib.roest import RoestMachine, selectROESTmachine
@@ -6032,7 +6012,7 @@ class ApplicationWindow(QMainWindow):
                             self.mugmaHost = host
                         else:
                             res = False
-                    elif (self.qmc.device in {0, 9, 19, 53, 101, 115, 126, 196} or ((self.qmc.device == 29 or 29 in self.qmc.extradevices) and self.modbus.type in {0, 1, 2}) or
+                    elif action.data()[2] != 'RoastHubs' and action.data()[1] != 'ROEST' and (self.qmc.device in {0, 9, 19, 53, 101, 115, 126, 196} or ((self.qmc.device == 29 or 29 in self.qmc.extradevices) and self.modbus.type in {0, 1, 2}) or
                             (self.qmc.device == 134 and self.santokerSerial and not self.santokerBLE) or
                             (self.qmc.device == 138 and self.kaleidoSerial)): # Fuji, Center301, TC4, Hottop, Behmor or MODBUS serial, HB/ARC
                         select_device_name = None
@@ -6063,7 +6043,7 @@ class ApplicationWindow(QMainWindow):
                             QMessageBox.warning(None, #self, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
                                     message, message)
                     if res:
-                        if self.qmc.roastersize_setup == 0:
+                        if self.qmc.roastersize_setup == 0 and action.data()[2] != 'RoastHubs' and action.data()[1] != 'ROEST':
                             batchsize, res2 = QInputDialog.getDouble(self,
                                 QApplication.translate('Message', 'Machine'),
                                 QApplication.translate('Message', 'Machine Capacity (kg)'),
@@ -6078,7 +6058,7 @@ class ApplicationWindow(QMainWindow):
                             res = self.qmc.roastersize_setup != 0 # roastersize_setup was loaded from machine setup
                     if res:
                         # first establish roastersize_setup batchsizes as default batchsize (potentially unit converted)
-                        if self.qmc.roastersize_setup > 0:
+                        if self.qmc.roastersize_setup > 0  and action.data()[2] != 'RoastHubs' and action.data()[1] != 'ROEST':
                             weight_unit = self.qmc.weight[2]
                             self.qmc.last_batchsize = convertWeight(self.qmc.roastersize_setup,1,0) # nominal batch size in g
                             nominal_batch_size = convertWeight(self.qmc.roastersize_setup,1,weight_units.index(weight_unit))
@@ -7830,7 +7810,7 @@ class ApplicationWindow(QMainWindow):
                         mpl.rcParams['font.family'] = ['Arial Unicode MS', 'DejaVu Sans', 'Meiryo', 'MS Gothic', 'Source Han Sans JP', 'Noto Sans CJK JP', 'Noto Sans JP', 'sans-serif']
                     elif self.locale_str == 'zh_CN':
 #                        self.set_mpl_fontproperties('C:\\Windows\\Fonts\\simsun.ttc')
-                        mpl.rcParams['font.family'] = ['Arial Unicode MS', 'DejaVu Sans', 'Microsoft YaHei', 'SimHei', 'Noto Sans CJK SC', 'Noto Sans SC', 'sans-serif']
+                        mpl.rcParams['font.family'] = ['Microsoft YaHei', 'Arial Unicode MS', 'DejaVu Sans', 'SimHei', 'Noto Sans CJK SC', 'Noto Sans SC', 'sans-serif']
                     elif self.locale_str == 'zh_TW':
 #                        self.set_mpl_fontproperties('C:\\Windows\\Fonts\\mingliu.ttc')
                         mpl.rcParams['font.family'] = ['Arial Unicode MS', 'DejaVu Sans', 'Microsoft JhengHei', 'MingLiU', 'Noto Sans CJK TC', 'Noto Sans TC', 'sans-serif']
@@ -11011,6 +10991,13 @@ class ApplicationWindow(QMainWindow):
                                     if len(args) == 1:
                                         state = toBool(eval(args[0][:eval_limit])) # pylint: disable=eval-used
                                         self.qmc.showBackgroundEventsSignal.emit(state)
+                                except Exception as e: # pylint: disable=broad-except
+                                    _log.exception(e)
+                            # upload
+                            elif cs == 'upload2RoastHubs':
+                                try:
+                                    QTimer.singleShot(10, self.qmc.uploadRoastHubs)
+                                    self.sendmessage(f'Artisan Command: {cs}')
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
                             else:
@@ -15699,7 +15686,7 @@ class ApplicationWindow(QMainWindow):
     def validateProfileDict(self, profile_dict:dict[str,Any], quiet:bool=True, validate_signature:bool = False) -> ProfileData:
         ta:TypeAdapter[ProfileData] = self.getProfileDataTypeAdapter()
         profile:ProfileData = ta.validate_python(profile_dict)
-        if self.official_build and validate_signature and 'version' in profile and QVersionNumber.fromString(profile['version'])[0] >= QVersionNumber(4,2,0):
+        if self.official_build and validate_signature and ('version' not in profile or QVersionNumber.fromString(profile['version'])[0] >= QVersionNumber(4,2,0)):
 #        # testing:
 #        if self.official_build and validate_signature and 'version' in profile and 'signature' in profile:
             # official builds validate all profile signatures for files generated by Artisan versions >= v4.2
@@ -15707,7 +15694,7 @@ class ApplicationWindow(QMainWindow):
             try:
                 with open(getResourcePath() + 'artisan_public_key.pem', 'rb') as f:
                     public_key:ed25519.Ed25519PublicKey = cast(ed25519.Ed25519PublicKey, serialization.load_pem_public_key(f.read()))
-                    version = profile['version']
+                    version = profile['version'] # pyright:ignore # version not required field in TypedDict ProfileData; we want it here to fail if not available
                     revision = profile['revision'] # pyright: ignore[reportTypedDictNotRequiredAccess]
                     artisan_os = profile['artisan_os'] # pyright: ignore[reportTypedDictNotRequiredAccess]
                     message:bytes = signature_message(version, revision, artisan_os)
@@ -18305,6 +18292,17 @@ class ApplicationWindow(QMainWindow):
 
             #restore device
 
+#--- BEGIN GROUP RoastHubs
+            settings.beginGroup('RoastHubs')
+            self.roasthubs_org_id = settings.value('org_id',self.roasthubs_org_id)
+            self.roasthubs_machine_id = settings.value('machine_id',self.roasthubs_machine_id)
+            if self.roasthubs_org_id != '' and self.roasthubs_machine_id != '':
+                # self.roasthubs_token is persisted in the keychain
+                import artisanlib.roasthubs
+                self.roasthubs_token = artisanlib.roasthubs.get_token(self.roasthubs_org_id, self.roasthubs_machine_id)
+            settings.endGroup()
+#--- END GROUP RoastHubs
+
 #--- BEGIN GROUP Device
             settings.beginGroup('Device')
             if settings.contains('device_logging'):
@@ -20377,6 +20375,13 @@ class ApplicationWindow(QMainWindow):
                 settings.endGroup()
 #--- END GROUP System
 
+#--- BEGIN GROUP RoastHubs
+            settings.beginGroup('RoastHubs')
+            self.settingsSetValue(settings, default_settings, 'org_id',self.roasthubs_org_id, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'machine_id',self.roasthubs_machine_id, read_defaults)
+            # self.roasthubs_token is persisted in the keychain
+            settings.endGroup()
+#--- END GROUP RoastHubs
 
 #--- BEGIN GROUP Device
             #save device
@@ -23726,6 +23731,7 @@ class ApplicationWindow(QMainWindow):
             pass
         self.html_loader = None
 
+
     # if batch_process is True, the QWebEngineView() is created only if self.html_loader is not None and never deleted
     # the caller is responsible to release that self.html_loader via releaseQWebEngineView()
     def html2pdf(self, html_file:str, pdf_file:str, landscape:bool = False, batch_process:bool = False) -> None:
@@ -23814,6 +23820,7 @@ class ApplicationWindow(QMainWindow):
                     libtime.sleep(0.001)
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
+
 
     # if batch_process is True and pdf_filename is given, the caller needs to cleanup the QWebEngineView by calling self.releaseQWebEngineView() the after processing all reports
     def roastReport(self, pdf_filename:str|None = None, batch_process:bool = False) -> None:
@@ -24074,6 +24081,7 @@ class ApplicationWindow(QMainWindow):
                     os.remove(filename)
                 except OSError:
                     pass
+                _log.debug('PRINT HTML: %s, %s',type(html),html)
                 with open(filename, 'w', encoding='utf-8') as f:
                     for ht in html:
                         f.write(ht)
@@ -24707,7 +24715,7 @@ class ApplicationWindow(QMainWindow):
                 coredevelopers,
                 PYMODBUS_VERSION_STR,
                 QApplication.translate('About', 'License'),
-                '<a href="http://www.gnu.org/copyleft/gpl.html">GNU Public Licence (GPLv3.0)</a>',
+                '<a href="https://www.gnu.org/licenses/agpl-3.0.html">GNU Affero General Public License (AGPLv3.0)</a>',
                 build,
                 otherlibs, # pyright:ignore[reportUnknownArgumentType]
                 '<a href="https://artisan-scope.org">https://artisan-scope.org</a>',

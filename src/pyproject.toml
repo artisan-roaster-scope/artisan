@@ -1,7 +1,7 @@
 [project]
 name = 'Artisan'
 dynamic = ['version']
-description = "artisan Scope is a software that helps coffee roasters record, analyze, and control roast profiles."
+description = "artisan scope is a software that helps coffee roasters record, analyze, and control roast profiles"
 readme = {file = 'README.txt', content-type='text/markdown'}
 authors = [
     {name = 'Rafael Cobo'},
@@ -12,7 +12,7 @@ maintainers = [
     {name = 'Marko Luther'},
     {name = 'Dave Baxter'}
 ]
-license = 'GPL-3.0'
+license = 'AGPLv3+'
 license-files = ['LICENSE']
 requires-python = '>=3.12'
 keywords = ['roasting', 'roast logging', 'speciality coffee']
@@ -21,6 +21,7 @@ classifiers = [
     'Operating System :: Windows',
     'Operating System :: MacOS',
     'Operating System :: POSIX :: Linux',
+    'License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)',
     'Programming Language :: Python',
     'Programming Language :: Python :: 3',
     'Programming Language :: Python :: 3.12',

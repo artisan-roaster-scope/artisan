@@ -1,17 +1,27 @@
 #
 # ABOUT
 # Artisan Device Configuration Dialog
-
+#
+# COPYRIGHT (C) 2010-2026 The Artisan team represented by
+#   Marko Luther <marko.luther@gmx.net> (maintainer) and all contributors
+#
 # LICENSE
-# This program or module is free software: you can redistribute it and/or
-# modify it under the terms of the GNU General Public License as published
-# by the Free Software Foundation, either version 2 of the License, or
-# version 3 of the License, or (at your option) any later version. It is
-# provided for educational purposes and is distributed in the hope that
-# it will be useful, but WITHOUT ANY WARRANTY; without even the implied
-# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
-# the GNU General Public License for more details.
-
+# This program or module is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+# MAINTAINER
+# Marko Luther, 2026
+#
 # AUTHOR
 # Marko Luther, 2023
 
@@ -44,7 +54,7 @@ from PyQt6.QtCore import (Qt, pyqtSlot, QSettings, QTimer, QRegularExpression, Q
 from PyQt6.QtGui import (QStandardItemModel, QStandardItem, QColor, QIntValidator, QRegularExpressionValidator, QPixmap, QIcon)
 from PyQt6.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit,
                              QPushButton, QSpinBox, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout,
-                             QGroupBox, QRadioButton, QButtonGroup, QInputDialog, QToolButton,
+                             QGroupBox, QRadioButton, QButtonGroup, QInputDialog, QToolButton, QSpacerItem,
                              QTableWidget, QMessageBox, QHeaderView, QTableWidgetItem, QSizePolicy)
 
 
@@ -1228,6 +1238,26 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             if len(self.aw.kaleidoEventFlags) > i:
                 cb.setChecked(self.aw.kaleidoEventFlags[i])
 
+        roasthubsOrgIdLabel = QLabel(QApplication.translate('Label','Organization ID'))
+        self.roasthubsOrgId = QLineEdit(self.aw.roasthubs_org_id)
+#        self.roasthubsOrgId.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.roasthubsOrgId.setFixedWidth(110)
+
+        roasthubsMachineIdLabel = QLabel(QApplication.translate('Label','Machine ID'))
+        self.roasthubsMachineId = QLineEdit(self.aw.roasthubs_machine_id)
+#        self.roasthubsMachineId.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.roasthubsMachineId.setFixedWidth(110)
+
+        roasthubsTokenLabel = QLabel(QApplication.translate('Label','Token'))
+        self.roasthubsToken = QLineEdit(self.aw.roasthubs_token)
+        self.roasthubsToken.setEchoMode(QLineEdit.EchoMode.Password)
+#        self.roasthubsToken.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.roasthubsToken.setFixedWidth(180)
+
+        roasthubsUploadButton =  QPushButton(QApplication.translate('Button','Upload'))
+        roasthubsUploadButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        roasthubsUploadButton.clicked.connect(self.aw.qmc.uploadRoastHubs)
+
         mugmaHostLabel = QLabel(QApplication.translate('Label','Host'))
         self.mugmaHost = QLineEdit(self.aw.mugmaHost)
         self.mugmaHost.setAlignment(Qt.AlignmentFlag.AlignRight)
@@ -1334,6 +1364,27 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
         kaleidoNetworkGroupBox = QGroupBox('Kaleido')
         kaleidoNetworkGroupBox.setLayout(kaleidoVBox)
+
+# roasthubs
+
+        roasthubsUploadHBox = QHBoxLayout()
+        roasthubsUploadHBox.addStretch()
+        roasthubsUploadHBox.addWidget(roasthubsUploadButton)
+        roasthubsGrid = QGridLayout()
+        roasthubsGrid.addWidget(roasthubsOrgIdLabel,0,0)
+        roasthubsGrid.addWidget(self.roasthubsOrgId,0,1)
+        roasthubsGrid.addItem(QSpacerItem(15, 0, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding),0,2)
+        roasthubsGrid.addWidget(roasthubsMachineIdLabel,0,3)
+        roasthubsGrid.addWidget(self.roasthubsMachineId,0,4)
+        roasthubsGrid.addWidget(roasthubsTokenLabel,1,0)
+        roasthubsGrid.addWidget(self.roasthubsToken,1,1,1,3) # rowSpan=1, columnSpan=4
+        roasthubsGrid.addLayout(roasthubsUploadHBox,1,4)
+        roasthubsHBox = QHBoxLayout()
+        roasthubsHBox.addLayout(roasthubsGrid)
+        roasthubsHBox.addStretch()
+
+        roasthubsGroupBox = QGroupBox('RoastHubs')
+        roasthubsGroupBox.setLayout(roasthubsHBox)
 
         mugmaNetworkGrid = QGridLayout()
         mugmaNetworkGrid.addWidget(mugmaHostLabel,0,1)
@@ -1543,6 +1594,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         tab7VLayout = QVBoxLayout()
         tab7VLayout.addWidget(santokerNetworkGroupBox)
         tab7VLayout.addWidget(kaleidoNetworkGroupBox)
+        tab7VLayout.addWidget(roasthubsGroupBox)
         tab7VLayout.addStretch()
         tab7V2Layout = QVBoxLayout()
         tab7V2Layout.addLayout(mugmaVBox)
@@ -4935,6 +4987,16 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             except Exception: # pylint: disable=broad-except
                 pass
 #            self.aw.kaleidoPID = self.kaleidoPIDFlag.isChecked()
+            #
+            if self.roasthubsOrgId.text() != '' or self.roasthubsMachineId.text() != '' or self.roasthubsToken.text() != '':
+                from artisanlib.roasthubs import setRoastHubsCredentials
+                setRoastHubsCredentials(
+                    self.aw,
+                    self.roasthubsOrgId.text(),
+                    self.roasthubsMachineId.text(),
+                    self.roasthubsToken.text())
+
+            #
             self.aw.mugmaHost = self.mugmaHost.text().strip()
             try:
                 self.aw.mugmaPort = int(self.mugmaPort.text())
