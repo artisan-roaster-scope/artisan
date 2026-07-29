@@ -473,7 +473,7 @@ Section Uninstall
   Delete "$INSTDIR\qt.conf"
   Delete "$INSTDIR\vc_redist.x64.exe"
   Delete "$INSTDIR\logging.yaml"
-  Delete "$INSTDIR\artisan_public_key.pem dist"
+  Delete "$INSTDIR\artisan_public_key.pem"
 
   SetShellVarContext all
   Delete "$SMPROGRAMS\Artisan\Uninstall.lnk"
