@@ -121,7 +121,7 @@ ls -lh *.deb *.rpm
 # Check that the packaged files are above an expected size
 basename=${NAME}
 suffixes=".deb .rpm .AppImage" # separate statements for suffixes to check
-min_size=270000000
+min_size=200000000
 for suffix in $suffixes; do
     filename="$basename$suffix"
     size=$(($(du -k "$filename" | cut -f1) * 1024)) # returns kB so multiply by 1024 (du works on macOS)

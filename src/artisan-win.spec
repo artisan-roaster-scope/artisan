@@ -364,58 +364,6 @@ for root, _, files in os.walk(rootdir + r'\babel\locale-data'):
 # remove unneeded files and folders from Windows
 logging.info(">>>>> Removing unneeded files")
 for fn in [
-    r'_internal\PyQt6\Qt6\bin\Qt6Multimedia.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6MultimediaQuick.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6PdfQuick.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6PositioningQuick.dll',
-    #r'_internal\PyQt6\Qt6\bin\Qt6QmlWorkerScript.dll',  # required for pyqt6 v6.8+
-#    r'_internal\PyQt6\Qt6\bin\Qt6Quick3D.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6Quick3DAssetImport.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6Quick3DAssetUtils.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6Quick3DEffects.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6Quick3DHelpers.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6Quick3DHelpersImpl.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6Quick3DParticles.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6Quick3DPhysics.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6Quick3DPhysicsHelpers.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6Quick3DRuntimeRender.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6Quick3DSpatialAudio.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6Quick3DUtils.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6QuickControls2.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6QuickControls2Basic.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6QuickControls2BasicStyleImpl.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6QuickControls2Fusion.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6QuickControls2FusionStyleImpl.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6QuickControls2Imagine.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6QuickControls2ImagineStyleImpl.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6QuickControls2Impl.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6QuickControls2Material.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6QuickControls2MaterialStyleImpl.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6QuickControls2Universal.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6QuickControls2UniversalStyleImpl.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6QuickDialogs2.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6QuickDialogs2QuickImpl.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6QuickDialogs2Utils.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6QuickLayouts.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6QuickParticles.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6QuickShapes.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6QuickTemplates2.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6QuickTest.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6QuickTimeline.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6QuickTimelineBlendTrees.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6RemoteObjects.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6RemoteObjectsQml.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6Sensors.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6SensorsQuick.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6SerialPort.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6ShaderTools.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6SpatialAudio.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6Test.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6TextToSpeech.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6WebChannelQuick.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6WebEngineQuick.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6WebEngineQuickDelegatesQml.dll',
-    r'_internal\PyQt6\Qt6\bin\Qt6WebSockets.dll',
     r'_internal\PyQt6\Qt6\plugins\platforms\qminimal.dll',
     r'_internal\PyQt6\Qt6\plugins\platforms\qoffscreen.dll',
     r'_internal\PyQt6\Qt6\plugins\imageformats\qicns.dll',
@@ -423,8 +371,7 @@ for fn in [
     r'_internal\PyQt6\Qt6\plugins\imageformats\qtiff.dll',
     r'_internal\PyQt6\Qt6\plugins\imageformats\qwebp.dll',
     ]:
-#    del_file(f'{TARGET}{fn}', True)
-    check_file_exists(f'{TARGET}{fn}', False)
+    del_file(f'{TARGET}{fn}', True)
 
 # The api-ms-win*.dll files are generated on Appveyer CI and are not required
 for root, _, files in os.walk(TARGET):
@@ -437,7 +384,6 @@ logging.info(">>>>> Removing unneeded folders")
 for dp in [
     r'_internal\PyQt6\Qt6\plugins\generic',
     r'_internal\PyQt6\Qt6\plugins\networkinformation',
-    r'_internal\PyQt6\Qt6\plugins\position',
     r'_internal\PyQt6\Qt6\plugins\tls',
     r'_internal\PyQt6\Qt6\qml',
     r'_internal\matplotlib\mpl-data\sample_data',
