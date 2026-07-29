@@ -385,7 +385,6 @@ for dp in [
     r'_internal\PyQt6\Qt6\plugins\generic',
     r'_internal\PyQt6\Qt6\plugins\networkinformation',
     r'_internal\PyQt6\Qt6\plugins\tls',
-    r'_internal\PyQt6\Qt6\qml',
     r'_internal\matplotlib\mpl-data\sample_data',
     ]:
     remove_dir(f'{TARGET}{dp}', True)
