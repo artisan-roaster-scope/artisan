@@ -187,7 +187,7 @@ SUPPORTED_LANGUAGES="ar bg cs da de el en es fa fi fr gd he hu id it ja ko lv nl
 # remove unused Qt translations
 
 # the following produces a (harmless) warning log entry on generating PDF reports as locales cannot be found
-rm -rf dist/_internal/PyQt6/Qt6/translations/qtwebengine_locales
+#rm -rf dist/_internal/PyQt6/Qt6/translations/qtwebengine_locales
 
 for qttrans in $(find dist/_internal/PyQt6/Qt6/translations -type f -name "*.qm"); do
     qttrans_filename="${qttrans##*/}"

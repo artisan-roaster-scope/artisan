@@ -369,7 +369,7 @@ for fn in [
     r'_internal\PyQt6\Qt6\bin\Qt6PdfQuick.dll',
     r'_internal\PyQt6\Qt6\bin\Qt6PositioningQuick.dll',
     #r'_internal\PyQt6\Qt6\bin\Qt6QmlWorkerScript.dll',  # required for pyqt6 v6.8+
-    r'_internal\PyQt6\Qt6\bin\Qt6Quick3D.dll',
+#    r'_internal\PyQt6\Qt6\bin\Qt6Quick3D.dll',
     r'_internal\PyQt6\Qt6\bin\Qt6Quick3DAssetImport.dll',
     r'_internal\PyQt6\Qt6\bin\Qt6Quick3DAssetUtils.dll',
     r'_internal\PyQt6\Qt6\bin\Qt6Quick3DEffects.dll',
@@ -423,7 +423,8 @@ for fn in [
     r'_internal\PyQt6\Qt6\plugins\imageformats\qtiff.dll',
     r'_internal\PyQt6\Qt6\plugins\imageformats\qwebp.dll',
     ]:
-    del_file(f'{TARGET}{fn}', True)
+#    del_file(f'{TARGET}{fn}', True)
+    check_file_exists(f'{TARGET}{fn}', False)
 
 # The api-ms-win*.dll files are generated on Appveyer CI and are not required
 for root, _, files in os.walk(TARGET):

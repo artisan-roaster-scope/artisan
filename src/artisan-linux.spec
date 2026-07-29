@@ -72,7 +72,7 @@ EXCLUDES = [
 
 
 DATA_FILES = [
-    (os.path.join(get_package_paths('PyQt6')[1], 'Qt6/translations/qtwebengine_locales/en-US.pak'), 'PyQt6/Qt6/translations/qtwebengine_locales')
+#    (os.path.join(get_package_paths('PyQt6')[1], 'Qt6/translations/qtwebengine_locales/en-US.pak'), 'PyQt6/Qt6/translations/qtwebengine_locales')
 ]
 
 a = Analysis(['artisan.py'],
