@@ -11,6 +11,14 @@ body {
     background: #ffffff;
     color: #0f5071
 }
+.page-break {
+  break-after: page;
+}
+svg {
+  left: 1px;
+  top: 1px;   
+  width: 100%;
+}
 a {
   color: #297aa3;
 }
@@ -19,14 +27,12 @@ h1 {
 }
 table {
     border-collapse: collapse;
-    width: 100%;
-    font-size: smaller;
     -webkit-print-color-adjust: exact;
     color-adjust: exact;
 }
 th, td {
     text-align: right;
-    padding: 8px;
+    padding: 5px;
     white-space:nowrap;
     -webkit-print-color-adjust: exact;
     color-adjust: exact;
@@ -37,11 +43,86 @@ td:nth-child(1) {
 }
 td:nth-child(2) {
     text-align: left;
-     width: 20%;
-     text-overflow:ellipsis;
-     overflow: hidden; 
-     max-width:1px;
+    width: 20%;
 }
+
+td:nth-child(4) {
+    width: 20%;
+    text-align: left;
+    background-color: #8080801a;
+}
+td:nth-child(5) {
+    width: 20%;
+    text-align: left;
+    background-color: #8080804d;
+}
+td:nth-child(6) {
+    width: 20%;
+    text-align: left;
+    background-color: #0000ff0d;
+}
+td:nth-child(7) {
+    width: 20%;
+    text-align: left;
+    background-color: #0000ff1a;
+}
+td:nth-child(8) {
+    width: 20%;
+    text-align: left;
+    background-color: #ff00000d;
+}
+td:nth-child(9) {
+    width: 20%;
+    text-align: left;
+    background-color: #ff00001a;
+}
+td:nth-child(10) {
+    width: 20%;
+    text-align: left;
+    background-color: #00ff000d;
+}
+td:nth-child(11) {
+    width: 20%;
+    text-align: left;
+    background-color: #00ff000d;
+}
+td:nth-child(12) {
+    width: 20%;
+    text-align: left;
+    background-color: #00ff000d;
+}
+td:nth-child(13) {
+    width: 20%;
+    text-align: left;
+    background-color: #00ff001a;
+}
+td:nth-child(14) {
+    width: 20%;
+    text-align: left;
+    background-color: #8080801a;
+}
+td:nth-child(15) {
+    width: 20%;
+    text-align: left;
+    background-color: #8080801a;
+}
+td:nth-child(16) {
+    width: 20%;
+    text-align: left;
+    background-color: #8080801a;
+}
+td:nth-child(17) {
+    width: 20%;
+    text-align: left;
+    background-color: #0000ff0d;
+}
+td:nth-child(18) {
+    width: 20%;
+    text-align: left;
+    background-color:  #0000ff0d;
+}
+
+
 tfoot {
     background-color: #949b9e !important;
     color: white !important;
@@ -59,69 +140,32 @@ th {
     color: #ffffff !important;
     -webkit-print-color-adjust: exact;
 }
-@media screen and (prefers-color-scheme: dark) {
-  body {
-      background: #242728;
-      color: #9da9af;
-  }
-  a {
-    color: #269dd9;
-  }
-  h1 {
-    color: #5ebbed;
-  }
-  th, td {
-      text-align: right;
-      padding: 8px;
-      white-space:nowrap;
-      -webkit-print-color-adjust: exact;
-      color-adjust: exact;
-      border: 1px solid #ed615e;
-  }
-  tfoot {
-      background-color: #494e50 !important;
-      color: white !important;
-      -webkit-print-color-adjust: exact;
-      color-adjust: exact;
-      font-weight: bold;
-  }
-  .inv {
-      color: #29363d;
-      background-color: #afb4b6 !important;
-  }
-  th {
-      text-align: center;
-      background-color: #4095bf;
-      color: #f2f2f2 !important;
-      -webkit-print-color-adjust: exact;
-  }
-}
 .grey {
-  background-color: rgba(128,128,128,.10);
+  background-color: #8080801a;
 }
 .lightgrey {
-  background-color: rgba(230,230,230,.50);
+  background-color: #e6e6e680;
 }
 .darkgrey {
-  background-color: rgba(128,128,128,.30);
+  background-color: #8080804d;
 }
 .red {
-  background-color: rgba(255,0,0,.05);
+  background-color: #ff00000d;
 }
 .darkred {
-  background-color: rgba(255,0,0,.10);
+  background-color: #ff00001a;
 }
 .blue {
-  background-color: rgba(0,0,255,.05);
+  background-color: #0000ff0d;
 }
 .darkblue {
-  background-color: rgba(0,0,255,.10);
+  background-color: #0000ff1a;
 }
 .green {
-  background-color: rgba(0,255,0,.05);
+  background-color: #00ff000d;
 }
 .darkgreen {
-  background-color: rgba(0,255,0,.10);
+  background-color: #00ff001a;
 }
 </style>
 </head>
@@ -190,9 +234,13 @@ $entries
 </tr>
 </tfoot>
 </table>
+<div class="page-break"></div>
+<br>
 <p style="text-align:center;">
 $graph_image
 </p>
+<div class="page-break"></div>
+<br>
 <p style="text-align:center;">
 $graph_image_pct
 </p>

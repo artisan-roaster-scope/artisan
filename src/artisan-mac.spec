@@ -100,8 +100,11 @@ DATA_FILES = [
         (r'includes/site.webmanifest', '.'),
         (r'includes/sorttable.js', '.'),
         (r'includes/report-template.htm', '.'),
+        (r'includes/report-template-pdf.htm', '.'),
         (r'includes/roast-template.htm', '.'),
+        (r'includes/roast-template-pdf.htm', '.'),
         (r'includes/ranking-template.htm', '.'),
+        (r'includes/ranking-template-pdf.htm', '.'),
         (r'includes/Humor-Sans.ttf', '.'),
         (r'includes/WenQuanYiZenHei-01.ttf', '.'),
         (r'includes/WenQuanYiZenHeiMonoMedium.ttf', '.'),
@@ -146,7 +149,7 @@ a = Analysis(['artisan.py'],
              hookspath=[],
              runtime_hooks=['./pyinstaller_hooks/rthooks/pyi_rth_mplconfig.py'], # overwrites default MPL runtime hook which keeps loading font cache from (new) temp directory
              additional_hooks_dir=[],
-             excludes= ['tkinter', 'mypy', 'pkg_resources'],
+             excludes= ['tkinter', 'mypy', 'hypothesis', 'tornado', 'pkg_resources'],
              win_no_prefer_redirects=False,
              win_private_assemblies=False,
              cipher=block_cipher,
@@ -265,22 +268,7 @@ Qt_modules = [
     'QtPrintSupport',
     'QtNetwork',
     'QtDBus',
-#    'QtBluetooth', # replaced by bleak
-#    'QtConcurrent', # not on PyQt6.2, but PyQt6.4 and PyQt5.x
-# needed for QtWebEngine HTML2PDF export:
-    'QtWebEngineCore',
-#    'QtWebEngine', # only on PyQt5, does not exists for PyQt6
-    'QtWebEngineWidgets', # required by QtWebEngineCore
-# the following are required by QtWebEngineWidgets and thus by QtWebEngine for the HTML2PDF export
-    'QtQuick',
-    'QtQuickWidgets',
-    'QtQml',
-    'QtQmlModels',
-    'QtQmlMeta',
-    'QtQmlWorkerScript',
-    'QtWebChannel',
-    'QtPositioning',
-    'QtOpenGL'
+    'QtPdf',
 ]
 Qt_frameworks = [module + '.framework' for module in Qt_modules]
 
@@ -347,7 +335,6 @@ for qt_dir in [
 #        'PyQt6/Qt6/translations', # qt translations are kept and loaded from their standard dir
         'PyQt6/Qt6/qml',
         'PyQt6/Qt6/qsci',
-#        'PyQt6/Qt6/lib', # comment for the non-Framework variant
     ]:
     try:
         subprocess.check_call(f'rm -rf {rootdir}/{qt_dir}',shell = True)
@@ -373,23 +360,11 @@ for qt_dir in ['PyQt6/Qt6/translations']:
                 subprocess.check_call(f'rm -rf {file_path}',shell = True)
 
 
-print('*** Removing QtWebEngine translations ***')
-
-for qtwebengine_dir in ['PyQt6/Qt6/lib/QtWebEngineCore.framework/Versions/A/Resources/qtwebengine_locales/']:
-    qtwebengine = f'{rootdir}/{qtwebengine_dir}'
-    for root, _, files in os.walk(qtwebengine):
-        for file in files:
-            if not file == 'en-US.pak':
-                file_path = os.path.join(root, file)
-                print(f'rm -rf {file_path}')
-                subprocess.check_call(f'rm {file_path}',shell = True)
-
-print('*** Removing QtWebEngine remote debug lib ***')
-
-try:
-    subprocess.check_call(f'rm -rf {rootdir}/PyQt6/Qt6/lib/QtWebEngineCore.framework/Versions/A/Resources/qtwebengine_devtools_resources.pak',shell = True)
-except Exception: # pylint: disable=broad-except
-    pass
+print('*** Fix symbolic link to Qt translations ***')
+# remove Framework/translations symbolic link to translations -> Resources/translations
+subprocess.check_call(f'unlink ./Artisan.app/Contents/Frameworks/translations',shell = True)
+# add symbolic link Frameworks/translations -> Resources/PyQt6/Qt6/translations
+os.symlink(f'../Resources/PyQt6/Qt6/translations', f'./Artisan.app/Contents/Frameworks/translations')
 
 
 print('*** Removing unused files ***')
@@ -443,13 +418,6 @@ for root, _, files in os.walk(f'./Artisan.app/Contents/Resources/babel/locale-da
                 ('_' in file and file.split('.')[0] not in SUPPORTED_LANGUAGES))):
 #            print('Deleting', file)
             os.remove(os.path.join(root,file))
-
-# NOT NEEDED for pyinstaller builds
-#print('*** Removing Phidget driver libs not for this platforms ***')
-#try:
-#    subprocess.check_call(f'rm -f ./Artisan.app/Contents/Frameworks/phidget22.dll',shell = True)
-#except Exception: # pylint: disable=broad-except
-#    pass
 
 
 print('*** Removing mypy completely ***')

@@ -140,8 +140,8 @@ hiddenimports_list=['charset_normalizer.md__mypyc', # part of requests 2.28.2 # 
                             'win32cred',
                             'win32timezone',
                             'babel.numbers',  # should not be needed as it got fixed in pyinstaller 6.11
-                            'PyQt6.QtWebChannel',
-                            'PyQt6.QtWebEngineCore',
+#                            'PyQt6.QtWebChannel',
+#                            'PyQt6.QtWebEngineCore',
                             'importlib_resources',
                             'winrt.windows.foundation.collections'
                             ]
@@ -289,8 +289,11 @@ for fn in [
     r'includes\bigtext.js',
     r'includes\sorttable.js',
     r'includes\report-template.htm',
+    r'includes\report-template-pdf.htm',
     r'includes\roast-template.htm',
+    r'includes\roast-template-pdf.htm',
     r'includes\ranking-template.htm',
+    r'includes\ranking-template-pdf.htm',
     r'includes\jquery-1.11.1.min.js',
     r'includes\android-chrome-192x192.png',
     r'includes\android-chrome-512x512.png',

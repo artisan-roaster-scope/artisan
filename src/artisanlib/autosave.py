@@ -25,20 +25,19 @@
 # AUTHOR
 # Marko Luther, 2023
 
-from typing import override, cast, TYPE_CHECKING
+from typing import override, TYPE_CHECKING
 from artisanlib.dialogs import ArtisanDialog
 
 from PyQt6.QtCore import Qt, pyqtSlot, QSettings
 from PyQt6.QtWidgets import (QApplication, QMessageBox, QLabel, QPushButton, QDialogButtonBox, QFrame,
     QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout, QLineEdit, QSpacerItem)
-from PyQt6.QtGui import QStandardItemModel
 
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
     from artisanlib.dialogs import HelpDlg # noqa: F401 # pylint: disable=unused-import
     from PyQt6.QtWidgets import QWidget # pylint: disable=unused-import
-    from PyQt6.QtGui import QStandardItem, QCloseEvent # pylint: disable=unused-import
+    from PyQt6.QtGui import QCloseEvent # pylint: disable=unused-import
 
 class autosaveDlg(ArtisanDialog):
     def __init__(self, parent:'QWidget', aw:'ApplicationWindow') -> None:
@@ -80,16 +79,6 @@ class autosaveDlg(ArtisanDialog):
         self.autopdfcheckbox.setChecked(self.aw.qmc.autosaveimage)
         self.imageTypesComboBox = QComboBox()
         self.imageTypesComboBox.addItems(self.aw.qmc.autoasaveimageformat_types)
-        try:
-            if not self.aw.QtWebEngineSupport:
-                # disable "PDF Report" item if QtWebEngine Support is not available
-                model = self.imageTypesComboBox.model()
-                if model is not None:
-                    item: QStandardItem|None = cast(QStandardItemModel, model).item(self.aw.qmc.autoasaveimageformat_types.index('PDF Report'))
-                    if item is not None:
-                        item.setEnabled(False)
-        except Exception: # pylint: disable=broad-except
-            pass
         self.imageTypesComboBox.setCurrentIndex(self.aw.qmc.autoasaveimageformat_types.index(self.aw.qmc.autosaveimageformat))
         prefixlabel = QLabel()
         prefixlabel.setAlignment(Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignRight)

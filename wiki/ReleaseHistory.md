@@ -11,6 +11,7 @@ v4.2.2
   - adds autoCHARGE/DROP and drum speed control to the [Schuilenburg](https://artisan-scope.org/machines/schuilenburg/) PLC machine setup
 * CHANGES
   - tightened license from [GPLv3](https://www.gnu.org/licenses/gpl-3.0.html) to [AGPLv3](https://www.gnu.org/licenses/agpl-3.0.html) to prevent commercialization as headless engine
+  - smaller builds (size reduced by ~45%) by replacing headless Chromium engine by Rust-based pyfulgur lib for HTML2PDF conversion
 * FIXES
   - fixes faulty hash generation on files created using `Save As` causing `modified file` warnings on load ([Issue #2205](../../../issues/2205))
   - fixes regression causing canvas color not being applied correctly ([Issue #2212](../../../issues/2212))

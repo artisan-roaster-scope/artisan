@@ -7,30 +7,29 @@
 <title>$doc</title>
 <style type="text/css">
 body {
-    background: hsl(210, 0%, 100%);
-    color: hsl(210, 77%, 17%);
+    background: #ffffff;
+    color: #0a2b4d;
+}
+.page-break {
+  break-after: page;
+}
+svg {
+  left: 1px;
+  top: 1px;   
+  width: 100%;
 }
 a {
-  color: hsl(210, 60%, 40%);
+  color: #2966a3;
 }
 h1 {
-  color: hsl(201, 60%, 40%);
-}
-@media screen and (prefers-color-scheme: dark) {
-  body {
-      background: hsl(210, 10%, 15%);
-      color: hsl(210, 10%, 62%);
-  }
-  a {
-    color: hsl(210, 90%, 70%);
-  }
-  h1 {
-    color: hsl(201, 80%, 65%);
-  }
+  color: #2978a3;
 }
 td { 
   vertical-align: top;
-  padding: 0px 0px 0px 5px;
+  padding-top: 0px;
+  padding-left:  7px;
+  padding-right:  7px;
+  padding-bottom: 0px;
 }
 th {
   text-align: right;
@@ -41,11 +40,8 @@ th {
 <body>
 <center>
 <h1>$title</h1>
+</center>
 <table cellpadding="10" width="80%">
-<tr>
-<td>
-<center>
-<table>
 <tr>
 <td>
 <table width="230">
@@ -203,13 +199,11 @@ th {
 </td>
 </tr>
 </table>
-</center>
-</td>
-</tr>
-<tr><td><br></td></tr>
-<tr>
-<td style="vertical-align:middle" align="center"><a href='$graph_image'><img alt='roast graph' width="650" src='$graph_image'></a></td>
-</tr>
+<br>
+<p style="text-align:center;">
+$graph_image
+</p>
+<table style="width: 100%;">
 <tr>
 <td align="center">
 <br>
@@ -227,21 +221,12 @@ $specialevents
 </td>
 </tr>
 </table>
-<table cellpadding="10" style="page-break-inside:avoid"  width="80%">
-<tr>
-<td style="vertical-align:middle;" align="center">
+
 <span style="display: $show_cupping;">
-<a href='$flavor_image'><img alt='flavor graph' width="550" src='$flavor_image'></a>
+<div class="page-break"></div>
+<p style="text-align:center;">
+$flavor_image
+</p>
 </span>
-</td>
-</tr>
-<tr><td><br></td></tr>
-<tr>
-<td><center><b>$cupping_notes_label</b></center>
-<center><span style="width:80%">$cupping_notes</span></center>
-</td>
-</tr>
-</table>
-</center>
 </body>
 </html>

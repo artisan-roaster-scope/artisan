@@ -44,6 +44,7 @@ import functools
 import dateutil.parser
 import copy as copyd
 import arabic_reshaper # type:ignore[import-untyped]
+from io import StringIO
 from bidi import get_display # type:ignore[import-untyped] # newer rust based implementation of the original Python implementation
 from enum import IntEnum
 from pathlib import Path
@@ -124,16 +125,6 @@ from PyQt6.QtCore import (QStandardPaths, QLibraryInfo, QTranslator, QLocale, QF
                           qVersion, QVersionNumber, QTime, QTimer, QFile, QIODevice, QTextStream, QSettings,
                           QRegularExpression, QDate, QUrl, QUrlQuery, QDir, Qt, QPoint, QEvent, QDateTime, QThread, qInstallMessageHandler)
 from PyQt6.QtNetwork import QLocalSocket
-
-QtWebEngineSupport:bool = False # set to True if the QtWebEngine was successfully imported
-#QtWebEngineWidgets must be imported before a QCoreApplication instance is created
-try:
-    from PyQt6.QtWebEngineWidgets import QWebEngineView
-    from PyQt6.QtWebEngineCore import QWebEngineProfile
-    QtWebEngineSupport = True
-except ImportError:
-    # on the RPi platform there is no native package PyQt-WebEngine nor PyQt6-WebEngine
-    pass
 from PyQt6 import sip
 
 
@@ -193,7 +184,6 @@ if TYPE_CHECKING:
     from PyQt6.QtWidgets import QTableWidgetItem, QTableWidget, QScrollBar # pylint: disable=unused-import
     from PyQt6.QtGui import QStyleHints, QClipboard, QKeyEvent, QMouseEvent, QDropEvent, QDragEnterEvent, QCloseEvent, QResizeEvent, QValidator # pylint: disable=unused-import
     from PyQt6.QtCore import QFile, QObject, QPermission, QMessageLogContext  # noqa: F401 # pylint: disable=unused-import,reimported # QFile is reimported for mypy!?
-    from PyQt6.QtWebEngineCore import QWebEnginePage  # noqa: F401 # pylint: disable=unused-import
     from matplotlib.backend_bases import Event as MplEvent, MouseEvent # type:ignore[untyped-import,unused-ignore] # pylint: disable=unused-import
     from matplotlib.artist import Artist # type:ignore[untyped-import,unused-ignore] # pylint: disable=unused-import
     from matplotlib.lines import Line2D # type:ignore[untyped-import,unused-ignore] # pylint: disable=unused-import
@@ -689,10 +679,6 @@ if multiprocessing.current_process().name == 'MainProcess':
 else:
     _log.info('child process loaded')
 
-if QtWebEngineSupport:
-    _log.info('QtWebEngine found => PDF report rendering enabled')
-else:
-    _log.info('QtWebEngine not found => PDF report rendering disabled')
 
 if platform.system().startswith('Windows'):
     # on Windows we use the Fusion style per default which supports the dark mode
@@ -1523,10 +1509,10 @@ class ApplicationWindow(QMainWindow):
         'DRYlabel', 'DRYlcd', 'DRYlcdFrame', 'DRY2FCslabel', 'DRY2FCsframe', 'FCslabel', 'FCslcd', 'FCslcdFrame', 'AUClabel', 'AUClcd', 'AUClcdFrame',
         'AUCLCD', 'phasesLCDs', 'extrabuttonsLayout', 'extrabuttondialogs', 'slider1', 'slider2', 'slider3', 'slider4', 'sliderLCD1', 'sliderLCD2', 'sliderLCD3',
         'sliderLCD4', 'sliderGrpBox1', 'sliderGrpBox2', 'sliderGrpBox3', 'sliderGrpBox4', 'sliderSV', 'sliderLCDSV', 'sliderGrpBoxSV', 'leftlayout',
-        'sliderFrame', 'sliderDock', 'lcdFrame', 'midlayout', 'editgraphdialog', 'html_loader', 'QtWebEngineSupport', 'artisanviewerFirstStart',
+        'sliderFrame', 'sliderDock', 'lcdFrame', 'midlayout', 'editgraphdialog', 'artisanviewerFirstStart',
         'buttonpalette', 'extraeventbuttontextcolor', 'extraeventsactions', 'extraeventsdescriptions', 'extraeventstypes', 'extraeventsvalues',
         'extraeventsvisibility', 'fileSaveAsAction', 'keyboardButtonStyles', 'language_menu_actions', 'loadThemeAction', 'main_button_min_width_str',
-        'minieventleft', 'minieventright', 'notificationManager', 'notificationsflag', 'ntb', 'pdf_page_layout', 'pdf_rendering', 'productionPDFAction',
+        'minieventleft', 'minieventright', 'notificationManager', 'notificationsflag', 'ntb', 'productionPDFAction',
         'rankingPDFAction', 'roastReportMenu', 'roastReportPDFAction', 'saveAsThemeAction', 'sliderGrp12', 'sliderGrp34', 'sliderGrpBox1x', 'sliderGrpBox2x', 'sliderGrpBox3x', 'sliderGrpBox4x',
         'small_button_min_width_str', 'standard_button_min_width_px', 'tiny_button_min_width_str', 'recording_version', 'recording_revision', 'recording_build',
         'lastIOResult', 'lastArtisanResult', 'max_palettes', 'palette_entries', 'eventsliders', 'defaultSettings', 'zoomInShortcut', 'zoomOutShortcut',
@@ -1540,7 +1526,7 @@ class ApplicationWindow(QMainWindow):
 
     nLCDS: Final[int] = 10 # maximum number of LCDs and extra devices (2x10 => 20 in total!)
 
-    def __init__(self, parent:QWidget|None = None, *, locale:str, WebEngineSupport:bool, artisanviewerFirstStart:bool) -> None:
+    def __init__(self, parent:QWidget|None = None, *, locale:str, artisanviewerFirstStart:bool) -> None:
 
         self.defaultSettings: dict[str, Any] = {}
                 # holds default values of all app QSettings
@@ -1555,7 +1541,6 @@ class ApplicationWindow(QMainWindow):
         self.sample_loop_running:bool = True
         self.time_stopped:float = 0
 
-        self.QtWebEngineSupport:bool = WebEngineSupport
         self.artisanviewerFirstStart:bool = artisanviewerFirstStart
 
         self.profile_data_type_adapter:TypeAdapter[ProfileData]|None = None
@@ -1599,11 +1584,6 @@ class ApplicationWindow(QMainWindow):
         self.quickEventShortCut:tuple[int, str]|None = None
         # this is None if inactive, or holds a tuple (n,s) with n a number {-1,..,4} indicating the custom event number (0-3), 4 for SV, or -1 for custom event buttons to be addressed
         # and s a string of length 0 (no digit yet), length 1 (if first digit is typed) or 2 (both digits are typed) indicating the value (00-99)
-
-        # html2pdf() state:
-        self.html_loader:QWebEngineView|None = None # pyright:ignore[reportPossiblyUnboundVariable] # holds the QWebEngineView during HTML2PDF generation in self.html2pdf()
-        self.pdf_page_layout:QPageLayout|None = None # holds the QPageLayout used during HTML2PDF generation in self.html2pdf()
-        self.pdf_rendering:bool = False # True while PDF is rendered by QWebEngineView
 
         self.eventaction_running_threads:list[EventActionThread] = []
 
@@ -2343,8 +2323,6 @@ class ApplicationWindow(QMainWindow):
         fileConvertReportPDFAction = QAction(QApplication.translate('Menu', 'Roast Report PDF...'), self)
         fileConvertReportPDFAction.triggered.connect(self.fileConvertReportPDF)
         self.convMenu.addAction(fileConvertReportPDFAction)
-        if not self.QtWebEngineSupport:
-            fileConvertReportPDFAction.setEnabled(False)
 
         self.saveGraphMenu:QMenu = QMenu(QApplication.translate('Menu', 'Save Graph'))
         PDFAction = QAction('PDF...', self)
@@ -2369,8 +2347,6 @@ class ApplicationWindow(QMainWindow):
         self.roastReportPDFAction = QAction(QApplication.translate('Menu', 'PDF...'), self)
         self.roastReportPDFAction.triggered.connect(self.pdfReport)
         self.roastReportMenu.addAction(self.roastReportPDFAction)
-        if not self.QtWebEngineSupport:
-            self.roastReportPDFAction.setEnabled(False)
 
         self.htmlAction = QAction(QApplication.translate('Menu', 'Web...'), self)
         self.htmlAction.triggered.connect(self.htmlReport)
@@ -2382,8 +2358,6 @@ class ApplicationWindow(QMainWindow):
         self.productionPDFAction = QAction(QApplication.translate('Menu', 'PDF...'), self)
         self.productionPDFAction.triggered.connect(self.productionPDFReport)
         self.productionMenu.addAction(self.productionPDFAction)
-        if not self.QtWebEngineSupport:
-            self.productionPDFAction.setEnabled(False)
         self.productionWebAction = QAction(QApplication.translate('Menu', 'Web...'), self)
         self.productionWebAction.triggered.connect(self.productionHTMLReport)
         self.productionMenu.addAction(self.productionWebAction)
@@ -2399,8 +2373,6 @@ class ApplicationWindow(QMainWindow):
         self.rankingPDFAction = QAction(QApplication.translate('Menu', 'PDF...'), self)
         self.rankingPDFAction.triggered.connect(self.rankingPDFReport)
         self.rankingMenu.addAction(self.rankingPDFAction)
-        if not self.QtWebEngineSupport:
-            self.rankingPDFAction.setEnabled(False)
         self.rankingWebAction = QAction(QApplication.translate('Menu', 'Web...'), self)
         self.rankingWebAction.triggered.connect(self.rankingHTMLReport)
         self.rankingMenu.addAction(self.rankingWebAction)
@@ -5919,7 +5891,6 @@ class ApplicationWindow(QMainWindow):
                     elif action.data()[2] == 'RoastHubs':
                         from artisanlib.roasthubs import configureConnection
                         res = configureConnection(self)
-                        _log.debug('PRINT res: %s',res)
                         if not res:
                             self.sendmessage(QApplication.translate('Message','Action canceled'))
                     elif action.data()[1] == 'ROEST' and self.qmc.device:
@@ -12127,8 +12098,8 @@ class ApplicationWindow(QMainWindow):
         self.convMenu.setEnabled(True)
         self.saveGraphMenu.setEnabled(True)
         self.htmlAction.setEnabled(True)
-        if self.QtWebEngineSupport:
-            self.roastReportPDFAction.setEnabled(True)
+#        if self.QtWebEngineSupport:
+#            self.roastReportPDFAction.setEnabled(True)
         self.reportMenu.setEnabled(True)
         self.productionMenu.setEnabled(True)
         self.rankingMenu.setEnabled(True)
@@ -13297,7 +13268,7 @@ class ApplicationWindow(QMainWindow):
     def autosave(self, filename:str) -> None:
         if self.qmc.autosaveimageformat == 'PDF':
             self.saveVectorGraph(extension='.pdf',fname=filename)
-        elif self.qmc.autosaveimageformat == 'PDF Report' and self.QtWebEngineSupport:
+        elif self.qmc.autosaveimageformat == 'PDF Report':
             self.roastReport(pdf_filename=filename + '.pdf')
         elif self.qmc.autosaveimageformat == 'SVG':
             self.saveVectorGraph(extension='.svg',fname=filename)
@@ -17800,7 +17771,7 @@ class ApplicationWindow(QMainWindow):
                         res = self.setProfileDict(f,profile,quiet=True)
                         if res:
                             self.qmc.redraw()
-                            self.roastReport(pdf_filename=fconv, batch_process=True)
+                            self.roastReport(pdf_filename=fconv)
                     else:
                         self.sendmessage(QApplication.translate('Message','Target file {0} exists. {1} not converted.').format(fconv,fname + str(ext)))
                 except Exception as e: # pylint: disable=broad-except
@@ -17809,7 +17780,6 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.fileCleanSignal.emit()
                 self.qmc.reset(soundOn=False)
                 self.restoreExtradeviceSettings()
-            self.releaseQWebEngineView()
             if loaded_profile:
                 self.loadFile(loaded_profile, quiet=True)
             self.qmc.roastpropertiesflag = flag_temp
@@ -21828,9 +21798,6 @@ class ApplicationWindow(QMainWindow):
 <td sorttable_customkey=\"$in_num\">$weightin</td>
 <td sorttable_customkey=\"$out_num\">$weightout</td>
 <td sorttable_customkey=\"$loss_num\">$weightloss</td>
-<td sorttable_customkey=\"$defects_num\">$defects</td>
-<td sorttable_customkey=\"$dfectsloss_num\">$defectsloss</td>
-
 </tr>"""
         ds:ProductionDataStr = self.productionData2string(data,units=False)
         batch_html = ds['id']
@@ -21862,9 +21829,7 @@ class ApplicationWindow(QMainWindow):
             defectsloss = ds['defects_loss'],
             in_num = f"{ds['weight_in_num']:.0f}",
             out_num = f"{ds['weight_out_num']:.0f}",
-            loss_num = f"{ds['weight_loss_num']:.2f}",
-            defects_num = f"{ds['defects_weight_num']:.0f}",
-            dfectsloss_num = f"{ds['defects_loss_num']:.2f}",
+            loss_num = f"{ds['weight_loss_num']:.2f}"
         )
 
     # extracts the following from a give profile dict in a new dict:
@@ -22010,22 +21975,24 @@ class ApplicationWindow(QMainWindow):
                 profiles = sorted(profiles,
                     key=lambda p: (QDateTime(QDate.fromString(p['roastisodate'], Qt.DateFormat.ISODate),QTime.fromString(p['roasttime'])).toMSecsSinceEpoch()
                          if 'roastisodate' in p and 'roasttime' in p else 0))
-                with open(getResourcePath() + 'report-template.htm', encoding='utf-8') as myfile:
+                with open(getResourcePath() +
+                        ('report-template-pdf.htm' if pdf else 'report-template.htm'),
+                        encoding='utf-8') as myfile:
                     HTML_REPORT_TEMPLATE=myfile.read()
                 entries = ''
                 total_in_sum = 0.
                 total_out_sum = 0.
-                total_defects_sum = 0.
+#                total_defects_sum = 0.
                 unit = self.qmc.weight[2]
                 # collect data
                 for p in profiles:
                     d = self.profileProductionData(p)
                     weight = d.get('weight', (0, 0, weight_units[1]))
-                    defects_weight = d.get('defects_weight', 0)
+#                    defects_weight = d.get('defects_weight', 0)
                     last_unit = (weight[2] if weight is not None else 'kg')
                     total_in_sum += (convertWeight(weight[0],weight_units.index(last_unit),weight_units.index(unit)) if weight is not None else 0)
                     total_out_sum += (convertWeight(weight[1],weight_units.index(last_unit),weight_units.index(unit)) if weight is not None else 0)
-                    total_defects_sum += (convertWeight(defects_weight,weight_units.index(last_unit),weight_units.index(unit)) if defects_weight == 0 else 0)
+#                    total_defects_sum += (convertWeight(defects_weight,weight_units.index(last_unit),weight_units.index(unit)) if defects_weight == 0 else 0)
                     entries += self.productionData2htmlentry(d) + '\n'
 
                 html = libstring.Template(HTML_REPORT_TEMPLATE).safe_substitute(
@@ -22034,8 +22001,8 @@ class ApplicationWindow(QMainWindow):
                     total_in = (f'{total_in_sum:.2f}' if unit in {'Kg', 'lb', 'oz'} else f'{total_in_sum:.0f}'),
                     total_out = (f'{total_out_sum:.2f}' if unit in {'Kg', 'lb', 'oz'} else f'{total_out_sum:.0f}'),
                     total_loss = float2float(self.weight_loss(total_in_sum,total_out_sum), self.percent_decimals),
-                    total_defects = (f'{total_defects_sum:.2f}' if unit in {'Kg', 'lb', 'oz'} else f'{total_defects_sum:.0f}'),
-                    total_defectsloss = float2float(self.weight_loss(total_out_sum,total_out_sum-total_defects_sum), self.percent_decimals),
+#                    total_defects = (f'{total_defects_sum:.2f}' if unit in {'Kg', 'lb', 'oz'} else f'{total_defects_sum:.0f}'),
+#                    total_defectsloss = float2float(self.weight_loss(total_out_sum,total_out_sum-total_defects_sum), self.percent_decimals),
                     resources = str(getResourcePath()),
                     batch = QApplication.translate('HTML Report Template', 'Batch'),
                     time = QApplication.translate('HTML Report Template', 'Date'),
@@ -22044,8 +22011,8 @@ class ApplicationWindow(QMainWindow):
                     weightin = QApplication.translate('HTML Report Template', 'In'),
                     weightout = QApplication.translate('HTML Report Template', 'Out'),
                     loss = QApplication.translate('HTML Report Template', 'Loss'),
-                    defects = QApplication.translate('HTML Report Template', 'Def.'),
-                    defectsloss = QApplication.translate('HTML Report Template', 'Def.L'),
+#                    defects = QApplication.translate('HTML Report Template', 'Def.'),
+#                    defectsloss = QApplication.translate('HTML Report Template', 'Def.L'),
                     sum = QApplication.translate('HTML Report Template', 'SUM'),
                     unit = unit.lower()
                 )
@@ -22053,24 +22020,27 @@ class ApplicationWindow(QMainWindow):
                 f = None
                 try:
                     tmpdir = str(QDir.tempPath() + '/')
-                    filename = str(QDir(tmpdir).filePath('ProductionReport.html'))
-                    try:
-                        os.remove(filename)
-                    except OSError:
-                        pass
-                    with open(filename, 'w', encoding='utf-8') as f:
-                        for ht in html:
-                            f.write(ht)
-                    if platform.system() == 'Darwin':
-                        full_path = 'file://' + filename # Safari refuses to load the javascript lib (sorttable) otherwise
-                    else:
-                        full_path = 'file:///' + filename # Explorer refuses to start otherwise
                     if pdf:
                         # select file
                         filename = self.ArtisanSaveFileDialog(msg=QApplication.translate('Message', 'Export {}').format('PDF'),ext='*.pdf')
                         if filename:
-                            self.html2pdf(full_path, filename, landscape=True)
+                            self.htmltext2pdf(html, filename,
+                                title=f"Artisan {QApplication.translate('HTML Report Template', 'Production Report')}",
+                                landscape=True)
                     else:
+                        tmpdir = str(QDir.tempPath() + '/')
+                        filename = str(QDir(tmpdir).filePath('ProductionReport.html'))
+                        try:
+                            os.remove(filename)
+                        except OSError:
+                            pass
+                        with open(filename, 'w', encoding='utf-8') as f:
+                            for ht in html:
+                                f.write(ht)
+                        if platform.system() == 'Darwin':
+                            full_path = 'file://' + filename # Safari refuses to load the javascript lib (sorttable) otherwise
+                        else:
+                            full_path = 'file:///' + filename # Explorer refuses to start otherwise
                         QDesktopServices.openUrl(QUrl(full_path, QUrl.ParsingMode.TolerantMode))
 
                 except OSError as e:
@@ -22854,7 +22824,8 @@ class ApplicationWindow(QMainWindow):
                     profiles = sorted(profiles,
                         key=lambda p: (QDateTime(QDate.fromString(p['roastisodate'], Qt.DateFormat.ISODate),QTime.fromString(p['roasttime'])).toMSecsSinceEpoch()
                              if 'roastisodate' in p and 'roasttime' in p else 0))
-                    with open(getResourcePath() + 'ranking-template.htm', encoding='utf-8') as myfile:
+                    with open(getResourcePath() + ('ranking-template-pdf.htm' if pdf else 'ranking-template.htm'),
+                        encoding='utf-8') as myfile:
                         HTML_REPORT_TEMPLATE=myfile.read()
                     entries = ''
                     charges = 0.
@@ -23115,7 +23086,7 @@ class ApplicationWindow(QMainWindow):
                     prop.set_size('x-small')
 
                     if self.qmc.ax is None or len(profiles) > max_profiles:
-                        QMessageBox.information(self, QApplication.translate('Message', 'Ranking Report'),
+                        QMessageBox.information(self, QApplication.translate('HTML Report Template', 'Ranking Report'),
                                                   QApplication.translate('Message', 'Ranking graphs are only generated up to {0} profiles').format(str(max_profiles)))
                     else:
                         try:
@@ -23198,21 +23169,28 @@ class ApplicationWindow(QMainWindow):
                                 _log.exception(e)
 
                             # generate graph
+                            self.qmc.set_xlabel('')
                             self.qmc.fig.set_layout_engine('none')
                             self.qmc.fig.canvas.draw()
-                            # save graph
-                            graph_image = str(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(graph_image + '.svg')))
-                            try:
-                                os.remove(graph_image)
-                            except OSError:
-                                pass
-                            self.qmc.fig.set_layout_engine('tight', **self.qmc.tight_layout_params)
-                            self.qmc.fig.savefig(graph_image,transparent=True)
 
-                            #add some random number to force HTML reloading
-                            graph_image = path2url(graph_image)
-                            graph_image = graph_image + '?dummy=' + str(int(libtime.time()))
-                            graph_image = "<img alt='roast graph' style=\"width:100%;\" src='" + graph_image + "'>"
+                            if pdf:
+                                # we embed the SVG directly
+                                graph_image_svg = StringIO()
+                                self.qmc.fig.savefig(graph_image_svg, transparent=True, format='svg', backend='svg')
+                                graph_image = graph_image_svg.getvalue().split('\n',3)[3]
+                            else:
+                                # save graph
+                                graph_image = str(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(graph_image + '.svg')))
+                                try:
+                                    os.remove(graph_image)
+                                except OSError:
+                                    pass
+                                self.qmc.fig.set_layout_engine('tight', **self.qmc.tight_layout_params)
+                                self.qmc.fig.savefig(graph_image,transparent=True)
+                                #add some random number to force HTML reloading
+                                graph_image = path2url(graph_image)
+                                graph_image = graph_image + '?dummy=' + str(int(libtime.time()))
+                                graph_image = "<img alt='roast graph' style=\"width:100%;\" src='" + graph_image + "'>"
 
                         except Exception as e: # pylint: disable=broad-except
                             _log.exception(e)
@@ -23351,17 +23329,24 @@ class ApplicationWindow(QMainWindow):
                                 ax.text( n + 100/2,                                                             i*(barheight + barspacer) + textoffset, missingPhaseevents, ha='center', color=lightfontcolor, fontproperties=prop)
                                 ax.text( n + 100 + g + 1, i*(barheight + barspacer) + textoffset, stringfromseconds(drop_time), ha='left', color=fontcolor, fontproperties=prop)
 
-                        # save graph
-                        graph_image_pct = str(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(graph_image_pct + '.svg')))
-                        try:
-                            os.remove(graph_image_pct)
-                        except OSError:
-                            pass
-                        fig.savefig(graph_image_pct,transparent=True)
-                        #add some random number to force HTML reloading
-                        graph_image_pct = path2url(graph_image_pct)
-                        graph_image_pct = graph_image_pct + '?dummy=' + str(int(libtime.time()))
-                        graph_image_pct = "<img alt='roast graph pct' style=\"width: 95%;\" src='" + graph_image_pct + "'>"
+
+                        if pdf:
+                            # we embed the SVG directly
+                            graph_image_pct_svg = StringIO()
+                            fig.savefig(graph_image_pct_svg, transparent=True, format='svg', backend='svg')
+                            graph_image_pct = graph_image_pct_svg.getvalue().split('\n',3)[3]
+                        else:
+                            # save graph
+                            graph_image_pct = str(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(graph_image_pct + '.svg')))
+                            try:
+                                os.remove(graph_image_pct)
+                            except OSError:
+                                pass
+                            fig.savefig(graph_image_pct,transparent=True)
+                            #add some random number to force HTML reloading
+                            graph_image_pct = path2url(graph_image_pct)
+                            graph_image_pct = graph_image_pct + '?dummy=' + str(int(libtime.time()))
+                            graph_image_pct = "<img alt='roast graph pct' style=\"width: 95%;\" src='" + graph_image_pct + "'>"
 
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
@@ -23414,27 +23399,28 @@ class ApplicationWindow(QMainWindow):
                         graph_image_pct=graph_image_pct
                     )
                     try:
-                        filename = str(QDir(tmpdir).filePath('RankingReport.html'))
-                        try:
-                            os.remove(filename)
-                        except OSError:
-                            pass
-                        with open(filename, 'w', encoding='utf-8') as f:
-                            for ht in html:
-                                f.write(ht)
-                        if platform.system() == 'Darwin':
-                            full_path = 'file://' + filename # Safari refuses to load the javascript lib (sorttable) otherwise
-                        else:
-                            full_path = 'file:///' + filename # Explorer refuses to start otherwise
-
                         if pdf:
                             # select file
                             filename = self.ArtisanSaveFileDialog(msg=QApplication.translate('Message', 'Export {}').format('PDF'),ext='*.pdf')
                             if filename:
-                                self.html2pdf(full_path, filename, landscape=True)
+                                self.htmltext2pdf(html, filename,
+                                    title=f"Artisan {QApplication.translate('HTML Report Template', 'Ranking Report')}",
+                                    landscape=True, fontsize='large')
                         else:
-                            QDesktopServices.openUrl(QUrl(full_path, QUrl.ParsingMode.TolerantMode))
+                            filename = str(QDir(tmpdir).filePath('RankingReport.html'))
+                            try:
+                                os.remove(filename)
+                            except OSError:
+                                pass
+                            with open(filename, 'w', encoding='utf-8') as f:
+                                for ht in html:
+                                    f.write(ht)
+                            if platform.system() == 'Darwin':
+                                full_path = 'file://' + filename # Safari refuses to load the javascript lib (sorttable) otherwise
+                            else:
+                                full_path = 'file:///' + filename # Explorer refuses to start otherwise
 
+                            QDesktopServices.openUrl(QUrl(full_path, QUrl.ParsingMode.TolerantMode))
                     except OSError as e:
                         self.qmc.adderror((QApplication.translate('Error Message', 'IO Error:') + ' rankingReport() {0}').format(str(e)))
         except Exception as e:  # pylint: disable=broad-except
@@ -23715,120 +23701,23 @@ class ApplicationWindow(QMainWindow):
     def htmlReport(self, _:bool = False) -> None:
         self.roastReport()
 
-    def releaseQWebEngineView(self) -> None:
-        try: # sip not supported on older PyQt versions (RPi!)
-            if self.pdf_page_layout is not None:
-                sip.delete(self.pdf_page_layout)
-            #print(sip.isdeleted(self.pdf_page_layout))
-        except Exception: # pylint: disable=broad-except
-            pass
-        self.pdf_page_layout = None
-        try: # sip not supported on older PyQt versions (RPi!)
-            if self.html_loader is not None:
-                sip.delete(self.html_loader)
-            #print(sip.isdeleted(self.html_loader))
-        except Exception: # pylint: disable=broad-except
-            pass
-        self.html_loader = None
 
-
-    # if batch_process is True, the QWebEngineView() is created only if self.html_loader is not None and never deleted
-    # the caller is responsible to release that self.html_loader via releaseQWebEngineView()
-    def html2pdf(self, html_file:str, pdf_file:str, landscape:bool = False, batch_process:bool = False) -> None:
-        def release() -> None:
-            if batch_process and self.html_loader is not None:
-                try:
-                    self.html_loader.page().pdfPrintingFinished.disconnect() # type: ignore[union-attr] # "Callable[[str, bool], None]" has no attribute "disconnect"
-                except Exception: # pylint: disable=broad-except
-                    pass
-                try:
-                    self.html_loader.loadFinished.disconnect()
-                except Exception: # pylint: disable=broad-except
-                    pass
-                try:
-                    self.html_loader.renderProcessTerminated.disconnect()
-                except Exception: # pylint: disable=broad-except
-                    pass
-            else:
-                self.releaseQWebEngineView()
-            self.pdf_rendering = False
-
-        @pyqtSlot(str,bool)
-        def printing_finished(_file:str, _success:bool) -> None:
-            release()
-
-        @pyqtSlot(bool)
-        def emit_pdf(ok:bool) -> None:
-            if ok:
-                if self.html_loader is not None and self.pdf_page_layout is not None:
-                    page = self.html_loader.page()
-                    if page is not None:
-                        page.pdfPrintingFinished.connect(printing_finished)
-                        page.printToPdf(pdf_file, self.pdf_page_layout)
-                else:
-                    self.pdf_rendering = False
-            else:
-                self.pdf_rendering = False
-
-        @pyqtSlot('QWebEnginePage::RenderProcessTerminationStatus', int)
-        def renderingTerminated(terminationStatus:'QWebEnginePage.RenderProcessTerminationStatus',exitCode:int) -> None:
-            _log.debug('renderingTerminated(%s,%s)',terminationStatus,exitCode)
-            release()
-
-        try:
-            # we wait for a previous pdf conversion to terminate
-            while self.pdf_rendering:
-                QApplication.processEvents()
-                libtime.sleep(0.001)
-            self.pdf_rendering = True
-            if self.html_loader is None:
-                try:
-                    profile = QWebEngineProfile() # pyright:ignore[reportPossiblyUnboundVariable]
-                    profile.setSpellCheckEnabled(False) # disable spell checker
-                    profile.setHttpCacheType(QWebEngineProfile.HttpCacheType.NoCache) # pyright:ignore[reportPossiblyUnboundVariable]
-                    self.html_loader = QWebEngineView(profile) # pyright:ignore[reportPossiblyUnboundVariable]
-                except Exception: # pylint: disable=broad-except
-                    self.html_loader = QWebEngineView() # pyright:ignore[reportPossiblyUnboundVariable]
-                if self.html_loader is not None:
-                    self.html_loader.setZoomFactor(1)
-            if self.pdf_page_layout is None:
-                # lazy imports
-                from PyQt6.QtCore import QMarginsF
-                from PyQt6.QtGui import QPageSize
-                if QPrinter().pageLayout().pageSize().id() == QPageSize.PageSizeId.Letter: # ty:ignore[no-matching-overload]
-                    # Letter
-                    ps = QPageSize(QPageSize.PageSizeId.Letter)
-                    pu = QPageLayout.Unit.Inch
-                    pm = QMarginsF(0.7, 0.7, 0.7, 0.7)
-                else:
-                    # A4
-                    ps = QPageSize(QPageSize.PageSizeId.A4)
-                    pu = QPageLayout.Unit.Millimeter
-                    pm = QMarginsF(15, 15, 15, 15)
-                if landscape:
-                    po = QPageLayout.Orientation.Landscape
-                else:
-                    po = QPageLayout.Orientation.Portrait
-                self.pdf_page_layout = QPageLayout(ps, po, pm, pu)
-            if self.html_loader is not None:
-                self.html_loader.renderProcessTerminated.connect(renderingTerminated)
-                self.html_loader.loadFinished.connect(emit_pdf)
-                self.html_loader.load(QUrl(html_file))
-                # busy wait for the pdf conversion to terminate
-                while self.pdf_rendering:
-                    QApplication.processEvents()
-                    libtime.sleep(0.001)
-        except Exception as e: # pylint: disable=broad-except
-            _log.exception(e)
+    @staticmethod
+    def htmltext2pdf(html:str, pdf_file:str, title:str, landscape:bool = False, fontsize:str='small') -> None:
+        from pyfulgur import Engine, AssetBundle, PageSize, Margin
+        bundle = AssetBundle()
+        bundle.add_css(f"body {{ font-size: {fontsize}; }}")
+        engine = Engine(page_size=(PageSize.A4.landscape() if landscape else PageSize.A4), title=title, margin=Margin.uniform(30))
+        engine.render_html_to_file(html, pdf_file)
 
 
     # if batch_process is True and pdf_filename is given, the caller needs to cleanup the QWebEngineView by calling self.releaseQWebEngineView() the after processing all reports
-    def roastReport(self, pdf_filename:str|None = None, batch_process:bool = False) -> None:
+    def roastReport(self, pdf_filename:str|None = None) -> None:
         import html as htmllib
         import string as libstring
         try:
             rcParams['path.effects'] = []
-            with open(getResourcePath() + 'roast-template.htm', encoding='utf-8') as myfile:
+            with open(getResourcePath() + ('roast-template-pdf.htm' if pdf_filename else 'roast-template.htm'), encoding='utf-8') as myfile:
                 HTML_REPORT_TEMPLATE=myfile.read()
             beans_html:str = str(htmllib.escape(self.qmc.beans))
             if len(beans_html) > 43:
@@ -23850,35 +23739,46 @@ class ApplicationWindow(QMainWindow):
                 elif 'AUCbase' in cp:
                     etbta += f" [{cp['AUCbase']:.0f}]"
             tmpdir = str(QDir.tempPath() + '/')
-            graph_image = 'roastlog-graph'
-            graph_image = str(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(graph_image + '.svg')))
-            try:
-                os.remove(graph_image)
-            except OSError:
-                pass
 
             org_patheffects = self.qmc.patheffects
             if self.app.darkmode:
                 self.qmc.patheffects = 0
             self.qmc.redraw(recomputeAllDeltas=False)
 
-            self.qmc.fig.savefig(graph_image,transparent=True)
-            #add some random number to force HTML reloading
-            graph_image = path2url(graph_image)
-            graph_image = graph_image + '?dummy=' + str(int(libtime.time()))
+            if pdf_filename:
+                graph_image_svg = StringIO()
+                self.qmc.fig.savefig(graph_image_svg, transparent=True, format='svg', backend='svg')
+                graph_image = graph_image_svg.getvalue().split('\n',3)[3]
+            else:
+                graph_image = 'roastlog-graph'
+                graph_image = str(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(graph_image + '.svg')))
+                try:
+                    os.remove(graph_image)
+                except OSError:
+                    pass
+                self.qmc.fig.savefig(graph_image,transparent=True)
+                #add some random number to force HTML reloading
+                graph_image = path2url(graph_image)
+                graph_image = graph_image + '?dummy=' + str(int(libtime.time()))
 
             #obtain flavor chart image
             self.qmc.flavorchart()
-            flavor_image = 'roastlog-flavor'
-            flavor_image = str(QDir.cleanPath(QDir(tmpdir).absoluteFilePath(flavor_image + '.svg')))
-            try:
-                os.remove(flavor_image)
-            except OSError:
-                pass
-            self.qmc.fig.savefig(flavor_image,transparent=True)
-            flavor_image = path2url(flavor_image)
-            flavor_image = flavor_image + '?dummy=' + str(int(libtime.time()))
-            #return screen to GRAPH profile mode
+
+            if pdf_filename:
+                flavor_image_svg = StringIO()
+                self.qmc.fig.savefig(flavor_image_svg, transparent=True, format='svg', backend='svg')
+                flavor_image = flavor_image_svg.getvalue().split('\n',3)[3]
+            else:
+                flavor_image = str(QDir.cleanPath(QDir(tmpdir).absoluteFilePath('roastlog-flavor.svg')))
+                try:
+                    os.remove(flavor_image)
+                except OSError:
+                    pass
+                self.qmc.fig.savefig(flavor_image,transparent=True)
+                flavor_image = path2url(flavor_image)
+                flavor_image = flavor_image + '?dummy=' + str(int(libtime.time()))
+                #return screen to GRAPH profile mode
+
             if self.app.darkmode:
                 self.qmc.patheffects = org_patheffects
 
@@ -24076,22 +23976,23 @@ class ApplicationWindow(QMainWindow):
                 cupping_notes=cupping_notes)
             f = None
             try:
-                filename = str(QDir(tmpdir).filePath('Roastlog.html'))
-                try:
-                    os.remove(filename)
-                except OSError:
-                    pass
-                _log.debug('PRINT HTML: %s, %s',type(html),html)
-                with open(filename, 'w', encoding='utf-8') as f:
-                    for ht in html:
-                        f.write(ht)
-                if platform.system() == 'Darwin':
-                    full_path = 'file://' + filename # Safari refuses to load the javascript lib (sorttable) otherwise
-                else:
-                    full_path = 'file:///' + filename # Explorer refuses to start otherwise
                 if pdf_filename:
-                    self.html2pdf(full_path,pdf_filename, batch_process=batch_process)
+                    self.htmltext2pdf(html, pdf_filename,
+                        title=f"Artisan {QApplication.translate('HTML Report Template', 'Roasting Report')}",
+                        landscape=False)
                 else:
+                    filename = str(QDir(tmpdir).filePath('Roastlog.html'))
+                    try:
+                        os.remove(filename)
+                    except OSError:
+                        pass
+                    with open(filename, 'w', encoding='utf-8') as f:
+                        for ht in html:
+                            f.write(ht)
+                    if platform.system() == 'Darwin':
+                        full_path = 'file://' + filename # Safari refuses to load the javascript lib (sorttable) otherwise
+                    else:
+                        full_path = 'file:///' + filename # Explorer refuses to start otherwise
                     QDesktopServices.openUrl(QUrl(full_path, QUrl.ParsingMode.TolerantMode))
 
             except OSError as e:
@@ -28348,7 +28249,7 @@ def main() -> None:
     locale_str = initialize_locale(app)
     _log.info('locale: %s',locale_str)
 
-    appWindow = ApplicationWindow(locale=locale_str, WebEngineSupport=QtWebEngineSupport, artisanviewerFirstStart=artisanviewerFirstStart)
+    appWindow = ApplicationWindow(locale=locale_str, artisanviewerFirstStart=artisanviewerFirstStart)
 
     app.setActivationWindow(appWindow,activateOnMessage=False) # set the activation window for the QtSingleApplication
 

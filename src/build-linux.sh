@@ -111,8 +111,11 @@ cp includes/fitty_patched.js dist
 cp includes/bigtext.js dist
 cp includes/sorttable.js dist
 cp includes/report-template.htm dist
+cp includes/report-template-pdf.htm dist
 cp includes/roast-template.htm dist
+cp includes/roast-template-pdf.htm dist
 cp includes/ranking-template.htm dist
+cp includes/ranking-template-pdf.htm dist
 cp includes/jquery-1.11.1.min.js dist
 cp includes/android-chrome-192x192.png dist
 cp includes/android-chrome-512x512.png dist
@@ -146,10 +149,11 @@ cp -R includes/Icons/* dist/Icons
 
 # remove unused Qt modules
 
-keep_qt_modules="libQt6Bluetooth libQt6Concurrent libQt6Core libQt6DBus libQt6Gui libQt6Network
- libQt6OpenGL libQt6Positioning libQt6PrintSupport libQt6Qml libQt6QmlModels libQt6QmlMeta libQt6Quick libQt6QuickWidgets
- libQt6Svg libQt6WaylandClient libQt6WaylandEglClientHwIntegration libQt6WebChannel libQt6WebEngineCore
- libQt6WebEngineWidgets libQt6Widgets libQt6WlShellIntegration libQt6XcbQpa libQt6QmlWorkerScript"
+keep_qt_modules="libQt6Concurrent libQt6Core libQt6DBus libQt6Gui libQt6Network
+ libQt6PrintSupport libQt6Svg libQt6WaylandClient libQt6WaylandEglClientHwIntegration
+ libQt6Widgets libQt6WlShellIntegration libQt6XcbQpa "
+
+
 
 for qtlib in $(find dist/_internal/PyQt6/Qt6/lib -type f -name "libQt6*.so.*"); do
     qtlib_filename="${qtlib##*/}"
