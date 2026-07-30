@@ -1397,6 +1397,8 @@ class InvalidProfileHash(Exception):
 #class ApplicationWindow():
 class ApplicationWindow(QMainWindow):
 
+    NUMBER_OF_EXTRABUTTON_ROWS:Final[int] = 10 # max number of extra button rows
+
     singleShotPhidgetsPulseOFF = pyqtSignal(int,int,str) # signal to be called from the eventaction thread to realise Phidgets pulse via QTimer in the main thread
     singleShotPhidgetsPulseOFFSerial = pyqtSignal(int,int,str,str)
     updatePlusStatusSignal = pyqtSignal() # can be called from another thread or a QTimer to trigger to update the plus icon status
@@ -1500,9 +1502,7 @@ class ApplicationWindow(QMainWindow):
         'buttonpalettemaxlen_default', 'buttonpalettemaxlen', 'buttonpalette_shortcuts', 'buttonsize_default', 'buttonsize',
         'mark_last_button_pressed_default', 'mark_last_button_pressed', 'show_extrabutton_tooltips_default', 'show_extrabutton_tooltips',
         'buttonpalette_buttonsize', 'buttonpalette_mark_last_button_pressed', 'buttonpalette_tooltips', 'buttonpalette_slider_alternative_layout', 'eventbuttontablecolumnwidths',
-        'lowerbuttondialogLayout', 'lowerbuttondialog', 'lowerbuttondialogLayout', 'e1buttonbarLayout', 'e1buttondialog', 'e2buttonbarLayout', 'e2buttondialog',
-        'e3buttonbarLayout', 'e3buttondialog', 'e4buttonbarLayout', 'e4buttondialog','e5buttonbarLayout', 'e5buttondialog', 'e6buttonbarLayout', 'e6buttondialog',
-        'e7buttonbarLayout', 'e7buttondialog', 'e8buttonbarLayout', 'e8buttondialog', 'e9buttonbarLayout', 'e9buttondialog', 'e10buttonbarLayout', 'e10buttondialog',
+        'lowerbuttondialogLayout', 'lowerbuttondialog', 'lowerbuttondialogLayout', 'extrabuttonbars',
         'keyboardmove', 'keyboardButtonList', 'keyboardmoveindex',
         'keyboardmoveflag', 'lastkeyboardcmd', 'error_dlg', 'serial_dlg', 'message_dlg', 'ETname', 'BTname', 'level1frame', 'level1layout', 'qpc', 'splitter', 'scroller', 'EventsGroupLayout',
         'LCD2frame', 'LCD3frame', 'LCD4frame', 'LCD5frame', 'LCD6frame', 'LCD7frame', 'TPlabel', 'TPlcd', 'TPlcdFrame', 'TP2DRYlabel', 'TP2DRYframe',
@@ -3582,86 +3582,21 @@ class ApplicationWindow(QMainWindow):
 
         #initiate configuration
         self.lowerbuttondialogLayout.addStretch()
-        self.lowerbuttondialogLayout.addWidget(self.buttonCHARGE)
-        self.lowerbuttondialogLayout.addWidget(self.buttonDRY)
-        self.lowerbuttondialogLayout.addWidget(self.buttonFCs)
-        self.lowerbuttondialogLayout.addWidget(self.buttonFCe)
-        self.lowerbuttondialogLayout.addWidget(self.buttonSCs)
-        self.lowerbuttondialogLayout.addWidget(self.buttonSCe)
-        self.lowerbuttondialogLayout.addWidget(self.buttonDROP)
-        self.lowerbuttondialogLayout.addWidget(self.buttonCOOL)
-        self.lowerbuttondialogLayout.addWidget(self.buttonEVENT)
+        for button_widget in [self.buttonCHARGE, self.buttonDRY, self.buttonFCs, self.buttonFCe,
+                self.buttonSCs, self.buttonSCe, self.buttonDROP, self.buttonCOOL, self.buttonEVENT]:
+            self.lowerbuttondialogLayout.addWidget(cast(EventPushButton, button_widget))
         self.lowerbuttondialogLayout.addStretch()
 
-        self.e1buttonbarLayout = QHBoxLayout()
-        self.e1buttonbarLayout.setSpacing(1)
-        self.e1buttonbarLayout.setContentsMargins(0, 0, 0, 0)
-        self.e1buttondialog = QFrame()
-        self.e1buttondialog.setContentsMargins(0, 0, 0, 0)
-        self.e1buttondialog.setLayout(self.e1buttonbarLayout)
+        def makeButtonbar() -> QFrame:
+            buttonbarLayout = QHBoxLayout()
+            buttonbarLayout.setSpacing(1)
+            buttonbarLayout.setContentsMargins(0, 0, 0, 0)
+            buttonbar = QFrame()
+            buttonbar.setContentsMargins(0, 0, 0, 0)
+            buttonbar.setLayout(buttonbarLayout)
+            return buttonbar
 
-        self.e2buttonbarLayout = QHBoxLayout()
-        self.e2buttonbarLayout.setSpacing(1)
-        self.e2buttonbarLayout.setContentsMargins(0, 0, 0, 0)
-        self.e2buttondialog = QFrame()
-        self.e2buttondialog.setContentsMargins(0, 0, 0, 0)
-        self.e2buttondialog.setLayout(self.e2buttonbarLayout)
-
-        self.e3buttonbarLayout = QHBoxLayout()
-        self.e3buttonbarLayout.setSpacing(1)
-        self.e3buttonbarLayout.setContentsMargins(0, 0, 0, 0)
-        self.e3buttondialog = QFrame()
-        self.e3buttondialog.setContentsMargins(0, 0, 0, 0)
-        self.e3buttondialog.setLayout(self.e3buttonbarLayout)
-
-        self.e4buttonbarLayout = QHBoxLayout()
-        self.e4buttonbarLayout.setSpacing(1)
-        self.e4buttonbarLayout.setContentsMargins(0, 0, 0, 0)
-        self.e4buttondialog = QFrame()
-        self.e4buttondialog.setContentsMargins(0, 0, 0, 0)
-        self.e4buttondialog.setLayout(self.e4buttonbarLayout)
-
-        self.e5buttonbarLayout = QHBoxLayout()
-        self.e5buttonbarLayout.setSpacing(1)
-        self.e5buttonbarLayout.setContentsMargins(0, 0, 0, 0)
-        self.e5buttondialog = QFrame()
-        self.e5buttondialog.setContentsMargins(0, 0, 0, 0)
-        self.e5buttondialog.setLayout(self.e5buttonbarLayout)
-
-        self.e6buttonbarLayout = QHBoxLayout()
-        self.e6buttonbarLayout.setSpacing(1)
-        self.e6buttonbarLayout.setContentsMargins(0, 0, 0, 0)
-        self.e6buttondialog = QFrame()
-        self.e6buttondialog.setContentsMargins(0, 0, 0, 0)
-        self.e6buttondialog.setLayout(self.e6buttonbarLayout)
-
-        self.e7buttonbarLayout = QHBoxLayout()
-        self.e7buttonbarLayout.setSpacing(1)
-        self.e7buttonbarLayout.setContentsMargins(0, 0, 0, 0)
-        self.e7buttondialog = QFrame()
-        self.e7buttondialog.setContentsMargins(0, 0, 0, 0)
-        self.e7buttondialog.setLayout(self.e7buttonbarLayout)
-
-        self.e8buttonbarLayout = QHBoxLayout()
-        self.e8buttonbarLayout.setSpacing(1)
-        self.e8buttonbarLayout.setContentsMargins(0, 0, 0, 0)
-        self.e8buttondialog = QFrame()
-        self.e8buttondialog.setContentsMargins(0, 0, 0, 0)
-        self.e8buttondialog.setLayout(self.e8buttonbarLayout)
-
-        self.e9buttonbarLayout = QHBoxLayout()
-        self.e9buttonbarLayout.setSpacing(1)
-        self.e9buttonbarLayout.setContentsMargins(0, 0, 0, 0)
-        self.e9buttondialog = QFrame()
-        self.e9buttondialog.setContentsMargins(0, 0, 0, 0)
-        self.e9buttondialog.setLayout(self.e9buttonbarLayout)
-
-        self.e10buttonbarLayout = QHBoxLayout()
-        self.e10buttonbarLayout.setSpacing(1)
-        self.e10buttonbarLayout.setContentsMargins(0, 0, 0, 0)
-        self.e10buttondialog = QFrame()
-        self.e10buttondialog.setContentsMargins(0, 0, 0, 0)
-        self.e10buttondialog.setLayout(self.e10buttonbarLayout)
+        self.extrabuttonbars:list[QFrame] = [makeButtonbar() for _ in range(self.NUMBER_OF_EXTRABUTTON_ROWS)]
 
         # set the focus on the main widget
         self.main_widget.setFocus()
@@ -3951,27 +3886,9 @@ class ApplicationWindow(QMainWindow):
         self.extrabuttonsLayout = QVBoxLayout()
         self.extrabuttonsLayout.setContentsMargins(0,0,0,7)
         self.extrabuttonsLayout.setSpacing(5)
-        self.extrabuttonsLayout.addWidget(self.e1buttondialog)
-        self.extrabuttonsLayout.addWidget(self.e2buttondialog)
-        self.extrabuttonsLayout.addWidget(self.e3buttondialog)
-        self.extrabuttonsLayout.addWidget(self.e4buttondialog)
-        self.extrabuttonsLayout.addWidget(self.e5buttondialog)
-        self.extrabuttonsLayout.addWidget(self.e6buttondialog)
-        self.extrabuttonsLayout.addWidget(self.e7buttondialog)
-        self.extrabuttonsLayout.addWidget(self.e8buttondialog)
-        self.extrabuttonsLayout.addWidget(self.e9buttondialog)
-        self.extrabuttonsLayout.addWidget(self.e10buttondialog)
-
-        self.e1buttondialog.setVisible(False)
-        self.e2buttondialog.setVisible(False)
-        self.e3buttondialog.setVisible(False)
-        self.e4buttondialog.setVisible(False)
-        self.e5buttondialog.setVisible(False)
-        self.e6buttondialog.setVisible(False)
-        self.e7buttondialog.setVisible(False)
-        self.e8buttondialog.setVisible(False)
-        self.e9buttondialog.setVisible(False)
-        self.e10buttondialog.setVisible(False)
+        for buttonbar in self.extrabuttonbars:
+            buttonbar.setVisible(False)
+            self.extrabuttonsLayout.addWidget(buttonbar)
 
         self.extrabuttondialogs = QFrame()
         self.extrabuttondialogs.setLayout(self.extrabuttonsLayout)
@@ -26838,43 +26755,18 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     def realignbuttons(self) -> None:
         #clear buttons
-        self.clearBoxLayout(self.e1buttonbarLayout)
-        self.clearBoxLayout(self.e2buttonbarLayout)
-        self.clearBoxLayout(self.e3buttonbarLayout)
-        self.clearBoxLayout(self.e4buttonbarLayout)
-        self.clearBoxLayout(self.e5buttonbarLayout)
-        self.clearBoxLayout(self.e6buttonbarLayout)
-        self.clearBoxLayout(self.e7buttonbarLayout)
-        self.clearBoxLayout(self.e8buttonbarLayout)
-        self.clearBoxLayout(self.e9buttonbarLayout)
-        self.clearBoxLayout(self.e10buttonbarLayout)
+        for buttonbar in self.extrabuttonbars:
+            buttondialogLayout = buttonbar.layout()
+            if buttondialogLayout is not None:
+                self.clearBoxLayout(buttondialogLayout)
+            #hide all extra button rows
+            buttonbar.setVisible(False)
 
         self.extraeventbuttonround = []
 
         self.buttonlist = []
         self.buttonStates = []
-        #hide all extra button rows
-        self.e1buttondialog.setVisible(False)
-        self.e2buttondialog.setVisible(False)
-        self.e3buttondialog.setVisible(False)
-        self.e4buttondialog.setVisible(False)
-        self.e5buttondialog.setVisible(False)
-        self.e6buttondialog.setVisible(False)
-        self.e7buttondialog.setVisible(False)
-        self.e8buttondialog.setVisible(False)
-        self.e9buttondialog.setVisible(False)
-        self.e10buttondialog.setVisible(False)
 
-        row1count = 0
-        row2count = 0
-        row3count = 0
-        row4count = 0
-        row5count = 0
-        row6count = 0
-        row7count = 0
-        row8count = 0
-        row9count = 0
-        row10count = 0
 
         # hidden buttons at the top of the table are for actions and don't count in the first row
         # find the index of the first visible button
@@ -26883,6 +26775,8 @@ class ApplicationWindow(QMainWindow):
             if self.extraeventsvisibility[i]:
                 first_visible_idx = i
                 break
+
+        rowcounts:list[int] = [0 for _ in range(len(self.extrabuttonbars))]
 
         for i, eet in enumerate(self.extraeventstypes):
             # next button in this group is hidden
@@ -26935,99 +26829,24 @@ class ApplicationWindow(QMainWindow):
             #add button to row
             if i < first_visible_idx:
                 pass
-            elif row1count < self.buttonlistmaxlen:
-                self.e1buttonbarLayout.addWidget(self.buttonlist[i])
-                if not self.extraeventsvisibility[i]:
-                    self.e1buttonbarLayout.addSpacing(5)
-                row1count += 1
-            elif row2count < self.buttonlistmaxlen:
-                self.e2buttonbarLayout.addWidget(self.buttonlist[i])
-                if not self.extraeventsvisibility[i]:
-                    self.e2buttonbarLayout.addSpacing(5)
-                row2count += 1
-            elif row3count < self.buttonlistmaxlen:
-                self.e3buttonbarLayout.addWidget(self.buttonlist[i])
-                if not self.extraeventsvisibility[i]:
-                    self.e3buttonbarLayout.addSpacing(5)
-                row3count += 1
-            elif row4count < self.buttonlistmaxlen:
-                self.e4buttonbarLayout.addWidget(self.buttonlist[i])
-                if not self.extraeventsvisibility[i]:
-                    self.e4buttonbarLayout.addSpacing(5)
-                row4count += 1
-            elif row5count < self.buttonlistmaxlen:
-                self.e5buttonbarLayout.addWidget(self.buttonlist[i])
-                if not self.extraeventsvisibility[i]:
-                    self.e5buttonbarLayout.addSpacing(5)
-                row5count += 1
-            elif row6count < self.buttonlistmaxlen:
-                self.e6buttonbarLayout.addWidget(self.buttonlist[i])
-                if not self.extraeventsvisibility[i]:
-                    self.e6buttonbarLayout.addSpacing(5)
-                row6count += 1
-            elif row7count < self.buttonlistmaxlen:
-                self.e7buttonbarLayout.addWidget(self.buttonlist[i])
-                if not self.extraeventsvisibility[i]:
-                    self.e7buttonbarLayout.addSpacing(5)
-                row7count += 1
-            elif row8count < self.buttonlistmaxlen:
-                self.e8buttonbarLayout.addWidget(self.buttonlist[i])
-                if not self.extraeventsvisibility[i]:
-                    self.e8buttonbarLayout.addSpacing(5)
-                row8count += 1
-            elif row9count < self.buttonlistmaxlen:
-                self.e9buttonbarLayout.addWidget(self.buttonlist[i])
-                if not self.extraeventsvisibility[i]:
-                    self.e9buttonbarLayout.addSpacing(5)
-                row9count += 1
             else:
-                self.e10buttonbarLayout.addWidget(self.buttonlist[i])
-                if not self.extraeventsvisibility[i]:
-                    self.e10buttonbarLayout.addSpacing(5)
-                row10count += 1
-                if row10count == self.buttonlistmaxlen:
-                    break
+                for j, rowcount in enumerate(rowcounts):
+                    if rowcount < self.buttonlistmaxlen:
+                        buttondialogLayout = self.extrabuttonbars[j].layout()
+                        if buttondialogLayout is not None and isinstance(buttondialogLayout, QHBoxLayout):
+                            buttondialogLayout.addWidget(self.buttonlist[i])
+                            if not self.extraeventsvisibility[i]:
+                                buttondialogLayout.addSpacing(5)
+                            rowcounts[j] += 1
+                            break
 
-        if self.e1buttonbarLayout.count() > 0:
-            self.e1buttondialog.setVisible(True)
-            self.e1buttonbarLayout.insertStretch(0)
-            self.e1buttonbarLayout.insertStretch(self.e1buttonbarLayout.count())
-        if self.e2buttonbarLayout.count() > 0:
-            self.e2buttondialog.setVisible(True)
-            self.e2buttonbarLayout.insertStretch(0)
-            self.e2buttonbarLayout.insertStretch(self.e2buttonbarLayout.count())
-        if self.e3buttonbarLayout.count() > 0:
-            self.e3buttondialog.setVisible(True)
-            self.e3buttonbarLayout.insertStretch(0)
-            self.e3buttonbarLayout.insertStretch(self.e3buttonbarLayout.count())
-        if self.e4buttonbarLayout.count() > 0:
-            self.e4buttondialog.setVisible(True)
-            self.e4buttonbarLayout.insertStretch(0)
-            self.e4buttonbarLayout.insertStretch(self.e4buttonbarLayout.count())
-        if self.e5buttonbarLayout.count() > 0:
-            self.e5buttondialog.setVisible(True)
-            self.e5buttonbarLayout.insertStretch(0)
-            self.e5buttonbarLayout.insertStretch(self.e5buttonbarLayout.count())
-        if self.e6buttonbarLayout.count() > 0:
-            self.e6buttondialog.setVisible(True)
-            self.e6buttonbarLayout.insertStretch(0)
-            self.e6buttonbarLayout.insertStretch(self.e6buttonbarLayout.count())
-        if self.e7buttonbarLayout.count() > 0:
-            self.e7buttondialog.setVisible(True)
-            self.e7buttonbarLayout.insertStretch(0)
-            self.e7buttonbarLayout.insertStretch(self.e7buttonbarLayout.count())
-        if self.e8buttonbarLayout.count() > 0:
-            self.e8buttondialog.setVisible(True)
-            self.e8buttonbarLayout.insertStretch(0)
-            self.e8buttonbarLayout.insertStretch(self.e8buttonbarLayout.count())
-        if self.e9buttonbarLayout.count() > 0:
-            self.e9buttondialog.setVisible(True)
-            self.e9buttonbarLayout.insertStretch(0)
-            self.e9buttonbarLayout.insertStretch(self.e9buttonbarLayout.count())
-        if self.e10buttonbarLayout.count() > 0:
-            self.e10buttondialog.setVisible(True)
-            self.e10buttonbarLayout.insertStretch(0)
-            self.e10buttonbarLayout.insertStretch(self.e10buttonbarLayout.count())
+        for buttondialog in self.extrabuttonbars:
+            buttondialogLayout = buttondialog.layout()
+            if buttondialogLayout is not None and isinstance(buttondialogLayout, QHBoxLayout) and buttondialogLayout.count() > 0:
+                buttondialog.setVisible(True)
+                buttondialogLayout.insertStretch(0)
+                buttondialogLayout.insertStretch(buttondialogLayout.count())
+
         self.settooltip()
         if self.app.artisanviewerMode:
             self.buttonsAction.setEnabled(False)
