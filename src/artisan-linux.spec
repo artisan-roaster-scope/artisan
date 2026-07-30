@@ -47,6 +47,10 @@ hiddenimports_list=[
 ] + collect_submodules('dbus_fast')
 
 EXCLUDES = [
+    'tkinter',
+    'mypy',
+    'hypothesis',
+    'tornado',
     'pkg_resources',
     'PyQt5',
     'PyQt6.Multimedia',

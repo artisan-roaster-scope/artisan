@@ -45,14 +45,17 @@ _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 class WebView:
 
-    __slots__ = [ '_loop', '_thread', '_app', '_port', '_last_send', '_last_message', '_min_send_interval', '_resource_path', '_index_path', '_websocket_path', '_runner'  ]
+    __slots__ = [ '_loop', '_thread', '_app', 'websockets_appkey', '_port', '_last_send', '_last_message',
+        '_min_send_interval', '_resource_path', '_index_path', '_websocket_path', '_runner'  ]
 
     def __init__(self, port:int, resource_path:str, index_path:str, websocket_path:str) -> None:
 
         self._loop:        asyncio.AbstractEventLoop|None = None # the asyncio loop
         self._thread:      Thread|None                    = None # the thread running the asyncio loop
         self._app = web.Application(debug=True)
-        self._app['websockets'] = weakref.WeakSet()
+        self.websockets_appkey = web.AppKey('websockets', weakref.WeakSet[web.WebSocketResponse])
+        self._app[self.websockets_appkey] = weakref.WeakSet()
+
         self._app.on_shutdown.append(self.on_shutdown)
 
         self._last_send:float = time.time() # timestamp of the last message send to the clients
@@ -88,13 +91,13 @@ class WebView:
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
             try:
-                self._app['websockets'].discard(ws)
+                self._app[self.websockets_appkey].discard(ws)
             except Exception as ex: # pylint: disable=broad-except
                 _log.exception(ex)
 
     async def send_msg_to_all(self, message:str) -> None:
-        if 'websockets' in self._app and self._app['websockets'] is not None:
-            ws_set = set(self._app['websockets'])
+        if self.websockets_appkey in self._app:
+            ws_set = self._app[self.websockets_appkey]
             for ws in ws_set:
                 await self.send_msg_to_ws(ws, message)
 
@@ -116,7 +119,7 @@ class WebView:
     async def websocket_handler(self, request: 'Request') -> web.WebSocketResponse:
         ws:web.WebSocketResponse = web.WebSocketResponse()
         await ws.prepare(request)
-        request.app['websockets'].add(ws)
+        request.app[self.websockets_appkey].add(ws)
         try:
             async for msg in ws:
                 if msg.type == WSMsgType.TEXT:
@@ -126,14 +129,14 @@ class WebView:
                 elif msg.type == WSMsgType.ERROR:
                     _log.error('ws connection closed with exception %s', ws.exception())
         finally:
-            request.app['websockets'].discard(ws)
+            request.app[self.websockets_appkey].discard(ws)
         return ws
 
-    @staticmethod
-    async def on_shutdown(app:web.Application) -> None:
-        for ws in set(app['websockets']):
+#    @staticmethod
+    async def on_shutdown(self, app:web.Application) -> None:
+        for ws in app[self.websockets_appkey]:
             await ws.close(code=WSCloseCode.GOING_AWAY,
-                           message='Server shutdown')
+                           message=b'Server shutdown')
 
     async def startup(self) -> None:
         self._runner = web.AppRunner(self._app)

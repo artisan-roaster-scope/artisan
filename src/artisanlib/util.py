@@ -51,7 +51,6 @@ if TYPE_CHECKING:
     from artisanlib.atypes import ProfileData # pylint: disable=unused-import
     from proto import artisan_roast_pb2 # pylint: disable=unused-import
 
-from artisanlib.atypes import ProfileData
 
 ##
 
@@ -1379,7 +1378,7 @@ def deserialize(filename:str) -> dict[str, Any]:
 
 def csv_load(csvFile:io.TextIOWrapper) -> 'ProfileData':
     import csv
-    profile = ProfileData()
+    profile:ProfileData = {}
 
     data = csv.reader(csvFile,delimiter='\t')
     #read file header

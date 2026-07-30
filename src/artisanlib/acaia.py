@@ -237,7 +237,8 @@ HEADER2:Final[bytes]      = b'\xdd'
 HEARTBEAT_FREQUENCY:Final[int] = 5 # send the heartbeat every 5 sec
 
 RELAY_STREAMING:Final[bool] = False # if set, configure Acaia relay (and COSMO) scales to streaming mode, otherwise they work in non-streaming mode reporting only weight changes
-WEIGHT_ROUNDING:Final[bool] = False # if set, received weights are rounded to appropriate values based on scale max weight
+WEIGHT_ROUNDING:Final[bool] = False # if set, received weights are rounded to appropriate values based on scales readability
+# rounding for scales with readability>1 (to 4g), no rounding otherwise
 
 
 # ISP versions -> device model (CSMO series)
@@ -269,7 +270,7 @@ class AcaiaProtocol:
             weight_changed_handler:Callable[[float,bool], None],
             battery_changed_handler: Callable[[int], None],
             tare_pressed_handler: Callable[[], None],
-            stable_only:bool=True, # if True only stable weight readings are reported by weight_changed_signal
+            stable_only:bool=False, # if True only stable weight readings are reported by weight_changed_signal
             decimals:int=1) -> None: # number of significant decimals (0, 1, ..) of the weight signal
         super().__init__()
 
@@ -554,9 +555,9 @@ class AcaiaProtocol:
         if self._logging:
             _log.debug('update_weight(%s,%s)', value, stable)
         if value is not None and (not self.stable_only or stable):
-            if WEIGHT_ROUNDING and self.repeatability > 1:
-                # round to full 5g
-                value = round_base(value, 5)
+            if WEIGHT_ROUNDING and self.repeatability >= 1:
+                # round to full 4g
+                value = round_base(value, 4)
                 ## round to full 10g
                 ##value = round(value, -1)
             # convert the weight in g delivered with one decimal to an int

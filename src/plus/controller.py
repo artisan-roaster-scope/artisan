@@ -284,9 +284,10 @@ def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
                         message = QApplication.translate(
                             'Plus', 'Authentication failed'
                         )
-                        message = (
-                            f'{aw.plus_account} {message}'
-                        )  # @UndefinedVariable
+                        if aw.plus_account is not None: # pyright:ignore[reportUnnecessaryComparison] # pyright infers type str here, which is wrong!
+                            message = (
+                                f'{aw.plus_account} {message}'
+                            )  # @UndefinedVariable
                         aw.sendmessageSignal.emit(
                             message, True, None
                         )  # @UndefinedVariable
