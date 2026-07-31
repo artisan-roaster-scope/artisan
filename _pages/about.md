@@ -8,20 +8,12 @@ toc_label: "On this page"
 toc_icon: "cog"
 ---
 
-<!--
-header:
-  overlay_color: "#2899c7"
-header:
-  image: /assets/images/teaser-small.webp
-  overlay_image: /assets/images/teaser-small.webp
--->
-
 <br>
 
-> In 2009, the two Computer Scientists Rafael and [Marko](/authors/luther/) started **<span style="color: #2899c7;">artisan</span>**, a simple app for coffee lovers to track their roasts. Fast forward ten years, and **<span style="color: #2899c7;">artisan</span>** became the most trusted roasting software for commercial roasters thanks to the launch of **[<span style="color: #2899c7;">artisan.plus</span>](https://artisan.plus)**, a cloud-based extension adding professional features like inventory management. Today, **<span style="color: #2899c7;">artisan</span>** has a user base that's ten times bigger than any other roasting software. 
+> In 2009, the two Computer Scientists Rafael and [Marko](/authors/luther/) started **<span style="color: #2899c7;">Artisan Scope</span>**, a simple app for coffee lovers to track their roasts. Fast forward ten years, and **<span style="color: #2899c7;">Artisan Scope</span>** became the most trusted roasting software for commercial roasters thanks to the launch of **[<span style="color: #2899c7;">artisan tools</span>](https://artisan.plus)**, a cloud-based platform adding professional features like inventory management. Today, **<span style="color: #2899c7;">Artisan Scope</span>** has a user base that's ten times bigger than any other roasting software. 
 
 <div id="Platforms"></div>
-**<span style="color: #2899c7;">Artisan</span>** runs on Windows, macOS, Linux, Raspberry Pi
+**<span style="color: #2899c7;">Artisan Scope</span>** runs on Windows, macOS, Linux, Raspberry Pi
 {: style="text-align: center;" }
 <br>
 
@@ -188,7 +180,7 @@ header:
             <h2 class="archive__item-title"><div id="InventoryManagement"></div><span style="color: #2899c7;">Inventory Management</span></h2>
             <div class="archive__item-excerpt">
 <ul>
-  <li>the affordable <a href="https://artisan.plus"><strong><span style="color: #2899c7;">artisan.plus</span></strong></a> cloud extension adds multi-storage, multi-user, multi-machine, mobile-friendly transaction-based inventory management at one fixed price and with friendly 3 month free trial period</li>
+  <li>the affordable <a href="https://artisan.plus"><strong><span style="color: #2899c7;">artisan cloud platform</span></strong></a> adds multi-storage, multi-user, multi-machine, mobile-friendly transaction-based inventory management at one fixed price and with friendly 3 month free trial period</li>
   <li><a href="https://doc.artisan.plus/partners/" target="_blank">detailed bean data imported directly from our partners</a> like <a href="https://algrano.com/artisan?utm_source=artisan_blog&amp;utm_medium=referral&amp;utm_campaign=algrano_x_artisan&amp;utm_content=blog" target="_blank">Algrano</a>, <a href="https://royalcoffee.com/" target="_blank">Royal Coffee</a>, <a href="https://haceacoffee.com/" target="_blank">hacea</a>, …, blend management with <a href="https://doc.artisan.plus/updates/replace-blend-ingredients/" target="_blank">magic transitions</a>, EUDR management, stock taking, profile search, <a href="https://artisan-roasterscope.blogspot.com/2020/06/working-together-artisan-artisanviewer.html" target="_blank">automatic synchronization and seamless integration with <strong><span style="color: #2899c7;">artisan</span></strong></a> and professional 24h support</li>
 </ul>
             </div>
@@ -216,7 +208,7 @@ header:
         <div class="archive__item-body">
             <h2 class="archive__item-title"><span style="color: #2899c7;">Production Support</span></h2>
             <div class="archive__item-excerpt">
-<p><a href="https://artisan.plus"><strong><span style="color: #2899c7;">artisan.plus</span></strong></a> also adds <a href="https://doc.artisan.plus/docs/schedule/" target="_blank">production planning</a> and <a href="https://doc.artisan.plus/docs/schedule/" target="_blank">roast scheduling</a>, <a href="https://doc.artisan.plus/docs/batch-manager/" target="_blank">batch management</a> and <a href="https://doc.artisan.plus/docs/reminders/" target="_blank">maintenance alerts</a></p>
+<p><a href="https://artisan.plus"><strong><span style="color: #2899c7;">artisan tools</span></strong></a> also adds <a href="https://doc.artisan.plus/docs/schedule/" target="_blank">production planning</a> and <a href="https://doc.artisan.plus/docs/schedule/" target="_blank">roast scheduling</a>, <a href="https://doc.artisan.plus/docs/batch-manager/" target="_blank">batch management</a> and <a href="https://doc.artisan.plus/docs/reminders/" target="_blank">maintenance alerts</a></p>
             </div>
             <p><a href="https://doc.artisan.plus/docs/" class="btn btn--info btn--small">Read More</a></p>
         </div>
@@ -242,7 +234,7 @@ header:
             <div class="archive__item-excerpt">
 <ul>
   <li>basic <a href="https://artisan-roasterscope.blogspot.de/2016/03/artisan-v099.html" target="_blank">roast-, production- and ranking reports</a> in Web, PDF, CSV, and Excel format</li>
-  <li><a href="https://artisan.plus"><strong><span style="color: #2899c7;">artisan.plus</span></strong></a> adds <a href="https://doc.artisan.plus/docs/reports/#roast-reports" target="_blank">sequential and open roast reports</a>, as well as <a href="https://doc.artisan.plus/docs/reports/#purchasessales-reports" target="_blank">purchase/sales</a>, <a href="https://doc.artisan.plus/docs/reports/#stocks-reports" target="_blank">stock</a>, <a href="https://doc.artisan.plus/updates/organic-reports/" target="_blank">organic</a> and <a href="https://doc.artisan.plus/updates/tax-reports/" target="_blank">tax business reporting</a> with PDF, CSV and Excel exports</li>
+  <li><a href="https://artisan.plus"><strong><span style="color: #2899c7;">artisan tools</span></strong></a> adds <a href="https://doc.artisan.plus/docs/reports/#roast-reports" target="_blank">sequential and open roast reports</a>, as well as <a href="https://doc.artisan.plus/docs/reports/#purchasessales-reports" target="_blank">purchase/sales</a>, <a href="https://doc.artisan.plus/docs/reports/#stocks-reports" target="_blank">stock</a>, <a href="https://doc.artisan.plus/updates/organic-reports/" target="_blank">organic</a> and <a href="https://doc.artisan.plus/updates/tax-reports/" target="_blank">tax business reporting</a> with PDF, CSV and Excel exports</li>
 </ul>
             </div>
             <p><a href="https://doc.artisan.plus/docs/reports/" class="btn btn--info btn--small">Read More</a></p>
@@ -252,7 +244,7 @@ header:
 </div>
 
 
-We believe in [open-source](https://www.youtube.com/watch?v=SpeDK1TPbew){:target="_blank"}. Open-source software powers nearly all the world’s major companies. This software is freely available, and is developed collaboratively, maintained by a broad network that includes everyone from unpaid volunteers to employees at competing tech companies. Check out the **<span style="color: #2899c7;">artisan</span>** [code on GitHub](https://github.com/artisan-roaster-scope/artisan){:target="_blank"} and contribute!
+We believe in [open-source](https://www.youtube.com/watch?v=SpeDK1TPbew){:target="_blank"}. Open-source software powers nearly all the world’s major companies. Our roast-logging software Artisan Scope is freely available, and is developed collaboratively, maintained by a broad network that includes everyone from unpaid volunteers to employees at competing tech companies. Check out the **<span style="color: #2899c7;">artisan</span>** [code on GitHub](https://github.com/artisan-roaster-scope/artisan){:target="_blank"} and contribute!
 
 
   
@@ -289,9 +281,9 @@ __[Frans Goddijn](https://kostverlorenvaart.blogspot.com/){:target="_blank"}__ �
 <span style="color:grey">__Rafael Cobo__ –– initiator</span>
 {: style="text-align: center;" }
 
-Especially, people that help us to localize the UI of **<span style="color: #2899c7;">artisan</span>** to more languages and to complete the existing translations are very welcome to join in!
+Especially, people that help us to localize the UI of **<span style="color: #2899c7;">Artisan Scope</span>** to more languages and to complete the existing translations are very welcome to join in!
 
-Contact us via the [Contact Form](https://artisan-roasterscope.blogspot.com/p/contact-me.html){:target="_blank"} on the [**<span style="color: #2899c7;">artisan</span>** blog](https://artisan-roasterscope.blogspot.com/){:target="_blank"}.
+Contact us via the [Contact Form](https://artisan-roasterscope.blogspot.com/p/contact-me.html){:target="_blank"} on the [**<span style="color: #2899c7;">Artisan Scope</span>** blog](https://artisan-roasterscope.blogspot.com/){:target="_blank"}.
 
 
 
@@ -319,9 +311,9 @@ We are always looking for people that support us here and there.
 ## Supporters
 {: style="color: #2899c7;" }
 
-The development of **<span style="color: #2899c7;">artisan</span>** is supported by a growing number of companies and individuals that recognize its value for their customers and endeavors. Add yourself to this list by [sending a donation](https://www.paypal.me/MarkoLuther){:target="_blank"}!
+The development of **<span style="color: #2899c7;">Artisan Scope</span>** is supported by a growing number of companies and individuals that recognize its value for their customers and endeavors. Add yourself to this list by [sending a donation](https://www.paypal.me/MarkoLuther){:target="_blank"}!
 
-![image](/assets/images/artisan-plus-logo.svg){: style="width: 5%;"} [<span style="color: #2899c7;font-weight:bold;">artisan.plus</span>](https://artisan.plus) inventory management
+![image](/assets/images/artisan-plus-logo.svg){: style="width: 5%;"} [<span style="color: #2899c7;font-weight:bold;">artisan</span>](https://artisan.plus) platform
 {: style="text-align: center;" }
 
 <figure class="third ">
@@ -475,5 +467,5 @@ The development of **<span style="color: #2899c7;">artisan</span>** is supported
 ## License
 {: style="color: #2899c7;" }
 
-**<span style="color: #2899c7;">artisan</span>** is developed and distributed under the [GPLv3.0 License](http://www.gnu.org/copyleft/gpl.html). All its documentation (in part available on this site) under the [GFDLv1.3 License](https://www.gnu.org/licenses/fdl-1.3.en.html).
+**<span style="color: #2899c7;">Artisan Scope</span>** is developed and distributed under the [AGPLv3.0 License](https://www.gnu.org/licenses/agpl-3.0.html). All its documentation (in part available on this site) under the [GFDLv1.3 License](https://www.gnu.org/licenses/fdl-1.3.en.html).
 
