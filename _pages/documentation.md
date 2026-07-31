@@ -44,4 +44,4 @@ Please use the public **<span style="color: #2899c7;">artisan scope</span>** [di
 
 Commercial support for **<span style="color: #2899c7;">artisan scope</span>** is included with every [PRO subscription](https://buy.artisan.plus/Professional-Roasters) to the cloud-based
 
-&nbsp;&nbsp;&nbsp;&nbsp; ![image](/assets/images/artisan-plus-logo.svg){: style="width: 5%;"} [<span style="color: #2899c7;font-weight:bold;">artisan tools platform </span>](https://artisan.plus)
+&nbsp;&nbsp;&nbsp;&nbsp; ![image](/assets/images/artisan-plus-logo.svg){: style="width: 5%;"} [<span style="color: #2899c7;font-weight:bold;">artisan platform </span>](https://artisan.plus)
