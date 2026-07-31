@@ -10,10 +10,10 @@ toc_icon: "cog"
 
 <br>
 
-> In 2009, the two Computer Scientists Rafael and [Marko](/authors/luther/) started **<span style="color: #2899c7;">Artisan Scope</span>**, a simple app for coffee lovers to track their roasts. Fast forward ten years, and **<span style="color: #2899c7;">Artisan Scope</span>** became the most trusted roasting software for commercial roasters thanks to the launch of **[<span style="color: #2899c7;">artisan tools</span>](https://artisan.plus)**, a cloud-based platform adding professional features like inventory management. Today, **<span style="color: #2899c7;">Artisan Scope</span>** has a user base that's ten times bigger than any other roasting software. 
+> In 2009, the two Computer Scientists Rafael and [Marko](/authors/luther/) started **<span style="color: #2899c7;">artisan scope</span>**, a simple app for coffee lovers to track their roasts. Fast forward ten years, and **<span style="color: #2899c7;">artisan scope</span>** became the most trusted roasting software for commercial roasters thanks to the launch of the **[<span style="color: #2899c7;">artisan platform</span>](https://artisan.plus)** adding professional features like inventory management. Today, **<span style="color: #2899c7;">artisan scope</span>** has a user base that's ten times bigger than any other roasting software. 
 
 <div id="Platforms"></div>
-**<span style="color: #2899c7;">Artisan Scope</span>** runs on Windows, macOS, Linux, Raspberry Pi
+**<span style="color: #2899c7;">artisan scope</span>** runs on Windows, macOS, Linux, Raspberry Pi
 {: style="text-align: center;" }
 <br>
 
@@ -244,7 +244,7 @@ toc_icon: "cog"
 </div>
 
 
-We believe in [open-source](https://www.youtube.com/watch?v=SpeDK1TPbew){:target="_blank"}. Open-source software powers nearly all the world’s major companies. Our roast-logging software Artisan Scope is freely available, and is developed collaboratively, maintained by a broad network that includes everyone from unpaid volunteers to employees at competing tech companies. Check out the **<span style="color: #2899c7;">Artisan Scope</span>** [code on GitHub](https://github.com/artisan-roaster-scope/artisan){:target="_blank"} and contribute!
+We believe in [open-source](https://www.youtube.com/watch?v=SpeDK1TPbew){:target="_blank"}. Open-source software powers nearly all the world’s major companies. Our roast-logging software artisan scope is freely available, and is developed collaboratively, maintained by a broad network that includes everyone from unpaid volunteers to employees at competing tech companies. Check out the **<span style="color: #2899c7;">artisan scope</span>** [code on GitHub](https://github.com/artisan-roaster-scope/artisan){:target="_blank"} and contribute!
 
 
   
@@ -281,9 +281,9 @@ __[Frans Goddijn](https://kostverlorenvaart.blogspot.com/){:target="_blank"}__ �
 <span style="color:grey">__Rafael Cobo__ –– initiator</span>
 {: style="text-align: center;" }
 
-Especially, people that help us to localize the UI of **<span style="color: #2899c7;">Artisan Scope</span>** to more languages and to complete the existing translations are very welcome to join in!
+Especially, people that help us to localize the UI of **<span style="color: #2899c7;">artisan scope</span>** to more languages and to complete the existing translations are very welcome to join in!
 
-Contact us via the [Contact Form](https://artisan-roasterscope.blogspot.com/p/contact-me.html){:target="_blank"} on the [**<span style="color: #2899c7;">Artisan Scope blog</span>**](https://artisan-roasterscope.blogspot.com/){:target="_blank"}.
+Contact us via the [Contact Form](https://artisan-roasterscope.blogspot.com/p/contact-me.html){:target="_blank"} on the [**<span style="color: #2899c7;">artisan scope blog</span>**](https://artisan-roasterscope.blogspot.com/){:target="_blank"}.
 
 
 
@@ -311,7 +311,7 @@ We are always looking for people that support us here and there.
 ## Supporters
 {: style="color: #2899c7;" }
 
-The development of **<span style="color: #2899c7;">Artisan Scope</span>** is supported by a growing number of companies and individuals that recognize its value for their customers and endeavors. Add yourself to this list by [sending a donation](https://www.paypal.me/MarkoLuther){:target="_blank"}!
+The development of **<span style="color: #2899c7;">artisan scope</span>** is supported by a growing number of companies and individuals that recognize its value for their customers and endeavors. Add yourself to this list by [sending a donation](https://www.paypal.me/MarkoLuther){:target="_blank"}!
 
 ![image](/assets/images/artisan-plus-logo.svg){: style="width: 5%;"} [<span style="color: #2899c7;font-weight:bold;">artisan platform</span>](https://artisan.plus)
 {: style="text-align: center;" }
@@ -452,7 +452,7 @@ The development of **<span style="color: #2899c7;">Artisan Scope</span>** is sup
 ## Enablers
 {: style="color: #2899c7;" }
 
-**<span style="color: #2899c7;">Artisan Scope</span>** builds on a large base of excellent open-source software.
+**<span style="color: #2899c7;">artisan scope</span>** builds on a large base of excellent open-source software.
 
 * [Python](https://www.python.org){:target="_blank"}, [Qt](https://www.qt.io){:target="_blank"}, [PyQt](https://riverbankcomputing.com){:target="_blank"}
 * [numpy/scipy](https://www.scipy.org){:target="_blank"}, [matplotlib](https://matplotlib.org){:target="_blank"}
@@ -467,5 +467,5 @@ The development of **<span style="color: #2899c7;">Artisan Scope</span>** is sup
 ## License
 {: style="color: #2899c7;" }
 
-**<span style="color: #2899c7;">Artisan Scope</span>** is developed and distributed under the [AGPLv3.0 License](https://www.gnu.org/licenses/agpl-3.0.html). All its documentation (in part available on this site) under the [GFDLv1.3 License](https://www.gnu.org/licenses/fdl-1.3.en.html).
+**<span style="color: #2899c7;">artisan scope</span>** is developed and distributed under the [AGPLv3.0 License](https://www.gnu.org/licenses/agpl-3.0.html). All its documentation (in part available on this site) under the [GFDLv1.3 License](https://www.gnu.org/licenses/fdl-1.3.en.html).
 
