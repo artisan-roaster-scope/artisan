@@ -52,7 +52,7 @@ openpyxl==3.1.5
 keyring==25.7.0
 prettytable==3.18.0
 lxml==6.1.1
-matplotlib==3.10.9 # 3.11.0/3.11.1 does not set the canvas facecolor (background color) correctly
+matplotlib==3.11.1
 jinja2==3.1.6
 aiohttp==3.14.3
 aiohttp_jinja2==1.6

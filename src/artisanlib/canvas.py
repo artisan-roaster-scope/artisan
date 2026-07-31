@@ -9440,7 +9440,11 @@ class tgraphcanvas(QObject):
                         self.ax.spines['top'].set_sketch_params(scale, length, randomness)
                     # hide all spines from the delta_ax
                     if self.delta_ax is not None:
-                        self.delta_ax.set_frame_on(False) # hide all splines (as the four lines above)
+                        self.delta_ax.spines.top.set_visible(False)
+                        self.delta_ax.spines.bottom.set_visible(False)
+                        self.delta_ax.spines.left.set_visible(False)
+                        self.delta_ax.spines.right.set_visible(False)
+#                        self.delta_ax.set_frame_on(False) # hide all splines (as the four lines above) # this removes canvas background color on MPL 3.11.x, lines above don't have this issue
 
                     if self.ygrid > 0:
                         major_locator = ticker.MultipleLocator(self.ygrid)
@@ -12244,7 +12248,7 @@ class tgraphcanvas(QObject):
                 bbox_data = self.ax.transData.inverted().transform(bb)  # zuban:ignore[arg-type] # bounding box in data space
                 bbox = Bbox(bbox_data)
                 t.remove()
-                return bbox.bounds  # x0, y0, width, height.  Relative to the start of the curve and self.ylimit_min
+                return cast(tuple[float,float,float,float], bbox.bounds)  # x0, y0, width, height.  Relative to the start of the curve and self.ylimit_min
             return 0,0,0,0
 
     # Find the bounds for an event annotation text box

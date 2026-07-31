@@ -3584,7 +3584,7 @@ class ApplicationWindow(QMainWindow):
         self.lowerbuttondialogLayout.addStretch()
         for button_widget in [self.buttonCHARGE, self.buttonDRY, self.buttonFCs, self.buttonFCe,
                 self.buttonSCs, self.buttonSCe, self.buttonDROP, self.buttonCOOL, self.buttonEVENT]:
-            self.lowerbuttondialogLayout.addWidget(cast(EventPushButton, button_widget))
+            self.lowerbuttondialogLayout.addWidget(button_widget) # pyright:ignore[reportUnknownArgumentType] # pyright fails to infer EventPushButton here
         self.lowerbuttondialogLayout.addStretch()
 
         def makeButtonbar() -> QFrame:
@@ -6501,6 +6501,7 @@ class ApplicationWindow(QMainWindow):
         if hasattr(self, 'light_background_p'):
             # reset the cached property self.light_background_p
             del self.light_background_p
+
 
 
     # called from within the sample loop thread!

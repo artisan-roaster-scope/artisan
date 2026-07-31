@@ -319,11 +319,12 @@ class profileTransformatorDlg(ArtisanDialog):
             for w in self.phases_target_widgets_time:
                 ri:int|None = None
                 if w is not None:
-                    try:
-                        txt = w.text()
-                        ri = stringtoseconds(txt)
-                    except Exception as e: # pylint: disable=broad-except
-                        _log.error(e) # widget should not allow for malformed time string input on which stringtoseconds raises an exception
+                    txt = w.text()
+                    if txt != '':
+                        try:
+                            ri = stringtoseconds(txt)
+                        except Exception as e: # pylint: disable=broad-except
+                            _log.error(e) # widget should not allow for malformed time string input on which stringtoseconds raises an exception
                 res_times.append(ri)
         if self.phases_target_widgets_percent is not None:
             for w in self.phases_target_widgets_percent:
