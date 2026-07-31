@@ -2404,7 +2404,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
 
         disconnected_widget = QLabel()
         disconnected_widget.setTextFormat(Qt.TextFormat.RichText)
-        disconnected_widget.setText(QApplication.translate('Plus', 'Login to {} to receive your roast schedule').format(f'<a href="{plusLink()}">{plus.config.app_name}</a>'))
+        disconnected_widget.setText(QApplication.translate('Plus', 'Login to {} to receive your roast schedule').format(f'<a href="{plusLink()}">artisan platform</a>'))
         disconnected_widget.setWordWrap(True)
         disconnected_widget.setTextInteractionFlags(Qt.TextInteractionFlag.TextBrowserInteraction)
         disconnected_widget.linkActivated.connect(self.disconnected_link_handler)
@@ -4019,7 +4019,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
                             self.aw.qmc.scheduleID = None
                             self.aw.qmc.scheduleDate = None
                         # show empty schedule message
-                        self.remaining_message.setText(QApplication.translate('Plus', 'Schedule empty!{}Plan your schedule on {}').format('<BR><BR>', f'<a href="{schedulerLink()}">{plus.config.app_name}</a><br>'))
+                        self.remaining_message.setText(QApplication.translate('Plus', 'Schedule empty!{}Plan your schedule on {}').format('<BR><BR>', f'<a href="{schedulerLink()}">artisan platform</a><br>'))
                         self.stacked_remaining_widget.setCurrentWidget(self.remaining_message_widget)
                         self.setAppBadge(0)
                     else:

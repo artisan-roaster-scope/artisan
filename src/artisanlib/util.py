@@ -56,6 +56,7 @@ if TYPE_CHECKING:
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
+# don't update any of those as they are used to find the app settings
 application_name: Final[str] = 'Artisan'
 application_viewer_name: Final[str] = 'ArtisanViewer'
 application_organization_name: Final[str] = 'artisan-scope'
@@ -444,7 +445,7 @@ def getDataDirectory() -> str|None:
 # internal function to return
 @functools.cache
 def _getAppDataDirectory(app:'Artisan') -> str|None:
-    # temporarily switch app name to Artisan (as it might be ArtisanViewer)
+    # temporarily switch app name to Artisan (as it might be artisanViewer)
     appName = app.applicationName()
     app.setApplicationName(application_name)
     data_dir = QStandardPaths.standardLocations(

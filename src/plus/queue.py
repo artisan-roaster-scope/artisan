@@ -146,8 +146,8 @@ class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues]
                                     aw.sendmessage(
                                         QApplication.translate(
                                             'Plus',
-                                            'Roast successfully uploaded to {}'
-                                        ).format(config.app_name)
+                                            'Roast successfully uploaded to the artisan platform'
+                                        )
                                     )  # @UndefinedVariable
                                 # successfully transmitted, we add/update the
                                 # roasts UUID sync-cache
@@ -458,8 +458,8 @@ def addRoast(roast_record:dict[str, Any]|None = None, unsynced:bool=False) -> No
                 aw.sendmessage(
                     QApplication.translate(
                         'Plus',
-                        'Queuing roast for upload to {}'
-                    ).format(config.app_name)
+                        'Queuing roast for upload to the artisan platform'
+                    )
                 )  # @UndefinedVariable
                 rr: dict[str, Any]
                 if roast_record is not None:

@@ -1695,7 +1695,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 
         if start_recording_on_exit:
             from PyQt6.QtWidgets import QMessageBox
-            string = QApplication.translate('Message', 'artisan.plus needs to know the beans you are roasting')
+            string = QApplication.translate('Message', 'artisan platform needs to know the beans you are roasting')
             mbox = QMessageBox(self.aw)
             mbox.setText(string)
             plus.util.setPlusIcon(mbox)

@@ -71,7 +71,7 @@ class flavorDlg(ArtisanResizeablDialog):
 
         defaultlabel = QLabel(QApplication.translate('Label','Default'))
         self.defaultcombobox = QComboBox()
-        self.defaultcombobox.addItems(['','Artisan','SCA','SCAA','CQI','SweetMarias','C','E','CoffeeGeek','Intelligentsia','IIAC','WCRC','*CUSTOM*'])
+        self.defaultcombobox.addItems(['','artisan','SCA','SCAA','CQI','SweetMarias','C','E','CoffeeGeek','Intelligentsia','IIAC','WCRC','*CUSTOM*'])
         self.defaultcombobox.setCurrentIndex(0)
         self.lastcomboboxIndex = 0
         self.defaultcombobox.currentIndexChanged.connect(self.setdefault)
@@ -328,7 +328,7 @@ class flavorDlg(ArtisanResizeablDialog):
             # store the current labels as *CUSTOM*
             self.aw.qmc.customflavorlabels = self.aw.qmc.flavorlabels
         dindex =  self.defaultcombobox.currentIndex()
-        #["","Artisan","SCAA","CQI","SweetMarias","C","E","coffeegeek","Intelligentsia","WCRC"]
+        #["","artisan","SCAA","CQI","SweetMarias","C","E","coffeegeek","Intelligentsia","WCRC"]
         if dindex > 0 or dindex < self.defaultcombobox.count()-1:
             self.aw.qmc.flavorstartangle = 90
         if dindex == 1:

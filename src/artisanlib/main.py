@@ -551,7 +551,18 @@ app_args = sys.argv
 if sys.platform.startswith('linux'):
     # avoid a GTK bug in Ubuntu Unity
     app_args = app_args + ['-style','Fusion']
+
+
+# set UI scale factor before initializing the QtApplication
+if sys.platform.startswith('darwin'):
+    qsettings = QSettings(application_organization_domain, application_name) # on macOS the organization domain is used to locate the settings file
+else:
+    qsettings = QSettings(application_organization_name, application_name)
+if qsettings.contains('scale_factor'):
+    os.environ['QT_SCALE_FACTOR'] = f"{float(qsettings.value('scale_factor')):.2f}"
+
 app = Artisan(app_args)
+
 
 
 # On the first run if there are legacy settings under "YourQuest" but no new settings under "artisan-scope" then the legacy settings
@@ -668,7 +679,7 @@ _log: Final[logging.Logger] = logging.getLogger(__name__)
 if multiprocessing.current_process().name == 'MainProcess':
     _log.info(
         '%s v%s (%s, %s)',
-        ('ArtisanViewer' if app.artisanviewerMode else 'Artisan'),
+        ('artisanViewer' if app.artisanviewerMode else 'artisan'),
         str(__version__),
         str(__revision__),
         str(__build__),
@@ -769,7 +780,6 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
 ##        f.setBold(True)
         self.locLabel.setFont(f)
 
-# WORK:
 
 # add green flag menu on matplotlib v2.0 and later
         self.edit_curve_parameters_action = None
@@ -1522,7 +1532,8 @@ class ApplicationWindow(QMainWindow):
         'schedule_visible_filter', 'scheduler_tasks_visible', 'scheduler_completed_details_visible', 'scheduler_filters_visible', 'scheduler_auto_open',
         'main_menu_actions_with_shortcuts', 'ui_mode', 'UIModeMenu',  'productionModeAction', 'defaultModeAction', 'expertModeAction', 'calculatorAction',
         'helpAboutAction', 'checkUpdateAction', 'errorAction', 'messageAction', 'serialAction', 'platformAction', 'aboutQtAction',
-        'helpDocumentationAction', 'KshortCAction', 'profile_data_type_adapter', 'official_build', 'roasthubs_org_id', 'roasthubs_machine_id', 'roasthubs_token' ]
+        'helpDocumentationAction', 'KshortCAction', 'profile_data_type_adapter', 'official_build', 'roasthubs_org_id', 'roasthubs_machine_id', 'roasthubs_token',
+        'qt_scale_factor' ]
 
     nLCDS: Final[int] = 10 # maximum number of LCDs and extra devices (2x10 => 20 in total!)
 
@@ -1537,6 +1548,8 @@ class ApplicationWindow(QMainWindow):
         self.official_build:bool = appFrozen() and __signature__ != '' and self.app_signature_valid() # type:ignore[reportUnnecessaryComparison,unused-ignore]
         self.superusermode:bool = False
         self.ui_mode:UI_MODE = UI_MODE.DEFAULT
+
+        self.qt_scale_factor:float = 1.0
 
         self.sample_loop_running:bool = True
         self.time_stopped:float = 0
@@ -2070,15 +2083,15 @@ class ApplicationWindow(QMainWindow):
         self.updateRecentFileActions()
 
         self.importMenu:QMenu = QMenu(QApplication.translate('Menu', 'Import'))
-        urlImportAction = QAction('Artisan URL...', self)
+        urlImportAction = QAction('artisan URL...', self)
         urlImportAction.triggered.connect(self.urlImport)
         self.importMenu.addAction(urlImportAction)
 
-        fileImportCSVAction = QAction('Artisan CSV...', self)
+        fileImportCSVAction = QAction('artisan CSV...', self)
         fileImportCSVAction.triggered.connect(self.fileImportCSV)
         self.importMenu.addAction(fileImportCSVAction)
 
-        fileImportJSONAction = QAction('Artisan JSON...', self)
+        fileImportJSONAction = QAction('artisan JSON...', self)
         fileImportJSONAction.triggered.connect(self.fileImportJSON)
         self.importMenu.addAction(fileImportJSONAction)
 
@@ -2235,11 +2248,11 @@ class ApplicationWindow(QMainWindow):
         self.exportMenu:QMenu = QMenu(QApplication.translate('Menu', 'Export'))
         if QIcon.hasThemeIcon('document-export'):
             self.exportMenu.setIcon(QIcon.fromTheme('document-export'))
-        fileExportCSVAction = QAction(QApplication.translate('Menu', 'Artisan CSV...'), self)
+        fileExportCSVAction = QAction(QApplication.translate('Menu', 'artisan CSV...'), self)
         fileExportCSVAction.triggered.connect(self.fileExportCSV)
         self.exportMenu.addAction(fileExportCSVAction)
 
-        fileExportJSONAction = QAction(QApplication.translate('Menu', 'Artisan JSON...'), self)
+        fileExportJSONAction = QAction(QApplication.translate('Menu', 'artisan JSON...'), self)
         fileExportJSONAction.triggered.connect(self.fileExportJSON)
         self.exportMenu.addAction(fileExportJSONAction)
 
@@ -2275,11 +2288,11 @@ class ApplicationWindow(QMainWindow):
 
         self.convMenu.addSeparator()
 
-        fileConvertCSVAction = QAction(QApplication.translate('Menu', 'Artisan CSV...'), self)
+        fileConvertCSVAction = QAction(QApplication.translate('Menu', 'artisan CSV...'), self)
         fileConvertCSVAction.triggered.connect(self.fileConvertCSV)
         self.convMenu.addAction(fileConvertCSVAction)
 
-        fileConvertJSONAction = QAction(QApplication.translate('Menu', 'Artisan JSON...'), self)
+        fileConvertJSONAction = QAction(QApplication.translate('Menu', 'artisan JSON...'), self)
         fileConvertJSONAction.triggered.connect(self.fileConvertJSON)
         self.convMenu.addAction(fileConvertJSONAction)
 
@@ -4130,31 +4143,31 @@ class ApplicationWindow(QMainWindow):
 
 #        # provide information message to user about sharing settings at start-up
         if settingsRelocated:
-            string =  QApplication.translate('Message','Welcome to version {0} of Artisan!').format(__version__) + '\n\n'
-            string += QApplication.translate('Message','This is a one time message to inform you about a change in Artisan.') + '\n\n'
-            string += QApplication.translate('Message','If you never run older versions of Artisan you can skip this message, the change does not affect you.') + '  '
-            string += QApplication.translate('Message','Artisan preserves all your configuration settings when you exit so they will automatically be available the next time you start Artisan.') + '  '
+            string =  QApplication.translate('Message','Welcome to version {0} of artisan!').format(__version__) + '\n\n'
+            string += QApplication.translate('Message','This is a one time message to inform you about a change in artisan.') + '\n\n'
+            string += QApplication.translate('Message','If you never run older versions of artisan you can skip this message, the change does not affect you.') + '  '
+            string += QApplication.translate('Message','artisan preserves all your configuration settings when you exit so they will automatically be available the next time you start artisan.') + '  '
             string += QApplication.translate('Message','Beginning with release v2.0, settings will no longer be automatically shared at start-up with versions before v2.0.') + '\n\n'
-            string += QApplication.translate('Message','Do not worry. Since this is the first time you opened this new version Artisan has already loaded your last used settings.') + '\n\n'
-            string += QApplication.translate('Message',"To share settings between this version and Artisan versions before v2.0 use 'Help>Save Settings' and 'Help>Load Settings'.") + '\n\n'
-            string += QApplication.translate('Message','Enjoy using Artisan, The Artisan Team')
+            string += QApplication.translate('Message','Do not worry. Since this is the first time you opened this new version artisan has already loaded your last used settings.') + '\n\n'
+            string += QApplication.translate('Message',"To share settings between this version and artisan versions before v2.0 use 'Help>Save Settings' and 'Help>Load Settings'.") + '\n\n'
+            string += QApplication.translate('Message','Enjoy using artisan, The artisan team')
             QMessageBox.information(self, QApplication.translate('Message','One time message about loading settings at start-up'),string)
 
-        # provide information message to user about ArtisanViewer the first time it is started
+        # provide information message to user about artisanViewer the first time it is started
         if self.artisanviewerFirstStart:
-            string =  QApplication.translate('Message','Welcome to the ArtisanViewer!').format(__version__) + '\n\n'
-            string += QApplication.translate('Message','This is a one time message to introduce you to the ArtisanViewer.') + '\n\n'
-            string += QApplication.translate('Message','The ArtisanViewer opens whenever a copy of Artisan is already running.') + '\n\n'
-            string += QApplication.translate('Message','ArtisanViewer will preserve all your configuration settings when you exit so they will automatically be available the next time you start ArtisanViewer.') + '\n\n'
-            string += QApplication.translate('Message',"Caution, the only way to share settings between Artisan and ArtisanViewer is to explicitly save and load them using 'Help>Save Settings' and 'Help>Load Settings'.") + '\n\n'
-            string += QApplication.translate('Message','Enjoy using ArtisanViewer,') +'\n'
-            string += QApplication.translate('Message','The Artisan Team')
-            QMessageBox.information(self, QApplication.translate('Message','One time message about ArtisanViewer'),string)
+            string =  QApplication.translate('Message','Welcome to the artisanViewer!').format(__version__) + '\n\n'
+            string += QApplication.translate('Message','This is a one time message to introduce you to the artisanViewer.') + '\n\n'
+            string += QApplication.translate('Message','The artisanViewer opens whenever a copy of artisan is already running.') + '\n\n'
+            string += QApplication.translate('Message','artisanViewer will preserve all your configuration settings when you exit so they will automatically be available the next time you start artisanViewer.') + '\n\n'
+            string += QApplication.translate('Message',"Caution, the only way to share settings between artisan and artisanViewer is to explicitly save and load them using 'Help>Save Settings' and 'Help>Load Settings'.") + '\n\n'
+            string += QApplication.translate('Message','Enjoy using artisanViewer,') +'\n'
+            string += QApplication.translate('Message','The artisan team')
+            QMessageBox.information(self, QApplication.translate('Message','One time message about artisanViewer'),string)
             settings.setValue('Mode',self.qmc.mode)  #prevent this popup in case a second instance is started before this first one is closed.
 
-        self.recording_version:str = str(__version__) # saved to and loaded from profiles, indicating the Artisan version that created this profile, will be set to __version__ on RESET
-        self.recording_revision:str = str(__revision__) # saved to and loaded from profiles, indicating the Artisan revision that created this profile, will be set to __revision__ on RESET
-        self.recording_build:str = str(__build__) # saved to and loaded from profiles, indicating the Artisan build that created this profile, will be set to __build__ on RESET
+        self.recording_version:str = str(__version__) # saved to and loaded from profiles, indicating the artisan version that created this profile, will be set to __version__ on RESET
+        self.recording_revision:str = str(__revision__) # saved to and loaded from profiles, indicating the artisan revision that created this profile, will be set to __revision__ on RESET
+        self.recording_build:str = str(__build__) # saved to and loaded from profiles, indicating the artisan build that created this profile, will be set to __build__ on RESET
 
         # we connect the signals
         self.singleShotPhidgetsPulseOFF.connect(self.processSingleShotPhidgetsPulse)
@@ -4879,7 +4892,7 @@ class ApplicationWindow(QMainWindow):
         # message["X-Uniform-Type-Identifier"] = "com.apple.mail-draft"
         message.attach(
             MIMEText(
-                f"Please find attached the log files written by Artisan!\nPlease forward this email to {message['To']}\n--\n",
+                f"Please find attached the log files written by artisan!\nPlease forward this email to {message['To']}\n--\n",
                 'plain',
             )
         )
@@ -4940,7 +4953,7 @@ class ApplicationWindow(QMainWindow):
 
     def updateWindowTitle(self) -> None:
         try:
-            appTitle = f'{(application_viewer_name if self.app.artisanviewerMode else application_name)} {str(__version__)}'
+            appTitle = f'{(application_viewer_name.lower() if self.app.artisanviewerMode else application_name.lower())} {str(__version__)}'
             dirtySign = '* ' if self.qmc.safesaveflag else ''
             if self.simulator is not None and self.simulatorpath:
                 # simulator running
@@ -4993,9 +5006,9 @@ class ApplicationWindow(QMainWindow):
                     starts is not None and
                     (now >= lastdonationpopup > now-everytime) and
                     0 <= starts < everystarts):
-#                message = QApplication.translate('Message', 'Artisan is free to use!<br><br>To keep it free and current please support us<br><br><a href="{0}">{0}</a><br><br>and book<br><br><a href="{1}">{1}</a><br><br>to suppress this dialog')
+#                message = QApplication.translate('Message', 'artisan is free to use!<br><br>To keep it free and current please support us<br><br><a href="{0}">{0}</a><br><br>and book<br><br><a href="{1}">{1}</a><br><br>to suppress this dialog')
 #                message = message.format('https://artisan-scope.org/donate/', 'https://artisan.plus')
-                message = QApplication.translate('Message', 'Artisan is free to use!\n\nTo keep it free and current please support us with your donation and subscribe to artisan.plus to suppress this dialog!')
+                message = QApplication.translate('Message', 'artisan is free to use!\n\nTo keep it free and current please support us with your donation and subscribe to the artisan platform to suppress this dialog!')
                 donate_message_box = QMessageBox()
                 donate_message_box.setText(message)
                 donate_message_box.setIcon(QMessageBox.Icon.Information)
@@ -5263,13 +5276,13 @@ class ApplicationWindow(QMainWindow):
                     if self.editgraphdialog is False:
                         # syncing from server in progress
                         plus_icon = 'plus-dirty'
-                        tooltip = QApplication.translate('Tooltip', 'Syncing with artisan.plus')
+                        tooltip = QApplication.translate('Tooltip', 'Syncing with the artisan platform')
                     elif plus.controller.is_synced():
                         plus_icon = 'plus-connected'
-                        tooltip = QApplication.translate('Tooltip', 'Disconnect artisan.plus')
+                        tooltip = QApplication.translate('Tooltip', 'Disconnect from the artisan platform')
                     else:
                         plus_icon = 'plus-unsynced'
-                        tooltip = QApplication.translate('Tooltip', 'Upload to artisan.plus')
+                        tooltip = QApplication.translate('Tooltip', 'Upload to the artisan platform')
                     if self.plus_subscription == 'HOME':
                         subscription_icon = 'plus-home'
                         if self.plus_paidUntil is not None:
@@ -5300,10 +5313,10 @@ class ApplicationWindow(QMainWindow):
                                     subscription_icon = 'plus-pro-low'
                 else:
                     plus_icon = 'plus-on'
-                    tooltip = QApplication.translate('Tooltip', 'Disconnect artisan.plus')
+                    tooltip = QApplication.translate('Tooltip', 'Disconnect from the artisan platform')
             else:
                 plus_icon = 'plus-off'
-                tooltip = QApplication.translate('Tooltip', 'Connect artisan.plus')
+                tooltip = QApplication.translate('Tooltip', 'Connect to the artisan platform')
             if svgsupport:
                 plus_icon += '.svg'
             else:
@@ -6010,8 +6023,8 @@ class ApplicationWindow(QMainWindow):
                                     self.qmc.restoreEnergyLoadDefaults()
                                     self.qmc.restoreEnergyProtocolDefaults()
                                     self.sendmessage(QApplication.translate('Message','Energy loads configured for {0} {1}kg').format(label,self.qmc.roastersize_setup))
-                            self.sendmessage(QApplication.translate('Message','Artisan configured for {0}').format(label))
-                            _log.info('Artisan configured for %s',label)
+                            self.sendmessage(QApplication.translate('Message','artisan configured for {0}').format(label))
+                            _log.info('artisan configured for %s',label)
                         else:
                             res = False
                     if not res:
@@ -6448,7 +6461,7 @@ class ApplicationWindow(QMainWindow):
         self.sendmessage('', append=False)
         self.ntb.setMinimumHeight(50)
 
-        self.sliderFrame.setStyleSheet('QGroupBox {background-color:' + str(canvas_color) + ';'
+        self.sliderFrame.setStyleSheet('QGroupBox {background-color:' + rgba_colorname2argb_colorname(canvas_color) + ';'
                                     + 'color: ' + rgba_colorname2argb_colorname(title_color) + ';'
                                     + 'border: 0px solid gray;'
                                     + 'border-width: 0px;'
@@ -11268,7 +11281,7 @@ class ApplicationWindow(QMainWindow):
 #                                else: # this branch is most likely never reached
 #                                    (k, _, value) = line.partition('=') # pyright: ignore [reportGeneralTypeIssues] # "Never" is not iterable
                                     # don't copy PYTHONHOME nor PYTHONPATH if it points to the Artisan.app
-                                    if not ((k in {'PYTHONHOME','PYTHONPATH'}) and (('Artisan.app' in value) or 'artisan' in value)):
+                                    if not ((k in {'PYTHONHOME','PYTHONPATH'}) and (('artisan.app' in value) or 'artisan' in value)):
                                         my_env[k] = value.rstrip('\n')
                             proc.communicate()
                 except Exception as e: # pylint: disable=broad-except
@@ -14610,7 +14623,7 @@ class ApplicationWindow(QMainWindow):
                 from json import dump as json_dump
                 json_dump(self.getProfile(), outfile, indent=None, separators=(',', ':'), ensure_ascii=False)
                 outfile.write('\n')
-            self.sendmessage(f"{QApplication.translate('Message','{} file saved successfully').format('Artisan JSON')} ({filename})")
+            self.sendmessage(f"{QApplication.translate('Message','{} file saved successfully').format('artisan JSON')} ({filename})")
             return True
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
@@ -14864,7 +14877,7 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.fileDirtySignal.emit()
                 self.autoAdjustAxis()
                 self.qmc.redraw()
-                self.sendmessage(f"{QApplication.translate('Message','Artisan JSON file loaded successfully')} ({filename})")
+                self.sendmessage(f"{QApplication.translate('Message','artisan JSON file loaded successfully')} ({filename})")
                 return True
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
@@ -14886,7 +14899,7 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.fileDirtySignal.emit()
                 self.autoAdjustAxis()
                 self.qmc.redraw()
-                self.sendmessage(f"{QApplication.translate('Message','Artisan JSON file loaded successfully')} ({filename})")
+                self.sendmessage(f"{QApplication.translate('Message','artisan JSON file loaded successfully')} ({filename})")
                 return True
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
@@ -14951,9 +14964,9 @@ class ApplicationWindow(QMainWindow):
     def exportCSV(self, filename:str) -> bool:
         try:
             if exportProfile2CSV(filename, self.getProfile()):
-                self.sendmessage(f"{QApplication.translate('Message','{} file saved successfully').format('Artisan CSV')} ({filename})")
+                self.sendmessage(f"{QApplication.translate('Message','{} file saved successfully').format('artisan CSV')} ({filename})")
                 return True
-            self.sendmessage(f"{QApplication.translate('Message','Empty {} file not saved').format('Artisan CSV')} ({filename})")
+            self.sendmessage(f"{QApplication.translate('Message','Empty {} file not saved').format('artisan CSV')} ({filename})")
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
@@ -17840,7 +17853,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot(bool)
     def urlImport(self, _:bool = False) -> None:
         try:
-            self.importExternalURL(self.artisanURLextractor, QApplication.translate('Message','Import {}').format('Artisan URL'))
+            self.importExternalURL(self.artisanURLextractor, QApplication.translate('Message','Import {}').format('artisan URL'))
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
 
@@ -18428,6 +18441,7 @@ class ApplicationWindow(QMainWindow):
             self.keyboardmoveflag = toInt(settings.value('keyboardmoveflag',int(self.keyboardmoveflag)))
             self.ui_mode = UI_MODE(toInt(settings.value('UI_mode',int(self.ui_mode))))
             self.set_ui_mode(self.ui_mode)
+            self.qt_scale_factor = toFloat(settings.value('scale_factor',self.qt_scale_factor))
             self.qmc.ambientTempSource = toInt(settings.value('AmbientTempSource',int(self.qmc.ambientTempSource)))
             self.qmc.ambientHumiditySource = toInt(settings.value('AmbientHumiditySource',int(self.qmc.ambientHumiditySource)))
             self.qmc.ambientPressureSource = toInt(settings.value('AmbientPressureSource',int(self.qmc.ambientPressureSource)))
@@ -20457,6 +20471,8 @@ class ApplicationWindow(QMainWindow):
             #save UI Mode
             if not read_defaults:
                 settings.setValue('UI_mode',int(self.ui_mode)) # 'UI_mode' is always stored to ease the transition (old settings default to Expert, new to Default)
+            self.settingsSetValue(settings, default_settings, 'scale_factor',self.qt_scale_factor, read_defaults)
+
             #save ambient temperature source
             self.settingsSetValue(settings, default_settings, 'AmbientTempSource',self.qmc.ambientTempSource, read_defaults)
             self.settingsSetValue(settings, default_settings, 'AmbientHumiditySource',self.qmc.ambientHumiditySource, read_defaults)
@@ -24524,7 +24540,7 @@ class ApplicationWindow(QMainWindow):
                 <p><b>{9}</b><small>{10}</small></p>
                 <p><b>{12}</b><br><small>{13}</small></p>
                 """.format( # noqa: UP030
-                name,
+                name.lower(),
                 __version__,
                 (f' ({str(__revision__)})' if str(__revision__) != '' else ''),
                 platform.python_version(),
@@ -24537,7 +24553,7 @@ class ApplicationWindow(QMainWindow):
                 coredevelopers,
                 PYMODBUS_VERSION_STR,
                 QApplication.translate('About', 'License'),
-                '<a href="https://www.gnu.org/licenses/agpl-3.0.html">GNU Affero General Public License (AGPLv3.0)</a>',
+                    '<a href="https://www.gnu.org/licenses/agpl-3.0.html">GNU Affero General Public License (AGPLv3.0)</a>',
                 build,
                 otherlibs, # pyright:ignore[reportUnknownArgumentType]
                 '<a href="https://artisan-scope.org">https://artisan-scope.org</a>',
@@ -24604,7 +24620,7 @@ class ApplicationWindow(QMainWindow):
         fmt = 'png'
         initialPath = QDir.currentPath() + '/ArtisanScreenshot.' + fmt
         with MenuShortCutsDisabled(self.main_menu_actions_with_shortcuts):
-            fileName = QFileDialog.getSaveFileName(self, 'Artisan ScreenShot',
+            fileName = QFileDialog.getSaveFileName(self, 'artisan ScreenShot',
                     initialPath,
                     f'{fmt.upper()} Files (*.{fmt});;All Files (*)')[0]
             if fileName:
@@ -26504,8 +26520,8 @@ class ApplicationWindow(QMainWindow):
                     metadata = {
                         'Title': f'{batch_nr_str}{self.qmc.title}',
                         'Author': getpass.getuser(),
-                        'Description': f'Artisan Roast Profile {batch_nr_str}{self.qmc.title}',
-                        'Software': f'Artisan v{__version__}, https://artisan-scope.org/'
+                        'Description': f'artisan roast profile {batch_nr_str}{self.qmc.title}',
+                        'Software': f'artisan v{__version__}, https://artisan-scope.org/'
                     }
                 else:
                     metadata = None
@@ -26556,17 +26572,17 @@ class ApplicationWindow(QMainWindow):
                     metadata = {
                             'Title': f'{batch_nr_str}{self.qmc.title}',
                             'Author': getpass.getuser(),
-                            'Subject': f'Artisan Roast Profile {batch_nr_str}{self.qmc.title}',
-                            'Keywords': ', '.join(filter(None, ['Artisan', 'Roast Profile', batch_nr_str])),
-                            'Creator': f'Artisan v{__version__}, https://artisan-scope.org/'
+                            'Subject': f'artisan roast profile {batch_nr_str}{self.qmc.title}',
+                            'Keywords': ', '.join(filter(None, ['artisan', 'roast profile', batch_nr_str])),
+                            'Creator': f'artisan v{__version__}, https://artisan-scope.org/'
                             }
                 else: # SVG
                     metadata = {
                             'Title': f'{batch_nr_str}{self.qmc.title}',
                             'Creator': getpass.getuser(),
-                            'Description': f'Artisan Roast Profile {batch_nr_str}{self.qmc.title}',
-                            'Keywords': ', '.join(filter(None, ['Artisan', 'Roast Profile', batch_nr_str])),
-                            'Publisher': f'Artisan v{__version__}, https://artisan-scope.org/'
+                            'Description': f'artisan roast profile {batch_nr_str}{self.qmc.title}',
+                            'Keywords': ', '.join(filter(None, ['artisan', 'roast profile', batch_nr_str])),
+                            'Publisher': f'artisan v{__version__}, https://artisan-scope.org/'
                     }
                     if self.curFile is not None:
                         metadata['Source'] = Path(self.curFile).name

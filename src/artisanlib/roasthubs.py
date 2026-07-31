@@ -72,7 +72,7 @@ async def send_roast(roast:'artisan_roast_pb2.Roast', token:str,
         async with aiohttp.ClientSession() as session:
             headers = {
                 'Content-Type': 'application/protobuf',
-                'User-Agent': f'Artisan/{__version__}',
+                'User-Agent': f'artisan/{__version__}',
                 'Accept-Encoding': 'deflate, compress, gzip',
                 'Authorization': f'Bearer {token}',
                 'Idempotency-Key': uuid.uuid4().hex

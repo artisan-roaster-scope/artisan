@@ -1,7 +1,7 @@
 [project]
 name = 'Artisan'
 dynamic = ['version']
-description = "artisan scope is a software that helps coffee roasters record, analyze, and control roast profiles"
+description = "Artisan Scope is a software that helps coffee roasters record, analyze, and control roast profiles"
 readme = {file = 'README.txt', content-type='text/markdown'}
 authors = [
     {name = 'Rafael Cobo'},

@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>Artisan</string>
+	<string>artisan</string>
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
@@ -16,7 +16,7 @@
 			<key>CFBundleTypeIconFile</key>
 			<string>artisanProfile.icns</string>
 			<key>CFBundleTypeName</key>
-			<string>Artisan Profile</string>
+			<string>artisan profile</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>LSTypeIsPackage</key>
@@ -32,7 +32,7 @@
 			<key>CFBundleTypeIconFile</key>
 			<string>artisanAlarms.icns</string>
 			<key>CFBundleTypeName</key>
-			<string>Artisan Alarms</string>
+			<string>artisan alarms</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>LSTypeIsPackage</key>
@@ -48,7 +48,7 @@
 			<key>CFBundleTypeIconFile</key>
 			<string>artisanPalettes.icns</string>
 			<key>CFBundleTypeName</key>
-			<string>Artisan Palettes</string>
+			<string>artisan palettes</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>LSTypeIsPackage</key>
@@ -64,7 +64,7 @@
 			<key>CFBundleTypeIconFile</key>
 			<string>artisanSettings.icns</string>
 			<key>CFBundleTypeName</key>
-			<string>Artisan Settings</string>
+			<string>artisan settings</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>LSTypeIsPackage</key>
@@ -80,7 +80,7 @@
 			<key>CFBundleTypeIconFile</key>
 			<string>artisanWheel.icns</string>
 			<key>CFBundleTypeName</key>
-			<string>Artisan Wheel</string>
+			<string>artisan wheel</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>LSTypeIsPackage</key>
@@ -96,7 +96,7 @@
 			<key>CFBundleTypeIconFile</key>
 			<string>artisanTheme.icns</string>
 			<key>CFBundleTypeName</key>
-			<string>Artisan Theme</string>
+			<string>artisan theme</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>LSTypeIsPackage</key>
@@ -106,9 +106,9 @@
 		</dict>
 	</array>
 	<key>CFBundleExecutable</key>
-	<string>Artisan</string>
+	<string>artisan</string>
 	<key>CFBundleGetInfoString</key>
-	<string>Artisan, Roast Logger</string>
+	<string>artisan scope</string>
 	<key>CFBundleIconFile</key>
 	<string>artisan.icns</string>
 	<key>CFBundleIdentifier</key>
@@ -116,7 +116,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>Artisan</string>
+	<string>artisan</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>

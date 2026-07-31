@@ -34,7 +34,7 @@ if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
 
 # Constants
-app_name: Final[str] = 'artisan.plus'
+app_name: Final[str] = 'artisan.plus' # don't rename as this holds the keychain credentials
 profile_ext: Final[str] = 'alog'
 uuid_tag: Final[str] = 'roastUUID' # as used in .alog profiles, send as 'roast_id' as part of the sync record to the server
 schedule_uuid_tag: Final[str] = 'scheduleID' # send as 's_item_id' as part of the sync record to the server
