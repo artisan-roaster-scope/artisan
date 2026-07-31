@@ -244,7 +244,7 @@ toc_icon: "cog"
 </div>
 
 
-We believe in [open-source](https://www.youtube.com/watch?v=SpeDK1TPbew){:target="_blank"}. Open-source software powers nearly all the world’s major companies. Our roast-logging software Artisan Scope is freely available, and is developed collaboratively, maintained by a broad network that includes everyone from unpaid volunteers to employees at competing tech companies. Check out the **<span style="color: #2899c7;">artisan</span>** [code on GitHub](https://github.com/artisan-roaster-scope/artisan){:target="_blank"} and contribute!
+We believe in [open-source](https://www.youtube.com/watch?v=SpeDK1TPbew){:target="_blank"}. Open-source software powers nearly all the world’s major companies. Our roast-logging software Artisan Scope is freely available, and is developed collaboratively, maintained by a broad network that includes everyone from unpaid volunteers to employees at competing tech companies. Check out the **<span style="color: #2899c7;">Artisan Scope</span>** [code on GitHub](https://github.com/artisan-roaster-scope/artisan){:target="_blank"} and contribute!
 
 
   
@@ -283,7 +283,7 @@ __[Frans Goddijn](https://kostverlorenvaart.blogspot.com/){:target="_blank"}__ �
 
 Especially, people that help us to localize the UI of **<span style="color: #2899c7;">Artisan Scope</span>** to more languages and to complete the existing translations are very welcome to join in!
 
-Contact us via the [Contact Form](https://artisan-roasterscope.blogspot.com/p/contact-me.html){:target="_blank"} on the [**<span style="color: #2899c7;">Artisan Scope</span>** blog](https://artisan-roasterscope.blogspot.com/){:target="_blank"}.
+Contact us via the [Contact Form](https://artisan-roasterscope.blogspot.com/p/contact-me.html){:target="_blank"} on the [**<span style="color: #2899c7;">Artisan Scope blog</span>**](https://artisan-roasterscope.blogspot.com/){:target="_blank"}.
 
 
 
@@ -313,7 +313,7 @@ We are always looking for people that support us here and there.
 
 The development of **<span style="color: #2899c7;">Artisan Scope</span>** is supported by a growing number of companies and individuals that recognize its value for their customers and endeavors. Add yourself to this list by [sending a donation](https://www.paypal.me/MarkoLuther){:target="_blank"}!
 
-![image](/assets/images/artisan-plus-logo.svg){: style="width: 5%;"} [<span style="color: #2899c7;font-weight:bold;">artisan</span>](https://artisan.plus) platform
+![image](/assets/images/artisan-plus-logo.svg){: style="width: 5%;"} [<span style="color: #2899c7;font-weight:bold;">artisan platform</span>](https://artisan.plus)
 {: style="text-align: center;" }
 
 <figure class="third ">
@@ -452,7 +452,7 @@ The development of **<span style="color: #2899c7;">Artisan Scope</span>** is sup
 ## Enablers
 {: style="color: #2899c7;" }
 
-**<span style="color: #2899c7;">artisan</span>** builds on a large base of excellent open-source software.
+**<span style="color: #2899c7;">Artisan Scope</span>** builds on a large base of excellent open-source software.
 
 * [Python](https://www.python.org){:target="_blank"}, [Qt](https://www.qt.io){:target="_blank"}, [PyQt](https://riverbankcomputing.com){:target="_blank"}
 * [numpy/scipy](https://www.scipy.org){:target="_blank"}, [matplotlib](https://matplotlib.org){:target="_blank"}

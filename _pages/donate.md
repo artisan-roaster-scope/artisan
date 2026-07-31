@@ -11,7 +11,7 @@ author_profile: true
 ## Donations 
 {: style="color: #2899c7;" }
   
-This software is open-source and absolutely free, also for commercial use. If you think **<span style="color: #2899c7;">artisan</span>** is useful to you and your business, contribute financially to its further development. Send any amount via 
+This software is open-source and absolutely free, also for commercial use. If you think **<span style="color: #2899c7;">Artisan Scope</span>** is useful to you and your business, contribute financially to its further development. Send any amount via 
 - my [PayPal.Me page](https://www.paypal.me/MarkoLuther){:target="_blank"} or
 - [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/artisan-roaster-scope) (one-time or monthly) 
 
@@ -34,8 +34,8 @@ Any donation that you make to the Artisan Scope project via the above links is v
 ## artisan platform
 {: style="color: #2899c7;" }
 
-Another way to support the Artisan Scope project is to [sign up](https://artisan.plus/en/register){:target="_blank"} and subscribe to
+Another way to support the **<span style="color: #2899c7;">Artisan Scope</span>** project is to [sign up](https://artisan.plus/en/register){:target="_blank"} and subscribe to the
 
-&nbsp;&nbsp;&nbsp;&nbsp; ![image](/assets/images/artisan-plus-logo.svg){: style="width: 5%;"} [<span style="color: #2899c7;font-weight:bold;">artisan</span>](https://artisan.plus){:target="_blank"} platform
+&nbsp;&nbsp;&nbsp;&nbsp; ![image](/assets/images/artisan-plus-logo.svg){: style="width: 5%;"} [<span style="color: #2899c7;font-weight:bold;">artisan platform</span>](https://artisan.plus){:target="_blank"}
 
 A [yearly subscription for HOME roasters](https://buy.artisan.plus/Home-Roasters){:target="_blank"} is only 50.- EUR with the additional benefit of access to coupons by [green bean supplier partners](https://doc.artisan.plus/partners/){:target="_blank"}.
