@@ -19,23 +19,23 @@ This software is open-source and absolutely free, also for commercial use. If yo
 Thank you!
 
 **Watch out!** 
-Home roasting enthusiasts often donate 10-100.- (in $ or EUR), while small roasting businesses and consultant that use Artisan in their daily work tend to donate 100-300.- (in $ or EUR) per year. For extra tech support, [please inquire](https://artisan-roasterscope.blogspot.com/p/contact-me.html){:target="_blank"}.
+Home roasting enthusiasts often donate 10-100.- (in $ or EUR), while small roasting businesses and consultant that use Artisan Scope in their daily work tend to donate 100-300.- (in $ or EUR) per year. For extra tech support, [please inquire](https://artisan-roasterscope.blogspot.com/p/contact-me.html){:target="_blank"}.
 {: .notice--primary}
 
 
 ## Legal Notice for donations
 {: style="color: #2899c7;" }
 
-Any donation that you make to the Artisan project via the above links is voluntary and is not a fee for any services, goods, or advantages. By making a donation to the Artisan project, you acknowledge that we have the right to use the money you donate in any lawful way and for any lawful purpose we see fit and we are not obligated to disclose the way and purpose to any party unless required by applicable law. Although Artisan is free software, to the best of our knowledge the Artisan project does not have any tax exempt status. The Artisan project is neither a registered non-profit corporation nor a registered charity in any country. Your donation may or may not be tax-deductible; please consult your tax advisor in this matter. Your donation is non-refundable.
+Any donation that you make to the Artisan Scope project via the above links is voluntary and is not a fee for any services, goods, or advantages. By making a donation to the Artisan Scope project, you acknowledge that we have the right to use the money you donate in any lawful way and for any lawful purpose we see fit and we are not obligated to disclose the way and purpose to any party unless required by applicable law. Although Artisan Scope is free software, to the best of our knowledge the Artisan Scope project does not have any tax exempt status. The Artisan Scope project is neither a registered non-profit corporation nor a registered charity in any country. Your donation may or may not be tax-deductible; please consult your tax advisor in this matter. Your donation is non-refundable.
 
 
 
 
-## artisan.plus subscription
+## artisan platform
 {: style="color: #2899c7;" }
 
-Another way to support the Artisan project is to [sign up](https://artisan.plus/en/register){:target="_blank"} and subscribe to
+Another way to support the Artisan Scope project is to [sign up](https://artisan.plus/en/register){:target="_blank"} and subscribe to
 
-&nbsp;&nbsp;&nbsp;&nbsp; ![image](/assets/images/artisan-plus-logo.svg){: style="width: 5%;"} [<span style="color: #2899c7;font-weight:bold;">artisan.plus</span>](https://artisan.plus){:target="_blank"} inventory management
+&nbsp;&nbsp;&nbsp;&nbsp; ![image](/assets/images/artisan-plus-logo.svg){: style="width: 5%;"} [<span style="color: #2899c7;font-weight:bold;">artisan</span>](https://artisan.plus){:target="_blank"} platform
 
 A [yearly subscription for HOME roasters](https://buy.artisan.plus/Home-Roasters){:target="_blank"} is only 50.- EUR with the additional benefit of access to coupons by [green bean supplier partners](https://doc.artisan.plus/partners/){:target="_blank"}.
