@@ -1,7 +1,7 @@
 ---
 title: "Quick-Start Guide"
 permalink: /docs/quick-start-guide/
-excerpt: "How to quickly install and setup Artisan"
+excerpt: "How to quickly install and setup artisan scope"
 last_modified_at: 2021-02-12T15:59:00-04:00
 toc: false
 author: Michael Herbert
@@ -12,38 +12,39 @@ author_profile: true
 {: style="color: #2899c7;" }
 
 **Watch out!** 
-If you read through the topics on the left you will have a very good idea of how Artisan works.  This Quick-Start-Guide is not intended to answer all technical questions.
+If you read through the topics on the left you will have a very good idea of how **<span style="color: #2899c7;">artisan scope</span>** works.  This Quick-Start-Guide is not intended to answer all technical questions.
 {: .notice--primary}
 
-Artisan Quick-Start Guide is maintained by *Michael Herbert of [CarefreeBuzzBuzz](https://www.carefreebuzzbuzz.com/){:target="_blank"}*. If you have suggestions for improving the content of the Quick-Start-Guide or technical questions, please use the [Artisan discussion forum](https://github.com/artisan-roaster-scope/artisan/discussions) (GitHub registration required).  When clicking links in this Quick-Start-Guide, we suggest you open links in a new window.  You can also find a great deal of more advanced information at the [Artisan Blog](https://artisan-roasterscope.blogspot.com/).  Use the search bar in the upper left.
+This **<span style="color: #2899c7;">artisan scope</span>** Quick-Start Guide is maintained by *Michael Herbert of [CarefreeBuzzBuzz](https://www.carefreebuzzbuzz.com/){:target="_blank"}*. If you have suggestions for improving the content of the Quick-Start-Guide or technical questions, please use the [**<span style="color: #2899c7;">artisan discussion forum</span>**](https://github.com/artisan-roaster-scope/artisan/discussions) ([GitHub registration](https://artisan-scope.org/discussions/) required).  When clicking links in this Quick-Start-Guide, we suggest you open links in a new window.  You can also find a great deal of more advanced information at the [**<span style="color: #2899c7;">artisan blog</span>**](https://artisan-roasterscope.blogspot.com/).  Use the search bar in the upper left.
 
 
 
 
-### artisan.plus
+### artisan platform
 {: style="color: #2899c7;" }
 
-Introduced as part of Artisan v2, [artisan.plus](https://artisan.plus/en/) is an inventory management system which is not covered in the Quick Start Guide. Artisan v2 connects to the inventory management service. This service manages your stock of beans and automatically subtracts batches as you roast them. Beans can be specified to every detail and only essential meta data of roasts is stored online in the cloud. All roast profiles stay local just with you and are not shared with the platform.  You can read the [Artisan Plus Quick Start Guide](https://doc.artisan.plus/docs/quick-start-guide/).  Signing up for this service is a great way to support Artisan.  
+Introduced as part of **<span style="color: #2899c7;">artisan scope</span>** 2.0 release, the [artisan platform](https://artisan.plus/en/) is an inventory management system which is not covered in the Quick Start Guide. **<span style="color: #2899c7;">artisan scope</span>** connects to the inventory management service. This service manages your stock of beans and automatically subtracts batches as you roast them. Beans can be specified to every detail and only essential meta data of roasts is stored online in the cloud. All roast profiles stay local just with you and are not shared with the platform.  You can read the [artisan platform Quick Start Guide](https://doc.artisan.plus/docs/quick-start-guide/).  Signing up for this service is a great way to support **<span style="color: #2899c7;">artisan scope</span>**.  
 
 Additional popup menus in the Roast Properties dialog (menu `Roast` >> `Properties`) allow you to choose from your stock and have beans information filled in automatically.
 
-The [artisan.plus service](https://artisan.plus/en/) features support for
+The [artisan platform](https://artisan.plus/en/) features support for
 
 - multiple users, machines and stores
 - blends & certifications
 - charts, tax reports & predictions
-- Support for offline roasting which Cropster doesn't.  Your roasts and profiles are uploaded when you reconnect to Plus.  
+- roast scheduling
+- support for offline roasting which Cropster doesn't.  Your roasts and profiles are uploaded when you reconnect to the platform.  
 
 
-### Learn what Artisan can do and Your First Roast 
+### Learn what artisan scope can do and Your First Roast 
 {: style="color: #2899c7;" }
 
 **Best Practices - Learn to save your settings.**   Go to `Help` >> `Save Settings`  
 Maybe the most important step. Save your settings and make a habit of it before every upgrade and when you change settings.  Also after installing a new version do two things; read the release notes so you can spot anything relevant to your roasting, and look over the shortcuts as new ones are often being added.  
 
-Skim the pages of this Quick Start Guide, learn what Artisan RoasterScope can do, and then go back and read the pages of interest in detail. For each roast, an Artisan "profile" will be created and can be saved in various formats and can be exported for sharing under File>Save Graph (be sure to review these).  For most of the topics below, you will find a page in this Quick Start Guide, and some are linked.  
+Skim the pages of this Quick Start Guide, learn what **<span style="color: #2899c7;">artisan scope</span>** can do, and then go back and read the pages of interest in detail. For each roast, an **<span style="color: #2899c7;">artisan</span>** "profile" will be created and can be saved in various formats and can be exported for sharing under File>Save Graph (be sure to review these).  For most of the topics below, you will find a page in this Quick Start Guide, and some are linked.  
 
-New as of 2026 are User Interface Modes:  Standard, Expert, and Production.  Artisan 4 starts in Standard mode, which restricts menus and dialogs to basic configurations and functionalities. By using the Mode menu, Artisan can be switched to Expert mode, which restores full functionality, similar to previous versions. Additionally, there's a Production mode that hides all configuration options and features only the UI elements and functions necessary for production.
+New as of 2026 are User Interface Modes:  Standard, Expert, and Production.  **<span style="color: #2899c7;">artisan scope</span>** v4 starts in Standard mode, which restricts menus and dialogs to basic configurations and functionalities. By using the mode menu, **<span style="color: #2899c7;">artisan scope</span>** can be switched to Expert mode, which restores full functionality, similar to previous versions. Additionally, there's a Production mode that hides all configuration options and features only the UI elements and functions necessary for production.
 
 **Standard Mode Choices**
 
@@ -76,7 +77,7 @@ Go to `Help` >> `Shortcuts` to see what keyboard shortcuts are available.
 1.	`Config` >> [`Sampling`](https://artisan-scope.org/docs/sampling/)  
 Leave at 3 for now. After you have done 25-30 roasts and know the program better you can reduce it if your devices support that. Under Curves your Delta Span should be at least twice your sampling rate. 
 2.	`Config` >> [`Curves`](https://artisan-scope.org/docs/curves/)   
-Check the boxes needed on the RoR tab and set the values on the Filters page. Suggest you start with zero for all smoothing and check the Drop Spikes and Smooth Spikes choices. Set Delta Span at twice your sampling rate (3 by default) so 6.  If you find zero smoothing give you too many spikes, slowing increase the numbers.  Once you have an Artisan profile, you can change the numbers and see the results on screen.  Also in the`Config` >> `Curves` dialog, last tab, UI, you can pick a font and background image, IF you wish to personalize your screen.  
+Check the boxes needed on the RoR tab and set the values on the Filters page. Suggest you start with zero for all smoothing and check the Drop Spikes and Smooth Spikes choices. Set Delta Span at twice your sampling rate (3 by default) so 6.  If you find zero smoothing give you too many spikes, slowing increase the numbers.  Once you have an **<span style="color: #2899c7;">artisan</span>** profile, you can change the numbers and see the results on screen.  Also in the`Config` >> `Curves` dialog, last tab, UI, you can pick a font and background image, IF you wish to personalize your screen.  
 3.	`Config` >> [`Statistics`](https://artisan-scope.org/docs/statistics/)  
 Check all the boxes on the top row.
 4.	`Roast` >> [`Background`](https://artisan-scope.org/docs/background/)  
@@ -91,15 +92,15 @@ In Expert Mode you will also have Analyzer,Simulator, Wheel Graph, Transposer an
 The main controls look like this:
 ![View Controls](/assets/images/gsg/view menu controls.png)
 
-Artisan’s standard event buttons are as follows:
-![Artisan buttons](/assets/images/gsg/standard buttons.png)
+The **<span style="color: #2899c7;">artisan scope</span>** standard event buttons are as follows:
+![artisan buttons](/assets/images/gsg/standard buttons.png)
 
-In the upper right of your screen, `ON` starts reading the Devices.  `START` will begin a roast profile recording  the time and temps.  After you hit `START`, wait at least 15 seconds, before you drop your beans into the roaster and hit `CHARGE` (or use `Auto CHARGE`) to get a ∆BT graph.  Without a CHARGE event there is no ∆BT graph.  Using the trier, when you determine you are at Dry End, hit the `DRY END` button, and do the same for `FC START`, and `DROP`.  After the roast completes, hit the off button.  Congratulations on your first roast.  At the end of the roast you hit `OFF` to stop the recording. When you hit `RESET`, the current profile and background profile are removed and Artisan is reset to be ready for a new roast.  You don’t have to `RESET` after every roast. 
+In the upper right of your screen, `ON` starts reading the Devices.  `START` will begin a roast profile recording  the time and temps.  After you hit `START`, wait at least 15 seconds, before you drop your beans into the roaster and hit `CHARGE` (or use `Auto CHARGE`) to get a ∆BT graph.  Without a CHARGE event there is no ∆BT graph.  Using the trier, when you determine you are at Dry End, hit the `DRY END` button, and do the same for `FC START`, and `DROP`.  After the roast completes, hit the off button.  Congratulations on your first roast.  At the end of the roast you hit `OFF` to stop the recording. When you hit `RESET`, the current profile and background profile are removed and **<span style="color: #2899c7;">artisan scope</span>** is reset to be ready for a new roast.  You don’t have to `RESET` after every roast. 
 
 **NOTE:
 *Unplug Your Laptop Before You Roast***
 
-For some people, unless you have a USB isolator, you need to unplug your computer when using Artisan or you may get feedback loops that may create unwanted spikes in the graph.  If you are using a desktop, you may need an isolator if you are seeing the spikes.  
+For some people, unless you have a USB isolator, you need to unplug your computer when using **<span style="color: #2899c7;">artisan scope</span>** or you may get feedback loops that may create unwanted spikes in the graph.  If you are using a desktop, you may need an isolator if you are seeing the spikes.  
 
 Before or after your first roast, look at the [Setup ](https://artisan-scope.org/docs/setup/) page to see how to adjust your bean temp readings and your sampling rates.
 
@@ -108,3 +109,4 @@ You can save your graphs under `File` >> `Save Graph` to various size formats or
 To review your own files you can use `File` >> `Open` and search for a file or use the list under `File` >> `Open Recent`.  When starting a roast you can choose `File` >> `New` and pick one of the previous Roast Profiles you may have saved.  
 
 ## READY FOR YOUR FIRST ROAST
+{: style="color: #2899c7;" }
