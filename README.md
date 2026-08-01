@@ -1,8 +1,8 @@
 <img align="right" src="https://raw.githubusercontent.com/artisan-roaster-scope/artisan/master/wiki/screenshots/artisan.png" width="70">
 
-Artisan Scope
+artisan scope
 ==========
-Visual scope for coffee roasters
+visual scope for coffee roasters
 
 [![Latest release](https://img.shields.io/github/release/artisan-roaster-scope/artisan.svg)](https://github.com/artisan-roaster-scope/artisan/releases/latest)
 [![Pre-release](https://img.shields.io/github/release-pre/artisan-roaster-scope/artisan.svg)](https://github.com/artisan-roaster-scope/artisan/releases/continuous)
@@ -24,16 +24,16 @@ Visual scope for coffee roasters
 Summary
 -------
 
-Artisan is a software that helps coffee roasters record, analyze, and control roast profiles. When used in conjunction with a thermocouple data logger or a proportional–integral–derivative controller (PID controller), this software can automate the creation of roasting metrics to help make decisions that influence the final coffee flavor.
+artisan scope is a software that helps coffee roasters record, analyze, and control roast profiles. When used in conjunction with a thermocouple data logger or a proportional–integral–derivative controller (PID controller), this software can automate the creation of roasting metrics to help make decisions that influence the final coffee flavor.
 
-Artisan is listed on [Awesome Python Applications](https://github.com/mahmoud/awesome-python-applications).
+artisan scope is listed on [Awesome Python Applications](https://github.com/mahmoud/awesome-python-applications).
 
 Donations
 ---------
 
 This software is open-source and absolutely free to use, also in commercial settings.
 
-If you think Artisan is useful to you, contribute financially to its further development. Send any amount via my [PayPal.Me page](https://www.paypal.me/MarkoLuther). Thanks!
+If you think artisan scope is useful to you, contribute financially to its further development. Send any amount via my [PayPal.Me page](https://www.paypal.me/MarkoLuther). Thanks!
 
 > *Home roasting enthusiasts often donate 10-100.- (in $ or EUR), while small roasting businesses and consultant that use Artisan in their daily work tend to donate 100-300.- (in $ or EUR). For extra tech support, please inquire.*
 

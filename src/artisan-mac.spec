@@ -448,4 +448,4 @@ for subdir, _dirs, files in os.walk('.', followlinks=False):
 dist_name = r'artisan-mac-' + VERSION + r'.dmg'
 os.chdir('..')
 os.system(r'rm ' + dist_name)
-os.system(r'hdiutil create ' + dist_name + r' -volname "Artisan" -fs HFS+ -srcfolder "dist"')
+os.system(r'hdiutil create ' + dist_name + r' -volname "artisan" -fs HFS+ -srcfolder "dist"')

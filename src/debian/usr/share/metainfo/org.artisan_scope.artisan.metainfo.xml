@@ -2,7 +2,7 @@
 <component type="desktop-application">
   <id>org.artisan_scope.artisan</id>
 
-  <name>artisan Scope</name>
+  <name>artisan scope</name>
   <summary>Visual scope for coffee roasters</summary>
 
   <metadata_license>CC0-1.0</metadata_license>
@@ -15,7 +15,7 @@
   </supports>
 
   <description>
-    <p>artisan Scope is open-source software that helps coffee roasters record, analyze, and control roast profiles. It automates tedious roasting tasks and streamlines processes, enabling roasters to consistently produce exceptional-tasting coffee. With support for over 200 brands of roasting machines, including the capability to control roaster functions, Scope stands out as the most versatile software available to roasters – and it's completely free!</p>
+    <p>artisan scope is open-source software that helps coffee roasters record, analyze, and control roast profiles. It automates tedious roasting tasks and streamlines processes, enabling roasters to consistently produce exceptional-tasting coffee. With support for over 200 brands of roasting machines, including the capability to control roaster functions, Scope stands out as the most versatile software available to roasters – and it's completely free!</p>
 
     <p>**Notable features**</p>
     <ul>
@@ -30,9 +30,9 @@
       <li>Localized in more than 30 languages</li>
     </ul>
 
-    <p>**More features with artisan.plus**</p>
+    <p>**More features with the artisan platform**</p>
 
-    <p>Subscribers to our optional artisan.plus service unlock access to even more features of artisan Scope, including:</p>
+    <p>Subscribers to our artisan platform unlock access to even more features of artisan scope, including:</p>
     <ul>
       <li>Inventory management</li>
       <li>Roast scheduling with Acaia scale integration</li>
@@ -42,7 +42,7 @@
       <li>Multiple users under one organization  </li>
     </ul>
 
-    <p>The artisan project runs on donations from individuals and companies recognising the value of artisan for the coffee community. Consider supporting this project with a donation or by purchasing an artisan.plus membership!</p>
+    <p>The artisan project runs on donations from individuals and companies recognising the value of artisan for the coffee community. Consider supporting this project with a donation or by purchasing an artisan platform membership!</p>
   </description>
 
   <developer id="org.artisan-scope">
