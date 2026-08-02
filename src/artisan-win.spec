@@ -276,7 +276,7 @@ for fn in [
     r'includes\ComicNeue-Regular.ttf',
     r'includes\xkcd-script.ttf',
     r'includes\Nunito-Regular.ttf',
-    r'includes\NotoSansMono-Regular.ttf,
+    r'includes\NotoSansMono-Regular.ttf',
     r'includes\WenQuanYiZenHei-01.ttf',
     r'includes\WenQuanYiZenHeiMonoMedium.ttf',
     r'includes\SourceHanSansCN-Regular.otf',
