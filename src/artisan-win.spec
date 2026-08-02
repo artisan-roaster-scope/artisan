@@ -1,7 +1,7 @@
 # ABOUT
-# Artisan pyinstaller specification file
+# artisan scope pyinstaller specification file
 #
-# COPYRIGHT (C) 2010-2026 The Artisan team represented by
+# COPYRIGHT (C) 2010-2026 The artisan team represented by
 #   Marko Luther <marko.luther@gmx.net> (maintainer) and all contributors
 #
 # LICENSE

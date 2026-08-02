@@ -1,7 +1,7 @@
 ; ABOUT
-; NSIS script file for Artisan Windows installer.
+; NSIS script file for artisan Windows installer.
 ;
-; COPYRIGHT (C) 2010-2026 The Artisan team represented by
+; COPYRIGHT (C) 2010-2026 The artisan team represented by
 ; Marko Luther <marko.luther@gmx.net> (maintainer) and all contributors
 ;
 ; LICENSE

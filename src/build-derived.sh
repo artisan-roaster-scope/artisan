@@ -1,9 +1,9 @@
 #!/bin/bash
 # ABOUT
 # Generate translation, ui, and help files derived from repository sources
-# for Artisan Linux and macOS builds
+# for artisan Linux and macOS builds
 #
-# COPYRIGHT (C) 2010-2026 The Artisan team represented by
+# COPYRIGHT (C) 2010-2026 The artisan team represented by
 #   Marko Luther <marko.luther@gmx.net> (maintainer) and all contributors
 #
 # LICENSE

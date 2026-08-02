@@ -1,8 +1,8 @@
 #!/bin/bash
 # ABOUT
-# Build shell script for Artisan macOS CI builds
+# Build shell script for artisan macOS CI builds
 #
-# COPYRIGHT (C) 2010-2026 The Artisan team represented by
+# COPYRIGHT (C) 2010-2026 The artisan team represented by
 #   Marko Luther <marko.luther@gmx.net> (maintainer) and all contributors
 #
 # LICENSE

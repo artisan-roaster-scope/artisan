@@ -1,8 +1,8 @@
 #
 # ABOUT
-# Artisan PID Controllers (Fuji, DTA, Arduino TC4)
+# artisan scope PID control (Fuji, DTA, Arduino TC4, artisan)
 #
-# COPYRIGHT (C) 2010-2026 The Artisan team represented by
+# COPYRIGHT (C) 2010-2026 The artisan team represented by
 #   Marko Luther <marko.luther@gmx.net> (maintainer) and all contributors
 #
 # LICENSE
@@ -1210,7 +1210,7 @@ class PIDcontrol:
         self.negativeTargetMin:int = 0
         self.negativeTargetMax:int = 100
         # derivative filter
-        self.derivative_filter:int = 0 # 0: off, 1: on
+        self.derivative_filter:int = 0 # 0: off, >0: on
         # duty filter
         self.duty_filter:int = 0 # 0: off, 1: on
         # sv smoothing

@@ -1,9 +1,9 @@
 #
 # ABOUT
-# Thermoworks Bluedot Thermometer support for Artisan
+# Thermoworks Bluedot Thermometer support for artisan scope
 # see https://github.com/lamroger/artisan-websocket-bluedot
 #
-# COPYRIGHT (C) 2010-2026 The Artisan team represented by
+# COPYRIGHT (C) 2010-2026 The artisan team represented by
 #   Marko Luther <marko.luther@gmx.net> (maintainer) and all contributors
 #
 # LICENSE

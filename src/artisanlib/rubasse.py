@@ -1,8 +1,8 @@
 #
 # ABOUT
-# RUBASSE CSV Roast Profile importer for Artisan
+# RUBASSE CSV roast profile importer for artisan scope
 #
-# COPYRIGHT (C) 2010-2026 The Artisan team represented by
+# COPYRIGHT (C) 2010-2026 The artisan team represented by
 #   Marko Luther <marko.luther@gmx.net> (maintainer) and all contributors
 #
 # LICENSE

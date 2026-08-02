@@ -2,7 +2,7 @@
 # This program shows how to plot the temperature and its rate of change from a
 # roasting machine, PID or a thermocouple meter.
 #
-# COPYRIGHT (C) 2010-2026 The Artisan team represented by
+# COPYRIGHT (C) 2010-2026 The artisan team represented by
 #   Marko Luther <marko.luther@gmx.net> (maintainer) and all contributors
 #
 # LICENSE
@@ -10244,7 +10244,6 @@ class ApplicationWindow(QMainWindow):
                                     self.updatePlaybackIndicatorSignal.emit()
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
-
                             # playbackdropmode(<n>) with 0: off, 1: time, 2: BT, 3: ET
                             elif cs.startswith('playbackdropmode(') and cs.endswith(')'):
                                 try:
@@ -10267,7 +10266,52 @@ class ApplicationWindow(QMainWindow):
                                         self.sendmessage(QApplication.translate('Message','playback DROP by ET'))
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
-
+                            # pidDerivativeFilter(<n>) : 0 <= n < 6
+                            elif cs.startswith('pidDerivativeFilter(') and cs.endswith(')'):
+                                try:
+                                    value_int = max(0, min(5, int(cs[len('pidDerivativeFilter('):-1])))
+                                    self.pidcontrol.derivative_filter = value_int
+                                    self.pidcontrol.confSoftwarePID()
+                                except Exception as e: # pylint: disable=broad-except
+                                    _log.exception(e)
+                            # pidDerivativeLimit(<n>) : n >= 0
+                            elif cs.startswith('pidDerivativeLimit(') and cs.endswith(')'):
+                                try:
+                                    value_int = max(0, int(cs[len('pidDerivativeLimit('):-1]))
+                                    self.pidcontrol.pidDlimit = value_int
+                                    self.pidcontrol.confSoftwarePID()
+                                except Exception as e: # pylint: disable=broad-except
+                                    _log.exception(e)
+                            # pidILF(<n>) 0 <= n <= 1
+                            elif cs.startswith('pidILF(') and cs.endswith(')'):
+                                try:
+                                    value_float = max(0, min(1, float(eval(cs[len('pidILF('):-1][:eval_limit])))) # pylint: disable=eval-used
+                                    self.pidcontrol.pidIlimitFactor = value_float
+                                    self.pidcontrol.confSoftwarePID()
+                                except Exception as e: # pylint: disable=broad-except
+                                    _log.exception(e)
+                            # pidIWP(<bool>) enable/disable PID IWP
+                            elif cs.startswith('pidIWP(') and cs.endswith(')'):
+                                try:
+                                    value_str = cs[len('pidIWP('):-1].strip()
+                                    if value_str.lower() in {'yes', 'true', 't', '1'}:
+                                        self.pidcontrol.pidIWP = True
+                                    else:
+                                        self.pidcontrol.pidIWP = False
+                                    self.pidcontrol.confSoftwarePID()
+                                except Exception as e: # pylint: disable=broad-except
+                                    _log.exception(e)
+                            # pidIRoC(<bool>) enable/disable PID IRoC
+                            elif cs.startswith('pidIRoC(') and cs.endswith(')'):
+                                try:
+                                    value_str = cs[len('pidIRoC('):-1].strip()
+                                    if value_str.lower() in {'yes', 'true', 't', '1'}:
+                                        self.pidcontrol.pidIRoC = True
+                                    else:
+                                        self.pidcontrol.pidIRoC = False
+                                    self.pidcontrol.confSoftwarePID()
+                                except Exception as e: # pylint: disable=broad-except
+                                    _log.exception(e)
                             # openProperties : open Roast Properties dialog
                             elif cs == 'openProperties':
                                 self.openPropertiesSignal.emit()
@@ -12874,14 +12918,12 @@ class ApplicationWindow(QMainWindow):
                     else:
                         nextcmd = self.nextActiveButton(self.keyboardmoveindex)
                     # activate the button at index nextcmd
-                    self.keyboardButtonList[nextcmd].setSelected(True)
-                    self.keyboardButtonList[self.keyboardmoveindex].setSelected(False)
-                    # update self.keyboardmoveindex
-                    self.keyboardmoveindex = nextcmd
-                else:
-                    # last visible enabled button pressed
-                    self.keyboardmoveindex += 1
-                    self.keyboardButtonList[self.keyboardmoveindex].setSelected(True)
+                    if not (self.keyboardButtonList[self.keyboardmoveindex].isFlat() and self.keyboardButtonList[nextcmd].isFlat()):
+                        # only move if source and destination are not both flat
+                        self.keyboardButtonList[nextcmd].setSelected(True)
+                        self.keyboardButtonList[self.keyboardmoveindex].setSelected(False)
+                        # update self.keyboardmoveindex
+                        self.keyboardmoveindex = nextcmd
 
     #sound feedback when pressing a push button
     @pyqtSlot()
@@ -24513,7 +24555,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     @pyqtSlot(bool)
     def helpHelp(self, _:bool = False) -> None:  # pylint: disable=no-self-use # used as slot
-        QDesktopServices.openUrl(QUrl('https://artisan-scope.org/help/', QUrl.ParsingMode.TolerantMode))
+        QDesktopServices.openUrl(QUrl('https://artisan-scope.org/docs/', QUrl.ParsingMode.TolerantMode))
 
     @pyqtSlot()
     @pyqtSlot(bool)

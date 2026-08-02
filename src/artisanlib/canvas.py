@@ -1,8 +1,8 @@
 #
 # ABOUT
-# Artisan Main Canvas
+# artisan main canvas
 #
-# COPYRIGHT (C) 2010-2026 The Artisan team represented by
+# COPYRIGHT (C) 2010-2026 The artisan team represented by
 #   Marko Luther <marko.luther@gmx.net> (maintainer) and all contributors
 #
 # LICENSE
@@ -12248,7 +12248,7 @@ class tgraphcanvas(QObject):
                 bbox_data = self.ax.transData.inverted().transform(bb)  # zuban:ignore[arg-type] # bounding box in data space
                 bbox = Bbox(bbox_data)
                 t.remove()
-                return cast(tuple[float,float,float,float], bbox.bounds)  # x0, y0, width, height.  Relative to the start of the curve and self.ylimit_min
+                return bbox.bounds # type:ignore[no-any-return] # x0, y0, width, height.  Relative to the start of the curve and self.ylimit_min
             return 0,0,0,0
 
     # Find the bounds for an event annotation text box

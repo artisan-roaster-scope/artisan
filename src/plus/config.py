@@ -3,9 +3,9 @@
 # config.py
 #
 # ABOUT
-# This module connects to the artisan.plus inventory management service
+# This module connects to the artisan platform
 #
-# COPYRIGHT (C) 2010-2026 The Artisan team represented by
+# COPYRIGHT (C) 2010-2026 The artisan team represented by
 #   Marko Luther <marko.luther@gmx.net> (maintainer) and all contributors
 #
 # LICENSE
@@ -114,13 +114,13 @@ prepared_items_cache: Final[str] = 'prepared'
 hidden_items_cache: Final[str] = 'hidden'
 
 # the uuid register that associates UUIDs with local filepaths where to
-# locate the corresponding Artisan profiles
+# locate the corresponding artisan profiles
 uuid_cache: Final[str] = 'uuids'
 
 # the account register that associates account ids with a local running
 # account number
-# Note: the account_cache file is shared between the main Artisan and the
-# ArtisanViewer app, protected by a filelock
+# Note: the account_cache file is shared between the main artisan and the
+# artisanViewer app, protected by a filelock
 account_cache: Final[str] = 'account'
 
 # the account nr locally associated to the current account, or None
@@ -128,19 +128,19 @@ account_nr: int|None = None
 
 # the sync register that associates UUIDs with last known modification dates
 # modified_at for profiles uploaded/synced automatically
-# Note: the sync_cache file is shared between the main Artisan and the
-# ArtisanViewer app, protected by a filelock
+# Note: the sync_cache file is shared between the main artisan and the
+# artisanViewer app, protected by a filelock
 sync_cache: Final[str] = 'sync'
 
 # the outbox queues the outgoing PUSH/PUT data requests
-# Note: the outbox_cache file is shared between the main Artisan and the
-# ArtisanViewer app, NOT protected by an extra filelock
+# Note: the outbox_cache file is shared between the main artisan and the
+# artisanViewer app, NOT protected by an extra filelock
 outbox_cache: Final[str] = 'outbox'
 
 
 # Runtime variables
 
-app_window: 'ApplicationWindow|None' = None  # handle to the main Artisan application window
+app_window: 'ApplicationWindow|None' = None  # handle to the main artisan application window
 #   if set, app_window.plus_login holds the current login account if any and
 #   app_window.updatePlusIcon() is a function that updates the toolbar
 #   plus service connection indicator icon

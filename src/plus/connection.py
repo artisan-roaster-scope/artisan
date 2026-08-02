@@ -2,9 +2,9 @@
 # connection.py
 #
 # ABOUT
-# This module connects to the artisan.plus inventory management service
+# This module connects to the artisan platform
 #
-# COPYRIGHT (C) 2010-2026 The Artisan team represented by
+# COPYRIGHT (C) 2010-2026 The artisan team represented by
 #   Marko Luther <marko.luther@gmx.net> (maintainer) and all contributors
 #
 # LICENSE
@@ -366,7 +366,7 @@ def getHeaders(
     if aw is not None:
         os, os_version, os_arch = aw.get_os()  # @UndefinedVariable
         headers = {
-            'user-agent': f'Artisan/{__version__} ({os}; {os_version}; {os_arch})',
+            'user-agent': f'artisan/{__version__} ({os}; {os_version}; {os_arch})',
             'Accept-Charset': 'utf-8'
         }
         try:

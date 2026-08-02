@@ -1,8 +1,8 @@
 #
 # ABOUT
-# This program realizes a PID controller as part of the open-source roast logging software Artisan.
+# This program realizes a PID controller as part of the open-source roast logging software artisan scope
 #
-# COPYRIGHT (C) 2010-2026 The Artisan team represented by
+# COPYRIGHT (C) 2010-2026 The artisan team represented by
 #   Marko Luther <marko.luther@gmx.net> (maintainer) and all contributors
 #
 # LICENSE

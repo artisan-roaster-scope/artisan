@@ -1,8 +1,8 @@
 ### -*- mode: python ; coding: utf-8 -*-
 # ABOUT
-# artisan-mac.spec script for Artisan macOS builds using pyinstaller
+# artisan-mac.spec script for artisan macOS builds using pyinstaller
 #
-# COPYRIGHT (C) 2010-2026 The Artisan team represented by
+# COPYRIGHT (C) 2010-2026 The artisan team represented by
 #   Marko Luther <marko.luther@gmx.net> (maintainer) and all contributors
 #
 # LICENSE

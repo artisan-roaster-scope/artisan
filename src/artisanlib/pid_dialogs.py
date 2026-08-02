@@ -1,8 +1,8 @@
 #
 # ABOUT
-# Artisan PID Dialogs
+# artisan scope PID dialogs
 #
-# COPYRIGHT (C) 2010-2026 The Artisan team represented by
+# COPYRIGHT (C) 2010-2026 The artisan team represented by
 #   Marko Luther <marko.luther@gmx.net> (maintainer) and all contributors
 #
 # LICENSE
@@ -662,6 +662,7 @@ class PID_DlgControl(ArtisanDialog):
             self.dFilterSpinBox.setRange(0,5)
             self.dFilterSpinBox.setSingleStep(1)
             self.dFilterSpinBox.setValue(self.aw.pidcontrol.derivative_filter)
+            self.dFilterSpinBox.setToolTip(QApplication.translate('Tooltip', 'Derivative filter size; changes effective after restart of the PID'))
 
             DFilterBox = QHBoxLayout()
 #            DFilterBox.addWidget(self.derivativeFilterFlag)

@@ -1,5 +1,9 @@
 # -*- mode: python -*-
-# COPYRIGHT (C) 2010-2026 The Artisan team represented by
+#
+# ABOUT
+# artisan-linux.spec script for artisan linux builds using pyinstaller
+#
+# COPYRIGHT (C) 2010-2026 The artisan team represented by
 #   Marko Luther <marko.luther@gmx.net> (maintainer) and all contributors
 #
 # LICENSE

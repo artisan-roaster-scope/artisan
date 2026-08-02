@@ -1,9 +1,9 @@
 # ABOUT
-# Qt Translation processing for Artisan
+# Qt Translation processing for artisan scope
 # Parses artisan.pro file.  Format of the .pro file:  Must have SOURCES and TRANSLATIONS files
 # each on its own line, no blank lines.  A blank line must separate SOURCES and TRANSLATIONS.
 #
-# COPYRIGHT (C) 2010-2026 The Artisan team represented by
+# COPYRIGHT (C) 2010-2026 The artisan team represented by
 #   Marko Luther <marko.luther@gmx.net> (maintainer) and all contributors
 #
 # LICENSE

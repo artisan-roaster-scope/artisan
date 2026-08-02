@@ -18,7 +18,7 @@ santokerBLE=true
 Controlbuttonflag=true
 
 [Axis]
-resetmaxtime=360
+resetmaxtime=450
 
 [background]
 DeltaBTB=false

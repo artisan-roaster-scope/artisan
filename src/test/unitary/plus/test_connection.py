@@ -574,7 +574,7 @@ class TestHeaderGeneration:
 
             # Assert
             assert 'user-agent' in headers
-            assert 'Artisan/2.8.0' in headers['user-agent']
+            assert 'artisan/2.8.0' in headers['user-agent']
             assert 'macOS' in headers['user-agent']
             assert 'Accept-Charset' in headers
             assert headers['Accept-Charset'] == 'utf-8'
