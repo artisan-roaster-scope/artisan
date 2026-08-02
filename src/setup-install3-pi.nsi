@@ -433,6 +433,8 @@ Section Uninstall
   Delete "$INSTDIR\Humor-Sans.ttf"
   Delete "$INSTDIR\dijkstra.ttf"
   Delete "$INSTDIR\xkcd-script.ttf"
+  Delete "$INSTDIR\Nunito-Regular.ttf"
+  Delete "$INSTDIR\NotoSansMono-Regular.ttf"
   Delete "$INSTDIR\ComicNeue-Regular.ttf"
   Delete "$INSTDIR\WenQuanYiZenHei-01.ttf"
   Delete "$INSTDIR\WenQuanYiZenHeiMonoMedium.ttf"

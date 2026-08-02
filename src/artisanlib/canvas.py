@@ -1711,6 +1711,20 @@ class tgraphcanvas(QObject):
         self.glow:int = 0
         self.graphstyle:int = 0
         self.graphfont:int = 0
+        # 0: Qt system default (system)
+        # 1: Humor (included)
+        # 2: Comic (system)
+        # 3: WenQuanYi Zen Hei (included)
+        # 4: Source Han Sans CN (included)
+        # 5: Source Han Sans TW (included)
+        # 6: Source Han Sans HK (included)
+        # 7: Source Han Sans KR (included)
+        # 8: Source Han Sans JP (included)
+        # 9: Dijkstra (included)
+        # 10: xkcd Script (included)
+        # 11: Comic Neue (included)
+        # 12: Nunito  (included)
+        # 13: Noto Sans Mono  (included)
 
         #variables to configure the 8 default buttons
         # button = 0:CHARGE, 1:DRY_END, 2:FC_START, 3:FC_END, 4:SC_START, 5:SC_END, 6:DROP, 7:COOL_END;
@@ -1849,7 +1863,7 @@ class tgraphcanvas(QObject):
         self.EvalueColor:list[str] = self.EvalueColor_default.copy()
         self.EvalueTextColor:list[str] = self.EvalueTextColor_default.copy()
         self.EvalueMarker:list[str] = ['o','s','h','D']
-        self.EvalueMarkerSize:list[float] = [4,4,4,4]
+        self.EvalueMarkerSize:list[float] = [3,3,3,3]
         self.Evaluelinethickness:list[float] = [1,1,1,1]
         self.Evaluealpha:list[float] = [.8,.8,.8,.8]
         #the event value position bars are calculated at redraw()
@@ -1869,21 +1883,21 @@ class tgraphcanvas(QObject):
         self.linestyle_default: Final[str] = '-'
         self.drawstyle_default: Final[str] = 'default'
         self.linewidth_default: Final[float] = 1.5
-        self.back_linewidth_default: Final[float] = 2
-        self.delta_linewidth_default: Final[float] = 1
-        self.back_delta_linewidth_default: Final[float] = 1.5
+        self.back_linewidth_default: Final[float] = 1.8
+        self.delta_linewidth_default: Final[float] = 0.8
+        self.back_delta_linewidth_default: Final[float] = 1.3
         self.extra_linewidth_default: Final[float] = 1
         self.marker_default: Final[str] = 'None'
         self.markersize_default: Final[float] = 6
 
         self.BTlinestyle:str = self.linestyle_default
         self.BTdrawstyle:str = self.drawstyle_default
-        self.BTlinewidth:float = self.linewidth_default
+        self.BTlinewidth:float = 2 # self.linewidth_default
         self.BTmarker:str = self.marker_default
         self.BTmarkersize:float = self.markersize_default
         self.ETlinestyle:str = self.linestyle_default
         self.ETdrawstyle:str = self.drawstyle_default
-        self.ETlinewidth:float = self.linewidth_default
+        self.ETlinewidth:float = 1.5 # self.linewidth_default
         self.ETmarker:str = self.marker_default
         self.ETmarkersize:float = self.markersize_default
         self.BTdeltalinestyle:str = self.linestyle_default

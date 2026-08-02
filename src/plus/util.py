@@ -441,7 +441,7 @@ def schedulerLink() -> str:
 
 def setPlusIcon(mbox:'QMessageBox') -> None:
     basedir = os.path.join(getResourcePath(),'Icons')
-    p = os.path.join(basedir, 'plus-notification.svg')
+    p = os.path.join(basedir, 'artisan-notification.svg')
     app_style:QStyle|None = QApplication.style()
     if app_style is not None:
         icon_size = app_style.pixelMetric(QStyle.PixelMetric.PM_MessageBoxIconSize)
