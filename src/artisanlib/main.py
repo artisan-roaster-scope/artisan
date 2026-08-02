@@ -562,49 +562,6 @@ if qsettings.contains('scale_factor'):
     os.environ['QT_SCALE_FACTOR'] = f"{float(qsettings.value('scale_factor')):.2f}"
 
 app = Artisan(app_args)
-
-
-
-# On the first run if there are legacy settings under "YourQuest" but no new settings under "artisan-scope" then the legacy settings
-# will be copied to the new settings location. Once settings exist under "artisan-scope" the legacy settings under "YourQuest" will
-# no longer be read or saved.  At start-up, versions of Artisan before to v2.0 will no longer share settings with versions v2.0 and after.
-# Settings can be shared among all versions of Artisan by explicitly saving and loading them using Help>Save/Load Settings.
-
-settingsRelocated:bool = False
-try:
-    app.setApplicationName(application_name)                                #needed by QSettings() to store windows geometry in operating system
-
-    app.setOrganizationName('YourQuest')                                    #needed by QSettings() to store windows geometry in operating system
-    app.setOrganizationDomain('p.code.google.com')                          #needed by QSettings() to store windows geometry in operating system
-    legacysettings = QSettings()
-    app.setOrganizationName(application_organization_name)                  #needed by QSettings() to store windows geometry in operating system
-    app.setOrganizationDomain(application_organization_domain)              #needed by QSettings() to store windows geometry in operating system
-    newsettings = QSettings()
-
-    # copy settings from legacy to new if newsettings do not exist, legacysettings do exist, and were not previously copied
-    if not newsettings.contains('Mode') and legacysettings.contains('Mode') and legacysettings.contains('_settingsCopied') and legacysettings.value('_settingsCopied') != 1:
-        settingsRelocated = True
-        # copy Artisan settings
-        for key in legacysettings.allKeys():
-            newsettings.setValue(key,legacysettings.value(key))
-        legacysettings.setValue('_settingsCopied', 1)  # prevents copying again in the future, this key not cleared by a Factory Reset
-
-        # copy ArtisanViewer settings
-        app.setApplicationName(application_viewer_name)                         #needed by QSettings() to store windows geometry in operating system
-
-        app.setOrganizationName('YourQuest')                                    #needed by QSettings() to store windows geometry in operating system
-        app.setOrganizationDomain('p.code.google.com')                          #needed by QSettings() to store windows geometry in operating system
-        legacysettings = QSettings()
-        app.setOrganizationName(application_organization_name)                  #needed by QSettings() to store windows geometry in operating system
-        app.setOrganizationDomain(application_organization_domain)              #needed by QSettings() to store windows geometry in operating system
-        newsettings = QSettings()
-        for key in legacysettings.allKeys():
-            newsettings.setValue(key,legacysettings.value(key))
-    del legacysettings   #free up memory?
-    del newsettings      #free up memory?
-except Exception: # pylint: disable=broad-except
-    pass
-
 app.setApplicationName(application_name)                                #needed by QSettings() to store windows geometry in operating system
 app.setOrganizationName(application_organization_name)                  #needed by QSettings() to store windows geometry in operating system
 app.setOrganizationDomain(application_organization_domain)              #needed by QSettings() to store windows geometry in operating system
@@ -4140,18 +4097,6 @@ class ApplicationWindow(QMainWindow):
         # this variable is bound to the Roast Properties dialog if it is open, set to False to block opening the dialog or None otherwise
 
         self.editgraphdialog:editGraphDlg|bool|None = None
-
-#        # provide information message to user about sharing settings at start-up
-        if settingsRelocated:
-            string =  QApplication.translate('Message','Welcome to version {0} of artisan!').format(__version__) + '\n\n'
-            string += QApplication.translate('Message','This is a one time message to inform you about a change in artisan.') + '\n\n'
-            string += QApplication.translate('Message','If you never run older versions of artisan you can skip this message, the change does not affect you.') + '  '
-            string += QApplication.translate('Message','artisan preserves all your configuration settings when you exit so they will automatically be available the next time you start artisan.') + '  '
-            string += QApplication.translate('Message','Beginning with release v2.0, settings will no longer be automatically shared at start-up with versions before v2.0.') + '\n\n'
-            string += QApplication.translate('Message','Do not worry. Since this is the first time you opened this new version artisan has already loaded your last used settings.') + '\n\n'
-            string += QApplication.translate('Message',"To share settings between this version and artisan versions before v2.0 use 'Help>Save Settings' and 'Help>Load Settings'.") + '\n\n'
-            string += QApplication.translate('Message','Enjoy using artisan, The artisan team')
-            QMessageBox.information(self, QApplication.translate('Message','One time message about loading settings at start-up'),string)
 
         # provide information message to user about artisanViewer the first time it is started
         if self.artisanviewerFirstStart:
