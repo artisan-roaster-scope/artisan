@@ -489,7 +489,7 @@ class TestSerialportClass:
 
             # Assert
             # Should have 207 device functions (indices 0-206)
-            assert len(ser.devicefunctionlist) == 207
+            assert len(ser.devicefunctionlist) == 211
             # All functions should be callable
             for i, func in enumerate(ser.devicefunctionlist):
                 assert callable(func), f"Function at index {i} is not callable"

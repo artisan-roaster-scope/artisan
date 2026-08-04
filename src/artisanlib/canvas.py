@@ -1016,6 +1016,10 @@ class tgraphcanvas(QObject):
                        '+MQTT 78',                   #204
                        '+MQTT 910',                  #205
                        '+MQTT 1112',                 #206
+                       'Skywalker BT/ET',            #207 ## CYBER ## Cyberroaster (Skywalker V2)
+                       '+Skywalker Burner/Air',      #208 ## CYBER ## OT1/OT2 duty echoes
+                       'Skycommand BT/ET',             #209 ## SKYBLE ## Skywalker V2 through SkyBLE dongle
+                       '+Skycommand Burner/Air',         #210 ## SKYBLE ## OT1/OT2 duty echoes
                        ]
 
         # ADD DEVICE:
@@ -1109,7 +1113,11 @@ class tgraphcanvas(QObject):
             195: (True, True), # +Yocto Meteo Pressure
             198: (True, True), # +Orbiter Sound/Drum
             199: (True, True), # +Orbiter Damper/Heater
-            200: (True, True)  # +Orbiter Air/RoR
+            200: (True, True),  # +Orbiter Air/RoR
+            207: (False, False), # Skywalker BT/ET ## CYBER ## Cyberroaster is BLE (nonserial)
+            208: (True, True), # +Skywalker Burner/Air ## CYBER ## OT1/OT2 duty echoes
+            209: (False, False), # SkyBLE BT/ET ## SKYBLE ## Skywalker V2 through SkyBLE dongle
+            210: (True, True), # +Skycommand Burner/Air ## SKYBLE
         }
 
         # ADD DEVICE:
@@ -1183,9 +1191,10 @@ class tgraphcanvas(QObject):
             175, # Thermoworks BlueDOT
             176, # Aillio Bullet R2
             194, # +Yocto Meteo Hum/Temp
-            195  # +Yocto Meteo Pressure
+            195, # +Yocto Meteo Pressure
+            207,  # Skywalker BT/ET ## CYBER ## Cyberroaster is BLE (nonserial)
+            209, # SkyBLE BT/ET ## SKYBLE ## Skywalker V2 through SkyBLE dongle
         ]
-
 
         # ADD DEVICE:
         # ids of special devices certain input filters should not be applied
@@ -13260,6 +13269,22 @@ class tgraphcanvas(QObject):
                         disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('Santoker R'),True,None))
                     self.aw.santokerR.setLogging(self.device_logging)
                     self.aw.santokerR.start(case_sensitive=False)
+                elif self.device == 207:
+                    ## CYBER ## connect Skywalker V2 (Cyberroaster)
+                    from artisanlib.skywalker import Skywalker
+                    self.aw.skywalker = Skywalker(
+                        connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('Skywalker'),True,None),
+                        disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('Skywalker'),True,None))
+                    self.aw.skywalker.setLogging(self.device_logging)
+                    self.aw.skywalker.start(case_sensitive=False)
+                elif self.device == 209:
+                    ## SKYBLE ## connect Skywalker V2 through BLE (SkyBLE)
+                    from artisanlib.skyble import SkyBLE
+                    self.aw.skyble = SkyBLE(
+                        connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('SkyBLE'),True,None),
+                        disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('SkyBLE'),True,None))
+                    self.aw.skyble.setLogging(self.device_logging)
+                    self.aw.skyble.start(case_sensitive=False)
                 elif self.device == 175:
                     # connect Thermoworks BlueDOT
                     from artisanlib.bluedot import BlueDOT
@@ -13468,6 +13493,16 @@ class tgraphcanvas(QObject):
                 if not bool(self.aw.simulator) and self.device == 171 and self.aw.santokerR is not None:
                     self.aw.santokerR.stop()
                     self.aw.santokerR = None
+
+                ## CYBER ## disconnect Skywalker V2 (Cyberroaster)
+                if not bool(self.aw.simulator) and self.device == 207 and self.aw.skywalker is not None:
+                    self.aw.skywalker.stop()
+                    self.aw.skywalker = None
+
+                ## SKYBLE ## disconnect Skywalker V2 through BLE (SkyBLE)
+                if not bool(self.aw.simulator) and self.device == 209 and self.aw.skyble is not None:
+                    self.aw.skyble.stop()
+                    self.aw.skyble = None
 
                 if self.aw.lebrew_roastseeNEXT is not None:
                     self.aw.lebrew_roastseeNEXT.stop()

@@ -23,8 +23,10 @@ environment:
   PYUPGRADE_WIN_VER: 3.14.6
   #PYUPGRADE_MACOS_V: 3.12.1  # when upgrading see the notes in the deploy phase
 
-  ARTISAN_KEY:
-    secure: 4BswEsF7OdFwgn3gMbnjkmCyAfJtmnak+3rmXzggbpitK0txN22SERo/sIh3wxse1L3rFDIPc+NDEEagMTFsODcmM8/gsclDbeJA4S5UTIY=
+  ## CYBER ## ARTISAN_KEY and GITHUB_TOKEN are set as secure variables in this
+  ## CYBER ## fork's AppVeyor *project settings* (Settings -> Environment), not
+  ## CYBER ## here. The upstream `secure:` blob is account-bound to Marko and
+  ## CYBER ## cannot decrypt on the fork account. See CI-SETUP.md (local doc).
 
   matrix:
   - job_name: windows

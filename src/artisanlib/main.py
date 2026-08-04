@@ -168,6 +168,8 @@ if TYPE_CHECKING:
     from artisanlib.weblcds import WebLCDs, WebGreen, WebRoasted # pylint: disable=unused-import
     from artisanlib.santoker import Santoker # pylint: disable=unused-import
     from artisanlib.santoker_r import SantokerR # pylint: disable=unused-import
+    from artisanlib.skywalker import Skywalker # pylint: disable=unused-import ## CYBER ##
+    from artisanlib.skyble import SkyBLE # pylint: disable=unused-import ## SKYBLE ##
     from artisanlib.lebrew import Lebrew_RoastSeeNEXT # pylint: disable=unused-import
     from artisanlib.bluedot import BlueDOT # pylint: disable=unused-import
     from artisanlib.mugma import Mugma # pylint: disable=unused-import
@@ -1791,6 +1793,11 @@ class ApplicationWindow(QMainWindow):
 
         # Santoker R
         self.santokerR:SantokerR|None = None # holds the Santoker R instance created on connect; reset to None on disconnect
+
+        ## CYBER ## Skywalker V2 (Cyberroaster)
+        self.skywalker:Skywalker|None = None # holds the Skywalker instance created on connect; reset to None on disconnect
+        ## SKYBLE ## Skywalker V2 (Cyberroaster)
+        self.skyble:SkyBLE|None = None # holds the Skycommand BLE instance created on connect; reset to None on disconnect
 
         # Lebrew RoastSee NEXT
         self.lebrew_roastseeNEXT:Lebrew_RoastSeeNEXT|None = None # holds the Lebrew RoastSeeNEXT instance; reset to None on disconnect
@@ -9468,6 +9475,42 @@ class ApplicationWindow(QMainWindow):
                                             if len(bts)>0:
                                                 self.santokerSendMessageSignal.emit(bts[0:1], int(round(fv)))
 
+                                ##  skywalker(<command>,<value>) : raw TC4 command to the Cyberroaster (OT1=burner, OT2=airflow, OT3=drum)  ## CYBER ##
+                                ##     ex: skywalker(OT1,50) => burner to 50% ; skywalker(OT2, _) => airflow to slider value
+                                elif c.startswith('skywalker'):
+                                    if self.skywalker is not None:
+                                        args = c[len('skywalker'):].strip()
+                                        if args.startswith('(') and args.endswith(')'):
+                                            inner = args[1:-1].strip()
+                                            comma_pos = inner.find(',')
+                                            if comma_pos > 0:
+                                                target = inner[:comma_pos].strip()
+                                                vs = inner[comma_pos+1:].strip()
+                                                try:
+                                                    # <value> can be a formula like "100 - _" or "_"
+                                                    vs = str(eval(vs[:eval_limit])) # pylint: disable=eval-used
+                                                except Exception:  # pylint: disable=broad-except
+                                                    pass
+                                                self.skywalker.send_command(f'{target},{vs}')
+
+                                ##  skycommand(<command>,<value>) : raw TC4 command to the Cyberroaster (OT1=burner, OT2=airflow, OT3=drum)  ## SKYBLE ##
+                                ##     ex: skycommand(OT1,50) => burner to 50% ; skycommand(OT2, _) => airflow to slider value
+                                elif c.startswith('skycommand'):
+                                    if self.skyble is not None:
+                                        args = c[len('skycommand'):].strip()
+                                        if args.startswith('(') and args.endswith(')'):
+                                            inner = args[1:-1].strip()
+                                            comma_pos = inner.find(',')
+                                            if comma_pos > 0:
+                                                target = inner[:comma_pos].strip()
+                                                vs = inner[comma_pos+1:].strip()
+                                                try:
+                                                    # <value> can be a formula like "100 - _" or "_"
+                                                    vs = str(eval(vs[:eval_limit])) # pylint: disable=eval-used
+                                                except Exception:  # pylint: disable=broad-except
+                                                    pass
+                                                self.skyble.send_command(f'{target},{vs}')
+
                                 ##  kaleido(<target>,<value>) : the <target> string indicates where <value> of type string should be written to
                                 elif c.startswith('kaleido'):
                                     if self.kaleido is not None:
@@ -9475,7 +9518,7 @@ class ApplicationWindow(QMainWindow):
                                         if args.startswith('(') and args.endswith(')'):
                                             comma_pos = args.index(',')
                                             target = args[1:comma_pos].strip()
-                                            vs:str = args[comma_pos+1:-1].strip()
+                                            vs = args[comma_pos+1:-1].strip()
                                             try:
                                                 # <value> can be a formula like "1 - _" or "1 - $"
                                                 vs = str(eval(vs[:eval_limit])) # pylint: disable=eval-used
@@ -21502,6 +21545,10 @@ class ApplicationWindow(QMainWindow):
                 # disconnect Santoker R
                 self.santokerR.stop()
                 self.santokerR = None
+            elif self.qmc.device == 207 and self.skywalker is not None:
+                ## CYBER ## disconnect Skywalker V2 (Cyberroaster)
+                self.skywalker.stop()
+                self.skywalker = None
             elif self.qmc.device == 175 and self.thermoworksBlueDOT is not None:
                 # disconnect BlueDOT
                 self.thermoworksBlueDOT.stop()

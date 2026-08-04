@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -c ' *)",
+      "Bash(.venv/bin/python --version)",
+      "Bash(.venv/bin/python -c \"import sys; print\\(sys.executable\\); print\\(sys.base_prefix\\)\")",
+      "Bash(../.venv/bin/python -c ' *)",
+      "Bash(./.venv/bin/python -c ' *)",
+      "Bash(python3 -m py_compile help/eventbuttons_help.py help/eventsliders_help.py)",
+      "Bash(git commit *)",
+      "Bash(git rebase *)",
+      "Bash(python3 tools/check_cyber_indices.py)",
+      "Bash(echo \"exit=$?\")",
+      "Bash(git fetch *)"
+    ]
+  }
+}

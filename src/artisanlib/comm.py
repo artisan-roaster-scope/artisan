@@ -591,7 +591,11 @@ class serialport:
                                    self.MQTT_56,                     #203
                                    self.MQTT_78,                     #204
                                    self.MQTT_910,                    #205
-                                   self.MQTT_1112                    #206
+                                   self.MQTT_1112,                   #206
+                                   self.SKYWALKER_BTET,              #207 ## CYBER ## index must == device id
+                                   self.SKYWALKER_PF,                #208 ## CYBER ## burner/airflow echoes
+                                   self.SKYBLE_BTET,                 #209 ## SKYBLE ## index must == device id
+                                   self.SKYBLE_PF,                   #210 ## SKYBLE ## burner/airflow echoes
                                    ]
         #string with the name of the program for device #27
         self.externalprogram:str = 'test.py'
@@ -2016,6 +2020,52 @@ class serialport:
     def MQTT_1112(self) -> tuple[float,float,float]:
         tx,t2,t1 = self.MQTTread(4)
         return tx,t2,t1
+
+    ## CYBER ## Skywalker V2 (Cyberroaster) BT/ET reader, device id 207
+    def SKYWALKER_BTET(self) -> tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        if self.aw.skywalker is not None:
+            t2,t1 = self.aw.skywalker.getBTET() # (BT, ET)
+            if self.aw.qmc.mode == 'F':
+                t1 = fromCtoFstrict(t1)
+                t2 = fromCtoFstrict(t2)
+        else:
+            t1 = t2 = -1
+        return tx,t1,t2 # time, ET (chan2), BT (chan1)
+
+    ## CYBER ## Skywalker V2 (Cyberroaster) burner/airflow echoes, device id 208
+    def SKYWALKER_PF(self) -> tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        if self.aw.skywalker is not None:
+            t2,t1 = self.aw.skywalker.getPF() # (burner, airflow)
+        else:
+            t1 = t2 = -1
+        return tx,t1,t2 # time, Airflow (chan2), Burner (chan1)
+
+    ## SKYBLE ## Skywalker V2 (Cyberroaster) BT/ET reader, device id 207
+    def SKYBLE_BTET(self) -> tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        if self.aw.skyble is not None:
+            _log.error('SKYBLE_BTET() reading BT/ET from Skycommand device')
+            t2,t1 = self.aw.skyble.getBTET() # (BT, ET)
+            _log.error('SKYBLE_BTET() reading BT/ET from Skycommand device: BT=%s, ET=%s', t2, t1)
+            if self.aw.qmc.mode == 'F':
+                t1 = fromCtoFstrict(t1)
+                t2 = fromCtoFstrict(t2)
+        else:
+            t1 = t2 = -1
+        return tx,t1,t2 # time, ET (chan2), BT (chan1)
+
+    ## SKYBLE ## Skywalker V2 (Cyberroaster) burner/airflow echoes, device id 208
+    def SKYBLE_PF(self) -> tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        if self.aw.skyble is not None:
+            _log.error('SKYBLE_PF() reading burner/airflow from Skycommand device')
+            t2,t1 = self.aw.skyble.getPF() # (burner, airflow)
+            _log.error('SKYBLE_PF() reading burner/airflow from Skycommand device: Burner=%s, Airflow=%s', t2, t1)
+        else:
+            t1 = t2 = -1
+        return tx,t1,t2 # time, Airflow (chan2), Burner (chan1)
 
 #
 
