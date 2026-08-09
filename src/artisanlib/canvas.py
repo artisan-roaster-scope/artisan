@@ -1016,6 +1016,7 @@ class tgraphcanvas(QObject):
                        '+MQTT 78',                   #204
                        '+MQTT 910',                  #205
                        '+MQTT 1112',                 #206
+                       '+MODBUS 1112',               #207
                        ]
 
         # ADD DEVICE:
@@ -4492,10 +4493,9 @@ class tgraphcanvas(QObject):
             _log.exception(e)
 
 
-    # ADD DEVICE:
-
     # returns True if the extra device n, channel c, is of type MODBUS or S7, has no factor defined, nor any math formula, and is of type int
     # channel c is either 0 or 1
+    # ADD DEVICE:
     @functools.cache # noqa: B019 # pylint: disable=W1518 # Not relevant here, as qmc is only created once: [B019] Use of `functools.lru_cache` or `functools.cache` on methods can lead to memory leaks
     def intChannel(self, n:int, c:int) -> bool:
         if len(self.extradevices) > n:
@@ -4505,7 +4505,7 @@ class tgraphcanvas(QObject):
             if c == 1:
                 no_math_formula_defined = bool(self.extramathexpression2[n] == '')
             # MODBUS channels
-            for idx, dev_type in enumerate([29,33,55,109,150]): # MODBUS, MODBUS_34, MODBUS_56, MODBUS_78, MODBUS_910
+            for idx, dev_type in enumerate([29,33,55,109,150,207]): # MODBUS, MODBUS_34, MODBUS_56, MODBUS_78, MODBUS_910, MODBUS_1112
                 if self.extradevices[n] == dev_type:
                     return ((self.aw.modbus.inputFloatsAsInt[idx*2 + c] or self.aw.modbus.inputBCDsAsInt[idx*2 + c] or not self.aw.modbus.inputFloats[idx*2 + c]) and
                         self.aw.modbus.inputDivs[idx*2 + c] == 0 and
@@ -5531,7 +5531,7 @@ class tgraphcanvas(QObject):
                 if i < self.aw.nLCDS:
                     try:
                         extra1_value = resLCD
-                        if idx is not None and XTs1[i] and idx < len(XTs1[i]):
+                        if idx is not None and i < len(XTs1) and idx < len(XTs1[i]):
                             fmt = lcdformat
                             v = float(XTs1[i][idx])
                             if v != -1:
@@ -5553,7 +5553,7 @@ class tgraphcanvas(QObject):
                         self.aw.extraLCD1[i].display(extra1_value)
                     try:
                         extra2_value = resLCD
-                        if idx is not None and XTs2[i] and idx < len(XTs2[i]):
+                        if idx is not None and i < len(XTs2) and idx < len(XTs2[i]):
                             fmt = lcdformat
                             v = float(XTs2[i][idx])
                             if v != -1:
@@ -9275,9 +9275,9 @@ class tgraphcanvas(QObject):
 
                     decay_smoothing_p = (not self.optimalSmoothing) or self.flagon
 
-                    scale = 1 if self.graphstyle == 1 else 0
-                    length = 700 # 100 (128 the default)
-                    randomness = 12 # 2 (16 default)
+                    scale = 1.5 if self.graphstyle == 1 else 0
+                    length = 800 # 100 (128 the default)
+                    randomness = 16 # 2 (16 default)
                     rcParams['path.sketch'] = (scale, length, randomness)
 
                     # if no axis are set, we need to forceRenewAxis in any case
@@ -12574,7 +12574,6 @@ class tgraphcanvas(QObject):
                 self.EvalueColor = self.EvalueColor_default.copy()
                 self.EvalueTextColor = self.EvalueTextColor_default.copy()
                 self.aw.sendmessage(QApplication.translate('Message','Colors set to defaults'))
-#                self.aw.closeEventSettings()
 
         elif color == 2:
             self.aw.sendmessage(QApplication.translate('Message','Colors set to grey'))
@@ -12596,7 +12595,6 @@ class tgraphcanvas(QObject):
             self.backgroundxtcolor      = self.aw.convertToGreyscale(self.backgroundxtcolor)
             self.backgroundytcolor      = self.aw.convertToGreyscale(self.backgroundytcolor)
             self.aw.setLCDsBW()
-#            self.aw.closeEventSettings()
 
         elif color == 3:
             from artisanlib.colors import graphColorDlg
@@ -12640,23 +12638,15 @@ class tgraphcanvas(QObject):
                 self.backgrounddeltabtcolor = str(dialog.bgdeltabtButton.text())
                 self.backgroundxtcolor = str(dialog.bgextraButton.text())
                 self.backgroundytcolor = str(dialog.bgextra2Button.text())
-#                self.aw.closeEventSettings()
-
-#            #deleteLater() will not work here as the dialog is still bound via the parent
-#            #dialog.deleteLater() # now we explicitly allow the dialog an its widgets to be GCed
-#            # the following will immediately release the memory despite this parent link
-#            QApplication.processEvents() # we ensure events concerning this dialog are processed before deletion
-#            try: # sip not supported on older PyQt versions (RPi!)
-#                sip.delete(dialog)
-#                #print(sip.isdeleted(dialog))
-#            except Exception:  # pylint: disable=broad-except
-#                pass
+                # release the dialog
+                dialog.destroy()
+                del dialog
 
         #update screen with new colors
         self.aw.updateCanvasColors()
         self.aw.applyStandardButtonVisibility()
         self.aw.update_extraeventbuttons_visibility()
-        self.fig.canvas.draw_idle() #.redraw()
+        self.fig.canvas.draw_idle()
 
     def clearFlavorChart(self) -> None:
         self.flavorchart_plotf = None
@@ -12950,6 +12940,7 @@ class tgraphcanvas(QObject):
     # indicating which curves should not be temperature converted
     # True indicates a non-temperature device (data should not be converted)
     # False indicates a temperature device (data should be converted if temperature unit changes)
+    # ADD DEVICE:
     def generateNoneTempHints(self) -> None:
         self.extraNoneTempHint1 = []
         self.extraNoneTempHint2 = []
@@ -12969,6 +12960,12 @@ class tgraphcanvas(QObject):
             elif d == 109: # +MODBUS 78
                 self.extraNoneTempHint1.append(self.aw.modbus.inputModes[6] == '')
                 self.extraNoneTempHint2.append(self.aw.modbus.inputModes[7] == '')
+            elif d == 150: # +MODBUS 910
+                self.extraNoneTempHint1.append(self.aw.modbus.inputModes[8] == '')
+                self.extraNoneTempHint2.append(self.aw.modbus.inputModes[9] == '')
+            elif d == 207: # +MODBUS 1112
+                self.extraNoneTempHint1.append(self.aw.modbus.inputModes[10] == '')
+                self.extraNoneTempHint2.append(self.aw.modbus.inputModes[11] == '')
             elif d == 79: # S7
                 self.extraNoneTempHint1.append(not bool(self.aw.s7.mode[0]))
                 self.extraNoneTempHint2.append(not bool(self.aw.s7.mode[1]))
@@ -12999,9 +12996,6 @@ class tgraphcanvas(QObject):
             elif d == 119: # +WebSocket 910
                 self.extraNoneTempHint1.append(not bool(self.aw.ws.channel_modes[8]))
                 self.extraNoneTempHint2.append(not bool(self.aw.ws.channel_modes[9]))
-            elif d == 150: # +MODBUS 910
-                self.extraNoneTempHint1.append(self.aw.modbus.inputModes[8] == '')
-                self.extraNoneTempHint2.append(self.aw.modbus.inputModes[9] == '')
             elif d == 151: # +S7 1112
                 self.extraNoneTempHint1.append(not bool(self.aw.s7.mode[10]))
                 self.extraNoneTempHint2.append(not bool(self.aw.s7.mode[11]))

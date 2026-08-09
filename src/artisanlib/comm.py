@@ -591,7 +591,8 @@ class serialport:
                                    self.MQTT_56,                     #203
                                    self.MQTT_78,                     #204
                                    self.MQTT_910,                    #205
-                                   self.MQTT_1112                    #206
+                                   self.MQTT_1112,                   #206
+                                   self.MODBUS_1112,                 #207
                                    ]
         #string with the name of the program for device #27
         self.externalprogram:str = 'test.py'
@@ -1663,6 +1664,9 @@ class serialport:
 
     def MODBUS_910(self) -> tuple[float,float,float]:
         return self.aw.extraMODBUStx,self.aw.extraMODBUStemps[9],self.aw.extraMODBUStemps[8]
+
+    def MODBUS_1112(self) -> tuple[float,float,float]:
+        return self.aw.extraMODBUStx,self.aw.extraMODBUStemps[11],self.aw.extraMODBUStemps[10]
 
     def HH802U(self) -> tuple[float,float,float]:
         tx = self.aw.qmc.timeclock.elapsedMilli()

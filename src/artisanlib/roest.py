@@ -467,6 +467,19 @@ class ROESTdialog(ArtisanDialog):
             cancelAction.setShortcut(QKeySequence.StandardKey.Cancel)
             self.cancel_button.addActions([cancelAction])
 
+        lineEditstyle = """
+            QLineEdit {
+                border-radius: 10px;
+                padding: 5px;
+                border-color: palette(window);
+                border-width: 2px;
+                border-style: solid;
+                background-color: palette(base);
+            }
+            QLineEdit:focus {
+                border-color: palette(Accent);
+            }
+        """
 
         self.labelTitle:QLabel = QLabel('ROEST')
 
@@ -474,11 +487,13 @@ class ROESTdialog(ArtisanDialog):
         self.textClientId.setMinimumWidth(300)
         self.textClientId.setPlaceholderText('Client Id')
         self.textClientId.setText(self.client_id)
+        self.textClientId.setStyleSheet(lineEditstyle)
 
         self.textClientSecret:QLineEdit = QLineEdit(self)
         self.textClientSecret.setPlaceholderText('Secret')
         self.textClientSecret.setEchoMode(QLineEdit.EchoMode.PasswordEchoOnEdit)
         self.textClientSecret.setText(self.client_secret)
+        self.textClientSecret.setStyleSheet(lineEditstyle)
 
         self.textClientId.textChanged.connect(self.textChanged)
         self.textClientSecret.textChanged.connect(self.textChanged)
@@ -582,10 +597,13 @@ def selectROESTmachine(aw:'ApplicationWindow') -> RoestMachine|None:
     global clientId, clientSecret # pylint:disable=global-statement
     rd = ROESTdialog(aw, clientId, clientSecret)
     rd.setWindowFlags(Qt.WindowType.Sheet)
-    rd.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose, True)
+    rd.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose, False)
     if rd.exec():
         # login dialog not canceled
         clientId = rd.client_id
         clientSecret = rd.client_secret
-        return rd.selected_machine
+        selected_machine = rd.selected_machine
+        rd.destroy()
+        del rd
+        return selected_machine
     return None

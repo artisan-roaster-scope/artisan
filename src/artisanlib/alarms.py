@@ -44,6 +44,7 @@ from artisanlib.util import deltaLabelUTF8, comma2dot, float2float, deserialize
 from artisanlib.dialogs import ArtisanResizeablDialog
 from artisanlib.widgets import (MyQComboBox, MyTableWidgetItemNumber, MyTableWidgetItemQCheckBox,
                                 MyTableWidgetItemQComboBox, MyTableWidgetItemQLineEdit, MyTableWidgetItemQTime)
+from artisanlib.table_style import horizontal_header_style
 
 
 from PyQt6.QtCore import (Qt, pyqtSlot, QSettings, QTimer)
@@ -79,6 +80,9 @@ class AlarmDlg(ArtisanResizeablDialog):
 
         #table for alarms
         self.alarmtable = QTableWidget()
+        horizontal_header = self.alarmtable.horizontalHeader()
+        if horizontal_header is not None:
+            horizontal_header.setStyleSheet(horizontal_header_style(self.aw.app.darkmode))
         self.alarmtable.itemSelectionChanged.connect(self.selectionChanged)
         allonButton = QPushButton(QApplication.translate('Button','All On'))
         allonButton.clicked.connect(self.alarmsAllOn)

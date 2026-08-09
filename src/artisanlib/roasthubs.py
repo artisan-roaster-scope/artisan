@@ -178,6 +178,19 @@ class RoastHubsdialog(ArtisanDialog):
             cancelAction.setShortcut(QKeySequence.StandardKey.Cancel)
             self.cancel_button.addActions([cancelAction])
 
+        lineEditstyle = """
+            QLineEdit {
+                border-radius: 10px;
+                padding: 5px;
+                border-color: palette(window);
+                border-width: 2px;
+                border-style: solid;
+                background-color: palette(base);
+            }
+            QLineEdit:focus {
+                border-color: palette(Accent);
+            }
+        """
 
         self.labelTitle:QLabel = QLabel('RoastHubs')
 
@@ -185,16 +198,19 @@ class RoastHubsdialog(ArtisanDialog):
         self.textOrgId.setMinimumWidth(300)
         self.textOrgId.setPlaceholderText(QApplication.translate('Label','Organization ID'))
         self.textOrgId.setText(self.org_id)
+        self.textOrgId.setStyleSheet(lineEditstyle)
 
         self.textMachineId:QLineEdit = QLineEdit(self)
         self.textMachineId.setMinimumWidth(300)
         self.textMachineId.setPlaceholderText(QApplication.translate('Label','Machine ID'))
         self.textMachineId.setText(self.machine_id)
+        self.textMachineId.setStyleSheet(lineEditstyle)
 
         self.textSecret:QLineEdit = QLineEdit(self)
         self.textSecret.setPlaceholderText(QApplication.translate('Label','Token'))
         self.textSecret.setEchoMode(QLineEdit.EchoMode.Password)
         self.textSecret.setText(self.token)
+        self.textSecret.setStyleSheet(lineEditstyle)
 
 
         #
@@ -259,12 +275,14 @@ def setRoastHubsCredentials(aw:'ApplicationWindow', org_id:str, machine_id:str, 
 def configureConnection(aw:'ApplicationWindow') -> bool:
     rd = RoastHubsdialog(aw)
     rd.setWindowFlags(Qt.WindowType.Sheet)
-    rd.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose, True)
+    rd.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose, False)
     if rd.exec():
         # login dialog not canceled
         try:
             setRoastHubsCredentials(aw, rd.org_id, rd.machine_id, rd.token)
         except Exception as e:  # pylint: disable=broad-except
             _log.exception(e)
+        rd.destroy()
+        del rd
         return True
     return False

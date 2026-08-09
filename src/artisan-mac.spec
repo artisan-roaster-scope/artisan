@@ -277,6 +277,7 @@ Qt_modules = [
     'QtNetwork',
     'QtDBus',
     'QtPdf',
+    'QtSvgWidgets',
 ]
 Qt_frameworks = [module + '.framework' for module in Qt_modules]
 

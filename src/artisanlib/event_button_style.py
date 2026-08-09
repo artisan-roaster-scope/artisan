@@ -25,6 +25,11 @@
 from artisanlib.util import createGradient
 
 artisan_event_button_style: str = """
+            QFrame {{
+                background-color: {background_color};
+                border-width: 0px;
+            }}
+
             EventPushButton {{
                 min-width: {min_width}px;
                 min-height: {min_height}px;

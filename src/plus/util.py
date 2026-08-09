@@ -439,9 +439,10 @@ def schedulerLink() -> str:
 
 # HiRes plus QMessageBox icon
 
-def setPlusIcon(mbox:'QMessageBox') -> None:
+def setPlusIcon(mbox:'QMessageBox', darkmode:bool=False) -> None:
     basedir = os.path.join(getResourcePath(),'Icons')
-    p = os.path.join(basedir, 'artisan-notification.svg')
+#    p = os.path.join(basedir, 'artisan-notification.svg')
+    p = os.path.join(basedir, ('plus-connected.svg' if darkmode else 'white_plus-connected.svg'))
     app_style:QStyle|None = QApplication.style()
     if app_style is not None:
         icon_size = app_style.pixelMetric(QStyle.PixelMetric.PM_MessageBoxIconSize)

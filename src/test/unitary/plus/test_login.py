@@ -170,7 +170,7 @@ class MockArtisanDialog:
 class MockQLabel:
     def __init__(self, *_args: Any) -> None:
         self.setOpenExternalLinks = Mock()
-
+        self.setStyleSheet = Mock()
 
 class MockQLineEdit:
     def __init__(self, *_args: Any) -> None:
@@ -179,6 +179,8 @@ class MockQLineEdit:
         self.setText = Mock()
         self.text = Mock(return_value='')
         self.textChanged = Mock()
+        self.setMinimumWidth = Mock()
+        self.setStyleSheet = Mock()
 
     class EchoMode:
         Password = 1
@@ -203,6 +205,7 @@ class MockQLayout:
         self.addStretch = Mock()
         self.setContentsMargins = Mock()
         self.setSpacing = Mock()
+        self.addSpacing = Mock()
 
 
 with patch('PyQt6.QtWidgets.QApplication', MockQApplication), patch(
@@ -378,7 +381,6 @@ class TestLoginDialogInitialization:
             mock_super_init.assert_called_once_with(mock_parent_widget, mock_app_window)
             assert dialog.login is None
             assert dialog.passwd is None
-            assert dialog.remember is True  # Default value
 
     def test_login_dialog_init_with_email(self, mock_parent_widget:Mock, mock_app_window:Mock) -> None:
         """Test Login dialog initialization with email parameter."""
@@ -395,7 +397,6 @@ class TestLoginDialogInitialization:
             mock_super_init.assert_called_once_with(mock_parent_widget, mock_app_window)
             assert dialog.login is None
             assert dialog.passwd is None
-            assert dialog.remember is True
 
     def test_login_dialog_init_with_saved_password(
         self, mock_parent_widget:Mock, mock_app_window:Mock
@@ -417,19 +418,6 @@ class TestLoginDialogInitialization:
             mock_super_init.assert_called_once_with(mock_parent_widget, mock_app_window)
             assert dialog.passwd == test_password
 
-    def test_login_dialog_init_remember_credentials_false(
-        self, mock_parent_widget:Mock, mock_app_window:Mock
-    ) -> None:
-        """Test Login dialog initialization with remember_credentials=False."""
-        # Arrange
-        with patch('plus.login.ArtisanDialog.__init__') as mock_super_init:
-            mock_super_init.return_value = None
-
-            # Act
-            dialog = login.Login(mock_parent_widget, mock_app_window, remember_credentials=False)
-
-            # Assert
-            assert dialog.remember is False
 
     def test_login_dialog_ui_components_created(self, mock_parent_widget:Mock, mock_app_window:Mock) -> None:
         """Test Login dialog creates all UI components."""
@@ -443,7 +431,7 @@ class TestLoginDialogInitialization:
             # Assert
             assert hasattr(dialog, 'textName')
             assert hasattr(dialog, 'textPass')
-            assert hasattr(dialog, 'rememberCheckbox')
+#            assert hasattr(dialog, 'rememberCheckbox')
             assert hasattr(dialog, 'linkRegister')
             assert hasattr(dialog, 'linkResetPassword')
 
@@ -555,32 +543,6 @@ class TestLoginDialogValidation:
 
 class TestLoginDialogEventHandlers:
     """Test Login dialog event handlers."""
-
-    def test_remember_check_changed_true(self, mock_parent_widget:Mock, mock_app_window:Mock) -> None:
-        """Test rememberCheckChanged sets remember to True."""
-        # Arrange
-        with patch('plus.login.ArtisanDialog.__init__') as mock_super_init:
-            mock_super_init.return_value = None
-            dialog = login.Login(mock_parent_widget, mock_app_window)
-
-            # Act
-            dialog.rememberCheckChanged(1)  # Checked state
-
-            # Assert
-            assert dialog.remember is True
-
-    def test_remember_check_changed_false(self, mock_parent_widget:Mock, mock_app_window:Mock) -> None:
-        """Test rememberCheckChanged sets remember to False."""
-        # Arrange
-        with patch('plus.login.ArtisanDialog.__init__') as mock_super_init:
-            mock_super_init.return_value = None
-            dialog = login.Login(mock_parent_widget, mock_app_window)
-
-            # Act
-            dialog.rememberCheckChanged(0)  # Unchecked state
-
-            # Assert
-            assert dialog.remember is False
 
     def test_text_changed_valid_input(self, mock_parent_widget:Mock, mock_app_window:Mock) -> None:
         """Test textChanged enables OK button for valid input."""
@@ -704,7 +666,7 @@ class TestPlusLoginFunction:
             mock_dialog.setWindowTitle.assert_called_once_with('plus')
             mock_dialog.setWindowFlags.assert_called_once_with(MockQt.WindowType.Sheet)
             mock_dialog.setAttribute.assert_called_once_with(
-                MockQt.WidgetAttribute.WA_DeleteOnClose, True
+                MockQt.WidgetAttribute.WA_DeleteOnClose, False
             )
             mock_dialog.exec.assert_called_once()
 
@@ -732,7 +694,7 @@ class TestPlusLoginFunction:
             # Assert
             assert result_login == 'user@example.com'
             assert result_passwd == 'password123'
-            assert result_remember is False
+#            assert result_remember is False
             assert result_code == 0
 
     def test_plus_login_none_login(self, mock_parent_widget:Mock, mock_app_window:Mock) -> None:
@@ -872,23 +834,6 @@ class TestLoginDialogUIComponents:
             mock_email_field.setPlaceholderText.assert_called()
             mock_email_field.textChanged.connect.assert_called()
             mock_email_field.setText.assert_called_with('test@example.com')
-
-    def test_remember_checkbox_setup(self, mock_parent_widget:Mock, mock_app_window:Mock) -> None:
-        """Test remember checkbox is configured with proper state and handler."""
-        # Arrange
-        with patch('plus.login.ArtisanDialog.__init__') as mock_super_init, patch(
-            'plus.login.QCheckBox'
-        ) as mock_qcheckbox_class:
-            mock_super_init.return_value = None
-            mock_checkbox = Mock()
-            mock_qcheckbox_class.return_value = mock_checkbox
-
-            # Act
-            login.Login(mock_parent_widget, mock_app_window, remember_credentials=False)
-
-            # Assert
-            mock_checkbox.setChecked.assert_called_with(False)
-            mock_checkbox.stateChanged.connect.assert_called()
 
     def test_button_state_with_saved_password(self, mock_parent_widget:Mock, mock_app_window:Mock) -> None:
         """Test button states are properly set when saved password is provided."""

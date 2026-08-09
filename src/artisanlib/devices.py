@@ -46,7 +46,7 @@ from artisanlib.util import (deltaLabelUTF8, setDeviceDebugLogLevel, argb_colorn
 from artisanlib.dialogs import ArtisanResizeablDialog, tareDlg
 from artisanlib.widgets import MyContentLimitedQComboBox, MyQComboBox, MyQDoubleSpinBox
 from artisanlib.scale import SUPPORTED_SCALES
-
+from artisanlib.table_style import horizontal_header_style, vertical_header_style
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
@@ -273,6 +273,32 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         ##########################    TAB 2  WIDGETS   "EXTRA DEVICES"
         #table for showing data
         self.devicetable = QTableWidget()
+
+# with this one loses the native macOS rectangular focus frames and native items on all cells
+#        self.devicetable.setStyleSheet("""
+#            QDialog QLineEdit {
+#                padding: 0 2px;
+#            }
+#            QTableWidget {
+#                background-color: palette(base);
+#                padding: 3px;
+#                border-radius: 10px;
+#                border-width: 2px;
+#                border-style: solid;
+#                border-color: palette(dark);
+#            }
+#            }
+#        """)
+#            self.devicetable.setStyleSheet("selection-background-color: transparent;") # avoid the selection color to shine through transparent device color items
+
+        horizontal_header = self.devicetable.horizontalHeader()
+        if horizontal_header is not None:
+            horizontal_header.setStyleSheet(horizontal_header_style(self.aw.app.darkmode))
+        vertical_header = self.devicetable.verticalHeader()
+        if vertical_header is not None:
+            vertical_header.setStyleSheet(vertical_header_style(self.aw.app.darkmode))
+            vertical_header.setDefaultAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
+
         self.devicetable.setTabKeyNavigation(True)
         self.copydeviceTableButton = QPushButton(QApplication.translate('Button', 'Copy Table'))
         self.copydeviceTableButton.setToolTip(QApplication.translate('Tooltip','Copy table to clipboard, OPTION or ALT click for tabular text'))
@@ -407,7 +433,6 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         phidget1048VBox.addStretch()
         phidget1048GroupBox = QGroupBox('1048/1051/TMP1100/TMP1101 TC')
         phidget1048GroupBox.setLayout(phidget1048VBox)
-        phidget1048GroupBox.setContentsMargins(0,0,0,0)
         phidget1048HBox.setContentsMargins(0,0,0,0)
         phidget1048VBox.setContentsMargins(0,0,0,0)
 
@@ -579,7 +604,6 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         phidget1046VBox.addStretch()
         phidget1046GroupBox = QGroupBox('1046 RTD / DAQ1500')
         phidget1046GroupBox.setLayout(phidget1046VBox)
-        phidget1046GroupBox.setContentsMargins(0,10,0,0)
         phidget1046HBox.setContentsMargins(0,0,0,0)
         phidget1046VBox.setContentsMargins(0,0,0,0)
 
@@ -786,7 +810,6 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
         phidget1200GroupBox = QGroupBox('TMP1200/1202 RTD')
         phidget1200GroupBox.setLayout(phidgetGroupBoxLayout)
-        phidget1200GroupBox.setContentsMargins(0,2,0,0) # left, top, right, bottom
 
 
         # DAQ1400 VI
@@ -825,7 +848,6 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
         phidget1400GroupBox = QGroupBox('DAQ1400 VI')
         phidget1400GroupBox.setLayout(phidget1400VBox)
-        phidget1400GroupBox.setContentsMargins(0,0,0,0)
         phidget1400VBox.setContentsMargins(0,0,0,0)
         phidget1400HBox.setContentsMargins(0,0,0,0)
 
@@ -2829,7 +2851,6 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.devicetable.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
             self.devicetable.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
 
-#            self.devicetable.setStyleSheet("selection-background-color: transparent;") # avoid the selection color to shine through transparent device color items
 
             self.devicetable.setShowGrid(True)
             vheader = self.devicetable.verticalHeader()
@@ -2878,10 +2899,14 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                         color2Button.setStyleSheet(f"selection-background-color: transparent; border: none; outline: none; background-color: rgba{ImageColor.getcolor(self.aw.qmc.extradevicecolor2[i], 'RGBA')}; color: {textcolor}")
                         # 3+4: name 1 + 2
                         name1edit = QLineEdit(self.aw.qmc.extraname1[i])
+                        name1edit.setTextMargins(3,0,3,0) # (left, top, right, bottom)
                         name2edit = QLineEdit(self.aw.qmc.extraname2[i])
+                        name2edit.setTextMargins(3,0,3,0) # (left, top, right, bottom)
                         # 5+6: math 1 + 2
                         mexpr1edit = QLineEdit(self.aw.qmc.extramathexpression1[i])
+                        mexpr1edit.setTextMargins(3,0,3,0) # (left, top, right, bottom)
                         mexpr2edit = QLineEdit(self.aw.qmc.extramathexpression2[i])
+                        mexpr2edit.setTextMargins(3,0,3,0) # (left, top, right, bottom)
                         mexpr1edit.setToolTip(QApplication.translate('Tooltip','Example: 100 + 2*x'))
                         mexpr2edit.setToolTip(QApplication.translate('Tooltip','Example: 100 + x'))
                         # 7: lcd 1
@@ -4630,6 +4655,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ##########################
                 ####  DEVICE 206 is +WebSocket 1112 but +DEVICE cannot be set as main device
                 ##########################
+                ##########################
+                ####  DEVICE 207 is +MODBUS 1112 but +DEVICE cannot be set as main device
+                ##########################
 
                 # ADD DEVICE:
 
@@ -4855,7 +4883,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 1, # 203
                 1, # 204
                 1, # 205
-                1  # 206
+                1, # 206
+                1  # 207
                 ]
             #init serial settings of extra devices
             for i, _ in enumerate(self.aw.qmc.extradevices):

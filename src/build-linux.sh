@@ -153,7 +153,7 @@ cp -R includes/Icons/* dist/Icons
 
 keep_qt_modules="libQt6Concurrent libQt6Core libQt6DBus libQt6Gui libQt6Network
  libQt6PrintSupport libQt6Svg libQt6WaylandClient libQt6WaylandEglClientHwIntegration
- libQt6Widgets libQt6WlShellIntegration libQt6XcbQpa "
+ libQt6Widgets libQt6WlShellIntegration libQt6XcbQpa libQt6SvgWidgets"
 
 
 

@@ -67,7 +67,7 @@ from functools import reduce as freduce
 
 
 
-##### BEGIN Profiling: use @profile annotations and check results using '# snakeviz *.profile'
+##### BEGIN Profiling: use @profile annotations and check results using '# snakeviz /users/luther/*.profile'
 #import cProfile
 #import pstats
 #from functools import wraps
@@ -87,7 +87,7 @@ from functools import reduce as freduce
 #        ps.dump_stats(f'/Users/luther/{datafn}')
 #        return retval
 #    return wrapper
-##### END Profiling
+#### END Profiling
 
 
 
@@ -113,16 +113,16 @@ from PyQt6.QtWidgets import (QApplication, QWidget, QMessageBox, QLabel, QMainWi
                          QInputDialog, QGroupBox, QLineEdit,
                          QSizePolicy, QVBoxLayout, QHBoxLayout, QPushButton,
                          QLCDNumber, QSpinBox, QComboBox,
-                         QSlider,
+                         QSlider, QToolButton,
                          QColorDialog, QFrame, QScrollArea, QProgressDialog,
                          QStyleFactory, QMenuBar, QMenu, QLayout, QDockWidget)
-from PyQt6.QtGui import (QScreen, QPageLayout, QAction, QImageReader, QWindow,
+from PyQt6.QtGui import (QScreen, QPageLayout, QAction, QWindow,
                             QKeySequence, QShortcut,
                             QPixmap,QColor,QDesktopServices,QIcon,
                             QRegularExpressionValidator, QDoubleValidator, QPainter, QCursor)
 from PyQt6.QtPrintSupport import (QPrinter,QPrintDialog)
-from PyQt6.QtCore import (QStandardPaths, QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, pyqtSignal, pyqtSlot, QtMsgType,
-                          qVersion, QVersionNumber, QTime, QTimer, QFile, QIODevice, QTextStream, QSettings,
+from PyQt6.QtCore import (QStandardPaths, QLibraryInfo, QTranslator, QLocale, QFileInfo, pyqtSignal, pyqtSlot, QtMsgType,
+                          qVersion, QVersionNumber, QTime, QTimer, QFile, QIODevice, QTextStream, QSettings, QSize,
                           QRegularExpression, QDate, QUrl, QUrlQuery, QDir, Qt, QPoint, QEvent, QDateTime, QThread, qInstallMessageHandler)
 from PyQt6.QtNetwork import QLocalSocket
 from PyQt6 import sip
@@ -142,7 +142,7 @@ with suppress_stdout_stderr():
 
 from matplotlib.backend_bases import _Mode as MPL_Mode # type:ignore[untyped-import,unused-ignore] # pylint: disable=import-private-name,unknown-option-value # @UnresolvedImport
 
-svgsupport = next((x for x in QImageReader.supportedImageFormats() if x == b'svg'),None)
+#svgsupport = next((x for x in QImageReader.supportedImageFormats() if x == b'svg'),None)
 
 from matplotlib.figure import Figure # type:ignore[untyped-import,unused-ignore]
 from matplotlib import rcParams, ticker # type:ignore[untyped-import,unused-ignore]
@@ -211,12 +211,6 @@ from artisanlib.util import (appFrozen, uchr, decodeLocal, decodeLocalStrict, en
 
 from artisanlib.qtsingleapplication import QtSingleApplication
 
-
-
-try:
-    from yoctopuce.yocto_api import YAPI # type: ignore[import-untyped]
-except ImportError:
-    pass
 
 # platform dependent imports:
 if sys.platform.startswith('darwin'):
@@ -566,6 +560,10 @@ app.setApplicationName(application_name)                                #needed 
 app.setOrganizationName(application_organization_name)                  #needed by QSettings() to store windows geometry in operating system
 app.setOrganizationDomain(application_organization_domain)              #needed by QSettings() to store windows geometry in operating system
 
+
+#app.setStyleSheet("") # setting any styleSheet on QApplication disables native dialogs on macOS
+
+
 if sys.platform.startswith('linux'):
     app.setDesktopFileName(application_desktop_file_name)
 
@@ -702,7 +700,8 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
         self.toolitems: list[tuple[str, ...] | tuple[None, ...]] = [ # zuban:ignore[assignment] # pyrefly:ignore[bad-override]
                 ('Plus', QApplication.translate('Tooltip', 'Connect to plus service'), 'plus', 'plus'),
                 ('', QApplication.translate('Tooltip', 'Subscription'), 'plus-pro', 'subscription'),
-                (QApplication.translate('Toolbar', 'Home'), QApplication.translate('Tooltip', 'Reset original view'), 'home', 'home'),
+                (None, None, None, None),
+                (QApplication.translate('Toolbar', 'Home'), QApplication.translate('Tooltip', 'Reset original view / activate follow mode'), 'home', 'home'),
                 (QApplication.translate('Toolbar', 'Back'), QApplication.translate('Tooltip', 'Back to  previous view'), 'back', 'back'),
                 (QApplication.translate('Toolbar', 'Forward'), QApplication.translate('Tooltip', 'Forward to next view'), 'forward', 'forward'),
                 (None, None, None, None),
@@ -741,26 +740,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
 # add green flag menu on matplotlib v2.0 and later
         self.edit_curve_parameters_action = None
 
-        # adjust for dark or light canvas and set hover/selection style
-        for a in self.actions():
-            if self.qmc.palette['canvas'] == 'None':
-                canvas_color = QColor('#ECECEC')
-            else:
-                canvas_color = QColor(self.qmc.palette['canvas'])
-            if canvas_color.name() == '#000000': # on black we start with (1,1,1) for lighter
-                canvas_color = QColor('#222222')
-
-            if self.white_icons:
-                selected_canvas_color = canvas_color.lighter(250)
-                border_color = '#ffffff'
-            else:
-                selected_canvas_color = canvas_color.darker(120)
-                border_color = '#000000'
-            self.widgetForAction(a).setStyleSheet(' \
-                    QToolButton:checked {border:1px solid transparent; margin: 1px; padding: 2px; background-color:' + selected_canvas_color.name() + ';border-radius: 3px;} \
-                    QToolButton:hover {border:1px solid ' + border_color + '; margin: 2px; padding: 2px; background-color:transparent;border-radius: 3px;} \
-                    QToolButton:checked:hover {border:1px solid ' + border_color + '; margin: 2px; padding: 2px; background-color:' + selected_canvas_color.name() + ';border-radius: 3px;} \
-                    QToolButton {border:1px solid transparent; margin: 2px; padding: 2px; background-color: transparent;border-radius: 3px;}')
+        self.setIconSize(QSize(35,35))
 
         self.aw.updatePlusStatus(self)
 
@@ -783,6 +763,9 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
             formlayout.fedit_org = formlayout.fedit # type: ignore[attr-defined]
             formlayout.fedit = self.my_fedit  # pyright:ignore[reportPrivateImportUsage]
 
+        toolbar_ext_button = self.findChild(QToolButton, 'qt_toolbar_ext_button')
+        if toolbar_ext_button:
+            toolbar_ext_button.setIcon(self._icon('ext_button'))
 
 #######################################################################################
 #####   temporary hack for windows till better solution found about toolbar icon problem with py2exe and svg
@@ -1001,39 +984,20 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
 
     @override
     def _icon(self, name:str) -> QIcon:
-        if name.startswith('plus') or self.white_icons:
-            basedir = os.path.join(getResourcePath(),'Icons')
-        else:
-            basedir = os.path.join(mpl.get_data_path(), 'images')
+        basedir = os.path.join(getResourcePath(),'Icons')
         if (self.white_icons and not name.startswith('plus')) or not self.white_icons and name.startswith('plus'):
             name = 'white_' + name
-        #dirty hack to prefer .svg over .png Toolbar icons
-        if not svgsupport:
-            name = name.replace('.svg','.png')
-        else:
-            name = name.replace('.png','.svg')
-        # large png icons introduced in MPL 2.1
-        name = name.replace('.png', '_large.png')
+#        #dirty hack to prefer .svg over .png Toolbar icons
+#        if not svgsupport:
+#            name = name.replace('.svg','.png')
+#        else:
+#            name = name.replace('.png','.svg')
+        name = name.replace('.png','.svg')
         p = os.path.join(basedir, name)
         pm = QPixmap(p)
-#        if not name.startswith('plus') and not name.startswith('white_plus'):
-#            if self.white_icons:
-#                pm = self.recolorIcon(pm, QColor('#dfdfdf'))
-#            else:
-#                pm = self.recolorIcon(pm, QColor('#424242'))
         if hasattr(pm, 'setDevicePixelRatio'):
             pm.setDevicePixelRatio(self.devicePixelRatioF() or 1) # pyright:ignore[reportUnknownArgumentType]
-
         return QIcon(pm)
-
-#    @staticmethod
-#    def recolorIcon(pixmap:QPixmap, color:QColor) -> QPixmap:
-#        tmp = pixmap.toImage()
-#        for y in range(tmp.height()):
-#            for x in range(tmp.width()):
-#                color.setAlpha(tmp.pixelColor(x,y).alpha())
-#                tmp.setPixelColor(x,y,color)
-#        return QPixmap.fromImage(tmp)
 
     def update_message(self) -> None:
         if not self.qmc.twoAxisMode():
@@ -1222,15 +1186,15 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
 #                subscription_message_box = ArtisanMessageBox(self.aw, QApplication.translate('Message', 'Subscription'), message)
                 subscription_message_box = QMessageBox() # only without super this one shows the native dialog on macOS under Qt 6.6.2
 #                subscription_message_box.setTextFormat(Qt.TextFormat.RichText)
-                plus.util.setPlusIcon(subscription_message_box)
+                plus.util.setPlusIcon(subscription_message_box, self.aw.app.darkmode)
                 if percent_used_formatted != '':
                     percent_used_formatted = '\n' + percent_used_formatted
                 subscription_message_box.setText(QApplication.translate('Plus','Do you want to extend your subscription?'))
-                subscription_message_box.setInformativeText((QApplication.translate('Plus','Your subscription ends on') if remaining_days>0 else QApplication.translate('Plus','Your subscription ended on')) + f' {QDate(pu.year,pu.month,pu.day).toString(QLocale().dateFormat(QLocale.FormatType.ShortFormat))}\n{days}{percent_used_formatted}')
+                subscription_message_box.setInformativeText((QApplication.translate('Plus','Your subscription ends on') if remaining_days>0 else QApplication.translate('Plus','Your subscription ended on')) + f'   {QDate(pu.year,pu.month,pu.day).toString(QLocale().dateFormat(QLocale.FormatType.ShortFormat))}\n  {days}{percent_used_formatted}')
                 subscription_message_box.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
                 res = subscription_message_box.exec()
                 plus_link = plus.config.shop_base_url
-                if self.aw.plus_subscription == 'PRO':
+                if self.aw.plus_subscription in {'PRO', 'MAX'}:
                     plus_link += '/professional-roasters'
                 elif self.aw.plus_subscription == 'HOME':
                     plus_link += '/home-roasters'
@@ -1414,6 +1378,7 @@ class ApplicationWindow(QMainWindow):
     updateScheduleSignal = pyqtSignal()
     disconnectPlusSignal = pyqtSignal() # connected/disconnected in plus/scheduler.py
     setTimerColorSignal = pyqtSignal(str)
+    loadThemeSignal = pyqtSignal(str,str)
 
     __slots__ = [ 'locale_str', 'app', 'superusermode', 'sample_loop_running', 'time_stopped', 'plus_account', 'plus_account_id', 'plus_remember_credentials', 'plus_email', 'plus_language', 'plus_subscription', 'percent_decimals',
         'plus_paidUntil', 'plus_rlimit', 'plus_used', 'plus_readonly', 'plus_user_id', 'appearance', 'mpl_fontproperties', 'full_screen_mode_active', 'processingKeyEvent', 'quickEventShortCut',
@@ -1523,7 +1488,7 @@ class ApplicationWindow(QMainWindow):
         self.plus_email:str|None = None # if self.plus_remember_credentials is ticked, we remember here the login to be pre-set as plus_account in the dialog
         self.plus_language:str = 'en' # one of ["en", "de", "it", ..] indicates the language setting of the plus_account used on the artisan.plus platform,
                 # used in links back to objects on the platform (see plus/util.py#storeLink() and similars)
-        self.plus_subscription:str|None = None # one of [None, "HOME", "PRO"]
+        self.plus_subscription:str|None = None # one of [None, "HOME", "PRO", "MAX"]
         self.plus_paidUntil:datetime.datetime|None = None # either None if unknown or otherwise a datetime.datetime object with indicating the expiration date of the account
         self.plus_rlimit:float = 0 # account amount limit (kg); if 0 then considered as not valid
         self.plus_used:float = 0   # account amount greens roasted within rlimit (kg); if 0 then considered as not valid
@@ -1690,7 +1655,7 @@ class ApplicationWindow(QMainWindow):
 
         self.printer:QPrinter|None = None
 
-        self.main_widget:QWidget = QWidget(self)
+        self.main_widget = QWidget(self)
         #set a minimum size (main window can be bigger but never smaller)
         self.main_widget.setMinimumWidth(800)
         self.main_widget.setMinimumHeight(400)
@@ -2416,6 +2381,9 @@ class ApplicationWindow(QMainWindow):
         # using a QTimer to speed up startup a bit
         QTimer.singleShot(500,self.populateMachineMenu)
 
+        self.machineNameAction:QAction = QAction(QApplication.translate('Menu', 'Machine Name') + '...', self)
+        self.machineNameAction.triggered.connect(self.set_machine_name)
+
         self.deviceAction:QAction = QAction(QApplication.translate('Menu', 'Device...'), self)
         self.deviceAction.triggered.connect(self.deviceassigment)
         self.deviceAction.setShortcut('Ctrl+D')
@@ -2789,6 +2757,7 @@ class ApplicationWindow(QMainWindow):
 
         #create a Label object to display program status information
         self.messagelabel: QLabel = QLabel()
+        self.messagelabel.setContentsMargins(15,3,5,8) # left, top, right, bottom
         f = self.messagelabel.font()
         f.setPointSize(self.messagelabel.font().pointSize()+1)
         self.messagelabel.setFont(f)
@@ -2810,11 +2779,6 @@ class ApplicationWindow(QMainWindow):
         self.button_font_size_tiny = f'{self.button_font_size_pt - 4}pt'
         self.button_font_size_micro = f'{self.button_font_size_pt - 5}pt'
 
-        #TODO: keep # pylint: disable=fixme
-        button_font_size_small_pt = self.button_font_size_pt - 3
-        button_font_size_small_selected_pt = self.button_font_size_pt - 2
-#        button_font_size_tiny_pt = self.button_font_size_pt - 4
-#        button_font_size_micro_pt = self.button_font_size_pt - 5
         if platform.system() == 'Windows':
             self.button_font_size_pt = self.button_font_size_pt - 2
 
@@ -2845,7 +2809,7 @@ class ApplicationWindow(QMainWindow):
 #            self.small_button_min_width_px = 60
 #            self.tiny_button_min_width_px = 50
 
-        border_modern = 'border-style:solid; border-radius:4;border-color:grey; border-width:0;' # modernize
+        border_modern = 'border-style:solid; border-radius:20; border-color:grey; border-width:0;' # modernize
 
         self.pushbuttonstyles_simulator: dict[str, str] = {
             'OFF':    """
@@ -2856,7 +2820,6 @@ class ApplicationWindow(QMainWindow):
                     font-weight: bold;
                     color: #147bb3;
                     background-color: white;
-                    border-radius:4;
                 }
                 QPushButton:!enabled {
                     color: darkgrey;
@@ -2879,7 +2842,6 @@ class ApplicationWindow(QMainWindow):
                     font-weight: bold;
                     color: #cc0f50;
                     background-color: white;
-                    border-radius:4;
                 }
                 QPushButton:!enabled {
                     color: darkgrey;
@@ -2902,7 +2864,6 @@ class ApplicationWindow(QMainWindow):
                     font-weight: bold;
                     color: #147bb3;
                     background-color: white;
-                    border-radius:4;
                 }
                 QPushButton:!enabled {
                     color: #EFEFEF;
@@ -2925,7 +2886,6 @@ class ApplicationWindow(QMainWindow):
                     font-weight: bold;
                     color: yellow;
                     background-color: #ff3d00;
-                    border-radius:4;
                 }
                 QPushButton:!enabled {
                     color: darkgrey;
@@ -2951,7 +2911,6 @@ class ApplicationWindow(QMainWindow):
                     font-weight: bold;
                     color: white;
                     background-color: #4c97c3;
-                    border-radius:4;
                 }
                 QPushButton:!enabled {
                     color: darkgrey;
@@ -2974,7 +2933,6 @@ class ApplicationWindow(QMainWindow):
                     font-weight: bold;
                     color: white;
                     background-color: #3979ae;
-                    border-radius:4;
                 }
                 QPushButton:!enabled {
                     color: darkgrey;
@@ -2997,7 +2955,6 @@ class ApplicationWindow(QMainWindow):
                     font-weight: bold;
                     color: white;
                     background-color: #cc0f50;
-                    border-radius:4;
                 }
                 QPushButton:!enabled {
                     color: darkgrey;
@@ -3020,7 +2977,6 @@ class ApplicationWindow(QMainWindow):
                     font-weight: bold;
                     color: white;
                     background-color: #3979ae;
-                    border-radius:4;
                 }
                 QPushButton:!enabled {
                     color: darkgrey;
@@ -3043,7 +2999,6 @@ class ApplicationWindow(QMainWindow):
                     font-weight: bold;
                     color: yellow;
                     background-color: #ff3d00;
-                    border-radius:4;
                 }
                 QPushButton:!enabled {
                     color: darkgrey;
@@ -3066,7 +3021,6 @@ class ApplicationWindow(QMainWindow):
                     font-weight: bold;
                     color: white;
                     background-color: #4c97c3;
-                    border-radius:4;
                 }
                 QPushButton:!enabled {
                     color: darkgrey;
@@ -3089,7 +3043,6 @@ class ApplicationWindow(QMainWindow):
                     font-weight: bold;
                     color: white;
                     background-color: #cc0f50;
-                    border-radius:4;
                 }
                 QPushButton:!enabled {
                     color: darkgrey;
@@ -3112,7 +3065,6 @@ class ApplicationWindow(QMainWindow):
                     font-weight: bold;
                     color: white;
                     background-color:""" + createGradient('#db5785') + """ ;
-                    border-radius:4;
                 }
                 QPushButton:pressed {
                     color: #EEEEEE;
@@ -3131,7 +3083,6 @@ class ApplicationWindow(QMainWindow):
                     font-weight: bold;
                     color: white;
                     background-color:""" + createGradient('#64b7d8') + """ ;
-                    border-radius:4;
                 }
                 QPushButton:pressed {
                     color: #EEEEEE;
@@ -3159,7 +3110,7 @@ class ApplicationWindow(QMainWindow):
 
         #create ON/OFF buttons
 
-        self.buttonONOFF: QPushButton = QPushButton(QApplication.translate('Button', 'ON'))
+        self.buttonONOFF = QPushButton(QApplication.translate('Button', 'ON'))
         self.buttonONOFF.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.buttonONOFF.setToolTip(QApplication.translate('Tooltip', 'Start monitoring'))
         self.buttonONOFF.setStyleSheet(self.pushbuttonstyles['OFF'])
@@ -3173,7 +3124,7 @@ class ApplicationWindow(QMainWindow):
             self.buttonONOFF.setVisible(False)
 
         #create START/STOP buttons
-        self.buttonSTARTSTOP: QPushButton = QPushButton(QApplication.translate('Button', 'START'))
+        self.buttonSTARTSTOP = QPushButton(QApplication.translate('Button', 'START'))
         self.buttonSTARTSTOP.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.buttonSTARTSTOP.setToolTip(QApplication.translate('Tooltip', 'Start recording'))
         self.buttonSTARTSTOP.setStyleSheet(self.pushbuttonstyles['STOP'])
@@ -3188,24 +3139,24 @@ class ApplicationWindow(QMainWindow):
             self.buttonSTARTSTOP.setVisible(False)
 
         #create 1C START, 1C END, 2C START and 2C END buttons
-        self.buttonFCs: MinorEventPushButton = MinorEventPushButton(QApplication.translate('Button', 'FC\nSTART'))
+        self.buttonFCs = MinorEventPushButton(QApplication.translate('Button', 'FC\nSTART'))
         self.buttonFCs.setToolTip(QApplication.translate('Tooltip', 'First Crack Start'))
         self.buttonFCs.clicked.connect(self.qmc.mark1Cstart)
 
-        self.buttonFCe: MinorEventPushButton = MinorEventPushButton(QApplication.translate('Button', 'FC\nEND'))
+        self.buttonFCe = MinorEventPushButton(QApplication.translate('Button', 'FC\nEND'))
         self.buttonFCe.setToolTip(QApplication.translate('Tooltip', 'First Crack End'))
         self.buttonFCe.clicked.connect(self.qmc.mark1Cend)
 
-        self.buttonSCs: MinorEventPushButton = MinorEventPushButton(QApplication.translate('Button', 'SC\nSTART'))
+        self.buttonSCs = MinorEventPushButton(QApplication.translate('Button', 'SC\nSTART'))
         self.buttonSCs.setToolTip(QApplication.translate('Tooltip', 'Second Crack Start'))
         self.buttonSCs.clicked.connect(self.qmc.mark2Cstart)
 
-        self.buttonSCe: MinorEventPushButton = MinorEventPushButton(QApplication.translate('Button', 'SC\nEND'))
+        self.buttonSCe = MinorEventPushButton(QApplication.translate('Button', 'SC\nEND'))
         self.buttonSCe.setToolTip(QApplication.translate('Tooltip', 'Second Crack End'))
         self.buttonSCe.clicked.connect(self.qmc.mark2Cend)
 
         #create RESET button
-        self.buttonRESET: QPushButton = QPushButton(QApplication.translate('Button', 'RESET'))
+        self.buttonRESET = QPushButton(QApplication.translate('Button', 'RESET'))
         self.buttonRESET.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.buttonRESET.setStyleSheet(self.pushbuttonstyles['RESET'])
         self.buttonRESET.setGraphicsEffect(self.makeShadow())
@@ -3217,17 +3168,17 @@ class ApplicationWindow(QMainWindow):
         self.buttonRESET.clicked.connect(self.qmc.resetButtonAction)
 
         #create CHARGE button
-        self.buttonCHARGE: AnimatedMajorEventPushButton = AnimatedMajorEventPushButton(QApplication.translate('Button', 'CHARGE'))
+        self.buttonCHARGE = AnimatedMajorEventPushButton(QApplication.translate('Button', 'CHARGE'))
         self.buttonCHARGE.setToolTip(QApplication.translate('Tooltip', 'Charge'))
         self.buttonCHARGE.clicked.connect(self.qmc.markCharge)
 
         #create DROP button
-        self.buttonDROP: MajorEventPushButton = MajorEventPushButton(QApplication.translate('Button', 'DROP'))
+        self.buttonDROP = MajorEventPushButton(QApplication.translate('Button', 'DROP'))
         self.buttonDROP.setToolTip(QApplication.translate('Tooltip', 'Drop'))
         self.buttonDROP.clicked.connect(self.qmc.markDrop)
 
         #create PID control button
-        self.buttonCONTROL: QPushButton = QPushButton(QApplication.translate('Button', 'CONTROL'))
+        self.buttonCONTROL = QPushButton(QApplication.translate('Button', 'CONTROL'))
         self.buttonCONTROL.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.buttonCONTROL.setStyleSheet(self.pushbuttonstyles['PID'])
         self.buttonCONTROL.setGraphicsEffect(self.makeShadow())
@@ -3240,12 +3191,12 @@ class ApplicationWindow(QMainWindow):
             self.buttonCONTROL.setVisible(False)
 
         #create EVENT record button
-        self.buttonEVENT: AuxEventPushButton = AuxEventPushButton(QApplication.translate('Button', 'EVENT'))
+        self.buttonEVENT = AuxEventPushButton(QApplication.translate('Button', 'EVENT'))
         self.buttonEVENT.setToolTip(QApplication.translate('Tooltip', 'Event'))
         self.buttonEVENT.clicked.connect(self.qmc.EventRecord_action)
 
         #create PID+5 button
-        self.buttonSVp5: QPushButton = QPushButton(QApplication.translate('Button', 'SV +5'))
+        self.buttonSVp5 = QPushButton(QApplication.translate('Button', 'SV +5'))
         self.buttonSVp5.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.buttonSVp5.setStyleSheet(self.pushbuttonstyles['SV +'])
         self.buttonSVp5.setMinimumWidth(90)
@@ -3254,7 +3205,7 @@ class ApplicationWindow(QMainWindow):
         self.buttonSVp5.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
         #create PID+10 button
-        self.buttonSVp10: QPushButton = QPushButton(QApplication.translate('Button', 'SV +10'))
+        self.buttonSVp10 = QPushButton(QApplication.translate('Button', 'SV +10'))
         self.buttonSVp10.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.buttonSVp10.setStyleSheet(self.pushbuttonstyles['SV +'])
         self.buttonSVp10.setMinimumWidth(90)
@@ -3263,7 +3214,7 @@ class ApplicationWindow(QMainWindow):
         self.buttonSVp10.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
         #create PID+20 button
-        self.buttonSVp20: QPushButton = QPushButton(QApplication.translate('Button', 'SV +20'))
+        self.buttonSVp20 = QPushButton(QApplication.translate('Button', 'SV +20'))
         self.buttonSVp20.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.buttonSVp20.setStyleSheet(self.pushbuttonstyles['SV +'])
         self.buttonSVp20.setMinimumWidth(90)
@@ -3272,7 +3223,7 @@ class ApplicationWindow(QMainWindow):
         self.buttonSVp20.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
         #create PID-20 button
-        self.buttonSVm20: QPushButton = QPushButton(QApplication.translate('Button', 'SV -20'))
+        self.buttonSVm20 = QPushButton(QApplication.translate('Button', 'SV -20'))
         self.buttonSVm20.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.buttonSVm20.setStyleSheet(self.pushbuttonstyles['SV -'])
         self.buttonSVm20.setMinimumWidth(90)
@@ -3281,7 +3232,7 @@ class ApplicationWindow(QMainWindow):
         self.buttonSVm20.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
         #create PID-10 button
-        self.buttonSVm10: QPushButton = QPushButton(QApplication.translate('Button', 'SV -10'))
+        self.buttonSVm10 = QPushButton(QApplication.translate('Button', 'SV -10'))
         self.buttonSVm10.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.buttonSVm10.setStyleSheet(self.pushbuttonstyles['SV -'])
         self.buttonSVm10.setMinimumWidth(90)
@@ -3290,7 +3241,7 @@ class ApplicationWindow(QMainWindow):
         self.buttonSVm10.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
         #create PID-5 button
-        self.buttonSVm5: QPushButton = QPushButton(QApplication.translate('Button', 'SV -5'))
+        self.buttonSVm5 = QPushButton(QApplication.translate('Button', 'SV -5'))
         self.buttonSVm5.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.buttonSVm5.setStyleSheet(self.pushbuttonstyles['SV -'])
         self.buttonSVm5.setMinimumWidth(90)
@@ -3301,12 +3252,12 @@ class ApplicationWindow(QMainWindow):
         #HUD button (button_18 was removed)
 
         #create DRY button
-        self.buttonDRY: MinorEventPushButton = MinorEventPushButton(QApplication.translate('Button', 'DRY\nEND'))
+        self.buttonDRY = MinorEventPushButton(QApplication.translate('Button', 'DRY\nEND'))
         self.buttonDRY.setToolTip(QApplication.translate('Tooltip', 'Dry End'))
         self.buttonDRY.clicked.connect(self.qmc.markDryEnd)
 
         #create COOLe button
-        self.buttonCOOL: MinorEventPushButton = MinorEventPushButton(QApplication.translate('Button', 'COOL\nEND'))
+        self.buttonCOOL = MinorEventPushButton(QApplication.translate('Button', 'COOL\nEND'))
         self.buttonCOOL.setToolTip(QApplication.translate('Tooltip', 'Cool End'))
         self.buttonCOOL.clicked.connect(self.qmc.markCoolEnd)
 
@@ -3320,14 +3271,13 @@ class ApplicationWindow(QMainWindow):
 
         # NavigationToolbar VMToolbar
         self.ntb: VMToolbar = VMToolbar(self.qmc.canvas, self.main_widget)
-        #self.ntb.setMinimumHeight(50)
 
         #create LCD displays
         #RIGHT COLUMN
         self.lcd1: MyQLCDNumber = MyQLCDNumber() # time
         self.lcd1.setSegmentStyle(QLCDNumber.SegmentStyle.Flat)
         self.lcd1.setMinimumHeight(40)
-        self.lcd1.setMinimumWidth(100)
+        self.lcd1.setMinimumWidth(110)
         self.lcd1.setFrameStyle(QFrame.Shadow.Plain)
         # switch superusermode action:
         self.lcd1.clicked.connect(self.superusermodeLeftClicked)
@@ -3349,13 +3299,7 @@ class ApplicationWindow(QMainWindow):
         self.lcd6.display(zz)
         self.lcd7.display(zz)
 
-        self.lcd1.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {rgba_colorname2argb_colorname(self.lcdpaletteF['timer'])}; background-color: {rgba_colorname2argb_colorname(self.lcdpaletteB['timer'])};}}")
-        self.lcd2.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {rgba_colorname2argb_colorname(self.lcdpaletteF['et'])}; background-color: {rgba_colorname2argb_colorname(self.lcdpaletteB['et'])};}}")
-        self.lcd3.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {rgba_colorname2argb_colorname(self.lcdpaletteF['bt'])}; background-color: {rgba_colorname2argb_colorname(self.lcdpaletteB['bt'])};}}")
-        self.lcd4.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {rgba_colorname2argb_colorname(self.lcdpaletteF['deltaet'])}; background-color: {rgba_colorname2argb_colorname(self.lcdpaletteB['deltaet'])};}}")
-        self.lcd5.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {rgba_colorname2argb_colorname(self.lcdpaletteF['deltabt'])}; background-color: {rgba_colorname2argb_colorname(self.lcdpaletteB['deltabt'])};}}")
-        self.lcd6.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {rgba_colorname2argb_colorname(self.lcdpaletteF['sv'])}; background-color: {rgba_colorname2argb_colorname(self.lcdpaletteB['sv'])};}}")
-        self.lcd7.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {rgba_colorname2argb_colorname(self.lcdpaletteF['sv'])}; background-color: {rgba_colorname2argb_colorname(self.lcdpaletteB['sv'])};}}")
+        self.updateLCDcolors()
 
         self.lcd1.setToolTip(QApplication.translate('Tooltip', 'Timer'))
         self.lcd2.setToolTip(QApplication.translate('Tooltip', 'ET Temperature'))
@@ -3440,8 +3384,8 @@ class ApplicationWindow(QMainWindow):
             self.extraLCDframe2[i].customContextMenuRequested.connect(self.setTare_slot)
             self.extraLCDframe2[i].left_clicked.connect(self.toggleExtraCurve2)
             self.extraLCDframe2[i].setVisible(False)
-            self.extraLCD1[i].setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {rgba_colorname2argb_colorname(self.lcdpaletteF['sv'])}; background-color: {rgba_colorname2argb_colorname(self.lcdpaletteB['sv'])};}}")
-            self.extraLCD2[i].setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {rgba_colorname2argb_colorname(self.lcdpaletteF['sv'])}; background-color: {rgba_colorname2argb_colorname(self.lcdpaletteB['sv'])};}}")
+            self.updateLCDcolor(self.extraLCD1[i], 'sv')
+            self.updateLCDcolor(self.extraLCD2[i], 'sv')
             #configure Labels
             self.extraLCDlabel1[i].setSizePolicy(QSizePolicy.Policy.Preferred,QSizePolicy.Policy.Preferred)
             self.extraLCDlabel2[i].setSizePolicy(QSizePolicy.Policy.Preferred,QSizePolicy.Policy.Preferred)
@@ -3484,9 +3428,6 @@ class ApplicationWindow(QMainWindow):
         self.minieventright.clicked.connect(self.incrEventNumber)
 
         self.lineEvent: QLineEdit = QLineEdit()
-        self.lineEvent.setMinimumWidth(200)
-
-        self.eventlabel.setStyleSheet("background-color:'#bdbdbd';")
 
         self.etypeComboBox: QComboBox = QComboBox()
         self.etypeComboBox.setToolTip(QApplication.translate('Tooltip', 'Type of event'))
@@ -3503,6 +3444,7 @@ class ApplicationWindow(QMainWindow):
         self.etimeline: QLineEdit = QLineEdit()
         self.etimeline.setValidator(QRegularExpressionValidator(regextime,self))
         self.etimeline.setMaximumWidth(50)
+        self.etimeline.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         #create EVENT mini button
         self.buttonminiEvent: QPushButton = QPushButton(QApplication.translate('Button', 'Update'))
@@ -3554,13 +3496,13 @@ class ApplicationWindow(QMainWindow):
         # We set the styles of event buttons assigned to self.lowerbuttondialog here
         # All stylesheet of its children (the actual event buttons) needs to be non-conflicting.
         # Any conflict will turn off merging of parent styles and just rely on the child stylesheet.
-        self.lowerbuttondialog.setStyleSheet(
-            artisan_event_button_style.format(
-                min_width=self.standard_button_min_width_px - 6,
-                min_height=self.standard_button_height - 7,
-                padding=3,
-                default_font_size=button_font_size_small_pt,
-                selected_font_size=button_font_size_small_selected_pt))
+#        self.lowerbuttondialog.setStyleSheet(
+#            artisan_event_button_style.format(
+#                min_width=self.standard_button_min_width_px - 6,
+#                min_height=self.standard_button_height - 7,
+#                padding=3,
+#                default_font_size=button_font_size_small_pt,
+#                selected_font_size=button_font_size_small_selected_pt))
 
         #initiate configuration
         self.lowerbuttondialogLayout.addStretch()
@@ -3634,6 +3576,8 @@ class ApplicationWindow(QMainWindow):
         self.level1frame = QFrame()
         self.level1layout = QHBoxLayout()   # matplotlib toolbox + RESET button + LCD Timer
         self.level1frame.setLayout(self.level1layout)
+        self.level1frame.setContentsMargins(17,5,0,0) # left, top, right, bottom
+        self.level1frame.setMinimumHeight(100)
 
         level3layout = QHBoxLayout()   # PID buttons, graph, temperature LCDs
 
@@ -3645,24 +3589,34 @@ class ApplicationWindow(QMainWindow):
 
         #EVENT MINIEDITOR layout
         EventsLayout.addWidget(self.eventlabel)
-        EventsLayout.addSpacing(4)
+        EventsLayout.addSpacing(10)
         EventsLayout.addWidget(self.etimeline)
-        EventsLayout.addSpacing(4)
+        EventsLayout.addSpacing(5)
         EventsLayout.addWidget(self.lineEvent)
-        EventsLayout.addSpacing(4)
+        EventsLayout.addSpacing(5)
         EventsLayout.addWidget(self.etypeComboBox)
-        EventsLayout.addSpacing(4)
+        EventsLayout.addSpacing(5)
         EventsLayout.addWidget(self.valueEdit)
-        EventsLayout.addSpacing(4)
-        EventsLayout.addWidget(self.eNumberSpinBox)
-        EventsLayout.addSpacing(4)
+#        EventsLayout.addSpacing(5)
+#        EventsLayout.addWidget(self.eNumberSpinBox) # we don't show it but use it still internally as reference
+        EventsLayout.addSpacing(25)
         EventsLayout.addWidget(self.minieventleft)
+        EventsLayout.addSpacing(2)
         EventsLayout.addWidget(self.minieventright)
-        EventsLayout.addSpacing(4)
+        EventsLayout.addSpacing(20)
         EventsLayout.addWidget(self.buttonminiEvent)
+        EventsLayout.addSpacing(2)
         self.EventsGroupLayout = QGroupBox()
         self.EventsGroupLayout.setLayout(EventsLayout)
         self.EventsGroupLayout.setVisible(False)
+
+
+        self.eventlabel.setObjectName('eventlabel')
+        self.etimeline.setObjectName('etimeline')
+        self.valueEdit.setObjectName('valueEdit')
+        self.minieventleft.setObjectName('minieventleft')
+        self.minieventright.setObjectName('minieventright')
+        self.buttonminiEvent.setObjectName('buttonminiEvent')
 
         LCDlayout = QVBoxLayout()
         LCDlayout.setSpacing(0)
@@ -3812,7 +3766,11 @@ class ApplicationWindow(QMainWindow):
         phasesLCDlayout.addWidget(self.FCslcdFrame)
         phasesLCDlayout.setContentsMargins(0, 0, 0, 0)
         phasesLCDlayout.setSpacing(0)
-        self.phasesLCDs.setLayout(phasesLCDlayout)
+        phasesLCDlayoutVBox = QVBoxLayout()
+        phasesLCDlayoutVBox.addStretch()
+        phasesLCDlayoutVBox.addLayout(phasesLCDlayout)
+        phasesLCDlayoutVBox.addStretch()
+        self.phasesLCDs.setLayout(phasesLCDlayoutVBox)
         self.phasesLCDs.hide()
         self.phasesLCDs.setToolTip(QApplication.translate('Tooltip','Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE'))
 
@@ -3828,7 +3786,7 @@ class ApplicationWindow(QMainWindow):
         self.level1layout.addWidget(self.buttonSTARTSTOP)
         self.level1layout.addSpacing(15)
         self.level1layout.addWidget(self.buttonCONTROL)
-        self.level1layout.addSpacing(10)
+        self.level1layout.addSpacing(20)
         self.level1layout.addWidget(self.lcd1)
         self.level1layout.setSpacing(0)
         self.level1layout.setContentsMargins(0,7,7,12) # left, top, right, bottom
@@ -3883,7 +3841,6 @@ class ApplicationWindow(QMainWindow):
         midleftlayout.addLayout(level3layout)
         midleftlayout.addWidget(self.lowerbuttondialog)
         midleftlayout.addWidget(self.extrabuttondialogs)
-
         midleftlayout.addWidget(self.EventsGroupLayout)
 
         self.slider1:SliderUnclickable = self.slider()
@@ -4081,18 +4038,16 @@ class ApplicationWindow(QMainWindow):
         self.lcdFrame.setContentsMargins(0,0,0,0)
         self.lcdFrame.setSizePolicy(QSizePolicy.Policy.Maximum,QSizePolicy.Policy.Expanding) # prevent horizontal expansion (graph might not maximize otherwise)
 
-        self.midlayout:QHBoxLayout = QHBoxLayout()
-#        self.midlayout.addWidget(self.sliderFrame)
-#        self.midlayout.addWidget(self.sliderDock)
+        self.midlayout = QHBoxLayout()
         self.midlayout.addLayout(midleftlayout)
         self.midlayout.addWidget(self.lcdFrame)
         self.midlayout.setSpacing(0)
         self.midlayout.setContentsMargins(0,0,0,0)
 
-        mainlayout:QVBoxLayout = QVBoxLayout(self.main_widget)
+        mainlayout = QVBoxLayout(self.main_widget)
         mainlayout.addWidget(self.level1frame)
         mainlayout.addLayout(self.midlayout)
-        mainlayout.setContentsMargins(0,0,0,0)
+        mainlayout.setContentsMargins(0,0,0,0) # left, top, right, bottom
         mainlayout.setSpacing(0)
 
         self.displayonlymenus() # enable/disable menu items as needed
@@ -4176,6 +4131,7 @@ class ApplicationWindow(QMainWindow):
         self.comparatorAddProfileSignal.connect(self.comparatorAddProfileSlot, type=Qt.ConnectionType.QueuedConnection)  # type: ignore[call-arg]
         self.updateScheduleSignal.connect(self.updateSchedule, type=Qt.ConnectionType.QueuedConnection)  # type: ignore[call-arg]
         self.setTimerColorSignal.connect(self.setTimerColor, type=Qt.ConnectionType.QueuedConnection)  # type: ignore[call-arg]
+        self.loadThemeSignal.connect(self.loadThemeFile, type=Qt.ConnectionType.QueuedConnection)  # type: ignore[call-arg]
 
         self.notificationManager:NotificationManager|None = None
         if not self.app.artisanviewerMode:
@@ -4197,7 +4153,6 @@ class ApplicationWindow(QMainWindow):
         self.zoomInShortcut.activated.connect(self.zoomIn)
         self.zoomOutShortcut = QShortcut(QKeySequence.StandardKey.ZoomOut, self)
         self.zoomOutShortcut.activated.connect(self.zoomOut)
-
 
     # checks a builds signature using the public key
     def app_signature_valid(self) -> bool:
@@ -4266,6 +4221,7 @@ class ApplicationWindow(QMainWindow):
         config_menu = QMenu(f"&{QApplication.translate('Menu', 'Config')}")
         if ui_mode in {UI_MODE.EXPERT, UI_MODE.DEFAULT}:
             config_menu.addMenu(self.machineMenu)
+            config_menu.addAction(self.machineNameAction)
         if ui_mode is UI_MODE.EXPERT:
             config_menu.addAction(self.deviceAction)
             config_menu.addAction(self.commportAction)
@@ -4368,7 +4324,6 @@ class ApplicationWindow(QMainWindow):
             help_menu.addAction(self.messageAction)
             help_menu.addAction(self.serialAction)
             help_menu.addAction(self.platformAction)
-        if ui_mode in {UI_MODE.EXPERT, UI_MODE.DEFAULT}:
             help_menu.addSeparator()
             help_menu.addAction(self.loadSettingsAction)
             help_menu.addMenu(self.openRecentSettingMenu)
@@ -4418,16 +4373,22 @@ class ApplicationWindow(QMainWindow):
     def setProductionMode(self, _:bool = False) -> None:
         if self.ui_mode is not UI_MODE.PRODUCTION:
             self.set_ui_mode(UI_MODE.PRODUCTION)
+        else:
+            self.productionModeAction.setChecked(True)
     @pyqtSlot()
     @pyqtSlot(bool)
     def setDefaultMode(self, _:bool = False) -> None:
         if self.ui_mode is not UI_MODE.DEFAULT:
             self.set_ui_mode(UI_MODE.DEFAULT)
+        else:
+            self.defaultModeAction.setChecked(True)
     @pyqtSlot()
     @pyqtSlot(bool)
     def setExpertMode(self, _:bool = False) -> None:
         if self.ui_mode is not UI_MODE.EXPERT:
             self.set_ui_mode(UI_MODE.EXPERT)
+        else:
+            self.expertModeAction.setChecked(True)
 
     def announce_current_ui_mode(self) -> None:
         if self.ui_mode is UI_MODE.PRODUCTION:
@@ -4576,7 +4537,7 @@ class ApplicationWindow(QMainWindow):
     # timer_color one of "timer" (black), "slowcoolingtimer" (red), "rstimer" (blue)
     @pyqtSlot(str)
     def setTimerColor(self, timer_color:str) -> None:
-        self.lcd1.setStyleSheet(f'QLCDNumber {{ border-radius: 4; color: {rgba_colorname2argb_colorname(self.lcdpaletteF[timer_color])}; background-color: {rgba_colorname2argb_colorname(self.lcdpaletteB[timer_color])};}}')
+        self.updateLCDcolor(self.lcd1, timer_color)
         self.qmc.setTimerLargeLCDcolorSignal.emit(self.lcdpaletteF[timer_color], self.lcdpaletteB[timer_color])
 
     @override
@@ -5224,12 +5185,37 @@ class ApplicationWindow(QMainWindow):
         self.updatePlusStatus()
 
     def updatePlusStatus(self,ntb:VMToolbar|None = None) -> None:
+
+        def get_subscription_icon_state(icon_prefix:str, paid_until:datetime.datetime|None, rlimit:float, used:float, default_postfix:str) -> str:
+            icon_postfix = default_postfix
+            if paid_until is not None:
+                remaining_days = (paid_until.date() - datetime.datetime.now(datetime.UTC).date()).days
+                if remaining_days <= 0:
+                    icon_postfix = '-off'
+                elif remaining_days < 31:
+                    icon_postfix = '-low'
+                if rlimit > 0:
+                    percent_used = used/(rlimit/100)
+                    if percent_used >= 100:
+                        icon_postfix = '-off'
+                    elif percent_used >= 90:
+                        icon_postfix = '-low'
+            return f'{icon_prefix}{icon_postfix}'
+
+        def get_subscription_icon(plus_subscription:str|None, paid_until:datetime.datetime|None, rlimit:float, used:float, connected:bool) -> str|None:
+            if plus_subscription in {'HOME', 'PRO', 'MAX'}:
+                return get_subscription_icon_state(f'plus-{plus_subscription.lower()}', paid_until, rlimit, used, ('' if connected else '-on'))
+            return None
+
+
         if ntb is None:
             ntb = self.ntb
         try:
             subscription_icon = None
             if self.plus_account is not None:
-                if plus.controller.is_connected():
+                connected = plus.controller.is_connected()
+                subscription_icon = get_subscription_icon(self.plus_subscription, self.plus_paidUntil, self.plus_rlimit, self.plus_used, connected)
+                if connected:
                     if self.editgraphdialog is False:
                         # syncing from server in progress
                         plus_icon = 'plus-dirty'
@@ -5240,49 +5226,23 @@ class ApplicationWindow(QMainWindow):
                     else:
                         plus_icon = 'plus-unsynced'
                         tooltip = QApplication.translate('Tooltip', 'Upload to the artisan platform')
-                    if self.plus_subscription == 'HOME':
-                        subscription_icon = 'plus-home'
-                        if self.plus_paidUntil is not None:
-                            remaining_days = (self.plus_paidUntil.date() - datetime.datetime.now(datetime.UTC).date()).days
-                            if remaining_days <= 0:
-                                subscription_icon = 'plus-home-off'
-                            elif remaining_days < 31:
-                                subscription_icon = 'plus-home-low'
-                            if self.plus_rlimit > 0:
-                                percent_used = self.plus_used/(self.plus_rlimit/100)
-                                if percent_used >= 100:
-                                    subscription_icon = 'plus-home-off'
-                                elif percent_used >= 90:
-                                    subscription_icon = 'plus-home-low'
-                    elif self.plus_subscription == 'PRO':
-                        subscription_icon = 'plus-pro'
-                        if self.plus_paidUntil is not None:
-                            remaining_days = (self.plus_paidUntil.date() - datetime.datetime.now(datetime.UTC).date()).days
-                            if remaining_days <= 0:
-                                subscription_icon = 'plus-pro-off'
-                            elif remaining_days < 31:
-                                subscription_icon = 'plus-pro-low'
-                            if self.plus_rlimit > 0:
-                                percent_used = self.plus_used/(self.plus_rlimit/100)
-                                if percent_used >= 100:
-                                    subscription_icon = 'plus-pro-off'
-                                elif percent_used >= 90:
-                                    subscription_icon = 'plus-pro-low'
                 else:
                     plus_icon = 'plus-on'
                     tooltip = QApplication.translate('Tooltip', 'Disconnect from the artisan platform')
             else:
                 plus_icon = 'plus-off'
-                tooltip = QApplication.translate('Tooltip', 'Connect to the artisan platform')
-            if svgsupport:
-                plus_icon += '.svg'
-            else:
-                plus_icon += '.png'
+                tooltip = QApplication.translate('Plus', 'Sign in to your artisan account')
+#            if svgsupport:
+#                plus_icon += '.svg'
+#            else:
+#                plus_icon += '.png'
+            plus_icon += '.svg'
             if subscription_icon is not None:
-                if svgsupport:
-                    subscription_icon += '.svg'
-                else:
-                    subscription_icon += '.png'
+#                if svgsupport:
+#                    subscription_icon += '.svg'
+#                else:
+#                    subscription_icon += '.png'
+                subscription_icon += '.svg'
             if len(ntb.actions()) > 0: # pyright:ignore[reportUnknownArgumentType]
                 a = ntb.actions()[0] # the plus action is the first one
                 a.setIcon(ntb._icon(plus_icon)) # pylint: disable=protected-access
@@ -6043,10 +6003,14 @@ class ApplicationWindow(QMainWindow):
             if reply == QMessageBox.StandardButton.Cancel:
                 return
             if reply == QMessageBox.StandardButton.Yes:
-                self.loadSettings(fn=action.data()[0],remember=False,reset=False, theme=True)
-                self.sendmessage(QApplication.translate('Message','Loaded theme {0}').format(action.text()))
-                libtime.sleep(.8)
-                self.qmc.redraw(True)
+                self.loadThemeSignal.emit(action.data()[0], action.text())
+
+    @pyqtSlot(str,str)
+    def loadThemeFile(self, filename:str, theme_name:str) -> None:
+        res = self.settingsLoad(filename,theme=True,redraw=False)
+        self.qmc.redraw(False,False,True,True,False) # redraw without any recomputation but force renew axis to adjust for xkcd style change
+        if res:
+            self.sendmessage(QApplication.translate('Message','Loaded theme {0}').format(theme_name))
 
     def getcolorPairsToCheck(self) -> list[tuple[str,str,str,str]]:
         colorPairsToCheck = []
@@ -6295,17 +6259,7 @@ class ApplicationWindow(QMainWindow):
         self.lcdpaletteB['slowcoolingtimer'] = '#000000'
         self.lcdpaletteF['slowcoolingtimer'] = '#ffffff'
         self.setTimerColorSignal.emit('timer')
-        self.lcd2.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {rgba_colorname2argb_colorname(self.lcdpaletteF['et'])}; background-color: {rgba_colorname2argb_colorname(self.lcdpaletteB['et'])};}}")
-        self.setLabelColor(self.label2,self.qmc.palette['et'], self.qmc.ETcurve)
-        self.lcd3.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {rgba_colorname2argb_colorname(self.lcdpaletteF['bt'])}; background-color: {rgba_colorname2argb_colorname(self.lcdpaletteB['bt'])};}}")
-        self.setLabelColor(self.label3,self.qmc.palette['bt'], self.qmc.BTcurve)
-        self.lcd4.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {rgba_colorname2argb_colorname(self.lcdpaletteF['deltaet'])}; background-color: {rgba_colorname2argb_colorname(self.lcdpaletteB['deltaet'])};}}")
-        self.setLabelColor(self.label4,self.qmc.palette['deltaet'],self.qmc.DeltaETflag)
-        self.lcd5.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {rgba_colorname2argb_colorname(self.lcdpaletteF['deltabt'])}; background-color: {rgba_colorname2argb_colorname(self.lcdpaletteB['deltabt'])};}}")
-        self.setLabelColor(self.label5,self.qmc.palette['deltabt'],self.qmc.DeltaBTflag)
-        self.lcd6.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {rgba_colorname2argb_colorname(self.lcdpaletteF['sv'])}; background-color: {rgba_colorname2argb_colorname(self.lcdpaletteB['sv'])};}}")
-        # label always black?
-        self.lcd7.setStyleSheet(f"QLCDNumber {{ border-radius: 4; color: {rgba_colorname2argb_colorname(self.lcdpaletteF['sv'])}; background-color: {rgba_colorname2argb_colorname(self.lcdpaletteB['sv'])};}}")
+        self.updateLCDcolors()
         self.updateLCDproperties()
 
     # switches slider layout to its alternative layout if 'alternativeLayout' is True,
@@ -6342,8 +6296,20 @@ class ApplicationWindow(QMainWindow):
         background_color = self.qmc.palette['background']
         return self.colorDifference('#ffffff', background_color) < self.colorDifference('#000000',background_color)
 
+    def setLowerButtonDialogStyle(self, canvas_color:str) -> None:
+        button_font_size_small_pt = self.button_font_size_pt - 3
+        button_font_size_small_selected_pt = self.button_font_size_pt - 2
+        self.lowerbuttondialog.setStyleSheet(
+            artisan_event_button_style.format(
+                background_color=rgba_colorname2argb_colorname(canvas_color),
+                min_width=self.standard_button_min_width_px - 6,
+                min_height=self.standard_button_height - 7,
+                padding=3,
+                default_font_size=button_font_size_small_pt,
+                selected_font_size=button_font_size_small_selected_pt))
 
     def updateCanvasColors(self, checkColors:bool=True) -> None:
+        self.setUpdatesEnabled(False) # disable display updates on main application window until the background color has been set on all sub widgets to gain performance
         canvas_color = self.qmc.palette['canvas']
         if canvas_color != 'None' and not QColor.isValidColor(canvas_color):
             # we re-initialize broken canvas color
@@ -6395,7 +6361,159 @@ class ApplicationWindow(QMainWindow):
             whitep = self.colorDifference('#ffffff',canvas_color) > self.colorDifference('#000000',canvas_color)
 
         self.qmc.fig.patch.set_facecolor(str(canvas_color))
-        self.setStyleSheet(f'QMainWindow{{background-color:{rgba_colorname2argb_colorname(canvas_color)};border: 0px solid black;}}')
+
+# with the following all QWidgets loose their native focus frame on macOS!
+#        self.setStyleSheet(f'QMainWindow{{background-color:{rgba_colorname2argb_colorname(canvas_color)}; border-width: 0px;}}')
+# thus it got replaced by setting that background to all direct children:
+
+        self.main_widget.setStyleSheet(f'QFrame {{background-color:{rgba_colorname2argb_colorname(canvas_color)};border-width: 0px;}}')
+        self.lcdFrame.setStyleSheet(f'QFrame {{background-color:{rgba_colorname2argb_colorname(canvas_color)};border-width: 0px;}}')
+        self.level1frame.setStyleSheet(f'QFrame {{background-color:{rgba_colorname2argb_colorname(canvas_color)};border-width: 0px;}}')
+        self.messagelabel.setStyleSheet(f'QFrame {{background-color:{rgba_colorname2argb_colorname(canvas_color)};border-width: 0px;}}')
+        self.splitter.setStyleSheet(f'QSplitter, QFrame {{background-color:{rgba_colorname2argb_colorname(canvas_color)};border-width: 0px;}}')
+        self.scroller.setStyleSheet(f'QScroller, QFrame {{background-color:{rgba_colorname2argb_colorname(canvas_color)};border-width: 0px;}}')
+        self.setLowerButtonDialogStyle(rgba_colorname2argb_colorname(canvas_color))
+        self.extrabuttondialogs.setStyleSheet(f'QFrame {{background-color:{rgba_colorname2argb_colorname(canvas_color)};border-width: 0px;}}')
+
+        line_edit_color = ('#ffffff' if whitep else '#000000')
+
+        self.EventsGroupLayout.setStyleSheet(f"""
+            QGroupBox {{
+                background-color: {rgba_colorname2argb_colorname(self.qmc.palette['background'])};
+                border-width: 10px;
+                border-style:solid;
+                border-radius: 0;
+                border-color: {rgba_colorname2argb_colorname(self.qmc.palette['background'])};
+            }}
+            QLabel#eventlabel {{
+                background-color: #F3F3F3;
+                color: #333333;
+                border-width: 1;
+                border-color: #333333;
+                border-style:solid;
+                border-radius: 4;
+                min-height: 25px;
+                min-width: 80px;
+            }}
+
+            QLineEdit {{
+                background-color: {rgba_colorname2argb_colorname(self.qmc.palette['background'])};
+                color: {line_edit_color};
+                min-height: 25px;
+                padding: 0px 5px;
+                border-radius: 8px;
+                border-width: 1px;
+                border-style: solid;
+                border-color: palette(dark);
+            }}
+            QLineEdit:focus {{
+                border-color: {line_edit_color};
+            }}
+
+            QLineEdit#etimeline {{
+                min-width: 50px;
+            }}
+            QLineEdit#valueEdit {{
+                min-width: 30px;
+            }}
+
+            QComboBox {{
+                background-color: #E9E9E9;
+                color: black;
+                min-height: 25px;
+                border-radius: 4;
+                padding: 0px 5px;
+                min-width: 80px;
+            }}
+            QComboBox:hover {{
+                background-color: '#F5F5F5';
+            }}
+            QComboBox::drop-down {{
+                subcontrol-origin: padding;
+                subcontrol-position: top right;
+                width: 15px;
+
+                border-left-width: 1px;
+                border-left-color: darkgray;
+                border-left-style: solid; /* just a single line */
+                border-top-right-radius: 4;
+                border-bottom-right-radius: 4;
+            }}
+            QComboBox::down-arrow {{
+                image: url({os.path.join(getResourcePath(),'Icons','arrow-down-01-stroke-rounded.svg')});
+                subcontrol-position: center;
+                width: 30px;
+            }}
+            QComboBox::drop-down:button {{
+                background-color: '#E9E9E9';
+                width: 30px;
+            }}
+            QComboBox::drop-down:pressed {{
+                background-color: '#A9A9A9';
+                width: 30px;
+            }}
+            QComboBox::drop-down:hover {{
+                background-color: '#F5F5F5';
+                width: 30px;
+            }}
+
+            QComboBox QAbstractItemView {{
+                border-radius: 4;
+                selection-background-color: lightgray;
+            }}
+
+            QSpinBox {{
+                background-color: #E9E9E9;
+                color: black;
+                min-height: 25px;
+                border-radius: 4;
+                padding: 0px 5px;
+            }}
+            QPushButton#minieventleft {{
+                background-color: {createGradient('#E9E9E9')};
+                color: #333333;
+                border-top-left-radius: 10px;
+                border-bottom-left-radius: 10px;
+                min-width: 50px;
+                min-height: 25px;
+            }}
+            QPushButton#minieventleft:pressed {{
+                background-color: {createGradient('#C9C9C9')};
+            }}
+            QPushButton#minieventleft:hover:!pressed {{
+                background-color: {createGradient('#FFFFFF')};
+            }}
+            QPushButton#minieventright {{
+                background-color: {createGradient('#E9E9E9')};
+                color: #333333;
+                border-width: 0;
+                border-top-right-radius: 10px;
+                border-bottom-right-radius: 10px;
+                min-width: 50px;
+                min-height: 25px;
+            }}
+            QPushButton#minieventright:pressed {{
+                background-color: {createGradient('#C9C9C9')};
+            }}
+            QPushButton#minieventright:hover:!pressed {{
+                background-color: {createGradient('#FFFFFF')};
+            }}
+            QPushButton#buttonminiEvent {{
+                background-color: {createGradient('#A7A7A7')};
+                border-radius: 10;
+                color: white;
+                min-width: 100px;
+                min-height: 25px;
+                border-width: 0;
+            }}
+            QPushButton#buttonminiEvent:pressed {{
+                background-color: {createGradient('#888888')};
+            }}
+            QPushButton#buttonminiEvent:hover:!pressed {{
+                background-color: {createGradient('#C7C7C7')};
+            }}
+
+        """)
 
 
         if current_background_color is None or current_background_color != str(canvas_color) or (whitep and self.qmc.palette['messages'] != '#ffffff'): # canvas color did not change, we do not need to redo the navigation bar
@@ -6407,16 +6525,15 @@ class ApplicationWindow(QMainWindow):
             if self.ntb.mode == MPL_Mode.ZOOM:
                 self.ntb.zoom() # type:ignore[no-untyped-call] # ZOOM is active, we deactivate it before changing the ToolBar
             self.removeToolBar(self.ntb)
-#            self.ntb.hide() # seems not to be necessary anymore with the removeToolBar() above
             self.ntb.destroy()
             self.ntb = VMToolbar(self.qmc.canvas, self.main_widget, whitep)
+            self.set_toolbar(self.ui_mode)
 
         if whitep:
             self.qmc.palette['messages'] = '#ffffff'
         else:
             self.qmc.palette['messages'] = '#000000'
         self.sendmessage('', append=False)
-        self.ntb.setMinimumHeight(50)
 
         self.sliderFrame.setStyleSheet('QGroupBox {background-color:' + rgba_colorname2argb_colorname(canvas_color) + ';'
                                     + 'color: ' + rgba_colorname2argb_colorname(title_color) + ';'
@@ -6437,11 +6554,46 @@ class ApplicationWindow(QMainWindow):
         self.ntb.locLabel.setStyleSheet('QWidget {background-color:' + rgba_colorname2argb_colorname(canvas_color) + ';'
                                     + 'color: ' + rgba_colorname2argb_colorname(title_color) + ';'
                                     + '}' )
-        # make QToolBar background transparent
-        self.ntb.setStyleSheet('QToolBar {background-color:' + rgba_colorname2argb_colorname(canvas_color) + ';'
-                                    + 'border: 5px solid ' + rgba_colorname2argb_colorname(canvas_color) + ';'
-                                    + 'color: ' + rgba_colorname2argb_colorname(title_color) + ';'
-                                    + '}' )
+
+        # on black we start with (1,1,1) for lighter
+        selected_canvas_color = QColor('#222222' if canvas_color == '#000000' else canvas_color)
+        if whitep:
+            selected_canvas_color = selected_canvas_color.lighter(250)
+            border_color = '#dcdcdc'
+        else:
+            selected_canvas_color = selected_canvas_color.darker(120)
+            border_color = '#3c3c3c'
+
+
+
+        self.ntb.setStyleSheet(f"""
+            QToolBar {{
+                background-color: {rgba_colorname2argb_colorname(canvas_color)};
+                border: 1px solid {rgba_colorname2argb_colorname(canvas_color)};
+                color: {rgba_colorname2argb_colorname(title_color)};
+                spacing: 2px;
+            }}
+            QToolButton:checked {{
+                background-color: {selected_canvas_color.name()};
+            }}
+            QToolButton:hover {{
+                border-color: {border_color};
+            }}
+            QToolButton:checked:hover {{
+                border-color: {border_color};
+                background-color: {selected_canvas_color.name()};
+            }}
+            QToolButton {{
+                border-width: 1px;
+                border-style: solid;
+                border-radius: 5px;
+                border-color: transparent;
+                margin: 0px;
+                padding: 0px;
+                background-color: transparent;
+            }}
+        """)
+
 
         if self.comparator is None:
             if self.qmc.background and self.qmc.title != '':
@@ -6456,10 +6608,6 @@ class ApplicationWindow(QMainWindow):
 
         self.level1layout.insertWidget(0,self.ntb)
 
-        if str(canvas_color) == 'None':
-            self.qmc.canvas.setStyleSheet('background-color:transparent;')
-            self.ntb.setStyleSheet('QToolBar {background-color:transparent;}')
-
         self.updateSliderColors()
         self.updatePhasesLCDsColors()
 
@@ -6467,10 +6615,11 @@ class ApplicationWindow(QMainWindow):
             colorPairsToCheck = self.getcolorPairsToCheck()
             self.checkColors(colorPairsToCheck)
 
-
         if hasattr(self, 'light_background_p'):
             # reset the cached property self.light_background_p
             del self.light_background_p
+
+        self.setUpdatesEnabled(True) # re-enable display updates
 
 
 
@@ -7633,6 +7782,7 @@ class ApplicationWindow(QMainWindow):
 
 
     def setFonts(self, redraw:bool = True) -> None:
+        self.setUpdatesEnabled(False) # disable display updates on main application window until
         # try to select the right font for matplotlib according to the given locale and platform
         if self.qmc.graphfont == 0:
             try:
@@ -7774,6 +7924,7 @@ class ApplicationWindow(QMainWindow):
             self.mpl_fontproperties = FontProperties()
         if redraw:
             self.qmc.redraw(recomputeAllDeltas=False, forceRenewAxis=True, re_smooth_background=True)
+        self.setUpdatesEnabled(True)
 
     def set_mpl_fontproperties(self, fontpath:str) -> None:
         if os.path.exists(fontpath):
@@ -7810,7 +7961,7 @@ class ApplicationWindow(QMainWindow):
         LCDVbox = QVBoxLayout()
         LCDVbox.addWidget(label)
         LCDVbox.addWidget(lcd)
-        LCDVbox.addSpacing(5)
+        LCDVbox.addSpacing(12) # to align Phases LCDs with main buttons on the right vertically
         LCDVbox.setSpacing(0)
         LCDVbox.setContentsMargins(0, 0, 0, 0)
         frame.setStyleSheet('QLCDNumber{border-radius:4; border-width: 0; border-color: black; border-style:solid; color: black; background-color: #e6e6e6;}')
@@ -11663,7 +11814,7 @@ class ApplicationWindow(QMainWindow):
             if style is not None and style != '':
                 self.messagelabel.setStyleSheet(style)
             else:
-                self.messagelabel.setStyleSheet(f"background-color:'transparent'; color: {rgba_colorname2argb_colorname(self.qmc.palette['messages'])};")
+                self.messagelabel.setStyleSheet(f"background-color:{rgba_colorname2argb_colorname(self.qmc.palette['canvas'])}; color: {rgba_colorname2argb_colorname(self.qmc.palette['messages'])};")
             message = self.arabicReshape(message)
             #keep a max of 100 messages
             if append:
@@ -11967,6 +12118,24 @@ class ApplicationWindow(QMainWindow):
     def showEventsMinieditor(self) -> None:
         self.EventsGroupLayout.setVisible(True)
 
+    def updateLCDcolor(self, lcd:MyQLCDNumber, color_tag:str) -> None:
+        argb_color = rgba_colorname2argb_colorname(self.lcdpaletteF[color_tag])
+        argb_background_color = rgba_colorname2argb_colorname(self.lcdpaletteB[color_tag])
+        lcd.setStyleSheet(
+            f'QLCDNumber {{ border-radius: 8; color: {argb_color}; background-color: {argb_background_color};}}')
+
+    def updateLCDcolors(self) -> None:
+        for lcd, color_tag in [
+                (self.lcd1, 'timer'),
+                (self.lcd2, 'et'),
+                (self.lcd3, 'bt'),
+                (self.lcd4, 'deltaet'),
+                (self.lcd5, 'deltabt'),
+                (self.lcd6, 'sv'),
+                (self.lcd7, 'sv')
+                ]:
+            self.updateLCDcolor(lcd, color_tag)
+
     def updateLCDproperties(self) -> None:
         # clear intChannel cache
         self.qmc.intChannel.cache_clear()
@@ -11979,13 +12148,13 @@ class ApplicationWindow(QMainWindow):
                     l1 = '<b>' + self.qmc.device_name_subst(self.qmc.extraname1[i]) + '</b>'
                     self.extraLCDlabel1[i].setText(l1)
                     self.setLabelColor(self.extraLCDlabel1[i],self.qmc.extradevicecolor1[i], self.extraCurveVisibility1[i])
-                self.extraLCD1[i].setStyleSheet(f"QLCDNumber {{ border-radius:4; color: {rgba_colorname2argb_colorname(self.lcdpaletteF['sv'])}; background-color: {rgba_colorname2argb_colorname(self.lcdpaletteB['sv'])};}}")
+                self.updateLCDcolor(self.extraLCD1[i], 'sv')
                 self.extraLCDframe2[i].setVisible(bool(self.extraLCDvisibility2[i]))
                 if i < len(self.qmc.extraname2):
                     l2 = '<b>' + self.qmc.device_name_subst(self.qmc.extraname2[i]) + '</b>'
                     self.extraLCDlabel2[i].setText(l2)
                     self.setLabelColor(self.extraLCDlabel2[i],self.qmc.extradevicecolor2[i], self.extraCurveVisibility2[i])
-                self.extraLCD2[i].setStyleSheet(f"QLCDNumber {{ border-radius:4; color: {rgba_colorname2argb_colorname(self.lcdpaletteF['sv'])}; background-color: {rgba_colorname2argb_colorname(self.lcdpaletteB['sv'])};}}")
+                self.updateLCDcolor(self.extraLCD2[i], 'sv')
         #hide the rest (just in case)
         for i in range(ndev,self.nLCDS):
             self.extraLCDframe1[i].setVisible(False)
@@ -12684,7 +12853,7 @@ class ApplicationWindow(QMainWindow):
                 elif k == Qt.Key.Key_Z and no_modifier: # 90:   #Z (toggle xy coordinates between 0: cursor, 1: BT, 2: ET, 3: BTB, 4: ETB)
                     if not self.qmc.designerflag and not self.qmc.wheelflag and self.comparator is None:
                         self.qmc.nextFmtDataCurve()
-                elif k == Qt.Key.Key_U and no_modifier: # 85:    #U (toggle running LCDs on/off)
+                elif k == Qt.Key.Key_U and no_modifier: # 85:   #U (toggle running LCDs on/off)
                     if not self.qmc.flagon:
                         if self.qmc.running_LCDs == 0 and self.curFile:
                             self.qmc.running_LCDs = 1
@@ -15469,7 +15638,8 @@ class ApplicationWindow(QMainWindow):
 
     def getExtraDeviceSettings(self, settings:QSettings) -> None:
         self.qmc.extradevices = [toInt(x) for x in toList(settings.value('extradevices',self.qmc.extradevices))]
-        self.qmc.extradevices = [(x if (0 < x < len(self.qmc.devices)-1 and x != 18) else 25) for x in self.qmc.extradevices] # if out of range (note index is shifted by 1) or NONE, set to VIRTUAL
+        # not in the device ids are shifted by relative to the (zero-based) positions in self.qmc.device as the first entry is idx=1 (idx=0 is reserved for FUJI PID)
+        self.qmc.extradevices = [(x if (0 < x <= len(self.qmc.devices) and x != 18) else 25) for x in self.qmc.extradevices] # if out of range (note index is shifted by 1) or NONE, set to VIRTUAL
         self.qmc.extraname1 = list(map(str,list(toStringList(settings.value('extraname1',self.qmc.extraname1)))))
         self.qmc.extraname2 = list(map(str,list(toStringList(settings.value('extraname2',self.qmc.extraname2)))))
         self.qmc.extramathexpression1 = list(map(str,list(toStringList(settings.value('extramathexpression1',self.qmc.extramathexpression1)))))
@@ -18007,6 +18177,8 @@ class ApplicationWindow(QMainWindow):
         #remember swaplcds and swapdeltalcds
         old_swaplcds = self.qmc.swaplcds
         old_swapdeltalcds = self.qmc.swapdeltalcds
+        canvas_color_changed:bool = False # used to avoid unnecessary (expensive) call to updateCanvasColors()
+        graphfont_changed:bool = False # used to avoid unnecessary (expensive) call to setFonts()
         try:
             updateBatchCounter = True
             if filename is not None:
@@ -18114,7 +18286,6 @@ class ApplicationWindow(QMainWindow):
                 settings.setValue('recentFileList', recentFiles)
                 # reset recent settings
                 settings.setValue('recentSettingList', recentSettings)
-
 
                 if 'canvas' in self.qmc.palette:
                     self.updateCanvasColors(checkColors=False)
@@ -18463,7 +18634,10 @@ class ApplicationWindow(QMainWindow):
             #restore colors
             if settings.contains('Colors'):
                 for (k, v) in list(settings.value('Colors').items()):
-                    self.qmc.palette[str(k)] = s2a(toString(v))
+                    new_canvas_color = s2a(toString(v))
+                    if k == 'canvas' and 'canvas' in self.qmc.palette and self.qmc.palette['canvas'] != new_canvas_color:
+                        canvas_color_changed = True
+                    self.qmc.palette[str(k)] = new_canvas_color
                 if 'messages' in self.qmc.palette:
                     self.setLabelColor(self.messagelabel,self.qmc.palette['messages'])
                 if 'et' in self.qmc.palette:
@@ -18496,13 +18670,7 @@ class ApplicationWindow(QMainWindow):
                 for (k, v) in list(settings.value('Alphas').items()):
                     self.qmc.alpha[str(k)] = v
             #restore colors
-            self.lcd1.setStyleSheet(f"QLCDNumber {{ border-radius:4; color: {rgba_colorname2argb_colorname(self.lcdpaletteF['timer'])}; background: {rgba_colorname2argb_colorname(self.lcdpaletteB['timer'])};}}")
-            self.lcd2.setStyleSheet(f"QLCDNumber {{ border-radius:4; color: {rgba_colorname2argb_colorname(self.lcdpaletteF['et'])}; background: {rgba_colorname2argb_colorname(self.lcdpaletteB['et'])};}}")
-            self.lcd3.setStyleSheet(f"QLCDNumber {{ border-radius:4; color: {rgba_colorname2argb_colorname(self.lcdpaletteF['bt'])}; background: {rgba_colorname2argb_colorname(self.lcdpaletteB['bt'])};}}")
-            self.lcd4.setStyleSheet(f"QLCDNumber {{ border-radius:4; color: {rgba_colorname2argb_colorname(self.lcdpaletteF['deltaet'])}; background: {rgba_colorname2argb_colorname(self.lcdpaletteB['deltaet'])};}}")
-            self.lcd5.setStyleSheet(f"QLCDNumber {{ border-radius:4; color: {rgba_colorname2argb_colorname(self.lcdpaletteF['deltabt'])}; background: {rgba_colorname2argb_colorname(self.lcdpaletteB['deltabt'])};}}")
-            self.lcd6.setStyleSheet(f"QLCDNumber {{ border-radius:4; color: {rgba_colorname2argb_colorname(self.lcdpaletteF['sv'])}; background: {rgba_colorname2argb_colorname(self.lcdpaletteB['sv'])};}}")
-            self.lcd7.setStyleSheet(f"QLCDNumber {{ border-radius:4; color: {rgba_colorname2argb_colorname(self.lcdpaletteF['sv'])}; background: {rgba_colorname2argb_colorname(self.lcdpaletteB['sv'])};}}")
+            self.updateLCDcolors()
             self.readingslcdsflags = [toInt(x) for x in toList(settings.value('readingslcdsflags',self.readingslcdsflags))]
             self.controlsflags = [toInt(x) for x in toList(settings.value('controlsflags',self.controlsflags))]
             #restore flavors
@@ -18964,7 +19132,9 @@ class ApplicationWindow(QMainWindow):
             self.qmc.patheffects = toInt(settings.value('patheffects',self.qmc.patheffects))
             self.qmc.glow = toInt(settings.value('glow',self.qmc.glow))
             self.qmc.graphstyle = toInt(settings.value('graphstyle',self.qmc.graphstyle))
+            old_graphfont = self.qmc.graphfont
             self.qmc.graphfont = toInt(settings.value('graphfont',self.qmc.graphfont))
+            graphfont_changed = old_graphfont != self.qmc.graphfont
             if settings.contains('ETname'):
                 self.ETname = settings.value('ETname')
                 ETname_subst = self.qmc.device_name_subst(self.ETname)
@@ -19665,7 +19835,8 @@ class ApplicationWindow(QMainWindow):
 
 #--------------------------------
         try:
-            self.setFonts(redraw=redraw) # this one triggers a redraw by default to establish the correct fonts
+            if graphfont_changed or filename is None:
+                self.setFonts(redraw=redraw) # this one triggers a redraw by default to establish the correct fonts
             # only after this the correct aspect ratio of the qmc canvas is set
 
             if len(self.logofilename) > 0:
@@ -19744,8 +19915,8 @@ class ApplicationWindow(QMainWindow):
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
 
-            # this one has done here, if it is done on start of the section the slider title colors are not set correctly on Linux and macOS
-            if 'canvas' in self.qmc.palette:
+            # this one has to be done here, if it is done on start of the section the slider title colors are not set correctly on Linux and macOS
+            if 'canvas' in self.qmc.palette and (filename is None or canvas_color_changed):
                 self.updateCanvasColors(checkColors=False)
 
         except Exception as e: # pylint: disable=broad-except
@@ -21448,17 +21619,6 @@ class ApplicationWindow(QMainWindow):
 #--- END GROUP CurveStyles
 #--- BEGIN GROUP Axis
             settings.beginGroup('Axis')
-            xmin = self.qmc.startofx
-            if self.qmc.timeindex[0] != -1:
-                xmin -= self.qmc.timex[self.qmc.timeindex[0]]
-            settings.setValue('xmin',xmin)
-            settings.setValue('xmax',self.qmc.endofx)
-            settings.setValue('ymax',self.qmc.ylimit)
-            settings.setValue('ymin',self.qmc.ylimit_min)
-            settings.setValue('zmax',self.qmc.zlimit)
-            settings.setValue('zmin',self.qmc.zlimit_min)
-            settings.setValue('resetmaxtime',self.qmc.resetmaxtime)
-            settings.setValue('chargemintime',self.qmc.chargemintime)
             settings.setValue('legendloc',self.qmc.legendloc)
             settings.setValue('temp_grid',self.qmc.temp_grid)
             settings.setValue('time_grid',self.qmc.time_grid)
@@ -24612,66 +24772,56 @@ class ApplicationWindow(QMainWindow):
         self.message_dlg.raise_()
         self.message_dlg.activateWindow()
 
+
     @pyqtSlot()
     @pyqtSlot(bool)
     def helpAbout(self, _:bool = False) -> None:
         # pylint: disable=consider-using-f-string
         coredevelopers:str = '<br>Rafael Cobo, Marko Luther &amp; Dave Baxter'
-        box = QMessageBox(self)
-
-        #create a html QString
-        from scipy import __version__ as SCIPY_VERSION_STR # type #  ignore # @UnresolvedImport
-        from pymodbus import __version__ as PYMODBUS_VERSION_STR
-        build:str = ''
-        if __build__ != '0': # pyright:ignore[reportUnnecessaryComparison]
-            build = ' build ' + __build__
+        box = QMessageBox()
+        box.setStyleSheet(f"""
+            QMessageBox {{
+                font-weight: normal;
+            }}
+            QDialogButtonBox {{
+                qproperty-centerButtons: true;
+            }}
+            QMessageBox QPushButton {{
+                width: {self.main_button_min_width_str};
+                height: {self.standard_button_height};
+                border-style:solid;
+                border-radius:20;
+                border-color:grey;
+                border-width:0;
+                font-size: {self.button_font_size};
+                font-weight: bold;
+                color: white;
+                background-color: #3979ae;
+            }}
+            QMessageBox QPushButton:!enabled {{
+                color: darkgrey;
+                background-color: #E0E0E0;
+            }}
+            QMessageBox QPushButton:pressed {{
+                color: #EEEEEE;
+                background-color: #116D98;
+            }}
+            QMessageBox QPushButton:hover:!pressed {{
+                color: white;
+                background-color: #1985ba;
+            }}
+        """)
         name:str = (application_viewer_name if self.app.artisanviewerMode else application_name)
-        otherlibs:str = ''
-        try:
-            from Phidget22.Phidget import Phidget as PhidgetDriver # type: ignore[import-untyped]
-            phidgetlibversion = PhidgetDriver.getLibraryVersion()
-            otherlibs += ', ' + phidgetlibversion
-        except Exception as e: # pylint: disable=broad-except
-            _log.debug(e)
-        try:
-            from Phidget22 import __version__ as phidget_lib_version # type: ignore[import-untyped] # @UnresolvedImport
-            otherlibs += f' ({phidget_lib_version})'
-        except Exception: # pylint: disable=broad-except
-            pass
-        try:
-            yocto_version = YAPI.GetAPIVersion() # type:ignore[reportPossibleUnboundVariable,unused-ignore]
-            otherlibs += ', Yoctopuce ' + yocto_version
-        except Exception as e: # pylint: disable=broad-except
-            _log.exception(e)
-        unofficial = ('' if not appFrozen() or self.official_build else QApplication.translate('Message', 'unoffical build')) # fork, mod
-        box.about(self,
-                QApplication.translate('About', 'About'),
-                """<h2>{0} {1}{14}{2}</h2>{17}
-                <p>
-                <small>Python {3}, Qt {4}, PyQt {5}, Matplotlib {6}, NumPy {7}, SciPy {8}, pymodbus {11}{15}</small>
-                </p>
-                <p>{16}</p>
-                <p><b>{9}</b><small>{10}</small></p>
-                <p><b>{12}</b><br><small>{13}</small></p>
-                """.format( # noqa: UP030
-                name.lower(),
-                __version__,
-                (f' ({str(__revision__)})' if str(__revision__) != '' else ''),
-                platform.python_version(),
-                qVersion,
-                PYQT_VERSION_STR,
-                mpl.__version__,
-                numpy.__version__,
-                SCIPY_VERSION_STR,
-                QApplication.translate('About', 'Core Developers'),
-                coredevelopers,
-                PYMODBUS_VERSION_STR,
-                QApplication.translate('About', 'License'),
-                    '<a href="https://www.gnu.org/licenses/agpl-3.0.html">GNU Affero General Public License (AGPLv3.0)</a>',
-                build,
-                otherlibs, # pyright:ignore[reportUnknownArgumentType]
-                '<a href="https://artisan-scope.org">https://artisan-scope.org</a>',
-                unofficial))
+        box.setText(
+                f"""<center><h1><font color='#2899c7'>{name.lower()}</font></h1><b>v{__version__}</b> {(__build__ if __build__ != '0' else '')}{(f' ({str(__revision__)})' if str(__revision__) != '' else '')}
+                <i>{('' if not appFrozen() or self.official_build else QApplication.translate('Message', 'unoffical build'))}</i></center>
+                <p><center><a href="https://artisan-scope.org">https://artisan-scope.org</a></center><br></p>
+                <p><b>{QApplication.translate('About', 'Core Developers')}</b><small>{coredevelopers}</small></p>
+                <p><b>{QApplication.translate('About', 'License')}</b><br><small><a href="https://www.gnu.org/licenses/agpl-3.0.html">GNU Affero General Public License (AGPLv3.0)</a></small></p>
+                """)
+        box.setWindowTitle(QApplication.translate('About', 'About'))
+        box.exec()
+
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -24752,6 +24902,15 @@ class ApplicationWindow(QMainWindow):
                         f'{fmt.upper()} Files (*.{fmt});;All Files (*)')[0]
                 if fileName:
                     imag.save(fileName, fmt)
+
+
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def set_machine_name(self, _:bool = False) -> None:
+        new_name, ok = QInputDialog.getText(self, QApplication.translate('Menu', 'Machine Name'), QApplication.translate('Menu', 'Machine Name'), text=self.qmc.roastertype_setup)
+        if ok:
+            self.qmc.roastertype_setup = new_name
+
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -25152,7 +25311,6 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     @pyqtSlot(bool)
     def loadSettings_triggered(self, _:bool = False) -> None:
-        _log.info('menu load settings')
         self.loadSettings()
 
     def loadSettings(self, fn:str|None = None, remember:bool = True, reset:bool = True,
@@ -25374,7 +25532,8 @@ class ApplicationWindow(QMainWindow):
                 if reply == QMessageBox.StandardButton.Cancel:
                     return
                 try:
-                    res = self.settingsLoad(filename,theme=True)
+                    res = self.settingsLoad(filename,theme=True,redraw=False)
+                    self.qmc.redraw(False,False,True,True,False) # redraw without any recomputation but force renew axis to adjust for xkcd style change
                     self.sendmessage(QApplication.translate('Message','Loaded theme {0}').format(filename))
                     if reset:
                         self.qmc.reset(soundOn=False)
@@ -25409,6 +25568,7 @@ class ApplicationWindow(QMainWindow):
                                 widget.updateRecentThemeActions()
                         self.themeMenu.clear()
                         self.populateThemeMenu()
+
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
                     # remove file from the recent file list

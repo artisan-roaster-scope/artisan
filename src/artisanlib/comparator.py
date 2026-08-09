@@ -51,6 +51,7 @@ from artisanlib.suppress_errors import suppress_stdout_stderr
 from artisanlib.dialogs import ArtisanDialog
 from artisanlib.widgets import MyQComboBox
 from artisanlib.qcheckcombobox import CheckComboBox
+from artisanlib.table_style import horizontal_header_style, vertical_header_style
 
 with suppress_stdout_stderr():
     from matplotlib import colormaps # pyrefly:ignore[missing-module-attribute]
@@ -1062,19 +1063,20 @@ class roastCompareDlg(ArtisanDialog):
         settings1Layout = QHBoxLayout()
         settings1Layout.addWidget(self.modeComboBox)
         settings1Layout.addStretch()
-        settings1Layout.addSpacing(10)
-        settings1Layout.addStretch()
+        settings1Layout.addSpacing(8)
         settings1Layout.addWidget(alignLabel)
+        settings1Layout.addSpacing(4)
         settings1Layout.addWidget(self.alignComboBox)
 
         settings2Layout = QHBoxLayout()
         settings2Layout.addWidget(self.cb)
-        settings1Layout.addSpacing(2)
+        settings2Layout.addSpacing(4)
         settings2Layout.addWidget(self.eventsComboBox)
 
         settingsLayout = QVBoxLayout()
         settingsLayout.addLayout(settings2Layout)
         settingsLayout.addLayout(settings1Layout)
+        settingsLayout.setSpacing(2)
 
         buttonLayout = QHBoxLayout()
         buttonLayout.addStretch()
@@ -1575,33 +1577,33 @@ class roastCompareDlg(ArtisanDialog):
             vheader: QHeaderView|None = self.profileTable.verticalHeader()
             if vheader is not None:
                 vheader.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
-            self.profileTable.setHorizontalHeaderLabels(['',
-                                                         QApplication.translate('Label','ON'),
-                                                         QApplication.translate('Label','Title')])
-            hheader: QHeaderView|None = self.profileTable.horizontalHeader()
-            if hheader is not None:
-                hheader.sectionClicked.connect(self.columnHeaderClicked)
-            self.profileTable.setCornerButtonEnabled(True) # click in the left header corner selects all entries in the table
-            self.profileTable.setSortingEnabled(False)
-
-            vheader = self.profileTable.verticalHeader()
-            if vheader is not None:
                 vheader.setSectionsMovable(True)
                 vheader.setDragDropMode(QTableWidget.DragDropMode.InternalMove)
                 vheader.sectionMoved.connect(self.sectionMoved)
                 vheader.sectionDoubleClicked.connect(self.tableSectionClicked)
+                vheader.setStyleSheet(vertical_header_style(self.aw.app.darkmode))
+                vheader.setDefaultAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
+
+
+            self.profileTable.setHorizontalHeaderLabels(['',
+                                                         QApplication.translate('Label','ON'),
+                                                         QApplication.translate('Label','Title')])
+            self.profileTable.setCornerButtonEnabled(True) # click in the left header corner selects all entries in the table
+            self.profileTable.setSortingEnabled(False)
 
             self.profileTable.itemSelectionChanged.connect(self.selectionChanged)
             self.profileTable.deleteKeyPressed.connect(self.deleteSelected)
 
             header: QHeaderView|None = self.profileTable.horizontalHeader()
             if header is not None:
+                header.sectionClicked.connect(self.columnHeaderClicked)
                 header.setStretchLastSection(True)
                 header.setMinimumSectionSize(10)  # color column size
 #                header.setSectionResizeMode(0, QHeaderView.ResizeMode.Fixed)
                 header.setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
                 header.setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
                 header.setSectionResizeMode(2, QHeaderView.ResizeMode.Stretch)
+                header.setStyleSheet(horizontal_header_style(self.aw.app.darkmode))
 
             self.profileTable.setColumnWidth(0,10) # color column size
             self.profileTable.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)

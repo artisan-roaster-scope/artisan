@@ -46,7 +46,7 @@ from PyQt6.QtCore import (Qt, QMimeData, QSettings, pyqtSlot, pyqtSignal, QPoint
 from PyQt6.QtGui import (QDrag, QPixmap, QPainter, QTextLayout, QTextLine, QColor, QFontMetrics, QCursor, QAction, QIcon)
 from PyQt6.QtWidgets import (QDialogButtonBox, QMessageBox, QStackedWidget, QApplication, QWidget, QVBoxLayout, QHBoxLayout, QFrame, QTabWidget,
         QCheckBox, QGroupBox, QScrollArea, QLabel, QSizePolicy,
-        QGraphicsDropShadowEffect, QPlainTextEdit, QLineEdit, QMenu, QStatusBar, QToolButton)
+        QGraphicsDropShadowEffect, QLineEdit, QMenu, QStatusBar, QToolButton)
 
 
 from babel.dates import format_date, format_timedelta
@@ -72,7 +72,7 @@ import plus.sync
 import plus.util
 from plus.util import datetime2epoch, epoch2datetime, schedulerLink, epoch2ISO8601, ISO86012epoch, plusLink
 from plus.weight import Display, GreenDisplay, RoastedDisplay, PROCESS_STATE, WeightManager, GreenWeightItem, RoastedWeightItem
-from artisanlib.widgets import ClickableQLabel, ClickableQLineEdit, Splitter
+from artisanlib.widgets import ClickableQLabel, ClickableQLineEdit, Splitter, ArtisanPlainTextEdit
 from artisanlib.dialogs import ArtisanResizeablDialog
 from artisanlib.util import (float2float, float2str, convertWeight, weight_units, render_weight, comma2dot, float2floatWeightVolume, getDirectory,
     getResourcePath, deserialize, roast_time, get_total_roast_time_from_profile, stringfromseconds)
@@ -2135,19 +2135,19 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         roasted_moisture_suffix.setFixedWidth(color_density_moisture_suffix_width)
         roasted_moisture_suffix.setAlignment (Qt.AlignmentFlag.AlignLeft)
 
-        self.roasted_notes = QPlainTextEdit()
+        self.roasted_notes = ArtisanPlainTextEdit()
         self.roasted_notes.setPlaceholderText(QApplication.translate('Label', 'Roasting Notes'))
         self.roasted_notes.setToolTip(QApplication.translate('Label', 'Roasting Notes'))
 
         self.cupping_score = QLineEdit()
-        self.cupping_score.setFixedWidth(42)
+        self.cupping_score.setFixedWidth(60)
         self.cupping_score.setPlaceholderText(QApplication.translate('Label', 'Score'))
         self.cupping_score.setToolTip(QApplication.translate('Label','Cupping Score'))
         self.cupping_score.setValidator(self.aw.createCLocaleDoubleValidator(0., 100., 2, self.cupping_score))
         self.cupping_score.setAlignment(Qt.AlignmentFlag.AlignCenter) #Qt.AlignmentFlag.AlignHCenter|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.cupping_score.editingFinished.connect(self.cupping_score_changed)
 
-        self.cupping_notes = QPlainTextEdit()
+        self.cupping_notes = ArtisanPlainTextEdit()
         self.cupping_notes.setPlaceholderText(QApplication.translate('Label', 'Cupping Notes'))
         self.cupping_notes.setToolTip(QApplication.translate('Label', 'Cupping Notes'))
 
@@ -2198,6 +2198,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         lines:int = 2
         docMargin:float = 0
         lineSpacing:float = 1.5
+        padding:float = 1.0
 
         roasted_notes_doc:QTextDocument|None = self.roasted_notes.document()
         if roasted_notes_doc is not None:
@@ -2207,7 +2208,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
             lineSpacing = fontMetrics.lineSpacing()
         margins:QMargins = self.roasted_notes.contentsMargins()
         notes_hight:int = math.ceil(lineSpacing * lines +
-            (docMargin + self.roasted_notes.frameWidth()) * 2 + margins.top() + margins.bottom())
+            (docMargin + self.roasted_notes.frameWidth()) * 2 + margins.top() + margins.bottom() + 2* padding)
         self.roasted_notes.setFixedHeight(notes_hight)
         self.roasted_notes.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.roasted_notes.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
@@ -2221,7 +2222,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
             lineSpacing = fontMetrics.lineSpacing()
         margins = self.cupping_notes.contentsMargins()
         cupping_notes_hight:int = math.ceil(lineSpacing * lines +
-            (docMargin + self.cupping_notes.frameWidth()) * 2 + margins.top() + margins.bottom())
+            (docMargin + self.cupping_notes.frameWidth()) * 2 + margins.top() + margins.bottom() + 2* padding)
         self.cupping_notes.setFixedHeight(cupping_notes_hight)
         self.cupping_notes.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.cupping_notes.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
@@ -2245,7 +2246,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.completed_details_scrollarea.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.completed_details_scrollarea.setWidgetResizable(True)
         self.completed_details_scrollarea.setWidget(self.completed_details_group)
-        self.completed_details_scrollarea.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
+        self.completed_details_scrollarea.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum) # horizontal/vertical
 
         completed_details_layout2 =  QVBoxLayout()
         completed_details_layout2.addSpacing(1) # ensures a minimum height to keep the handle movable

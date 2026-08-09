@@ -392,15 +392,15 @@ class TestModbusPortInitialization:
     def test_initialization_channels_setup(self, client: Any) -> None:
         """Test that channels are properly initialized."""
         # Assert
-        assert client.channels == 10
-        assert len(client.inputDeviceIds) == 10
-        assert len(client.inputRegisters) == 10
-        assert len(client.inputFloats) == 10
-        assert len(client.inputBCDs) == 10
-        assert len(client.inputSigned) == 10
-        assert len(client.inputCodes) == 10
-        assert len(client.inputDivs) == 10
-        assert len(client.inputModes) == 10
+        assert client.channels == 12
+        assert len(client.inputDeviceIds) == 12
+        assert len(client.inputRegisters) == 12
+        assert len(client.inputFloats) == 12
+        assert len(client.inputBCDs) == 12
+        assert len(client.inputSigned) == 12
+        assert len(client.inputCodes) == 12
+        assert len(client.inputDivs) == 12
+        assert len(client.inputModes) == 12
 
         # Check default values
         assert all(slave == 0 for slave in client.inputDeviceIds)

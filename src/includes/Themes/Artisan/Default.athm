@@ -68,6 +68,17 @@ graphfont=0
 graphstyle=0
 patheffects=1
 
+[Axis]
+chargemintime=-30
+legendloc=4
+resetmaxtime=600
+temp_grid=false
+time_grid=false
+ymax=275
+ymin=0
+zmax=25
+zmin=0
+
 [XT]
 color=#404040
 color2=#404040
@@ -84,3 +95,13 @@ Evaluelinethickness=1, 1, 1, 1
 
 [grid]
 gridalpha=0.2
+gridlinestyle=0
+gridthickness=1
+xgrid=120
+ygrid=50
+zgrid=5
+
+[Axis]
+legendloc=4
+temp_grid=false
+time_grid=false

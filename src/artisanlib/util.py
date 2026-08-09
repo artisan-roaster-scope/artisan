@@ -575,12 +575,16 @@ def toDim(color:str) -> str:
 
 # creates QLinearGradient style from light to dark by default, or from dark to light if reverse is True
 @functools.cache
-def createGradient(rgb:QColor|str, tint_factor:float = 0.1, shade_factor:float = 0.1, reverse:bool = False) -> str:
+def createGradient(rgb:QColor|str, tint_factor:float = 0.1, shade_factor:float = 0.1, reverse:bool = False, left_to_right:bool = False) -> str:
     light_grad,dark_grad = createRGBGradient(rgb,tint_factor,shade_factor)
     if reverse:
         # dark to light
+        if left_to_right:
+            return f'QLinearGradient(x1:0,y1:0,x2:1,y2:0,stop:0 {dark_grad}, stop:1 {light_grad})'
         return f'QLinearGradient(x1:0,y1:0,x2:0,y2:1,stop:0 {dark_grad}, stop:1 {light_grad})'
     # light to dark (default)
+    if left_to_right:
+        return f'QLinearGradient(x1:0,y1:0,x2:1,y2:0,stop:0 {light_grad}, stop:1 {dark_grad})'
     return f'QLinearGradient(x1:0,y1:0,x2:0,y2:1,stop:0 {light_grad}, stop:1 {dark_grad})'
 
 # NOTE: for now alpha values of the rgb argument are ignored and resulting colors are RGB without alphas

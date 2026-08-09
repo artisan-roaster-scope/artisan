@@ -32,6 +32,8 @@ from artisanlib.main import UI_MODE
 from artisanlib.util import deltaLabelUTF8, deltaLabelPrefix, stringfromseconds
 from artisanlib.dialogs import ArtisanResizeablDialog
 from artisanlib.widgets import (MyTableWidgetItemNumber)
+from artisanlib.table_style import horizontal_header_style, vertical_header_style
+
 from typing import override, Final, TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -185,6 +187,13 @@ class backgroundDlg(ArtisanResizeablDialog):
         #TAB 2 EVENTS
         #table for showing events
         self.eventtable = QTableWidget()
+        horizontal_header = self.eventtable.horizontalHeader()
+        if horizontal_header is not None:
+            horizontal_header.setStyleSheet(horizontal_header_style(self.aw.app.darkmode))
+        vertical_header = self.eventtable.verticalHeader()
+        if vertical_header is not None:
+            vertical_header.setStyleSheet(vertical_header_style(self.aw.app.darkmode))
+            vertical_header.setDefaultAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
         self.eventtable.setTabKeyNavigation(True)
         self.copyeventTableButton = QPushButton(QApplication.translate('Button', 'Copy Table'))
         self.copyeventTableButton.setToolTip(QApplication.translate('Tooltip','Copy table to clipboard, OPTION or ALT click for tabular text'))
@@ -195,6 +204,13 @@ class backgroundDlg(ArtisanResizeablDialog):
         #TAB 3 DATA
         #table for showing data
         self.datatable = QTableWidget()
+        horizontal_header = self.datatable.horizontalHeader()
+        if horizontal_header is not None:
+            horizontal_header.setStyleSheet(horizontal_header_style(self.aw.app.darkmode))
+        vertical_header = self.datatable.verticalHeader()
+        if vertical_header is not None:
+            vertical_header.setStyleSheet(vertical_header_style(self.aw.app.darkmode))
+            vertical_header.setDefaultAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
         self.datatable.setTabKeyNavigation(True)
         self.copydataTableButton = QPushButton(QApplication.translate('Button', 'Copy Table'))
         self.copydataTableButton.setToolTip(QApplication.translate('Tooltip','Copy table to clipboard, OPTION or ALT click for tabular text'))

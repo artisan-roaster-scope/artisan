@@ -24,3 +24,14 @@ Evaluelinethickness=1, 1, 1, 1
 
 [grid]
 gridalpha=0.2
+gridlinestyle=0
+gridthickness=1
+xgrid=120
+ygrid=50
+zgrid=5
+
+
+[Axis]
+legendloc=4
+temp_grid=false
+time_grid=false

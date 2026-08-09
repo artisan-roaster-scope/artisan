@@ -39,7 +39,7 @@ if TYPE_CHECKING:
 from PyQt6.QtCore import (Qt, pyqtSignal, pyqtSlot, QLine, QEvent,
     QByteArray, QPropertyAnimation, QEasingCurve, QLocale)
 from PyQt6.QtCore import pyqtProperty # type:ignore[attr-defined]
-from PyQt6.QtWidgets import (QApplication, QSplitter, QSplitterHandle, QLabel, QComboBox, QLineEdit, QTextEdit, QDoubleSpinBox, QPushButton,
+from PyQt6.QtWidgets import (QApplication, QSplitter, QSplitterHandle, QLabel, QComboBox, QLineEdit, QTextEdit, QPlainTextEdit, QDoubleSpinBox, QPushButton,
     QTableWidget, QTableWidgetItem, QSizePolicy, QLCDNumber, QGroupBox, QFrame, QSlider, QStyle, QStyleOptionSlider)
 from PyQt6.QtGui import QPen, QPainter, QFontMetrics, QColor, QCursor, QEnterEvent, QPaintEvent
 
@@ -349,8 +349,55 @@ class ClickableLCDFrame(QFrame):
                 self.right_clicked.emit()
 
 
+# Text Edits
+
+def textEditColorStyle(
+        background_color: str|None = None,
+        selection_background_color: str|None = None) -> str:
+    if background_color is not None and selection_background_color is not None:
+        return f"""
+            QTextEdit, QPlainTextEdit {{
+                background-color: {background_color};
+                selection-background-color: {selection_background_color};
+                padding: 0 0.8px;
+                border-radius: 10px;
+                border-width: 2px;
+                border-style: solid;
+                border-color: palette(dark);
+            }}
+            QTextEdit, QPlainTextEdit:focus {{
+                border-color: palette(accent);
+            }}
+        """
+    return """
+        QTextEdit, QPlainTextEdit {
+            background-color: palette(base);
+            padding: 0 0.8px;
+            border-radius: 10px;
+            border-width: 2px;
+            border-style: solid;
+            border-color: palette(dark);
+        }
+        QTextEdit:focus, QPlainTextEdit:focus {
+            border-color: palette(accent);
+        }
+    """
+
+
+class ArtisanTextEdit(QTextEdit):
+    def __init__(self, parent:'QWidget|None' = None, **kwargs:dict[Any,Any]) -> None:
+        super().__init__(parent, **kwargs)
+        self.setStyleSheet(textEditColorStyle())
+
+
+class ArtisanPlainTextEdit(QPlainTextEdit):
+    def __init__(self, parent:'QWidget|None' = None, **kwargs:dict[Any,Any]) -> None:
+        super().__init__(parent, **kwargs)
+        self.setStyleSheet(textEditColorStyle())
+
+
 # this one emits a clicked event on right-clicks and an editingFinished event when the text was changed and the focus got lost
-class ClickableTextEdit(QTextEdit):
+class ClickableTextEdit(ArtisanPlainTextEdit):
     clicked = pyqtSignal()
     editingFinished = pyqtSignal()
     receivedFocus = pyqtSignal()
@@ -387,7 +434,7 @@ class ClickableTextEdit(QTextEdit):
         self._changed = state
 
     def setNewPlainText(self, text:str) -> None:
-        QTextEdit.setPlainText(self, text)
+        self.setPlainText(text)
         self._changed = False
 
 # this one emits a clicked event on right-clicks and an editingFinished event when the text was changed and the focus got lost

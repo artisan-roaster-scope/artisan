@@ -19,14 +19,14 @@
 ######
 # the following commented package versions are read by appveyor.yml and downloaded outside of pip.
 #
-# pyinstaller==6.21.0; platform_system='Windows'
+# pyinstaller==6.22.0; platform_system='Windows'
 # libusb==1.0.26;  platform_system='Linux'
 # dotenv==2.8.1;   platform_system='Linux'  # v3.0.0 not compatible with fpm  # gem installed, not pip
 #
 ######
 # packages that are required on all platforms
 #
-setuptools==83.0.0
+setuptools==84.0.0
 wheel==0.47.0
 pyserial==3.5
 pymodbus==3.14.0
@@ -38,13 +38,13 @@ requests==2.34.2
 requests-file==3.0.1
 pyusb==1.3.1
 persist-queue==1.1.0
-portalocker==4.0.0
+portalocker==4.1.0
 xlrd==2.0.2
 websockets==17.0.1
 PyYAML==6.0.3
 psutil==7.2.2
 protobuf==7.35.1
-numpy==2.5.1
+numpy==2.5.2
 scipy==1.18.0
 wquantiles==0.6
 colorspacious==1.1.2
@@ -63,7 +63,7 @@ pydantic==2.13.4
 babel==2.18.0
 bleak==3.0.2
 python-statemachine==3.2.1
-yoctopuce==2.1.15129
+yoctopuce==2.1.15391
 PyQt6==6.11.0
 paho-mqtt==2.1.0
 jmespath==1.1.0
@@ -76,7 +76,7 @@ pyfulgur==0.40.0
 # packages that differ per platform
 #
 ###
-pyinstaller==6.21.0; platform_system=='Linux' or sys_platform=='darwin' # on Windows pyinstaller is separately installed (see above)
+pyinstaller==6.22.0; platform_system=='Linux' or sys_platform=='darwin' # on Windows pyinstaller is separately installed (see above)
 #
 ### Qt build tools not part of PyQt but required by build-derived
 qt5-tools==5.15.2.1.3; (platform_system=='Windows' and python_version<'3.9')

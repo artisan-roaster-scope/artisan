@@ -30,11 +30,11 @@ import logging
 import re
 
 from PyQt6.QtCore import Qt, QEvent, QSettings, pyqtSlot, pyqtSignal, QRegularExpression
-from PyQt6.QtWidgets import (QApplication, QWidget, QDialog, QMessageBox, QDialogButtonBox, QTextEdit,
+from PyQt6.QtWidgets import (QApplication, QWidget, QDialog, QMessageBox, QDialogButtonBox,
             QHBoxLayout, QVBoxLayout, QLabel, QLineEdit, QLayout, QTableWidget, QHeaderView, QPushButton, QSpinBox, QCheckBox)
 from PyQt6.QtGui import QKeySequence, QAction, QIntValidator, QTextCharFormat, QTextCursor, QColor
 
-from artisanlib.widgets import MyQComboBox, ClickableQLineEdit
+from artisanlib.widgets import MyQComboBox, ClickableQLineEdit, ArtisanTextEdit
 from artisanlib.util import comma2dot, float2float, float2floatWeightVolume, convertWeight, weight_units
 
 from collections.abc import Callable
@@ -51,6 +51,7 @@ class ArtisanDialog(QDialog):
     __slots__ = ['aw', 'dialogbuttons']
 
     def __init__(self, parent:QWidget|None, aw:'ApplicationWindow') -> None:
+
         super().__init__(parent)
         self.aw = aw # the Artisan application window
 
@@ -59,6 +60,7 @@ class ArtisanDialog(QDialog):
         # want to use a dialog.deleteLater() call to explicitly have the dialog and its widgets GCe
         # or rather use sip.delete(dialog) if the GC via .deleteLater() is prevented by a link to a parent object (parent not None)
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose, True)
+
 
 #        if platf == 'Windows':
 # setting those Windows flags could be the reason for some instabilities on Windows
@@ -183,7 +185,7 @@ class HelpDlg(ArtisanDialog):
             self.restoreGeometry(settings.value('HelpGeometry'))
 
         # Load the help content
-        self.phelp = QTextEdit()
+        self.phelp = ArtisanTextEdit()
         self.phelp.setHtml(content)
         self.phelp.setReadOnly(True)
 
@@ -314,7 +316,7 @@ class HelpDlg(ArtisanDialog):
         if self.matches:
             # Highlight all matches, the current match in current_match_highlight and all others in extra_matches_highlight
             for i, matchCursor in enumerate(self.matches):
-                selection = QTextEdit.ExtraSelection()
+                selection = self.phelp.ExtraSelection()
                 selection.cursor = matchCursor  # pyrefly: ignore[bad-assignment]
                 fmt:QTextCharFormat = QTextCharFormat()
                 fmt.setForeground(QColor(match_text))

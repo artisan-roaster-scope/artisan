@@ -39,14 +39,16 @@ if TYPE_CHECKING:
 
 from artisanlib.util import toFloat, uchr, comma2dot, float2float, toInt
 from artisanlib.dialogs import ArtisanDialog, ArtisanResizeablDialog, PortComboBox
+from artisanlib.widgets import wait_cursor, ArtisanPlainTextEdit
 from artisanlib.comm import serialport
+from artisanlib.table_style import horizontal_header_style, vertical_header_style
 
 
 from PyQt6.QtCore import (Qt, pyqtSlot, QSettings)
 from PyQt6.QtGui import QIntValidator, QStandardItemModel
 from PyQt6.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit,
                              QPushButton, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout,QSizePolicy,
-                             QGroupBox, QTableWidget, QTableWidgetItem, QDialog, QTextEdit, QDoubleSpinBox,
+                             QGroupBox, QTableWidget, QTableWidgetItem, QDialog, QDoubleSpinBox,
                              QHeaderView, QScrollArea, QFrame)
 
 
@@ -104,11 +106,11 @@ class scanModbusDlg(ArtisanDialog):
         self.checkbox4:QCheckBox = QCheckBox(QApplication.translate('CheckBox','Fct. 4'))
         self.checkbox4.setChecked(self.code4)
         self.checkbox4.stateChanged.connect(self.checkbox4Changed)
-        self.modbusEdit:QTextEdit = QTextEdit()
+        self.modbusEdit = ArtisanPlainTextEdit()
         self.modbusEdit.setReadOnly(True)
-        startButton:QPushButton = QPushButton(QApplication.translate('Button','Start'))
-        startButton.setMaximumWidth(150)
-        startButton.clicked.connect(self.start_pressed)
+        self.startButton:QPushButton = QPushButton(QApplication.translate('Button','Start'))
+        self.startButton.setMaximumWidth(150)
+        self.startButton.clicked.connect(self.start_pressed)
         labellayout:QHBoxLayout = QHBoxLayout()
         labellayout.addWidget(self.deviceIDLabel)
         labellayout.addStretch()
@@ -128,7 +130,7 @@ class scanModbusDlg(ArtisanDialog):
         cblayout.addStretch()
         hlayout:QHBoxLayout = QHBoxLayout()
         hlayout.addStretch()
-        hlayout.addWidget(startButton)
+        hlayout.addWidget(self.startButton)
         hlayout.addStretch()
         layout:QVBoxLayout = QVBoxLayout()
         layout.addLayout(labellayout)
@@ -147,65 +149,65 @@ class scanModbusDlg(ArtisanDialog):
 
     @pyqtSlot(bool)
     def start_pressed(self, _:bool = False) -> None:
-        try:
-            # set MODBUS serial, type, host, port settings from dialog
-            self.aw.modbus.comport = self.port
-            self.aw.modbus.baudrate = self.baudrate
-            self.aw.modbus.bytesize = self.bytesize
-            self.aw.modbus.stopbits = self.stopbits
-            self.aw.modbus.parity = self.parity
-            self.aw.modbus.timeout = self.timeout
-            self.aw.modbus.type = self.mtype
-            self.aw.modbus.host = self.mhost
-            self.aw.modbus.port = self.mport
-            self.stop = False
+        if not self.stop:
+            self.stop = True
+            self.startButton.setText(QApplication.translate('Button','Start'))
+        else:
+            with wait_cursor():
+                try:
+                    # set MODBUS serial, type, host, port settings from dialog
+                    self.aw.modbus.comport = self.port
+                    self.aw.modbus.baudrate = self.baudrate
+                    self.aw.modbus.bytesize = self.bytesize
+                    self.aw.modbus.stopbits = self.stopbits
+                    self.aw.modbus.parity = self.parity
+                    self.aw.modbus.timeout = self.timeout
+                    self.aw.modbus.type = self.mtype
+                    self.aw.modbus.host = self.mhost
+                    self.aw.modbus.port = self.mport
+                    self.stop = False
+                    self.startButton.setText(QApplication.translate('Button','Stop'))
+                    QApplication.processEvents()
 
-            # update device and register limits
-            self.deviceID = int(self.deviceIDEdit.text())
-            self.min_register = int(self.minRegisterEdit.text())
-            self.max_register = int(self.maxRegisterEdit.text())
+                    # update device and register limits
+                    self.deviceID = int(self.deviceIDEdit.text())
+                    self.min_register = int(self.minRegisterEdit.text())
+                    self.max_register = int(self.maxRegisterEdit.text())
 
-            # scan and report
-            result = 'Register,Value<br>'
-            result += '--------------<br>'
-            #### lock shared resources #####
-            self.aw.modbus.COMsemaphore.acquire(1)
-            for register in range(min(self.min_register,self.max_register),max(self.min_register,self.max_register)+1):
-                QApplication.processEvents()
-                if self.stop:
-                    result += '<br>stopped<br>'
-                    self.modbusEdit.setHtml(result)
-                    break
-                if self.code4:
-                    for __ in range(10):
-                        self.aw.modbus.sleepBetween()
-                    res = self.aw.modbus.peekSingleRegister(self.deviceID, int(register), code=4)
-                    if res is not None:
-                        result += str(register) + '(4),' + str(res) + '<br>'
-                        self.modbusEdit.setHtml(result)
-                if self.code3:
-                    for __ in range(10):
-                        self.aw.modbus.sleepBetween()
-                    res = self.aw.modbus.peekSingleRegister(self.deviceID, int(register), code=3)
-                    if res is not None:
-                        result += str(register) + '(3),' + str(res) + '<br>'
-                        self.modbusEdit.setHtml(result)
-            self.aw.modbus.disconnect()
-        except Exception as e: # pylint: disable=broad-except
-            _log.exception(e)
-        finally:
-            if self.aw.modbus.COMsemaphore.available() < 1:
-                self.aw.modbus.COMsemaphore.release(1)
-        # reconstruct MODBUS setup
-        self.aw.modbus.comport = self.port_aw
-        self.aw.modbus.baudrate = self.baudrate_aw
-        self.aw.modbus.bytesize = self.bytesize_aw
-        self.aw.modbus.stopbits = self.stopbits_aw
-        self.aw.modbus.parity = self.parity_aw
-        self.aw.modbus.timeout = self.timeout_aw
-        self.aw.modbus.type = self.mtype_aw
-        self.aw.modbus.host = self.mhost_aw
-        self.aw.modbus.port = self.mport_aw
+                    # scan and report
+                    result = 'Register,Value<br>'
+                    result += '--------------<br>'
+                    #### lock shared resources #####
+                    self.aw.modbus.COMsemaphore.acquire(1)
+                    self.modbusEdit.clear()
+                    for register in range(min(self.min_register,self.max_register),max(self.min_register,self.max_register)+1):
+                        QApplication.processEvents()
+                        if self.stop:
+                            self.modbusEdit.appendPlainText('<---->')
+                            break
+                        res = None
+                        for __ in range(10):
+                            time.sleep(self.aw.modbus.modbus_serial_read_delay)
+                        res = self.aw.modbus.peekSingleRegister(self.deviceID, int(register), code=(4 if self.code4 else 3))
+                        if res is not None:
+                            self.modbusEdit.appendPlainText(f'{register} ({3 if self.code3 else 4}), {res}')
+                    self.aw.modbus.disconnect()
+                except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
+                finally:
+                    if self.aw.modbus.COMsemaphore.available() < 1:
+                        self.aw.modbus.COMsemaphore.release(1)
+                # reconstruct MODBUS setup
+                self.aw.modbus.comport = self.port_aw
+                self.aw.modbus.baudrate = self.baudrate_aw
+                self.aw.modbus.bytesize = self.bytesize_aw
+                self.aw.modbus.stopbits = self.stopbits_aw
+                self.aw.modbus.parity = self.parity_aw
+                self.aw.modbus.timeout = self.timeout_aw
+                self.aw.modbus.type = self.mtype_aw
+                self.aw.modbus.host = self.mhost_aw
+                self.aw.modbus.port = self.mport_aw
+                self.startButton.setText(QApplication.translate('Button','Start'))
 
     @pyqtSlot(int)
     def checkbox3Changed(self, _:int) -> None:
@@ -280,11 +282,11 @@ class scanS7Dlg(ArtisanDialog):
         self.checkbox4 = QCheckBox(QApplication.translate('CheckBox','Float'))
         self.checkbox4.setChecked(self.typeFloat)
         self.checkbox4.stateChanged.connect(self.checkbox4Changed)
-        self.S7Edit = QTextEdit()
+        self.S7Edit = ArtisanPlainTextEdit()
         self.S7Edit.setReadOnly(True)
-        startButton = QPushButton(QApplication.translate('Button','Start'))
-        startButton.setMaximumWidth(150)
-        startButton.clicked.connect(self.start_pressed)
+        self.startButton = QPushButton(QApplication.translate('Button','Start'))
+        self.startButton.setMaximumWidth(150)
+        self.startButton.clicked.connect(self.start_pressed)
         gridlayout = QGridLayout()
         gridlayout.addWidget(self.areaLabel,0,0)
         gridlayout.addWidget(self.DBnrLabel,0,1)
@@ -302,7 +304,7 @@ class scanS7Dlg(ArtisanDialog):
         cblayout.addStretch()
         hlayout = QHBoxLayout()
         hlayout.addStretch()
-        hlayout.addWidget(startButton)
+        hlayout.addWidget(self.startButton)
         hlayout.addStretch()
         layout = QVBoxLayout()
         layout.addLayout(gridlayout)
@@ -320,52 +322,59 @@ class scanS7Dlg(ArtisanDialog):
 
     @pyqtSlot(bool)
     def start_pressed(self, _:bool = False) -> None:
-        try:
-            # set S7 host, port and other settings from dialog
+        if not self.stop:
+            self.stop = True
+            self.startButton.setText(QApplication.translate('Button','Start'))
+        else:
+            with wait_cursor():
+                try:
+                    # set S7 host, port and other settings from dialog
 
-            self.aw.s7.host = self.shost
-            self.aw.s7.port = self.sport
-            self.aw.s7.rack = self.srack
-            self.aw.s7.slot = self.sslot
+                    self.aw.s7.host = self.shost
+                    self.aw.s7.port = self.sport
+                    self.aw.s7.rack = self.srack
+                    self.aw.s7.slot = self.sslot
 
-            self.stop = False
+                    self.stop = False
+                    self.startButton.setText(QApplication.translate('Button','Stop'))
+                    QApplication.processEvents()
 
-            # update device and register limits
-            self.area = int(self.areaCombo.currentIndex())
-            self.DBnr = int(self.DBnrEdit.text())
-            self.min_register = int(self.minRegisterEdit.text())
-            self.max_register = int(self.maxRegisterEdit.text())
+                    # update device and register limits
+                    self.area = int(self.areaCombo.currentIndex())
+                    self.DBnr = int(self.DBnrEdit.text())
+                    self.min_register = int(self.minRegisterEdit.text())
+                    self.max_register = int(self.maxRegisterEdit.text())
 
-            # scan and report
-            result = 'Start,Value<br>'
-            result += '--------------<br>'
-            #### lock shared resources #####
-            self.aw.s7.COMsemaphore.acquire(1)
-            for register in range(min(self.min_register,self.max_register),max(self.min_register,self.max_register)+1,(4 if self.typeFloat else 2)):
-                QApplication.processEvents()
-                if self.stop:
-                    result += '<br>stopped<br>'
-                    self.S7Edit.setHtml(result)
-                    break
-                if self.typeFloat:
-                    res = self.aw.s7.peekFloat(self.area,self.DBnr,register)
-                else:
-                    res = self.aw.s7.peekInt(self.area,self.DBnr,register)
-                if res is not None:
-                    result += f'{str(register)}: {str(res)}<br>'
-                    self.S7Edit.setHtml(result)
-                time.sleep(0.4)
-            self.aw.s7.disconnect()
-        except Exception as e: # pylint: disable=broad-except
-            _log.exception(e)
-        finally:
-            if self.aw.s7.COMsemaphore.available() < 1:
-                self.aw.s7.COMsemaphore.release(1)
-        # reconstruct S7 setup
-        self.aw.s7.host = self.shost_aw
-        self.aw.s7.port = self.sport_aw
-        self.aw.s7.rack = self.srack_aw
-        self.aw.s7.slot = self.sslot_aw
+                    # scan and report
+                    result = 'Start,Value<br>'
+                    result += '--------------<br>'
+                    #### lock shared resources #####
+                    self.aw.s7.COMsemaphore.acquire(1)
+                    self.S7Edit.clear()
+                    for register in range(min(self.min_register,self.max_register),max(self.min_register,self.max_register)+1,(4 if self.typeFloat else 2)):
+                        QApplication.processEvents()
+                        if self.stop:
+                            self.S7Edit.appendPlainText('<---->')
+                            break
+                        if self.typeFloat:
+                            res = self.aw.s7.peekFloat(self.area,self.DBnr,register)
+                        else:
+                            res = self.aw.s7.peekInt(self.area,self.DBnr,register)
+                        if res is not None:
+                            self.S7Edit.appendPlainText(f'{str(register)}: {str(res)}')
+                        time.sleep(0.4)
+                    self.aw.s7.disconnect()
+                except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
+                finally:
+                    if self.aw.s7.COMsemaphore.available() < 1:
+                        self.aw.s7.COMsemaphore.release(1)
+                # reconstruct S7 setup
+                self.aw.s7.host = self.shost_aw
+                self.aw.s7.port = self.sport_aw
+                self.aw.s7.rack = self.srack_aw
+                self.aw.s7.slot = self.sslot_aw
+                self.startButton.setText(QApplication.translate('Button','Start'))
 
     @pyqtSlot(int)
     def checkbox3Changed(self, _:int) -> None:
@@ -460,6 +469,11 @@ class comportDlg(ArtisanResizeablDialog):
         if hheader is not None:
             hheader.setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
             hheader.setStretchLastSection(True)
+            hheader.setStyleSheet(horizontal_header_style(self.aw.app.darkmode))
+        vheader: QHeaderView|None = self.serialtable.verticalHeader()
+        if vheader is not None:
+            vheader.setStyleSheet(vertical_header_style(self.aw.app.darkmode))
+            vheader.setDefaultAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
         self.createserialTable()
         ##########################    TAB 3 WIDGETS   MODBUS
         modbus_comportlabel = QLabel(QApplication.translate('Label', 'Comm Port'))

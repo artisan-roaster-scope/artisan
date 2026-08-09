@@ -234,8 +234,6 @@ def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
                                 )  # @UndefinedVariable
                             except Exception:  # pylint: disable=broad-except
                                 pass
-
-
                         # remember password in memory for this session
                         config_passwd = passwd
             if aw is not None:
@@ -331,11 +329,13 @@ def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
 
 
 # show a dialog to have the user confirm the disconnect action
+# NOTE: adding a stylesheet to the QApplication referts this to a Qt dialog instead of native dialogs again
 def disconnect_confirmed() -> bool:
-    string = QApplication.translate('Plus', 'Disconnect from the artisan platform?')
+    string = QApplication.translate('Plus', 'Disconnect?')
     mbox = QMessageBox()
     mbox.setText(string)
-    util.setPlusIcon(mbox)
+    if config.app_window is not None:
+        util.setPlusIcon(mbox, config.app_window.app.darkmode)
     mbox.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
     res = mbox.exec()
     return QMessageBox.StandardButton.Yes == res

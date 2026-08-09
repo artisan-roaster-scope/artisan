@@ -966,7 +966,7 @@ class TestPlusIcon:
             util.setPlusIcon(mock_mbox)
 
             # Assert
-            mock_qicon.assert_called_once_with(str(Path('/path/to/resources/Icons/artisan-notification.svg')))
+            mock_qicon.assert_called_once_with(str(Path('/path/to/resources/Icons/white_plus-connected.svg')))
             mock_qsize.assert_called_once_with(48, 48)
             mock_mbox.setIconPixmap.assert_called_once_with(mock_pixmap)
 
@@ -988,6 +988,6 @@ class TestPlusIcon:
             util.setPlusIcon(mock_mbox)
 
             # Assert
-            mock_qicon.assert_called_once_with(str(Path('/path/to/resources/Icons/artisan-notification.svg')))
+            mock_qicon.assert_called_once_with(str(Path('/path/to/resources/Icons/white_plus-connected.svg')))
             mock_qsize.assert_called_once_with(64, 64)  # Default size
             mock_mbox.setIconPixmap.assert_called_once_with(mock_pixmap)

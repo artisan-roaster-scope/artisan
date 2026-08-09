@@ -218,7 +218,9 @@ class tphasescanvas(QObject):
             self.aw.scroller.setVisible(True)
             # set canvas background color
             background_color = self.aw.qmc.palette['background']
-            self.canvas.setStyleSheet(f'background-color: {background_color[:7]}')
+#            self.canvas.setStyleSheet(f'background-color: {background_color[:7]}')
+#            self.canvas.setStyleSheet(f"background-color:{rgba_colorname2argb_colorname(self.aw.qmc.palette['canvas'])}")
+            self.canvas.fig.patch.set_facecolor(self.aw.qmc.palette['canvas'])
             # maximum total roast time of all given profiles
             max_total_time = max(p[1] for p in self.data)
             # set font

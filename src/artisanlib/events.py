@@ -40,6 +40,7 @@ from artisanlib.main import UI_MODE
 from artisanlib.util import comma2dot, eventtime2string
 from artisanlib.dialogs import ArtisanResizeablDialog, ArtisanDialog
 from artisanlib.widgets import MyQComboBox, MyQDoubleSpinBox
+from artisanlib.table_style import horizontal_header_style, vertical_header_style
 
 from uic import SliderCalculatorDialog # pyright: ignore[attr-defined] # pylint: disable=no-name-in-module
 
@@ -666,10 +667,14 @@ class EventsDlg(ArtisanResizeablDialog):
         self.eventbuttontable = QTableWidget()
         self.eventbuttontable.setTabKeyNavigation(True)
         self.eventbuttontable.itemSelectionChanged.connect(self.selectionChanged)
-        vheader: QHeaderView|None = self.eventbuttontable.verticalHeader()
-        if vheader is not None:
-            vheader.sectionMoved.connect(self.sectionMoved)
-#        self.createEventbuttonTable()
+        horizontal_header = self.eventbuttontable.horizontalHeader()
+        if horizontal_header is not None:
+            horizontal_header.setStyleSheet(horizontal_header_style(self.aw.app.darkmode))
+        vertical_header = self.eventbuttontable.verticalHeader()
+        if vertical_header is not None:
+            vertical_header.setStyleSheet(vertical_header_style(self.aw.app.darkmode))
+            vertical_header.setDefaultAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
+            vertical_header.sectionMoved.connect(self.sectionMoved)
         self.copyeventbuttonTableButton = QPushButton(QApplication.translate('Button', 'Copy Table'))
         self.copyeventbuttonTableButton.setToolTip(QApplication.translate('Tooltip','Copy table to clipboard, OPTION or ALT click for tabular text'))
         self.copyeventbuttonTableButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
