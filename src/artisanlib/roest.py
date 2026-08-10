@@ -42,6 +42,7 @@ from PyQt6.QtGui import QKeySequence, QAction, QIcon
 from artisanlib.util import encodeLocalStrict, getResourcePath
 from artisanlib.atypes import ProfileData
 from artisanlib.dialogs import ArtisanDialog
+from artisanlib.widgets import StyledQLineEdit
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
@@ -467,33 +468,17 @@ class ROESTdialog(ArtisanDialog):
             cancelAction.setShortcut(QKeySequence.StandardKey.Cancel)
             self.cancel_button.addActions([cancelAction])
 
-        lineEditstyle = """
-            QLineEdit {
-                border-radius: 10px;
-                padding: 5px;
-                border-color: palette(window);
-                border-width: 2px;
-                border-style: solid;
-                background-color: palette(base);
-            }
-            QLineEdit:focus {
-                border-color: palette(Accent);
-            }
-        """
-
         self.labelTitle:QLabel = QLabel('ROEST')
 
-        self.textClientId:QLineEdit = QLineEdit(self)
+        self.textClientId = StyledQLineEdit(self)
         self.textClientId.setMinimumWidth(300)
         self.textClientId.setPlaceholderText('Client Id')
         self.textClientId.setText(self.client_id)
-        self.textClientId.setStyleSheet(lineEditstyle)
 
-        self.textClientSecret:QLineEdit = QLineEdit(self)
+        self.textClientSecret = StyledQLineEdit(self)
         self.textClientSecret.setPlaceholderText('Secret')
         self.textClientSecret.setEchoMode(QLineEdit.EchoMode.PasswordEchoOnEdit)
         self.textClientSecret.setText(self.client_secret)
-        self.textClientSecret.setStyleSheet(lineEditstyle)
 
         self.textClientId.textChanged.connect(self.textChanged)
         self.textClientSecret.textChanged.connect(self.textChanged)

@@ -2757,7 +2757,7 @@ class ApplicationWindow(QMainWindow):
 
         #create a Label object to display program status information
         self.messagelabel: QLabel = QLabel()
-        self.messagelabel.setContentsMargins(15,3,5,8) # left, top, right, bottom
+        self.messagelabel.setContentsMargins(15,0,5,8) # left, top, right, bottom
         f = self.messagelabel.font()
         f.setPointSize(self.messagelabel.font().pointSize()+1)
         self.messagelabel.setFont(f)
@@ -2809,7 +2809,9 @@ class ApplicationWindow(QMainWindow):
 #            self.small_button_min_width_px = 60
 #            self.tiny_button_min_width_px = 50
 
+
         border_modern = 'border-style:solid; border-radius:20; border-color:grey; border-width:0;' # modernize
+
 
         self.pushbuttonstyles_simulator: dict[str, str] = {
             'OFF':    """
@@ -3496,13 +3498,16 @@ class ApplicationWindow(QMainWindow):
         # We set the styles of event buttons assigned to self.lowerbuttondialog here
         # All stylesheet of its children (the actual event buttons) needs to be non-conflicting.
         # Any conflict will turn off merging of parent styles and just rely on the child stylesheet.
-#        self.lowerbuttondialog.setStyleSheet(
-#            artisan_event_button_style.format(
-#                min_width=self.standard_button_min_width_px - 6,
-#                min_height=self.standard_button_height - 7,
-#                padding=3,
-#                default_font_size=button_font_size_small_pt,
-#                selected_font_size=button_font_size_small_selected_pt))
+        button_font_size_small_pt = self.button_font_size_pt - 3
+        button_font_size_small_selected_pt = self.button_font_size_pt - 2
+        self.lowerbuttondialog.setStyleSheet(
+            artisan_event_button_style.format(
+                min_width=self.standard_button_min_width_px - 6,
+                min_height=self.standard_button_height - 7,
+                padding=3,
+                default_font_size=button_font_size_small_pt,
+                selected_font_size=button_font_size_small_selected_pt))
+
 
         #initiate configuration
         self.lowerbuttondialogLayout.addStretch()
@@ -3576,8 +3581,8 @@ class ApplicationWindow(QMainWindow):
         self.level1frame = QFrame()
         self.level1layout = QHBoxLayout()   # matplotlib toolbox + RESET button + LCD Timer
         self.level1frame.setLayout(self.level1layout)
-        self.level1frame.setContentsMargins(17,5,0,0) # left, top, right, bottom
-        self.level1frame.setMinimumHeight(100)
+        self.level1frame.setContentsMargins(17,0,0,0) # left, top, right, bottom
+        self.level1frame.setFixedHeight(75)
 
         level3layout = QHBoxLayout()   # PID buttons, graph, temperature LCDs
 
@@ -3739,10 +3744,7 @@ class ApplicationWindow(QMainWindow):
         self.AUClcd.customContextMenuRequested.connect(self.AUClcdClicked)
         self.AUClcd.display('--')
         self.AUClcdFrame: QFrame = self.makePhasesLCDbox(self.AUClabel,self.AUClcd)
-#        self.AUClcdFrame.setFrameStyle(QFrame.Shadow.Plain)
         self.AUClcd.setNumDigits(3)
-        self.AUClcd.setMinimumWidth(65)
-        self.AUClcdFrame.setStyleSheet('QLCDNumber{border-radius:4; border-width: 0; border-color: black; border-style:solid; color: black; background-color: #e6e6e6;}')
 
         AUCLayout = QHBoxLayout()
         AUCLayout.addSpacing(20)
@@ -3756,8 +3758,8 @@ class ApplicationWindow(QMainWindow):
         self.AUCLCD.hide()
 
 
-        self.phasesLCDs: QFrame = QFrame()
-        self.phasesLCDs.setContentsMargins(0, 0, 0, 0)
+        self.phasesLCDs = QFrame()
+        self.phasesLCDs.setContentsMargins(10, 0, 0, 0) # left, top, right, bottom
         phasesLCDlayout = QHBoxLayout()
         phasesLCDlayout.addWidget(self.TPlcdFrame)
         phasesLCDlayout.addWidget(self.TP2DRYframe)
@@ -3767,17 +3769,33 @@ class ApplicationWindow(QMainWindow):
         phasesLCDlayout.setContentsMargins(0, 0, 0, 0)
         phasesLCDlayout.setSpacing(0)
         phasesLCDlayoutVBox = QVBoxLayout()
-        phasesLCDlayoutVBox.addStretch()
-        phasesLCDlayoutVBox.addLayout(phasesLCDlayout)
-        phasesLCDlayoutVBox.addStretch()
-        self.phasesLCDs.setLayout(phasesLCDlayoutVBox)
+#        phasesLCDlayoutVBox.addStretch()
+#        phasesLCDlayoutVBox.addLayout(phasesLCDlayout)
+#        phasesLCDlayoutVBox.addStretch()
+        self.phasesLCDs.setLayout(phasesLCDlayout)
         self.phasesLCDs.hide()
         self.phasesLCDs.setToolTip(QApplication.translate('Tooltip','Phase LCDs: right-click to cycle through TIME, PERCENTAGE and TEMP MODE'))
 
+
+        fullPhasesLCDlayout = QHBoxLayout()
+        fullPhasesLCDlayout.addWidget(self.phasesLCDs)
+        fullPhasesLCDlayout.addWidget(self.AUCLCD)
+        fullPhasesLCDlayout.setContentsMargins(0, 0, 0, 0)
+        fullPhasesLCDlayout.setSpacing(0)
+
+        self.phasesLCDsFrame: QFrame = QFrame()
+        self.phasesLCDsFrame.setContentsMargins(0, 0, 0, 0)
+        phasesLCDlayoutVBox = QVBoxLayout()
+        phasesLCDlayoutVBox.setContentsMargins(0, 0, 0, 0)
+        phasesLCDlayoutVBox.addStretch()
+        phasesLCDlayoutVBox.addLayout(fullPhasesLCDlayout)
+        phasesLCDlayoutVBox.addStretch()
+        self.phasesLCDsFrame.setLayout(phasesLCDlayoutVBox)
+
+
         #level 1
         self.level1layout.addStretch()
-        self.level1layout.addWidget(self.phasesLCDs)
-        self.level1layout.addWidget(self.AUCLCD)
+        self.level1layout.addWidget(self.phasesLCDsFrame)
         self.level1layout.addSpacing(20)
         self.level1layout.addWidget(self.buttonRESET)
         self.level1layout.addSpacing(10)
@@ -4035,7 +4053,7 @@ class ApplicationWindow(QMainWindow):
         self.lcdFrame:QFrame = QFrame()
         self.lcdFrame.setLayout(LCDlayout)
         self.lcdFrame.setVisible(False)
-        self.lcdFrame.setContentsMargins(0,0,0,0)
+        self.lcdFrame.setContentsMargins(5,0,0,0)
         self.lcdFrame.setSizePolicy(QSizePolicy.Policy.Maximum,QSizePolicy.Policy.Expanding) # prevent horizontal expansion (graph might not maximize otherwise)
 
         self.midlayout = QHBoxLayout()
@@ -6296,18 +6314,6 @@ class ApplicationWindow(QMainWindow):
         background_color = self.qmc.palette['background']
         return self.colorDifference('#ffffff', background_color) < self.colorDifference('#000000',background_color)
 
-    def setLowerButtonDialogStyle(self, canvas_color:str) -> None:
-        button_font_size_small_pt = self.button_font_size_pt - 3
-        button_font_size_small_selected_pt = self.button_font_size_pt - 2
-        self.lowerbuttondialog.setStyleSheet(
-            artisan_event_button_style.format(
-                background_color=rgba_colorname2argb_colorname(canvas_color),
-                min_width=self.standard_button_min_width_px - 6,
-                min_height=self.standard_button_height - 7,
-                padding=3,
-                default_font_size=button_font_size_small_pt,
-                selected_font_size=button_font_size_small_selected_pt))
-
     def updateCanvasColors(self, checkColors:bool=True) -> None:
         self.setUpdatesEnabled(False) # disable display updates on main application window until the background color has been set on all sub widgets to gain performance
         canvas_color = self.qmc.palette['canvas']
@@ -6366,16 +6372,9 @@ class ApplicationWindow(QMainWindow):
 #        self.setStyleSheet(f'QMainWindow{{background-color:{rgba_colorname2argb_colorname(canvas_color)}; border-width: 0px;}}')
 # thus it got replaced by setting that background to all direct children:
 
-        self.main_widget.setStyleSheet(f'QFrame {{background-color:{rgba_colorname2argb_colorname(canvas_color)};border-width: 0px;}}')
-        self.lcdFrame.setStyleSheet(f'QFrame {{background-color:{rgba_colorname2argb_colorname(canvas_color)};border-width: 0px;}}')
-        self.level1frame.setStyleSheet(f'QFrame {{background-color:{rgba_colorname2argb_colorname(canvas_color)};border-width: 0px;}}')
-        self.messagelabel.setStyleSheet(f'QFrame {{background-color:{rgba_colorname2argb_colorname(canvas_color)};border-width: 0px;}}')
-        self.splitter.setStyleSheet(f'QSplitter, QFrame {{background-color:{rgba_colorname2argb_colorname(canvas_color)};border-width: 0px;}}')
-        self.scroller.setStyleSheet(f'QScroller, QFrame {{background-color:{rgba_colorname2argb_colorname(canvas_color)};border-width: 0px;}}')
-        self.setLowerButtonDialogStyle(rgba_colorname2argb_colorname(canvas_color))
-        self.extrabuttondialogs.setStyleSheet(f'QFrame {{background-color:{rgba_colorname2argb_colorname(canvas_color)};border-width: 0px;}}')
-
         line_edit_color = ('#ffffff' if whitep else '#000000')
+        self.main_widget.setStyleSheet(f'* {{background-color:{rgba_colorname2argb_colorname(canvas_color)}; color: {rgba_colorname2argb_colorname(line_edit_color)}; border-width: 0px;}}')
+
 
         self.EventsGroupLayout.setStyleSheet(f"""
             QGroupBox {{
@@ -6564,14 +6563,15 @@ class ApplicationWindow(QMainWindow):
             selected_canvas_color = selected_canvas_color.darker(120)
             border_color = '#3c3c3c'
 
-
-
         self.ntb.setStyleSheet(f"""
             QToolBar {{
                 background-color: {rgba_colorname2argb_colorname(canvas_color)};
                 border: 1px solid {rgba_colorname2argb_colorname(canvas_color)};
                 color: {rgba_colorname2argb_colorname(title_color)};
                 spacing: 2px;
+            }}
+            QToolBar::separator {{
+                background-color: transparent;
             }}
             QToolButton:checked {{
                 background-color: {selected_canvas_color.name()};
@@ -24779,46 +24779,20 @@ class ApplicationWindow(QMainWindow):
         # pylint: disable=consider-using-f-string
         coredevelopers:str = '<br>Rafael Cobo, Marko Luther &amp; Dave Baxter'
         box = QMessageBox()
-        box.setStyleSheet(f"""
+        box.setStyleSheet("""
             QMessageBox {{
                 font-weight: normal;
-            }}
-            QDialogButtonBox {{
-                qproperty-centerButtons: true;
-            }}
-            QMessageBox QPushButton {{
-                width: {self.main_button_min_width_str};
-                height: {self.standard_button_height};
-                border-style:solid;
-                border-radius:20;
-                border-color:grey;
-                border-width:0;
-                font-size: {self.button_font_size};
-                font-weight: bold;
-                color: white;
-                background-color: #3979ae;
-            }}
-            QMessageBox QPushButton:!enabled {{
-                color: darkgrey;
-                background-color: #E0E0E0;
-            }}
-            QMessageBox QPushButton:pressed {{
-                color: #EEEEEE;
-                background-color: #116D98;
-            }}
-            QMessageBox QPushButton:hover:!pressed {{
-                color: white;
-                background-color: #1985ba;
             }}
         """)
         name:str = (application_viewer_name if self.app.artisanviewerMode else application_name)
         box.setText(
-                f"""<center><h1><font color='#2899c7'>{name.lower()}</font></h1><b>v{__version__}</b> {(__build__ if __build__ != '0' else '')}{(f' ({str(__revision__)})' if str(__revision__) != '' else '')}
+                f"""<center><h1>{name.lower()}</h1>v{__version__} {(__build__ if __build__ != '0' else '')}{(f' ({str(__revision__)})' if str(__revision__) != '' else '')}
                 <i>{('' if not appFrozen() or self.official_build else QApplication.translate('Message', 'unoffical build'))}</i></center>
                 <p><center><a href="https://artisan-scope.org">https://artisan-scope.org</a></center><br></p>
                 <p><b>{QApplication.translate('About', 'Core Developers')}</b><small>{coredevelopers}</small></p>
-                <p><b>{QApplication.translate('About', 'License')}</b><br><small><a href="https://www.gnu.org/licenses/agpl-3.0.html">GNU Affero General Public License (AGPLv3.0)</a></small></p>
+                <p><b>{QApplication.translate('About', 'License')}</b><br><small><a href="https://www.gnu.org/licenses/agpl-3.0.html">GNU Affero General Public License (AGPLv3.0)</a></small></p><br>
                 """)
+        #box.setIconPixmap(QPixmap(os.path.join(getResourcePath(),'Icons','plus-connected.svg')))
         box.setWindowTitle(QApplication.translate('About', 'About'))
         box.exec()
 

@@ -49,7 +49,7 @@ from PyQt6.QtGui import QKeySequence, QAction
 from artisanlib import __version__
 from artisanlib.util import roast_message
 from artisanlib.dialogs import ArtisanDialog
-
+from artisanlib.widgets import StyledQLineEdit
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
@@ -178,39 +178,22 @@ class RoastHubsdialog(ArtisanDialog):
             cancelAction.setShortcut(QKeySequence.StandardKey.Cancel)
             self.cancel_button.addActions([cancelAction])
 
-        lineEditstyle = """
-            QLineEdit {
-                border-radius: 10px;
-                padding: 5px;
-                border-color: palette(window);
-                border-width: 2px;
-                border-style: solid;
-                background-color: palette(base);
-            }
-            QLineEdit:focus {
-                border-color: palette(Accent);
-            }
-        """
-
         self.labelTitle:QLabel = QLabel('RoastHubs')
 
-        self.textOrgId:QLineEdit = QLineEdit(self)
+        self.textOrgId = StyledQLineEdit(self)
         self.textOrgId.setMinimumWidth(300)
         self.textOrgId.setPlaceholderText(QApplication.translate('Label','Organization ID'))
         self.textOrgId.setText(self.org_id)
-        self.textOrgId.setStyleSheet(lineEditstyle)
 
-        self.textMachineId:QLineEdit = QLineEdit(self)
+        self.textMachineId = StyledQLineEdit(self)
         self.textMachineId.setMinimumWidth(300)
         self.textMachineId.setPlaceholderText(QApplication.translate('Label','Machine ID'))
         self.textMachineId.setText(self.machine_id)
-        self.textMachineId.setStyleSheet(lineEditstyle)
 
-        self.textSecret:QLineEdit = QLineEdit(self)
+        self.textSecret = StyledQLineEdit(self)
         self.textSecret.setPlaceholderText(QApplication.translate('Label','Token'))
         self.textSecret.setEchoMode(QLineEdit.EchoMode.Password)
         self.textSecret.setText(self.token)
-        self.textSecret.setStyleSheet(lineEditstyle)
 
 
         #

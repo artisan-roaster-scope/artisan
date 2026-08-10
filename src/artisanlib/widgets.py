@@ -280,6 +280,23 @@ class MyQLabel(QLabel):
             #--- update font size ---
             self.setFont(f)
 
+class StyledQLineEdit(QLineEdit):
+    def __init__(self, parent: 'QWidget|None' = None) -> None:
+        super().__init__(parent)
+        lineEditstyle = """
+            QLineEdit {
+                border-radius: 10px;
+                padding: 5px;
+                border-color: palette(window);
+                border-width: 2px;
+                border-style: solid;
+                background-color: palette(base);
+            }
+            QLineEdit:focus {
+                border-color: palette(Accent);
+            }
+        """
+        self.setStyleSheet(lineEditstyle)
 
 class ClickableQLabel(QLabel):
     clicked = pyqtSignal()

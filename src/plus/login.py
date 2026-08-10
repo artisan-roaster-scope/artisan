@@ -44,6 +44,7 @@ from PyQt6.QtGui import QKeySequence, QAction
 
 from artisanlib.util import getResourcePath
 from artisanlib.dialogs import ArtisanDialog
+from artisanlib.widgets import StyledQLineEdit
 from plus import config
 
 
@@ -135,23 +136,8 @@ class Login(ArtisanDialog):
                 [cancelAction]
             )
 
-        lineEditstyle = """
-            QLineEdit {
-                border-radius: 10px;
-                padding: 5px;
-                border-color: palette(window);
-                border-width: 2px;
-                border-style: solid;
-                background-color: palette(base);
-            }
-            QLineEdit:focus {
-                border-color: palette(Accent);
-            }
-        """
-
-        self.textPass:QLineEdit = QLineEdit(self)
+        self.textPass = StyledQLineEdit(self)
         self.textPass.setMinimumWidth(230)
-        self.textPass.setStyleSheet(lineEditstyle)
 
 
         self.textPass.setEchoMode(QLineEdit.EchoMode.Password)
@@ -159,9 +145,8 @@ class Login(ArtisanDialog):
             QApplication.translate('Plus', 'Password')
         )
 
-        self.textName:QLineEdit = QLineEdit(self)
+        self.textName = StyledQLineEdit(self)
         self.textName.setMinimumWidth(230)
-        self.textName.setStyleSheet(lineEditstyle)
 
         self.textName.setPlaceholderText(
             QApplication.translate('Plus', 'Email')

@@ -5658,8 +5658,12 @@ class tgraphcanvas(QObject):
                                     xlim_offset = (xlim[1] - xlim[0]) / 2.
                                     xlim_new = (tx - xlim_offset, tx + xlim_offset)
                                     ylim = self.ax.get_ylim()
-                                    ylim_offset = (ylim[1] - ylim[0]) / 2.
-                                    ylim_new = (temp - ylim_offset, temp + ylim_offset)
+                                    if self.fmt_data_curve == 0:
+                                        ylim_offset = (ylim[1] - ylim[0]) / 2.
+                                        ylim_new = (temp - ylim_offset, temp + ylim_offset)
+                                    else:
+                                        # in clamp mode (any) we don't follow the y-axis, but only the x-axis
+                                        ylim_new = ylim
                                     if ylim != ylim_new or xlim != xlim_new:
                                         # set new limits to center current temp on canvas
                                         self.ax.set_xlim(xlim_new)
@@ -5688,9 +5692,13 @@ class tgraphcanvas(QObject):
                                         xlim_offset = (xlim[1] - xlim[0]) / 2.
                                         xlim_new = (tx - xlim_offset, tx + xlim_offset)
                                         ylim = self.ax.get_ylim()
-                                        ylim_offset = (ylim[1] - ylim[0]) / 2.
-                                        rord = float(self.ax.transData.inverted().transform((0,self.delta_ax.transData.transform((0,ror))[1]))[1])
-                                        ylim_new = (rord - ylim_offset, rord + ylim_offset)
+                                        if self.fmt_data_curve == 0:
+                                            ylim_offset = (ylim[1] - ylim[0]) / 2.
+                                            rord = float(self.ax.transData.inverted().transform((0,self.delta_ax.transData.transform((0,ror))[1]))[1])
+                                            ylim_new = (rord - ylim_offset, rord + ylim_offset)
+                                        else:
+                                            # in clamp mode (any) we don't follow the y-axis, but only the x-axis
+                                            ylim_new = ylim
                                         if ylim != ylim_new or xlim != xlim_new:
                                             # set new limits to center current temp on canvas
                                             self.ax.set_xlim(xlim_new)
