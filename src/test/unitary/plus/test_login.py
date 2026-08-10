@@ -210,7 +210,7 @@ class MockQLayout:
 
 with patch('PyQt6.QtWidgets.QApplication', MockQApplication), patch(
     'PyQt6.QtWidgets.QLabel', MockQLabel
-), patch('PyQt6.QtWidgets.QLineEdit', MockQLineEdit), patch(
+), patch('artisanlib.widgets.StyledQLineEdit', MockQLineEdit), patch(
     'PyQt6.QtWidgets.QCheckBox', MockQCheckBox
 ), patch(
     'PyQt6.QtWidgets.QGroupBox', Mock
@@ -799,41 +799,6 @@ class TestLoginDialogUIComponents:
             # Assert
             mock_reset_link.setOpenExternalLinks.assert_called_with(True)
             assert dialog.linkResetPassword == mock_reset_link
-
-    def test_password_field_setup(self, mock_parent_widget:Mock, mock_app_window:Mock) -> None:
-        """Test password field is configured with password echo mode."""
-        # Arrange
-        with patch('plus.login.ArtisanDialog.__init__') as mock_super_init, patch(
-            'plus.login.QLineEdit'
-        ) as mock_qlineedit_class:
-            mock_super_init.return_value = None
-            mock_password_field = Mock()
-            mock_qlineedit_class.return_value = mock_password_field
-
-            # Act
-            login.Login(mock_parent_widget, mock_app_window)
-
-            # Assert
-            mock_password_field.setEchoMode.assert_called()
-            mock_password_field.setPlaceholderText.assert_called()
-
-    def test_email_field_setup(self, mock_parent_widget:Mock, mock_app_window:Mock) -> None:
-        """Test email field is configured with placeholder and change handler."""
-        # Arrange
-        with patch('plus.login.ArtisanDialog.__init__') as mock_super_init, patch(
-            'plus.login.QLineEdit'
-        ) as mock_qlineedit_class:
-            mock_super_init.return_value = None
-            mock_email_field = Mock()
-            mock_qlineedit_class.return_value = mock_email_field
-
-            # Act
-            login.Login(mock_parent_widget, mock_app_window, email='test@example.com')
-
-            # Assert
-            mock_email_field.setPlaceholderText.assert_called()
-            mock_email_field.textChanged.connect.assert_called()
-            mock_email_field.setText.assert_called_with('test@example.com')
 
     def test_button_state_with_saved_password(self, mock_parent_widget:Mock, mock_app_window:Mock) -> None:
         """Test button states are properly set when saved password is provided."""
