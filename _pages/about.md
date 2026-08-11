@@ -443,7 +443,7 @@ The development of **<span style="color: #2899c7;">artisan scope</span>** is sup
           <img src="/assets/images/dmr-logo.webp" alt="Dutch Master Roasters" loading="lazy" decoding="async" />
       </a>
       <a target="_blank" href="https://roasthubs.com/" title="RoastHubs">
-          <img src="/assets/images/roasthubs-logo.webp" alt="RoastHubs" loading="lazy" decoding="async" />
+          <img src="/assets/images/roasthubs-logo.svg" alt="RoastHubs" loading="lazy" decoding="async" />
       </a>
       
 </figure>
