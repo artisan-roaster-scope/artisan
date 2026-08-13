@@ -37,7 +37,7 @@ if TYPE_CHECKING:
 
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import (QApplication, QGroupBox, QHBoxLayout, # QCheckBox,
-    QVBoxLayout, QLabel, QLineEdit, QDialogButtonBox, QWidget)
+    QVBoxLayout, QLabel, QLineEdit, QDialogButtonBox, QWidget, QLayout)
 from PyQt6.QtCore import Qt, pyqtSlot
 from PyQt6.QtGui import QKeySequence, QAction
 
@@ -74,10 +74,10 @@ class Login(ArtisanDialog):
         basedir = os.path.join(getResourcePath(),'Icons')
         register_icon_path = os.path.join(basedir, ('user-add-01-stroke-rounded-dark.svg' if aw.app.darkmode else 'user-add-01-stroke-rounded-light.svg'))
         self.register_icon = QSvgWidget(register_icon_path)
-        self.register_icon.setMaximumSize(13,13)
+        self.register_icon.setMaximumSize(15,15)
 
         self.linkRegister = QLabel(
-            f'<sub>{QApplication.translate('Plus','An artisan account unlocks more features.')} <a href="{config.register_url}">{QApplication.translate('Plus', 'Register')}</a></sub>'
+            f'<small>{QApplication.translate('Plus','An artisan account unlocks more features.')} <a href="{config.register_url}">{QApplication.translate('Plus', 'Register')}</a></smalls>'
         )
         self.linkRegister.setOpenExternalLinks(True)
         self.linkRegister.setStyleSheet(f"""
@@ -173,7 +173,7 @@ class Login(ArtisanDialog):
         registerIconLayout.addStretch()
         registerIconLayout.addWidget(self.register_icon)
         registerIconLayout.addStretch()
-        registerIconLayout.setContentsMargins(0, 5, 0, 0) # (left, top, right, bottom)
+        registerIconLayout.setContentsMargins(0, 0, 0, 0) # (left, top, right, bottom)
 
         linkRegisterLayout = QHBoxLayout()
         linkRegisterLayout.addStretch()
@@ -219,6 +219,10 @@ class Login(ArtisanDialog):
         layout.setSpacing(10)
         layout.addWidget(registerGroup)
 #        layout.setContentsMargins(15, 15, 15, 15) # (left, top, right, bottom)
+
+        # not resizable
+        layout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
+        self.setSizeGripEnabled(False)
 
         if saved_password is not None:
             self.passwd = saved_password

@@ -164,7 +164,8 @@ class volumeCalculatorDlg(ArtisanDialog):
         self.coffeeinweight.setReadOnly(True)
         self.coffeeinweight.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         if sys.platform.startswith('darwin'):
-            self.coffeeinweight.setStyleSheet("border: 0.5px solid lightgrey; background-color:'lightgrey'")
+            #self.coffeeinweight.setStyleSheet("border: 0.5px solid lightgrey; background-color:'lightgrey'")
+            pass
         else:
             self.coffeeinweight.setStyleSheet("background-color:'lightgrey'")
         coffeeinweightUnit = QLabel(weight_units[weightunit])
@@ -236,7 +237,8 @@ class volumeCalculatorDlg(ArtisanDialog):
         self.coffeeoutweight.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.coffeeoutweight.setReadOnly(True)
         if sys.platform.startswith('darwin'):
-            self.coffeeoutweight.setStyleSheet("border: 0.5px solid lightgrey; background-color:'lightgrey'")
+            # self.coffeeoutweight.setStyleSheet("border: 0.5px solid lightgrey; background-color:'lightgrey'")
+            pass
         else:
             self.coffeeoutweight.setStyleSheet("background-color:'lightgrey'")
         self.coffeeoutweight.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -2200,21 +2202,23 @@ class editGraphDlg(ArtisanResizeablDialog):
 
 
         # for QLineEdit
-        if b:
-            if self.aw.app.darkmode:
-                qlineedit_marked_style = 'QLineEdit { background-color: #0D658F; selection-background-color: darkgray; }'
+        # not on macOS as there seems to be an interaction between the native and Qt widget
+        if not sys.platform.startswith('darwin'):
+            if b:
+                if self.aw.app.darkmode:
+                    qlineedit_marked_style = 'QLineEdit { background-color: #0D658F; selection-background-color: darkgray; }'
+                else:
+                    qlineedit_marked_style = 'QLineEdit { background-color: #e4f3f8; selection-background-color: #424242; }'
+                self.bean_density_in_edit.setStyleSheet(qlineedit_marked_style)
+                self.bean_size_min_edit.setStyleSheet(qlineedit_marked_style)
+                self.bean_size_max_edit.setStyleSheet(qlineedit_marked_style)
+                self.moisture_greens_edit.setStyleSheet(qlineedit_marked_style)
             else:
-                qlineedit_marked_style = 'QLineEdit { background-color: #e4f3f8; selection-background-color: #424242; }'
-            self.bean_density_in_edit.setStyleSheet(qlineedit_marked_style)
-            self.bean_size_min_edit.setStyleSheet(qlineedit_marked_style)
-            self.bean_size_max_edit.setStyleSheet(qlineedit_marked_style)
-            self.moisture_greens_edit.setStyleSheet(qlineedit_marked_style)
-        else:
-            background_white_style = ''
-            self.bean_density_in_edit.setStyleSheet(background_white_style)
-            self.bean_size_min_edit.setStyleSheet(background_white_style)
-            self.bean_size_max_edit.setStyleSheet(background_white_style)
-            self.moisture_greens_edit.setStyleSheet(background_white_style)
+                background_white_style = ''
+                self.bean_density_in_edit.setStyleSheet(background_white_style)
+                self.bean_size_min_edit.setStyleSheet(background_white_style)
+                self.bean_size_max_edit.setStyleSheet(background_white_style)
+                self.moisture_greens_edit.setStyleSheet(background_white_style)
 
     def updateTitle(self, prev_coffee_label:str|None, prev_blend_label:str|None) -> None:
         titles_to_be_overwritten = [ '', QApplication.translate('Scope Title', 'Roaster Scope') ]
@@ -4934,13 +4938,14 @@ class editGraphDlg(ArtisanResizeablDialog):
 
     # mark widget w if b holds otherwise unmark it
     def markWidget(self, w:QLineEdit, b:bool) -> None:
-        if b:
-            if self.aw.app.darkmode:
-                w.setStyleSheet("""QLineEdit { background-color: #ad0427;  }""")
+        if not sys.platform.startswith('darwin'):
+            if b:
+                if self.aw.app.darkmode:
+                    w.setStyleSheet("""QLineEdit { background-color: #ad0427;  }""")
+                else:
+                    w.setStyleSheet("""QLineEdit { color: #CC0F50; }""")
             else:
-                w.setStyleSheet("""QLineEdit { color: #CC0F50; }""")
-        else:
-            w.setStyleSheet('QLineEdit { }')
+                w.setStyleSheet('QLineEdit { }')
 
     def checkWeightOut(self) -> None:
         try:

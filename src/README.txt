@@ -6,7 +6,7 @@ Artisan is free for personal and commercial use, but asks for a [donation](https
 
 <https://artisan-scope.org>
 
-The home of its development is on GitHub were all source and binary files are available as well as an issue tracker.
+The home of its development is on GitHub where all source and binary files are available as well as an issue tracker.
 
 <https://github.com/artisan-roaster-scope/artisan>
 

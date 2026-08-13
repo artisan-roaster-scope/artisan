@@ -34,7 +34,7 @@ from typing import TypedDict, Final, NotRequired, TYPE_CHECKING
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
 
-from PyQt6.QtWidgets import (QApplication, QGroupBox, QHBoxLayout,
+from PyQt6.QtWidgets import (QApplication, QGroupBox, QHBoxLayout, QLayout,
     QVBoxLayout, QLabel, QLineEdit, QToolButton, QDialogButtonBox, QComboBox)
 from PyQt6.QtCore import Qt, pyqtSlot
 from PyQt6.QtGui import QKeySequence, QAction, QIcon
@@ -543,7 +543,10 @@ class ROESTdialog(ArtisanDialog):
         layout.addLayout(buttonLayout)
         layout.setContentsMargins(10, 10, 10, 10)
         layout.setSpacing(5)
-        self.setLayout(layout)
+
+        # not resizable
+        layout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
+        self.setSizeGripEnabled(False)
 
     @pyqtSlot(str)
     def textChanged(self, _:str) -> None:

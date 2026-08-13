@@ -152,6 +152,9 @@ class MockArtisanDialog:
         self.ok_button = Mock()
         self.cancel_button = Mock()
 
+    def setSizeGripEnabled(self, b:bool) -> None:
+        pass
+
     def accept(self) -> None:
         pass
 
@@ -206,6 +209,7 @@ class MockQLayout:
         self.setContentsMargins = Mock()
         self.setSpacing = Mock()
         self.addSpacing = Mock()
+        self.setSizeConstraint = Mock()
 
 
 with patch('PyQt6.QtWidgets.QApplication', MockQApplication), patch(

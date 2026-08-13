@@ -983,6 +983,51 @@
             <td>upload current loaded profile to RoastHubs</td>
         </tr>
         <tr>
+            <td>&#160;</td>
+            <td>zoom(&lt;x&gt;[,&lt;y&gt;])</td>
+            <td>zooms the canvas by factor &lt;x&gt; horizontally and the optional &lt;y&gt; vertically. &lt;y&gt; defaults to &lt;x&gt;.</td>
+        </tr>
+        <tr>
+            <td>&#160;</td>
+            <td>pan(&lt;x&gt;[,&lt;y&gt;])</td>
+            <td>pans the canvas by factor &lt;x&gt; horizontally and the optional &lt;y&gt; vertically. A factor 0 does not apply any panning, a factor 1 moves by one full screen to the left/bottom, a factor -1 by one full screen to the right/top. &lt;y&gt; defaults to &lt;x&gt;.</td>
+        </tr>
+        <tr>
+            <td>&#160;</td>
+            <td>center(&lt;x&gt;,&lt;y&gt;[,&lt;clamp&gt;])</td>
+            <td>centers canvas and then applies panning according to the given x/y parameters in horizontal and vertical direction. 0: no panning, 1: pan canvas one full screen to the left/bottom, -1: pan canvas one full screen to the right/top. If &lt;clamp&gt; is 0 the canvas is centered w.r.t. both axis limits. If not recording, and &lt;clamp&gt; i -1 the canvas is centered only horizontally wr.t. its x-axis limits and with clamp in {1,..,4} w.r.t. to both axis limits. While recording if &lt;clamp&gt; is -1 the canvas is centered horizontally to the current time, if 1 also centered to current BT, 2 current ET, 3 current BT RoR, 4 current ET RoR. &lt;clamp&gt; defaults to -1 if xy-cursor widget is clamped to any temp or RoR curve (z-key), 0 if zoom follow is OFF and xy-cursor not clamped, 1-4 if zoom follow is ON and xy-cursor not clamped, centering on the value zoom followed.</td>
+        </tr>
+        <tr>
+            <td>&#160;</td>
+            <td>clamp(&lt;n&gt;)</td>
+            <td>set xy cursor clamp mode (shortcut key z) to 0: off, 1: BT@x, 2: ET@x, 3: BTB@x, 4: ETB@x</td>
+        </tr>
+        <tr>
+            <td>&#160;</td>
+            <td>followMode(&lt;bool&gt;)</td>
+            <td>enables/disables follow mode</td>
+        </tr>
+        <tr>
+            <td>&#160;</td>
+            <td>followModePanning(&lt;x&gt;[,&lt;y&gt;])</td>
+            <td>sets additional panning in horizontal and vertical direction, applied in follow mode after the centering. 0: no panning, 1: pan canvas one full screen to the left/bottom, -1: pan canvas one full screen to the right/top. &lt;y&gt; defaults to &lt;x&gt;.</td>
+        </tr>
+        <tr>
+            <td>&#160;</td>
+            <td>home</td>
+            <td>toolbar home action</td>
+        </tr>
+        <tr>
+            <td>&#160;</td>
+            <td>back</td>
+            <td>toolbar back action</td>
+        </tr>
+        <tr>
+            <td>&#160;</td>
+            <td>forward</td>
+            <td>toolbar forward action</td>
+        </tr>
+        <tr>
             <td>RC Command</td>
             <td>pulse(ch,min,max[,sn])</td>
             <td>for PHIDGET RC modules: sets the min/max pulse width in microseconds</td>

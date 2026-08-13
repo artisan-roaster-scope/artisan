@@ -245,6 +245,8 @@ class tgraphcanvas(QObject):
     redrawSignal = pyqtSignal(bool,bool,bool,bool,bool)
     redrawKeepViewSignal = pyqtSignal(bool,bool,bool,bool,bool)
     monitorClosedDown = pyqtSignal()
+    canvasZoomSignal = pyqtSignal(float, float)
+    canvasPanSignal = pyqtSignal(float, float, int)
 
     umlaute_dict : Final[dict[str, str]] = {
        uchr(228): 'ae',  # U+00E4   \xc3\xa4
@@ -388,7 +390,8 @@ class tgraphcanvas(QObject):
         'CO2kg_per_BTU_default', 'CO2kg_per_BTU', 'Biogas_CO2_Reduction', 'Biogas_CO2_Reduction_default',
         'meterunitnames', 'meterreads_default', 'meterreads', 'meterlabels_setup', 'meterlabels', 'meterunits_setup', 'meterunits',
         'meterfuels_setup', 'meterfuels', 'metersources_setup', 'metersources', 'playbackdrop_min_roasttime', 'TP_max_roasttime',
-        'single_click_mpl_upperleft_corner_timer', 'single_click_mpl_upperleft_corner_TIMEOUT', 'profile_upload_limit', 'last_profile_upload_times'
+        'single_click_mpl_upperleft_corner_timer', 'single_click_mpl_upperleft_corner_TIMEOUT', 'profile_upload_limit', 'last_profile_upload_times',
+        'zoom_follow_pan_x', 'zoom_follow_pan_y'
         ]
 
 
@@ -1336,6 +1339,10 @@ class tgraphcanvas(QObject):
 
         self.zoom_follow:bool = False # if True, Artisan "follows" BT in the center by panning during recording. Activated via a click on the HOME icon
         self.zoom_follow_onET:bool = False # if True, the Zoom Follow follows ET (or ET RoR if fmt_data_RoR is set) instead of BT (or BT RoR if fmt_data_RoR is set)
+        # panning factor relative to the distance (xmax - xmin) applied after centering
+        #   0: no panning, 1: pan canvas one full screen to the left/bottom, -1: pan canvas one full screen to the right/top
+        self.zoom_follow_pan_x:float = 0
+        self.zoom_follow_pan_y:float = 0
 
         self.alignEvent = 0 # 0:CHARGE, 1:DRY, 2:FCs, 3:FCe, 4:SCs, 5:SCe, 6:DROP, 7:ALL
         self.alignnames = [
@@ -2405,7 +2412,7 @@ class tgraphcanvas(QObject):
         # flag to toggle between Temp and RoR scale of xy-display
         self.fmt_data_RoR:bool = False
         self.fmt_data_ON:bool = True #; if False, the xy-display is deactivated
-        # toggle between using the 0: y-cursor pos, 1: BT@x, 2: ET@x, 3: BTB@x, 4: ETB@x (thus BT, ET or the corresponding background curve data at cursor position x)
+        # toggle between using the 0: y-cursor pos, 1: BT@x, 2: ET@x, 3: BTB@x, 4: ETB@x (thus BT, ET or the corresponding background curve data at cursor position
         # to display the y of the cursor coordinates
         self.fmt_data_curve = 0
         self.running_LCDs = 0 # if not 0 and not sampling visible LCDs show the readings at the cursor position of 1: foreground profile, 2: background profile
@@ -2635,6 +2642,8 @@ class tgraphcanvas(QObject):
         self.showBackgroundEventsSignal.connect(self.showBackgroundEvents)
         self.redrawSignal.connect(self.redraw, type=Qt.ConnectionType.QueuedConnection) # type: ignore[call-arg]
         self.redrawKeepViewSignal.connect(self.redraw_keep_view, type=Qt.ConnectionType.QueuedConnection) # type: ignore[call-arg]
+        self.canvasZoomSignal.connect(self.canvas_zoom, type=Qt.ConnectionType.QueuedConnection) # type: ignore[call-arg]
+        self.canvasPanSignal.connect(self.canvas_pan, type=Qt.ConnectionType.QueuedConnection) # type: ignore[call-arg]
 
     #NOTE: empty Figure is initially drawn at the end of self.awsettingsload()
     #################################    FUNCTIONS    ###################################
@@ -2659,22 +2668,143 @@ class tgraphcanvas(QObject):
              device_id in self.specialDevices
              )
 
+    @pyqtSlot(float, float)
+    def canvas_zoom(self, factor_x:float, factor_y:float) -> None:
+        try:
+            if self.fig.canvas.toolbar is not None and self.ax is not None:
+                if self.fig.canvas.toolbar._nav_stack() is None:  # type:ignore[attr-defined] # pylint: disable=protected-access
+                    self.fig.canvas.toolbar.push_current()   # Set the home button to this view.
+                xmin, xmax = self.ax.get_xlim()
+                ymin, ymax = self.ax.get_ylim()
+                if self.twoAxisMode() and self.delta_ax is not None:
+                    zmin, zmax = self.delta_ax.get_ylim()
+                else:
+                    zmin = ymin
+                    zmax = ymax
+                # update
+                if factor_x != 0:
+                    new_x_range = (xmax - xmin)/(2*factor_x)
+                    mid_x = (xmax - xmin)/2 + xmin
+                    xmin = mid_x - new_x_range
+                    xmax = mid_x + new_x_range
+                    # update state
+                    self.ax.set_xlim(xmin, xmax)
+                if factor_y != 0:
+                    new_y_range = (ymax - ymin)/(2*factor_y)
+                    mid_y = (ymax - ymin)/2
+                    ymin = mid_y -  new_y_range
+                    ymax = mid_y + new_y_range
+                    # update state
+                    self.ax.set_ylim(ymin, ymax)
+                    # delta axis
+                    if self.twoAxisMode() and self.delta_ax is not None:
+                        new_z_range = (zmax - zmin)/(2*factor_y)
+                        mid_z = (zmax - zmin)/2
+                        zmin = mid_z - new_z_range
+                        zmax = mid_z + new_z_range
+                        self.delta_ax.set_ylim(zmin, zmax)
+#                        self.delta_ax.set_xlim(xmin, xmax)
+
+                # remember current state in history
+                self.fig.canvas.toolbar.push_current()
+                self.fig.canvas.draw_idle()
+        except Exception as e:  # pylint: disable=broad-except
+            _log.exception(e)
+
+    # the center argument is interpreted as
+    # -2: don't center, just pan (for use by pan Artisan Command)
+    # -1: center to current time only during recording and otherwise like 0, center to current axis limits
+    #  0: center to current axis limits
+    #  during recording the following are actually follow-time only and keep y/z-achses to defaults:
+    #  1: current time and BT
+    #  2: current time and ET
+    #  3: current time and BT RoR (delta BT)
+    #  4: current time and ET RoR (delta ET)
+    # mode 1-4 are ignored if not recording and default to 0
+    @pyqtSlot(float, float, int)
+    def canvas_pan(self, factor_x:float, factor_y:float, center:int) -> None:
+        try:
+            if self.fig.canvas.toolbar is not None and self.ax is not None:
+                if self.fig.canvas.toolbar._nav_stack() is None:  # type:ignore[attr-defined] # pylint: disable=protected-access
+                    self.fig.canvas.toolbar.push_current()   # Set the home button to this view.
+                xmin, xmax = self.ax.get_xlim()
+                ymin, ymax = self.ax.get_ylim()
+                if self.twoAxisMode() and self.delta_ax is not None:
+                    zmin, zmax = self.delta_ax.get_ylim()
+                else:
+                    zmin = ymin
+                    zmax = ymax
+                # center
+                if center != -2:
+                    if center in {-1, 0} or not self.flagstart:
+                        chargetime = (self.timex[self.timeindex[0]] if self.timeindex[0] > -1 and self.timeindex[0] < len(self.timex) else 0)
+                        xmin = self.startofx
+                        xmax = self.endofx + chargetime
+                        if center != -1:
+                            ymin = self.ylimit_min
+                            ymax = self.ylimit
+                    elif (center == -1 or center>0) and len(self.timex)>0 and len(self.temp1)>0 and len(self.temp2)> 0:
+                        # only during recording we center relative to current time and optional to temp/RoR
+                        tx = self.timex[-1]
+                        xoffset = (xmax - xmin) / 2.
+                        xmin = tx - xoffset
+                        xmax = tx + xoffset
+                        if center in {1, 2}:
+                            # center on ET or BT
+                            yoffset = (ymax - ymin) / 2.
+                            yvalue = (self.temp1[-1] if center == 2 else self.temp2[-1])
+                            ymin = yvalue - yoffset
+                            ymax = yvalue + yoffset
+                            if self.twoAxisMode() and self.delta_ax is not None:
+                                zoffset = (zmax - zmin) / 2.
+                                zvalued = float(self.delta_ax.transData.inverted().transform((0,self.ax.transData.transform((0,yvalue))[1]))[1])
+                                zmin = zvalued - zoffset
+                                zmax = zvalued + zoffset
+                        elif center in {3, 4} and self.twoAxisMode() and self.delta_ax is not None:
+                            # center on ET RoR or BT RoR
+                            ror:float|None = None
+                            if center == 4 and len(self.delta1)>0:
+                                ror = self.delta1[-1]
+                            elif center == 3 and len(self.delta2)>0:
+                                ror = self.delta2[-1]
+                            if ror is not None:
+                                zoffset = (zmax - zmin) / 2.
+                                zmin = ror - zoffset
+                                zmax = ror + zoffset
+                                yoffset = (ymax - ymin) / 2.
+                                zvalue = float(self.ax.transData.inverted().transform((0,self.delta_ax.transData.transform((0,ror))[1]))[1])
+                                ymin = zvalue - yoffset
+                                ymax = zvalue + yoffset
+                # shift from center
+                shift_x = (xmax - xmin)*factor_x
+                xmin += shift_x
+                xmax += shift_x
+                shift_y = (ymax - ymin)*factor_y
+                ymin += shift_y
+                ymax += shift_y
+                # update state
+                self.ax.set_xlim(xmin, xmax)
+                self.ax.set_ylim(ymin, ymax)
+                # delta axis
+                if self.twoAxisMode() and self.delta_ax is not None:
+                    shift_z = (zmax - zmin)*factor_y
+                    zmin += shift_z
+                    zmax += shift_z
+                    self.delta_ax.set_ylim(zmin, zmax)
+#                    self.delta_ax.set_xlim(xmin, xmax)
+                # remember current state in history
+                self.fig.canvas.toolbar.push_current()
+                self.fig.canvas.draw_idle()
+        except Exception as e:   # pylint: disable=broad-except
+            _log.exception(e)
+
     # returns None if there is no weight at the given container_idx registered
     def get_container_weight(self, container_idx:int) -> float|None:
         if len(self.container_weights) > container_idx >= 0:
             return self.container_weights[container_idx]
         return None
 
-    # toggles the y cursor coordinate see self.fmt_data_curve
-    def nextFmtDataCurve(self) -> None:
-        self.fmt_data_curve = (self.fmt_data_curve+1) % 5
-        if self.backgroundprofile is None and self.fmt_data_curve in {3, 4}:
-            self.fmt_data_curve = 0
-        if len(self.timex)<3 and self.fmt_data_curve in {1, 2}:
-            if self.backgroundprofile is None:
-                self.fmt_data_curve = 0
-            else:
-                self.fmt_data_curve = 3
+    def xy_cursor_setting(self) -> str:
         s = 'cursor position'
         if self.fmt_data_curve == 1:
             s = self.aw.BTname
@@ -2684,8 +2814,20 @@ class tgraphcanvas(QObject):
             s = f"{QApplication.translate('Label','Background')} {self.aw.BTname}"
         elif self.fmt_data_curve == 4:
             s = f"{QApplication.translate('Label','Background')} {self.aw.ETname}"
+        return QApplication.translate('Message', 'set y-coordinate to {}').format(s)
+
+    # toggles the xy cursor coordinate see self.fmt_data_curve
+    def nextFmtDataCurve(self) -> None:
+        self.fmt_data_curve = (self.fmt_data_curve+1) % 5
+        if self.backgroundprofile is None and self.fmt_data_curve in {3, 4}:
+            self.fmt_data_curve = 0
+        if len(self.timex)<3 and self.fmt_data_curve in {1, 2}:
+            if self.backgroundprofile is None:
+                self.fmt_data_curve = 0
+            else:
+                self.fmt_data_curve = 3
         self.aw.ntb.update_message()
-        self.aw.sendmessage(QApplication.translate('Message', 'set y-coordinate to {}').format(s))
+        self.aw.sendmessage(self.xy_cursor_setting())
 
     @pyqtSlot(str, bool)
     def showCurve(self, name: str, state: bool) -> None:
@@ -5349,14 +5491,14 @@ class tgraphcanvas(QObject):
                                     alarm_temp = sample_temp2[-1]
                                     if alarm_idx is not None:
                                         alarm_temp -= sample_temp2[alarm_idx] # subtract the reading at alarm_idx for IF ALARMs
-                                elif self.alarmsource[i] > 1 and ((self.alarmsource[i] - 2) < (2*len(self.extradevices))):
-                                    if (self.alarmsource[i])%2==0:
+                                elif self.alarmsource[i] > 1 and ((self.alarmsource[i] - 2)//2 < (len(self.extradevices))):
+                                    if (self.alarmsource[i])%2==0 and len(sample_extratemp1[(self.alarmsource[i] - 2)//2])>0:
                                         alarm_temp = sample_extratemp1[(self.alarmsource[i] - 2)//2][-1]
-                                        if alarm_idx is not None:
+                                        if alarm_idx is not None and alarm_idx < len(sample_extratemp1[(self.alarmsource[i] - 2)//2]):
                                             alarm_temp -= sample_extratemp1[(self.alarmsource[i] - 2)//2][alarm_idx] # subtract the reading at alarm_idx for IF ALARMs
-                                    else:
+                                    elif len(sample_extratemp2[(self.alarmsource[i] - 2)//2])>0:
                                         alarm_temp = sample_extratemp2[(self.alarmsource[i] - 2)//2][-1]
-                                        if alarm_idx is not None:
+                                        if alarm_idx is not None and alarm_idx < len(sample_extratemp2[(self.alarmsource[i] - 2)//2]):
                                             alarm_temp -= sample_extratemp2[(self.alarmsource[i] - 2)//2][alarm_idx] # subtract the reading at alarm_idx for IF ALARMs
 
                                 alarm_limit = self.alarmtemperature[i]
@@ -5656,11 +5798,13 @@ class tgraphcanvas(QObject):
                                     # get current limits
                                     xlim = self.ax.get_xlim()
                                     xlim_offset = (xlim[1] - xlim[0]) / 2.
-                                    xlim_new = (tx - xlim_offset, tx + xlim_offset)
+                                    xlim_shift = (xlim[1] - xlim[0])*self.zoom_follow_pan_x
+                                    xlim_new = (tx - xlim_offset + xlim_shift, tx + xlim_offset + xlim_shift)
                                     ylim = self.ax.get_ylim()
                                     if self.fmt_data_curve == 0:
                                         ylim_offset = (ylim[1] - ylim[0]) / 2.
-                                        ylim_new = (temp - ylim_offset, temp + ylim_offset)
+                                        ylim_shift = (ylim[1] - ylim[0])*self.zoom_follow_pan_y
+                                        ylim_new = (temp - ylim_offset + ylim_shift, temp + ylim_offset + ylim_shift)
                                     else:
                                         # in clamp mode (any) we don't follow the y-axis, but only the x-axis
                                         ylim_new = ylim
@@ -5672,8 +5816,9 @@ class tgraphcanvas(QObject):
                                             # keep the RoR axis constant
                                             zlim = self.delta_ax.get_ylim()
                                             zlim_offset = (zlim[1] - zlim[0]) / 2.
+                                            zlim_shift = (zlim[1] - zlim[0])*self.zoom_follow_pan_y
                                             tempd = float(self.delta_ax.transData.inverted().transform((0,self.ax.transData.transform((0,temp))[1]))[1])
-                                            zlim_new = (tempd - zlim_offset, tempd + zlim_offset)
+                                            zlim_new = (tempd - zlim_offset + zlim_shift, tempd + zlim_offset + zlim_shift)
                                             self.delta_ax.set_ylim(zlim_new)
                                         self.ax_background = None
                             else:
@@ -5690,12 +5835,14 @@ class tgraphcanvas(QObject):
                                         # get current limits
                                         xlim = self.ax.get_xlim()
                                         xlim_offset = (xlim[1] - xlim[0]) / 2.
-                                        xlim_new = (tx - xlim_offset, tx + xlim_offset)
+                                        xlim_shift = (xlim[1] - xlim[0])*self.zoom_follow_pan_x
+                                        xlim_new = (tx - xlim_offset + xlim_shift, tx + xlim_offset + xlim_shift)
                                         ylim = self.ax.get_ylim()
                                         if self.fmt_data_curve == 0:
                                             ylim_offset = (ylim[1] - ylim[0]) / 2.
+                                            ylim_shift = (ylim[1] - ylim[0])*self.zoom_follow_pan_y
                                             rord = float(self.ax.transData.inverted().transform((0,self.delta_ax.transData.transform((0,ror))[1]))[1])
-                                            ylim_new = (rord - ylim_offset, rord + ylim_offset)
+                                            ylim_new = (rord - ylim_offset + ylim_shift, rord + ylim_offset + ylim_shift)
                                         else:
                                             # in clamp mode (any) we don't follow the y-axis, but only the x-axis
                                             ylim_new = ylim
@@ -15151,8 +15298,21 @@ class tgraphcanvas(QObject):
                 self.aw.roasthubs_org_id,
                 self.aw.roasthubs_machine_id,
                 self.aw.roasthubs_token,
-                on_upload_succeeded,
-                on_upload_failure)
+                # filter conf
+                interpolate_drops = self.interpolateDropsflag,
+                curvefilter = self.curvefilter,
+                medfilt_factor = self.median_filter_factor,
+                limit_ror = self.RoRlimitFlag,
+                ror_limit_min = self.RoRlimitm,
+                ror_limit_max = self.RoRlimit,
+                delta_span_ET = self.deltaETspan,
+                delta_span_BT = self.deltaBTspan,
+                medfilt_factor_RoR = self.median_filter_factor_RoR,
+                delta_ET_filter = self.deltaETfilter,
+                delta_BT_filter = self.deltaBTfilter,
+                # handlers
+                on_success=on_upload_succeeded,
+                on_failure=on_upload_failure)
 
 
 

@@ -1643,10 +1643,12 @@ def roast_message(profile:'ProfileData', org_id:str|None = None, machine_id:str|
         smooth_curves:bool = True,
         curvefilter:int = 3,
         medfilt_factor:int = 3, # has to be uneven
-        decay_smoothing_p:bool = False,
+        decay_smoothing_p:bool = False, # False: optimal smoothing
         add_additional_curves:int = 1, # 0:no additional curves, 1:visible additional curves, 2:all additional curves
         rate_of_rise:int = 1, # 0: no RoR curve, 1: only BT RoR, 2: ET and BT RoR
         limit_ror:bool = True,
+        ror_limit_min:int = 0,
+        ror_limit_max:int = 170,
         delta_span_ET:int = 20, # delta span RoR ET in seconds
         delta_span_BT:int = 20,  # delta span RoR BT in seconds
         medfilt_factor_RoR:int = 3, # has to be uneven
@@ -1667,9 +1669,6 @@ def roast_message(profile:'ProfileData', org_id:str|None = None, machine_id:str|
 
     if len(timex)<=0:
         return None
-
-    ror_limit_min:Final[int] = 0    # C/min
-    ror_limit_max:Final[int] = 170  # C/min
 
     mode:Final[str] = profile.get('mode', 'C')
 

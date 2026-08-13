@@ -896,31 +896,31 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
 
     # monkey patch matplotlib navigationbar zoom and pan to update background cache
     def release_pan_new(self, event:'MplEvent') -> None:
-        self.release_pan_org(event)
-        if self.qmc.ai is not None and [round(r) for r in self.axis_ranges] != [round(r) for r in self.getAxisRanges()]:
-            # only hide the background image if the axis ratio changed
-            self.qmc.ai.set_visible(False)
         # as since MPL 3.5 release_pan calls self.canvas.draw_idle() instead of _draw() we just invalidate the background here instead of
         # updating it
         #self.qmc.updateBackground()
         self.qmc.ax_background = None
+        self.release_pan_org(event)
+        if self.qmc.ai is not None and [round(r) for r in self.axis_ranges] != [round(r) for r in self.getAxisRanges()]:
+            # only hide the background image if the axis ratio changed
+            self.qmc.ai.set_visible(False)
 
     # monkey patch matplotlib navigationbar zoom rectangle to update background cache
     def release_zoom_new(self, event:'MplEvent') -> None:
-        self.release_zoom_org(event)
-        if self.qmc.ai is not None:
-            self.qmc.ai.set_visible(False)
         # as since MPL 3.5 release_zoom calls self.canvas.draw_idle() instead of _draw() we just invalidate the background here instead of
         # updating it
         #self.qmc.updateBackground()
         self.qmc.ax_background = None
+        self.release_zoom_org(event)
+        if self.qmc.ai is not None:
+            self.qmc.ai.set_visible(False)
 
     # monkey patch matplotlib navigationbar home/left/right history navigation to update background cache
     def update_view_new(self) -> None:
-        self.update_view_org()
         # as since MPL 3.5 _update_view calls self.canvas.draw_idle() instead of _draw() we just invalidate the background here instead of
         #self.qmc.updateBackground()
         self.qmc.ax_background = None
+        self.update_view_org()
 
     def getAxisRanges(self) -> list[float]:
         res = []
@@ -3405,13 +3405,6 @@ class ApplicationWindow(QMainWindow):
         #the SV buttons are activated from the PID control panel
         self.buttonCONTROL.setVisible(False)
 
-        self.buttonSVp5.setVisible(False)
-        self.buttonSVp10.setVisible(False)
-        self.buttonSVp20.setVisible(False)
-        self.buttonSVm20.setVisible(False)
-        self.buttonSVm10.setVisible(False)
-        self.buttonSVm5.setVisible(False)
-
         #### EVENT MINI EDITOR: View&Edits events without opening roast properties Dlg.
         self.eventlabel: QLabel = QLabel(f"{QApplication.translate('Form Caption', 'Event')} #<b>0 </b>")
 
@@ -3587,6 +3580,10 @@ class ApplicationWindow(QMainWindow):
         level3layout = QHBoxLayout()   # PID buttons, graph, temperature LCDs
 
         pidbuttonLayout = QVBoxLayout()
+        pidbuttonLayout.setContentsMargins(15,0,5,0) # left, top, right, bottom
+        self.pidbuttonFrame = QFrame()
+        self.pidbuttonFrame.setLayout(pidbuttonLayout)
+        self.pidbuttonFrame.setVisible(False)
 
         EventsLayout = QHBoxLayout()
         EventsLayout.setContentsMargins(1,1,1,1)
@@ -3810,7 +3807,7 @@ class ApplicationWindow(QMainWindow):
         self.level1layout.setContentsMargins(0,7,7,12) # left, top, right, bottom
 
         #level 3
-        level3layout.addLayout(pidbuttonLayout,0)
+        level3layout.addWidget(self.pidbuttonFrame,0)
 
         self.qpc:tphasescanvas|None = None
 
@@ -4053,7 +4050,7 @@ class ApplicationWindow(QMainWindow):
         self.lcdFrame:QFrame = QFrame()
         self.lcdFrame.setLayout(LCDlayout)
         self.lcdFrame.setVisible(False)
-        self.lcdFrame.setContentsMargins(5,0,0,0)
+        self.lcdFrame.setContentsMargins(5,0,10,0) # left top right bottom
         self.lcdFrame.setSizePolicy(QSizePolicy.Policy.Maximum,QSizePolicy.Policy.Expanding) # prevent horizontal expansion (graph might not maximize otherwise)
 
         self.midlayout = QHBoxLayout()
@@ -5725,6 +5722,7 @@ class ApplicationWindow(QMainWindow):
                     org_roastersize = self.qmc.roastersize
                     org_roasterheating_setup = self.qmc.roasterheating_setup
                     org_roasterheating = self.qmc.roasterheating
+                    no_config = False
                     # reset roaster_setup_default to ensure we do not offer a default from a previously loaded machine setup
                     self.qmc.roastersize_setup_default = 0
                     self.qmc.roasterheating_setup_default = 0
@@ -5755,11 +5753,13 @@ class ApplicationWindow(QMainWindow):
                         if res:
                             QTimer.singleShot(700, self.qmc.startPhidgetManager)
                     elif action.data()[2] == 'RoastHubs':
+                        no_config = True # no further configurations required
                         from artisanlib.roasthubs import configureConnection
                         res = configureConnection(self)
                         if not res:
                             self.sendmessage(QApplication.translate('Message','Action canceled'))
                     elif action.data()[1] == 'ROEST' and self.qmc.device:
+                        no_config = True # no further configurations required
                         # select ROEST machine and retrieve MQTT credentials
                         from artisanlib.roest import RoestMachine, selectROESTmachine
                         roest_machine:RoestMachine|None = selectROESTmachine(self)
@@ -5794,7 +5794,7 @@ class ApplicationWindow(QMainWindow):
                         self.qmc.machinesetup = action.text()
                         res = True
                     ###
-                    if (self.qmc.device == 29 or 29 in self.qmc.extradevices) and self.modbus.type in {3,4}: # MODBUS TCP or UDP
+                    if not no_config and (self.qmc.device == 29 or 29 in self.qmc.extradevices) and self.modbus.type in {3,4}: # MODBUS TCP or UDP
                         # as default we offer the current settings MODBUS host, or if this is set to its default as after a factory reset (self.modbus.default_host) we take the one from the machine setup
                         defaultModbusHost:str = (self.modbus.host if org_modbus_host == self.modbus.default_host else org_modbus_host)
                         host, res2 = QInputDialog.getText(self,
@@ -5805,7 +5805,7 @@ class ApplicationWindow(QMainWindow):
                             self.modbus.host = host
                         else:
                             res = False
-                    elif self.qmc.device == 79 or 79 in self.qmc.extradevices: # S7
+                    elif not no_config and (self.qmc.device == 79 or 79 in self.qmc.extradevices): # S7
                         # as default we offer the current settings S7 host, or if this is set to its default as after a factory reset (self.s7.default_host) we take the one from the machine setup
                         defaultS7Host:str = (self.s7.host if org_s7_host == self.s7.default_host else org_s7_host)
                         host, res2 = QInputDialog.getText(self,
@@ -5816,7 +5816,7 @@ class ApplicationWindow(QMainWindow):
                             self.s7.host = host
                         else:
                             res = False
-                    elif self.qmc.device == 111 or 111 in self.qmc.extradevices: # WebSocket
+                    elif not no_config and (self.qmc.device == 111 or 111 in self.qmc.extradevices): # WebSocket
                         # as default we offer the current settings WebSocket host, or if this is set to its default as after a factory reset (self.ws.default_host) we take the one from the machine setup
                         defaultWSHost:str = (self.ws.host if org_ws_host == self.ws.default_host else org_ws_host)
                         host, res2 = QInputDialog.getText(self,
@@ -5827,7 +5827,7 @@ class ApplicationWindow(QMainWindow):
                             self.ws.host = host
                         else:
                             res = False
-                    elif self.qmc.device == 138 and not self.kaleidoSerial: # Kaleido Network
+                    elif not no_config and (self.qmc.device == 138 and not self.kaleidoSerial): # Kaleido Network
                         # as default we offer the current settings kaleido host, or if this is set to its default as after a factory reset (self.kaleido_default_host) we take the one from the machine setup
                         defaultKaleidoHost:str = (self.kaleidoHost if org_kaleido_host == self.kaleido_default_host else org_kaleido_host)
                         host, res2 = QInputDialog.getText(self,
@@ -5838,7 +5838,7 @@ class ApplicationWindow(QMainWindow):
                             self.kaleidoHost = host
                         else:
                             res = False
-                    elif self.qmc.device == 164: # Mugma
+                    elif not no_config and (self.qmc.device == 164): # Mugma
                         # as default we offer the current settings mugma host, or if this is set to its default as after a factory reset (self.mugma_default_host) we take the one from the machine setup
                         defaultMugmaHost:str = (self.mugmaHost if org_mugma_host == self.mugma_default_host else org_mugma_host)
                         host, res2 = QInputDialog.getText(self,
@@ -5849,7 +5849,7 @@ class ApplicationWindow(QMainWindow):
                             self.mugmaHost = host
                         else:
                             res = False
-                    elif action.data()[2] != 'RoastHubs' and action.data()[1] != 'ROEST' and (self.qmc.device in {0, 9, 19, 53, 101, 115, 126, 196} or ((self.qmc.device == 29 or 29 in self.qmc.extradevices) and self.modbus.type in {0, 1, 2}) or
+                    elif not no_config and (self.qmc.device in {0, 9, 19, 53, 101, 115, 126, 196} or ((self.qmc.device == 29 or 29 in self.qmc.extradevices) and self.modbus.type in {0, 1, 2}) or
                             (self.qmc.device == 134 and self.santokerSerial and not self.santokerBLE) or
                             (self.qmc.device == 138 and self.kaleidoSerial)): # Fuji, Center301, TC4, Hottop, Behmor or MODBUS serial, HB/ARC
                         select_device_name = None
@@ -5872,7 +5872,7 @@ class ApplicationWindow(QMainWindow):
                                     self.modbus.comport = new_port
                                 else: # Fuji or HOTTOP
                                     self.ser.comport = new_port
-                    elif self.qmc.device == 142: # IKAWA
+                    elif not no_config and self.qmc.device == 142: # IKAWA
                         # we request Bluetooth permission
                         permission_status:bool|None = self.app.getBluetoothPermission(request=True)
                         if permission_status is False:
@@ -5880,7 +5880,7 @@ class ApplicationWindow(QMainWindow):
                             QMessageBox.warning(None, #self, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
                                     message, message)
                     if res:
-                        if self.qmc.roastersize_setup == 0 and action.data()[2] != 'RoastHubs' and action.data()[1] != 'ROEST':
+                        if not no_config and self.qmc.roastersize_setup == 0:
                             batchsize, res2 = QInputDialog.getDouble(self,
                                 QApplication.translate('Message', 'Machine'),
                                 QApplication.translate('Message', 'Machine Capacity (kg)'),
@@ -5895,7 +5895,7 @@ class ApplicationWindow(QMainWindow):
                             res = self.qmc.roastersize_setup != 0 # roastersize_setup was loaded from machine setup
                     if res:
                         # first establish roastersize_setup batchsizes as default batchsize (potentially unit converted)
-                        if self.qmc.roastersize_setup > 0  and action.data()[2] != 'RoastHubs' and action.data()[1] != 'ROEST':
+                        if not no_config and self.qmc.roastersize_setup > 0:
                             weight_unit = self.qmc.weight[2]
                             self.qmc.last_batchsize = convertWeight(self.qmc.roastersize_setup,1,0) # nominal batch size in g
                             nominal_batch_size = convertWeight(self.qmc.roastersize_setup,1,weight_units.index(weight_unit))
@@ -5903,7 +5903,7 @@ class ApplicationWindow(QMainWindow):
                             self.qmc.weight = (nominal_batch_size,0,weight_unit)
                         # size set, ask for heating
                         resi:int|None
-                        if self.qmc.roasterheating_setup == 0:
+                        if not no_config and self.qmc.roasterheating_setup == 0:
                             dlg:ArtisanComboBoxDialog = ArtisanComboBoxDialog(self, self, QApplication.translate('Message',
                                     'Machine'),QApplication.translate('Label', 'Heating'),self.qmc.heating_types,self.qmc.roasterheating_setup_default)
                             resi = dlg.idx if dlg.exec() else None
@@ -11067,9 +11067,133 @@ class ApplicationWindow(QMainWindow):
                                     self.sendmessage(f'Artisan Command: {cs}')
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
+
+                            # zoom(<factor_x>[,<factor_y>]) zooms the canvas with <factor_x> and the optional <factor_y> floats indicating
+                            #  the zoom factor in x and y direction, respectivily. A factor 1 does not apply any zoom,
+                            #  a positive factor zooms in, a negative one zoom out. If <factor_y> is not given,
+                            #  it defaults to <factor_x>
+                            elif cs.startswith('zoom(') and cs.endswith(')'):
+                                try:
+                                    values = cs[len('zoom('):-1].split(',')
+                                    factor_x = factor_y = float(eval(values[0][:eval_limit])) # pylint: disable=eval-used
+                                    if len(values)>1:
+                                        factor_y = float(eval(values[1][:eval_limit])) # pylint: disable=eval-used
+                                    self.qmc.canvasZoomSignal.emit(factor_x,factor_y)
+                                except Exception as e: # pylint: disable=broad-except
+                                    _log.exception(e)
+                            # pan(<x>[,<y>]) pans the canvas with <x> and the optional <y>, two floats indicating
+                            #  the panning in x and y direction, respectivily. A pan of 0 does not apply any panning,
+                            #  a pan of 1 moves one full screen to the left/bottom, a pan of -1 moves canvas one full screen to the right/top.
+                            #  If <y> is not given, it defaults to <x>
+                            elif cs.startswith('pan(') and cs.endswith(')'):
+                                try:
+                                    values = cs[len('pan('):-1].split(',')
+                                    shift_factor_x = shift_factor_y = float(eval(values[0][:eval_limit])) # pylint: disable=eval-used
+                                    if len(values)>1:
+                                        shift_factor_y = float(eval(values[1][:eval_limit])) # pylint: disable=eval-used
+                                    self.qmc.canvasPanSignal.emit(shift_factor_x, shift_factor_y, -2) # -2: don't center
+                                except Exception as e: # pylint: disable=broad-except
+                                    _log.exception(e)
+
+                            # center(<pan_x>,<pan_y>[,<clamp>]) centers canvas and then applies panning according to the given pan_x/pan_y parameters
+                            #
+                            # if not recording and clamp
+                            #   -1: center canvas only horizontally to its x-axis limits
+                            #   {0-4}: center canvas to both axis limits
+                            # if recording, center the canvas w.r.t. the current zoom follow and clamp mode or the optional clamp argument given with
+                            #  -1: only along x-axis to current time
+                            #   0: w.r.t. axis limits
+                            #   1: w.r.t. current time and BT
+                            #   2: w.r.t. time and ET
+                            #   3: w.r.t. time and BT RoR (delta BT)
+                            #   4: w.r.t. time and ET RoR (delta ET)
+                            # clamp defaults to
+                            # -1 if xy-cursor widget is clamped to any temp or RoR curve (z-key)
+                            #  0 if zoom follow is OFF and xy-cursor not clamped
+                            #  1-4 if zoom follow is ON and xy-cursor not clamped, centering on the value zoom followed
+                            #
+                            # The float arguments <pan_x> and <pan_y> define additional panning w.r.t. this center position with a value of 0
+                            # not applying any additional panning, a value of 1 applying an additional panning of one full screen to the left/bottom
+                            # and a value of -1 applying an additional panning of one full screen to the right/top.
+                            elif cs.startswith('center(') and cs.endswith(')'):
+                                try:
+                                    raw_values = eval(f'[{cs[len('center('):-1]}]'[:eval_limit]) # pylint: disable=eval-used
+                                    if len(raw_values) > 1:
+                                        x = float(raw_values[0])
+                                        y = float(raw_values[1])
+                                        clamp = self.qmc.fmt_data_curve
+                                        if len(raw_values) > 2:
+                                            clamp = int(raw_values[2])
+                                        elif self.qmc.fmt_data_curve != 0:
+                                            clamp = -1
+                                        else:
+                                            clamp = 0
+                                            if self.qmc.zoom_follow:
+                                                if self.qmc.fmt_data_RoR:
+                                                    clamp = (4 if self.qmc.zoom_follow_onET else 3)
+                                                else:
+                                                    clamp = (2 if self.qmc.zoom_follow_onET else 1)
+                                        self.qmc.canvasPanSignal.emit(x, y, clamp)
+                                except Exception as e: # pylint: disable=broad-except
+                                    _log.exception(e)
+
+                            # clamp(<n>) : set clamp to 0: off, 1: BT@x, 2: ET@x, 3: BTB@x, 4: ETB@x
+                            elif cs.startswith('clamp(') and cs.endswith(')'):
+                                try:
+                                    new_clamp = max(0, min(4, toInt(eval(cs[len('clamp('):-1][:eval_limit])))) # pylint: disable=eval-used
+                                    if new_clamp != self.qmc.fmt_data_curve:
+                                        self.qmc.fmt_data_curve = new_clamp
+                                        self.sendmessage(self.qmc.xy_cursor_setting())
+                                except Exception as e: # pylint: disable=broad-except
+                                    _log.exception(e)
+
+                            # followMode(<bool>) enable/disable follow mode
+                            elif cs.startswith('followMode(') and cs.endswith(')'):
+                                try:
+                                    value_str = cs[len('followMode('):-1]
+                                    if value_str.lower() in {'yes', 'true', 't', '1'}:
+                                        self.qmc.zoom_follow = True
+                                        self.sendmessage(QApplication.translate('Message','follow on'))
+                                    else:
+                                        self.qmc.zoom_follow = False
+                                        self.sendmessage(QApplication.translate('Message','follow off'))
+                                except Exception as e: # pylint: disable=broad-except
+                                    _log.exception(e)
+
+                            # followModePanning(<x>[,<y>]) sets additional panning to be applied in follow mode after the centering
+                            #   indicated by the two floats <x> and the optional <y> in horizontal and vertical direction, respectively.
+                            #   0: no panning, 1: pan canvas one full screen to the left/bottom, -1: pan canvas one full screen to the right/top
+                            # If the <y> is not given, it defaults to <x>.
+                            elif cs.startswith('followModePanning(') and cs.endswith(')'):
+                                try:
+                                    values = cs[len('followModePanning('):-1].split(',')
+                                    factor_x = factor_y = float(eval(values[0][:eval_limit])) # pylint: disable=eval-used
+                                    if len(values)>1:
+                                        factor_y = float(eval(values[1][:eval_limit])) # pylint: disable=eval-used
+                                    self.qmc.zoom_follow_pan_x = factor_x
+                                    self.qmc.zoom_follow_pan_y = factor_y
+                                except Exception as e: # pylint: disable=broad-except
+                                    _log.exception(e)
+
+                            elif cs.strip() == 'home' and self.qmc.fig.canvas.toolbar is not None:
+                                self.qmc.fig.canvas.toolbar.home()
+                            elif cs.strip() == 'back' and self.qmc.fig.canvas.toolbar is not None:
+                                try:
+                                    if self.qmc.fig.canvas.toolbar._nav_stack._pos > 0: # type:ignore[attr-defined] # pylint: disable=protected-access
+                                        self.qmc.fig.canvas.toolbar.back()
+                                except Exception as e:
+                                    _log.error(e)
+                            elif cs.strip() == 'forward' and self.qmc.fig.canvas.toolbar is not None:
+                                try:
+                                    if self.qmc.fig.canvas.toolbar._nav_stack._pos < len(self.qmc.fig.canvas.toolbar._nav_stack) - 1:  # type:ignore[attr-defined] # pylint: disable=protected-access
+                                        self.qmc.fig.canvas.toolbar.forward()
+                                except Exception as e:
+                                    _log.error(e)
+
                             else:
                                 # command not recognized
                                 _log.info('Artisan Command <%s> not recognized', cs)
+
                 elif action == 21: # RC Command
                     # PHIDGETS   sn : has the form <hub_serial>[:<hub_port>], an optional serial number of the hub, optionally specifying the port number the module is connected to
                     ##  pulse(ch,min,max[,sn]) : sets the min/max pulse width in microseconds
@@ -19673,15 +19797,18 @@ class ApplicationWindow(QMainWindow):
             self.schedule_machine_filter = toBool(settings.value('ScheduleMachineFilter',self.schedule_machine_filter))
             self.schedule_visible_filter = toBool(settings.value('ScheduleVisibleFilter',self.schedule_visible_filter))
             self.scheduled_items_uuids = list(toStringList(settings.value('scheduled_items',self.scheduled_items_uuids)))
-            self.scheduleFlag = toBool(settings.value('Schedule',self.scheduleFlag))
             self.scheduler_tasks_visible = toBool(settings.value('SchedulerTasks',self.scheduler_tasks_visible))
             self.scheduler_completed_details_visible = toBool(settings.value('SchedulerCompletedDetails',self.scheduler_completed_details_visible))
             self.scheduler_filters_visible = toBool(settings.value('SchedulerFilter',self.scheduler_filters_visible))
-            if self.scheduleFlag:
-                try:
-                    QTimer.singleShot(700, lambda:self.schedule(True))
-                except Exception as e: # pylint: disable=broad-except
-                    _log.exception(e)
+            if settings.contains('Schedule'):
+                scheduleFlag = toBool(settings.value('Schedule',self.scheduleFlag))
+                if scheduleFlag and not self.scheduleFlag and not theme and not machine:
+                    # we automatically re-open the scheduler if it is not yet open
+                    self.scheduleFlag = scheduleFlag
+                    try:
+                        QTimer.singleShot(700, lambda:self.schedule(True))
+                    except Exception as e: # pylint: disable=broad-except
+                        _log.exception(e)
 
             self.LargeLCDsFlag = toBool(settings.value('LargeLCDs',self.LargeLCDsFlag))
             if self.LargeLCDsFlag:
@@ -19809,10 +19936,10 @@ class ApplicationWindow(QMainWindow):
                         self.recentRoasts = []
                 except Exception: # pylint: disable=broad-except
                     pass
-            try:
-                self.updateNewMenuRecentRoasts()
-            except Exception: # pylint: disable=broad-except
-                pass
+                try:
+                    self.updateNewMenuRecentRoasts()
+                except Exception: # pylint: disable=broad-except
+                    pass
 
             # used on startup to reload previous loaded profiles
             if settings.contains('lastLoadedProfile'):
@@ -25577,7 +25704,6 @@ class ApplicationWindow(QMainWindow):
                 self.schedule_window.show()
         elif self.schedule_window is not None:
             self.schedule_window.close()
-            self.schedule_window = None
 
     @pyqtSlot()
     @pyqtSlot(bool)

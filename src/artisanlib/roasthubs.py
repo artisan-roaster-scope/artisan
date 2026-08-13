@@ -41,7 +41,7 @@ if TYPE_CHECKING:
     from proto import artisan_roast_pb2 # pylint: disable=unused-import
 
 from PyQt6.QtWidgets import (QApplication, QGroupBox, QHBoxLayout,
-    QVBoxLayout, QLabel, QLineEdit, QDialogButtonBox)
+    QVBoxLayout, QLabel, QLineEdit, QDialogButtonBox, QLayout)
 from PyQt6.QtCore import Qt, pyqtSlot
 from PyQt6.QtGui import QKeySequence, QAction
 
@@ -105,11 +105,47 @@ async def send_roast(roast:'artisan_roast_pb2.Roast', token:str,
         _log.error('exception in roasthubs:send_roast: %s', e)
 
 
-def send_profile(profile:'ProfileData', org_id:str, machine_id:str, token:str,
-        on_success:Callable[[], None] | None, on_failure:Callable[[], None] | None) -> None:
+def send_profile(
+        profile:'ProfileData',
+        org_id:str,
+        machine_id:str,
+        token:str,
+        # filter conf
+        interpolate_drops:bool = True,
+        curvefilter:int = 3,
+        medfilt_factor:int = 3,
+        limit_ror:bool = True,
+        ror_limit_min:int = 0,
+        ror_limit_max:int = 170,
+        delta_span_ET:int = 20,
+        delta_span_BT:int = 20,
+        medfilt_factor_RoR:int = 3,
+        delta_ET_filter:int = 7,
+        delta_BT_filter:int = 7,
+        # handlers
+        on_success:Callable[[], None] | None = None,
+        on_failure:Callable[[], None] | None = None) -> None:
     if org_id != '' and machine_id != '' and token != '':
         # only if org_id and machin_id are not empty the connector is active
-        roast:artisan_roast_pb2.Roast|None = roast_message(profile, org_id=org_id, machine_id=machine_id) # pylint: disable=no-member
+        roast:artisan_roast_pb2.Roast|None = roast_message( # pylint: disable=no-member
+                profile,
+                org_id=org_id,
+                machine_id=machine_id,
+                # filter conf
+                interpolate_drops=interpolate_drops,
+                smooth_curves=True,
+                curvefilter=curvefilter,
+                medfilt_factor=medfilt_factor,
+                decay_smoothing_p=False, # optimal smoothing # qmc.optimalSmoothing
+                limit_ror=limit_ror,
+                ror_limit_min=ror_limit_min,
+                ror_limit_max=ror_limit_max,
+                delta_span_ET=delta_span_ET,
+                delta_span_BT=delta_span_BT,
+                medfilt_factor_RoR=medfilt_factor_RoR,
+                delta_ET_filter=delta_ET_filter,
+                delta_BT_filter=delta_BT_filter
+            ) # pylint: disable=no-member
         if roast is not None:
             with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
                 executor.submit(asyncio.run, send_roast(roast, token, on_success, on_failure))
@@ -228,7 +264,10 @@ class RoastHubsdialog(ArtisanDialog):
         layout.addLayout(buttonLayout)
         layout.setContentsMargins(10, 10, 10, 10)
         layout.setSpacing(5)
-        self.setLayout(layout)
+
+        # not resizable
+        layout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
+        self.setSizeGripEnabled(False)
 
 
     @pyqtSlot(str)

@@ -236,7 +236,7 @@ HEADER2:Final[bytes]      = b'\xdd'
 
 HEARTBEAT_FREQUENCY:Final[int] = 5 # send the heartbeat every 5 sec
 
-RELAY_STREAMING:Final[bool] = False # if set, configure Acaia relay (and COSMO) scales to streaming mode, otherwise they work in non-streaming mode reporting only weight changes
+RELAY_STREAMING:Final[bool] = True # if set, configure Acaia relay (and COSMO) scales to streaming mode, otherwise they work in non-streaming mode reporting only weight changes
 WEIGHT_ROUNDING:Final[bool] = False # if set, received weights are rounded to appropriate values based on scales readability
 # rounding for scales with readability>1 (to 4g), no rounding otherwise
 

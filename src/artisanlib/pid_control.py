@@ -1842,20 +1842,10 @@ class PIDcontrol:
 
     def showSVButtons(self) -> None:
         if self.aw.qmc.flagon and self.aw.qmc.Controlbuttonflag:
-            self.aw.buttonSVp5.setVisible(True)
-            self.aw.buttonSVp10.setVisible(True)
-            self.aw.buttonSVp20.setVisible(True)
-            self.aw.buttonSVm20.setVisible(True)
-            self.aw.buttonSVm10.setVisible(True)
-            self.aw.buttonSVm5.setVisible(True)
+            self.aw.pidbuttonFrame.setVisible(True)
 
     def hideSVButtons(self) -> None:
-        self.aw.buttonSVp5.setVisible(False)
-        self.aw.buttonSVp10.setVisible(False)
-        self.aw.buttonSVp20.setVisible(False)
-        self.aw.buttonSVm20.setVisible(False)
-        self.aw.buttonSVm10.setVisible(False)
-        self.aw.buttonSVm5.setVisible(False)
+        self.aw.pidbuttonFrame.setVisible(False)
 
     def activateONOFFeasySV(self, flag:bool) -> None:
         if flag:
