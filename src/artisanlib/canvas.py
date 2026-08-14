@@ -2699,7 +2699,7 @@ class tgraphcanvas(QObject):
                     # delta axis
                     if self.twoAxisMode() and self.delta_ax is not None:
                         new_z_range = (zmax - zmin)/(2*factor_y)
-                        mid_z = (zmax - zmin)/2
+                        mid_z = (zmax - zmin)/2 + zmin
                         zmin = mid_z - new_z_range
                         zmax = mid_z + new_z_range
                         self.delta_ax.set_ylim(zmin, zmax)
