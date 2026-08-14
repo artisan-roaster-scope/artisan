@@ -10724,7 +10724,7 @@ class ApplicationWindow(QMainWindow):
                                             self.updateExtraEventButtonsVisibilitySignal.emit()
                                             self.realignButtonsSignal.emit()
 
-                            # button(<e>) with <e> one of { ON, START, CHARGE, DRY, FCs, FCe, SCs, SCe, DROP, COOL, OFF }
+                            # button(<e>[,<int>]) with <e> one of { ON, START, CHARGE, DRY, FCs, FCe, SCs, SCe, DROP, COOL, OFF }
                             elif cs.startswith('button(') and cs.endswith(')'):
                                 try:
                                     try:

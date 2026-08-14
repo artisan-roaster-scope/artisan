@@ -2691,7 +2691,7 @@ class tgraphcanvas(QObject):
                     self.ax.set_xlim(xmin, xmax)
                 if factor_y != 0:
                     new_y_range = (ymax - ymin)/(2*factor_y)
-                    mid_y = (ymax - ymin)/2
+                    mid_y = (ymax - ymin)/2 + ymin
                     ymin = mid_y -  new_y_range
                     ymax = mid_y + new_y_range
                     # update state

@@ -201,11 +201,14 @@ class nonedevDlg(QDialog):
         self.btEdit.setValidator(QIntValidator(0, 1000, self.btEdit))
         self.btEdit.setFocus()
         self.ETbox = QCheckBox(QApplication.translate('CheckBox','ET'))
+        self.ETbox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         if self.aw.qmc.manuallogETflag:
             self.ETbox.setChecked(True)
+            self.etEdit.selectAll()
         else:
             self.ETbox.setChecked(False)
             self.etEdit.setVisible(False)
+            self.btEdit.selectAll()
         self.ETbox.stateChanged.connect(self.changemanuallogETflag)
         self.okButton = QPushButton(QApplication.translate('Button','OK'))
         self.cancelButton = QPushButton(QApplication.translate('Button','Cancel'))
