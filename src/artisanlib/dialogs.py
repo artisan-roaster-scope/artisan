@@ -36,6 +36,7 @@ from PyQt6.QtGui import QKeySequence, QAction, QIntValidator, QTextCharFormat, Q
 
 from artisanlib.widgets import MyQComboBox, ClickableQLineEdit, ArtisanTextEdit
 from artisanlib.util import comma2dot, float2float, float2floatWeightVolume, convertWeight, weight_units
+from artisanlib.table_style import horizontal_header_style, vertical_header_style
 
 from collections.abc import Callable
 from typing import override, Final, cast, TYPE_CHECKING
@@ -761,6 +762,8 @@ class tareDlg(ArtisanDialog):
         vheader: QHeaderView|None = self.taretable.verticalHeader()
         if vheader is not None:
             vheader.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
+            vheader.setStyleSheet(vertical_header_style(self.aw.app.darkmode))
+            vheader.setDefaultAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
         for i, cn in enumerate(self.aw.qmc.container_names):
             #add widgets to the table
             self.setTableRow(i, cn, self.aw.qmc.container_weights[i])
@@ -769,6 +772,8 @@ class tareDlg(ArtisanDialog):
         if header is not None:
             header.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
             header.setSectionResizeMode(1, QHeaderView.ResizeMode.Fixed)
+            header.setStyleSheet(horizontal_header_style(self.aw.app.darkmode))
+
         self.taretable.setColumnWidth(1,80)
 
 class DesignerSplineNodesDlg(ArtisanDialog):

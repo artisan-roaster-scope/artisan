@@ -44,6 +44,7 @@ from typing import Final, TYPE_CHECKING
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
 
+from artisanlib.button_style import artisan_push_button_style_dict
 from artisanlib.util import fromCtoFstrict, fromFtoCstrict, hex2int, str2cmd, stringfromseconds, cmd2str, float2float
 
 from PyQt6.QtCore import pyqtSlot
@@ -1496,12 +1497,14 @@ class PIDcontrol:
         if (self.externalPIDControl() == 1 and self.aw.modbus.PID_ON_action and self.aw.modbus.PID_ON_action != ''):
             self.aw.eventaction(4,self.aw.modbus.PID_ON_action)
             self.pidActive = True
-            self.aw.buttonCONTROL.setStyleSheet(self.aw.pushbuttonstyles['PIDactive'])
+            self.aw.buttonCONTROL.setStyleSheet(artisan_push_button_style_dict['PIDactive'].format(min_width=self.aw.main_button_min_width, font_size=self.aw.button_font_size))
+
         # S7 hardware PID
         elif (self.externalPIDControl() == 2 and self.aw.s7.PID_ON_action and self.aw.s7.PID_ON_action != ''):
             self.aw.eventaction(15,self.aw.s7.PID_ON_action)
             self.pidActive = True
-            self.aw.buttonCONTROL.setStyleSheet(self.aw.pushbuttonstyles['PIDactive'])
+            self.aw.buttonCONTROL.setStyleSheet(artisan_push_button_style_dict['PIDactive'].format(min_width=self.aw.main_button_min_width, font_size=self.aw.button_font_size))
+
         elif self.aw.qmc.device == 19 and self.aw.qmc.PIDbuttonflag: # ArduinoTC4 firmware PID
             if send_command and self.aw.ser.ArduinoIsInitialized:
                 self.confPID(self.pidKp,self.pidKi,self.pidKd,self.pidSource,self.pidCycle) # first configure PID according to the actual settings
@@ -1514,7 +1517,7 @@ class PIDcontrol:
                         self.aw.ser.SP.write(str2cmd('PID;LIMIT;' + str(duty_min) + ';' + str(duty_max) + '\n'))
                         self.aw.ser.SP.write(str2cmd('PID;ON\n'))
                         self.pidActive = True
-                        self.aw.buttonCONTROL.setStyleSheet(self.aw.pushbuttonstyles['PIDactive'])
+                        self.aw.buttonCONTROL.setStyleSheet(artisan_push_button_style_dict['PIDactive'].format(min_width=self.aw.main_button_min_width, font_size=self.aw.button_font_size))
                         self.aw.sendmessage(QApplication.translate('Message','PID turned on'))
                 finally:
                     if self.aw.ser.COMsemaphore.available() < 1:
@@ -1525,14 +1528,14 @@ class PIDcontrol:
                 self.aw.kaleido.pidON()
             self.pidActive = True
             self.aw.qmc.pid.on()
-            self.aw.buttonCONTROL.setStyleSheet(self.aw.pushbuttonstyles['PIDactive'])
+            self.aw.buttonCONTROL.setStyleSheet(artisan_push_button_style_dict['PIDactive'].format(min_width=self.aw.main_button_min_width, font_size=self.aw.button_font_size))
         elif self.aw.qmc.Controlbuttonflag:
             # software PID
             if not self.pidActive: # only if not yet active!
                 self.confSoftwarePID()
                 self.pidActive = True
                 self.aw.qmc.pid.on()
-                self.aw.buttonCONTROL.setStyleSheet(self.aw.pushbuttonstyles['PIDactive'])
+                self.aw.buttonCONTROL.setStyleSheet(artisan_push_button_style_dict['PIDactive'].format(min_width=self.aw.main_button_min_width, font_size=self.aw.button_font_size))
                 self.aw.qmc.pid.setTarget(self.svValue,init=False)
         if self.sv is None and self.svMode == 0: # only in manual SV mode we initialize the SV on PID ON
             self.setSV(self.svValue)
@@ -1548,13 +1551,13 @@ class PIDcontrol:
         if (self.externalPIDControl() == 1 and self.aw.modbus.PID_OFF_action and self.aw.modbus.PID_OFF_action != ''):
             self.aw.eventaction(4,self.aw.modbus.PID_OFF_action)
             if not self.aw.HottopControlActive:
-                self.aw.buttonCONTROL.setStyleSheet(self.aw.pushbuttonstyles['PID'])
+                self.aw.buttonCONTROL.setStyleSheet(artisan_push_button_style_dict['PID'].format(min_width=self.aw.main_button_min_width, font_size=self.aw.button_font_size))
             self.pidActive = False
         # S7 hardware PID
         elif (self.externalPIDControl() == 2 and self.aw.s7.PID_OFF_action and self.aw.s7.PID_OFF_action != ''):
             self.aw.eventaction(15,self.aw.s7.PID_OFF_action)
             if not self.aw.HottopControlActive:
-                self.aw.buttonCONTROL.setStyleSheet(self.aw.pushbuttonstyles['PID'])
+                self.aw.buttonCONTROL.setStyleSheet(artisan_push_button_style_dict['PID'].format(min_width=self.aw.main_button_min_width, font_size=self.aw.button_font_size))
             self.pidActive = False
         # TC4 hardware PID
         elif self.aw.qmc.device == 19 and self.aw.qmc.PIDbuttonflag and self.aw.qmc.Controlbuttonflag: # ArduinoTC4 firmware PID
@@ -1571,7 +1574,7 @@ class PIDcontrol:
                     if self.aw.ser.COMsemaphore.available() < 1:
                         self.aw.ser.COMsemaphore.release(1)
                 if not self.aw.HottopControlActive:
-                    self.aw.buttonCONTROL.setStyleSheet(self.aw.pushbuttonstyles['PID'])
+                    self.aw.buttonCONTROL.setStyleSheet(artisan_push_button_style_dict['PID'].format(min_width=self.aw.main_button_min_width, font_size=self.aw.button_font_size))
                 self.pidActive = False
         elif self.aw.qmc.Controlbuttonflag and self.externalPIDControl() == 4 and self.aw.kaleido is not None:
             # Kaleido PID
@@ -1579,14 +1582,14 @@ class PIDcontrol:
                 self.aw.kaleido.pidOFF()
             self.pidActive = False
             self.aw.qmc.pid.off()
-            self.aw.buttonCONTROL.setStyleSheet(self.aw.pushbuttonstyles['PID'])
+            self.aw.buttonCONTROL.setStyleSheet(artisan_push_button_style_dict['PID'].format(min_width=self.aw.main_button_min_width, font_size=self.aw.button_font_size))
         elif self.aw.qmc.Controlbuttonflag:
             # software PID
             self.aw.qmc.pid.setControl(lambda _: None)
             self.pidActive = False
             self.aw.qmc.pid.off()
             if not self.aw.HottopControlActive:
-                self.aw.buttonCONTROL.setStyleSheet(self.aw.pushbuttonstyles['PID'])
+                self.aw.buttonCONTROL.setStyleSheet(artisan_push_button_style_dict['PID'].format(min_width=self.aw.main_button_min_width, font_size=self.aw.button_font_size))
 
     @pyqtSlot(int)
     def sliderMinValueChanged(self, i:int) -> None:

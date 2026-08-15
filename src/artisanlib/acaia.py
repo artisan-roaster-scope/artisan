@@ -236,7 +236,7 @@ HEADER2:Final[bytes]      = b'\xdd'
 
 HEARTBEAT_FREQUENCY:Final[int] = 5 # send the heartbeat every 5 sec
 
-RELAY_STREAMING:Final[bool] = True # if set, configure Acaia relay (and COSMO) scales to streaming mode, otherwise they work in non-streaming mode reporting only weight changes
+RELAY_STREAMING:Final[bool] = False # if set, configure Acaia relay (and COSMO) scales to streaming mode, otherwise they work in non-streaming mode reporting only weight changes
 WEIGHT_ROUNDING:Final[bool] = False # if set, received weights are rounded to appropriate values based on scales readability
 # rounding for scales with readability>1 (to 4g), no rounding otherwise
 
@@ -501,6 +501,8 @@ class AcaiaProtocol:
     def parse_info(self, data:bytes) -> None:
         if self._logging:
             _log.debug('INFO MSG: %s', data)
+        else:
+            _log.debug('INFO MSG received')
 
         if len(data)>2:
             self.isp_version = data[2]
@@ -832,10 +834,9 @@ class AcaiaProtocol:
                 self.parse_info(data)
                 self.info_msg_received = True
                 if not self.id_sent:
-                    self.send_ID() # send after very INFO_A as handshake confirmation
+                    self.send_ID() # send after every INFO_A as handshake confirmation
             elif msg_type == CMD.STATUS_A and self.info_msg_received:
                 self.parse_status(data)
-                self.id_sent = True # connection confirmed by device, no need for further handshake
                 self.identify_device()
             elif msg_type == CMD.EVENT_SA:
                 self.parse_scale_events(data)
@@ -848,9 +849,9 @@ class AcaiaProtocol:
                 # Note: this event is needed to have the connected scale start to send weight messages even on relay scales which ignore the settings
                 self.fast_notifications()
 
-            if not self.id_sent:
-                # send ID only once per connect to initiate the handshake
-                self.send_ID()
+#            if not self.id_sent:
+#                # send ID only once per connect to initiate the handshake, but never before receiving the INFO_A message
+#                self.send_ID()
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
             _log.debug('data: %s',data)

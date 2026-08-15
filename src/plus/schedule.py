@@ -137,7 +137,7 @@ plus_blue_hover: Final[str] = '#1985ba'
 plus_blue: Final[str] = '#147BB3'
 ## for selected schedule item:
 plus_alt_blue_hover: Final[str] = '#3d81ba'
-plus_alt_blue: Final[str] = '#3979ae' # main.py:dark_blue
+plus_alt_blue: Final[str] = '#3979ae'
 #
 white: Final[str] = 'white'
 dull_white: Final[str] = '#FDFDFD'

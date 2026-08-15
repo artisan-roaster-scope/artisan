@@ -223,8 +223,8 @@ if sys.platform.startswith('darwin'):
 #################### Main Application  ################################################
 #######################################################################################
 
-light_blue: Final[str] = '#4c97c3' # buttons CONTROL & RESET (was #2298c7)
-dark_blue: Final[str] = '#3979ae' # buttons ON & START (was #147bb3)
+#light_blue: Final[str] = '#4c97c3' # buttons CONTROL & RESET (was #2298c7)
+#dark_blue: Final[str] = '#3979ae' # buttons ON & START (was #147bb3)
 
 appGuid:Final[str] = '9068bd2fa8e54945a6be1f1a0a589e92'
 viewerAppGuid:Final[str] = '9068bd2fa8e54945a6be1f1a0a589e93'
@@ -655,8 +655,10 @@ from artisanlib.s7port import s7port
 from artisanlib.wsport import wsport
 from artisanlib.mqttport import mqttport
 from artisanlib.modbusport import modbusport
-from artisanlib.slider_style import artisan_slider_style
-from artisanlib.event_button_style import artisan_event_button_style
+from artisanlib.slider_style import artisan_slider_style, artisan_slider_frame_style
+from artisanlib.button_style import (artisan_event_button_style, artisan_simulator_push_button_style_dict,
+    artisan_push_button_style_dict, artisan_sv_plus_push_button_style, artisan_sv_minus_push_button_style)
+from artisanlib.events_editor_style import artisan_events_editor_style
 from artisanlib.simulator import Simulator
 from artisanlib.dialogs import HelpDlg, ArtisanInputDialog, ArtisanComboBoxDialog, ArtisanPortsDialog, ArtisanSliderLCDinputDlg
 from artisanlib.large_lcds import (LargeMainLCDs, LargeDeltaLCDs, LargePIDLCDs, LargeExtraLCDs, LargePhasesLCDs, LargeScaleLCDs)
@@ -1419,9 +1421,9 @@ class ApplicationWindow(QMainWindow):
         'designerAction', 'simulatorAction', 'wheeleditorAction', 'transformAction', 'temperatureMenu', 'ConvertToFahrenheitAction',
         'ConvertToCelsiusAction', 'controlsAction', 'readingsAction', 'eventsEditorAction', 'buttonsAction', 'slidersAction', 'scheduleAction', 'lcdsAction', 'deltalcdsAction',
         'pidlcdsAction', 'scalelcdsAction', 'extralcdsAction', 'phaseslcdsAction', 'fullscreenAction', 'newRoastAction', 'loadSettingsAction', 'openRecentSettingMenu',
-        'saveAsSettingsAction', 'resetAction', 'messagelabel', 'button_font_size_pt', 'button_font_size', 'button_font_size_small', 'button_font_size_small_selected',
+        'saveAsSettingsAction', 'resetAction', 'messagelabel', 'button_font_size_pt', 'button_font_size', 'button_font_size_small',
         'button_font_size_tiny', 'button_font_size_micro',
-        'pushbuttonstyles_simulator', 'pushbuttonstyles', 'standard_button_tiny_height', 'standard_button_small_height', 'standard_button_height',
+        'standard_button_tiny_height', 'standard_button_small_height', 'standard_button_height',
         'buttonONOFF', 'buttonSTARTSTOP', 'buttonFCs', 'buttonFCe', 'buttonSCs', 'buttonSCe', 'buttonRESET', 'buttonCHARGE', 'buttonDROP',
         'buttonCONTROL', 'buttonEVENT', 'buttonSVp5', 'buttonSVp10', 'buttonSVp20', 'buttonSVm20', 'buttonSVm10', 'buttonSVm5', 'buttonDRY',
         'buttonCOOL', 'lcd1', 'lcd2', 'lcd3', 'lcd4', 'lcd5',
@@ -2769,15 +2771,13 @@ class ApplicationWindow(QMainWindow):
         else:
             self.button_font_size_pt = 13
 
-        #TODO: delete # pylint: disable=fixme
         if platform.system() == 'Windows':
-            self.button_font_size = f'{self.button_font_size_pt - 2}pt'
+            self.button_font_size = self.button_font_size_pt - 2
         else:
-            self.button_font_size = f'{self.button_font_size_pt}pt'
-        self.button_font_size_small = f'{self.button_font_size_pt - 3}pt'
-        self.button_font_size_small_selected = f'{self.button_font_size_pt - 2}pt'
-        self.button_font_size_tiny = f'{self.button_font_size_pt - 4}pt'
-        self.button_font_size_micro = f'{self.button_font_size_pt - 5}pt'
+            self.button_font_size = self.button_font_size_pt
+        self.button_font_size_small = self.button_font_size_pt - 3
+        self.button_font_size_tiny = self.button_font_size_pt - 4
+        self.button_font_size_micro = self.button_font_size_pt - 5
 
         if platform.system() == 'Windows':
             self.button_font_size_pt = self.button_font_size_pt - 2
@@ -2801,6 +2801,7 @@ class ApplicationWindow(QMainWindow):
         else:
             # TODO: remove # pylint: disable=fixme
             self.main_button_min_width_str = '100px'
+            self.main_button_min_width = 100
             self.small_button_min_width_str = '60px'
             self.tiny_button_min_width_str = '50px'
             # TODO: keep # pylint: disable=fixme
@@ -2809,293 +2810,6 @@ class ApplicationWindow(QMainWindow):
 #            self.small_button_min_width_px = 60
 #            self.tiny_button_min_width_px = 50
 
-
-        border_modern = 'border-style:solid; border-radius:20; border-color:grey; border-width:0;' # modernize
-
-
-        self.pushbuttonstyles_simulator: dict[str, str] = {
-            'OFF':    """
-                QPushButton {
-                    min-width: """ + self.main_button_min_width_str + """;
-                    """ + border_modern + """
-                    font-size: """ + self.button_font_size + """;
-                    font-weight: bold;
-                    color: #147bb3;
-                    background-color: white;
-                }
-                QPushButton:!enabled {
-                    color: darkgrey;
-                    background-color: #E0E0E0;
-                }
-                QPushButton:pressed {
-                    color: #116D98;
-                    background-color: #EEEEEE;
-                }
-                QPushButton:hover:!pressed {
-                    color: #1985ba;
-                    background-color: #F5F5F5;
-                }
-            """,
-            'ON':    """
-                QPushButton {
-                    min-width: """ + self.main_button_min_width_str + """;
-                    """ + border_modern + """
-                    font-size: """ + self.button_font_size + """;
-                    font-weight: bold;
-                    color: #cc0f50;
-                    background-color: white;
-                }
-                QPushButton:!enabled {
-                    color: darkgrey;
-                    background-color: #E0E0E0;
-                }
-                QPushButton:pressed {
-                    color: #c70d49;
-                    background-color: #EEEEEE;
-                }
-                QPushButton:hover:!pressed {
-                    color: #d4336a;
-                    background-color: #F5F5F5;
-                }
-            """,
-            'STOP':     """
-                QPushButton {
-                    min-width: """ + self.main_button_min_width_str + """;
-                    """ + border_modern + """
-                    font-size: """ + self.button_font_size + """;
-                    font-weight: bold;
-                    color: #147bb3;
-                    background-color: white;
-                }
-                QPushButton:!enabled {
-                    color: #EFEFEF;
-                    background-color: darkgrey;
-                }
-                QPushButton:pressed {
-                    color: #116999;
-                    background-color: #EEEEEE;
-                }
-                QPushButton:hover:!pressed {
-                    color: #1985ba;
-                    background-color: #F5F5F5;
-                }
-            """,
-            'START':    """
-                QPushButton {
-                    min-width: """ + self.main_button_min_width_str + """;
-                    """ + border_modern + """
-                    font-size: """ + self.button_font_size + """;
-                    font-weight: bold;
-                    color: yellow;
-                    background-color: #ff3d00;
-                }
-                QPushButton:!enabled {
-                    color: darkgrey;
-                    background-color: #E0E0E0;
-                }
-                QPushButton:pressed {
-                    color: #EEEEEE;
-                    background-color: #116999;
-                }
-                QPushButton:hover:!pressed {
-                    color: white;
-                    background-color: red;
-                }
-            """,
-        }
-
-        self.pushbuttonstyles: dict[str, str] = {
-            'RESET':     """
-                QPushButton {
-                    min-width: """ + self.main_button_min_width_str + """;
-                    """ + border_modern + """
-                    font-size: """ + self.button_font_size + """;
-                    font-weight: bold;
-                    color: white;
-                    background-color: #4c97c3;
-                }
-                QPushButton:!enabled {
-                    color: darkgrey;
-                    background-color: lightgrey;
-                }
-                QPushButton:pressed {
-                    color: #EEEEEE;
-                    background-color: #1985ba;
-                }
-                QPushButton:hover:!pressed {
-                    color: white;
-                    background-color: #43a7cf;
-                }
-            """,
-            'OFF':    """
-                QPushButton {
-                    min-width: """ + self.main_button_min_width_str + """;
-                    """ + border_modern + """
-                    font-size: """ + self.button_font_size + """;
-                    font-weight: bold;
-                    color: white;
-                    background-color: #3979ae;
-                }
-                QPushButton:!enabled {
-                    color: darkgrey;
-                    background-color: #E0E0E0;
-                }
-                QPushButton:pressed {
-                    color: #EEEEEE;
-                    background-color: #116D98;
-                }
-                QPushButton:hover:!pressed {
-                    color: white;
-                    background-color: #1985ba;
-                }
-            """,
-            'ON':    """
-                QPushButton {
-                    min-width: """ + self.main_button_min_width_str + """;
-                    """ + border_modern + """
-                    font-size: """ + self.button_font_size + """;
-                    font-weight: bold;
-                    color: white;
-                    background-color: #cc0f50;
-                }
-                QPushButton:!enabled {
-                    color: darkgrey;
-                    background-color: #E0E0E0;
-                }
-                QPushButton:pressed {
-                    color: #EEEEEE;
-                    background-color: #c70d49;
-                }
-                QPushButton:hover:!pressed {
-                    color: white;
-                    background-color: #d4336a;
-                }
-            """,
-            'STOP':     """
-                QPushButton {
-                    min-width: """ + self.main_button_min_width_str + """;
-                    """ + border_modern + """
-                    font-size: """ + self.button_font_size + """;
-                    font-weight: bold;
-                    color: white;
-                    background-color: #3979ae;
-                }
-                QPushButton:!enabled {
-                    color: darkgrey;
-                    background-color: #E0E0E0;
-                }
-                QPushButton:pressed {
-                    color: #EEEEEE;
-                    background-color: #116999;
-                }
-                QPushButton:hover:!pressed {
-                    color: white;
-                    background-color: #1985ba;
-                }
-            """,
-            'START':    """
-                QPushButton {
-                    min-width: """ + self.main_button_min_width_str + """;
-                    """ + border_modern + """
-                    font-size: """ + self.button_font_size + """;
-                    font-weight: bold;
-                    color: yellow;
-                    background-color: #ff3d00;
-                }
-                QPushButton:!enabled {
-                    color: darkgrey;
-                    background-color: #E0E0E0;
-                }
-                QPushButton:pressed {
-                    color: #EEEEEE;
-                    background-color: #116999;
-                }
-                QPushButton:hover:!pressed {
-                    color: white;
-                    background-color: red;
-                }
-            """,
-            'PID':     """
-                QPushButton {
-                    min-width: """ + self.main_button_min_width_str + """;
-                    """ + border_modern + """
-                    font-size: """ + self.button_font_size + """;
-                    font-weight: bold;
-                    color: white;
-                    background-color: #4c97c3;
-                }
-                QPushButton:!enabled {
-                    color: darkgrey;
-                    background-color: lightgrey;
-                }
-                QPushButton:pressed {
-                    color: #EEEEEE;
-                    background-color: #1985ba;
-                }
-                QPushButton:hover:!pressed {
-                    color: white;
-                    background-color: #43a7cf;
-                }
-            """,
-            'PIDactive':     """
-                QPushButton {
-                    min-width: """ + self.main_button_min_width_str + """;
-                    """ + border_modern + """
-                    font-size: """ + self.button_font_size + """;
-                    font-weight: bold;
-                    color: white;
-                    background-color: #cc0f50;
-                }
-                QPushButton:!enabled {
-                    color: darkgrey;
-                    background-color: lightgrey;
-                }
-                QPushButton:pressed {
-                    color: #EEEEEE;
-                    background-color: #c70d49;
-                }
-                QPushButton:hover:!pressed {
-                    color: white;
-                    background-color: #d4336a;
-                }
-            """,
-            'SV +':     """
-                QPushButton {
-                    min-width: """ + str(self.standard_button_min_width_px) + """px;
-                    """ + border_modern + """
-                    font-size: """ + self.button_font_size_small + """;
-                    font-weight: bold;
-                    color: white;
-                    background-color:""" + createGradient('#db5785') + """ ;
-                }
-                QPushButton:pressed {
-                    color: #EEEEEE;
-                    background-color:""" + createGradient('#d4336a') + """ ;
-                }
-                QPushButton:hover:!pressed {
-                    color: white;
-                    background-color:""" + createGradient('#e480a2') + """ ;
-                                     }
-            """,
-            'SV -':     """
-                QPushButton {
-                    min-width: """ + str(self.standard_button_min_width_px) + """px;
-                    """ + border_modern + """
-                    font-size: """ + self.button_font_size_small + """;
-                    font-weight: bold;
-                    color: white;
-                    background-color:""" + createGradient('#64b7d8') + """ ;
-                }
-                QPushButton:pressed {
-                    color: #EEEEEE;
-                    background-color:""" + createGradient('#43a7cf') + """ ;
-                }
-                QPushButton:hover:!pressed {
-                    color: white;
-                    background-color:""" + createGradient('#85cae1') + """ ;
-                }
-            """
-            }
         # we use this high to dynamically adjust the button size to different font sizes (important for high-dpi displays on Windows)
         self.standard_button_tiny_height:int
         self.standard_button_small_height:int
@@ -3113,32 +2827,45 @@ class ApplicationWindow(QMainWindow):
         #create ON/OFF buttons
 
         self.buttonONOFF = QPushButton(QApplication.translate('Button', 'ON'))
-        self.buttonONOFF.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.buttonONOFF.setToolTip(QApplication.translate('Tooltip', 'Start monitoring'))
-        self.buttonONOFF.setStyleSheet(self.pushbuttonstyles['OFF'])
-        self.buttonONOFF.setGraphicsEffect(self.makeShadow())
-#        self.buttonONOFF.pressed.connect(self.mainButtonPressed)
-#        self.buttonONOFF.released.connect(self.mainButtonReleased)
-        self.buttonONOFF.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-        self.buttonONOFF.setMinimumHeight(self.standard_button_height)
+        self.buttonONOFF.setStyleSheet(artisan_push_button_style_dict['OFF'].format(min_width=self.main_button_min_width, font_size=self.button_font_size))
         self.buttonONOFF.clicked.connect(self.qmc.ToggleMonitor)
         if self.app.artisanviewerMode:
             self.buttonONOFF.setVisible(False)
 
         #create START/STOP buttons
         self.buttonSTARTSTOP = QPushButton(QApplication.translate('Button', 'START'))
-        self.buttonSTARTSTOP.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.buttonSTARTSTOP.setToolTip(QApplication.translate('Tooltip', 'Start recording'))
-        self.buttonSTARTSTOP.setStyleSheet(self.pushbuttonstyles['STOP'])
-        self.buttonSTARTSTOP.setGraphicsEffect(self.makeShadow())
-#        self.buttonSTARTSTOP.pressed.connect(self.mainButtonPressed)
-#        self.buttonSTARTSTOP.released.connect(self.mainButtonReleased)
-        self.buttonSTARTSTOP.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-
-        self.buttonSTARTSTOP.setMinimumHeight(self.standard_button_height)
+        self.buttonSTARTSTOP.setStyleSheet(artisan_push_button_style_dict['STOP'].format(min_width=self.main_button_min_width, font_size=self.button_font_size))
         self.buttonSTARTSTOP.clicked.connect(self.qmc.ToggleRecorder)
         if self.app.artisanviewerMode:
             self.buttonSTARTSTOP.setVisible(False)
+
+        #create RESET button
+        self.buttonRESET = QPushButton(QApplication.translate('Button', 'RESET'))
+        self.buttonRESET.setToolTip(QApplication.translate('Tooltip', 'Reset'))
+        self.buttonRESET.setStyleSheet(artisan_push_button_style_dict['RESET'].format(min_width=self.main_button_min_width, font_size=self.button_font_size))
+        self.buttonRESET.clicked.connect(self.qmc.resetButtonAction)
+
+        #create PID control button
+        self.buttonCONTROL = QPushButton(QApplication.translate('Button', 'CONTROL'))
+        self.buttonCONTROL.setStyleSheet(artisan_push_button_style_dict['PID'].format(min_width=self.main_button_min_width, font_size=self.button_font_size))
+        self.buttonCONTROL.clicked.connect(self.PIDcontrol)
+        if self.app.artisanviewerMode:
+            self.buttonCONTROL.setVisible(False)
+
+
+        for button in [self.buttonONOFF, self.buttonSTARTSTOP, self.buttonRESET, self.buttonCONTROL]:
+            button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            button.setGraphicsEffect(self.makeShadow())
+            button.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+            button.setMinimumHeight(self.standard_button_height)
+
+
+        #create CHARGE button
+        self.buttonCHARGE = AnimatedMajorEventPushButton(QApplication.translate('Button', 'CHARGE'))
+        self.buttonCHARGE.setToolTip(QApplication.translate('Tooltip', 'Charge'))
+        self.buttonCHARGE.clicked.connect(self.qmc.markCharge)
 
         #create 1C START, 1C END, 2C START and 2C END buttons
         self.buttonFCs = MinorEventPushButton(QApplication.translate('Button', 'FC\nSTART'))
@@ -3157,99 +2884,57 @@ class ApplicationWindow(QMainWindow):
         self.buttonSCe.setToolTip(QApplication.translate('Tooltip', 'Second Crack End'))
         self.buttonSCe.clicked.connect(self.qmc.mark2Cend)
 
-        #create RESET button
-        self.buttonRESET = QPushButton(QApplication.translate('Button', 'RESET'))
-        self.buttonRESET.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.buttonRESET.setStyleSheet(self.pushbuttonstyles['RESET'])
-        self.buttonRESET.setGraphicsEffect(self.makeShadow())
-#        self.buttonRESET.pressed.connect(self.mainButtonPressed)
-#        self.buttonRESET.released.connect(self.mainButtonReleased)
-        self.buttonRESET.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-        self.buttonRESET.setMinimumHeight(self.standard_button_height)
-        self.buttonRESET.setToolTip(QApplication.translate('Tooltip', 'Reset'))
-        self.buttonRESET.clicked.connect(self.qmc.resetButtonAction)
-
-        #create CHARGE button
-        self.buttonCHARGE = AnimatedMajorEventPushButton(QApplication.translate('Button', 'CHARGE'))
-        self.buttonCHARGE.setToolTip(QApplication.translate('Tooltip', 'Charge'))
-        self.buttonCHARGE.clicked.connect(self.qmc.markCharge)
-
         #create DROP button
         self.buttonDROP = MajorEventPushButton(QApplication.translate('Button', 'DROP'))
         self.buttonDROP.setToolTip(QApplication.translate('Tooltip', 'Drop'))
         self.buttonDROP.clicked.connect(self.qmc.markDrop)
-
-        #create PID control button
-        self.buttonCONTROL = QPushButton(QApplication.translate('Button', 'CONTROL'))
-        self.buttonCONTROL.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.buttonCONTROL.setStyleSheet(self.pushbuttonstyles['PID'])
-        self.buttonCONTROL.setGraphicsEffect(self.makeShadow())
-#        self.buttonCONTROL.pressed.connect(self.mainButtonPressed)
-#        self.buttonCONTROL.released.connect(self.mainButtonReleased)
-        self.buttonCONTROL.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-        self.buttonCONTROL.setMinimumHeight(self.standard_button_height)
-        self.buttonCONTROL.clicked.connect(self.PIDcontrol)
-        if self.app.artisanviewerMode:
-            self.buttonCONTROL.setVisible(False)
 
         #create EVENT record button
         self.buttonEVENT = AuxEventPushButton(QApplication.translate('Button', 'EVENT'))
         self.buttonEVENT.setToolTip(QApplication.translate('Tooltip', 'Event'))
         self.buttonEVENT.clicked.connect(self.qmc.EventRecord_action)
 
+
+
         #create PID+5 button
         self.buttonSVp5 = QPushButton(QApplication.translate('Button', 'SV +5'))
-        self.buttonSVp5.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.buttonSVp5.setStyleSheet(self.pushbuttonstyles['SV +'])
-        self.buttonSVp5.setMinimumWidth(90)
-        self.buttonSVp5.setMinimumHeight(self.standard_button_height)
         self.buttonSVp5.setToolTip(QApplication.translate('Tooltip', 'Increases the current SV value by 5'))
-        self.buttonSVp5.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
         #create PID+10 button
         self.buttonSVp10 = QPushButton(QApplication.translate('Button', 'SV +10'))
-        self.buttonSVp10.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.buttonSVp10.setStyleSheet(self.pushbuttonstyles['SV +'])
-        self.buttonSVp10.setMinimumWidth(90)
-        self.buttonSVp10.setMinimumHeight(self.standard_button_height)
         self.buttonSVp10.setToolTip(QApplication.translate('Tooltip', 'Increases the current SV value by 10'))
-        self.buttonSVp10.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
         #create PID+20 button
         self.buttonSVp20 = QPushButton(QApplication.translate('Button', 'SV +20'))
-        self.buttonSVp20.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.buttonSVp20.setStyleSheet(self.pushbuttonstyles['SV +'])
-        self.buttonSVp20.setMinimumWidth(90)
-        self.buttonSVp20.setMinimumHeight(self.standard_button_height)
         self.buttonSVp20.setToolTip(QApplication.translate('Tooltip', 'Increases the current SV value by 20'))
-        self.buttonSVp20.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
         #create PID-20 button
         self.buttonSVm20 = QPushButton(QApplication.translate('Button', 'SV -20'))
-        self.buttonSVm20.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.buttonSVm20.setStyleSheet(self.pushbuttonstyles['SV -'])
-        self.buttonSVm20.setMinimumWidth(90)
-        self.buttonSVm20.setMinimumHeight(self.standard_button_height)
         self.buttonSVm20.setToolTip(QApplication.translate('Tooltip', 'Decreases the current SV value by 20'))
-        self.buttonSVm20.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
         #create PID-10 button
         self.buttonSVm10 = QPushButton(QApplication.translate('Button', 'SV -10'))
-        self.buttonSVm10.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.buttonSVm10.setStyleSheet(self.pushbuttonstyles['SV -'])
-        self.buttonSVm10.setMinimumWidth(90)
-        self.buttonSVm10.setMinimumHeight(self.standard_button_height)
         self.buttonSVm10.setToolTip(QApplication.translate('Tooltip', 'Decreases the current SV value by 10'))
-        self.buttonSVm10.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
         #create PID-5 button
         self.buttonSVm5 = QPushButton(QApplication.translate('Button', 'SV -5'))
-        self.buttonSVm5.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.buttonSVm5.setStyleSheet(self.pushbuttonstyles['SV -'])
-        self.buttonSVm5.setMinimumWidth(90)
-        self.buttonSVm5.setMinimumHeight(self.standard_button_height)
         self.buttonSVm5.setToolTip(QApplication.translate('Tooltip', 'Decreases the current SV value by 5'))
-        self.buttonSVm5.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+
+        sv_plus_style = artisan_sv_plus_push_button_style.format(min_width=self.standard_button_min_width_px, font_size=self.button_font_size_small)
+        for button in [self.buttonSVp5, self.buttonSVp10, self.buttonSVp20]:
+            button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            button.setStyleSheet(sv_plus_style)
+            button.setMinimumWidth(90)
+            button.setMinimumHeight(self.standard_button_height)
+            button.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+
+        sv_minus_style = artisan_sv_minus_push_button_style.format(min_width=self.standard_button_min_width_px, font_size=self.button_font_size_small)
+        for button in [self.buttonSVm20, self.buttonSVm10, self.buttonSVm5]:
+            button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            button.setStyleSheet(sv_minus_style)
+            button.setMinimumWidth(90)
+            button.setMinimumHeight(self.standard_button_height)
+            button.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
         #HUD button (button_18 was removed)
 
@@ -3679,12 +3364,14 @@ class ApplicationWindow(QMainWindow):
         del w
 
         #PID Buttons
+        pidbuttonLayout.addSpacing(50)
         pidbuttonLayout.addWidget(self.buttonSVp20)
         pidbuttonLayout.addWidget(self.buttonSVp10)
         pidbuttonLayout.addWidget(self.buttonSVp5)
         pidbuttonLayout.addWidget(self.buttonSVm5)
         pidbuttonLayout.addWidget(self.buttonSVm10)
         pidbuttonLayout.addWidget(self.buttonSVm20)
+        pidbuttonLayout.addStretch()
 
         # phases LCDs
 
@@ -6375,144 +6062,10 @@ class ApplicationWindow(QMainWindow):
         line_edit_color = ('#ffffff' if whitep else '#000000')
         self.main_widget.setStyleSheet(f'* {{background-color:{rgba_colorname2argb_colorname(canvas_color)}; color: {rgba_colorname2argb_colorname(line_edit_color)}; border-width: 0px;}}')
 
-
-        self.EventsGroupLayout.setStyleSheet(f"""
-            QGroupBox {{
-                background-color: {rgba_colorname2argb_colorname(self.qmc.palette['background'])};
-                border-width: 10px;
-                border-style:solid;
-                border-radius: 0;
-                border-color: {rgba_colorname2argb_colorname(self.qmc.palette['background'])};
-            }}
-            QLabel#eventlabel {{
-                background-color: #F3F3F3;
-                color: #333333;
-                border-width: 1;
-                border-color: #333333;
-                border-style:solid;
-                border-radius: 4;
-                min-height: 25px;
-                min-width: 80px;
-            }}
-
-            QLineEdit {{
-                background-color: {rgba_colorname2argb_colorname(self.qmc.palette['background'])};
-                color: {line_edit_color};
-                min-height: 25px;
-                padding: 0px 5px;
-                border-radius: 8px;
-                border-width: 1px;
-                border-style: solid;
-                border-color: palette(dark);
-            }}
-            QLineEdit:focus {{
-                border-color: {line_edit_color};
-            }}
-
-            QLineEdit#etimeline {{
-                min-width: 50px;
-            }}
-            QLineEdit#valueEdit {{
-                min-width: 30px;
-            }}
-
-            QComboBox {{
-                background-color: #E9E9E9;
-                color: black;
-                min-height: 25px;
-                border-radius: 4;
-                padding: 0px 5px;
-                min-width: 80px;
-            }}
-            QComboBox:hover {{
-                background-color: '#F5F5F5';
-            }}
-            QComboBox::drop-down {{
-                subcontrol-origin: padding;
-                subcontrol-position: top right;
-                width: 15px;
-
-                border-left-width: 1px;
-                border-left-color: darkgray;
-                border-left-style: solid; /* just a single line */
-                border-top-right-radius: 4;
-                border-bottom-right-radius: 4;
-            }}
-            QComboBox::down-arrow {{
-                image: url({os.path.join(getResourcePath(),'Icons','arrow-down-01-stroke-rounded.svg')});
-                subcontrol-position: center;
-                width: 30px;
-            }}
-            QComboBox::drop-down:button {{
-                background-color: '#E9E9E9';
-                width: 30px;
-            }}
-            QComboBox::drop-down:pressed {{
-                background-color: '#A9A9A9';
-                width: 30px;
-            }}
-            QComboBox::drop-down:hover {{
-                background-color: '#F5F5F5';
-                width: 30px;
-            }}
-
-            QComboBox QAbstractItemView {{
-                border-radius: 4;
-                selection-background-color: lightgray;
-            }}
-
-            QSpinBox {{
-                background-color: #E9E9E9;
-                color: black;
-                min-height: 25px;
-                border-radius: 4;
-                padding: 0px 5px;
-            }}
-            QPushButton#minieventleft {{
-                background-color: {createGradient('#E9E9E9')};
-                color: #333333;
-                border-top-left-radius: 10px;
-                border-bottom-left-radius: 10px;
-                min-width: 50px;
-                min-height: 25px;
-            }}
-            QPushButton#minieventleft:pressed {{
-                background-color: {createGradient('#C9C9C9')};
-            }}
-            QPushButton#minieventleft:hover:!pressed {{
-                background-color: {createGradient('#FFFFFF')};
-            }}
-            QPushButton#minieventright {{
-                background-color: {createGradient('#E9E9E9')};
-                color: #333333;
-                border-width: 0;
-                border-top-right-radius: 10px;
-                border-bottom-right-radius: 10px;
-                min-width: 50px;
-                min-height: 25px;
-            }}
-            QPushButton#minieventright:pressed {{
-                background-color: {createGradient('#C9C9C9')};
-            }}
-            QPushButton#minieventright:hover:!pressed {{
-                background-color: {createGradient('#FFFFFF')};
-            }}
-            QPushButton#buttonminiEvent {{
-                background-color: {createGradient('#A7A7A7')};
-                border-radius: 10;
-                color: white;
-                min-width: 100px;
-                min-height: 25px;
-                border-width: 0;
-            }}
-            QPushButton#buttonminiEvent:pressed {{
-                background-color: {createGradient('#888888')};
-            }}
-            QPushButton#buttonminiEvent:hover:!pressed {{
-                background-color: {createGradient('#C7C7C7')};
-            }}
-
-        """)
+        self.EventsGroupLayout.setStyleSheet(artisan_events_editor_style.format(
+            background_color = rgba_colorname2argb_colorname(self.qmc.palette['background']),
+            line_edit_color = line_edit_color,
+            down_arrow_icon_path = os.path.join(getResourcePath(),'Icons','arrow-down-01-stroke-rounded.svg')))
 
 
         if current_background_color is None or current_background_color != str(canvas_color) or (whitep and self.qmc.palette['messages'] != '#ffffff'): # canvas color did not change, we do not need to redo the navigation bar
@@ -6534,20 +6087,10 @@ class ApplicationWindow(QMainWindow):
             self.qmc.palette['messages'] = '#000000'
         self.sendmessage('', append=False)
 
-        self.sliderFrame.setStyleSheet('QGroupBox {background-color:' + rgba_colorname2argb_colorname(canvas_color) + ';'
-                                    + 'color: ' + rgba_colorname2argb_colorname(title_color) + ';'
-                                    + 'border: 0px solid gray;'
-                                    + 'border-width: 0px;'
-                                    + 'padding-top: 12px;'
-                                    + 'padding-bottom: 5px;'
-                                    + 'padding-left: 0px;'
-                                    + 'padding-right: 0px;'
-                                    + '}'
-                                    + 'QGroupBox::title {background-color:' + rgba_colorname2argb_colorname(canvas_color) + ';'
-                                    + 'subcontrol-origin: margin;' # or border or margin
-                                    + 'subcontrol-position: top center;' #/* position at the top center */
-                                    + 'color: ' + self.qmc.palette['messages'] + ';'
-                                    + '}')
+        self.sliderFrame.setStyleSheet(artisan_slider_frame_style.format(
+            title_color = self.qmc.palette['messages'],
+            color = rgba_colorname2argb_colorname(title_color),
+            background_color = rgba_colorname2argb_colorname(canvas_color)))
 
         # ensure x/y coordinates are readable
         self.ntb.locLabel.setStyleSheet('QWidget {background-color:' + rgba_colorname2argb_colorname(canvas_color) + ';'
@@ -10724,7 +10267,7 @@ class ApplicationWindow(QMainWindow):
                                             self.updateExtraEventButtonsVisibilitySignal.emit()
                                             self.realignButtonsSignal.emit()
 
-                            # button(<e>[,<int>]) with <e> one of { ON, START, CHARGE, DRY, FCs, FCe, SCs, SCe, DROP, COOL, OFF }
+                            # button(<e>|<int>) with <e> one of { ON, START, CHARGE, DRY, FCs, FCe, SCs, SCe, DROP, COOL, OFF }
                             elif cs.startswith('button(') and cs.endswith(')'):
                                 try:
                                     try:
@@ -11709,7 +11252,7 @@ class ApplicationWindow(QMainWindow):
             # set color of this button to "pressed"
             color = self.extraeventbuttoncolor[tee]
             backgroundcolor = self.extraeventbuttontextcolor[tee]
-        buttonstyle = f'min-width:{button_min_width};margin:0px;padding:0px;border-style:solid;border-color:darkgrey;border-width:0px;font-size:{button_font_size};font-weight:bold;{rounding}color:{color};'
+        buttonstyle = f'min-width:{button_min_width};margin:0px;padding:0px;border-style:solid;border-color:darkgrey;border-width:0px;font-size:{button_font_size}px;font-weight:bold;{rounding}color:{color};'
         #
         plain_style = f'QPushButton {{{buttonstyle}background:{createGradient(backgroundcolor)}}}'
         pressed_style = f'QPushButton:hover:pressed {{background:{createGradient(QColor(backgroundcolor).lighter(80).name())}}}'
@@ -13119,13 +12662,13 @@ class ApplicationWindow(QMainWindow):
     def resetKeyboardButtonMarks(self) -> None:
         if self.qmc.flagon:
             if self.simulator:
-                self.buttonONOFF.setStyleSheet(self.pushbuttonstyles_simulator['ON'])
+                self.buttonONOFF.setStyleSheet(artisan_simulator_push_button_style_dict['ON'].format(min_width=self.main_button_min_width, font_size=self.button_font_size))
             else:
-                self.buttonONOFF.setStyleSheet(self.pushbuttonstyles['ON'])
+                self.buttonONOFF.setStyleSheet(artisan_push_button_style_dict['ON'].format(min_width=self.main_button_min_width, font_size=self.button_font_size))
         elif self.simulator:
-            self.buttonONOFF.setStyleSheet(self.pushbuttonstyles_simulator['OFF'])
+            self.buttonONOFF.setStyleSheet(artisan_simulator_push_button_style_dict['OFF'].format(min_width=self.main_button_min_width, font_size=self.button_font_size))
         else:
-            self.buttonONOFF.setStyleSheet(self.pushbuttonstyles['OFF'])
+            self.buttonONOFF.setStyleSheet(artisan_push_button_style_dict['OFF'].format(min_width=self.main_button_min_width, font_size=self.button_font_size))
         for b in [
                 self.buttonCHARGE,  # CHARGE
                 self.buttonDRY, # DRY END
@@ -25292,7 +24835,7 @@ class ApplicationWindow(QMainWindow):
                 if self.qmc.flagon:
                     # if not sampling we also stop the communication loop with the Hottop here completely
                     self.hottop.stop()
-                self.buttonCONTROL.setStyleSheet(self.pushbuttonstyles['PID'])
+                self.buttonCONTROL.setStyleSheet(artisan_push_button_style_dict['PID'].format(min_width=self.main_button_min_width, font_size=self.button_font_size))
 
     def HottopControlOn(self, autosuper:bool=True) -> None:
         # if super holds, the superusermode is automatically activated (if control is activated via an HOTTOP Command 'control')
@@ -25304,7 +24847,7 @@ class ApplicationWindow(QMainWindow):
                 res = self.hottop.takeHottopControl()
                 if res:
                     self.hottop.setHottop(drum_motor=True)
-                    self.buttonCONTROL.setStyleSheet(self.pushbuttonstyles['PIDactive'])
+                    self.buttonCONTROL.setStyleSheet(artisan_push_button_style_dict['PIDactive'].format(min_width=self.main_button_min_width, font_size=self.button_font_size))
                     if not self.HottopControlActive:
                         self.sendmessage(QApplication.translate('Message','Hottop control turned on'))
                     self.HottopControlActive = True
@@ -28171,8 +27714,8 @@ class ApplicationWindow(QMainWindow):
                 self.simulator = None
                 self.qmc.timeclock.setBase(1000)
                 self.sample_loop_running = True # we enable the sampling loop again that might have been stopped during the simulation via a timerLCD click
-                self.buttonONOFF.setStyleSheet(self.pushbuttonstyles['OFF'])
-                self.buttonSTARTSTOP.setStyleSheet(self.pushbuttonstyles['STOP'])
+                self.buttonONOFF.setStyleSheet(artisan_push_button_style_dict['OFF'].format(min_width=self.main_button_min_width, font_size=self.button_font_size))
+                self.buttonSTARTSTOP.setStyleSheet(artisan_push_button_style_dict['STOP'].format(min_width=self.main_button_min_width, font_size=self.button_font_size))
                 self.qmc.updateDeltaSamples() # to get the delta_spans right
                 self.sendmessage(QApplication.translate('Message','Simulator stopped'))
                 self.updateWindowTitle()
@@ -28204,8 +27747,8 @@ class ApplicationWindow(QMainWindow):
                         self.plusAddPath(profile, filename)
                         self.simulator = Simulator(self.qmc.mode, profile)
                         self.simulatorpath = filename
-                        self.buttonONOFF.setStyleSheet(self.pushbuttonstyles_simulator['OFF'])
-                        self.buttonSTARTSTOP.setStyleSheet(self.pushbuttonstyles_simulator['STOP'])
+                        self.buttonONOFF.setStyleSheet(artisan_simulator_push_button_style_dict['OFF'].format(min_width=self.main_button_min_width, font_size=self.button_font_size))
+                        self.buttonSTARTSTOP.setStyleSheet(artisan_simulator_push_button_style_dict['STOP'].format(min_width=self.main_button_min_width, font_size=self.button_font_size))
                         self.qmc.updateDeltaSamples() # to get the delta_spans right
                         self.sendmessage(QApplication.translate('Message','Simulator started @{}x').format(speed))
                         self.updateWindowTitle()

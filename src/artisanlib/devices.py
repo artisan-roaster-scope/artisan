@@ -4915,12 +4915,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 else:
                     self.aw.extratimeout.append(dsettings[4])
             if self.nonpidButton.isChecked():
-                self.aw.buttonSVp5.setVisible(False)
-                self.aw.buttonSVp10.setVisible(False)
-                self.aw.buttonSVp20.setVisible(False)
-                self.aw.buttonSVm20.setVisible(False)
-                self.aw.buttonSVm10.setVisible(False)
-                self.aw.buttonSVm5.setVisible(False)
+                self.aw.pidbuttonFrame.setVisible(False)
                 self.aw.LCD6frame.setVisible(False)
                 self.aw.LCD7frame.setVisible(False)
             self.aw.qmc.ETfunction = str(self.ETfunctionedit.text())
