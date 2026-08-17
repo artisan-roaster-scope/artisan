@@ -2789,13 +2789,14 @@ class ApplicationWindow(QMainWindow):
         if platform.system() == 'Windows':
             # TODO: remove # pylint: disable=fixme
             self.main_button_min_width_str = '110px'
+            self.main_button_min_width = 110
             self.small_button_min_width_str = '75px'
             self.tiny_button_min_width_str = '60px'
             # TODO: keep # pylint: disable=fixme
 #            self.main_button_min_width_px = 110
             self.standard_button_min_width_px = 90
 #            self.small_button_min_width_px = 75
-            #self.tiny_button_min_width_px = 60
+#            self.tiny_button_min_width_px = 60
         else:
             # TODO: remove # pylint: disable=fixme
             self.main_button_min_width_str = '100px'
@@ -5710,7 +5711,7 @@ class ApplicationWindow(QMainWindow):
             if reply == QMessageBox.StandardButton.Cancel:
                 return
             if reply == QMessageBox.StandardButton.Yes:
-                self.loadThemeSignal.emit(action.data()[0], action.text())
+                self.loadThemeSignal.emit(action.data()[0], label)
 
     @pyqtSlot(str,str)
     def loadThemeFile(self, filename:str, theme_name:str) -> None:

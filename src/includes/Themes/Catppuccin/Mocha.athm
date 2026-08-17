@@ -64,7 +64,7 @@ YTbackmarkersize=6
 
 [Style]
 glow=0
-graphstyle=1
+graphstyle=0
 patheffects=0
 
 [XT]
