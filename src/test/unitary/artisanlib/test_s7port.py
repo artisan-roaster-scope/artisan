@@ -506,20 +506,17 @@ class TestS7PortCaching:
 class TestS7PortReadOperations:
     """Test s7port read operations."""
 
-    @patch('artisanlib.s7port.get_int')
     @patch('artisanlib.s7port.s7port.isConnected')
     @patch('artisanlib.s7port.s7port.connect')
     def test_read_int_success(
         self,
         mock_connect: Mock,
         mock_is_connected: Mock,
-        mock_get_int: Mock,
         s7port_instance: s7port,
         mock_s7_client: Mock,
     ) -> None:
         """Test successful integer reading."""
         # Arrange
-        mock_get_int.return_value = 1234
         mock_is_connected.return_value = True
         mock_connect.return_value = None
         s7port_instance.plc = mock_s7_client
@@ -528,12 +525,18 @@ class TestS7PortReadOperations:
         mock_s7_client.read_area.return_value = bytearray([0x04, 0xD2])  # 1234 in bytes
 
         # Act
-        result = s7port_instance.readInt(1, 5, 10)
 
-        # Assert
-        assert result == 1234
-        mock_s7_client.read_area.assert_called_once()
-        mock_get_int.assert_called_once()
+        # mock the lazy imported get_int
+        import snap7.util.getters
+        with patch.object(snap7.util.getters, 'get_int', autospec=True) as mock_get_int:
+            mock_get_int.return_value = 1234
+
+            result = s7port_instance.readInt(1, 5, 10)
+
+            # Assert
+            assert result == 1234
+            mock_s7_client.read_area.assert_called_once()
+            mock_get_int.assert_called_once()
 
     def test_read_int_area_zero(self, s7port_instance: s7port) -> None:
         """Test reading integer with area 0 (disabled)."""
@@ -543,20 +546,21 @@ class TestS7PortReadOperations:
         # Assert
         assert result is None
 
-    @patch('artisanlib.s7port.get_int')
-    def test_read_int_with_cache_hit(self, mock_get_int: Mock, s7port_instance: s7port) -> None:
+    def test_read_int_with_cache_hit(self, s7port_instance: s7port) -> None:
         """Test reading integer with cache hit."""
         # Arrange
-        mock_get_int.return_value = 5678
         s7port_instance.optimizer = True
         s7port_instance.readingsCache = {1: {5: {10: 0x16, 11: 0x2E}}}  # 5678 in bytes
 
         # Act
-        result = s7port_instance.readInt(1, 5, 10)
+        import snap7.util.getters
+        with patch.object(snap7.util.getters, 'get_int', autospec=True) as mock_get_int:
+            mock_get_int.return_value = 5678
+            result = s7port_instance.readInt(1, 5, 10)
 
-        # Assert
-        assert result == 5678
-        mock_get_int.assert_called_once_with(bytearray([0x16, 0x2E]), 0)
+            # Assert
+            assert result == 5678
+            mock_get_int.assert_called_once_with(bytearray([0x16, 0x2E]), 0)
 
     def test_read_int_cache_miss_with_fail_on_miss(self, s7port_instance: s7port) -> None:
         """Test reading integer with cache miss and fail_on_cache_miss enabled."""
@@ -571,28 +575,29 @@ class TestS7PortReadOperations:
         # Assert
         assert result is None
 
-    @patch('artisanlib.s7port.get_real')
-    def test_read_float_with_cache_hit(self, mock_get_real: Mock, s7port_instance: s7port) -> None:
+    def test_read_float_with_cache_hit(self, s7port_instance: s7port) -> None:
         """Test reading float with cache hit."""
         # Arrange
-        mock_get_real.return_value = 678.90
         s7port_instance.optimizer = True
         s7port_instance.readingsCache = {1: {5: {10: 0x44, 11: 0x29, 12: 0x73, 13: 0x33}}}
 
         # Act
-        result = s7port_instance.readFloat(1, 5, 10)
+        import snap7.util.getters
+        with patch.object(snap7.util.getters, 'get_real', autospec=True) as mock_get_real:
+            mock_get_real.return_value = 678.90
 
-        # Assert
-        assert result == 678.90
-        mock_get_real.assert_called_once_with(bytearray([0x44, 0x29, 0x73, 0x33]), 0)
+            result = s7port_instance.readFloat(1, 5, 10)
+
+            # Assert
+            assert result == 678.90
+            mock_get_real.assert_called_once_with(bytearray([0x44, 0x29, 0x73, 0x33]), 0)
 
 
 class TestS7PortWriteOperations:
     """Test s7port write operations."""
 
-    @patch('artisanlib.s7port.set_int')
     def test_write_int_success(
-        self, mock_set_int: Mock, s7port_instance: s7port, mock_s7_client: Mock
+        self, s7port_instance: s7port, mock_s7_client: Mock
     ) -> None:
         """Test successful integer writing."""
         # Arrange
@@ -603,16 +608,17 @@ class TestS7PortWriteOperations:
         mock_s7_client.read_area.return_value = bytearray([0x00, 0x00])
 
         # Act
-        s7port_instance.writeInt(1, 5, 10, 1234.0)
+        import snap7.util.setters
+        with patch.object(snap7.util.setters, 'set_int', autospec=True) as mock_set_int:
+            s7port_instance.writeInt(1, 5, 10, 1234.0)
 
-        # Assert
-        mock_s7_client.read_area.assert_called_once()
-        mock_set_int.assert_called_once_with(bytearray([0x00, 0x00]), 0, 1234)
-        mock_s7_client.write_area.assert_called_once()
+            # Assert
+            mock_s7_client.read_area.assert_called_once()
+            mock_set_int.assert_called_once_with(bytearray([0x00, 0x00]), 0, 1234)
+            mock_s7_client.write_area.assert_called_once()
 
-    @patch('artisanlib.s7port.set_real')
     def test_write_float_success(
-        self, mock_set_real: Mock, s7port_instance: s7port, mock_s7_client: Mock
+        self, s7port_instance: s7port, mock_s7_client: Mock
     ) -> None:
         """Test successful float writing."""
         # Arrange
@@ -623,16 +629,17 @@ class TestS7PortWriteOperations:
         mock_s7_client.read_area.return_value = bytearray([0x00, 0x00, 0x00, 0x00])
 
         # Act
-        s7port_instance.writeFloat(1, 5, 10, 123.45)
+        import snap7.util.setters
+        with patch.object(snap7.util.setters, 'set_real', autospec=True) as mock_set_real:
+            s7port_instance.writeFloat(1, 5, 10, 123.45)
 
-        # Assert
-        mock_s7_client.read_area.assert_called_once()
-        mock_set_real.assert_called_once_with(bytearray([0x00, 0x00, 0x00, 0x00]), 0, 123.45)
-        mock_s7_client.write_area.assert_called_once()
+            # Assert
+            mock_s7_client.read_area.assert_called_once()
+            mock_set_real.assert_called_once_with(bytearray([0x00, 0x00, 0x00, 0x00]), 0, 123.45)
+            mock_s7_client.write_area.assert_called_once()
 
-    @patch('artisanlib.s7port.set_int')
     def test_mask_write_int_success(
-        self, mock_set_int: Mock, s7port_instance: s7port, mock_s7_client: Mock
+        self, s7port_instance: s7port, mock_s7_client: Mock
     ) -> None:
         """Test successful masked integer writing."""
         # Arrange
@@ -643,38 +650,42 @@ class TestS7PortWriteOperations:
         mock_s7_client.read_area.return_value = bytearray([0x00, 0x00])
 
         # Act
-        s7port_instance.maskWriteInt(1, 5, 10, 0xFF00, 0x00FF, 0x1234)
+        import snap7.util.setters
+        with patch.object(snap7.util.setters, 'set_int', autospec=True) as mock_set_int:
+            s7port_instance.maskWriteInt(1, 5, 10, 0xFF00, 0x00FF, 0x1234)
 
-        # Assert
-        mock_s7_client.read_area.assert_called_once()
-        # Calculate expected masked value: (0x1234 & 0xFF00) | (0x00FF & (0xFF00 ^ 0xFFFF))
-        expected_value = (0x1234 & 0xFF00) | (0x00FF & (0xFF00 ^ 0xFFFF))
-        mock_set_int.assert_called_once_with(bytearray([0x00, 0x00]), 0, expected_value)
-        mock_s7_client.write_area.assert_called_once()
+            # Assert
+            mock_s7_client.read_area.assert_called_once()
+            # Calculate expected masked value: (0x1234 & 0xFF00) | (0x00FF & (0xFF00 ^ 0xFFFF))
+            expected_value = (0x1234 & 0xFF00) | (0x00FF & (0xFF00 ^ 0xFFFF))
+            mock_set_int.assert_called_once_with(bytearray([0x00, 0x00]), 0, expected_value)
+            mock_s7_client.write_area.assert_called_once()
 
 
 class TestS7PortPeekOperations:
     """Test s7port peek operations (non-blocking reads)."""
 
-    @patch('artisanlib.s7port.get_int')
     def test_peek_int_success(
-        self, mock_get_int: Mock, s7port_instance: s7port, mock_s7_client: Mock
+        self, s7port_instance: s7port, mock_s7_client: Mock
     ) -> None:
         """Test successful integer peeking."""
         # Arrange
-        mock_get_int.return_value = 9876
         s7port_instance.plc = mock_s7_client
         s7port_instance.is_connected = True
         s7port_instance.initArrays()
         mock_s7_client.read_area.return_value = bytearray([0x26, 0x94])
 
         # Act
-        result = s7port_instance.peekInt(1, 5, 10)
+        # mock the lazy imported get_int
+        import snap7.util.getters
+        with patch.object(snap7.util.getters, 'get_int', autospec=True) as mock_get_int:
+            mock_get_int.return_value = 9876
+            result = s7port_instance.peekInt(1, 5, 10)
 
-        # Assert
-        assert result == 9876
-        mock_s7_client.read_area.assert_called_once()
-        mock_get_int.assert_called_once()
+            # Assert
+            assert result == 9876
+            mock_s7_client.read_area.assert_called_once()
+            mock_get_int.assert_called_once()
 
     def test_peek_int_area_zero(self, s7port_instance: s7port) -> None:
         """Test peeking integer with area 0 (disabled)."""
@@ -696,25 +707,26 @@ class TestS7PortPeekOperations:
         # Assert
         assert result is None
 
-    @patch('artisanlib.s7port.get_real')
     def test_peek_float_success(
-        self, mock_get_real: Mock, s7port_instance: s7port, mock_s7_client: Mock
+        self, s7port_instance: s7port, mock_s7_client: Mock
     ) -> None:
         """Test successful float peeking."""
         # Arrange
-        mock_get_real.return_value = 456.78
         s7port_instance.plc = mock_s7_client
         s7port_instance.is_connected = True
         s7port_instance.initArrays()
         mock_s7_client.read_area.return_value = bytearray([0x43, 0xE4, 0xC7, 0xAE])
 
         # Act
-        result = s7port_instance.peekFloat(1, 5, 10)
+        import snap7.util.getters
+        with patch.object(snap7.util.getters, 'get_real', autospec=True) as mock_get_real:
+            mock_get_real.return_value = 456.78
+            result = s7port_instance.peekFloat(1, 5, 10)
 
-        # Assert
-        assert result == 456.78
-        mock_s7_client.read_area.assert_called_once()
-        mock_get_real.assert_called_once()
+            # Assert
+            assert result == 456.78
+            mock_s7_client.read_area.assert_called_once()
+            mock_get_real.assert_called_once()
 
     def test_peek_float_area_zero(self, s7port_instance: s7port) -> None:
         """Test peeking float with area 0 (disabled)."""

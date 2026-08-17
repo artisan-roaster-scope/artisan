@@ -58,7 +58,7 @@ signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 import zlib
 import logging.config
-from yaml import safe_load as yaml_load
+import json
 from collections.abc import Callable
 from pydantic import TypeAdapter, ValidationError
 from typing import Final, cast, Any, override, Literal, TYPE_CHECKING
@@ -174,6 +174,9 @@ if TYPE_CHECKING:
     from artisanlib.kaleido import KaleidoPort # pylint: disable=unused-import
     from artisanlib.orbiter import Orbiter # pylint: disable=unused-import
     from artisanlib.phases_canvas import tphasescanvas # pylint: disable=unused-import
+    from artisanlib.simulator import Simulator # pylint: disable=unused-import
+    from artisanlib.large_lcds import (LargeMainLCDs, LargeDeltaLCDs, LargePIDLCDs, LargeExtraLCDs, LargePhasesLCDs, LargeScaleLCDs)  # pylint: disable=unused-import
+    import plus.schedule as plus_schedule # pylint: disable=unused-import
     try:
         from artisanlib.ikawa import IKAWA_BLE # pylint: disable=unused-import
     except Exception: # pylint: disable=broad-except
@@ -196,7 +199,7 @@ try:
 except Exception: # pylint: disable=broad-except
     pass
 
-
+from artisanlib.pid_control import PIDcontrol, FujiPID, DtaPID
 from artisanlib.atypes import (ProfileData, ComputedProfileInformation, RecentRoast, CurveSimilarity, ProductionData, ProductionDataStr, Wheel)
 from artisanlib.util import (appFrozen, uchr, decodeLocal, decodeLocalStrict, encodeLocal, encodeLocalStrict, s2a, fill_gaps,
         deltaLabelPrefix, deltaLabelUTF8, deltaLabelBigPrefix, stringfromseconds, stringtoseconds,
@@ -581,8 +584,8 @@ if not appFrozen() and __revision__ in {'', '0'}:
 # configure logging
 
 try:
-    with open(os.path.join(getResourcePath(),'logging.yaml'), encoding='utf-8') as logging_conf:
-        conf = yaml_load(logging_conf)
+    with open(os.path.join(getResourcePath(),'logging.json'), encoding='utf-8') as logging_conf:
+        conf = json.load(logging_conf)
         try:
             # set log file to Artisan data directory
             _datadir = getDataDirectory()
@@ -659,14 +662,9 @@ from artisanlib.slider_style import artisan_slider_style, artisan_slider_frame_s
 from artisanlib.button_style import (artisan_event_button_style, artisan_simulator_push_button_style_dict,
     artisan_push_button_style_dict, artisan_sv_plus_push_button_style, artisan_sv_minus_push_button_style)
 from artisanlib.events_editor_style import artisan_events_editor_style
-from artisanlib.simulator import Simulator
 from artisanlib.dialogs import HelpDlg, ArtisanInputDialog, ArtisanComboBoxDialog, ArtisanPortsDialog, ArtisanSliderLCDinputDlg
-from artisanlib.large_lcds import (LargeMainLCDs, LargeDeltaLCDs, LargePIDLCDs, LargeExtraLCDs, LargePhasesLCDs, LargeScaleLCDs)
 from artisanlib.logs import (serialLogDlg, errorDlg, messageDlg)
 from artisanlib.comm import serialport
-from artisanlib.pid_dialogs import (PXRpidDlgControl, PXG4pidDlgControl,
-    PID_DlgControl, DTApidDlgControl)
-from artisanlib.pid_control import FujiPID, PIDcontrol, DtaPID
 from artisanlib.widgets import (MyQLCDNumber, EventPushButton, MajorEventPushButton,
     AnimatedMajorEventPushButton, MinorEventPushButton, AuxEventPushButton, ClickableLCDFrame, Splitter, SliderUnclickable)
 
@@ -678,16 +676,16 @@ from artisanlib.scale import ScaleManager
 
 # import artisan.plus module
 import plus.config
-import plus.util
+import plus.util as plus_util
 import plus.sync
 import plus.queue
-import plus.controller
+import plus.controller as plus_controller
 import plus.connection
 import plus.register
 import plus.notifications
 import plus.blend
 import plus.stock
-import plus.schedule
+
 
 
 
@@ -1140,7 +1138,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
             # ALT-click (OPTION on macOS) sends the log file by email
             self.aw.sendLog()
         else:
-            plus.controller.toggle(self.aw)
+            plus_controller.toggle(self.aw)
 
     def subscription(self) -> None:
         if self.aw.plus_paidUntil is not None: # after reset and authentication, it might still take a moment until the paidUntil is set via its signal
@@ -1188,7 +1186,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
 #                subscription_message_box = ArtisanMessageBox(self.aw, QApplication.translate('Message', 'Subscription'), message)
                 subscription_message_box = QMessageBox() # only without super this one shows the native dialog on macOS under Qt 6.6.2
 #                subscription_message_box.setTextFormat(Qt.TextFormat.RichText)
-                plus.util.setPlusIcon(subscription_message_box, self.aw.app.darkmode)
+                plus_util.setPlusIcon(subscription_message_box, self.aw.app.darkmode)
                 if percent_used_formatted != '':
                     percent_used_formatted = '\n' + percent_used_formatted
                 subscription_message_box.setText(QApplication.translate('Plus','Do you want to extend your subscription?'))
@@ -1551,7 +1549,7 @@ class ApplicationWindow(QMainWindow):
         self.segmentresultsanno:Annotation|None = None
 
         # Schedule
-        self.schedule_window:plus.schedule.ScheduleWindow|None = None # None if scheduler is not active
+        self.schedule_window:plus_schedule.ScheduleWindow|None = None # None if scheduler is not active
         # the uuids of the scheduled items in local custom order on last closing the scheduler
         # persistet along the app settings
         self.scheduled_items_uuids:list[str] = []
@@ -3856,6 +3854,7 @@ class ApplicationWindow(QMainWindow):
         self.zoomOutShortcut = QShortcut(QKeySequence.StandardKey.ZoomOut, self)
         self.zoomOutShortcut.activated.connect(self.zoomOut)
 
+
     # checks a builds signature using the public key
     def app_signature_valid(self) -> bool:
         try:
@@ -4103,7 +4102,7 @@ class ApplicationWindow(QMainWindow):
             f"{QApplication.translate('Menu', 'Mode')}: {mode_name}",True,None)
 
     # configures apps UI for different usage scenario by adjusting menus, dialogs, and shortcuts
-    def set_ui_mode(self, ui_mode:UI_MODE) -> None:
+    def set_ui_mode(self, ui_mode:UI_MODE, announce:bool = True) -> None:
         self.ui_mode = ui_mode
         self.productionModeAction.setChecked(ui_mode is UI_MODE.PRODUCTION)
         self.defaultModeAction.setChecked(ui_mode is UI_MODE.DEFAULT)
@@ -4112,10 +4111,10 @@ class ApplicationWindow(QMainWindow):
         self.set_menu(ui_mode)
         # configure toolbar
         self.set_toolbar(ui_mode)
-        # send message
-        self.announce_current_ui_mode()
+        if announce:
+            # send message
+            self.announce_current_ui_mode()
 
-    #
 
     def establish_phasescanvas(self) -> None:
         if self.qpc is None:
@@ -4175,7 +4174,7 @@ class ApplicationWindow(QMainWindow):
         return custom_name or scale_device[0]
 
     # today is expected to be w.r.t. local timezone
-    def scheduledItemsfilter(self, today:datetime.date, item:plus.schedule.ScheduledItem, hidden:bool = False) -> bool:
+    def scheduledItemsfilter(self, today:datetime.date, item:'plus_schedule.ScheduledItem', hidden:bool = False) -> bool:
         # if user filter is active only items not for a specific user or for the current user (if available) are listed
         # if machine filter is active only items not for a specific machine or for the current machine setup are listed in case a current machine is set
         return ((not self.schedule_visible_filter or not hidden) and
@@ -4186,9 +4185,11 @@ class ApplicationWindow(QMainWindow):
                         item.machine.strip() == self.qmc.roastertype_setup.strip())))
 
     def updateBadge(self, count:int|None = None) -> None:
-        if self.schedule_window is None:
-            item_count = (plus.schedule.ScheduleWindow.openScheduleItemsCount(self) if count is None else count)
-            plus.schedule.ScheduleWindow.setAppBadge(item_count)
+        if self.plus_account is not None and self.schedule_window is None: # if schedule_window is open it will itself update the app badge
+            # only if connected to plus
+            import plus.schedule as plus_schedule
+            item_count = (plus_schedule.ScheduleWindow.openScheduleItemsCount(self) if count is None else count)
+            plus_schedule.ScheduleWindow.setAppBadge(item_count)
 
     def blockTicks(self) -> int:
         return max(1, int(round(self.sampling_seconds_to_block_quantifiction / (self.qmc.delay / 1000))) + 1)
@@ -4290,9 +4291,10 @@ class ApplicationWindow(QMainWindow):
     def updateSchedule(self) -> None:
         if self.schedule_window is None:
             # schedule window is closed
-            item_count:int = plus.schedule.ScheduleWindow.openScheduleItemsCount(self)
+            import plus.schedule as plus_schedule
+            item_count:int = plus_schedule.ScheduleWindow.openScheduleItemsCount(self)
             if self.scheduler_auto_open:
-                if item_count > 0 and plus.controller.is_connected():
+                if item_count > 0 and plus_controller.is_connected():
                     # if plus is connected and there are open schedule items, we open the scheduler window automatically
                     self.schedule(True)
                 elif item_count == 0:
@@ -4915,14 +4917,14 @@ class ApplicationWindow(QMainWindow):
         try:
             subscription_icon = None
             if self.plus_account is not None:
-                connected = plus.controller.is_connected()
+                connected = plus_controller.is_connected()
                 subscription_icon = get_subscription_icon(self.plus_subscription, self.plus_paidUntil, self.plus_rlimit, self.plus_used, connected)
                 if connected:
                     if self.editgraphdialog is False:
                         # syncing from server in progress
                         plus_icon = 'plus-dirty'
                         tooltip = QApplication.translate('Tooltip', 'Syncing with the artisan platform')
-                    elif plus.controller.is_synced():
+                    elif plus_controller.is_synced():
                         plus_icon = 'plus-connected'
                         tooltip = QApplication.translate('Tooltip', 'Disconnect from the artisan platform')
                     else:
@@ -13584,11 +13586,12 @@ class ApplicationWindow(QMainWindow):
                 _log.info('profile loaded: %s', filename)
 
                 # update plus data set modification date
-                self.qmc.plus_file_last_modified = plus.util.getModificationDate(filename)
+                self.qmc.plus_file_last_modified = plus_util.getModificationDate(filename)
                 self.updatePlusStatus()
                 if self.plus_account is not None and plus.config.uuid_tag in obj_dict:
+                    import plus.schedule as plus_schedule
                     QTimer.singleShot(100, plus.sync.sync)
-                    QTimer.singleShot(700, lambda: plus.schedule.update_completed_item_from_loaded_profile(self))
+                    QTimer.singleShot(700, lambda: plus_schedule.update_completed_item_from_loaded_profile(self))
 
                 #check colors
                 self.checkColors(self.getcolorPairsToCheck())
@@ -15466,7 +15469,6 @@ class ApplicationWindow(QMainWindow):
 
             if 'hash' in profile:
                 import hashlib
-                import json
                 profile_hash:str = profile['hash']
                 del profile['hash']
                 computed_hash = hashlib.sha256(json.dumps(rec_int_to_float(profile), sort_keys=True, ensure_ascii=True, separators=(',', ':')).encode()).hexdigest()
@@ -17103,7 +17105,7 @@ class ApplicationWindow(QMainWindow):
 
             if generate_hash:
                 # set sync_record_hash if any
-                sync_record_hash = plus.controller.updateSyncRecordHashAndSync()
+                sync_record_hash = plus_controller.updateSyncRecordHashAndSync()
                 if sync_record_hash is not None:
                     # we add the hash over the sync record to be able to detect offline changes
                     srh = encodeLocal(sync_record_hash)
@@ -17112,7 +17114,6 @@ class ApplicationWindow(QMainWindow):
 
                 # add hash
                 import hashlib
-                import json
                 profile['hash'] = hashlib.sha256(json.dumps(rec_int_to_float(profile), sort_keys=True, ensure_ascii=True, separators=(',', ':')).encode()).hexdigest()
 
             return profile
@@ -17173,7 +17174,7 @@ class ApplicationWindow(QMainWindow):
                         self.qmc.fileCleanSignal.emit()
 
                     # update plus data set modification date
-                    self.qmc.plus_file_last_modified = plus.util.getModificationDate(filename)
+                    self.qmc.plus_file_last_modified = plus_util.getModificationDate(filename)
 
                     if self.qmc.autosaveimage and not self.qmc.flagon:
                         #
@@ -18289,7 +18290,7 @@ class ApplicationWindow(QMainWindow):
             self.qmc.AUCshowFlag = toBool(settings.value('AUCshowFlag',self.qmc.AUCshowFlag))
             self.keyboardmoveflag = toInt(settings.value('keyboardmoveflag',int(self.keyboardmoveflag)))
             self.ui_mode = UI_MODE(toInt(settings.value('UI_mode',int(self.ui_mode))))
-            self.set_ui_mode(self.ui_mode)
+            self.set_ui_mode(self.ui_mode, False)
             self.qt_scale_factor = toFloat(settings.value('scale_factor',self.qt_scale_factor))
             self.qmc.ambientTempSource = toInt(settings.value('AmbientTempSource',int(self.qmc.ambientTempSource)))
             self.qmc.ambientHumiditySource = toInt(settings.value('AmbientHumiditySource',int(self.qmc.ambientHumiditySource)))
@@ -19581,7 +19582,7 @@ class ApplicationWindow(QMainWindow):
 
             if filename is None and self.plus_account is not None:
                 try:
-                    plus.controller.start(self)
+                    plus_controller.start(self)
                 except Exception as e: # pylint: disable=broad-except
                     _log.exception(e)
 
@@ -19672,7 +19673,8 @@ class ApplicationWindow(QMainWindow):
                     else:
                         # send init message
                         from json import dumps as json_dumps
-                        msg = json_dumps(plus.schedule.GreenWebDisplay.INIT_PAYLOAD, indent=None, separators=(',', ':'))
+                        import plus.schedule as plus_schedule
+                        msg = json_dumps(plus_schedule.GreenWebDisplay.INIT_PAYLOAD, indent=None, separators=(',', ':'))
                         self.taskWebDisplayGreen_server.send_msg(msg)
                     return True
                 self.stopWebGreen()
@@ -19722,7 +19724,8 @@ class ApplicationWindow(QMainWindow):
                     else:
                         # send init message
                         from json import dumps as json_dumps
-                        msg = json_dumps(plus.schedule.RoastedWebDisplay.INIT_PAYLOAD, indent=None, separators=(',', ':'))
+                        import plus.schedule as plus_schedule
+                        msg = json_dumps(plus_schedule.RoastedWebDisplay.INIT_PAYLOAD, indent=None, separators=(',', ':'))
                         self.taskWebDisplayRoasted_server.send_msg(msg)
                     return True
                 self.stopWebRoasted()
@@ -21692,9 +21695,9 @@ class ApplicationWindow(QMainWindow):
 #                    title_html = f'<a href="artisan://roast/{roast_uuid}">{title_html}</a>'
                 title_html = f'<a href="artisan://roast/{roast_uuid}">{title_html}</a>'
                 if bool(plus.sync.getSync(roast_uuid)):
-                    time_html = f"<a href='{plus.util.roastLink(roast_uuid)}' target='_blank'>{time_html}</a>"
+                    time_html = f"<a href='{plus_util.roastLink(roast_uuid)}' target='_blank'>{time_html}</a>"
                 if 'plus_coffee' in data and data['plus_coffee'] != '':
-                    beans_html = f"<a href=\"{plus.util.coffeeLink(data['plus_coffee'])}\" target=\"_blank\">{beans_html}</a>"
+                    beans_html = f"<a href=\"{plus_util.coffeeLink(data['plus_coffee'])}\" target=\"_blank\">{beans_html}</a>"
         except Exception: # pylint: disable=broad-except
             pass
         return libstring.Template(HTML_REPORT_TEMPLATE).safe_substitute(
@@ -22614,7 +22617,7 @@ class ApplicationWindow(QMainWindow):
 #                    title_html = '<a href="artisan://roast/{0}">{1}</a>'.format(roast_uuid,title_html)
                 title_html = f'<a href="artisan://roast/{roast_uuid}">{title_html}</a>'
                 if bool(plus.sync.getSync(roast_uuid)):
-                    time_html = f'<a href="{plus.util.roastLink(roast_uuid)}" target="_blank">{time_html}</a>'
+                    time_html = f'<a href="{plus_util.roastLink(roast_uuid)}" target="_blank">{time_html}</a>'
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
         weight_fmt = ('{0:.2f}' if self.qmc.weight[2] in {'Kg', 'lb', 'oz'} else '{0:.0f}')
@@ -23758,13 +23761,13 @@ class ApplicationWindow(QMainWindow):
 #                    title_html = '<a href="artisan://roast/' + self.qmc.roastUUID + '">' + title_html + "</a>"
                 title_html = '<a href="artisan://roast/' + self.qmc.roastUUID + '">' + title_html + '</a>'
                 if bool(plus.sync.getSync(self.qmc.roastUUID)):
-                    datetime_html = f'<a href="{plus.util.roastLink(self.qmc.roastUUID)}" target="_blank">{datetime_html}</a>'
+                    datetime_html = f'<a href="{plus_util.roastLink(self.qmc.roastUUID)}" target="_blank">{datetime_html}</a>'
 #            if self.qmc.background and self.qmc.titleB is not None and self.qmc.titleB != "" and self.qmc.backgroundUUID is not None and plus.register.getPath(self.qmc.backgroundUUID):
 #                background_html = '<a href="artisan://roast/' + self.qmc.backgroundUUID + '">' + background_html + "</a>"
             if self.qmc.background and self.qmc.titleB != '' and self.qmc.backgroundUUID is not None:
                 background_html = '<a href="artisan://roast/' + self.qmc.backgroundUUID + '">' + background_html + '</a>'
             if beans_html != '' and self.qmc.plus_coffee is not None:
-                beans_html = f'<a href="{plus.util.coffeeLink(self.qmc.plus_coffee)}" target="_blank">{beans_html}</a>'
+                beans_html = f'<a href="{plus_util.coffeeLink(self.qmc.plus_coffee)}" target="_blank">{beans_html}</a>'
                 # note that blends are hard to link back as it requires to link component by component
             cupping_score, cupping_all_default = self.cuppingSum(self.qmc.flavors)
             cupping_notes = self.note2html(self.qmc.cuppingnotes).strip()
@@ -24483,8 +24486,6 @@ class ApplicationWindow(QMainWindow):
     def checkUpdate(self, _:bool = False) -> None:
         update_url = '<a href="https://artisan-scope.org">https://artisan-scope.org</a>'
         update_str = QApplication.translate('About', 'There was a problem retrieving the latest version information.  Please check your Internet connection, try again later, or check manually.')
-        import json
-        import json.decoder
         try:
             import requests
             r = requests.get('https://api.github.com/repos/artisan-roaster-scope/artisan/releases/latest', timeout=(2,4))
@@ -24873,6 +24874,7 @@ class ApplicationWindow(QMainWindow):
                     self.fujipid.setONOFFstandby(0)
                     self.sendmessage(QApplication.translate('Message','PID set to ON'))
             else:
+                from artisanlib.pid_dialogs import (PXRpidDlgControl, PXG4pidDlgControl, PID_DlgControl, DTApidDlgControl)
                 dialog:PXG4pidDlgControl|PXRpidDlgControl|DTApidDlgControl|PID_DlgControl
                 if self.ser.controlETpid[0] == 0:
                     dialog = PXG4pidDlgControl(self,self)
@@ -24890,6 +24892,7 @@ class ApplicationWindow(QMainWindow):
         elif self.qmc.device == 53:
             modifiers = QApplication.keyboardModifiers()
             if modifiers == Qt.KeyboardModifier.ControlModifier:
+                from artisanlib.pid_dialogs import PID_DlgControl
                 dialog = PID_DlgControl(self,self,self.PID_DlgControl_activeTab)
                 #modeless style dialog
                 dialog.show()
@@ -24902,6 +24905,7 @@ class ApplicationWindow(QMainWindow):
             if self.ui_mode is UI_MODE.PRODUCTION or modifiers == Qt.KeyboardModifier.ControlModifier:
                 self.pidcontrol.togglePID()
             else:
+                from artisanlib.pid_dialogs import PID_DlgControl
                 dialog = PID_DlgControl(self,self,self.PID_DlgControl_activeTab)
                 #modeless style dialog
                 dialog.show()
@@ -25241,7 +25245,8 @@ class ApplicationWindow(QMainWindow):
     def schedule(self, b:bool = False) -> None:
         if b and self.schedule_window is None:
             if  not self.app.artisanviewerMode:  # no scheduler in ArtisanViewer mode
-                self.schedule_window = plus.schedule.ScheduleWindow(self, self, self.schedule_activeTab)
+                import plus.schedule as plus_schedule
+                self.schedule_window = plus_schedule.ScheduleWindow(self, self, self.schedule_activeTab)
                 self.scheduleFlag = True
                 self.scheduleAction.setChecked(True)
                 self.schedule_window.show()
@@ -25252,6 +25257,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot(bool)
     def largeLCDs(self, _:bool = False) -> None:
         if self.largeLCDs_dialog is None:
+            from artisanlib.large_lcds import LargeMainLCDs
             self.largeLCDs_dialog = LargeMainLCDs(self,self)
             self.largeLCDs_dialog.setModal(False)
             self.LargeLCDsFlag = True
@@ -25265,6 +25271,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot(bool)
     def largeDeltaLCDs(self, _:bool = False) -> None:
         if self.largeDeltaLCDs_dialog is None:
+            from artisanlib.large_lcds import LargeDeltaLCDs
             self.largeDeltaLCDs_dialog = LargeDeltaLCDs(self,self)
             self.largeDeltaLCDs_dialog.setModal(False)
             self.LargeDeltaLCDsFlag = True
@@ -25278,6 +25285,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot(bool)
     def largePIDLCDs(self, _:bool = False) -> None:
         if self.largePIDLCDs_dialog is None:
+            from artisanlib.large_lcds import LargePIDLCDs
             self.largePIDLCDs_dialog = LargePIDLCDs(self,self)
             self.largePIDLCDs_dialog.setModal(False)
             self.LargePIDLCDsFlag = True
@@ -25294,6 +25302,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot(bool)
     def largeScaleLCDs(self, _:bool = False) -> None:
         if self.largeScaleLCDs_dialog is None:
+            from artisanlib.large_lcds import LargeScaleLCDs
             self.largeScaleLCDs_dialog = LargeScaleLCDs(self,self)
             self.largeScaleLCDs_dialog.setModal(False)
             self.LargeScaleLCDsFlag = True
@@ -25307,6 +25316,12 @@ class ApplicationWindow(QMainWindow):
             self.scale_manager.scale2_disconnected_signal.connect(self.scale2disconnectedSlot)
             self.scale_manager.scale2_weight_changed_signal.connect(self.scale2WeightChangedSlot)
             self.largeScaleLCDs_dialog.show()
+            scale1_weight = self.scale_manager.get_scale1_last_weight()
+            if scale1_weight is not None:
+                self.scale1WeightChangedSlot(scale1_weight)
+            scale2_weight = self.scale_manager.get_scale2_last_weight()
+            if scale2_weight is not None:
+                self.scale2WeightChangedSlot(scale2_weight)
         else:
             try:
                 self.scale_manager.connect_scale1_signal.disconnect(self.scale1connectedSlot)
@@ -25393,6 +25408,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot(bool)
     def largeExtraLCDs(self, _:bool = False) -> None:
         if self.largeExtraLCDs_dialog is None:
+            from artisanlib.large_lcds import LargeExtraLCDs
             self.largeExtraLCDs_dialog = LargeExtraLCDs(self,self)
             self.largeExtraLCDs_dialog.setModal(False)
             self.LargeExtraLCDsFlag = True
@@ -25406,6 +25422,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot(bool)
     def largePhasesLCDs(self, _:bool = False) -> None:
         if self.largePhasesLCDs_dialog is None:
+            from artisanlib.large_lcds import LargePhasesLCDs
             self.largePhasesLCDs_dialog = LargePhasesLCDs(self,self)
             self.largePhasesLCDs_dialog.setModal(False)
             self.LargePhasesLCDsFlag = True
@@ -27095,9 +27112,8 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot(str)
     def loadAlarms(self, filename:str) -> None:
         try:
-            from json import load as json_load
             with open(filename, encoding='utf-8') as infile:
-                alarms = json_load(infile)
+                alarms = json.load(infile)
             self.qmc.alarmflag = alarms['alarmflags']
             self.qmc.alarmguard = alarms['alarmguards']
             self.qmc.alarmnegguard = alarms['alarmnegguards']
@@ -27745,6 +27761,7 @@ class ApplicationWindow(QMainWindow):
                         self.qmc.timeclock.setBase(1000*speed)
                         profile = deserialize(filename)
                         self.plusAddPath(profile, filename)
+                        from artisanlib.simulator import Simulator
                         self.simulator = Simulator(self.qmc.mode, profile)
                         self.simulatorpath = filename
                         self.buttonONOFF.setStyleSheet(artisan_simulator_push_button_style_dict['OFF'].format(min_width=self.main_button_min_width, font_size=self.button_font_size))
@@ -27840,15 +27857,16 @@ def excepthook(excType:type, excValue:BaseException, tracebackobj:'TracebackType
 sys.excepthook = excepthook
 
 
+# 2026 update: the cocoa lib loads slow and the issue seems not to occur any longer
 # the following avoids the "No document could be created" dialog and the Console message
 # "The Artisan Profile type doesn't map to any NSDocumentClass." on startup (since pyobjc-core 3.1.1)
-if sys.platform.startswith('darwin'):
-    from Cocoa import NSDocument # type: ignore[import-untyped, attr-defined, unused-ignore] # @UnresolvedImport # pylint: disable=import-error,no-name-in-module
-    class Document(NSDocument): # type:ignore[misc,no-any-unimported] # zuban: ignore # pylint: disable= too-few-public-methods
-#        def windowNibName(self):
-#            return None #"Document"
-        def makeWindowControllers(self) -> None:
-            pass
+#if sys.platform.startswith('darwin'):
+#    from Cocoa import NSDocument # type: ignore[import-untyped, attr-defined, unused-ignore] # @UnresolvedImport # pylint: disable=import-error,no-name-in-module
+#    class Document(NSDocument): # type:ignore[misc,no-any-unimported] # zuban: ignore # pylint: disable= too-few-public-methods
+##        def windowNibName(self):
+##            return None #"Document"
+#        def makeWindowControllers(self) -> None:
+#            pass
 
 def qt_message_handler(mode:QtMsgType, context:'QMessageLogContext', message:str|None) -> None:
     if mode == QtMsgType.QtInfoMsg:
@@ -27917,7 +27935,7 @@ def initialize_locale(my_app:Artisan) -> str:
 
     if locale == '':
         if platform.system() == 'Darwin':
-            from Cocoa import NSUserDefaults # type:ignore[import-not-found,attr-defined,unused-ignore]  # @UnresolvedImport # pylint: disable=import-error,no-name-in-module
+            from Cocoa import NSUserDefaults # type:ignore[import-not-found,attr-defined,unused-ignore,import-untyped]  # @UnresolvedImport # pylint: disable=import-error,no-name-in-module
             defs = NSUserDefaults.standardUserDefaults()
             langs = defs.objectForKey_('AppleLanguages') # pyright:ignore[reportUnknownArgumentType]
             if langs.objectAtIndex_(0)[:7] == 'zh_Hans': # pyright:ignore[reportUnknownArgumentType]
@@ -28010,7 +28028,7 @@ def main() -> None:
     app.setActivationWindow(appWindow,activateOnMessage=False) # set the activation window for the QtSingleApplication
 
 
-    # only here deactivating the app napping seems to have an effect
+    # only here deactivating the app napping seems to have an effect (after GUI has been initialized)
     if sys.platform.startswith('darwin'):
         import appnope # pyright:ignore # @UnresolvedImport # type:ignore[import-not-found, unused-ignore] # pylint: disable=import-error,redefined-outer-name
         appnope.nope()
@@ -28036,7 +28054,7 @@ def main() -> None:
     _log.info('loaded %s settings in %.2fs', len(QSettings().allKeys()), libtime.process_time() - start_time)
 #    _log.debug("PRINT mpl.get_cachedir(): %s",mpl.get_cachedir())
 
-    appWindow.set_ui_mode(appWindow.ui_mode)
+    appWindow.set_ui_mode(appWindow.ui_mode, False)
 
     # inform the user the debug logging is on
     if debugLogLevelActive():

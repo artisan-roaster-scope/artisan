@@ -32,7 +32,6 @@ import re
 import platform
 import logging
 from PIL import ImageColor
-from babel.units import get_unit_name
 from typing import override, Final, cast, TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -2012,7 +2011,10 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.automaticRegistrationPeriod.setToolTip(QApplication.translate('Tooltip','Register the weight of a roasted batch automatically\nafter the given time (if not set to zero) without removing the filled container,\nenabling the addition of more batches'))
             self.automaticRegistrationPeriod.setRange(0, 30)
             self.automaticRegistrationPeriod.setAlignment(Qt.AlignmentFlag.AlignRight)
+
+            from babel.units import get_unit_name
             unit_name = get_unit_name('duration-minute', length='short', locale=self.aw.locale_str)
+
             self.automaticRegistrationPeriod.setSuffix(f" {unit_name if unit_name is not None else 'min'}")
             self.automaticRegistrationPeriod.setValue(int(round(self.aw.automatic_registration_period/60.)))
 

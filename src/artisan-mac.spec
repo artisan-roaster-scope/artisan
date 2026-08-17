@@ -122,7 +122,7 @@ DATA_FILES = [
         (r'includes/Machines', './Machines'),
         (r'includes/Themes', './Themes'),
         (r'includes/Icons', './Icons'),
-        (r'includes/logging.yaml', '.')
+        (r'includes/logging.json', '.')
 ]
 
 # add Artisan translations to DATA_FILES

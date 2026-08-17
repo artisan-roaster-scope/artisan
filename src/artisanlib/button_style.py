@@ -147,7 +147,7 @@ artisan_simulator_push_button_style_dict: dict[str, str] = {
         }}
     """,
     'ON': """
-        QPushButton {
+        QPushButton {{
             min-width: {min_width}px;
             border-style:solid;
             border-radius:20px;
@@ -157,22 +157,22 @@ artisan_simulator_push_button_style_dict: dict[str, str] = {
             font-weight: bold;
             color: #cc0f50;
             background-color: white;
-        }
-        QPushButton:!enabled {
+        }}
+        QPushButton:!enabled {{
             color: darkgrey;
             background-color: #E0E0E0;
-        }
-        QPushButton:pressed {
+        }}
+        QPushButton:pressed {{
             color: #c70d49;
             background-color: #EEEEEE;
-        }
-        QPushButton:hover:!pressed {
+        }}
+        QPushButton:hover:!pressed {{
             color: #d4336a;
             background-color: #F5F5F5;
-        }
+        }}
     """,
     'STOP':  """
-        QPushButton {
+        QPushButton {{
             min-width: {min_width}px;
             border-style:solid;
             border-radius:20px;
@@ -182,22 +182,22 @@ artisan_simulator_push_button_style_dict: dict[str, str] = {
             font-weight: bold;
             color: #147bb3;
             background-color: white;
-        }
-        QPushButton:!enabled {
+        }}
+        QPushButton:!enabled {{
             color: #EFEFEF;
             background-color: darkgrey;
-        }
-        QPushButton:pressed {
+        }}
+        QPushButton:pressed {{
             color: #116999;
             background-color: #EEEEEE;
-        }
-        QPushButton:hover:!pressed {
+        }}
+        QPushButton:hover:!pressed {{
             color: #1985ba;
             background-color: #F5F5F5;
-        }
+        }}
     """,
     'START': """
-        QPushButton {
+        QPushButton {{
             min-width: {min_width}px;
             border-style:solid;
             border-radius:20px;
@@ -207,19 +207,19 @@ artisan_simulator_push_button_style_dict: dict[str, str] = {
             font-weight: bold;
             color: yellow;
             background-color: #ff3d00;
-        }
-        QPushButton:!enabled {
+        }}
+        QPushButton:!enabled {{
             color: darkgrey;
             background-color: #E0E0E0;
-        }
-        QPushButton:pressed {
+        }}
+        QPushButton:pressed {{
             color: #EEEEEE;
             background-color: #116999;
-        }
-        QPushButton:hover:!pressed {
+        }}
+        QPushButton:hover:!pressed {{
             color: white;
             background-color: red;
-        }
+        }}
     """,
 }
 

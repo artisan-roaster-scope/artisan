@@ -474,7 +474,7 @@ Section Uninstall
   Delete "$INSTDIR\jquery-1.11.1.min.js"
   Delete "$INSTDIR\qt.conf"
   Delete "$INSTDIR\vc_redist.x64.exe"
-  Delete "$INSTDIR\logging.yaml"
+  Delete "$INSTDIR\logging.json"
   Delete "$INSTDIR\artisan_public_key.pem"
 
   SetShellVarContext all

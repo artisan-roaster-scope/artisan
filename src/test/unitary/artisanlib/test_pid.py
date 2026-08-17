@@ -318,17 +318,6 @@ class TestPIDInitialization:
         assert pid.force_duty == 3
         assert pid.iterations_since_duty == 0
 
-    def test_init_derivative_filter(self, basic_pid: Any) -> None:
-        """Test that derivative filter is properly initialized."""
-        # Arrange - Use the fixture-provided PID instance
-        pid = basic_pid
-
-        # Act & Assert - Verify derivative filter initialization
-        assert pid.derivative_filter_level == 0
-        assert pid.derivative_filter is not None
-        # Should be a LiveSosFilter instance
-        assert hasattr(pid.derivative_filter, 'process')
-
     def test_init_semaphore(self, basic_pid: Any) -> None:
         """Test that semaphore is properly initialized."""
         # Arrange - Use the fixture-provided PID instance

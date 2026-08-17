@@ -29,14 +29,12 @@ import ssl
 import platform
 import json
 import logging
-import paho.mqtt.client as mqtt
-from requests.utils import DEFAULT_CA_BUNDLE_PATH
-from paho.mqtt.enums import CallbackAPIVersion, MQTTProtocolVersion
 from PyQt6.QtWidgets import QApplication
 from typing import Any, Final, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
+    import paho.mqtt.client as mqtt
     from paho.mqtt.reasoncodes import ReasonCodes
     from paho.mqtt.properties import Properties
     from paho.mqtt.client import DisconnectFlags
@@ -51,11 +49,6 @@ class mqttport:
 
     KEYRING_SERVICE: Final[str] = 'artisan.mqtt'
     CHANNELS:Final[int] = 12 # maximal number of MQTT channels
-    PROTOCOL_VERSIONS:Final[dict[int, MQTTProtocolVersion]] = {
-        0: mqtt.MQTTv31,
-        1: mqtt.MQTTv311,
-        2: mqtt.MQTTv5
-    }
     PROTOCOL_VERSION_LABELS:Final[dict[int, str]] = {
         0: 'MQTT v3.1',
         1: 'MQTT v3.1.1',
@@ -100,7 +93,7 @@ class mqttport:
     # paho callbacks
 
 
-    def on_connect_handler(self, client:mqtt.Client, _userdata:Any, _flags:dict[str, Any], status:'ReasonCodes', _properties:'Properties|None') -> None:
+    def on_connect_handler(self, client:'mqtt.Client', _userdata:Any, _flags:dict[str, Any], status:'ReasonCodes', _properties:'Properties|None') -> None:
         if status == 0:
             _log.debug('MQTT connected')
             self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('MQTT'),True,None)
@@ -129,11 +122,11 @@ class mqttport:
             _log.debug('MQTT failed to connect to %s. Error: %s', self.host, status)
             self.aw.qmc.adderror(QApplication.translate('Error Message','MQTT failed to connect to {0}: {1}').format(self.host,status))
 
-    def on_disconnect_handler(self, _client:mqtt.Client, _userdata:Any, _disconnect_flags:'DisconnectFlags|None', status:'ReasonCodes', _properties:'Properties|None') -> None:
+    def on_disconnect_handler(self, _client:'mqtt.Client', _userdata:Any, _disconnect_flags:'DisconnectFlags|None', status:'ReasonCodes', _properties:'Properties|None') -> None:
         _log.debug('MQTT disconnected: %s', status.getName()) # type:ignore[no-untyped-call]
         self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('MQTT'),True,None)
 
-    def on_subscribe_handler(self, _client:mqtt.Client, _userdata:Any, _mid:int, reason_code_list:'list[ReasonCodes]', _properties:'Properties') -> None:
+    def on_subscribe_handler(self, _client:'mqtt.Client', _userdata:Any, _mid:int, reason_code_list:'list[ReasonCodes]', _properties:'Properties') -> None:
         _log.debug('on_subscribe_handler: %s', [(rc.getId(rc.getName()), rc.getName()) for rc in reason_code_list]) # type:ignore[no-untyped-call]
         for rc in reason_code_list:
             name = rc.getName() # type:ignore[no-untyped-call]
@@ -141,11 +134,12 @@ class mqttport:
                 self.aw.qmc.adderror(QApplication.translate('Error Message','MQTT subscribe error: {0}').format(name))
 
 
-    def on_message_handler(self, _client:mqtt.Client, _userdata:Any, message:mqtt.MQTTMessage) -> None:
+    def on_message_handler(self, _client:'mqtt.Client', _userdata:Any, message:'mqtt.MQTTMessage') -> None:
         try:
             received_data = json.loads(message.payload.decode('utf-8')) # Decode bytes, then deserialize JSON
             if self._logging:
                 _log.debug('received_data:\n%s', json.dumps(received_data, indent=3))
+                import paho.mqtt.client as mqtt
                 if mqtt.topic_matches_sub(self.topic, message.topic):
                     _log.debug('message for main topic %s received', self.topic)
 
@@ -189,6 +183,7 @@ class mqttport:
         for i, channel_topic in enumerate(self.channel_topics):
             node_expression:jmespath.parser.ParsedResult|None = self.channel_node_expressions[i]
             res:float|None = None
+            import paho.mqtt.client as mqtt
             if (node_expression is not None and
                 (mqtt.topic_matches_sub(channel_topic, topic) or (mqtt.topic_matches_sub(self.topic, topic) and channel_topic == ''))):
                 try:
@@ -267,16 +262,24 @@ class mqttport:
         # compile node expressions
         self.compile_node_expressions()
 
+        import paho.mqtt.client as mqtt
+        from paho.mqtt.enums import CallbackAPIVersion, MQTTProtocolVersion
+        PROTOCOL_VERSIONS:dict[int, MQTTProtocolVersion] = {
+            0: mqtt.MQTTv31,
+            1: mqtt.MQTTv311,
+            2: mqtt.MQTTv5
+        }
+
         # create mqtt client object and configure it
-        if self.PROTOCOL_VERSIONS[self.protocol_version] == mqtt.MQTTv5: # MQTTv5
+        if PROTOCOL_VERSIONS[self.protocol_version] == mqtt.MQTTv5: # MQTTv5
             self.client = mqtt.Client( # Xtype:ignore[call-arg]
                 callback_api_version = CallbackAPIVersion.VERSION2,
-                protocol = self.PROTOCOL_VERSIONS[self.protocol_version],
+                protocol = PROTOCOL_VERSIONS[self.protocol_version],
                 transport = self.SUPPORTED_TRANSPORT[self.transport].lower()) # type:ignore[arg-type] # clean_session parameter not support for MQTTv5 clients
         else:
             self.client = mqtt.Client( # Xtype:ignore[call-arg]
                 callback_api_version = CallbackAPIVersion.VERSION2,
-                protocol = self.PROTOCOL_VERSIONS[self.protocol_version],
+                protocol = PROTOCOL_VERSIONS[self.protocol_version],
                 transport = self.SUPPORTED_TRANSPORT[self.transport].lower(), # type:ignore[arg-type]
                 clean_session = True) # if client_id is not set a random number is generated and clean_session needs to be True
 
@@ -284,6 +287,7 @@ class mqttport:
         if self.tls:
 #            import certifi
 #            self.client.tls_set(ca_certs=certifi.where(), cert_reqs=ssl.CERT_REQUIRED)
+            from requests.utils import DEFAULT_CA_BUNDLE_PATH
             self.client.tls_set(ca_certs=DEFAULT_CA_BUNDLE_PATH, cert_reqs=ssl.CERT_REQUIRED)
         if self.user != '':
             self.client.username_pw_set(self.user, self.password)

@@ -36,13 +36,13 @@ from artisanlib.dialogs import ArtisanDialog
 from artisanlib.widgets import ArtisanPlainTextEdit
 from artisanlib.util import appFrozen, application_name, application_viewer_name
 
+
+import matplotlib as mpl
+import numpy
+
 from PyQt6.QtCore import Qt, PYQT_VERSION_STR
 from PyQt6.QtWidgets import QApplication, QVBoxLayout
 
-import numpy
-from scipy import __version__ as SCIPY_VERSION_STR
-import matplotlib as mpl
-from pymodbus import __version__ as PYMODBUS_VERSION_STR
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
@@ -51,6 +51,10 @@ if TYPE_CHECKING:
 class platformDlg(ArtisanDialog):
     def __init__(self, parent:'QWidget', aw:'ApplicationWindow') -> None:
         super().__init__(parent, aw)
+
+        from scipy import __version__ as SCIPY_VERSION_STR
+        from pymodbus import __version__ as PYMODBUS_VERSION_STR
+
         self.setModal(True)
         self.setWindowTitle(QApplication.translate('Form Caption','Artisan Platform'))
 

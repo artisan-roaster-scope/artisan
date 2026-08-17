@@ -313,7 +313,7 @@ for fn in [
     r'includes\mstile-150x150.png',
     r'includes\safari-pinned-tab.svg',
     r'includes\site.webmanifest',
-    r'includes\logging.yaml',
+    r'includes\logging.json',
     r'includes\artisan_public_key.pem',
     ]:
     copy_file(fn, TARGET)

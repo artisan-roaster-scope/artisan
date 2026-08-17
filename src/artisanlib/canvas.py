@@ -48,7 +48,6 @@ import textwrap
 import functools
 import psutil
 from psutil._common import bytes2human # pyright:ignore[reportPrivateImportUsage]
-from babel.units import get_unit_name
 
 from collections.abc import Callable, Sequence
 from typing import override, Final, Literal, Any, cast, TYPE_CHECKING
@@ -9383,17 +9382,24 @@ class tgraphcanvas(QObject):
         if self.flagstart or self.xgrid == 0:
             return ''
         if self.roastersize_setup == 0 and self.roastertype_setup == '':
+
             if self.aw.qmc.xgrid < 3600:
+                res = 'mins'
+                if self.aw.locale_str != 'en':
+                    try:
+                        from babel.units import get_unit_name
+                        res = get_unit_name('duration-minute', length='short', locale=self.aw.locale_str) or 'mins'
+                    except Exception as e:  # pylint: disable=broad-except # UnknownLocaleError
+                        _log.exception(e)
+                return res
+            res = 'h'
+            if self.aw.locale_str != 'en':
                 try:
-                    return get_unit_name('duration-minute', length='short', locale=self.aw.locale_str) or 'min'
+                    from babel.units import get_unit_name
+                    return get_unit_name('duration-hour', length='short', locale=self.aw.locale_str) or 'h'
                 except Exception as e:  # pylint: disable=broad-except # UnknownLocaleError
                     _log.exception(e)
-                    return get_unit_name('duration-minute', length='short', locale='en') or 'min'
-            try:
-                return get_unit_name('duration-hour', length='short', locale=self.aw.locale_str) or 'h'
-            except Exception as e:  # pylint: disable=broad-except # UnknownLocaleError
-                _log.exception(e)
-                return get_unit_name('duration-hour', length='short', locale='en') or 'h'
+            return res
         if right_to_left(self.locale_str):
             return f"{(render_weight(self.roastersize_setup, 1, weight_units.index(self.weight[2]), right_to_left_lang=True) if self.roastersize_setup>=0 else '')}  {self.__dijkstra_to_ascii(self.roastertype_setup)}"
         return f"{self.__dijkstra_to_ascii(self.roastertype_setup)} {(render_weight(self.roastersize_setup, 1, weight_units.index(self.weight[2])) if self.roastersize_setup>0 else '')}"

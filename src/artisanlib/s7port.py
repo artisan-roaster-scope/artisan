@@ -32,11 +32,8 @@ from typing import Final, TYPE_CHECKING, no_type_check
 
 if TYPE_CHECKING:
     from snap7.client import Client as S7Client
+    from snap7.type import Area
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
-
-from snap7.type import Area
-from snap7.util.getters import get_bool, get_int, get_real
-from snap7.util.setters import set_bool, set_int, set_real
 
 from artisanlib.util import isOpen, max_blocks, min_blocks
 
@@ -124,6 +121,7 @@ class s7port:
     @no_type_check # as types changed between vs 1.x and 2.x
     def initArrays(self) -> None:
         if self.areas is None:
+            from snap7.type import Area
             self.areas = [
                     Area.PE, # 129, 0x81
                     Area.PA, # 130, 0x82
@@ -387,6 +385,7 @@ class s7port:
                 ba = self.plc.read_area(self.areas[area],dbnumber,start,4)
                 if len(ba) != 4:
                     raise Exception(f'read_area({area},{dbnumber},{start},4) returned result of length {len(ba)}') # pylint: disable=broad-exception-raised
+                from snap7.util.setters import set_real
                 set_real(ba, 0, float(value))
                 self.waitToEnsureMinTimeBetweenRequests()
                 self.plc.write_area(self.areas[area],dbnumber,start,ba)
@@ -418,6 +417,7 @@ class s7port:
                 ba = self.plc.read_area(self.areas[area],dbnumber,start,2)
                 if len(ba) != 2:
                     raise Exception(f'read_area({area},{dbnumber},{start},2) returned result of length {len(ba)}') # pylint: disable=broad-exception-raised
+                from snap7.util.setters import set_int
                 set_int(ba, 0, int(round(value)))
                 self.waitToEnsureMinTimeBetweenRequests()
                 self.plc.write_area(self.areas[area],dbnumber,start,ba)
@@ -450,6 +450,7 @@ class s7port:
                 if len(ba) != 2:
                     raise Exception(f'read_area({area},{dbnumber},{start},2) returned result of length {len(ba)}') # pylint: disable=broad-exception-raised
                 new_val = (int(round(value)) & and_mask) | (or_mask & (and_mask ^ 0xFFFF))
+                from snap7.util.setters import set_int
                 set_int(ba, 0, int(new_val))
                 self.waitToEnsureMinTimeBetweenRequests()
                 self.plc.write_area(self.areas[area],dbnumber,start,ba)
@@ -481,6 +482,7 @@ class s7port:
                 ba = self.plc.read_area(self.areas[area],dbnumber,start,1)
                 if len(ba) != 1:
                     raise Exception(f'read_area({area},{dbnumber},{start},1) returned result of length {len(ba)}') # pylint: disable=broad-exception-raised
+                from snap7.util.setters import set_bool
                 set_bool(ba, 0, int(index), bool(value))
                 self.waitToEnsureMinTimeBetweenRequests()
                 self.plc.write_area(self.areas[area],dbnumber,start,ba)
@@ -512,6 +514,7 @@ class s7port:
                 if area in self.readingsCache and dbnumber in self.readingsCache[area] and start in self.readingsCache[area][dbnumber] \
                     and start+1 in self.readingsCache[area][dbnumber] and start+2 in self.readingsCache[area][dbnumber] \
                     and start+3 in self.readingsCache[area][dbnumber]:
+                    from snap7.util.getters import get_real
                     # cache hit
                     res = bytearray([
                         self.readingsCache[area][dbnumber][start],
@@ -550,6 +553,7 @@ class s7port:
                 if self.commError: # we clear the previous error and send a message
                     self.commError = False
                     self.aw.qmc.adderror(QApplication.translate('Error Message','S7 Communication Resumed'))
+                from snap7.util.getters import get_real
                 r = get_real(res,0)
                 if self.aw.seriallogflag:
                     self.aw.addserial(f'S7 readFloat({area},{dbnumber},{start},{force}) => {r}')
@@ -586,6 +590,7 @@ class s7port:
                 res = self.plc.read_area(self.areas[area],dbnumber,start,4)
                 if len(res) != 4:
                     raise Exception(f'read_area({area},{dbnumber},{start},4) returned result of length {len(res)}') # pylint: disable=broad-exception-raised
+                from snap7.util.getters import get_real
                 return get_real(res,0)
             return None
         except Exception as e: # pylint: disable=broad-except
@@ -609,6 +614,7 @@ class s7port:
                     res = bytearray([
                         self.readingsCache[area][dbnumber][start],
                         self.readingsCache[area][dbnumber][start+1]])
+                    from snap7.util.getters import get_int
                     r = get_int(res,0)
                     if self.aw.seriallogflag:
                         self.aw.addserial(f'S7 readInt_cached({area},{dbnumber},{start},{force}) => {r}')
@@ -641,6 +647,7 @@ class s7port:
                 if self.commError: # we clear the previous error and send a message
                     self.commError = False
                     self.aw.qmc.adderror(QApplication.translate('Error Message','S7 Communication Resumed'))
+                from snap7.util.getters import get_int
                 r = get_int(res,0)
                 if self.aw.seriallogflag:
                     self.aw.addserial(f'S7 readInt({area},{dbnumber},{start},{force}) => {r}')
@@ -679,6 +686,7 @@ class s7port:
                 res = self.plc.read_area(self.areas[area],dbnumber,start,2)
                 if len(res) != 2:
                     raise Exception(f'read_area({area},{dbnumber},{start},2) returned result of length {len(res)}') # pylint: disable=broad-exception-raised
+                from snap7.util.getters import get_int
                 return get_int(res,0)
             return None
         except Exception as e: # pylint: disable=broad-except
@@ -700,6 +708,7 @@ class s7port:
                     # cache hit
                     res = bytearray([
                         self.readingsCache[area][dbnumber][start]])
+                    from snap7.util.getters import get_bool
                     r = get_bool(res,0,index)
                     if self.aw.seriallogflag:
                         self.aw.addserial(f'S7 readBool_cached({area},{dbnumber},{start},{index},{force}) => {r}')
@@ -732,6 +741,7 @@ class s7port:
                 if self.commError: # we clear the previous error and send a message
                     self.commError = False
                     self.aw.qmc.adderror(QApplication.translate('Error Message','S7 Communication Resumed'))
+                from snap7.util.getters import get_bool
                 r = get_bool(res,0,index)
                 if self.aw.seriallogflag:
                     self.aw.addserial(f'S7 readBool({area},{dbnumber},{start},{index},{force}) => {r}')
