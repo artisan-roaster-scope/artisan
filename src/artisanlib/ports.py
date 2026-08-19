@@ -42,6 +42,7 @@ from artisanlib.dialogs import ArtisanDialog, ArtisanResizeablDialog, PortComboB
 from artisanlib.widgets import wait_cursor, ArtisanPlainTextEdit
 from artisanlib.comm import serialport
 from artisanlib.table_style import horizontal_header_style, vertical_header_style
+from artisanlib.device_registry import get_device_name, is_non_serial_device, DEVICE_ID_MAX, DEVICE_ID_NONE, DEVICE_ID_VIRTUAL
 
 
 from PyQt6.QtCore import (Qt, pyqtSlot, QSettings)
@@ -829,7 +830,7 @@ class comportDlg(ArtisanResizeablDialog):
         tab1Layout = QVBoxLayout()
         tab1Layout.addWidget(etbt_help_label)
         devid = self.aw.qmc.device
-        if (((devid not in self.aw.qmc.nonSerialDevices) or (devid == 134 and self.aw.santokerSerial) or (devid == 138 and self.aw.kaleidoSerial)) and
+        if (((not is_non_serial_device(devid)) or (devid == 134 and self.aw.santokerSerial) or (devid == 138 and self.aw.kaleidoSerial)) and
                 not(devid == 0 and self.aw.ser.useModbusPort)): # hide serial confs for MODBUS, Phidget and Yocto devices (but enable for Santoker/Serial)
             grid = QGridLayout()
             grid.addWidget(comportlabel,0,0,Qt.AlignmentFlag.AlignRight)
@@ -1865,21 +1866,21 @@ class comportDlg(ArtisanResizeablDialog):
                 for i in range(nssdevices):
                     if len(self.aw.qmc.extradevices) > i:
                         devid = self.aw.qmc.extradevices[i]
-                        if devid == 18: # manual device not available among extra devices
-                            devid = 25
+                        if devid == DEVICE_ID_NONE: # manual device not available among extra devices
+                            devid = DEVICE_ID_VIRTUAL
                         try:
-                            devicename = self.aw.qmc.devices[max(0,devid-1)]
+                            devicename = get_device_name(devid)
                         except Exception: # pylint: disable=broad-except
                             # if referenced device id is out of range we resolve to the default
-                            devicename = self.aw.qmc.devices[24] # +Virtual
-                            devid = 25
+                            devid = DEVICE_ID_VIRTUAL # +Virtual
+                            devicename = get_device_name(devid)
                         if devicename[0] == '+':
                             devname = devicename[1:]
                         else:
                             devname = devicename
                         device = QTableWidgetItem(devname)    #type identification of the device. Non editable
                         self.serialtable.setItem(i,0,device)
-                        if (devid not in self.aw.qmc.nonSerialDevices) and devid != 29 and devicename[0] != '+': # hide serial confs for MODBUS, Phidgets and "+X" extra devices
+                        if not is_non_serial_device(devid) and devid != 29 and devicename[0] != '+': # hide serial confs for MODBUS, Phidgets and "+X" extra devices
                             comportComboBox = PortComboBox(selection = self.aw.extracomport[i])
                             comportComboBox.activated.connect(self.portComboBoxIndexChanged)
                             comportComboBox.setMinimumContentsLength(15)
@@ -1922,11 +1923,11 @@ class comportDlg(ArtisanResizeablDialog):
             for i in range(ser_ports):
                 if len(self.aw.qmc.extradevices) > i:
                     devid = self.aw.qmc.extradevices[i]
-                    if devid == 18: # manual extra device not available
-                        devid = 25 # virtual
-                    if devid-1 < len(self.aw.qmc.devices):
-                        devicename = self.aw.qmc.devices[devid-1]    #type identification of the device. Non editable
-                        if (devid not in self.aw.qmc.nonSerialDevices) and devid != 29 and devicename[0] != '+': # hide serial confs for MODBUS and "+XX" extra devices
+                    if devid == DEVICE_ID_NONE: # manual extra device not available
+                        devid = DEVICE_ID_VIRTUAL # virtual
+                    if devid <= DEVICE_ID_MAX:
+                        devicename = get_device_name(devid)    #type identification of the device. Non editable
+                        if not is_non_serial_device(devid) and devid != 29 and devicename[0] != '+': # hide serial confs for MODBUS and "+XX" extra devices
                             comportComboBox = cast(PortComboBox, self.serialtable.cellWidget(i,1))
                             self.aw.extracomport[i] = str(comportComboBox.getSelection())
                             baudComboBox = cast(QComboBox, self.serialtable.cellWidget(i,2))
@@ -2017,7 +2018,7 @@ class comportDlg(ArtisanResizeablDialog):
         timeout = comma2dot(str(self.timeoutEdit.text()))
         #save extra serial ports by reading the serial extra table
         self.saveserialtable()
-        if (self.aw.qmc.device not in self.aw.qmc.nonSerialDevices) and not(self.aw.qmc.device == 0 and self.aw.ser.useModbusPort): # only if serial conf is not hidden
+        if not is_non_serial_device(self.aw.qmc.device) and not(self.aw.qmc.device == 0 and self.aw.ser.useModbusPort): # only if serial conf is not hidden
             try:
                 #check here comport errors
                 if not comport:

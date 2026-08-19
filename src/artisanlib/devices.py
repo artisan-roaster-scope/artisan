@@ -46,6 +46,7 @@ from artisanlib.dialogs import ArtisanResizeablDialog, tareDlg
 from artisanlib.widgets import MyContentLimitedQComboBox, MyQComboBox, MyQDoubleSpinBox
 from artisanlib.scale import SUPPORTED_SCALES
 from artisanlib.table_style import horizontal_header_style, vertical_header_style
+from artisanlib.device_registry import DEVICES, DEVICE_ID_NONE, DEVICE_ID_VIRTUAL, is_non_serial_device, get_device_name, get_device_id
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
@@ -137,7 +138,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         # devices with a first letter "+" are extra devices an depend on another device
         # each device provides 2 curves
         #don't show devices with a "-". Devices with a - at front are either a pid, arduino, or an external program
-        dev = self.aw.qmc.devices[:]             #deep copy
+        dev = DEVICES[:]             #deep copy
         limit = len(dev)
         for _ in range(limit):
             for i, _ in enumerate(dev):
@@ -222,7 +223,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.nonpidButton.setChecked(True)          #else
             selected_device_index = 0
             try:
-                selected_device_index = self.sorted_devices.index(self.aw.qmc.devices[self.aw.qmc.device - 1])
+                selected_device_index = self.sorted_devices.index(get_device_name(self.aw.qmc.device))
             except Exception: # pylint: disable=broad-except
                 pass
             self.devicetypeComboBox.setCurrentIndex(selected_device_index)
@@ -2861,7 +2862,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
             fixed_size_sections = [7,8,9,10,11,12,13,14]
             if nddevices:
-                dev = self.aw.qmc.devices[:]             #deep copy
+                dev = DEVICES[:]             #deep copy
                 limit = len(dev)
                 for _ in range(limit):
                     for i, _ in enumerate(dev):
@@ -2879,11 +2880,10 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                         typeComboBox.addItems(devices[:])
                         dev_name:str
                         try:
-                            dev_name = self.aw.qmc.devices[max(0,self.aw.qmc.extradevices[i]-1)]
-                            if dev_name == 'NONE': # manual device not available among extra devices
-                                dev_name = self.aw.qmc.devices[24] # +Virtual
+                            # manual device (NONE) not available among extra devices
+                            dev_name = (get_device_name(DEVICE_ID_VIRTUAL) if self.aw.qmc.extradevices[i] == DEVICE_ID_NONE else get_device_name(self.aw.qmc.extradevices[i]))
                         except Exception: # pylint: disable=broad-except
-                            dev_name = self.aw.qmc.devices[24] # +Virtual
+                            dev_name = get_device_name(DEVICE_ID_VIRTUAL)
                         if dev_name[0] == '+':
                             dev_name = dev_name[1:]
                         typeComboBox.setCurrentIndex(devices.index(dev_name))
@@ -3344,12 +3344,12 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 mexpr1edit = cast(QLineEdit, self.devicetable.cellWidget(i,5))
                 mexpr2edit = cast(QLineEdit, self.devicetable.cellWidget(i,6))
                 try:
-                    self.aw.qmc.extradevices[i] = self.aw.qmc.devices.index(str(typecombobox.currentText())) + 1
+                    self.aw.qmc.extradevices[i] = get_device_id(typecombobox.currentText())
                 except Exception: # pylint: disable=broad-except
                     try: # might be a +device
-                        self.aw.qmc.extradevices[i] = self.aw.qmc.devices.index('+' + str(typecombobox.currentText())) + 1
+                        self.aw.qmc.extradevices[i] = get_device_id(f'+{typecombobox.currentText()}')
                     except Exception: # pylint: disable=broad-except
-                        self.aw.qmc.extradevices[i] = 25
+                        self.aw.qmc.extradevices[i] = DEVICE_ID_VIRTUAL
                 self.aw.qmc.extraname1[i] = name1edit.text()
                 self.aw.qmc.extraname2[i] = name2edit.text()
 
@@ -5066,7 +5066,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.aw.sendmessage(message)
             #open serial conf Dialog
             #if device is not None or not external-program (don't need serial settings config)
-            if (self.aw.qmc.device not in self.aw.qmc.nonSerialDevices or (self.aw.qmc.device == 134 and self.aw.santokerSerial) or
+            if (not is_non_serial_device(self.aw.qmc.device) or (self.aw.qmc.device == 134 and self.aw.santokerSerial) or
                 (self.aw.qmc.device == 138 and self.aw.kaleidoSerial)) and (self.aw.qmc.device != 50) and self.TabWidget.currentIndex() in {0,1,6}:
                 QTimer.singleShot(700, self.aw.setcommport)
             self.close()

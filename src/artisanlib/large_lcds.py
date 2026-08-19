@@ -92,11 +92,13 @@ class LargeLCDs(ArtisanResizeablDialog):
 
     @override
     def resizeEvent(self, a0:'QResizeEvent|None') -> None:
-        super().resizeEvent(a0)
+        self.setUpdatesEnabled(False)
         if a0 is not None:
             w = a0.size().width()
             h = a0.size().height()
             self.chooseLayout(w,h)
+        super().resizeEvent(a0)
+        self.setUpdatesEnabled(True)
 
     def landscapeLayout(self) -> 'QLayout':
         self.tight = False
@@ -135,7 +137,7 @@ class LargeLCDs(ArtisanResizeablDialog):
         else:
             self.lowerLabelssvisibility(True)
         if all(ll.text().strip() == '' for ll in (self.lcds1labelsUpper + self.lcds2labelsUpper)):
-            # all lower labels empty, hide them to gain space
+            # all upper labels empty, hide them to gain space
             self.upperLabelssvisibility(False)
         else:
             self.upperLabelssvisibility(True)
@@ -168,13 +170,13 @@ class LargeLCDs(ArtisanResizeablDialog):
     def lowerLabelssvisibility(self, b:bool) -> None:
         lower_labels = [val for pair in zip(self.lcds1labelsLower, self.lcds2labelsLower, strict=True) for val in pair]
         for i, ll in enumerate(lower_labels):
-            if len(self.visibleFrames) > i and ll.isHidden() == b:
+            if len(self.visibleFrames) > i and ll.isVisible() != b:
                 ll.setVisible(b)
 
     def upperLabelssvisibility(self, b:bool) -> None:
         upper_labels = [val for pair in zip(self.lcds1labelsUpper, self.lcds2labelsUpper, strict=True) for val in pair]
         for i, ll in enumerate(upper_labels):
-            if len(self.visibleFrames) > i and ll.isHidden() == b:
+            if len(self.visibleFrames) > i and ll.isVisible() != b:
                 ll.setVisible(b)
 
     # n the number of layout to be set (0: landscape, 1: portrait)
@@ -250,33 +252,37 @@ class LargeLCDs(ArtisanResizeablDialog):
             except Exception: # pylint: disable=broad-except
                 pass
 
-    def updateStyles(self) -> None:
+    def updateStyles(self, update_labels:bool = True) -> None:
         for i,s in enumerate(self.lcds1styles):
-            try:
-                self.lcds1labelsUpper[i].setStyleSheet(f'QLabel {{ color: {self.aw.lcdpaletteF[s][:7]}; background-color: {self.aw.lcdpaletteB[s][:7]};}}')
-            except Exception: # pylint: disable=broad-except
-                pass
+            if update_labels:
+                try:
+                    self.lcds1labelsUpper[i].setStyleSheet(f'QLabel {{ color: {self.aw.lcdpaletteF[s][:7]}; background-color: {self.aw.lcdpaletteB[s][:7]};}}')
+                except Exception: # pylint: disable=broad-except
+                    pass
             try:
                 self.lcds1[i].setStyleSheet(f'QLCDNumber {{ color: {rgba_colorname2argb_colorname(self.aw.lcdpaletteF[s])}; background-color: {rgba_colorname2argb_colorname(self.aw.lcdpaletteB[s])};}}')
             except Exception: # pylint: disable=broad-except
                 pass
-            try:
-                self.lcds1labelsLower[i].setStyleSheet(f'QLabel {{ color: {self.aw.lcdpaletteF[s][:7]}; background-color: {self.aw.lcdpaletteB[s][:7]};}}')
-            except Exception: # pylint: disable=broad-except
-                pass
+            if update_labels:
+                try:
+                    self.lcds1labelsLower[i].setStyleSheet(f'QLabel {{ color: {self.aw.lcdpaletteF[s][:7]}; background-color: {self.aw.lcdpaletteB[s][:7]};}}')
+                except Exception: # pylint: disable=broad-except
+                    pass
         for i,s in enumerate(self.lcds2styles):
-            try:
-                self.lcds2labelsUpper[i].setStyleSheet(f'QLabel {{ color: {self.aw.lcdpaletteF[s][:7]}; background-color: {self.aw.lcdpaletteB[s][:7]};}}')
-            except Exception: # pylint: disable=broad-except
-                pass
+            if update_labels:
+                try:
+                    self.lcds2labelsUpper[i].setStyleSheet(f'QLabel {{ color: {self.aw.lcdpaletteF[s][:7]}; background-color: {self.aw.lcdpaletteB[s][:7]};}}')
+                except Exception: # pylint: disable=broad-except
+                    pass
             try:
                 self.lcds2[i].setStyleSheet(f'QLCDNumber {{ color: {rgba_colorname2argb_colorname(self.aw.lcdpaletteF[s])}; background-color: {rgba_colorname2argb_colorname(self.aw.lcdpaletteB[s])};}}')
             except Exception: # pylint: disable=broad-except
                 pass
-            try:
-                self.lcds2labelsLower[i].setStyleSheet(f'QLabel {{ color: {self.aw.lcdpaletteF[s][:7]}; background-color: {self.aw.lcdpaletteB[s][:7]};}}')
-            except Exception: # pylint: disable=broad-except
-                pass
+            if update_labels:
+                try:
+                    self.lcds2labelsLower[i].setStyleSheet(f'QLabel {{ color: {self.aw.lcdpaletteF[s][:7]}; background-color: {self.aw.lcdpaletteB[s][:7]};}}')
+                except Exception: # pylint: disable=broad-except
+                    pass
 
     # in horizontal layouts we add one more digit per LCD than needed as spacer for separation
     # in vertical layouts we add only the exact number of digits that are needed to fully display the number to save space (tight mode)
@@ -384,9 +390,9 @@ class LargeMainLCDs(LargeLCDs):
             self.lcd0.setStyleSheet(f'QLCDNumber {{ color: {rgba_colorname2argb_colorname(fc)}; background-color: {rgba_colorname2argb_colorname(bc)};}}')
 
     @override
-    def updateStyles(self) -> None:
+    def updateStyles(self, update_labels:bool = True) -> None:
         self.setTimerLCDcolor(self.aw.lcdpaletteF['timer'][:7],self.aw.lcdpaletteB['timer'][:7])
-        super().updateStyles()
+        super().updateStyles( update_labels = update_labels)
 
     @override
     def updateValues(self, values1:list[str|None], values2:list[str|None],
@@ -726,8 +732,8 @@ class LargeExtraLCDs(LargeLCDs):
         self.updateVisibilities(self.aw.extraLCDvisibility1,self.aw.extraLCDvisibility2)
 
     @override
-    def updateStyles(self) -> None:
-        super().updateStyles()
+    def updateStyles(self, update_labels:bool = True) -> None:
+        super().updateStyles(update_labels=False)
         for i,s in enumerate(self.lcds1styles):
             try:
                 self.lcds1labelsUpper[i].setStyleSheet(f'QLabel {{ color: {self.aw.qmc.extradevicecolor1[i][:7]}; background-color: {self.aw.lcdpaletteB[s][:7]};}}')

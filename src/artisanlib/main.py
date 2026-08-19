@@ -211,7 +211,7 @@ from artisanlib.util import (appFrozen, uchr, decodeLocal, decodeLocalStrict, en
         comma2dot, is_proper_temp, weight_units, weight_units_lower, volume_units, float2float, float2str,
         convertWeight, convertVolume, rgba_colorname2argb_colorname, render_weight, serialize, deserialize, csv_load, exportProfile2CSV, findTPint,
         eventtime2string, toDim, signature_message, rec_int_to_float, smooth_list)
-
+from artisanlib.device_registry import DEVICE_ID_MIN, DEVICE_ID_MAX, DEVICE_ID_NONE, DEVICE_ID_VIRTUAL, get_device_name
 from artisanlib.qtsingleapplication import QtSingleApplication
 
 
@@ -1443,7 +1443,7 @@ class ApplicationWindow(QMainWindow):
         'sliderLCD4', 'sliderGrpBox1', 'sliderGrpBox2', 'sliderGrpBox3', 'sliderGrpBox4', 'sliderSV', 'sliderLCDSV', 'sliderGrpBoxSV', 'leftlayout',
         'sliderFrame', 'sliderDock', 'lcdFrame', 'midlayout', 'editgraphdialog', 'artisanviewerFirstStart',
         'buttonpalette', 'extraeventbuttontextcolor', 'extraeventsactions', 'extraeventsdescriptions', 'extraeventstypes', 'extraeventsvalues',
-        'extraeventsvisibility', 'fileSaveAsAction', 'keyboardButtonStyles', 'language_menu_actions', 'loadThemeAction', 'main_button_min_width_str',
+        'extraeventsvisibility', 'fileSaveAsAction', 'keyboardButtonStyles', 'language_menu_actions', 'loadThemeAction',
         'minieventleft', 'minieventright', 'notificationManager', 'notificationsflag', 'ntb', 'productionPDFAction',
         'rankingPDFAction', 'roastReportMenu', 'roastReportPDFAction', 'saveAsThemeAction', 'sliderGrp12', 'sliderGrp34', 'sliderGrpBox1x', 'sliderGrpBox2x', 'sliderGrpBox3x', 'sliderGrpBox4x',
         'small_button_min_width_str', 'standard_button_min_width_px', 'tiny_button_min_width_str', 'recording_version', 'recording_revision', 'recording_build',
@@ -1455,7 +1455,8 @@ class ApplicationWindow(QMainWindow):
         'main_menu_actions_with_shortcuts', 'ui_mode', 'UIModeMenu',  'productionModeAction', 'defaultModeAction', 'expertModeAction', 'calculatorAction',
         'helpAboutAction', 'checkUpdateAction', 'errorAction', 'messageAction', 'serialAction', 'platformAction', 'aboutQtAction',
         'helpDocumentationAction', 'KshortCAction', 'profile_data_type_adapter', 'official_build', 'roasthubs_org_id', 'roasthubs_machine_id', 'roasthubs_token',
-        'qt_scale_factor' ]
+        'qt_scale_factor', 'automatic_registration_period', 'mqtt', 'orbiter', 'machineNameAction', 'main_button_min_width', 'main_button_min_width', 'pidbuttonFrame', 'phasesLCDsFrame', 'machineNameAction', 'automatic_registration_period',
+         ]
 
     nLCDS: Final[int] = 10 # maximum number of LCDs and extra devices (2x10 => 20 in total!)
 
@@ -2761,53 +2762,40 @@ class ApplicationWindow(QMainWindow):
         f = self.messagelabel.font()
         f.setPointSize(self.messagelabel.font().pointSize()+1)
         self.messagelabel.setFont(f)
-
         self.messagelabel.setIndent(6)
+
         # set a few broad style parameters
         if platform.system() == 'Linux':
             self.button_font_size_pt = 11
         else:
             self.button_font_size_pt = 13
 
+        self.button_font_size = self.button_font_size_pt
         if platform.system() == 'Windows':
-            self.button_font_size = self.button_font_size_pt - 2
+            self.button_font_size_small = self.button_font_size_pt
+            self.button_font_size_tiny = self.button_font_size_pt - 1
+            self.button_font_size_micro = self.button_font_size_pt - 2
         else:
-            self.button_font_size = self.button_font_size_pt
-        self.button_font_size_small = self.button_font_size_pt - 3
-        self.button_font_size_tiny = self.button_font_size_pt - 4
-        self.button_font_size_micro = self.button_font_size_pt - 5
+            self.button_font_size_small = self.button_font_size_pt - 3
+            self.button_font_size_tiny = self.button_font_size_pt - 4
+            self.button_font_size_micro = self.button_font_size_pt - 5
 
-        if platform.system() == 'Windows':
-            self.button_font_size_pt = self.button_font_size_pt - 2
-
-        self.main_button_min_width_str: str
+        self.main_button_min_width:int
+        self.standard_button_min_width_px: int
         self.small_button_min_width_str: str
         self.tiny_button_min_width_str: str
-        self.standard_button_min_width_px: int
 
         # button width in px
         if platform.system() == 'Windows':
-            # TODO: remove # pylint: disable=fixme
-            self.main_button_min_width_str = '110px'
             self.main_button_min_width = 110
+            self.standard_button_min_width_px = 90
             self.small_button_min_width_str = '75px'
             self.tiny_button_min_width_str = '60px'
-            # TODO: keep # pylint: disable=fixme
-#            self.main_button_min_width_px = 110
-            self.standard_button_min_width_px = 90
-#            self.small_button_min_width_px = 75
-#            self.tiny_button_min_width_px = 60
         else:
-            # TODO: remove # pylint: disable=fixme
-            self.main_button_min_width_str = '100px'
             self.main_button_min_width = 100
+            self.standard_button_min_width_px = 75
             self.small_button_min_width_str = '60px'
             self.tiny_button_min_width_str = '50px'
-            # TODO: keep # pylint: disable=fixme
-#            self.main_button_min_width_px = 100
-            self.standard_button_min_width_px = 75
-#            self.small_button_min_width_px = 60
-#            self.tiny_button_min_width_px = 50
 
         # we use this high to dynamically adjust the button size to different font sizes (important for high-dpi displays on Windows)
         self.standard_button_tiny_height:int
@@ -3175,8 +3163,12 @@ class ApplicationWindow(QMainWindow):
         # We set the styles of event buttons assigned to self.lowerbuttondialog here
         # All stylesheet of its children (the actual event buttons) needs to be non-conflicting.
         # Any conflict will turn off merging of parent styles and just rely on the child stylesheet.
-        button_font_size_small_pt = self.button_font_size_pt - 3
-        button_font_size_small_selected_pt = self.button_font_size_pt - 2
+        if platform.system() == 'Windows':
+            button_font_size_small_pt = self.button_font_size_pt
+            button_font_size_small_selected_pt = self.button_font_size_pt + 1
+        else:
+            button_font_size_small_pt = self.button_font_size_pt - 3
+            button_font_size_small_selected_pt = self.button_font_size_pt - 2
         self.lowerbuttondialog.setStyleSheet(
             artisan_event_button_style.format(
                 min_width=self.standard_button_min_width_px - 6,
@@ -15310,7 +15302,7 @@ class ApplicationWindow(QMainWindow):
     def getExtraDeviceSettings(self, settings:QSettings) -> None:
         self.qmc.extradevices = [toInt(x) for x in toList(settings.value('extradevices',self.qmc.extradevices))]
         # not in the device ids are shifted by relative to the (zero-based) positions in self.qmc.device as the first entry is idx=1 (idx=0 is reserved for FUJI PID)
-        self.qmc.extradevices = [(x if (0 < x <= len(self.qmc.devices) and x != 18) else 25) for x in self.qmc.extradevices] # if out of range (note index is shifted by 1) or NONE, set to VIRTUAL
+        self.qmc.extradevices = [(x if (DEVICE_ID_MIN < x <= DEVICE_ID_MAX and x != DEVICE_ID_NONE) else DEVICE_ID_VIRTUAL) for x in self.qmc.extradevices] # if out of range (note index is shifted by 1) or NONE, set to VIRTUAL
         self.qmc.extraname1 = list(map(str,list(toStringList(settings.value('extraname1',self.qmc.extraname1)))))
         self.qmc.extraname2 = list(map(str,list(toStringList(settings.value('extraname2',self.qmc.extraname2)))))
         self.qmc.extramathexpression1 = list(map(str,list(toStringList(settings.value('extramathexpression1',self.qmc.extramathexpression1)))))
@@ -17041,7 +17033,7 @@ class ApplicationWindow(QMainWindow):
             try:
                 ds = list(self.qmc.extradevices)
                 ds.insert(0,self.qmc.device)
-                profile['devices'] = [('PID' if d==0 else (self.qmc.devices[24] if d > len(self.qmc.devices) else self.qmc.devices[d-1])) for d in ds]
+                profile['devices'] = [('PID' if d<=0 else (get_device_name(DEVICE_ID_VIRTUAL) if d > DEVICE_ID_MAX else get_device_name(d))) for d in ds]
             except Exception: # pylint: disable=broad-except
                 pass
             profile['elevation'] = self.qmc.elevation
@@ -18066,9 +18058,9 @@ class ApplicationWindow(QMainWindow):
                     setDeviceDebugLogLevel(self.qmc.device_logging)
                 except Exception: # pylint: disable=broad-except
                     pass
-            self.qmc.device = toInt(settings.value('id',self.qmc.device))
-            if self.qmc.device < 0 or self.qmc.device-1 >= len(self.qmc.devices):
-                self.qmc.device = 18
+            self.qmc.device = max(0, toInt(settings.value('id',self.qmc.device)))
+            if not DEVICE_ID_MIN <= self.qmc.device <= DEVICE_ID_MAX:
+                self.qmc.device = DEVICE_ID_NONE
             # Phidget configurations
             self.qmc.phidget1048_types = [toInt(x) for x in toList(settings.value('phidget1048_types',self.qmc.phidget1048_types))]
             self.qmc.phidget1048_async = [toBool(x) for x in toList(settings.value('phidget1048_async',self.qmc.phidget1048_async))]
@@ -19007,7 +18999,7 @@ class ApplicationWindow(QMainWindow):
 
             try:
                 _log.info('machine: %s (%s, %skg, %s)', self.qmc.machinesetup, self.qmc.roastertype_setup, self.qmc.roastersize_setup, ([''] + self.qmc.sourcenames)[self.qmc.roasterheating_setup])
-                _log.info('device: %s (%s extra devices)', ('??' if self.qmc.device > len(self.qmc.devices) else (['PID']+self.qmc.devices)[self.qmc.device]), len(self.qmc.extradevices))
+                _log.info('device: %s (%s extra devices)', ('PID' if self.qmc.device <= 0 else ('??' if not (DEVICE_ID_MIN <= self.qmc.device <= DEVICE_ID_MAX) else get_device_name(self.qmc.device))), len(self.qmc.extradevices))
                 _log.info('serial: %s @%s', self.ser.comport, self.ser.baudrate)
                 _log.info('MODBUS %s: %s, %s %s%s%s@%s (%s, %s, %s / %s, %s)', ['Serial RTU','Serial ASCII','Serial Binary','TCP','UDP'][self.modbus.type],
                         self.modbus.host, self.modbus.comport, self.modbus.bytesize, self.modbus.parity, self.modbus.stopbits, self.modbus.baudrate, self.modbus.timeout, self.modbus.modbus_serial_connect_delay, self.modbus.serial_readRetries, self.modbus.IP_timeout, self.modbus.IP_retries)

@@ -9,7 +9,7 @@ v4.2.2
   - adds support for [Dutch Master Roasters](https://artisan-scope.org/machines/dmr/)
   - adds support for [RoastHubs](https://roasthubs.com/)
   - adds autoCHARGE/DROP and drum speed control to the [Schuilenburg](https://artisan-scope.org/machines/schuilenburg/) PLC machine setup
-  - adds autoCHARGE/autoDROP recognition to the [IMF](https://artisan-scope.org/machines/imf/) 'control' setup which picks up CHARGE and DROP events from the machine
+  - adds autoCHARGE/autoDROP recognition for [IMF](https://artisan-scope.org/machines/imf/) as 'auto' setup which picks up CHARGE and DROP events from the machine
   - adds UI scaling factor
   - adds [Catppuccin](https://github.com/catppuccin) themes by Liam
   - adds two more MODBUS device channels
