@@ -1455,7 +1455,7 @@ class ApplicationWindow(QMainWindow):
         'main_menu_actions_with_shortcuts', 'ui_mode', 'UIModeMenu',  'productionModeAction', 'defaultModeAction', 'expertModeAction', 'calculatorAction',
         'helpAboutAction', 'checkUpdateAction', 'errorAction', 'messageAction', 'serialAction', 'platformAction', 'aboutQtAction',
         'helpDocumentationAction', 'KshortCAction', 'profile_data_type_adapter', 'official_build', 'roasthubs_org_id', 'roasthubs_machine_id', 'roasthubs_token',
-        'qt_scale_factor', 'automatic_registration_period', 'mqtt', 'orbiter', 'machineNameAction', 'main_button_min_width', 'main_button_min_width', 'pidbuttonFrame', 'phasesLCDsFrame', 'machineNameAction', 'automatic_registration_period',
+        'qt_scale_factor', 'automatic_registration_period', 'mqtt', 'orbiter', 'machineNameAction', 'main_button_min_width', 'main_button_min_width', 'pidbuttonFrame', 'phasesLCDsFrame', 'machineNameAction', 'automatic_registration_period', 'label_fmt', 'lcd_label_fmt', 'button_border_radius',
          ]
 
     nLCDS: Final[int] = 10 # maximum number of LCDs and extra devices (2x10 => 20 in total!)
@@ -2759,23 +2759,25 @@ class ApplicationWindow(QMainWindow):
         #create a Label object to display program status information
         self.messagelabel: QLabel = QLabel()
         self.messagelabel.setContentsMargins(15,0,5,8) # left, top, right, bottom
-        f = self.messagelabel.font()
-        f.setPointSize(self.messagelabel.font().pointSize()+1)
-        self.messagelabel.setFont(f)
+        if platform.system() != 'Linux':
+            f = self.messagelabel.font()
+            f.setPointSize(self.messagelabel.font().pointSize()+1)
+            self.messagelabel.setFont(f)
         self.messagelabel.setIndent(6)
 
         # set a few broad style parameters
-        if platform.system() == 'Linux':
-            self.button_font_size_pt = 11
-        else:
-            self.button_font_size_pt = 13
 
-        self.button_font_size = self.button_font_size_pt
+        self.button_border_radius = (15 if platform.system() == 'Linux' else 20)
+        self.button_font_size_pt = 13
+
+
         if platform.system() == 'Windows':
+            self.button_font_size = self.button_font_size_pt + 1
             self.button_font_size_small = self.button_font_size_pt
             self.button_font_size_tiny = self.button_font_size_pt - 1
             self.button_font_size_micro = self.button_font_size_pt - 2
         else:
+            self.button_font_size = self.button_font_size_pt
             self.button_font_size_small = self.button_font_size_pt - 3
             self.button_font_size_tiny = self.button_font_size_pt - 4
             self.button_font_size_micro = self.button_font_size_pt - 5
@@ -2815,7 +2817,10 @@ class ApplicationWindow(QMainWindow):
 
         self.buttonONOFF = QPushButton(QApplication.translate('Button', 'ON'))
         self.buttonONOFF.setToolTip(QApplication.translate('Tooltip', 'Start monitoring'))
-        self.buttonONOFF.setStyleSheet(artisan_push_button_style_dict['OFF'].format(min_width=self.main_button_min_width, font_size=self.button_font_size))
+        self.buttonONOFF.setStyleSheet(artisan_push_button_style_dict['OFF'].format(
+            min_width=self.main_button_min_width,
+            font_size=self.button_font_size,
+            border_radius=self.button_border_radius))
         self.buttonONOFF.clicked.connect(self.qmc.ToggleMonitor)
         if self.app.artisanviewerMode:
             self.buttonONOFF.setVisible(False)
@@ -2823,7 +2828,10 @@ class ApplicationWindow(QMainWindow):
         #create START/STOP buttons
         self.buttonSTARTSTOP = QPushButton(QApplication.translate('Button', 'START'))
         self.buttonSTARTSTOP.setToolTip(QApplication.translate('Tooltip', 'Start recording'))
-        self.buttonSTARTSTOP.setStyleSheet(artisan_push_button_style_dict['STOP'].format(min_width=self.main_button_min_width, font_size=self.button_font_size))
+        self.buttonSTARTSTOP.setStyleSheet(artisan_push_button_style_dict['STOP'].format(
+            min_width=self.main_button_min_width,
+            font_size=self.button_font_size,
+            border_radius=self.button_border_radius))
         self.buttonSTARTSTOP.clicked.connect(self.qmc.ToggleRecorder)
         if self.app.artisanviewerMode:
             self.buttonSTARTSTOP.setVisible(False)
@@ -2831,12 +2839,18 @@ class ApplicationWindow(QMainWindow):
         #create RESET button
         self.buttonRESET = QPushButton(QApplication.translate('Button', 'RESET'))
         self.buttonRESET.setToolTip(QApplication.translate('Tooltip', 'Reset'))
-        self.buttonRESET.setStyleSheet(artisan_push_button_style_dict['RESET'].format(min_width=self.main_button_min_width, font_size=self.button_font_size))
+        self.buttonRESET.setStyleSheet(artisan_push_button_style_dict['RESET'].format(
+            min_width=self.main_button_min_width,
+            font_size=self.button_font_size,
+            border_radius=self.button_border_radius))
         self.buttonRESET.clicked.connect(self.qmc.resetButtonAction)
 
         #create PID control button
         self.buttonCONTROL = QPushButton(QApplication.translate('Button', 'CONTROL'))
-        self.buttonCONTROL.setStyleSheet(artisan_push_button_style_dict['PID'].format(min_width=self.main_button_min_width, font_size=self.button_font_size))
+        self.buttonCONTROL.setStyleSheet(artisan_push_button_style_dict['PID'].format(
+            min_width=self.main_button_min_width,
+            font_size=self.button_font_size,
+            border_radius=self.button_border_radius))
         self.buttonCONTROL.clicked.connect(self.PIDcontrol)
         if self.app.artisanviewerMode:
             self.buttonCONTROL.setVisible(False)
@@ -2907,7 +2921,10 @@ class ApplicationWindow(QMainWindow):
         self.buttonSVm5 = QPushButton(QApplication.translate('Button', 'SV -5'))
         self.buttonSVm5.setToolTip(QApplication.translate('Tooltip', 'Decreases the current SV value by 5'))
 
-        sv_plus_style = artisan_sv_plus_push_button_style.format(min_width=self.standard_button_min_width_px, font_size=self.button_font_size_small)
+        sv_plus_style = artisan_sv_plus_push_button_style.format(
+            min_width=self.standard_button_min_width_px,
+            font_size=self.button_font_size_small,
+            border_radius=self.button_border_radius)
         for button in [self.buttonSVp5, self.buttonSVp10, self.buttonSVp20]:
             button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             button.setStyleSheet(sv_plus_style)
@@ -2915,7 +2932,10 @@ class ApplicationWindow(QMainWindow):
             button.setMinimumHeight(self.standard_button_height)
             button.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
-        sv_minus_style = artisan_sv_minus_push_button_style.format(min_width=self.standard_button_min_width_px, font_size=self.button_font_size_small)
+        sv_minus_style = artisan_sv_minus_push_button_style.format(
+            min_width=self.standard_button_min_width_px,
+            font_size=self.button_font_size_small,
+            border_radius=self.button_border_radius)
         for button in [self.buttonSVm20, self.buttonSVm10, self.buttonSVm5]:
             button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             button.setStyleSheet(sv_minus_style)
@@ -2983,25 +3003,29 @@ class ApplicationWindow(QMainWindow):
         self.lcd6.setToolTip(QApplication.translate('Tooltip', 'Value of SV in PID'))
         self.lcd7.setToolTip(QApplication.translate('Tooltip', 'PID power %'))
 
+
+        self.lcd_label_fmt = ('<b>{}</b>' if platform.system() == 'Linux' else '<big><b>{}</b></big>')
+        self.extra_lcd_label_fmt = ('<small><b></small>{}</b>' if platform.system() == 'Linux' else '<b>{}</b>')
+
         #MET
         self.label2:QLabel = QLabel()
         self.label2.setAlignment(Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignRight)
-        self.label2.setText(f"<big><b>{QApplication.translate('Label', 'ET')}</b></big>")
+        self.label2.setText(self.lcd_label_fmt.format(QApplication.translate('Label', 'ET')))
         self.setLabelColor(self.label2,self.qmc.palette['et'], self.qmc.ETcurve)
         #BT
         self.label3:QLabel = QLabel()
         self.label3.setAlignment(Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignRight)
-        self.label3.setText(f"<big><b>{QApplication.translate('Label', 'BT')}</b></big>")
+        self.label3.setText(self.lcd_label_fmt.format(QApplication.translate('Label', 'BT')))
         self.setLabelColor(self.label3,self.qmc.palette['bt'], self.qmc.BTcurve)
         #DELTA MET
         self.label4:QLabel = QLabel()
         self.label4.setAlignment(Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignRight)
-        self.label4.setText(f"{deltaLabelBigPrefix}{QApplication.translate('Label', 'ET')}</b></big>")
+        self.label4.setText(f"{deltaLabelBigPrefix}{self.lcd_label_fmt.format(QApplication.translate('Label', 'ET'))}")
         self.setLabelColor(self.label4,self.qmc.palette['deltaet'], self.qmc.DeltaETflag)
         # DELTA BT
         self.label5:QLabel = QLabel()
         self.label5.setAlignment(Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignRight)
-        self.label5.setText(f"{deltaLabelBigPrefix}{QApplication.translate('Label', 'BT')}</b></big>")
+        self.label5.setText(f"{deltaLabelBigPrefix}{self.lcd_label_fmt.format(QApplication.translate('Label', 'BT'))}")
         self.setLabelColor(self.label5,self.qmc.palette['deltabt'], self.qmc.DeltaBTflag)
         # pid sv
         self.label6:QLabel = QLabel()
@@ -3366,9 +3390,11 @@ class ApplicationWindow(QMainWindow):
 
         # phases LCDs
 
+        self.label_fmt = ('<sub><b>{}</b></sub>' if platform.system() == 'Linux' else '<small><b>{}</b></small>')
+
         # TP
         self.TPlabel: QLabel = QLabel()
-        self.TPlabel.setText('<small><b>' + QApplication.translate('Label', 'TP') + '&raquo;</b></small>')
+        self.TPlabel.setText(self.label_fmt.format(QApplication.translate('Label', 'TP')))
         self.TPlcd = QLCDNumber()
         self.TPlcd.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.TPlcd.customContextMenuRequested.connect(self.PhaseslcdClicked)
@@ -3386,7 +3412,7 @@ class ApplicationWindow(QMainWindow):
 
         # DRY
         self.DRYlabel: QLabel = QLabel()
-        self.DRYlabel.setText('<small><b>&raquo;' + QApplication.translate('Label', 'DRY') + '</b></small>')
+        self.DRYlabel.setText(self.label_fmt.format(QApplication.translate('Label', 'DRY')))
         self.DRYlcd = QLCDNumber()
         self.DRYlcd.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.DRYlcd.customContextMenuRequested.connect(self.PhaseslcdClicked)
@@ -3404,7 +3430,7 @@ class ApplicationWindow(QMainWindow):
 
         # FCs
         self.FCslabel: QLabel = QLabel()
-        self.FCslabel.setText('<small><b>&raquo;' + QApplication.translate('Label', 'FCs') + '</b></small>')
+        self.FCslabel.setText(self.label_fmt.format(QApplication.translate('Label', 'FCs')))
         self.FCslcd = QLCDNumber()
         self.FCslcd.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.FCslcd.customContextMenuRequested.connect(self.PhaseslcdClicked)
@@ -3413,7 +3439,7 @@ class ApplicationWindow(QMainWindow):
 
         # AUC LCD
         self.AUClabel: QLabel = QLabel()
-        self.AUClabel.setText('<small><b>' + QApplication.translate('Label', 'AUC') + '</b></small>')
+        self.AUClabel.setText(self.label_fmt.format(QApplication.translate('Label', 'AUC')))
         self.AUClcd: QLCDNumber = QLCDNumber()
         self.AUClcd.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.AUClcd.customContextMenuRequested.connect(self.AUClcdClicked)
@@ -5289,19 +5315,19 @@ class ApplicationWindow(QMainWindow):
 
     def establish_etypes(self) -> None:
         # update ET/BT LCD label substitutions
-        ETname = self.qmc.device_name_subst(self.ETname)
-        BTname = self.qmc.device_name_subst(self.BTname)
-        self.label2.setText(f'<big><b>{ETname}</b></big>')
-        self.label3.setText(f'<big><b>{BTname}</b></big>')
+        ETname = self.lcd_label_fmt.format(self.qmc.device_name_subst(self.ETname))
+        BTname = self.lcd_label_fmt.format(self.qmc.device_name_subst(self.BTname))
+        self.label2.setText(self.lcd_label_fmt.format(ETname))
+        self.label3.setText(self.lcd_label_fmt.format(BTname))
         # update ET/BT Delta LCD label substitutions
-        self.label4.setText(f'{deltaLabelBigPrefix}{ETname}</b></big>')
-        self.label5.setText(f'{deltaLabelBigPrefix}{BTname}</b></big>')
+        self.label4.setText(f'{deltaLabelBigPrefix}{self.lcd_label_fmt.format(ETname)}')
+        self.label5.setText(f'{deltaLabelBigPrefix}{self.lcd_label_fmt.format(BTname)}')
         # update extra LCD label substitutions
         for i in range(len(self.qmc.extradevices)):
             if i < len(self.qmc.extraname1):
-                self.extraLCDlabel1[i].setText('<b>' + self.qmc.device_name_subst(self.qmc.extraname1[i]) + '</b>')
+                self.extraLCDlabel1[i].setText(self.extra_lcd_label_fmt.format(self.qmc.device_name_subst(self.qmc.extraname1[i])))
             if i < len(self.qmc.extraname2):
-                self.extraLCDlabel2[i].setText('<b>' + self.qmc.device_name_subst(self.qmc.extraname2[i]) + '</b>')
+                self.extraLCDlabel2[i].setText(self.extra_lcd_label_fmt.format(self.qmc.device_name_subst(self.qmc.extraname2[i])))
         self.settooltip()
 
     def populateListMenu(self, resourceName:str, ext:str, triggered:Callable[[bool], None], menu:QMenu, addMenu:bool = True,
@@ -7889,7 +7915,6 @@ class ApplicationWindow(QMainWindow):
                 TP,TPlabel,DRY,DRYlabel,FCs,FCslabel,TP2DRYlabel,DRY2FCslabel,TP2DRYframeTooltip,DRY2FCsframeTooltip,phasesLCDsTooltip = self.getPhasesLCDsData()
 
                 if self.qmc.phasesLCDflag:
-                    label_fmt = '<small><b>{}</b></small>'
                     #
                     if TP is not None:
                         self.TPlcd.display(TP)
@@ -7899,11 +7924,11 @@ class ApplicationWindow(QMainWindow):
                         self.FCslcd.display(FCs)
                     #
                     if TPlabel is not None:
-                        self.TPlabel.setText(label_fmt.format(TPlabel))
+                        self.TPlabel.setText(self.label_fmt.format(TPlabel))
                     if DRYlabel is not None:
-                        self.DRYlabel.setText(label_fmt.format(DRYlabel))
+                        self.DRYlabel.setText(self.label_fmt.format(DRYlabel))
                     if FCslabel is not None:
-                        self.FCslabel.setText(label_fmt.format(FCslabel))
+                        self.FCslabel.setText(self.label_fmt.format(FCslabel))
                     #
                     if TP2DRYlabel is not None:
                         self.TP2DRYlabel.setText(TP2DRYlabel)
@@ -11807,14 +11832,12 @@ class ApplicationWindow(QMainWindow):
             if i < self.nLCDS:
                 self.extraLCDframe1[i].setVisible(bool(self.extraLCDvisibility1[i]))
                 if i < len(self.qmc.extraname1):
-                    l1 = '<b>' + self.qmc.device_name_subst(self.qmc.extraname1[i]) + '</b>'
-                    self.extraLCDlabel1[i].setText(l1)
+                    self.extraLCDlabel1[i].setText(self.extra_lcd_label_fmt.format(self.qmc.device_name_subst(self.qmc.extraname1[i])))
                     self.setLabelColor(self.extraLCDlabel1[i],self.qmc.extradevicecolor1[i], self.extraCurveVisibility1[i])
                 self.updateLCDcolor(self.extraLCD1[i], 'sv')
                 self.extraLCDframe2[i].setVisible(bool(self.extraLCDvisibility2[i]))
                 if i < len(self.qmc.extraname2):
-                    l2 = '<b>' + self.qmc.device_name_subst(self.qmc.extraname2[i]) + '</b>'
-                    self.extraLCDlabel2[i].setText(l2)
+                    self.extraLCDlabel2[i].setText(self.extra_lcd_label_fmt.format(self.qmc.device_name_subst(self.qmc.extraname2[i])))
                     self.setLabelColor(self.extraLCDlabel2[i],self.qmc.extradevicecolor2[i], self.extraCurveVisibility2[i])
                 self.updateLCDcolor(self.extraLCD2[i], 'sv')
         #hide the rest (just in case)
@@ -12657,13 +12680,25 @@ class ApplicationWindow(QMainWindow):
     def resetKeyboardButtonMarks(self) -> None:
         if self.qmc.flagon:
             if self.simulator:
-                self.buttonONOFF.setStyleSheet(artisan_simulator_push_button_style_dict['ON'].format(min_width=self.main_button_min_width, font_size=self.button_font_size))
+                self.buttonONOFF.setStyleSheet(artisan_simulator_push_button_style_dict['ON'].format(
+                    min_width=self.main_button_min_width,
+                    font_size=self.button_font_size,
+                    border_radius=self.button_border_radius))
             else:
-                self.buttonONOFF.setStyleSheet(artisan_push_button_style_dict['ON'].format(min_width=self.main_button_min_width, font_size=self.button_font_size))
+                self.buttonONOFF.setStyleSheet(artisan_push_button_style_dict['ON'].format(
+                    min_width=self.main_button_min_width,
+                    font_size=self.button_font_size,
+                    border_radius=self.button_border_radius))
         elif self.simulator:
-            self.buttonONOFF.setStyleSheet(artisan_simulator_push_button_style_dict['OFF'].format(min_width=self.main_button_min_width, font_size=self.button_font_size))
+            self.buttonONOFF.setStyleSheet(artisan_simulator_push_button_style_dict['OFF'].format(
+                min_width=self.main_button_min_width,
+                font_size=self.button_font_size,
+                border_radius=self.button_border_radius))
         else:
-            self.buttonONOFF.setStyleSheet(artisan_push_button_style_dict['OFF'].format(min_width=self.main_button_min_width, font_size=self.button_font_size))
+            self.buttonONOFF.setStyleSheet(artisan_push_button_style_dict['OFF'].format(
+                min_width=self.main_button_min_width,
+                font_size=self.button_font_size,
+                border_radius=self.button_border_radius))
         for b in [
                 self.buttonCHARGE,  # CHARGE
                 self.buttonDRY, # DRY END
@@ -18799,15 +18834,15 @@ class ApplicationWindow(QMainWindow):
             if settings.contains('ETname'):
                 self.ETname = settings.value('ETname')
                 ETname_subst = self.qmc.device_name_subst(self.ETname)
-                self.label2.setText(f'<big><b>{ETname_subst}</b></big>')
-                self.label4.setText(f'{deltaLabelBigPrefix}{ETname_subst}</b></big>')
+                self.label2.setText(self.lcd_label_fmt.format(ETname_subst))
+                self.label4.setText(f"{deltaLabelBigPrefix}{self.lcd_label_fmt.format(ETname_subst)}")
             else:
                 self.ETname = QApplication.translate('Label', 'ET')
             if settings.contains('BTname'):
                 self.BTname = settings.value('BTname')
                 BTname_subst = self.qmc.device_name_subst(self.BTname)
-                self.label3.setText(f'<big><b>{BTname_subst}</b></big>')
-                self.label5.setText(f'{deltaLabelBigPrefix}{BTname_subst}</b></big>')
+                self.label3.setText(self.lcd_label_fmt.format(BTname_subst))
+                self.label5.setText(f"{deltaLabelBigPrefix}{self.lcd_label_fmt.format(BTname_subst)}")
             else:
                 self.BTname = QApplication.translate('Label', 'BT')
             settings.endGroup()
@@ -24829,7 +24864,10 @@ class ApplicationWindow(QMainWindow):
                 if self.qmc.flagon:
                     # if not sampling we also stop the communication loop with the Hottop here completely
                     self.hottop.stop()
-                self.buttonCONTROL.setStyleSheet(artisan_push_button_style_dict['PID'].format(min_width=self.main_button_min_width, font_size=self.button_font_size))
+                self.buttonCONTROL.setStyleSheet(artisan_push_button_style_dict['PID'].format(
+                    min_width=self.main_button_min_width,
+                    font_size=self.button_font_size,
+                    border_radius=self.button_border_radius))
 
     def HottopControlOn(self, autosuper:bool=True) -> None:
         # if super holds, the superusermode is automatically activated (if control is activated via an HOTTOP Command 'control')
@@ -24841,7 +24879,10 @@ class ApplicationWindow(QMainWindow):
                 res = self.hottop.takeHottopControl()
                 if res:
                     self.hottop.setHottop(drum_motor=True)
-                    self.buttonCONTROL.setStyleSheet(artisan_push_button_style_dict['PIDactive'].format(min_width=self.main_button_min_width, font_size=self.button_font_size))
+                    self.buttonCONTROL.setStyleSheet(artisan_push_button_style_dict['PIDactive'].format(
+                        min_width=self.main_button_min_width,
+                        font_size=self.button_font_size,
+                        border_radius=self.button_border_radius))
                     if not self.HottopControlActive:
                         self.sendmessage(QApplication.translate('Message','Hottop control turned on'))
                     self.HottopControlActive = True
@@ -27723,8 +27764,14 @@ class ApplicationWindow(QMainWindow):
                 self.simulator = None
                 self.qmc.timeclock.setBase(1000)
                 self.sample_loop_running = True # we enable the sampling loop again that might have been stopped during the simulation via a timerLCD click
-                self.buttonONOFF.setStyleSheet(artisan_push_button_style_dict['OFF'].format(min_width=self.main_button_min_width, font_size=self.button_font_size))
-                self.buttonSTARTSTOP.setStyleSheet(artisan_push_button_style_dict['STOP'].format(min_width=self.main_button_min_width, font_size=self.button_font_size))
+                self.buttonONOFF.setStyleSheet(artisan_push_button_style_dict['OFF'].format(
+                    min_width=self.main_button_min_width,
+                    font_size=self.button_font_size,
+                    border_radius=self.button_border_radius))
+                self.buttonSTARTSTOP.setStyleSheet(artisan_push_button_style_dict['STOP'].format(
+                    min_width=self.main_button_min_width,
+                    font_size=self.button_font_size,
+                    border_radius=self.button_border_radius))
                 self.qmc.updateDeltaSamples() # to get the delta_spans right
                 self.sendmessage(QApplication.translate('Message','Simulator stopped'))
                 self.updateWindowTitle()
@@ -27757,8 +27804,14 @@ class ApplicationWindow(QMainWindow):
                         from artisanlib.simulator import Simulator
                         self.simulator = Simulator(self.qmc.mode, profile)
                         self.simulatorpath = filename
-                        self.buttonONOFF.setStyleSheet(artisan_simulator_push_button_style_dict['OFF'].format(min_width=self.main_button_min_width, font_size=self.button_font_size))
-                        self.buttonSTARTSTOP.setStyleSheet(artisan_simulator_push_button_style_dict['STOP'].format(min_width=self.main_button_min_width, font_size=self.button_font_size))
+                        self.buttonONOFF.setStyleSheet(artisan_simulator_push_button_style_dict['OFF'].format(
+                            min_width=self.main_button_min_width,
+                            font_size=self.button_font_size,
+                            border_radius=self.button_border_radius))
+                        self.buttonSTARTSTOP.setStyleSheet(artisan_simulator_push_button_style_dict['STOP'].format(
+                            min_width=self.main_button_min_width,
+                            font_size=self.button_font_size,
+                            border_radius=self.button_border_radius))
                         self.qmc.updateDeltaSamples() # to get the delta_spans right
                         self.sendmessage(QApplication.translate('Message','Simulator started @{}x').format(speed))
                         self.updateWindowTitle()

@@ -1604,8 +1604,8 @@ class CurvesDlg(ArtisanDialog):
         if self.aw.BTname == '':
             self.aw.BTname = QApplication.translate('Label', 'BT')
         BTname_subst = self.aw.qmc.device_name_subst(self.aw.BTname)
-        self.aw.label3.setText(f'<big><b>{BTname_subst}</b></big>')
-        self.aw.label5.setText(f'{deltaLabelBigPrefix}{BTname_subst}</b></big>')
+        self.aw.label3.setText(self.aw.lcd_label_fmt.format(BTname_subst))
+        self.aw.label5.setText(f'{deltaLabelBigPrefix}{self.aw.lcd_label_fmt.format(BTname_subst)}')
 
     @pyqtSlot()
     def renameET(self) -> None:
@@ -1613,8 +1613,8 @@ class CurvesDlg(ArtisanDialog):
         if self.aw.ETname == '':
             self.aw.ETname = QApplication.translate('Label', 'ET')
         ETname_subst = self.aw.qmc.device_name_subst(self.aw.ETname)
-        self.aw.label2.setText(f'<big><b>{ETname_subst}</b></big>')
-        self.aw.label4.setText(f'{deltaLabelBigPrefix}{ETname_subst}</b></big>')
+        self.aw.label2.setText(self.aw.lcd_label_fmt.format(ETname_subst))
+        self.aw.label4.setText(f'{deltaLabelBigPrefix}{self.aw.lcd_label_fmt.format(ETname_subst)}')
 
     @pyqtSlot(int)
     def toggleWebLCDsAlerts(self, _:int) -> None:

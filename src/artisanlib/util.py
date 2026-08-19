@@ -71,7 +71,7 @@ from PyQt6.QtGui import QColor
 deltaLabelPrefix:Final[str] = '<html>&Delta;&thinsp;</html>' # prefix constant for labels to compose DeltaET/BT by prepending this prefix to ET/BT labels
 deltaLabelUTF8:Final[str] = 'Delta' if platform.system() == 'Linux' else '\u0394\u2009' # u("\u03B4") # prefix for non HTML Qt Widgets like QPushbuttons
 
-deltaLabelBigPrefix:Final[str] = '<big><b>&Delta;</b></big>&thinsp;<big><b>' # same as above for big/bold use cases
+deltaLabelBigPrefix:Final[str] = ('<b>&Delta;</b>&thinsp;' if platform.system() == 'Linux' else '<big><b>&Delta;</b></big>&thinsp;') # same as above for big/bold use cases
 deltaLabelMathPrefix:Final[str] = r'$\Delta\/$'  # prefix for labels in matplibgraphs to compose DeltaET/BT by prepending this prefix to ET/BT labels
 
 

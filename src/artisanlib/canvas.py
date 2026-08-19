@@ -7816,14 +7816,26 @@ class tgraphcanvas(QObject):
             self.aw.buttonCOOL.setFlat(False)
             self.aw.buttonONOFF.setText(QApplication.translate('Button', 'ON'))
             if self.aw.simulator:
-                self.aw.buttonONOFF.setStyleSheet(artisan_simulator_push_button_style_dict['OFF'].format(min_width=self.aw.main_button_min_width, font_size=self.aw.button_font_size))
+                self.aw.buttonONOFF.setStyleSheet(artisan_simulator_push_button_style_dict['OFF'].format(
+                    min_width=self.aw.main_button_min_width,
+                    font_size=self.aw.button_font_size,
+                    border_radius=self.aw.button_border_radius))
             else:
-                self.aw.buttonONOFF.setStyleSheet(artisan_push_button_style_dict['OFF'].format(min_width=self.aw.main_button_min_width, font_size=self.aw.button_font_size))
+                self.aw.buttonONOFF.setStyleSheet(artisan_push_button_style_dict['OFF'].format(
+                    min_width=self.aw.main_button_min_width,
+                    font_size=self.aw.button_font_size,
+                    border_radius=self.aw.button_border_radius))
             self.aw.buttonSTARTSTOP.setText(QApplication.translate('Button', 'START'))
             if self.aw.simulator:
-                self.aw.buttonSTARTSTOP.setStyleSheet(artisan_simulator_push_button_style_dict['STOP'].format(min_width=self.aw.main_button_min_width, font_size=self.aw.button_font_size))
+                self.aw.buttonSTARTSTOP.setStyleSheet(artisan_simulator_push_button_style_dict['STOP'].format(
+                    min_width=self.aw.main_button_min_width,
+                    font_size=self.aw.button_font_size,
+                    border_radius=self.aw.button_border_radius))
             else:
-                self.aw.buttonSTARTSTOP.setStyleSheet(artisan_push_button_style_dict['STOP'].format(min_width=self.aw.main_button_min_width, font_size=self.aw.button_font_size))
+                self.aw.buttonSTARTSTOP.setStyleSheet(artisan_push_button_style_dict['STOP'].format(
+                    min_width=self.aw.main_button_min_width,
+                    font_size=self.aw.button_font_size,
+                    border_radius=self.aw.button_border_radius))
 
             # quantification is blocked if lock_quantification_sampling_ticks is not 0
             # (eg. after a change of the event value by button or slider actions)
@@ -13106,9 +13118,15 @@ class tgraphcanvas(QObject):
                 _log.exception(e)
 
             if self.aw.simulator:
-                self.aw.buttonONOFF.setStyleSheet(artisan_simulator_push_button_style_dict['ON'].format(min_width=self.aw.main_button_min_width, font_size=self.aw.button_font_size))
+                self.aw.buttonONOFF.setStyleSheet(artisan_simulator_push_button_style_dict['ON'].format(
+                    min_width=self.aw.main_button_min_width,
+                    font_size=self.aw.button_font_size,
+                    border_radius=self.aw.button_border_radius))
             else:
-                self.aw.buttonONOFF.setStyleSheet(artisan_push_button_style_dict['ON'].format(min_width=self.aw.main_button_min_width, font_size=self.aw.button_font_size))
+                self.aw.buttonONOFF.setStyleSheet(artisan_push_button_style_dict['ON'].format(
+                    min_width=self.aw.main_button_min_width,
+                    font_size=self.aw.button_font_size,
+                    border_radius=self.aw.button_border_radius))
 
             self.aw.buttonONOFF.setText(QApplication.translate('Button', 'OFF')) # text means click to turn OFF (it is ON)
             self.aw.buttonONOFF.setToolTip(QApplication.translate('Tooltip', 'Stop monitoring'))
@@ -13266,7 +13284,10 @@ class tgraphcanvas(QObject):
                 self.palette['canvas'] = self.palette['canvas_alt']
                 self.aw.updateCanvasColors(checkColors=False)
             #enable RESET button:
-            self.aw.buttonRESET.setStyleSheet(artisan_push_button_style_dict['RESET'].format(min_width=self.aw.main_button_min_width, font_size=self.aw.button_font_size))
+            self.aw.buttonRESET.setStyleSheet(artisan_push_button_style_dict['RESET'].format(
+                min_width=self.aw.main_button_min_width,
+                font_size=self.aw.button_font_size,
+                border_radius=self.aw.button_border_radius))
             self.aw.buttonRESET.setEnabled(True)
             self.aw.buttonRESET.setVisible(True)
 
@@ -13281,9 +13302,15 @@ class tgraphcanvas(QObject):
                 _log.exception(e)
 
             if self.aw.simulator:
-                self.aw.buttonONOFF.setStyleSheet(artisan_simulator_push_button_style_dict['OFF'].format(min_width=self.aw.main_button_min_width, font_size=self.aw.button_font_size))
+                self.aw.buttonONOFF.setStyleSheet(artisan_simulator_push_button_style_dict['OFF'].format(
+                    min_width=self.aw.main_button_min_width,
+                    font_size=self.aw.button_font_size,
+                    border_radius=self.aw.button_border_radius))
             else:
-                self.aw.buttonONOFF.setStyleSheet(artisan_push_button_style_dict['OFF'].format(min_width=self.aw.main_button_min_width, font_size=self.aw.button_font_size))
+                self.aw.buttonONOFF.setStyleSheet(artisan_push_button_style_dict['OFF'].format(
+                    min_width=self.aw.main_button_min_width,
+                    font_size=self.aw.button_font_size,
+                    border_radius=self.aw.button_border_radius))
             self.aw.buttonONOFF.setToolTip(QApplication.translate('Tooltip', 'Start monitoring'))
             self.aw.sendmessage(QApplication.translate('Message','Scope stopped'))
             self.aw.buttonONOFF.setText(QApplication.translate('Button', 'ON')) # text means click to turn OFF (it is ON)
@@ -13994,14 +14021,23 @@ class tgraphcanvas(QObject):
             self.aw.resetCurveVisibilities()
             self.flagstart = False
             if self.aw.simulator:
-                self.aw.buttonSTARTSTOP.setStyleSheet(artisan_simulator_push_button_style_dict['STOP'].format(min_width=self.aw.main_button_min_width, font_size=self.aw.button_font_size))
+                self.aw.buttonSTARTSTOP.setStyleSheet(artisan_simulator_push_button_style_dict['STOP'].format(
+                    min_width=self.aw.main_button_min_width,
+                    font_size=self.aw.button_font_size,
+                    border_radius=self.aw.button_border_radius))
             else:
-                self.aw.buttonSTARTSTOP.setStyleSheet(artisan_push_button_style_dict['STOP'].format(min_width=self.aw.main_button_min_width, font_size=self.aw.button_font_size))
+                self.aw.buttonSTARTSTOP.setStyleSheet(artisan_push_button_style_dict['STOP'].format(
+                    min_width=self.aw.main_button_min_width,
+                    font_size=self.aw.button_font_size,
+                    border_radius=self.aw.button_border_radius))
             if enableButton:
                 self.aw.buttonSTARTSTOP.setEnabled(True)
                 self.aw.buttonSTARTSTOP.setGraphicsEffect(self.aw.makeShadow())
             #enable RESET button:
-            self.aw.buttonRESET.setStyleSheet(artisan_push_button_style_dict['RESET'].format(min_width=self.aw.main_button_min_width, font_size=self.aw.button_font_size))
+            self.aw.buttonRESET.setStyleSheet(artisan_push_button_style_dict['RESET'].format(
+                min_width=self.aw.main_button_min_width,
+                font_size=self.aw.button_font_size,
+                border_radius=self.aw.button_border_radius))
             self.aw.buttonRESET.setEnabled(True)
             self.updateLCDtime()
             #prevents accidentally deleting a modified profile:

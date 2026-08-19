@@ -3352,9 +3352,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                         self.aw.qmc.extradevices[i] = DEVICE_ID_VIRTUAL
                 self.aw.qmc.extraname1[i] = name1edit.text()
                 self.aw.qmc.extraname2[i] = name2edit.text()
-
-                self.aw.extraLCDlabel1[i].setText('<b>' + self.aw.qmc.device_name_subst(self.aw.qmc.extraname1[i]) + '</b>')
-                self.aw.extraLCDlabel2[i].setText('<b>' + self.aw.qmc.device_name_subst(self.aw.qmc.extraname2[i]) + '</b>')
+                self.aw.extraLCDlabel1[i].setText(self.aw.extra_lcd_label_fmt.format(self.aw.qmc.device_name_subst(self.aw.qmc.extraname1[i])))
+                self.aw.extraLCDlabel2[i].setText(self.aw.extra_lcd_label_fmt.format(self.aw.qmc.device_name_subst(self.aw.qmc.extraname2[i])))
                 self.aw.qmc.extramathexpression1[i] = mexpr1edit.text()
                 self.aw.qmc.extramathexpression2[i] = mexpr2edit.text()
             #update legend with new curves
