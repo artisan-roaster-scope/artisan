@@ -126,7 +126,7 @@ artisan_simulator_push_button_style_dict: dict[str, str] = {
         QPushButton {{
             min-width: {min_width}px;
             border-style: solid;
-            border-radius:{ border_radius}px;
+            border-radius: {border_radius}px;
             border-color: grey;
             border-width: 0;
             font-size: {font_size}px;
@@ -413,12 +413,12 @@ artisan_push_button_style_dict: dict[str, str] = {
 artisan_sv_plus_push_button_style: str = """
     QPushButton {{
         min-width: {min_width}px;
-        border-style:solid;
-        border-radius:{border_radius}px;
+        border-style: solid;
+        border-radius: {border_radius}px;
         border-color:grey;
         border-width:0;
-        font-size:{font_size}px;
-        font-weight:bold;
+        font-size: {font_size}px;
+        font-weight: bold;
         color:white;
         background-color: """ + createGradient('#db5785') + """;
     }}
@@ -438,13 +438,13 @@ artisan_sv_plus_push_button_style: str = """
 #   border_radius
 artisan_sv_minus_push_button_style: str = """
     QPushButton {{
-        min-width:{min_width}px;
-        border-style:solid;
-        border-radius:{border_radius}px;
-        border-color:grey;
-        border-width:0;
-        font-size:{font_size}px;
-        font-weight:bold;
+        min-width: {min_width}px;
+        border-style: solid;
+        border-radius: {border_radius}px;
+        border-color: grey;
+        border-width: 0;
+        font-size: {font_size}px;
+        font-weight: bold;
         color: white;
         background-color: """ + createGradient('#64b7d8') + """;
     }}

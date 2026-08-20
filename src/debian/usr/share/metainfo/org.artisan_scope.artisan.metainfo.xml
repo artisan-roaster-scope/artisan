@@ -59,12 +59,12 @@
   <launchable type="desktop-id">org.artisan_scope.artisan.desktop</launchable>
   <screenshots>
     <screenshot type="default">
-      <image>https://github.com/artisan-roaster-scope/artisan/blob/2c94e7d03f51221771a6f5e10c3a55fd1a26e744/wiki/screenshots/artisan-cover.png?raw=true</image>
-      <caption>Main window of the application</caption>
+      <image>https://raw.githubusercontent.com/artisan-roaster-scope/artisan/eb5d87d6577625ada2a9524a4efa9a1407e4e18b/wiki/screenshots/artisan-cover-linux.png</image>
+      <caption>artisan in light mode roasting</caption>
     </screenshot>
     <screenshot>
-      <image>https://github.com/artisan-roaster-scope/artisan/blob/2c94e7d03f51221771a6f5e10c3a55fd1a26e744/wiki/screenshots/artisan-cover2.png?raw=true</image>
-      <caption>Main window with custom event buttons</caption>
+      <image>https://github.com/artisan-roaster-scope/artisan/blob/eb5d87d6577625ada2a9524a4efa9a1407e4e18b/wiki/screenshots/artisan-cover-linux-dark.png?raw=true</image>
+      <caption>artisan in dark mode displaying a profile</caption>
     </screenshot>
   </screenshots>
 
