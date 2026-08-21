@@ -60,7 +60,6 @@ extraeventsvisibility=1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1
 marklastbuttonpressed=true
 showextrabuttontooltips=false
 
-
 [Modbus]
 IP_retries=1
 IP_timeout=0.3
@@ -166,6 +165,30 @@ input8Signed=false
 input8bcd=false
 input8code=3
 input8deviceId=1
+input8div=0
+input8float=false
+input8mode=
+input8register=32790
+input9BCDsAsInt=false
+input9FloatsAsInt=false
+input9Signed=false
+input9bcd=false
+input9code=3
+input9deviceId=1
+input9div=1
+input9float=false
+input9mode=
+input9register=32772
+modbus_serial_connect_delay=0.5
+optimizer=false
+parity=N
+port=502
+serial_readRetries=1
+stopbits=1
+timeout=0.4
+type=3
+wordorderLittle=true
+
 
 [Sliders]
 ModeTempSliders=C

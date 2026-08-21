@@ -6086,7 +6086,8 @@ class ApplicationWindow(QMainWindow):
         self.EventsGroupLayout.setStyleSheet(artisan_events_editor_style.format(
             background_color = rgba_colorname2argb_colorname(self.qmc.palette['background']),
             line_edit_color = line_edit_color,
-            down_arrow_icon_path = os.path.join(getResourcePath(),'Icons','arrow-down-01-stroke-rounded.svg')))
+            # path in style sheets needs always to use forward slashes, also on Windows
+            down_arrow_icon_path = Path.as_posix(Path(os.path.join(getResourcePath(),'Icons','arrow-down-01-stroke-rounded.svg')))))
 
 
         if current_background_color is None or current_background_color != str(canvas_color) or (whitep and self.qmc.palette['messages'] != '#ffffff'): # canvas color did not change, we do not need to redo the navigation bar

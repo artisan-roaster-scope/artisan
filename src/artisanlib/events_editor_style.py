@@ -71,7 +71,7 @@ artisan_events_editor_style = """
         min-width: 80px;
     }}
     QComboBox:hover {{
-        background-color: '#F5F5F5';
+        background-color: #F5F5F5;
     }}
     QComboBox::drop-down {{
         subcontrol-origin: padding;
@@ -89,15 +89,15 @@ artisan_events_editor_style = """
         width: 30px;
     }}
     QComboBox::drop-down:button {{
-        background-color: '#E9E9E9';
+        background-color: #E9E9E9;
         width: 30px;
     }}
     QComboBox::drop-down:pressed {{
-        background-color: '#A9A9A9';
+        background-color: #A9A9A9;
         width: 30px;
     }}
     QComboBox::drop-down:hover {{
-        background-color: '#F5F5F5';
+        background-color: #F5F5F5;
         width: 30px;
     }}
     QComboBox QAbstractItemView {{
