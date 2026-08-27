@@ -11,6 +11,8 @@ v4.2.2
   - adds autoCHARGE/DROP and drum speed control to the [Schuilenburg](https://artisan-scope.org/machines/schuilenburg/) PLC machine setup
   - adds autoCHARGE/autoDROP recognition for [IMF](https://artisan-scope.org/machines/imf/) as 'auto' setup which picks up CHARGE and DROP events from the machine
   - adds UI scaling factor
+  - prevents the computer from entering standby while Artisan is ON to not lose the connection to the machine (can be turned off via the new `Prevent Sleep` flag of the Sampling dialog) ([Issue #2226](../../../issues/2226))
+  - reconnects the machine if the computer was suspended nevertheless (eg. a laptop closing its lid)
   - adds [Catppuccin](https://github.com/catppuccin) themes by Liam
   - adds two more MODBUS device channels
   - adds Artisan Commands `pidDerivativeFilter(<n>)`, `pidDerivativeLimit(<n>)`, `pidILF(<n>)`, `pidIWP(<bool>)`, and `pidIRoC(<bool>)` to configure the internal PID (for John)
@@ -22,6 +24,8 @@ v4.2.2
   - faster app start (startup time redued by ~50%)
   - refreshed UI
 * FIXES
+  - fixes the repeated `Kaleido disconnected` message on every failing reconnect attempt
+  - logs the machine connection lifecycle (connect/connection lost/timeout) on the default log level to ease the analysis of connection issues
   - fixes faulty hash generation on files created using `Save As` causing `modified file` warnings on load ([Issue #2205](../../../issues/2205))
   - fixes regression causing canvas color not being applied correctly ([Issue #2212](../../../issues/2212))
 

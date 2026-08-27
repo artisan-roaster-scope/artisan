@@ -71,7 +71,7 @@ modules with Qt dependencies and complex canvas/graphics operations.
 import os
 import sys
 from collections.abc import Generator
-from typing import Any
+from typing import Any, cast
 from unittest.mock import Mock, patch
 
 import hypothesis.strategies as st
@@ -1509,3 +1509,128 @@ class TestFindTextGap:
         # Assert
         assert isinstance(ystep_down, int)
         assert isinstance(ystep_up, int)
+
+
+class TestSleepAndWakeHandling:
+    """Test the standby prevention and the reconnect of the machine after a system suspension."""
+
+    @staticmethod
+    def _canvas() -> 'tgraphcanvas':
+        canvas = Mock(spec=tgraphcanvas)
+        canvas.aw = Mock()
+        canvas.aw.hottop = None
+        canvas.aw.santoker = None
+        canvas.aw.mugma = None
+        canvas.aw.orbiter = None
+        canvas.aw.kaleido = None
+        canvas.flagKeepAwake = True
+        canvas.sleep_inhibitor = None
+        canvas.wake_detector = None
+        canvas.preventSleep = tgraphcanvas.preventSleep.__get__(canvas, tgraphcanvas)
+        canvas.allowSleep = tgraphcanvas.allowSleep.__get__(canvas, tgraphcanvas)
+        canvas.checkWake = tgraphcanvas.checkWake.__get__(canvas, tgraphcanvas)
+        canvas.reconnectMachine = tgraphcanvas.reconnectMachine.__get__(canvas, tgraphcanvas)
+        return canvas
+
+    def test_prevent_sleep_creates_and_inhibits(self) -> None:
+        canvas = self._canvas()
+        with patch('artisanlib.power.SleepInhibitor') as inhibitor_class:
+            canvas.preventSleep()
+            inhibitor_class.assert_called_once()
+            inhibitor = cast(Mock, canvas.sleep_inhibitor)
+            inhibitor.inhibit.assert_called_once()
+
+    def test_prevent_sleep_reuses_the_inhibitor(self) -> None:
+        canvas = self._canvas()
+        inhibitor = Mock()
+        canvas.sleep_inhibitor = inhibitor
+        with patch('artisanlib.power.SleepInhibitor') as inhibitor_class:
+            canvas.preventSleep()
+            inhibitor_class.assert_not_called()
+        assert canvas.sleep_inhibitor is inhibitor
+        inhibitor.inhibit.assert_called_once()
+
+    def test_prevent_sleep_respects_the_setting(self) -> None:
+        canvas = self._canvas()
+        canvas.flagKeepAwake = False
+        with patch('artisanlib.power.SleepInhibitor') as inhibitor_class:
+            canvas.preventSleep()
+            inhibitor_class.assert_not_called()
+        assert canvas.sleep_inhibitor is None
+
+    def test_prevent_sleep_survives_a_failing_inhibitor(self) -> None:
+        canvas = self._canvas()
+        inhibitor = Mock()
+        inhibitor.inhibit.side_effect = OSError('no power management')
+        canvas.sleep_inhibitor = inhibitor
+        canvas.preventSleep() # must not raise
+
+    def test_allow_sleep_releases(self) -> None:
+        canvas = self._canvas()
+        inhibitor = Mock()
+        canvas.sleep_inhibitor = inhibitor
+        canvas.allowSleep()
+        inhibitor.release.assert_called_once()
+
+    def test_allow_sleep_without_inhibitor(self) -> None:
+        canvas = self._canvas()
+        canvas.allowSleep() # must not raise
+
+    def test_reconnect_machine_reconnects_all_connected_machines(self) -> None:
+        canvas = self._canvas()
+        kaleido = Mock()
+        kaleido.reconnect.return_value = True
+        santoker = Mock()
+        santoker.reconnect.return_value = True
+        canvas.aw.kaleido = kaleido
+        canvas.aw.santoker = santoker
+        assert canvas.reconnectMachine() == 2
+        kaleido.reconnect.assert_called_once()
+        santoker.reconnect.assert_called_once()
+
+    def test_reconnect_machine_without_connection(self) -> None:
+        canvas = self._canvas()
+        assert canvas.reconnectMachine() == 0
+
+    def test_reconnect_machine_counts_only_triggered_reconnects(self) -> None:
+        canvas = self._canvas()
+        kaleido = Mock()
+        kaleido.reconnect.return_value = False # eg. no connection established yet
+        canvas.aw.kaleido = kaleido
+        assert canvas.reconnectMachine() == 0
+
+    def test_reconnect_machine_continues_after_a_failing_machine(self) -> None:
+        canvas = self._canvas()
+        hottop = Mock()
+        hottop.reconnect.side_effect = OSError('boom')
+        kaleido = Mock()
+        kaleido.reconnect.return_value = True
+        canvas.aw.hottop = hottop
+        canvas.aw.kaleido = kaleido
+        assert canvas.reconnectMachine() == 1
+        kaleido.reconnect.assert_called_once()
+
+    def test_check_wake_without_suspension(self) -> None:
+        canvas = self._canvas()
+        detector = Mock()
+        detector.check.return_value = 0
+        canvas.wake_detector = detector
+        canvas.checkWake()
+        canvas.aw.sendmessage.assert_not_called()
+
+    def test_check_wake_reconnects_after_a_suspension(self) -> None:
+        canvas = self._canvas()
+        detector = Mock()
+        detector.check.return_value = 300
+        canvas.wake_detector = detector
+        kaleido = Mock()
+        kaleido.reconnect.return_value = True
+        canvas.aw.kaleido = kaleido
+        canvas.checkWake()
+        kaleido.reconnect.assert_called_once()
+        canvas.aw.sendmessage.assert_called_once()
+
+    def test_check_wake_without_detector(self) -> None:
+        canvas = self._canvas()
+        canvas.checkWake() # must not raise
+        canvas.aw.sendmessage.assert_not_called()

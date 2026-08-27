@@ -54,6 +54,9 @@ from typing import override, Final, Literal, Any, cast, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.comm import serialport # pylint: disable=unused-import
+    from artisanlib.power import SleepInhibitor, WakeDetector # pylint: disable=unused-import
+    from artisanlib.async_comm import AsyncComm # pylint: disable=unused-import
+    from artisanlib.kaleido import KaleidoPort # pylint: disable=unused-import
     from artisanlib.atypes import ProfileData, BTU # pylint: disable=unused-import
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
     from plus.stock import Blend # pylint: disable=unused-import
@@ -125,6 +128,9 @@ except Exception: # pylint: disable=broad-except
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
+
+# interval in milliseconds in which Artisan checks for a system suspension while sampling
+_wake_check_interval: Final[int] = 5000
 
 
 
@@ -287,7 +293,7 @@ class tgraphcanvas(QObject):
         'extraname1', 'extraname2', 'extramathexpression1', 'extramathexpression2', 'extralinestyles1', 'extralinestyles2', 'extradrawstyles1', 'extradrawstyles2',
         'extralinewidths1', 'extralinewidths2', 'extramarkers1', 'extramarkers2', 'extramarkersizes1', 'extramarkersizes2', 'devicetablecolumnwidths', 'energytablecolumnwidths', 'extraNoneTempHint1',
         'extraNoneTempHint2', 'plotcurves', 'plotcurvecolor', 'overlapList', 'tight_layout_params', 'cupping_tight_layout_params', 'fig', 'ax', 'delta_ax', 'legendloc', 'legendloc_pos', 'onclick_cid',
-        'oncpick_cid', 'ondraw_cid', 'onmove_cid', 'rateofchange1', 'rateofchange2', 'flagon', 'flagstart', 'flagKeepON', 'flagOpenCompleted', 'flagsampling', 'flagsamplingthreadrunning',
+        'oncpick_cid', 'ondraw_cid', 'onmove_cid', 'rateofchange1', 'rateofchange2', 'flagon', 'flagstart', 'flagKeepON', 'flagOpenCompleted', 'flagKeepAwake', 'sleep_inhibitor', 'wake_detector', 'wake_timer', 'flagsampling', 'flagsamplingthreadrunning',
         'manuallogETflag', 'zoom_follow', 'zoom_follow_onET', 'alignEvent', 'compareAlignEvent', 'compareEvents', 'compareET', 'compareBT', 'compareDeltaET', 'compareDeltaBT', 'compareMainEvents', 'compareBBP', 'compareRoast', 'compareExtraCurves1', 'compareExtraCurves2',
         'replayType', 'replayDropType', 'replayedBackgroundEvents', 'beepedBackgroundEvents', 'roastpropertiesflag', 'roastpropertiesAutoOpenFlag', 'roastpropertiesAutoOpenDropFlag',
         'title', 'title_show_always', 'ambientTemp', 'ambientTempSource', 'ambientHumiditySource', 'ambientPressureSource', 'ambient_temperature_device', 'ambient_pressure', 'ambient_pressure_device', 'ambient_humidity',
@@ -923,6 +929,10 @@ class tgraphcanvas(QObject):
         self.flagstart:bool = False # Artisan logging/recording
         self.flagKeepON:bool = False # turn Artisan ON again after pressing OFF during recording
         self.flagOpenCompleted:bool = False # after completing a recording with OFF, send the saved profile to be opened in the ArtisanViewer
+        self.flagKeepAwake:bool = True # if True the computer is prevented from entering standby (idle system sleep) while Artisan is ON
+        self.sleep_inhibitor:SleepInhibitor|None = None # holds the system sleep inhibition while Artisan is ON (see flagKeepAwake)
+        self.wake_detector:WakeDetector|None = None # detects system suspensions while Artisan is ON to reconnect the machine on wake
+        self.wake_timer:QTimer|None = None # drives the wake_detector while Artisan is ON
         self.flagsampling:bool = False # if True, Artisan is still in the sampling phase and one has to wait for its end to turn OFF
         self.flagsamplingthreadrunning:bool = False
         #log flag that tells to log ET when using device 18 (manual mode)
@@ -12929,6 +12939,88 @@ class tgraphcanvas(QObject):
             if self.samplingSemaphore.available() < 1:
                 self.samplingSemaphore.release(1)
 
+    # prevents the computer from entering standby (idle system sleep) while Artisan is sampling.
+    # A system sleep tears down the USB/Bluetooth link to the machine and machines watching the
+    # communication (like Kaleido) react on such a connection loss (eg. by starting to cool).
+    # NOTE: the display is still allowed to sleep, only the system has to stay awake. A laptop
+    #  closing its lid still sleeps (clamshell sleep) as this cannot be inhibited by an application.
+    def preventSleep(self) -> None:
+        if not self.flagKeepAwake:
+            return
+        try:
+            if self.sleep_inhibitor is None:
+                from artisanlib.power import SleepInhibitor
+                self.sleep_inhibitor = SleepInhibitor()
+            self.sleep_inhibitor.inhibit()
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
+
+    # releases the system sleep inhibition acquired by preventSleep()
+    def allowSleep(self) -> None:
+        try:
+            if self.sleep_inhibitor is not None:
+                self.sleep_inhibitor.release()
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
+
+    # a system suspension cannot be prevented in all cases (a laptop closing its lid or a user
+    # explicitly sending the machine to sleep). As a machine connection established before a
+    # suspension is dead afterwards, without the transport necessarily reporting an error or
+    # running into a timeout, we watch out for suspensions while sampling to reconnect on wake.
+    def startWakeDetection(self) -> None:
+        try:
+            if self.wake_detector is None:
+                from artisanlib.power import WakeDetector
+                self.wake_detector = WakeDetector()
+            self.wake_detector.start()
+            if self.wake_timer is None:
+                self.wake_timer = QTimer()
+                self.wake_timer.timeout.connect(self.checkWake)
+            self.wake_timer.start(_wake_check_interval)
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
+
+    def stopWakeDetection(self) -> None:
+        try:
+            if self.wake_timer is not None:
+                self.wake_timer.stop()
+            if self.wake_detector is not None:
+                self.wake_detector.stop()
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
+
+    @pyqtSlot()
+    def checkWake(self) -> None:
+        try:
+            if self.wake_detector is None:
+                return
+            suspension:float = self.wake_detector.check()
+            if suspension > 0:
+                _log.warning('system resumed after a suspension of %.0fs; reconnecting the machine '
+                        '(NOTE: the roast timer does not advance while the system is suspended)', suspension)
+                self.reconnectMachine()
+                self.aw.sendmessage(QApplication.translate('Message','System resumed. Reconnecting...'))
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
+
+    # forces a reconnect of those machine connections which offer this operation and returns the
+    # number of connections that were asked to reconnect.
+    # NOTE: the classic serial devices re-open their port automatically on the next failing read
+    #  and the BLE devices are reconnected by their disconnect callbacks, thus both are not
+    #  handled here
+    def reconnectMachine(self) -> int:
+        reconnects:int = 0
+        machines:list[AsyncComm|KaleidoPort|None] = [self.aw.hottop, self.aw.santoker, self.aw.mugma,
+                self.aw.orbiter, self.aw.kaleido]
+        for machine in machines:
+            if machine is not None:
+                try:
+                    if machine.reconnect():
+                        reconnects += 1
+                except Exception as e: # pylint: disable=broad-except
+                    _log.exception(e)
+        return reconnects
+
     @pyqtSlot()
     def OnMonitor(self) -> None:
         try:
@@ -13102,6 +13194,8 @@ class tgraphcanvas(QObject):
             self.TPalarmtimeindex = None
 
             self.flagon = True
+            self.preventSleep() # keep the computer awake to not lose the connection to the machine
+            self.startWakeDetection() # reconnect the machine if the system was suspended nevertheless
             self.redraw(True,re_smooth_foreground=False, re_smooth_background=True) # there is now foreground at this point; we need to re-smooth background with no curve-smoothing and standard instead of optimal-smoothing on ON
 
             if self.designerflag:
@@ -13279,6 +13373,8 @@ class tgraphcanvas(QObject):
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
             QTimer.singleShot(5,self.disconnectProbes)
+            self.stopWakeDetection()
+            self.allowSleep() # the machine is disconnected, the computer may sleep again
             # reset the canvas color when it was set by an alarm but never reset
             if 'canvas_alt' in self.palette:
                 self.palette['canvas'] = self.palette['canvas_alt']

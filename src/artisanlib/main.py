@@ -18327,6 +18327,7 @@ class ApplicationWindow(QMainWindow):
             self.setSamplingRate(toInt(settings.value('Delay',int(self.qmc.delay))))
             self.qmc.flagKeepON = toBool(settings.value('KeepON',self.qmc.flagKeepON))
             self.qmc.flagOpenCompleted = toBool(settings.value('flagOpenCompleted',self.qmc.flagOpenCompleted))
+            self.qmc.flagKeepAwake = toBool(settings.value('KeepAwake',self.qmc.flagKeepAwake))
             self.qmc.extra_event_sampling_delay = toInt(settings.value('ExtraEventSamplingDelay',int(self.qmc.extra_event_sampling_delay)))
             #restore colors
             if settings.contains('Colors'):
@@ -20366,6 +20367,7 @@ class ApplicationWindow(QMainWindow):
             # save keepON flag
             self.settingsSetValue(settings, default_settings, 'KeepON',self.qmc.flagKeepON, read_defaults)
             self.settingsSetValue(settings, default_settings, 'flagOpenCompleted',self.qmc.flagOpenCompleted, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'KeepAwake',self.qmc.flagKeepAwake, read_defaults)
             # save extra event sampling interval
             self.settingsSetValue(settings, default_settings, 'ExtraEventSamplingDelay',self.qmc.extra_event_sampling_delay, read_defaults)
             #save colors

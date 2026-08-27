@@ -86,6 +86,23 @@ class AsyncLoopThread:
         return self.__loop
 
 
+# closes the given connection through the asyncio loop it is running in, to have the connect loop
+# of the corresponding transport re-establish it immediately.
+# Used on system wake as a connection that was established before a system suspension might be dead
+# without the transport ever reporting an error or EOF (thus without ever timing out).
+# Can be called from any thread. Returns True if a reconnect was triggered.
+def force_reconnect(loop_thread:AsyncLoopThread|None, writer:asyncio.StreamWriter|None) -> bool:
+    if loop_thread is None or writer is None:
+        return False
+    _log.info('reconnect requested')
+    try:
+        loop_thread.loop.call_soon_threadsafe(writer.close)
+        return True
+    except Exception as e: # pylint: disable=broad-except
+        _log.error(e)
+        return False
+
+
 class AsyncIterable:
 
     _queue: 'asyncio.Queue[bytes]' # type Queue is not subscriptable in Python <3.9 thus it is quoted
@@ -263,7 +280,7 @@ async def create_serial_connection(
 
 class AsyncComm:
 
-    __slots__ = [ '_asyncLoopThread', '_write_queue', '_running', '_serialize_write_lock', '_ACK_received', '_write_errors_without_disconnect', 'write_error_sem',
+    __slots__ = [ '_asyncLoopThread', '_write_queue', '_running', '_writer', '_serialize_write_lock', '_ACK_received', '_write_errors_without_disconnect', 'write_error_sem',
                     '_host', '_port', '_serial', '_connected_handler', '_disconnected_handler',
                     '_verify_crc', '_logging', '_send_timeout' ]
 
@@ -275,6 +292,7 @@ class AsyncComm:
         self._asyncLoopThread: AsyncLoopThread|None       = None # the asyncio AsyncLoopThread object
         self._write_queue:  asyncio.Queue[bytes]|None     = None # noqa: UP037 # quotes for Python3.8 # the write_queue
         self._running:bool                                = False              # while true we keep running the thread
+        self._writer: asyncio.StreamWriter|None           = None  # the writer of the currently established connection (if any)
 
         # lock to serialize write_await calls to realize request/response patterns in send_await/write_await
         self._serialize_write_lock:asyncio.Lock = asyncio.Lock()
@@ -406,7 +424,7 @@ class AsyncComm:
         while self._running:
             try:
                 if self._serial is not None:
-                    _log.debug('connecting to serial port: %s ...', self._serial['port'])
+                    _log.info('connecting to serial port: %s ...', self._serial['port'])
                     connect = self.open_serial_connection(
                         url = self._serial['port'],
                         baudrate = self._serial['baudrate'],
@@ -416,16 +434,17 @@ class AsyncComm:
                         timeout = self._serial['timeout'],
                         clear_HUPCL = self._serial['clear_HUPCL'])
                 else:
-                    _log.debug('connecting to %s:%s ...', self._host, self._port)
+                    _log.info('connecting to %s:%s ...', self._host, self._port)
                     connect = asyncio.open_connection(self._host, self._port)
                 # Wait for 2 seconds, then raise TimeoutError
                 reader, writer = await asyncio.wait_for(connect, timeout=connect_timeout)
                 if writer is not None: # pyright:ignore[reportUnnecessaryComparison] # reader is of type asyncio.streams.StreamReader and thus never None
                     self._write_queue = asyncio.Queue()
+                    self._writer = writer # registered to allow a forced reconnect (see reconnect())
                     write_handler = asyncio.create_task(self.handle_writes(writer, self._write_queue))
                     read_handler = asyncio.create_task(self.handle_reads(reader))
                     self._ACK_received = asyncio.Event()
-                    _log.debug('connected')
+                    _log.info('connected to %s', self._serial['port'] if self._serial is not None else f'{self._host}:{self._port}')
                     was_connected = True
                     if self._connected_handler is not None:
                         try:
@@ -433,7 +452,7 @@ class AsyncComm:
                         except Exception as e: # pylint: disable=broad-except
                             _log.exception(e)
                     done, pending = await asyncio.wait([read_handler, write_handler], return_when=asyncio.FIRST_COMPLETED)
-                    _log.debug('disconnected')
+                    _log.warning('connection lost')
 
                     for task in pending:
                         task.cancel()
@@ -452,20 +471,24 @@ class AsyncComm:
                     self._ACK_received = None
 
             except TimeoutError:
-                _log.debug('connection timeout')
-            except SerialException:
-                #_log.debug('serial exception: %s',e)
-                pass
+                _log.warning('connection timeout')
+            except SerialException as e:
+                _log.warning('serial exception: %s', e)
             except Exception as e: # pylint: disable=broad-except
                 _log.error('exception 1: %s', e)
             finally:
                 self._ACK_received = None
+                self._writer = None
                 self.reset_readings()
-                if was_connected and self._disconnected_handler is not None:
-                    try:
-                        self._disconnected_handler()
-                    except Exception as e: # pylint: disable=broad-except
-                        _log.error('exception 2: %s', e)
+                if was_connected:
+                    # only report a disconnect if a connection was established before to not
+                    # repeat the disconnect message on every failing reconnect attempt
+                    was_connected = False
+                    if self._disconnected_handler is not None:
+                        try:
+                            self._disconnected_handler()
+                        except Exception as e: # pylint: disable=broad-except
+                            _log.error('exception 2: %s', e)
                 if writer is not None:
                     try:
                         writer.close()
@@ -475,6 +498,11 @@ class AsyncComm:
                     except Exception as e: # pylint: disable=broad-except
                         _log.error('exception 3: %s', e)
             await asyncio.sleep(1)
+
+    # closes the current connection to have the connect loop re-establish it immediately
+    # (see force_reconnect())
+    def reconnect(self) -> bool:
+        return self._running and force_reconnect(self._asyncLoopThread, self._writer)
 
     def send(self, message:bytes) -> None:
         if self._asyncLoopThread is not None and self._write_queue is not None:
