@@ -11,6 +11,7 @@ v4.2.2
   - adds autoCHARGE/DROP and drum speed control to the [Schuilenburg](https://artisan-scope.org/machines/schuilenburg/) PLC machine setup
   - adds autoCHARGE/autoDROP recognition for [IMF](https://artisan-scope.org/machines/imf/) as 'auto' setup which picks up CHARGE and DROP events from the machine
   - adds UI scaling factor
+  - adds a `Repair` action to the serial port settings which re-establishes an unresponsive Bluetooth serial port on macOS by removing the pairing of the machine and pairing it again ([Issue #2226](../../../issues/2226))
   - adds [Catppuccin](https://github.com/catppuccin) themes by Liam
   - adds two more MODBUS device channels
   - adds Artisan Commands `pidDerivativeFilter(<n>)`, `pidDerivativeLimit(<n>)`, `pidILF(<n>)`, `pidIWP(<bool>)`, and `pidIRoC(<bool>)` to configure the internal PID (for John)
