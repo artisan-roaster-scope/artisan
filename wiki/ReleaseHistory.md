@@ -22,6 +22,7 @@ v4.2.2
   - faster app start (startup time redued by ~50%)
   - refreshed UI
 * FIXES
+  - reports a hint if the serial port of a Kaleido machine opens, but the machine does not respond, as a Bluetooth serial port can be left behind stale by a system suspension on macOS ([Issue #2226](../../../issues/2226))
   - fixes faulty hash generation on files created using `Save As` causing `modified file` warnings on load ([Issue #2205](../../../issues/2205))
   - fixes regression causing canvas color not being applied correctly ([Issue #2212](../../../issues/2212))
 
