@@ -15,8 +15,8 @@ sidebar:
 * __Connection:__ MODBUS TCP via the network
 * __Features:__ 
    - logging of bean temperature, inlet temperature and related rate-of-rise curves, as well as the burner temperature. 
-   - control of drum speed, airflow and vortex valve on machines with the latest firmware installed
-  - the 'control' setup picks up the CHARGE and DROP events from the machine if the firmware of the machine supports it
+   - the 'control' setup allows the control of drum speed, airflow and vortex valve on machines with the latest firmware installed
+  - the 'auto' setup build on the 'control' setup and additionally picks up the CHARGE and DROP events from the machine if the firmware of the machine supports it
 
 <figure>
 <center>
