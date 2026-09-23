@@ -157,6 +157,12 @@ class Scale(QObject):
     def signal_user(self, action:STATE_ACTION) -> None:
         pass
 
+    def enable_streaming(self) -> None:
+        pass
+
+    def disable_streaming(self) -> None:
+        pass
+
 
 class ScaleManager(QObject):
 
@@ -376,6 +382,7 @@ class ScaleManager(QObject):
     @pyqtSlot()
     def reserve_scale1_slot(self) -> None:
         if self.scale1 is not None:
+            self.scale1.enable_streaming()
             self.scale1.set_assigned(True)
             self.update_availability()
             _log.debug('scale1 reserved')
@@ -383,6 +390,7 @@ class ScaleManager(QObject):
     @pyqtSlot()
     def release_scale1_slot(self) -> None:
         if self.scale1 is not None:
+            self.scale1.disable_streaming()
             self.scale1.set_assigned(False)
             self.update_availability()
             _log.debug('scale1 released')
@@ -544,6 +552,7 @@ class ScaleManager(QObject):
     @pyqtSlot()
     def reserve_scale2_slot(self) -> None:
         if self.scale2 is not None:
+            self.scale2.enable_streaming()
             self.scale2.set_assigned(True)
             self.update_availability()
             _log.debug('scale2 reserved')
@@ -551,6 +560,7 @@ class ScaleManager(QObject):
     @pyqtSlot()
     def release_scale2_slot(self) -> None:
         if self.scale2 is not None:
+            self.scale2.disable_streaming()
             self.scale2.set_assigned(False)
             self.update_availability()
             _log.debug('scale2 released')

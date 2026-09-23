@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 24 24"
+   width="24"
+   height="24"
+   color="currentColor"
+   fill="none"
+   stroke="currentColor"
+   stroke-width="1.5"
+   stroke-linecap="round"
+   version="1.1"
+   id="svg5"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs5" />
+  <path
+     d="M10.9961 6L20.9961 6"
+     id="path1"
+     style="stroke:#dbdbdb;stroke-opacity:1" />
+  <path
+     d="M10.9961 12L20.9961 12"
+     id="path2"
+     style="stroke:#dbdbdb;stroke-opacity:1" />
+  <path
+     d="M10.9961 18L20.9961 18"
+     id="path3"
+     style="stroke:#dbdbdb;stroke-opacity:1" />
+  <path
+     d="M2.99609 15H4.49609C4.77489 15 4.91428 15 5.0302 15.0231C5.50623 15.1177 5.87835 15.4899 5.97304 15.9659C5.99609 16.0818 5.99609 16.2212 5.99609 16.5C5.99609 16.7788 5.99609 16.9182 5.97304 17.0341C5.87835 17.5101 5.50623 17.8823 5.0302 17.9769C4.91428 18 4.77489 18 4.49609 18C4.2173 18 4.0779 18 3.96199 18.0231C3.48596 18.1177 3.11384 18.4899 3.01915 18.9659C2.99609 19.0818 2.99609 19.2212 2.99609 19.5V20.4C2.99609 20.6828 2.99609 20.8243 3.08396 20.9121C3.17183 21 3.31325 21 3.59609 21H5.99609"
+     stroke-linejoin="round"
+     id="path4"
+     style="stroke:#dbdbdb;stroke-opacity:1" />
+  <path
+     d="M2.99609 9H4.49609M4.49609 9H5.99609M4.49609 9V4C4.49609 3.5286 4.49609 3.29289 4.34965 3.14645C4.2032 3 3.9675 3 3.49609 3H2.99609"
+     stroke-linejoin="round"
+     id="path5"
+     style="stroke:#dbdbdb;stroke-opacity:1" />
+</svg>

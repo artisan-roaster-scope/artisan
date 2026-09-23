@@ -95,12 +95,12 @@ class platformDlg(ArtisanDialog):
         platformdic['matplotlib'] = mpl.__version__
         platformdic['pymodbus'] = PYMODBUS_VERSION_STR
         try:
-            from Phidget22.Phidget import Phidget as PhidgetDriver # type: ignore[import-untyped]
+            from Phidget22.Phidget import Phidget as PhidgetDriver
             platformdic['Phidget driver'] = PhidgetDriver.getLibraryVersion()
         except Exception: # pylint: disable=broad-except
             pass
         try:
-            from Phidget22 import __version__ as phidget_lib_version # type: ignore[import-untyped] # @UnresolvedImport
+            from Phidget22 import __version__ as phidget_lib_version
             platformdic['Phidget lib'] = phidget_lib_version
         except Exception: # pylint: disable=broad-except
             pass

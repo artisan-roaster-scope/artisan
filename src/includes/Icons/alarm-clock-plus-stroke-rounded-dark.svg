@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 24 24"
+   width="24"
+   height="24"
+   color="currentColor"
+   fill="none"
+   stroke="currentColor"
+   stroke-width="1.5"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   version="1.1"
+   id="svg6"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs6" />
+  <path
+     d="M12 21C16.6944 21 20.5 17.1944 20.5 12.5C20.5 7.80558 16.6944 4 12 4C7.30558 4 3.5 7.80558 3.5 12.5C3.5 17.1944 7.30558 21 12 21Z"
+     id="path1"
+     style="stroke:#dbdbdb;stroke-opacity:1" />
+  <path
+     d="M5.88 18.7031L3.5 21.0031"
+     id="path2"
+     style="stroke:#dbdbdb;stroke-opacity:1" />
+  <path
+     d="M18.1406 18.668L20.5006 20.998"
+     id="path3"
+     style="stroke:#dbdbdb;stroke-opacity:1" />
+  <path
+     d="M5 3L2 6"
+     id="path4"
+     style="stroke:#dbdbdb;stroke-opacity:1" />
+  <path
+     d="M22 6L19 3"
+     id="path5"
+     style="stroke:#dbdbdb;stroke-opacity:1" />
+  <path
+     d="M12.0009 9V16M15.5059 12.495H8.50586"
+     id="path6"
+     style="stroke:#dbdbdb;stroke-opacity:1" />
+</svg>

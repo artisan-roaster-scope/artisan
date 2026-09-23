@@ -32,20 +32,24 @@ if TYPE_CHECKING:
     from PyQt6.QtWidgets import QWidget # pylint: disable=unused-import
     from PyQt6.QtGui import QCloseEvent # pylint: disable=unused-import
 
-from artisanlib.util import serialize
-from artisanlib.dialogs import ArtisanDialog
-
-from PyQt6.QtCore import Qt, pyqtSlot
-from PyQt6.QtGui import QColor
+from PyQt6.QtCore import Qt, pyqtSlot, QSize
+from PyQt6.QtGui import QColor, QIcon
 from PyQt6.QtWidgets import (QApplication, QLabel, QTableWidget, QPushButton,
     QComboBox, QHBoxLayout, QVBoxLayout, QTableWidgetItem, QDialogButtonBox,
-    QDoubleSpinBox, QGroupBox, QLineEdit, QSpinBox, QHeaderView)
+    QDoubleSpinBox, QGroupBox, QLineEdit, QSpinBox, QHeaderView, QToolButton)
+
+from artisanlib.util import serialize, getStyleIconPath
+from artisanlib.dialogs import ArtisanDialog
+from artisanlib.widgets import ArtisanMinorPushButton
+from artisanlib.styles import (horizontal_header_style, vertical_header_style, line_edit_style, spin_box_style,
+    table_style, artisan_minor_push_button_style, tool_button_icon_style)
 
 
 class WheelDlg(ArtisanDialog):
     def __init__(self, parent:'QWidget', aw:'ApplicationWindow') -> None:
         super().__init__(parent, aw)
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose, False) # overwrite the ArtisanDialog class default here!!
+        self.dashboard_was_active_on_open = self.aw.dashboard.dashboard_active()
 
         self.setModal(True)
         self.setWindowTitle(QApplication.translate('Form Caption','Wheel Graph Editor'))
@@ -54,6 +58,10 @@ class WheelDlg(ArtisanDialog):
         self.createdatatable()
         #table for labels
         self.labeltable = QTableWidget()
+
+        for table in [self.datatable, self.labeltable]:
+            table.setStyleSheet(table_style(self.aw.app.darkmode))
+            table.setShowGrid(False)
 
         self.subdialogbuttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Close | QDialogButtonBox.StandardButton.RestoreDefaults, Qt.Orientation.Horizontal)
         self.setButtonTranslations(self.subdialogbuttons.button(QDialogButtonBox.StandardButton.RestoreDefaults),'Restore Defaults',QApplication.translate('Button','Restore Defaults'))
@@ -72,6 +80,7 @@ class WheelDlg(ArtisanDialog):
         self.subdialogbuttons.setVisible(False)
         aspectlabel = QLabel(QApplication.translate('Label','Ratio'))
         self.aspectSpinBox = QDoubleSpinBox()
+        self.aspectSpinBox.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.aspectSpinBox.setToolTip(QApplication.translate('Tooltip','Aspect Ratio'))
         self.aspectSpinBox.setRange(0.,2.)
         self.aspectSpinBox.setSingleStep(.1)
@@ -86,47 +95,77 @@ class WheelDlg(ArtisanDialog):
         txtButtonminus.clicked.connect(self.changetext0)
         edgelabel = QLabel(QApplication.translate('Label','Edge'))
         self.edgeSpinBox = QSpinBox()
+        self.edgeSpinBox.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.edgeSpinBox.setToolTip(QApplication.translate('Tooltip','Decorative edge between wheels'))
         self.edgeSpinBox.setRange(0,5)
         self.edgeSpinBox.setValue(int(round(self.aw.qmc.wheeledge*100)))
         self.edgeSpinBox.valueChanged.connect(self.setedge)
         linewidthlabel = QLabel(QApplication.translate('Label','Line'))
         self.linewidthSpinBox = QSpinBox()
+        self.linewidthSpinBox.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.linewidthSpinBox.setToolTip(QApplication.translate('Tooltip','Line thickness'))
         self.linewidthSpinBox.setRange(0,20)
         self.linewidthSpinBox.setValue(int(round(self.aw.qmc.wheellinewidth)))
         self.linewidthSpinBox.valueChanged.connect(self.setlinewidth)
-        linecolor = QPushButton(QApplication.translate('Button','Line Color'))
+        linecolor = ArtisanMinorPushButton(QApplication.translate('Button','Line Color'),
+                'palette-stroke-rounded-white.svg',
+                'palette-stroke-rounded-dark.svg',
+                self.aw.app.darkmode)
         linecolor.setToolTip(QApplication.translate('Tooltip','Line color'))
         linecolor.clicked.connect(self.setlinecolor)
-        textcolor = QPushButton(QApplication.translate('Button','Text Color'))
+        textcolor = ArtisanMinorPushButton(QApplication.translate('Button','Text Color'),
+                'palette-stroke-rounded-white.svg',
+                'palette-stroke-rounded-dark.svg',
+                self.aw.app.darkmode)
         textcolor.setToolTip(QApplication.translate('Tooltip','Text color'))
         textcolor.clicked.connect(self.settextcolor)
         colorlabel = QLabel(QApplication.translate('Label','Color pattern'))
         self.colorSpinBox = QSpinBox()
+        self.colorSpinBox.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.colorSpinBox.setToolTip(QApplication.translate('Tooltip','Apply color pattern to whole graph'))
         self.colorSpinBox.setRange(0,255)
         self.colorSpinBox.setValue(int(round(self.aw.qmc.wheelcolorpattern)))
         self.colorSpinBox.setWrapping(True)
         self.colorSpinBox.valueChanged.connect(self.setcolorpattern)
-        addButton: QPushButton = QPushButton(QApplication.translate('Button','Add'))
+        addButton = ArtisanMinorPushButton(QApplication.translate('Button','Add'),
+            'add-01-stroke-rounded-white.svg',
+            'add-01-stroke-rounded-dark.svg',
+            self.aw.app.darkmode)
         addButton.setToolTip(QApplication.translate('Tooltip','Add new wheel'))
         addButton.clicked.connect(self.insertwheel)
-        rotateLeftButton: QPushButton = QPushButton('<')
+
+        rotateLeftButton = QToolButton()
+        rotateLeftButton.setText('')
         rotateLeftButton.setToolTip(QApplication.translate('Tooltip','Rotate graph 1 degree counter clockwise'))
+        rotateLeftButton.setStyleSheet(tool_button_icon_style(self.aw.app.darkmode, 'rotate-left-02-stroke-rounded-light.svg', 'rotate-left-02-stroke-rounded-dark.svg'))
+        rotateLeftButton.setMinimumWidth(28)
+        rotateLeftButton.setMinimumHeight(28)
+        rotateLeftButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         rotateLeftButton.clicked.connect(self.rotatewheels1)
-        rotateRightButton: QPushButton = QPushButton('>')
+
+        rotateRightButton = QToolButton()
+        rotateRightButton.setText('')
         rotateRightButton.setToolTip(QApplication.translate('Tooltip','Rotate graph 1 degree clockwise'))
+        rotateRightButton.setStyleSheet(tool_button_icon_style(self.aw.app.darkmode, 'rotate-right-02-stroke-rounded-light.svg', 'rotate-right-02-stroke-rounded-dark.svg'))
+        rotateRightButton.setMinimumWidth(28)
+        rotateRightButton.setMinimumHeight(28)
+        rotateRightButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         rotateRightButton.clicked.connect(self.rotatewheels0)
 
         self.main_buttons = QDialogButtonBox()
 
-        saveButton: QPushButton = QPushButton(QApplication.translate('Button','Save File'))
+        saveButton: QPushButton = ArtisanMinorPushButton(QApplication.translate('Button','Save File'),
+                'save-stroke-rounded-white.svg',
+                'save-stroke-rounded-dark.svg',
+                self.aw.app.darkmode)
         saveButton.clicked.connect(self.fileSave)
         saveButton.setToolTip(QApplication.translate('Tooltip','Save graph to a text file.wg'))
         self.main_buttons.addButton(saveButton,QDialogButtonBox.ButtonRole.ActionRole)
 
-        saveImgButton: QPushButton = QPushButton(QApplication.translate('Button','Save Img'))
+        saveImgButton: QPushButton = ArtisanMinorPushButton(QApplication.translate('Button','Save Imgage'),
+                'save-stroke-rounded-white.svg',
+                'save-stroke-rounded-dark.svg',
+                self.aw.app.darkmode)
         saveImgButton.setToolTip(QApplication.translate('Tooltip','Save image using current graph size to a png format'))
         #saveImgButton.clicked.connect(self.aw.resizeImg_0_1) # save as PNG (raster)
         saveImgButton.clicked.connect(self.aw.saveVectorGraph_PDF) # save as PDF (vector)
@@ -136,11 +175,17 @@ class WheelDlg(ArtisanDialog):
         if openButton is not None:
             openButton.setToolTip(QApplication.translate('Tooltip','open wheel graph file'))
             openButton.clicked.connect(self.loadWheel)
+            openButton.setIconSize(QSize(14,14))
+            openButton.setStyleSheet(artisan_minor_push_button_style(self.aw.app.darkmode))
+            openButton.setIcon(QIcon(getStyleIconPath('file-02-stroke-rounded-dark.svg' if self.aw.app.darkmode else 'file-02-stroke-rounded-white.svg')))
 
         viewModeButton: QPushButton|None = self.main_buttons.addButton(QDialogButtonBox.StandardButton.Close)
         if viewModeButton is not None:
             viewModeButton.setToolTip(QApplication.translate('Tooltip','Sets Wheel graph to view mode'))
             viewModeButton.clicked.connect(self.viewmode)
+            viewModeButton.setIconSize(QSize(14,14))
+            viewModeButton.setStyleSheet(artisan_minor_push_button_style(self.aw.app.darkmode))
+            viewModeButton.setIcon(QIcon(getStyleIconPath('cancel-square-stroke-rounded-dark.svg' if self.aw.app.darkmode else 'cancel-square-stroke-rounded-white.svg')))
 
         self.setButtonTranslations(self.main_buttons.button(QDialogButtonBox.StandardButton.Close),'Close', QApplication.translate('Button','Close'))
         self.setButtonTranslations(self.main_buttons.button(QDialogButtonBox.StandardButton.Open),'Open', QApplication.translate('Button','Open'))
@@ -171,10 +216,13 @@ class WheelDlg(ArtisanDialog):
         configlayout.addWidget(txtButtonplus)
         configlayout.addWidget(txtButtonminus)
         controlLayout = QHBoxLayout()
+        controlLayout.addStretch()
         controlLayout.addWidget(addButton)
+        controlLayout.addSpacing(10)
         controlLayout.addWidget(rotateLeftButton)
         controlLayout.addWidget(rotateRightButton)
 #        controlLayout.addWidget(self.hierarchyButton)
+        controlLayout.addStretch()
         mainlayout = QVBoxLayout()
         mainlayout.addWidget(self.datatable)
         mainlayout.addWidget(self.labelGroupLayout)
@@ -221,6 +269,13 @@ class WheelDlg(ArtisanDialog):
             vheader: QHeaderView|None = self.labeltable.verticalHeader()
             if vheader is not None:
                 vheader.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
+                vheader.setStyleSheet(vertical_header_style(self.aw.app.darkmode))
+                vheader.setDefaultAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
+            horizontal_header: QHeaderView|None = self.labeltable.horizontalHeader()
+            if horizontal_header is not None:
+                horizontal_header.setStyleSheet(horizontal_header_style(self.aw.app.darkmode))
+                horizontal_header.setSectionsClickable(False)
+                horizontal_header.setHighlightSections(False)
             #populate table
             for i in range(nlabels):
                 label = QTableWidgetItem(self.aw.qmc.wheelnames[x][i])
@@ -235,6 +290,7 @@ class WheelDlg(ArtisanDialog):
                     parentComboBox.addItems([])
                 parentComboBox.currentIndexChanged.connect(self.setwheelchild)
                 labelwidthSpinBox = QDoubleSpinBox()
+                labelwidthSpinBox.setStyleSheet(spin_box_style(self.aw.app.darkmode))
                 labelwidthSpinBox.setRange(1.,100.)
                 labelwidthSpinBox.setValue(self.aw.qmc.segmentlengths[x][i])
                 labelwidthSpinBox.setSuffix('%')
@@ -242,6 +298,7 @@ class WheelDlg(ArtisanDialog):
                 colorButton = QPushButton('Set Color')
                 colorButton.clicked.connect(self.setsegmentcolor)
                 alphaSpinBox = QSpinBox()
+                alphaSpinBox.setStyleSheet(spin_box_style(self.aw.app.darkmode))
                 alphaSpinBox.setRange(0,10)
                 alphaSpinBox.setValue(int(round(self.aw.qmc.segmentsalpha[x][i]*10)))
                 alphaSpinBox.valueChanged.connect(self.setsegmentalpha)
@@ -439,21 +496,31 @@ class WheelDlg(ArtisanDialog):
         vheader: QHeaderView|None = self.datatable.verticalHeader()
         if vheader is not None:
             vheader.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
+            vheader.setStyleSheet(vertical_header_style(self.aw.app.darkmode))
+            vheader.setDefaultAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
+        horizontal_header: QHeaderView|None = self.datatable.horizontalHeader()
+        if horizontal_header is not None:
+            horizontal_header.setStyleSheet(horizontal_header_style(self.aw.app.darkmode))
+            horizontal_header.setSectionsClickable(False)
+            horizontal_header.setHighlightSections(False)
         #populate table
         for i in range(ndata):
             delButton = QPushButton(QApplication.translate('Button','Delete'))
             delButton.clicked.connect(self.popwheel)
             labelsedit = QLineEdit(str(','.join(self.aw.qmc.wheelnames[i])))
+            labelsedit.setStyleSheet(line_edit_style(self.aw.app.darkmode))
             updateButton = QPushButton(QApplication.translate('Button','Update'))
             updateButton.clicked.connect(self.updatelabels)
             setButton = QPushButton(QApplication.translate('Button','Select'))
             setButton.clicked.connect(self.createlabeltable)
             widthSpinBox = QDoubleSpinBox()
+            widthSpinBox.setStyleSheet(spin_box_style(self.aw.app.darkmode))
             widthSpinBox.setRange(1.,100.)
             widthSpinBox.setValue(self.aw.qmc.wradii[i])
             widthSpinBox.setSuffix('%')
             widthSpinBox.valueChanged.connect(self.setwidth)
             angleSpinBox = QSpinBox()
+            angleSpinBox.setStyleSheet(spin_box_style(self.aw.app.darkmode))
             angleSpinBox.setSuffix(QApplication.translate('Label',' dg'))
             angleSpinBox.setRange(0,359)
             angleSpinBox.setWrapping(True)
@@ -466,12 +533,14 @@ class WheelDlg(ArtisanDialog):
             projectionComboBox.setCurrentIndex(self.aw.qmc.projection[i])
             projectionComboBox.currentIndexChanged.connect(self.setprojection)
             txtSpinBox = QSpinBox()
+            txtSpinBox.setStyleSheet(spin_box_style(self.aw.app.darkmode))
             txtSpinBox.setRange(1,30)
             txtSpinBox.setValue(int(round(self.aw.qmc.wheeltextsize[i])))
             txtSpinBox.valueChanged.connect(self.setTextsizeX)
             colorButton = QPushButton(QApplication.translate('Button','Set Color'))
             colorButton.clicked.connect(self.setwheelcolor)
             colorSpinBox = QSpinBox()
+            colorSpinBox.setStyleSheet(spin_box_style(self.aw.app.darkmode))
             colorSpinBox.setRange(0,255)
             colorSpinBox.setWrapping(True)
             colorSpinBox.valueChanged.connect(self.setwheelcolorpattern)

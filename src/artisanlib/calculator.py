@@ -26,20 +26,19 @@
 # Marko Luther, 2023
 
 from typing import override, TYPE_CHECKING
-
-from artisanlib.util import fromCtoF, fromFtoC, stringfromseconds, stringtoseconds, comma2dot, weight_units, convertWeight, convertVolume
-from artisanlib.dialogs import ArtisanDialog
+if TYPE_CHECKING:
+    from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
+    from PyQt6.QtWidgets import QWidget # pylint: disable=unused-import
+    from PyQt6.QtGui import QCloseEvent # pylint: disable=unused-import
 
 from PyQt6.QtCore import pyqtSlot, QSettings, QRegularExpression
 from PyQt6.QtGui import QRegularExpressionValidator
 from PyQt6.QtWidgets import (QApplication, QLabel, QGridLayout, QGroupBox, QLineEdit,
     QComboBox, QHBoxLayout, QVBoxLayout)
 
-
-if TYPE_CHECKING:
-    from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
-    from PyQt6.QtWidgets import QWidget # pylint: disable=unused-import
-    from PyQt6.QtGui import QCloseEvent # pylint: disable=unused-import
+from artisanlib.util import fromCtoF, fromFtoC, stringfromseconds, stringtoseconds, comma2dot, weight_units, convertWeight, convertVolume
+from artisanlib.dialogs import ArtisanDialog
+from artisanlib.styles import line_edit_style
 
 class calculatorDlg(ArtisanDialog):
     def __init__(self, parent:'QWidget', aw:'ApplicationWindow') -> None:
@@ -58,7 +57,9 @@ class calculatorDlg(ArtisanDialog):
         startlabel = QLabel(QApplication.translate('Label', 'Start (00:00)'))
         endlabel = QLabel(QApplication.translate('Label', 'End (00:00)'))
         self.startEdit = QLineEdit()
+        self.startEdit.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.endEdit = QLineEdit()
+        self.endEdit.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         regextime = QRegularExpression(r'^-?[0-9]?[0-9]?[0-9][:,h][0-5][0-9]$')
         self.startEdit.setValidator(QRegularExpressionValidator(regextime,self))
         self.endEdit.setValidator(QRegularExpressionValidator(regextime,self))
@@ -78,7 +79,9 @@ class calculatorDlg(ArtisanDialog):
         flabel = QLabel(QApplication.translate('Label', 'Fahrenheit'))
         clabel = QLabel(QApplication.translate('Label', 'Celsius'))
         self.faEdit = QLineEdit()
+        self.faEdit.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.ceEdit = QLineEdit()
+        self.ceEdit.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.faEdit.setValidator(self.aw.createCLocaleDoubleValidator(-999999., 9999999., 2, self.faEdit))
         self.ceEdit.setValidator(self.aw.createCLocaleDoubleValidator(-999999., 9999999., 2, self.ceEdit))
         self.faEdit.editingFinished.connect(self.convertTempFtoC)
@@ -94,7 +97,9 @@ class calculatorDlg(ArtisanDialog):
         self.WoutComboBox.addItems(weight_units)
         self.WoutComboBox.setCurrentIndex(2)
         self.WinEdit = QLineEdit()
+        self.WinEdit.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.WoutEdit = QLineEdit()
+        self.WoutEdit.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.WinEdit.setMaximumWidth(70)
         self.WoutEdit.setMaximumWidth(70)
         #self.WinEdit.setMinimumWidth(60)
@@ -120,7 +125,9 @@ class calculatorDlg(ArtisanDialog):
         self.VoutComboBox.addItems(volumeunits)
         self.VoutComboBox.setCurrentIndex(4)
         self.VinEdit = QLineEdit()
+        self.VinEdit.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.VoutEdit = QLineEdit()
+        self.VoutEdit.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.VinEdit.setMaximumWidth(70)
         self.VoutEdit.setMaximumWidth(70)
         #self.VinEdit.setMinimumWidth(60)
@@ -135,9 +142,13 @@ class calculatorDlg(ArtisanDialog):
         tdslabel = QLabel(QApplication.translate('Label', 'TDS (%)'))
         coffeelabel = QLabel(QApplication.translate('Label', 'Coffee (g)'))
         self.groundsEdit = QLineEdit()
+        self.groundsEdit.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.coffeeEdit = QLineEdit()
+        self.coffeeEdit.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.tdsEdit = QLineEdit()
+        self.tdsEdit.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.yieldEdit = QLineEdit()
+        self.yieldEdit.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.yieldEdit.setReadOnly(True)
         self.groundsEdit.setValidator(self.aw.createCLocaleDoubleValidator(1., 999999., 2, self.groundsEdit))
         self.coffeeEdit.setValidator(self.aw.createCLocaleDoubleValidator(1., 999999., 2, self.coffeeEdit))

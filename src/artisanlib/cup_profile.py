@@ -26,9 +26,6 @@
 # Marko Luther, 2023
 
 import platform
-from artisanlib.main import UI_MODE
-from artisanlib.dialogs import ArtisanResizeablDialog
-from artisanlib.widgets import MyQDoubleSpinBox
 
 from typing import override, Any, cast, TYPE_CHECKING
 
@@ -39,12 +36,18 @@ if TYPE_CHECKING:
 
 from PyQt6.QtCore import (Qt, pyqtSlot, QSettings)
 from PyQt6.QtWidgets import (QApplication, QCheckBox, QHBoxLayout, QVBoxLayout, QLabel,
-                             QLineEdit,QPushButton, QComboBox, QDialogButtonBox, QHeaderView,
-                             QTableWidget, QDoubleSpinBox, QGroupBox)
+                             QLineEdit, QComboBox, QDialogButtonBox, QHeaderView,
+                             QTableWidget, QDoubleSpinBox, QGroupBox, QToolButton)
+
+from artisanlib.main import UI_MODE
+from artisanlib.dialogs import ArtisanResizeablDialog
+from artisanlib.widgets import MyQDoubleSpinBox, ArtisanMinorPushButton
+from artisanlib.styles import horizontal_header_style, vertical_header_style, tool_button_icon_style, line_edit_style, table_style
 
 class flavorDlg(ArtisanResizeablDialog):
     def __init__(self, parent:'QWidget', aw:'ApplicationWindow') -> None:
         super().__init__(parent, aw)
+        self.dashboard_was_active_on_open = self.aw.dashboard.dashboard_active()
         self.setModal(True)
         #avoid question mark context help
         flags = self.windowFlags()
@@ -76,6 +79,8 @@ class flavorDlg(ArtisanResizeablDialog):
         self.lastcomboboxIndex = 0
         self.defaultcombobox.currentIndexChanged.connect(self.setdefault)
         self.flavortable = QTableWidget()
+        self.flavortable.setStyleSheet(table_style(self.aw.app.darkmode))
+        self.flavortable.setShowGrid(False)
         self.flavortable.setTabKeyNavigation(True)
 
         vheader = self.flavortable.verticalHeader()
@@ -85,6 +90,11 @@ class flavorDlg(ArtisanResizeablDialog):
             vheader.setDragDropMode(QTableWidget.DragDropMode.InternalMove)
             vheader.setAutoScroll(False)
             vheader.sectionMoved.connect(self.sectionMoved)
+            vheader.setStyleSheet(vertical_header_style(self.aw.app.darkmode))
+            vheader.setDefaultAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
+        horizontal_header = self.flavortable.horizontalHeader()
+        if horizontal_header is not None:
+            horizontal_header.setStyleSheet(horizontal_header_style(self.aw.app.darkmode))
 
         self.createFlavorTable()
 
@@ -96,19 +106,38 @@ class flavorDlg(ArtisanResizeablDialog):
         self.correctionSpinBox.setValue(self.aw.qmc.flavors_total_correction)
         self.correctionSpinBox.valueChanged.connect(self.setcorrection)
 
-        leftButton = QPushButton('<')
+        leftButton = QToolButton()
+        leftButton.setText('')
+        leftButton.setStyleSheet(tool_button_icon_style(self.aw.app.darkmode, 'rotate-left-02-stroke-rounded-light.svg', 'rotate-left-02-stroke-rounded-dark.svg'))
+        leftButton.setMinimumWidth(28)
+        leftButton.setMinimumHeight(28)
         leftButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         leftButton.clicked.connect(self.moveLeft)
-        rightButton = QPushButton('>')
+
+        rightButton = QToolButton()
+        rightButton.setText('')
+        rightButton.setStyleSheet(tool_button_icon_style(self.aw.app.darkmode, 'rotate-right-02-stroke-rounded-light.svg', 'rotate-right-02-stroke-rounded-dark.svg'))
+        rightButton.setMinimumWidth(28)
+        rightButton.setMinimumHeight(28)
         rightButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         rightButton.clicked.connect(self.moveRight)
-        addButton = QPushButton(QApplication.translate('Button','Add'))
+
+        addButton = ArtisanMinorPushButton(QApplication.translate('Button','Add'),
+            'add-01-stroke-rounded-white.svg',
+            'add-01-stroke-rounded-dark.svg',
+            self.aw.app.darkmode)
         addButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         addButton.clicked.connect(self.addlabel)
-        delButton = QPushButton(QApplication.translate('Button','Del'))
+        delButton = ArtisanMinorPushButton(QApplication.translate('Button','Delete'),
+            'delete-02-stroke-rounded-white.svg',
+            'delete-02-stroke-rounded-dark.svg',
+            self.aw.app.darkmode)
         delButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         delButton.clicked.connect(self.poplabel)
-        saveImgButton = QPushButton(QApplication.translate('Button','Save Image'))
+        saveImgButton = ArtisanMinorPushButton(QApplication.translate('Button','Save image'),
+            'save-stroke-rounded-white.svg',
+            'save-stroke-rounded-dark.svg',
+            self.aw.app.darkmode)
         saveImgButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         saveImgButton.clicked.connect(self.aw.saveVectorGraph_PDF) # save as PDF (vector)
 
@@ -239,6 +268,7 @@ class flavorDlg(ArtisanResizeablDialog):
             #populate table
             for i in range(nflavors):
                 labeledit = QLineEdit(self.aw.qmc.flavorlabels[i])
+                labeledit.setStyleSheet(line_edit_style(self.aw.app.darkmode))
                 labeledit.textChanged.connect(self.setlabel)
                 valueSpinBox = MyQDoubleSpinBox()
                 valueSpinBox.setRange(0.,10.)
@@ -388,6 +418,8 @@ class flavorDlg(ArtisanResizeablDialog):
 
     @override
     def close(self) -> bool:
+        if self.dashboard_was_active_on_open:
+            self.aw.dashboard.show_dashboard()
         settings = QSettings()
         #save window geometry
         settings.setValue('FlavorProperties',self.saveGeometry())

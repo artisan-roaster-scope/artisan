@@ -90,6 +90,7 @@ EvalueMarkerSize=2.5, 2.5, 2.5, 2.5
 EvalueTextColor=#ffffff, #ffffff, #ffffff, #ffffff
 Evaluealpha=0.85, 0.85, 0.85, 0.85
 Evaluelinethickness=1, 1, 1, 1
+eventsGraphflag=2
 
 [grid]
 gridalpha=0.35

@@ -28,22 +28,24 @@
 # Marko Luther
 
 from PyQt6.QtWidgets import (QApplication, QComboBox, QLineEdit, QDialogButtonBox,
-    QToolButton, QTableWidget, QStyle, QHeaderView)
+    QToolButton, QTableWidget, QHeaderView, QWidget, QHBoxLayout)
 from PyQt6.QtCore import Qt, pyqtSlot, QSize, QSettings
-from PyQt6.QtGui import QKeySequence, QAction, QIcon, QStandardItemModel
+from PyQt6.QtGui import QKeySequence, QAction, QStandardItemModel
 
 import logging
-from artisanlib.util import comma2dot, float2floatWeightVolume
-from artisanlib.dialogs import ArtisanDialog
-from artisanlib.widgets import MyQComboBox
 from uic import BlendDialog # OFF type: ignore[attr-defined] # pylint: disable=no-name-in-module
 from collections.abc import Collection
 from typing import override, Final, cast, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
-    from PyQt6.QtWidgets import QWidget # noqa: F401 # pylint: disable=unused-import
+    from PyQt6.QtWidgets import QWidget # noqa: F401 # pylint: disable=unused-import,reimported
     from PyQt6.QtGui import QCloseEvent, QKeyEvent # pylint: disable=unused-import
+
+from artisanlib.util import comma2dot, float2floatWeightVolume
+from artisanlib.dialogs import ArtisanDialog
+from artisanlib.widgets import MyQComboBox
+from artisanlib.styles import tool_button_icon_style, line_edit_style, table_style, horizontal_header_style, vertical_header_style
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
@@ -157,8 +159,25 @@ class CustomBlendDialog(ArtisanDialog):
                 pass
             cancelButton.addActions([cancelAction])
 
+        # style
+        self.ui.tableWidget.setStyleSheet(table_style(self.aw.app.darkmode))
+        self.ui.tableWidget.setShowGrid(False)
+        horizontal_header = self.ui.tableWidget.horizontalHeader()
+        if horizontal_header is not None:
+            horizontal_header.setStyleSheet(horizontal_header_style(aw.app.darkmode))
+            horizontal_header.setSectionsClickable(False)
+            horizontal_header.setHighlightSections(False)
+        vertical_header = self.ui.tableWidget.verticalHeader()
+        if vertical_header is not None:
+            vertical_header.setStyleSheet(vertical_header_style(aw.app.darkmode))
+            vertical_header.setDefaultAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
+            vertical_header.setSectionsClickable(False)
+            vertical_header.setHighlightSections(False)
+            vertical_header.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
 
         # populate widgets
+        self.ui.lineEdit_name.setStyleSheet(line_edit_style(self.aw.app.darkmode))
+        self.ui.lineEdit_weight.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.ui.lineEdit_name.setText(self.blend.name)
         self.ui.label_weight.setText(QApplication.translate('Label','Weight'))
         self.ui.lineEdit_weight.setValidator(self.aw.createCLocaleDoubleValidator(0., 9999999., 4, self.ui.lineEdit_weight))  # the max limit has to be high enough otherwise the connected signals are not send!
@@ -368,13 +387,17 @@ class CustomBlendDialog(ArtisanDialog):
                 ratioedit.setMaximumWidth(40)
                 ratioedit.setValidator(self.aw.createCLocaleDoubleValidator(0., 9999999., 1, ratioedit))  # the max limit has to be high enough otherwise the connected signals are not send!
                 if not ratio_correct:
-                    ratioedit.setStyleSheet('QLineEdit { color: #CC0F50; }')
+#                    ratioedit.setStyleSheet('QLineEdit { color: #CC0F50; }')
+                    ratioedit.setStyleSheet(line_edit_style(self.aw.app.darkmode, color='#CC0F50'))
+                else:
+                    ratioedit.setStyleSheet(line_edit_style(self.aw.app.darkmode))
                 self.ui.tableWidget.setCellWidget(i,0,ratioedit)
                 ratioedit.editingFinished.connect(self.ratioChanged)
 
                 #weight
                 component_weight = c.ratio * self.inWeight
                 weightedit = QLineEdit(f'{float2floatWeightVolume(component_weight):g}')
+                weightedit.setStyleSheet(line_edit_style(self.aw.app.darkmode))
                 weightedit.setAlignment(Qt.AlignmentFlag.AlignRight)
                 weightedit.setMinimumWidth(70)
                 weightedit.setMaximumWidth(70)
@@ -406,16 +429,25 @@ class CustomBlendDialog(ArtisanDialog):
                 #delete
                 if rows>2:
                     deleteButton = QToolButton()
-                    app_style = QApplication.style()
-                    if app_style is not None:
-                        deleteButton.setIcon(QIcon(app_style.standardIcon(QStyle.StandardPixmap.SP_DialogDiscardButton))) #SP_TitleBarCloseButton
+                    deleteButton.setText('')
+#                    app_style = QApplication.style()
+#                    if app_style is not None:
+#                        deleteButton.setIcon(QIcon(app_style.standardIcon(QStyle.StandardPixmap.SP_DialogDiscardButton))) #SP_TitleBarCloseButton
+                    deleteButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+                    deleteButton.setStyleSheet(tool_button_icon_style(self.aw.app.darkmode,
+                        'delete-02-stroke-rounded-light.svg', 'delete-02-stroke-rounded-dark.svg'))
                     deleteButton.setIconSize(QSize(16,16))
                     deleteButton.setFixedSize(QSize(22, 22))
                     deleteButton.clicked.connect(self.deleteComponent)
-                    self.ui.tableWidget.setCellWidget(i,3,deleteButton)
+                    container = QWidget()
+                    layout = QHBoxLayout(container)
+                    layout.addWidget(deleteButton)
+                    layout.setContentsMargins(0, 0, 0, 0)
+                    layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+                    self.ui.tableWidget.setCellWidget(i,3,container)
 
-            header = self.ui.tableWidget.horizontalHeader()
             self.ui.tableWidget.resizeColumnsToContents()
+            header = self.ui.tableWidget.horizontalHeader()
             if header is not None:
                 header.setStretchLastSection(False)
                 header.setSectionResizeMode(0, QHeaderView.ResizeMode.Fixed)
@@ -425,6 +457,8 @@ class CustomBlendDialog(ArtisanDialog):
             self.ui.tableWidget.setColumnWidth(3,22)
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
+
+
 
 
 def openCustomBlendDialog(window:'QWidget', aw:'ApplicationWindow', inWeight:float, weightUnit:str,

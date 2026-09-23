@@ -236,7 +236,8 @@ HEADER2:Final[bytes]      = b'\xdd'
 
 HEARTBEAT_FREQUENCY:Final[int] = 5 # send the heartbeat every 5 sec
 
-RELAY_STREAMING:Final[bool] = False # if set, configure Acaia relay (and COSMO) scales to streaming mode, otherwise they work in non-streaming mode reporting only weight changes
+RELAY_NON_STREAMING:Final[bool] = True # if set, non-streaming mode on relay scales is enabled
+#if set, default Acaia relay (and COSMO) scales to streaming mode, otherwise  work in non-streaming mode reporting only weight changes
 WEIGHT_ROUNDING:Final[bool] = False # if set, received weights are rounded to appropriate values based on scales readability
 # rounding for scales with readability>1 (to 4g), no rounding otherwise
 
@@ -690,7 +691,7 @@ class AcaiaProtocol:
                 if self.fast_notifications_sent and not self.slow_notifications_sent and self.stable_weight is not None: # ensure that we turn slow only after receiving a stable weight
                     # after receiving the first weight quick,
                     # we slow down the weight notificatinos
-                    self.slow_notifications()
+                    self.slow_notifications(not RELAY_NON_STREAMING)
             elif event == EVENT.BATTERY:
                 val = self.parse_battery_event(payload)
             elif event == EVENT.SETTING:
@@ -1015,9 +1016,11 @@ class AcaiaProtocol:
                     0,  # weight id
                     0])) # only SCALE_CLASS.RELAY # 0: only weight changes are reported; 1: streaming weight changes at 1/10
 
-    def slow_notifications(self) -> None:
+    # if not streaming, non-streaming mode is activated if scale supports it
+    def slow_notifications(self, streaming:bool = False) -> None:
         _log.debug('slow notifications: %s', self.scale_class)
-        if self.scale_class == SCALE_CLASS.RELAY and not RELAY_STREAMING:
+        if self.scale_class == SCALE_CLASS.RELAY and not streaming and RELAY_NON_STREAMING: # if non-streaming mode is enabled and requests we switch to non-streaming mode
+            _log.debug('non-streaming mode activated')
             self.send_event(
                 bytes([ # pairs of key/setting
                         0,  # weight id
@@ -1026,6 +1029,7 @@ class AcaiaProtocol:
                           # 5 or 7 seems to be good values for this app in Artisan
                     ]))
         else:
+            _log.debug('standard streaming mode activated')
             self.send_event(
                 bytes([ # pairs of key/setting
                         0,  # weight id
@@ -1195,6 +1199,12 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
     def send_tare(self) -> None:
         self.protocol.send_tare()
 
+    def enable_streaming(self) -> None:
+        self.protocol.slow_notifications(streaming=True)
+
+    def disable_streaming(self) -> None:
+        self.protocol.slow_notifications(streaming=False)
+
     ###
 
     async def reader(self) -> None:
@@ -1295,6 +1305,12 @@ class AcaiaAsync(AsyncComm):
     def send_tare(self) -> None:
         self.protocol.send_tare()
 
+    def enable_streaming(self) -> None:
+        self.protocol.slow_notifications(streaming=True)
+
+    def disable_streaming(self) -> None:
+        self.protocol.slow_notifications(streaming=False)
+
     ###
 
     def connected_handler(self) -> None:
@@ -1385,6 +1401,13 @@ class AcaiaBluetooth(Acaia): # pyright: ignore [reportGeneralTypeIssues] # Argum
     def signal_user(self, action:STATE_ACTION) -> None:
         self.acaia.send_signal(action)
 
+    @override
+    def enable_streaming(self) -> None:
+        self.acaia.enable_streaming()
+
+    @override
+    def disable_streaming(self) -> None:
+        self.acaia.disable_streaming()
 
 ### internal signals
 
@@ -1502,6 +1525,15 @@ class AcaiaSerial(Acaia): # pyright: ignore [reportGeneralTypeIssues] # Argument
         if self.acaia is not None:
             self.acaia.send_signal(action)
 
+    @override
+    def enable_streaming(self) -> None:
+        if self.acaia is not None:
+            self.acaia.enable_streaming()
+
+    @override
+    def disable_streaming(self) -> None:
+        if self.acaia is not None:
+            self.acaia.disable_streaming()
 
     ###
 

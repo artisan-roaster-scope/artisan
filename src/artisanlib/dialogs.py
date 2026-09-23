@@ -19,7 +19,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
-# MAINTAINER
+# MAINTAINERline_edit_style
 # Marko Luther, 2026
 #
 # AUTHOR
@@ -28,22 +28,22 @@
 import platform
 import logging
 import re
-
-from PyQt6.QtCore import Qt, QEvent, QSettings, pyqtSlot, pyqtSignal, QRegularExpression
-from PyQt6.QtWidgets import (QApplication, QWidget, QDialog, QMessageBox, QDialogButtonBox,
-            QHBoxLayout, QVBoxLayout, QLabel, QLineEdit, QLayout, QTableWidget, QHeaderView, QPushButton, QSpinBox, QCheckBox)
-from PyQt6.QtGui import QKeySequence, QAction, QIntValidator, QTextCharFormat, QTextCursor, QColor
-
-from artisanlib.widgets import MyQComboBox, ClickableQLineEdit, ArtisanTextEdit
-from artisanlib.util import comma2dot, float2float, float2floatWeightVolume, convertWeight, weight_units
-from artisanlib.table_style import horizontal_header_style, vertical_header_style
-
 from collections.abc import Callable
 from typing import override, Final, cast, TYPE_CHECKING
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
     from PyQt6.QtGui import QCloseEvent, QDragEnterEvent, QDropEvent, QKeyEvent, QShowEvent  # pylint: disable=unused-import
     from PyQt6.QtCore import QTimerEvent, QObject # pylint: disable=unused-import
+
+from PyQt6.QtCore import Qt, QEvent, QSettings, pyqtSlot, pyqtSignal, QRegularExpression
+from PyQt6.QtWidgets import (QApplication, QWidget, QDialog, QMessageBox, QDialogButtonBox,
+            QHBoxLayout, QVBoxLayout, QLabel, QLineEdit, QLayout, QTableWidget, QHeaderView, QPushButton, QSpinBox, QCheckBox)
+from PyQt6.QtGui import QKeySequence, QAction, QIntValidator, QTextCharFormat, QTextCursor, QColor, QIcon
+
+from artisanlib.widgets import MyQComboBox, ClickableQLineEdit, ArtisanTextEdit, ArtisanMinorPushButton
+from artisanlib.util import comma2dot, float2float, float2floatWeightVolume, convertWeight, weight_units, getStyleIconPath
+from artisanlib.styles import horizontal_header_style, vertical_header_style, line_edit_style, spin_box_style, table_style
+
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
@@ -198,6 +198,7 @@ class HelpDlg(ArtisanDialog):
         # Search bar
         self.search_input = QLineEdit()
         self.search_input.setPlaceholderText(QApplication.translate('Label', 'Enter text to search'))
+        self.search_input.setStyleSheet(line_edit_style(self.aw.app.darkmode))
 
         # Connect Enter key to search and navigate results
         self.search_input.returnPressed.connect(self.doSearch)
@@ -227,6 +228,7 @@ class HelpDlg(ArtisanDialog):
 
     @override
     def keyPressEvent(self, a0: 'QKeyEvent|None') -> None:
+
         if a0 is not None:
             key = a0.key()
             # uncomment next lines to find the integer value and name of a key
@@ -362,6 +364,7 @@ class ArtisanInputDialog(ArtisanDialog):
         self.setModal(True)
         self.setAcceptDrops(True)
         self.inputLine = QLineEdit(self.url)
+        self.inputLine.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         layout = QVBoxLayout()
         layout.addWidget(QLabel(label))
         layout.addWidget(self.inputLine)
@@ -572,6 +575,7 @@ class ArtisanSliderLCDinputDlg(ArtisanDialog):
         self.label = QLabel(title)
 
         self.valueEdit = QLineEdit(str(value))
+        self.valueEdit.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.valueEdit.setFixedWidth(50)
         self.valueEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.valueEdit.setValidator(QIntValidator(value_min, value_max, self.valueEdit))
@@ -619,14 +623,22 @@ class tareDlg(ArtisanDialog):
         self.setWindowTitle(QApplication.translate('Form Caption','Containers'))
 
         self.taretable = QTableWidget()
+        self.taretable.setStyleSheet(table_style(self.aw.app.darkmode))
+        self.taretable.setShowGrid(False)
         self.taretable.setTabKeyNavigation(True)
         self.createTareTable()
 
         self.taretable.itemSelectionChanged.connect(self.selectionChanged)
 
-        addButton = QPushButton(QApplication.translate('Button','Add'))
+        addButton = ArtisanMinorPushButton(QApplication.translate('Button','Add'),
+            'add-01-stroke-rounded-white.svg',
+            'add-01-stroke-rounded-dark.svg',
+            self.aw.app.darkmode)
         addButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.delButton = QPushButton(QApplication.translate('Button','Delete'))
+        self.delButton = ArtisanMinorPushButton(QApplication.translate('Button','Delete'),
+            'delete-02-stroke-rounded-light.svg',
+            'delete-02-stroke-rounded-dark.svg',
+            self.aw.app.darkmode)
         self.delButton.setDisabled(True)
         self.delButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
@@ -656,12 +668,17 @@ class tareDlg(ArtisanDialog):
         self.setMinimumWidth(230)
         self.setMinimumHeight(250)
 
+    def updateDelButtonState(self) -> None:
+        if len(self.taretable.selectedRanges()) > 0:
+            self.delButton.setEnabled(True)
+            self.delButton.setIcon(QIcon(getStyleIconPath('delete-02-stroke-rounded-white.svg')))
+        else:
+            self.delButton.setEnabled(False)
+            self.delButton.setIcon(QIcon(getStyleIconPath('delete-02-stroke-rounded-dark.svg' if self.aw.app.darkmode else 'delete-02-stroke-rounded.svg')))
+
     @pyqtSlot()
     def selectionChanged(self) -> None:
-        if len(self.taretable.selectedRanges()) > 0:
-            self.delButton.setDisabled(False)
-        else:
-            self.delButton.setDisabled(False)
+        self.updateDelButtonState()
 
     @pyqtSlot()
     @override
@@ -674,9 +691,11 @@ class tareDlg(ArtisanDialog):
     # weight is always in g
     def setTableRow(self, row:int, name:str, weight:float) -> None:
         name_widget = QLineEdit()
+        name_widget.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         name_widget.setAlignment(Qt.AlignmentFlag.AlignRight)
         name_widget.setText(name)
         weight_widget = ClickableQLineEdit()
+        weight_widget.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         weight_widget.setAlignment(Qt.AlignmentFlag.AlignRight)
         # NOTE: we support container weights up to 5kg (11,023lb)
         if self.aw.qmc.weight[2] == 'g':
@@ -704,6 +723,7 @@ class tareDlg(ArtisanDialog):
             weight = 0
         #add widgets to the table
         self.setTableRow(rows, QApplication.translate('Label', 'container'), weight)
+#        self.updateDelButtonState()
 
     @pyqtSlot(bool)
     def delTare(self, _:bool = False) -> None:
@@ -712,6 +732,7 @@ class tareDlg(ArtisanDialog):
             bindex = selected[0].topRow()
             if bindex >= 0:
                 self.taretable.removeRow(bindex)
+                self.updateDelButtonState()
 
     def saveTareTable(self) -> None:
         tars = self.taretable.rowCount()
@@ -808,6 +829,7 @@ class DesignerSplineNodesDlg(ArtisanDialog):
         # Create the spinbox for selecting number of nodes
         self.nodes_label = QLabel(QApplication.translate('Label','Number of spline nodes'))
         self.nodes_spinbox = QSpinBox()
+        self.nodes_spinbox.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.nodes_spinbox.setMinimum(3)
         self.nodes_spinbox.setMaximum(100)
         self.nodes_spinbox.setValue(default_nodes)

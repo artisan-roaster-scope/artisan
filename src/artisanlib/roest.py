@@ -502,7 +502,7 @@ class ROESTdialog(ArtisanDialog):
         self.buttonUpdate.clicked.connect(self.trigger_machine_update)
 
         basedir = os.path.join(getResourcePath(),'Icons')
-        p = os.path.join(basedir, ('update_dark.svg' if self.aw.app.darkmode else 'update_light.svg'))
+        p = os.path.join(basedir, ('update-dark.svg' if self.aw.app.darkmode else 'update-light.svg'))
         self.buttonUpdate.setIcon(QIcon(p))
 
         self.machinesCombo = QComboBox()

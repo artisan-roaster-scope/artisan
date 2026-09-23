@@ -324,8 +324,11 @@ def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
                 connect_semaphore.release(1)
         if aw is not None:
             aw.updatePlusStatusSignal.emit()  # @UndefinedVariable
-        if interactive and is_connected():
-            QTimer.singleShot(2000, stock.update)
+        if is_connected():
+            if interactive:
+                QTimer.singleShot(2000, stock.update)
+            if aw is not None:
+                aw.dashboard.update_inventory_section()
 
 
 # show a dialog to have the user confirm the disconnect action
@@ -399,6 +402,7 @@ def disconnect(
             if connect_semaphore.available() < 1:
                 connect_semaphore.release(1)
         if aw is not None:
+            aw.dashboard.update_inventory_section()
             aw.updatePlusStatusSignal.emit()  # @UndefinedVariable
             aw.disconnectPlusSignal.emit()  # @UndefinedVariable
 

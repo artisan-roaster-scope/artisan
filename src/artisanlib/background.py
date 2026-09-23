@@ -28,11 +28,6 @@
 import platform
 import logging
 
-from artisanlib.main import UI_MODE
-from artisanlib.util import deltaLabelUTF8, deltaLabelPrefix, stringfromseconds
-from artisanlib.dialogs import ArtisanResizeablDialog
-from artisanlib.widgets import (MyTableWidgetItemNumber)
-from artisanlib.table_style import horizontal_header_style, vertical_header_style
 
 from typing import override, Final, TYPE_CHECKING
 
@@ -42,10 +37,15 @@ if TYPE_CHECKING:
 
 from PyQt6.QtCore import (Qt, pyqtSlot, QSettings, QTimer)
 from PyQt6.QtGui import QColor, QKeySequence
-from PyQt6.QtWidgets import (QApplication, QCheckBox, QGridLayout, QHBoxLayout, QVBoxLayout,
+from PyQt6.QtWidgets import (QApplication, QCheckBox, QGridLayout, QHBoxLayout, QVBoxLayout, QToolButton,
                              QLabel, QLineEdit,QPushButton, QComboBox, QDialogButtonBox, QHeaderView,
                              QSpinBox, QTableWidget, QTableWidgetItem, QTabWidget, QWidget, QGroupBox)
 
+from artisanlib.main import UI_MODE
+from artisanlib.util import deltaLabelUTF8, deltaLabelPrefix, stringfromseconds
+from artisanlib.dialogs import ArtisanResizeablDialog
+from artisanlib.widgets import MyTableWidgetItemNumber, ArtisanMinorPushButton
+from artisanlib.styles import horizontal_header_style, vertical_header_style, line_edit_style, tool_button_icon_style, table_style, spin_box_style
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -58,7 +58,7 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.ETname = self.aw.qmc.device_name_subst(self.aw.ETname)
         self.BTname = self.aw.qmc.device_name_subst(self.aw.BTname)
 
-        self.setWindowTitle(QApplication.translate('Form Caption','Profile Background'))
+        self.setWindowTitle(QApplication.translate('Form Caption','Roast Template'))
         self.setModal(True)
 
         settings = QSettings()
@@ -67,7 +67,7 @@ class backgroundDlg(ArtisanResizeablDialog):
 
         #TAB 1
         self.pathedit = QLineEdit(self.aw.qmc.backgroundpath)
-        self.pathedit.setStyleSheet("background-color:'lightgrey';")
+        self.pathedit.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.pathedit.setReadOnly(True)
         self.pathedit.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.filename = ''
@@ -92,16 +92,25 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.backgroundBTflag.setChecked(self.aw.qmc.backgroundBTcurve)
         self.backgroundFullflag.setChecked(self.aw.qmc.backgroundShowFullflag)
         self.keyboardControlflag.setChecked(self.aw.qmc.backgroundKeyboardControlFlag)
-        loadButton = QPushButton(QApplication.translate('Button','Load'))
+        loadButton = ArtisanMinorPushButton(QApplication.translate('Button','Load'),
+            'file-02-stroke-rounded-white.svg',
+            'file-02-stroke-rounded-dark.svg',
+            self.aw.app.darkmode)
         loadButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        delButton = QPushButton(QApplication.translate('Button','Delete'))
+        delButton = ArtisanMinorPushButton(QApplication.translate('Button','Clear'),
+            'cancel-01-stroke-rounded-white.svg',
+            'cancel-01-stroke-rounded-dark.svg',
+            self.aw.app.darkmode)
         delButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
         # connect the ArtisanDialog standard OK/Cancel buttons
         self.dialogbuttons.accepted.connect(self.accept)
         self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel))
 
-        alignButton = QPushButton(QApplication.translate('Button','Align'))
+        alignButton = ArtisanMinorPushButton(QApplication.translate('Button','Align'),
+            'keyframe-align-vertical-stroke-rounded-white.svg',
+            'keyframe-align-vertical-stroke-rounded-dark.svg',
+            self.aw.app.darkmode)
         alignButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.alignComboBox = QComboBox()
         self.aw.qmc.alignnames = [
@@ -121,6 +130,7 @@ class backgroundDlg(ArtisanResizeablDialog):
         alignButton.clicked.connect(self.timealign)
 
         self.speedSpinBox = QSpinBox()
+        self.speedSpinBox.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.speedSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.speedSpinBox.setRange(1,90)
         self.speedSpinBox.setSingleStep(5)
@@ -163,14 +173,34 @@ class backgroundDlg(ArtisanResizeablDialog):
             self.ytcurveComboBox.setCurrentIndex(self.aw.qmc.ytcurveidx)
         self.ytcurveComboBox.currentIndexChanged.connect(self.changeYTcurveidx)
 
-        self.upButton = QPushButton(QApplication.translate('Button','Up'))
+        self.upButton = QToolButton()
+        self.upButton.setText('')
+        self.upButton.setStyleSheet(tool_button_icon_style(self.aw.app.darkmode, 'arrow-big-up-dash-stroke-rounded-light.svg', 'arrow-big-up-dash-stroke-rounded-dark.svg'))
+        self.upButton.setMinimumWidth(35)
+        self.upButton.setMinimumHeight(35)
         self.upButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.downButton = QPushButton(QApplication.translate('Button','Down'))
+
+        self.downButton = QToolButton()
+        self.downButton.setText('')
+        self.downButton.setStyleSheet(tool_button_icon_style(self.aw.app.darkmode, 'arrow-big-down-dash-stroke-rounded-light.svg', 'arrow-big-down-dash-stroke-rounded-dark.svg'))
+        self.downButton.setMinimumWidth(35)
+        self.downButton.setMinimumHeight(35)
         self.downButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.leftButton = QPushButton(QApplication.translate('Button','Left'))
+
+        self.leftButton = QToolButton()
+        self.leftButton.setText('')
+        self.leftButton.setStyleSheet(tool_button_icon_style(self.aw.app.darkmode, 'arrow-big-left-dash-stroke-rounded-light.svg', 'arrow-big-left-dash-stroke-rounded-dark.svg'))
+        self.leftButton.setMinimumWidth(35)
+        self.leftButton.setMinimumHeight(35)
         self.leftButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.rightButton = QPushButton(QApplication.translate('Button','Right'))
+
+        self.rightButton = QToolButton()
+        self.rightButton.setText('')
+        self.rightButton.setStyleSheet(tool_button_icon_style(self.aw.app.darkmode, 'arrow-big-right-dash-stroke-rounded-light.svg', 'arrow-big-right-dash-stroke-rounded-dark.svg'))
+        self.rightButton.setMinimumWidth(35)
+        self.rightButton.setMinimumHeight(35)
         self.rightButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+
         self.backgroundCheck.clicked.connect(self.readChecks)
         self.backgroundDetails.clicked.connect(self.readChecks)
         self.backgroundeventsflag.clicked.connect(self.readChecks)
@@ -187,6 +217,7 @@ class backgroundDlg(ArtisanResizeablDialog):
         #TAB 2 EVENTS
         #table for showing events
         self.eventtable = QTableWidget()
+        self.eventtable.setStyleSheet(table_style(self.aw.app.darkmode))
         horizontal_header = self.eventtable.horizontalHeader()
         if horizontal_header is not None:
             horizontal_header.setStyleSheet(horizontal_header_style(self.aw.app.darkmode))
@@ -195,15 +226,17 @@ class backgroundDlg(ArtisanResizeablDialog):
             vertical_header.setStyleSheet(vertical_header_style(self.aw.app.darkmode))
             vertical_header.setDefaultAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
         self.eventtable.setTabKeyNavigation(True)
-        self.copyeventTableButton = QPushButton(QApplication.translate('Button', 'Copy Table'))
+        self.copyeventTableButton = ArtisanMinorPushButton(QApplication.translate('Button', 'Copy table'),
+            'copy-stroke-rounded-white.svg',
+            'copy-stroke-rounded-dark.svg',
+            self.aw.app.darkmode)
         self.copyeventTableButton.setToolTip(QApplication.translate('Tooltip','Copy table to clipboard, OPTION or ALT click for tabular text'))
         self.copyeventTableButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.copyeventTableButton.setMaximumSize(self.copyeventTableButton.sizeHint())
-        self.copyeventTableButton.setMinimumSize(self.copyeventTableButton.minimumSizeHint())
         self.copyeventTableButton.clicked.connect(self.copyEventTabletoClipboard)
         #TAB 3 DATA
         #table for showing data
         self.datatable = QTableWidget()
+        self.datatable.setStyleSheet(table_style(self.aw.app.darkmode))
         horizontal_header = self.datatable.horizontalHeader()
         if horizontal_header is not None:
             horizontal_header.setStyleSheet(horizontal_header_style(self.aw.app.darkmode))
@@ -212,7 +245,10 @@ class backgroundDlg(ArtisanResizeablDialog):
             vertical_header.setStyleSheet(vertical_header_style(self.aw.app.darkmode))
             vertical_header.setDefaultAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignVCenter)
         self.datatable.setTabKeyNavigation(True)
-        self.copydataTableButton = QPushButton(QApplication.translate('Button', 'Copy Table'))
+        self.copydataTableButton = ArtisanMinorPushButton(QApplication.translate('Button', 'Copy table'),
+            'copy-stroke-rounded-white.svg',
+            'copy-stroke-rounded-dark.svg',
+            self.aw.app.darkmode)
         self.copydataTableButton.setToolTip(QApplication.translate('Tooltip','Copy table to clipboard, OPTION or ALT click for tabular text'))
         self.copydataTableButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.copydataTableButton.setMaximumSize(self.copydataTableButton.sizeHint())
@@ -267,7 +303,9 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.etimeunit =QLabel(QApplication.translate('Label', 'sec'))
         self.etimeunit.setEnabled(self.aw.qmc.backgroundReproduce)
         self.etimeSpinBox = QSpinBox()
+        self.etimeSpinBox.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.etimeSpinBox.setRange(1,60)
+        self.etimeSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.etimeSpinBox.setValue(int(self.aw.qmc.detectBackgroundEventTime))
         self.etimeSpinBox.valueChanged.connect(self.setreproduce)
         self.etimeSpinBox.setEnabled(self.aw.qmc.backgroundReproduce)
@@ -289,11 +327,11 @@ class backgroundDlg(ArtisanResizeablDialog):
 
         #LAYOUT MANAGERS
         movelayout = QGridLayout()
-        movelayout.addWidget(self.upButton,0,1)
+        movelayout.addWidget(self.upButton,0,1, Qt.AlignmentFlag.AlignCenter)
         movelayout.addWidget(self.leftButton,1,0)
         movelayout.addWidget(self.speedSpinBox,1,1)
         movelayout.addWidget(self.rightButton,1,2)
-        movelayout.addWidget(self.downButton,2,1)
+        movelayout.addWidget(self.downButton,2,1, Qt.AlignmentFlag.AlignCenter)
         movelayout.setSpacing(15)
         checkslayout1 = QHBoxLayout()
         checkslayout1.addStretch()
@@ -429,6 +467,7 @@ class backgroundDlg(ArtisanResizeablDialog):
 
         # Ramp Lookahead
         self.rampLookahead = QSpinBox()
+        self.rampLookahead.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.rampLookahead.setToolTip(QApplication.translate('Tooltip', 'On ramping the ramp value is taken with a positive time offset\nspecified by the lookahead'))
         self.rampLookahead.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.rampLookahead.setRange(0,999)

@@ -64,7 +64,8 @@ YTbackmarkersize=6
 
 [Style]
 glow=0
-graphstyle=0
+graphfont=9
+graphstyle=1
 patheffects=0
 
 [XT]
@@ -80,6 +81,7 @@ EvalueMarkerSize=3, 3, 3, 3
 EvalueTextColor=#303446, #303446, #303446, #303446
 Evaluealpha=0.85, 0.85, 0.85, 0.85
 Evaluelinethickness=1, 1, 1, 1
+eventsGraphflag=2
 
 [grid]
 gridalpha=0.25

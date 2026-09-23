@@ -26,22 +26,26 @@
 # Marko Luther, 2023
 
 from contextlib import contextmanager
-from collections.abc import Generator
+from collections.abc import Generator, Callable
 from typing import override, Any, TYPE_CHECKING
 
-from artisanlib.util import stringtoseconds, createGradient
 
 if TYPE_CHECKING:
     from PyQt6.QtCore import QCoreApplication, QObject # pylint: disable=unused-import
     from PyQt6.QtGui import QWheelEvent, QMouseEvent, QFocusEvent, QResizeEvent, QKeyEvent # pylint: disable=unused-import
-    from PyQt6.QtWidgets import QWidget, QTimeEdit, QCheckBox, QComboBox # pylint: disable=unused-import
+    from PyQt6.QtWidgets import QWidget, QTimeEdit, QCheckBox, QComboBox, QCompleter # pylint: disable=unused-import
+    from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
 
 from PyQt6.QtCore import (Qt, pyqtSignal, pyqtSlot, QLine, QEvent,
     QByteArray, QPropertyAnimation, QEasingCurve, QLocale)
-from PyQt6.QtCore import pyqtProperty # type:ignore[attr-defined]
+from PyQt6.QtCore import pyqtProperty, QSize # type:ignore[attr-defined]
 from PyQt6.QtWidgets import (QApplication, QSplitter, QSplitterHandle, QLabel, QComboBox, QLineEdit, QTextEdit, QPlainTextEdit, QDoubleSpinBox, QPushButton,
-    QTableWidget, QTableWidgetItem, QSizePolicy, QLCDNumber, QGroupBox, QFrame, QSlider, QStyle, QStyleOptionSlider)
-from PyQt6.QtGui import QPen, QPainter, QFontMetrics, QColor, QCursor, QEnterEvent, QPaintEvent
+    QTableWidget, QTableWidgetItem, QSizePolicy, QLCDNumber, QGroupBox, QFrame, QSlider, QStyle, QStyleOptionSlider, QListView, QToolButton)
+from PyQt6.QtGui import QPen, QPainter, QFontMetrics, QColor, QCursor, QEnterEvent, QPaintEvent, QIcon
+
+from artisanlib.util import stringtoseconds, createGradient,getStyleIconPath
+from artisanlib.styles import text_edit_style, artisan_minor_push_button_style
+
 
 
 @contextmanager
@@ -62,6 +66,72 @@ class MyQComboBox(QComboBox):
     def wheelEvent(self, e:'QWheelEvent|None') -> None:
         if self.hasFocus():
             super().wheelEvent(e)
+
+
+class RoastsComboBox(MyQComboBox):
+    def __init__(self, parent:'QWidget') -> None:
+        super().__init__(parent)
+        self.installEventFilter(self)
+        self.selection:str|None = None
+        self.edited:str|None = None
+        self.editTextChanged.connect(self.textEdited)
+        self.setEditable(True)
+        completer: QCompleter|None = self.completer()
+        if completer is not None:
+            completer.setCaseSensitivity(Qt.CaseSensitivity.CaseSensitive)
+#        self.setMouseTracking(False)
+        self.recent_roasts_menu_list:Callable[[], list[str]]|None = None
+
+    def init(self, recent_roasts_menu_list:Callable[[], list[str]], selection:str|None) -> None:
+        self.setView(QListView())
+        self.recent_roasts_menu_list = recent_roasts_menu_list
+        self.selection = selection # just the roast title
+        self.edited = selection
+        self.updateMenu()
+
+    @pyqtSlot(str)
+    def textEdited(self, txt:str) -> None:
+        cleaned = ' '.join(txt.split())
+        self.edited = cleaned
+
+    def getSelection(self) -> str|None:
+        return self.edited or self.selection
+
+    def setSelection(self, i:int) -> None:
+        if i >= 0:
+            try:
+                self.edited = None # reset the user text editing
+            except Exception: # pylint: disable=broad-except
+                pass
+
+    @override
+    def eventFilter(self, a0:'QObject|None' = None, a1:QEvent|None = None) -> bool:
+        del a0
+# the next prevents correct setSelection on Windows
+#        if a1.type() == QEvent.Type.FocusIn:
+#            self.setSelection(self.currentIndex())
+        if a1 is not None and a1.type() == QEvent.Type.MouseButtonPress:
+            self.updateMenu()
+#            return True # stops processing # popup not drawn if this line is added
+#        return super().eventFilter(a0, a1) # this seems to slow down things on Windows and not necessary anyhow
+        return False # cont processing
+
+    # the first entry is always just the current text edit line
+    def updateMenu(self) -> None:
+        if self.recent_roasts_menu_list is not None:
+            self.blockSignals(True)
+            try:
+    #            roasts = self.aw.recentRoastsMenuList()
+                roasts = self.recent_roasts_menu_list()
+                self.clear()
+                if self.edited is None:
+                    self.addItems(roasts)
+                else:
+                    self.addItems([self.edited] + roasts)
+            except Exception: # pylint: disable=broad-except
+                pass
+            self.blockSignals(False)
+
 
 class MyContentLimitedQComboBox(MyQComboBox): # pylint: disable=too-few-public-methods  # pyright: ignore [reportGeneralTypeIssues]# Argument to class must be a base class
     def __init__(self, parent:'QWidget|None' = None, **kwargs:dict[Any,Any]) -> None:
@@ -280,6 +350,7 @@ class MyQLabel(QLabel):
             #--- update font size ---
             self.setFont(f)
 
+# wider border than styles.py:line_edit_style (used in login/roest-setup dialogs)
 class StyledQLineEdit(QLineEdit):
     def __init__(self, parent: 'QWidget|None' = None) -> None:
         super().__init__(parent)
@@ -366,52 +437,30 @@ class ClickableLCDFrame(QFrame):
                 self.right_clicked.emit()
 
 
-# Text Edits
-
-def textEditColorStyle(
-        background_color: str|None = None,
-        selection_background_color: str|None = None) -> str:
-    if background_color is not None and selection_background_color is not None:
-        return f"""
-            QTextEdit, QPlainTextEdit {{
-                background-color: {background_color};
-                selection-background-color: {selection_background_color};
-                padding: 0 0.8px;
-                border-radius: 10px;
-                border-width: 2px;
-                border-style: solid;
-                border-color: palette(dark);
-            }}
-            QTextEdit, QPlainTextEdit:focus {{
-                border-color: palette(accent);
-            }}
-        """
-    return """
-        QTextEdit, QPlainTextEdit {
-            background-color: palette(base);
-            padding: 0 0.8px;
-            border-radius: 10px;
-            border-width: 2px;
-            border-style: solid;
-            border-color: palette(dark);
-        }
-        QTextEdit:focus, QPlainTextEdit:focus {
-            border-color: palette(accent);
-        }
-    """
-
-
 class ArtisanTextEdit(QTextEdit):
     def __init__(self, parent:'QWidget|None' = None, **kwargs:dict[Any,Any]) -> None:
         super().__init__(parent, **kwargs)
-        self.setStyleSheet(textEditColorStyle())
+        self.update_style()
+
+    def update_style(self,
+            background_color: str|None = None,
+            selection_background_color: str|None = None,
+            border_color: str|None = None,
+            color: str|None = None) -> None:
+        self.setStyleSheet(text_edit_style(background_color, selection_background_color, border_color, color))
 
 
 class ArtisanPlainTextEdit(QPlainTextEdit):
     def __init__(self, parent:'QWidget|None' = None, **kwargs:dict[Any,Any]) -> None:
         super().__init__(parent, **kwargs)
-        self.setStyleSheet(textEditColorStyle())
+        self.update_style()
 
+    def update_style(self,
+            background_color: str|None = None,
+            selection_background_color: str|None = None,
+            border_color: str|None = None,
+            color: str|None = None) -> None:
+        self.setStyleSheet(text_edit_style(background_color, selection_background_color, border_color, color))
 
 # this one emits a clicked event on right-clicks and an editingFinished event when the text was changed and the focus got lost
 class ClickableTextEdit(ArtisanPlainTextEdit):
@@ -496,6 +545,21 @@ class ClickableQLineEdit(QLineEdit):
 
 
 # Event Buttons
+
+class ArtisanMinorPushButton(QPushButton):
+    def __init__(self, text:str, light_icon:str|None = None, dark_icon:str|None = None, dark:bool = False, parent:'QWidget|None' = None) -> None:
+        super().__init__(text, parent)
+        self.setStyleSheet(artisan_minor_push_button_style(dark))
+        if dark_icon is None:
+            dark_icon = light_icon
+        if dark and dark_icon is not None:
+            self.setIconSize(QSize(14,14))
+            self.setIcon(QIcon(getStyleIconPath(dark_icon)))
+        elif light_icon is not None:
+            self.setIconSize(QSize(14,14))
+            self.setIcon(QIcon(getStyleIconPath(light_icon)))
+        self.setMaximumSize(self.sizeHint())
+        self.setMinimumSize(self.minimumSizeHint())
 
 # selector is a stylesheet property selector like "[Selected=true]"
 # state is a stylesheet pseudo state restriction like ":!pressed:hover"
@@ -689,3 +753,31 @@ class Splitter(QSplitter):
     @override
     def createHandle(self) -> QSplitterHandle:
         return SplitterHandle(self.orientation(), self)
+
+
+class FixedRatio2ToolButton(QToolButton):
+    def __init__(self, parent:'QWidget|None' = None) -> None:
+        super().__init__(parent)
+        # Set a policy that allows expansion, then enable height-for-width
+        policy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
+        policy.setHeightForWidth(True)
+        self.setSizePolicy(policy)
+
+    # pylint: disable=no-self-use
+    @override
+    def hasHeightForWidth(self) -> bool:
+        return True
+
+    # pylint: disable=no-self-use
+    @override
+    def heightForWidth(self, a0: int) -> int:
+        # 2:1 ratio
+        return int(round(a0/2))
+
+    # Ensure the default size hint also respects the aspect ratio
+    @override
+    def sizeHint(self) -> QSize:
+        hint = super().sizeHint()
+        # Maintain aspect ratio based on the default width hint
+        hint.setHeight(self.heightForWidth(hint.width()))
+        return hint

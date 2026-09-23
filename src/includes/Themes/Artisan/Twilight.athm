@@ -17,6 +17,7 @@ EvalueMarker=o, s, *, D
 Evaluelinethickness=2, 2, 2, 2
 EvalueMarkerSize=5, 5, 5, 5
 Evaluealpha=0.8, 0.8, 0.8, 0.8
+eventsGraphflag=2
 
 [XT]
 color=#008000

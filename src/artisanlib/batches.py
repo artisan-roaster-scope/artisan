@@ -25,8 +25,6 @@
 # AUTHOR
 # Marko Luther, 2023
 
-from artisanlib.dialogs import ArtisanDialog
-from artisanlib.main import UI_MODE
 
 from typing import override, TYPE_CHECKING
 
@@ -38,14 +36,20 @@ from PyQt6.QtCore import Qt, pyqtSlot, QSettings
 from PyQt6.QtWidgets import (QApplication, QLabel, QHBoxLayout, QVBoxLayout, QCheckBox,
                              QDialogButtonBox, QGridLayout, QLineEdit, QSpinBox, QLayout)
 
+from artisanlib.dialogs import ArtisanDialog
+from artisanlib.main import UI_MODE
+from artisanlib.styles import line_edit_style, spin_box_style
+
 class batchDlg(ArtisanDialog):
     def __init__(self, parent:'QWidget', aw:'ApplicationWindow') -> None:
         super().__init__(parent, aw)
         self.setModal(True)
         self.setWindowTitle(QApplication.translate('Form Caption','Batch'))
         self.prefixEdit = QLineEdit(self.aw.qmc.batchprefix)
+        self.prefixEdit.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.prefixEdit.setToolTip(QApplication.translate('Tooltip', 'Batch prefix'))
         self.counterSpinBox = QSpinBox()
+        self.counterSpinBox.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.counterSpinBox.setRange(0,999999)
         self.counterSpinBox.setSingleStep(1)
         self.counterSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
@@ -91,6 +95,7 @@ class batchDlg(ArtisanDialog):
         buttonLayout = QHBoxLayout()
         buttonLayout.addStretch()
         buttonLayout.addWidget(self.dialogbuttons)
+        buttonLayout.addStretch()
         batchlayout = QGridLayout()
         batchlayout.addWidget(self.batchcheckbox,0,0,Qt.AlignmentFlag.AlignRight)
         batchlayout.addWidget(batchchecklabel,0,1)

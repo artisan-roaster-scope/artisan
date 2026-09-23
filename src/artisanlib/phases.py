@@ -26,16 +26,19 @@
 # Marko Luther, 2023
 
 from typing import TYPE_CHECKING
-from artisanlib.dialogs import ArtisanDialog
-from artisanlib.main import UI_MODE
-
-from PyQt6.QtCore import Qt, pyqtSlot, QSettings
-from PyQt6.QtWidgets import (QApplication, QLabel, QDialogButtonBox, QGridLayout,
-    QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QLayout, QSpinBox)
-
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
     from PyQt6.QtWidgets import QWidget, QPushButton # pylint: disable=unused-import
+
+from PyQt6.QtCore import Qt, pyqtSlot, QSettings
+from PyQt6.QtGui import QIcon
+from PyQt6.QtWidgets import (QApplication, QLabel, QDialogButtonBox, QGridLayout,
+    QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QLayout, QSpinBox)
+
+from artisanlib.dialogs import ArtisanDialog
+from artisanlib.main import UI_MODE
+from artisanlib.util import getStyleIconPath
+from artisanlib.styles import spin_box_style, artisan_minor_push_button_style
 
 class phasesGraphDlg(ArtisanDialog):
     def __init__(self, parent:'QWidget', aw:'ApplicationWindow') -> None:
@@ -59,21 +62,27 @@ class phasesGraphDlg(ArtisanDialog):
         minf = QLabel(QApplication.translate('Label', 'min','abbrev of minimum'))
         maxf = QLabel(QApplication.translate('Label', 'max'))
         self.startdry = QSpinBox()
+        self.startdry.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.startdry.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.startdry.setMinimumWidth(80)
         self.enddry = QSpinBox()
+        self.enddry.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.enddry.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.enddry.setMinimumWidth(80)
         self.startmid = QSpinBox()
+        self.startmid.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.startmid.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.startmid.setMinimumWidth(80)
         self.endmid = QSpinBox()
+        self.endmid.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.endmid.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.endmid.setMinimumWidth(80)
         self.startfinish = QSpinBox()
+        self.startfinish.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.startfinish.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.startfinish.setMinimumWidth(80)
         self.endfinish = QSpinBox()
+        self.endfinish.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.endfinish.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.endfinish.setMinimumWidth(80)
         if self.aw.qmc.mode == 'F':
@@ -127,6 +136,9 @@ class phasesGraphDlg(ArtisanDialog):
             setDefaultButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             setDefaultButton.clicked.connect(self.setdefault)
             self.setButtonTranslations(setDefaultButton,'Restore Defaults',QApplication.translate('Button','Restore Defaults'))
+            setDefaultButton.setStyleSheet(artisan_minor_push_button_style(self.aw.app.darkmode))
+            setDefaultButton.setIcon(QIcon(getStyleIconPath(
+                'undo-03-stroke-rounded-dark.svg' if self.aw.app.darkmode else 'undo-03-stroke-rounded-white.svg')))
 
         phaseLayout = QGridLayout()
         phaseLayout.addWidget(minf,0,1,Qt.AlignmentFlag.AlignHCenter|Qt.AlignmentFlag.AlignBottom)

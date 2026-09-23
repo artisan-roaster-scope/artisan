@@ -26,20 +26,21 @@
 # Marko Luther, 2023
 
 import platform
-
-from artisanlib.util import deltaLabelUTF8, rgba_colorname2argb_colorname, argb_colorname2rgba_colorname
-from artisanlib.dialogs import ArtisanDialog
 from typing import override, TYPE_CHECKING
-
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
     from PyQt6.QtGui import QCloseEvent # pylint: disable=unused-import
 
-from PyQt6.QtCore import Qt, QTimer, pyqtSlot
-from PyQt6.QtGui import QColor, QFont, QPalette
+from PyQt6.QtCore import Qt, QTimer, pyqtSlot, QSize
+from PyQt6.QtGui import QColor, QFont, QPalette, QIcon
 from PyQt6.QtWidgets import (QApplication, QWidget, QLabel, QPushButton,
     QSizePolicy, QHBoxLayout, QVBoxLayout, QDialogButtonBox, QGridLayout, QGroupBox,
     QLayout, QSpinBox, QTabWidget, QMessageBox)
+
+from artisanlib.util import deltaLabelUTF8, rgba_colorname2argb_colorname, argb_colorname2rgba_colorname, getStyleIconPath
+from artisanlib.dialogs import ArtisanDialog
+from artisanlib.widgets import ArtisanMinorPushButton
+from artisanlib.styles import spin_box_style, artisan_minor_push_button_style
 
 
 class graphColorDlg(ArtisanDialog):
@@ -120,6 +121,7 @@ class graphColorDlg(ArtisanDialog):
         opaqbgLabel = QLabel(QApplication.translate('Label', 'Opaqueness'))
         opaqbgLabel.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.opaqbgSpinBox = QSpinBox()
+        self.opaqbgSpinBox.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.opaqbgSpinBox.setToolTip(QApplication.translate('Tooltip', 'Background curve: 0=fully transparent, 10=fully opaque'))
         self.opaqbgSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.opaqbgSpinBox.setRange(1,10)
@@ -218,6 +220,7 @@ class graphColorDlg(ArtisanDialog):
         self.legendbgButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.legendbgButton.clicked.connect(self.setColorSlot)
         self.legendbgSpinBox = QSpinBox()
+        self.legendbgSpinBox.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.legendbgSpinBox.setToolTip(QApplication.translate('Tooltip', 'Legend background: 0=fully transparent, 10=fully opaque'))
         self.legendbgSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.legendbgSpinBox.setRange(1,10)
@@ -280,6 +283,7 @@ class graphColorDlg(ArtisanDialog):
         self.analysismaskButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.analysismaskButton.clicked.connect(self.setColorSlot)
         self.analysismaskSpinBox = QSpinBox()
+        self.analysismaskSpinBox.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.analysismaskSpinBox.setToolTip(QApplication.translate('Tooltip', 'Analysis mask: 0=fully transparent, 10=fully opaque'))
         self.analysismaskSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.analysismaskSpinBox.setRange(1,10)
@@ -297,6 +301,7 @@ class graphColorDlg(ArtisanDialog):
         self.statsanalysisbkgndButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.statsanalysisbkgndButton.clicked.connect(self.setColorSlot)
         self.statsanalysisbkgndSpinBox = QSpinBox()
+        self.statsanalysisbkgndSpinBox.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.statsanalysisbkgndSpinBox.setToolTip(QApplication.translate('Tooltip', 'Statistics and Analysis background: 0=fully transparent, 10=fully opaque'))
         self.statsanalysisbkgndSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.statsanalysisbkgndSpinBox.setRange(1,10)
@@ -368,7 +373,10 @@ class graphColorDlg(ArtisanDialog):
         self.lcd7LEDButton.setMinimumWidth(80)
         self.lcd8LEDButton.setMinimumWidth(80)
 
-        LCDdefaultButton = QPushButton(QApplication.translate('Button','B/W'))
+        LCDdefaultButton = ArtisanMinorPushButton(QApplication.translate('Button','B/W'),
+            'palette-stroke-rounded-white.svg',
+            'palette-stroke-rounded-dark.svg',
+            self.aw.app.darkmode)
         LCDdefaultButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         LCDdefaultButton.setToolTip(QApplication.translate('Tooltip', 'Sets LCD colors to black and white'))
         LCDdefaultButton.clicked.connect(self.setLCD_bw)
@@ -575,15 +583,22 @@ class graphColorDlg(ArtisanDialog):
             resetButton.clicked.connect(self.recolor1)
             resetButton.setToolTip(QApplication.translate('Tooltip', 'Loads the Default theme'))
             self.setButtonTranslations(resetButton,'Restore Defaults',QApplication.translate('Button','Restore Defaults'))
+            resetButton.setIconSize(QSize(14,14))
+            resetButton.setStyleSheet(artisan_minor_push_button_style(self.aw.app.darkmode))
+            resetButton.setIcon(QIcon(getStyleIconPath('undo-03-stroke-rounded-dark.svg' if self.aw.app.darkmode else 'undo-03-stroke-rounded-white.svg')))
 
-        greyButton = QPushButton(QApplication.translate('Button','Grey'))
+        greyButton = ArtisanMinorPushButton(QApplication.translate('Button','Grey'),
+            'palette-stroke-rounded-white.svg',
+            'palette-stroke-rounded-dark.svg',
+            self.aw.app.darkmode)
         greyButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         greyButton.setToolTip(QApplication.translate('Tooltip', 'Sets button colors to grey scale and LCD colors to black and white'))
         greyButton.clicked.connect(self.recolor2)
 
-        self.dialogbuttons.addButton(greyButton, QDialogButtonBox.ButtonRole.ActionRole)
-
         okLayout = QHBoxLayout()
+        okLayout.addWidget(resetButton)
+        okLayout.addStretch()
+        okLayout.addWidget(greyButton)
         okLayout.addStretch()
         okLayout.addWidget(self.dialogbuttons)
         okLayout.setContentsMargins(10, 10, 10, 10)

@@ -25,20 +25,22 @@
 # AUTHOR
 # Marko Luther, 2023
 
-from typing import override, TYPE_CHECKING
 from babel.units import get_unit_name
-
-from artisanlib.dialogs import ArtisanDialog
-from artisanlib.widgets import MyQDoubleSpinBox
-
-from PyQt6.QtCore import Qt, pyqtSlot, QSettings
-from PyQt6.QtWidgets import (QMessageBox, QApplication, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout,
-                             QDialogButtonBox, QLayout)
+from typing import override, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # noqa: F401 # pylint: disable=unused-import
     from PyQt6.QtWidgets import QWidget, QPushButton # pylint: disable=unused-import
     from PyQt6.QtGui import QCloseEvent # pylint: disable=unused-import
+
+from PyQt6.QtCore import Qt, pyqtSlot, QSettings
+from PyQt6.QtWidgets import (QMessageBox, QApplication, QHBoxLayout, QVBoxLayout, QCheckBox, QGridLayout,
+                             QDialogButtonBox, QLayout)
+
+from artisanlib.dialogs import ArtisanDialog
+from artisanlib.widgets import MyQDoubleSpinBox
+from artisanlib.styles import spin_box_style
+
 
 class SamplingDlg(ArtisanDialog):
     def __init__(self, parent:'QWidget', aw:'ApplicationWindow') -> None:
@@ -56,6 +58,7 @@ class SamplingDlg(ArtisanDialog):
         self.openCompletedFlag.setChecked(bool(self.aw.qmc.flagOpenCompleted))
 
         self.interval = MyQDoubleSpinBox()
+        self.interval.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.interval.setSingleStep(1)
         self.interval.setRange(self.aw.qmc.min_delay/1000.,999.99)
         interval = self.aw.qmc.delay/1000.

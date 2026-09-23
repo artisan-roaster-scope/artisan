@@ -217,7 +217,6 @@ class Santoker(AsyncComm):
     # message decoder
 
     def register_reading(self, target:bytes, data:bytes) -> None:
-        #if self._logging:
         value:int
         # convert data into the integer data
         if target in {self.BT_ROR, self.ET_ROR}:

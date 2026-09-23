@@ -64,8 +64,8 @@ application_organization_domain: Final[str] = 'artisan-scope.org'
 application_desktop_file_name: Final[str] = 'org.artisan_scope.artisan'
 
 
-from PyQt6.QtCore import Qt, QStandardPaths, QCoreApplication, QTime, QDate, QDateTime
-from PyQt6.QtGui import QColor
+from PyQt6.QtCore import Qt, QStandardPaths, QCoreApplication, QTime, QDate, QDateTime, QUrl
+from PyQt6.QtGui import QColor, QDesktopServices
 
 
 deltaLabelPrefix:Final[str] = '<html>&Delta;&thinsp;</html>' # prefix constant for labels to compose DeltaET/BT by prepending this prefix to ET/BT labels
@@ -517,6 +517,11 @@ def getResourcePath() -> str:
         return os.path.dirname(os.path.realpath(__file__)) + '\\..\\includes\\'
     return QCoreApplication.applicationDirPath() + '/'
 
+@functools.cache
+def getStyleIconPath(icon_filename:str) -> str:
+    # path in stylesheets needs to feature forward slashes also on Windows!
+    return Path.as_posix(Path(getResourcePath()).joinpath('Icons').joinpath(icon_filename))
+
 # if share is True, the same (cache) file is shared between the Artisan and
 # ArtisanViewer apps
 # and locks have to be used to avoid race conditions
@@ -538,6 +543,27 @@ def getDirectory(filename: str, ext: str|None = None, share: bool = False) -> st
         pass
     return str(fp)
 
+
+
+def getTaskURL(port:int, index_path:str) -> str:
+#    # use Artisan's host IP address
+#    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+#    s.connect(('8.8.8.8', 80))
+#    localIP = s.getsockname()[0]
+#    s.close()
+#    return f'http://{str(localIP)}:{str(port)}/{index_path}'
+    # use Artisan's host name (more stable over DHCP/zeroconf updates), but cannot be accessed on Windows from iPhone
+    if sys.platform.startswith('darwin'):
+        import subprocess
+        host = subprocess.check_output(['scutil', '--get', 'LocalHostName']).decode('utf-8')
+    else:
+        import socket
+        # on Linux/Windows the mdns name is created by appending ".local" to the hostname
+        host = socket.gethostname()
+    return f"http://{host.strip().replace(' ', '_').casefold()}.local:{str(port)}/{index_path}"
+
+def open_link(url:str) -> None:
+    QDesktopServices.openUrl(QUrl(url, QUrl.ParsingMode.TolerantMode))
 
 # standard/MPL hex color strings append alpha information to the end, while QColor assumes the alpha information in color name strings at the begin
 
@@ -1344,7 +1370,7 @@ def computeDeltas(
 
         # cut out the part after DROP and before CHARGE and remove values beyond the RoRlimit
         return [
-            d if ((roast_start_idx <= i <= roast_end_idx) and (d is not None and (not limit_ror or
+            float(d) if ((roast_start_idx <= i <= roast_end_idx) and (d is not None and (not limit_ror or
                 ror_limit_min < d < ror_limit_max)))
             else None
             for i,d in enumerate(delta1)
@@ -1551,7 +1577,7 @@ def exportProfile2CSV(filename:str, profile:'ProfileData') -> bool:
             events_set:set[str] = set()
             for i, tx in enumerate(timex_zero):
                 if tx >= CHARGE >= 0:
-                    di,mo = divmod(tx - CHARGE, 60)
+                    di,mo = divmod(math.floor(tx - CHARGE + 0.5), 60)
                     time2 = f'{di:02.0f}:{mo:02.0f}'
                 else:
                     time2 = ''
@@ -1561,7 +1587,7 @@ def exportProfile2CSV(filename:str, profile:'ProfileData') -> bool:
                         event = ev[1]
                         events_set.add(ev[1])
                         break
-                di,mo = divmod(tx,60)
+                di,mo = divmod(math.floor(tx + 0.5),60)
                 time1 = f'{di:02.0f}:{mo:02.0f}'
                 if last_time is None or last_time != time1:
                     extratemps = []
@@ -1693,12 +1719,12 @@ def roast_message(profile:'ProfileData', org_id:str|None = None, machine_id:str|
         try:
             roastdate = None
             date = QDate.fromString(decodeLocalStrict(profile['roastisodate']),Qt.DateFormat.ISODate)
-            if not date.isValid(): # ty:ignore[no-matching-overload]
+            if not date.isValid():
                 date = QDate.currentDate()
             if 'roasttime' in profile:
                 try:
                     time = QTime.fromString(decodeLocalStrict(profile['roasttime']))
-                    if not time.isValid(): # ty:ignore[no-matching-overload]
+                    if not time.isValid():
                         time = QTime().currentTime()
                     roastdate = QDateTime(date,time)
                 except Exception: # pylint: disable=broad-except
@@ -1710,7 +1736,7 @@ def roast_message(profile:'ProfileData', org_id:str|None = None, machine_id:str|
     elif 'roastdate' in profile:
         try:
             date = QDate.fromString(decodeLocalStrict(profile['roastdate']))
-            if not date.isValid(): # ty:ignore[no-matching-overload]
+            if not date.isValid():
                 date = QDate.currentDate()
             if 'roasttime' in profile:
                 try:

@@ -58,7 +58,7 @@ class serialLogDlg(ArtisanDialog):
         self.serialEdit = ArtisanPlainTextEdit()
         self.serialEdit.setReadOnly(True)
         self.serialEdit.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.serialEdit.setPlainText(self.getstring())
+        self.serialEdit.appendHtml(self.getstring())
         layout = QVBoxLayout()
         layout.addWidget(self.serialcheckbox,0)
         layout.addWidget(self.serialEdit,1)
@@ -74,7 +74,8 @@ class serialLogDlg(ArtisanDialog):
 
     def update_log(self) -> None:
         if self.aw.seriallogflag:
-            self.serialEdit.setPlainText(self.getstring())
+            self.serialEdit.clear()
+            self.serialEdit.appendHtml(self.getstring())
 
     @pyqtSlot(int)
     def serialcheckboxChanged(self, _:int) -> None:
@@ -117,7 +118,8 @@ class errorDlg(ArtisanDialog):
         enumber = len(self.aw.qmc.errorlog)
         labelstr =  f'{QApplication.translate('Label','Number of errors found {0}').format(str(enumber))}\n'
         self.elabel.setText(labelstr)
-        self.errorEdit.setPlainText(f'version = {__version__}\n\n' + htmlerr)
+        self.errorEdit.clear()
+        self.errorEdit.appendHtml(f'version = {__version__}\n\n{htmlerr}')
 
     @pyqtSlot('QCloseEvent')
     @override
