@@ -30,6 +30,60 @@ from artisanlib.util import createGradient, getResourcePath
 
 # button styles
 
+
+# dialog buttons style
+
+@functools.lru_cache
+def artisan_dialog_button_style(is_dark_mode:bool, accent_name:str, accent_hover:str, accent_pressed:str) -> str:
+    # Define contrasting background shades depending on Dark/Light configurations
+    if is_dark_mode:
+        bg_color = '#2c2c2c'        # Dark slate gray
+        bg_hover = '#3a3a3a'
+        bg_pressed = '#1e1e1e'
+        border_color = '#454545'
+        text_color = '#ffffff'
+    else:
+        bg_color = '#ececec'        # Clean canvas light grey
+        bg_hover = '#e2e2e2'
+        bg_pressed = '#d2d2d2'
+        border_color = '#dcdcdc'
+        text_color = '#000000'
+
+    return f"""
+            /* Secondary Button Styles (Cancel) */
+            QDialogButtonBox QPushButton {{
+                background-color: {bg_color};
+                outline: none;
+                border: 1px solid {border_color};
+                border-radius: 5px;
+                padding: 3px 16px;
+                font-size: 13px;
+                color: {text_color};
+                min-width: 40px;
+            }}
+            QDialogButtonBox QPushButton:hover {{
+                background-color: {bg_hover};
+            }}
+            QDialogButtonBox QPushButton:pressed {{
+                background-color: {bg_pressed};
+            }}
+
+            /* Primary Button Styles (OK) paired with Native Accent */
+            QDialogButtonBox QPushButton:default {{
+                background-color: {accent_name};
+                border: 1px solid {accent_name};
+                color: #ffffff;
+            }}
+            QDialogButtonBox QPushButton:default:hover {{
+                background-color: {accent_hover};
+                border-color: {accent_hover};
+            }}
+            QDialogButtonBox QPushButton:default:pressed {{
+                background-color: {accent_pressed};
+                border-color: {accent_pressed};
+            }}
+    """
+
 @functools.lru_cache
 def artisan_push_button_style(dark:bool=False) -> str:
     return f"""
@@ -115,6 +169,7 @@ def tool_button_icon_style(dark:bool, light_icon:str, dark_icon:str, border_widt
     return f"""
         QToolButton {{
             background-color: transparent;
+            outline: none;
             border: {border_width}px solid;
             border-radius: {border_radius}px;
             border-color: transparent;
@@ -453,36 +508,9 @@ def artisan_slider_frame_style(title_color:str, color:str, background_color:str)
 """
 
 
-
-# table styles
-
 @functools.lru_cache
-def table_style(darkmode:bool) -> str:
+def scroller_style(darkmode:bool) -> str:
     return f"""
-    QTableWidget {{
-        border: none;
-        border-radius: 6px;
-        background-color: transparent;
-    }}
-
-    QTableView {{
-        selection-background-color: {'#555555' if darkmode else '#DDDDDD'};
-        selection-color: {'white' if darkmode else 'black'};
-    }}
-
-    QHeaderView {{
-        background-color: transparent;
-    }}
-    QTableView QTableCornerButton::section {{
-        background-color: transparent;
-        border: none;
-    }}
-
-    QAbstractScrollArea::corner {{
-        background-color: transparent;
-        border: none;
-    }}
-
     QScrollBar:vertical {{
         background-color: transparent;
         margin: 0px 0px 0px 8px;
@@ -522,6 +550,39 @@ def table_style(darkmode:bool) -> str:
         background: none;
         height: 0px;
     }}
+"""
+
+# table styles
+
+@functools.lru_cache
+def table_style(darkmode:bool) -> str:
+    return f"""
+    QTableWidget {{
+        border: none;
+        border-radius: 6px;
+        background-color: transparent;
+    }}
+
+    QTableView {{
+        selection-background-color: {'#555555' if darkmode else '#DDDDDD'};
+        selection-color: {'white' if darkmode else 'black'};
+    }}
+
+    QHeaderView {{
+        background-color: transparent;
+    }}
+    QTableView QTableCornerButton::section {{
+        background-color: transparent;
+        border: none;
+    }}
+
+    QAbstractScrollArea::corner {{
+        background-color: transparent;
+        border: none;
+    }}
+
+    {scroller_style(darkmode)}
+
 """
 
 @functools.lru_cache
@@ -585,6 +646,7 @@ def vertical_header_style(darkmode:bool) -> str:
 # Text edit styles
 
 def text_edit_style(
+        darkmode:bool,
         background_color: str|None = None,
         selection_background_color: str|None = None,
         border_color: str|None = None,
@@ -594,7 +656,8 @@ def text_edit_style(
                 background-color: {background_color if background_color is not None else 'palette(base)'};
                 {f'selection-background-color: {selection_background_color};' if selection_background_color is not None else ''}
                 color: {color if color is not None else 'palette(text)'};
-                padding: 0 0.8px;
+                /* padding: 0.8 0.8px; */
+                padding: 2px;
                 border-radius: 10px;
                 border-width: 1px;
                 border-style: solid;
@@ -603,17 +666,19 @@ def text_edit_style(
             QTextEdit:focus, QPlainTextEdit:focus, ClickableTextEdit:focus {{
                 border-color: palette(accent);
             }}
+            {scroller_style(darkmode)}
     """
 
 # Line edit style
 
-def line_edit_style(dark:bool = False, bold:bool = False, color:str = 'palette(text)', background_color:str = 'palette(window)', selection_background_color: str|None = None) -> str:
+def line_edit_style(dark:bool = False, bold:bool = False, color:str = 'palette(text)', background_color:str = 'palette(base)', selection_background_color: str|None = None) -> str:
     return f"""
         QLineEdit {{
             font-weight: {'bold' if bold else 'normal'};
             border: 1px solid {'#555555' if dark else '#D6D6D6'};
             border-radius: 5px;
             color: {color};
+            selection-color: {color};
             background-color: {background_color};
             {f'selection-background-color: {selection_background_color};' if selection_background_color is not None else ''}
             padding: 2px 5px 2px 5px; }}

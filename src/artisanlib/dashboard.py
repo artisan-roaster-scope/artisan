@@ -27,6 +27,7 @@
 
 import os
 import sys
+import platform
 import logging
 from pathlib import Path
 from typing import Final, override, TYPE_CHECKING
@@ -85,7 +86,10 @@ class Dashboard(QWidget):
             self.ui.donate_pushButton.setStyleSheet(artisan_push_button_style())
 
             self.ui.plus_button.setStyleSheet(artisan_push_button_style())
+            self.ui.plus_button.setFixedSize(QSize(26,26))
             self.ui.minus_button.setStyleSheet(artisan_push_button_style())
+            self.ui.minus_button.setFixedSize(QSize(26,26))
+
             self.ui.properties_pushButton.setStyleSheet(artisan_minor_push_button_style())
             self.ui.compare_pushButton.setStyleSheet(artisan_minor_push_button_style())
             self.ui.load_pushButton.setStyleSheet(artisan_minor_push_button_style())
@@ -114,7 +118,7 @@ class Dashboard(QWidget):
                 QFrame:pressed { background-color: '#D0D0D0'; }
             """)
 
-            # font (not: el, ar, zh, jp, he)
+            # font # TODO: (not: el, ar, zh, jp, he)
             artisan_font_semibold_file = os.path.join(getResourcePath(),'Nunito-SemiBold.ttf')
             artisan_font_semibold_id = QFontDatabase.addApplicationFont(artisan_font_semibold_file)
             artisan_font_semibold_families = QFontDatabase.applicationFontFamilies(artisan_font_semibold_id)
@@ -122,12 +126,13 @@ class Dashboard(QWidget):
             artisan_font_normal_id = QFontDatabase.addApplicationFont(artisan_font_normal)
             artisan_font_normal_families = QFontDatabase.applicationFontFamilies(artisan_font_normal_id)
 
-            self.ui.roast_label.setFont(QFont(artisan_font_semibold_families[0], 20, QFont.Weight.DemiBold))
-            self.ui.profile_label.setFont(QFont(artisan_font_semibold_families[0], 20, QFont.Weight.DemiBold))
-            self.ui.inventory_group.setFont(QFont(artisan_font_normal_families[0], 16, QFont.Weight.Normal))
-            self.ui.sponsor_label.setFont(QFont(artisan_font_normal_families[0], 16, QFont.Weight.Normal))
-            self.ui.donate_label.setFont(QFont(artisan_font_normal_families[0], 16, QFont.Weight.Normal))
-
+            main_header_font_size = (18 if platform.system() == 'Windows' else 20)
+            sub_header_font_size = (14 if platform.system() == 'Windows' else 16)
+            self.ui.roast_label.setFont(QFont(artisan_font_semibold_families[0], main_header_font_size, QFont.Weight.DemiBold))
+            self.ui.profile_label.setFont(QFont(artisan_font_semibold_families[0], main_header_font_size, QFont.Weight.DemiBold))
+            self.ui.inventory_group.setFont(QFont(artisan_font_normal_families[0], sub_header_font_size, QFont.Weight.Normal))
+            self.ui.sponsor_label.setFont(QFont(artisan_font_normal_families[0], sub_header_font_size, QFont.Weight.Normal))
+            self.ui.donate_label.setFont(QFont(artisan_font_normal_families[0], sub_header_font_size, QFont.Weight.Normal))
 
             # configure widgets
             self.ui.weight_unit_comboBox.addItems(weight_units_lower)
@@ -151,7 +156,7 @@ class Dashboard(QWidget):
             self.ui.compare_pushButton.setIcon(QIcon(getStyleIconPath('git-compare-arrows-stroke-rounded-light.svg')))
 
             self.ui.donate_pushButton.setIconSize(QSize(14,14))
-            self.ui.donate_pushButton.setIcon(QIcon(getStyleIconPath('hand-coins-stroke-rounded.svg')))
+            self.ui.donate_pushButton.setIcon(QIcon(getStyleIconPath('heart-handshake-stroke-rounded-white.svg')))
 
             self.ui.login_pushButton.setIconSize(QSize(14,14))
             self.ui.login_pushButton.setIcon(QIcon(getStyleIconPath('user-circle-stroke-rounded-dark.svg')))
@@ -414,7 +419,7 @@ class Dashboard(QWidget):
 
     def set_style(self) -> None:
         self.ui.title_comboBox.setStyleSheet(combobox_style(self.aw.app.darkmode, getStyleIconPath('arrow-down-01-stroke-rounded-light.svg'), 'bold'))
-        self.ui.beans_textEdit.update_style()
+        self.ui.beans_textEdit.update_style(self.aw.app.darkmode)
 
     def update_recent_roast_buttons(self) -> None:
         if self.aw.qmc.title != QApplication.translate('Scope Title', 'Roaster Scope') and self.aw.qmc.weight[0] != 0:
@@ -583,10 +588,9 @@ class Dashboard(QWidget):
         if self.aw.qmc.backgroundprofile is not None and self.aw.qmc.backgroundpath:
             # if a background profile is loaded we open the file selector using its path
             path = self.aw.qmc.backgroundpath
-        filename = self.aw.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Load Background'),path =path, ext='*.alog')
+        filename = self.aw.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Load Background Roast Template'),path =path, ext='*.alog')
         if len(filename) != 0:
             self.aw.loadBackgroundSignal.emit(filename, False)
-#            QTimer.singleShot(500, self.update_profile_section) # not needed here as doen in loadBackground
 
     @pyqtSlot(bool)
     def profile_clear_clicked(self, b:bool) -> None:
@@ -631,4 +635,4 @@ class Dashboard(QWidget):
 
     @pyqtSlot(bool)
     def start_designer(self, _b:bool) -> None:
-        self.aw.startdesigner()
+        self.aw.startdesigner(background_mode = True)

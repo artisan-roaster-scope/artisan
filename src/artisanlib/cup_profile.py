@@ -42,7 +42,8 @@ from PyQt6.QtWidgets import (QApplication, QCheckBox, QHBoxLayout, QVBoxLayout, 
 from artisanlib.main import UI_MODE
 from artisanlib.dialogs import ArtisanResizeablDialog
 from artisanlib.widgets import MyQDoubleSpinBox, ArtisanMinorPushButton
-from artisanlib.styles import horizontal_header_style, vertical_header_style, tool_button_icon_style, line_edit_style, table_style
+from artisanlib.styles import (horizontal_header_style, vertical_header_style,
+    tool_button_icon_style, line_edit_style, table_style, spin_box_style)
 
 class flavorDlg(ArtisanResizeablDialog):
     def __init__(self, parent:'QWidget', aw:'ApplicationWindow') -> None:
@@ -72,8 +73,9 @@ class flavorDlg(ArtisanResizeablDialog):
         if settings.contains('FlavorProperties'):
             self.restoreGeometry(settings.value('FlavorProperties'))
 
-        defaultlabel = QLabel(QApplication.translate('Label','Default'))
+        defaultlabel = QLabel(QApplication.translate('Label','Form'))
         self.defaultcombobox = QComboBox()
+        self.defaultcombobox.setToolTip(QApplication.translate('Tooltip', 'Cupping form selector'))
         self.defaultcombobox.addItems(['','artisan','SCA','SCAA','CQI','SweetMarias','C','E','CoffeeGeek','Intelligentsia','IIAC','WCRC','*CUSTOM*'])
         self.defaultcombobox.setCurrentIndex(0)
         self.lastcomboboxIndex = 0
@@ -100,11 +102,13 @@ class flavorDlg(ArtisanResizeablDialog):
 
         correctionLabel = QLabel(QApplication.translate('Label','Correction'))
         self.correctionSpinBox = MyQDoubleSpinBox()
+        self.correctionSpinBox.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.correctionSpinBox.setRange(-10.,10.)
         self.correctionSpinBox.setSingleStep(.25)
         self.correctionSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.correctionSpinBox.setValue(self.aw.qmc.flavors_total_correction)
         self.correctionSpinBox.valueChanged.connect(self.setcorrection)
+        self.correctionSpinBox.setToolTip(QApplication.translate('Tooltip', 'Correction offset added to the total result'))
 
         leftButton = QToolButton()
         leftButton.setText('')
@@ -126,18 +130,21 @@ class flavorDlg(ArtisanResizeablDialog):
             'add-01-stroke-rounded-white.svg',
             'add-01-stroke-rounded-dark.svg',
             self.aw.app.darkmode)
+        addButton.setToolTip(QApplication.translate('Tooltip', 'Add parameter'))
         addButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         addButton.clicked.connect(self.addlabel)
         delButton = ArtisanMinorPushButton(QApplication.translate('Button','Delete'),
             'delete-02-stroke-rounded-white.svg',
             'delete-02-stroke-rounded-dark.svg',
             self.aw.app.darkmode)
+        delButton.setToolTip(QApplication.translate('Tooltip', 'Delete last parameter'))
         delButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         delButton.clicked.connect(self.poplabel)
-        saveImgButton = ArtisanMinorPushButton(QApplication.translate('Button','Save image'),
+        saveImgButton = ArtisanMinorPushButton(f'{QApplication.translate('Button','Save')} PDF',
             'save-stroke-rounded-white.svg',
             'save-stroke-rounded-dark.svg',
             self.aw.app.darkmode)
+        saveImgButton.setToolTip(QApplication.translate('Tooltip', 'Save graph as PDF'))
         saveImgButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         saveImgButton.clicked.connect(self.aw.saveVectorGraph_PDF) # save as PDF (vector)
 
@@ -146,26 +153,32 @@ class flavorDlg(ArtisanResizeablDialog):
         self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel))
 
         self.backgroundCheck = QCheckBox(QApplication.translate('CheckBox','Background'))
+        self.backgroundCheck.setToolTip(QApplication.translate('Tooltip', 'Draw background profiles cupping results'))
         if self.aw.qmc.flavorbackgroundflag:
             self.backgroundCheck.setChecked(True)
         self.backgroundCheck.clicked.connect(self.showbackground)
         aspectlabel = QLabel(QApplication.translate('Label','Aspect Ratio'))
         self.aspectSpinBox = QDoubleSpinBox()
-        self.aspectSpinBox.setToolTip(QApplication.translate('Tooltip','Aspect Ratio'))
+        self.aspectSpinBox.setStyleSheet(spin_box_style(self.aw.app.darkmode))
+        self.aspectSpinBox.setToolTip(QApplication.translate('Tooltip','Graph aspect ratio'))
         self.aspectSpinBox.setRange(0.5,2.)
         self.aspectSpinBox.setSingleStep(.1)
+        self.aspectSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.aspectSpinBox.setValue(self.aw.qmc.flavoraspect)
         self.aspectSpinBox.valueChanged.connect(self.setaspect)
         flavorLayout = QHBoxLayout()
         flavorLayout.addWidget(self.flavortable)
         comboLayout = QHBoxLayout()
+        comboLayout.addStretch()
         comboLayout.addWidget(defaultlabel)
+        comboLayout.addSpacing(10)
         comboLayout.addWidget(self.defaultcombobox)
         comboLayout.addStretch()
         aspectLayout = QHBoxLayout()
         aspectLayout.addWidget(self.backgroundCheck)
         aspectLayout.addStretch()
         aspectLayout.addWidget(aspectlabel)
+        aspectLayout.addSpacing(10)
         aspectLayout.addWidget(self.aspectSpinBox)
         blayout1 = QHBoxLayout()
         if self.aw.ui_mode is UI_MODE.EXPERT:
@@ -199,10 +212,14 @@ class flavorDlg(ArtisanResizeablDialog):
         mainButtonsLayout.addWidget(self.dialogbuttons)
         mainLayout = QVBoxLayout()
         mainLayout.addLayout(flavorLayout)
+        mainLayout.addSpacing(10)
         mainLayout.addLayout(blayout1)
+        mainLayout.addSpacing(5)
         mainLayout.addWidget(extraGroupLayout)
         if self.aw.ui_mode is UI_MODE.PRODUCTION:
             extraGroupLayout.hide()
+        else:
+            mainLayout.addSpacing(5)
         mainLayout.addLayout(mainButtonsLayout)
         mainLayout.setContentsMargins(7,5,7,5) # left, top, right, bottom
         mainLayout.setSpacing(3)
@@ -271,6 +288,7 @@ class flavorDlg(ArtisanResizeablDialog):
                 labeledit.setStyleSheet(line_edit_style(self.aw.app.darkmode))
                 labeledit.textChanged.connect(self.setlabel)
                 valueSpinBox = MyQDoubleSpinBox()
+                valueSpinBox.setStyleSheet(spin_box_style(self.aw.app.darkmode))
                 valueSpinBox.setRange(0.,10.)
                 valueSpinBox.setSingleStep(.25)
                 valueSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)

@@ -335,6 +335,7 @@ class WindowsDlg(ArtisanDialog):
 
         resetButton: QPushButton|None = self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.RestoreDefaults)
         if resetButton is not None:
+            self.dialogbuttons.removeButton(resetButton)
             resetButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             resetButton.clicked.connect(self.reset)
             self.setButtonTranslations(resetButton,'Restore Defaults',QApplication.translate('Button','Restore Defaults'))
@@ -460,8 +461,10 @@ class WindowsDlg(ArtisanDialog):
         GridGroupLayout = QGroupBox(QApplication.translate('GroupBox','Grid'))
         GridGroupLayout.setLayout(graphgridlayout)
         buttonLayout = QHBoxLayout()
-        buttonLayout.addWidget(self.loadAxisFromProfile)
+        buttonLayout.addWidget(resetButton)
         buttonLayout.addSpacing(10)
+        buttonLayout.addWidget(self.loadAxisFromProfile)
+        buttonLayout.addStretch()
         buttonLayout.addWidget(self.dialogbuttons)
         mainLayout1 = QVBoxLayout()
         mainLayout1.addWidget(xGroupLayout)

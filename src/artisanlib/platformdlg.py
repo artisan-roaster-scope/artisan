@@ -40,7 +40,7 @@ from artisanlib.util import appFrozen, application_name, application_viewer_name
 import matplotlib as mpl
 import numpy
 
-from PyQt6.QtCore import Qt, PYQT_VERSION_STR
+from PyQt6.QtCore import PYQT_VERSION_STR
 from PyQt6.QtWidgets import QApplication, QVBoxLayout
 
 
@@ -116,10 +116,10 @@ class platformDlg(ArtisanDialog):
         htmlplatform:str = f'<b>{(application_viewer_name if self.aw.app.artisanviewerMode else application_name)} version =</b> {__version__} ({__revision__}) {unofficial}<br>---------<br>'
         for key,value in platformdic.items():
             htmlplatform += '<b>' + key + ' = </b> <i>' + value + '</i><br>'
-        platformEdit = ArtisanPlainTextEdit()
+        platformEdit = ArtisanPlainTextEdit(self.aw.app.darkmode)
         platformEdit.appendHtml(htmlplatform)
         platformEdit.setReadOnly(True)
-        platformEdit.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+#        platformEdit.setFocusPolicy(Qt.FocusPolicy.NoFocus) # NoFocus breaks copy keyboard selection and shortcuts
         layout = QVBoxLayout()
         layout.addWidget(platformEdit)
         self.setLayout(layout)

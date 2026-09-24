@@ -58,7 +58,7 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.ETname = self.aw.qmc.device_name_subst(self.aw.ETname)
         self.BTname = self.aw.qmc.device_name_subst(self.aw.BTname)
 
-        self.setWindowTitle(QApplication.translate('Form Caption','Roast Template'))
+        self.setWindowTitle(QApplication.translate('Form Caption','Background Roast Template'))
         self.setModal(True)
 
         settings = QSettings()
@@ -361,25 +361,44 @@ class backgroundDlg(ArtisanResizeablDialog):
         layoutBoxedH.addStretch()
         layoutBoxedH.addLayout(movelayout)
         layoutBoxedH.addStretch()
-        if self.aw.ui_mode is not UI_MODE.PRODUCTION:
-            layoutBoxedH.addWidget(self.keyboardControlflag)
+        layoutOuterBoxed = QVBoxLayout()
+        layoutBoxedH.addLayout(layoutOuterBoxed)
+        layoutOuterBoxed.addStretch()
         layoutBoxed = QVBoxLayout()
-        layoutBoxed.addStretch()
+        layoutBoxed.addSpacing(5)
         if self.aw.ui_mode is not UI_MODE.PRODUCTION:
             layoutBoxed.addLayout(checkslayout1)
             layoutBoxed.addStretch()
         layoutBoxed.addLayout(layoutBoxedH)
         layoutBoxed.addStretch()
+        if self.aw.ui_mode is not UI_MODE.PRODUCTION:
+            keyboardHBox = QHBoxLayout()
+
+            keyboardHBox.addStretch()
+
+            if len(self.aw.qmc.extratimexB)>0:
+                keyboardHBox.addWidget(self.xtcurvelabel)
+                keyboardHBox.addWidget(self.xtcurveComboBox)
+                keyboardHBox.addSpacing(10)
+                keyboardHBox.addStretch()
+
+            keyboardHBox.addWidget(self.keyboardControlflag)
+
+            if len(self.aw.qmc.extratimexB)>0:
+                keyboardHBox.addStretch()
+                keyboardHBox.addSpacing(10)
+                keyboardHBox.addWidget(self.ytcurvelabel)
+                keyboardHBox.addWidget(self.ytcurveComboBox)
+
+            keyboardHBox.addStretch()
+            layoutBoxed.addLayout(keyboardHBox)
         alignButtonBoxed = QHBoxLayout()
-        if len(self.aw.qmc.extratimexB)>0 and self.aw.ui_mode is not UI_MODE.PRODUCTION:
-            alignButtonBoxed.addWidget(self.xtcurvelabel)
-            alignButtonBoxed.addWidget(self.xtcurveComboBox)
-            alignButtonBoxed.addSpacing(10)
-            alignButtonBoxed.addWidget(self.ytcurvelabel)
-            alignButtonBoxed.addWidget(self.ytcurveComboBox)
         alignButtonBoxed.addStretch()
-        alignButtonBoxed.addWidget(alignButton)
         alignButtonBoxed.addWidget(self.alignComboBox)
+        alignButtonBoxed.addWidget(alignButton)
+        layoutOuterBoxed.addLayout(alignButtonBoxed)
+        layoutOuterBoxed.addStretch()
+
 
         self.backgroundPlaybackAid0 = QCheckBox(self.aw.qmc.etypesf(0))
         self.backgroundPlaybackAid0.setFocusPolicy(Qt.FocusPolicy.NoFocus)
@@ -545,7 +564,7 @@ class backgroundDlg(ArtisanResizeablDialog):
         optcontent.addWidget(self.hideBgafterprofileload)
         tab1layout = QVBoxLayout()
         tab1layout.addLayout(layoutBoxed)
-        tab1layout.addLayout(alignButtonBoxed)
+#        tab1layout.addLayout(alignButtonBoxed)
         if self.aw.ui_mode is not UI_MODE.PRODUCTION:
             tab1layout.addWidget(playbackGroupLayout)
         if self.aw.ui_mode is UI_MODE.EXPERT:
@@ -922,7 +941,7 @@ class backgroundDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(bool)
     def load(self, _:bool = False) -> None:
-        self.filename = self.aw.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Load Background'),ext='*.alog')
+        self.filename = self.aw.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Load Background Roast Template'),ext='*.alog')
         if len(self.filename) == 0:
             return
         self.aw.sendmessage(QApplication.translate('Message','Reading background profile...'))

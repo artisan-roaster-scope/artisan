@@ -3287,8 +3287,10 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.addButton.setEnabled(True)
         if len(self.aw.qmc.extradevices) > 0:
             self.delButton.setEnabled(True)
+            self.delButton.setIcon(QIcon(getStyleIconPath('delete-02-stroke-rounded-white.svg')))
         else:
             self.delButton.setEnabled(False)
+            self.delButton.setIcon(QIcon(getStyleIconPath('delete-02-stroke-rounded-dark.svg' if self.aw.app.darkmode else 'delete-02-stroke-rounded-light.svg')))
         if len(self.aw.qmc.timex) > 0:
             self.recalcButton.setEnabled(True)
             self.recalcButton.setIcon(QIcon(getStyleIconPath('update-white.svg')))

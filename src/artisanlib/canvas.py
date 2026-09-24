@@ -212,7 +212,7 @@ class MplCanvas(FigureCanvas):
 
 # NOTE: to have pylint to verify proper __slot__ definitions using pylint one has to remove the super class FigureCanvas here temporarily
 #   as this does not has __slot__ definitions and thus __dict__ is contained which suppresses the warnings
-#class tgraphcanvas():
+#class tgraphcanvas:
 class tgraphcanvas(QObject):
     updategraphicsSignal = pyqtSignal()
     updateLargeLCDsTimeSignal = pyqtSignal(str)
@@ -395,7 +395,7 @@ class tgraphcanvas(QObject):
         'meterfuels_setup', 'meterfuels', 'metersources_setup', 'metersources', 'playbackdrop_min_roasttime', 'TP_max_roasttime',
         'single_click_mpl_upperleft_corner_timer', 'single_click_mpl_upperleft_corner_TIMEOUT', 'profile_upload_limit', 'last_profile_upload_times',
         'zoom_follow_pan_x', 'zoom_follow_pan_y', 'main_event_buttons_undo_enabled', 'plus_beans_reminder_on_start',
-        'last_fit_title_max_chars'
+        'last_fit_title_max_chars', 'designer_dashboard_was_active_on_open', 'designer_background_mode', 'designer_loaded_foreground_profile_file'
         ]
 
 
@@ -1788,6 +1788,9 @@ class tgraphcanvas(QObject):
 
         ##########################     Designer variables       #################################
         self.designerflag:bool = False # True if in designer mode
+        self.designer_dashboard_was_active_on_open:bool = False # visibility of dashboard on start of the designer to reconstruct this state on exit
+        self.designer_background_mode: bool = False # flag indicating if designer was started from dashboard to edit background profile
+        self.designer_loaded_foreground_profile_file:str|None = None # the foreground profile that was loaded on starting the designer
         self.designerconnections:list[int|None] = [None,None,None,None]   #mouse event ids
         self.mousepress:bool = False
         self.indexpoint:int = 0
@@ -17575,11 +17578,12 @@ class tgraphcanvas(QObject):
     ####################  PROFILE DESIGNER   ###################################################################################
 
     # Fit a spline with N nodes to existing profile data
-    def fit_spline_to_profile(self, num_nodes: int) -> tuple[list[float], list[float], list[float]]:
+    def fit_spline_to_profile(self, num_nodes: int, background_mode:bool) -> tuple[list[float], list[float], list[float]]:
         """Fit a spline with the specified number of nodes to the current profile data.
 
         Args:
             num_nodes: Number of control points/nodes for the fitted spline
+            background_mode: if set we assume working on the background profile
 
         Returns:
             Tuple of (times, temps1, temps2) lists containing the fitted control points
@@ -17590,8 +17594,8 @@ class tgraphcanvas(QObject):
             return [], [], []
 
         # Get the time range from CHARGE to DROP
-        start_idx = self.timeindex[0]  # CHARGE
-        end_idx = self.timeindex[6]    # DROP
+        start_idx = (self.timeindexB[0] if background_mode else self.timeindex[0])  # CHARGE
+        end_idx = (self.timeindexB[6] if background_mode else self.timeindex[6])    # DROP
 
         if start_idx == -1 or end_idx == 0:
             # Fall back to full range if no CHARGE/DROP
@@ -17599,9 +17603,9 @@ class tgraphcanvas(QObject):
             end_idx = len(self.timex) - 1
 
         # Extract the data segment
-        time_data = numpy.array(self.timex[start_idx:end_idx+1])
-        temp1_data = numpy.array(self.temp1[start_idx:end_idx+1])
-        temp2_data = numpy.array(self.temp2[start_idx:end_idx+1])
+        time_data = numpy.array(self.timeB[start_idx:end_idx+1] if background_mode else self.timex[start_idx:end_idx+1])
+        temp1_data = numpy.array(self.temp1B[start_idx:end_idx+1] if background_mode else self.temp1[start_idx:end_idx+1])
+        temp2_data = numpy.array(self.temp2B[start_idx:end_idx+1] if background_mode else self.temp2[start_idx:end_idx+1])
 
         # Fit smoothing splines to the data
         # Use s parameter for smoothing (0 = interpolation, higher = more smoothing)
@@ -17632,7 +17636,7 @@ class tgraphcanvas(QObject):
                     [float(temp2_data[i]) for i in indices])
 
     #launches designer
-    def designer(self) -> None:
+    def designer(self, background_mode:bool = False) -> None:
         #disconnect mouse cross if ON
         if self.crossmarker:
             self.togglecrosslines()
@@ -17640,14 +17644,16 @@ class tgraphcanvas(QObject):
         if len(self.analysisresultsstr) > 0:
             self.aw.deleteBackground()
 
-        if self.timex:
+        if (not background_mode and self.timex) or (background_mode and self.timeB):
             # Show dialog to select number of spline nodes
             from artisanlib.dialogs import DesignerSplineNodesDlg
             dialog = DesignerSplineNodesDlg(self.aw, self.aw, default_nodes=10)
             if dialog.exec():
+                self.designer_loaded_foreground_profile_file = self.aw.curFile
                 num_nodes = dialog.get_num_nodes()
-                res = self.initfromprofile(num_nodes=num_nodes)
+                res = self.initfromprofile(num_nodes=num_nodes, background_mode=background_mode)
                 if res:
+                    self.designer_background_mode = background_mode
                     self.ax_lines_clear()
                     self.ax_annotations_clear() # remove background profiles annotations (has to be done before reset!)
                     # we also have to remove those extra event annotations if in combo mode
@@ -17663,6 +17669,7 @@ class tgraphcanvas(QObject):
         else:
             #if no profile found
             #
+            self.designer_background_mode = background_mode
             # reset also the special event copy held for the designer
             self.eventtimecopy = []
             self.eventtimecopy = []
@@ -17786,38 +17793,48 @@ class tgraphcanvas(QObject):
         self.redrawdesigner(force=True)
 
     #loads main points from a profile so that they can be edited
-    def initfromprofile(self, num_nodes: int = 0) -> bool:
+    def initfromprofile(self, num_nodes: int = 0, background_mode:bool = False) -> bool:
         """Initialize designer from existing profile by fitting a spline.
 
         Args:
             num_nodes: Number of spline nodes to fit. If 0, uses landmark-based method (old behavior).
+            background_mode: if set we assume working on the background profile
 
         Returns:
             True if successful, False otherwise.
         """
-        if self.timeindex[0] == -1 or self.timeindex[6] == 0:
+        if ((background_mode and (self.timeindexB[0] == -1 or self.timeindexB[6] == 0)) or
+                not background_mode and (self.timeindex[0] == -1 or self.timeindex[6] == 0)):
             QMessageBox.information(self.aw, QApplication.translate('Message','Designer Init'),
                                     QApplication.translate('Message','Unable to start designer.\nProfile missing [CHARGE] or [DROP]'))
             self.disconnect_designer()
             return False
 
         #save events. They will be deleted on qmc.reset()
-        self.specialeventsStringscopy = self.specialeventsStrings[:]
-        self.specialeventsvaluecopy = self.specialeventsvalue[:]
-        self.specialeventstypecopy = self.specialeventstype[:]
+        self.specialeventsStringscopy = (self.backgroundEStrings[:] if background_mode else self.specialeventsStrings[:])
+        self.specialeventsvaluecopy = (self.backgroundEvalues[:] if background_mode else self.specialeventsvalue[:])
+        self.specialeventstypecopy = (self.backgroundEtypes[:] if background_mode else self.specialeventstype[:])
         self.eventtimecopy = []
-        for spe in self.specialevents:
-            #save relative time of events
-            self.eventtimecopy.append(self.timex[spe]-self.timex[self.timeindex[0]])
-        self.etypescopy = self.etypes[:]
+        if background_mode:
+            for spe in self.backgroundEvents:
+                #save relative time of events
+                self.eventtimecopy.append(self.timeB[spe]-self.timeB[self.timeindexB[0]])
+        else:
+            for spe in self.specialevents:
+                #save relative time of events
+                self.eventtimecopy.append(self.timex[spe]-self.timex[self.timeindex[0]])
+        self.etypescopy = (self.Betypes[:] if background_mode else self.etypes[:])
 
         # Save landmark times before any modifications
-        timeindexhold:list[float] = [self.timex[idx] if 0 <= idx < len(self.timex) else 0 for idx in self.timeindex]
+        timeindexhold:list[float] = (
+            [self.timeB[idx] if 0 <= idx < len(self.timeB) else 0 for idx in self.timeindexB]
+            if background_mode else
+            [self.timex[idx] if 0 <= idx < len(self.timex) else 0 for idx in self.timeindex])
 
         if num_nodes > 0:
             # NEW METHOD: Fit spline with specified number of nodes
             # Fit the spline to the existing profile data
-            fitted_times, fitted_temp1, fitted_temp2 = self.fit_spline_to_profile(num_nodes)
+            fitted_times, fitted_temp1, fitted_temp2 = self.fit_spline_to_profile(num_nodes, background_mode)
 
             if not fitted_times:
                 # Fitting failed, fall back to old method
@@ -17825,7 +17842,7 @@ class tgraphcanvas(QObject):
             else:
                 # we remember time axis limits to reconstruct after reset
                 startofx = self.startofx
-                endofx = self.endofx
+                endofx = (fitted_times[-1]+30 if background_mode else self.endofx)
 
                 res = self.reset()  #erase screen
                 if not res:
@@ -17846,28 +17863,43 @@ class tgraphcanvas(QObject):
         if num_nodes == 0:
             # OLD METHOD: Extract only landmark points (backwards compatibility)
             #find lowest point from profile to be converted
-            lpindex = self.aw.findTP()
-            if lpindex != -1 and lpindex not in self.timeindex:
+            lpindex = (self.aw.findTPbackground() if background_mode else self.aw.findTP())
+            if not background_mode and lpindex != -1 and lpindex not in self.timeindex:
                 lptime = self.timex[lpindex]
                 lptemp2 = self.temp2[lpindex]
                 # we only consider TP if its BT is at least 20 degrees lower than the CHARGE temperature
                 if self.temp2[self.timeindex[0]] < (lptemp2 + 20):
+                    lpindex = -1
+            if background_mode and lpindex != -1 and lpindex not in self.timeindexB:
+                lptime = self.timeB[lpindex]
+                lptemp2 = self.temp2B[lpindex]
+                # we only consider TP if its BT is at least 20 degrees lower than the CHARGE temperature
+                if self.temp2B[self.timeindexB[0]] < (lptemp2 + 20):
                     lpindex = -1
             else:
                 lpindex = -1
                 lptime = -1
                 lptemp2 = -1
 
-            timez,t1,t2 = [self.timex[self.timeindex[0]]],[self.temp1[self.timeindex[0]]],[self.temp2[self.timeindex[0]]]    #first CHARGE point
-            for i in range(1,len(self.timeindex)):
-                if self.timeindex[i]:                           # fill up empty lists with main points (FCs, etc). match from timeindex
-                    timez.append(self.timex[self.timeindex[i]])  #add time
-                    t1.append(self.temp1[self.timeindex[i]])    #add temp1
-                    t2.append(self.temp2[self.timeindex[i]])    #add temp2
+            timez = ([self.timeB[self.timeindexB[0]]] if background_mode else [self.timex[self.timeindex[0]]])
+            t1 = ([self.temp1B[self.timeindexB[0]]] if background_mode else [self.temp1[self.timeindex[0]]])
+            t2 = ([self.temp2B[self.timeindexB[0]]] if background_mode else [self.temp2[self.timeindex[0]]])
+            if background_mode:
+                for i in range(1,len(self.timeindexB)):
+                    if self.timeindexB[i]:                           # fill up empty lists with main points (FCs, etc). match from timeindex
+                        timez.append(self.timeB[self.timeindexB[i]])  #add time
+                        t1.append(self.temp1B[self.timeindexB[i]])    #add temp1
+                        t2.append(self.temp2B[self.timeindexB[i]])    #add temp2
+            else:
+                for i in range(1,len(self.timeindex)):
+                    if self.timeindex[i]:                           # fill up empty lists with main points (FCs, etc). match from timeindex
+                        timez.append(self.timex[self.timeindex[i]])  #add time
+                        t1.append(self.temp1[self.timeindex[i]])    #add temp1
+                        t2.append(self.temp2[self.timeindex[i]])    #add temp2
 
             # we remember time axis limits to reconstruct after reset (which might alter them such that they do not fit to the profile data any longer!)
             startofx = self.startofx
-            endofx = self.endofx
+            endofx = (timez[-1]+30 if background_mode else self.endofx)
 
             res = self.reset()  #erase screen
             if not res:
@@ -17893,15 +17925,12 @@ class tgraphcanvas(QObject):
         self.timealign(redraw=False)
 
         self.xaxistosm(redraw=False)
-#        # import UnivariateSpline needed to draw the curve in designer
-#        from scipy.interpolate import UnivariateSpline # @UnusedImport # pylint: disable=import-error
-#        global UnivariateSpline # pylint: disable=global-statement
         # init designer timez
         self.designer_timez = [float(w) for w in numpy.arange(self.timex[0],self.timex[-1],self.time_step_size)]
         # set initial RoR z-axis limits
         self.setDesignerDeltaAxisLimits(self.DeltaETflag and self.autodeltaxET, self.DeltaBTflag and self.autodeltaxBT)
 
-        self.redrawdesigner(force=True)                                   #redraw the designer screen
+        self.redrawdesigner(force=True) #redraw the designer screen
 
         return True
 
@@ -18667,9 +18696,8 @@ class tgraphcanvas(QObject):
 
 
     #converts from a designer profile to a normal profile
-    def convert_designer(self) -> None:
+    def convert_designer(self, filename:str|None) -> None:
         try:
-            self.disconnect_designer()
 
             from scipy.interpolate import UnivariateSpline
             #pylint: disable=E0611
@@ -18737,24 +18765,36 @@ class tgraphcanvas(QObject):
             elif self.reproducedesigner == 4:
                 self.designer_create_ramp_command()
 
-            self.redraw()
+            self.disconnect_designer()
+
+            if filename:
+                # save profile
+                self.aw.fileSave(filename, copy=True)
+                self.fileClean()
+                if self.designer_loaded_foreground_profile_file is not None:
+                    self.aw.loadFile(self.designer_loaded_foreground_profile_file)
+                else:
+                    self.reset(soundOn=False, fireResetAction=False)
+                self.aw.loadBackgroundSignal.emit(filename, False)
+
             self.aw.sendmessage(QApplication.translate('Message', 'New profile created'))
 
         except ValueError:
             _, _, exc_tb = sys.exc_info()
             self.adderror(QApplication.translate('Error Message', 'Value Error:') + ' createFromDesigner()',getattr(exc_tb, 'tb_lineno', '?'))
-            return
 
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
             _, _, exc_tb = sys.exc_info()
             self.adderror((QApplication.translate('Error Message', 'Exception:') + ' createFromDesigner() {0}').format(str(e)),getattr(exc_tb, 'tb_lineno', '?'))
-            return
+
 
     #activates mouse events
     def connect_designer(self) -> None:
         if not self.designerflag:
             self.designerflag = True
+            self.designer_dashboard_was_active_on_open = self.aw.dashboard.dashboard_active()
+            self.aw.dashboard.hide_dashboard()
             self.aw.designerAction.setChecked(True)
             self.canvas.setCursor(Qt.CursorShape.PointingHandCursor)
             self.mousepress = False
@@ -18771,6 +18811,9 @@ class tgraphcanvas(QObject):
     def disconnect_designer(self) -> None:
         self.designerflag = False
         self.aw.designerAction.setChecked(False)
+        if self.designer_dashboard_was_active_on_open:
+            self.aw.dashboard.show_dashboard()
+        self.designer_dashboard_was_active_on_open = False
         for dc in self.designerconnections:
             if dc is not None:
                 self.fig.canvas.mpl_disconnect(dc)

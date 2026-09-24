@@ -91,6 +91,7 @@ class autosaveDlg(ArtisanDialog):
         self.dialogbuttons.rejected.connect(lambda : (None if self.close() else None)) # lambda to make mypy happy, turning close from None->bool into None->None
         self.helpButton = self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.Help)
         if self.helpButton is not None:
+            self.dialogbuttons.removeButton(self.helpButton)
             self.setButtonTranslations(self.helpButton,'Help',QApplication.translate('Button','Help'))
             self.helpButton.clicked.connect(self.showautosavehelp)
             self.helpButton.setIconSize(QSize(14,14))
@@ -129,6 +130,8 @@ class autosaveDlg(ArtisanDialog):
         linea.setFrameShadow(QFrame.Shadow.Sunken)
 
         buttonLayout = QHBoxLayout()
+        buttonLayout.addWidget(self.helpButton)
+        buttonLayout.addStretch()
         buttonLayout.addWidget(self.dialogbuttons)
         autolayout = QGridLayout()
         autolayout.addWidget(self.autocheckbox,0,0,Qt.AlignmentFlag.AlignRight)

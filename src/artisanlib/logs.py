@@ -38,7 +38,7 @@ from artisanlib import __version__
 from artisanlib.dialogs import ArtisanDialog
 from artisanlib.widgets import ArtisanPlainTextEdit
 
-from PyQt6.QtCore import Qt, pyqtSlot
+from PyQt6.QtCore import pyqtSlot
 from PyQt6.QtWidgets import (QApplication, QLabel, QCheckBox, QVBoxLayout)
 
 
@@ -55,9 +55,9 @@ class serialLogDlg(ArtisanDialog):
         self.serialcheckbox.setToolTip(QApplication.translate('Tooltip', 'ON/OFF logs serial communication'))
         self.serialcheckbox.setChecked(self.aw.seriallogflag)
         self.serialcheckbox.stateChanged.connect(self.serialcheckboxChanged)
-        self.serialEdit = ArtisanPlainTextEdit()
+        self.serialEdit = ArtisanPlainTextEdit(self.aw.app.darkmode)
         self.serialEdit.setReadOnly(True)
-        self.serialEdit.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+#        self.serialEdit.setFocusPolicy(Qt.FocusPolicy.NoFocus)  # NoFocus breaks copy keyboard selection and shortcuts
         self.serialEdit.appendHtml(self.getstring())
         layout = QVBoxLayout()
         layout.addWidget(self.serialcheckbox,0)
@@ -101,9 +101,9 @@ class errorDlg(ArtisanDialog):
         self.setModal(True)
         self.setWindowTitle(QApplication.translate('Form Caption','Error Log'))
         self.elabel = QLabel()
-        self. errorEdit = ArtisanPlainTextEdit()
+        self. errorEdit = ArtisanPlainTextEdit(self.aw.app.darkmode)
         self.errorEdit.setReadOnly(True)
-        self.errorEdit.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+#        self.errorEdit.setFocusPolicy(Qt.FocusPolicy.NoFocus) # NoFocus breaks copy keyboard selection and shortcuts
         layout = QVBoxLayout()
         layout.addWidget(self.elabel,0)
         layout.addWidget(self.errorEdit,1)
@@ -138,9 +138,9 @@ class messageDlg(ArtisanDialog):
         super().__init__(parent, aw)
         self.setModal(True)
         self.setWindowTitle(QApplication.translate('Form Caption','Message History'))
-        self.messageEdit = ArtisanPlainTextEdit()
+        self.messageEdit = ArtisanPlainTextEdit(self.aw.app.darkmode)
         self.messageEdit.setReadOnly(True)
-        self.messageEdit.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+#        self.messageEdit.setFocusPolicy(Qt.FocusPolicy.NoFocus) # NoFocus breaks copy keyboard selection and shortcuts
         layout = QVBoxLayout()
         layout.addWidget(self.messageEdit,0)
         self.setLayout(layout)

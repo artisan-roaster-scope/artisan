@@ -40,7 +40,7 @@ from PyQt6.QtCore import (Qt, pyqtSignal, pyqtSlot, QLine, QEvent,
     QByteArray, QPropertyAnimation, QEasingCurve, QLocale)
 from PyQt6.QtCore import pyqtProperty, QSize # type:ignore[attr-defined]
 from PyQt6.QtWidgets import (QApplication, QSplitter, QSplitterHandle, QLabel, QComboBox, QLineEdit, QTextEdit, QPlainTextEdit, QDoubleSpinBox, QPushButton,
-    QTableWidget, QTableWidgetItem, QSizePolicy, QLCDNumber, QGroupBox, QFrame, QSlider, QStyle, QStyleOptionSlider, QListView, QToolButton)
+    QTableWidget, QTableWidgetItem, QSizePolicy, QLCDNumber, QGroupBox, QFrame, QSlider, QStyle, QStyleOptionSlider, QListView, QToolButton, QSpinBox)
 from PyQt6.QtGui import QPen, QPainter, QFontMetrics, QColor, QCursor, QEnterEvent, QPaintEvent, QIcon
 
 from artisanlib.util import stringtoseconds, createGradient,getStyleIconPath
@@ -144,6 +144,17 @@ class MyContentLimitedQComboBox(MyQComboBox): # pylint: disable=too-few-public-m
         view = self.view()
         if view is not None:
             view.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+
+# Spin box with mouse wheel / touch pad scrolling disabled
+class MyQSpinBox(QSpinBox):
+    def __init__(self, parent:'QWidget|None' = None, **kwargs:dict[str,Any]) -> None:
+        super().__init__(parent, **kwargs)
+        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+        self.setLocale(QLocale('C'))
+
+    @override
+    def wheelEvent(self, e:'QWheelEvent|None') -> None: # pylint: disable=no-self-use # used as slot
+        del e
 
 class MyQDoubleSpinBox(QDoubleSpinBox):
     def __init__(self, parent:'QWidget|None' = None, **kwargs:dict[str,Any]) -> None:
@@ -438,29 +449,31 @@ class ClickableLCDFrame(QFrame):
 
 
 class ArtisanTextEdit(QTextEdit):
-    def __init__(self, parent:'QWidget|None' = None, **kwargs:dict[Any,Any]) -> None:
+    def __init__(self, darkmode:bool = False, parent:'QWidget|None' = None, **kwargs:dict[Any,Any]) -> None:
         super().__init__(parent, **kwargs)
-        self.update_style()
+        self.update_style(darkmode)
 
     def update_style(self,
+            darkmode:bool,
             background_color: str|None = None,
             selection_background_color: str|None = None,
             border_color: str|None = None,
             color: str|None = None) -> None:
-        self.setStyleSheet(text_edit_style(background_color, selection_background_color, border_color, color))
+        self.setStyleSheet(text_edit_style(darkmode, background_color, selection_background_color, border_color, color))
 
 
 class ArtisanPlainTextEdit(QPlainTextEdit):
-    def __init__(self, parent:'QWidget|None' = None, **kwargs:dict[Any,Any]) -> None:
+    def __init__(self, darkmode:bool = False, parent:'QWidget|None' = None, **kwargs:dict[Any,Any]) -> None:
         super().__init__(parent, **kwargs)
-        self.update_style()
+        self.update_style(darkmode)
 
     def update_style(self,
+            darkmode:bool,
             background_color: str|None = None,
             selection_background_color: str|None = None,
             border_color: str|None = None,
             color: str|None = None) -> None:
-        self.setStyleSheet(text_edit_style(background_color, selection_background_color, border_color, color))
+        self.setStyleSheet(text_edit_style(darkmode, background_color, selection_background_color, border_color, color))
 
 # this one emits a clicked event on right-clicks and an editingFinished event when the text was changed and the focus got lost
 class ClickableTextEdit(ArtisanPlainTextEdit):
@@ -468,8 +481,8 @@ class ClickableTextEdit(ArtisanPlainTextEdit):
     editingFinished = pyqtSignal()
     receivedFocus = pyqtSignal()
 
-    def __init__(self, parent:'QWidget|None' = None, **kwargs:dict[str,Any]) -> None:
-        super().__init__(parent, **kwargs)
+    def __init__(self, darkmode:bool = False, parent:'QWidget|None' = None, **kwargs:dict[str,Any]) -> None:
+        super().__init__(darkmode, parent, **kwargs)
         self._changed = False
         self.setTabChangesFocus(True)
         self.textChanged.connect(self._handle_text_changed)

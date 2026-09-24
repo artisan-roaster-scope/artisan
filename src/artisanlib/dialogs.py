@@ -38,11 +38,11 @@ if TYPE_CHECKING:
 from PyQt6.QtCore import Qt, QEvent, QSettings, pyqtSlot, pyqtSignal, QRegularExpression
 from PyQt6.QtWidgets import (QApplication, QWidget, QDialog, QMessageBox, QDialogButtonBox,
             QHBoxLayout, QVBoxLayout, QLabel, QLineEdit, QLayout, QTableWidget, QHeaderView, QPushButton, QSpinBox, QCheckBox)
-from PyQt6.QtGui import QKeySequence, QAction, QIntValidator, QTextCharFormat, QTextCursor, QColor, QIcon
+from PyQt6.QtGui import QKeySequence, QAction, QIntValidator, QTextCharFormat, QTextCursor, QColor, QIcon, QPalette
 
 from artisanlib.widgets import MyQComboBox, ClickableQLineEdit, ArtisanTextEdit, ArtisanMinorPushButton
 from artisanlib.util import comma2dot, float2float, float2floatWeightVolume, convertWeight, weight_units, getStyleIconPath
-from artisanlib.styles import horizontal_header_style, vertical_header_style, line_edit_style, spin_box_style, table_style
+from artisanlib.styles import horizontal_header_style, vertical_header_style, line_edit_style, spin_box_style, table_style, artisan_dialog_button_style
 
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -76,6 +76,22 @@ class ArtisanDialog(QDialog):
 
         # configure standard dialog buttons
         self.dialogbuttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel,Qt.Orientation.Horizontal)
+
+        # style
+        palette = self.palette()
+        accent_color = palette.color(QPalette.ColorRole.Accent)
+        if not accent_color.isValid():
+            accent_color = QColor('#007aff')  # Fallback blue if OS provides none
+        # Generate math-driven lighting variants for the accent button
+        accent_name = accent_color.name()
+        accent_hover = accent_color.lighter(115).name() if self.aw.app.darkmode else accent_color.darker(105).name()
+        accent_pressed = accent_color.darker(110).name() if self.aw.app.darkmode else accent_color.darker(115).name()
+        self.dialogbuttons.setStyleSheet(artisan_dialog_button_style(
+            self.aw.app.darkmode,
+            accent_name,
+            accent_hover,
+            accent_pressed))
+
         okButton: QPushButton|None = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)
         if okButton is not None:
             okButton.setDefault(True)
@@ -186,7 +202,7 @@ class HelpDlg(ArtisanDialog):
             self.restoreGeometry(settings.value('HelpGeometry'))
 
         # Load the help content
-        self.phelp = ArtisanTextEdit()
+        self.phelp = ArtisanTextEdit(self.aw.app.darkmode)
         self.phelp.setHtml(content)
         self.phelp.setReadOnly(True)
 
@@ -639,7 +655,7 @@ class tareDlg(ArtisanDialog):
             'delete-02-stroke-rounded-light.svg',
             'delete-02-stroke-rounded-dark.svg',
             self.aw.app.darkmode)
-        self.delButton.setDisabled(True)
+        self.delButton.setEnabled(False)
         self.delButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
         addButton.clicked.connect(self.addTare)

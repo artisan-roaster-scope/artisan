@@ -538,8 +538,8 @@ class graphColorDlg(ArtisanDialog):
         lcd8layout.setContentsMargins(0,0,0,0)
 
         buttonlayout = QHBoxLayout()
-        buttonlayout.addStretch()
         buttonlayout.addWidget(LCDdefaultButton)
+        buttonlayout.addStretch()
         buttonlayout.setContentsMargins(0,0,0,0)
         buttonlayout.setSpacing(0)
 
@@ -579,6 +579,7 @@ class graphColorDlg(ArtisanDialog):
         self.dialogbuttons.removeButton(self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel))
         resetButton = self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.RestoreDefaults)
         if resetButton is not None:
+            self.dialogbuttons.removeButton(resetButton)
             resetButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             resetButton.clicked.connect(self.recolor1)
             resetButton.setToolTip(QApplication.translate('Tooltip', 'Loads the Default theme'))

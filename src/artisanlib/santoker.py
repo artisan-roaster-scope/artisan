@@ -110,10 +110,10 @@ class Santoker(AsyncComm):
 
     # data targets
     BOARD:Final[bytes] = b'\xF0'
-    BT:Final[bytes] = b'\xF1'
-    ET:Final[bytes] = b'\xF2'
-    OLD_BT:Final[bytes] = b'\xF3'
-    OLD_ET:Final[bytes] = b'\xF4'
+    LEGACY_BT:Final[bytes] = b'\xF1'
+    LEGACY_ET:Final[bytes] = b'\xF2'
+    BT:Final[bytes] = b'\xF3'
+    ET:Final[bytes] = b'\xF4'
     BT_ROR:Final[bytes] = b'\xF5'
     ET_ROR:Final[bytes] = b'\xF6'
     IR:Final[bytes] = b'\xF8'
@@ -133,8 +133,8 @@ class Santoker(AsyncComm):
     BT_CALIB = b'\x87'
     ET_CALIB = b'\x88'
 
-    __slots__ = [ 'HEADER', '_charge_handler', '_dry_handler', '_fcs_handler', '_scs_handler', '_drop_handler', '_board', '_bt', '_et',
-                    '_bt_ror', '_et_ror', '_ir',
+    __slots__ = [ 'HEADER', '_charge_handler', '_dry_handler', '_fcs_handler', '_scs_handler', '_drop_handler', '_board',
+                    '_legacy_bt', '_legacy_et', '_bt', '_et', '_bt_ror', '_et_ror', '_ir',
                     '_power', '_air', '_drum', '_CHARGE', '_DRY', '_FCs', '_SCs', '_DROP', '_connect_using_ble', '_ble_client' ]
 
     def __init__(self, host:str = '127.0.0.1', port:int = 8080, serial:'SerialSettings|None' = None,
@@ -162,6 +162,8 @@ class Santoker(AsyncComm):
 
         # current readings
         self._board:float = -1  # board temperature in °C
+        self._legacy_bt:float = -1 # legacy bean temperature in °C
+        self._legacy_et:float = -1 # legacy environmental temperature in °C
         self._bt:float = -1     # bean temperature in °C
         self._et:float = -1     # environmental temperature in °C
         self._bt_ror:float = -1 # bean temperature rate-of-rise in C°/min
@@ -187,9 +189,9 @@ class Santoker(AsyncComm):
     def getBoard(self) -> float:
         return self._board
     def getBT(self) -> float:
-        return self._bt
+        return (self._legacy_bt if self._bt == -1 else self._bt)
     def getET(self) -> float:
-        return self._et
+        return (self._legacy_et if self._et == -1 else self._et)
     def getBT_RoR(self) -> float:
         return self._bt_ror
     def getET_RoR(self) -> float:
@@ -234,12 +236,22 @@ class Santoker(AsyncComm):
 #            _log.debug('register_reading(%s,%s)',target,value)
         if target == self.BOARD:
             self._board = value / 10.0
-        elif target in {self.BT, self.OLD_BT}:
+        elif target == self.LEGACY_BT:
+            legacy_BT = value / 10.0
+            self._legacy_bt = (legacy_BT if self._legacy_bt == -1 else (2*legacy_BT + self._legacy_bt)/3)
+            if self._logging:
+                _log.debug('legacy BT: %s',self._legacy_bt)
+        elif target == self.LEGACY_ET:
+            legacy_ET = value / 10.0
+            self._legacy_et = (legacy_ET if self._legacy_et == -1 else (2*legacy_ET + self._legacy_et)/3)
+            if self._logging:
+                _log.debug('legacy ET: %s',self._legacy_et)
+        elif target == self.BT:
             BT = value / 10.0
             self._bt = (BT if self._bt == -1 else (2*BT + self._bt)/3)
             if self._logging:
                 _log.debug('BT: %s',self._bt)
-        elif target in {self.ET, self.OLD_ET}:
+        elif target == self.ET:
             ET = value / 10.0
             self._et = (ET if self._et == -1 else (2*ET + self._et)/3)
             if self._logging:

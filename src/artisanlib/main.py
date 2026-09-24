@@ -113,7 +113,7 @@ from PyQt6.QtWidgets import (QApplication, QWidget, QMessageBox, QLabel, QMainWi
                          QInputDialog, QGroupBox, QLineEdit, QStatusBar,
                          QSizePolicy, QVBoxLayout, QHBoxLayout, QPushButton,
                          QLCDNumber, QSpinBox, QComboBox,
-                         QSlider, QToolButton, QStackedWidget, #QStackedLayout,
+                         QSlider, QToolButton, QStackedWidget,
                          QColorDialog, QFrame, QScrollArea, QProgressDialog,
                          QStyleFactory, QMenuBar, QMenu, QLayout, QDockWidget)
 from PyQt6.QtGui import (QScreen, QPageLayout, QAction, QWindow,
@@ -691,7 +691,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
 
         # toolitem entries of the form (text, tooltip_text, image_file, callback)
         self.toolitems: list[tuple[str, ...] | tuple[None, ...]] = [ # zuban:ignore[assignment] # pyrefly:ignore[bad-override]
-                ('Plus', QApplication.translate('Tooltip', 'Connect to plus service'), 'plus', 'plus'),
+                ('Plus', QApplication.translate('Tooltip', 'Connect to plus service'), 'plus-off', 'plus'),
                 ('', QApplication.translate('Tooltip', 'Subscription'), 'plus-pro', 'subscription'),
                 (None, None, None, None),
                 ('Dashboard', QApplication.translate('Tooltip', 'View Dashboard'), 'layout-dashboard-stroke-rounded', 'dashboard'),
@@ -885,6 +885,8 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
                                 tb.push_current()
                     except Exception as e: # pylint: disable=broad-except
                         _log.exception(e)
+                #icon = None
+                icon = QIcon(getStyleIconPath('list-ordered-stroke-rounded-white.svg' if self.aw.app.darkmode else 'line-style-stroke-rounded.svg'))
                 dialog = formlayout.FormDialog(data, QApplication.translate('Toolbar', 'Lines'), comment, icon, parent, my_apply) # type: ignore[no-untyped-call]
                 dialog.exec()
 
@@ -1335,7 +1337,7 @@ class InvalidProfileHash(Exception):
 
 # NOTE: to have pylint to verify proper __slot__ definitions with pylint one has to remove the super class QMainWindow here temporarily
 #   as this class does not has __slot__ definitions and thus __dict__ is contained which suppresses the warnings
-#class ApplicationWindow():
+#class ApplicationWindow:
 class ApplicationWindow(QMainWindow):
 
     NUMBER_OF_EXTRABUTTON_ROWS:Final[int] = 10 # max number of extra button rows
@@ -1468,7 +1470,7 @@ class ApplicationWindow(QMainWindow):
         'qt_scale_factor', 'automatic_registration_period', 'mqtt', 'orbiter', 'machineNameAction', 'main_button_min_width', 'main_button_min_width',
         'pidbuttonFrame', 'phasesLCDsFrame', 'machineNameAction', 'automatic_registration_period', 'label_fmt', 'lcd_label_fmt', 'button_border_radius',
         'dashboard', 'stack', 'line_bottom', 'dashboard_background_image', 'dashboardImageToolButton', 'lcd1widget', 'buttonCONTROLwidget', 'extra_lcd_label_fmt',
-        'exitToolButton'
+        'exitToolButton', 'status_bar'
          ]
 
     nLCDS: Final[int] = 10 # maximum number of LCDs and extra devices (2x10 => 20 in total!)
@@ -2398,7 +2400,7 @@ class ApplicationWindow(QMainWindow):
         # using a QTimer to speed up startup a bit
         QTimer.singleShot(500,self.populateMachineMenu)
 
-        self.machineNameAction:QAction = QAction(QApplication.translate('Menu', 'Machine Name') + '...', self)
+        self.machineNameAction:QAction = QAction(QApplication.translate('Menu', 'Machine Display Name') + '...', self)
         self.machineNameAction.triggered.connect(self.set_machine_name)
 
         self.deviceAction:QAction = QAction(QApplication.translate('Menu', 'Device...'), self)
@@ -2773,7 +2775,7 @@ class ApplicationWindow(QMainWindow):
         ############################## WIDGETS SECTION ########################################
 
         #create a Label object to display program status information
-        self.messagelabel: QLabel = QLabel()
+        self.messagelabel = QLabel()
         self.messagelabel.setContentsMargins(15,0,5,5) # left, top, right, bottom
         if platform.system() != 'Linux':
             f = self.messagelabel.font()
@@ -3596,7 +3598,7 @@ class ApplicationWindow(QMainWindow):
         self.stack.addWidget(self.dashboard)
 
         self.setMinimumWidth(890)
-        self.setMinimumHeight(550)
+        self.setMinimumHeight(620)
 
         midleftlayout = QVBoxLayout()
         midleftlayout.setSpacing(0)
@@ -3771,18 +3773,18 @@ class ApplicationWindow(QMainWindow):
         sliderGrpSV.setContentsMargins(0,0,0,0)
         sliderGrpSV.addWidget(self.sliderGrpBoxSV)
 
-        self.leftlayout:QHBoxLayout = QHBoxLayout()
+        self.leftlayout = QHBoxLayout()
         self.leftlayout.setSpacing(0)
         self.leftlayout.setContentsMargins(0,0,0,0)
         self.leftlayout.addLayout(self.sliderGrp12)
         self.leftlayout.addLayout(self.sliderGrp34)
         self.leftlayout.addLayout(sliderGrpSV)
 
-        self.sliderFrame:QFrame = QFrame()
+        self.sliderFrame = QFrame()
         self.sliderFrame.setLayout(self.leftlayout)
         self.sliderFrame.setContentsMargins(0,0,0,0)
 
-        self.sliderDock:QDockWidget = QDockWidget()
+        self.sliderDock = QDockWidget()
         self.sliderDock.setObjectName('sliderDock') # object is needed to have saveState() working
 #        self.sliderDock.setWindowTitle(QApplication.translate('Tab','Sliders'))
         self.sliderDock.setWidget(self.sliderFrame)
@@ -3838,6 +3840,9 @@ class ApplicationWindow(QMainWindow):
         mainlayout.addWidget(self.status_bar)
         mainlayout.setContentsMargins(0,0,0,0) # left, top, right, bottom
         mainlayout.setSpacing(0)
+
+        # remove space between movable separator between dock widgets and central widget
+        self.setStyleSheet('QMainWindow::separator{ width: 0px; height: 0px; margin: -10px; padding: 0px; }')
 
         self.displayonlymenus() # enable/disable menu items as needed
 
@@ -3947,7 +3952,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot(bool)
     def update_dashboard_background(self, _:bool = False) -> None:
         if self.dashboard_background_image is None:
-            filename = self.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Load Background'), ext='Images (*.png *.jpeg *.jpg)')
+            filename = self.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Load Background Roast Template'), ext='Images (*.png *.jpeg *.jpg)')
             if len(filename) != 0:
                 self.dashboard_background_image = filename
                 QTimer.singleShot(10, self.dashboard.update_background)
@@ -5038,16 +5043,8 @@ class ApplicationWindow(QMainWindow):
             else:
                 plus_icon = 'plus-off'
                 tooltip = QApplication.translate('Plus', 'Sign in to your artisan account')
-#            if svgsupport:
-#                plus_icon += '.svg'
-#            else:
-#                plus_icon += '.png'
             plus_icon += '.svg'
             if subscription_icon is not None:
-#                if svgsupport:
-#                    subscription_icon += '.svg'
-#                else:
-#                    subscription_icon += '.png'
                 subscription_icon += '.svg'
             if len(ntb.actions()) > 0: # pyright:ignore[reportUnknownArgumentType]
                 a = ntb.actions()[0] # the plus action is the first one
@@ -11525,7 +11522,7 @@ class ApplicationWindow(QMainWindow):
                             QApplication.translate('Message','Factory Reset'),string,
                             QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Reset, QMessageBox.StandardButton.Cancel)
 
-        if reply == QMessageBox.StandardButton.Reset :
+        if reply == QMessageBox.StandardButton.Reset:
             #raise flag. Next time app will open, the settings (bad settings) will not be loaded.
             self.resetqsettings = 1  # zuban:ignore[unreachable]
             self.clearExtraDeviceSettingsBackup()
@@ -11595,7 +11592,7 @@ class ApplicationWindow(QMainWindow):
             if style is not None and style != '':
                 self.messagelabel.setStyleSheet(style)
             else:
-                self.messagelabel.setStyleSheet(f"background-color:{rgba_colorname2argb_colorname(self.qmc.palette['canvas'])}; color: {rgba_colorname2argb_colorname(self.qmc.palette['messages'])};")
+                self.messagelabel.setStyleSheet(f"outline: none; background-color:{rgba_colorname2argb_colorname(self.qmc.palette['canvas'])}; color: {rgba_colorname2argb_colorname(self.qmc.palette['messages'])};")
             message = self.arabicReshape(message)
             #keep a max of 100 messages
             if append:
@@ -12386,7 +12383,7 @@ class ApplicationWindow(QMainWindow):
                             if self.qmc.backgroundprofile is not None and self.qmc.backgroundpath:
                                 # if a background profile is loaded we open the file selector using its path
                                 path = self.qmc.backgroundpath
-                            filename = self.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Load Background'),path =path, ext='*.alog')
+                            filename = self.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Load Background Roast Template'),path =path, ext='*.alog')
                             if len(filename) != 0:
                                 self.loadBackgroundSignal.emit(filename, False)
                 elif k == Qt.Key.Key_L and no_modifier and self.ui_mode is not UI_MODE.PRODUCTION: # 76:       #L (load alarms)
@@ -24229,6 +24226,10 @@ class ApplicationWindow(QMainWindow):
     def findTP(self) -> int:
         return findTPint(self.qmc.timeindex, self.qmc.timex, self.qmc.temp2)
 
+    #returns the index of the lowest point in BT; return -1 if no such value found in background profile
+    def findTPbackground(self) -> int:
+        return findTPint(self.qmc.timeindexB, self.qmc.timeB, self.qmc.temp2B)
+
 
     #returns the index of the end of the dry phase (returns -1 if dry end cannot be determined)
     #if given, starts at TP_index and looks forward, otherwise it looks backwards from end of roast (EoR)
@@ -25772,7 +25773,7 @@ class ApplicationWindow(QMainWindow):
         else:
             self.startdesigner()
 
-    def startdesigner(self) -> None:
+    def startdesigner(self, background_mode:bool = False) -> None:
         if self.qmc.ai:
             try:
                 self.qmc.ai.remove()
@@ -25783,19 +25784,36 @@ class ApplicationWindow(QMainWindow):
         self.hideSliders(False)
         self.hide_minieventline(False)
         self.hideExtraButtons(False)
-        self.qmc.designer()
-        self.dashboard.hide_dashboard()
+        self.qmc.designer(background_mode)
 
     def stopdesigner(self) -> None:
+        filename:str|None = None
+        if self.qmc.designer_background_mode:
+            # we save the result and load it as background
+            string = QApplication.translate('Message', 'Save as background roast template?')
+            mbox = QMessageBox()
+            mbox.setText(string)
+            from plus.util import setPlusIcon
+            setPlusIcon(mbox, self.app.darkmode)
+            mbox.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No | QMessageBox.StandardButton.Cancel)
+            res = mbox.exec()
+            if res == QMessageBox.StandardButton.Cancel:
+                return # zuban:ignore[unreachable]
+            if res == QMessageBox.StandardButton.Yes:
+                filename = self.ArtisanSaveFileDialog(msg=QApplication.translate('Message','Save Background Roast Template'),ext='*.alog') # zuban:ignore[unreachable]
+                if len(filename) == 0:
+                    return
+
         self.enableEditMenus()
         self.qmc.clear_designer()
-        self.qmc.convert_designer()
+        self.qmc.convert_designer(filename)
 #        self.updateControlsVisibility()
         self.updateReadingsLCDsVisibility()
         self.updateSlidersVisibility()
         self.update_minieventline_visibility()
         self.updateExtraButtonsVisibility()
         self.dashboard.update_tool_icons()
+        self.qmc.designer_background_mode = False
 
     @pyqtSlot()
     @pyqtSlot(bool)

@@ -3038,7 +3038,7 @@ class EventsDlg(ArtisanResizeablDialog):
             visibilityComboBox.setCurrentIndex(self.extraeventsvisibility[i])
             visibilityComboBox.currentIndexChanged.connect(self.setvisibilitytyeventbutton)
             #7 Color
-            colorButton = QPushButton('Select')
+            colorButton = QPushButton()
             colorButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             colorButton.clicked.connect(self.setbuttoncolor)
             label = self.extraeventslabels[i][:]
@@ -3047,7 +3047,7 @@ class EventsDlg(ArtisanResizeablDialog):
             colorButton.setText(label)
             colorButton.setStyleSheet(f'border: none; outline: none; background-color: {self.extraeventbuttoncolor[i]}; color: {self.extraeventbuttontextcolor[i]};')
             #8 Text Color
-            colorTextButton = QPushButton('Select')
+            colorTextButton = QPushButton()
             colorTextButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             colorTextButton.clicked.connect(self.setbuttontextcolor)
             colorTextButton.setText(label)

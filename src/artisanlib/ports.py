@@ -110,7 +110,7 @@ class scanModbusDlg(ArtisanDialog):
         self.checkbox4 = QCheckBox(QApplication.translate('CheckBox','Fct. 4'))
         self.checkbox4.setChecked(self.code4)
         self.checkbox4.stateChanged.connect(self.checkbox4Changed)
-        self.modbusEdit = ArtisanPlainTextEdit()
+        self.modbusEdit = ArtisanPlainTextEdit(self.aw.app.darkmode)
         self.modbusEdit.setReadOnly(True)
         self.startButton:QPushButton = QPushButton(QApplication.translate('Button','Start'))
         self.startButton.setMaximumWidth(150)
@@ -289,7 +289,7 @@ class scanS7Dlg(ArtisanDialog):
         self.checkbox4 = QCheckBox(QApplication.translate('CheckBox','Float'))
         self.checkbox4.setChecked(self.typeFloat)
         self.checkbox4.stateChanged.connect(self.checkbox4Changed)
-        self.S7Edit = ArtisanPlainTextEdit()
+        self.S7Edit = ArtisanPlainTextEdit(self.aw.app.darkmode)
         self.S7Edit.setReadOnly(True)
         self.startButton = QPushButton(QApplication.translate('Button','Start'))
         self.startButton.setMaximumWidth(150)
@@ -849,6 +849,7 @@ class comportDlg(ArtisanResizeablDialog):
 
         helpButton: QPushButton|None = self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.Help)
         if helpButton is not None:
+            self.dialogbuttons.removeButton(helpButton)
             helpButton.setToolTip(QApplication.translate('Tooltip','Show help'))
             self.setButtonTranslations(helpButton,'Help',QApplication.translate('Button','Help'))
             helpButton.clicked.connect(self.showButtonhelp)
@@ -859,6 +860,8 @@ class comportDlg(ArtisanResizeablDialog):
 
         #button layout
         buttonLayout = QHBoxLayout()
+        buttonLayout.addWidget(helpButton)
+        buttonLayout.addStretch()
         buttonLayout.addWidget(self.dialogbuttons)
         #LAYOUT TAB 1
         tab1Layout = QVBoxLayout()

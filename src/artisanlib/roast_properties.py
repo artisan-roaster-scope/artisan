@@ -874,9 +874,12 @@ class editGraphDlg(ArtisanResizeablDialog):
 
         #Beans
         beanslabel = QLabel('<b>' + QApplication.translate('Label', 'Beans') + '</b>')
-        self.beansedit = ClickableTextEdit()
+        self.beansedit = ClickableTextEdit(self.aw.app.darkmode)
         self.beansedit.editingFinished.connect(self.beansEdited)
-
+        if self.aw.app.darkmode:
+            self.beansedit.update_style(self.aw.app.darkmode, background_color = 'palette(base)', border_color = '#555555')
+        else:
+            self.beansedit.update_style(self.aw.app.darkmode)
         self.beansedit.setNewPlainText(self.aw.qmc.beans)
 
         #weight
@@ -1055,6 +1058,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.addRecentButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.addRecentButton.setToolTip(QApplication.translate('Tooltip','Add roast properties to list of recent roasts'))
         self.addRecentButton.setStyleSheet(artisan_push_button_style(self.aw.app.darkmode))
+        self.addRecentButton.setFixedSize(QSize(26,26))
 
         # delete from recent
         self.delRecentButton = QPushButton('–')
@@ -1064,6 +1068,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.delRecentButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.delRecentButton.setToolTip(QApplication.translate('Tooltip','Remove roast properties from list of recent roasts'))
         self.delRecentButton.setStyleSheet(artisan_push_button_style(self.aw.app.darkmode))
+        self.delRecentButton.setFixedSize(QSize(26,26))
 
         self.recentRoastEnabled()
 
@@ -1208,17 +1213,17 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.scaleWeightAccumulated.clicked.connect(self.resetScaleSet)
         # NOTES
         roastinglabel = QLabel('<b>' + QApplication.translate('Label', 'Roasting Notes') + '</b>')
-        self.roastingeditor = ArtisanPlainTextEdit()
+        self.roastingeditor = ArtisanPlainTextEdit(self.aw.app.darkmode)
         if self.aw.app.darkmode:
-            self.roastingeditor.update_style(background_color = 'palette(base)', border_color = '#555555')
+            self.roastingeditor.update_style(self.aw.app.darkmode, background_color = 'palette(base)', border_color = '#555555')
 
 
         self.roastingeditor.setPlainText(self.aw.qmc.roastingnotes)
         cuppinglabel = QLabel('<b>' + QApplication.translate('Label', 'Cupping Notes') + '</b>')
-        self.cuppingeditor =  ArtisanPlainTextEdit()
+        self.cuppingeditor =  ArtisanPlainTextEdit(self.aw.app.darkmode)
         self.cuppingeditor.setPlainText(self.aw.qmc.cuppingnotes)
         if self.aw.app.darkmode:
-            self.cuppingeditor.update_style(background_color = 'palette(base)', border_color = '#555555')
+            self.cuppingeditor.update_style(self.aw.app.darkmode, background_color = 'palette(base)', border_color = '#555555')
 
         # Flags
         self.heavyFC = QCheckBox(QApplication.translate('CheckBox','Heavy FC'))
@@ -1681,7 +1686,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.tab1aLayout.addLayout(ambientGrid)
         tab1Layout = QVBoxLayout()
 #        tab1Layout.addStretch()
-        tab1Layout.setContentsMargins(5, 5, 5, 2) # left, top, right, bottom
+        tab1Layout.setContentsMargins(5, 5, 5, 5) # left, top, right, bottom
         tab1Layout.addLayout(self.tab1aLayout)
         tab1Layout.setSpacing(0)
 #        tab1Layout.addStretch()
@@ -1703,7 +1708,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         tab4Layout = QVBoxLayout()
         tab4Layout.addWidget(self.datatable)
         tab4Layout.addLayout(databuttonLayout)
-        tab4Layout.setContentsMargins(2, 5, 2, 5) # left, top, right, bottom
+        tab4Layout.setContentsMargins(5, 5, 5, 5) # left, top, right, bottom
         #tabwidget
         self.TabWidget = QTabWidget()
         self.TabWidget.setContentsMargins(0,0,0,0)
@@ -1920,11 +1925,13 @@ class editGraphDlg(ArtisanResizeablDialog):
         self.batchprefixedit = QLineEdit(self.aw.qmc.roastbatchprefix)
         self.batchprefixedit.setStyleSheet(line_edit_style(self.aw.app.darkmode))
         self.batchcounterSpinBox = QSpinBox()
+        self.batchcounterSpinBox.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.batchcounterSpinBox.setRange(0,65534)
         self.batchcounterSpinBox.setSingleStep(1)
         self.batchcounterSpinBox.setValue(int(self.aw.qmc.roastbatchnr))
         self.batchcounterSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.batchposSpinBox = QSpinBox()
+        self.batchposSpinBox.setStyleSheet(spin_box_style(self.aw.app.darkmode))
         self.batchposSpinBox.setRange(1,99)
         self.batchposSpinBox.setSingleStep(1)
         self.batchposSpinBox.setValue(int(self.aw.qmc.roastbatchpos))
@@ -2217,13 +2224,13 @@ class editGraphDlg(ArtisanResizeablDialog):
     def markPlusCoffeeFields(self, b:bool) -> None:
         if b:
             if self.aw.app.darkmode:
-                self.beansedit.update_style(background_color = '#333333', selection_background_color = 'darkgray', border_color = '#555555')
+                self.beansedit.update_style(self.aw.app.darkmode, background_color = '#333333', selection_background_color = 'darkgray', border_color = '#555555')
             else:
-                self.beansedit.update_style('#e4f3f8', '#E2E2E2', '#555555')
+                self.beansedit.update_style(self.aw.app.darkmode, '#e4f3f8', '#E2E2E2', '#555555')
         elif self.aw.app.darkmode:
-            self.beansedit.update_style(background_color = 'palette(base)', border_color = '#555555')
+            self.beansedit.update_style(self.aw.app.darkmode, background_color = 'palette(base)', border_color = '#555555')
         else:
-            self.beansedit.update_style()
+            self.beansedit.update_style(self.aw.app.darkmode)
 
 
         # for QLineEdit
@@ -4328,7 +4335,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.setup_ui.SetDefaults.setText(QApplication.translate('Button', 'Save Defaults'))
             # hack to access the Qt automatic translation of the RestoreDefaults button
             db = QDialogButtonBox(QDialogButtonBox.StandardButton.RestoreDefaults)
-            defaults_button: QPushButton|None = db.button(QDialogButtonBox.StandardButton.RestoreDefaults)
+            defaults_button = db.button(QDialogButtonBox.StandardButton.RestoreDefaults)
             if defaults_button is not None:
                 defaults_button_text_translated = defaults_button.text()
                 self.setup_ui.Defaults.setText(defaults_button_text_translated)
@@ -5054,14 +5061,13 @@ class editGraphDlg(ArtisanResizeablDialog):
 
     # mark widget w if b holds otherwise unmark it
     def markWidget(self, w:QLineEdit, b:bool) -> None:
-        if not sys.platform.startswith('darwin'):
-            if b:
-                if self.aw.app.darkmode:
-                    w.setStyleSheet("""QLineEdit { background-color: #ad0427;  }""")
-                else:
-                    w.setStyleSheet("""QLineEdit { color: #CC0F50; }""")
+        if b:
+            if self.aw.app.darkmode:
+                w.setStyleSheet(line_edit_style(self.aw.app.darkmode, background_color = '#ad0427'))
             else:
-                w.setStyleSheet('QLineEdit { }')
+                w.setStyleSheet(line_edit_style(self.aw.app.darkmode, color = '#CC0F50'))
+        else:
+            w.setStyleSheet(line_edit_style(self.aw.app.darkmode))
 
     def checkWeightOut(self) -> None:
         try:

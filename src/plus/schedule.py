@@ -2156,7 +2156,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         roasted_moisture_suffix.setFixedWidth(color_density_moisture_suffix_width)
         roasted_moisture_suffix.setAlignment (Qt.AlignmentFlag.AlignLeft)
 
-        self.roasted_notes = ArtisanPlainTextEdit()
+        self.roasted_notes = ArtisanPlainTextEdit(self.aw.app.darkmode)
         self.roasted_notes.setPlaceholderText(QApplication.translate('Label', 'Roasting Notes'))
         self.roasted_notes.setToolTip(QApplication.translate('Label', 'Roasting Notes'))
 
@@ -2169,7 +2169,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.cupping_score.setAlignment(Qt.AlignmentFlag.AlignCenter) #Qt.AlignmentFlag.AlignHCenter|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
         self.cupping_score.editingFinished.connect(self.cupping_score_changed)
 
-        self.cupping_notes = ArtisanPlainTextEdit()
+        self.cupping_notes = ArtisanPlainTextEdit(self.aw.app.darkmode)
         self.cupping_notes.setPlaceholderText(QApplication.translate('Label', 'Cupping Notes'))
         self.cupping_notes.setToolTip(QApplication.translate('Label', 'Cupping Notes'))
 
@@ -4034,8 +4034,8 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
             self.task_weight.setStyleSheet(
                 f'{tooltip_dull_dark_background_style} QLabel {{ color: {dim_white}; font-size: 40px; font-weight: 700; }}')
             self.task_frame.setStyleSheet(f'background: {medium_dark_grey};')
-            self.roasted_notes.update_style(background_color = 'palette(base)', selection_background_color = 'palette(base)', border_color = '#555555')
-            self.cupping_notes.update_style(background_color = 'palette(base)', selection_background_color = 'palette(base)', border_color = '#555555')
+            self.roasted_notes.update_style(self.aw.app.darkmode, background_color = 'palette(base)', selection_background_color = 'palette(base)', border_color = '#555555')
+            self.cupping_notes.update_style(self.aw.app.darkmode, background_color = 'palette(base)', selection_background_color = 'palette(base)', border_color = '#555555')
         else:
             # set light mode styles
             self.task_type.setStyleSheet(f'QLabel {{ color: {dark_grey}; font-weight: 700; }}')
@@ -4043,8 +4043,8 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
             self.task_weight.setStyleSheet(
                 f'{tooltip_style} QLabel {{ color: {plus_alt_blue}; font-size: 40px; font-weight: 700; }}')
             self.task_frame.setStyleSheet(f'background: {dull_white};')
-            self.roasted_notes.update_style()
-            self.cupping_notes.update_style()
+            self.roasted_notes.update_style(self.aw.app.darkmode)
+            self.cupping_notes.update_style(self.aw.app.darkmode)
         # status bars
         self.status_bar.setStyleSheet('QStatusBar {background-color:palette(base);}')
         self.status_bar_completed.setStyleSheet('QStatusBar {background-color:palette(base);}')
