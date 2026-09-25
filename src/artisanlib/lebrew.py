@@ -201,7 +201,7 @@ class Lebrew_RoastSeeNEXT:
         if hasattr(self, '_ble_client') and self._ble_client is not None:
             # send via BLE
             if self._logging:
-                _log.debug('send_msg(%s): %s',message)
+                _log.debug('send_msg(%s)',message)
             self._ble_client.send(message, response=True)
 
     def start(self, connect_timeout:float=3) -> None:

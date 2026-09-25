@@ -99,6 +99,7 @@ cp includes/dijkstra.ttf dist
 cp includes/ComicNeue-Regular.ttf dist
 cp includes/xkcd-script.ttf dist
 cp includes/Nunito-Regular.ttf dist
+cp includes/Nunito-SemiBold.ttf dist
 cp includes/NotoSansMono-Regular.ttf dist
 cp includes/alarmclock.eot dist
 cp includes/alarmclock.svg dist
@@ -131,6 +132,7 @@ cp includes/safari-pinned-tab.svg dist
 cp includes/site.webmanifest dist
 cp includes/logging.json dist
 cp includes/artisan_public_key.pem dist
+cp includes/release-sponsor-logo.svg dist
 cp -R icons dist
 cp -R Wheels dist
 cp README.txt dist

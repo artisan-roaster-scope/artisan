@@ -117,12 +117,14 @@ DATA_FILES = [
         (r'includes/ComicNeue-Regular.ttf', '.'),
         (r'includes/xkcd-script.ttf', '.'),
         (r'includes/Nunito-Regular.ttf', '.'),
+        (r'includes/Nunito-SemiBold.ttf', '.'),
         (r'includes/NotoSansMono-Regular.ttf', '.'),
         (r'includes/artisan_public_key.pem', '.'),
         (r'includes/Machines', './Machines'),
         (r'includes/Themes', './Themes'),
         (r'includes/Icons', './Icons'),
-        (r'includes/logging.json', '.')
+        (r'includes/logging.json', '.'),
+	(r'includes/release-sponsor-logo.svg', '.')
 ]
 
 # add Artisan translations to DATA_FILES

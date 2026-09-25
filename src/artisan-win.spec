@@ -276,6 +276,7 @@ for fn in [
     r'includes\ComicNeue-Regular.ttf',
     r'includes\xkcd-script.ttf',
     r'includes\Nunito-Regular.ttf',
+    r'includes\Nunito-SemiBold.ttf',
     r'includes\NotoSansMono-Regular.ttf',
     r'includes\WenQuanYiZenHei-01.ttf',
     r'includes\WenQuanYiZenHeiMonoMedium.ttf',
@@ -315,6 +316,7 @@ for fn in [
     r'includes\site.webmanifest',
     r'includes\logging.json',
     r'includes\artisan_public_key.pem',
+    r'includes\release-sponsor-logo.svg',
     ]:
     copy_file(fn, TARGET)
 
