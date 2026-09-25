@@ -5544,6 +5544,8 @@ class ApplicationWindow(QMainWindow):
                             self.qmc.machinesetup = action.text()
                         if res:
                             QTimer.singleShot(700, self.qmc.startPhidgetManager)
+                    elif action.data()[2] == 'Lebrew':
+                        no_config = True # no further configurations required
                     elif action.data()[2] == 'RoastHubs':
                         no_config = True # no further configurations required
                         from artisanlib.roasthubs import configureConnection
