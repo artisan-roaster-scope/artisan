@@ -221,6 +221,8 @@ devices:
         url: /devices/phidgets/
       - title: "Phidget SETS"
         url: /devices/phidget-sets/
+      - title: "RoastSee NEXT"
+        url: /devices/lebrew/
       - title: "Shelly"
         url: /devices/shelly/
       - title: "Siemens S7"

@@ -8,7 +8,7 @@ author_profile: true
 
 ---
 
-## Donations 
+## Donate!
 {: style="color: #2899c7;" }
   
 This software is open-source and absolutely free, also for commercial use. If you think **<span style="color: #2899c7;">artisan scope</span>** is useful to you and your business, contribute financially to its further development. Send any amount via 
