@@ -3820,6 +3820,7 @@ class ApplicationWindow(QMainWindow):
         self.exitToolButton.clicked.connect(self.exitTriggered)
 
         self.status_bar = QStatusBar()
+        self.status_bar.setStyleSheet('QStatusBar::item { border: none; }')
         self.status_bar.addWidget(self.messagelabel)
         self.status_bar.addPermanentWidget(self.dashboardImageToolButton)
         self.status_bar.addPermanentWidget(self.exitToolButton)
@@ -11592,7 +11593,7 @@ class ApplicationWindow(QMainWindow):
             if style is not None and style != '':
                 self.messagelabel.setStyleSheet(style)
             else:
-                self.messagelabel.setStyleSheet(f"outline: none; background-color:{rgba_colorname2argb_colorname(self.qmc.palette['canvas'])}; color: {rgba_colorname2argb_colorname(self.qmc.palette['messages'])};")
+                self.messagelabel.setStyleSheet(f"background-color:{rgba_colorname2argb_colorname(self.qmc.palette['canvas'])}; color: {rgba_colorname2argb_colorname(self.qmc.palette['messages'])};")
             message = self.arabicReshape(message)
             #keep a max of 100 messages
             if append:

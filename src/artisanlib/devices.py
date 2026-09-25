@@ -4756,6 +4756,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ##########################
                 ####  DEVICE 207 is +MODBUS 1112 but +DEVICE cannot be set as main device
                 ##########################
+                ##########################
+                ####  DEVICE 208 is +Santoker XT/YT but +DEVICE cannot be set as main device
+                ##########################
 
                 # ADD DEVICE:
 
@@ -4982,7 +4985,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 1, # 204
                 1, # 205
                 1, # 206
-                1  # 207
+                1, # 207
+                1  # 208
                 ]
             #init serial settings of extra devices
             for i, _ in enumerate(self.aw.qmc.extradevices):

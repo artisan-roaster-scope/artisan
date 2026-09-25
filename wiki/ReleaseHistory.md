@@ -24,6 +24,7 @@ v4.2.2
   - fixes faulty hash generation on files created using `Save As` causing `modified file` warnings on load ([Issue #2205](../../../issues/2205))
   - fixes regression causing canvas color not being applied correctly ([Issue #2212](../../../issues/2212))
   - fixes wrong time formatting in Artisan CSV export ([Issue #2233](../../../issues/2233))
+  - fixes incorrect BT/ET readings on newer Santoker R machines ([Discussion #2232](../../../discussions/2232) and [Discussion #2085](../../../discussions/2085))
 
 
 ----

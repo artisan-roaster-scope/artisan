@@ -461,11 +461,15 @@ class AsyncComm:
             finally:
                 self._ACK_received = None
                 self.reset_readings()
-                if was_connected and self._disconnected_handler is not None:
-                    try:
-                        self._disconnected_handler()
-                    except Exception as e: # pylint: disable=broad-except
-                        _log.error('exception 2: %s', e)
+                if was_connected:
+                    # only report a disconnect if a connection was established before to not
+                    # repeat the disconnect message on every failing reconnect attempt
+                    was_connected = False
+                    if self._disconnected_handler is not None:
+                        try:
+                            self._disconnected_handler()
+                        except Exception as e: # pylint: disable=broad-except
+                            _log.error('exception 2: %s', e)
                 if writer is not None:
                     try:
                         writer.close()

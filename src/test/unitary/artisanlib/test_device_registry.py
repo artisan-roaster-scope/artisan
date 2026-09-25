@@ -10,7 +10,7 @@ from artisanlib.device_registry import (DEVICES, BINARY_DEVICES, PHIDGET_DEVICES
 
 
 def test_devices_length() -> None:
-    assert len(DEVICES) == 207
+    assert len(DEVICES) == 208
 
 
 def test_device_id_is_index_plus_one() -> None:

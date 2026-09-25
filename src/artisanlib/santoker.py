@@ -78,12 +78,18 @@ class SantokerCube_BLE(ClientBLE):
     @override
     def on_connect(self) -> None: # pylint: disable=no-self-use
         if self._connected_handler is not None:
-            self._connected_handler()
+            try:
+                self._connected_handler()
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
 
     @override
     def on_disconnect(self) -> None: # pylint: disable=no-self-use
         if self._disconnected_handler is not None:
-            self._disconnected_handler()
+            try:
+                self._disconnected_handler()
+            except Exception as e: # pylint: disable=broad-except
+                _log.exception(e)
 
     async def reader(self) -> None:
         self._read_queue = asyncio.Queue(maxsize=200) # queue needs to be started in the current async event loop!
@@ -189,9 +195,9 @@ class Santoker(AsyncComm):
     def getBoard(self) -> float:
         return self._board
     def getBT(self) -> float:
-        return (self._legacy_bt if self._bt == -1 else self._bt)
+        return self._bt
     def getET(self) -> float:
-        return (self._legacy_et if self._et == -1 else self._et)
+        return self._et
     def getBT_RoR(self) -> float:
         return self._bt_ror
     def getET_RoR(self) -> float:
@@ -204,6 +210,10 @@ class Santoker(AsyncComm):
         return self._air
     def getDrum(self) -> int:
         return self._drum
+    def getBTlegacy(self) -> float:
+        return self._legacy_bt
+    def getETlegacy(self) -> float:
+        return self._legacy_et
 
     def resetReadings(self) -> None:
         self._board = -1
@@ -261,7 +271,8 @@ class Santoker(AsyncComm):
         elif target == self.ET_ROR:
             self._et_ror = value / 10.0
         elif target == self.IR:
-            self._ir = value / 10.0
+            IR = value / 10.0
+            self._ir = (IR if self._ir == -1 else (2*IR + self._ir)/3)
         elif target == self.POWER:
             self._power = value
         elif target == self.AIR:

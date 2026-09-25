@@ -4046,8 +4046,8 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
             self.roasted_notes.update_style(self.aw.app.darkmode)
             self.cupping_notes.update_style(self.aw.app.darkmode)
         # status bars
-        self.status_bar.setStyleSheet('QStatusBar {background-color:palette(base);}')
-        self.status_bar_completed.setStyleSheet('QStatusBar {background-color:palette(base);}')
+        self.status_bar.setStyleSheet('QStatusBar {background-color:palette(base);} QStatusBar::item { border: none; }')
+        self.status_bar_completed.setStyleSheet('QStatusBar {background-color:palette(base);} QStatusBar::item { border: none; }')
         # scroll areas
         remaining_scrollarea_viewport = self.remaining_scrollarea.viewport()
         if remaining_scrollarea_viewport is not None:
