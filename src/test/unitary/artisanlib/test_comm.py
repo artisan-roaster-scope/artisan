@@ -488,8 +488,8 @@ class TestSerialportClass:
             ser = serialport(mock_aw)
 
             # Assert
-            # Should have 208 device functions (indices 0-207)
-            assert len(ser.devicefunctionlist) == 208
+            # Should have 209 device functions (indices 0-208)
+            assert len(ser.devicefunctionlist) == 209
             # All functions should be callable
             for i, func in enumerate(ser.devicefunctionlist):
                 assert callable(func), f"Function at index {i} is not callable"

@@ -211,7 +211,7 @@ DEVICES: Final[list[str]] = [
     'ColorTrack Serial',         #170
     'Santoker R BT/ET',          #171
     '+Santoker IR/Board',        #172
-    '+Santoker DelatBT/DeltaET', #173
+    '+Santoker DeltaBT/DeltaET', #173
     'ColorTrack BT',             #174
     'Thermoworks BlueDOT',       #175
     'Aillio Bullet R2',          #176
@@ -246,6 +246,7 @@ DEVICES: Final[list[str]] = [
     '+MQTT 910',                  #205
     '+MQTT 1112',                 #206
     '+MODBUS 1112',               #207
+    '+Santoker XT/YT'             #208
 ]
 
 
@@ -412,8 +413,6 @@ NON_SERIAL_DEVICES: Final[set[int]] = PHIDGET_DEVICES.union({
     174, # ColorTrack BT
     175, # Thermoworks BlueDOT
     176, # Aillio Bullet R2
-    194, # +Yocto Meteo Hum/Temp
-    195, # +Yocto Meteo Pressure
 })
 
 # ids of special devices certain input filters should not be applied
