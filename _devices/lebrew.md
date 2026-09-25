@@ -12,4 +12,4 @@ toc_label: "On this page"
 toc_icon: "cog"
 ---
 
-The laser-based [RoastSee NEXT](https://lebrewtech.com/products/roastsee-next-3) real-time color meter by [Lebrew](https://lebrewtech.com/) reports Agtron readings and detected cracks during a roast. It connects to artisan scope via Bluetooth low-energy (BLE) to record the color curve and automatically mark DRY and FCs events based on received color and crack data.
+The laser-based [RoastSee NEXT](https://lebrewtech.com/products/roastsee-next-3) is a real-time color meter by [Lebrew](https://lebrewtech.com/). The device reports Agtron readings and detected cracks during a roast. It connects to artisan scope via Bluetooth low-energy (BLE) to record the color curve and automatically mark DRY and FCs events based on received color and crack data.
