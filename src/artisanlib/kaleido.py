@@ -61,7 +61,7 @@ class KaleidoPort:
 
     __slots__ = [ '_asyncLoopThread', '_write_queue', '_running', '_default_data_stream', '_ping_timeout', '_open_timeout', '_init_timeout',
             '_send_timeout', '_read_timeout', '_ping_retry_delay', '_reconnect_delay', 'send_button_timeout', '_single_await_var_prefix',
-            '_state', '_pending_requests', '_logging' ]
+            '_state', '_pending_requests', '_logging', '_unresponsive_connects', '_unresponsive_hint_after' ]
 
     def __init__(self) -> None:
         # internals
@@ -77,6 +77,15 @@ class KaleidoPort:
         self._read_timeout:Final[float] = 5      # in seconds
         self._ping_retry_delay:Final[float] = 1  # in seconds
         self._reconnect_delay:Final[float] = 0.5 # in seconds
+
+        # counts the connect attempts that opened the port, but never received a response from the
+        # machine. On macOS a Bluetooth serial port can be left behind by a system suspension: the
+        # /dev/cu.* device still exists and opens successfully, but there is no serial connection
+        # behind it any longer and thus data is neither sent nor received. As this is
+        # indistinguishable from a machine that is turned off, we hint at it only after a couple of
+        # such attempts (see the unresponsive_handler of serial_connect)
+        self._unresponsive_connects:int = 0
+        self._unresponsive_hint_after:Final[int] = 3
 
         self.send_button_timeout:Final[float] = 1.2  # in seconds
 
@@ -439,9 +448,21 @@ class KaleidoPort:
         except TimeoutError:
             _log.debug('SC AR timeout')
 
+    # registers a connect attempt that opened the port, but received no response from the machine.
+    # Returns True exactly once per unresponsive phase, on reaching _unresponsive_hint_after, to
+    # trigger the hint only once and not on every reconnect attempt
+    def register_unresponsive_connect(self) -> bool:
+        self._unresponsive_connects += 1
+        return self._unresponsive_connects == self._unresponsive_hint_after
+
+    # called on a successful connect to re-arm the hint for the next unresponsive phase
+    def reset_unresponsive_connects(self) -> None:
+        self._unresponsive_connects = 0
+
     async def serial_connect(self, mode:str, serial:SerialSettings,
                 connected_handler:Callable[[], None]|None = None,
-                disconnected_handler:Callable[[], None]|None = None) -> None:
+                disconnected_handler:Callable[[], None]|None = None,
+                unresponsive_handler:Callable[[], None]|None = None) -> None:
 
         writer:asyncio.StreamWriter|None = None
         while self._running:
@@ -463,6 +484,7 @@ class KaleidoPort:
                     await asyncio.wait_for(self.serial_initialize(reader, writer, mode), timeout=self._init_timeout)
 
                     _log.debug('connected')
+                    self.reset_unresponsive_connects()
                     if connected_handler is not None:
                         try:
                             connected_handler()
@@ -483,6 +505,16 @@ class KaleidoPort:
                             raise exception
             except TimeoutError:
                 _log.debug('connection timeout')
+                if self.register_unresponsive_connect():
+                    _log.warning('%s opens, but the machine does not respond. If the machine is '
+                            'connected via Bluetooth, the serial port might be stale and has to be '
+                            're-established by removing the machine in the system Bluetooth '
+                            'settings and pairing it again', serial['port'])
+                    if unresponsive_handler is not None:
+                        try:
+                            unresponsive_handler()
+                        except Exception as e: # pylint: disable=broad-except
+                            _log.exception(e)
             except Exception as e: # pylint: disable=broad-except
                 _log.error(e)
             finally:
@@ -613,11 +645,13 @@ class KaleidoPort:
     def start(self, mode:str, host:str = '127.0.0.1', port:int = 80, path:str = 'ws',
                 serial:SerialSettings|None = None,
                 connected_handler:Callable[[], None]|None = None,
-                disconnected_handler:Callable[[], None]|None = None) -> None:
+                disconnected_handler:Callable[[], None]|None = None,
+                unresponsive_handler:Callable[[], None]|None = None) -> None:
         try:
             # initialize data structures
             self._state = {}
             self._pending_requests = {}
+            self.reset_unresponsive_connects()
 
             _log.debug('start sampling')
             if self._asyncLoopThread is None:
@@ -630,7 +664,7 @@ class KaleidoPort:
                     connected_handler, disconnected_handler)
             else:
                 coro = self.serial_connect(mode, serial,
-                    connected_handler, disconnected_handler)
+                    connected_handler, disconnected_handler, unresponsive_handler)
             asyncio.run_coroutine_threadsafe(coro, self._asyncLoopThread.loop)
         except Exception as e:  # pylint: disable=broad-except
             _log.exception(e)

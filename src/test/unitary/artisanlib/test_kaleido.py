@@ -726,3 +726,55 @@ class TestKaleidoImplementationDetails:
 #        # Test Heater/Fan retrieval (converts int to float)
 #        result = get_heater_fan_values(75, 50)
 #        assert result == (75.0, 50.0)
+
+
+class TestKaleidoUnresponsiveConnect:
+    """Test the hint raised when the serial port opens but the machine never responds.
+
+    On macOS a Bluetooth serial port survives a system suspension as a stale device: it still
+    opens successfully while no data passes any longer. The hint is raised after a couple of such
+    connect attempts and only once per unresponsive phase.
+    """
+
+    def test_hint_is_raised_after_the_configured_number_of_attempts(self) -> None:
+        from artisanlib.kaleido import KaleidoPort
+
+        kaleido = KaleidoPort()
+        attempts = kaleido._unresponsive_hint_after
+        results = [kaleido.register_unresponsive_connect() for _ in range(attempts)]
+        assert results[:-1] == [False] * (attempts - 1)
+        assert results[-1] is True
+
+    def test_hint_is_raised_only_once(self) -> None:
+        from artisanlib.kaleido import KaleidoPort
+
+        kaleido = KaleidoPort()
+        for _ in range(kaleido._unresponsive_hint_after):
+            kaleido.register_unresponsive_connect()
+        # further failing attempts must not repeat the hint on every reconnect
+        assert not any(kaleido.register_unresponsive_connect() for _ in range(10))
+
+    def test_a_successful_connect_rearms_the_hint(self) -> None:
+        from artisanlib.kaleido import KaleidoPort
+
+        kaleido = KaleidoPort()
+        attempts = kaleido._unresponsive_hint_after
+        for _ in range(attempts):
+            kaleido.register_unresponsive_connect()
+        kaleido.reset_unresponsive_connects()
+        results = [kaleido.register_unresponsive_connect() for _ in range(attempts)]
+        assert results[-1] is True
+
+    def test_start_rearms_the_hint(self) -> None:
+        """start() resets the counter such that a new session reports an unresponsive machine."""
+        from unittest.mock import patch
+
+        from artisanlib.kaleido import KaleidoPort
+
+        kaleido = KaleidoPort()
+        for _ in range(kaleido._unresponsive_hint_after):
+            kaleido.register_unresponsive_connect()
+        with patch('artisanlib.kaleido.AsyncLoopThread'), patch('asyncio.run_coroutine_threadsafe'):
+            kaleido.start('C', serial=None)
+        assert kaleido._unresponsive_connects == 0
+        kaleido.stop()

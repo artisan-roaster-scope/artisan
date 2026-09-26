@@ -13050,7 +13050,8 @@ class tgraphcanvas(QObject):
                     self.aw.kaleido.start(self.mode, self.aw.kaleidoHost, self.aw.kaleidoPort,
                         serial=kaleido_serial,
                         connected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} connected').format('Kaleido'),True,None),
-                        disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('Kaleido'),True,None))
+                        disconnected_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} disconnected').format('Kaleido'),True,None),
+                        unresponsive_handler=lambda : self.aw.sendmessageSignal.emit(QApplication.translate('Message', '{} does not respond. If connected via Bluetooth, remove the machine in the system Bluetooth settings and pair it again.').format('Kaleido'),True,None))
                 elif self.device == 142:
                     try:
                         from artisanlib.ikawa import IKAWA_BLE
