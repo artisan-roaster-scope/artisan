@@ -48,7 +48,7 @@ from artisanlib.device_registry import get_device_name, is_non_serial_device, DE
 from PyQt6.QtCore import (Qt, pyqtSlot, QSettings)
 from PyQt6.QtGui import QIntValidator, QStandardItemModel
 from PyQt6.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit,
-                             QPushButton, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout,QSizePolicy,
+                             QMessageBox, QPushButton, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout,QSizePolicy,
                              QGroupBox, QTableWidget, QTableWidgetItem, QDialog, QDoubleSpinBox,
                              QHeaderView, QScrollArea, QFrame)
 
@@ -405,7 +405,7 @@ class scanS7Dlg(ArtisanDialog):
 
 class comportDlg(ArtisanResizeablDialog):
 
-    __slots__ = [ 'comportEdit', 'baudrateComboBox', 'bauds', 'bytesizeComboBox', 'bytesizes', 'parityComboBox', 'parity', 'stopbitsComboBox', 'stopbits',
+    __slots__ = [ 'comportEdit', 'repairButton', 'baudrateComboBox', 'bauds', 'bytesizeComboBox', 'bytesizes', 'parityComboBox', 'parity', 'stopbitsComboBox', 'stopbits',
         'timeoutEdit', 'serialtable', 'modbus_comportEdit', 'modbus_baudrateComboBox', 'modbus_bauds', 'modbus_bytesizeComboBox', 'modbus_bytesizes',
         'modbus_bytesizeComboBox', 'modbus_parityComboBox', 'modbus_parity', 'modbus_stopbitsComboBox', 'modbus_stopbits', 'modbus_timeoutEdit',
         'modbus_inputDeviceEdits', 'modbus_inputRegisterEdits', 'modbus_inputCodes', 'modbus_inputDivs', 'modbus_inputModes', 'modbus_inputDecodes',
@@ -432,6 +432,17 @@ class comportDlg(ArtisanResizeablDialog):
         comportlabel =QLabel(QApplication.translate('Label', 'Comm Port'))
         self.comportEdit = PortComboBox(selection = self.aw.ser.comport)
         self.comportEdit.activated.connect(self.portComboBoxIndexChanged)
+
+        # on macOS a Bluetooth serial port can be left behind stale by a machine that disappeared
+        # and can only be re-established by pairing the machine again (see artisanlib.bluetooth_macos)
+        self.repairButton:QPushButton|None = None
+        from artisanlib.bluetooth_macos import available as bluetooth_repair_available
+        if bluetooth_repair_available():
+            self.repairButton = QPushButton(QApplication.translate('Button','Repair'))
+            self.repairButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            self.repairButton.setToolTip(QApplication.translate('Tooltip',
+                'Re-establishes an unresponsive Bluetooth serial port by removing the pairing of the machine and pairing it again'))
+            self.repairButton.clicked.connect(self.repairBluetoothPort)
 #        comportlabel.setBuddy(self.comportEdit)
         baudratelabel = QLabel(QApplication.translate('Label', 'Baud Rate'))
         self.baudrateComboBox = QComboBox()
@@ -835,6 +846,9 @@ class comportDlg(ArtisanResizeablDialog):
             grid = QGridLayout()
             grid.addWidget(comportlabel,0,0,Qt.AlignmentFlag.AlignRight)
             grid.addWidget(self.comportEdit,0,1)
+            if self.repairButton is not None:
+                grid.addWidget(self.repairButton,0,2)
+                self.updateRepairButton()
             grid.addWidget(baudratelabel,1,0,Qt.AlignmentFlag.AlignRight)
             grid.addWidget(self.baudrateComboBox,1,1)
             grid.addWidget(bytesizelabel,2,0,Qt.AlignmentFlag.AlignRight)
@@ -1835,6 +1849,45 @@ class comportDlg(ArtisanResizeablDialog):
         scan_modbuds_dlg.mhost = str(self.modbus_hostEdit.text())
         scan_modbuds_dlg.mport = toInt(str(self.modbus_portEdit.text()))
         scan_modbuds_dlg.show()
+
+    @pyqtSlot(int)
+    # enables the repair button only for a port that belongs to a paired Bluetooth device
+    def updateRepairButton(self) -> None:
+        if self.repairButton is None:
+            return
+        try:
+            from artisanlib.bluetooth_macos import paired_device_for_port
+            port:str = str(self.comportEdit.getSelection() or '')
+            self.repairButton.setEnabled(paired_device_for_port(port) is not None)
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
+            self.repairButton.setEnabled(False)
+
+    # removes the pairing of the machine connected to the selected port and pairs it again to
+    # re-establish a stale Bluetooth serial port. Only ever triggered explicitly by the user as
+    # removing a pairing cannot be undone automatically if the machine is not reachable
+    @pyqtSlot(bool)
+    def repairBluetoothPort(self, _:bool = False) -> None:
+        port:str = str(self.comportEdit.getSelection() or '')
+        if QMessageBox.warning(None, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
+                QApplication.translate('Message','Repair'),
+                QApplication.translate('Message',
+                    'This removes the pairing of the machine connected to {} and pairs it again. '
+                    'The machine has to be switched on and in range.').format(port),
+                QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel,
+                QMessageBox.StandardButton.Cancel) != QMessageBox.StandardButton.Ok:
+            return
+        from artisanlib.bluetooth_macos import repair_serial_port
+        QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
+        try:
+            repaired:bool = repair_serial_port(port)
+        finally:
+            QApplication.restoreOverrideCursor()
+        if repaired:
+            self.aw.sendmessage(QApplication.translate('Message','{} re-established').format(port))
+        else:
+            self.aw.sendmessage(QApplication.translate('Message','{} could not be re-established').format(port))
+        self.updateRepairButton()
 
     @pyqtSlot(int)
     def portComboBoxIndexChanged(self, i:int) -> None:
