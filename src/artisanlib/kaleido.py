@@ -40,7 +40,7 @@ if TYPE_CHECKING:
 
 from artisanlib.util import encodeLocalStrict
 from artisanlib.atypes import SerialSettings, ProfileData
-from artisanlib.async_comm import AsyncLoopThread
+from artisanlib.async_comm import AsyncLoopThread, force_reconnect
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
@@ -59,7 +59,7 @@ class State(TypedDict, total=False):
 
 class KaleidoPort:
 
-    __slots__ = [ '_asyncLoopThread', '_write_queue', '_running', '_default_data_stream', '_ping_timeout', '_open_timeout', '_init_timeout',
+    __slots__ = [ '_asyncLoopThread', '_write_queue', '_running', '_writer', '_default_data_stream', '_ping_timeout', '_open_timeout', '_init_timeout',
             '_send_timeout', '_read_timeout', '_ping_retry_delay', '_reconnect_delay', 'send_button_timeout', '_single_await_var_prefix',
             '_state', '_pending_requests', '_logging' ]
 
@@ -68,6 +68,7 @@ class KaleidoPort:
         self._asyncLoopThread: AsyncLoopThread|None     = None  # the asyncio AsyncLoopThread object
         self._write_queue: asyncio.Queue[str]|None      = None  # the write queue
         self._running:bool                              = False # while True we keep running the thread
+        self._writer: asyncio.StreamWriter|None         = None  # the writer of the currently established serial connection (if any)
 
         self._default_data_stream:Final[str] = 'A0'
         self._open_timeout:Final[float] = 6      # in seconds
@@ -444,9 +445,10 @@ class KaleidoPort:
                 disconnected_handler:Callable[[], None]|None = None) -> None:
 
         writer:asyncio.StreamWriter|None = None
+        was_connected:bool = False # set on a successful connect to report only real connection losses
         while self._running:
             try:
-                _log.debug('connecting to %s@%s ...',serial['port'],serial['baudrate'])
+                _log.info('connecting to %s@%s ...',serial['port'],serial['baudrate'])
 
                 connect = self.open_serial_connection(
                         url=serial['port'],
@@ -460,9 +462,11 @@ class KaleidoPort:
 
                 if writer is not None: # pyright:ignore[reportUnnecessaryComparison] # reader is never None!
                     self._write_queue = asyncio.Queue()
+                    self._writer = writer # registered to allow a forced reconnect (see reconnect())
                     await asyncio.wait_for(self.serial_initialize(reader, writer, mode), timeout=self._init_timeout)
 
-                    _log.debug('connected')
+                    _log.info('connected to %s', serial['port'])
+                    was_connected = True
                     if connected_handler is not None:
                         try:
                             connected_handler()
@@ -473,7 +477,7 @@ class KaleidoPort:
                     write_handler = asyncio.create_task(self.serial_handle_writes(writer, self._write_queue))
                     done, pending = await asyncio.wait([read_handler, write_handler], return_when=asyncio.FIRST_COMPLETED)
 
-                    _log.debug('disconnected')
+                    _log.warning('connection to %s lost', serial['port'])
 
                     for task in pending:
                         task.cancel()
@@ -482,10 +486,11 @@ class KaleidoPort:
                         if isinstance(exception, Exception):
                             raise exception
             except TimeoutError:
-                _log.debug('connection timeout')
+                _log.warning('connection timeout (%s)', serial['port'])
             except Exception as e: # pylint: disable=broad-except
                 _log.error(e)
             finally:
+                self._writer = None
                 if self._write_queue is not None:
                     try:
                         while not self._write_queue.empty():
@@ -508,11 +513,15 @@ class KaleidoPort:
 
             # the following is not reached on stop()
             self.resetReadings()
-            if disconnected_handler is not None:
-                try:
-                    disconnected_handler()
-                except Exception as e: # pylint: disable=broad-except
-                    _log.exception(e)
+            if was_connected:
+                # only report a disconnect if a connection was established before to not repeat
+                # the disconnect message on every failing reconnect attempt
+                was_connected = False
+                if disconnected_handler is not None:
+                    try:
+                        disconnected_handler()
+                    except Exception as e: # pylint: disable=broad-except
+                        _log.exception(e)
 
             await asyncio.sleep(self._reconnect_delay)
 
@@ -603,6 +612,11 @@ class KaleidoPort:
                     _log.error(ex)
         return None
 
+    # closes the current serial connection to have the connect loop re-establish it immediately
+    # (see force_reconnect())
+    def reconnect(self) -> bool:
+        return self._running and force_reconnect(self._asyncLoopThread, self._writer)
+
     def markTP(self) -> None:
         self.send_msg('EV', '2')
 
@@ -642,6 +656,7 @@ class KaleidoPort:
         self._running = False
         self._asyncLoopThread = None
         self._write_queue = None
+        self._writer = None
         self.resetReadings()
 
 

@@ -30,6 +30,7 @@ modules that handle complex async communication and state management.
 
 import sys
 from collections.abc import Generator
+from typing import Any
 from unittest.mock import patch
 
 import pytest
@@ -726,3 +727,78 @@ class TestKaleidoImplementationDetails:
 #        # Test Heater/Fan retrieval (converts int to float)
 #        result = get_heater_fan_values(75, 50)
 #        assert result == (75.0, 50.0)
+
+
+def kaleido_writer(kaleido:Any) -> Any:
+    """Reads the internal writer of a KaleidoPort.
+
+    Read through this function and not directly as the type checker narrows the type of an
+    attribute access and keeps that narrowing across the calls that change it, reporting the
+    assertions on the attribute after such a call as unreachable.
+    """
+    return kaleido._writer # pylint: disable=protected-access
+
+
+class TestKaleidoReconnect:
+    """Test the forced reconnect used to re-establish the serial connection after a system wake."""
+
+    def test_reconnect_without_established_connection(self) -> None:
+        """Without a current connection there is nothing to reconnect."""
+        from artisanlib.kaleido import KaleidoPort
+
+        kaleido = KaleidoPort()
+        kaleido._running = True
+        assert kaleido.reconnect() is False
+
+    def test_reconnect_while_not_running(self) -> None:
+        """A stopped KaleidoPort must not be reconnected as its connect loop has terminated."""
+        from unittest.mock import Mock
+
+        from artisanlib.kaleido import KaleidoPort
+
+        kaleido = KaleidoPort()
+        kaleido._running = False
+        kaleido._writer = Mock()
+        kaleido._asyncLoopThread = Mock()
+        assert kaleido.reconnect() is False
+
+    def test_reconnect_closes_the_current_writer(self) -> None:
+        """The current connection is closed so the connect loop re-establishes it immediately."""
+        from unittest.mock import Mock
+
+        from artisanlib.kaleido import KaleidoPort
+
+        kaleido = KaleidoPort()
+        kaleido._running = True
+        writer = Mock()
+        kaleido._writer = writer
+        loop_thread = Mock()
+        kaleido._asyncLoopThread = loop_thread
+        assert kaleido.reconnect() is True
+        loop_thread.loop.call_soon_threadsafe.assert_called_once_with(writer.close)
+
+    def test_reconnect_survives_a_failing_loop(self) -> None:
+        """A failure to schedule the close is reported, never raised into the caller."""
+        from unittest.mock import Mock
+
+        from artisanlib.kaleido import KaleidoPort
+
+        kaleido = KaleidoPort()
+        kaleido._running = True
+        kaleido._writer = Mock()
+        loop_thread = Mock()
+        loop_thread.loop.call_soon_threadsafe.side_effect = RuntimeError('event loop is closed')
+        kaleido._asyncLoopThread = loop_thread
+        assert kaleido.reconnect() is False
+
+    def test_stop_clears_the_writer(self) -> None:
+        """stop() drops the writer such that a later reconnect() does not touch a dead connection."""
+        from unittest.mock import Mock
+
+        from artisanlib.kaleido import KaleidoPort
+
+        kaleido = KaleidoPort()
+        kaleido._writer = Mock()
+        kaleido.stop()
+        assert kaleido_writer(kaleido) is None
+        assert kaleido.reconnect() is False

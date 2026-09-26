@@ -9,6 +9,7 @@ This module tests the async communication classes including:
 """
 
 import asyncio
+import threading
 import time
 from unittest.mock import AsyncMock, Mock, patch
 from collections.abc import AsyncGenerator
@@ -504,3 +505,65 @@ class TestAsyncCommEdgeCases:
         result = await reader.readexactly(4)
 
         assert result == b'data'
+
+
+class TestAsyncCommReconnect:
+    """Test the forced reconnect used to re-establish a connection after a system suspension."""
+
+    def test_reconnect_without_established_connection(self) -> None:
+        """Without a current connection there is nothing to reconnect."""
+        comm = AsyncComm()
+        comm._running = True
+        assert comm.reconnect() is False
+
+    def test_reconnect_while_not_running(self) -> None:
+        """A stopped AsyncComm must not be reconnected (it would not re-establish the connection)."""
+        comm = AsyncComm()
+        comm._running = False
+        comm._writer = Mock()
+        comm._asyncLoopThread = Mock(spec=AsyncLoopThread)
+        assert comm.reconnect() is False
+
+    def test_reconnect_closes_the_current_writer(self) -> None:
+        """The current connection is closed so the connect loop re-establishes it immediately."""
+        comm = AsyncComm()
+        comm._running = True
+        writer = Mock()
+        comm._writer = writer
+        loop_thread = Mock(spec=AsyncLoopThread)
+        comm._asyncLoopThread = loop_thread
+        assert comm.reconnect() is True
+        loop_thread.loop.call_soon_threadsafe.assert_called_once_with(writer.close)
+
+    def test_reconnect_closes_the_writer_on_the_loop_thread(self) -> None:
+        """The close is scheduled on the asyncio loop thread, not executed on the calling thread."""
+        comm = AsyncComm()
+        loop_thread = AsyncLoopThread()
+        try:
+            comm._asyncLoopThread = loop_thread
+            comm._running = True
+            closed = threading.Event()
+            closing_thread:list[int] = []
+
+            def close() -> None:
+                closing_thread.append(threading.get_ident())
+                closed.set()
+
+            writer = Mock()
+            writer.close.side_effect = close
+            comm._writer = writer
+            assert comm.reconnect() is True
+            assert closed.wait(timeout=2)
+            assert closing_thread[0] != threading.get_ident()
+        finally:
+            loop_thread.loop.call_soon_threadsafe(loop_thread.loop.stop)
+
+    def test_reconnect_survives_a_failing_loop(self) -> None:
+        """A failure to schedule the close is reported, never raised into the caller."""
+        comm = AsyncComm()
+        comm._running = True
+        comm._writer = Mock()
+        loop_thread = Mock(spec=AsyncLoopThread)
+        loop_thread.loop.call_soon_threadsafe.side_effect = RuntimeError('event loop is closed')
+        comm._asyncLoopThread = loop_thread
+        assert comm.reconnect() is False

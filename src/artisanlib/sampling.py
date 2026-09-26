@@ -55,6 +55,11 @@ class SamplingDlg(ArtisanDialog):
         self.openCompletedFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.openCompletedFlag.setChecked(bool(self.aw.qmc.flagOpenCompleted))
 
+        self.keepAwakeFlag = QCheckBox(QApplication.translate('Label','Prevent Sleep'))
+        self.keepAwakeFlag.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.keepAwakeFlag.setToolTip(QApplication.translate('Tooltip','Prevents the computer from entering standby while Artisan is ON to not lose the connection to the machine. The display is still allowed to turn off.'))
+        self.keepAwakeFlag.setChecked(bool(self.aw.qmc.flagKeepAwake))
+
         self.interval = MyQDoubleSpinBox()
         self.interval.setSingleStep(1)
         self.interval.setRange(self.aw.qmc.min_delay/1000.,999.99)
@@ -82,6 +87,7 @@ class SamplingDlg(ArtisanDialog):
         flagGrid = QGridLayout()
         flagGrid.addWidget(self.keepOnFlag,0,0)
         flagGrid.addWidget(self.openCompletedFlag,1,0)
+        flagGrid.addWidget(self.keepAwakeFlag,2,0)
 
         flagLayout = QHBoxLayout()
         flagLayout.addStretch()
@@ -133,6 +139,13 @@ class SamplingDlg(ArtisanDialog):
     def ok(self) -> None:
         self.aw.qmc.flagKeepON = bool(self.keepOnFlag.isChecked())
         self.aw.qmc.flagOpenCompleted = bool(self.openCompletedFlag.isChecked())
+        self.aw.qmc.flagKeepAwake = bool(self.keepAwakeFlag.isChecked())
+        if self.aw.qmc.flagon:
+            # apply the changed setting immediately if Artisan is already sampling
+            if self.aw.qmc.flagKeepAwake:
+                self.aw.qmc.preventSleep()
+            else:
+                self.aw.qmc.allowSleep()
         interval = self.interval.value()*1000.
         if self.aw.qmc.xgrid >= 3600:
             interval = interval * 60
