@@ -394,6 +394,7 @@ class tgraphcanvas(QObject):
         'meterfuels_setup', 'meterfuels', 'metersources_setup', 'metersources', 'playbackdrop_min_roasttime', 'TP_max_roasttime',
         'single_click_mpl_upperleft_corner_timer', 'single_click_mpl_upperleft_corner_TIMEOUT', 'profile_upload_limit', 'last_profile_upload_times',
         'zoom_follow_pan_x', 'zoom_follow_pan_y', 'main_event_buttons_undo_enabled', 'plus_beans_reminder_on_start',
+        'last_fit_title_max_chars'
         ]
 
 
@@ -866,6 +867,8 @@ class tgraphcanvas(QObject):
         self.ax = self.fig.add_subplot(111,facecolor=self.palette['background'])
         self.delta_ax:_AxesBase|None = None
         self.delta_ax = self.ax.twinx()
+
+        self.last_fit_title_max_chars:int|None = None # remembers the title max chars as computed in fit_titles for on-screen rendering for pdf creation
 
         #legend location
         self.legendloc:int = 4
@@ -2819,11 +2822,15 @@ class tgraphcanvas(QObject):
                     ax_width = self.ax.get_window_extent().width
                 else:
                     ax_width = self.ax.get_window_extent(renderer=r).width # pyright:ignore[reportUnknownArgumentType]
-                ax_width_for_title = ax_width - self.background_title_width
+                screen = self.aw.app.primaryScreen()
+                screen_dpi = (screen.devicePixelRatio() if screen is not None else 2)
+                dpi_factor = (screen_dpi * self.aw.dpi) / self.fig.get_dpi() # if dpi is set different to its default in fig_save (as in save PNG/JPG) this factor is different from 1
+                ax_width_for_title = (ax_width - self.background_title_width) * dpi_factor
                 redraw = False
                 if self.title_text is not None and self.title_artist is not None and self.title_width is not None:
                     try:
                         prev_title_text = self.title_artist.get_text()
+                        # we need a fresh renderer here!
                         render = None
                         try:
                             render = self.fig.canvas.get_renderer() # type: ignore[attr-defined]
@@ -2831,10 +2838,11 @@ class tgraphcanvas(QObject):
                             # FigureCanvasPdf does not feature a renderer and thus the abbreviation mechanism does not work for PDF export
                             pass
                         if render is not None and ax_width_for_title <= self.title_width:
-                            chars = max(3,int(ax_width_for_title / (self.title_width / len(self.title_text))) - 2)
-                            self.title_artist.set_text(f'{self.title_text[:chars].strip()}...')
+                            chars = max(3,int(ax_width_for_title / (self.title_width / len(self.title_text))) - 3)
+                            self.last_fit_title_max_chars = chars # remembers the title max chars as computed in fit_titles for on-screen rendering for pdf creation
+                            self.title_artist.set_text(abbrevString(self.title_text, chars))
                         else:
-                            self.title_artist.set_text(self.title_text)
+                            self.title_artist.set_text(abbrevString(self.title_text, (70 if self.last_fit_title_max_chars is None else self.last_fit_title_max_chars)))
                         if prev_title_text != self.title_artist.get_text():
                             redraw = True
                     except Exception as e: # pylint: disable=broad-except

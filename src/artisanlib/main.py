@@ -14982,7 +14982,7 @@ class ApplicationWindow(QMainWindow):
                     last_time:str|None = None
                     for i, tx in enumerate(self.qmc.timex):
                         if tx >= CHARGE > 0:
-                            di,mo = divmod(tx - CHARGE, 60)
+                            di,mo = divmod(math.floor(tx - CHARGE + 0.5), 60)
                             time2 = f'{di:02.0f}:{mo:02.0f}'  #@UnusedVariable # pylint: disable=unused-variable # noqa: F841
                         else:
                             time2 = '' #@UnusedVariable #@UnusedVariable # pylint: disable=unused-variable # noqa: F841
@@ -15003,7 +15003,7 @@ class ApplicationWindow(QMainWindow):
                                     else:
                                         event += self.qmc.etypesf(self.qmc.specialeventstype[n])[0] + self.qmc.eventsvalues(self.qmc.specialeventsvalue[n])
 
-                        di,mo = divmod(tx,60)
+                        di,mo = divmod(math.floor(tx + 0.5),60)
                         time1 = f'{di:02.0f}:{mo:02.0f}'
                         if last_time is None or last_time != time1:
                             extratemps:list[float] = []
