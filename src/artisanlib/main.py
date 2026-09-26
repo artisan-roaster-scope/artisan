@@ -14646,210 +14646,6 @@ class ApplicationWindow(QMainWindow):
         elif level and (not elem_tail or not elem_tail.strip()):
             elem.tail = i
 
-#    def exportPilot(self, filename:str) -> bool:
-#        try:
-#            # warning popup if filename contains more than one _
-#            # only contain one _ followed by an index number like Name_0.xml
-#            s = filename.split('_')
-#            if (len(s) < 2 or len(s) > 2):
-#                QMessageBox.warning(None, #self, # only without super this one shows the native dialog on macOS under Qt 6.6.2 and later
-#                    QApplication.translate('Message', 'Warning'),QApplication.translate('Message', 'The Probat Shop Pilot Software expects files named <Name>_<Index>.xml like in Test_0.xml on import'))
-#
-#            import xml.etree.ElementTree as ET
-#            tree = ET.Element('recipe')
-#
-#            charge = ET.SubElement(tree, 'charge')
-#            charge.text = str(float2float(convertWeight(self.qmc.weight[0],weight_units.index(self.qmc.weight[2]),1)))
-#
-#            beans = ET.SubElement(tree, 'coffeetype')
-#            if self.qmc.beans and self.qmc.beans != '':
-#                beans.text = self.qmc.beans
-#
-#            color = ET.SubElement(tree, 'coffeecolor')
-#            if self.qmc.ground_color:
-#                color.text = str(self.qmc.ground_color)
-#
-#            endtemperature = ET.SubElement(tree, 'endtemperature')
-#            endtime = ET.SubElement(tree, 'endtime')
-#            cooling = ET.SubElement(tree, 'coolingtime')
-#
-#            roaster = ET.SubElement(tree, 'roaster')
-#            if self.qmc.roastertype and self.qmc.roastertype != '':
-#                roaster.text = self.qmc.roastertype
-#
-#            notes = ET.SubElement(tree, 'notes')
-#            if self.qmc.roastingnotes and self.qmc.roastingnotes != '':
-#                notes.text = self.qmc.roastingnotes
-#
-#            roasttype = ET.SubElement(tree, 'roasttype')
-#            roasttype.text = '0' # 0: global, 1: time, 2: temp
-#
-#            recipedata = ET.SubElement(tree, 'recipedata_temp_unit')
-#            recipedata.text = self.qmc.mode
-#
-#            diagrampoints = ET.SubElement(tree, 'diagrampoints')
-#
-#            time_tag = 'sTime'
-#            temp_tag = 'nTemperature'
-#            burner_tag = 'nBurnercapacity'
-#            rising_tag = 'bRising'
-#
-#            # if CHARGE is defined, only export from CHARGE
-#            # if DROP is defined only export until DROP
-#            end_temp = None
-#            end_time = None
-#            idx = 1
-#            for i, tx in enumerate(self.qmc.timex):
-#                if (self.qmc.timeindex[0] < 0 or i >= self.qmc.timeindex[0]) and (self.qmc.timeindex[6] == 0 or i <= self.qmc.timeindex[6]):
-#                    data = ET.SubElement(diagrampoints, 'data', index=str(idx))
-#                    t = tx
-#                    if self.qmc.timeindex[0] > -1:
-#                        t = t - self.qmc.timex[self.qmc.timeindex[0]]
-#                    time = ET.SubElement(data,time_tag)
-#                    di, mo = divmod(t,60)
-#                    time.text = f'{di:02.0f}:{mo:02.0f}'
-#                    end_time = time.text
-#                    temp = ET.SubElement(data,temp_tag)
-#                    temp.text = str(int(round(self.qmc.temp2[i])))
-#                    end_temp = temp.text
-#                    burner = ET.SubElement(data,burner_tag)
-#                    if len(self.qmc.extradevices) > 0:
-#                        burner.text = str(max(0,int(round(self.qmc.extratemp1[0][i]))))
-#                    else:
-#                        burner.text = '0'
-#                    rising = ET.SubElement(data,rising_tag)
-#                    delta2i = self.qmc.delta2[i]
-#                    if delta2i is not None and delta2i > 0:
-#                        rising.text = 'true'
-#                    else:
-#                        rising.text = 'false'
-#                    idx = idx + 1
-#
-#            if end_temp:
-#                endtemperature.text = end_temp
-#
-#            if end_temp:
-#                endtime.text = end_time
-#
-#            if self.qmc.timeindex[7]:
-#                t = self.qmc.timex[self.qmc.timeindex[7]] - self.qmc.timex[self.qmc.timeindex[6]]
-#                di,mo = divmod(t,60)
-#                cooling.text = f'{di:02.0f}:{mo:02.0f}'
-#            else:
-#                cooling.text = '00:00'
-#
-#            switchpoints = ET.SubElement(tree, 'switchpoints')
-#            # take data from 2nd extra event type
-#            idx = 1
-#            for i, spe in enumerate(self.qmc.specialevents):
-#                if self.qmc.specialeventstype[i] == 3 and (self.qmc.timeindex[0] < 0 or spe >= self.qmc.timeindex[0]) and (self.qmc.timeindex[6] == 0 or spe <= self.qmc.timeindex[6]):
-#                    data = ET.SubElement(switchpoints, 'data', index=str(idx))
-#                    if self.qmc.timeindex[0] > -1 and len(self.qmc.timex) > self.qmc.timeindex[0]:
-#                        timez = stringfromseconds(self.qmc.timex[spe]-self.qmc.timex[self.qmc.timeindex[0]])
-#                    else:
-#                        timez = stringfromseconds(self.qmc.timex[spe])
-#                    t = spe
-#                    if self.qmc.timeindex[0] > -1:
-#                        t = t - self.qmc.timeindex[0]
-#                    time = ET.SubElement(data,time_tag)
-#                    time.text = timez
-#                    temp = ET.SubElement(data,temp_tag)
-#                    temp.text = str(int(round(self.qmc.temp2[spe])))
-#                    burner = ET.SubElement(data,burner_tag)
-#                    b = self.qmc.eventsInternal2ExternalValue(self.qmc.specialeventsvalue[i])
-#                    burner.text = str(int(round(b)))
-#                    rising = ET.SubElement(data,rising_tag)
-#                    delta2i = self.qmc.delta2[i]
-#                    if delta2i is not None and delta2i > 0:
-#                        rising.text = 'true'
-#                    else:
-#                        rising.text = 'false'
-#                    idx = idx + 1
-#            self.indent(tree)
-#            ET.ElementTree(tree).write(filename,encoding='utf-8', xml_declaration=True)
-#            return True
-#        except Exception as ex: # pylint: disable=broad-except
-#            _log.exception(ex)
-#            _, _, exc_tb = sys.exc_info()
-#            self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' exportPilot() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
-#            return False
-
-#    #Write readings to RoastLogger CSV file
-#    def exportRoastLogger(self, filename:str) -> bool:
-#        import csv
-#        try:
-#            with open(filename, 'w', encoding='utf-8') as outfile:
-#                outfile.write('Log created at 09:00:00 '+ self.qmc.roastdate.date().toString("dd'/'MM'/'yyyy") + '\n')
-#                outfile.write('Use Options|Set template for new log to modify this template.\n')
-#                outfile.write('------------------------------------------------------\n')
-#                outfile.write('Bean/Blend name:\n')
-#                outfile.write('\n')
-#                outfile.write('Profile description:\n')
-#                outfile.write('\n')
-#                outfile.write('Roast notes:\n')
-#                outfile.write('\n')
-#                outfile.write('Cupping results:\n')
-#                outfile.write('\n')
-#                outfile.write('Roast Logger Copyright ? T. R. Coxon (GreenBean TMC).\n')
-#                outfile.write('Roast started at 09:00:00 ' + self.qmc.roastdate.date().toString("dd'/'MM'/'yyyy") + '\n')
-#                if len(self.qmc.timex) > 0:
-#                    CHARGE = self.qmc.timex[self.qmc.timeindex[0]]
-#                else:
-#                    CHARGE = 0
-#                writer= csv.writer(outfile,delimiter=',')
-#                writer.writerow(['Elapsed time ',' T1 ',' T2 ',' Event type'])
-#                for i, _ in enumerate(self.qmc.timex):
-#                    if i == self.qmc.timeindex[0]:
-#                        kind = 'Beans loaded'
-#                    elif i!=0 and i == self.qmc.timeindex[2]:
-#                        kind = 'First crack start'
-#                    elif i!=0 and i == self.qmc.timeindex[3]:
-#                        kind = 'First crack end'
-#                    elif i!=0 and i == self.qmc.timeindex[4]:
-#                        kind = 'Second crack start'
-#                    elif i!=0 and i == self.qmc.timeindex[6]:
-#                        kind = 'Beans ejected'
-#                    else:
-#                        kind = 'timer'
-#                    writer.writerow([stringfromseconds(self.qmc.timex[i]-CHARGE),f'{self.qmc.temp2[i]:.1f}',f'{self.qmc.temp1[i]:.1f}',kind])
-#                outfile.write('\n')
-#                outfile.write('@actionT1Table\n')
-#                outfile.write('120|null|30\n')
-#                outfile.write('178|65|null\n')
-#                outfile.write('null|null|null\n')
-#                outfile.write('null|null|null\n')
-#                outfile.write('null|null|null\n')
-#                outfile.write('null|null|null\n')
-#                outfile.write('null|null|null\n')
-#                outfile.write('null|null|null\n')
-#                outfile.write('null|null|null\n')
-#                outfile.write('null|null|null\n')
-#                outfile.write('\n')
-#                outfile.write('@actionSecsFCTable\n')
-#                outfile.write('60|50|null\n')
-#                outfile.write('null|null|null\n')
-#                outfile.write('null|null|null\n')
-#                outfile.write('null|null|null\n')
-#                outfile.write('null|null|null\n')
-#                outfile.write('null|null|null\n')
-#                outfile.write('null|null|null\n')
-#                outfile.write('null|null|null\n')
-#                outfile.write('null|null|null\n')
-#                outfile.write('null|null|null\n')
-#                outfile.write('\n')
-#                outfile.write('@actionResetTable\n')
-#                outfile.write('100|0\n')
-#                outfile.write('\n')
-#                outfile.write('@loadBeansTable\n')
-#                outfile.write('146\n')
-#                outfile.write('\n')
-#            return True
-#        except Exception as ex: # pylint: disable=broad-except
-#            _log.exception(ex)
-#            _, _, exc_tb = sys.exc_info()
-#            self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' exportRoastLogger() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
-#            return False
-
     def importJSON(self, filename:str) -> bool:
         try:
             from json import load as json_load
@@ -15089,7 +14885,7 @@ class ApplicationWindow(QMainWindow):
                     last_time:str|None = None
                     for i, tx in enumerate(self.qmc.timex):
                         if tx >= CHARGE > 0:
-                            di,mo = divmod(tx - CHARGE, 60)
+                            di,mo = divmod(math.floor(tx - CHARGE + 0.5), 60)
                             time2 = f'{di:02.0f}:{mo:02.0f}'  #@UnusedVariable # pylint: disable=unused-variable # noqa: F841
                         else:
                             time2 = '' #@UnusedVariable #@UnusedVariable # pylint: disable=unused-variable # noqa: F841
@@ -15110,7 +14906,7 @@ class ApplicationWindow(QMainWindow):
                                     else:
                                         event += self.qmc.etypesf(self.qmc.specialeventstype[n])[0] + self.qmc.eventsvalues(self.qmc.specialeventsvalue[n])
 
-                        di,mo = divmod(tx,60)
+                        di,mo = divmod(math.floor(tx + 0.5),60)
                         time1 = f'{di:02.0f}:{mo:02.0f}'
                         if last_time is None or last_time != time1:
                             extratemps:list[float] = []

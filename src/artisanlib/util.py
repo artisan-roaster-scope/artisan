@@ -1001,7 +1001,7 @@ def findTPint(timeindex:list[int], timex:list[float], temp:list[float]) -> int:
 def eventtime2string(time:float) -> str:
     if time == 0.0:
         return ''
-    di,mo = divmod(time,60)
+    di,mo = divmod(math.floor(time + 0.5),60)
     return f'{di:02.0f}:{mo:02.0f}'
 
 
