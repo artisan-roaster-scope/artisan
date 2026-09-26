@@ -9,8 +9,9 @@ v4.2.2
   - adds support for [Dutch Master Roasters](https://artisan-scope.org/machines/dmr/)
   - adds autoCHARGE/DROP and drum speed control to the [Schuilenburg](https://artisan-scope.org/machines/schuilenburg/) PLC machine setup
   - adds autoCHARGE/autoDROP recognition for [IMF](https://artisan-scope.org/machines/imf/) as 'auto' setup which picks up CHARGE and DROP events from the machine
+  - adds device setup for Lebrews online-color and crack sensor [RoastSee NEXT](https://lebrewtech.com/products/roastsee-next)
   - adds UI scaling factor
-  - adds [Catppuccin](https://github.com/catppuccin) themes by Liam
+  - adds [Catppuccin](https://github.com/catppuccin) and some more new themes
   - adds two more MODBUS device channels
   - adds Artisan Commands `pidDerivativeFilter(<n>)`, `pidDerivativeLimit(<n>)`, `pidILF(<n>)`, `pidIWP(<bool>)`, and `pidIRoC(<bool>)` to configure the internal PID (for John)
   - adds Artisan Commands `zoom(<x>[,<y>])`, `pan(<x>[,<y>])`, `center(<x>,<y>[,<clamp>])`, `clamp(<n>)`, `followMode(<bool>)`, and `followModePanning(<x>[,<y>])` to update the canvas perspective
@@ -25,6 +26,7 @@ v4.2.2
   - fixes regression causing canvas color not being applied correctly ([Issue #2212](../../../issues/2212))
   - fixes wrong time formatting in Artisan CSV export ([Issue #2233](../../../issues/2233))
   - fixes incorrect BT/ET readings on newer Santoker R machines ([Discussion #2232](../../../discussions/2232) and [Discussion #2085](../../../discussions/2085))
+  - fixes the image export of profiles with very long titles that could result in compressed time axis ([Discussion #2231](../../../discussions/2231))
 
 
 ----
