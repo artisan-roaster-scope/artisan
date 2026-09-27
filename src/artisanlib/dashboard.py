@@ -45,7 +45,8 @@ from uic import DashboardWidget # pyright: ignore[attr-defined] # pylint: disabl
 
 from artisanlib import __release_sponsor_url__
 from artisanlib.styles import combobox_style, dashboard_style
-from artisanlib.util import getStyleIconPath, float2floatWeightVolume, convertVolume, convertWeight, volume_units, weight_units, weight_units_lower, toStringList, comma2dot, getResourcePath, open_link
+from artisanlib.util import (getStyleIconPath, float2floatWeightVolume, convertVolume, convertWeight, volume_units,
+    weight_units, weight_units_lower, toStringList, comma2dot, getResourcePath, open_link, toInt)
 from artisanlib.styles import tool_button_icon_style, artisan_push_button_style, artisan_minor_push_button_style, link_push_button_style
 from plus.util import plusLink
 
@@ -126,8 +127,8 @@ class Dashboard(QWidget):
             artisan_font_normal_id = QFontDatabase.addApplicationFont(artisan_font_normal)
             artisan_font_normal_families = QFontDatabase.applicationFontFamilies(artisan_font_normal_id)
 
-            main_header_font_size = (16 if platform.system() == 'Windows' else 20)
-            sub_header_font_size = (12 if platform.system() == 'Windows' else 16)
+            main_header_font_size = (14 if platform.system() == 'Windows' else 20)
+            sub_header_font_size = (10 if platform.system() == 'Windows' else 16)
             self.ui.roast_label.setFont(QFont(artisan_font_semibold_families[0], main_header_font_size, QFont.Weight.DemiBold))
             self.ui.profile_label.setFont(QFont(artisan_font_semibold_families[0], main_header_font_size, QFont.Weight.DemiBold))
             self.ui.inventory_group.setFont(QFont(artisan_font_normal_families[0], sub_header_font_size, QFont.Weight.Normal))
@@ -225,7 +226,7 @@ class Dashboard(QWidget):
             self.ui.donate_pushButton.clicked.connect(self.open_donate_url)
             self.ui.sponsor_logo_toolButton.clicked.connect(self.open_sponsor_url)
 
-            self.canvas_clicked.connect(self.hide_dashboard)
+            #self.canvas_clicked.connect(self.hide_dashboard) # don't hide dashboard on a click to the canvas for now
 
             self.set_style()
 
@@ -252,17 +253,34 @@ class Dashboard(QWidget):
         else:
             self.show_dashboard()
 
+    def enable_dashboard_toggle_toolbutton(self) -> None:
+        if self.aw.ntb.dashboard_tool is not None:
+#            self.aw.ntb.dashboard_tool.setEnabled(True)
+            self.aw.ntb.dashboard_tool.setVisible(True)
+
+
+    def disable_dashboard_toggle_toolbutton(self) -> None:
+        if self.aw.ntb.dashboard_tool is not None:
+#            self.aw.ntb.dashboard_tool.setEnabled(False)
+            self.aw.ntb.dashboard_tool.setVisible(False)
+
     def show_dashboard(self) -> None:
-        if not self.aw.qmc.flagstart:
+        if not (self.aw.qmc.flagstart or self.aw.qmc.designerflag or self.aw.comparator is not None):
             self.update_dashboard(force=True)
             # only open the dashboard if not recording!
             self.aw.stack.setCurrentIndex(1)
             self.update_dashboard()
+            self.enable_dashboard_toggle_toolbutton()
 
     @pyqtSlot()
     def hide_dashboard(self) -> None:
         self.aw.stack.setCurrentIndex(0)
         self.update_dashboard()
+        if (self.aw.ntb.dashboard_tool is not None and
+            (self.aw.qmc.flagstart or self.aw.qmc.designerflag or self.aw.comparator is not None)):
+            # disable dashboard/graph toggle toolbar button
+            # while recording or if designer or comparator is open
+            self.disable_dashboard_toggle_toolbutton()
 
     # if force, update even if not visible
     # if init_title, the title popup is re-initialized (only needed if the popup content changes, not if only the title changes)
@@ -306,6 +324,13 @@ class Dashboard(QWidget):
 
                 # profile
                 self.update_profile_section()
+
+                # starts
+                settings = QSettings()
+                starts = 0
+                if settings.contains('starts'):
+                    starts = toInt(settings.value('starts'))
+                    self.ui.starts_label.setText(f'{starts} {QApplication.translate('Label','recordings')}')
             finally:
                 self.ui.recentFiles_comboBox.blockSignals(False)
 
@@ -468,11 +493,11 @@ class Dashboard(QWidget):
     @pyqtSlot(str)
     def recent_roast_enabled(self, s:str) -> None:
         self.aw.qmc.title = s
+        self.aw.qmc.fileDirtySignal.emit()
         self.title_changed_timer.start(self.TITLE_CHANGE_ESTABLISH_PERIOD)
 
     @pyqtSlot()
     def title_changed(self) -> None:
-        self.aw.qmc.title = self.aw.qmc.title
         self.update_recent_roast_buttons()
         self.aw.qmc.setProfileTitle(self.aw.qmc.title)
 
@@ -578,7 +603,7 @@ class Dashboard(QWidget):
     @pyqtSlot(int)
     def recent_files_index_changed(self, i:int) -> None:
         if i > 0 and i-1 < len(self.recent_files):
-            self.aw.loadBackgroundSignal.emit(self.recent_files[i-1], False)
+            self.aw.loadBackgroundSignal.emit(self.recent_files[i-1], False, True) # we load background explicitly (not as part of a foreground profiles) thus we force_show
             QTimer.singleShot(500, self.update_profile_section)
 
     @pyqtSlot(bool)
@@ -588,9 +613,9 @@ class Dashboard(QWidget):
         if self.aw.qmc.backgroundprofile is not None and self.aw.qmc.backgroundpath:
             # if a background profile is loaded we open the file selector using its path
             path = self.aw.qmc.backgroundpath
-        filename = self.aw.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Load Background Roast Template'),path =path, ext='*.alog')
+        filename = self.aw.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Load roast template'),path =path, ext='*.alog')
         if len(filename) != 0:
-            self.aw.loadBackgroundSignal.emit(filename, False)
+            self.aw.loadBackgroundSignal.emit(filename, False, True) # we load background explicitly (not as part of a foreground profiles) thus we force_show
 
     @pyqtSlot(bool)
     def profile_clear_clicked(self, b:bool) -> None:

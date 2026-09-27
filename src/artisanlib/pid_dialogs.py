@@ -491,7 +491,7 @@ class PID_DlgControl(ArtisanDialog):
         pidModeItems = [
             QApplication.translate('Label', 'Manual'),
             QApplication.translate('Label', 'Ramp/Soak'),
-            QApplication.translate('Label', 'Background')]
+            QApplication.translate('Label', 'Template')]
         self.pidMode = QComboBox()
         self.pidMode.addItems(pidModeItems)
         self.pidMode.setCurrentIndex(self.aw.pidcontrol.svMode)
@@ -826,8 +826,8 @@ class PID_DlgControl(ArtisanDialog):
         if pid_controller != 0:
             self.createEvents.setEnabled(False)
 
-        self.loadPIDfromBackground = QCheckBox(QApplication.translate('CheckBox', 'Load p-i-d from background'))
-        self.loadPIDfromBackground.setToolTip(QApplication.translate('Tooltip', 'Load kp, ki, kd, PID Input, P on Error/Input and Lookahead settings from background profile'))
+        self.loadPIDfromBackground = QCheckBox(QApplication.translate('CheckBox', 'Load p-i-d from template'))
+        self.loadPIDfromBackground.setToolTip(QApplication.translate('Tooltip', 'Load kp, ki, kd, PID Input, P on Error/Input and Lookahead settings from template profile'))
         self.loadPIDfromBackground.setChecked(self.aw.pidcontrol.loadpidfrombackground)
         if pid_controller == 4:
             self.loadPIDfromBackground.setEnabled(False)
@@ -975,7 +975,7 @@ class PID_DlgControl(ArtisanDialog):
         self.loadRampSoakFromProfile = QCheckBox(QApplication.translate('CheckBox', 'Load from profile'))
         self.loadRampSoakFromProfile.setChecked(self.aw.pidcontrol.loadRampSoakFromProfile)
         self.loadRampSoakFromProfile.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.loadRampSoakFromBackground = QCheckBox(QApplication.translate('CheckBox', 'Load from background'))
+        self.loadRampSoakFromBackground = QCheckBox(QApplication.translate('CheckBox', 'Load from template'))
         self.loadRampSoakFromBackground.setChecked(self.aw.pidcontrol.loadRampSoakFromBackground)
         self.loadRampSoakFromBackground.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
@@ -2144,7 +2144,7 @@ class PXRpidDlgControl(PXpidDlgControl):
 
 
         # Follow Background
-        self.followBackground = QCheckBox(QApplication.translate('CheckBox', 'Follow Background'))
+        self.followBackground = QCheckBox(QApplication.translate('CheckBox', 'Follow Template'))
         self.followBackground.setChecked(self.aw.fujipid.followBackground)
         self.followBackground.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.followBackground.stateChanged.connect(self.changeFollowBackground)         #toggle
@@ -2963,7 +2963,7 @@ class PXG4pidDlgControl(PXpidDlgControl):
         buttonRampSoakLayout2.addWidget(self.label_rs16)
 
         # Follow Background
-        self.followBackground = QCheckBox(QApplication.translate('CheckBox', 'Follow Background'))
+        self.followBackground = QCheckBox(QApplication.translate('CheckBox', 'Follow Template'))
         self.followBackground.setChecked(self.aw.fujipid.followBackground)
         self.followBackground.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.followBackground.stateChanged.connect(self.changeFollowBackground)         #toggle

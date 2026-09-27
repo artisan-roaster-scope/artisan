@@ -316,62 +316,53 @@ class graphColorDlg(ArtisanDialog):
 
         #TAB2
         self.lcd1LEDButton = QPushButton(QApplication.translate('Button','Digits'))
-        self.lcd1LEDButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.lcd1LEDButton.clicked.connect(self.paintlcdsSlot)
         self.lcd2LEDButton = QPushButton(QApplication.translate('Button','Digits'))
-        self.lcd2LEDButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.lcd2LEDButton.clicked.connect(self.paintlcdsSlot)
         self.lcd3LEDButton = QPushButton(QApplication.translate('Button','Digits'))
-        self.lcd3LEDButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.lcd3LEDButton.clicked.connect(self.paintlcdsSlot)
         self.lcd4LEDButton = QPushButton(QApplication.translate('Button','Digits'))
-        self.lcd4LEDButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.lcd4LEDButton.clicked.connect(self.paintlcdsSlot)
         self.lcd5LEDButton = QPushButton(QApplication.translate('Button','Digits'))
-        self.lcd5LEDButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.lcd5LEDButton.clicked.connect(self.paintlcdsSlot)
         self.lcd6LEDButton = QPushButton(QApplication.translate('Button','Digits'))
-        self.lcd6LEDButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.lcd6LEDButton.clicked.connect(self.paintlcdsSlot)
         self.lcd7LEDButton = QPushButton(QApplication.translate('Button','Digits'))
-        self.lcd7LEDButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.lcd7LEDButton.clicked.connect(self.paintlcdsSlot)
         self.lcd8LEDButton = QPushButton(QApplication.translate('Button','Digits'))
-        self.lcd8LEDButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.lcd8LEDButton.clicked.connect(self.paintlcdsSlot)
+        self.lcd9LEDButton = QPushButton(QApplication.translate('Button','Digits'))
+        self.lcd9LEDButton.clicked.connect(self.paintlcdsSlot)
+        self.lcd10LEDButton = QPushButton(QApplication.translate('Button','Digits'))
+        self.lcd10LEDButton.clicked.connect(self.paintlcdsSlot)
 
         self.lcd1backButton = QPushButton(QApplication.translate('Button','Background'))
-        self.lcd1backButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.lcd1backButton.clicked.connect(self.paintlcdsSlot)
         self.lcd2backButton = QPushButton(QApplication.translate('Button','Background'))
-        self.lcd2backButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.lcd2backButton.clicked.connect(self.paintlcdsSlot)
         self.lcd3backButton = QPushButton(QApplication.translate('Button','Background'))
-        self.lcd3backButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.lcd3backButton.clicked.connect(self.paintlcdsSlot)
         self.lcd4backButton = QPushButton(QApplication.translate('Button','Background'))
-        self.lcd4backButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.lcd4backButton.clicked.connect(self.paintlcdsSlot)
         self.lcd5backButton = QPushButton(QApplication.translate('Button','Background'))
-        self.lcd5backButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.lcd5backButton.clicked.connect(self.paintlcdsSlot)
         self.lcd6backButton = QPushButton(QApplication.translate('Button','Background'))
-        self.lcd6backButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.lcd6backButton.clicked.connect(self.paintlcdsSlot)
         self.lcd7backButton = QPushButton(QApplication.translate('Button','Background'))
-        self.lcd7backButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.lcd7backButton.clicked.connect(self.paintlcdsSlot)
         self.lcd8backButton = QPushButton(QApplication.translate('Button','Background'))
-        self.lcd8backButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.lcd8backButton.clicked.connect(self.paintlcdsSlot)
-        self.lcd1LEDButton.setMinimumWidth(80)
-        self.lcd2LEDButton.setMinimumWidth(80)
-        self.lcd3LEDButton.setMinimumWidth(80)
-        self.lcd4LEDButton.setMinimumWidth(80)
-        self.lcd5LEDButton.setMinimumWidth(80)
-        self.lcd6LEDButton.setMinimumWidth(80)
-        self.lcd7LEDButton.setMinimumWidth(80)
-        self.lcd8LEDButton.setMinimumWidth(80)
+        self.lcd9backButton = QPushButton(QApplication.translate('Button','Background'))
+        self.lcd9backButton.clicked.connect(self.paintlcdsSlot)
+        self.lcd10backButton = QPushButton(QApplication.translate('Button','Background'))
+        self.lcd10backButton.clicked.connect(self.paintlcdsSlot)
+
+        for lcd_button in [self.lcd1LEDButton, self.lcd2LEDButton, self.lcd3LEDButton, self.lcd4LEDButton,
+                self.lcd5LEDButton, self.lcd6LEDButton, self.lcd7LEDButton, self.lcd8LEDButton, self.lcd9LEDButton, self.lcd10LEDButton,
+                self.lcd1backButton, self.lcd2backButton, self.lcd3backButton, self.lcd4backButton, self.lcd5backButton,
+                self.lcd6backButton, self.lcd7backButton, self.lcd8backButton, self.lcd9backButton, self.lcd10backButton]:
+            lcd_button.setMinimumWidth(80)
+            lcd_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
         LCDdefaultButton = ArtisanMinorPushButton(QApplication.translate('Button','B/W'),
             'palette-stroke-rounded-white.svg',
@@ -512,6 +503,14 @@ class graphColorDlg(ArtisanDialog):
         lcd8layout = QHBoxLayout()
         lcd8layout.addWidget(self.lcd8LEDButton,0)
         lcd8layout.addWidget(self.lcd8backButton,1)
+
+        lcd9layout = QHBoxLayout()
+        lcd9layout.addWidget(self.lcd9LEDButton,0)
+        lcd9layout.addWidget(self.lcd9backButton,1)
+        lcd10layout = QHBoxLayout()
+        lcd10layout.addWidget(self.lcd10LEDButton,0)
+        lcd10layout.addWidget(self.lcd10backButton,1)
+
         LCD1GroupLayout = QGroupBox(QApplication.translate('GroupBox','Timer LCD'))
         LCD1GroupLayout.setLayout(lcd1layout)
         lcd1layout.setContentsMargins(0,0,0,0)
@@ -530,12 +529,19 @@ class graphColorDlg(ArtisanDialog):
         LCD6GroupLayout = QGroupBox(QApplication.translate('GroupBox','Extra Devices / PID SV LCD'))
         LCD6GroupLayout.setLayout(lcd6layout)
         lcd6layout.setContentsMargins(0,0,0,0)
-        LCD7GroupLayout = QGroupBox(QApplication.translate('GroupBox','Ramp/Soak Timer LCD'))
+        LCD7GroupLayout = QGroupBox(QApplication.translate('GroupBox','Cooling Timer LCD'))
         LCD7GroupLayout.setLayout(lcd7layout)
         lcd7layout.setContentsMargins(0,0,0,0)
         LCD8GroupLayout = QGroupBox(QApplication.translate('GroupBox','Slow Cooling Timer LCD'))
         LCD8GroupLayout.setLayout(lcd8layout)
         lcd8layout.setContentsMargins(0,0,0,0)
+
+        LCD9GroupLayout = QGroupBox(QApplication.translate('GroupBox','Scale LCD'))
+        LCD9GroupLayout.setLayout(lcd9layout)
+        lcd9layout.setContentsMargins(0,0,0,0)
+        LCD10GroupLayout = QGroupBox(QApplication.translate('GroupBox','Phase LCD'))
+        LCD10GroupLayout.setLayout(lcd10layout)
+        lcd10layout.setContentsMargins(0,0,0,0)
 
         buttonlayout = QHBoxLayout()
         buttonlayout.addWidget(LCDdefaultButton)
@@ -548,11 +554,13 @@ class graphColorDlg(ArtisanDialog):
         lcdlayout1.addWidget(LCD3GroupLayout)
         lcdlayout1.addWidget(LCD1GroupLayout)
         lcdlayout1.addWidget(LCD6GroupLayout)
+        lcdlayout1.addWidget(LCD10GroupLayout)
         lcdlayout2 = QVBoxLayout()
         lcdlayout2.addWidget(LCD4GroupLayout)
         lcdlayout2.addWidget(LCD5GroupLayout)
         lcdlayout2.addWidget(LCD7GroupLayout)
         lcdlayout2.addWidget(LCD8GroupLayout)
+        lcdlayout2.addWidget(LCD9GroupLayout)
         lcdlayout = QHBoxLayout()
         lcdlayout.addLayout(lcdlayout1)
         lcdlayout.addLayout(lcdlayout2)
@@ -706,6 +714,8 @@ class graphColorDlg(ArtisanDialog):
                 self.aw.largeExtraLCDs_dialog.updateStyles()
             if self.aw.largePhasesLCDs_dialog:
                 self.aw.largePhasesLCDs_dialog.updateStyles()
+            if self.aw.largeScaleLCDs_dialog:
+                self.aw.largeScaleLCDs_dialog.updateStyles()
         if lcdButton in [self.lcd7LEDButton,self.lcd7backButton]:
             if lcdButton == self.lcd7backButton:
                 self.setlcdColor(self.aw.lcdpaletteB,self.aw.lcdpaletteF,'rstimer')
@@ -720,6 +730,22 @@ class graphColorDlg(ArtisanDialog):
                 self.setlcdColor(self.aw.lcdpaletteF,self.aw.lcdpaletteB,'slowcoolingtimer')
             if self.aw.largeLCDs_dialog:
                 self.aw.largeLCDs_dialog.updateStyles()
+        if lcdButton in [self.lcd9LEDButton,self.lcd9backButton]:
+            if lcdButton == self.lcd9backButton:
+                self.setlcdColor(self.aw.lcdpaletteB,self.aw.lcdpaletteF,'scale')
+            else:
+                self.setlcdColor(self.aw.lcdpaletteF,self.aw.lcdpaletteB,'scale')
+            if self.aw.largeScaleLCDs_dialog:
+                self.aw.largeScaleLCDs_dialog.updateStyles()
+
+        if lcdButton in [self.lcd10LEDButton,self.lcd10backButton]:
+            if lcdButton == self.lcd10backButton:
+                self.setlcdColor(self.aw.lcdpaletteB,self.aw.lcdpaletteF,'phases')
+            else:
+                self.setlcdColor(self.aw.lcdpaletteF,self.aw.lcdpaletteB,'phases')
+            if self.aw.largePhasesLCDs_dialog:
+                self.aw.largePhasesLCDs_dialog.updateStyles()
+
         self.setColorButtons()
 
     def setColorButtons(self) -> None:
@@ -776,22 +802,30 @@ class graphColorDlg(ArtisanDialog):
         self.opaqbgSpinBox.setValue(int(round(self.aw.qmc.backgroundalpha * 10)))
 
         # LEDs
-        self.lcd1backButton.setStyleSheet('background-color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteB['timer']) + '; color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteF['timer']) + ';' + self.commonstyle)
-        self.lcd1LEDButton.setStyleSheet('background-color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteB['timer']) + '; color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteF['timer']) + ';' + self.commonstyle)
-        self.lcd2backButton.setStyleSheet('background-color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteB['et']) + '; color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteF['et']) + ';' + self.commonstyle)
-        self.lcd2LEDButton.setStyleSheet('background-color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteB['et']) + '; color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteF['et']) + ';' + self.commonstyle)
-        self.lcd3backButton.setStyleSheet('background-color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteB['bt']) + '; color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteF['bt']) + ';' + self.commonstyle)
-        self.lcd3LEDButton.setStyleSheet('background-color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteB['bt']) + '; color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteF['bt']) + ';' + self.commonstyle)
-        self.lcd4backButton.setStyleSheet('background-color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteB['deltaet']) + '; color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteF['deltaet']) + ';' + self.commonstyle)
-        self.lcd4LEDButton.setStyleSheet('background-color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteB['deltaet']) + '; color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteF['deltaet']) + ';' + self.commonstyle)
-        self.lcd5backButton.setStyleSheet('background-color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteB['deltabt']) + '; color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteF['deltabt']) + ';' + self.commonstyle)
-        self.lcd5LEDButton.setStyleSheet('background-color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteB['deltabt']) + '; color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteF['deltabt']) + ';' + self.commonstyle)
-        self.lcd6backButton.setStyleSheet('background-color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteB['sv']) + '; color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteF['sv']) + ';' + self.commonstyle)
-        self.lcd6LEDButton.setStyleSheet('background-color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteB['sv']) + '; color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteF['sv']) + ';' + self.commonstyle)
-        self.lcd7backButton.setStyleSheet('background-color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteB['rstimer']) + '; color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteF['rstimer']) + ';' + self.commonstyle)
-        self.lcd7LEDButton.setStyleSheet('background-color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteB['rstimer']) + '; color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteF['rstimer']) + ';' + self.commonstyle)
-        self.lcd8backButton.setStyleSheet('background-color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteB['slowcoolingtimer']) + '; color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteF['slowcoolingtimer']) + ';' + self.commonstyle)
-        self.lcd8LEDButton.setStyleSheet('background-color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteB['slowcoolingtimer']) + '; color: ' + rgba_colorname2argb_colorname(self.aw.lcdpaletteF['slowcoolingtimer']) + ';' + self.commonstyle)
+        for button,tag in [
+                (self.lcd1backButton,'timer'),
+                (self.lcd1LEDButton,'timer'),
+                (self.lcd2backButton,'et'),
+                (self.lcd2LEDButton,'et'),
+                (self.lcd3backButton,'bt'),
+                (self.lcd3LEDButton,'bt'),
+                (self.lcd4backButton,'deltaet'),
+                (self.lcd4LEDButton,'deltaet'),
+                (self.lcd5backButton,'deltabt'),
+                (self.lcd5LEDButton,'deltabt'),
+                (self.lcd6backButton,'sv'),
+                (self.lcd6LEDButton,'sv'),
+                (self.lcd7backButton,'rstimer'),
+                (self.lcd7LEDButton,'rstimer'),
+                (self.lcd8backButton,'slowcoolingtimer'),
+                (self.lcd8LEDButton,'slowcoolingtimer'),
+                (self.lcd9backButton,'scale'),
+                (self.lcd9LEDButton,'scale'),
+                (self.lcd10backButton,'phases'),
+                (self.lcd10LEDButton,'phases'),
+                ]:
+            button.setStyleSheet(f"""
+                background-color: {rgba_colorname2argb_colorname(self.aw.lcdpaletteB[tag])}; color: {rgba_colorname2argb_colorname(self.aw.lcdpaletteF[tag])};{self.commonstyle}""")
 
         if str(self.aw.qmc.palette['canvas']) == 'None':
             self.canvasLabel.setStyleSheet('QPushButton {background-color: #f0f0f0 ;' + self.commonstyle + '}')

@@ -25,7 +25,7 @@
 import time as libtime
 startup_time = libtime.process_time()
 
-from artisanlib import __version__, __revision__, __build__, __signature__, __release_sponsor_name__
+from artisanlib import __version__, __revision__, __build__, __signature__
 
 import os
 import sys  # @UnusedImport
@@ -389,7 +389,7 @@ class Artisan(QtSingleApplication):
                     # load Artisan profile on double-click on *.alog file or as result of a drag-and-drop action to the canvas
                     # in case OPTION/ALT key is hold, load into background, else foreground
                     elif (url_query is not None and url_query == 'template') or modifiers == Qt.KeyboardModifier.AltModifier:
-                        aw.loadBackgroundSignal.emit(filename, True)
+                        aw.loadBackgroundSignal.emit(filename, True, True)
                     else:
                         aw.loadFileSignal.emit(filename)
                 elif file_suffix == 'alrm' and not aw.app.artisanviewerMode:
@@ -897,11 +897,13 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
 
     def enable_edit_curve_parameters(self) -> None:
         if self.edit_curve_parameters_action is not None:
-            self.edit_curve_parameters_action.setEnabled(True)
+#            self.edit_curve_parameters_action.setEnabled(True)
+            self.edit_curve_parameters_action.setVisible(True)
 
     def disable_edit_curve_parameters(self) -> None:
         if self.edit_curve_parameters_action is not None:
-            self.edit_curve_parameters_action.setEnabled(False)
+#            self.edit_curve_parameters_action.setEnabled(False)
+            self.edit_curve_parameters_action.setVisible(False)
 
     # monkey patch matplotlib navigationbar zoom and pan to update background cache
     def release_pan_new(self, event:'MplEvent') -> None:
@@ -1205,8 +1207,6 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
                     plus_link += '/home-roasters'
                 if res == QMessageBox.StandardButton.Yes:
                     QDesktopServices.openUrl(QUrl(plus_link, QUrl.ParsingMode.TolerantMode)) # zuban:ignore[unreachable]
-#                box = QMessageBox(self)
-#                box.about(self.aw, QApplication.translate('Message', 'Subscription'),message)
             except Exception as e: # pylint: disable=broad-except
                 _log.exception(e)
 
@@ -1353,7 +1353,7 @@ class ApplicationWindow(QMainWindow):
     resetCanvasColorSignal = pyqtSignal()
     setbuttonsfromSignal = pyqtSignal(int)
     setExtraEventButtonStyleSignal = pyqtSignal(int,str)
-    loadBackgroundSignal = pyqtSignal(str, bool)
+    loadBackgroundSignal = pyqtSignal(str, bool, bool)
     clearBackgroundSignal = pyqtSignal()
     setTareSignal = pyqtSignal(int)
     adjustSVSignal = pyqtSignal(float)
@@ -1828,8 +1828,10 @@ class ApplicationWindow(QMainWindow):
             'deltaet':'#EBEBEB',
             'deltabt':'#EBEBEB',
             'sv':'#F8F8F8',
-            'rstimer':'#F8F8F8',
+            'rstimer':'#F8F8F8', # regular cooling timer lcd
             'slowcoolingtimer':'#F8F8F8',
+            'scale':'#F8F8F8',
+            'phases':'#E6E6E6',
             }
         self.lcdpaletteF:dict[str,str] = {
             'timer':'#262626',
@@ -1838,8 +1840,10 @@ class ApplicationWindow(QMainWindow):
             'deltaet':'#cc0f50',
             'deltabt':'#0A5C90',
             'sv':'#4C4C4C',
-            'rstimer':'#187AB3',
+            'rstimer':'#187AB3', # regular cooling timer lcd
             'slowcoolingtimer':'#CC0D50',
+            'scale':'#187AB3',
+            'phases':'#000000',
             }
 
         #user defined event buttons
@@ -3028,8 +3032,6 @@ class ApplicationWindow(QMainWindow):
         self.lcd6.display(zz)
         self.lcd7.display(zz)
 
-        self.updateLCDcolors()
-
         self.lcd1.setToolTip(QApplication.translate('Tooltip', 'Timer'))
         self.lcd2.setToolTip(QApplication.translate('Tooltip', 'ET Temperature'))
         self.lcd3.setToolTip(QApplication.translate('Tooltip', 'BT Temperature'))
@@ -3497,6 +3499,7 @@ class ApplicationWindow(QMainWindow):
         self.AUCLCD.setLayout(AUCLayout)
         self.AUCLCD.hide()
 
+        self.updateLCDcolors()
 
         self.phasesLCDs = QFrame()
         self.phasesLCDs.setContentsMargins(10, 0, 0, 0) # left, top, right, bottom
@@ -3535,7 +3538,7 @@ class ApplicationWindow(QMainWindow):
         #level 1
         self.level1layout.addStretch()
         self.level1layout.addWidget(self.phasesLCDsFrame)
-        self.level1layout.addSpacing(20)
+        self.level1layout.addSpacing(50)
         self.level1layout.addWidget(self.buttonRESET)
         self.level1layout.addSpacing(10)
         self.level1layout.addWidget(self.buttonONOFF)
@@ -3939,7 +3942,7 @@ class ApplicationWindow(QMainWindow):
 #PLUS
         self.updatePlusStatusSignal.connect(self.updatePlusStatusSlot)
 
-        QTimer.singleShot(2000,self.donate)
+#        QTimer.singleShot(2000,self.donate)
 
         QTimer.singleShot(0, self.logStartupTime)
         QTimer.singleShot(500, self.updateBadge)
@@ -3953,7 +3956,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot(bool)
     def update_dashboard_background(self, _:bool = False) -> None:
         if self.dashboard_background_image is None:
-            filename = self.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Load Background Roast Template'), ext='Images (*.png *.jpeg *.jpg)')
+            filename = self.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Load background image'), ext='Images (*.png *.jpeg *.jpg)')
             if len(filename) != 0:
                 self.dashboard_background_image = filename
                 QTimer.singleShot(10, self.dashboard.update_background)
@@ -4704,61 +4707,58 @@ class ApplicationWindow(QMainWindow):
                 if self.comparator is None and not self.qmc.designerflag and not self.qmc.wheelflag and self.qmc.ax is not None:
                     self.setWindowFilePath(self.curFile)
             # no profile loaded
-            elif __release_sponsor_name__ != '': # pyright:ignore[reportUnnecessaryComparison]
-                self.setWindowTitle(f"{dirtySign}{appTitle} – {__release_sponsor_name__} ({QApplication.translate('About','Release Sponsor')})")
-                self.setWindowFilePath('')
             else:
                 self.setWindowTitle(f'{dirtySign}{appTitle}')
                 self.setWindowFilePath('')
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
 
-    @staticmethod
-    def resetDonateCounter() -> None:
-        settings = QSettings()
-        settings.setValue('lastdonationpopup',int(libtime.time()))
-        settings.setValue('starts',0)
-        settings.sync()
-        if settings.status() != QSettings.Status.NoError:
-            _log.error('Failed to save lastdonationpopup settings')
+#    @staticmethod
+#    def resetDonateCounter() -> None:
+#        settings = QSettings()
+#        settings.setValue('lastdonationpopup',int(libtime.time()))
+#        settings.setValue('starts',0)
+#        settings.sync()
+#        if settings.status() != QSettings.Status.NoError:
+#            _log.error('Failed to save lastdonationpopup settings')
 
     @pyqtSlot()
     def logStartupTime(self) -> None: # pylint: disable=no-self-use # used as slot
         _log.info('MODE: startup time: %.2f', libtime.process_time() - startup_time)
 
-    @pyqtSlot()
-    def donate(self) -> None:
-        try:
-            everytime = 4*30*24*60*60 # 4 month in seconds
-            everystarts = 30 # number of recordings
-            starts = None
-            lastdonationpopup = None
-            settings = QSettings()
-            if settings.contains('starts'):
-                starts = toInt(settings.value('starts'))
-            if settings.contains('lastdonationpopup'):
-                lastdonationpopup = toInt(settings.value('lastdonationpopup'))
-            now = int(libtime.time())
-            if not(settings.status() == QSettings.Status.NoError and
-                    lastdonationpopup is not None and
-                    starts is not None and
-                    (now >= lastdonationpopup > now-everytime) and
-                    0 <= starts < everystarts):
-#                message = QApplication.translate('Message', 'artisan is free to use!<br><br>To keep it free and current please support us<br><br><a href="{0}">{0}</a><br><br>and book<br><br><a href="{1}">{1}</a><br><br>to suppress this dialog')
-#                message = message.format('https://artisan-scope.org/donate/', 'https://artisan.plus')
-                message = QApplication.translate('Message', 'artisan is free to use!\n\nTo keep it free and current please support us with your donation and subscribe to the artisan platform to suppress this dialog!')
-                donate_message_box = QMessageBox()
-                donate_message_box.setText(message)
-                donate_message_box.setIcon(QMessageBox.Icon.Information)
-                donate_message_box.setModal(True)
-                donate_message_box.setStandardButtons(QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Ok)
-                donate_message_box.setDefaultButton(QMessageBox.StandardButton.Ok)
-                res = donate_message_box.exec()
-                if res == QMessageBox.StandardButton.Ok:
-                    QDesktopServices.openUrl(QUrl('https://artisan-scope.org/donate/', QUrl.ParsingMode.TolerantMode)) # zuban:ignore[unreachable]
-                self.resetDonateCounter()
-        except Exception as e: # pylint: disable=broad-except
-            _log.exception(e)
+#    @pyqtSlot()
+#    def donate(self) -> None:
+#        try:
+#            everytime = 4*30*24*60*60 # 4 month in seconds
+#            everystarts = 30 # number of recordings
+#            starts = None
+#            lastdonationpopup = None
+#            settings = QSettings()
+#            if settings.contains('starts'):
+#                starts = toInt(settings.value('starts'))
+#            if settings.contains('lastdonationpopup'):
+#                lastdonationpopup = toInt(settings.value('lastdonationpopup'))
+#            now = int(libtime.time())
+#            if not(settings.status() == QSettings.Status.NoError and
+#                    lastdonationpopup is not None and
+#                    starts is not None and
+#                    (now >= lastdonationpopup > now-everytime) and
+#                    0 <= starts < everystarts):
+##                message = QApplication.translate('Message', 'artisan is free to use!<br><br>To keep it free and current please support us<br><br><a href="{0}">{0}</a><br><br>and book<br><br><a href="{1}">{1}</a><br><br>to suppress this dialog')
+##                message = message.format('https://artisan-scope.org/donate/', 'https://artisan.plus')
+#                message = QApplication.translate('Message', 'artisan is free to use!\n\nTo keep it free and current please support us with your donation and subscribe to the artisan platform to suppress this dialog!')
+#                donate_message_box = QMessageBox()
+#                donate_message_box.setText(message)
+#                donate_message_box.setIcon(QMessageBox.Icon.Information)
+#                donate_message_box.setModal(True)
+#                donate_message_box.setStandardButtons(QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Ok)
+#                donate_message_box.setDefaultButton(QMessageBox.StandardButton.Ok)
+#                res = donate_message_box.exec()
+#                if res == QMessageBox.StandardButton.Ok:
+#                    QDesktopServices.openUrl(QUrl('https://artisan-scope.org/donate/', QUrl.ParsingMode.TolerantMode)) # zuban:ignore[unreachable]
+#                self.resetDonateCounter()
+#        except Exception as e: # pylint: disable=broad-except
+#            _log.exception(e)
 
     @pyqtSlot(str)
     def setCanvasColor(self, c:str) -> None: # pylint: disable=no-self-use # used as slot
@@ -6005,10 +6005,14 @@ class ApplicationWindow(QMainWindow):
                 c1 = c[1]
                 c3 = c[3]
                 # if one color is the canvas color set to None (transparent), we try to avoid a false warning
-                if str(c1) == 'None' and c[0] == 'Canvas':
+                if c1 == 'None' and c[0] == 'Canvas':
                     c1 = '#000000' if self.app.darkmode else '#ffffff'
-                if str(c3) == 'None' and c[2] == 'Canvas':
+                if c3 == 'None' and c[2] == 'Canvas':
                     c3 = '#000000' if self.app.darkmode else '#ffffff'
+                # if one of the colors has a transparency we avoid the check as well:
+                if (len(c1) == 9 and c1[0] == '#' and c1[7:9].lower() != 'ff' or
+                        len(c3) == 9 and c3[0] == '#' and c3[7:9].lower() != 'ff'):
+                    return self.qmc.colorDifferenceThreshold
                 val = self.colorDifference(c1,c3)
                 if val < self.qmc.colorDifferenceThreshold :
                     val = float2float(val,1)
@@ -6071,6 +6075,10 @@ class ApplicationWindow(QMainWindow):
         self.lcdpaletteF['rstimer'] = '#000000'
         self.lcdpaletteB['slowcoolingtimer'] = '#000000'
         self.lcdpaletteF['slowcoolingtimer'] = '#ffffff'
+        self.lcdpaletteB['scale'] = '#000000'
+        self.lcdpaletteF['scale'] = '#ffffff'
+        self.lcdpaletteB['phases'] = '#E6E6E6'
+        self.lcdpaletteF['phases'] = '#000000'
         self.setTimerColorSignal.emit('timer')
         self.updateLCDcolors()
         self.updateLCDproperties()
@@ -6266,7 +6274,7 @@ class ApplicationWindow(QMainWindow):
         self.level1layout.insertWidget(0,self.ntb)
 
         self.updateSliderColors()
-        self.updatePhasesLCDsColors()
+        self.updatePhasesLCDsLabelColors()
 
         self.dashboard.update_dashboard(dark_canvas=whitep)
 
@@ -6367,7 +6375,7 @@ class ApplicationWindow(QMainWindow):
         self.slider4.setStyleSheet(self.slideStyle(3))
         self.sliderSV.setStyleSheet(self.slideStyle(4))
 
-    def updatePhasesLCDsColors(self) -> None:
+    def updatePhasesLCDsLabelColors(self) -> None:
         label_style = 'QLabel { color : ' + self.qmc.palette['messages']  + '; }'
         self.TPlabel.setStyleSheet(label_style)
         self.TP2DRYlabel.setStyleSheet(label_style)
@@ -7496,44 +7504,44 @@ class ApplicationWindow(QMainWindow):
             rcParams['font.size'] = 12.0
             rcParams['font.family'] = ['WenQuanYi Zen Hei']
             rcParams['axes.unicode_minus'] = False
-#            self.set_mpl_fontproperties(self.getResourcePath() + "wqy-zenhei.ttc") # .ttc fonts are not supported yet by the PDF backend
-            self.set_mpl_fontproperties(getResourcePath() + 'WenQuanYiZenHei-01.ttf')
+#            self.set_mpl_fontproperties(f'{self.getResourcePath()}wqy-zenhei.ttc') # .ttc fonts are not supported yet by the PDF backend
+            self.set_mpl_fontproperties(f'{getResourcePath()}WenQuanYiZenHei-01.ttf')
         elif self.qmc.graphfont == 4: # Source Han Sans CN
             # font Source Han Sans selected, Simplified Chinese
             rcParams['axes.unicode_minus'] = True
             rcParams['font.size'] = 12.0
             rcParams['font.family'] = ['Source Han Sans CN']
-            self.set_mpl_fontproperties(getResourcePath() + 'SourceHanSansCN-Regular.otf')
+            self.set_mpl_fontproperties(f'{getResourcePath()}SourceHanSansCN-Regular.otf')
         elif self.qmc.graphfont == 5: # Source Han Sans TW
             # font Source Han Sans selected, Traditional Chinese, Taiwan
             rcParams['axes.unicode_minus'] = True
             rcParams['font.size'] = 12.0
             rcParams['font.family'] = ['Source Han Sans TW']
-            self.set_mpl_fontproperties(getResourcePath() + 'SourceHanSansTW-Regular.otf')
+            self.set_mpl_fontproperties(f'{getResourcePath()}SourceHanSansTW-Regular.otf')
         elif self.qmc.graphfont == 6: # Source Han Sans HK
             # font Source Han Sans selected, Traditional Chinese, Hong Kong
             rcParams['axes.unicode_minus'] = True
             rcParams['font.size'] = 12.0
             rcParams['font.family'] = ['Source Han Sans HK']
-            self.set_mpl_fontproperties(getResourcePath() + 'SourceHanSansHK-Regular.otf')
+            self.set_mpl_fontproperties(f'{getResourcePath()}SourceHanSansHK-Regular.otf')
         elif self.qmc.graphfont == 7: # Source Han Sans KR
             # font Source Han Sans selected, Korean
             rcParams['axes.unicode_minus'] = True
             rcParams['font.size'] = 12.0
             rcParams['font.family'] = ['Source Han Sans KR']
-            self.set_mpl_fontproperties(getResourcePath() + 'SourceHanSansKR-Regular.otf')
+            self.set_mpl_fontproperties(f'{getResourcePath()}SourceHanSansKR-Regular.otf')
         elif self.qmc.graphfont == 8: # Source Han Sans JP
             # font Source Han Sans selected, Japanese
             rcParams['axes.unicode_minus'] = True
             rcParams['font.size'] = 12.0
             rcParams['font.family'] = ['Source Han Sans JP']
-            self.set_mpl_fontproperties(getResourcePath() + 'SourceHanSansJP-Regular.otf')
+            self.set_mpl_fontproperties(f'{getResourcePath()}SourceHanSansJP-Regular.otf')
         elif self.qmc.graphfont == 9:
             # font Dijkstra selected
             rcParams['font.size'] = 10.0
             rcParams['font.family'] = ['Dijkstra']
             rcParams['axes.unicode_minus'] = False
-            self.set_mpl_fontproperties(getResourcePath() + 'dijkstra.ttf')
+            self.set_mpl_fontproperties(f'{getResourcePath()}dijkstra.ttf')
         elif self.qmc.graphfont == 10:
             # font xkcd Script selected
             # https://github.com/ipython/xkcd-font/
@@ -7543,7 +7551,7 @@ class ApplicationWindow(QMainWindow):
                 rcParams['font.family'] = ['xkcd Script']
             else:
                 rcParams['font.family'] = ['xkcd Script', 'Comic Sans MS']
-            self.set_mpl_fontproperties(getResourcePath() + 'xkcd-script.ttf')
+            self.set_mpl_fontproperties(f'{getResourcePath()}xkcd-script.ttf')
         elif self.qmc.graphfont == 1:
             # font Humor selected
             rcParams['axes.unicode_minus'] = False
@@ -7552,7 +7560,7 @@ class ApplicationWindow(QMainWindow):
                 rcParams['font.family'] = ['Humor Sans']
             else:
                 rcParams['font.family'] = ['Humor Sans', 'Comic Sans MS']
-            self.set_mpl_fontproperties(getResourcePath() + 'Humor-Sans.ttf')
+            self.set_mpl_fontproperties(f'{getResourcePath()}Humor-Sans.ttf')
         elif self.qmc.graphfont == 11 or platform.system() == 'Linux': # no Comic on Linux, we subst it with Comic Neue
             # font Comic Neue selected
             # http://comicneue.com/
@@ -7562,19 +7570,19 @@ class ApplicationWindow(QMainWindow):
                 rcParams['font.family'] = ['Comic Neue']
             else:
                 rcParams['font.family'] = ['Comic Neue', 'Comic Sans MS']
-            self.set_mpl_fontproperties(getResourcePath() + 'ComicNeue-Regular.ttf')
+            self.set_mpl_fontproperties(f'{getResourcePath()}ComicNeue-Regular.ttf')
         elif self.qmc.graphfont == 12:
             # font Nunito  selected
             # https://fonts.google.com/specimen/Nunito
             rcParams['font.size'] = 12.0
             rcParams['font.family'] = ['Nunito']
-            self.set_mpl_fontproperties(getResourcePath() + 'Nunito-Regular.ttf')
+            self.set_mpl_fontproperties(f'{getResourcePath()}Nunito-Regular.ttf')
         elif self.qmc.graphfont == 13:
             # font Nunito  selected
             # https://fonts.google.com/noto/specimen/Noto+Sans+Mono
             rcParams['font.size'] = 12.0
             rcParams['font.family'] = ['NotoSansMono']
-            self.set_mpl_fontproperties(getResourcePath() + 'NotoSansMono-Regular.ttf')
+            self.set_mpl_fontproperties(f'{getResourcePath()}NotoSansMono-Regular.ttf')
         elif self.qmc.graphfont == 2 and platform.system() != 'Linux':
             # font Comic selected
             rcParams['axes.unicode_minus'] = True
@@ -10588,7 +10596,7 @@ class ApplicationWindow(QMainWindow):
                                     except Exception: # pylint: disable=broad-except
                                         fp = str(cs[len('loadBackground('):-1])
                                     self.sendmessage(f'Artisan Command: {c}')
-                                    self.loadBackgroundSignal.emit(fp, True)
+                                    self.loadBackgroundSignal.emit(fp, True, True)
                                 except Exception as e: # pylint: disable=broad-except
                                     _log.exception(e)
                             # clearBackground
@@ -11899,22 +11907,31 @@ class ApplicationWindow(QMainWindow):
     def showEventsMinieditor(self) -> None:
         self.EventsGroupLayout.setVisible(True)
 
-    def updateLCDcolor(self, lcd:MyQLCDNumber, color_tag:str) -> None:
-        argb_color = rgba_colorname2argb_colorname(self.lcdpaletteF[color_tag])
-        argb_background_color = rgba_colorname2argb_colorname(self.lcdpaletteB[color_tag])
-        lcd.setStyleSheet(
-            f'QLCDNumber {{ border-radius: 8; color: {argb_color}; background-color: {argb_background_color};}}')
+    def updateLCDcolor(self, lcd:QLCDNumber, color_tag:str) -> None:
+        if color_tag in self.lcdpaletteF and color_tag in self.lcdpaletteB:
+            argb_color = rgba_colorname2argb_colorname(self.lcdpaletteF[color_tag])
+            argb_background_color = rgba_colorname2argb_colorname(self.lcdpaletteB[color_tag])
+            lcd.setStyleSheet(
+                # with border
+                f'QLCDNumber, MyQLCDNumber {{ border-width: 1; border-color: {argb_color}; border-radius: 8; color: {argb_color}; background-color: {argb_background_color};}}' if color_tag == 'phases' else
+                # without border
+                f'QLCDNumber, MyQLCDNumber {{ border-radius: 8; color: {argb_color}; background-color: {argb_background_color};}}')
 
     def updateLCDcolors(self) -> None:
-        for lcd, color_tag in [
+        lcd_tag_list:list[tuple[QLCDNumber,str]] = [
                 (self.lcd1, 'timer'),
                 (self.lcd2, 'et'),
                 (self.lcd3, 'bt'),
                 (self.lcd4, 'deltaet'),
                 (self.lcd5, 'deltabt'),
                 (self.lcd6, 'sv'),
-                (self.lcd7, 'sv')
-                ]:
+                (self.lcd7, 'sv'),
+                (self.TPlcd, 'phases'),
+                (self.DRYlcd, 'phases'),
+                (self.FCslcd, 'phases'),
+                (self.AUClcd, 'phases')
+        ]
+        for lcd, color_tag in lcd_tag_list:
             self.updateLCDcolor(lcd, color_tag)
 
     def updateLCDproperties(self) -> None:
@@ -12388,7 +12405,7 @@ class ApplicationWindow(QMainWindow):
                                 path = self.qmc.backgroundpath
                             filename = self.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Load Background Roast Template'),path =path, ext='*.alog')
                             if len(filename) != 0:
-                                self.loadBackgroundSignal.emit(filename, False)
+                                self.loadBackgroundSignal.emit(filename, False, True)
                 elif k == Qt.Key.Key_L and no_modifier and self.ui_mode is not UI_MODE.PRODUCTION: # 76:       #L (load alarms)
                     if not self.qmc.designerflag and self.comparator is None:
                         filename = self.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Load Alarms'),ext='*.alrm')
@@ -12540,7 +12557,8 @@ class ApplicationWindow(QMainWindow):
                         self.qmc.clear_last_picked_event_selection()
                         self.qmc.fileDirtySignal.emit()
                         self.qmc.redraw_keep_view(recomputeAllDeltas=False)
-                elif k == Qt.Key.Key_Escape and no_modifier: # 16777216:             #ESCAPE (exists full screen mode / clears message line / resets event short cut / exits designer/wheel graph / releases minieditor)
+                elif k == Qt.Key.Key_Escape and no_modifier: # 16777216:             #ESCAPE
+                    # (exists full screen mode / clears message line / resets event short cut / exits designer/wheel graph / releases minieditor / toggles dashboard-graph)
                     if self.quickEventShortCut is not None:
                         eventNr = self.quickEventShortCut[0]
                         # if corresponding slider has focus we reset LCD color and value
@@ -12568,20 +12586,23 @@ class ApplicationWindow(QMainWindow):
                         _log.exception(e)
                     if self.full_screen_mode_active or self.isFullScreen() or macfullscreen:
                         self.toggleFullscreen()
-                    else:
+                    elif self.qmc.designerflag:
                         #if designer ON
-                        if self.qmc.designerflag:
-                            string = QApplication.translate('Message','Exit Designer?')
-                            reply = QMessageBox.question(self, QApplication.translate('Message', 'Designer Mode ON'),string,QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
-                            if reply == QMessageBox.StandardButton.Yes:
-                                self.stopdesigner()
-                            else:
-                                return
+                        string = QApplication.translate('Message','Exit Designer?')
+                        reply = QMessageBox.question(self, QApplication.translate('Message', 'Designer Mode ON'),string,QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
+                        if reply == QMessageBox.StandardButton.Yes:
+                            self.stopdesigner()
+                        else:
+                            return
+                    elif self.qmc.wheelflag:
                         #if wheel graph ON
-                        elif self.qmc.wheelflag:
-                            self.graphwheel()
-                            self.wheeleditorAction.setChecked(self.qmc.wheelflag)
-                        self.releaseminieditor()
+                        self.graphwheel()
+                        self.wheeleditorAction.setChecked(self.qmc.wheelflag)
+                    else:
+                        # toggle dashboard/graph view
+                        self.dashboard.toggle_dashboard()
+
+                    self.releaseminieditor()
 
                     if self.qmc.foreground_event_last_picked_ind is not None or self.qmc.foreground_event_last_picked_pos is not None:
                         self.qmc.clear_last_picked_event_selection()
@@ -14116,8 +14137,10 @@ class ApplicationWindow(QMainWindow):
         self.autoAdjustAxis()
         self.qmc.redraw()
 
-    @pyqtSlot(str,bool)
-    def loadbackgroundRedraw(self, filename:str, quiet:bool) -> None:
+    @pyqtSlot(str,bool,bool)
+    # if force_show is set, the background profile is in any case shown independent of the hideBgafterprofile flag
+    # In cases where a background profile is explicitly loaded (not as part of a foreground profiles) force_show should be True
+    def loadbackgroundRedraw(self, filename:str, quiet:bool, force_show:bool) -> None:
         if len(filename) == 0:
             return
         try:
@@ -14129,7 +14152,7 @@ class ApplicationWindow(QMainWindow):
                 self.sendmessage(QApplication.translate('Message','Reading background profile...'))
                 self.qmc.resetlinecountcaches()
                 self.loadbackground(filename, quiet=quiet)
-                self.qmc.background = not self.qmc.hideBgafterprofileload
+                self.qmc.background = force_show or not self.qmc.hideBgafterprofileload
                 self.qmc.timealign(redraw=False)
                 self.qmc.redraw()
 
@@ -15380,7 +15403,7 @@ class ApplicationWindow(QMainWindow):
             # official builds validate all profile signatures for files generated by Artisan versions >= v4.2
             # we validate the signature
             try:
-                with open(getResourcePath() + 'artisan_public_key.pem', 'rb') as f:
+                with open(f'{getResourcePath()}artisan_public_key.pem', 'rb') as f:
                     public_key:ed25519.Ed25519PublicKey = cast(ed25519.Ed25519PublicKey, serialization.load_pem_public_key(f.read()))
                     version = profile['version'] # pyright:ignore # version not required field in TypedDict ProfileData; we want it here to fail if not available
                     revision = profile['revision'] # pyright: ignore[reportTypedDictNotRequiredAccess]
@@ -17778,6 +17801,7 @@ class ApplicationWindow(QMainWindow):
     def settingsLoad(self, filename:str|None = None, theme:bool = False, machine:bool = False, redraw:bool = True) -> bool: # pyright: ignore [reportGeneralTypeIssues] # Code is too complex to analyze; reduce complexity by refactoring into subroutines or reducing
         res = False
         settings:QSettings|None = None
+        first_start:bool = False
         #remember swaplcds and swapdeltalcds
         old_swaplcds = self.qmc.swaplcds
         old_swapdeltalcds = self.qmc.swapdeltalcds
@@ -17805,7 +17829,7 @@ class ApplicationWindow(QMainWindow):
 #                        settings.contains('System/artisan_version') and settings.contains('System/artisan_signature')):
                     # we validate the signature
                     try:
-                        with open(getResourcePath() + 'artisan_public_key.pem', 'rb') as f:
+                        with open(f'{getResourcePath()}artisan_public_key.pem', 'rb') as f:
                             public_key:ed25519.Ed25519PublicKey = cast(ed25519.Ed25519PublicKey, serialization.load_pem_public_key(f.read()))
                             version = settings.value('System/artisan_version','')
                             revision = settings.value('System/artisan_revision','')
@@ -17845,35 +17869,38 @@ class ApplicationWindow(QMainWindow):
                                 updateBatchCounter = False
                     settings.endGroup()
 #--- END GROUP Batch
-
                 # on explicit settings load we remove the ExtraDeviceBackup to prevent later restoreExtraDeviceSettingsBackup()
                 self.clearExtraDeviceSettingsBackup()
             else:
                 settings = QSettings()
             if settings.contains('resetqsettings'):
                 self.resetqsettings = toInt(settings.value('resetqsettings',self.resetqsettings))
-            if not self.resetqsettings and filename is None and settings.contains('Mode'):
-                # if not loading from settings file and there are already Artisan settings (not the first start)
-                # we set the old defaults of the autosave/batchcounter changed after v3.2.0 as those were not saved in users settings
-                # to avoid that they are changed to the new defaults
-                self.qmc.autosaveflag = 0
-                self.qmc.autosaveaddtorecentfilesflag = False
-                self.qmc.batchcounter = -1
-                self.qmc.batchprefix = ''
-                # similarly we default to UI_MODE.EXPERT for existing users while for new users the default is UI_MODE.DEFAULT
-                self.ui_mode = UI_MODE.EXPERT
+            if not self.resetqsettings and filename is None:
+                if settings.contains('Mode'):
+                    # if not loading from settings file and there are already Artisan settings (not the first start)
+                    # we set the old defaults of the autosave/batchcounter changed after v3.2.0 as those were not saved in users settings
+                    # to avoid that they are changed to the new defaults
+                    self.qmc.autosaveflag = 0
+                    self.qmc.autosaveaddtorecentfilesflag = False
+                    self.qmc.batchcounter = -1
+                    self.qmc.batchprefix = ''
+                    # similarly we default to UI_MODE.EXPERT for existing users while for new users the default is UI_MODE.DEFAULT
+                    self.ui_mode = UI_MODE.EXPERT
+                else:
+                    # first start ever
+                    first_start = True
 
             if self.resetqsettings or (filename is None and QApplication.queryKeyboardModifiers() == (Qt.KeyboardModifier.AltModifier | Qt.KeyboardModifier.ShiftModifier)):
                 self.resetqsettings = 0
 
                 # the call to settings.clear() below
                 # ensures to get rid of old Artisan settings that have been retired via "Save Settings >> Factory Reset >> Load Settings"
-                # however, settings.clear() has the consequence that recent files/settings, the starts counter and lastdonationpopup
+                # however, settings.clear() has the consequence that recent files/settings and the starts counter
                 # are cleared as well such that the donation popup is shown always after a Factory Reset and recent files/settings menu entries are lost
                 # thus we have to take care to preserve those over this FactoryReset here
-                lastdonationpopup:int|None = None
-                if settings.contains('lastdonationpopup'):
-                    lastdonationpopup = toInt(settings.value('lastdonationpopup'))
+#                lastdonationpopup:int|None = None
+#                if settings.contains('lastdonationpopup'):
+#                    lastdonationpopup = toInt(settings.value('lastdonationpopup'))
                 starts:int|None = None
                 if settings.contains('starts'):
                     starts = toInt(settings.value('starts'))
@@ -17882,8 +17909,8 @@ class ApplicationWindow(QMainWindow):
                 # keep recentSettings
                 recentSettings = toStringList(settings.value('recentSettingList'))
                 settings.clear()
-                if lastdonationpopup is not None:
-                    settings.setValue('lastdonationpopup',lastdonationpopup)
+#                if lastdonationpopup is not None:
+#                    settings.setValue('lastdonationpopup',lastdonationpopup)
                 if starts is not None:
                     settings.setValue('starts',starts)
                 # reset recent file list
@@ -17902,6 +17929,9 @@ class ApplicationWindow(QMainWindow):
                 except Exception: # pylint: disable=broad-except
                     pass
                 _log.info('Factory reset')
+                if self.app.darkmode:
+                    # first ever start in dark mode, we load a dark theme
+                    QTimer.singleShot(100, self.load_dark_theme)
                 return True  #don't load any more settings. They could be bad (corrupted). Stop here.
 
 
@@ -19532,6 +19562,10 @@ class ApplicationWindow(QMainWindow):
             if 'canvas' in self.qmc.palette and (filename is None or canvas_color_changed):
                 self.updateCanvasColors(checkColors=False)
 
+            if first_start and self.app.darkmode:
+                # first ever start in dark mode, we load a dark theme
+                QTimer.singleShot(500, self.load_dark_theme)
+
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
             res = False
@@ -19539,6 +19573,12 @@ class ApplicationWindow(QMainWindow):
             QMessageBox.information(self,QApplication.translate('Error Message', 'Error'),QApplication.translate('Error Message', 'Exception:') + ' settingsLoad()  @line ' + str(getattr(exc_tb, 'tb_lineno', '?')))
 
         return res
+
+    def load_dark_theme(self) -> None:
+        try:
+            self.loadThemeSignal.emit(str(Path(getResourcePath()).joinpath('Themes').joinpath('Catppuccin').joinpath('Macchiato.athm')), 'Catppuccin Macchiato')
+        except Exception as e:
+            _log.error(e)
 
     ## WebLCDs
 
@@ -24436,7 +24476,7 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     @pyqtSlot(bool)
     def checkUpdate(self, _:bool = False) -> None:
-        update_url = '<a href="https://artisan-scope.org">https://artisan-scope.org</a>'
+        #update_url = '<a href="https://artisan-scope.org">https://artisan-scope.org</a>'
         update_str = QApplication.translate('About', 'There was a problem retrieving the latest version information.  Please check your Internet connection, try again later, or check manually.')
         try:
             import requests
@@ -24457,8 +24497,7 @@ class ApplicationWindow(QMainWindow):
                         elif latest == __version__ :
                             update_str = QApplication.translate('About', 'You are using the latest release.')
                         elif latest < __version__:
-                            update_str = QApplication.translate('About', 'You are using a beta continuous build.')
-                            update_str += '<br/><br/>' + QApplication.translate('About', 'You will see a notice here once a new official release is available.')
+                            update_str = f'{QApplication.translate('About', 'You are using a beta continuous build.')} {QApplication.translate('About', 'You will see a notice here once a new official release is available.')}'
         except json.decoder.JSONDecodeError as e:
             if not e.doc:
                 _log.error('Empty response in checkUpdate.')
@@ -24471,10 +24510,14 @@ class ApplicationWindow(QMainWindow):
             _a, _b, exc_tb = sys.exc_info()
             self.qmc.adderror((QApplication.translate('Error Message','Exception:') + ' checkUpdate() {0}').format(str(ex)),getattr(exc_tb, 'tb_lineno', '?'))
 
-        box = QMessageBox(self)
-        box.about(self,
-                QApplication.translate('About', 'Update status'),
-                f"""<p>{update_str}</p>{update_url}""")
+        box = QMessageBox()
+#        box.about(self,
+#                QApplication.translate('About', 'Update status'),
+#                f"""<p>{update_str}</p>{update_url}""")
+        box.setText(QApplication.translate('About', 'Update status'))
+#        box.setInformativeText(f"""<p>{update_str}</p>{update_url}""")
+        box.setInformativeText(update_str)
+        box.exec()
 
     def applicationscreenshot(self) -> None:
         imag = self.grab()

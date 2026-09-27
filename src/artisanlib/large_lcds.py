@@ -781,7 +781,7 @@ class LargePhasesLCDs(LargeLCDs):
 
     @override
     def makeLCDs(self) -> None:
-        self.lcds1styles = ['sv','sv']
+        self.lcds1styles = ['phases','phases']
         self.lcds1 = [
             self.makeLCD(self.lcds1styles[0]), # Phase 1
             self.makeLCD(self.lcds1styles[1])  # Phase 3
@@ -797,7 +797,7 @@ class LargePhasesLCDs(LargeLCDs):
             f.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
             f.customContextMenuRequested.connect(self.aw.PhaseslcdClicked)
         #
-        self.lcds2styles = ['sv','sv']
+        self.lcds2styles = ['phases','phases']
         self.lcds2 = [
             self.makeLCD(self.lcds2styles[0]), # Phase 2
             self.makeLCD(self.lcds2styles[1])  # AUC
@@ -913,7 +913,7 @@ class LargeScaleLCDs(LargeLCDs):
 
     @override
     def makeLCDs(self) -> None:
-        self.lcds1styles = ['rstimer']
+        self.lcds1styles = ['scale']
         self.lcd1 = self.makeLCD(self.lcds1styles[0])
         self.lcd1.clicked.connect(self.aw.scale_manager.tare_scale1_slot)
         self.lcds1 = [self.lcd1] # Scale 1 weight
@@ -923,7 +923,7 @@ class LargeScaleLCDs(LargeLCDs):
         self.lcds1labelsLower = [label1Lower]
         self.lcds1frames = [self.makeLCDframe(label1Upper,self.lcds1[0],label1Lower)]
         #
-        self.lcds2styles = ['rstimer']
+        self.lcds2styles = ['scale']
         self.lcd2 = self.makeLCD(self.lcds2styles[0])
         self.lcd2.clicked.connect(self.aw.scale_manager.tare_scale2_slot)
         self.lcds2 = [self.lcd2] # Scale 2 weight

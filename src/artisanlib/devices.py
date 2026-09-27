@@ -298,6 +298,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             horizontal_header.setStyleSheet(horizontal_header_style(self.aw.app.darkmode))
             horizontal_header.setSectionsClickable(False)
             horizontal_header.setHighlightSections(False)
+            horizontal_header.sectionResized.connect(self.enforce_min_column_width)
         vertical_header = self.devicetable.verticalHeader()
         if vertical_header is not None:
             vertical_header.setStyleSheet(vertical_header_style(self.aw.app.darkmode))
@@ -1591,7 +1592,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         bLayout.addStretch()
         bLayout.addWidget(self.addButton)
         bLayout.addWidget(self.delButton)
-        bLayout.addSpacing(10)
+        bLayout.addSpacing(20)
         bLayout.addWidget(resetButton)
         bLayout.addStretch()
         bLayout.addWidget(self.recalcButton)
@@ -2179,6 +2180,18 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         # we set the active tab with a QTimer after the tabbar has been rendered once, as otherwise
         # some tabs are not rendered at all on Windows using Qt v6.5.1 (https://bugreports.qt.io/projects/QTBUG/issues/QTBUG-114204?filter=allissues)
         QTimer.singleShot(50, self.setActiveTab)
+
+    @pyqtSlot(int,int,int)
+    def enforce_min_column_width(self, logicalIndex:int, oldSize:int, newSize:int) -> None:
+        del oldSize
+        # ensure that first column never shrinks below min_width to keep entries readable
+        min_width = 230
+        hheader = self.devicetable.horizontalHeader()
+        if hheader is not None and logicalIndex == 0 and newSize < min_width:
+            # Block signals temporarily to prevent infinite recursion loop
+            hheader.blockSignals(True)
+            self.devicetable.setColumnWidth(0, min_width)
+            hheader.blockSignals(False)
 
     @pyqtSlot(int)
     def temperatureDeviceComboBoxIndexChanged(self, i:int) -> None:

@@ -2177,9 +2177,6 @@ class roastCompareDlg(ArtisanDialog):
     @override
     def closeEvent(self, a0:'QCloseEvent|None' = None) -> None:
         del a0
-        # show dashboard again if it was shown on starting the Comparator
-        if self.dashboard_was_active_on_open:
-            self.aw.dashboard.show_dashboard()
         #disconnect pick handler
         self.aw.qmc.fig.canvas.mpl_disconnect(self.pick_handler_id)
         #save window geometry
@@ -2211,3 +2208,6 @@ class roastCompareDlg(ArtisanDialog):
             _log.exception(e)
         if self.aw.qpc is not None:
             self.aw.qpc.update_phases(None)
+        # show dashboard again if it was shown on starting the Comparator
+        if self.dashboard_was_active_on_open:
+            self.aw.dashboard.show_dashboard()

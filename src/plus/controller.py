@@ -265,10 +265,10 @@ def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
                             queue.start()  # start the outbox queue
                         except Exception as e:  # pylint: disable=broad-except
                             _log.exception(e)
-                        try:
-                            aw.resetDonateCounter()
-                        except Exception as e:  # pylint: disable=broad-except
-                            _log.exception(e)
+#                        try:
+#                            aw.resetDonateCounter()
+#                        except Exception as e:  # pylint: disable=broad-except
+#                            _log.exception(e)
                     elif clear_on_failure:
                         connection.clearCredentials()
                         aw.sendmessageSignal.emit(

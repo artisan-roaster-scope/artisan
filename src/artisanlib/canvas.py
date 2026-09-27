@@ -29,9 +29,6 @@ from artisanlib import __version__
 from artisanlib import __revision__
 from artisanlib import __build__
 
-from artisanlib import __release_sponsor_domain__
-from artisanlib import __release_sponsor_url__
-
 #import gc
 import time as libtime
 import os
@@ -3908,24 +3905,20 @@ class tgraphcanvas(QObject):
                         return
                     if isinstance(fig, Figure):
                         s = fig.get_size_inches()*fig.dpi
-                        if event.x > s[0]*2/3 and event.y > s[1]*2/3:
-                            if not self.flagstart and not self.flagon and self.backgroundprofile is None and __release_sponsor_domain__ and __release_sponsor_url__: # ty: ignore
-                                QDesktopServices.openUrl(QUrl(__release_sponsor_url__, QUrl.ParsingMode.TolerantMode))
+                        if event.x > s[0]*2/3 and event.y > s[1]*2/3 and self.backgroundprofile is not None:
+                            modifiers = QApplication.keyboardModifiers()
+                            if self.background and modifiers == Qt.KeyboardModifier.AltModifier:
+                                self.aw.togglePlaybackEvents()
                                 return
-                            if self.backgroundprofile is not None:
-                                modifiers = QApplication.keyboardModifiers()
-                                if self.background and modifiers == Qt.KeyboardModifier.AltModifier:
-                                    self.aw.togglePlaybackEvents()
-                                    return
-                                if event.dblclick:
-                                    # toggle background if right top corner above canvas where the subtitle is clicked
-                                    self.background = not self.background
-                                    self.aw.autoAdjustAxis(background=self.background and (not len(self.timex) > 3))
-                                    if self.statssummary and self.autotimex:
-                                        self.redraw(recomputeAllDeltas=True)
-                                    else:
-                                        self.redraw_keep_view(recomputeAllDeltas=True)
-                                    return
+                            if event.dblclick:
+                                # toggle background if right top corner above canvas where the subtitle is clicked
+                                self.background = not self.background
+                                self.aw.autoAdjustAxis(background=self.background and (not len(self.timex) > 3))
+                                if self.statssummary and self.autotimex:
+                                    self.redraw(recomputeAllDeltas=True)
+                                else:
+                                    self.redraw_keep_view(recomputeAllDeltas=True)
+                                return
 
 
                 event_xdata = event.xdata
@@ -6204,7 +6197,8 @@ class tgraphcanvas(QObject):
                 # if all event types reached their end, we can stop checking further events (optimization)
 
                 # register per event type that we do not have to check further events of that type, if all are checked we can stop the processing
-                end_reached:list[bool] = [not flag for flag in self.specialeventplayback] # those event types not activated for event replay are considered done already
+                end_reached:list[bool] = [not ((flag and self.backgroundPlaybackEvents) or (flag_aid and self.backgroundReproduce))
+                    for flag, flag_aid in zip(self.specialeventplayback,self.specialeventplaybackaid, strict=True)] # those event types not activated for event replay are considered done already
 
                 # the next variables is used to realize ramping event replay
                 ramps:list[int|None] = [None,None,None,None]  # holds the time or temp ramp value to be applied per event type, calculated from last replayed event and the succeeding event
@@ -6268,9 +6262,9 @@ class tgraphcanvas(QObject):
                                 message = f'> [{self.Betypesf(event_type)}] [{self.eventsvalues(self.backgroundEvalues[i])}] : <b>{stringfromseconds(timed)}</b> : {self.backgroundEStrings[i]}'
                                 #rotate colors to get attention
                                 if int(round(timed))%2:
-                                    style = "background-color:'transparent';"
+                                    style = 'background-color: transparent;'
                                 else:
-                                    style = "background-color:'yellow';"
+                                    style = 'background-color:yellow; color: black;'
 
                                 self.aw.sendmessage(message,style=style)
                                 reproducing = i
@@ -9116,15 +9110,11 @@ class tgraphcanvas(QObject):
                     else:
                         self.setProfileTitle(self.title)
 
-                    if not ((self.flagstart and not self.title_show_always) or self.title.strip() == ''):
-                        if self.backgroundprofile is not None:
-                            if self.roastbatchnrB == 0:
-                                titleB = self.titleB
-                            else:
-                                titleB = f'{self.roastbatchprefixB}{self.roastbatchnrB} {self.titleB}'
-                        elif __release_sponsor_domain__ != '':
-                            sponsor = QApplication.translate('About','sponsored by {}').format(__release_sponsor_domain__)
-                            titleB = f'\n{sponsor}'
+                    if not ((self.flagstart and not self.title_show_always) or self.title.strip() == '') and self.backgroundprofile is not None:
+                        if self.roastbatchnrB == 0:
+                            titleB = self.titleB
+                        else:
+                            titleB = f'{self.roastbatchprefixB}{self.roastbatchnrB} {self.titleB}'
 
                     # extra event names with substitution of event names applied
                     extraname1_subst = self.extraname1[:]
@@ -12415,13 +12405,16 @@ class tgraphcanvas(QObject):
                 self.backgrounddeltaetcolor = str(dialog.bgdeltametButton.text())
                 self.backgrounddeltabtcolor = str(dialog.bgdeltabtButton.text())
                 self.backgroundxtcolor = str(dialog.bgextraButton.text())
+                self.palette['xt'] = self.backgroundxtcolor
                 self.backgroundytcolor = str(dialog.bgextra2Button.text())
+                self.palette['yt'] = self.backgroundytcolor
                 # release the dialog
                 dialog.destroy()
                 del dialog
 
         #update screen with new colors
         self.aw.updateCanvasColors()
+        self.aw.updateLCDcolors()
         self.aw.applyStandardButtonVisibility()
         self.aw.update_extraeventbuttons_visibility()
         self.fig.canvas.draw_idle()
@@ -13137,7 +13130,8 @@ class tgraphcanvas(QObject):
 
             self.aw.buttonONOFF.setText(QApplication.translate('Button', 'OFF')) # text means click to turn OFF (it is ON)
             self.aw.buttonONOFF.setToolTip(QApplication.translate('Tooltip', 'Stop monitoring'))
-            self.aw.buttonSTARTSTOP.setEnabled(True) # ensure that the START button is enabled
+#            self.aw.buttonSTARTSTOP.setEnabled(True) # ensure that the START button is enabled
+            self.aw.buttonSTARTSTOP.setVisible(True)
             self.aw.disableEditMenus()
             self.aw.updateControlsVisibility()
             self.aw.update_extraeventbuttons_visibility()
@@ -13368,7 +13362,8 @@ class tgraphcanvas(QObject):
 
             self.aw.buttonONOFF.setEnabled(True)
             self.aw.buttonONOFF.setGraphicsEffect(self.aw.makeShadow())
-            self.aw.buttonSTARTSTOP.setEnabled(True)
+#            self.aw.buttonSTARTSTOP.setEnabled(True)
+            self.aw.buttonSTARTSTOP.setVisible(True)
             self.aw.buttonSTARTSTOP.setGraphicsEffect(self.aw.makeShadow())
             self.aw.buttonCONTROL.setEnabled(True)
             self.aw.buttonCONTROL.setGraphicsEffect(self.aw.makeShadow())
@@ -13402,10 +13397,11 @@ class tgraphcanvas(QObject):
                 ge:QGraphicsEffect|None = self.aw.buttonONOFF.graphicsEffect()
                 if ge is not None:
                     ge.setEnabled(False)
-                self.aw.buttonSTARTSTOP.setEnabled(False)
-                ge = self.aw.buttonSTARTSTOP.graphicsEffect()
-                if ge is not None:
-                    ge.setEnabled(False)
+#                self.aw.buttonSTARTSTOP.setEnabled(False)
+#                ge = self.aw.buttonSTARTSTOP.graphicsEffect()
+#                if ge is not None:
+#                    ge.setEnabled(False)
+                self.aw.buttonSTARTSTOP.setVisible(False)
 
                 self.aw.buttonCONTROL.setEnabled(False)
                 ge = self.aw.buttonCONTROL.graphicsEffect()
@@ -13954,10 +13950,11 @@ class tgraphcanvas(QObject):
             self.updateDeltaSamples()
             self.aw.disableSaveActions()
             self.aw.sendmessage(QApplication.translate('Message','Scope recording...'))
-            self.aw.buttonSTARTSTOP.setEnabled(False)
-            ge:QGraphicsEffect|None = self.aw.buttonSTARTSTOP.graphicsEffect()
-            if ge is not None:
-                ge.setEnabled(False)
+#            self.aw.buttonSTARTSTOP.setEnabled(False)
+#            ge:QGraphicsEffect|None = self.aw.buttonSTARTSTOP.graphicsEffect()
+#            if ge is not None:
+#                ge.setEnabled(False)
+            self.aw.buttonSTARTSTOP.setVisible(False)
             self.aw.buttonONOFF.setText(QApplication.translate('Button', 'OFF')) # text means click to turn OFF (it is ON)
             self.aw.buttonONOFF.setToolTip(QApplication.translate('Tooltip', 'Stop recording'))
             self.aw.buttonONOFF.setEnabled(True) # ensure that the OFF button is enabled
@@ -14066,6 +14063,7 @@ class tgraphcanvas(QObject):
             self.aw.phasesLCDs.hide()
             self.aw.AUCLCD.hide()
             self.aw.hideEventsMinieditor()
+            self.aw.dashboard.enable_dashboard_toggle_toolbutton()
 
             # enable "green flag" menu:
             try:
@@ -18251,13 +18249,19 @@ class tgraphcanvas(QObject):
 
             designermenu.addSeparator()
 
-            resetAction = QAction(QApplication.translate('Contextual Menu', 'Reset Designer'),self)
+            resetAction = QAction(QApplication.translate('Contextual Menu', 'Reset'),self)
             resetAction.triggered.connect(self.reset_designer)
             designermenu.addAction(resetAction)
 
             configAction = QAction(QApplication.translate('Contextual Menu', 'Config...'),self)
             configAction.triggered.connect(self.desconfig)
             designermenu.addAction(configAction)
+
+            designermenu.addSeparator()
+
+            exitAction = QAction(QApplication.translate('Contextual Menu', 'Exit'),self)
+            exitAction.triggered.connect(self.aw.exitTriggered)
+            designermenu.addAction(exitAction)
 
             designermenu.exec(QCursor.pos())
         except Exception as e: # pylint: disable=broad-except
@@ -18775,7 +18779,7 @@ class tgraphcanvas(QObject):
                     self.aw.loadFile(self.designer_loaded_foreground_profile_file)
                 else:
                     self.reset(soundOn=False, fireResetAction=False)
-                self.aw.loadBackgroundSignal.emit(filename, False)
+                self.aw.loadBackgroundSignal.emit(filename, False, True)
 
             self.aw.sendmessage(QApplication.translate('Message', 'New profile created'))
 
@@ -19045,22 +19049,28 @@ class tgraphcanvas(QObject):
                 self.wheellocationz = ydata
 
         elif event.button == 3:
-            designermenu = QMenu(self.aw) # if we bind this to self, we inherit the background-color: transparent from self.fig
-            cuppingAction = QAction(QApplication.translate('Contextual Menu', 'Add to Cupping Notes'),self)
+            wheelmenu = QMenu(self.aw) # if we bind this to self, we inherit the background-color: transparent from self.fig
+            cuppingAction = QAction(QApplication.translate('Contextual Menu', 'Add to cupping notes'),self)
             cuppingAction.triggered.connect(self.addTocuppingnotes)
-            designermenu.addAction(cuppingAction)
+            wheelmenu.addAction(cuppingAction)
 
-            roastingAction = QAction(QApplication.translate('Contextual Menu', 'Add to Roasting Notes'),self)
+            roastingAction = QAction(QApplication.translate('Contextual Menu', 'Add to roasting notes'),self)
             roastingAction.triggered.connect(self.addToroastingnotes)
-            designermenu.addAction(roastingAction)
+            wheelmenu.addAction(roastingAction)
 
-            designermenu.addSeparator()
+            wheelmenu.addSeparator()
 
             editAction = QAction(QApplication.translate('Contextual Menu', 'Edit'),self)
             editAction.triggered.connect(self.editmode)
-            designermenu.addAction(editAction)
+            wheelmenu.addAction(editAction)
 
-            designermenu.exec(QCursor.pos())
+            wheelmenu.addSeparator()
+
+            exitAction = QAction(QApplication.translate('Contextual Menu', 'Exit'),self)
+            exitAction.triggered.connect(self.aw.exitTriggered)
+            wheelmenu.addAction(exitAction)
+
+            wheelmenu.exec(QCursor.pos())
 
     @pyqtSlot()
     @pyqtSlot(bool)

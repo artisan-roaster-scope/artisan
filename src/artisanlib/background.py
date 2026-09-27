@@ -82,7 +82,7 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.backgroundBTflag = QCheckBox(self.BTname)
         self.backgroundFullflag = QCheckBox(QApplication.translate('CheckBox','Show Full'))
         self.keyboardControlflag = QCheckBox(QApplication.translate('CheckBox','Keyboard Control'))
-        self.keyboardControlflag.setToolTip(QApplication.translate('Tooltip', 'Move the background profile using the cursor keys'))
+        self.keyboardControlflag.setToolTip(QApplication.translate('Tooltip', 'Move the template profile using the cursor keys'))
         self.backgroundCheck.setChecked(self.aw.qmc.background)
         self.backgroundDetails.setChecked(self.aw.qmc.backgroundDetails)
         self.backgroundeventsflag.setChecked(self.aw.qmc.backgroundeventsflag)
@@ -157,7 +157,7 @@ class backgroundDlg(ArtisanResizeablDialog):
             curvenames.append(f'B{2*i+4}: {cn2}')
         self.xtcurvelabel = QLabel(QApplication.translate('Label', 'Extra 1'))
         self.xtcurveComboBox = QComboBox()
-        self.xtcurveComboBox.setToolTip(QApplication.translate('Tooltip','For loaded backgrounds with extra devices only'))
+        self.xtcurveComboBox.setToolTip(QApplication.translate('Tooltip','For loaded templates with extra devices only'))
         self.xtcurveComboBox.setMinimumWidth(120)
         self.xtcurveComboBox.addItems(curvenames)
         if self.aw.qmc.xtcurveidx < len(curvenames):
@@ -166,7 +166,7 @@ class backgroundDlg(ArtisanResizeablDialog):
 
         self.ytcurvelabel = QLabel(QApplication.translate('Label', 'Extra 2'))
         self.ytcurveComboBox = QComboBox()
-        self.ytcurveComboBox.setToolTip(QApplication.translate('Tooltip','For loaded backgrounds with extra devices only'))
+        self.ytcurveComboBox.setToolTip(QApplication.translate('Tooltip','For loaded templates with extra devices only'))
         self.ytcurveComboBox.setMinimumWidth(120)
         self.ytcurveComboBox.addItems(curvenames)
         if self.aw.qmc.ytcurveidx < len(curvenames):
@@ -280,6 +280,7 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.replayDropComboBox.setEnabled(self.aw.qmc.backgroundPlaybackDROP)
 
         self.backgroundReproduce = QCheckBox(QApplication.translate('CheckBox','Playback Aid'))
+        self.backgroundReproduce.setToolTip(QApplication.translate('Tooltip', 'Show text warnings ahead of approaching an event in the template'))
         self.backgroundReproduce.setChecked(self.aw.qmc.backgroundReproduce)
         self.backgroundReproduce.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.backgroundReproduce.stateChanged.connect(self.setreproduce)
@@ -292,12 +293,12 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.backgroundPlaybackEvents.setChecked(self.aw.qmc.backgroundPlaybackEvents)
         self.backgroundPlaybackEvents.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.backgroundPlaybackEvents.stateChanged.connect(self.setplaybackevent)
-        self.backgroundPlaybackEvents.setToolTip(QApplication.translate('Tooltip', 'Replays the selected backgrounds events by time, BT, or ET (before TP always by time at least until 2min into the roast)'))
+        self.backgroundPlaybackEvents.setToolTip(QApplication.translate('Tooltip', 'Replays the selected templates events by time, BT, or ET (before TP always by time at least until 2min into the roast)'))
         self.backgroundPlaybackDROP = QCheckBox(QApplication.translate('CheckBox','Playback DROP'))
         self.backgroundPlaybackDROP.setChecked(self.aw.qmc.backgroundPlaybackDROP)
         self.backgroundPlaybackDROP.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.backgroundPlaybackDROP.stateChanged.connect(self.setplaybackdrop)
-        self.backgroundPlaybackDROP.setToolTip(QApplication.translate('Tooltip', 'Replays the backgrounds DROP event by time, BT, or ET (but earlierst 4min into the roast)'))
+        self.backgroundPlaybackDROP.setToolTip(QApplication.translate('Tooltip', 'Replays the templates DROP event by time, BT, or ET (but earlierst 4min into the roast)'))
         self.etimelabel =QLabel(QApplication.translate('Label', 'Text Warning'))
         self.etimelabel.setEnabled(self.aw.qmc.backgroundReproduce)
         self.etimeunit =QLabel(QApplication.translate('Label', 'sec'))
@@ -309,18 +310,18 @@ class backgroundDlg(ArtisanResizeablDialog):
         self.etimeSpinBox.setValue(int(self.aw.qmc.detectBackgroundEventTime))
         self.etimeSpinBox.valueChanged.connect(self.setreproduce)
         self.etimeSpinBox.setEnabled(self.aw.qmc.backgroundReproduce)
-        self.clearBgbeforeprofileload = QCheckBox(QApplication.translate('CheckBox','Clear background before loading'))
-        self.clearBgbeforeprofileload.setToolTip(QApplication.translate('Tooltip', 'Clear background before loading a profile'))
+        self.clearBgbeforeprofileload = QCheckBox(QApplication.translate('CheckBox','Clear template before loading'))
+        self.clearBgbeforeprofileload.setToolTip(QApplication.translate('Tooltip', 'Clear template before loading a profile'))
         self.clearBgbeforeprofileload.setChecked(self.aw.qmc.clearBgbeforeprofileload)
         self.clearBgbeforeprofileload.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.clearBgbeforeprofileload.stateChanged.connect(self.optclearbgbeforeprofileload)
         self.setBatchSizeFromBackground = QCheckBox(QApplication.translate('CheckBox','Set batch size'))
-        self.setBatchSizeFromBackground.setToolTip(QApplication.translate('Tooltip', 'Set batch size from background profile on load'))
+        self.setBatchSizeFromBackground.setToolTip(QApplication.translate('Tooltip', 'Set batch size from template profile on load'))
         self.setBatchSizeFromBackground.setChecked(self.aw.qmc.setBatchSizeFromBackground)
         self.setBatchSizeFromBackground.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.setBatchSizeFromBackground.stateChanged.connect(self.optsetBatchSizeFromBackground)
-        self.hideBgafterprofileload = QCheckBox(QApplication.translate('CheckBox','Always hide background on loading'))
-        self.hideBgafterprofileload.setToolTip(QApplication.translate('Tooltip', 'Always hide background on loading a profile'))
+        self.hideBgafterprofileload = QCheckBox(QApplication.translate('CheckBox','Hide template on loading profiles'))
+        self.hideBgafterprofileload.setToolTip(QApplication.translate('Tooltip', 'Always hide template on loading a profile'))
         self.hideBgafterprofileload.setChecked(self.aw.qmc.hideBgafterprofileload)
         self.hideBgafterprofileload.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.hideBgafterprofileload.stateChanged.connect(self.opthideBgafterprofileload)
@@ -688,15 +689,13 @@ class backgroundDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(int)
     def setplaybackevent(self, _:int) -> None:
-        s = None
         if self.backgroundPlaybackEvents.isChecked():
             self.aw.qmc.turn_playback_event_ON()
             msg = QApplication.translate('Message','Playback Events set ON')
         else:
             self.aw.qmc.turn_playback_event_OFF()
             msg = QApplication.translate('StatusBar','Playback Events set OFF')
-            s = "background-color:'transparent';"
-        self.aw.sendmessage(msg, style=s)
+        self.aw.sendmessage(msg)
         self.aw.updatePlaybackIndicator()
         for widget in [
                 self.replayComboBox,
@@ -819,50 +818,6 @@ class backgroundDlg(ArtisanResizeablDialog):
         else:
             self.aw.qmc.hideBgafterprofileload = False
 
-#    def adjustcolor(self,curve):
-#
-#        curve = str(curve).lower()
-#
-#        etcolor = str(self.metcolorComboBox.currentText()).lower()
-#        btcolor = str(self.btcolorComboBox.currentText()).lower()
-#        deltabtcolor = str(self.deltabtcolorComboBox.currentText()).lower()
-#        deltaetcolor = str(self.deltaetcolorComboBox.currentText()).lower()
-#        xtcolor = str(self.xtcolorComboBox.currentText()).lower()
-#
-#        defaults =  ['et','bt','deltaet','deltabt']
-#
-#        if curve == 'et':
-#            if etcolor in defaults:
-#                self.aw.qmc.backgroundmetcolor = self.aw.qmc.palette[etcolor]
-#            else:
-#                self.aw.qmc.backgroundmetcolor = etcolor
-#
-#        elif curve == 'bt':
-#            if btcolor in defaults:
-#                self.aw.qmc.backgroundbtcolor = self.aw.qmc.palette[btcolor]
-#            else:
-#                self.aw.qmc.backgroundbtcolor = btcolor
-#
-#        elif curve == 'deltaet':
-#            if deltaetcolor in defaults:
-#                self.aw.qmc.backgrounddeltaetcolor = self.aw.qmc.palette[deltaetcolor]
-#            else:
-#                self.aw.qmc.backgrounddeltaetcolor = deltaetcolor
-#
-#        elif curve == 'deltabt':
-#            if deltabtcolor in defaults:
-#                self.aw.qmc.backgrounddeltabtcolor = self.aw.qmc.palette[deltabtcolor]
-#            else:
-#                self.aw.qmc.backgrounddeltabtcolor = deltabtcolor
-#
-#        elif curve == 'xt':
-#            if xtcolor in defaults:
-#                self.aw.qmc.backgroundxtcolor = self.aw.qmc.palette[xtcolor]
-#            else:
-#                self.aw.qmc.backgroundxtcolor = xtcolor
-#
-#        self.aw.qmc.redraw(recomputeAllDeltas=False)
-
     @pyqtSlot(bool)
     def delete(self, _:bool = False) -> None:
         self.pathedit.setText('')
@@ -941,10 +896,10 @@ class backgroundDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(bool)
     def load(self, _:bool = False) -> None:
-        self.filename = self.aw.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Load Background Roast Template'),ext='*.alog')
+        self.filename = self.aw.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Load Template Roast Template'),ext='*.alog')
         if len(self.filename) == 0:
             return
-        self.aw.sendmessage(QApplication.translate('Message','Reading background profile...'))
+        self.aw.sendmessage(QApplication.translate('Message','Reading template profile...'))
         self.aw.qmc.resetlinecountcaches()
         self.aw.loadbackground(self.filename, quiet=False)
 
