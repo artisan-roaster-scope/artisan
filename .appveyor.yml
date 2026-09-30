@@ -20,7 +20,7 @@ environment:
   # Set the default Appveyor Python version here. Can be overridden in platform environment.
   PYTHON_V: 3.14
   # Upgrade to specific version (for platforms supporting upgrade). Upgrade skipped if env var is missing or blank.
-  PYUPGRADE_WIN_VER: 3.14.6
+  PYUPGRADE_WIN_VER: 3.14.7
   #PYUPGRADE_MACOS_V: 3.12.1  # when upgrading see the notes in the deploy phase
 
   ARTISAN_KEY:
@@ -28,7 +28,7 @@ environment:
 
   matrix:
   - job_name: windows
-    appveyor_build_worker_image: Visual Studio 2022
+    appveyor_build_worker_image: Visual Studio 2026
   - job_name: macos
     appveyor_build_worker_image: macos-ventura
   - job_name: linux
