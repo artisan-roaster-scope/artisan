@@ -207,8 +207,7 @@ def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
                                 )
                                 keychain_success = True
                                 _log.debug('keyring set password (%s)', login)
-                            # pylint: disable=broad-except
-                            except Exception as e:
+                            except Exception as e:  # pylint: disable=broad-except
                                 _log.exception(e)
                                 if (
                                     not platform.system().startswith('Windows')

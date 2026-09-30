@@ -30,11 +30,11 @@ import sys
 import platform
 import logging
 from pathlib import Path
-from typing import Final, override, TYPE_CHECKING
+from typing import Final, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.main import ApplicationWindow # pylint: disable=unused-import
-    from PyQt6.QtGui import QMouseEvent # pylint: disable=unused-import
+#    from PyQt6.QtGui import QMouseEvent # pylint: disable=unused-import
 
 from PyQt6.QtWidgets import QApplication, QWidget, QComboBox
 from PyQt6.QtCore import Qt, QSettings, pyqtSlot, QTimer, pyqtSignal, QSize
@@ -47,7 +47,8 @@ from artisanlib import __release_sponsor_url__
 from artisanlib.styles import combobox_style, dashboard_style
 from artisanlib.util import (getStyleIconPath, float2floatWeightVolume, convertVolume, convertWeight, volume_units,
     weight_units, weight_units_lower, toStringList, comma2dot, getResourcePath, open_link, toInt)
-from artisanlib.styles import tool_button_icon_style, artisan_push_button_style, artisan_minor_push_button_style, link_push_button_style
+from artisanlib.styles import (tool_button_icon_style, artisan_push_button_style, tool_button_frame_style,
+    artisan_minor_push_button_style, link_push_button_style, line_edit_style, separator_line_style)
 from plus.util import plusLink
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -82,42 +83,12 @@ class Dashboard(QWidget):
             self.ui.blend_comboBox.addItems(['Brazil Santos [30,7kg]','some cool','items that look','different','all of them'])
             self.ui.space_comboBox.addItems(['Brazil Santos [30,7kg]','some cool','items that look','different','all of them'])
 
-            # style
+            # set static styles
             self.ui.login_pushButton.setStyleSheet(artisan_push_button_style())
             self.ui.donate_pushButton.setStyleSheet(artisan_push_button_style())
 
-            self.ui.plus_button.setStyleSheet(artisan_push_button_style())
             self.ui.plus_button.setFixedSize(QSize(26,26))
-            self.ui.minus_button.setStyleSheet(artisan_push_button_style())
             self.ui.minus_button.setFixedSize(QSize(26,26))
-
-            self.ui.properties_pushButton.setStyleSheet(artisan_minor_push_button_style())
-            self.ui.compare_pushButton.setStyleSheet(artisan_minor_push_button_style())
-            self.ui.load_pushButton.setStyleSheet(artisan_minor_push_button_style())
-            self.ui.clear_pushButton.setStyleSheet(artisan_minor_push_button_style())
-            self.ui.create_pushButton.setStyleSheet(artisan_minor_push_button_style())
-
-            self.ui.documentation_pushButton.setStyleSheet(link_push_button_style)
-            self.ui.documentation_pushButton.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
-            self.ui.forum_pushButton.setStyleSheet(link_push_button_style)
-            self.ui.forum_pushButton.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
-            self.ui.issue_pushButton.setStyleSheet(link_push_button_style)
-            self.ui.issue_pushButton.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
-            self.ui.platform_pushButton.setStyleSheet(link_push_button_style)
-            self.ui.platform_pushButton.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
-
-            self.ui.custom_blend.setStyleSheet(tool_button_icon_style(self.aw.app.darkmode,
-                'pencil-edit-02-stroke-rounded-light.svg', 'pencil-edit-02-stroke-rounded-dark.svg'))
-            self.ui.sync.setStyleSheet(tool_button_icon_style(self.aw.app.darkmode,
-                'update-light.svg', 'update-light.svg'))
-            self.ui.scheduler_toolButton.setStyleSheet(tool_button_icon_style(self.aw.app.darkmode,
-                'calendar-03-stroke-rounded-blue.svg', 'calendar-03-stroke-rounded-blue.svg'))
-
-            self.ui.scheduler_frame.setStyleSheet("""
-                QFrame { border-width: 1px; border-style: solid; border-color: #BBBBBB; border-radius: 15px; background-color: #F3F3F3; }
-                QFrame:hover { background-color: '#E0E0E0'; }
-                QFrame:pressed { background-color: '#D0D0D0'; }
-            """)
 
             # font # TODO: (not: el, ar, zh, jp, he)
             artisan_font_semibold_file = os.path.join(getResourcePath(),'Nunito-SemiBold.ttf')
@@ -128,7 +99,7 @@ class Dashboard(QWidget):
             artisan_font_normal_families = QFontDatabase.applicationFontFamilies(artisan_font_normal_id)
 
             main_header_font_size = (14 if platform.system() == 'Windows' else 20)
-            sub_header_font_size = (10 if platform.system() == 'Windows' else 16)
+            sub_header_font_size = (8 if platform.system() == 'Windows' else 14)
             self.ui.roast_label.setFont(QFont(artisan_font_semibold_families[0], main_header_font_size, QFont.Weight.DemiBold))
             self.ui.profile_label.setFont(QFont(artisan_font_semibold_families[0], main_header_font_size, QFont.Weight.DemiBold))
             self.ui.inventory_group.setFont(QFont(artisan_font_normal_families[0], sub_header_font_size, QFont.Weight.Normal))
@@ -156,10 +127,10 @@ class Dashboard(QWidget):
             self.ui.compare_pushButton.setIconSize(QSize(14,14))
             self.ui.compare_pushButton.setIcon(QIcon(getStyleIconPath('git-compare-arrows-stroke-rounded-light.svg')))
 
-            self.ui.donate_pushButton.setIconSize(QSize(14,14))
+            self.ui.donate_pushButton.setIconSize(QSize(20,20))
             self.ui.donate_pushButton.setIcon(QIcon(getStyleIconPath('heart-handshake-stroke-rounded-white.svg')))
 
-            self.ui.login_pushButton.setIconSize(QSize(14,14))
+            self.ui.login_pushButton.setIconSize(QSize(20,20))
             self.ui.login_pushButton.setIcon(QIcon(getStyleIconPath('user-circle-stroke-rounded-dark.svg')))
 
             self.ui.documentation_pushButton.setIconSize(QSize(10,10))
@@ -170,31 +141,6 @@ class Dashboard(QWidget):
             self.ui.issue_pushButton.setIcon(QIcon(getStyleIconPath('external-link-stroke-rounded.svg')))
             self.ui.platform_pushButton.setIconSize(QSize(10,10))
             self.ui.platform_pushButton.setIcon(QIcon(getStyleIconPath('external-link-stroke-rounded.svg')))
-
-
-            if __release_sponsor_url__ == '': # pyright:ignore[reportUnnecessaryComparison]
-                self.ui.groupBox_sponsor.setVisible(False)
-            else:
-                try:
-                    self.ui.sponsor_logo_toolButton.setIcon(QIcon(Path.as_posix(Path(getResourcePath()).joinpath('release-sponsor-logo.svg'))))
-                    self.ui.sponsor_logo_toolButton.setIconSize(QSize(150,75))
-                    self.ui.sponsor_logo_toolButton.setStyleSheet("""
-                        FixedRatio2ToolButton {
-                            background-color: #ffffff;
-                            border: 0px solid;
-                            border-radius: 10px;
-                            min-width: 150px;
-                            max-width: 150px;
-                        }
-                        FixedRatio2ToolButton:hover {
-                            background-color: #fAfAfA;
-                        }
-                        FixedRatio2ToolButton:pressed {
-                            background-color: #f5f5f5;
-                        }
-                    """)
-                except Exception: # pylint: disable=broad-except
-                    self.ui.groupBox_sponsor.setVisible(False)
 
             # timers
             self.title_changed_timer = QTimer()
@@ -233,15 +179,15 @@ class Dashboard(QWidget):
         finally:
             self.setUpdatesEnabled(True) # re-enable display updates
 
-    @override
-    def mousePressEvent(self, a0:'QMouseEvent|None') -> None:
-        # Check if it's a left click
-        if a0 is not None and a0.button() == Qt.MouseButton.LeftButton and not (
-                self.ui.groupBox_roast.underMouse() or
-                self.ui.groupBox_profile.underMouse()):
-            self.canvas_clicked.emit()
-        # Call the base class implementation
-        super().mousePressEvent(a0)
+#    @override
+#    def mousePressEvent(self, a0:'QMouseEvent|None') -> None:
+#        # Check if it's a left click
+#        if a0 is not None and a0.button() == Qt.MouseButton.LeftButton and not (
+#                self.ui.groupBox_roast.underMouse() or
+#                self.ui.groupBox_profile.underMouse()):
+#            self.canvas_clicked.emit()
+#        # Call the base class implementation
+#        super().mousePressEvent(a0)
 
 
     def dashboard_active(self) -> bool:
@@ -253,11 +199,24 @@ class Dashboard(QWidget):
         else:
             self.show_dashboard()
 
+
+    def disable_graph_tools(self) -> None:
+        for graph_tool in [self.aw.ntb.home_tool, self.aw.ntb.back_tool, self.aw.ntb.forward_tool,
+                self.aw.ntb.pan_tool, self.aw.ntb.zoom_tool, self.aw.ntb.edit_curve_parameters_action]:
+            if graph_tool is not None:
+                graph_tool.setVisible(False)
+        self.aw.ntb.locLabel.setText('') # clear xy-mouse coordinates
+
+    def enable_graph_tools(self) -> None:
+        for graph_tool in [self.aw.ntb.home_tool, self.aw.ntb.back_tool, self.aw.ntb.forward_tool,
+                self.aw.ntb.pan_tool, self.aw.ntb.zoom_tool, self.aw.ntb.edit_curve_parameters_action]:
+            if graph_tool is not None:
+                graph_tool.setVisible(True)
+
     def enable_dashboard_toggle_toolbutton(self) -> None:
         if self.aw.ntb.dashboard_tool is not None:
 #            self.aw.ntb.dashboard_tool.setEnabled(True)
             self.aw.ntb.dashboard_tool.setVisible(True)
-
 
     def disable_dashboard_toggle_toolbutton(self) -> None:
         if self.aw.ntb.dashboard_tool is not None:
@@ -271,16 +230,19 @@ class Dashboard(QWidget):
             self.aw.stack.setCurrentIndex(1)
             self.update_dashboard()
             self.enable_dashboard_toggle_toolbutton()
+            self.disable_graph_tools()
 
     @pyqtSlot()
     def hide_dashboard(self) -> None:
         self.aw.stack.setCurrentIndex(0)
-        self.update_dashboard()
-        if (self.aw.ntb.dashboard_tool is not None and
-            (self.aw.qmc.flagstart or self.aw.qmc.designerflag or self.aw.comparator is not None)):
+        # always update tool icons
+        self.update_tool_icons()
+        self.aw.ntb.update_tools()
+        if (self.aw.qmc.flagstart or self.aw.qmc.designerflag or self.aw.comparator is not None):
             # disable dashboard/graph toggle toolbar button
             # while recording or if designer or comparator is open
             self.disable_dashboard_toggle_toolbutton()
+        self.enable_graph_tools()
 
     # if force, update even if not visible
     # if init_title, the title popup is re-initialized (only needed if the popup content changes, not if only the title changes)
@@ -325,12 +287,15 @@ class Dashboard(QWidget):
                 # profile
                 self.update_profile_section()
 
+                # release sponsor
+                self.update_release_sponsor(darkmode)
+
                 # starts
                 settings = QSettings()
                 starts = 0
                 if settings.contains('starts'):
                     starts = toInt(settings.value('starts'))
-                    self.ui.starts_label.setText(f'{starts} {QApplication.translate('Label','recordings')}')
+                    self.ui.starts_label.setText(QApplication.translate('Label',"You've roasted {} batches").format(starts))
             finally:
                 self.ui.recentFiles_comboBox.blockSignals(False)
 
@@ -338,24 +303,107 @@ class Dashboard(QWidget):
         self.update_tool_icons(darkmode)
         self.aw.ntb.update_tools()
 
+    def update_release_sponsor(self, darkmode:bool) -> None:
+        if __release_sponsor_url__ == '': # pyright:ignore[reportUnnecessaryComparison]
+            self.ui.groupBox_sponsor.setVisible(False)
+        else:
+            try:
+                self.ui.sponsor_logo_toolButton.setIcon(QIcon(Path.as_posix(Path(getResourcePath()).joinpath(
+                    'release-sponsor-logo-dark.svg' if darkmode else 'release-sponsor-logo.svg'))))
+                self.ui.sponsor_logo_toolButton.setIconSize(QSize(150,75))
+                self.ui.sponsor_logo_toolButton.setStyleSheet(f"""
+                    FixedRatio2ToolButton {{
+                        background-color: {'#414456' if darkmode else '#ffffff'};
+                        border: 0px solid;
+                        border-radius: 10px;
+                        min-width: 150px;
+                        max-width: 150px;
+                    }}
+                    FixedRatio2ToolButton:hover {{
+                        background-color: {'#494D61' if darkmode else '#fAfAfA'};
+                    }}
+                    FixedRatio2ToolButton:pressed {{
+                        background-color: {'#3A3C4C' if darkmode else '#f5f5f5'};
+                    }}
+                """)
+            except Exception: # pylint: disable=broad-except
+                self.ui.groupBox_sponsor.setVisible(False)
+
     def update_main_style(self, darkmode:bool) -> None:
-        combobox_stylesheet = combobox_style(False, getStyleIconPath('arrow-down-01-stroke-rounded-light.svg'))
-        self.setStyleSheet(dashboard_style(darkmode or self.aw.dashboard_background_image is not None) + combobox_stylesheet)
+        self.setStyleSheet(dashboard_style(darkmode, self.aw.dashboard_background_image is not None))
+        # sponsor
+        self.update_release_sponsor(darkmode)
+        # push buttons
+        self.ui.plus_button.setStyleSheet(artisan_push_button_style(darkmode))
+        self.ui.minus_button.setStyleSheet(artisan_push_button_style(darkmode))
+        self.ui.properties_pushButton.setStyleSheet(artisan_minor_push_button_style(darkmode))
+        self.ui.compare_pushButton.setStyleSheet(artisan_minor_push_button_style(darkmode))
+        self.ui.load_pushButton.setStyleSheet(artisan_minor_push_button_style(darkmode))
+        self.ui.clear_pushButton.setStyleSheet(artisan_minor_push_button_style(darkmode))
+        self.ui.create_pushButton.setStyleSheet(artisan_minor_push_button_style(darkmode))
+        # tool buttons
+        self.ui.custom_blend.setStyleSheet(tool_button_icon_style(darkmode,
+            'pencil-edit-02-stroke-rounded-light.svg', 'pencil-edit-02-stroke-rounded-dark.svg'))
+        self.ui.sync.setStyleSheet(tool_button_icon_style(darkmode,
+            'update-light.svg', 'update-dark.svg'))
+        self.ui.scheduler_toolButton.setStyleSheet(tool_button_icon_style(darkmode,
+            'calendar-03-stroke-rounded-blue.svg', 'calendar-03-stroke-rounded-blue.svg'))
+        self.update_schedule_toolbutton(darkmode)
+        #
+        self.ui.roast_frame.setStyleSheet(separator_line_style(darkmode))
+        self.ui.profile_frame.setStyleSheet(separator_line_style(darkmode))
+        #
+        self.ui.documentation_pushButton.setStyleSheet(link_push_button_style(darkmode))
+        self.ui.forum_pushButton.setStyleSheet(link_push_button_style(darkmode))
+        self.ui.issue_pushButton.setStyleSheet(link_push_button_style(darkmode))
+        self.ui.platform_pushButton.setStyleSheet(link_push_button_style(darkmode))
+        #
+        self.ui.title_comboBox.setStyleSheet(combobox_style(
+            darkmode,
+            getStyleIconPath('arrow-down-01-stroke-rounded-dark.svg' if darkmode else 'arrow-down-01-stroke-rounded-light.svg'),
+            'bold'))
+        combobox_stylesheet = combobox_style(
+            darkmode,
+            getStyleIconPath('arrow-down-01-stroke-rounded-dark.svg' if darkmode else 'arrow-down-01-stroke-rounded-light.svg'))
+        for combo_box in [self.ui.weight_unit_comboBox, self.ui.recentFiles_comboBox,
+                self.ui.beans_comboBox, self.ui.blend_comboBox, self.ui.space_comboBox]:
+            combo_box.setStyleSheet(combobox_stylesheet)
+        #
+        # lineedits: specify colors explicitly as OS dark/light-mode defaults don't apply here
+        line_edit_background_color_dark = '#171717'
+        line_edit_background_color_light = '#FFFFFF'
+        line_edit_color_dark = '#FFFFFF'
+        line_edit_color_light = '#000000'
+        line_edit_border_color_dark = '#555555'
+        line_edit_border_color_light = '#D7D7D7'
+        #
+        self.ui.weightinedit.setStyleSheet(
+            line_edit_style(
+                darkmode,
+                color = (line_edit_color_dark if darkmode else line_edit_color_light),
+                background_color = (line_edit_background_color_dark if darkmode else line_edit_background_color_light)))
+        #
+        self.ui.beans_textEdit.update_style(darkmode,
+            background_color = (line_edit_background_color_dark if darkmode else line_edit_background_color_light),
+            border_color = (line_edit_border_color_dark if darkmode else line_edit_border_color_light),
+            color = (line_edit_color_dark if darkmode else line_edit_color_light))
 
     def update_background(self) -> None:
+        darkmode = self.aw.dark_canvas_p()
         if self.aw.dashboard_background_image is None:
             self.aw.stack.setStyleSheet('QStackedWidget {{background-color: transparent; }}')
+        else:
+            self.aw.stack.setStyleSheet(f'QStackedWidget {{background-color: transparent; background-image: url({Path.as_posix(Path(self.aw.dashboard_background_image))}); }}')
+        if self.aw.dashboard_background_image is None or darkmode:
             for pane in [self.ui.groupBox_roast, self.ui.groupBox_profile, self.ui.groupBox_links,
                     self.ui.groupBox_links, self.ui.groupBox_donation]:
                 pane.setGraphicsEffect(None)
         else:
-            self.aw.stack.setStyleSheet(f'QStackedWidget {{background-color: transparent; background-image: url({Path.as_posix(Path(self.aw.dashboard_background_image))}); }}')
             for pane in [self.ui.groupBox_roast, self.ui.groupBox_profile, self.ui.groupBox_links,
                     self.ui.groupBox_links, self.ui.groupBox_donation]:
                 pane.setGraphicsEffect(self.aw.makeShadow(strong=True))
         self.update_image_tool_icon()
         # update overall style to get the border color of the panes right
-        darkmode = self.aw.dark_canvas_p()
         self.update_main_style(darkmode)
 
 
@@ -394,6 +442,13 @@ class Dashboard(QWidget):
             self.aw.exitToolButton.setVisible(False)
 #----
 
+    def update_schedule_toolbutton(self, dark:bool|None = None) -> None:
+        darkmode = (dark if dark is not None else self.aw.dark_canvas_p())
+        self.ui.scheduler_toolButton.setStyleSheet(tool_button_icon_style(darkmode,
+            ('calendar-03-stroke-rounded-dark.svg' if self.aw.plus_account is None or self.aw.app.artisanviewerMode else 'calendar-03-stroke-rounded-blue.svg'),
+            ('calendar-03-stroke-rounded-dark.svg' if self.aw.plus_account is None or self.aw.app.artisanviewerMode else 'calendar-03-stroke-rounded-blue.svg')))
+        # scheduler tool button frame
+        self.ui.scheduler_frame.setStyleSheet(tool_button_frame_style(darkmode))
 
     def update_inventory_section(self, force:bool=False) -> None:
         if force or self.aw.stack.currentIndex() == 1:
@@ -401,17 +456,16 @@ class Dashboard(QWidget):
             # enable/disable scheduler tool button
             self.ui.scheduler_frame.setEnabled(self.aw.plus_account is not None and not self.aw.app.artisanviewerMode)  # no scheduler in ArtisanViewer mode
             # scheduler tool icon
-            self.ui.scheduler_toolButton.setStyleSheet(tool_button_icon_style(self.aw.app.darkmode,
-                ('calendar-03-stroke-rounded-dark.svg' if self.aw.plus_account is None or self.aw.app.artisanviewerMode else 'calendar-03-stroke-rounded-blue.svg'),
-                ('calendar-03-stroke-rounded-dark.svg' if self.aw.plus_account is None or self.aw.app.artisanviewerMode else 'calendar-03-stroke-rounded-blue.svg')))
+            self.update_schedule_toolbutton()
 
     def clearPushButtonSetEnabled(self) -> None:
         self.ui.clear_pushButton.setEnabled(True)
         self.ui.clear_pushButton.setIcon(QIcon(getStyleIconPath('cancel-01-stroke-rounded-white.svg')))
 
     def clearPushButtonSetDisabled(self) -> None:
+        darkmode = self.aw.dark_canvas_p()
         self.ui.clear_pushButton.setEnabled(False)
-        self.ui.clear_pushButton.setIcon(QIcon(getStyleIconPath('cancel-01-stroke-rounded.svg')))
+        self.ui.clear_pushButton.setIcon(QIcon(getStyleIconPath('cancel-01-stroke-rounded-white.svg' if darkmode else 'cancel-01-stroke-rounded.svg')))
 
 
     pyqtSlot()
@@ -458,13 +512,15 @@ class Dashboard(QWidget):
     def update_compare_create_buttons(self) -> None:
         self.ui.compare_pushButton.setVisible(not self.aw.inProductionMode())
         self.ui.compare_pushButton.setEnabled(self.aw.curFile is not None)
+        darkmode = self.aw.dark_canvas_p()
         self.ui.compare_pushButton.setIcon(QIcon(getStyleIconPath(
-            'git-compare-arrows-stroke-rounded-dark.svg' if self.aw.curFile is None else 'git-compare-arrows-stroke-rounded-light.svg')))
+            ('git-compare-arrows-stroke-rounded-white.svg' if darkmode else 'git-compare-arrows-stroke-rounded.svg') if
+                self.aw.curFile is None else 'git-compare-arrows-stroke-rounded-white.svg')))
         #
         self.ui.create_pushButton.setVisible(not self.aw.inProductionMode())
         self.ui.create_pushButton.setEnabled(not self.aw.qmc.flagon)
         self.ui.create_pushButton.setIcon(QIcon(getStyleIconPath(
-            'add-01-stroke-rounded-dark.svg' if self.aw.qmc.flagon else 'add-01-stroke-rounded-white.svg')))
+            ('add-01-stroke-rounded-white.svg' if darkmode else 'add-01-stroke-rounded.svg') if self.aw.qmc.flagon else 'add-01-stroke-rounded-white.svg')))
 
     # slots
 

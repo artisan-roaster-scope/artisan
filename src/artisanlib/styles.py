@@ -118,14 +118,40 @@ def artisan_push_button_style(dark:bool=False) -> str:
 def artisan_minor_push_button_style(dark:bool=False) -> str:
     return f"""
         QPushButton {{
-            background-color: {'#3B3B3B' if dark else '#B0B0B0'};
+            background-color: {'#3B3B3B' if dark else '#B7B7B7'};
             color: {'#DEDEDE' if dark else '#FFFFFF'};
             border: {'1px solid #4A4A4A' if dark else '0px solid'};
             border-radius: 12px;
             padding: {'3px' if dark else '4px'} 10px;
         }}
         QPushButton:hover {{
-            background-color: {'#4B4B4B' if dark else '#B7B7B7'};
+            background-color: {'#4B4B4B' if dark else '#C7C7C7'};
+        }}
+        QPushButton:pressed {{
+            background-color: {'#5B5B5B' if dark else '#979797'};
+        }}
+        QPushButton:disabled {{
+            background-color: {'#303030' if dark else '#E8E8E8'};
+            color: {'#8F8F8F' if dark else '#8E8E93'};
+        }}
+    """
+
+@functools.lru_cache
+def link_push_button_style(dark:bool=False) -> str:
+    return f"""
+        QPushButton {{
+            background-color: {'#3B3B3B' if dark else '#B7B7B7'};
+            color: {'#DEDEDE' if dark else '#FFFFFF'};
+            border: 0px solid;
+            border-radius: 8px;
+            padding: 4px 0px;
+            max-height: 10px;
+            text-align: left;
+            padding-right: 10px;
+            padding-left: 10px;
+        }}
+        QPushButton:hover {{
+            background-color: {'#4B4B4B' if dark else '#C7C7C7'};
         }}
         QPushButton:pressed {{
             background-color: {'#5B5B5B' if dark else '#979797'};
@@ -135,30 +161,6 @@ def artisan_minor_push_button_style(dark:bool=False) -> str:
             color: {'#8F8F8F' if dark else '#8E8E93'};
         }}
     """
-
-link_push_button_style: str = """
-    QPushButton {
-        background-color: #B7B7B7;
-        color: #FFFFFF;
-        border: 0px solid;
-        border-radius: 8px;
-        padding: 4px 0px;
-        max-height: 10px;
-        text-align: left;
-        padding-right: 10px;
-        padding-left: 10px;
-    }
-    QPushButton:hover {
-        background-color: #AFAFAF;
-    }
-    QPushButton:pressed {
-        background-color: #909090;
-    }
-    QPushButton:disabled {
-        background-color: #F8F8F8;
-        color: #8E8E93;
-    }
-"""
 
 @functools.lru_cache
 def tool_button_icon_style(dark:bool, light_icon:str, dark_icon:str, border_width:int = 3, border_radius:int = 7) -> str:
@@ -678,7 +680,7 @@ def line_edit_style(dark:bool = False, bold:bool = False, color:str = 'palette(t
             border: 1px solid {'#555555' if dark else '#D6D6D6'};
             border-radius: 5px;
             color: {color};
-            selection-color: {color};
+/*            selection-color: {color};  automatic set if not given*/
             background-color: {background_color};
             {f'selection-background-color: {selection_background_color};' if selection_background_color is not None else ''}
             padding: 2px 5px 2px 5px; }}
@@ -956,23 +958,59 @@ def combobox_style(dark:bool, down_arrow_icon_path:str, font_weight:str = 'norma
 """
 
 
+
+# separator line style
+
+def separator_line_style(dark:bool) -> str:
+    return f"""
+        QFrame[frameShape="4"] {{
+            border: none;
+            max-height: 2px;
+            background-color: {'rgb(55, 55, 55)' if dark else 'rgb(216, 216, 216)'};
+        }}
+    """
+
+
+# tool button frame style
+
+def tool_button_frame_style(dark:bool) -> str:
+    return f"""
+        QFrame {{
+            border-width: 1px;
+            border-style: solid;
+            border-color: {'rgb(65, 65, 65)' if dark else '#BBBBBB'};
+            border-radius: 15px;
+            background-color: {'#404040' if dark else '#F3F3F3'};
+        }}
+        QFrame:hover {{
+            background-color: {'#555555' if dark else '#E0E0E0'};
+        }}
+        QFrame:pressed {{
+            background-color: {'#777777' if dark else '#D0D0D0'};
+        }}
+        QFrame:disabled {{
+            background-color: {'#303030' if dark else '#E8E8E8'};
+        }}
+    """
+
 # dashboard style
 
-def dashboard_style(dark:bool) -> str:
+def dashboard_style(dark:bool, group_border_class:bool) -> str:
     return f"""
     QLabel {{
         background-color: transparent;
         border-style: none;
         border-width: 0px;
-        color: palette(buttontext);
+        color: {'#EEEEEE' if dark else 'rgb(102, 102, 102)'};
     }}
     QGroupBox {{
         color: palette(buttontext);
         border-style:solid;
         border-width: 2px;
         border-radius: 18px;
-        border-color: {'rgb(240, 240, 240)' if dark else 'rgb(210, 210, 210)'};
-        background-color: rgba(240, 240, 240, 90%);
+        border-color: {('rgb(35, 35, 35)' if group_border_class else 'rgb(65, 65, 65)') if dark else
+            ('rgb(240, 240, 240)' if group_border_class else 'rgb(210, 210, 210)')};
+        background-color: {'rgba(41, 41, 41, 90%)' if dark else 'rgba(240, 240, 240, 90%)'};
     }}
     QGroupBox:title {{
         top: 7px;
@@ -987,35 +1025,14 @@ def dashboard_style(dark:bool) -> str:
         padding-top: 10px;
         border-width: 1px;
         border-style:solid;
-        border-color: rgb(216, 216, 216);
+        border-color: {'rgb(65, 65, 65)' if dark else 'rgb(216, 216, 216)'};
         border-radius: 10px;
-        background-color: rgb(245, 245, 245);
+        background-color: {'rgb(50, 50, 50)' if dark else 'rgb(245, 245, 245)'};
     }}
     QWidget#inventory_page {{
-        background-color: rgb(245, 245, 245);
+        background-color: {'rgb(50, 50, 50)' if dark else 'rgb(245, 245, 245)'};
     }}
     QWidget#no_inventory_page {{
-        background-color: rgb(245, 245, 245);
-    }}
-    QLineEdit {{
-        background-color: #FFFFFF;
-        border: 1px solid #D1D1D6;
-        border-radius: 5px;
-        padding: 4px 8px;
-        color: #1C1C1E;
-        selection-background-color: palette(accent);
-        selection-color: #FFFFFF;
-        font-size: 13px;
-    }}
-    QLineEdit:focus {{
-        border: 1px solid palette(accent);
-        background-color: #FFFFFF;
-        outline: none;
-        padding: 2px 8px 2px 8px;
-    }}
-    QLineEdit:disabled {{
-        background-color: #F2F2F7;
-        color: #AEAEB2;
-        border: 1px solid #E5E5EA;
+        background-color: {'rgb(50, 50, 50)' if dark else 'rgb(245, 245, 245)'};
     }}
 """

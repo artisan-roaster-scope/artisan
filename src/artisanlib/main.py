@@ -737,6 +737,12 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
 
         self.dashboard_tool:QAction|None = next(tool for tool in cast(list[QAction], self.findChildren(QAction)) if tool.text() == 'Dashboard')
 
+        self.home_tool:QAction|None = next(tool for tool in cast(list[QAction], self.findChildren(QAction)) if tool.text() == 'Home')
+        self.back_tool:QAction|None = next(tool for tool in cast(list[QAction], self.findChildren(QAction)) if tool.text() == 'Back')
+        self.forward_tool:QAction|None = next(tool for tool in cast(list[QAction], self.findChildren(QAction)) if tool.text() == 'Forward')
+        self.pan_tool:QAction|None = next(tool for tool in cast(list[QAction], self.findChildren(QAction)) if tool.text() == 'Pan')
+        self.zoom_tool:QAction|None = next(tool for tool in cast(list[QAction], self.findChildren(QAction)) if tool.text() == 'Zoom')
+
         self.setIconSize(QSize(35,35))
 
         self.aw.updatePlusStatus(self)
@@ -765,10 +771,6 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
             toolbar_ext_button.setIcon(self._icon('ext_button'))
 
         self.setContentsMargins(0,0,2,0) # left, top, right, bottom # make space for the toolbar ext. icon
-
-#######################################################################################
-#####   temporary hack for windows till better solution found about toolbar icon problem with py2exe and svg
-#######################################################################################
 
     def add_toolbar_lines_configuration(self) -> None:
         if len(self.actions()) > 0 and self.edit_curve_parameters_action is None: # pyright:ignore[reportUnknownArgumentType]
@@ -4172,7 +4174,7 @@ class ApplicationWindow(QMainWindow):
             menuBar.addMenu(self.helpMenu)
 
     def set_toolbar(self, ui_mode:UI_MODE) -> None:
-        if ui_mode is UI_MODE.EXPERT:
+        if ui_mode is UI_MODE.EXPERT and not self.dashboard.dashboard_active():
             self.ntb.add_toolbar_lines_configuration()
         else:
             self.ntb.remove_toolbar_lines_configuration()
@@ -13327,7 +13329,7 @@ class ApplicationWindow(QMainWindow):
                 self.eNumberSpinBox.setValue(int(lenevents))
                 return
             self.lineEvent.setText(self.qmc.specialeventsStrings[currentevent-1])
-            if self.qmc.timeindex[0] > -1 and len(self.qmc.timex) > self.qmc.timeindex[0]:
+            if -1 < self.qmc.timeindex[0] < len(self.qmc.timex):
                 timez = stringfromseconds(self.qmc.timex[self.qmc.specialevents[currentevent-1]]-self.qmc.timex[self.qmc.timeindex[0]])
             else:
                 timez = stringfromseconds(self.qmc.timex[self.qmc.specialevents[currentevent-1]])
@@ -16344,7 +16346,7 @@ class ApplicationWindow(QMainWindow):
                 output = 'Metrics not available: profile is zero length.'
 
             # Find some BBP data
-            if ( len(self.qmc.timeindex)>0 and self.qmc.timeindex[0]>-1 and len(self.qmc.timex)>self.qmc.timeindex[0] and
+            if (len(self.qmc.timeindex) > 0 and -1 < self.qmc.timeindex[0] < len(self.qmc.timex) and
                     ( self.qmc.timex[self.qmc.timeindex[0]] > 0 ) and ( self.qmc.timex[self.qmc.timeindex[0]] - self.qmc.timex[0] >= 60 ) ):  #greater than 1 minute
                 try:
                     # fake the events
@@ -24218,7 +24220,7 @@ class ApplicationWindow(QMainWindow):
                                     ts = self.qmc.timeclock.elapsed()/1000.
                                     self.qmc.AUCguideTime = ts + roots[0]*60 # takes the first positive root and calculates the time in seconds until the target AUC is reached
                                 if self.qmc.l_AUCguide is not None:
-                                    if self.qmc.AUCguideTime > 0 and self.qmc.AUCguideTime < self.qmc.endofx:
+                                    if 0 < self.qmc.AUCguideTime < self.qmc.endofx:
                                         self.qmc.l_AUCguide.set_xdata([self.qmc.AUCguideTime])
                                         self.qmc.l_AUCguide.set_visible(True)
                                     else:

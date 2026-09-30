@@ -317,6 +317,7 @@ for fn in [
     r'includes\logging.json',
     r'includes\artisan_public_key.pem',
     r'includes\release-sponsor-logo.svg',
+    r'includes\release-sponsor-logo-dark.svg',
     ]:
     copy_file(fn, TARGET)
 

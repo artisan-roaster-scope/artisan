@@ -915,14 +915,14 @@ class profileTransformatorDlg(ArtisanDialog):
         for i, _ in enumerate(timex):
             # first fit is to be applied for all readings before DRY
             j = 0
-            if self.aw.qmc.timeindex[6] > 0 and i >= self.aw.qmc.timeindex[6]:
+            if 0 < self.aw.qmc.timeindex[6] <= i:
                 # last fit counts after DROP
                 j = 4
-            elif self.aw.qmc.timeindex[4] > 0 and i >= self.aw.qmc.timeindex[4]:
+            elif 0 < self.aw.qmc.timeindex[4] <= i:
                 j = 3 # after SCs
-            elif self.aw.qmc.timeindex[2] > 0 and i >= self.aw.qmc.timeindex[2]:
+            elif 0 < self.aw.qmc.timeindex[2] <= i:
                 j = 2 # after FCs
-            elif self.aw.qmc.timeindex[1] > 0 and i >= self.aw.qmc.timeindex[1]:
+            elif 0 < self.aw.qmc.timeindex[1] <= i:
                 j = 1 # after DRY
             fitsj = fits[j]
             if fitsj is None:
@@ -1003,14 +1003,14 @@ class profileTransformatorDlg(ArtisanDialog):
             for i, _ in enumerate(self.org_temp2):
                 # first fit is to be applied for all readings before DRY
                 j = 0
-                if self.aw.qmc.timeindex[6] > 0 and i >= self.aw.qmc.timeindex[6]:
+                if 0 < self.aw.qmc.timeindex[6] <= i:
                     # last fit counts after DROP
                     j = 4
-                elif self.aw.qmc.timeindex[4] > 0 and i >= self.aw.qmc.timeindex[4]:
+                elif 0 < self.aw.qmc.timeindex[4] <= i:
                     j = 3 # after SCs
-                elif self.aw.qmc.timeindex[2] > 0 and i >= self.aw.qmc.timeindex[2]:
+                elif  0 < self.aw.qmc.timeindex[2] <= i:
                     j = 2 # after FCs
-                elif self.aw.qmc.timeindex[1] > 0 and i >= self.aw.qmc.timeindex[1]:
+                elif 0 < self.aw.qmc.timeindex[1] <= i:
                     j = 1 # after DRY
 
                 tp = self.org_temp2[i]

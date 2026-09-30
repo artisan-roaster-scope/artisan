@@ -124,7 +124,8 @@ DATA_FILES = [
         (r'includes/Themes', './Themes'),
         (r'includes/Icons', './Icons'),
         (r'includes/logging.json', '.'),
-	(r'includes/release-sponsor-logo.svg', '.')
+	(r'includes/release-sponsor-logo.svg', '.'),
+	(r'includes/release-sponsor-logo-dark.svg', '.')
 ]
 
 # add Artisan translations to DATA_FILES

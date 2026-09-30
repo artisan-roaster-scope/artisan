@@ -115,7 +115,7 @@ class Worker(QObject): # pyright: ignore [reportGeneralTypeIssues]
                         iters = 0
                     if 'data' in item and 'modified_at' in item['data']:
                         item_age = time.time()-util.ISO86012epoch(item['data']['modified_at'])
-                        if (config.queue_discard_after > 0 and item_age > config.queue_discard_after):
+                        if 0 < config.queue_discard_after < item_age:
                             # old item scheduled to be removed from the queue
                             iters = 0
                             _log.debug('-> expired item %s removed from queue (%s min)',item['data']['roast_id'],int(round(item_age/60)))

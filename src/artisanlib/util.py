@@ -992,7 +992,7 @@ def findTPint(timeindex:list[int], timex:list[float], temp:list[float]) -> int:
     if start < SOR_index < end:
         start = SOR_index
     for i in range(end - 1, start -1, -1):
-        if temp[i] > 0 and temp[i] < TP:
+        if 0 < temp[i] < TP:
             TP = temp[i]
             idx = i
     return idx
@@ -1614,7 +1614,7 @@ def roast_time(timeindex:list[int], timex:list[float]) -> float|None:
     if len(timex) == 0 or len(timeindex) < 7:
         return None
     starttime = (timex[timeindex[0]] if timeindex[0] != -1 and timeindex[0] < len(timex) else 0)
-    endtime = (timex[timeindex[6]] if timeindex[6] > 0  and timeindex[6] < len(timex) else timex[-1])
+    endtime =  (timex[timeindex[6]] if 0 < timeindex[6] < len(timex) else timex[-1])
     return endtime - starttime
 
 # return the total roasting time of the given profile in seconds
@@ -1762,10 +1762,10 @@ def roast_message(profile:'ProfileData', org_id:str|None = None, machine_id:str|
     # remove readings before CHARGE and after DROP
     start_idx:int = 0
     end_idx:int = len(timex)
-    if seconds_before_charge is not None and timeindex[0]>-1 and timeindex[0]<len(timex):
+    if seconds_before_charge is not None and -1 < timeindex[0] < len(timex):
         readings_before,_ = divmod(seconds_before_charge,sampling_interval)
         start_idx = max(0,timeindex[0]-readings_before)
-    if seconds_after_drop is not None and timeindex[6]>0 and timeindex[6]<len(timex):
+    if seconds_after_drop is not None and 0 < timeindex[6] < len(timex):
         readings_after,_ = divmod(seconds_after_drop,sampling_interval)
         end_idx = min(end_idx, timeindex[6]+readings_after+1)
     # adjust roastepoch (start of recording) by adding the duration removed
@@ -1809,7 +1809,7 @@ def roast_message(profile:'ProfileData', org_id:str|None = None, machine_id:str|
     # roast start / CHARGE
     last_idx:int = 0
     charge_offset:int = 0 # delta in seconds between time[0] (start of recording; roastepoch) and CHARGE (start of roast)
-    if len(timeindex)>0 and timeindex[0]>-1 and len(timex_resampled)>timeindex[0]:
+    if len(timeindex)>0 and timeindex[0] > -1 and -1 < timeindex[0] < len(timex_resampled):
         charge_offset = timex_resampled[timeindex[0]]
         roast.milestones.charge_idx = timeindex[0]
         last_idx = timeindex[0]
@@ -1822,22 +1822,22 @@ def roast_message(profile:'ProfileData', org_id:str|None = None, machine_id:str|
         last_idx = timeindex[1]
 
     # FIRST CRACK START
-    if len(timeindex)>1 and timeindex[2]>0 and len(timex_resampled)>timeindex[2]>last_idx:
+    if len(timeindex)>2 and timeindex[2]>0 and len(timex_resampled)>timeindex[2]>last_idx:
         roast.milestones.first_crack_start_idx = timeindex[2]
         last_idx = timeindex[2]
 
     # FIRST CRACK END
-    if len(timeindex)>1 and timeindex[3]>0 and len(timex_resampled)>timeindex[3]>last_idx:
+    if len(timeindex)>3 and timeindex[3]>0 and len(timex_resampled)>timeindex[3]>last_idx:
         roast.milestones.first_crack_end_idx = timeindex[3]
         last_idx = timeindex[3]
 
     # SECOND CRACK START
-    if len(timeindex)>1 and timeindex[4]>0 and len(timex_resampled)>timeindex[4]>last_idx:
+    if len(timeindex)>4 and timeindex[4]>0 and len(timex_resampled)>timeindex[4]>last_idx:
         roast.milestones.second_crack_start_idx = timeindex[4]
         last_idx = timeindex[4]
 
     # SECOND CRACK END
-    if len(timeindex)>1 and timeindex[5]>0 and len(timex_resampled)>timeindex[5]>last_idx:
+    if len(timeindex)>5 and timeindex[5]>0 and len(timex_resampled)>timeindex[5]>last_idx:
         roast.milestones.second_crack_end_idx = timeindex[5]
         last_idx = timeindex[5]
 
@@ -1955,8 +1955,8 @@ def roast_message(profile:'ProfileData', org_id:str|None = None, machine_id:str|
                 True,               # optimal smoothing
                 time_lin,
                 delta_ET_filter,    # delta filter
-                (timeindex[0] if len(timeindex)>0 and timeindex[0]>-1 and len(timex)>timeindex[0] else 0),           # roast_start_idx
-                (timeindex[6] if len(timeindex)>6 and timeindex[6]>0 and len(timex)>timeindex[6] else len(timex)-1), # roast_end_idx
+                (timeindex[0] if len(timeindex)>0 and -1 < timeindex[0] < len(timex) else 0),           # roast_start_idx
+                (timeindex[6] if len(timeindex)>6 and 0 < timeindex[6] < len(timex) else len(timex)-1), # roast_end_idx
                 True, # polyfit ror computation (in combination with optimal smoothing this results in the application of the optimal Savgol filter)
                 medfilt_factor_RoR, # median filter factor RoR
                 False,              # no further dropout filtering
@@ -1977,8 +1977,8 @@ def roast_message(profile:'ProfileData', org_id:str|None = None, machine_id:str|
                 True,               # optimal smoothing
                 time_lin,
                 delta_BT_filter,    # delta filter
-                (timeindex[0] if len(timeindex)>0 and timeindex[0]>-1 and len(timex)>timeindex[0] else 0),           # roast_start_idx
-                (timeindex[6] if len(timeindex)>6 and timeindex[6]>0 and len(timex)>timeindex[6] else len(timex)-1), # roast_end_idx
+                (timeindex[0] if len(timeindex)>0 and -1 < timeindex[0] < len(timex) else 0),           # roast_start_idx
+                (timeindex[6] if len(timeindex)>6 and 0 < timeindex[6] < len(timex) else len(timex)-1), # roast_end_idx
                 True, # polyfit ror computation (in combination with optimal smoothing this results in the application of the optimal Savgol filter)
                 medfilt_factor_RoR, # median filter factor RoR
                 False,              # no further dropout filtering

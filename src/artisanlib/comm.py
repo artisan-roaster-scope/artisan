@@ -2846,7 +2846,7 @@ class serialport:
                     s2 = hex2int(r[index+7],r[index+8])/10.
 
                     # 64="\x40"  67="\x43" 194="\xC2" 195="\xC3"
-                    if ((r[index+11] >= 64 and r[index+11] <= 67) or (r[index+11] >= 194 and r[index+11] <= 195)):
+                    if ((64 <= r[index + 11] <= 67) or (194 <= r[index + 11] <= 195)):
                         s1 = -1.
 
                     if r[index+12] == 64: # 64="\x40"

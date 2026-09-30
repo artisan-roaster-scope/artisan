@@ -133,6 +133,7 @@ cp includes/site.webmanifest dist
 cp includes/logging.json dist
 cp includes/artisan_public_key.pem dist
 cp includes/release-sponsor-logo.svg dist
+cp includes/release-sponsor-logo-dark.svg dist
 cp -R icons dist
 cp -R Wheels dist
 cp README.txt dist

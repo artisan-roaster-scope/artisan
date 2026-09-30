@@ -115,6 +115,7 @@ class MSG(IntEnum):
     SETTINGS = 6
     INFO = 7
     STATUS = 8
+    SETTING_CHANGE = 10 # set a single parameter
     IDENTIFY = 11
     EVENT = 12
     TIMER = 13
@@ -125,6 +126,7 @@ class MSG(IntEnum):
 class CMD(IntEnum):
     SYSTEM_SA = 0
     INFO_A = 7
+    STATUS_S = 6 # actively query scale status (cmd 6, must carry a 1-byte payload)
     STATUS_A = 8
     EVENT_SA = 12
 
@@ -140,6 +142,29 @@ class LED_EFFECT(IntEnum):
     HALO = 1
     WIPE_OFF = 2
     BREATHE = 3
+
+class SETTING_ITEM(IntEnum):
+    RESOLUTION = 3
+    FILTER = 12
+    ZERO_TRACKING = 13
+
+class RESOLUTION_SETTING(IntEnum):
+    ONE_GRAM = 0 # default
+    TEN_GRAM = 1
+    TWENTY_GRAM = 2
+
+class FILTER_SETTING(IntEnum):
+    MOST_SENSITIVE = 1 # default
+    SENSITIVE = 2
+    LESS_SENSITIVE = 3
+    LEAST_SENSITIVE = 4
+
+class ZERO_TRACKING_SETTING(IntEnum):
+    OFF = 0
+    FIVE_GRAM_RANGE = 1
+    NINE_GRAM_RANGE = 2
+    TWENTY_GRAM_RANGE = 3 # default
+    THIRTY_GRAM_RANGE = 4
 
 # Event types
 @unique
@@ -236,10 +261,12 @@ HEADER2:Final[bytes]      = b'\xdd'
 
 HEARTBEAT_FREQUENCY:Final[int] = 5 # send the heartbeat every 5 sec
 
-RELAY_NON_STREAMING:Final[bool] = True # if set, non-streaming mode on relay scales is enabled
+RELAY_NON_STREAMING:Final[bool] = True # if set, non-streaming mode on relay scales
+    # respects calls to enable_streaming() for high reactivity during active weighing and disable_streaming() for calm communication in between
 #if set, default Acaia relay (and COSMO) scales to streaming mode, otherwise  work in non-streaming mode reporting only weight changes
+WEIGHT_AVERAGING:Final[bool] = True # if set, received stable weights are running through a average filter
 WEIGHT_ROUNDING:Final[bool] = False # if set, received weights are rounded to appropriate values based on scales readability
-# rounding for scales with readability>1 (to 4g), no rounding otherwise
+# rounding for scales with readability>1 (to 2g), no rounding otherwise
 
 
 # ISP versions -> device model (CSMO series)
@@ -261,10 +288,11 @@ BROWN:Final[Color] = (255,60,0)
 
 class AcaiaProtocol:
 
-    __slots__ = [ '_send', '_weight_changed_handler', '_battery_changed_handler', '_tare_pressed_handler', '_logging', 'stable_only',
-            'decimals', 'heartbeat_frequency', 'scale_class', 'id_sent', 'info_msg_received', 'device_identified', 'fast_notifications_sent', 'slow_notifications_sent',
-            'stable_weight', 'battery', 'isp_version', 'firmware', 'unit', 'max_weight', 'readability', 'repeatability', 'auto_off_timer', 'has_leds' ]
-
+    __slots__ = [ '_send', '_weight_changed_handler', '_battery_changed_handler', '_tare_pressed_handler', '_logging',
+            '_setting_ack_id', 'stable_only', 'decimals', 'heartbeat_frequency', 'scale_class', 'id_sent',
+            'info_msg_received', 'device_identified', 'fast_notifications_sent', 'slow_notifications_sent',
+            'stable_weight', 'battery', 'isp_version', 'firmware', 'unit', 'max_weight', 'readability',
+            'repeatability', 'auto_off_timer', 'has_leds' ]
 
     def __init__(self,
             send:Callable[[bytes], None],
@@ -286,6 +314,9 @@ class AcaiaProtocol:
         self.stable_only:bool = stable_only
         self.decimals:int = decimals
         self.heartbeat_frequency = HEARTBEAT_FREQUENCY
+
+        # internal state
+        self._setting_ack_id:int = 0   # [CSMO] cmd10 setting correlation token (cycles 1~255)
 
         # scale class
         self.scale_class:SCALE_CLASS = SCALE_CLASS.MODERN
@@ -312,6 +343,11 @@ class AcaiaProtocol:
 
         ###
 
+    def _next_ack_id(self) -> int:
+        """Increment the setting correlation token (cycles 1~255, skipping 0)."""
+        self._setting_ack_id = (self._setting_ack_id % 255) + 1
+        return self._setting_ack_id
+
     # configuration
 
     def get_max_weight(self) -> float:
@@ -336,6 +372,13 @@ class AcaiaProtocol:
     def on_connect(self) -> None:
         self.reset_parser()
 
+    def is_COSMO(self) -> bool:
+        return self.isp_version in {ISP_VERSION_CSMO_S, ISP_VERSION_CSMO_L}
+
+    def configure_COSMO_100(self) -> None:
+        _log.debug('configure COSMO 100')
+        self.send_update_setting(self.update_setting_payload(SETTING_ITEM.FILTER, FILTER_SETTING.MOST_SENSITIVE))
+
     # configure for the specific scale based on the available ISP version received
     def identify_device(self) -> None:
         if not self.device_identified:
@@ -349,6 +392,7 @@ class AcaiaProtocol:
                 self.scale_class = SCALE_CLASS.RELAY
                 self.set_heartbeat_frequency(0) # disable heartbeat
                 _log.info('connected to Acaia Cosmo 100kg (serial)')
+                self.configure_COSMO_100()
             #elif self.isp_version == ISP_VERSION_CSMO_S:
             else:
                 # fallback to COSMO-10
@@ -418,8 +462,8 @@ class AcaiaProtocol:
                         self.readability = 0.1
                         self.repeatability = 0.1
                         _log.info('connected to Acaia Relay: %s', connected_device_name)
-                    self.fast_notifications()
-                    self.clear_fast_notifications_sent()
+#                    self.fast_notifications()
+#                    self.clear_fast_notifications_sent()
 
             elif connected_service_UUID == ACAIA_SERVICE_UUID:
                 self.scale_class = SCALE_CLASS.MODERN
@@ -451,8 +495,9 @@ class AcaiaProtocol:
                         # COSMO is still a relay scale
                         self.scale_class = SCALE_CLASS.RELAY
                         self.set_heartbeat_frequency(0) # disable heartbeat
-                        self.fast_notifications()
-                        self.clear_fast_notifications_sent()
+#                        self.fast_notifications()
+#                        self.clear_fast_notifications_sent()
+                        self.configure_COSMO_100()
                         _log.info('connected to Acaia Cosmo 100kg (BLE): %s', connected_device_name)
                     elif connected_device_name.startswith('COSMO-10'):
                         # Acaia Cosmo 10kg
@@ -463,8 +508,8 @@ class AcaiaProtocol:
                         # COSMO is still a relay scale
                         self.scale_class = SCALE_CLASS.RELAY
                         self.set_heartbeat_frequency(0) # disable heartbeat
-                        self.fast_notifications()
-                        self.clear_fast_notifications_sent()
+#                        self.fast_notifications()
+#                        self.clear_fast_notifications_sent()
                         _log.info('connected to Acaia Cosmo 10kg (BLE): %s', connected_device_name)
                     else:
                         # Acaia Lunar (PEARLS)
@@ -512,8 +557,7 @@ class AcaiaProtocol:
 
         if len(data)>5:
             self.firmware = (data[3],data[4],data[5]) # main/sub/add
-            if self._logging:
-                _log.debug('firmware: %s.%s.%s', self.firmware[0], self.firmware[1], f'{self.firmware[2]:>03}')
+            _log.debug('firmware: %s.%s.%s', self.firmware[0], self.firmware[1], f'{self.firmware[2]:>03}')
 
             # data[2] ISP_VERSION
 #        if len(data)>6:
@@ -558,9 +602,12 @@ class AcaiaProtocol:
         if self._logging:
             _log.debug('update_weight(%s,%s)', value, stable)
         if value is not None and (not self.stable_only or stable):
+            if WEIGHT_AVERAGING and self.stable_weight is not None and stable and abs(self.stable_weight - value)<6:
+                # only average small stable weight updates
+                value = (value + self.stable_weight + self.stable_weight) / 3
             if WEIGHT_ROUNDING and self.repeatability >= 1:
-                # round to full 4g
-                value = round_base(value, 4)
+                # round to full 2g
+                value = round_base(value, 2)
                 ## round to full 10g
                 ##value = round(value, -1)
             # convert the weight in g delivered with one decimal to an int
@@ -793,32 +840,41 @@ class AcaiaProtocol:
 #                _log.debug('sleep: %s%s', payload[4], (f' ({sleep_modes[payload[4]]})' if (payload[4] in sleep_modes) else ''))
 
         # byte 5:
-#        if payload and len(payload) > 5:
-#            if self.scale_class == SCALE_CLASS.RELAY:
-#                # relay scales: resolution setting
-#                _log.debug('resolution: %s', ('0.01g' if payload[5] else '0.1g')) # resolution/readability: 0.1g / 0.01g
-#            else:
-#                # display scales: key disabled (0: off , 1: on)
-#                _log.debug('keys disabled: %s', ('on' if payload[5] else 'off'))
+        if payload and len(payload) > 5:
+            if self.scale_class == SCALE_CLASS.RELAY:
+                if self.is_COSMO():
+                    _log.debug('resolution: %s', payload[5])
+                else:
+                    # relay scales: resolution setting
+                    _log.debug('resolution: %s', ('0.01g' if payload[5] else '0.1g')) # resolution/readability: 0.1g / 0.01g
+            else:
+                # display scales: key disabled (0: off , 1: on)
+                _log.debug('keys disabled: %s', ('on' if payload[5] else 'off'))
 
-#        # byte 6:
-#        if payload and len(payload) > 6:
-#            if self.scale_class == SCALE_CLASS.RELAY:
-#                # relay scales: magic relay sensing (low/normal/high)
-#                _log.debug('magic relay sensing: %s', payload[6])
-#                # 0: low, 1: normal, 2: high
-#            else:
-#                # display scales: beep setting (0:off, 1:on)
-#                _log.debug('sound: %s', ('on' if payload[6] else 'off'))
+        # byte 6:
+        if payload and len(payload) > 6:
+            if self.scale_class == SCALE_CLASS.RELAY:
+                if self.is_COSMO():
+                    _log.debug('filter sensitivity: %s', payload[6])
+                else:
+                    # relay scales: magic relay sensing (low/normal/high)
+                    _log.debug('magic relay: %s', payload[6])
+                    # 0: low, 1: normal, 2: high
+            else:
+                # display scales: beep setting (0:off, 1:on)
+                _log.debug('sound: %s', ('on' if payload[6] else 'off'))
 
         # byte 7:
-#        if payload and len(payload) > 7:
-#            if self.scale_class == SCALE_CLASS.RELAY:
-#                # relay scales: magic relay beep
-#                _log.debug('magic relay beep: %s', ('on' if payload[7] else 'off'))
-#            else:
-#                # display scales: resolution (0:default, 1:high)
-#                _log.debug('resolution: %s', ('high' if payload[7] else 'default'))
+        if payload and len(payload) > 7:
+            if self.scale_class == SCALE_CLASS.RELAY:
+                if self.is_COSMO():
+                    _log.debug('zero tracking: %s', payload[7])
+                else:
+                    # relay scales: magic relay beep
+                    _log.debug('magic relay beep: %s', ('on' if payload[7] else 'off'))
+            else:
+                # display scales: resolution (0:default, 1:high)
+                _log.debug('resolution: %s', ('high' if payload[7] else 'default'))
 
 #        # byte 8/8/10:
 #        if payload and len(payload) > 10 and self.scale_class == SCALE_CLASS.RELAY:
@@ -913,6 +969,15 @@ class AcaiaProtocol:
     def send_reset_timer(self) -> None:
         _log.debug('send reset time')
         self.send_message(MSG.TIMER,b'\x00\x01')
+
+    def update_setting_payload(self, item:SETTING_ITEM, value:int) -> bytes:
+        #  payload: ack_id/item/value
+        ack_id = self._next_ack_id()
+        return bytes([ack_id, item, value])
+
+    def send_update_setting(self, payload:bytes) -> None:
+        _log.debug('send update setting command: %s', payload)
+        self.send_message(MSG.SETTING_CHANGE, payload)
 
     def send_led_cmd(self, payload:bytes) -> None:
         if self.has_leds:
@@ -1115,7 +1180,7 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
 
     def __init__(self, connected_handler:Callable[[], None]|None = None,
                        disconnected_handler:Callable[[], None]|None = None,
-                       stable_only:bool=True, # if True only stable weight readings are reported by weight_changed_signal
+                       stable_only:bool=False, # if True only stable weight readings are reported by weight_changed_signal
                        decimals:int=1) -> None: # number of significant decimals (0, 1, ..) of the weight signal
         super().__init__()
 

@@ -1662,14 +1662,14 @@ class editGraphDlg(ArtisanResizeablDialog):
         if self.aw.ui_mode is UI_MODE.EXPERT:
             eventbuttonLayout.addWidget(self.createalarmTableButton)
         eventbuttonLayout.addStretch()
+        eventbuttonLayout.addWidget(self.neweventTableButton)
+        eventbuttonLayout.addWidget(self.deleventTableButton)
+        eventbuttonLayout.addStretch()
         if self.aw.ui_mode is UI_MODE.EXPERT:
             eventbuttonLayout.addWidget(self.clusterEventsButton)
         eventbuttonLayout.addWidget(self.ordereventTableButton)
         eventbuttonLayout.addStretch()
         eventbuttonLayout.addWidget(self.clearEventsButton)
-        eventbuttonLayout.addStretch()
-        eventbuttonLayout.addWidget(self.deleventTableButton)
-        eventbuttonLayout.addWidget(self.neweventTableButton)
         databuttonLayout = QHBoxLayout()
         databuttonLayout.addWidget(self.copydataTableButton)
         databuttonLayout.addStretch()
@@ -1844,7 +1844,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 
         coffees = plus.stock.getCoffeeLabels()
 
-        if len(coffees)>2:
+        if len(coffees)>1:
             if self.aw.qmc.plus_custom_blend is not None and self.aw.qmc.plus_custom_blend.isValid(coffees.values()):
                 blend = self.aw.qmc.plus_custom_blend
             else:
@@ -2172,7 +2172,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                 # if a valid custom_blend with a non-empty name exists, we add it to the blend popups
                 if self.aw.qmc.plus_custom_blend is not None and self.aw.qmc.plus_custom_blend.name.strip() != '':
                     coffees = plus.stock.getCoffeeLabels()
-                    if len(coffees)>2 and self.aw.qmc.plus_custom_blend.isValid(coffees.values()):
+                    if len(coffees)>1 and self.aw.qmc.plus_custom_blend.isValid(coffees.values()):
                         custom_blend = plus.stock.Blend(
                             hr_id = '',
                             label = self.aw.qmc.plus_custom_blend.name.strip(),
@@ -4765,7 +4765,7 @@ class editGraphDlg(ArtisanResizeablDialog):
                     timeline.setStyleSheet(line_edit_style(self.aw.app.darkmode))
                     timeline.setTextMargins(3,0,3,0) # (left, top, right, bottom)
                     timeline.setAlignment(Qt.AlignmentFlag.AlignCenter)
-                    if self.aw.qmc.timeindex[0] > -1 and len(self.aw.qmc.timex) > self.aw.qmc.timeindex[0]:
+                    if -1 < self.aw.qmc.timeindex[0] < len(self.aw.qmc.timex):
                         timez = stringfromseconds(self.aw.qmc.timex[self.aw.qmc.specialevents[i]]-self.aw.qmc.timex[self.aw.qmc.timeindex[0]])
                     else:
                         timez = stringfromseconds(self.aw.qmc.timex[self.aw.qmc.specialevents[i]])
@@ -5928,7 +5928,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 
         self.clean_up()
 
-        # update dashbaord
+        # update dashboard
         self.aw.dashboard.update_dashboard()
 
         if (self.start_recording_on_exit and

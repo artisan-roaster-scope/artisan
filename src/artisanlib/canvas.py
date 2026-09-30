@@ -2333,7 +2333,7 @@ class tgraphcanvas(QObject):
                 # center
                 if center != -2:
                     if center in {-1, 0} or not self.flagstart:
-                        chargetime = (self.timex[self.timeindex[0]] if self.timeindex[0] > -1 and self.timeindex[0] < len(self.timex) else 0)
+                        chargetime = (self.timex[self.timeindex[0]] if -1 < self.timeindex[0] < len(self.timex) else 0)
                         xmin = self.startofx
                         xmax = self.endofx + chargetime
                         if center != -1:
@@ -4292,7 +4292,7 @@ class tgraphcanvas(QObject):
                     self.ax.draw_artist(self.l_BTprojection)
                 if self.projectDeltaFlag and self.l_DeltaBTprojection is not None and self.DeltaBTflag:
                     self.ax.draw_artist(self.l_DeltaBTprojection)
-            if self.l_AUCguide is not None and self.AUCguideFlag and self.AUCguideTime > 0 and self.AUCguideTime < self.endofx:
+            if self.l_AUCguide is not None and self.AUCguideFlag and 0 < self.AUCguideTime < self.endofx:
                 self.ax.draw_artist(self.l_AUCguide)
 
     # input filter
@@ -4412,7 +4412,7 @@ class tgraphcanvas(QObject):
         #   we are 20sec after CHARGE
         #   len(BT) > 4
         # BT[-5] <= BT[-4] and BT[-5] <= BT[-3] and BT[-5] <= BT[-2] and BT[-5] <= BT[-1] and BT[-5] < BT[-1]
-        if seconds_since_CHARGE > 20 and not self.afterTP and len(self.temp2) > 3 and (self.temp2[-5] <= self.temp2[-4]) and (self.temp2[-5] <= self.temp2[-3]) and (self.temp2[-5] <= self.temp2[-2]) and (self.temp2[-5] <= self.temp2[-1]) and (self.temp2[-5] < self.temp2[-1]):
+        if seconds_since_CHARGE > 20 and not self.afterTP and len(self.temp2) > 3 and (self.temp2[-5] <= self.temp2[-4]) and (self.temp2[-5] <= self.temp2[-3]) and (self.temp2[-5] <= self.temp2[-2]) and (self.temp2[-5] <= self.temp2[-1]) and (self.temp2[-5] < self.temp2[-1]): # pylint:disable=chained-comparison # pylint 4.1.1 bug
             self.afterTP = True
         return self.afterTP
 
@@ -4906,8 +4906,8 @@ class tgraphcanvas(QObject):
                             try:
                                 tp = self.aw.findTP()
 
-                                if ((self.mode == 'C' and sample_temp2[tp] > 50 and sample_temp2[tp] < 150) or \
-                                    (self.mode == 'F' and sample_temp2[tp] > 100 and sample_temp2[tp] < 300)): # only mark TP if not an error value!
+                                if ((self.mode == 'C' and  50 < sample_temp2[tp] < 150) or \
+                                    (self.mode == 'F' and 100 < sample_temp2[tp] < 300)): # only mark TP if not an error value!
                                     self.TPalarmtimeindex = tp
                                     self.markTPSignal.emit() # queued
                             except Exception as e: # pylint: disable=broad-except
@@ -5030,7 +5030,7 @@ class tgraphcanvas(QObject):
                               and (self.alarmnegguard[i] < 0 or (0 <= self.alarmnegguard[i] < len(self.alarmstate) and self.alarmstate[self.alarmnegguard[i]] == -1)) \
                               and ((self.alarmtime[i] == 9) or (self.alarmtime[i] < 0 and local_flagstart) \
                                 or (local_flagstart and self.alarmtime[i] == 0 and self.timeindex[0] > -1) \
-                                or (local_flagstart and self.alarmtime[i] > 0 and self.alarmtime[i] < 8 and self.timeindex[self.alarmtime[i]] > 0) \
+                                or (local_flagstart and 0 < self.alarmtime[i] < 8 and self.timeindex[self.alarmtime[i]] > 0) \
                                 or (self.alarmtime[i] == 10 and self.alarmguard[i] != -1)  \
                                 or (local_flagstart and self.alarmtime[i] == 8 and self.timeindex[0] > -1 \
                                     and self.TPalarmtimeindex)):
@@ -6796,7 +6796,7 @@ class tgraphcanvas(QObject):
             delta_main_events = ['dCHARGE','dDRY','dFCs','dFCe','dSCs','dSCe','dDROP', 'dCOOL']
             try:
                 for i,v in enumerate(delta_main_events):
-                    if len(sample_timex)>0 and (i == 0 and self.timeindex[i] > -1) or (self.timeindex[i] > 0) and len(sample_timex)>self.timeindex[i]:
+                    if len(sample_timex)>0 and ((i == 0 and self.timeindex[i] > -1) or (0 < self.timeindex[i] < len(sample_timex))):
                         # we return the time after the event in seconds
                         mathdictionary[v] = sample_timex[-1] - sample_timex[self.timeindex[i]]
                     else:
@@ -11077,7 +11077,7 @@ class tgraphcanvas(QObject):
                                             visible=self.flagstart,
                                             linestyle = '-', linewidth= 1, alpha = .5,sketch_params=None,path_effects=[])
                 if self.AUCguideFlag:
-                    self.l_AUCguide = self.ax.axvline(self.AUCguideTime,visible=(self.AUCguideTime > 0 and self.AUCguideTime < self.endofx),color = self.palette['aucguide'],
+                    self.l_AUCguide = self.ax.axvline(self.AUCguideTime,visible=(0 < self.AUCguideTime < self.endofx),color = self.palette['aucguide'],
                                                 label=self.aw.arabicReshape(QApplication.translate('Label', 'AUCguide')),
                                                 linestyle = '-', linewidth= 1, alpha = .5,sketch_params=None,path_effects=[])
 
@@ -15842,7 +15842,7 @@ class tgraphcanvas(QObject):
                     sep = '   '
                     tm = self.roastdate.time().toString()[:-3]
                     starttime = (self.timex[self.timeindex[0]] if self.timeindex[0] != -1 and self.timeindex[0] < len(self.timex) else 0)
-                    endtime = (self.timex[self.timeindex[6]] if self.timeindex[6] > 0  and self.timeindex[6] < len(self.timex) else self.timex[-1])
+                    endtime = (self.timex[self.timeindex[6]] if 0 < self.timeindex[6] < len(self.timex) else self.timex[-1])
                     totaltime = endtime - starttime
                     if right_to_left(self.locale_str):
                         msg = ''
@@ -16515,7 +16515,7 @@ class tgraphcanvas(QObject):
                             continue  #j loop
 
                         # Event begins before DROP, terminates after DROP
-                        if loadtime <= self.timex[self.timeindex[6]] and prev_loadtime[i] > self.timex[self.timeindex[6]]:
+                        if loadtime <= self.timex[self.timeindex[6]] < prev_loadtime[i]:
                             # Event begins after CHARGE
                             if loadtime >= self.timex[self.timeindex[0]]:
                                 # Two portions to register
@@ -16557,8 +16557,7 @@ class tgraphcanvas(QObject):
                             continue  #j loop
 
                         # Event begins before CHARGE and terminates after CHARGE and before DROP
-                        if (loadtime < self.timex[self.timeindex[0]] and
-                            self.timex[self.timeindex[0]] <= prev_loadtime[i] < self.timex[self.timeindex[6]]):
+                        if loadtime < self.timex[self.timeindex[0]] <= prev_loadtime[i] < self.timex[self.timeindex[6]]:
                             # Two portions to register
                             # Before CHARGE
                             kind = 18  #Event BBP
@@ -18781,6 +18780,7 @@ class tgraphcanvas(QObject):
                     self.reset(soundOn=False, fireResetAction=False)
                 self.aw.loadBackgroundSignal.emit(filename, False, True)
 
+            self.redraw()
             self.aw.sendmessage(QApplication.translate('Message', 'New profile created'))
 
         except ValueError:
