@@ -733,7 +733,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 #        self.cooledit.setMaximumWidth(55)
         self.cooledit.setMinimumWidth(55)
         coollabel.setBuddy(self.cooledit)
-        self.roastproperties = QCheckBox(QApplication.translate('CheckBox','Delete roast properties on RESET'))
+        self.roastproperties = QCheckBox(QApplication.translate('CheckBox','Delete properties on RESET'))
         self.roastproperties.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.roastproperties.setChecked(bool(self.aw.qmc.roastpropertiesflag))
         self.roastproperties.stateChanged.connect(self.roastpropertiesChanged)
@@ -1426,13 +1426,11 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.plus_blends_combo.currentIndexChanged.connect(self.blendSelectionChanged)
             self.plus_custom_blend_button = QToolButton()
             self.plus_custom_blend_button.setToolTip(QApplication.translate('Tooltip','Define a custom blend'))
-            self.plus_custom_blend_button.setText('...')
-
+            self.plus_custom_blend_button.setText('')
             self.plus_custom_blend_button.setMinimumWidth(20)
             self.plus_custom_blend_button.setMinimumHeight(20)
-            self.plus_custom_blend_button.setText('')
             self.plus_custom_blend_button.setStyleSheet(tool_button_icon_style(self.aw.app.darkmode, 'pencil-edit-02-stroke-rounded-light.svg', 'pencil-edit-02-stroke-rounded-dark.svg'))
-
+            self.plus_custom_blend_button.setEnabled(False)
             self.plus_custom_blend_button.clicked.connect(self.customBlendButton_triggered)
             self.plus_selected_line = QLabel()
             self.plus_selected_line.setOpenExternalLinks(True)
@@ -2166,17 +2164,19 @@ class editGraphDlg(ArtisanResizeablDialog):
                         self.plus_coffees_combo.setCurrentIndex(p+1)
                     mark_coffee_fields = True
 
+
                 #---- Blends
 
                 custom_blend:plus.stock.Blend|None = None
                 # if a valid custom_blend with a non-empty name exists, we add it to the blend popups
-                if self.aw.qmc.plus_custom_blend is not None and self.aw.qmc.plus_custom_blend.name.strip() != '':
-                    coffees = plus.stock.getCoffeeLabels()
-                    if len(coffees)>1 and self.aw.qmc.plus_custom_blend.isValid(coffees.values()):
-                        custom_blend = plus.stock.Blend(
-                            hr_id = '',
-                            label = self.aw.qmc.plus_custom_blend.name.strip(),
-                            ingredients = [plus.stock.BlendIngredient(ratio = c.ratio, coffee = c.coffee) for c in self.aw.qmc.plus_custom_blend.components])
+                coffees = plus.stock.getCoffeeLabels()
+                self.plus_custom_blend_button.setEnabled(len(coffees)>1) # there need at least to be two different coffes with stock in some warehouse
+                if (self.aw.qmc.plus_custom_blend is not None and self.aw.qmc.plus_custom_blend.name.strip() != '' and
+                        len(coffees)>1 and self.aw.qmc.plus_custom_blend.isValid(coffees.values())):
+                    custom_blend = plus.stock.Blend(
+                        hr_id = '',
+                        label = self.aw.qmc.plus_custom_blend.name.strip(),
+                        ingredients = [plus.stock.BlendIngredient(ratio = c.ratio, coffee = c.coffee) for c in self.aw.qmc.plus_custom_blend.components])
                 self.plus_blends = plus.stock.getBlends(self.unitsComboBox.currentIndex(),self.plus_default_store, custom_blend)
                 self.plus_blends_combo.blockSignals(True)
                 self.plus_blends_combo.clear()

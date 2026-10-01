@@ -84,6 +84,7 @@ class Scale(QObject):
     scanned_signal = pyqtSignal(list)               # delivers discovered device details
     weight_changed_signal = pyqtSignal(float, bool) # delivers new weight in g with decimals for accurate
                                                     #   conversion and flag indicating stable readings
+    weight_error_signal = pyqtSignal(str)           # delivers weight error message
     tare_pressed_signal = pyqtSignal()              # issued on tare button pressed
     battery_changed_signal = pyqtSignal(int)        # delivers new battery level in %
     connected_signal = pyqtSignal()                 # issued on connect

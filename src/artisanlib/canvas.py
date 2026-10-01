@@ -15301,9 +15301,11 @@ class tgraphcanvas(QObject):
                         if bc > -1 and bc == self.batchcounter+1 and self.batchprefix == bprefix:
                             settings.setValue('batchcounter',bc - 1)
                             settings.setValue('batchsequence',self.batchsequence)
+                            settings.sync()
                     settings.endGroup()
                 except Exception: # pylint: disable=broad-except
-                    self.aw.settingspath = ''
+                    pass
+                    #self.aw.settingspath = ''
 
     def incBatchCounter(self) -> None:
         if not bool(self.aw.simulator):
@@ -15346,9 +15348,11 @@ class tgraphcanvas(QObject):
                             settings.setValue('batchcounter',self.batchcounter)
                             settings.setValue('batchsequence',self.batchsequence)
                             settings.setValue('lastroastepoch',self.lastroastepoch)
+                            settings.sync()
                     settings.endGroup()
                 except Exception: # pylint: disable=broad-except
-                    self.aw.settingspath = ''
+                    pass
+                    #self.aw.settingspath = ''
         else: # batch counter system inactive
             # set the batchcounter of the current profiles
             self.roastbatchnr = 0

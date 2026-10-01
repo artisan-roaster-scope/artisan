@@ -112,14 +112,14 @@ class FACTOR(IntEnum):
 class MSG(IntEnum):
     SYSTEM = 0
     TARE = 4
-    SETTINGS = 6
+    SETTINGS = 6 # requests status
     INFO = 7
     STATUS = 8
-    SETTING_CHANGE = 10 # set a single parameter
+    SETTING_CHANGE = 10 # set a single parameter (wait until ACK received before sending next)
     IDENTIFY = 11
-    EVENT = 12
+    EVENT = 12 # event subscription and configuration
     TIMER = 13
-    LED = 53
+    LED = 53 # LED API
 
 # Command IDs
 @unique
@@ -143,22 +143,31 @@ class LED_EFFECT(IntEnum):
     WIPE_OFF = 2
     BREATHE = 3
 
+@unique
 class SETTING_ITEM(IntEnum):
     RESOLUTION = 3
+    AUTO_OFF = 6 # 1:on, 0:off
+    BEEP = 7 # read-only; 1:on, 0:off
+    UNIT = 8 # read-only; 0=g
     FILTER = 12
     ZERO_TRACKING = 13
+    STABLE_WEIGHT_INDICATOR = 14 # 1:on, 0:off
+    # all others reserved
 
+@unique
 class RESOLUTION_SETTING(IntEnum):
     ONE_GRAM = 0 # default
     TEN_GRAM = 1
     TWENTY_GRAM = 2
 
+@unique
 class FILTER_SETTING(IntEnum):
     MOST_SENSITIVE = 1 # default
     SENSITIVE = 2
     LESS_SENSITIVE = 3
     LEAST_SENSITIVE = 4
 
+@unique
 class ZERO_TRACKING_SETTING(IntEnum):
     OFF = 0
     FIVE_GRAM_RANGE = 1
@@ -183,6 +192,33 @@ class EVENT_LEN(IntEnum):
     TIMER = 3
     KEY = 1
     ACK = 2 # specifies minimum len (ACK payloads have len 2 or 9)
+
+
+# Weight types
+
+@unique
+class WeightType(IntEnum):
+    #-- regular weights:
+    NET = 0
+    PW = 1
+    TARE = 2
+    UMBRA = 3 # normal weight
+    #-- error weights:
+    OVERWEIGHT = 4 # weight value is a fixed sentinel 10300
+    ERROR303 = 5   # weight value is a fixed sentinel 303; latched until the scale is rebooted
+    UNDERLOAD = 6  # weight value is a fixed sentinel 0; reverse load / load cell fault; value
+
+WEIGHT_TYPE_NAMES = {
+        0: 'NET',
+        1: 'PW',
+        2: 'TARE',
+        3: 'UMBRA',
+        4: 'OVERWEIGHT',
+        5: 'ER303',
+        6: 'UNDERLOAD',
+}
+
+REGULAR_WEIGHT_TYPES = {WeightType.NET, WeightType.PW, WeightType.TARE, WeightType.UMBRA}
 
 @unique
 class ACAIA_TIMER(IntEnum):
@@ -265,8 +301,8 @@ RELAY_NON_STREAMING:Final[bool] = True # if set, non-streaming mode on relay sca
     # respects calls to enable_streaming() for high reactivity during active weighing and disable_streaming() for calm communication in between
 #if set, default Acaia relay (and COSMO) scales to streaming mode, otherwise  work in non-streaming mode reporting only weight changes
 WEIGHT_AVERAGING:Final[bool] = True # if set, received stable weights are running through a average filter
-WEIGHT_ROUNDING:Final[bool] = False # if set, received weights are rounded to appropriate values based on scales readability
-# rounding for scales with readability>1 (to 2g), no rounding otherwise
+WEIGHT_ROUNDING:Final[bool] = True # if set, received weights are rounded to appropriate values based on scales readability
+# rounding for scales with readability>1 (to 5g), no rounding otherwise
 
 
 # ISP versions -> device model (CSMO series)
@@ -288,7 +324,8 @@ BROWN:Final[Color] = (255,60,0)
 
 class AcaiaProtocol:
 
-    __slots__ = [ '_send', '_weight_changed_handler', '_battery_changed_handler', '_tare_pressed_handler', '_logging',
+    __slots__ = [ '_send', '_weight_changed_handler', '_weight_error_handler', '_battery_changed_handler',
+            '_tare_pressed_handler', '_logging',
             '_setting_ack_id', 'stable_only', 'decimals', 'heartbeat_frequency', 'scale_class', 'id_sent',
             'info_msg_received', 'device_identified', 'fast_notifications_sent', 'slow_notifications_sent',
             'stable_weight', 'battery', 'isp_version', 'firmware', 'unit', 'max_weight', 'readability',
@@ -297,6 +334,7 @@ class AcaiaProtocol:
     def __init__(self,
             send:Callable[[bytes], None],
             weight_changed_handler:Callable[[float,bool], None],
+            weight_error_handler:Callable[[str], None],
             battery_changed_handler: Callable[[int], None],
             tare_pressed_handler: Callable[[], None],
             stable_only:bool=False, # if True only stable weight readings are reported by weight_changed_signal
@@ -306,6 +344,7 @@ class AcaiaProtocol:
         # handlers
         self._send = send
         self._weight_changed_handler = weight_changed_handler
+        self._weight_error_handler = weight_error_handler
         self._battery_changed_handler = battery_changed_handler
         self._tare_pressed_handler = tare_pressed_handler
 
@@ -377,7 +416,8 @@ class AcaiaProtocol:
 
     def configure_COSMO_100(self) -> None:
         _log.debug('configure COSMO 100')
-        self.send_update_setting(self.update_setting_payload(SETTING_ITEM.FILTER, FILTER_SETTING.MOST_SENSITIVE))
+        # we set the filter to less sensitive
+        self.send_update_setting(self.update_setting_payload(SETTING_ITEM.FILTER, FILTER_SETTING.LESS_SENSITIVE))
 
     # configure for the specific scale based on the available ISP version received
     def identify_device(self) -> None:
@@ -564,7 +604,7 @@ class AcaiaProtocol:
 #            _log.debug('password set: %s', data[6])
 
 
-    def decode_weight(self, payload:bytes) -> tuple[float|None, bool]:
+    def decode_weight(self, payload:bytes) -> tuple[float|None, bool, WeightType|None]:
         try:
             # first 4 bytes encode the weight as unsigned long (little endian)
             value:float = ((payload[3] & 0xff) << 24) + \
@@ -587,16 +627,30 @@ class AcaiaProtocol:
                 if self.unit == UNIT.KG:
                     value = value * 1000
                 elif self.unit == UNIT.OZ:
-                    value = value * 28.3495 # scale set to oz displays 4 decimals
+                    value = value * 1000 / (2.20462262185*16) # scale set to oz displays 4 decimals (convert oz to g)
 
             stable = (payload[5] & 0x01) != 0x01
 
             # if 2nd bit of payload[5] is set, the reading is negative
             if (payload[5] & 0x02) == 0x02:
                 value *= -1
-            return value, stable
+
+            # n_type (bits 2..7) of payload[5] indicates type of the reading (regular, overload, reverse overload, zeroing-error)
+            n_type = (payload[5] >> 2) & 0x3F
+            weight_type = WeightType.UMBRA
+            try:
+                weight_type = WeightType(n_type)
+            except ValueError:
+                pass
+
+            return value, stable, weight_type
         except Exception:  # pylint: disable=broad-except
-            return None, False
+            return None, False, None
+
+    def signal_weight_error(self, weight_type:WeightType) -> None:
+        weight_error_name = WEIGHT_TYPE_NAMES.get(weight_type, f'Error: {weight_type}')
+        _log.debug('weight error: %s', weight_error_name)
+        self._weight_error_handler(weight_error_name)
 
     def update_weight(self, value:float|None, stable:bool|None = False) -> None:
         if self._logging:
@@ -606,9 +660,9 @@ class AcaiaProtocol:
                 # only average small stable weight updates
                 value = (value + self.stable_weight + self.stable_weight) / 3
             if WEIGHT_ROUNDING and self.repeatability >= 1:
-                # round to full 2g
-                value = round_base(value, 2)
-                ## round to full 10g
+                # round to full 5g
+                value = round_base(value, 5)
+                ## round to full 10g:
                 ##value = round(value, -1)
             # convert the weight in g delivered with one decimal to an int
             value_rounded:float = float2float(value, self.decimals)
@@ -624,15 +678,23 @@ class AcaiaProtocol:
     def parse_weight_event(self, payload:bytes) -> int:
         if len(payload) < EVENT_LEN.WEIGHT:
             return -1
-        weight, stable = self.decode_weight(payload)
-        self.update_weight(weight, stable)
+        weight, stable, weight_type = self.decode_weight(payload)
+        if weight_type in REGULAR_WEIGHT_TYPES:
+            self.update_weight(weight, stable)
+        elif weight_type is not None:
+            # weight error reported by scale
+            self.signal_weight_error(weight_type)
+        else:
+            _log.error('failed to decode weight message')
         return EVENT_LEN.WEIGHT
 
     def parse_battery_event(self, payload:bytes) -> int:
         if len(payload) < EVENT_LEN.BATTERY:
             return -1
         b = payload[0]
-        if 0 <= b <= 100:
+        if b == 255:
+            _log.debug('battery: --')
+        elif 0 <= b <= 100:
             self.battery = int(payload[0])
             self._battery_changed_handler(self.battery)
             _log.debug('battery: %s', self.battery)
@@ -675,7 +737,7 @@ class AcaiaProtocol:
             elif payload[0] == KEY_ADDITIONAL_INFO.WEIGHT:
                 data_payload = payload[1:]
                 if len(data_payload) >= EVENT_LEN.WEIGHT:
-                    weight, stable = self.decode_weight(data_payload)
+                    weight, stable, _weight_type = self.decode_weight(data_payload)
                     _log.debug('key event weight: %s (stable: %s)', weight, stable)
                 else:
                     weight = 0
@@ -686,7 +748,7 @@ class AcaiaProtocol:
                 time = (self.decode_time(time_payload) if len(time_payload) >= EVENT_LEN.TIMER else 0)
                 weight_payload = payload[5:]
                 if len(weight_payload) >= EVENT_LEN.WEIGHT:
-                    weight, stable = self.decode_weight(weight_payload)
+                    weight, stable, _weight_type = self.decode_weight(weight_payload)
                     _log.debug('key event time: %s, weight: %s (stable: %s)',time,weight,stable)
                 else:
                     weight = 0
@@ -772,9 +834,12 @@ class AcaiaProtocol:
 
         # byte 1: battery level (7 bits of second byte) + TIMER_START (1bit)
         if payload and len(payload) > 1:
-            self.battery = int(payload[1] & ~(1 << 7))
-            self._battery_changed_handler(self.battery)
-            _log.debug('battery: %s%%', self.battery)
+            if int(payload[1]) == 255:
+                _log.debug('battery: ---')
+            else:
+                self.battery = int(payload[1] & ~(1 << 7))
+                self._battery_changed_handler(self.battery)
+                _log.debug('battery: %s%%', self.battery)
 
         # byte 2:
         if payload and len(payload) > 2:
@@ -810,40 +875,40 @@ class AcaiaProtocol:
                 self.unit = int(payload[2] & 0x7F)
 #                _log.debug('unit: %s (%s)', self.unit, ('g' if self.unit == UNIT.G else 'oz'))
 
-#        # byte 3:
-#        if payload and len(payload) > 3:
-#            if self.scale_class == SCALE_CLASS.RELAY:
-#                # relay scales: beep setting (0:off, 1:on)
-#                # display scales: beep setting (0:off, 1:on)
-#                _log.debug('sound: %s', ('on' if payload[6] else 'off'))
-#            else:
-#                # display scales: mode (7 bits of third byte) + tare (1bit)
-#                mode = int(payload[3] & 0x7F)
-#                _log.debug('mode: %s', mode)
-#                _log.debug('tare: %s', (payload[3] & 0x80) == 0x80)
-#                # Lunar
-#                # 2: NodE_1 Weighing Mode
-#                # 4: NodE_2 Dual Display Mode
-#                # 3: NodE_3 Timer Starts with Flow Mode (drop)
-#                # 15: NodE_4 Auto-Tare Timer Starts with Flow Mode (drop/square)
-#                # 16: NodE_5 Auto-Tare Auto-Start Timer Mode (triangle/square)
-#                # 17: NodE_6 Auto-Tare Mode (square)
+        # byte 3:
+        if payload and len(payload) > 3:
+            if self.scale_class == SCALE_CLASS.RELAY:
+                # relay scales: beep setting (0:off, 1:on)
+                # display scales: beep setting (0:off, 1:on)
+                _log.debug('sound: %s', ('on' if payload[6] else 'off'))
+            else:
+                # display scales: mode (7 bits of third byte) + tare (1bit)
+                mode = int(payload[3] & 0x7F)
+                _log.debug('mode: %s', mode)
+                _log.debug('tare: %s', (payload[3] & 0x80) == 0x80)
+                # Lunar
+                # 2: NodE_1 Weighing Mode
+                # 4: NodE_2 Dual Display Mode
+                # 3: NodE_3 Timer Starts with Flow Mode (drop)
+                # 15: NodE_4 Auto-Tare Timer Starts with Flow Mode (drop/square)
+                # 16: NodE_5 Auto-Tare Auto-Start Timer Mode (triangle/square)
+                # 17: NodE_6 Auto-Tare Mode (square)
 
-#        # byte 4:
-#        if payload and len(payload) > 4:
-#            if self.scale_class == SCALE_CLASS.RELAY:
-#                # relay scales: weight unit setting (0:g, 1:oz)
-#                self.unit = (UNIT.OZ if payload[4] == 1 else UNIT.G)
-#                _log.debug('unit: %s (%s)', self.unit, ('g' if self.unit == UNIT.G else 'oz'))
-#            else:
-#                sleep_modes = {0:'off', 1:'5sec', 2:'10sec', 3:'20sec', 4:'30sec', 5:'60sec'}
-#                _log.debug('sleep: %s%s', payload[4], (f' ({sleep_modes[payload[4]]})' if (payload[4] in sleep_modes) else ''))
+        # byte 4:
+        if payload and len(payload) > 4:
+            if self.scale_class == SCALE_CLASS.RELAY:
+                # relay scales: weight unit setting (0:g, 1:oz)
+                self.unit = (UNIT.OZ if payload[4] == 1 else UNIT.G)
+                _log.debug('unit: %s (%s)', self.unit, ('g' if self.unit == UNIT.G else 'oz'))
+            else:
+                sleep_modes = {0:'off', 1:'5sec', 2:'10sec', 3:'20sec', 4:'30sec', 5:'60sec'}
+                _log.debug('sleep: %s%s', payload[4], (f' ({sleep_modes[payload[4]]})' if (payload[4] in sleep_modes) else ''))
 
         # byte 5:
         if payload and len(payload) > 5:
             if self.scale_class == SCALE_CLASS.RELAY:
                 if self.is_COSMO():
-                    _log.debug('resolution: %s', payload[5])
+                    _log.debug('resolution: %s', ('1g' if payload[5] == 0 else ('10g' if payload[5] == 1 else '20g')))
                 else:
                     # relay scales: resolution setting
                     _log.debug('resolution: %s', ('0.01g' if payload[5] else '0.1g')) # resolution/readability: 0.1g / 0.01g
@@ -855,7 +920,7 @@ class AcaiaProtocol:
         if payload and len(payload) > 6:
             if self.scale_class == SCALE_CLASS.RELAY:
                 if self.is_COSMO():
-                    _log.debug('filter sensitivity: %s', payload[6])
+                    _log.debug('filter sensitivity: %s', payload[6]) # see FILTER_SETTING
                 else:
                     # relay scales: magic relay sensing (low/normal/high)
                     _log.debug('magic relay: %s', payload[6])
@@ -868,7 +933,7 @@ class AcaiaProtocol:
         if payload and len(payload) > 7:
             if self.scale_class == SCALE_CLASS.RELAY:
                 if self.is_COSMO():
-                    _log.debug('zero tracking: %s', payload[7])
+                    _log.debug('zero tracking: %s', payload[7]) # see ZERO_TRACKING_SETTINGS
                 else:
                     # relay scales: magic relay beep
                     _log.debug('magic relay beep: %s', ('on' if payload[7] else 'off'))
@@ -876,13 +941,19 @@ class AcaiaProtocol:
                 # display scales: resolution (0:default, 1:high)
                 _log.debug('resolution: %s', ('high' if payload[7] else 'default'))
 
-#        # byte 8/8/10:
-#        if payload and len(payload) > 10 and self.scale_class == SCALE_CLASS.RELAY:
-#            # firmware version
-#            firmware = (payload[8],payload[9],payload[10])
-#            _log.debug('firmware: %s.%s.%s', firmware[0], firmware[1], firmware[2])
+        # byte 8/9/10:
+        if payload and len(payload) > 10 and self.scale_class == SCALE_CLASS.RELAY:
+            # firmware version
+            firmware = (payload[8],payload[9],payload[10])
+            _log.debug('firmware: %s.%s.%s', firmware[0], firmware[1], firmware[2])
 
-        # bytes 11 & 12 reserved
+        # byte 11:
+        if payload and len(payload) > 10 and self.scale_class == SCALE_CLASS.RELAY:
+            # effect (stable-weight indicator, 1:on, 0:off)
+            _log.debug('effect: %s', payload[11])
+
+
+        # bytes 12-23 reserved
 
 
     def parse_data(self, msg_type:int, data:bytes) -> None:
@@ -933,9 +1004,10 @@ class AcaiaProtocol:
         return HEADER1 + HEADER2 + tp.to_bytes(1, 'big') + payload + self.crc(payload)
 
     def send_message(self, tp:int, payload:bytes) -> None:
-        self._send(self.message(tp, payload))
+        msg = self.message(tp, payload)
+        self._send(msg)
         if self._logging:
-            _log.debug('send: %s',payload)
+            _log.debug('send: %s',msg)
 
     def send_event(self, payload:bytes) -> None:
         self.send_message(MSG.EVENT, bytes([len(payload)+1]) + payload)
@@ -957,6 +1029,7 @@ class AcaiaProtocol:
     def send_get_settings(self) -> None:
         _log.debug('send get settings')
         self.send_message(MSG.SETTINGS, b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00')
+#        self.send_message(MSG.SETTINGS, b'\x00')
 
     def send_start_timer(self) -> None:
         _log.debug('send start time')
@@ -1089,7 +1162,7 @@ class AcaiaProtocol:
             self.send_event(
                 bytes([ # pairs of key/setting
                         0,  # weight id
-                        0 # 0: only weight changes are reported; 1: streaming weight changes at 1/10
+                        0 # 0: only weight changes are reported; 1: streaming weight changes at 1Hz (fast), >1: 5Hz (slow)
                           # 0, 1, 3, 5, 7, 15, 31, 63, 127  # weight argument (speed of notifications in 1/10 sec; 0:  report changes in weight every 1/10)
                           # 5 or 7 seems to be good values for this app in Artisan
                     ]))
@@ -1098,10 +1171,10 @@ class AcaiaProtocol:
             self.send_event(
                 bytes([ # pairs of key/setting
                         0,  # weight id
-                        3,  # 0, 1, 3, 5, 7, 15, 31, 63, 127  # weight argument (speed of notifications in 1/10 sec; 0:  report changes in weight every 1/10)
+                        3,  # 0: only weight changes are reported; 1: streaming weight changes at 1Hz (fast), >1: 5Hz (slow)
                             # 5 or 7 seems to be good values for this app in Artisan
     #                    1,   # battery id
-    #                    255, #2,  # battery argument (if 0 : fast, 1 : slow)
+    #                    255, #2,  # battery argument (if 0 : default (60s), n=!0: n*10s)
     #                    2,  # timer id
     #                    255, #5,  # timer argument (number of heartbeats between timer messages)
     #                    3,  # key id (no parameter)
@@ -1128,6 +1201,7 @@ class AcaiaProtocol:
         self.fast_notifications_sent = True
 
     def clear_fast_notifications_sent(self) -> None:
+        _log.debug('clear_fast_notifications_sent')
         self.fast_notifications_sent = False
 
 
@@ -1166,11 +1240,12 @@ class AcaiaProtocol:
 class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argument to class must be a base class
 
     weight_changed_signal = pyqtSignal(float, bool) # delivers new weight in g with decimals for accurate conversion, and flag indicating stable readings
+    weight_error_signal = pyqtSignal(str) # signals a weight error reported by the connected scale
     battery_changed_signal = pyqtSignal(int)  # delivers new batter level in %
-    tare_pressed_signal = pyqtSignal()   # issued on pressing the physical tare button
+    tare_pressed_signal = pyqtSignal()    # issued on pressing the physical tare button
     #
-    connected_signal = pyqtSignal()     # issued on connect
-    disconnected_signal = pyqtSignal()  # issued on disconnect
+    connected_signal = pyqtSignal()       # issued on connect
+    disconnected_signal = pyqtSignal()    # issued on disconnect
 
 
 # NOTE: __slots__ are incompatible with multiple inheritance mixings in subclasses (as done below in class Acaia with QObject)
@@ -1187,6 +1262,7 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
         self.protocol:AcaiaProtocol = AcaiaProtocol(
             self.send_message,
             self.weight_changed,
+            self.weight_error,
             self.battery_changed,
             self.tare_pressed,
             stable_only,
@@ -1241,6 +1317,9 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
 
     def weight_changed(self, stable_weight:float, stable:bool) -> None:
         self.weight_changed_signal.emit(stable_weight, stable)
+
+    def weight_error(self, message:str) -> None:
+        self.weight_error_signal.emit(message)
 
     def battery_changed(self, level:int) -> None:
         self.battery_changed_signal.emit(level)
@@ -1321,6 +1400,7 @@ class AcaiaAsync(AsyncComm):
 
     def __init__(self,
                 weight_changed:Callable[[float,bool], None],
+                weight_error:Callable[[str], None],
                 battery_changed:Callable[[int], None],
                 tare_pressed:Callable[[], None],
                 host:str = '127.0.0.1', port:int = 8080, serial:'SerialSettings|None' = None,
@@ -1335,6 +1415,7 @@ class AcaiaAsync(AsyncComm):
         self.protocol:AcaiaProtocol = AcaiaProtocol(
             self.send_message,
             weight_changed,
+            weight_error,
             battery_changed,
             tare_pressed,
             stable_only,
@@ -1480,6 +1561,10 @@ class AcaiaBluetooth(Acaia): # pyright: ignore [reportGeneralTypeIssues] # Argum
     def weight_changed(self, new_value:float, stable:bool) -> None:
         self.weight_changed_signal.emit(new_value, stable)
 
+    @pyqtSlot(str)
+    def weight_error(self, message:str) -> None:
+        self.weight_error_signal.emit(message)
+
     @pyqtSlot()
     def tare_pressed(self) -> None:
         self.tare_pressed_signal.emit()
@@ -1544,6 +1629,7 @@ class AcaiaSerial(Acaia): # pyright: ignore [reportGeneralTypeIssues] # Argument
                 clear_HUPCL = False)
             self.acaia = AcaiaAsync(
                 self.weight_changed,
+                self.weight_error,
                 self.battery_changed,
                 self.tare_pressed,
                 serial = acaia_serial,
@@ -1604,6 +1690,9 @@ class AcaiaSerial(Acaia): # pyright: ignore [reportGeneralTypeIssues] # Argument
 
     def weight_changed(self, new_value:float, stable:bool) -> None:
         self.weight_changed_signal.emit(new_value, stable)
+
+    def weight_error(self, message:str) -> None:
+        self.weight_error_signal.emit(message)
 
     def battery_changed(self, new_value:int) -> None:
         self.battery_changed_signal.emit(new_value)

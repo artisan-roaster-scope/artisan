@@ -225,7 +225,7 @@ DEVICES: Final[list[str]] = [
     'TASI TA612C',                   #184
     '+TASI TA612C 34',               #185
     '+CM ET/BT',                     #186
-    '+RoastSeeNEXT Agtron/Crack',    #187
+    '+RoastSeeNEXT Agtron/Noise',    #187
     '+RoastSeeNEXT RoR/FoR',         #188
     '+RoastSeeNEXT Distance/Time',   #189
     '+RoastSeeNEXT Yellow',          #190

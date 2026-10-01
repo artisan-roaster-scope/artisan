@@ -5758,7 +5758,9 @@ class ApplicationWindow(QMainWindow):
                             _log.info('artisan configured for %s',label)
                         else:
                             res = False
-                    if not res:
+                    if no_config:
+                        self.sendmessage(QApplication.translate('Message','Configured'))
+                    elif not res:
                         # reset
                         self.qmc.etypes= org_etypes
                         self.qmc.device = org_device
@@ -25483,7 +25485,6 @@ class ApplicationWindow(QMainWindow):
                     self.wheeldialog.createdatatable() # pyright:ignore[reportOptionalMemberAccess]
                 except Exception as e:  # pylint: disable=broad-except
                     _log.exception(e)
-                    self.settingspath = ''
             self.qmc.drawWheel()
             self.dashboard.hide_dashboard()
 

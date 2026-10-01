@@ -598,7 +598,7 @@ class TestAcaiaBLEWeightDecoding:
                 # Weight is little-endian: 1000 = 0x03e8 = [0xe8, 0x03, 0x00, 0x00]
                 # Stable flag is inverted: stable = (payload[5] & 0x01) != 0x01
                 test_payload = b'\xe8\x03\x00\x00\x01\x00'  # 1000 in little-endian, factor=TEN, stable (bit 0 = 0)
-                weight, stable = acaia_ble.protocol.decode_weight(test_payload)
+                weight, stable, _error = acaia_ble.protocol.decode_weight(test_payload)
 
                 assert weight is not None
                 assert isinstance(weight, float)
@@ -607,22 +607,22 @@ class TestAcaiaBLEWeightDecoding:
 
                 # Test with different factor
                 test_payload_hundred = b'\xe8\x03\x00\x00\x02\x00'  # factor=HUNDRED, stable
-                weight_hundred, _ = acaia_ble.protocol.decode_weight(test_payload_hundred)
+                weight_hundred, _, _error = acaia_ble.protocol.decode_weight(test_payload_hundred)
                 assert weight_hundred == 10.0  # 1000 / 100 = 10.0
 
                 # Test with negative weight (bit 1 of last byte)
                 test_payload_negative = b'\xe8\x03\x00\x00\x01\x02'  # negative flag set (bit 1)
-                weight_neg, _ = acaia_ble.protocol.decode_weight(test_payload_negative)
+                weight_neg, _, _error = acaia_ble.protocol.decode_weight(test_payload_negative)
                 assert weight_neg == -100.0
 
                 # Test unstable reading (bit 0 = 1)
                 test_payload_unstable = b'\xe8\x03\x00\x00\x01\x01'  # unstable (bit 0 = 1)
-                _, stable_unstable = acaia_ble.protocol.decode_weight(test_payload_unstable)
+                _, stable_unstable, _error = acaia_ble.protocol.decode_weight(test_payload_unstable)
                 assert stable_unstable is False  # unstable when bit 0 = 1
 
                 # Test with insufficient payload
                 short_payload = b'\x00\x00\x03'  # Only 3 bytes
-                weight_short, stable_short = acaia_ble.protocol.decode_weight(short_payload)
+                weight_short, stable_short, _error = acaia_ble.protocol.decode_weight(short_payload)
                 assert weight_short is None
                 assert stable_short is False
 
@@ -925,11 +925,11 @@ class TestAcaiaBLEScaleClassBehavior:
                 # Test unit conversion for MODERN scales
                 acaia_ble.protocol.unit = UNIT.KG
                 test_payload = b'\xe8\x03\x00\x00\x01\x01'  # 1000 in little-endian, factor=TEN
-                weight, _ = acaia_ble.protocol.decode_weight(test_payload)
+                weight, _, _error = acaia_ble.protocol.decode_weight(test_payload)
                 assert weight == 100000.0  # 100.0 * 1000 (kg to g conversion)
 
                 acaia_ble.protocol.unit = UNIT.OZ
-                weight_oz, _ = acaia_ble.protocol.decode_weight(test_payload)
+                weight_oz, _, _error = acaia_ble.protocol.decode_weight(test_payload)
                 assert weight_oz is not None
                 assert abs(weight_oz - 2834.95) < 0.01  # 100.0 * 28.3495 (oz to g conversion)
 
@@ -987,16 +987,16 @@ class TestAcaiaBLEScaleClassBehavior:
 
                 # Test that RELAY scales always report in grams (no unit conversion)
                 test_payload = b'\xe8\x03\x00\x00\x01\x01'  # 1000 in little-endian, factor=TEN
-                weight, _ = acaia_ble.protocol.decode_weight(test_payload)
+                weight, _, _error = acaia_ble.protocol.decode_weight(test_payload)
                 assert weight == 100.0  # No conversion for RELAY scales
 
                 # Test stable bit behavior for RELAY scales (same as other scales in current implementation)
                 test_payload_stable = b'\xe8\x03\x00\x00\x01\x00'  # stable bit = 0
-                _, stable = acaia_ble.protocol.decode_weight(test_payload_stable)
+                _, stable, _error = acaia_ble.protocol.decode_weight(test_payload_stable)
                 assert stable is True  # stable when bit 0 = 0
 
                 test_payload_unstable = b'\xe8\x03\x00\x00\x01\x01'  # stable bit = 1
-                _, stable_inv = acaia_ble.protocol.decode_weight(test_payload_unstable)
+                _, stable_inv, _error = acaia_ble.protocol.decode_weight(test_payload_unstable)
                 assert stable_inv is False  # unstable when bit 0 = 1
 
 

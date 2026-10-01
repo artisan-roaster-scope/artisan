@@ -9,7 +9,8 @@ v4.2.2
   - adds support for [Dutch Master Roasters](https://artisan-scope.org/machines/dmr/)
   - adds autoCHARGE/DROP and drum speed control to the [Schuilenburg](https://artisan-scope.org/machines/schuilenburg/) PLC machine setup
   - adds autoCHARGE/autoDROP recognition for [IMF](https://artisan-scope.org/machines/imf/) as 'auto' setup which picks up CHARGE and DROP events from the machine
-  - adds device setup for Lebrews online-color and crack sensor [RoastSee NEXT](https://lebrewtech.com/products/roastsee-next)
+  - adds device setup for Lebrews online-color sensor [RoastSee NEXT](https://lebrewtech.com/products/roastsee-next)
+  - improved support for [Orbiter](https://artisan-scope.org/machines/orbiter/) smart roasters
   - adds UI scaling factor
   - adds [Catppuccin](https://github.com/catppuccin) and some more new themes
   - adds two more MODBUS device channels

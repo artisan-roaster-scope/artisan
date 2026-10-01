@@ -98,8 +98,9 @@ class Dashboard(QWidget):
             artisan_font_normal_id = QFontDatabase.addApplicationFont(artisan_font_normal)
             artisan_font_normal_families = QFontDatabase.applicationFontFamilies(artisan_font_normal_id)
 
-            main_header_font_size = (14 if platform.system() == 'Windows' else 20)
-            sub_header_font_size = (8 if platform.system() == 'Windows' else 14)
+            # factor 96 (Windows) to 72 (macOS): 75/96 = 0.75
+            main_header_font_size = (15 if platform.system() == 'Windows' else 20)
+            sub_header_font_size = (9 if platform.system() == 'Windows' else 14)
             self.ui.roast_label.setFont(QFont(artisan_font_semibold_families[0], main_header_font_size, QFont.Weight.DemiBold))
             self.ui.profile_label.setFont(QFont(artisan_font_semibold_families[0], main_header_font_size, QFont.Weight.DemiBold))
             self.ui.inventory_group.setFont(QFont(artisan_font_normal_families[0], sub_header_font_size, QFont.Weight.Normal))
