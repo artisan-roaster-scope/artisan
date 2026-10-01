@@ -4814,7 +4814,12 @@ class ApplicationWindow(QMainWindow):
                 urls = mimeData.urls()
                 try:
                     if urls and len(urls)>0:
-                        self.app.open_url(urls[0])
+                        if self.dashboard.dashboard_active():
+                            filename = urls[0].toLocalFile()
+                            self.dashboard_background_image = filename
+                            QTimer.singleShot(10, self.dashboard.update_background)
+                        else:
+                            self.app.open_url(urls[0])
                     if self.comparator is not None:
                         for url in urls[0:]:
                             self.app.open_url(url)

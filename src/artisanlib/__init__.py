@@ -1,9 +1,9 @@
 __version__ = '4.2.1'
-__revision__ = 'a4b16896f'
+__revision__ = ''
 __build__ = '0'
-__artisan_os__ = 'macOS'
+__artisan_os__ = 'Linux'
 
 __release_sponsor_name__ = 'LABEL!ISTEN'
 __release_sponsor_domain__ = 'labelisten.com'
 __release_sponsor_url__ = 'https://labelisten.com/'
-__signature__ = '9485043458838a6bcf9e7306b1c403bd6dcc96ed95ceea66468a7cf47b828b5e82f93d5d96a365943d0ae7134e36520e944465dee1bd3b80ce927f8ddc65750b'
+__signature__ = '4857e858c31f5a78c45bbee1a8e3d89d7b177feacefe47052d5029d4f8fc6ff4f82829c4e6b04b9ee11e1602613b523a98e6bffe0581793afb50238dafeb1e08'
