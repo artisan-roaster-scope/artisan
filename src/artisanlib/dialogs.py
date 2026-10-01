@@ -80,7 +80,7 @@ class ArtisanDialog(QDialog):
         # style
         palette = self.palette()
         accent_color = palette.color(QPalette.ColorRole.Accent)
-        if platf == 'Windows' or not accent_color.isValid():
+        if not accent_color.isValid() or platform.system() == 'Windows':
             accent_color = QColor('#3979ae')  # Fallback artisan button blue if OS provides none (and on Windows)
         # Generate math-driven lighting variants for the accent button
         accent_name = accent_color.name()
