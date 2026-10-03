@@ -62,6 +62,7 @@ if TYPE_CHECKING:
 
 
 from artisanlib.util import cmd2str, RoRfromCtoFstrict, fromCtoFstrict, fromFtoCstrict, hex2int, str2cmd
+from artisanlib.shinko_acs13a import parse_pv_response, pv_request
 
 from PyQt6.QtCore import Qt, QDateTime, QSemaphore, pyqtSlot
 from PyQt6.QtGui import QIntValidator
@@ -261,7 +262,8 @@ class serialport:
         'controlETpid','readBTpid','useModbusPort','showFujiLCDs','arduinoETChannel','arduinoBTChannel','arduinoATChannel',\
         'ArduinoIsInitialized','ArduinoFILT','HH806Winitflag','R1','devicefunctionlist','externalprogram',\
         'externaloutprogram','externaloutprogramFlag','PhidgetHUMtemp','PhidgetHUMhum','PhidgetPREpre','TMP1000temp', 'colorTrackSerial', 'colorTrackBT',
-        'CM_reference_timeb', 'CM_ET_readings_count', 'CM_BT_readings_count', 'CM_ET_sum_of_squared_differences', 'CM_BT_sum_of_squared_differences' ]
+        'CM_reference_timeb', 'CM_ET_readings_count', 'CM_BT_readings_count', 'CM_ET_sum_of_squared_differences', 'CM_BT_sum_of_squared_differences',
+        'shinko_instrument_number', 'shinko_pv_divider' ]
 
     def __init__(self, aw:'ApplicationWindow') -> None:
 
@@ -277,6 +279,8 @@ class serialport:
         self.parity:str = 'O'
         self.stopbits:int = 1
         self.timeout:float = 0.4
+        self.shinko_instrument_number:int = 0
+        self.shinko_pv_divider:int = 10
         #serial port for ET/BT
         import serial  # @UnusedImport
         self.SP:serial.Serial = serial.Serial()
@@ -597,6 +601,7 @@ class serialport:
                                    self.MQTT_1112,                   #206
                                    self.MODBUS_1112,                 #207
                                    self.Santoker_XY,                 #208
+                                   self.SHINKO_ACS13A,              #209
                                    ]
         #string with the name of the program for device #27
         self.externalprogram:str = 'test.py'
@@ -2779,6 +2784,29 @@ class serialport:
                 self.SP.close()
         except Exception: # pylint: disable=broad-except
             pass
+
+    def SHINKO_ACS13A(self) -> tuple[float,float,float]:
+        """Read the ACS-13A PV over its CMA Shinko serial connection as BT."""
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        self.COMsemaphore.acquire(1)
+        try:
+            if not self.SP.is_open:
+                self.openport()
+            if not self.SP.is_open:
+                return tx,-1.,-1.
+            request = pv_request(self.shinko_instrument_number)
+            self.SP.reset_input_buffer()
+            self.SP.write(request)
+            response = self.SP.read(15)
+            if self.aw.seriallogflag:
+                self.aw.addserial(f'Shinko ACS-13A: Tx = {request.hex()} || Rx = {response.hex()}')
+            pv = parse_pv_response(response, self.shinko_instrument_number)
+            return tx,-1.,pv / self.shinko_pv_divider
+        except Exception as exc: # pylint: disable=broad-except
+            _log.debug('Shinko ACS-13A PV read failed: %s', exc)
+            return tx,-1.,-1.
+        finally:
+            self.COMsemaphore.release(1)
 
 #    @pyqtSlot('QCloseEvent')
 #    def closeEvent(self,_:'QCloseEvent') -> None:

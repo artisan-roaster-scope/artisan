@@ -5557,7 +5557,7 @@ class ApplicationWindow(QMainWindow):
                             self.mugmaHost = host
                         else:
                             res = False
-                    elif not no_config and (self.qmc.device in {0, 9, 19, 53, 101, 115, 126, 196} or ((self.qmc.device == 29 or 29 in self.qmc.extradevices) and self.modbus.type in {0, 1, 2}) or
+                    elif not no_config and (self.qmc.device in {0, 9, 19, 53, 101, 115, 126, 196, 209} or ((self.qmc.device == 29 or 29 in self.qmc.extradevices) and self.modbus.type in {0, 1, 2}) or
                             (self.qmc.device == 134 and self.santokerSerial and not self.santokerBLE) or
                             (self.qmc.device == 138 and self.kaleidoSerial)): # Fuji, Center301, TC4, Hottop, Behmor or MODBUS serial, HB/ARC
                         select_device_name = None
@@ -18409,6 +18409,8 @@ class ApplicationWindow(QMainWindow):
             #restore serial port
             settings.beginGroup('SerialPort')
             self.ser.comport = s2a(toString(settings.value('comport',self.ser.comport)))
+            self.ser.shinko_instrument_number = toInt(settings.value('shinko_instrument_number',self.ser.shinko_instrument_number))
+            self.ser.shinko_pv_divider = max(1,toInt(settings.value('shinko_pv_divider',self.ser.shinko_pv_divider)))
             self.ser.baudrate = toInt(settings.value('baudrate',int(self.ser.baudrate)))
             self.ser.bytesize = toInt(settings.value('bytesize',self.ser.bytesize))
             self.ser.stopbits = toInt(settings.value('stopbits',self.ser.stopbits))
@@ -20403,6 +20405,8 @@ class ApplicationWindow(QMainWindow):
             #save serial port
             settings.beginGroup('SerialPort')
             self.settingsSetValue(settings, default_settings, 'comport',self.ser.comport, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'shinko_instrument_number',self.ser.shinko_instrument_number, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'shinko_pv_divider',self.ser.shinko_pv_divider, read_defaults)
             self.settingsSetValue(settings, default_settings, 'baudrate',self.ser.baudrate, read_defaults)
             self.settingsSetValue(settings, default_settings, 'bytesize',self.ser.bytesize, read_defaults)
             self.settingsSetValue(settings, default_settings, 'stopbits',self.ser.stopbits, read_defaults)
