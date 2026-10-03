@@ -2078,6 +2078,10 @@ class ApplicationWindow(QMainWindow):
         importPetronciniAction.triggered.connect(self.importPetroncini)
         self.importMenu.addAction(importPetronciniAction)
 
+        importRoastingCompassAction = QAction('Roasting Compass CSV...', self)
+        importRoastingCompassAction.triggered.connect(self.importRoastingCompass)
+        self.importMenu.addAction(importRoastingCompassAction)
+
         importROESTAction = QAction('ROEST CSV...', self)
         importROESTAction.triggered.connect(self.importRoest)
         self.importMenu.addAction(importROESTAction)
@@ -26280,6 +26284,13 @@ class ApplicationWindow(QMainWindow):
     def importPetroncini(self, _:bool = False) -> None:
         from artisanlib.petroncini import extractProfilePetronciniCSV
         self.importExternal(extractProfilePetronciniCSV,QApplication.translate('Message','Import {}').format('Petroncini CSV'),'*.csv')
+
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def importRoastingCompass(self, _:bool = False) -> None:
+        from artisanlib.roasting_compass import extractProfileRoastingCompassCSV
+        self.importExternal(extractProfileRoastingCompassCSV,
+                QApplication.translate('Message','Import {}').format('Roasting Compass CSV'),'*.csv')
 
     @pyqtSlot()
     @pyqtSlot(bool)
