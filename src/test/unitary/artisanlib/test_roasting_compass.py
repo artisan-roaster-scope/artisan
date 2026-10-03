@@ -4,6 +4,7 @@ from tempfile import TemporaryDirectory
 import unittest
 
 from artisanlib.roasting_compass import extractProfileRoastingCompassCSV
+from artisanlib.util import decodeLocalStrict
 
 
 class RoastingCompassImportTest(unittest.TestCase):
@@ -17,19 +18,23 @@ class RoastingCompassImportTest(unittest.TestCase):
                     ['日　付', '保存時間', '製品温度(℃)', 'チェックポイント'],
                     ['2026/10/03', '8:23:01', '189.8', '0'],
                     ['2026/10/03', '8:23:02', '189.6', '1'],
+                    ['2026/10/03', '8:23:03', '188.0', '2'],
+                    ['2026/10/03', '8:23:04', '187.0', '3'],
                     ['', '', '', ''],
                     ['2026/10/03 8:23:01', '豆名', '', ''],
+                    ['晴れ', '250', '', '焙煎メモ'],
                 ])
             profile = extractProfileRoastingCompassCSV(str(file), [], [], [], float)
 
-        self.assertEqual(profile['timex'], [0.0, 1.0])
-        self.assertEqual(profile['temp2'], [189.8, 189.6])
-        self.assertEqual(profile['temp1'], [-1.0, -1.0])
+        self.assertEqual(profile['timex'], [0.0, 1.0, 2.0, 3.0])
+        self.assertEqual(profile['temp2'], [189.8, 189.6, 188.0, 187.0])
+        self.assertEqual(profile['temp1'], [-1.0] * 4)
         self.assertEqual(profile['timeindex'][0], 0)
-        self.assertEqual(profile['timeindex'][6], 1)
-        self.assertEqual(profile['specialevents'], [1])
-        self.assertEqual(profile['specialeventsStrings'], ['CP1'])
-        self.assertEqual(profile['title'], '豆名')
+        self.assertEqual(profile['timeindex'][6], 3)
+        self.assertEqual(profile['specialevents'], [1, 2, 3])
+        self.assertEqual(profile['specialeventsStrings'], ['CP1', 'CP2', 'CP3'])
+        self.assertEqual(decodeLocalStrict(profile['title']), '豆名')
+        self.assertEqual(decodeLocalStrict(profile['roastingnotes']), '焙煎メモ')
 
     def test_rejects_unrelated_csv(self) -> None:
         with TemporaryDirectory() as directory:

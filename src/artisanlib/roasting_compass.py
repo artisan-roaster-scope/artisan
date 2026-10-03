@@ -9,6 +9,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from artisanlib.atypes import ProfileData
 
+from artisanlib.util import encodeLocalStrict
+
 
 def _read_rows(file: str) -> list[list[str]]:
     for encoding in ('utf-8-sig', 'cp932'):
@@ -69,7 +71,7 @@ def extractProfileRoastingCompassCSV(
         raise ValueError('Roasting Compass CSV has no temperature samples')
 
     profile: ProfileData = {
-        'title': Path(file).stem,
+        'title': encodeLocalStrict(Path(file).stem),
         'mode': 'C',
         'samplinginterval': 1.0,
         'timex': timex,
@@ -87,8 +89,16 @@ def extractProfileRoastingCompassCSV(
         profile['specialeventsvalue'] = specialeventsvalue
         profile['specialeventsStrings'] = specialeventsStrings
 
-    # The first summary row repeats the roast start and names the coffee.
-    summary = rows[len(timex) + 3:]
-    if summary and len(summary[0]) > 1 and summary[0][1].strip():
-        profile['title'] = summary[0][1].strip()
+    # A blank row separates the samples from the summary table. Its first row
+    # contains the coffee name; the next row's fourth column contains the memo.
+    summary_index = next((i for i in range(len(timex) + 2, len(rows))
+                          if rows[i] and rows[i][0].strip()), None)
+    if summary_index is not None:
+        summary = rows[summary_index]
+        if len(summary) > 1 and summary[1].strip():
+            profile['title'] = encodeLocalStrict(summary[1].strip())
+        if summary_index + 1 < len(rows) and len(rows[summary_index + 1]) > 3:
+            memo = rows[summary_index + 1][3].strip()
+            if memo:
+                profile['roastingnotes'] = encodeLocalStrict(memo)
     return profile
