@@ -17330,8 +17330,10 @@ class ApplicationWindow(QMainWindow):
     @pyqtSlot()
     @pyqtSlot(bool)
     def convertFromRoastingCompass(self, _:bool = False) -> None:
-        from artisanlib.roasting_compass import extractProfileRoastingCompassCSV
-        self.fileConvertFrom('*.csv', extractProfileRoastingCompassCSV)
+        from artisanlib.roasting_compass import (convertedRoastingCompassFilename,
+                                                  extractProfileRoastingCompassCSV)
+        self.fileConvertFrom('*.csv', extractProfileRoastingCompassCSV,
+                             convertedRoastingCompassFilename)
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -17366,7 +17368,8 @@ class ApplicationWindow(QMainWindow):
     #   eventsExternal2InternalValue: Callable[[int],float]
     def fileConvertFrom(self,
             ext:str,
-            extractor: Callable[[str, list[str], list[str], list[str], Callable[[int],float]],'ProfileData|None']) -> None:
+            extractor: Callable[[str, list[str], list[str], list[str], Callable[[int],float]],'ProfileData|None'],
+            target_name: Callable[[str, 'ProfileData'], str]|None = None) -> None:
         files = self.ArtisanOpenFilesDialog(ext=ext)
         if files and len(files) > 0:
             loaded_profile = self.curFile
@@ -17387,7 +17390,7 @@ class ApplicationWindow(QMainWindow):
                         QApplication.processEvents()
                         fname = str(QFileInfo(f).fileName())
                         fconv = str(QDir(outdir).filePath(f'{fname}.alog'))
-                        if not os.path.exists(fconv):
+                        if target_name is not None or not os.path.exists(fconv):
                             self.qmc.reset(redraw=False,soundOn=False)
                             pd = extractor(f,
                                     self.qmc.etypesdefault[:],
@@ -17395,17 +17398,22 @@ class ApplicationWindow(QMainWindow):
                                     self.qmc.artisanflavordefaultlabels[:],
                                     self.qmc.eventsExternal2InternalValue)
                             if pd is not None:
-                                self.plusAddPath(cast(dict[str,Any], pd), fconv)
-                                # add creator information
-                                pd['version'] = str(__version__)
-                                pd['revision'] = str(__revision__)
-                                pd['build'] = str(__build__)
-                                pd['signature'] = str(__signature__)
-                                pd['artisan_os'] = os_name
-                                pd['artisan_os_version'] = os_version
-                                pd['artisan_os_arch'] = os_arch
-                                # serialize to file
-                                serialize(fconv, cast(dict[str,Any], pd))
+                                if target_name is not None:
+                                    fconv = str(QDir(outdir).filePath(target_name(f, pd)))
+                                if not os.path.exists(fconv):
+                                    self.plusAddPath(cast(dict[str,Any], pd), fconv)
+                                    # add creator information
+                                    pd['version'] = str(__version__)
+                                    pd['revision'] = str(__revision__)
+                                    pd['build'] = str(__build__)
+                                    pd['signature'] = str(__signature__)
+                                    pd['artisan_os'] = os_name
+                                    pd['artisan_os_version'] = os_version
+                                    pd['artisan_os_arch'] = os_arch
+                                    # serialize to file
+                                    serialize(fconv, cast(dict[str,Any], pd))
+                                else:
+                                    self.sendmessage(QApplication.translate('Message','Target file {0} exists. {1} not converted.').format(fconv,fname + str(ext)))
                             else:
                                 self.sendmessage(QApplication.translate('Message','Target file {0} exists. {1} not converted.').format(fconv,fname + str(ext)))
                         else:

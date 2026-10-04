@@ -3,8 +3,10 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
 
-from artisanlib.roasting_compass import extractProfileRoastingCompassCSV
-from artisanlib.util import decodeLocalStrict, events_external_to_internal_value
+from artisanlib.roasting_compass import (convertedRoastingCompassFilename,
+                                          extractProfileRoastingCompassCSV)
+from artisanlib.util import (decodeLocalStrict, encodeLocalStrict,
+                             events_external_to_internal_value)
 
 
 class RoastingCompassImportTest(unittest.TestCase):
@@ -45,6 +47,11 @@ class RoastingCompassImportTest(unittest.TestCase):
         self.assertEqual(profile['specialeventsStrings'],
                          ['1 kPa', 'Damper 1', 'CP1', 'CP2', 'CP3'])
         self.assertEqual(decodeLocalStrict(profile['title']), '豆名')
+        self.assertEqual(convertedRoastingCompassFilename(str(file), profile),
+                         'roast_豆名.alog')
+        profile['title'] = encodeLocalStrict('豆/名:別?')
+        self.assertEqual(convertedRoastingCompassFilename(str(file), profile),
+                         'roast_豆名別.alog')
         self.assertEqual(profile['ambientTemp'], 18.0)
         self.assertEqual(profile['ambient_humidity'], 60.0)
         self.assertEqual(decodeLocalStrict(profile['roastingnotes']),

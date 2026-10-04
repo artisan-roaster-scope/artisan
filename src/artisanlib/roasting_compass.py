@@ -11,10 +11,21 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from artisanlib.atypes import ProfileData
 
-from artisanlib.util import encodeLocalStrict
+from artisanlib.util import decodeLocalStrict, encodeLocalStrict
 
 
 _NUMBER = re.compile(r'\d+(?:\.\d+)?')
+
+
+def convertedRoastingCompassFilename(file: str, profile: 'ProfileData') -> str:
+    """Keep the source date and add the roast title to a converted profile name."""
+    stem = Path(file).stem
+    title = re.sub(r'[<>:"/\\|?*\x00-\x1f]', '',
+                   decodeLocalStrict(profile.get('title', b''))).strip(' .')
+    name = f'{stem}_{title}' if title and title != stem else stem
+    name = re.sub(r'[<>:"/\\|?*\x00-\x1f]', '', name).strip(' .')
+    # Leave room for the extension within common filesystem component limits.
+    return name.encode('utf-8')[:240].decode('utf-8', 'ignore') + '.alog'
 
 
 def _setting_values(rows: list[list[str]], start: int, end: int) -> list[tuple[int, str]]:
