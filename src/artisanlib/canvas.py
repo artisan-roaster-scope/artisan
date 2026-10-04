@@ -14098,8 +14098,9 @@ class tgraphcanvas(QObject):
         """Follow the observed COFFEE DISCOVERY timer contact while monitoring is on."""
         if self.device != 209 or not self.aw.ser.shinko_timer_sync:
             return
-        if active and not self.flagstart:
-            self.ToggleRecorder()
+        if active:
+            if not self.flagstart:
+                self.ToggleRecorder()
             if self.flagstart and self.timeindex[0] < 0:
                 self.markShinkoTimerCharge()
         elif not active and self.flagstart:

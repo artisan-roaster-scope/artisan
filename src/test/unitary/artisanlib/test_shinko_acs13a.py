@@ -1,7 +1,15 @@
 """ACS-13A wire format, including a frame captured from a CMA-connected controller."""
 
 import unittest
+from types import SimpleNamespace
+from unittest.mock import Mock
 
+from PyQt6.QtCore import QCoreApplication
+
+_app = QCoreApplication.instance() or QCoreApplication([])
+_app.artisanviewerMode = False
+
+from artisanlib.canvas import tgraphcanvas
 from artisanlib.shinko_acs13a import parse_pv_response, parse_read_response, pv_request, read_request, timer_state
 
 
@@ -24,3 +32,15 @@ class ACS13AProtocolTests(unittest.TestCase):
         on = bytes.fromhex('06 20 20 20 30 30 38 35 32 30 30 30 31 31 03')
         self.assertFalse(timer_state(parse_read_response(off, '0085', 0)))
         self.assertTrue(timer_state(parse_read_response(on, '0085', 0)))
+
+    def test_timer_on_marks_charge_after_manual_start(self) -> None:
+        canvas = Mock()
+        canvas.device = 209
+        canvas.aw = SimpleNamespace(ser=SimpleNamespace(shinko_timer_sync=True))
+        canvas.flagstart = True
+        canvas.timeindex = [-1, 0, 0, 0, 0, 0, 0, 0]
+
+        tgraphcanvas.shinkoTimerStateTrigger(canvas, True)
+
+        canvas.ToggleRecorder.assert_not_called()
+        canvas.markShinkoTimerCharge.assert_called_once_with()
