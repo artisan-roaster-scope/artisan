@@ -14,3 +14,7 @@ timeout=0.8
 shinko_instrument_number=0
 shinko_pv_divider=10
 shinko_timer_sync=true
+shinko_timer_on_event=CHARGE
+shinko_timer_off_event=DROP
+shinko_timer_auto_start=true
+shinko_timer_auto_stop=true

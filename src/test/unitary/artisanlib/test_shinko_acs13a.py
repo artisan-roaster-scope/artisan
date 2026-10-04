@@ -36,7 +36,8 @@ class ACS13AProtocolTests(unittest.TestCase):
     def test_timer_on_marks_charge_after_manual_start(self) -> None:
         canvas = Mock()
         canvas.device = 209
-        canvas.aw = SimpleNamespace(ser=SimpleNamespace(shinko_timer_sync=True))
+        canvas.aw = SimpleNamespace(ser=SimpleNamespace(shinko_timer_sync=True,
+            shinko_timer_on_event='CHARGE', shinko_timer_auto_start=True))
         canvas.flagstart = True
         canvas.timeindex = [-1, 0, 0, 0, 0, 0, 0, 0]
 
@@ -44,3 +45,17 @@ class ACS13AProtocolTests(unittest.TestCase):
 
         canvas.ToggleRecorder.assert_not_called()
         canvas.markShinkoTimerCharge.assert_called_once_with()
+
+    def test_timer_events_can_leave_recording_under_manual_control(self) -> None:
+        canvas = Mock()
+        canvas.device = 209
+        canvas.aw = SimpleNamespace(ser=SimpleNamespace(shinko_timer_sync=True,
+            shinko_timer_on_event='CHARGE', shinko_timer_off_event='DROP',
+            shinko_timer_auto_start=False, shinko_timer_auto_stop=False))
+        canvas.flagstart = True
+        canvas.timeindex = [0, 0, 0, 0, 0, 0, 0, 0]
+
+        tgraphcanvas.shinkoTimerStateTrigger(canvas, False)
+
+        canvas.markDrop.assert_called_once_with()
+        canvas.ToggleRecorder.assert_not_called()

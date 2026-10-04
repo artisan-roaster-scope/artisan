@@ -14099,14 +14099,15 @@ class tgraphcanvas(QObject):
         if self.device != 209 or not self.aw.ser.shinko_timer_sync:
             return
         if active:
-            if not self.flagstart:
+            if self.aw.ser.shinko_timer_auto_start and not self.flagstart:
                 self.ToggleRecorder()
-            if self.flagstart and self.timeindex[0] < 0:
+            if self.aw.ser.shinko_timer_on_event == 'CHARGE' and self.flagstart and self.timeindex[0] < 0:
                 self.markShinkoTimerCharge()
         elif not active and self.flagstart:
-            if self.timeindex[0] >= 0 and self.timeindex[6] == 0:
+            if self.aw.ser.shinko_timer_off_event == 'DROP' and self.timeindex[0] >= 0 and self.timeindex[6] == 0:
                 self.markDrop()
-            self.ToggleRecorder()
+            if self.aw.ser.shinko_timer_auto_stop:
+                self.ToggleRecorder()
 
     def markShinkoTimerCharge(self) -> None:
         if self.flagstart and self.timeindex[0] < 0:

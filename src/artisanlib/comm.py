@@ -263,7 +263,8 @@ class serialport:
         'ArduinoIsInitialized','ArduinoFILT','HH806Winitflag','R1','devicefunctionlist','externalprogram',\
         'externaloutprogram','externaloutprogramFlag','PhidgetHUMtemp','PhidgetHUMhum','PhidgetPREpre','TMP1000temp', 'colorTrackSerial', 'colorTrackBT',
         'CM_reference_timeb', 'CM_ET_readings_count', 'CM_BT_readings_count', 'CM_ET_sum_of_squared_differences', 'CM_BT_sum_of_squared_differences',
-        'shinko_instrument_number', 'shinko_pv_divider', 'shinko_timer_sync', 'shinko_timer_last_state' ]
+        'shinko_instrument_number', 'shinko_pv_divider', 'shinko_timer_sync', 'shinko_timer_last_state',
+        'shinko_timer_on_event', 'shinko_timer_off_event', 'shinko_timer_auto_start', 'shinko_timer_auto_stop' ]
 
     def __init__(self, aw:'ApplicationWindow') -> None:
 
@@ -283,6 +284,10 @@ class serialport:
         self.shinko_pv_divider:int = 10
         self.shinko_timer_sync:bool = False
         self.shinko_timer_last_state:bool|None = None
+        self.shinko_timer_on_event:str = 'CHARGE'
+        self.shinko_timer_off_event:str = 'DROP'
+        self.shinko_timer_auto_start:bool = True
+        self.shinko_timer_auto_stop:bool = True
         #serial port for ET/BT
         import serial  # @UnusedImport
         self.SP:serial.Serial = serial.Serial()
