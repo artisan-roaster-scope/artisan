@@ -4,12 +4,35 @@ from tempfile import TemporaryDirectory
 import unittest
 
 from artisanlib.roasting_compass import (convertedRoastingCompassFilename,
+                                          applyRoastingCompassCheckpointMapping,
                                           extractProfileRoastingCompassCSV)
 from artisanlib.util import (decodeLocalStrict, encodeLocalStrict,
                              events_external_to_internal_value)
 
 
 class RoastingCompassImportTest(unittest.TestCase):
+    def test_checkpoint_mapping_uses_roast_markers_and_keeps_none(self) -> None:
+        profile = {
+            'timeindex': [0, 0, 0, 0, 0, 0, 4, 0],
+            'specialevents': [1, 2, 3, 4],
+            'specialeventstype': [4, 4, 4, 3],
+            'specialeventsvalue': [0.0, 0.0, 0.0, 1.4],
+            'specialeventsStrings': ['CP1', 'CP2', 'CP3', '4 kPa'],
+        }
+        applyRoastingCompassCheckpointMapping(
+            profile, {1: 'DRY END', 2: 'FC START', 3: 'NONE'})
+        self.assertEqual(profile['timeindex'], [0, 1, 2, 0, 0, 0, 4, 0])
+        self.assertEqual(profile['specialevents'], [3, 4])
+        self.assertEqual(profile['specialeventsStrings'], ['CP3', '4 kPa'])
+        self.assertEqual(profile['specialeventstype'], [4, 3])
+        self.assertEqual(profile['specialeventsvalue'], [0.0, 1.4])
+
+    def test_duplicate_checkpoint_marker_is_rejected(self) -> None:
+        profile = {'timeindex': [0] * 8}
+        with self.assertRaisesRegex(ValueError, 'at most once'):
+            applyRoastingCompassCheckpointMapping(
+                profile, {1: 'FC START', 2: 'FC START'})
+
     def test_cp932_temperature_and_checkpoint(self) -> None:
         with TemporaryDirectory() as directory:
             file = Path(directory) / 'roast.csv'

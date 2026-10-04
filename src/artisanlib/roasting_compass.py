@@ -15,6 +15,39 @@ from artisanlib.util import decodeLocalStrict, encodeLocalStrict
 
 
 _NUMBER = re.compile(r'\d+(?:\.\d+)?')
+CHECKPOINT_MARKERS = {
+    'DRY END': 1,
+    'FC START': 2,
+    'FC END': 3,
+    'SC START': 4,
+    'SC END': 5,
+}
+
+
+def applyRoastingCompassCheckpointMapping(
+        profile: 'ProfileData', choices: dict[int, str]) -> None:
+    """Move selected CP events to Artisan's roast milestone indices."""
+    selected = [marker for marker in choices.values() if marker != 'NONE']
+    if len(selected) != len(set(selected)) or any(
+            marker not in CHECKPOINT_MARKERS for marker in selected):
+        raise ValueError('Each checkpoint marker must be selected at most once')
+
+    events = profile.get('specialevents', [])
+    labels = profile.get('specialeventsStrings', [])
+    types = profile.get('specialeventstype', [])
+    values = profile.get('specialeventsvalue', [])
+    kept = []
+    for event, event_type, value, label in zip(events, types, values, labels, strict=True):
+        checkpoint = int(label[2:]) if label in ('CP1', 'CP2', 'CP3') else None
+        marker = choices.get(checkpoint, 'NONE') if checkpoint is not None else 'NONE'
+        if marker != 'NONE' and event > 0 and not profile['timeindex'][CHECKPOINT_MARKERS[marker]]:
+            profile['timeindex'][CHECKPOINT_MARKERS[marker]] = event
+        else:
+            kept.append((event, event_type, value, label))
+    profile['specialevents'] = [event[0] for event in kept]
+    profile['specialeventstype'] = [event[1] for event in kept]
+    profile['specialeventsvalue'] = [event[2] for event in kept]
+    profile['specialeventsStrings'] = [event[3] for event in kept]
 
 
 def convertedRoastingCompassFilename(file: str, profile: 'ProfileData') -> str:

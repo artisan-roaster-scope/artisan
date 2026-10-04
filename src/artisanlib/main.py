@@ -111,10 +111,10 @@ except Exception: # pylint: disable=broad-except
 
 from PyQt6.QtWidgets import (QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog, QGraphicsDropShadowEffect,
                          QInputDialog, QGroupBox, QLineEdit,
-                         QSizePolicy, QVBoxLayout, QHBoxLayout, QPushButton,
+                         QSizePolicy, QVBoxLayout, QHBoxLayout, QFormLayout, QPushButton,
                          QLCDNumber, QSpinBox, QComboBox,
                          QSlider, QToolButton,
-                         QColorDialog, QFrame, QScrollArea, QProgressDialog,
+                         QColorDialog, QDialog, QDialogButtonBox, QFrame, QScrollArea, QProgressDialog,
                          QStyleFactory, QMenuBar, QMenu, QLayout, QDockWidget)
 from PyQt6.QtGui import (QScreen, QPageLayout, QAction, QWindow,
                             QKeySequence, QShortcut,
@@ -17333,7 +17333,47 @@ class ApplicationWindow(QMainWindow):
         from artisanlib.roasting_compass import (convertedRoastingCompassFilename,
                                                   extractProfileRoastingCompassCSV)
         self.fileConvertFrom('*.csv', extractProfileRoastingCompassCSV,
-                             convertedRoastingCompassFilename)
+                             convertedRoastingCompassFilename,
+                             self.configureRoastingCompassCheckpoints)
+
+    def configureRoastingCompassCheckpoints(self) -> Callable[['ProfileData'], None]|None:
+        from artisanlib.roasting_compass import (CHECKPOINT_MARKERS,
+                                                 applyRoastingCompassCheckpointMapping)
+        dialog = QDialog(self)
+        dialog.setWindowTitle('Roasting Compass Checkpoints')
+        layout = QVBoxLayout(dialog)
+        layout.addWidget(QLabel('Convert checkpoints to Artisan roast markers:'))
+        form = QFormLayout()
+        selectors = []
+        for checkpoint in (1, 2, 3):
+            selector = QComboBox(dialog)
+            selector.addItem(f'NONE (keep CP{checkpoint})', 'NONE')
+            for marker in CHECKPOINT_MARKERS:
+                selector.addItem(marker, marker)
+            form.addRow(f'CP{checkpoint}', selector)
+            selectors.append(selector)
+        layout.addLayout(form)
+        buttons = QDialogButtonBox(
+            QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel,
+            parent=dialog)
+        buttons.rejected.connect(dialog.reject)
+
+        def accept_mapping() -> None:
+            selected = [selector.currentData() for selector in selectors]
+            markers = [marker for marker in selected if marker != 'NONE']
+            if len(markers) != len(set(markers)):
+                QMessageBox.warning(dialog, 'Roasting Compass Checkpoints',
+                                    'Each Artisan roast marker can be selected only once.')
+            else:
+                dialog.accept()
+
+        buttons.accepted.connect(accept_mapping)
+        layout.addWidget(buttons)
+        if dialog.exec() != QDialog.DialogCode.Accepted:
+            return None
+        choices = {checkpoint: str(selector.currentData())
+                   for checkpoint, selector in zip((1, 2, 3), selectors, strict=True)}
+        return functools.partial(applyRoastingCompassCheckpointMapping, choices=choices)
 
     @pyqtSlot()
     @pyqtSlot(bool)
@@ -17369,9 +17409,13 @@ class ApplicationWindow(QMainWindow):
     def fileConvertFrom(self,
             ext:str,
             extractor: Callable[[str, list[str], list[str], list[str], Callable[[int],float]],'ProfileData|None'],
-            target_name: Callable[[str, 'ProfileData'], str]|None = None) -> None:
+            target_name: Callable[[str, 'ProfileData'], str]|None = None,
+            configure_profile: Callable[[], Callable[['ProfileData'], None]|None]|None = None) -> None:
         files = self.ArtisanOpenFilesDialog(ext=ext)
         if files and len(files) > 0:
+            transform = configure_profile() if configure_profile is not None else None
+            if configure_profile is not None and transform is None:
+                return
             loaded_profile = self.curFile
             if self.qmc.reset(soundOn=False):
                 self.saveExtradeviceSettings()
@@ -17398,6 +17442,8 @@ class ApplicationWindow(QMainWindow):
                                     self.qmc.artisanflavordefaultlabels[:],
                                     self.qmc.eventsExternal2InternalValue)
                             if pd is not None:
+                                if transform is not None:
+                                    transform(pd)
                                 if target_name is not None:
                                     fconv = str(QDir(outdir).filePath(target_name(f, pd)))
                                 if not os.path.exists(fconv):
@@ -26233,11 +26279,15 @@ class ApplicationWindow(QMainWindow):
     #   artisanflavordefaultlabels:list[str]  # translated to current locale
     #   eventsExternal2InternalValue: Callable[[int],float]
     def importExternal(self, extractor:  Callable[[str, list[str], list[str], list[str], Callable[[int],float]],
-            'ProfileData'], message:str, extension:str, filename:str|None = None) -> None:
+            'ProfileData'], message:str, extension:str, filename:str|None = None,
+            configure_profile: Callable[[], Callable[['ProfileData'], None]|None]|None = None) -> None:
         try:
             if filename is None:
                 filename = self.ArtisanOpenFileDialog(msg=message,ext=extension)
             if len(filename) == 0:
+                return
+            transform = configure_profile() if configure_profile is not None else None
+            if configure_profile is not None and transform is None:
                 return
             res = self.qmc.reset(redraw=False,soundOn=False)
             if res:
@@ -26246,6 +26296,8 @@ class ApplicationWindow(QMainWindow):
                                         self.qmc.alt_etypesdefault,
                                         self.qmc.artisanflavordefaultlabels,
                                         self.qmc.eventsExternal2InternalValue)
+                if transform is not None:
+                    transform(obj)
                 res = self.setProfile(filename, obj)
 
             if res:
@@ -26320,7 +26372,8 @@ class ApplicationWindow(QMainWindow):
     def importRoastingCompass(self, _:bool = False) -> None:
         from artisanlib.roasting_compass import extractProfileRoastingCompassCSV
         self.importExternal(extractProfileRoastingCompassCSV,
-                QApplication.translate('Message','Import {}').format('Roasting Compass CSV'),'*.csv')
+                QApplication.translate('Message','Import {}').format('Roasting Compass CSV'),'*.csv',
+                configure_profile=self.configureRoastingCompassCheckpoints)
 
     @pyqtSlot()
     @pyqtSlot(bool)
