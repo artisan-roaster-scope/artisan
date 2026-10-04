@@ -2078,6 +2078,10 @@ class ApplicationWindow(QMainWindow):
         importPetronciniAction.triggered.connect(self.importPetroncini)
         self.importMenu.addAction(importPetronciniAction)
 
+        importRoastingCompassAction = QAction('Roasting Compass CSV...', self)
+        importRoastingCompassAction.triggered.connect(self.importRoastingCompass)
+        self.importMenu.addAction(importRoastingCompassAction)
+
         importROESTAction = QAction('ROEST CSV...', self)
         importROESTAction.triggered.connect(self.importRoest)
         self.importMenu.addAction(importROESTAction)
@@ -2139,6 +2143,10 @@ class ApplicationWindow(QMainWindow):
         fileConvertFromPetronciniAction = QAction(QApplication.translate('Menu', 'Petroncini CSV...'), self)
         fileConvertFromPetronciniAction.triggered.connect(self.convertFromPetroncini)
         self.convFromMenu.addAction(fileConvertFromPetronciniAction)
+
+        fileConvertFromRoastingCompassAction = QAction(QApplication.translate('Menu', 'Roasting Compass CSV...'), self)
+        fileConvertFromRoastingCompassAction.triggered.connect(self.convertFromRoastingCompass)
+        self.convFromMenu.addAction(fileConvertFromRoastingCompassAction)
 
         fileConvertFromROESTAction = QAction(QApplication.translate('Menu', 'ROEST CSV...'), self)
         fileConvertFromROESTAction.triggered.connect(self.convertFromROEST)
@@ -5331,7 +5339,7 @@ class ApplicationWindow(QMainWindow):
         self.settooltip()
 
     def populateListMenu(self, resourceName:str, ext:str, triggered:Callable[[bool], None], menu:QMenu, addMenu:bool = True,
-                forceSubmenu:bool = False) -> None:
+                forceSubmenu:bool = False, forceSubmenuFor:set[str]|None = None) -> None:
         one_added:bool = False
         res:dict[str, list[tuple[str, str]]] = {}
         for root,dirs,files in os.walk(os.path.join(getResourcePath(),resourceName)):
@@ -5349,7 +5357,7 @@ class ApplicationWindow(QMainWindow):
         keys = list(res.keys())
         keys.sort(key=lambda v: (v.upper(), v[0].islower()))
         for k in keys:
-            if len(res[k]) > 1:
+            if len(res[k]) > 1 or (forceSubmenuFor is not None and k in forceSubmenuFor):
                 if len(keys) == 1 and not forceSubmenu:
                     for e in res[k]:
                         a = QAction(self)
@@ -5396,7 +5404,8 @@ class ApplicationWindow(QMainWindow):
             self.ConfMenu.addMenu(menu)
 
     def populateMachineMenu(self) -> None:
-        self.populateListMenu('Machines','.aset',self.openMachineSettings,self.machineMenu, addMenu=False)
+        self.populateListMenu('Machines','.aset',self.openMachineSettings,self.machineMenu,
+                              addMenu=False, forceSubmenuFor={'Fuji Royal'})
 
     @pyqtSlot(bool)
     def openMachineSettings(self, _checked:bool = False) -> None:
@@ -5557,7 +5566,7 @@ class ApplicationWindow(QMainWindow):
                             self.mugmaHost = host
                         else:
                             res = False
-                    elif not no_config and (self.qmc.device in {0, 9, 19, 53, 101, 115, 126, 196} or ((self.qmc.device == 29 or 29 in self.qmc.extradevices) and self.modbus.type in {0, 1, 2}) or
+                    elif not no_config and (self.qmc.device in {0, 9, 19, 53, 101, 115, 126, 196, 209} or ((self.qmc.device == 29 or 29 in self.qmc.extradevices) and self.modbus.type in {0, 1, 2}) or
                             (self.qmc.device == 134 and self.santokerSerial and not self.santokerBLE) or
                             (self.qmc.device == 138 and self.kaleidoSerial)): # Fuji, Center301, TC4, Hottop, Behmor or MODBUS serial, HB/ARC
                         select_device_name = None
@@ -17320,6 +17329,12 @@ class ApplicationWindow(QMainWindow):
 
     @pyqtSlot()
     @pyqtSlot(bool)
+    def convertFromRoastingCompass(self, _:bool = False) -> None:
+        from artisanlib.roasting_compass import extractProfileRoastingCompassCSV
+        self.fileConvertFrom('*.csv', extractProfileRoastingCompassCSV)
+
+    @pyqtSlot()
+    @pyqtSlot(bool)
     def convertFromOrbiter(self, _:bool = False) -> None:
         from artisanlib.orbiter import extractProfileOrbiterROP
         self.fileConvertFrom('(*.rop *.zip)', extractProfileOrbiterROP)
@@ -18409,6 +18424,14 @@ class ApplicationWindow(QMainWindow):
             #restore serial port
             settings.beginGroup('SerialPort')
             self.ser.comport = s2a(toString(settings.value('comport',self.ser.comport)))
+            self.ser.shinko_instrument_number = toInt(settings.value('shinko_instrument_number',self.ser.shinko_instrument_number))
+            self.ser.shinko_pv_divider = max(1,toInt(settings.value('shinko_pv_divider',self.ser.shinko_pv_divider)))
+            self.ser.shinko_timer_sync = toBool(settings.value('shinko_timer_sync',self.ser.shinko_timer_sync))
+            self.ser.shinko_timer_last_state = None
+            self.ser.shinko_timer_on_event = toString(settings.value('shinko_timer_on_event',self.ser.shinko_timer_on_event))
+            self.ser.shinko_timer_off_event = toString(settings.value('shinko_timer_off_event',self.ser.shinko_timer_off_event))
+            self.ser.shinko_timer_auto_start = toBool(settings.value('shinko_timer_auto_start',self.ser.shinko_timer_auto_start))
+            self.ser.shinko_timer_auto_stop = toBool(settings.value('shinko_timer_auto_stop',self.ser.shinko_timer_auto_stop))
             self.ser.baudrate = toInt(settings.value('baudrate',int(self.ser.baudrate)))
             self.ser.bytesize = toInt(settings.value('bytesize',self.ser.bytesize))
             self.ser.stopbits = toInt(settings.value('stopbits',self.ser.stopbits))
@@ -20403,6 +20426,13 @@ class ApplicationWindow(QMainWindow):
             #save serial port
             settings.beginGroup('SerialPort')
             self.settingsSetValue(settings, default_settings, 'comport',self.ser.comport, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'shinko_instrument_number',self.ser.shinko_instrument_number, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'shinko_pv_divider',self.ser.shinko_pv_divider, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'shinko_timer_sync',self.ser.shinko_timer_sync, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'shinko_timer_on_event',self.ser.shinko_timer_on_event, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'shinko_timer_off_event',self.ser.shinko_timer_off_event, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'shinko_timer_auto_start',self.ser.shinko_timer_auto_start, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'shinko_timer_auto_stop',self.ser.shinko_timer_auto_stop, read_defaults)
             self.settingsSetValue(settings, default_settings, 'baudrate',self.ser.baudrate, read_defaults)
             self.settingsSetValue(settings, default_settings, 'bytesize',self.ser.bytesize, read_defaults)
             self.settingsSetValue(settings, default_settings, 'stopbits',self.ser.stopbits, read_defaults)
@@ -26276,6 +26306,13 @@ class ApplicationWindow(QMainWindow):
     def importPetroncini(self, _:bool = False) -> None:
         from artisanlib.petroncini import extractProfilePetronciniCSV
         self.importExternal(extractProfilePetronciniCSV,QApplication.translate('Message','Import {}').format('Petroncini CSV'),'*.csv')
+
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def importRoastingCompass(self, _:bool = False) -> None:
+        from artisanlib.roasting_compass import extractProfileRoastingCompassCSV
+        self.importExternal(extractProfileRoastingCompassCSV,
+                QApplication.translate('Message','Import {}').format('Roasting Compass CSV'),'*.csv')
 
     @pyqtSlot()
     @pyqtSlot(bool)

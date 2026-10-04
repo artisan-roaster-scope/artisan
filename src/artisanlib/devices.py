@@ -4662,6 +4662,18 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 ##########################
                 ####  DEVICE 208 is +Santoker XT/YT but +DEVICE cannot be set as main device
                 ##########################
+                elif meter == 'Shinko ACS-13A (CMA)':
+                    self.aw.qmc.device = 209
+                    self.aw.ser.baudrate = 9600
+                    self.aw.ser.bytesize = 7
+                    self.aw.ser.parity = 'E'
+                    self.aw.ser.stopbits = 1
+                    self.aw.ser.timeout = 0.8
+                    self.aw.ser.shinko_instrument_number = 0
+                    self.aw.ser.shinko_pv_divider = 10
+                    self.aw.ser.shinko_timer_sync = False
+                    self.aw.ser.shinko_timer_last_state = None
+                    message = QApplication.translate('Message','Device set to {0}. Now, choose serial port').format(meter)
 
                 # ADD DEVICE:
 
@@ -4676,7 +4688,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             #extra devices serial config
             #set of different serial settings modes options
             ssettings: list[tuple[int,int,str,int,float]] = [(9600,8,'O',1,0.5),(19200,8,'E',1,0.5),(2400,7,'E',1,1),(9600,8,'N',1,0.5),
-                         (19200,8,'N',1,0.5),(2400,8,'N',1,1),(9600,8,'E',1,0.5),(38400,8,'E',1,0.5),(115200,8,'N',1,0.4),(57600,8,'N',1,0.4)]
+                         (19200,8,'N',1,0.5),(2400,8,'N',1,1),(9600,8,'E',1,0.5),(38400,8,'E',1,0.5),(115200,8,'N',1,0.4),(57600,8,'N',1,0.4),
+                         (9600,7,'E',1,0.8)]
             #map device index to a setting mode (choose the one that matches the device)
     # ADD DEVICE: to add a device you have to modify several places. Search for the tag "ADD DEVICE:"in the code
     # - add an entry to devsettings below (and potentially to ssettings above)
@@ -4889,7 +4902,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 1, # 205
                 1, # 206
                 1, # 207
-                1  # 208
+                1, # 208
+                10 # 209: ACS-13A CMA 9600 7E1
                 ]
             #init serial settings of extra devices
             for i, _ in enumerate(self.aw.qmc.extradevices):

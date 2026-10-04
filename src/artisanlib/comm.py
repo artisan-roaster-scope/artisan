@@ -62,6 +62,7 @@ if TYPE_CHECKING:
 
 
 from artisanlib.util import cmd2str, RoRfromCtoFstrict, fromCtoFstrict, fromFtoCstrict, hex2int, str2cmd
+from artisanlib.shinko_acs13a import parse_pv_response, parse_read_response, pv_request, read_request, timer_state
 
 from PyQt6.QtCore import Qt, QDateTime, QSemaphore, pyqtSlot
 from PyQt6.QtGui import QIntValidator
@@ -261,7 +262,9 @@ class serialport:
         'controlETpid','readBTpid','useModbusPort','showFujiLCDs','arduinoETChannel','arduinoBTChannel','arduinoATChannel',\
         'ArduinoIsInitialized','ArduinoFILT','HH806Winitflag','R1','devicefunctionlist','externalprogram',\
         'externaloutprogram','externaloutprogramFlag','PhidgetHUMtemp','PhidgetHUMhum','PhidgetPREpre','TMP1000temp', 'colorTrackSerial', 'colorTrackBT',
-        'CM_reference_timeb', 'CM_ET_readings_count', 'CM_BT_readings_count', 'CM_ET_sum_of_squared_differences', 'CM_BT_sum_of_squared_differences' ]
+        'CM_reference_timeb', 'CM_ET_readings_count', 'CM_BT_readings_count', 'CM_ET_sum_of_squared_differences', 'CM_BT_sum_of_squared_differences',
+        'shinko_instrument_number', 'shinko_pv_divider', 'shinko_timer_sync', 'shinko_timer_last_state',
+        'shinko_timer_on_event', 'shinko_timer_off_event', 'shinko_timer_auto_start', 'shinko_timer_auto_stop' ]
 
     def __init__(self, aw:'ApplicationWindow') -> None:
 
@@ -277,6 +280,14 @@ class serialport:
         self.parity:str = 'O'
         self.stopbits:int = 1
         self.timeout:float = 0.4
+        self.shinko_instrument_number:int = 0
+        self.shinko_pv_divider:int = 10
+        self.shinko_timer_sync:bool = False
+        self.shinko_timer_last_state:bool|None = None
+        self.shinko_timer_on_event:str = 'CHARGE'
+        self.shinko_timer_off_event:str = 'DROP'
+        self.shinko_timer_auto_start:bool = True
+        self.shinko_timer_auto_stop:bool = True
         #serial port for ET/BT
         import serial  # @UnusedImport
         self.SP:serial.Serial = serial.Serial()
@@ -597,6 +608,7 @@ class serialport:
                                    self.MQTT_1112,                   #206
                                    self.MODBUS_1112,                 #207
                                    self.Santoker_XY,                 #208
+                                   self.SHINKO_ACS13A,              #209
                                    ]
         #string with the name of the program for device #27
         self.externalprogram:str = 'test.py'
@@ -2749,6 +2761,8 @@ class serialport:
                 self.confport()
                 #Reinitialize Arduino in case communication was interrupted
                 self.SP.open()
+                if self.aw.qmc.device == 209:
+                    self.shinko_timer_last_state = None
                 if self.aw.qmc.device == 19:
                     libtime.sleep(1) # Arduino takes about 1s after port open until it communicates, as it first restarts
                     self.ArduinoIsInitialized = 0  # Assume the Arduino has to be reinitialized
@@ -2779,6 +2793,43 @@ class serialport:
                 self.SP.close()
         except Exception: # pylint: disable=broad-except
             pass
+
+    def SHINKO_ACS13A(self) -> tuple[float,float,float]:
+        """Read BT and, when enabled, the Fuji Royal timer contact over CMA."""
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        self.COMsemaphore.acquire(1)
+        try:
+            if not self.SP.is_open:
+                self.openport()
+            if not self.SP.is_open:
+                return tx,-1.,-1.
+            request = pv_request(self.shinko_instrument_number)
+            self.SP.reset_input_buffer()
+            self.SP.write(request)
+            response = self.SP.read(15)
+            if self.aw.seriallogflag:
+                self.aw.addserial(f'Shinko ACS-13A: Tx = {request.hex()} || Rx = {response.hex()}')
+            pv = parse_pv_response(response, self.shinko_instrument_number)
+            if self.shinko_timer_sync:
+                try:
+                    status_request = read_request('0085', self.shinko_instrument_number)
+                    self.SP.reset_input_buffer()
+                    self.SP.write(status_request)
+                    status_response = self.SP.read(15)
+                    if self.aw.seriallogflag:
+                        self.aw.addserial(f'Shinko ACS-13A status: Tx = {status_request.hex()} || Rx = {status_response.hex()}')
+                    active = timer_state(parse_read_response(status_response, '0085', self.shinko_instrument_number))
+                    if self.shinko_timer_last_state is not None and active != self.shinko_timer_last_state:
+                        self.aw.qmc.shinkoTimerStateSignal.emit(active)
+                    self.shinko_timer_last_state = active
+                except Exception as exc: # pylint: disable=broad-except
+                    _log.debug('Shinko ACS-13A timer status read failed: %s', exc)
+            return tx,-1.,pv / self.shinko_pv_divider
+        except Exception as exc: # pylint: disable=broad-except
+            _log.debug('Shinko ACS-13A PV read failed: %s', exc)
+            return tx,-1.,-1.
+        finally:
+            self.COMsemaphore.release(1)
 
 #    @pyqtSlot('QCloseEvent')
 #    def closeEvent(self,_:'QCloseEvent') -> None:

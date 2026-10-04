@@ -246,7 +246,8 @@ DEVICES: Final[list[str]] = [
     '+MQTT 910',                  #205
     '+MQTT 1112',                 #206
     '+MODBUS 1112',               #207
-    '+Santoker XT/YT'             #208
+    '+Santoker XT/YT',            #208
+    'Shinko ACS-13A (CMA)'        #209
 ]
 
 

@@ -234,6 +234,7 @@ class tgraphcanvas(QObject):
     onMonitorSignal = pyqtSignal()
     toggleMonitorSignal = pyqtSignal()
     toggleRecorderSignal = pyqtSignal()
+    shinkoTimerStateSignal = pyqtSignal(bool)
     processAlarmSignal = pyqtSignal(int, bool, int, str)
     alarmsetSignal = pyqtSignal(int)
     moveBackgroundSignal = pyqtSignal(str, int)
@@ -2224,6 +2225,7 @@ class tgraphcanvas(QObject):
         self.onMonitorSignal.connect(self.OnMonitor, type=Qt.ConnectionType.QueuedConnection) # type: ignore[call-arg]
         self.toggleMonitorSignal.connect(self.toggleMonitorTigger)
         self.toggleRecorderSignal.connect(self.toggleRecorderTigger)
+        self.shinkoTimerStateSignal.connect(self.shinkoTimerStateTrigger, type=Qt.ConnectionType.QueuedConnection) # type: ignore[call-arg]
         self.processAlarmSignal.connect(self.processAlarm, type=Qt.ConnectionType.QueuedConnection) # type: ignore[call-arg] # queued to avoid deadlock between RampSoak processing and EventRecordAction, both accessing the same critical section protected by profileDataSemaphore
         self.alarmsetSignal.connect(self.selectAlarmSet)
         self.moveBackgroundSignal.connect(self.moveBackgroundAndRedraw)
@@ -14090,6 +14092,29 @@ class tgraphcanvas(QObject):
             self.ToggleMonitor()
         else:
             self.ToggleRecorder()
+
+    @pyqtSlot(bool)
+    def shinkoTimerStateTrigger(self, active:bool) -> None:
+        """Follow the observed COFFEE DISCOVERY timer contact while monitoring is on."""
+        if self.device != 209 or not self.aw.ser.shinko_timer_sync:
+            return
+        if active:
+            if self.aw.ser.shinko_timer_auto_start and not self.flagstart:
+                self.ToggleRecorder()
+            if self.aw.ser.shinko_timer_on_event == 'CHARGE' and self.flagstart and self.timeindex[0] < 0:
+                self.markShinkoTimerCharge()
+        elif not active and self.flagstart:
+            if self.aw.ser.shinko_timer_off_event == 'DROP' and self.timeindex[0] >= 0 and self.timeindex[6] == 0:
+                self.markDrop()
+            if self.aw.ser.shinko_timer_auto_stop:
+                self.ToggleRecorder()
+
+    def markShinkoTimerCharge(self) -> None:
+        if self.flagstart and self.timeindex[0] < 0:
+            if self.timex:
+                self.markCharge()
+            else:
+                QTimer.singleShot(250, self.markShinkoTimerCharge)
 
     #Turns START/STOP flag self.flagon to read and plot. Called from push buttonSTARTSTOP.
     @pyqtSlot(bool)
