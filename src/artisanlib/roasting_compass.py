@@ -1,15 +1,28 @@
 """Import Fuji Royal Roasting Compass CSV profiles."""
 
 import csv
+from bisect import bisect_left
 from collections.abc import Callable
 from datetime import datetime
 from pathlib import Path
+import re
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from artisanlib.atypes import ProfileData
 
 from artisanlib.util import encodeLocalStrict
+
+
+_NUMBER = re.compile(r'\d+(?:\.\d+)?')
+
+
+def _setting_values(rows: list[list[str]], start: int, end: int) -> list[tuple[int, str]]:
+    """Read a 16-by-4 footer grid, where each cell represents one roast minute."""
+    return [(4 * row_index + column, value)
+            for row_index, row in enumerate(rows[start:end])
+            for column, cell in enumerate(row[:4])
+            if (value := cell.strip()) and _NUMBER.fullmatch(value)]
 
 
 def _read_rows(file: str) -> list[list[str]]:
@@ -83,12 +96,6 @@ def extractProfileRoastingCompassCSV(
         'roasttime': started.time().isoformat(),
         'roastepoch': int(started.astimezone().timestamp()),
     }
-    if specialevents:
-        profile['specialevents'] = specialevents
-        profile['specialeventstype'] = specialeventstype
-        profile['specialeventsvalue'] = specialeventsvalue
-        profile['specialeventsStrings'] = specialeventsStrings
-
     # A blank row separates the samples from the summary table. Its first row
     # contains the coffee name; the next row's fourth column contains the memo.
     summary_index = next((i for i in range(len(timex) + 2, len(rows))
@@ -106,7 +113,39 @@ def extractProfileRoastingCompassCSV(
             weather = details[0].strip() if details else ''
             memo = details[3].strip() if len(details) > 3 else ''
             # Preserve weather in notes because Artisan has no dedicated weather field.
-            notes = '\n'.join(part for part in (f'天候: {weather}' if weather else '', memo) if part)
+            # Each footer grid cell represents a minute from the roast start.
+            # Preserve exact settings in notes as the graph event values use
+            # Artisan's integer scale (tenths of kPa for gas pressure).
+            gas = _setting_values(rows, summary_index + 5, summary_index + 21)
+            damper = _setting_values(rows, summary_index + 21, summary_index + 37)
+            notes = '\n'.join(part for part in (
+                f'天候: {weather}' if weather else '',
+                f'ガス圧 (kPa): {", ".join(value for _, value in gas)}' if gas else '',
+                f'ダンパー開度: {", ".join(value for _, value in damper)}' if damper else '',
+                memo,
+            ) if part)
             if notes:
                 profile['roastingnotes'] = encodeLocalStrict(notes)
+
+            for event_type, settings in ((3, gas), (2, damper)):
+                for minute, value in settings:
+                    seconds = minute * 60
+                    if seconds > timex[-1]:
+                        continue
+                    specialevents.append(bisect_left(timex, seconds))
+                    specialeventstype.append(event_type)
+                    external_value = (round(float(value) * 10) if event_type == 3
+                                      else round(float(value)))
+                    specialeventsvalue.append(_eventsExternal2InternalValue(external_value))
+                    specialeventsStrings.append(
+                        f'{value} kPa' if event_type == 3 else f'Damper {value}')
+
+    if specialevents:
+        events = sorted(zip(specialevents, specialeventstype,
+                            specialeventsvalue, specialeventsStrings, strict=True),
+                        key=lambda event: event[0])
+        profile['specialevents'] = [event[0] for event in events]
+        profile['specialeventstype'] = [event[1] for event in events]
+        profile['specialeventsvalue'] = [event[2] for event in events]
+        profile['specialeventsStrings'] = [event[3] for event in events]
     return profile
