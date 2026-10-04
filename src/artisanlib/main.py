@@ -18415,6 +18415,8 @@ class ApplicationWindow(QMainWindow):
             self.ser.comport = s2a(toString(settings.value('comport',self.ser.comport)))
             self.ser.shinko_instrument_number = toInt(settings.value('shinko_instrument_number',self.ser.shinko_instrument_number))
             self.ser.shinko_pv_divider = max(1,toInt(settings.value('shinko_pv_divider',self.ser.shinko_pv_divider)))
+            self.ser.shinko_timer_sync = toBool(settings.value('shinko_timer_sync',self.ser.shinko_timer_sync))
+            self.ser.shinko_timer_last_state = None
             self.ser.baudrate = toInt(settings.value('baudrate',int(self.ser.baudrate)))
             self.ser.bytesize = toInt(settings.value('bytesize',self.ser.bytesize))
             self.ser.stopbits = toInt(settings.value('stopbits',self.ser.stopbits))
@@ -20411,6 +20413,7 @@ class ApplicationWindow(QMainWindow):
             self.settingsSetValue(settings, default_settings, 'comport',self.ser.comport, read_defaults)
             self.settingsSetValue(settings, default_settings, 'shinko_instrument_number',self.ser.shinko_instrument_number, read_defaults)
             self.settingsSetValue(settings, default_settings, 'shinko_pv_divider',self.ser.shinko_pv_divider, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'shinko_timer_sync',self.ser.shinko_timer_sync, read_defaults)
             self.settingsSetValue(settings, default_settings, 'baudrate',self.ser.baudrate, read_defaults)
             self.settingsSetValue(settings, default_settings, 'bytesize',self.ser.bytesize, read_defaults)
             self.settingsSetValue(settings, default_settings, 'stopbits',self.ser.stopbits, read_defaults)

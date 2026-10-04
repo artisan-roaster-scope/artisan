@@ -2,7 +2,7 @@
 
 import unittest
 
-from artisanlib.shinko_acs13a import parse_pv_response, pv_request
+from artisanlib.shinko_acs13a import parse_pv_response, parse_read_response, pv_request, read_request, timer_state
 
 
 class ACS13AProtocolTests(unittest.TestCase):
@@ -17,3 +17,10 @@ class ACS13AProtocolTests(unittest.TestCase):
         response = bytes.fromhex('06 20 20 20 30 30 38 30 30 30 41 38 46 45 03')
         with self.assertRaisesRegex(ValueError, 'checksum'):
             parse_pv_response(response, 0)
+
+    def test_fuji_royal_timer_status(self) -> None:
+        self.assertEqual(read_request('0085', 0), bytes.fromhex('02 20 20 20 30 30 38 35 44 33 03'))
+        off = bytes.fromhex('06 20 20 20 30 30 38 35 30 30 30 30 31 33 03')
+        on = bytes.fromhex('06 20 20 20 30 30 38 35 32 30 30 30 31 31 03')
+        self.assertFalse(timer_state(parse_read_response(off, '0085', 0)))
+        self.assertTrue(timer_state(parse_read_response(on, '0085', 0)))

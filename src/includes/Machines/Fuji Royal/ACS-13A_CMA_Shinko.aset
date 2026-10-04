@@ -13,3 +13,4 @@ stopbits=1
 timeout=0.8
 shinko_instrument_number=0
 shinko_pv_divider=10
+shinko_timer_sync=true
