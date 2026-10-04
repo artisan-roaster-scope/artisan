@@ -2144,6 +2144,10 @@ class ApplicationWindow(QMainWindow):
         fileConvertFromPetronciniAction.triggered.connect(self.convertFromPetroncini)
         self.convFromMenu.addAction(fileConvertFromPetronciniAction)
 
+        fileConvertFromRoastingCompassAction = QAction(QApplication.translate('Menu', 'Roasting Compass CSV...'), self)
+        fileConvertFromRoastingCompassAction.triggered.connect(self.convertFromRoastingCompass)
+        self.convFromMenu.addAction(fileConvertFromRoastingCompassAction)
+
         fileConvertFromROESTAction = QAction(QApplication.translate('Menu', 'ROEST CSV...'), self)
         fileConvertFromROESTAction.triggered.connect(self.convertFromROEST)
         self.convFromMenu.addAction(fileConvertFromROESTAction)
@@ -17322,6 +17326,12 @@ class ApplicationWindow(QMainWindow):
     def convertFromPetroncini(self, _:bool = False) -> None:
         from artisanlib.petroncini import extractProfilePetronciniCSV
         self.fileConvertFrom('*.csv', extractProfilePetronciniCSV)
+
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def convertFromRoastingCompass(self, _:bool = False) -> None:
+        from artisanlib.roasting_compass import extractProfileRoastingCompassCSV
+        self.fileConvertFrom('*.csv', extractProfileRoastingCompassCSV)
 
     @pyqtSlot()
     @pyqtSlot(bool)

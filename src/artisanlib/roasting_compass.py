@@ -97,8 +97,16 @@ def extractProfileRoastingCompassCSV(
         summary = rows[summary_index]
         if len(summary) > 1 and summary[1].strip():
             profile['title'] = encodeLocalStrict(summary[1].strip())
-        if summary_index + 1 < len(rows) and len(rows[summary_index + 1]) > 3:
-            memo = rows[summary_index + 1][3].strip()
-            if memo:
-                profile['roastingnotes'] = encodeLocalStrict(memo)
+        if len(summary) > 2 and summary[2].strip():
+            profile['ambientTemp'] = float(summary[2])
+        if len(summary) > 3 and summary[3].strip():
+            profile['ambient_humidity'] = float(summary[3])
+        if summary_index + 1 < len(rows):
+            details = rows[summary_index + 1]
+            weather = details[0].strip() if details else ''
+            memo = details[3].strip() if len(details) > 3 else ''
+            # Preserve weather in notes because Artisan has no dedicated weather field.
+            notes = '\n'.join(part for part in (f'天候: {weather}' if weather else '', memo) if part)
+            if notes:
+                profile['roastingnotes'] = encodeLocalStrict(notes)
     return profile

@@ -21,7 +21,7 @@ class RoastingCompassImportTest(unittest.TestCase):
                     ['2026/10/03', '8:23:03', '188.0', '2'],
                     ['2026/10/03', '8:23:04', '187.0', '3'],
                     ['', '', '', ''],
-                    ['2026/10/03 8:23:01', '豆名', '', ''],
+                    ['2026/10/03 8:23:01', '豆名', '18', '60'],
                     ['晴れ', '250', '', '焙煎メモ'],
                 ])
             profile = extractProfileRoastingCompassCSV(str(file), [], [], [], float)
@@ -34,7 +34,9 @@ class RoastingCompassImportTest(unittest.TestCase):
         self.assertEqual(profile['specialevents'], [1, 2, 3])
         self.assertEqual(profile['specialeventsStrings'], ['CP1', 'CP2', 'CP3'])
         self.assertEqual(decodeLocalStrict(profile['title']), '豆名')
-        self.assertEqual(decodeLocalStrict(profile['roastingnotes']), '焙煎メモ')
+        self.assertEqual(profile['ambientTemp'], 18.0)
+        self.assertEqual(profile['ambient_humidity'], 60.0)
+        self.assertEqual(decodeLocalStrict(profile['roastingnotes']), '天候: 晴れ\n焙煎メモ')
 
     def test_rejects_unrelated_csv(self) -> None:
         with TemporaryDirectory() as directory:
