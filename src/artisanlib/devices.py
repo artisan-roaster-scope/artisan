@@ -4671,6 +4671,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                     self.aw.ser.timeout = 0.8
                     self.aw.ser.shinko_instrument_number = 0
                     self.aw.ser.shinko_pv_divider = 10
+                    self.aw.ser.shinko_timer_sync = False
+                    self.aw.ser.shinko_timer_last_state = None
                     message = QApplication.translate('Message','Device set to {0}. Now, choose serial port').format(meter)
 
                 # ADD DEVICE:

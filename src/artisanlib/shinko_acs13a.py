@@ -1,7 +1,7 @@
 """Read-only Shinko standard serial protocol support for the ACS-13A."""
 
 
-FUJI_ROYAL_TIMER_MASK = 0x2000
+COFFEE_DISCOVERY_TIMER_MASK = 0x2000
 
 
 def read_request(item:str, instrument_number:int) -> bytes:
@@ -38,5 +38,5 @@ def parse_pv_response(response:bytes, instrument_number:int) -> int:
 
 
 def timer_state(status:int) -> bool:
-    """Observed Fuji Royal timer contact in status item 0085 bit 13."""
-    return bool(status & FUJI_ROYAL_TIMER_MASK)
+    """Observed COFFEE DISCOVERY timer contact in status item 0085 bit 13."""
+    return bool(status & COFFEE_DISCOVERY_TIMER_MASK)

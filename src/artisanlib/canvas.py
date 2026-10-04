@@ -14095,7 +14095,7 @@ class tgraphcanvas(QObject):
 
     @pyqtSlot(bool)
     def shinkoTimerStateTrigger(self, active:bool) -> None:
-        """Follow the observed Fuji Royal timer contact while monitoring is on."""
+        """Follow the observed COFFEE DISCOVERY timer contact while monitoring is on."""
         if self.device != 209 or not self.aw.ser.shinko_timer_sync:
             return
         if active and not self.flagstart:

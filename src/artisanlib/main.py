@@ -5335,7 +5335,7 @@ class ApplicationWindow(QMainWindow):
         self.settooltip()
 
     def populateListMenu(self, resourceName:str, ext:str, triggered:Callable[[bool], None], menu:QMenu, addMenu:bool = True,
-                forceSubmenu:bool = False) -> None:
+                forceSubmenu:bool = False, forceSubmenuFor:set[str]|None = None) -> None:
         one_added:bool = False
         res:dict[str, list[tuple[str, str]]] = {}
         for root,dirs,files in os.walk(os.path.join(getResourcePath(),resourceName)):
@@ -5353,7 +5353,7 @@ class ApplicationWindow(QMainWindow):
         keys = list(res.keys())
         keys.sort(key=lambda v: (v.upper(), v[0].islower()))
         for k in keys:
-            if len(res[k]) > 1:
+            if len(res[k]) > 1 or (forceSubmenuFor is not None and k in forceSubmenuFor):
                 if len(keys) == 1 and not forceSubmenu:
                     for e in res[k]:
                         a = QAction(self)
@@ -5400,7 +5400,8 @@ class ApplicationWindow(QMainWindow):
             self.ConfMenu.addMenu(menu)
 
     def populateMachineMenu(self) -> None:
-        self.populateListMenu('Machines','.aset',self.openMachineSettings,self.machineMenu, addMenu=False)
+        self.populateListMenu('Machines','.aset',self.openMachineSettings,self.machineMenu,
+                              addMenu=False, forceSubmenuFor={'Fuji Royal'})
 
     @pyqtSlot(bool)
     def openMachineSettings(self, _checked:bool = False) -> None:
