@@ -1,0 +1,19 @@
+{
+  "name": "BatchManager Roasted",
+  "short_name": "BatchManager Roasted",
+  "icons": [
+    {
+      "src": "/roasted-android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/roasted-android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#2899c7",
+  "background_color": "#2899c7",
+  "display": "standalone"
+}

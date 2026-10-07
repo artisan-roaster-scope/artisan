@@ -35,7 +35,7 @@ if TYPE_CHECKING:
     from PyQt6.QtGui import QCloseEvent, QDragEnterEvent, QDropEvent, QKeyEvent, QShowEvent  # pylint: disable=unused-import
     from PyQt6.QtCore import QTimerEvent, QObject # pylint: disable=unused-import
 
-from PyQt6.QtCore import Qt, QEvent, QSettings, pyqtSlot, pyqtSignal, QRegularExpression
+from PyQt6.QtCore import Qt, QEvent, QSettings, pyqtSlot, pyqtSignal, QRegularExpression, QSize
 from PyQt6.QtWidgets import (QApplication, QWidget, QDialog, QMessageBox, QDialogButtonBox,
             QHBoxLayout, QVBoxLayout, QLabel, QLineEdit, QLayout, QTableWidget, QHeaderView, QPushButton, QSpinBox, QCheckBox)
 from PyQt6.QtGui import QKeySequence, QAction, QIntValidator, QTextCharFormat, QTextCursor, QColor, QIcon, QPalette
@@ -80,11 +80,11 @@ class ArtisanDialog(QDialog):
         # style
         palette = self.palette()
         accent_color = palette.color(QPalette.ColorRole.Accent)
-        if not accent_color.isValid() or platform.system() == 'Windows':
-            accent_color = QColor('#3979ae')  # Fallback artisan button blue if OS provides none (and on Windows)
+        if not accent_color.isValid() or platform.system() != 'darwin':
+            accent_color = QColor('#3979ae')  # Fallback artisan button blue if OS provides none (and on Windows/Linux)
         # Generate math-driven lighting variants for the accent button
         accent_name = accent_color.name()
-        accent_hover = accent_color.lighter(115).name() if self.aw.app.darkmode else accent_color.darker(105).name()
+        accent_hover = accent_color.lighter(115).name() if self.aw.app.darkmode else accent_color.darker(110).name()
         accent_pressed = accent_color.darker(110).name() if self.aw.app.darkmode else accent_color.darker(115).name()
         self.dialogbuttons.setStyleSheet(artisan_dialog_button_style(
             self.aw.app.darkmode,
@@ -117,6 +117,8 @@ class ArtisanDialog(QDialog):
                 (cancelButton,'Cancel',QApplication.translate('Button','Cancel'))]:
             self.setButtonTranslations(btn,txt,trans)
 
+    # txt: the original source text of the button (in english)
+    # trans: the artisan translation to be used if a default Qt translation does not exist
     @staticmethod
     def setButtonTranslations(btn: 'QPushButton|None', txt:str, trans:str) -> None:
         if btn is not None:
@@ -126,6 +128,9 @@ class ArtisanDialog(QDialog):
                 current_trans = trans
             if txt != current_trans:
                 btn.setText(current_trans)
+                btn.setMaximumWidth(16777215)
+                btn.setMinimumWidth(0)
+#                btn.setMinimumSize(btn.sizeHint())
 
     @pyqtSlot()
     def cancelDialog(self) -> None:  # ESC key
@@ -241,6 +246,12 @@ class HelpDlg(ArtisanDialog):
         hLayout.addWidget(self.phelp)
         hLayout.addLayout(buttonLayout)
         self.setLayout(hLayout)
+
+    @override
+    def sizeHint(self) -> QSize: # pylint:disable=no-self-use
+        # Keeps default height logic but forces a preferred 700px width
+#        return QSize(700, super().sizeHint().height())
+        return QSize(700, 500)
 
     @override
     def keyPressEvent(self, a0: 'QKeyEvent|None') -> None:
@@ -666,6 +677,11 @@ class tareDlg(ArtisanDialog):
         cancelButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         okButton.clicked.connect(self.accept)
         cancelButton.clicked.connect(self.reject)
+
+        # connect the ArtisanDialog standard OK/Cancel buttons
+        self.dialogbuttons.accepted.connect(self.accept)
+        self.dialogbuttons.rejected.connect(self.reject)
+
         contentbuttonLayout = QHBoxLayout()
         contentbuttonLayout.addStretch()
         contentbuttonLayout.addWidget(addButton)
@@ -674,8 +690,7 @@ class tareDlg(ArtisanDialog):
 
         buttonLayout = QHBoxLayout()
         buttonLayout.addStretch()
-        buttonLayout.addWidget(cancelButton)
-        buttonLayout.addWidget(okButton)
+        buttonLayout.addWidget(self.dialogbuttons)
         layout = QVBoxLayout()
         layout.addWidget(self.taretable)
         layout.addLayout(contentbuttonLayout)

@@ -103,7 +103,6 @@ class AlarmDlg(ArtisanResizeablDialog):
             'add-01-stroke-rounded-dark.svg',
             self.aw.app.darkmode)
         addButton.clicked.connect(self.addalarm)
-        addButton.setMinimumWidth(80)
         addButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
         self.insertButton = ArtisanMinorPushButton(QApplication.translate('Button','Insert'),
@@ -111,7 +110,6 @@ class AlarmDlg(ArtisanResizeablDialog):
             'row-insert-stroke-rounded-dark.svg',
             self.aw.app.darkmode)
         self.insertButton.clicked.connect(self.insertalarm)
-        self.insertButton.setMinimumWidth(80)
         self.insertButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.insertButtonSetEnabled(False)
 
@@ -120,7 +118,6 @@ class AlarmDlg(ArtisanResizeablDialog):
             'delete-02-stroke-rounded-dark.svg',
             self.aw.app.darkmode)
         deleteButton.clicked.connect(self.deletealarm)
-        deleteButton.setMinimumWidth(80)
         deleteButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
         self.copyalarmTableButton = ArtisanMinorPushButton(QApplication.translate('Button', 'Copy table'),
@@ -136,14 +133,12 @@ class AlarmDlg(ArtisanResizeablDialog):
             'file-02-stroke-rounded-dark.svg',
             self.aw.app.darkmode)
         importButton.clicked.connect(self.importalarms)
-        importButton.setMinimumWidth(80)
         importButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         exportButton = ArtisanMinorPushButton(QApplication.translate('Button','Save'),
             'save-stroke-rounded-white.svg',
             'save-stroke-rounded-dark.svg',
             self.aw.app.darkmode)
         exportButton.clicked.connect(self.exportalarms)
-        exportButton.setMinimumWidth(80)
         exportButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
         # connect the ArtisanDialog standard OK/Cancel buttons
@@ -156,20 +151,21 @@ class AlarmDlg(ArtisanResizeablDialog):
             self.setButtonTranslations(helpButton,'Help',QApplication.translate('Button','Help'))
             helpButton.setToolTip(QApplication.translate('Tooltip','Show help'))
             helpButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-            helpButton.setMinimumWidth(80)
             helpButton.clicked.connect(self.showAlarmbuttonhelp)
             helpButton.setStyleSheet(artisan_minor_push_button_style(self.aw.app.darkmode))
             helpButton.setIconSize(QSize(14,14))
             helpButton.setIcon(QIcon(getStyleIconPath(
                 'tick-01-stroke-rounded-dark.svg' if self.aw.app.darkmode else 'tick-01-stroke-rounded-white.svg')))
-        clearButton = ArtisanMinorPushButton(QApplication.translate('Button','Clear'),
-            'cancel-01-stroke-rounded-white.svg',
-            'cancel-01-stroke-rounded-dark.svg',
-            self.aw.app.darkmode)
-        clearButton.setToolTip(QApplication.translate('Tooltip','Clear alarms table'))
-        clearButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        clearButton.setMinimumWidth(80)
-        clearButton.clicked.connect(self.clearalarms)
+
+        clearDialogButton = QDialogButtonBox()
+        clearButton = clearDialogButton.addButton(QDialogButtonBox.StandardButton.Reset)
+        if clearButton is not None:
+            clearButton.clicked.connect(self.clearalarms)
+            self.setButtonTranslations(clearButton,'Reset',QApplication.translate('Button','Reset'))
+            clearButton.setIconSize(QSize(14,14))
+            clearButton.setStyleSheet(artisan_minor_push_button_style(self.aw.app.darkmode))
+            clearButton.setIcon(QIcon(getStyleIconPath('undo-03-stroke-rounded-dark.svg' if self.aw.app.darkmode else 'undo-03-stroke-rounded-white.svg')))
+
         self.loadAlarmsFromProfile = QCheckBox(QApplication.translate('CheckBox', 'Load from profile'))
         self.loadAlarmsFromProfile.setChecked(self.aw.qmc.loadalarmsfromprofile)
         self.loadAlarmsFromBackground = QCheckBox(QApplication.translate('CheckBox', 'Load from background'))
@@ -196,6 +192,7 @@ class AlarmDlg(ArtisanResizeablDialog):
         buttonlayout = QHBoxLayout()
         okbuttonlayout = QHBoxLayout()
         buttonlayout.addWidget(helpButton)
+        buttonlayout.addWidget(clearButton)
         tablelayout.addWidget(self.alarmtable)
         buttonlayout.addWidget(self.copyalarmTableButton)
         buttonlayout.addSpacing(10)
@@ -208,8 +205,6 @@ class AlarmDlg(ArtisanResizeablDialog):
         buttonlayout.addWidget(self.insertButton)
         buttonlayout.addWidget(deleteButton)
         buttonlayout.addSpacing(15)
-        buttonlayout.addStretch()
-        buttonlayout.addWidget(clearButton)
         buttonlayout.addStretch()
         buttonlayout.addSpacing(10)
         buttonlayout.addWidget(importButton)

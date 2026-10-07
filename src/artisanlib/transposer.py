@@ -149,21 +149,30 @@ class profileTransformatorDlg(ArtisanDialog):
             self.applyButton.setStyleSheet(artisan_minor_push_button_style(self.aw.app.darkmode))
             self.applyButton.setIcon(QIcon(getStyleIconPath(
                 'tick-01-stroke-rounded-dark.svg' if self.aw.app.darkmode else 'tick-01-stroke-rounded-white.svg')))
+            self.dialogbuttons.removeButton(self.applyButton)
         if self.resetButton is not None:
             self.resetButton.clicked.connect(self.restore)
             self.setButtonTranslations(self.resetButton,'Reset',QApplication.translate('Button','Reset'))
             self.resetButton.setIconSize(QSize(14,14))
             self.resetButton.setStyleSheet(artisan_minor_push_button_style(self.aw.app.darkmode))
             self.resetButton.setIcon(QIcon(getStyleIconPath('undo-03-stroke-rounded-dark.svg' if self.aw.app.darkmode else 'undo-03-stroke-rounded-white.svg')))
+            self.dialogbuttons.removeButton(self.resetButton)
         if self.helpButton is not None:
             self.helpButton.clicked.connect(self.openHelp)
             self.setButtonTranslations(self.helpButton,'Help',QApplication.translate('Button','Help'))
             self.helpButton.setStyleSheet(artisan_minor_push_button_style(self.aw.app.darkmode))
             self.helpButton.setIcon(QIcon(getStyleIconPath('help-square-stroke-rounded-dark.svg' if self.aw.app.darkmode else 'help-square-stroke-rounded-white.svg')))
+            self.dialogbuttons.removeButton(self.helpButton)
 
         #buttons
         buttonsLayout = QHBoxLayout()
-        buttonsLayout.addWidget(self.dialogbuttons)
+        buttonsLayout.addWidget(self.helpButton)
+        buttonsLayout.addWidget(self.resetButton)
+        buttonsLayout.addWidget(self.applyButton)
+        buttonsLayout.addStretch()
+        standardButtonsLayout = QHBoxLayout()
+        standardButtonsLayout.addStretch()
+        standardButtonsLayout.addWidget(self.dialogbuttons)
 
         mappingLabel = QLabel(QApplication.translate('Label','Mapping'))
         self.mappingModeComboBox = QComboBox()
@@ -224,6 +233,11 @@ class profileTransformatorDlg(ArtisanDialog):
         mainlayout.addWidget(tempGroupLayout)
         mainlayout.addStretch()
         mainlayout.addLayout(buttonsLayout)
+        mainlayout.addLayout(standardButtonsLayout)
+        buttonsLayout.setContentsMargins(0, 5, 0, 0)  # left, top, right, bottom
+        standardButtonsLayout.setContentsMargins(0, 0, 0, 0)  # left, top, right, bottom
+        mainlayout.setContentsMargins(10, 5, 10, 5)  # left, top, right, bottom
+        mainlayout.setSpacing(5)
 
         self.setLayout(mainlayout)
         ok_button = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Ok)

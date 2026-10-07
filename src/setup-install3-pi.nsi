@@ -56,7 +56,7 @@ RequestExecutionLevel admin
 SetCompressor lzma
 ManifestDPIAware true
 
-   
+
 ; =============================================================================
 ; MACROS
 ; =============================================================================
@@ -96,7 +96,7 @@ ManifestDPIAware true
 !macroend
 
 ; ---------------------------------------------------------------------------
-; Macro to simulate the missing !Info 
+; Macro to simulate the missing !Info
 ; ---------------------------------------------------------------------------
 !macro info msg
     !verbose push
@@ -1089,12 +1089,30 @@ Section Uninstall
     Delete "$INSTDIR\browserconfig.xml"
     Delete "$INSTDIR\favicon-16x16.png"
     Delete "$INSTDIR\favicon-32x32.png"
+    Delete "$INSTDIR\favicon-48x48.png"
     Delete "$INSTDIR\favicon.ico"
     Delete "$INSTDIR\mstile-150x150.png"
     Delete "$INSTDIR\safari-pinned-tab.svg"
     Delete "$INSTDIR\site.webmanifest"
     Delete "$INSTDIR\artisan.tpl"
-    Delete "$INSTDIR\scale_widget.tpl"
+    Delete "$INSTDIR\green_scale_widget.tpl"
+    Delete "$INSTDIR\green-android-chrome-192x192.png"
+    Delete "$INSTDIR\green-android-chrome-512x512.png"
+    Delete "$INSTDIR\green-apple-touch-icon.png"
+    Delete "$INSTDIR\green-favicon-16x16.png"
+    Delete "$INSTDIR\green-favicon-32x32.png"
+    Delete "$INSTDIR\green-favicon-48x48.png"
+    Delete "$INSTDIR\green-favicon.ico"
+    Delete "$INSTDIR\green-site.webmanifest"
+    Delete "$INSTDIR\roasted_scale_widget.tpl"
+    Delete "$INSTDIR\roasted-android-chrome-192x192.png"
+    Delete "$INSTDIR\roasted-android-chrome-512x512.png"
+    Delete "$INSTDIR\roasted-apple-touch-icon.png"
+    Delete "$INSTDIR\roasted-favicon-16x16.png"
+    Delete "$INSTDIR\roasted-favicon-32x32.png"
+    Delete "$INSTDIR\roasted-favicon-48x48.png"
+    Delete "$INSTDIR\roasted-favicon.ico"
+    Delete "$INSTDIR\roasted-site.webmanifest"
     Delete "$INSTDIR\fitty_patched.js"
     Delete "$INSTDIR\bigtext.js"
     Delete "$INSTDIR\sorttable.js"

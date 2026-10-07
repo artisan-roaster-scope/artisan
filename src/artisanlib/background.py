@@ -896,7 +896,7 @@ class backgroundDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(bool)
     def load(self, _:bool = False) -> None:
-        self.filename = self.aw.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Load Template Roast Template'),ext='*.alog')
+        self.filename = self.aw.ArtisanOpenFileDialog(msg=QApplication.translate('Message','Load Background Roast Template'),ext='*.alog')
         if len(self.filename) == 0:
             return
         self.aw.sendmessage(QApplication.translate('Message','Reading template profile...'))

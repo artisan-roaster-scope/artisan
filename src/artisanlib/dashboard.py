@@ -87,8 +87,18 @@ class Dashboard(QWidget):
             self.ui.login_pushButton.setStyleSheet(artisan_push_button_style())
             self.ui.donate_pushButton.setStyleSheet(artisan_push_button_style())
 
+            header_styles:Final[str] = 'QLabel{color:rgb(40, 153, 199);background-color:transparent;}'
+            self.ui.roast_label.setStyleSheet(header_styles)
+            self.ui.profile_label.setStyleSheet(header_styles)
+            self.ui.links_label.setStyleSheet(header_styles)
+            self.ui.sponsor_label.setStyleSheet(header_styles)
+            self.ui.donate_label.setStyleSheet(header_styles)
+
             self.ui.plus_button.setFixedSize(QSize(26,26))
             self.ui.minus_button.setFixedSize(QSize(26,26))
+
+            # set label and tooltips with translations
+            self.fill_labels_and_tooltips()
 
             # font # TODO: (not: el, ar, zh, jp, he)
             artisan_font_semibold_file = os.path.join(getResourcePath(),'Nunito-SemiBold.ttf')
@@ -179,6 +189,85 @@ class Dashboard(QWidget):
 
         finally:
             self.setUpdatesEnabled(True) # re-enable display updates
+
+    def fill_labels_and_tooltips(self) -> None:
+
+        # ROAST
+#        self.ui.roast_label.setText(QApplication.translate('Label', 'ROAST')) # often translated wrongly!
+        self.ui.roast_label.setText(QApplication.translate('Menu', 'Roast').upper())
+        self.ui.batchsize_label.setText(QApplication.translate('Label', 'Batch size'))
+        self.ui.beans_textEdit.setPlaceholderText(QApplication.translate('Label', 'Beans'))
+        self.ui.compare_pushButton.setText(QApplication.translate('Button', 'Compare'))
+        self.ui.properties_pushButton.setText(QApplication.translate('Button', 'Properties'))
+        self.ui.inventory_group.setTitle(QApplication.translate('GroupBox', 'INVENTORY'))
+        self.ui.login_pushButton.setText(QApplication.translate('Button', 'LOGIN TO UNLOCK'))
+        self.ui.beans_label.setText(QApplication.translate('Label', 'Beans'))
+        self.ui.blend_label.setText(QApplication.translate('Label', 'Blend'))
+        self.ui.space_label.setText(QApplication.translate('Label', 'Space'))
+
+        self.ui.roast_label.setToolTip(QApplication.translate('Tooltip','Essential roast properties'))
+        self.ui.scheduler_frame.setToolTip(QApplication.translate('Tooltip','Open your roast schedule'))
+        self.ui.title_comboBox.setToolTip(QApplication.translate('Tooltip','Enter the roast title or set properties by choosing from a recent roast'))
+        self.ui.plus_button.setToolTip(QApplication.translate('Tooltip', 'Add roast properties to list of recent roasts'))
+        self.ui.minus_button.setToolTip(QApplication.translate('Tooltip', 'Remove roast properties from list of recent roasts'))
+
+        self.ui.inventory_group.setToolTip(QApplication.translate('Tooltip', 'Green beans inventory'))
+        self.ui.login_pushButton.setToolTip(QApplication.translate('Plus', 'Sign in to your artisan account'))
+        self.ui.beans_comboBox.setToolTip(QApplication.translate('Tooltip', 'Select beans from your inventory'))
+        self.ui.blend_comboBox.setToolTip(QApplication.translate('Tooltip', 'Select a blend from your inventory'))
+        self.ui.space_comboBox.setToolTip(QApplication.translate('Tooltip', 'Select a storage space'))
+        self.ui.custom_blend.setToolTip(QApplication.translate('Tooltip', 'Define a custom blend'))
+        self.ui.sync.setToolTip(QApplication.translate('Tooltip', 'Update inventory from platform'))
+        self.ui.beans_textEdit.setToolTip(QApplication.translate('Tooltip', 'Description of the green beans used'))
+        self.ui.weightinedit.setToolTip(QApplication.translate('Tooltip', 'batch size'))
+        self.ui.weight_unit_comboBox.setToolTip(QApplication.translate('Tooltip', 'weight unit'))
+        self.ui.properties_pushButton.setToolTip(QApplication.translate('Tooltip', 'Open roast properties dialog'))
+        self.ui.compare_pushButton.setToolTip(QApplication.translate('Tooltip', 'Open roast in {}').format(QApplication.translate('Menu', 'Comparator')))
+
+        # TEMPLATE
+        self.ui.profile_label.setText(QApplication.translate('Label', 'TEMPLATE'))
+        self.ui.load_pushButton.setText(QApplication.translate('Button', 'Load'))
+        self.ui.clear_pushButton.setText(QApplication.translate('Button', 'Clear'))
+        self.ui.create_pushButton.setText(QApplication.translate('Button', 'Create'))
+
+        self.ui.profile_label.setToolTip(QApplication.translate('Tooltip','Background roast template'))
+        self.ui.load_pushButton.setToolTip(QApplication.translate('Tooltip','Load a profile as template into the background'))
+        self.ui.recentFiles_comboBox.setToolTip(QApplication.translate('Tooltip','Choose a recent roast and load as roast template'))
+        self.ui.clear_pushButton.setToolTip(QApplication.translate('Tooltip','Remove the loaded background roast template'))
+        self.ui.create_pushButton.setToolTip(QApplication.translate('Tooltip','Start the {} and create a background roast template').format(QApplication.translate('Menu', 'Designer')))
+
+        # LINKS
+        self.ui.links_label.setText(QApplication.translate('Label', 'QUICK LINKS'))
+        self.ui.documentation_pushButton.setText(QApplication.translate('Button', 'Documentation'))
+        self.ui.forum_pushButton.setText(QApplication.translate('Button', 'User Forum'))
+        self.ui.issue_pushButton.setText(QApplication.translate('Button', 'Report an Issue'))
+        self.ui.platform_pushButton.setText(QApplication.translate('Button', 'Web Platform'))
+
+
+        self.ui.links_label.setToolTip(QApplication.translate('Tooltip','Links to external information and services'))
+        self.ui.documentation_pushButton.setToolTip(QApplication.translate('Tooltip','Explore the documentation'))
+        self.ui.forum_pushButton.setToolTip(QApplication.translate('Tooltip','Ask questions, share tips, and connect with the community'))
+        self.ui.issue_pushButton.setToolTip(QApplication.translate('Tooltip','Report a bug or request a feature'))
+        self.ui.platform_pushButton.setToolTip(QApplication.translate('Tooltip','Browse to the artisan platform'))
+
+        # SPONSOR
+        self.ui.sponsor_label.setText(QApplication.translate('Label', 'RELEASE SPONSOR'))
+
+        self.ui.sponsor_label.setToolTip(QApplication.translate('Tooltip','Sponsor of this release'))
+        self.ui.sponsor_logo_toolButton.setToolTip(QApplication.translate('Tooltip','Visit our sponsor'))
+
+        # DONATION
+        self.ui.donate_label.setText(QApplication.translate('Label', 'SUPPORT ARTISAN'))
+        self.ui.donate_pushButton.setText(QApplication.translate('Button', 'DONATE'))
+
+        self.ui.donate_label.setToolTip(QApplication.translate('Tooltip','Help to keep artisan going'))
+        self.ui.donate_pushButton.setToolTip(QApplication.translate('Tooltip','Send your donation'))
+        self.ui.starts_label.setToolTip(QApplication.translate('Tooltip','Counts total number of recordings'))
+
+#  --- scheduler
+#   . create schedule link button
+#   . login plus button
+
 
 #    @override
 #    def mousePressEvent(self, a0:'QMouseEvent|None') -> None:

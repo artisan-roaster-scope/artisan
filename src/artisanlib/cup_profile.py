@@ -140,7 +140,7 @@ class flavorDlg(ArtisanResizeablDialog):
         delButton.setToolTip(QApplication.translate('Tooltip', 'Delete last parameter'))
         delButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         delButton.clicked.connect(self.poplabel)
-        saveImgButton = ArtisanMinorPushButton(f'{QApplication.translate('Button','Save')} PDF',
+        saveImgButton = ArtisanMinorPushButton(QApplication.translate('Button','Save PDF'),
             'save-stroke-rounded-white.svg',
             'save-stroke-rounded-dark.svg',
             self.aw.app.darkmode)

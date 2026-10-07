@@ -58,7 +58,7 @@ class graphColorDlg(ArtisanDialog):
         #TAB0
         profilecolorlabel = QLabel(QApplication.translate('Label','Profile Colors'))
         profilecolorlabel.setFont(titlefont)
-        bgcolorlabel = QLabel(QApplication.translate('Label','Background Profile Colors'))
+        bgcolorlabel = QLabel(QApplication.translate('Label','Template Profile Colors'))
         bgcolorlabel.setFont(titlefont)
         profilecolorlabel.setMaximumSize(180,20)
         bgcolorlabel.setMaximumSize(180,20)

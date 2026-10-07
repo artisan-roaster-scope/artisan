@@ -49,8 +49,8 @@ def is_connected() -> bool:
     return config.connected
 
 
-# artisan.plus is on as soon as an account id has been established
-# Note that artisan.plus might be on, while not being connected due to
+# artisan platform is on as soon as an account id has been established
+# Note that artisan platform might be on, while not being connected due to
 # connectivity issues
 def is_on() -> bool:
     aw = config.app_window
@@ -259,7 +259,7 @@ def connect(clear_on_failure: bool =False, interactive: bool = True) -> None:
                             True,
                             None,
                         )  # @UndefinedVariable
-                        _log.info('artisan.plus connected')
+                        _log.info('artisan platform connected')
                         try:
                             queue.start()  # start the outbox queue
                         except Exception as e:  # pylint: disable=broad-except
@@ -451,7 +451,7 @@ def updateSyncRecordHashAndSync() -> str|None:
                         roast_record['roast_id'], server_updates_modified_at
                     )
                     sync.setApplidedServerUpdatesModifiedAt(None)
-                # artisan.plus is ON and the profile is under sync
+                # artisan platform is ON and the profile is under sync
                 if sync.syncRecordUpdated(roast_record):
                     # we push updates on the sync record back to the server
                     # via the queue

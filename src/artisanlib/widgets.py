@@ -293,6 +293,12 @@ class SliderUnclickable(QSlider):
     focus_out = pyqtSignal()
 
     @override
+    def keyPressEvent(self, ev:'QKeyEvent|None') -> None:
+        if ev is not None and ev.key() in (Qt.Key.Key_Left, Qt.Key.Key_Right):
+            return
+        super().keyPressEvent(ev)
+
+    @override
     def mousePressEvent(self, ev:'QMouseEvent|None') -> None:
         opt = QStyleOptionSlider()
         self.initStyleOption(opt)

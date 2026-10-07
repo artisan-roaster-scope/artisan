@@ -43,7 +43,7 @@ if TYPE_CHECKING:
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtCore import (Qt, pyqtSlot, QSettings, QTimer, QRegularExpression, QSignalBlocker)
+from PyQt6.QtCore import Qt, pyqtSlot, QSettings, QTimer, QRegularExpression, QSignalBlocker, QSize
 from PyQt6.QtGui import (QStandardItemModel, QStandardItem, QColor, QIntValidator, QRegularExpressionValidator, QPixmap, QIcon)
 from PyQt6.QtWidgets import (QApplication, QWidget, QCheckBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit,
                              QPushButton, QSpinBox, QTabWidget, QComboBox, QDialogButtonBox, QGridLayout,
@@ -163,7 +163,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         selectprogrambutton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         selectprogrambutton.clicked.connect(self.loadprogramname)
 
-        # hack to access the Qt automatic translation of the RestoreDefaults button
+        # hack to access the Qt automatic translation of the Help button
         db_help = QDialogButtonBox(QDialogButtonBox.StandardButton.Help)
         help_button = db_help.button(QDialogButtonBox.StandardButton.Help)
         if help_button is not None:
@@ -332,14 +332,12 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.aw.app.darkmode)
         self.setButtonTranslations(resetButton,'Reset',QApplication.translate('Button','Reset'))
         resetButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-#        resetButton.setMinimumWidth(100)
         resetButton.clicked.connect(self.resetextradevices)
         extradevHelpButton = ArtisanMinorPushButton(help_text_translated,
             'help-square-stroke-rounded-white.svg',
             'help-square-stroke-rounded-dark.svg',
             self.aw.app.darkmode)
         self.setButtonTranslations(extradevHelpButton,'Help',QApplication.translate('Button','Help'))
-#        extradevHelpButton.setMinimumWidth(100)
         extradevHelpButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         extradevHelpButton.clicked.connect(self.showExtradevHelp)
         self.delButton = ArtisanMinorPushButton(QApplication.translate('Button','Delete'),
@@ -347,8 +345,6 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             'delete-02-stroke-rounded-dark.svg',
             self.aw.app.darkmode)
         self.delButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-#        self.delButton.setMinimumWidth(100)
-        #self.delButton.setMaximumWidth(100)
         self.delButton.clicked.connect(self.deldevice)
         self.recalcButton = ArtisanMinorPushButton(QApplication.translate('Button','Update profile'),
             'update-white.svg',
@@ -1539,8 +1535,8 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
         adjustmentHelp = QHBoxLayout()
         adjustmentHelp.addWidget(symbolicHelpButton)
-        adjustmentHelp.addWidget(self.updateETBTButton)
         adjustmentHelp.addStretch()
+        adjustmentHelp.addWidget(self.updateETBTButton)
         adjustmentHelp.setContentsMargins(10,5,0,0)
         adjustmentGroupBox = QGroupBox(QApplication.translate('GroupBox','Symbolic Assignments'))
         adjustmentsLayout = QVBoxLayout()
@@ -1589,16 +1585,15 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
         tab1Layout.addStretch()
         bLayout = QHBoxLayout()
         bLayout.addWidget(extradevHelpButton)
+        bLayout.addWidget(resetButton)
         bLayout.addWidget(self.copydeviceTableButton)
         bLayout.addStretch()
-        bLayout.addWidget(self.recalcButton)
-        bLayout.addSpacing(20)
+        bLayout.addSpacing(25)
         bLayout.addWidget(self.addButton)
         bLayout.addWidget(self.delButton)
         bLayout.addSpacing(20)
-        bLayout.addWidget(resetButton)
         bLayout.addStretch()
-        bLayout.addStretch()
+        bLayout.addWidget(self.recalcButton)
         bLayout.setContentsMargins(10,5,10,0)
         #LAYOUT TAB 2 (Extra Devices)
         tab2Layout = QVBoxLayout()
@@ -1981,18 +1976,24 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.bucket_button1.setToolTip(QApplication.translate('Tooltip','The one-bucket mode assumes that the entire batch fits into a single bucket'))
             self.bucket_button1.setIcon(QIcon(p))
             self.bucket_button1.setFixedHeight(20)
+            self.bucket_button1.setFixedWidth(20)
+            self.bucket_button1.setIconSize(QSize(20,20))
             self.bucket_button1.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             self.bucket_button1.setStyleSheet('QToolButton {border:none;}')
             self.bucket_button2 = QToolButton()
             self.bucket_button2.setToolTip(QApplication.translate('Tooltip','The two-bucket mode allows splitting a batch into two buckets for easier lifting'))
             self.bucket_button2.setIcon(QIcon(p))
             self.bucket_button2.setFixedHeight(20)
+            self.bucket_button2.setFixedWidth(20)
+            self.bucket_button2.setIconSize(QSize(20,20))
             self.bucket_button2.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             self.bucket_button2.setStyleSheet('QToolButton {border:none;}')
             self.bucket_button2.setEnabled(False)
             self.bucket_button3 = QToolButton()
             self.bucket_button3.setIcon(QIcon(p))
             self.bucket_button3.setFixedHeight(20)
+            self.bucket_button3.setFixedWidth(20)
+            self.bucket_button3.setIconSize(QSize(20,20))
             self.bucket_button3.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             self.bucket_button3.setStyleSheet('QToolButton {border:none;}')
 
@@ -2104,7 +2105,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             greenVLayout.addLayout(greenIconHLayout)
             greenVLayout.addWidget(containerGreen)
             greenVLayout.addWidget(taskGreen)
-            sectionGreen = QGroupBox(QApplication.translate('GroupBox', 'Green'))
+            sectionGreen = QGroupBox(QApplication.translate('Label', 'Green'))
             sectionGreen.setLayout(greenVLayout)
 
             roastedIconHLayout = QHBoxLayout()
@@ -2115,7 +2116,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             roastedVLayout.addLayout(roastedIconHLayout)
             roastedVLayout.addWidget(containerRoasted)
             roastedVLayout.addWidget(taskRoasted)
-            sectionRoasted = QGroupBox(QApplication.translate('GroupBox', 'Roasted'))
+            sectionRoasted = QGroupBox(QApplication.translate('Label', 'Roasted'))
             sectionRoasted.setLayout(roastedVLayout)
 
             tab8Layout.addWidget(scale1,0,0)
@@ -2298,6 +2299,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(int)
     def scale1ModelChanged(self, i:int) -> None:
+        _log.debug('PRIN scale1ModelChanged')
         self.scale1NameComboBox.setEnabled(False)
         self.scale1EditButton.setEnabled(False)
         if i > 0 and len(SUPPORTED_SCALES) > i-1 and len(SUPPORTED_SCALES[i-1]) > 0:
@@ -2314,6 +2316,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.aw.scale1_model = None
             self.scale1ScanButtonSetEnabled(False)
             self.updateScale1NameLabel(0)
+        self.aw.updateScaleConfiguration() # triggers an update on the largeScaleLCDs visibilites
 
     @pyqtSlot(int)
     def scale1NameChanged(self, i:int) -> None:
@@ -2469,6 +2472,7 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
             self.aw.scale2_model = None
             self.scale2ScanButtonSetEnabled(False)
             self.updateScale1NameLabel(0)
+        self.aw.updateScaleConfiguration() # triggers an update on the largeScaleLCDs visibilites
 
     @pyqtSlot(int)
     def scale2NameChanged(self, i:int) -> None:
@@ -3656,16 +3660,9 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
                 self.aw.scale_manager.scale2_weight_changed_signal.disconnect(self.scale2_weight_changed)
             except Exception as e: # pylint: disable=broad-except
                 _log.error(e)
-            if self.aw.schedule_window is None:
-                # in case the scheduler is running, we keep the scales connected as it is using them
-                try:
-                    # disconnect scales if they were not connected before
-                    if not self.scale1_was_connected:
-                        self.aw.scale_manager.disconnect_scale1_signal.emit()
-                    if not self.scale2_was_connected:
-                        self.aw.scale_manager.disconnect_scale2_signal.emit()
-                except Exception as e: # pylint: disable=broad-except
-                    _log.error(e)
+            # disconnect both scales only in case they are not in use (WeightManager:weight_changed_signal is no longer connected)
+            self.aw.scale_manager.disconnect_scale1_signal.emit()
+            self.aw.scale_manager.disconnect_scale2_signal.emit()
         return True
 
     @pyqtSlot()

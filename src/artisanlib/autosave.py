@@ -92,15 +92,16 @@ class autosaveDlg(ArtisanDialog):
         self.helpButton = self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.Help)
         if self.helpButton is not None:
             self.dialogbuttons.removeButton(self.helpButton)
-            self.setButtonTranslations(self.helpButton,'Help',QApplication.translate('Button','Help'))
             self.helpButton.clicked.connect(self.showautosavehelp)
             self.helpButton.setIconSize(QSize(14,14))
             self.helpButton.setStyleSheet(artisan_minor_push_button_style(self.aw.app.darkmode))
             self.helpButton.setIcon(QIcon(getStyleIconPath('help-square-stroke-rounded-dark.svg' if self.aw.app.darkmode else 'help-square-stroke-rounded-white.svg')))
+            self.setButtonTranslations(self.helpButton,'Help',QApplication.translate('Button','Help'))
+
 
         pathButton = ArtisanMinorPushButton(QApplication.translate('Button','Path'),
-            'folder-01-stroke-rounded-white.svg.svg',
-            'folder-01-stroke-rounded-dark.svg.svg',
+            'folder-01-stroke-rounded-white.svg',
+            'folder-01-stroke-rounded-dark.svg',
             self.aw.app.darkmode)
         pathButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.pathEdit = QLineEdit(self.aw.qmc.autosavepath)
@@ -142,13 +143,13 @@ class autosaveDlg(ArtisanDialog):
         autolayout.addWidget(self.prefixPreview,2,1)
         autolayout.addWidget(self.prefixpreviewrecordingLabel,3,0)
         autolayout.addWidget(self.prefixPreviewrecording,3,1)
-        autolayout.addWidget(pathButton,4,0)
+        autolayout.addWidget(pathButton,4,0,Qt.AlignmentFlag.AlignRight)
         autolayout.addWidget(self.pathEdit,4,1,1,2)
         autolayout.addItem(QSpacerItem(0,12),5,0)
         autolayout.addWidget(linea,6,0,1,3)
         autolayout.addWidget(self.autopdfcheckbox,8,0)
         autolayout.addWidget(self.imageTypesComboBox,8,2)
-        autolayout.addWidget(pathAlsoButton,9,0)
+        autolayout.addWidget(pathAlsoButton,9,0,Qt.AlignmentFlag.AlignRight)
         autolayout.addWidget(self.pathAlsoEdit,9,1,1,2)
         autolayout.setColumnStretch(0,0)
         autolayout.setColumnStretch(1,10)

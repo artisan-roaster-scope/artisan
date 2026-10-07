@@ -109,8 +109,14 @@
            <height>16777215</height>
           </size>
          </property>
+         <property name="toolTip">
+          <string notr="true"/>
+         </property>
+         <property name="accessibleDescription">
+          <string notr="true"/>
+         </property>
          <property name="title">
-          <string/>
+          <string notr="true"/>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_8">
           <property name="spacing">
@@ -135,11 +141,14 @@
               <pointsize>16</pointsize>
              </font>
             </property>
-            <property name="styleSheet">
-             <string notr="true">QLabel { color: rgb(40, 153, 199); background-color: transparent; }</string>
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
             </property>
             <property name="text">
-             <string>QUICK LINKS</string>
+             <string notr="true">QUICK LINKS</string>
             </property>
            </widget>
           </item>
@@ -190,8 +199,17 @@
               <property name="focusPolicy">
                <enum>Qt::FocusPolicy::NoFocus</enum>
               </property>
+              <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="accessibleDescription">
+               <string notr="true"/>
+              </property>
+              <property name="layoutDirection">
+               <enum>Qt::LayoutDirection::RightToLeft</enum>
+              </property>
               <property name="text">
-               <string>Documentation</string>
+               <string notr="true">Documentation</string>
               </property>
              </widget>
             </item>
@@ -212,8 +230,17 @@
               <property name="focusPolicy">
                <enum>Qt::FocusPolicy::NoFocus</enum>
               </property>
+              <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="accessibleDescription">
+               <string notr="true"/>
+              </property>
+              <property name="layoutDirection">
+               <enum>Qt::LayoutDirection::RightToLeft</enum>
+              </property>
               <property name="text">
-               <string>User Forum</string>
+               <string notr="true">User Forum</string>
               </property>
              </widget>
             </item>
@@ -234,8 +261,17 @@
               <property name="focusPolicy">
                <enum>Qt::FocusPolicy::NoFocus</enum>
               </property>
+              <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="accessibleDescription">
+               <string notr="true"/>
+              </property>
+              <property name="layoutDirection">
+               <enum>Qt::LayoutDirection::RightToLeft</enum>
+              </property>
               <property name="text">
-               <string>Report an Issue</string>
+               <string notr="true">Report an Issue</string>
               </property>
              </widget>
             </item>
@@ -256,8 +292,17 @@
               <property name="focusPolicy">
                <enum>Qt::FocusPolicy::NoFocus</enum>
               </property>
+              <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="accessibleDescription">
+               <string notr="true"/>
+              </property>
+              <property name="layoutDirection">
+               <enum>Qt::LayoutDirection::RightToLeft</enum>
+              </property>
               <property name="text">
-               <string>Web Platform</string>
+               <string notr="true">Web Platform</string>
               </property>
              </widget>
             </item>
@@ -299,8 +344,14 @@
            <height>200</height>
           </size>
          </property>
+         <property name="toolTip">
+          <string notr="true"/>
+         </property>
+         <property name="accessibleDescription">
+          <string notr="true"/>
+         </property>
          <property name="title">
-          <string/>
+          <string notr="true"/>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_10">
           <property name="spacing">
@@ -325,11 +376,14 @@
               <pointsize>16</pointsize>
              </font>
             </property>
-            <property name="styleSheet">
-             <string notr="true">QLabel { color: rgb(40, 153, 199); background-color: transparent; }</string>
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
             </property>
             <property name="text">
-             <string>RELEASE SPONSOR</string>
+             <string notr="true">RELEASE SPONSOR</string>
             </property>
            </widget>
           </item>
@@ -355,8 +409,14 @@
                 <height>0</height>
                </size>
               </property>
+              <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="accessibleDescription">
+               <string notr="true"/>
+              </property>
               <property name="text" stdset="0">
-               <string/>
+               <string notr="true"/>
               </property>
              </widget>
             </item>
@@ -385,8 +445,14 @@
            <height>100</height>
           </size>
          </property>
+         <property name="toolTip">
+          <string notr="true"/>
+         </property>
+         <property name="accessibleDescription">
+          <string notr="true"/>
+         </property>
          <property name="title">
-          <string/>
+          <string notr="true"/>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_11">
           <property name="spacing">
@@ -411,11 +477,14 @@
               <pointsize>16</pointsize>
              </font>
             </property>
-            <property name="styleSheet">
-             <string notr="true">QLabel { color: rgb(40, 153, 199); background-color: transparent; }</string>
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
             </property>
             <property name="text">
-             <string>SUPPORT ARTISAN</string>
+             <string notr="true">SUPPORT ARTISAN</string>
             </property>
            </widget>
           </item>
@@ -444,11 +513,22 @@
                 <height>28</height>
                </size>
               </property>
+              <property name="font">
+               <font>
+                <kerning>false</kerning>
+               </font>
+              </property>
               <property name="focusPolicy">
                <enum>Qt::FocusPolicy::NoFocus</enum>
               </property>
+              <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="accessibleDescription">
+               <string notr="true"/>
+              </property>
               <property name="text">
-               <string>DONATE</string>
+               <string notr="true">DONATE</string>
               </property>
              </widget>
             </item>
@@ -461,8 +541,14 @@
               <pointsize>10</pointsize>
              </font>
             </property>
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
             <property name="text">
-             <string/>
+             <string notr="true"/>
             </property>
            </widget>
           </item>
@@ -524,8 +610,14 @@
            <height>16777215</height>
           </size>
          </property>
+         <property name="toolTip">
+          <string notr="true"/>
+         </property>
+         <property name="accessibleDescription">
+          <string notr="true"/>
+         </property>
          <property name="title">
-          <string/>
+          <string notr="true"/>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout">
           <property name="spacing">
@@ -547,11 +639,14 @@
                 <fontweight>Medium</fontweight>
                </font>
               </property>
-              <property name="styleSheet">
-               <string notr="true">QLabel { color: rgb(40, 153, 199); background-color: transparent; }</string>
+              <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="accessibleDescription">
+               <string notr="true"/>
               </property>
               <property name="text">
-               <string>ROAST</string>
+               <string notr="true">ROAST</string>
               </property>
               <property name="textFormat">
                <enum>Qt::TextFormat::PlainText</enum>
@@ -563,6 +658,12 @@
             </item>
             <item>
              <widget class="QLabel" name="batch_nr">
+              <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="accessibleDescription">
+               <string notr="true"/>
+              </property>
               <property name="frameShape">
                <enum>QFrame::Shape::NoFrame</enum>
               </property>
@@ -573,7 +674,7 @@
                <number>0</number>
               </property>
               <property name="text">
-               <string/>
+               <string notr="true"/>
               </property>
               <property name="alignment">
                <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
@@ -593,6 +694,12 @@
                 <width>30</width>
                 <height>30</height>
                </size>
+              </property>
+              <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="accessibleDescription">
+               <string notr="true"/>
               </property>
               <property name="frameShape">
                <enum>QFrame::Shape::Box</enum>
@@ -667,8 +774,14 @@
                    <property name="focusPolicy">
                     <enum>Qt::FocusPolicy::NoFocus</enum>
                    </property>
+                   <property name="toolTip">
+                    <string notr="true"/>
+                   </property>
+                   <property name="accessibleDescription">
+                    <string notr="true"/>
+                   </property>
                    <property name="text">
-                    <string/>
+                    <string notr="true"/>
                    </property>
                   </widget>
                  </item>
@@ -707,7 +820,10 @@
           </item>
           <item>
            <widget class="QFrame" name="roast_frame">
-            <property name="styleSheet">
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
              <string notr="true"/>
             </property>
             <property name="frameShape">
@@ -730,6 +846,18 @@
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
+              </property>
+              <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="accessibleDescription">
+               <string notr="true"/>
+              </property>
+              <property name="currentText">
+               <string notr="true"/>
+              </property>
+              <property name="placeholderText">
+               <string notr="true"/>
               </property>
              </widget>
             </item>
@@ -766,8 +894,14 @@
               <property name="focusPolicy">
                <enum>Qt::FocusPolicy::NoFocus</enum>
               </property>
+              <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="accessibleDescription">
+               <string notr="true"/>
+              </property>
               <property name="text">
-               <string>+</string>
+               <string notr="true">+</string>
               </property>
              </widget>
             </item>
@@ -788,8 +922,14 @@
               <property name="focusPolicy">
                <enum>Qt::FocusPolicy::NoFocus</enum>
               </property>
+              <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="accessibleDescription">
+               <string notr="true"/>
+              </property>
               <property name="text">
-               <string>–</string>
+               <string notr="true">–</string>
               </property>
              </widget>
             </item>
@@ -820,8 +960,14 @@
               <fontweight>Medium</fontweight>
              </font>
             </property>
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
             <property name="title">
-             <string>INVENTORY</string>
+             <string notr="true">INVENTORY</string>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_3">
              <property name="topMargin">
@@ -838,10 +984,22 @@
                  <height>0</height>
                 </size>
                </property>
+               <property name="toolTip">
+                <string notr="true"/>
+               </property>
+               <property name="accessibleDescription">
+                <string notr="true"/>
+               </property>
                <property name="currentIndex">
                 <number>0</number>
                </property>
                <widget class="QWidget" name="no_inventory_page">
+                <property name="toolTip">
+                 <string notr="true"/>
+                </property>
+                <property name="accessibleDescription">
+                 <string notr="true"/>
+                </property>
                 <layout class="QHBoxLayout" name="horizontalLayout_11">
                  <property name="leftMargin">
                   <number>0</number>
@@ -890,14 +1048,26 @@
                    <property name="focusPolicy">
                     <enum>Qt::FocusPolicy::NoFocus</enum>
                    </property>
+                   <property name="toolTip">
+                    <string notr="true"/>
+                   </property>
+                   <property name="accessibleDescription">
+                    <string notr="true"/>
+                   </property>
                    <property name="text">
-                    <string>LOGIN TO UNLOCK</string>
+                    <string notr="true">LOGIN TO UNLOCK</string>
                    </property>
                   </widget>
                  </item>
                 </layout>
                </widget>
                <widget class="QWidget" name="inventory_page">
+                <property name="toolTip">
+                 <string notr="true"/>
+                </property>
+                <property name="accessibleDescription">
+                 <string notr="true"/>
+                </property>
                 <layout class="QHBoxLayout" name="horizontalLayout_9">
                  <property name="leftMargin">
                   <number>0</number>
@@ -913,60 +1083,123 @@
                  </property>
                  <item>
                   <widget class="QLabel" name="beans_label">
+                   <property name="toolTip">
+                    <string notr="true"/>
+                   </property>
+                   <property name="accessibleDescription">
+                    <string notr="true"/>
+                   </property>
                    <property name="styleSheet">
                     <string notr="true"/>
                    </property>
                    <property name="text">
-                    <string>Beans</string>
+                    <string notr="true">Beans</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QComboBox" name="beans_comboBox"/>
+                  <widget class="QComboBox" name="beans_comboBox">
+                   <property name="toolTip">
+                    <string notr="true"/>
+                   </property>
+                   <property name="accessibleDescription">
+                    <string notr="true"/>
+                   </property>
+                   <property name="currentText">
+                    <string notr="true"/>
+                   </property>
+                  </widget>
                  </item>
                  <item>
                   <widget class="QLabel" name="blend_label">
+                   <property name="toolTip">
+                    <string notr="true"/>
+                   </property>
+                   <property name="accessibleDescription">
+                    <string notr="true"/>
+                   </property>
                    <property name="styleSheet">
                     <string notr="true"/>
                    </property>
                    <property name="text">
-                    <string>Blend</string>
+                    <string notr="true">Blend</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QComboBox" name="blend_comboBox"/>
+                  <widget class="QComboBox" name="blend_comboBox">
+                   <property name="toolTip">
+                    <string notr="true"/>
+                   </property>
+                   <property name="accessibleDescription">
+                    <string notr="true"/>
+                   </property>
+                   <property name="currentText">
+                    <string notr="true"/>
+                   </property>
+                   <property name="placeholderText">
+                    <string notr="true"/>
+                   </property>
+                  </widget>
                  </item>
                  <item>
                   <widget class="QToolButton" name="custom_blend">
                    <property name="focusPolicy">
                     <enum>Qt::FocusPolicy::NoFocus</enum>
                    </property>
+                   <property name="toolTip">
+                    <string notr="true"/>
+                   </property>
+                   <property name="accessibleDescription">
+                    <string notr="true"/>
+                   </property>
                    <property name="text">
-                    <string/>
+                    <string notr="true"/>
                    </property>
                   </widget>
                  </item>
                  <item>
                   <widget class="QLabel" name="space_label">
+                   <property name="toolTip">
+                    <string notr="true"/>
+                   </property>
+                   <property name="accessibleDescription">
+                    <string notr="true"/>
+                   </property>
                    <property name="styleSheet">
                     <string notr="true"/>
                    </property>
                    <property name="text">
-                    <string>space</string>
+                    <string>Space</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QComboBox" name="space_comboBox"/>
+                  <widget class="QComboBox" name="space_comboBox">
+                   <property name="toolTip">
+                    <string notr="true"/>
+                   </property>
+                   <property name="accessibleDescription">
+                    <string notr="true"/>
+                   </property>
+                   <property name="currentText">
+                    <string notr="true"/>
+                   </property>
+                  </widget>
                  </item>
                  <item>
                   <widget class="QToolButton" name="sync">
                    <property name="focusPolicy">
                     <enum>Qt::FocusPolicy::NoFocus</enum>
                    </property>
+                   <property name="toolTip">
+                    <string notr="true"/>
+                   </property>
+                   <property name="accessibleDescription">
+                    <string notr="true"/>
+                   </property>
                    <property name="text">
-                    <string/>
+                    <string notr="true"/>
                    </property>
                   </widget>
                  </item>
@@ -997,8 +1230,14 @@
               <height>100</height>
              </size>
             </property>
+            <property name="toolTip">
+             <string notr="true"/>
+            </property>
+            <property name="accessibleDescription">
+             <string notr="true"/>
+            </property>
             <property name="placeholderText">
-             <string>Beans</string>
+             <string notr="true">Beans</string>
             </property>
            </widget>
           </item>
@@ -1006,11 +1245,17 @@
            <layout class="QHBoxLayout" name="horizontalLayout_8">
             <item>
              <widget class="QLabel" name="batchsize_label">
+              <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="accessibleDescription">
+               <string notr="true"/>
+              </property>
               <property name="styleSheet">
                <string notr="true"/>
               </property>
               <property name="text">
-               <string>Batch Size</string>
+               <string notr="true">Batch size</string>
               </property>
              </widget>
             </item>
@@ -1031,8 +1276,23 @@
               <property name="focusPolicy">
                <enum>Qt::FocusPolicy::StrongFocus</enum>
               </property>
+              <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="accessibleDescription">
+               <string notr="true"/>
+              </property>
+              <property name="inputMask">
+               <string notr="true"/>
+              </property>
+              <property name="text">
+               <string notr="true"/>
+              </property>
               <property name="alignment">
                <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+              </property>
+              <property name="placeholderText">
+               <string notr="true"/>
               </property>
              </widget>
             </item>
@@ -1055,6 +1315,15 @@
                 <width>60</width>
                 <height>16777215</height>
                </size>
+              </property>
+              <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="accessibleDescription">
+               <string notr="true"/>
+              </property>
+              <property name="currentText">
+               <string notr="true"/>
               </property>
              </widget>
             </item>
@@ -1091,8 +1360,14 @@
               <property name="focusPolicy">
                <enum>Qt::FocusPolicy::NoFocus</enum>
               </property>
+              <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="accessibleDescription">
+               <string notr="true"/>
+              </property>
               <property name="text">
-               <string>Properties</string>
+               <string notr="true">Properties</string>
               </property>
              </widget>
             </item>
@@ -1126,8 +1401,14 @@
               <property name="focusPolicy">
                <enum>Qt::FocusPolicy::NoFocus</enum>
               </property>
+              <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="accessibleDescription">
+               <string notr="true"/>
+              </property>
               <property name="text">
-               <string>Compare</string>
+               <string notr="true">Compare</string>
               </property>
              </widget>
             </item>
@@ -1156,8 +1437,14 @@
            <height>100</height>
           </size>
          </property>
+         <property name="toolTip">
+          <string notr="true"/>
+         </property>
+         <property name="accessibleDescription">
+          <string notr="true"/>
+         </property>
          <property name="title">
-          <string/>
+          <string notr="true"/>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_4">
           <property name="spacing">
@@ -1176,11 +1463,14 @@
                 <fontweight>Medium</fontweight>
                </font>
               </property>
-              <property name="styleSheet">
-               <string notr="true">QLabel { color: rgb(40, 153, 199); background-color: transparent; }</string>
+              <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="accessibleDescription">
+               <string notr="true"/>
               </property>
               <property name="text">
-               <string>TEMPLATE</string>
+               <string notr="true">TEMPLATE</string>
               </property>
              </widget>
             </item>
@@ -1192,8 +1482,14 @@
                 <verstretch>0</verstretch>
                </sizepolicy>
               </property>
+              <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="accessibleDescription">
+               <string notr="true"/>
+              </property>
               <property name="text">
-               <string>P223 Espresso Roast</string>
+               <string notr="true"/>
               </property>
               <property name="alignment">
                <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
@@ -1237,8 +1533,14 @@
               <property name="focusPolicy">
                <enum>Qt::FocusPolicy::NoFocus</enum>
               </property>
+              <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="accessibleDescription">
+               <string notr="true"/>
+              </property>
               <property name="text">
-               <string>Load</string>
+               <string notr="true">Load</string>
               </property>
              </widget>
             </item>
@@ -1255,6 +1557,15 @@
                 <width>100</width>
                 <height>0</height>
                </size>
+              </property>
+              <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="accessibleDescription">
+               <string notr="true"/>
+              </property>
+              <property name="currentText">
+               <string notr="true"/>
               </property>
              </widget>
             </item>
@@ -1275,8 +1586,14 @@
               <property name="focusPolicy">
                <enum>Qt::FocusPolicy::NoFocus</enum>
               </property>
+              <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="accessibleDescription">
+               <string notr="true"/>
+              </property>
               <property name="text">
-               <string>Clear</string>
+               <string notr="true">Clear</string>
               </property>
              </widget>
             </item>
@@ -1310,8 +1627,14 @@
               <property name="focusPolicy">
                <enum>Qt::FocusPolicy::NoFocus</enum>
               </property>
+              <property name="toolTip">
+               <string notr="true"/>
+              </property>
+              <property name="accessibleDescription">
+               <string notr="true"/>
+              </property>
               <property name="text">
-               <string>Create</string>
+               <string notr="true">Create</string>
               </property>
              </widget>
             </item>

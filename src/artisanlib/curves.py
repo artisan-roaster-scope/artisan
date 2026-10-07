@@ -1305,6 +1305,7 @@ class CurvesDlg(ArtisanDialog):
         self.resolutionSpinBox.setSingleStep(5)
         self.resolutionSpinBox.setValue(int(round(self.aw.dpi)))
         self.resolutionSpinBox.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.resolutionSpinBox.setAlignment(Qt.AlignmentFlag.AlignRight)
         resButton = ArtisanMinorPushButton(QApplication.translate('Button','Set'),
             'tick-01-stroke-rounded-white.svg',
             'tick-01-stroke-rounded-dark.svg',

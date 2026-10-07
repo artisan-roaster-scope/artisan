@@ -48,7 +48,7 @@ from artisanlib.util import (deltaLabelUTF8, stringfromseconds,stringtoseconds, 
         convertWeight, convertVolume, float2str, getStyleIconPath)
 from artisanlib.dialogs import ArtisanDialog, ArtisanResizeablDialog, tareDlg
 from artisanlib.widgets import MyQComboBox, ClickableQLabel, ClickableTextEdit, MyTableWidgetItemNumber, ArtisanPlainTextEdit, RoastsComboBox, ArtisanMinorPushButton
-from artisanlib.styles import (artisan_push_button_style, tool_button_icon_style, combobox_style, line_edit_style,
+from artisanlib.styles import (artisan_push_button_style, tool_button_icon_style, combobox_style, line_edit_style, artisan_dialog_button_style,
     artisan_minor_push_button_style, spin_box_style, table_style, horizontal_header_style, vertical_header_style)
 
 # import artisan.plus modules
@@ -829,6 +829,7 @@ class editGraphDlg(ArtisanResizeablDialog):
         #TITLE
         titlelabel = QLabel('<b>' + QApplication.translate('Label', 'Title') + '</b>')
         self.titleedit = RoastsComboBox(self)
+        self.titleedit.setToolTip(QApplication.translate('Tooltip','Enter the roast title or set properties by choosing from a recent roast'))
         self.titleedit.init(self.aw.recentRoastsMenuList, self.aw.qmc.title) # we need to initialize the popup and lineedit
         self.titleedit.setMinimumWidth(100)
         self.titleedit.setSizePolicy(QSizePolicy.Policy.MinimumExpanding,QSizePolicy.Policy.Fixed)
@@ -1308,7 +1309,7 @@ class editGraphDlg(ArtisanResizeablDialog):
 
         self.updateWeightOutDefectsLabel()
 
-        updateAmbientTemp = ArtisanMinorPushButton(QApplication.translate('Button', 'update'),
+        updateAmbientTemp = ArtisanMinorPushButton(QApplication.translate('Button', 'Update'),
             'update-white.svg',
             'update-dark.svg',
             self.aw.app.darkmode)
@@ -1416,7 +1417,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.plusBlendslabel = QLabel('<b>' + QApplication.translate('Label', 'Blend') + '</b>')
             self.plusBlendslabel.setToolTip(QApplication.translate('Tooltip','Select a blend from your inventory'))
             self.plus_stores_combo = MyQComboBox(self)
-            self.plus_stores_combo.setToolTip(QApplication.translate('Tooltip','Select a storage location'))
+            self.plus_stores_combo.setToolTip(QApplication.translate('Tooltip','Select a storage space'))
             self.plus_coffees_combo = CoffeesComboBox(self)
             self.plus_coffees_combo.setToolTip(QApplication.translate('Tooltip','Select beans from your inventory'))
             self.plus_blends_combo = BlendsComboBox(self)
@@ -1545,7 +1546,7 @@ class editGraphDlg(ArtisanResizeablDialog):
             self.aw.scale_manager.scale1_disconnected_signal.connect(self.scale_disconnected)
 
             if self.scale1_was_connected:
-                scale1_last_weight:int|None = self.aw.scale_manager.get_scale1_last_weight()
+                scale1_last_weight:int|None = (self.aw.scale_manager.get_scale1_last_weight() if self.aw.scale_manager.is_scale1_connected() else None)
                 if scale1_last_weight is None:
                     self.updateWeightLCD('----')
                 else:
@@ -4333,6 +4334,9 @@ class editGraphDlg(ArtisanResizeablDialog):
             # populate comboBox
             self.setup_ui.comboBoxHeating.addItems(self.aw.qmc.heating_types)
             self.setup_ui.SetDefaults.setText(QApplication.translate('Button', 'Save Defaults'))
+            self.setup_ui.SetDefaults.setIconSize(QSize(14,14))
+            self.setup_ui.SetDefaults.setStyleSheet(artisan_minor_push_button_style(self.aw.app.darkmode))
+
             # hack to access the Qt automatic translation of the RestoreDefaults button
             db = QDialogButtonBox(QDialogButtonBox.StandardButton.RestoreDefaults)
             defaults_button = db.button(QDialogButtonBox.StandardButton.RestoreDefaults)
@@ -4340,8 +4344,9 @@ class editGraphDlg(ArtisanResizeablDialog):
                 defaults_button_text_translated = defaults_button.text()
                 self.setup_ui.Defaults.setText(defaults_button_text_translated)
             self.setButtonTranslations(self.setup_ui.Defaults,'Restore Defaults',QApplication.translate('Button','Restore Defaults'))
+            self.setup_ui.Defaults.setIconSize(QSize(14,14))
             self.setup_ui.Defaults.setStyleSheet(artisan_minor_push_button_style(self.aw.app.darkmode))
-            self.setup_ui.SetDefaults.setStyleSheet(artisan_minor_push_button_style(self.aw.app.darkmode))
+
 
             # apply styles
 
@@ -6102,7 +6107,29 @@ class EnergyMeasuringDialog(ArtisanDialog):
         self.setWindowTitle(QApplication.translate('Form Caption','Set Measure from Profile'))
         self.ui.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel|QDialogButtonBox.StandardButton.Apply)
         # hack to assign the Apply button the AcceptRole without losing default system translations
+        # style
+        palette = self.palette()
+        accent_color = palette.color(QPalette.ColorRole.Accent)
+        if not accent_color.isValid() or platform.system() != 'darwin':
+            accent_color = QColor('#3979ae')  # Fallback artisan button blue if OS provides none (and on Windows/Linux)
+        # Generate math-driven lighting variants for the accent button
+        accent_name = accent_color.name()
+        accent_hover = accent_color.lighter(115).name() if self.aw.app.darkmode else accent_color.darker(105).name()
+        accent_pressed = accent_color.darker(110).name() if self.aw.app.darkmode else accent_color.darker(115).name()
+        artisan_dialog_style = artisan_dialog_button_style(self.aw.app.darkmode, accent_name, accent_hover, accent_pressed)
+
         applyButton = self.ui.buttonBox.button(QDialogButtonBox.StandardButton.Apply)
         if applyButton is not None:
             self.ui.buttonBox.removeButton(applyButton)
-            self.ui.buttonBox.addButton(applyButton.text(), QDialogButtonBox.ButtonRole.AcceptRole)
+            self.applyButton = self.ui.buttonBox.addButton(applyButton.text(), QDialogButtonBox.ButtonRole.AcceptRole)
+            self.setButtonTranslations(self.applyButton,'Apply',QApplication.translate('Button','Apply'))
+            self.applyButton.setStyleSheet(artisan_dialog_style)
+        artisan_cancel_button: QPushButton|None = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel)
+        if artisan_cancel_button is not None:
+            _log.debug('PRINT artisan cancel button exists')
+            defaultCancelButton = self.ui.buttonBox.button(QDialogButtonBox.StandardButton.Cancel)
+            if defaultCancelButton is not None:
+                _log.debug('PRINT default cancel button exists')
+                self.ui.buttonBox.removeButton(defaultCancelButton)
+                artisan_cancel_button.setStyleSheet(artisan_dialog_style)
+                self.ui.buttonBox.addButton(artisan_cancel_button, QDialogButtonBox.ButtonRole.RejectRole)

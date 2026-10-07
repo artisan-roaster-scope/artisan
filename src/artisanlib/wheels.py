@@ -202,7 +202,7 @@ class WheelDlg(ArtisanDialog):
         saveButton.setToolTip(QApplication.translate('Tooltip','Save graph to a text file.wg'))
 #        self.main_buttons.addButton(saveButton,QDialogButtonBox.ButtonRole.ActionRole)
 
-        saveImgButton: QPushButton = ArtisanMinorPushButton(QApplication.translate('Button','Save Imgage'),
+        saveImgButton: QPushButton = ArtisanMinorPushButton(QApplication.translate('Button','Save Image'),
                 'save-stroke-rounded-white.svg',
                 'save-stroke-rounded-dark.svg',
                 self.aw.app.darkmode)

@@ -97,8 +97,8 @@ class LargeLCDs(ArtisanResizeablDialog):
             w = a0.size().width()
             h = a0.size().height()
             self.chooseLayout(w,h)
-        super().resizeEvent(a0)
         self.setUpdatesEnabled(True)
+        super().resizeEvent(a0)
 
     def landscapeLayout(self) -> 'QLayout':
         self.tight = False
@@ -933,12 +933,16 @@ class LargeScaleLCDs(LargeLCDs):
         self.lcds2labelsLower = [label2Lower]
         self.lcds2frames = [self.makeLCDframe(label2Upper,self.lcds2[0],label2Lower)]
         ##
-        self.updateVisiblitiesScale()
+        self.setVisiblitiesScale() # calling updateVisibilitiesScales() instead would loop via relayout()
         self.updateStyles()
         self.updateDecimals()
 
+    def setVisiblitiesScale(self) -> None:
+        self.updateVisibilities([self.aw.scale1_model is not None],[self.aw.scale2_model is not None])
+
     def updateVisiblitiesScale(self) -> None:
-        self.updateVisibilities([True],[True])
+        self.setVisiblitiesScale()
+        self.reLayout() # should not be called from makeLCDs as this triggers a loop
 
     @override
     def updateDecimals(self) -> None:
@@ -958,6 +962,7 @@ class LargeScaleLCDs(LargeLCDs):
         settings = QSettings()
         #save window geometry
         settings.setValue('ScaleLCDGeometry',self.saveGeometry())
+        self.aw.closeLargeScaleLCDs()
         self.aw.largeScaleLCDs_dialog = None
         self.aw.LargeScaleLCDsFlag = False
         self.aw.scalelcdsAction.setChecked(False)

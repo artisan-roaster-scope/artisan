@@ -25,6 +25,7 @@
 # AUTHOR
 # Marko Luther, 2024
 
+import time
 import platform
 import asyncio
 import logging
@@ -296,6 +297,7 @@ HEADER1:Final[bytes]      = b'\xef'
 HEADER2:Final[bytes]      = b'\xdd'
 
 HEARTBEAT_FREQUENCY:Final[int] = 5 # send the heartbeat every 5 sec
+PERIOD_AWAITING_INFO_A_AFTER_CONNECT:Final[float] = 3.0 # should be shorter than heartbeat to prevent a disconnect
 
 RELAY_NON_STREAMING:Final[bool] = True # if set, non-streaming mode on relay scales
     # respects calls to enable_streaming() for high reactivity during active weighing and disable_streaming() for calm communication in between
@@ -325,8 +327,8 @@ BROWN:Final[Color] = (255,60,0)
 class AcaiaProtocol:
 
     __slots__ = [ '_send', '_weight_changed_handler', '_weight_error_handler', '_battery_changed_handler',
-            '_tare_pressed_handler', '_logging',
-            '_setting_ack_id', 'stable_only', 'decimals', 'heartbeat_frequency', 'scale_class', 'id_sent',
+            '_tare_pressed_handler', '_logging', '_setting_ack_id', '_on_connect_time',
+            'stable_only', 'decimals', 'heartbeat_frequency', 'scale_class', 'id_sent',
             'info_msg_received', 'device_identified', 'fast_notifications_sent', 'slow_notifications_sent',
             'stable_weight', 'battery', 'isp_version', 'firmware', 'unit', 'max_weight', 'readability',
             'repeatability', 'auto_off_timer', 'has_leds' ]
@@ -356,6 +358,7 @@ class AcaiaProtocol:
 
         # internal state
         self._setting_ack_id:int = 0   # [CSMO] cmd10 setting correlation token (cycles 1~255)
+        self._on_connect_time:float = 0  # time self.on_connect was called during the process; the time this connection started
 
         # scale class
         self.scale_class:SCALE_CLASS = SCALE_CLASS.MODERN
@@ -410,6 +413,7 @@ class AcaiaProtocol:
 
     def on_connect(self) -> None:
         self.reset_parser()
+        self._on_connect_time = time.time()
 
     def is_COSMO(self) -> bool:
         return self.isp_version in {ISP_VERSION_CSMO_S, ISP_VERSION_CSMO_L}
@@ -723,7 +727,7 @@ class AcaiaProtocol:
     def parse_extra_weight_time_data(self, payload:bytes) -> int:
         if len(payload) > EVENT_LEN.KEY:
             weight:float|None = None
-            time:float|None = None
+            time_value:float|None = None
             if payload[0] == KEY_ADDITIONAL_INFO.ZERO:
                 _log.debug('aditional key info 0: %s', payload[1:])
             elif payload[0] == KEY_ADDITIONAL_INFO.ONE:
@@ -745,11 +749,11 @@ class AcaiaProtocol:
                 _log.debug('aditional key info 6: %s', payload[1:])
             elif payload[0] == KEY_ADDITIONAL_INFO.WEIGHT_TIME:
                 time_payload = payload[1:]
-                time = (self.decode_time(time_payload) if len(time_payload) >= EVENT_LEN.TIMER else 0)
+                time_value = (self.decode_time(time_payload) if len(time_payload) >= EVENT_LEN.TIMER else 0)
                 weight_payload = payload[5:]
                 if len(weight_payload) >= EVENT_LEN.WEIGHT:
                     weight, stable, _weight_type = self.decode_weight(weight_payload)
-                    _log.debug('key event time: %s, weight: %s (stable: %s)',time,weight,stable)
+                    _log.debug('key event time: %s, weight: %s (stable: %s)',time_value,weight,stable)
                 else:
                     weight = 0
             elif payload[0] == KEY_ADDITIONAL_INFO.BATTERY:
@@ -797,7 +801,8 @@ class AcaiaProtocol:
             val = -1
             if event == EVENT.WEIGHT:
                 val = self.parse_weight_event(payload)
-                if self.fast_notifications_sent and not self.slow_notifications_sent and self.stable_weight is not None: # ensure that we turn slow only after receiving a stable weight
+                if self.fast_notifications_sent and not self.slow_notifications_sent:
+                        # NOTE: don't restrict sending slow_notifications to after receiving a stable weight as some scales never send one like the Pyxis
                     # after receiving the first weight quick,
                     # we slow down the weight notificatinos
                     self.slow_notifications(not RELAY_NON_STREAMING)
@@ -977,9 +982,9 @@ class AcaiaProtocol:
                 # Note: this event is needed to have the connected scale start to send weight messages even on relay scales which ignore the settings
                 self.fast_notifications()
 
-#            if not self.id_sent:
-#                # send ID only once per connect to initiate the handshake, but never before receiving the INFO_A message
-#                self.send_ID()
+            if not self.id_sent and (time.time() - self._on_connect_time) > PERIOD_AWAITING_INFO_A_AFTER_CONNECT:
+                # send ID only once per connect to initiate the handshake, but only before receiving the INFO_A message if this did not arrive up to 5sec after connect
+                self.send_ID()
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
             _log.debug('data: %s',data)
@@ -1341,6 +1346,7 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
         self.protocol.send_signal(action)
 
     def send_tare(self) -> None:
+        _log.debug('send_tare')
         self.protocol.send_tare()
 
     def enable_streaming(self) -> None:
@@ -1389,7 +1395,7 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
     # keep alive should be send every 3-5sec
     @override
     def heartbeat(self) -> None:
-#        _log.debug('send heartbeat')
+        _log.debug('send heartbeat')
         self.protocol.send_message(MSG.SYSTEM, b'\x02\x00')
 
 
@@ -1618,7 +1624,7 @@ class AcaiaSerial(Acaia): # pyright: ignore [reportGeneralTypeIssues] # Argument
 
     @override
     def connect_scale(self, device_logging:bool) -> None:
-        if self.ident is not None:
+        if self.acaia is None and self.ident is not None:
             acaia_serial = SerialSettings(
                 port = self.ident,
                 baudrate = SERIAL_BAUDRATE,
@@ -1639,6 +1645,9 @@ class AcaiaSerial(Acaia): # pyright: ignore [reportGeneralTypeIssues] # Argument
                 decimals = self.decimals)
             self.acaia.protocol.setLogging(device_logging)
             self.acaia.start()
+        else:
+            _log.error('AcaiaAsync client already running')
+
 
     @override
     def disconnect_scale(self) -> None:

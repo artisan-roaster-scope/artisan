@@ -30,7 +30,7 @@ import platform
 import logging
 from typing import override, Any, cast, TYPE_CHECKING, Final
 
-from PyQt6.QtCore import Qt, pyqtSlot, QSettings, QTimer
+from PyQt6.QtCore import Qt, pyqtSlot, QSettings, QTimer, QSize
 from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import (QApplication, QLabel, QDialogButtonBox, QGridLayout,
     QComboBox, QHBoxLayout, QVBoxLayout, QCheckBox, QGroupBox,
@@ -43,7 +43,7 @@ if TYPE_CHECKING:
 from artisanlib.dialogs import ArtisanResizeablDialog
 from artisanlib.util import deltaLabelUTF8, getStyleIconPath
 from artisanlib.widgets import MyContentLimitedQComboBox, MyQTableWidget, ArtisanMinorPushButton
-from artisanlib.styles import vertical_header_style, table_style, spin_box_style
+from artisanlib.styles import vertical_header_style, table_style, spin_box_style, artisan_minor_push_button_style
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
@@ -333,13 +333,17 @@ class StatisticsDlg(ArtisanResizeablDialog):
         self.copyTableButton.setToolTip(QApplication.translate('Tooltip','Copy table to clipboard, OPTION or ALT click for tabular text'))
         self.copyTableButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.copyTableButton.clicked.connect(self.copyEventButtonTabletoClipboard)
-        self.defaultButton = ArtisanMinorPushButton(QApplication.translate('Button', 'Defaults'),
-            'undo-03-stroke-rounded-white.svg',
-            'undo-03-stroke-rounded-dark.svg',
-            self.aw.app.darkmode)
-        self.defaultButton.setToolTip(QApplication.translate('Tooltip','Set Statistics Summary to default settings'))
-        self.defaultButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.defaultButton.clicked.connect(self.restoreDefaults)
+
+
+        self.defaultButton = self.dialogbuttons.addButton(QDialogButtonBox.StandardButton.Reset)
+        if self.defaultButton is not None:
+            self.defaultButton.clicked.connect(self.restoreDefaults)
+            self.setButtonTranslations(self.defaultButton,'Reset',QApplication.translate('Button','Reset'))
+            self.defaultButton.setIconSize(QSize(14,14))
+            self.defaultButton.setStyleSheet(artisan_minor_push_button_style(self.aw.app.darkmode))
+            self.defaultButton.setIcon(QIcon(getStyleIconPath('undo-03-stroke-rounded-dark.svg' if self.aw.app.darkmode else 'undo-03-stroke-rounded-white.svg')))
+            self.dialogbuttons.removeButton(self.defaultButton)
+
 #        helpDialogButton = QDialogButtonBox()
 #        helpButtonD: QPushButton|None = helpDialogButton.addButton(QDialogButtonBox.StandardButton.Help)
 #        if helpButtonD is not None:
@@ -361,13 +365,13 @@ class StatisticsDlg(ArtisanResizeablDialog):
         statstablebuttonslayout.addStretch()
         statstablebuttonslayout.setContentsMargins(7, 2, 7, 2)  # left, top, right, bottom
         tab2buttonlayout = QHBoxLayout()
+        tab2buttonlayout.addWidget(self.defaultButton)
         tab2buttonlayout.addWidget(self.copyTableButton)
         tab2buttonlayout.addStretch()
         tab2buttonlayout.addWidget(addButton)
         tab2buttonlayout.addWidget(self.insertButton)
         tab2buttonlayout.addWidget(delButton)
         tab2buttonlayout.addStretch()
-        tab2buttonlayout.addWidget(self.defaultButton)
 #        tab2buttonlayout.addWidget(helpDialogButton)
         tab2buttonlayout.setContentsMargins(7, 0, 7, 0)  # left, top, right, bottom
 

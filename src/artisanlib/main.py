@@ -653,7 +653,7 @@ from artisanlib.s7port import s7port
 from artisanlib.wsport import wsport
 from artisanlib.mqttport import mqttport
 from artisanlib.modbusport import modbusport
-from artisanlib.styles import (artisan_slider_style, artisan_slider_frame_style, artisan_event_button_style,
+from artisanlib.styles import (artisan_slider_style, artisan_slider_frame_style, artisan_event_button_style, qlcd_style,
     push_button_style, artisan_sv_plus_push_button_style, artisan_sv_minus_push_button_style, events_editor_style)
 from artisanlib.dialogs import HelpDlg, ArtisanInputDialog, ArtisanComboBoxDialog, ArtisanPortsDialog, ArtisanSliderLCDinputDlg
 from artisanlib.logs import (serialLogDlg, errorDlg, messageDlg)
@@ -737,11 +737,11 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
 
         self.dashboard_tool:QAction|None = next(tool for tool in cast(list[QAction], self.findChildren(QAction)) if tool.text() == 'Dashboard')
 
-        self.home_tool:QAction|None = next(tool for tool in cast(list[QAction], self.findChildren(QAction)) if tool.text() == 'Home')
-        self.back_tool:QAction|None = next(tool for tool in cast(list[QAction], self.findChildren(QAction)) if tool.text() == 'Back')
-        self.forward_tool:QAction|None = next(tool for tool in cast(list[QAction], self.findChildren(QAction)) if tool.text() == 'Forward')
-        self.pan_tool:QAction|None = next(tool for tool in cast(list[QAction], self.findChildren(QAction)) if tool.text() == 'Pan')
-        self.zoom_tool:QAction|None = next(tool for tool in cast(list[QAction], self.findChildren(QAction)) if tool.text() == 'Zoom')
+        self.home_tool:QAction|None = next(tool for tool in cast(list[QAction], self.findChildren(QAction)) if tool.text() == QApplication.translate('Toolbar', 'Home'))
+        self.back_tool:QAction|None = next(tool for tool in cast(list[QAction], self.findChildren(QAction)) if tool.text() == QApplication.translate('Toolbar', 'Back'))
+        self.forward_tool:QAction|None = next(tool for tool in cast(list[QAction], self.findChildren(QAction)) if tool.text() == QApplication.translate('Toolbar', 'Forward'))
+        self.pan_tool:QAction|None = next(tool for tool in cast(list[QAction], self.findChildren(QAction)) if tool.text() == QApplication.translate('Toolbar', 'Pan'))
+        self.zoom_tool:QAction|None = next(tool for tool in cast(list[QAction], self.findChildren(QAction)) if tool.text() == QApplication.translate('Toolbar', 'Zoom'))
 
         self.setIconSize(QSize(35,35))
 
@@ -898,7 +898,7 @@ class VMToolbar(NavigationToolbar): # pylint: disable=abstract-method
 
 
     def enable_edit_curve_parameters(self) -> None:
-        if self.edit_curve_parameters_action is not None:
+        if self.edit_curve_parameters_action is not None and not self.aw.dashboard.dashboard_active():
 #            self.edit_curve_parameters_action.setEnabled(True)
             self.edit_curve_parameters_action.setVisible(True)
 
@@ -1620,7 +1620,7 @@ class ApplicationWindow(QMainWindow):
         self.two_bucket_mode:bool = False # if True, the TaskManager allows to split green task weight into two buckets
         self.scale1_dedicated_for_green_only:bool = False
         self.scale2_dedicated_for_roasted_only:bool = False
-        self.green_task_precision:float = 10 # precision in percent (range [0.1 - 10%]; if set to 0 all "non-overlapping" weights are accepted)
+        self.green_task_precision:float = 5 # precision in percent (range [0.1 - 10%]; if set to 0 all "non-overlapping" weights are accepted)
         # scale2: just for green
         self.scale2_model:int|None = None
         self.scale2_name:str|None = None  # the display/local name of the device (like "ACAIA162FC")
@@ -2384,7 +2384,7 @@ class ApplicationWindow(QMainWindow):
         self.editGraphAction.triggered.connect(self.editgraph)
         self.editGraphAction.setShortcut('Ctrl+T')
 
-        self.backgroundAction:QAction = QAction(QApplication.translate('Menu', 'Background...'), self)
+        self.backgroundAction:QAction = QAction(QApplication.translate('Menu', 'Template...'), self)
         self.backgroundAction.triggered.connect(self.background)
         self.backgroundAction.setShortcut('Ctrl+B')
 
@@ -3483,11 +3483,11 @@ class ApplicationWindow(QMainWindow):
         # AUC LCD
         self.AUClabel: QLabel = QLabel()
         self.AUClabel.setText(self.label_fmt.format(QApplication.translate('Label', 'AUC')))
-        self.AUClcd: QLCDNumber = QLCDNumber()
+        self.AUClcd = QLCDNumber()
         self.AUClcd.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.AUClcd.customContextMenuRequested.connect(self.AUClcdClicked)
         self.AUClcd.display('--')
-        self.AUClcdFrame: QFrame = self.makePhasesLCDbox(self.AUClabel,self.AUClcd)
+        self.AUClcdFrame = self.makePhasesLCDbox(self.AUClabel,self.AUClcd)
         self.AUClcd.setNumDigits(3)
 
         AUCLayout = QHBoxLayout()
@@ -3602,7 +3602,7 @@ class ApplicationWindow(QMainWindow):
         self.stack.addWidget(level3layoutFrame)
         self.stack.addWidget(self.dashboard)
 
-        self.setMinimumWidth(890)
+        self.setMinimumWidth(1080)
         self.setMinimumHeight(620)
 
         midleftlayout = QVBoxLayout()
@@ -3953,6 +3953,11 @@ class ApplicationWindow(QMainWindow):
         self.zoomInShortcut.activated.connect(self.zoomIn)
         self.zoomOutShortcut = QShortcut(QKeySequence.StandardKey.ZoomOut, self)
         self.zoomOutShortcut.activated.connect(self.zoomOut)
+
+        # ensure that we can move via tab key between sliders and main event buttons in keyboard modus
+        cw = self.centralWidget()
+        if cw is not None:
+            cw.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
 
 
     @pyqtSlot(bool)
@@ -5820,12 +5825,20 @@ class ApplicationWindow(QMainWindow):
         if action and isinstance(action, QAction) and hasattr(action,'data') and hasattr(action,'text'):
             label = (action.text() if action.data()[1] == '' else f'{action.data()[1]} {action.text()}')
             string = QApplication.translate('Message', 'Load theme {0}?').format(label)
-            reply = QMessageBox.question(self, QApplication.translate('Message', 'Adjust Theme Related Settings'),string,
-                QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
+
+#            reply = QMessageBox.question(self, QApplication.translate('Message', 'Adjust Theme Related Settings'),string,
+#                QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.Cancel)
+            box = QMessageBox()
+            box.setText(string)
+            plus_util.setPlusIcon(box, self.app.darkmode)
+            box.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+            reply = box.exec()
+
             if reply == QMessageBox.StandardButton.Cancel:
                 return
             if reply == QMessageBox.StandardButton.Yes:
                 self.loadThemeSignal.emit(action.data()[0], label)
+
 
     @pyqtSlot(str,str)
     def loadThemeFile(self, filename:str, theme_name:str) -> None:
@@ -6188,7 +6201,7 @@ class ApplicationWindow(QMainWindow):
         self.main_widget.setStyleSheet(f'* {{background-color:{rgba_colorname2argb_colorname(canvas_color)}; color: {rgba_colorname2argb_colorname(line_edit_color)};}}')
         self.EventsGroupLayout.setStyleSheet(events_editor_style(
             whitep,
-            background_color = rgba_colorname2argb_colorname(self.qmc.palette['background']),
+            background_color = rgba_colorname2argb_colorname(QColor(self.qmc.palette['background'][:7]).lighter(110 if whitep else 90).name()),
             line_edit_color = line_edit_color) +
                 combobox_style(whitep,
                     getStyleIconPath('arrow-down-01-stroke-rounded-dark.svg' if whitep else 'arrow-down-01-stroke-rounded-light.svg'),
@@ -7429,6 +7442,7 @@ class ApplicationWindow(QMainWindow):
 
     # set slider focus to Qt.FocusPolicy.StrongFocus to allow keyboard control and
     # Qt.FocusPolicy.NoFocus to deactivate it
+    # on of: ClickFocus TabFocus StrongFocus NoFocus
     def setSliderFocusPolicy(self, focus:Qt.FocusPolicy) -> None:
         if self.eventsliderKeyboardControl and bool(self.eventslidervisibilities[0]):
             self.slider1.setFocusPolicy(focus)
@@ -7640,7 +7654,7 @@ class ApplicationWindow(QMainWindow):
         LCDVbox.addSpacing(12) # to align Phases LCDs with main buttons on the right vertically
         LCDVbox.setSpacing(0)
         LCDVbox.setContentsMargins(0, 0, 0, 0)
-        frame.setStyleSheet('QLCDNumber{border-radius:4; border-width: 0; border-color: black; border-style:solid; color: black; background-color: #e6e6e6;}')
+        frame.setStyleSheet('QLCDNumber {border-radius:4; border-width: 0; border-color: black; border-style:solid; color: black; background-color: #e6e6e6;}')
 #        frame.setFrameShadow(QFrame.Shadow.Sunken)
 #        frame.setLineWidth(1)
 #        frame.setFrameShape(QFrame.Shape.Panel)
@@ -7651,7 +7665,7 @@ class ApplicationWindow(QMainWindow):
     def updateAUCLCD(self) -> None:
         try:
             auc_value_str = '---'
-            auc_style = 'QLCDNumber { color: black; }'
+            auc_color = rgba_colorname2argb_colorname(self.lcdpaletteF['phases'])
             if ((self.qmc.AUCbegin == 0 and self.qmc.timeindex[0] > -1) or
                 (self.qmc.AUCbegin == 1 and self.qmc.TPalarmtimeindex) or
                 (self.qmc.AUCbegin == 2 and self.qmc.timeindex[1] > 0) or
@@ -7667,7 +7681,6 @@ class ApplicationWindow(QMainWindow):
                             self.AUClcd.setNumDigits(4)
                         else:
                             self.AUClcd.setNumDigits(3)
-                    auc_style = 'QLCDNumber { color: black; }'
                 elif self.qmc.AUCLCDmode == 1: # AUC delta to target/background
                     if self.qmc.AUCtargetFlag and self.qmc.backgroundprofile is not None and self.qmc.AUCbackground > 0:
                         # background AUC as target
@@ -7678,15 +7691,15 @@ class ApplicationWindow(QMainWindow):
                     d = self.qmc.AUCvalue-target
                     if d < 0:
                         # too low => blue
-                        auc_style = 'QLCDNumber { color: blue; }'
+                        auc_color = '#3979AE'
                     else:
                         # too high => red
-                        auc_style = 'QLCDNumber { color: red; }'
+                        auc_color = '#d4336a'
                         self.AUClabel.setText('<small><b>' + QApplication.translate('Label', 'AUC') + '&laquo;</b></small>')
                     v = abs(int(round(d)))
                     if v > 9999:
                         auc_value_str = '--'
-                        auc_style = 'QLCDNumber { color: black; }'
+                        auc_color = rgba_colorname2argb_colorname(self.lcdpaletteF['phases'])
                         self.AUClcd.setNumDigits(3)
                     else:
                         auc_value_str = str(v)
@@ -7705,16 +7718,14 @@ class ApplicationWindow(QMainWindow):
                             self.AUClcd.setNumDigits(4)
                         else:
                             self.AUClcd.setNumDigits(3)
-                    auc_style = 'QLCDNumber { color: black; }'
                 else:
                     self.AUClcd.setNumDigits(3)
                     auc_value_str = '--'
-                    auc_style = 'QLCDNumber { color: black; }'
             self.AUClcd.display(auc_value_str)
-            self.AUClcd.setStyleSheet(auc_style)
+            self.updateLCDcolor(self.AUClcd, 'phases', auc_color)
             if self.LargePhasesLCDsFlag and self.largePhasesLCDs_dialog:
                 self.largePhasesLCDs_dialog.updateValues([None,None],[None,auc_value_str])
-                self.largePhasesLCDs_dialog.updateAUCstyle(auc_style)
+                self.largePhasesLCDs_dialog.updateAUCstyle(self.AUClcd.styleSheet())
         except Exception as ex: # pylint: disable=broad-except
             _log.exception(ex)
             _, _, exc_tb = sys.exc_info()
@@ -11743,13 +11754,13 @@ class ApplicationWindow(QMainWindow):
             focused_widget = QApplication.focusWidget()
             if focused_widget and focused_widget != self.centralWidget():
                 focused_widget.clearFocus()
+#            if self.qmc.flagstart and self.keyboardmoveflag == 0: # now always set slider to StrongFocus if visible
+            self.setSliderFocusPolicy(Qt.FocusPolicy.StrongFocus)
             self.slider1.setVisible(True)
             self.slider2.setVisible(True)
             self.slider3.setVisible(True)
             self.slider4.setVisible(True)
             self.sliderSV.setVisible(True)
-            if self.keyboardmoveflag == 0:
-                self.setSliderFocusPolicy(Qt.FocusPolicy.StrongFocus)
             # set slider singleStep
             self.slider1.setSingleStep(self.eventSliderStepSize(0))
             self.slider2.setSingleStep(self.eventSliderStepSize(1))
@@ -11916,15 +11927,11 @@ class ApplicationWindow(QMainWindow):
     def showEventsMinieditor(self) -> None:
         self.EventsGroupLayout.setVisible(True)
 
-    def updateLCDcolor(self, lcd:QLCDNumber, color_tag:str) -> None:
+    def updateLCDcolor(self, lcd:QLCDNumber, color_tag:str, text_color:str|None = None) -> None:
         if color_tag in self.lcdpaletteF and color_tag in self.lcdpaletteB:
-            argb_color = rgba_colorname2argb_colorname(self.lcdpaletteF[color_tag])
+            argb_color = (rgba_colorname2argb_colorname(self.lcdpaletteF[color_tag]) if text_color is None else text_color)
             argb_background_color = rgba_colorname2argb_colorname(self.lcdpaletteB[color_tag])
-            lcd.setStyleSheet(
-                # with border
-                f'QLCDNumber, MyQLCDNumber {{ border-width: 1; border-color: {argb_color}; border-radius: 8; color: {argb_color}; background-color: {argb_background_color};}}' if color_tag == 'phases' else
-                # without border
-                f'QLCDNumber, MyQLCDNumber {{ border-radius: 8; color: {argb_color}; background-color: {argb_background_color};}}')
+            lcd.setStyleSheet(qlcd_style(argb_color,argb_background_color,color_tag == 'phases'))
 
     def updateLCDcolors(self) -> None:
         lcd_tag_list:list[tuple[QLCDNumber,str]] = [
@@ -12912,15 +12919,15 @@ class ApplicationWindow(QMainWindow):
             if force or self.keyboardmoveflag == 0:
                 #turn on
                 self.keyboardmoveflag = 1
-                # deactivate slider keyboard control
-                self.setSliderFocusPolicy(Qt.FocusPolicy.NoFocus)
+#                # deactivate slider keyboard control
+#                self.setSliderFocusPolicy(Qt.FocusPolicy.NoFocus)
                 self.sendmessage(QApplication.translate('Message','Keyboard moves turned ON'))
                 self.keyboardmoveindex = self.ignoreFlatButtons(self.keyboardmoveindex) - 1
             elif self.keyboardmoveflag == 1:
                 # turn off
                 self.keyboardmoveflag = 0
-                # activate slider keyboard control
-                self.setSliderFocusPolicy(Qt.FocusPolicy.StrongFocus)
+#                # activate slider keyboard control
+#                self.setSliderFocusPolicy(Qt.FocusPolicy.StrongFocus)
                 # clear all
                 self.sendmessage(QApplication.translate('Message','Keyboard moves turned OFF'))
                 self.resetKeyboardButtonMarks()
@@ -19601,7 +19608,7 @@ class ApplicationWindow(QMainWindow):
                 from artisanlib.weblcds import WebLCDs
                 self.weblcds_server = WebLCDs(
                     self.WebLCDsPort,
-                    str(getResourcePath()),
+                    getResourcePath(),
                     self.weblcds_index_path,
                     self.weblcds_websocket_path,
                     ('&nbsp;&nbsp;-.-' if self.qmc.LCDdecimalplaces else '&nbsp;--'),
@@ -21312,8 +21319,6 @@ class ApplicationWindow(QMainWindow):
 
 
     def stopActivities(self) -> None:
-        # disconnect connected scales
-        self.scale_manager.disconnect_all_signal.emit()
 
         if self.full_screen_mode_active:
             if self.fullscreenAction is not None and not (platform.system() == 'Darwin' and self.qmc.locale_str == 'en'):
@@ -21363,16 +21368,6 @@ class ApplicationWindow(QMainWindow):
             self.scheduler_auto_open = False
             self.schedule_window.closeWithoutDialog()
             self.scheduleFlag = tmp_Schedule
-        else:
-            # the scheduler closes the connection to all connected scales, but if that one is not active we might
-            # still be connected to some scales
-            try:
-                #self.scale_manager.disconnect_all_signal.emit()
-                # closing via signal does not work on app quite for unknown reasons thus we make a direct call
-                self.scale_manager.disconnect_all_slot()
-            except Exception as e: # pylint: disable=broad-except
-                _log.exception(e)
-
         if self.LargeLCDsFlag and self.largeLCDs_dialog:
             tmp_LargeLCDs = self.LargeLCDsFlag # we keep the state to properly store it in the settings
             self.largeLCDs_dialog.close()
@@ -21399,6 +21394,12 @@ class ApplicationWindow(QMainWindow):
             self.LargePhasesLCDsFlag = tmp_LargeLCDs
         if self.comparator:
             self.comparator.close()
+        try:
+            #self.scale_manager.disconnect_all_signal.emit()
+            # closing via signal does not work on app quite for unknown reasons thus we make a direct call
+            self.scale_manager.disconnect_all_slot()
+        except Exception as e: # pylint: disable=broad-except
+            _log.exception(e)
         # now wait until the current sampling thread is terminated
         while self.qmc.flagsamplingthreadrunning:
             QApplication.processEvents()
@@ -24501,7 +24502,7 @@ class ApplicationWindow(QMainWindow):
                             update_str = QApplication.translate('About', 'A new release is available.')
                             update_str += '<br/><a href="https://github.com/artisan-roaster-scope/artisan/blob/master/wiki/ReleaseHistory.md">'
                             update_str +=  QApplication.translate('About', 'Show Change list')
-                            update_str += '<br/><a href="https://github.com/artisan-roaster-scope/artisan/releases/tag/' + str(tag_name) + '">'
+                            update_str += '<br/><a href="https://artisan-scope.org/download/">'
                             update_str +=  QApplication.translate('About', 'Download Release') + ' ' + str(tag_name)
                         elif latest == __version__ :
                             update_str = QApplication.translate('About', 'You are using the latest release.')
@@ -25324,39 +25325,54 @@ class ApplicationWindow(QMainWindow):
             self.scale_manager.scale1_connected_signal.connect(self.scale1connectedSlot)
             self.scale_manager.scale1_disconnected_signal.connect(self.scale1disconnectedSlot)
             self.scale_manager.scale1_weight_changed_signal.connect(self.scale1WeightChangedSlot)
+            #
             self.scale_manager.scale2_connected_signal.connect(self.scale2connectedSlot)
             self.scale_manager.scale2_disconnected_signal.connect(self.scale2disconnectedSlot)
             self.scale_manager.scale2_weight_changed_signal.connect(self.scale2WeightChangedSlot)
             self.largeScaleLCDs_dialog.show()
-            scale1_weight = self.scale_manager.get_scale1_last_weight()
+            scale1_weight = (self.scale_manager.get_scale1_last_weight() if self.scale_manager.is_scale1_connected() else None)
             if scale1_weight is not None:
                 self.scale1WeightChangedSlot(scale1_weight)
-            scale2_weight = self.scale_manager.get_scale2_last_weight()
+            scale2_weight = (self.scale_manager.get_scale2_last_weight()  if self.scale_manager.is_scale2_connected() else None)
             if scale2_weight is not None:
                 self.scale2WeightChangedSlot(scale2_weight)
+            self.scale_manager.connect_all_signal.emit(self.qmc.device_logging)
         else:
-            try:
-                self.scale_manager.connect_scale1_signal.disconnect(self.scale1connectedSlot)
-            except Exception: # pylint: disable=broad-except
-                pass
-            try:
-                self.scale_manager.disconnect_scale1_signal.connect(self.scale1disconnectedSlot)
-            except Exception: # pylint: disable=broad-except
-                pass
-            try:
-                self.scale_manager.scale1_weight_changed_signal.disconnect(self.scale1WeightChangedSlot)
-            except Exception: # pylint: disable=broad-except
-                pass
-            try:
-                self.scale_manager.connect_scale2_signal.connect(self.scale2connectedSlot)
-            except Exception: # pylint: disable=broad-except
-                pass
-            try:
-                self.scale_manager.disconnect_scale2_signal.connect(self.scale2disconnectedSlot)
-            except Exception: # pylint: disable=broad-except
-                pass
+            # close dialog
             self.largeScaleLCDs_dialog.close()
-            self.largeScaleLCDs_dialog = None
+
+
+    def closeLargeScaleLCDs(self) -> None:
+        _log.debug('main:closeLargeScaleLCDs()')
+        #
+        try:
+            self.scale_manager.scale1_weight_changed_signal.disconnect(self.scale1WeightChangedSlot)
+        except Exception: # pylint: disable=broad-except
+            pass
+        try:
+            self.scale_manager.connect_scale1_signal.disconnect(self.scale1connectedSlot)
+        except Exception: # pylint: disable=broad-except
+            pass
+        try:
+            self.scale_manager.disconnect_scale1_signal.disconnect(self.scale1disconnectedSlot)
+        except Exception: # pylint: disable=broad-except
+            pass
+        #
+        try:
+            self.scale_manager.scale2_weight_changed_signal.disconnect(self.scale2WeightChangedSlot)
+        except Exception: # pylint: disable=broad-except
+            pass
+        try:
+            self.scale_manager.connect_scale2_signal.disconnect(self.scale2connectedSlot)
+        except Exception: # pylint: disable=broad-except
+            pass
+        try:
+            self.scale_manager.disconnect_scale2_signal.disconnect(self.scale2disconnectedSlot)
+        except Exception: # pylint: disable=broad-except
+            pass
+        # disconnect both scales only in case they are not in use (WeightManager:weight_changed_signal is no longer connected)
+        self.scale_manager.disconnect_scale1_signal.emit()
+        self.scale_manager.disconnect_scale2_signal.emit()
 
 
     def weight2str(self, weight:int) -> str:
@@ -25371,6 +25387,9 @@ class ApplicationWindow(QMainWindow):
         converted_weight:float = convertWeight(weight,0,unit)
         return f'{converted_weight:.2f}'
 
+    def updateScaleConfiguration(self) -> None:
+        if self.largeScaleLCDs_dialog is not None:
+            self.largeScaleLCDs_dialog.updateVisiblitiesScale()
 
     def updateScale1name(self) -> None:
         scale1_id:str|None = self.scale_manager.get_scale1_id()

@@ -39,7 +39,7 @@ if TYPE_CHECKING:
 from uic import SliderCalculatorDialog # pyright: ignore[attr-defined] # pylint: disable=no-name-in-module
 
 from PyQt6.QtCore import Qt, pyqtSlot, QSettings, QTimer, QSize
-from PyQt6.QtGui import (QColor, QFont, QIntValidator, QIcon)
+from PyQt6.QtGui import QColor, QFont, QIntValidator, QIcon, QPalette
 from PyQt6.QtWidgets import (QApplication, QCheckBox, QComboBox, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit,
                              QPushButton, QSpinBox, QWidget, QTabWidget, QDialogButtonBox,
                              QGridLayout, QGroupBox, QTableWidget, QHeaderView, QToolButton)
@@ -49,7 +49,7 @@ from artisanlib.util import comma2dot, eventtime2string, getStyleIconPath
 from artisanlib.dialogs import ArtisanResizeablDialog, ArtisanDialog
 from artisanlib.widgets import MyQComboBox, MyQDoubleSpinBox, ArtisanMinorPushButton
 from artisanlib.styles import (tool_button_icon_style, horizontal_header_style, vertical_header_style,
-    line_edit_style, spin_box_style, table_style, artisan_minor_push_button_style)
+    line_edit_style, spin_box_style, table_style, artisan_minor_push_button_style, artisan_dialog_button_style)
 
 _log: Final[logging.Logger] = logging.getLogger(__name__)
 
@@ -273,20 +273,20 @@ class EventsDlg(ArtisanResizeablDialog):
         helpcurveDialogButton = QDialogButtonBox()
         helpButton: QPushButton|None = helpcurveDialogButton.addButton(QDialogButtonBox.StandardButton.Help)
         if helpButton is not None:
-            self.setButtonTranslations(helpButton,'Help',QApplication.translate('Button','Help'))
             helpButton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             helpButton.clicked.connect(self.showEventannotationhelp)
             helpButton.setStyleSheet(artisan_minor_push_button_style(self.aw.app.darkmode))
             helpButton.setIconSize(QSize(14,14))
             helpButton.setIcon(QIcon(getStyleIconPath(
                 'help-square-stroke-rounded-dark.svg' if self.aw.app.darkmode else 'help-square-stroke-rounded-white.svg')))
+            self.setButtonTranslations(helpButton,'Help',QApplication.translate('Button','Help'))
 
         buttonLayout = QHBoxLayout()
+        buttonLayout.addWidget(helpButton)
         buttonLayout.addStretch()
         buttonLayout.addWidget(overlapeditLabel)
         buttonLayout.addWidget(self.overlapEdit)
         buttonLayout.addStretch()
-        buttonLayout.addWidget(helpButton)
         buttonLayout.setContentsMargins(10,10,0,10)
         entryLayout = QHBoxLayout()
         entryLayout.addLayout(eventannoLayout)
@@ -749,12 +749,13 @@ class EventsDlg(ArtisanResizeablDialog):
         if helpButtonD is not None:
             helpButtonD.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             helpButtonD.setToolTip(QApplication.translate('Tooltip','Show help'))
-            self.setButtonTranslations(helpButton,'Help',QApplication.translate('Button','Help'))
             helpButtonD.clicked.connect(self.showEventbuttonhelp)
             helpButtonD.setStyleSheet(artisan_minor_push_button_style(self.aw.app.darkmode))
             helpButtonD.setIconSize(QSize(14,14))
             helpButtonD.setIcon(QIcon(getStyleIconPath(
                 'help-square-stroke-rounded-dark.svg' if self.aw.app.darkmode else 'help-square-stroke-rounded-white.svg')))
+            self.setButtonTranslations(helpButtonD,'Help',QApplication.translate('Button','Help'))
+
         #color patterns
         #flag that prevents changing colors too fast
         self.changingcolorflag = False
@@ -772,7 +773,7 @@ class EventsDlg(ArtisanResizeablDialog):
             'arrow-big-left-dash-stroke-rounded-dark.svg',
             self.aw.app.darkmode)
         transferpalettebutton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        setpalettebutton = ArtisanMinorPushButton(QApplication.translate('Button','Activate Palette >>'),
+        setpalettebutton = ArtisanMinorPushButton(QApplication.translate('Button','Activate Palette'),
             'arrow-big-right-dash-stroke-rounded-white.svg',
             'arrow-big-right-dash-stroke-rounded-dark.svg',
             self.aw.app.darkmode)
@@ -1104,12 +1105,12 @@ class EventsDlg(ArtisanResizeablDialog):
         helpsliderbutton: QPushButton|None = helpsliderDialogButton.addButton(QDialogButtonBox.StandardButton.Help)
         if helpsliderbutton is not None:
             helpsliderbutton.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-            self.setButtonTranslations(helpsliderbutton,'Help',QApplication.translate('Button','Help'))
             helpsliderbutton.clicked.connect(self.showSliderHelp)
             helpsliderbutton.setStyleSheet(artisan_minor_push_button_style(self.aw.app.darkmode))
             helpsliderbutton.setIconSize(QSize(14,14))
             helpsliderbutton.setIcon(QIcon(getStyleIconPath(
                 'help-square-stroke-rounded-dark.svg' if self.aw.app.darkmode else 'help-square-stroke-rounded-white.svg')))
+            self.setButtonTranslations(helpsliderbutton,'Help',QApplication.translate('Button','Help'))
         self.sliderKeyboardControlflag = QCheckBox(QApplication.translate('CheckBox','Keyboard Control'))
         self.sliderKeyboardControlflag.setToolTip(QApplication.translate('Tooltip', 'Move slider under focus using the up/down cursor keys'))
         self.sliderKeyboardControlflag.setChecked(self.aw.eventsliderKeyboardControl)
@@ -1719,13 +1720,13 @@ class EventsDlg(ArtisanResizeablDialog):
         nbuttonslayout.addWidget(self.showExtraButtonTooltips)
         nbuttonslayout.addStretch()
         tab2buttonlayout = QHBoxLayout()
+        tab2buttonlayout.addWidget(helpButtonD)
         tab2buttonlayout.addWidget(self.copyeventbuttonTableButton)
         tab2buttonlayout.addStretch()
         tab2buttonlayout.addWidget(addButton)
         tab2buttonlayout.addWidget(self.insertButton)
         tab2buttonlayout.addWidget(delButton)
         tab2buttonlayout.addStretch()
-        tab2buttonlayout.addWidget(helpButtonD)
         ### tab2 layout
         tab2layout = QVBoxLayout()
         tab2layout.addWidget(self.eventbuttontable)
@@ -1758,6 +1759,7 @@ class EventsDlg(ArtisanResizeablDialog):
         paletteButtons.addStretch()
         paletteButtons.addWidget(restorebutton)
         paletteButtons.addWidget(backupbutton)
+        paletteButtons.addStretch()
         tab3layout = QVBoxLayout()
         tab3layout.addWidget(paletteGroupLayout)
         tab3layout.addStretch()
@@ -1862,12 +1864,12 @@ class EventsDlg(ArtisanResizeablDialog):
         tab5Layout.addWidget(self.E4_calc,4,11)
 
         SliderHelpHBox = QHBoxLayout()
+        SliderHelpHBox.addWidget(helpsliderbutton)
         SliderHelpHBox.addStretch()
         SliderHelpHBox.addWidget(self.sliderAlternativeLayoutFlag)
         SliderHelpHBox.addSpacing(10)
         SliderHelpHBox.addWidget(self.sliderKeyboardControlflag)
         SliderHelpHBox.addStretch()
-        SliderHelpHBox.addWidget(helpsliderbutton)
         SliderHelpHBox.setContentsMargins(10,10,0,10)
         C5VBox = QVBoxLayout()
         C5VBox.addLayout(tab5Layout)
@@ -4104,10 +4106,33 @@ class SliderCalculator(ArtisanDialog):
         self.setWindowTitle(QApplication.translate('Form Caption','Slider Calculator'))
         self.ui.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel|QDialogButtonBox.StandardButton.Apply)
         # hack to assign the Apply button the AcceptRole without losing default system translations
+
+        # style
+        palette = self.palette()
+        accent_color = palette.color(QPalette.ColorRole.Accent)
+        if not accent_color.isValid() or platform.system() != 'darwin':
+            accent_color = QColor('#3979ae')  # Fallback artisan button blue if OS provides none (and on Windows/Linux)
+        # Generate math-driven lighting variants for the accent button
+        accent_name = accent_color.name()
+        accent_hover = accent_color.lighter(115).name() if self.aw.app.darkmode else accent_color.darker(105).name()
+        accent_pressed = accent_color.darker(110).name() if self.aw.app.darkmode else accent_color.darker(115).name()
+        artisan_dialog_style = artisan_dialog_button_style(self.aw.app.darkmode, accent_name, accent_hover, accent_pressed)
+
         applyButton = self.ui.buttonBox.button(QDialogButtonBox.StandardButton.Apply)
         if applyButton is not None:
             self.ui.buttonBox.removeButton(applyButton)
             self.applyButton = self.ui.buttonBox.addButton(applyButton.text(), QDialogButtonBox.ButtonRole.AcceptRole)
+            self.setButtonTranslations(self.applyButton,'Apply',QApplication.translate('Button','Apply'))
+            self.applyButton.setStyleSheet(artisan_dialog_style)
+        artisan_cancel_button: QPushButton|None = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel)
+        if artisan_cancel_button is not None:
+            _log.debug('PRINT artisan cancel button exists')
+            defaultCancelButton = self.ui.buttonBox.button(QDialogButtonBox.StandardButton.Cancel)
+            if defaultCancelButton is not None:
+                _log.debug('PRINT default cancel button exists')
+                self.ui.buttonBox.removeButton(defaultCancelButton)
+                artisan_cancel_button.setStyleSheet(artisan_dialog_style)
+                self.ui.buttonBox.addButton(artisan_cancel_button, QDialogButtonBox.ButtonRole.RejectRole)
 
     @pyqtSlot()
     @override

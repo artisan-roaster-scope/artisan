@@ -298,21 +298,24 @@ class designerconfigDlg(ArtisanDialog):
             apply_button.setStyleSheet(artisan_minor_push_button_style(self.aw.app.darkmode))
             apply_button.setIcon(QIcon(getStyleIconPath(
                 'tick-01-stroke-rounded-dark.svg' if self.aw.app.darkmode else 'tick-01-stroke-rounded-white.svg')))
+            self.dialogbuttons.removeButton(apply_button)
         if defaults_button is not None:
             self.setButtonTranslations(defaults_button,'Restore Defaults',QApplication.translate('Button','Restore Defaults'))
             defaults_button.clicked.connect(self.reset)
             defaults_button.setIconSize(QSize(14,14))
             defaults_button.setStyleSheet(artisan_minor_push_button_style(self.aw.app.darkmode))
             defaults_button.setIcon(QIcon(getStyleIconPath('undo-03-stroke-rounded-dark.svg' if self.aw.app.darkmode else 'undo-03-stroke-rounded-white.svg')))
+            self.dialogbuttons.removeButton(defaults_button)
 
         self.dialogbuttons.rejected.connect(self.accept)
 
         buttonLayout = QHBoxLayout()
         buttonLayout.addWidget(defaults_button)
-        buttonLayout.addStretch()
         buttonLayout.addWidget(apply_button)
         buttonLayout.addStretch()
-        buttonLayout.addWidget(self.dialogbuttons)
+        standardButtonLayout = QHBoxLayout()
+        standardButtonLayout.addStretch()
+        standardButtonLayout.addWidget(self.dialogbuttons)
         marksLayout = QGridLayout()
         marksLayout.addWidget(markersettinglabel,0,0)
         marksLayout.addWidget(timesettinglabel,0,1)
@@ -362,6 +365,11 @@ class designerconfigDlg(ArtisanDialog):
         mainLayout.addWidget(marksGroupLayout)
         mainLayout.addLayout(modLayout)
         mainLayout.addLayout(buttonLayout)
+        mainLayout.addLayout(standardButtonLayout)
+        buttonLayout.setContentsMargins(0, 5, 0, 0)  # left, top, right, bottom
+        standardButtonLayout.setContentsMargins(0, 0, 0, 0)  # left, top, right, bottom
+        mainLayout.setContentsMargins(10, 5, 10, 5)  # left, top, right, bottom
+        mainLayout.setSpacing(5)
         self.setLayout(mainLayout)
         if close_button is not None:
             close_button.setFocus()

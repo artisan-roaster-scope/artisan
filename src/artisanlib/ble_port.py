@@ -199,7 +199,7 @@ class BLE:
             blacklist:set[str], # list of client addresses to ignore as they don't offer the required service
             case_sensitive:bool=True,
             disconnected_callback:Callable[[BleakClient], None]|None = None,
-            scan_timeout:float=6,
+            scan_timeout:float=10,
             connect_timeout:float=6,
             address:str|None = None # if given, connect only to the device with this ble address
             ) -> tuple[BleakClient|None, str|None, str|None]:
@@ -329,7 +329,7 @@ class ClientBLE(QObject):
 
 
     # connect and re-connect while self._running to BLE
-    async def _connect(self, case_sensitive:bool=True, scan_timeout:float=6, connect_timeout:float=6, address:str|None = None) -> None:
+    async def _connect(self, case_sensitive:bool=True, scan_timeout:float=10, connect_timeout:float=6, address:str|None = None) -> None:
         blacklist:set[str] = set()
         while self._running:
             # scan and connect
@@ -390,6 +390,7 @@ class ClientBLE(QObject):
         # if still connected, wait somewhat until really disconnected
         while self._ble_client is not None and self._ble_client.is_connected:
             await asyncio.sleep(0.05)
+        await asyncio.sleep(0.1)
         self._disconnected_event.set()
 
     # this seems only to be called if disconnect from device received and not if disconnecting via API calls
@@ -451,7 +452,7 @@ class ClientBLE(QObject):
             self._keep_alive())
 
 
-    def scan(self, scan_timeout:float = 5.0) -> 'list[tuple[BLEDevice, AdvertisementData]]':
+    def scan(self, scan_timeout:float = 10.0) -> 'list[tuple[BLEDevice, AdvertisementData]]':
         try:
             if not hasattr(self, '_async_loop_thread') or self._async_loop_thread is None:
                 self._running = True # enable automatic reconnects
@@ -480,7 +481,7 @@ class ClientBLE(QObject):
         return []
 
 
-    def start(self, case_sensitive:bool=True, scan_timeout:float=6, connect_timeout:float=6, address:str|None = None) -> None:
+    def start(self, case_sensitive:bool=True, scan_timeout:float=10, connect_timeout:float=6, address:str|None = None) -> None:
         _log.debug('start')
         self._sleep_between_scans = self.SCAN_BETWEEN_SCANS_START
         if self._running:

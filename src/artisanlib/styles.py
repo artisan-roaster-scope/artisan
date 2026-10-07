@@ -50,16 +50,16 @@ def artisan_dialog_button_style(is_dark_mode:bool, accent_name:str, accent_hover
         text_color = '#000000'
 
     return f"""
-            /* Secondary Button Styles (Cancel) */
             QDialogButtonBox QPushButton {{
                 background-color: {bg_color};
                 outline: none;
                 border: 1px solid {border_color};
-                border-radius: 5px;
+                border-radius: 12px;
                 padding: 3px 16px;
                 font-size: 13px;
                 color: {text_color};
-                min-width: 40px;
+                min-width: 60px;
+                height: 20px;
             }}
             QDialogButtonBox QPushButton:hover {{
                 background-color: {bg_hover};
@@ -67,8 +67,6 @@ def artisan_dialog_button_style(is_dark_mode:bool, accent_name:str, accent_hover
             QDialogButtonBox QPushButton:pressed {{
                 background-color: {bg_pressed};
             }}
-
-            /* Primary Button Styles (OK) paired with Native Accent */
             QDialogButtonBox QPushButton:default {{
                 background-color: {accent_name};
                 border: 1px solid {accent_name};
@@ -81,6 +79,11 @@ def artisan_dialog_button_style(is_dark_mode:bool, accent_name:str, accent_hover
             QDialogButtonBox QPushButton:default:pressed {{
                 background-color: {accent_pressed};
                 border-color: {accent_pressed};
+            }}
+            QDialogButtonBox QPushButton:disabled {{
+                background-color: {'#5F5F5F' if is_dark_mode else '#DFDFDF'};
+                color: {'#AEAEA3' if is_dark_mode else '#8E8E93'};
+                border: 0;
             }}
     """
 
@@ -339,6 +342,8 @@ def push_button_style(simulator:bool, button:str, min_width:int, font_size:int, 
     return f"""
         QPushButton {{
             min-width: {min_width}px;
+            padding-left: 8px;
+            padding-right: 8px;
             border-style: solid;
             border-radius: {border_radius}px;
             border-color: grey;
@@ -647,6 +652,8 @@ def vertical_header_style(darkmode:bool) -> str:
 
 # Text edit styles
 
+
+@functools.lru_cache
 def text_edit_style(
         darkmode:bool,
         background_color: str|None = None,
@@ -658,7 +665,6 @@ def text_edit_style(
                 background-color: {background_color if background_color is not None else 'palette(base)'};
                 {f'selection-background-color: {selection_background_color};' if selection_background_color is not None else ''}
                 color: {color if color is not None else 'palette(text)'};
-                /* padding: 0.8 0.8px; */
                 padding: 2px;
                 border-radius: 10px;
                 border-width: 1px;
@@ -673,6 +679,8 @@ def text_edit_style(
 
 # Line edit style
 
+
+@functools.lru_cache
 def line_edit_style(dark:bool = False, bold:bool = False, color:str = 'palette(text)', background_color:str = 'palette(base)', selection_background_color: str|None = None) -> str:
     return f"""
         QLineEdit {{
@@ -680,7 +688,6 @@ def line_edit_style(dark:bool = False, bold:bool = False, color:str = 'palette(t
             border: 1px solid {'#555555' if dark else '#D6D6D6'};
             border-radius: 5px;
             color: {color};
-/*            selection-color: {color};  automatic set if not given*/
             background-color: {background_color};
             {f'selection-background-color: {selection_background_color};' if selection_background_color is not None else ''}
             padding: 2px 5px 2px 5px; }}
@@ -694,9 +701,11 @@ def line_edit_style(dark:bool = False, bold:bool = False, color:str = 'palette(t
         }}
     """
 
+
 # Spin box style
 
 
+@functools.lru_cache
 def spin_box_style(dark:bool = False) -> str:
     up_icon_path = Path.as_posix(Path(os.path.join(getResourcePath(),'Icons'),
         ('arrow-up-01-stroke-rounded-white.svg' if dark else 'arrow-up-01-stroke-rounded.svg')))
@@ -821,7 +830,7 @@ def events_editor_style(dark:bool, background_color:str, line_edit_color:str) ->
         border-radius: 8px;
         border-width: 1px;
         border-style: solid;
-        border-color: {'#555555' if dark else '#b6b6b6'};
+        border-color: {'#777777' if dark else '#b6b6b6'};
     }}
     QLineEdit:focus {{
         border: 1px solid palette(accent);
@@ -870,31 +879,25 @@ def events_editor_style(dark:bool, background_color:str, line_edit_color:str) ->
         background-color: {createGradient('#393939') if dark else createGradient('#F0F0F0')};
     }}
     QPushButton#buttonminiEvent {{
-        background-color: {createGradient('#B9B9B9') if dark else createGradient('#A7A7A7')};
+        background-color: {createGradient('#494949') if dark else createGradient('#E9E9E9')};
         border-radius: 6px;
-        color: {'black' if dark else 'white'};
+        color: { '#F3F3F3' if dark else '#333333' };
         min-width: 100px;
         min-height: 25px;
         border-width: 0;
     }}
     QPushButton#buttonminiEvent:pressed {{
-        background-color: {createGradient('#D0D0D0') if dark else createGradient('#909090')};
+        background-color: {createGradient('#696969') if dark else createGradient('#C9C9C9')};
     }}
-    QPushButton#buttonminiEvent:focus:!pressed {{
-        background-color: {createGradient('#E0E0E0')if dark else createGradient('#878787')};
-        outline: none;
-    }}
-    QPushButton#buttonminiEvent:hover:!focus {{
-        background-color: {createGradient('#C9C9C9') if dark else createGradient('#AFAFAF')};
-    }}
-    QPushButton#buttonminiEvent:hover:focus:!pressed {{
-        background-color: {createGradient('#E0E0E0') if dark else createGradient('#808080')};
+    QPushButton#buttonminiEvent:hover:!pressed {{
+        background-color: {createGradient('#393939') if dark else createGradient('#F0F0F0')};
     }}
 """
 
 
 # ComboBox style
 
+@functools.lru_cache
 def combobox_style(dark:bool, down_arrow_icon_path:str, font_weight:str = 'normal', dark_background_color:str = '#393939') -> str:
     return f"""
     QComboBox {{
@@ -959,8 +962,26 @@ def combobox_style(dark:bool, down_arrow_icon_path:str, font_weight:str = 'norma
 
 
 
+# QLCD styles
+
+
+@functools.lru_cache
+def qlcd_style(color:str, background_color:str, border:bool) -> str:
+    return f"""
+        QLCDNumber, MyQLCDNumber {{
+            border-width: {'1' if border else '0'};
+            border-color: {color};
+            border-radius: 8;
+            color: {color};
+            background-color: {background_color};
+        }}
+"""
+
+
+
 # separator line style
 
+@functools.lru_cache
 def separator_line_style(dark:bool) -> str:
     return f"""
         QFrame[frameShape="4"] {{
@@ -973,6 +994,7 @@ def separator_line_style(dark:bool) -> str:
 
 # tool button frame style
 
+@functools.lru_cache
 def tool_button_frame_style(dark:bool) -> str:
     return f"""
         QFrame {{
@@ -995,6 +1017,7 @@ def tool_button_frame_style(dark:bool) -> str:
 
 # dashboard style
 
+@functools.lru_cache
 def dashboard_style(dark:bool, group_border_class:bool) -> str:
     return f"""
     QLabel {{

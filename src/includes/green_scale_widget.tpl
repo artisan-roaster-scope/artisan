@@ -29,6 +29,12 @@ Receives data in the shape of
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-status-bar-style" content="black">
     <meta name="mobile-web-app-title" content="{{window_title}}">
+    <meta name="application-name" content="{{window_title}}" />
+    <link rel="icon" href="/green-favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/green-favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/green-favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/green-apple-touch-icon.png" />
+    <link rel="manifest" href="/green-site.webmanifest" />
     <!-- use local fonts -->
     <!-- <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;600"> -->
     <title>{{window_title}}</title>

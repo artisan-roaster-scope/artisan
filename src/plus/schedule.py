@@ -2001,6 +2001,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.remaining_filter_group.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
 
         self.create_schedule_widget = QPushButton(f' {QApplication.translate('Button','CREATE SCHEDULE')} ')
+        self.create_schedule_widget.setToolTip(QApplication.translate('Plus', 'Create roast schedule on the platform'))
         self.create_schedule_widget.setStyleSheet(artisan_push_button_style())
         self.create_schedule_widget.setIconSize(QSize(14,14))
         self.create_schedule_widget.setIcon(QIcon(getStyleIconPath('external-link-stroke-rounded.svg')))
@@ -2439,11 +2440,13 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.task_frame_hide = False # flag used by mainSplitterMoved()/hide_task_frame() to hide task frame again after closing the drawer
 
         disconnected_widget = QPushButton(QApplication.translate('Button','LOGIN TO UNLOCK'))
+        disconnected_widget.setToolTip(QApplication.translate('Plus', 'Sign in to your artisan account'))
         disconnected_widget.setStyleSheet(artisan_push_button_style())
         disconnected_widget.setIconSize(QSize(14,14))
         disconnected_widget.setIcon(QIcon(getStyleIconPath('user-circle-stroke-rounded-dark.svg')))
         disconnected_widget.clicked.connect(self.disconnected_link_handler)
         disconnected_widget_layout = QHBoxLayout()
+        disconnected_widget_layout.addStretch()
         disconnected_widget_layout.addStretch()
         disconnected_widget_layout.addWidget(disconnected_widget)
         disconnected_widget_layout.addStretch()
@@ -2451,6 +2454,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         disconnected_layout = QVBoxLayout()
         disconnected_widget_layout.addStretch()
         disconnected_layout.addLayout(disconnected_widget_layout)
+        disconnected_widget_layout.addStretch()
         disconnected_layout.setContentsMargins(15, 15, 15, 15) # left, top, right, bottom
 
         self.message_widget = QWidget()
@@ -2489,7 +2493,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         self.weight_item_display:WeightItemDisplay = WeightItemDisplay(self)
         self.green_web_display:GreenWebDisplay = GreenWebDisplay(self)
         self.roasted_web_display:RoastedWebDisplay = RoastedWebDisplay(self)
-        self.weight_manager:WeightManager = WeightManager(self.aw, [self.weight_item_display, self.green_web_display, self.roasted_web_display], self.aw.scale_manager)
+        self.weight_manager = WeightManager(self.aw, [self.weight_item_display, self.green_web_display, self.roasted_web_display], self.aw.scale_manager)
 
         plus.stock.update() # explicit update stock on opening the scheduler
         self.updateScheduleWindow()
@@ -2832,6 +2836,8 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
     def keyPressEvent(self, a0: 'QKeyEvent|None') -> None:
         if a0 is not None:
             k = int(a0.key())
+            if k == 16777216: # ESC
+                return # overwriting the close window action of the super class to prevent accidentially closing the scheduler
             if k == 16777235:    # UP
                 active_tab = self.TabWidget.currentIndex()
                 if active_tab == 0:
