@@ -5835,9 +5835,9 @@ class ApplicationWindow(QMainWindow):
             reply = box.exec()
 
             if reply == QMessageBox.StandardButton.Cancel:
-                return
+                return # zuban:ignore[unreachable]
             if reply == QMessageBox.StandardButton.Yes:
-                self.loadThemeSignal.emit(action.data()[0], label)
+                self.loadThemeSignal.emit(action.data()[0], label)  # zuban:ignore[unreachable]
 
 
     @pyqtSlot(str,str)

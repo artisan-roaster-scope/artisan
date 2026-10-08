@@ -2837,7 +2837,7 @@ class ScheduleWindow(ArtisanResizeablDialog): # pyright:ignore[reportGeneralType
         if a0 is not None:
             k = int(a0.key())
             if k == 16777216: # ESC
-                return # overwriting the close window action of the super class to prevent accidentially closing the scheduler
+                return # overwriting the close window action of the super class to prevent accidentally closing the scheduler
             if k == 16777235:    # UP
                 active_tab = self.TabWidget.currentIndex()
                 if active_tab == 0:

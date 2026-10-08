@@ -415,6 +415,9 @@ class AcaiaProtocol:
         self.reset_parser()
         self._on_connect_time = time.time()
 
+    def on_disconnect(self) -> None:
+        self.reset_parser()
+
     def is_COSMO(self) -> bool:
         return self.isp_version in {ISP_VERSION_CSMO_S, ISP_VERSION_CSMO_L}
 
@@ -729,15 +732,15 @@ class AcaiaProtocol:
             weight:float|None = None
             time_value:float|None = None
             if payload[0] == KEY_ADDITIONAL_INFO.ZERO:
-                _log.debug('aditional key info 0: %s', payload[1:])
+                _log.debug('additional key info 0: %s', payload[1:])
             elif payload[0] == KEY_ADDITIONAL_INFO.ONE:
-                _log.debug('aditional key info 1: %s', payload[1:])
+                _log.debug('additional key info 1: %s', payload[1:])
             elif payload[0] == KEY_ADDITIONAL_INFO.TWO:
-                _log.debug('aditional key info 2: %s', payload[1:])
+                _log.debug('additional key info 2: %s', payload[1:])
             elif payload[0] == KEY_ADDITIONAL_INFO.THREE:
-                _log.debug('aditional key info 3: %s', payload[1:])
+                _log.debug('additional key info 3: %s', payload[1:])
             elif payload[0] == KEY_ADDITIONAL_INFO.FOUR:
-                _log.debug('aditional key info 4: %s', payload[1:])
+                _log.debug('additional key info 4: %s', payload[1:])
             elif payload[0] == KEY_ADDITIONAL_INFO.WEIGHT:
                 data_payload = payload[1:]
                 if len(data_payload) >= EVENT_LEN.WEIGHT:
@@ -966,8 +969,7 @@ class AcaiaProtocol:
             if msg_type == CMD.INFO_A:
                 self.parse_info(data)
                 self.info_msg_received = True
-                if not self.id_sent:
-                    self.send_ID() # send after every INFO_A as handshake confirmation
+                self.send_ID() # send after every INFO_A as handshake confirmation as scale might have missed our previous one
             elif msg_type == CMD.STATUS_A and self.info_msg_received:
                 self.parse_status(data)
                 self.identify_device()
@@ -1393,6 +1395,7 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
     @override
     def on_disconnect(self) -> None:
         _log.debug('disconnected')
+        self.protocol.on_disconnect() # initialize protocol
         if self._disconnected_handler is not None:
             self._disconnected_handler()
         self.disconnected_signal.emit()
@@ -1476,6 +1479,7 @@ class AcaiaAsync(AsyncComm):
             self.outer_connected_handler()
 
     def disconnected_handler(self) -> None:
+        self.protocol.on_disconnect() # initialize protocol
         if self.outer_disconnected_handler is not None:
             self.outer_disconnected_handler()
 

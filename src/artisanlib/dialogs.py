@@ -84,8 +84,8 @@ class ArtisanDialog(QDialog):
             accent_color = QColor('#3979ae')  # Fallback artisan button blue if OS provides none (and on Windows/Linux)
         # Generate math-driven lighting variants for the accent button
         accent_name = accent_color.name()
-        accent_hover = accent_color.lighter(115).name() if self.aw.app.darkmode else accent_color.darker(110).name()
-        accent_pressed = accent_color.darker(110).name() if self.aw.app.darkmode else accent_color.darker(115).name()
+        accent_hover = accent_color.lighter(115).name() if self.aw.app.darkmode else accent_color.darker(115).name()
+        accent_pressed = accent_color.darker(110).name() if self.aw.app.darkmode else accent_color.darker(125).name()
         self.dialogbuttons.setStyleSheet(artisan_dialog_button_style(
             self.aw.app.darkmode,
             accent_name,

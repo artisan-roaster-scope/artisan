@@ -58,7 +58,7 @@ aiohttp_jinja2==1.6
 python-bidi==0.6.11
 arabic-reshaper==3.0.1
 pillow==12.3.0
-pydantic==2.13.5
+pydantic==2.14.0
 babel==2.18.0
 bleak==3.0.2
 python-statemachine==3.2.1

@@ -243,6 +243,7 @@ class BLE:
                 fut.result()
             except Exception:  # pylint: disable=broad-except
                 _log.error('exception in start_notify: %s', fut.exception())
+                self.disconnect_ble(client) # disconnect from ble client in case we cannot establish the notifications
 
     def stop_notify(self, client:'BleakClient', uuid:str) -> None:
         if hasattr(self, '_asyncLoopThread') and self._asyncLoopThread is not None and client.is_connected:
@@ -328,7 +329,7 @@ class ClientBLE(QObject):
             return self._connected_service_uuid, self._connected_device_name
         return None, None
 
-    # returns Ture if an active connection is established, otherwise False
+    # returns True if an active connection is established, otherwise False
     def is_connected(self) -> bool:
         return self._connected
 
@@ -342,6 +343,7 @@ class ClientBLE(QObject):
             self._connected = False # set to True once the connected client offers the requested service
             self._connected_service_uuid = None
             self._connected_device_name = None
+            _log.debug('ble.scan_and_connect() fired')
             self._ble_client, service_uuid, device_name = ble.scan_and_connect(
                                     (self._device_descriptions, self._device_manufacturer_keys),
                                     blacklist,
@@ -399,10 +401,10 @@ class ClientBLE(QObject):
 
     # this seems only to be called if disconnect from device received and not if disconnecting via API calls
     def disconnected_callback(self, _client:BleakClient) -> None:
-        self.stop_notifications()
-        self.on_disconnect()
+        self.on_disconnect() # has to be done before releasing the event lock to have the parser reset before rescanning
         if hasattr(self, '_async_loop_thread') and self._async_loop_thread is not None:
             asyncio.run_coroutine_threadsafe(self.set_event(), self._async_loop_thread.loop)
+        self.stop_notifications()
 
     def send(self, message:bytes, response:bool = False, write_characteristic:str|None = None, chunk:int = 20) -> None:
         if self._ble_client is not None and self._connected_service_uuid is not None and self._connected_service_uuid in self._writers:

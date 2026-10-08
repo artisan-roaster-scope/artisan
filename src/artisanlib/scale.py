@@ -687,5 +687,5 @@ class ScaleManager(QObject):
     @pyqtSlot(bool)
     def connect_all_slot(self, device_logging:bool) -> None:
         self.connect_scale1_slot(device_logging)
-        libtime.sleep(0.1)
+        libtime.sleep(0.2)
         self.connect_scale2_slot(device_logging)
