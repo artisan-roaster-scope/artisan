@@ -19582,6 +19582,12 @@ class ApplicationWindow(QMainWindow):
                 # first ever start in dark mode, we load a dark theme
                 QTimer.singleShot(500, self.load_dark_theme)
 
+            # sync dashboard state
+            if self.dashboard.dashboard_active():
+                self.dashboard.show_dashboard()
+            else:
+                self.dashboard.hide_dashboard()
+
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
             res = False
@@ -25402,9 +25408,9 @@ class ApplicationWindow(QMainWindow):
 
     @pyqtSlot()
     def scale1disconnectedSlot(self) -> None:
+        self.qmc.updateLargeScaleLCDs('')
         if self.largeScaleLCDs_dialog is not None:
             self.largeScaleLCDs_dialog.setScale1Name(None)
-        self.qmc.updateLargeScaleLCDs('')
 
     @pyqtSlot(int)
     def scale1WeightChangedSlot(self, weight:int) -> None:
@@ -25425,9 +25431,9 @@ class ApplicationWindow(QMainWindow):
 
     @pyqtSlot()
     def scale2disconnectedSlot(self) -> None:
+        self.qmc.updateLargeScaleLCDs(None, '')
         if self.largeScaleLCDs_dialog is not None:
             self.largeScaleLCDs_dialog.setScale2Name(None)
-        self.qmc.updateLargeScaleLCDs(None, '')
 
     @pyqtSlot(int)
     def scale2WeightChangedSlot(self, weight:int) -> None:

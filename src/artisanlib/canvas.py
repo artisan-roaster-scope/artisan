@@ -4211,7 +4211,7 @@ class tgraphcanvas(QObject):
         except Exception as e: # pylint: disable=broad-except
             _log.exception(e)
 
-    # note that partial values might be given here
+    # note that partial values might be given here, represented by None
     def updateLargeScaleLCDs(self, weight1:str|None = None, weight2:str|None = None) -> None:
         try:
             if self.aw.largeScaleLCDs_dialog is not None:

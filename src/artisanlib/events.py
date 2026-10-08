@@ -4122,14 +4122,14 @@ class SliderCalculator(ArtisanDialog):
         if applyButton is not None:
             self.ui.buttonBox.removeButton(applyButton)
             self.applyButton = self.ui.buttonBox.addButton(applyButton.text(), QDialogButtonBox.ButtonRole.AcceptRole)
-            self.setButtonTranslations(self.applyButton,'Apply',QApplication.translate('Button','Apply'))
-            self.applyButton.setStyleSheet(artisan_dialog_style)
+            if self.applyButton:
+                self.setButtonTranslations(self.applyButton,'Apply',QApplication.translate('Button','Apply'))
+                self.applyButton.setStyleSheet(artisan_dialog_style)
         artisan_cancel_button: QPushButton|None = self.dialogbuttons.button(QDialogButtonBox.StandardButton.Cancel)
         if artisan_cancel_button is not None:
             _log.debug('PRINT artisan cancel button exists')
             defaultCancelButton = self.ui.buttonBox.button(QDialogButtonBox.StandardButton.Cancel)
             if defaultCancelButton is not None:
-                _log.debug('PRINT default cancel button exists')
                 self.ui.buttonBox.removeButton(defaultCancelButton)
                 artisan_cancel_button.setStyleSheet(artisan_dialog_style)
                 self.ui.buttonBox.addButton(artisan_cancel_button, QDialogButtonBox.ButtonRole.RejectRole)

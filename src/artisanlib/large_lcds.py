@@ -46,8 +46,9 @@ _log: Final[logging.Logger] = logging.getLogger(__name__)
 
 class LargeLCDs(ArtisanResizeablDialog):
 
-#    __slots__ = ['lcds1', 'lcds2', 'lcds1styles', 'lcds2styles', 'lcds1labelsUpper', 'lcds2labelsUpper', 'lcds1labelsLower', 'lcds2labelsLower',
-#        'lcds1frames', 'lcds2frames', 'visibleFrames', 'tight', 'layoutNr', 'swaplcds']
+    __slots__ = ['last_values1', 'last_values2', 'lcds1', 'lcds2', 'lcds1styles', 'lcds2styles', 'lcds1labelsUpper',
+        'lcds2labelsUpper', 'lcds1labelsLower', 'lcds2labelsLower',
+        'lcds1frames', 'lcds2frames', 'visibleFrames', 'tight', 'layoutNr', 'swaplcds']
 
     def __init__(self, parent:'QWidget', aw:'ApplicationWindow') -> None:
         if aw.get_os()[0] == 'RPi':
@@ -56,6 +57,8 @@ class LargeLCDs(ArtisanResizeablDialog):
             super().__init__(parent, aw) # if parent is set to None, largeLCD panels hide behind the main window in full screen mode on Windows!
         # it is assumed that both lists of lcds (lcd1 & lcd2) have the same length
         # the same is assumed for the other lists below:
+        self.last_values1:list[str|None] = []
+        self.last_values2:list[str|None] = []
         self.lcds1:list[QLCDNumber] = []
         self.lcds2:list[QLCDNumber] = []
         self.lcds1styles:list[str] = []
@@ -78,7 +81,7 @@ class LargeLCDs(ArtisanResizeablDialog):
         # we want minimize and close buttons, but no maximize buttons
         if not platform.system().startswith('Windows'):
             windowFlags = self.windowFlags()
-            windowFlags |= Qt.WindowType.Tool
+#            windowFlags |= Qt.WindowType.Tool # this keeps the window always on top which might not be what we want
             windowFlags |= Qt.WindowType.CustomizeWindowHint # needed to be able to customize the close/min/max controls (at least on macOS)
             windowFlags |= Qt.WindowType.WindowMinimizeButtonHint
             windowFlags |= Qt.WindowType.WindowCloseButtonHint # not needed on macOS, but maybe on Linux
@@ -200,6 +203,7 @@ class LargeLCDs(ArtisanResizeablDialog):
             self.raise_()
             self.activateWindow()
             self.layoutNr = newLayoutNr
+            self.updateValues(self.last_values1, self.last_values2)
 
     def chooseLayout(self, w:int, h:int) -> None:
         if w > h:
@@ -314,12 +318,18 @@ class LargeLCDs(ArtisanResizeablDialog):
             try:
                 if v1 is not None:
                     self.lcds1[i].display(v1)
+                    if len(self.last_values1) != len(self.lcds1):
+                        self.last_values1 = ['']*len(self.lcds1)
+                    self.last_values1[i] = v1
             except Exception: # pylint: disable=broad-except
                 pass
         for i,v2 in enumerate(values2):
             try:
                 if v2 is not None:
                     self.lcds2[i].display(v2)
+                    if len(self.last_values2) != len(self.lcds2):
+                        self.last_values2 = ['']*len(self.lcds2)
+                    self.last_values2[i] = v2
             except Exception: # pylint: disable=broad-except
                 pass
 
@@ -943,6 +953,7 @@ class LargeScaleLCDs(LargeLCDs):
     def updateVisiblitiesScale(self) -> None:
         self.setVisiblitiesScale()
         self.reLayout() # should not be called from makeLCDs as this triggers a loop
+        self.updateValues(self.last_values1, self.last_values2)
 
     @override
     def updateDecimals(self) -> None:

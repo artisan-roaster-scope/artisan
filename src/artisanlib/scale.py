@@ -418,6 +418,7 @@ class ScaleManager(QObject):
 
     @pyqtSlot()
     def scale1_disconnected_slot(self) -> None:
+        self.scale1_stable_reading_timer.stop() # prevent weight changes being send after disconnect
         self.scale1_disconnected_signal.emit()
 
     ## try to catch a last non-stable weight change and send as stable state
@@ -593,6 +594,7 @@ class ScaleManager(QObject):
 
     @pyqtSlot()
     def scale2_disconnected_slot(self) -> None:
+        self.scale2_stable_reading_timer.stop() # prevent weight changes being send after disconnect
         self.scale2_disconnected_signal.emit()
 
     ## try to catch a last non-stable weight change and send as stable state

@@ -2299,7 +2299,6 @@ class DeviceAssignmentDlg(ArtisanResizeablDialog):
 
     @pyqtSlot(int)
     def scale1ModelChanged(self, i:int) -> None:
-        _log.debug('PRIN scale1ModelChanged')
         self.scale1NameComboBox.setEnabled(False)
         self.scale1EditButton.setEnabled(False)
         if i > 0 and len(SUPPORTED_SCALES) > i-1 and len(SUPPORTED_SCALES[i-1]) > 0:

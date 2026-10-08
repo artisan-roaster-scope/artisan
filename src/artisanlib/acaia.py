@@ -421,7 +421,7 @@ class AcaiaProtocol:
     def configure_COSMO_100(self) -> None:
         _log.debug('configure COSMO 100')
         # we set the filter to less sensitive
-        self.send_update_setting(self.update_setting_payload(SETTING_ITEM.FILTER, FILTER_SETTING.LESS_SENSITIVE))
+        self.send_update_setting(self.update_setting_payload(SETTING_ITEM.FILTER, FILTER_SETTING.SENSITIVE))
 
     # configure for the specific scale based on the available ISP version received
     def identify_device(self) -> None:
@@ -1318,19 +1318,24 @@ class AcaiaBLE(ClientBLE): # pyright: ignore [reportGeneralTypeIssues] # Argumen
     ###
 
     def send_message(self, payload:bytes) -> None:
-        self.send(payload)
+        if self.is_connected():
+            self.send(payload)
 
-    def weight_changed(self, stable_weight:float, stable:bool) -> None:
-        self.weight_changed_signal.emit(stable_weight, stable)
+    def weight_changed(self, weight:float, stable:bool) -> None:
+        if self.is_connected():
+            self.weight_changed_signal.emit(weight, stable)
 
     def weight_error(self, message:str) -> None:
-        self.weight_error_signal.emit(message)
+        if self.is_connected():
+            self.weight_error_signal.emit(message)
 
     def battery_changed(self, level:int) -> None:
-        self.battery_changed_signal.emit(level)
+        if self.is_connected():
+            self.battery_changed_signal.emit(level)
 
     def tare_pressed(self) -> None:
-        self.tare_pressed_signal.emit()
+        if self.is_connected():
+            self.tare_pressed_signal.emit()
 
     ###
 

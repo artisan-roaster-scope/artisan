@@ -274,6 +274,7 @@ class ClientBLE(QObject):
         super().__init__()
         # internals
         self._running:bool                                   = False           # if True we keep reconnecting
+        self._connected:bool                                 = False           # True if connected
         self._async_loop_thread: AsyncLoopThread|None        = None            # the asyncio AsyncLoopThread object
         self._ble_client:BleakClient|None                    = None
         self._connected_service_uuid:str|None                = None            # set to the service UUID we are connected to
@@ -321,12 +322,15 @@ class ClientBLE(QObject):
         if self._ble_client is not None and self._ble_client.is_connected:
             ble.disconnect_ble(self._ble_client)
 
-    # returns the service UUID connected to or None
+    # returns the service UUID connected (or about to reconnect) to or None
     def connected(self) -> tuple[str|None, str|None]:
         if self._ble_client is not None and self._ble_client.is_connected:
             return self._connected_service_uuid, self._connected_device_name
         return None, None
 
+    # returns Ture if an active connection is established, otherwise False
+    def is_connected(self) -> bool:
+        return self._connected
 
     # connect and re-connect while self._running to BLE
     async def _connect(self, case_sensitive:bool=True, scan_timeout:float=10, connect_timeout:float=6, address:str|None = None) -> None:
@@ -335,7 +339,7 @@ class ClientBLE(QObject):
             # scan and connect
             # NOTE: re-connecting a bleak client by address on reconnect can lead to instabilities thus we re-scan always
             service_uuid:str|None
-            connected:bool = False # set to True once the connected client offers the requested service
+            self._connected = False # set to True once the connected client offers the requested service
             self._connected_service_uuid = None
             self._connected_device_name = None
             self._ble_client, service_uuid, device_name = ble.scan_and_connect(
@@ -367,11 +371,11 @@ class ClientBLE(QObject):
                     self._connected_device_name = None
                 else:
                     # successfully connected
-                    connected = True
+                    self._connected = True
             if self._ble_client is not None:
                 # start notifications
                 self.start_notifications()
-                if connected:
+                if self._connected:
                     # NOTE: on_connect() is signalled only after the notifications got established such that
                     # implementations can already send commands expecting a notified response from on_connect()
                     self.on_connect()
