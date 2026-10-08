@@ -300,6 +300,28 @@ class TestRequestBuilders:
         assert frame[15] == sr900.MIN_LEVEL
         assert frame[16] == sr900.MIN_LEVEL
 
+    def test_start_roast_takes_uncommanded_levels_from_the_roaster(self) -> None:
+        # nothing commanded on this connection: the reported levels win over the driver defaults
+        d = _make_driver(fan=9, heater=3)
+        d.start_roast()
+        frame = d.sent[0]
+        assert frame[15] == 3
+        assert frame[16] == 9
+
+    def test_start_roast_prefers_commanded_levels_over_the_readback(self) -> None:
+        d = _make_driver(fan=9, heater=3, _last_fan_level=5, _fan_commanded=True)
+        d.start_roast()
+        frame = d.sent[0]
+        assert frame[15] == 3  # heater not commanded, taken from the roaster
+        assert frame[16] == 5  # fan commanded, taken from the command
+
+    def test_start_roast_clamps_a_readback_of_0(self) -> None:
+        d = _make_driver(fan=2, heater=0)
+        d.start_roast()
+        frame = d.sent[0]
+        assert frame[15] == sr900.MIN_LEVEL
+        assert frame[16] == 2
+
     def test_stop_and_cool_carry_only_the_mac(self) -> None:
         d = _make_driver(BT=100)
         d.stop_roast()
@@ -688,6 +710,31 @@ class TestMachineSetup:
         strings = self._list(parser, 'DefaultButtons', 'buttonactionstrings')
         assert strings[6] == 'sr900(cool)'   # DROP runs the cooling cycle
         assert strings[7] == 'sr900(stop)'   # COOL END returns the roaster to idle
+
+    def test_generic_autodrop_is_off(self) -> None:
+        # DROP comes from the roaster entering its cooling state, see comm.py. The generic BT
+        # break detector misreads the BT stall and wobble at first crack as a drop (observed:
+        # 399 -> 401 -> 399F right after FCs auto-DROPped a roast 8s into first crack)
+        parser = self._aset()
+        assert parser['events']['autoDrop'] == 'false'
+
+    def test_fan_and_heater_quantifiers_follow_the_readback(self) -> None:
+        # sr900(cool) sets heater 0 / fan 3 on the roaster without touching the sliders, so only
+        # the quantifiers get those levels into the events (observed: the Fan/Heater events stayed
+        # at 4/6 through cooling). They also pick up changes made at the roaster itself
+        parser = self._aset()
+        assert self._list(parser, 'Quantifiers', 'quantifieractive') == ['1', '0', '0', '1']
+        # quantifiersource n -> extradevices[(n-2)//2] == 209, odd -> extratemp2 (Fan),
+        # even -> extratemp1 (Heater)
+        assert self._list(parser, 'Quantifiers', 'quantifiersource') == ['3', '0', '0', '2']
+        # the levels are quantified over the slider ranges
+        for key in ('min', 'max'):
+            assert (self._list(parser, 'Quantifiers', f'quantifier{key}')
+                    == self._list(parser, 'Sliders', f'slider{key}'))
+        # never blocked after a slider move, or a DROP shortly after one would be missed
+        assert self._list(parser, 'Quantifiers', 'eventquantifierSV') == ['1', '0', '0', '1']
+        # the readback is recorded only, never sent back to the roaster
+        assert set(self._list(parser, 'Quantifiers', 'eventquantifieraction')) == {'0'}
 
 
 class TestClearData:

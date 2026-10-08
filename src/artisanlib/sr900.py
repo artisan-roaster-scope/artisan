@@ -634,11 +634,16 @@ try:
         # start a manual roast at the levels last set via set_heat()/set_fan(). The heater and
         # fan hardware does not energize from HEAT_SET/FAN_SET alone, a START_ROAST is required.
         # The levels are clamped as the roaster refuses a START carrying a heater or fan level
-        # of 0, ignoring it silently just as it ignores an out of range roast time
+        # of 0, ignoring it silently just as it ignores an out of range roast time.
+        # A level not commanded on this connection is taken from the roaster's status frames instead,
+        # which at idle report the levels last set; the driver's own defaults of 1 would otherwise
+        # override them (observed: a queued fan 9 lost on reconnect started the roast at fan 1)
         def start_roast(self) -> None:
+            heat_level = (self._last_heat_level if self._heat_commanded or self.heater < 0 else self.heater)
+            fan_level = (self._last_fan_level if self._fan_commanded or self.fan < 0 else self.fan)
             self.start_manual(roast_time=self._roast_time, cool_time=self._cool_time,
-                            heat_level=max(MIN_LEVEL, self._last_heat_level),
-                            fan_level=max(MIN_LEVEL, self._last_fan_level),
+                            heat_level=max(MIN_LEVEL, heat_level),
+                            fan_level=max(MIN_LEVEL, fan_level),
                             auto_stop_f=self._auto_stop_f)
 
         # the target is given in F or in C, see AUTO_STOP_TEMP
