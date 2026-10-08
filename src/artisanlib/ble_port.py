@@ -406,7 +406,7 @@ class ClientBLE(QObject):
             write_chars = self._writers[self._connected_service_uuid]
             wc:str|None = None
             if write_characteristic is None:
-                # if there is no explicit write_characteristic specified thus we write to the only registered as writer
+                # if there is no explicit write_characteristic specified thus we write to the only one registered as writer
                 if len(write_chars) == 1:
                     wc = write_chars[0]
             elif write_characteristic in write_chars:

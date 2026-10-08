@@ -596,9 +596,10 @@ class serialport:
                                    self.MQTT_910,                    #205
                                    self.MQTT_1112,                   #206
                                    self.MODBUS_1112,                 #207
-                                   self.SR900,                       #208
-                                   self.SR900_HeaterFan,             #209
-                                   self.SR900_State,                 #210
+                                   self.Santoker_XY,                 #208
+                                   self.SR900,                       #209
+                                   self.SR900_HeaterFan,             #210
+                                   self.SR900_State,                 #211
                                    ]
         #string with the name of the program for device #27
         self.externalprogram:str = 'test.py'
@@ -2139,6 +2140,15 @@ class serialport:
         else:
             t1 = t2 = -1
         return tx,t1,t2 # time, Board (chan2), IR (chan1)
+
+    def Santoker_XY(self) -> tuple[float,float,float]:
+        tx = self.aw.qmc.timeclock.elapsedMilli()
+        if self.aw.santoker is not None:
+            t1 = self.aw.santoker.getETlegacy()
+            t2 = self.aw.santoker.getBTlegacy()
+        else:
+            t1 = t2 = -1
+        return tx,t1,t2 # time, ET Legacy (chan2), BT Legacy (chan1)
 
     def Santoker_RR(self) -> tuple[float,float,float]:
         tx = self.aw.qmc.timeclock.elapsedMilli()

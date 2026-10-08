@@ -35,7 +35,7 @@ default_etypes_set=1, 0, 0, 1, 0
 
 [Device]
 Controlbuttonflag=true
-id=208
+id=209
 
 [ExtraComm]
 extrabaudrate=9600, 9600
@@ -56,7 +56,7 @@ extraLCDvisibility1=true, false, false, false, false, false, false, false, false
 extraLCDvisibility2=true, false, false, false, false, false, false, false, false, false
 extradevicecolor1=#ad0427ff, #808080ff
 extradevicecolor2=#43a7cfff, #808080ff
-extradevices=209, 210
+extradevices=210, 211
 extramathexpression1=,
 extramathexpression2=,
 extraname1={3}, State

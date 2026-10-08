@@ -642,8 +642,8 @@ class TestMachineSetup:
 
     def test_device_ids(self) -> None:
         parser = self._aset()
-        assert parser['Device']['id'] == '208'
-        assert self._list(parser, 'ExtraDev', 'extradevices') == ['209', '210']
+        assert parser['Device']['id'] == '209'
+        assert self._list(parser, 'ExtraDev', 'extradevices') == ['210', '211']
 
     def test_alarm_lists_are_all_the_same_length(self) -> None:
         parser = self._aset()
@@ -663,7 +663,7 @@ class TestMachineSetup:
         # 7 START, 14 COOL END, 15 OFF (the alarm action combo index minus one)
         assert self._list(parser, 'Alarms', 'alarmaction') == ['7', '14', '15']
         # every one of them watches the roaster state, which is chan1 of the second
-        # extra device: alarmsource 4 -> extradevices[(4-2)//2] == 210, even -> extratemp1
+        # extra device: alarmsource 4 -> extradevices[(4-2)//2] == 211, even -> extratemp1
         assert set(self._list(parser, 'Alarms', 'alarmsource')) == {'4'}
         # all three compare for equality against a state code
         assert set(self._list(parser, 'Alarms', 'alarmcond')) == {'2'}
@@ -724,7 +724,7 @@ class TestMachineSetup:
         # at 4/6 through cooling). They also pick up changes made at the roaster itself
         parser = self._aset()
         assert self._list(parser, 'Quantifiers', 'quantifieractive') == ['1', '0', '0', '1']
-        # quantifiersource n -> extradevices[(n-2)//2] == 209, odd -> extratemp2 (Fan),
+        # quantifiersource n -> extradevices[(n-2)//2] == 210, odd -> extratemp2 (Fan),
         # even -> extratemp1 (Heater)
         assert self._list(parser, 'Quantifiers', 'quantifiersource') == ['3', '0', '0', '2']
         # the levels are quantified over the slider ranges

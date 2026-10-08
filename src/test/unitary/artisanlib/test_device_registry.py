@@ -10,25 +10,25 @@ from artisanlib.device_registry import (DEVICES, BINARY_DEVICES, PHIDGET_DEVICES
 
 
 def test_devices_length() -> None:
-    assert len(DEVICES) == 210
+    assert len(DEVICES) == 211
 
 
 def test_device_id_is_index_plus_one() -> None:
     assert get_device_name(1) == 'Omega HH806AU'
     assert get_device_name(18) == 'NONE'
     assert get_device_name(138) == 'Kaleido BT/ET'
-    assert get_device_name(208) == 'SR900 BT/ET'
+    assert get_device_name(209) == 'SR900 BT/ET'
     assert DEVICES[205] == '+MQTT 1112'
 
 
 def test_sr900_devices() -> None:
     # the SR900 main device plus the two +devices carrying its readback channels
-    assert get_device_name(208) == 'SR900 BT/ET'
-    assert get_device_name(209) == '+SR900 Heater/Fan'
-    assert get_device_name(210) == '+SR900 State/Time'
+    assert get_device_name(209) == 'SR900 BT/ET'
+    assert get_device_name(210) == '+SR900 Heater/Fan'
+    assert get_device_name(211) == '+SR900 State/Time'
     # the roaster is reached over BLE, never over a serial port
-    assert is_non_serial_device(208)
-    assert not is_phidget_device(208)
+    assert is_non_serial_device(209)
+    assert not is_phidget_device(209)
 
 
 def test_get_device_name_edge_cases() -> None:
