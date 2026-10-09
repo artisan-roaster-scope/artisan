@@ -150,6 +150,7 @@ class ProfileData(TypedDict, total=False):
     mode: str
     viewerMode: bool
     timeindex: list[int]
+    TP_override_idx: int
     flavors: list[float]
     flavors_total_correction: float
     flavorlabels: list[str]

@@ -1562,6 +1562,29 @@ class EventsDlg(ArtisanResizeablDialog):
         tab1layout.addWidget(ButtonGroupLayout)
         if self.aw.ui_mode is not UI_MODE.EXPERT:
             ButtonGroupLayout.hide()
+        self.shinkoTimerOnEvent = QComboBox()
+        self.shinkoTimerOnEvent.addItem(QApplication.translate('ComboBox', 'None'), 'NONE')
+        self.shinkoTimerOnEvent.addItem('CHARGE', 'CHARGE')
+        self.shinkoTimerOnEvent.setCurrentIndex(max(0, self.shinkoTimerOnEvent.findData(self.aw.ser.shinko_timer_on_event)))
+        self.shinkoTimerAutoStart = QCheckBox(QApplication.translate('CheckBox', 'START recording'))
+        self.shinkoTimerAutoStart.setChecked(self.aw.ser.shinko_timer_auto_start)
+        self.shinkoTimerOffEvent = QComboBox()
+        self.shinkoTimerOffEvent.addItem(QApplication.translate('ComboBox', 'None'), 'NONE')
+        self.shinkoTimerOffEvent.addItem('DROP', 'DROP')
+        self.shinkoTimerOffEvent.setCurrentIndex(max(0, self.shinkoTimerOffEvent.findData(self.aw.ser.shinko_timer_off_event)))
+        self.shinkoTimerAutoStop = QCheckBox(QApplication.translate('CheckBox', 'STOP recording'))
+        self.shinkoTimerAutoStop.setChecked(self.aw.ser.shinko_timer_auto_stop)
+        shinkoTimerLayout = QGridLayout()
+        shinkoTimerLayout.addWidget(QLabel('ON'), 0, 0)
+        shinkoTimerLayout.addWidget(self.shinkoTimerOnEvent, 0, 1)
+        shinkoTimerLayout.addWidget(self.shinkoTimerAutoStart, 0, 2)
+        shinkoTimerLayout.addWidget(QLabel('OFF'), 1, 0)
+        shinkoTimerLayout.addWidget(self.shinkoTimerOffEvent, 1, 1)
+        shinkoTimerLayout.addWidget(self.shinkoTimerAutoStop, 1, 2)
+        shinkoTimerGroup = QGroupBox(QApplication.translate('GroupBox', 'COFFEE DISCOVERY timer'))
+        shinkoTimerGroup.setLayout(shinkoTimerLayout)
+        shinkoTimerGroup.setVisible(self.aw.qmc.device == 209 and self.aw.ser.shinko_timer_sync)
+        tab1layout.addWidget(shinkoTimerGroup)
         tab1layout.addLayout(FlagsLayout2)
         tab1layout.addStretch()
         FlagsLayout.setContentsMargins(0,10,0,0)
@@ -3662,6 +3685,12 @@ class EventsDlg(ArtisanResizeablDialog):
     def updatetypes(self) -> None:
         try:
             self.closeHelp()
+
+            if self.aw.qmc.device == 209 and self.aw.ser.shinko_timer_sync:
+                self.aw.ser.shinko_timer_on_event = str(self.shinkoTimerOnEvent.currentData())
+                self.aw.ser.shinko_timer_off_event = str(self.shinkoTimerOffEvent.currentData())
+                self.aw.ser.shinko_timer_auto_start = self.shinkoTimerAutoStart.isChecked()
+                self.aw.ser.shinko_timer_auto_stop = self.shinkoTimerAutoStop.isChecked()
 
             if self.aw.ui_mode is UI_MODE.EXPERT:
                 self.aw.buttonsize = self.nbuttonsSizeBox.currentIndex()

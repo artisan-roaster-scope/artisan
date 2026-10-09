@@ -1,0 +1,20 @@
+[General]
+Delay=2000
+roastertype_setup=Fuji Royal(ACS)
+
+[Device]
+id=209
+
+[SerialPort]
+baudrate=9600
+bytesize=7
+parity=E
+stopbits=1
+timeout=0.8
+shinko_instrument_number=0
+shinko_pv_divider=10
+shinko_timer_sync=true
+shinko_timer_on_event=CHARGE
+shinko_timer_off_event=DROP
+shinko_timer_auto_start=true
+shinko_timer_auto_stop=true

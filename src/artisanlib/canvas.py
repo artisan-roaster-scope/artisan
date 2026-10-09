@@ -234,6 +234,7 @@ class tgraphcanvas(QObject):
     onMonitorSignal = pyqtSignal()
     toggleMonitorSignal = pyqtSignal()
     toggleRecorderSignal = pyqtSignal()
+    shinkoTimerStateSignal = pyqtSignal(bool)
     processAlarmSignal = pyqtSignal(int, bool, int, str)
     alarmsetSignal = pyqtSignal(int)
     moveBackgroundSignal = pyqtSignal(str, int)
@@ -301,7 +302,7 @@ class tgraphcanvas(QObject):
         'backgroundeventsflag', 'backgroundpath', 'backgroundUUID', 'backgroundUUID', 'backgroundShowFullflag', 'backgroundKeyboardControlFlag', 'titleB', 'roastbatchnrB', 'roastbatchprefixB',
         'roastbatchposB', 'temp1B', 'temp2B', 'temp1BX', 'temp2BX', 'timeB', 'abs_timeB',
         'stemp1B', 'stemp2B', 'stemp1BX', 'stemp2BX', 'extraname1B', 'extraname2B', 'extratimexB', 'xtcurveidx', 'ytcurveidx', 'delta1B', 'delta2B', 'timeindexB',
-        'TP_time_B_loaded', 'backgroundEvents', 'backgroundEtypes', 'backgroundEvalues', 'backgroundEStrings', 'backgroundalpha', 'backgroundmetcolor',
+        'TP_time_B_loaded', 'TP_override_idx', 'backgroundEvents', 'backgroundEtypes', 'backgroundEvalues', 'backgroundEStrings', 'backgroundalpha', 'backgroundmetcolor',
         'backgroundbtcolor', 'backgroundxtcolor', 'backgroundytcolor', 'backgrounddeltaetcolor', 'backgrounddeltabtcolor', 'detectBackgroundEventTime',
         'backgroundReproduce', 'backgroundReproduceBeep', 'backgroundPlaybackEvents', 'backgroundPlaybackDROP', 'Betypes', 'backgroundFlavors', 'flavorbackgroundflag',
         'E1backgroundtimex', 'E2backgroundtimex', 'E3backgroundtimex', 'E4backgroundtimex', 'E1backgroundvalues', 'E2backgroundvalues', 'E3backgroundvalues',
@@ -1583,6 +1584,7 @@ class tgraphcanvas(QObject):
         self.loadalarmsfrombackground:bool = False # if set, alarms are loaded from background profiles
         self.alarmsfile:str = '' # filename alarms were loaded from
         self.TPalarmtimeindex:int|None = None # is set to the current  self.time index by sample(), if alarms are defined and once the TP is detected
+        self.TP_override_idx:int|None = None # source TP for imported profiles, if explicitly supplied
 
         self.rsfile:str = '' # filename Ramp/Soak patterns were loaded from
 
@@ -2224,6 +2226,7 @@ class tgraphcanvas(QObject):
         self.onMonitorSignal.connect(self.OnMonitor, type=Qt.ConnectionType.QueuedConnection) # type: ignore[call-arg]
         self.toggleMonitorSignal.connect(self.toggleMonitorTigger)
         self.toggleRecorderSignal.connect(self.toggleRecorderTigger)
+        self.shinkoTimerStateSignal.connect(self.shinkoTimerStateTrigger, type=Qt.ConnectionType.QueuedConnection) # type: ignore[call-arg]
         self.processAlarmSignal.connect(self.processAlarm, type=Qt.ConnectionType.QueuedConnection) # type: ignore[call-arg] # queued to avoid deadlock between RampSoak processing and EventRecordAction, both accessing the same critical section protected by profileDataSemaphore
         self.alarmsetSignal.connect(self.selectAlarmSet)
         self.moveBackgroundSignal.connect(self.moveBackgroundAndRedraw)
@@ -7699,6 +7702,7 @@ class tgraphcanvas(QObject):
             self.DeltaBTprojection_tx, self.DeltaBTprojection_temp, self.DeltaETprojection_tx, self.DeltaETprojection_temp = [],[],[],[]
             # timeindex
             self.timeindex = [-1,0,0,0,0,0,0,0]
+            self.TP_override_idx = None
             # we set startofx to x-axis min limit as timeindex[0] is no cleared, to keep the axis limits constant (note that startx depends on timeindex[0]!)
             self.startofx = self.startofx - charge
             #extra devices
@@ -14090,6 +14094,29 @@ class tgraphcanvas(QObject):
             self.ToggleMonitor()
         else:
             self.ToggleRecorder()
+
+    @pyqtSlot(bool)
+    def shinkoTimerStateTrigger(self, active:bool) -> None:
+        """Follow the observed COFFEE DISCOVERY timer contact while monitoring is on."""
+        if self.device != 209 or not self.aw.ser.shinko_timer_sync:
+            return
+        if active:
+            if self.aw.ser.shinko_timer_auto_start and not self.flagstart:
+                self.ToggleRecorder()
+            if self.aw.ser.shinko_timer_on_event == 'CHARGE' and self.flagstart and self.timeindex[0] < 0:
+                self.markShinkoTimerCharge()
+        elif not active and self.flagstart:
+            if self.aw.ser.shinko_timer_off_event == 'DROP' and self.timeindex[0] >= 0 and self.timeindex[6] == 0:
+                self.markDrop()
+            if self.aw.ser.shinko_timer_auto_stop:
+                self.ToggleRecorder()
+
+    def markShinkoTimerCharge(self) -> None:
+        if self.flagstart and self.timeindex[0] < 0:
+            if self.timex:
+                self.markCharge()
+            else:
+                QTimer.singleShot(250, self.markShinkoTimerCharge)
 
     #Turns START/STOP flag self.flagon to read and plot. Called from push buttonSTARTSTOP.
     @pyqtSlot(bool)

@@ -1507,7 +1507,9 @@ def exportProfile2CSV(filename:str, profile:'ProfileData') -> bool:
         # make timex zero based
         timex_zero = [tx - timex[0] for tx in timex]
         CHARGE = timex_zero[timeindex[0]] if timeindex[0] > -1 else -1
-        TP_index = findTPint(timeindex, timex, temp2)
+        override = profile.get('TP_override_idx')
+        TP_index = (override if isinstance(override, int) and 0 < override < len(timex)
+                    else findTPint(timeindex, timex, temp2))
         TP = timex_zero[TP_index] if TP_index and TP_index < len(timex_zero) else 0.
         DRYe = timex_zero[timeindex[1]] if timeindex[1] and timeindex[1] < len(timex) else 0.
         FCs = timex_zero[timeindex[2]] if timeindex[2] and timeindex[2] < len(timex) else 0.

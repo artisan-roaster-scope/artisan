@@ -111,10 +111,10 @@ except Exception: # pylint: disable=broad-except
 
 from PyQt6.QtWidgets import (QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog, QGraphicsDropShadowEffect,
                          QInputDialog, QGroupBox, QLineEdit,
-                         QSizePolicy, QVBoxLayout, QHBoxLayout, QPushButton,
+                         QSizePolicy, QVBoxLayout, QHBoxLayout, QFormLayout, QPushButton,
                          QLCDNumber, QSpinBox, QComboBox,
                          QSlider, QToolButton,
-                         QColorDialog, QFrame, QScrollArea, QProgressDialog,
+                         QColorDialog, QDialog, QDialogButtonBox, QFrame, QScrollArea, QProgressDialog,
                          QStyleFactory, QMenuBar, QMenu, QLayout, QDockWidget)
 from PyQt6.QtGui import (QScreen, QPageLayout, QAction, QWindow,
                             QKeySequence, QShortcut,
@@ -2078,6 +2078,10 @@ class ApplicationWindow(QMainWindow):
         importPetronciniAction.triggered.connect(self.importPetroncini)
         self.importMenu.addAction(importPetronciniAction)
 
+        importRoastingCompassAction = QAction('Roasting Compass CSV...', self)
+        importRoastingCompassAction.triggered.connect(self.importRoastingCompass)
+        self.importMenu.addAction(importRoastingCompassAction)
+
         importROESTAction = QAction('ROEST CSV...', self)
         importROESTAction.triggered.connect(self.importRoest)
         self.importMenu.addAction(importROESTAction)
@@ -2139,6 +2143,10 @@ class ApplicationWindow(QMainWindow):
         fileConvertFromPetronciniAction = QAction(QApplication.translate('Menu', 'Petroncini CSV...'), self)
         fileConvertFromPetronciniAction.triggered.connect(self.convertFromPetroncini)
         self.convFromMenu.addAction(fileConvertFromPetronciniAction)
+
+        fileConvertFromRoastingCompassAction = QAction(QApplication.translate('Menu', 'Roasting Compass CSV...'), self)
+        fileConvertFromRoastingCompassAction.triggered.connect(self.convertFromRoastingCompass)
+        self.convFromMenu.addAction(fileConvertFromRoastingCompassAction)
 
         fileConvertFromROESTAction = QAction(QApplication.translate('Menu', 'ROEST CSV...'), self)
         fileConvertFromROESTAction.triggered.connect(self.convertFromROEST)
@@ -5331,7 +5339,7 @@ class ApplicationWindow(QMainWindow):
         self.settooltip()
 
     def populateListMenu(self, resourceName:str, ext:str, triggered:Callable[[bool], None], menu:QMenu, addMenu:bool = True,
-                forceSubmenu:bool = False) -> None:
+                forceSubmenu:bool = False, forceSubmenuFor:set[str]|None = None) -> None:
         one_added:bool = False
         res:dict[str, list[tuple[str, str]]] = {}
         for root,dirs,files in os.walk(os.path.join(getResourcePath(),resourceName)):
@@ -5349,7 +5357,7 @@ class ApplicationWindow(QMainWindow):
         keys = list(res.keys())
         keys.sort(key=lambda v: (v.upper(), v[0].islower()))
         for k in keys:
-            if len(res[k]) > 1:
+            if len(res[k]) > 1 or (forceSubmenuFor is not None and k in forceSubmenuFor):
                 if len(keys) == 1 and not forceSubmenu:
                     for e in res[k]:
                         a = QAction(self)
@@ -5396,7 +5404,8 @@ class ApplicationWindow(QMainWindow):
             self.ConfMenu.addMenu(menu)
 
     def populateMachineMenu(self) -> None:
-        self.populateListMenu('Machines','.aset',self.openMachineSettings,self.machineMenu, addMenu=False)
+        self.populateListMenu('Machines','.aset',self.openMachineSettings,self.machineMenu,
+                              addMenu=False, forceSubmenuFor={'Fuji Royal'})
 
     @pyqtSlot(bool)
     def openMachineSettings(self, _checked:bool = False) -> None:
@@ -5557,7 +5566,7 @@ class ApplicationWindow(QMainWindow):
                             self.mugmaHost = host
                         else:
                             res = False
-                    elif not no_config and (self.qmc.device in {0, 9, 19, 53, 101, 115, 126, 196} or ((self.qmc.device == 29 or 29 in self.qmc.extradevices) and self.modbus.type in {0, 1, 2}) or
+                    elif not no_config and (self.qmc.device in {0, 9, 19, 53, 101, 115, 126, 196, 209} or ((self.qmc.device == 29 or 29 in self.qmc.extradevices) and self.modbus.type in {0, 1, 2}) or
                             (self.qmc.device == 134 and self.santokerSerial and not self.santokerBLE) or
                             (self.qmc.device == 138 and self.kaleidoSerial)): # Fuji, Center301, TC4, Hottop, Behmor or MODBUS serial, HB/ARC
                         select_device_name = None
@@ -16214,6 +16223,13 @@ class ApplicationWindow(QMainWindow):
                     return res
                 self.qmc.timeindex = remove_invalid_indices(self.qmc.timeindex)
 
+                override = profile.get('TP_override_idx')
+                self.qmc.TP_override_idx = (override if isinstance(override, int) and
+                    0 < override < data_len and
+                    (self.qmc.timeindex[0] == -1 or override > self.qmc.timeindex[0]) and
+                    (not self.qmc.timeindex[6] or override < self.qmc.timeindex[6])
+                    else None)
+
                 if self.qmc.locktimex:
                     if self.qmc.timeindex[0] != -1:
                         self.qmc.startofx = self.qmc.timex[self.qmc.timeindex[0]] + self.qmc.locktimex_start
@@ -17074,6 +17090,8 @@ class ApplicationWindow(QMainWindow):
                 pass
             profile['elevation'] = self.qmc.elevation
             profile['computed'] = self.computedProfileInformation()
+            if self.qmc.TP_override_idx is not None:
+                profile['TP_override_idx'] = self.qmc.TP_override_idx
             # add positions of main event annotations and custom event flags
             profile['anno_positions'] = self.qmc.getAnnoPositions()
             profile['flag_positions'] = self.qmc.getFlagPositions()
@@ -17320,6 +17338,54 @@ class ApplicationWindow(QMainWindow):
 
     @pyqtSlot()
     @pyqtSlot(bool)
+    def convertFromRoastingCompass(self, _:bool = False) -> None:
+        from artisanlib.roasting_compass import (convertedRoastingCompassFilename,
+                                                  extractProfileRoastingCompassCSV)
+        self.fileConvertFrom('*.csv', extractProfileRoastingCompassCSV,
+                             convertedRoastingCompassFilename,
+                             self.configureRoastingCompassCheckpoints)
+
+    def configureRoastingCompassCheckpoints(self) -> Callable[['ProfileData'], None]|None:
+        from artisanlib.roasting_compass import (CHECKPOINT_MARKERS,
+                                                 applyRoastingCompassCheckpointMapping)
+        dialog = QDialog(self)
+        dialog.setWindowTitle('Roasting Compass Checkpoints')
+        layout = QVBoxLayout(dialog)
+        layout.addWidget(QLabel('Convert checkpoints to Artisan roast markers:'))
+        form = QFormLayout()
+        selectors = []
+        for checkpoint in (1, 2, 3):
+            selector = QComboBox(dialog)
+            selector.addItem(f'NONE (keep CP{checkpoint})', 'NONE')
+            for marker in CHECKPOINT_MARKERS:
+                selector.addItem(marker, marker)
+            form.addRow(f'CP{checkpoint}', selector)
+            selectors.append(selector)
+        layout.addLayout(form)
+        buttons = QDialogButtonBox(
+            QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel,
+            parent=dialog)
+        buttons.rejected.connect(dialog.reject)
+
+        def accept_mapping() -> None:
+            selected = [selector.currentData() for selector in selectors]
+            markers = [marker for marker in selected if marker != 'NONE']
+            if len(markers) != len(set(markers)):
+                QMessageBox.warning(dialog, 'Roasting Compass Checkpoints',
+                                    'Each Artisan roast marker can be selected only once.')
+            else:
+                dialog.accept()
+
+        buttons.accepted.connect(accept_mapping)
+        layout.addWidget(buttons)
+        if dialog.exec() != QDialog.DialogCode.Accepted:
+            return None
+        choices = {checkpoint: str(selector.currentData())
+                   for checkpoint, selector in zip((1, 2, 3), selectors, strict=True)}
+        return functools.partial(applyRoastingCompassCheckpointMapping, choices=choices)
+
+    @pyqtSlot()
+    @pyqtSlot(bool)
     def convertFromOrbiter(self, _:bool = False) -> None:
         from artisanlib.orbiter import extractProfileOrbiterROP
         self.fileConvertFrom('(*.rop *.zip)', extractProfileOrbiterROP)
@@ -17351,9 +17417,14 @@ class ApplicationWindow(QMainWindow):
     #   eventsExternal2InternalValue: Callable[[int],float]
     def fileConvertFrom(self,
             ext:str,
-            extractor: Callable[[str, list[str], list[str], list[str], Callable[[int],float]],'ProfileData|None']) -> None:
+            extractor: Callable[[str, list[str], list[str], list[str], Callable[[int],float]],'ProfileData|None'],
+            target_name: Callable[[str, 'ProfileData'], str]|None = None,
+            configure_profile: Callable[[], Callable[['ProfileData'], None]|None]|None = None) -> None:
         files = self.ArtisanOpenFilesDialog(ext=ext)
         if files and len(files) > 0:
+            transform = configure_profile() if configure_profile is not None else None
+            if configure_profile is not None and transform is None:
+                return
             loaded_profile = self.curFile
             if self.qmc.reset(soundOn=False):
                 self.saveExtradeviceSettings()
@@ -17372,7 +17443,7 @@ class ApplicationWindow(QMainWindow):
                         QApplication.processEvents()
                         fname = str(QFileInfo(f).fileName())
                         fconv = str(QDir(outdir).filePath(f'{fname}.alog'))
-                        if not os.path.exists(fconv):
+                        if target_name is not None or not os.path.exists(fconv):
                             self.qmc.reset(redraw=False,soundOn=False)
                             pd = extractor(f,
                                     self.qmc.etypesdefault[:],
@@ -17380,17 +17451,24 @@ class ApplicationWindow(QMainWindow):
                                     self.qmc.artisanflavordefaultlabels[:],
                                     self.qmc.eventsExternal2InternalValue)
                             if pd is not None:
-                                self.plusAddPath(cast(dict[str,Any], pd), fconv)
-                                # add creator information
-                                pd['version'] = str(__version__)
-                                pd['revision'] = str(__revision__)
-                                pd['build'] = str(__build__)
-                                pd['signature'] = str(__signature__)
-                                pd['artisan_os'] = os_name
-                                pd['artisan_os_version'] = os_version
-                                pd['artisan_os_arch'] = os_arch
-                                # serialize to file
-                                serialize(fconv, cast(dict[str,Any], pd))
+                                if transform is not None:
+                                    transform(pd)
+                                if target_name is not None:
+                                    fconv = str(QDir(outdir).filePath(target_name(f, pd)))
+                                if not os.path.exists(fconv):
+                                    self.plusAddPath(cast(dict[str,Any], pd), fconv)
+                                    # add creator information
+                                    pd['version'] = str(__version__)
+                                    pd['revision'] = str(__revision__)
+                                    pd['build'] = str(__build__)
+                                    pd['signature'] = str(__signature__)
+                                    pd['artisan_os'] = os_name
+                                    pd['artisan_os_version'] = os_version
+                                    pd['artisan_os_arch'] = os_arch
+                                    # serialize to file
+                                    serialize(fconv, cast(dict[str,Any], pd))
+                                else:
+                                    self.sendmessage(QApplication.translate('Message','Target file {0} exists. {1} not converted.').format(fconv,fname + str(ext)))
                             else:
                                 self.sendmessage(QApplication.translate('Message','Target file {0} exists. {1} not converted.').format(fconv,fname + str(ext)))
                         else:
@@ -18409,6 +18487,14 @@ class ApplicationWindow(QMainWindow):
             #restore serial port
             settings.beginGroup('SerialPort')
             self.ser.comport = s2a(toString(settings.value('comport',self.ser.comport)))
+            self.ser.shinko_instrument_number = toInt(settings.value('shinko_instrument_number',self.ser.shinko_instrument_number))
+            self.ser.shinko_pv_divider = max(1,toInt(settings.value('shinko_pv_divider',self.ser.shinko_pv_divider)))
+            self.ser.shinko_timer_sync = toBool(settings.value('shinko_timer_sync',self.ser.shinko_timer_sync))
+            self.ser.shinko_timer_last_state = None
+            self.ser.shinko_timer_on_event = toString(settings.value('shinko_timer_on_event',self.ser.shinko_timer_on_event))
+            self.ser.shinko_timer_off_event = toString(settings.value('shinko_timer_off_event',self.ser.shinko_timer_off_event))
+            self.ser.shinko_timer_auto_start = toBool(settings.value('shinko_timer_auto_start',self.ser.shinko_timer_auto_start))
+            self.ser.shinko_timer_auto_stop = toBool(settings.value('shinko_timer_auto_stop',self.ser.shinko_timer_auto_stop))
             self.ser.baudrate = toInt(settings.value('baudrate',int(self.ser.baudrate)))
             self.ser.bytesize = toInt(settings.value('bytesize',self.ser.bytesize))
             self.ser.stopbits = toInt(settings.value('stopbits',self.ser.stopbits))
@@ -20403,6 +20489,13 @@ class ApplicationWindow(QMainWindow):
             #save serial port
             settings.beginGroup('SerialPort')
             self.settingsSetValue(settings, default_settings, 'comport',self.ser.comport, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'shinko_instrument_number',self.ser.shinko_instrument_number, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'shinko_pv_divider',self.ser.shinko_pv_divider, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'shinko_timer_sync',self.ser.shinko_timer_sync, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'shinko_timer_on_event',self.ser.shinko_timer_on_event, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'shinko_timer_off_event',self.ser.shinko_timer_off_event, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'shinko_timer_auto_start',self.ser.shinko_timer_auto_start, read_defaults)
+            self.settingsSetValue(settings, default_settings, 'shinko_timer_auto_stop',self.ser.shinko_timer_auto_stop, read_defaults)
             self.settingsSetValue(settings, default_settings, 'baudrate',self.ser.baudrate, read_defaults)
             self.settingsSetValue(settings, default_settings, 'bytesize',self.ser.bytesize, read_defaults)
             self.settingsSetValue(settings, default_settings, 'stopbits',self.ser.stopbits, read_defaults)
@@ -24104,6 +24197,8 @@ class ApplicationWindow(QMainWindow):
 
     #returns the index of the lowest point in BT; return -1 if no such value found
     def findTP(self) -> int:
+        if self.qmc.TP_override_idx is not None and 0 < self.qmc.TP_override_idx < len(self.qmc.timex):
+            return self.qmc.TP_override_idx
         return findTPint(self.qmc.timeindex, self.qmc.timex, self.qmc.temp2)
 
 
@@ -26195,11 +26290,15 @@ class ApplicationWindow(QMainWindow):
     #   artisanflavordefaultlabels:list[str]  # translated to current locale
     #   eventsExternal2InternalValue: Callable[[int],float]
     def importExternal(self, extractor:  Callable[[str, list[str], list[str], list[str], Callable[[int],float]],
-            'ProfileData'], message:str, extension:str, filename:str|None = None) -> None:
+            'ProfileData'], message:str, extension:str, filename:str|None = None,
+            configure_profile: Callable[[], Callable[['ProfileData'], None]|None]|None = None) -> None:
         try:
             if filename is None:
                 filename = self.ArtisanOpenFileDialog(msg=message,ext=extension)
             if len(filename) == 0:
+                return
+            transform = configure_profile() if configure_profile is not None else None
+            if configure_profile is not None and transform is None:
                 return
             res = self.qmc.reset(redraw=False,soundOn=False)
             if res:
@@ -26208,6 +26307,8 @@ class ApplicationWindow(QMainWindow):
                                         self.qmc.alt_etypesdefault,
                                         self.qmc.artisanflavordefaultlabels,
                                         self.qmc.eventsExternal2InternalValue)
+                if transform is not None:
+                    transform(obj)
                 res = self.setProfile(filename, obj)
 
             if res:
@@ -26276,6 +26377,14 @@ class ApplicationWindow(QMainWindow):
     def importPetroncini(self, _:bool = False) -> None:
         from artisanlib.petroncini import extractProfilePetronciniCSV
         self.importExternal(extractProfilePetronciniCSV,QApplication.translate('Message','Import {}').format('Petroncini CSV'),'*.csv')
+
+    @pyqtSlot()
+    @pyqtSlot(bool)
+    def importRoastingCompass(self, _:bool = False) -> None:
+        from artisanlib.roasting_compass import extractProfileRoastingCompassCSV
+        self.importExternal(extractProfileRoastingCompassCSV,
+                QApplication.translate('Message','Import {}').format('Roasting Compass CSV'),'*.csv',
+                configure_profile=self.configureRoastingCompassCheckpoints)
 
     @pyqtSlot()
     @pyqtSlot(bool)
