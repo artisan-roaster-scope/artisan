@@ -15,6 +15,7 @@ from artisanlib.util import decodeLocalStrict, encodeLocalStrict
 
 
 _NUMBER = re.compile(r'\d+(?:\.\d+)?')
+_ROAST_TIME = re.compile(r'(\d+):([0-5]\d)')
 CHECKPOINT_MARKERS = {
     'DRY END': 1,
     'FC START': 2,
@@ -152,6 +153,24 @@ def extractProfileRoastingCompassCSV(
             profile['ambientTemp'] = float(summary[2])
         if len(summary) > 3 and summary[3].strip():
             profile['ambient_humidity'] = float(summary[3])
+        # The first time/temperature pair in the summary is the source TP.
+        # Prefer its sample over an automatically detected later sample on a
+        # flat minimum-temperature plateau.
+        if summary_index + 2 < len(rows):
+            turning_point = rows[summary_index + 2]
+            if len(turning_point) > 1:
+                match = _ROAST_TIME.fullmatch(turning_point[0].strip())
+                if match and _NUMBER.fullmatch(turning_point[1].strip()):
+                    seconds = int(match[1]) * 60 + int(match[2])
+                    if 0 < seconds < timex[-1]:
+                        position = bisect_left(timex, seconds)
+                        candidates = (position - 1, position)
+                        index = min((i for i in candidates if 0 <= i < len(timex)),
+                                    key=lambda i: abs(timex[i] - seconds))
+                        temperature = float(turning_point[1])
+                        if (abs(timex[index] - seconds) <= 1 and
+                                abs(temp2[index] - temperature) <= 0.2):
+                            profile['TP_override_idx'] = index
         if summary_index + 1 < len(rows):
             details = rows[summary_index + 1]
             weather = details[0].strip() if details else ''

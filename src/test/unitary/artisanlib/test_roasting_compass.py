@@ -11,6 +11,33 @@ from artisanlib.util import (decodeLocalStrict, encodeLocalStrict,
 
 
 class RoastingCompassImportTest(unittest.TestCase):
+    def test_summary_turning_point_precedes_flat_bt_minimum(self) -> None:
+        with TemporaryDirectory() as directory:
+            file = Path(directory) / 'turning_point.csv'
+            rows = [
+                ['制御データ', '', '', ''],
+                ['日　付', '保存時間', '製品温度(℃)', 'チェックポイント'],
+            ]
+            rows += [['2026/10/03', f'8:{23 + second // 60:02d}:{second % 60:02d}',
+                      '96.7' if 68 <= second <= 72 else str(190 - second),
+                      '1' if second == 73 else '0']
+                     for second in range(76)]
+            rows += [
+                ['', '', '', ''],
+                ['2026/10/03 8:23:00', '豆名', '', ''],
+                ['', '', '', ''],
+                ['01:08', '96.7', '01:13', '117.0'],
+            ]
+            with file.open('w', encoding='cp932', newline='') as stream:
+                csv.writer(stream).writerows(rows)
+            profile = extractProfileRoastingCompassCSV(
+                str(file), [], [], [], events_external_to_internal_value)
+
+        self.assertEqual(profile['TP_override_idx'], 68)
+        self.assertEqual(profile['timex'][profile['TP_override_idx']], 68)
+        self.assertEqual(profile['temp2'][profile['TP_override_idx']], 96.7)
+        self.assertIn('CP1', profile['specialeventsStrings'])
+
     def test_checkpoint_mapping_uses_roast_markers_and_keeps_none(self) -> None:
         profile = {
             'timeindex': [0, 0, 0, 0, 0, 0, 4, 0],
@@ -65,6 +92,7 @@ class RoastingCompassImportTest(unittest.TestCase):
         self.assertEqual(profile['temp1'], [-1.0] * 4)
         self.assertEqual(profile['timeindex'][0], 0)
         self.assertEqual(profile['timeindex'][6], 3)
+        self.assertNotIn('TP_override_idx', profile)  # summary TP lies beyond the samples
         self.assertEqual(profile['specialevents'], [0, 0, 1, 2, 3])
         self.assertEqual(profile['specialeventstype'], [3, 2, 4, 4, 4])
         self.assertEqual(profile['specialeventsStrings'],

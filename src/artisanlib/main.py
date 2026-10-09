@@ -16223,6 +16223,13 @@ class ApplicationWindow(QMainWindow):
                     return res
                 self.qmc.timeindex = remove_invalid_indices(self.qmc.timeindex)
 
+                override = profile.get('TP_override_idx')
+                self.qmc.TP_override_idx = (override if isinstance(override, int) and
+                    0 < override < data_len and
+                    (self.qmc.timeindex[0] == -1 or override > self.qmc.timeindex[0]) and
+                    (not self.qmc.timeindex[6] or override < self.qmc.timeindex[6])
+                    else None)
+
                 if self.qmc.locktimex:
                     if self.qmc.timeindex[0] != -1:
                         self.qmc.startofx = self.qmc.timex[self.qmc.timeindex[0]] + self.qmc.locktimex_start
@@ -17083,6 +17090,8 @@ class ApplicationWindow(QMainWindow):
                 pass
             profile['elevation'] = self.qmc.elevation
             profile['computed'] = self.computedProfileInformation()
+            if self.qmc.TP_override_idx is not None:
+                profile['TP_override_idx'] = self.qmc.TP_override_idx
             # add positions of main event annotations and custom event flags
             profile['anno_positions'] = self.qmc.getAnnoPositions()
             profile['flag_positions'] = self.qmc.getFlagPositions()
@@ -24188,6 +24197,8 @@ class ApplicationWindow(QMainWindow):
 
     #returns the index of the lowest point in BT; return -1 if no such value found
     def findTP(self) -> int:
+        if self.qmc.TP_override_idx is not None and 0 < self.qmc.TP_override_idx < len(self.qmc.timex):
+            return self.qmc.TP_override_idx
         return findTPint(self.qmc.timeindex, self.qmc.timex, self.qmc.temp2)
 
 
